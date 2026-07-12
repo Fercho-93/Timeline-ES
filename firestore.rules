@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    match /rooms/{roomId} {
+      function isParticipant() {
+        return signedIn() && request.auth.uid in resource.data.playerOrder;
+      }
+
+      function isHost() {
+        return signedIn() && resource.data.hostUid == request.auth.uid;
+      }
+
+      function isCurrentPlayer() {
+        return isParticipant()
+          && resource.data.status == 'playing'
+          && resource.data.playerOrder[resource.data.current] == request.auth.uid;
+      }
+
+      function validJoin() {
+        return signedIn()
+          && resource.data.status == 'lobby'
+          && !(request.auth.uid in resource.data.playerOrder)
+          && resource.data.playerOrder.size() < 9
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['players', 'playerOrder', 'version', 'updatedAt'])
+          && request.resource.data.playerOrder.size() == resource.data.playerOrder.size() + 1
+          && request.resource.data.playerOrder[resource.data.playerOrder.size()] == request.auth.uid
+          && request.resource.data.players.diff(resource.data.players).affectedKeys()
+            .hasOnly([request.auth.uid])
+          && request.resource.data.players[request.auth.uid].name is string
+          && request.resource.data.players[request.auth.uid].name.size() >= 1
+          && request.resource.data.players[request.auth.uid].name.size() <= 18
+          && request.resource.data.players[request.auth.uid].hand.size() == 0
+          && request.resource.data.version == resource.data.version + 1;
+      }
+
+      allow get: if signedIn() && (resource.data.status == 'lobby' || isParticipant());
+      allow list: if false;
+
+      allow create: if signedIn()
+        && request.resource.data.hostUid == request.auth.uid
+        && request.resource.data.status == 'lobby'
+        && request.resource.data.playerOrder.size() == 1
+        && request.resource.data.playerOrder[0] == request.auth.uid
+        && request.resource.data.players[request.auth.uid].name is string;
+
+      allow update: if validJoin()
+        || isHost()
+        || (isCurrentPlayer()
+          && request.resource.data.version == resource.data.version + 1);
+
+      allow delete: if isHost();
+    }
+  }
+}

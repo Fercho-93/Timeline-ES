@@ -1,5 +1,5 @@
-const CACHE = "hilo-espana-v3";
-const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./app.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
+const CACHE = "hilo-espana-v4";
+const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -15,5 +15,5 @@ self.addEventListener("fetch", event => {
     const copy = response.clone();
     caches.open(CACHE).then(cache => cache.put(event.request, copy));
     return response;
-  }).catch(() => caches.match("./index.html"))));
+  }).catch(() => event.request.mode === "navigate" ? caches.match("./index.html") : Response.error())));
 });

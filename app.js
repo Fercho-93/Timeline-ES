@@ -70,7 +70,8 @@
           <p class="lead">Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.</p>
           <div class="hero-stats"><span class="pill">${window.HISTORY_CARDS.length} hechos</span><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
           <div class="actions">
-            <button class="btn btn-primary" data-action="setup">Comenzar partida <span>→</span></button>
+            <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
+            <button class="btn btn-secondary" data-action="online">Varios móviles</button>
             ${game ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
           </div>
         </div>
@@ -233,6 +234,18 @@
     showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
   }
 
+  async function launchOnline(roomCode = "") {
+    app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2>Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`;
+    try {
+      const online = await import("./online.js");
+      await online.openOnlineMode({ roomCode });
+    } catch (error) {
+      console.error(error);
+      showToast("No se pudo conectar. Comprueba tu conexión a internet.");
+      home();
+    }
+  }
+
   app.addEventListener("input", event => {
     if (event.target.closest("#players")) syncStarterOptions();
   });
@@ -244,6 +257,7 @@
     if (action === "home") home();
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "setup") setup();
+    else if (action === "online") launchOnline();
     else if (action === "continue") { game.winner ? renderWinner(game.players.find(p => p.id === game.winner)) : renderPass(); }
     else if (action === "add-player") {
       const count = document.querySelectorAll("#players .player-row").length;
@@ -266,5 +280,7 @@
   });
 
   if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js"));
-  home();
+  const invitedRoom = new URLSearchParams(location.search).get("room") || "";
+  if (invitedRoom) launchOnline(invitedRoom);
+  else home();
 })();
