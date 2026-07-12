@@ -74,7 +74,7 @@
             ${game ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
           </div>
         </div>
-        <div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt=""><div class="art-seal"><span>72</span><small>momentos<br>de historia</small></div><div class="art-caption">De Hispania a la democracia</div></div>
+        <div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt=""><div class="art-seal"><span>${window.HISTORY_CARDS.length}</span><small>momentos<br>de historia</small></div><div class="art-caption">De Hispania a la democracia</div></div>
       </section>
     </div>`;
   }

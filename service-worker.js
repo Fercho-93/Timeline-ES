@@ -1,4 +1,4 @@
-const CACHE = "hilo-espana-v2";
+const CACHE = "hilo-espana-v3";
 const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./app.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {
