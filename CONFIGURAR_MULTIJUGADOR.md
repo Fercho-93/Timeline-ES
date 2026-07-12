@@ -40,7 +40,7 @@ El archivo `firestore.rules` no es ejecutado por GitHub Pages; se incluye como c
 1. Abre la web actualizada con conexión a internet.
 2. Elige **Varios móviles → Crear una sala**.
 3. Escribe el nombre del anfitrión.
-4. Comparte el enlace generado.
+4. Comparte el enlace generado o pulsa **Mostrar QR** para que el resto lo escanee con la cámara.
 5. Abre el enlace desde un segundo móvil e introduce otro nombre.
 6. El anfitrión selecciona las cartas iniciales y la persona más joven.
 7. Pulsa **Barajar y empezar**.
@@ -52,6 +52,7 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
 - No se solicitan correos, teléfonos ni contraseñas.
 - Las cuentas anónimas las administra Firebase.
 - Las salas utilizan códigos aleatorios de ocho caracteres.
+- Los códigos QR se generan dentro del propio dispositivo y no envían la invitación a servicios externos.
 - La interfaz solo enseña a cada participante su propia mano.
 - Es un juego doméstico: una persona con conocimientos técnicos y acceso a la sala podría inspeccionar los datos enviados al navegador.
 - El modo compartido necesita internet. El modo de un móvil continúa funcionando sin conexión.

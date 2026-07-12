@@ -5,7 +5,7 @@ Juego de cronología de la historia de España para 2–9 personas, diseñado pa
 La aplicación ofrece dos alternativas:
 
 - **Un solo móvil:** no necesita conexión y conserva las partidas localmente.
-- **Varios móviles:** crea una sala compartida con Firebase para que cada persona juegue su mano y todos vean la cronología en directo.
+- **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
 
 ## Probarlo en un ordenador
 
