@@ -20,6 +20,20 @@
     return card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year);
   }
 
+  function eraForCard(card) {
+    if (card.year < 711) return { key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" };
+    if (card.year < 1492) return { key: "medieval", name: "Edad Media", symbol: "♜" };
+    if (card.year < 1700) return { key: "imperio", name: "Monarquía Hispánica", symbol: "✦" };
+    if (card.year < 1808) return { key: "ilustracion", name: "Ilustración", symbol: "☼" };
+    if (card.year < 1931) return { key: "moderna", name: "España contemporánea", symbol: "⌁" };
+    if (card.year < 1975) return { key: "sigloxx", name: "Siglo XX", symbol: "◈" };
+    return { key: "democracia", name: "Democracia", symbol: "◎" };
+  }
+
+  function initials(name) {
+    return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase();
+  }
+
   function shuffle(items) {
     const copy = [...items];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -49,15 +63,18 @@
   function home() {
     screen = "home";
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
-      <section class="hero">
-        <div class="eyebrow">Historia · intuición · sobremesa</div>
-        <h1>¿Antes o después?</h1>
-        <p class="lead">Construid juntos una línea del tiempo de España. Coloca tus hechos en el lugar correcto y sé la única persona que se queda sin cartas.</p>
-        <div class="hero-stats"><span class="pill">${window.HISTORY_CARDS.length} hechos</span><span class="pill">2–6 jugadores</span><span class="pill">Sin internet</span><span class="pill">Un solo móvil</span></div>
-        <div class="actions">
-          <button class="btn btn-primary" data-action="setup">Nueva partida</button>
-          ${game ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : ''}
+      <section class="hero hero-premium">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> Historia · intuición · sobremesa</div>
+          <h1>¿Antes o<br><em>después?</em></h1>
+          <p class="lead">Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.</p>
+          <div class="hero-stats"><span class="pill">${window.HISTORY_CARDS.length} hechos</span><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
+          <div class="actions">
+            <button class="btn btn-primary" data-action="setup">Comenzar partida <span>→</span></button>
+            ${game ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
+          </div>
         </div>
+        <div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt=""><div class="art-seal"><span>72</span><small>momentos<br>de historia</small></div><div class="art-caption">De Hispania a la democracia</div></div>
       </section>
     </div>`;
   }
@@ -65,15 +82,15 @@
   function setup() {
     screen = "setup";
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
-      <section><div class="eyebrow">Preparación</div><h2>¿Quién juega?</h2><p class="lead">Añade los nombres y marca a la persona más joven: comenzará la partida.</p>
+      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> Preparación</div><h2>La historia empieza aquí</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
-          <button class="btn btn-ghost" data-action="add-player">+ Añadir jugador</button>
+          <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
           <div class="setup-grid">
             <div class="field"><label for="starter">La persona más joven</label><select id="starter"><option value="0">Jugador 1</option><option value="1">Jugador 2</option></select></div>
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
           </div>
-          <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar</button>
+          <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
       </section>
     </div>`;
@@ -111,7 +128,7 @@
     screen = "pass";
     const player = currentPlayer();
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
-      <section class="pass-screen"><div class="panel"><div class="big-icon">📱</div><div class="eyebrow">Ronda ${game.round}</div><h2>Pásale el móvil a ${escapeHtml(player.name)}</h2><p>Las fechas siguen ocultas. Cuando lo tenga, puede comenzar su turno.</p><button class="btn btn-primary btn-block" data-action="ready">Soy ${escapeHtml(player.name)}</button></div></section>
+      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion">${escapeHtml(initials(player.name))}</div><div class="eyebrow">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><h2>El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p><button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
     </div>`;
   }
 
@@ -125,14 +142,15 @@
       slots.push(`<button class="slot" data-action="place" data-index="${i}" ${selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${i + 1}"><span>+</span></button>`);
       if (i < timelineCards.length) {
         const card = timelineCards[i];
-        slots.push(`<article class="timeline-card"><div class="year">${formatYear(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></article>`);
+        const era = eraForCard(card);
+        slots.push(`<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatYear(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
       }
     }
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
-      <div class="game-head"><div><div class="turn-label">Ronda ${game.round} · Turno de</div><div class="turn-name">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
-      <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}">${escapeHtml(p.name)} · ${p.hand.length}</span>`).join("")}</div>
+      <div class="game-head"><div><div class="turn-label">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
+      <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
       <section><div class="hand-title"><h3>Línea temporal</h3><small>${game.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-      <section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}"><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong></button>`).join("")}</div><p class="hint">${selectedCardId ? "Ahora toca un hueco + de la línea temporal" : "Elige una carta para colocarla"}</p></section>
+      <section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => { const era = eraForCard(card); return `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}"><span class="card-era era-${era.key}"><i>${era.symbol}</i>${era.name}</span><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla"}</p></section>
     </div>`;
     if (selectedCardId) setTimeout(() => document.querySelector(".timeline-wrap")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
@@ -168,7 +186,8 @@
   function renderResult() {
     gameView();
     const { correct, card } = result;
-    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="big-icon">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno</button></div></div>`);
+    const era = eraForCard(card);
+    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   function finishTurn() {
@@ -200,7 +219,7 @@
 
   function rules() {
     const returnTo = screen;
-    app.insertAdjacentHTML("beforeend", `<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="eyebrow">Reglas rápidas</div><h2>Cómo jugar</h2><ol><li>Reparte 4 cartas por persona (o la cantidad que elijáis), siempre con la fecha oculta.</li><li>La persona más joven comienza. En su turno elige una carta y el hueco donde cree que encaja.</li><li>Al revelar la fecha, si está bien ordenada permanece en la línea. Si falla, se descarta y roba otra.</li><li>Todos juegan una vez por ronda, en el orden indicado.</li><li>Gana quien sea la única persona que termina una ronda sin cartas. Si varias lo logran, reciben una carta y desempatan.</li></ol><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`);
+    app.insertAdjacentHTML("beforeend", `<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="eyebrow">Reglas rápidas</div><h2>Cómo jugar</h2><ol><li>Pueden jugar de 2 a 9 personas. Reparte 4 cartas a cada una (o la cantidad que elijáis), siempre con la fecha oculta.</li><li>La persona más joven comienza. En su turno elige una carta y el hueco donde cree que encaja.</li><li>Al revelar la fecha, si está bien ordenada permanece en la línea. Si falla, se descarta y roba otra.</li><li>Todos juegan una vez por ronda, en el orden indicado.</li><li>Gana quien sea la única persona que termina una ronda sin cartas. Si varias lo logran, reciben una carta y desempatan.</li></ol><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`);
   }
 
   function gameMenu() {
@@ -228,7 +247,7 @@
     else if (action === "continue") { game.winner ? renderWinner(game.players.find(p => p.id === game.winner)) : renderPass(); }
     else if (action === "add-player") {
       const count = document.querySelectorAll("#players .player-row").length;
-      if (count >= 6) return showToast("El máximo es de 6 jugadores");
+      if (count >= 9) return showToast("El máximo es de 9 jugadores");
       document.getElementById("players").insertAdjacentHTML("beforeend", `<div class="player-row"><input aria-label="Nombre del jugador ${count + 1}" value="Jugador ${count + 1}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div>`);
       syncStarterOptions();
     } else if (action === "remove-player") {

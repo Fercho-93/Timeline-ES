@@ -1,5 +1,5 @@
-const CACHE = "hilo-espana-v1";
-const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./app.js", "./manifest.webmanifest", "./icon.svg"];
+const CACHE = "hilo-espana-v2";
+const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./app.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));

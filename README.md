@@ -1,6 +1,6 @@
 # Hilo de España
 
-Juego de cronología de la historia de España para 2–6 personas, diseñado para jugarse pasando un solo móvil. Incluye 72 cartas y funciona sin conexión después de instalarse como aplicación web.
+Juego de cronología de la historia de España para 2–9 personas, diseñado para jugarse pasando un solo móvil. Incluye 72 cartas y funciona sin conexión después de instalarse como aplicación web.
 
 ## Probarlo en un ordenador
 
