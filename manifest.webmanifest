@@ -1,0 +1,12 @@
+{
+  "name": "Hilo de España",
+  "short_name": "Hilo",
+  "description": "Ordena los grandes hechos de la historia de España.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4eddf",
+  "theme_color": "#9f2f25",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
