@@ -16,7 +16,8 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
-const cardById = new Map(window.HISTORY_CARDS.map(card => [card.id, card]));
+const MODE_CARDS = { history: window.HISTORY_CARDS, movies: window.MOVIE_CARDS };
+const MODE_NAMES = { history: "Historia de España", movies: "Estrenos de cine" };
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 let user = null;
@@ -26,13 +27,23 @@ let roomState = null;
 let unsubscribeRoom = null;
 let selectedCardId = null;
 let busy = false;
+let selectedModeKey = "history";
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
 }
 
 function formatYear(card) {
+  if (card.label) return card.label;
   return card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year);
+}
+
+function modeCards(modeKey = roomState?.mode || selectedModeKey) {
+  return MODE_CARDS[modeKey] || MODE_CARDS.history;
+}
+
+function getCard(id) {
+  return modeCards().find(card => card.id === id);
 }
 
 function initials(name) {
@@ -40,6 +51,14 @@ function initials(name) {
 }
 
 function eraForCard(card) {
+  if ((roomState?.mode || selectedModeKey) === "movies") {
+    if (card.year < 1930) return { key: "pioneros", name: "Cine pionero", symbol: "▥" };
+    if (card.year < 1960) return { key: "clasico", name: "Cine clásico", symbol: "★" };
+    if (card.year < 1980) return { key: "nuevocine", name: "Nuevo cine", symbol: "◉" };
+    if (card.year < 2000) return { key: "blockbuster", name: "Era blockbuster", symbol: "◆" };
+    if (card.year < 2010) return { key: "milenio", name: "Nuevo milenio", symbol: "✦" };
+    return { key: "actual", name: "Cine actual", symbol: "▷" };
+  }
   if (card.year < 711) return { key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" };
   if (card.year < 1492) return { key: "medieval", name: "Edad Media", symbol: "♜" };
   if (card.year < 1700) return { key: "imperio", name: "Monarquía Hispánica", symbol: "✦" };
@@ -50,7 +69,8 @@ function eraForCard(card) {
 }
 
 function header(extra = "") {
-  return `<header class="topbar"><div class="brand"><span class="brand-mark">⌛</span>Hilo de España <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
+  const modeName = MODE_NAMES[roomState?.mode || selectedModeKey] || MODE_NAMES.history;
+  return `<header class="topbar"><div class="brand"><span class="brand-mark">${(roomState?.mode || selectedModeKey) === "movies" ? "🎬" : "🏛️"}</span>Hilo · ${modeName} <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
 }
 
 function showToast(message) {
@@ -238,6 +258,7 @@ async function ensureAuth() {
 }
 
 export async function openOnlineMode(options = {}) {
+  selectedModeKey = MODE_CARDS[options.modeKey] ? options.modeKey : "history";
   renderEntry(cleanCode(options.roomCode));
   await ensureAuth();
   const invited = cleanCode(options.roomCode);
@@ -255,7 +276,7 @@ export async function openOnlineMode(options = {}) {
 
 function renderEntry(invited = "") {
   appEl.innerHTML = `<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="back">Salir</button>')}
-    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Modo multijugador</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
+    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${MODE_NAMES[selectedModeKey]}</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid">
       <form class="panel online-form" data-online-form="create"><span class="form-number">01</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
       <form class="panel online-form" data-online-form="join"><span class="form-number">02</span><h3>Entrar en una sala</h3><p>Usa el código que aparece en el móvil anfitrión.</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name"></div><button class="btn btn-secondary btn-block" type="submit">Unirme a la partida</button></form>
@@ -273,6 +294,7 @@ async function createRoom(name) {
     const reference = doc(db, "rooms", code);
     await setDoc(reference, {
       roomCode: code,
+      mode: selectedModeKey,
       hostUid: user.uid,
       status: "lobby",
       phase: "lobby",
@@ -333,6 +355,8 @@ function connectToRoom(code) {
       return;
     }
     roomState = snapshot.data();
+    roomState.mode = roomState.mode || "history";
+    selectedModeKey = roomState.mode;
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
     else renderGame();
@@ -363,7 +387,7 @@ async function startRoom() {
       const snapshot = await transaction.get(roomRef);
       const data = snapshot.data();
       if (data.hostUid !== user.uid || data.status !== "lobby" || data.playerOrder.length < 2) throw new Error("INVALID_START");
-      const deck = shuffle(window.HISTORY_CARDS.map(card => card.id));
+      const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
       const players = { ...data.players };
       data.playerOrder.forEach(uid => { players[uid] = { ...players[uid], hand: deck.splice(0, handSize) }; });
       const timeline = [deck.shift()];
@@ -386,7 +410,7 @@ function renderGame() {
   const currentUid = roomState.playerOrder[roomState.current];
   const currentPlayer = roomState.players[currentUid];
   const myTurn = currentUid === user.uid && roomState.phase === "turn";
-  const timelineCards = roomState.timeline.map(id => cardById.get(id));
+  const timelineCards = roomState.timeline.map(id => getCard(id));
   const slots = [];
   for (let index = 0; index <= timelineCards.length; index++) {
     slots.push(`<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1}"><span>+</span></button>`);
@@ -401,14 +425,14 @@ function renderGame() {
     <div class="game-head"><div><div class="turn-label">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
     <section><div class="hand-title"><h3>Línea temporal</h3><small>${roomState.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = cardById.get(id); const era = eraForCard(card); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" ${myTurn ? "" : "disabled"}><span class="card-era era-${era.key}"><i>${era.symbol}</i>${era.name}</span><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
+    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); const era = eraForCard(card); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" ${myTurn ? "" : "disabled"}><span class="card-era era-${era.key}"><i>${era.symbol}</i>${era.name}</span><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
   </div>`;
 }
 
 function revealOverlay(currentUid) {
   const reveal = roomState.reveal;
-  const card = cardById.get(reveal.cardId);
+  const card = getCard(reveal.cardId);
   const era = eraForCard(card);
   const canContinue = user.uid === currentUid || user.uid === roomState.hostUid;
   return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
@@ -426,9 +450,9 @@ async function placeCard(index) {
       if (data.status !== "playing" || data.phase !== "turn" || currentUid !== user.uid) throw new Error("NOT_TURN");
       const hand = [...data.players[user.uid].hand];
       if (!hand.includes(playedId)) throw new Error("NO_CARD");
-      const card = cardById.get(playedId);
-      const previous = index > 0 ? cardById.get(data.timeline[index - 1]) : null;
-      const next = index < data.timeline.length ? cardById.get(data.timeline[index]) : null;
+      const card = getCard(playedId);
+      const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
+      const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
       const correct = (!previous || card.year >= previous.year) && (!next || card.year <= next.year);
       hand.splice(hand.indexOf(playedId), 1);
       const timeline = [...data.timeline];
@@ -574,3 +598,4 @@ document.addEventListener("click", event => {
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
 });
+
