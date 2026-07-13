@@ -285,7 +285,7 @@
   async function launchOnline(roomCode = "") {
     app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2>Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`;
     try {
-      const online = await import("./online.js");
+      const online = await import("./online.js?v=7");
       await online.openOnlineMode({ roomCode, modeKey: selectedModeKey });
     } catch (error) {
       console.error(error);
@@ -328,7 +328,7 @@
     else if (action === "abandon") { game = null; saveGame(); home(); }
   });
 
-  if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js"));
+  if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js?v=7", { updateViaCache: "none" }));
   const invitedRoom = new URLSearchParams(location.search).get("room") || "";
   if (invitedRoom) launchOnline(invitedRoom);
   else home();
