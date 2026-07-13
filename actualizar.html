@@ -77,7 +77,7 @@
       <div class="mark" aria-hidden="true">&#8635;</div>
       <h1>Actualizando Hilo&hellip;</h1>
       <p id="status" role="status">Eliminando la versi&oacute;n antigua del dispositivo.</p>
-      <a id="continue" href="./?actualizado=1">Abrir la versi&oacute;n nueva</a>
+      <a id="continue" href="./?actualizado=1" target="_blank" rel="noopener">Abrir la versi&oacute;n nueva en otra pestaña</a>
     </main>
 
     <script>
@@ -99,8 +99,9 @@
           localStorage.clear();
           sessionStorage.clear();
 
-          status.textContent = "Actualizaci\u00f3n completada. Abriendo la versi\u00f3n nueva\u2026";
-          window.location.replace(`./?actualizado=${Date.now()}`);
+          status.textContent = "Limpieza completada. Pulsa el bot\\u00f3n para abrir la versi\\u00f3n nueva en otra pesta\\u00f1a.";
+          continueLink.href = `./?actualizado=${Date.now()}`;
+          continueLink.classList.add("visible");
         } catch (error) {
           status.textContent = "No se pudo completar autom\u00e1ticamente. Pulsa el bot\u00f3n para continuar.";
           continueLink.classList.add("visible");
