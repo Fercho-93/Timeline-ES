@@ -31,6 +31,7 @@ Sube todos los archivos de esta versión. En especial deben estar:
 - `styles.css`
 - `service-worker.js`
 - `cards.js`
+- `movies.js`
 - la carpeta `assets`
 
 El archivo `firestore.rules` no es ejecutado por GitHub Pages; se incluye como copia de seguridad de las reglas publicadas en Firebase.
@@ -56,3 +57,4 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
 - La interfaz solo enseña a cada participante su propia mano.
 - Es un juego doméstico: una persona con conocimientos técnicos y acceso a la sala podría inspeccionar los datos enviados al navegador.
 - El modo compartido necesita internet. El modo de un móvil continúa funcionando sin conexión.
+

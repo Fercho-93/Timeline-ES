@@ -3,8 +3,25 @@
 
   const app = document.getElementById("app");
   const toast = document.getElementById("toast");
-  const STORAGE_KEY = "hilo-espana-game-v1";
-  const cardsById = new Map(window.HISTORY_CARDS.map(card => [card.id, card]));
+  const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
+  const LEGACY_STORAGE_KEY = "hilo-espana-game-v1";
+  const MODES = {
+    history: {
+      key: "history", name: "Historia de España", shortName: "España", icon: "🏛️",
+      eyebrow: "Historia · intuición · sobremesa",
+      description: "Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.",
+      cardLabel: "hechos", caption: "De Hispania a la democracia", cards: window.HISTORY_CARDS
+    },
+    movies: {
+      key: "movies", name: "Estrenos de cine", shortName: "Cine", icon: "🎬",
+      eyebrow: "Cine · memoria · palomitas",
+      description: "Ordenad grandes películas por su año de estreno. De los pioneros del cine a los éxitos más recientes.",
+      cardLabel: "películas", caption: "De Méliès a nuestros días", cards: window.MOVIE_CARDS
+    }
+  };
+  let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || "history";
+  if (!MODES[selectedModeKey]) selectedModeKey = "history";
+  let cardsById = new Map(MODES[selectedModeKey].cards.map(card => [card.id, card]));
   let screen = "home";
   let game = loadGame();
   let selectedCardId = null;
@@ -20,7 +37,29 @@
     return card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year);
   }
 
+  function currentMode() { return MODES[selectedModeKey]; }
+
+  function storageKey() { return `hilo-game-${selectedModeKey}-v1`; }
+
+  function setMode(modeKey) {
+    if (!MODES[modeKey]) return;
+    selectedModeKey = modeKey;
+    localStorage.setItem(MODE_STORAGE_KEY, modeKey);
+    cardsById = new Map(currentMode().cards.map(card => [card.id, card]));
+    game = loadGame();
+    selectedCardId = null;
+    result = null;
+  }
+
   function eraForCard(card) {
+    if (selectedModeKey === "movies") {
+      if (card.year < 1930) return { key: "pioneros", name: "Cine pionero", symbol: "▥" };
+      if (card.year < 1960) return { key: "clasico", name: "Cine clásico", symbol: "★" };
+      if (card.year < 1980) return { key: "nuevocine", name: "Nuevo cine", symbol: "◉" };
+      if (card.year < 2000) return { key: "blockbuster", name: "Era blockbuster", symbol: "◆" };
+      if (card.year < 2010) return { key: "milenio", name: "Nuevo milenio", symbol: "✦" };
+      return { key: "actual", name: "Cine actual", symbol: "▷" };
+    }
     if (card.year < 711) return { key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" };
     if (card.year < 1492) return { key: "medieval", name: "Edad Media", symbol: "♜" };
     if (card.year < 1700) return { key: "imperio", name: "Monarquía Hispánica", symbol: "✦" };
@@ -44,38 +83,47 @@
   }
 
   function saveGame() {
-    if (game) localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
-    else localStorage.removeItem(STORAGE_KEY);
+    if (game) localStorage.setItem(storageKey(), JSON.stringify(game));
+    else localStorage.removeItem(storageKey());
   }
 
   function loadGame() {
     try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      let raw = localStorage.getItem(storageKey());
+      if (!raw && selectedModeKey === "history") raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      const stored = JSON.parse(raw);
       if (!stored || !stored.players || !stored.timeline) return null;
+      stored.mode = stored.mode || selectedModeKey;
       return stored;
     } catch { return null; }
   }
 
   function header(extra = "") {
-    return `<header class="topbar"><div class="brand"><span class="brand-mark">⌛</span>Hilo de España</div>${extra}</header>`;
+    return `<header class="topbar"><div class="brand"><span class="brand-mark">${currentMode().icon}</span>Hilo · ${currentMode().shortName}</div>${extra}</header>`;
   }
 
   function home() {
     screen = "home";
+    const mode = currentMode();
+    const modePicker = `<div class="mode-switch" role="group" aria-label="Modalidad de juego">${Object.values(MODES).map(item => `<button class="mode-option ${item.key === selectedModeKey ? "active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${item.key === selectedModeKey}"><span>${item.icon}</span><b>${item.name}</b></button>`).join("")}</div>`;
+    const heroArt = selectedModeKey === "history"
+      ? `<div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt=""><div class="art-seal"><span>${mode.cards.length}</span><small>momentos<br>de historia</small></div><div class="art-caption">${mode.caption}</div></div>`
+      : `<div class="hero-art hero-cinema" aria-hidden="true"><div class="cinema-symbol">🎬</div><div class="film-strip"></div><div class="art-seal"><span>${mode.cards.length}</span><small>grandes<br>estrenos</small></div><div class="art-caption">${mode.caption}</div></div>`;
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
+      ${modePicker}
       <section class="hero hero-premium">
         <div class="hero-copy">
-          <div class="eyebrow"><span class="eyebrow-line"></span> Historia · intuición · sobremesa</div>
+          <div class="eyebrow"><span class="eyebrow-line"></span> ${mode.eyebrow}</div>
           <h1>¿Antes o<br><em>después?</em></h1>
-          <p class="lead">Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.</p>
-          <div class="hero-stats"><span class="pill">${window.HISTORY_CARDS.length} hechos</span><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
+          <p class="lead">${mode.description}</p>
+          <div class="hero-stats"><span class="pill">${mode.cards.length} ${mode.cardLabel}</span><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
           <div class="actions">
             <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
             <button class="btn btn-secondary" data-action="online">Varios móviles</button>
-            ${game ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
+            ${game && game.mode === selectedModeKey ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
           </div>
         </div>
-        <div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt=""><div class="art-seal"><span>${window.HISTORY_CARDS.length}</span><small>momentos<br>de historia</small></div><div class="art-caption">De Hispania a la democracia</div></div>
+        ${heroArt}
       </section>
     </div>`;
   }
@@ -83,7 +131,7 @@
   function setup() {
     screen = "setup";
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
-      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> Preparación</div><h2>La historia empieza aquí</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
+      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2>La partida empieza aquí</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
           <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
@@ -112,10 +160,10 @@
     const names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
     const handSize = Number(document.getElementById("hand-size").value);
     const starter = Number(document.getElementById("starter").value);
-    const shuffled = shuffle(window.HISTORY_CARDS.map(card => card.id));
+    const shuffled = shuffle(currentMode().cards.map(card => card.id));
     const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize) }));
     const timeline = [shuffled.shift()];
-    game = { players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null };
+    game = { mode: selectedModeKey, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null };
     selectedCardId = null;
     result = null;
     passReady = false;
@@ -238,7 +286,7 @@
     app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2>Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`;
     try {
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode });
+      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey });
     } catch (error) {
       console.error(error);
       showToast("No se pudo conectar. Comprueba tu conexión a internet.");
@@ -255,6 +303,7 @@
     if (!target) return;
     const action = target.dataset.action;
     if (action === "home") home();
+    else if (action === "set-mode") { setMode(target.dataset.mode); home(); }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();
@@ -284,3 +333,4 @@
   if (invitedRoom) launchOnline(invitedRoom);
   else home();
 })();
+

@@ -1,6 +1,13 @@
-# Hilo de España
+# Hilo
 
-Juego de cronología de la historia de España para 2–9 personas, diseñado para jugarse pasando un solo móvil. Incluye 190 cartas verificadas y funciona sin conexión después de instalarse como aplicación web.
+Juego de cronología para 2–9 personas, diseñado para jugarse pasando un solo móvil o mediante una sala compartida. Funciona sin conexión después de instalarse como aplicación web, salvo cuando se utiliza el modo de varios móviles.
+
+## Modalidades
+
+- **Historia de España:** 190 hechos históricos verificados, desde la Antigüedad hasta la actualidad.
+- **Estrenos de cine:** 103 películas internacionales y españolas, desde los pioneros del cine hasta 2024.
+
+Cada modalidad conserva su propia partida local. La modalidad elegida también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
 La aplicación ofrece dos alternativas:
 
@@ -30,3 +37,4 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
 - Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.
+

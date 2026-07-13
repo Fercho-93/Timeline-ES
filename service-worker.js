@@ -1,5 +1,5 @@
-const CACHE = "hilo-espana-v5";
-const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
+const CACHE = "hilo-modos-v6";
+const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -17,3 +17,4 @@ self.addEventListener("fetch", event => {
     return response;
   }).catch(() => event.request.mode === "navigate" ? caches.match("./index.html") : Response.error())));
 });
+
