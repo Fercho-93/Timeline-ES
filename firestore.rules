@@ -44,17 +44,20 @@ service cloud.firestore {
 
       allow create: if signedIn()
         && request.resource.data.hostUid == request.auth.uid
+        && request.resource.data.mode in ['history', 'movies']
         && request.resource.data.status == 'lobby'
         && request.resource.data.playerOrder.size() == 1
         && request.resource.data.playerOrder[0] == request.auth.uid
         && request.resource.data.players[request.auth.uid].name is string;
 
-      allow update: if validJoin()
-        || isHost()
-        || (isCurrentPlayer()
-          && request.resource.data.version == resource.data.version + 1);
+      allow update: if request.resource.data.get('mode', 'history') == resource.data.get('mode', 'history')
+        && (validJoin()
+          || isHost()
+          || (isCurrentPlayer()
+            && request.resource.data.version == resource.data.version + 1));
 
       allow delete: if isHost();
     }
   }
 }
+
