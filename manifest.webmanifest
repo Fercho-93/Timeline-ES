@@ -1,7 +1,7 @@
 {
-  "name": "Hilo de España",
+  "name": "Hilo · Juego de cronología",
   "short_name": "Hilo",
-  "description": "Ordena los grandes hechos de la historia de España.",
+  "description": "Ordena hechos históricos y estrenos de cine en su línea temporal.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f4eddf",
@@ -10,3 +10,4 @@
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }
+
