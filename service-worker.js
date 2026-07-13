@@ -1,5 +1,16 @@
-const CACHE = "hilo-modos-v6";
-const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
+const CACHE = "hilo-modos-v7";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./styles.css?v=7",
+  "./cards.js?v=7",
+  "./movies.js?v=7",
+  "./app.js?v=7",
+  "./online.js?v=7",
+  "./manifest.webmanifest?v=7",
+  "./icon.svg?v=7",
+  "./assets/hero-history.jpg"
+];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -11,10 +22,23 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-    const copy = response.clone();
-    caches.open(CACHE).then(cache => cache.put(event.request, copy));
-    return response;
-  }).catch(() => event.request.mode === "navigate" ? caches.match("./index.html") : Response.error())));
-});
 
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put("./index.html", copy));
+        return response;
+      }).catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+      const copy = response.clone();
+      caches.open(CACHE).then(cache => cache.put(event.request, copy));
+      return response;
+    }).catch(() => Response.error()))
+  );
+});
