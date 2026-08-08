@@ -132,7 +132,7 @@ h2 { font-family: Georgia, serif; font-size: clamp(2rem, 7vw, 3.2rem); letter-sp
 .hand-title small { color: var(--muted); }
 .hand { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 .hand-card { min-height: 174px; text-align: left; border: 1px solid #dfd1bc; border-radius: 19px; padding: 14px; color: var(--ink); background: linear-gradient(145deg, #fffdf7, #f3e7d4); box-shadow: var(--shadow-soft); cursor: pointer; position: relative; overflow: hidden; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
-.hand-card::after { content: "Â¿"; position: absolute; right: 10px; bottom: -20px; font: italic 800 5rem Georgia, serif; color: rgba(143,47,42,.07); }
+.hand-card::after { content: "¿"; position: absolute; right: 10px; bottom: -20px; font: italic 800 5rem Georgia, serif; color: rgba(143,47,42,.07); }
 .hand-card:active { transform: translateY(2px); }
 .hand-card.selected { border-color: var(--red); box-shadow: 0 0 0 2px rgba(143,47,42,.2), 0 12px 25px rgba(104,29,27,.14); background: #fff8eb; transform: translateY(-3px); }
 .card-era { margin: 0 -14px 13px; padding: 9px 11px; display: flex; align-items: center; gap: 7px; color: rgba(255,255,255,.92); font-size: .58rem; line-height: 1; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
@@ -255,4 +255,3 @@ h2 { font-family: Georgia, serif; font-size: clamp(2rem, 7vw, 3.2rem); letter-sp
 }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
-
