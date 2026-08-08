@@ -57,4 +57,3 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
 - La interfaz solo enseña a cada participante su propia mano.
 - Es un juego doméstico: una persona con conocimientos técnicos y acceso a la sala podría inspeccionar los datos enviados al navegador.
 - El modo compartido necesita internet. El modo de un móvil continúa funcionando sin conexión.
-

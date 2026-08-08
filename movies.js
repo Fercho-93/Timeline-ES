@@ -103,4 +103,3 @@ window.MOVIE_CARDS = [
   { id: 1102, year: 2023, title: "Oppenheimer", detail: "Christopher Nolan narra el papel del físico J. Robert Oppenheimer en el desarrollo de la bomba atómica." },
   { id: 1103, year: 2024, title: "Dune: Parte Dos", detail: "Paul Atreides se une a los fremen mientras Villeneuve completa la segunda parte de su adaptación." }
 ];
-

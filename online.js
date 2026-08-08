@@ -598,4 +598,3 @@ document.addEventListener("click", event => {
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
 });
-
