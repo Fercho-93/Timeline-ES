@@ -1,4 +1,4 @@
-const CACHE = "hilo-modos-v7";
+const CACHE = "hilo-modos-v8";
 const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {
