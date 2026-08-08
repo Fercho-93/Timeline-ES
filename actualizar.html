@@ -74,10 +74,10 @@
   </head>
   <body>
     <main>
-      <div class="mark" aria-hidden="true">&#8635;</div>
-      <h1>Actualizando Hilo&hellip;</h1>
-      <p id="status" role="status">Eliminando la versi&oacute;n antigua del dispositivo.</p>
-      <a id="continue" href="./?actualizado=1" target="_blank" rel="noopener">Abrir la versi&oacute;n nueva en otra pestaña</a>
+      <div class="mark" aria-hidden="true">↻</div>
+      <h1>Actualizando Hilo…</h1>
+      <p id="status" role="status">Eliminando la versión antigua del dispositivo.</p>
+      <a id="continue" href="./?actualizado=1">Abrir la versión nueva</a>
     </main>
 
     <script>
@@ -99,11 +99,10 @@
           localStorage.clear();
           sessionStorage.clear();
 
-          status.textContent = "Limpieza completada. Pulsa el botón para abrir la versión nueva en otra pestaña.";
-          continueLink.href = `./?actualizado=${Date.now()}`;
-          continueLink.classList.add("visible");
+          status.textContent = "Actualización completada. Abriendo la versión nueva…";
+          window.location.replace(`./?actualizado=${Date.now()}`);
         } catch (error) {
-          status.textContent = "No se pudo completar autom\u00e1ticamente. Pulsa el bot\u00f3n para continuar.";
+          status.textContent = "No se pudo completar automáticamente. Pulsa el botón para continuar.";
           continueLink.classList.add("visible");
         }
       })();

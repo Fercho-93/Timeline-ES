@@ -255,4 +255,3 @@ h2 { font-family: Georgia, serif; font-size: clamp(2rem, 7vw, 3.2rem); letter-sp
 }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
-
