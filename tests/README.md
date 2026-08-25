@@ -14,7 +14,7 @@ node tests/partidas-al-azar.mjs
 
 # Reglas de Firestore contra el emulador oficial (necesita Java instalado).
 npx --yes firebase-tools emulators:exec --project demo-hilo --only firestore \
-  "node tests/reglas-firestore.mjs"
+  "node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs"
 ```
 
 `reglas-firestore.mjs` cubre quién puede escribir en una sala y qué puede escribir:
@@ -23,3 +23,8 @@ docena de intentos de trampa (vaciarse la mano, repartirse cartas, declararse ga
 con cartas, expulsar al anfitrión). Si alguna denegación se explica por el límite de
 1000 expresiones de Firestore en vez de por la propia regla, el emulador lo imprime:
 esa señal no debe aparecer.
+
+`compatibilidad-version-anterior.mjs` comprueba que las reglas nuevas siguen aceptando las
+salas y las escrituras de la versión anterior de la aplicación, que no conocía el campo
+`winners`. Así se pueden publicar las reglas sin esperar a que todos los móviles hayan
+recargado la aplicación.

@@ -31,8 +31,10 @@ jugada fallida en su turno, aunque no puede robar cartas ajenas, saltarse turnos
 victoria. Cerrar también esa puerta exige mover la jugada a una Cloud Function, con las manos
 en subcolecciones privadas; para un juego de sobremesa entre conocidos no compensa.
 
-Las pruebas de `tests/reglas-firestore.mjs` ejecutan estas reglas contra el emulador oficial
-antes de publicarlas. Consulta `tests/README.md`.
+Las reglas toleran las salas creadas por la versión anterior de la aplicación, así que se
+pueden publicar sin esperar a que todos los móviles hayan recargado la web. Las pruebas de
+`tests/reglas-firestore.mjs` y `tests/compatibilidad-version-anterior.mjs` ejecutan estas
+reglas contra el emulador oficial antes de publicarlas. Consulta `tests/README.md`.
 
 ### Limpiar salas antiguas
 

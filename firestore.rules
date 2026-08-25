@@ -74,7 +74,7 @@ service cloud.firestore {
           && after().turnsInRound == 0
           && after().round == 1
           && after().winner == null
-          && after().winners == null
+          && after().get('winners', null) == null
           && after().reveal == null
           && bumped();
       }
@@ -114,7 +114,7 @@ service cloud.firestore {
                  && after().phase == 'finished'
                  && after().winner in before().playerOrder
                  && before().players[after().winner].hand.size() == 0
-                 && after().winners.size() >= 1)
+                 && after().get('winners', [after().winner]).size() >= 1)
               : (changed().hasOnly(['players', 'deck', 'discard', 'current', 'turnsInRound', 'round',
                                     'phase', 'reveal', 'version', 'updatedAt'])
                  && after().status == 'playing'
@@ -180,7 +180,7 @@ service cloud.firestore {
         && request.resource.data.deck.size() == 0
         && request.resource.data.timeline.size() == 0
         && request.resource.data.winner == null
-        && request.resource.data.winners == null;
+        && request.resource.data.get('winners', null) == null;
 
       // Cada escritura entra por una sola rama: encadenar seis validaciones agota
       // el límite de 1000 expresiones que Firestore evalúa por petición.
