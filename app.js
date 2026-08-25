@@ -131,7 +131,18 @@
         </div>
         ${heroArt}
       </section>
+      <p class="app-version" id="app-version"></p>
     </div>`;
+    showCacheVersion();
+  }
+
+  async function showCacheVersion() {
+    if (!("caches" in window)) return;
+    try {
+      const key = (await caches.keys()).find(name => name.startsWith("hilo-"));
+      const label = document.getElementById("app-version");
+      if (key && label) label.textContent = `Versión guardada en este móvil: ${key}`;
+    } catch { /* sin caché disponible no hay nada que mostrar */ }
   }
 
   function setup() {

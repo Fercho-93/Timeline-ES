@@ -212,6 +212,7 @@ h2 { font-family: Georgia, serif; font-size: clamp(2rem, 7vw, 3.2rem); letter-sp
 .lobby-player strong, .lobby-player small { display: block; }
 .lobby-player small { margin-top: 2px; color: var(--muted); font-size: .69rem; }
 .lobby-player > i { color: var(--green); font-style: normal; font-weight: 900; }
+.app-version { margin: 20px 0 4px; text-align: center; color: var(--muted); font-size: .64rem; letter-spacing: .04em; }
 .kick-btn { padding: 7px 11px; border: 1px solid rgba(143,47,42,.35); border-radius: 999px; background: transparent; color: var(--red); font: inherit; font-size: .68rem; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
 .kick-btn:active { background: rgba(143,47,42,.1); }
 .manage-players { margin-top: 18px; text-align: left; }
