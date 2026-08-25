@@ -12,6 +12,9 @@ node tests/partida-local.mjs
 # 40 partidas al azar: bloqueos, conteo de cartas y orden de la línea temporal.
 node tests/partidas-al-azar.mjs
 
+# Service worker: qué versión de la aplicación acaba viendo el móvil (sin dependencias).
+node tests/service-worker.mjs
+
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npx --yes firebase-tools emulators:exec --project demo-hilo --only firestore \
   "node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs"
@@ -33,3 +36,8 @@ recargado la aplicación.
 al entrar por una invitación, la primera instantánea de `onSnapshot` llega de la caché y
 todavía no incluye a quien acaba de entrar. Comprueba el SDK y la condición, no el propio
 `online.js`, que no se puede importar desde Node porque carga Firebase desde gstatic.
+
+`service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado.
+Comprueba lo que decide qué versión ve cada móvil: se responde con la copia guardada,
+pero se pide la del servidor por detrás, así que un archivo nuevo llega en el siguiente
+arranque aunque se olvide subir el número de la caché.
