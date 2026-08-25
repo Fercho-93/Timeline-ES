@@ -28,6 +28,7 @@ let unsubscribeRoom = null;
 let selectedCardId = null;
 let busy = false;
 let selectedModeKey = "history";
+let seenSelfInRoom = false;
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
@@ -349,15 +350,23 @@ function connectToRoom(code) {
   unsubscribeRoom?.();
   roomCode = code;
   roomRef = doc(db, "rooms", code);
+  seenSelfInRoom = false;
   unsubscribeRoom = onSnapshot(roomRef, snapshot => {
     if (!snapshot.exists()) {
+      // Mismo motivo: una caché aún sin la sala no significa que la hayan cerrado.
+      if (!seenSelfInRoom && snapshot.metadata.fromCache) return;
       leaveOnline("La sala ha sido cerrada");
       return;
     }
     roomState = snapshot.data();
     roomState.mode = roomState.mode || "history";
     selectedModeKey = roomState.mode;
-    if (!roomState.playerOrder.includes(user.uid)) {
+    if (roomState.playerOrder.includes(user.uid)) seenSelfInRoom = true;
+    else if (!seenSelfInRoom && snapshot.metadata.fromCache) {
+      // Al abrir el enlace de invitación se lee la sala, así que la primera instantánea
+      // llega de la caché con la foto anterior a nuestra entrada. No es una expulsión.
+      return;
+    } else {
       leaveOnline("Ya no estás en esta sala");
       return;
     }
