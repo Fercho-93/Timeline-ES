@@ -15,6 +15,7 @@ function boot() {
   const { window } = dom;
   window.eval(read("cards.js"));
   window.eval(read("movies.js"));
+  window.eval(read("countries.js"));
   window.eval(read("app.js"));
   return window;
 }
@@ -53,6 +54,7 @@ while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML) && turns < 4000) {
   if (index < 0) index = years.length;
   if (turns % 5 === 0) index = index === 0 ? years.length : 0; // fallo deliberado
   slots[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  click(w, '[data-action="confirm-place"]');
   const modal = w.document.querySelector(".modal");
   if (modal && /class="year"/.test(modal.innerHTML)) revealed++;
   click(w, '[data-action="finish-turn"]');

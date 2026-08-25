@@ -15,6 +15,12 @@ node tests/partidas-al-azar.mjs
 # Service worker: qué versión de la aplicación acaba viendo el móvil (sin dependencias).
 node tests/service-worker.mjs
 
+# Calidad de los tres mazos: repeticiones, huecos y cartas demasiado juntas (sin dependencias).
+node tests/mazos.mjs
+
+# Solitario, reto diario, confirmación al colocar y modalidad de países.
+node tests/solitario.mjs
+
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npx --yes firebase-tools emulators:exec --project demo-hilo --only firestore \
   "node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs"

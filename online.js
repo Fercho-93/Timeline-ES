@@ -16,8 +16,9 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
-const MODE_CARDS = { history: window.HISTORY_CARDS, movies: window.MOVIE_CARDS };
-const MODE_NAMES = { history: "Historia de España", movies: "Estrenos de cine" };
+const MODE_CARDS = { history: window.HISTORY_CARDS, movies: window.MOVIE_CARDS, countries: window.COUNTRY_CARDS };
+const MODE_NAMES = { history: "Historia de España", movies: "Estrenos de cine", countries: "Superficie de países" };
+const MODE_ICONS = { history: "🏛️", movies: "🎬", countries: "🌍" };
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 let user = null;
@@ -26,6 +27,7 @@ let roomRef = null;
 let roomState = null;
 let unsubscribeRoom = null;
 let selectedCardId = null;
+let pendingIndex = null;
 let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
@@ -34,10 +36,24 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
 }
 
-function formatYear(card) {
+function modeKey() { return roomState?.mode || selectedModeKey; }
+
+function isArea() { return modeKey() === "countries"; }
+
+function formatValue(card) {
+  if (isArea()) {
+    const value = card.value < 10 ? card.value.toLocaleString("es-ES", { maximumFractionDigits: 2 }) : Math.round(card.value).toLocaleString("es-ES");
+    return `${value} km²`;
+  }
   if (card.label) return card.label;
   return card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year);
 }
+
+function sortValue(card) { return isArea() ? -card.value : card.year; }
+
+function hiddenLabel() { return isArea() ? "Superficie oculta" : "Fecha oculta"; }
+
+function timelineTitle() { return isArea() ? "De mayor a menor" : "Línea temporal"; }
 
 function modeCards(modeKey = roomState?.mode || selectedModeKey) {
   return MODE_CARDS[modeKey] || MODE_CARDS.history;
@@ -52,7 +68,15 @@ function initials(name) {
 }
 
 function eraForCard(card) {
-  if ((roomState?.mode || selectedModeKey) === "movies") {
+  if (isArea()) {
+    if (card.value < 1000) return { key: "diminuto", name: "Diminuto", symbol: "·" };
+    if (card.value < 50000) return { key: "pequeno", name: "Pequeño", symbol: "▪" };
+    if (card.value < 300000) return { key: "mediano", name: "Mediano", symbol: "◈" };
+    if (card.value < 1000000) return { key: "grande", name: "Grande", symbol: "◆" };
+    if (card.value < 5000000) return { key: "enorme", name: "Enorme", symbol: "★" };
+    return { key: "gigante", name: "Gigante", symbol: "⬢" };
+  }
+  if (modeKey() === "movies") {
     if (card.year < 1930) return { key: "pioneros", name: "Cine pionero", symbol: "▥" };
     if (card.year < 1960) return { key: "clasico", name: "Cine clásico", symbol: "★" };
     if (card.year < 1980) return { key: "nuevocine", name: "Nuevo cine", symbol: "◉" };
@@ -70,8 +94,8 @@ function eraForCard(card) {
 }
 
 function header(extra = "") {
-  const modeName = MODE_NAMES[roomState?.mode || selectedModeKey] || MODE_NAMES.history;
-  return `<header class="topbar"><div class="brand"><span class="brand-mark">${(roomState?.mode || selectedModeKey) === "movies" ? "🎬" : "🏛️"}</span>Hilo · ${modeName} <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
+  const modeName = MODE_NAMES[modeKey()] || MODE_NAMES.history;
+  return `<header class="topbar"><div class="brand"><span class="brand-mark">${MODE_ICONS[modeKey()] || MODE_ICONS.history}</span>Hilo · ${modeName} <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
 }
 
 function showToast(message) {
@@ -370,6 +394,7 @@ function connectToRoom(code) {
       leaveOnline("Ya no estás en esta sala");
       return;
     }
+    if (roomState.phase !== "turn") pendingIndex = null;
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
     else renderGame();
@@ -425,21 +450,24 @@ function renderGame() {
   const currentPlayer = roomState.players[currentUid];
   const myTurn = currentUid === user.uid && roomState.phase === "turn";
   const timelineCards = roomState.timeline.map(id => getCard(id));
+  const selectedCard = selectedCardId ? getCard(selectedCardId) : null;
   const slots = [];
   for (let index = 0; index <= timelineCards.length; index++) {
-    slots.push(`<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1}"><span>+</span></button>`);
+    slots.push(myTurn && selectedCard && pendingIndex === index
+      ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(selectedCard.title)}</strong><button class="btn btn-primary btn-block" data-online-action="confirm-place">Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
+      : `<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
-      slots.push(`<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatYear(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      slots.push(`<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
   appEl.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-online-action="room">Sala</button>')}
     <div class="connection-strip"><span><i></i> Sala ${roomCode}</span><small>${roomState.playerOrder.length} participantes</small></div>
     <div class="game-head"><div><div class="turn-label">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
-    <section><div class="hand-title"><h3>Línea temporal</h3><small>${roomState.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
+    <section><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
+    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
   </div>`;
 }
@@ -449,12 +477,13 @@ function revealOverlay(currentUid) {
   const card = getCard(reveal.cardId);
   const era = eraForCard(card);
   const canContinue = user.uid === currentUid || user.uid === roomState.hostUid;
-  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
+  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
 }
 
 async function placeCard(index) {
   if (busy || !selectedCardId) return;
   const playedId = selectedCardId;
+  pendingIndex = null;
   busy = true;
   try {
     await runTransaction(db, async transaction => {
@@ -467,7 +496,7 @@ async function placeCard(index) {
       const card = getCard(playedId);
       const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
       const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
-      const correct = (!previous || card.year >= previous.year) && (!next || card.year <= next.year);
+      const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
       hand.splice(hand.indexOf(playedId), 1);
       const timeline = [...data.timeline];
       let deck = [...data.deck];
@@ -709,8 +738,10 @@ document.addEventListener("click", event => {
   else if (action === "qr") showQr();
   else if (action === "close-qr") target.closest("[data-qr-overlay]")?.remove();
   else if (action === "start") startRoom();
-  else if (action === "select") { selectedCardId = Number(target.dataset.id); renderGame(); }
-  else if (action === "place") placeCard(Number(target.dataset.index));
+  else if (action === "select") { selectedCardId = Number(target.dataset.id); pendingIndex = null; renderGame(); }
+  else if (action === "place") { pendingIndex = Number(target.dataset.index); renderGame(); }
+  else if (action === "confirm-place") placeCard(pendingIndex);
+  else if (action === "cancel-place") { pendingIndex = null; renderGame(); }
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
   else if (action === "room") roomMenu();
