@@ -12,9 +12,9 @@ node tests/partida-local.mjs
 # 40 partidas al azar: bloqueos, conteo de cartas y orden de la línea temporal.
 node tests/partidas-al-azar.mjs
 
-# Reglas de Firestore contra el emulador oficial (necesita Java instalado).
+# Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npx --yes firebase-tools emulators:exec --project demo-hilo --only firestore \
-  "node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs"
+  "node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs"
 ```
 
 `reglas-firestore.mjs` cubre quién puede escribir en una sala y qué puede escribir:
@@ -28,3 +28,8 @@ esa señal no debe aparecer.
 salas y las escrituras de la versión anterior de la aplicación, que no conocía el campo
 `winners`. Así se pueden publicar las reglas sin esperar a que todos los móviles hayan
 recargado la aplicación.
+
+`entrada-por-enlace.mjs` fija el comportamiento del SDK del que depende `connectToRoom()`:
+al entrar por una invitación, la primera instantánea de `onSnapshot` llega de la caché y
+todavía no incluye a quien acaba de entrar. Comprueba el SDK y la condición, no el propio
+`online.js`, que no se puede importar desde Node porque carga Firebase desde gstatic.
