@@ -168,7 +168,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.hostUid == uid()
         && request.resource.data.roomCode == roomId
-        && request.resource.data.mode in ['history', 'movies']
+        && request.resource.data.mode in ['history', 'movies', 'countries']
         && request.resource.data.status == 'lobby'
         && request.resource.data.phase == 'lobby'
         && request.resource.data.version == 1

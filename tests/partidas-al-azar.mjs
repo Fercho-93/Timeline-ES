@@ -8,7 +8,7 @@ const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
 const boot = () => {
   const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  dom.window.eval(read("cards.js")); dom.window.eval(read("movies.js")); dom.window.eval(read("app.js"));
+  dom.window.eval(read("cards.js")); dom.window.eval(read("movies.js")); dom.window.eval(read("countries.js")); dom.window.eval(read("app.js"));
   return dom.window;
 };
 const fire = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
@@ -16,10 +16,13 @@ let problems = 0, games = 0, sharedWins = 0, returns = 0;
 
 for (let g = 0; g < 40; g++) {
   const w = boot();
-  const mode = g % 2 ? "movies" : "history";
+  const mode = ["history", "movies", "countries"][g % 3];
   fire(w, w.document.querySelector(`[data-mode="${mode}"]`));
-  const total = (mode === "movies" ? w.MOVIE_CARDS : w.HISTORY_CARDS).length;
-  const cardsById = new Map((mode === "movies" ? w.MOVIE_CARDS : w.HISTORY_CARDS).map(c => [c.id, c]));
+  const mazo = { history: w.HISTORY_CARDS, movies: w.MOVIE_CARDS, countries: w.COUNTRY_CARDS }[mode];
+  const total = mazo.length;
+  const cardsById = new Map(mazo.map(c => [c.id, c]));
+  // La superficie ordena de mayor a menor, así que su valor de orden va en negativo.
+  const orden = card => (mode === "countries" ? -card.value : card.year);
   fire(w, w.document.querySelector('[data-action="setup"]'));
   const players = 2 + (g % 8);
   for (let i = 2; i < players; i++) fire(w, w.document.querySelector('[data-action="add-player"]'));
@@ -42,6 +45,7 @@ for (let g = 0; g < 40; g++) {
     if (index < 0) index = years.length;
     if (Math.random() < 0.35) index = Math.floor(Math.random() * (years.length + 1)); // juega mal a menudo
     fire(w, w.document.querySelectorAll('[data-action="place"]')[index]);
+  fire(w, w.document.querySelector('[data-action="confirm-place"]'));
     if (/vuelve a tu mano/.test(w.document.querySelector(".modal")?.innerHTML || "")) returns++;
     fire(w, w.document.querySelector('[data-action="finish-turn"]'));
     const state = JSON.parse(w.localStorage.getItem(key));
@@ -49,8 +53,8 @@ for (let g = 0; g < 40; g++) {
     if (counted !== total) { console.log(`  FALLA partida ${g}: ${counted} cartas de ${total}`); problems++; break; }
     const dupes = new Set([...state.deck, ...state.discard, ...state.timeline, ...state.players.flatMap(p => p.hand)]).size !== total;
     if (dupes) { console.log(`  FALLA partida ${g}: cartas duplicadas`); problems++; break; }
-    const line = state.timeline.map(cid => cardsById.get(cid).year);
-    if (line.some((y, i) => i && y < line[i - 1])) { console.log(`  FALLA partida ${g}: línea temporal desordenada`); problems++; break; }
+    const line = state.timeline.map(cid => orden(cardsById.get(cid)));
+    if (line.some((y, i) => i && y < line[i - 1])) { console.log(`  FALLA partida ${g}: línea desordenada`); problems++; break; }
   }
   if (/ganan<\/h1>/.test(w.document.body.innerHTML)) sharedWins++;
   games++;

@@ -4,6 +4,10 @@ El código de Firebase ya está incluido en `online.js`. Solo falta publicar las
 
 ## 1. Publicar las reglas de Firestore
 
+> Las reglas hay que volver a publicarlas al añadir una modalidad: la lista de modalidades
+> permitidas está dentro de ellas. La modalidad **Superficie de países** no funcionará en las
+> salas compartidas hasta que publiques la versión actual de `firestore.rules`.
+
 1. Abre el proyecto **Timeline ES** en Firebase.
 2. Entra en **Firestore**.
 3. Abre la pestaña **Reglas**.
@@ -20,7 +24,8 @@ que las cartas ni se creen ni se dupliquen:
 - Al acertar, la carta sale de la mano y entra en la línea temporal; no se roba nada de paso.
 - Nadie puede vaciarse la mano sin jugar, repartir cartas a otras personas fuera del
   desempate de final de ronda ni declararse ganador con cartas en la mano.
-- La modalidad, el código de sala y el anfitrión no cambian nunca después de crear la sala.
+- La modalidad tiene que ser una de las tres previstas, y no cambia después de crear la sala,
+  igual que el código y el anfitrión.
 - Expulsar es cosa del anfitrión; marcharse, de cada cual. El anfitrión no puede ser
   expulsado: cierra la sala.
 

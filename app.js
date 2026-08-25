@@ -10,13 +10,57 @@
       key: "history", name: "Historia de España", shortName: "España", icon: "🏛️",
       eyebrow: "Historia · intuición · sobremesa",
       description: "Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.",
-      cardLabel: "hechos", caption: "De Hispania a la democracia", cards: window.HISTORY_CARDS
+      cardLabel: "hechos", caption: "De Hispania a la democracia", cards: window.HISTORY_CARDS,
+      headline: "¿Antes o<br><em>después?</em>", axis: "time"
     },
     movies: {
       key: "movies", name: "Estrenos de cine", shortName: "Cine", icon: "🎬",
       eyebrow: "Cine · memoria · palomitas",
       description: "Ordenad grandes películas por su año de estreno. De los pioneros del cine a los éxitos más recientes.",
-      cardLabel: "películas", caption: "De Méliès a nuestros días", cards: window.MOVIE_CARDS
+      cardLabel: "películas", caption: "De Méliès a nuestros días", cards: window.MOVIE_CARDS,
+      headline: "¿Antes o<br><em>después?</em>", axis: "time"
+    },
+    countries: {
+      key: "countries", name: "Superficie de países", shortName: "Países", icon: "🌍",
+      eyebrow: "Geografía · escala · discusión",
+      description: "Ordenad países por su superficie, del más extenso al más pequeño. Nadie tiene tan claro como cree lo que ocupa cada país.",
+      cardLabel: "países", caption: "De Rusia al Vaticano", cards: window.COUNTRY_CARDS,
+      headline: "¿Más grande o<br><em>más pequeño?</em>", axis: "area"
+    }
+  };
+
+  const AXES = {
+    time: {
+      sortValue: card => card.year,
+      format: card => card.label || (card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year)),
+      hiddenLabel: "Fecha oculta",
+      timelineTitle: "Línea temporal",
+      bands: [
+        { limit: 711, key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" },
+        { limit: 1492, key: "medieval", name: "Edad Media", symbol: "♜" },
+        { limit: 1700, key: "imperio", name: "Monarquía Hispánica", symbol: "✦" },
+        { limit: 1808, key: "ilustracion", name: "Ilustración", symbol: "☼" },
+        { limit: 1931, key: "moderna", name: "España contemporánea", symbol: "⌁" },
+        { limit: 1975, key: "sigloxx", name: "Siglo XX", symbol: "◈" },
+        { limit: Infinity, key: "democracia", name: "Democracia", symbol: "◎" }
+      ]
+    },
+    area: {
+      // Se ordena por el valor en negativo: así la carta más extensa va primero y la
+      // comparación de siempre (de menor a mayor) sigue valiendo sin tocar nada.
+      sortValue: card => -card.value,
+      format: card => `${formatArea(card.value)} km²`,
+      hiddenLabel: "Superficie oculta",
+      timelineTitle: "De mayor a menor",
+      bands: [
+        { limit: 1000, key: "diminuto", name: "Diminuto", symbol: "·" },
+        { limit: 50000, key: "pequeno", name: "Pequeño", symbol: "▪" },
+        { limit: 300000, key: "mediano", name: "Mediano", symbol: "◈" },
+        { limit: 1000000, key: "grande", name: "Grande", symbol: "◆" },
+        { limit: 5000000, key: "enorme", name: "Enorme", symbol: "★" },
+        { limit: Infinity, key: "gigante", name: "Gigante", symbol: "⬢" }
+      ],
+      bandValue: card => card.value
     }
   };
   let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || "history";
@@ -26,15 +70,22 @@
   let game = loadGame();
   let selectedCardId = null;
   let result = null;
+  let pendingIndex = null;
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
   }
 
-  function formatYear(card) {
-    if (card.label) return card.label;
-    return card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year);
+  function currentAxis() { return AXES[currentMode().axis]; }
+
+  function formatArea(value) {
+    if (value < 10) return value.toLocaleString("es-ES", { maximumFractionDigits: 2 });
+    return Math.round(value).toLocaleString("es-ES");
   }
+
+  function formatValue(card) { return currentAxis().format(card); }
+
+  function sortValue(card) { return currentAxis().sortValue(card); }
 
   function currentMode() { return MODES[selectedModeKey]; }
 
@@ -47,25 +98,24 @@
     cardsById = new Map(currentMode().cards.map(card => [card.id, card]));
     game = loadGame();
     selectedCardId = null;
+    pendingIndex = null;
     result = null;
   }
 
+  const MOVIE_BANDS = [
+    { limit: 1930, key: "pioneros", name: "Cine pionero", symbol: "▥" },
+    { limit: 1960, key: "clasico", name: "Cine clásico", symbol: "★" },
+    { limit: 1980, key: "nuevocine", name: "Nuevo cine", symbol: "◉" },
+    { limit: 2000, key: "blockbuster", name: "Era blockbuster", symbol: "◆" },
+    { limit: 2010, key: "milenio", name: "Nuevo milenio", symbol: "✦" },
+    { limit: Infinity, key: "actual", name: "Cine actual", symbol: "▷" }
+  ];
+
   function eraForCard(card) {
-    if (selectedModeKey === "movies") {
-      if (card.year < 1930) return { key: "pioneros", name: "Cine pionero", symbol: "▥" };
-      if (card.year < 1960) return { key: "clasico", name: "Cine clásico", symbol: "★" };
-      if (card.year < 1980) return { key: "nuevocine", name: "Nuevo cine", symbol: "◉" };
-      if (card.year < 2000) return { key: "blockbuster", name: "Era blockbuster", symbol: "◆" };
-      if (card.year < 2010) return { key: "milenio", name: "Nuevo milenio", symbol: "✦" };
-      return { key: "actual", name: "Cine actual", symbol: "▷" };
-    }
-    if (card.year < 711) return { key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" };
-    if (card.year < 1492) return { key: "medieval", name: "Edad Media", symbol: "♜" };
-    if (card.year < 1700) return { key: "imperio", name: "Monarquía Hispánica", symbol: "✦" };
-    if (card.year < 1808) return { key: "ilustracion", name: "Ilustración", symbol: "☼" };
-    if (card.year < 1931) return { key: "moderna", name: "España contemporánea", symbol: "⌁" };
-    if (card.year < 1975) return { key: "sigloxx", name: "Siglo XX", symbol: "◈" };
-    return { key: "democracia", name: "Democracia", symbol: "◎" };
+    const axis = currentAxis();
+    const bands = selectedModeKey === "movies" ? MOVIE_BANDS : axis.bands;
+    const value = axis.bandValue ? axis.bandValue(card) : card.year;
+    return bands.find(band => value < band.limit) || bands[bands.length - 1];
   }
 
   function initials(name) {
@@ -120,12 +170,13 @@
       <section class="hero hero-premium">
         <div class="hero-copy">
           <div class="eyebrow"><span class="eyebrow-line"></span> ${mode.eyebrow}</div>
-          <h1>¿Antes o<br><em>después?</em></h1>
+          <h1>${mode.headline}</h1>
           <p class="lead">${mode.description}</p>
           <div class="hero-stats"><span class="pill">${mode.cards.length} ${mode.cardLabel}</span><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
           <div class="actions">
             <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
             <button class="btn btn-secondary" data-action="online">Varios móviles</button>
+            <button class="btn btn-secondary" data-action="solo">Jugar solo</button>
             ${game && game.mode === selectedModeKey ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
           </div>
         </div>
@@ -202,31 +253,44 @@
     const player = currentPlayer();
     const timelineCards = game.timeline.map(id => cardsById.get(id));
     const handCards = player.hand.map(id => cardsById.get(id));
+    const selectedCard = selectedCardId ? cardsById.get(selectedCardId) : null;
     const slots = [];
     for (let i = 0; i <= timelineCards.length; i++) {
-      slots.push(`<button class="slot" data-action="place" data-index="${i}" ${selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${i + 1}"><span>+</span></button>`);
+      slots.push(pendingIndex === i && selectedCard
+        ? confirmSlot(selectedCard)
+        : `<button class="slot" data-action="place" data-index="${i}" ${selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${i + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
       if (i < timelineCards.length) {
-        const card = timelineCards[i];
-        const era = eraForCard(card);
-        slots.push(`<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatYear(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+        slots.push(timelineCardMarkup(timelineCards[i]));
       }
     }
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <div class="game-head"><div><div class="turn-label">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
-      <section><div class="hand-title"><h3>Línea temporal</h3><small>${game.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-      <section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}"><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla"}</p></section>
+      <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
+      <section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla"}</p></section>
     </div>`;
     if (selectedCardId) setTimeout(() => document.querySelector(".timeline-wrap")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
+  function timelineCardMarkup(card) {
+    const era = eraForCard(card);
+    return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+  }
+
+  function confirmSlot(card) {
+    return `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(card.title)}</strong>
+      <button class="btn btn-primary btn-block" data-action="confirm-place">Sí, aquí</button>
+      <button class="btn btn-ghost btn-block" data-action="cancel-place">Cancelar</button></div>`;
+  }
+
   function placeCard(index) {
     if (!selectedCardId) return;
+    pendingIndex = null;
     const player = currentPlayer();
     const card = cardsById.get(selectedCardId);
     const previous = index > 0 ? cardsById.get(game.timeline[index - 1]) : null;
     const next = index < game.timeline.length ? cardsById.get(game.timeline[index]) : null;
-    const correct = (!previous || card.year >= previous.year) && (!next || card.year <= next.year);
+    const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
     player.hand = player.hand.filter(id => id !== selectedCardId);
     let returned = false;
     if (correct) game.timeline.splice(index, 0, selectedCardId);
@@ -257,7 +321,7 @@
     gameView();
     const { correct, returned, card } = result;
     const era = eraForCard(card);
-    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   function finishTurn() {
@@ -301,6 +365,209 @@
       ? "Ha sido la única persona en terminar la ronda sin cartas."
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
     app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`;
+  }
+
+  const DAILY_CARDS = 15;
+  const SOLO_LIVES = 3;
+  const RECORDS_KEY = "hilo-retos-v1";
+  let solo = null;
+
+  function soloKey() { return `hilo-solo-${selectedModeKey}-v1`; }
+
+  function today() { return new Date().toLocaleDateString("sv-SE"); }
+
+  function yesterday() {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    return date.toLocaleDateString("sv-SE");
+  }
+
+  // Semilla a partir de la fecha: el reto del día es el mismo en todos los móviles,
+  // sin necesidad de servidor.
+  function seedFrom(text) {
+    let seed = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      seed ^= text.charCodeAt(i);
+      seed = Math.imul(seed, 16777619);
+    }
+    return seed >>> 0;
+  }
+
+  function seededRandom(seed) {
+    let state = seed;
+    return () => {
+      state |= 0;
+      state = (state + 0x6d2b79f5) | 0;
+      let value = Math.imul(state ^ (state >>> 15), 1 | state);
+      value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
+      return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffleWith(items, random) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function readRecords() {
+    try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || {}; } catch { return {}; }
+  }
+
+  function modeRecords() {
+    const records = readRecords();
+    return records[selectedModeKey] || { best: 0, streak: 0, lastDay: "", days: {} };
+  }
+
+  function saveRecords(entry) {
+    const records = readRecords();
+    records[selectedModeKey] = entry;
+    try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* almacenamiento lleno */ }
+  }
+
+  function saveSolo() {
+    if (solo) localStorage.setItem(soloKey(), JSON.stringify(solo));
+    else localStorage.removeItem(soloKey());
+  }
+
+  function loadSolo() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(soloKey()));
+      if (!stored || !stored.timeline || stored.finished) return null;
+      // El reto diario caduca: si es de otro día ya no vale continuarlo.
+      if (stored.kind === "daily" && stored.day !== today()) return null;
+      return stored;
+    } catch { return null; }
+  }
+
+  function soloHome() {
+    screen = "solo-home";
+    solo = loadSolo();
+    pendingIndex = null;
+    const records = modeRecords();
+    const doneToday = records.days && records.days[today()];
+    const mode = currentMode();
+    const pendiente = solo && solo.kind === "free";
+    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2>Jugar en solitario</h2>
+        <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una.</p>
+        <div class="panel solo-panel">
+          <div class="section-label">Reto diario <small>${today().split("-").reverse().join("/")}</small></div>
+          ${doneToday
+            ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
+            : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
+          <div class="solo-stats"><span><b>${records.streak || 0}</b><small>días seguidos</small></span><span><b>${records.best || 0}</b><small>mejor marca libre</small></span></div>
+        </div>
+        <div class="panel solo-panel">
+          <div class="section-label">Partida libre</div>
+          <p>El mazo entero, sin límite de cartas: aguanta lo que puedas.</p>
+          ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar la partida <span>→</span></button>` : ""}
+          <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
+        </div>
+      </section>
+    </div>`;
+  }
+
+  function startSolo(kind) {
+    const ids = currentMode().cards.map(card => card.id);
+    const barajado = kind === "daily"
+      ? shuffleWith(ids, seededRandom(seedFrom(`${today()}:${selectedModeKey}`))).slice(0, DAILY_CARDS + 1)
+      : shuffle(ids);
+    const timeline = [barajado.shift()];
+    solo = {
+      kind, mode: selectedModeKey, day: today(), deck: barajado, timeline,
+      current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
+      total: kind === "daily" ? DAILY_CARDS : null, finished: false
+    };
+    pendingIndex = null;
+    result = null;
+    saveSolo();
+    soloView();
+  }
+
+  function soloView() {
+    screen = "solo";
+    const card = cardsById.get(solo.current);
+    const timelineCards = solo.timeline.map(id => cardsById.get(id));
+    const slots = [];
+    for (let i = 0; i <= timelineCards.length; i++) {
+      slots.push(pendingIndex === i
+        ? confirmSlot(card)
+        : `<button class="slot" data-action="solo-place" data-index="${i}" aria-label="Colocar en la posición ${i + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
+      if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i]));
+    }
+    const restantes = solo.total ? solo.total - solo.played : solo.deck.length + 1;
+    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="solo-menu">Salir</button>')}
+      <div class="game-head"><div><div class="turn-label">${solo.kind === "daily" ? "Reto diario" : "Partida libre"}</div><div class="turn-name">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
+      <div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>
+      <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
+      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde crees que encaja"}</p></section>
+    </div>`;
+  }
+
+  function soloPlace(index) {
+    const card = cardsById.get(solo.current);
+    const previous = index > 0 ? cardsById.get(solo.timeline[index - 1]) : null;
+    const next = index < solo.timeline.length ? cardsById.get(solo.timeline[index]) : null;
+    const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+    if (correct) {
+      solo.timeline.splice(index, 0, solo.current);
+      solo.hits += 1;
+    } else {
+      solo.lives -= 1;
+    }
+    solo.played += 1;
+    pendingIndex = null;
+    result = { correct, card, solo: true };
+    saveSolo();
+    soloResult();
+  }
+
+  function soloResult() {
+    soloView();
+    const { correct, card } = result;
+    const era = eraForCard(card);
+    const acabada = solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total);
+    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+  }
+
+  function soloNext() {
+    result = null;
+    if (solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total)) return soloFinish();
+    solo.current = solo.deck.shift();
+    saveSolo();
+    soloView();
+  }
+
+  function soloFinish() {
+    screen = "solo-end";
+    const total = solo.total || solo.played;
+    const records = modeRecords();
+    const dia = today();
+    if (solo.kind === "daily" && !(records.days && records.days[dia])) {
+      records.days = records.days || {};
+      records.days[dia] = { hits: solo.hits, total };
+      records.streak = records.lastDay === yesterday() ? (records.streak || 0) + 1 : 1;
+      records.lastDay = dia;
+      // No hace falta guardar el histórico entero: basta con los últimos días.
+      const dias = Object.keys(records.days).sort().slice(-60);
+      records.days = Object.fromEntries(dias.map(clave => [clave, records.days[clave]]));
+      saveRecords(records);
+    } else if (solo.kind === "free" && solo.hits > (records.best || 0)) {
+      records.best = solo.hits;
+      saveRecords(records);
+    }
+    const superado = solo.lives > 0;
+    const resumen = solo.kind === "daily"
+      ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
+      : `Has aguantado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} seguidas antes de quedarte sin vidas.`;
+    solo.finished = true;
+    saveSolo();
+    solo = null;
+    app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`;
   }
 
   function rules() {
@@ -355,9 +622,18 @@
       target.closest(".player-row").remove(); syncStarterOptions();
     } else if (action === "start") startGame();
     else if (action === "ready") gameView();
-    else if (action === "select-card") { selectedCardId = Number(target.dataset.id); gameView(); }
-    else if (action === "place") placeCard(Number(target.dataset.index));
+    else if (action === "select-card") { selectedCardId = Number(target.dataset.id); pendingIndex = null; gameView(); }
+    else if (action === "place") { pendingIndex = Number(target.dataset.index); gameView(); }
+    else if (action === "confirm-place") { screen === "solo" ? soloPlace(pendingIndex) : placeCard(pendingIndex); }
+    else if (action === "cancel-place") { pendingIndex = null; screen === "solo" ? soloView() : gameView(); }
     else if (action === "finish-turn") finishTurn();
+    else if (action === "solo") soloHome();
+    else if (action === "start-daily") startSolo("daily");
+    else if (action === "start-free") startSolo("free");
+    else if (action === "resume-solo") { solo = loadSolo(); pendingIndex = null; solo ? soloView() : soloHome(); }
+    else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); soloView(); }
+    else if (action === "solo-next") soloNext();
+    else if (action === "solo-menu") soloHome();
     else if (action === "rules") rules();
     else if (action === "close-rules") target.closest(".overlay").remove();
     else if (action === "game-menu") gameMenu();

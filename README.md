@@ -8,13 +8,27 @@ Juego de cronología para 2–9 personas, diseñado para jugarse pasando un solo
 - **Estrenos de cine:** 87 películas conocidas, de *Viaje a la Luna* (1902) a *Del revés 2* (2024),
   con trece títulos del cine español. Cada año aparece una sola vez y el reparto está equilibrado
   por décadas, para que ninguna carta sea una moneda al aire entre dos estrenos del mismo año.
+- **Superficie de países:** 59 países ordenados de mayor a menor, de Rusia a la Ciudad del Vaticano.
+  Aquí la línea no es temporal: se ordena por tamaño. Ningún país está a menos de un 8% de otro,
+  así que las cartas cercanas siempre se pueden razonar.
 
 Cada modalidad conserva su propia partida local. La modalidad elegida también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
-La aplicación ofrece dos alternativas:
+La aplicación ofrece tres formas de jugar:
 
-- **Un solo móvil:** no necesita conexión y conserva las partidas localmente.
+- **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
+- **En solitario:** una persona contra el mazo, con tres vidas.
+
+## Jugar en solitario
+
+Dos formatos, los dos sin conexión y con la marca guardada en el propio móvil:
+
+- **Reto diario:** las mismas 15 cartas para todo el mundo ese día y un solo intento. Las cartas se
+  barajan con la fecha como semilla, así que no hace falta ningún servidor para que dos móviles
+  reciban exactamente el mismo reto. Completar el reto un día detrás de otro encadena una racha.
+- **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
+  mejor marca de cada modalidad y se puede dejar a medias y continuar después.
 
 ## Probarlo en un ordenador
 
@@ -41,7 +55,9 @@ de Firestore contra el emulador oficial. Las instrucciones están en `tests/READ
 
 - La persona más joven comienza y el turno avanza en el orden de los jugadores.
 - Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
-- La fecha permanece oculta hasta colocar la carta en un hueco de la línea temporal.
+- La fecha (o la superficie) permanece oculta hasta colocar la carta en un hueco de la línea.
+- Al elegir un hueco hay que confirmarlo antes de revelar: en un móvil el dedo falla y la jugada
+  no debería depender de eso.
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
 - Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.

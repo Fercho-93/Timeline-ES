@@ -55,6 +55,9 @@ await check("entrar con nombre de 30 caracteres", "deny", updateDoc(ref(ctx(P2))
 await check("entrar borrando al anfitrión", "deny", updateDoc(ref(ctx(P2)), { players: { [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [P2], version: 2, updatedAt: 2 }));
 await check("entrar cambiando la modalidad", "deny", updateDoc(ref(ctx(P2)), { mode: "movies", players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: 2 }));
 
+await check("crear una sala de la modalidad de países", "allow", setDoc(doc(ctx(HOST), "rooms", "PAIS2345"), { ...base(), roomCode: "PAIS2345", mode: "countries" }));
+await check("crear una sala de una modalidad inventada", "deny", setDoc(doc(ctx(HOST), "rooms", "XXXX2345"), { ...base(), roomCode: "XXXX2345", mode: "banderas" }));
+
 console.log("\nEmpezar la partida");
 const lobby3 = { ...base(), playerOrder: [HOST, P2, P3], players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 }, [P2]: { name: "Bea", hand: [], joinedAt: 2 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3 } } };
 const startPayload = { winners: null, handSize: 2, players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2 }, [P3]: { name: "Cid", hand: [6, 7], joinedAt: 3 } }, deck: [10, 11], discard: [], timeline: [20], status: "playing", phase: "turn", current: 1, starter: P2, turnsInRound: 0, round: 1, winner: null, reveal: null, version: 2, updatedAt: 2 };
