@@ -1,4 +1,4 @@
-const CACHE = "hilo-modos-v8";
+const CACHE = "hilo-modos-v9";
 const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {
@@ -12,8 +12,11 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-    const copy = response.clone();
-    caches.open(CACHE).then(cache => cache.put(event.request, copy));
+    // Solo se guardan respuestas propias y correctas: un 404 cacheado sobrevive a los despliegues.
+    if (response.ok && response.type === "basic") {
+      const copy = response.clone();
+      caches.open(CACHE).then(cache => cache.put(event.request, copy));
+    }
     return response;
   }).catch(() => event.request.mode === "navigate" ? caches.match("./index.html") : Response.error())));
 });

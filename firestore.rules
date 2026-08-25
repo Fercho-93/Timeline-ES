@@ -1,60 +1,197 @@
 rules_version = '2';
 
+// Las reglas validan la *estructura* de cada jugada: quién escribe, en qué fase,
+// qué campos toca y que las cartas no se creen ni se dupliquen. La comprobación de
+// si el año encaja en la línea temporal sigue siendo del cliente: sin backend no
+// hay forma de verificarla, porque las fechas viven en cards.js / movies.js.
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
-
     match /rooms/{roomId} {
-      function isParticipant() {
-        return signedIn() && request.auth.uid in resource.data.playerOrder;
+      function signedIn() { return request.auth != null; }
+      function uid() { return request.auth.uid; }
+      function before() { return resource.data; }
+      function after() { return request.resource.data; }
+      function changed() { return after().diff(before()).affectedKeys(); }
+
+      function isParticipant() { return signedIn() && uid() in before().playerOrder; }
+      function isHost() { return signedIn() && before().hostUid == uid(); }
+      function isCurrent() { return isParticipant() && before().playerOrder[before().current] == uid(); }
+      function bumped() { return after().version == before().version + 1; }
+      function validName(name) { return name is string && name.size() >= 1 && name.size() <= 18; }
+
+      // Identidad de la sala: nunca cambia después de crearla.
+      function identityKept() {
+        return after().roomCode == before().roomCode
+          && after().mode == before().mode
+          && after().hostUid == before().hostUid
+          && after().createdAt == before().createdAt;
       }
 
-      function isHost() {
-        return signedIn() && resource.data.hostUid == request.auth.uid;
+      // Las cartas ni se crean ni se destruyen: mazo + descarte + línea + mi mano.
+      function myCardsBefore() {
+        return before().deck.size() + before().discard.size() + before().timeline.size()
+          + before().players[uid()].hand.size();
+      }
+      function myCardsAfter() {
+        return after().deck.size() + after().discard.size() + after().timeline.size()
+          + after().players[uid()].hand.size();
+      }
+      function onlyMyHand() {
+        return after().players.diff(before().players).affectedKeys().hasOnly([uid()]);
       }
 
-      function isCurrentPlayer() {
-        return isParticipant()
-          && resource.data.status == 'playing'
-          && resource.data.playerOrder[resource.data.current] == request.auth.uid;
-      }
+      function roundEnds() { return before().turnsInRound + 1 >= before().playerOrder.size(); }
 
+      // Entrar en una sala que aún está en el vestíbulo.
       function validJoin() {
         return signedIn()
-          && resource.data.status == 'lobby'
-          && !(request.auth.uid in resource.data.playerOrder)
-          && resource.data.playerOrder.size() < 9
-          && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['players', 'playerOrder', 'version', 'updatedAt'])
-          && request.resource.data.playerOrder.size() == resource.data.playerOrder.size() + 1
-          && request.resource.data.playerOrder[resource.data.playerOrder.size()] == request.auth.uid
-          && request.resource.data.players.diff(resource.data.players).affectedKeys()
-            .hasOnly([request.auth.uid])
-          && request.resource.data.players[request.auth.uid].name is string
-          && request.resource.data.players[request.auth.uid].name.size() >= 1
-          && request.resource.data.players[request.auth.uid].name.size() <= 18
-          && request.resource.data.players[request.auth.uid].hand.size() == 0
-          && request.resource.data.version == resource.data.version + 1;
+          && before().status == 'lobby'
+          && !(uid() in before().playerOrder)
+          && before().playerOrder.size() < 9
+          && changed().hasOnly(['players', 'playerOrder', 'version', 'updatedAt'])
+          && after().playerOrder.size() == before().playerOrder.size() + 1
+          && after().playerOrder[before().playerOrder.size()] == uid()
+          && after().players.diff(before().players).affectedKeys().hasOnly([uid()])
+          && validName(after().players[uid()].name)
+          && after().players[uid()].hand.size() == 0
+          && bumped();
+      }
+
+      // El anfitrión reparte y arranca la partida.
+      function validStart() {
+        return isHost()
+          && before().status == 'lobby'
+          && before().playerOrder.size() >= 2
+          && changed().hasOnly(['handSize', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
+                                'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
+                                'version', 'updatedAt'])
+          && after().status == 'playing'
+          && after().phase == 'turn'
+          && after().handSize >= 1 && after().handSize <= 6
+          && after().current >= 0 && after().current < before().playerOrder.size()
+          && after().timeline.size() == 1
+          && after().discard.size() == 0
+          && after().turnsInRound == 0
+          && after().round == 1
+          && after().winner == null
+          && after().get('winners', null) == null
+          && after().reveal == null
+          && bumped();
+      }
+
+      // Colocar una carta: solo el jugador de turno, solo su mano, sin inventar cartas.
+      function validPlay() {
+        return isCurrent()
+          && before().status == 'playing'
+          && before().phase == 'turn'
+          && changed().hasOnly(['players', 'deck', 'discard', 'timeline', 'phase', 'reveal',
+                                'version', 'updatedAt'])
+          && after().phase == 'reveal'
+          && onlyMyHand()
+          && myCardsAfter() == myCardsBefore()
+          && after().reveal.playerUid == uid()
+          && after().reveal.cardId is int
+          && after().reveal.correct is bool
+          && (after().reveal.correct
+              ? (after().timeline.size() == before().timeline.size() + 1
+                 && after().deck.size() == before().deck.size()
+                 && after().discard.size() == before().discard.size()
+                 && after().players[uid()].hand.size() == before().players[uid()].hand.size() - 1)
+              : (after().timeline.size() == before().timeline.size()
+                 && after().players[uid()].hand.size() <= before().players[uid()].hand.size()
+                 && after().players[uid()].hand.size() >= before().players[uid()].hand.size() - 1))
+          && bumped();
+      }
+
+      // Cerrar el turno: el jugador de turno o el anfitrión, nunca antes de revelar.
+      function validAdvance() {
+        return (isCurrent() || isHost())
+          && before().status == 'playing'
+          && before().phase == 'reveal'
+          && after().reveal == null
+          && (after().status == 'ended'
+              ? (changed().hasOnly(['status', 'phase', 'winner', 'winners', 'reveal', 'version', 'updatedAt'])
+                 && after().phase == 'finished'
+                 && after().winner in before().playerOrder
+                 && before().players[after().winner].hand.size() == 0
+                 && after().get('winners', [after().winner]).size() >= 1)
+              : (changed().hasOnly(['players', 'deck', 'discard', 'current', 'turnsInRound', 'round',
+                                    'phase', 'reveal', 'version', 'updatedAt'])
+                 && after().status == 'playing'
+                 && after().phase == 'turn'
+                 && after().winner == null
+                 && after().current == (before().current + 1) % before().playerOrder.size()
+                 && after().turnsInRound == (roundEnds() ? 0 : before().turnsInRound + 1)
+                 && after().round == (roundEnds() ? before().round + 1 : before().round)
+                 // Solo el desempate de final de ronda puede repartir cartas.
+                 && (roundEnds() || (after().players == before().players
+                                     && after().deck == before().deck
+                                     && after().discard == before().discard))))
+          && bumped();
+      }
+
+      // El anfitrión salta el turno de quien se ha desconectado.
+      function validSkip() {
+        return isHost()
+          && before().status == 'playing'
+          && changed().hasOnly(['current', 'turnsInRound', 'round', 'phase', 'reveal',
+                                'version', 'updatedAt'])
+          && after().phase == 'turn'
+          && after().reveal == null
+          && after().current == (before().current + 1) % before().playerOrder.size()
+          && after().turnsInRound == (roundEnds() ? 0 : before().turnsInRound + 1)
+          && after().round == (roundEnds() ? before().round + 1 : before().round)
+          && bumped();
+      }
+
+      // El anfitrión expulsa a alguien, o alguien se marcha: sus cartas van al descarte.
+      function validKick() {
+        return isParticipant()
+          && (isHost() || !(uid() in after().playerOrder))
+          && (after().winner == null || after().winner in after().playerOrder)
+          && changed().hasOnly(['players', 'playerOrder', 'discard', 'current', 'turnsInRound',
+                                'phase', 'status', 'winner', 'reveal', 'version', 'updatedAt'])
+          && after().playerOrder.size() == before().playerOrder.size() - 1
+          && after().playerOrder.size() >= 1
+          && after().players.size() == before().players.size() - 1
+          && before().hostUid in after().playerOrder
+          && after().current >= 0
+          && after().current < after().playerOrder.size()
+          && after().deck.size() == before().deck.size()
+          && after().timeline.size() == before().timeline.size()
+          && bumped();
       }
 
       allow get: if signedIn() && (resource.data.status == 'lobby' || isParticipant());
       allow list: if false;
 
       allow create: if signedIn()
-        && request.resource.data.hostUid == request.auth.uid
+        && request.resource.data.hostUid == uid()
+        && request.resource.data.roomCode == roomId
         && request.resource.data.mode in ['history', 'movies']
         && request.resource.data.status == 'lobby'
+        && request.resource.data.phase == 'lobby'
+        && request.resource.data.version == 1
         && request.resource.data.playerOrder.size() == 1
-        && request.resource.data.playerOrder[0] == request.auth.uid
-        && request.resource.data.players[request.auth.uid].name is string;
+        && request.resource.data.playerOrder[0] == uid()
+        && request.resource.data.players.size() == 1
+        && validName(request.resource.data.players[uid()].name)
+        && request.resource.data.players[uid()].hand.size() == 0
+        && request.resource.data.deck.size() == 0
+        && request.resource.data.timeline.size() == 0
+        && request.resource.data.winner == null
+        && request.resource.data.get('winners', null) == null;
 
-      allow update: if request.resource.data.get('mode', 'history') == resource.data.get('mode', 'history')
-        && (validJoin()
-          || isHost()
-          || (isCurrentPlayer()
-            && request.resource.data.version == resource.data.version + 1));
+      // Cada escritura entra por una sola rama: encadenar seis validaciones agota
+      // el límite de 1000 expresiones que Firestore evalúa por petición.
+      allow update: if signedIn() && identityKept() && (
+        after().playerOrder.size() < before().playerOrder.size()
+          ? validKick()
+          : (before().status == 'lobby'
+              ? (after().status == 'lobby' ? validJoin() : validStart())
+              : (after().phase == 'reveal'
+                  ? validPlay()
+                  : (before().phase == 'reveal' ? validAdvance() : validSkip()))));
 
       allow delete: if isHost();
     }

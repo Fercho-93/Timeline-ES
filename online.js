@@ -275,11 +275,12 @@ export async function openOnlineMode(options = {}) {
 }
 
 function renderEntry(invited = "") {
+  const known = invited ? rememberedRoom(invited) : null;
   appEl.innerHTML = `<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="back">Salir</button>')}
     <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${MODE_NAMES[selectedModeKey]}</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid">
       <form class="panel online-form" data-online-form="create"><span class="form-number">01</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
-      <form class="panel online-form" data-online-form="join"><span class="form-number">02</span><h3>Entrar en una sala</h3><p>Usa el código que aparece en el móvil anfitrión.</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name"></div><button class="btn btn-secondary btn-block" type="submit">Unirme a la partida</button></form>
+      <form class="panel online-form" data-online-form="join"><span class="form-number">02</span><h3>Entrar en una sala</h3><p>Usa el código que aparece en el móvil anfitrión.</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${escapeHtml(known?.name || "")}"></div><button class="btn btn-secondary btn-block" type="submit">Unirme a la partida</button></form>
     </div>
     <p class="online-note">Necesita conexión a internet durante la partida compartida.</p>
   </div>`;
@@ -303,7 +304,7 @@ async function createRoom(name) {
       playerOrder: [user.uid],
       players: { [user.uid]: { name, hand: [], joinedAt: Date.now() } },
       deck: [], discard: [], timeline: [], current: 0, starter: user.uid,
-      turnsInRound: 0, round: 1, winner: null, reveal: null,
+      turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
       createdAt: serverTimestamp(), updatedAt: serverTimestamp()
     });
     rememberRoom(code, name);
@@ -350,28 +351,32 @@ function connectToRoom(code) {
   roomRef = doc(db, "rooms", code);
   unsubscribeRoom = onSnapshot(roomRef, snapshot => {
     if (!snapshot.exists()) {
-      showToast("La sala ha sido cerrada");
-      leaveOnline();
+      leaveOnline("La sala ha sido cerrada");
       return;
     }
     roomState = snapshot.data();
     roomState.mode = roomState.mode || "history";
     selectedModeKey = roomState.mode;
+    if (!roomState.playerOrder.includes(user.uid)) {
+      leaveOnline("Ya no estás en esta sala");
+      return;
+    }
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
     else renderGame();
   }, error => {
     console.error(error);
-    showToast("Se perdió la conexión con la sala");
+    if (error.code === "permission-denied") leaveOnline("Ya no estás en esta sala");
+    else showToast("Se perdió la conexión con la sala");
   });
 }
 
 function renderLobby() {
   const isHost = roomState.hostUid === user.uid;
   const people = roomState.playerOrder.map(uid => roomState.players[uid]);
-  appEl.innerHTML = `<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="leave">Salir</button>')}
+  appEl.innerHTML = `<div class="shell online-shell">${header(isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>')}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2>Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
-    <div class="online-lobby-grid"><section class="panel"><div class="section-label">Participantes <small>${people.length}/9</small></div><div class="lobby-players">${roomState.playerOrder.map((uid, index) => { const player = roomState.players[uid]; return `<div class="lobby-player"><span>${escapeHtml(initials(player.name))}</span><div><strong>${escapeHtml(player.name)}</strong><small>${uid === roomState.hostUid ? "Anfitrión" : `Participante ${index + 1}`}</small></div><i>✓</i></div>`; }).join("")}</div></section>
+    <div class="online-lobby-grid"><section class="panel"><div class="section-label">Participantes <small>${people.length}/9</small></div><div class="lobby-players">${roomState.playerOrder.map((uid, index) => { const player = roomState.players[uid]; return `<div class="lobby-player"><span>${escapeHtml(initials(player.name))}</span><div><strong>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</strong><small>${uid === roomState.hostUid ? "Anfitrión" : `Participante ${index + 1}`}</small></div>${isHost && uid !== roomState.hostUid ? `<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button>` : "<i>✓</i>"}</div>`; }).join("")}</div></section>
       <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
     </div>
   </div>`;
@@ -394,7 +399,7 @@ async function startRoom() {
       transaction.update(roomRef, {
         handSize, players, deck, timeline, discard: [], status: "playing", phase: "turn",
         current: data.playerOrder.indexOf(starterUid), starter: starterUid,
-        turnsInRound: 0, round: 1, winner: null, reveal: null,
+        turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -420,12 +425,12 @@ function renderGame() {
       slots.push(`<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatYear(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
-  appEl.innerHTML = `<div class="shell">${header('<div class="top-actions"><button class="icon-btn" data-online-action="share">Compartir</button><button class="icon-btn qr-top" data-online-action="qr">QR</button></div>')}
+  appEl.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-online-action="room">Sala</button>')}
     <div class="connection-strip"><span><i></i> Sala ${roomCode}</span><small>${roomState.playerOrder.length} participantes</small></div>
     <div class="game-head"><div><div class="turn-label">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
     <section><div class="hand-title"><h3>Línea temporal</h3><small>${roomState.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); const era = eraForCard(card); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" ${myTurn ? "" : "disabled"}><span class="card-era era-${era.key}"><i>${era.symbol}</i>${era.name}</span><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
+    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">Fecha oculta</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta para colocarla") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
   </div>`;
 }
@@ -435,7 +440,7 @@ function revealOverlay(currentUid) {
   const card = getCard(reveal.cardId);
   const era = eraForCard(card);
   const canContinue = user.uid === currentUid || user.uid === roomState.hostUid;
-  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
+  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
 }
 
 async function placeCard(index) {
@@ -458,17 +463,19 @@ async function placeCard(index) {
       const timeline = [...data.timeline];
       let deck = [...data.deck];
       let discard = [...data.discard];
+      let returned = false;
       if (correct) timeline.splice(index, 0, playedId);
       else {
-        discard.push(playedId);
         const drawn = takeCard(deck, discard);
         deck = drawn.deck; discard = drawn.discard;
-        if (drawn.cardId != null) hand.push(drawn.cardId);
+        if (drawn.cardId != null) { hand.push(drawn.cardId); discard.push(playedId); }
+        // Sin mazo ni descarte no hay nada que robar: la carta vuelve a la mano.
+        else { hand.push(playedId); returned = true; }
       }
       const players = { ...data.players, [user.uid]: { ...data.players[user.uid], hand } };
       transaction.update(roomRef, {
         players, deck, discard, timeline, phase: "reveal",
-        reveal: { cardId: playedId, correct, playerUid: user.uid, playerName: data.players[user.uid].name },
+        reveal: { cardId: playedId, correct, returned, playerUid: user.uid, playerName: data.players[user.uid].name },
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -487,7 +494,7 @@ function takeCard(deckInput, discardInput) {
 }
 
 async function finishTurn() {
-  if (busy) return;
+  if (busy || roomState?.phase !== "reveal") return;
   busy = true;
   try {
     await runTransaction(db, async transaction => {
@@ -502,8 +509,10 @@ async function finishTurn() {
       let discard = [...data.discard];
       if (turnsInRound >= data.playerOrder.length) {
         const empty = data.playerOrder.filter(uid => players[uid].hand.length === 0);
-        if (empty.length === 1) {
-          transaction.update(roomRef, { status: "ended", phase: "finished", winner: empty[0], reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
+        // Sin cartas suficientes para el desempate la partida termina compartida:
+        // si no, a esas personas les llegaría el turno con la mano vacía.
+        if (empty.length === 1 || (empty.length > 1 && deck.length + discard.length < empty.length)) {
+          transaction.update(roomRef, { status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
         }
         if (empty.length > 1) {
@@ -523,14 +532,109 @@ async function finishTurn() {
       });
     });
   } catch (error) {
-    console.error(error);
-    showToast("No se pudo avanzar el turno");
+    // NOT_ALLOWED = alguien se adelantó a cerrar el turno; no hay nada que avisar.
+    if (error.message !== "NOT_ALLOWED") {
+      console.error(error);
+      showToast("No se pudo avanzar el turno");
+    }
   } finally { busy = false; }
 }
 
 function renderWinner() {
-  const winner = roomState.players[roomState.winner];
-  appEl.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(winner.name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 style="font-size:clamp(2.5rem,12vw,4.5rem)">${escapeHtml(winner.name)} gana</h1><p class="lead" style="margin-inline:auto">Ha sido la única persona en terminar la ronda sin cartas.</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`;
+  const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
+  const names = uids.map(uid => escapeHtml(roomState.players[uid].name));
+  const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
+  const lead = names.length === 1
+    ? "Ha sido la única persona en terminar la ronda sin cartas."
+    : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
+  appEl.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(roomState.players[uids[0]].name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`;
+}
+
+function roomMenu() {
+  const isHost = roomState?.hostUid === user.uid;
+  const playing = roomState?.status === "playing";
+  const currentUid = playing ? roomState.playerOrder[roomState.current] : null;
+  const currentName = currentUid ? roomState.players[currentUid].name : "";
+  const others = (roomState?.playerOrder || []).filter(uid => uid !== roomState.hostUid);
+  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-room-overlay><div class="modal">
+    <div class="eyebrow">Sala ${roomCode}</div><h2>Gestionar la partida</h2>
+    <div class="actions" style="display:grid">
+      <button class="btn btn-secondary" data-online-action="share">Compartir enlace</button>
+      <button class="btn btn-secondary" data-online-action="qr">Mostrar QR</button>
+      ${isHost && playing ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
+    </div>
+    ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span>${escapeHtml(initials(roomState.players[uid].name))}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong><button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
+    <div class="actions" style="display:grid">
+      ${isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
+      <button class="btn btn-primary" data-online-action="close-room-menu">Volver a la partida</button>
+    </div>
+  </div></div>`);
+}
+
+// El anfitrión desatasca la partida cuando alguien se queda sin batería o sin cobertura.
+async function skipTurn() {
+  if (busy || roomState?.hostUid !== user.uid || roomState?.status !== "playing") return;
+  busy = true;
+  try {
+    await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(roomRef);
+      const data = snapshot.data();
+      if (data.hostUid !== user.uid || data.status !== "playing") throw new Error("NOT_ALLOWED");
+      const roundEnds = data.turnsInRound + 1 >= data.playerOrder.length;
+      transaction.update(roomRef, {
+        current: (data.current + 1) % data.playerOrder.length,
+        turnsInRound: roundEnds ? 0 : data.turnsInRound + 1,
+        round: roundEnds ? data.round + 1 : data.round,
+        phase: "turn", reveal: null,
+        version: data.version + 1, updatedAt: serverTimestamp()
+      });
+    });
+    showToast("Turno saltado");
+  } catch (error) {
+    console.error(error);
+    showToast("No se pudo saltar el turno");
+  } finally { busy = false; }
+}
+
+// Expulsar (anfitrión) o marcharse: las cartas de quien sale vuelven al descarte.
+async function removePlayer(targetUid) {
+  if (busy) return;
+  if (targetUid !== user.uid && roomState?.hostUid !== user.uid) return;
+  busy = true;
+  try {
+    await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(roomRef);
+      const data = snapshot.data();
+      const index = data.playerOrder.indexOf(targetUid);
+      if (index < 0) return;
+      if (targetUid === data.hostUid) throw new Error("HOST");
+      const playerOrder = data.playerOrder.filter(uid => uid !== targetUid);
+      const players = { ...data.players };
+      const hand = players[targetUid]?.hand || [];
+      delete players[targetUid];
+      const update = {
+        players, playerOrder, discard: [...data.discard, ...hand],
+        version: data.version + 1, updatedAt: serverTimestamp()
+      };
+      if (data.status === "playing") {
+        if (playerOrder.length < 2) {
+          Object.assign(update, { status: "ended", phase: "finished", winner: playerOrder[0], current: 0, turnsInRound: 0, reveal: null });
+        } else {
+          const before = index < data.current;
+          const current = (before ? data.current - 1 : data.current) % playerOrder.length;
+          const turnsInRound = before ? Math.max(0, data.turnsInRound - 1) : data.turnsInRound;
+          Object.assign(update, {
+            current, turnsInRound: Math.min(turnsInRound, playerOrder.length - 1),
+            phase: "turn", reveal: null
+          });
+        }
+      }
+      transaction.update(roomRef, update);
+    });
+  } catch (error) {
+    console.error(error);
+    showToast(error.message === "HOST" ? "El anfitrión no puede salir: cierra la sala" : "No se pudo actualizar la sala");
+  } finally { busy = false; }
 }
 
 async function shareRoom() {
@@ -555,14 +659,17 @@ async function closeRoom() {
   await deleteDoc(roomRef);
 }
 
-function leaveOnline() {
+// Con mensaje se recarga un momento después, para que dé tiempo a leerlo.
+function leaveOnline(message = "") {
   unsubscribeRoom?.();
   unsubscribeRoom = null;
   roomState = null;
   roomRef = null;
   roomCode = "";
   history.replaceState({}, "", location.pathname);
-  location.reload();
+  if (!message) return location.reload();
+  showToast(message);
+  setTimeout(() => location.reload(), 1600);
 }
 
 document.addEventListener("submit", event => {
@@ -597,4 +704,13 @@ document.addEventListener("click", event => {
   else if (action === "place") placeCard(Number(target.dataset.index));
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
+  else if (action === "room") roomMenu();
+  else if (action === "close-room-menu") target.closest("[data-room-overlay]")?.remove();
+  else if (action === "skip") { target.closest("[data-room-overlay]")?.remove(); skipTurn(); }
+  else if (action === "kick") {
+    const name = roomState?.players[target.dataset.uid]?.name || "esta persona";
+    if (confirm(`¿Expulsar a ${name} de la sala?`)) { target.closest("[data-room-overlay]")?.remove(); removePlayer(target.dataset.uid); }
+  } else if (action === "leave-room") {
+    if (confirm("¿Salir de la sala? Tus cartas volverán al mazo.")) removePlayer(user.uid);
+  }
 });

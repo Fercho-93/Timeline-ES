@@ -26,7 +26,6 @@
   let game = loadGame();
   let selectedCardId = null;
   let result = null;
-  let passReady = false;
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
@@ -90,10 +89,17 @@
   function loadGame() {
     try {
       let raw = localStorage.getItem(storageKey());
-      if (!raw && selectedModeKey === "history") raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (!raw && selectedModeKey === "history") {
+        raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (raw) {
+          localStorage.setItem(storageKey(), raw);
+          localStorage.removeItem(LEGACY_STORAGE_KEY);
+        }
+      }
       const stored = JSON.parse(raw);
       if (!stored || !stored.players || !stored.timeline) return null;
       stored.mode = stored.mode || selectedModeKey;
+      if (!stored.winners && stored.winner != null) stored.winners = [stored.winner];
       return stored;
     } catch { return null; }
   }
@@ -163,10 +169,9 @@
     const shuffled = shuffle(currentMode().cards.map(card => card.id));
     const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize) }));
     const timeline = [shuffled.shift()];
-    game = { mode: selectedModeKey, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null };
+    game = { mode: selectedModeKey, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null };
     selectedCardId = null;
     result = null;
-    passReady = false;
     saveGame();
     renderPass();
   }
@@ -212,12 +217,15 @@
     const next = index < game.timeline.length ? cardsById.get(game.timeline[index]) : null;
     const correct = (!previous || card.year >= previous.year) && (!next || card.year <= next.year);
     player.hand = player.hand.filter(id => id !== selectedCardId);
+    let returned = false;
     if (correct) game.timeline.splice(index, 0, selectedCardId);
+    else if (drawCard(player)) game.discard.push(selectedCardId);
     else {
-      game.discard.push(selectedCardId);
-      drawCard(player);
+      // Sin mazo ni descarte no hay nada que robar: la carta vuelve a la mano.
+      player.hand.push(selectedCardId);
+      returned = true;
     }
-    result = { correct, card, playerName: player.name };
+    result = { correct, returned, card, playerName: player.name };
     selectedCardId = null;
     saveGame();
     renderResult();
@@ -229,41 +237,59 @@
       game.discard = [];
     }
     const id = game.deck.shift();
-    if (id != null) player.hand.push(id);
+    if (id == null) return false;
+    player.hand.push(id);
+    return true;
   }
 
   function renderResult() {
     gameView();
-    const { correct, card } = result;
+    const { correct, returned, card } = result;
     const era = eraForCard(card);
-    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatYear(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   function finishTurn() {
     game.turnsInRound += 1;
-    if (game.turnsInRound >= game.players.length) {
-      const empty = game.players.filter(player => player.hand.length === 0);
-      if (empty.length === 1) {
-        game.winner = empty[0].id;
-        saveGame();
-        return renderWinner(empty[0]);
-      }
-      if (empty.length > 1) {
-        empty.forEach(drawCard);
-        showToast("Empate: una carta extra para cada finalista");
-      }
-      game.round += 1;
-      game.turnsInRound = 0;
-    }
+    if (game.turnsInRound >= game.players.length && resolveRound()) return;
     game.current = (game.current + 1) % game.players.length;
     result = null;
     saveGame();
     renderPass();
   }
 
-  function renderWinner(winner) {
+  // Devuelve true si la partida ha terminado. Nadie puede empezar un turno con la mano
+  // vacía: o gana, o el desempate le da una carta, o se acaba la partida por falta de mazo.
+  function resolveRound() {
+    const empty = game.players.filter(player => player.hand.length === 0);
+    if (empty.length === 1) return endGame(empty);
+    if (empty.length > 1) {
+      if (game.deck.length + game.discard.length < empty.length) return endGame(empty);
+      empty.forEach(drawCard);
+      showToast("Empate: una carta extra para cada finalista");
+    }
+    game.round += 1;
+    game.turnsInRound = 0;
+    return false;
+  }
+
+  function endGame(winners) {
+    game.winners = winners.map(player => player.id);
+    game.winner = game.winners[0];
+    saveGame();
+    renderWinner(winners);
+    return true;
+  }
+
+  function renderWinner(winners) {
     screen = "winner";
-    app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 style="font-size:clamp(2.5rem,12vw,4.5rem)">${escapeHtml(winner.name)} gana</h1><p class="lead" style="margin-inline:auto">Ha sido la única persona en terminar la ronda sin cartas.</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`;
+    const list = [].concat(winners);
+    const names = list.map(player => escapeHtml(player.name));
+    const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
+    const lead = names.length === 1
+      ? "Ha sido la única persona en terminar la ronda sin cartas."
+      : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
+    app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`;
   }
 
   function rules() {
@@ -307,7 +333,7 @@
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();
-    else if (action === "continue") { game.winner ? renderWinner(game.players.find(p => p.id === game.winner)) : renderPass(); }
+    else if (action === "continue") { game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : renderPass(); }
     else if (action === "add-player") {
       const count = document.querySelectorAll("#players .player-row").length;
       if (count >= 9) return showToast("El máximo es de 9 jugadores");
@@ -317,7 +343,7 @@
       if (document.querySelectorAll("#players .player-row").length <= 2) return showToast("Se necesitan al menos 2 jugadores");
       target.closest(".player-row").remove(); syncStarterOptions();
     } else if (action === "start") startGame();
-    else if (action === "ready") { passReady = true; gameView(); }
+    else if (action === "ready") gameView();
     else if (action === "select-card") { selectedCardId = Number(target.dataset.id); gameView(); }
     else if (action === "place") placeCard(Number(target.dataset.index));
     else if (action === "finish-turn") finishTurn();

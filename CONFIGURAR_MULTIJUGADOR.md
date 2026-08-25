@@ -11,7 +11,37 @@ El código de Firebase ya está incluido en `online.js`. Solo falta publicar las
 5. Copia todo el contenido del archivo `firestore.rules`.
 6. Pégalo en el editor y pulsa **Publicar**.
 
-Las reglas permiten crear salas, unirse antes de que comience la partida y hacer jugadas únicamente al participante cuyo turno está activo. El anfitrión puede iniciar, desbloquear o cerrar su sala.
+Cada escritura entra por una sola rama de las reglas, según lo que intente cambiar: entrar
+en el vestíbulo, repartir, colocar una carta, cerrar el turno, saltar un turno, expulsar o
+marcharse. Las reglas comprueban quién escribe, en qué fase está la sala, qué campos toca y
+que las cartas ni se creen ni se dupliquen:
+
+- Solo el participante de turno coloca carta, y solo puede tocar su propia mano.
+- Al acertar, la carta sale de la mano y entra en la línea temporal; no se roba nada de paso.
+- Nadie puede vaciarse la mano sin jugar, repartir cartas a otras personas fuera del
+  desempate de final de ronda ni declararse ganador con cartas en la mano.
+- La modalidad, el código de sala y el anfitrión no cambian nunca después de crear la sala.
+- Expulsar es cosa del anfitrión; marcharse, de cada cual. El anfitrión no puede ser
+  expulsado: cierra la sala.
+
+**Lo que las reglas no pueden comprobar:** si el año de la carta encaja de verdad en el hueco
+elegido. Las fechas viven en `cards.js` y `movies.js`, dentro del propio navegador, así que esa
+parte la decide el cliente. Quien sepa manipular su navegador puede declarar acertada una
+jugada fallida en su turno, aunque no puede robar cartas ajenas, saltarse turnos ni forzar la
+victoria. Cerrar también esa puerta exige mover la jugada a una Cloud Function, con las manos
+en subcolecciones privadas; para un juego de sobremesa entre conocidos no compensa.
+
+Las reglas toleran las salas creadas por la versión anterior de la aplicación, así que se
+pueden publicar sin esperar a que todos los móviles hayan recargado la web. Las pruebas de
+`tests/reglas-firestore.mjs` y `tests/compatibilidad-version-anterior.mjs` ejecutan estas
+reglas contra el emulador oficial antes de publicarlas. Consulta `tests/README.md`.
+
+### Limpiar salas antiguas
+
+Las salas abandonadas se quedan guardadas para siempre. En **Firestore → Copia de seguridad y
+TTL → Directivas de TTL**, crea una directiva sobre la colección `rooms` con el campo
+`updatedAt`: Firestore borrará solas las salas sin actividad reciente y el proyecto se
+mantiene dentro del plan gratuito.
 
 ## 2. Comprobar Authentication
 
@@ -46,6 +76,11 @@ El archivo `firestore.rules` no es ejecutado por GitHub Pages; se incluye como c
 6. El anfitrión selecciona las cartas iniciales y la persona más joven.
 7. Pulsa **Barajar y empezar**.
 
+Durante la partida, el botón **Sala** abre la gestión: compartir el enlace, mostrar el QR y,
+si eres el anfitrión, **saltar el turno** de quien se haya quedado sin batería o **expulsar**
+a quien ya no juegue. Sus cartas vuelven al descarte y la partida sigue. Quien no sea
+anfitrión puede salir por su cuenta desde ese mismo menú.
+
 El orden de entrada en la sala determina el orden de los turnos; la persona marcada como más joven realiza el primero.
 
 ## Privacidad y límites
@@ -55,5 +90,7 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
 - Las salas utilizan códigos aleatorios de ocho caracteres.
 - Los códigos QR se generan dentro del propio dispositivo y no envían la invitación a servicios externos.
 - La interfaz solo enseña a cada participante su propia mano.
-- Es un juego doméstico: una persona con conocimientos técnicos y acceso a la sala podría inspeccionar los datos enviados al navegador.
+- Es un juego doméstico: el documento de la sala viaja entero a cada móvil, así que quien
+  sepa inspeccionar el navegador puede ver las manos ajenas y el orden del mazo. Las reglas
+  impiden manipular la partida, no mirar.
 - El modo compartido necesita internet. El modo de un móvil continúa funcionando sin conexión.

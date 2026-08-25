@@ -5,7 +5,9 @@ Juego de cronología para 2–9 personas, diseñado para jugarse pasando un solo
 ## Modalidades
 
 - **Historia de España:** 190 hechos históricos verificados, desde la Antigüedad hasta la actualidad.
-- **Estrenos de cine:** 103 películas internacionales y españolas, desde los pioneros del cine hasta 2024.
+- **Estrenos de cine:** 87 películas conocidas, de *Viaje a la Luna* (1902) a *Del revés 2* (2024),
+  con trece títulos del cine español. Cada año aparece una sola vez y el reparto está equilibrado
+  por décadas, para que ninguna carta sea una moneda al aire entre dos estrenos del mismo año.
 
 Cada modalidad conserva su propia partida local. La modalidad elegida también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
@@ -27,7 +29,13 @@ La carpeta debe abrirse mediante un servidor web local (no haciendo doble clic e
 
 El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.
 
-El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo.
+El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo: las reglas de seguridad hay que volver a publicarlas cuando cambian.
+
+## Comprobaciones
+
+`tests/` contiene tres comprobaciones automáticas: una partida completa del modo local sobre un
+DOM simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, y las reglas
+de Firestore contra el emulador oficial. Las instrucciones están en `tests/README.md`.
 
 ## Reglas implementadas
 
@@ -37,3 +45,9 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
 - Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.
+- Si al desempatar ya no quedan cartas que repartir, la partida termina y ganan todas ellas.
+- Si al fallar no queda nada que robar, la carta vuelve a la mano en lugar de descartarse.
+
+En el modo de varios móviles, el anfitrión puede saltar el turno de quien se haya quedado sin
+batería o expulsar a quien ya no juegue, y cualquier participante puede marcharse: sus cartas
+vuelven al descarte y la partida continúa.
