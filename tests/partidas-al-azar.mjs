@@ -6,9 +6,11 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
+// La lista de scripts sale de index.html, para no repetirla en cada prueba.
+const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 const boot = () => {
   const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
-  dom.window.eval(read("cards.js")); dom.window.eval(read("movies.js")); dom.window.eval(read("countries.js")); dom.window.eval(read("modes.js")); dom.window.eval(read("app.js"));
+  guiones().forEach(archivo => dom.window.eval(read(archivo)));
   return dom.window;
 };
 const fire = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));

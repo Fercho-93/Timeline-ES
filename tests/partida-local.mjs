@@ -7,17 +7,16 @@ import { fileURLToPath } from "node:url";
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
+const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot() {
   const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
-  window.eval(read("cards.js"));
-  window.eval(read("movies.js"));
-  window.eval(read("countries.js"));
-  window.eval(read("modes.js"));
-  window.eval(read("app.js"));
+  // Los scripts se toman de index.html, que es la única lista de verdad: así un mazo
+  // nuevo no obliga a tocar cada prueba (y no se olvida, que ya pasó).
+  guiones().forEach(archivo => window.eval(read(archivo)));
   return window;
 }
 const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) throw new Error(`no existe ${sel}`); el.dispatchEvent(new w.MouseEvent("click", { bubbles: true })); };

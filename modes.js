@@ -34,6 +34,21 @@
         { limit: Infinity, key: "democracia", name: "Democracia", symbol: "◎" }
       ]
     },
+    population: {
+      sortValue: card => card.value,
+      format: card => `${Math.round(card.value).toLocaleString("es-ES")} hab.`,
+      hiddenLabel: "Población oculta",
+      timelineTitle: "De menos a más",
+      question: "¿Menos o más gente?",
+      bands: [
+        { limit: 100000, key: "minusculo", name: "Minúsculo", symbol: "·" },
+        { limit: 2000000, key: "muypequeno", name: "Muy pequeño", symbol: "▪" },
+        { limit: 12000000, key: "pequeno", name: "Pequeño", symbol: "◈" },
+        { limit: 50000000, key: "medio", name: "Medio", symbol: "◆" },
+        { limit: 150000000, key: "grande", name: "Grande", symbol: "★" },
+        { limit: Infinity, key: "gigante", name: "Gigante", symbol: "⬢" }
+      ]
+    },
     area: {
       sortValue: card => card.value,
       format: card => `${formatArea(card.value)} km²`,
@@ -76,6 +91,11 @@
       key: "countries", name: "Superficie de países",
       cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
       axis: "area"
+    },
+    population: {
+      key: "population", name: "Población de países",
+      cardLabel: "países", blurb: "Del Vaticano a la India.", cards: window.POPULATION_CARDS,
+      axis: "population"
     }
   };
 
@@ -83,14 +103,13 @@
   // enseña el bloque y no el juego, así que añadir «Historia mundial» o «Inventos»
   // es declararlo aquí y sumarlo a `games`.
   //
-  // Ojo: las claves de los juegos (history, movies, countries) están escritas en
-  // `firestore.rules`, en la lista de modalidades que puede tener una sala. Cambiarlas
-  // obliga a volver a publicar las reglas y rompe las salas en curso, así que se
-  // quedan como están; los bloques usan claves propias.
+  // La clave de cada juego viaja en el documento de la sala compartida, así que cambiar
+  // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga
+  // a tocar `firestore.rules`: dejaron de llevar dentro la lista.
   const BLOCKS = {
     historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history"] },
     cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
-    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries"] }
+    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] }
   };
 
   const DEFAULT_MODE = "history";

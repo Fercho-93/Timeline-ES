@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
+const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
@@ -13,11 +14,9 @@ function boot(almacen = {}) {
   const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
-  window.eval(read("cards.js"));
-  window.eval(read("movies.js"));
-  window.eval(read("countries.js"));
-  window.eval(read("modes.js"));
-  window.eval(read("app.js"));
+  // Los scripts se toman de index.html, que es la única lista de verdad: así un mazo
+  // nuevo no obliga a tocar cada prueba (y no se olvida, que ya pasó).
+  guiones().forEach(archivo => window.eval(read(archivo)));
   return window;
 }
 const click = (w, sel) => {
@@ -131,17 +130,24 @@ console.log("\nRacha de días");
   ok("jugar ayer y hoy encadena la racha", JSON.parse(w.localStorage.getItem("hilo-retos-v1")).history.streak === 5);
 }
 
-console.log("\nModalidad de países");
+console.log("\nBloque de geografía");
 {
   const w = boot();
   click(w, '[data-block="geografia"]');
-  ok("elegir el bloque selecciona su juego", /59 países/.test(texto(w)));
+  ok("elegir el bloque selecciona su primer juego", /59 países/.test(texto(w)));
+  ok("el bloque lista sus dos juegos", w.document.querySelectorAll(".game-row").length === 2);
+  ok("los dos juegos del bloque aparecen por su nombre",
+     /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w)));
   ok("la galería ofrece los tres bloques", w.document.querySelectorAll(".gallery-panel").length === 3);
   const portada = w.document.querySelector(".gallery-panel.active").outerHTML;
   ok("la carátula desplegada es la de geografía, no otra", /hero-geography\.jpg/.test(portada) && !/hero-cinema|hero-history/.test(portada));
   ok("el rótulo es el del bloque de geografía", /Geografía/.test(portada) && !/Cine|Historia/.test(portada));
   ok("el juego aparece listado bajo la carátula", /Superficie de países/.test(w.document.querySelector(".games").textContent));
   ok("el titular cambia al eje de tamaño", /más grande/i.test(texto(w)));
+  click(w, '[data-mode="population"]');
+  ok("cambiar de juego dentro del bloque cambia el mazo", /49 países/.test(texto(w)));
+  ok("y cambia el titular al eje de población", /más gente/i.test(texto(w)));
+  click(w, '[data-mode="countries"]');
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   ok("la carta oculta la superficie, no la fecha", /superficie oculta/i.test(texto(w)));
