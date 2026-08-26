@@ -10,21 +10,21 @@
       key: "history", name: "Historia de España", shortName: "España", icon: "🏛️",
       eyebrow: "Historia · intuición · sobremesa",
       description: "Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.",
-      cardLabel: "hechos", caption: "De Hispania a la democracia", seal: "momentos<br>de historia", cards: window.HISTORY_CARDS,
+      cardLabel: "hechos", caption: "De Hispania a la democracia", cards: window.HISTORY_CARDS,
       headline: "¿Antes o<br><em>después?</em>", axis: "time"
     },
     movies: {
       key: "movies", name: "Estrenos de cine", shortName: "Cine", icon: "🎬",
       eyebrow: "Cine · memoria · palomitas",
       description: "Ordenad grandes películas por su año de estreno. De los pioneros del cine a los éxitos más recientes.",
-      cardLabel: "películas", caption: "De Méliès a nuestros días", seal: "grandes<br>estrenos", cards: window.MOVIE_CARDS,
+      cardLabel: "películas", caption: "De Méliès a nuestros días", cards: window.MOVIE_CARDS,
       headline: "¿Antes o<br><em>después?</em>", axis: "time"
     },
     countries: {
       key: "countries", name: "Superficie de países", shortName: "Países", icon: "🌍",
       eyebrow: "Geografía · escala · discusión",
       description: "Ordenad países por su superficie, del más pequeño al más extenso. Nadie tiene tan claro como cree lo que ocupa cada país.",
-      cardLabel: "países", caption: "Del Vaticano a Rusia", seal: "países<br>del mundo", cards: window.COUNTRY_CARDS,
+      cardLabel: "países", caption: "Del Vaticano a Rusia", cards: window.COUNTRY_CARDS,
       headline: "¿Más pequeño o<br><em>más grande?</em>", axis: "area"
     }
   };
@@ -156,24 +156,37 @@
     return `<header class="topbar"><div class="brand"><span class="brand-mark">${currentMode().icon}</span>Hilo · ${currentMode().shortName}</div>${extra}</header>`;
   }
 
+  // Cada modalidad tiene su propia carátula: una fotografía para historia y dos
+  // composiciones dibujadas con CSS para cine y países, que así siguen sin conexión.
+  const PANEL_ART = {
+    history: '<img src="assets/hero-history.jpg" alt="">',
+    movies: '<span class="art-cinema"><i></i><i></i></span>',
+    countries: '<span class="art-globe"><i></i><i></i><i></i></span>'
+  };
+
+  // La galería en acordeón es también el selector de modalidad: la carátula elegida
+  // se despliega en color y las otras dos quedan como lomos que se pueden tocar.
+  function gallery() {
+    return `<div class="gallery" role="group" aria-label="Elige la modalidad">${Object.values(MODES).map(item => {
+      const active = item.key === selectedModeKey;
+      return `<button class="gallery-panel panel-${item.key}${active ? " active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${item.cards.length} ${item.cardLabel}">
+        <span class="panel-art" aria-hidden="true">${PANEL_ART[item.key]}</span>
+        <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.shortName}</b></span>
+        <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.cards.length} ${item.cardLabel} · ${item.caption}</small></span>
+      </button>`;
+    }).join("")}</div>`;
+  }
+
   function home() {
     screen = "home";
     const mode = currentMode();
-    const modePicker = `<div class="mode-switch" role="group" aria-label="Modalidad de juego">${Object.values(MODES).map(item => `<button class="mode-option ${item.key === selectedModeKey ? "active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${item.key === selectedModeKey}"><span>${item.icon}</span><b>${item.name}</b></button>`).join("")}</div>`;
-    const seal = `<div class="art-seal"><span>${mode.cards.length}</span><small>${mode.seal}</small></div><div class="art-caption">${mode.caption}</div>`;
-    const heroArt = {
-      history: `<div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt="">${seal}</div>`,
-      movies: `<div class="hero-art hero-cinema" aria-hidden="true"><div class="cinema-symbol">🎬</div><div class="film-strip"></div>${seal}</div>`,
-      countries: `<div class="hero-art hero-globe" aria-hidden="true"><div class="globe"><i></i><i></i><i></i></div>${seal}</div>`
-    }[selectedModeKey];
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
-      ${modePicker}
       <section class="hero hero-premium">
         <div class="hero-copy">
           <div class="eyebrow"><span class="eyebrow-line"></span> ${mode.eyebrow}</div>
           <h1>${mode.headline}</h1>
           <p class="lead">${mode.description}</p>
-          <div class="hero-stats"><span class="pill">${mode.cards.length} ${mode.cardLabel}</span><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
+          <div class="hero-stats"><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
           <div class="actions">
             <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
             <button class="btn btn-secondary" data-action="online">Varios móviles</button>
@@ -181,7 +194,7 @@
             ${game && game.mode === selectedModeKey ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
           </div>
         </div>
-        ${heroArt}
+        ${gallery()}
       </section>
       <p class="app-version" id="app-version"></p>
     </div>`;
