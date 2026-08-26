@@ -18,8 +18,8 @@ const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
 // Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
 // cuando este módulo se descarga: se pide al entrar en el modo de varios móviles.
-const HILO = window.HILO;
-const { escapeHtml, initials, shuffle } = HILO;
+const CT = window.CONTINUUM;
+const { escapeHtml, initials, shuffle } = CT;
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 let user = null;
@@ -36,25 +36,24 @@ let seenSelfInRoom = false;
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
 
-function formatValue(card) { return HILO.formatValue(modeKey(), card); }
+function formatValue(card) { return CT.formatValue(modeKey(), card); }
 
-function sortValue(card) { return HILO.sortValue(modeKey(), card); }
+function sortValue(card) { return CT.sortValue(modeKey(), card); }
 
-function hiddenLabel() { return HILO.hiddenLabel(modeKey()); }
+function hiddenLabel() { return CT.hiddenLabel(modeKey()); }
 
-function timelineTitle() { return HILO.timelineTitle(modeKey()); }
+function timelineTitle() { return CT.timelineTitle(modeKey()); }
 
-function eraForCard(card) { return HILO.eraForCard(modeKey(), card); }
+function eraForCard(card) { return CT.eraForCard(modeKey(), card); }
 
-function modeCards(key = modeKey()) { return HILO.cards(key); }
+function modeCards(key = modeKey()) { return CT.cards(key); }
 
 function getCard(id) {
   return modeCards().find(card => card.id === id);
 }
 
 function header(extra = "") {
-  const mode = HILO.mode(modeKey());
-  return `<header class="topbar"><div class="brand"><span class="brand-mark">${mode.icon}</span>Hilo · ${mode.name} <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
+  return `<header class="topbar"><div class="brand">Continuum <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
 }
 
 function showToast(message) {
@@ -233,7 +232,7 @@ async function ensureAuth() {
 }
 
 export async function openOnlineMode(options = {}) {
-  selectedModeKey = HILO.has(options.modeKey) ? options.modeKey : HILO.DEFAULT_MODE;
+  selectedModeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
   renderEntry(cleanCode(options.roomCode));
   await ensureAuth();
   const invited = cleanCode(options.roomCode);
@@ -252,7 +251,7 @@ export async function openOnlineMode(options = {}) {
 function renderEntry(invited = "") {
   const known = invited ? rememberedRoom(invited) : null;
   appEl.innerHTML = `<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="back">Salir</button>')}
-    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${HILO.mode(selectedModeKey).name}</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
+    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${CT.mode(selectedModeKey).name}</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid">
       <form class="panel online-form" data-online-form="create"><span class="form-number">01</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
       <form class="panel online-form" data-online-form="join"><span class="form-number">02</span><h3>Entrar en una sala</h3><p>Usa el código que aparece en el móvil anfitrión.</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${escapeHtml(known?.name || "")}"></div><button class="btn btn-secondary btn-block" type="submit">Unirme a la partida</button></form>
@@ -628,7 +627,7 @@ async function removePlayer(targetUid) {
 async function shareRoom() {
   const url = invitationUrl();
   try {
-    if (navigator.share) await navigator.share({ title: "Hilo de España", text: `Únete a mi partida. Código: ${roomCode}`, url });
+    if (navigator.share) await navigator.share({ title: "Continuum", text: `Únete a mi partida. Código: ${roomCode}`, url });
     else { await navigator.clipboard.writeText(url); showToast("Enlace copiado"); }
   } catch (error) {
     if (error.name !== "AbortError") showToast("No se pudo compartir el enlace");

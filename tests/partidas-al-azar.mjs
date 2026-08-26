@@ -17,6 +17,9 @@ let problems = 0, games = 0, sharedWins = 0, returns = 0;
 for (let g = 0; g < 40; g++) {
   const w = boot();
   const mode = ["history", "movies", "countries"][g % 3];
+  // Hay que abrir antes el bloque: la portada solo lista los juegos del bloque en pantalla.
+  const block = { history: "historia", movies: "cine", countries: "geografia" }[mode];
+  fire(w, w.document.querySelector(`[data-block="${block}"]`));
   fire(w, w.document.querySelector(`[data-mode="${mode}"]`));
   const mazo = { history: w.HISTORY_CARDS, movies: w.MOVIE_CARDS, countries: w.COUNTRY_CARDS }[mode];
   const total = mazo.length;
