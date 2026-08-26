@@ -1,18 +1,29 @@
-# Hilo
+# Continuum
 
-Juego de cronología para 2–9 personas, diseñado para jugarse pasando un solo móvil o mediante una sala compartida. Funciona sin conexión después de instalarse como aplicación web, salvo cuando se utiliza el modo de varios móviles.
+Juego de ordenar para 2–9 personas, diseñado para jugarse pasando un solo móvil o mediante una sala compartida. Funciona sin conexión después de instalarse como aplicación web, salvo cuando se utiliza el modo de varios móviles.
 
-## Modalidades
+## Bloques y juegos
+
+Los juegos se agrupan en tres bloques. Hoy hay uno por bloque; la portada ya enseña el bloque,
+así que añadir juegos es sumarlos a `modes.js`.
+
+**Historia**
 
 - **Historia de España:** 190 hechos históricos verificados, desde la Antigüedad hasta la actualidad.
+
+**Cine**
+
 - **Estrenos de cine:** 87 películas conocidas, de *Viaje a la Luna* (1902) a *Del revés 2* (2024),
   con trece títulos del cine español. Cada año aparece una sola vez y el reparto está equilibrado
   por décadas, para que ninguna carta sea una moneda al aire entre dos estrenos del mismo año.
+
+**Geografía**
+
 - **Superficie de países:** 59 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
   Aquí la línea no es temporal: se ordena por tamaño. Ningún país está a menos de un 8% de otro,
   así que las cartas cercanas siempre se pueden razonar.
 
-Cada modalidad conserva su propia partida local. La modalidad elegida también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
+Cada juego conserva su propia partida local. El juego elegido también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
 La aplicación ofrece tres formas de jugar:
 
@@ -28,7 +39,7 @@ Dos formatos, los dos sin conexión y con la marca guardada en el propio móvil:
   barajan con la fecha como semilla, así que no hace falta ningún servidor para que dos móviles
   reciban exactamente el mismo reto. Completar el reto un día detrás de otro encadena una racha.
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
-  mejor marca de cada modalidad y se puede dejar a medias y continuar después.
+  mejor marca de cada juego y se puede dejar a medias y continuar después.
 
 ## Probarlo en un ordenador
 

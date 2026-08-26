@@ -7,40 +7,42 @@
   const LEGACY_STORAGE_KEY = "hilo-espana-game-v1";
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
-  const HILO = window.HILO;
-  const MODES = HILO.MODES;
-  const { escapeHtml, initials, shuffle } = HILO;
-  let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || HILO.DEFAULT_MODE;
-  if (!HILO.has(selectedModeKey)) selectedModeKey = HILO.DEFAULT_MODE;
-  let cardsById = new Map(HILO.cards(selectedModeKey).map(card => [card.id, card]));
+  const CT = window.CONTINUUM;
+  const { escapeHtml, initials, shuffle } = CT;
+  let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || CT.DEFAULT_MODE;
+  if (!CT.has(selectedModeKey)) selectedModeKey = CT.DEFAULT_MODE;
+  // El bloque en pantalla se deduce siempre del juego elegido, así que no se guarda aparte.
+  let selectedBlockKey = CT.blockOf(selectedModeKey).key;
+  let cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
   let screen = "home";
   let game = loadGame();
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
 
-  function currentAxis() { return HILO.axis(selectedModeKey); }
+  function currentAxis() { return CT.axis(selectedModeKey); }
 
-  function formatValue(card) { return HILO.formatValue(selectedModeKey, card); }
+  function formatValue(card) { return CT.formatValue(selectedModeKey, card); }
 
-  function sortValue(card) { return HILO.sortValue(selectedModeKey, card); }
+  function sortValue(card) { return CT.sortValue(selectedModeKey, card); }
 
-  function currentMode() { return HILO.mode(selectedModeKey); }
+  function currentMode() { return CT.mode(selectedModeKey); }
 
   function storageKey() { return `hilo-game-${selectedModeKey}-v1`; }
 
   function setMode(modeKey) {
-    if (!HILO.has(modeKey)) return;
+    if (!CT.has(modeKey)) return;
     selectedModeKey = modeKey;
+    selectedBlockKey = CT.blockOf(modeKey).key;
     localStorage.setItem(MODE_STORAGE_KEY, modeKey);
-    cardsById = new Map(HILO.cards(selectedModeKey).map(card => [card.id, card]));
+    cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     game = loadGame();
     selectedCardId = null;
     pendingIndex = null;
     result = null;
   }
 
-  function eraForCard(card) { return HILO.eraForCard(selectedModeKey, card); }
+  function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
 
   function saveGame() {
     if (game) localStorage.setItem(storageKey(), JSON.stringify(game));
@@ -66,48 +68,60 @@
   }
 
   function header(extra = "") {
-    return `<header class="topbar"><div class="brand"><span class="brand-mark">${currentMode().icon}</span>Hilo · ${currentMode().shortName}</div>${extra}</header>`;
+    return `<header class="topbar"><div class="brand">Continuum</div>${extra}</header>`;
   }
 
-  // Cada modalidad tiene su propia carátula: una fotografía para historia y dos
-  // composiciones dibujadas con CSS para cine y países, que así siguen sin conexión.
-  const PANEL_ART = {
+  // La carátula de cada bloque. Van a la caché de la aplicación, así que están
+  // reducidas a 900 px de ancho: es el doble de lo que ocupa el panel más grande.
+  const BLOCK_ART = {
     history: '<img src="assets/hero-history.jpg" alt="">',
-    movies: '<span class="art-cinema"><i></i><i></i></span>',
-    countries: '<span class="art-globe"><i></i><i></i><i></i></span>'
+    cinema: '<img src="assets/hero-cinema.jpg" alt="">',
+    globe: '<img src="assets/hero-geography.jpg" alt="">'
   };
 
-  // La galería en acordeón es también el selector de modalidad: la carátula elegida
-  // se despliega en color y las otras dos quedan como lomos que se pueden tocar.
+  // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
+  // en color y las otras quedan como lomos que se pueden tocar.
   function gallery() {
-    return `<div class="gallery" role="group" aria-label="Elige la modalidad">${Object.values(MODES).map(item => {
+    return `<div class="gallery" role="group" aria-label="Elige el bloque">${Object.values(CT.BLOCKS).map(item => {
+      const active = item.key === selectedBlockKey;
+      const total = item.games.length;
+      return `<button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}">
+        <span class="panel-art" aria-hidden="true">${BLOCK_ART[item.art]}</span>
+        <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
+        <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
+      </button>`;
+    }).join("")}</div>`;
+  }
+
+  // Los juegos del bloque en pantalla. Hoy hay uno por bloque; la lista está pensada
+  // para cuando haya varios.
+  function gameList() {
+    const games = CT.blockGames(selectedBlockKey);
+    return `<div class="games" role="group" aria-label="Elige el juego">${games.map(item => {
       const active = item.key === selectedModeKey;
-      return `<button class="gallery-panel panel-${item.key}${active ? " active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${item.cards.length} ${item.cardLabel}">
-        <span class="panel-art" aria-hidden="true">${PANEL_ART[item.key]}</span>
-        <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.shortName}</b></span>
-        <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.cards.length} ${item.cardLabel} · ${item.caption}</small></span>
+      return `<button class="game-row${active ? " active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}">
+        <span class="game-name">${item.name}</span>
+        <span class="game-meta">${item.cards.length} ${item.cardLabel} · ${item.blurb}</span>
       </button>`;
     }).join("")}</div>`;
   }
 
   function home() {
     screen = "home";
-    const mode = currentMode();
+    const resume = game && game.mode === selectedModeKey;
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
-      <section class="hero hero-premium">
+      <section class="hero">
+        ${gallery()}
         <div class="hero-copy">
-          <div class="eyebrow"><span class="eyebrow-line"></span> ${mode.eyebrow}</div>
-          <h1>${mode.headline}</h1>
-          <p class="lead">${mode.description}</p>
-          <div class="hero-stats"><span class="pill">2–9 jugadores</span><span class="pill">Sin conexión</span></div>
+          <h1>${CT.question(selectedModeKey)}</h1>
+          ${gameList()}
           <div class="actions">
             <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
             <button class="btn btn-secondary" data-action="online">Varios móviles</button>
             <button class="btn btn-secondary" data-action="solo">Jugar solo</button>
-            ${game && game.mode === selectedModeKey ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
+            ${resume ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
           </div>
         </div>
-        ${gallery()}
       </section>
       <p class="app-version" id="app-version"></p>
     </div>`;
@@ -117,16 +131,24 @@
   async function showCacheVersion() {
     if (!("caches" in window)) return;
     try {
-      const key = (await caches.keys()).find(name => name.startsWith("hilo-"));
+      const key = (await caches.keys()).find(name => name.startsWith("continuum-"));
       const label = document.getElementById("app-version");
-      if (key && label) label.textContent = `Versión guardada en este móvil: ${key}`;
+      if (key && label) label.textContent = key;
     } catch { /* sin caché disponible no hay nada que mostrar */ }
+  }
+
+  // Elegir bloque selecciona su primer juego, que es lo que se espera cuando solo hay uno.
+  function setBlock(blockKey) {
+    if (!CT.hasBlock(blockKey)) return;
+    selectedBlockKey = blockKey;
+    const games = CT.block(blockKey).games;
+    if (!games.includes(selectedModeKey)) setMode(games[0]);
   }
 
   function setup() {
     screen = "setup";
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
-      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2>La partida empieza aquí</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
+      <section class="setup-section"><h2>${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
           <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
@@ -535,6 +557,7 @@
     const action = target.dataset.action;
     if (action === "home") home();
     else if (action === "set-mode") { setMode(target.dataset.mode); home(); }
+    else if (action === "set-block") { setBlock(target.dataset.block); home(); }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();

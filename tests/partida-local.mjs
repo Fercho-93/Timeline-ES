@@ -25,6 +25,10 @@ const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) t
 console.log("\nArranque");
 let w = boot();
 ok("la portada se pinta con el mazo de historia", /190 hechos/.test(w.document.body.innerHTML));
+ok("los tres bloques están en la galería", w.document.querySelectorAll("[data-block]").length === 3);
+// Elegir bloque selecciona su primer juego; el clic en el juego es explícito de todos
+// modos, que es como funcionará cuando un bloque tenga varios.
+click(w, '[data-block="cine"]');
 click(w, '[data-mode="movies"]');
 ok("cambiar a cine muestra las 87 películas", /87 películas/.test(w.document.body.innerHTML));
 ok("la portada de cine no promete lo que no hay", !/103/.test(w.document.body.innerHTML));

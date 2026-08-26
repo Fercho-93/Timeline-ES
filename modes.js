@@ -23,6 +23,7 @@
       format: card => card.label || (card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year)),
       hiddenLabel: "Fecha oculta",
       timelineTitle: "Línea temporal",
+      question: "¿Antes o después?",
       bands: [
         { limit: 711, key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" },
         { limit: 1492, key: "medieval", name: "Edad Media", symbol: "♜" },
@@ -38,6 +39,7 @@
       format: card => `${formatArea(card.value)} km²`,
       hiddenLabel: "Superficie oculta",
       timelineTitle: "De menor a mayor",
+      question: "¿Más pequeño o más grande?",
       bands: [
         { limit: 1000, key: "diminuto", name: "Diminuto", symbol: "·" },
         { limit: 50000, key: "pequeno", name: "Pequeño", symbol: "▪" },
@@ -53,18 +55,14 @@
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
   const MODES = {
     history: {
-      key: "history", name: "Historia de España", shortName: "España", icon: "🏛️",
-      eyebrow: "Historia · intuición · sobremesa",
-      description: "Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.",
-      cardLabel: "hechos", caption: "De Hispania a la democracia", cards: window.HISTORY_CARDS,
-      headline: "¿Antes o<br><em>después?</em>", axis: "time"
+      key: "history", name: "Historia de España",
+      cardLabel: "hechos", blurb: "De Hispania a la democracia.", cards: window.HISTORY_CARDS,
+      axis: "time"
     },
     movies: {
-      key: "movies", name: "Estrenos de cine", shortName: "Cine", icon: "🎬",
-      eyebrow: "Cine · memoria · palomitas",
-      description: "Ordenad grandes películas por su año de estreno. De los pioneros del cine a los éxitos más recientes.",
-      cardLabel: "películas", caption: "De Méliès a nuestros días", cards: window.MOVIE_CARDS,
-      headline: "¿Antes o<br><em>después?</em>", axis: "time",
+      key: "movies", name: "Estrenos de cine",
+      cardLabel: "películas", blurb: "De Méliès a nuestros días.", cards: window.MOVIE_CARDS,
+      axis: "time",
       bands: [
         { limit: 1930, key: "pioneros", name: "Cine pionero", symbol: "▥" },
         { limit: 1960, key: "clasico", name: "Cine clásico", symbol: "★" },
@@ -75,17 +73,41 @@
       ]
     },
     countries: {
-      key: "countries", name: "Superficie de países", shortName: "Países", icon: "🌍",
-      eyebrow: "Geografía · escala · discusión",
-      description: "Ordenad países por su superficie, del más pequeño al más extenso. Nadie tiene tan claro como cree lo que ocupa cada país.",
-      cardLabel: "países", caption: "Del Vaticano a Rusia", cards: window.COUNTRY_CARDS,
-      headline: "¿Más pequeño o<br><em>más grande?</em>", axis: "area"
+      key: "countries", name: "Superficie de países",
+      cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
+      axis: "area"
     }
   };
 
+  // Los juegos se agrupan en bloques. Hoy hay uno por bloque, pero la portada ya
+  // enseña el bloque y no el juego, así que añadir «Historia mundial» o «Inventos»
+  // es declararlo aquí y sumarlo a `games`.
+  //
+  // Ojo: las claves de los juegos (history, movies, countries) están escritas en
+  // `firestore.rules`, en la lista de modalidades que puede tener una sala. Cambiarlas
+  // obliga a volver a publicar las reglas y rompe las salas en curso, así que se
+  // quedan como están; los bloques usan claves propias.
+  const BLOCKS = {
+    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history"] },
+    cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
+    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries"] }
+  };
+
   const DEFAULT_MODE = "history";
+  const DEFAULT_BLOCK = "historia";
 
   function has(modeKey) { return Object.prototype.hasOwnProperty.call(MODES, modeKey); }
+
+  function hasBlock(blockKey) { return Object.prototype.hasOwnProperty.call(BLOCKS, blockKey); }
+
+  function block(blockKey) { return hasBlock(blockKey) ? BLOCKS[blockKey] : BLOCKS[DEFAULT_BLOCK]; }
+
+  // De un juego a su bloque, para saber qué carátula toca desde una partida guardada.
+  function blockOf(modeKey) {
+    return Object.values(BLOCKS).find(item => item.games.includes(modeKey)) || BLOCKS[DEFAULT_BLOCK];
+  }
+
+  function blockGames(blockKey) { return block(blockKey).games.map(mode); }
 
   // Una modalidad desconocida cae en la de historia: llega de `localStorage` o del
   // documento de una sala, y ninguno de los dos es de fiar.
@@ -102,6 +124,8 @@
   function hiddenLabel(modeKey) { return axis(modeKey).hiddenLabel; }
 
   function timelineTitle(modeKey) { return axis(modeKey).timelineTitle; }
+
+  function question(modeKey) { return axis(modeKey).question; }
 
   function eraForCard(modeKey, card) {
     const bands = mode(modeKey).bands || axis(modeKey).bands;
@@ -126,9 +150,11 @@
     return copy;
   }
 
-  window.HILO = {
-    MODES, DEFAULT_MODE, has, mode, axis, cards,
-    formatValue, sortValue, hiddenLabel, timelineTitle, eraForCard,
+  window.CONTINUUM = {
+    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK,
+    has, mode, axis, cards,
+    hasBlock, block, blockOf, blockGames,
+    formatValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
     escapeHtml, initials, shuffle
   };
 })();

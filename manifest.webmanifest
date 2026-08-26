@@ -1,11 +1,11 @@
 {
-  "name": "Hilo · Juego de cronología",
-  "short_name": "Hilo",
-  "description": "Ordena hechos históricos y estrenos de cine en su línea temporal.",
+  "name": "Continuum",
+  "short_name": "Continuum",
+  "description": "Juego de ordenar: historia, cine y geografía.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f4eddf",
-  "theme_color": "#8f2f2a",
+  "background_color": "#f7f5f1",
+  "theme_color": "#f7f5f1",
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
