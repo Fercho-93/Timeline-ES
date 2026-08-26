@@ -21,8 +21,7 @@ for (let g = 0; g < 40; g++) {
   const mazo = { history: w.HISTORY_CARDS, movies: w.MOVIE_CARDS, countries: w.COUNTRY_CARDS }[mode];
   const total = mazo.length;
   const cardsById = new Map(mazo.map(c => [c.id, c]));
-  // La superficie ordena de mayor a menor, así que su valor de orden va en negativo.
-  const orden = card => (mode === "countries" ? -card.value : card.year);
+  const orden = card => (mode === "countries" ? card.value : card.year);
   fire(w, w.document.querySelector('[data-action="setup"]'));
   const players = 2 + (g % 8);
   for (let i = 2; i < players; i++) fire(w, w.document.querySelector('[data-action="add-player"]'));

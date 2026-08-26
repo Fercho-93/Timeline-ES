@@ -135,20 +135,39 @@ console.log("\nModalidad de países");
   const w = boot();
   click(w, '[data-mode="countries"]');
   ok("la portada anuncia las 59 cartas de países", /59 países/.test(texto(w)));
-  ok("el titular cambia al eje de tamaño", /más pequeño/i.test(texto(w)));
+  const portada = w.document.querySelector(".hero-art").outerHTML;
+  ok("la carátula es la del globo, no la del cine", /hero-globe/.test(portada) && !/🎬|film-strip/.test(portada));
+  ok("el sello no habla de estrenos", /países/.test(portada) && !/estrenos/i.test(portada));
+  ok("el titular cambia al eje de tamaño", /más grande/i.test(texto(w)));
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   ok("la carta oculta la superficie, no la fecha", /superficie oculta/i.test(texto(w)));
   const estado = JSON.parse(w.localStorage.getItem("hilo-solo-countries-v1"));
   const cards = new Map(w.COUNTRY_CARDS.map(c => [c.id, c]));
-  // Colocar un país más pequeño que el de la línea debe ir DESPUÉS: de mayor a menor.
+  // La línea va de menor a mayor: un país más grande que el de la línea va DESPUÉS.
   const enLinea = cards.get(estado.timeline[0]);
   const enMano = cards.get(estado.current);
-  const correcto = enMano.value > enLinea.value ? 0 : 1;
+  const correcto = enMano.value > enLinea.value ? 1 : 0;
   w.document.querySelectorAll('[data-action="solo-place"]')[correcto].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   click(w, '[data-action="confirm-place"]');
-  ok("ordena de mayor a menor superficie", /Bien colocado/.test(w.document.querySelector(".modal").textContent));
+  ok("ordena de menor a mayor superficie", /Bien colocado/.test(w.document.querySelector(".modal").textContent));
   ok("la superficie se muestra en km²", /km²/.test(w.document.querySelector(".modal").textContent));
+}
+
+console.log("\nSan Marino y Suiza, de menor a mayor");
+{
+  const dia = new Date().toLocaleDateString("sv-SE");
+  const estado = { kind: "free", mode: "countries", day: dia, deck: [2001], timeline: [2040], current: 2056, lives: 3, hits: 0, played: 0, total: null, finished: false };
+  const resultado = hueco => {
+    const w = boot({ "hilo-selected-mode-v1": "countries", "hilo-solo-countries-v1": JSON.stringify(estado) });
+    click(w, '[data-action="solo"]');
+    click(w, '[data-action="resume-solo"]');
+    w.document.querySelectorAll('[data-action="solo-place"]')[hueco].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    click(w, '[data-action="confirm-place"]');
+    return /Bien colocado/.test(w.document.querySelector(".modal").textContent);
+  };
+  ok("San Marino (61 km²) va ANTES que Suiza (41.291 km²)", resultado(0));
+  ok("y colocarlo después es un fallo", !resultado(1));
 }
 
 console.log(`\n${fail} fallos`);
