@@ -176,6 +176,9 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .era-mediano { background: #8a6a3b; }
 .era-pequeno { background: #8a5f4c; }
 .era-diminuto { background: #7a6a72; }
+.era-minusculo { background: #7a6a72; }
+.era-muypequeno { background: #8a5f4c; }
+.era-medio { background: #6f6a4a; }
 .hint { margin: 12px 0 0; color: var(--muted); font-size: .85rem; text-align: center; }
 
 .overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(35,27,19,.73); backdrop-filter: blur(8px); }

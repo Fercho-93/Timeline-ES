@@ -4,8 +4,8 @@ Juego de ordenar para 2–9 personas, diseñado para jugarse pasando un solo mó
 
 ## Bloques y juegos
 
-Los juegos se agrupan en tres bloques. Hoy hay uno por bloque; la portada ya enseña el bloque,
-así que añadir juegos es sumarlos a `modes.js`.
+Los juegos se agrupan en tres bloques. La portada enseña el bloque y lista sus juegos debajo,
+así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 **Historia**
 
@@ -22,6 +22,9 @@ así que añadir juegos es sumarlos a `modes.js`.
 - **Superficie de países:** 59 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
   Aquí la línea no es temporal: se ordena por tamaño. Ningún país está a menos de un 8% de otro,
   así que las cartas cercanas siempre se pueden razonar.
+- **Población de países:** 49 países ordenados de menos a más gente, del Vaticano a la India,
+  con las cifras de la ONU a 1 de enero de 2026. Mismo margen del 8%: por eso falta China, que
+  queda a un 4% de la India.
 
 Cada juego conserva su propia partida local. El juego elegido también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
@@ -60,7 +63,7 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 `tests/` contiene nueve comprobaciones automáticas: la sintaxis de todos los archivos,
 partidas completas sobre un DOM simulado, cuarenta partidas al azar que vigilan bloqueos y el
-conteo de cartas, la calidad de los tres mazos, el modo solitario, el service worker y las
+conteo de cartas, la calidad de los cuatro mazos, el modo solitario, el service worker y las
 reglas de Firestore contra el emulador oficial. Se lanzan con `npm install` y `npm test`, y se ejecutan solas en cada propuesta de
 cambio. Las instrucciones están en `tests/README.md`.
 
