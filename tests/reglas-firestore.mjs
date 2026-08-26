@@ -56,7 +56,11 @@ await check("entrar borrando al anfitrión", "deny", updateDoc(ref(ctx(P2)), { p
 await check("entrar cambiando la modalidad", "deny", updateDoc(ref(ctx(P2)), { mode: "movies", players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: 2 }));
 
 await check("crear una sala de la modalidad de países", "allow", setDoc(doc(ctx(HOST), "rooms", "PAIS2345"), { ...base(), roomCode: "PAIS2345", mode: "countries" }));
-await check("crear una sala de una modalidad inventada", "deny", setDoc(doc(ctx(HOST), "rooms", "XXXX2345"), { ...base(), roomCode: "XXXX2345", mode: "banderas" }));
+// La lista de juegos ya no vive en las reglas, para no republicarlas con cada juego
+// nuevo. Lo que sí se sigue exigiendo es que el campo sea un identificador corto.
+await check("crear una sala de un juego aún no publicado", "allow", setDoc(doc(ctx(HOST), "rooms", "NUEV2345"), { ...base(), roomCode: "NUEV2345", mode: "population" }));
+await check("crear una sala sin juego", "deny", setDoc(doc(ctx(HOST), "rooms", "SINM2345"), { ...base(), roomCode: "SINM2345", mode: "" }));
+await check("crear una sala con un juego desmesurado", "deny", setDoc(doc(ctx(HOST), "rooms", "LARG2345"), { ...base(), roomCode: "LARG2345", mode: "x".repeat(33) }));
 
 console.log("\nEmpezar la partida");
 const lobby3 = { ...base(), playerOrder: [HOST, P2, P3], players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 }, [P2]: { name: "Bea", hand: [], joinedAt: 2 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3 } } };
