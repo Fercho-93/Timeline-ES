@@ -47,9 +47,10 @@ button { touch-action: manipulation; }
 .gallery-panel.active { flex-grow: 1; cursor: default; animation: panel-open .5s cubic-bezier(.22,.61,.36,1); }
 @keyframes panel-open { from { flex-grow: .02; } }
 .gallery-panel:focus-visible { outline: 3px solid rgba(189,139,49,.55); outline-offset: 3px; }
-.gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(24,17,11,.12) 22%, rgba(24,17,11,.8)); pointer-events: none; }
+.gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,15,9,0) 38%, rgba(20,15,9,.5) 62%, rgba(20,15,9,.92)); pointer-events: none; }
 .panel-art { position: absolute; inset: 0; display: block; }
 .panel-art img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
+.panel-cinema .panel-art img, .panel-globe .panel-art img { object-position: center; }
 /* Los lomos se apagan para que la carátula elegida sea la única en color. */
 .gallery-panel:not(.active) .panel-art { filter: grayscale(.9) brightness(.44) contrast(1.05); }
 @media (hover: hover) {
@@ -84,24 +85,8 @@ h1 em { color: var(--accent); font-weight: 400; }
 h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw, 2.1rem); letter-spacing: -.025em; margin-bottom: 10px; }
 .lead { color: var(--muted); font-size: .96rem; line-height: 1.55; max-width: 560px; }
 .panel-history { background: #6b5231; }
-.panel-cinema { background: linear-gradient(155deg, #35251a, #0d1820 62%, #5e201d); }
-.panel-globe { background: radial-gradient(circle at 50% 26%, rgba(255,226,166,.16), transparent 44%), linear-gradient(155deg, #1f3a44, #14212b 56%, #3c2a1c); }
-.art-cinema { position: absolute; inset: 0; }
-/* Haz del proyector entrando por la esquina superior. */
-.art-cinema::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 62% 38% at 26% 6%, rgba(255,214,140,.26), transparent 64%); }
-/* Dos tiras de película: la banda oscura y las perforaciones arriba y abajo. */
-.art-cinema i { position: absolute; left: -22%; right: -22%; height: 58px; transform: rotate(-8deg); background:
-  repeating-linear-gradient(90deg, rgba(255,240,208,.52) 0 8px, transparent 8px 20px) left top / 100% 8px repeat-x,
-  repeating-linear-gradient(90deg, rgba(255,240,208,.52) 0 8px, transparent 8px 20px) left bottom / 100% 8px repeat-x,
-  rgba(12,9,6,.58); }
-.art-cinema i:nth-child(1) { top: 25%; }
-.art-cinema i:nth-child(2) { top: 57%; }
-.art-globe { position: absolute; top: 44%; left: 50%; width: min(64%, 205px); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle at 34% 28%, #6e9b86, #2f6152 52%, #17323a); box-shadow: 0 22px 45px rgba(0,0,0,.4), inset -14px -18px 40px rgba(0,0,0,.45), inset 6px 8px 22px rgba(255,255,255,.14); border: 1px solid rgba(255,239,202,.28); }
-/* Paralelos y meridiano: dos elipses aplastadas y una vertical bastan para leerlo como globo. */
-.art-globe i { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(255,244,214,.3); }
-.art-globe i:nth-child(1) { transform: scaleY(.34); }
-.art-globe i:nth-child(2) { transform: scaleY(.72); }
-.art-globe i:nth-child(3) { transform: scaleX(.4); }
+.panel-cinema { background: #2c2117; }
+.panel-globe { background: #2b2a20; }
 .era-pioneros { background: #4a4438; }
 .era-clasico { background: #7d6642; }
 .era-nuevocine { background: #6b5350; }

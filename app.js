@@ -71,12 +71,12 @@
     return `<header class="topbar"><div class="brand">Continuum</div>${extra}</header>`;
   }
 
-  // Cada bloque tiene su carátula: una fotografía para historia y dos composiciones
-  // dibujadas con CSS para cine y geografía, que así siguen funcionando sin conexión.
+  // La carátula de cada bloque. Van a la caché de la aplicación, así que están
+  // reducidas a 900 px de ancho: es el doble de lo que ocupa el panel más grande.
   const BLOCK_ART = {
     history: '<img src="assets/hero-history.jpg" alt="">',
-    cinema: '<span class="art-cinema"><i></i><i></i></span>',
-    globe: '<span class="art-globe"><i></i><i></i><i></i></span>'
+    cinema: '<img src="assets/hero-cinema.jpg" alt="">',
+    globe: '<img src="assets/hero-geography.jpg" alt="">'
   };
 
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega

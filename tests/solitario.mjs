@@ -138,7 +138,7 @@ console.log("\nModalidad de países");
   ok("elegir el bloque selecciona su juego", /59 países/.test(texto(w)));
   ok("la galería ofrece los tres bloques", w.document.querySelectorAll(".gallery-panel").length === 3);
   const portada = w.document.querySelector(".gallery-panel.active").outerHTML;
-  ok("la carátula desplegada es la del globo, no la del cine", /art-globe/.test(portada) && !/🎬|art-cinema/.test(portada));
+  ok("la carátula desplegada es la de geografía, no otra", /hero-geography\.jpg/.test(portada) && !/hero-cinema|hero-history/.test(portada));
   ok("el rótulo es el del bloque de geografía", /Geografía/.test(portada) && !/Cine|Historia/.test(portada));
   ok("el juego aparece listado bajo la carátula", /Superficie de países/.test(w.document.querySelector(".games").textContent));
   ok("el titular cambia al eje de tamaño", /más grande/i.test(texto(w)));
