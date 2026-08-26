@@ -47,9 +47,11 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene tres comprobaciones automáticas: una partida completa del modo local sobre un
-DOM simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, y las reglas
-de Firestore contra el emulador oficial. Las instrucciones están en `tests/README.md`.
+`tests/` contiene ocho comprobaciones automáticas: partidas completas sobre un DOM simulado,
+cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de los tres
+mazos, el modo solitario, el service worker y las reglas de Firestore contra el emulador
+oficial. Se lanzan con `npm install` y `npm test`, y se ejecutan solas en cada propuesta de
+cambio. Las instrucciones están en `tests/README.md`.
 
 ## Reglas implementadas
 

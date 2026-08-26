@@ -1,0 +1,22 @@
+{
+  "name": "hilo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hilo: juego instalable de cronología histórica, cine y países, con modo local y multijugador.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/partida-local.mjs && node tests/partidas-al-azar.mjs && node tests/service-worker.mjs && node tests/mazos.mjs && node tests/solitario.mjs",
+    "test:reglas": "firebase emulators:exec --project demo-hilo --only firestore \"node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs\"",
+    "test:todo": "npm test && npm run test:reglas"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase": "^12.15.0",
+    "firebase-tools": "^14.0.0",
+    "jsdom": "^30.0.0"
+  }
+}

@@ -1,30 +1,37 @@
 # Comprobaciones
 
-Las dependencias no se guardan en el repositorio; se instalan solo para pasar las pruebas
-(`.gitignore` ya ignora `node_modules`).
+Las versiones de las dependencias están fijadas en `package-lock.json`, así que se instalan
+siempre las mismas. `node_modules` no se guarda en el repositorio.
 
 ```sh
-npm install --no-save jsdom @firebase/rules-unit-testing firebase
+npm install
 
-# Partida completa del modo de un solo móvil sobre un DOM simulado.
-node tests/partida-local.mjs
-
-# 40 partidas al azar: bloqueos, conteo de cartas y orden de la línea temporal.
-node tests/partidas-al-azar.mjs
-
-# Service worker: qué versión de la aplicación acaba viendo el móvil (sin dependencias).
-node tests/service-worker.mjs
-
-# Calidad de los tres mazos: repeticiones, huecos y cartas demasiado juntas (sin dependencias).
-node tests/mazos.mjs
-
-# Solitario, reto diario, confirmación al colocar y modalidad de países.
-node tests/solitario.mjs
+# Juego, mazos y service worker: cinco suites, sin nada más que Node.
+npm test
 
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
-npx --yes firebase-tools emulators:exec --project demo-hilo --only firestore \
-  "node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs"
+npm run test:reglas
+
+# Las ocho de una vez.
+npm run test:todo
 ```
+
+Las mismas comprobaciones se ejecutan solas en cada propuesta de cambio y en cada subida a
+`main` (`.github/workflows/pruebas.yml`), sobre un clon limpio. El resultado aparece como un
+tick verde o una cruz roja en la propia propuesta, antes de fusionar.
+
+Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
+
+| Archivo | Qué comprueba |
+| --- | --- |
+| `partida-local.mjs` | Partida completa del modo de un solo móvil sobre un DOM simulado. |
+| `partidas-al-azar.mjs` | 40 partidas al azar: bloqueos, conteo de cartas y orden de la línea. |
+| `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil. Sin dependencias. |
+| `mazos.mjs` | Calidad de los tres mazos: repeticiones, huecos y cartas demasiado juntas. Sin dependencias. |
+| `solitario.mjs` | Solitario, reto diario, confirmación al colocar y modalidad de países. |
+| `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
+| `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |
+| `entrada-por-enlace.mjs` | La secuencia del SDK al entrar por una invitación. Necesita el emulador. |
 
 `reglas-firestore.mjs` cubre quién puede escribir en una sala y qué puede escribir:
 entrar, empezar, colocar carta, cerrar turno, saltar turno, expulsar, marcharse y una
