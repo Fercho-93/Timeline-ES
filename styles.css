@@ -67,6 +67,14 @@ h2 { font-family: Georgia, serif; font-size: clamp(2rem, 7vw, 3.2rem); letter-sp
 .hero-cinema::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,220,148,.18), transparent 28%), linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,.05) 50%, transparent 50.5%); }
 .cinema-symbol { position: relative; z-index: 2; font-size: clamp(5.5rem, 16vw, 9rem); filter: drop-shadow(0 18px 20px rgba(0,0,0,.35)); transform: rotate(-6deg); }
 .film-strip { position: absolute; left: -10%; right: -10%; bottom: 18%; height: 48px; border-block: 8px dotted rgba(255,239,202,.48); background: rgba(18,12,9,.45); transform: rotate(-7deg); }
+.hero-globe { min-height: 420px; display: grid; place-items: center; background: radial-gradient(circle at 50% 30%, rgba(255,226,166,.16), transparent 42%), linear-gradient(150deg, #1f3a44, #14212b 58%, #3c2a1c); }
+.hero-globe::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 78% 78%, rgba(189,139,49,.22), transparent 34%); }
+.globe { position: relative; z-index: 2; width: clamp(140px, 34vw, 210px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 34% 28%, #6e9b86, #2f6152 52%, #17323a); box-shadow: 0 22px 45px rgba(0,0,0,.4), inset -14px -18px 40px rgba(0,0,0,.45), inset 6px 8px 22px rgba(255,255,255,.14); border: 1px solid rgba(255,239,202,.28); }
+/* Paralelos y meridiano: dos elipses aplastadas y una vertical bastan para leerlo como globo. */
+.globe i { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(255,244,214,.3); }
+.globe i:nth-child(1) { transform: scaleY(.34); }
+.globe i:nth-child(2) { transform: scaleY(.72); }
+.globe i:nth-child(3) { transform: scaleX(.4); }
 .era-pioneros { background: linear-gradient(135deg, #4d4438, #211e1a); }
 .era-clasico { background: linear-gradient(135deg, #8d642f, #563621); }
 .era-nuevocine { background: linear-gradient(135deg, #7c3030, #372d52); }

@@ -10,22 +10,22 @@
       key: "history", name: "Historia de España", shortName: "España", icon: "🏛️",
       eyebrow: "Historia · intuición · sobremesa",
       description: "Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.",
-      cardLabel: "hechos", caption: "De Hispania a la democracia", cards: window.HISTORY_CARDS,
+      cardLabel: "hechos", caption: "De Hispania a la democracia", seal: "momentos<br>de historia", cards: window.HISTORY_CARDS,
       headline: "¿Antes o<br><em>después?</em>", axis: "time"
     },
     movies: {
       key: "movies", name: "Estrenos de cine", shortName: "Cine", icon: "🎬",
       eyebrow: "Cine · memoria · palomitas",
       description: "Ordenad grandes películas por su año de estreno. De los pioneros del cine a los éxitos más recientes.",
-      cardLabel: "películas", caption: "De Méliès a nuestros días", cards: window.MOVIE_CARDS,
+      cardLabel: "películas", caption: "De Méliès a nuestros días", seal: "grandes<br>estrenos", cards: window.MOVIE_CARDS,
       headline: "¿Antes o<br><em>después?</em>", axis: "time"
     },
     countries: {
       key: "countries", name: "Superficie de países", shortName: "Países", icon: "🌍",
       eyebrow: "Geografía · escala · discusión",
-      description: "Ordenad países por su superficie, del más extenso al más pequeño. Nadie tiene tan claro como cree lo que ocupa cada país.",
-      cardLabel: "países", caption: "De Rusia al Vaticano", cards: window.COUNTRY_CARDS,
-      headline: "¿Más grande o<br><em>más pequeño?</em>", axis: "area"
+      description: "Ordenad países por su superficie, del más pequeño al más extenso. Nadie tiene tan claro como cree lo que ocupa cada país.",
+      cardLabel: "países", caption: "Del Vaticano a Rusia", seal: "países<br>del mundo", cards: window.COUNTRY_CARDS,
+      headline: "¿Más pequeño o<br><em>más grande?</em>", axis: "area"
     }
   };
 
@@ -46,12 +46,10 @@
       ]
     },
     area: {
-      // Se ordena por el valor en negativo: así la carta más extensa va primero y la
-      // comparación de siempre (de menor a mayor) sigue valiendo sin tocar nada.
-      sortValue: card => -card.value,
+      sortValue: card => card.value,
       format: card => `${formatArea(card.value)} km²`,
       hiddenLabel: "Superficie oculta",
-      timelineTitle: "De mayor a menor",
+      timelineTitle: "De menor a mayor",
       bands: [
         { limit: 1000, key: "diminuto", name: "Diminuto", symbol: "·" },
         { limit: 50000, key: "pequeno", name: "Pequeño", symbol: "▪" },
@@ -162,9 +160,12 @@
     screen = "home";
     const mode = currentMode();
     const modePicker = `<div class="mode-switch" role="group" aria-label="Modalidad de juego">${Object.values(MODES).map(item => `<button class="mode-option ${item.key === selectedModeKey ? "active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${item.key === selectedModeKey}"><span>${item.icon}</span><b>${item.name}</b></button>`).join("")}</div>`;
-    const heroArt = selectedModeKey === "history"
-      ? `<div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt=""><div class="art-seal"><span>${mode.cards.length}</span><small>momentos<br>de historia</small></div><div class="art-caption">${mode.caption}</div></div>`
-      : `<div class="hero-art hero-cinema" aria-hidden="true"><div class="cinema-symbol">🎬</div><div class="film-strip"></div><div class="art-seal"><span>${mode.cards.length}</span><small>grandes<br>estrenos</small></div><div class="art-caption">${mode.caption}</div></div>`;
+    const seal = `<div class="art-seal"><span>${mode.cards.length}</span><small>${mode.seal}</small></div><div class="art-caption">${mode.caption}</div>`;
+    const heroArt = {
+      history: `<div class="hero-art" aria-hidden="true"><img src="assets/hero-history.jpg" alt="">${seal}</div>`,
+      movies: `<div class="hero-art hero-cinema" aria-hidden="true"><div class="cinema-symbol">🎬</div><div class="film-strip"></div>${seal}</div>`,
+      countries: `<div class="hero-art hero-globe" aria-hidden="true"><div class="globe"><i></i><i></i><i></i></div>${seal}</div>`
+    }[selectedModeKey];
     app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
       ${modePicker}
       <section class="hero hero-premium">

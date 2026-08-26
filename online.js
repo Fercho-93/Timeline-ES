@@ -49,11 +49,11 @@ function formatValue(card) {
   return card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year);
 }
 
-function sortValue(card) { return isArea() ? -card.value : card.year; }
+function sortValue(card) { return isArea() ? card.value : card.year; }
 
 function hiddenLabel() { return isArea() ? "Superficie oculta" : "Fecha oculta"; }
 
-function timelineTitle() { return isArea() ? "De mayor a menor" : "Línea temporal"; }
+function timelineTitle() { return isArea() ? "De menor a mayor" : "Línea temporal"; }
 
 function modeCards(modeKey = roomState?.mode || selectedModeKey) {
   return MODE_CARDS[modeKey] || MODE_CARDS.history;

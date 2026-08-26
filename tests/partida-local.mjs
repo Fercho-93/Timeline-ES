@@ -69,9 +69,11 @@ w = boot();
 click(w, '[data-action="setup"]');
 click(w, '[data-action="start"]');
 click(w, '[data-action="ready"]');
-const handHtml = [...w.document.querySelectorAll('[data-action="select-card"]')].map(el => el.innerHTML).join(" ");
-ok("las cartas de la mano no filtran el año", !/\d{3,4}/.test(handHtml.replace(/data-id="\d+"/g, "")));
-ok("las cartas de la mano no filtran la época", !/card-era|Edad Media|Hispania/.test(handHtml));
+const manoCartas = [...w.document.querySelectorAll('[data-action="select-card"]')];
+const handHtml = manoCartas.map(el => el.innerHTML).join(" ");
+ok("ninguna carta de la mano enseña su valor", manoCartas.every(el => !el.querySelector(".year")));
+ok("todas anuncian que el dato está oculto", manoCartas.every(el => /oculta/i.test(el.textContent)));
+ok("las cartas de la mano no llevan distintivo de época", !/card-era|reveal-era|era-[a-z]/.test(handHtml));
 ok("la partida queda guardada en el dispositivo", !!w.localStorage.getItem("hilo-game-history-v1"));
 
 console.log("\nPartida heredada de la versión anterior");

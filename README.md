@@ -8,7 +8,7 @@ Juego de cronología para 2–9 personas, diseñado para jugarse pasando un solo
 - **Estrenos de cine:** 87 películas conocidas, de *Viaje a la Luna* (1902) a *Del revés 2* (2024),
   con trece títulos del cine español. Cada año aparece una sola vez y el reparto está equilibrado
   por décadas, para que ninguna carta sea una moneda al aire entre dos estrenos del mismo año.
-- **Superficie de países:** 59 países ordenados de mayor a menor, de Rusia a la Ciudad del Vaticano.
+- **Superficie de países:** 59 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
   Aquí la línea no es temporal: se ordena por tamaño. Ningún país está a menos de un 8% de otro,
   así que las cartas cercanas siempre se pueden razonar.
 

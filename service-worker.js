@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "hilo-modos-v11";
+const CACHE = "hilo-modos-v12";
 const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./countries.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {

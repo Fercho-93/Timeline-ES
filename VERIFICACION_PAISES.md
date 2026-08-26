@@ -6,7 +6,8 @@ Fecha de revisión: 25 de agosto de 2026.
 
 - 59 países revisados uno a uno, con la superficie total en km².
 - 59 identificadores, títulos y valores únicos.
-- Rango: de 17.098.246 km² (Rusia) a 0,49 km² (Ciudad del Vaticano).
+- Rango: de 0,49 km² (Ciudad del Vaticano) a 17.098.246 km² (Rusia). La línea se ordena de menor
+  a mayor, igual que la del tiempo avanza de lo antiguo a lo reciente.
 - **Separación mínima entre cartas contiguas: 8%** (Afganistán y Ucrania). El resto está más
   separado, y la mayoría por encima del 15%.
 
