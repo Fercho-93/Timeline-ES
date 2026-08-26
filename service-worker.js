@@ -1,7 +1,7 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "hilo-modos-v13";
-const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./countries.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
+const CACHE = "hilo-modos-v14";
+const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./countries.js", "./modes.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));

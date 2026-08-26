@@ -6,13 +6,13 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm install
 
-# Juego, mazos y service worker: cinco suites, sin nada más que Node.
+# Sintaxis, juego, mazos y service worker: seis suites, sin nada más que Node.
 npm test
 
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npm run test:reglas
 
-# Las ocho de una vez.
+# Las nueve de una vez.
 npm run test:todo
 ```
 
@@ -24,6 +24,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 
 | Archivo | Qué comprueba |
 | --- | --- |
+| `sintaxis.mjs` | Que todos los archivos del juego parsean. Es la única red que cubre `online.js`. Sin dependencias. |
 | `partida-local.mjs` | Partida completa del modo de un solo móvil sobre un DOM simulado. |
 | `partidas-al-azar.mjs` | 40 partidas al azar: bloqueos, conteo de cartas y orden de la línea. |
 | `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil. Sin dependencias. |
