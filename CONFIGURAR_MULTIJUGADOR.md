@@ -4,9 +4,10 @@ El código de Firebase ya está incluido en `online.js`. Solo falta publicar las
 
 ## 1. Publicar las reglas de Firestore
 
-> Las reglas hay que volver a publicarlas al añadir una modalidad: la lista de modalidades
-> permitidas está dentro de ellas. La modalidad **Superficie de países** no funcionará en las
-> salas compartidas hasta que publiques la versión actual de `firestore.rules`.
+> Publica esta versión de `firestore.rules` una vez. A partir de ella, **añadir juegos ya no
+> obliga a republicarlas**: las reglas dejaron de llevar dentro la lista de juegos permitidos,
+> porque nunca pudieron validar el contenido de un mazo (las cartas viven en el cliente) y esa
+> lista solo servía para obligar a una publicación manual con cada juego nuevo.
 
 1. Abre el proyecto **Timeline ES** en Firebase.
 2. Entra en **Firestore**.
@@ -24,8 +25,9 @@ que las cartas ni se creen ni se dupliquen:
 - Al acertar, la carta sale de la mano y entra en la línea temporal; no se roba nada de paso.
 - Nadie puede vaciarse la mano sin jugar, repartir cartas a otras personas fuera del
   desempate de final de ronda ni declararse ganador con cartas en la mano.
-- La modalidad tiene que ser una de las tres previstas, y no cambia después de crear la sala,
-  igual que el código y el anfitrión.
+- El juego tiene que ser un identificador corto, y no cambia después de crear la sala, igual
+  que el código y el anfitrión. Cuál sea en concreto lo decide el cliente: un valor que no
+  conozca hace que caiga en el mazo por defecto.
 - Expulsar es cosa del anfitrión; marcharse, de cada cual. El anfitrión no puede ser
   expulsado: cierra la sala.
 

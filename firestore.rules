@@ -168,7 +168,14 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.hostUid == uid()
         && request.resource.data.roomCode == roomId
-        && request.resource.data.mode in ['history', 'movies', 'countries']
+        // El juego solo elige qué mazo usan todos los móviles de la sala, y las reglas
+        // nunca han podido validar su contenido: las cartas viven en el cliente. Con una
+        // lista cerrada aquí, cada juego nuevo obligaba a volver a publicar las reglas,
+        // así que basta con exigir que sea un identificador corto. Un valor desconocido
+        // hace que el cliente caiga en el mazo por defecto.
+        && request.resource.data.mode is string
+        && request.resource.data.mode.size() >= 1
+        && request.resource.data.mode.size() <= 32
         && request.resource.data.status == 'lobby'
         && request.resource.data.phase == 'lobby'
         && request.resource.data.version == 1
