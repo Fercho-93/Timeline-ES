@@ -5,129 +5,42 @@
   const toast = document.getElementById("toast");
   const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
   const LEGACY_STORAGE_KEY = "hilo-espana-game-v1";
-  const MODES = {
-    history: {
-      key: "history", name: "Historia de España", shortName: "España", icon: "🏛️",
-      eyebrow: "Historia · intuición · sobremesa",
-      description: "Construid una línea del tiempo de España. Escucha tu intuición, arriesga y sé la única persona que se queda sin cartas.",
-      cardLabel: "hechos", caption: "De Hispania a la democracia", cards: window.HISTORY_CARDS,
-      headline: "¿Antes o<br><em>después?</em>", axis: "time"
-    },
-    movies: {
-      key: "movies", name: "Estrenos de cine", shortName: "Cine", icon: "🎬",
-      eyebrow: "Cine · memoria · palomitas",
-      description: "Ordenad grandes películas por su año de estreno. De los pioneros del cine a los éxitos más recientes.",
-      cardLabel: "películas", caption: "De Méliès a nuestros días", cards: window.MOVIE_CARDS,
-      headline: "¿Antes o<br><em>después?</em>", axis: "time"
-    },
-    countries: {
-      key: "countries", name: "Superficie de países", shortName: "Países", icon: "🌍",
-      eyebrow: "Geografía · escala · discusión",
-      description: "Ordenad países por su superficie, del más pequeño al más extenso. Nadie tiene tan claro como cree lo que ocupa cada país.",
-      cardLabel: "países", caption: "Del Vaticano a Rusia", cards: window.COUNTRY_CARDS,
-      headline: "¿Más pequeño o<br><em>más grande?</em>", axis: "area"
-    }
-  };
-
-  const AXES = {
-    time: {
-      sortValue: card => card.year,
-      format: card => card.label || (card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year)),
-      hiddenLabel: "Fecha oculta",
-      timelineTitle: "Línea temporal",
-      bands: [
-        { limit: 711, key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" },
-        { limit: 1492, key: "medieval", name: "Edad Media", symbol: "♜" },
-        { limit: 1700, key: "imperio", name: "Monarquía Hispánica", symbol: "✦" },
-        { limit: 1808, key: "ilustracion", name: "Ilustración", symbol: "☼" },
-        { limit: 1931, key: "moderna", name: "España contemporánea", symbol: "⌁" },
-        { limit: 1975, key: "sigloxx", name: "Siglo XX", symbol: "◈" },
-        { limit: Infinity, key: "democracia", name: "Democracia", symbol: "◎" }
-      ]
-    },
-    area: {
-      sortValue: card => card.value,
-      format: card => `${formatArea(card.value)} km²`,
-      hiddenLabel: "Superficie oculta",
-      timelineTitle: "De menor a mayor",
-      bands: [
-        { limit: 1000, key: "diminuto", name: "Diminuto", symbol: "·" },
-        { limit: 50000, key: "pequeno", name: "Pequeño", symbol: "▪" },
-        { limit: 300000, key: "mediano", name: "Mediano", symbol: "◈" },
-        { limit: 1000000, key: "grande", name: "Grande", symbol: "◆" },
-        { limit: 5000000, key: "enorme", name: "Enorme", symbol: "★" },
-        { limit: Infinity, key: "gigante", name: "Gigante", symbol: "⬢" }
-      ],
-      bandValue: card => card.value
-    }
-  };
-  let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || "history";
-  if (!MODES[selectedModeKey]) selectedModeKey = "history";
-  let cardsById = new Map(MODES[selectedModeKey].cards.map(card => [card.id, card]));
+  // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
+  // móviles están en modes.js, para declararlos una sola vez.
+  const HILO = window.HILO;
+  const MODES = HILO.MODES;
+  const { escapeHtml, initials, shuffle } = HILO;
+  let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || HILO.DEFAULT_MODE;
+  if (!HILO.has(selectedModeKey)) selectedModeKey = HILO.DEFAULT_MODE;
+  let cardsById = new Map(HILO.cards(selectedModeKey).map(card => [card.id, card]));
   let screen = "home";
   let game = loadGame();
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
 
-  function escapeHtml(value) {
-    return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
-  }
+  function currentAxis() { return HILO.axis(selectedModeKey); }
 
-  function currentAxis() { return AXES[currentMode().axis]; }
+  function formatValue(card) { return HILO.formatValue(selectedModeKey, card); }
 
-  function formatArea(value) {
-    if (value < 10) return value.toLocaleString("es-ES", { maximumFractionDigits: 2 });
-    return Math.round(value).toLocaleString("es-ES");
-  }
+  function sortValue(card) { return HILO.sortValue(selectedModeKey, card); }
 
-  function formatValue(card) { return currentAxis().format(card); }
-
-  function sortValue(card) { return currentAxis().sortValue(card); }
-
-  function currentMode() { return MODES[selectedModeKey]; }
+  function currentMode() { return HILO.mode(selectedModeKey); }
 
   function storageKey() { return `hilo-game-${selectedModeKey}-v1`; }
 
   function setMode(modeKey) {
-    if (!MODES[modeKey]) return;
+    if (!HILO.has(modeKey)) return;
     selectedModeKey = modeKey;
     localStorage.setItem(MODE_STORAGE_KEY, modeKey);
-    cardsById = new Map(currentMode().cards.map(card => [card.id, card]));
+    cardsById = new Map(HILO.cards(selectedModeKey).map(card => [card.id, card]));
     game = loadGame();
     selectedCardId = null;
     pendingIndex = null;
     result = null;
   }
 
-  const MOVIE_BANDS = [
-    { limit: 1930, key: "pioneros", name: "Cine pionero", symbol: "▥" },
-    { limit: 1960, key: "clasico", name: "Cine clásico", symbol: "★" },
-    { limit: 1980, key: "nuevocine", name: "Nuevo cine", symbol: "◉" },
-    { limit: 2000, key: "blockbuster", name: "Era blockbuster", symbol: "◆" },
-    { limit: 2010, key: "milenio", name: "Nuevo milenio", symbol: "✦" },
-    { limit: Infinity, key: "actual", name: "Cine actual", symbol: "▷" }
-  ];
-
-  function eraForCard(card) {
-    const axis = currentAxis();
-    const bands = selectedModeKey === "movies" ? MOVIE_BANDS : axis.bands;
-    const value = axis.bandValue ? axis.bandValue(card) : card.year;
-    return bands.find(band => value < band.limit) || bands[bands.length - 1];
-  }
-
-  function initials(name) {
-    return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase();
-  }
-
-  function shuffle(items) {
-    const copy = [...items];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-  }
+  function eraForCard(card) { return HILO.eraForCard(selectedModeKey, card); }
 
   function saveGame() {
     if (game) localStorage.setItem(storageKey(), JSON.stringify(game));

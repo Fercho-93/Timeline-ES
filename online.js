@@ -16,9 +16,10 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
-const MODE_CARDS = { history: window.HISTORY_CARDS, movies: window.MOVIE_CARDS, countries: window.COUNTRY_CARDS };
-const MODE_NAMES = { history: "Historia de España", movies: "Estrenos de cine", countries: "Superficie de países" };
-const MODE_ICONS = { history: "🏛️", movies: "🎬", countries: "🌍" };
+// Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
+// cuando este módulo se descarga: se pide al entrar en el modo de varios móviles.
+const HILO = window.HILO;
+const { escapeHtml, initials, shuffle } = HILO;
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 let user = null;
@@ -32,70 +33,28 @@ let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
-}
-
+// La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
 
-function isArea() { return modeKey() === "countries"; }
+function formatValue(card) { return HILO.formatValue(modeKey(), card); }
 
-function formatValue(card) {
-  if (isArea()) {
-    const value = card.value < 10 ? card.value.toLocaleString("es-ES", { maximumFractionDigits: 2 }) : Math.round(card.value).toLocaleString("es-ES");
-    return `${value} km²`;
-  }
-  if (card.label) return card.label;
-  return card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year);
-}
+function sortValue(card) { return HILO.sortValue(modeKey(), card); }
 
-function sortValue(card) { return isArea() ? card.value : card.year; }
+function hiddenLabel() { return HILO.hiddenLabel(modeKey()); }
 
-function hiddenLabel() { return isArea() ? "Superficie oculta" : "Fecha oculta"; }
+function timelineTitle() { return HILO.timelineTitle(modeKey()); }
 
-function timelineTitle() { return isArea() ? "De menor a mayor" : "Línea temporal"; }
+function eraForCard(card) { return HILO.eraForCard(modeKey(), card); }
 
-function modeCards(modeKey = roomState?.mode || selectedModeKey) {
-  return MODE_CARDS[modeKey] || MODE_CARDS.history;
-}
+function modeCards(key = modeKey()) { return HILO.cards(key); }
 
 function getCard(id) {
   return modeCards().find(card => card.id === id);
 }
 
-function initials(name) {
-  return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase();
-}
-
-function eraForCard(card) {
-  if (isArea()) {
-    if (card.value < 1000) return { key: "diminuto", name: "Diminuto", symbol: "·" };
-    if (card.value < 50000) return { key: "pequeno", name: "Pequeño", symbol: "▪" };
-    if (card.value < 300000) return { key: "mediano", name: "Mediano", symbol: "◈" };
-    if (card.value < 1000000) return { key: "grande", name: "Grande", symbol: "◆" };
-    if (card.value < 5000000) return { key: "enorme", name: "Enorme", symbol: "★" };
-    return { key: "gigante", name: "Gigante", symbol: "⬢" };
-  }
-  if (modeKey() === "movies") {
-    if (card.year < 1930) return { key: "pioneros", name: "Cine pionero", symbol: "▥" };
-    if (card.year < 1960) return { key: "clasico", name: "Cine clásico", symbol: "★" };
-    if (card.year < 1980) return { key: "nuevocine", name: "Nuevo cine", symbol: "◉" };
-    if (card.year < 2000) return { key: "blockbuster", name: "Era blockbuster", symbol: "◆" };
-    if (card.year < 2010) return { key: "milenio", name: "Nuevo milenio", symbol: "✦" };
-    return { key: "actual", name: "Cine actual", symbol: "▷" };
-  }
-  if (card.year < 711) return { key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" };
-  if (card.year < 1492) return { key: "medieval", name: "Edad Media", symbol: "♜" };
-  if (card.year < 1700) return { key: "imperio", name: "Monarquía Hispánica", symbol: "✦" };
-  if (card.year < 1808) return { key: "ilustracion", name: "Ilustración", symbol: "☼" };
-  if (card.year < 1931) return { key: "moderna", name: "España contemporánea", symbol: "⌁" };
-  if (card.year < 1975) return { key: "sigloxx", name: "Siglo XX", symbol: "◈" };
-  return { key: "democracia", name: "Democracia", symbol: "◎" };
-}
-
 function header(extra = "") {
-  const modeName = MODE_NAMES[modeKey()] || MODE_NAMES.history;
-  return `<header class="topbar"><div class="brand"><span class="brand-mark">${MODE_ICONS[modeKey()] || MODE_ICONS.history}</span>Hilo · ${modeName} <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
+  const mode = HILO.mode(modeKey());
+  return `<header class="topbar"><div class="brand"><span class="brand-mark">${mode.icon}</span>Hilo · ${mode.name} <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
 }
 
 function showToast(message) {
@@ -103,15 +62,6 @@ function showToast(message) {
   toastEl.classList.add("show");
   clearTimeout(showToast.timer);
   showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 3000);
-}
-
-function shuffle(items) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
 }
 
 function createRoomCode() {
@@ -283,7 +233,7 @@ async function ensureAuth() {
 }
 
 export async function openOnlineMode(options = {}) {
-  selectedModeKey = MODE_CARDS[options.modeKey] ? options.modeKey : "history";
+  selectedModeKey = HILO.has(options.modeKey) ? options.modeKey : HILO.DEFAULT_MODE;
   renderEntry(cleanCode(options.roomCode));
   await ensureAuth();
   const invited = cleanCode(options.roomCode);
@@ -302,7 +252,7 @@ export async function openOnlineMode(options = {}) {
 function renderEntry(invited = "") {
   const known = invited ? rememberedRoom(invited) : null;
   appEl.innerHTML = `<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="back">Salir</button>')}
-    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${MODE_NAMES[selectedModeKey]}</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
+    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${HILO.mode(selectedModeKey).name}</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid">
       <form class="panel online-form" data-online-form="create"><span class="form-number">01</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
       <form class="panel online-form" data-online-form="join"><span class="form-number">02</span><h3>Entrar en una sala</h3><p>Usa el código que aparece en el móvil anfitrión.</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${escapeHtml(known?.name || "")}"></div><button class="btn btn-secondary btn-block" type="submit">Unirme a la partida</button></form>

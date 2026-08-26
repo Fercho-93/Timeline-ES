@@ -16,6 +16,7 @@ function boot() {
   window.eval(read("cards.js"));
   window.eval(read("movies.js"));
   window.eval(read("countries.js"));
+  window.eval(read("modes.js"));
   window.eval(read("app.js"));
   return window;
 }
