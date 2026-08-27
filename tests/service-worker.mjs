@@ -99,6 +99,17 @@ console.log("\nService worker");
     .matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => `./${m[1]}`);
   const olvidados = guiones.filter(archivo => !precargados.includes(archivo));
   ok(`todos los guiones de index.html se precargan${olvidados.length ? ` (falta ${olvidados.join(", ")})` : ""}`, !olvidados.length);
+
+  // Y lo mismo con las carátulas, que se piden por su nombre montado a mano.
+  const app = fs.readFileSync(path.join(REPO, "app.js"), "utf8");
+  const archivos = [...new Set([...app.matchAll(/archivo: "(hero-[a-z]+)"/g)].map(m => m[1]))];
+  const anchos = (app.match(/const ancho = active \? (\d+) : (\d+);/) || []).slice(1);
+  const caratulas = archivos.flatMap(nombre => anchos.map(ancho => `./assets/${nombre}-${ancho}.webp`));
+  ok(`se deducen las ${caratulas.length} carátulas de app.js`, caratulas.length === 6);
+  const sinPrecargar = caratulas.filter(archivo => !precargados.includes(archivo));
+  ok(`todas se precargan${sinPrecargar.length ? ` (falta ${sinPrecargar.join(", ")})` : ""}`, !sinPrecargar.length);
+  const sinArchivo = caratulas.filter(archivo => !fs.existsSync(path.join(REPO, archivo)));
+  ok(`y todas existen en disco${sinArchivo.length ? ` (falta ${sinArchivo.join(", ")})` : ""}`, !sinArchivo.length);
 }
 
 console.log(`\n${fail} fallos`);

@@ -80,13 +80,24 @@
     return `<header class="topbar"><div class="brand">Continuum</div>${extra}</header>`;
   }
 
-  // La carátula de cada bloque. Van a la caché de la aplicación, así que están
-  // reducidas a 900 px de ancho: es el doble de lo que ocupa el panel más grande.
+  // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
+  // que hay dos tamaños de cada una y cada panel pide el que de verdad usa: el lomo mide
+  // 66 px de ancho y además va en gris y oscurecido, así que con 400 va sobrado; la
+  // carátula abierta ocupa unos 292 px en un móvil y unos 880 en un escritorio.
+  //
+  // Se decide aquí y no con `sizes`, que no sabe nada del panel que está abierto: al
+  // desplegar otro bloque la portada se repinta entera y con ella cambia la imagen.
   const BLOCK_ART = {
-    history: '<img src="assets/hero-history.jpg" alt="">',
-    cinema: '<img src="assets/hero-cinema.jpg" alt="">',
-    globe: '<img src="assets/hero-geography.jpg" alt="">'
+    history: { archivo: "hero-history", alto: { 400: 267, 700: 467 } },
+    cinema: { archivo: "hero-cinema", alto: { 400: 558, 700: 977 } },
+    globe: { archivo: "hero-geography", alto: { 400: 491, 700: 859 } }
   };
+
+  function blockArt(art, active) {
+    const ancho = active ? 700 : 400;
+    const arte = BLOCK_ART[art];
+    return `<img src="assets/${arte.archivo}-${ancho}.webp" alt="" width="${ancho}" height="${arte.alto[ancho]}" decoding="async" fetchpriority="${active ? "high" : "low"}">`;
+  }
 
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
   // en color y las otras quedan como lomos que se pueden tocar.
@@ -95,7 +106,7 @@
       const active = item.key === selectedBlockKey;
       const total = item.games.length;
       return `<button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}">
-        <span class="panel-art" aria-hidden="true">${BLOCK_ART[item.art]}</span>
+        <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
       </button>`;

@@ -61,6 +61,10 @@ La carpeta debe abrirse mediante un servidor web local (no haciendo doble clic e
 3. En Android/Chrome, elige **Añadir a pantalla de inicio**. En iPhone/Safari, pulsa **Compartir → Añadir a pantalla de inicio**.
 4. Desde ese momento se abre como una app y la partida funciona sin conexión.
 
+Pensado para el dedo: ningún control baja de los 44 px que necesita una yema, y las
+carátulas se sirven en dos tamaños —una para el lomo y otra para la portada desplegada—,
+así que la primera visita baja unos 107 KB de imagen en vez de los 698 KB de antes.
+
 El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.
 
 El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo: las reglas de seguridad solo hay que volver a publicarlas cuando cambia su contenido, no al añadir un juego nuevo.
