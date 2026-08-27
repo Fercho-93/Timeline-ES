@@ -19,7 +19,11 @@ const toastEl = document.getElementById("toast");
 // Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
 // cuando este módulo se descarga: se pide al entrar en el modo de varios móviles.
 const CT = window.CONTINUUM;
-const { escapeHtml, initials, shuffle } = CT;
+const { escapeHtml, initials, shuffle, announce } = CT;
+// Igual que en el juego local: pintar conserva el foco del teclado, y las capas se abren
+// como diálogos de verdad. Está en `a11y.js`, compartido por los dos motores.
+const paint = (html, pantalla) => CT.paint(appEl, html, pantalla);
+const abreCapa = (capa, cerrable) => CT.openDialog(capa, cerrable);
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 let user = null;
@@ -250,14 +254,14 @@ export async function openOnlineMode(options = {}) {
 
 function renderEntry(invited = "") {
   const known = invited ? rememberedRoom(invited) : null;
-  appEl.innerHTML = `<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="back">Salir</button>')}
-    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${CT.mode(selectedModeKey).name}</div><h2>Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
+  paint(`<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="back">Salir</button>')}
+    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid">
       <form class="panel online-form" data-online-form="create"><span class="form-number">01</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
       <form class="panel online-form" data-online-form="join"><span class="form-number">02</span><h3>Entrar en una sala</h3><p>Usa el código que aparece en el móvil anfitrión.</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${escapeHtml(known?.name || "")}"></div><button class="btn btn-secondary btn-block" type="submit">Unirme a la partida</button></form>
     </div>
     <p class="online-note">Necesita conexión a internet durante la partida compartida.</p>
-  </div>`;
+  </div>`, "online-entry");
 }
 
 async function createRoom(name) {
@@ -357,12 +361,12 @@ function connectToRoom(code) {
 function renderLobby() {
   const isHost = roomState.hostUid === user.uid;
   const people = roomState.playerOrder.map(uid => roomState.players[uid]);
-  appEl.innerHTML = `<div class="shell online-shell">${header(isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>')}
-    <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2>Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
+  paint(`<div class="shell online-shell">${header(isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>')}
+    <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
     <div class="online-lobby-grid"><section class="panel"><div class="section-label">Participantes <small>${people.length}/9</small></div><div class="lobby-players">${roomState.playerOrder.map((uid, index) => { const player = roomState.players[uid]; return `<div class="lobby-player"><span>${escapeHtml(initials(player.name))}</span><div><strong>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</strong><small>${uid === roomState.hostUid ? "Anfitrión" : `Participante ${index + 1}`}</small></div>${isHost && uid !== roomState.hostUid ? `<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button>` : "<i>✓</i>"}</div>`; }).join("")}</div></section>
       <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
     </div>
-  </div>`;
+  </div>`, "online-lobby");
 }
 
 async function startRoom() {
@@ -403,7 +407,7 @@ function renderGame() {
   const slots = [];
   for (let index = 0; index <= timelineCards.length; index++) {
     slots.push(myTurn && selectedCard && pendingIndex === index
-      ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(selectedCard.title)}</strong><button class="btn btn-primary btn-block" data-online-action="confirm-place">Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
+      ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(selectedCard.title)}</strong><button class="btn btn-primary btn-block" data-online-action="confirm-place" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
       : `<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
     if (index < timelineCards.length) {
       const card = timelineCards[index];
@@ -411,20 +415,32 @@ function renderGame() {
       slots.push(`<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
-  appEl.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-online-action="room">Sala</button>')}
+  paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room">Sala</button>')}
     <div class="connection-strip"><span><i></i> Sala ${roomCode}</span><small>${roomState.playerOrder.length} participantes</small></div>
-    <div class="game-head"><div><div class="turn-label">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
-    <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
+    <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
     <section><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
+    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
-  </div>`;
+  </div>`, "online-game");
   // Igual que en el juego local: arrastrar una carta hasta un hueco es otra forma de
   // llegar a la confirmación. Fuera de turno las cartas están desactivadas y no arrancan.
   CT.enableDrag({
     cardSelector: ".hand-card", slotSelector: ".slot",
-    onDrop: (id, index) => { selectedCardId = id; pendingIndex = index; renderGame(); }
+    onDrop: (id, index) => {
+      selectedCardId = id;
+      pendingIndex = index;
+      if (index !== null) announce(`Hueco ${index + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`);
+      renderGame();
+    }
   });
+  // La capa del revelado viaja dentro del repintado, y este se repite con cada
+  // instantánea que llega de la sala. Solo se abre como diálogo al aparecer, o el foco
+  // saltaría dentro de ella una y otra vez.
+  const revelando = roomState.phase === "reveal";
+  if (revelando && !renderGame.revelando) abreCapa(appEl.querySelector(".overlay"), false);
+  renderGame.revelando = revelando;
 }
 
 function revealOverlay(currentUid) {
@@ -432,7 +448,7 @@ function revealOverlay(currentUid) {
   const card = getCard(reveal.cardId);
   const era = eraForCard(card);
   const canContinue = user.uid === currentUid || user.uid === roomState.hostUid;
-  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
+  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
 }
 
 async function placeCard(index) {
@@ -540,7 +556,7 @@ function renderWinner() {
   const lead = names.length === 1
     ? "Ha sido la única persona en terminar la ronda sin cartas."
     : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
-  appEl.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(roomState.players[uids[0]].name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`;
+  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(roomState.players[uids[0]].name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`, "online-winner");
 }
 
 function roomMenu() {
@@ -562,6 +578,7 @@ function roomMenu() {
       <button class="btn btn-primary" data-online-action="close-room-menu">Volver a la partida</button>
     </div>
   </div></div>`);
+  abreCapa(appEl.querySelector("[data-room-overlay]"), true);
 }
 
 // El anfitrión desatasca la partida cuando alguien se queda sin batería o sin cobertura.
@@ -644,6 +661,7 @@ function showQr() {
   document.body.insertAdjacentHTML("beforeend", `<div class="overlay qr-overlay" data-qr-overlay><div class="modal qr-modal"><div class="eyebrow">Invitación a la sala</div><h2>Escanea para entrar</h2><div class="qr-frame"><canvas id="room-qr" aria-label="Código QR de invitación a la sala"></canvas></div><div class="qr-room-code">${roomCode}</div><p>Abre la cámara del otro móvil y apunta al código. El enlace rellenará automáticamente la sala.</p><div class="actions" style="display:grid"><button class="btn btn-primary" data-online-action="share">Compartir enlace</button><button class="btn btn-secondary" data-online-action="close-qr">Cerrar</button></div></div></div>`);
   try { drawQr(document.getElementById("room-qr"), invitationUrl()); }
   catch (error) { console.error(error); showToast("La dirección es demasiado larga para generar el QR"); }
+  abreCapa(document.querySelector("[data-qr-overlay]"), true);
 }
 
 async function closeRoom() {
@@ -691,20 +709,29 @@ document.addEventListener("click", event => {
   if (action === "back" || action === "leave") leaveOnline();
   else if (action === "share") shareRoom();
   else if (action === "qr") showQr();
-  else if (action === "close-qr") target.closest("[data-qr-overlay]")?.remove();
+  else if (action === "close-qr") CT.closeDialog();
   else if (action === "start") startRoom();
-  else if (action === "select") { selectedCardId = Number(target.dataset.id); pendingIndex = null; renderGame(); }
-  else if (action === "place") { pendingIndex = Number(target.dataset.index); renderGame(); }
+  else if (action === "select") {
+    selectedCardId = Number(target.dataset.id);
+    pendingIndex = null;
+    announce(`Elegida la carta ${getCard(selectedCardId).title}. Ahora elige un hueco.`);
+    renderGame();
+  }
+  else if (action === "place") {
+    pendingIndex = Number(target.dataset.index);
+    announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`);
+    renderGame();
+  }
   else if (action === "confirm-place") placeCard(pendingIndex);
   else if (action === "cancel-place") { pendingIndex = null; renderGame(); }
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
   else if (action === "room") roomMenu();
-  else if (action === "close-room-menu") target.closest("[data-room-overlay]")?.remove();
-  else if (action === "skip") { target.closest("[data-room-overlay]")?.remove(); skipTurn(); }
+  else if (action === "close-room-menu") CT.closeDialog();
+  else if (action === "skip") { CT.closeDialog(); skipTurn(); }
   else if (action === "kick") {
     const name = roomState?.players[target.dataset.uid]?.name || "esta persona";
-    if (confirm(`¿Expulsar a ${name} de la sala?`)) { target.closest("[data-room-overlay]")?.remove(); removePlayer(target.dataset.uid); }
+    if (confirm(`¿Expulsar a ${name} de la sala?`)) { CT.closeDialog(); removePlayer(target.dataset.uid); }
   } else if (action === "leave-room") {
     if (confirm("¿Salir de la sala? Tus cartas volverán al mazo.")) removePlayer(user.uid);
   }
