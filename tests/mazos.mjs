@@ -1,4 +1,4 @@
-// Reglas de calidad de los cuatro mazos: sin cartas repetidas, sin huecos y, sobre todo,
+// Reglas de calidad de los cinco mazos: sin cartas repetidas, sin huecos y, sobre todo,
 // sin parejas tan pegadas que colocarlas bien sea cuestión de suerte.
 import fs from "node:fs";
 import path from "node:path";
@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.window = {};
-for (const archivo of ["cards.js", "movies.js", "countries.js", "population.js", "modes.js"]) {
+for (const archivo of ["cards.js", "movies.js", "inventos.js", "countries.js", "population.js", "modes.js"]) {
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
-const { HISTORY_CARDS, MOVIE_CARDS, COUNTRY_CARDS, POPULATION_CARDS } = globalThis.window;
+const { HISTORY_CARDS, MOVIE_CARDS, INVENTION_CARDS, COUNTRY_CARDS, POPULATION_CARDS } = globalThis.window;
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
@@ -24,6 +24,16 @@ function comunes(nombre, mazo, valor) {
 comunes("Historia de España", HISTORY_CARDS, c => c.year);
 comunes("Estrenos de cine", MOVIE_CARDS, c => c.year);
 ok("cada año aparece una sola vez", new Set(MOVIE_CARDS.map(c => c.year)).size === MOVIE_CARDS.length);
+
+// En los inventos la fecha es el juego entero, así que aquí tampoco puede haber dos
+// cartas del mismo año: serían una moneda al aire.
+comunes("Inventos y descubrimientos", INVENTION_CARDS, c => c.year);
+ok("cada año aparece una sola vez", new Set(INVENTION_CARDS.map(c => c.year)).size === INVENTION_CARDS.length);
+{
+  const orden = [...INVENTION_CARDS].sort((a, b) => a.year - b.year);
+  const pegados = orden.filter((card, i) => i && card.year - orden[i - 1].year <= 1).length;
+  ok(`pocos pares en años seguidos (${pegados} de ${orden.length - 1})`, pegados <= orden.length / 10);
+}
 
 // En los mazos numéricos, dos cartas demasiado próximas no se razonan: se aciertan por
 // suerte. El margen es el mismo para todos.
@@ -63,7 +73,7 @@ const CT = globalThis.window.CONTINUUM;
 redondeoLegible("Superficie de países", "countries", COUNTRY_CARDS);
 redondeoLegible("Población de países", "population", POPULATION_CARDS);
 
-const todos = [...HISTORY_CARDS, ...MOVIE_CARDS, ...COUNTRY_CARDS, ...POPULATION_CARDS];
+const todos = [...HISTORY_CARDS, ...MOVIE_CARDS, ...INVENTION_CARDS, ...COUNTRY_CARDS, ...POPULATION_CARDS];
 console.log("\nEntre mazos");
 ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.id)).size === todos.length);
 

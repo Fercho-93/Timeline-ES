@@ -175,6 +175,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .hand-card strong { display: block; margin-top: 11px; padding-right: 12px; font-family: Georgia, serif; font-size: 1rem; line-height: 1.18; position: relative; z-index: 1; }
 .card-arrow { position: absolute; left: 14px; bottom: 11px; color: var(--accent); font-weight: 700; }
 .era-antigua { background: #6f6353; }
+.era-cientifica { background: #5f6b6a; }
+.era-industrial { background: #6b5b4a; }
+.era-electrica { background: #8a7340; }
+.era-atomica { background: #55605f; }
+.era-digital { background: #5a5f6b; }
 .era-medieval { background: #7a5f49; }
 .era-imperio { background: #8a6a3b; }
 .era-ilustracion { background: #94794b; }
