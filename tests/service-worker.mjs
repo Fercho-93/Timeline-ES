@@ -90,6 +90,16 @@ console.log("\nService worker");
   const envio = await sw.pedir("./sala", "same-origin", "POST");
   ok("no se mete en las peticiones que no son GET", envio === undefined);
 }
+{
+  // Un archivo nuevo en `index.html` que no esté en la lista de precarga no se guarda al
+  // instalar: la aplicación se abriría rota al quedarse sin conexión.
+  const fuente = fs.readFileSync(path.join(REPO, "service-worker.js"), "utf8");
+  const precargados = [...fuente.matchAll(/"(\.\/[^"]+)"/g)].map(m => m[1]);
+  const guiones = [...fs.readFileSync(path.join(REPO, "index.html"), "utf8")
+    .matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => `./${m[1]}`);
+  const olvidados = guiones.filter(archivo => !precargados.includes(archivo));
+  ok(`todos los guiones de index.html se precargan${olvidados.length ? ` (falta ${olvidados.join(", ")})` : ""}`, !olvidados.length);
+}
 
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

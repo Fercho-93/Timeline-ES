@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.window = {};
-for (const archivo of ["cards.js", "movies.js", "countries.js", "population.js"]) {
+for (const archivo of ["cards.js", "movies.js", "countries.js", "population.js", "modes.js"]) {
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
 const { HISTORY_CARDS, MOVIE_CARDS, COUNTRY_CARDS, POPULATION_CARDS } = globalThis.window;
@@ -44,6 +44,24 @@ function separadas(nombre, mazo, unidad) {
 separadas("Superficie de países", COUNTRY_CARDS, "superficies");
 separadas("Población de países", POPULATION_CARDS, "poblaciones");
 ok("las poblaciones son números enteros de personas", POPULATION_CARDS.every(c => Number.isInteger(c.value)));
+
+// Las cifras grandes se muestran redondeadas a millones. El redondeo solo vale si no
+// borra el orden: dos cartas contiguas nunca pueden acabar enseñando la misma cifra, o
+// la partida pediría adivinar en vez de razonar.
+function redondeoLegible(nombre, modo, mazo) {
+  console.log(`\n${nombre}, ya redondeado`);
+  const orden = [...mazo].sort((a, b) => a.value - b.value);
+  const textos = orden.map(card => CT.formatValue(modo, card));
+  const repetido = textos.find((texto, i) => i && texto === textos[i - 1]);
+  ok(`ninguna cifra se repite tras redondear${repetido ? ` (${repetido})` : ""}`, !repetido);
+  ok("la cifra más pequeña no se queda en cero", !/^0[.,]?0*\s/.test(textos[0]));
+  const largo = textos.reduce((a, b) => b.length > a.length ? b : a);
+  ok(`la cifra más larga cabe en una carta: «${largo}»`, largo.length <= 22);
+}
+
+const CT = globalThis.window.CONTINUUM;
+redondeoLegible("Superficie de países", "countries", COUNTRY_CARDS);
+redondeoLegible("Población de países", "population", POPULATION_CARDS);
 
 const todos = [...HISTORY_CARDS, ...MOVIE_CARDS, ...COUNTRY_CARDS, ...POPULATION_CARDS];
 console.log("\nEntre mazos");

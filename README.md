@@ -72,8 +72,13 @@ cambio. Las instrucciones están en `tests/README.md`.
 - La persona más joven comienza y el turno avanza en el orden de los jugadores.
 - Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
 - La fecha (o la superficie) permanece oculta hasta colocar la carta en un hueco de la línea.
-- Al elegir un hueco hay que confirmarlo antes de revelar: en un móvil el dedo falla y la jugada
-  no debería depender de eso.
+- Hay dos formas de colocar: tocar la carta y luego el hueco, o arrastrar la carta hasta cualquiera
+  de los huecos. Con el dedo, el arrastre empieza tras una pulsación breve, para que deslizar sobre
+  una carta siga desplazando la pantalla.
+- Al elegir un hueco hay que confirmarlo antes de revelar, se haya llegado tocando o arrastrando:
+  en un móvil el dedo falla y la jugada no debería depender de eso.
+- Las cifras grandes se expresan en millones con tres cifras significativas («83,6 millones»). El
+  redondeo no puede estropear ninguna jugada porque entre dos cartas contiguas siempre hay un 8%.
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
 - Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.

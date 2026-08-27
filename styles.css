@@ -155,9 +155,20 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .hand-title h3 { margin: 0; }
 .hand-title small { color: var(--muted); }
 .hand { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-.hand-card { min-height: 164px; text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: var(--ink); background: var(--surface); box-shadow: var(--shadow-soft); cursor: pointer; position: relative; overflow: hidden; transition: transform .15s ease, border-color .15s ease; }
+.hand-card { min-height: 164px; text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: var(--ink); background: var(--surface); box-shadow: var(--shadow-soft); cursor: grab; position: relative; overflow: hidden; transition: transform .15s ease, border-color .15s ease; }
 .hand-card:active { transform: translateY(2px); }
 .hand-card.selected { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); transform: translateY(-2px); }
+
+/* Arrastrar cartas. La carta original se queda apagada en su sitio, como hueco de
+   donde salió, y lo que sigue al dedo es una copia flotante. */
+.hand-card.armed { transform: scale(.97); box-shadow: inset 0 0 0 2px var(--accent); }
+.hand-card.dragging { opacity: .3; filter: grayscale(1); cursor: grabbing; }
+.drag-ghost { position: fixed; left: 0; top: 0; z-index: 60; margin: 0; min-height: 0; padding: 11px 13px; pointer-events: none; transform: rotate(-2deg); border-color: var(--accent); box-shadow: 0 16px 34px rgba(40,28,18,.3); }
+.drag-ghost .card-arrow, .drag-ghost .card-era { display: none; }
+.drag-ghost strong { margin-top: 7px; font-size: .9rem; }
+.slot.drop-target span { border-style: solid; border-color: var(--accent); background: rgba(189,139,49,.14); color: var(--accent); transform: scale(1.08); }
+body.dragging-card { touch-action: none; user-select: none; -webkit-user-select: none; }
+body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .card-era { margin: 0 -14px 13px; padding: 9px 11px; display: flex; align-items: center; gap: 7px; color: rgba(255,255,255,.92); font-size: .58rem; line-height: 1; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
 .card-era i { font: normal 1rem Georgia, serif; }
 .hand-card .hidden-date { color: var(--accent); font-size: .63rem; letter-spacing: .13em; text-transform: uppercase; font-weight: 700; }
@@ -252,7 +263,7 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .solo-stats small { color: var(--muted); font-size: .65rem; }
 .solo-lives { margin: -6px 0 14px; font-size: 1.25rem; letter-spacing: .18em; color: var(--accent); }
 .hand-solo { grid-template-columns: minmax(0, 260px); }
-.hand-solo .hand-card { cursor: default; }
+.hand-solo .hand-card { cursor: grab; }
 .app-version { margin: 24px 0 4px; text-align: center; color: var(--muted); font-size: .6rem; letter-spacing: .08em; opacity: .55; }
 .kick-btn { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--accent); font: inherit; font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
 .kick-btn:active { background: rgba(143,47,42,.1); }

@@ -9,9 +9,20 @@
 (function () {
   "use strict";
 
-  function formatArea(value) {
-    if (value < 10) return value.toLocaleString("es-ES", { maximumFractionDigits: 2 });
-    return Math.round(value).toLocaleString("es-ES");
+  // Un número entero largo no dice nada: 1.476.625.576 no se lee, se mira. A partir del
+  // millón se expresa en millones con tres cifras significativas. Redondear no puede
+  // estropear el juego porque entre dos cartas contiguas siempre hay al menos un 8%: el
+  // orden se mantiene y nunca salen dos cartas con la misma cifra.
+  function compact(value) {
+    if (value < 1e6) {
+      if (value < 10) return value.toLocaleString("es-ES", { maximumFractionDigits: 2 });
+      return Math.round(value).toLocaleString("es-ES");
+    }
+    const millions = value / 1e6;
+    const decimals = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
+    const cifra = millions.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    // «1,00 millones» no lo dice nadie; justo por encima del millón se dice «1 millón».
+    return Math.round(millions * 100) === 100 ? "1 millón" : `${cifra} millones`;
   }
 
   // Un eje dice cómo se ordenan las cartas, cómo se muestra el dato una vez revelado y
@@ -36,7 +47,8 @@
     },
     population: {
       sortValue: card => card.value,
-      format: card => `${Math.round(card.value).toLocaleString("es-ES")} hab.`,
+      // Con la cifra en millones el «hab.» sobra y no cabe; abajo sí aclara.
+      format: card => card.value >= 1e6 ? compact(card.value) : `${compact(card.value)} hab.`,
       hiddenLabel: "Población oculta",
       timelineTitle: "De menos a más",
       question: "¿Menos o más gente?",
@@ -51,7 +63,8 @@
     },
     area: {
       sortValue: card => card.value,
-      format: card => `${formatArea(card.value)} km²`,
+      // «de km²» solo cuando la cifra va en millones: «17,1 millones de km²».
+      format: card => card.value >= 1e6 ? `${compact(card.value)} de km²` : `${compact(card.value)} km²`,
       hiddenLabel: "Superficie oculta",
       timelineTitle: "De menor a mayor",
       question: "¿Más pequeño o más grande?",
