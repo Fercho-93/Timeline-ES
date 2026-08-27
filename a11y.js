@@ -31,6 +31,41 @@
     return document.activeElement === el;
   }
 
+  // La línea temporal (y su mapa) se recorren con el dedo o con el ratón, sin pasar por
+  // el foco, así que su posición se guarda aparte. Se ancla a la carta que hubiera más a
+  // la izquierda, no al número de píxel: si la nueva carta entra antes de esa posición,
+  // el desplazamiento absoluto ya no señalaría al mismo sitio, señalaría a la carta de al
+  // lado. Solo se ancla cuando de verdad había algo desplazado; un `scrollLeft` en cero
+  // ya vuelve a cero solo, que es el comportamiento correcto al entrar en la pantalla.
+  const SCROLL_ANCHORS = [".timeline-wrap", ".timeline-map"];
+
+  function posicion(el, wrap) {
+    return el.getBoundingClientRect().left - wrap.getBoundingClientRect().left + wrap.scrollLeft;
+  }
+
+  function capturaScroll(container) {
+    return SCROLL_ANCHORS.map(selector => {
+      const wrap = container.querySelector(selector);
+      if (!wrap || wrap.scrollLeft <= 0) return null;
+      let anchor = null;
+      for (const hijo of wrap.querySelectorAll("[data-id]")) {
+        if (posicion(hijo, wrap) > wrap.scrollLeft) break;
+        anchor = hijo;
+      }
+      if (!anchor) return null;
+      return { selector, id: anchor.dataset.id, delta: wrap.scrollLeft - posicion(anchor, wrap) };
+    });
+  }
+
+  function restauraScroll(container, anclas) {
+    anclas.forEach(ancla => {
+      if (!ancla) return;
+      const wrap = container.querySelector(ancla.selector);
+      const hijo = wrap?.querySelector(`[data-id="${ancla.id}"]`);
+      if (wrap && hijo) wrap.scrollLeft = posicion(hijo, wrap) + ancla.delta;
+    });
+  }
+
   // Pinta y decide dónde queda el foco:
   //
   // - Al cambiar de pantalla, en su titular. Así el lector lee dónde está, y quien usa
@@ -48,9 +83,12 @@
     const clave = dentro ? selectorFor(activo) : null;
     const primero = paint.screen === undefined;
     const cambioDePantalla = screen !== paint.screen;
+    // Cambiar de pantalla sí debe volver la línea al principio: es una línea distinta.
+    const anclas = cambioDePantalla ? null : capturaScroll(container);
     paint.screen = screen;
 
     container.innerHTML = html;
+    if (anclas) restauraScroll(container, anclas);
     if (primero) return;
     if (cambioDePantalla) {
       // Sin preventScroll: al cambiar de pantalla queremos que suba al titular.
