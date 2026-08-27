@@ -38,7 +38,9 @@ button { touch-action: manipulation; }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
-.icon-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 14px; font-size: .85rem; font-weight: 650; cursor: pointer; }
+/* 44 px es lo que necesita un dedo. Los botones pequeños llegaban a 36 y a 29, y son
+   justo los que más se usan: el de la esquina en cada pantalla de partida. */
+.icon-btn { min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 16px; font-size: .85rem; font-weight: 650; cursor: pointer; }
 
 .hero { padding: 8px 0; display: grid; gap: 26px; align-items: center; }
 .hero-copy { position: relative; z-index: 2; }
@@ -118,7 +120,7 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .field label { font-size: .85rem; font-weight: 700; color: var(--muted); }
 .field input, .field select { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; min-height: 49px; padding: 11px 13px; color: var(--ink); }
 .player-row { display: grid; grid-template-columns: 1fr auto; gap: 9px; margin-bottom: 9px; }
-.remove { width: 48px; border: 0; border-radius: 10px; background: var(--paper); color: var(--accent); font-weight: 700; cursor: pointer; }
+.remove { width: 48px; min-height: 44px; border: 0; border-radius: 10px; background: var(--paper); color: var(--accent); font-weight: 700; cursor: pointer; }
 .section-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 22px 0 10px; font-weight: 700; }
 .section-label small { color: var(--muted); font-weight: 650; }
 
@@ -281,7 +283,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .hand-solo { grid-template-columns: minmax(0, 260px); }
 .hand-solo .hand-card { cursor: grab; }
 .app-version { margin: 24px 0 4px; text-align: center; color: var(--muted); font-size: .6rem; letter-spacing: .08em; opacity: .55; }
-.kick-btn { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--accent); font: inherit; font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.kick-btn { min-height: 44px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--accent); font: inherit; font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
 .kick-btn:active { background: rgba(143,47,42,.1); }
 .manage-players { margin-top: 18px; text-align: left; }
 .manage-player { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; padding: 7px 0; }

@@ -1,7 +1,7 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v7";
-const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./inventos.js", "./mundo.js", "./countries.js", "./population.js", "./modes.js", "./drag.js", "./a11y.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history.jpg", "./assets/hero-cinema.jpg", "./assets/hero-geography.jpg"];
+const CACHE = "continuum-v8";
+const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./inventos.js", "./mundo.js", "./countries.js", "./population.js", "./modes.js", "./drag.js", "./a11y.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history-400.webp", "./assets/hero-history-700.webp", "./assets/hero-cinema-400.webp", "./assets/hero-cinema-700.webp", "./assets/hero-geography-400.webp", "./assets/hero-geography-700.webp"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
