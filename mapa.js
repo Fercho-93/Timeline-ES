@@ -21,7 +21,7 @@
     const paradas = cards.map((card, i) => {
       const era = CT.eraForCard(modeKey, card);
       const nombre = `${card.title}, ${CT.formatValue(modeKey, card)}`;
-      return `<button class="map-stop era-${era.key}" data-goto="${i}" aria-label="Ir a ${CT.escapeHtml(nombre)}"><span>${CT.escapeHtml(CT.shortValue(modeKey, card))}</span></button>`;
+      return `<button class="map-stop era-${era.key}" data-goto="${i}" data-id="${card.id}" aria-label="Ir a ${CT.escapeHtml(nombre)}"><span>${CT.escapeHtml(CT.shortValue(modeKey, card))}</span></button>`;
     }).join("");
     return `<div class="timeline-map" role="group" aria-label="Recorrer la línea: ${cards.length} cartas colocadas">${paradas}</div>`;
   }
