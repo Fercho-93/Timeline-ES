@@ -25,6 +25,19 @@
     return Math.round(millions * 100) === 100 ? "1 millón" : `${cifra} millones`;
   }
 
+  // Además del dato completo, cada eje sabe decirlo en corto. Es lo que cabe en el mapa
+  // de la línea, donde solo hay sitio para cuatro o cinco caracteres por carta.
+  function shortMillions(value) {
+    if (value >= 1e6) {
+      const millones = value / 1e6;
+      const cifra = millones >= 100 ? Math.round(millones) : Number(millones.toPrecision(3));
+      return `${cifra.toLocaleString("es-ES")} M`;
+    }
+    // «402 mil» se lee de un vistazo; «402.329», en un hueco de cuarenta píxeles, no.
+    if (value >= 10000) return `${Math.round(value / 1000).toLocaleString("es-ES")} mil`;
+    return compact(value);
+  }
+
   // Un eje dice cómo se ordenan las cartas, cómo se muestra el dato una vez revelado y
   // cómo se llama mientras está oculto. Es lo que permite que la línea no sea siempre
   // temporal: la de países ordena por tamaño con el mismo motor.
@@ -32,6 +45,7 @@
     time: {
       sortValue: card => card.year,
       format: card => card.label || (card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year)),
+      shortValue: card => card.year < 0 ? `${Math.abs(card.year)} a.C.` : String(card.year),
       hiddenLabel: "Fecha oculta",
       timelineTitle: "Línea temporal",
       question: "¿Antes o después?",
@@ -49,6 +63,7 @@
       sortValue: card => card.value,
       // Con la cifra en millones el «hab.» sobra y no cabe; abajo sí aclara.
       format: card => card.value >= 1e6 ? compact(card.value) : `${compact(card.value)} hab.`,
+      shortValue: card => shortMillions(card.value),
       hiddenLabel: "Población oculta",
       timelineTitle: "De menos a más",
       question: "¿Menos o más gente?",
@@ -65,6 +80,7 @@
       sortValue: card => card.value,
       // «de km²» solo cuando la cifra va en millones: «17,1 millones de km²».
       format: card => card.value >= 1e6 ? `${compact(card.value)} de km²` : `${compact(card.value)} km²`,
+      shortValue: card => shortMillions(card.value),
       hiddenLabel: "Superficie oculta",
       timelineTitle: "De menor a mayor",
       question: "¿Más pequeño o más grande?",
@@ -179,6 +195,9 @@
 
   function formatValue(modeKey, card) { return axis(modeKey).format(card); }
 
+  // El dato en corto, para el mapa de la línea.
+  function shortValue(modeKey, card) { return axis(modeKey).shortValue(card); }
+
   function sortValue(modeKey, card) { return axis(modeKey).sortValue(card); }
 
   function hiddenLabel(modeKey) { return axis(modeKey).hiddenLabel; }
@@ -214,7 +233,7 @@
     MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK,
     has, mode, axis, cards,
     hasBlock, block, blockOf, blockGames,
-    formatValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
+    formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
     escapeHtml, initials, shuffle
   };
 })();

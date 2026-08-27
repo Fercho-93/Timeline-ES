@@ -181,5 +181,32 @@ console.log("\nSan Marino y Suiza, de menor a mayor");
   ok("y colocarlo después es un fallo", !resultado(1));
 }
 
+// El mapa de la línea: una tira de paradas para recorrer una línea que en un móvil no
+// cabe ni de lejos. No coloca nada, solo lleva la vista.
+console.log("\nEl mapa de la línea");
+{
+  const dia = new Date().toLocaleDateString("sv-SE");
+  const conLinea = ids => {
+    const estado = { kind: "free", mode: "history", day: dia, deck: [], timeline: ids, current: 100, lives: 3, hits: 0, played: 0, total: null, finished: false };
+    const w = boot({ "hilo-solo-history-v1": JSON.stringify(estado) });
+    click(w, '[data-action="solo"]');
+    click(w, '[data-action="resume-solo"]');
+    return w;
+  };
+
+  const corta = conLinea([1, 2, 3, 4]);
+  ok("con cuatro cartas no hay mapa: la línea ya casi cabe", !existe(corta, ".timeline-map"));
+
+  const w = conLinea([1, 2, 3, 4, 5, 6, 7, 8]);
+  const paradas = [...w.document.querySelectorAll(".map-stop")];
+  ok(`hay una parada por carta (${paradas.length} de 8)`, paradas.length === 8);
+  ok("cada parada dice a dónde lleva", paradas.every(p => /^Ir a .+, .+/.test(p.getAttribute("aria-label") || "")));
+  ok("y lleva el color de su época", paradas.every(p => /\bera-[a-z]+\b/.test(p.className)));
+  // Lo que se ve es la versión corta: «218 a.C.», no «218 a. C.» con su título detrás.
+  ok("la primera parada enseña el año en corto", paradas[0].textContent.trim() === "218 a.C.");
+  ok("y su etiqueta, la carta entera", paradas[0].getAttribute("aria-label") === "Ir a Desembarco romano en Emporion, 218 a. C.");
+  ok("las paradas no son huecos: no colocan nada", paradas.every(p => !p.hasAttribute("data-action")));
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

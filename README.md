@@ -61,7 +61,10 @@ La carpeta debe abrirse mediante un servidor web local (no haciendo doble clic e
 3. En Android/Chrome, elige **Añadir a pantalla de inicio**. En iPhone/Safari, pulsa **Compartir → Añadir a pantalla de inicio**.
 4. Desde ese momento se abre como una app y la partida funciona sin conexión.
 
-Pensado para el dedo: ningún control baja de los 44 px que necesita una yema, y las
+Pensado para el dedo. Sobre la línea temporal hay un mapa —una tira con una parada por
+carta colocada, con su época y su año— porque en una pantalla de 390 px no caben ni dos
+cartas de la línea: el mapa no coloca nada, solo lleva la vista hasta donde le digas.
+Ningún control baja de los 44 px que necesita una yema, y las
 carátulas se sirven en dos tamaños —una para el lomo y otra para la portada desplegada—,
 así que la primera visita baja unos 107 KB de imagen en vez de los 698 KB de antes.
 
