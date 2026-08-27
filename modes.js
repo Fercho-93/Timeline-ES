@@ -100,6 +100,20 @@
         { limit: Infinity, key: "actual", name: "Cine actual", symbol: "▷" }
       ]
     },
+    inventions: {
+      key: "inventions", name: "Inventos y descubrimientos",
+      cardLabel: "inventos", blurb: "De la escritura a la edición genética.", cards: window.INVENTION_CARDS,
+      axis: "time",
+      bands: [
+        { limit: 500, key: "antigua", name: "Mundo antiguo", symbol: "☉" },
+        { limit: 1400, key: "medieval", name: "Edad Media", symbol: "♜" },
+        { limit: 1700, key: "cientifica", name: "Revolución científica", symbol: "✧" },
+        { limit: 1830, key: "industrial", name: "Revolución industrial", symbol: "⚙" },
+        { limit: 1900, key: "electrica", name: "Era eléctrica", symbol: "⚡" },
+        { limit: 1970, key: "atomica", name: "Siglo de los átomos", symbol: "⚛" },
+        { limit: Infinity, key: "digital", name: "Era digital", symbol: "⌘" }
+      ]
+    },
     countries: {
       key: "countries", name: "Superficie de países",
       cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
@@ -120,7 +134,7 @@
   // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga
   // a tocar `firestore.rules`: dejaron de llevar dentro la lista.
   const BLOCKS = {
-    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history"] },
+    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "inventions"] },
     cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] }
   };
