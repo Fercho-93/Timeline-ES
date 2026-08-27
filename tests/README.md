@@ -6,13 +6,13 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm install
 
-# Sintaxis, juego, mazos y service worker: seis suites, sin nada más que Node.
+# Sintaxis, juego, mazos, service worker y accesibilidad: siete suites, sin nada más que Node.
 npm test
 
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npm run test:reglas
 
-# Las nueve de una vez.
+# Las diez de una vez.
 npm run test:todo
 ```
 
@@ -30,6 +30,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil, y que ningún guion de `index.html` se quede sin precargar. Sin dependencias. |
 | `mazos.mjs` | Calidad de los seis mazos: repeticiones, huecos, cartas demasiado juntas y cifras que el redondeo no confunda. Sin dependencias. |
 | `solitario.mjs` | Solitario, reto diario, confirmación al colocar y modalidad de países. |
+| `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie y que las bandas tengan contraste. |
 | `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
 | `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |
 | `entrada-por-enlace.mjs` | La secuencia del SDK al entrar por una invitación. Necesita el emulador. |
@@ -50,6 +51,12 @@ recargado la aplicación.
 al entrar por una invitación, la primera instantánea de `onSnapshot` llega de la caché y
 todavía no incluye a quien acaba de entrar. Comprueba el SDK y la condición, no el propio
 `online.js`, que no se puede importar desde Node porque carga Firebase desde gstatic.
+
+`accesibilidad.mjs` juega con teclado sobre el DOM simulado: comprueba que tras cada
+repintado el foco vuelve donde debe, que las capas se anuncian como diálogos y devuelven
+el foco al cerrarse, que elegir carta y hueco pasa por la región viva, y que el texto de
+las bandas de época llega a 4,5:1 de contraste. Ese último es puro dato: no necesita
+navegador y avisa en cuanto alguien añade una banda demasiado clara.
 
 `service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado.
 Comprueba lo que decide qué versión ve cada móvil: se responde con la copia guardada,

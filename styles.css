@@ -26,6 +26,12 @@ body {
   background: var(--paper);
 }
 button, input, select { font: inherit; }
+/* Para lectores de pantalla: fuera de la vista pero dentro del árbol de accesibilidad.
+   Aquí viven los titulares de la partida y los avisos de lo que acaba de pasar. */
+.solo-lectores { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+/* Ningún elemento enfocado se queda sin marca visible, ni siquiera los que solo reciben
+   el foco desde el programa. */
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 button { touch-action: manipulation; }
 
 #app { min-height: 100dvh; }
@@ -182,19 +188,19 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .era-friaguerra { background: #4a5a6b; }
 .era-global { background: #63596b; }
 .era-industrial { background: #6b5b4a; }
-.era-electrica { background: #8a7340; }
+.era-electrica { background: #7d6838; }
 .era-atomica { background: #55605f; }
 .era-digital { background: #5a5f6b; }
 .era-medieval { background: #7a5f49; }
-.era-imperio { background: #8a6a3b; }
-.era-ilustracion { background: #94794b; }
+.era-imperio { background: #856539; }
+.era-ilustracion { background: #7f663c; }
 .era-moderna { background: #5d6b6d; }
 .era-sigloxx { background: #4f4f4c; }
 .era-democracia { background: #4a6b5d; }
 .era-gigante { background: #4a5a63; }
 .era-enorme { background: #4f6b5d; }
 .era-grande { background: #6f6a4a; }
-.era-mediano { background: #8a6a3b; }
+.era-mediano { background: #856539; }
 .era-pequeno { background: #8a5f4c; }
 .era-diminuto { background: #7a6a72; }
 .era-minusculo { background: #7a6a72; }

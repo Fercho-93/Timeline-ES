@@ -8,7 +8,16 @@
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
-  const { escapeHtml, initials, shuffle } = CT;
+  const { escapeHtml, initials, shuffle, announce } = CT;
+  // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
+  const paint = html => CT.paint(app, html, screen);
+  // Y las capas se abren como diálogos: foco dentro, tabulador atrapado, Escape cierra.
+  // `cerrable` distingue las capas que se pueden descartar —las reglas, el menú— de las
+  // que son un paso obligado de la jugada, donde Escape no debe hacer nada.
+  function overlay(html, cerrable) {
+    app.insertAdjacentHTML("beforeend", html);
+    CT.openDialog(app.lastElementChild, cerrable);
+  }
   let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || CT.DEFAULT_MODE;
   if (!CT.has(selectedModeKey)) selectedModeKey = CT.DEFAULT_MODE;
   // El bloque en pantalla se deduce siempre del juego elegido, así que no se guarda aparte.
@@ -109,11 +118,11 @@
   function home() {
     screen = "home";
     const resume = game && game.mode === selectedModeKey;
-    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
       <section class="hero">
         ${gallery()}
         <div class="hero-copy">
-          <h1>${CT.question(selectedModeKey)}</h1>
+          <h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
           ${gameList()}
           <div class="actions">
             <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
@@ -124,7 +133,7 @@
         </div>
       </section>
       <p class="app-version" id="app-version"></p>
-    </div>`;
+    </div>`);
     showCacheVersion();
   }
 
@@ -147,8 +156,8 @@
 
   function setup() {
     screen = "setup";
-    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
-      <section class="setup-section"><h2>${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+      <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
           <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
@@ -159,7 +168,7 @@
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
       </section>
-    </div>`;
+    </div>`);
   }
 
   function syncStarterOptions() {
@@ -192,9 +201,9 @@
   function renderPass() {
     screen = "pass";
     const player = currentPlayer();
-    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
-      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion">${escapeHtml(initials(player.name))}</div><div class="eyebrow">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><h2>El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p><button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
-    </div>`;
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
+      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion">${escapeHtml(initials(player.name))}</div><div class="eyebrow">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p><button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
+    </div>`);
   }
 
   function gameView() {
@@ -212,19 +221,26 @@
         slots.push(timelineCardMarkup(timelineCards[i]));
       }
     }
-    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
-      <div class="game-head"><div><div class="turn-label">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
-      <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
+      <h1 class="solo-lectores" data-focus tabindex="-1">Turno de ${escapeHtml(player.name)}, ronda ${game.round}</h1>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
+      <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-      <section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p></section>
-    </div>`;
+      <section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p></section>
+    </div>`);
     if (selectedCardId) setTimeout(() => document.querySelector(".timeline-wrap")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
     // Arrastrar una carta hasta un hueco lleva al mismo sitio que tocarla y luego tocar
     // el hueco: a la confirmación. El paso de confirmar se mantiene porque en un móvil
     // el dedo falla y la jugada no debería depender de eso.
     CT.enableDrag({
       cardSelector: ".hand-card", slotSelector: ".slot",
-      onDrop: (id, index) => { selectedCardId = id; pendingIndex = index; gameView(); }
+      onDrop: (id, index) => {
+        selectedCardId = id;
+        pendingIndex = index;
+        if (index === null) announce(`Elegida la carta ${cardsById.get(id).title}. Ahora elige un hueco.`);
+        else anunciaHueco(index, game.timeline.length);
+        gameView();
+      }
     });
   }
 
@@ -235,7 +251,7 @@
 
   function confirmSlot(card) {
     return `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(card.title)}</strong>
-      <button class="btn btn-primary btn-block" data-action="confirm-place">Sí, aquí</button>
+      <button class="btn btn-primary btn-block" data-action="confirm-place" data-autofocus>Sí, aquí</button>
       <button class="btn btn-ghost btn-block" data-action="cancel-place">Cancelar</button></div>`;
   }
 
@@ -277,7 +293,7 @@
     gameView();
     const { correct, returned, card } = result;
     const era = eraForCard(card);
-    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   function finishTurn() {
@@ -320,7 +336,7 @@
     const lead = names.length === 1
       ? "Ha sido la única persona en terminar la ronda sin cartas."
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
-    app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`;
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
   }
 
   const DAILY_CARDS = 15;
@@ -407,8 +423,8 @@
     const doneToday = records.days && records.days[today()];
     const mode = currentMode();
     const pendiente = solo && solo.kind === "free";
-    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
-      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2>Jugar en solitario</h2>
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 data-focus tabindex="-1">Jugar en solitario</h2>
         <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una.</p>
         <div class="panel solo-panel">
           <div class="section-label">Reto diario <small>${today().split("-").reverse().join("/")}</small></div>
@@ -424,7 +440,7 @@
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
         </div>
       </section>
-    </div>`;
+    </div>`);
   }
 
   function startSolo(kind) {
@@ -456,15 +472,20 @@
       if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i]));
     }
     const restantes = solo.total ? solo.total - solo.played : solo.deck.length + 1;
-    app.innerHTML = `<div class="shell">${header('<button class="icon-btn" data-action="solo-menu">Salir</button>')}
-      <div class="game-head"><div><div class="turn-label">${solo.kind === "daily" ? "Reto diario" : "Partida libre"}</div><div class="turn-name">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="solo-menu">Salir</button>')}
+      <h1 class="solo-lectores" data-focus tabindex="-1">${solo.kind === "daily" ? "Reto diario" : "Partida libre"}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}</h1>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${solo.kind === "daily" ? "Reto diario" : "Partida libre"}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
       <div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div><div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
-    </div>`;
+    </div>`);
     CT.enableDrag({
       cardSelector: ".hand-card", slotSelector: ".slot",
-      onDrop: (id, index) => { pendingIndex = index; soloView(); }
+      onDrop: (id, index) => {
+        pendingIndex = index;
+        if (index !== null) anunciaHueco(index, solo.timeline.length);
+        soloView();
+      }
     });
   }
 
@@ -491,7 +512,7 @@
     const { correct, card } = result;
     const era = eraForCard(card);
     const acabada = solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total);
-    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark">${correct ? "✓" : "×"}</div><div class="eyebrow">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
@@ -527,16 +548,16 @@
     solo.finished = true;
     saveSolo();
     solo = null;
-    app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`;
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
   }
 
   function rules() {
     const returnTo = screen;
-    app.insertAdjacentHTML("beforeend", `<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="eyebrow">Reglas rápidas</div><h2>Cómo jugar</h2><ol><li>Pueden jugar de 2 a 9 personas. Reparte 4 cartas a cada una (o la cantidad que elijáis), siempre con la fecha oculta.</li><li>La persona más joven comienza. En su turno elige una carta y el hueco donde cree que encaja.</li><li>Al revelar la fecha, si está bien ordenada permanece en la línea. Si falla, se descarta y roba otra.</li><li>Todos juegan una vez por ronda, en el orden indicado.</li><li>Gana quien sea la única persona que termina una ronda sin cartas. Si varias lo logran, reciben una carta y desempatan.</li></ol><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`);
+    overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="eyebrow">Reglas rápidas</div><h2>Cómo jugar</h2><ol><li>Pueden jugar de 2 a 9 personas. Reparte 4 cartas a cada una (o la cantidad que elijáis), siempre con la fecha oculta.</li><li>La persona más joven comienza. En su turno elige una carta y el hueco donde cree que encaja.</li><li>Al revelar la fecha, si está bien ordenada permanece en la línea. Si falla, se descarta y roba otra.</li><li>Todos juegan una vez por ronda, en el orden indicado.</li><li>Gana quien sea la única persona que termina una ronda sin cartas. Si varias lo logran, reciben una carta y desempatan.</li></ol><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
   }
 
   function gameMenu() {
-    app.insertAdjacentHTML("beforeend", `<div class="overlay"><div class="modal"><div class="eyebrow">Partida en pausa</div><h2>¿Qué quieres hacer?</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Ver las reglas</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`);
+    overlay(`<div class="overlay"><div class="modal"><div class="eyebrow">Partida en pausa</div><h2>¿Qué quieres hacer?</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Ver las reglas</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`, true);
   }
 
   function showToast(message) {
@@ -547,7 +568,7 @@
   }
 
   async function launchOnline(roomCode = "") {
-    app.innerHTML = `<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2>Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`;
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
     try {
       const online = await import("./online.js");
       await online.openOnlineMode({ roomCode, modeKey: selectedModeKey });
@@ -556,6 +577,11 @@
       showToast("No se pudo conectar. Comprueba tu conexión a internet.");
       home();
     }
+  }
+
+  // Colocar es la única acción cuyo resultado no se ve en ningún titular: hay que decirlo.
+  function anunciaHueco(index, cartas) {
+    announce(`Hueco ${index + 1} de ${cartas + 1} elegido. Confirma o elige otro.`);
   }
 
   app.addEventListener("input", event => {
@@ -583,8 +609,13 @@
       target.closest(".player-row").remove(); syncStarterOptions();
     } else if (action === "start") startGame();
     else if (action === "ready") gameView();
-    else if (action === "select-card") { selectedCardId = Number(target.dataset.id); pendingIndex = null; gameView(); }
-    else if (action === "place") { pendingIndex = Number(target.dataset.index); gameView(); }
+    else if (action === "select-card") {
+      selectedCardId = Number(target.dataset.id);
+      pendingIndex = null;
+      announce(`Elegida la carta ${cardsById.get(selectedCardId).title}. Ahora elige un hueco.`);
+      gameView();
+    }
+    else if (action === "place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
     else if (action === "confirm-place") { screen === "solo" ? soloPlace(pendingIndex) : placeCard(pendingIndex); }
     else if (action === "cancel-place") { pendingIndex = null; screen === "solo" ? soloView() : gameView(); }
     else if (action === "finish-turn") finishTurn();
@@ -592,13 +623,13 @@
     else if (action === "start-daily") startSolo("daily");
     else if (action === "start-free") startSolo("free");
     else if (action === "resume-solo") { solo = loadSolo(); pendingIndex = null; solo ? soloView() : soloHome(); }
-    else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); soloView(); }
+    else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") soloHome();
     else if (action === "rules") rules();
-    else if (action === "close-rules") target.closest(".overlay").remove();
+    else if (action === "close-rules") CT.closeDialog();
     else if (action === "game-menu") gameMenu();
-    else if (action === "close-menu") target.closest(".overlay").remove();
+    else if (action === "close-menu") CT.closeDialog();
     else if (action === "abandon") { game = null; saveGame(); home(); }
   });
 
