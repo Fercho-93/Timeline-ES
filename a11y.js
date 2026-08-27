@@ -37,27 +37,36 @@
   // el desplazamiento absoluto ya no señalaría al mismo sitio, señalaría a la carta de al
   // lado. Solo se ancla cuando de verdad había algo desplazado; un `scrollLeft` en cero
   // ya vuelve a cero solo, que es el comportamiento correcto al entrar en la pantalla.
+  //
+  // El ancla se guarda fuera de cualquier pintado concreto, porque en la partida local
+  // cada turno pasa por la pantalla de «pásale el móvil», que no tiene línea temporal.
+  // Si el ancla solo viviera dentro de un pintado, se perdería justo ahí: se capturaría
+  // al salir de la partida, no encontraría dónde restaurarla en la pantalla de paso, y
+  // ya no quedaría nada que restaurar al volver a entrar. Guardándola aparte, una
+  // pantalla sin línea simplemente la deja pasar de largo hasta la siguiente que sí
+  // tenga una.
   const SCROLL_ANCHORS = [".timeline-wrap", ".timeline-map"];
+  let anclas = SCROLL_ANCHORS.map(() => null);
 
   function posicion(el, wrap) {
     return el.getBoundingClientRect().left - wrap.getBoundingClientRect().left + wrap.scrollLeft;
   }
 
-  function capturaScroll(container) {
-    return SCROLL_ANCHORS.map(selector => {
+  function actualizaAnclas(container) {
+    anclas = SCROLL_ANCHORS.map((selector, i) => {
       const wrap = container.querySelector(selector);
-      if (!wrap || wrap.scrollLeft <= 0) return null;
+      if (!wrap) return anclas[i]; // esta pantalla no tiene línea: se conserva la última ancla conocida
+      if (wrap.scrollLeft <= 0) return null;
       let anchor = null;
       for (const hijo of wrap.querySelectorAll("[data-id]")) {
         if (posicion(hijo, wrap) > wrap.scrollLeft) break;
         anchor = hijo;
       }
-      if (!anchor) return null;
-      return { selector, id: anchor.dataset.id, delta: wrap.scrollLeft - posicion(anchor, wrap) };
+      return anchor ? { selector, id: anchor.dataset.id, delta: wrap.scrollLeft - posicion(anchor, wrap) } : null;
     });
   }
 
-  function restauraScroll(container, anclas) {
+  function restauraAnclas(container) {
     anclas.forEach(ancla => {
       if (!ancla) return;
       const wrap = container.querySelector(ancla.selector);
@@ -83,12 +92,11 @@
     const clave = dentro ? selectorFor(activo) : null;
     const primero = paint.screen === undefined;
     const cambioDePantalla = screen !== paint.screen;
-    // Cambiar de pantalla sí debe volver la línea al principio: es una línea distinta.
-    const anclas = cambioDePantalla ? null : capturaScroll(container);
+    actualizaAnclas(container);
     paint.screen = screen;
 
     container.innerHTML = html;
-    if (anclas) restauraScroll(container, anclas);
+    restauraAnclas(container);
     if (primero) return;
     if (cambioDePantalla) {
       // Sin preventScroll: al cambiar de pantalla queremos que suba al titular.
