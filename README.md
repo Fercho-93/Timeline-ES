@@ -34,21 +34,30 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 Cada juego conserva su propia partida local. El juego elegido también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
-La aplicación ofrece tres formas de jugar:
+La aplicación ofrece cuatro formas de jugar:
 
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
 - **En solitario:** una persona contra el mazo, con tres vidas.
+- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los seis juegos.
+
+Al terminar una partida —local, en solitario o de competición— si hubo alguna carta mal
+colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su
+explicación completa, en vez de perderse en el descarte sin más.
 
 ## Jugar en solitario
 
-Dos formatos, los dos sin conexión y con la marca guardada en el propio móvil:
+Tres formatos, los tres sin conexión y con la marca guardada en el propio móvil:
 
 - **Reto diario:** las mismas 15 cartas para todo el mundo ese día y un solo intento. Las cartas se
   barajan con la fecha como semilla, así que no hace falta ningún servidor para que dos móviles
   reciban exactamente el mismo reto. Completar el reto un día detrás de otro encadena una racha.
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
+- **Competición:** una ronda de 5 cartas por cada uno de los seis juegos, en un orden al azar
+  distinto cada vez y sin repetir ninguno, con tres vidas nuevas en cada ronda. Al terminar la
+  última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
+  después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
 
 ## Probarlo en un ordenador
 
@@ -63,7 +72,11 @@ La carpeta debe abrirse mediante un servidor web local (no haciendo doble clic e
 
 Pensado para el dedo. Sobre la línea temporal hay un mapa —una tira con una parada por
 carta colocada, con su época y su año— porque en una pantalla de 390 px no caben ni dos
-cartas de la línea: el mapa no coloca nada, solo lleva la vista hasta donde le digas.
+cartas de la línea: el mapa no coloca nada, solo lleva la vista hasta donde le digas. Las
+paradas se sitúan a escala real dentro del rango de lo ya colocado, no repartidas a
+partes iguales, así que de un vistazo se ve la forma de verdad de la línea —sus racimos y
+sus huecos— y no solo un índice; cuando dos paradas caen demasiado cerca para pulsarlas
+por separado, se separan lo justo para seguir siendo un botón de dedo.
 Ningún control baja de los 44 px que necesita una yema, y las
 carátulas se sirven en dos tamaños —una para el lomo y otra para la portada desplegada—,
 así que la primera visita baja unos 107 KB de imagen en vez de los 698 KB de antes.

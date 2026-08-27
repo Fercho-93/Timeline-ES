@@ -139,13 +139,15 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .score.active i { background: #fff; }
 .score.active em { color: var(--accent-dark); background: #fff; }
 
-/* El mapa de la línea. Las paradas se reparten el ancho, pero nunca bajan de lo que
-   necesita un dedo, así que a partir de una docena de cartas la tira se desplaza. */
+/* El mapa de la línea. Cada parada se sitúa donde le toca a escala real (el ancho
+   exacto lo fija JS en línea, según el tamaño del racimo más apretado), nunca por
+   debajo de lo que necesita un dedo, así que a partir de una docena de cartas la tira
+   se desplaza. */
 /* Sangra hasta el borde igual que la línea: así se ve que la tira sigue y se puede
    desplazar, en vez de parecer que se corta. */
-.timeline-map { display: flex; gap: 3px; margin: 12px -18px 0; padding: 0 18px 4px; overflow-x: auto; scrollbar-width: none; }
+.timeline-map { position: relative; height: 48px; margin: 12px -18px 0; padding: 0 18px 4px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .timeline-map::-webkit-scrollbar { display: none; }
-.map-stop { flex: 1 0 auto; min-width: 52px; min-height: 44px; display: grid; place-items: center; padding: 4px 5px; border: 0; border-radius: 8px; color: rgba(255,255,255,.92); font-size: .64rem; font-weight: 700; line-height: 1.1; cursor: pointer; opacity: .82; transition: opacity .15s ease; }
+.map-stop { position: absolute; top: 0; width: 44px; height: 44px; display: grid; place-items: center; padding: 4px; border: 0; border-radius: 8px; color: rgba(255,255,255,.92); font-size: .64rem; font-weight: 700; line-height: 1.1; cursor: pointer; opacity: .82; transition: opacity .15s ease; }
 .map-stop:hover, .map-stop:focus-visible { opacity: 1; }
 .map-stop:active { transform: scale(.96); }
 .timeline-wrap { margin: 10px -18px 22px; padding: 8px 18px 18px; overflow-x: auto; scrollbar-width: thin; }
@@ -293,6 +295,26 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .solo-stats span { padding: 12px 8px; border-radius: 10px; background: var(--paper); text-align: center; }
 .solo-stats b { display: block; font-family: Georgia, serif; font-size: 1.5rem; color: var(--accent); }
 .solo-stats small { color: var(--muted); font-size: .65rem; }
+/* La pantalla de repaso reutiliza la carta de la línea temporal, pero en vertical y a
+   todo el ancho: aquí no hay que desplazarse a los lados, hay que leer. */
+.review-grid { display: flex; flex-direction: column; gap: 12px; margin: 16px 0 22px; }
+.review-grid .timeline-card { width: 100%; min-height: 0; }
+.review-grid .card-visual { height: 56px; }
+/* En móvil la carta de la línea esconde su descripción para que quepan más a la vez
+   (ver el bloque `@media (max-width: 420px)`), pero aquí es justo lo que hay que leer. */
+.review-grid .timeline-card p { display: block; }
+.review-count { margin-top: 6px; color: var(--accent); font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+/* La promo de la competición vive junto a los botones de inicio, no dentro del
+   acordeón de bloques: no es un mazo más, es una forma distinta de jugar con todos. */
+.comp-promo { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft); cursor: pointer; padding: 0; margin-top: 6px; }
+.comp-promo-art { display: block; height: 120px; overflow: hidden; }
+.comp-promo-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.comp-promo-copy { display: block; padding: 14px 16px 16px; }
+.comp-promo-copy b { display: block; font-family: Georgia, serif; font-size: 1.05rem; margin-bottom: 4px; }
+.comp-promo-copy small { color: var(--muted); font-size: .78rem; line-height: 1.4; }
+.comp-summary { list-style: none; margin: 18px auto; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: left; max-width: 360px; }
+.comp-summary li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: .85rem; }
+.comp-summary li span { color: var(--accent); font-weight: 700; }
 .solo-lives { margin: -6px 0 14px; font-size: 1.25rem; letter-spacing: .18em; color: var(--accent); }
 .hand-solo { grid-template-columns: minmax(0, 260px); }
 .hand-solo .hand-card { cursor: grab; }
