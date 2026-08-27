@@ -176,6 +176,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .card-arrow { position: absolute; left: 14px; bottom: 11px; color: var(--accent); font-weight: 700; }
 .era-antigua { background: #6f6353; }
 .era-cientifica { background: #5f6b6a; }
+.era-edadmoderna { background: #7a6440; }
+.era-revoluciones { background: #77504a; }
+.era-guerras { background: #4b4f45; }
+.era-friaguerra { background: #4a5a6b; }
+.era-global { background: #63596b; }
 .era-industrial { background: #6b5b4a; }
 .era-electrica { background: #8a7340; }
 .era-atomica { background: #55605f; }

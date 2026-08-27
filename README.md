@@ -10,6 +10,8 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 **Historia**
 
 - **Historia de España:** 190 hechos históricos verificados, desde la Antigüedad hasta la actualidad.
+- **Historia mundial:** 117 hechos de los faraones a hoy, mirando más allá de España y
+  dejando los hitos técnicos al mazo de al lado. Mismo criterio de fechas que aquel.
 - **Inventos y descubrimientos:** 103 hitos de la técnica y la ciencia, de la escritura cuneiforme
   a las imágenes del telescopio James Webb. Cada carta se fecha por un hecho concreto y datable
   —una patente, una publicación, una primera demostración— y ningún año se repite, así que dos
@@ -67,7 +69,7 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 `tests/` contiene nueve comprobaciones automáticas: la sintaxis de todos los archivos,
 partidas completas sobre un DOM simulado, cuarenta partidas al azar que vigilan bloqueos y el
-conteo de cartas, la calidad de los cinco mazos, el modo solitario, el service worker y las
+conteo de cartas, la calidad de los seis mazos, el modo solitario, el service worker y las
 reglas de Firestore contra el emulador oficial. Se lanzan con `npm install` y `npm test`, y se ejecutan solas en cada propuesta de
 cambio. Las instrucciones están en `tests/README.md`.
 

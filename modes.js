@@ -114,6 +114,20 @@
         { limit: Infinity, key: "digital", name: "Era digital", symbol: "⌘" }
       ]
     },
+    world: {
+      key: "world", name: "Historia mundial",
+      cardLabel: "hechos", blurb: "De los faraones a hoy.", cards: window.WORLD_CARDS,
+      axis: "time",
+      bands: [
+        { limit: 476, key: "antigua", name: "Antigüedad", symbol: "⚱" },
+        { limit: 1453, key: "medieval", name: "Edad Media", symbol: "♜" },
+        { limit: 1789, key: "edadmoderna", name: "Edad Moderna", symbol: "⚜" },
+        { limit: 1914, key: "revoluciones", name: "Siglo de las revoluciones", symbol: "⚑" },
+        { limit: 1945, key: "guerras", name: "Guerras mundiales", symbol: "✚" },
+        { limit: 1991, key: "friaguerra", name: "Guerra Fría", symbol: "☢" },
+        { limit: Infinity, key: "global", name: "Mundo global", symbol: "◍" }
+      ]
+    },
     countries: {
       key: "countries", name: "Superficie de países",
       cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
@@ -134,7 +148,7 @@
   // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga
   // a tocar `firestore.rules`: dejaron de llevar dentro la lista.
   const BLOCKS = {
-    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "inventions"] },
+    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "world", "inventions"] },
     cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] }
   };
