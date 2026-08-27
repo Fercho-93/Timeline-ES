@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v10";
+const CACHE = "continuum-v12";
 const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./inventos.js", "./mundo.js", "./countries.js", "./population.js", "./modes.js", "./drag.js", "./a11y.js", "./mapa.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history-400.webp", "./assets/hero-history-700.webp", "./assets/hero-cinema-400.webp", "./assets/hero-cinema-700.webp", "./assets/hero-geography-400.webp", "./assets/hero-geography-700.webp"];
 
 self.addEventListener("install", event => {
