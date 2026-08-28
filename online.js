@@ -33,50 +33,9 @@ let roomState = null;
 let unsubscribeRoom = null;
 let selectedCardId = null;
 let pendingIndex = null;
-// La carta se anima cuando termina el aviso de resultado, ya visible en el tablero.
-let settlingCardId = null;
 let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
-
-let depositingCard = false;
-
-function animateCardDeposit(cardId) {
-  const source = appEl.querySelector(`.hand-card[data-id="${cardId}"]`) || appEl.querySelector(".hand-card.selected");
-  const destination = appEl.querySelector(".slot-confirm");
-  if (!source || !destination || matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
-
-  const start = source.getBoundingClientRect();
-  const end = destination.getBoundingClientRect();
-  const ghost = source.cloneNode(true);
-  ghost.classList.remove("selected", "dragging", "armed");
-  ghost.classList.add("card-flight");
-  ghost.style.width = `${start.width}px`;
-  ghost.style.height = `${start.height}px`;
-  ghost.style.left = `${start.left}px`;
-  ghost.style.top = `${start.top}px`;
-  document.body.appendChild(ghost);
-
-  const dx = end.left + end.width / 2 - (start.left + start.width / 2);
-  const dy = end.top + end.height / 2 - (start.top + start.height / 2);
-  source.classList.add("depositing-source");
-  requestAnimationFrame(() => { ghost.style.transform = `translate(${dx}px, ${dy}px) rotate(0deg) scale(.92)`; });
-  return new Promise(resolve => setTimeout(() => {
-    ghost.remove();
-    source.classList.remove("depositing-source");
-    resolve();
-  }, 560));
-}
-
-async function depositThen(cardId, action) {
-  if (depositingCard) return;
-  depositingCard = true;
-  await animateCardDeposit(cardId);
-  depositingCard = false;
-  action();
-}
-
-
 
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
@@ -391,11 +350,7 @@ function connectToRoom(code) {
       leaveOnline("La sala ha sido cerrada");
       return;
     }
-    const previousState = roomState;
     roomState = snapshot.data();
-    if (previousState?.phase === "reveal" && roomState.phase === "turn" && previousState.reveal?.correct) {
-      settlingCardId = previousState.reveal.cardId;
-    }
     roomState.mode = roomState.mode || "history";
     selectedModeKey = roomState.mode;
     if (roomState.playerOrder.includes(user.uid)) seenSelfInRoom = true;
@@ -458,7 +413,6 @@ async function startRoom() {
 }
 
 function renderGame() {
-  const cardJustSettled = settlingCardId;
   if (!roomState.playerOrder.includes(user.uid)) return renderEntry(roomCode);
   const me = roomState.players[user.uid];
   const currentUid = roomState.playerOrder[roomState.current];
@@ -490,7 +444,7 @@ function renderGame() {
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
-      slots.push(`<article class="timeline-card${settlingCardId === card.id ? " card-settling" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      slots.push(`<article class="timeline-card" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room">Sala</button>')}
@@ -505,10 +459,6 @@ function renderGame() {
       : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
   </div>`, "online-game");
-  if (cardJustSettled) {
-    setTimeout(() => { if (settlingCardId === cardJustSettled) settlingCardId = null; }, 850);
-  }
-
   // Igual que en el juego local: arrastrar una carta hasta un hueco es otra forma de
   // llegar a la confirmación. Fuera de turno las cartas están desactivadas y no arrancan.
   CT.enableDrag({
@@ -721,14 +671,6 @@ function takeCard(deckInput, discardInput) {
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
-  const acceptedCardId = roomState.reveal?.correct ? roomState.reveal.cardId : null;
-  if (acceptedCardId) {
-    // Se ve la llegada de la carta justo al aceptar el resultado, antes de avanzar.
-    appEl.querySelector(".overlay")?.classList.add("result-exit");
-    const cardEl = appEl.querySelector(`.timeline-card[data-id="${acceptedCardId}"]`);
-    requestAnimationFrame(() => cardEl?.classList.add("card-settling"));
-    await new Promise(resolve => setTimeout(resolve, 720));
-  }
   try {
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
@@ -945,13 +887,13 @@ document.addEventListener("click", event => {
   else if (action === "close-pulse") CT.closeDialog();
   else if (action === "pulse-target") { CT.closeDialog(); startPulse(target.dataset.target); }
   else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`); renderGame(); }
-  else if (action === "confirm-pulse") depositThen(roomState?.pulseTurn?.cardId, () => placePulse(pendingIndex));
+  else if (action === "confirm-pulse") placePulse(pendingIndex);
   else if (action === "place") {
     pendingIndex = Number(target.dataset.index);
     announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`);
     renderGame();
   }
-  else if (action === "confirm-place") depositThen(selectedCardId, () => placeCard(pendingIndex));
+  else if (action === "confirm-place") placeCard(pendingIndex);
   else if (action === "cancel-place") { pendingIndex = null; renderGame(); }
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
