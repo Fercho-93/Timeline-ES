@@ -1,6 +1,12 @@
 /* Paleta neutra y plana: la única fuente de color son las carátulas. Todo lo demás
    es papel, tinta y una sola tinta de acento en bronce, tomada del sepia de las
-   ilustraciones para que la interfaz no compita con ellas. */
+   ilustraciones para que la interfaz no compita con ellas.
+
+   El modo oscuro cambia el papel y la tinta, pero no el acento: sigue siendo bronce,
+   solo que más claro para leerse sobre un fondo oscuro. `--ink-solid` es aparte de
+   `--ink`: el botón primario y la tarjeta del código de sala quieren un bloque que
+   siempre contraste con el papel, así que en claro es casi negro y en oscuro casi
+   blanco, mientras que `--ink` (el texto normal) se limita a invertirse. */
 :root {
   color-scheme: light;
   --ink: #1b1917;
@@ -11,8 +17,46 @@
   --accent: #8a6a3b;
   --accent-dark: #6d5330;
   --green: #3d6b53;
+  --ink-solid: #1b1917;
+  --ink-solid-contrast: #fff;
   --shadow: 0 12px 32px rgba(38, 30, 20, .07);
   --shadow-soft: 0 4px 14px rgba(38, 30, 20, .05);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* El sistema manda salvo que ya se haya elegido «claro» a mano. */
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ink: #ece7dd;
+    --muted: #a79c8c;
+    --line: #3a342a;
+    --paper: #16130e;
+    --surface: #1f1b14;
+    --accent: #d9ad6e;
+    --accent-dark: #e9c88e;
+    --green: #6fae86;
+    --ink-solid: #f3eee3;
+    --ink-solid-contrast: #17140f;
+    --shadow: 0 12px 32px rgba(0, 0, 0, .35);
+    --shadow-soft: 0 4px 14px rgba(0, 0, 0, .25);
+  }
+}
+
+/* El interruptor manda incluso si contradice al sistema, en los dos sentidos. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #ece7dd;
+  --muted: #a79c8c;
+  --line: #3a342a;
+  --paper: #16130e;
+  --surface: #1f1b14;
+  --accent: #d9ad6e;
+  --accent-dark: #e9c88e;
+  --green: #6fae86;
+  --ink-solid: #f3eee3;
+  --ink-solid-contrast: #17140f;
+  --shadow: 0 12px 32px rgba(0, 0, 0, .35);
+  --shadow-soft: 0 4px 14px rgba(0, 0, 0, .25);
 }
 
 * { box-sizing: border-box; }
@@ -37,6 +81,7 @@ button { touch-action: manipulation; }
 #app { min-height: 100dvh; }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
 /* 44 px es lo que necesita un dedo. Los botones pequeños llegaban a 36 y a 29, y son
    justo los que más se usan: el de la esquina en cada pantalla de partida. */
@@ -105,8 +150,8 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .btn { min-height: 50px; border: 0; border-radius: 10px; padding: 13px 20px; font-weight: 650; cursor: pointer; transition: background .15s ease; }
 .btn span { display: inline-block; margin-left: 8px; }
 .btn:active { transform: scale(.98); }
-.btn-primary { color: #fff; background: var(--ink); }
-.btn-primary:hover { background: #000; }
+.btn-primary { color: var(--ink-solid-contrast); background: var(--ink-solid); }
+.btn-primary:hover { filter: brightness(.85); }
 .btn-secondary { color: var(--ink); background: var(--surface); border: 1px solid var(--line); }
 .btn-secondary:hover { background: var(--paper); }
 .btn-ghost { color: var(--accent); background: transparent; }
@@ -137,7 +182,9 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .score em { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); font-style: normal; font-weight: 700; }
 .score.active { color: white; background: var(--accent); border-color: var(--accent); }
 .score.active i { background: #fff; }
-.score.active em { color: var(--accent-dark); background: #fff; }
+/* Color fijo y no `--accent-dark`: esta insignia lleva un fondo blanco literal en
+   cualquier tema, así que necesita una tinta oscura fija para seguir leyéndose. */
+.score.active em { color: #6d5330; background: #fff; }
 
 /* El mapa de la línea. Cada parada se sitúa donde le toca a escala real (el ancho
    exacto lo fija JS en línea, según el tamaño del racimo más apretado), nunca por
@@ -161,10 +208,16 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .timeline-card h3 { margin: 8px 0 7px; font-size: .91rem; line-height: 1.2; }
 .timeline-card p { color: var(--muted); font-size: .69rem; line-height: 1.35; margin: 0; }
 .slot { width: 54px; min-height: 244px; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; }
-.slot span { display: grid; place-items: center; width: 38px; height: 100%; min-height: 116px; border: 1px dashed #cfc9bd; border-radius: 10px; color: var(--muted); font-size: 1.4rem; transition: .15s ease; }
+.slot span { display: grid; place-items: center; width: 38px; height: 100%; min-height: 116px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: 1.4rem; transition: .15s ease; }
 .slot:hover span, .slot:focus-visible span { border-color: var(--accent); color: var(--accent); }
 .slot:disabled { cursor: default; }
 .slot:disabled span { opacity: .25; }
+/* El hueco donde iba de verdad la carta que se acaba de fallar: se resalta detrás del
+   aviso de fallo, así que tiene que verse aunque el hueco esté deshabilitado. */
+.slot-correct { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.slot-correct span { border-style: solid; border-color: var(--accent); background: rgba(189,139,49,.16); color: var(--accent); }
+.slot-correct:disabled span { opacity: 1; }
+.slot-correct small { color: var(--accent); font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
 .slot-confirm { width: 150px; min-height: 244px; margin: 0 6px; padding: 14px 12px; display: flex; flex-direction: column; justify-content: center; gap: 8px; text-align: center; border: 2px dashed var(--accent); border-radius: 12px; background: var(--surface); }
 .slot-confirm small { color: var(--accent); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
 .slot-confirm strong { font-family: Georgia, serif; font-size: .95rem; line-height: 1.18; margin-bottom: 4px; }
@@ -242,6 +295,17 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .rules { text-align: left; }
 .rules ol { padding-left: 21px; color: var(--muted); line-height: 1.55; }
 .rules li + li { margin-top: 9px; }
+
+.settings-modal { text-align: left; }
+.settings-modal h2 { margin: 4px 0 20px; }
+.settings-modal .field { margin-bottom: 18px; }
+.switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; padding: 4px 0; font-size: .92rem; font-weight: 600; }
+.switch-row + .switch-row { border-top: 1px solid var(--line); }
+.switch-row input[type="checkbox"] { width: 42px; height: 26px; flex: none; -webkit-appearance: none; appearance: none; margin: 0; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background .15s ease; }
+.switch-row input[type="checkbox"]::before { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-soft); transition: transform .15s ease; }
+.switch-row input[type="checkbox"]:checked { background: var(--accent); }
+.switch-row input[type="checkbox"]:checked::before { transform: translateX(16px); }
+.settings-modal .btn-block { margin-top: 22px; }
 /* El aviso se esconde bajando su propia altura MÁS lo que está separado del borde. Con
    un porcentaje a secas no basta: vacío mide lo que su relleno, 24 px, y un 150% son 36,
    que no alcanzan a tapar los 18 px de separación; asomaban seis píxeles de barrita
@@ -267,8 +331,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 
 .lobby-head { display: grid; gap: 18px; margin: 24px 0 20px; }
 .lobby-head h2 { margin: 7px 0 0; }
-.room-code-card { padding: 15px 17px; border-radius: 12px; color: #fff; background: var(--ink); box-shadow: var(--shadow-soft); }
-.room-code-card small { display: block; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .1em; font-size: .59rem; }
+.room-code-card { padding: 15px 17px; border-radius: 12px; color: var(--ink-solid-contrast); background: var(--ink-solid); box-shadow: var(--shadow-soft); }
+.room-code-card small { display: block; color: color-mix(in srgb, var(--ink-solid-contrast) 60%, transparent); text-transform: uppercase; letter-spacing: .1em; font-size: .59rem; }
 .room-code-card strong { display: block; margin: 3px 0 7px; font: 800 1.55rem ui-monospace, monospace; letter-spacing: .14em; }
 .room-code-card button { padding: 0; border: 0; background: transparent; color: var(--accent); font-size: .73rem; font-weight: 700; cursor: pointer; }
 .room-invite-actions { display: flex; flex-wrap: wrap; gap: 13px; }
@@ -295,6 +359,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .solo-stats span { padding: 12px 8px; border-radius: 10px; background: var(--paper); text-align: center; }
 .solo-stats b { display: block; font-family: Georgia, serif; font-size: 1.5rem; color: var(--accent); }
 .solo-stats small { color: var(--muted); font-size: .65rem; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 12px; }
+.cal-day { aspect-ratio: 1; border-radius: 4px; background: var(--paper); border: 1px solid var(--line); }
+.cal-day.cal-bajo { background: color-mix(in srgb, var(--accent) 30%, var(--paper)); border-color: transparent; }
+.cal-day.cal-medio { background: color-mix(in srgb, var(--accent) 65%, var(--paper)); border-color: transparent; }
+.cal-day.cal-alto { background: var(--accent); border-color: transparent; }
 /* La pantalla de repaso reutiliza la carta de la línea temporal, pero en vertical y a
    todo el ancho: aquí no hay que desplazarse a los lados, hay que leer. */
 .review-grid { display: flex; flex-direction: column; gap: 12px; margin: 16px 0 22px; }

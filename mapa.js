@@ -49,6 +49,17 @@
     return `<div class="timeline-map" role="group" aria-label="Recorrer la línea: ${cards.length} cartas colocadas" style="width:${anchoTotal + 36}px;min-width:100%">${paradas.map(p => p.html).join("")}</div>`;
   }
 
+  // Centra un elemento dentro de la tira que se desplaza en horizontal. Con rectángulos
+  // y no con offsetLeft: el elemento no cuelga del contenedor que se desplaza, así que
+  // su offsetLeft se mide desde otro sitio. La usan tanto el mapa como el resaltado del
+  // hueco correcto al fallar, así que vive aquí y ninguno de los dos la repite.
+  function scrollToElement(wrap, el) {
+    if (!wrap || !el) return;
+    const caja = el.getBoundingClientRect();
+    const marco = wrap.getBoundingClientRect();
+    wrap.scrollBy({ left: caja.left - marco.left - (marco.width - caja.width) / 2, behavior: "smooth" });
+  }
+
   // Llevar la línea hasta una carta no necesita saber nada de la partida, así que se
   // resuelve aquí y ningún motor tiene que enterarse.
   document.addEventListener("click", event => {
@@ -57,12 +68,9 @@
     const wrap = document.querySelector(".timeline-wrap");
     const carta = wrap?.querySelectorAll(".timeline-card")[Number(parada.dataset.goto)];
     if (!carta) return;
-    // Con rectángulos y no con offsetLeft: la carta no cuelga del contenedor que se
-    // desplaza, así que su offsetLeft se mide desde otro sitio.
-    const caja = carta.getBoundingClientRect();
-    const marco = wrap.getBoundingClientRect();
-    wrap.scrollBy({ left: caja.left - marco.left - (marco.width - caja.width) / 2, behavior: "smooth" });
+    scrollToElement(wrap, carta);
   });
 
   CT.timelineMap = timelineMap;
+  CT.scrollToElement = scrollToElement;
 })();
