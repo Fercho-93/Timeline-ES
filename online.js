@@ -444,7 +444,7 @@ function renderGame() {
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
-      slots.push(`<article class="timeline-card" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      slots.push(`<article class="timeline-card${roomState.reveal?.correct && roomState.reveal.cardId === card.id ? " card-settling" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room">Sala</button>')}
