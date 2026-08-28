@@ -211,11 +211,12 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .timeline-wrap { margin: 10px -18px 22px; padding: 8px 18px 18px; overflow-x: auto; scrollbar-width: thin; }
 .timeline { display: flex; align-items: stretch; min-width: max-content; padding: 8px 0; }
 .timeline-card { width: 174px; min-height: 244px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
-.timeline-card.card-settling { animation: card-settle .34s cubic-bezier(.22,.61,.36,1) both; transform-origin: center bottom; }
+.timeline-card.card-settling { animation: card-settle .72s cubic-bezier(.22,.61,.36,1) both; transform-origin: center bottom; position: relative; z-index: 2; }
 @keyframes card-settle {
-  from { opacity: .45; transform: translateY(12px) scale(.975); }
-  68% { opacity: 1; transform: translateY(-2px) scale(1.006); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  0% { opacity: 0; transform: translateY(30px) scale(.9); box-shadow: 0 0 0 rgba(189,139,49,0), var(--shadow-soft); }
+  52% { opacity: 1; transform: translateY(-7px) scale(1.025); box-shadow: 0 0 0 9px rgba(189,139,49,.18), 0 18px 34px rgba(75,48,16,.2); }
+  72% { transform: translateY(2px) scale(.992); box-shadow: 0 0 0 4px rgba(189,139,49,.1), var(--shadow-soft); }
+  100% { opacity: 1; transform: translateY(0) scale(1); box-shadow: var(--shadow-soft); }
 }
 @media (prefers-reduced-motion: reduce) {
   .timeline-card.card-settling { animation: none; }
