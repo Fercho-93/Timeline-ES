@@ -446,11 +446,7 @@ function renderGame() {
   // instantánea que llega de la sala. Solo se abre como diálogo al aparecer, o el foco
   // saltaría dentro de ella una y otra vez.
   const revelando = roomState.phase === "reveal";
-  if (revelando && !renderGame.revelando) {
-    abreCapa(appEl.querySelector(".overlay"), false);
-    CT.playSound(roomState.reveal.correct ? "hit" : "miss");
-    if (!roomState.reveal.correct) CT.vibrate("miss");
-  }
+  if (revelando && !renderGame.revelando) abreCapa(appEl.querySelector(".overlay"), false);
   renderGame.revelando = revelando;
   if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
 }

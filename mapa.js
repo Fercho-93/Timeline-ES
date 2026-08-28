@@ -54,7 +54,7 @@
   // su offsetLeft se mide desde otro sitio. La usan tanto el mapa como el resaltado del
   // hueco correcto al fallar, así que vive aquí y ninguno de los dos la repite.
   function scrollToElement(wrap, el) {
-    if (!wrap || !el) return;
+    if (!wrap || !el || typeof wrap.scrollBy !== "function") return;
     const caja = el.getBoundingClientRect();
     const marco = wrap.getBoundingClientRect();
     wrap.scrollBy({ left: caja.left - marco.left - (marco.width - caja.width) / 2, behavior: "smooth" });
