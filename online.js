@@ -33,6 +33,8 @@ let roomState = null;
 let unsubscribeRoom = null;
 let selectedCardId = null;
 let pendingIndex = null;
+// La carta se anima cuando termina el aviso de resultado, ya visible en el tablero.
+let settlingCardId = null;
 let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
@@ -350,7 +352,11 @@ function connectToRoom(code) {
       leaveOnline("La sala ha sido cerrada");
       return;
     }
+    const previousState = roomState;
     roomState = snapshot.data();
+    if (previousState?.phase === "reveal" && roomState.phase === "turn" && previousState.reveal?.correct) {
+      settlingCardId = previousState.reveal.cardId;
+    }
     roomState.mode = roomState.mode || "history";
     selectedModeKey = roomState.mode;
     if (roomState.playerOrder.includes(user.uid)) seenSelfInRoom = true;
@@ -413,6 +419,7 @@ async function startRoom() {
 }
 
 function renderGame() {
+  const cardJustSettled = settlingCardId;
   if (!roomState.playerOrder.includes(user.uid)) return renderEntry(roomCode);
   const me = roomState.players[user.uid];
   const currentUid = roomState.playerOrder[roomState.current];
@@ -444,7 +451,7 @@ function renderGame() {
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
-      slots.push(`<article class="timeline-card${roomState.reveal?.correct && roomState.reveal.cardId === card.id ? " card-settling" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      slots.push(`<article class="timeline-card${settlingCardId === card.id ? " card-settling" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room">Sala</button>')}
@@ -459,6 +466,10 @@ function renderGame() {
       : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
   </div>`, "online-game");
+  if (cardJustSettled) {
+    setTimeout(() => { if (settlingCardId === cardJustSettled) settlingCardId = null; }, 850);
+  }
+
   // Igual que en el juego local: arrastrar una carta hasta un hueco es otra forma de
   // llegar a la confirmación. Fuera de turno las cartas están desactivadas y no arrancan.
   CT.enableDrag({
