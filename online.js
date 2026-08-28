@@ -39,6 +39,45 @@ let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
 
+let depositingCard = false;
+
+function animateCardDeposit(cardId) {
+  const source = appEl.querySelector(`.hand-card[data-id="${cardId}"]`) || appEl.querySelector(".hand-card.selected");
+  const destination = appEl.querySelector(".slot-confirm");
+  if (!source || !destination || matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
+
+  const start = source.getBoundingClientRect();
+  const end = destination.getBoundingClientRect();
+  const ghost = source.cloneNode(true);
+  ghost.classList.remove("selected", "dragging", "armed");
+  ghost.classList.add("card-flight");
+  ghost.style.width = `${start.width}px`;
+  ghost.style.height = `${start.height}px`;
+  ghost.style.left = `${start.left}px`;
+  ghost.style.top = `${start.top}px`;
+  document.body.appendChild(ghost);
+
+  const dx = end.left + end.width / 2 - (start.left + start.width / 2);
+  const dy = end.top + end.height / 2 - (start.top + start.height / 2);
+  source.classList.add("depositing-source");
+  requestAnimationFrame(() => { ghost.style.transform = `translate(${dx}px, ${dy}px) rotate(0deg) scale(.92)`; });
+  return new Promise(resolve => setTimeout(() => {
+    ghost.remove();
+    source.classList.remove("depositing-source");
+    resolve();
+  }, 560));
+}
+
+async function depositThen(cardId, action) {
+  if (depositingCard) return;
+  depositingCard = true;
+  await animateCardDeposit(cardId);
+  depositingCard = false;
+  action();
+}
+
+
+
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
 
@@ -906,13 +945,13 @@ document.addEventListener("click", event => {
   else if (action === "close-pulse") CT.closeDialog();
   else if (action === "pulse-target") { CT.closeDialog(); startPulse(target.dataset.target); }
   else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`); renderGame(); }
-  else if (action === "confirm-pulse") placePulse(pendingIndex);
+  else if (action === "confirm-pulse") depositThen(roomState?.pulseTurn?.cardId, () => placePulse(pendingIndex));
   else if (action === "place") {
     pendingIndex = Number(target.dataset.index);
     announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`);
     renderGame();
   }
-  else if (action === "confirm-place") placeCard(pendingIndex);
+  else if (action === "confirm-place") depositThen(selectedCardId, () => placeCard(pendingIndex));
   else if (action === "cancel-place") { pendingIndex = null; renderGame(); }
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
