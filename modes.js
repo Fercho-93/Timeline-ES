@@ -95,28 +95,33 @@
     }
   };
 
+  // Las bandas de Historia mundial, aparte: son la periodización más general de las
+  // cuatro modalidades por fecha, así que «Gran mezcla» las reutiliza en vez de llevar su
+  // propia copia que podría quedarse desactualizada si estas cambiaran alguna vez.
+  const WORLD_BANDS = [
+    { limit: 476, key: "antigua", name: "Antigüedad", symbol: "⚱" },
+    { limit: 1453, key: "medieval", name: "Edad Media", symbol: "♜" },
+    { limit: 1789, key: "edadmoderna", name: "Edad Moderna", symbol: "⚜" },
+    { limit: 1914, key: "revoluciones", name: "Siglo de las revoluciones", symbol: "⚑" },
+    { limit: 1945, key: "guerras", name: "Guerras mundiales", symbol: "✚" },
+    { limit: 1991, key: "friaguerra", name: "Guerra Fría", symbol: "☢" },
+    { limit: Infinity, key: "global", name: "Mundo global", symbol: "◍" }
+  ];
+
   // Una modalidad hereda las bandas de su eje salvo que declare las suyas, como el cine:
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
   const MODES = {
     // Historia de España, Historia mundial, Inventos y Estrenos de cine comparten el eje
     // del tiempo aunque estén en bloques distintos, así que mezclarlas es concatenar sus
     // mazos: ninguna carta cambia y `eraForCard` sigue funcionando igual porque las
-    // bandas de esta modalidad son las mismas que las de Historia mundial, el mazo con
-    // la periodización más general de los cuatro.
+    // bandas de esta modalidad son las mismas que las de Historia mundial (`WORLD_BANDS`),
+    // el mazo con la periodización más general de los cuatro.
     mixed: {
       key: "mixed", name: "Gran mezcla",
       cardLabel: "hechos", blurb: "Historia, mundo, inventos y cine, todo junto.",
       cards: [...window.HISTORY_CARDS, ...window.WORLD_CARDS, ...window.INVENTION_CARDS, ...window.MOVIE_CARDS],
       axis: "time",
-      bands: [
-        { limit: 476, key: "antigua", name: "Antigüedad", symbol: "⚱" },
-        { limit: 1453, key: "medieval", name: "Edad Media", symbol: "♜" },
-        { limit: 1789, key: "edadmoderna", name: "Edad Moderna", symbol: "⚜" },
-        { limit: 1914, key: "revoluciones", name: "Siglo de las revoluciones", symbol: "⚑" },
-        { limit: 1945, key: "guerras", name: "Guerras mundiales", symbol: "✚" },
-        { limit: 1991, key: "friaguerra", name: "Guerra Fría", symbol: "☢" },
-        { limit: Infinity, key: "global", name: "Mundo global", symbol: "◍" }
-      ]
+      bands: WORLD_BANDS
     },
     history: {
       key: "history", name: "Historia de España",
@@ -154,15 +159,7 @@
       key: "world", name: "Historia mundial",
       cardLabel: "hechos", blurb: "De los faraones a hoy.", cards: window.WORLD_CARDS,
       axis: "time",
-      bands: [
-        { limit: 476, key: "antigua", name: "Antigüedad", symbol: "⚱" },
-        { limit: 1453, key: "medieval", name: "Edad Media", symbol: "♜" },
-        { limit: 1789, key: "edadmoderna", name: "Edad Moderna", symbol: "⚜" },
-        { limit: 1914, key: "revoluciones", name: "Siglo de las revoluciones", symbol: "⚑" },
-        { limit: 1945, key: "guerras", name: "Guerras mundiales", symbol: "✚" },
-        { limit: 1991, key: "friaguerra", name: "Guerra Fría", symbol: "☢" },
-        { limit: Infinity, key: "global", name: "Mundo global", symbol: "◍" }
-      ]
+      bands: WORLD_BANDS
     },
     countries: {
       key: "countries", name: "Superficie de países",
@@ -202,9 +199,13 @@
 
   function block(blockKey) { return hasBlock(blockKey) ? BLOCKS[blockKey] : BLOCKS[DEFAULT_BLOCK]; }
 
-  // De un juego a su bloque, para saber qué carátula toca desde una partida guardada.
-  function blockOf(modeKey) {
-    return Object.values(BLOCKS).find(item => item.games.includes(modeKey)) || BLOCKS[DEFAULT_BLOCK];
+  // De un juego a su bloque, para saber qué carátula toca desde una partida guardada. Un
+  // juego que no esté en ningún bloque —hoy, solo «Gran mezcla»— cae en el de por
+  // defecto salvo que se pida lo contrario: elegirlo no debe forzar una carátula que no
+  // le corresponde, así que `setMode` en `app.js` pide `fallback: false`.
+  function blockOf(modeKey, { fallback = true } = {}) {
+    const dueño = Object.values(BLOCKS).find(item => item.games.includes(modeKey));
+    return dueño || (fallback ? BLOCKS[DEFAULT_BLOCK] : undefined);
   }
 
   function blockGames(blockKey) { return block(blockKey).games.map(mode); }
