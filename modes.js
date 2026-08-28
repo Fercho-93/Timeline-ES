@@ -177,11 +177,7 @@
   // añadir uno nuevo es declararlo aquí y sumarlo a `games`.
   //
   // «Gran mezcla» es un bloque más, pero no temático: agrupa por eje del tiempo en vez de
-  // por tema, con Historia y Cine a la vez dentro. Es el único bloque sin carátula
-  // fotográfica —no hay una imagen que valga para «un poco de los otros tres»—, así que
-  // `art: "mixed"` no aparece en `BLOCK_ART` (`app.js`) y `blockArt` lo resuelve entero
-  // con CSS: el mismo icono que ya llevan todos los bloques en el lomo, sobre un fondo
-  // ilustrado en vez de una fotografía.
+  // por tema, con Historia y Cine a la vez dentro.
   //
   // La clave de cada juego viaja en el documento de la sala compartida, así que cambiar
   // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga

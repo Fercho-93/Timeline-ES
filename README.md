@@ -103,7 +103,7 @@ sus huecos— y no solo un índice; cuando dos paradas caen demasiado cerca para
 por separado, se separan lo justo para seguir siendo un botón de dedo.
 Ningún control baja de los 44 px que necesita una yema, y las
 carátulas se sirven en dos tamaños —una para el lomo y otra para la portada desplegada—,
-así que la primera visita baja unos 107 KB de imagen en vez de los 698 KB de antes.
+así que la primera visita baja unos 150 KB de imagen en vez de los 698 KB de antes.
 
 El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.
 

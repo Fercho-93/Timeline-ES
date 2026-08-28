@@ -95,16 +95,13 @@
   const BLOCK_ART = {
     history: { archivo: "hero-history", alto: { 400: 267, 700: 467 } },
     cinema: { archivo: "hero-cinema", alto: { 400: 558, 700: 977 } },
-    globe: { archivo: "hero-geography", alto: { 400: 491, 700: 859 } }
+    globe: { archivo: "hero-geography", alto: { 400: 491, 700: 859 } },
+    mixed: { archivo: "hero-mixed", alto: { 400: 567, 700: 992 } }
   };
 
   function blockArt(art, active) {
-    const arte = BLOCK_ART[art];
-    // «Gran mezcla» no tiene fotografía propia —no hay una imagen que valga para «un
-    // poco de los otros tres»—, así que su carátula la resuelve entera `.panel-mixed`
-    // en la hoja de estilos, con el mismo icono que ya lleva en el lomo.
-    if (!arte) return "";
     const ancho = active ? 700 : 400;
+    const arte = BLOCK_ART[art];
     return `<img src="assets/${arte.archivo}-${ancho}.webp" alt="" width="${ancho}" height="${arte.alto[ancho]}" decoding="async" fetchpriority="${active ? "high" : "low"}">`;
   }
 
