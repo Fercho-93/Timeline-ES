@@ -265,6 +265,22 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .drag-ghost .card-arrow, .drag-ghost .card-era { display: none; }
 .drag-ghost strong { margin-top: 7px; font-size: .9rem; }
 .slot.drop-target span { border-style: solid; border-color: var(--accent); background: rgba(189,139,49,.14); color: var(--accent); transform: scale(1.08); }
+
+/* La carta vuela desde la mano al hueco confirmado antes de revelar el resultado. */
+.card-flight {
+  position: fixed !important;
+  z-index: 120;
+  margin: 0;
+  pointer-events: none;
+  transform: translate(0, 0) rotate(-3deg) scale(1);
+  transform-origin: center center;
+  transition: transform .56s cubic-bezier(.22,.78,.22,1), opacity .56s ease, box-shadow .56s ease;
+  box-shadow: 0 20px 42px rgba(40,28,18,.32) !important;
+  border-color: var(--accent) !important;
+  opacity: 1;
+}
+.depositing-source { opacity: .22; transform: scale(.96); }
+
 body.dragging-card { touch-action: none; user-select: none; -webkit-user-select: none; }
 body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .card-era { margin: 0 -14px 13px; padding: 9px 11px; display: flex; align-items: center; gap: 7px; color: rgba(255,255,255,.92); font-size: .58rem; line-height: 1; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
