@@ -23,6 +23,11 @@
   // El bloque en pantalla se deduce siempre del juego elegido, así que no se guarda aparte.
   let selectedBlockKey = CT.blockOf(selectedModeKey).key;
   let cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
+  // Cada mazo numera sus cartas en su propio rango (historia 1-190, cine 1001+, países
+  // 2001+...), así que un identificador nunca choca entre modalidades. Esto es lo que
+  // permite que la pantalla de repaso de la competición, que mezcla fallos de varios
+  // temas distintos, pueda encontrar cualquier carta sin saber de qué mazo venía.
+  const GLOBAL_CARDS_BY_ID = new Map(Object.values(CT.MODES).flatMap(m => m.cards).map(card => [card.id, card]));
   let screen = "home";
   let game = loadGame();
   let selectedCardId = null;
@@ -141,6 +146,10 @@
             <button class="btn btn-secondary" data-action="solo">Jugar solo</button>
             ${resume ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
           </div>
+          <button class="comp-promo" data-action="start-competition">
+            <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
+            <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
+          </button>
         </div>
       </section>
       <p class="app-version" id="app-version"></p>
@@ -279,11 +288,16 @@
     player.hand = player.hand.filter(id => id !== selectedCardId);
     let returned = false;
     if (correct) game.timeline.splice(index, 0, selectedCardId);
-    else if (drawCard(player)) game.discard.push(selectedCardId);
-    else {
+    else if (drawCard(player)) {
+      game.discard.push(selectedCardId);
+      // Aparte del descarte, que vuelve al mazo y se puede volver a repartir: para el
+      // repaso final importa que la carta se falló alguna vez, acierte después o no.
+      (game.failed = game.failed || []).push(selectedCardId);
+    } else {
       // Sin mazo ni descarte no hay nada que robar: la carta vuelve a la mano.
       player.hand.push(selectedCardId);
       returned = true;
+      (game.failed = game.failed || []).push(selectedCardId);
     }
     result = { correct, returned, card, playerName: player.name };
     selectedCardId = null;
@@ -349,13 +363,40 @@
     const lead = names.length === 1
       ? "Ha sido la única persona en terminar la ronda sin cartas."
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+    const fallosUnicos = new Set(game.failed || []).size;
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+  }
+
+  // Repasa lo que se falló al terminar: cada fallo se descarta en el momento y nunca se
+  // vuelve a ver dónde iba en realidad, así que el juego se queda sin su mejor ocasión
+  // para enseñar algo. `items` son pares { id, mode }, no solo identificadores: la
+  // competición mezcla fallos de varios temas y cada uno se formatea con las reglas de
+  // su propio eje (fecha, superficie o población).
+  function reviewScreen(items, actionsHtml) {
+    screen = "review";
+    const counts = new Map();
+    items.forEach(({ id, mode }) => counts.set(id, { mode, veces: (counts.get(id)?.veces || 0) + 1 }));
+    const unicos = [...counts.entries()];
+    paint(`<div class="shell">${header()}<section>
+      <div class="eyebrow">Repaso</div>
+      <h1 data-focus tabindex="-1">${unicos.length ? `${unicos.length} ${unicos.length === 1 ? "carta" : "cartas"} para recordar` : "Ninguna carta fallada"}</h1>
+      ${unicos.length ? `<div class="review-grid">${unicos.map(([id, { mode, veces }]) => {
+        const card = GLOBAL_CARDS_BY_ID.get(id);
+        if (!card) return "";
+        const era = CT.eraForCard(mode, card);
+        return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${CT.formatValue(mode, card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p>${veces > 1 ? `<p class="review-count">Fallada ${veces} veces</p>` : ""}</div></article>`;
+      }).join("")}</div>` : `<p class="lead">Partida perfecta.</p>`}
+      <div class="actions" style="justify-content:center">${actionsHtml}</div>
+    </section></div>`);
   }
 
   const DAILY_CARDS = 15;
   const SOLO_LIVES = 3;
   const RECORDS_KEY = "hilo-retos-v1";
   let solo = null;
+  // Los fallos de la última partida en solitario, para poder repasarlos aunque `solo`
+  // ya se haya vaciado al terminar.
+  let soloFailedForReview = [];
 
   function soloKey() { return `hilo-solo-${selectedModeKey}-v1`; }
 
@@ -414,6 +455,10 @@
   }
 
   function saveSolo() {
+    // La competición no se guarda: cada ronda cambia de tema y, con él, de modalidad
+    // seleccionada, así que su clave de guardado (soloKey, atada a esa modalidad)
+    // pisaría la partida libre o el reto diario que hubiera guardados en ese tema.
+    if (solo && solo.kind === "comp") return;
     if (solo) localStorage.setItem(soloKey(), JSON.stringify(solo));
     else localStorage.removeItem(soloKey());
   }
@@ -485,9 +530,10 @@
       if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i]));
     }
     const restantes = solo.total ? solo.total - solo.played : solo.deck.length + 1;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="solo-menu">Salir</button>')}
-      <h1 class="solo-lectores" data-focus tabindex="-1">${solo.kind === "daily" ? "Reto diario" : "Partida libre"}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${solo.kind === "daily" ? "Reto diario" : "Partida libre"}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
+    const etiqueta = soloLabel();
+    paint(`<div class="shell">${header(`<button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
+      <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}</h1>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
       <div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
@@ -512,6 +558,7 @@
       solo.hits += 1;
     } else {
       solo.lives -= 1;
+      (solo.failed = solo.failed || []).push(solo.current);
     }
     solo.played += 1;
     pendingIndex = null;
@@ -537,6 +584,7 @@
   }
 
   function soloFinish() {
+    if (solo.kind === "comp") return compRoundFinish();
     screen = "solo-end";
     const total = solo.total || solo.played;
     const records = modeRecords();
@@ -558,10 +606,104 @@
     const resumen = solo.kind === "daily"
       ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
       : `Has aguantado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} seguidas antes de quedarte sin vidas.`;
+    soloFailedForReview = (solo.failed || []).map(id => ({ id, mode: solo.mode }));
     solo.finished = true;
     saveSolo();
     solo = null;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+  }
+
+  // Competición: una ronda de ROUND_CARDS cartas por cada modalidad ya establecida, en
+  // un orden al azar y sin repetir ninguna, todas con el mismo motor de colocar-una-a-
+  // una que el solitario (`solo`, con kind: "comp"). Lo único propio de la competición
+  // vive en `comp`: qué temas quedan por jugar y el marcador acumulado de las rondas ya
+  // resueltas.
+  //
+  // No se guarda en `localStorage`: cada ronda cambia la modalidad seleccionada, y esa
+  // modalidad es la que decide dónde se guardan las partidas normales de solitario. Si
+  // la competición sobreviviera a un cierre de la aplicación, arrastraría esa modalidad
+  // cambiada consigo. Se pierde si se recarga la página a mitad, igual que se perdería
+  // una mano de cartas repartida y no anotada en cualquier juego de mesa.
+  const ROUND_CARDS = 5;
+  const TOTAL_TEMAS = Object.keys(CT.MODES).length;
+  let comp = null;
+  let previousModeKey = null;
+
+  function soloLabel() {
+    if (solo.kind === "daily") return "Reto diario";
+    if (solo.kind === "comp") return `Competición · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
+    return "Partida libre";
+  }
+
+  function startCompetition() {
+    previousModeKey = selectedModeKey;
+    comp = { queue: shuffle(Object.keys(CT.MODES)), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    compRoundIntro();
+  }
+
+  function compRoundIntro() {
+    screen = "comp-intro";
+    const mode = CT.mode(comp.queue[0]);
+    const numero = TOTAL_TEMAS - comp.queue.length + 1;
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card">
+      <div class="eyebrow">Competición · Tema ${numero} de ${TOTAL_TEMAS}</div>
+      <h2 data-focus tabindex="-1">${mode.name}</h2>
+      <p>${mode.blurb} ${ROUND_CARDS} cartas, ${SOLO_LIVES} vidas nuevas.</p>
+      ${comp.roundsSummary.length ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${comp.totalHits}</b><small>aciertos hasta ahora</small></span></div>` : ""}
+      <button class="btn btn-primary btn-block" data-action="comp-next-round">Empezar <span>→</span></button>
+    </div></section></div>`);
+  }
+
+  function beginCompRound() {
+    const modeKey = comp.queue.shift();
+    selectedModeKey = modeKey;
+    cardsById = new Map(CT.cards(modeKey).map(card => [card.id, card]));
+    const barajado = shuffle(CT.cards(modeKey).map(card => card.id)).slice(0, ROUND_CARDS + 1);
+    const timeline = [barajado.shift()];
+    solo = {
+      kind: "comp", mode: modeKey, timeline, deck: barajado,
+      current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
+      total: ROUND_CARDS, finished: false, failed: []
+    };
+    pendingIndex = null;
+    result = null;
+    soloView();
+  }
+
+  function compRoundFinish() {
+    comp.roundsSummary.push({ mode: solo.mode, hits: solo.hits, total: solo.total });
+    comp.totalHits += solo.hits;
+    comp.totalFailed.push(...(solo.failed || []).map(id => ({ id, mode: solo.mode })));
+    solo = null;
+    if (comp.queue.length) compRoundIntro();
+    else compFinish();
+  }
+
+  function compFinish() {
+    screen = "comp-end";
+    selectedModeKey = previousModeKey;
+    cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
+    const totalCards = comp.roundsSummary.length * ROUND_CARDS;
+    const fallosUnicos = new Set(comp.totalFailed.map(item => item.id)).size;
+    const filas = comp.roundsSummary.map(r => `<li><b>${escapeHtml(CT.mode(r.mode).name)}</b><span>${r.hits} de ${r.total}</span></li>`).join("");
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
+      <div class="big-icon">🏆</div>
+      <div class="eyebrow">Competición terminada</div>
+      <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${comp.totalHits} de ${totalCards} en total</h1>
+      <ul class="comp-summary">${filas}</ul>
+      <div class="actions" style="justify-content:center">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-comp">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
+    </div></section></div>`);
+  }
+
+  // Salir a mitad de una competición no debe dejar la modalidad cambiada puesta: se
+  // restaura la de antes de empezar, igual que hace `compFinish` al terminarla entera.
+  function abandonCompetition() {
+    selectedModeKey = previousModeKey;
+    cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
+    solo = null;
+    comp = null;
+    home();
   }
 
   function rules() {
@@ -644,6 +786,12 @@
     else if (action === "game-menu") gameMenu();
     else if (action === "close-menu") CT.closeDialog();
     else if (action === "abandon") { game = null; saveGame(); home(); }
+    else if (action === "review-game") reviewScreen((game.failed || []).map(id => ({ id, mode: game.mode })), `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
+    else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
+    else if (action === "review-comp") reviewScreen(comp.totalFailed, `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
+    else if (action === "start-competition") startCompetition();
+    else if (action === "comp-next-round") beginCompRound();
+    else if (action === "abandon-comp") abandonCompetition();
   });
 
   if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js"));
