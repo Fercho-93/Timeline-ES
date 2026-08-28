@@ -6,7 +6,15 @@
    solo que más claro para leerse sobre un fondo oscuro. `--ink-solid` es aparte de
    `--ink`: el botón primario y la tarjeta del código de sala quieren un bloque que
    siempre contraste con el papel, así que en claro es casi negro y en oscuro casi
-   blanco, mientras que `--ink` (el texto normal) se limita a invertirse. */
+   blanco, mientras que `--ink` (el texto normal) se limita a invertirse.
+
+   `--accent-solid` y `--green-solid` son aparte de `--accent` y `--green` por la misma
+   razón, pero al revés: los medallones, las insignias de turno y la marca de acierto
+   llevan siempre texto blanco encima, así que necesitan el bronce y el verde oscuros de
+   siempre en los dos temas —si usaran `--accent`/`--green`, que se aclaran a propósito
+   para leerse como texto sobre un fondo oscuro, el blanco encima dejaría de contrastar—.
+   `--accent`/`--green` siguen siendo para texto (el año de una carta, el marcador de
+   acierto) y sí cambian con el tema. */
 :root {
   color-scheme: light;
   --ink: #1b1917;
@@ -17,6 +25,8 @@
   --accent: #8a6a3b;
   --accent-dark: #6d5330;
   --green: #3d6b53;
+  --accent-solid: #8a6a3b;
+  --green-solid: #3d6b53;
   --ink-solid: #1b1917;
   --ink-solid-contrast: #fff;
   --shadow: 0 12px 32px rgba(38, 30, 20, .07);
@@ -180,7 +190,7 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .score i { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--line); color: var(--accent-dark); font-size: .62rem; font-style: normal; font-weight: 700; }
 .score b { max-width: 80px; overflow: hidden; text-overflow: ellipsis; font-weight: 650; }
 .score em { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); font-style: normal; font-weight: 700; }
-.score.active { color: white; background: var(--accent); border-color: var(--accent); }
+.score.active { color: white; background: var(--accent-solid); border-color: var(--accent-solid); }
 .score.active i { background: #fff; }
 /* Color fijo y no `--accent-dark`: esta insignia lleva un fondo blanco literal en
    cualquier tema, así que necesita una tinta oscura fija para seguir leyéndose. */
@@ -282,14 +292,14 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .reveal-era { margin: 0 -18px 15px; padding: 10px 14px; color: rgba(255,255,255,.94); font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
 .reveal-era span { margin-right: 8px; font: 1.1rem Georgia, serif; }
 .reveal .year { color: var(--accent); font: 850 2.2rem Georgia, serif; }
-.result-mark { width: 48px; height: 48px; margin: 0 auto 12px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--green); font-size: 1.4rem; font-weight: 700; }
-.failure .result-mark { background: var(--accent); }
+.result-mark { width: 48px; height: 48px; margin: 0 auto 12px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--green-solid); font-size: 1.4rem; font-weight: 700; }
+.failure .result-mark { background: var(--accent-solid); }
 .success .big-icon { color: var(--green); }
 .failure .big-icon { color: var(--accent); }
 .pass-screen { min-height: calc(100dvh - 110px); display: grid; place-items: center; text-align: center; }
 .pass-screen .panel { width: min(100%, 480px); }
 .pass-card { position: relative; overflow: hidden; }
-.player-medallion { width: 74px; height: 74px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent); border: 2px solid var(--accent); font: 700 1.2rem Georgia, serif; }
+.player-medallion { width: 74px; height: 74px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); border: 2px solid var(--accent-solid); font: 700 1.2rem Georgia, serif; }
 .pass-card .eyebrow { justify-content: center; }
 
 .rules { text-align: left; }
@@ -342,7 +352,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .online-lobby-grid { display: grid; gap: 14px; }
 .lobby-players { display: grid; gap: 8px; }
 .lobby-player { display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 11px; padding: 9px; border-radius: 10px; background: var(--paper); }
-.lobby-player > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent); font-size: .72rem; font-weight: 700; }
+.lobby-player > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); font-size: .72rem; font-weight: 700; }
 .lobby-player strong, .lobby-player small { display: block; }
 .lobby-player small { margin-top: 2px; color: var(--muted); font-size: .69rem; }
 .lobby-player > i { color: var(--green); font-style: normal; font-weight: 700; }
@@ -391,7 +401,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .kick-btn:active { background: rgba(143,47,42,.1); }
 .manage-players { margin-top: 18px; text-align: left; }
 .manage-player { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; padding: 7px 0; }
-.manage-player > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent); font-size: .62rem; font-weight: 700; }
+.manage-player > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); font-size: .62rem; font-weight: 700; }
 .lobby-settings { align-self: start; }
 .lobby-settings .field + .field { margin-top: 12px; }
 .lobby-settings .btn-primary { margin-top: 18px; }

@@ -49,7 +49,7 @@
     selectedModeKey = modeKey;
     // «Gran mezcla» no vive en ningún bloque: elegirla no debe cambiar qué bloque está
     // desplegado en la galería, porque no pertenece a ninguno en particular.
-    const dueño = Object.values(CT.BLOCKS).find(item => item.games.includes(modeKey));
+    const dueño = CT.blockOf(modeKey, { fallback: false });
     if (dueño) selectedBlockKey = dueño.key;
     localStorage.setItem(MODE_STORAGE_KEY, modeKey);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
@@ -481,11 +481,11 @@
     try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* almacenamiento lleno */ }
   }
 
-  // Un identificador estable y anónimo, generado una vez y guardado aparte de `records`
-  // (que se indexa por modalidad, no vale para algo que es del jugador y no del mazo). No
-  // identifica a nadie ni sale de este móvil todavía: hoy solo sirve para que el reto
-  // diario ya guarde lo que un marcador entre amigos necesitaría el día que exista, sin
-  // tener que tocar las partidas ya jugadas para añadírselo después.
+  // Un identificador estable y anónimo. Vive en su propia clave, generado una sola vez,
+  // porque es del jugador y no de un mazo — `records` en cambio se indexa por modalidad.
+  // Se copia además dentro del registro de cada modalidad (más abajo) para que un futuro
+  // marcador entre amigos no tenga que cruzar dos claves de almacenamiento para asociar
+  // una marca con quién la hizo. No identifica a nadie ni sale de este móvil todavía.
   const PLAYER_KEY = "hilo-jugador-v1";
 
   function playerId() {
