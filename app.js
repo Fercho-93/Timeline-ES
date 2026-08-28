@@ -47,10 +47,7 @@
   function setMode(modeKey) {
     if (!CT.has(modeKey)) return;
     selectedModeKey = modeKey;
-    // «Gran mezcla» no vive en ningún bloque: elegirla no debe cambiar qué bloque está
-    // desplegado en la galería, porque no pertenece a ninguno en particular.
-    const dueño = CT.blockOf(modeKey, { fallback: false });
-    if (dueño) selectedBlockKey = dueño.key;
+    selectedBlockKey = CT.blockOf(modeKey).key;
     localStorage.setItem(MODE_STORAGE_KEY, modeKey);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     game = loadGame();
@@ -102,8 +99,12 @@
   };
 
   function blockArt(art, active) {
-    const ancho = active ? 700 : 400;
     const arte = BLOCK_ART[art];
+    // «Gran mezcla» no tiene fotografía propia —no hay una imagen que valga para «un
+    // poco de los otros tres»—, así que su carátula la resuelve entera `.panel-mixed`
+    // en la hoja de estilos, con el mismo icono que ya lleva en el lomo.
+    if (!arte) return "";
+    const ancho = active ? 700 : 400;
     return `<img src="assets/${arte.archivo}-${ancho}.webp" alt="" width="${ancho}" height="${arte.alto[ancho]}" decoding="async" fetchpriority="${active ? "high" : "low"}">`;
   }
 
@@ -143,16 +144,6 @@
         <div class="hero-copy">
           <h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
           ${gameList()}
-          <button class="comp-promo mixed-promo${selectedModeKey === "mixed" ? " active" : ""}" data-action="set-mode" data-mode="mixed" aria-pressed="${selectedModeKey === "mixed"}">
-            <span class="comp-promo-art mixed-art" aria-hidden="true">
-              <i class="mixed-icon mixed-icon-a">🏛️</i>
-              <i class="mixed-icon mixed-icon-b">🗺️</i>
-              <i class="mixed-icon mixed-icon-c">⚙️</i>
-              <i class="mixed-icon mixed-icon-d">🎬</i>
-              <b class="mixed-glyph">⏳</b>
-            </span>
-            <span class="comp-promo-copy"><b>Gran mezcla ⏳</b><small>No es de un bloque: mezcla Historia, Historia mundial, Inventos y Estrenos de cine por su fecha. ${CT.mode("mixed").cards.length} cartas.</small></span>
-          </button>
           <div class="actions">
             <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
             <button class="btn btn-secondary" data-action="online">Varios móviles</button>
