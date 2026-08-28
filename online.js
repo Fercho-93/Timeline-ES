@@ -379,7 +379,7 @@ function renderLobby() {
   paint(`<div class="shell online-shell">${header(isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>')}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
     <div class="online-lobby-grid"><section class="panel"><div class="section-label">Participantes <small>${people.length}/9</small></div><div class="lobby-players">${roomState.playerOrder.map((uid, index) => { const player = roomState.players[uid]; return `<div class="lobby-player"><span>${escapeHtml(initials(player.name))}</span><div><strong>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</strong><small>${uid === roomState.hostUid ? "Anfitrión" : `Participante ${index + 1}`}</small></div>${isHost && uid !== roomState.hostUid ? `<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button>` : "<i>✓</i>"}</div>`; }).join("")}</div></section>
-      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
+      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><label class="opt-row"><span>Pulso <small>Una vez por partida, reta a otra persona con una carta del mazo en vez de jugar tu turno.</small></span><input type="checkbox" id="online-pulse"></label><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
     </div>
   </div>`, "online-lobby");
 }
@@ -388,6 +388,7 @@ async function startRoom() {
   if (busy || roomState.hostUid !== user.uid) return;
   const handSize = Number(document.getElementById("online-hand-size").value);
   const starterUid = document.getElementById("online-starter").value;
+  const pulse = !!document.getElementById("online-pulse")?.checked;
   busy = true;
   try {
     await runTransaction(db, async transaction => {
@@ -396,12 +397,12 @@ async function startRoom() {
       if (data.hostUid !== user.uid || data.status !== "lobby" || data.playerOrder.length < 2) throw new Error("INVALID_START");
       const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
       const players = { ...data.players };
-      data.playerOrder.forEach(uid => { players[uid] = { ...players[uid], hand: deck.splice(0, handSize) }; });
+      data.playerOrder.forEach(uid => { players[uid] = { ...players[uid], hand: deck.splice(0, handSize), pulseUsed: false, shieldRound: 0 }; });
       const timeline = [deck.shift()];
       transaction.update(roomRef, {
-        handSize, players, deck, timeline, discard: [], status: "playing", phase: "turn",
+        handSize, pulse, players, deck, timeline, discard: [], status: "playing", phase: "turn",
         current: data.playerOrder.indexOf(starterUid), starter: starterUid,
-        turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
+        turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, pulseTurn: null,
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -417,6 +418,12 @@ function renderGame() {
   const currentUid = roomState.playerOrder[roomState.current];
   const currentPlayer = roomState.players[currentUid];
   const myTurn = currentUid === user.uid && roomState.phase === "turn";
+  // Mientras se resuelve un Pulso la mano no se toca: la única carta jugable es la que
+  // sacó el mazo, y solo quien lo lanzó puede colocarla.
+  const pulsing = roomState.phase === "pulse" && roomState.pulseTurn;
+  const myPulse = pulsing && currentUid === user.uid;
+  const pulseCard = pulsing ? getCard(roomState.pulseTurn.cardId) : null;
+  const pulseTargetName = pulsing ? roomState.players[roomState.pulseTurn.targetUid]?.name || "" : "";
   const timelineCards = roomState.timeline.map(id => getCard(id));
   const selectedCard = selectedCardId ? getCard(selectedCardId) : null;
   // Igual que en la partida local: mientras se ve el aviso de fallo, `roomState.timeline`
@@ -426,8 +433,11 @@ function renderGame() {
     : null;
   const slots = [];
   for (let index = 0; index <= timelineCards.length; index++) {
-    slots.push(myTurn && selectedCard && pendingIndex === index
-      ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(selectedCard.title)}</strong><button class="btn btn-primary btn-block" data-online-action="confirm-place" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
+    const confirmable = myPulse ? pulseCard : (myTurn ? selectedCard : null);
+    slots.push(confirmable && pendingIndex === index
+      ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-online-action="${myPulse ? "confirm-pulse" : "confirm-place"}" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
+      : myPulse
+        ? `<button class="slot" data-online-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`
       : index === failIndex
         ? `<button class="slot slot-correct" data-online-action="place" data-index="${index}" disabled aria-label="Aquí iba la carta que se acaba de fallar"><span>✦</span><small>Aquí</small></button>`
         : `<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
@@ -442,8 +452,11 @@ function renderGame() {
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
     <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
+    ${pulsing ? `<div class="pulse-banner">⚡ Pulso de <b>${escapeHtml(currentPlayer.name)}</b> contra <b>${escapeHtml(pulseTargetName)}</b></div>` : ""}
     <section><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-    <section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>
+    ${pulsing
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTargetName)}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}"><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una") : `${escapeHtml(currentPlayer.name)} está resolviendo su Pulso…`}</p></section>`
+      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
   </div>`, "online-game");
   // Igual que en el juego local: arrastrar una carta hasta un hueco es otra forma de
@@ -451,7 +464,8 @@ function renderGame() {
   CT.enableDrag({
     cardSelector: ".hand-card", slotSelector: ".slot",
     onDrop: (id, index) => {
-      selectedCardId = id;
+      // En un Pulso la carta ya está decidida: arrastrar solo elige el hueco.
+      if (!myPulse) selectedCardId = id;
       pendingIndex = index;
       if (index !== null) announce(`Hueco ${index + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`);
       renderGame();
@@ -474,7 +488,15 @@ function revealOverlay(currentUid) {
   // El hueco resaltado en la línea, detrás de esta capa, ya lo enseña; esta frase lo dice
   // también con palabras, que es lo único que le llega a quien usa un lector de pantalla.
   const hint = reveal.correct ? "" : `<p>${CT.placementHint(modeKey(), roomState.timeline.map(id => getCard(id)), card)}</p>`;
-  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
+  // El título de la carta que cambia de mano solo lo ven las dos personas implicadas: el
+  // resto de la sala se entera de que hubo trasvase, pero no de cuál era la carta.
+  const implicado = reveal.pulse && (user.uid === reveal.playerUid || user.uid === reveal.targetUid);
+  const desenlace = reveal.pulse
+    ? (reveal.correct
+      ? `<p class="pulse-outcome">La carta se queda en la línea. <b>${escapeHtml(reveal.targetName)}</b> se lleva ${implicado && reveal.giftId != null ? `<b>${escapeHtml(getCard(reveal.giftId).title)}</b>` : "una carta"} de <b>${escapeHtml(reveal.playerName)}</b>.</p>`
+      : `<p class="pulse-outcome">La carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una. A <b>${escapeHtml(reveal.targetName)}</b> no le pasa nada.</p>`)
+    : `<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>`;
+  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.pulse ? "⚡ Pulso · " : ""}${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
 }
 
 async function placeCard(index) {
@@ -515,6 +537,124 @@ async function placeCard(index) {
       });
     });
     selectedCardId = null;
+  } catch (error) {
+    console.error(error);
+    showToast("La jugada no se pudo enviar. Inténtalo de nuevo.");
+  } finally { busy = false; }
+}
+
+// ---------------------------------------------------------------------------
+// El Pulso en la sala compartida. Las reglas son las mismas que en un solo móvil, y están
+// explicadas en `app.js`. Lo propio de aquí es que se resuelve en dos transacciones y no
+// en una: entre lanzarlo y colocar la carta hay que enseñársela a quien reta, así que
+// `turn` → `pulse` la saca del mazo y `pulse` → `reveal` la resuelve.
+//
+// Es la única jugada del juego que toca dos manos a la vez, y por eso `firestore.rules`
+// necesita reglas propias: `onlyMyHand()`, que protege el resto de jugadas, aquí no vale.
+const PULSE_MIN_HAND = 2;
+
+function pulseTargetUids() {
+  if (!roomState) return [];
+  return roomState.playerOrder.filter(uid =>
+    uid !== user.uid && (roomState.players[uid].shieldRound || 0) !== roomState.round);
+}
+
+function pulseAvailable() {
+  const me = roomState.players[user.uid];
+  return !!roomState.pulse && !me.pulseUsed && me.hand.length >= PULSE_MIN_HAND
+    && roomState.deck.length + roomState.discard.length > 0 && pulseTargetUids().length > 0;
+}
+
+function openPulse() {
+  const opciones = pulseTargetUids().map(uid => {
+    const player = roomState.players[uid];
+    return `<button class="btn btn-secondary btn-block pulse-target" data-online-action="pulse-target" data-target="${uid}"><b>${escapeHtml(player.name)}</b><small>${player.hand.length} ${player.hand.length === 1 ? "carta" : "cartas"}</small></button>`;
+  }).join("");
+  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-pulse-overlay><div class="modal">
+    <div class="eyebrow">Pulso</div>
+    <h2>¿A quién retas?</h2>
+    <p class="lead" style="margin-inline:auto">El mazo sacará una carta que no eliges tú. Si la colocas bien, le pasas una carta al azar de tu mano; si fallas, robas una y a esa persona no le pasa nada.</p>
+    <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
+    <button class="btn btn-ghost btn-block" style="margin-top:10px" data-online-action="close-pulse">Mejor no</button>
+  </div></div>`);
+  abreCapa(appEl.querySelector("[data-pulse-overlay]"), true);
+}
+
+async function startPulse(targetUid) {
+  if (busy) return;
+  busy = true;
+  try {
+    await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(roomRef);
+      const data = snapshot.data();
+      const currentUid = data.playerOrder[data.current];
+      if (data.status !== "playing" || data.phase !== "turn" || currentUid !== user.uid) throw new Error("NOT_TURN");
+      const me = data.players[user.uid];
+      if (!data.pulse || me.pulseUsed || me.hand.length < PULSE_MIN_HAND) throw new Error("NO_PULSE");
+      if (!data.playerOrder.includes(targetUid) || targetUid === user.uid) throw new Error("NO_TARGET");
+      if ((data.players[targetUid].shieldRound || 0) === data.round) throw new Error("SHIELDED");
+      let deck = [...data.deck];
+      let discard = [...data.discard];
+      if (!deck.length) { deck = shuffle(discard); discard = []; }
+      const cardId = deck.shift();
+      if (cardId == null) throw new Error("NO_CARDS");
+      transaction.update(roomRef, {
+        players: { ...data.players, [user.uid]: { ...me, pulseUsed: true } },
+        deck, discard, phase: "pulse", pulseTurn: { targetUid, cardId },
+        version: data.version + 1, updatedAt: serverTimestamp()
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    showToast("No se pudo lanzar el Pulso");
+  } finally { busy = false; }
+}
+
+async function placePulse(index) {
+  if (busy || roomState?.phase !== "pulse") return;
+  pendingIndex = null;
+  busy = true;
+  try {
+    await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(roomRef);
+      const data = snapshot.data();
+      const currentUid = data.playerOrder[data.current];
+      if (data.status !== "playing" || data.phase !== "pulse" || currentUid !== user.uid) throw new Error("NOT_TURN");
+      const { targetUid, cardId } = data.pulseTurn;
+      const card = getCard(cardId);
+      const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
+      const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
+      const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+      const timeline = [...data.timeline];
+      let deck = [...data.deck];
+      let discard = [...data.discard];
+      const players = { ...data.players };
+      let giftId = null;
+      if (correct) {
+        timeline.splice(index, 0, cardId);
+        const hand = [...players[user.uid].hand];
+        // Al azar: si pudieras elegirla soltarías siempre la que no sabes colocar.
+        giftId = hand[Math.floor(Math.random() * hand.length)];
+        hand.splice(hand.indexOf(giftId), 1);
+        players[user.uid] = { ...players[user.uid], hand };
+        players[targetUid] = { ...players[targetUid], hand: [...players[targetUid].hand, giftId], shieldRound: data.round };
+      } else {
+        // El castigo recae solo en quien reta: a la otra persona no le pasa nada.
+        discard.push(cardId);
+        const drawn = takeCard(deck, discard);
+        deck = drawn.deck; discard = drawn.discard;
+        if (drawn.cardId != null) players[user.uid] = { ...players[user.uid], hand: [...players[user.uid].hand, drawn.cardId] };
+      }
+      transaction.update(roomRef, {
+        players, deck, discard, timeline, phase: "reveal", pulseTurn: null,
+        reveal: {
+          cardId, correct, returned: false, pulse: true, giftId,
+          playerUid: user.uid, playerName: players[user.uid].name,
+          targetUid, targetName: data.players[targetUid].name
+        },
+        version: data.version + 1, updatedAt: serverTimestamp()
+      });
+    });
   } catch (error) {
     console.error(error);
     showToast("La jugada no se pudo enviar. Inténtalo de nuevo.");
@@ -743,6 +883,11 @@ document.addEventListener("click", event => {
     announce(`Elegida la carta ${getCard(selectedCardId).title}. Ahora elige un hueco.`);
     renderGame();
   }
+  else if (action === "pulse-open") openPulse();
+  else if (action === "close-pulse") CT.closeDialog();
+  else if (action === "pulse-target") { CT.closeDialog(); startPulse(target.dataset.target); }
+  else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`); renderGame(); }
+  else if (action === "confirm-pulse") placePulse(pendingIndex);
   else if (action === "place") {
     pendingIndex = Number(target.dataset.index);
     announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`);
