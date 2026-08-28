@@ -682,6 +682,14 @@ function takeCard(deckInput, discardInput) {
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
+  const acceptedCardId = roomState.reveal?.correct ? roomState.reveal.cardId : null;
+  if (acceptedCardId) {
+    // Se ve la llegada de la carta justo al aceptar el resultado, antes de avanzar.
+    appEl.querySelector(".overlay")?.classList.add("result-exit");
+    const cardEl = appEl.querySelector(`.timeline-card[data-id="${acceptedCardId}"]`);
+    requestAnimationFrame(() => cardEl?.classList.add("card-settling"));
+    await new Promise(resolve => setTimeout(resolve, 720));
+  }
   try {
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
