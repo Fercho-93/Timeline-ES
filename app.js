@@ -900,7 +900,31 @@
     else if (action === "abandon-comp") abandonCompetition();
   });
 
-  if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js"));
+  // `skipWaiting` y `clients.claim`, en el propio service worker, hacen que la versión
+  // nueva tome el control sin esperar a cerrar la pestaña. Pero eso no basta: la página ya
+  // abierta sigue ejecutando el código antiguo hasta que se recarga, así que sin esta
+  // línea la actualización llega pero no se ve —exactamente lo que pasa en una PWA
+  // instalada, donde «entrar y salir» a veces reanuda la misma pestaña en vez de abrir
+  // una de verdad—. En cuanto cambia quién controla la página, se recarga sola.
+  //
+  // Y como el navegador no siempre comprueba si hay una versión nueva por su cuenta al
+  // reabrir la aplicación, se le pide explícitamente cada vez que vuelve a primer plano:
+  // así una actualización ya subida a GitHub Pages no depende de que el navegador decida
+  // por sí mismo cuándo mirar.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+      const registro = await navigator.serviceWorker.register("service-worker.js");
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") registro.update();
+      });
+    });
+    let recargando = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (recargando) return;
+      recargando = true;
+      location.reload();
+    });
+  }
   const invitedRoom = new URLSearchParams(location.search).get("room") || "";
   if (invitedRoom) launchOnline(invitedRoom);
   else home();
