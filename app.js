@@ -33,6 +33,8 @@
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
+  // Se activa al cerrar el aviso de acierto, para que la animación no quede tapada.
+  let settlingCardId = null;
 
   function currentAxis() { return CT.axis(selectedModeKey); }
 
@@ -217,6 +219,7 @@
     const timeline = [shuffled.shift()];
     game = { mode: selectedModeKey, pulse, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
     selectedCardId = null;
+    if (result?.correct) settlingCardId = result.card.id;
     result = null;
     saveGame();
     renderPass();
@@ -238,6 +241,7 @@
   }
 
   function gameView() {
+    const cardJustSettled = settlingCardId;
     screen = "game";
     const player = currentPlayer();
     const timelineCards = game.timeline.map(id => cardsById.get(id));
@@ -261,6 +265,10 @@
         slots.push(timelineCardMarkup(timelineCards[i]));
       }
     }
+    if (cardJustSettled) {
+      setTimeout(() => { if (settlingCardId === cardJustSettled) settlingCardId = null; }, 850);
+    }
+
     const manoHtml = pulseCard
       ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
       : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
@@ -294,7 +302,7 @@
     const era = eraForCard(card);
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
-    return `<article class="timeline-card${result?.correct && result.card?.id === card.id ? " card-settling" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+    return `<article class="timeline-card${settlingCardId === card.id ? " card-settling" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
   }
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
