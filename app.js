@@ -823,12 +823,56 @@
     overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
-  function soloNext() {
+  function advanceSolo() {
     result = null;
     if (solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total)) return soloFinish();
     solo.current = solo.deck.shift();
     saveSolo();
     soloView();
+  }
+
+  function animateAcceptedSoloCard(cardId) {
+    const source = appEl.querySelector(`.hand-card[data-id="${cardId}"]`);
+    const destination = appEl.querySelector(`.timeline-card[data-id="${cardId}"]`);
+    appEl.querySelector(".overlay")?.classList.add("result-exit");
+    if (!source || !destination) {
+      destination?.classList.add("card-arrived");
+      return new Promise(resolve => setTimeout(resolve, 760));
+    }
+
+    const start = source.getBoundingClientRect();
+    const end = destination.getBoundingClientRect();
+    const ghost = source.cloneNode(true);
+    ghost.classList.remove("selected", "dragging", "armed");
+    ghost.classList.add("card-flight", "accepted-card-flight");
+    ghost.style.width = `${start.width}px`;
+    ghost.style.height = `${start.height}px`;
+    ghost.style.left = `${start.left}px`;
+    ghost.style.top = `${start.top}px`;
+    destination.classList.add("accepted-target-hidden");
+    source.classList.add("depositing-source");
+    document.body.appendChild(ghost);
+
+    const dx = end.left + end.width / 2 - (start.left + start.width / 2);
+    const dy = end.top + end.height / 2 - (start.top + start.height / 2);
+    const scale = Math.min(1.08, Math.max(.88, end.width / start.width));
+    requestAnimationFrame(() => {
+      ghost.style.transform = `translate(${dx}px, ${dy}px) rotate(0deg) scale(${scale})`;
+    });
+
+    return new Promise(resolve => setTimeout(() => {
+      ghost.remove();
+      source.classList.remove("depositing-source");
+      destination.classList.remove("accepted-target-hidden");
+      destination.classList.add("card-arrived");
+      setTimeout(resolve, 360);
+    }, 680));
+  }
+
+  function soloNext() {
+    if (!result?.correct) return advanceSolo();
+    const cardId = result.card.id;
+    animateAcceptedSoloCard(cardId).then(advanceSolo);
   }
 
   function soloFinish() {
@@ -1054,7 +1098,7 @@
       gameView();
     }
     else if (action === "place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
-    else if (action === "confirm-place") { const cardId = game?.pulseTurn?.cardId || selectedCardId; depositThen(cardId, () => screen === "solo" ? soloPlace(pendingIndex) : game.pulseTurn ? placePulse(pendingIndex) : placeCard(pendingIndex)); }
+    else if (action === "confirm-place") { if (screen === "solo") soloPlace(pendingIndex); else { const cardId = game?.pulseTurn?.cardId || selectedCardId; depositThen(cardId, () => game.pulseTurn ? placePulse(pendingIndex) : placeCard(pendingIndex)); } }
     else if (action === "cancel-place") { pendingIndex = null; screen === "solo" ? soloView() : gameView(); }
     else if (action === "finish-turn") finishTurn();
     else if (action === "solo") soloHome();
