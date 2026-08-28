@@ -47,7 +47,10 @@
   function setMode(modeKey) {
     if (!CT.has(modeKey)) return;
     selectedModeKey = modeKey;
-    selectedBlockKey = CT.blockOf(modeKey).key;
+    // «Gran mezcla» no vive en ningún bloque: elegirla no debe cambiar qué bloque está
+    // desplegado en la galería, porque no pertenece a ninguno en particular.
+    const dueño = Object.values(CT.BLOCKS).find(item => item.games.includes(modeKey));
+    if (dueño) selectedBlockKey = dueño.key;
     localStorage.setItem(MODE_STORAGE_KEY, modeKey);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     game = loadGame();
@@ -140,6 +143,10 @@
         <div class="hero-copy">
           <h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
           ${gameList()}
+          <button class="comp-promo mixed-promo${selectedModeKey === "mixed" ? " active" : ""}" data-action="set-mode" data-mode="mixed" aria-pressed="${selectedModeKey === "mixed"}">
+            <span class="comp-promo-art mixed-art" aria-hidden="true">⏳</span>
+            <span class="comp-promo-copy"><b>Gran mezcla ⏳</b><small>No es de un bloque: mezcla Historia, Historia mundial, Inventos y Estrenos de cine por su fecha. ${CT.mode("mixed").cards.length} cartas.</small></span>
+          </button>
           <div class="actions">
             <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
             <button class="btn btn-secondary" data-action="online">Varios móviles</button>
@@ -313,8 +320,6 @@
       returned = true;
       (game.failed = game.failed || []).push(selectedCardId);
     }
-    CT.playSound(correct ? "hit" : "miss");
-    if (!correct) CT.vibrate("miss");
     result = { correct, returned, card, playerName: player.name };
     selectedCardId = null;
     saveGame();
@@ -629,8 +634,6 @@
     // hace falta para dibujar la cuadrícula de aciertos al compartir el reto diario.
     (solo.sequence = solo.sequence || []).push(correct);
     pendingIndex = null;
-    CT.playSound(correct ? "hit" : "miss");
-    if (!correct) CT.vibrate("miss");
     result = { correct, card, solo: true };
     saveSolo();
     soloResult();
@@ -727,7 +730,11 @@
   // cambiada consigo. Se pierde si se recarga la página a mitad, igual que se perdería
   // una mano de cartas repartida y no anotada en cualquier juego de mesa.
   const ROUND_CARDS = 5;
-  const TOTAL_TEMAS = Object.keys(CT.MODES).length;
+  // «Gran mezcla» no es un género propio: es la combinación de otros cuatro. Un tema de
+  // competición que sea «un poco de todo lo anterior» no aporta nada nuevo a la ronda, así
+  // que se excluye de la rotación.
+  const COMP_MODES = Object.keys(CT.MODES).filter(key => key !== "mixed");
+  const TOTAL_TEMAS = COMP_MODES.length;
   let comp = null;
   let previousModeKey = null;
 
@@ -739,7 +746,7 @@
 
   function startCompetition() {
     previousModeKey = selectedModeKey;
-    comp = { queue: shuffle(Object.keys(CT.MODES)), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp = { queue: shuffle(COMP_MODES), roundsSummary: [], totalHits: 0, totalFailed: [] };
     compRoundIntro();
   }
 

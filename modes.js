@@ -98,10 +98,11 @@
   // Una modalidad hereda las bandas de su eje salvo que declare las suyas, como el cine:
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
   const MODES = {
-    // Las cuatro modalidades del bloque de Historia comparten el eje del tiempo, así que
-    // mezclarlas es concatenar sus mazos: ninguna carta cambia y `eraForCard` sigue
-    // funcionando igual porque las bandas de esta modalidad son las mismas que las de
-    // Historia mundial, el mazo con la periodización más general de los cuatro.
+    // Historia de España, Historia mundial, Inventos y Estrenos de cine comparten el eje
+    // del tiempo aunque estén en bloques distintos, así que mezclarlas es concatenar sus
+    // mazos: ninguna carta cambia y `eraForCard` sigue funcionando igual porque las
+    // bandas de esta modalidad son las mismas que las de Historia mundial, el mazo con
+    // la periodización más general de los cuatro.
     mixed: {
       key: "mixed", name: "Gran mezcla",
       cardLabel: "hechos", blurb: "Historia, mundo, inventos y cine, todo junto.",
@@ -176,15 +177,18 @@
   };
 
   // Los juegos se agrupan en bloques. La portada enseña el bloque y no el juego, así que
-  // añadir uno nuevo es declararlo aquí y sumarlo a `games`. «Gran mezcla» va primero en
-  // Historia aposta: reutiliza las cartas de los otros tres juegos del bloque más las de
-  // cine, así que es el más completo y el que más conviene ver al abrir el bloque.
+  // añadir uno nuevo es declararlo aquí y sumarlo a `games`.
+  //
+  // «Gran mezcla» no está en ningún bloque a propósito: mezcla las cartas de Historia
+  // con las de Cine, así que meterla dentro de un bloque temático sería mentir sobre lo
+  // que contiene. Se presenta aparte, como una modalidad transversal por eje del tiempo
+  // y no por tema, en la propia portada (`app.js`, función `home`).
   //
   // La clave de cada juego viaja en el documento de la sala compartida, así que cambiar
   // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga
   // a tocar `firestore.rules`: dejaron de llevar dentro la lista.
   const BLOCKS = {
-    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["mixed", "history", "world", "inventions"] },
+    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "world", "inventions"] },
     cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] }
   };

@@ -9,11 +9,6 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 **Historia**
 
-- **Gran mezcla:** 474 cartas, las de los otros tres juegos del bloque más las de Estrenos de
-  cine, todas en la misma línea. Compartir eje del tiempo es lo único que hace falta para
-  mezclarlas, así que es una concatenación y no un mazo aparte: coloca a la vez un hecho de
-  España, uno del resto del mundo, un invento y un estreno de cine, con las mismas épocas que
-  Historia mundial.
 - **Historia de España:** 167 hechos históricos verificados, desde la Antigüedad hasta la actualidad,
   sin dos cartas a un año de distancia salvo un puñado de hitos que de verdad lo son.
 - **Historia mundial:** 117 hechos de los faraones a hoy, mirando más allá de España y
@@ -38,6 +33,14 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
   con las cifras de la ONU a 1 de enero de 2026. Mismo margen del 8%: por eso falta China, que
   queda a un 4% de la India.
 
+**Gran mezcla** no es de ningún bloque, a propósito: mezcla Historia de España, Historia
+mundial, Inventos y Estrenos de cine —474 cartas en total—, así que meterla dentro de
+Historia sería mentir sobre lo que contiene, dado que la mitad de sus juegos son de otros
+bloques. Se presenta aparte en la propia portada, como una modalidad transversal por eje
+del tiempo y no por tema. Compartir el eje es lo único que hace falta para mezclarlas: es
+una concatenación y no un mazo aparte, con las mismas épocas que Historia mundial. No entra
+en la rotación del modo Competición, que sí es por tema.
+
 Cada juego conserva su propia partida local. El juego elegido también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
 La aplicación ofrece cuatro formas de jugar:
@@ -56,16 +59,9 @@ que nadie aprenda de él.
 
 ## Ajustes
 
-Un botón de «Ajustes» en la cabecera, disponible en cualquier pantalla, abre tema, sonido y
-vibración:
-
-- **Tema:** automático (seguía la preferencia del móvil), claro u oscuro. La elección se
-  guarda y se aplica al instante, sin recargar.
-- **Sonido:** un pitido distinto para acierto y para fallo, generado con osciladores en vez
-  de archivos de audio, así que no pesa nada y no hay que precargarlo.
-- **Vibración:** un aviso corto al fallar, en los móviles que lo permiten.
-
-Los tres están activados por defecto y se pueden apagar por separado.
+Un botón de «Ajustes» en la cabecera, disponible en cualquier pantalla, elige el tema:
+automático (según la preferencia del móvil), claro u oscuro. La elección se guarda y se
+aplica al instante, sin recargar.
 
 ## Jugar en solitario
 

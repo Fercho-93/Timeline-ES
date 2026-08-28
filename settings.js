@@ -1,13 +1,13 @@
-// Ajustes que no dependen de la partida: tema, sonido y vibración. Viven aparte porque
-// los dos motores (el local en `app.js` y el compartido en `online.js`) los necesitan
-// por igual, y porque no se guardan por modalidad como una partida: son del móvil, no
-// del juego que se esté jugando.
+// El único ajuste que no depende de la partida: el tema. Vive aparte porque los dos
+// motores (el local en `app.js` y el compartido en `online.js`) lo necesitan por igual,
+// y porque no se guarda por modalidad como una partida: es del móvil, no del juego que
+// se esté jugando.
 (function () {
   "use strict";
 
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
-  const DEFAULTS = { theme: "auto", sound: true, haptics: true };
+  const DEFAULTS = { theme: "auto" };
 
   function read() {
     try {
@@ -41,71 +41,19 @@
 
   applyTheme();
 
-  // Dos pitidos cortos con osciladores, no con archivos: no hay nada que precargar ni
-  // que guardar en la caché del `service worker`, y arrancan igual de rápido la primera
-  // vez que la centésima. `AudioContext` solo se crea al primer sonido —crearlo antes de
-  // cualquier gesto del usuario lo deja «suspended» en algunos navegadores— y se reutiliza
-  // después.
-  let audioCtx = null;
-  function ctx() {
-    if (audioCtx) return audioCtx;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return null;
-    audioCtx = new AC();
-    return audioCtx;
-  }
-
-  function tone(context, frequency, start, duration, peak) {
-    const osc = context.createOscillator();
-    const gain = context.createGain();
-    osc.type = "sine";
-    osc.frequency.value = frequency;
-    gain.gain.setValueAtTime(0, start);
-    gain.gain.linearRampToValueAtTime(peak, start + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-    osc.connect(gain).connect(context.destination);
-    osc.start(start);
-    osc.stop(start + duration + 0.02);
-  }
-
-  // El acierto sube (dos notas ascendentes); el fallo baja y es más corto y más grave,
-  // para que se distingan sin mirar la pantalla.
-  function playSound(kind) {
-    if (!settings.sound) return;
-    const context = ctx();
-    if (!context) return;
-    if (context.state === "suspended") context.resume();
-    const now = context.currentTime;
-    if (kind === "hit") {
-      tone(context, 587.33, now, 0.16, 0.16);
-      tone(context, 880, now + 0.09, 0.22, 0.16);
-    } else {
-      tone(context, 220, now, 0.24, 0.14);
-    }
-  }
-
-  // Un patrón corto y distinto para el fallo; el acierto no vibra, que sea la excepción
-  // y no la costumbre es lo que hace que se note.
-  function vibrate(kind) {
-    if (!settings.haptics || !navigator.vibrate) return;
-    navigator.vibrate(kind === "hit" ? 12 : [40, 40, 40]);
-  }
-
   function panelHtml() {
     const s = settings;
     return `<div class="overlay" data-overlay="settings"><div class="modal settings-modal">
       <div class="eyebrow">Ajustes</div>
-      <h2>Cómo se ve y se oye</h2>
+      <h2>Tema</h2>
       <div class="field">
-        <label for="ajuste-tema">Tema</label>
+        <label for="ajuste-tema">Cómo se ve la aplicación</label>
         <select id="ajuste-tema" data-settings-action="theme">
           <option value="auto"${s.theme === "auto" ? " selected" : ""}>Automático, según el móvil</option>
           <option value="light"${s.theme === "light" ? " selected" : ""}>Claro</option>
           <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
         </select>
       </div>
-      <label class="switch-row"><span>Sonido al colocar una carta</span><input type="checkbox" data-settings-action="sound"${s.sound ? " checked" : ""}></label>
-      <label class="switch-row"><span>Vibración al fallar</span><input type="checkbox" data-settings-action="haptics"${s.haptics ? " checked" : ""}></label>
       <button class="btn btn-primary btn-block" data-settings-action="close">Hecho</button>
     </div></div>`;
   }
@@ -119,15 +67,10 @@
   }
 
   document.addEventListener("change", event => {
-    const action = event.target.dataset.settingsAction;
-    if (!action) return;
-    if (action === "theme") settings.theme = event.target.value;
-    else if (action === "sound") settings.sound = event.target.checked;
-    else if (action === "haptics") settings.haptics = event.target.checked;
+    if (event.target.dataset.settingsAction !== "theme") return;
+    settings.theme = event.target.value;
     save();
-    if (action === "theme") applyTheme();
-    if (action === "sound" && settings.sound) playSound("hit");
-    if (action === "haptics" && settings.haptics) vibrate("miss");
+    applyTheme();
   });
 
   document.addEventListener("click", event => {
@@ -137,7 +80,5 @@
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
   });
 
-  CT.playSound = playSound;
-  CT.vibrate = vibrate;
   CT.settingsButton = () => '<button class="icon-btn" data-settings-action="open">Ajustes</button>';
 })();
