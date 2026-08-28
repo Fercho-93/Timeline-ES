@@ -57,7 +57,7 @@ function getCard(id) {
 }
 
 function header(extra = "") {
-  return `<header class="topbar"><div class="brand">Continuum <span class="live-badge"><i></i> EN DIRECTO</span></div>${extra}</header>`;
+  return `<header class="topbar"><div class="brand">Continuum <span class="live-badge"><i></i> EN DIRECTO</span></div><div class="topbar-actions">${extra}${CT.settingsButton()}</div></header>`;
 }
 
 function showToast(message) {
@@ -404,11 +404,18 @@ function renderGame() {
   const myTurn = currentUid === user.uid && roomState.phase === "turn";
   const timelineCards = roomState.timeline.map(id => getCard(id));
   const selectedCard = selectedCardId ? getCard(selectedCardId) : null;
+  // Igual que en la partida local: mientras se ve el aviso de fallo, `roomState.timeline`
+  // todavía no lleva la carta fallada, así que se puede señalar dónde iba de verdad.
+  const failIndex = roomState.phase === "reveal" && !roomState.reveal.correct
+    ? CT.correctIndex(modeKey(), timelineCards, getCard(roomState.reveal.cardId))
+    : null;
   const slots = [];
   for (let index = 0; index <= timelineCards.length; index++) {
     slots.push(myTurn && selectedCard && pendingIndex === index
       ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(selectedCard.title)}</strong><button class="btn btn-primary btn-block" data-online-action="confirm-place" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
-      : `<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
+      : index === failIndex
+        ? `<button class="slot slot-correct" data-online-action="place" data-index="${index}" disabled aria-label="Aquí iba la carta que se acaba de fallar"><span>✦</span><small>Aquí</small></button>`
+        : `<button class="slot" data-online-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
@@ -439,8 +446,13 @@ function renderGame() {
   // instantánea que llega de la sala. Solo se abre como diálogo al aparecer, o el foco
   // saltaría dentro de ella una y otra vez.
   const revelando = roomState.phase === "reveal";
-  if (revelando && !renderGame.revelando) abreCapa(appEl.querySelector(".overlay"), false);
+  if (revelando && !renderGame.revelando) {
+    abreCapa(appEl.querySelector(".overlay"), false);
+    CT.playSound(roomState.reveal.correct ? "hit" : "miss");
+    if (!roomState.reveal.correct) CT.vibrate("miss");
+  }
   renderGame.revelando = revelando;
+  if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
 }
 
 function revealOverlay(currentUid) {
@@ -448,7 +460,10 @@ function revealOverlay(currentUid) {
   const card = getCard(reveal.cardId);
   const era = eraForCard(card);
   const canContinue = user.uid === currentUid || user.uid === roomState.hostUid;
-  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
+  // El hueco resaltado en la línea, detrás de esta capa, ya lo enseña; esta frase lo dice
+  // también con palabras, que es lo único que le llega a quien usa un lector de pantalla.
+  const hint = reveal.correct ? "" : `<p>${CT.placementHint(modeKey(), roomState.timeline.map(id => getCard(id)), card)}</p>`;
+  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
 }
 
 async function placeCard(index) {

@@ -10,6 +10,7 @@ for (const archivo of ["cards.js", "movies.js", "inventos.js", "mundo.js", "coun
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
 const { HISTORY_CARDS, MOVIE_CARDS, INVENTION_CARDS, WORLD_CARDS, COUNTRY_CARDS, POPULATION_CARDS } = globalThis.window;
+const CT = globalThis.window.CONTINUUM;
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
@@ -21,21 +22,26 @@ function comunes(nombre, mazo, valor) {
   ok("suficientes cartas para nueve jugadores", mazo.length >= 9 * 4 + 2);
 }
 
-comunes("Historia de España", HISTORY_CARDS, c => c.year);
 comunes("Estrenos de cine", MOVIE_CARDS, c => c.year);
 ok("cada año aparece una sola vez", new Set(MOVIE_CARDS.map(c => c.year)).size === MOVIE_CARDS.length);
 
 // En los mazos nuevos del bloque de historia la fecha es el juego entero, así que no
 // puede haber dos cartas del mismo año —serían una moneda al aire— ni demasiadas en
-// años seguidos, que se razonan igual de mal.
-function fechadas(nombre, mazo) {
+// años seguidos, que se razonan igual de mal. Historia de España es la excepción: es
+// el mazo fundacional y algunos años concentran de verdad varios hechos mayores (1492,
+// 1808...); `placeCard` compara con `>=` y `<=`, así que dos cartas del mismo año se dan
+// por buenas en cualquier orden y no son una moneda al aire, solo una coincidencia de
+// calendario. Lo que sí lo es —y lo que cuenta como «pegado»— es un año de diferencia:
+// ahí sí hay un orden correcto y solo uno.
+function fechadas(nombre, mazo, { unicos = true } = {}) {
   comunes(nombre, mazo, c => c.year);
-  ok("cada año aparece una sola vez", new Set(mazo.map(c => c.year)).size === mazo.length);
+  if (unicos) ok("cada año aparece una sola vez", new Set(mazo.map(c => c.year)).size === mazo.length);
   const orden = [...mazo].sort((a, b) => a.year - b.year);
-  const pegados = orden.filter((card, i) => i && card.year - orden[i - 1].year <= 1).length;
-  ok(`pocos pares en años seguidos (${pegados} de ${orden.length - 1})`, pegados <= orden.length / 10);
+  const pegados = orden.filter((card, i) => i && card.year - orden[i - 1].year === 1).length;
+  ok(`pocos pares a un año de diferencia (${pegados} de ${orden.length - 1})`, pegados <= orden.length / 10);
 }
 
+fechadas("Historia de España", HISTORY_CARDS, { unicos: false });
 fechadas("Inventos y descubrimientos", INVENTION_CARDS);
 fechadas("Historia mundial", WORLD_CARDS);
 
@@ -73,13 +79,22 @@ function redondeoLegible(nombre, modo, mazo) {
   ok(`la cifra más larga cabe en una carta: «${largo}»`, largo.length <= 22);
 }
 
-const CT = globalThis.window.CONTINUUM;
 redondeoLegible("Superficie de países", "countries", COUNTRY_CARDS);
 redondeoLegible("Población de países", "population", POPULATION_CARDS);
 
 const todos = [...HISTORY_CARDS, ...MOVIE_CARDS, ...INVENTION_CARDS, ...WORLD_CARDS, ...COUNTRY_CARDS, ...POPULATION_CARDS];
 console.log("\nEntre mazos");
 ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.id)).size === todos.length);
+
+// La Gran mezcla no es un mazo propio: es la concatenación de los otros cuatro mazos con
+// eje del tiempo, así que no le pide nada nuevo salvo que la concatenación en sí no rompa
+// nada. No se le exige el límite de pares pegados de `fechadas()`: mezclar cuatro mazos ya
+// separados a propósito produce muchas más coincidencias de año que cualquiera de ellos
+// por separado, y esa dificultad extra es justo lo que la hace la modalidad más difícil.
+console.log("\nGran mezcla");
+const mixed = CT.cards("mixed");
+ok(`${mixed.length} cartas, las de los cuatro mazos de tiempo juntas`, mixed.length === HISTORY_CARDS.length + WORLD_CARDS.length + INVENTION_CARDS.length + MOVIE_CARDS.length);
+ok("identificadores únicos también mezclados", new Set(mixed.map(c => c.id)).size === mixed.length);
 
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

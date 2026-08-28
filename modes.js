@@ -98,6 +98,25 @@
   // Una modalidad hereda las bandas de su eje salvo que declare las suyas, como el cine:
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
   const MODES = {
+    // Las cuatro modalidades del bloque de Historia comparten el eje del tiempo, así que
+    // mezclarlas es concatenar sus mazos: ninguna carta cambia y `eraForCard` sigue
+    // funcionando igual porque las bandas de esta modalidad son las mismas que las de
+    // Historia mundial, el mazo con la periodización más general de los cuatro.
+    mixed: {
+      key: "mixed", name: "Gran mezcla",
+      cardLabel: "hechos", blurb: "Historia, mundo, inventos y cine, todo junto.",
+      cards: [...window.HISTORY_CARDS, ...window.WORLD_CARDS, ...window.INVENTION_CARDS, ...window.MOVIE_CARDS],
+      axis: "time",
+      bands: [
+        { limit: 476, key: "antigua", name: "Antigüedad", symbol: "⚱" },
+        { limit: 1453, key: "medieval", name: "Edad Media", symbol: "♜" },
+        { limit: 1789, key: "edadmoderna", name: "Edad Moderna", symbol: "⚜" },
+        { limit: 1914, key: "revoluciones", name: "Siglo de las revoluciones", symbol: "⚑" },
+        { limit: 1945, key: "guerras", name: "Guerras mundiales", symbol: "✚" },
+        { limit: 1991, key: "friaguerra", name: "Guerra Fría", symbol: "☢" },
+        { limit: Infinity, key: "global", name: "Mundo global", symbol: "◍" }
+      ]
+    },
     history: {
       key: "history", name: "Historia de España",
       cardLabel: "hechos", blurb: "De Hispania a la democracia.", cards: window.HISTORY_CARDS,
@@ -156,15 +175,16 @@
     }
   };
 
-  // Los juegos se agrupan en bloques. Hoy hay uno por bloque, pero la portada ya
-  // enseña el bloque y no el juego, así que añadir «Historia mundial» o «Inventos»
-  // es declararlo aquí y sumarlo a `games`.
+  // Los juegos se agrupan en bloques. La portada enseña el bloque y no el juego, así que
+  // añadir uno nuevo es declararlo aquí y sumarlo a `games`. «Gran mezcla» va primero en
+  // Historia aposta: reutiliza las cartas de los otros tres juegos del bloque más las de
+  // cine, así que es el más completo y el que más conviene ver al abrir el bloque.
   //
   // La clave de cada juego viaja en el documento de la sala compartida, así que cambiar
   // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga
   // a tocar `firestore.rules`: dejaron de llevar dentro la lista.
   const BLOCKS = {
-    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "world", "inventions"] },
+    historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["mixed", "history", "world", "inventions"] },
     cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] }
   };
@@ -212,6 +232,27 @@
     return bands.find(band => value < band.limit) || bands[bands.length - 1];
   }
 
+  // Dónde iba de verdad una carta fallada: el hueco más a la izquierda de todos los que
+  // habrían sido válidos. Con empates —dos cartas con el mismo valor— hay más de un
+  // hueco correcto, y `placeCard` los acepta todos; este es solo el que se señala.
+  function correctIndex(modeKey, timelineCards, card) {
+    const value = sortValue(modeKey, card);
+    const index = timelineCards.findIndex(other => sortValue(modeKey, other) > value);
+    return index === -1 ? timelineCards.length : index;
+  }
+
+  // La frase que explica dónde iba, para el aviso de fallo: quien juega con lector de
+  // pantalla no puede simplemente «ver» el hueco resaltado en la línea.
+  function placementHint(modeKey, timelineCards, card) {
+    const index = correctIndex(modeKey, timelineCards, card);
+    const before = timelineCards[index - 1];
+    const after = timelineCards[index];
+    if (!before && !after) return "Era la única carta de la línea.";
+    if (!before) return `Iba al principio, antes de «${escapeHtml(after.title)}».`;
+    if (!after) return `Iba al final, después de «${escapeHtml(before.title)}».`;
+    return `Iba entre «${escapeHtml(before.title)}» y «${escapeHtml(after.title)}».`;
+  }
+
   function escapeHtml(value) {
     return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
   }
@@ -234,6 +275,7 @@
     has, mode, axis, cards,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
+    correctIndex, placementHint,
     escapeHtml, initials, shuffle
   };
 })();

@@ -23,7 +23,7 @@ const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) t
 
 console.log("\nArranque");
 let w = boot();
-ok("la portada se pinta con el mazo de historia", /190 hechos/.test(w.document.body.innerHTML));
+ok("la portada se pinta con el mazo de historia", /167 hechos/.test(w.document.body.innerHTML));
 ok("los tres bloques están en la galería", w.document.querySelectorAll("[data-block]").length === 3);
 // Elegir bloque selecciona su primer juego; el clic en el juego es explícito de todos
 // modos, que es como funcionará cuando un bloque tenga varios.

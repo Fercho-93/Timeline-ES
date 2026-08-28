@@ -9,7 +9,13 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 **Historia**
 
-- **Historia de España:** 190 hechos históricos verificados, desde la Antigüedad hasta la actualidad.
+- **Gran mezcla:** 474 cartas, las de los otros tres juegos del bloque más las de Estrenos de
+  cine, todas en la misma línea. Compartir eje del tiempo es lo único que hace falta para
+  mezclarlas, así que es una concatenación y no un mazo aparte: coloca a la vez un hecho de
+  España, uno del resto del mundo, un invento y un estreno de cine, con las mismas épocas que
+  Historia mundial.
+- **Historia de España:** 167 hechos históricos verificados, desde la Antigüedad hasta la actualidad,
+  sin dos cartas a un año de distancia salvo un puñado de hitos que de verdad lo son.
 - **Historia mundial:** 117 hechos de los faraones a hoy, mirando más allá de España y
   dejando los hitos técnicos al mazo de al lado. Mismo criterio de fechas que aquel.
 - **Inventos y descubrimientos:** 103 hitos de la técnica y la ciencia, de la escritura cuneiforme
@@ -43,7 +49,23 @@ La aplicación ofrece cuatro formas de jugar:
 
 Al terminar una partida —local, en solitario o de competición— si hubo alguna carta mal
 colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su
-explicación completa, en vez de perderse en el descarte sin más.
+explicación completa, en vez de perderse en el descarte sin más. Y en el momento mismo del
+fallo, mientras se ve el aviso, la línea de detrás señala el hueco exacto donde iba —con una
+frase para quien usa un lector de pantalla— en vez de dejar que se pierda en el descarte sin
+que nadie aprenda de él.
+
+## Ajustes
+
+Un botón de «Ajustes» en la cabecera, disponible en cualquier pantalla, abre tema, sonido y
+vibración:
+
+- **Tema:** automático (seguía la preferencia del móvil), claro u oscuro. La elección se
+  guarda y se aplica al instante, sin recargar.
+- **Sonido:** un pitido distinto para acierto y para fallo, generado con osciladores en vez
+  de archivos de audio, así que no pesa nada y no hay que precargarlo.
+- **Vibración:** un aviso corto al fallar, en los móviles que lo permiten.
+
+Los tres están activados por defecto y se pueden apagar por separado.
 
 ## Jugar en solitario
 
@@ -51,7 +73,13 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
 
 - **Reto diario:** las mismas 15 cartas para todo el mundo ese día y un solo intento. Las cartas se
   barajan con la fecha como semilla, así que no hace falta ningún servidor para que dos móviles
-  reciban exactamente el mismo reto. Completar el reto un día detrás de otro encadena una racha.
+  reciban exactamente el mismo reto. Completar el reto un día detrás de otro encadena una racha,
+  que además se ve como un calendario de las últimas cuatro semanas, no solo como un número. Al
+  terminar se puede compartir el resultado —puntuación y una cuadrícula de aciertos al estilo
+  Wordle, sin desvelar ninguna carta— por donde el móvil ofrezca o copiado al portapapeles. La
+  partida guarda además un identificador anónimo y estable por dispositivo y la secuencia exacta
+  de aciertos de cada día: nada de eso sale del móvil todavía, pero es lo que un marcador entre
+  amigos necesitaría el día que exista, sin tener que rehacer partidas ya jugadas para tenerlo.
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
 - **Competición:** una ronda de 5 cartas por cada uno de los seis juegos, en un orden al azar

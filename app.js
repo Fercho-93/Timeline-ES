@@ -82,7 +82,7 @@
   }
 
   function header(extra = "") {
-    return `<header class="topbar"><div class="brand">Continuum</div>${extra}</header>`;
+    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${extra}${CT.settingsButton()}</div></header>`;
   }
 
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
@@ -232,11 +232,15 @@
     const timelineCards = game.timeline.map(id => cardsById.get(id));
     const handCards = player.hand.map(id => cardsById.get(id));
     const selectedCard = selectedCardId ? cardsById.get(selectedCardId) : null;
+    // Tras un fallo, `result` sigue apuntando a la carta que se acaba de fallar (todavía
+    // no se ha pulsado «Terminar turno»): se aprovecha para señalar en la propia línea el
+    // hueco donde iba de verdad, justo debajo del aviso que ya lo cuenta con palabras.
+    const failIndex = result && !result.correct ? CT.correctIndex(selectedModeKey, timelineCards, result.card) : null;
     const slots = [];
     for (let i = 0; i <= timelineCards.length; i++) {
       slots.push(pendingIndex === i && selectedCard
         ? confirmSlot(selectedCard)
-        : `<button class="slot" data-action="place" data-index="${i}" ${selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${i + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
+        : slotMarkup(i, timelineCards.length, "place", !!selectedCardId, i === failIndex));
       if (i < timelineCards.length) {
         slots.push(timelineCardMarkup(timelineCards[i]));
       }
@@ -249,6 +253,7 @@
       <section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p></section>
     </div>`);
     if (selectedCardId) setTimeout(() => document.querySelector(".timeline-wrap")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+    if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
     // Arrastrar una carta hasta un hueco lleva al mismo sitio que tocarla y luego tocar
     // el hueco: a la confirmación. El paso de confirmar se mantiene porque en un móvil
     // el dedo falla y la jugada no debería depender de eso.
@@ -269,6 +274,15 @@
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
     return `<article class="timeline-card" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+  }
+
+  // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
+  // carta que se acaba de fallar. Lo usan tanto la partida como el solitario.
+  function slotMarkup(index, total, actionName, enabled, isCorrectSlot) {
+    if (isCorrectSlot) {
+      return `<button class="slot slot-correct" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="Aquí iba la carta que acabas de fallar"><span>✦</span><small>Aquí</small></button>`;
+    }
+    return `<button class="slot" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${total + 1}"><span>+</span></button>`;
   }
 
   function confirmSlot(card) {
@@ -299,6 +313,8 @@
       returned = true;
       (game.failed = game.failed || []).push(selectedCardId);
     }
+    CT.playSound(correct ? "hit" : "miss");
+    if (!correct) CT.vibrate("miss");
     result = { correct, returned, card, playerName: player.name };
     selectedCardId = null;
     saveGame();
@@ -320,7 +336,10 @@
     gameView();
     const { correct, returned, card } = result;
     const era = eraForCard(card);
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    // El hueco resaltado detrás del aviso ya lo enseña; esta frase lo dice también con
+    // palabras, que es lo único que le llega a quien usa un lector de pantalla.
+    const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, game.timeline.map(id => cardsById.get(id)), card)}</p>`;
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p><button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   function finishTurn() {
@@ -397,6 +416,9 @@
   // Los fallos de la última partida en solitario, para poder repasarlos aunque `solo`
   // ya se haya vaciado al terminar.
   let soloFailedForReview = [];
+  // El texto para compartir el reto diario, por la misma razón: se construye antes de
+  // vaciar `solo` y el botón de compartir vive en la pantalla siguiente.
+  let lastShareText = null;
 
   function soloKey() { return `hilo-solo-${selectedModeKey}-v1`; }
 
@@ -454,6 +476,24 @@
     try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* almacenamiento lleno */ }
   }
 
+  // Un identificador estable y anónimo, generado una vez y guardado aparte de `records`
+  // (que se indexa por modalidad, no vale para algo que es del jugador y no del mazo). No
+  // identifica a nadie ni sale de este móvil todavía: hoy solo sirve para que el reto
+  // diario ya guarde lo que un marcador entre amigos necesitaría el día que exista, sin
+  // tener que tocar las partidas ya jugadas para añadírselo después.
+  const PLAYER_KEY = "hilo-jugador-v1";
+
+  function playerId() {
+    try {
+      let id = localStorage.getItem(PLAYER_KEY);
+      if (!id) {
+        id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        localStorage.setItem(PLAYER_KEY, id);
+      }
+      return id;
+    } catch { return null; }
+  }
+
   function saveSolo() {
     // La competición no se guarda: cada ronda cambia de tema y, con él, de modalidad
     // seleccionada, así que su clave de guardado (soloKey, atada a esa modalidad)
@@ -473,6 +513,27 @@
     } catch { return null; }
   }
 
+  const CALENDARIO_DIAS = 28;
+
+  // Las últimas cuatro semanas del reto diario, un cuadrito por día. La racha ya se ve
+  // como número; esto enseña su forma: dónde hay huecos y qué tan bien fue cada intento.
+  function calendarHtml(records) {
+    const days = records.days || {};
+    const celdas = [];
+    for (let i = CALENDARIO_DIAS - 1; i >= 0; i--) {
+      const fecha = new Date();
+      fecha.setDate(fecha.getDate() - i);
+      const clave = fecha.toLocaleDateString("sv-SE");
+      const entrada = days[clave];
+      const ratio = entrada ? entrada.hits / entrada.total : null;
+      const nivel = ratio === null ? "vacio" : ratio >= 0.8 ? "alto" : ratio >= 0.5 ? "medio" : "bajo";
+      const fechaLegible = fecha.toLocaleDateString("es-ES", { day: "numeric", month: "long" });
+      const etiqueta = entrada ? `${fechaLegible}: ${entrada.hits} de ${entrada.total}` : `${fechaLegible}: sin jugar`;
+      celdas.push(`<span class="cal-day cal-${nivel}" title="${escapeHtml(etiqueta)}" aria-label="${escapeHtml(etiqueta)}"></span>`);
+    }
+    return `<div class="cal-grid" role="img" aria-label="Calendario de los últimos ${CALENDARIO_DIAS} días del reto diario">${celdas.join("")}</div>`;
+  }
+
   function soloHome() {
     screen = "solo-home";
     solo = loadSolo();
@@ -490,6 +551,7 @@
             ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
             : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
           <div class="solo-stats"><span><b>${records.streak || 0}</b><small>días seguidos</small></span><span><b>${records.best || 0}</b><small>mejor marca libre</small></span></div>
+          ${calendarHtml(records)}
         </div>
         <div class="panel solo-panel">
           <div class="section-label">Partida libre</div>
@@ -522,11 +584,12 @@
     screen = "solo";
     const card = cardsById.get(solo.current);
     const timelineCards = solo.timeline.map(id => cardsById.get(id));
+    const failIndex = result && !result.correct ? CT.correctIndex(selectedModeKey, timelineCards, result.card) : null;
     const slots = [];
     for (let i = 0; i <= timelineCards.length; i++) {
       slots.push(pendingIndex === i
         ? confirmSlot(card)
-        : `<button class="slot" data-action="solo-place" data-index="${i}" aria-label="Colocar en la posición ${i + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
+        : slotMarkup(i, timelineCards.length, "solo-place", true, i === failIndex));
       if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i]));
     }
     const restantes = solo.total ? solo.total - solo.played : solo.deck.length + 1;
@@ -538,6 +601,7 @@
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
     </div>`);
+    if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
     CT.enableDrag({
       cardSelector: ".hand-card", slotSelector: ".slot",
       onDrop: (id, index) => {
@@ -561,7 +625,12 @@
       (solo.failed = solo.failed || []).push(solo.current);
     }
     solo.played += 1;
+    // Un acierto o un fallo por carta, en el orden en que se jugaron: es lo único que
+    // hace falta para dibujar la cuadrícula de aciertos al compartir el reto diario.
+    (solo.sequence = solo.sequence || []).push(correct);
     pendingIndex = null;
+    CT.playSound(correct ? "hit" : "miss");
+    if (!correct) CT.vibrate("miss");
     result = { correct, card, solo: true };
     saveSolo();
     soloResult();
@@ -572,7 +641,8 @@
     const { correct, card } = result;
     const era = eraForCard(card);
     const acabada = solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total);
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div><p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
@@ -588,10 +658,17 @@
     screen = "solo-end";
     const total = solo.total || solo.played;
     const records = modeRecords();
+    // Se guarda con cada marca, no solo al crearlo, para que una instalación que ya
+    // tenía partidas antes de este cambio acabe teniendo el suyo igual.
+    records.playerId = records.playerId || playerId();
     const dia = today();
-    if (solo.kind === "daily" && !(records.days && records.days[dia])) {
+    const esReto = solo.kind === "daily" && !(records.days && records.days[dia]);
+    if (esReto) {
       records.days = records.days || {};
-      records.days[dia] = { hits: solo.hits, total };
+      // `sequence` y `finishedAt` no los usa nada todavía: son lo que necesitaría un
+      // marcador entre amigos del reto diario si algún día existe, guardado desde ya
+      // para no depender de reconstruirlo a partir de partidas viejas que no lo llevan.
+      records.days[dia] = { hits: solo.hits, total, sequence: solo.sequence || [], finishedAt: new Date().toISOString() };
       records.streak = records.lastDay === yesterday() ? (records.streak || 0) + 1 : 1;
       records.lastDay = dia;
       // No hace falta guardar el histórico entero: basta con los últimos días.
@@ -607,11 +684,35 @@
       ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
       : `Has aguantado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} seguidas antes de quedarte sin vidas.`;
     soloFailedForReview = (solo.failed || []).map(id => ({ id, mode: solo.mode }));
+    const compartir = solo.kind === "daily" ? shareText(currentMode().name, dia, solo.hits, total, solo.sequence || [], records.streak) : null;
     solo.finished = true;
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center">${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    lastShareText = compartir;
+  }
+
+  // Un resumen al estilo Wordle: cuenta el resultado sin revelar ninguna carta, así que
+  // se puede compartir sin destriparle el reto a quien todavía no lo ha jugado.
+  function shareText(modeName, dia, hits, total, sequence, streak) {
+    const grid = sequence.map(ok => (ok ? "🟩" : "⬜")).join("");
+    const fecha = dia.split("-").reverse().join("/");
+    const rachaLinea = streak > 1 ? `\n🔥 racha de ${streak} días` : "";
+    return `Continuum · ${modeName} · reto diario ${fecha}\n📊 ${hits}/${total}${rachaLinea}\n${grid}`;
+  }
+
+  async function shareDaily() {
+    if (!lastShareText) return;
+    if (navigator.share) {
+      try { await navigator.share({ text: lastShareText }); return; } catch { /* cancelado, se intenta copiar */ }
+    }
+    try {
+      await navigator.clipboard.writeText(lastShareText);
+      showToast("Resultado copiado");
+    } catch {
+      showToast("No se pudo compartir");
+    }
   }
 
   // Competición: una ronda de ROUND_CARDS cartas por cada modalidad ya establecida, en
@@ -788,6 +889,7 @@
     else if (action === "abandon") { game = null; saveGame(); home(); }
     else if (action === "review-game") reviewScreen((game.failed || []).map(id => ({ id, mode: game.mode })), `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
     else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
+    else if (action === "share-daily") shareDaily();
     else if (action === "review-comp") reviewScreen(comp.totalFailed, `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();

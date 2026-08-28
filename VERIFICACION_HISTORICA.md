@@ -4,20 +4,31 @@ Fecha de revisión: 12 de julio de 2026.
 
 ## Resultado
 
-- 190 cartas revisadas individualmente.
-- 190 identificadores únicos y 190 títulos únicos.
+- 167 cartas revisadas individualmente.
+- 167 identificadores únicos y 167 títulos únicos.
 - Ninguna carta sin año, título o explicación.
 - Periodo cubierto: desde 575 a. C. hasta 2020.
-- Distribución: 20 cartas anteriores a 711, 34 medievales, 37 de 1492–1699, 18 de 1700–1807, 42 de 1808–1930, 17 de 1931–1974 y 22 desde 1975.
+- Distribución: 20 cartas anteriores a 711, 32 medievales, 34 de 1492–1699, 16 de 1700–1807, 32 de 1808–1930, 14 de 1931–1974 y 19 desde 1975.
 
 La revisión distingue entre una fecha documental exacta, una fecha convencional y una datación discutida. Cuando no existe consenso suficiente, el matiz aparece en la propia tarjeta.
+
+## Revisión de espaciado (28 de agosto de 2026)
+
+Este mazo es el más antiguo del juego y el único cuyas cartas iniciales no pasaban por la
+comprobación de espaciado que sí se exige a Historia mundial e Inventos: ningún año a un año
+exacto de otro en más de una de cada diez adyacencias, porque a esa distancia acertar el orden
+deja de depender de saber algo y pasa a depender de adivinar. 23 cartas —añadidas en revisiones
+posteriores a las 71 originales, para ganar densidad— quedaban a un año de otra ya existente. Se
+retiraron todas salvo tres cuyo peso histórico pesaba más que el hueco que dejaban (la vuelta al
+mundo de Elcano, el matrimonio igualitario y el fin de la actividad armada de ETA), que se
+conservan a sabiendas de que forman pareja ajustada con la carta contigua. El resultado son 8
+pares a un año de distancia sobre 166, bien por debajo del límite de `tests/mazos.mjs`.
 
 ## Matices incorporados
 
 - **Covadonga (722):** se conserva la fecha tradicional, pero se indica que la cronología exacta es debatida.
 - **Emerita Augusta (25 a. C.):** se presenta como datación tradicional y se menciona la propuesta alternativa de 19 a. C.
 - **Reino de Pamplona (824):** se identifica como fecha convencional para sus orígenes.
-- **Castilla y Aragón (1479):** se describe como unión dinástica; las coronas conservaron instituciones y leyes propias.
 - **La Celestina (1499):** se habla de la edición más antigua conocida y de una fecha tradicional aproximada.
 - **Real Academia Española (1713):** se diferencia la primera reunión formal de la protección real concedida en 1714.
 - **Bandera rojigualda (1785):** se aclara que nació como pabellón naval, no todavía como bandera nacional general.
@@ -74,4 +85,4 @@ La revisión distingue entre una fecha documental exacta, una fecha convencional
 
 ## Control técnico
 
-Además del contraste histórico se ejecutó una validación automática del catálogo para detectar identificadores repetidos, títulos duplicados, años no numéricos, campos vacíos y errores de sintaxis. El resultado fue correcto en las 190 cartas.
+Además del contraste histórico se ejecutó una validación automática del catálogo para detectar identificadores repetidos, títulos duplicados, años no numéricos, campos vacíos y errores de sintaxis. El resultado fue correcto en las 167 cartas.
