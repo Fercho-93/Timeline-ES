@@ -144,7 +144,13 @@
           <h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
           ${gameList()}
           <button class="comp-promo mixed-promo${selectedModeKey === "mixed" ? " active" : ""}" data-action="set-mode" data-mode="mixed" aria-pressed="${selectedModeKey === "mixed"}">
-            <span class="comp-promo-art mixed-art" aria-hidden="true">⏳</span>
+            <span class="comp-promo-art mixed-art" aria-hidden="true">
+              <i class="mixed-icon mixed-icon-a">🏛️</i>
+              <i class="mixed-icon mixed-icon-b">🗺️</i>
+              <i class="mixed-icon mixed-icon-c">⚙️</i>
+              <i class="mixed-icon mixed-icon-d">🎬</i>
+              <b class="mixed-glyph">⏳</b>
+            </span>
             <span class="comp-promo-copy"><b>Gran mezcla ⏳</b><small>No es de un bloque: mezcla Historia, Historia mundial, Inventos y Estrenos de cine por su fecha. ${CT.mode("mixed").cards.length} cartas.</small></span>
           </button>
           <div class="actions">

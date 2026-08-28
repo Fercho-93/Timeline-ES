@@ -388,7 +388,26 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 /* «Gran mezcla» no tiene carátula propia: no es de un bloque, así que no le corresponde
    ninguna de las tres fotos. Un símbolo sobre un degradado del propio acento la distingue
    sin fingir que pertenece a Historia, Cine o Geografía. */
-.mixed-art { display: flex; align-items: center; justify-content: center; font-size: 2.6rem; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); }
+/* Los cuatro mazos que se mezclan orbitan el reloj de arena central, sobre rayos y un
+   resplandor —el mismo lenguaje que ya usa la carátula de Competición, la otra tarjeta
+   plana de esta pantalla—, para que las dos hagan pareja en vez de que una tenga una
+   ilustración y la otra un icono suelto flotando en un degradado vacío. Colores fijos y
+   no `--accent`/`--accent-dark`: es una ilustración de marca, como las carátulas de los
+   bloques, no un bloque de texto que deba invertirse con el tema. */
+.mixed-art {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255,244,222,.45), transparent 58%),
+    repeating-conic-gradient(from 0deg at 50% 46%, rgba(255,255,255,.08) 0deg 5deg, transparent 5deg 20deg),
+    linear-gradient(160deg, #a5813f, #6d5330);
+}
+.mixed-glyph { position: relative; z-index: 1; font-size: 2.1rem; filter: drop-shadow(0 2px 6px rgba(0,0,0,.28)); }
+.mixed-icon { position: absolute; font-size: 1.05rem; font-style: normal; opacity: .6; filter: drop-shadow(0 1px 3px rgba(0,0,0,.25)); }
+.mixed-icon-a { top: 14px; left: 20%; }
+.mixed-icon-b { top: 14px; right: 20%; }
+.mixed-icon-c { bottom: 14px; left: 20%; }
+.mixed-icon-d { bottom: 14px; right: 20%; }
 .mixed-promo.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .comp-summary { list-style: none; margin: 18px auto; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: left; max-width: 360px; }
 .comp-summary li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: .85rem; }
