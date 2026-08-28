@@ -176,10 +176,12 @@
   // Los juegos se agrupan en bloques. La portada enseña el bloque y no el juego, así que
   // añadir uno nuevo es declararlo aquí y sumarlo a `games`.
   //
-  // «Gran mezcla» no está en ningún bloque a propósito: mezcla las cartas de Historia
-  // con las de Cine, así que meterla dentro de un bloque temático sería mentir sobre lo
-  // que contiene. Se presenta aparte, como una modalidad transversal por eje del tiempo
-  // y no por tema, en la propia portada (`app.js`, función `home`).
+  // «Gran mezcla» es un bloque más, pero no temático: agrupa por eje del tiempo en vez de
+  // por tema, con Historia y Cine a la vez dentro. Es el único bloque sin carátula
+  // fotográfica —no hay una imagen que valga para «un poco de los otros tres»—, así que
+  // `art: "mixed"` no aparece en `BLOCK_ART` (`app.js`) y `blockArt` lo resuelve entero
+  // con CSS: el mismo icono que ya llevan todos los bloques en el lomo, sobre un fondo
+  // ilustrado en vez de una fotografía.
   //
   // La clave de cada juego viaja en el documento de la sala compartida, así que cambiar
   // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga
@@ -187,7 +189,8 @@
   const BLOCKS = {
     historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "world", "inventions"] },
     cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
-    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] }
+    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] },
+    mezcla: { key: "mezcla", name: "Gran mezcla", icon: "⏳", art: "mixed", tagline: "Ordena el tiempo.", games: ["mixed"] }
   };
 
   const DEFAULT_MODE = "history";
@@ -199,13 +202,9 @@
 
   function block(blockKey) { return hasBlock(blockKey) ? BLOCKS[blockKey] : BLOCKS[DEFAULT_BLOCK]; }
 
-  // De un juego a su bloque, para saber qué carátula toca desde una partida guardada. Un
-  // juego que no esté en ningún bloque —hoy, solo «Gran mezcla»— cae en el de por
-  // defecto salvo que se pida lo contrario: elegirlo no debe forzar una carátula que no
-  // le corresponde, así que `setMode` en `app.js` pide `fallback: false`.
-  function blockOf(modeKey, { fallback = true } = {}) {
-    const dueño = Object.values(BLOCKS).find(item => item.games.includes(modeKey));
-    return dueño || (fallback ? BLOCKS[DEFAULT_BLOCK] : undefined);
+  // De un juego a su bloque, para saber qué carátula toca desde una partida guardada.
+  function blockOf(modeKey) {
+    return Object.values(BLOCKS).find(item => item.games.includes(modeKey)) || BLOCKS[DEFAULT_BLOCK];
   }
 
   function blockGames(blockKey) { return block(blockKey).games.map(mode); }
