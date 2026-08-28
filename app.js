@@ -474,13 +474,24 @@
     overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${result.pulse ? "⚡ Pulso · " : ""}${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
-  function finishTurn() {
+  function advanceTurn() {
     game.turnsInRound += 1;
     if (game.turnsInRound >= game.players.length && resolveRound()) return;
     game.current = (game.current + 1) % game.players.length;
     result = null;
     saveGame();
     renderPass();
+  }
+
+  function finishTurn() {
+    const acceptedCardId = result?.correct ? result.card.id : null;
+    if (!acceptedCardId) return advanceTurn();
+
+    // La carta ya está en el tablero: primero retiramos el aviso y se ve cómo aterriza.
+    appEl.querySelector(".overlay")?.classList.add("result-exit");
+    const cardEl = appEl.querySelector(`.timeline-card[data-id="${acceptedCardId}"]`);
+    requestAnimationFrame(() => cardEl?.classList.add("card-settling"));
+    setTimeout(advanceTurn, 720);
   }
 
   // Devuelve true si la partida ha terminado. Nadie puede empezar un turno con la mano
