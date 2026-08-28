@@ -30,6 +30,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil, y que ni un guion de `index.html` ni una carátula se queden sin precargar. Sin dependencias. |
 | `mazos.mjs` | Calidad de los seis mazos: repeticiones, huecos, cartas demasiado juntas y cifras que el redondeo no confunda. Sin dependencias. |
 | `solitario.mjs` | Solitario, reto diario, confirmación al colocar, modalidad de países y el mapa de la línea. |
+| `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
 | `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie y que las bandas tengan contraste. |
 | `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
 | `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |

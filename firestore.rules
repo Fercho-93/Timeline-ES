@@ -62,9 +62,9 @@ service cloud.firestore {
         return isHost()
           && before().status == 'lobby'
           && before().playerOrder.size() >= 2
-          && changed().hasOnly(['handSize', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
+          && changed().hasOnly(['handSize', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
-                                'version', 'updatedAt'])
+                                'pulseTurn', 'version', 'updatedAt'])
           && after().status == 'playing'
           && after().phase == 'turn'
           && after().handSize >= 1 && after().handSize <= 6
@@ -100,6 +100,74 @@ service cloud.firestore {
               : (after().timeline.size() == before().timeline.size()
                  && after().players[uid()].hand.size() <= before().players[uid()].hand.size()
                  && after().players[uid()].hand.size() >= before().players[uid()].hand.size() - 1))
+          && bumped();
+      }
+
+      // ---------------------------------------------------------------------
+      // El Pulso. Es la única jugada que toca la mano de otra persona, así que
+      // `onlyMyHand()` —lo que protege al resto de jugadas— aquí no sirve y hay que
+      // acotar a mano exactamente cuánto puede cambiar cada cosa.
+      //
+      // Va en dos pasos porque entre lanzarlo y colocar la carta hay que enseñársela a
+      // quien reta: `turn` -> `pulse` la saca del mazo, y `pulse` -> `reveal` la resuelve.
+
+      function pulseTarget() { return before().pulseTurn.targetUid; }
+
+      // Paso 1: gastar el Pulso y sacar la carta del mazo. Ninguna mano cambia todavía.
+      function validPulseStart() {
+        return isCurrent()
+          && before().status == 'playing'
+          && before().phase == 'turn'
+          && before().get('pulse', false) == true
+          && changed().hasOnly(['players', 'deck', 'discard', 'phase', 'pulseTurn', 'version', 'updatedAt'])
+          && after().phase == 'pulse'
+          // Solo se marca el Pulso como gastado: la mano no se toca en este paso.
+          && onlyMyHand()
+          && before().players[uid()].get('pulseUsed', false) == false
+          && after().players[uid()].pulseUsed == true
+          && after().players[uid()].hand.size() == before().players[uid()].hand.size()
+          && after().players[uid()].hand.size() >= 2
+          // Un objetivo real, distinto de uno mismo y sin escudo de esta ronda.
+          && after().pulseTurn.targetUid in before().playerOrder
+          && after().pulseTurn.targetUid != uid()
+          && before().players[after().pulseTurn.targetUid].get('shieldRound', 0) != before().round
+          && after().pulseTurn.cardId is int
+          // Sale exactamente una carta de mazo + descarte (barajar el descarte no cuenta).
+          && after().deck.size() + after().discard.size() == before().deck.size() + before().discard.size() - 1
+          && after().timeline == before().timeline
+          && bumped();
+      }
+
+      // Paso 2: colocar la carta del reto y repartir las consecuencias.
+      function validPulseEnd() {
+        return isCurrent()
+          && before().status == 'playing'
+          && before().phase == 'pulse'
+          && changed().hasOnly(['players', 'deck', 'discard', 'timeline', 'phase', 'pulseTurn',
+                                'reveal', 'version', 'updatedAt'])
+          && after().phase == 'reveal'
+          && after().pulseTurn == null
+          && after().reveal.cardId == before().pulseTurn.cardId
+          && after().reveal.correct is bool
+          && after().reveal.playerUid == uid()
+          && (after().reveal.correct
+              // Acierta: la carta va a la línea y una carta mía pasa a la mano del rival.
+              // Es el único caso de todo el juego en que cambian dos manos, y solo esas.
+              ? (after().players.diff(before().players).affectedKeys().hasOnly([uid(), pulseTarget()])
+                 && after().timeline.size() == before().timeline.size() + 1
+                 && after().deck.size() == before().deck.size()
+                 && after().discard.size() == before().discard.size()
+                 && after().players[uid()].hand.size() == before().players[uid()].hand.size() - 1
+                 && after().players[pulseTarget()].hand.size() == before().players[pulseTarget()].hand.size() + 1
+                 && after().players[pulseTarget()].shieldRound == before().round)
+              // Falla: solo cambia mi mano. Que el rival no pueda salir beneficiado es lo
+              // que impide que alguien ya sin opciones falle aposta para regalar la partida.
+              : (onlyMyHand()
+                 && after().timeline == before().timeline
+                 && after().players[uid()].hand.size() == before().players[uid()].hand.size() + 1
+                 // La carta del reto estaba fuera de todo mientras duraba la fase, así que
+                 // al volver (al descarte) el recuento total sube exactamente en una.
+                 && myCardsAfter() == myCardsBefore() + 1))
           && bumped();
       }
 
@@ -196,9 +264,11 @@ service cloud.firestore {
           ? validKick()
           : (before().status == 'lobby'
               ? (after().status == 'lobby' ? validJoin() : validStart())
-              : (after().phase == 'reveal'
-                  ? validPlay()
-                  : (before().phase == 'reveal' ? validAdvance() : validSkip()))));
+              : (after().phase == 'pulse'
+                  ? validPulseStart()
+                  : (after().phase == 'reveal'
+                      ? (before().phase == 'pulse' ? validPulseEnd() : validPlay())
+                      : (before().phase == 'reveal' ? validAdvance() : validSkip())))));
 
       allow delete: if isHost();
     }

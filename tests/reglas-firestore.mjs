@@ -125,6 +125,97 @@ await check("el anfitrión expulsa desde el vestíbulo", "allow", updateDoc(ref(
 await seed(playing({ current: 1, phase: "reveal", reveal: { cardId: 3, correct: true, playerUid: P2, playerName: "Bea" } }));
 await check("el anfitrión salta un turno ya revelado", "allow", updateDoc(ref(ctx(HOST)), { current: 2, turnsInRound: 1, round: 1, phase: "turn", reveal: null, version: 2, updatedAt: 2 }));
 
+console.log("\nEl Pulso");
+// Es la única jugada que toca la mano de otra persona, así que lo que hay que demostrar
+// aquí no es que funcione, sino que no se pueda usar para robar cartas.
+const conPulso = (over = {}) => playing({
+  pulse: true, pulseTurn: null,
+  players: {
+    [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1, pulseUsed: false, shieldRound: 0 },
+    [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 0 },
+    [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 }
+  }, ...over
+});
+// Estado a mitad de Pulso: Ana ya gastó el suyo y tiene la carta 10 en la mano del reto.
+const enPulso = (over = {}) => conPulso({
+  phase: "pulse", deck: [11, 12], pulseTurn: { targetUid: P2, cardId: 10 },
+  players: {
+    [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1, pulseUsed: true, shieldRound: 0 },
+    [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 0 },
+    [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 }
+  }, ...over
+});
+const lanzar = (over = {}) => ({
+  players: {
+    [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1, pulseUsed: true, shieldRound: 0 },
+    [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 0 },
+    [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 }
+  },
+  deck: [11, 12], discard: [], phase: "pulse", pulseTurn: { targetUid: P2, cardId: 10 },
+  version: 2, updatedAt: 2, ...over
+});
+
+await seed(conPulso());
+await check("quien tiene el turno lanza su Pulso", "allow", updateDoc(ref(ctx(HOST)), lanzar()));
+await seed(conPulso());
+await check("lanzarlo fuera de turno", "deny", updateDoc(ref(ctx(P2)), lanzar()));
+await seed(conPulso({ pulse: false }));
+await check("lanzarlo en una partida sin Pulso", "deny", updateDoc(ref(ctx(HOST)), lanzar()));
+await seed(conPulso({ players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1, pulseUsed: true, shieldRound: 0 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 0 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } }));
+await check("lanzarlo dos veces", "deny", updateDoc(ref(ctx(HOST)), lanzar()));
+await seed(conPulso({ players: { [HOST]: { name: "Ana", hand: [1], joinedAt: 1, pulseUsed: false, shieldRound: 0 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 0 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } }));
+await check("lanzarlo con una sola carta", "deny", updateDoc(ref(ctx(HOST)), lanzar({ players: { [HOST]: { name: "Ana", hand: [1], joinedAt: 1, pulseUsed: true, shieldRound: 0 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 0 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } })));
+await seed(conPulso());
+await check("retarse a uno mismo", "deny", updateDoc(ref(ctx(HOST)), lanzar({ pulseTurn: { targetUid: HOST, cardId: 10 } })));
+await seed(conPulso({ players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1, pulseUsed: false, shieldRound: 0 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 1 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } }));
+await check("retar a quien ya recibió una carta esta ronda", "deny", updateDoc(ref(ctx(HOST)), lanzar()));
+await seed(conPulso());
+await check("aprovechar el lanzamiento para robar una carta", "deny", updateDoc(ref(ctx(HOST)), lanzar({ players: { [HOST]: { name: "Ana", hand: [1, 2, 3], joinedAt: 1, pulseUsed: true, shieldRound: 0 }, [P2]: { name: "Bea", hand: [4], joinedAt: 2, pulseUsed: false, shieldRound: 0 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } })));
+
+// Resolverlo: acertando pasa una carta mía al rival; fallando solo cambia mi mano.
+const acierta = (over = {}) => ({
+  players: {
+    [HOST]: { name: "Ana", hand: [2], joinedAt: 1, pulseUsed: true, shieldRound: 0 },
+    [P2]: { name: "Bea", hand: [3, 4, 1], joinedAt: 2, pulseUsed: false, shieldRound: 1 },
+    [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 }
+  },
+  deck: [11, 12], discard: [], timeline: [20, 10], phase: "reveal", pulseTurn: null,
+  reveal: { cardId: 10, correct: true, playerUid: HOST, playerName: "Ana", targetUid: P2, targetName: "Bea", giftId: 1 },
+  version: 2, updatedAt: 2, ...over
+});
+const falla = (over = {}) => ({
+  players: {
+    [HOST]: { name: "Ana", hand: [1, 2, 11], joinedAt: 1, pulseUsed: true, shieldRound: 0 },
+    [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2, pulseUsed: false, shieldRound: 0 },
+    [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 }
+  },
+  deck: [12], discard: [10], timeline: [20], phase: "reveal", pulseTurn: null,
+  reveal: { cardId: 10, correct: false, playerUid: HOST, playerName: "Ana", targetUid: P2, targetName: "Bea", giftId: null },
+  version: 2, updatedAt: 2, ...over
+});
+
+await seed(enPulso());
+await check("acertar el Pulso y pasarle una carta al rival", "allow", updateDoc(ref(ctx(HOST)), acierta()));
+await seed(enPulso());
+await check("fallar el Pulso y robar del mazo", "allow", updateDoc(ref(ctx(HOST)), falla()));
+await seed(enPulso());
+await check("resolver el Pulso de otra persona", "deny", updateDoc(ref(ctx(P2)), acierta()));
+// Lo que de verdad protege la regla nueva: que abrir dos manos no sea un permiso general.
+await seed(enPulso());
+await check("acertar quitándole una carta al rival en vez de dársela", "deny", updateDoc(ref(ctx(HOST)), acierta({ players: { [HOST]: { name: "Ana", hand: [1, 2, 3], joinedAt: 1, pulseUsed: true, shieldRound: 0 }, [P2]: { name: "Bea", hand: [4], joinedAt: 2, pulseUsed: false, shieldRound: 1 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } })));
+await seed(enPulso());
+await check("fallar quitándole una carta al rival", "deny", updateDoc(ref(ctx(HOST)), falla({ players: { [HOST]: { name: "Ana", hand: [1, 2, 11], joinedAt: 1, pulseUsed: true, shieldRound: 0 }, [P2]: { name: "Bea", hand: [3], joinedAt: 2, pulseUsed: false, shieldRound: 0 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } })));
+await seed(enPulso());
+await check("acertar tocando de paso la mano de quien no está en el Pulso", "deny", updateDoc(ref(ctx(HOST)), acierta({ players: { [HOST]: { name: "Ana", hand: [2], joinedAt: 1, pulseUsed: true, shieldRound: 0 }, [P2]: { name: "Bea", hand: [3, 4, 1], joinedAt: 2, pulseUsed: false, shieldRound: 1 }, [P3]: { name: "Cid", hand: [], joinedAt: 3, pulseUsed: false, shieldRound: 0 } } })));
+await seed(enPulso());
+await check("acertar sin dejar la carta en la línea", "deny", updateDoc(ref(ctx(HOST)), acierta({ timeline: [20] })));
+await seed(enPulso());
+await check("fallar sin descartar la carta del reto", "deny", updateDoc(ref(ctx(HOST)), falla({ discard: [], deck: [12] })));
+await seed(enPulso());
+await check("resolver diciendo que la carta era otra", "deny", updateDoc(ref(ctx(HOST)), acierta({ reveal: { cardId: 11, correct: true, playerUid: HOST, playerName: "Ana", targetUid: P2, targetName: "Bea", giftId: 1 } })));
+await seed(conPulso());
+await check("saltarse el paso de sacar la carta y resolver directamente", "deny", updateDoc(ref(ctx(HOST)), acierta()));
+
 console.log("\nLectura y borrado");
 await seed(playing());
 await check("alguien de fuera lee una partida en curso", "deny", getDoc(ref(ctx(OUT))));

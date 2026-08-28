@@ -109,11 +109,15 @@ El modo local no utiliza backend ni cuentas y guarda la partida únicamente en e
 
 El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo: las reglas de seguridad solo hay que volver a publicarlas cuando cambia su contenido, no al añadir un juego nuevo.
 
+> **Al desplegar el Pulso hay que volver a publicar `firestore.rules`.** Es la única jugada
+> que toca la mano de dos personas a la vez, así que trae reglas nuevas; sin republicarlas,
+> el servidor rechazará los Pulsos de las salas compartidas.
+
 ## Comprobaciones
 
-`tests/` contiene diez comprobaciones automáticas: la sintaxis de todos los archivos,
+`tests/` contiene once comprobaciones automáticas: la sintaxis de todos los archivos,
 partidas completas sobre un DOM simulado, cuarenta partidas al azar que vigilan bloqueos y el
-conteo de cartas, la calidad de los seis mazos, el modo solitario, la accesibilidad con teclado y lector de pantalla, el service worker y las
+conteo de cartas, la calidad de los seis mazos, el modo solitario, el Pulso, la accesibilidad con teclado y lector de pantalla, el service worker y las
 reglas de Firestore contra el emulador oficial. Se lanzan con `npm install` y `npm test`, y se ejecutan solas en cada propuesta de
 cambio. Las instrucciones están en `tests/README.md`.
 
@@ -134,6 +138,33 @@ cambio. Las instrucciones están en `tests/README.md`.
 - Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.
 - Si al desempatar ya no quedan cartas que repartir, la partida termina y ganan todas ellas.
 - Si al fallar no queda nada que robar, la carta vuelve a la mano en lugar de descartarse.
+
+## El Pulso
+
+Se activa con un interruptor al montar la partida; sin él, el juego es exactamente el de
+siempre. Es la única jugada que toca la mano de otra persona:
+
+- **Una vez por partida y jugador**, y sustituye al turno en vez de sumarse a él.
+- Retas a quien elijas. **El mazo saca una carta que tú no eliges** y la colocas sin prisa:
+  no hay cronómetro, la dificultad la pone lo llena que esté la línea. Al principio los
+  huecos son anchos y aciertas casi seguro, pero es cuando menos daño haces; al final son
+  estrechos y es cuando el Pulso decide la partida.
+- **Si aciertas**, la carta se queda en la línea y le pasas una carta al azar de tu mano.
+  Al azar y no a elección: si pudieras escogerla soltarías siempre la que no sabes colocar,
+  y el Pulso dejaría de ser una apuesta para ser un vertedero.
+- **Si fallas**, la carta va al descarte y robas tú una. A la otra persona no le pasa nada.
+  El castigo recae solo en quien reta a propósito: si además le quitara una carta al rival,
+  alguien ya sin opciones podría fallar aposta para regalarle la partida a quien quisiera.
+- Hacen falta **dos cartas** para lanzarlo. Con una sola, ganar el Pulso te dejaría a cero
+  regalándola, sin haberla colocado nunca en la línea.
+- Quien recibe una carta **no puede volver a ser retado esa ronda**.
+- Sí se puede retar a quien ya está **a cero cartas** esperando ganar al final de la ronda:
+  acertar le quita la victoria, y es la jugada más tensa del mecanismo.
+
+Funciona en los dos modos. En un solo móvil, quien recibe la carta se entera al recoger el
+teléfono, en la pantalla de pasar el turno. En varios móviles todo el mundo ve el Pulso en
+directo, pero el título de la carta que cambia de mano solo lo ven las dos personas
+implicadas: el resto se entera de que hubo trasvase, no de cuál era la carta.
 
 En el modo de varios móviles, el anfitrión puede saltar el turno de quien se haya quedado sin
 batería o expulsar a quien ya no juegue, y cualquier participante puede marcharse: sus cartas

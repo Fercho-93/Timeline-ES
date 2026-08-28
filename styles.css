@@ -285,6 +285,23 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .era-medio { background: #6f6a4a; }
 .hint { margin: 12px 0 0; color: var(--muted); font-size: .85rem; text-align: center; }
 
+/* El Pulso. El acento es el mismo bronce del resto: no es un modo aparte, es una jugada
+   más, solo que se gasta una vez. El rayo la distingue sin necesidad de otro color. */
+.opt-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; padding: 12px 0 2px; border-top: 1px solid var(--line); font-size: .9rem; font-weight: 700; }
+.opt-row span { display: flex; flex-direction: column; gap: 3px; }
+.opt-row small { font-size: .74rem; font-weight: 500; line-height: 1.35; color: var(--muted); }
+.opt-row input[type="checkbox"] { width: 42px; height: 26px; flex: none; -webkit-appearance: none; appearance: none; margin: 0; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background .15s ease; }
+.opt-row input[type="checkbox"]::before { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-soft); transition: transform .15s ease; }
+.opt-row input[type="checkbox"]:checked { background: var(--accent); }
+.opt-row input[type="checkbox"]:checked::before { transform: translateX(16px); }
+.pulse-btn { margin-top: 14px; display: flex; flex-direction: column; align-items: center; gap: 2px; border-color: var(--accent); color: var(--accent); }
+.pulse-btn small { font-size: .68rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.pulse-banner { margin: 0 0 14px; padding: 11px 14px; border-radius: 10px; background: var(--accent-solid); color: #fff; font-size: .84rem; font-weight: 650; text-align: center; }
+.pulse-target { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.pulse-target small { color: var(--muted); font-size: .72rem; font-weight: 500; }
+.pulse-gift { margin: 14px 0 0; padding: 11px 13px; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); font-size: .84rem; line-height: 1.4; }
+.pulse-outcome { margin-top: 10px; }
+
 .overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(35,27,19,.73); backdrop-filter: blur(8px); }
 .modal { width: min(100%, 460px); max-height: calc(100dvh - 36px); overflow-y: auto; border-radius: 12px; padding: 26px; background: var(--surface); box-shadow: 0 20px 50px rgba(0,0,0,.22); text-align: center; border: 1px solid var(--line); }
 .modal .big-icon { font-size: 3rem; margin-bottom: 10px; }
