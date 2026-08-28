@@ -33,45 +33,6 @@
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
-  // Se activa al cerrar el aviso de acierto, para que la animación no quede tapada.
-  let settlingCardId = null;
-
-  let depositingCard = false;
-
-  function animateCardDeposit(cardId) {
-    const source = appEl.querySelector(`.hand-card[data-id="${cardId}"]`) || appEl.querySelector(".hand-card.selected");
-    const destination = appEl.querySelector(".slot-confirm");
-    if (!source || !destination || matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
-
-    const start = source.getBoundingClientRect();
-    const end = destination.getBoundingClientRect();
-    const ghost = source.cloneNode(true);
-    ghost.classList.remove("selected", "dragging", "armed");
-    ghost.classList.add("card-flight");
-    ghost.style.width = `${start.width}px`;
-    ghost.style.height = `${start.height}px`;
-    ghost.style.left = `${start.left}px`;
-    ghost.style.top = `${start.top}px`;
-    document.body.appendChild(ghost);
-
-    const dx = end.left + end.width / 2 - (start.left + start.width / 2);
-    const dy = end.top + end.height / 2 - (start.top + start.height / 2);
-    source.classList.add("depositing-source");
-    requestAnimationFrame(() => { ghost.style.transform = `translate(${dx}px, ${dy}px) rotate(0deg) scale(.92)`; });
-    return new Promise(resolve => setTimeout(() => {
-      ghost.remove();
-      source.classList.remove("depositing-source");
-      resolve();
-    }, 560));
-  }
-
-  async function depositThen(cardId, action) {
-    if (depositingCard) return;
-    depositingCard = true;
-    await animateCardDeposit(cardId);
-    depositingCard = false;
-    action();
-  }
 
   function currentAxis() { return CT.axis(selectedModeKey); }
 
@@ -256,7 +217,6 @@
     const timeline = [shuffled.shift()];
     game = { mode: selectedModeKey, pulse, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
     selectedCardId = null;
-    if (result?.correct) settlingCardId = result.card.id;
     result = null;
     saveGame();
     renderPass();
@@ -278,7 +238,6 @@
   }
 
   function gameView() {
-    const cardJustSettled = settlingCardId;
     screen = "game";
     const player = currentPlayer();
     const timelineCards = game.timeline.map(id => cardsById.get(id));
@@ -302,10 +261,6 @@
         slots.push(timelineCardMarkup(timelineCards[i]));
       }
     }
-    if (cardJustSettled) {
-      setTimeout(() => { if (settlingCardId === cardJustSettled) settlingCardId = null; }, 850);
-    }
-
     const manoHtml = pulseCard
       ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
       : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
@@ -339,7 +294,7 @@
     const era = eraForCard(card);
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
-    return `<article class="timeline-card${settlingCardId === card.id ? " card-settling" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+    return `<article class="timeline-card" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
   }
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
@@ -511,24 +466,13 @@
     overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${result.pulse ? "⚡ Pulso · " : ""}${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
-  function advanceTurn() {
+  function finishTurn() {
     game.turnsInRound += 1;
     if (game.turnsInRound >= game.players.length && resolveRound()) return;
     game.current = (game.current + 1) % game.players.length;
     result = null;
     saveGame();
     renderPass();
-  }
-
-  function finishTurn() {
-    const acceptedCardId = result?.correct ? result.card.id : null;
-    if (!acceptedCardId) return advanceTurn();
-
-    // La carta ya está en el tablero: primero retiramos el aviso y se ve cómo aterriza.
-    appEl.querySelector(".overlay")?.classList.add("result-exit");
-    const cardEl = appEl.querySelector(`.timeline-card[data-id="${acceptedCardId}"]`);
-    requestAnimationFrame(() => cardEl?.classList.add("card-settling"));
-    setTimeout(advanceTurn, 720);
   }
 
   // Devuelve true si la partida ha terminado. Nadie puede empezar un turno con la mano
@@ -823,56 +767,12 @@
     overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
-  function advanceSolo() {
+  function soloNext() {
     result = null;
     if (solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total)) return soloFinish();
     solo.current = solo.deck.shift();
     saveSolo();
     soloView();
-  }
-
-  function animateAcceptedSoloCard(cardId) {
-    const source = appEl.querySelector(`.hand-card[data-id="${cardId}"]`);
-    const destination = appEl.querySelector(`.timeline-card[data-id="${cardId}"]`);
-    appEl.querySelector(".overlay")?.classList.add("result-exit");
-    if (!source || !destination) {
-      destination?.classList.add("card-arrived");
-      return new Promise(resolve => setTimeout(resolve, 760));
-    }
-
-    const start = source.getBoundingClientRect();
-    const end = destination.getBoundingClientRect();
-    const ghost = source.cloneNode(true);
-    ghost.classList.remove("selected", "dragging", "armed");
-    ghost.classList.add("card-flight", "accepted-card-flight");
-    ghost.style.width = `${start.width}px`;
-    ghost.style.height = `${start.height}px`;
-    ghost.style.left = `${start.left}px`;
-    ghost.style.top = `${start.top}px`;
-    destination.classList.add("accepted-target-hidden");
-    source.classList.add("depositing-source");
-    document.body.appendChild(ghost);
-
-    const dx = end.left + end.width / 2 - (start.left + start.width / 2);
-    const dy = end.top + end.height / 2 - (start.top + start.height / 2);
-    const scale = Math.min(1.08, Math.max(.88, end.width / start.width));
-    requestAnimationFrame(() => {
-      ghost.style.transform = `translate(${dx}px, ${dy}px) rotate(0deg) scale(${scale})`;
-    });
-
-    return new Promise(resolve => setTimeout(() => {
-      ghost.remove();
-      source.classList.remove("depositing-source");
-      destination.classList.remove("accepted-target-hidden");
-      destination.classList.add("card-arrived");
-      setTimeout(resolve, 360);
-    }, 680));
-  }
-
-  function soloNext() {
-    if (!result?.correct) return advanceSolo();
-    const cardId = result.card.id;
-    animateAcceptedSoloCard(cardId).then(advanceSolo);
   }
 
   function soloFinish() {
@@ -1098,7 +998,7 @@
       gameView();
     }
     else if (action === "place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
-    else if (action === "confirm-place") { if (screen === "solo") soloPlace(pendingIndex); else { const cardId = game?.pulseTurn?.cardId || selectedCardId; depositThen(cardId, () => game.pulseTurn ? placePulse(pendingIndex) : placeCard(pendingIndex)); } }
+    else if (action === "confirm-place") { screen === "solo" ? soloPlace(pendingIndex) : game.pulseTurn ? placePulse(pendingIndex) : placeCard(pendingIndex); }
     else if (action === "cancel-place") { pendingIndex = null; screen === "solo" ? soloView() : gameView(); }
     else if (action === "finish-turn") finishTurn();
     else if (action === "solo") soloHome();
