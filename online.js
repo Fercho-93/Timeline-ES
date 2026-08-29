@@ -55,7 +55,7 @@ function modeCards(key = modeKey()) { return CT.cards(key); }
 // Un mapa por modalidad, no uno solo: la modalidad puede cambiar entre partidas (aunque
 // nunca a mitad de una) y cada mazo conserva sus propios identificadores. Se construye la
 // primera vez que se pide y se reutiliza después, en vez de recorrer el mazo entero —hasta
-// 474 cartas en Gran mezcla— en cada carta de la línea y de la mano, en cada instantánea
+// 673 cartas en Gran mezcla— en cada carta de la línea y de la mano, en cada instantánea
 // de la sala.
 const cardsByIdCache = new Map();
 function cardsById(key = modeKey()) {

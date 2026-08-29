@@ -96,7 +96,7 @@
   };
 
   // Las bandas de Historia mundial, aparte: son la periodización más general de las
-  // cuatro modalidades por fecha, así que «Gran mezcla» las reutiliza en vez de llevar su
+  // modalidades por fecha, así que «Gran mezcla» las reutiliza en vez de llevar su
   // propia copia que podría quedarse desactualizada si estas cambiaran alguna vez.
   const WORLD_BANDS = [
     { limit: 476, key: "antigua", name: "Antigüedad", symbol: "⚱" },
@@ -111,15 +111,19 @@
   // Una modalidad hereda las bandas de su eje salvo que declare las suyas, como el cine:
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
   const MODES = {
-    // Historia de España, Historia mundial, Inventos y Estrenos de cine comparten el eje
+    // Todos los mazos cronológicos comparten el eje del tiempo
     // del tiempo aunque estén en bloques distintos, así que mezclarlas es concatenar sus
     // mazos: ninguna carta cambia y `eraForCard` sigue funcionando igual porque las
     // bandas de esta modalidad son las mismas que las de Historia mundial (`WORLD_BANDS`),
     // el mazo con la periodización más general de los cuatro.
     mixed: {
       key: "mixed", name: "Gran mezcla",
-      cardLabel: "hechos", blurb: "Historia, mundo, inventos y cine, todo junto.",
-      cards: [...window.HISTORY_CARDS, ...window.WORLD_CARDS, ...window.INVENTION_CARDS, ...window.MOVIE_CARDS],
+      cardLabel: "hitos", blurb: "Historia, cultura y ciencia, todo junto.",
+      cards: [
+        ...window.HISTORY_CARDS, ...window.WORLD_CARDS, ...window.INVENTION_CARDS,
+        ...window.MOVIE_CARDS, ...window.MUSIC_CARDS, ...window.VIDEOGAME_CARDS,
+        ...window.ASTRONOMY_CARDS, ...window.MEDICINE_CARDS
+      ],
       axis: "time",
       bands: WORLD_BANDS
     },
@@ -139,6 +143,33 @@
         { limit: 2000, key: "blockbuster", name: "Era blockbuster", symbol: "◆" },
         { limit: 2010, key: "milenio", name: "Nuevo milenio", symbol: "✦" },
         { limit: Infinity, key: "actual", name: "Cine actual", symbol: "▷" }
+      ]
+    },
+    music: {
+      key: "music", name: "Hitos de la música",
+      cardLabel: "hitos", blurb: "De Monteverdi al streaming.", cards: window.MUSIC_CARDS,
+      axis: "time",
+      bands: [
+        { limit: 1750, key: "barroco", name: "Barroco", symbol: "♫" },
+        { limit: 1820, key: "clasica", name: "Clasicismo", symbol: "♩" },
+        { limit: 1900, key: "romantica", name: "Romanticismo y grabación", symbol: "♪" },
+        { limit: 1950, key: "electrica", name: "Radio y sonido eléctrico", symbol: "⚡" },
+        { limit: 1980, key: "popular", name: "Música popular", symbol: "★" },
+        { limit: 2000, key: "videoclip", name: "Era del videoclip", symbol: "▶" },
+        { limit: Infinity, key: "streaming", name: "Era digital", symbol: "⌁" }
+      ]
+    },
+    videogames: {
+      key: "videogames", name: "Historia de los videojuegos",
+      cardLabel: "juegos", blurb: "Del laboratorio a los mundos abiertos.", cards: window.VIDEOGAME_CARDS,
+      axis: "time",
+      bands: [
+        { limit: 1972, key: "laboratorio", name: "Pioneros", symbol: "⌨" },
+        { limit: 1983, key: "arcade", name: "Era arcade", symbol: "●" },
+        { limit: 1990, key: "ochobits", name: "Consolas de 8 y 16 bits", symbol: "◆" },
+        { limit: 2000, key: "tresd", name: "Salto a las 3D", symbol: "△" },
+        { limit: 2010, key: "online", name: "Juego conectado", symbol: "◎" },
+        { limit: Infinity, key: "actual", name: "Juego actual", symbol: "✦" }
       ]
     },
     inventions: {
@@ -161,6 +192,34 @@
       axis: "time",
       bands: WORLD_BANDS
     },
+    astronomy: {
+      key: "astronomy", name: "Astronomía y espacio",
+      cardLabel: "hitos", blurb: "De Copérnico al otro lado de la Luna.", cards: window.ASTRONOMY_CARDS,
+      axis: "time",
+      bands: [
+        { limit: 1700, key: "revolucion", name: "Revolución astronómica", symbol: "☉" },
+        { limit: 1900, key: "telescopio", name: "Universo telescópico", symbol: "◉" },
+        { limit: 1957, key: "cosmologia", name: "Nueva física", symbol: "∞" },
+        { limit: 1970, key: "carreraespacial", name: "Carrera espacial", symbol: "▲" },
+        { limit: 1990, key: "sondas", name: "Sondas y estaciones", symbol: "✦" },
+        { limit: 2010, key: "observatorios", name: "Nuevos observatorios", symbol: "✧" },
+        { limit: Infinity, key: "espacioactual", name: "Exploración actual", symbol: "◍" }
+      ]
+    },
+    medicine: {
+      key: "medicine", name: "Historia de la medicina",
+      cardLabel: "hitos", blurb: "De Hipócrates a la edición genética.", cards: window.MEDICINE_CARDS,
+      axis: "time",
+      bands: [
+        { limit: 1500, key: "medicinaantigua", name: "Medicina antigua", symbol: "⚕" },
+        { limit: 1800, key: "anatomia", name: "Anatomía y observación", symbol: "◉" },
+        { limit: 1900, key: "microbios", name: "Cirugía y microbios", symbol: "✚" },
+        { limit: 1950, key: "terapias", name: "Primeras terapias modernas", symbol: "⚗" },
+        { limit: 1980, key: "tecnologia", name: "Medicina tecnológica", symbol: "◆" },
+        { limit: 2000, key: "molecular", name: "Medicina molecular", symbol: "⌬" },
+        { limit: Infinity, key: "genomica", name: "Era genómica", symbol: "∞" }
+      ]
+    },
     countries: {
       key: "countries", name: "Superficie de países",
       cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
@@ -177,14 +236,15 @@
   // añadir uno nuevo es declararlo aquí y sumarlo a `games`.
   //
   // «Gran mezcla» es un bloque más, pero no temático: agrupa por eje del tiempo en vez de
-  // por tema, con Historia y Cine a la vez dentro.
+  // por tema, con todos los mazos cronológicos a la vez dentro.
   //
   // La clave de cada juego viaja en el documento de la sala compartida, así que cambiar
   // una rompe las partidas en curso de ese juego. Añadir juegos, en cambio, ya no obliga
   // a tocar `firestore.rules`: dejaron de llevar dentro la lista.
   const BLOCKS = {
     historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "world", "inventions"] },
-    cine: { key: "cine", name: "Cine", icon: "🎬", art: "cinema", tagline: "Ordena la pantalla.", games: ["movies"] },
+    cine: { key: "cine", name: "Entretenimiento", icon: "🎭", art: "entertainment", tagline: "Ordena la cultura popular.", games: ["movies", "music", "videogames"] },
+    ciencia: { key: "ciencia", name: "Ciencia", icon: "🔬", art: "science", tagline: "Ordena los descubrimientos.", games: ["astronomy", "medicine"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] },
     mezcla: { key: "mezcla", name: "Gran mezcla", icon: "⏳", art: "mixed", tagline: "Ordena el tiempo.", games: ["mixed"] }
   };
