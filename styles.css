@@ -113,7 +113,7 @@ button { touch-action: manipulation; }
 .gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,15,9,0) 38%, rgba(20,15,9,.5) 62%, rgba(20,15,9,.92)); pointer-events: none; }
 .panel-art { position: absolute; inset: 0; display: block; }
 .panel-art img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
-.panel-cinema .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
+.panel-entertainment .panel-art img, .panel-science .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
 /* Los lomos se apagan para que la carátula elegida sea la única en color. */
 .gallery-panel:not(.active) .panel-art { filter: grayscale(.9) brightness(.44) contrast(1.05); }
 @media (hover: hover) {
@@ -148,7 +148,8 @@ h1 em { color: var(--accent); font-weight: 400; }
 h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw, 2.1rem); letter-spacing: -.025em; margin-bottom: 10px; }
 .lead { color: var(--muted); font-size: .96rem; line-height: 1.55; max-width: 560px; }
 .panel-history { background: #6b5231; }
-.panel-cinema { background: #2c2117; }
+.panel-entertainment { background: #2c2117; }
+.panel-science { background: #172523; }
 .panel-globe { background: #2b2a20; }
 .panel-mixed { background: #2f2313; }
 .era-pioneros { background: #4a4438; }
@@ -283,6 +284,31 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .era-minusculo { background: #7a6a72; }
 .era-muypequeno { background: #8a5f4c; }
 .era-medio { background: #6f6a4a; }
+.era-barroco { background: #74543d; }
+.era-clasica { background: #65564a; }
+.era-romantica { background: #6f4650; }
+.era-popular { background: #704d3f; }
+.era-videoclip { background: #5a4f70; }
+.era-streaming { background: #3f6268; }
+.era-laboratorio { background: #4c5963; }
+.era-arcade { background: #65503f; }
+.era-ochobits { background: #634661; }
+.era-tresd { background: #3f5f66; }
+.era-online { background: #4b644c; }
+.era-revolucion { background: #6d593f; }
+.era-telescopio { background: #4d5d6d; }
+.era-cosmologia { background: #4e4b68; }
+.era-carreraespacial { background: #6b4d40; }
+.era-sondas { background: #3f5e68; }
+.era-observatorios { background: #53516c; }
+.era-espacioactual { background: #3d6162; }
+.era-medicinaantigua { background: #675747; }
+.era-anatomia { background: #704b45; }
+.era-microbios { background: #49655b; }
+.era-terapias { background: #5a5369; }
+.era-tecnologia { background: #445f6b; }
+.era-molecular { background: #5c4d68; }
+.era-genomica { background: #3f6256; }
 .hint { margin: 12px 0 0; color: var(--muted); font-size: .85rem; text-align: center; }
 
 /* El Pulso. El acento es el mismo bronce del resto: no es un modo aparte, es una jugada

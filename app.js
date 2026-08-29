@@ -23,8 +23,8 @@
   // El bloque en pantalla se deduce siempre del juego elegido, así que no se guarda aparte.
   let selectedBlockKey = CT.blockOf(selectedModeKey).key;
   let cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
-  // Cada mazo numera sus cartas en su propio rango (historia 1-190, cine 1001+, países
-  // 2001+...), así que un identificador nunca choca entre modalidades. Esto es lo que
+  // Cada mazo numera sus cartas en su propio rango (historia 1+, cine 1001+, música
+  // 6001+...), así que un identificador nunca choca entre modalidades. Esto es lo que
   // permite que la pantalla de repaso de la competición, que mezcla fallos de varios
   // temas distintos, pueda encontrar cualquier carta sin saber de qué mazo venía.
   const GLOBAL_CARDS_BY_ID = new Map(Object.values(CT.MODES).flatMap(m => m.cards).map(card => [card.id, card]));
@@ -94,7 +94,8 @@
   // desplegar otro bloque la portada se repinta entera y con ella cambia la imagen.
   const BLOCK_ART = {
     history: { archivo: "hero-history", alto: { 400: 267, 700: 467 } },
-    cinema: { archivo: "hero-cinema", alto: { 400: 558, 700: 977 } },
+    entertainment: { archivo: "hero-entertainment", alto: { 400: 600, 700: 1050 } },
+    science: { archivo: "hero-science", alto: { 400: 600, 700: 1050 } },
     globe: { archivo: "hero-geography", alto: { 400: 491, 700: 859 } },
     mixed: { archivo: "hero-mixed", alto: { 400: 567, 700: 992 } }
   };
@@ -119,8 +120,7 @@
     }).join("")}</div>`;
   }
 
-  // Los juegos del bloque en pantalla. Hoy hay uno por bloque; la lista está pensada
-  // para cuando haya varios.
+  // Los juegos del bloque en pantalla.
   function gameList() {
     const games = CT.blockGames(selectedBlockKey);
     return `<div class="games" role="group" aria-label="Elige el juego">${games.map(item => {

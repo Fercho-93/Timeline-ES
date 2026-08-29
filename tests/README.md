@@ -26,9 +26,9 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | --- | --- |
 | `sintaxis.mjs` | Que todos los archivos del juego parsean. Es la única red que cubre `online.js`. Sin dependencias. |
 | `partida-local.mjs` | Partida completa del modo de un solo móvil sobre un DOM simulado. |
-| `partidas-al-azar.mjs` | 40 partidas al azar sobre cinco juegos: bloqueos, conteo de cartas y orden de la línea. |
+| `partidas-al-azar.mjs` | 40 partidas al azar repartidas entre todos los juegos: bloqueos, conteo de cartas y orden de la línea. |
 | `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil, y que ni un guion de `index.html` ni una carátula se queden sin precargar. Sin dependencias. |
-| `mazos.mjs` | Calidad de los seis mazos: repeticiones, huecos, cartas demasiado juntas y cifras que el redondeo no confunda. Sin dependencias. |
+| `mazos.mjs` | Calidad de todos los mazos: repeticiones, huecos, años únicos, espaciado cuando corresponde y cifras que el redondeo no confunda. Sin dependencias. |
 | `solitario.mjs` | Solitario, reto diario, confirmación al colocar, modalidad de países y el mapa de la línea. |
 | `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
 | `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie y que las bandas tengan contraste. |

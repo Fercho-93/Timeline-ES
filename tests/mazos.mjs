@@ -1,4 +1,4 @@
-// Reglas de calidad de los seis mazos: sin cartas repetidas, sin huecos y, sobre todo,
+// Reglas de calidad de todos los mazos: sin cartas repetidas, sin huecos y, sobre todo,
 // sin parejas tan pegadas que colocarlas bien sea cuestión de suerte.
 import fs from "node:fs";
 import path from "node:path";
@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.window = {};
-for (const archivo of ["cards.js", "movies.js", "inventos.js", "mundo.js", "countries.js", "population.js", "modes.js"]) {
+for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "modes.js"]) {
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
-const { HISTORY_CARDS, MOVIE_CARDS, INVENTION_CARDS, WORLD_CARDS, COUNTRY_CARDS, POPULATION_CARDS } = globalThis.window;
+const { HISTORY_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, INVENTION_CARDS, WORLD_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS, COUNTRY_CARDS, POPULATION_CARDS } = globalThis.window;
 const CT = globalThis.window.CONTINUUM;
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
@@ -24,6 +24,19 @@ function comunes(nombre, mazo, valor) {
 
 comunes("Estrenos de cine", MOVIE_CARDS, c => c.year);
 ok("cada año aparece una sola vez", new Set(MOVIE_CARDS.map(c => c.year)).size === MOVIE_CARDS.length);
+
+function fechadasDensas(nombre, mazo) {
+  comunes(nombre, mazo, c => c.year);
+  ok("cada año aparece una sola vez", new Set(mazo.map(c => c.year)).size === mazo.length);
+}
+
+// En mazos contemporáneos hay décadas repletas de hitos imprescindibles. Se conserva
+// el año único —nunca hay un empate al azar—, pero no se impone el espaciado pensado para
+// relatos de miles de años.
+fechadasDensas("Hitos de la música", MUSIC_CARDS);
+fechadasDensas("Historia de los videojuegos", VIDEOGAME_CARDS);
+fechadasDensas("Astronomía y espacio", ASTRONOMY_CARDS);
+fechadasDensas("Historia de la medicina", MEDICINE_CARDS);
 
 // En los mazos nuevos del bloque de historia la fecha es el juego entero, así que no
 // puede haber dos cartas del mismo año —serían una moneda al aire— ni demasiadas en
@@ -82,18 +95,19 @@ function redondeoLegible(nombre, modo, mazo) {
 redondeoLegible("Superficie de países", "countries", COUNTRY_CARDS);
 redondeoLegible("Población de países", "population", POPULATION_CARDS);
 
-const todos = [...HISTORY_CARDS, ...MOVIE_CARDS, ...INVENTION_CARDS, ...WORLD_CARDS, ...COUNTRY_CARDS, ...POPULATION_CARDS];
+const cronologicos = [HISTORY_CARDS, WORLD_CARDS, INVENTION_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS];
+const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS];
 console.log("\nEntre mazos");
 ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.id)).size === todos.length);
 
-// La Gran mezcla no es un mazo propio: es la concatenación de los otros cuatro mazos con
+// La Gran mezcla no es un mazo propio: es la concatenación de todos los mazos con
 // eje del tiempo, así que no le pide nada nuevo salvo que la concatenación en sí no rompa
-// nada. No se le exige el límite de pares pegados de `fechadas()`: mezclar cuatro mazos ya
+// nada. No se le exige el límite de pares pegados de `fechadas()`: mezclar tantos mazos ya
 // separados a propósito produce muchas más coincidencias de año que cualquiera de ellos
 // por separado, y esa dificultad extra es justo lo que la hace la modalidad más difícil.
 console.log("\nGran mezcla");
 const mixed = CT.cards("mixed");
-ok(`${mixed.length} cartas, las de los cuatro mazos de tiempo juntas`, mixed.length === HISTORY_CARDS.length + WORLD_CARDS.length + INVENTION_CARDS.length + MOVIE_CARDS.length);
+ok(`${mixed.length} cartas, las de los mazos de tiempo juntas`, mixed.length === cronologicos.flat().length);
 ok("identificadores únicos también mezclados", new Set(mixed.map(c => c.id)).size === mixed.length);
 
 console.log(`\n${fail} fallos`);

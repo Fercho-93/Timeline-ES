@@ -4,7 +4,7 @@ Juego de ordenar para 2–9 personas, diseñado para jugarse pasando un solo mó
 
 ## Bloques y juegos
 
-Los juegos se agrupan en tres bloques. La portada enseña el bloque y lista sus juegos debajo,
+Los juegos se agrupan en cinco bloques. La portada enseña el bloque y lista sus juegos debajo,
 así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 **Historia**
@@ -18,11 +18,25 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
   —una patente, una publicación, una primera demostración— y ningún año se repite, así que dos
   cartas nunca son una moneda al aire.
 
-**Cine**
+**Entretenimiento**
 
 - **Estrenos de cine:** 87 películas conocidas, de *Viaje a la Luna* (1902) a *Del revés 2* (2024),
   con trece títulos del cine español. Cada año aparece una sola vez y el reparto está equilibrado
   por décadas, para que ninguna carta sea una moneda al aire entre dos estrenos del mismo año.
+- **Hitos de la música:** 51 estrenos, obras, discos y cambios de formato, de *L'Orfeo* (1607)
+  a *The Eras Tour* (2023). El recorrido cruza música clásica, jazz, rock, pop, hip-hop y la
+  transición del fonógrafo al streaming.
+- **Historia de los videojuegos:** 51 hitos de *OXO* (1952) a *Balatro* (2024), repartidos entre
+  laboratorio, recreativas, ordenadores, consolas, juego en línea y móvil. En lanzamientos
+  regionales se toma siempre el primero que la propia carta especifica.
+
+**Ciencia**
+
+- **Astronomía y espacio:** 49 descubrimientos y misiones, del modelo heliocéntrico de Copérnico
+  (1543) a las primeras muestras traídas de la cara oculta de la Luna (2024).
+- **Historia de la medicina:** 48 hitos, del corpus hipocrático a los primeros xenotrasplantes
+  modernos. Las explicaciones reconocen los procesos colectivos y distinguen descubrimiento,
+  demostración, aprobación y aplicación clínica.
 
 **Geografía**
 
@@ -33,13 +47,10 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
   con las cifras de la ONU a 1 de enero de 2026. Mismo margen del 8%: por eso falta China, que
   queda a un 4% de la India.
 
-**Gran mezcla** no es de ningún bloque, a propósito: mezcla Historia de España, Historia
-mundial, Inventos y Estrenos de cine —474 cartas en total—, así que meterla dentro de
-Historia sería mentir sobre lo que contiene, dado que la mitad de sus juegos son de otros
-bloques. Se presenta aparte en la propia portada, como una modalidad transversal por eje
-del tiempo y no por tema. Compartir el eje es lo único que hace falta para mezclarlas: es
-una concatenación y no un mazo aparte, con las mismas épocas que Historia mundial. No entra
-en la rotación del modo Competición, que sí es por tema.
+**Gran mezcla** no es de ningún bloque temático, a propósito: concatena los ocho mazos
+cronológicos —673 cartas en total— y los ordena sobre un único eje. Se presenta aparte en la
+portada como modalidad transversal, reutiliza las épocas generales de Historia mundial y no
+entra en la rotación del modo Competición, que sí cambia de tema.
 
 Cada juego conserva su propia partida local. El juego elegido también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
@@ -48,7 +59,7 @@ La aplicación ofrece cuatro formas de jugar:
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
 - **En solitario:** una persona contra el mazo, con tres vidas.
-- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los seis juegos.
+- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los diez juegos.
 
 Al terminar una partida —local, en solitario o de competición— si hubo alguna carta mal
 colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su
@@ -78,7 +89,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   amigos necesitaría el día que exista, sin tener que rehacer partidas ya jugadas para tenerlo.
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
-- **Competición:** una ronda de 5 cartas por cada uno de los seis juegos, en un orden al azar
+- **Competición:** una ronda de 5 cartas por cada uno de los diez juegos, en un orden al azar
   distinto cada vez y sin repetir ninguno, con tres vidas nuevas en cada ronda. Al terminar la
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
@@ -117,7 +128,7 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 `tests/` contiene once comprobaciones automáticas: la sintaxis de todos los archivos,
 partidas completas sobre un DOM simulado, cuarenta partidas al azar que vigilan bloqueos y el
-conteo de cartas, la calidad de los seis mazos, el modo solitario, el Pulso, la accesibilidad con teclado y lector de pantalla, el service worker y las
+conteo de cartas, la calidad de todos los mazos, el modo solitario, el Pulso, la accesibilidad con teclado y lector de pantalla, el service worker y las
 reglas de Firestore contra el emulador oficial. Se lanzan con `npm install` y `npm test`, y se ejecutan solas en cada propuesta de
 cambio. Las instrucciones están en `tests/README.md`.
 

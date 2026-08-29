@@ -2,7 +2,7 @@
   "name": "continuum",
   "version": "1.0.0",
   "private": true,
-  "description": "CONTINUUM: juego instalable de cronología histórica, cine y países, con modo local y multijugador.",
+  "description": "CONTINUUM: juego instalable de historia, entretenimiento, ciencia y geografía, con modo local y multijugador.",
   "license": "MIT",
   "type": "module",
   "scripts": {

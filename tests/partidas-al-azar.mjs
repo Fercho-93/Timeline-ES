@@ -16,17 +16,24 @@ const boot = () => {
 const fire = (w, el) => el.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 let problems = 0, games = 0, sharedWins = 0, returns = 0;
 
+const catalogo = [
+  ["history", "historia", "HISTORY_CARDS"], ["world", "historia", "WORLD_CARDS"],
+  ["inventions", "historia", "INVENTION_CARDS"], ["movies", "cine", "MOVIE_CARDS"],
+  ["music", "cine", "MUSIC_CARDS"], ["videogames", "cine", "VIDEOGAME_CARDS"],
+  ["astronomy", "ciencia", "ASTRONOMY_CARDS"], ["medicine", "ciencia", "MEDICINE_CARDS"],
+  ["countries", "geografia", "COUNTRY_CARDS"], ["population", "geografia", "POPULATION_CARDS"]
+];
+
 for (let g = 0; g < 40; g++) {
   const w = boot();
-  const mode = ["history", "movies", "inventions", "world", "countries"][g % 5];
+  const [mode, block, globalName] = catalogo[g % catalogo.length];
   // Hay que abrir antes el bloque: la portada solo lista los juegos del bloque en pantalla.
-  const block = { history: "historia", movies: "cine", inventions: "historia", world: "historia", countries: "geografia" }[mode];
   fire(w, w.document.querySelector(`[data-block="${block}"]`));
   fire(w, w.document.querySelector(`[data-mode="${mode}"]`));
-  const mazo = { history: w.HISTORY_CARDS, movies: w.MOVIE_CARDS, inventions: w.INVENTION_CARDS, world: w.WORLD_CARDS, countries: w.COUNTRY_CARDS }[mode];
+  const mazo = w[globalName];
   const total = mazo.length;
   const cardsById = new Map(mazo.map(c => [c.id, c]));
-  const orden = card => (mode === "countries" ? card.value : card.year);
+  const orden = card => (mode === "countries" || mode === "population" ? card.value : card.year);
   fire(w, w.document.querySelector('[data-action="setup"]'));
   const players = 2 + (g % 8);
   for (let i = 2; i < players; i++) fire(w, w.document.querySelector('[data-action="add-player"]'));
@@ -44,10 +51,11 @@ for (let g = 0; g < 40; g++) {
     const pick = hand[Math.floor(Math.random() * hand.length)];
     const id = Number(pick.dataset.id);
     fire(w, pick);
-    const years = [...w.document.querySelectorAll(".timeline-card .year")].map(t => t.textContent.endsWith("a. C.") ? -parseInt(t.textContent) : parseInt(t.textContent));
-    let index = years.findIndex(y => y > cardsById.get(id).year);
-    if (index < 0) index = years.length;
-    if (Math.random() < 0.35) index = Math.floor(Math.random() * (years.length + 1)); // juega mal a menudo
+    const stateBefore = JSON.parse(w.localStorage.getItem(key));
+    const values = stateBefore.timeline.map(cid => orden(cardsById.get(cid)));
+    let index = values.findIndex(value => value > orden(cardsById.get(id)));
+    if (index < 0) index = values.length;
+    if (Math.random() < 0.35) index = Math.floor(Math.random() * (values.length + 1)); // juega mal a menudo
     fire(w, w.document.querySelectorAll('[data-action="place"]')[index]);
   fire(w, w.document.querySelector('[data-action="confirm-place"]'));
     if (/vuelve a tu mano/.test(w.document.querySelector(".modal")?.innerHTML || "")) returns++;
