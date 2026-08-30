@@ -116,7 +116,7 @@ window.HISTORY_CARDS = [
   { id: 120, year: 1598, title: "Felipe III inicia su reinado", detail: "La muerte de Felipe II da paso al gobierno de Felipe III y sus validos." },
   { id: 121, year: 1618, title: "Comienza la guerra de los Treinta Años", detail: "La Monarquía Hispánica interviene en el gran conflicto europeo junto a los Habsburgo imperiales." },
   { id: 122, year: 1621, title: "Felipe IV accede al trono", detail: "Comienza un reinado marcado por el gobierno del conde-duque de Olivares y las guerras europeas." },
-  { id: 123, year: 1643, title: "Batalla de Rocroi", detail: "El ejército francés derrota a fuerzas de la Monarquía Hispánica en Flandes." },
+  { id: 123, year: 1643, title: "Batalla de Rocroi", detail: "El ejército francés derrota a fuerzas de la Monarquía Hispánica junto a Rocroi, en las Ardenas francesas." },
   { id: 124, year: 1648, title: "Paz de Münster", detail: "La Monarquía Hispánica reconoce formalmente la independencia de las Provincias Unidas." },
   { id: 125, year: 1665, title: "Carlos II accede al trono", detail: "Comienza el último reinado de la Casa de Austria en España." },
   { id: 126, year: 1668, title: "España reconoce la independencia de Portugal", detail: "El Tratado de Lisboa pone fin a la guerra de Restauración portuguesa." },

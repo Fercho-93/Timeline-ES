@@ -179,7 +179,6 @@ cerradas. Siguen siendo seleccionables y, por tanto, **también pueden aparecer 
 | Longevidad | 12002 | «Mosca de mayo» y «efímera» son nombres solapados; falta una especie y una duración documentadas. |
 | Longevidad | 12007 | Falta una fuente que respalde el promedio silvestre de tres meses. |
 | Longevidad | 12008 | Falta una fuente que respalde el valor silvestre de 0,4 años. |
-| Longevidad | 12018 | No se ha confirmado el respaldo de los 22 años para esta especie. |
 | Longevidad | 12028 | La longevidad superior a dos siglos está documentada, pero falta justificar los 235 años concretos. |
 | Longevidad | 12032 | Faltan especie, ejemplar y método que justifiquen esta estimación. |
 | Longevidad | 12033 | Faltan especie, ejemplar y método que justifiquen esta estimación. |
@@ -200,6 +199,7 @@ cerradas. Siguen siendo seleccionables y, por tanto, **también pueden aparecer 
 | Velocidad | 13029 | No se ha encontrado respaldo suficiente para los 315 km/h. |
 | Velocidad | 13033 | Falta identificar la especie y documentar la cifra. |
 | Velocidad | 13034 | Se compara la marcha por el fondo, pero falta documentar su cifra. |
+| Peso | 10009 | Falta una fuente homogénea que respalde 2,5 kg como peso típico de un adulto. |
 
 Otros matices abiertos en los informes no se convierten automáticamente en cambios:
 por ejemplo, el recuento de acompañantes de Elcano, Andrómeda (observación frente a anuncio),
@@ -218,7 +218,40 @@ Tampoco se altera JFK por una supuesta afirmación de retransmisión en directo 
   empate y con valores cercanos; comprueba también los avisos visibles. `tests/mazos.mjs`
   conserva integridad, cardinalidad y controles de formato. Ninguna de estas pruebas verifica
   hechos científicos por sí sola.
-- La caché pasa a `continuum-v25`. Tras recibir la actualización conviene iniciar partidas
-  nuevas, especialmente de animales e inventos: una línea guardada con las cifras anteriores
+- La caché pasa a `continuum-v26`. Tras recibir la actualización conviene iniciar partidas
+  nuevas, especialmente de animales y longevidad: una línea guardada con las cifras anteriores
   puede haber quedado desordenada. No se borran partidas ni puntuaciones automáticamente.
   En multijugador todos deben actualizar antes de crear una sala nueva.
+
+## Ronda 3: matices publicados
+
+Se corrigen afirmaciones demasiado absolutas o imprecisas sin cambiar las fechas de Rocroi,
+la destrucción del Primer Templo, la guerra de los Siete Años, el fin de la guerra de Vietnam,
+Hong Kong, *Viaje a la Luna*, *Star Wars*, *Avatar*, las medias de nailon y Chang'e 6.
+
+- Rocroi se sitúa junto a la localidad de las Ardenas francesas, no «en Flandes».
+  [Visit Ardenne](https://www.visitardenne.com/en/best-ardennes/iconic-sites/rocroi)
+- El exilio babilónico había empezado antes de la destrucción del templo; la carta refleja
+  nuevas deportaciones en 586 a. C. [Metropolitan Museum](https://www.metmuseum.org/perspectives/cyrus-and-the-judean-diaspora)
+- La guerra de Sucesión Austríaca ya tuvo conflictos en Europa, Canadá e India, por lo que se
+  elimina la prioridad geográfica absoluta atribuida a la guerra de los Siete Años.
+  [National Army Museum](https://www.nam.ac.uk/explore/war-austrian)
+- Se suprime «primera derrota estadounidense» para Vietnam: el NPS documenta la victoria de
+  Nube Roja frente a Estados Unidos antes de 1868. [National Park Service](https://www.nps.gov/places/1868-treaty-field-area.htm)
+- Hong Kong pasa a describirse por el fin de la administración británica, sin atribuirle el
+  cierre de todo ciclo imperial europeo; Macao continuó bajo administración portuguesa hasta 1999.
+  [Gobierno de Macao](https://www.gov.mo/en/news/288348/)
+- Alan Ladd Jr. aprobó y defendió *Star Wars*, frente a las dudas de otros ejecutivos.
+  [Lucasfilm](https://www.starwars.com/news/alan-ladd-jr)
+- *Viaje a la Luna* se describe como hito, no como inicio literal del cine fantástico: Méliès ya
+  había realizado *Le Manoir du diable* en 1896. [BFI](https://www.bfi.org.uk/film/903dde01-68ea-536a-9be3-471d59cf83bb/le-manoir-du-diable)
+- El lanzamiento nacional de las medias de nailon es de 1940; hubo ventas limitadas en 1939.
+  [American Chemical Society](https://www.acs.org/education/whatischemistry/landmarks/carotherspolymers.html)
+- La cara oculta lunar se formula sin «nunca»: las libraciones permiten observar alrededor del
+  59 % de la superficie lunar con el tiempo. [Observatorio de Hong Kong](https://www.hko.gov.hk/en/education/astronomy-and-time/astronomy/00777-what-is-lunar-libration.html)
+
+La carta del lince ibérico pasa de 22 años sin respaldo a Aura, una hembra del programa
+Ex-situ que murió a los 20 años en 2022. Es una edad individual, no una esperanza de vida ni
+un récord vigente de especie. [Boletín del programa de conservación](https://www.lynxexsitu.es/ficheros/boletines_pdf/124/Boletin_2semestre2022_Exsitu.pdf).
+La liebre europea se mantiene jugable, pero se marca como pendiente: la ficha consultada da un
+rango de 3–5 kg y no respalda 2,5 kg como peso típico. [Animal Diversity Web](https://animaldiversity.org/accounts/Lepus_europaeus/).

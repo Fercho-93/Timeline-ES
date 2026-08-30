@@ -50,5 +50,5 @@ window.ASTRONOMY_CARDS = [
   { id: 8046, year: 2021, title: "Lanzamiento del telescopio James Webb", detail: "El mayor observatorio infrarrojo enviado al espacio parte hacia un punto situado a millón y medio de kilómetros de la Tierra." },
   { id: 8047, year: 2022, title: "Primeras imágenes científicas del James Webb", detail: "Nebulosas, galaxias y un campo profundo muestran con detalle la capacidad infrarroja del nuevo telescopio." },
   { id: 8048, year: 2023, title: "OSIRIS-REx trae muestras de Bennu", detail: "Una cápsula devuelve a la Tierra rocas y polvo recogidos directamente de un asteroide." },
-  { id: 8049, year: 2024, title: "Chang'e 6 trae muestras de la cara oculta", detail: "La misión china devuelve por primera vez material recogido en el hemisferio de la Luna que nunca mira a la Tierra." }
+  { id: 8049, year: 2024, title: "Chang'e 6 trae muestras de la cara oculta", detail: "La misión china devuelve por primera vez material recogido en la cara lunar habitualmente orientada en sentido opuesto a la Tierra." }
 ];

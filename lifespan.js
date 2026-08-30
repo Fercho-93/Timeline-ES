@@ -20,7 +20,7 @@ window.ANIMAL_LIFESPAN_CARDS = [
   { id: 12015, value: 10, title: "Zorro rojo (ejemplar longevo)", detail: "En libertad vive pocos años de media, pero se han documentado individuos de diez o más." },
   { id: 12016, value: 13, title: "Perro doméstico", detail: "La longevidad varía mucho por raza y tamaño; los perros pequeños suelen vivir más." },
   { id: 12017, value: 17, title: "Gato doméstico (de interior)", detail: "Un gato de interior bien cuidado puede superar con frecuencia los quince años." },
-  { id: 12018, value: 22, title: "Lince ibérico · en revisión", detail: "Dato pendiente de verificación. No se ha confirmado el respaldo de los 22 años para esta especie.", reviewStatus: "pending" },
+  { id: 12018, value: 20, title: "Lince ibérico: Aura (edad al fallecer)", detail: "Aura, hembra del programa de conservación Ex-situ, murió en octubre de 2022 a los 20 años. La carta representa su edad individual, no la esperanza de vida de la especie.", source: "https://www.lynxexsitu.es/ficheros/boletines_pdf/124/Boletin_2semestre2022_Exsitu.pdf" },
   { id: 12019, value: 28, title: "Dragón de Komodo", detail: "Este gran varano suele vivir alrededor de treinta años en libertad." },
   { id: 12020, value: 36, title: "Águila harpía", detail: "Las grandes rapaces pueden vivir décadas; su reproducción lenta ayuda a explicar esa longevidad." },
   { id: 12021, value: 20, title: "Bisonte americano (límite habitual en libertad)", detail: "Animal Diversity Web sitúa su vida silvestre habitual entre quince y veinte años. Se usa el extremo superior del rango; los registros en cautividad no son la media en libertad.", source: "https://animaldiversity.org/accounts/Bison_bison/" },

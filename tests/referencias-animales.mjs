@@ -41,7 +41,7 @@ function play(cardId, neighbourId, slot, expected) {
   check("70 y 70,35 km/h se muestran diferentes", CT.formatValue("speed", byId(13020)) !== CT.formatValue("speed", byId(13021)));
   check("un empate real conserva la misma cifra", CT.formatValue("speed", byId(13007)) === CT.formatValue("speed", byId(13014)));
   check("12,8 kg no se redondean a un entero", CT.formatValue("animals", w.ANIMAL_WEIGHT_CARDS.find(card => card.id === 10013)) === "12,8 kg");
-  for (const mode of ["lifespan", "speed"]) {
+  for (const mode of ["animals", "lifespan", "speed"]) {
     check("los pendientes se avisan en título y explicación", CT.cards(mode).filter(c => c.reviewStatus === "pending").every(c => /en revisión/.test(c.title) && /pendiente de verificación/i.test(c.detail)));
   }
   dom.window.close();

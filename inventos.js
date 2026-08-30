@@ -80,7 +80,7 @@ window.INVENTION_CARDS = [
   { id: 4071, year: 1930, title: "La patente del motor a reacción", detail: "Frank Whittle registra la turbina de gas para aviación con veintitrés años." },
   { id: 4072, year: 1935, title: "El radar", detail: "Watson-Watt detecta un bombardero a trece kilómetros rebotando ondas de radio en él." },
   { id: 4073, year: 1938, title: "La fisión nuclear", detail: "Hahn y Strassmann parten el uranio; Meitner y Frisch explican por qué y lo bautizan." },
-  { id: 4074, year: 1940, title: "Las medias de nailon salen a la venta", detail: "Cuatro millones de pares en cuatro días: la primera fibra sintética conquista la calle." },
+  { id: 4074, year: 1940, title: "Las medias de nailon salen a la venta en todo Estados Unidos", detail: "Tras las ventas limitadas de 1939 en Wilmington, el lanzamiento nacional llega el 15 de mayo de 1940." },
   { id: 4075, year: 1942, title: "La primera reacción nuclear en cadena", detail: "Bajo las gradas de un campo de fútbol de Chicago, una pila de grafito y uranio se sostiene sola." },
   { id: 4076, year: 1946, title: "El ENIAC", detail: "Treinta toneladas y dieciocho mil válvulas en el primer gran computador electrónico de uso general." },
   { id: 4077, year: 1947, title: "El transistor", detail: "Tres investigadores de Bell Labs sustituyen la válvula por un trocito de germanio." },
