@@ -81,7 +81,9 @@ button, input, select { font: inherit; }
 /* Ningún elemento enfocado se queda sin marca visible, ni siquiera los que solo reciben
    el foco desde el programa. */
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-button { touch-action: manipulation; }
+/* Safari aplica azul de enlace a algunos botones si no se declara el color de forma
+   explícita. Los nombres de los mazos deben usar siempre la tinta de la interfaz. */
+button { touch-action: manipulation; color: inherit; }
 
 #app { min-height: 100dvh; }
 .screen-enter { animation: screen-in .32s cubic-bezier(.22,.61,.36,1) both; }
@@ -116,7 +118,7 @@ button { touch-action: manipulation; }
 .panel-entertainment .panel-art img, .panel-nature .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
 /* La ilustración de ciencia concentra el motivo en el tercio superior: con el encuadre
    centrado quedaba oculto al abrir la carátula, justo detrás del degradado del título. */
-.panel-science .panel-art img { object-position: 50% 24%; }
+.panel-science .panel-art img { object-position: 50% 20%; }
 .panel-science::after { background: linear-gradient(180deg, rgba(10,29,34,.04) 30%, rgba(10,29,34,.38) 60%, rgba(10,29,34,.82)); }
 /* Los lomos se apagan para que la carátula elegida sea la única en color. */
 .gallery-panel:not(.active) .panel-art { filter: grayscale(.9) brightness(.44) contrast(1.05); }
