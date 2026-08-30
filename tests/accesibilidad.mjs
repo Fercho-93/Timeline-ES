@@ -90,6 +90,10 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("peso muestra su dato oculto", /peso oculto/i.test(texto));
   ok("los mazos con pendientes lo explican", /en revisión/.test(texto));
   ok("los empates exactos se admiten", /mismo valor/.test(texto));
+  ok("el Pulso se explica fuera de solitario", /Pulso activo/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: true })));
+  ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));
+  ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
+  ok("la guía online explica al anfitrión", /anfitrión/i.test(w.CONTINUUM.guideMarkup("history", "online")));
 }
 {
   const w = boot();

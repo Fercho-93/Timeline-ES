@@ -136,7 +136,7 @@
   function home() {
     screen = "home";
     const resume = game && game.mode === selectedModeKey;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Cómo jugar</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
       <section class="hero">
         ${gallery()}
         <div class="hero-copy">
@@ -178,7 +178,7 @@
 
   function setup() {
     screen = "setup";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
       <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
@@ -667,7 +667,7 @@
     const doneToday = records.days && records.days[today()];
     const mode = currentMode();
     const pendiente = solo && solo.kind === "free";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
       <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 data-focus tabindex="-1">Jugar en solitario</h2>
         <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una.</p>
         <div class="panel solo-panel">
@@ -719,7 +719,7 @@
     }
     const restantes = solo.total ? solo.total - solo.played : solo.deck.length + 1;
     const etiqueta = soloLabel();
-    paint(`<div class="shell">${header(`<button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
+    paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
       <div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>
@@ -875,7 +875,7 @@
     screen = "comp-intro";
     const mode = CT.mode(comp.queue[0]);
     const numero = TOTAL_TEMAS - comp.queue.length + 1;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card">
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card">
       <div class="eyebrow">Competición · Tema ${numero} de ${TOTAL_TEMAS}</div>
       <h2 data-focus tabindex="-1">${mode.name}</h2>
       <p>${mode.blurb} ${ROUND_CARDS} cartas, ${SOLO_LIVES} vidas nuevas.</p>
@@ -937,16 +937,13 @@
 
   function rules() {
     const returnTo = screen;
-    const modeKey = game?.mode || selectedModeKey;
-    const mode = CT.mode(modeKey);
-    const dataName = CT.hiddenLabel(modeKey).toLowerCase();
-    const order = mode.axis === "time" ? "de antes a después" : "de menor a mayor";
-    const pending = CT.cards(modeKey).some(card => card.reviewStatus === "pending");
-    overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="eyebrow">Reglas rápidas · ${escapeHtml(mode.name)}</div><h2>Cómo jugar</h2><ol><li>Pueden jugar de 2 a 9 personas. Elegid entre una y seis cartas por persona; el ${dataName} permanece oculto.</li><li>La persona más joven comienza. En su turno elige una carta y el hueco donde cree que encaja en el orden ${order}.</li><li>Confirma el hueco para revelar el dato. Si la carta queda bien ordenada, permanece en la línea; si falla, se descarta y robas otra.</li><li>Si dos cartas tienen exactamente el mismo valor, cualquiera de los dos órdenes es válido.</li>${pending ? `<li>Las cartas «en revisión» usan por ahora el valor mostrado, pero avisan de que su referencia sigue pendiente de contraste.</li>` : ""}<li>Todos juegan una vez por ronda. Gana quien sea la única persona que termina una ronda sin cartas; si varias lo logran, reciben una carta y desempatan.</li></ol>${game && game.pulse ? `<div class="eyebrow" style="margin-top:18px">Con el Pulso</div><ol><li>Una vez por partida, en vez de jugar tu turno puedes retar a otra persona.</li><li>El mazo saca una carta que tú no eliges y la colocas sin prisa.</li><li>Si aciertas, se queda en la línea y le pasas una carta al azar de tu mano.</li><li>Si fallas, va al descarte y robas tú una: a esa persona no le pasa nada.</li><li>Quien recibe una carta no puede volver a ser retado esa ronda. Necesitas dos cartas para lanzarlo.</li></ol>` : ""}<button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
+    const context = comp ? "competition" : solo ? "solo" : "local";
+    const modeKey = game?.mode || solo?.mode || selectedModeKey;
+    overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
   }
 
   function gameMenu() {
-    overlay(`<div class="overlay"><div class="modal"><div class="eyebrow">Partida en pausa</div><h2>¿Qué quieres hacer?</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Ver las reglas</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`, true);
+    overlay(`<div class="overlay"><div class="modal"><div class="eyebrow">Partida en pausa</div><h2>¿Qué quieres hacer?</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Ver la guía</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`, true);
   }
 
   function showToast(message) {

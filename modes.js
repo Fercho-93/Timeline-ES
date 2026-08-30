@@ -423,6 +423,26 @@
     return `Iba entre «${escapeHtml(before.title)}» y «${escapeHtml(after.title)}».`;
   }
 
+  // La guía se comparte entre los motores local y multijugador. El primer bloque explica
+  // el mazo abierto; el segundo cambia según la forma de jugar, para no presentar como
+  // regla universal una función que solo existe en solitario o en una sala compartida.
+  function guideMarkup(modeKey, context = "local", { pulse = false } = {}) {
+    const selectedMode = mode(modeKey);
+    const datum = hiddenLabel(modeKey).replace(/\s+oculta$/i, "").toLowerCase();
+    const order = selectedMode.axis === "time" ? "de antes a después" : "de menor a mayor";
+    const pending = cards(modeKey).some(card => card.reviewStatus === "pending");
+    const shared = context === "local" || context === "online";
+    const pulseGuide = shared ? `<section class="guide-section"><h3>⚡ Pulso ${pulse ? "activo" : "opcional"}</h3><p>${pulse ? "Una vez por partida puedes usarlo en lugar de tu turno." : "El anfitrión puede activarlo antes de empezar."} Necesitas al menos dos cartas y eliges a otra persona. El mazo saca una carta que no eliges: si aciertas, le pasas una carta tuya al azar; si fallas, robas tú una. Quien recibe carta queda protegido hasta la siguiente ronda.</p></section>` : "";
+    const contextGuide = context === "solo"
+      ? `<section class="guide-section"><h3>Jugar en solitario</h3><p>Tienes tres vidas: cada fallo consume una. El reto diario propone las mismas 15 cartas a todo el mundo y solo admite un intento al día; puedes compartir el resultado sin revelar cartas. La partida libre usa todo el mazo, guarda tu mejor marca y se puede continuar más tarde. Al final, «Ver lo que se falló» permite repasarlas.</p></section>`
+      : context === "competition"
+        ? `<section class="guide-section"><h3>🏆 Competición</h3><p>Juegas cinco cartas de cada tema en un orden al azar, sin repetir temas. Cada ronda empieza con tres vidas nuevas y los aciertos se acumulan. La competición no se guarda si sales o cierras la aplicación a mitad.</p></section>`
+        : context === "online"
+          ? `<section class="guide-section"><h3>Varios móviles</h3><p>Requiere conexión durante la partida. El anfitrión crea la sala, comparte código, enlace o QR, y elige de una a seis cartas, quién empieza y el Pulso. Puede saltar un turno si alguien se desconecta. Si una persona sale, sus cartas vuelven al mazo; el anfitrión puede cerrar la sala para todos.</p></section>`
+          : `<section class="guide-section"><h3>Un solo móvil</h3><p>De 2 a 9 personas se pasan el teléfono en cada turno. Elegid de una a seis cartas por persona y quién comienza; por defecto, empieza la persona más joven.</p></section>`;
+    return `<div class="eyebrow">Guía del juego · ${escapeHtml(selectedMode.name)}</div><h2>Cómo se juega</h2><section class="guide-section"><h3>Objetivo</h3><p>Coloca las cartas en una sola línea, ordenadas ${order}. El ${escapeHtml(datum)} no se ve hasta confirmar la jugada.</p></section><section class="guide-section"><h3>Tu jugada</h3><p>Toca una carta y un hueco, o arrástrala hasta él. Confirma la posición antes de revelar. Un acierto queda en la línea; un fallo se descarta y, en una partida compartida, robas otra carta si queda alguna.</p><p>Si dos cartas tienen exactamente el mismo valor, cualquiera de los dos órdenes es válido.</p>${pending ? `<p>Las cartas «en revisión» siguen siendo jugables con el valor mostrado, pero señalan que su referencia está pendiente de contraste.</p>` : ""}</section>${shared ? `<section class="guide-section"><h3>Final de la partida</h3><p>La victoria se comprueba al acabar una ronda completa. Gana quien sea la única persona sin cartas; si varias terminan a cero, reciben una carta para desempatar. Si no quedan cartas para repartir, comparten la victoria.</p></section>` : ""}${pulseGuide}${contextGuide}`;
+  }
+
   function escapeHtml(value) {
     return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
   }
@@ -445,7 +465,7 @@
     has, mode, axis, cards,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
-    correctIndex, placementHint,
+    correctIndex, placementHint, guideMarkup,
     escapeHtml, initials, shuffle
   };
 })();

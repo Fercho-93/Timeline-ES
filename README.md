@@ -150,6 +150,11 @@ cambio. Las instrucciones están en `tests/README.md`.
 
 ## Reglas implementadas
 
+El botón **Guía** está disponible en la portada, la configuración, una partida local, el
+solitario y las salas compartidas. Explica primero el eje del mazo abierto y después solo
+las funciones de la modalidad activa: Pulso, reto diario, partida libre, competición o
+gestión de sala.
+
 - La persona más joven comienza y el turno avanza en el orden de los jugadores.
 - Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
 - El dato que ordena el mazo —fecha, superficie, población, peso, longevidad, velocidad o

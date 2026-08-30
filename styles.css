@@ -378,6 +378,10 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .rules { text-align: left; }
 .rules ol { padding-left: 21px; color: var(--muted); line-height: 1.55; }
 .rules li + li { margin-top: 9px; }
+.guide-section { margin: 18px 0; padding-top: 16px; border-top: 1px solid var(--line); }
+.guide-section:first-of-type { margin-top: 12px; }
+.guide-section h3 { margin: 0 0 7px; font-size: .92rem; color: var(--ink); }
+.guide-section p { margin: 7px 0; }
 
 .settings-modal { text-align: left; }
 .settings-modal h2 { margin: 4px 0 20px; }
