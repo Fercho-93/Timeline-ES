@@ -152,7 +152,8 @@ cambio. Las instrucciones están en `tests/README.md`.
 
 - La persona más joven comienza y el turno avanza en el orden de los jugadores.
 - Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
-- La fecha (o la superficie) permanece oculta hasta colocar la carta en un hueco de la línea.
+- El dato que ordena el mazo —fecha, superficie, población, peso, longevidad, velocidad o
+  distancia— permanece oculto hasta colocar la carta en un hueco de la línea.
 - Hay dos formas de colocar: tocar la carta y luego el hueco, o arrastrar la carta hasta cualquiera
   de los huecos. Con el dedo, el arrastre empieza tras una pulsación breve, para que deslizar sobre
   una carta siga desplazando la pantalla.
@@ -161,6 +162,9 @@ cambio. Las instrucciones están en `tests/README.md`.
 - Las cifras grandes se expresan en millones con tres cifras significativas («83,6 millones»). El
   formato se comprueba para no confundir valores distintos. En animales se permiten empates
   reales y referencias próximas: no se alteran las cifras para imponer una distancia del 8%.
+- Cuando dos cartas tienen exactamente el mismo valor, cualquiera de los dos órdenes es válido.
+  Las cartas «en revisión» indican antes de jugar que su referencia sigue pendiente de contraste;
+  mientras permanezcan en el mazo se resuelven con el valor mostrado.
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
 - Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.

@@ -19,12 +19,13 @@ const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
-function boot() {
+function boot(mode = null) {
   const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://continuum.test/" });
   const { window } = dom;
   // jsdom no maquetiza, así que no tiene scrollIntoView; y al pulsar tampoco enfoca, que
   // es lo que hace un navegador de verdad con un botón. Las dos cosas se suplen aquí.
   window.Element.prototype.scrollIntoView = function () {};
+  if (mode) window.localStorage.setItem("hilo-selected-mode-v1", mode);
   guiones().forEach(archivo => window.eval(read(archivo)));
   return window;
 }
@@ -79,6 +80,16 @@ console.log("\nLas capas son diálogos de verdad");
   // Devolver el foco espera a que el navegador confirme que la capa se ha ido.
   await respira();
   ok("y el foco vuelve al botón que las abrió", activo(w) === abrio);
+}
+
+console.log("\nLas reglas se adaptan al mazo");
+{
+  const w = boot("animals");
+  click(w, '[data-action="rules"]');
+  const texto = el(w, ".overlay .modal").textContent;
+  ok("peso muestra su dato oculto", /peso oculto/i.test(texto));
+  ok("los mazos con pendientes lo explican", /en revisión/.test(texto));
+  ok("los empates exactos se admiten", /mismo valor/.test(texto));
 }
 {
   const w = boot();
