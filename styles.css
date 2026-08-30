@@ -1,12 +1,12 @@
-/* Sistema editorial: papel cálido, tinta azulada y terracota para las decisiones.
+/* Sistema editorial: papel cálido, tinta carbón y terracota para las decisiones.
    Los colores tienen una función: la tinta manda la navegación, el terracota invita a
-   actuar, el verde confirma aciertos y el petróleo identifica estados informativos.
+   actuar, el verde confirma aciertos y el petróleo se reserva para Ciencia y online.
    `--*-solid` se reserva para fondos con texto claro y conserva el contraste en ambos
    temas. */
 :root {
   color-scheme: light;
-  --ink: #20272b;
-  --muted: #687073;
+  --ink: #2b2927;
+  --muted: #6e6963;
   --line: #dedbd3;
   --paper: #f6f1e8;
   --surface: #fffdfa;
@@ -17,11 +17,11 @@
   --green: #356b50;
   --accent-solid: #a94f32;
   --green-solid: #356b50;
-  --ink-solid: #20272b;
+  --ink-solid: #2b2927;
   --ink-solid-contrast: #fff;
   --font-display: Iowan Old Style, Palatino Linotype, Book Antiqua, Palatino, Georgia, serif;
-  --shadow: 0 14px 34px rgba(31, 43, 46, .10);
-  --shadow-soft: 0 5px 16px rgba(31, 43, 46, .07);
+  --shadow: 0 14px 34px rgba(43, 35, 29, .10);
+  --shadow-soft: 0 5px 16px rgba(43, 35, 29, .07);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -84,6 +84,8 @@ button, input, select { font: inherit; }
 button { touch-action: manipulation; }
 
 #app { min-height: 100dvh; }
+.screen-enter { animation: screen-in .32s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes screen-in { from { opacity: 0; transform: translateY(10px); } }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
@@ -111,7 +113,11 @@ button { touch-action: manipulation; }
 .gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,15,9,0) 38%, rgba(20,15,9,.5) 62%, rgba(20,15,9,.92)); pointer-events: none; }
 .panel-art { position: absolute; inset: 0; display: block; }
 .panel-art img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
-.panel-entertainment .panel-art img, .panel-science .panel-art img, .panel-nature .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
+.panel-entertainment .panel-art img, .panel-nature .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
+/* La ilustración de ciencia concentra el motivo en el tercio superior: con el encuadre
+   centrado quedaba oculto al abrir la carátula, justo detrás del degradado del título. */
+.panel-science .panel-art img { object-position: 50% 24%; }
+.panel-science::after { background: linear-gradient(180deg, rgba(10,29,34,.04) 30%, rgba(10,29,34,.38) 60%, rgba(10,29,34,.82)); }
 /* Los lomos se apagan para que la carátula elegida sea la única en color. */
 .gallery-panel:not(.active) .panel-art { filter: grayscale(.9) brightness(.44) contrast(1.05); }
 @media (hover: hover) {
@@ -139,6 +145,31 @@ button { touch-action: manipulation; }
 .game-name { font-weight: 700; font-size: .96rem; }
 .game-meta { color: var(--muted); font-size: .8rem; }
 .game-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* Los tres formatos son decisiones distintas, por eso se presentan como tarjetas y no
+   como una hilera de botones idénticos. Cada icono es un trazo discreto que acompaña al
+   texto, nunca lo sustituye. */
+.play-choices { margin: 26px 0 18px; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: color-mix(in srgb, var(--surface) 84%, var(--paper)); box-shadow: var(--shadow-soft); }
+.play-choices-head { margin-bottom: 14px; }
+.play-choices-head .eyebrow { margin-bottom: 7px; }
+.play-choices h2 { margin: 0; font-size: clamp(1.35rem, 4vw, 1.75rem); }
+.play-choice-grid { display: grid; gap: 9px; }
+.play-choice { width: 100%; min-height: 76px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); background: var(--surface); text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease; }
+.play-choice:hover { border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); background: var(--paper); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.play-choice.primary { border-color: var(--ink-solid); background: var(--ink-solid); color: var(--ink-solid-contrast); }
+.play-choice.primary:hover { filter: brightness(.92); }
+.choice-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 11px; color: var(--accent); background: var(--accent-soft); }
+.choice-icon svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.play-choice.primary .choice-icon { color: var(--ink-solid); background: #fffaf4; }
+.play-choice b, .play-choice small { display: block; }
+.play-choice b { font-size: .93rem; }
+.play-choice small { margin-top: 3px; color: var(--muted); font-size: .75rem; line-height: 1.25; }
+.play-choice.primary small { color: color-mix(in srgb, var(--ink-solid-contrast) 70%, transparent); }
+.play-choice > i { font-size: 1.1rem; font-style: normal; color: var(--accent); transition: transform .18s ease; }
+.play-choice.primary > i { color: var(--ink-solid-contrast); }
+.play-choice:hover > i { transform: translateX(3px); }
+.continue-choice { min-height: 44px; border: 0; padding: 7px 3px 0; color: var(--accent); background: transparent; font-size: .8rem; font-weight: 700; text-align: left; cursor: pointer; }
+.continue-choice span { margin-left: 5px; }
 
 h1, h2, h3, p { margin-top: 0; }
 h1 { max-width: 640px; margin-bottom: 20px; font-family: var(--font-display); font-weight: 650; font-size: clamp(2rem, 6vw, 2.75rem); line-height: 1.05; letter-spacing: -.035em; }
@@ -497,6 +528,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .gallery-panel { flex-basis: 62px; border-radius: 28px; }
   .panel-label { left: 26px; right: 26px; bottom: 24px; }
   .hand { grid-template-columns: repeat(4, 1fr); }
+  .play-choice-grid { grid-template-columns: repeat(3, 1fr); }
+  .play-choice { min-height: 170px; grid-template-columns: 1fr; align-content: start; gap: 12px; padding: 16px; }
+  .play-choice > i { position: absolute; align-self: end; justify-self: end; margin: 0 17px 16px 0; }
+  .play-choice { position: relative; }
+  .continue-choice { grid-column: 1 / -1; text-align: center; }
   .online-entry-grid { grid-template-columns: 1fr 1fr; }
   .online-form { padding: 28px; }
   .lobby-head { grid-template-columns: 1fr auto; align-items: end; }
@@ -531,5 +567,5 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   * { scroll-behavior: auto !important; transition: none !important; }
   /* Solo se apaga el despliegue de la galería: el resto de animaciones son
      indicadores de espera y sin ellas la interfaz parece colgada. */
-  .gallery-panel.active, .gallery-panel.active .panel-label { animation: none !important; }
+  .gallery-panel.active, .gallery-panel.active .panel-label, .screen-enter { animation: none !important; }
 }
