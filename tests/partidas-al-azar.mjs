@@ -20,7 +20,7 @@ const catalogo = [
   ["history", "historia", "HISTORY_CARDS"], ["world", "historia", "WORLD_CARDS"],
   ["inventions", "historia", "INVENTION_CARDS"], ["movies", "cine", "MOVIE_CARDS"],
   ["music", "cine", "MUSIC_CARDS"], ["videogames", "cine", "VIDEOGAME_CARDS"],
-  ["animals", "naturaleza", "ANIMAL_WEIGHT_CARDS"],
+  ["animals", "naturaleza", "ANIMAL_WEIGHT_CARDS"], ["lifespan", "naturaleza", "ANIMAL_LIFESPAN_CARDS"], ["speed", "naturaleza", "ANIMAL_SPEED_CARDS"],
   ["astronomy", "ciencia", "ASTRONOMY_CARDS"], ["medicine", "ciencia", "MEDICINE_CARDS"],
   ["countries", "geografia", "COUNTRY_CARDS"], ["population", "geografia", "POPULATION_CARDS"],
   ["distances", "geografia", "CITY_DISTANCE_CARDS"]
@@ -35,7 +35,7 @@ for (let g = 0; g < 40; g++) {
   const mazo = w[globalName];
   const total = mazo.length;
   const cardsById = new Map(mazo.map(c => [c.id, c]));
-  const orden = card => (["countries", "population", "animals", "distances"].includes(mode) ? card.value : card.year);
+  const orden = card => (["countries", "population", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
   fire(w, w.document.querySelector('[data-action="setup"]'));
   const players = 2 + (g % 8);
   for (let i = 2; i < players; i++) fire(w, w.document.querySelector('[data-action="add-player"]'));

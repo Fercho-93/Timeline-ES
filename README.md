@@ -42,6 +42,11 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 - **Peso de animales:** 38 especies ordenadas por masa típica adulta, desde una abeja hasta una
   ballena azul. Las cifras son orientativas: sexo, edad y población cambian el peso real.
+- **Esperanza de vida de animales:** 38 referencias de longevidad, desde insectos que viven días
+  hasta animales marinos de aguas profundas de varios milenios. La carta explica si el dato es
+  habitual o procede de una longevidad máxima documentada.
+- **Velocidad de animales:** 38 velocidades punta, de caracol a halcón peregrino. Cada carta dice
+  si se trata de caminar, correr, nadar o picar, porque no todos se mueven en el mismo medio.
 
 **Geografía**
 
@@ -66,7 +71,7 @@ La aplicación ofrece cuatro formas de jugar:
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
 - **En solitario:** una persona contra el mazo, con tres vidas.
-- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los doce juegos.
+- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los catorce juegos.
 
 Al terminar una partida —local, en solitario o de competición— si hubo alguna carta mal
 colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su
@@ -96,7 +101,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   amigos necesitaría el día que exista, sin tener que rehacer partidas ya jugadas para tenerlo.
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
-- **Competición:** una ronda de 5 cartas por cada uno de los doce juegos, en un orden al azar
+- **Competición:** una ronda de 5 cartas por cada uno de los catorce juegos, en un orden al azar
   distinto cada vez y sin repetir ninguno, con tres vidas nuevas en cada ronda. Al terminar la
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
