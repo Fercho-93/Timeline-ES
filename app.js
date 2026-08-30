@@ -133,6 +133,24 @@
     }).join("")}</div>`;
   }
 
+  // Los iconos son trazos propios, no una librería externa: no añaden una descarga ni
+  // rompen el uso sin conexión. El texto sigue siendo el nombre accesible de cada modo.
+  function playIcon(kind) {
+    const common = 'viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
+    if (kind === "local") return `<svg ${common}><rect x="7" y="2.75" width="10" height="18.5" rx="2.2"></rect><path d="M10.5 18h3"></path></svg>`;
+    if (kind === "online") return `<svg ${common}><rect x="3" y="6" width="10" height="15" rx="2"></rect><rect x="11" y="2.75" width="10" height="15" rx="2"></rect><path d="M14 14.75h4"></path></svg>`;
+    return `<svg ${common}><circle cx="12" cy="8" r="3.25"></circle><path d="M5.5 21c.8-4.05 3.05-6 6.5-6s5.7 1.95 6.5 6"></path></svg>`;
+  }
+
+  function playChoices(resume) {
+    return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div><div class="play-choice-grid">
+      <button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
+      <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
+      <button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>
+      ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}
+    </div></section>`;
+  }
+
   function home() {
     screen = "home";
     const resume = game && game.mode === selectedModeKey;
@@ -142,12 +160,7 @@
         <div class="hero-copy">
           <h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
           ${gameList()}
-          <div class="actions">
-            <button class="btn btn-primary" data-action="setup">Un solo móvil <span>→</span></button>
-            <button class="btn btn-secondary" data-action="online">Varios móviles</button>
-            <button class="btn btn-secondary" data-action="solo">Jugar solo</button>
-            ${resume ? '<button class="btn btn-secondary" data-action="continue">Continuar</button>' : ''}
-          </div>
+          ${playChoices(resume)}
           <button class="comp-promo" data-action="start-competition">
             <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
             <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
