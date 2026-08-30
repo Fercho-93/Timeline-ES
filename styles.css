@@ -105,10 +105,13 @@ button { touch-action: manipulation; }
    así que el panel nace ya desplegado y no hay estado anterior desde el que
    transicionar. */
 /* En móvil la galería va primero: se elige el juego y luego se lee de qué va. */
-.gallery { order: -1; display: flex; gap: 10px; height: clamp(310px, 44vh, 430px); margin: 2px 0; }
-.gallery-panel { position: relative; flex: 0 1 66px; min-width: 0; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.16); border-radius: 24px; background: #241b14; cursor: pointer; isolation: isolate; box-shadow: 0 18px 42px rgba(52,34,17,.22); transition: flex-grow .45s cubic-bezier(.22,.61,.36,1); }
-.gallery-panel.active { flex-grow: 1; cursor: default; animation: panel-open .5s cubic-bezier(.22,.61,.36,1); }
-@keyframes panel-open { from { flex-grow: .02; } }
+.gallery { order: -1; display: flex; gap: 8px; height: clamp(310px, 44vh, 430px); margin: 2px 0; }
+/* Con seis bloques, dejar 66 px a cada lomo agotaba el ancho de un móvil antes de
+   repartir ninguno al panel abierto. Los lomos tienen una anchura fija y el elegido
+   recibe el resto: así siempre se despliega, incluso en pantallas estrechas. */
+.gallery-panel { position: relative; flex: 0 0 42px; min-width: 0; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.16); border-radius: 24px; background: #241b14; cursor: pointer; isolation: isolate; box-shadow: 0 18px 42px rgba(52,34,17,.22); transition: flex .45s cubic-bezier(.22,.61,.36,1); }
+.gallery-panel.active { flex: 1 1 0; cursor: default; animation: panel-open .5s cubic-bezier(.22,.61,.36,1); }
+@keyframes panel-open { from { flex: .02 1 0; } }
 .gallery-panel:focus-visible { outline: 3px solid rgba(189,139,49,.55); outline-offset: 3px; }
 .gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,15,9,0) 38%, rgba(20,15,9,.5) 62%, rgba(20,15,9,.92)); pointer-events: none; }
 .panel-art { position: absolute; inset: 0; display: block; }
@@ -480,7 +483,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .timeline-wrap { margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
   .hero { grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr); min-height: calc(100dvh - 115px); }
   .gallery { order: 0; height: min(66vh, 600px); gap: 12px; }
-  .gallery-panel { flex-basis: 78px; border-radius: 28px; }
+  .gallery-panel { flex-basis: 62px; border-radius: 28px; }
   .panel-label { left: 26px; right: 26px; bottom: 24px; }
   .hand { grid-template-columns: repeat(4, 1fr); }
   .online-entry-grid { grid-template-columns: 1fr 1fr; }
@@ -491,8 +494,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 }
 
 @media (max-width: 420px) {
-  .gallery { height: 290px; gap: 8px; }
-  .gallery-panel { flex-basis: 56px; border-radius: 12px; }
+  .gallery { height: 290px; gap: 4px; }
+  .gallery-panel { flex-basis: 34px; border-radius: 12px; }
   .panel-label { left: 16px; right: 16px; bottom: 16px; column-gap: 11px; }
   .hand { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   /* En una pantalla estrecha, una carta a tamaño normal ocupa casi todo el ancho: apenas
