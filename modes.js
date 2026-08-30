@@ -51,6 +51,17 @@
     return `${Math.round(value).toLocaleString("es-ES")} km`;
   }
 
+  function compactLifespan(value) {
+    if (value < 1 / 12) return `${Math.round(value * 365)} días`;
+    if (value < 1) return `${Math.round(value * 12)} meses`;
+    return `${Math.round(value).toLocaleString("es-ES")} años`;
+  }
+
+  function compactSpeed(value) {
+    const decimals = value < 1 ? 2 : value < 10 ? 1 : 0;
+    return `${value.toLocaleString("es-ES", { maximumFractionDigits: decimals })} km/h`;
+  }
+
   // Un eje dice cómo se ordenan las cartas, cómo se muestra el dato una vez revelado y
   // cómo se llama mientras está oculto. Es lo que permite que la línea no sea siempre
   // temporal: la de países ordena por tamaño con el mismo motor.
@@ -121,6 +132,38 @@
         { limit: 1000, key: "grananimal", name: "Grande", symbol: "★" },
         { limit: 10000, key: "giganteanimal", name: "Gigante", symbol: "⬢" },
         { limit: Infinity, key: "colosal", name: "Colosal", symbol: "◉" }
+      ]
+    },
+    lifespan: {
+      sortValue: card => card.value,
+      format: card => compactLifespan(card.value),
+      shortValue: card => compactLifespan(card.value),
+      hiddenLabel: "Vida oculta",
+      timelineTitle: "De menos a más longevos",
+      question: "¿Vive menos o más?",
+      bands: [
+        { limit: 1, key: "fugaz", name: "Fugaz", symbol: "·" },
+        { limit: 10, key: "breve", name: "Breve", symbol: "▪" },
+        { limit: 50, key: "duradero", name: "Duradero", symbol: "◈" },
+        { limit: 100, key: "veterano", name: "Veterano", symbol: "◆" },
+        { limit: 300, key: "centenario", name: "Centenario", symbol: "★" },
+        { limit: Infinity, key: "milenario", name: "Milenario", symbol: "◉" }
+      ]
+    },
+    speed: {
+      sortValue: card => card.value,
+      format: card => compactSpeed(card.value),
+      shortValue: card => compactSpeed(card.value),
+      hiddenLabel: "Velocidad oculta",
+      timelineTitle: "De más lento a más rápido",
+      question: "¿Más lento o más rápido?",
+      bands: [
+        { limit: 1, key: "pausado", name: "Pausado", symbol: "·" },
+        { limit: 20, key: "tranquilo", name: "Tranquilo", symbol: "▪" },
+        { limit: 70, key: "veloz", name: "Veloz", symbol: "◈" },
+        { limit: 130, key: "rapido", name: "Rápido", symbol: "◆" },
+        { limit: 200, key: "fulgurante", name: "Fulgurante", symbol: "★" },
+        { limit: Infinity, key: "vertiginoso", name: "Vertiginoso", symbol: "◉" }
       ]
     },
     distance: {
@@ -271,6 +314,16 @@
       cardLabel: "animales", blurb: "De una abeja a la ballena azul.", cards: window.ANIMAL_WEIGHT_CARDS,
       axis: "mass"
     },
+    lifespan: {
+      key: "lifespan", name: "Esperanza de vida de animales",
+      cardLabel: "animales", blurb: "De días a milenios.", cards: window.ANIMAL_LIFESPAN_CARDS,
+      axis: "lifespan"
+    },
+    speed: {
+      key: "speed", name: "Velocidad de animales",
+      cardLabel: "animales", blurb: "De un caracol a un halcón.", cards: window.ANIMAL_SPEED_CARDS,
+      axis: "speed"
+    },
     countries: {
       key: "countries", name: "Superficie de países",
       cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
@@ -301,7 +354,7 @@
     historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "world", "inventions"] },
     cine: { key: "cine", name: "Entretenimiento", icon: "🎭", art: "entertainment", tagline: "Ordena la cultura popular.", games: ["movies", "music", "videogames"] },
     ciencia: { key: "ciencia", name: "Ciencia", icon: "🔬", art: "science", tagline: "Ordena los descubrimientos.", games: ["astronomy", "medicine"] },
-    naturaleza: { key: "naturaleza", name: "Naturaleza", icon: "🦋", art: "nature", tagline: "Ordena la vida.", games: ["animals"] },
+    naturaleza: { key: "naturaleza", name: "Naturaleza", icon: "🦋", art: "nature", tagline: "Ordena la vida.", games: ["animals", "lifespan", "speed"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population", "distances"] },
     mezcla: { key: "mezcla", name: "Gran mezcla temporal", icon: "⏳", art: "mixed", tagline: "Solo mazos de línea temporal.", games: ["mixed"] }
   };

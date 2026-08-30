@@ -326,6 +326,18 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .era-continental { background: #4a5f70; }
 .era-oceanica { background: #5f506a; }
 .era-antipoda { background: #3f625e; }
+.era-fugaz { background: #5d586c; }
+.era-breve { background: #665248; }
+.era-duradero { background: #556a59; }
+.era-veterano { background: #4a5f70; }
+.era-centenario { background: #5f506a; }
+.era-milenario { background: #3f625e; }
+.era-pausado { background: #5d586c; }
+.era-tranquilo { background: #665248; }
+.era-veloz { background: #556a59; }
+.era-rapido { background: #4a5f70; }
+.era-fulgurante { background: #5f506a; }
+.era-vertiginoso { background: #3f625e; }
 .hint { margin: 12px 0 0; color: var(--muted); font-size: .85rem; text-align: center; }
 
 /* El Pulso. El acento es el mismo bronce del resto: no es un modo aparte, es una jugada
