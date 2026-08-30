@@ -54,7 +54,7 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 - **Distancias entre ciudades:** 38 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 
-**Gran mezcla** no es de ningún bloque temático, a propósito: concatena los ocho mazos
+**Gran mezcla temporal** no es de ningún bloque temático, a propósito: concatena los ocho mazos
 cronológicos —673 cartas en total— y los ordena sobre un único eje. Se presenta aparte en la
 portada como modalidad transversal, reutiliza las épocas generales de Historia mundial y no
 entra en la rotación del modo Competición, que sí cambia de tema.

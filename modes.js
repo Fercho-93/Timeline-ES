@@ -163,8 +163,8 @@
     // bandas de esta modalidad son las mismas que las de Historia mundial (`WORLD_BANDS`),
     // el mazo con la periodización más general de los cuatro.
     mixed: {
-      key: "mixed", name: "Gran mezcla",
-      cardLabel: "hitos", blurb: "Historia, cultura y ciencia, todo junto.",
+      key: "mixed", name: "Gran mezcla temporal",
+      cardLabel: "hitos", blurb: "Todos los mazos de línea temporal, juntos.",
       cards: [
         ...window.HISTORY_CARDS, ...window.WORLD_CARDS, ...window.INVENTION_CARDS,
         ...window.MOVIE_CARDS, ...window.MUSIC_CARDS, ...window.VIDEOGAME_CARDS,
@@ -303,7 +303,7 @@
     ciencia: { key: "ciencia", name: "Ciencia", icon: "🔬", art: "science", tagline: "Ordena los descubrimientos.", games: ["astronomy", "medicine"] },
     naturaleza: { key: "naturaleza", name: "Naturaleza", icon: "🦋", art: "nature", tagline: "Ordena la vida.", games: ["animals"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population", "distances"] },
-    mezcla: { key: "mezcla", name: "Gran mezcla", icon: "⏳", art: "mixed", tagline: "Ordena el tiempo.", games: ["mixed"] }
+    mezcla: { key: "mezcla", name: "Gran mezcla temporal", icon: "⏳", art: "mixed", tagline: "Solo mazos de línea temporal.", games: ["mixed"] }
   };
 
   const DEFAULT_MODE = "history";

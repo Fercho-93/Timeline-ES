@@ -850,7 +850,8 @@
   // cambiada consigo. Se pierde si se recarga la página a mitad, igual que se perdería
   // una mano de cartas repartida y no anotada en cualquier juego de mesa.
   const ROUND_CARDS = 5;
-  // «Gran mezcla» no es un género propio: es la combinación de otros cuatro. Un tema de
+  // «Gran mezcla temporal» no es un género propio: combina los demás mazos con eje temporal.
+  // Un tema de
   // competición que sea «un poco de todo lo anterior» no aporta nada nuevo a la ronda, así
   // que se excluye de la rotación.
   const COMP_MODES = Object.keys(CT.MODES).filter(key => key !== "mixed");
