@@ -1,5 +1,5 @@
-// Reglas de calidad de todos los mazos: sin cartas repetidas, sin huecos y, sobre todo,
-// sin parejas tan pegadas que colocarlas bien sea cuestión de suerte.
+// Integridad de los mazos. Estas pruebas no verifican la verdad de una afirmación.
+// La dificultad de la selección nunca justifica modificar un dato documentado.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -31,21 +31,15 @@ function fechadasDensas(nombre, mazo) {
 }
 
 // En mazos contemporáneos hay décadas repletas de hitos imprescindibles. Se conserva
-// el año único —nunca hay un empate al azar—, pero no se impone el espaciado pensado para
+// el año único como decisión de selección, pero no se impone el espaciado pensado para
 // relatos de miles de años.
 fechadasDensas("Hitos de la música", MUSIC_CARDS);
 fechadasDensas("Historia de los videojuegos", VIDEOGAME_CARDS);
 fechadasDensas("Astronomía y espacio", ASTRONOMY_CARDS);
 fechadasDensas("Historia de la medicina", MEDICINE_CARDS);
 
-// En los mazos nuevos del bloque de historia la fecha es el juego entero, así que no
-// puede haber dos cartas del mismo año —serían una moneda al aire— ni demasiadas en
-// años seguidos, que se razonan igual de mal. Historia de España es la excepción: es
-// el mazo fundacional y algunos años concentran de verdad varios hechos mayores (1492,
-// 1808...); `placeCard` compara con `>=` y `<=`, así que dos cartas del mismo año se dan
-// por buenas en cualquier orden y no son una moneda al aire, solo una coincidencia de
-// calendario. Lo que sí lo es —y lo que cuenta como «pegado»— es un año de diferencia:
-// ahí sí hay un orden correcto y solo uno.
+// Las fechas únicas y su distribución son criterios editoriales de estos mazos.
+// Los empates reales se aceptan en ambos órdenes por los motores del juego.
 function fechadas(nombre, mazo, { unicos = true } = {}) {
   comunes(nombre, mazo, c => c.year);
   if (unicos) ok("cada año aparece una sola vez", new Set(mazo.map(c => c.year)).size === mazo.length);
@@ -58,9 +52,9 @@ fechadas("Historia de España", HISTORY_CARDS, { unicos: false });
 fechadas("Inventos y descubrimientos", INVENTION_CARDS);
 fechadas("Historia mundial", WORLD_CARDS);
 
-// En los mazos numéricos, dos cartas demasiado próximas no se razonan: se aciertan por
-// suerte. El margen es el mismo para todos.
-function separadas(nombre, mazo, unidad) {
+// El 8 % se conserva como criterio de selección de geografía. En animales se
+// permiten proximidad y empates documentados; nunca se retocan cifras para separarlas.
+function separadas(nombre, mazo, unidad, { margen = true } = {}) {
   comunes(nombre, mazo, c => c.value);
   const orden = [...mazo].sort((a, b) => b.value - a.value);
   let peor = { salto: Infinity, par: "" };
@@ -69,16 +63,18 @@ function separadas(nombre, mazo, unidad) {
     const salto = orden[i - 1].value / card.value;
     if (salto < peor.salto) peor = { salto, par: `${orden[i - 1].title} y ${card.title}` };
   });
-  ok(`ningún par a menos del 8% (el más justo: ${peor.par}, ${((peor.salto - 1) * 100).toFixed(0)}%)`, peor.salto >= 1.08);
-  ok(`${unidad} sin repetir`, new Set(mazo.map(c => c.value)).size === mazo.length);
+  if (margen) {
+    ok(`ningún par a menos del 8% (el más justo: ${peor.par}, ${((peor.salto - 1) * 100).toFixed(0)}%)`, peor.salto >= 1.08);
+    ok(`${unidad} sin repetir`, new Set(mazo.map(c => c.value)).size === mazo.length);
+  }
   ok(`${unidad} siempre positivas`, mazo.every(c => c.value > 0));
 }
 
 separadas("Superficie de países", COUNTRY_CARDS, "superficies");
 separadas("Población de países", POPULATION_CARDS, "poblaciones");
-separadas("Peso de animales", ANIMAL_WEIGHT_CARDS, "pesos");
-separadas("Esperanza de vida de animales", ANIMAL_LIFESPAN_CARDS, "longevidades");
-separadas("Velocidad de animales", ANIMAL_SPEED_CARDS, "velocidades");
+separadas("Peso de animales", ANIMAL_WEIGHT_CARDS, "pesos", { margen: false });
+separadas("Longevidad de animales", ANIMAL_LIFESPAN_CARDS, "longevidades", { margen: false });
+separadas("Velocidad de animales", ANIMAL_SPEED_CARDS, "velocidades", { margen: false });
 separadas("Distancias entre ciudades", CITY_DISTANCE_CARDS, "distancias");
 ok("las poblaciones son números enteros de personas", POPULATION_CARDS.every(c => Number.isInteger(c.value)));
 
@@ -89,8 +85,8 @@ function redondeoLegible(nombre, modo, mazo) {
   console.log(`\n${nombre}, ya redondeado`);
   const orden = [...mazo].sort((a, b) => a.value - b.value);
   const textos = orden.map(card => CT.formatValue(modo, card));
-  const repetido = textos.find((texto, i) => i && texto === textos[i - 1]);
-  ok(`ninguna cifra se repite tras redondear${repetido ? ` (${repetido})` : ""}`, !repetido);
+  const repetido = textos.find((texto, i) => i && texto === textos[i - 1] && orden[i].value !== orden[i - 1].value);
+  ok(`el formato no confunde valores distintos${repetido ? ` (${repetido})` : ""}`, !repetido);
   ok("la cifra más pequeña no se queda en cero", !/^0[.,]?0*\s/.test(textos[0]));
   const largo = textos.reduce((a, b) => b.length > a.length ? b : a);
   ok(`la cifra más larga cabe en una carta: «${largo}»`, largo.length <= 22);

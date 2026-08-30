@@ -1,19 +1,19 @@
 # Verificación del mazo de población
 
-Fecha de revisión: 26 de agosto de 2026.
+Fecha de revisión inicial: 26 de agosto de 2026. Fecha y ámbito corregidos el 30 de agosto.
 
 ## Fuente y fecha de corte
 
-- **Población a 1 de enero de 2026**, tomada de la tabla «Población por país (2026)» de
-  Worldometer, que publica las estimaciones de la **revisión de 2024 de las Perspectivas de la
+- **Población proyectada a 1 de julio de 2026**, tomada de la tabla «Población por país (2026)» de
+  Worldometer, que publica las proyecciones de la **revisión de 2024 de las Perspectivas de la
   Población Mundial** de la División de Población de la ONU.
 - La tabla completa (234 filas, países y territorios) la aportó el autor del repositorio; las
   cifras del mazo se copian de ella sin redondear.
 
-**Por qué la fecha de corte no envejece el mazo:** ningún país cambia de población un 8% en un
-año, y esa es justo la separación mínima entre cartas contiguas. Las cifras de la carta se
-quedarán algo desfasadas con el tiempo, pero **el orden seguirá siendo correcto**, que es lo
-único que decide si una jugada acierta o falla.
+**Serie congelada:** se juega con la proyección de esa fecha y revisión, no con una
+población en tiempo real. Las 49 cifras coinciden con la tabla contrastada en la auditoría.
+El margen del 8 % no garantiza que el orden sobreviva a futuras revisiones; al actualizar
+hay que contrastar de nuevo la serie completa sin mezclar censos nacionales de otras fechas.
 
 ## Resultado
 
@@ -62,10 +62,11 @@ solo cabe una carta. Las bajas notables, con su motivo:
 
 ## Cifras con matiz
 
-- **Francia (66.746.401):** la cifra de la ONU incluye los territorios de ultramar. La Francia
-  metropolitana ronda los 66 millones, y se dice en la propia carta.
+- **Francia (66.746.401):** se usa el ámbito WPP 2024, que excluye los territorios de ultramar
+  enumerados por la ONU. No equivale al total nacional publicado por el INSEE.
+  Véase la nota territorial 10 de [UNFPA](https://www.unfpa.org/data/world-population/WORLD).
 - **Ciudad del Vaticano (506):** la ONU la cuenta aparte de Italia. Es una población residente,
   no el número de personas que pisan el país cada día.
 - **Siria y Venezuela:** las dos han vivido salidas masivas de población en la última década, y
   sus cifras son las más revisadas de todo el mazo entre una edición y otra de la ONU. Aun así,
-  sus vecinas de línea están a más de un 8%, así que el orden aguanta.
+  la separación entre vecinas debe volver a comprobarse si se adopta otra edición.

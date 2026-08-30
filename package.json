@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "test": "node tests/sintaxis.mjs && node tests/partida-local.mjs && node tests/partidas-al-azar.mjs && node tests/service-worker.mjs && node tests/mazos.mjs && node tests/solitario.mjs && node tests/pulso.mjs && node tests/accesibilidad.mjs",
+    "test": "node tests/sintaxis.mjs && node tests/referencias-animales.mjs && node tests/partida-local.mjs && node tests/partidas-al-azar.mjs && node tests/service-worker.mjs && node tests/mazos.mjs && node tests/solitario.mjs && node tests/pulso.mjs && node tests/accesibilidad.mjs",
     "test:reglas": "firebase emulators:exec --project demo-hilo --only firestore \"node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs\"",
     "test:todo": "npm test && npm run test:reglas"
   },

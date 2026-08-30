@@ -63,3 +63,10 @@ navegador y avisa en cuanto alguien añade una banda demasiado clara.
 Comprueba lo que decide qué versión ve cada móvil: se responde con la copia guardada,
 pero se pide la del servidor por detrás, así que un archivo nuevo llega en el siguiente
 arranque aunque se olvide subir el número de la caché.
+
+## Referencias animales
+
+`node tests/referencias-animales.mjs` juega casos con empates y cifras próximas en el DOM
+real: comprueba ambos lados de un empate, el orden de 70 y 70,35 km/h, la precisión de las
+masas y que los datos pendientes se avisan en el título y la explicación. No valida hechos
+zoológicos: las fuentes y los límites están en `VERIFICACION_CORRECCIONES.md`.

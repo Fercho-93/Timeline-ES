@@ -1,6 +1,9 @@
 # Verificación de la expansión de Entretenimiento, Ciencia y Naturaleza
 
-Fecha de revisión: 29 de agosto de 2026.
+Fecha de revisión inicial: 29 de agosto de 2026. Criterios corregidos el 30 de agosto.
+
+Esta revisión inicial no certificó cada cifra. Las correcciones y las limitaciones vigentes
+se detallan en [VERIFICACION_CORRECCIONES.md](VERIFICACION_CORRECCIONES.md).
 
 ## Resultado
 
@@ -10,7 +13,7 @@ Fecha de revisión: 29 de agosto de 2026.
 - **Historia de la medicina:** 48 cartas, desde aproximadamente 400 a. C. hasta 2024.
 - **Peso de animales:** 38 cartas, de 0,1 g a 150 t.
 - **Distancias entre ciudades:** 38 cartas, de 17 km a 19.597 km.
-- **Esperanza de vida de animales:** 38 cartas, de días a milenios.
+- **Longevidad de animales:** 38 cartas, de días a milenios.
 - **Velocidad de animales:** 38 cartas, de 0,03 km/h a 360 km/h.
 - 351 identificadores nuevos, todos únicos y reservados por mazo: 6000 música, 7000
   videojuegos, 8000 astronomía, 9000 medicina, 10000 peso, 11000 distancias,
@@ -32,15 +35,15 @@ Fecha de revisión: 29 de agosto de 2026.
    observar una posibilidad y convertirla en un tratamiento disponible.
 5. En astronomía se diferencia descubrimiento, anuncio y fecha de misión; por ejemplo, James
    Webb se lanza en 2021 y publica sus primeras imágenes científicas en 2022.
-6. Los pesos son masas típicas de adultos, expresadas en kilogramos; no se presentan como un
-   máximo de la especie ni como el peso de un individuo excepcional.
+6. Los pesos son referencias en kilogramos. Se distingue el sexo, el promedio publicado,
+   el extremo de un rango o el ejemplar excepcional; no se consideran medias universales.
 7. Cada distancia es la geodésica de círculo máximo entre coordenadas de centros urbanos,
    calculada con Haversine y radio terrestre de 6.371 km. No es una distancia por carretera,
    ferrocarril ni una ruta comercial de aviación.
-8. La longevidad no se presenta como una promesa individual: cada carta usa una referencia
-   documentada y especifica los casos de vida máxima, cautividad o estimación de colonia.
-9. La velocidad es una punta de referencia; las cartas indican el movimiento concreto para no
-   confundir una carrera, un nado y un picado.
+8. La longevidad distingue contexto y tipo de edad; no todas las referencias son medias.
+   Los casos aún sin respaldo suficiente llevan un aviso visible de revisión.
+9. La velocidad distingue movimiento y tipo de medición; crucero, media de carrera y máximo
+   observado no se presentan como récords absolutos equivalentes. Se permiten empates reales.
 
 ## Fuentes de contraste principales
 

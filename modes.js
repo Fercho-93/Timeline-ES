@@ -11,8 +11,8 @@
 
   // Un número entero largo no dice nada: 1.476.625.576 no se lee, se mira. A partir del
   // millón se expresa en millones con tres cifras significativas. Redondear no puede
-  // estropear el juego porque entre dos cartas contiguas siempre hay al menos un 8%: el
-  // orden se mantiene y nunca salen dos cartas con la misma cifra.
+  // estropear el orden de las superficies y poblaciones seleccionadas. Los ejes de
+  // animales tienen su propio formato; pueden existir empates reales.
   function compact(value) {
     if (value < 1e6) {
       if (value < 10) return value.toLocaleString("es-ES", { maximumFractionDigits: 2 });
@@ -41,7 +41,7 @@
   function compactMass(value) {
     if (value < 0.001) return `${Math.round(value * 1e6).toLocaleString("es-ES")} mg`;
     if (value < 1) return `${Math.round(value * 1000).toLocaleString("es-ES")} g`;
-    if (value < 1000) return `${Math.round(value).toLocaleString("es-ES")} kg`;
+    if (value < 1000) return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} kg`;
     const tonnes = value / 1000;
     const decimals = tonnes >= 100 ? 0 : tonnes >= 10 ? 0 : 1;
     return `${tonnes.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })} t`;
@@ -54,11 +54,11 @@
   function compactLifespan(value) {
     if (value < 1 / 12) return `${Math.round(value * 365)} días`;
     if (value < 1) return `${Math.round(value * 12)} meses`;
-    return `${Math.round(value).toLocaleString("es-ES")} años`;
+    return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} años`;
   }
 
   function compactSpeed(value) {
-    const decimals = value < 1 ? 2 : value < 10 ? 1 : 0;
+    const decimals = value < 1 ? 3 : 2;
     return `${value.toLocaleString("es-ES", { maximumFractionDigits: decimals })} km/h`;
   }
 
@@ -311,17 +311,17 @@
     },
     animals: {
       key: "animals", name: "Peso de animales",
-      cardLabel: "animales", blurb: "De una abeja a la ballena azul.", cards: window.ANIMAL_WEIGHT_CARDS,
+      cardLabel: "animales", blurb: "Masas de referencia; consulta el sexo y el rango.", cards: window.ANIMAL_WEIGHT_CARDS,
       axis: "mass"
     },
     lifespan: {
-      key: "lifespan", name: "Esperanza de vida de animales",
-      cardLabel: "animales", blurb: "De días a milenios.", cards: window.ANIMAL_LIFESPAN_CARDS,
+      key: "lifespan", name: "Longevidad de animales",
+      cardLabel: "animales", blurb: "Edades de referencia, con contexto y casos en revisión.", cards: window.ANIMAL_LIFESPAN_CARDS,
       axis: "lifespan"
     },
     speed: {
       key: "speed", name: "Velocidad de animales",
-      cardLabel: "animales", blurb: "De un caracol a un halcón.", cards: window.ANIMAL_SPEED_CARDS,
+      cardLabel: "animales", blurb: "Movimiento y medición indicados; hay datos en revisión.", cards: window.ANIMAL_SPEED_CARDS,
       axis: "speed"
     },
     countries: {
@@ -331,7 +331,7 @@
     },
     population: {
       key: "population", name: "Población de países",
-      cardLabel: "países", blurb: "Del Vaticano a la India.", cards: window.POPULATION_CARDS,
+      cardLabel: "países", blurb: "Proyección ONU a 1 de julio de 2026.", cards: window.POPULATION_CARDS,
       axis: "population"
     },
     distances: {

@@ -22,7 +22,7 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 - **Estrenos de cine:** 87 películas conocidas, de *Viaje a la Luna* (1902) a *Del revés 2* (2024),
   con trece títulos del cine español. Cada año aparece una sola vez y el reparto está equilibrado
-  por décadas, para que ninguna carta sea una moneda al aire entre dos estrenos del mismo año.
+  por décadas para ofrecer una selección variada de estrenos.
 - **Hitos de la música:** 51 estrenos, obras, discos y cambios de formato, de *L'Orfeo* (1607)
   a *The Eras Tour* (2023). El recorrido cruza música clásica, jazz, rock, pop, hip-hop y la
   transición del fonógrafo al streaming.
@@ -40,13 +40,17 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 **Naturaleza**
 
-- **Peso de animales:** 38 especies ordenadas por masa típica adulta, desde una abeja hasta una
-  ballena azul. Las cifras son orientativas: sexo, edad y población cambian el peso real.
-- **Esperanza de vida de animales:** 38 referencias de longevidad, desde insectos que viven días
-  hasta animales marinos de aguas profundas de varios milenios. La carta explica si el dato es
-  habitual o procede de una longevidad máxima documentada.
-- **Velocidad de animales:** 38 velocidades punta, de caracol a halcón peregrino. Cada carta dice
-  si se trata de caminar, correr, nadar o picar, porque no todos se mueven en el mismo medio.
+- **Peso de animales:** 38 referencias de masa. Los títulos distinguen sexo, ejemplares grandes,
+  medias publicadas y extremos de rangos cuando corresponde; no son promedios universales.
+- **Longevidad de animales:** 38 referencias de edad. Se distingue fase adulta, vida en libertad,
+  cuidado humano, estadísticos y edades de ejemplares o colonias. Por eso el mazo ya no se
+  presenta como «esperanza de vida», que implicaría una medida estadística homogénea.
+- **Velocidad de animales:** 38 referencias que identifican movimiento y tipo de medición:
+  esprint, nado, picado, crucero o media de una carrera. No es una tabla de récords absolutos.
+- **Datos pendientes:** 25 cartas de longevidad y velocidad llevan «en revisión» en el título,
+  visible antes de colocarlas, y explican qué falta contrastar. Se conservan sus valores
+  provisionales, sin certificarlos ni sustituirlos por estimaciones inventadas.
+  Véase [correcciones, fuentes y pendientes](VERIFICACION_CORRECCIONES.md).
 
 **Geografía**
 
@@ -54,7 +58,7 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
   Aquí la línea no es temporal: se ordena por tamaño. Ningún país está a menos de un 8% de otro,
   así que las cartas cercanas siempre se pueden razonar.
 - **Población de países:** 49 países ordenados de menos a más gente, del Vaticano a la India,
-  con las cifras de la ONU a 1 de enero de 2026. Mismo margen del 8%: por eso falta China, que
+  con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer). Mismo margen del 8%: por eso falta China, que
   queda a un 4% de la India.
 - **Distancias entre ciudades:** 38 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
@@ -155,7 +159,8 @@ cambio. Las instrucciones están en `tests/README.md`.
 - Al elegir un hueco hay que confirmarlo antes de revelar, se haya llegado tocando o arrastrando:
   en un móvil el dedo falla y la jugada no debería depender de eso.
 - Las cifras grandes se expresan en millones con tres cifras significativas («83,6 millones»). El
-  redondeo no puede estropear ninguna jugada porque entre dos cartas contiguas siempre hay un 8%.
+  formato se comprueba para no confundir valores distintos. En animales se permiten empates
+  reales y referencias próximas: no se alteran las cifras para imponer una distancia del 8%.
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
 - Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.

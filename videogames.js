@@ -14,7 +14,7 @@ window.VIDEOGAME_CARDS = [
   { id: 7011, year: 1983, title: "Famicom llega a Japón", detail: "Nintendo lanza la consola que fuera de Japón se conocerá como NES y ayudará a reconstruir el mercado doméstico." },
   { id: 7012, year: 1984, title: "Tetris", detail: "Alekséi Pázhitnov crea en Moscú el rompecabezas de piezas que encajan y que acabará en casi cualquier plataforma imaginable." },
   { id: 7013, year: 1985, title: "Super Mario Bros.", detail: "Mario cruza el Reino Champiñón y establece el lenguaje de los juegos de plataformas para consola." },
-  { id: 7014, year: 1986, title: "The Legend of Zelda", detail: "Nintendo mezcla exploración, puzles y combate en una aventura que permite guardar la partida en el cartucho." },
+  { id: 7014, year: 1986, title: "The Legend of Zelda", detail: "Nintendo lanza la aventura en Japón para Famicom Disk System, que guarda la partida en disco. La versión occidental en cartucho llegará en 1987." },
   { id: 7015, year: 1987, title: "Final Fantasy", detail: "Square publica el juego de rol que dará origen a una de las sagas japonesas más longevas." },
   { id: 7016, year: 1988, title: "Mega Drive", detail: "Sega estrena en Japón una consola de 16 bits que competirá directamente con Nintendo durante la siguiente generación." },
   { id: 7017, year: 1989, title: "Game Boy", detail: "Nintendo combina pantalla monocroma, autonomía y Tetris para convertir el juego portátil en un mercado masivo." },
