@@ -1,4 +1,4 @@
-# Verificación de la expansión de Entretenimiento y Ciencia
+# Verificación de la expansión de Entretenimiento, Ciencia y Naturaleza
 
 Fecha de revisión: 29 de agosto de 2026.
 
@@ -8,8 +8,10 @@ Fecha de revisión: 29 de agosto de 2026.
 - **Historia de los videojuegos:** 51 cartas, de 1952 a 2024.
 - **Astronomía y espacio:** 49 cartas, de 1543 a 2024.
 - **Historia de la medicina:** 48 cartas, desde aproximadamente 400 a. C. hasta 2024.
-- 199 identificadores nuevos, todos únicos y reservados por mazo: 6000 música, 7000
-  videojuegos, 8000 astronomía y 9000 medicina.
+- **Peso de animales:** 38 cartas, de 0,1 g a 150 t.
+- **Distancias entre ciudades:** 38 cartas, de 17 km a 19.597 km.
+- 275 identificadores nuevos, todos únicos y reservados por mazo: 6000 música, 7000
+  videojuegos, 8000 astronomía, 9000 medicina, 10000 animales y 11000 distancias.
 - Ningún título repetido, ningún campo vacío y ningún año repetido dentro de un mismo mazo.
 - Todos superan las 38 cartas necesarias para repartir cuatro a nueve participantes y dejar
   una carta inicial sobre la línea.
@@ -27,6 +29,11 @@ Fecha de revisión: 29 de agosto de 2026.
    observar una posibilidad y convertirla en un tratamiento disponible.
 5. En astronomía se diferencia descubrimiento, anuncio y fecha de misión; por ejemplo, James
    Webb se lanza en 2021 y publica sus primeras imágenes científicas en 2022.
+6. Los pesos son masas típicas de adultos, expresadas en kilogramos; no se presentan como un
+   máximo de la especie ni como el peso de un individuo excepcional.
+7. Cada distancia es la geodésica de círculo máximo entre coordenadas de centros urbanos,
+   calculada con Haversine y radio terrestre de 6.371 km. No es una distancia por carretera,
+   ferrocarril ni una ruta comercial de aviación.
 
 ## Fuentes de contraste principales
 
@@ -59,9 +66,16 @@ Fecha de revisión: 29 de agosto de 2026.
 - [Nobel Prize — CRISPR-Cas9](https://www.nobelprize.org/prizes/chemistry/2020/press-release/): desarrollo de la edición genética programable.
 - [FDA — vacunas contra la COVID-19](https://www.fda.gov/vaccines-blood-biologics/coronavirus-covid-19-cber-regulated-biologics): autorizaciones y documentación regulatoria.
 
+### Animales y distancias
+
+- [Animal Diversity Web](https://animaldiversity.org/): contraste de masas y rangos de especies.
+- [NOAA Fisheries — especies marinas](https://www.fisheries.noaa.gov/species-directory): contraste de grandes mamíferos y tiburón ballena.
+- [GeoNames](https://www.geonames.org/): coordenadas de referencia de las ciudades.
+- [Movable Type Scripts — fórmula de Haversine](https://www.movable-type.co.uk/scripts/latlong.html): método de cálculo de distancia de círculo máximo.
+
 ## Control automático
 
 `node tests/mazos.mjs` comprueba tamaño mínimo, años, títulos e identificadores únicos, campos
 obligatorios y colisiones entre todos los mazos. `node tests/partidas-al-azar.mjs` reparte sus
-cuarenta simulaciones entre los diez juegos y confirma que ninguna carta se crea, duplica o
+cuarenta simulaciones entre los doce juegos y confirma que ninguna carta se crea, duplica o
 desaparece y que la línea permanece ordenada.

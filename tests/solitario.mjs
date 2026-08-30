@@ -135,15 +135,15 @@ console.log("\nBloque de geografía");
   const w = boot();
   click(w, '[data-block="geografia"]');
   ok("elegir el bloque selecciona su primer juego", /59 países/.test(texto(w)));
-  ok("el bloque lista sus dos juegos", w.document.querySelectorAll(".game-row").length === 2);
-  ok("los dos juegos del bloque aparecen por su nombre",
-     /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w)));
-  ok("la galería ofrece los cinco bloques", w.document.querySelectorAll(".gallery-panel").length === 5);
+  ok("el bloque lista sus tres juegos", w.document.querySelectorAll(".game-row").length === 3);
+  ok("los tres juegos del bloque aparecen por su nombre",
+     /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w)) && /Distancias entre ciudades/.test(texto(w)));
+  ok("la galería ofrece los seis bloques", w.document.querySelectorAll(".gallery-panel").length === 6);
   const portada = w.document.querySelector(".gallery-panel.active").outerHTML;
   // Las tres carátulas están siempre, pero solo la desplegada pide el tamaño grande.
   ok("la carátula desplegada es la de geografía, no otra",
-    /hero-geography-700\.webp/.test(portada) && !/hero-(entertainment|science|history)-700/.test(portada));
-  ok("el rótulo es el del bloque de geografía", /Geografía/.test(portada) && !/Entretenimiento|Ciencia|Historia/.test(portada));
+    /hero-geography-700\.webp/.test(portada) && !/hero-(entertainment|science|nature|history)-700/.test(portada));
+  ok("el rótulo es el del bloque de geografía", /Geografía/.test(portada) && !/Entretenimiento|Naturaleza|Ciencia|Historia/.test(portada));
   ok("el juego aparece listado bajo la carátula", /Superficie de países/.test(w.document.querySelector(".games").textContent));
   ok("el titular cambia al eje de tamaño", /más grande/i.test(texto(w)));
   click(w, '[data-mode="population"]');

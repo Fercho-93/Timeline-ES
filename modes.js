@@ -38,6 +38,19 @@
     return compact(value);
   }
 
+  function compactMass(value) {
+    if (value < 0.001) return `${Math.round(value * 1e6).toLocaleString("es-ES")} mg`;
+    if (value < 1) return `${Math.round(value * 1000).toLocaleString("es-ES")} g`;
+    if (value < 1000) return `${Math.round(value).toLocaleString("es-ES")} kg`;
+    const tonnes = value / 1000;
+    const decimals = tonnes >= 100 ? 0 : tonnes >= 10 ? 0 : 1;
+    return `${tonnes.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })} t`;
+  }
+
+  function compactDistance(value) {
+    return `${Math.round(value).toLocaleString("es-ES")} km`;
+  }
+
   // Un eje dice cómo se ordenan las cartas, cómo se muestra el dato una vez revelado y
   // cómo se llama mientras está oculto. Es lo que permite que la línea no sea siempre
   // temporal: la de países ordena por tamaño con el mismo motor.
@@ -91,6 +104,39 @@
         { limit: 1000000, key: "grande", name: "Grande", symbol: "◆" },
         { limit: 5000000, key: "enorme", name: "Enorme", symbol: "★" },
         { limit: Infinity, key: "gigante", name: "Gigante", symbol: "⬢" }
+      ]
+    },
+    mass: {
+      sortValue: card => card.value,
+      format: card => compactMass(card.value),
+      shortValue: card => compactMass(card.value),
+      hiddenLabel: "Peso oculto",
+      timelineTitle: "De más ligero a más pesado",
+      question: "¿Más ligero o más pesado?",
+      bands: [
+        { limit: 0.01, key: "microscopico", name: "Minúsculo", symbol: "·" },
+        { limit: 1, key: "pequenisimo", name: "Muy pequeño", symbol: "▪" },
+        { limit: 10, key: "ligero", name: "Ligero", symbol: "◈" },
+        { limit: 100, key: "medianoanimal", name: "Mediano", symbol: "◆" },
+        { limit: 1000, key: "grananimal", name: "Grande", symbol: "★" },
+        { limit: 10000, key: "giganteanimal", name: "Gigante", symbol: "⬢" },
+        { limit: Infinity, key: "colosal", name: "Colosal", symbol: "◉" }
+      ]
+    },
+    distance: {
+      sortValue: card => card.value,
+      format: card => compactDistance(card.value),
+      shortValue: card => compactDistance(card.value),
+      hiddenLabel: "Distancia oculta",
+      timelineTitle: "De más cerca a más lejos",
+      question: "¿Más cerca o más lejos?",
+      bands: [
+        { limit: 100, key: "cercana", name: "Cercana", symbol: "·" },
+        { limit: 500, key: "regional", name: "Regional", symbol: "▪" },
+        { limit: 2000, key: "nacional", name: "Entre países cercanos", symbol: "◈" },
+        { limit: 6000, key: "continental", name: "Intercontinental", symbol: "◆" },
+        { limit: 12000, key: "oceanica", name: "Transoceánica", symbol: "★" },
+        { limit: Infinity, key: "antipoda", name: "Casi antípoda", symbol: "⬢" }
       ]
     }
   };
@@ -220,6 +266,11 @@
         { limit: Infinity, key: "genomica", name: "Era genómica", symbol: "∞" }
       ]
     },
+    animals: {
+      key: "animals", name: "Peso de animales",
+      cardLabel: "animales", blurb: "De una abeja a la ballena azul.", cards: window.ANIMAL_WEIGHT_CARDS,
+      axis: "mass"
+    },
     countries: {
       key: "countries", name: "Superficie de países",
       cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
@@ -229,6 +280,11 @@
       key: "population", name: "Población de países",
       cardLabel: "países", blurb: "Del Vaticano a la India.", cards: window.POPULATION_CARDS,
       axis: "population"
+    },
+    distances: {
+      key: "distances", name: "Distancias entre ciudades",
+      cardLabel: "pares", blurb: "En línea recta, de París a Auckland.", cards: window.CITY_DISTANCE_CARDS,
+      axis: "distance"
     }
   };
 
@@ -245,7 +301,8 @@
     historia: { key: "historia", name: "Historia", icon: "🏛️", art: "history", tagline: "Ordena el pasado.", games: ["history", "world", "inventions"] },
     cine: { key: "cine", name: "Entretenimiento", icon: "🎭", art: "entertainment", tagline: "Ordena la cultura popular.", games: ["movies", "music", "videogames"] },
     ciencia: { key: "ciencia", name: "Ciencia", icon: "🔬", art: "science", tagline: "Ordena los descubrimientos.", games: ["astronomy", "medicine"] },
-    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population"] },
+    naturaleza: { key: "naturaleza", name: "Naturaleza", icon: "🦋", art: "nature", tagline: "Ordena la vida.", games: ["animals"] },
+    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population", "distances"] },
     mezcla: { key: "mezcla", name: "Gran mezcla", icon: "⏳", art: "mixed", tagline: "Ordena el tiempo.", games: ["mixed"] }
   };
 

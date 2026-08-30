@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.window = {};
-for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "modes.js"]) {
+for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "animals.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "distances.js", "modes.js"]) {
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
-const { HISTORY_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, INVENTION_CARDS, WORLD_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS, COUNTRY_CARDS, POPULATION_CARDS } = globalThis.window;
+const { HISTORY_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ANIMAL_WEIGHT_CARDS, INVENTION_CARDS, WORLD_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS, COUNTRY_CARDS, POPULATION_CARDS, CITY_DISTANCE_CARDS } = globalThis.window;
 const CT = globalThis.window.CONTINUUM;
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
@@ -76,6 +76,8 @@ function separadas(nombre, mazo, unidad) {
 
 separadas("Superficie de países", COUNTRY_CARDS, "superficies");
 separadas("Población de países", POPULATION_CARDS, "poblaciones");
+separadas("Peso de animales", ANIMAL_WEIGHT_CARDS, "pesos");
+separadas("Distancias entre ciudades", CITY_DISTANCE_CARDS, "distancias");
 ok("las poblaciones son números enteros de personas", POPULATION_CARDS.every(c => Number.isInteger(c.value)));
 
 // Las cifras grandes se muestran redondeadas a millones. El redondeo solo vale si no
@@ -94,9 +96,11 @@ function redondeoLegible(nombre, modo, mazo) {
 
 redondeoLegible("Superficie de países", "countries", COUNTRY_CARDS);
 redondeoLegible("Población de países", "population", POPULATION_CARDS);
+redondeoLegible("Peso de animales", "animals", ANIMAL_WEIGHT_CARDS);
+redondeoLegible("Distancias entre ciudades", "distances", CITY_DISTANCE_CARDS);
 
 const cronologicos = [HISTORY_CARDS, WORLD_CARDS, INVENTION_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS];
-const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS];
+const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS, ...ANIMAL_WEIGHT_CARDS, ...CITY_DISTANCE_CARDS];
 console.log("\nEntre mazos");
 ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.id)).size === todos.length);
 

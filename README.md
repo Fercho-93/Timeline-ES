@@ -4,7 +4,7 @@ Juego de ordenar para 2–9 personas, diseñado para jugarse pasando un solo mó
 
 ## Bloques y juegos
 
-Los juegos se agrupan en cinco bloques. La portada enseña el bloque y lista sus juegos debajo,
+Los juegos se agrupan en seis bloques. La portada enseña el bloque y lista sus juegos debajo,
 así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 **Historia**
@@ -38,6 +38,11 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
   modernos. Las explicaciones reconocen los procesos colectivos y distinguen descubrimiento,
   demostración, aprobación y aplicación clínica.
 
+**Naturaleza**
+
+- **Peso de animales:** 38 especies ordenadas por masa típica adulta, desde una abeja hasta una
+  ballena azul. Las cifras son orientativas: sexo, edad y población cambian el peso real.
+
 **Geografía**
 
 - **Superficie de países:** 59 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
@@ -46,6 +51,8 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 - **Población de países:** 49 países ordenados de menos a más gente, del Vaticano a la India,
   con las cifras de la ONU a 1 de enero de 2026. Mismo margen del 8%: por eso falta China, que
   queda a un 4% de la India.
+- **Distancias entre ciudades:** 38 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
+  la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 
 **Gran mezcla** no es de ningún bloque temático, a propósito: concatena los ocho mazos
 cronológicos —673 cartas en total— y los ordena sobre un único eje. Se presenta aparte en la
@@ -59,7 +66,7 @@ La aplicación ofrece cuatro formas de jugar:
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
 - **En solitario:** una persona contra el mazo, con tres vidas.
-- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los diez juegos.
+- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los doce juegos.
 
 Al terminar una partida —local, en solitario o de competición— si hubo alguna carta mal
 colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su
@@ -89,7 +96,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   amigos necesitaría el día que exista, sin tener que rehacer partidas ya jugadas para tenerlo.
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
-- **Competición:** una ronda de 5 cartas por cada uno de los diez juegos, en un orden al azar
+- **Competición:** una ronda de 5 cartas por cada uno de los doce juegos, en un orden al azar
   distinto cada vez y sin repetir ninguno, con tres vidas nuevas en cada ronda. Al terminar la
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
