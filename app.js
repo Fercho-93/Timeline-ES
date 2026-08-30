@@ -96,6 +96,7 @@
     history: { archivo: "hero-history", alto: { 400: 267, 700: 467 } },
     entertainment: { archivo: "hero-entertainment", alto: { 400: 600, 700: 1050 } },
     science: { archivo: "hero-science", alto: { 400: 600, 700: 1050 } },
+    nature: { archivo: "hero-nature", alto: { 400: 600, 700: 1050 } },
     globe: { archivo: "hero-geography", alto: { 400: 491, 700: 859 } },
     mixed: { archivo: "hero-mixed", alto: { 400: 567, 700: 992 } }
   };

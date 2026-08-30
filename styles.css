@@ -113,7 +113,7 @@ button { touch-action: manipulation; }
 .gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,15,9,0) 38%, rgba(20,15,9,.5) 62%, rgba(20,15,9,.92)); pointer-events: none; }
 .panel-art { position: absolute; inset: 0; display: block; }
 .panel-art img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
-.panel-entertainment .panel-art img, .panel-science .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
+.panel-entertainment .panel-art img, .panel-science .panel-art img, .panel-nature .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
 /* Los lomos se apagan para que la carátula elegida sea la única en color. */
 .gallery-panel:not(.active) .panel-art { filter: grayscale(.9) brightness(.44) contrast(1.05); }
 @media (hover: hover) {
@@ -150,6 +150,7 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .panel-history { background: #6b5231; }
 .panel-entertainment { background: #2c2117; }
 .panel-science { background: #172523; }
+.panel-nature { background: #263327; }
 .panel-globe { background: #2b2a20; }
 .panel-mixed { background: #2f2313; }
 .era-pioneros { background: #4a4438; }
@@ -309,6 +310,19 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .era-tecnologia { background: #445f6b; }
 .era-molecular { background: #5c4d68; }
 .era-genomica { background: #3f6256; }
+.era-microscopico { background: #555c68; }
+.era-pequenisimo { background: #69554a; }
+.era-ligero { background: #566a54; }
+.era-medianoanimal { background: #6b5843; }
+.era-grananimal { background: #4d6470; }
+.era-giganteanimal { background: #5e4c66; }
+.era-colosal { background: #3e5e59; }
+.era-cercana { background: #5d586c; }
+.era-regional { background: #665248; }
+.era-nacional { background: #556a59; }
+.era-continental { background: #4a5f70; }
+.era-oceanica { background: #5f506a; }
+.era-antipoda { background: #3f625e; }
 .hint { margin: 12px 0 0; color: var(--muted); font-size: .85rem; text-align: center; }
 
 /* El Pulso. El acento es el mismo bronce del resto: no es un modo aparte, es una jugada

@@ -20,8 +20,10 @@ const catalogo = [
   ["history", "historia", "HISTORY_CARDS"], ["world", "historia", "WORLD_CARDS"],
   ["inventions", "historia", "INVENTION_CARDS"], ["movies", "cine", "MOVIE_CARDS"],
   ["music", "cine", "MUSIC_CARDS"], ["videogames", "cine", "VIDEOGAME_CARDS"],
+  ["animals", "naturaleza", "ANIMAL_WEIGHT_CARDS"],
   ["astronomy", "ciencia", "ASTRONOMY_CARDS"], ["medicine", "ciencia", "MEDICINE_CARDS"],
-  ["countries", "geografia", "COUNTRY_CARDS"], ["population", "geografia", "POPULATION_CARDS"]
+  ["countries", "geografia", "COUNTRY_CARDS"], ["population", "geografia", "POPULATION_CARDS"],
+  ["distances", "geografia", "CITY_DISTANCE_CARDS"]
 ];
 
 for (let g = 0; g < 40; g++) {
@@ -33,11 +35,14 @@ for (let g = 0; g < 40; g++) {
   const mazo = w[globalName];
   const total = mazo.length;
   const cardsById = new Map(mazo.map(c => [c.id, c]));
-  const orden = card => (mode === "countries" || mode === "population" ? card.value : card.year);
+  const orden = card => (["countries", "population", "animals", "distances"].includes(mode) ? card.value : card.year);
   fire(w, w.document.querySelector('[data-action="setup"]'));
   const players = 2 + (g % 8);
   for (let i = 2; i < players; i++) fire(w, w.document.querySelector('[data-action="add-player"]'));
-  w.document.getElementById("hand-size").value = String(1 + (g % 6));
+  // Un mazo mínimo de 38 cartas admite nueve jugadores con cuatro cartas y deja dos
+  // cartas para iniciar y continuar. La simulación no puede pedir más de lo que hay.
+  const mano = Math.min(1 + (g % 6), Math.floor((total - 2) / players));
+  w.document.getElementById("hand-size").value = String(mano);
   fire(w, w.document.querySelector('[data-action="start"]'));
   const key = `hilo-game-${mode}-v1`;
   let turns = 0;
