@@ -1,52 +1,45 @@
-/* Paleta neutra y plana: la única fuente de color son las carátulas. Todo lo demás
-   es papel, tinta y una sola tinta de acento en bronce, tomada del sepia de las
-   ilustraciones para que la interfaz no compita con ellas.
-
-   El modo oscuro cambia el papel y la tinta, pero no el acento: sigue siendo bronce,
-   solo que más claro para leerse sobre un fondo oscuro. `--ink-solid` es aparte de
-   `--ink`: el botón primario y la tarjeta del código de sala quieren un bloque que
-   siempre contraste con el papel, así que en claro es casi negro y en oscuro casi
-   blanco, mientras que `--ink` (el texto normal) se limita a invertirse.
-
-   `--accent-solid` y `--green-solid` son aparte de `--accent` y `--green` por la misma
-   razón, pero al revés: los medallones, las insignias de turno y la marca de acierto
-   llevan siempre texto blanco encima, así que necesitan el bronce y el verde oscuros de
-   siempre en los dos temas —si usaran `--accent`/`--green`, que se aclaran a propósito
-   para leerse como texto sobre un fondo oscuro, el blanco encima dejaría de contrastar—.
-   `--accent`/`--green` siguen siendo para texto (el año de una carta, el marcador de
-   acierto) y sí cambian con el tema. */
+/* Sistema editorial: papel cálido, tinta azulada y terracota para las decisiones.
+   Los colores tienen una función: la tinta manda la navegación, el terracota invita a
+   actuar, el verde confirma aciertos y el petróleo identifica estados informativos.
+   `--*-solid` se reserva para fondos con texto claro y conserva el contraste en ambos
+   temas. */
 :root {
   color-scheme: light;
-  --ink: #1b1917;
-  --muted: #6d6862;
-  --line: #e4e0d8;
-  --paper: #f7f5f1;
-  --surface: #fffefc;
-  --accent: #8a6a3b;
-  --accent-dark: #6d5330;
-  --green: #3d6b53;
-  --accent-solid: #8a6a3b;
-  --green-solid: #3d6b53;
-  --ink-solid: #1b1917;
+  --ink: #20272b;
+  --muted: #687073;
+  --line: #dedbd3;
+  --paper: #f6f1e8;
+  --surface: #fffdfa;
+  --accent: #ae5537;
+  --accent-dark: #843b28;
+  --accent-soft: #f2d8ce;
+  --teal: #245b66;
+  --green: #356b50;
+  --accent-solid: #a94f32;
+  --green-solid: #356b50;
+  --ink-solid: #20272b;
   --ink-solid-contrast: #fff;
-  --shadow: 0 12px 32px rgba(38, 30, 20, .07);
-  --shadow-soft: 0 4px 14px rgba(38, 30, 20, .05);
+  --font-display: Iowan Old Style, Palatino Linotype, Book Antiqua, Palatino, Georgia, serif;
+  --shadow: 0 14px 34px rgba(31, 43, 46, .10);
+  --shadow-soft: 0 5px 16px rgba(31, 43, 46, .07);
 }
 
 @media (prefers-color-scheme: dark) {
   /* El sistema manda salvo que ya se haya elegido «claro» a mano. */
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --ink: #ece7dd;
-    --muted: #a79c8c;
-    --line: #3a342a;
-    --paper: #16130e;
-    --surface: #1f1b14;
-    --accent: #d9ad6e;
-    --accent-dark: #e9c88e;
-    --green: #6fae86;
-    --ink-solid: #f3eee3;
-    --ink-solid-contrast: #17140f;
+    --ink: #ece9e1;
+    --muted: #aaa8a0;
+    --line: #3c4140;
+    --paper: #171b1c;
+    --surface: #202526;
+    --accent: #e59777;
+    --accent-dark: #f0aa8d;
+    --accent-soft: #54362d;
+    --teal: #79bec7;
+    --green: #79bd94;
+    --ink-solid: #f1eee7;
+    --ink-solid-contrast: #172022;
     --shadow: 0 12px 32px rgba(0, 0, 0, .35);
     --shadow-soft: 0 4px 14px rgba(0, 0, 0, .25);
   }
@@ -55,16 +48,18 @@
 /* El interruptor manda incluso si contradice al sistema, en los dos sentidos. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --ink: #ece7dd;
-  --muted: #a79c8c;
-  --line: #3a342a;
-  --paper: #16130e;
-  --surface: #1f1b14;
-  --accent: #d9ad6e;
-  --accent-dark: #e9c88e;
-  --green: #6fae86;
-  --ink-solid: #f3eee3;
-  --ink-solid-contrast: #17140f;
+  --ink: #ece9e1;
+  --muted: #aaa8a0;
+  --line: #3c4140;
+  --paper: #171b1c;
+  --surface: #202526;
+  --accent: #e59777;
+  --accent-dark: #f0aa8d;
+  --accent-soft: #54362d;
+  --teal: #79bec7;
+  --green: #79bd94;
+  --ink-solid: #f1eee7;
+  --ink-solid-contrast: #172022;
   --shadow: 0 12px 32px rgba(0, 0, 0, .35);
   --shadow-soft: 0 4px 14px rgba(0, 0, 0, .25);
 }
@@ -112,7 +107,7 @@ button { touch-action: manipulation; }
 .gallery-panel { position: relative; flex: 0 0 42px; min-width: 0; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.16); border-radius: 24px; background: #241b14; cursor: pointer; isolation: isolate; box-shadow: 0 18px 42px rgba(52,34,17,.22); transition: flex .45s cubic-bezier(.22,.61,.36,1); }
 .gallery-panel.active { flex: 1 1 0; cursor: default; animation: panel-open .5s cubic-bezier(.22,.61,.36,1); }
 @keyframes panel-open { from { flex: .02 1 0; } }
-.gallery-panel:focus-visible { outline: 3px solid rgba(189,139,49,.55); outline-offset: 3px; }
+.gallery-panel:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 62%, transparent); outline-offset: 3px; }
 .gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,15,9,0) 38%, rgba(20,15,9,.5) 62%, rgba(20,15,9,.92)); pointer-events: none; }
 .panel-art { position: absolute; inset: 0; display: block; }
 .panel-art img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
@@ -130,7 +125,7 @@ button { touch-action: manipulation; }
 .panel-label { position: absolute; z-index: 2; left: 22px; right: 22px; bottom: 20px; display: grid; grid-template-columns: 3px minmax(0, 1fr); column-gap: 14px; align-items: center; text-align: left; color: #fff8ea; }
 .gallery-panel:not(.active) .panel-label { visibility: hidden; }
 .panel-label i { grid-row: 1 / span 2; width: 3px; height: 100%; min-height: 36px; border-radius: 2px; background: var(--accent); }
-.panel-label strong { font-family: Georgia, serif; font-size: clamp(1.3rem, 3.6vw, 1.9rem); line-height: 1.05; letter-spacing: -.025em; }
+.panel-label strong { font-family: var(--font-display); font-size: clamp(1.35rem, 3.6vw, 2rem); line-height: 1.02; letter-spacing: -.03em; }
 .panel-label small { margin-top: 5px; color: rgba(255,246,232,.76); font-size: .73rem; }
 .gallery-panel.active .panel-label { animation: label-in .45s .12s backwards ease-out; }
 @keyframes label-in { from { opacity: 0; transform: translateY(12px); } }
@@ -146,16 +141,16 @@ button { touch-action: manipulation; }
 .game-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 h1, h2, h3, p { margin-top: 0; }
-h1 { max-width: 640px; margin-bottom: 20px; font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.9rem, 6vw, 2.6rem); line-height: 1.1; letter-spacing: -.03em; }
+h1 { max-width: 640px; margin-bottom: 20px; font-family: var(--font-display); font-weight: 650; font-size: clamp(2rem, 6vw, 2.75rem); line-height: 1.05; letter-spacing: -.035em; }
 h1 em { color: var(--accent); font-weight: 400; }
-h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw, 2.1rem); letter-spacing: -.025em; margin-bottom: 10px; }
+h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65rem, 5vw, 2.2rem); line-height: 1.08; letter-spacing: -.03em; margin-bottom: 10px; }
 .lead { color: var(--muted); font-size: .96rem; line-height: 1.55; max-width: 560px; }
-.panel-history { background: #6b5231; }
-.panel-entertainment { background: #2c2117; }
-.panel-science { background: #172523; }
-.panel-nature { background: #263327; }
-.panel-globe { background: #2b2a20; }
-.panel-mixed { background: #2f2313; }
+.panel-history { background: #704537; }
+.panel-entertainment { background: #4d304d; }
+.panel-science { background: #1f5361; }
+.panel-nature { background: #355f47; }
+.panel-globe { background: #285d66; }
+.panel-mixed { background: #80602d; }
 .era-pioneros { background: #4a4438; }
 .era-clasico { background: #7d6642; }
 .era-nuevocine { background: #6b5350; }
@@ -187,7 +182,7 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 
 .game-head { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; margin-bottom: 16px; }
 .turn-label { color: var(--accent); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
-.turn-name { font-family: Georgia, serif; font-size: 2rem; font-weight: 700; }
+.turn-name { font-family: var(--font-display); font-size: 2.1rem; font-weight: 700; letter-spacing: -.025em; }
 .deck-count { text-align: center; min-width: 62px; padding: 9px 10px; border-radius: 10px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
 .deck-count strong { display: block; font-size: 1.2rem; }
 .deck-count span { color: var(--muted); font-size: .62rem; text-transform: uppercase; letter-spacing: .07em; }
@@ -196,11 +191,11 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .score i { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--line); color: var(--accent-dark); font-size: .62rem; font-style: normal; font-weight: 700; }
 .score b { max-width: 80px; overflow: hidden; text-overflow: ellipsis; font-weight: 650; }
 .score em { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); font-style: normal; font-weight: 700; }
-.score.active { color: white; background: var(--accent-solid); border-color: var(--accent-solid); }
+.score.active { color: white; background: var(--accent-solid); border-color: var(--accent-solid); box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-solid) 32%, transparent); }
 .score.active i { background: #fff; }
 /* Color fijo y no `--accent-dark`: esta insignia lleva un fondo blanco literal en
    cualquier tema, así que necesita una tinta oscura fija para seguir leyéndose. */
-.score.active em { color: #6d5330; background: #fff; }
+.score.active em { color: var(--accent-dark); background: #fff; }
 
 /* El mapa de la línea. Cada parada se sitúa donde le toca a escala real (el ancho
    exacto lo fija JS en línea, según el tamaño del racimo más apretado), nunca por
@@ -217,12 +212,12 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .timeline { display: flex; align-items: stretch; min-width: max-content; padding: 8px 0; }
 .timeline-card { width: 174px; min-height: 244px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
 .card-visual { height: 74px; padding: 12px 13px; display: flex; align-items: flex-end; justify-content: space-between; color: rgba(255,255,255,.92); position: relative; overflow: hidden; }
-.card-visual span { font: 700 1.55rem Georgia, serif; position: relative; z-index: 1; }
+.card-visual span { font: 700 1.6rem var(--font-display); position: relative; z-index: 1; }
 .card-visual small { max-width: 90px; text-align: right; font-size: .56rem; line-height: 1.1; text-transform: uppercase; letter-spacing: .08em; position: relative; z-index: 1; }
 .card-content { padding: 13px; }
-.timeline-card .year { font-family: Georgia, serif; color: var(--accent); font-size: 1.5rem; font-weight: 700; }
-.timeline-card h3 { margin: 8px 0 7px; font-size: .91rem; line-height: 1.2; }
-.timeline-card p { color: var(--muted); font-size: .69rem; line-height: 1.35; margin: 0; }
+.timeline-card .year { font-family: var(--font-display); color: var(--accent); font-size: 1.6rem; font-weight: 700; line-height: 1; }
+.timeline-card h3 { margin: 9px 0 8px; font-family: var(--font-display); font-size: .98rem; line-height: 1.16; letter-spacing: -.01em; }
+.timeline-card p { color: var(--muted); font-size: .75rem; line-height: 1.42; margin: 0; }
 .slot { width: 54px; min-height: 244px; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; }
 .slot span { display: grid; place-items: center; width: 38px; height: 100%; min-height: 116px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: 1.4rem; transition: .15s ease; }
 .slot:hover span, .slot:focus-visible span { border-color: var(--accent); color: var(--accent); }
@@ -231,12 +226,12 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 /* El hueco donde iba de verdad la carta que se acaba de fallar: se resalta detrás del
    aviso de fallo, así que tiene que verse aunque el hueco esté deshabilitado. */
 .slot-correct { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
-.slot-correct span { border-style: solid; border-color: var(--accent); background: rgba(189,139,49,.16); color: var(--accent); }
+.slot-correct span { border-style: solid; border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
 .slot-correct:disabled span { opacity: 1; }
 .slot-correct small { color: var(--accent); font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
 .slot-confirm { width: 150px; min-height: 244px; margin: 0 6px; padding: 14px 12px; display: flex; flex-direction: column; justify-content: center; gap: 8px; text-align: center; border: 2px dashed var(--accent); border-radius: 12px; background: var(--surface); }
 .slot-confirm small { color: var(--accent); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
-.slot-confirm strong { font-family: Georgia, serif; font-size: .95rem; line-height: 1.18; margin-bottom: 4px; }
+.slot-confirm strong { font-family: var(--font-display); font-size: 1rem; line-height: 1.15; margin-bottom: 4px; }
 .slot-confirm .btn { padding: 10px 12px; font-size: .78rem; }
 
 .hand-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
@@ -254,13 +249,13 @@ h2 { font-family: Georgia, serif; font-weight: 600; font-size: clamp(1.6rem, 5vw
 .drag-ghost { position: fixed; left: 0; top: 0; z-index: 60; margin: 0; min-height: 0; padding: 11px 13px; pointer-events: none; transform: rotate(-2deg); border-color: var(--accent); box-shadow: 0 16px 34px rgba(40,28,18,.3); }
 .drag-ghost .card-arrow, .drag-ghost .card-era { display: none; }
 .drag-ghost strong { margin-top: 7px; font-size: .9rem; }
-.slot.drop-target span { border-style: solid; border-color: var(--accent); background: rgba(189,139,49,.14); color: var(--accent); transform: scale(1.08); }
+.slot.drop-target span { border-style: solid; border-color: var(--accent); background: var(--accent-soft); color: var(--accent); transform: scale(1.08); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent); }
 body.dragging-card { touch-action: none; user-select: none; -webkit-user-select: none; }
 body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .card-era { margin: 0 -14px 13px; padding: 9px 11px; display: flex; align-items: center; gap: 7px; color: rgba(255,255,255,.92); font-size: .58rem; line-height: 1; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
-.card-era i { font: normal 1rem Georgia, serif; }
+.card-era i { font: normal 1rem var(--font-display); }
 .hand-card .hidden-date { color: var(--accent); font-size: .63rem; letter-spacing: .13em; text-transform: uppercase; font-weight: 700; }
-.hand-card strong { display: block; margin-top: 11px; padding-right: 12px; font-family: Georgia, serif; font-size: 1rem; line-height: 1.18; position: relative; z-index: 1; }
+.hand-card strong { display: block; margin-top: 11px; padding-right: 12px; font-family: var(--font-display); font-size: 1.06rem; line-height: 1.16; letter-spacing: -.01em; position: relative; z-index: 1; }
 .card-arrow { position: absolute; left: 14px; bottom: 11px; color: var(--accent); font-weight: 700; }
 .era-antigua { background: #6f6353; }
 .era-cientifica { background: #5f6b6a; }
@@ -340,8 +335,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .era-vertiginoso { background: #3f625e; }
 .hint { margin: 12px 0 0; color: var(--muted); font-size: .85rem; text-align: center; }
 
-/* El Pulso. El acento es el mismo bronce del resto: no es un modo aparte, es una jugada
-   más, solo que se gasta una vez. El rayo la distingue sin necesidad de otro color. */
+/* El Pulso comparte el terracota de las decisiones: es una jugada excepcional, no un
+   modo aparte. El rayo le aporta la segunda pista visual. */
 .opt-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; padding: 12px 0 2px; border-top: 1px solid var(--line); font-size: .9rem; font-weight: 700; }
 .opt-row span { display: flex; flex-direction: column; gap: 3px; }
 .opt-row small { font-size: .74rem; font-weight: 500; line-height: 1.35; color: var(--muted); }
@@ -363,8 +358,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .modal p { color: var(--muted); line-height: 1.55; }
 .reveal { margin: 18px 0; padding: 0 18px 18px; border-radius: 12px; background: var(--paper); overflow: hidden; }
 .reveal-era { margin: 0 -18px 15px; padding: 10px 14px; color: rgba(255,255,255,.94); font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
-.reveal-era span { margin-right: 8px; font: 1.1rem Georgia, serif; }
-.reveal .year { color: var(--accent); font: 850 2.2rem Georgia, serif; }
+.reveal-era span { margin-right: 8px; font: 1.1rem var(--font-display); }
+.reveal .year { color: var(--accent); font: 850 2.25rem var(--font-display); }
 .result-mark { width: 48px; height: 48px; margin: 0 auto 12px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--green-solid); font-size: 1.4rem; font-weight: 700; }
 .failure .result-mark { background: var(--accent-solid); }
 .success .big-icon { color: var(--green); }
@@ -372,7 +367,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .pass-screen { min-height: calc(100dvh - 110px); display: grid; place-items: center; text-align: center; }
 .pass-screen .panel { width: min(100%, 480px); }
 .pass-card { position: relative; overflow: hidden; }
-.player-medallion { width: 74px; height: 74px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); border: 2px solid var(--accent-solid); font: 700 1.2rem Georgia, serif; }
+.player-medallion { width: 74px; height: 74px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); border: 2px solid var(--accent-solid); font: 700 1.2rem var(--font-display); }
 .pass-card .eyebrow { justify-content: center; }
 
 .rules { text-align: left; }
@@ -402,9 +397,9 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .online-intro h2 { font-size: clamp(2.7rem, 10vw, 5rem); line-height: .92; }
 .online-entry-grid { display: grid; gap: 14px; }
 .online-form { position: relative; overflow: hidden; }
-.online-form h3 { margin: 5px 0 8px; font: 800 1.55rem Georgia, serif; }
+.online-form h3 { margin: 5px 0 8px; font: 800 1.55rem var(--font-display); letter-spacing: -.02em; }
 .online-form p { color: var(--muted); line-height: 1.45; }
-.form-number { display: block; color: var(--accent); font: italic 1rem Georgia, serif; }
+.form-number { display: block; color: var(--accent); font: italic 1rem var(--font-display); }
 .room-code-input { text-transform: uppercase; letter-spacing: .16em; font-weight: 700; }
 .online-note { margin-top: 16px; text-align: center; color: var(--muted); font-size: .8rem; }
 .spinner { width: 48px; height: 48px; margin: 0 auto 18px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
@@ -438,7 +433,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .solo-done strong { color: var(--ink); }
 .solo-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
 .solo-stats span { padding: 12px 8px; border-radius: 10px; background: var(--paper); text-align: center; }
-.solo-stats b { display: block; font-family: Georgia, serif; font-size: 1.5rem; color: var(--accent); }
+.solo-stats b { display: block; font-family: var(--font-display); font-size: 1.6rem; color: var(--accent); }
 .solo-stats small { color: var(--muted); font-size: .65rem; }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 12px; }
 .cal-day { aspect-ratio: 1; border-radius: 4px; background: var(--paper); border: 1px solid var(--line); }
@@ -460,7 +455,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .comp-promo-art { display: block; height: 120px; overflow: hidden; }
 .comp-promo-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .comp-promo-copy { display: block; padding: 14px 16px 16px; }
-.comp-promo-copy b { display: block; font-family: Georgia, serif; font-size: 1.05rem; margin-bottom: 4px; }
+.comp-promo-copy b { display: block; font-family: var(--font-display); font-size: 1.12rem; margin-bottom: 4px; }
 .comp-promo-copy small { color: var(--muted); font-size: .78rem; line-height: 1.4; }
 .comp-summary { list-style: none; margin: 18px auto; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: left; max-width: 360px; }
 .comp-summary li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: .85rem; }
@@ -478,7 +473,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .lobby-settings .field + .field { margin-top: 12px; }
 .lobby-settings .btn-primary { margin-top: 18px; }
 .waiting-orbit { width: 78px; height: 78px; margin: 20px auto 23px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; animation: spin 3s linear infinite; }
-.waiting-orbit::before { content: ""; width: 50px; height: 50px; border: 1px solid rgba(189,139,49,.35); border-radius: 50%; }
+.waiting-orbit::before { content: ""; width: 50px; height: 50px; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 50%; }
 .waiting-orbit span { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); transform: translateY(-39px); box-shadow: 0 5px 12px rgba(104,29,27,.3); }
 .lobby-settings:not(:has(.field)) { text-align: center; }
 .lobby-settings:not(:has(.field)) p { color: var(--muted); line-height: 1.5; }
