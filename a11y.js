@@ -96,6 +96,9 @@
     paint.screen = screen;
 
     container.innerHTML = html;
+    // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
+    // muchas veces y no debe convertir cada toque en una animación.
+    if (!primero && cambioDePantalla) container.firstElementChild?.classList.add("screen-enter");
     restauraAnclas(container);
     if (primero) return;
     if (cambioDePantalla) {
