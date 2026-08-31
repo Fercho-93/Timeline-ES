@@ -130,6 +130,76 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
 
+## Fantasma y dificultades (v36)
+
+En partidas locales, el poder Fantasma puede acompañar al reparto o a un robo. En salas
+se activa con «Cartas Fantasma» al configurar la partida. Está separado de las cartas a
+ordenar: conservarlo no impide ganar, no sustituye un robo de penalización, no se pasa
+con el Pulso y no se recicla con el descarte. Máximo un uso por persona, incluso si recibe
+más de una aparición. Las partidas antiguas se conservan sin añadirles poderes retroactivamente.
+
+Con al menos cinco cartas en la línea y alguna en la mano, se puede activar al comienzo
+del propio turno; no reemplaza la colocación. Afecta a quien lo activa y a cada rival una
+vez. Después hay una vuelta completa con valores visibles antes de otro Fantasma. No se
+pueden acumular ni combinar su activación con el Pulso en ese mismo turno. Un rival sí
+puede usar Pulso durante el efecto. Saltar un turno o abandonar la sala descuenta al
+participante afectado sin alargar la duración. Los empates y la victoria siguen comprobándose
+al final de la ronda, sin contar poderes.
+
+Se ocultan cifras, explicaciones y bandas de época/magnitud del tablero. El minimapa usa
+posiciones uniformes y números de orden, también en sus etiquetas accesibles. Los títulos
+—incluidas las condiciones de medición y avisos «en revisión»— siguen visibles. El resultado
+revela la carta recién resuelta a todos, sin destapar las anteriores. Es una regla de interfaz,
+no protección contra un cliente modificado: los datos de los mazos ya están en el navegador.
+
+### Aparición matemática
+
+Sean P los jugadores, H la mano inicial efectiva y N las cartas del mazo:
+
+- El 30% de partidas no programa poderes. En el 70% restante se sortean uniformemente
+  entre 1 y ceil(P/3) apariciones: como máximo 1 con 2–3 personas, 2 con 4–6 y 3 con 7–9.
+- Se seleccionan posiciones diferentes entre los P×H robos iniciales y los siguientes
+  2×P robos, limitados a N−1 cartas; nunca la carta inicial del tablero.
+- Cada posición del reparto pesa 3; cada posición posterior, 1. Se muestrea sin reemplazo.
+  No hay una posición fija ni se diluye la probabilidad en los mazos de cientos de cartas.
+- La aparición se asocia al identificador de la carta normal de esa posición y entrega
+  el poder aparte al recibirla. Una aparición que nadie llegue a robar no se entrega.
+  Si una persona recibe varias, sigue teniendo un solo uso. Robar para el Pulso también
+  puede entregar un poder, que solo se podrá usar en un turno posterior.
+- Todo el sorteo se fija al empezar y se guarda/sincroniza. Recargar no vuelve a sortear.
+- Si no caben P×H cartas más la inicial, H se reduce por igual para todos a floor((N−1)/P).
+
+La simulación determinista de `tests/fantasma.mjs` recorre 22.500 repartos (2, 5 y 9 personas;
+38, 167 y 673 cartas). Se comprueba una aparición inicial frecuente, partidas sin poderes,
+posiciones variables, ausencia de duplicados y conservación de las cartas normales.
+
+### Solitario
+
+| Nivel | Cartas automáticas tras cada turno | Visibilidad |
+|---|---:|---|
+| Fácil | 0 | Visible |
+| Normal | 1 | Visible |
+| Difícil | 2 | Fantasma ocasional durante una jugada |
+| Experto | 2 | Oculto en todas las jugadas |
+
+Las incorporaciones se hacen al continuar, tras acierto o fallo, antes de la nueva decisión.
+Primero se reserva la siguiente carta del jugador; si faltan cartas se añaden menos. No
+suman aciertos ni cambian vidas. En Difícil se sortea, con probabilidad del 70%, un turno
+Fantasma en cada bloque de cuatro turnos a partir del cuarto; nunca son consecutivos.
+El calendario se guarda al iniciar, no al repintar. En Experto el resultado sigue revelando
+el valor y la explicación de la carta jugada para aprender de ella.
+
+La partida libre permite los cuatro niveles, conserva partidas y separa récords por mazo
+y dificultad. Los récords antiguos se mantienen en Fácil. La competición individual también
+elige un nivel, conserva cinco decisiones humanas por tema y reserva cartas adicionales
+para el tablero. El reto diario permanece en Fácil para no cambiar las quince cartas ni las
+marcas existentes. Pulso conserva su funcionamiento; convertirlo en carta robable queda fuera
+de esta versión.
+
+**Salas: publicar `firestore.rules` v36 antes de activar Cartas Fantasma.** Todos los móviles
+deben actualizar la app y crear una sala nueva; se comprueba la versión de cada participante. Sin esas reglas, desmarcar Cartas Fantasma permite seguir iniciando
+salas con las reglas anteriores. Las reglas nuevas mantienen compatibles las salas antiguas.
+
 ## Probarlo en un ordenador
 
 La carpeta debe abrirse mediante un servidor web local (no haciendo doble clic en `index.html`). Por ejemplo, con la extensión gratuita **Live Server** de Visual Studio Code, usa **Open with Live Server** sobre `index.html`.

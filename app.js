@@ -232,6 +232,7 @@
             <div class="field"><label for="starter">La persona más joven</label><select id="starter"><option value="0">Jugador 1</option><option value="1">Jugador 2</option></select></div>
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
           </div>
+          <p class="hint">Puede aparecer una carta Fantasma al repartir o robar. Es un poder opcional y no cuenta para ganar.</p>
           <label class="opt-row"><span>Pulso <small>Una vez por partida, reta a otra persona con una carta del mazo en vez de jugar tu turno.</small></span><input type="checkbox" id="pulse-toggle"></label>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
@@ -252,16 +253,20 @@
     const inputs = [...document.querySelectorAll("#players input")];
     if (inputs.length < 2) return showToast("Se necesitan al menos 2 jugadores");
     const names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
-    const handSize = Number(document.getElementById("hand-size").value);
+    const requestedHand = Number(document.getElementById("hand-size").value);
+    const handSize = Math.min(requestedHand, Math.floor((currentMode().cards.length - 1) / names.length));
+    if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
     const starter = Number(document.getElementById("starter").value);
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
     const shuffled = shuffle(currentMode().cards.map(card => card.id));
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
+    const ghost = CT.Ghost.create(shuffled, names.length, handSize);
     const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
+    players.forEach(p => p.hand.forEach(id => CT.Ghost.claim(ghost, id, p.id)));
     const timeline = [shuffled.shift()];
-    game = { mode: selectedModeKey, pulse, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
+    game = { mode: selectedModeKey, pulse, ghost, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
     selectedCardId = null;
     result = null;
     saveGame();
@@ -305,7 +310,7 @@
         ? confirmSlot(activeCard)
         : slotMarkup(i, timelineCards.length, pulseCard ? "pulse-place" : "place", pulseCard ? true : !!selectedCardId, i === failIndex));
       if (i < timelineCards.length) {
-        slots.push(timelineCardMarkup(timelineCards[i]));
+        slots.push(timelineCardMarkup(timelineCards[i], !!game.ghost?.pending.length));
       }
     }
     const manoHtml = pulseCard
@@ -316,8 +321,10 @@
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
       ${pulseCard ? `<div class="pulse-banner">⚡ Pulso contra <b>${escapeHtml(pulseTarget.name)}</b></div>` : ""}
-      <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
+      ${CT.Ghost.banner(game.ghost, game.players)}
+      <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: !!game.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${manoHtml}
+      ${!game.pulseTurn && !result ? CT.Ghost.power(game.ghost, player.id, game.timeline.length, player.hand.length, 'data-action="ghost-use"') : ""}
     </div>`);
     if (nuevaSeleccion) {
       const linea = app.querySelector(".timeline-wrap");
@@ -347,7 +354,8 @@
     });
   }
 
-  function timelineCardMarkup(card) {
+  function timelineCardMarkup(card, hidden = false) {
+    if (hidden) return CT.Ghost.hiddenCard(card);
     const era = eraForCard(card);
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
@@ -405,6 +413,7 @@
     const id = game.deck.shift();
     if (id == null) return false;
     player.hand.push(id);
+    CT.Ghost.claim(game.ghost, id, player.id);
     return true;
   }
 
@@ -441,7 +450,7 @@
   }
 
   function pulseAvailable(player) {
-    return !!game.pulse && !player.pulseUsed && player.hand.length >= PULSE_MIN_HAND
+    return !game.ghost?.fresh && !!game.pulse && !player.pulseUsed && player.hand.length >= PULSE_MIN_HAND
       && game.deck.length + game.discard.length > 0 && pulseTargets().length > 0;
   }
 
@@ -454,6 +463,7 @@
     }
     const cardId = game.deck.shift();
     if (cardId == null) return showToast("No quedan cartas para el Pulso");
+    CT.Ghost.claim(game.ghost, cardId, player.id);
     player.pulseUsed = true;
     game.pulseTurn = { targetId, cardId };
     selectedCardId = null;
@@ -509,6 +519,8 @@
   }
 
   function renderResult() {
+    game.pendingResult = result;
+    saveGame();
     gameView();
     const { correct, returned, card } = result;
     const era = eraForCard(card);
@@ -523,7 +535,18 @@
     overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${result.pulse ? "⚡ Pulso · " : ""}${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
+  function useGhost() {
+    const player = currentPlayer();
+    if (result || game.pendingResult || game.pulseTurn || !CT.Ghost.available(game.ghost, player.id, game.timeline.length, player.hand.length)) return;
+    CT.Ghost.activate(game.ghost, player.id, game.players.map(p => p.id));
+    selectedCardId = null; pendingIndex = null;
+    saveGame(); gameView(); announce(`${player.name} ha activado Fantasma durante una vuelta.`);
+  }
+
   function finishTurn() {
+    if (!result && !game.pendingResult) return;
+    CT.Ghost.advance(game.ghost, currentPlayer().id, game.players.map(p => p.id));
+    game.pendingResult = null;
     game.turnsInRound += 1;
     if (game.turnsInRound >= game.players.length && resolveRound()) return;
     game.current = (game.current + 1) % game.players.length;
@@ -715,6 +738,9 @@
     return `<div class="cal-grid" role="img" aria-label="Calendario de los últimos ${CALENDARIO_DIAS} días del reto diario">${celdas.join("")}</div>`;
   }
 
+  let selectedDifficulty = localStorage.getItem("continuum-difficulty-v1") || "easy";
+  if (!CT.Ghost.LEVELS[selectedDifficulty]) selectedDifficulty = "easy";
+  function soloHidden() { return solo.difficulty === "expert" || !!solo.ghostTurns?.includes(solo.played - (solo.pendingResult ? 1 : 0)); }
   function soloHome() {
     screen = "solo-home";
     solo = loadSolo();
@@ -731,13 +757,15 @@
           ${doneToday
             ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
             : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
-          <div class="solo-stats"><span><b>${records.streak || 0}</b><small>días seguidos</small></span><span><b>${records.best || 0}</b><small>mejor marca libre</small></span></div>
+          <div class="solo-stats"><span><b>${records.streak || 0}</b><small>días seguidos</small></span><span><b>${records.best || 0}</b><small>mejor marca · Fácil</small></span></div>
           ${calendarHtml(records)}
         </div>
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Partida libre</h3></div>
-          <p>El mazo entero, sin límite de cartas: aguanta lo que puedas.</p>
-          ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar la partida <span>→</span></button>` : ""}
+          <p>El mazo entero, hasta perder las tres vidas o agotarlo.</p>
+          ${CT.Ghost.difficultySelect("solo-difficulty", selectedDifficulty)}
+          <p class="hint" data-level-record>Mejor marca en ${CT.Ghost.level(selectedDifficulty).name}: ${records.bestByDifficulty?.[selectedDifficulty] || (selectedDifficulty === "easy" ? records.best || 0 : 0)}</p>
+          ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
         </div>
       </section>
@@ -745,13 +773,15 @@
   }
 
   function startSolo(kind) {
+    const difficulty = kind === "daily" ? "easy" : selectedDifficulty;
     const ids = currentMode().cards.map(card => card.id);
     const barajado = kind === "daily"
       ? shuffleWith(ids, seededRandom(seedFrom(`${today()}:${selectedModeKey}`))).slice(0, DAILY_CARDS + 1)
       : shuffle(ids);
     const timeline = [barajado.shift()];
     solo = {
-      kind, mode: selectedModeKey, day: today(), deck: barajado, timeline,
+      kind, difficulty, ghostTurns: difficulty === "hard" ? CT.Ghost.soloSchedule(ids.length) : [],
+      mode: selectedModeKey, day: today(), deck: barajado, timeline,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: kind === "daily" ? DAILY_CARDS : null, finished: false
     };
@@ -771,15 +801,17 @@
       slots.push(pendingIndex === i
         ? confirmSlot(card)
         : slotMarkup(i, timelineCards.length, "solo-place", true, i === failIndex));
-      if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i]));
+      if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i], soloHidden()));
     }
-    const restantes = solo.total ? solo.total - solo.played : solo.deck.length + 1;
+    const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + Math.ceil(solo.deck.length / (1 + CT.Ghost.level(solo.difficulty).extra));
     const etiqueta = soloLabel();
     paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
       <div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>
-      <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
+      ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
+      <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
+      ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
       <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
     </div>`);
     if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
@@ -794,6 +826,7 @@
   }
 
   function soloPlace(index) {
+    if (solo.pendingResult || !Number.isInteger(index) || index < 0 || index > solo.timeline.length) return;
     const card = cardsById.get(solo.current);
     const previous = index > 0 ? cardsById.get(solo.timeline[index - 1]) : null;
     const next = index < solo.timeline.length ? cardsById.get(solo.timeline[index]) : null;
@@ -811,6 +844,7 @@
     (solo.sequence = solo.sequence || []).push(correct);
     pendingIndex = null;
     result = { correct, card, solo: true };
+    solo.pendingResult = { correct, cardId: card.id };
     saveSolo();
     soloResult();
   }
@@ -825,9 +859,20 @@
   }
 
   function soloNext() {
+    if (!solo?.pendingResult) return;
+    solo.pendingResult = null;
     result = null;
     if (solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total)) return soloFinish();
+    // Primero se reserva la siguiente carta del jugador. Nunca se duplica ni se
+    // consume por la inserción automática, que no modifica aciertos ni vidas.
     solo.current = solo.deck.shift();
+    solo.autoAdded = [];
+    const extra = CT.Ghost.level(solo.difficulty).extra;
+    for (let n = 0; n < extra && solo.deck.length; n++) {
+      const id = solo.deck.shift();
+      const at = CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), cardsById.get(id));
+      solo.timeline.splice(at, 0, id); solo.autoAdded.push(id);
+    }
     saveSolo();
     soloView();
   }
@@ -854,14 +899,17 @@
       const dias = Object.keys(records.days).sort().slice(-60);
       records.days = Object.fromEntries(dias.map(clave => [clave, records.days[clave]]));
       saveRecords(records);
-    } else if (solo.kind === "free" && solo.hits > (records.best || 0)) {
-      records.best = solo.hits;
+    } else if (solo.kind === "free") {
+      const difficulty = solo.difficulty || "easy";
+      records.bestByDifficulty = records.bestByDifficulty || { easy: records.best || 0 };
+      records.bestByDifficulty[difficulty] = Math.max(records.bestByDifficulty[difficulty] || 0, solo.hits);
+      if (difficulty === "easy") records.best = records.bestByDifficulty.easy;
       saveRecords(records);
     }
     const superado = solo.lives > 0;
     const resumen = solo.kind === "daily"
       ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
-      : `Has aguantado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} seguidas antes de quedarte sin vidas.`;
+      : `Has colocado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} en ${CT.Ghost.level(solo.difficulty).name}. ${solo.lives > 0 ? "Has completado el mazo." : "Has agotado las tres vidas."}`;
     soloFailedForReview = (solo.failed || []).map(id => ({ id, mode: solo.mode }));
     const compartir = solo.kind === "daily" ? shareText(currentMode().name, dia, solo.hits, total, solo.sequence || [], records.streak) : null;
     solo.finished = true;
@@ -917,13 +965,13 @@
 
   function soloLabel() {
     if (solo.kind === "daily") return "Reto diario";
-    if (solo.kind === "comp") return `Competición · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
-    return "Partida libre";
+    if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
+    return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
   function startCompetition() {
     previousModeKey = selectedModeKey;
-    comp = { queue: shuffle(COMP_MODES), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp = { difficulty: selectedDifficulty, queue: shuffle(COMP_MODES), roundsSummary: [], totalHits: 0, totalFailed: [] };
     compRoundIntro();
   }
 
@@ -935,19 +983,22 @@
       <div class="eyebrow">Competición · Tema ${numero} de ${TOTAL_TEMAS}</div>
       <h2 data-focus tabindex="-1">${mode.name}</h2>
       <p>${mode.blurb} ${ROUND_CARDS} cartas, ${SOLO_LIVES} vidas nuevas.</p>
+      ${!comp.roundsSummary.length ? CT.Ghost.difficultySelect("comp-difficulty", comp.difficulty) : `<p>${CT.Ghost.level(comp.difficulty).name}</p>`}
       ${comp.roundsSummary.length ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${comp.totalHits}</b><small>aciertos hasta ahora</small></span></div>` : ""}
       <button class="btn btn-primary btn-block" data-action="comp-next-round">Empezar <span>→</span></button>
     </div></section></div>`);
   }
 
   function beginCompRound() {
+    if (!comp.roundsSummary.length) comp.difficulty = document.getElementById("comp-difficulty")?.value || comp.difficulty;
     const modeKey = comp.queue.shift();
     selectedModeKey = modeKey;
     cardsById = new Map(CT.cards(modeKey).map(card => [card.id, card]));
-    const barajado = shuffle(CT.cards(modeKey).map(card => card.id)).slice(0, ROUND_CARDS + 1);
+    const extra = CT.Ghost.level(comp.difficulty).extra;
+    const barajado = shuffle(CT.cards(modeKey).map(card => card.id)).slice(0, ROUND_CARDS + 1 + extra * (ROUND_CARDS - 1));
     const timeline = [barajado.shift()];
     solo = {
-      kind: "comp", mode: modeKey, timeline, deck: barajado,
+      kind: "comp", difficulty: comp.difficulty, ghostTurns: comp.difficulty === "hard" ? CT.Ghost.soloSchedule(ROUND_CARDS) : [], mode: modeKey, timeline, deck: barajado,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: ROUND_CARDS, finished: false, failed: []
     };
@@ -1027,6 +1078,18 @@
     announce(`Hueco ${index + 1} de ${cartas + 1} elegido. Confirma o elige otro.`);
   }
 
+  app.addEventListener("change", event => {
+    if (!["solo-difficulty", "comp-difficulty"].includes(event.target.id)) return;
+    const key = event.target.value;
+    if (!CT.Ghost.LEVELS[key]) return;
+    event.target.closest(".difficulty-field").querySelector("[data-difficulty-help]").textContent = CT.Ghost.level(key).description;
+    selectedDifficulty = key;
+    localStorage.setItem("continuum-difficulty-v1", key);
+    const record = app.querySelector("[data-level-record]");
+    const records = modeRecords();
+    if (record) record.textContent = `Mejor marca en ${CT.Ghost.level(key).name}: ${records.bestByDifficulty?.[key] || (key === "easy" ? records.best || 0 : 0)}`;
+  });
+
   app.addEventListener("input", event => {
     if (event.target.closest("#players")) syncStarterOptions();
   });
@@ -1051,7 +1114,8 @@
       if (document.querySelectorAll("#players .player-row").length <= 2) return showToast("Se necesitan al menos 2 jugadores");
       target.closest(".player-row").remove(); syncStarterOptions();
     } else if (action === "start") startGame();
-    else if (action === "ready") { if (game.pulseGift && game.pulseGift.to === currentPlayer().id) { game.pulseGift = null; saveGame(); } gameView(); }
+    else if (action === "ready") { if (game.pulseGift && game.pulseGift.to === currentPlayer().id) { game.pulseGift = null; saveGame(); } if (game.pendingResult) { result = game.pendingResult; renderResult(); } else gameView(); }
+    else if (action === "ghost-use") useGhost();
     else if (action === "select-card") {
       selectedCardId = Number(target.dataset.id);
       pendingIndex = null;
@@ -1065,7 +1129,7 @@
     else if (action === "solo") soloHome();
     else if (action === "start-daily") startSolo("daily");
     else if (action === "start-free") startSolo("free");
-    else if (action === "resume-solo") { solo = loadSolo(); pendingIndex = null; solo ? soloView() : soloHome(); }
+    else if (action === "resume-solo") { solo = loadSolo(); pendingIndex = null; if (!solo) soloHome(); else if (solo.pendingResult) { result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true }; soloResult(); } else { result = null; soloView(); } }
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") soloHome();
