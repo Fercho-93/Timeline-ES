@@ -2,6 +2,26 @@
 
 Juego de ordenar para 2–9 personas, diseñado para jugarse pasando un solo móvil o mediante una sala compartida. Funciona sin conexión después de instalarse como aplicación web, salvo cuando se utiliza el modo de varios móviles.
 
+## Nombre y destino del producto
+
+El nombre del juego es **Continuum**, tanto en la aplicación como en su instalación móvil,
+documentación y futuras fichas comerciales. El objetivo es comercializarlo como juego móvil
+en App Store; la versión actual es una aplicación web instalable, no una app iOS publicada.
+
+El nombre del repositorio y el nombre visible del proyecto de Firebase se administran fuera
+del código. Sigue pendiente unificarlos a **Continuum** desde sus respectivas configuraciones.
+Al renombrar el repositorio, hay que comprobar de nuevo GitHub Pages y actualizar enlaces de
+invitación e instalaciones existentes: el sitio publicado no hereda automáticamente las
+redirecciones del repositorio. No se cambia ninguna dirección de servicio hasta que exista
+su destino real.
+
+Los identificadores técnicos como `timeline` describen la línea de cartas, no la marca.
+Se conservan para mantener compatibles las partidas guardadas y las reglas de las salas.
+Las URL y los títulos de fuentes externas tampoco se renombran como si fueran propios.
+
+`tests/marca.mjs` comprueba el nombre de la web, del acceso directo de iOS, del manifiesto y
+de las pantallas locales. Este cambio de denominación no modifica la licencia del código.
+
 ## Bloques y juegos
 
 Los juegos se agrupan en seis bloques. La portada enseña el bloque y lista sus juegos debajo,

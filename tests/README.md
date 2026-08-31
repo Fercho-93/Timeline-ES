@@ -25,6 +25,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | Archivo | Qué comprueba |
 | --- | --- |
 | `sintaxis.mjs` | Que todos los archivos del juego parsean. Es la única red que cubre `online.js`. Sin dependencias. |
+| `marca.mjs` | Nombre Continuum en metadatos, acceso directo de iOS, manifiesto y pantallas locales. Distingue marca de identificadores técnicos. |
 | `partida-local.mjs` | Partida completa del modo de un solo móvil sobre un DOM simulado. |
 | `partidas-al-azar.mjs` | 40 partidas al azar repartidas entre todos los juegos: bloqueos, conteo de cartas y orden de la línea. |
 | `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil, y que ni un guion de `index.html` ni una carátula se queden sin precargar. Sin dependencias. |

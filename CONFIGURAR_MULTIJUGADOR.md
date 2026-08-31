@@ -9,7 +9,7 @@ El código de Firebase ya está incluido en `online.js`. Solo falta publicar las
 > porque nunca pudieron validar el contenido de un mazo (las cartas viven en el cliente) y esa
 > lista solo servía para obligar a una publicación manual con cada juego nuevo.
 
-1. Abre el proyecto **Timeline ES** en Firebase.
+1. Abre en Firebase el proyecto conectado a **Continuum**. Puedes identificarlo por el `projectId` de `online.js`, aunque su nombre en la consola todavía sea el anterior.
 2. Entra en **Firestore**.
 3. Abre la pestaña **Reglas**.
 4. Borra el contenido del editor.
@@ -51,6 +51,20 @@ TTL → Directivas de TTL**, crea una directiva sobre la colección `rooms` con 
 mantiene dentro del plan gratuito.
 
 ## 2. Comprobar Authentication
+
+### Nombre del proyecto
+
+Para unificar la denominación, cambia el nombre visible del proyecto a **Continuum** en
+**Configuración del proyecto → General → Nombre del proyecto**. Este es un paso pendiente
+en la consola, no un cambio que aplique el código de este repositorio.
+
+El nombre visible y el identificador son distintos: conserva el `projectId`, `authDomain`
+y `storageBucket` actuales de `online.js`. El identificador de un proyecto existente no
+se puede renombrar; reemplazarlo por un nombre inventado desconecta las salas y las cuentas.
+Eliminar también la denominación histórica de esos identificadores exige un proyecto nuevo
+y una migración planificada de configuración y datos.
+
+### Proveedor y dominios
 
 En **Authentication → Método de inicio de sesión**, el proveedor **Anónimo** debe aparecer como habilitado.
 

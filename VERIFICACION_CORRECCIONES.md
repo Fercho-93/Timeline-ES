@@ -1,4 +1,4 @@
-# Correcciones de las auditorías de Timeline
+# Correcciones de las auditorías de Continuum
 
 Fecha: 30 de agosto de 2026. Base revisada: `61c73e96935108bae49e5a2c594e6e81edf9038d`.
 
