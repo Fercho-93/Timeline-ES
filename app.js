@@ -724,10 +724,10 @@
     const mode = currentMode();
     const pendiente = solo && solo.kind === "free";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
-      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 data-focus tabindex="-1">Jugar en solitario</h2>
-        <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una.</p>
+      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
+        <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una.</p></div>
         <div class="panel solo-panel">
-          <div class="section-label">Reto diario <small>${today().split("-").reverse().join("/")}</small></div>
+          <div class="solo-panel-head"><h3>Reto diario</h3><time datetime="${today()}">${today().split("-").reverse().join("/")}</time></div>
           ${doneToday
             ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
             : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
@@ -735,7 +735,7 @@
           ${calendarHtml(records)}
         </div>
         <div class="panel solo-panel">
-          <div class="section-label">Partida libre</div>
+          <div class="solo-panel-head"><h3>Partida libre</h3></div>
           <p>El mazo entero, sin límite de cartas: aguanta lo que puedas.</p>
           ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar la partida <span>→</span></button>` : ""}
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
