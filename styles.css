@@ -139,7 +139,8 @@ button { touch-action: manipulation; color: inherit; }
 .panel-label { position: absolute; z-index: 2; left: 22px; right: 22px; bottom: 20px; display: grid; grid-template-columns: 3px minmax(0, 1fr); column-gap: 14px; align-items: center; text-align: left; color: #fff8ea; }
 .gallery-panel:not(.active) .panel-label { visibility: hidden; }
 .panel-label i { grid-row: 1 / span 2; width: 3px; height: 100%; min-height: 36px; border-radius: 2px; background: var(--accent); }
-.panel-label strong { font-family: var(--font-display); font-size: clamp(1.35rem, 3.6vw, 2rem); line-height: 1.02; letter-spacing: -.03em; }
+.panel-label strong { font-family: var(--font-display); font-size: clamp(1.35rem, 3.6vw, 2rem); line-height: 1.02; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.panel-entertainment .panel-label strong { font-size: clamp(1rem, 2.2vw, 1.25rem); }
 .panel-label small { margin-top: 5px; color: rgba(255,246,232,.76); font-size: .73rem; }
 .gallery-panel.active .panel-label { animation: label-in 420ms 110ms backwards var(--ease-out); }
 @keyframes label-in { from { opacity: 0; transform: translateY(12px); } }
@@ -556,9 +557,9 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .shell { padding-left: 28px; padding-right: 28px; }
   .setup-grid { grid-template-columns: 1fr 1fr; }
   .timeline-wrap { margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
-  .hero { grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr); min-height: calc(100dvh - 115px); }
-  .gallery { order: 0; height: min(66vh, 600px); gap: 12px; }
-  .gallery-panel { flex-basis: 62px; border-radius: 28px; }
+  .hero { grid-template-columns: minmax(0, 1fr); min-height: calc(100dvh - 115px); }
+  .gallery { order: 0; height: min(66vh, 600px); gap: 8px; }
+  .gallery-panel { flex-basis: 34px; border-radius: 22px; }
   .panel-label { left: 26px; right: 26px; bottom: 24px; }
   .hand { grid-template-columns: repeat(4, 1fr); }
   .play-choice-grid { grid-template-columns: repeat(3, 1fr); }
@@ -571,6 +572,12 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .lobby-head { grid-template-columns: 1fr auto; align-items: end; }
   .room-code-card { min-width: 250px; }
   .online-lobby-grid { grid-template-columns: 1.15fr .85fr; }
+}
+
+/* Dos columnas solo cuando la galería puede abrir de verdad una de seis carátulas.
+   Los lomos de 62 px dejaban apenas 104 px para el panel abierto en escritorio. */
+@media (min-width: 1000px) {
+  .hero { grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr); }
 }
 
 @media (max-width: 420px) {

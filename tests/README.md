@@ -64,6 +64,8 @@ navegador y avisa en cuanto alguien añade una banda demasiado clara.
 Comprueba lo que decide qué versión ve cada móvil: se responde con la copia guardada,
 pero se pide la del servidor por detrás, así que un archivo nuevo llega en el siguiente
 arranque aunque se olvide subir el número de la caché.
+La instalación fuerza una descarga actual y el refresco revalida la caché HTTP. Así no
+se puede etiquetar como nueva una copia antigua todavía vigente en la caché del navegador.
 
 ## Referencias animales
 

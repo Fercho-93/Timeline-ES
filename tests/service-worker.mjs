@@ -20,11 +20,14 @@ function arrancar() {
   const guardado = new Map();
   const listeners = {};
   const peticiones = [];
+  const opciones = [];
+  const tareas = [];
+  const precargas = [];
   let servidor = url => respuesta(`${url} del servidor`);
   const cache = {
     match: async request => guardado.get(request.url),
     put: async (request, response) => { guardado.set(request.url, response); },
-    addAll: async urls => { urls.forEach(url => guardado.set(url, respuesta(`${url} precargado`))); }
+    addAll: async requests => { requests.forEach(request => { precargas.push(request); guardado.set(request.url, respuesta(`${request.url} precargado`)); }); }
   };
   const contexto = {
     self: {
@@ -38,7 +41,8 @@ function arrancar() {
       keys: async () => ["hilo-modos-v9"],
       delete: async () => true
     },
-    fetch: async request => { peticiones.push(request.url); return servidor(request.url); },
+    fetch: async (request, options) => { peticiones.push(request.url); opciones.push(options); return servidor(request.url); },
+    Request: class { constructor(url, options) { this.url = url; this.cache = options.cache; } },
     Response: { error: () => respuesta("error de red", { ok: false }) },
     setTimeout, Promise
   };
@@ -47,13 +51,20 @@ function arrancar() {
 
   const pedir = async (url, mode = "same-origin", method = "GET") => {
     let devuelta;
-    listeners.fetch({ request: { url, method, mode }, respondWith: valor => { devuelta = valor; } });
+    listeners.fetch({ request: { url, method, mode }, respondWith: valor => { devuelta = valor; }, waitUntil: tarea => tareas.push(tarea) });
     return devuelta ? await devuelta : undefined;
   };
-  return { pedir, guardado, peticiones, listeners, cache, servidor: fn => { servidor = fn; } };
+  return { pedir, guardado, peticiones, opciones, tareas, precargas, listeners, cache, servidor: fn => { servidor = fn; } };
 }
 
 console.log("\nService worker");
+{
+  const sw = arrancar();
+  let instalada;
+  sw.listeners.install({ waitUntil: tarea => { instalada = tarea; } });
+  await instalada;
+  ok("instalar una versión nueva evita reutilizar archivos viejos de la caché HTTP", sw.precargas.length > 0 && sw.precargas.every(request => request.cache === "reload"));
+}
 {
   const sw = arrancar();
   sw.guardado.set("./online.js", respuesta("online.js viejo"));
@@ -61,8 +72,33 @@ console.log("\nService worker");
   ok("responde con la copia guardada, para poder jugar sin conexión", primera.cuerpo === "online.js viejo");
   await espera();
   ok("pero pide la versión del servidor por detrás", sw.peticiones.includes("./online.js"));
+  ok("el refresco revalida la caché HTTP", sw.opciones[0].cache === "no-cache");
+  ok("el trabajador espera a completar el refresco", sw.tareas.length === 1);
+  await Promise.all(sw.tareas);
   const segunda = await sw.pedir("./online.js");
   ok("y en el siguiente arranque ya sirve la nueva", segunda.cuerpo === "./online.js del servidor");
+}
+{
+  const sw = arrancar();
+  sw.guardado.set("./styles.css", respuesta("estilos anteriores"));
+  let terminaGuardado;
+  const pendiente = new Promise(resolve => { terminaGuardado = resolve; });
+  const guardar = sw.cache.put;
+  sw.cache.put = async (...args) => { await pendiente; await guardar(...args); };
+  const primera = await sw.pedir("./styles.css");
+  let terminada = false;
+  sw.tareas[0].then(() => { terminada = true; });
+  await espera();
+  ok("la respuesta local no espera a una escritura lenta", primera.cuerpo === "estilos anteriores" && !terminada);
+  terminaGuardado();
+  await Promise.all(sw.tareas);
+  ok("la tarea de fondo incluye la escritura completa", sw.guardado.get("./styles.css").cuerpo === "./styles.css del servidor");
+}
+{
+  const sw = arrancar();
+  sw.cache.put = async () => { throw new Error("sin espacio"); };
+  const response = await sw.pedir("./app.js");
+  ok("sin espacio de caché sigue entregando la respuesta de red", response.cuerpo === "./app.js del servidor");
 }
 {
   const sw = arrancar();
