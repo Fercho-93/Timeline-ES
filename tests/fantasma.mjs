@@ -1,0 +1,153 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { JSDOM } from 'jsdom';
+const root = new URL('../', import.meta.url);
+const read = name => fs.readFileSync(new URL(name, root), 'utf8');
+const html = read('index.html');
+const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const plain = value => JSON.parse(JSON.stringify(value));
+function boot(storage = {}) {
+  const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), { runScripts: 'outside-only', url: 'https://continuum.test' }).window;
+  w.structuredClone = structuredClone;
+  Object.entries(storage).forEach(([key, value]) => w.localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value)));
+  scripts.forEach(file => w.eval(read(file)));
+  return w;
+}
+const click = (w, action) => { const el = w.document.querySelector(`[data-action="${action}"]`); assert.ok(el, action); el.click(); };
+const key = 'hilo-game-history-v1', soloKey = 'hilo-solo-history-v1';
+const state = (w, k = key) => JSON.parse(w.localStorage.getItem(k));
+const all = s => [...s.timeline, ...s.deck, ...s.discard, ...s.players.flatMap(p => p.hand)];
+function freshGhost(owners = ['1']) { return { cards: [6], owners, used: [], pending: [], cooldown: [], actor: '', fresh: false }; }
+function fixture() {
+  return { mode: 'history', pulse: true, ghost: freshGhost(), players: [{ id: 1, name: 'Ana', hand: [6, 7, 8] }, { id: 2, name: 'Luis', hand: [9, 10, 11] }], timeline: [1, 2, 3, 4, 5], deck: [12, 13, 14, 15], discard: [], current: 0, starter: 0, round: 1, turnsInRound: 0, winner: null, winners: null };
+}
+function play(w, correct = true, single = false) {
+  const s = state(w, single ? soloKey : key), ct = w.CONTINUUM;
+  const id = single ? s.current : s.players[s.current].hand[0];
+  const card = ct.cards(s.mode).find(c => c.id === id);
+  const board = s.timeline.map(id => ct.cards(s.mode).find(c => c.id === id));
+  const at = ct.correctIndex(s.mode, board, card);
+  const index = correct ? at : (at === 0 ? board.length : 0);
+  if (!single) { const el = w.document.querySelector(`[data-action="select-card"][data-id="${id}"]`); el.click(); }
+  w.document.querySelectorAll(`[data-action="${single ? 'solo-place' : 'place'}"]`)[index].click();
+  click(w, 'confirm-place');
+}
+console.log('\nFantasma: reparto, jugadas y dificultades');
+{
+  const w = boot(), g = w.CONTINUUM.Ghost;
+  let seed = 73473;
+  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+  for (const n of [38, 167, 673]) for (const p of [2, 5, 9]) {
+    const h = Math.min(4, Math.floor((n - 1) / p)), deck = Array.from({ length: n }, (_, i) => i + 1);
+    let potential = 0, dealt = 0;
+    const seen = new Set();
+    for (let k = 0; k < 2500; k++) {
+      const ghost = g.create(deck, p, h, random);
+      if (ghost.cards.length) potential++;
+      if (ghost.cards.some(id => id <= p * h)) dealt++;
+      assert.ok(ghost.cards.length <= Math.ceil(p / 3));
+      assert.equal(new Set(ghost.cards).size, ghost.cards.length);
+      ghost.cards.forEach(id => { assert.notEqual(id, p * h + 1, 'no poder en carta inicial'); assert.ok(id <= Math.min(n, p * h + p * 2 + 1)); seen.add(id); });
+    }
+    assert.ok(potential > 1600 && potential < 1900, 'azar sin presencia garantizada');
+    assert.ok(dealt > 1250 && dealt < 1900, 'presencia inicial frecuente pero no constante');
+    assert.ok(seen.size > p * h, 'también aparece en robos posteriores');
+    console.log(`  ${p} jugadores, ${n} cartas: ${(dealt/25).toFixed(1)}% con poder repartido, ${(potential/25).toFixed(1)}% con poder posible`);
+  }
+  w.close();
+}
+{
+  let w = boot({ [key]: fixture() });
+  click(w, 'continue'); click(w, 'ready');
+  const inventory = all(state(w)).sort((a,b) => a-b);
+  click(w, 'ghost-use');
+  assert.deepEqual(state(w).ghost.pending, ['1', '2']);
+  assert.equal(w.document.querySelector('[data-action="pulse-open"]'), null);
+  assert.equal(w.document.querySelectorAll('.ghost-card').length, 5);
+  assert.ok([...w.document.querySelectorAll('.map-stop')].every(x => /valor oculto/.test(x.getAttribute('aria-label'))));
+  assert.ok([...w.document.querySelectorAll('.timeline-card')].every(x => !/era-/.test(x.innerHTML)));
+  play(w);
+  assert.ok(w.document.querySelector('.modal .year').textContent.trim());
+  assert.equal(w.document.querySelectorAll('.ghost-card').length, 6, 'el resultado no destapa el tablero');
+  const saved = state(w); w.close();
+  w = boot({ [key]: saved }); click(w,'continue'); click(w,'ready');
+  assert.ok(w.document.querySelector('.modal'), 'recarga restaura resultado, no repite jugada');
+  click(w, 'finish-turn'); click(w,'ready');
+  assert.deepEqual(state(w).ghost.pending, ['2']);
+  assert.ok(w.document.querySelector('[data-action="pulse-open"]'), 'el rival puede usar Pulso dentro del efecto');
+  play(w); click(w,'finish-turn'); click(w,'ready');
+  assert.deepEqual(state(w).ghost.pending, []);
+  assert.deepEqual(state(w).ghost.cooldown, ['1','2']);
+  assert.equal(w.document.querySelectorAll('.ghost-card').length,0);
+  assert.deepEqual(all(state(w)).sort((a,b)=>a-b), inventory);
+  play(w); click(w,'finish-turn'); click(w,'ready'); play(w); click(w,'finish-turn');
+  assert.deepEqual(state(w).ghost.cooldown, []);
+  w.close();
+}
+{
+  const f = fixture(); f.players[0].hand = [6]; f.current = 1; f.turnsInRound = 0;
+  const w = boot({ [key]: f }); click(w,'continue'); click(w,'ready');
+  play(w); click(w,'finish-turn'); click(w,'ready'); play(w); click(w,'finish-turn');
+  assert.equal(state(w).winner,1,'conservar Fantasma no impide ganar');
+  assert.deepEqual(state(w).ghost.used,[]);
+  w.close();
+}
+{
+  const f=fixture(); f.ghost=freshGhost(['']); f.ghost.cards=[12];
+  const w=boot({[key]:f});click(w,'continue');click(w,'ready');play(w,false);
+  assert.equal(state(w).ghost.owners[0],'1','el robo de penalización puede entregar el poder');
+  assert.equal(state(w).players[0].hand.length,3,'el poder no sustituye la penalización');w.close();
+}
+{
+  const initial={kind:'free',mode:'history',difficulty:'hard',ghostTurns:[3],day:'2026-08-31',deck:[7,8,9,10,11,12],timeline:[1,2,3,4,5],current:6,lives:3,hits:3,played:3,total:null,finished:false};
+  const w=boot({[soloKey]:initial});click(w,'solo');click(w,'resume-solo');
+  assert.equal(w.document.querySelectorAll('.ghost-card').length,5);
+  play(w,true,true);assert.equal(w.document.querySelectorAll('.ghost-card').length,6);
+  click(w,'solo-next');assert.equal(w.document.querySelectorAll('.ghost-card').length,0);
+  assert.equal(state(w,soloKey).autoAdded.length,2);w.close();
+}
+for (const difficulty of ['easy','normal','hard','expert']) {
+  let w = boot({ 'continuum-difficulty-v1': difficulty }); click(w,'solo'); click(w,'start-free');
+  let s = state(w,soloKey); const initialTotal=s.deck.length+s.timeline.length+1;
+  assert.equal(s.difficulty,difficulty);
+  assert.equal(w.document.querySelectorAll('.ghost-card').length,difficulty==='expert'?1:0);
+  play(w,false,true); const saved=state(w,soloKey); w.close();
+  w=boot({[soloKey]:saved,'continuum-difficulty-v1':difficulty});click(w,'solo');click(w,'resume-solo');
+  assert.ok(w.document.querySelector('.modal'));click(w,'solo-next');
+  s=state(w,soloKey);
+  assert.equal(s.lives,2);assert.equal(s.hits,0);assert.equal(s.played,1);
+  assert.equal(s.autoAdded.length, {easy:0,normal:1,hard:2,expert:2}[difficulty], 'automáticas incluso tras fallo');
+  assert.equal(new Set([...s.timeline,...s.deck,s.current,...s.failed]).size,initialTotal);
+  const cards=w.CONTINUUM.cards(s.mode), byId=new Map(cards.map(c=>[c.id,c]));
+  let turns=0;
+  while (!w.document.querySelector('.pass-screen') && turns++<cards.length) {
+    s=state(w,soloKey);const values=s.timeline.map(id=>w.CONTINUUM.sortValue(s.mode,byId.get(id)));
+    assert.deepEqual([...values].sort((a,b)=>a-b),values);
+    play(w,true,true); click(w,'solo-next');
+  }
+  assert.ok(turns<cards.length,'termina sin bloqueo aunque las automáticas agoten el mazo');
+  assert.match(w.document.body.textContent,/Has completado el mazo/);
+  const records=JSON.parse(w.localStorage.getItem('hilo-retos-v1')).history;
+  assert.ok(records.bestByDifficulty[difficulty]>0);
+  if(difficulty!=='easy')assert.equal(records.best||0,0,'no pisa récord clásico');
+  w.close();
+}
+{
+  const w=boot({'continuum-difficulty-v1':'expert'});click(w,'start-competition');click(w,'comp-next-round');
+  assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
+  let rounds=0;
+  // Las cinco cartas del usuario nunca se consumen como incorporaciones automáticas.
+  while(rounds++<14){
+    for(let i=0;i<5;i++){
+      const id=Number(w.document.querySelector('.hand-card').dataset.id),ct=w.CONTINUUM;
+      const cards=Object.values(ct.MODES).flatMap(m=>m.cards),byId=new Map(cards.map(c=>[c.id,c]));
+      const board=[...w.document.querySelectorAll('.timeline-card')].map(el=>byId.get(Number(el.dataset.id)));
+      const card=byId.get(id);const mode=Object.values(ct.MODES).find(m=>m.key!=='mixed'&&m.cards.some(c=>c.id===id)).key;
+      const at=ct.correctIndex(mode,board,card);
+      w.document.querySelectorAll('[data-action="solo-place"]')[at].click();click(w,'confirm-place');click(w,'solo-next');
+    }
+    if(rounds<14){click(w,'comp-next-round');}
+  }
+  assert.match(w.document.body.textContent,/70/);w.close();
+}
+console.log('  Fantasma, conservación de cartas, guardado y cuatro dificultades: OK');

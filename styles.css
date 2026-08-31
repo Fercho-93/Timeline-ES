@@ -627,3 +627,22 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .dialog-exit, .dialog-exit .modal, .drag-ghost, .game-row.active,
   .spinner, .waiting-orbit, .waiting-inline i { animation: none !important; }
 }
+
+/* Fantasma: se mantiene el tamaño y la legibilidad; solo se retiran las pistas. */
+.ghost-card .card-visual, .map-stop.era-ghost { background: var(--surface, #ede9e2); color: var(--muted, #766e63); }
+.ghost-value { letter-spacing: .14em; color: var(--muted, #766e63); }
+.ghost-card .card-content p { font-style: italic; }
+.ghost-banner { display: flex; gap: 12px; align-items: center; margin: 14px 0; padding: 14px 16px; border: 1px solid var(--line, #d8d2c8); border-radius: 16px; background: var(--surface, #eeeae3); }
+.ghost-banner > span { font-size: 1.8rem; }
+.ghost-banner small, .ghost-power small { display: block; margin-top: 4px; font-size: .78rem; line-height: 1.45; color: var(--muted, #766e63); }
+.ghost-power { display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px; margin: 16px 0; text-align: left; font: inherit; color: inherit; background: transparent; border: 1px solid var(--line, #d8d2c8); border-radius: 16px; cursor: pointer; min-height: 64px; }
+.ghost-power > span:first-child { font-size: 2rem; }
+.ghost-power:disabled { cursor: default; opacity: .6; }
+.ghost-power:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.auto-cards { font-size: .82rem; line-height: 1.6; color: var(--muted, #766e63); margin: 12px 0 18px; overflow-wrap: anywhere; }
+.difficulty-field { margin: 18px 0; }
+.difficulty-field select { width: 100%; min-height: 48px; }
+@media (prefers-reduced-motion: no-preference) {
+  .ghost-card .ghost-value { animation: ghost-appear 220ms ease-out both; }
+  @keyframes ghost-appear { from { opacity: 0; } to { opacity: 1; } }
+}

@@ -26,7 +26,7 @@
   const MINIMO = 5;
   const ANCHO_PARADA = 44;
 
-  function timelineMap(modeKey, cards) {
+  function timelineMap(modeKey, cards, { hidden = false } = {}) {
     if (cards.length < MINIMO) return "";
     const valores = cards.map(card => CT.sortValue(modeKey, card));
     const minimo = Math.min(...valores), maximo = Math.max(...valores);
@@ -36,12 +36,12 @@
     const lienzo = Math.max(320, cards.length * ANCHO_PARADA);
     let anterior = -Infinity;
     const paradas = cards.map((card, i) => {
-      const era = CT.eraForCard(modeKey, card);
-      const nombre = `${card.title}, ${CT.formatValue(modeKey, card)}`;
-      const proporcional = ((valores[i] - minimo) / rango) * (lienzo - ANCHO_PARADA);
+      const era = hidden ? { key: "ghost" } : CT.eraForCard(modeKey, card);
+      const nombre = `${card.title}, ${hidden ? "valor oculto" : CT.formatValue(modeKey, card)}`;
+      const proporcional = hidden ? i * ANCHO_PARADA : ((valores[i] - minimo) / rango) * (lienzo - ANCHO_PARADA);
       const izquierda = Math.max(proporcional, anterior + ANCHO_PARADA);
       anterior = izquierda;
-      return { izquierda, html: `<button class="map-stop era-${era.key}" style="left:${izquierda}px" data-goto="${i}" data-id="${card.id}" aria-label="Ir a ${CT.escapeHtml(nombre)}"><span>${CT.escapeHtml(CT.shortValue(modeKey, card))}</span></button>` };
+      return { izquierda, html: `<button class="map-stop era-${era.key}" style="left:${izquierda}px" data-goto="${i}" data-id="${card.id}" aria-label="Ir a ${CT.escapeHtml(nombre)}"><span>${hidden ? i + 1 : CT.escapeHtml(CT.shortValue(modeKey, card))}</span></button>` };
     });
     const anchoTotal = Math.max(lienzo, paradas[paradas.length - 1].izquierda + ANCHO_PARADA);
     // +36: el relleno lateral de 18px a cada lado, que con box-sizing: border-box cuenta

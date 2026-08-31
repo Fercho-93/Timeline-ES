@@ -121,3 +121,15 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
   sepa inspeccionar el navegador puede ver las manos ajenas y el orden del mazo. Las reglas
   impiden manipular la partida, no mirar.
 - El modo compartido necesita internet. El modo de un móvil continúa funcionando sin conexión.
+
+## Actualización v36: Fantasma
+
+Publica el contenido completo de `firestore.rules` en Firebase Console → Firestore Database
+→ Reglas → Publicar. Si utilizas la CLI autenticada, usa `firebase deploy --only firestore:rules
+--project timeline-es` con `firebase.json` apuntando a este archivo. No hace falta modificar
+los mazos ni borrar salas. Todos los participantes deben actualizar la aplicación a v36.
+
+Hasta publicar las reglas, desmarca **Cartas Fantasma** en la configuración de la sala.
+La app no puede publicar reglas con la clave pública de Firebase: hace falta la cuenta
+propietaria o una cuenta de servicio autorizada. El poder sí funciona sin Firebase al pasar
+un solo móvil.
