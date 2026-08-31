@@ -20,6 +20,11 @@
   --ink-solid: #2b2927;
   --ink-solid-contrast: #fff;
   --font-display: Iowan Old Style, Palatino Linotype, Book Antiqua, Palatino, Georgia, serif;
+  --ease-out: cubic-bezier(.22, .61, .36, 1);
+  --ease-spring: cubic-bezier(.2, .78, .28, 1.04);
+  --motion-fast: 160ms;
+  --motion-base: 260ms;
+  --motion-slow: 460ms;
   --shadow: 0 14px 34px rgba(43, 35, 29, .10);
   --shadow-soft: 0 5px 16px rgba(43, 35, 29, .07);
 }
@@ -75,6 +80,7 @@ body {
   background: var(--paper);
 }
 button, input, select { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
 /* Para lectores de pantalla: fuera de la vista pero dentro del árbol de accesibilidad.
    Aquí viven los titulares de la partida y los avisos de lo que acaba de pasar. */
 .solo-lectores { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
@@ -86,8 +92,10 @@ button, input, select { font: inherit; }
 button { touch-action: manipulation; color: inherit; }
 
 #app { min-height: 100dvh; }
-.screen-enter { animation: screen-in .32s cubic-bezier(.22,.61,.36,1) both; }
-@keyframes screen-in { from { opacity: 0; transform: translateY(10px); } }
+.screen-enter .topbar { animation: chrome-in var(--motion-base) var(--ease-out) both; }
+.screen-enter > :not(.topbar) { animation: content-in 340ms 45ms var(--ease-out) both; }
+@keyframes chrome-in { from { opacity: 0; transform: translateY(-6px); } }
+@keyframes content-in { from { opacity: 0; transform: translateY(12px); } }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
@@ -98,23 +106,19 @@ button { touch-action: manipulation; color: inherit; }
 
 .hero { padding: 8px 0; display: grid; gap: 26px; align-items: center; }
 .hero-copy { position: relative; z-index: 2; }
-/* Galería en acordeón: la modalidad elegida se despliega y las otras dos quedan
-   como lomos verticales. El despliegue se anima con @keyframes y no con una
-   transición porque la portada se vuelve a pintar entera al cambiar de modalidad,
-   así que el panel nace ya desplegado y no hay estado anterior desde el que
-   transicionar. */
+/* Galería persistente: el bloque anterior se contrae a la vez que se abre el nuevo.
+   Cambiar de mazo dentro del mismo bloque no reinicia ni descarga la carátula. */
 /* En móvil la galería va primero: se elige el juego y luego se lee de qué va. */
 .gallery { order: -1; display: flex; gap: 8px; height: clamp(310px, 44vh, 430px); margin: 2px 0; }
 /* Con seis bloques, dejar 66 px a cada lomo agotaba el ancho de un móvil antes de
    repartir ninguno al panel abierto. Los lomos tienen una anchura fija y el elegido
    recibe el resto: así siempre se despliega, incluso en pantallas estrechas. */
-.gallery-panel { position: relative; flex: 0 0 42px; min-width: 0; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.16); border-radius: 24px; background: #241b14; cursor: pointer; isolation: isolate; box-shadow: 0 18px 42px rgba(52,34,17,.22); transition: flex .45s cubic-bezier(.22,.61,.36,1); }
-.gallery-panel.active { flex: 1 1 0; cursor: default; animation: panel-open .5s cubic-bezier(.22,.61,.36,1); }
-@keyframes panel-open { from { flex: .02 1 0; } }
+.gallery-panel { position: relative; flex: 0 0 42px; min-width: 0; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.16); border-radius: 24px; background: #241b14; cursor: pointer; isolation: isolate; box-shadow: 0 18px 42px rgba(52,34,17,.22); transition: flex var(--motion-slow) var(--ease-out), transform var(--motion-fast) ease, box-shadow var(--motion-base) ease; }
+.gallery-panel.active { flex: 1 1 0; cursor: default; }
 .gallery-panel:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 62%, transparent); outline-offset: 3px; }
 .gallery-panel::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,15,9,0) 38%, rgba(20,15,9,.5) 62%, rgba(20,15,9,.92)); pointer-events: none; }
-.panel-art { position: absolute; inset: 0; display: block; }
-.panel-art img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; }
+.panel-art { position: absolute; inset: 0; display: block; transition: filter var(--motion-slow) ease; }
+.panel-art img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; display: block; transition: filter var(--motion-slow) ease, transform 700ms var(--ease-out); }
 .panel-entertainment .panel-art img, .panel-nature .panel-art img, .panel-globe .panel-art img, .panel-mixed .panel-art img { object-position: center; }
 /* La ilustración de ciencia concentra el motivo en el tercio superior: con el encuadre
    centrado quedaba oculto al abrir la carátula, justo detrás del degradado del título. */
@@ -122,8 +126,10 @@ button { touch-action: manipulation; color: inherit; }
 .panel-science::after { background: linear-gradient(180deg, rgba(10,29,34,.04) 30%, rgba(10,29,34,.38) 60%, rgba(10,29,34,.82)); }
 /* Los lomos se apagan para que la carátula elegida sea la única en color. */
 .gallery-panel:not(.active) .panel-art { filter: grayscale(.9) brightness(.44) contrast(1.05); }
-@media (hover: hover) {
-  .gallery-panel:not(.active):hover { flex-grow: .2; }
+.gallery-panel.active .panel-art img { animation: cover-in 720ms var(--ease-out) both; }
+@keyframes cover-in { from { transform: scale(1.035); } }
+@media (hover: hover) and (pointer: fine) {
+  .gallery-panel:not(.active):hover { flex-grow: .2; transform: translateY(-2px); box-shadow: 0 21px 46px rgba(52,34,17,.26); }
   .gallery-panel:not(.active):hover .panel-art { filter: grayscale(.5) brightness(.62); }
 }
 .panel-spine { position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px 0 17px; color: #f7ecd8; }
@@ -135,15 +141,15 @@ button { touch-action: manipulation; color: inherit; }
 .panel-label i { grid-row: 1 / span 2; width: 3px; height: 100%; min-height: 36px; border-radius: 2px; background: var(--accent); }
 .panel-label strong { font-family: var(--font-display); font-size: clamp(1.35rem, 3.6vw, 2rem); line-height: 1.02; letter-spacing: -.03em; }
 .panel-label small { margin-top: 5px; color: rgba(255,246,232,.76); font-size: .73rem; }
-.gallery-panel.active .panel-label { animation: label-in .45s .12s backwards ease-out; }
+.gallery-panel.active .panel-label { animation: label-in 420ms 110ms backwards var(--ease-out); }
 @keyframes label-in { from { opacity: 0; transform: translateY(12px); } }
 .eyebrow { display: flex; align-items: center; gap: 9px; color: var(--accent); font-size: .73rem; text-transform: uppercase; letter-spacing: .16em; font-weight: 700; }
 .eyebrow-line { width: 28px; height: 1px; background: var(--accent); }
 /* Los juegos del bloque: filas sobrias, la elegida marcada con una línea de acento. */
 .games { display: grid; gap: 1px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--line); }
-.game-row { display: grid; gap: 3px; padding: 15px 17px; border: 0; border-left: 3px solid transparent; background: var(--surface); text-align: left; cursor: pointer; transition: background .15s ease; }
-.game-row:hover { background: var(--paper); }
-.game-row.active { border-left-color: var(--accent); cursor: default; }
+.game-row { display: grid; gap: 3px; padding: 15px 17px; border: 0; border-left: 3px solid transparent; background: var(--surface); text-align: left; cursor: pointer; transition: background var(--motion-fast) ease; }
+.game-row.active { border-left-color: var(--accent); cursor: default; animation: row-select 280ms var(--ease-out) both; }
+@keyframes row-select { from { background: var(--accent-soft); } }
 .game-name { font-weight: 700; font-size: .96rem; }
 .game-meta { color: var(--muted); font-size: .8rem; }
 .game-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -156,20 +162,18 @@ button { touch-action: manipulation; color: inherit; }
 .play-choices-head .eyebrow { margin-bottom: 7px; }
 .play-choices h2 { margin: 0; font-size: clamp(1.35rem, 4vw, 1.75rem); }
 .play-choice-grid { display: grid; gap: 9px; }
-.play-choice { width: 100%; min-height: 76px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); background: var(--surface); text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease; }
-.play-choice:hover { border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); background: var(--paper); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.play-choice { width: 100%; min-height: 76px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); background: var(--surface); text-align: left; cursor: pointer; transition: transform var(--motion-fast) var(--ease-out), border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, background var(--motion-fast) ease; }
 .play-choice.primary { border-color: var(--ink-solid); background: var(--ink-solid); color: var(--ink-solid-contrast); }
-.play-choice.primary:hover { filter: brightness(.92); }
 .choice-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 11px; color: var(--accent); background: var(--accent-soft); }
 .choice-icon svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.play-choice.primary .choice-icon { color: var(--ink-solid); background: #fffaf4; }
+.play-choice.primary .choice-icon { color: #2b2927; background: #fffaf4; }
 .play-choice b, .play-choice small { display: block; }
 .play-choice b { font-size: .93rem; }
 .play-choice small { margin-top: 3px; color: var(--muted); font-size: .75rem; line-height: 1.25; }
 .play-choice.primary small { color: color-mix(in srgb, var(--ink-solid-contrast) 70%, transparent); }
 .play-choice > i { font-size: 1.1rem; font-style: normal; color: var(--accent); transition: transform .18s ease; }
 .play-choice.primary > i { color: var(--ink-solid-contrast); }
-.play-choice:hover > i { transform: translateX(3px); }
+.play-choice:active { transform: translateY(0) scale(.985); }
 .continue-choice { min-height: 44px; border: 0; padding: 7px 3px 0; color: var(--accent); background: transparent; font-size: .8rem; font-weight: 700; text-align: left; cursor: pointer; }
 .continue-choice span { margin-left: 5px; }
 
@@ -191,13 +195,23 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .era-milenio { background: #5b6650; }
 .era-actual { background: #6a5a67; }
 
-.btn { min-height: 50px; border: 0; border-radius: 10px; padding: 13px 20px; font-weight: 650; cursor: pointer; transition: background .15s ease; }
+.btn { min-height: 50px; border: 0; border-radius: 10px; padding: 13px 20px; font-weight: 650; cursor: pointer; transition: background var(--motion-fast) ease, color var(--motion-fast) ease, transform 110ms ease, box-shadow var(--motion-fast) ease; }
 .btn span { display: inline-block; margin-left: 8px; }
-.btn:active { transform: scale(.98); }
+.btn:active { transform: scale(.975); }
 .btn-primary { color: var(--ink-solid-contrast); background: var(--ink-solid); }
-.btn-primary:hover { filter: brightness(.85); }
 .btn-secondary { color: var(--ink); background: var(--surface); border: 1px solid var(--line); }
-.btn-secondary:hover { background: var(--paper); }
+.btn:disabled { cursor: default; }
+.btn:disabled:active { transform: none; }
+/* En una pantalla táctil :hover puede quedarse pegado después de pulsar. */
+@media (hover: hover) and (pointer: fine) {
+  .game-row:hover { background: var(--paper); }
+  .play-choice:hover { border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); background: var(--paper); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+  .play-choice.primary:hover { background: var(--ink-solid); filter: brightness(.92); }
+  .play-choice:hover > i { transform: translateX(3px); }
+  .play-choice:active { transform: scale(.985); }
+  .btn-primary:not(:disabled):hover { filter: brightness(.92); }
+  .btn-secondary:not(:disabled):hover { background: var(--paper); }
+}
 .btn-ghost { color: var(--accent); background: transparent; }
 .btn-block { width: 100%; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -252,7 +266,7 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .timeline-card h3 { margin: 9px 0 8px; font-family: var(--font-display); font-size: .98rem; line-height: 1.16; letter-spacing: -.01em; }
 .timeline-card p { color: var(--muted); font-size: .75rem; line-height: 1.42; margin: 0; }
 .slot { width: 54px; min-height: 244px; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; }
-.slot span { display: grid; place-items: center; width: 38px; height: 100%; min-height: 116px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: 1.4rem; transition: .15s ease; }
+.slot span { display: grid; place-items: center; width: 38px; height: 100%; min-height: 116px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: 1.4rem; transition: border-color var(--motion-fast) ease, color var(--motion-fast) ease, background var(--motion-fast) ease, transform var(--motion-fast) var(--ease-spring), box-shadow var(--motion-fast) ease; }
 .slot:hover span, .slot:focus-visible span { border-color: var(--accent); color: var(--accent); }
 .slot:disabled { cursor: default; }
 .slot:disabled span { opacity: .25; }
@@ -266,20 +280,25 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .slot-confirm small { color: var(--accent); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
 .slot-confirm strong { font-family: var(--font-display); font-size: 1rem; line-height: 1.15; margin-bottom: 4px; }
 .slot-confirm .btn { padding: 10px 12px; font-size: .78rem; }
+.placement-enter { animation: placement-in 240ms var(--ease-spring) both; transform-origin: center; }
+@keyframes placement-in { from { opacity: 0; transform: scale(.94); } }
 
 .hand-title { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
 .hand-title h3 { margin: 0; }
 .hand-title small { color: var(--muted); }
 .hand { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-.hand-card { min-height: 164px; text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: var(--ink); background: var(--surface); box-shadow: var(--shadow-soft); cursor: grab; position: relative; overflow: hidden; transition: transform .15s ease, border-color .15s ease; }
+.hand-card { min-height: 164px; text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: var(--ink); background: var(--surface); box-shadow: var(--shadow-soft); cursor: grab; position: relative; overflow: hidden; transition: transform var(--motion-fast) var(--ease-out), border-color var(--motion-fast) ease, box-shadow var(--motion-base) ease, opacity var(--motion-fast) ease; }
 .hand-card:active { transform: translateY(2px); }
 .hand-card.selected { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); transform: translateY(-2px); }
+.hand-card.selection-enter { animation: card-select 260ms var(--ease-spring) both; }
+@keyframes card-select { 0% { transform: translateY(1px) scale(.985); } 100% { transform: translateY(-2px); } }
 
 /* Arrastrar cartas. La carta original se queda apagada en su sitio, como hueco de
    donde salió, y lo que sigue al dedo es una copia flotante. */
 .hand-card.armed { transform: scale(.97); box-shadow: inset 0 0 0 2px var(--accent); }
 .hand-card.dragging { opacity: .3; filter: grayscale(1); cursor: grabbing; }
-.drag-ghost { position: fixed; left: 0; top: 0; z-index: 60; margin: 0; min-height: 0; padding: 11px 13px; pointer-events: none; transform: rotate(-2deg); border-color: var(--accent); box-shadow: 0 16px 34px rgba(40,28,18,.3); }
+.drag-ghost { position: fixed; left: 0; top: 0; z-index: 60; margin: 0; min-height: 0; padding: 11px 13px; pointer-events: none; transition: none; border-color: var(--accent); box-shadow: 0 16px 34px rgba(40,28,18,.3); animation: ghost-lift 180ms var(--ease-spring) both; }
+@keyframes ghost-lift { from { opacity: .65; } }
 .drag-ghost .card-arrow, .drag-ghost .card-era { display: none; }
 .drag-ghost strong { margin-top: 7px; font-size: .9rem; }
 .slot.drop-target span { border-style: solid; border-color: var(--accent); background: var(--accent-soft); color: var(--accent); transform: scale(1.08); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent); }
@@ -387,9 +406,21 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 
 .overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(35,27,19,.73); backdrop-filter: blur(8px); }
 .modal { width: min(100%, 460px); max-height: calc(100dvh - 36px); overflow-y: auto; border-radius: 12px; padding: 26px; background: var(--surface); box-shadow: 0 20px 50px rgba(0,0,0,.22); text-align: center; border: 1px solid var(--line); }
+.dialog-enter { animation: veil-in 180ms ease-out both; }
+.dialog-enter .modal { animation: dialog-in 280ms var(--ease-spring) both; }
+.dialog-exit { pointer-events: none; animation: veil-out var(--motion-fast) ease-in both; }
+.dialog-exit .modal { animation: dialog-out var(--motion-fast) ease-in both; }
+@keyframes veil-in { from { opacity: 0; } }
+@keyframes veil-out { to { opacity: 0; } }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(16px) scale(.975); } }
+@keyframes dialog-out { to { opacity: 0; transform: translateY(8px) scale(.985); } }
 .modal .big-icon { font-size: 3rem; margin-bottom: 10px; }
 .modal p { color: var(--muted); line-height: 1.55; }
 .reveal { margin: 18px 0; padding: 0 18px 18px; border-radius: 12px; background: var(--paper); overflow: hidden; }
+.dialog-enter .reveal { animation: reveal-in 360ms 90ms var(--ease-out) backwards; }
+.dialog-enter .result-mark { animation: result-in 380ms 80ms var(--ease-spring) backwards; }
+@keyframes reveal-in { from { opacity: 0; transform: translateY(7px); } }
+@keyframes result-in { from { opacity: 0; transform: scale(.88); } }
 .reveal-era { margin: 0 -18px 15px; padding: 10px 14px; color: rgba(255,255,255,.94); font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
 .reveal-era span { margin-right: 8px; font: 1.1rem var(--font-display); }
 .reveal .year { color: var(--accent); font: 850 2.25rem var(--font-display); }
@@ -420,8 +451,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
    que no alcanzan a tapar los 18 px de separación; asomaban seis píxeles de barrita
    oscura en el borde inferior de todas las pantallas. Y como nunca se pulsa, tampoco
    recibe toques: en esa franja se los estaba tragando. */
-.toast { position: fixed; z-index: 50; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); transform: translate(-50%, calc(100% + max(18px, env(safe-area-inset-bottom)) + 4px)); width: max-content; max-width: calc(100% - 36px); padding: 12px 16px; border-radius: 10px; background: #29241e; color: white; font-weight: 650; box-shadow: var(--shadow); pointer-events: none; transition: transform .25s ease; }
-.toast.show { transform: translate(-50%, 0); }
+.toast { position: fixed; z-index: 50; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); opacity: 0; transform: translate(-50%, calc(100% + max(18px, env(safe-area-inset-bottom)) + 4px)) scale(.98); width: max-content; max-width: calc(100% - 36px); padding: 12px 16px; border-radius: 10px; background: #29241e; color: white; font-weight: 650; box-shadow: var(--shadow); pointer-events: none; transition: transform var(--motion-base) var(--ease-spring), opacity var(--motion-fast) ease; }
+.toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
 .live-badge { display: inline-flex; align-items: center; gap: 5px; margin-left: 3px; padding: 5px 8px; border-radius: 999px; background: rgba(50,105,79,.1); color: var(--green); font: 800 .55rem ui-sans-serif, system-ui, sans-serif; letter-spacing: .08em; vertical-align: middle; }
 .live-badge i, .connection-strip i { width: 6px; height: 6px; border-radius: 50%; background: #42a776; box-shadow: 0 0 0 4px rgba(66,167,118,.13); }
@@ -567,7 +598,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; }
-  /* Solo se apaga el despliegue de la galería: el resto de animaciones son
-     indicadores de espera y sin ellas la interfaz parece colgada. */
-  .gallery-panel.active, .gallery-panel.active .panel-label, .screen-enter { animation: none !important; }
+  /* Los estados siguen siendo visibles por su texto y color, sin desplazamientos,
+     zooms, rebotes ni giros; también se respeta la preferencia al recorrer el mapa. */
+  .gallery-panel.active, .gallery-panel.active .panel-label, .gallery-panel.active .panel-art img,
+  .screen-enter .topbar, .screen-enter > :not(.topbar), .selection-enter, .placement-enter,
+  .dialog-enter, .dialog-enter .modal, .dialog-enter .reveal, .dialog-enter .result-mark,
+  .dialog-exit, .dialog-exit .modal, .drag-ghost, .game-row.active,
+  .spinner, .waiting-orbit, .waiting-inline i { animation: none !important; }
 }

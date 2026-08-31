@@ -6,13 +6,13 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm install
 
-# Sintaxis, juego, mazos, service worker y accesibilidad: siete suites, sin nada más que Node.
+# Sintaxis, juego, mazos, service worker, accesibilidad y movimiento: diez suites.
 npm test
 
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npm run test:reglas
 
-# Las diez de una vez.
+# Todas las suites, incluidas las tres del emulador.
 npm run test:todo
 ```
 
@@ -32,6 +32,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `solitario.mjs` | Solitario, reto diario, confirmación al colocar, modalidad de países y el mapa de la línea. |
 | `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
 | `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie y que las bandas tengan contraste. |
+| `movimiento.mjs` | Navegación repetida, galería persistente, selección de cartas, cierres interrumpidos, arrastre y movimiento reducido. |
 | `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
 | `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |
 | `entrada-por-enlace.mjs` | La secuencia del SDK al entrar por una invitación. Necesita el emulador. |
@@ -70,3 +71,16 @@ arranque aunque se olvide subir el número de la caché.
 real: comprueba ambos lados de un empate, el orden de 70 y 70,35 km/h, la precisión de las
 masas y que los datos pendientes se avisan en el título y la explicación. No valida hechos
 zoológicos: las fuentes y los límites están en `VERIFICACION_CORRECCIONES.md`.
+
+## Movimiento e interacción
+
+`node tests/movimiento.mjs` recorre tres veces todos los bloques y mazos, seis veces la
+navegación y los diálogos, y ocho veces la elección y cancelación de huecos. Simula
+deslizamiento, pulsación mantenida, arrastre, suelta entre frames y cancelación del sistema.
+Comprueba también el foco al interrumpir un cierre y el desplazamiento sin animación cuando
+se solicita movimiento reducido. Captura excepciones de los manejadores, no solo aserciones.
+
+Son contratos sobre DOM simulado: no miden fluidez ni sustituyen la inspección visual en un
+navegador o un iPhone. Los movimientos usan tiempos cortos (160–460 ms), salvo el encuadre
+suave de la carátula; no se anima la mesa completa al elegir carta o hueco. La copia de una
+carta arrastrada se posiciona una vez por frame, sin interpolación que la retrase respecto al dedo.

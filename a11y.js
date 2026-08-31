@@ -92,6 +92,8 @@
     const clave = dentro ? selectorFor(activo) : null;
     const primero = paint.screen === undefined;
     const cambioDePantalla = screen !== paint.screen;
+    const cartaElegida = container.querySelector(".hand-card.selected")?.dataset.id || null;
+    const confirmacionAnterior = container.querySelector(".slot-confirm")?.dataset.index ?? null;
     actualizaAnclas(container);
     paint.screen = screen;
 
@@ -99,6 +101,15 @@
     // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
     // muchas veces y no debe convertir cada toque en una animación.
     if (!primero && cambioDePantalla) container.firstElementChild?.classList.add("screen-enter");
+    // Dentro de una partida no se anima el repintado entero: solo el elemento que acaba
+    // de cambiar de estado. Así el movimiento explica la acción en lugar de decorar cada
+    // toque con el mismo efecto.
+    if (!cambioDePantalla) {
+      const nuevaCarta = container.querySelector(".hand-card.selected");
+      if (nuevaCarta && nuevaCarta.dataset.id !== cartaElegida) nuevaCarta.classList.add("selection-enter");
+      const nuevaConfirmacion = container.querySelector(".slot-confirm");
+      if (nuevaConfirmacion && nuevaConfirmacion.dataset.index !== confirmacionAnterior) nuevaConfirmacion.classList.add("placement-enter");
+    }
     restauraAnclas(container);
     if (primero) return;
     if (cambioDePantalla) {
@@ -147,6 +158,7 @@
   function openDialog(overlay, cerrable) {
     if (!overlay) return;
     const modal = overlay.querySelector(".modal") || overlay;
+    overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", "true");
     modal.setAttribute("tabindex", "-1");
@@ -157,7 +169,10 @@
     }
 
     const previo = document.activeElement;
-    focus(focusables(modal)[0] || modal);
+    // Una guía larga debe abrir por su título, no desplazarse hasta «Entendido».
+    const lectura = titulo && modal.querySelector(".guide-content");
+    if (lectura) titulo.setAttribute("tabindex", "-1");
+    focus(lectura ? titulo : (focusables(modal)[0] || modal), { preventScroll: true });
 
     function onKey(event) {
       if (pila.length && pila[pila.length - 1].overlay !== overlay) return;
@@ -167,10 +182,11 @@
       }
       if (event.key !== "Tab") return;
       const lista = focusables(modal);
-      if (lista.length < 2) { event.preventDefault(); return; }
+      if (!lista.length) { event.preventDefault(); return; }
       const primero = lista[0];
       const ultimo = lista[lista.length - 1];
-      if (event.shiftKey && document.activeElement === primero) { event.preventDefault(); ultimo.focus(); }
+      if (!lista.includes(document.activeElement)) { event.preventDefault(); (event.shiftKey ? ultimo : primero).focus(); }
+      else if (event.shiftKey && document.activeElement === primero) { event.preventDefault(); ultimo.focus(); }
       else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
     }
     document.addEventListener("keydown", onKey);
@@ -182,8 +198,25 @@
     const dialogo = pila.pop();
     if (!dialogo) return;
     document.removeEventListener("keydown", dialogo.onKey);
-    dialogo.overlay.remove();
-    if (dialogo.previo && dialogo.previo.isConnected) dialogo.previo.focus({ preventScroll: true });
+    const anteriorEnPila = pila[pila.length - 1];
+    const termina = () => {
+      if (!dialogo.overlay.isConnected) return;
+      dialogo.overlay.remove();
+      // Un diálogo nuevo puede haberse abierto durante la salida: el cierre anterior no
+      // debe quitarle el foco. Tampoco dejamos controles accionables mientras salen.
+      if (pila[pila.length - 1] === anteriorEnPila && dialogo.previo?.isConnected) dialogo.previo.focus({ preventScroll: true });
+    };
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    // jsdom y navegadores antiguos no exponen getAnimations: en ellos se mantiene el
+    // cierre inmediato. En navegadores actuales se deja respirar la salida 160 ms.
+    if (reduce || typeof dialogo.overlay.getAnimations !== "function") { termina(); return; }
+    dialogo.overlay.classList.remove("dialog-enter");
+    dialogo.overlay.classList.add("dialog-exit");
+    dialogo.overlay.inert = true;
+    dialogo.overlay.addEventListener("animationend", event => {
+      if (event.target === dialogo.overlay && event.animationName === "veil-out") termina();
+    });
+    setTimeout(termina, 220);
   }
 
   // Un repintado se lleva por delante las capas que viven dentro. No hay nada que cerrar

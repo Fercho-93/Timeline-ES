@@ -26,6 +26,7 @@
     clearTimeout(session.timer);
     cancelAnimationFrame(session.frame);
     session.ghost?.remove();
+    session.enabledSlots?.forEach(slot => { if (slot.isConnected) slot.disabled = true; });
     session.card.classList.remove("dragging", "armed");
     document.querySelectorAll(".drop-target").forEach(el => el.classList.remove("drop-target"));
     document.body.classList.remove("dragging-card");
@@ -34,9 +35,9 @@
 
   function slotUnder(x, y) {
     if (!session) return null;
-    session.ghost.style.visibility = "hidden";
+    // La copia ya tiene pointer-events:none: no hace falta ocultarla (ni forzar un
+    // repintado extra) en cada frame para encontrar el hueco que hay debajo.
     const target = document.elementFromPoint(x, y);
-    session.ghost.style.visibility = "";
     return target?.closest(session.slotSelector) || null;
   }
 
@@ -52,6 +53,7 @@
         else if (session.x > box.right - EDGE) wrap.scrollLeft += EDGE_STEP;
       }
     }
+    moveGhost();
     session.frame = requestAnimationFrame(autoScroll);
   }
 
@@ -59,7 +61,9 @@
     const { card } = session;
     const ghost = card.cloneNode(true);
     ghost.classList.add("drag-ghost");
-    ghost.classList.remove("dragging", "armed");
+    ghost.classList.remove("dragging", "armed", "selection-enter");
+    ghost.setAttribute("aria-hidden", "true");
+    ghost.setAttribute("tabindex", "-1");
     ghost.removeAttribute("disabled");
     ghost.style.width = `${Math.min(card.getBoundingClientRect().width, GHOST_WIDTH)}px`;
     document.body.appendChild(ghost);
@@ -75,7 +79,8 @@
 
     // Los huecos están desactivados mientras no hay carta elegida. Se habilitan aquí y no
     // repintando la pantalla, porque repintar en mitad del gesto destruiría el destino.
-    document.querySelectorAll(`${session.slotSelector}[disabled]`).forEach(slot => { slot.disabled = false; });
+    session.enabledSlots = [...document.querySelectorAll(`${session.slotSelector}[disabled]`)];
+    session.enabledSlots.forEach(slot => { slot.disabled = false; });
 
     moveGhost();
     session.frame = requestAnimationFrame(autoScroll);
@@ -87,8 +92,7 @@
     const { ghostWidth: w, ghostHeight: h } = session;
     const left = Math.min(Math.max(4, session.x - w / 2), window.innerWidth - w - 4);
     const top = Math.min(Math.max(4, session.y - h - LIFT), window.innerHeight - h - 4);
-    session.ghost.style.left = `${left}px`;
-    session.ghost.style.top = `${top}px`;
+    session.ghost.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(-1.5deg)`;
     const slot = slotUnder(session.x, session.y);
     if (slot !== session.slot) {
       session.slot?.classList.remove("drop-target");
@@ -138,11 +142,17 @@
       return;
     }
     event.preventDefault();
-    moveGhost();
+    // El frame de autoScroll dibuja la última posición una vez por refresco, aunque el
+    // móvil emita varios pointermove. También actualiza el destino al desplazar la tira.
   }
 
   function onPointerUp(event) {
     if (!session || event.pointerId !== session.pointerId) return;
+    if (session.dragging) {
+      session.x = event.clientX;
+      session.y = event.clientY;
+      moveGhost(); // no depende de que llegue otro frame entre el último movimiento y soltar
+    }
     const { dragging, slot, cardId, onDrop } = session;
     cleanup();
     if (!dragging) return;          // fue un toque: que siga su curso y seleccione

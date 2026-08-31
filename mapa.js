@@ -57,7 +57,8 @@
     if (!wrap || !el || typeof wrap.scrollBy !== "function") return;
     const caja = el.getBoundingClientRect();
     const marco = wrap.getBoundingClientRect();
-    wrap.scrollBy({ left: caja.left - marco.left - (marco.width - caja.width) / 2, behavior: "smooth" });
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    wrap.scrollBy({ left: caja.left - marco.left - (marco.width - caja.width) / 2, behavior: reduce ? "auto" : "smooth" });
   }
 
   // Llevar la línea hasta una carta no necesita saber nada de la partida, así que se

@@ -87,11 +87,11 @@
 
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
   // que hay dos tamaños de cada una y cada panel pide el que de verdad usa: el lomo mide
-  // 66 px de ancho y además va en gris y oscurecido, así que con 400 va sobrado; la
-  // carátula abierta ocupa unos 292 px en un móvil y unos 880 en un escritorio.
+  // unos pocos píxeles de ancho y además va en gris y oscurecido: basta con 400;
+  // la carátula abierta usa 700 para conservar detalle.
   //
   // Se decide aquí y no con `sizes`, que no sabe nada del panel que está abierto: al
-  // desplegar otro bloque la portada se repinta entera y con ella cambia la imagen.
+  // desplegar otro bloque se actualiza su imagen sin destruir la galería.
   const BLOCK_ART = {
     history: { archivo: "hero-history", alto: { 400: 267, 700: 467 } },
     entertainment: { archivo: "hero-entertainment", alto: { 400: 600, 700: 1050 } },
@@ -152,21 +152,35 @@
   }
 
   function home() {
+    const galeriaAnterior = screen === "home" ? app.querySelector(".gallery") : null;
     screen = "home";
     const resume = game && game.mode === selectedModeKey;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      <section class="hero">
-        ${gallery()}
-        <div class="hero-copy">
-          <h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
+    const contenido = `<h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
           ${gameList()}
           ${playChoices(resume)}
           <button class="comp-promo" data-action="start-competition">
             <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
             <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
-          </button>
-        </div>
-      </section>
+          </button>`;
+    // Conserva los nodos y sus imágenes decodificadas. La transición puede partir del
+    // ancho real anterior, incluso si se toca otro bloque antes de terminar la primera.
+    if (galeriaAnterior) {
+      CT.paint(app.querySelector(".hero-copy"), contenido, screen);
+      galeriaAnterior.querySelectorAll("[data-block]").forEach(panel => {
+        const activo = panel.dataset.block === selectedBlockKey;
+        panel.classList.toggle("active", activo);
+        panel.setAttribute("aria-pressed", String(activo));
+        if (activo) {
+          const arte = BLOCK_ART[CT.block(panel.dataset.block).art];
+          const img = panel.querySelector("img");
+          img.setAttribute("src", `assets/${arte.archivo}-700.webp`);
+          img.setAttribute("width", "700");
+          img.setAttribute("height", String(arte.alto[700]));
+          img.setAttribute("fetchpriority", "high");
+        }
+      });
+    } else paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
+      <section class="hero">${gallery()}<div class="hero-copy">${contenido}</div></section>
       <p class="app-version" id="app-version"></p>
     </div>`);
     showCacheVersion();
@@ -321,7 +335,7 @@
   }
 
   function confirmSlot(card) {
-    return `<div class="slot-confirm"><small>Colocar aquí</small><strong>${escapeHtml(card.title)}</strong>
+    return `<div class="slot-confirm" data-index="${pendingIndex}"><small>Colocar aquí</small><strong>${escapeHtml(card.title)}</strong>
       <button class="btn btn-primary btn-block" data-action="confirm-place" data-autofocus>Sí, aquí</button>
       <button class="btn btn-ghost btn-block" data-action="cancel-place">Cancelar</button></div>`;
   }
