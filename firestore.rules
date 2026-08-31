@@ -41,58 +41,94 @@ service cloud.firestore {
       }
 
 
-      // Fantasma v36. Los poderes viven fuera de hand/deck/discard/timeline.
-      // Sus cartas asociadas son inmutables; reclamar un poder exige un robo real.
+      // Fantasma v37. Poderes fuera de las manos; las salas v36 siguen válidas.
+      // Solo se recoloca un poder sin dueño si lo roba quien ya tiene otro.
       function gb() { return before().ghost; }
       function ga() { return after().ghost; }
       function ghostShape() {
         let next = after().get('ghost', null);
         return next is map
-          && next.keys().hasOnly(['cards', 'owners', 'used', 'pending', 'cooldown', 'actor', 'fresh'])
+          && next.keys().hasOnly(['distribution', 'cards', 'owners', 'used', 'pending', 'cooldown', 'actor', 'fresh'])
+          && next.get('distribution', 1) in [1, 2]
           && next.cards is list && next.cards.size() <= 3
           && next.cards.toSet().size() == next.cards.size()
           && next.owners is list && next.owners.size() == next.cards.size()
           && next.used is list && next.pending is list && next.cooldown is list
           && next.actor is string && next.fresh is bool;
       }
-      function initialOwner(i) {
-        let next = after().get('ghost', null);
+      function initialOwner(i, next, data) {
         return i >= next.cards.size() || (next.cards[i] is int
-          && (next.owners[i] == '' ? next.cards[i] in after().deck
-            : (next.owners[i] in after().playerOrder
-              && next.cards[i] in after().players[next.owners[i]].hand)));
+          && (next.owners[i] == '' ? next.cards[i] in data.deck
+            : (next.owners[i] in data.playerOrder
+              && next.cards[i] in data.players[next.owners[i]].hand)));
       }
-      function ghostClientReady(i) {
-        let data = before();
-        return i >= data.playerOrder.size() || data.players[data.playerOrder[i]].get('clientVersion', 0) >= 36;
+      function ghostClientReady(i, version, data) {
+        return i >= data.playerOrder.size() || data.players[data.playerOrder[i]].get('clientVersion', 0) >= version;
       }
       function ghostStart() {
-        let next = after().get('ghost', null);
-        return !('ghost' in after()) || (ghostShape()
-          && ghostClientReady(0) && ghostClientReady(1) && ghostClientReady(2)
-          && ghostClientReady(3) && ghostClientReady(4) && ghostClientReady(5)
-          && ghostClientReady(6) && ghostClientReady(7) && ghostClientReady(8)
-          && next.cards.size() <= (after().playerOrder.size() + 2) / 3
+        let data = after();
+        let prior = before();
+        let next = data.get('ghost', null);
+        let version = next == null || next.get('distribution', 1) == 1 ? 36 : 37;
+        return !('ghost' in data) || (ghostShape()
+          && ghostClientReady(0, version, prior) && ghostClientReady(1, version, prior) && ghostClientReady(2, version, prior)
+          && ghostClientReady(3, version, prior) && ghostClientReady(4, version, prior) && ghostClientReady(5, version, prior)
+          && ghostClientReady(6, version, prior) && ghostClientReady(7, version, prior) && ghostClientReady(8, version, prior)
+          && next.cards.size() <= (data.playerOrder.size() + 2) / 3
+          && (version == 36 || next.cards.size() * 3 >= data.playerOrder.size())
           && next.used == [] && next.pending == [] && next.cooldown == []
           && next.actor == '' && next.fresh == false
-          && initialOwner(0) && initialOwner(1) && initialOwner(2));
+          && initialOwner(0, next, data) && initialOwner(1, next, data) && initialOwner(2, next, data)
+          && (version == 36 || next.owners.removeAll(['']).size() == next.owners.removeAll(['']).toSet().size()
+            || data.deck.toSet().difference(next.cards.toSet()).size() == 0));
       }
-      function drawnOwner(i) {
-        let g = before().get('ghost', null);
-        let next = after().get('ghost', null);
-        return i >= g.cards.size() || next.owners[i] == g.owners[i]
-          || (g.owners[i] == '' && next.owners[i] in after().playerOrder
-            && (g.cards[i] in before().deck || g.cards[i] in before().discard)
-            && !(g.cards[i] in after().deck) && !(g.cards[i] in after().discard)
-            && (g.cards[i] in after().players[next.owners[i]].hand
-              || (after().phase == 'pulse' && next.owners[i] == uid()
-                && after().pulseTurn.cardId == g.cards[i])));
+      function drawnTo(card, owner, data, next) {
+        return owner in next.playerOrder
+          && (card in data.deck || card in data.discard)
+          && !(card in next.deck) && !(card in next.discard)
+          && (card in next.players[owner].hand
+            || (next.phase == 'pulse' && owner == uid() && next.pulseTurn.cardId == card));
+      }
+      function otherOwner(i, owner, owners) {
+        return (i != 0 && owners.size() > 0 && owners[0] == owner)
+          || (i != 1 && owners.size() > 1 && owners[1] == owner)
+          || (i != 2 && owners.size() > 2 && owners[2] == owner);
+      }
+      function recipientSafe(i, data) {
+        let next = data.ghost;
+        return i >= next.cards.size() || next.owners[i] == ''
+          || !otherOwner(i, next.owners[i], next.owners)
+          // Sin posiciones libres, el duplicado se consume sin otro uso.
+          || data.deck.toSet().difference(next.cards.toSet()).size() == 0;
+      }
+      function duplicateDraw(i, j, card, owners, prior, data) {
+        return i != j && j < owners.size() && owners[j] != '' && drawnTo(card, owners[j], prior, data);
+      }
+      function drawnOwner(i, prior, data, uniqueOwners) {
+        let g = prior.ghost;
+        let next = data.ghost;
+        return i >= g.cards.size() || (next.cards[i] == g.cards[i]
+          ? (next.owners[i] == g.owners[i]
+            || (g.owners[i] == '' && drawnTo(g.cards[i], next.owners[i], prior, data)
+              && (g.get('distribution', 1) == 1 || uniqueOwners || recipientSafe(i, data))))
+          : (g.get('distribution', 1) == 2 && g.owners[i] == ''
+            && (duplicateDraw(i, 0, g.cards[i], next.owners, prior, data)
+              || duplicateDraw(i, 1, g.cards[i], next.owners, prior, data)
+              || duplicateDraw(i, 2, g.cards[i], next.owners, prior, data))
+            && next.cards[i] is int && (uniqueOwners || recipientSafe(i, data))
+            && (next.owners[i] == '' ? next.cards[i] in data.deck
+              : drawnTo(next.cards[i], next.owners[i], prior, data))));
       }
       function ghostClaims() {
-        let g = before().get('ghost', null);
-        let next = after().get('ghost', null);
-        return ghostShape() && next.cards == g.cards
-          && drawnOwner(0) && drawnOwner(1) && drawnOwner(2);
+        let prior = before();
+        let data = after();
+        let g = prior.ghost;
+        let next = data.ghost;
+        let owners = next.owners.removeAll(['']);
+        let uniqueOwners = owners.size() == owners.toSet().size();
+        return ghostShape() && next.cards.size() == g.cards.size()
+          && next.get('distribution', 1) == g.get('distribution', 1)
+          && drawnOwner(0, prior, data, uniqueOwners) && drawnOwner(1, prior, data, uniqueOwners) && drawnOwner(2, prior, data, uniqueOwners);
       }
       function ghostActivate() {
         let g = before().get('ghost', null);
@@ -103,19 +139,22 @@ service cloud.firestore {
           && uid() in g.owners && !(uid() in g.used)
           && g.pending == [] && g.cooldown == []
           && ghostShape() && next.cards == g.cards && next.owners == g.owners
+          && next.get('distribution', 1) == g.get('distribution', 1)
           && next.used == g.used.concat([uid()]) && next.actor == uid() && next.fresh == true
           && next.cooldown == [] && next.pending.size() == before().playerOrder.size()
           && next.pending.toSet() == before().playerOrder.toSet();
       }
       function ghostTick() {
-        let g = before().get('ghost', null);
-        let next = after().get('ghost', null);
-        let player = before().playerOrder[before().current];
+        let prior = before();
+        let data = after();
+        let g = prior.get('ghost', null);
+        let next = data.get('ghost', null);
+        let player = prior.playerOrder[prior.current];
         let remaining = g.pending.removeAll([player]);
         return ghostClaims() && next.used == g.used && next.actor == g.actor
           && next.fresh == false && next.pending == remaining
           && next.cooldown == (g.pending.size() > 0
-            ? (remaining.size() == 0 ? before().playerOrder : g.cooldown)
+            ? (remaining.size() == 0 ? prior.playerOrder : g.cooldown)
             : g.cooldown.removeAll([player]));
       }
       function ghostLeave() {
@@ -124,6 +163,7 @@ service cloud.firestore {
         let removed = before().playerOrder.removeAll(after().playerOrder);
         let remaining = g.pending.removeAll(removed);
         return ghostShape() && next.cards == g.cards && next.owners == g.owners
+          && next.get('distribution', 1) == g.get('distribution', 1)
           && next.used == g.used && next.actor == g.actor
           && next.pending == remaining
           && next.fresh == (before().playerOrder[before().current] in removed ? false : g.fresh)
@@ -133,15 +173,17 @@ service cloud.firestore {
       function ghostKept() {
         let g = before().get('ghost', null);
         let next = after().get('ghost', null);
-        return ghostClaims() && next.diff(g).affectedKeys().hasOnly(['owners']);
+        return ghostClaims() && next.diff(g).affectedKeys().hasOnly(['cards', 'owners']);
       }
       function ghostSafe() {
-        return before().status == 'lobby' ? ghostStart()
-          : (!('ghost' in before()) ? !('ghost' in after())
-            : (!('ghost' in after()) ? false
-              : (after().playerOrder.size() < before().playerOrder.size() ? ghostLeave()
-                : (after().status == 'ended' ? ga() == gb()
-                  : (after().phase == 'turn' ? ghostTick() : ghostKept())))));
+        let prior = before();
+        let data = after();
+        return prior.status == 'lobby' ? ghostStart()
+          : (!('ghost' in prior) ? !('ghost' in data)
+            : (!('ghost' in data) ? false
+              : (data.playerOrder.size() < prior.playerOrder.size() ? ghostLeave()
+                : (data.status == 'ended' ? ga() == gb()
+                  : (data.phase == 'turn' ? ghostTick() : ghostKept())))));
       }
 
       function roundEnds() { return before().turnsInRound + 1 >= before().playerOrder.size(); }
@@ -163,47 +205,51 @@ service cloud.firestore {
 
       // El anfitrión reparte y arranca la partida.
       function validStart() {
+        let prior = before();
+        let next = after();
         return isHost()
-          && before().status == 'lobby'
-          && before().playerOrder.size() >= 2
+          && prior.status == 'lobby'
+          && prior.playerOrder.size() >= 2
           && changed().hasOnly(['ghost', 'handSize', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
                                 'pulseTurn', 'version', 'updatedAt'])
-          && after().status == 'playing'
-          && after().phase == 'turn'
-          && after().handSize >= 1 && after().handSize <= 6
-          && after().current >= 0 && after().current < before().playerOrder.size()
-          && after().timeline.size() == 1
-          && after().discard.size() == 0
-          && after().turnsInRound == 0
-          && after().round == 1
-          && after().winner == null
-          && after().get('winners', null) == null
-          && after().reveal == null
+          && next.status == 'playing'
+          && next.phase == 'turn'
+          && next.handSize >= 1 && next.handSize <= 6
+          && next.current >= 0 && next.current < prior.playerOrder.size()
+          && next.timeline.size() == 1
+          && next.discard.size() == 0
+          && next.turnsInRound == 0
+          && next.round == 1
+          && next.winner == null
+          && next.get('winners', null) == null
+          && next.reveal == null
           && bumped();
       }
 
       // Colocar una carta: solo el jugador de turno, solo su mano, sin inventar cartas.
       function validPlay() {
+        let prior = before();
+        let next = after();
         return isCurrent()
-          && before().status == 'playing'
-          && before().phase == 'turn'
+          && prior.status == 'playing'
+          && prior.phase == 'turn'
           && changed().hasOnly(['ghost', 'players', 'deck', 'discard', 'timeline', 'phase', 'reveal',
                                 'version', 'updatedAt'])
-          && after().phase == 'reveal'
+          && next.phase == 'reveal'
           && onlyMyHand()
           && myCardsAfter() == myCardsBefore()
-          && after().reveal.playerUid == uid()
-          && after().reveal.cardId is int
-          && after().reveal.correct is bool
-          && (after().reveal.correct
-              ? (after().timeline.size() == before().timeline.size() + 1
-                 && after().deck.size() == before().deck.size()
-                 && after().discard.size() == before().discard.size()
-                 && after().players[uid()].hand.size() == before().players[uid()].hand.size() - 1)
-              : (after().timeline.size() == before().timeline.size()
-                 && after().players[uid()].hand.size() <= before().players[uid()].hand.size()
-                 && after().players[uid()].hand.size() >= before().players[uid()].hand.size() - 1))
+          && next.reveal.playerUid == uid()
+          && next.reveal.cardId is int
+          && next.reveal.correct is bool
+          && (next.reveal.correct
+              ? (next.timeline.size() == prior.timeline.size() + 1
+                 && next.deck.size() == prior.deck.size()
+                 && next.discard.size() == prior.discard.size()
+                 && next.players[uid()].hand.size() == prior.players[uid()].hand.size() - 1)
+              : (next.timeline.size() == prior.timeline.size()
+                 && next.players[uid()].hand.size() <= prior.players[uid()].hand.size()
+                 && next.players[uid()].hand.size() >= prior.players[uid()].hand.size() - 1))
           && bumped();
       }
 
@@ -219,57 +265,61 @@ service cloud.firestore {
 
       // Paso 1: gastar el Pulso y sacar la carta del mazo. Ninguna mano cambia todavía.
       function validPulseStart() {
+        let prior = before();
+        let next = after();
         return isCurrent()
-          && before().status == 'playing'
-          && before().phase == 'turn'
-          && before().get('pulse', false) == true
-          && (!('ghost' in before()) || gb().fresh == false)
+          && prior.status == 'playing'
+          && prior.phase == 'turn'
+          && prior.get('pulse', false) == true
+          && (!('ghost' in prior) || gb().fresh == false)
           && changed().hasOnly(['ghost', 'players', 'deck', 'discard', 'phase', 'pulseTurn', 'version', 'updatedAt'])
-          && after().phase == 'pulse'
+          && next.phase == 'pulse'
           // Solo se marca el Pulso como gastado: la mano no se toca en este paso.
           && onlyMyHand()
-          && before().players[uid()].get('pulseUsed', false) == false
-          && after().players[uid()].pulseUsed == true
-          && after().players[uid()].hand.size() == before().players[uid()].hand.size()
-          && after().players[uid()].hand.size() >= 2
+          && prior.players[uid()].get('pulseUsed', false) == false
+          && next.players[uid()].pulseUsed == true
+          && next.players[uid()].hand.size() == prior.players[uid()].hand.size()
+          && next.players[uid()].hand.size() >= 2
           // Un objetivo real, distinto de uno mismo y sin escudo de esta ronda.
-          && after().pulseTurn.targetUid in before().playerOrder
-          && after().pulseTurn.targetUid != uid()
-          && before().players[after().pulseTurn.targetUid].get('shieldRound', 0) != before().round
-          && after().pulseTurn.cardId is int
+          && next.pulseTurn.targetUid in prior.playerOrder
+          && next.pulseTurn.targetUid != uid()
+          && prior.players[next.pulseTurn.targetUid].get('shieldRound', 0) != prior.round
+          && next.pulseTurn.cardId is int
           // Sale exactamente una carta de mazo + descarte (barajar el descarte no cuenta).
-          && after().deck.size() + after().discard.size() == before().deck.size() + before().discard.size() - 1
-          && after().timeline == before().timeline
+          && next.deck.size() + next.discard.size() == prior.deck.size() + prior.discard.size() - 1
+          && next.timeline == prior.timeline
           && bumped();
       }
 
       // Paso 2: colocar la carta del reto y repartir las consecuencias.
       function validPulseEnd() {
+        let prior = before();
+        let next = after();
         return isCurrent()
-          && before().status == 'playing'
-          && before().phase == 'pulse'
+          && prior.status == 'playing'
+          && prior.phase == 'pulse'
           && changed().hasOnly(['ghost', 'players', 'deck', 'discard', 'timeline', 'phase', 'pulseTurn',
                                 'reveal', 'version', 'updatedAt'])
-          && after().phase == 'reveal'
-          && after().pulseTurn == null
-          && after().reveal.cardId == before().pulseTurn.cardId
-          && after().reveal.correct is bool
-          && after().reveal.playerUid == uid()
-          && (after().reveal.correct
+          && next.phase == 'reveal'
+          && next.pulseTurn == null
+          && next.reveal.cardId == prior.pulseTurn.cardId
+          && next.reveal.correct is bool
+          && next.reveal.playerUid == uid()
+          && (next.reveal.correct
               // Acierta: la carta va a la línea y una carta mía pasa a la mano del rival.
               // Es el único caso de todo el juego en que cambian dos manos, y solo esas.
-              ? (after().players.diff(before().players).affectedKeys().hasOnly([uid(), pulseTarget()])
-                 && after().timeline.size() == before().timeline.size() + 1
-                 && after().deck.size() == before().deck.size()
-                 && after().discard.size() == before().discard.size()
-                 && after().players[uid()].hand.size() == before().players[uid()].hand.size() - 1
-                 && after().players[pulseTarget()].hand.size() == before().players[pulseTarget()].hand.size() + 1
-                 && after().players[pulseTarget()].shieldRound == before().round)
+              ? (next.players.diff(prior.players).affectedKeys().hasOnly([uid(), pulseTarget()])
+                 && next.timeline.size() == prior.timeline.size() + 1
+                 && next.deck.size() == prior.deck.size()
+                 && next.discard.size() == prior.discard.size()
+                 && next.players[uid()].hand.size() == prior.players[uid()].hand.size() - 1
+                 && next.players[pulseTarget()].hand.size() == prior.players[pulseTarget()].hand.size() + 1
+                 && next.players[pulseTarget()].shieldRound == prior.round)
               // Falla: solo cambia mi mano. Que el rival no pueda salir beneficiado es lo
               // que impide que alguien ya sin opciones falle aposta para regalar la partida.
               : (onlyMyHand()
-                 && after().timeline == before().timeline
-                 && after().players[uid()].hand.size() == before().players[uid()].hand.size() + 1
+                 && next.timeline == prior.timeline
+                 && next.players[uid()].hand.size() == prior.players[uid()].hand.size() + 1
                  // La carta del reto estaba fuera de todo mientras duraba la fase, así que
                  // al volver (al descarte) el recuento total sube exactamente en una.
                  && myCardsAfter() == myCardsBefore() + 1))
@@ -278,28 +328,30 @@ service cloud.firestore {
 
       // Cerrar el turno: el jugador de turno o el anfitrión, nunca antes de revelar.
       function validAdvance() {
+        let prior = before();
+        let next = after();
         return (isCurrent() || isHost())
-          && before().status == 'playing'
-          && before().phase == 'reveal'
-          && after().reveal == null
-          && (after().status == 'ended'
+          && prior.status == 'playing'
+          && prior.phase == 'reveal'
+          && next.reveal == null
+          && (next.status == 'ended'
               ? (changed().hasOnly(['status', 'phase', 'winner', 'winners', 'reveal', 'version', 'updatedAt'])
-                 && after().phase == 'finished'
-                 && after().winner in before().playerOrder
-                 && before().players[after().winner].hand.size() == 0
-                 && after().get('winners', [after().winner]).size() >= 1)
+                 && next.phase == 'finished'
+                 && next.winner in prior.playerOrder
+                 && prior.players[next.winner].hand.size() == 0
+                 && next.get('winners', [next.winner]).size() >= 1)
               : (changed().hasOnly(['ghost', 'players', 'deck', 'discard', 'current', 'turnsInRound', 'round',
                                     'phase', 'reveal', 'version', 'updatedAt'])
-                 && after().status == 'playing'
-                 && after().phase == 'turn'
-                 && after().winner == null
-                 && after().current == (before().current + 1) % before().playerOrder.size()
-                 && after().turnsInRound == (roundEnds() ? 0 : before().turnsInRound + 1)
-                 && after().round == (roundEnds() ? before().round + 1 : before().round)
+                 && next.status == 'playing'
+                 && next.phase == 'turn'
+                 && next.winner == null
+                 && next.current == (prior.current + 1) % prior.playerOrder.size()
+                 && next.turnsInRound == (roundEnds() ? 0 : prior.turnsInRound + 1)
+                 && next.round == (roundEnds() ? prior.round + 1 : prior.round)
                  // Solo el desempate de final de ronda puede repartir cartas.
-                 && (roundEnds() || (after().players == before().players
-                                     && after().deck == before().deck
-                                     && after().discard == before().discard))))
+                 && (roundEnds() || (next.players == prior.players
+                                     && next.deck == prior.deck
+                                     && next.discard == prior.discard))))
           && bumped();
       }
 

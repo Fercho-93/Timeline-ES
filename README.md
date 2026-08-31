@@ -130,13 +130,16 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
 
-## Fantasma y dificultades (v36)
+## Fantasma y dificultades (reparto v37)
 
 En partidas locales, el poder Fantasma puede acompañar al reparto o a un robo. En salas
 se activa con «Cartas Fantasma» al configurar la partida. Está separado de las cartas a
 ordenar: conservarlo no impide ganar, no sustituye un robo de penalización, no se pasa
-con el Pulso y no se recicla con el descarte. Máximo un uso por persona, incluso si recibe
-más de una aparición. Las partidas antiguas se conservan sin añadirles poderes retroactivamente.
+con el Pulso y no se recicla con el descarte. El poder solo se muestra a su propietario,
+sin aumentar el contador público de cartas. Máximo un uso por persona. Si encuentra otro,
+se recoloca al azar entre las cartas pendientes sin Fantasma; si no quedan posiciones
+libres, se consume sin conceder otro uso. Las partidas antiguas conservan su reparto y
+su comportamiento anterior, sin añadir poderes ni volver a sortearlos.
 
 Con al menos cinco cartas en la línea y alguna en la mano, se puede activar al comienzo
 del propio turno; no reemplaza la colocación. Afecta a quien lo activa y a cada rival una
@@ -154,24 +157,34 @@ no protección contra un cliente modificado: los datos de los mazos ya están en
 
 ### Aparición matemática
 
-Sean P los jugadores, H la mano inicial efectiva y N las cartas del mazo:
+Sean P los jugadores, H la mano inicial efectiva y N las cartas disponibles, excluida
+la que inicia el tablero:
 
-- El 30% de partidas no programa poderes. En el 70% restante se sortean uniformemente
-  entre 1 y ceil(P/3) apariciones: como máximo 1 con 2–3 personas, 2 con 4–6 y 3 con 7–9.
-- Se seleccionan posiciones diferentes entre los P×H robos iniciales y los siguientes
-  2×P robos, limitados a N−1 cartas; nunca la carta inicial del tablero.
-- Cada posición del reparto pesa 3; cada posición posterior, 1. Se muestrea sin reemplazo.
-  No hay una posición fija ni se diluye la probabilidad en los mazos de cientos de cartas.
+- Siempre se incluyen min(3, ceil(P/3)) poderes: 1 con 2–3 personas, 2 con 4–6 y 3 con 7–9.
+  Solo se limita esa cantidad si no quedan suficientes posiciones elegibles.
+- Cada poder se sortea al 50% entre las primeras W=min(N, 12×P) cartas elegibles y al
+  50% entre todo el mazo. La primera zona incluye las cartas del reparto inicial.
+- Para una posición i, el peso es 0.5/N + (i<W ? 0.5/W : 0). Se muestrea sin reemplazo,
+  equivalente a repetir el sorteo completo si la posición ya está ocupada. Si W=N,
+  todas las posiciones tienen el mismo peso. Nunca se marca la carta inicial del tablero.
+- La primera y la última carta siguen siendo posibles. Se favorece la zona inicial de
+  los mazos grandes sin garantizar que el poder llegue a salir durante la partida.
 - La aparición se asocia al identificador de la carta normal de esa posición y entrega
   el poder aparte al recibirla. Una aparición que nadie llegue a robar no se entrega.
-  Si una persona recibe varias, sigue teniendo un solo uso. Robar para el Pulso también
-  puede entregar un poder, que solo se podrá usar en un turno posterior.
-- Todo el sorteo se fija al empezar y se guarda/sincroniza. Recargar no vuelve a sortear.
-- Si no caben P×H cartas más la inicial, H se reduce por igual para todos a floor((N−1)/P).
+  Los duplicados de una misma persona se recolocan uniformemente entre las posiciones
+  pendientes libres, sin cambiar las cartas normales. Robar para el Pulso también puede
+  entregar un poder, que solo se podrá usar en un turno posterior.
+- El sorteo inicial y cada recolocación se guardan/sincronizan. Recargar no vuelve a sortear.
+- Si no caben P×H cartas más la inicial, H se reduce por igual para todos a floor(N/P).
 
-La simulación determinista de `tests/fantasma.mjs` recorre 22.500 repartos (2, 5 y 9 personas;
-38, 167 y 673 cartas). Se comprueba una aparición inicial frecuente, partidas sin poderes,
-posiciones variables, ausencia de duplicados y conservación de las cartas normales.
+Con 5 jugadores, 2 poderes y 20 cartas extraídas, la probabilidad de encontrar al menos
+uno es aproximadamente 64% para N=50, 39% para N=200 y 34% para N=500, frente al 64%,
+19% y 8% de un reparto uniforme. Son probabilidades, no cuotas de aparición por partida.
+
+La simulación determinista de `tests/fantasma.mjs` recorre 90.000 repartos: todos los
+números de jugadores de 2 a 9 con 38, 167 y 673 cartas, más los tres ejemplos anteriores.
+Se comprueba cantidad fija, variación de posiciones, posibilidad de aparición tardía,
+ausencia de posiciones duplicadas, recolocación y conservación de las cartas normales.
 
 ### Solitario
 
@@ -196,8 +209,8 @@ para el tablero. El reto diario permanece en Fácil para no cambiar las quince c
 marcas existentes. Pulso conserva su funcionamiento; convertirlo en carta robable queda fuera
 de esta versión.
 
-**Salas: publicar `firestore.rules` v36 antes de activar Cartas Fantasma.** Todos los móviles
-deben actualizar la app y crear una sala nueva; se comprueba la versión de cada participante. Sin esas reglas, desmarcar Cartas Fantasma permite seguir iniciando
+**Salas nuevas: publicar `firestore.rules` v37 antes de activar Cartas Fantasma.** Todos los móviles
+deben actualizar la app a v37 y crear una sala nueva; se comprueba la versión de cada participante. Las reglas v37 mantienen las salas v36. Sin esas reglas, desmarcar Cartas Fantasma permite seguir iniciando
 salas con las reglas anteriores. Las reglas nuevas mantienen compatibles las salas antiguas.
 
 ## Probarlo en un ordenador

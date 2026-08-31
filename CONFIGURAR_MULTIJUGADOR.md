@@ -122,12 +122,16 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
   impiden manipular la partida, no mirar.
 - El modo compartido necesita internet. El modo de un móvil continúa funcionando sin conexión.
 
-## Actualización v36: Fantasma
+## Actualización v37: reparto de Fantasma
 
 Publica el contenido completo de `firestore.rules` en Firebase Console → Firestore Database
 → Reglas → Publicar. Si utilizas la CLI autenticada, usa `firebase deploy --only firestore:rules
 --project timeline-es` con `firebase.json` apuntando a este archivo. No hace falta modificar
-los mazos ni borrar salas. Todos los participantes deben actualizar la aplicación a v36.
+los mazos ni borrar salas. Todos los participantes deben actualizar la aplicación a v37.
+Aunque ya publicaras las reglas v36, debes publicar esta actualización: permite recolocar
+un Fantasma duplicado solo tras un robo válido y conserva la compatibilidad con salas antiguas.
+Las salas nuevas incluyen de 1 a 3 poderes según el número de jugadores y utilizan el
+reparto 50/50 entre las primeras 12 cartas por jugador y el mazo completo.
 
 Hasta publicar las reglas, desmarca **Cartas Fantasma** en la configuración de la sala.
 La app no puede publicar reglas con la clave pública de Firebase: hace falta la cuenta

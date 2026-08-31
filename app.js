@@ -232,7 +232,7 @@
             <div class="field"><label for="starter">La persona más joven</label><select id="starter"><option value="0">Jugador 1</option><option value="1">Jugador 2</option></select></div>
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
           </div>
-          <p class="hint">Puede aparecer una carta Fantasma al repartir o robar. Es un poder opcional y no cuenta para ganar.</p>
+          <p class="hint">El mazo esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</p>
           <label class="opt-row"><span>Pulso <small>Una vez por partida, reta a otra persona con una carta del mazo en vez de jugar tu turno.</small></span><input type="checkbox" id="pulse-toggle"></label>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
@@ -264,8 +264,8 @@
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
     const ghost = CT.Ghost.create(shuffled, names.length, handSize);
     const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
-    players.forEach(p => p.hand.forEach(id => CT.Ghost.claim(ghost, id, p.id)));
     const timeline = [shuffled.shift()];
+    players.forEach(p => p.hand.forEach(id => CT.Ghost.claim(ghost, id, p.id, shuffled)));
     game = { mode: selectedModeKey, pulse, ghost, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
     selectedCardId = null;
     result = null;
@@ -413,7 +413,7 @@
     const id = game.deck.shift();
     if (id == null) return false;
     player.hand.push(id);
-    CT.Ghost.claim(game.ghost, id, player.id);
+    CT.Ghost.claim(game.ghost, id, player.id, game.deck);
     return true;
   }
 
@@ -463,7 +463,7 @@
     }
     const cardId = game.deck.shift();
     if (cardId == null) return showToast("No quedan cartas para el Pulso");
-    CT.Ghost.claim(game.ghost, cardId, player.id);
+    CT.Ghost.claim(game.ghost, cardId, player.id, game.deck);
     player.pulseUsed = true;
     game.pulseTurn = { targetId, cardId };
     selectedCardId = null;

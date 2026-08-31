@@ -81,15 +81,56 @@ try {
  const outdated=fixture();outdated.status='lobby';outdated.phase='lobby';delete outdated.ghost;outdated.timeline=[];outdated.deck=[];Object.values(outdated.players).forEach(p=>p.hand=[]);await seed(outdated);
  await clients[0].call('renderLobby');await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
  // Arranque real, nueve personas y mazo pequeño: reparto igual y una carta reservada.
- const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:36} ]));await seed(lobby);
+ const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:37} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
  assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,38);
+ assert.equal(s.ghost.distribution,2);assert.equal(s.ghost.cards.length,3);
  // Máximo de poderes y jugadores: también debe caber en el límite de reglas.
  const maximum=clone(s);maximum.ghost={cards:[s.players[A].hand[0],s.players[B].hand[0],s.players[C].hand[0]],owners:[A,B,C],used:[],pending:[],cooldown:[],actor:'',fresh:false};
  await seed(lobby);await updateDoc(ref(A),maximum);
  const stale=clone(lobby);stale.players[B].clientVersion=35;await seed(stale);await assertFails(updateDoc(ref(A),maximum));
+ const modern=clone(maximum);modern.ghost.distribution=2;
+ const previous=clone(lobby);previous.players[B].clientVersion=36;await seed(previous);await assertFails(updateDoc(ref(A),modern));
+ await seed(lobby);const missing=clone(modern);missing.ghost.cards.pop();missing.ghost.owners.pop();await assertFails(updateDoc(ref(A),missing));
+ await updateDoc(ref(A),modern);
  const three=fixture();three.phase='reveal';three.current=2;three.turnsInRound=2;Object.values(three.players).forEach(p=>p.hand=[]);three.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};three.ghost.cards=[15,16,17];three.ghost.owners=['','',''];
  await seed(three);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).ghost.owners,[A,B,C]);
+ const modernThree=clone(three);modernThree.ghost.distribution=2;
+ await seed(modernThree);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).ghost.owners,[A,B,C]);
+ // Reparto v37: recolocar solo después de un robo real de un poder duplicado.
+ const balanced=fixture();balanced.ghost.distribution=2;
+ await seed(balanced);await play(clients[0],false);s=await snapshot();
+ assert.equal(s.players[A].hand.length,3);assert.equal(s.ghost.owners[1],'');assert.ok(s.deck.includes(s.ghost.cards[1]));
+ for(const [i,cl] of clients.entries()){
+  await cl.call('renderGame');assert.equal(cl.w.document.querySelectorAll('.hand-card').length,s.players[[A,B,C][i]].hand.length);
+  assert.deepEqual([...cl.w.document.querySelectorAll('.scoreboard em')].map(el=>Number(el.textContent)),[3,3,3],'los contadores públicos no incluyen poderes');
+ }
+ await clients[0].call('finishTurn');
+ await clients[0].call('renderGame');assert.ok(clients[0].w.document.querySelector('.ghost-power'));
+ await clients[1].call('renderGame');assert.equal(clients[1].w.document.querySelector('.ghost-power'),null,'el rival no ve el poder ajeno');
+ await seed(balanced);const switched=clone(balanced.ghost);switched.cards[1]=18;
+ await assertFails(updateDoc(ref(A),{ghost:switched,version:2,updatedAt:2}));
+ const early=clone(balanced.ghost);early.owners[1]=B;
+ await assertFails(updateDoc(ref(A),{ghost:early,version:2,updatedAt:2}));
+ // Ni una jugada correcta permite cambiar posiciones ni quitar la versión.
+ await seed(balanced);await play(clients[0]);const correct=await snapshot();await seed(balanced);
+ const moved=clone(correct);moved.ghost.cards[1]=18;await assertFails(updateDoc(ref(A),moved));
+ const downgrade=clone(correct);delete downgrade.ghost.distribution;await assertFails(updateDoc(ref(A),downgrade));
+ // Tampoco se recoloca el primer poder de una persona que aún no tiene otro.
+ const unowned=clone(balanced);unowned.ghost.owners[0]='';await seed(unowned);await play(clients[0],false);const claimed=await snapshot();await seed(unowned);
+ claimed.ghost.owners[1]='';claimed.ghost.cards[1]=18;await assertFails(updateDoc(ref(A),claimed));
+ // Pulso roba sin cambiar el contador, y también recoloca duplicados.
+ await seed(balanced);await clients[0].call('startPulse',B);s=await snapshot();
+ assert.equal(s.players[A].hand.length,3);assert.equal(s.ghost.owners[1],'');assert.ok(s.deck.includes(s.ghost.cards[1]));
+ // Dos robos en una transacción: el duplicado puede llegar a otra persona.
+ const retie=clone(tie);retie.ghost.distribution=2;await seed(retie);
+ const savedRandom=clients[2].w.Math.random;clients[2].w.Math.random=()=>0;
+ await clients[2].call('finishTurn');clients[2].w.Math.random=savedRandom;s=await snapshot();
+ assert.equal(s.ghost.cards[1],16);assert.equal(s.ghost.owners[1],B);
+ // Sin sitio se consume, sin conceder otro uso ni volver al reciclar descartes.
+ const exhausted=clone(balanced);exhausted.deck=[15];exhausted.ghost.used=[A];await seed(exhausted);await play(clients[0],false);s=await snapshot();
+ assert.deepEqual(s.ghost.owners,[A,A]);assert.deepEqual(s.ghost.used,[A]);
+ assert.equal(clients[0].w.CONTINUUM.Ghost.owns(s.ghost,A),false);
  console.log('  Inicio, activación, turnos, dos clientes, robos, Pulso, salidas y escrituras rechazadas: OK');
 } finally {clients.forEach(c=>c.w.close());await env.cleanup();}
