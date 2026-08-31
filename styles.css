@@ -91,11 +91,15 @@ button { -webkit-tap-highlight-color: transparent; }
    explícita. Los nombres de los mazos deben usar siempre la tinta de la interfaz. */
 button { touch-action: manipulation; color: inherit; }
 
-#app { min-height: 100dvh; }
-.screen-enter .topbar { animation: chrome-in var(--motion-base) var(--ease-out) both; }
-.screen-enter > :not(.topbar) { animation: content-in 340ms 45ms var(--ease-out) both; }
-@keyframes chrome-in { from { opacity: 0; transform: translateY(-6px); } }
-@keyframes content-in { from { opacity: 0; transform: translateY(12px); } }
+#app { min-height: 100dvh; overflow-x: clip; }
+.screen-enter .topbar { animation: chrome-in var(--motion-fast) ease-out both; }
+.screen-enter > :not(.topbar) { animation: content-in 280ms var(--ease-out) both; }
+.screen-return { --entry-x: -12px; }
+@keyframes chrome-in { from { opacity: .4; } }
+@keyframes content-in { from { opacity: 0; transform: translateX(var(--entry-x, 12px)); } }
+.home-selection { display: flow-root; overflow: clip; }
+.section-enter > * { animation: section-in 240ms var(--ease-out) both; }
+@keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
@@ -129,10 +133,10 @@ button { touch-action: manipulation; color: inherit; }
 .gallery-panel.active .panel-art img { animation: cover-in 720ms var(--ease-out) both; }
 @keyframes cover-in { from { transform: scale(1.035); } }
 @media (hover: hover) and (pointer: fine) {
-  .gallery-panel:not(.active):hover { flex-grow: .2; transform: translateY(-2px); box-shadow: 0 21px 46px rgba(52,34,17,.26); }
+  .gallery-panel:not(.active):hover { transform: translateY(-2px); box-shadow: 0 21px 46px rgba(52,34,17,.26); }
   .gallery-panel:not(.active):hover .panel-art { filter: grayscale(.5) brightness(.62); }
 }
-.panel-spine { position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px 0 17px; color: #f7ecd8; }
+.panel-spine { position: absolute; z-index: 2; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px 0 17px; color: #f7ecd8; transition: opacity var(--motion-fast) ease; }
 .panel-spine i { font-size: 1.25rem; font-style: normal; }
 .panel-spine b { writing-mode: vertical-rl; transform: rotate(180deg); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
 .gallery-panel.active .panel-spine { opacity: 0; }
@@ -141,14 +145,14 @@ button { touch-action: manipulation; color: inherit; }
 .panel-label i { grid-row: 1 / span 2; width: 3px; height: 100%; min-height: 36px; border-radius: 2px; background: var(--accent); }
 .panel-label strong { font-family: var(--font-display); font-size: clamp(1.35rem, 3.6vw, 2rem); line-height: 1.02; letter-spacing: -.03em; overflow-wrap: anywhere; }
 .panel-entertainment .panel-label strong { font-size: clamp(1rem, 2.2vw, 1.25rem); }
-.panel-label small { margin-top: 5px; color: rgba(255,246,232,.76); font-size: .73rem; }
+.panel-label small { min-width: 0; overflow-wrap: anywhere; margin-top: 5px; color: rgba(255,246,232,.76); font-size: .73rem; }
 .gallery-panel.active .panel-label { animation: label-in 420ms 110ms backwards var(--ease-out); }
 @keyframes label-in { from { opacity: 0; transform: translateY(12px); } }
 .eyebrow { display: flex; align-items: center; gap: 9px; color: var(--accent); font-size: .73rem; text-transform: uppercase; letter-spacing: .16em; font-weight: 700; }
 .eyebrow-line { width: 28px; height: 1px; background: var(--accent); }
 /* Los juegos del bloque: filas sobrias, la elegida marcada con una línea de acento. */
 .games { display: grid; gap: 1px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--line); }
-.game-row { display: grid; gap: 3px; padding: 15px 17px; border: 0; border-left: 3px solid transparent; background: var(--surface); text-align: left; cursor: pointer; transition: background var(--motion-fast) ease; }
+.game-row { display: grid; gap: 3px; padding: 15px 17px; border: 0; border-left: 3px solid transparent; background: var(--surface); text-align: left; cursor: pointer; transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease; }
 .game-row.active { border-left-color: var(--accent); cursor: default; animation: row-select 280ms var(--ease-out) both; }
 @keyframes row-select { from { background: var(--accent-soft); } }
 .game-name { font-weight: 700; font-size: .96rem; }
@@ -406,14 +410,14 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .pulse-outcome { margin-top: 10px; }
 
 .overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(35,27,19,.73); backdrop-filter: blur(8px); }
-.modal { width: min(100%, 460px); max-height: calc(100dvh - 36px); overflow-y: auto; border-radius: 12px; padding: 26px; background: var(--surface); box-shadow: 0 20px 50px rgba(0,0,0,.22); text-align: center; border: 1px solid var(--line); }
+.modal { width: min(100%, 460px); max-height: calc(100dvh - 36px); overflow-y: auto; overscroll-behavior-y: contain; border-radius: 12px; padding: 26px; background: var(--surface); box-shadow: 0 20px 50px rgba(0,0,0,.22); text-align: center; border: 1px solid var(--line); }
 .dialog-enter { animation: veil-in 180ms ease-out both; }
-.dialog-enter .modal { animation: dialog-in 280ms var(--ease-spring) both; }
+.dialog-enter .modal { animation: dialog-in 260ms var(--ease-out) both; }
 .dialog-exit { pointer-events: none; animation: veil-out var(--motion-fast) ease-in both; }
 .dialog-exit .modal { animation: dialog-out var(--motion-fast) ease-in both; }
 @keyframes veil-in { from { opacity: 0; } }
 @keyframes veil-out { to { opacity: 0; } }
-@keyframes dialog-in { from { opacity: 0; transform: translateY(16px) scale(.975); } }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(10px) scale(.985); } }
 @keyframes dialog-out { to { opacity: 0; transform: translateY(8px) scale(.985); } }
 .modal .big-icon { font-size: 3rem; margin-bottom: 10px; }
 .modal p { color: var(--muted); line-height: 1.55; }
@@ -608,7 +612,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   /* Los estados siguen siendo visibles por su texto y color, sin desplazamientos,
      zooms, rebotes ni giros; también se respeta la preferencia al recorrer el mapa. */
   .gallery-panel.active, .gallery-panel.active .panel-label, .gallery-panel.active .panel-art img,
-  .screen-enter .topbar, .screen-enter > :not(.topbar), .selection-enter, .placement-enter,
+  .screen-enter .topbar, .screen-enter > :not(.topbar), .section-enter > *, .selection-enter, .placement-enter,
   .dialog-enter, .dialog-enter .modal, .dialog-enter .reveal, .dialog-enter .result-mark,
   .dialog-exit, .dialog-exit .modal, .drag-ghost, .game-row.active,
   .spinner, .waiting-orbit, .waiting-inline i { animation: none !important; }

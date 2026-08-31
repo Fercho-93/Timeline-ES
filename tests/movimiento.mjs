@@ -60,6 +60,16 @@ console.log("\nGalería continua y navegación repetida");
   }
   ok("tres vueltas por todos los bloques y mazos conservan galería y foco", true);
   ok("la imagen de Ciencia mantiene su nodo y el tamaño grande al volver", scienceImage === el(w, ".panel-science img") && scienceImage.getAttribute("src").endsWith("700.webp"));
+  click(w, '[data-block="historia"]');
+  const choices = el(w, '.play-choices');
+  const rows = [...w.document.querySelectorAll('.game-row')];
+  const title = el(w, '.home-selection h1');
+  click(w, '[data-mode="history"]');
+  ok("tocar el mazo activo no reconstruye el título ni sus botones", title === el(w, '.home-selection h1') && rows[0] === el(w, '.game-row'));
+  click(w, '[data-mode="world"]');
+  ok("cambiar de mazo conserva todos los botones y el foco", rows.every(row => row.isConnected) && choices === el(w, '.play-choices') && w.document.activeElement.dataset.mode === 'world');
+  click(w, '[data-block="ciencia"]');
+  ok("cambiar de bloque conserva los formatos de juego", choices === el(w, '.play-choices'));
   for (let round = 0; round < 6; round++) {
     click(w, '[data-action="setup"]');
     assert.ok(el(w, ".shell").classList.contains("screen-enter"));
@@ -68,6 +78,50 @@ console.log("\nGalería continua y navegación repetida");
     click(w, '[data-action="home"]');
   }
   ok("seis recorridos inicio–configuración–solitario conservan controles y foco", true);
+  w.close();
+}
+
+console.log("\nVolver al menú sin saltos de lectura");
+{
+  const w = boot();
+  const calls = [];
+  w.scrollTo = options => { calls.push(options); w.scrollY = options.top; };
+  w.scrollY = 520;
+  click(w, '[data-action="setup"]');
+  ok("la configuración comienza arriba incluso si Inicio estaba desplazado", w.scrollY === 0);
+  click(w, '[data-action="home"]');
+  ok("Volver recupera posición y botón de origen", w.scrollY === 520 && w.document.activeElement.dataset.action === 'setup');
+  ok("el regreso tiene sentido inverso sin un segundo desplazamiento animado", el(w, '.shell').classList.contains('screen-return') && calls.every(call => call.behavior === 'instant'));
+  w.close();
+}
+
+console.log("\nCambiar de categoría durante un ajuste de altura");
+{
+  const w = boot();
+  const animations = [];
+  let height = 200;
+  const container = el(w, '.home-selection');
+  container.getBoundingClientRect = () => ({ height });
+  container.animate = () => {
+    let resolve, reject;
+    const animation = {
+      finished: new Promise((yes, no) => { resolve = yes; reject = no; }),
+      cancel() { this.cancelled = true; reject(new Error('cancelled')); },
+      finish() { resolve(); }
+    };
+    animations.push(animation);
+    return animation;
+  };
+  w.CONTINUUM.resizeContent(container, 300);
+  height = 150;
+  w.CONTINUUM.resizeContent(container, 240);
+  ok("una segunda selección cancela el ajuste anterior", animations.length === 2 && animations[0].cancelled);
+  animations[1].finish();
+  await Promise.resolve();
+  ok("terminar no deja una altura fija que recorte el siguiente mazo", !container.style.height);
+  w.matchMedia = () => ({ matches: true });
+  w.CONTINUUM.resizeContent(container, 400);
+  ok("movimiento reducido no crea ajustes animados de altura", animations.length === 2);
   w.close();
 }
 
@@ -93,6 +147,31 @@ console.log("\nRespuesta a selección y confirmación, sin reinicios");
 }
 
 console.log("\nCierres animados, interrupciones y movimiento reducido");
+{
+  const w = boot({ reduce: true });
+  const scrolls = [];
+  w.Element.prototype.scrollIntoView = function(options) { scrolls.push(options); };
+  const originalRect = w.Element.prototype.getBoundingClientRect;
+  w.Element.prototype.getBoundingClientRect = function() {
+    return this.matches('.timeline-wrap') ? { top: 900, bottom: 1100, left: 0 } : originalRect.call(this);
+  };
+  game(w);
+  click(w, '.hand-card');
+  await sleep(10);
+  ok("acercar una línea fuera de vista respeta movimiento reducido", scrolls.length === 1 && scrolls[0].behavior === 'auto');
+  click(w, '.slot[data-index="0"]');
+  click(w, '.slot[data-index="1"]');
+  click(w, '[data-action="cancel-place"]');
+  await sleep(10);
+  ok("cambiar y cancelar huecos no reinicia el desplazamiento de pantalla", scrolls.length === 1);
+  click(w, '.hand-card:last-child');
+  click(w, '[data-action="game-menu"]');
+  // Una navegación inmediata invalida el desplazamiento pendiente de la mesa vieja.
+  click(w, '[data-action="abandon"]');
+  await sleep(10);
+  ok("un desplazamiento pendiente no arrastra una pantalla nueva", scrolls.length === 1);
+  w.close();
+}
 {
   const w = boot({ animated: true });
   const guide = el(w, '[data-action="rules"]');

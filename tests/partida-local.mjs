@@ -47,7 +47,9 @@ while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML) && turns < 4000) {
   click(w, '[data-action="ready"]');
   const hand = [...w.document.querySelectorAll('[data-action="select-card"]')];
   if (!hand.length) { emptyTurn = true; break; }
-  // Juega siempre bien salvo un turno de cada cinco, para que haya fallos y robos.
+  // Dos fallos pueden coincidir en una ronda. Con tres jugadores y solo un fallo
+  // cada cinco turnos, siempre quedaban dos finalistas y se repetía el desempate
+  // hasta agotar casi todo el mazo: esta prueba de humo tardaba miles de repintados.
   const pick = hand[0];
   const id = Number(pick.dataset.id);
   pick.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
@@ -56,7 +58,7 @@ while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML) && turns < 4000) {
   const years = timeline.map(t => t.endsWith("a. C.") ? -parseInt(t) : parseInt(t));
   let index = years.findIndex(y => y > cardsById.get(id).year);
   if (index < 0) index = years.length;
-  if (turns % 5 === 0) index = index === 0 ? years.length : 0; // fallo deliberado
+  if (turns % 5 === 0 || turns % 6 === 0) index = index === 0 ? years.length : 0; // fallo deliberado
   slots[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   click(w, '[data-action="confirm-place"]');
   const modal = w.document.querySelector(".modal");

@@ -155,8 +155,8 @@
     const galeriaAnterior = screen === "home" ? app.querySelector(".gallery") : null;
     screen = "home";
     const resume = game && game.mode === selectedModeKey;
-    const contenido = `<h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>
-          ${gameList()}
+    const seleccion = `<h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>${gameList()}`;
+    const contenido = `<div class="home-selection">${seleccion}</div>
           ${playChoices(resume)}
           <button class="comp-promo" data-action="start-competition">
             <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
@@ -165,7 +165,25 @@
     // Conserva los nodos y sus imágenes decodificadas. La transición puede partir del
     // ancho real anterior, incluso si se toca otro bloque antes de terminar la primera.
     if (galeriaAnterior) {
-      CT.paint(app.querySelector(".hero-copy"), contenido, screen);
+      const selector = app.querySelector(".home-selection");
+      const mismoBloque = galeriaAnterior.querySelector(".active")?.dataset.block === selectedBlockKey;
+      if (mismoBloque) {
+        // El mazo cambia, pero sus botones y los formatos de juego no desaparecen
+        // debajo del dedo. Tampoco se reinicia la animación de la carátula.
+        selector.querySelector("h1").innerHTML = CT.question(selectedModeKey);
+        selector.querySelectorAll("[data-mode]").forEach(row => {
+          const active = row.dataset.mode === selectedModeKey;
+          row.classList.toggle("active", active);
+          row.setAttribute("aria-pressed", String(active));
+        });
+      } else {
+        const height = selector.getBoundingClientRect().height;
+        CT.paint(selector, seleccion, screen);
+        CT.resizeContent(selector, height);
+      }
+      const continuar = app.querySelector(".continue-choice");
+      if (!resume) continuar?.remove();
+      else if (!continuar) app.querySelector(".play-choice-grid").insertAdjacentHTML("beforeend", '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>');
       galeriaAnterior.querySelectorAll("[data-block]").forEach(panel => {
         const activo = panel.dataset.block === selectedBlockKey;
         panel.classList.toggle("active", activo);
@@ -276,6 +294,7 @@
     const pulseCard = game.pulseTurn ? cardsById.get(game.pulseTurn.cardId) : null;
     const pulseTarget = game.pulseTurn ? game.players.find(item => item.id === game.pulseTurn.targetId) : null;
     const activeCard = pulseCard || selectedCard;
+    const nuevaSeleccion = activeCard && app.querySelector(".hand-card.selected")?.dataset.id !== String(activeCard.id);
     // Tras un fallo, `result` sigue apuntando a la carta que se acaba de fallar (todavía
     // no se ha pulsado «Terminar turno»): se aprovecha para señalar en la propia línea el
     // hueco donde iba de verdad, justo debajo del aviso que ya lo cuenta con palabras.
@@ -300,7 +319,17 @@
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${manoHtml}
     </div>`);
-    if (selectedCardId || pulseCard) setTimeout(() => document.querySelector(".timeline-wrap")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+    if (nuevaSeleccion) {
+      const linea = app.querySelector(".timeline-wrap");
+      setTimeout(() => {
+        // Un cambio de hueco o pantalla puede haber sustituido la mesa antes del frame.
+        if (!linea?.isConnected) return;
+        const rect = linea.getBoundingClientRect();
+        if (rect.top >= 0 && rect.bottom <= window.innerHeight) return;
+        const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        linea.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+      }, 0);
+    }
     if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
     // Arrastrar una carta hasta un hueco lleva al mismo sitio que tocarla y luego tocar
     // el hueco: a la confirmación. El paso de confirmar se mantiene porque en un móvil
@@ -981,6 +1010,7 @@
   }
 
   async function launchOnline(roomCode = "") {
+    screen = "online-loading";
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
     try {
       const online = await import("./online.js");
@@ -1006,8 +1036,8 @@
     if (!target) return;
     const action = target.dataset.action;
     if (action === "home") home();
-    else if (action === "set-mode") { setMode(target.dataset.mode); home(); }
-    else if (action === "set-block") { setBlock(target.dataset.block); home(); }
+    else if (action === "set-mode") { if (target.dataset.mode === selectedModeKey) return; setMode(target.dataset.mode); home(); }
+    else if (action === "set-block") { if (target.dataset.block === selectedBlockKey) return; setBlock(target.dataset.block); home(); }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();

@@ -75,6 +75,29 @@
     });
   }
 
+  // Una sola transición por selector; una pulsación rápida parte de la altura visible
+  // actual. Nunca se aplaza el cambio de estado ni se deja una altura fija al acabar.
+  const resizing = new WeakMap();
+  function resizeContent(container, from) {
+    resizing.get(container)?.cancel();
+    resizing.delete(container);
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !container.animate) return;
+    const to = container.getBoundingClientRect().height;
+    container.classList.remove("section-enter");
+    void container.offsetWidth;
+    container.classList.add("section-enter");
+    if (Math.abs(to - from) < 1) return;
+    const animation = container.animate([{ height: `${from}px` }, { height: `${to}px` }], {
+      duration: 280, easing: "cubic-bezier(.22, .61, .36, 1)"
+    });
+    resizing.set(container, animation);
+    animation.finished.then(() => {
+      if (resizing.get(container) === animation) resizing.delete(container);
+    }).catch(() => {});
+  }
+
+  let homePosition = null;
+
   // Pinta y decide dónde queda el foco:
   //
   // - Al cambiar de pantalla, en su titular. Así el lector lee dónde está, y quien usa
@@ -92,6 +115,12 @@
     const clave = dentro ? selectorFor(activo) : null;
     const primero = paint.screen === undefined;
     const cambioDePantalla = screen !== paint.screen;
+    const vuelve = screen === "home" ||
+      (screen === "solo-home" && ["solo", "solo-end", "review"].includes(paint.screen)) ||
+      (screen === "online-entry" && !["home", "online-loading"].includes(paint.screen));
+    if (cambioDePantalla && paint.screen === "home") {
+      homePosition = { top: window.scrollY, focus: clave };
+    }
     const cartaElegida = container.querySelector(".hand-card.selected")?.dataset.id || null;
     const confirmacionAnterior = container.querySelector(".slot-confirm")?.dataset.index ?? null;
     actualizaAnclas(container);
@@ -100,7 +129,10 @@
     container.innerHTML = html;
     // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
     // muchas veces y no debe convertir cada toque en una animación.
-    if (!primero && cambioDePantalla) container.firstElementChild?.classList.add("screen-enter");
+    if (!primero && cambioDePantalla) {
+      container.firstElementChild?.classList.add("screen-enter");
+      if (vuelve) container.firstElementChild?.classList.add("screen-return");
+    }
     // Dentro de una partida no se anima el repintado entero: solo el elemento que acaba
     // de cambiar de estado. Así el movimiento explica la acción en lugar de decorar cada
     // toque con el mismo efecto.
@@ -113,8 +145,14 @@
     restauraAnclas(container);
     if (primero) return;
     if (cambioDePantalla) {
-      // Sin preventScroll: al cambiar de pantalla queremos que suba al titular.
-      if (focus(container.querySelector("[data-focus]"))) return;
+      // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil
+      // el titular de Inicio está debajo de la galería; enfocarlo saltaba la portada.
+      const regreso = screen === "home" && homePosition;
+      const destino = regreso?.focus && container.querySelector(regreso.focus);
+      focus(destino || container.querySelector("[data-focus]"), { preventScroll: true });
+      const top = regreso ? regreso.top : 0;
+      if (window.scrollY !== top || window.scrollX !== 0) window.scrollTo({ top, left: 0, behavior: "instant" });
+      return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que
     // estaba mirando y no navegando es más molesto que útil.
@@ -231,6 +269,7 @@
 
   window.CONTINUUM = window.CONTINUUM || {};
   window.CONTINUUM.paint = paint;
+  window.CONTINUUM.resizeContent = resizeContent;
   window.CONTINUUM.announce = announce;
   window.CONTINUUM.openDialog = openDialog;
   window.CONTINUUM.closeDialog = closeDialog;

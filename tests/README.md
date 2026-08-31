@@ -86,3 +86,20 @@ Son contratos sobre DOM simulado: no miden fluidez ni sustituyen la inspección 
 navegador o un iPhone. Los movimientos usan tiempos cortos (160–460 ms), salvo el encuadre
 suave de la carátula; no se anima la mesa completa al elegir carta o hueco. La copia de una
 carta arrastrada se posiciona una vez por frame, sin interpolación que la retrase respecto al dedo.
+# Revisión visual de las transiciones
+
+`npm run dev` sirve los archivos originales con Vite, solo durante el desarrollo.
+Abre `/tests/preview.html` en ese servidor para revisar anchos de 360, 390, 430,
+768 y 1080 px. La publicación en GitHub Pages sigue siendo estática: no necesita
+compilar ni descarga Vite al móvil. El servidor de desarrollo requiere Node
+20.19+ o 22.12+.
+
+Recorrido: cambia varias veces de bloque y de mazo; abre y cierra Guía y Ajustes;
+entra en configuración y vuelve al mismo punto de Inicio; inicia una partida,
+elige carta, cambia de hueco, cancela y confirma. Repite en claro, oscuro y con
+«reducir movimiento». Comprueba que no desaparecen controles, no quedan alturas
+fijas, no se repite el desplazamiento al cambiar de hueco y las animaciones no
+duplican jugadas. La vista responsive no sustituye una prueba en un iPhone real.
+
+`node tests/movimiento.mjs` verifica además interrupciones, foco, cancelación,
+gestos, navegación y el comportamiento con movimiento reducido.
