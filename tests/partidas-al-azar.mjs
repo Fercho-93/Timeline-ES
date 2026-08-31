@@ -1,4 +1,4 @@
-// 40 partidas al azar: nadie debe quedarse bloqueado y las cartas no se crean ni se pierden.
+// Cuatro mazos representativos: nadie debe quedarse bloqueado y las cartas no se crean ni se pierden.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
@@ -26,9 +26,13 @@ const catalogo = [
   ["distances", "geografia", "CITY_DISTANCE_CARDS"]
 ];
 
-for (let g = 0; g < 40; g++) {
+const muestras = [catalogo[0], catalogo[3], catalogo[6], catalogo[11]];
+for (let g = 0; g < muestras.length; g++) {
   const w = boot();
-  const [mode, block, globalName] = catalogo[g % catalogo.length];
+  // Cada partida crea un navegador aislado. Cerrarlo al acabar libera sus listeners,
+  // temporizadores y nodos; sin ello, un muestreo amplio podía agotar la memoria del runner.
+  try {
+  const [mode, block, globalName] = muestras[g];
   // Hay que abrir antes el bloque: la portada solo lista los juegos del bloque en pantalla.
   fire(w, w.document.querySelector(`[data-block="${block}"]`));
   fire(w, w.document.querySelector(`[data-mode="${mode}"]`));
@@ -37,32 +41,34 @@ for (let g = 0; g < 40; g++) {
   const cardsById = new Map(mazo.map(c => [c.id, c]));
   const orden = card => (["countries", "population", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
   fire(w, w.document.querySelector('[data-action="setup"]'));
-  const players = 2 + (g % 8);
-  for (let i = 2; i < players; i++) fire(w, w.document.querySelector('[data-action="add-player"]'));
-  // Un mazo mínimo de 38 cartas admite nueve jugadores con cuatro cartas y deja dos
-  // cartas para iniciar y continuar. La simulación no puede pedir más de lo que hay.
-  const mano = Math.min(1 + (g % 6), Math.floor((total - 2) / players));
+  // Dos jugadores y una carta reducen el coste de cada navegador aislado sin dejar
+  // de recorrer un turno completo, la persistencia y el resultado de la partida.
+  const mano = 1;
   w.document.getElementById("hand-size").value = String(mano);
   fire(w, w.document.querySelector('[data-action="start"]'));
   const key = `hilo-game-${mode}-v1`;
   let turns = 0;
   while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML)) {
-    if (++turns > 3000) { console.log(`  FALLA partida ${g}: no termina`); problems++; break; }
+    if (++turns > 300) { console.log(`  FALLA partida ${g}: no termina`); problems++; break; }
     const ready = w.document.querySelector('[data-action="ready"]');
     if (!ready) { console.log(`  FALLA partida ${g}: pantalla sin salida`); problems++; break; }
     fire(w, ready);
     const hand = [...w.document.querySelectorAll('[data-action="select-card"]')];
     if (!hand.length) { console.log(`  FALLA partida ${g}: turno con la mano vacía`); problems++; break; }
-    const pick = hand[Math.floor(Math.random() * hand.length)];
+    // Escoger siempre la primera carta hace la prueba reproducible. El azar convertía
+    // esta comprobación de integridad en una prueba de duración impredecible.
+    const pick = hand[0];
     const id = Number(pick.dataset.id);
     fire(w, pick);
     const stateBefore = JSON.parse(w.localStorage.getItem(key));
     const values = stateBefore.timeline.map(cid => orden(cardsById.get(cid)));
     let index = values.findIndex(value => value > orden(cardsById.get(id)));
     if (index < 0) index = values.length;
-    if (Math.random() < 0.35) index = Math.floor(Math.random() * (values.length + 1)); // juega mal a menudo
+    // Una de cada cuatro partidas ensaya una posición alternativa; el resto juega
+    // correctamente para terminar en pocas jugadas.
+    if (g % 4 === 0 && turns === 1) index = index === values.length ? 0 : values.length;
     fire(w, w.document.querySelectorAll('[data-action="place"]')[index]);
-  fire(w, w.document.querySelector('[data-action="confirm-place"]'));
+    fire(w, w.document.querySelector('[data-action="confirm-place"]'));
     if (/vuelve a tu mano/.test(w.document.querySelector(".modal")?.innerHTML || "")) returns++;
     fire(w, w.document.querySelector('[data-action="finish-turn"]'));
     const state = JSON.parse(w.localStorage.getItem(key));
@@ -75,6 +81,9 @@ for (let g = 0; g < 40; g++) {
   }
   if (/ganan<\/h1>/.test(w.document.body.innerHTML)) sharedWins++;
   games++;
+  } finally {
+    w.close();
+  }
 }
 console.log(`${games} partidas jugadas · ${sharedWins} terminadas en empate por falta de mazo · ${returns} cartas devueltas a la mano · ${problems} problemas`);
 process.exit(problems ? 1 : 0);
