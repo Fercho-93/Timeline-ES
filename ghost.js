@@ -10,32 +10,40 @@
     expert: { name: "Experto", extra: 2, description: "Dos cartas automáticas. Tablero siempre oculto." }
   };
 
-  // 30% de partidas sin poderes. En las demás, 1..ceil(jugadores/3), máximo 3.
-  // Se eligen robos sin reemplazo dentro de H*P + 2*P (acotado por el mazo).
-  // Los robos del reparto pesan 3 y los posteriores 1: evita diluir el poder en
-  // mazos largos sin fijarlo siempre en una posición ni en una mano concreta.
+  // Siempre ceil(P/3) poderes, máximo 3. Cada posición elegible pesa
+  // 0.5/N + (está entre las primeras 12*P ? 0.5/W : 0), con W=min(N,12*P).
+  // Es la mezcla 50/50 entre todo el mazo y la zona inicial, sin reemplazo:
+  // también puede tocar la última carta. N excluye la que inicia el tablero.
   function create(deck, count, handSize, random = Math.random) {
     const dealt = count * handSize;
-    const windowSize = Math.min(deck.length - 1, dealt + 2 * count);
-    const slots = Array.from({ length: Math.max(0, windowSize) }, (_, i) => i < dealt ? i : i + 1);
+    const eligible = deck.filter((_, i) => i !== dealt);
+    const windowSize = Math.min(eligible.length, 12 * count);
+    const slots = eligible.map((id, i) => ({ id, weight: 0.5 / eligible.length + (i < windowSize ? 0.5 / windowSize : 0) }));
     const chosen = [];
-    if (random() < 0.70) {
-      const amount = Math.min(slots.length, 1 + Math.floor(random() * Math.ceil(count / 3)));
-      for (let n = 0; n < amount; n++) {
-        const weight = slots.reduce((sum, i) => sum + (i < dealt ? 3 : 1), 0);
-        let pick = random() * weight;
-        let at = 0;
-        while (at < slots.length - 1 && (pick -= slots[at] < dealt ? 3 : 1) >= 0) at++;
-        chosen.push(deck[slots.splice(at, 1)[0]]);
-      }
+    const amount = Math.min(slots.length, 3, Math.ceil(count / 3));
+    for (let n = 0; n < amount; n++) {
+      let pick = random() * slots.reduce((sum, slot) => sum + slot.weight, 0);
+      let at = 0;
+      while (at < slots.length - 1 && (pick -= slots[at].weight) >= 0) at++;
+      chosen.push(slots.splice(at, 1)[0].id);
     }
-    return { cards: chosen, owners: chosen.map(() => ""), used: [], pending: [], cooldown: [], actor: "", fresh: false };
+    return { distribution: 2, cards: chosen, owners: chosen.map(() => ""), used: [], pending: [], cooldown: [], actor: "", fresh: false };
   }
 
-  function claim(ghost, cardId, playerId) {
+  function claim(ghost, cardId, playerId, remainingDeck = [], random = Math.random) {
     if (!ghost) return;
     const index = ghost.cards.indexOf(cardId);
-    if (index >= 0 && !ghost.owners[index]) ghost.owners[index] = String(playerId);
+    if (index < 0 || ghost.owners[index]) return;
+    const id = String(playerId);
+    if (ghost.distribution === 2 && ghost.owners.includes(id)) {
+      const candidates = remainingDeck.filter(card => !ghost.cards.includes(card));
+      if (candidates.length) {
+        ghost.cards[index] = candidates[Math.floor(random() * candidates.length)];
+        return;
+      }
+      // Sin posiciones libres queda consumido por este jugador, sin otro uso.
+    }
+    ghost.owners[index] = id;
   }
   function owns(ghost, playerId) {
     const id = String(playerId);

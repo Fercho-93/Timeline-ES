@@ -105,13 +105,17 @@ duplican jugadas. La vista responsive no sustituye una prueba en un iPhone real.
 `node tests/movimiento.mjs` verifica además interrupciones, foco, cancelación,
 gestos, navegación y el comportamiento con movimiento reducido.
 
-## Fantasma y dificultades (v36)
+## Fantasma y dificultades (reparto v37)
 
-`npm test` incluye 22.500 repartos deterministas, uso y duración del Fantasma,
+`npm test` incluye 90.000 repartos deterministas, uso y duración del Fantasma,
 minimapa sin pistas, guardado tras resolver, victoria con poder sin gastar,
 robos que entregan poderes, partidas completas por dificultad y competición experta.
 `npm run test:reglas` ejecuta además `fantasma-online.mjs`: el código real de
 `online.js` con clientes DOM independientes y transacciones contra el emulador
 de Firestore. Comprueba activación, revelado, cooldown, robos, Pulso, salidas,
-reparto limitado por el mazo y rechazo de escrituras que inventan o roban poderes.
+cantidad fija por jugadores, posiciones de todo el mazo con mezcla 50/50 y rechazo de
+escrituras que inventan o roban poderes. También prueba la recolocación de duplicados,
+dos robos encadenados en un desempate, el agotamiento del mazo, la privacidad de la
+interfaz y la compatibilidad con partidas v36. Comprueba los ejemplos de probabilidad
+con 50, 200 y 500 cartas disponibles usando márgenes estadísticos.
 No sustituye una prueba de Safari en un iPhone físico.

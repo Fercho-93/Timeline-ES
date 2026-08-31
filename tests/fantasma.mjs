@@ -37,23 +37,55 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
   const w = boot(), g = w.CONTINUUM.Ghost;
   let seed = 73473;
   const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
-  for (const n of [38, 167, 673]) for (const p of [2, 5, 9]) {
+  for (const n of [38, 167, 673]) for (const p of [2, 3, 4, 5, 6, 7, 8, 9]) {
     const h = Math.min(4, Math.floor((n - 1) / p)), deck = Array.from({ length: n }, (_, i) => i + 1);
-    let potential = 0, dealt = 0;
+    let dealt = 0;
     const seen = new Set();
     for (let k = 0; k < 2500; k++) {
       const ghost = g.create(deck, p, h, random);
-      if (ghost.cards.length) potential++;
       if (ghost.cards.some(id => id <= p * h)) dealt++;
-      assert.ok(ghost.cards.length <= Math.ceil(p / 3));
+      assert.equal(ghost.distribution, 2);
+      assert.equal(ghost.cards.length, Math.ceil(p / 3), 'siempre la cantidad fija por jugadores');
       assert.equal(new Set(ghost.cards).size, ghost.cards.length);
-      ghost.cards.forEach(id => { assert.notEqual(id, p * h + 1, 'no poder en carta inicial'); assert.ok(id <= Math.min(n, p * h + p * 2 + 1)); seen.add(id); });
+      ghost.cards.forEach(id => { assert.notEqual(id, p * h + 1, 'no poder en carta inicial'); assert.ok(deck.includes(id)); seen.add(id); });
     }
-    assert.ok(potential > 1600 && potential < 1900, 'azar sin presencia garantizada');
-    assert.ok(dealt > 1250 && dealt < 1900, 'presencia inicial frecuente pero no constante');
+    assert.ok(dealt > 0);
+    if (n >= 167) assert.ok(dealt < 2500, 'incluir poderes no garantiza repartirlos');
     assert.ok(seen.size > p * h, 'también aparece en robos posteriores');
-    console.log(`  ${p} jugadores, ${n} cartas: ${(dealt/25).toFixed(1)}% con poder repartido, ${(potential/25).toFixed(1)}% con poder posible`);
+    assert.ok([...seen].some(id => id > n * 0.9), 'la cola del mazo sigue siendo elegible');
+    assert.deepEqual(deck, Array.from({ length: n }, (_, i) => i + 1), 'no cambia cartas normales ni su orden');
+    console.log(`  ${p} jugadores, ${n} cartas: ${(dealt/25).toFixed(1)}% con poder repartido; siempre ${Math.ceil(p/3)} incluidos`);
   }
+  // Probabilidades anunciadas: 20 cartas extraídas, 5 jugadores y 2 Fantasmas.
+  // Estos N ya excluyen la carta inicial del tablero. Margen estadístico, sin
+  // reproducir el algoritmo: detecta tanto el reparto uniforme como el antiguo.
+  for (const [n, expected] of [[50, 0.64], [200, 0.39], [500, 0.34]]) {
+    const deck = Array.from({ length: n + 1 }, (_, i) => i + 1);
+    let appeared = 0;
+    for (let i = 0; i < 10000; i++) if (g.create(deck, 5, 4, random).cards.some(id => id <= 20)) appeared++;
+    assert.ok(Math.abs(appeared / 10000 - expected) < 0.025, `${n} cartas: ${(appeared/100).toFixed(1)}% esperado ≈${expected*100}%`);
+    console.log(`  Probabilidad con ${n} cartas disponibles y 20 extraídas: ${(appeared/100).toFixed(1)}%`);
+  }
+  const deck = Array.from({ length: 201 }, (_, i) => i + 1);
+  assert.equal(g.create(deck, 2, 1, () => 0).cards[0], 1, 'puede tocar la primera');
+  assert.equal(g.create(deck, 2, 6, () => 1 - Number.EPSILON).cards[0], 201, 'puede tocar la última');
+  assert.equal(g.create([], 9, 0).cards.length, 0, 'sin posiciones no inventa cartas');
+  assert.equal(g.create([1], 9, 0).cards.length, 0, 'solo hay carta inicial');
+  assert.equal(g.create([1, 2, 3], 9, 0).cards.length, 2, 'acota cantidad por posiciones disponibles');
+  const repeated = { ...freshGhost(['1', '']), cards: [6, 12], distribution: 2 };
+  g.claim(repeated, 12, 1, [13, 14], () => 0);
+  assert.deepEqual(plain(repeated.cards), [6, 13]);
+  assert.deepEqual(plain(repeated.owners), ['1', ''], 'no entrega un segundo poder');
+  const restored = JSON.parse(JSON.stringify(repeated));
+  g.claim(restored, 13, 2, [14]);
+  assert.deepEqual(restored.owners, ['1', '2'], 'el poder recolocado se conserva y llega a otro jugador');
+  repeated.used = ['1'];
+  g.claim(repeated, 13, 1, [14], () => 0);
+  assert.equal(repeated.cards[1], 14, 'haberlo usado no permite recibir otro');
+  g.claim(repeated, 14, 1, []);
+  assert.equal(g.owns(repeated, 1), false, 'sin sitio se consume y no restaura un uso');
+  g.claim(repeated, 14, 2, [15]);
+  assert.equal(g.owns(repeated, 2), false, 'no resucita por reciclar la carta normal');
   w.close();
 }
 {
@@ -97,6 +129,19 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
   const w=boot({[key]:f});click(w,'continue');click(w,'ready');play(w,false);
   assert.equal(state(w).ghost.owners[0],'1','el robo de penalización puede entregar el poder');
   assert.equal(state(w).players[0].hand.length,3,'el poder no sustituye la penalización');w.close();
+}
+{
+  const f=fixture(); f.ghost={...freshGhost(['1','']),cards:[6,12],distribution:2};
+  let w=boot({[key]:f});click(w,'continue');click(w,'ready');play(w,false);
+  let s=state(w);
+  assert.equal(s.players[0].hand.length,3,'recolocar un duplicado conserva el castigo');
+  assert.equal(s.ghost.owners[1],'');assert.ok(s.deck.includes(s.ghost.cards[1]));
+  w.close();w=boot({[key]:s});click(w,'continue');click(w,'ready');
+  assert.deepEqual(state(w).ghost,s.ghost,'recargar no vuelve a sortear la recolocación');
+  click(w,'finish-turn');
+  assert.equal(w.document.querySelector('.ghost-power'),null,'el cambio de manos no revela el poder');
+  click(w,'ready');assert.equal(w.document.querySelector('.ghost-power'),null,'el rival no ve el poder ajeno');
+  w.close();
 }
 {
   const initial={kind:'free',mode:'history',difficulty:'hard',ghostTurns:[3],day:'2026-08-31',deck:[7,8,9,10,11,12],timeline:[1,2,3,4,5],current:6,lives:3,hits:3,played:3,total:null,finished:false};
