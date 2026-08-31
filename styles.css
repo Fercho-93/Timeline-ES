@@ -87,6 +87,9 @@ button { -webkit-tap-highlight-color: transparent; }
 /* Ningún elemento enfocado se queda sin marca visible, ni siquiera los que solo reciben
    el foco desde el programa. */
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+/* Los títulos se enfocan al abrir una pantalla para que el lector la anuncie. No son
+   controles y el anillo de foco sobre ellos parece un aviso de error, sobre todo en Safari. */
+[data-focus]:focus { outline: none; }
 /* Safari aplica azul de enlace a algunos botones si no se declara el color de forma
    explícita. Los nombres de los mazos deben usar siempre la tinta de la interfaz. */
 button { touch-action: manipulation; color: inherit; }
@@ -498,6 +501,13 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .lobby-player small { margin-top: 2px; color: var(--muted); font-size: .69rem; }
 .lobby-player > i { color: var(--green); font-style: normal; font-weight: 700; }
 .solo-panel { margin-bottom: 16px; }
+.solo-home { margin-top: 24px; }
+.solo-intro { margin-bottom: 24px; }
+.solo-title { margin: 7px 0 10px; }
+.solo-intro .lead { max-width: 43ch; margin-bottom: 0; }
+.solo-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.solo-panel-head h3 { margin: 0; font-size: 1.08rem; letter-spacing: -.015em; }
+.solo-panel-head time { flex: 0 0 auto; color: var(--muted); font-size: .78rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .solo-panel p { color: var(--muted); font-size: .82rem; margin: 0 0 14px; }
 .solo-done strong { color: var(--ink); }
 .solo-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
