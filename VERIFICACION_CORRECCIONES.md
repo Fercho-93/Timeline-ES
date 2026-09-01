@@ -255,3 +255,73 @@ Ex-situ que murió a los 20 años en 2022. Es una edad individual, no una espera
 un récord vigente de especie. [Boletín del programa de conservación](https://www.lynxexsitu.es/ficheros/boletines_pdf/124/Boletin_2semestre2022_Exsitu.pdf).
 La liebre europea se mantiene jugable, pero se marca como pendiente: la ficha consultada da un
 rango de 3–5 kg y no respalda 2,5 kg como peso típico. [Animal Diversity Web](https://animaldiversity.org/accounts/Lepus_europaeus/).
+
+## Ronda 4: contraste con fuentes oficiales (1 de septiembre de 2026)
+
+Repaso carta a carta de los catorce mazos y contraste dirigido de las afirmaciones con más
+riesgo de errata: cifras concretas dentro de una explicación (horas, kilos, edades, víctimas),
+relaciones de causa y fecha, y superlativos. Se confirman ocho erratas y se corrigen. El resto
+de las comprobaciones dirigidas —Bessemer (1855), *El libro de la selva* como último largo
+supervisado por Walt Disney, Singapur (744,3 km²)— sostiene lo que ya decían las cartas y no
+se toca nada.
+
+Como en las rondas anteriores, esto no es una certificación externa de las 933 cartas: es una
+lectura completa más un contraste dirigido de los puntos dudosos.
+
+### Datos numéricos dentro de la explicación
+
+| ID | Mazo | Antes | Ahora | Fuente |
+|---|---|---|---|---|
+| 70 | Historia de España | «causan 193 víctimas mortales» | 192 muertes en los trenes; 193 al sumar al GEO de Leganés | [Ayuntamiento de Leganés](https://www.leganes.org/w/leganes-rinde-homenaje-a-las-victimas-del-11m-y-al-geo-fallecido-en-acto-de-servicio-en-el-municipio-el-3-de-abril-de-2004) |
+| 4055 | Inventos | filamento que «aguanta cuarenta horas» | trece horas y media el 22 de octubre de 1879 | [Edison Papers, Rutgers](https://edison.rutgers.edu/life-of-edison/biographical-essays/lighting/the-carbon-filament-lamp) |
+| 4071 | Inventos | Whittle patenta «con veintitrés años» | con veintidós; solicitud del 16 de enero de 1930 y concesión en 1932 | [The First Patent, frankwhittle.co.uk](https://frankwhittle.co.uk/the-first-patent/) |
+| 4087 | Inventos | «un aparato de casi un kilo» | «un prototipo de más de un kilo» | [CBS News: 40 años del DynaTAC](https://www.cbsnews.com/news/cell-phone-turns-40-martin-coopers-first-call-on-the-dynatac/) |
+| 3008 | Población | «Pierde medio millón al año desde 2010» | más de una década de descensos; ~550.000 en 2024 | [Statistics Bureau of Japan](https://www.stat.go.jp/english/data/jinsui/2024np/index.html) |
+
+Las cuatro primeras decían un número que la fuente no sostiene. La de Japón mezclaba el ritmo
+de pérdida actual con el del principio de la década: el descenso encadena catorce años, pero en
+los primeros la caída era de unos cientos de miles, no de medio millón.
+
+### Relación de causa y fecha
+
+- **89 (910):** García I no llega al trono «tras la muerte de Alfonso III». Alfonso III abdicó y
+  repartió sus dominios entre sus hijos, y murió después, el 20 de diciembre de ese mismo año.
+  La carta pasa a describir la abdicación y el reparto, y sitúa la muerte al final.
+  [Alfonso III de Asturias](https://es.wikipedia.org/wiki/Alfonso_III_de_Asturias)
+
+### Valores de ordenación modificados
+
+Dos cartas de Longevidad ordenaban por un número que su propia explicación contradecía. Se
+corrigen con el criterio del mazo: el valor es el de la fuente y el título dice de qué
+referencia se trata.
+
+| ID | Referencia corregida | Antes | Ahora | Unidad | Fuente |
+|---|---|---:|---:|---|---|
+| 12013 | Erizo europeo (límite en libertad) | 4 | 6 | años | [Animal Diversity Web](https://animaldiversity.org/accounts/Erinaceus_europaeus/) |
+| 12019 | Dragón de Komodo (referencia en libertad) | 28 | 30 | años | [Smithsonian's National Zoo](https://nationalzoo.si.edu/animals/komodo-dragon) |
+
+El erizo ordenaba por 4 años mientras su texto hablaba de siete; ADW da hasta seis en libertad
+y hasta diez en cautividad, y la carta usa ahora ese límite en libertad. El dragón de Komodo
+ordenaba por 28 y su texto decía «alrededor de treinta»: se adopta la referencia del
+Smithsonian, que además distingue la vida en libertad de la mediana en cuidado humano.
+El erizo queda empatado con la cobaya en 6 años; es un empate real y los motores ya lo aceptan
+en ambos órdenes.
+
+### Distancias entre ciudades: queda cerrado el punto abierto
+
+La ronda anterior dejó anotado que faltaban las coordenadas originales para reproducir el mazo
+con exactitud. Se ha recalculado entero con el método que declara el propio archivo
+—círculo máximo, radio de 6.371 km— y coordenadas de centro urbano de uso corriente: **las 38
+cartas salen dentro del 0,1 %**, salvo París–Versalles, que redondea 17,4 a 17. El mazo queda
+reproducido y no se cambia ninguna cifra.
+
+### Integridad
+
+- No se añaden ni se retiran cartas: se conservan los 933 identificadores y los 14 mazos.
+- `npm test` pasa las 339 comprobaciones de las doce pruebas, incluidas cardinalidad, empates,
+  formato de valores y avisos visibles. Ninguna de ellas verifica un hecho por sí sola.
+- La caché pasa a `continuum-v39`. Conviene empezar partidas nuevas de Longevidad: una línea
+  guardada con los valores anteriores del erizo o el dragón de Komodo puede haber quedado
+  desordenada.
+- Los 25 pendientes de la ronda anterior siguen pendientes: no se ha encontrado respaldo nuevo
+  y no se inventa una cifra para cerrarlos.
