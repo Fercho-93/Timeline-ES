@@ -630,3 +630,90 @@ Es una decisión sobre qué mide el mazo, no sobre si un dato es cierto, así qu
 - 38 cartas por mazo y 933 identificadores, sin cambios.
 - `npm test` pasa 344 comprobaciones. Techo de mudas actualizado a 35.
 - La caché pasa a `continuum-v43`. Cambian los pesos de la jorobada y el rorcual.
+
+## Ronda 9: criterio de medias y típicas, y el folclore de las velocidades (1 de septiembre de 2026)
+
+Decisión del autor: **el mazo compara medidas medias o típicas, no récords ni ejemplares
+excepcionales.** Se adopta como criterio para lo que queda por documentar y se empieza a
+aplicar hacia atrás. Deuda: **35 → 29 mudas**, con 7 avisos.
+
+### Lo que este criterio destapa
+
+Al aplicarlo a Velocidad aparece un patrón que va más allá de una carta suelta: **las cifras
+populares de velocidad animal son sistemáticamente más altas que las institucionales, y no
+traen procedencia.** Cuatro casos en esta tanda:
+
+| Carta | Cifra popular (la que tenía) | Lo que dice la fuente |
+|---|---:|---|
+| Halcón peregrino | 360 km/h | Picados medidos de 39 a 51 m/s (140–184). Los autores subrayan que quedan **muy por debajo** de la velocidad terminal posible: el halcón modera el picado para no perder precisión |
+| Hipopótamo | 30 km/h | San Diego Zoo: carga de hasta 14 mph, **22,5 km/h** |
+| León africano | 78 km/h | Los 80 km/h que se repiten en todas partes no traen procedencia; el GPS en Botsuana da puntas menores y variables; San Diego Zoo baja a 53 km/h en leonas |
+| Caracol de jardín | 0,03 km/h | El **récord** Guinness de caracol terrestre es 0,233 cm/s, o sea **0,0084 km/h** |
+
+El caracol es el más llamativo: la carta iba 3,5 veces más rápida que el ejemplar más veloz
+jamás cronometrado. No era una velocidad típica; no era ni siquiera posible.
+
+Los 389 km/h del peregrino, que es de donde venían los 360, son de un ejemplar entrenado
+lanzándose junto a un paracaidista. Es el ejemplo de manual de lo que el criterio nuevo excluye.
+
+### Cartas cerradas (6)
+
+| ID | Carta | Antes | Ahora | Fuente |
+|---|---|---:|---:|---|
+| 13005 | Perezoso de tres dedos (entre las ramas) | 0,22 | **0,27 km/h** | Guinness: 4,6 m/min en las ramas, 1,8–2,4 en el suelo |
+| 13015 | Hipopótamo común (carga en tierra) | 30 | **22,5 km/h** | San Diego Zoo |
+| 13017 | Jirafa (galopando) | 55 | **56,3 km/h** | San Diego Zoo, unas 35 mph |
+| 13030 | Halcón peregrino (picado medido) | 360 | **184 km/h** | Ponitz et al., PLOS ONE |
+
+Más las de Peso de la ronda anterior que ya seguían el criterio. El perezoso tenía además el
+problema de mezclar medidas: Guinness da una cifra para el suelo y otra para las ramas, y la
+carta habla de las ramas.
+
+### Dos que pasan a revisión
+
+- **León africano.** Tres fuentes, tres cifras que no se pueden conciliar. Marcarlo es más
+  honesto que elegir una.
+- **Caracol de jardín.** Se ha demostrado que la cifra es imposible, pero no hay una velocidad
+  típica publicada con la que sustituirla.
+
+Los avisos suben de 5 a 7 y el techo del test con ellos. Es la tercera vez que pasa y conviene
+decirlo claro: **el contador de avisos subiendo es el sistema funcionando**, no fallando. Baja
+cuando se documenta y sube cuando se descubre que algo estaba mal. Lo que no puede hacer es
+moverse sin que quede escrito por qué.
+
+### Una consecuencia que hay que decidir
+
+Con el peregrino en 184, la carta más rápida del mazo pasa a ser el **águila real en picado, con
+240 km/h**, y es la cifra peor sostenida de las cinco primeras: Birds of the World la da como
+«referida, no cronometrada». La carta lo dice en su explicación y lleva fuente, así que se
+mantiene, pero hay una elección pendiente:
+
+1. **Dejarlo.** El águila encabeza el mazo con una cifra de referencia honestamente etiquetada.
+2. **Pasarla también a revisión.** Entonces encabeza el **halcón gerifalte con 209 km/h**, que es
+   el mejor picado realmente medido del mazo (seguimiento óptico de once picados).
+
+La segunda es más coherente con el criterio nuevo. Tiene el coste de que el peregrino deje de
+ser el animal más rápido de la baraja, que es lo que todo el mundo espera.
+
+### Inventario: 40 cartas con marco de récord
+
+Aplicar el criterio hacia atrás no es trivial. Hoy hay **40 de 114 cartas** enmarcadas como
+récord, extremo o ejemplar concreto: 12 en Peso, 21 en Longevidad y 7 en Velocidad. Se agrupan
+en tres tipos que no admiten el mismo trato:
+
+- **Límites de rango publicados** («hasta», «límite del rango»): 20 cartas. Convertibles a un
+  valor central cuando la fuente da el rango entero.
+- **Ejemplares con nombre** (Ming, Aura, Jonathan, Old Billy, Cookie, Winning Brew, Usain Bolt):
+  convertibles solo si existe una cifra típica publicada para la especie.
+- **Dataciones de un individuo o una colonia** (Monorhaphis, corales, esponja de Curaçao,
+  ballena boreal, tiburón de Groenlandia): **no tienen equivalente típico**. La edad del
+  ejemplar datado *es* el hallazgo científico; no existe «la longevidad media de un coral negro».
+  Para estas, el criterio de medias obliga a elegir entre conservarlas etiquetadas o retirar el
+  animal del mazo.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones. Techos a 29 mudas y 7 avisos.
+- La caché pasa a `continuum-v44`. Cambian cuatro velocidades, una de ellas la más alta del
+  mazo: conviene empezar partidas nuevas de Naturaleza.
