@@ -325,3 +325,83 @@ reproducido y no se cambia ninguna cifra.
   desordenada.
 - Los 25 pendientes de la ronda anterior siguen pendientes: no se ha encontrado respaldo nuevo
   y no se inventa una cifra para cerrarlos.
+
+## Ronda 5: se atacan los 25 pendientes (1 de septiembre de 2026)
+
+Los pendientes de la ronda 2 no eran una lista cerrada, sino un encargo. Se ha buscado fuente
+para los 25. **Doce quedan cerrados y trece siguen abiertos.** Peso pasa a no tener ninguno.
+
+El criterio no cambia: si la fuente sostiene otra cifra, se cambia la cifra; si el problema es
+el animal —una atribución que nadie ha medido, o dos cartas para el mismo bicho—, se sustituye
+la carta y se dice por quién. No se inventa un número para tapar un hueco y no se retoca
+ninguna cifra para separarla de su vecina.
+
+### Cerrados con cifra corregida
+
+| ID | Mazo | Antes | Ahora | Fuente |
+|---|---|---:|---:|---|
+| 10009 | Peso | 2,5 | 5 kg | [ADW: Lepus europaeus](https://animaldiversity.org/accounts/Lepus_europaeus/) (rango 3–5 kg) |
+| 12007 | Longevidad | 0,25 | 1,5 años | [ADW: Mus musculus](https://animaldiversity.org/accounts/Mus_musculus/) (12–18 meses en libertad) |
+| 12008 | Longevidad | 0,4 | 2 años | [ADW: Rattus norvegicus](https://animaldiversity.org/accounts/Rattus_norvegicus/) |
+| 12028 | Longevidad | 235 | 211 años | [George et al., 1999](https://cdnsciencepub.com/doi/10.1139/z99-015), racemización del aspártico |
+| 13016 | Velocidad | 45 | 24,5 km/h | [Hutchinson et al., 2006, JEB](https://journals.biologists.com/jeb/article/209/19/3812/16362/The-locomotor-kinematics-of-Asian-and-African) (6,8 m/s) |
+| 13022 | Velocidad | 120 | 80 km/h | [Zoo de Granby](https://www.zoodegranby.com/en/animals/blue-wildebeest) |
+| 13028 | Velocidad | 275 | 209 km/h | [Tucker, 1998, JEB](https://journals.biologists.com/jeb/article/201/13/2061/7683/Diving-Speeds-and-Angles-of-a-Gyrfalcon-Falco) (52–58 m/s, seguimiento óptico) |
+
+Los 45 km/h del elefante eran el caso más claro: Hutchinson midió más de 2.400 zancadas de
+elefantes africanos y asiáticos y la mayor velocidad fiable fue de 6,8 m/s. El gerifalte pasa
+de una cifra sin origen a once picados cronometrados con aparato óptico.
+
+### Cerrados sustituyendo la carta
+
+Cuatro cartas no tenían arreglo cambiando el número, porque el problema era el animal.
+
+| ID | Antes | Ahora | Motivo y fuente |
+|---|---|---|---|
+| 12038 | Esponja de aguas profundas, 3.300 años | Esponja barril gigante de Curaçao, 2.300 años | «Esponja de aguas profundas» no es una especie. Se sustituye por un ejemplar concreto de *Xestospongia muta* datado con las ecuaciones de [McMurray et al., 2008](https://link.springer.com/article/10.1007/s00227-008-1014-z) |
+| 13025 | Vencejo de garganta blanca, 182 km/h | Ser humano: Usain Bolt, 44,7 km/h | Los 170 km/h del vencejo de garganta blanca se citan en todas partes, pero el método nunca se publicó. Se sustituye por la punta mejor medida de cualquier animal: [informe biomecánico de World Athletics, Berlín 2009](https://worldathletics.org/download/download?filename=76ade5f9-75a0-4fda-b9bf-1b30be6f60d2.pdf&urlslug=1+-+Biomechanics+Report+WC+Berlin+2009+Sprint+Men) |
+| 13026 | Águila real, 210 km/h | Murciélago de cola libre brasileño, 160 km/h | Había **dos** cartas de águila real haciendo lo mismo. Se conserva una y esta pasa al vuelo horizontal más rápido registrado: [McCracken et al., 2016](https://royalsocietypublishing.org/doi/10.1098/rsos.160398) |
+| 13029 | Halcón sacre, 315 km/h | Vencejo común, 111,6 km/h | Ningún picado de sacre está medido. Se sustituye por el récord de vuelo horizontal de un ave, con radar de la Universidad de Lund: [Guinness World Records](https://www.guinnessworldrecords.com/world-records/fastest-bird-level-flight) |
+
+La carta que se conserva del águila real (13027) queda en 240 km/h, el extremo inferior del
+rango de [Birds of the World](https://birdsoftheworld.org/bow/species/goleag/cur/behavior), y
+dice en su explicación que son cifras referidas y no cronometradas.
+
+### Empates y cifras próximas que esto genera
+
+Tres parejas quedan a menos de un 8 %, y se dejan así a propósito: son dos valores documentados
+que resultan estar cerca, y el mazo tiene prohibido moverlos para separarlos.
+
+- **Guepardo 112 y vencejo común 111,6 km/h** (0,4 %). Es el peor par del mazo para jugar y a la
+  vez el mejor dato: un vencejo en vuelo horizontal va tan rápido como un guepardo esprintando.
+- **Manatí 24,1 y elefante 24,5 km/h** (1,7 %).
+- **León 78 y ñu azul 80 km/h** (2,6 %). El 78 del león sigue sin fuente; si algún día se cierra,
+  este par se recoloca solo.
+
+Si alguno resulta molesto en la mesa, la salida correcta es cambiar de animal, no de cifra.
+
+### Los trece que siguen abiertos
+
+| Mazo | ID | Por qué no se cierra |
+|---|---|---|
+| Longevidad | 12001, 12002 | «Efímera» y «mosca de mayo» son el mismo orden de insectos: son dos cartas del mismo animal. Falta elegir especie y separar fase adulta de ciclo completo. |
+| Longevidad | 12032, 12033, 12034 | Las estimaciones publicadas de esponjas van de 15.000 a 40.000 años y un seguimiento de McMurdo no detectó crecimiento en 22 años, lo que invalida los modelos de crecimiento. Ninguna sostiene 650, 850 ni 1.100. |
+| Longevidad | 12035 | Sin colonia identificada ni estudio para los 1.450 años del coral de bambú. |
+| Velocidad | 13002, 13003, 13006, 13033, 13034 | Invertebrados lentos. No hay fuente institucional ni experimental que dé una cifra por especie. |
+| Velocidad | 13008 | Sin fuente para la marcha del panda gigante. |
+| Velocidad | 13009 | Las referencias divulgativas dan 2,5–2,8 km/h caminando, por encima del 1,7 de la carta, pero no se ha localizado la medición original. |
+
+Las tres esponjas y el coral de bambú son ahora el bloque más flojo del juego: cuatro cartas
+seguidas con cifras redondas que ninguna literatura respalda. Cerrarlas pide sustituirlas por
+organismos datados, y no hay cuatro con fecha publicada en ese tramo. Se dejan marcadas.
+
+### Integridad
+
+- Se conservan las 38 cartas de cada mazo de Naturaleza y los 933 identificadores.
+- **Peso queda sin pendientes**, así que su aviso «en revisión» desaparece del juego. La prueba
+  de accesibilidad comprobaba ese aviso sobre el mazo de peso; ahora comprueba las dos caras
+  —que aparece donde quedan pendientes y que desaparece donde no— en vez de dar por hecho que
+  siempre hay alguno.
+- `npm test` pasa 340 comprobaciones.
+- La caché pasa a `continuum-v40`. Conviene empezar partidas nuevas de Naturaleza: cambian
+  valores en los tres mazos.

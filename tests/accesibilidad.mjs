@@ -88,7 +88,10 @@ console.log("\nLas reglas se adaptan al mazo");
   click(w, '[data-action="rules"]');
   const texto = el(w, ".overlay .modal").textContent;
   ok("peso muestra su dato oculto", /peso oculto/i.test(texto));
-  ok("los mazos con pendientes lo explican", /en revisión/.test(texto));
+  // El aviso depende del mazo, así que se comprueban los dos lados: aparece donde
+  // quedan cartas sin cerrar y desaparece en cuanto un mazo ya no tiene ninguna.
+  ok("los mazos con pendientes lo explican", /en revisión/.test(w.CONTINUUM.guideMarkup("speed", "local")));
+  ok("y los mazos sin pendientes no lo dicen", !/en revisión/.test(texto));
   ok("los empates exactos se admiten", /mismo valor/.test(texto));
   ok("el Pulso se explica fuera de solitario", /Carta Pulso activa/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: true })));
   ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));

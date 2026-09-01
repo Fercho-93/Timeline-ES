@@ -10,7 +10,7 @@ window.ANIMAL_WEIGHT_CARDS = [
   { id: 10006, value: 0.4, title: "Rata parda (media publicada)", detail: "Animal Diversity Web recoge una masa media de 400 g y un rango de 140 a 500 g. La media describe esa referencia, no a todos los individuos.", source: "https://animaldiversity.org/accounts/Rattus_norvegicus/" },
   { id: 10007, value: 0.35, title: "Paloma bravía", detail: "La paloma común de las ciudades suele pesar alrededor de 350 gramos." },
   { id: 10008, value: 0.9, title: "Cobaya", detail: "Una cobaya adulta suele pesar cerca de 900 gramos, aunque el rango depende mucho de su raza." },
-  { id: 10009, value: 2.5, title: "Liebre europea · en revisión", detail: "Dato pendiente de verificación. Falta una fuente homogénea que respalde 2,5 kg como peso típico de un adulto.", reviewStatus: "pending" },
+  { id: 10009, value: 5, title: "Liebre europea (límite del rango)", detail: "Animal Diversity Web da un rango adulto de 3 a 5 kg. Se ordena por el extremo superior de ese rango; los 2,5 kg anteriores no estaban respaldados.", source: "https://animaldiversity.org/accounts/Lepus_europaeus/" },
   { id: 10010, value: 4.5, title: "Gato doméstico", detail: "Un gato adulto de tamaño común ronda los cuatro o cinco kilogramos." },
   { id: 10011, value: 6.5, title: "Zorro rojo", detail: "Un zorro rojo adulto pesa aproximadamente seis kilos y medio; las hembras suelen ser algo más ligeras." },
   { id: 10012, value: 35, title: "Castor europeo (límite del rango)", detail: "Animal Diversity Web recoge un rango adulto de 13 a 35 kg. Se ordena por el extremo superior de ese rango, no por un peso medio.", source: "https://animaldiversity.org/accounts/Castor_fiber/" },
