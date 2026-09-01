@@ -864,3 +864,74 @@ podido salir: **Usain Bolt** y el **caballo Winning Brew**, este a un 0,5 % del 
 - 38 cartas por mazo, 933 identificadores, cero cartas avisadas.
 - `npm test` pasa 345 comprobaciones. Techo de mudas a 27.
 - La caché pasa a `continuum-v46`.
+
+## Ronda 12: la literatura de locomoción, y por qué había que mirarla (1 de septiembre de 2026)
+
+Se abandonan las fichas de zoo y se va a los artículos de biomecánica. **Velocidad pasa de 8
+mudas a 4** y la deuda total de 27 a 23. Pero lo importante es lo que aparece al mirar ahí:
+**el extremo lento del mazo estaba inventado, y por factores enormes.**
+
+### Cuatro cartas cerradas, cuatro errores de magnitud
+
+| Carta | Tenía | Medido | Se equivocaba por |
+|---|---:|---:|---:|
+| Lapa | 0,17 km/h | **0,00036 km/h** (0,6 cm/min) | **×470** |
+| Cangrejo ermitaño | 4,6 km/h | **0,23 km/h** | ×20 |
+| Cucaracha americana | 5,8 km/h | **5,4 km/h** | ×1,07 |
+| Hormiga roja | 0,104 km/h | — sustituida | — |
+
+- **Lapa.** El seguimiento de *Patella vulgata* da una media de 0,6 cm por minuto en el trayecto
+  de ida y vuelta al pasto: 36 centímetros a la hora. La carta la hacía casi quinientas veces
+  más rápida. [Estudio de actividad de forrajeo](https://www.sciencedirect.com/science/article/pii/0022098185901339)
+- **Cangrejo ermitaño.** Herreid y Full cronometraron a *Coenobita compressus* en playa y en
+  cinta: media de 0,23 km/h. [JEB 120:283](https://journals.biologists.com/jeb/article/120/1/283/4963/Locomotion-of-Hermit-Crabs-Coenobita-Compressus-on)
+- **Cucaracha.** Full y Tu midieron hasta 1,5 m/s, cincuenta longitudes de cuerpo por segundo,
+  y a esa velocidad la cucaracha deja el trípode y corre con cuatro patas o con dos.
+  [JEB 156:215](https://journals.biologists.com/jeb/article/156/1/215/6299/Mechanics-of-A-Rapid-Running-Insect-Two-Four-and)
+- **Hormiga.** La roja no tenía cifra documentada; entra la **hormiga plateada del Sáhara**,
+  cronometrada en 855 mm/s —3,08 km/h, 106 longitudes de cuerpo por segundo— por Pfeffer y
+  colaboradores. [JEB 222:jeb198705](https://journals.biologists.com/jeb/article/222/20/jeb198705/224418/High-speed-locomotion-in-the-Saharan-silver-ant)
+
+Las tres primeras eran cartas que nadie habría mirado dos veces. Una lapa a 0,17 km/h suena
+lenta, y lo parece al lado de un guepardo; solo al buscar la medición se ve que es casi
+quinientas veces la velocidad real. **Sonar plausible no es ser cierto**, y el extremo lento del
+mazo era justo donde eso no se notaba.
+
+### El formato, otra vez, tapaba el dato
+
+A 0,00036 km/h el redondeo enseñaba «0 km/h». `compactSpeed` baja ahora a **metros por hora**
+por debajo de 0,01 km/h, igual que la longevidad bajó a minutos para la efímera. La lapa se lee
+«0,36 m/h». Es la segunda vez que el formato no llegaba adonde llegaba el dato.
+
+### Las cuatro que siguen sin fuente
+
+Cangrejo araña, topo europeo, gallina doméstica y erizo europeo. En las cuatro hay literatura de
+locomoción pero no devuelve una velocidad comparable:
+
+- **Erizo.** Lo que hay publicado es velocidad **media de desplazamiento diario** —0,12 a 0,25
+  km/h en un estudio de presupuestos de actividad—, que no es lo mismo que a qué velocidad corre.
+  Usarla lo pondría junto al perezoso, y sería mezclar dos medidas distintas: exactamente el
+  error del que ya se corrigió el perezoso.
+- **Topo.** Lo publicado es la velocidad de **excavación**, unos 4 m/h, no la de desplazamiento.
+- **Gallina y cangrejo araña.** Hay estudios de cinemática y de marcha, pero sin cifra de
+  velocidad máxima en los resúmenes consultados.
+
+Dado el factor de error encontrado en sus tres vecinas, **es razonable sospechar que estas
+cuatro también estén infladas**. No se tocan sin medición, pero conviene no leerlas como si
+estuvieran comprobadas.
+
+### Estado
+
+| | Antes | Ahora |
+|---|---:|---:|
+| Con fuente | 87 | **91** |
+| Sin fuente | 27 | **23** |
+| En revisión | 0 | 0 |
+
+Por mazo: Peso 31/7, Longevidad 26/12, **Velocidad 34/4**.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 23.
+- La caché pasa a `continuum-v47`. Cambian cuatro velocidades y el formato de las más lentas.

@@ -72,6 +72,12 @@
   }
 
   function compactSpeed(value) {
+    // Hay animales que se miden en centímetros por minuto. En km/h el redondeo los
+    // enseñaba como «0», así que por debajo de 0,01 la escala baja a metros por hora.
+    if (value < 0.01) {
+      const metros = value * 1000;
+      return `${metros.toLocaleString("es-ES", { maximumFractionDigits: metros < 1 ? 2 : 1 })} m/h`;
+    }
     const decimals = value < 1 ? 3 : 2;
     return `${value.toLocaleString("es-ES", { maximumFractionDigits: decimals })} km/h`;
   }
