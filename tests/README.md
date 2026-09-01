@@ -105,7 +105,7 @@ duplican jugadas. La vista responsive no sustituye una prueba en un iPhone real.
 `node tests/movimiento.mjs` verifica además interrupciones, foco, cancelación,
 gestos, navegación y el comportamiento con movimiento reducido.
 
-## Fantasma y dificultades (reparto v37)
+## Fantasma, Pulso y dificultades (poderes v38)
 
 `npm test` incluye 90.000 repartos deterministas, uso y duración del Fantasma,
 minimapa sin pistas, guardado tras resolver, victoria con poder sin gastar,
@@ -116,6 +116,8 @@ de Firestore. Comprueba activación, revelado, cooldown, robos, Pulso, salidas,
 cantidad fija por jugadores, posiciones de todo el mazo con mezcla 50/50 y rechazo de
 escrituras que inventan o roban poderes. También prueba la recolocación de duplicados,
 dos robos encadenados en un desempate, el agotamiento del mazo, la privacidad de la
-interfaz y la compatibilidad con partidas v36. Comprueba los ejemplos de probabilidad
+interfaz y la compatibilidad con partidas anteriores. Pulso comprueba además inventario
+privado, consumo, victoria sin gastarlo, reparto conjunto sin posiciones compartidas y
+rechazo online de usos o asignaciones inventados. Comprueba los ejemplos de probabilidad
 con 50, 200 y 500 cartas disponibles usando márgenes estadísticos.
 No sustituye una prueba de Safari en un iPhone físico.

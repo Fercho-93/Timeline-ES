@@ -81,19 +81,20 @@ try {
  const outdated=fixture();outdated.status='lobby';outdated.phase='lobby';delete outdated.ghost;outdated.timeline=[];outdated.deck=[];Object.values(outdated.players).forEach(p=>p.hand=[]);await seed(outdated);
  await clients[0].call('renderLobby');await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
  // Arranque real, nueve personas y mazo pequeño: reparto igual y una carta reservada.
- const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:37} ]));await seed(lobby);
+ const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:38} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
  assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,38);
  assert.equal(s.ghost.distribution,2);assert.equal(s.ghost.cards.length,3);
- // Máximo de poderes y jugadores: también debe caber en el límite de reglas.
- const maximum=clone(s);maximum.ghost={cards:[s.players[A].hand[0],s.players[B].hand[0],s.players[C].hand[0]],owners:[A,B,C],used:[],pending:[],cooldown:[],actor:'',fresh:false};
- await seed(lobby);await updateDoc(ref(A),maximum);
- const stale=clone(lobby);stale.players[B].clientVersion=35;await seed(stale);await assertFails(updateDoc(ref(A),maximum));
- const modern=clone(maximum);modern.ghost.distribution=2;
- const previous=clone(lobby);previous.players[B].clientVersion=36;await seed(previous);await assertFails(updateDoc(ref(A),modern));
- await seed(lobby);const missing=clone(modern);missing.ghost.cards.pop();missing.ghost.owners.pop();await assertFails(updateDoc(ref(A),missing));
- await updateDoc(ref(A),modern);
+ // Pulso usa el mismo reparto, sin compartir posiciones con Fantasma.
+ await seed(lobby);await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-pulse').checked=true;await clients[0].call('startRoom');
+ s=await snapshot();assert.equal(s.pulsePower.cards.length,3);assert.equal(s.pulsePower.used.length,0);
+ assert.equal(s.pulsePower.cards.filter(id=>s.ghost.cards.includes(id)).length,0);
+ assert.equal(new Set([...s.pulsePower.cards,...s.ghost.cards]).size,6);
+ // Pulso también bloquea el arranque normal si queda un cliente v37 en la mesa.
+ const pulsePrevious=clone(lobby);pulsePrevious.players[B].clientVersion=37;await seed(pulsePrevious);
+ await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-pulse').checked=true;
+ await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
  const three=fixture();three.phase='reveal';three.current=2;three.turnsInRound=2;Object.values(three.players).forEach(p=>p.hand=[]);three.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};three.ghost.cards=[15,16,17];three.ghost.owners=['','',''];
  await seed(three);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).ghost.owners,[A,B,C]);
  const modernThree=clone(three);modernThree.ghost.distribution=2;
@@ -132,5 +133,18 @@ try {
  const exhausted=clone(balanced);exhausted.deck=[15];exhausted.ghost.used=[A];await seed(exhausted);await play(clients[0],false);s=await snapshot();
  assert.deepEqual(s.ghost.owners,[A,A]);assert.deepEqual(s.ghost.used,[A]);
  assert.equal(clients[0].w.CONTINUUM.Ghost.owns(s.ghost,A),false);
+ // Pulso robable: solo su dueño lo ve, se consume al lanzarlo y no cuenta en la mano.
+ const pulseOwned=fixture();pulseOwned.ghost.distribution=2;pulseOwned.pulsePower={distribution:2,cards:[7,16],owners:[A,''],used:[]};
+ await seed(pulseOwned);
+ await clients[0].call('renderGame');assert.ok(clients[0].w.document.querySelector('.pulse-power'));
+ assert.equal(clients[0].w.document.querySelectorAll('.hand-card').length,3);
+ await clients[1].call('renderGame');assert.equal(clients[1].w.document.querySelector('.pulse-power'),null);
+ await clients[0].call('startPulse',B);s=await snapshot();assert.deepEqual(s.pulsePower.used,[A]);assert.equal(s.players[A].hand.length,3);
+ assert.equal(s.phase,'pulse');assert.equal(s.pulsePower.owners[1],'');
+ const forgedPulse=clone(s);forgedPulse.pulsePower.used=[A,B];forgedPulse.version++;
+ await assertFails(updateDoc(ref(B),forgedPulse));
+ // Recibir un Pulso en un robo normal no sustituye la penalización.
+ const pulseDraw=fixture();pulseDraw.ghost={...pulseDraw.ghost,distribution:2,cards:[6,17]};pulseDraw.pulsePower={distribution:2,cards:[15],owners:[''],used:[]};
+ await seed(pulseDraw);await play(clients[0],false);s=await snapshot();assert.equal(s.pulsePower.owners[0],A);assert.equal(s.players[A].hand.length,3);
  console.log('  Inicio, activación, turnos, dos clientes, robos, Pulso, salidas y escrituras rechazadas: OK');
 } finally {clients.forEach(c=>c.w.close());await env.cleanup();}

@@ -636,6 +636,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .ghost-banner > span { font-size: 1.8rem; }
 .ghost-banner small, .ghost-power small { display: block; margin-top: 4px; font-size: .78rem; line-height: 1.45; color: var(--muted, #766e63); }
 .ghost-power { display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px; margin: 16px 0; text-align: left; font: inherit; color: inherit; background: transparent; border: 1px solid var(--line, #d8d2c8); border-radius: 16px; cursor: pointer; min-height: 64px; }
+.pulse-power { border-color: rgba(184,117,34,.38); background: linear-gradient(135deg,rgba(255,248,226,.96),rgba(251,236,195,.84)); }
 .ghost-power > span:first-child { font-size: 2rem; }
 .ghost-power:disabled { cursor: default; opacity: .6; }
 .ghost-power:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }

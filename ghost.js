@@ -14,29 +14,33 @@
   // 0.5/N + (está entre las primeras 12*P ? 0.5/W : 0), con W=min(N,12*P).
   // Es la mezcla 50/50 entre todo el mazo y la zona inicial, sin reemplazo:
   // también puede tocar la última carta. N excluye la que inicia el tablero.
-  function create(deck, count, handSize, random = Math.random) {
+  function choose(deck, count, handSize, amount, random = Math.random) {
     const dealt = count * handSize;
     const eligible = deck.filter((_, i) => i !== dealt);
     const windowSize = Math.min(eligible.length, 12 * count);
     const slots = eligible.map((id, i) => ({ id, weight: 0.5 / eligible.length + (i < windowSize ? 0.5 / windowSize : 0) }));
-    const chosen = [];
-    const amount = Math.min(slots.length, 3, Math.ceil(count / 3));
-    for (let n = 0; n < amount; n++) {
+    const picked = [];
+    const limit = Math.min(slots.length, amount);
+    for (let n = 0; n < limit; n++) {
       let pick = random() * slots.reduce((sum, slot) => sum + slot.weight, 0);
       let at = 0;
       while (at < slots.length - 1 && (pick -= slots[at].weight) >= 0) at++;
-      chosen.push(slots.splice(at, 1)[0].id);
+      picked.push(slots.splice(at, 1)[0].id);
     }
+    return picked;
+  }
+  function create(deck, count, handSize, random = Math.random) {
+    const chosen = choose(deck, count, handSize, Math.min(3, Math.ceil(count / 3)), random);
     return { distribution: 2, cards: chosen, owners: chosen.map(() => ""), used: [], pending: [], cooldown: [], actor: "", fresh: false };
   }
 
-  function claim(ghost, cardId, playerId, remainingDeck = [], random = Math.random) {
+  function claim(ghost, cardId, playerId, remainingDeck = [], random = Math.random, occupied = []) {
     if (!ghost) return;
     const index = ghost.cards.indexOf(cardId);
     if (index < 0 || ghost.owners[index]) return;
     const id = String(playerId);
     if (ghost.distribution === 2 && ghost.owners.includes(id)) {
-      const candidates = remainingDeck.filter(card => !ghost.cards.includes(card));
+      const candidates = remainingDeck.filter(card => !ghost.cards.includes(card) && !occupied.includes(card));
       if (candidates.length) {
         ghost.cards[index] = candidates[Math.floor(random() * candidates.length)];
         return;
@@ -91,6 +95,35 @@
     const hint = size < 5 ? "Disponible con 5 cartas en el tablero" : ghost.pending.length ? "Ya hay un Fantasma activo" : ghost.cooldown.length ? "Espera una vuelta con valores visibles" : "Oculta los valores durante una vuelta";
     return `<button class="ghost-power" ${action} ${ready ? "" : "disabled"}><span aria-hidden="true">◌</span><span><b>Carta Fantasma</b><small>${hint}</small><small>No cuenta para ganar · un uso</small></span></button>`;
   }
+  function createPowers(deck, count, handSize, ghostEnabled = true, pulseEnabled = false, random = Math.random) {
+    const each = Math.min(3, Math.ceil(count / 3));
+    const types = [...(ghostEnabled ? Array(each).fill("ghost") : []), ...(pulseEnabled ? Array(each).fill("pulse") : [])];
+    for (let i = types.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [types[i], types[j]] = [types[j], types[i]];
+    }
+    const cards = choose(deck, count, handSize, types.length, random);
+    const byType = type => cards.filter((_, i) => types[i] === type);
+    const ghostCards = byType("ghost"), pulseCards = byType("pulse");
+    return {
+      ghost: ghostEnabled ? { distribution: 2, cards: ghostCards, owners: ghostCards.map(() => ""), used: [], pending: [], cooldown: [], actor: "", fresh: false } : null,
+      pulsePower: pulseEnabled ? { distribution: 2, cards: pulseCards, owners: pulseCards.map(() => ""), used: [] } : null
+    };
+  }
+  function claimPowers(state, cardId, playerId, remainingDeck = [], random = Math.random) {
+    if (state?.ghost?.cards.includes(cardId)) claim(state.ghost, cardId, playerId, remainingDeck, random, state.pulsePower?.cards || []);
+    else if (state?.pulsePower?.cards.includes(cardId)) claim(state.pulsePower, cardId, playerId, remainingDeck, random, state.ghost?.cards || []);
+  }
+  function ownsPulse(pulsePower, playerId) { return owns(pulsePower, playerId); }
+  function consumePulse(pulsePower, playerId) {
+    if (pulsePower && ownsPulse(pulsePower, playerId)) pulsePower.used.push(String(playerId));
+  }
+  function pulsePower(pulse, id, handSize, action, enabled = true) {
+    if (!ownsPulse(pulse, id)) return "";
+    const ready = enabled && handSize >= 2;
+    const hint = handSize < 2 ? "Necesitas dos cartas normales para lanzarlo" : "Reta a alguien en lugar de colocar tu carta";
+    return `<button class="ghost-power pulse-power" ${action} ${ready ? "" : "disabled"}><span aria-hidden="true">⚡</span><span><b>Carta Pulso</b><small>${hint}</small><small>No cuenta para ganar · un uso</small></span></button>`;
+  }
   function level(key) { return LEVELS[key] || LEVELS.easy; }
   function difficultySelect(id, selected = "easy") {
     return `<div class="field difficulty-field"><label for="${id}">Dificultad</label><select id="${id}">${Object.entries(LEVELS).map(([key, info]) => `<option value="${key}" ${key === selected ? "selected" : ""}>${info.name}</option>`).join("")}</select><p class="hint" data-difficulty-help>${level(selected).description}</p></div>`;
@@ -107,4 +140,5 @@
     return schedule;
   }
   CT.Ghost = { create, claim, owns, available, activate, advance, remove, hiddenCard, banner, power, level, difficultySelect, soloSchedule, LEVELS };
+  CT.Powers = { create: createPowers, claim: claimPowers, ownsPulse, consumePulse, pulsePower };
 })();

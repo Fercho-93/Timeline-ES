@@ -31,13 +31,39 @@ const cartas = w => new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
 
 // Una partida servida a medida: así se sabe exactamente qué carta sale en el Pulso y
 // dónde hay que colocarla para acertar o para fallar a propósito.
-function partida({ manos, timeline, deck, pulse = true, round = 1, players: extra = {} }) {
+function partida({ manos, timeline, deck, pulse = true, pulsePower, ghost, round = 1, players: extra = {} }) {
   return JSON.stringify({
     mode: "history", pulse,
     players: manos.map((hand, i) => ({ id: i + 1, name: `J${i + 1}`, hand, pulseUsed: false, shieldRound: 0, ...(extra[i] || {}) })),
     deck, discard: [], timeline, current: 0, starter: 0, turnsInRound: 0, round,
-    winner: null, winners: null, pulseTurn: null, pulseGift: null
+    winner: null, winners: null, pulseTurn: null, pulseGift: null,
+    ...(pulsePower ? { pulsePower } : {}), ...(ghost ? { ghost } : {})
   });
+}
+
+console.log("\nPulso como poder secreto");
+{
+  const base = { manos: [[1, 2], [3, 4]], timeline: [15, 21], deck: [20, 24, 25],
+    pulsePower: { distribution: 2, cards: [1], owners: ["1"], used: [] } };
+  const owner = boot({ [CLAVE]: partida(base) }); entrar(owner);
+  ok("solo el propietario ve la Carta Pulso", existe(owner, ".pulse-power"));
+  ok("el poder no aumenta el contador de su mano", estado(owner).players[0].hand.length === 2);
+  click(owner, '[data-action="pulse-open"]'); click(owner, '[data-action="pulse-target"]');
+  ok("se consume al lanzarlo", estado(owner).pulsePower.used.includes("1"));
+
+  const rival = boot({ [CLAVE]: partida({ ...base, pulsePower: { ...base.pulsePower, owners: ["2"] } }) }); entrar(rival);
+  ok("el jugador que no lo tiene no ve ni puede lanzar Pulso", !existe(rival, '[data-action="pulse-open"]'));
+
+  const una = boot({ [CLAVE]: partida({ ...base, manos: [[1], [3, 4]] }) }); entrar(una);
+  ok("con una carta el poder se ve, pero queda bloqueado", existe(una, ".pulse-power:disabled"));
+
+  const ganado = partida({ ...base, manos: [[], [3, 4]], pulsePower: { distribution: 2, cards: [1], owners: ["1"], used: [] } });
+  const guardado = JSON.parse(ganado);guardado.current=1;guardado.turnsInRound=1;
+  const w = boot({ [CLAVE]: JSON.stringify(guardado) });entrar(w);
+  const card=w.HISTORY_CARDS.find(c=>c.id===3),board=estado(w).timeline.map(id=>w.HISTORY_CARDS.find(c=>c.id===id));
+  const at=w.CONTINUUM.correctIndex("history",board,card);
+  w.document.querySelector('[data-action="select-card"]').click();w.document.querySelectorAll('[data-action="place"]')[at].click();click(w,'[data-action="confirm-place"]');click(w,'[data-action="finish-turn"]');
+  ok("guardar Pulso sin utilizar no impide ganar", estado(w).winner === 1);
 }
 
 // Total de cartas repartidas por todas partes: tiene que ser invariante.
