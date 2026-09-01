@@ -489,3 +489,82 @@ Las 57 mudas son el trabajo pendiente real, y algunas ya huelen mal:
 - `npm test` pasa 344 comprobaciones.
 - La caché pasa a `continuum-v41`. Cambian valores en Longevidad y Velocidad y cambia el
   formato de los valores pequeños: conviene empezar partidas nuevas de Naturaleza.
+
+## Ronda 7: primera tanda contra las 57 mudas (1 de septiembre de 2026)
+
+Se ataca la deuda de fuentes documentada en la ronda anterior. **La deuda baja de 57 a 45.**
+Doce cartas de Peso pasan a llevar respaldo, y en el camino aparecen dos cifras que estaban mal.
+
+### Cómo se ha trabajado, y por qué importa
+
+La red de esta sesión no deja descargar páginas: solo se ven resúmenes de búsqueda. Para que
+eso no se convierta en citar de oído, se ha seguido una regla estricta: **solo se anota una
+fuente cuando la búsqueda estaba restringida al dominio de esa fuente y devolvió una cifra
+concreta para esa especie.** Todo lo que salió vago, ausente o mezclado con otra especie se ha
+dejado sin tocar. De unas quince consultas, cuatro se descartaron por eso.
+
+No es una precaución teórica. En esta misma tanda, una consulta sobre la cebra devolvió el peso
+de la cebra de Grevy, y otra sobre el zorro llegó a mezclar tres cánidos. Anotar esas
+respuestas habría metido errores nuevos en el mazo con aspecto de estar documentado, que es
+justo lo que estas auditorías intentan evitar.
+
+### Cartas cerradas (12)
+
+| ID | Carta | Valor | Fuente |
+|---|---|---:|---|
+| 10011 | Zorro rojo (adulto típico) | 6,5 kg | ADW, rango 3–14 |
+| 10015 | Lobo gris (media de hembras publicada) | 45 kg | ADW, hembras 23–55 (media 45), machos 30–80 (media 55) |
+| 10016 | Capibara (adulto grande) | 60 kg | ADW, rango 35–66 |
+| 10018 | Panda gigante (adulto típico) | 110 kg | Smithsonian: Mei Xiang 112 kg, Tian Tian 123,6 kg en 2022 |
+| 10019 | Oso negro americano (adulto típico) | 150 kg | ADW, machos 47–409, hembras 39–236 |
+| 10020 | León africano (macho adulto) | 190 kg | San Diego Zoo, machos 150–260 |
+| 10021 | Tigre de Bengala (macho adulto) | 250 kg | San Diego Zoo, hasta 295 |
+| 10024 | Alce (macho de la subespecie de Alaska) | 700 kg | ADW, machos 360–600 y hasta 771 en Alaska |
+| 10026 | Jirafa (límite de las hembras) | 1.200 kg | ADW, hembras hasta 1.180, machos hasta 1.930 |
+| 10027 | Hipopótamo común (hembra adulta) | 1.500 kg | San Diego Zoo, hembras 1.400 de media |
+| 10033 | Ballena gris (hasta, aprox.) | **40.800 kg** | NOAA, unas 90.000 libras |
+| 10022 | Cebra de llanura | — | pasa a revisión, ver abajo |
+
+En casi todas, el número ya era razonable y lo que faltaba era decir de dónde salía y de qué
+es medida: si es una media, un límite de rango o un sexo concreto. Los títulos ahora lo dicen.
+
+### Dos cifras que estaban mal
+
+- **Ballena gris: 25.000 → 40.800 kg.** NOAA da unas 90.000 libras. Las 25 toneladas no salían
+  de ninguna parte. Con el cambio, la ballena gris pasa por delante de la jorobada en la línea.
+- **Cebra de llanura, 350 kg: pasa a revisión.** San Diego Zoo describe la de llanura como la
+  **más pequeña** de las tres especies de cebra, y sitúa en 350–450 kg a la de Grevy, que es la
+  **mayor**. Darle 350 kg a la más pequeña no encaja. No se ha encontrado cifra publicada con la
+  que sustituirla, así que se marca en vez de dejarla como si estuviera comprobada.
+
+Esto sube los avisos de 4 a 5. El techo del test se sube a la vez y con motivo: el mecanismo
+existe para que la deuda no crezca **en silencio**, no para empujar a esconder un hallazgo con
+tal de mantener un contador en verde. Encontrar un error y marcarlo es el test funcionando.
+
+### Estado de la deuda
+
+| | Antes | Ahora |
+|---|---:|---:|
+| Sin fuente y sin aviso | 57 | **45** |
+| En revisión | 4 | 5 |
+| Con fuente | 53 | 64 |
+
+Techos del test actualizados a 45 y 5. Reparto de lo que queda: 18 en Peso, 12 en Longevidad
+y 15 en Velocidad.
+
+### Lo que falta y a qué ritmo va
+
+Quedan 45. Al ritmo real de esta tanda —con los descartes incluidos— son del orden de cincuenta
+consultas más. Se puede seguir por tandas; el orden sensato es acabar Peso, que es el que mejor
+cubre Animal Diversity Web, y dejar para el final las tres señaladas en la ronda anterior
+(caracol de jardín, perezoso y el peregrino a 360 km/h), que necesitan decidir antes **qué**
+miden, no solo de dónde sale el número.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones. La prueba de accesibilidad apuntaba al mazo de Peso para
+  comprobar que un mazo sin pendientes no muestra el aviso; como Peso vuelve a tener uno, ahora
+  apunta a Longevidad, que sí está limpio.
+- La caché pasa a `continuum-v42`. Cambia el peso de la ballena gris, así que conviene empezar
+  partidas nuevas de Naturaleza.
