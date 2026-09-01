@@ -803,3 +803,64 @@ dato atado y haya que decidir qué hacer con él.
 - `npm test` pasa 345 comprobaciones. Techos a 28 mudas y **0 avisos**.
 - La caché pasa a `continuum-v45`. Cambian siete cartas de golpe: hay que empezar partidas
   nuevas de Naturaleza.
+
+## Ronda 11: el resto, y por qué se para aquí (1 de septiembre de 2026)
+
+Se cierra el cachalote y la deuda queda en **27 mudas de 114 cartas**. Pero lo importante de
+esta ronda no es la carta que entra, sino que las 27 que quedan ya no son un resto cualquiera:
+tienen todas la misma forma, y conviene decir cuál antes de seguir gastando esfuerzo.
+
+### Lo cerrado
+
+**Cachalote: 50.000 → 40.800 kg.** NOAA da machos de unos 52 pies y casi 45 toneladas cortas,
+frente a las 15 toneladas de las hembras. Queda **empatado con la ballena gris**, porque NOAA
+da a las dos la misma cifra: 45 toneladas cortas son exactamente 90.000 libras. Es un empate
+real, no un descuido, y los motores lo aceptan en los dos órdenes.
+
+### Las 27 que quedan tienen todas la misma pinta
+
+| Mazo | Quedan | Qué son |
+|---|---:|---|
+| Peso | 7 | abeja, monarca, mantis, rana arborícola, paloma, caballo de silla, tiburón ballena |
+| Longevidad | 12 | mosquito, mosca de la fruta, abeja obrera, conejo, ardilla, zorro, perro, gato, águila harpía, elefante, ballena azul, tortuga de Galápagos |
+| Velocidad | 8 | hormiga, lapa, cangrejo araña, topo, cangrejo ermitaño, cucaracha, gallina, erizo |
+
+Son **animales pequeños, domésticos o muy corrientes**. Y ese es justo el problema: las
+instituciones publican fichas de las especies carismáticas, amenazadas o espectaculares. Nadie
+publica cuánto pesa una mantis, a qué velocidad anda una lapa o cuántos años vive una mosca de
+la fruta, porque no hay ninguna razón institucional para hacerlo.
+
+En esta ronda se consultaron, sin éxito y con búsqueda restringida al dominio: los campos de
+longevidad de Animal Diversity Web (no aparecen en los resúmenes), las fichas de San Diego Zoo
+para águila harpía y elefante, All About Birds de Cornell para la paloma, los CDC para el
+mosquito y Georgia Aquarium para el tiburón ballena. Solo el tiburón ballena devolvió cifra
+—20,6 toneladas «como mucho»— y es un máximo, no el valor típico que pide el criterio.
+
+### Lo que esto significa para el criterio
+
+El criterio es «si no está atado, fuera la carta». Aplicado a estas 27:
+
+- **Peso y Longevidad aguantan.** Son 7 y 12 sobre 38. Sustituirlas por especies documentadas
+  es trabajo, pero hay candidatas: el mundo está lleno de mamíferos y aves con ficha.
+- **Velocidad no aguanta bien.** Sus 8 mudas son invertebrados y animales pequeños, y ya se
+  gastaron seis de las siete altas disponibles en la ronda anterior. Los récords de grupo de
+  Guinness —el insecto, el crustáceo, el reptil, la serpiente, el mamífero marino más rápidos—
+  están **agotados**: eran la veta y ya se ha usado.
+
+Hay además dos ejemplares con nombre que el criterio de medias sigue rechazando y que no han
+podido salir: **Usain Bolt** y el **caballo Winning Brew**, este a un 0,5 % del avestruz.
+
+### Las tres decisiones que quedan sobre la mesa
+
+1. **Velocidad.** Con la veta agotada, llevar el mazo a 38 cartas documentadas exige encontrar
+   ocho velocidades más de especies que no apelmacen las bandas ya ocupadas. Puede no existir.
+   Las salidas son: aceptar el mazo con menos ambición, rehacerlo con otro criterio, o retirarlo.
+2. **Bolt y Winning Brew.** Salen en cuanto aparezcan dos velocidades de especie limpias.
+3. **La ballena gris.** Sigue ordenando por un «llega a pesar» de NOAA, que es un máximo. Bajo
+   el criterio de medias necesitaría un valor típico que no se ha encontrado.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero cartas avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 27.
+- La caché pasa a `continuum-v46`.

@@ -109,7 +109,7 @@ console.log("\nDeuda de fuentes en Naturaleza");
   const naturaleza = [...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS];
   const enRevision = naturaleza.filter(card => card.reviewStatus === "pending");
   const mudas = naturaleza.filter(card => !card.source && card.reviewStatus !== "pending");
-  const TECHO_MUDAS = 28;
+  const TECHO_MUDAS = 27;
   const TECHO_REVISION = 0;
   ok(`${mudas.length} cartas sin fuente y sin aviso (techo ${TECHO_MUDAS}, solo puede bajar)`, mudas.length <= TECHO_MUDAS);
   ok(`${enRevision.length} cartas en revisión (techo ${TECHO_REVISION}, solo puede bajar)`, enRevision.length <= TECHO_REVISION);
