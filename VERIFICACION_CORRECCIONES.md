@@ -1031,3 +1031,72 @@ por una reconstrucción sin verificar. Se anota la sospecha en la propia carta.
 
 Se descartó además el estudio de locomoción de ratas topo desnudas (JEB, 2025): mide marcha
 rápida a 10 cm/s en cinta, que es un protocolo experimental, no la velocidad de la especie.
+
+## Ronda 15: las tres decisiones abiertas, resueltas (1 de septiembre de 2026)
+
+### 1. Longevidad con medianas de zoo, solo donde no distorsionen
+
+El criterio elegido fue aplicar la mediana ex situ **únicamente a especies donde zoo y libertad
+no divergen**. Verificado especie a especie, el criterio se aplica a sí mismo con dureza y
+**solo cierra una de las tres candidatas**:
+
+- **Elefante africano: excluido por el propio criterio.** Clubb y colaboradores demostraron en
+  *Science* que los elefantes de zoo viven **la mitad** que los de poblaciones protegidas. Es
+  justo el caso que el criterio B manda dejar fuera.
+  [Compromised survivorship in zoo elephants](https://www.science.org/doi/10.1126/science.1164298)
+- **Águila harpía: no se cierra.** Zoo y libertad sí coinciden —25 a 35 años en ambos—, pero la
+  ficha de The Peregrine Fund no publica la cifra y las que circulan son compilaciones.
+- **Tortuga de Galápagos: cerrada.** 115 → **100 años**. Galápagos Conservancy indica que superan
+  el siglo, hasta el punto de que su longevidad complica la planificación de la conservación.
+  Empata con el erizo rojo: los dos son animales de más de un siglo.
+  [Galápagos Conservancy](https://www.galapagos.org/conservation/giant-tortoise-restoration/)
+
+Que un criterio pensado para ampliar cobertura acabe descartando dos de tres candidatas no es un
+fallo: es la señal de que estaba bien planteado.
+
+### 2. Fuera los dos ejemplares con nombre de Velocidad
+
+| Fuera | Dentro | Fuente |
+|---|---|---|
+| Ser humano: Usain Bolt, 44,7 km/h | Cangrejo nadador de Henslow, **4,68 km/h** | [Guinness, el crustáceo más rápido nadando](https://www.guinnessworldrecords.com/world-records/112624-fastest-swimming-crustacean) |
+| Caballo Winning Brew, 70,35 km/h | Reno, **80 km/h** | [San Diego Zoo](https://animals.sandiegozoo.org/animals/reindeer-caribou) |
+
+**Velocidad ya no contiene ningún ejemplar con nombre.** Dos efectos secundarios buenos: se
+deshace el par avestruz/Winning Brew, que estaba a un 0,5 % y era una moneda al aire, y el
+cangrejo de Henslow cae en un hueco vacío entre el topo y la cucaracha.
+
+El reno empata exactamente con el ñu azul en 80 km/h. Es un empate real y deliberado: dos
+ungulados grandes que corren lo mismo. Se prefirió a meter una carta a un 3 % de otra, porque un
+empate se acierta en los dos órdenes y un 3 % se falla la mitad de las veces.
+
+Se descartó el récord Guinness de galgo (67,32 km/h, Star Title): encajaba en el hueco, pero es
+un ejemplar con nombre, exactamente lo que se estaba quitando.
+
+### 3. La ballena gris pasa de máximo a media
+
+**40.800 → 31.700 kg.** El Departamento de Pesca y Caza de Alaska da una media de 30 a 40
+toneladas cortas en ambos sexos, es decir de 27,2 a 36,3 métricas; la carta ordena por el centro
+de ese rango. Antes ordenaba por el «llega a pesar» de NOAA, que era un máximo.
+[ADF&G](https://www.adfg.alaska.gov/index.cfm?adfg=graywhale.main)
+
+Deshace además el empate exacto que tenía con el cachalote.
+
+### Estado
+
+| | Ronda 6 | Ahora |
+|---|---:|---:|
+| Con fuente | 53 | **95** |
+| Sin fuente | 57 | **19** |
+| En revisión | 4 | **0** |
+
+Por mazo: Peso 31/7, Longevidad 27/11, Velocidad 37/1.
+
+Las cabeceras de `lifespan.js` y `speed.js` decían que las cartas pendientes se señalan antes de
+jugar. Ya no hay ninguna, así que ahora dicen lo que rige: cada carta lleva su fuente o no está
+en el mazo.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 19.
+- La caché pasa a `continuum-v50`. Cambian cuatro cartas: hay que empezar partidas nuevas.

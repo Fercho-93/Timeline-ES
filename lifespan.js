@@ -1,6 +1,6 @@
 // Longevidad de referencia en años, no esperanza de vida universal.
 // El título distingue fase vital, contexto, estadístico y edades de ejemplares/colonias.
-// Las cartas pendientes se señalan antes de jugar; no se consideran verificadas.
+// Ya no se publican cartas sin dato atado: cada una lleva su fuente o no está en el mazo.
 // Véase VERIFICACION_CORRECCIONES.md para fuentes y limitaciones.
 window.ANIMAL_LIFESPAN_CARDS = [
   { id: 12001, value: 0.0000095, title: "Efímera Dolania americana (hembra adulta)", detail: "El portal de biodiversidad de Georgia documenta que la hembra vive hasta cinco minutos como subimago: la vida adulta más corta registrada en un animal. De ninfa pasa hasta dos años enterrada en la arena del río.", source: "https://georgiabiodiversity.org/portal/profile?group=all&es_id=21325" },
@@ -27,7 +27,7 @@ window.ANIMAL_LIFESPAN_CARDS = [
   { id: 12022, value: 36, title: "Hipopótamo común (mediana publicada)", detail: "San Diego Zoo publica una mediana de longevidad de 36 años. Es el valor de referencia de su ficha, no una promesa de vida ni un máximo universal.", source: "https://animals.sandiegozoo.org/animals/hippo" },
   { id: 12023, value: 72, title: "Elefante africano", detail: "Los elefantes pueden vivir varias décadas, con hembras que alcanzan edades muy avanzadas." },
   { id: 12024, value: 90, title: "Ballena azul (límite del rango típico)", detail: "Las estimaciones de edad sugieren una longevidad típica de ochenta a noventa años." },
-  { id: 12025, value: 115, title: "Tortuga gigante de Galápagos", detail: "Estas tortugas pueden superar el siglo de vida y siguen creciendo lentamente durante décadas." },
+  { id: 12025, value: 100, title: "Tortuga gigante de Galápagos (más de un siglo)", detail: "Galápagos Conservancy indica que superan los cien años, hasta el punto de que su longevidad complica la planificación de la conservación. Empata con el erizo rojo: los dos son animales de más de un siglo.", source: "https://www.galapagos.org/conservation/giant-tortoise-restoration/" },
   { id: 12026, value: 50, title: "Guacamayo rojo (límite habitual)", detail: "Animal Diversity Web sitúa su longevidad típica alrededor de cuarenta a cincuenta años. Se compara el extremo superior de ese rango; 145 años no estaba respaldado.", source: "https://animaldiversity.org/accounts/Ara_macao/" },
   { id: 12027, value: 40, title: "Koi (media publicada)", detail: "Smithsonian's National Zoo da una longevidad media de 40 años. Los relatos de ejemplares centenarios no se convierten en una esperanza de vida de 185 años.", source: "https://nationalzoo.si.edu/animals/japanese-koi" },
   { id: 12028, value: 211, title: "Ballena boreal (ejemplar datado)", detail: "El estudio de George y colaboradores (1999) estimó en 211 años un macho a partir de la racemización del aspártico del cristalino. Es la edad de un ejemplar y con un margen amplio, no una media de la especie.", source: "https://cdnsciencepub.com/doi/10.1139/z99-015" },
