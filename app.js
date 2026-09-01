@@ -233,7 +233,7 @@
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
           </div>
           <p class="hint">El mazo esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</p>
-          <label class="opt-row"><span>Pulso <small>Una vez por partida, reta a otra persona con una carta del mazo en vez de jugar tu turno.</small></span><input type="checkbox" id="pulse-toggle"></label>
+          <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"></label>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
       </section>
@@ -262,11 +262,11 @@
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
-    const ghost = CT.Ghost.create(shuffled, names.length, handSize);
+    const powers = CT.Powers.create(shuffled, names.length, handSize, true, pulse);
     const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
     const timeline = [shuffled.shift()];
-    players.forEach(p => p.hand.forEach(id => CT.Ghost.claim(ghost, id, p.id, shuffled)));
-    game = { mode: selectedModeKey, pulse, ghost, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
+    players.forEach(p => p.hand.forEach(id => CT.Powers.claim(powers, id, p.id, shuffled)));
+    game = { mode: selectedModeKey, pulse, ...powers, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
     selectedCardId = null;
     result = null;
     saveGame();
@@ -315,7 +315,7 @@
     }
     const manoHtml = pulseCard
       ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
-      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
+      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">Turno de ${escapeHtml(player.name)}, ronda ${game.round}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
@@ -325,6 +325,7 @@
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: !!game.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${manoHtml}
       ${!game.pulseTurn && !result ? CT.Ghost.power(game.ghost, player.id, game.timeline.length, player.hand.length, 'data-action="ghost-use"') : ""}
+      ${!game.pulseTurn && !result ? CT.Powers.pulsePower(game.pulsePower, player.id, player.hand.length, 'data-action="pulse-open"', !game.ghost?.fresh && game.deck.length + game.discard.length > 0 && pulseTargets().length > 0) : ""}
     </div>`);
     if (nuevaSeleccion) {
       const linea = app.querySelector(".timeline-wrap");
@@ -413,7 +414,7 @@
     const id = game.deck.shift();
     if (id == null) return false;
     player.hand.push(id);
-    CT.Ghost.claim(game.ghost, id, player.id, game.deck);
+    CT.Powers.claim(game, id, player.id, game.deck);
     return true;
   }
 
@@ -450,7 +451,8 @@
   }
 
   function pulseAvailable(player) {
-    return !game.ghost?.fresh && !!game.pulse && !player.pulseUsed && player.hand.length >= PULSE_MIN_HAND
+    const hasPower = game.pulsePower ? CT.Powers.ownsPulse(game.pulsePower, player.id) : !!game.pulse;
+    return !game.ghost?.fresh && hasPower && !player.pulseUsed && player.hand.length >= PULSE_MIN_HAND
       && game.deck.length + game.discard.length > 0 && pulseTargets().length > 0;
   }
 
@@ -463,7 +465,8 @@
     }
     const cardId = game.deck.shift();
     if (cardId == null) return showToast("No quedan cartas para el Pulso");
-    CT.Ghost.claim(game.ghost, cardId, player.id, game.deck);
+    CT.Powers.consumePulse(game.pulsePower, player.id);
+    CT.Powers.claim(game, cardId, player.id, game.deck);
     player.pulseUsed = true;
     game.pulseTurn = { targetId, cardId };
     selectedCardId = null;

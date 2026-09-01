@@ -130,7 +130,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
 
-## Fantasma y dificultades (reparto v37)
+## Fantasma, Pulso y dificultades (poderes v38)
 
 En partidas locales, el poder Fantasma puede acompañar al reparto o a un robo. En salas
 se activa con «Cartas Fantasma» al configurar la partida. Está separado de las cartas a
@@ -206,11 +206,11 @@ La partida libre permite los cuatro niveles, conserva partidas y separa récords
 y dificultad. Los récords antiguos se mantienen en Fácil. La competición individual también
 elige un nivel, conserva cinco decisiones humanas por tema y reserva cartas adicionales
 para el tablero. El reto diario permanece en Fácil para no cambiar las quince cartas ni las
-marcas existentes. Pulso conserva su funcionamiento; convertirlo en carta robable queda fuera
-de esta versión.
+marcas existentes. En las partidas compartidas, Pulso conserva su efecto pero se obtiene
+como poder secreto al encontrar la carta normal a la que quedó asociado.
 
-**Salas nuevas: publicar `firestore.rules` v37 antes de activar Cartas Fantasma.** Todos los móviles
-deben actualizar la app a v37 y crear una sala nueva; se comprueba la versión de cada participante. Las reglas v37 mantienen las salas v36. Sin esas reglas, desmarcar Cartas Fantasma permite seguir iniciando
+**Salas nuevas: publicar `firestore.rules` v38 antes de activar Fantasma o Pulso.** Todos los móviles
+deben actualizar la app a v38 y crear una sala nueva; se comprueba la versión de cada participante. Las reglas v38 mantienen las salas anteriores. Sin esas reglas, desmarcar ambos poderes permite seguir iniciando
 salas con las reglas anteriores. Las reglas nuevas mantienen compatibles las salas antiguas.
 
 ## Probarlo en un ordenador
@@ -239,9 +239,9 @@ El modo local no utiliza backend ni cuentas y guarda la partida únicamente en e
 
 El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo: las reglas de seguridad solo hay que volver a publicarlas cuando cambia su contenido, no al añadir un juego nuevo.
 
-> **Al desplegar el Pulso hay que volver a publicar `firestore.rules`.** Es la única jugada
-> que toca la mano de dos personas a la vez, así que trae reglas nuevas; sin republicarlas,
-> el servidor rechazará los Pulsos de las salas compartidas.
+> **Para los poderes v38 hay que volver a publicar `firestore.rules`.** Valida tanto la
+> obtención privada como el uso de Pulso; sin republicarlas, las salas nuevas rechazarán
+> el reparto aunque las reglas v37 de Fantasma ya estuvieran publicadas.
 
 ## Comprobaciones
 
@@ -281,10 +281,16 @@ gestión de sala.
 
 ## El Pulso
 
-Se activa con un interruptor al montar la partida; sin él, el juego es exactamente el de
-siempre. Es la única jugada que toca la mano de otra persona:
+Se incluye con el interruptor «Cartas Pulso» al montar la partida. El mazo esconde siempre
+1 con 2–3 jugadores, 2 con 4–6 y 3 con 7–9, usando exactamente la misma posición 50/50
+que Fantasma. Fantasma y Pulso nunca comparten una carta normal. Puede salir al repartir,
+al robar o quedarse sin descubrir al final. Cuando aparece se guarda en privado, fuera de
+la mano y de su contador; no elimina un robo de penalización ni impide ganar. Si la misma
+persona encuentra otra Carta Pulso, se recoloca entre las posiciones pendientes libres.
 
-- **Una vez por partida y jugador**, y sustituye al turno en vez de sumarse a él.
+Su efecto sigue siendo la única jugada que toca la mano de otra persona:
+
+- **Una vez por cada persona que encuentre el poder**, y sustituye al turno en vez de sumarse a él.
 - Retas a quien elijas. **El mazo saca una carta que tú no eliges** y la colocas sin prisa:
   no hay cronómetro, la dificultad la pone lo llena que esté la línea. Al principio los
   huecos son anchos y aciertas casi seguro, pero es cuando menos daño haces; al final son

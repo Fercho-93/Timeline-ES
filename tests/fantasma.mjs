@@ -86,6 +86,17 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
   assert.equal(g.owns(repeated, 1), false, 'sin sitio se consume y no restaura un uso');
   g.claim(repeated, 14, 2, [15]);
   assert.equal(g.owns(repeated, 2), false, 'no resucita por reciclar la carta normal');
+  for (const p of [2,3,4,5,6,7,8,9]) {
+    const deck = Array.from({length: 167},(_,i)=>i+1), powers=w.CONTINUUM.Powers.create(deck,p,4,true,true,random);
+    const amount=Math.ceil(p/3);
+    assert.equal(powers.ghost.cards.length,amount);
+    assert.equal(powers.pulsePower.cards.length,amount);
+    assert.equal(new Set([...powers.ghost.cards,...powers.pulsePower.cards]).size,amount*2,'los dos poderes no comparten carta');
+    assert.ok(!powers.ghost.cards.includes(p*4+1) && !powers.pulsePower.cards.includes(p*4+1));
+  }
+  const together={ghost:{...freshGhost(['1']),distribution:2,cards:[6]},pulsePower:{distribution:2,cards:[12,13],owners:['1',''],used:[]}};
+  w.CONTINUUM.Powers.claim(together,13,1,[6,12,14],()=>0);
+  assert.equal(together.pulsePower.cards[1],14,'el duplicado evita posiciones de ambos poderes');
   w.close();
 }
 {
