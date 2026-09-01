@@ -39,7 +39,7 @@ window.INVENTION_CARDS = [
   { id: 4030, year: 1714, title: "El termómetro de mercurio", detail: "Fahrenheit desarrolla el termómetro de mercurio; la publicación de la escala que lleva su nombre llegará en 1724." },
   { id: 4031, year: 1735, title: "Linneo publica la primera edición de «Systema Naturae»", detail: "Linneo presenta su clasificación de la naturaleza. Los puntos de partida de su nomenclatura binomial llegarán en 1753 para plantas y 1758 para animales." },
   { id: 4032, year: 1752, title: "El pararrayos de Franklin", detail: "Tras el experimento de la cometa, propone una punta metálica conectada a tierra." },
-  { id: 4033, year: 1769, title: "Watt patenta el condensador separado", detail: "Enfriar el vapor fuera del cilindro triplica el rendimiento y arranca la revolución industrial." },
+  { id: 4033, year: 1769, title: "Watt patenta el condensador separado", detail: "Enfriar el vapor fuera del cilindro recorta unas tres cuartas partes del combustible frente a la máquina de Newcomen. No arranca la revolución industrial, que ya estaba en marcha, pero la acelera." },
   { id: 4034, year: 1774, title: "El descubrimiento del oxígeno", detail: "Priestley aísla el gas que mantiene la llama; Lavoisier lo nombra y explica la combustión." },
   { id: 4035, year: 1783, title: "El globo de los hermanos Montgolfier", detail: "Un globo de aire caliente eleva a dos personas sobre París: el primer vuelo libre tripulado. Un mes antes ya había subido una persona, pero con el globo atado al suelo." },
   { id: 4036, year: 1796, title: "La vacuna de la viruela", detail: "Jenner inocula viruela de las vacas a un niño y lo protege de la humana." },

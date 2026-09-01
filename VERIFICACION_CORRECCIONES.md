@@ -1218,3 +1218,82 @@ con varios protagonistas, y esa compresión es justo donde se pierde el dato.
 - Ninguna carta añadida ni retirada. 933 identificadores.
 - `npm test` pasa 345 comprobaciones.
 - La caché pasa a `continuum-v52`.
+
+## Ronda 18: cuarto filtro, coherencia interna y estado real de la verificación
+
+### Filtro 4: relaciones de causa y efecto
+
+Se extrajeron las cartas que afirman que algo **provoca, desemboca en, desata o arranca** otra
+cosa. Son **13**. Una estaba mal, y era doble:
+
+**Watt (1769): «triplica el rendimiento y arranca la revolución industrial».**
+
+1. **No arranca nada.** La revolución industrial se data convencionalmente **1760–1840**: ya
+   estaba en marcha cuando Watt patentó. El propio mazo lo delata, porque tiene a Savery en 1698
+   y a Newcomen en 1712 unas cartas antes.
+2. **No triplica.** La máquina de Watt consumía **unas tres cuartas partes menos** de combustible
+   que la de Newcomen, o sea que multiplicaba el rendimiento por cuatro, no por tres.
+
+La carta dice ahora lo que hizo de verdad: recortar el combustible y **acelerar** una revolución
+que ya había empezado.
+
+### Dos comprobaciones automáticas sobre las 933
+
+**Coherencia de fechas.** Se buscaron cartas cuya explicación menciona un año distinto al de la
+carta. Salen 18 y **las 18 son matices deliberados**: la Constitución *de 1812* en la carta del
+Trienio, el DeLorean que viaja *a 1955*, el Óscar de Titanic *en 1998*. Ninguna es una
+contradicción.
+
+**Duplicados entre mazos: 29 pares.** Esto no es un problema de veracidad, pero sí de contenido,
+y conviene dejarlo escrito. Hay **29 hechos que aparecen en dos mazos distintos con el mismo
+año**: Dolly en Inventos y en Medicina, el Sputnik en Inventos y en Astronomía, Colón en Historia
+de España y en Historia mundial, Copérnico, Newton, Hooke, Harvey, la penicilina, el ADN,
+Gagarin, el Hubble, CRISPR, el agujero negro, el James Webb…
+
+Por separado cada mazo está bien: Dolly pertenece tanto a Inventos como a Medicina. **El problema
+es la Gran mezcla**, que concatena los ocho mazos cronológicos: ahí las dos cartas caen en la
+misma partida, con el mismo año, y ordenarlas una respecto a otra es una moneda al aire además
+de leerse como un error.
+
+No se toca porque la solución es de diseño, no de dato: habría que decidir si la Gran mezcla
+descarta duplicados, si se reescriben las parejas para que cubran aspectos distintos del hecho,
+o si se acepta. Queda planteado.
+
+### Estado real de la verificación, sin adornos
+
+Con «revisar todas las cartas» conviene ser exacto sobre qué significa aquí cada nivel.
+
+| Nivel | Cartas | Qué garantiza |
+|---|---:|---|
+| **Fuente individual comprobada** | **95** | Naturaleza. Cada carta lleva URL de una institución y la cifra se contrastó contra ella |
+| **Recalculado desde cero** | **38** | Distancias. Las 38 reproducidas con el método declarado, dentro del 0,1 % |
+| **Barrido sistemático por filtros** | **329 afirmaciones** | 161 cifras, 131 superlativos, 24 atribuciones y 13 relaciones causales, extraídas por script de las 819 cartas cronológicas y comprobadas una a una |
+| **Lectura completa** | **933** | Todas se han leído carta a carta en esta auditoría y en las anteriores |
+| **Sin fuente individual** | **838** | Los ocho mazos cronológicos y los de superficie y población no tienen campo `source` |
+
+Lo que **no** se puede afirmar: que las 933 estén verificadas contra una fuente oficial. Serían
+del orden de novecientas consultas y, con la red de esta sesión limitada a resúmenes de
+búsqueda, muchas de esas citas serían de oído, que es peor que no tenerlas.
+
+Lo que **sí** se puede afirmar: que las cuatro familias de afirmación falsable de los mazos
+cronológicos —cifra, exclusividad, autoría y causa— se han barrido enteras por script, y que el
+resultado acumulado es **6 erratas sobre 329 afirmaciones**.
+
+### Balance de los cuatro filtros
+
+| Filtro | Afirmaciones | Erratas | Tasa |
+|---|---:|---:|---:|
+| Cifras dentro del texto | 161 | 0 | 0 % |
+| Exclusividad | 131 | 2 | 1,5 % |
+| Causa y efecto | 13 | 1 | 7,7 % |
+| Atribución de autoría | 24 | 3 | 12,5 % |
+
+El patrón se mantiene y se refuerza: **cuanto más interpretativa es la afirmación, más falla**.
+Una fecha o una cifra se copian de una fuente. Decir quién inventó algo o qué causó qué exige
+comprimir una historia, y la compresión es donde se pierde el dato.
+
+### Integridad
+
+- Ninguna carta añadida ni retirada. 933 identificadores.
+- `npm test` pasa 345 comprobaciones.
+- La caché pasa a `continuum-v53`.
