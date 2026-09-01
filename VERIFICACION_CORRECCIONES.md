@@ -983,3 +983,51 @@ la vida en cautividad. Es una decisión editorial, no de veracidad, y queda abie
 - 38 cartas por mazo, 933 identificadores, cero avisadas.
 - `npm test` pasa 345 comprobaciones. Techo de mudas a 20.
 - La caché pasa a `continuum-v48`.
+
+## Ronda 14: el topo, o la quinta confusión de unidades (1 de septiembre de 2026)
+
+Se aportó una cifra para cerrar la última muda de Velocidad: el topo europeo a **4 km/h** por
+galerías ya excavadas, y hasta 6 km/h en otros tálpidos, atribuido a compilaciones de historia
+natural y a la Mammal Society. Al contrastarla aparece un problema que conviene dejar escrito,
+porque **no está en el número sino en su linaje**.
+
+### Lo que se encontró
+
+La cifra que circula por la red dice, literalmente y en la misma frase:
+
+> «A mole's speed through existing tunnels is about **80 ft. per minute**, which is equivalent
+> to approximately **80 meters per minute** or 4.8 km/h»
+
+**80 pies por minuto no son 80 metros por minuto.** Son 24,4 m/min, o sea **1,46 km/h**, no 4,8.
+La equivalencia está mal por un factor de 3,3, y es esa versión corregida al alza la que se ha
+replicado por las compilaciones hasta convertirse en «el topo corre a 4 km/h».
+
+Otro fragmento de la misma familia de fuentes dice «hasta 2,5 millas por hora (80 metros por
+minuto)»: 2,5 mph son 4,02 km/h y 80 m/min son 4,8. Tampoco cuadran entre sí.
+
+### Por qué no se adopta
+
+Es el mismo fallo que ya se corrigió cuatro veces en esta auditoría: el caracol de jardín
+(0,03 millas por hora leídas como 0,03 km/h), la lapa (×470), el cangrejo ermitaño (×20) y las
+toneladas cortas de NOAA leídas como métricas. **Una cifra repetida en veinte sitios no gana
+procedencia por repetirse**; si los veinte copian la misma conversión mala, el error se propaga
+intacto.
+
+La referencia de fondo, *The Natural History of Moles* de Gorman y Stone (1990), es legítima y
+probablemente sea el origen del dato. Pero es un libro: no se ha podido consultar, y no se anota
+como fuente algo que no se ha visto. Quien tenga acceso puede cerrarlo en un minuto.
+
+### Sobre el tipo de fuente
+
+Las compilaciones tipo AZ Animals o Animal Fun Facts son exactamente el nivel que esta auditoría
+viene descartando desde la ronda 7, y este caso explica por qué mejor que cualquier argumento:
+no verifican conversiones, y su volumen hace que un error parezca consenso.
+
+### Lo que queda
+
+El topo sigue siendo **la única muda de Velocidad** (37 de 38). Su valor de 3,5 km/h está en el
+mismo rango que la cifra sospechosa, así que probablemente también sea alto, pero no se cambia
+por una reconstrucción sin verificar. Se anota la sospecha en la propia carta.
+
+Se descartó además el estudio de locomoción de ratas topo desnudas (JEB, 2025): mide marcha
+rápida a 10 cm/s en cinta, que es un protocolo experimental, no la velocidad de la especie.
