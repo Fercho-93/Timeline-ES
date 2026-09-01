@@ -52,8 +52,22 @@
   }
 
   function compactLifespan(value) {
-    if (value < 1 / 12) return `${Math.round(value * 365)} días`;
-    if (value < 1) return `${Math.round(value * 12)} meses`;
+    const dias = value * 365;
+    // Hay vidas adultas que se miden en minutos. Redondearlas a días las enseñaba como
+    // «0 días», así que la escala baja hasta donde llega el dato en vez de aplastarlo.
+    if (dias < 1) {
+      const horas = dias * 24;
+      if (horas < 1) return `${Math.round(horas * 60)} min`;
+      return `${horas.toLocaleString("es-ES", { maximumFractionDigits: 1 })} h`;
+    }
+    if (value < 1 / 12) {
+      const enteros = Math.round(dias);
+      return `${enteros} ${enteros === 1 ? "día" : "días"}`;
+    }
+    if (value < 1) {
+      const meses = Math.round(value * 12);
+      return `${meses} ${meses === 1 ? "mes" : "meses"}`;
+    }
     return `${value.toLocaleString("es-ES", { maximumFractionDigits: 1 })} años`;
   }
 

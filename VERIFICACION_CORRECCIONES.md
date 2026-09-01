@@ -405,3 +405,87 @@ organismos datados, y no hay cuatro con fecha publicada en ese tramo. Se dejan m
 - `npm test` pasa 340 comprobaciones.
 - La caché pasa a `continuum-v40`. Conviene empezar partidas nuevas de Naturaleza: cambian
   valores en los tres mazos.
+
+## Ronda 6: el problema no eran los pendientes (1 de septiembre de 2026)
+
+Al buscar cómo cerrar los trece pendientes que quedaban apareció el dato que cambia el
+diagnóstico: en los tres mazos de Naturaleza hay **114 cartas y 58 no tenían fuente ni aviso**.
+El peregrino a 360 km/h, el león a 78, la jirafa a 55, el rinoceronte a 2,3 t: ninguna llevaba
+respaldo y ninguna avisaba. La marca «en revisión» cubría trece cartas de un problema de
+cincuenta y ocho, y al hacerlo daba a entender que el resto estaba comprobado.
+
+Así que perseguir los trece de uno en uno no era lo eficiente: arreglaba la etiqueta, no el
+mazo, y dejaba intacto el mecanismo que permitió que la deuda creciera sin que nadie la viera.
+
+### Lo que se ha hecho
+
+**1. Longevidad queda cerrada: cero pendientes.** Los seis que quedaban se sustituyen por
+animales con edad documentada. Cuatro eran esponjas y un coral de bambú con cifras redondas
+que ninguna literatura sostiene —para el coral de bambú las colonias vivas rondan de 50 a 150
+años, no 1.450— y las dos primeras eran, literalmente, el mismo insecto dos veces.
+
+| ID | Antes | Ahora | Fuente |
+|---|---|---|---|
+| 12001 | Efímera, 5 días | Efímera *Dolania americana*, **5 minutos** | [Portal de biodiversidad de Georgia](https://georgiabiodiversity.org/portal/profile?group=all&es_id=21325) |
+| 12002 | Mosca de mayo, 9 días | Caballo Old Billy, **62 años** | [Guinness](https://www.guinnessworldrecords.com/news/2021/10/worlds-oldest-animals-cats-dogs-deep-sea-creatures-and-more-678003) |
+| 12032 | Esponja de vidrio, 650 | Erizo rojo del Pacífico, **100 años** | [Ebert y Southon, NOAA](https://spo.nmfs.noaa.gov/content/red-sea-urchins-strongylocentrotus-franciscanus-can-live-over-100-years-confirmation-bomb) |
+| 12033 | Esponja antártica, 850 | Tortuga Jonathan, **194 años** | [Guinness](https://www.guinnessworldrecords.com/news/icons/jonathan-the-tortoise-the-oldest-terrestrial-animal) |
+| 12034 | Esponja barril antártica, 1.100 | Mejillón perlífero de río, **280 años** | [ADW](https://animaldiversity.org/accounts/Margaritifera_margaritifera/) |
+| 12035 | Coral de bambú, 1.450 | Cacatúa Cookie, **83 años** | [Guinness](https://www.guinnessworldrecords.com/news/2021/10/worlds-oldest-animals-cats-dogs-deep-sea-creatures-and-more-678003) |
+
+La efímera es el mejor cambio del lote: pasa de una cifra inventada a la vida adulta más corta
+registrada en un animal, cinco minutos, con la ninfa pasando hasta dos años enterrada en la
+arena del río.
+
+**2. Se corrige de paso una carta muda.** El tiburón de Groenlandia ordenaba por 300 años sin
+fuente; la datación por radiocarbono del cristalino de Nielsen y colaboradores da **392 ± 120**
+para el mayor ejemplar. [Science, 2016](https://www.science.org/doi/10.1126/science.aaf1703).
+
+**3. Velocidad cierra tres de siete.** Los récords institucionales existen justo donde no hay
+medias por especie, así que se nombra el récord en vez de la especie, como ya hacían las cartas
+de Winning Brew o la orca.
+
+| ID | Antes | Ahora | Fuente |
+|---|---|---|---|
+| 13003 | Estrella de mar, 0,08 | Estrella de mar girasol, **0,06 km/h** | [Guinness, estrella más rápida](https://www.guinnessworldrecords.com/world-records/118353-fastest-starfish) |
+| 13006 | Caballito de mar, 0,36 | Caballito de mar enano, **0,016 km/h** | [Guinness, el pez más lento](https://www.guinnessworldrecords.com/world-records/70705-slowest-fish) |
+| 13009 | Pingüino emperador en tierra, 1,7 | Pingüino papúa nadando, **36 km/h** | [Guinness, ave nadadora más rápida](https://www.guinnessworldrecords.com/world-records/70933-fastest-bird-swimmer) |
+
+Aviso sobre el caballito de mar: muchos sitios repiten «1,5 m/h». La ficha de Guinness dice
+0,016 km/h, diez veces más. Se usa la del récord.
+
+**4. El formato deja de aplastar el dato.** Cinco minutos se enseñaban como «0 días». La escala
+de longevidad baja ahora hasta minutos y horas, y de paso se arreglan dos concordancias que ya
+fallaban: decía «1 días» y «1 meses».
+
+**5. La deuda se cuenta y solo puede bajar.** `tests/mazos.mjs` cuenta las cartas de Naturaleza
+sin `source` y las marcadas en revisión, y falla si alguna de las dos cifras sube. Hoy el techo
+está en **57 mudas y 4 en revisión**. Esto no comprueba que un dato sea cierto —ninguna prueba
+puede—, pero convierte una deuda invisible en una cifra que se ve en cada ejecución y que solo
+se mueve en una dirección. Bajarla es documentar cartas; subirla exige explicarlo en el commit.
+
+### Los cuatro que siguen abiertos
+
+Babosa, caracol marino, cangrejo de río y panda gigante. Son invertebrados lentos y un
+mamífero para los que no existe una velocidad por especie publicada por ninguna institución.
+Se quedan marcados, ahora ya sin la compañía de los otros veintiuno.
+
+### Lo que queda por hacer, con nombre
+
+Las 57 mudas son el trabajo pendiente real, y algunas ya huelen mal:
+
+- **Caracol de jardín, 0,03 km/h.** Guinness da 0,03 **millas** por hora, que son 0,048 km/h.
+  Tiene toda la pinta de un cambio de unidad perdido, pero no se toca sin confirmarlo.
+- **Perezoso de tres dedos, 0,22 km/h.** Guinness da 1,8–2,4 m/min *en el suelo*, o sea
+  0,11–0,14. La carta habla de moverse entre las ramas, que es otra cosa; hay que decidir cuál
+  de las dos mide.
+- **Halcón peregrino, 360 km/h** y **león africano, 78 km/h**: las dos cifras más altas del
+  mazo de velocidad no llevan respaldo. Cerrar la del león recolocaría además el par que
+  ahora queda a un 2,6 % del ñu.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones.
+- La caché pasa a `continuum-v41`. Cambian valores en Longevidad y Velocidad y cambia el
+  formato de los valores pequeños: conviene empezar partidas nuevas de Naturaleza.
