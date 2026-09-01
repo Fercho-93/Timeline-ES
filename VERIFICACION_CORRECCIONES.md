@@ -568,3 +568,65 @@ miden, no solo de dónde sale el número.
   apunta a Longevidad, que sí está limpio.
 - La caché pasa a `continuum-v42`. Cambia el peso de la ballena gris, así que conviene empezar
   partidas nuevas de Naturaleza.
+
+## Ronda 8: segunda tanda contra las mudas (1 de septiembre de 2026)
+
+**La deuda baja de 45 a 35.** Diez cartas más de Peso pasan a llevar respaldo. Peso queda con
+ocho mudas y una en revisión; Longevidad con doce; Velocidad con quince y cuatro en revisión.
+
+Se mantiene la regla de la ronda anterior: fuente solo cuando la búsqueda iba restringida a ese
+dominio y devolvió cifra concreta para esa especie. En esta tanda se descartaron seis consultas
+—bisonte por ADW tres veces, cachalote, tiburón ballena, cobaya por la RSPCA— antes de dar con
+una fuente utilizable o dejarlas para otra vez.
+
+### Cartas cerradas (10)
+
+| ID | Carta | Valor | Fuente |
+|---|---|---:|---|
+| 10005 | Ratón doméstico (adulto típico) | 25 g | ADW, rango 12–30 g |
+| 10008 | Cobaya (adulto típico) | 900 g | ADW, rango 700–1.200 g |
+| 10010 | Gato doméstico (adulto típico) | 4,5 kg | ADW, rango 4,1–5,4 kg |
+| 10025 | Bisonte americano (macho adulto) | 900 kg | NPS, machos hasta 2.000 libras |
+| 10028 | Rinoceronte blanco (límite publicado) | 2.300 kg | San Diego Zoo, 6.000 libras el más pesado |
+| 10029 | Elefante marino del sur (macho adulto) | 4.000 kg | ADW, machos de más de 3.700 kg |
+| 10030 | Elefante africano de sabana (macho grande) | 6.000 kg | San Diego Zoo, machos 12.000–15.000 libras |
+| 10034 | Ballena jorobada (hasta, aprox.) | **36.300 kg** | NOAA, 40 toneladas cortas |
+| 10036 | Rorcual común (hasta, aprox.) | **68.900 kg** | NOAA, 76 toneladas cortas |
+| 10038 | Ballena azul (hasta, aprox.) | 150.000 kg | NOAA, más de 330.000 libras en las antárticas |
+
+### Una ambigüedad de unidades que conviene dejar anotada
+
+Las fichas de NOAA dan pesos «in tons» sin decir cuáles. En la ballena jorobada la propia ficha
+las traduce —40 toneladas ≈ 80.000 libras—, lo que confirma que **son toneladas cortas**, no
+métricas. La diferencia no es menor: 76 toneladas del rorcual son 68,9 métricas, no 76.
+Con eso resuelto, jorobada y rorcual se ajustan a la cifra publicada. La ballena azul ya venía
+en libras y salía clavada.
+
+### Lo que queda, y una decisión que no es mía
+
+Quedan **35**: 8 en Peso (abeja, monarca, mantis, rana arborícola, paloma, caballo de silla,
+tiburón ballena y cachalote), 12 en Longevidad y 15 en Velocidad.
+
+Para Longevidad aparece un atajo real: **AnAge**, la base de longevidad animal de Human Ageing
+Genomic Resources, tiene ficha por especie con URL predecible y responde bien a la búsqueda.
+Cubriría casi todo el mazo de una vez.
+
+El problema es que AnAge publica **longevidad máxima registrada**, no la típica, y las cartas
+actuales dicen otra cosa. Adoptarla significaría que el conejo pasa de 2,5 a 9 años, la ardilla
+roja de 6,5 a 12 y el zorro de 10 a 21,3. Y llevado al perro o al gato daría 29 y 30 años, que
+son Bluey y Creme Puff: el mazo se convertiría en una lista de récords, cuando ya tiene a Old
+Billy, Cookie y Jonathan cumpliendo ese papel.
+
+Es una decisión sobre qué mide el mazo, no sobre si un dato es cierto, así que se deja abierta:
+
+1. **Convertir Longevidad a máximos de AnAge.** Rápido, una sola fuente, cierra casi todo. El
+   mazo pasa a comparar récords en vez de vidas corrientes.
+2. **Mantener valores típicos** y buscar fuente caso a caso. Conserva el carácter del mazo y es
+   bastante más lento; algunas cartas quizá no se cierren nunca.
+3. **Mezclar con etiqueta**, como ahora: cada carta dice si es media, límite o récord.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones. Techo de mudas actualizado a 35.
+- La caché pasa a `continuum-v43`. Cambian los pesos de la jorobada y el rorcual.
