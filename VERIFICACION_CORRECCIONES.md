@@ -935,3 +935,51 @@ Por mazo: Peso 31/7, Longevidad 26/12, **Velocidad 34/4**.
 - 38 cartas por mazo, 933 identificadores, cero avisadas.
 - `npm test` pasa 345 comprobaciones. Techo de mudas a 23.
 - La caché pasa a `continuum-v47`. Cambian cuatro velocidades y el formato de las más lentas.
+
+## Ronda 13: Velocidad queda en una sola muda (1 de septiembre de 2026)
+
+Tres de las cuatro cartas sospechosas se sustituyen por récords Guinness de grupo, que son
+medida de especie y llevan ficha propia:
+
+| Fuera | Dentro | Fuente |
+|---|---|---|
+| Cangrejo araña, 1,3 km/h | Araña flic-flac de Marruecos, **6,12 km/h** | [Guinness, la araña más rápida](https://www.guinnessworldrecords.com/world-records/82841-fastest-spider) |
+| Gallina doméstica, 7,5 km/h | Solífugo, **16 km/h** | [Guinness, el invertebrado terrestre más rápido](https://www.guinnessworldrecords.com/world-records/83657-fastest-invertebrates) |
+| Erizo europeo, 12 km/h | Libélula australiana, **58 km/h** | [Guinness, el insecto volador más rápido](https://www.guinnessworldrecords.com/world-records/70635-fastest-flying-insect) |
+
+**Velocidad queda 37 de 38.** La única muda es el topo europeo: lo publicado es su velocidad de
+excavación, unos 4 m/h, que no es comparable con el resto del mazo.
+
+Se descartó una consulta sobre velocidad de ratones: devolvió «7,2 m/s», que serían 26 km/h para
+un ratón. La cifra es absurda y la respuesta mezclaba protocolos de cinta con carreras de campo.
+Es el mismo filtro de siempre: si el resumen no es coherente, no se anota.
+
+La libélula queda a un 3 % de la jirafa. Es un par ajustado y a la vez un buen dato: una libélula
+vuela tan rápido como galopa una jirafa.
+
+### Longevidad: existe una salida, y hay que decidirla
+
+Buscando fuente para las 12 mudas de Longevidad aparece el estadístico que faltaba: la
+**mediana de esperanza de vida** que publican la AZA y el trabajo de medianas por sexo para
+**330 especies** en poblaciones ex situ. Es exactamente una medida típica —la mitad de los
+individuos muere antes y la mitad después— y está calculada excluyendo el primer año de vida,
+que es donde se concentra la mortalidad.
+
+[AZA: Species Survival Statistics](https://www.aza.org/species-survival-statistics) ·
+[Medianas por sexo de 330 especies](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6484356/)
+
+Cubriría el águila harpía, el elefante africano, la tortuga de Galápagos, el zorro, el conejo y
+probablemente la ardilla: seis de las doce. Perro y gato tienen estudios veterinarios de
+esperanza de vida. Quedarían fuera mosquito, mosca de la fruta, abeja obrera y ballena azul.
+
+**Pero cambia lo que mide la carta.** Una mediana ex situ es la vida de un animal en un zoo, no
+en libertad, y para muchas especies es bastante más larga. El mazo ya mezcla tipos de medida
+—rangos silvestres, longevidades de mascota de la RSPCA, medianas de zoo, ejemplares datados— y
+cada carta dice cuál es; pero pasar seis cartas a mediana de zoo de golpe inclina el mazo hacia
+la vida en cautividad. Es una decisión editorial, no de veracidad, y queda abierta.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 20.
+- La caché pasa a `continuum-v48`.
