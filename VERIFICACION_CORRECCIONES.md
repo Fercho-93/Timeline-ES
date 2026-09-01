@@ -717,3 +717,89 @@ en tres tipos que no admiten el mismo trato:
 - `npm test` pasa 344 comprobaciones. Techos a 29 mudas y 7 avisos.
 - La caché pasa a `continuum-v44`. Cambian cuatro velocidades, una de ellas la más alta del
   mazo: conviene empezar partidas nuevas de Naturaleza.
+
+## Ronda 10: si el dato no está atado, fuera la carta (1 de septiembre de 2026)
+
+Decisión del autor: **si la veracidad y la oficialidad del dato no están atadas, se quita el
+concepto.** Se aplica. El resultado es que **`reviewStatus` queda a cero**: ya no se publica
+ninguna carta avisada; o tiene fuente o no está en el mazo.
+
+Restricción que condiciona todo: cada mazo necesita **38 cartas** para repartir a nueve
+jugadores. Cada baja obliga a un alta documentada. No se puede solo quitar.
+
+### Siete cartas fuera, siete dentro
+
+| Fuera | Por qué | Dentro | Fuente |
+|---|---|---|---|
+| Caracol de jardín, 0,03 km/h | Iba 3,5 veces más rápido que el récord de la especie | Escarabajo tigre, **9 km/h** | Guinness, insecto terrestre más rápido |
+| Babosa, 0,05 km/h | Sin especie ni cifra | Cangrejo fantasma, **14,4 km/h** | Guinness, crustáceo terrestre más rápido |
+| Panda gigante, 1 km/h | Sin fuente para su marcha | Mamba negra, **19 km/h** | Guinness, serpiente terrestre más rápida |
+| León africano, 78 km/h | Tres fuentes irreconciliables (53, GPS variable, 80 sin procedencia) | Iguana espinosa, **34,9 km/h** | Guinness, reptil terrestre más rápido |
+| Caracol marino, 0,46 km/h | Sin especie ni cifra | León marino de California, **40 km/h** | Guinness, mamífero marino más rápido |
+| Cangrejo de río, 0,75 km/h | Sin cifra documentada | Cebra (huida), **64 km/h** | San Diego Zoo, más de 40 mph |
+| Cebra de llanura, 350 kg | Se le habían dado los kilos de la de Grevy | Cebra de Grevy, **400 kg** | San Diego Zoo, rango 350–450 |
+
+Además, la tortuga gigante pasa de 0,13 a **0,37 km/h**, el récord Guinness de lentitud entre
+los quelonios, y deja de ser una muda.
+
+Sobre el criterio de medias: estos siete altas son **récords de grupo**, no ejemplares con
+nombre. «El insecto terrestre más rápido» es una medida de especie, que es la comparable
+natural en un mazo de velocidad; no es Usain Bolt. La distinción importa y se mantiene.
+
+### La cebra: el error se explica solo
+
+La carta de peso decía «cebra de llanura, 350 kg». San Diego Zoo describe la de llanura como la
+**más pequeña** de las tres especies y da 350–450 kg para la de **Grevy**, la mayor. Alguien
+tomó los kilos de una especie y les puso el nombre de otra. Se corrige poniendo el nombre que
+corresponde a la cifra publicada, y se ordena por el centro del rango, no por su extremo.
+
+### El aviso «en revisión» queda apagado
+
+Con cero pendientes, el mecanismo de aviso deja de encenderse. Se conserva en el código como
+red de seguridad, pero **el techo del test baja a cero**: si alguna carta vuelve a marcarse,
+la prueba falla. La prueba de accesibilidad, que antes comprobaba que el aviso aparecía en el
+mazo que tuviera pendientes, ahora comprueba lo contrario en los tres mazos.
+
+### Estado
+
+| | Ronda 6 | Ahora |
+|---|---:|---:|
+| Con fuente | 53 | **86** |
+| Sin fuente y sin aviso | 57 | **28** |
+| En revisión | 4 | **0** |
+
+Por mazo: Peso 30 con fuente y 8 mudas; Longevidad 26 y 12; Velocidad 30 y 8.
+
+### Los dos outliers que quedan, y por qué no salen todavía
+
+Bajo el criterio de medias siguen sobrando dos cartas, las dos de ejemplar con nombre:
+
+- **Ser humano: Usain Bolt (44,7 km/h)**
+- **Caballo Winning Brew (70,35 km/h)** — que además está a un 0,5 % del avestruz, o sea que
+  ese par se juega a cara o cruz.
+
+No salen en esta ronda por un motivo concreto: hacen falta **dos velocidades de especie
+documentadas que no apelmacen la banda de 55 a 70 km/h**, y las cuatro candidatas encontradas
+caen todas dentro de un 7 % de una carta vecina: hiena manchada 60, canguro rojo 56, facóquero
+55 y coyote 72,4. Quitarlas sin recambio dejaría el mazo en 36 cartas y rompería el reparto a
+nueve jugadores. Queda pendiente de encontrar dos huecos limpios.
+
+### Lo que queda por documentar
+
+28 mudas: 8 en Peso (abeja, monarca, mantis, rana arborícola, paloma, caballo de silla, tiburón
+ballena y cachalote), 12 en Longevidad y 8 en Velocidad (hormiga roja, lapa, cangrejo araña,
+topo, cangrejo ermitaño, cucaracha, gallina y erizo).
+
+Las 8 de Velocidad son el bloque difícil y conviene decirlo pronto: **son invertebrados y
+animales pequeños para los que ninguna institución publica una velocidad por especie**. Si el
+criterio se aplica hasta el final, no se pueden documentar y hay que sustituirlas, lo que exige
+ocho velocidades documentadas más. Puede que el mazo de Velocidad no dé para 38 cartas con
+dato atado y haya que decidir qué hacer con él.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores: las bajas reutilizan el identificador de la carta
+  que sustituyen, así que la numeración no se mueve.
+- `npm test` pasa 345 comprobaciones. Techos a 28 mudas y **0 avisos**.
+- La caché pasa a `continuum-v45`. Cambian siete cartas de golpe: hay que empezar partidas
+  nuevas de Naturaleza.
