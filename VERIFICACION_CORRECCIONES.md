@@ -1157,3 +1157,64 @@ porque cambiaría el orden del mazo respecto a la escritura cuneiforme.
 - Ninguna carta añadida ni retirada. 933 identificadores.
 - `npm test` pasa 345 comprobaciones.
 - La caché pasa a `continuum-v51`.
+
+## Ronda 17: filtro de atribuciones (1 de septiembre de 2026)
+
+Tercer filtro automático sobre los mazos cronológicos, después de las cifras y los superlativos:
+**quién hizo qué**. Se extrajeron las cartas que atribuyen autoría en singular —nombre propio
+más verbo de creación o hallazgo— porque son las que tumba un «en realidad fue un equipo» o un
+«ya lo había hecho otro». Son **24 cartas**. Tres estaban mal.
+
+### Vértigo (1958): el zoom no lo inventó Hitchcock
+
+Decía «Hitchcock inventa el efecto de zoom contrario». Lo resolvió **Irmin Roberts**, cámara de
+segunda unidad de Paramount, a petición de Hitchcock, que describió el efecto que quería. Roberts
+**no figura en los créditos** de la película. La carta le devuelve el nombre.
+
+### El circuito integrado (1958): Kilby y Noyce
+
+Decía solo «Kilby mete varios componentes en una sola pieza de semiconductor». **Robert Noyce**
+llegó a la misma idea en 1959, y su diseño monolítico de silicio es el que acabó imponiéndose
+—el de Kilby era de germanio con hilos externos—. Tras el pleito de patentes, Texas Instruments
+y Fairchild **acordaron reconocerlos coinventores**, y ambos recibieron la Medalla Nacional de
+Ciencia. Dejar a uno fuera no era un matiz: era media historia.
+
+### Tiburón (1975): falla dos veces
+
+Decía «Spielberg inventa el estreno masivo de verano».
+
+1. **No fue Spielberg.** La estrategia se decidió en una proyección de marzo de 1975 por la
+   dirección de Universal —Lew Wasserman, Sid Sheinberg, Henry Martin y Bob Carpenter—, que
+   fijó 409 salas y 1,8 millones de dólares en publicidad, con tráilers en televisión en horario
+   de máxima audiencia.
+2. **No lo inventó nadie en 1975.** El estreno en saturación ya existía: *El proceso de Billy
+   Jack* abrió en más de mil salas en 1974.
+
+Lo que *Tiburón* hizo fue **fijar el modelo**, no inventarlo. La carta lo dice así ahora.
+
+### Una cuarta, comprobada y no cambiada
+
+**El descubrimiento del oxígeno (1774).** La carta dice «Priestley aísla el gas; Lavoisier lo
+nombra y explica la combustión». Es cierto, pero está incompleto: **Carl Wilhelm Scheele** lo
+había aislado hacia 1771–1772, aunque publicó en 1777 y perdió la prioridad. No se cambia
+porque la carta no afirma que Priestley fuera el primero, y ya reparte el mérito con Lavoisier;
+queda anotado como matiz por si se quiere ampliar.
+
+### Balance de los tres filtros
+
+| Filtro | Cartas revisadas | Erratas |
+|---|---:|---:|
+| Cifras dentro del texto | 161 | **0** |
+| Afirmaciones de exclusividad | 131 | **2** |
+| Atribuciones de autoría | 24 | **3** |
+
+La densidad de error crece según baja el número de cartas: las cifras concretas ya estaban
+limpias, pero **una de cada ocho atribuciones estaba mal**. Tiene sentido: una cifra se copia de
+una fuente, mientras que «X inventó Y» es la forma en que la divulgación comprime una historia
+con varios protagonistas, y esa compresión es justo donde se pierde el dato.
+
+### Integridad
+
+- Ninguna carta añadida ni retirada. 933 identificadores.
+- `npm test` pasa 345 comprobaciones.
+- La caché pasa a `continuum-v52`.

@@ -87,7 +87,7 @@ window.INVENTION_CARDS = [
   { id: 4078, year: 1953, title: "La estructura del ADN", detail: "La doble hélice, apoyada en las imágenes de rayos X de Rosalind Franklin." },
   { id: 4079, year: 1955, title: "La vacuna de la polio", detail: "La campaña de Salk empieza a vaciar los pabellones de pulmones de acero." },
   { id: 4080, year: 1957, title: "El Sputnik", detail: "Una esfera de 58 centímetros da la vuelta al mundo cada 96 minutos y abre la carrera espacial." },
-  { id: 4081, year: 1958, title: "El circuito integrado", detail: "Kilby mete varios componentes en una sola pieza de semiconductor: nace el chip." },
+  { id: 4081, year: 1958, title: "El circuito integrado", detail: "Kilby mete varios componentes en una sola pieza de semiconductor. Robert Noyce llega a la misma idea al año siguiente, con el diseño de silicio que acabará imponiéndose; las dos empresas acordaron reconocerlos coinventores." },
   { id: 4082, year: 1960, title: "El láser", detail: "Maiman consigue el primer haz con un rubí sintético y una lámpara de flash." },
   { id: 4083, year: 1961, title: "El primer humano en el espacio", detail: "Yuri Gagarin da una vuelta completa a la Tierra en 108 minutos." },
   { id: 4084, year: 1967, title: "El primer trasplante de corazón", detail: "Christiaan Barnard opera en Ciudad del Cabo; el paciente vive dieciocho días." },
