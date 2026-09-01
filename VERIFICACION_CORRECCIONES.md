@@ -1100,3 +1100,60 @@ en el mazo.
 - 38 cartas por mazo, 933 identificadores, cero avisadas.
 - `npm test` pasa 345 comprobaciones. Techo de mudas a 19.
 - La caché pasa a `continuum-v50`. Cambian cuatro cartas: hay que empezar partidas nuevas.
+
+## Ronda 16: barrido sistemático de los mazos cronológicos (1 de septiembre de 2026)
+
+Hasta aquí las auditorías habían mirado los mazos de Naturaleza, que son los que llevan campo
+`source`. Los otros ocho —833 cartas de historia, inventos, cine, música, videojuegos,
+astronomía y medicina— solo se habían revisado leyéndolos y con una pasada dirigida en la
+ronda 4. Esta ronda los somete a dos filtros automáticos.
+
+### Filtro 1: afirmaciones numéricas dentro del texto
+
+Se extrajeron con un script las cartas cuya explicación contiene una cifra concreta —dígitos o
+palabra-número en español—, que es donde vivían las erratas de Edison, Whittle y Cooper. Son
+**161 cartas**: 40 en Inventos, 39 en Historia mundial, 25 en Historia de España, 15 en Cine,
+15 en Astronomía, 13 en Música, 12 en Videojuegos y 2 en Medicina.
+
+**Resultado: cero erratas nuevas.** Comprobadas una a una, cuadran las 116 años de la guerra de
+los Cien Años, los 27 de la del Peloponeso, los 32 de Alejandro, los 19 de Juana de Arco, los
+11 siglos de Bizancio, los 116 de Ford, los 58 cm y 96 minutos del Sputnik, los 108 de Gagarin,
+los 18 días de Washkansky, los 12 minutos de Leónov, los 4 días de 51 Pegasi b y el resto.
+
+Que un barrido exhaustivo no encuentre nada nuevo confirma que la pasada dirigida de la ronda 4
+recogió lo que había. También acota el riesgo: la cifra dentro del texto ya no es la vía por la
+que entra un error en estos mazos.
+
+### Filtro 2: afirmaciones de exclusividad
+
+Segundo script: cartas que afirman «el primero», «el único», «el mayor», «nunca», «por primera
+vez». Son **131**, concentradas en Inventos (36) y Astronomía (20), que es normal en mazos cuya
+gracia es precisamente la primera vez que pasó algo. Aquí sí aparecen dos.
+
+**Daguerrotipo (1839): «la primera fotografía nítida y repetible».** El daguerrotipo produce una
+**placa única que no se puede copiar**; su limitación definitoria era exactamente esa. La
+reproducción en muchas copias llegó con el negativo de Talbot. Decir «repetible» invertía el
+hecho que distingue a los dos procesos.
+
+**Globo Montgolfier (1783): «el primer vuelo tripulado».** Fue el primer vuelo **libre**
+tripulado, el 21 de noviembre. El 15 de octubre Pilâtre de Rozier ya había subido casi cuatro
+minutos con el globo atado con cuerdas de casi cien metros. La carta lo dice ahora.
+
+### Una tercera, comprobada y confirmada
+
+**La rueda de alfarero: «el primer uso documentado de la rueda, antes que el transporte».**
+Se comprobó porque suena a tópico repetido, y resulta **cierta**: los tornos de alfarero
+mesopotámicos están datados hacia 4200–4000 a. C., y el vehículo con ruedas más antiguo bien
+fechado —el vaso de Bronocice— es de 3500–3350 a. C.
+
+Queda anotado un matiz que no se toca: la carta fecha el torno hacia **3000 a. C.** y esa
+literatura lo lleva más de mil años atrás. La distinción entre torno lento y torno rápido
+explica parte de la diferencia y las fuentes no coinciden, así que se deja como está —el título
+ya dice «fecha aproximada»— pero conviene mirarlo con una fuente única antes de moverlo,
+porque cambiaría el orden del mazo respecto a la escritura cuneiforme.
+
+### Integridad
+
+- Ninguna carta añadida ni retirada. 933 identificadores.
+- `npm test` pasa 345 comprobaciones.
+- La caché pasa a `continuum-v51`.
