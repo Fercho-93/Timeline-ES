@@ -88,7 +88,9 @@ console.log("\nLas reglas se adaptan al mazo");
   click(w, '[data-action="rules"]');
   const texto = el(w, ".overlay .modal").textContent;
   ok("peso muestra su dato oculto", /peso oculto/i.test(texto));
-  ok("los mazos con pendientes lo explican", /en revisión/.test(texto));
+  // Ya no se publica ninguna carta sin dato atado, así que el aviso «en revisión» debe
+  // estar apagado en los tres mazos. Si vuelve a encenderse es que se ha colado una.
+  ["animals", "lifespan", "speed"].forEach(mazo => ok(`${mazo} no muestra el aviso de revisión`, !/en revisión/.test(w.CONTINUUM.guideMarkup(mazo, "local"))));
   ok("los empates exactos se admiten", /mismo valor/.test(texto));
   ok("el Pulso se explica fuera de solitario", /Carta Pulso activa/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: true })));
   ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));

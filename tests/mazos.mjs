@@ -99,6 +99,24 @@ redondeoLegible("Esperanza de vida de animales", "lifespan", ANIMAL_LIFESPAN_CAR
 redondeoLegible("Velocidad de animales", "speed", ANIMAL_SPEED_CARDS);
 redondeoLegible("Distancias entre ciudades", "distances", CITY_DISTANCE_CARDS);
 
+// Deuda de fuentes. El campo `source` es lo único que separa un dato contrastado de un
+// número heredado, y el aviso «en revisión» solo cubre los que alguien llegó a marcar: la
+// mayoría de las cartas sin fuente no avisan de nada. Aquí no se comprueba que un dato sea
+// cierto —ninguna prueba puede—, sino que la deuda no crece a escondidas. Los techos bajan
+// cuando se documenta una carta; subirlos exige explicar por qué en el mensaje del commit.
+console.log("\nDeuda de fuentes en Naturaleza");
+{
+  const naturaleza = [...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS];
+  const enRevision = naturaleza.filter(card => card.reviewStatus === "pending");
+  const mudas = naturaleza.filter(card => !card.source && card.reviewStatus !== "pending");
+  const TECHO_MUDAS = 19;
+  const TECHO_REVISION = 0;
+  ok(`${mudas.length} cartas sin fuente y sin aviso (techo ${TECHO_MUDAS}, solo puede bajar)`, mudas.length <= TECHO_MUDAS);
+  ok(`${enRevision.length} cartas en revisión (techo ${TECHO_REVISION}, solo puede bajar)`, enRevision.length <= TECHO_REVISION);
+  ok("toda carta en revisión lo dice en su título", enRevision.every(card => /en revisión/.test(card.title)));
+  ok("ninguna carta con fuente sigue marcada en revisión", !naturaleza.some(card => card.source && card.reviewStatus === "pending"));
+}
+
 const cronologicos = [HISTORY_CARDS, WORLD_CARDS, INVENTION_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS];
 const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS, ...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS, ...CITY_DISTANCE_CARDS];
 console.log("\nEntre mazos");

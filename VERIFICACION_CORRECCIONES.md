@@ -325,3 +325,778 @@ reproducido y no se cambia ninguna cifra.
   desordenada.
 - Los 25 pendientes de la ronda anterior siguen pendientes: no se ha encontrado respaldo nuevo
   y no se inventa una cifra para cerrarlos.
+
+## Ronda 5: se atacan los 25 pendientes (1 de septiembre de 2026)
+
+Los pendientes de la ronda 2 no eran una lista cerrada, sino un encargo. Se ha buscado fuente
+para los 25. **Doce quedan cerrados y trece siguen abiertos.** Peso pasa a no tener ninguno.
+
+El criterio no cambia: si la fuente sostiene otra cifra, se cambia la cifra; si el problema es
+el animal —una atribución que nadie ha medido, o dos cartas para el mismo bicho—, se sustituye
+la carta y se dice por quién. No se inventa un número para tapar un hueco y no se retoca
+ninguna cifra para separarla de su vecina.
+
+### Cerrados con cifra corregida
+
+| ID | Mazo | Antes | Ahora | Fuente |
+|---|---|---:|---:|---|
+| 10009 | Peso | 2,5 | 5 kg | [ADW: Lepus europaeus](https://animaldiversity.org/accounts/Lepus_europaeus/) (rango 3–5 kg) |
+| 12007 | Longevidad | 0,25 | 1,5 años | [ADW: Mus musculus](https://animaldiversity.org/accounts/Mus_musculus/) (12–18 meses en libertad) |
+| 12008 | Longevidad | 0,4 | 2 años | [ADW: Rattus norvegicus](https://animaldiversity.org/accounts/Rattus_norvegicus/) |
+| 12028 | Longevidad | 235 | 211 años | [George et al., 1999](https://cdnsciencepub.com/doi/10.1139/z99-015), racemización del aspártico |
+| 13016 | Velocidad | 45 | 24,5 km/h | [Hutchinson et al., 2006, JEB](https://journals.biologists.com/jeb/article/209/19/3812/16362/The-locomotor-kinematics-of-Asian-and-African) (6,8 m/s) |
+| 13022 | Velocidad | 120 | 80 km/h | [Zoo de Granby](https://www.zoodegranby.com/en/animals/blue-wildebeest) |
+| 13028 | Velocidad | 275 | 209 km/h | [Tucker, 1998, JEB](https://journals.biologists.com/jeb/article/201/13/2061/7683/Diving-Speeds-and-Angles-of-a-Gyrfalcon-Falco) (52–58 m/s, seguimiento óptico) |
+
+Los 45 km/h del elefante eran el caso más claro: Hutchinson midió más de 2.400 zancadas de
+elefantes africanos y asiáticos y la mayor velocidad fiable fue de 6,8 m/s. El gerifalte pasa
+de una cifra sin origen a once picados cronometrados con aparato óptico.
+
+### Cerrados sustituyendo la carta
+
+Cuatro cartas no tenían arreglo cambiando el número, porque el problema era el animal.
+
+| ID | Antes | Ahora | Motivo y fuente |
+|---|---|---|---|
+| 12038 | Esponja de aguas profundas, 3.300 años | Esponja barril gigante de Curaçao, 2.300 años | «Esponja de aguas profundas» no es una especie. Se sustituye por un ejemplar concreto de *Xestospongia muta* datado con las ecuaciones de [McMurray et al., 2008](https://link.springer.com/article/10.1007/s00227-008-1014-z) |
+| 13025 | Vencejo de garganta blanca, 182 km/h | Ser humano: Usain Bolt, 44,7 km/h | Los 170 km/h del vencejo de garganta blanca se citan en todas partes, pero el método nunca se publicó. Se sustituye por la punta mejor medida de cualquier animal: [informe biomecánico de World Athletics, Berlín 2009](https://worldathletics.org/download/download?filename=76ade5f9-75a0-4fda-b9bf-1b30be6f60d2.pdf&urlslug=1+-+Biomechanics+Report+WC+Berlin+2009+Sprint+Men) |
+| 13026 | Águila real, 210 km/h | Murciélago de cola libre brasileño, 160 km/h | Había **dos** cartas de águila real haciendo lo mismo. Se conserva una y esta pasa al vuelo horizontal más rápido registrado: [McCracken et al., 2016](https://royalsocietypublishing.org/doi/10.1098/rsos.160398) |
+| 13029 | Halcón sacre, 315 km/h | Vencejo común, 111,6 km/h | Ningún picado de sacre está medido. Se sustituye por el récord de vuelo horizontal de un ave, con radar de la Universidad de Lund: [Guinness World Records](https://www.guinnessworldrecords.com/world-records/fastest-bird-level-flight) |
+
+La carta que se conserva del águila real (13027) queda en 240 km/h, el extremo inferior del
+rango de [Birds of the World](https://birdsoftheworld.org/bow/species/goleag/cur/behavior), y
+dice en su explicación que son cifras referidas y no cronometradas.
+
+### Empates y cifras próximas que esto genera
+
+Tres parejas quedan a menos de un 8 %, y se dejan así a propósito: son dos valores documentados
+que resultan estar cerca, y el mazo tiene prohibido moverlos para separarlos.
+
+- **Guepardo 112 y vencejo común 111,6 km/h** (0,4 %). Es el peor par del mazo para jugar y a la
+  vez el mejor dato: un vencejo en vuelo horizontal va tan rápido como un guepardo esprintando.
+- **Manatí 24,1 y elefante 24,5 km/h** (1,7 %).
+- **León 78 y ñu azul 80 km/h** (2,6 %). El 78 del león sigue sin fuente; si algún día se cierra,
+  este par se recoloca solo.
+
+Si alguno resulta molesto en la mesa, la salida correcta es cambiar de animal, no de cifra.
+
+### Los trece que siguen abiertos
+
+| Mazo | ID | Por qué no se cierra |
+|---|---|---|
+| Longevidad | 12001, 12002 | «Efímera» y «mosca de mayo» son el mismo orden de insectos: son dos cartas del mismo animal. Falta elegir especie y separar fase adulta de ciclo completo. |
+| Longevidad | 12032, 12033, 12034 | Las estimaciones publicadas de esponjas van de 15.000 a 40.000 años y un seguimiento de McMurdo no detectó crecimiento en 22 años, lo que invalida los modelos de crecimiento. Ninguna sostiene 650, 850 ni 1.100. |
+| Longevidad | 12035 | Sin colonia identificada ni estudio para los 1.450 años del coral de bambú. |
+| Velocidad | 13002, 13003, 13006, 13033, 13034 | Invertebrados lentos. No hay fuente institucional ni experimental que dé una cifra por especie. |
+| Velocidad | 13008 | Sin fuente para la marcha del panda gigante. |
+| Velocidad | 13009 | Las referencias divulgativas dan 2,5–2,8 km/h caminando, por encima del 1,7 de la carta, pero no se ha localizado la medición original. |
+
+Las tres esponjas y el coral de bambú son ahora el bloque más flojo del juego: cuatro cartas
+seguidas con cifras redondas que ninguna literatura respalda. Cerrarlas pide sustituirlas por
+organismos datados, y no hay cuatro con fecha publicada en ese tramo. Se dejan marcadas.
+
+### Integridad
+
+- Se conservan las 38 cartas de cada mazo de Naturaleza y los 933 identificadores.
+- **Peso queda sin pendientes**, así que su aviso «en revisión» desaparece del juego. La prueba
+  de accesibilidad comprobaba ese aviso sobre el mazo de peso; ahora comprueba las dos caras
+  —que aparece donde quedan pendientes y que desaparece donde no— en vez de dar por hecho que
+  siempre hay alguno.
+- `npm test` pasa 340 comprobaciones.
+- La caché pasa a `continuum-v40`. Conviene empezar partidas nuevas de Naturaleza: cambian
+  valores en los tres mazos.
+
+## Ronda 6: el problema no eran los pendientes (1 de septiembre de 2026)
+
+Al buscar cómo cerrar los trece pendientes que quedaban apareció el dato que cambia el
+diagnóstico: en los tres mazos de Naturaleza hay **114 cartas y 58 no tenían fuente ni aviso**.
+El peregrino a 360 km/h, el león a 78, la jirafa a 55, el rinoceronte a 2,3 t: ninguna llevaba
+respaldo y ninguna avisaba. La marca «en revisión» cubría trece cartas de un problema de
+cincuenta y ocho, y al hacerlo daba a entender que el resto estaba comprobado.
+
+Así que perseguir los trece de uno en uno no era lo eficiente: arreglaba la etiqueta, no el
+mazo, y dejaba intacto el mecanismo que permitió que la deuda creciera sin que nadie la viera.
+
+### Lo que se ha hecho
+
+**1. Longevidad queda cerrada: cero pendientes.** Los seis que quedaban se sustituyen por
+animales con edad documentada. Cuatro eran esponjas y un coral de bambú con cifras redondas
+que ninguna literatura sostiene —para el coral de bambú las colonias vivas rondan de 50 a 150
+años, no 1.450— y las dos primeras eran, literalmente, el mismo insecto dos veces.
+
+| ID | Antes | Ahora | Fuente |
+|---|---|---|---|
+| 12001 | Efímera, 5 días | Efímera *Dolania americana*, **5 minutos** | [Portal de biodiversidad de Georgia](https://georgiabiodiversity.org/portal/profile?group=all&es_id=21325) |
+| 12002 | Mosca de mayo, 9 días | Caballo Old Billy, **62 años** | [Guinness](https://www.guinnessworldrecords.com/news/2021/10/worlds-oldest-animals-cats-dogs-deep-sea-creatures-and-more-678003) |
+| 12032 | Esponja de vidrio, 650 | Erizo rojo del Pacífico, **100 años** | [Ebert y Southon, NOAA](https://spo.nmfs.noaa.gov/content/red-sea-urchins-strongylocentrotus-franciscanus-can-live-over-100-years-confirmation-bomb) |
+| 12033 | Esponja antártica, 850 | Tortuga Jonathan, **194 años** | [Guinness](https://www.guinnessworldrecords.com/news/icons/jonathan-the-tortoise-the-oldest-terrestrial-animal) |
+| 12034 | Esponja barril antártica, 1.100 | Mejillón perlífero de río, **280 años** | [ADW](https://animaldiversity.org/accounts/Margaritifera_margaritifera/) |
+| 12035 | Coral de bambú, 1.450 | Cacatúa Cookie, **83 años** | [Guinness](https://www.guinnessworldrecords.com/news/2021/10/worlds-oldest-animals-cats-dogs-deep-sea-creatures-and-more-678003) |
+
+La efímera es el mejor cambio del lote: pasa de una cifra inventada a la vida adulta más corta
+registrada en un animal, cinco minutos, con la ninfa pasando hasta dos años enterrada en la
+arena del río.
+
+**2. Se corrige de paso una carta muda.** El tiburón de Groenlandia ordenaba por 300 años sin
+fuente; la datación por radiocarbono del cristalino de Nielsen y colaboradores da **392 ± 120**
+para el mayor ejemplar. [Science, 2016](https://www.science.org/doi/10.1126/science.aaf1703).
+
+**3. Velocidad cierra tres de siete.** Los récords institucionales existen justo donde no hay
+medias por especie, así que se nombra el récord en vez de la especie, como ya hacían las cartas
+de Winning Brew o la orca.
+
+| ID | Antes | Ahora | Fuente |
+|---|---|---|---|
+| 13003 | Estrella de mar, 0,08 | Estrella de mar girasol, **0,06 km/h** | [Guinness, estrella más rápida](https://www.guinnessworldrecords.com/world-records/118353-fastest-starfish) |
+| 13006 | Caballito de mar, 0,36 | Caballito de mar enano, **0,016 km/h** | [Guinness, el pez más lento](https://www.guinnessworldrecords.com/world-records/70705-slowest-fish) |
+| 13009 | Pingüino emperador en tierra, 1,7 | Pingüino papúa nadando, **36 km/h** | [Guinness, ave nadadora más rápida](https://www.guinnessworldrecords.com/world-records/70933-fastest-bird-swimmer) |
+
+Aviso sobre el caballito de mar: muchos sitios repiten «1,5 m/h». La ficha de Guinness dice
+0,016 km/h, diez veces más. Se usa la del récord.
+
+**4. El formato deja de aplastar el dato.** Cinco minutos se enseñaban como «0 días». La escala
+de longevidad baja ahora hasta minutos y horas, y de paso se arreglan dos concordancias que ya
+fallaban: decía «1 días» y «1 meses».
+
+**5. La deuda se cuenta y solo puede bajar.** `tests/mazos.mjs` cuenta las cartas de Naturaleza
+sin `source` y las marcadas en revisión, y falla si alguna de las dos cifras sube. Hoy el techo
+está en **57 mudas y 4 en revisión**. Esto no comprueba que un dato sea cierto —ninguna prueba
+puede—, pero convierte una deuda invisible en una cifra que se ve en cada ejecución y que solo
+se mueve en una dirección. Bajarla es documentar cartas; subirla exige explicarlo en el commit.
+
+### Los cuatro que siguen abiertos
+
+Babosa, caracol marino, cangrejo de río y panda gigante. Son invertebrados lentos y un
+mamífero para los que no existe una velocidad por especie publicada por ninguna institución.
+Se quedan marcados, ahora ya sin la compañía de los otros veintiuno.
+
+### Lo que queda por hacer, con nombre
+
+Las 57 mudas son el trabajo pendiente real, y algunas ya huelen mal:
+
+- **Caracol de jardín, 0,03 km/h.** Guinness da 0,03 **millas** por hora, que son 0,048 km/h.
+  Tiene toda la pinta de un cambio de unidad perdido, pero no se toca sin confirmarlo.
+- **Perezoso de tres dedos, 0,22 km/h.** Guinness da 1,8–2,4 m/min *en el suelo*, o sea
+  0,11–0,14. La carta habla de moverse entre las ramas, que es otra cosa; hay que decidir cuál
+  de las dos mide.
+- **Halcón peregrino, 360 km/h** y **león africano, 78 km/h**: las dos cifras más altas del
+  mazo de velocidad no llevan respaldo. Cerrar la del león recolocaría además el par que
+  ahora queda a un 2,6 % del ñu.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones.
+- La caché pasa a `continuum-v41`. Cambian valores en Longevidad y Velocidad y cambia el
+  formato de los valores pequeños: conviene empezar partidas nuevas de Naturaleza.
+
+## Ronda 7: primera tanda contra las 57 mudas (1 de septiembre de 2026)
+
+Se ataca la deuda de fuentes documentada en la ronda anterior. **La deuda baja de 57 a 45.**
+Doce cartas de Peso pasan a llevar respaldo, y en el camino aparecen dos cifras que estaban mal.
+
+### Cómo se ha trabajado, y por qué importa
+
+La red de esta sesión no deja descargar páginas: solo se ven resúmenes de búsqueda. Para que
+eso no se convierta en citar de oído, se ha seguido una regla estricta: **solo se anota una
+fuente cuando la búsqueda estaba restringida al dominio de esa fuente y devolvió una cifra
+concreta para esa especie.** Todo lo que salió vago, ausente o mezclado con otra especie se ha
+dejado sin tocar. De unas quince consultas, cuatro se descartaron por eso.
+
+No es una precaución teórica. En esta misma tanda, una consulta sobre la cebra devolvió el peso
+de la cebra de Grevy, y otra sobre el zorro llegó a mezclar tres cánidos. Anotar esas
+respuestas habría metido errores nuevos en el mazo con aspecto de estar documentado, que es
+justo lo que estas auditorías intentan evitar.
+
+### Cartas cerradas (12)
+
+| ID | Carta | Valor | Fuente |
+|---|---|---:|---|
+| 10011 | Zorro rojo (adulto típico) | 6,5 kg | ADW, rango 3–14 |
+| 10015 | Lobo gris (media de hembras publicada) | 45 kg | ADW, hembras 23–55 (media 45), machos 30–80 (media 55) |
+| 10016 | Capibara (adulto grande) | 60 kg | ADW, rango 35–66 |
+| 10018 | Panda gigante (adulto típico) | 110 kg | Smithsonian: Mei Xiang 112 kg, Tian Tian 123,6 kg en 2022 |
+| 10019 | Oso negro americano (adulto típico) | 150 kg | ADW, machos 47–409, hembras 39–236 |
+| 10020 | León africano (macho adulto) | 190 kg | San Diego Zoo, machos 150–260 |
+| 10021 | Tigre de Bengala (macho adulto) | 250 kg | San Diego Zoo, hasta 295 |
+| 10024 | Alce (macho de la subespecie de Alaska) | 700 kg | ADW, machos 360–600 y hasta 771 en Alaska |
+| 10026 | Jirafa (límite de las hembras) | 1.200 kg | ADW, hembras hasta 1.180, machos hasta 1.930 |
+| 10027 | Hipopótamo común (hembra adulta) | 1.500 kg | San Diego Zoo, hembras 1.400 de media |
+| 10033 | Ballena gris (hasta, aprox.) | **40.800 kg** | NOAA, unas 90.000 libras |
+| 10022 | Cebra de llanura | — | pasa a revisión, ver abajo |
+
+En casi todas, el número ya era razonable y lo que faltaba era decir de dónde salía y de qué
+es medida: si es una media, un límite de rango o un sexo concreto. Los títulos ahora lo dicen.
+
+### Dos cifras que estaban mal
+
+- **Ballena gris: 25.000 → 40.800 kg.** NOAA da unas 90.000 libras. Las 25 toneladas no salían
+  de ninguna parte. Con el cambio, la ballena gris pasa por delante de la jorobada en la línea.
+- **Cebra de llanura, 350 kg: pasa a revisión.** San Diego Zoo describe la de llanura como la
+  **más pequeña** de las tres especies de cebra, y sitúa en 350–450 kg a la de Grevy, que es la
+  **mayor**. Darle 350 kg a la más pequeña no encaja. No se ha encontrado cifra publicada con la
+  que sustituirla, así que se marca en vez de dejarla como si estuviera comprobada.
+
+Esto sube los avisos de 4 a 5. El techo del test se sube a la vez y con motivo: el mecanismo
+existe para que la deuda no crezca **en silencio**, no para empujar a esconder un hallazgo con
+tal de mantener un contador en verde. Encontrar un error y marcarlo es el test funcionando.
+
+### Estado de la deuda
+
+| | Antes | Ahora |
+|---|---:|---:|
+| Sin fuente y sin aviso | 57 | **45** |
+| En revisión | 4 | 5 |
+| Con fuente | 53 | 64 |
+
+Techos del test actualizados a 45 y 5. Reparto de lo que queda: 18 en Peso, 12 en Longevidad
+y 15 en Velocidad.
+
+### Lo que falta y a qué ritmo va
+
+Quedan 45. Al ritmo real de esta tanda —con los descartes incluidos— son del orden de cincuenta
+consultas más. Se puede seguir por tandas; el orden sensato es acabar Peso, que es el que mejor
+cubre Animal Diversity Web, y dejar para el final las tres señaladas en la ronda anterior
+(caracol de jardín, perezoso y el peregrino a 360 km/h), que necesitan decidir antes **qué**
+miden, no solo de dónde sale el número.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones. La prueba de accesibilidad apuntaba al mazo de Peso para
+  comprobar que un mazo sin pendientes no muestra el aviso; como Peso vuelve a tener uno, ahora
+  apunta a Longevidad, que sí está limpio.
+- La caché pasa a `continuum-v42`. Cambia el peso de la ballena gris, así que conviene empezar
+  partidas nuevas de Naturaleza.
+
+## Ronda 8: segunda tanda contra las mudas (1 de septiembre de 2026)
+
+**La deuda baja de 45 a 35.** Diez cartas más de Peso pasan a llevar respaldo. Peso queda con
+ocho mudas y una en revisión; Longevidad con doce; Velocidad con quince y cuatro en revisión.
+
+Se mantiene la regla de la ronda anterior: fuente solo cuando la búsqueda iba restringida a ese
+dominio y devolvió cifra concreta para esa especie. En esta tanda se descartaron seis consultas
+—bisonte por ADW tres veces, cachalote, tiburón ballena, cobaya por la RSPCA— antes de dar con
+una fuente utilizable o dejarlas para otra vez.
+
+### Cartas cerradas (10)
+
+| ID | Carta | Valor | Fuente |
+|---|---|---:|---|
+| 10005 | Ratón doméstico (adulto típico) | 25 g | ADW, rango 12–30 g |
+| 10008 | Cobaya (adulto típico) | 900 g | ADW, rango 700–1.200 g |
+| 10010 | Gato doméstico (adulto típico) | 4,5 kg | ADW, rango 4,1–5,4 kg |
+| 10025 | Bisonte americano (macho adulto) | 900 kg | NPS, machos hasta 2.000 libras |
+| 10028 | Rinoceronte blanco (límite publicado) | 2.300 kg | San Diego Zoo, 6.000 libras el más pesado |
+| 10029 | Elefante marino del sur (macho adulto) | 4.000 kg | ADW, machos de más de 3.700 kg |
+| 10030 | Elefante africano de sabana (macho grande) | 6.000 kg | San Diego Zoo, machos 12.000–15.000 libras |
+| 10034 | Ballena jorobada (hasta, aprox.) | **36.300 kg** | NOAA, 40 toneladas cortas |
+| 10036 | Rorcual común (hasta, aprox.) | **68.900 kg** | NOAA, 76 toneladas cortas |
+| 10038 | Ballena azul (hasta, aprox.) | 150.000 kg | NOAA, más de 330.000 libras en las antárticas |
+
+### Una ambigüedad de unidades que conviene dejar anotada
+
+Las fichas de NOAA dan pesos «in tons» sin decir cuáles. En la ballena jorobada la propia ficha
+las traduce —40 toneladas ≈ 80.000 libras—, lo que confirma que **son toneladas cortas**, no
+métricas. La diferencia no es menor: 76 toneladas del rorcual son 68,9 métricas, no 76.
+Con eso resuelto, jorobada y rorcual se ajustan a la cifra publicada. La ballena azul ya venía
+en libras y salía clavada.
+
+### Lo que queda, y una decisión que no es mía
+
+Quedan **35**: 8 en Peso (abeja, monarca, mantis, rana arborícola, paloma, caballo de silla,
+tiburón ballena y cachalote), 12 en Longevidad y 15 en Velocidad.
+
+Para Longevidad aparece un atajo real: **AnAge**, la base de longevidad animal de Human Ageing
+Genomic Resources, tiene ficha por especie con URL predecible y responde bien a la búsqueda.
+Cubriría casi todo el mazo de una vez.
+
+El problema es que AnAge publica **longevidad máxima registrada**, no la típica, y las cartas
+actuales dicen otra cosa. Adoptarla significaría que el conejo pasa de 2,5 a 9 años, la ardilla
+roja de 6,5 a 12 y el zorro de 10 a 21,3. Y llevado al perro o al gato daría 29 y 30 años, que
+son Bluey y Creme Puff: el mazo se convertiría en una lista de récords, cuando ya tiene a Old
+Billy, Cookie y Jonathan cumpliendo ese papel.
+
+Es una decisión sobre qué mide el mazo, no sobre si un dato es cierto, así que se deja abierta:
+
+1. **Convertir Longevidad a máximos de AnAge.** Rápido, una sola fuente, cierra casi todo. El
+   mazo pasa a comparar récords en vez de vidas corrientes.
+2. **Mantener valores típicos** y buscar fuente caso a caso. Conserva el carácter del mazo y es
+   bastante más lento; algunas cartas quizá no se cierren nunca.
+3. **Mezclar con etiqueta**, como ahora: cada carta dice si es media, límite o récord.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones. Techo de mudas actualizado a 35.
+- La caché pasa a `continuum-v43`. Cambian los pesos de la jorobada y el rorcual.
+
+## Ronda 9: criterio de medias y típicas, y el folclore de las velocidades (1 de septiembre de 2026)
+
+Decisión del autor: **el mazo compara medidas medias o típicas, no récords ni ejemplares
+excepcionales.** Se adopta como criterio para lo que queda por documentar y se empieza a
+aplicar hacia atrás. Deuda: **35 → 29 mudas**, con 7 avisos.
+
+### Lo que este criterio destapa
+
+Al aplicarlo a Velocidad aparece un patrón que va más allá de una carta suelta: **las cifras
+populares de velocidad animal son sistemáticamente más altas que las institucionales, y no
+traen procedencia.** Cuatro casos en esta tanda:
+
+| Carta | Cifra popular (la que tenía) | Lo que dice la fuente |
+|---|---:|---|
+| Halcón peregrino | 360 km/h | Picados medidos de 39 a 51 m/s (140–184). Los autores subrayan que quedan **muy por debajo** de la velocidad terminal posible: el halcón modera el picado para no perder precisión |
+| Hipopótamo | 30 km/h | San Diego Zoo: carga de hasta 14 mph, **22,5 km/h** |
+| León africano | 78 km/h | Los 80 km/h que se repiten en todas partes no traen procedencia; el GPS en Botsuana da puntas menores y variables; San Diego Zoo baja a 53 km/h en leonas |
+| Caracol de jardín | 0,03 km/h | El **récord** Guinness de caracol terrestre es 0,233 cm/s, o sea **0,0084 km/h** |
+
+El caracol es el más llamativo: la carta iba 3,5 veces más rápida que el ejemplar más veloz
+jamás cronometrado. No era una velocidad típica; no era ni siquiera posible.
+
+Los 389 km/h del peregrino, que es de donde venían los 360, son de un ejemplar entrenado
+lanzándose junto a un paracaidista. Es el ejemplo de manual de lo que el criterio nuevo excluye.
+
+### Cartas cerradas (6)
+
+| ID | Carta | Antes | Ahora | Fuente |
+|---|---|---:|---:|---|
+| 13005 | Perezoso de tres dedos (entre las ramas) | 0,22 | **0,27 km/h** | Guinness: 4,6 m/min en las ramas, 1,8–2,4 en el suelo |
+| 13015 | Hipopótamo común (carga en tierra) | 30 | **22,5 km/h** | San Diego Zoo |
+| 13017 | Jirafa (galopando) | 55 | **56,3 km/h** | San Diego Zoo, unas 35 mph |
+| 13030 | Halcón peregrino (picado medido) | 360 | **184 km/h** | Ponitz et al., PLOS ONE |
+
+Más las de Peso de la ronda anterior que ya seguían el criterio. El perezoso tenía además el
+problema de mezclar medidas: Guinness da una cifra para el suelo y otra para las ramas, y la
+carta habla de las ramas.
+
+### Dos que pasan a revisión
+
+- **León africano.** Tres fuentes, tres cifras que no se pueden conciliar. Marcarlo es más
+  honesto que elegir una.
+- **Caracol de jardín.** Se ha demostrado que la cifra es imposible, pero no hay una velocidad
+  típica publicada con la que sustituirla.
+
+Los avisos suben de 5 a 7 y el techo del test con ellos. Es la tercera vez que pasa y conviene
+decirlo claro: **el contador de avisos subiendo es el sistema funcionando**, no fallando. Baja
+cuando se documenta y sube cuando se descubre que algo estaba mal. Lo que no puede hacer es
+moverse sin que quede escrito por qué.
+
+### Una consecuencia que hay que decidir
+
+Con el peregrino en 184, la carta más rápida del mazo pasa a ser el **águila real en picado, con
+240 km/h**, y es la cifra peor sostenida de las cinco primeras: Birds of the World la da como
+«referida, no cronometrada». La carta lo dice en su explicación y lleva fuente, así que se
+mantiene, pero hay una elección pendiente:
+
+1. **Dejarlo.** El águila encabeza el mazo con una cifra de referencia honestamente etiquetada.
+2. **Pasarla también a revisión.** Entonces encabeza el **halcón gerifalte con 209 km/h**, que es
+   el mejor picado realmente medido del mazo (seguimiento óptico de once picados).
+
+La segunda es más coherente con el criterio nuevo. Tiene el coste de que el peregrino deje de
+ser el animal más rápido de la baraja, que es lo que todo el mundo espera.
+
+### Inventario: 40 cartas con marco de récord
+
+Aplicar el criterio hacia atrás no es trivial. Hoy hay **40 de 114 cartas** enmarcadas como
+récord, extremo o ejemplar concreto: 12 en Peso, 21 en Longevidad y 7 en Velocidad. Se agrupan
+en tres tipos que no admiten el mismo trato:
+
+- **Límites de rango publicados** («hasta», «límite del rango»): 20 cartas. Convertibles a un
+  valor central cuando la fuente da el rango entero.
+- **Ejemplares con nombre** (Ming, Aura, Jonathan, Old Billy, Cookie, Winning Brew, Usain Bolt):
+  convertibles solo si existe una cifra típica publicada para la especie.
+- **Dataciones de un individuo o una colonia** (Monorhaphis, corales, esponja de Curaçao,
+  ballena boreal, tiburón de Groenlandia): **no tienen equivalente típico**. La edad del
+  ejemplar datado *es* el hallazgo científico; no existe «la longevidad media de un coral negro».
+  Para estas, el criterio de medias obliga a elegir entre conservarlas etiquetadas o retirar el
+  animal del mazo.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores, sin cambios.
+- `npm test` pasa 344 comprobaciones. Techos a 29 mudas y 7 avisos.
+- La caché pasa a `continuum-v44`. Cambian cuatro velocidades, una de ellas la más alta del
+  mazo: conviene empezar partidas nuevas de Naturaleza.
+
+## Ronda 10: si el dato no está atado, fuera la carta (1 de septiembre de 2026)
+
+Decisión del autor: **si la veracidad y la oficialidad del dato no están atadas, se quita el
+concepto.** Se aplica. El resultado es que **`reviewStatus` queda a cero**: ya no se publica
+ninguna carta avisada; o tiene fuente o no está en el mazo.
+
+Restricción que condiciona todo: cada mazo necesita **38 cartas** para repartir a nueve
+jugadores. Cada baja obliga a un alta documentada. No se puede solo quitar.
+
+### Siete cartas fuera, siete dentro
+
+| Fuera | Por qué | Dentro | Fuente |
+|---|---|---|---|
+| Caracol de jardín, 0,03 km/h | Iba 3,5 veces más rápido que el récord de la especie | Escarabajo tigre, **9 km/h** | Guinness, insecto terrestre más rápido |
+| Babosa, 0,05 km/h | Sin especie ni cifra | Cangrejo fantasma, **14,4 km/h** | Guinness, crustáceo terrestre más rápido |
+| Panda gigante, 1 km/h | Sin fuente para su marcha | Mamba negra, **19 km/h** | Guinness, serpiente terrestre más rápida |
+| León africano, 78 km/h | Tres fuentes irreconciliables (53, GPS variable, 80 sin procedencia) | Iguana espinosa, **34,9 km/h** | Guinness, reptil terrestre más rápido |
+| Caracol marino, 0,46 km/h | Sin especie ni cifra | León marino de California, **40 km/h** | Guinness, mamífero marino más rápido |
+| Cangrejo de río, 0,75 km/h | Sin cifra documentada | Cebra (huida), **64 km/h** | San Diego Zoo, más de 40 mph |
+| Cebra de llanura, 350 kg | Se le habían dado los kilos de la de Grevy | Cebra de Grevy, **400 kg** | San Diego Zoo, rango 350–450 |
+
+Además, la tortuga gigante pasa de 0,13 a **0,37 km/h**, el récord Guinness de lentitud entre
+los quelonios, y deja de ser una muda.
+
+Sobre el criterio de medias: estos siete altas son **récords de grupo**, no ejemplares con
+nombre. «El insecto terrestre más rápido» es una medida de especie, que es la comparable
+natural en un mazo de velocidad; no es Usain Bolt. La distinción importa y se mantiene.
+
+### La cebra: el error se explica solo
+
+La carta de peso decía «cebra de llanura, 350 kg». San Diego Zoo describe la de llanura como la
+**más pequeña** de las tres especies y da 350–450 kg para la de **Grevy**, la mayor. Alguien
+tomó los kilos de una especie y les puso el nombre de otra. Se corrige poniendo el nombre que
+corresponde a la cifra publicada, y se ordena por el centro del rango, no por su extremo.
+
+### El aviso «en revisión» queda apagado
+
+Con cero pendientes, el mecanismo de aviso deja de encenderse. Se conserva en el código como
+red de seguridad, pero **el techo del test baja a cero**: si alguna carta vuelve a marcarse,
+la prueba falla. La prueba de accesibilidad, que antes comprobaba que el aviso aparecía en el
+mazo que tuviera pendientes, ahora comprueba lo contrario en los tres mazos.
+
+### Estado
+
+| | Ronda 6 | Ahora |
+|---|---:|---:|
+| Con fuente | 53 | **86** |
+| Sin fuente y sin aviso | 57 | **28** |
+| En revisión | 4 | **0** |
+
+Por mazo: Peso 30 con fuente y 8 mudas; Longevidad 26 y 12; Velocidad 30 y 8.
+
+### Los dos outliers que quedan, y por qué no salen todavía
+
+Bajo el criterio de medias siguen sobrando dos cartas, las dos de ejemplar con nombre:
+
+- **Ser humano: Usain Bolt (44,7 km/h)**
+- **Caballo Winning Brew (70,35 km/h)** — que además está a un 0,5 % del avestruz, o sea que
+  ese par se juega a cara o cruz.
+
+No salen en esta ronda por un motivo concreto: hacen falta **dos velocidades de especie
+documentadas que no apelmacen la banda de 55 a 70 km/h**, y las cuatro candidatas encontradas
+caen todas dentro de un 7 % de una carta vecina: hiena manchada 60, canguro rojo 56, facóquero
+55 y coyote 72,4. Quitarlas sin recambio dejaría el mazo en 36 cartas y rompería el reparto a
+nueve jugadores. Queda pendiente de encontrar dos huecos limpios.
+
+### Lo que queda por documentar
+
+28 mudas: 8 en Peso (abeja, monarca, mantis, rana arborícola, paloma, caballo de silla, tiburón
+ballena y cachalote), 12 en Longevidad y 8 en Velocidad (hormiga roja, lapa, cangrejo araña,
+topo, cangrejo ermitaño, cucaracha, gallina y erizo).
+
+Las 8 de Velocidad son el bloque difícil y conviene decirlo pronto: **son invertebrados y
+animales pequeños para los que ninguna institución publica una velocidad por especie**. Si el
+criterio se aplica hasta el final, no se pueden documentar y hay que sustituirlas, lo que exige
+ocho velocidades documentadas más. Puede que el mazo de Velocidad no dé para 38 cartas con
+dato atado y haya que decidir qué hacer con él.
+
+### Integridad
+
+- 38 cartas por mazo y 933 identificadores: las bajas reutilizan el identificador de la carta
+  que sustituyen, así que la numeración no se mueve.
+- `npm test` pasa 345 comprobaciones. Techos a 28 mudas y **0 avisos**.
+- La caché pasa a `continuum-v45`. Cambian siete cartas de golpe: hay que empezar partidas
+  nuevas de Naturaleza.
+
+## Ronda 11: el resto, y por qué se para aquí (1 de septiembre de 2026)
+
+Se cierra el cachalote y la deuda queda en **27 mudas de 114 cartas**. Pero lo importante de
+esta ronda no es la carta que entra, sino que las 27 que quedan ya no son un resto cualquiera:
+tienen todas la misma forma, y conviene decir cuál antes de seguir gastando esfuerzo.
+
+### Lo cerrado
+
+**Cachalote: 50.000 → 40.800 kg.** NOAA da machos de unos 52 pies y casi 45 toneladas cortas,
+frente a las 15 toneladas de las hembras. Queda **empatado con la ballena gris**, porque NOAA
+da a las dos la misma cifra: 45 toneladas cortas son exactamente 90.000 libras. Es un empate
+real, no un descuido, y los motores lo aceptan en los dos órdenes.
+
+### Las 27 que quedan tienen todas la misma pinta
+
+| Mazo | Quedan | Qué son |
+|---|---:|---|
+| Peso | 7 | abeja, monarca, mantis, rana arborícola, paloma, caballo de silla, tiburón ballena |
+| Longevidad | 12 | mosquito, mosca de la fruta, abeja obrera, conejo, ardilla, zorro, perro, gato, águila harpía, elefante, ballena azul, tortuga de Galápagos |
+| Velocidad | 8 | hormiga, lapa, cangrejo araña, topo, cangrejo ermitaño, cucaracha, gallina, erizo |
+
+Son **animales pequeños, domésticos o muy corrientes**. Y ese es justo el problema: las
+instituciones publican fichas de las especies carismáticas, amenazadas o espectaculares. Nadie
+publica cuánto pesa una mantis, a qué velocidad anda una lapa o cuántos años vive una mosca de
+la fruta, porque no hay ninguna razón institucional para hacerlo.
+
+En esta ronda se consultaron, sin éxito y con búsqueda restringida al dominio: los campos de
+longevidad de Animal Diversity Web (no aparecen en los resúmenes), las fichas de San Diego Zoo
+para águila harpía y elefante, All About Birds de Cornell para la paloma, los CDC para el
+mosquito y Georgia Aquarium para el tiburón ballena. Solo el tiburón ballena devolvió cifra
+—20,6 toneladas «como mucho»— y es un máximo, no el valor típico que pide el criterio.
+
+### Lo que esto significa para el criterio
+
+El criterio es «si no está atado, fuera la carta». Aplicado a estas 27:
+
+- **Peso y Longevidad aguantan.** Son 7 y 12 sobre 38. Sustituirlas por especies documentadas
+  es trabajo, pero hay candidatas: el mundo está lleno de mamíferos y aves con ficha.
+- **Velocidad no aguanta bien.** Sus 8 mudas son invertebrados y animales pequeños, y ya se
+  gastaron seis de las siete altas disponibles en la ronda anterior. Los récords de grupo de
+  Guinness —el insecto, el crustáceo, el reptil, la serpiente, el mamífero marino más rápidos—
+  están **agotados**: eran la veta y ya se ha usado.
+
+Hay además dos ejemplares con nombre que el criterio de medias sigue rechazando y que no han
+podido salir: **Usain Bolt** y el **caballo Winning Brew**, este a un 0,5 % del avestruz.
+
+### Las tres decisiones que quedan sobre la mesa
+
+1. **Velocidad.** Con la veta agotada, llevar el mazo a 38 cartas documentadas exige encontrar
+   ocho velocidades más de especies que no apelmacen las bandas ya ocupadas. Puede no existir.
+   Las salidas son: aceptar el mazo con menos ambición, rehacerlo con otro criterio, o retirarlo.
+2. **Bolt y Winning Brew.** Salen en cuanto aparezcan dos velocidades de especie limpias.
+3. **La ballena gris.** Sigue ordenando por un «llega a pesar» de NOAA, que es un máximo. Bajo
+   el criterio de medias necesitaría un valor típico que no se ha encontrado.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero cartas avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 27.
+- La caché pasa a `continuum-v46`.
+
+## Ronda 12: la literatura de locomoción, y por qué había que mirarla (1 de septiembre de 2026)
+
+Se abandonan las fichas de zoo y se va a los artículos de biomecánica. **Velocidad pasa de 8
+mudas a 4** y la deuda total de 27 a 23. Pero lo importante es lo que aparece al mirar ahí:
+**el extremo lento del mazo estaba inventado, y por factores enormes.**
+
+### Cuatro cartas cerradas, cuatro errores de magnitud
+
+| Carta | Tenía | Medido | Se equivocaba por |
+|---|---:|---:|---:|
+| Lapa | 0,17 km/h | **0,00036 km/h** (0,6 cm/min) | **×470** |
+| Cangrejo ermitaño | 4,6 km/h | **0,23 km/h** | ×20 |
+| Cucaracha americana | 5,8 km/h | **5,4 km/h** | ×1,07 |
+| Hormiga roja | 0,104 km/h | — sustituida | — |
+
+- **Lapa.** El seguimiento de *Patella vulgata* da una media de 0,6 cm por minuto en el trayecto
+  de ida y vuelta al pasto: 36 centímetros a la hora. La carta la hacía casi quinientas veces
+  más rápida. [Estudio de actividad de forrajeo](https://www.sciencedirect.com/science/article/pii/0022098185901339)
+- **Cangrejo ermitaño.** Herreid y Full cronometraron a *Coenobita compressus* en playa y en
+  cinta: media de 0,23 km/h. [JEB 120:283](https://journals.biologists.com/jeb/article/120/1/283/4963/Locomotion-of-Hermit-Crabs-Coenobita-Compressus-on)
+- **Cucaracha.** Full y Tu midieron hasta 1,5 m/s, cincuenta longitudes de cuerpo por segundo,
+  y a esa velocidad la cucaracha deja el trípode y corre con cuatro patas o con dos.
+  [JEB 156:215](https://journals.biologists.com/jeb/article/156/1/215/6299/Mechanics-of-A-Rapid-Running-Insect-Two-Four-and)
+- **Hormiga.** La roja no tenía cifra documentada; entra la **hormiga plateada del Sáhara**,
+  cronometrada en 855 mm/s —3,08 km/h, 106 longitudes de cuerpo por segundo— por Pfeffer y
+  colaboradores. [JEB 222:jeb198705](https://journals.biologists.com/jeb/article/222/20/jeb198705/224418/High-speed-locomotion-in-the-Saharan-silver-ant)
+
+Las tres primeras eran cartas que nadie habría mirado dos veces. Una lapa a 0,17 km/h suena
+lenta, y lo parece al lado de un guepardo; solo al buscar la medición se ve que es casi
+quinientas veces la velocidad real. **Sonar plausible no es ser cierto**, y el extremo lento del
+mazo era justo donde eso no se notaba.
+
+### El formato, otra vez, tapaba el dato
+
+A 0,00036 km/h el redondeo enseñaba «0 km/h». `compactSpeed` baja ahora a **metros por hora**
+por debajo de 0,01 km/h, igual que la longevidad bajó a minutos para la efímera. La lapa se lee
+«0,36 m/h». Es la segunda vez que el formato no llegaba adonde llegaba el dato.
+
+### Las cuatro que siguen sin fuente
+
+Cangrejo araña, topo europeo, gallina doméstica y erizo europeo. En las cuatro hay literatura de
+locomoción pero no devuelve una velocidad comparable:
+
+- **Erizo.** Lo que hay publicado es velocidad **media de desplazamiento diario** —0,12 a 0,25
+  km/h en un estudio de presupuestos de actividad—, que no es lo mismo que a qué velocidad corre.
+  Usarla lo pondría junto al perezoso, y sería mezclar dos medidas distintas: exactamente el
+  error del que ya se corrigió el perezoso.
+- **Topo.** Lo publicado es la velocidad de **excavación**, unos 4 m/h, no la de desplazamiento.
+- **Gallina y cangrejo araña.** Hay estudios de cinemática y de marcha, pero sin cifra de
+  velocidad máxima en los resúmenes consultados.
+
+Dado el factor de error encontrado en sus tres vecinas, **es razonable sospechar que estas
+cuatro también estén infladas**. No se tocan sin medición, pero conviene no leerlas como si
+estuvieran comprobadas.
+
+### Estado
+
+| | Antes | Ahora |
+|---|---:|---:|
+| Con fuente | 87 | **91** |
+| Sin fuente | 27 | **23** |
+| En revisión | 0 | 0 |
+
+Por mazo: Peso 31/7, Longevidad 26/12, **Velocidad 34/4**.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 23.
+- La caché pasa a `continuum-v47`. Cambian cuatro velocidades y el formato de las más lentas.
+
+## Ronda 13: Velocidad queda en una sola muda (1 de septiembre de 2026)
+
+Tres de las cuatro cartas sospechosas se sustituyen por récords Guinness de grupo, que son
+medida de especie y llevan ficha propia:
+
+| Fuera | Dentro | Fuente |
+|---|---|---|
+| Cangrejo araña, 1,3 km/h | Araña flic-flac de Marruecos, **6,12 km/h** | [Guinness, la araña más rápida](https://www.guinnessworldrecords.com/world-records/82841-fastest-spider) |
+| Gallina doméstica, 7,5 km/h | Solífugo, **16 km/h** | [Guinness, el invertebrado terrestre más rápido](https://www.guinnessworldrecords.com/world-records/83657-fastest-invertebrates) |
+| Erizo europeo, 12 km/h | Libélula australiana, **58 km/h** | [Guinness, el insecto volador más rápido](https://www.guinnessworldrecords.com/world-records/70635-fastest-flying-insect) |
+
+**Velocidad queda 37 de 38.** La única muda es el topo europeo: lo publicado es su velocidad de
+excavación, unos 4 m/h, que no es comparable con el resto del mazo.
+
+Se descartó una consulta sobre velocidad de ratones: devolvió «7,2 m/s», que serían 26 km/h para
+un ratón. La cifra es absurda y la respuesta mezclaba protocolos de cinta con carreras de campo.
+Es el mismo filtro de siempre: si el resumen no es coherente, no se anota.
+
+La libélula queda a un 3 % de la jirafa. Es un par ajustado y a la vez un buen dato: una libélula
+vuela tan rápido como galopa una jirafa.
+
+### Longevidad: existe una salida, y hay que decidirla
+
+Buscando fuente para las 12 mudas de Longevidad aparece el estadístico que faltaba: la
+**mediana de esperanza de vida** que publican la AZA y el trabajo de medianas por sexo para
+**330 especies** en poblaciones ex situ. Es exactamente una medida típica —la mitad de los
+individuos muere antes y la mitad después— y está calculada excluyendo el primer año de vida,
+que es donde se concentra la mortalidad.
+
+[AZA: Species Survival Statistics](https://www.aza.org/species-survival-statistics) ·
+[Medianas por sexo de 330 especies](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6484356/)
+
+Cubriría el águila harpía, el elefante africano, la tortuga de Galápagos, el zorro, el conejo y
+probablemente la ardilla: seis de las doce. Perro y gato tienen estudios veterinarios de
+esperanza de vida. Quedarían fuera mosquito, mosca de la fruta, abeja obrera y ballena azul.
+
+**Pero cambia lo que mide la carta.** Una mediana ex situ es la vida de un animal en un zoo, no
+en libertad, y para muchas especies es bastante más larga. El mazo ya mezcla tipos de medida
+—rangos silvestres, longevidades de mascota de la RSPCA, medianas de zoo, ejemplares datados— y
+cada carta dice cuál es; pero pasar seis cartas a mediana de zoo de golpe inclina el mazo hacia
+la vida en cautividad. Es una decisión editorial, no de veracidad, y queda abierta.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 20.
+- La caché pasa a `continuum-v48`.
+
+## Ronda 14: el topo, o la quinta confusión de unidades (1 de septiembre de 2026)
+
+Se aportó una cifra para cerrar la última muda de Velocidad: el topo europeo a **4 km/h** por
+galerías ya excavadas, y hasta 6 km/h en otros tálpidos, atribuido a compilaciones de historia
+natural y a la Mammal Society. Al contrastarla aparece un problema que conviene dejar escrito,
+porque **no está en el número sino en su linaje**.
+
+### Lo que se encontró
+
+La cifra que circula por la red dice, literalmente y en la misma frase:
+
+> «A mole's speed through existing tunnels is about **80 ft. per minute**, which is equivalent
+> to approximately **80 meters per minute** or 4.8 km/h»
+
+**80 pies por minuto no son 80 metros por minuto.** Son 24,4 m/min, o sea **1,46 km/h**, no 4,8.
+La equivalencia está mal por un factor de 3,3, y es esa versión corregida al alza la que se ha
+replicado por las compilaciones hasta convertirse en «el topo corre a 4 km/h».
+
+Otro fragmento de la misma familia de fuentes dice «hasta 2,5 millas por hora (80 metros por
+minuto)»: 2,5 mph son 4,02 km/h y 80 m/min son 4,8. Tampoco cuadran entre sí.
+
+### Por qué no se adopta
+
+Es el mismo fallo que ya se corrigió cuatro veces en esta auditoría: el caracol de jardín
+(0,03 millas por hora leídas como 0,03 km/h), la lapa (×470), el cangrejo ermitaño (×20) y las
+toneladas cortas de NOAA leídas como métricas. **Una cifra repetida en veinte sitios no gana
+procedencia por repetirse**; si los veinte copian la misma conversión mala, el error se propaga
+intacto.
+
+La referencia de fondo, *The Natural History of Moles* de Gorman y Stone (1990), es legítima y
+probablemente sea el origen del dato. Pero es un libro: no se ha podido consultar, y no se anota
+como fuente algo que no se ha visto. Quien tenga acceso puede cerrarlo en un minuto.
+
+### Sobre el tipo de fuente
+
+Las compilaciones tipo AZ Animals o Animal Fun Facts son exactamente el nivel que esta auditoría
+viene descartando desde la ronda 7, y este caso explica por qué mejor que cualquier argumento:
+no verifican conversiones, y su volumen hace que un error parezca consenso.
+
+### Lo que queda
+
+El topo sigue siendo **la única muda de Velocidad** (37 de 38). Su valor de 3,5 km/h está en el
+mismo rango que la cifra sospechosa, así que probablemente también sea alto, pero no se cambia
+por una reconstrucción sin verificar. Se anota la sospecha en la propia carta.
+
+Se descartó además el estudio de locomoción de ratas topo desnudas (JEB, 2025): mide marcha
+rápida a 10 cm/s en cinta, que es un protocolo experimental, no la velocidad de la especie.
+
+## Ronda 15: las tres decisiones abiertas, resueltas (1 de septiembre de 2026)
+
+### 1. Longevidad con medianas de zoo, solo donde no distorsionen
+
+El criterio elegido fue aplicar la mediana ex situ **únicamente a especies donde zoo y libertad
+no divergen**. Verificado especie a especie, el criterio se aplica a sí mismo con dureza y
+**solo cierra una de las tres candidatas**:
+
+- **Elefante africano: excluido por el propio criterio.** Clubb y colaboradores demostraron en
+  *Science* que los elefantes de zoo viven **la mitad** que los de poblaciones protegidas. Es
+  justo el caso que el criterio B manda dejar fuera.
+  [Compromised survivorship in zoo elephants](https://www.science.org/doi/10.1126/science.1164298)
+- **Águila harpía: no se cierra.** Zoo y libertad sí coinciden —25 a 35 años en ambos—, pero la
+  ficha de The Peregrine Fund no publica la cifra y las que circulan son compilaciones.
+- **Tortuga de Galápagos: cerrada.** 115 → **100 años**. Galápagos Conservancy indica que superan
+  el siglo, hasta el punto de que su longevidad complica la planificación de la conservación.
+  Empata con el erizo rojo: los dos son animales de más de un siglo.
+  [Galápagos Conservancy](https://www.galapagos.org/conservation/giant-tortoise-restoration/)
+
+Que un criterio pensado para ampliar cobertura acabe descartando dos de tres candidatas no es un
+fallo: es la señal de que estaba bien planteado.
+
+### 2. Fuera los dos ejemplares con nombre de Velocidad
+
+| Fuera | Dentro | Fuente |
+|---|---|---|
+| Ser humano: Usain Bolt, 44,7 km/h | Cangrejo nadador de Henslow, **4,68 km/h** | [Guinness, el crustáceo más rápido nadando](https://www.guinnessworldrecords.com/world-records/112624-fastest-swimming-crustacean) |
+| Caballo Winning Brew, 70,35 km/h | Reno, **80 km/h** | [San Diego Zoo](https://animals.sandiegozoo.org/animals/reindeer-caribou) |
+
+**Velocidad ya no contiene ningún ejemplar con nombre.** Dos efectos secundarios buenos: se
+deshace el par avestruz/Winning Brew, que estaba a un 0,5 % y era una moneda al aire, y el
+cangrejo de Henslow cae en un hueco vacío entre el topo y la cucaracha.
+
+El reno empata exactamente con el ñu azul en 80 km/h. Es un empate real y deliberado: dos
+ungulados grandes que corren lo mismo. Se prefirió a meter una carta a un 3 % de otra, porque un
+empate se acierta en los dos órdenes y un 3 % se falla la mitad de las veces.
+
+Se descartó el récord Guinness de galgo (67,32 km/h, Star Title): encajaba en el hueco, pero es
+un ejemplar con nombre, exactamente lo que se estaba quitando.
+
+### 3. La ballena gris pasa de máximo a media
+
+**40.800 → 31.700 kg.** El Departamento de Pesca y Caza de Alaska da una media de 30 a 40
+toneladas cortas en ambos sexos, es decir de 27,2 a 36,3 métricas; la carta ordena por el centro
+de ese rango. Antes ordenaba por el «llega a pesar» de NOAA, que era un máximo.
+[ADF&G](https://www.adfg.alaska.gov/index.cfm?adfg=graywhale.main)
+
+Deshace además el empate exacto que tenía con el cachalote.
+
+### Estado
+
+| | Ronda 6 | Ahora |
+|---|---:|---:|
+| Con fuente | 53 | **95** |
+| Sin fuente | 57 | **19** |
+| En revisión | 4 | **0** |
+
+Por mazo: Peso 31/7, Longevidad 27/11, Velocidad 37/1.
+
+Las cabeceras de `lifespan.js` y `speed.js` decían que las cartas pendientes se señalan antes de
+jugar. Ya no hay ninguna, así que ahora dicen lo que rige: cada carta lleva su fuente o no está
+en el mazo.
+
+### Integridad
+
+- 38 cartas por mazo, 933 identificadores, cero avisadas.
+- `npm test` pasa 345 comprobaciones. Techo de mudas a 19.
+- La caché pasa a `continuum-v50`. Cambian cuatro cartas: hay que empezar partidas nuevas.
