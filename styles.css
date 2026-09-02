@@ -104,9 +104,15 @@ button { touch-action: manipulation; color: inherit; }
 .section-enter > * { animation: section-in 240ms var(--ease-out) both; }
 @keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
+/* `flex-start`, no `center`: cuando las acciones envuelven a una segunda fila, la marca
+   debe quedar a la altura de la primera, no centrada respecto al bloque entero. */
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+/* Hasta tres botones caben en una fila en la mayoría de móviles, pero una etiqueta larga
+   («Enciclopedia») o una marca visible al lado ya no. En vez de recortarse fuera de
+   pantalla, el bloque de acciones se encoge primero y, si aun así no cabe, envuelve sus
+   propios botones en una segunda fila pegada a la derecha. */
+.topbar-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; row-gap: 6px; min-width: 0; }
+.brand { display: flex; align-items: center; min-height: 44px; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
 /* 44 px es lo que necesita un dedo. Los botones pequeños llegaban a 36 y a 29, y son
    justo los que más se usan: el de la esquina en cada pantalla de partida. */
 .icon-btn { min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 16px; font-size: .85rem; font-weight: 650; cursor: pointer; }
