@@ -33,6 +33,10 @@
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
+  // La portada empieza mostrando la colección, no un mazo abierto. El primer toque
+  // descubre una categoría y el segundo enseña los mazos que contiene.
+  let collectionOpen = false;
+  let collectionDetails = false;
 
   function currentAxis() { return CT.axis(selectedModeKey); }
 
@@ -110,10 +114,11 @@
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
   // en color y las otras quedan como lomos que se pueden tocar.
   function gallery() {
-    return `<div class="gallery" role="group" aria-label="Elige el bloque">${Object.values(CT.BLOCKS).map(item => {
-      const active = item.key === selectedBlockKey;
+    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map(item => {
+      const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
-      return `<button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}">
+      const instruction = active ? (collectionDetails ? "Mazos visibles debajo." : "Toca de nuevo para ver sus mazos.") : "Toca para ampliar.";
+      return `<button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
@@ -151,6 +156,13 @@
     </div></section>`;
   }
 
+  function competitionPromo() {
+    return `<button class="comp-promo" data-action="start-competition">
+      <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
+      <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
+    </button>`;
+  }
+
   function homeMasthead() {
     return `<section class="home-masthead" aria-label="Continuum, un juego para ordenar y comparar">
       <div class="home-crest" aria-hidden="true"><img src="assets/hero-history-400.webp" alt="" width="400" height="267" decoding="async" fetchpriority="high"></div>
@@ -165,63 +177,34 @@
     return `<nav class="home-nav" aria-label="Navegación de inicio">
       <button data-action="home-top" aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
       <button data-action="home-collection" aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
-      <button data-action="home-play" aria-label="Ir a las formas de juego"><span aria-hidden="true">♜</span><small>Jugar</small></button>
       <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
     </nav>`;
   }
 
   function home() {
-    const galeriaAnterior = screen === "home" ? app.querySelector(".gallery") : null;
     screen = "home";
-    const resume = game && game.mode === selectedModeKey;
-    const seleccion = `<h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>${gameList()}`;
-    const contenido = `<section class="home-play" id="home-play">${playChoices(resume)}
-          <button class="comp-promo" data-action="start-competition">
-            <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
-            <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
-          </button></section>
-          <section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}<div class="home-selection">${seleccion}</div></section>`;
-    // Conserva los nodos y sus imágenes decodificadas. La transición puede partir del
-    // ancho real anterior, incluso si se toca otro bloque antes de terminar la primera.
-    if (galeriaAnterior) {
-      const selector = app.querySelector(".home-selection");
-      const mismoBloque = galeriaAnterior.querySelector(".active")?.dataset.block === selectedBlockKey;
-      if (mismoBloque) {
-        // El mazo cambia, pero sus botones y los formatos de juego no desaparecen
-        // debajo del dedo. Tampoco se reinicia la animación de la carátula.
-        selector.querySelector("h1").innerHTML = CT.question(selectedModeKey);
-        selector.querySelectorAll("[data-mode]").forEach(row => {
-          const active = row.dataset.mode === selectedModeKey;
-          row.classList.toggle("active", active);
-          row.setAttribute("aria-pressed", String(active));
-        });
-      } else {
-        const height = selector.getBoundingClientRect().height;
-        CT.paint(selector, seleccion, screen);
-        CT.resizeContent(selector, height);
-      }
-      const continuar = app.querySelector(".continue-choice");
-      if (!resume) continuar?.remove();
-      else if (!continuar) app.querySelector(".play-choice-grid").insertAdjacentHTML("beforeend", '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>');
-      galeriaAnterior.querySelectorAll("[data-block]").forEach(panel => {
-        const activo = panel.dataset.block === selectedBlockKey;
-        panel.classList.toggle("active", activo);
-        panel.setAttribute("aria-pressed", String(activo));
-        if (activo) {
-          const arte = BLOCK_ART[CT.block(panel.dataset.block).art];
-          const img = panel.querySelector("img");
-          img.setAttribute("src", `assets/${arte.archivo}-700.webp`);
-          img.setAttribute("width", "700");
-          img.setAttribute("height", String(arte.alto[700]));
-          img.setAttribute("fetchpriority", "high");
-        }
-      });
-    } else paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      ${homeMasthead()}<section class="hero"><div class="hero-copy">${contenido}</div></section>
+    const selected = CT.block(selectedBlockKey);
+    const mazos = collectionDetails
+      ? `<div class="home-selection"><h2 data-focus tabindex="-1">${selected.name}</h2><p class="lead">Elige un mazo para continuar.</p>${gameList()}</div>`
+      : collectionOpen ? `<p class="collection-hint">Vuelve a tocar <b>${selected.name}</b> para ver sus mazos.</p>` : "";
+    paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
+      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}${mazos}</section></div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
     showCacheVersion();
+  }
+
+  function playMenu() {
+    screen = "play-menu";
+    const resume = game && game.mode === selectedModeKey;
+    const block = CT.block(selectedBlockKey);
+    const art = BLOCK_ART[block.art];
+    paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="collection-back">Volver</button>')}
+      <section class="mode-masthead"><img src="assets/${art.archivo}-700.webp" alt="" width="700" height="${art.alto[700]}" decoding="async"><div><div class="eyebrow">${block.name}</div><h1 data-focus tabindex="-1">${currentMode().name}</h1><p>${currentMode().blurb}</p></div></section>
+      <section class="home-play">${playChoices(resume)}${competitionPromo()}</section>
+    </div>`);
+    window.scrollTo(0, 0);
   }
 
   async function showCacheVersion() {
@@ -1125,9 +1108,13 @@
     if (action === "home") home();
     else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
     else if (action === "home-collection") document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    else if (action === "home-play") document.getElementById("home-play")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    else if (action === "set-mode") { if (target.dataset.mode === selectedModeKey) return; setMode(target.dataset.mode); home(); }
-    else if (action === "set-block") { if (target.dataset.block === selectedBlockKey) return; setBlock(target.dataset.block); home(); }
+    else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }
+    else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
+    else if (action === "set-block") {
+      if (collectionOpen && target.dataset.block === selectedBlockKey) collectionDetails = true;
+      else { setBlock(target.dataset.block); collectionOpen = true; collectionDetails = false; }
+      home();
+    }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();
@@ -1206,3 +1193,4 @@
   if (invitedRoom) launchOnline(invitedRoom);
   else home();
 })();
+
