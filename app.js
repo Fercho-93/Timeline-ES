@@ -75,12 +75,13 @@
     if (selectedModeKey !== "animals") return "";
     const title = card.title.toLocaleLowerCase("es");
     const individual = {
-      10001: "bee", 10040: "flamingo", 10011: "fox", 10020: "lion", 10030: "elephant"
+      10001: "bee", 10003: "mantis", 10010: "cat", 10011: "fox", 10016: "capybara", 10020: "lion", 10026: "giraffe",
+      10030: "elephant", 10038: "blue-whale", 10039: "octopus", 10040: "flamingo", 10041: "penguin", 10042: "kangaroo"
     };
     const plate = individual[card.id] || (/pulpo|orca|tiburón|ballena|cachalote|elefante marino/.test(title) ? "ocean"
-      : /pingüino|oso polar/.test(title) ? "polar"
-      : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari"
-      : Number(card.value) < 5 ? "small" : "land");
+      : /pingüino|oso polar/.test(title) ? "polar-bear"
+      : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari-rhino"
+      : Number(card.value) < 5 ? "small" : "woodland-fox");
     return `<img class="animal-card-art" src="assets/animal-cards/${plate}.png" alt="" decoding="async" loading="lazy">`;
   }
 
