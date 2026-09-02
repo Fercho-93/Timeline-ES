@@ -72,9 +72,9 @@
       10001: "bee", 10040: "flamingo", 10011: "fox", 10020: "lion", 10030: "elephant"
     };
     const plate = individual[card.id] || (/pulpo|orca|tiburón|ballena|cachalote|elefante marino/.test(title) ? "ocean"
-      : /pingüino|oso polar/.test(title) ? "polar"
-      : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari"
-      : Number(card.value) < 5 ? "small" : "land");
+      : /pingüino|oso polar/.test(title) ? "polar-bear"
+      : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari-rhino"
+      : Number(card.value) < 5 ? "small" : "woodland-fox");
     return `<img class="animal-card-art" src="assets/animal-cards/${plate}.png" alt="" decoding="async" loading="lazy">`;
   }
 
