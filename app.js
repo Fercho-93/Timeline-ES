@@ -68,10 +68,13 @@
   function animalArt(card) {
     if (selectedModeKey !== "animals") return "";
     const title = card.title.toLocaleLowerCase("es");
-    const plate = /pulpo|orca|tiburón|ballena|cachalote|elefante marino/.test(title) ? "ocean"
+    const individual = {
+      10001: "bee", 10040: "flamingo", 10011: "fox", 10020: "lion", 10030: "elephant"
+    };
+    const plate = individual[card.id] || (/pulpo|orca|tiburón|ballena|cachalote|elefante marino/.test(title) ? "ocean"
       : /pingüino|oso polar/.test(title) ? "polar"
       : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari"
-      : Number(card.value) < 5 ? "small" : "land";
+      : Number(card.value) < 5 ? "small" : "land");
     return `<img class="animal-card-art" src="assets/animal-cards/${plate}.png" alt="" decoding="async" loading="lazy">`;
   }
 
