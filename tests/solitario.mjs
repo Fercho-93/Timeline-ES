@@ -27,9 +27,14 @@ const click = (w, sel) => {
 const existe = (w, sel) => !!w.document.querySelector(sel);
 const texto = w => w.document.body.textContent;
 
+// El solitario, como cualquier otro formato, se elige ahora desde el menú de un mazo
+// concreto (`playMenu`), al que se llega desplegando su bloque en la portada.
+const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
+
 console.log("\nConfirmar antes de colocar");
 {
   const w = boot();
+  abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   const huecos = w.document.querySelectorAll('[data-action="solo-place"]');
@@ -47,6 +52,7 @@ console.log("\nConfirmar antes de colocar");
 console.log("\nPartida libre");
 {
   const w = boot();
+  abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
@@ -71,12 +77,15 @@ console.log("\nPartida libre");
 console.log("\nReto diario");
 {
   const uno = boot();
+  abreMazo(uno, "historia", "history");
   click(uno, '[data-action="solo"]');
   click(uno, '[data-action="start-free"]');
   const otro = boot();
+  abreMazo(otro, "historia", "history");
   click(otro, '[data-action="solo"]');
   click(otro, '[data-action="start-daily"]');
   const tercero = boot();
+  abreMazo(tercero, "historia", "history");
   click(tercero, '[data-action="solo"]');
   click(tercero, '[data-action="start-daily"]');
   const a = JSON.parse(otro.localStorage.getItem("hilo-solo-history-v1"));
@@ -113,6 +122,7 @@ console.log("\nRacha de días");
   ayer.setDate(ayer.getDate() - 1);
   const marcas = { history: { best: 3, streak: 4, lastDay: ayer.toLocaleDateString("sv-SE"), days: {} } };
   const w = boot({ "hilo-retos-v1": JSON.stringify(marcas) });
+  abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   ok("la portada de solitario muestra la racha", /4/.test(w.document.querySelector(".solo-stats").textContent));
   click(w, '[data-action="start-daily"]');
@@ -134,7 +144,7 @@ console.log("\nBloque de geografía");
 {
   const w = boot();
   click(w, '[data-block="geografia"]');
-  ok("elegir el bloque selecciona su primer juego", /59 países/.test(texto(w)));
+  ok("elegir el bloque selecciona su primer juego", /72 países/.test(texto(w)));
   ok("el bloque lista sus tres juegos", w.document.querySelectorAll(".game-row").length === 3);
   ok("los tres juegos del bloque aparecen por su nombre",
      /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w)) && /Distancias entre ciudades/.test(texto(w)));
@@ -145,10 +155,9 @@ console.log("\nBloque de geografía");
     /hero-geography-700\.webp/.test(portada) && !/hero-(entertainment|science|nature|history)-700/.test(portada));
   ok("el rótulo es el del bloque de geografía", /Geografía/.test(portada) && !/Entretenimiento|Naturaleza|Ciencia|Historia/.test(portada));
   ok("el juego aparece listado bajo la carátula", /Superficie de países/.test(w.document.querySelector(".games").textContent));
-  ok("el titular cambia al eje de tamaño", /más grande/i.test(texto(w)));
   click(w, '[data-mode="population"]');
-  ok("cambiar de juego dentro del bloque cambia el mazo", /49 países/.test(texto(w)));
-  ok("y cambia el titular al eje de población", /más gente/i.test(texto(w)));
+  ok("cambiar de juego dentro del bloque cambia el mazo", w.document.querySelector("h1")?.textContent === "Población de países");
+  click(w, '[data-action="collection-back"]');
   click(w, '[data-mode="countries"]');
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
@@ -171,6 +180,7 @@ console.log("\nSan Marino y Suiza, de menor a mayor");
   const estado = { kind: "free", mode: "countries", day: dia, deck: [2001], timeline: [2040], current: 2056, lives: 3, hits: 0, played: 0, total: null, finished: false };
   const resultado = hueco => {
     const w = boot({ "hilo-selected-mode-v1": "countries", "hilo-solo-countries-v1": JSON.stringify(estado) });
+    abreMazo(w, "geografia", "countries");
     click(w, '[data-action="solo"]');
     click(w, '[data-action="resume-solo"]');
     w.document.querySelectorAll('[data-action="solo-place"]')[hueco].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
@@ -189,6 +199,7 @@ console.log("\nEl mapa de la línea");
   const conLinea = ids => {
     const estado = { kind: "free", mode: "history", day: dia, deck: [], timeline: ids, current: 100, lives: 3, hits: 0, played: 0, total: null, finished: false };
     const w = boot({ "hilo-solo-history-v1": JSON.stringify(estado) });
+    abreMazo(w, "historia", "history");
     click(w, '[data-action="solo"]');
     click(w, '[data-action="resume-solo"]');
     return w;

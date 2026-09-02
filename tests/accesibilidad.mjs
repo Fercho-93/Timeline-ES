@@ -42,6 +42,8 @@ const activo = w => w.document.activeElement;
 const respira = () => new Promise(r => setTimeout(r, 80));
 
 function partida(w) {
+  click(w, '[data-block="historia"]');
+  click(w, '[data-mode="history"]');
   click(w, '[data-action="setup"]');
   click(w, '[data-action="start"]');
   click(w, '[data-action="ready"]');
