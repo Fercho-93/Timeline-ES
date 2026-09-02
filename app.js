@@ -67,8 +67,11 @@
   // peso que hay que ordenar.
   function animalArt(card) {
     if (selectedModeKey !== "animals") return "";
-    const value = Number(card.value);
-    const plate = value < 5 ? "small" : value < 150 ? "land" : value < 1000 ? "safari" : value < 5000 ? "polar" : "ocean";
+    const title = card.title.toLocaleLowerCase("es");
+    const plate = /pulpo|orca|tiburón|ballena|cachalote|elefante marino/.test(title) ? "ocean"
+      : /pingüino|oso polar/.test(title) ? "polar"
+      : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari"
+      : Number(card.value) < 5 ? "small" : "land";
     return `<img class="animal-card-art" src="assets/animal-cards/${plate}.png" alt="" decoding="async" loading="lazy">`;
   }
 
