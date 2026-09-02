@@ -118,11 +118,14 @@
       const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
       const instruction = active ? (collectionDetails ? "Mazos visibles debajo." : "Toca de nuevo para ver sus mazos.") : "Toca para ampliar.";
-      return `<button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
+      const mazos = active && collectionDetails
+        ? `<div class="collection-decks"><h2 data-focus tabindex="-1">${item.name}</h2><p class="lead">Elige un mazo para continuar.</p>${gameList()}</div>`
+        : "";
+      return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
-      </button>`;
+      </button>${mazos}</div>`;
     }).join("")}</div>`;
   }
 
@@ -184,11 +187,10 @@
   function home() {
     screen = "home";
     const selected = CT.block(selectedBlockKey);
-    const mazos = collectionDetails
-      ? `<div class="home-selection"><h2 data-focus tabindex="-1">${selected.name}</h2><p class="lead">Elige un mazo para continuar.</p>${gameList()}</div>`
-      : collectionOpen ? `<p class="collection-hint">Vuelve a tocar <b>${selected.name}</b> para ver sus mazos.</p>` : "";
+    const hint = collectionOpen && !collectionDetails
+      ? `<p class="collection-hint">Vuelve a tocar <b>${selected.name}</b> para ver sus mazos.</p>` : "";
     paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}${mazos}</section></div></section>
+      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}${hint}</section></div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
