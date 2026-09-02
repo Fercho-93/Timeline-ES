@@ -33,6 +33,12 @@
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
+  // Estado de la enciclopedia: qué mazo se consulta, la búsqueda y el filtro de banda en
+  // curso, y qué carta destacar al llegar desde el repaso de una carta fallada.
+  let encMode = null;
+  let encQuery = "";
+  let encBand = "all";
+  let encHighlight = null;
 
   function currentAxis() { return CT.axis(selectedModeKey); }
 
@@ -197,7 +203,7 @@
           img.setAttribute("fetchpriority", "high");
         }
       });
-    } else paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
+    } else paint(`<div class="shell">${header('<button class="icon-btn" data-action="enciclopedia">Enciclopedia</button><button class="icon-btn" data-action="rules">Guía</button>')}
       <section class="hero">${gallery()}<div class="hero-copy">${contenido}</div></section>
       <p class="app-version" id="app-version"></p>
     </div>`);
@@ -611,10 +617,72 @@
         const card = GLOBAL_CARDS_BY_ID.get(id);
         if (!card) return "";
         const era = CT.eraForCard(mode, card);
-        return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${CT.formatValue(mode, card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p>${veces > 1 ? `<p class="review-count">Fallada ${veces} veces</p>` : ""}</div></article>`;
+        return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${CT.formatValue(mode, card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p>${veces > 1 ? `<p class="review-count">Fallada ${veces} veces</p>` : ""}<button type="button" class="enc-link" data-action="enc-view" data-mode="${mode}" data-id="${id}">Ver en la enciclopedia <span aria-hidden="true">→</span></button></div></article>`;
       }).join("")}</div>` : `<p class="lead">Partida perfecta.</p>`}
       <div class="actions" style="justify-content:center">${actionsHtml}</div>
     </section></div>`);
+  }
+
+  // El desplegable de mazos agrupado por bloque, igual que la portada los agrupa en la
+  // galería: así la enciclopedia no inventa un segundo orden de los catorce juegos.
+  function encModeOptions(modeKey) {
+    return Object.values(CT.BLOCKS).map(item => `<optgroup label="${escapeHtml(item.name)}">${item.games.map(key => {
+      const mode = CT.mode(key);
+      return `<option value="${key}"${key === modeKey ? " selected" : ""}>${escapeHtml(mode.name)} (${mode.cards.length})</option>`;
+    }).join("")}</optgroup>`).join("");
+  }
+
+  function encCountText(modeKey, count) {
+    const mode = CT.mode(modeKey);
+    return `${count} de ${mode.cards.length} ${escapeHtml(mode.cardLabel)} · ${escapeHtml(CT.axis(modeKey).timelineTitle)}`;
+  }
+
+  // Solo se entra aquí desde la portada o desde un repaso: nunca desde dentro de una
+  // partida, donde ver el mazo entero volvería trivial cualquier jugada pendiente.
+  function enciclopediaView() {
+    screen = "enciclopedia";
+    const mode = CT.mode(encMode);
+    const bands = CT.Enciclopedia.bands(encMode);
+    const cards = CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
+      <section class="setup-section enc-section">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
+        <h1 data-focus tabindex="-1">${escapeHtml(mode.name)}</h1>
+        <p class="lead" id="enc-count">${encCountText(encMode, cards.length)}</p>
+        <div class="panel enc-toolbar">
+          <div class="field">
+            <label for="enc-mode-select">Mazo</label>
+            <select id="enc-mode-select">${encModeOptions(encMode)}</select>
+          </div>
+          <div class="field">
+            <label for="enc-search-input">Buscar</label>
+            <input id="enc-search-input" type="search" autocomplete="off" placeholder="Título, explicación o fuente…" value="${escapeHtml(encQuery)}">
+          </div>
+          <div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
+            <button type="button" id="enc-band-all" class="band-chip${encBand === "all" ? " active" : ""}" data-action="enc-band" data-band="all" aria-pressed="${encBand === "all"}">Todas</button>
+            ${bands.map(band => `<button type="button" id="enc-band-${band.key}" class="band-chip${encBand === band.key ? " active" : ""}" data-action="enc-band" data-band="${band.key}" aria-pressed="${encBand === band.key}"><span aria-hidden="true">${band.symbol}</span> ${escapeHtml(band.name)}</button>`).join("")}
+          </div>
+        </div>
+        <div id="enc-results">${CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
+      </section>
+    </div>`);
+  }
+
+  function openEnciclopedia(modeKey, { highlight = null } = {}) {
+    encMode = CT.has(modeKey) ? modeKey : selectedModeKey;
+    encQuery = "";
+    encBand = "all";
+    encHighlight = highlight;
+    enciclopediaView();
+    if (highlight == null) return;
+    // Se aplaza al siguiente turno de repintado: el elemento acaba de entrar en el DOM
+    // y aún puede sustituirse (o desaparecer) antes de que haya nada que desplazar.
+    setTimeout(() => {
+      const carta = app.querySelector(`[data-enc-card="${highlight}"]`);
+      if (!carta?.isConnected) return;
+      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      carta.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+    }, 0);
   }
 
   const DAILY_CARDS = 15;
@@ -1083,6 +1151,7 @@
   }
 
   app.addEventListener("change", event => {
+    if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value); return; }
     if (!["solo-difficulty", "comp-difficulty"].includes(event.target.id)) return;
     const key = event.target.value;
     if (!CT.Ghost.LEVELS[key]) return;
@@ -1096,6 +1165,14 @@
 
   app.addEventListener("input", event => {
     if (event.target.closest("#players")) syncStarterOptions();
+    else if (event.target.id === "enc-search-input") {
+      // Se actualiza solo el resultado, sin repintar la pantalla entera: repintarla
+      // destruiría el campo justo mientras se escribe en él.
+      encQuery = event.target.value;
+      const cards = CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
+      document.getElementById("enc-results").innerHTML = CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight });
+      document.getElementById("enc-count").textContent = encCountText(encMode, cards.length);
+    }
   });
 
   app.addEventListener("click", event => {
@@ -1152,6 +1229,9 @@
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
     else if (action === "abandon-comp") abandonCompetition();
+    else if (action === "enciclopedia") openEnciclopedia(selectedModeKey);
+    else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id) });
+    else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
   });
 
   // `skipWaiting` y `clients.claim`, en el propio service worker, hacen que la versión

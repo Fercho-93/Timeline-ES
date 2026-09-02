@@ -104,6 +104,17 @@ fallo, mientras se ve el aviso, la línea de detrás señala el hueco exacto don
 frase para quien usa un lector de pantalla— en vez de dejar que se pierda en el descarte sin
 que nadie aprenda de él.
 
+## Enciclopedia
+
+Un botón en la portada abre cualquier mazo fuera de partida: todas sus cartas, ya con el
+valor revelado, ordenadas por el eje del juego y con su explicación completa. Se puede
+buscar por título, explicación o fuente —sin distinguir tildes ni mayúsculas— y filtrar por
+época o magnitud. Las cartas de Peso, Longevidad, Velocidad y Superficie que llevan una
+fuente documentada enlazan directamente a ella. Cada carta fallada en el repaso de fin de
+partida también lleva a su ficha en la enciclopedia, ya con esa carta destacada. No aparece
+en ninguna pantalla de partida: vería el mazo entero y volvería trivial cualquier jugada
+pendiente.
+
 ## Ajustes
 
 Un botón de «Ajustes» en la cabecera, disponible en cualquier pantalla, elige el tema:
