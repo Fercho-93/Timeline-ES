@@ -32,7 +32,7 @@
     // correcto antes incluso de que este script se ejecute. Con una preferencia
     // explícita que no coincida con el sistema, se fuerzan las dos al mismo color; en
     // «auto» se les devuelve el suyo y vuelve a mandar el sistema.
-    const claro = "#f7f5f1", oscuro = "#16130e";
+    const claro = "#d7b778", oscuro = "#21170d";
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => {
       if (settings.theme === "auto") meta.setAttribute("content", (meta.getAttribute("media") || "").includes("dark") ? oscuro : claro);
       else meta.setAttribute("content", settings.theme === "dark" ? oscuro : claro);
