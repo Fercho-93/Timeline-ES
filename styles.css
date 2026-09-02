@@ -903,6 +903,47 @@ body::before {
   box-shadow: inset 0 0 0 3px #2b1b0f, inset 0 0 0 5px rgba(190,134,57,.38), 0 6px 13px rgba(55,31,12,.25);
 }
 .hand-card .hidden-date, .hand-card .card-arrow { color: #d3a960; }
+
+/* Ilustraciones del mazo de animales: la criatura se muestra, pero la masa sigue
+   oculta en la mano. Al revelar la carta, la lámina pasa a ser su cabecera. */
+.animal-hand-card {
+  min-height: 210px;
+  isolation: isolate;
+  border-color: #b98742;
+  background: #2d1b0e;
+}
+.animal-hand-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, rgba(25,14,7,.94) 0%, rgba(25,14,7,.38) 58%, rgba(25,14,7,.15) 100%);
+}
+.animal-card-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: sepia(.25) saturate(.82) contrast(1.04);
+}
+.animal-hand-card .animal-card-art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.animal-hand-card .hidden-date,
+.animal-hand-card strong,
+.animal-hand-card .card-arrow { text-shadow: 0 2px 6px #160d05; }
+.animal-hand-card strong { max-width: 11ch; margin-top: 66px; font-size: 1.28rem; }
+.animal-timeline-card .card-visual { height: 112px; padding: 0; background: #8a6031; }
+.animal-timeline-card .card-content { position: relative; }
+.animal-timeline-card .year { display: inline-block; margin-top: -18px; position: relative; padding: 6px 10px; border: 1px solid rgba(126,82,34,.5); border-radius: 3px; background: #f4ddb0; box-shadow: 0 2px 5px rgba(62,35,12,.18); }
+.review-grid .animal-timeline-card .card-visual { height: 76px; }
+@media (max-width: 620px) {
+  .animal-hand-card { min-height: 190px; }
+  .animal-timeline-card .card-visual { height: 86px; }
+}
 .slot, .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: rgba(235,204,146,.64); }
 .overlay { background: rgba(47,29,14,.68); backdrop-filter: blur(6px) sepia(.2); }
 .modal { background: #edd29b; }
