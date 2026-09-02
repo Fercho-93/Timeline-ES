@@ -786,9 +786,8 @@ body::before {
 
 .deck-collection {
   scroll-margin-top: 15px;
-  margin-top: 16px;
-  padding-top: 28px;
-  border-top: 1px solid rgba(132,87,38,.35);
+  margin-top: 0;
+  padding-top: 8px;
 }
 .collection-heading { text-align: center; margin-bottom: 16px; }
 .collection-heading .eyebrow { justify-content: center; }
@@ -800,8 +799,7 @@ body::before {
   height: auto;
   margin: 0;
 }
-.home-shell .gallery-panel,
-.home-shell .gallery-panel.active {
+.home-shell .gallery-panel {
   width: 100%;
   height: 88px;
   min-height: 88px;
@@ -809,8 +807,9 @@ body::before {
   border: 1px solid rgba(130,81,35,.5);
   border-radius: 8px;
   box-shadow: 0 3px 9px rgba(70,39,10,.14);
+  transition: height var(--motion-base) var(--ease-out), border-color var(--motion-fast) ease, transform var(--motion-fast) ease;
 }
-.home-shell .gallery-panel.active { border: 2px solid var(--accent-dark); }
+.home-shell .gallery-panel.active { height: clamp(190px, 52vw, 280px); border: 2px solid var(--accent-dark); }
 .home-shell .gallery-panel::after { background: linear-gradient(90deg, rgba(46,28,12,.08), rgba(36,21,8,.18) 35%, rgba(34,20,8,.77)); }
 .home-shell .gallery-panel:not(.active) .panel-art { filter: sepia(.65) saturate(.65) brightness(.9); }
 .home-shell .gallery-panel .panel-art img { object-position: center 43%; }
@@ -826,10 +825,13 @@ body::before {
   color: #fff0cd;
 }
 .home-shell .gallery-panel.active .panel-label { animation: none; }
+.home-shell .gallery-panel.active .panel-label { left: 22px; right: 22px; top: auto; bottom: 22px; transform: none; }
 .home-shell .panel-label strong { font-size: 1.22rem; letter-spacing: 0; }
 .home-shell .panel-label small { color: #e8c990; }
 .home-selection { margin-top: 17px; padding: 18px; border: 1px solid rgba(130,81,35,.42); border-radius: 8px; background: rgba(242,216,164,.64); }
-.home-selection h1 { max-width: none; margin-bottom: 14px; text-align: center; font-size: clamp(1.55rem, 5vw, 2rem); }
+.home-selection h1, .home-selection h2 { max-width: none; margin-bottom: 8px; text-align: center; font-size: clamp(1.55rem, 5vw, 2rem); }
+.home-selection .lead { margin: 0 auto 14px; text-align: center; }
+.collection-hint { margin: 16px 0 0; padding: 13px 15px; border: 1px solid rgba(130,81,35,.38); border-radius: 8px; background: rgba(242,216,164,.55); text-align: center; color: var(--muted); }
 .games { border-color: rgba(130,81,35,.4); border-radius: 7px; background: rgba(130,81,35,.3); }
 .game-row { border-left-width: 4px; background: rgba(249,228,184,.66); }
 .game-row.active { border-left-color: var(--accent); background: rgba(216,174,104,.62); }
@@ -844,7 +846,7 @@ body::before {
   min-height: 66px;
   padding: 7px 12px max(7px, env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   transform: translateX(-50%);
   border-top: 1px solid #a97b41;
   background: rgba(232,204,149,.94);
@@ -854,6 +856,15 @@ body::before {
 .home-nav button { min-height: 48px; display: grid; place-items: center; gap: 1px; border: 0; color: var(--ink); background: transparent; cursor: pointer; }
 .home-nav span { font-size: 1.25rem; line-height: 1; }
 .home-nav small { font-family: var(--font-display); font-size: .7rem; }
+
+.play-menu-shell .brand { visibility: visible; }
+.play-menu-shell { padding-bottom: max(34px, env(safe-area-inset-bottom)); }
+.mode-masthead { position: relative; min-height: 210px; display: grid; align-items: end; overflow: hidden; margin: 4px 0 25px; padding: 22px; border: 1px solid rgba(130,81,35,.5); border-radius: 10px; color: #fff0ce; background: #57331c; box-shadow: var(--shadow-soft); isolation: isolate; }
+.mode-masthead::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(40,23,10,.86), rgba(40,23,10,.26)); }
+.mode-masthead img { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: sepia(.62) saturate(.75); }
+.mode-masthead h1 { margin: 5px 0 7px; max-width: 17ch; font-size: clamp(2rem, 8vw, 3.1rem); }
+.mode-masthead p { max-width: 36ch; margin: 0; color: #f1d29b; }
+.play-menu-shell .home-play { display: grid; gap: 10px; }
 
 /* El mismo vocabulario llega a las partidas, los formularios y los resultados. */
 .panel, .modal, .reveal, .room-code-card, .connection-strip {
@@ -901,6 +912,7 @@ body::before {
   .home-shell .play-choice-grid { grid-template-columns: repeat(3, 1fr); }
   .home-shell .play-choice { min-height: 118px; }
   .home-shell .gallery { grid-template-columns: repeat(2, 1fr); }
+  .home-shell .gallery-panel.active { grid-column: 1 / -1; height: 300px; }
   .home-shell .comp-promo { max-width: 100%; }
 }
 
@@ -934,3 +946,4 @@ body::before {
 }
 :root[data-theme="dark"] body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
 :root[data-theme="dark"] .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
+
