@@ -75,11 +75,9 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 **Geografía**
 
 - **Superficie de países:** 59 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
-  Aquí la línea no es temporal: se ordena por tamaño. Ningún país está a menos de un 8% de otro,
-  así que las cartas cercanas siempre se pueden razonar.
+  Aquí la línea no es temporal: se ordena por tamaño.
 - **Población de países:** 49 países ordenados de menos a más gente, del Vaticano a la India,
-  con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer). Mismo margen del 8%: por eso falta China, que
-  queda a un 4% de la India.
+  con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer).
 - **Distancias entre ciudades:** 38 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 

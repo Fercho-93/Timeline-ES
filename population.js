@@ -1,7 +1,9 @@
 // El valor es la población proyectada a 1 de julio de 2026, según la revisión de 2024 de las
-// Perspectivas de la Población Mundial de la ONU (tabla de Worldometer). Ninguna carta está
-// a menos de un 8% de otra: si no, colocarla bien sería cuestión de suerte. Los países que
-// faltan suelen faltar por eso — China queda a un 4% de la India, y Argentina a un 4% de España.
+// Perspectivas de la Población Mundial de la ONU (tabla de Worldometer). La selección buscó
+// separar las cartas contiguas para que colocarlas bien no fuera cuestión de suerte, aunque
+// ya no se exige un margen mínimo entre ellas: las cifras se revisan a mano, una por una.
+// Los países que faltan suelen faltar por parecerse demasiado a otro ya incluido — China
+// queda a un 4% de la India, y Argentina a un 4% de España.
 window.POPULATION_CARDS = [
   { id: 3001, value: 1476625576, title: "India", detail: "El país más poblado del mundo: adelantó a China en 2023." },
   { id: 3002, value: 349035494, title: "Estados Unidos", detail: "El tercero, pero a menos de la cuarta parte del primero." },
