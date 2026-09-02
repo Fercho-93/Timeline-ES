@@ -833,7 +833,6 @@ body::before {
 .collection-decks { margin-top: 10px; padding: 18px; border: 1px solid rgba(130,81,35,.42); border-radius: 8px; background: rgba(242,216,164,.64); }
 .collection-decks h2 { max-width: none; margin-bottom: 8px; text-align: center; font-size: clamp(1.55rem, 5vw, 2rem); }
 .collection-decks .lead { margin: 0 auto 14px; text-align: center; }
-.collection-hint { margin: 16px 0 0; padding: 13px 15px; border: 1px solid rgba(130,81,35,.38); border-radius: 8px; background: rgba(242,216,164,.55); text-align: center; color: var(--muted); }
 .games { border-color: rgba(130,81,35,.4); border-radius: 7px; background: rgba(130,81,35,.3); }
 .game-row { border-left-width: 4px; background: rgba(249,228,184,.66); }
 .game-row.active { border-left-color: var(--accent); background: rgba(216,174,104,.62); }
