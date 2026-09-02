@@ -14,6 +14,10 @@ function boot(storage = {}) {
   return w;
 }
 const click = (w, action) => { const el = w.document.querySelector(`[data-action="${action}"]`); assert.ok(el, action); el.click(); };
+// «Continuar», «Solitario» y «Competición» viven ahora en el menú de un mazo concreto
+// (`playMenu`), al que se llega desplegando antes su bloque en la portada. Este archivo
+// solo juega con Historia de España.
+const abreMazo = w => { w.document.querySelector('[data-block="historia"]').click(); w.document.querySelector('[data-mode="history"]').click(); };
 const key = 'hilo-game-history-v1', soloKey = 'hilo-solo-history-v1';
 const state = (w, k = key) => JSON.parse(w.localStorage.getItem(k));
 const all = s => [...s.timeline, ...s.deck, ...s.discard, ...s.players.flatMap(p => p.hand)];
@@ -101,6 +105,7 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
 }
 {
   let w = boot({ [key]: fixture() });
+  abreMazo(w);
   click(w, 'continue'); click(w, 'ready');
   const inventory = all(state(w)).sort((a,b) => a-b);
   click(w, 'ghost-use');
@@ -113,7 +118,7 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
   assert.ok(w.document.querySelector('.modal .year').textContent.trim());
   assert.equal(w.document.querySelectorAll('.ghost-card').length, 6, 'el resultado no destapa el tablero');
   const saved = state(w); w.close();
-  w = boot({ [key]: saved }); click(w,'continue'); click(w,'ready');
+  w = boot({ [key]: saved }); abreMazo(w); click(w,'continue'); click(w,'ready');
   assert.ok(w.document.querySelector('.modal'), 'recarga restaura resultado, no repite jugada');
   click(w, 'finish-turn'); click(w,'ready');
   assert.deepEqual(state(w).ghost.pending, ['2']);
@@ -129,7 +134,7 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
 }
 {
   const f = fixture(); f.players[0].hand = [6]; f.current = 1; f.turnsInRound = 0;
-  const w = boot({ [key]: f }); click(w,'continue'); click(w,'ready');
+  const w = boot({ [key]: f }); abreMazo(w); click(w,'continue'); click(w,'ready');
   play(w); click(w,'finish-turn'); click(w,'ready'); play(w); click(w,'finish-turn');
   assert.equal(state(w).winner,1,'conservar Fantasma no impide ganar');
   assert.deepEqual(state(w).ghost.used,[]);
@@ -137,17 +142,17 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
 }
 {
   const f=fixture(); f.ghost=freshGhost(['']); f.ghost.cards=[12];
-  const w=boot({[key]:f});click(w,'continue');click(w,'ready');play(w,false);
+  const w=boot({[key]:f});abreMazo(w);click(w,'continue');click(w,'ready');play(w,false);
   assert.equal(state(w).ghost.owners[0],'1','el robo de penalización puede entregar el poder');
   assert.equal(state(w).players[0].hand.length,3,'el poder no sustituye la penalización');w.close();
 }
 {
   const f=fixture(); f.ghost={...freshGhost(['1','']),cards:[6,12],distribution:2};
-  let w=boot({[key]:f});click(w,'continue');click(w,'ready');play(w,false);
+  let w=boot({[key]:f});abreMazo(w);click(w,'continue');click(w,'ready');play(w,false);
   let s=state(w);
   assert.equal(s.players[0].hand.length,3,'recolocar un duplicado conserva el castigo');
   assert.equal(s.ghost.owners[1],'');assert.ok(s.deck.includes(s.ghost.cards[1]));
-  w.close();w=boot({[key]:s});click(w,'continue');click(w,'ready');
+  w.close();w=boot({[key]:s});abreMazo(w);click(w,'continue');click(w,'ready');
   assert.deepEqual(state(w).ghost,s.ghost,'recargar no vuelve a sortear la recolocación');
   click(w,'finish-turn');
   assert.equal(w.document.querySelector('.ghost-power'),null,'el cambio de manos no revela el poder');
@@ -156,19 +161,19 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
 }
 {
   const initial={kind:'free',mode:'history',difficulty:'hard',ghostTurns:[3],day:'2026-08-31',deck:[7,8,9,10,11,12],timeline:[1,2,3,4,5],current:6,lives:3,hits:3,played:3,total:null,finished:false};
-  const w=boot({[soloKey]:initial});click(w,'solo');click(w,'resume-solo');
+  const w=boot({[soloKey]:initial});abreMazo(w);click(w,'solo');click(w,'resume-solo');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,5);
   play(w,true,true);assert.equal(w.document.querySelectorAll('.ghost-card').length,6);
   click(w,'solo-next');assert.equal(w.document.querySelectorAll('.ghost-card').length,0);
   assert.equal(state(w,soloKey).autoAdded.length,2);w.close();
 }
 for (const difficulty of ['easy','normal','hard','expert']) {
-  let w = boot({ 'continuum-difficulty-v1': difficulty }); click(w,'solo'); click(w,'start-free');
+  let w = boot({ 'continuum-difficulty-v1': difficulty }); abreMazo(w); click(w,'solo'); click(w,'start-free');
   let s = state(w,soloKey); const initialTotal=s.deck.length+s.timeline.length+1;
   assert.equal(s.difficulty,difficulty);
   assert.equal(w.document.querySelectorAll('.ghost-card').length,difficulty==='expert'?1:0);
   play(w,false,true); const saved=state(w,soloKey); w.close();
-  w=boot({[soloKey]:saved,'continuum-difficulty-v1':difficulty});click(w,'solo');click(w,'resume-solo');
+  w=boot({[soloKey]:saved,'continuum-difficulty-v1':difficulty});abreMazo(w);click(w,'solo');click(w,'resume-solo');
   assert.ok(w.document.querySelector('.modal'));click(w,'solo-next');
   s=state(w,soloKey);
   assert.equal(s.lives,2);assert.equal(s.hits,0);assert.equal(s.played,1);
@@ -189,7 +194,7 @@ for (const difficulty of ['easy','normal','hard','expert']) {
   w.close();
 }
 {
-  const w=boot({'continuum-difficulty-v1':'expert'});click(w,'start-competition');click(w,'comp-next-round');
+  const w=boot({'continuum-difficulty-v1':'expert'});abreMazo(w);click(w,'start-competition');click(w,'comp-next-round');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
   let rounds=0;
   // Las cinco cartas del usuario nunca se consumen como incorporaciones automáticas.

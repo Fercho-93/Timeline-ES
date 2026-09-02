@@ -32,7 +32,10 @@ const el = (w, selector) => {
   return element;
 };
 function click(w, selector) { const element = el(w, selector); element.focus(); element.click(); }
-function game(w) { ["setup", "start", "ready"].forEach(action => click(w, `[data-action="${action}"]`)); }
+// Un mazo concreto se elige ahora desde la portada antes de llegar al menú de
+// formatos (`playMenu`), donde de verdad viven «setup»/«start»/«ready».
+function abreMazo(w, block, mode) { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); }
+function game(w) { abreMazo(w, "historia", "history"); ["setup", "start", "ready"].forEach(action => click(w, `[data-action="${action}"]`)); }
 function animationEnd(w, target, name) {
   const event = new w.Event("animationend", { bubbles: true });
   Object.defineProperty(event, "animationName", { value: name });
@@ -41,39 +44,37 @@ function animationEnd(w, target, name) {
 
 console.log("\nGalería continua y navegación repetida");
 {
+  // La portada ya no conserva el nodo de la galería entre repintados (la colección se
+  // repinta entera al desplegar un bloque o al volver de un mazo), así que aquí se
+  // comprueba lo que sigue siendo cierto: el estado activo y el foco llegan al elemento
+  // correcto tras cada clic, ronda tras ronda, y elegir un mazo lleva al menú de
+  // formatos con su nombre.
   const w = boot();
-  const gallery = el(w, ".gallery");
-  const scienceImage = el(w, ".panel-science img");
   const blocks = Object.values(w.CONTINUUM.BLOCKS);
   for (let round = 0; round < 3; round++) {
     for (const block of blocks) {
       click(w, `[data-block="${block.key}"]`);
-      assert.equal(el(w, ".gallery"), gallery);
       assert.equal(el(w, ".gallery-panel.active").dataset.block, block.key);
       assert.equal(w.document.activeElement.dataset.block, block.key);
       for (const mode of block.games) {
         click(w, `[data-mode="${mode}"]`);
-        assert.equal(el(w, ".gallery"), gallery);
-        assert.equal(el(w, ".game-row.active").dataset.mode, mode);
+        assert.equal(el(w, "h1").textContent, w.CONTINUUM.mode(mode).name);
+        click(w, '[data-action="collection-back"]');
+        assert.equal(el(w, ".gallery-panel.active").dataset.block, block.key);
       }
     }
   }
-  ok("tres vueltas por todos los bloques y mazos conservan galería y foco", true);
-  ok("la imagen de Ciencia mantiene su nodo y el tamaño grande al volver", scienceImage === el(w, ".panel-science img") && scienceImage.getAttribute("src").endsWith("700.webp"));
-  click(w, '[data-block="historia"]');
-  const choices = el(w, '.play-choices');
-  const rows = [...w.document.querySelectorAll('.game-row')];
-  const title = el(w, '.home-selection h1');
-  click(w, '[data-mode="history"]');
-  ok("tocar el mazo activo no reconstruye el título ni sus botones", title === el(w, '.home-selection h1') && rows[0] === el(w, '.game-row'));
-  click(w, '[data-mode="world"]');
-  ok("cambiar de mazo conserva todos los botones y el foco", rows.every(row => row.isConnected) && choices === el(w, '.play-choices') && w.document.activeElement.dataset.mode === 'world');
+  ok("tres vueltas por todos los bloques y mazos llevan el estado activo y el foco al elemento correcto", true);
   click(w, '[data-block="ciencia"]');
-  ok("cambiar de bloque conserva los formatos de juego", choices === el(w, '.play-choices'));
+  ok("la imagen de Ciencia pide el tamaño grande al desplegarse", el(w, ".panel-science img").getAttribute("src").endsWith("700.webp"));
   for (let round = 0; round < 6; round++) {
+    click(w, '[data-block="historia"]');
+    click(w, '[data-mode="history"]');
     click(w, '[data-action="setup"]');
     assert.ok(el(w, ".shell").classList.contains("screen-enter"));
     click(w, '[data-action="home"]');
+    click(w, '[data-block="historia"]');
+    click(w, '[data-mode="history"]');
     click(w, '[data-action="solo"]');
     click(w, '[data-action="home"]');
   }
@@ -85,12 +86,22 @@ console.log("\nVolver al menú sin saltos de lectura");
 {
   const w = boot();
   const calls = [];
-  w.scrollTo = options => { calls.push(options); w.scrollY = options.top; };
+  // `window.scrollTo` admite dos firmas (par de coordenadas u opciones); un navegador
+  // real entiende las dos, así que el simulacro también debe hacerlo.
+  w.scrollTo = (...args) => {
+    const options = args.length === 1 ? args[0] : { top: args[1], left: args[0], behavior: "instant" };
+    calls.push(options);
+    w.scrollY = options.top;
+  };
   w.scrollY = 520;
+  click(w, '[data-block="historia"]');
+  // Elegir un mazo es lo que de verdad sale de Inicio; el resto del recorrido
+  // (menú de formatos, configuración) no vuelve a tocar esa posición guardada.
+  click(w, '[data-mode="history"]');
+  ok("elegir un mazo comienza arriba incluso si Inicio estaba desplazado", w.scrollY === 0);
   click(w, '[data-action="setup"]');
-  ok("la configuración comienza arriba incluso si Inicio estaba desplazado", w.scrollY === 0);
   click(w, '[data-action="home"]');
-  ok("Volver recupera posición y botón de origen", w.scrollY === 520 && w.document.activeElement.dataset.action === 'setup');
+  ok("Volver recupera la posición y el foco de cuando se dejó Inicio", w.scrollY === 520 && w.document.activeElement.dataset.mode === 'history');
   ok("el regreso tiene sentido inverso sin un segundo desplazamiento animado", el(w, '.shell').classList.contains('screen-return') && calls.every(call => call.behavior === 'instant'));
   w.close();
 }
@@ -100,7 +111,7 @@ console.log("\nCambiar de categoría durante un ajuste de altura");
   const w = boot();
   const animations = [];
   let height = 200;
-  const container = el(w, '.home-selection');
+  const container = el(w, '.deck-collection');
   container.getBoundingClientRect = () => ({ height });
   container.animate = () => {
     let resolve, reject;

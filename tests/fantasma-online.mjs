@@ -84,7 +84,7 @@ try {
  const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:38} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
- assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,38);
+ assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,41);
  assert.equal(s.ghost.distribution,2);assert.equal(s.ghost.cards.length,3);
  // Pulso usa el mismo reparto, sin compartir posiciones con Fantasma.
  await seed(lobby);await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-pulse').checked=true;await clients[0].call('startRoom');

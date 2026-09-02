@@ -73,7 +73,11 @@ function inventario(w) {
   return { total: todas.length, unicas: new Set(todas).size };
 }
 
+// La partida guardada solo ofrece «Continuar» dentro del menú de su propio mazo
+// (`playMenu`), al que hay que llegar desplegando antes el bloque de Historia.
 function entrar(w) {
+  click(w, '[data-block="historia"]');
+  click(w, '[data-mode="history"]');
   click(w, '[data-action="continue"]');
   click(w, '[data-action="ready"]');
 }

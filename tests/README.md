@@ -34,6 +34,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
 | `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie y que las bandas tengan contraste. |
 | `movimiento.mjs` | Navegación repetida, galería persistente, selección de cartas, cierres interrumpidos, arrastre y movimiento reducido. |
+| `enciclopedia.mjs` | Filtrado y búsqueda de `CT.Enciclopedia`, la pantalla que consulta cualquier mazo fuera de partida y su enlace desde el repaso de fin de partida. Comprueba también que no aparece dentro de ninguna partida. |
 | `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
 | `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |
 | `entrada-por-enlace.mjs` | La secuencia del SDK al entrar por una invitación. Necesita el emulador. |

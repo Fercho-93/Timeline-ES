@@ -29,6 +29,8 @@ function play(cardId, neighbourId, slot, expected) {
     starter: 0, turnsInRound: 0, round: 1, winner: null
   }));
   scripts.forEach(file => w.eval(read(file)));
+  click(w, '[data-block="naturaleza"]');
+  click(w, '[data-mode="speed"]');
   click(w, '[data-action="continue"]');
   click(w, '[data-action="ready"]');
   check("la mano no revela la velocidad", !w.document.querySelector('.hand-card .year'));

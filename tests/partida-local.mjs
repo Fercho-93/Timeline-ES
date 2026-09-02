@@ -23,17 +23,21 @@ const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) t
 
 console.log("\nArranque");
 let w = boot();
-ok("la portada se pinta con el mazo de historia", /167 hechos/.test(w.document.body.innerHTML));
 ok("los seis bloques están en la galería", w.document.querySelectorAll("[data-block]").length === 6);
+click(w, '[data-block="historia"]');
+ok("el bloque de historia se despliega con el mazo de historia", /167 hechos/.test(w.document.body.innerHTML));
 // Elegir bloque selecciona su primer juego; el clic en el juego es explícito de todos
 // modos, que es como funcionará cuando un bloque tenga varios.
 click(w, '[data-block="cine"]');
-click(w, '[data-mode="movies"]');
 ok("Entretenimiento reúne cine, música y videojuegos", w.document.querySelectorAll(".game-row").length === 3);
-ok("cambiar a Estrenos de cine muestra las 87 películas", /87 películas/.test(w.document.body.innerHTML));
+ok("el bloque de cine muestra las 87 películas", /87 películas/.test(w.document.body.innerHTML));
+click(w, '[data-mode="movies"]');
+ok("elegir un juego lleva al menú de formatos de Estrenos de cine", w.document.querySelector("h1")?.textContent === "Estrenos de cine");
 
 console.log("\nUna partida entera");
 w = boot();
+click(w, '[data-block="historia"]');
+click(w, '[data-mode="history"]');
 click(w, '[data-action="setup"]');
 click(w, '[data-action="add-player"]');
 w.document.getElementById("hand-size").value = "2";
@@ -72,6 +76,8 @@ ok(`cada turno revela la fecha de su carta (${revealed} de ${turns})`, revealed 
 
 console.log("\nFechas ocultas y persistencia");
 w = boot();
+click(w, '[data-block="historia"]');
+click(w, '[data-mode="history"]');
 click(w, '[data-action="setup"]');
 click(w, '[data-action="start"]');
 click(w, '[data-action="ready"]');
