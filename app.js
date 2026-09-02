@@ -68,21 +68,29 @@
 
   function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
 
-  // El mazo de animales usa cinco láminas originales de historia natural. No contienen
-  // cifras, por lo que pueden enseñarse también en la carta de la mano sin revelar el
+  // Cada carta del mazo de peso tiene una lámina propia. Se enlazan por ID para que un
+  // retoque del título o del valor no pueda cambiar por accidente la ilustración.
+  const ANIMAL_ART_BY_ID = {
+    10001: "bee", 10002: "monarch-butterfly", 10003: "mantis", 10004: "green-tree-frog",
+    10005: "house-mouse", 10007: "rock-pigeon", 10008: "guinea-pig", 10009: "european-hare",
+    10010: "cat", 10011: "fox", 10012: "european-beaver", 10013: "iberian-lynx",
+    10014: "great-dane", 10015: "gray-wolf", 10016: "capybara", 10017: "chimpanzee",
+    10018: "giant-panda", 10019: "american-black-bear", 10020: "lion", 10021: "bengal-tiger",
+    10022: "grevys-zebra", 10023: "domestic-horse", 10024: "alaska-moose", 10025: "american-bison",
+    10026: "giraffe", 10027: "common-hippopotamus", 10028: "white-rhinoceros",
+    10029: "southern-elephant-seal", 10030: "elephant", 10031: "whale-shark", 10032: "orca",
+    10034: "humpback-whale", 10035: "sperm-whale", 10038: "blue-whale", 10039: "octopus",
+    10040: "flamingo", 10041: "penguin", 10042: "kangaroo", 10043: "nile-crocodile",
+    10044: "polar-bear", 10045: "dromedary-camel"
+  };
+
+  // Las láminas no contienen cifras, por lo que pueden verse en la mano sin revelar el
   // peso que hay que ordenar.
   function animalArt(card) {
     if (selectedModeKey !== "animals") return "";
-    const title = card.title.toLocaleLowerCase("es");
-    const individual = {
-      10001: "bee", 10003: "mantis", 10010: "cat", 10011: "fox", 10016: "capybara", 10020: "lion", 10026: "giraffe",
-      10030: "elephant", 10038: "blue-whale", 10039: "octopus", 10040: "flamingo", 10041: "penguin", 10042: "kangaroo"
-    };
-    const plate = individual[card.id] || (/pulpo|orca|tiburón|ballena|cachalote|elefante marino/.test(title) ? "ocean"
-      : /pingüino|oso polar/.test(title) ? "polar-bear"
-      : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari-rhino"
-      : Number(card.value) < 5 ? "small" : "woodland-fox");
-    return `<img class="animal-card-art" src="assets/animal-cards/${plate}.png" alt="" decoding="async" loading="lazy">`;
+    const plate = ANIMAL_ART_BY_ID[card.id];
+    if (!plate) return "";
+    return `<img class="animal-card-art" src="assets/animal-cards/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
   function saveGame() {

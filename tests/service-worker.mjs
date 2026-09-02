@@ -64,6 +64,12 @@ console.log("\nService worker");
   sw.listeners.install({ waitUntil: tarea => { instalada = tarea; } });
   await instalada;
   ok("instalar una versión nueva evita reutilizar archivos viejos de la caché HTTP", sw.precargas.length > 0 && sw.precargas.every(request => request.cache === "reload"));
+  const animalAssets = fs.readdirSync(path.join(REPO, "assets", "animal-cards"))
+    .filter(file => file.endsWith(".webp"))
+    .map(file => `./assets/animal-cards/${file}`);
+  const cachedAssets = new Set(sw.precargas.map(request => request.url));
+  const animalsMissingOffline = animalAssets.filter(file => !cachedAssets.has(file));
+  ok(`las ${animalAssets.length} ilustraciones de animales se precargan para jugar sin conexión${animalsMissingOffline.length ? ` (faltan ${animalsMissingOffline.join(", ")})` : ""}`, !animalsMissingOffline.length);
 }
 {
   const sw = arrancar();
