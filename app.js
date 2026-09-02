@@ -33,8 +33,8 @@
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
-  // La portada empieza mostrando la colección, no un mazo abierto. El primer toque
-  // descubre una categoría y el segundo enseña los mazos que contiene.
+  // La portada empieza mostrando la colección, no un mazo abierto. Un toque descubre
+  // una categoría y enseña directamente los mazos que contiene.
   let collectionOpen = false;
   let collectionDetails = false;
 
@@ -117,7 +117,7 @@
     return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map(item => {
       const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
-      const instruction = active ? (collectionDetails ? "Mazos visibles debajo." : "Toca de nuevo para ver sus mazos.") : "Toca para ampliar.";
+      const instruction = active ? "Mazos visibles debajo." : "Toca para ampliar y ver sus mazos.";
       const mazos = active && collectionDetails
         ? `<div class="collection-decks"><h2 data-focus tabindex="-1">${item.name}</h2><p class="lead">Elige un mazo para continuar.</p>${gameList()}</div>`
         : "";
@@ -186,11 +186,8 @@
 
   function home() {
     screen = "home";
-    const selected = CT.block(selectedBlockKey);
-    const hint = collectionOpen && !collectionDetails
-      ? `<p class="collection-hint">Vuelve a tocar <b>${selected.name}</b> para ver sus mazos.</p>` : "";
     paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}${hint}</section></div></section>
+      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section></div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
@@ -1113,8 +1110,9 @@
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }
     else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
     else if (action === "set-block") {
-      if (collectionOpen && target.dataset.block === selectedBlockKey) collectionDetails = true;
-      else { setBlock(target.dataset.block); collectionOpen = true; collectionDetails = false; }
+      if (!collectionOpen || target.dataset.block !== selectedBlockKey) setBlock(target.dataset.block);
+      collectionOpen = true;
+      collectionDetails = true;
       home();
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }
