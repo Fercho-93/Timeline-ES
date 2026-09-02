@@ -1,7 +1,7 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v51";
-const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js", "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js", "./medicine.js", "./countries.js", "./population.js", "./distances.js", "./modes.js", "./enciclopedia.js", "./ghost.js", "./drag.js", "./a11y.js", "./mapa.js", "./settings.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history-400.webp", "./assets/hero-history-700.webp", "./assets/hero-entertainment-400.webp", "./assets/hero-entertainment-700.webp", "./assets/hero-science-400.webp", "./assets/hero-science-700.webp", "./assets/hero-nature-400.webp", "./assets/hero-nature-700.webp", "./assets/hero-geography-400.webp", "./assets/hero-geography-700.webp", "./assets/hero-mixed-400.webp", "./assets/hero-mixed-700.webp", "./assets/hero-competicion-400.webp", "./assets/hero-competicion-700.webp"];
+const CACHE = "continuum-v58";
+const ASSETS = ["./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js", "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js", "./medicine.js", "./countries.js", "./population.js", "./distances.js", "./modes.js", "./enciclopedia.js", "./ghost.js", "./drag.js", "./a11y.js", "./mapa.js", "./settings.js", "./app.js", "./online.js", "./manifest.webmanifest", "./icon.svg", "./assets/hero-history-400.webp", "./assets/hero-history-700.webp", "./assets/hero-entertainment-400.webp", "./assets/hero-entertainment-700.webp", "./assets/hero-science-400.webp", "./assets/hero-science-700.webp", "./assets/hero-nature-400.webp", "./assets/hero-nature-700.webp", "./assets/hero-geography-400.webp", "./assets/hero-geography-700.webp", "./assets/hero-mixed-400.webp", "./assets/hero-mixed-700.webp", "./assets/hero-competicion-400.webp", "./assets/hero-competicion-700.webp", "./assets/animal-cards/small.png", "./assets/animal-cards/land.png", "./assets/animal-cards/safari.png", "./assets/animal-cards/polar.png", "./assets/animal-cards/ocean.png", "./assets/animal-cards/bee.png", "./assets/animal-cards/flamingo.png", "./assets/animal-cards/fox.png", "./assets/animal-cards/lion.png", "./assets/animal-cards/elephant.png"];
 
 self.addEventListener("install", event => {
   // Una caché de aplicación nueva no basta si la caché HTTP aún considera frescos los
@@ -35,3 +35,4 @@ self.addEventListener("fetch", event => {
     return fresh.catch(() => event.request.mode === "navigate" ? caches.match("./index.html") : Response.error());
   }));
 });
+

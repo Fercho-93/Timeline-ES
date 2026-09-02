@@ -39,6 +39,10 @@
   let encQuery = "";
   let encBand = "all";
   let encHighlight = null;
+  // La portada empieza mostrando la colección, no un mazo abierto. Un toque descubre
+  // una categoría y enseña directamente los mazos que contiene.
+  let collectionOpen = false;
+  let collectionDetails = false;
 
   function currentAxis() { return CT.axis(selectedModeKey); }
 
@@ -63,6 +67,22 @@
   }
 
   function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
+
+  // El mazo de animales usa cinco láminas originales de historia natural. No contienen
+  // cifras, por lo que pueden enseñarse también en la carta de la mano sin revelar el
+  // peso que hay que ordenar.
+  function animalArt(card) {
+    if (selectedModeKey !== "animals") return "";
+    const title = card.title.toLocaleLowerCase("es");
+    const individual = {
+      10001: "bee", 10040: "flamingo", 10011: "fox", 10020: "lion", 10030: "elephant"
+    };
+    const plate = individual[card.id] || (/pulpo|orca|tiburón|ballena|cachalote|elefante marino/.test(title) ? "ocean"
+      : /pingüino|oso polar/.test(title) ? "polar"
+      : /león|tigre|cebra|cocodrilo|camello|rinoceronte|elefante africano|jirafa|hipopótamo|bisonte|alce/.test(title) ? "safari"
+      : Number(card.value) < 5 ? "small" : "land");
+    return `<img class="animal-card-art" src="assets/animal-cards/${plate}.png" alt="" decoding="async" loading="lazy">`;
+  }
 
   function saveGame() {
     if (game) localStorage.setItem(storageKey(), JSON.stringify(game));
@@ -116,14 +136,18 @@
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
   // en color y las otras quedan como lomos que se pueden tocar.
   function gallery() {
-    return `<div class="gallery" role="group" aria-label="Elige el bloque">${Object.values(CT.BLOCKS).map(item => {
-      const active = item.key === selectedBlockKey;
+    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map(item => {
+      const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
-      return `<button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}">
+      const instruction = active ? "Mazos visibles debajo." : "Toca para ampliar y ver sus mazos.";
+      const mazos = active && collectionDetails
+        ? `<div class="collection-decks"><h2 data-focus tabindex="-1">${item.name}</h2><p class="lead">Elige un mazo para continuar.</p>${gameList()}</div>`
+        : "";
+      return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
-      </button>`;
+      </button>${mazos}</div>`;
     }).join("")}</div>`;
   }
 
@@ -157,57 +181,53 @@
     </div></section>`;
   }
 
+  function competitionPromo() {
+    return `<button class="comp-promo" data-action="start-competition">
+      <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
+      <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
+    </button>`;
+  }
+
+  function homeMasthead() {
+    return `<section class="home-masthead" aria-label="Continuum, un juego para ordenar y comparar">
+      <div class="home-crest" aria-hidden="true"><img src="assets/hero-history-400.webp" alt="" width="400" height="267" decoding="async" fetchpriority="high"></div>
+      <div class="home-wordmark">Continuum</div>
+      <div class="home-tagline">Ordena. Compara. Descubre.</div>
+      <div class="home-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
+      <p>Coloca las cartas en el orden correcto<br>y construye la línea del tiempo.</p>
+    </section>`;
+  }
+
+  function homeNav() {
+    return `<nav class="home-nav" aria-label="Navegación de inicio">
+      <button data-action="home-top" aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
+      <button data-action="home-collection" aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
+      <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
+    </nav>`;
+  }
+
   function home() {
-    const galeriaAnterior = screen === "home" ? app.querySelector(".gallery") : null;
     screen = "home";
-    const resume = game && game.mode === selectedModeKey;
-    const seleccion = `<h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>${gameList()}`;
-    const contenido = `<div class="home-selection">${seleccion}</div>
-          ${playChoices(resume)}
-          <button class="comp-promo" data-action="start-competition">
-            <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
-            <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
-          </button>`;
-    // Conserva los nodos y sus imágenes decodificadas. La transición puede partir del
-    // ancho real anterior, incluso si se toca otro bloque antes de terminar la primera.
-    if (galeriaAnterior) {
-      const selector = app.querySelector(".home-selection");
-      const mismoBloque = galeriaAnterior.querySelector(".active")?.dataset.block === selectedBlockKey;
-      if (mismoBloque) {
-        // El mazo cambia, pero sus botones y los formatos de juego no desaparecen
-        // debajo del dedo. Tampoco se reinicia la animación de la carátula.
-        selector.querySelector("h1").innerHTML = CT.question(selectedModeKey);
-        selector.querySelectorAll("[data-mode]").forEach(row => {
-          const active = row.dataset.mode === selectedModeKey;
-          row.classList.toggle("active", active);
-          row.setAttribute("aria-pressed", String(active));
-        });
-      } else {
-        const height = selector.getBoundingClientRect().height;
-        CT.paint(selector, seleccion, screen);
-        CT.resizeContent(selector, height);
-      }
-      const continuar = app.querySelector(".continue-choice");
-      if (!resume) continuar?.remove();
-      else if (!continuar) app.querySelector(".play-choice-grid").insertAdjacentHTML("beforeend", '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>');
-      galeriaAnterior.querySelectorAll("[data-block]").forEach(panel => {
-        const activo = panel.dataset.block === selectedBlockKey;
-        panel.classList.toggle("active", activo);
-        panel.setAttribute("aria-pressed", String(activo));
-        if (activo) {
-          const arte = BLOCK_ART[CT.block(panel.dataset.block).art];
-          const img = panel.querySelector("img");
-          img.setAttribute("src", `assets/${arte.archivo}-700.webp`);
-          img.setAttribute("width", "700");
-          img.setAttribute("height", String(arte.alto[700]));
-          img.setAttribute("fetchpriority", "high");
-        }
-      });
-    } else paint(`<div class="shell">${header('<button class="icon-btn" data-action="enciclopedia">Enciclopedia</button><button class="icon-btn" data-action="rules">Guía</button>')}
-      <section class="hero">${gallery()}<div class="hero-copy">${contenido}</div></section>
+    paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
+      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section></div></section>
+      ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
     showCacheVersion();
+  }
+
+  // Se llega aquí con un mazo ya elegido, así que es el sitio natural para ojearlo
+  // entero antes de decidir cómo jugarlo.
+  function playMenu() {
+    screen = "play-menu";
+    const resume = game && game.mode === selectedModeKey;
+    const block = CT.block(selectedBlockKey);
+    const art = BLOCK_ART[block.art];
+    paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="enciclopedia">Enciclopedia</button><button class="icon-btn" data-action="collection-back">Volver</button>')}
+      <section class="mode-masthead"><img src="assets/${art.archivo}-700.webp" alt="" width="700" height="${art.alto[700]}" decoding="async"><div><div class="eyebrow">${block.name}</div><h1 data-focus tabindex="-1">${currentMode().name}</h1><p>${currentMode().blurb}</p></div></section>
+      <section class="home-play">${playChoices(resume)}${competitionPromo()}</section>
+    </div>`);
+    window.scrollTo(0, 0);
   }
 
   async function showCacheVersion() {
@@ -321,8 +341,8 @@
       }
     }
     const manoHtml = pulseCard
-      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
-      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected ${selectedModeKey === "animals" ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
+      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${selectedModeKey === "animals" ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">Turno de ${escapeHtml(player.name)}, ronda ${game.round}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
@@ -367,7 +387,8 @@
     const era = eraForCard(card);
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
-    return `<article class="timeline-card" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+    const animal = selectedModeKey === "animals";
+    return `<article class="timeline-card ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
   }
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
@@ -884,7 +905,7 @@
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
-      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}"><span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
+      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected ${selectedModeKey === "animals" ? "animal-hand-card" : ""}" data-id="${card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
     </div>`);
     if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
     CT.enableDrag({
@@ -1180,8 +1201,16 @@
     if (!target) return;
     const action = target.dataset.action;
     if (action === "home") home();
-    else if (action === "set-mode") { if (target.dataset.mode === selectedModeKey) return; setMode(target.dataset.mode); home(); }
-    else if (action === "set-block") { if (target.dataset.block === selectedBlockKey) return; setBlock(target.dataset.block); home(); }
+    else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
+    else if (action === "home-collection") document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }
+    else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
+    else if (action === "set-block") {
+      if (!collectionOpen || target.dataset.block !== selectedBlockKey) setBlock(target.dataset.block);
+      collectionOpen = true;
+      collectionDetails = true;
+      home();
+    }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();
@@ -1263,3 +1292,4 @@
   if (invitedRoom) launchOnline(invitedRoom);
   else home();
 })();
+
