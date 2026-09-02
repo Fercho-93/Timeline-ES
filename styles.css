@@ -799,6 +799,8 @@ body::before {
   height: auto;
   margin: 0;
 }
+.collection-entry { min-width: 0; }
+.collection-entry.active { grid-column: 1 / -1; }
 .home-shell .gallery-panel {
   width: 100%;
   height: 88px;
@@ -828,9 +830,9 @@ body::before {
 .home-shell .gallery-panel.active .panel-label { left: 22px; right: 22px; top: auto; bottom: 22px; transform: none; }
 .home-shell .panel-label strong { font-size: 1.22rem; letter-spacing: 0; }
 .home-shell .panel-label small { color: #e8c990; }
-.home-selection { margin-top: 17px; padding: 18px; border: 1px solid rgba(130,81,35,.42); border-radius: 8px; background: rgba(242,216,164,.64); }
-.home-selection h1, .home-selection h2 { max-width: none; margin-bottom: 8px; text-align: center; font-size: clamp(1.55rem, 5vw, 2rem); }
-.home-selection .lead { margin: 0 auto 14px; text-align: center; }
+.collection-decks { margin-top: 10px; padding: 18px; border: 1px solid rgba(130,81,35,.42); border-radius: 8px; background: rgba(242,216,164,.64); }
+.collection-decks h2 { max-width: none; margin-bottom: 8px; text-align: center; font-size: clamp(1.55rem, 5vw, 2rem); }
+.collection-decks .lead { margin: 0 auto 14px; text-align: center; }
 .collection-hint { margin: 16px 0 0; padding: 13px 15px; border: 1px solid rgba(130,81,35,.38); border-radius: 8px; background: rgba(242,216,164,.55); text-align: center; color: var(--muted); }
 .games { border-color: rgba(130,81,35,.4); border-radius: 7px; background: rgba(130,81,35,.3); }
 .game-row { border-left-width: 4px; background: rgba(249,228,184,.66); }
@@ -912,7 +914,7 @@ body::before {
   .home-shell .play-choice-grid { grid-template-columns: repeat(3, 1fr); }
   .home-shell .play-choice { min-height: 118px; }
   .home-shell .gallery { grid-template-columns: repeat(2, 1fr); }
-  .home-shell .gallery-panel.active { grid-column: 1 / -1; height: 300px; }
+  .home-shell .gallery-panel.active { height: 300px; }
   .home-shell .comp-promo { max-width: 100%; }
 }
 
