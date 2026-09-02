@@ -151,17 +151,36 @@
     </div></section>`;
   }
 
+  function homeMasthead() {
+    return `<section class="home-masthead" aria-label="Continuum, ordena el pasado">
+      <div class="home-crest" aria-hidden="true"><img src="assets/hero-history-400.webp" alt="" width="400" height="267" decoding="async" fetchpriority="high"></div>
+      <div class="home-wordmark">Continuum</div>
+      <div class="home-tagline">Ordena el pasado.</div>
+      <div class="home-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
+      <p>Coloca las cartas en el orden correcto<br>y construye la línea del tiempo.</p>
+    </section>`;
+  }
+
+  function homeNav() {
+    return `<nav class="home-nav" aria-label="Navegación de inicio">
+      <button data-action="home-top" aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
+      <button data-action="home-collection" aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
+      <button data-action="home-play" aria-label="Ir a las formas de juego"><span aria-hidden="true">♜</span><small>Jugar</small></button>
+      <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
+    </nav>`;
+  }
+
   function home() {
     const galeriaAnterior = screen === "home" ? app.querySelector(".gallery") : null;
     screen = "home";
     const resume = game && game.mode === selectedModeKey;
     const seleccion = `<h1 data-focus tabindex="-1">${CT.question(selectedModeKey)}</h1>${gameList()}`;
-    const contenido = `<div class="home-selection">${seleccion}</div>
-          ${playChoices(resume)}
+    const contenido = `<section class="home-play" id="home-play">${playChoices(resume)}
           <button class="comp-promo" data-action="start-competition">
             <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
             <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
-          </button>`;
+          </button></section>
+          <section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}<div class="home-selection">${seleccion}</div></section>`;
     // Conserva los nodos y sus imágenes decodificadas. La transición puede partir del
     // ancho real anterior, incluso si se toca otro bloque antes de terminar la primera.
     if (galeriaAnterior) {
@@ -197,8 +216,9 @@
           img.setAttribute("fetchpriority", "high");
         }
       });
-    } else paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      <section class="hero">${gallery()}<div class="hero-copy">${contenido}</div></section>
+    } else paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
+      ${homeMasthead()}<section class="hero"><div class="hero-copy">${contenido}</div></section>
+      ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
     showCacheVersion();
@@ -1103,6 +1123,9 @@
     if (!target) return;
     const action = target.dataset.action;
     if (action === "home") home();
+    else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
+    else if (action === "home-collection") document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    else if (action === "home-play") document.getElementById("home-play")?.scrollIntoView({ behavior: "smooth", block: "start" });
     else if (action === "set-mode") { if (target.dataset.mode === selectedModeKey) return; setMode(target.dataset.mode); home(); }
     else if (action === "set-block") { if (target.dataset.block === selectedBlockKey) return; setBlock(target.dataset.block); home(); }
     else if (action === "home-new") { game = null; saveGame(); home(); }
