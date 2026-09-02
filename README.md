@@ -132,8 +132,10 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
 
 ## Fantasma, Pulso y dificultades (poderes v38)
 
-En partidas locales, el poder Fantasma puede acompañar al reparto o a un robo. En salas
-se activa con «Cartas Fantasma» al configurar la partida. Está separado de las cartas a
+El poder Fantasma puede acompañar al reparto o a un robo. Tanto en partidas de un solo
+móvil como en salas se activa o desactiva con «Cartas Fantasma» al configurar la partida,
+igual que «Cartas Pulso»; ambos interruptores parten marcados o desmarcados según su valor
+por defecto y se pueden cambiar antes de barajar. Fantasma está separado de las cartas a
 ordenar: conservarlo no impide ganar, no sustituye un robo de penalización, no se pasa
 con el Pulso y no se recicla con el descarte. El poder solo se muestra a su propietario,
 sin aumentar el contador público de cartas. Máximo un uso por persona. Si encuentra otro,

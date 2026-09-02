@@ -84,7 +84,7 @@ function showToast(message) {
 
 function showGuide() {
   const mode = modeKey();
-  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-online-guide><div class="modal rules"><div class="guide-content">${CT.guideMarkup(mode, "online", { pulse: !!roomState?.pulse })}</div><button class="btn btn-primary btn-block" data-online-action="close-guide">Entendido</button></div></div>`);
+  appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-online-guide><div class="modal rules"><div class="guide-content">${CT.guideMarkup(mode, "online", { pulse: !!roomState?.pulse, ghost: roomState?.status === "playing" ? !!roomState.ghost : true })}</div><button class="btn btn-primary btn-block" data-online-action="close-guide">Entendido</button></div></div>`);
   abreCapa(appEl.querySelector("[data-online-guide]"), true);
 }
 
