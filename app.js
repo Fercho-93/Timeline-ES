@@ -152,10 +152,10 @@
   }
 
   function homeMasthead() {
-    return `<section class="home-masthead" aria-label="Continuum, ordena el pasado">
+    return `<section class="home-masthead" aria-label="Continuum, un juego para ordenar y comparar">
       <div class="home-crest" aria-hidden="true"><img src="assets/hero-history-400.webp" alt="" width="400" height="267" decoding="async" fetchpriority="high"></div>
       <div class="home-wordmark">Continuum</div>
-      <div class="home-tagline">Ordena el pasado.</div>
+      <div class="home-tagline">Ordena. Compara. Descubre.</div>
       <div class="home-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
       <p>Coloca las cartas en el orden correcto<br>y construye la línea del tiempo.</p>
     </section>`;
