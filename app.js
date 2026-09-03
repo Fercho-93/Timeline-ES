@@ -796,12 +796,12 @@
   // al tramo del mazo donde está lo que se falla, que es donde se puede hacer algo.
   function perfilPuntosDebiles(bandas, cartas) {
     if (!bandas.length && !cartas.length) return "";
-    const filasBandas = bandas.map(banda => `<button type="button" class="weak-row" data-action="enc-band-view" data-mode="${banda.mode}" data-band="${banda.band}">
+    const filasBandas = bandas.map(banda => `<button type="button" class="weak-row" data-action="enc-band-view" data-mode="${escapeHtml(banda.mode)}" data-band="${escapeHtml(banda.band)}">
       <span class="weak-mark" aria-hidden="true">${escapeHtml(banda.symbol)}</span>
       <span><b>${escapeHtml(banda.name)}</b><small>${escapeHtml(banda.modeName)} · ${banda.accuracy}% en ${banda.played} ${banda.played === 1 ? "carta" : "cartas"}</small></span>
       <i aria-hidden="true">→</i>
     </button>`).join("");
-    const filasCartas = cartas.map(carta => `<button type="button" class="weak-row" data-action="enc-view" data-mode="${carta.mode}" data-id="${carta.id}">
+    const filasCartas = cartas.map(carta => `<button type="button" class="weak-row" data-action="enc-view" data-mode="${escapeHtml(carta.mode)}" data-id="${carta.id}">
       <span class="weak-mark" aria-hidden="true">×${carta.count}</span>
       <span><b>${escapeHtml(carta.title)}</b><small>${escapeHtml(carta.modeName)}</small></span>
       <i aria-hidden="true">→</i>

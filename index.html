@@ -7,6 +7,12 @@
     <meta name="theme-color" content="#d7b778" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#21170d" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Juego de ordenar: historia, entretenimiento, ciencia y geografía" />
+    <!-- El modo de varios móviles carga los módulos de Firebase desde gstatic.com y habla
+         con las APIs de Google (autenticación anónima y Firestore) bajo googleapis.com; el
+         resto de la aplicación —incluida la carga de todos los mazos— es de este origen.
+         `frame-ancestors` no se puede fijar aquí: los navegadores solo la respetan si la
+         manda una cabecera HTTP de verdad, y GitHub Pages no permite añadir cabeceras. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />

@@ -16,7 +16,10 @@ service cloud.firestore {
       function isParticipant() { return signedIn() && uid() in before().playerOrder; }
       function isHost() { return signedIn() && before().hostUid == uid(); }
       function isCurrent() { return isParticipant() && before().playerOrder[before().current] == uid(); }
-      function bumped() { return after().version == before().version + 1; }
+      // El número de versión sube de uno en uno y `updatedAt` es siempre la hora real del
+      // servidor: nadie puede fecharla a mano ni adelantarla, que es lo único que evita
+      // que una sala abandonada burle la directiva de TTL que la borra sola.
+      function bumped() { return after().version == before().version + 1 && after().updatedAt == request.time; }
       function validName(name) { return name is string && name.size() >= 1 && name.size() <= 18; }
 
       // Identidad de la sala: nunca cambia después de crearla.
@@ -447,10 +450,24 @@ service cloud.firestore {
 
       // El anfitrión expulsa a alguien, o alguien se marcha: sus cartas van al descarte.
       function validKick() {
-        let cancelPulse = before().phase == 'pulse' && (!(before().playerOrder[before().current] in after().playerOrder) || !(before().pulseTurn.targetUid in after().playerOrder));
+        // Quien se marcha o es expulsado puede ser justo quien tenía el turno.
+        let currentLeft = !(before().playerOrder[before().current] in after().playerOrder);
+        let cancelPulse = before().phase == 'pulse' && (currentLeft || !(before().pulseTurn.targetUid in after().playerOrder));
+        // Ganar de verdad por abandono: solo cuando de verdad queda una única persona.
+        // Sin esto, cualquiera que se marchara podría declararse ganador o dar la
+        // victoria a otra persona con la mesa todavía llena.
+        let soleWinner = after().playerOrder.size() == 1
+          && after().status == 'ended' && after().phase == 'finished'
+          && after().winner == after().playerOrder[0]
+          && after().get('reveal', null) == null;
+        // La partida sigue: ni el estado ni el resultado se inventan al salir. Solo se
+        // permite descartar una jugada a medio revelar si era justo la de quien se fue.
+        let stillPlaying = after().status == before().status
+          && after().winner == before().winner
+          && after().get('reveal', null) == (currentLeft ? null : before().get('reveal', null))
+          && after().phase == (cancelPulse || currentLeft ? 'turn' : before().phase);
         return isParticipant()
           && (isHost() || !(uid() in after().playerOrder))
-          && (after().winner == null || after().winner in after().playerOrder)
           && changed().hasOnly(['ghost', 'pulseTurn', 'players', 'playerOrder', 'discard', 'current', 'turnsInRound',
                                 'phase', 'status', 'winner', 'reveal', 'version', 'updatedAt'])
           && after().playerOrder.size() == before().playerOrder.size() - 1
@@ -462,6 +479,11 @@ service cloud.firestore {
           && after().deck.size() == before().deck.size()
           && after().timeline.size() == before().timeline.size()
           && after().get('pulseTurn', null) == (cancelPulse ? null : before().get('pulseTurn', null))
+          && (before().status != 'playing'
+              // Fuera de partida (vestíbulo o ya terminada) nada de esto se toca.
+              ? (after().status == before().status && after().phase == before().phase
+                 && after().winner == before().winner && after().get('reveal', null) == before().get('reveal', null))
+              : (soleWinner || stillPlaying))
           && bumped();
       }
 
@@ -484,6 +506,8 @@ service cloud.firestore {
         && request.resource.data.status == 'lobby'
         && request.resource.data.phase == 'lobby'
         && request.resource.data.version == 1
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
         && request.resource.data.playerOrder.size() == 1
         && request.resource.data.playerOrder[0] == uid()
         && request.resource.data.players.size() == 1

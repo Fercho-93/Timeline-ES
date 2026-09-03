@@ -41,6 +41,86 @@
     };
   }
 
+  // El perfil se puede pegar a mano en «Recuperar ese perfil»: cualquier texto llega
+  // hasta aquí, no solo una copia de verdad. Cada campo se reconstruye con su tipo
+  // esperado y las claves de mazo, banda y logro solo se aceptan si existen hoy en el
+  // código — así un título o un valor ajeno no puede colarse donde la pantalla lo
+  // interpola tal cual, ni como texto ni como atributo.
+  function num(value, fallback = 0) {
+    return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+  }
+  function str(value, fallback = "") {
+    return typeof value === "string" ? value : fallback;
+  }
+
+  function normalizeTotals(stored) {
+    const base = emptyProfile().totals;
+    if (!stored || typeof stored !== "object") return base;
+    return { games: num(stored.games), cards: num(stored.cards), hits: num(stored.hits),
+      wins: num(stored.wins), run: num(stored.run), bestRun: num(stored.bestRun) };
+  }
+
+  function normalizeMarks(stored) {
+    const base = emptyProfile().marks;
+    const out = {};
+    for (const key of Object.keys(base)) out[key] = num(stored && stored[key]);
+    return out;
+  }
+
+  // Solo mazos que existen hoy, con sus contadores numéricos. `byKind` no se enseña en
+  // pantalla, pero `apply()` da por hecho que existe en cada entrada.
+  function normalizeByMode(stored) {
+    const out = {};
+    if (!stored || typeof stored !== "object") return out;
+    for (const [modeKey, entry] of Object.entries(stored)) {
+      if (!CT.has(modeKey) || !entry || typeof entry !== "object") continue;
+      const byKind = {};
+      if (entry.byKind && typeof entry.byKind === "object") {
+        for (const [kind, count] of Object.entries(entry.byKind)) {
+          if (typeof kind === "string" && kind.length <= 20) byKind[kind] = num(count);
+        }
+      }
+      out[modeKey] = { games: num(entry.games), cards: num(entry.cards), hits: num(entry.hits), byKind };
+    }
+    return out;
+  }
+
+  // Solo mazo + banda que existen hoy en modes.js: `band` se enseña como atributo en
+  // pantalla y esta lista es lo que impide que lleve otra cosa.
+  function normalizeByBand(stored) {
+    const out = {};
+    if (!stored || typeof stored !== "object") return out;
+    for (const [key, stats] of Object.entries(stored)) {
+      if (!stats || typeof stats !== "object" || !CT.has(stats.mode) || typeof stats.band !== "string") continue;
+      if (!bandInfo(stats.mode, stats.band)) continue;
+      out[key] = { mode: stats.mode, band: stats.band, hits: num(stats.hits), misses: num(stats.misses) };
+    }
+    return out;
+  }
+
+  // Solo cartas que existen hoy en su mazo.
+  function normalizeMisses(stored) {
+    const out = {};
+    if (!stored || typeof stored !== "object") return out;
+    for (const [id, miss] of Object.entries(stored)) {
+      if (!miss || typeof miss !== "object" || !CT.has(miss.mode) || !cardById(miss.mode, Number(id))) continue;
+      out[id] = { mode: miss.mode, count: num(miss.count), lastDay: str(miss.lastDay) };
+    }
+    return out;
+  }
+
+  // Solo logros que existen hoy.
+  function normalizeAchievements(stored) {
+    const out = {};
+    if (!stored || typeof stored !== "object") return out;
+    const known = new Set(ACHIEVEMENTS.map(item => item.key));
+    for (const [key, value] of Object.entries(stored)) {
+      if (!known.has(key) || !value || typeof value !== "object") continue;
+      out[key] = { unlockedAt: str(value.unlockedAt) };
+    }
+    return out;
+  }
+
   // Se rellenan los huecos en vez de confiar en lo guardado: un perfil escrito por una
   // versión anterior puede no traer un contador que aquí ya se lee, y leerlo de menos
   // rompería la pantalla entera en vez de enseñar un cero.
@@ -48,14 +128,17 @@
     const base = emptyProfile();
     if (!stored || typeof stored !== "object") return base;
     return {
-      ...base, ...stored,
-      totals: { ...base.totals, ...stored.totals },
-      marks: { ...base.marks, ...stored.marks },
-      byMode: { ...stored.byMode },
-      byBand: { ...stored.byBand },
-      misses: { ...stored.misses },
-      achievements: { ...stored.achievements },
-      seenOnline: Array.isArray(stored.seenOnline) ? stored.seenOnline.slice(-SEEN_ONLINE) : []
+      version: VERSION,
+      playerId: str(stored.playerId, base.playerId),
+      createdAt: str(stored.createdAt, base.createdAt),
+      totals: normalizeTotals(stored.totals),
+      marks: normalizeMarks(stored.marks),
+      byMode: normalizeByMode(stored.byMode),
+      byBand: normalizeByBand(stored.byBand),
+      misses: normalizeMisses(stored.misses),
+      achievements: normalizeAchievements(stored.achievements),
+      seenOnline: Array.isArray(stored.seenOnline) ? stored.seenOnline.filter(item => typeof item === "string").slice(-SEEN_ONLINE) : [],
+      lastOnline: str(stored.lastOnline, base.lastOnline)
     };
   }
 

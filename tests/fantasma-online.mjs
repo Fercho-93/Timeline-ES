@@ -18,7 +18,10 @@ function client(uid){
  w.structuredClone=structuredClone;
  for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
  const errors=[];w.console.error=e=>errors.push(e);
- w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>tx.update(ref,clone(data))})),serverTimestamp:()=>Date.now()};
+ // `clone` pasa los datos por JSON para normalizarlos al realm de este módulo, pero
+ // `serverTimestamp()` no es JSON: hay que conservar ese centinela tal cual o Firestore
+ // no lo reconoce como marca de hora del servidor.
+ w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>{const limpio=clone(data);if('updatedAt' in data)limpio.updatedAt=data.updatedAt;tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
  w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,skipTurn,removePlayer,startPulse,placePulse,renderGame,renderLobby};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};

@@ -1,5 +1,5 @@
 import { initializeTestEnvironment, assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -33,19 +33,19 @@ console.log("\nSala antigua (sin campo winners) contra las reglas nuevas");
 await check("empezar partida con el cliente ANTIGUO", "allow", updateDoc(ref(ctx(HOST)), {
   handSize: 2, players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2 } },
   deck: [10], timeline: [20], discard: [], status: "playing", phase: "turn", current: 0, starter: HOST,
-  turnsInRound: 0, round: 1, winner: null, reveal: null, version: 2, updatedAt: 2 }));
+  turnsInRound: 0, round: 1, winner: null, reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await env.withSecurityRulesDisabled(async c => { await setDoc(doc(c.firestore(), "rooms", ROOM), vieja); });
 await check("empezar partida con el cliente NUEVO", "allow", updateDoc(ref(ctx(HOST)), {
   handSize: 2, players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2 } },
   deck: [10], timeline: [20], discard: [], status: "playing", phase: "turn", current: 0, starter: HOST,
-  turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, version: 2, updatedAt: 2 }));
+  turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, version: 2, updatedAt: serverTimestamp() }));
 
 // Y el final de partida del cliente antiguo, que no enviaba winners.
 const jugando = { ...vieja, status: "playing", phase: "reveal", deck: [10], timeline: [20],
   players: { [HOST]: { name: "Ana", hand: [1] }, [P2]: { name: "Bea", hand: [] } }, current: 1, turnsInRound: 1,
   reveal: { cardId: 3, correct: true, playerUid: P2, playerName: "Bea" } };
 await env.withSecurityRulesDisabled(async c => { await setDoc(doc(c.firestore(), "rooms", ROOM), jugando); });
-await check("declarar ganador con el cliente ANTIGUO", "allow", updateDoc(ref(ctx(P2)), { status: "ended", phase: "finished", winner: P2, reveal: null, version: 2, updatedAt: 2 }));
+await check("declarar ganador con el cliente ANTIGUO", "allow", updateDoc(ref(ctx(P2)), { status: "ended", phase: "finished", winner: P2, reveal: null, version: 2, updatedAt: serverTimestamp() }));
 
 await env.cleanup();
 console.log(`\n${pass} correctas, ${fail} fallidas`);
