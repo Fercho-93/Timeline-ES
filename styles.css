@@ -1148,7 +1148,7 @@ body::before {
 .timeline .animal-timeline-card {
   isolation: isolate;
   border: 0;
-  background: #d9b978;
+  background: #c9a66b;
   box-shadow: 0 5px 12px rgba(73,42,14,.2);
 }
 .timeline .animal-timeline-card .card-visual {
@@ -1181,7 +1181,7 @@ body::before {
   padding: 5px 8px;
   border: 0;
   border-radius: 3px;
-  background: rgba(247,222,173,.82);
+  background: #f4ddb0;
   box-shadow: 0 2px 5px rgba(62,35,12,.14);
   backdrop-filter: blur(4px);
 }
