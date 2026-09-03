@@ -13,8 +13,9 @@
       await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
     }
 
-    localStorage.clear();
-    sessionStorage.clear();
+    // Solo se descarta la versión instalada de la aplicación: el perfil, la racha del
+    // reto diario y las partidas guardadas viven en localStorage y esta página no es
+    // sitio para perderlos. Quien la abre solo quiere una versión nueva, no empezar de cero.
 
     status.textContent = "Actualización completada. Abriendo la versión nueva…";
     window.location.replace(`./?actualizado=${Date.now()}`);
