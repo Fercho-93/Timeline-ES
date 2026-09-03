@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v67";
+const CACHE = "continuum-v68";
 const ANIMAL_ASSETS = [
   "bee", "monarch-butterfly", "mantis", "green-tree-frog", "house-mouse", "rock-pigeon", "guinea-pig",
   "european-hare", "cat", "fox", "european-beaver", "iberian-lynx", "great-dane", "gray-wolf",

@@ -822,7 +822,7 @@
     return `<div class="section-label">Copia de seguridad</div>
       <div class="panel">
         <p class="hint">El perfil se guarda solo en este móvil. Cópialo antes de cambiar de teléfono o de borrar los datos del navegador.</p>
-        <div class="actions" style="margin-top:12px">
+        <div class="actions" style="margin-top:12px;justify-content:center">
           <button class="btn btn-secondary" data-action="perfil-export">Copiar mi perfil</button>
           <button class="btn btn-ghost" data-action="perfil-reset">Empezar de cero</button>
         </div>
