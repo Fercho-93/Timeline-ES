@@ -396,8 +396,12 @@
     profile.version = VERSION;
     profile.playerId = playerId();
     pruneMisses(profile);
+    // Se repasan los logros al recuperar: una copia hecha por una versión con menos
+    // logros que esta traería contadores por encima del umbral y ninguna marca, y la
+    // pantalla enseñaría una barra llena con el logro todavía bloqueado.
+    const nuevos = unlock(profile);
     save(profile);
-    return { ok: true, summary: summary(profile) };
+    return { ok: true, summary: summary(profile), nuevos };
   }
 
   CT.Progreso = {

@@ -292,9 +292,17 @@ console.log("\nCopia de seguridad");
   ok("recuperar la copia funciona", resultado.ok === true);
   ok("y devuelve los números que tenía", P.read().totals.games === 1 && P.read().totals.cards === 1);
 
+  // Una copia hecha por una versión con menos logros trae los contadores pasados y
+  // ninguna marca: al recuperarla se ponen al día, en vez de enseñar la barra llena con
+  // el logro bloqueado.
+  const antigua = JSON.stringify({ version: 1, totals: { games: 4, cards: 60, hits: 55, wins: 0, run: 0, bestRun: 30 }, achievements: {} });
+  const recuperada = P.importJson(antigua);
+  ok("una copia sin logros marcados los recupera al importarla", recuperada.nuevos.some(l => l.key === "tirada"));
+  ok("y quedan guardados, no solo anunciados", !!P.read().achievements.tirada);
+
   ok("un texto que no es JSON se rechaza sin romper nada", P.importJson("{{{").ok === false);
   ok("un JSON que no es un perfil también", P.importJson('{"hola":1}').ok === false);
-  ok("y el perfil sigue intacto tras los dos intentos", P.read().totals.games === 1);
+  ok("y el perfil sigue intacto tras los dos intentos", P.read().totals.games === 4 && P.read().totals.cards === 60);
 }
 {
   // Con un récord y una racha ya guardados, para poder comprobar que borrar el perfil

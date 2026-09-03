@@ -173,6 +173,65 @@ console.log("\nEl perfil");
   ok("la flecha no cuenta como parte del nombre", filas.every(f => f.querySelector("i")?.getAttribute("aria-hidden") === "true"));
 }
 
+// El tema oscuro solo puede cambiar variables. Una superficie con el color escrito a pelo
+// dentro de su regla se queda clara también de noche, y como la tinta sí cambia, el texto
+// encima se vuelve ilegible. Pasó con los paneles, los campos, las filas y la carta de la
+// línea: se leía blanco sobre papel. Esto vigila que cada superficie del pergamino siga
+// teniendo su versión oscura.
+console.log("\nCada superficie del tema claro tiene su versión oscura");
+{
+  const css = read("styles.css");
+  // El último de cada uno, no el primero: los bloques de la paleta anterior siguen
+  // arriba en el archivo y son los que ganarían un `indexOf`.
+  const bloque = (inicio, fin) => {
+    const desde = css.lastIndexOf(inicio);
+    return desde === -1 ? "" : css.slice(desde, css.indexOf(fin, desde));
+  };
+  // El `:root` del pergamino no es el primero del archivo —antes está la paleta que
+  // sustituyó—, así que se busca hacia atrás desde la primera de sus variables.
+  const pergamino = css.slice(css.lastIndexOf(":root {", css.indexOf("--vitela:")));
+  const superficies = [...pergamino.slice(0, pergamino.indexOf("}")).matchAll(/(--[a-z-]+):/g)].map(m => m[1])
+    .filter(v => !["--font-display", "--ease-out", "--ease-spring"].includes(v));
+  const sistema = bloque(':root:not([data-theme="light"]) {', "}");
+  const interruptor = bloque(':root[data-theme="dark"] {', "}");
+
+  ok(`se encuentran las superficies del pergamino (${superficies.length})`, superficies.length > 20);
+  ok("se encuentran los dos bloques oscuros", sistema.length > 200 && interruptor.length > 200);
+
+  // Las que son deliberadamente iguales en los dos temas, por ser objetos de la mesa y no
+  // superficies de la interfaz: la carta de la línea es papel de día y de noche.
+  const iguales = ["--carta-tinta", "--accent-solid", "--green-solid", "--teal", "--green", "--shadow", "--shadow-soft", "--motion-fast", "--motion-base", "--motion-slow"];
+  const pendientes = superficies.filter(v => !iguales.includes(v))
+    .filter(v => !sistema.includes(`${v}:`) || !interruptor.includes(`${v}:`));
+  ok(`ninguna superficie se queda sin versión oscura${pendientes.length ? ` (falta ${pendientes.join(", ")})` : ""}`, !pendientes.length);
+
+  // Y ninguna regla nueva del pergamino vuelve a escribir un fondo claro a mano. Quedan
+  // seis, todas a propósito: o son objetos de la mesa —la carta de la línea, el marco de
+  // la portada—, o llevan su propia tinta oscura encima y no dependen del tema. Si
+  // aparece una séptima hay que decidir a cuál de los dos grupos pertenece: si no es
+  // ninguno, necesita variable y versión oscura como las demás.
+  const APROPOSITO = [
+    "#d9b56f",              // el marco de la portada: adorno, sin texto encima
+    "rgba(255,237,192,.53)", // el círculo del icono de formato, con su tinta #75451f
+    "#f0d292",              // el mismo círculo en el formato destacado, con su #8d3c1b
+    "rgba(232,204,149,.94)", // la barra de la portada, ya sustituida en los bloques oscuros
+    "#d7b676",              // la lámina de la carta de animal
+    "#f4ddb0"               // la cartela del valor, sobre esa misma carta
+  ];
+  const desde = css.indexOf("--vitela:");
+  const hasta = css.indexOf("@media (prefers-color-scheme: dark)", desde);
+  const aPelo = [...css.slice(desde, hasta).matchAll(/^\.[^\n{]*\{[^}]*background: (rgba?\([^)]*\)|#[0-9a-f]{3,6})[;\s]/gm)]
+    .map(m => m[1])
+    .filter(color => {
+      const canales = color.startsWith("#")
+        ? [1, 3, 5].map(i => parseInt(color.slice(i, i + 2), 16))
+        : color.match(/[\d.]+/g).slice(0, 3).map(Number);
+      return canales.reduce((a, b) => a + b, 0) / 3 > 150;
+    })
+    .filter(color => !APROPOSITO.includes(color));
+  ok(`ningún fondo claro nuevo escrito a mano${aPelo.length ? ` (${aPelo.join(", ")})` : ""}`, !aPelo.length);
+}
+
 console.log("\nContraste de las bandas de época");
 {
   const css = read("styles.css");
