@@ -221,10 +221,13 @@
     </section>`;
   }
 
+  // El perfil entra por aquí y no por la cabecera: es un destino de la portada, como la
+  // colección, y la barra de arriba ya tiene su trabajo con las acciones de cada pantalla.
   function homeNav() {
     return `<nav class="home-nav" aria-label="Navegación de inicio">
       <button data-action="home-top" aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
       <button data-action="home-collection" aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
+      <button data-action="perfil" aria-label="Ver tu perfil"><span aria-hidden="true">★</span><small>Perfil</small></button>
       <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
     </nav>`;
   }
@@ -453,6 +456,8 @@
     }
     result = { correct, returned, card, playerName: player.name };
     selectedCardId = null;
+    // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
+    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", hidden: !!game.ghost?.pending.length }));
     saveGame();
     renderResult();
   }
@@ -554,6 +559,7 @@
     game.pulseTurn = null;
     pendingIndex = null;
     result = { correct, card, pulse: true, targetName: target.name, gift };
+    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", hidden: !!game.ghost?.pending.length, pulse: true }));
     saveGame();
     renderResult();
   }
@@ -627,6 +633,7 @@
   function endGame(winners) {
     game.winners = winners.map(player => player.id);
     game.winner = game.winners[0];
+    anotaLogros(CT.Progreso.finishGame({ mode: game.mode, kind: "local", players: game.players.length }));
     saveGame();
     renderWinner(winners);
     return true;
@@ -712,10 +719,10 @@
     </div>`);
   }
 
-  function openEnciclopedia(modeKey, { highlight = null } = {}) {
+  function openEnciclopedia(modeKey, { highlight = null, band = "all" } = {}) {
     encMode = CT.has(modeKey) ? modeKey : selectedModeKey;
     encQuery = "";
-    encBand = "all";
+    encBand = band;
     encHighlight = highlight;
     enciclopediaView();
     if (highlight == null) return;
@@ -727,6 +734,162 @@
       const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
       carta.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
     }, 0);
+  }
+
+  // ---------------------------------------------------------------------------
+  // El perfil
+  //
+  // Lo que hasta ahora era invisible: cuánto has jugado, en qué mazo aciertas y en cuál
+  // no, y qué te falta para el siguiente logro. Los números los lleva `progreso.js`; aquí
+  // solo se pintan. Es la única pantalla que mira todos los mazos a la vez, así que cada
+  // punto débil enlaza con la enciclopedia del suyo en vez de dejarte buscándolo.
+  // ---------------------------------------------------------------------------
+
+  const LOGRO_GRUPOS = ["Constancia", "Puntería", "Recorrido", "Oficio"];
+
+  function statBox(valor, etiqueta) {
+    return `<span><b>${valor}</b><small>${etiqueta}</small></span>`;
+  }
+
+  function perfilResumen(resumen) {
+    return `<div class="panel">
+      <div class="solo-stats perfil-stats">
+        ${statBox(resumen.games, resumen.games === 1 ? "partida" : "partidas")}
+        ${statBox(resumen.cards, "cartas colocadas")}
+        ${statBox(`${resumen.accuracy}%`, "de aciertos")}
+        ${statBox(resumen.bestRun, "mejor tirada seguida")}
+        ${statBox(resumen.bestStreak, "días seguidos de reto")}
+        ${statBox(`${resumen.unlocked}/${resumen.total}`, "logros")}
+      </div>
+    </div>`;
+  }
+
+  function perfilPorJuego(filas) {
+    if (!filas.length) return "";
+    return `<div class="section-label">Por juego <small>${filas.length} ${filas.length === 1 ? "mazo" : "mazos"}</small></div>
+      <div class="games">${filas.map(fila => `<div class="game-row">
+        <span class="game-name">${escapeHtml(fila.name)}</span>
+        <span class="game-meta">${fila.cards} ${fila.cards === 1 ? "carta" : "cartas"} · ${fila.accuracy}% de aciertos · ${fila.games} ${fila.games === 1 ? "partida" : "partidas"}</span>
+      </div>`).join("")}</div>`;
+  }
+
+  // Un punto débil no es un reproche: es un enlace. Por eso cada fila lleva a la ficha o
+  // al tramo del mazo donde está lo que se falla, que es donde se puede hacer algo.
+  function perfilPuntosDebiles(bandas, cartas) {
+    if (!bandas.length && !cartas.length) return "";
+    const filasBandas = bandas.map(banda => `<button type="button" class="weak-row" data-action="enc-band-view" data-mode="${banda.mode}" data-band="${banda.band}">
+      <span class="weak-mark" aria-hidden="true">${escapeHtml(banda.symbol)}</span>
+      <span><b>${escapeHtml(banda.name)}</b><small>${escapeHtml(banda.modeName)} · ${banda.accuracy}% en ${banda.played} ${banda.played === 1 ? "carta" : "cartas"}</small></span>
+      <i aria-hidden="true">→</i>
+    </button>`).join("");
+    const filasCartas = cartas.map(carta => `<button type="button" class="weak-row" data-action="enc-view" data-mode="${carta.mode}" data-id="${carta.id}">
+      <span class="weak-mark" aria-hidden="true">×${carta.count}</span>
+      <span><b>${escapeHtml(carta.title)}</b><small>${escapeHtml(carta.modeName)}</small></span>
+      <i aria-hidden="true">→</i>
+    </button>`).join("");
+    return `<div class="section-label">Puntos débiles</div>
+      <div class="panel weak-panel">
+        ${bandas.length ? `<h3>Dónde más se falla</h3><div class="weak-list" role="group" aria-label="Tramos con menos aciertos">${filasBandas}</div>` : ""}
+        ${cartas.length ? `<h3>Cartas que se atragantan</h3><div class="weak-list" role="group" aria-label="Cartas falladas más veces">${filasCartas}</div>` : ""}
+      </div>`;
+  }
+
+  function perfilLogros(logros) {
+    const grupos = LOGRO_GRUPOS.filter(grupo => logros.some(logro => logro.group === grupo));
+    return `<div class="section-label">Logros <small>${logros.filter(l => l.unlocked).length} de ${logros.length}</small></div>
+      ${grupos.map(grupo => `<h3 class="logro-grupo">${escapeHtml(grupo)}</h3>
+        <div class="logro-grid" role="group" aria-label="Logros de ${escapeHtml(grupo)}">
+          ${logros.filter(logro => logro.group === grupo).map(logroCard).join("")}
+        </div>`).join("")}`;
+  }
+
+  function logroCard(logro) {
+    // La barra solo tiene sentido cuando hay camino que recorrer: en un logro de «hazlo
+    // una vez» no informa de nada, o estás a cero o ya lo tienes.
+    const barra = !logro.unlocked && logro.goal > 1
+      ? `<div class="logro-bar" role="img" aria-label="${logro.have} de ${logro.goal}"><i style="width:${Math.round((logro.have / logro.goal) * 100)}%"></i></div><small class="logro-progress">${logro.have} de ${logro.goal}</small>`
+      : "";
+    return `<div class="logro${logro.unlocked ? " unlocked" : ""}">
+      <span class="logro-mark" aria-hidden="true">${logro.unlocked ? "★" : "☆"}</span>
+      <div><b>${escapeHtml(logro.name)}</b><small>${escapeHtml(logro.desc)}</small>${barra}</div>
+    </div>`;
+  }
+
+  // Todo esto vive en un solo móvil: borrar los datos del navegador, cambiar de teléfono
+  // o jugar en una ventana privada se lo lleva sin aviso. La copia no es un extra, es lo
+  // que hace razonable pedirle a alguien treinta días seguidos por un logro.
+  function perfilCopia() {
+    return `<div class="section-label">Copia de seguridad</div>
+      <div class="panel">
+        <p class="hint">El perfil se guarda solo en este móvil. Cópialo antes de cambiar de teléfono o de borrar los datos del navegador.</p>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn btn-secondary" data-action="perfil-export">Copiar mi perfil</button>
+          <button class="btn btn-ghost" data-action="perfil-reset">Empezar de cero</button>
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label for="perfil-import">Pegar un perfil copiado</label>
+          <textarea id="perfil-import" rows="3" placeholder="Pega aquí el texto que copiaste"></textarea>
+        </div>
+        <button class="btn btn-secondary btn-block" style="margin-top:10px" data-action="perfil-import">Recuperar ese perfil</button>
+      </div>`;
+  }
+
+  function perfilView() {
+    screen = "perfil";
+    const resumen = CT.Progreso.summary();
+    const filas = CT.Progreso.modeRows();
+    const estrenado = resumen.cards > 0 || resumen.games > 0;
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+      <section class="setup-section perfil-section">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Tu progreso</div>
+        <h1 data-focus tabindex="-1">Perfil</h1>
+        ${estrenado
+          ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
+          : `<p class="lead">Aquí se irá guardando lo que juegues: aciertos, mazos, puntos débiles y logros. Todavía no hay nada que contar.</p>`}
+        ${perfilResumen(resumen)}
+        ${perfilPorJuego(filas)}
+        ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
+        ${perfilLogros(CT.Progreso.achievements())}
+        ${perfilCopia()}
+      </section>
+    </div>`);
+  }
+
+  async function perfilExport() {
+    const texto = CT.Progreso.exportJson();
+    if (navigator.share) {
+      try { await navigator.share({ text: texto }); return; } catch { /* cancelado, se intenta copiar */ }
+    }
+    try {
+      await navigator.clipboard.writeText(texto);
+      showToast("Perfil copiado");
+    } catch {
+      showToast("No se pudo copiar el perfil");
+    }
+  }
+
+  function perfilImport() {
+    const campo = document.getElementById("perfil-import");
+    const texto = (campo?.value || "").trim();
+    if (!texto) return showToast("Pega antes el texto del perfil");
+    const resultado = CT.Progreso.importJson(texto);
+    if (!resultado.ok) return showToast(resultado.error);
+    showToast("Perfil recuperado");
+    perfilView();
+  }
+
+  // Borrar el perfil no se deshace, así que se pregunta. Es la misma cautela que el resto
+  // del juego tiene con abandonar una partida.
+  function perfilResetMenu() {
+    overlay(`<div class="overlay"><div class="modal">
+      <div class="eyebrow">Empezar de cero</div>
+      <h2>¿Borrar todo el progreso?</h2>
+      <p class="lead" style="margin-inline:auto">Se pierden las estadísticas y los logros de este móvil, y no hay manera de recuperarlos. El reto diario y sus rachas no se tocan.</p>
+      <div class="actions" style="display:grid">
+        <button class="btn btn-ghost" data-action="perfil-reset-confirm">Sí, borrar el perfil</button>
+        <button class="btn btn-primary" data-action="close-menu">Mejor no</button>
+      </div>
+    </div></div>`, true);
   }
 
   const DAILY_CARDS = 15;
@@ -794,24 +957,6 @@
     const records = readRecords();
     records[selectedModeKey] = entry;
     try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* almacenamiento lleno */ }
-  }
-
-  // Un identificador estable y anónimo. Vive en su propia clave, generado una sola vez,
-  // porque es del jugador y no de un mazo — `records` en cambio se indexa por modalidad.
-  // Se copia además dentro del registro de cada modalidad (más abajo) para que un futuro
-  // marcador entre amigos no tenga que cruzar dos claves de almacenamiento para asociar
-  // una marca con quién la hizo. No identifica a nadie ni sale de este móvil todavía.
-  const PLAYER_KEY = "hilo-jugador-v1";
-
-  function playerId() {
-    try {
-      let id = localStorage.getItem(PLAYER_KEY);
-      if (!id) {
-        id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        localStorage.setItem(PLAYER_KEY, id);
-      }
-      return id;
-    } catch { return null; }
   }
 
   function saveSolo() {
@@ -961,6 +1106,7 @@
     pendingIndex = null;
     result = { correct, card, solo: true };
     solo.pendingResult = { correct, cardId: card.id };
+    anotaLogros(CT.Progreso.record({ mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() }));
     saveSolo();
     soloResult();
   }
@@ -1000,7 +1146,10 @@
     const records = modeRecords();
     // Se guarda con cada marca, no solo al crearlo, para que una instalación que ya
     // tenía partidas antes de este cambio acabe teniendo el suyo igual.
-    records.playerId = records.playerId || playerId();
+    // El identificador anónimo del móvil lo genera `progreso.js`, que es quien lo usa
+    // para el perfil; aquí solo se copia dentro del récord del mazo para que un futuro
+    // marcador entre amigos no tenga que cruzar dos claves de almacenamiento.
+    records.playerId = records.playerId || CT.Progreso.playerId();
     const dia = today();
     const esReto = solo.kind === "daily" && !(records.days && records.days[dia]);
     if (esReto) {
@@ -1023,6 +1172,10 @@
       saveRecords(records);
     }
     const superado = solo.lives > 0;
+    const logros = CT.Progreso.finishGame({
+      mode: solo.mode, kind: solo.kind, hits: solo.hits, total,
+      difficulty: solo.difficulty || "easy", streak: records.streak || 0, lives: solo.lives
+    });
     const resumen = solo.kind === "daily"
       ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
       : `Has colocado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} en ${CT.Ghost.level(solo.difficulty).name}. ${solo.lives > 0 ? "Has completado el mazo." : "Has agotado las tres vidas."}`;
@@ -1032,7 +1185,7 @@
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1><div class="actions" style="justify-content:center">${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1>${logrosMarkup(logros)}<div class="actions" style="justify-content:center">${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -1127,6 +1280,9 @@
     comp.roundsSummary.push({ mode: solo.mode, hits: solo.hits, total: solo.total });
     comp.totalHits += solo.hits;
     comp.totalFailed.push(...(solo.failed || []).map(id => ({ id, mode: solo.mode })));
+    // Cada ronda es una partida de su propio mazo, y así es como la cuenta el perfil. El
+    // logro de la competición entera se apunta al final, en `compFinish`.
+    anotaLogros(CT.Progreso.finishGame({ mode: solo.mode, kind: "comp", hits: solo.hits, total: solo.total, difficulty: comp.difficulty }));
     solo = null;
     if (comp.queue.length) compRoundIntro();
     else compFinish();
@@ -1139,11 +1295,13 @@
     const totalCards = comp.roundsSummary.length * ROUND_CARDS;
     const fallosUnicos = new Set(comp.totalFailed.map(item => item.id)).size;
     const filas = comp.roundsSummary.map(r => `<li><b>${escapeHtml(CT.mode(r.mode).name)}</b><span>${r.hits} de ${r.total}</span></li>`).join("");
+    const logros = CT.Progreso.finishCompetition();
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
       <div class="big-icon">🏆</div>
       <div class="eyebrow">Competición terminada</div>
       <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${comp.totalHits} de ${totalCards} en total</h1>
       <ul class="comp-summary">${filas}</ul>
+      ${logrosMarkup(logros)}
       <div class="actions" style="justify-content:center">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-comp">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
     </div></section></div>`);
   }
@@ -1174,6 +1332,23 @@
     toast.classList.add("show");
     clearTimeout(showToast.timer);
     showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+
+  // Un logro puede caer a mitad de partida, y ahí no hay pantalla donde ponerlo: se avisa
+  // y se sigue jugando. En una pantalla de fin, en cambio, hay sitio para enseñarlo
+  // entero, así que ahí se usa `logrosMarkup` en vez de esto.
+  function anotaLogros(nuevos) {
+    if (!nuevos || !nuevos.length) return;
+    showToast(nuevos.length === 1 ? `Logro: ${nuevos[0].name}` : `${nuevos.length} logros nuevos`);
+    announce(nuevos.map(item => `Logro desbloqueado: ${item.name}.`).join(" "));
+  }
+
+  function logrosMarkup(nuevos) {
+    if (!nuevos || !nuevos.length) return "";
+    return `<div class="logros-nuevos" role="status">
+      <div class="eyebrow">${nuevos.length === 1 ? "Logro nuevo" : `${nuevos.length} logros nuevos`}</div>
+      ${nuevos.map(item => `<div class="logro-chip"><b>${escapeHtml(item.name)}</b><small>${escapeHtml(item.desc)}</small></div>`).join("")}
+    </div>`;
   }
 
   async function launchOnline(roomCode = "") {
@@ -1283,7 +1458,13 @@
     else if (action === "abandon-comp") abandonCompetition();
     else if (action === "enciclopedia") openEnciclopedia(selectedModeKey);
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id) });
+    else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
+    else if (action === "perfil") perfilView();
+    else if (action === "perfil-export") perfilExport();
+    else if (action === "perfil-import") perfilImport();
+    else if (action === "perfil-reset") perfilResetMenu();
+    else if (action === "perfil-reset-confirm") { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
   });
 
   // `skipWaiting` y `clients.claim`, en el propio service worker, hacen que la versión

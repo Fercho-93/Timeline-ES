@@ -140,6 +140,39 @@ console.log("\nEstado de los controles");
   ok("los huecos se describen por su posición", [...w.document.querySelectorAll(".slot")].every(s => /Colocar en la posición \d+ de \d+/.test(s.getAttribute("aria-label") || "")));
 }
 
+console.log("\nEl perfil");
+{
+  const w = boot();
+  const nav = [...w.document.querySelectorAll(".home-nav button")];
+  ok("los cuatro destinos de la portada tienen nombre", nav.length === 4 && nav.every(b => b.getAttribute("aria-label")));
+
+  click(w, '[data-action="perfil"]');
+  ok("el foco va al titular de la pantalla", activo(w) === el(w, "h1[data-focus]"));
+  ok("las agrupaciones de logros se nombran", [...w.document.querySelectorAll(".logro-grid")].every(g => g.getAttribute("role") === "group" && g.getAttribute("aria-label")));
+  // La barra de progreso es puro color y anchura: sin esto, quien no la ve no sabe
+  // cuánto lleva de un logro. El número también está escrito al lado, en texto.
+  const barras = [...w.document.querySelectorAll(".logro-bar")];
+  ok(`las barras de progreso dicen su valor (${barras.length})`, barras.length > 0 && barras.every(b => /^\d+ de \d+$/.test(b.getAttribute("aria-label") || "")));
+  ok("la estrella de cada logro no es la única señal: hay texto", [...w.document.querySelectorAll(".logro")].every(l => l.querySelector("b")?.textContent.trim()));
+  ok("los símbolos decorativos se ocultan al lector", [...w.document.querySelectorAll(".logro-mark")].every(m => m.getAttribute("aria-hidden") === "true"));
+}
+{
+  // Un punto débil es un botón que lleva a otra pantalla: tiene que decir lo suficiente
+  // por sí solo, no solo «→».
+  const w = boot();
+  w.localStorage.setItem("hilo-perfil-v1", JSON.stringify({
+    version: 1,
+    totals: { games: 1, cards: 10, hits: 1, wins: 0, run: 0, bestRun: 1 },
+    byBand: { "history:antigua": { mode: "history", band: "antigua", hits: 1, misses: 9 } },
+    misses: { [read("cards.js").match(/id: (\d+)/)[1]]: { mode: "history", count: 4, lastDay: "2026-02-02" } }
+  }));
+  click(w, '[data-action="perfil"]');
+  const filas = [...w.document.querySelectorAll(".weak-row")];
+  ok(`hay puntos débiles que revisar (${filas.length})`, filas.length >= 2);
+  ok("cada uno dice de qué carta o tramo habla, y de qué mazo", filas.every(f => (f.textContent.match(/\S/g) || []).length > 10));
+  ok("la flecha no cuenta como parte del nombre", filas.every(f => f.querySelector("i")?.getAttribute("aria-hidden") === "true"));
+}
+
 console.log("\nContraste de las bandas de época");
 {
   const css = read("styles.css");

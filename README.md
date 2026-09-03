@@ -114,6 +114,31 @@ partida también lleva a su ficha en la enciclopedia, ya con esa carta destacada
 en ninguna pantalla de partida: vería el mazo entero y volvería trivial cualquier jugada
 pendiente.
 
+## Perfil, estadísticas y logros
+
+«Perfil», en la barra de la portada, reúne lo que hasta ahora no se veía: partidas jugadas,
+cartas colocadas, porcentaje de aciertos, mejor tirada seguida y racha de retos diarios. Por
+debajo, una fila por mazo jugado y dos listas de puntos débiles —los tramos donde más se
+falla y las cartas que más se atragantan—, cada una enlazando a la enciclopedia del mazo
+correspondiente, ya filtrada o con la carta destacada.
+
+Los dieciséis logros van en cuatro grupos (Constancia, Puntería, Recorrido y Oficio). Los que
+piden repetición enseñan cuánto llevas; los demás, solo si están o no. Se comprueban al
+resolver una carta o al terminar una partida, nunca al repintar, así que ninguno se
+desbloquea dos veces. Los que caen a mitad de partida se avisan y ya está; los de una
+pantalla de fin se enseñan ahí, con su nombre y su condición.
+
+El perfil se guarda en `hilo-perfil-v1`, aparte del reto diario y los récords de
+`hilo-retos-v1`, que no se tocan: una instalación anterior conserva su racha y sus marcas y
+estrena el perfil a cero. Como todo vive en un solo móvil, la pantalla permite copiar el
+perfil en JSON y recuperarlo en otro, y borrarlo entero previa confirmación.
+
+Dos cosas se cuentan con cuidado. En una partida a un solo móvil gana alguien de la mesa,
+pero el juego no sabe quién sostiene el teléfono: esa partida se cuenta como jugada, no como
+ganada. Y en una sala cada móvil registra solo sus propias cartas, descartando las
+instantáneas de Firestore que ya vio —se recuerdan las últimas cuarenta por `CÓDIGO:versión`—
+para que una reconexión o una instantánea que llega desordenada no sume dos veces.
+
 ## Ajustes
 
 Un botón de «Ajustes» en la cabecera, disponible en cualquier pantalla, elige el tema:
@@ -257,11 +282,14 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene once comprobaciones automáticas: la sintaxis de todos los archivos,
-partidas completas sobre un DOM simulado, cuarenta partidas al azar que vigilan bloqueos y el
-conteo de cartas, la calidad de todos los mazos, el modo solitario, el Pulso, la accesibilidad con teclado y lector de pantalla, el service worker y las
-reglas de Firestore contra el emulador oficial. Se lanzan con `npm install` y `npm test`, y se ejecutan solas en cada propuesta de
-cambio. Las instrucciones están en `tests/README.md`.
+`tests/` contiene dieciocho comprobaciones automáticas: catorce que corren en cualquier
+ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
+simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
+todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
+los animales, la marca, el service worker, la enciclopedia, el perfil y la accesibilidad con
+teclado y lector de pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
+se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
+en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 
 ## Reglas implementadas
 

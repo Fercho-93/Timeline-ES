@@ -234,6 +234,8 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
   .play-choice:active { transform: scale(.985); }
   .deck-browse:hover { border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); background: var(--paper); }
   .deck-browse:hover > i { transform: translateX(3px); }
+  .weak-row:hover { background: var(--accent-soft); }
+  .weak-row:hover > i { transform: translateX(3px); }
   .btn-primary:not(:disabled):hover { filter: brightness(.92); }
   .btn-secondary:not(:disabled):hover { background: var(--paper); }
 }
@@ -559,6 +561,55 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 /* La carta a la que se llega desde un repaso se ve entre las demás sin depender solo
    del color: el desplazamiento ya la deja centrada, esto confirma cuál es. */
 .enc-card-highlight { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* El perfil. Reutiliza la rejilla de cifras del solitario y las filas de la colección:
+   son los mismos datos leídos de otra manera, no una interfaz aparte. Lo único propio
+   son los puntos débiles y los logros. */
+.perfil-section { padding-bottom: 40px; }
+.perfil-stats { grid-template-columns: repeat(3, 1fr); }
+.perfil-stats b { font-size: 1.35rem; }
+.perfil-section textarea { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px 13px; color: var(--ink); font-family: inherit; font-size: .85rem; resize: vertical; }
+.perfil-section .hint { text-align: left; }
+.perfil-section h3 { margin: 0 0 10px; font-size: .95rem; }
+
+.weak-panel h3 + .weak-list { margin-bottom: 18px; }
+.weak-panel .weak-list:last-child { margin-bottom: 0; }
+.weak-list { display: grid; gap: 6px; }
+/* Cada punto débil es un enlace a la enciclopedia, así que se comporta como una fila
+   pulsable: alto de dedo, la flecha del resto del juego y sin fondo que compita con el
+   panel que la contiene. */
+.weak-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 11px; width: 100%; min-height: 52px; padding: 8px 10px; border: 0; border-radius: 10px; background: var(--paper); color: var(--ink); text-align: left; cursor: pointer; transition: background var(--motion-fast) ease; }
+.weak-row b, .weak-row small { display: block; }
+.weak-row b { font-size: .88rem; }
+.weak-row small { margin-top: 2px; color: var(--muted); font-size: .73rem; }
+.weak-mark { display: grid; place-items: center; width: 40px; height: 34px; border-radius: 8px; background: var(--surface); color: var(--accent-dark); font-size: .8rem; font-weight: 700; }
+.weak-row > i { font-style: normal; color: var(--accent); transition: transform .18s ease; }
+
+.logro-grupo { margin: 18px 0 8px; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; }
+.logro-grid { display: grid; gap: 8px; }
+.logro { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 11px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+/* Un logro bloqueado se distingue por el contorno y por su estrella vacía, no solo por
+   ser más pálido: el color no puede ser la única señal. */
+.logro:not(.unlocked) { border-style: dashed; }
+.logro:not(.unlocked) b { color: var(--muted); }
+.logro-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--paper); color: var(--muted); font-size: 1rem; }
+.logro.unlocked .logro-mark { background: var(--accent-soft); color: var(--accent-dark); }
+.logro b { display: block; font-size: .9rem; }
+.logro small { display: block; margin-top: 3px; color: var(--muted); font-size: .75rem; line-height: 1.3; }
+.logro-bar { height: 5px; margin-top: 8px; border-radius: 999px; background: var(--paper); overflow: hidden; }
+.logro-bar i { display: block; height: 100%; background: var(--accent); }
+.logro-progress { margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+/* Los logros recién desbloqueados, en la pantalla de fin de partida: se enseñan una vez
+   y en el sitio donde ya se está mirando el resultado. */
+.logros-nuevos { display: grid; gap: 8px; justify-items: center; max-width: 380px; margin: 0 auto 18px; }
+.logro-chip { width: 100%; padding: 10px 14px; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); text-align: left; }
+.logro-chip b { display: block; color: var(--accent-dark); font-size: .9rem; }
+.logro-chip small { display: block; margin-top: 2px; color: var(--muted); font-size: .74rem; }
+
+@media (max-width: 420px) {
+  .perfil-stats { grid-template-columns: repeat(2, 1fr); }
+}
 /* La promo de la competición vive junto a los botones de inicio, no dentro del
    acordeón de bloques: no es un mazo más, es una forma distinta de jugar con todos. */
 .comp-promo { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft); cursor: pointer; padding: 0; margin-top: 6px; }
@@ -888,7 +939,7 @@ body::before {
   min-height: 66px;
   padding: 7px 12px max(7px, env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   transform: translateX(-50%);
   border-top: 1px solid #a97b41;
   background: rgba(232,204,149,.94);

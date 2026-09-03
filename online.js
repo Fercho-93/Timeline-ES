@@ -369,6 +369,7 @@ function connectToRoom(code) {
       return;
     }
     if (roomState.phase !== "turn") pendingIndex = null;
+    anotaProgreso();
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
     else renderGame();
@@ -377,6 +378,33 @@ function connectToRoom(code) {
     if (error.code === "permission-denied") leaveOnline("Ya no estás en esta sala");
     else showToast("Se perdió la conexión con la sala");
   });
+}
+
+// El perfil se alimenta desde aquí, en el único sitio por el que pasa cada cambio de la
+// sala, y no dentro de las transacciones: una transacción puede reintentarse, y la
+// instantánea que la confirma es la que cuenta. Todo lo demás —no contar las jugadas
+// ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
+// entre recargas qué versiones de la sala ya vio.
+function anotaProgreso() {
+  const nuevos = [];
+  if (roomState.phase === "reveal" && roomState.reveal) {
+    const { reveal } = roomState;
+    nuevos.push(...CT.Progreso.recordOnline({
+      code: roomCode, version: roomState.version, mine: reveal.playerUid === user.uid,
+      mode: modeKey(), cardId: reveal.cardId, correct: !!reveal.correct,
+      hidden: !!roomState.ghost?.pending.length, pulse: !!reveal.pulse
+    }));
+  }
+  if (roomState.status === "ended") {
+    const ganadores = roomState.winners || (roomState.winner ? [roomState.winner] : []);
+    nuevos.push(...CT.Progreso.finishOnline({
+      code: roomCode, version: roomState.version, mode: modeKey(), won: ganadores.includes(user.uid)
+    }));
+  }
+  if (nuevos.length) {
+    showToast(nuevos.length === 1 ? `Logro: ${nuevos[0].name}` : `${nuevos.length} logros nuevos`);
+    announce(nuevos.map(item => `Logro desbloqueado: ${item.name}.`).join(" "));
+  }
 }
 
 function renderLobby() {
