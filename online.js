@@ -300,6 +300,7 @@ async function createRoom(name) {
     await setDoc(reference, {
       roomCode: code,
       mode: selectedModeKey,
+      deckFingerprint: CT.deckFingerprint(selectedModeKey),
       hostUid: user.uid,
       status: "lobby",
       phase: "lobby",
@@ -330,6 +331,11 @@ async function joinRoom(code, name) {
       const snapshot = await transaction.get(reference);
       if (!snapshot.exists()) throw new Error("ROOM_NOT_FOUND");
       const data = snapshot.data();
+      // Si los dos móviles llevan versiones distintas, el mazo puede haber cambiado —ha
+      // pasado con animales, países y distancias— y entonces un mismo identificador de
+      // carta señalaría cosas distintas en cada pantalla. Mejor avisar aquí que dejar
+      // que la partida se reparta mal o se rompa a mitad de jugarla.
+      if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
       if (data.playerOrder.includes(user.uid)) return;
       if (data.status !== "lobby") throw new Error("ALREADY_STARTED");
       if (data.playerOrder.length >= 9) throw new Error("ROOM_FULL");
@@ -344,7 +350,7 @@ async function joinRoom(code, name) {
     history.replaceState({}, "", invitationUrl(code));
     connectToRoom(code);
   } catch (error) {
-    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene 9 participantes" };
+    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene 9 participantes", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
     showToast(messages[error.message] || "No se pudo entrar. Comprueba el código y las reglas de Firebase.");
   } finally { busy = false; }
 }
@@ -435,6 +441,9 @@ async function startRoom(withGhost = true) {
       const snapshot = await transaction.get(roomRef);
       const data = snapshot.data();
       if (data.hostUid !== user.uid || data.status !== "lobby" || data.playerOrder.length < 2) throw new Error("INVALID_START");
+      // El anfitrión pudo abrir la sala y esperar con la pestaña de fondo mientras la
+      // aplicación se actualizaba sola: se comprueba también aquí, no solo al entrar.
+      if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
       if ((enableGhost || pulse) && data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < 38)) throw new Error("UPDATE_CLIENTS");
       const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
       const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
@@ -452,7 +461,7 @@ async function startRoom(withGhost = true) {
     });
   } catch (error) {
     console.error(error);
-    showToast(error.message === "UPDATE_CLIENTS" ? "Para usar los poderes, actualizad todos los móviles a v38 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v38 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
+    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? "Para usar los poderes, actualizad todos los móviles a v38 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v38 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
   } finally { busy = false; }
 }
 

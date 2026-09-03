@@ -24,6 +24,10 @@ service cloud.firestore {
 
       // Identidad de la sala: nunca cambia después de crearla.
       function identityKept() {
+        // `deckFingerprint` no se repite aquí: ninguna rama de `allow update` lo incluye
+        // en su changed().hasOnly([...]), así que ya no se puede tocar sin repetir el
+        // chequeo en cada escritura y agotar el límite de 1000 expresiones de Firestore
+        // que ya rozan las jugadas del Pulso.
         return after().roomCode == before().roomCode
           && after().mode == before().mode
           && after().hostUid == before().hostUid
@@ -503,6 +507,12 @@ service cloud.firestore {
         && request.resource.data.mode is string
         && request.resource.data.mode.size() >= 1
         && request.resource.data.mode.size() <= 32
+        // La huella tampoco se valida por contenido —el mazo vive en el cliente—, solo
+        // por forma: sirve para que otro móvil detecte que lleva una versión distinta,
+        // no para que el servidor sepa si el mazo declarado es el que dice ser.
+        && request.resource.data.deckFingerprint is string
+        && request.resource.data.deckFingerprint.size() >= 1
+        && request.resource.data.deckFingerprint.size() <= 24
         && request.resource.data.status == 'lobby'
         && request.resource.data.phase == 'lobby'
         && request.resource.data.version == 1

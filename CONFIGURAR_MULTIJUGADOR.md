@@ -30,6 +30,10 @@ que las cartas ni se creen ni se dupliquen:
   conozca hace que caiga en el mazo por defecto.
 - Expulsar es cosa del anfitrión; marcharse, de cada cual. El anfitrión no puede ser
   expulsado: cierra la sala.
+- La sala guarda también una huella del mazo —el mismo mecanismo del duelo por enlace—,
+  igual de inmutable que el juego. Si un móvil se actualiza mientras espera en el vestíbulo
+  y el mazo ha cambiado entretanto, entrar o repartir se rechaza con un aviso claro en vez
+  de repartir cartas que no significan lo mismo en cada pantalla.
 
 **Lo que las reglas no pueden comprobar:** si el año de la carta encaja de verdad en el hueco
 elegido. Las fechas viven en `cards.js` y `movies.js`, dentro del propio navegador, así que esa

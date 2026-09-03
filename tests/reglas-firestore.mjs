@@ -30,7 +30,7 @@ async function check(label, expected, promise) {
 }
 
 const base = () => ({ winners: null,
-  roomCode: ROOM, mode: "history", hostUid: HOST, status: "lobby", phase: "lobby", version: 1, handSize: 4,
+  roomCode: ROOM, mode: "history", deckFingerprint: "167.test1", hostUid: HOST, status: "lobby", phase: "lobby", version: 1, handSize: 4,
   playerOrder: [HOST], players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 } },
   deck: [], discard: [], timeline: [], current: 0, starter: HOST,
   turnsInRound: 0, round: 1, winner: null, reveal: null, createdAt: serverTimestamp(), updatedAt: serverTimestamp()

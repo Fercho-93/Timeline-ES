@@ -462,6 +462,23 @@
     return `<img class="animal-card-art" src="assets/animal-cards/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
+  // La huella de un mazo: no el contenido —eso vive en el cliente y las reglas nunca han
+  // podido comprobarlo—, sino una forma barata de detectar que dos móviles no llevan el
+  // mismo mazo. Cuenta el orden, no solo el conjunto: el reparto depende de en qué
+  // posición está cada identificador, así que dos mazos con las mismas cartas
+  // recolocadas no son el mismo. La usan el duelo por enlace —para no comparar dos
+  // partidas que no son la misma— y las salas compartidas —para no repartir ni empezar
+  // con un móvil que lleva una versión distinta del juego.
+  function deckFingerprint(modeKey) {
+    const deck = cards(modeKey);
+    let hash = 2166136261;
+    for (const card of deck) {
+      hash ^= card.id;
+      hash = Math.imul(hash, 16777619);
+    }
+    return `${deck.length}.${(hash >>> 0).toString(36)}`;
+  }
+
   function formatValue(modeKey, card) { return axis(modeKey).format(card); }
 
   // El dato en corto, para el mapa de la línea.
@@ -577,7 +594,7 @@
   window.CONTINUUM = {
     MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK,
     has, mode, axis, cards,
-    usesAnimalArt, cardArt, animalArt,
+    usesAnimalArt, cardArt, animalArt, deckFingerprint,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
     correctIndex, placementHint, guideMarkup,
