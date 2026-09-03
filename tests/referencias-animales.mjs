@@ -65,6 +65,7 @@ check("las ilustraciones móviles no superan 100 KB", weightCardIds.every(id => 
 const styles = read("styles.css");
 const placedAnimalArt = (styles.match(/\.animal-timeline-card \.animal-card-art\s*\{([\s\S]*?)\}/) || [])[1] || "";
 check("la carta colocada muestra el animal completo", /object-fit:\s*contain/.test(placedAnimalArt));
+check("la carta colocada rellena los laterales sin franjas blancas", /animal-card-backdrop/.test(read("app.js")) && /object-fit:\s*cover/.test((styles.match(/\.animal-timeline-card \.animal-card-backdrop\s*\{([\s\S]*?)\}/) || [])[1] || ""));
 
 console.log(`\n${failures} fallos`);
 process.exit(failures ? 1 : 0);
