@@ -1,13 +1,18 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v67";
+const CACHE = "continuum-v68";
 const ANIMAL_ASSETS = [
   "bee", "monarch-butterfly", "mantis", "green-tree-frog", "house-mouse", "rock-pigeon", "guinea-pig",
   "european-hare", "cat", "fox", "european-beaver", "iberian-lynx", "great-dane", "gray-wolf",
   "capybara", "chimpanzee", "giant-panda", "american-black-bear", "lion", "bengal-tiger", "grevys-zebra",
   "domestic-horse", "alaska-moose", "american-bison", "giraffe", "common-hippopotamus", "white-rhinoceros",
   "southern-elephant-seal", "elephant", "whale-shark", "orca", "humpback-whale", "sperm-whale", "blue-whale",
-  "octopus", "flamingo", "penguin", "kangaroo", "nile-crocodile", "polar-bear", "dromedary-camel"
+  "octopus", "flamingo", "penguin", "kangaroo", "nile-crocodile", "polar-bear", "dromedary-camel",
+  "dolania-mayfly", "common-mosquito", "fruit-fly", "brown-rat", "domestic-hamster", "domestic-gerbil",
+  "european-rabbit", "european-hedgehog", "red-squirrel", "domestic-dog", "komodo-dragon", "harpy-eagle",
+  "galapagos-giant-tortoise", "scarlet-macaw", "japanese-koi", "bowhead-whale", "greenland-shark",
+  "ocean-quahog", "black-coral", "red-sea-urchin", "jonathan-tortoise", "freshwater-pearl-mussel",
+  "cookie-cockatoo", "gold-coral", "monorhaphis-chuni", "giant-barrel-sponge"
 ].map(name => `./assets/animal-cards/${name}.webp`);
 const ASSETS = [
   "./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",

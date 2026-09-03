@@ -68,7 +68,7 @@
 
   function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
 
-  // Cada carta del mazo de peso tiene una lámina propia. Se enlazan por ID para que un
+  // Cada carta de peso y longevidad tiene una lámina propia. Se enlazan por ID para que un
   // retoque del título o del valor no pueda cambiar por accidente la ilustración.
   const ANIMAL_ART_BY_ID = {
     10001: "bee", 10002: "monarch-butterfly", 10003: "mantis", 10004: "green-tree-frog",
@@ -81,13 +81,28 @@
     10029: "southern-elephant-seal", 10030: "elephant", 10031: "whale-shark", 10032: "orca",
     10034: "humpback-whale", 10035: "sperm-whale", 10038: "blue-whale", 10039: "octopus",
     10040: "flamingo", 10041: "penguin", 10042: "kangaroo", 10043: "nile-crocodile",
-    10044: "polar-bear", 10045: "dromedary-camel"
+    10044: "polar-bear", 10045: "dromedary-camel",
+    12001: "dolania-mayfly", 12002: "domestic-horse", 12003: "common-mosquito",
+    12004: "fruit-fly", 12005: "bee", 12006: "monarch-butterfly", 12007: "house-mouse",
+    12008: "brown-rat", 12009: "domestic-hamster", 12010: "domestic-gerbil",
+    12011: "guinea-pig", 12012: "european-rabbit", 12013: "european-hedgehog",
+    12014: "red-squirrel", 12015: "fox", 12016: "domestic-dog", 12017: "cat",
+    12018: "iberian-lynx", 12019: "komodo-dragon", 12020: "harpy-eagle",
+    12021: "american-bison", 12022: "common-hippopotamus", 12023: "elephant",
+    12024: "blue-whale", 12025: "galapagos-giant-tortoise", 12026: "scarlet-macaw",
+    12027: "japanese-koi", 12028: "bowhead-whale", 12029: "greenland-shark",
+    12030: "ocean-quahog", 12031: "black-coral", 12032: "red-sea-urchin",
+    12033: "jonathan-tortoise", 12034: "freshwater-pearl-mussel",
+    12035: "cookie-cockatoo", 12036: "gold-coral", 12037: "monorhaphis-chuni",
+    12038: "giant-barrel-sponge"
   };
 
+  function usesAnimalArt() { return selectedModeKey === "animals" || selectedModeKey === "lifespan"; }
+
   // Las láminas no contienen cifras, por lo que pueden verse en la mano sin revelar el
-  // peso que hay que ordenar.
+  // peso o la longevidad que hay que ordenar.
   function animalArt(card) {
-    if (selectedModeKey !== "animals") return "";
+    if (!usesAnimalArt()) return "";
     const plate = ANIMAL_ART_BY_ID[card.id];
     if (!plate) return "";
     return `<img class="animal-card-art" src="assets/animal-cards/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
@@ -367,8 +382,8 @@
       }
     }
     const manoHtml = pulseCard
-      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected ${selectedModeKey === "animals" ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
-      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${selectedModeKey === "animals" ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
+      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">Turno de ${escapeHtml(player.name)}, ronda ${game.round}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
@@ -413,7 +428,7 @@
     const era = eraForCard(card);
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
-    const animal = selectedModeKey === "animals";
+    const animal = usesAnimalArt();
     return `<article class="timeline-card ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
   }
 
@@ -1111,7 +1126,7 @@
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
-      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected ${selectedModeKey === "animals" ? "animal-hand-card" : ""}" data-id="${card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
+      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
     </div>`);
     if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
     CT.enableDrag({
