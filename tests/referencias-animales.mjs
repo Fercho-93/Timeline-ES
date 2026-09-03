@@ -59,9 +59,11 @@ const animalMapBlock = (appSource.match(/const ANIMAL_ART_BY_ID = \{([\s\S]*?)\}
 const artById = new Map([...animalMapBlock.matchAll(/(\d+): "([^"]+)"/g)].map(match => [Number(match[1]), match[2]]));
 const weightCardIds = [...read("animals.js").matchAll(/\{\s*id:\s*(\d+),/g)].map(match => Number(match[1]));
 const lifespanCardIds = [...read("lifespan.js").matchAll(/\{\s*id:\s*(\d+),/g)].map(match => Number(match[1]));
-const illustratedCardIds = [...weightCardIds, ...lifespanCardIds];
+const speedCardIds = [...read("speed.js").matchAll(/\{\s*id:\s*(\d+),/g)].map(match => Number(match[1]));
+const illustratedCardIds = [...weightCardIds, ...lifespanCardIds, ...speedCardIds];
 check("cada carta de peso tiene una ilustración propia", weightCardIds.every(id => artById.has(id)));
 check("cada carta de longevidad tiene una ilustración propia", lifespanCardIds.every(id => artById.has(id)));
+check("cada carta de velocidad tiene una ilustración propia", speedCardIds.every(id => artById.has(id)));
 check("no hay ilustraciones asignadas a cartas inexistentes", [...artById.keys()].every(id => illustratedCardIds.includes(id)));
 check("cada carta usa un archivo WebP existente", illustratedCardIds.every(id => fs.existsSync(path.join(root, "assets", "animal-cards", `${artById.get(id)}.webp`))));
 check("las ilustraciones móviles no superan 100 KB", illustratedCardIds.every(id => fs.statSync(path.join(root, "assets", "animal-cards", `${artById.get(id)}.webp`)).size <= 100_000));

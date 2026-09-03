@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v68";
+const CACHE = "continuum-v69";
 const ANIMAL_ASSETS = [
   "bee", "monarch-butterfly", "mantis", "green-tree-frog", "house-mouse", "rock-pigeon", "guinea-pig",
   "european-hare", "cat", "fox", "european-beaver", "iberian-lynx", "great-dane", "gray-wolf",
@@ -12,7 +12,13 @@ const ANIMAL_ASSETS = [
   "european-rabbit", "european-hedgehog", "red-squirrel", "domestic-dog", "komodo-dragon", "harpy-eagle",
   "galapagos-giant-tortoise", "scarlet-macaw", "japanese-koi", "bowhead-whale", "greenland-shark",
   "ocean-quahog", "black-coral", "red-sea-urchin", "jonathan-tortoise", "freshwater-pearl-mussel",
-  "cookie-cockatoo", "gold-coral", "monorhaphis-chuni", "giant-barrel-sponge"
+  "cookie-cockatoo", "gold-coral", "monorhaphis-chuni", "giant-barrel-sponge",
+  "tiger-beetle", "ghost-crab", "sunflower-sea-star", "three-toed-sloth", "dwarf-seahorse", "koala",
+  "black-mamba", "gentoo-penguin", "florida-manatee", "hermit-crab", "solifuge", "australian-dragonfly",
+  "emu", "spiny-tailed-iguana", "ostrich", "reindeer", "blue-wildebeest", "american-pronghorn",
+  "cheetah", "henslow-swimming-crab", "brazilian-free-tailed-bat", "golden-eagle", "gyrfalcon",
+  "common-swift", "peregrine-falcon", "saharan-silver-ant", "common-limpet", "california-sea-lion",
+  "moroccan-flic-flac-spider", "european-mole", "american-cockroach"
 ].map(name => `./assets/animal-cards/${name}.webp`);
 const ASSETS = [
   "./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
