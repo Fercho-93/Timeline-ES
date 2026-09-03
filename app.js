@@ -68,7 +68,7 @@
 
   function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
 
-  // Cada carta de peso y longevidad tiene una lámina propia. Se enlazan por ID para que un
+  // Cada carta de peso, longevidad y velocidad tiene una lámina propia. Se enlazan por ID para que un
   // retoque del título o del valor no pueda cambiar por accidente la ilustración.
   const ANIMAL_ART_BY_ID = {
     10001: "bee", 10002: "monarch-butterfly", 10003: "mantis", 10004: "green-tree-frog",
@@ -94,13 +94,25 @@
     12030: "ocean-quahog", 12031: "black-coral", 12032: "red-sea-urchin",
     12033: "jonathan-tortoise", 12034: "freshwater-pearl-mussel",
     12035: "cookie-cockatoo", 12036: "gold-coral", 12037: "monorhaphis-chuni",
-    12038: "giant-barrel-sponge"
+    12038: "giant-barrel-sponge",
+    13001: "tiger-beetle", 13002: "ghost-crab", 13003: "sunflower-sea-star",
+    13004: "galapagos-giant-tortoise", 13005: "three-toed-sloth", 13006: "dwarf-seahorse",
+    13007: "koala", 13008: "black-mamba", 13009: "gentoo-penguin", 13010: "florida-manatee",
+    13011: "hermit-crab", 13012: "solifuge", 13013: "australian-dragonfly", 13014: "polar-bear",
+    13015: "common-hippopotamus", 13016: "elephant", 13017: "giraffe", 13018: "emu",
+    13019: "spiny-tailed-iguana", 13020: "ostrich", 13021: "reindeer", 13022: "blue-wildebeest",
+    13023: "american-pronghorn", 13024: "cheetah", 13025: "henslow-swimming-crab",
+    13026: "brazilian-free-tailed-bat", 13027: "golden-eagle", 13028: "gyrfalcon",
+    13029: "common-swift", 13030: "peregrine-falcon", 13031: "saharan-silver-ant",
+    13032: "common-limpet", 13033: "california-sea-lion", 13034: "grevys-zebra",
+    13035: "moroccan-flic-flac-spider", 13036: "european-mole",
+    13037: "american-cockroach", 13038: "bee"
   };
 
-  function usesAnimalArt() { return selectedModeKey === "animals" || selectedModeKey === "lifespan"; }
+  function usesAnimalArt() { return ["animals", "lifespan", "speed"].includes(selectedModeKey); }
 
   // Las láminas no contienen cifras, por lo que pueden verse en la mano sin revelar el
-  // peso o la longevidad que hay que ordenar.
+  // peso, la longevidad o la velocidad que hay que ordenar.
   function animalArt(card) {
     if (!usesAnimalArt()) return "";
     const plate = ANIMAL_ART_BY_ID[card.id];
