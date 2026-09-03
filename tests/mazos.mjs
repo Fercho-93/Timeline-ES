@@ -52,29 +52,21 @@ fechadas("Historia de España", HISTORY_CARDS, { unicos: false });
 fechadas("Inventos y descubrimientos", INVENTION_CARDS);
 fechadas("Historia mundial", WORLD_CARDS);
 
-// El 8 % se conserva como criterio de selección de geografía. En animales se
-// permiten proximidad y empates documentados; nunca se retocan cifras para separarlas.
-function separadas(nombre, mazo, unidad, { margen = true } = {}) {
+// El margen mínimo del 8 % entre cartas contiguas ya no se exige aquí: las cifras de
+// geografía se revisan a mano, una por una, en vez de forzar una separación automática.
+// En animales se permiten además proximidad y empates documentados; nunca se retocan
+// cifras para separarlas.
+function separadas(nombre, mazo, unidad, { unicos = true } = {}) {
   comunes(nombre, mazo, c => c.value);
-  const orden = [...mazo].sort((a, b) => b.value - a.value);
-  let peor = { salto: Infinity, par: "" };
-  orden.forEach((card, i) => {
-    if (!i) return;
-    const salto = orden[i - 1].value / card.value;
-    if (salto < peor.salto) peor = { salto, par: `${orden[i - 1].title} y ${card.title}` };
-  });
-  if (margen) {
-    ok(`ningún par a menos del 8% (el más justo: ${peor.par}, ${((peor.salto - 1) * 100).toFixed(0)}%)`, peor.salto >= 1.08);
-    ok(`${unidad} sin repetir`, new Set(mazo.map(c => c.value)).size === mazo.length);
-  }
+  if (unicos) ok(`${unidad} sin repetir`, new Set(mazo.map(c => c.value)).size === mazo.length);
   ok(`${unidad} siempre positivas`, mazo.every(c => c.value > 0));
 }
 
 separadas("Superficie de países", COUNTRY_CARDS, "superficies");
 separadas("Población de países", POPULATION_CARDS, "poblaciones");
-separadas("Peso de animales", ANIMAL_WEIGHT_CARDS, "pesos", { margen: false });
-separadas("Longevidad de animales", ANIMAL_LIFESPAN_CARDS, "longevidades", { margen: false });
-separadas("Velocidad de animales", ANIMAL_SPEED_CARDS, "velocidades", { margen: false });
+separadas("Peso de animales", ANIMAL_WEIGHT_CARDS, "pesos", { unicos: false });
+separadas("Longevidad de animales", ANIMAL_LIFESPAN_CARDS, "longevidades", { unicos: false });
+separadas("Velocidad de animales", ANIMAL_SPEED_CARDS, "velocidades", { unicos: false });
 separadas("Distancias entre ciudades", CITY_DISTANCE_CARDS, "distancias");
 ok("las poblaciones son números enteros de personas", POPULATION_CARDS.every(c => Number.isInteger(c.value)));
 

@@ -1,6 +1,8 @@
-// El valor es la superficie en km². Ninguna carta está a menos de un 8% de otra: si no,
-// colocarla bien sería cuestión de suerte. Los países que faltan suelen faltar por eso
-// (China y Canadá se parecen demasiado a Estados Unidos, Alemania a Japón).
+// El valor es la superficie en km². La selección buscó separar las cartas contiguas
+// para que colocarlas bien no fuera cuestión de suerte, aunque ya no se exige un margen
+// mínimo entre ellas: las cifras se revisan a mano, una por una. Los países que faltan
+// suelen faltar por parecerse demasiado a otro ya incluido (China y Canadá a Estados
+// Unidos, Alemania a Japón).
 window.COUNTRY_CARDS = [
   { id: 2001, value: 17098246, title: "Rusia", detail: "El país más extenso del mundo: ocupa once husos horarios." },
   { id: 2002, value: 9833517, title: "Estados Unidos", detail: "Superficie total, aguas interiores incluidas; Alaska aporta casi una sexta parte." },

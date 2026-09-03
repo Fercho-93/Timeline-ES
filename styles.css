@@ -104,9 +104,15 @@ button { touch-action: manipulation; color: inherit; }
 .section-enter > * { animation: section-in 240ms var(--ease-out) both; }
 @keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
+/* `flex-start`, no `center`: si alguna vez las acciones llegan a envolver, la marca queda
+   a la altura de la primera fila y no centrada respecto al bloque entero. */
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+/* `margin-left: auto` y no el `space-between` del contenedor: así las acciones siguen
+   pegadas a la derecha aunque el nombre no esté (en móvil se oculta, más abajo).
+   `flex-wrap` es solo una red de seguridad para tamaños de letra enormes del sistema:
+   con los tres botones más largos del juego ya no llega a activarse. */
+.topbar-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; row-gap: 6px; min-width: 0; margin-left: auto; }
+.brand { display: flex; align-items: center; min-height: 44px; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
 /* 44 px es lo que necesita un dedo. Los botones pequeños llegaban a 36 y a 29, y son
    justo los que más se usan: el de la esquina en cada pantalla de partida. */
 .icon-btn { min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 16px; font-size: .85rem; font-weight: 650; cursor: pointer; }
@@ -182,6 +188,15 @@ button { touch-action: manipulation; color: inherit; }
 .play-choice > i { font-size: 1.1rem; font-style: normal; color: var(--accent); transition: transform .18s ease; }
 .play-choice.primary > i { color: var(--ink-solid-contrast); }
 .play-choice:active { transform: translateY(0) scale(.985); }
+/* La enciclopedia repite la anatomía de un formato —icono, texto, flecha— pero no su
+   peso: es una consulta del mazo, no una manera de jugar, así que va sin relleno y con
+   el borde punteado, para que se lea como lo que es sin competir con los tres de arriba. */
+.deck-browse { width: 100%; min-height: 64px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; margin-top: 9px; padding: 11px 12px; border: 1px dashed var(--line); border-radius: 13px; color: var(--ink); background: transparent; text-align: left; cursor: pointer; transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease; }
+.deck-browse b, .deck-browse small { display: block; }
+.deck-browse b { font-size: .93rem; }
+.deck-browse small { margin-top: 3px; color: var(--muted); font-size: .75rem; line-height: 1.25; }
+.deck-browse > i { font-size: 1.1rem; font-style: normal; color: var(--accent); transition: transform .18s ease; }
+.deck-browse:active { transform: scale(.985); }
 .continue-choice { min-height: 44px; border: 0; padding: 7px 3px 0; color: var(--accent); background: transparent; font-size: .8rem; font-weight: 700; text-align: left; cursor: pointer; }
 .continue-choice span { margin-left: 5px; }
 
@@ -217,6 +232,10 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
   .play-choice.primary:hover { background: var(--ink-solid); filter: brightness(.92); }
   .play-choice:hover > i { transform: translateX(3px); }
   .play-choice:active { transform: scale(.985); }
+  .deck-browse:hover { border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); background: var(--paper); }
+  .deck-browse:hover > i { transform: translateX(3px); }
+  .weak-row:hover { background: var(--accent-soft); }
+  .weak-row:hover > i { transform: translateX(3px); }
   .btn-primary:not(:disabled):hover { filter: brightness(.92); }
   .btn-secondary:not(:disabled):hover { background: var(--paper); }
 }
@@ -542,6 +561,55 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 /* La carta a la que se llega desde un repaso se ve entre las demás sin depender solo
    del color: el desplazamiento ya la deja centrada, esto confirma cuál es. */
 .enc-card-highlight { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* El perfil. Reutiliza la rejilla de cifras del solitario y las filas de la colección:
+   son los mismos datos leídos de otra manera, no una interfaz aparte. Lo único propio
+   son los puntos débiles y los logros. */
+.perfil-section { padding-bottom: 40px; }
+.perfil-stats { grid-template-columns: repeat(3, 1fr); }
+.perfil-stats b { font-size: 1.35rem; }
+.perfil-section textarea { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px 13px; color: var(--ink); font-family: inherit; font-size: .85rem; resize: vertical; }
+.perfil-section .hint { text-align: left; }
+.perfil-section h3 { margin: 0 0 10px; font-size: .95rem; }
+
+.weak-panel h3 + .weak-list { margin-bottom: 18px; }
+.weak-panel .weak-list:last-child { margin-bottom: 0; }
+.weak-list { display: grid; gap: 6px; }
+/* Cada punto débil es un enlace a la enciclopedia, así que se comporta como una fila
+   pulsable: alto de dedo, la flecha del resto del juego y sin fondo que compita con el
+   panel que la contiene. */
+.weak-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 11px; width: 100%; min-height: 52px; padding: 8px 10px; border: 0; border-radius: 10px; background: var(--paper); color: var(--ink); text-align: left; cursor: pointer; transition: background var(--motion-fast) ease; }
+.weak-row b, .weak-row small { display: block; }
+.weak-row b { font-size: .88rem; }
+.weak-row small { margin-top: 2px; color: var(--muted); font-size: .73rem; }
+.weak-mark { display: grid; place-items: center; width: 40px; height: 34px; border-radius: 8px; background: var(--surface); color: var(--accent-dark); font-size: .8rem; font-weight: 700; }
+.weak-row > i { font-style: normal; color: var(--accent); transition: transform .18s ease; }
+
+.logro-grupo { margin: 18px 0 8px; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; }
+.logro-grid { display: grid; gap: 8px; }
+.logro { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 11px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+/* Un logro bloqueado se distingue por el contorno y por su estrella vacía, no solo por
+   ser más pálido: el color no puede ser la única señal. */
+.logro:not(.unlocked) { border-style: dashed; }
+.logro:not(.unlocked) b { color: var(--muted); }
+.logro-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--paper); color: var(--muted); font-size: 1rem; }
+.logro.unlocked .logro-mark { background: var(--accent-soft); color: var(--accent-dark); }
+.logro b { display: block; font-size: .9rem; }
+.logro small { display: block; margin-top: 3px; color: var(--muted); font-size: .75rem; line-height: 1.3; }
+.logro-bar { height: 5px; margin-top: 8px; border-radius: 999px; background: var(--paper); overflow: hidden; }
+.logro-bar i { display: block; height: 100%; background: var(--accent); }
+.logro-progress { margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+/* Los logros recién desbloqueados, en la pantalla de fin de partida: se enseñan una vez
+   y en el sitio donde ya se está mirando el resultado. */
+.logros-nuevos { display: grid; gap: 8px; justify-items: center; max-width: 380px; margin: 0 auto 18px; }
+.logro-chip { width: 100%; padding: 10px 14px; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); text-align: left; }
+.logro-chip b { display: block; color: var(--accent-dark); font-size: .9rem; }
+.logro-chip small { display: block; margin-top: 2px; color: var(--muted); font-size: .74rem; }
+
+@media (max-width: 420px) {
+  .perfil-stats { grid-template-columns: repeat(2, 1fr); }
+}
 /* La promo de la competición vive junto a los botones de inicio, no dentro del
    acordeón de bloques: no es un mazo más, es una forma distinta de jugar con todos. */
 .comp-promo { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft); cursor: pointer; padding: 0; margin-top: 6px; }
@@ -606,6 +674,16 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
    Los lomos de 62 px dejaban apenas 104 px para el panel abierto en escritorio. */
 @media (min-width: 1000px) {
   .hero { grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr); }
+}
+
+/* En un móvil, el nombre del juego en la barra compite con los botones por el mismo
+   ancho y siempre gana él: son 150 px para repetir dónde estás. Dentro de la aplicación
+   es decoración —la portada ya lo enseña en grande— así que en pantallas estrechas la
+   barra se queda solo con sus acciones, en una fila y sin recortes. */
+@media (max-width: 560px) {
+  .topbar .brand { display: none; }
+  .topbar-actions { gap: 6px; }
+  .icon-btn { padding: 9px 13px; font-size: .8rem; }
 }
 
 @media (max-width: 420px) {
@@ -682,6 +760,36 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   --ink-solid-contrast: #fff3d7;
   --shadow: 0 16px 32px rgba(75, 43, 15, .19);
   --shadow-soft: 0 5px 13px rgba(75, 43, 15, .16);
+
+  /* Las superficies del pergamino, una por variable en vez de a pelo dentro de cada
+     regla. No es orden por gusto: el tema oscuro solo puede cambiar variables, así que
+     un color escrito directamente en la regla se queda claro también de noche —y con la
+     tinta clara encima, que en ese momento ya es la del tema oscuro, no hay manera de
+     leerlo—. Cada una tiene su versión oscura al final del archivo. */
+  --vitela: rgba(246,222,174,.88);
+  --vitela-luz: rgba(255,243,211,.36);
+  --vitela-borde: rgba(135,87,39,.48);
+  --borde-suave: rgba(132,84,35,.48);
+  --boton-suave: rgba(245,221,174,.78);
+  --boton-icono: rgba(246,221,170,.62);
+  --boton-icono-luz: rgba(255,246,213,.28);
+  --campo: rgba(250,232,194,.74);
+  --ficha: rgba(244,220,173,.75);
+  --contador: rgba(233,199,134,.75);
+  --hueco: rgba(235,204,146,.64);
+  --modal-fondo: #edd29b;
+  --fila: rgba(249,228,184,.66);
+  --fila-activa: rgba(216,174,104,.62);
+  --reja: rgba(130,81,35,.3);
+  --estante: rgba(242,216,164,.64);
+  --formato: linear-gradient(100deg, rgba(208,163,93,.7), rgba(235,204,145,.72));
+  --formato-luz: rgba(255,241,205,.38);
+  --formato-detalle: #76583a;
+  --promo: rgba(230,196,133,.72);
+  /* La carta de la línea temporal es papel en los dos temas: es un objeto de la mesa,
+     no una superficie de la interfaz, igual que la carta de la mano es cuero oscuro de
+     día y de noche. Por eso su tinta tampoco cambia. */
+  --carta-tinta: #3b2816;
 }
 
 html { background: #d7b778; scroll-behavior: smooth; }
@@ -717,8 +825,8 @@ body::before {
   border-color: rgba(128,81,34,.42);
   border-radius: 7px;
   color: var(--ink);
-  background: rgba(246,221,170,.62);
-  box-shadow: inset 0 0 0 1px rgba(255,246,213,.28);
+  background: var(--boton-icono);
+  box-shadow: inset 0 0 0 1px var(--boton-icono-luz);
 }
 
 .home-shell { max-width: 980px; padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
@@ -774,8 +882,8 @@ body::before {
   min-height: 76px;
   border-color: rgba(139,88,39,.48);
   border-radius: 8px;
-  background: linear-gradient(100deg, rgba(208,163,93,.7), rgba(235,204,145,.72));
-  box-shadow: inset 0 0 0 1px rgba(255,241,205,.38), 0 3px 8px rgba(73,42,13,.13);
+  background: var(--formato);
+  box-shadow: inset 0 0 0 1px var(--formato-luz), 0 3px 8px rgba(73,42,13,.13);
 }
 .home-shell .play-choice.primary {
   border-color: #7b2f15;
@@ -785,7 +893,7 @@ body::before {
 .home-shell .choice-icon { border-radius: 50%; color: #75451f; background: rgba(255,237,192,.53); }
 .home-shell .play-choice.primary .choice-icon { color: #8d3c1b; background: #f0d292; }
 .home-shell .play-choice b { font-family: var(--font-display); font-size: 1.02rem; text-transform: uppercase; }
-.home-shell .play-choice small { color: #76583a; font-family: var(--font-display); font-size: .8rem; }
+.home-shell .play-choice small { color: var(--formato-detalle); font-family: var(--font-display); font-size: .8rem; }
 .home-shell .play-choice.primary small { color: #ebc994; }
 .home-shell .continue-choice { color: var(--accent-dark); text-align: center; }
 
@@ -796,7 +904,7 @@ body::before {
   margin-top: 9px;
   border-color: rgba(139,88,39,.48);
   border-radius: 8px;
-  background: rgba(230,196,133,.72);
+  background: var(--promo);
 }
 .home-shell .comp-promo-art { height: 100%; min-height: 82px; }
 .home-shell .comp-promo-art img { filter: sepia(.5) saturate(.75); }
@@ -849,12 +957,12 @@ body::before {
 .home-shell .gallery-panel.active .panel-label { left: 22px; right: 22px; top: auto; bottom: 22px; transform: none; }
 .home-shell .panel-label strong { font-size: 1.22rem; letter-spacing: 0; }
 .home-shell .panel-label small { color: #e8c990; }
-.collection-decks { margin-top: 10px; padding: 18px; border: 1px solid rgba(130,81,35,.42); border-radius: 8px; background: rgba(242,216,164,.64); }
+.collection-decks { margin-top: 10px; padding: 18px; border: 1px solid rgba(130,81,35,.42); border-radius: 8px; background: var(--estante); }
 .collection-decks h2 { max-width: none; margin-bottom: 8px; text-align: center; font-size: clamp(1.55rem, 5vw, 2rem); }
 .collection-decks .lead { margin: 0 auto 14px; text-align: center; }
-.games { border-color: rgba(130,81,35,.4); border-radius: 7px; background: rgba(130,81,35,.3); }
-.game-row { border-left-width: 4px; background: rgba(249,228,184,.66); }
-.game-row.active { border-left-color: var(--accent); background: rgba(216,174,104,.62); }
+.games { border-color: rgba(130,81,35,.4); border-radius: 7px; background: var(--reja); }
+.game-row { border-left-width: 4px; background: var(--fila); }
+.game-row.active { border-left-color: var(--accent); background: var(--fila-activa); }
 .game-name { font-family: var(--font-display); }
 
 .home-nav {
@@ -866,7 +974,7 @@ body::before {
   min-height: 66px;
   padding: 7px 12px max(7px, env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   transform: translateX(-50%);
   border-top: 1px solid #a97b41;
   background: rgba(232,204,149,.94);
@@ -958,22 +1066,22 @@ body::before {
 
 /* El mismo vocabulario llega a las partidas, los formularios y los resultados. */
 .panel, .modal, .reveal, .room-code-card, .connection-strip {
-  border-color: rgba(135,87,39,.48);
+  border-color: var(--vitela-borde);
   border-radius: 9px;
-  background: rgba(246,222,174,.88);
-  box-shadow: inset 0 0 0 1px rgba(255,243,211,.36), var(--shadow-soft);
+  background: var(--vitela);
+  box-shadow: inset 0 0 0 1px var(--vitela-luz), var(--shadow-soft);
 }
 .room-code-card { color: var(--ink); }
 .room-code-card small { color: var(--muted); }
 .btn { border-radius: 7px; font-family: var(--font-display); font-size: .96rem; }
 .btn-primary { background: linear-gradient(110deg, #9e451f, #813112); }
-.btn-secondary { border-color: rgba(132,84,35,.48); background: rgba(245,221,174,.78); }
-.field input, .field select { border-color: rgba(132,84,35,.48); border-radius: 6px; background: rgba(250,232,194,.74); }
+.btn-secondary { border-color: var(--borde-suave); background: var(--boton-suave); }
+.field input, .field select { border-color: var(--borde-suave); border-radius: 6px; background: var(--campo); }
 .eyebrow { color: var(--accent-dark); font-family: var(--font-display); }
 .game-head { padding-bottom: 12px; border-bottom: 1px solid rgba(132,84,35,.36); }
 .turn-label { color: var(--accent-dark); font-family: var(--font-display); }
-.deck-count { border-color: rgba(132,84,35,.48); border-radius: 50%; background: rgba(233,199,134,.75); }
-.score { border-color: rgba(132,84,35,.43); background: rgba(244,220,173,.75); }
+.deck-count { border-color: var(--borde-suave); border-radius: 50%; background: var(--contador); }
+.score { border-color: var(--borde-suave); background: var(--ficha); }
 .timeline-card {
   border-color: #9d713c;
   border-radius: 8px;
@@ -981,7 +1089,9 @@ body::before {
   box-shadow: inset 0 0 0 3px rgba(247,222,171,.55), 0 5px 11px rgba(73,42,14,.18);
 }
 .card-visual { filter: sepia(.25) saturate(.72); }
-.timeline-card .year, .reveal .year { color: var(--ink); font-family: var(--font-display); }
+.timeline-card { color: var(--carta-tinta); }
+.timeline-card .year { color: var(--carta-tinta); font-family: var(--font-display); }
+.reveal .year { color: var(--ink); font-family: var(--font-display); }
 .hand-card {
   border-color: #9b6d35;
   border-radius: 8px;
@@ -1068,9 +1178,9 @@ body::before {
   .animal-hand-card { min-height: 190px; }
   .animal-timeline-card .card-visual { height: 120px; }
 }
-.slot, .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: rgba(235,204,146,.64); }
+.slot, .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: var(--hueco); }
 .overlay { background: rgba(47,29,14,.68); backdrop-filter: blur(6px) sepia(.2); }
-.modal { background: #edd29b; }
+.modal { background: var(--modal-fondo); }
 .toast { border: 1px solid #c08a47; border-radius: 7px; background: #3d2815; color: #f7dfaa; }
 
 @media (min-width: 700px) {
@@ -1094,6 +1204,28 @@ body::before {
     --accent-soft: #62401f;
     --ink-solid: #bb5c2b;
     --ink-solid-contrast: #fff0cf;
+    /* El pergamino de noche: cuero oscuro en vez de papel. La carta de la línea y la de
+       la mano no están aquí a propósito, porque son objetos de la mesa y no cambian. */
+    --vitela: rgba(52,36,20,.94);
+    --vitela-luz: rgba(255,226,170,.07);
+    --vitela-borde: rgba(180,132,70,.4);
+    --borde-suave: rgba(180,132,70,.4);
+    --boton-suave: rgba(68,48,27,.88);
+    --boton-icono: rgba(62,43,24,.85);
+    --boton-icono-luz: rgba(255,228,172,.07);
+    --campo: rgba(32,22,12,.88);
+    --ficha: rgba(60,42,24,.85);
+    --contador: rgba(62,43,24,.9);
+    --hueco: rgba(52,36,20,.72);
+    --modal-fondo: #31220f;
+    --fila: rgba(54,38,21,.9);
+    --fila-activa: rgba(84,58,30,.9);
+    --reja: rgba(130,95,48,.35);
+    --estante: rgba(44,31,17,.7);
+    --formato: linear-gradient(100deg, rgba(74,52,29,.9), rgba(52,36,20,.92));
+    --formato-luz: rgba(255,228,172,.08);
+    --formato-detalle: #c2a875;
+    --promo: rgba(64,45,25,.88);
   }
   :root:not([data-theme="light"]) body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
   :root:not([data-theme="light"]) .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
@@ -1109,6 +1241,28 @@ body::before {
   --accent-soft: #62401f;
   --ink-solid: #bb5c2b;
   --ink-solid-contrast: #fff0cf;
+  /* El pergamino de noche: cuero oscuro en vez de papel. La carta de la línea y la de
+     la mano no están aquí a propósito, porque son objetos de la mesa y no cambian. */
+  --vitela: rgba(52,36,20,.94);
+  --vitela-luz: rgba(255,226,170,.07);
+  --vitela-borde: rgba(180,132,70,.4);
+  --borde-suave: rgba(180,132,70,.4);
+  --boton-suave: rgba(68,48,27,.88);
+  --boton-icono: rgba(62,43,24,.85);
+  --boton-icono-luz: rgba(255,228,172,.07);
+  --campo: rgba(32,22,12,.88);
+  --ficha: rgba(60,42,24,.85);
+  --contador: rgba(62,43,24,.9);
+  --hueco: rgba(52,36,20,.72);
+  --modal-fondo: #31220f;
+  --fila: rgba(54,38,21,.9);
+  --fila-activa: rgba(84,58,30,.9);
+  --reja: rgba(130,95,48,.35);
+  --estante: rgba(44,31,17,.7);
+  --formato: linear-gradient(100deg, rgba(74,52,29,.9), rgba(52,36,20,.92));
+  --formato-luz: rgba(255,228,172,.08);
+  --formato-detalle: #c2a875;
+  --promo: rgba(64,45,25,.88);
 }
 :root[data-theme="dark"] body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
 :root[data-theme="dark"] .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }

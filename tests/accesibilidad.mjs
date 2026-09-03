@@ -140,6 +140,98 @@ console.log("\nEstado de los controles");
   ok("los huecos se describen por su posición", [...w.document.querySelectorAll(".slot")].every(s => /Colocar en la posición \d+ de \d+/.test(s.getAttribute("aria-label") || "")));
 }
 
+console.log("\nEl perfil");
+{
+  const w = boot();
+  const nav = [...w.document.querySelectorAll(".home-nav button")];
+  ok("los cuatro destinos de la portada tienen nombre", nav.length === 4 && nav.every(b => b.getAttribute("aria-label")));
+
+  click(w, '[data-action="perfil"]');
+  ok("el foco va al titular de la pantalla", activo(w) === el(w, "h1[data-focus]"));
+  ok("las agrupaciones de logros se nombran", [...w.document.querySelectorAll(".logro-grid")].every(g => g.getAttribute("role") === "group" && g.getAttribute("aria-label")));
+  // La barra de progreso es puro color y anchura: sin esto, quien no la ve no sabe
+  // cuánto lleva de un logro. El número también está escrito al lado, en texto.
+  const barras = [...w.document.querySelectorAll(".logro-bar")];
+  ok(`las barras de progreso dicen su valor (${barras.length})`, barras.length > 0 && barras.every(b => /^\d+ de \d+$/.test(b.getAttribute("aria-label") || "")));
+  ok("la estrella de cada logro no es la única señal: hay texto", [...w.document.querySelectorAll(".logro")].every(l => l.querySelector("b")?.textContent.trim()));
+  ok("los símbolos decorativos se ocultan al lector", [...w.document.querySelectorAll(".logro-mark")].every(m => m.getAttribute("aria-hidden") === "true"));
+}
+{
+  // Un punto débil es un botón que lleva a otra pantalla: tiene que decir lo suficiente
+  // por sí solo, no solo «→».
+  const w = boot();
+  w.localStorage.setItem("hilo-perfil-v1", JSON.stringify({
+    version: 1,
+    totals: { games: 1, cards: 10, hits: 1, wins: 0, run: 0, bestRun: 1 },
+    byBand: { "history:antigua": { mode: "history", band: "antigua", hits: 1, misses: 9 } },
+    misses: { [read("cards.js").match(/id: (\d+)/)[1]]: { mode: "history", count: 4, lastDay: "2026-02-02" } }
+  }));
+  click(w, '[data-action="perfil"]');
+  const filas = [...w.document.querySelectorAll(".weak-row")];
+  ok(`hay puntos débiles que revisar (${filas.length})`, filas.length >= 2);
+  ok("cada uno dice de qué carta o tramo habla, y de qué mazo", filas.every(f => (f.textContent.match(/\S/g) || []).length > 10));
+  ok("la flecha no cuenta como parte del nombre", filas.every(f => f.querySelector("i")?.getAttribute("aria-hidden") === "true"));
+}
+
+// El tema oscuro solo puede cambiar variables. Una superficie con el color escrito a pelo
+// dentro de su regla se queda clara también de noche, y como la tinta sí cambia, el texto
+// encima se vuelve ilegible. Pasó con los paneles, los campos, las filas y la carta de la
+// línea: se leía blanco sobre papel. Esto vigila que cada superficie del pergamino siga
+// teniendo su versión oscura.
+console.log("\nCada superficie del tema claro tiene su versión oscura");
+{
+  const css = read("styles.css");
+  // El último de cada uno, no el primero: los bloques de la paleta anterior siguen
+  // arriba en el archivo y son los que ganarían un `indexOf`.
+  const bloque = (inicio, fin) => {
+    const desde = css.lastIndexOf(inicio);
+    return desde === -1 ? "" : css.slice(desde, css.indexOf(fin, desde));
+  };
+  // El `:root` del pergamino no es el primero del archivo —antes está la paleta que
+  // sustituyó—, así que se busca hacia atrás desde la primera de sus variables.
+  const pergamino = css.slice(css.lastIndexOf(":root {", css.indexOf("--vitela:")));
+  const superficies = [...pergamino.slice(0, pergamino.indexOf("}")).matchAll(/(--[a-z-]+):/g)].map(m => m[1])
+    .filter(v => !["--font-display", "--ease-out", "--ease-spring"].includes(v));
+  const sistema = bloque(':root:not([data-theme="light"]) {', "}");
+  const interruptor = bloque(':root[data-theme="dark"] {', "}");
+
+  ok(`se encuentran las superficies del pergamino (${superficies.length})`, superficies.length > 20);
+  ok("se encuentran los dos bloques oscuros", sistema.length > 200 && interruptor.length > 200);
+
+  // Las que son deliberadamente iguales en los dos temas, por ser objetos de la mesa y no
+  // superficies de la interfaz: la carta de la línea es papel de día y de noche.
+  const iguales = ["--carta-tinta", "--accent-solid", "--green-solid", "--teal", "--green", "--shadow", "--shadow-soft", "--motion-fast", "--motion-base", "--motion-slow"];
+  const pendientes = superficies.filter(v => !iguales.includes(v))
+    .filter(v => !sistema.includes(`${v}:`) || !interruptor.includes(`${v}:`));
+  ok(`ninguna superficie se queda sin versión oscura${pendientes.length ? ` (falta ${pendientes.join(", ")})` : ""}`, !pendientes.length);
+
+  // Y ninguna regla nueva del pergamino vuelve a escribir un fondo claro a mano. Quedan
+  // seis, todas a propósito: o son objetos de la mesa —la carta de la línea, el marco de
+  // la portada—, o llevan su propia tinta oscura encima y no dependen del tema. Si
+  // aparece una séptima hay que decidir a cuál de los dos grupos pertenece: si no es
+  // ninguno, necesita variable y versión oscura como las demás.
+  const APROPOSITO = [
+    "#d9b56f",              // el marco de la portada: adorno, sin texto encima
+    "rgba(255,237,192,.53)", // el círculo del icono de formato, con su tinta #75451f
+    "#f0d292",              // el mismo círculo en el formato destacado, con su #8d3c1b
+    "rgba(232,204,149,.94)", // la barra de la portada, ya sustituida en los bloques oscuros
+    "#c9a66b",              // la lámina de la carta de animal
+    "#f4ddb0"               // la cartela del valor, sobre esa misma carta
+  ];
+  const desde = css.indexOf("--vitela:");
+  const hasta = css.indexOf("@media (prefers-color-scheme: dark)", desde);
+  const aPelo = [...css.slice(desde, hasta).matchAll(/^\.[^\n{]*\{[^}]*background: (rgba?\([^)]*\)|#[0-9a-f]{3,6})[;\s]/gm)]
+    .map(m => m[1])
+    .filter(color => {
+      const canales = color.startsWith("#")
+        ? [1, 3, 5].map(i => parseInt(color.slice(i, i + 2), 16))
+        : color.match(/[\d.]+/g).slice(0, 3).map(Number);
+      return canales.reduce((a, b) => a + b, 0) / 3 > 150;
+    })
+    .filter(color => !APROPOSITO.includes(color));
+  ok(`ningún fondo claro nuevo escrito a mano${aPelo.length ? ` (${aPelo.join(", ")})` : ""}`, !aPelo.length);
+}
+
 console.log("\nContraste de las bandas de época");
 {
   const css = read("styles.css");
