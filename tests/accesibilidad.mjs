@@ -215,7 +215,7 @@ console.log("\nCada superficie del tema claro tiene su versión oscura");
     "rgba(255,237,192,.53)", // el círculo del icono de formato, con su tinta #75451f
     "#f0d292",              // el mismo círculo en el formato destacado, con su #8d3c1b
     "rgba(232,204,149,.94)", // la barra de la portada, ya sustituida en los bloques oscuros
-    "#d7b676",              // la lámina de la carta de animal
+    "#c9a66b",              // la lámina de la carta de animal
     "#f4ddb0"               // la cartela del valor, sobre esa misma carta
   ];
   const desde = css.indexOf("--vitela:");
