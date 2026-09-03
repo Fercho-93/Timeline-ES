@@ -72,8 +72,10 @@ try {
  // Ganar conservando el poder y desempatar con un robo que lo entrega.
  const winning=fixture();winning.phase='reveal';winning.turnsInRound=2;winning.players[A].hand=[];winning.reveal={cardId:6,correct:true,playerUid:A,playerName:'Ana'};
  await seed(winning);await clients[0].call('finishTurn');assert.equal((await snapshot()).winner,A);
+ // Ana ya tiene un Fantasma: el segundo que le toque en el desempate se recoloca,
+ // no se le asigna también a ella. La carta en sí sí llega a su mano igualmente.
  const tie=fixture();tie.phase='reveal';tie.current=2;tie.turnsInRound=2;tie.players[A].hand=[];tie.players[B].hand=[];tie.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};
- await seed(tie);await clients[2].call('finishTurn');s=await snapshot();assert.equal(s.ghost.owners[1],A);assert.equal(s.players[A].hand.length,1);assert.equal(s.players[B].hand.length,1);
+ await seed(tie);await clients[2].call('finishTurn');s=await snapshot();assert.equal(s.ghost.owners[1],'');assert.notEqual(s.ghost.cards[1],15);assert.ok(s.players[A].hand.includes(15));assert.equal(s.players[A].hand.length,1);assert.equal(s.players[B].hand.length,1);
  // Una salida ajena no cierra ni repite un resultado ya resuelto.
  await seed(fixture());await clients[0].call('useGhost');await play(clients[0]);await clients[0].call('removePlayer',B);
  s=await snapshot();assert.equal(s.phase,'reveal');await clients[0].call('finishTurn');assert.deepEqual((await snapshot()).ghost.pending,[C]);

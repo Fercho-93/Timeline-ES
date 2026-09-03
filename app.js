@@ -4,7 +4,6 @@
   const app = document.getElementById("app");
   const toast = document.getElementById("toast");
   const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
-  const LEGACY_STORAGE_KEY = "hilo-espana-game-v1";
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
@@ -127,14 +126,7 @@
 
   function loadGame() {
     try {
-      let raw = localStorage.getItem(storageKey());
-      if (!raw && selectedModeKey === "history") {
-        raw = localStorage.getItem(LEGACY_STORAGE_KEY);
-        if (raw) {
-          localStorage.setItem(storageKey(), raw);
-          localStorage.removeItem(LEGACY_STORAGE_KEY);
-        }
-      }
+      const raw = localStorage.getItem(storageKey());
       const stored = JSON.parse(raw);
       if (!stored || !stored.players || !stored.timeline) return null;
       stored.mode = stored.mode || selectedModeKey;

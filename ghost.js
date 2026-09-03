@@ -39,7 +39,7 @@
     const index = ghost.cards.indexOf(cardId);
     if (index < 0 || ghost.owners[index]) return;
     const id = String(playerId);
-    if (ghost.distribution === 2 && ghost.owners.includes(id)) {
+    if (ghost.owners.includes(id)) {
       const candidates = remainingDeck.filter(card => !ghost.cards.includes(card) && !occupied.includes(card));
       if (candidates.length) {
         ghost.cards[index] = candidates[Math.floor(random() * candidates.length)];

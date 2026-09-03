@@ -106,7 +106,7 @@ duplican jugadas. La vista responsive no sustituye una prueba en un iPhone real.
 `node tests/movimiento.mjs` verifica además interrupciones, foco, cancelación,
 gestos, navegación y el comportamiento con movimiento reducido.
 
-## Fantasma, Pulso y dificultades (poderes v38)
+## Fantasma, Pulso y dificultades
 
 `npm test` incluye 90.000 repartos deterministas, uso y duración del Fantasma,
 minimapa sin pistas, guardado tras resolver, victoria con poder sin gastar,

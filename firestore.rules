@@ -41,62 +41,32 @@ service cloud.firestore {
       }
 
 
-      // Fantasma v37. Poderes fuera de las manos; las salas v36 siguen válidas.
-      // Solo se recoloca un poder sin dueño si lo roba quien ya tiene otro.
+      // Fantasma. Poderes fuera de las manos; el reparto vive en `distribution` por
+      // compatibilidad de forma con partidas ya guardadas, aunque hoy solo existe un
+      // reparto y no se distingue comportamiento por su valor.
       function gb() { return before().ghost; }
       function ga() { return after().ghost; }
       function ghostShape() {
         let next = after().get('ghost', null);
         return next is map
           && next.keys().hasOnly(['distribution', 'cards', 'owners', 'used', 'pending', 'cooldown', 'actor', 'fresh'])
-          && next.get('distribution', 1) in [1, 2]
+          && next.get('distribution', 2) == 2
           && next.cards is list && next.cards.size() <= 3
           && next.cards.toSet().size() == next.cards.size()
           && next.owners is list && next.owners.size() == next.cards.size()
           && next.used is list && next.pending is list && next.cooldown is list
           && next.actor is string && next.fresh is bool;
       }
-      function initialOwner(i, next, data) {
-        return i >= next.cards.size() || (next.cards[i] is int
-          && (next.owners[i] == '' ? next.cards[i] in data.deck
-            : (next.owners[i] in data.playerOrder
-              && next.cards[i] in data.players[next.owners[i]].hand)));
-      }
-      // Compatibilidad completa de salas Fantasma anteriores. En v38 el cliente
-      // comprueba a todos antes de escribir y las reglas exigen además un anfitrión
-      // actualizado; repetir aquí esa lista junto a seis poderes supera el máximo
-      // de 1000 expresiones de Firestore.
-      function allClientsReady(data, version) {
-        let order = data.playerOrder;
-        let players = data.players;
-        let size = order.size();
-        return (size <= 0 || players[order[0]].get('clientVersion', 0) >= version)
-          && (size <= 1 || players[order[1]].get('clientVersion', 0) >= version)
-          && (size <= 2 || players[order[2]].get('clientVersion', 0) >= version)
-          && (size <= 3 || players[order[3]].get('clientVersion', 0) >= version)
-          && (size <= 4 || players[order[4]].get('clientVersion', 0) >= version)
-          && (size <= 5 || players[order[5]].get('clientVersion', 0) >= version)
-          && (size <= 6 || players[order[6]].get('clientVersion', 0) >= version)
-          && (size <= 7 || players[order[7]].get('clientVersion', 0) >= version)
-          && (size <= 8 || players[order[8]].get('clientVersion', 0) >= version);
-      }
       function ghostStart() {
         let data = after();
-        let prior = before();
         let next = data.get('ghost', null);
-        let version = 'pulsePower' in data ? 38 : (next == null || next.get('distribution', 1) == 1 ? 36 : 37);
         return !('ghost' in data) || (ghostShape()
-          && (version == 38
-            ? prior.players[uid()].get('clientVersion', 0) >= 38
-            : allClientsReady(prior, version))
           && next.cards.size() <= (data.playerOrder.size() + 2) / 3
-          && (version == 36 || next.cards.size() * 3 >= data.playerOrder.size())
+          && next.cards.size() * 3 >= data.playerOrder.size()
           && next.used == [] && next.pending == [] && next.cooldown == []
           && next.actor == '' && next.fresh == false
-          && (version == 38
-            ? next.owners.removeAll(['']).toSet().difference(data.playerOrder.toSet()).size() == 0
-            : (initialOwner(0, next, data) && initialOwner(1, next, data) && initialOwner(2, next, data)))
-          && (version == 36 || next.owners.removeAll(['']).size() == next.owners.removeAll(['']).toSet().size()
+          && next.owners.removeAll(['']).toSet().difference(data.playerOrder.toSet()).size() == 0
+          && (next.owners.removeAll(['']).size() == next.owners.removeAll(['']).toSet().size()
             || data.deck.toSet().difference(next.cards.toSet()).size() == 0));
       }
       function drawnTo(card, owner, data, next) {
@@ -127,8 +97,8 @@ service cloud.firestore {
         return i >= g.cards.size() || (next.cards[i] == g.cards[i]
           ? (next.owners[i] == g.owners[i]
             || (g.owners[i] == '' && drawnTo(g.cards[i], next.owners[i], prior, data)
-              && (g.get('distribution', 1) == 1 || uniqueOwners || recipientSafe(i, data))))
-          : (g.get('distribution', 1) == 2 && g.owners[i] == ''
+              && (uniqueOwners || recipientSafe(i, data))))
+          : (g.owners[i] == ''
             && (duplicateDraw(i, 0, g.cards[i], next.owners, prior, data)
               || duplicateDraw(i, 1, g.cards[i], next.owners, prior, data)
               || duplicateDraw(i, 2, g.cards[i], next.owners, prior, data))
@@ -144,7 +114,6 @@ service cloud.firestore {
         let owners = next.owners.removeAll(['']);
         let uniqueOwners = owners.size() == owners.toSet().size();
         return ghostShape() && next.cards.size() == g.cards.size()
-          && next.get('distribution', 1) == g.get('distribution', 1)
           && drawnOwner(0, prior, data, uniqueOwners) && drawnOwner(1, prior, data, uniqueOwners) && drawnOwner(2, prior, data, uniqueOwners);
       }
       function ghostActivate() {
@@ -156,7 +125,6 @@ service cloud.firestore {
           && uid() in g.owners && !(uid() in g.used)
           && g.pending == [] && g.cooldown == []
           && ghostShape() && next.cards == g.cards && next.owners == g.owners
-          && next.get('distribution', 1) == g.get('distribution', 1)
           && next.used == g.used.concat([uid()]) && next.actor == uid() && next.fresh == true
           && next.cooldown == [] && next.pending.size() == before().playerOrder.size()
           && next.pending.toSet() == before().playerOrder.toSet();
@@ -180,7 +148,6 @@ service cloud.firestore {
         let removed = before().playerOrder.removeAll(after().playerOrder);
         let remaining = g.pending.removeAll(removed);
         return ghostShape() && next.cards == g.cards && next.owners == g.owners
-          && next.get('distribution', 1) == g.get('distribution', 1)
           && next.used == g.used && next.actor == g.actor
           && next.pending == remaining
           && next.fresh == (before().playerOrder[before().current] in removed ? false : g.fresh)
@@ -218,10 +185,8 @@ service cloud.firestore {
       }
       function pulsePowerStartShape() {
         let data = after();
-        let prior = before();
         let p = data.get('pulsePower', null);
         return !('pulsePower' in data) || (data.pulse == true && pulsePowerShape()
-          && ('ghost' in data || prior.players[uid()].get('clientVersion', 0) >= 38)
           && p.cards.size() <= (data.playerOrder.size() + 2) / 3
           && p.cards.size() * 3 >= data.playerOrder.size()
           && p.used == []
