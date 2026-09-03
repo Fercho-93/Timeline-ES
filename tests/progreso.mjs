@@ -60,7 +60,7 @@ console.log("\nUn perfil recién estrenado");
   ok("no se ha escrito nada en el almacenamiento por el mero hecho de leer", w.localStorage.getItem("hilo-perfil-v1") === null);
   const resumen = w.CONTINUUM.Progreso.summary();
   ok("un perfil vacío no divide por cero", resumen.accuracy === 0);
-  ok("hay dieciséis logros definidos", w.CONTINUUM.Progreso.ACHIEVEMENTS.length === 16);
+  ok("hay diecisiete logros definidos", w.CONTINUUM.Progreso.ACHIEVEMENTS.length === 17);
 }
 
 console.log("\nUna partida en solitario cuadra con lo anotado");
@@ -221,7 +221,7 @@ console.log("\nLa pantalla del perfil");
   click(w, '[data-action="perfil"]');
   ok("se llega desde la portada", w.document.querySelector("h1")?.textContent === "Perfil");
   ok("un perfil sin estrenar lo dice sin números falsos", /Todavía no hay nada que contar/.test(texto(w)));
-  ok("los dieciséis logros se pintan aunque estén bloqueados", w.document.querySelectorAll(".logro").length === 16);
+  ok("todos los logros se pintan aunque estén bloqueados", w.document.querySelectorAll(".logro").length === w.CONTINUUM.Progreso.ACHIEVEMENTS.length);
   ok("ninguno aparece como conseguido", w.document.querySelectorAll(".logro.unlocked").length === 0);
   ok("sin cartas jugadas no se inventa un punto débil", !existe(w, ".weak-row"));
   click(w, '[data-action="home"]');

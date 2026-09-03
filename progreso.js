@@ -30,7 +30,7 @@
       totals: { games: 0, cards: 0, hits: 0, wins: 0, run: 0, bestRun: 0 },
       // Los hitos que no se deducen de los totales: hacen falta para los logros y son
       // más baratos de contar en el momento que de reconstruir después.
-      marks: { perfectDaily: 0, bestStreak: 0, ghostHits: 0, pulseHits: 0, expertClears: 0, comps: 0, bigWins: 0, onlineWins: 0 },
+      marks: { perfectDaily: 0, bestStreak: 0, ghostHits: 0, pulseHits: 0, expertClears: 0, comps: 0, bigWins: 0, onlineWins: 0, duelWins: 0 },
       byMode: {},
       byBand: {},
       misses: {},
@@ -138,6 +138,7 @@
     { key: "fantasma", group: "Oficio", name: "A ciegas", desc: "Acierta una carta con los valores ocultos por el Fantasma.", have: p => p.marks.ghostHits, goal: 1 },
     { key: "experto", group: "Oficio", name: "Nivel experto", desc: "Completa un mazo en partida libre y en Experto.", have: p => p.marks.expertClears, goal: 1 },
     { key: "sala", group: "Oficio", name: "Ganar en sala", desc: "Gana una partida de varios móviles.", have: p => p.marks.onlineWins, goal: 1 },
+    { key: "duelo", group: "Oficio", name: "Duelo ganado", desc: "Supera la marca de quien te retó por enlace.", have: p => p.marks.duelWins, goal: 1 },
     { key: "habitual", group: "Oficio", name: "Cincuenta partidas", desc: "Termina cincuenta partidas, del formato que sea.", have: p => p.totals.games, goal: 50 }
   ];
 
@@ -205,17 +206,17 @@
     return nuevos;
   }
 
-  // Fin de partida. `won` solo llega de una sala: es el único formato donde el juego sabe
-  // cuál de las personas eres tú. En un móvil compartido gana alguien de la mesa, pero no
-  // hay manera de saber quién lo sostiene, así que esa partida se cuenta como jugada y no
-  // como ganada — apuntarse una victoria ajena sería inventarse el dato.
+  // Fin de partida. `won` solo llega de una sala o de un duelo: son los dos formatos donde
+  // el juego sabe cuál de las marcas es la tuya. En un móvil compartido gana alguien de la
+  // mesa, pero no hay manera de saber quién lo sostiene, así que esa partida se cuenta
+  // como jugada y no como ganada — apuntarse una victoria ajena sería inventarse el dato.
   function finishGame({ mode, kind = "free", hits = 0, total = 0, won = false, difficulty = "easy", players = 0, streak = 0, lives = 0 }) {
     const profile = read();
     if (!CT.has(mode)) return [];
     profile.playerId = profile.playerId || playerId();
     profile.totals.games += 1;
     modeEntry(profile, mode).games += 1;
-    if (won && kind === "online") profile.totals.wins += 1;
+    if (won && (kind === "online" || kind === "duel")) profile.totals.wins += 1;
     if (kind === "daily") {
       if (total > 0 && hits === total) profile.marks.perfectDaily += 1;
       profile.marks.bestStreak = Math.max(profile.marks.bestStreak, streak);
@@ -225,6 +226,9 @@
     if (kind === "free" && difficulty === "expert" && lives > 0) profile.marks.expertClears += 1;
     if (kind === "local" && players >= 5) profile.marks.bigWins += 1;
     if (kind === "online" && won) profile.marks.onlineWins += 1;
+    // El duelo es la otra vez que el juego sabe que la victoria es tuya: hay una marca
+    // concreta enfrente, la de quien te retó, y la has superado o no.
+    if (kind === "duel" && won) profile.marks.duelWins += 1;
     const nuevos = unlock(profile);
     save(profile);
     return nuevos;

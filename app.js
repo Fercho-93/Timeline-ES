@@ -8,7 +8,7 @@
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
-  const { escapeHtml, initials, shuffle, announce } = CT;
+  const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
   const paint = html => CT.paint(app, html, screen);
   // Y las capas se abren como diálogos: foco dentro, tabulador atrapado, Escape cierra.
@@ -902,6 +902,22 @@
   // El texto para compartir el reto diario, por la misma razón: se construye antes de
   // vaciar `solo` y el botón de compartir vive en la pantalla siguiente.
   let lastShareText = null;
+  // Lo mismo para el duelo: la invitación al crearlo, o el marcador al terminarlo.
+  let lastDuelShare = null;
+  // El duelo que ha llegado por enlace y todavía no se ha aceptado.
+  let pendingDuel = null;
+
+  function enDuelo() { return solo?.kind === "duel"; }
+
+  // Cuándo se acaba una partida en solitario. El duelo es el único formato sin vidas: las
+  // dos partes juegan las mismas cartas de principio a fin, porque si a una se le acabaran
+  // a la séptima el marcador estaría comparando siete cartas contra quince.
+  function soloAcabada() {
+    if (!solo) return true;
+    if (solo.total && solo.played >= solo.total) return true;
+    if (!solo.deck.length) return true;
+    return !enDuelo() && solo.lives === 0;
+  }
 
   function soloKey() { return `hilo-solo-${selectedModeKey}-v1`; }
 
@@ -911,37 +927,6 @@
     const date = new Date();
     date.setDate(date.getDate() - 1);
     return date.toLocaleDateString("sv-SE");
-  }
-
-  // Semilla a partir de la fecha: el reto del día es el mismo en todos los móviles,
-  // sin necesidad de servidor.
-  function seedFrom(text) {
-    let seed = 2166136261;
-    for (let i = 0; i < text.length; i++) {
-      seed ^= text.charCodeAt(i);
-      seed = Math.imul(seed, 16777619);
-    }
-    return seed >>> 0;
-  }
-
-  function seededRandom(seed) {
-    let state = seed;
-    return () => {
-      state |= 0;
-      state = (state + 0x6d2b79f5) | 0;
-      let value = Math.imul(state ^ (state >>> 15), 1 | state);
-      value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
-      return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-
-  function shuffleWith(items, random) {
-    const copy = [...items];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
   }
 
   function readRecords() {
@@ -1012,7 +997,7 @@
     const pendiente = solo && solo.kind === "free";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
-        <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una.</p></div>
+        <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una. Salvo en el duelo, donde se juegan las ${CT.Duelo.CARTAS} cartas siempre.</p></div>
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Reto diario</h3><time datetime="${today()}">${today().split("-").reverse().join("/")}</time></div>
           ${doneToday
@@ -1029,22 +1014,75 @@
           ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
         </div>
+        ${duelPanel()}
       </section>
     </div>`);
   }
 
-  function startSolo(kind) {
-    const difficulty = kind === "daily" ? "easy" : selectedDifficulty;
+  // El duelo es un formato propio y no un botón al final de otra partida. La razón es la
+  // semilla: el reto diario tiene una —la fecha— pero la partida libre baraja al azar y
+  // dura lo que duren las vidas, así que no hay nada que mandar que reparta lo mismo en
+  // el otro móvil. Con formato propio, en cambio, vale cualquier mazo y cuantas veces se
+  // quiera, y cada duelo estrena semilla.
+  function duelPanel() {
+    // Un duelo aceptado y dejado a medias no se puede volver a empezar desde el enlace si
+    // ya lo has cerrado, así que se ofrece continuarlo: con él se iría la marca del rival.
+    const aMedias = solo && solo.kind === "duel";
+    const contra = aMedias && solo.duelo?.rival ? solo.duelo.rival.nombre || "quien te retaba" : null;
+    return `<div class="panel solo-panel">
+      <div class="solo-panel-head"><h3>Duelo por enlace</h3></div>
+      <p>${CT.Duelo.CARTAS} cartas al azar de este mazo. Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas. Sin cuentas y sin esperar a nadie.</p>
+      <div class="field">
+        <label for="duel-name">Tu nombre, para que sepan quién reta</label>
+        <input id="duel-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
+      </div>
+      ${aMedias ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra ? `el duelo contra ${escapeHtml(contra)}` : "tu duelo"} <span>→</span></button>` : ""}
+      <button class="btn ${aMedias ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${aMedias ? "Empezar otro duelo" : "Crear un duelo"} <span>→</span></button>
+    </div>`;
+  }
+
+  // El nombre se guarda entre duelos: es lo único que hay que escribir, y pedirlo cada
+  // vez para acabar poniendo lo mismo sobra.
+  const DUEL_NAME_KEY = "hilo-nombre-v1";
+
+  function duelName() {
+    try { return CT.Duelo.limpiaNombre(localStorage.getItem(DUEL_NAME_KEY) || ""); } catch { return ""; }
+  }
+
+  function saveDuelName(nombre) {
+    try { localStorage.setItem(DUEL_NAME_KEY, CT.Duelo.limpiaNombre(nombre)); } catch { /* almacenamiento lleno */ }
+  }
+
+  function guardaNombreSiLoHay() {
+    const campo = document.getElementById("duel-name");
+    if (campo) saveDuelName(campo.value);
+  }
+
+  // `duel` recibe el duelo ya descodificado cuando se acepta un reto ajeno; si no viene,
+  // se estrena uno propio con semilla nueva. En los dos casos el reparto sale de la misma
+  // función, que es justo lo que garantiza que los dos móviles jueguen lo mismo.
+  function startSolo(kind, duel = null) {
+    // El duelo se juega siempre en Fácil, como el reto diario: si cada parte lo jugara en
+    // una dificultad, el marcador compararía dos cosas distintas.
+    const difficulty = kind === "daily" || kind === "duel" ? "easy" : selectedDifficulty;
     const ids = currentMode().cards.map(card => card.id);
-    const barajado = kind === "daily"
-      ? shuffleWith(ids, seededRandom(seedFrom(`${today()}:${selectedModeKey}`))).slice(0, DAILY_CARDS + 1)
-      : shuffle(ids);
+    let barajado;
+    let duelo = null;
+    if (kind === "duel") {
+      duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null };
+      barajado = CT.Duelo.reparto(selectedModeKey, duelo.seed, duelo.total);
+    } else if (kind === "daily") {
+      barajado = shuffleWith(ids, seededRandom(seedFrom(`${today()}:${selectedModeKey}`))).slice(0, DAILY_CARDS + 1);
+    } else {
+      barajado = shuffle(ids);
+    }
     const timeline = [barajado.shift()];
     solo = {
       kind, difficulty, ghostTurns: difficulty === "hard" ? CT.Ghost.soloSchedule(ids.length) : [],
       mode: selectedModeKey, day: today(), deck: barajado, timeline,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
-      total: kind === "daily" ? DAILY_CARDS : null, finished: false
+      total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : null,
+      duelo, finished: false
     };
     pendingIndex = null;
     result = null;
@@ -1067,9 +1105,9 @@
     const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + Math.ceil(solo.deck.length / (1 + CT.Ghost.level(solo.difficulty).extra));
     const etiqueta = soloLabel();
     paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
-      <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}</h1>
+      <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${enDuelo() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
-      <div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>
+      ${enDuelo() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
@@ -1096,7 +1134,8 @@
       solo.timeline.splice(index, 0, solo.current);
       solo.hits += 1;
     } else {
-      solo.lives -= 1;
+      // El duelo no gasta vidas: ver `soloAcabada`.
+      if (!enDuelo()) solo.lives -= 1;
       (solo.failed = solo.failed || []).push(solo.current);
     }
     solo.played += 1;
@@ -1115,16 +1154,16 @@
     soloView();
     const { correct, card } = result;
     const era = eraForCard(card);
-    const acabada = solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total);
+    const acabada = soloAcabada();
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
     if (!solo?.pendingResult) return;
     solo.pendingResult = null;
     result = null;
-    if (solo.lives === 0 || !solo.deck.length || (solo.total && solo.played >= solo.total)) return soloFinish();
+    if (soloAcabada()) return soloFinish();
     // Primero se reserva la siguiente carta del jugador. Nunca se duplica ni se
     // consume por la inserción automática, que no modifica aciertos ni vidas.
     solo.current = solo.deck.shift();
@@ -1171,22 +1210,132 @@
       if (difficulty === "easy") records.best = records.bestByDifficulty.easy;
       saveRecords(records);
     }
-    const superado = solo.lives > 0;
+    const enDueloEsta = solo.kind === "duel";
+    const superado = enDueloEsta ? solo.hits === total : solo.lives > 0;
     const logros = CT.Progreso.finishGame({
       mode: solo.mode, kind: solo.kind, hits: solo.hits, total,
-      difficulty: solo.difficulty || "easy", streak: records.streak || 0, lives: solo.lives
+      difficulty: solo.difficulty || "easy", streak: records.streak || 0, lives: solo.lives,
+      // Ganar un duelo solo se puede afirmar cuando hay alguien contra quien ganarlo: al
+      // crearlo todavía no hay rival, solo una marca que mandar.
+      won: enDueloEsta && !!solo.duelo?.rival && solo.hits > solo.duelo.rival.hits
     });
-    const resumen = solo.kind === "daily"
+    const resumen = solo.kind === "daily" || enDueloEsta
       ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
       : `Has colocado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} en ${CT.Ghost.level(solo.difficulty).name}. ${solo.lives > 0 ? "Has completado el mazo." : "Has agotado las tres vidas."}`;
     soloFailedForReview = (solo.failed || []).map(id => ({ id, mode: solo.mode }));
     const compartir = solo.kind === "daily" ? shareText(currentMode().name, dia, solo.hits, total, solo.sequence || [], records.streak) : null;
+    const duelo = enDueloEsta ? cierreDuelo(solo, total) : null;
     solo.finished = true;
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${superado ? "🏅" : "🎯"}</div><div class="eyebrow">${superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${resumen}</h1>${logrosMarkup(logros)}<div class="actions" style="justify-content:center">${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${duelo ? duelo.icono : superado ? "🏅" : "🎯"}</div><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${duelo ? duelo.titular : resumen}</h1>${duelo ? duelo.cuerpo : ""}${logrosMarkup(logros)}<div class="actions" style="justify-content:center">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
     lastShareText = compartir;
+  }
+
+  // El final de un duelo tiene dos caras. Si lo has creado tú, todavía no hay con quién
+  // compararse: lo que toca es mandar el enlace. Si lo has aceptado, sí hay marcador, y
+  // la gracia está en verlo carta a carta.
+  function cierreDuelo(partida, total) {
+    const mode = CT.mode(partida.mode);
+    const mio = { hits: partida.hits, sequence: partida.sequence || [] };
+    const rival = partida.duelo?.rival || null;
+    const payload = CT.Duelo.codificar({
+      mode: partida.mode, seed: partida.duelo.seed, total,
+      hits: mio.hits, sequence: mio.sequence, nombre: duelName()
+    });
+
+    if (!rival) {
+      lastDuelShare = CT.Duelo.invitacion({ modeName: mode.name, nombre: duelName(), hits: mio.hits, total, payload });
+      return {
+        icono: "🎯", eyebrow: "Duelo listo",
+        titular: `Has colocado bien <strong>${mio.hits}</strong> de ${total} cartas.`,
+        cuerpo: `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, en el mismo orden, y al terminar verá vuestro cara a cara.</p>`,
+        acciones: `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`
+      };
+    }
+
+    const gano = mio.hits > rival.hits;
+    const empate = mio.hits === rival.hits;
+    const quien = rival.nombre || "quien te retaba";
+    lastDuelShare = CT.Duelo.marcador({ modeName: mode.name, rival, mio });
+    return {
+      icono: empate ? "🤝" : gano ? "🏆" : "🎯",
+      eyebrow: empate ? "Empate" : gano ? "Has ganado el duelo" : "Duelo perdido",
+      titular: `${mio.hits} <span style="opacity:.6">a</span> ${rival.hits}`,
+      cuerpo: `<p class="lead" style="margin-inline:auto">${empate ? `Habéis acertado lo mismo que ${quien}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
+        ${duelGridMarkup(quien, rival.sequence, mio.sequence)}`,
+      acciones: `<button class="btn btn-primary" data-action="start-duel">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`
+    };
+  }
+
+  // Las dos cuadrículas, una encima de otra: se ve de un vistazo en qué cartas os habéis
+  // separado, que es lo que de verdad se comenta después.
+  function duelGridMarkup(quien, suya, mia) {
+    const fila = sec => sec.map(acierto => `<i class="${acierto ? "ok" : "ko"}" aria-hidden="true"></i>`).join("");
+    const cuenta = sec => `${sec.filter(Boolean).length} de ${sec.length}`;
+    return `<div class="duel-grid">
+      <div><b>${escapeHtml(quien)}</b><div class="duel-row" role="img" aria-label="${escapeHtml(quien)}: ${cuenta(suya)}">${fila(suya)}</div></div>
+      <div><b>Tú</b><div class="duel-row" role="img" aria-label="Tú: ${cuenta(mia)}">${fila(mia)}</div></div>
+    </div>`;
+  }
+
+  // La pantalla a la que se llega desde un enlace de duelo. Dice quién reta, con qué
+  // mazo y qué marca hay que batir —pero ninguna carta: la gracia es no saber qué sale—.
+  function duelIntro() {
+    screen = "duelo-intro";
+    const { mode, total, rival } = pendingDuel;
+    const juego = CT.mode(mode);
+    const quien = rival.nombre || "Alguien";
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+      <section class="pass-screen"><div class="panel">
+        <div class="big-icon">⚔️</div>
+        <div class="eyebrow">Duelo</div>
+        <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${escapeHtml(quien)} te reta</h1>
+        <p class="lead" style="margin-inline:auto">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)} y en el mismo orden.</p>
+        <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${rival.hits} de ${total}</b><small>la marca que hay que batir</small></span></div>
+        <div class="field" style="margin-top:16px">
+          <label for="duel-name">Tu nombre, para devolver el reto</label>
+          <input id="duel-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:12px" data-action="accept-duel">Aceptar el reto <span>→</span></button>
+        <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ahora no</button>
+      </div></section>
+    </div>`);
+  }
+
+  // Un enlace puede llegar cortado al reenviarlo, de una versión con otro mazo, o
+  // simplemente mal. Se explica qué ha pasado y se sigue: nunca una excepción ni una
+  // pantalla en blanco.
+  const DUELO_MOTIVOS = {
+    "mazo-distinto": "Este duelo se creó con una versión distinta del mazo, así que las cartas no serían las mismas. Actualizad los dos la aplicación y volved a intentarlo.",
+    version: "Este enlace es de una versión más nueva del juego. Actualiza la aplicación para poder jugarlo.",
+    mazo: "El enlace menciona un mazo que este juego no tiene.",
+    roto: "El enlace está incompleto o se ha estropeado por el camino. Pide que te lo manden otra vez, entero."
+  };
+
+  function duelInvalido(motivo) {
+    screen = "duelo-invalido";
+    paint(`<div class="shell">${header()}
+      <section class="pass-screen"><div class="panel">
+        <div class="big-icon">🔗</div>
+        <div class="eyebrow">Duelo</div>
+        <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.8rem)">Este enlace no vale</h1>
+        <p class="lead" style="margin-inline:auto">${DUELO_MOTIVOS[motivo] || DUELO_MOTIVOS.roto}</p>
+        <button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>
+      </div></section>
+    </div>`);
+  }
+
+  // Aceptar el reto: se cambia al mazo del duelo —puede no ser el que tuvieras abierto—
+  // y se reparte con su semilla, que es lo que hace que salgan las mismas cartas.
+  function acceptDuel() {
+    if (!pendingDuel) return home();
+    guardaNombreSiLoHay();
+    const duelo = pendingDuel;
+    pendingDuel = null;
+    if (duelo.mode !== selectedModeKey) setMode(duelo.mode);
+    startSolo("duel", duelo);
   }
 
   // Un resumen al estilo Wordle: cuenta el resultado sin revelar ninguna carta, así que
@@ -1198,14 +1347,16 @@
     return `Continuum · ${modeName} · reto diario ${fecha}\n📊 ${hits}/${total}${rachaLinea}\n${grid}`;
   }
 
-  async function shareDaily() {
-    if (!lastShareText) return;
+  // Compartir de verdad si el móvil sabe —el menú del sistema, con WhatsApp y demás— y
+  // copiar al portapapeles si no. Lo usan el reto diario y el duelo por igual.
+  async function compartir(texto, aviso) {
+    if (!texto) return;
     if (navigator.share) {
-      try { await navigator.share({ text: lastShareText }); return; } catch { /* cancelado, se intenta copiar */ }
+      try { await navigator.share({ text: texto }); return; } catch { /* cancelado, se intenta copiar */ }
     }
     try {
-      await navigator.clipboard.writeText(lastShareText);
-      showToast("Resultado copiado");
+      await navigator.clipboard.writeText(texto);
+      showToast(aviso);
     } catch {
       showToast("No se pudo compartir");
     }
@@ -1234,6 +1385,7 @@
 
   function soloLabel() {
     if (solo.kind === "daily") return "Reto diario";
+    if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${solo.duelo.rival.nombre || "quien te reta"}` : "Duelo · tu tirada";
     if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
     return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
   }
@@ -1437,6 +1589,14 @@
     else if (action === "solo") soloHome();
     else if (action === "start-daily") startSolo("daily");
     else if (action === "start-free") startSolo("free");
+    // Vale tanto para estrenar un duelo como para devolver uno recién jugado: en los dos
+    // casos es una semilla nueva, así que nadie repite cartas que ya conoce.
+    // El campo del nombre solo está donde se pide. Al devolver un reto desde el cara a
+    // cara no lo hay, y guardar lo que devuelve un elemento inexistente borraría el
+    // nombre que ya tenías puesto.
+    else if (action === "start-duel") { guardaNombreSiLoHay(); startSolo("duel"); }
+    else if (action === "accept-duel") acceptDuel();
+    else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
     else if (action === "resume-solo") { solo = loadSolo(); pendingIndex = null; if (!solo) soloHome(); else if (solo.pendingResult) { result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true }; soloResult(); } else { result = null; soloView(); } }
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
@@ -1451,7 +1611,7 @@
     else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
     else if (action === "review-game") reviewScreen((game.failed || []).map(id => ({ id, mode: game.mode })), `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
     else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
-    else if (action === "share-daily") shareDaily();
+    else if (action === "share-daily") compartir(lastShareText, "Resultado copiado");
     else if (action === "review-comp") reviewScreen(comp.totalFailed, `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
@@ -1492,7 +1652,15 @@
       location.reload();
     });
   }
-  const invitedRoom = new URLSearchParams(location.search).get("room") || "";
+  // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
+  // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
+  const params = new URLSearchParams(location.search);
+  const invitedRoom = params.get("room") || "";
+  const duelPayload = params.get("duelo") || "";
   if (invitedRoom) launchOnline(invitedRoom);
-  else home();
+  else if (duelPayload) {
+    const leido = CT.Duelo.descodificar(duelPayload);
+    if (leido.ok) { pendingDuel = leido.duelo; duelIntro(); }
+    else duelInvalido(leido.motivo);
+  } else home();
 })();
