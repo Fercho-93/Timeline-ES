@@ -104,14 +104,14 @@ button { touch-action: manipulation; color: inherit; }
 .section-enter > * { animation: section-in 240ms var(--ease-out) both; }
 @keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
 .shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
-/* `flex-start`, no `center`: cuando las acciones envuelven a una segunda fila, la marca
-   debe quedar a la altura de la primera, no centrada respecto al bloque entero. */
+/* `flex-start`, no `center`: si alguna vez las acciones llegan a envolver, la marca queda
+   a la altura de la primera fila y no centrada respecto al bloque entero. */
 .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
-/* Hasta tres botones caben en una fila en la mayoría de móviles, pero una etiqueta larga
-   («Enciclopedia») o una marca visible al lado ya no. En vez de recortarse fuera de
-   pantalla, el bloque de acciones se encoge primero y, si aun así no cabe, envuelve sus
-   propios botones en una segunda fila pegada a la derecha. */
-.topbar-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; row-gap: 6px; min-width: 0; }
+/* `margin-left: auto` y no el `space-between` del contenedor: así las acciones siguen
+   pegadas a la derecha aunque el nombre no esté (en móvil se oculta, más abajo).
+   `flex-wrap` es solo una red de seguridad para tamaños de letra enormes del sistema:
+   con los tres botones más largos del juego ya no llega a activarse. */
+.topbar-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; row-gap: 6px; min-width: 0; margin-left: auto; }
 .brand { display: flex; align-items: center; min-height: 44px; gap: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
 /* 44 px es lo que necesita un dedo. Los botones pequeños llegaban a 36 y a 29, y son
    justo los que más se usan: el de la esquina en cada pantalla de partida. */
@@ -188,6 +188,15 @@ button { touch-action: manipulation; color: inherit; }
 .play-choice > i { font-size: 1.1rem; font-style: normal; color: var(--accent); transition: transform .18s ease; }
 .play-choice.primary > i { color: var(--ink-solid-contrast); }
 .play-choice:active { transform: translateY(0) scale(.985); }
+/* La enciclopedia repite la anatomía de un formato —icono, texto, flecha— pero no su
+   peso: es una consulta del mazo, no una manera de jugar, así que va sin relleno y con
+   el borde punteado, para que se lea como lo que es sin competir con los tres de arriba. */
+.deck-browse { width: 100%; min-height: 64px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; margin-top: 9px; padding: 11px 12px; border: 1px dashed var(--line); border-radius: 13px; color: var(--ink); background: transparent; text-align: left; cursor: pointer; transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease; }
+.deck-browse b, .deck-browse small { display: block; }
+.deck-browse b { font-size: .93rem; }
+.deck-browse small { margin-top: 3px; color: var(--muted); font-size: .75rem; line-height: 1.25; }
+.deck-browse > i { font-size: 1.1rem; font-style: normal; color: var(--accent); transition: transform .18s ease; }
+.deck-browse:active { transform: scale(.985); }
 .continue-choice { min-height: 44px; border: 0; padding: 7px 3px 0; color: var(--accent); background: transparent; font-size: .8rem; font-weight: 700; text-align: left; cursor: pointer; }
 .continue-choice span { margin-left: 5px; }
 
@@ -223,6 +232,8 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
   .play-choice.primary:hover { background: var(--ink-solid); filter: brightness(.92); }
   .play-choice:hover > i { transform: translateX(3px); }
   .play-choice:active { transform: scale(.985); }
+  .deck-browse:hover { border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); background: var(--paper); }
+  .deck-browse:hover > i { transform: translateX(3px); }
   .btn-primary:not(:disabled):hover { filter: brightness(.92); }
   .btn-secondary:not(:disabled):hover { background: var(--paper); }
 }
@@ -612,6 +623,16 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
    Los lomos de 62 px dejaban apenas 104 px para el panel abierto en escritorio. */
 @media (min-width: 1000px) {
   .hero { grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr); }
+}
+
+/* En un móvil, el nombre del juego en la barra compite con los botones por el mismo
+   ancho y siempre gana él: son 150 px para repetir dónde estás. Dentro de la aplicación
+   es decoración —la portada ya lo enseña en grande— así que en pantallas estrechas la
+   barra se queda solo con sus acciones, en una fila y sin recortes. */
+@media (max-width: 560px) {
+  .topbar .brand { display: none; }
+  .topbar-actions { gap: 6px; }
+  .icon-btn { padding: 9px 13px; font-size: .8rem; }
 }
 
 @media (max-width: 420px) {

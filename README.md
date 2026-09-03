@@ -104,7 +104,8 @@ que nadie aprenda de él.
 
 ## Enciclopedia
 
-Un botón en la portada abre cualquier mazo fuera de partida: todas sus cartas, ya con el
+Al elegir un mazo, debajo de los formatos de juego, «Enciclopedia» lo abre fuera de partida:
+todas sus cartas, ya con el
 valor revelado, ordenadas por el eje del juego y con su explicación completa. Se puede
 buscar por título, explicación o fuente —sin distinguir tildes ni mayúsculas— y filtrar por
 época o magnitud. Las cartas de Peso, Longevidad, Velocidad y Superficie que llevan una

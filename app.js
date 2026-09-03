@@ -170,6 +170,7 @@
     const common = 'viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
     if (kind === "local") return `<svg ${common}><rect x="7" y="2.75" width="10" height="18.5" rx="2.2"></rect><path d="M10.5 18h3"></path></svg>`;
     if (kind === "online") return `<svg ${common}><rect x="3" y="6" width="10" height="15" rx="2"></rect><rect x="11" y="2.75" width="10" height="15" rx="2"></rect><path d="M14 14.75h4"></path></svg>`;
+    if (kind === "deck") return `<svg ${common}><path d="M12 6.6C10.4 5.3 8.5 4.7 6 4.7v12.9c2.5 0 4.4.6 6 1.9 1.6-1.3 3.5-1.9 6-1.9V4.7c-2.5 0-4.4.6-6 1.9Z"></path><path d="M12 6.6v12.9"></path></svg>`;
     return `<svg ${common}><circle cx="12" cy="8" r="3.25"></circle><path d="M5.5 21c.8-4.05 3.05-6 6.5-6s5.7 1.95 6.5 6"></path></svg>`;
   }
 
@@ -180,6 +181,19 @@
       <button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>
       ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}
     </div></section>`;
+  }
+
+  // Consultar el mazo no es una forma de jugar, así que no comparte fila con los
+  // formatos ni se cuela como un botón más de la cabecera: va debajo, con sitio para
+  // decir de cuántas cartas habla. Sin artículo delante del recuento: `cardLabel`
+  // cambia de género según el mazo («hechos», «películas», «pares»).
+  function deckBrowse() {
+    const mode = currentMode();
+    return `<button class="deck-browse" data-action="enciclopedia">
+      <span class="choice-icon">${playIcon("deck")}</span>
+      <span><b>Enciclopedia</b><small>Consulta sus ${mode.cards.length} ${escapeHtml(mode.cardLabel)}, con su valor y su explicación.</small></span>
+      <i aria-hidden="true">→</i>
+    </button>`;
   }
 
   function competitionPromo() {
@@ -224,9 +238,9 @@
     const resume = game && game.mode === selectedModeKey;
     const block = CT.block(selectedBlockKey);
     const art = BLOCK_ART[block.art];
-    paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="enciclopedia">Enciclopedia</button><button class="icon-btn" data-action="collection-back">Volver</button>')}
+    paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="collection-back">Volver</button>')}
       <section class="mode-masthead"><img src="assets/${art.archivo}-700.webp" alt="" width="700" height="${art.alto[700]}" decoding="async"><div><div class="eyebrow">${block.name}</div><h1 data-focus tabindex="-1">${currentMode().name}</h1><p>${currentMode().blurb}</p></div></section>
-      <section class="home-play">${playChoices(resume)}${competitionPromo()}</section>
+      <section class="home-play">${playChoices(resume)}${deckBrowse()}${competitionPromo()}</section>
     </div>`);
     window.scrollTo(0, 0);
   }
@@ -666,7 +680,7 @@
     const mode = CT.mode(encMode);
     const bands = CT.Enciclopedia.bands(encMode);
     const cards = CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
       <section class="setup-section enc-section">
         <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
         <h1 data-focus tabindex="-1">${escapeHtml(mode.name)}</h1>
