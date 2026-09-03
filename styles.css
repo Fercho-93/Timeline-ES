@@ -977,13 +977,17 @@ body::before {
 .animal-hand-card strong,
 .animal-hand-card .card-arrow { text-shadow: 0 2px 6px #160d05; }
 .animal-hand-card strong { max-width: 11ch; margin-top: 66px; font-size: 1.28rem; }
-.animal-timeline-card .card-visual { height: 112px; padding: 0; background: #8a6031; }
+.animal-timeline-card .card-visual { height: 150px; padding: 0; background: #d7b676; }
+.animal-timeline-card .animal-card-art {
+  object-fit: contain;
+  background: linear-gradient(90deg, #d7b676, #efd59f 50%, #d7b676);
+}
 .animal-timeline-card .card-content { position: relative; }
 .animal-timeline-card .year { display: inline-block; margin-top: -18px; position: relative; padding: 6px 10px; border: 1px solid rgba(126,82,34,.5); border-radius: 3px; background: #f4ddb0; box-shadow: 0 2px 5px rgba(62,35,12,.18); }
-.review-grid .animal-timeline-card .card-visual { height: 76px; }
+.review-grid .animal-timeline-card .card-visual { height: 110px; }
 @media (max-width: 620px) {
   .animal-hand-card { min-height: 190px; }
-  .animal-timeline-card .card-visual { height: 86px; }
+  .animal-timeline-card .card-visual { height: 120px; }
 }
 .slot, .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: rgba(235,204,146,.64); }
 .overlay { background: rgba(47,29,14,.68); backdrop-filter: blur(6px) sepia(.2); }
@@ -1029,4 +1033,3 @@ body::before {
 }
 :root[data-theme="dark"] body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
 :root[data-theme="dark"] .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
-

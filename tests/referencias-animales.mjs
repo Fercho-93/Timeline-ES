@@ -53,5 +53,18 @@ play(13007, 13014, 0, true);
 play(13007, 13014, 1, true);
 play(13021, 13020, 0, false);
 play(13021, 13020, 1, true);
+
+const appSource = read("app.js");
+const animalMapBlock = (appSource.match(/const ANIMAL_ART_BY_ID = \{([\s\S]*?)\};/) || [])[1] || "";
+const artById = new Map([...animalMapBlock.matchAll(/(\d+): "([^"]+)"/g)].map(match => [Number(match[1]), match[2]]));
+const weightCardIds = [...read("animals.js").matchAll(/\{\s*id:\s*(\d+),/g)].map(match => Number(match[1]));
+check("cada carta de peso tiene una ilustración propia", weightCardIds.every(id => artById.has(id)));
+check("no hay ilustraciones asignadas a cartas inexistentes", [...artById.keys()].every(id => weightCardIds.includes(id)));
+check("cada carta usa un archivo WebP existente", weightCardIds.every(id => fs.existsSync(path.join(root, "assets", "animal-cards", `${artById.get(id)}.webp`))));
+check("las ilustraciones móviles no superan 100 KB", weightCardIds.every(id => fs.statSync(path.join(root, "assets", "animal-cards", `${artById.get(id)}.webp`)).size <= 100_000));
+const styles = read("styles.css");
+const placedAnimalArt = (styles.match(/\.animal-timeline-card \.animal-card-art\s*\{([\s\S]*?)\}/) || [])[1] || "";
+check("la carta colocada muestra el animal completo", /object-fit:\s*contain/.test(placedAnimalArt));
+
 console.log(`\n${failures} fallos`);
 process.exit(failures ? 1 : 0);
