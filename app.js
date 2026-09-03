@@ -86,11 +86,11 @@
 
   // Las láminas no contienen cifras, por lo que pueden verse en la mano sin revelar el
   // peso que hay que ordenar.
-  function animalArt(card, extraClass = "") {
+  function animalArt(card) {
     if (selectedModeKey !== "animals") return "";
     const plate = ANIMAL_ART_BY_ID[card.id];
     if (!plate) return "";
-    return `<img class="animal-card-art${extraClass ? ` ${extraClass}` : ""}" src="assets/animal-cards/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
+    return `<img class="animal-card-art" src="assets/animal-cards/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
   function saveGame() {
@@ -414,7 +414,7 @@
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
     const animal = selectedModeKey === "animals";
-    return `<article class="timeline-card ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}">${animal ? `${animalArt(card, "animal-card-backdrop")}${animalArt(card)}` : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+    return `<article class="timeline-card ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
   }
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la

@@ -64,8 +64,9 @@ check("cada carta usa un archivo WebP existente", weightCardIds.every(id => fs.e
 check("las ilustraciones móviles no superan 100 KB", weightCardIds.every(id => fs.statSync(path.join(root, "assets", "animal-cards", `${artById.get(id)}.webp`)).size <= 100_000));
 const styles = read("styles.css");
 const placedAnimalArt = (styles.match(/\.animal-timeline-card \.animal-card-art\s*\{([\s\S]*?)\}/) || [])[1] || "";
-check("la carta colocada muestra el animal completo", /object-fit:\s*contain/.test(placedAnimalArt));
-check("la carta colocada rellena los laterales sin franjas blancas", /animal-card-backdrop/.test(read("app.js")) && /object-fit:\s*cover/.test((styles.match(/\.animal-timeline-card \.animal-card-backdrop\s*\{([\s\S]*?)\}/) || [])[1] || ""));
+const embeddedAnimalCard = (styles.match(/\.timeline \.animal-timeline-card \.card-visual\s*\{([\s\S]*?)\}/) || [])[1] || "";
+check("la ilustración cubre la carta sin franjas ni bordes interiores", /object-fit:\s*cover/.test(placedAnimalArt));
+check("la ilustración colocada queda incrustada en toda la carta", /position:\s*absolute/.test(embeddedAnimalCard) && /inset:\s*0/.test(embeddedAnimalCard));
 
 console.log(`\n${failures} fallos`);
 process.exit(failures ? 1 : 0);
