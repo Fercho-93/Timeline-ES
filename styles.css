@@ -874,6 +874,49 @@ body::before {
 
 .play-menu-shell .brand { visibility: visible; }
 .play-menu-shell { padding-bottom: max(34px, env(safe-area-inset-bottom)); }
+/* En móvil la marca y las acciones dejan de disputarse una sola línea. Los botones
+   forman una barra compacta debajo: conservan el texto y el área táctil de 44 px,
+   pero ninguna acción queda cortada ni obliga a desplazar la página. */
+@media (max-width: 620px) {
+  .topbar {
+    min-height: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 9px;
+    padding-bottom: 12px;
+  }
+  .topbar .brand {
+    justify-content: center;
+    font-size: .78rem;
+    letter-spacing: .2em;
+  }
+  .topbar-actions {
+    max-width: 100%;
+    justify-content: center;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid rgba(128,81,34,.38);
+    border-radius: 12px;
+    background: rgba(238,207,148,.58);
+    box-shadow: inset 0 1px rgba(255,246,213,.45), 0 4px 12px rgba(75,43,15,.1);
+  }
+  .topbar-actions .icon-btn {
+    min-width: 0;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 8px;
+    white-space: nowrap;
+    background: transparent;
+    box-shadow: none;
+    font-size: .78rem;
+  }
+  .topbar-actions .icon-btn:active { background: rgba(126,75,30,.12); }
+  .topbar-actions .icon-btn:focus-visible {
+    background: rgba(255,239,201,.5);
+    outline-offset: -2px;
+  }
+  .home-shell:not(.play-menu-shell) .brand { display: none; }
+}
 .mode-masthead { position: relative; min-height: 210px; display: grid; align-items: end; overflow: hidden; margin: 4px 0 25px; padding: 22px; border: 1px solid rgba(130,81,35,.5); border-radius: 10px; color: #fff0ce; background: #57331c; box-shadow: var(--shadow-soft); isolation: isolate; }
 .mode-masthead::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(40,23,10,.86), rgba(40,23,10,.26)); }
 .mode-masthead img { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: sepia(.62) saturate(.75); }
