@@ -69,55 +69,9 @@
 
   // Cada carta de peso, longevidad y velocidad tiene una lámina propia. Se enlazan por ID para que un
   // retoque del título o del valor no pueda cambiar por accidente la ilustración.
-  const ANIMAL_ART_BY_ID = {
-    10001: "bee", 10002: "monarch-butterfly", 10003: "mantis", 10004: "green-tree-frog",
-    10005: "house-mouse", 10007: "rock-pigeon", 10008: "guinea-pig", 10009: "european-hare",
-    10010: "cat", 10011: "fox", 10012: "european-beaver", 10013: "iberian-lynx",
-    10014: "great-dane", 10015: "gray-wolf", 10016: "capybara", 10017: "chimpanzee",
-    10018: "giant-panda", 10019: "american-black-bear", 10020: "lion", 10021: "bengal-tiger",
-    10022: "grevys-zebra", 10023: "domestic-horse", 10024: "alaska-moose", 10025: "american-bison",
-    10026: "giraffe", 10027: "common-hippopotamus", 10028: "white-rhinoceros",
-    10029: "southern-elephant-seal", 10030: "elephant", 10031: "whale-shark", 10032: "orca",
-    10034: "humpback-whale", 10035: "sperm-whale", 10038: "blue-whale", 10039: "octopus",
-    10040: "flamingo", 10041: "penguin", 10042: "kangaroo", 10043: "nile-crocodile",
-    10044: "polar-bear", 10045: "dromedary-camel",
-    12001: "dolania-mayfly", 12002: "domestic-horse", 12003: "common-mosquito",
-    12004: "fruit-fly", 12005: "bee", 12006: "monarch-butterfly", 12007: "house-mouse",
-    12008: "brown-rat", 12009: "domestic-hamster", 12010: "domestic-gerbil",
-    12011: "guinea-pig", 12012: "european-rabbit", 12013: "european-hedgehog",
-    12014: "red-squirrel", 12015: "fox", 12016: "domestic-dog", 12017: "cat",
-    12018: "iberian-lynx", 12019: "komodo-dragon", 12020: "harpy-eagle",
-    12021: "american-bison", 12022: "common-hippopotamus", 12023: "elephant",
-    12024: "blue-whale", 12025: "galapagos-giant-tortoise", 12026: "scarlet-macaw",
-    12027: "japanese-koi", 12028: "bowhead-whale", 12029: "greenland-shark",
-    12030: "ocean-quahog", 12031: "black-coral", 12032: "red-sea-urchin",
-    12033: "jonathan-tortoise", 12034: "freshwater-pearl-mussel",
-    12035: "cookie-cockatoo", 12036: "gold-coral", 12037: "monorhaphis-chuni",
-    12038: "giant-barrel-sponge",
-    13001: "tiger-beetle", 13002: "ghost-crab", 13003: "sunflower-sea-star",
-    13004: "galapagos-giant-tortoise", 13005: "three-toed-sloth", 13006: "dwarf-seahorse",
-    13007: "koala", 13008: "black-mamba", 13009: "gentoo-penguin", 13010: "florida-manatee",
-    13011: "hermit-crab", 13012: "solifuge", 13013: "australian-dragonfly", 13014: "polar-bear",
-    13015: "common-hippopotamus", 13016: "elephant", 13017: "giraffe", 13018: "emu",
-    13019: "spiny-tailed-iguana", 13020: "ostrich", 13021: "reindeer", 13022: "blue-wildebeest",
-    13023: "american-pronghorn", 13024: "cheetah", 13025: "henslow-swimming-crab",
-    13026: "brazilian-free-tailed-bat", 13027: "golden-eagle", 13028: "gyrfalcon",
-    13029: "common-swift", 13030: "peregrine-falcon", 13031: "saharan-silver-ant",
-    13032: "common-limpet", 13033: "california-sea-lion", 13034: "grevys-zebra",
-    13035: "moroccan-flic-flac-spider", 13036: "european-mole",
-    13037: "american-cockroach", 13038: "bee"
-  };
-
-  function usesAnimalArt() { return ["animals", "lifespan", "speed"].includes(selectedModeKey); }
-
-  // Las láminas no contienen cifras, por lo que pueden verse en la mano sin revelar el
-  // peso, la longevidad o la velocidad que hay que ordenar.
-  function animalArt(card) {
-    if (!usesAnimalArt()) return "";
-    const plate = ANIMAL_ART_BY_ID[card.id];
-    if (!plate) return "";
-    return `<img class="animal-card-art" src="assets/animal-cards/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
-  }
+  // La tabla de láminas vive en modes.js, compartida con online.js.
+  function usesAnimalArt() { return CT.usesAnimalArt(selectedModeKey); }
+  function animalArt(card) { return CT.animalArt(selectedModeKey, card); }
 
   function saveGame() {
     if (game) localStorage.setItem(storageKey(), JSON.stringify(game));

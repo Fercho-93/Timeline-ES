@@ -52,6 +52,11 @@ function eraForCard(card) { return CT.eraForCard(modeKey(), card); }
 
 function modeCards(key = modeKey()) { return CT.cards(key); }
 
+// Igual que en el juego local: las láminas de animales no llevan cifras, así que pueden
+// verse en la mano sin revelar el dato que hay que ordenar.
+function usesAnimalArt() { return CT.usesAnimalArt(modeKey()); }
+function animalArt(card) { return CT.animalArt(modeKey(), card); }
+
 // Un mapa por modalidad, no uno solo: la modalidad puede cambiar entre partidas (aunque
 // nunca a mitad de una) y cada mazo conserva sus propios identificadores. Se construye la
 // primera vez que se pide y se reutiliza después, en vez de recorrer el mazo entero —hasta
@@ -483,7 +488,8 @@ function renderGame() {
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
-      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      const animal = usesAnimalArt();
+      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="room">Sala</button>')}
@@ -495,8 +501,8 @@ function renderGame() {
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     <section><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} cartas</small></div>${CT.timelineMap(modeKey(), timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     ${pulsing
-      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTargetName)}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}"><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una") : `${escapeHtml(currentPlayer.name)} está resolviendo su Pulso…`}</p></section>`
-      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTargetName)}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una") : `${escapeHtml(currentPlayer.name)} está resolviendo su Pulso…`}</p></section>`
+      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}>${animalArt(card)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, user.uid, roomState.timeline.length, me.hand.length, 'data-online-action="ghost-use"', myTurn) : ""}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
     ${!pulsing && roomState.phase !== "reveal" ? CT.Powers.pulsePower(roomState.pulsePower, user.uid, me.hand.length, 'data-online-action="pulse-open"', myTurn && !roomState.ghost?.fresh && roomState.deck.length + roomState.discard.length > 0 && pulseTargetUids().length > 0) : ""}
