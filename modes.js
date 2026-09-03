@@ -456,7 +456,7 @@
     const pulseGuide = shared ? `<section class="guide-section"><h3>⚡ Carta Pulso ${pulse ? "activa" : "opcional"}</h3><p>${pulse ? "El mazo esconde de 1 a 3 Pulsos según los jugadores, con el mismo reparto 50/50 que Fantasma." : `${beforeStart} en el casillero «Cartas Pulso» antes de empezar.`} Si la encuentras, se guarda en privado fuera de la mano y puedes lanzarla cuando te convenga. Necesitas al menos dos cartas y eliges a otra persona. El mazo saca una carta que no eliges: si aciertas, le pasas una carta tuya al azar; si fallas, robas tú una. Quien recibe carta queda protegido hasta la siguiente ronda.</p></section>` : "";
     const ghostGuide = shared ? `<section class="guide-section"><h3>◌ Carta Fantasma ${ghost ? "activa" : "opcional"}</h3><p>${ghost ? "El mazo incluye 1 Fantasma con 2–3 jugadores, 2 con 4–6 y 3 con 7–9." : `${beforeStart} en el casillero «Cartas Fantasma» antes de empezar: el mazo incluirá de 1 a 3 Fantasmas según los jugadores, con el mismo reparto que si estuviera activa por defecto.`} Puede acompañar una carta del reparto o de un robo, sin sustituir la penalización. Cada uno se sortea al 50 % entre las primeras 12 cartas por jugador y al 50 % entre todo el mazo; puede quedar al final sin descubrirse. Se guarda en privado, aparte de la mano y de su contador: no cuenta para ganar y cada persona puede usarlo una vez. Si encuentras otro, se recoloca al azar entre las cartas pendientes sin Fantasma; si no queda sitio, se consume sin otro uso. Con cinco cartas en el tablero, actívala antes de colocar en tu turno. Todos jugáis sin valores durante una vuelta, incluido quien la activa. Al resolver se enseña solo el valor de la carta jugada. No se acumulan Fantasmas: entre dos debe pasar una vuelta con valores visibles. No puedes activar Fantasma y lanzar Pulso en el mismo turno.</p></section>` : `<section class="guide-section"><h3>Dificultad</h3><p>Fácil: valores visibles, sin cartas automáticas. Normal: una carta automática por turno. Difícil: dos y turnos Fantasma ocasionales. Experto: dos y tablero siempre oculto. Las incorporaciones automáticas van en su sitio correcto, no dan puntos y nunca consumen la siguiente carta que debes jugar. Los valores se enseñan al resolver tu carta. La partida libre guarda una marca por dificultad. El reto diario mantiene Fácil y las mismas quince cartas para todos.</p></section>`;
     const contextGuide = context === "solo"
-      ? `<section class="guide-section"><h3>Jugar en solitario</h3><p>Tienes tres vidas: cada fallo consume una. El reto diario propone las mismas 15 cartas a todo el mundo y solo admite un intento al día; puedes compartir el resultado sin revelar cartas. La partida libre usa todo el mazo, guarda tu mejor marca y se puede continuar más tarde. Al final, «Ver lo que se falló» permite repasarlas.</p></section>`
+      ? `<section class="guide-section"><h3>Jugar en solitario</h3><p>Tienes tres vidas: cada fallo consume una. El reto diario propone las mismas 15 cartas a todo el mundo y solo admite un intento al día; puedes compartir el resultado sin revelar cartas. La partida libre usa todo el mazo, guarda tu mejor marca y se puede continuar más tarde. Al final, «Ver lo que se falló» permite repasarlas.</p></section><section class="guide-section"><h3>⚔️ Duelo por enlace</h3><p>Juegas 15 cartas al azar de este mazo y mandas un enlace. Quien lo abra recibe exactamente esas mismas cartas, en el mismo orden, y al terminar ve el cara a cara. El duelo no gasta vidas: los dos jugáis las quince, porque si a uno se le acabaran antes se estarían comparando cosas distintas. No hace falta cuenta ni conexión: todo lo necesario viaja dentro del propio enlace, junto con una huella del mazo que impide jugar el duelo si los dos móviles llevan versiones distintas del juego.</p><p>Es un duelo entre amigos, no una competición arbitrada: el enlace es legible y la marca de quien reta la afirma su propio móvil. Nadie la comprueba.</p></section>`
       : context === "competition"
         ? `<section class="guide-section"><h3>🏆 Competición</h3><p>Juegas cinco cartas de cada tema en un orden al azar, sin repetir temas. Cada ronda empieza con tres vidas nuevas y los aciertos se acumulan. La competición no se guarda si sales o cierras la aplicación a mitad.</p></section>`
         : context === "online"
@@ -482,12 +482,45 @@
     return copy;
   }
 
+  // Barajar con semilla: dos móviles que parten del mismo texto reciben exactamente las
+  // mismas cartas en el mismo orden, sin hablar entre ellos y sin servidor. Es lo que
+  // sostiene el reto diario —la semilla es la fecha— y el duelo por enlace, donde la
+  // semilla viaja dentro del propio enlace.
+  function seedFrom(text) {
+    let seed = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      seed ^= text.charCodeAt(i);
+      seed = Math.imul(seed, 16777619);
+    }
+    return seed >>> 0;
+  }
+
+  function seededRandom(seed) {
+    let state = seed;
+    return () => {
+      state |= 0;
+      state = (state + 0x6d2b79f5) | 0;
+      let value = Math.imul(state ^ (state >>> 15), 1 | state);
+      value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
+      return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffleWith(items, random) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
   window.CONTINUUM = {
     MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK,
     has, mode, axis, cards,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
     correctIndex, placementHint, guideMarkup,
-    escapeHtml, initials, shuffle
+    escapeHtml, initials, shuffle, seedFrom, seededRandom, shuffleWith
   };
 })();

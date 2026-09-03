@@ -600,6 +600,16 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .logro-bar i { display: block; height: 100%; background: var(--accent); }
 .logro-progress { margin-top: 4px; font-variant-numeric: tabular-nums; }
 
+/* El cara a cara de un duelo: las dos tiradas una encima de otra, carta a carta. Un
+   número dice quién ganó; esto dice dónde os separasteis, que es lo que se comenta luego.
+   El acierto y el fallo no se distinguen solo por el color: el fallo va hueco. */
+.duel-grid { display: grid; gap: 12px; max-width: 380px; margin: 18px auto 6px; text-align: left; }
+.duel-grid b { display: block; margin-bottom: 5px; font-size: .82rem; }
+.duel-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.duel-row i { width: 15px; height: 15px; border-radius: 3px; border: 1px solid var(--accent); }
+.duel-row i.ok { background: var(--accent); }
+.duel-row i.ko { background: transparent; opacity: .45; }
+
 /* Los logros recién desbloqueados, en la pantalla de fin de partida: se enseñan una vez
    y en el sitio donde ya se está mirando el resultado. */
 .logros-nuevos { display: grid; gap: 8px; justify-items: center; max-width: 380px; margin: 0 auto 18px; }

@@ -114,6 +114,33 @@ partida también lleva a su ficha en la enciclopedia, ya con esa carta destacada
 en ninguna pantalla de partida: vería el mazo entero y volvería trivial cualquier jugada
 pendiente.
 
+## Duelo por enlace
+
+Un formato más dentro de «Jugar en solitario». Juegas 15 cartas al azar del mazo abierto y
+mandas un enlace: quien lo abra recibe exactamente esas mismas cartas, en el mismo orden, y
+al terminar ve el cara a cara —el marcador y las dos tiradas carta a carta— con un botón
+para devolver el reto con semilla nueva.
+
+Sin servidor, sin cuentas y sin que los dos móviles tengan que estar encendidos a la vez.
+Se apoya en lo mismo que el reto diario: dos móviles que barajan con la misma semilla
+reciben las mismas cartas. Allí la semilla es la fecha; aquí viaja dentro del enlace, junto
+con el mazo, el número de cartas, la marca de quien reta y su cuadrícula de aciertos, todo
+en base64url. Por eso un duelo funciona con la aplicación instalada y sin conexión.
+
+El duelo no gasta vidas: las dos partes juegan las quince de principio a fin. Si a una se le
+acabaran a la séptima, el marcador estaría comparando siete cartas contra quince.
+
+El enlace lleva una **huella del mazo** —su número de cartas y un hash de sus
+identificadores en orden—. No es opcional: si los dos móviles llevan versiones distintas de
+la aplicación, el mazo puede haber cambiado y la misma semilla repartiría cartas distintas.
+El duelo parecería ir bien y estaría comparando dos partidas que no son la misma, sin que
+nadie se enterara. Si la huella no cuadra se avisa y no se reparte. Un enlace cortado,
+manipulado o de una versión más nueva se rechaza con una explicación, nunca con un error.
+
+Es un duelo entre amigos, no una competición arbitrada: el enlace es legible y la marca de
+quien reta la afirma su propio móvil. Se dice así en la Guía, con la misma franqueza con que
+`firestore.rules` reconoce que el servidor no puede validar una colocación.
+
 ## Perfil, estadísticas y logros
 
 «Perfil», en la barra de la portada, reúne lo que hasta ahora no se veía: partidas jugadas,
@@ -122,7 +149,7 @@ debajo, una fila por mazo jugado y dos listas de puntos débiles —los tramos d
 falla y las cartas que más se atragantan—, cada una enlazando a la enciclopedia del mazo
 correspondiente, ya filtrada o con la carta destacada.
 
-Los dieciséis logros van en cuatro grupos (Constancia, Puntería, Recorrido y Oficio). Los que
+Los diecisiete logros van en cuatro grupos (Constancia, Puntería, Recorrido y Oficio). Los que
 piden repetición enseñan cuánto llevas; los demás, solo si están o no. Se comprueban al
 resolver una carta o al terminar una partida, nunca al repintar, así que ninguno se
 desbloquea dos veces. Los que caen a mitad de partida se avisan y ya está; los de una
@@ -135,7 +162,8 @@ perfil en JSON y recuperarlo en otro, y borrarlo entero previa confirmación.
 
 Dos cosas se cuentan con cuidado. En una partida a un solo móvil gana alguien de la mesa,
 pero el juego no sabe quién sostiene el teléfono: esa partida se cuenta como jugada, no como
-ganada. Y en una sala cada móvil registra solo sus propias cartas, descartando las
+ganada. Solo una sala y un duelo apuntan una victoria como tuya, porque son los dos formatos
+con una marca ajena identificable enfrente. Y en una sala cada móvil registra solo sus propias cartas, descartando las
 instantáneas de Firestore que ya vio —se recuerdan las últimas cuarenta por `CÓDIGO:versión`—
 para que una reconexión o una instantánea que llega desordenada no sume dos veces.
 
@@ -282,12 +310,12 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene dieciocho comprobaciones automáticas: catorce que corren en cualquier
+`tests/` contiene diecinueve comprobaciones automáticas: quince que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
-los animales, la marca, el service worker, la enciclopedia, el perfil y la accesibilidad con
-teclado y lector de pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
+los animales, la marca, el service worker, la enciclopedia, el perfil, el duelo por enlace y
+la accesibilidad con teclado y lector de pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 
