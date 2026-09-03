@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "CONTINUUM: juego instalable de historia, entretenimiento, ciencia y geografía, con modo local y multijugador.",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "test": "node tests/sintaxis.mjs && node tests/marca.mjs && node tests/referencias-animales.mjs && node tests/partida-local.mjs && node tests/partidas-al-azar.mjs && node tests/service-worker.mjs && node tests/mazos.mjs && node tests/solitario.mjs && node tests/pulso.mjs && node tests/accesibilidad.mjs && node tests/movimiento.mjs && node tests/fantasma.mjs && node tests/enciclopedia.mjs && node tests/progreso.mjs && node tests/duelo.mjs && node tests/actualizar.mjs",

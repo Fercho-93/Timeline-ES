@@ -1,0 +1,34 @@
+Copyright (c) 2026 [Tu nombre o el nombre de tu estudio — sustituye este texto]
+
+Todos los derechos reservados.
+
+El código fuente de este juego («Continuum») y su diseño —mecánicas,
+modos de juego, estructura de datos, interfaz e implementación— son
+propiedad exclusiva de su autor. No se concede permiso para usar,
+copiar, modificar, fusionar, publicar, distribuir, sublicenciar ni
+vender copias de este software, ni para permitir a quienes tengan acceso
+a él hacer ninguna de esas cosas, salvo autorización expresa y por
+escrito del autor.
+
+Que este repositorio sea públicamente visible en GitHub no concede
+ningún permiso de uso: solo de lectura.
+
+------------------------------------------------------------------------
+
+Excepciones — lo que este copyright no reivindica:
+
+1. Ilustraciones (carpeta `assets/`). Generadas con herramientas de
+   inteligencia artificial. La titularidad de una imagen puramente
+   generada por IA, sin aportación creativa humana sustancial, es
+   incierta o inexistente en la mayoría de jurisdicciones —entre ellas
+   España y la Unión Europea—, y este proyecto no reivindica sobre ellas
+   una exclusividad que la ley no reconoce.
+
+2. Contenido factual de las cartas: fechas, cifras, hechos históricos,
+   científicos y geográficos. Es información de dominio público —no un
+   dato inventado por este proyecto— y no se reivindica su exclusividad,
+   con independencia de en qué archivo del código viva ese dato.
+
+El copyright de la primera sección sí protege, dentro de esos mismos
+archivos, el código que lee, valida, ordena y presenta esos datos: la
+mecánica del juego, no los hechos que describe.
