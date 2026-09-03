@@ -727,23 +727,28 @@ body::before {
 .home-masthead { max-width: 540px; margin: -12px auto 32px; text-align: center; }
 .home-crest {
   position: relative;
-  width: 148px;
-  height: 118px;
-  margin: 0 auto 2px;
-  overflow: hidden;
-  border: 2px solid #a87839;
-  border-bottom-width: 7px;
-  border-radius: 76px 76px 9px 9px;
-  background: #d9b56f;
-  box-shadow: inset 0 0 0 5px rgba(241,216,163,.7), 0 7px 15px rgba(83,46,12,.14);
+  width: clamp(250px, 78vw, 390px);
+  aspect-ratio: 800 / 533;
+  margin: 0 auto -4px;
 }
-.home-crest::after {
+.home-crest::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 54%, rgba(67,37,12,.18));
+  z-index: -1;
+  inset: 20% 9% 15%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(199,151,79,.16), transparent 70%);
+  filter: blur(10px);
 }
-.home-crest img { width: 100%; height: 100%; object-fit: cover; filter: sepia(.72) saturate(.64) contrast(.92); }
+.home-crest img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: .95;
+  mix-blend-mode: multiply;
+  filter: sepia(.1) saturate(.78) contrast(.94);
+}
 .home-wordmark { font: 500 clamp(2.55rem, 9vw, 4.3rem)/.9 var(--font-display); letter-spacing: -.055em; text-transform: uppercase; }
 .home-tagline { margin-top: 10px; color: var(--accent); font-size: .72rem; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; }
 .home-ornament { display: grid; grid-template-columns: 58px 10px 58px; align-items: center; justify-content: center; gap: 7px; margin: 27px 0 20px; }
