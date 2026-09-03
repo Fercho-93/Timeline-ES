@@ -232,6 +232,26 @@ console.log("\nCada superficie del tema claro tiene su versión oscura");
   ok(`ningún fondo claro nuevo escrito a mano${aPelo.length ? ` (${aPelo.join(", ")})` : ""}`, !aPelo.length);
 }
 
+// En móvil la cabecera pasa a columna: el nombre arriba y los botones debajo, centrados.
+// En una columna, la alineación horizontal la decide `align-items`, no `justify-content`,
+// y un `margin-left: auto` en las acciones sobrevive al cambio y las empuja a un lado.
+// Las dos cosas pasaron y dejaron los botones descolocados sin que fallara nada.
+console.log("\nLa cabecera se centra en móvil");
+{
+  const css = read("styles.css");
+  const regla = css.match(/^\.topbar \{[^}]*\}/m)?.[0] || "";
+  const acciones = css.match(/^\.topbar-actions \{[^}]*\}/m)?.[0] || "";
+  ok("se encuentran las dos reglas base", !!regla && !!acciones);
+  ok(`la barra alinea al centro${/align-items: center/.test(regla) ? "" : ` (dice «${regla.match(/align-items: [^;]*/)?.[0]}»)`}`, /align-items: center/.test(regla));
+  ok("las acciones no llevan margen automático, que sobrevive a la columna", !/margin-left: auto/.test(acciones));
+
+  // Y el bloque que pone la columna sigue existiendo: si desapareciera, lo de arriba
+  // dejaría de tener sentido y habría que revisar esta prueba entera.
+  const columna = css.slice(css.indexOf("@media (max-width: 620px)"));
+  ok("el bloque de móvil sigue poniendo la cabecera en columna", /\.topbar \{[^}]*flex-direction: column/.test(columna));
+  ok("y centrando las acciones", /\.topbar-actions \{[^}]*justify-content: center/.test(columna));
+}
+
 console.log("\nContraste de las bandas de época");
 {
   const css = read("styles.css");
