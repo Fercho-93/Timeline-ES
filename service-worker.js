@@ -1,25 +1,11 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v70";
-const ANIMAL_ASSETS = [
-  "bee", "monarch-butterfly", "mantis", "green-tree-frog", "house-mouse", "rock-pigeon", "guinea-pig",
-  "european-hare", "cat", "fox", "european-beaver", "iberian-lynx", "great-dane", "gray-wolf",
-  "capybara", "chimpanzee", "giant-panda", "american-black-bear", "lion", "bengal-tiger", "grevys-zebra",
-  "domestic-horse", "alaska-moose", "american-bison", "giraffe", "common-hippopotamus", "white-rhinoceros",
-  "southern-elephant-seal", "elephant", "whale-shark", "orca", "humpback-whale", "sperm-whale", "blue-whale",
-  "octopus", "flamingo", "penguin", "kangaroo", "nile-crocodile", "polar-bear", "dromedary-camel",
-  "dolania-mayfly", "common-mosquito", "fruit-fly", "brown-rat", "domestic-hamster", "domestic-gerbil",
-  "european-rabbit", "european-hedgehog", "red-squirrel", "domestic-dog", "komodo-dragon", "harpy-eagle",
-  "galapagos-giant-tortoise", "scarlet-macaw", "japanese-koi", "bowhead-whale", "greenland-shark",
-  "ocean-quahog", "black-coral", "red-sea-urchin", "jonathan-tortoise", "freshwater-pearl-mussel",
-  "cookie-cockatoo", "gold-coral", "monorhaphis-chuni", "giant-barrel-sponge",
-  "tiger-beetle", "ghost-crab", "sunflower-sea-star", "three-toed-sloth", "dwarf-seahorse", "koala",
-  "black-mamba", "gentoo-penguin", "florida-manatee", "hermit-crab", "solifuge", "australian-dragonfly",
-  "emu", "spiny-tailed-iguana", "ostrich", "reindeer", "blue-wildebeest", "american-pronghorn",
-  "cheetah", "henslow-swimming-crab", "brazilian-free-tailed-bat", "golden-eagle", "gyrfalcon",
-  "common-swift", "peregrine-falcon", "saharan-silver-ant", "common-limpet", "california-sea-lion",
-  "moroccan-flic-flac-spider", "european-mole", "american-cockroach"
-].map(name => `./assets/animal-cards/${name}.webp`);
+const CACHE = "continuum-v71";
+// Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
+// abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
+// `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
+// se pide, así que la primera carta de un mazo de animales la baja de la red y a partir
+// de ahí, con esa carta ya vista, funciona sin conexión igual que el resto.
 const ASSETS = [
   "./", "./index.html", "./styles.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
@@ -29,8 +15,7 @@ const ASSETS = [
   "./assets/hero-entertainment-400.webp", "./assets/hero-entertainment-700.webp", "./assets/hero-science-400.webp",
   "./assets/hero-science-700.webp", "./assets/hero-nature-400.webp", "./assets/hero-nature-700.webp",
   "./assets/hero-geography-400.webp", "./assets/hero-geography-700.webp", "./assets/hero-mixed-400.webp",
-  "./assets/hero-mixed-700.webp", "./assets/hero-competicion-400.webp", "./assets/hero-competicion-700.webp",
-  ...ANIMAL_ASSETS
+  "./assets/hero-mixed-700.webp", "./assets/hero-competicion-400.webp", "./assets/hero-competicion-700.webp"
 ];
 
 self.addEventListener("install", event => {

@@ -54,8 +54,9 @@ play(13007, 13014, 1, true);
 play(13021, 13020, 0, false);
 play(13021, 13020, 1, true);
 
-const appSource = read("app.js");
-const animalMapBlock = (appSource.match(/const ANIMAL_ART_BY_ID = \{([\s\S]*?)\};/) || [])[1] || "";
+// La tabla vive en modes.js —compartida con online.js—, no en app.js.
+const modesSource = read("modes.js");
+const animalMapBlock = (modesSource.match(/const ANIMAL_ART_BY_ID = \{([\s\S]*?)\};/) || [])[1] || "";
 const artById = new Map([...animalMapBlock.matchAll(/(\d+): "([^"]+)"/g)].map(match => [Number(match[1]), match[2]]));
 const weightCardIds = [...read("animals.js").matchAll(/\{\s*id:\s*(\d+),/g)].map(match => Number(match[1]));
 const lifespanCardIds = [...read("lifespan.js").matchAll(/\{\s*id:\s*(\d+),/g)].map(match => Number(match[1]));

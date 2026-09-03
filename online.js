@@ -52,6 +52,11 @@ function eraForCard(card) { return CT.eraForCard(modeKey(), card); }
 
 function modeCards(key = modeKey()) { return CT.cards(key); }
 
+// Igual que en el juego local: las láminas de animales no llevan cifras, así que pueden
+// verse en la mano sin revelar el dato que hay que ordenar.
+function usesAnimalArt() { return CT.usesAnimalArt(modeKey()); }
+function animalArt(card) { return CT.animalArt(modeKey(), card); }
+
 // Un mapa por modalidad, no uno solo: la modalidad puede cambiar entre partidas (aunque
 // nunca a mitad de una) y cada mazo conserva sus propios identificadores. Se construye la
 // primera vez que se pide y se reutiliza después, en vez de recorrer el mazo entero —hasta
@@ -295,6 +300,7 @@ async function createRoom(name) {
     await setDoc(reference, {
       roomCode: code,
       mode: selectedModeKey,
+      deckFingerprint: CT.deckFingerprint(selectedModeKey),
       hostUid: user.uid,
       status: "lobby",
       phase: "lobby",
@@ -325,6 +331,11 @@ async function joinRoom(code, name) {
       const snapshot = await transaction.get(reference);
       if (!snapshot.exists()) throw new Error("ROOM_NOT_FOUND");
       const data = snapshot.data();
+      // Si los dos móviles llevan versiones distintas, el mazo puede haber cambiado —ha
+      // pasado con animales, países y distancias— y entonces un mismo identificador de
+      // carta señalaría cosas distintas en cada pantalla. Mejor avisar aquí que dejar
+      // que la partida se reparta mal o se rompa a mitad de jugarla.
+      if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
       if (data.playerOrder.includes(user.uid)) return;
       if (data.status !== "lobby") throw new Error("ALREADY_STARTED");
       if (data.playerOrder.length >= 9) throw new Error("ROOM_FULL");
@@ -339,7 +350,7 @@ async function joinRoom(code, name) {
     history.replaceState({}, "", invitationUrl(code));
     connectToRoom(code);
   } catch (error) {
-    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene 9 participantes" };
+    const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene 9 participantes", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
     showToast(messages[error.message] || "No se pudo entrar. Comprueba el código y las reglas de Firebase.");
   } finally { busy = false; }
 }
@@ -430,6 +441,9 @@ async function startRoom(withGhost = true) {
       const snapshot = await transaction.get(roomRef);
       const data = snapshot.data();
       if (data.hostUid !== user.uid || data.status !== "lobby" || data.playerOrder.length < 2) throw new Error("INVALID_START");
+      // El anfitrión pudo abrir la sala y esperar con la pestaña de fondo mientras la
+      // aplicación se actualizaba sola: se comprueba también aquí, no solo al entrar.
+      if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
       if ((enableGhost || pulse) && data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < 38)) throw new Error("UPDATE_CLIENTS");
       const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
       const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
@@ -447,7 +461,7 @@ async function startRoom(withGhost = true) {
     });
   } catch (error) {
     console.error(error);
-    showToast(error.message === "UPDATE_CLIENTS" ? "Para usar los poderes, actualizad todos los móviles a v38 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v38 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
+    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? "Para usar los poderes, actualizad todos los móviles a v38 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v38 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
   } finally { busy = false; }
 }
 
@@ -483,7 +497,8 @@ function renderGame() {
     if (index < timelineCards.length) {
       const card = timelineCards[index];
       const era = eraForCard(card);
-      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card" data-id="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      const animal = usesAnimalArt();
+      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="room">Sala</button>')}
@@ -495,8 +510,8 @@ function renderGame() {
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     <section><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} cartas</small></div>${CT.timelineMap(modeKey(), timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     ${pulsing
-      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTargetName)}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}"><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una") : `${escapeHtml(currentPlayer.name)} está resolviendo su Pulso…`}</p></section>`
-      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}><span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
+      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTargetName)}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una") : `${escapeHtml(currentPlayer.name)} está resolviendo su Pulso…`}</p></section>`
+      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}>${animalArt(card)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, user.uid, roomState.timeline.length, me.hand.length, 'data-online-action="ghost-use"', myTurn) : ""}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
     ${!pulsing && roomState.phase !== "reveal" ? CT.Powers.pulsePower(roomState.pulsePower, user.uid, me.hand.length, 'data-online-action="pulse-open"', myTurn && !roomState.ghost?.fresh && roomState.deck.length + roomState.discard.length > 0 && pulseTargetUids().length > 0) : ""}

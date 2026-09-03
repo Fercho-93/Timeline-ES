@@ -21,23 +21,13 @@
   const MAX_CARTAS = 40;
   const MAX_NOMBRE = 18;
 
-  // La huella del mazo. No es opcional: si los dos móviles llevan versiones distintas de
-  // la aplicación, el mazo puede haber cambiado —ha pasado con animales, países y
-  // distancias— y entonces la misma semilla reparte cartas distintas. El duelo parecería
-  // ir bien y estaría comparando dos partidas que no son la misma. Antes de repartir se
-  // comprueba, y si no cuadra se avisa en vez de jugar.
-  //
-  // Cuenta el orden, no solo el conjunto: el reparto depende de en qué posición está cada
-  // identificador, así que dos mazos con las mismas cartas recolocadas no son el mismo.
-  function huella(modeKey) {
-    const cards = CT.cards(modeKey);
-    let hash = 2166136261;
-    for (const card of cards) {
-      hash ^= card.id;
-      hash = Math.imul(hash, 16777619);
-    }
-    return `${cards.length}.${(hash >>> 0).toString(36)}`;
-  }
+  // La huella del mazo —compartida con las salas, en modes.js—. No es opcional: si los
+  // dos móviles llevan versiones distintas de la aplicación, el mazo puede haber
+  // cambiado —ha pasado con animales, países y distancias— y entonces la misma semilla
+  // reparte cartas distintas. El duelo parecería ir bien y estaría comparando dos
+  // partidas que no son la misma. Antes de repartir se comprueba, y si no cuadra se
+  // avisa en vez de jugar.
+  const huella = CT.deckFingerprint;
 
   function crearSemilla() {
     return Math.random().toString(36).slice(2, 10);

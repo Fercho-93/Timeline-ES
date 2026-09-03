@@ -18,7 +18,10 @@ function client(uid){
  w.structuredClone=structuredClone;
  for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
  const errors=[];w.console.error=e=>errors.push(e);
- w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>tx.update(ref,clone(data))})),serverTimestamp:()=>Date.now()};
+ // `clone` pasa los datos por JSON para normalizarlos al realm de este módulo, pero
+ // `serverTimestamp()` no es JSON: hay que conservar ese centinela tal cual o Firestore
+ // no lo reconoce como marca de hora del servidor.
+ w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>{const limpio=clone(data);if('updatedAt' in data)limpio.updatedAt=data.updatedAt;tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
  w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,skipTurn,removePlayer,startPulse,placePulse,renderGame,renderLobby};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
@@ -72,14 +75,24 @@ try {
  // Ganar conservando el poder y desempatar con un robo que lo entrega.
  const winning=fixture();winning.phase='reveal';winning.turnsInRound=2;winning.players[A].hand=[];winning.reveal={cardId:6,correct:true,playerUid:A,playerName:'Ana'};
  await seed(winning);await clients[0].call('finishTurn');assert.equal((await snapshot()).winner,A);
+ // Ana ya tiene un Fantasma: el segundo que le toque en el desempate se recoloca, no se
+ // le asigna también a ella. La carta en sí sí llega a su mano igualmente. La posición
+ // recolocada puede acabar en manos de quien reciba después esa misma carta en el mismo
+ // reparto —es azar, no fallo—; lo que nunca puede pasar es que Ana quede dueña de dos.
  const tie=fixture();tie.phase='reveal';tie.current=2;tie.turnsInRound=2;tie.players[A].hand=[];tie.players[B].hand=[];tie.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};
- await seed(tie);await clients[2].call('finishTurn');s=await snapshot();assert.equal(s.ghost.owners[1],A);assert.equal(s.players[A].hand.length,1);assert.equal(s.players[B].hand.length,1);
+ await seed(tie);await clients[2].call('finishTurn');s=await snapshot();
+ assert.equal(s.ghost.owners.filter(o=>o===A).length,1,'Ana no puede quedar dueña de dos Fantasmas');
+ assert.ok(s.players[A].hand.includes(15));assert.equal(s.players[A].hand.length,1);assert.equal(s.players[B].hand.length,1);
  // Una salida ajena no cierra ni repite un resultado ya resuelto.
  await seed(fixture());await clients[0].call('useGhost');await play(clients[0]);await clients[0].call('removePlayer',B);
  s=await snapshot();assert.equal(s.phase,'reveal');await clients[0].call('finishTurn');assert.deepEqual((await snapshot()).ghost.pending,[C]);
  // No se inicia Fantasma si un cliente anterior todavía podría enseñar valores.
  const outdated=fixture();outdated.status='lobby';outdated.phase='lobby';delete outdated.ghost;outdated.timeline=[];outdated.deck=[];Object.values(outdated.players).forEach(p=>p.hand=[]);await seed(outdated);
  await clients[0].call('renderLobby');await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
+ // No se reparte si la sala lleva la huella de un mazo distinto al de este cliente:
+ // alguien lleva otra versión del juego y las cartas ya no significarían lo mismo.
+ const mismatched=fixture();mismatched.status='lobby';mismatched.phase='lobby';delete mismatched.ghost;mismatched.timeline=[];mismatched.deck=[];mismatched.deckFingerprint='huella-de-otra-version';Object.values(mismatched.players).forEach(p=>p.hand=[]);await seed(mismatched);
+ await clients[0].call('renderLobby');await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/DECK_MISMATCH/);assert.equal((await snapshot()).status,'lobby');
  // Arranque real, nueve personas y mazo pequeño: reparto igual y una carta reservada.
  const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:38} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');

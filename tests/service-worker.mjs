@@ -64,12 +64,14 @@ console.log("\nService worker");
   sw.listeners.install({ waitUntil: tarea => { instalada = tarea; } });
   await instalada;
   ok("instalar una versión nueva evita reutilizar archivos viejos de la caché HTTP", sw.precargas.length > 0 && sw.precargas.every(request => request.cache === "reload"));
+  // Casi cien archivos y 5,5 MB: quien nunca abre Naturaleza no debería pagar esa
+  // descarga solo por instalar la aplicación. Se cachean por demanda, no al instalar.
   const animalAssets = fs.readdirSync(path.join(REPO, "assets", "animal-cards"))
     .filter(file => file.endsWith(".webp"))
     .map(file => `./assets/animal-cards/${file}`);
   const cachedAssets = new Set(sw.precargas.map(request => request.url));
-  const animalsMissingOffline = animalAssets.filter(file => !cachedAssets.has(file));
-  ok(`las ${animalAssets.length} ilustraciones de animales se precargan para jugar sin conexión${animalsMissingOffline.length ? ` (faltan ${animalsMissingOffline.join(", ")})` : ""}`, !animalsMissingOffline.length);
+  const animalesPrecargados = animalAssets.filter(file => cachedAssets.has(file));
+  ok(`las ${animalAssets.length} ilustraciones de animales NO se precargan al instalar${animalesPrecargados.length ? ` (se coló ${animalesPrecargados.join(", ")})` : ""}`, !animalesPrecargados.length);
 }
 {
   const sw = arrancar();
@@ -83,6 +85,17 @@ console.log("\nService worker");
   await Promise.all(sw.tareas);
   const segunda = await sw.pedir("./online.js");
   ok("y en el siguiente arranque ya sirve la nueva", segunda.cuerpo === "./online.js del servidor");
+}
+{
+  // Una lámina de animal no precargada: la primera vez que se pide viaja a la red
+  // igualmente, y a partir de ahí queda guardada, como cualquier otro archivo que ya se
+  // hubiera visto — es lo que permite jugar Naturaleza sin conexión tras la primera vez.
+  const sw = arrancar();
+  const lamina = "./assets/animal-cards/lion.webp";
+  const primera = await sw.pedir(lamina);
+  ok("una lámina no precargada se sirve igual, bajándola de la red", primera.cuerpo === `${lamina} del servidor`);
+  await Promise.all(sw.tareas);
+  ok("y queda guardada en caché tras esa primera vez", sw.guardado.get(lamina)?.cuerpo === `${lamina} del servidor`);
 }
 {
   const sw = arrancar();

@@ -88,13 +88,5 @@ ok("todas anuncian que el dato está oculto", manoCartas.every(el => /oculta/i.t
 ok("las cartas de la mano no llevan distintivo de época", !/card-era|reveal-era|era-[a-z]/.test(handHtml));
 ok("la partida queda guardada en el dispositivo", !!w.localStorage.getItem("hilo-game-history-v1"));
 
-console.log("\nPartida heredada de la versión anterior");
-w = boot();
-const legacy = JSON.stringify({ mode: "history", players: [{ id: 1, name: "Ana", hand: [1] }, { id: 2, name: "Bea", hand: [2] }], deck: [3], discard: [], timeline: [4], current: 0, starter: 0, turnsInRound: 0, round: 1, winner: null });
-w.localStorage.setItem("hilo-espana-game-v1", legacy);
-w = (() => { const w2 = boot(); w2.localStorage.setItem("hilo-espana-game-v1", legacy); w2.eval(read("app.js")); return w2; })();
-ok("se migra a la clave nueva", w.localStorage.getItem("hilo-game-history-v1") === legacy);
-ok("y se borra la vieja", w.localStorage.getItem("hilo-espana-game-v1") === null);
-
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

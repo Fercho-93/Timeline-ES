@@ -193,7 +193,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.
 
-## Fantasma, Pulso y dificultades (poderes v38)
+## Fantasma, Pulso y dificultades
 
 El poder Fantasma puede acompañar al reparto o a un robo. Tanto en partidas de un solo
 móvil como en salas se activa o desactiva con «Cartas Fantasma» al configurar la partida,
@@ -274,9 +274,8 @@ para el tablero. El reto diario permanece en Fácil para no cambiar las quince c
 marcas existentes. En las partidas compartidas, Pulso conserva su efecto pero se obtiene
 como poder secreto al encontrar la carta normal a la que quedó asociado.
 
-**Salas nuevas: publicar `firestore.rules` v38 antes de activar Fantasma o Pulso.** Todos los móviles
-deben actualizar la app a v38 y crear una sala nueva; se comprueba la versión de cada participante. Las reglas v38 mantienen las salas anteriores. Sin esas reglas, desmarcar ambos poderes permite seguir iniciando
-salas con las reglas anteriores. Las reglas nuevas mantienen compatibles las salas antiguas.
+**Publicar `firestore.rules` antes de activar Fantasma o Pulso.** Sin esas reglas, desmarcar
+ambos poderes permite seguir jugando en salas compartidas con normalidad.
 
 ## Probarlo en un ordenador
 
@@ -304,18 +303,19 @@ El modo local no utiliza backend ni cuentas y guarda la partida únicamente en e
 
 El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo: las reglas de seguridad solo hay que volver a publicarlas cuando cambia su contenido, no al añadir un juego nuevo.
 
-> **Para los poderes v38 hay que volver a publicar `firestore.rules`.** Valida tanto la
-> obtención privada como el uso de Pulso; sin republicarlas, las salas nuevas rechazarán
-> el reparto aunque las reglas v37 de Fantasma ya estuvieran publicadas.
+> **Para Fantasma y Pulso hay que publicar `firestore.rules`.** Valida tanto la obtención
+> privada como el uso de Pulso; sin publicarlas, las salas nuevas rechazan el reparto con
+> cualquiera de los dos poderes activado.
 
 ## Comprobaciones
 
-`tests/` contiene diecinueve comprobaciones automáticas: quince que corren en cualquier
+`tests/` contiene veinte comprobaciones automáticas: dieciséis que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
-los animales, la marca, el service worker, la enciclopedia, el perfil, el duelo por enlace y
-la accesibilidad con teclado y lector de pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
+los animales, la marca, el service worker, la página que fuerza una actualización, la
+enciclopedia, el perfil, el duelo por enlace y la accesibilidad con teclado y lector de
+pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 
