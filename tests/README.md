@@ -30,6 +30,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `partidas-al-azar.mjs` | 40 partidas al azar repartidas entre todos los juegos: bloqueos, conteo de cartas y orden de la línea. |
 | `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil, y que ni un guion de `index.html` ni una carátula se queden sin precargar. Sin dependencias. |
 | `actualizar.mjs` | La página que se manda a quien tiene la app atascada en una versión vieja: descarta el service worker y su caché, pero no borra el perfil ni las partidas guardadas. Sin dependencias. |
+| `diagnostico.mjs` | Un error sin capturar enseña un aviso con la versión, la pantalla y el mazo abiertos en vez de dejar la pantalla en blanco, no se duplica con varios errores seguidos y no confunde un ruido conocido del navegador con un fallo. El mismo informe alimenta el botón de comentarios de Ajustes. |
 | `mazos.mjs` | Calidad de todos los mazos: repeticiones, huecos, años únicos, espaciado cuando corresponde y cifras que el redondeo no confunda. Sin dependencias. |
 | `solitario.mjs` | Solitario, reto diario, confirmación al colocar, modalidad de países y el mapa de la línea. |
 | `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |

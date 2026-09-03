@@ -173,6 +173,11 @@ Un botón de «Ajustes» en la cabecera, disponible en cualquier pantalla, elige
 automático (según la preferencia del móvil), claro u oscuro. La elección se guarda y se
 aplica al instante, sin recargar.
 
+El mismo panel lleva un botón de comentarios que abre un correo con la versión instalada
+y la pantalla en la que se estaba, para no tener que describirlo de memoria. Si algo se
+rompe de verdad, en vez de una pantalla en blanco aparece un aviso con ese mismo informe
+y un botón para copiarlo.
+
 ## Jugar en solitario
 
 Tres formatos, los tres sin conexión y con la marca guardada en el propio móvil:
@@ -309,13 +314,13 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene veinte comprobaciones automáticas: dieciséis que corren en cualquier
+`tests/` contiene veintiuna comprobaciones automáticas: diecisiete que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
 los animales, la marca, el service worker, la página que fuerza una actualización, la
-enciclopedia, el perfil, el duelo por enlace y la accesibilidad con teclado y lector de
-pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
+pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace y la accesibilidad con
+teclado y lector de pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 

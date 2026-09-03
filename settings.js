@@ -8,6 +8,9 @@
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
   const DEFAULTS = { theme: "auto" };
+  // Pendiente de rellenar antes de repartir la beta: el correo donde debe llegar el
+  // informe de comentarios. Hasta entonces el botón avisa de que aún no hay dirección.
+  const FEEDBACK_EMAIL = "";
 
   function read() {
     try {
@@ -54,8 +57,27 @@
           <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
         </select>
       </div>
-      <button class="btn btn-primary btn-block" data-settings-action="close">Hecho</button>
+      <h2>Comentarios</h2>
+      <p class="hint">¿Algo no va bien o se te ocurre algo? Manda un correo con la versión instalada y la pantalla en la que estás, para no tener que describirlo de memoria.</p>
+      <button class="btn btn-secondary btn-block" data-settings-action="feedback">Enviar comentario</button>
+      <button class="btn btn-primary btn-block" style="margin-top:10px" data-settings-action="close">Hecho</button>
     </div></div>`;
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+
+  async function sendFeedback() {
+    if (!FEEDBACK_EMAIL) { showToast("Todavía no hay una dirección de contacto configurada."); return; }
+    const detalle = await CT.appDiagnostics?.() ?? "";
+    const cuerpo = encodeURIComponent(`Cuéntame qué ha pasado:\n\n\n---\n${detalle}`);
+    location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("Continuum: comentario")}&body=${cuerpo}`;
   }
 
   // Cada motor pinta a su manera, así que abrir y cerrar el panel pasa por lo que ya
@@ -78,6 +100,7 @@
     if (!target) return;
     if (target.dataset.settingsAction === "open") open();
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
+    else if (target.dataset.settingsAction === "feedback") sendFeedback();
   });
 
   CT.settingsButton = () => '<button class="icon-btn" data-settings-action="open">Ajustes</button>';

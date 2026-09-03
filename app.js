@@ -229,14 +229,94 @@
     window.scrollTo(0, 0);
   }
 
+  // Compartida con el diagnóstico de más abajo: es la misma búsqueda, una sola vez.
+  async function cacheVersion() {
+    if (!("caches" in window)) return null;
+    try { return (await caches.keys()).find(name => name.startsWith("continuum-")) || null; }
+    catch { return null; }
+  }
+
   async function showCacheVersion() {
-    if (!("caches" in window)) return;
+    const key = await cacheVersion();
+    // Nada llama a esto con `await`: si la pantalla ya cambió (o, en pruebas, si la
+    // ventana ya se cerró) para cuando `cacheVersion()` resuelve, tocar el DOM puede
+    // fallar. No es un fallo que nadie necesite ver ni reportar.
     try {
-      const key = (await caches.keys()).find(name => name.startsWith("continuum-"));
       const label = document.getElementById("app-version");
       if (key && label) label.textContent = key;
-    } catch { /* sin caché disponible no hay nada que mostrar */ }
+    } catch { /* la pantalla ya no está: no hay nada que actualizar */ }
   }
+
+  // Lo que hace falta para depurar un fallo a distancia: qué versión hay instalada,
+  // en qué pantalla estaba la persona y a qué hora. Se usa tanto en la pantalla de
+  // «algo ha fallado» de más abajo como en el botón de comentarios de Ajustes, para no
+  // mantener dos formatos distintos del mismo informe.
+  async function buildDiagnostics(extra = "") {
+    const version = (await cacheVersion()) || "sin instalar";
+    const lineas = [
+      `Continuum ${version}`,
+      `Pantalla: ${screen}`,
+      `Mazo: ${selectedModeKey}`,
+      `Navegador: ${navigator.userAgent}`,
+      `Hora: ${new Date().toISOString()}`
+    ];
+    if (extra) lineas.push("", extra);
+    return lineas.join("\n");
+  }
+
+  // Cuando algo se rompe de verdad, la pantalla se queda en blanco y quien está probando
+  // la aplicación no tiene forma de contarlo salvo describirlo de memoria. Este manejador
+  // sustituye ese silencio por un aviso con lo necesario para depurarlo a distancia.
+  //
+  // No pasa por `paint()`: si algo ya se rompió, lo más seguro es no depender de la misma
+  // maquinaria que acaba de fallar. Sí reutiliza `CT.openDialog`, que no toca nada del
+  // estado del juego, solo el elemento que se le pasa.
+  let crashShown = false;
+  async function showCrash(mensaje) {
+    if (crashShown) return;
+    crashShown = true;
+    // Nada espera a esto (ni podría: lo dispara un evento de error). Un manejador de
+    // errores que a su vez lanza un error sin capturar no ayuda a nadie, así que todo su
+    // cuerpo va protegido: si para cuando se ejecuta ya no hay documento donde pintar
+    // —la página se está yendo, o en una prueba, la ventana ya se cerró—, se abandona en
+    // silencio en vez de sumar un segundo fallo al primero.
+    try {
+      const detalle = await buildDiagnostics(mensaje);
+      const capa = document.createElement("div");
+      capa.className = "overlay";
+      capa.innerHTML = `<div class="modal">
+        <h2>Algo ha fallado</h2>
+        <p>No es cosa tuya. Copia este texto y compártelo con quien mantiene la aplicación.</p>
+        <div class="field"><textarea id="crash-detalle" rows="6" readonly>${escapeHtml(detalle)}</textarea></div>
+        <button type="button" class="btn btn-primary btn-block" data-crash-action="copiar">Copiar</button>
+        <button type="button" class="btn btn-secondary btn-block" style="margin-top:10px" data-crash-action="inicio">Volver al inicio</button>
+      </div>`;
+      document.body.appendChild(capa);
+      CT.openDialog(capa, false);
+      // El primer control focuseable es esta misma caja: seleccionar su texto de una vez
+      // deja el copiado a mano tan a mano como el botón.
+      const textarea = capa.querySelector("#crash-detalle");
+      textarea.select();
+      capa.querySelector('[data-crash-action="copiar"]').addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(detalle); }
+        catch { textarea.select(); document.execCommand("copy"); }
+      });
+      capa.querySelector('[data-crash-action="inicio"]').addEventListener("click", () => location.reload());
+    } catch { /* sin documento donde pintar, no hay aviso posible */ }
+  }
+
+  window.addEventListener("error", event => {
+    // Un ruido conocido de algunos navegadores, inofensivo y ajeno a la aplicación.
+    if (/ResizeObserver loop/.test(event.message || "")) return;
+    showCrash(`${event.message || "Error sin mensaje"}\n${event.error?.stack || ""}`.trim());
+  });
+  window.addEventListener("unhandledrejection", event => {
+    const reason = event.reason;
+    showCrash(reason instanceof Error ? `${reason.message}\n${reason.stack || ""}`.trim() : String(reason));
+  });
+  // El botón de comentarios de Ajustes usa el mismo informe, exista o no un fallo de por
+  // medio: «esto no me cuadra» también merece poder mandarse con contexto.
+  CT.appDiagnostics = () => buildDiagnostics();
 
   // Elegir bloque selecciona su primer juego, que es lo que se espera cuando solo hay uno.
   function setBlock(blockKey) {
