@@ -14,9 +14,10 @@ function boot(storage = {}) {
   return w;
 }
 const click = (w, action) => { const el = w.document.querySelector(`[data-action="${action}"]`); assert.ok(el, action); el.click(); };
-// «Continuar», «Solitario» y «Competición» viven ahora en el menú de un mazo concreto
-// (`playMenu`), al que se llega desplegando antes su bloque en la portada. Este archivo
-// solo juega con Historia de España.
+// «Continuar» y «Solitario» viven en el menú de un mazo concreto (`playMenu`), al que se
+// llega desplegando antes su bloque en la portada. «Competición» no: baraja varios mazos
+// al azar, así que su botón está en la portada y no depende de ningún mazo elegido. Este
+// archivo solo juega con Historia de España.
 const abreMazo = w => { w.document.querySelector('[data-block="historia"]').click(); w.document.querySelector('[data-mode="history"]').click(); };
 const key = 'hilo-game-history-v1', soloKey = 'hilo-solo-history-v1';
 const state = (w, k = key) => JSON.parse(w.localStorage.getItem(k));
@@ -194,7 +195,9 @@ for (const difficulty of ['easy','normal','hard','expert']) {
   w.close();
 }
 {
-  const w=boot({'continuum-difficulty-v1':'expert'});abreMazo(w);click(w,'start-competition');click(w,'comp-next-round');
+  // El modo competición ya no vive en el menú de un mazo concreto: baraja varios mazos
+  // al azar, así que su botón está en la portada y no hace falta `abreMazo` para llegar.
+  const w=boot({'continuum-difficulty-v1':'expert'});click(w,'start-competition');click(w,'comp-next-round');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
   let rounds=0;
   // Las cinco cartas del usuario nunca se consumen como incorporaciones automáticas.
