@@ -490,12 +490,219 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .pass-card .eyebrow { justify-content: center; }
 
 .rules { text-align: left; }
-.rules ol { padding-left: 21px; color: var(--muted); line-height: 1.55; }
-.rules li + li { margin-top: 9px; }
-.guide-section { margin: 18px 0; padding-top: 16px; border-top: 1px solid var(--line); }
-.guide-section:first-of-type { margin-top: 12px; }
-.guide-section h3 { margin: 0 0 7px; font-size: .92rem; color: var(--ink); }
-.guide-section p { margin: 7px 0; }
+
+/* La guía. Enseñar una jugada cuesta menos que contarla, así que abre con una: una carta
+   de este mazo sube a su hueco, se da la vuelta y descubre su valor, en bucle. Debajo,
+   los tres pasos del turno y una ficha por cada cosa que hay que decidir. */
+.guide-content h2 { margin: 3px 0 0; }
+.guide-content h3 {
+  margin: 24px 0 9px;
+  font: 700 .76rem/1 var(--font-display);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+.guide-lead { margin: 8px 0 0; color: var(--muted); font-size: .92rem; line-height: 1.5; }
+.guide-note {
+  margin: 15px 0 0;
+  padding: 10px 13px;
+  border-left: 2px solid var(--accent);
+  border-radius: 0 9px 9px 0;
+  background: var(--vitela);
+  color: var(--muted);
+  font-size: .83rem;
+  line-height: 1.45;
+}
+
+/* La demostración. Todo el bucle dura lo mismo (7,2 s) en las cuatro piezas que se
+   mueven, así que sus porcentajes son un único guion compartido: el hueco late, la carta
+   sube, gira y se queda, y la marca de acierto aparece al descubrirse el valor. */
+.guide-demo {
+  position: relative;
+  height: 186px;
+  margin: 16px 0 2px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: radial-gradient(ellipse at 50% 16%, rgba(255,244,214,.55), transparent 72%);
+}
+.gd-line { display: flex; gap: 7px; height: 90px; }
+.gd-card, .gd-slot, .gd-play, .gd-face { width: 72px; }
+.gd-card, .gd-face { padding: 9px 8px; display: flex; flex-direction: column; gap: 5px; overflow: hidden; border-radius: 8px; }
+/* La carta colocada es papel, como en la mesa; la que está por jugar, cuero. Son los dos
+   mismos materiales de la partida, para que la demostración no invente un tercero. */
+.gd-card, .gd-back {
+  border: 1px solid #9d713c;
+  color: var(--carta-tinta);
+  background: linear-gradient(145deg, rgba(249,230,190,.96), rgba(224,188,123,.88));
+  box-shadow: inset 0 0 0 2px rgba(247,222,171,.5), 0 4px 9px rgba(73,42,14,.16);
+}
+.gd-card b, .gd-face b { font: 700 .95rem/1 var(--font-display); }
+.gd-card small, .gd-face small {
+  font-size: .57rem;
+  line-height: 1.25;
+  opacity: .82;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gd-slot {
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--borde-suave);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 1.3rem;
+  animation: gd-gap 7.2s var(--ease-out) infinite;
+}
+.gd-play {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 90px;
+  margin-left: -36px;
+  perspective: 640px;
+  animation: gd-fly 7.2s var(--ease-spring) infinite;
+}
+.gd-flip { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: gd-turn 7.2s var(--ease-out) infinite; }
+.gd-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.gd-front {
+  border: 1px solid #9b6d35;
+  color: #f4dca8;
+  background:
+    radial-gradient(circle at center, transparent 0 24px, rgba(210,158,80,.17) 25px 26px, transparent 27px),
+    linear-gradient(135deg, #47301d, #24180e 58%, #54371f);
+  box-shadow: inset 0 0 0 2px #2b1b0f, inset 0 0 0 4px rgba(190,134,57,.38), 0 6px 13px rgba(55,31,12,.25);
+}
+.gd-front i { font-size: .5rem; font-style: normal; font-weight: 700; line-height: 1.2; letter-spacing: .11em; text-transform: uppercase; color: #d3a960; }
+.gd-back { transform: rotateY(180deg); }
+.gd-mark {
+  position: absolute;
+  top: 122px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--green-solid);
+  box-shadow: 0 5px 14px rgba(46,63,38,.28);
+  font-family: var(--font-display);
+  font-size: .84rem;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+  animation: gd-tick 7.2s var(--ease-spring) infinite;
+}
+.gd-mark span { font-size: .78rem; }
+@keyframes gd-fly {
+  0%, 4% { opacity: 0; transform: translateY(92px) scale(.94); }
+  10% { opacity: 1; transform: translateY(92px) scale(1); }
+  30%, 78% { opacity: 1; transform: translateY(0) scale(1); }
+  86%, 100% { opacity: 0; transform: translateY(0) scale(1); }
+}
+@keyframes gd-turn {
+  0%, 34% { transform: rotateY(0deg); }
+  46%, 87% { transform: rotateY(180deg); }
+  88%, 100% { transform: rotateY(0deg); }
+}
+@keyframes gd-gap {
+  0%, 8% { opacity: 1; border-color: var(--borde-suave); transform: scale(1); }
+  18% { opacity: 1; border-color: var(--accent); transform: scale(1.05); }
+  28%, 84% { opacity: 0; transform: scale(1); }
+  93%, 100% { opacity: 1; border-color: var(--borde-suave); }
+}
+@keyframes gd-tick {
+  0%, 46% { opacity: 0; transform: translateX(-50%) scale(.6); }
+  56%, 78% { opacity: 1; transform: translateX(-50%) scale(1); }
+  84%, 100% { opacity: 0; transform: translateX(-50%) scale(1); }
+}
+
+.guide-steps { list-style: none; margin: 17px 0 0; padding: 0; display: grid; gap: 8px; }
+.guide-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 12px;
+  padding: 11px 13px;
+  border: 1px solid var(--vitela-borde);
+  border-radius: 9px;
+  background: var(--vitela);
+}
+.gs-num {
+  grid-row: span 2;
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff3d7;
+  background: var(--accent-solid);
+  font: 700 .85rem var(--font-display);
+}
+.guide-step b { font-size: .93rem; }
+.guide-step small { color: var(--muted); font-size: .8rem; line-height: 1.4; }
+/* Los tres pasos entran uno detrás de otro: se leen en ese orden, así que se presentan
+   en ese orden. Solo al abrir la guía, no en cada repintado. */
+.dialog-enter .guide-step, .dialog-enter .guide-card { animation: guide-in 360ms var(--ease-spring) backwards; }
+.dialog-enter .guide-step:nth-child(2) { animation-delay: 80ms; }
+.dialog-enter .guide-step:nth-child(3) { animation-delay: 160ms; }
+@keyframes guide-in { from { opacity: 0; transform: translateY(9px); } }
+
+.guide-cards { display: grid; gap: 8px; }
+.guide-card {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 11px 13px;
+  border: 1px solid var(--vitela-borde);
+  border-radius: 9px;
+  background: var(--vitela);
+}
+.guide-card > i {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-style: normal;
+  font-size: 1.25rem;
+  color: var(--accent-dark);
+  background: var(--boton-icono);
+}
+.gc-body b { font-size: .92rem; }
+.gc-body em {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: .58rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent-dark);
+  background: var(--accent-soft);
+}
+.gc-body small { display: block; margin-top: 4px; color: var(--muted); font-size: .8rem; line-height: 1.42; }
+
+.guide-levels {
+  display: grid;
+  gap: 1px;
+  border: 1px solid var(--vitela-borde);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--vitela-borde);
+}
+.guide-levels > div { display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 10px; padding: 9px 13px; background: var(--vitela); font-size: .82rem; }
+.guide-levels b { font-family: var(--font-display); }
+.guide-levels span { color: var(--muted); line-height: 1.4; }
+.rules .btn-block { margin-top: 22px; }
 
 .settings-modal { text-align: left; }
 .settings-modal h2 { margin: 4px 0 20px; }
@@ -746,7 +953,14 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .screen-enter .topbar, .screen-enter > :not(.topbar), .section-enter > *, .selection-enter, .placement-enter,
   .dialog-enter, .dialog-enter .modal, .dialog-enter .reveal, .dialog-enter .result-mark,
   .dialog-exit, .dialog-exit .modal, .drag-ghost, .game-row.active,
+  .dialog-enter .guide-step, .dialog-enter .guide-card,
+  .gd-play, .gd-flip, .gd-slot, .gd-mark,
   .spinner, .waiting-orbit, .waiting-inline i { animation: none !important; }
+  /* Sin el bucle, la demostración se queda en un solo fotograma: la carta por jugar,
+     con su valor tapado, ya sobre el hueco al que va. Se recorta a la altura de la línea
+     porque la banda de abajo solo existía para verla subir. */
+  .gd-play { opacity: 1; transform: translateY(0); }
+  .guide-demo { height: 102px; }
 }
 
 /* Fantasma: se mantiene el tamaño y la legibilidad; solo se retiran las pistas. */

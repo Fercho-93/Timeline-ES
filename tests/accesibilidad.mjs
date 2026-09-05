@@ -95,7 +95,13 @@ console.log("\nLas reglas se adaptan al mazo");
   // estar apagado en los tres mazos. Si vuelve a encenderse es que se ha colado una.
   ["animals", "lifespan", "speed"].forEach(mazo => ok(`${mazo} no muestra el aviso de revisión`, !/en revisión/.test(w.CONTINUUM.guideMarkup(mazo, "local"))));
   ok("los empates exactos se admiten", /mismo valor/.test(texto));
-  ok("el Pulso se explica fuera de solitario", /Carta Pulso activa/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: true })));
+  // Los dos poderes se explican fuera del solitario, y la ficha dice además si están en
+  // juego o hay que encenderlos antes de empezar.
+  const conPulso = w.CONTINUUM.guideMarkup("history", "local", { pulse: true });
+  ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Retas a quien elijas/.test(conPulso));
+  ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
+  ok("los tres pasos de una jugada están numerados", [1, 2, 3].every(n => new RegExp(`gs-num[^>]*>${n}<`).test(conPulso)));
+  ok("la demostración usa cartas de verdad del mazo", /gd-play/.test(conPulso) && /Fecha oculta/.test(conPulso));
   ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));
   ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica al anfitrión", /anfitrión/i.test(w.CONTINUUM.guideMarkup("history", "online")));

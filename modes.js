@@ -519,26 +519,96 @@
     return `Iba entre «${escapeHtml(before.title)}» y «${escapeHtml(after.title)}».`;
   }
 
-  // La guía se comparte entre los motores local y multijugador. El primer bloque explica
-  // el mazo abierto; el segundo cambia según la forma de jugar, para no presentar como
-  // regla universal una función que solo existe en solitario o en una sala compartida.
+  // La demostración con la que abre la guía: una jugada entera, en bucle y con cartas de
+  // verdad del mazo que se va a jugar. Enseñar la mecánica cuesta menos que contarla —una
+  // carta sube a su hueco, se da la vuelta y descubre su valor— y de paso presenta el
+  // mazo. Las tres cartas se toman repartidas por el orden del mazo para que la del medio
+  // encaje de verdad entre las otras dos: la demostración no enseña una jugada falsa.
+  //
+  // Es decorativa para quien usa lector de pantalla (`aria-hidden`): lo que cuenta lo
+  // dicen los tres pasos de debajo, que sí se leen.
+  function guideDemo(modeKey) {
+    const deck = cards(modeKey);
+    if (deck.length < 3) return "";
+    const ordenadas = [...deck].sort((a, b) => sortValue(modeKey, a) - sortValue(modeKey, b));
+    const en = fraccion => ordenadas[Math.floor(ordenadas.length * fraccion)];
+    const [izquierda, medio, derecha] = [en(0.2), en(0.5), en(0.8)];
+    const mini = card => `<b>${escapeHtml(shortValue(modeKey, card))}</b><small>${escapeHtml(card.title)}</small>`;
+    return `<div class="guide-demo" aria-hidden="true">
+      <div class="gd-line">
+        <div class="gd-card">${mini(izquierda)}</div>
+        <div class="gd-slot"><span>+</span></div>
+        <div class="gd-card">${mini(derecha)}</div>
+      </div>
+      <div class="gd-play"><div class="gd-flip">
+        <div class="gd-face gd-front"><i>${escapeHtml(hiddenLabel(modeKey))}</i><small>${escapeHtml(medio.title)}</small></div>
+        <div class="gd-face gd-back">${mini(medio)}</div>
+      </div></div>
+      <div class="gd-mark"><span>✓</span> ¡En su sitio!</div>
+    </div>`;
+  }
+
+  function guideStep(numero, titulo, texto) {
+    return `<li class="guide-step"><span class="gs-num" aria-hidden="true">${numero}</span><b>${titulo}</b><small>${texto}</small></li>`;
+  }
+
+  function guideCard(icono, titulo, estado, texto) {
+    return `<div class="guide-card"><i aria-hidden="true">${icono}</i><span class="gc-body"><b>${titulo}</b>${estado ? `<em>${estado}</em>` : ""}<small>${texto}</small></span></div>`;
+  }
+
+  // La guía la lee quien quiere jugar ya, no quien quiere estudiarse un reglamento: una
+  // jugada de ejemplo, tres pasos y una ficha de una línea por cada cosa que de verdad
+  // hay que decidir. Lo que no hace falta para la primera partida se queda fuera a
+  // propósito — el detalle fino de cada poder ya lo explica la pantalla donde se usa.
+  //
+  // Se comparte entre los dos motores —`app.js` y `online.js`— y el último bloque cambia
+  // según la forma de jugar, para no presentar como regla universal algo que solo existe
+  // en solitario o en una sala compartida.
   function guideMarkup(modeKey, context = "local", { pulse = false, ghost = true } = {}) {
     const selectedMode = mode(modeKey);
-    const datum = hiddenLabel(modeKey).replace(/\s+oculta$/i, "").toLowerCase();
     const order = selectedMode.axis === "time" ? "de antes a después" : "de menor a mayor";
     const pending = cards(modeKey).some(card => card.reviewStatus === "pending");
     const shared = context === "local" || context === "online";
-    const beforeStart = context === "online" ? "El anfitrión puede marcarla" : "Se puede marcar";
-    const pulseGuide = shared ? `<section class="guide-section"><h3>⚡ Carta Pulso ${pulse ? "activa" : "opcional"}</h3><p>${pulse ? "El mazo esconde de 1 a 3 Pulsos según los jugadores, con el mismo reparto 50/50 que Fantasma." : `${beforeStart} en el casillero «Cartas Pulso» antes de empezar.`} Si la encuentras, se guarda en privado fuera de la mano y puedes lanzarla cuando te convenga. Necesitas al menos dos cartas y eliges a otra persona. El mazo saca una carta que no eliges: si aciertas, le pasas una carta tuya al azar; si fallas, robas tú una. Quien recibe carta queda protegido hasta la siguiente ronda.</p></section>` : "";
-    const ghostGuide = shared ? `<section class="guide-section"><h3>◌ Carta Fantasma ${ghost ? "activa" : "opcional"}</h3><p>${ghost ? "El mazo incluye 1 Fantasma con 2–3 jugadores, 2 con 4–6 y 3 con 7–9." : `${beforeStart} en el casillero «Cartas Fantasma» antes de empezar: el mazo incluirá de 1 a 3 Fantasmas según los jugadores, con el mismo reparto que si estuviera activa por defecto.`} Puede acompañar una carta del reparto o de un robo, sin sustituir la penalización. Cada uno se sortea al 50 % entre las primeras 12 cartas por jugador y al 50 % entre todo el mazo; puede quedar al final sin descubrirse. Se guarda en privado, aparte de la mano y de su contador: no cuenta para ganar y cada persona puede usarlo una vez. Si encuentras otro, se recoloca al azar entre las cartas pendientes sin Fantasma; si no queda sitio, se consume sin otro uso. Con cinco cartas en el tablero, actívala antes de colocar en tu turno. Todos jugáis sin valores durante una vuelta, incluido quien la activa. Al resolver se enseña solo el valor de la carta jugada. No se acumulan Fantasmas: entre dos debe pasar una vuelta con valores visibles. No puedes activar Fantasma y lanzar Pulso en el mismo turno.</p></section>` : `<section class="guide-section"><h3>Dificultad</h3><p>Fácil: valores visibles, sin cartas automáticas. Normal: una carta automática por turno. Difícil: dos y turnos Fantasma ocasionales. Experto: dos y tablero siempre oculto. Las incorporaciones automáticas van en su sitio correcto, no dan puntos y nunca consumen la siguiente carta que debes jugar. Los valores se enseñan al resolver tu carta. La partida libre guarda una marca por dificultad. El reto diario mantiene Fácil y las mismas quince cartas para todos.</p></section>`;
+    // Un poder apagado se explica igual —hay que saber qué te estás dejando—, pero
+    // diciendo además quién lo enciende, que en una sala es solo el anfitrión.
+    const seActiva = context === "online" ? " La activa el anfitrión antes de empezar." : " Se activa antes de empezar.";
+
+    const poderes = shared ? `<h3>Poderes</h3><div class="guide-cards">
+      ${guideCard("◌", "Fantasma", ghost ? "en juego" : "opcional", `Una vuelta a ciegas: durante toda ella nadie ve ningún valor. Una vez por persona, con cinco cartas ya en la línea.${ghost ? "" : seActiva}`)}
+      ${guideCard("⚡", "Pulso", pulse ? "en juego" : "opcional", `Retas a quien elijas: si aciertas, le pasas una carta tuya; si fallas, robas tú. Una vez por persona.${pulse ? "" : seActiva}`)}
+    </div>` : "";
+
+    const dificultad = `<h3>Dificultad</h3><div class="guide-levels">
+      <div><b>Fácil</b><span>Ves todos los valores de la línea.</span></div>
+      <div><b>Normal</b><span>Cada turno se coloca sola una carta más.</span></div>
+      <div><b>Difícil</b><span>Dos, y algún turno a ciegas.</span></div>
+      <div><b>Experto</b><span>Dos, y la línea siempre a ciegas.</span></div>
+    </div>`;
+
     const contextGuide = context === "solo"
-      ? `<section class="guide-section"><h3>Jugar en solitario</h3><p>Tienes tres vidas: cada fallo consume una. El reto diario propone las mismas 15 cartas a todo el mundo y solo admite un intento al día; puedes compartir el resultado sin revelar cartas. La partida libre usa todo el mazo, guarda tu mejor marca y se puede continuar más tarde. Al final, «Ver lo que se falló» permite repasarlas.</p></section><section class="guide-section"><h3>⚔️ Duelo por enlace</h3><p>Juegas 15 cartas al azar de este mazo y mandas un enlace. Quien lo abra recibe exactamente esas mismas cartas, en el mismo orden, y al terminar ve el cara a cara. El duelo no gasta vidas: los dos jugáis las quince, porque si a uno se le acabaran antes se estarían comparando cosas distintas. No hace falta cuenta ni conexión: todo lo necesario viaja dentro del propio enlace, junto con una huella del mazo que impide jugar el duelo si los dos móviles llevan versiones distintas del juego.</p><p>Es un duelo entre amigos, no una competición arbitrada: el enlace es legible y la marca de quien reta la afirma su propio móvil. Nadie la comprueba.</p></section>`
+      ? `<h3>Tú contra el mazo</h3><p class="guide-lead">Tienes tres vidas: cada fallo cuesta una.</p><div class="guide-cards">
+          ${guideCard("☼", "Reto diario", "", "Quince cartas, las mismas para todo el mundo. Un intento al día.")}
+          ${guideCard("∞", "Partida libre", "", "El mazo entero, a tu ritmo. Se guarda para seguir luego.")}
+          ${guideCard("⚔", "Duelo por enlace", "", "Mandas un enlace y quien lo abra juega tus mismas cartas. Al final, cara a cara.")}
+        </div>${dificultad}`
       : context === "competition"
-        ? `<section class="guide-section"><h3>🏆 Competición</h3><p>Juegas cinco cartas de cada tema en un orden al azar, sin repetir temas. Cada ronda empieza con tres vidas nuevas y los aciertos se acumulan. La competición no se guarda si sales o cierras la aplicación a mitad.</p></section>`
+        ? `<h3>🏆 Competición</h3><p class="guide-lead">Cinco cartas de cada tema, uno tras otro y sin repetir. Tres vidas nuevas en cada ronda, y los aciertos se van sumando.</p>${dificultad}`
         : context === "online"
-          ? `<section class="guide-section"><h3>Varios móviles</h3><p>Requiere conexión durante la partida. El anfitrión crea la sala, comparte código, enlace o QR, y elige de una a seis cartas, quién empieza, y si se juega con Fantasma y con Pulso. Puede saltar un turno si alguien se desconecta. Si una persona sale, sus cartas vuelven al mazo; el anfitrión puede cerrar la sala para todos.</p></section>`
-          : `<section class="guide-section"><h3>Un solo móvil</h3><p>De 2 a 9 personas se pasan el teléfono en cada turno. Elegid de una a seis cartas por persona, quién comienza (por defecto la persona más joven) y si jugáis con Cartas Fantasma y Cartas Pulso.</p></section>`;
-    return `<div class="eyebrow">Guía del juego · ${escapeHtml(selectedMode.name)}</div><h2>Cómo se juega</h2><section class="guide-section"><h3>Objetivo</h3><p>Coloca las cartas en una sola línea, ordenadas ${order}. El ${escapeHtml(datum)} no se ve hasta confirmar la jugada.</p></section><section class="guide-section"><h3>Tu jugada</h3><p>Toca una carta y un hueco, o arrástrala hasta él. Confirma la posición antes de revelar. Un acierto queda en la línea; un fallo se descarta y, en una partida compartida, robas otra carta si queda alguna.</p><p>Si dos cartas tienen exactamente el mismo valor, cualquiera de los dos órdenes es válido.</p>${pending ? `<p>Las cartas «en revisión» siguen siendo jugables con el valor mostrado, pero señalan que su referencia está pendiente de contraste.</p>` : ""}</section>${shared ? `<section class="guide-section"><h3>Final de la partida</h3><p>La victoria se comprueba al acabar una ronda completa. Gana quien sea la única persona sin cartas; si varias terminan a cero, reciben una carta para desempatar. Si no quedan cartas para repartir, comparten la victoria.</p></section>` : ""}${pulseGuide}${ghostGuide}${contextGuide}`;
+          ? `<h3>Varios móviles</h3><p class="guide-lead">El anfitrión abre la sala y reparte el código, el enlace o el QR. Cada cual juega desde su pantalla, con conexión.</p>`
+          : `<h3>Un solo móvil</h3><p class="guide-lead">De 2 a 9 personas, pasándoos el teléfono en cada turno. Antes de empezar elegís cuántas cartas lleva cada uno y quién comienza.</p>`;
+
+    return `<div class="eyebrow">Guía · ${escapeHtml(selectedMode.name)}</div>
+      <h2>Cómo se juega</h2>
+      ${guideDemo(modeKey)}
+      <p class="guide-lead">Ordena las cartas en una sola línea, ${order}. El valor va oculto: solo se descubre al confirmar.</p>
+      <ol class="guide-steps">
+        ${guideStep(1, "Elige una carta", "Tócala, o arrástrala hasta la línea.")}
+        ${guideStep(2, "Marca el hueco", "Entre qué dos cartas crees que encaja.")}
+        ${guideStep(3, "Confirma", "Se descubre el valor. Si aciertas, se queda en la línea.")}
+      </ol>
+      <p class="guide-note">¿Dos cartas con el mismo valor? Entonces valen los dos órdenes.${pending ? " Las cartas «en revisión» se juegan igual, con el valor que muestran." : ""}</p>
+      ${shared ? `<h3>Cómo se gana</h3><p class="guide-lead">Gana quien se quede sin cartas al acabar la ronda. Cada fallo te hace robar otra.</p>` : ""}
+      ${poderes}${contextGuide}`;
   }
 
   function escapeHtml(value) {
