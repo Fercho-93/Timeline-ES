@@ -1548,9 +1548,13 @@
     home();
   }
 
+  // La guía explica la forma de jugar que se tiene delante. Con una partida en marcha la
+  // dice ella; sin partida empezada la dice la pantalla, porque abrir la guía desde el
+  // menú del solitario y leer las reglas de una partida entre varios no ayuda a nadie.
   function rules() {
     const returnTo = screen;
-    const context = comp ? "competition" : solo ? "solo" : "local";
+    const enSolitario = ["solo-home", "solo", "solo-end", "duelo-intro"].includes(screen);
+    const context = comp ? "competition" : solo || enSolitario ? "solo" : "local";
     const modeKey = game?.mode || solo?.mode || selectedModeKey;
     overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
   }
