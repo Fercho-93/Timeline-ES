@@ -267,6 +267,32 @@
     }
   }
 
+  // Una carta ya colocada en la línea no se puede volver a jugar, así que tocarla no
+  // tiene otra jugada posible que enseñar su explicación. Se da la vuelta con una
+  // pequeña animación y no con un repintado: cambiar de estado del juego por mirar una
+  // carta sería spam en el historial de partida, y además perdería el resto de la mano.
+  function toggleFlip(carta) {
+    if (carta.classList.contains("flip-anim")) return;
+    const giraHaciaAtras = !carta.classList.contains("is-flipped");
+    carta.setAttribute("aria-pressed", String(giraHaciaAtras));
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { carta.classList.toggle("is-flipped", giraHaciaAtras); return; }
+    carta.classList.add("flip-anim");
+    setTimeout(() => carta.classList.toggle("is-flipped", giraHaciaAtras), 200);
+    setTimeout(() => carta.classList.remove("flip-anim"), 400);
+  }
+  document.addEventListener("click", event => {
+    const carta = event.target.closest(".card-flippable");
+    if (carta) toggleFlip(carta);
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const carta = event.target.closest?.(".card-flippable");
+    if (!carta) return;
+    event.preventDefault();
+    toggleFlip(carta);
+  });
+
   window.CONTINUUM = window.CONTINUUM || {};
   window.CONTINUUM.paint = paint;
   window.CONTINUUM.resizeContent = resizeContent;

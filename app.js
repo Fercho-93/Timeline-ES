@@ -38,6 +38,10 @@
   let encQuery = "";
   let encBand = "all";
   let encHighlight = null;
+  // A dónde vuelve el botón «Volver» de la enciclopedia: al mazo desde el que se abrió,
+  // o al perfil si se llegó desde un punto débil. Sin esto, «Volver» siempre mandaba al
+  // inicio, deshaciendo de un toque la navegación que trajo hasta aquí.
+  let encReturn = "home";
   // La portada empieza mostrando la colección, no un mazo abierto. Un toque descubre
   // una categoría y enseña directamente los mazos que contiene.
   let collectionOpen = false;
@@ -156,12 +160,22 @@
   }
 
   function playChoices(resume) {
-    return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div><div class="play-choice-grid">
-      <button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
-      <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
-      <button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>
-      ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}
-    </div></section>`;
+    return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
+      <div class="play-choice-block">
+        <h3 class="play-choice-block-title">Multijugador</h3>
+        <div class="play-choice-grid">
+          <button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
+          <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
+          ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}
+        </div>
+      </div>
+      <div class="play-choice-block">
+        <h3 class="play-choice-block-title">Solitario</h3>
+        <div class="play-choice-grid">
+          <button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>
+        </div>
+      </div>
+    </section>`;
   }
 
   // Consultar el mazo no es una forma de jugar, así que no comparte fila con los
@@ -208,7 +222,8 @@
   function home() {
     screen = "home";
     paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section></div></section>
+      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
+      <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section></div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
@@ -224,7 +239,7 @@
     const art = BLOCK_ART[block.art];
     paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="collection-back">Volver</button>')}
       <section class="mode-masthead"><img src="assets/${art.archivo}-700.webp" alt="" width="700" height="${art.alto[700]}" decoding="async"><div><div class="eyebrow">${block.name}</div><h1 data-focus tabindex="-1">${currentMode().name}</h1><p>${currentMode().blurb}</p></div></section>
-      <section class="home-play">${playChoices(resume)}${deckBrowse()}${competitionPromo()}</section>
+      <section class="home-play">${playChoices(resume)}${deckBrowse()}</section>
     </div>`);
     window.scrollTo(0, 0);
   }
@@ -467,7 +482,7 @@
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
     const animal = usesAnimalArt();
-    return `<article class="timeline-card ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}"><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+    return `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación."><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
   }
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
@@ -748,7 +763,7 @@
     const mode = CT.mode(encMode);
     const bands = CT.Enciclopedia.bands(encMode);
     const cards = CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="enc-back">Volver</button>')}
       <section class="setup-section enc-section">
         <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
         <h1 data-focus tabindex="-1">${escapeHtml(mode.name)}</h1>
@@ -772,11 +787,12 @@
     </div>`);
   }
 
-  function openEnciclopedia(modeKey, { highlight = null, band = "all" } = {}) {
+  function openEnciclopedia(modeKey, { highlight = null, band = "all", returnTo = "home" } = {}) {
     encMode = CT.has(modeKey) ? modeKey : selectedModeKey;
     encQuery = "";
     encBand = band;
     encHighlight = highlight;
+    encReturn = returnTo;
     enciclopediaView();
     if (highlight == null) return;
     // Se aplaza al siguiente turno de repintado: el elemento acaba de entrar en el DOM
@@ -1575,7 +1591,7 @@
   }
 
   app.addEventListener("change", event => {
-    if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value); return; }
+    if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value, { returnTo: encReturn }); return; }
     if (!["solo-difficulty", "comp-difficulty"].includes(event.target.id)) return;
     const key = event.target.value;
     if (!CT.Ghost.LEVELS[key]) return;
@@ -1669,10 +1685,11 @@
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
     else if (action === "abandon-comp") abandonCompetition();
-    else if (action === "enciclopedia") openEnciclopedia(selectedModeKey);
-    else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id) });
-    else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band });
+    else if (action === "enciclopedia") openEnciclopedia(selectedModeKey, { returnTo: "play-menu" });
+    else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: "perfil" });
+    else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
+    else if (action === "enc-back") { if (encReturn === "play-menu") playMenu(); else if (encReturn === "perfil") perfilView(); else home(); }
     else if (action === "perfil") perfilView();
     else if (action === "perfil-export") perfilExport();
     else if (action === "perfil-import") perfilImport();
