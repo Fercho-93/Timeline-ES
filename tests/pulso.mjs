@@ -78,6 +78,7 @@ function inventario(w) {
 function entrar(w) {
   click(w, '[data-block="historia"]');
   click(w, '[data-mode="history"]');
+  click(w, '[data-format="multi"]');
   click(w, '[data-action="continue"]');
   click(w, '[data-action="ready"]');
 }

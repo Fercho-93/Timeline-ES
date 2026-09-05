@@ -46,6 +46,9 @@
   // una categoría y enseña directamente los mazos que contiene.
   let collectionOpen = false;
   let collectionDetails = false;
+  // Qué bloque de formato está desplegado en el menú del mazo: "multi", "solo" o
+  // ninguno de los dos. Empiezan los dos cerrados, como la colección de la portada.
+  let formatOpen = null;
 
   function currentAxis() { return CT.axis(selectedModeKey); }
 
@@ -67,6 +70,7 @@
     selectedCardId = null;
     pendingIndex = null;
     result = null;
+    formatOpen = null;
   }
 
   function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
@@ -159,22 +163,29 @@
     return `<svg ${common}><circle cx="12" cy="8" r="3.25"></circle><path d="M5.5 21c.8-4.05 3.05-6 6.5-6s5.7 1.95 6.5 6"></path></svg>`;
   }
 
+  // Cada bloque es un acordeón propio: el encabezado siempre se ve, y solo despliega
+  // sus formatos cuando es el bloque elegido. Igual que la colección de la portada, no
+  // se abren los dos a la vez, para no repetir en pantalla las tres opciones sin que la
+  // persona haya pedido ver ninguna todavía.
+  function formatBlock(key, title, subtitle, choicesHtml) {
+    const open = formatOpen === key;
+    return `<div class="play-choice-block${open ? " open" : ""}">
+      <button class="play-block-toggle" data-action="toggle-format-block" data-format="${key}" aria-expanded="${open}">
+        <span><b>${title}</b><small>${subtitle}</small></span>
+        <i class="play-block-chevron" aria-hidden="true">⌄</i>
+      </button>
+      ${open ? `<div class="play-choice-grid">${choicesHtml}</div>` : ""}
+    </div>`;
+  }
+
   function playChoices(resume) {
+    const multi = `<button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
+      <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
+      ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}`;
+    const solo = `<button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
-      <div class="play-choice-block">
-        <h3 class="play-choice-block-title">Multijugador</h3>
-        <div class="play-choice-grid">
-          <button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
-          <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
-          ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}
-        </div>
-      </div>
-      <div class="play-choice-block">
-        <h3 class="play-choice-block-title">Solitario</h3>
-        <div class="play-choice-grid">
-          <button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>
-        </div>
-      </div>
+      ${formatBlock("multi", "Multijugador", "Un solo móvil o varios.", multi)}
+      ${formatBlock("solo", "Solitario", "Reto diario o partida libre.", solo)}
     </section>`;
   }
 
@@ -1631,6 +1642,7 @@
       home();
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }
+    else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; playMenu(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();
     else if (action === "continue") { game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : renderPass(); }

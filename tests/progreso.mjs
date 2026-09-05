@@ -67,7 +67,7 @@ console.log("\nUna partida en solitario cuadra con lo anotado");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   // Un fallo de cada tres: hacen falta aciertos y fallos para comprobar las dos ramas.
   const { jugadas, aciertos } = juegaSolitario(w, { falla: n => n % 3 === 2 });
@@ -91,7 +91,7 @@ console.log("\nUna partida a un solo móvil");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="setup"]');
+  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   w.document.getElementById("hand-size").value = "1";
   click(w, '[data-action="start"]');
   const cards = new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
@@ -209,7 +209,7 @@ console.log("\nAlmacenamiento roto, lleno o de otra versión");
   const w = boot({ "hilo-retos-v1": JSON.stringify(previo) });
   ok("no hay perfil todavía", w.localStorage.getItem("hilo-perfil-v1") === null);
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
   ok("el solitario sigue enseñando la racha de antes", /4/.test(texto(w)));
   const guardado = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
   ok("los récords de antes no se tocan", guardado.history.best === 9 && guardado.history.streak === 4);
@@ -230,7 +230,7 @@ console.log("\nLa pantalla del perfil");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   juegaSolitario(w, { falla: n => n % 2 === 1 });
   click(w, '[data-action="home"]');
@@ -310,7 +310,7 @@ console.log("\nCopia de seguridad");
   const retos = { history: { best: 11, streak: 5, lastDay: "2026-02-02", days: { "2026-02-02": { hits: 11, total: 15 } } } };
   const w = boot({ "hilo-retos-v1": JSON.stringify(retos) });
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   juegaSolitario(w, { falla: n => n % 2 === 1 });
   click(w, '[data-action="home"]');
@@ -333,7 +333,7 @@ console.log("\nNo se cuela en ninguna pantalla de partida");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="setup"]');
+  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   ok("no hay perfil en la preparación de la partida", !existe(w, '[data-action="perfil"]'));
   click(w, '[data-action="start"]');
   click(w, '[data-action="ready"]');

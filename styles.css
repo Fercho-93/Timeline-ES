@@ -177,8 +177,18 @@ button { touch-action: manipulation; color: inherit; }
 .play-choices-head { margin-bottom: 14px; }
 .play-choices-head .eyebrow { margin-bottom: 7px; }
 .play-choices h2 { margin: 0; font-size: clamp(1.35rem, 4vw, 1.75rem); }
-.play-choice-block + .play-choice-block { margin-top: 18px; }
-.play-choice-block-title { margin: 0 0 9px; font-size: .82rem; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.play-choice-block + .play-choice-block { margin-top: 9px; }
+/* El encabezado de cada bloque es un botón, no un rótulo: despliega sus formatos al
+   tocarlo, como el bloque de la colección en la portada. Los dos bloques no llevan
+   fondo propio para no doblar el marco de `.play-choices` que ya los envuelve; solo el
+   botón y, al abrirse, la rejilla de formatos debajo. */
+.play-block-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); background: var(--surface); text-align: left; cursor: pointer; transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, background var(--motion-fast) ease; }
+.play-choice-block.open .play-block-toggle { border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent); }
+.play-block-toggle b { display: block; font-size: .93rem; }
+.play-block-toggle small { display: block; margin-top: 3px; color: var(--muted); font-size: .75rem; line-height: 1.25; }
+.play-block-chevron { font-size: 1.1rem; font-style: normal; color: var(--accent); transition: transform .2s ease; }
+.play-choice-block.open .play-block-chevron { transform: rotate(180deg); }
+.play-choice-block .play-choice-grid { margin-top: 9px; }
 .play-choice-grid { display: grid; gap: 9px; }
 .play-choice { width: 100%; min-height: 76px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); background: var(--surface); text-align: left; cursor: pointer; transition: transform var(--motion-fast) var(--ease-out), border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, background var(--motion-fast) ease; }
 .play-choice.primary { border-color: var(--ink-solid); background: var(--ink-solid); color: var(--ink-solid-contrast); }
@@ -686,7 +696,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .gallery-panel { flex-basis: 34px; border-radius: 22px; }
   .panel-label { left: 26px; right: 26px; bottom: 24px; }
   .hand { grid-template-columns: repeat(4, 1fr); }
-  .play-choice-grid { grid-template-columns: repeat(3, 1fr); }
+  .play-choice-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .play-choice { min-height: 170px; grid-template-columns: 1fr; align-content: start; gap: 12px; padding: 16px; }
   .play-choice > i { position: absolute; align-self: end; justify-self: end; margin: 0 17px 16px 0; }
   .play-choice { position: relative; }
@@ -896,7 +906,15 @@ body::before {
 .home-shell .play-choices-head { text-align: center; margin-bottom: 13px; }
 .home-shell .play-choices-head .eyebrow { justify-content: center; }
 .home-shell .play-choices h2 { font-size: 1.65rem; }
-.home-shell .play-choice-block-title { text-align: center; }
+.home-shell .play-block-toggle {
+  border-color: rgba(139,88,39,.48);
+  border-radius: 8px;
+  background: var(--formato);
+  box-shadow: inset 0 0 0 1px var(--formato-luz), 0 3px 8px rgba(73,42,13,.13);
+}
+.home-shell .play-choice-block.open .play-block-toggle { box-shadow: inset 0 0 0 2px var(--accent-dark), 0 3px 8px rgba(73,42,13,.13); }
+.home-shell .play-block-toggle b { font-family: var(--font-display); font-size: 1.02rem; text-transform: uppercase; }
+.home-shell .play-block-toggle small { color: var(--formato-detalle); font-family: var(--font-display); font-size: .8rem; }
 .home-shell .play-choice-grid { gap: 9px; }
 .home-shell .play-choice {
   min-height: 76px;
@@ -1222,7 +1240,7 @@ body::before {
 
 @media (min-width: 700px) {
   .home-masthead { margin-top: 4px; }
-  .home-shell .play-choice-grid { grid-template-columns: repeat(3, 1fr); }
+  .home-shell .play-choice-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .home-shell .play-choice { min-height: 118px; }
   .home-shell .gallery { grid-template-columns: repeat(2, 1fr); }
   .home-shell .gallery-panel.active { height: 300px; }
