@@ -24,6 +24,13 @@ const click = action => {
   assert.ok(button, `Existe la acción ${action}`);
   button.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 };
+// El menú de formatos agrupa sus opciones en dos bloques plegados; hay que desplegar
+// el que toque («multi» o «solo») antes de poder tocar los botones de dentro.
+const openFormat = format => {
+  const button = w.document.querySelector(`[data-format="${format}"]`);
+  assert.ok(button, `Existe el bloque de formato ${format}`);
+  button.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+};
 const checkScreen = label => {
   check(`${label}: cabecera Continuum`, w.document.querySelector(".brand")?.textContent.trim() === brand);
   check(`${label}: sin la denominación antigua`, !formerBrand.test(w.document.getElementById("app").textContent));
@@ -43,11 +50,13 @@ try {
   click("set-block");
   click("set-mode");
   checkScreen("Menú de formatos");
+  openFormat("multi");
   click("setup");
   checkScreen("Configuración");
   click("home");
   click("set-block");
   click("set-mode");
+  openFormat("solo");
   click("solo");
   checkScreen("Solitario");
   click("start-free");

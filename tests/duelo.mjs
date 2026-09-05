@@ -169,7 +169,7 @@ console.log("\nCrear un duelo y jugarlo");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
   ok("el duelo es un formato más del solitario", /Duelo por enlace/.test(texto(w)));
   w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-duel"]');
@@ -286,7 +286,7 @@ console.log("\nEl duelo no se cuela donde no debe");
   const w = boot();
   abreMazo(w, "historia", "history");
   ok("no hay duelo en el menú de formatos", !existe(w, '[data-action="start-duel"]'));
-  click(w, '[data-action="setup"]');
+  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   ok("ni en la preparación de una partida local", !existe(w, '[data-action="start-duel"]'));
   click(w, '[data-action="start"]');
   click(w, '[data-action="ready"]');

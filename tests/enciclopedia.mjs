@@ -138,7 +138,7 @@ console.log("\nSin entrada desde dentro de una partida");
   const w = boot();
   abreMazo(w, "historia", "history");
   ok("el menú de formatos sí la ofrece, antes de empezar a jugar", existe(w, '[data-action="enciclopedia"]'));
-  click(w, '[data-action="setup"]');
+  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   click(w, '[data-action="start"]');
   ok("no hay enciclopedia en la pantalla de pasar el móvil", !existe(w, '[data-action="enciclopedia"]'));
   click(w, '[data-action="ready"]');
@@ -147,7 +147,7 @@ console.log("\nSin entrada desde dentro de una partida");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   ok("no hay enciclopedia en el solitario", !existe(w, '[data-action="enciclopedia"]'));
 }
@@ -162,7 +162,7 @@ console.log("\nEl repaso enlaza con la enciclopedia");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   const cards = new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
   let vueltas = 0;

@@ -35,7 +35,7 @@ function click(w, selector) { const element = el(w, selector); element.focus(); 
 // Un mazo concreto se elige ahora desde la portada antes de llegar al menú de
 // formatos (`playMenu`), donde de verdad viven «setup»/«start»/«ready».
 function abreMazo(w, block, mode) { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); }
-function game(w) { abreMazo(w, "historia", "history"); ["setup", "start", "ready"].forEach(action => click(w, `[data-action="${action}"]`)); }
+function game(w) { abreMazo(w, "historia", "history"); click(w, '[data-format="multi"]'); ["setup", "start", "ready"].forEach(action => click(w, `[data-action="${action}"]`)); }
 function animationEnd(w, target, name) {
   const event = new w.Event("animationend", { bubbles: true });
   Object.defineProperty(event, "animationName", { value: name });
@@ -70,12 +70,12 @@ console.log("\nGalería continua y navegación repetida");
   for (let round = 0; round < 6; round++) {
     click(w, '[data-block="historia"]');
     click(w, '[data-mode="history"]');
-    click(w, '[data-action="setup"]');
+    click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
     assert.ok(el(w, ".shell").classList.contains("screen-enter"));
     click(w, '[data-action="home"]');
     click(w, '[data-block="historia"]');
     click(w, '[data-mode="history"]');
-    click(w, '[data-action="solo"]');
+    click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
     click(w, '[data-action="home"]');
   }
   ok("seis recorridos inicio–configuración–solitario conservan controles y foco", true);
@@ -99,7 +99,7 @@ console.log("\nVolver al menú sin saltos de lectura");
   // (menú de formatos, configuración) no vuelve a tocar esa posición guardada.
   click(w, '[data-mode="history"]');
   ok("elegir un mazo comienza arriba incluso si Inicio estaba desplazado", w.scrollY === 0);
-  click(w, '[data-action="setup"]');
+  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   click(w, '[data-action="home"]');
   ok("Volver recupera la posición y el foco de cuando se dejó Inicio", w.scrollY === 520 && w.document.activeElement.dataset.mode === 'history');
   ok("el regreso tiene sentido inverso sin un segundo desplazamiento animado", el(w, '.shell').classList.contains('screen-return') && calls.every(call => call.behavior === 'instant'));

@@ -40,6 +40,7 @@ for (let g = 0; g < muestras.length; g++) {
   const total = mazo.length;
   const cardsById = new Map(mazo.map(c => [c.id, c]));
   const orden = card => (["countries", "population", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
+  fire(w, w.document.querySelector('[data-format="multi"]'));
   fire(w, w.document.querySelector('[data-action="setup"]'));
   // Dos jugadores y una carta reducen el coste de cada navegador aislado sin dejar
   // de recorrer un turno completo, la persistencia y el resultado de la partida.
