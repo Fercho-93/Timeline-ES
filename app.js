@@ -1328,6 +1328,7 @@
     const etiqueta = soloLabel();
     paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${enDuelo() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
+      ${solo.kind === "comp" ? `<div class="comp-topic">${escapeHtml(CT.mode(solo.mode).name)}</div>` : ""}
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
       ${enDuelo() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
@@ -1608,10 +1609,9 @@
   function soloLabel() {
     if (solo.kind === "daily") return "Reto diario";
     if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${solo.duelo.rival.nombre || "quien te reta"}` : "Duelo · tu tirada";
-    // El nombre del tema va siempre en la etiqueta, no solo en la pantalla de anuncio de
-    // la ronda: la partida dura varios minutos y el tema no puede depender de que se
-    // recuerde lo que decía esa pantalla al empezar.
-    if (solo.kind === "comp") return `Competición · ${CT.mode(solo.mode).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
+    // El tema no va aquí: lo lleva su propio rótulo encima del marcador, que es lo que
+    // recuerda a qué se está jugando cuando el cartel del principio ya se ha ido.
+    if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
     return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
@@ -1621,28 +1621,19 @@
     compRoundIntro();
   }
 
+  // El cartel de cada tema: cada ronda sale al azar, así que antes de jugarla la pantalla
+  // no dice nada más que a qué se va a jugar. Nada de dificultad, marcador ni número de
+  // cartas —eso ya se ve dentro de la partida—: un cartel, un botón y a jugar. No se
+  // retira solo; hace falta tocar «Empezar», igual en el primer tema que en los demás.
   function compRoundIntro() {
     screen = "comp-intro";
-    const primerTema = !comp.roundsSummary.length;
-    const mode = CT.mode(comp.queue[0]);
-    const icono = CT.blockOf(comp.queue[0]).icon;
-    const numero = TOTAL_TEMAS - comp.queue.length + 1;
-    // Cada tema sale al azar, así que antes de empezar la ronda se anuncia como un
-    // cartelito propio: no se retira solo, hace falta tocar «Empezar» para pasar a
-    // jugarlo, igual en el primer tema que en los siguientes.
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
-      <div class="comp-splash-icon" aria-hidden="true">${icono}</div>
-      <div class="eyebrow">Competición · Tema ${numero} de ${TOTAL_TEMAS} · ¡Te toca!</div>
-      <h2 data-focus tabindex="-1">${mode.name}</h2>
-      <p>${mode.blurb} ${ROUND_CARDS} cartas, ${SOLO_LIVES} vidas nuevas.</p>
-      ${primerTema ? CT.Ghost.difficultySelect("comp-difficulty", comp.difficulty) : `<p>${CT.Ghost.level(comp.difficulty).name}</p>`}
-      ${comp.roundsSummary.length ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${comp.totalHits}</b><small>aciertos hasta ahora</small></span></div>` : ""}
-      <button class="btn btn-primary btn-block" data-action="comp-next-round">Empezar <span>→</span></button>
+      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Vas a jugar a</span>${escapeHtml(CT.mode(comp.queue[0]).name)}</h2>
+      <button class="btn btn-block comp-splash-start" data-action="comp-next-round">Empezar</button>
     </div></section></div>`);
   }
 
   function beginCompRound() {
-    if (!comp.roundsSummary.length) comp.difficulty = document.getElementById("comp-difficulty")?.value || comp.difficulty;
     const modeKey = comp.queue.shift();
     selectedModeKey = modeKey;
     cardsById = new Map(CT.cards(modeKey).map(card => [card.id, card]));
@@ -1758,7 +1749,7 @@
 
   app.addEventListener("change", event => {
     if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value, { returnTo: encReturn }); return; }
-    if (!["solo-difficulty", "comp-difficulty"].includes(event.target.id)) return;
+    if (event.target.id !== "solo-difficulty") return;
     const key = event.target.value;
     if (!CT.Ghost.LEVELS[key]) return;
     event.target.closest(".difficulty-field").querySelector("[data-difficulty-help]").textContent = CT.Ghost.level(key).description;
