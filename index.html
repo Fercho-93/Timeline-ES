@@ -16,9 +16,25 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
+    <!-- El telón de apertura decide si se enseña antes del primer pintado, así que va en
+         la cabecera y sin `defer`: más abajo ya no llegaría a tiempo. -->
+    <script src="splash.js"></script>
     <title>Continuum</title>
   </head>
   <body>
+    <!-- El telón vive fuera de `#app` a propósito: la portada se pinta detrás mientras se
+         ve, y al retirarse ya está todo puesto. Es decorativo de cabo a rabo —lo que dice
+         lo repite la portada—, así que un lector de pantalla se lo salta entero. -->
+    <div class="splash" id="splash" aria-hidden="true">
+      <div class="splash-halo"></div>
+      <div class="splash-emblema">
+        <img src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" fetchpriority="high" decoding="async" />
+        <i class="splash-brillo"></i>
+      </div>
+      <div class="splash-marca">Continuum</div>
+      <p class="splash-lema">Ordena. Compara. Descubre.</p>
+      <div class="splash-ornamento"><span></span><i></i><span></span></div>
+    </div>
     <main id="app"></main>
     <div id="toast" class="toast" role="status" aria-live="assertive"></div>
     <script src="cards.js"></script>

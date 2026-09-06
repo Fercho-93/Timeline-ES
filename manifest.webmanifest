@@ -4,8 +4,8 @@
   "description": "Juego de ordenar: historia, entretenimiento, ciencia y geografía.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f7f5f1",
-  "theme_color": "#f7f5f1",
+  "background_color": "#d7b778",
+  "theme_color": "#d7b778",
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]

@@ -1552,3 +1552,143 @@ body::before {
 }
 :root[data-theme="dark"] body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
 :root[data-theme="dark"] .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
+
+/* ---------------------------------------------------------------------------
+   El telón de apertura.
+
+   Es lo primero que se ve, así que va al final de la hoja para que nada lo pise, y se
+   apoya en los mismos materiales que el resto: pergamino, oro y terracota. El emblema
+   lleva fondo blanco, y como en la portada se funde con `multiply`: por eso el suelo del
+   telón es claro y no oscuro, que dejaría el logo dentro de una caja.
+
+   Manda la animación, no el guion. El telón entra, se sostiene y se va él solo, y termina
+   en `visibility: hidden` con los eventos apagados: aunque `splash.js` no llegara a
+   ejecutarse, la aplicación quedaría accesible igual. El guion solo adelanta la salida al
+   tocar la pantalla y retira el nodo.
+   --------------------------------------------------------------------------- */
+.sin-splash .splash { display: none; }
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  /* No va centrado a ojo: se coloca a la altura del escudo de la portada, que es lo que
+     hay debajo. Al fundirse, el emblema y el rótulo del telón caen casi encima de los de
+     la portada y la salida se lee como si el telón se posara en su sitio. */
+  align-content: start;
+  justify-items: center;
+  /* La altura no es a ojo: es la del escudo de la portada, que se compone del relleno
+     del marco —que respeta la muesca del móvil— más la barra superior. Sale de medir la
+     portada, no de una fracción de pantalla: en un móvil bajito una fracción se quedaría
+     corta y el telón caería en otro sitio. */
+  padding: calc(84px + max(18px, env(safe-area-inset-top, 18px))) 24px 24px;
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(255,247,211,.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 8%, rgba(99,53,18,.07) 0 1px, transparent 2px),
+    radial-gradient(ellipse at 50% 40%, #f6e3b6 0%, #e2c187 46%, #c9a05c 100%);
+  background-size: 26px 26px, 34px 34px, auto;
+  animation: splash-telon 2000ms cubic-bezier(.22, .61, .36, 1) forwards;
+}
+/* La rosa de los vientos del emblema, continuada detrás en rayos muy tenues: gira
+   despacio y da la sensación de que el escudo está vivo sin robarle la atención. */
+.splash-halo {
+  position: absolute;
+  width: min(150vw, 660px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(140,73,32,.07) 0deg 5deg, transparent 5deg 17deg);
+  -webkit-mask: radial-gradient(circle, transparent 30%, #000 46%, transparent 76%);
+  mask: radial-gradient(circle, transparent 30%, #000 46%, transparent 76%);
+  animation: splash-halo 30s linear infinite, splash-aparece 900ms ease-out both;
+}
+.splash-emblema {
+  position: relative;
+  width: clamp(250px, 78vw, 390px);
+  animation: splash-emblema 900ms cubic-bezier(.2, .78, .28, 1.04) both;
+}
+.splash-emblema img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 14px 26px rgba(88,50,16,.28));
+}
+/* El destello del oro: una banda de luz que cruza el escudo una sola vez, como cuando se
+   gira una lámina dorada bajo una lámpara. */
+.splash-brillo {
+  position: absolute;
+  inset: -12% -40%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 34%, rgba(255,250,226,.9) 50%, transparent 66%);
+  /* Sin esto, la banda de luz entra y sale por un canto recto que se ve sobre el
+     pergamino: se difumina por arriba y por abajo para que solo se note el brillo. */
+  -webkit-mask: linear-gradient(180deg, transparent, #000 24%, #000 76%, transparent);
+  mask: linear-gradient(180deg, transparent, #000 24%, #000 76%, transparent);
+  mix-blend-mode: soft-light;
+  animation: splash-brillo 1500ms 620ms cubic-bezier(.4, 0, .2, 1) both;
+}
+/* Acaba con el mismo tamaño y el mismo entreletra que el rótulo de la portada: cuando el
+   telón se va, la palabra que queda debajo es la misma y en el mismo sitio. Arranca
+   abierta y se cierra, pero sin pasarse: en un móvil estrecho, un entreletra mayor
+   sacaría «CONTINUUM» fuera de la pantalla en los primeros fotogramas. */
+.splash-marca {
+  max-width: 100%;
+  /* El escudo de la portada monta 4px sobre el rótulo; el telón hace lo mismo para que
+     las dos palabras caigan exactamente una encima de la otra al fundirse. */
+  margin-top: -4px;
+  overflow: hidden;
+  font: 500 clamp(2.55rem, 9vw, 4.3rem)/.9 var(--font-display);
+  text-transform: uppercase;
+  color: #4a2d13;
+  white-space: nowrap;
+  animation: splash-marca 1000ms 260ms cubic-bezier(.22, .61, .36, 1) both;
+}
+.splash-ornamento {
+  display: grid;
+  grid-template-columns: 58px 10px 58px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 18px 0 0;
+  animation: splash-ornamento 700ms 780ms cubic-bezier(.22, .61, .36, 1) both;
+}
+.splash-ornamento span { height: 1px; background: rgba(137,87,36,.6); }
+.splash-ornamento i { width: 8px; height: 8px; border: 1px solid #a36d2d; transform: rotate(45deg); }
+.splash-lema {
+  margin: 14px 0 0;
+  color: #7a5424;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  animation: splash-aparece 800ms 640ms ease-out both;
+}
+/* Saltárselo tocando la pantalla: se va en un tercio del tiempo desde donde estuviera. */
+.splash.splash-sale { animation: splash-salida 320ms cubic-bezier(.22, .61, .36, 1) forwards; }
+@media (min-width: 700px) { .splash { padding-top: calc(58px + max(18px, env(safe-area-inset-top, 18px))); } }
+
+@keyframes splash-telon {
+  0%, 74% { opacity: 1; transform: scale(1); visibility: visible; }
+  100% { opacity: 0; transform: scale(1.02); visibility: hidden; pointer-events: none; }
+}
+@keyframes splash-salida { to { opacity: 0; transform: scale(1.02); visibility: hidden; pointer-events: none; } }
+@keyframes splash-emblema { from { opacity: 0; transform: scale(.84) translateY(14px); } }
+@keyframes splash-marca { from { opacity: 0; letter-spacing: .16em; } to { opacity: 1; letter-spacing: -.055em; } }
+@keyframes splash-ornamento { from { opacity: 0; transform: scaleX(.2); } }
+@keyframes splash-aparece { from { opacity: 0; } }
+@keyframes splash-brillo { from { transform: translateX(-85%) skewX(-16deg); } to { transform: translateX(85%) skewX(-16deg); } }
+@keyframes splash-halo { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Sin movimiento el telón sigue estando —es la identidad del juego, no un adorno—,
+     pero llega entero y se va con un fundido, sin giros ni desplazamientos. */
+  .splash-halo, .splash-emblema, .splash-brillo, .splash-marca, .splash-ornamento, .splash-lema { animation: none !important; }
+  .splash-brillo { display: none; }
+  .splash { animation: splash-telon-quieto 2000ms linear forwards !important; }
+  @keyframes splash-telon-quieto {
+    0%, 74% { opacity: 1; visibility: visible; }
+    100% { opacity: 0; visibility: hidden; pointer-events: none; }
+  }
+}
