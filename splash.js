@@ -46,8 +46,13 @@
       splash.classList.add("splash-ready");
     };
 
-    // Dos frames dejan que fuentes, estilos y la portada terminen de tomar su tamaño.
-    requestAnimationFrame(() => requestAnimationFrame(alignWithHome));
+    // Dos frames dejan que fuentes, estilos y la portada terminen de tomar su tamaño. En
+    // entornos sin requestAnimationFrame (tests, navegadores embebidos) usamos setTimeout:
+    // la apertura no puede romper el resto de la aplicación por una API de animación.
+    const nextFrame = typeof window.requestAnimationFrame === "function"
+      ? callback => window.requestAnimationFrame(callback)
+      : callback => window.setTimeout(callback, 0);
+    nextFrame(() => nextFrame(alignWithHome));
 
     const skip = () => splash.classList.add("splash-skip");
     splash.addEventListener("pointerdown", skip, { once: true, passive: true });
