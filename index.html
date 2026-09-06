@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-title" content="Continuum" />
-    <meta name="theme-color" content="#d7b778" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#21170d" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6f1e8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#171b1c" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Juego de ordenar: historia, entretenimiento, ciencia y geografía" />
     <!-- El modo de varios móviles carga los módulos de Firebase desde gstatic.com y habla
          con las APIs de Google (autenticación anónima y Firestore) bajo googleapis.com; el
@@ -15,10 +15,23 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="splash.css" />
     <link rel="stylesheet" href="styles.css" />
+    <!-- Se ejecuta en <head> para decidir si hay telón antes de que el body pueda pintarse. -->
+    <script src="splash.js"></script>
     <title>Continuum</title>
   </head>
   <body>
+    <div id="app-splash" aria-hidden="true">
+      <section class="home-masthead splash-masthead">
+        <div class="home-crest splash-crest">
+          <img src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" decoding="sync" fetchpriority="high" />
+        </div>
+        <div class="home-wordmark">Continuum</div>
+        <div class="home-tagline">Ordena. Compara. Descubre.</div>
+        <div class="home-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
+      </section>
+    </div>
     <main id="app"></main>
     <div id="toast" class="toast" role="status" aria-live="assertive"></div>
     <script src="cards.js"></script>
