@@ -1604,6 +1604,13 @@
   const TOTAL_TEMAS = COMP_MODES.length;
   let comp = null;
   let previousModeKey = null;
+  let compSplashTimer = null;
+  // Cuánto se queda el aviso de categoría en pantalla antes de arrancar la ronda solo.
+  const COMP_SPLASH_MS = 1800;
+
+  function clearCompSplashTimer() {
+    if (compSplashTimer) { clearTimeout(compSplashTimer); compSplashTimer = null; }
+  }
 
   function soloLabel() {
     if (solo.kind === "daily") return "Reto diario";
@@ -1622,20 +1629,31 @@
   }
 
   function compRoundIntro() {
+    clearCompSplashTimer();
     screen = "comp-intro";
+    const primerTema = !comp.roundsSummary.length;
     const mode = CT.mode(comp.queue[0]);
+    const icono = CT.blockOf(comp.queue[0]).icon;
     const numero = TOTAL_TEMAS - comp.queue.length + 1;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card">
-      <div class="eyebrow">Competición · Tema ${numero} de ${TOTAL_TEMAS}</div>
+    // El primer tema pide elegir dificultad, así que necesita un toque deliberado; a
+    // partir del segundo, el tema ya está decidido por el azar y no hay nada más que
+    // decidir, así que el aviso se retira solo y la ronda arranca sin esperar un toque.
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash ${primerTema ? "" : "comp-splash-auto"}">
+      <div class="comp-splash-icon" aria-hidden="true">${icono}</div>
+      <div class="eyebrow">Competición · Tema ${numero} de ${TOTAL_TEMAS} · ¡Te toca!</div>
       <h2 data-focus tabindex="-1">${mode.name}</h2>
       <p>${mode.blurb} ${ROUND_CARDS} cartas, ${SOLO_LIVES} vidas nuevas.</p>
-      ${!comp.roundsSummary.length ? CT.Ghost.difficultySelect("comp-difficulty", comp.difficulty) : `<p>${CT.Ghost.level(comp.difficulty).name}</p>`}
+      ${primerTema ? CT.Ghost.difficultySelect("comp-difficulty", comp.difficulty) : `<p>${CT.Ghost.level(comp.difficulty).name}</p>`}
       ${comp.roundsSummary.length ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${comp.totalHits}</b><small>aciertos hasta ahora</small></span></div>` : ""}
       <button class="btn btn-primary btn-block" data-action="comp-next-round">Empezar <span>→</span></button>
     </div></section></div>`);
+    // Un toque siempre vale para saltarse la espera; sin dificultad que elegir, además
+    // arranca sola pasado un instante, como un aviso que se retira solo.
+    if (!primerTema) compSplashTimer = setTimeout(() => { if (screen === "comp-intro" && !app.querySelector(".overlay")) beginCompRound(); }, COMP_SPLASH_MS);
   }
 
   function beginCompRound() {
+    clearCompSplashTimer();
     if (!comp.roundsSummary.length) comp.difficulty = document.getElementById("comp-difficulty")?.value || comp.difficulty;
     const modeKey = comp.queue.shift();
     selectedModeKey = modeKey;
@@ -1686,6 +1704,7 @@
   // Salir a mitad de una competición no debe dejar la modalidad cambiada puesta: se
   // restaura la de antes de empezar, igual que hace `compFinish` al terminarla entera.
   function abandonCompetition() {
+    clearCompSplashTimer();
     selectedModeKey = previousModeKey;
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     solo = null;
