@@ -64,7 +64,7 @@ await check("crear una sala con un juego desmesurado", "deny", setDoc(doc(ctx(HO
 
 console.log("\nEmpezar la partida");
 const lobby3 = { ...base(), playerOrder: [HOST, P2, P3], players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 }, [P2]: { name: "Bea", hand: [], joinedAt: 2 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3 } } };
-const startPayload = { winners: null, handSize: 2, players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2 }, [P3]: { name: "Cid", hand: [6, 7], joinedAt: 3 } }, deck: [10, 11], discard: [], timeline: [20], status: "playing", phase: "turn", current: 1, starter: P2, turnsInRound: 0, round: 1, winner: null, reveal: null, version: 2, updatedAt: serverTimestamp() };
+const startPayload = { winners: null, handSize: 2, players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2 }, [P3]: { name: "Cid", hand: [6, 7], joinedAt: 3 } }, deck: [10, 11], discard: [], timeline: [20], status: "playing", phase: "turn", current: 1, starter: P2, turnsInRound: 0, round: 1, winner: null, reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() };
 await seed(lobby3);
 await check("el anfitrión reparte y empieza", "allow", updateDoc(ref(ctx(HOST)), startPayload));
 await seed(lobby3);
@@ -88,7 +88,7 @@ await check("alguien de fuera escribe en la sala", "deny", updateDoc(ref(ctx(OUT
 console.log("\nCerrar el turno");
 const revealed = playing({ phase: "reveal", reveal: { cardId: 1, correct: true, playerUid: HOST, playerName: "Ana" }, players: { [HOST]: { name: "Ana", hand: [2] }, [P2]: { name: "Bea", hand: [3, 4] }, [P3]: { name: "Cid", hand: [5] } }, timeline: [1, 20] });
 await seed(revealed);
-await check("el jugador de turno pasa el turno", "allow", updateDoc(ref(ctx(HOST)), { players: revealed.players, deck: revealed.deck, discard: [], current: 1, turnsInRound: 1, round: 1, phase: "turn", reveal: null, version: 2, updatedAt: serverTimestamp() }));
+await check("el jugador de turno pasa el turno", "allow", updateDoc(ref(ctx(HOST)), { players: revealed.players, deck: revealed.deck, discard: [], current: 1, turnsInRound: 1, round: 1, phase: "turn", reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() }));
 await seed(revealed);
 await check("saltarse a un jugador al pasar turno", "deny", updateDoc(ref(ctx(HOST)), { players: revealed.players, deck: revealed.deck, discard: [], current: 2, turnsInRound: 1, round: 1, phase: "turn", reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await check("TRAMPA: repartirse cartas a mitad de ronda", "deny", updateDoc(ref(ctx(HOST)), { players: { ...revealed.players, [P2]: { name: "Bea", hand: [3, 4, 10] } }, deck: [11, 12], discard: [], current: 1, turnsInRound: 1, round: 1, phase: "turn", reveal: null, version: 2, updatedAt: serverTimestamp() }));
@@ -103,11 +103,11 @@ await check("terminar sin declarar ganadores", "deny", updateDoc(ref(ctx(P3)), {
 await seed(lastTurn);
 await check("TRAMPA: declararse ganador con cartas en mano", "deny", updateDoc(ref(ctx(HOST)), { status: "ended", phase: "finished", winner: HOST, winners: [HOST], reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await seed(lastTurn);
-await check("final de ronda: reparto de desempate", "allow", updateDoc(ref(ctx(P3)), { players: { ...lastTurn.players, [P3]: { name: "Cid", hand: [10] } }, deck: [11, 12], discard: [], current: 0, turnsInRound: 0, round: 2, phase: "turn", reveal: null, version: 2, updatedAt: serverTimestamp() }));
+await check("final de ronda: reparto de desempate", "allow", updateDoc(ref(ctx(P3)), { players: { ...lastTurn.players, [P3]: { name: "Cid", hand: [10] } }, deck: [11, 12], discard: [], current: 0, turnsInRound: 0, round: 2, phase: "turn", reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() }));
 
 console.log("\nControles del anfitrión");
 await seed(playing({ current: 1 }));
-await check("el anfitrión salta el turno del ausente", "allow", updateDoc(ref(ctx(HOST)), { current: 2, turnsInRound: 1, round: 1, phase: "turn", reveal: null, version: 2, updatedAt: serverTimestamp() }));
+await check("el anfitrión salta el turno del ausente", "allow", updateDoc(ref(ctx(HOST)), { current: 2, turnsInRound: 1, round: 1, phase: "turn", reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() }));
 await seed(playing({ current: 1 }));
 await check("un jugador cualquiera salta turnos", "deny", updateDoc(ref(ctx(P3)), { current: 2, turnsInRound: 1, round: 1, phase: "turn", reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await seed(playing({ current: 1 }));
@@ -123,7 +123,7 @@ await check("marcharse y declararse ganador de paso", "deny", updateDoc(ref(ctx(
 await seed({ ...base(), playerOrder: [HOST, P2], players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 }, [P2]: { name: "Bea", hand: [], joinedAt: 2 } } });
 await check("el anfitrión expulsa desde el vestíbulo", "allow", updateDoc(ref(ctx(HOST)), { players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 } }, playerOrder: [HOST], discard: [], version: 2, updatedAt: serverTimestamp() }));
 await seed(playing({ current: 1, phase: "reveal", reveal: { cardId: 3, correct: true, playerUid: P2, playerName: "Bea" } }));
-await check("el anfitrión salta un turno ya revelado", "allow", updateDoc(ref(ctx(HOST)), { current: 2, turnsInRound: 1, round: 1, phase: "turn", reveal: null, version: 2, updatedAt: serverTimestamp() }));
+await check("el anfitrión salta un turno ya revelado", "allow", updateDoc(ref(ctx(HOST)), { current: 2, turnsInRound: 1, round: 1, phase: "turn", reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() }));
 
 console.log("\nEl Pulso");
 // Es la única jugada que toca la mano de otra persona, así que lo que hay que demostrar

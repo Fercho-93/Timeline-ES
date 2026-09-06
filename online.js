@@ -36,6 +36,11 @@ let pendingIndex = null;
 let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
+let turnTimerHandle = null;
+// Cada turno tiene 20 segundos para colocar la carta; si se agotan, pasa al siguiente
+// jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
+// en todos los móviles aunque sus relojes no coincidan.
+const TURN_SECONDS = 20;
 
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
@@ -56,6 +61,7 @@ function modeCards(key = modeKey()) { return CT.cards(key); }
 // verse en la mano sin revelar el dato que hay que ordenar.
 function usesAnimalArt() { return CT.usesAnimalArt(modeKey()); }
 function animalArt(card) { return CT.animalArt(modeKey(), card); }
+function categoryBadge(card) { return CT.categoryBadge(modeKey(), card); }
 
 // Un mapa por modalidad, no uno solo: la modalidad puede cambiar entre partidas (aunque
 // nunca a mitad de una) y cada mazo conserva sus propios identificadores. Se construye la
@@ -419,6 +425,7 @@ function anotaProgreso() {
 }
 
 function renderLobby() {
+  clearTurnTimer();
   const isHost = roomState.hostUid === user.uid;
   const people = roomState.playerOrder.map(uid => roomState.players[uid]);
   paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button>${isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>'}`)}
@@ -456,6 +463,7 @@ async function startRoom(withGhost = true) {
         handSize: actualHand, pulse, ...(powers.ghost ? { ghost: powers.ghost } : {}), ...(powers.pulsePower ? { pulsePower: powers.pulsePower } : {}), players, deck, timeline, discard: [], status: "playing", phase: "turn",
         current: data.playerOrder.indexOf(starterUid), starter: starterUid,
         turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, pulseTurn: null,
+        turnStartedAt: serverTimestamp(),
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -463,6 +471,41 @@ async function startRoom(withGhost = true) {
     console.error(error);
     showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? "Para usar los poderes, actualizad todos los móviles a v38 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v38 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
   } finally { busy = false; }
+}
+
+function clearTurnTimer() {
+  if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; }
+}
+
+function turnDeadline() {
+  const started = roomState.turnStartedAt;
+  // Antes de que el servidor confirme la escritura, la caché local todavía puede llevar
+  // `serverTimestamp()` sin resolver (null); mientras tanto se cuenta desde ahora y el
+  // reloj se corrige solo en cuanto llegue la instantánea confirmada.
+  const startedMs = started && typeof started.toMillis === "function" ? started.toMillis() : Date.now();
+  return startedMs + TURN_SECONDS * 1000;
+}
+
+// Solo el anfitrión puede saltar un turno (`skipTurn`), así que es su móvil el que vigila
+// el reloj y lo hace pasar solo si a nadie le da tiempo a jugar. El resto de móviles solo
+// enseñan la cuenta atrás.
+function manageTurnTimer() {
+  clearTurnTimer();
+  if (!roomState || roomState.status !== "playing" || roomState.phase !== "turn") return;
+  const deadline = turnDeadline();
+  const tick = () => {
+    const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    const value = document.getElementById("turn-timer-value");
+    if (value) value.textContent = remaining;
+    const badge = document.getElementById("turn-timer");
+    if (badge) badge.classList.toggle("turn-timer-low", remaining <= 5);
+    if (remaining <= 0) {
+      clearTurnTimer();
+      if (roomState.hostUid === user.uid) skipTurn();
+    }
+  };
+  tick();
+  turnTimerHandle = setInterval(tick, 250);
 }
 
 function renderGame() {
@@ -501,29 +544,34 @@ function renderGame() {
       const card = timelineCards[index];
       const era = eraForCard(card);
       const animal = usesAnimalArt();
-      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación."><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación."><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
     }
   }
+  // El primer pintado ya arranca con la cuenta atrás en su punto real, no siempre en 20:
+  // quien abre la sala a mitad de turno ve lo que de verdad queda, no un contador que
+  // vuelve a empezar de cero en su pantalla.
+  const turnRemaining = roomState.phase === "turn" ? Math.max(0, Math.ceil((turnDeadline() - Date.now()) / 1000)) : null;
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="room">Sala</button>')}
     <div class="connection-strip"><span><i></i> Sala ${roomCode}</span><small>${roomState.playerOrder.length} participantes</small></div>
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
-    <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${turnRemaining !== null ? `<div class="turn-timer ${turnRemaining <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${turnRemaining}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
     ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     <section><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} cartas</small></div>${CT.timelineMap(modeKey(), timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     ${pulsing
-      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
+      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}${categoryBadge(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
         ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro"
           : defensa ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer.name)}`
           : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
         : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…`
         : `${escapeHtml(currentPlayer.name)} está colocando la carta del duelo…`}</p></section>`
-      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}>${animalArt(card)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
+      : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}>${animalArt(card)}${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, user.uid, roomState.timeline.length, me.hand.length, 'data-online-action="ghost-use"', myTurn) : ""}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
     ${!pulsing && roomState.phase !== "reveal" ? CT.Powers.pulsePower(roomState.pulsePower, user.uid, me.hand.length, 'data-online-action="pulse-open"', myTurn && !roomState.ghost?.fresh && roomState.deck.length + roomState.discard.length > 0 && pulseTargetUids().length > 0) : ""}
   </div>`, "online-game");
+  manageTurnTimer();
   // Igual que en el juego local: arrastrar una carta hasta un hueco es otra forma de
   // llegar a la confirmación. Fuera de turno las cartas están desactivadas y no arrancan.
   CT.enableDrag({
@@ -557,7 +605,7 @@ function revealOverlay(currentUid) {
   // resto de la sala se entera de que hubo trasvase, pero no de cuál era la carta.
   const implicado = reveal.pulse && (user.uid === reveal.playerUid || user.uid === reveal.targetUid);
   const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
-  const fichaCarta = `<div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
+  const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
   // Un duelo no lo gana ni lo pierde una sola persona, así que no lleva la marca grande de
   // acierto: cada jugada trae la suya y debajo se cuenta el desenlace.
   if (reveal.duel) {
@@ -875,7 +923,7 @@ async function finishTurn() {
       }
       transaction.update(roomRef, {
         players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, current: (data.current + 1) % data.playerOrder.length,
-        turnsInRound, round, phase: "turn", reveal: null,
+        turnsInRound, round, phase: "turn", reveal: null, turnStartedAt: serverTimestamp(),
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -889,6 +937,7 @@ async function finishTurn() {
 }
 
 function renderWinner() {
+  clearTurnTimer();
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
   const names = uids.map(uid => escapeHtml(roomState.players[uid].name));
   const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
@@ -908,7 +957,7 @@ function renderTimelineReview() {
       const card = getCard(id);
       if (!card) return "";
       const era = eraForCard(card);
-      return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+      return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
     }).join("")}</div>
     <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
   </section></div>`, "online-timeline-review");
@@ -954,7 +1003,7 @@ async function skipTurn() {
         current: (data.current + 1) % data.playerOrder.length,
         turnsInRound: roundEnds ? 0 : data.turnsInRound + 1,
         round: roundEnds ? data.round + 1 : data.round,
-        phase: "turn", reveal: null,
+        phase: "turn", reveal: null, turnStartedAt: serverTimestamp(),
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -1039,6 +1088,7 @@ async function closeRoom() {
 
 // Con mensaje se recarga un momento después, para que dé tiempo a leerlo.
 function leaveOnline(message = "") {
+  clearTurnTimer();
   unsubscribeRoom?.();
   unsubscribeRoom = null;
   roomState = null;

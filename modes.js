@@ -228,11 +228,17 @@
     mixed: {
       key: "mixed", name: "Gran mezcla temporal",
       cardLabel: "hitos", blurb: "Todos los mazos de línea temporal, juntos.",
+      // Cada carta se etiqueta con la modalidad de la que viene (`sourceMode`): al
+      // mezclar ocho mazos distintos, el título y el año solos no bastan para ubicarse
+      // —«Se estrena tal película» y «Cae tal ciudad» pueden caer en el mismo siglo—, así
+      // que la carta lleva consigo de qué tema es. Se copian los objetos en vez de
+      // reutilizar los del mazo original para no contaminar `history.cards` y compañía,
+      // que no llevan `sourceMode` porque en su propio mazo ya se sabe de sobra el tema.
       cards: [
-        ...window.HISTORY_CARDS, ...window.WORLD_CARDS, ...window.INVENTION_CARDS,
-        ...window.MOVIE_CARDS, ...window.MUSIC_CARDS, ...window.VIDEOGAME_CARDS,
-        ...window.ASTRONOMY_CARDS, ...window.MEDICINE_CARDS
-      ],
+        ["history", window.HISTORY_CARDS], ["world", window.WORLD_CARDS], ["inventions", window.INVENTION_CARDS],
+        ["movies", window.MOVIE_CARDS], ["music", window.MUSIC_CARDS], ["videogames", window.VIDEOGAME_CARDS],
+        ["astronomy", window.ASTRONOMY_CARDS], ["medicine", window.MEDICINE_CARDS]
+      ].flatMap(([sourceMode, deck]) => deck.map(card => ({ ...card, sourceMode }))),
       axis: "time",
       bands: WORLD_BANDS
     },
@@ -450,6 +456,21 @@
     13037: "american-cockroach", 13038: "bee"
   };
 
+  // El contexto de una carta en «Gran mezcla»: de qué tema viene, con el icono de su
+  // bloque para reconocerlo de un vistazo. En cualquier otra modalidad no hace falta —ya
+  // se sabe qué se está jugando— así que devuelve `null` y quien pinte la carta no añade
+  // nada.
+  function categoryFor(modeKey, card) {
+    if (modeKey !== "mixed" || !card.sourceMode || !has(card.sourceMode)) return null;
+    return { icon: blockOf(card.sourceMode).icon, name: MODES[card.sourceMode].name };
+  }
+
+  function categoryBadge(modeKey, card) {
+    const category = categoryFor(modeKey, card);
+    if (!category) return "";
+    return `<span class="card-category"><span aria-hidden="true">${category.icon}</span>${escapeHtml(category.name)}</span>`;
+  }
+
   function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey); }
 
   function cardArt(modeKey, card) {
@@ -594,7 +615,7 @@
       : context === "competition"
         ? `<h3>🏆 Competición</h3><p class="guide-lead">Cinco cartas de cada tema, uno tras otro y sin repetir. Tres vidas nuevas en cada ronda, y los aciertos se van sumando.</p>${dificultad}`
         : context === "online"
-          ? `<h3>Varios móviles</h3><p class="guide-lead">El anfitrión abre la sala y reparte el código, el enlace o el QR. Cada cual juega desde su pantalla, con conexión.</p>`
+          ? `<h3>Varios móviles</h3><p class="guide-lead">El anfitrión abre la sala y reparte el código, el enlace o el QR. Cada cual juega desde su pantalla, con conexión. Cada turno tiene 20 segundos para colocar la carta; si se agotan, el turno pasa solo a la siguiente persona.</p>`
           : `<h3>Un solo móvil</h3><p class="guide-lead">De 2 a 9 personas, pasándoos el teléfono en cada turno. Antes de empezar elegís cuántas cartas lleva cada uno y quién comienza.</p>`;
 
     return `<div class="eyebrow">Guía · ${escapeHtml(selectedMode.name)}</div>
@@ -664,7 +685,7 @@
   window.CONTINUUM = {
     MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK,
     has, mode, axis, cards,
-    usesAnimalArt, cardArt, animalArt, deckFingerprint,
+    usesAnimalArt, cardArt, animalArt, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
     correctIndex, placementHint, guideMarkup,

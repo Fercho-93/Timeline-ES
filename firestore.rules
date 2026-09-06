@@ -292,7 +292,7 @@ service cloud.firestore {
           && prior.playerOrder.size() >= 2
           && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
-                                'pulseTurn', 'version', 'updatedAt'])
+                                'pulseTurn', 'turnStartedAt', 'version', 'updatedAt'])
           && next.status == 'playing'
           && next.phase == 'turn'
           && next.handSize >= 1 && next.handSize <= 6
@@ -304,6 +304,10 @@ service cloud.firestore {
           && next.winner == null
           && next.get('winners', null) == null
           && next.reveal == null
+          // Optativo por compatibilidad: un cliente sin actualizar todavía no lo manda.
+          // No se exige igual a `request.time` por el mismo motivo que `winners` es
+          // optativo: forzarlo dejaría fuera a quien no ha actualizado el suyo.
+          && (!('turnStartedAt' in next) || next.turnStartedAt is timestamp)
           && pulsePowerStartShape()
           && bumped();
       }
@@ -461,13 +465,15 @@ service cloud.firestore {
                  && prior.players[next.winner].hand.size() == 0
                  && next.get('winners', [next.winner]).size() >= 1)
               : (changed().hasOnly(['ghost', 'pulsePower', 'players', 'deck', 'discard', 'current', 'turnsInRound', 'round',
-                                    'phase', 'reveal', 'version', 'updatedAt'])
+                                    'phase', 'reveal', 'turnStartedAt', 'version', 'updatedAt'])
                  && next.status == 'playing'
                  && next.phase == 'turn'
                  && next.winner == null
                  && next.current == (prior.current + 1) % prior.playerOrder.size()
                  && next.turnsInRound == (roundEnds() ? 0 : prior.turnsInRound + 1)
                  && next.round == (roundEnds() ? prior.round + 1 : prior.round)
+                 // Optativo por compatibilidad con clientes sin actualizar; ver `validStart`.
+                 && (!('turnStartedAt' in next) || next.turnStartedAt is timestamp)
                  // Solo el desempate de final de ronda puede repartir cartas.
                  && (roundEnds() || (next.players == prior.players
                                      && next.deck == prior.deck
@@ -480,7 +486,7 @@ service cloud.firestore {
         return isHost()
           && before().status == 'playing'
           && changed().hasOnly(['ghost', 'discard', 'pulseTurn', 'current', 'turnsInRound', 'round', 'phase', 'reveal',
-                                'version', 'updatedAt'])
+                                'turnStartedAt', 'version', 'updatedAt'])
           && after().phase == 'turn'
           && after().reveal == null
           && after().current == (before().current + 1) % before().playerOrder.size()
@@ -488,6 +494,8 @@ service cloud.firestore {
           && after().round == (roundEnds() ? before().round + 1 : before().round)
           && after().discard == (before().phase == 'pulse' ? before().discard.concat([before().pulseTurn.cardId]) : before().discard)
           && after().get('pulseTurn', null) == (before().phase == 'pulse' ? null : before().get('pulseTurn', null))
+          // Optativo por compatibilidad con clientes sin actualizar; ver `validStart`.
+          && (!('turnStartedAt' in after()) || after().turnStartedAt is timestamp)
           && bumped();
       }
 

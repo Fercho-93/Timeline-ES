@@ -80,6 +80,9 @@
   // La tabla de láminas vive en modes.js, compartida con online.js.
   function usesAnimalArt() { return CT.usesAnimalArt(selectedModeKey); }
   function animalArt(card) { return CT.animalArt(selectedModeKey, card); }
+  // El sello de tema de una carta, solo hay uno en «Gran mezcla»: en cualquier otra
+  // modalidad `CT.categoryBadge` devuelve una cadena vacía.
+  function categoryBadge(card) { return CT.categoryBadge(selectedModeKey, card); }
 
   function saveGame() {
     if (game) localStorage.setItem(storageKey(), JSON.stringify(game));
@@ -457,8 +460,8 @@
         ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer().name)}`
         : `Colócala. Si aciertas y ${escapeHtml(pulseTarget.name)} falla, le pasas una carta tuya`;
     const manoHtml = pulseCard
-      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pistaPulso()}</p></section>`
-      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
+      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pistaPulso()}</p></section>`
+      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
@@ -504,7 +507,7 @@
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
     const animal = usesAnimalArt();
-    return `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación."><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+    return `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación."><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
   }
 
   // El hueco «+» normal, o el mismo hueco resaltado como el sitio donde iba de verdad la
@@ -1330,7 +1333,7 @@
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
-      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
+      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${card.id}">${animalArt(card)}${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Arrastra la carta hasta un hueco, o tócalo directamente"}</p></section>
     </div>`);
     if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
     CT.enableDrag({
@@ -1375,7 +1378,7 @@
     const era = eraForCard(card);
     const acabada = soloAcabada();
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
@@ -1605,7 +1608,10 @@
   function soloLabel() {
     if (solo.kind === "daily") return "Reto diario";
     if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${solo.duelo.rival.nombre || "quien te reta"}` : "Duelo · tu tirada";
-    if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
+    // El nombre del tema va siempre en la etiqueta, no solo en la pantalla de anuncio de
+    // la ronda: la partida dura varios minutos y el tema no puede depender de que se
+    // recuerde lo que decía esa pantalla al empezar.
+    if (solo.kind === "comp") return `Competición · ${CT.mode(solo.mode).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
     return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
