@@ -250,7 +250,7 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
   .deck-browse:hover > i { transform: translateX(3px); }
   .weak-row:hover { background: var(--accent-soft); }
   .weak-row:hover > i { transform: translateX(3px); }
-  .btn-primary:not(:disabled):hover { filter: brightness(.92); }
+  .btn-primary:not(:disabled):hover, .comp-splash-start:not(:disabled):hover { filter: brightness(.92); }
   .btn-secondary:not(:disabled):hover { background: var(--paper); }
 }
 .btn-ghost { color: var(--accent); background: transparent; }
@@ -520,10 +520,17 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .player-medallion { width: 74px; height: 74px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); border: 2px solid var(--accent-solid); font: 700 1.2rem var(--font-display); }
 .pass-card .eyebrow { justify-content: center; }
 
-/* El anuncio de tema de Competición: un cartelito con el icono del bloque, para que se
-   note de un vistazo qué tema ha tocado antes de tocar «Empezar». */
-.comp-splash-icon { font-size: 3rem; line-height: 1; margin-bottom: 6px; animation: comp-splash-pop 420ms var(--ease-spring) both; }
-@keyframes comp-splash-pop { from { opacity: 0; transform: scale(.6); } }
+/* El cartel de tema de Competición: una pantalla entera para decir a qué se juega y nada
+   más, con el nombre a tamaño de titular y un botón rojo debajo. */
+.comp-splash { padding-block: 34px; animation: comp-splash-pop 380ms var(--ease-out) both; }
+@keyframes comp-splash-pop { from { opacity: 0; transform: scale(.94); } }
+.comp-splash h2 { margin: 0 0 26px; font-size: clamp(1.9rem, 8.5vw, 3rem); line-height: 1.06; }
+.comp-splash-lead { display: block; margin-bottom: 12px; color: var(--muted); font-size: .82rem; font-weight: 700; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase; }
+.comp-splash-start { min-height: 56px; color: #fff; font-size: 1.05rem; background: linear-gradient(110deg, #c33a2c, #9c1f15); box-shadow: 0 6px 16px rgba(140,26,18,.3); }
+
+/* Y dentro de la partida, el mismo tema como rótulo sombreado encima del marcador: el
+   cartel del principio ya no está y la ronda dura varios minutos. */
+.comp-topic { margin: 0 0 14px; padding: 11px 16px; border-radius: 12px; background: var(--accent-solid); color: #fff; box-shadow: 0 5px 14px rgba(73,42,14,.26); font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; letter-spacing: -.01em; text-align: center; }
 
 .rules { text-align: left; }
 
@@ -992,7 +999,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .dialog-enter .guide-step, .dialog-enter .guide-card,
   .gd-play, .gd-flip, .gd-slot, .gd-mark,
   .spinner, .waiting-orbit, .waiting-inline i, .turn-timer-low,
-  .comp-splash-icon { animation: none !important; }
+  .comp-splash { animation: none !important; }
   /* Sin el bucle, la demostración se queda en un solo fotograma: la carta por jugar,
      con su valor tapado, ya sobre el hueco al que va. Se recorta a la altura de la línea
      porque la banda de abajo solo existía para verla subir. */
