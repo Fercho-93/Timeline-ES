@@ -520,16 +520,10 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .player-medallion { width: 74px; height: 74px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent-solid); border: 2px solid var(--accent-solid); font: 700 1.2rem var(--font-display); }
 .pass-card .eyebrow { justify-content: center; }
 
-/* El anuncio de tema de Competición: un tema al azar, ya se sabe cuál, así que el aviso
-   se retira solo pasado un instante en vez de exigir un toque — salvo en el primero, que
-   además pide elegir dificultad. `comp-splash-drain` marca ese instante con una barra que
-   se vacía, para que quien mira la pantalla sepa que no hace falta tocar nada. */
+/* El anuncio de tema de Competición: un cartelito con el icono del bloque, para que se
+   note de un vistazo qué tema ha tocado antes de tocar «Empezar». */
 .comp-splash-icon { font-size: 3rem; line-height: 1; margin-bottom: 6px; animation: comp-splash-pop 420ms var(--ease-spring) both; }
 @keyframes comp-splash-pop { from { opacity: 0; transform: scale(.6); } }
-/* Solo a partir del segundo tema: el primero pide elegir dificultad, así que no se retira
-   solo, y esta barra —que anuncia justo eso— no le corresponde. */
-.comp-splash-auto::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--accent); transform-origin: left; animation: comp-splash-drain 1.8s linear forwards; }
-@keyframes comp-splash-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
 .rules { text-align: left; }
 
@@ -998,7 +992,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .dialog-enter .guide-step, .dialog-enter .guide-card,
   .gd-play, .gd-flip, .gd-slot, .gd-mark,
   .spinner, .waiting-orbit, .waiting-inline i, .turn-timer-low,
-  .comp-splash-icon, .comp-splash-auto::after { animation: none !important; }
+  .comp-splash-icon { animation: none !important; }
   /* Sin el bucle, la demostración se queda en un solo fotograma: la carta por jugar,
      con su valor tapado, ya sobre el hueco al que va. Se recorta a la altura de la línea
      porque la banda de abajo solo existía para verla subir. */
