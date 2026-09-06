@@ -1,0 +1,120 @@
+/* Telón de apertura de Continuum.
+   Reutiliza las clases de la cabecera real para que emblema, rótulo y lema tengan
+   exactamente la misma tipografía y proporciones que la portada que queda debajo. */
+#app-splash { display: none; }
+
+html.splash-active #app-splash {
+  display: block;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  color: #2b2927;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(255,255,255,.72), transparent 34%),
+    linear-gradient(180deg, #faf6ee 0%, #f6f1e8 52%, #eee4d3 100%);
+  animation: splash-curtain-out 620ms 2350ms cubic-bezier(.22,.61,.36,1) forwards;
+}
+
+/* Mientras todavía no hemos medido la portada, el contenido permanece invisible sobre
+   el pergamino. splash.js lo alinea y entonces deja entrar el emblema ya en su sitio. */
+#app-splash .splash-masthead {
+  position: fixed;
+  top: var(--splash-top, max(56px, calc(env(safe-area-inset-top) + 38px)));
+  left: var(--splash-left, 50%);
+  width: var(--splash-width, min(calc(100% - 36px), 540px));
+  max-width: none;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(9px) scale(.988);
+  pointer-events: none;
+}
+
+#app-splash.splash-ready .splash-masthead {
+  animation: splash-content-in 720ms 70ms cubic-bezier(.2,.78,.28,1.04) both;
+}
+
+/* Si todavía no hay coordenadas de la portada, el fallback usa left:50%; cuando sí las
+   hay, splash.js escribe un valor en píxeles y anulamos el centrado por transform. */
+#app-splash .splash-masthead:not([style*="--splash-left"]) { transform-origin: 50% 50%; }
+#app-splash.splash-ready .splash-masthead:not([style*="--splash-left"]) {
+  left: 50%;
+  margin-left: calc(var(--splash-width, min(calc(100% - 36px), 540px)) / -2);
+}
+
+#app-splash .splash-crest img {
+  animation: splash-gold-glow 920ms 820ms ease-in-out both;
+}
+
+/* Una veta de luz muy tenue cruza el escudo sin convertir la apertura en una animación
+   llamativa: la sensación buscada es de acabado editorial, no de pantalla de videojuego. */
+#app-splash .splash-crest::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: 10%;
+  bottom: 10%;
+  left: -34%;
+  width: 20%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(205,157,76,.26), rgba(255,242,196,.42), transparent);
+  filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  animation: splash-shine 900ms 840ms cubic-bezier(.22,.61,.36,1) both;
+}
+
+#app-splash.splash-skip {
+  animation-name: splash-curtain-skip;
+  animation-duration: 420ms;
+  animation-delay: 0ms;
+}
+
+#app-splash.splash-skip .splash-masthead,
+#app-splash.splash-skip .splash-crest img,
+#app-splash.splash-skip .splash-crest::after {
+  animation-play-state: paused;
+}
+
+@keyframes splash-content-in {
+  from { opacity: 0; transform: translateY(9px) scale(.988); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes splash-gold-glow {
+  0%, 100% { filter: sepia(.1) saturate(.78) contrast(.94); }
+  48% { filter: sepia(.22) saturate(.92) contrast(.96) drop-shadow(0 0 16px rgba(174,116,48,.30)); }
+}
+
+@keyframes splash-shine {
+  0% { left: -34%; opacity: 0; }
+  18% { opacity: .55; }
+  78% { opacity: .18; }
+  100% { left: 112%; opacity: 0; }
+}
+
+@keyframes splash-curtain-out {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+@keyframes splash-curtain-skip {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.splash-active #app-splash {
+    animation-duration: 320ms;
+    animation-delay: 1250ms;
+  }
+  #app-splash.splash-ready .splash-masthead {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  #app-splash .splash-crest img,
+  #app-splash .splash-crest::after { animation: none; }
+  #app-splash.splash-skip { animation-duration: 180ms; animation-delay: 0ms; }
+}
