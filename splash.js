@@ -1,0 +1,68 @@
+(() => {
+  const ROOT_CLASS = "splash-active";
+  const SEEN_KEY = "continuum-splash-seen-v1";
+  const root = document.documentElement;
+
+  // La marca se pone antes de que el body termine de parsearse. Así, si el service worker
+  // toma el control y recarga esta misma pestaña, el telón no aparece dos veces.
+  let alreadySeen = false;
+  try {
+    alreadySeen = sessionStorage.getItem(SEEN_KEY) === "1";
+    if (!alreadySeen) sessionStorage.setItem(SEEN_KEY, "1");
+  } catch {
+    // Bloquear sessionStorage no debe bloquear el arranque: simplemente se verá el telón.
+  }
+
+  if (alreadySeen) return;
+  root.classList.add(ROOT_CLASS);
+
+  function bootSplash() {
+    const splash = document.getElementById("app-splash");
+    if (!splash) {
+      root.classList.remove(ROOT_CLASS);
+      return;
+    }
+
+    const masthead = splash.querySelector(".splash-masthead");
+    let removed = false;
+
+    const remove = () => {
+      if (removed) return;
+      removed = true;
+      splash.remove();
+      root.classList.remove(ROOT_CLASS);
+    };
+
+    // La portada real ya se pinta antes de DOMContentLoaded. Tomamos sus coordenadas y
+    // colocamos el emblema del telón exactamente encima: al fundirse, no hay salto visual.
+    const alignWithHome = () => {
+      const target = document.querySelector("#app .home-masthead");
+      if (target && masthead) {
+        const rect = target.getBoundingClientRect();
+        masthead.style.setProperty("--splash-top", `${rect.top}px`);
+        masthead.style.setProperty("--splash-left", `${rect.left}px`);
+        masthead.style.setProperty("--splash-width", `${rect.width}px`);
+      }
+      splash.classList.add("splash-ready");
+    };
+
+    // Dos frames dejan que fuentes, estilos y la portada terminen de tomar su tamaño.
+    requestAnimationFrame(() => requestAnimationFrame(alignWithHome));
+
+    const skip = () => splash.classList.add("splash-skip");
+    splash.addEventListener("pointerdown", skip, { once: true, passive: true });
+    splash.addEventListener("animationend", event => {
+      if (event.target === splash && event.animationName.startsWith("splash-curtain-")) remove();
+    });
+
+    // Red de seguridad: incluso si el navegador no entrega animationend, el telón nunca
+    // puede quedarse por encima de la aplicación.
+    window.setTimeout(remove, 3800);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootSplash, { once: true });
+  } else {
+    bootSplash();
+  }
+})();
