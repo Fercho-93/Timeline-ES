@@ -849,7 +849,24 @@
       ? "Ha sido la única persona en terminar la ronda sin cartas."
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
     const fallosUnicos = new Set(game.failed || []).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center">${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} cartas jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+  }
+
+  // La pantalla de fin solo enseñaba lo fallado: quien gana su partida también quiere
+  // repasar la línea entera tal y como quedó, no solo lo que se le atragantó por el camino.
+  function timelineReviewScreen(ids, mode, actionsHtml) {
+    screen = "timeline-review";
+    paint(`<div class="shell">${header()}<section>
+      <div class="eyebrow">Línea de tiempo completa</div>
+      <h1 data-focus tabindex="-1">${ids.length} ${ids.length === 1 ? "carta jugada" : "cartas jugadas"}</h1>
+      <div class="review-grid">${ids.map(id => {
+        const card = GLOBAL_CARDS_BY_ID.get(id);
+        if (!card) return "";
+        const era = CT.eraForCard(mode, card);
+        return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${CT.formatValue(mode, card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p><button type="button" class="enc-link" data-action="enc-view" data-mode="${mode}" data-id="${id}">Ver en la enciclopedia <span aria-hidden="true">→</span></button></div></article>`;
+      }).join("")}</div>
+      <div class="actions" style="justify-content:center">${actionsHtml}</div>
+    </section></div>`);
   }
 
   // Repasa lo que se falló al terminar: cada fallo se descarta en el momento y nunca se
@@ -1820,6 +1837,7 @@
     else if (action === "pulse-target") { CT.closeDialog(); startPulse(Number(target.dataset.target)); }
     else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
     else if (action === "review-game") reviewScreen((game.failed || []).map(id => ({ id, mode: game.mode })), `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
+    else if (action === "review-timeline") timelineReviewScreen(game.timeline, game.mode, `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
     else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
     else if (action === "share-daily") compartir(lastShareText, "Resultado copiado");
     else if (action === "review-comp") reviewScreen(comp.totalFailed, `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);

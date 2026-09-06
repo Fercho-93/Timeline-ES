@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import { deleteDoc, doc, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAT-ELQvHrBdMaCdxJNUJzDRwq1jOOwI44",
@@ -895,7 +895,23 @@ function renderWinner() {
   const lead = names.length === 1
     ? "Ha sido la única persona en terminar la ronda sin cartas."
     : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
-  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(roomState.players[uids[0]].name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`, "online-winner");
+  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(roomState.players[uids[0]].name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} cartas jugadas</button><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`, "online-winner");
+}
+
+// Igual que en el juego local: quien gana su partida también quiere repasar la línea
+// entera tal y como quedó, no solo lo que falló por el camino.
+function renderTimelineReview() {
+  paint(`<div class="shell">${header()}<section>
+    <div class="eyebrow">Línea de tiempo completa</div>
+    <h1 data-focus tabindex="-1">${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta jugada" : "cartas jugadas"}</h1>
+    <div class="review-grid">${roomState.timeline.map(id => {
+      const card = getCard(id);
+      if (!card) return "";
+      const era = eraForCard(card);
+      return `<article class="timeline-card"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content"><div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`;
+    }).join("")}</div>
+    <div class="actions" style="justify-content:center"><button class="btn btn-primary" data-online-action="back-from-timeline">Volver</button></div>
+  </section></div>`, "online-timeline-review");
 }
 
 function roomMenu() {
@@ -1034,6 +1050,25 @@ function leaveOnline(message = "") {
   setTimeout(() => location.reload(), 1600);
 }
 
+// Un móvil que se bloquea, cambia de pestaña o pierde cobertura un momento puede dejar el
+// listener de Firestore colgado: la conexión persistente se corta y, en algunos
+// navegadores, no se reanuda sola hasta recargar. Al volver a primer plano o recuperar
+// red, se fuerza a Firestore a reconectar (cortando y reabriendo la conexión) para que
+// la sala se ponga al día sin que nadie tenga que refrescar a mano.
+async function forceResync() {
+  if (!roomRef) return;
+  try {
+    await disableNetwork(db);
+    await enableNetwork(db);
+  } catch (error) { console.error(error); }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") forceResync();
+});
+window.addEventListener("online", forceResync);
+window.addEventListener("pageshow", event => { if (event.persisted) forceResync(); });
+
 document.addEventListener("submit", event => {
   const form = event.target.closest("[data-online-form]");
   if (!form) return;
@@ -1058,6 +1093,8 @@ document.addEventListener("click", event => {
   if (!target) return;
   const action = target.dataset.onlineAction;
   if (action === "back" || action === "leave") leaveOnline();
+  else if (action === "review-timeline") renderTimelineReview();
+  else if (action === "back-from-timeline") renderWinner();
   else if (action === "guide") showGuide();
   else if (action === "close-guide") CT.closeDialog();
   else if (action === "share") shareRoom();
