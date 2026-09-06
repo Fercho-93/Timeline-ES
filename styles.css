@@ -459,6 +459,23 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .pulse-gift { margin: 14px 0 0; padding: 11px 13px; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); font-size: .84rem; line-height: 1.4; }
 .pulse-outcome { margin-top: 10px; }
 
+/* El desenlace de un duelo: las dos jugadas, una debajo de otra, con su marca. No lleva
+   la marca grande de acierto de una jugada normal porque aquí no hay un solo veredicto. */
+/* `duel-*`, a secas, ya es del cara a cara del duelo por enlace: estas son las del
+   Pulso y llevan su propio prefijo para no pisarse. */
+.modal.pulse-duel-modal { text-align: left; }
+.pulse-duel-modal h2 { margin: 6px 0 0; }
+.pulse-duel-modal .eyebrow { justify-content: flex-start; }
+.pulse-duel-rows { display: grid; gap: 8px; margin: 16px 0 0; }
+.pulse-duel-row { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 11px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.pulse-duel-row b { font-size: .92rem; }
+.pulse-duel-row small { display: block; margin-top: 2px; color: var(--muted); font-size: .78rem; line-height: 1.35; }
+.pulse-duel-mark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-size: .95rem; font-weight: 700; }
+.pulse-duel-hit { border-color: color-mix(in srgb, var(--green-solid) 45%, var(--line)); }
+.pulse-duel-hit .pulse-duel-mark { background: var(--green-solid); }
+.pulse-duel-miss .pulse-duel-mark { background: var(--accent-solid); }
+.pulse-duel-modal .pulse-outcome { margin-top: 14px; line-height: 1.5; }
+
 .overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(35,27,19,.73); backdrop-filter: blur(8px); }
 .modal { width: min(100%, 460px); max-height: calc(100dvh - 36px); overflow-y: auto; overscroll-behavior-y: contain; border-radius: 12px; padding: 26px; background: var(--surface); box-shadow: 0 20px 50px rgba(0,0,0,.22); text-align: center; border: 1px solid var(--line); }
 .dialog-enter { animation: veil-in 180ms ease-out both; }

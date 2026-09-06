@@ -575,7 +575,7 @@
 
     const poderes = shared ? `<h3>Poderes</h3><div class="guide-cards">
       ${guideCard("◌", "Fantasma", ghost ? "en juego" : "opcional", `Una vuelta a ciegas: durante toda ella nadie ve ningún valor. Una vez por persona, con cinco cartas ya en la línea.${ghost ? "" : seActiva}`)}
-      ${guideCard("⚡", "Pulso", pulse ? "en juego" : "opcional", `Retas a quien elijas: si aciertas, le pasas una carta tuya; si fallas, robas tú. Una vez por persona.${pulse ? "" : seActiva}`)}
+      ${guideCard("⚡", "Pulso", pulse ? "en juego" : "opcional", `Un duelo: el mazo saca una carta y la colocáis los dos, a ciegas. Si solo aciertas tú, le pasas una carta tuya; si acierta quien defiende, o si falláis los dos, robas tú. Una vez por persona.${pulse ? "" : seActiva}`)}
     </div>` : "";
 
     const dificultad = `<h3>Dificultad</h3><div class="guide-levels">

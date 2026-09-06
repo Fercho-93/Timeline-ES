@@ -1,6 +1,8 @@
-// El Pulso: la jugada de una vez por partida que sustituye al turno y reparte cartas
-// entre dos manos. Es la única jugada del juego que toca la mano de otra persona, así que
-// lo que más se comprueba aquí es que las cartas ni se creen ni se pierdan por el camino.
+// El Pulso: la jugada de una vez por partida que sustituye al turno y enfrenta a dos
+// personas con la misma carta. Es la única jugada del juego que toca la mano de otra
+// persona —y la única que se juega en dos mitades, una por cabeza—, así que lo que más se
+// comprueba aquí son las cuatro salidas del duelo y que las cartas ni se creen ni se
+// pierdan por el camino.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
@@ -76,17 +78,34 @@ function inventario(w) {
 // La partida guardada solo ofrece «Continuar» dentro del menú de su propio mazo
 // (`playMenu`), al que hay que llegar desplegando antes el bloque de Historia.
 function entrar(w) {
+  entrar2(w);
+  click(w, '[data-action="ready"]');
+}
+
+// Lo mismo, pero sin recoger el móvil: un duelo a medias no vuelve a la pantalla de paso
+// de un turno normal, así que ahí no hay ningún «Empezar mi turno» que tocar.
+function entrar2(w) {
   click(w, '[data-block="historia"]');
   click(w, '[data-mode="history"]');
   click(w, '[data-format="multi"]');
   click(w, '[data-action="continue"]');
-  click(w, '[data-action="ready"]');
 }
 
 // Coloca la carta del Pulso en el hueco pedido y confirma.
 function colocar(w, index) {
   w.document.querySelectorAll('[data-action="pulse-place"]')[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   click(w, '[data-action="confirm-place"]');
+}
+
+// El duelo entero: reta quien tiene el turno, pasa el móvil y defiende la otra persona.
+// 1478 (id 20) va entre 1212 (id 15) y 1492 (id 21), así que el hueco 1 acierta y el 0 no.
+const BIEN = 1, MAL = 0;
+function duelo(w, huecoReto, huecoDefensa) {
+  click(w, '[data-action="pulse-open"]');
+  click(w, '[data-action="pulse-target"]');
+  colocar(w, huecoReto);
+  click(w, '[data-action="pulse-defend"]');
+  colocar(w, huecoDefensa);
 }
 
 console.log("\nCuándo aparece el Pulso");
@@ -114,10 +133,9 @@ console.log("\nCuándo aparece el Pulso");
   ok("sin cartas que sacar tampoco", !existe(sinMazo, '[data-action="pulse-open"]'));
 }
 
-console.log("\nPulso acertado");
+console.log("\nEl duelo: quien reta juega primero y no se resuelve nada hasta que defiende el otro");
 {
   const w = boot({ [CLAVE]: partida({ manos: [[1, 2], [3, 4]], timeline: [15, 21], deck: [20, 24, 25] }) });
-  const antes = inventario(w);
   entrar(w);
   click(w, '[data-action="pulse-open"]');
   ok("se puede elegir a quién retar", existe(w, '[data-action="pulse-target"]'));
@@ -125,42 +143,90 @@ console.log("\nPulso acertado");
   const enJuego = estado(w);
   ok("el Pulso queda marcado como gastado en cuanto se lanza", enJuego.players[0].pulseUsed === true);
   ok("la carta del reto sale del mazo, no de la mano", enJuego.pulseTurn.cardId === 20 && !enJuego.players[0].hand.includes(20));
-  ok("la mano propia no se puede jugar durante el Pulso", !existe(w, '[data-action="select-card"]'));
+  ok("la carta que se pagaría queda apalabrada desde el principio", [1, 2].includes(enJuego.pulseTurn.giftId));
+  ok("la mano propia no se puede jugar durante el duelo", !existe(w, '[data-action="select-card"]'));
 
-  // 1478 (id 20) va entre 1212 (id 15) y 1492 (id 21): el hueco del medio.
-  colocar(w, 1);
-  const s = estado(w);
-  ok("la carta acertada se queda en la línea", s.timeline.includes(20));
-  ok("quien reta se queda con una carta menos", s.players[0].hand.length === 1);
-  ok("el rival se lleva una carta más", s.players[1].hand.length === 3);
-  ok("y es justo la que salió de la mano de quien retó", s.players[1].hand.some(id => [1, 2].includes(id)));
-  ok("el rival queda protegido esta ronda", s.players[1].shieldRound === s.round);
-  ok("se avisa a quien la recibe", s.pulseGift && s.pulseGift.to === 2);
-  const despues = inventario(w);
-  ok(`ni se crean ni se pierden cartas (${antes.total} → ${despues.total})`, despues.total === antes.total);
-  ok("y ninguna se duplica", despues.unicas === despues.total);
+  colocar(w, BIEN);
+  const tras = estado(w);
+  ok("colocar no resuelve nada todavía: el duelo sigue abierto", tras.pulseTurn !== null && tras.pulseTurn.stage === "pase");
+  ok("ninguna mano ha cambiado a media jugada", tras.players[0].hand.length === 2 && tras.players[1].hand.length === 2);
+  ok("la carta no ha entrado aún en la línea", !tras.timeline.includes(20));
+  ok("se pide pasar el móvil a quien defiende", existe(w, '[data-action="pulse-defend"]') && /Pásale el móvil a\s*J2/.test(w.document.body.textContent));
+  ok("y no se filtra dónde la ha puesto quien reta", !/pulse-place/.test(w.document.body.innerHTML));
+
+  click(w, '[data-action="pulse-defend"]');
+  ok("quien defiende coloca la misma carta", existe(w, '[data-action="pulse-place"]') && estado(w).pulseTurn.stage === "defensa");
+  ok("y la línea que ve sigue sin la carta del duelo", !estado(w).timeline.includes(20));
 }
 
-console.log("\nPulso fallado");
+console.log("\nLas cuatro salidas del duelo");
+{
+  const nueva = () => {
+    const w = boot({ [CLAVE]: partida({ manos: [[1, 2], [3, 4]], timeline: [15, 21], deck: [20, 24, 25] }) });
+    entrar(w);
+    return w;
+  };
+
+  const empate = nueva(); const antesEmpate = inventario(empate);
+  duelo(empate, BIEN, BIEN);
+  const e = estado(empate);
+  ok("aciertan los dos: la carta se queda en la línea", e.timeline.includes(20));
+  ok("y no cambia ninguna mano", e.players[0].hand.length === 2 && e.players[1].hand.length === 2);
+  ok("defenderse bien no cuesta el escudo de la ronda", e.players[1].shieldRound !== e.round);
+  ok(`ni se crean ni se pierden cartas (${antesEmpate.total} → ${inventario(empate).total})`, inventario(empate).total === antesEmpate.total);
+  ok("y ninguna se duplica", inventario(empate).unicas === inventario(empate).total);
+
+  const gana = nueva(); const antesGana = inventario(gana);
+  duelo(gana, BIEN, MAL);
+  const g = estado(gana);
+  ok("solo acierta quien reta: la carta se queda en la línea", g.timeline.includes(20));
+  ok("quien reta se queda con una carta menos", g.players[0].hand.length === 1);
+  ok("quien falla la defensa se lleva una carta más", g.players[1].hand.length === 3);
+  ok("y es justo la que se apalabró al lanzar el reto", g.players[1].hand.some(id => [1, 2].includes(id)));
+  ok("quien la recibe queda protegido esta ronda", g.players[1].shieldRound === g.round);
+  ok("se le avisa de la carta recibida", g.pulseGift && g.pulseGift.to === 2);
+  ok(`ni se crean ni se pierden cartas (${antesGana.total} → ${inventario(gana).total})`, inventario(gana).total === antesGana.total);
+  ok("y ninguna se duplica", inventario(gana).unicas === inventario(gana).total);
+
+  const defiende = nueva(); const antesDefiende = inventario(defiende);
+  duelo(defiende, MAL, BIEN);
+  const d = estado(defiende);
+  ok("solo acierta quien defiende: la carta entra en la línea igual", d.timeline.includes(20));
+  ok("quien retó roba una por fallar", d.players[0].hand.length === 3);
+  // Lo que impide que alguien ya sin opciones falle aposta para regalar la partida.
+  ok("y quien se defiende no pierde ni gana nada", d.players[1].hand.length === 2);
+  ok("defenderse no consume el escudo", d.players[1].shieldRound !== d.round);
+  ok(`ni se crean ni se pierden cartas (${antesDefiende.total} → ${inventario(defiende).total})`, inventario(defiende).total === antesDefiende.total);
+  ok("y ninguna se duplica", inventario(defiende).unicas === inventario(defiende).total);
+
+  const nadie = nueva(); const antesNadie = inventario(nadie);
+  duelo(nadie, MAL, MAL);
+  const n = estado(nadie);
+  ok("fallan los dos: la carta no entra en la línea", !n.timeline.includes(20));
+  ok("va al descarte", n.discard.includes(20));
+  ok("y queda anotada para el repaso final", (n.failed || []).includes(20));
+  ok("quien lanzó el reto roba una", n.players[0].hand.length === 3);
+  ok("quien defendió se queda como estaba", n.players[1].hand.length === 2 && n.players[1].shieldRound !== n.round);
+  ok(`ni se crean ni se pierden cartas (${antesNadie.total} → ${inventario(nadie).total})`, inventario(nadie).total === antesNadie.total);
+  ok("y ninguna se duplica", inventario(nadie).unicas === inventario(nadie).total);
+}
+
+console.log("\nUn duelo a medias sobrevive a cerrar la aplicación");
 {
   const w = boot({ [CLAVE]: partida({ manos: [[1, 2], [3, 4]], timeline: [15, 21], deck: [20, 24, 25] }) });
-  const antes = inventario(w);
   entrar(w);
   click(w, '[data-action="pulse-open"]');
   click(w, '[data-action="pulse-target"]');
-  // A propósito al principio de la línea: 1478 no va antes de 1212.
-  colocar(w, 0);
-  const s = estado(w);
-  ok("la carta fallada no entra en la línea", !s.timeline.includes(20));
-  ok("va al descarte", s.discard.includes(20));
-  ok("y queda anotada para el repaso final", (s.failed || []).includes(20));
-  ok("quien falla roba una carta", s.players[0].hand.length === 3);
-  // Lo que impide que un jugador ya sin opciones regale la partida fallando aposta.
-  ok("el rival se queda exactamente como estaba", s.players[1].hand.length === 2);
-  ok("y sin escudo, porque no ha recibido nada", s.players[1].shieldRound !== s.round);
-  const despues = inventario(w);
-  ok(`ni se crean ni se pierden cartas (${antes.total} → ${despues.total})`, despues.total === antes.total);
-  ok("y ninguna se duplica", despues.unicas === despues.total);
+  colocar(w, BIEN);
+  const guardado = w.localStorage.getItem(CLAVE);
+
+  const otra = boot({ [CLAVE]: guardado });
+  entrar2(otra);
+  ok("al volver se retoma en el paso del móvil, no en un turno nuevo", existe(otra, '[data-action="pulse-defend"]'));
+  click(otra, '[data-action="pulse-defend"]');
+  colocar(otra, MAL);
+  const s = estado(otra);
+  ok("y el duelo se resuelve con la jugada que ya estaba guardada", s.players[1].hand.length === 3 && s.timeline.includes(20));
 }
 
 console.log("\nA quién se puede retar");
@@ -186,9 +252,17 @@ console.log("\nRetar a quien está a punto de ganar");
   const objetivos = [...w.document.querySelectorAll('[data-action="pulse-target"]')].map(b => b.dataset.target);
   ok("se puede retar a quien está a cero cartas", objetivos.includes("2"));
   click(w, '[data-action="pulse-target"]');
-  colocar(w, 1);
+  colocar(w, BIEN);
+  click(w, '[data-action="pulse-defend"]');
+  colocar(w, MAL);
   const s = estado(w);
-  ok("acertar le quita la victoria: ya no está a cero", s.players[1].hand.length === 1);
+  ok("ganar el duelo le quita la victoria: ya no está a cero", s.players[1].hand.length === 1);
+
+  // Y defendiéndose bien la conserva, que es lo que hace que el reto sea un duelo.
+  const salvado = boot({ [CLAVE]: partida({ manos: [[1, 2], []], timeline: [15, 21], deck: [20, 24, 25] }) });
+  entrar(salvado);
+  duelo(salvado, BIEN, BIEN);
+  ok("defenderse bien conserva la victoria", estado(salvado).players[1].hand.length === 0);
 }
 
 console.log("\nUna partida guardada de antes del Pulso");

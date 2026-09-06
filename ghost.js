@@ -121,7 +121,7 @@
   function pulsePower(pulse, id, handSize, action, enabled = true) {
     if (!ownsPulse(pulse, id)) return "";
     const ready = enabled && handSize >= 2;
-    const hint = handSize < 2 ? "Necesitas dos cartas normales para lanzarlo" : "Reta a alguien en lugar de colocar tu carta";
+    const hint = handSize < 2 ? "Necesitas dos cartas normales para lanzarlo" : "Duelo: una carta del mazo la colocáis los dos";
     return `<button class="ghost-power pulse-power" ${action} ${ready ? "" : "disabled"}><span aria-hidden="true">⚡</span><span><b>Carta Pulso</b><small>${hint}</small><small>No cuenta para ganar · un uso</small></span></button>`;
   }
   function level(key) { return LEVELS[key] || LEVELS.easy; }
