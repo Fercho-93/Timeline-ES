@@ -23,7 +23,7 @@ function client(uid){
  // no lo reconoce como marca de hora del servidor.
  w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>{const limpio=clone(data);if('updatedAt' in data)limpio.updatedAt=data.updatedAt;tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,skipTurn,removePlayer,startPulse,placePulse,renderGame,renderLobby};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];
@@ -59,10 +59,16 @@ try {
  // Si sale el jugador de turno también se descuenta y se limpia fresh.
  await seed(fixture());await clients[0].call('useGhost');await clients[0].call('skipTurn');await clients[1].call('removePlayer',B);
  s=await snapshot();assert.deepEqual(s.ghost.pending,[C]);
- // Un Pulso durante Fantasma conserva el efecto y reclama poderes al sacar carta.
+ // Un Pulso durante Fantasma conserva el efecto y reclama poderes al sacar carta. El
+ // duelo se juega entero: coloca quien reta (Bea) y después defiende quien fue retado
+ // (Carlos), que es quien firma el desenlace.
  await seed(fixture());await clients[0].call('useGhost');await clients[0].call('skipTurn');await clients[1].call('startPulse',C);
  s=await snapshot();assert.equal(s.ghost.owners[1],B);assert.equal(s.phase,'pulse');
- await clients[1].load();let at=ct.correctIndex('history',s.timeline.map(id=>cards.get(id)),cards.get(s.pulseTurn.cardId));await clients[1].api.placePulse(at);assert.equal(clients[1].errors.length,0,clients[1].errors.map(String).join('\n'));await clients[1].call('finishTurn');
+ await clients[1].load();let at=ct.correctIndex('history',s.timeline.map(id=>cards.get(id)),cards.get(s.pulseTurn.cardId));await clients[1].api.placePulse(at);assert.equal(clients[1].errors.length,0,clients[1].errors.map(String).join('\n'));
+ s=await snapshot();assert.equal(s.phase,'pulse');assert.equal(s.pulseTurn.stage,'defensa');assert.equal(s.timeline.length,5,'colocar no resuelve nada hasta que defiende el otro');
+ await clients[2].load();await clients[2].api.defendPulse(at);assert.equal(clients[2].errors.length,0,clients[2].errors.map(String).join('\n'));
+ s=await snapshot();assert.equal(s.phase,'reveal');assert.ok(s.reveal.duel);assert.equal(s.players[C].hand.length,3,'defenderse bien no cuesta cartas');
+ await clients[1].call('finishTurn');
  assert.deepEqual((await snapshot()).ghost.pending,[C]);
  // Cancelar un Pulso al saltar o salir devuelve la carta apartada al descarte.
  await seed(fixture());await clients[0].call('startPulse',B);await clients[0].call('skipTurn');

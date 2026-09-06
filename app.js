@@ -422,7 +422,10 @@
 
   function gameView() {
     screen = "game";
-    const player = currentPlayer();
+    // Durante la defensa de un Pulso el móvil lo tiene quien ha sido retado, no quien
+    // tiene el turno: es su jugada la que se está haciendo.
+    const player = actingPlayer();
+    const defending = pulseStage() === PULSE_DEFENSA;
     const timelineCards = game.timeline.map(id => cardsById.get(id));
     const handCards = player.hand.map(id => cardsById.get(id));
     const selectedCard = selectedCardId ? cardsById.get(selectedCardId) : null;
@@ -445,14 +448,22 @@
         slots.push(timelineCardMarkup(timelineCards[i], !!game.ghost?.pending.length));
       }
     }
+    // Las dos mitades del duelo enseñan la misma carta; lo que cambia es a quién se le
+    // habla y qué se juega en esa mitad. Se calcula al vuelo y no antes: sin Pulso en
+    // marcha no hay a quién nombrar.
+    const pistaPulso = () => pendingIndex !== null
+      ? "Confirma el hueco elegido o toca otro"
+      : defending
+        ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer().name)}`
+        : `Colócala. Si aciertas y ${escapeHtml(pulseTarget.name)} falla, le pasas una carta tuya`;
     const manoHtml = pulseCard
-      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTarget.name)}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una"}</p></section>`
+      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pistaPulso()}</p></section>`
       : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
-      <h1 class="solo-lectores" data-focus tabindex="-1">Turno de ${escapeHtml(player.name)}, ronda ${game.round}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
+      <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
-      ${pulseCard ? `<div class="pulse-banner">⚡ Pulso contra <b>${escapeHtml(pulseTarget.name)}</b></div>` : ""}
+      ${pulseCard ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
       ${CT.Ghost.banner(game.ghost, game.players)}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: !!game.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${manoHtml}
@@ -554,29 +565,62 @@
   }
 
   // ---------------------------------------------------------------------------
-  // El Pulso
+  // El Pulso: un duelo a ciegas
   //
-  // Una sola vez por partida, en lugar de jugar tu turno, retas a otra persona: el mazo
-  // saca una carta que tú no has elegido y la colocas. Si aciertas, se queda en la línea
-  // y le endosas una carta al azar de tu mano; si fallas, va al descarte y robas tú.
+  // Una sola vez por partida, en lugar de jugar tu turno, retas a otra persona. El mazo
+  // saca una carta que no elige ninguno de los dos y la colocáis los dos: primero quien
+  // reta y después, sin ver la respuesta del otro, quien ha sido retado. Se descubre todo
+  // a la vez:
   //
-  // Tres decisiones que no son obvias:
+  //   los dos aciertan     → nada, defensa perfecta
+  //   solo quien reta      → le endosa una carta al azar de su mano
+  //   solo quien defiende  → quien reta roba una
+  //   ninguno de los dos   → quien reta roba una
   //
-  // - Fallar castiga solo a quien reta. Si además le quitara una carta al rival, quien ya
-  //   no puede ganar podría fallar aposta para acercar a la victoria a quien quisiera:
-  //   un jugador eliminado decidiendo la partida. Con el castigo en un solo lado eso
-  //   desaparece, y como efecto secundario se puede retar a quien ya está a cero cartas
-  //   esperando ganar al final de la ronda, que es la jugada más tensa del mecanismo.
-  // - La carta que se entrega va al azar. Si pudieras elegirla soltarías siempre la que
-  //   no sabes colocar, y el Pulso dejaría de ser una apuesta para ser un vertedero.
-  // - Hacen falta dos cartas para activarlo. Con una sola, ganar el Pulso te dejaría a
-  //   cero regalándola, sin haberla colocado nunca en la línea: se saltaría la condición
-  //   de victoria del juego.
+  // La carta se queda en la línea si alguno supo colocarla; si fallan los dos, al descarte.
+  //
+  // Decisiones que no son obvias:
+  //
+  // - Quien defiende nunca pierde una carta por fallar: solo la recibe si el otro acertó.
+  //   Así fallar no castiga a los dos lados y quien ya no puede ganar no puede fallar
+  //   aposta para acercar a nadie a la victoria. Es la misma razón por la que se puede
+  //   retar a quien está a cero cartas esperando el final de la ronda, que sigue siendo
+  //   la jugada más tensa del mecanismo.
+  // - La carta que se entrega va al azar y se aparta al lanzar el Pulso, antes de que
+  //   nadie coloque nada. Si pudieras elegirla soltarías siempre la que no sabes colocar,
+  //   y el Pulso dejaría de ser una apuesta para ser un vertedero.
+  // - Hacen falta dos cartas para lanzarlo. Con una sola, ganar el duelo te dejaría a cero
+  //   regalándola, sin haberla colocado nunca en la línea: se saltaría la condición de
+  //   victoria del juego.
   //
   // No hay cronómetro a propósito. La dificultad la pone lo llena que esté la línea: al
-  // principio los huecos son anchos y aciertas casi seguro, pero es cuando menos daño
-  // haces; al final son estrechos y es cuando el Pulso decide la partida.
+  // principio los huecos son anchos y acertáis los dos casi seguro —y entonces no pasa
+  // nada—, pero al final son estrechos y es cuando el Pulso decide la partida.
   const PULSE_MIN_HAND = 2;
+
+  // Las tres etapas de un duelo. Una partida guardada antes del duelo no las lleva: su
+  // Pulso se queda en la primera, que es justo donde estaba.
+  const PULSE_RETO = "reto", PULSE_PASE = "pase", PULSE_DEFENSA = "defensa";
+
+  function pulseStage() { return game.pulseTurn ? game.pulseTurn.stage || PULSE_RETO : null; }
+
+  // Quien tiene el móvil en la mano ahora mismo. Durante la defensa no es quien tiene el
+  // turno, y es lo único del juego que separa esas dos cosas.
+  function actingPlayer() {
+    if (pulseStage() === PULSE_DEFENSA) return game.players.find(item => item.id === game.pulseTurn.targetId);
+    return currentPlayer();
+  }
+
+  // Dónde ha colocado alguien la carta, dicho con palabras: es lo que cuenta el duelo al
+  // revelarse, y lo único que le llega a quien usa un lector de pantalla.
+  function posicionEnLinea(index, cartas) {
+    const antes = cartas[index - 1];
+    const despues = cartas[index];
+    if (!antes && !despues) return "en la línea vacía";
+    if (!antes) return `antes de «${escapeHtml(despues.title)}»`;
+    if (!despues) return `después de «${escapeHtml(antes.title)}»`;
+    return `entre «${escapeHtml(antes.title)}» y «${escapeHtml(despues.title)}»`;
+  }
 
   // Quién puede recibir el Pulso: cualquiera menos quien lo lanza y quien ya recibió una
   // carta esta ronda. Sin límite por cartas en mano —incluido quien está a cero.
@@ -603,44 +647,95 @@
     CT.Powers.consumePulse(game.pulsePower, player.id);
     CT.Powers.claim(game, cardId, player.id, game.deck);
     player.pulseUsed = true;
-    game.pulseTurn = { targetId, cardId };
+    // La carta que se pagaría si ganas el duelo se sortea aquí, con la mano todavía
+    // intacta y antes de que nadie coloque nada: así no puede elegirse a posteriori.
+    game.pulseTurn = {
+      targetId, cardId, stage: PULSE_RETO,
+      giftId: player.hand[Math.floor(Math.random() * player.hand.length)]
+    };
     selectedCardId = null;
     pendingIndex = null;
     saveGame();
     gameView();
   }
 
-  function placePulse(index) {
-    const player = currentPlayer();
-    const { targetId, cardId } = game.pulseTurn;
-    const target = game.players.find(item => item.id === targetId);
-    const card = cardsById.get(cardId);
+  function aciertaEn(card, index) {
     const previous = index > 0 ? cardsById.get(game.timeline[index - 1]) : null;
     const next = index < game.timeline.length ? cardsById.get(game.timeline[index]) : null;
-    const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+    return (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+  }
+
+  // Primera mitad del duelo: quien reta coloca y la jugada se guarda sin resolverse. No se
+  // revela nada todavía, porque el móvil va a pasar a la otra persona.
+  function placePulse(index) {
+    const card = cardsById.get(game.pulseTurn.cardId);
+    game.pulseTurn.byIndex = index;
+    game.pulseTurn.byOk = aciertaEn(card, index);
+    game.pulseTurn.stage = PULSE_PASE;
+    pendingIndex = null;
+    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: game.pulseTurn.byOk, kind: "local", hidden: !!game.ghost?.pending.length, pulse: true }));
+    saveGame();
+    renderPulsePass();
+  }
+
+  // Segunda mitad: defiende quien ha sido retado y se descubre todo a la vez.
+  function placePulseDefense(index) {
+    const player = currentPlayer();
+    const { targetId, cardId, byIndex, byOk } = game.pulseTurn;
+    const target = game.players.find(item => item.id === targetId);
+    const card = cardsById.get(cardId);
+    const targetOk = aciertaEn(card, index);
+    // Los textos de posición se calculan antes de tocar la línea: después, los índices ya
+    // señalarían a otras cartas.
+    const cartas = game.timeline.map(id => cardsById.get(id));
+    const posiciones = { by: posicionEnLinea(byIndex, cartas), target: posicionEnLinea(index, cartas) };
     let gift = null;
-    if (correct) {
-      game.timeline.splice(index, 0, cardId);
-      const giftId = player.hand[Math.floor(Math.random() * player.hand.length)];
+    if (byOk || targetOk) game.timeline.splice(byOk ? byIndex : index, 0, cardId);
+    else {
+      game.discard.push(cardId);
+      (game.failed = game.failed || []).push(cardId);
+    }
+    if (byOk && !targetOk) {
+      // Una partida guardada antes del duelo no traía la carta apalabrada: se sortea ahora.
+      const giftId = game.pulseTurn.giftId != null && player.hand.includes(game.pulseTurn.giftId)
+        ? game.pulseTurn.giftId
+        : player.hand[Math.floor(Math.random() * player.hand.length)];
       player.hand = player.hand.filter(id => id !== giftId);
       target.hand.push(giftId);
       target.shieldRound = game.round;
-      // Quien la recibe se entera al empezar su turno, en la pantalla de pasar el móvil.
+      // Quien la recibe la ve al resolverse el duelo, y se la recuerda su pantalla de paso.
       game.pulseGift = { to: target.id, cardId: giftId, from: player.name };
       gift = cardsById.get(giftId);
-    } else {
-      game.discard.push(cardId);
-      (game.failed = game.failed || []).push(cardId);
-      // Nunca falla: la carta del reto acaba de entrar en el descarte, así que hay al
-      // menos una que robar aunque el mazo estuviera vacío.
+    } else if (!byOk) {
+      // Nunca falla cuando los dos fallan: la carta del reto acaba de entrar en el
+      // descarte, así que hay al menos una que robar aunque el mazo estuviera vacío.
       drawCard(player);
     }
     game.pulseTurn = null;
     pendingIndex = null;
-    result = { correct, card, pulse: true, targetName: target.name, gift };
-    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", hidden: !!game.ghost?.pending.length, pulse: true }));
+    result = {
+      correct: byOk, card, pulse: true, duel: true, targetOk,
+      byName: player.name, targetName: target.name, gift, posiciones
+    };
+    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: targetOk, kind: "local", hidden: !!game.ghost?.pending.length, pulse: true }));
     saveGame();
     renderResult();
+  }
+
+  // El móvil cambia de manos en mitad de la jugada, así que hace falta una pantalla de
+  // paso propia: la de un turno normal anuncia una ronda y un turno que aquí no cambian.
+  function renderPulsePass() {
+    screen = "pulse-pass";
+    const target = game.players.find(item => item.id === game.pulseTurn.targetId);
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
+      <section class="pass-screen"><div class="panel pass-card">
+        <div class="player-medallion">${escapeHtml(initials(target.name))}</div>
+        <div class="eyebrow">⚡ Pulso · Te retan</div>
+        <h2 data-focus tabindex="-1">Pásale el móvil a<br>${escapeHtml(target.name)}</h2>
+        <p>Coloca la misma carta donde creas que va. No verás dónde la ha puesto ${escapeHtml(currentPlayer().name)} hasta que los dos hayáis jugado.</p>
+        <button class="btn btn-primary btn-block" data-action="pulse-defend">Defender <span>→</span></button>
+      </div></section>
+    </div>`);
   }
 
   function pulseTargetMenu() {
@@ -650,7 +745,7 @@
     overlay(`<div class="overlay"><div class="modal">
       <div class="eyebrow">Pulso</div>
       <h2>¿A quién retas?</h2>
-      <p class="lead" style="margin-inline:auto">El mazo sacará una carta que no eliges tú. Si la colocas bien, le pasas una carta al azar de tu mano; si fallas, robas una y a esa persona no le pasa nada.</p>
+      <p class="lead" style="margin-inline:auto">El mazo saca una carta que no elige nadie y la colocáis los dos: primero tú y luego esa persona, sin ver tu jugada. Si aciertas y falla, se lleva una carta tuya al azar; si acierta, o si falláis los dos, robas tú.</p>
       <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
       ${protegidos.length ? `<p class="hint" style="margin-top:12px">Ya recibieron una carta esta ronda: ${protegidos.map(player => escapeHtml(player.name)).join(", ")}.</p>` : ""}
       <button class="btn btn-ghost btn-block" style="margin-top:10px" data-action="close-menu">Mejor no</button>
@@ -666,12 +761,39 @@
     // El hueco resaltado detrás del aviso ya lo enseña; esta frase lo dice también con
     // palabras, que es lo único que le llega a quien usa un lector de pantalla.
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, game.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    const desenlace = result.pulse
-      ? (correct
-        ? `<p class="pulse-outcome">La carta se queda en la línea. <b>${escapeHtml(result.targetName)}</b> se lleva tu <b>${escapeHtml(result.gift.title)}</b>.</p>`
-        : `<p class="pulse-outcome">La carta va al descarte y robas una. A <b>${escapeHtml(result.targetName)}</b> no le pasa nada.</p>`)
-      : `<p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${result.pulse ? "⚡ Pulso · " : ""}${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    // Un duelo no lo gana ni lo pierde una sola persona, así que no lleva la marca grande
+    // de acierto: cada jugada trae la suya y debajo se cuenta el desenlace.
+    if (result.duel) {
+      const marcador = jugada => `<div class="pulse-duel-row ${jugada.ok ? "pulse-duel-hit" : "pulse-duel-miss"}"><span class="pulse-duel-mark" aria-hidden="true">${jugada.ok ? "✓" : "×"}</span><span><b>${escapeHtml(jugada.name)}</b><small>${jugada.ok ? "Acierta" : "Falla"}: la puso ${jugada.donde}</small></span></div>`;
+      overlay(`<div class="overlay"><div class="modal pulse-duel-modal">
+        <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
+        <h2>${escapeHtml(card.title)}</h2>
+        <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>
+        <div class="pulse-duel-rows">
+          ${marcador({ name: result.byName, ok: result.correct, donde: result.posiciones.by })}
+          ${marcador({ name: result.targetName, ok: result.targetOk, donde: result.posiciones.target })}
+        </div>
+        ${duelOutcome(result)}
+        <button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button>
+      </div></div>`);
+      return;
+    }
+    const desenlace = `<p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p>`;
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+  }
+
+  // Las cuatro salidas del duelo, contadas desde la mesa y no desde nadie en concreto.
+  function duelOutcome(result) {
+    if (result.correct && result.targetOk) {
+      return `<p class="pulse-outcome">Empate: los dos la habéis colocado bien, así que no cambia ninguna mano. La carta se queda en la línea.</p>`;
+    }
+    if (result.correct) {
+      return `<p class="pulse-outcome">Solo acierta <b>${escapeHtml(result.byName)}</b>: <b>${escapeHtml(result.targetName)}</b> se lleva su <b>${escapeHtml(result.gift.title)}</b>. La carta se queda en la línea.</p>`;
+    }
+    if (result.targetOk) {
+      return `<p class="pulse-outcome"><b>${escapeHtml(result.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(result.byName)}</b> roba una por fallar el reto.</p>`;
+    }
+    return `<p class="pulse-outcome">No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(result.byName)}</b> roba una por haber lanzado el reto.</p>`;
   }
 
   function useGhost() {
@@ -1649,7 +1771,9 @@
     else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; playMenu(); }
     else if (action === "setup") setup();
     else if (action === "online") launchOnline();
-    else if (action === "continue") { game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : renderPass(); }
+    // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
+    // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
+    else if (action === "continue") { game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : pulseStage() === PULSE_PASE ? renderPulsePass() : renderPass(); }
     else if (action === "add-player") {
       const count = document.querySelectorAll("#players .player-row").length;
       if (count >= 9) return showToast("El máximo es de 9 jugadores");
@@ -1668,7 +1792,7 @@
       gameView();
     }
     else if (action === "place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
-    else if (action === "confirm-place") { screen === "solo" ? soloPlace(pendingIndex) : game.pulseTurn ? placePulse(pendingIndex) : placeCard(pendingIndex); }
+    else if (action === "confirm-place") { screen === "solo" ? soloPlace(pendingIndex) : game.pulseTurn ? (pulseStage() === PULSE_DEFENSA ? placePulseDefense(pendingIndex) : placePulse(pendingIndex)) : placeCard(pendingIndex); }
     else if (action === "cancel-place") { pendingIndex = null; screen === "solo" ? soloView() : gameView(); }
     else if (action === "finish-turn") finishTurn();
     else if (action === "solo") soloHome();
@@ -1692,6 +1816,7 @@
     else if (action === "close-menu") CT.closeDialog();
     else if (action === "abandon") { game = null; saveGame(); home(); }
     else if (action === "pulse-open") pulseTargetMenu();
+    else if (action === "pulse-defend") { game.pulseTurn.stage = PULSE_DEFENSA; pendingIndex = null; saveGame(); gameView(); }
     else if (action === "pulse-target") { CT.closeDialog(); startPulse(Number(target.dataset.target)); }
     else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
     else if (action === "review-game") reviewScreen((game.failed || []).map(id => ({ id, mode: game.mode })), `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);

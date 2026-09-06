@@ -366,44 +366,83 @@ service cloud.firestore {
           && next.pulseTurn.targetUid != uid()
           && prior.players[next.pulseTurn.targetUid].get('shieldRound', 0) != prior.round
           && next.pulseTurn.cardId is int
+          // El duelo empieza por su primera mitad: sin esto se podría entrar directamente
+          // en la defensa dando por acertada una jugada que nadie ha hecho.
+          && next.pulseTurn.stage == 'reto'
           // Sale exactamente una carta de mazo + descarte (barajar el descarte no cuenta).
           && next.deck.size() + next.discard.size() == prior.deck.size() + prior.discard.size() - 1
           && next.timeline == prior.timeline
           && bumped();
       }
 
-      // Paso 2: colocar la carta del reto y repartir las consecuencias.
-      function validPulseEnd() {
+      // Paso 2: quien reta cierra su mitad del duelo. No cambia ninguna mano, ni la línea,
+      // ni el mazo: lo único que se guarda es dónde ha colocado y si acertó, para poder
+      // resolverlo cuando defienda la otra persona.
+      function validPulseChallenge() {
         let prior = before();
         let next = after();
         return isCurrent()
           && prior.status == 'playing'
           && prior.phase == 'pulse'
+          && prior.pulseTurn.stage == 'reto'
+          && changed().hasOnly(['pulseTurn', 'version', 'updatedAt'])
+          && next.pulseTurn.stage == 'defensa'
+          && next.pulseTurn.byOk is bool
+          && next.pulseTurn.byIndex is int
+          && next.pulseTurn.byIndex >= 0
+          && next.pulseTurn.byIndex <= prior.timeline.size()
+          && next.pulseTurn.diff(prior.pulseTurn).affectedKeys().hasOnly(['stage', 'byOk', 'byIndex'])
+          && bumped();
+      }
+
+      // Paso 3: defiende quien fue retado y se reparten las consecuencias de las dos
+      // jugadas. Es la única escritura del juego que hace alguien que no tiene el turno,
+      // así que aquí no vale `isCurrent()`: quien firma es el objetivo del duelo.
+      function validPulseEnd() {
+        let prior = before();
+        let next = after();
+        let pt = prior.pulseTurn;
+        // Quien retó es quien tiene el turno: el turno no cambia de manos durante el duelo.
+        let by = prior.playerOrder[prior.current];
+        // La carta se queda en la línea si alguno de los dos supo colocarla; quien reta
+        // paga una carta solo si acertó él y falló el otro, y roba si falló él.
+        let placed = pt.byOk || next.reveal.targetOk;
+        let gift = pt.byOk && !next.reveal.targetOk;
+        return isParticipant()
+          && uid() == pulseTarget()
+          && prior.status == 'playing'
+          && prior.phase == 'pulse'
+          && pt.stage == 'defensa'
           && changed().hasOnly(['ghost', 'pulsePower', 'players', 'deck', 'discard', 'timeline', 'phase', 'pulseTurn',
                                 'reveal', 'version', 'updatedAt'])
           && next.phase == 'reveal'
           && next.pulseTurn == null
-          && next.reveal.cardId == prior.pulseTurn.cardId
-          && next.reveal.correct is bool
-          && next.reveal.playerUid == uid()
-          && (next.reveal.correct
-              // Acierta: la carta va a la línea y una carta mía pasa a la mano del rival.
-              // Es el único caso de todo el juego en que cambian dos manos, y solo esas.
-              ? (next.players.diff(prior.players).affectedKeys().hasOnly([uid(), pulseTarget()])
-                 && next.timeline.size() == prior.timeline.size() + 1
-                 && next.deck.size() == prior.deck.size()
-                 && next.discard.size() == prior.discard.size()
-                 && next.players[uid()].hand.size() == prior.players[uid()].hand.size() - 1
-                 && next.players[pulseTarget()].hand.size() == prior.players[pulseTarget()].hand.size() + 1
-                 && next.players[pulseTarget()].shieldRound == prior.round)
-              // Falla: solo cambia mi mano. Que el rival no pueda salir beneficiado es lo
-              // que impide que alguien ya sin opciones falle aposta para regalar la partida.
-              : (onlyMyHand()
-                 && next.timeline == prior.timeline
-                 && next.players[uid()].hand.size() == prior.players[uid()].hand.size() + 1
-                 // La carta del reto estaba fuera de todo mientras duraba la fase, así que
-                 // al volver (al descarte) el recuento total sube exactamente en una.
-                 && myCardsAfter() == myCardsBefore() + 1))
+          && next.reveal.cardId == pt.cardId
+          && next.reveal.correct == pt.byOk
+          && next.reveal.targetOk is bool
+          && next.reveal.playerUid == by
+          && next.reveal.targetUid == uid()
+          // Solo se tocan las dos manos del duelo. La de quien defiende únicamente puede
+          // crecer con la carta apalabrada al lanzarlo, así que quien cobra no elige qué
+          // cobra; y el Pulso gastado de quien retó no se puede devolver desde aquí.
+          && next.players.diff(prior.players).affectedKeys().hasOnly([by, uid()])
+          && next.players[uid()].hand == (gift ? prior.players[uid()].hand.concat([pt.giftId]) : prior.players[uid()].hand)
+          // La carta que se cobra tiene que salir de la mano de quien retó, no aparecer.
+          && (!gift || pt.giftId in prior.players[by].hand)
+          && next.players[by].hand.size() == prior.players[by].hand.size() + (gift ? -1 : (pt.byOk ? 0 : 1))
+          && next.players[by].get('pulseUsed', false) == true
+          && next.players[by].get('shieldRound', 0) == prior.players[by].get('shieldRound', 0)
+          // El escudo se gana recibiendo una carta y solo así: defenderse bien no protege
+          // de la siguiente. Y nadie se devuelve su propio Pulso al firmar el desenlace.
+          && next.players[uid()].get('shieldRound', 0) == (gift ? prior.round : prior.players[uid()].get('shieldRound', 0))
+          && next.players[uid()].get('pulseUsed', false) == prior.players[uid()].get('pulseUsed', false)
+          && next.timeline.size() == prior.timeline.size() + (placed ? 1 : 0)
+          && (placed ? (pt.cardId in next.timeline) : (pt.cardId in next.discard))
+          // La carta del reto estaba fuera de todo mientras duraba la fase: al colocarse
+          // sube la línea y al descartarse sube el descarte, y el robo de quien falló el
+          // reto es lo único que puede bajar el montón.
+          && next.deck.size() + next.discard.size()
+             == prior.deck.size() + prior.discard.size() + (placed ? 0 : 1) - (pt.byOk ? 0 : 1)
           && bumped();
       }
 
@@ -541,7 +580,7 @@ service cloud.firestore {
           : (before().status == 'lobby'
               ? (after().status == 'lobby' ? validJoin() : validStart())
               : (after().phase == 'pulse'
-                  ? validPulseStart()
+                  ? (before().phase == 'turn' ? validPulseStart() : validPulseChallenge())
                   : (after().phase == 'reveal'
                       ? (before().phase == 'pulse' ? validPulseEnd() : validPlay())
                       : (before().phase == 'reveal' ? validAdvance() : validSkip())))))));

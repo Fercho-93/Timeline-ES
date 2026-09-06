@@ -474,7 +474,10 @@ function renderGame() {
   // Mientras se resuelve un Pulso la mano no se toca: la única carta jugable es la que
   // sacó el mazo, y solo quien lo lanzó puede colocarla.
   const pulsing = roomState.phase === "pulse" && roomState.pulseTurn;
-  const myPulse = pulsing && currentUid === user.uid;
+  const defensa = pulsing && roomState.pulseTurn.stage === "defensa";
+  // En un duelo coloca quien reta primero y quien defiende después: el turno no cambia
+  // de manos, pero la jugada sí.
+  const myPulse = pulsing && (defensa ? roomState.pulseTurn.targetUid === user.uid : currentUid === user.uid);
   const pulseCard = pulsing ? getCard(roomState.pulseTurn.cardId) : null;
   const pulseTargetName = pulsing ? roomState.players[roomState.pulseTurn.targetUid]?.name || "" : "";
   const timelineCards = roomState.timeline.map(id => getCard(id));
@@ -488,7 +491,7 @@ function renderGame() {
   for (let index = 0; index <= timelineCards.length; index++) {
     const confirmable = myPulse ? pulseCard : (myTurn ? selectedCard : null);
     slots.push(confirmable && pendingIndex === index
-      ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-online-action="${myPulse ? "confirm-pulse" : "confirm-place"}" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
+      ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-online-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-online-action="cancel-place">Cancelar</button></div>`
       : myPulse
         ? `<button class="slot" data-online-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`
       : index === failIndex
@@ -506,11 +509,16 @@ function renderGame() {
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
     <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
-    ${pulsing ? `<div class="pulse-banner">⚡ Pulso de <b>${escapeHtml(currentPlayer.name)}</b> contra <b>${escapeHtml(pulseTargetName)}</b></div>` : ""}
+    ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
     <section><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} cartas</small></div>${CT.timelineMap(modeKey(), timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     ${pulsing
-      ? `<section><div class="hand-title"><h3>Carta del Pulso</h3><small>contra ${escapeHtml(pulseTargetName)}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Colócala: si aciertas le pasas una carta tuya, si fallas robas una") : `${escapeHtml(currentPlayer.name)} está resolviendo su Pulso…`}</p></section>`
+      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defensa ? `te reta ${escapeHtml(currentPlayer.name)}` : `contra ${escapeHtml(pulseTargetName)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${myPulse
+        ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro"
+          : defensa ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer.name)}`
+          : `Colócala. Si aciertas y ${escapeHtml(pulseTargetName)} falla, le pasas una carta tuya`)
+        : defensa ? `${escapeHtml(pulseTargetName)} está colocando la misma carta…`
+        : `${escapeHtml(currentPlayer.name)} está colocando la carta del duelo…`}</p></section>`
       : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-online-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}>${animalArt(card)}<span class="hidden-date">${hiddenLabel()}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Elige una carta, o arrástrala hasta un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p>${myTurn && pulseAvailable() ? `<button class="btn btn-secondary btn-block pulse-btn" data-online-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`}
     ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, user.uid, roomState.timeline.length, me.hand.length, 'data-online-action="ghost-use"', myTurn) : ""}
     ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}
@@ -548,12 +556,45 @@ function revealOverlay(currentUid) {
   // El título de la carta que cambia de mano solo lo ven las dos personas implicadas: el
   // resto de la sala se entera de que hubo trasvase, pero no de cuál era la carta.
   const implicado = reveal.pulse && (user.uid === reveal.playerUid || user.uid === reveal.targetUid);
-  const desenlace = reveal.pulse
-    ? (reveal.correct
-      ? `<p class="pulse-outcome">La carta se queda en la línea. <b>${escapeHtml(reveal.targetName)}</b> se lleva ${implicado && reveal.giftId != null ? `<b>${escapeHtml(getCard(reveal.giftId).title)}</b>` : "una carta"} de <b>${escapeHtml(reveal.playerName)}</b>.</p>`
-      : `<p class="pulse-outcome">La carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una. A <b>${escapeHtml(reveal.targetName)}</b> no le pasa nada.</p>`)
-    : `<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>`;
-  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.pulse ? "⚡ Pulso · " : ""}${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}${canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`}</div></div>`;
+  const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
+  const fichaCarta = `<div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
+  // Un duelo no lo gana ni lo pierde una sola persona, así que no lleva la marca grande de
+  // acierto: cada jugada trae la suya y debajo se cuenta el desenlace.
+  if (reveal.duel) {
+    const cartas = roomState.timeline.map(id => getCard(id));
+    // La línea ya lleva la carta del duelo si alguien la colocó bien, así que para decir
+    // dónde la puso cada cual hay que mirar la línea sin ella.
+    const sinLaCarta = reveal.correct || reveal.targetOk ? cartas.filter(item => item.id !== card.id) : cartas;
+    const donde = index => {
+      const antes = sinLaCarta[index - 1], despues = sinLaCarta[index];
+      if (!antes && !despues) return "en la línea vacía";
+      if (!antes) return `antes de «${escapeHtml(despues.title)}»`;
+      if (!despues) return `después de «${escapeHtml(antes.title)}»`;
+      return `entre «${escapeHtml(antes.title)}» y «${escapeHtml(despues.title)}»`;
+    };
+    const fila = (nombre, ok, index) => `<div class="pulse-duel-row ${ok ? "pulse-duel-hit" : "pulse-duel-miss"}"><span class="pulse-duel-mark" aria-hidden="true">${ok ? "✓" : "×"}</span><span><b>${escapeHtml(nombre)}</b><small>${ok ? "Acierta" : "Falla"}: la puso ${donde(index)}</small></span></div>`;
+    const regalo = implicado && reveal.giftId != null ? `<b>${escapeHtml(getCard(reveal.giftId).title)}</b>` : "una carta";
+    const cierre = reveal.correct && reveal.targetOk
+      ? `Empate: los dos la habéis colocado bien, así que no cambia ninguna mano. La carta se queda en la línea.`
+      : reveal.correct
+        ? `Solo acierta <b>${escapeHtml(reveal.playerName)}</b>: <b>${escapeHtml(reveal.targetName)}</b> se lleva ${regalo}. La carta se queda en la línea.`
+        : reveal.targetOk
+          ? `<b>${escapeHtml(reveal.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(reveal.playerName)}</b> roba una por fallar el reto.`
+          : `No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una por haber lanzado el reto.`;
+    return `<div class="overlay"><div class="modal pulse-duel-modal">
+      <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
+      <h2>${escapeHtml(card.title)}</h2>
+      ${fichaCarta}
+      <div class="pulse-duel-rows">
+        ${fila(reveal.playerName, reveal.correct, reveal.byIndex)}
+        ${fila(reveal.targetName, reveal.targetOk, reveal.targetIndex)}
+      </div>
+      <p class="pulse-outcome">${cierre}</p>
+      ${seguir}
+    </div></div>`;
+  }
+  const desenlace = `<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>`;
+  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2>${fichaCarta}${hint}${desenlace}${seguir}</div></div>`;
 }
 
 async function placeCard(index) {
@@ -633,7 +674,7 @@ function openPulse() {
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-pulse-overlay><div class="modal">
     <div class="eyebrow">Pulso</div>
     <h2>¿A quién retas?</h2>
-    <p class="lead" style="margin-inline:auto">El mazo sacará una carta que no eliges tú. Si la colocas bien, le pasas una carta al azar de tu mano; si fallas, robas una y a esa persona no le pasa nada.</p>
+    <p class="lead" style="margin-inline:auto">El mazo saca una carta que no elige nadie y la colocáis los dos: primero tú y luego esa persona, sin ver tu jugada. Si aciertas y falla, se lleva una carta tuya al azar; si acierta, o si falláis los dos, robas tú.</p>
     <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
     <button class="btn btn-ghost btn-block" style="margin-top:10px" data-online-action="close-pulse">Mejor no</button>
   </div></div>`);
@@ -685,7 +726,10 @@ async function startPulse(targetUid) {
       CT.Powers.claim({ ghost, pulsePower }, cardId, user.uid, deck);
       transaction.update(roomRef, {
         players: { ...data.players, [user.uid]: { ...me, pulseUsed: true } },
-        ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, phase: "pulse", pulseTurn: { targetUid, cardId },
+        ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, phase: "pulse",
+        // La carta que se pagaría si ganas el duelo se sortea aquí, con la mano intacta y
+        // antes de que nadie coloque: así ni se elige a posteriori ni la elige quien cobra.
+        pulseTurn: { targetUid, cardId, stage: "reto", giftId: me.hand[Math.floor(Math.random() * me.hand.length)] },
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -695,6 +739,9 @@ async function startPulse(targetUid) {
   } finally { busy = false; }
 }
 
+// Primera mitad del duelo: quien reta coloca y su jugada se guarda sin resolver nada.
+// Ninguna mano, ni la línea, ni el mazo se tocan todavía: lo único que cambia es el
+// propio `pulseTurn`, que es lo que hace la transición barata de validar en las reglas.
 async function placePulse(index) {
   if (busy || roomState?.phase !== "pulse") return;
   pendingIndex = null;
@@ -705,46 +752,82 @@ async function placePulse(index) {
       const data = snapshot.data();
       const currentUid = data.playerOrder[data.current];
       if (data.status !== "playing" || data.phase !== "pulse" || currentUid !== user.uid) throw new Error("NOT_TURN");
-      const { targetUid, cardId } = data.pulseTurn;
-      const card = getCard(cardId);
-      const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
-      const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
-      const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
-      const timeline = [...data.timeline];
-      let deck = [...data.deck];
-      let discard = [...data.discard];
-      const players = { ...data.players };
-      const ghost = data.ghost ? structuredClone(data.ghost) : null;
-      const pulsePower = data.pulsePower ? structuredClone(data.pulsePower) : null;
-      let giftId = null;
-      if (correct) {
-        timeline.splice(index, 0, cardId);
-        const hand = [...players[user.uid].hand];
-        // Al azar: si pudieras elegirla soltarías siempre la que no sabes colocar.
-        giftId = hand[Math.floor(Math.random() * hand.length)];
-        hand.splice(hand.indexOf(giftId), 1);
-        players[user.uid] = { ...players[user.uid], hand };
-        players[targetUid] = { ...players[targetUid], hand: [...players[targetUid].hand, giftId], shieldRound: data.round };
-      } else {
-        // El castigo recae solo en quien reta: a la otra persona no le pasa nada.
-        discard.push(cardId);
-        const drawn = takeCard(deck, discard);
-        deck = drawn.deck; discard = drawn.discard;
-        if (drawn.cardId != null) { players[user.uid] = { ...players[user.uid], hand: [...players[user.uid].hand, drawn.cardId] }; CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, user.uid, deck); }
-      }
+      if ((data.pulseTurn.stage || "reto") !== "reto") throw new Error("NOT_STAGE");
       transaction.update(roomRef, {
-        players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, timeline, phase: "reveal", pulseTurn: null,
-        reveal: {
-          cardId, correct, returned: false, pulse: true, giftId,
-          playerUid: user.uid, playerName: players[user.uid].name,
-          targetUid, targetName: data.players[targetUid].name
-        },
+        pulseTurn: { ...data.pulseTurn, stage: "defensa", byIndex: index, byOk: aciertaEn(data, data.pulseTurn.cardId, index) },
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
   } catch (error) {
     console.error(error);
     showToast("La jugada no se pudo enviar. Inténtalo de nuevo.");
+  } finally { busy = false; }
+}
+
+function aciertaEn(data, cardId, index) {
+  const card = getCard(cardId);
+  const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
+  const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
+  return (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+}
+
+// Segunda mitad: defiende quien ha sido retado, y su transacción reparte las
+// consecuencias de las dos jugadas a la vez. Es la única escritura del juego que hace
+// alguien que no tiene el turno, y por eso `firestore.rules` la valida aparte.
+async function defendPulse(index) {
+  if (busy || roomState?.phase !== "pulse") return;
+  pendingIndex = null;
+  busy = true;
+  try {
+    await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(roomRef);
+      const data = snapshot.data();
+      if (data.status !== "playing" || data.phase !== "pulse") throw new Error("NOT_PULSE");
+      const { targetUid, cardId, byOk, giftId } = data.pulseTurn;
+      // Quien retó es quien tiene el turno; no hace falta un campo aparte que las reglas
+      // tendrían que validar por su cuenta.
+      const byUid = data.playerOrder[data.current];
+      if (data.pulseTurn.stage !== "defensa" || targetUid !== user.uid) throw new Error("NOT_DEFENSE");
+      const targetOk = aciertaEn(data, cardId, index);
+      const timeline = [...data.timeline];
+      let deck = [...data.deck];
+      let discard = [...data.discard];
+      const players = { ...data.players };
+      const ghost = data.ghost ? structuredClone(data.ghost) : null;
+      const pulsePower = data.pulsePower ? structuredClone(data.pulsePower) : null;
+      // La carta se queda si alguno supo colocarla, en el hueco de quien acertó.
+      if (byOk || targetOk) timeline.splice(byOk ? data.pulseTurn.byIndex : index, 0, cardId);
+      else discard.push(cardId);
+      if (byOk && !targetOk) {
+        const mano = [...players[byUid].hand];
+        mano.splice(mano.indexOf(giftId), 1);
+        players[byUid] = { ...players[byUid], hand: mano };
+        players[user.uid] = { ...players[user.uid], hand: [...players[user.uid].hand, giftId], shieldRound: data.round };
+      } else if (!byOk) {
+        // Fallar el reto lo paga solo quien lo lanzó: a quien defiende no le pasa nada,
+        // y por eso nadie sin opciones puede fallar aposta para acercar a otro al final.
+        const drawn = takeCard(deck, discard);
+        deck = drawn.deck; discard = drawn.discard;
+        if (drawn.cardId != null) {
+          players[byUid] = { ...players[byUid], hand: [...players[byUid].hand, drawn.cardId] };
+          CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, byUid, deck);
+        }
+      }
+      transaction.update(roomRef, {
+        players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, timeline, phase: "reveal", pulseTurn: null,
+        reveal: {
+          cardId, correct: byOk, returned: false, pulse: true, duel: true, targetOk,
+          giftId: byOk && !targetOk ? giftId : null,
+          byIndex: data.pulseTurn.byIndex, targetIndex: index,
+          playerUid: byUid, playerName: data.players[byUid].name,
+          targetUid: user.uid, targetName: players[user.uid].name
+        },
+        version: data.version + 1, updatedAt: serverTimestamp()
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    showToast("La defensa no se pudo enviar. Inténtalo de nuevo.");
   } finally { busy = false; }
 }
 
@@ -993,6 +1076,7 @@ document.addEventListener("click", event => {
   else if (action === "pulse-target") { CT.closeDialog(); startPulse(target.dataset.target); }
   else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`); renderGame(); }
   else if (action === "confirm-pulse") placePulse(pendingIndex);
+  else if (action === "confirm-defense") defendPulse(pendingIndex);
   else if (action === "place") {
     pendingIndex = Number(target.dataset.index);
     announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`);
