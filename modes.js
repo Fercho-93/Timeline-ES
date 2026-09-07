@@ -456,6 +456,12 @@
     13037: "american-cockroach", 13038: "bee"
   };
 
+  // Láminas del mazo de Astronomía y espacio, enlazadas por el ID de cada carta.
+  const ASTRONOMY_ART_BY_ID = {
+    8001: "copernicus-heliocentric", 8017: "andromeda-galaxy", 8022: "sputnik", 8023: "luna-2",
+    8024: "8024_yuri-gagarin", 8025: "8025-valentina-tereshkova", 8026: "8026-first-spacewalk", 8027: "8027-apollo-8", 8028: "8028-apollo-11", 8029: "8029-salyut-1", 8030: "8030-pioneer-10", 8031: "8031-viking-1", 8032: "8032-voyager", 8033: "8033-space-shuttle", 8034: "8034-giotto-halley", 8035: "8035-hubble", 8036: "8036-first-exoplanets", 8037: "8037-sunlike-exoplanet", 8038: "8038-sojourner", 8039: "8039-cassini", 8040: "8040-pluto-dwarf-planet", 8041: "8041-curiosity", 8042: "8042-philae", 8043: "8043-new-horizons", 8044: "8044-gravitational-waves", 8045: "8045-black-hole", 8046: "8046-james-webb-launch", 8047: "8047-james-webb-first-images", 8048: "8048-osiris-rex-bennu", 8049: "8049-change-6"
+  };
+
   // El contexto de una carta en «Gran mezcla»: de qué tema viene, con el icono de su
   // bloque para reconocerlo de un vistazo. En cualquier otra modalidad no hace falta —ya
   // se sabe qué se está jugando— así que devuelve `null` y quien pinte la carta no añade
@@ -476,16 +482,18 @@
     return `<span class="card-category"><span aria-hidden="true">${category.icon}</span>${escapeHtml(category.name)}</span>`;
   }
 
-  function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey); }
+  function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey) || modeKey === "astronomy"; }
 
   function cardArt(modeKey, card) {
-    return usesAnimalArt(modeKey) ? ANIMAL_ART_BY_ID[card.id] || null : null;
+    if (modeKey === "astronomy") return ASTRONOMY_ART_BY_ID[card.id] || null;
+    return ANIMAL_ART_MODES.includes(modeKey) ? ANIMAL_ART_BY_ID[card.id] || null : null;
   }
 
   function animalArt(modeKey, card) {
     const plate = cardArt(modeKey, card);
     if (!plate) return "";
-    return `<img class="animal-card-art" src="assets/animal-cards/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
+    const folder = modeKey === "astronomy" ? "astronomy-cards" : "animal-cards";
+    return `<img class="animal-card-art" src="assets/${folder}/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
   // La huella de un mazo: no el contenido —eso vive en el cliente y las reglas nunca han
