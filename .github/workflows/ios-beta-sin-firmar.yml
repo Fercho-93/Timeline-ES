@@ -28,11 +28,14 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx cap sync ios
+      - name: Instalar dependencias nativas (CocoaPods)
+        working-directory: ios/App
+        run: pod install
       - name: Compilar sin firma de código
         working-directory: ios/App
         run: |
           xcodebuild \
-            -workspace App.xcodeproj/project.xcworkspace \
+            -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
