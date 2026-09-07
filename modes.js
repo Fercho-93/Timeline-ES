@@ -243,12 +243,12 @@
       bands: WORLD_BANDS
     },
     history: {
-      key: "history", name: "Historia de España",
+      key: "history", name: "Historia de España", tag: "España",
       cardLabel: "hechos", blurb: "De Hispania a la democracia.", cards: window.HISTORY_CARDS,
       axis: "time"
     },
     movies: {
-      key: "movies", name: "Estrenos de cine",
+      key: "movies", name: "Estrenos de cine", tag: "Cine",
       cardLabel: "películas", blurb: "De Méliès a nuestros días.", cards: window.MOVIE_CARDS,
       axis: "time",
       bands: [
@@ -261,7 +261,7 @@
       ]
     },
     music: {
-      key: "music", name: "Hitos de la música",
+      key: "music", name: "Hitos de la música", tag: "Música",
       cardLabel: "hitos", blurb: "De Monteverdi al streaming.", cards: window.MUSIC_CARDS,
       axis: "time",
       bands: [
@@ -275,7 +275,7 @@
       ]
     },
     videogames: {
-      key: "videogames", name: "Historia de los videojuegos",
+      key: "videogames", name: "Historia de los videojuegos", tag: "Videojuegos",
       cardLabel: "juegos", blurb: "Del laboratorio a los mundos abiertos.", cards: window.VIDEOGAME_CARDS,
       axis: "time",
       bands: [
@@ -288,7 +288,7 @@
       ]
     },
     inventions: {
-      key: "inventions", name: "Inventos y descubrimientos",
+      key: "inventions", name: "Inventos y descubrimientos", tag: "Inventos",
       cardLabel: "inventos", blurb: "De la escritura a la edición genética.", cards: window.INVENTION_CARDS,
       axis: "time",
       bands: [
@@ -302,13 +302,13 @@
       ]
     },
     world: {
-      key: "world", name: "Historia mundial",
+      key: "world", name: "Historia mundial", tag: "Mundo",
       cardLabel: "hechos", blurb: "De los faraones a hoy.", cards: window.WORLD_CARDS,
       axis: "time",
       bands: WORLD_BANDS
     },
     astronomy: {
-      key: "astronomy", name: "Astronomía y espacio",
+      key: "astronomy", name: "Astronomía y espacio", tag: "Astronomía",
       cardLabel: "hitos", blurb: "De Copérnico al otro lado de la Luna.", cards: window.ASTRONOMY_CARDS,
       axis: "time",
       bands: [
@@ -322,7 +322,7 @@
       ]
     },
     medicine: {
-      key: "medicine", name: "Historia de la medicina",
+      key: "medicine", name: "Historia de la medicina", tag: "Medicina",
       cardLabel: "hitos", blurb: "De Hipócrates a la edición genética.", cards: window.MEDICINE_CARDS,
       axis: "time",
       bands: [
@@ -460,9 +460,14 @@
   // bloque para reconocerlo de un vistazo. En cualquier otra modalidad no hace falta —ya
   // se sabe qué se está jugando— así que devuelve `null` y quien pinte la carta no añade
   // nada.
+  //
+  // Va el nombre corto (`tag`) y no el del mazo: el sello se pinta también en las cartas
+  // de la línea, que miden 130 px en un móvil estrecho, y ahí «Inventos y
+  // descubrimientos» no cabe de ninguna manera. «Inventos» sí, y dice lo mismo.
   function categoryFor(modeKey, card) {
     if (modeKey !== "mixed" || !card.sourceMode || !has(card.sourceMode)) return null;
-    return { icon: blockOf(card.sourceMode).icon, name: MODES[card.sourceMode].name };
+    const source = MODES[card.sourceMode];
+    return { icon: blockOf(card.sourceMode).icon, name: source.tag || source.name };
   }
 
   function categoryBadge(modeKey, card) {
