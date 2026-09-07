@@ -332,10 +332,20 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
   (`window.Capacitor`), así que no tocan la versión web ni iOS.
 - `npm run build && npx cap sync` deja `android/` e `ios/` al día con el último `dist/`
   antes de abrirlos en Android Studio o Xcode.
-- Sigue pendiente (decisiones o pasos que necesitan intervención humana): probar en
-  dispositivos físicos, configurar `FEEDBACK_EMAIL` en `settings.js` con la dirección de
-  contacto real, y las cuentas de pago de Apple Developer / Google Play Developer cuando
-  llegue el momento de distribuir la beta más allá de este repositorio.
+- El número de versión de la beta (`0.1.0`, distinto del número interno de caché del
+  service worker) vive en `android/app/build.gradle` (`versionName`) y en
+  `ios/App/App.xcodeproj/project.pbxproj` (`MARKETING_VERSION`).
+- Ya probada en iPhone real (compilada sin firma vía GitHub Actions e instalada con
+  Sideloadly, sin necesitar un Mac). `.github/workflows/ios-beta-sin-firmar.yml` reproduce
+  ese build bajo demanda. Pendiente de un dispositivo Android para repetir la prueba ahí.
+- `PRIVACIDAD.md` es un primer borrador de la política de privacidad y `TESTERS.md` la
+  guía para elegir testers y qué preguntarles; ambos listos para cuando toque repartir la
+  beta, sin que haga falta tocarlos hasta entonces.
+- Sigue pendiente (decisiones o pasos que necesitan intervención humana): configurar
+  `FEEDBACK_EMAIL` en `settings.js` con la dirección de contacto real, revisión
+  profesional de `PRIVACIDAD.md` antes de publicar, y la cuenta de pago de Apple
+  Developer (con TestFlight) cuando llegue el momento de repartir la beta más allá de
+  este repositorio.
 
 El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.
 
