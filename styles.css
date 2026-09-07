@@ -103,7 +103,7 @@ button { touch-action: manipulation; color: inherit; }
 .home-selection { display: flow-root; overflow: clip; }
 .section-enter > * { animation: section-in 240ms var(--ease-out) both; }
 @keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
-.shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom)); position: relative; z-index: 1; }
+.shell { width: min(100%, 1080px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(26px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); position: relative; z-index: 1; }
 /* `align-items: center` importa más de lo que parece: en móvil esta barra pasa a columna
    (ver el bloque de 620 px) y entonces `align-items` es lo que decide la alineación
    horizontal. Con `flex-start` los botones se van al borde izquierdo en vez de quedar

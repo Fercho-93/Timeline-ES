@@ -304,6 +304,35 @@ Ningún control baja de los 44 px que necesita una yema, y las
 carátulas se sirven en dos tamaños —una para el lomo y otra para la portada desplegada—,
 así que la primera visita baja unos 150 KB de imagen en vez de los 698 KB de antes.
 
+## Preparación para App Store / Google Play (beta móvil)
+
+Continuum se sigue sirviendo como PWA (la sección anterior), y en paralelo se está
+preparando una capa móvil con [Capacitor](https://capacitorjs.com/) alrededor del mismo
+núcleo, sin reescribir el juego ni duplicarlo por plataforma:
+
+- `npm run build` genera `dist/`, una copia literal de los archivos que el juego necesita
+  para funcionar (el juego se sirve como scripts clásicos, no como módulos, así que el
+  build no empaqueta ni transforma nada: solo copia y comprueba que no falte nada de lo
+  que pide `service-worker.js`).
+- `capacitor.config.json` apunta `webDir` a `dist/`. El `appId`
+  (`com.fernandosirvent.continuum`) es provisional: hay que aprobarlo antes de distribuir
+  nada, porque las tiendas lo usan para reconocer la aplicación de forma permanente.
+- `android/` e `ios/` son los proyectos nativos generados por `npx cap add`. Se mantienen en
+  el repositorio (con el propio `.gitignore` de Capacitor, que excluye la copia de `dist/`
+  que se sincroniza dentro) porque ahí es donde vivirán ajustes específicos de cada
+  plataforma: iconos, splash, firma, permisos.
+- El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar
+  una partida en curso, o vuelve al inicio; ambos comportamientos están en `a11y.js`
+  (`backPressed`) y `app.js`, y solo se activan dentro del contenedor nativo de Capacitor
+  (`window.Capacitor`), así que no tocan la versión web ni iOS.
+- `npm run build && npx cap sync` deja `android/` e `ios/` al día con el último `dist/`
+  antes de abrirlos en Android Studio o Xcode.
+- Sigue pendiente (decisiones o pasos que necesitan intervención humana): confirmar el
+  `appId` definitivo, generar los iconos y el splash a partir del logo definitivo, probar
+  en dispositivos físicos, configurar `FEEDBACK_EMAIL` en `settings.js` con la dirección de
+  contacto real, y las cuentas de pago de Apple Developer / Google Play Developer cuando
+  llegue el momento de distribuir la beta más allá de este repositorio.
+
 El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.
 
 El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo: las reglas de seguridad solo hay que volver a publicarlas cuando cambia su contenido, no al añadir un juego nuevo.
@@ -314,13 +343,14 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene veintiuna comprobaciones automáticas: diecisiete que corren en cualquier
+`tests/` contiene veintidós comprobaciones automáticas: dieciocho que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
 los animales, la marca, el service worker, la página que fuerza una actualización, la
-pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace y la accesibilidad con
-teclado y lector de pantalla— y cuatro más que necesitan el emulador oficial de Firestore y
+pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace, la accesibilidad con
+teclado y lector de pantalla, y el build móvil (`npm run build`, `dist/` completo y
+sincronizado con `capacitor.config.json`)— y cuatro más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 

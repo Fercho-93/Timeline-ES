@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Continuum</string>
+    <string name="title_activity_main">Continuum</string>
+    <string name="package_name">com.fernandosirvent.continuum</string>
+    <string name="custom_url_scheme">com.fernandosirvent.continuum</string>
+</resources>

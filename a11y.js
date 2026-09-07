@@ -228,7 +228,16 @@
       else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
     }
     document.addEventListener("keydown", onKey);
-    pila.push({ overlay, previo, onKey });
+    pila.push({ overlay, previo, onKey, cerrable });
+  }
+
+  // Mismo criterio que Escape, para el botón/gesto Atrás de Android: si hay un diálogo
+  // descartable encima, lo cierra; si es un paso obligado, se queda quieto pero igualmente
+  // se come la pulsación, para no dejar que atraviese el diálogo y navegue por debajo.
+  function backPressed() {
+    if (!pila.length) return false;
+    if (pila[pila.length - 1].cerrable) closeDialog();
+    return true;
   }
 
   // Cierra el diálogo de arriba y devuelve el foco a quien lo abrió.
@@ -299,4 +308,5 @@
   window.CONTINUUM.announce = announce;
   window.CONTINUUM.openDialog = openDialog;
   window.CONTINUUM.closeDialog = closeDialog;
+  window.CONTINUUM.backPressed = backPressed;
 })();

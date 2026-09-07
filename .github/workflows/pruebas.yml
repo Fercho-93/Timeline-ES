@@ -23,6 +23,21 @@ jobs:
       - run: npm ci
       - run: npm test
 
+  movil:
+    name: Build móvil (Capacitor)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # Comprueba que Android e iPhone siguen aceptando el build actual sin tocar los
+      # proyectos nativos ya generados (los mismos que hay en android/ e ios/).
+      - run: npx cap sync
+
   reglas:
     name: Reglas de Firestore
     runs-on: ubuntu-latest

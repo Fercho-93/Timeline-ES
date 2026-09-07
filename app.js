@@ -1884,6 +1884,19 @@
       location.reload();
     });
   }
+  // El botón/gesto Atrás de Android: `window.Capacitor` solo existe dentro del contenedor
+  // nativo (Capacitor lo inyecta al arrancar la WebView), así que esto no toca la versión
+  // web ni iOS, que no lo tienen. Un diálogo abierto se cierra como con Escape; una partida
+  // en curso pregunta antes de abandonarla, igual que el resto del juego; cualquier otra
+  // pantalla vuelve al inicio; y desde el inicio, el gesto cierra la aplicación.
+  if (window.Capacitor?.isNativePlatform?.()) {
+    window.Capacitor.Plugins?.App?.addListener("backButton", () => {
+      if (CT.backPressed()) return;
+      if (screen === "game") { gameMenu(); return; }
+      if (screen !== "home") { home(); return; }
+      window.Capacitor.Plugins.App.exitApp();
+    });
+  }
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
   const params = new URLSearchParams(location.search);
