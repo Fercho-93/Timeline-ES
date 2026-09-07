@@ -313,10 +313,17 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .card-content { padding: 13px; }
 /* El sello de tema de «Gran mezcla temporal»: de qué mazo viene la carta, para
    ubicarse entre los ocho que se mezclan. No aparece en el resto de modalidades,
-   donde el tema ya se sabe de sobra. */
-.card-category { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 6px; padding: 3px 8px; border-radius: 999px; background: var(--paper); color: var(--muted); font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; line-height: 1.3; }
+   donde el tema ya se sabe de sobra.
+
+   Nunca se sale de su carta: `max-width` lo ata al ancho disponible y
+   `overflow-wrap: anywhere` deja que el texto baje de línea en lugar de asomar por el
+   borde —una carta de la línea mide 130 px en un móvil estrecho—. El icono no encoge.
+   Y va en su propia línea (`flex` con `width: fit-content`, no `inline-flex`) para que
+   «Fecha oculta» no se le meta al lado en la carta de la mano. */
+.card-category { display: flex; width: fit-content; align-items: center; gap: 4px; max-width: 100%; margin-bottom: 6px; padding: 3px 8px; border-radius: 999px; background: var(--paper); color: var(--muted); font-size: .62rem; font-weight: 700; text-align: left; text-transform: uppercase; letter-spacing: .06em; line-height: 1.3; overflow-wrap: anywhere; }
+.card-category > span { flex: none; }
 .hand-card .card-category { position: relative; z-index: 1; }
-.reveal .card-category { margin: 0 0 10px; }
+.reveal .card-category { margin: 14px 0 12px; }
 .timeline-card .year { font-family: var(--font-display); color: var(--accent); font-size: 1.6rem; font-weight: 700; line-height: 1; }
 .timeline-card h3 { margin: 9px 0 8px; font-family: var(--font-display); font-size: .98rem; line-height: 1.16; letter-spacing: -.01em; }
 .timeline-card p { color: var(--muted); font-size: .75rem; line-height: 1.42; margin: 0; }
