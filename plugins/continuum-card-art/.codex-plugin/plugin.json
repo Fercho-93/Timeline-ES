@@ -1,0 +1,40 @@
+{
+  "name": "continuum-card-art",
+  "version": "1.0.0",
+  "description": "Reusable visual system for creating Continuum card illustrations in the established sepia parchment and antique scientific engraving style.",
+  "author": {
+    "name": "Fernando Sirvent",
+    "email": "fernandosirventmerino@gmail.com",
+    "url": "https://github.com/Fercho-93"
+  },
+  "homepage": "https://github.com/Fercho-93/Timeline-ES/tree/main/plugins/continuum-card-art",
+  "repository": "https://github.com/Fercho-93/Timeline-ES",
+  "license": "MIT",
+  "keywords": [
+    "continuum",
+    "card-art",
+    "illustration",
+    "sepia",
+    "engraving",
+    "game-assets"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Continuum Card Art",
+    "shortDescription": "Generate matching Continuum card illustrations",
+    "longDescription": "Create new or refine existing Continuum card artwork while preserving the 512×768 format, sepia parchment palette, antique engraving technique and deck-specific composition.",
+    "developerName": "Fernando Sirvent",
+    "category": "Creative",
+    "capabilities": [
+      "Image generation",
+      "Reusable workflow"
+    ],
+    "websiteURL": "https://github.com/Fercho-93/Timeline-ES",
+    "defaultPrompt": [
+      "Create a Continuum card illustration in the established visual style.",
+      "Use the Continuum card-art style for this new deck.",
+      "Review this card image against the Continuum visual system."
+    ],
+    "brandColor": "#B9823A"
+  }
+}
