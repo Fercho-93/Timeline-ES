@@ -1,4 +1,0 @@
-interface:
-  display_name: "Continuum Card Art"
-  short_description: "Generate matching Continuum card illustrations"
-  default_prompt: "Use $continuum-card-art to create a card illustration in the established Continuum visual style."
