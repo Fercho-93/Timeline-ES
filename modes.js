@@ -493,17 +493,18 @@
     return `<span class="card-category"><span aria-hidden="true">${category.icon}</span>${escapeHtml(category.name)}</span>`;
   }
 
-  function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey) || modeKey === "astronomy"; }
+  function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey) || modeKey === "astronomy" || modeKey === "countries"; }
 
   function cardArt(modeKey, card) {
     if (modeKey === "astronomy") return ASTRONOMY_ART_BY_ID[card.id] || null;
+    if (modeKey === "countries") return String(card.id);
     return ANIMAL_ART_MODES.includes(modeKey) ? ANIMAL_ART_BY_ID[card.id] || null : null;
   }
 
   function animalArt(modeKey, card) {
     const plate = cardArt(modeKey, card);
     if (!plate) return "";
-    const folder = modeKey === "astronomy" ? "astronomy-cards" : "animal-cards";
+    const folder = modeKey === "astronomy" ? "astronomy-cards" : modeKey === "countries" ? "country-cards" : "animal-cards";
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.webp" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
