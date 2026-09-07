@@ -1,4 +1,4 @@
-package com.fernandosirvent.continuum;
+package com.continuum.game;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -314,9 +314,10 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
   para funcionar (el juego se sirve como scripts clásicos, no como módulos, así que el
   build no empaqueta ni transforma nada: solo copia y comprueba que no falte nada de lo
   que pide `service-worker.js`).
-- `capacitor.config.json` apunta `webDir` a `dist/`. El `appId`
-  (`com.fernandosirvent.continuum`) es provisional: hay que aprobarlo antes de distribuir
-  nada, porque las tiendas lo usan para reconocer la aplicación de forma permanente.
+- `capacitor.config.json` apunta `webDir` a `dist/`. El `appId` (`com.continuum.game`) ya
+  está aprobado y es el que hay que mantener estable de aquí en adelante: las tiendas lo
+  usan para reconocer la aplicación de forma permanente, así que cambiarlo después de
+  publicar equivaldría a crear una aplicación nueva desde cero.
 - `android/` e `ios/` son los proyectos nativos generados por `npx cap add`. Se mantienen en
   el repositorio (con el propio `.gitignore` de Capacitor, que excluye la copia de `dist/`
   que se sincroniza dentro) porque ahí es donde vivirán ajustes específicos de cada
@@ -331,10 +332,9 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
   (`window.Capacitor`), así que no tocan la versión web ni iOS.
 - `npm run build && npx cap sync` deja `android/` e `ios/` al día con el último `dist/`
   antes de abrirlos en Android Studio o Xcode.
-- Sigue pendiente (decisiones o pasos que necesitan intervención humana): confirmar el
-  `appId` definitivo, probar en dispositivos físicos, configurar `FEEDBACK_EMAIL` en
-  `settings.js` con la dirección de contacto real, y las cuentas de pago de Apple Developer
-  / Google Play Developer cuando
+- Sigue pendiente (decisiones o pasos que necesitan intervención humana): probar en
+  dispositivos físicos, configurar `FEEDBACK_EMAIL` en `settings.js` con la dirección de
+  contacto real, y las cuentas de pago de Apple Developer / Google Play Developer cuando
   llegue el momento de distribuir la beta más allá de este repositorio.
 
 El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.
