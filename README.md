@@ -321,6 +321,10 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
   el repositorio (con el propio `.gitignore` de Capacitor, que excluye la copia de `dist/`
   que se sincroniza dentro) porque ahí es donde vivirán ajustes específicos de cada
   plataforma: iconos, splash, firma, permisos.
+- Los iconos y la pantalla de apertura nativos ya están generados en todos los tamaños que
+  piden Android e iOS, a partir de `icon.svg` (el mismo icono de la PWA) y del emblema de la
+  portada, con `npm run icons` (usa `@capacitor/assets`; las fuentes en alta resolución
+  viven en `resources/`). Vuelve a ejecutarlo si cambia el logo definitivo.
 - El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar
   una partida en curso, o vuelve al inicio; ambos comportamientos están en `a11y.js`
   (`backPressed`) y `app.js`, y solo se activan dentro del contenedor nativo de Capacitor
@@ -328,9 +332,9 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
 - `npm run build && npx cap sync` deja `android/` e `ios/` al día con el último `dist/`
   antes de abrirlos en Android Studio o Xcode.
 - Sigue pendiente (decisiones o pasos que necesitan intervención humana): confirmar el
-  `appId` definitivo, generar los iconos y el splash a partir del logo definitivo, probar
-  en dispositivos físicos, configurar `FEEDBACK_EMAIL` en `settings.js` con la dirección de
-  contacto real, y las cuentas de pago de Apple Developer / Google Play Developer cuando
+  `appId` definitivo, probar en dispositivos físicos, configurar `FEEDBACK_EMAIL` en
+  `settings.js` con la dirección de contacto real, y las cuentas de pago de Apple Developer
+  / Google Play Developer cuando
   llegue el momento de distribuir la beta más allá de este repositorio.
 
 El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.

@@ -10,12 +10,14 @@
     "test:reglas": "firebase emulators:exec --project demo-hilo --only firestore \"node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs && node tests/fantasma-online.mjs\"",
     "test:todo": "npm test && npm run test:reglas",
     "dev": "vite",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "icons": "capacitor-assets generate --assetPath resources --android --ios"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@firebase/rules-unit-testing": "^5.0.0",
     "firebase": "^12.15.0",
     "firebase-tools": "^14.0.0",
