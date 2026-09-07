@@ -473,6 +473,8 @@
     8044: "8044-gravitational-waves", 8045: "8045-black-hole", 8046: "8046-james-webb-launch",
     8047: "8047-james-webb-first-images", 8048: "8048-osiris-rex-bennu", 8049: "8049-change-6"
   };
+  const COUNTRY_ART_IDS = new Set([2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2060, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2068, 2069, 2070, 2071, 2072]);
+
   // El contexto de una carta en «Gran mezcla»: de qué tema viene, con el icono de su
   // bloque para reconocerlo de un vistazo. En cualquier otra modalidad no hace falta —ya
   // se sabe qué se está jugando— así que devuelve `null` y quien pinte la carta no añade
@@ -497,7 +499,7 @@
 
   function cardArt(modeKey, card) {
     if (modeKey === "astronomy") return ASTRONOMY_ART_BY_ID[card.id] || null;
-    if (modeKey === "countries") return String(card.id);
+    if (modeKey === "countries") return COUNTRY_ART_IDS.has(card.id) ? String(card.id) : null;
     return ANIMAL_ART_MODES.includes(modeKey) ? ANIMAL_ART_BY_ID[card.id] || null : null;
   }
 
