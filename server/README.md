@@ -2,6 +2,8 @@
 
 Este servicio es independiente de las salas familiares del protocolo 40. Implementa creación y entrada a sala, inicio con tres cartas, jugadas normales, Pulso con respuestas privadas, cierre de ronda, desempates y resultados registrados por el servidor. Comparte la resolución de cartas con `engine.js`.
 
+`server/client.mjs` ofrece un adaptador HTTP pequeño para la futura interfaz: exige una URL HTTPS, añade los tokens de Firebase cuando están disponibles, limita el tiempo de espera y convierte respuestas de error en excepciones. No se activa mientras no exista una URL de servidor configurada.
+
 **No está desplegado ni conectado a las pantallas de la aplicación.** No ofrece todavía Fantasma ni expulsión: una desconexión conserva la partida, pero no sustituye al participante. El abandono voluntario, la recuperación del anfitrión y el cierre de un turno bloqueado sí están validados: devuelve las cartas al descarte, cancela un Pulso a medias, permite tomar el relevo tras 90 segundos sin presencia y acepta `timeout` tras 45 segundos sin actividad. No debe anunciarse como una modalidad pública disponible.
 
 ## Fronteras de seguridad
