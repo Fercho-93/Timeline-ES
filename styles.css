@@ -1693,3 +1693,4 @@ body::before {
   :root[data-text-size="150"] .home-shell .comp-promo-art,
   :root[data-text-size="200"] .home-shell .comp-promo-art { height: 90px; }
 }
+.home-shell .hero-copy { grid-template-columns: minmax(0, 1fr); }

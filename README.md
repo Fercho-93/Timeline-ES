@@ -362,7 +362,7 @@ todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las re
 los animales, la marca, el service worker, la página que fuerza una actualización, la
 pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace, la accesibilidad con
 teclado y lector de pantalla, y el build móvil (`npm run build`, `dist/` completo y
-sincronizado con `capacitor.config.json`)— y seis más que necesitan el emulador oficial de Firestore y
+sincronizado con `capacitor.config.json`)— y siete más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 
