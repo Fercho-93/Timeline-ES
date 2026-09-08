@@ -1084,6 +1084,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
      no una superficie de la interfaz, igual que la carta de la mano es cuero oscuro de
      día y de noche. Por eso su tinta tampoco cambia. */
   --carta-tinta: #3b2816;
+  /* La segunda tinta de esa misma carta: el dato (año, peso, distancia...) impreso en
+     rojo para separarlo del título de un vistazo. Fijo por el mismo motivo que
+     `--carta-tinta`; usar `--accent` lo volvería naranja claro de noche sobre un papel
+     que no cambia. */
+  --carta-dato: #9b411d;
 }
 
 html { background: #d7b778; scroll-behavior: smooth; }
@@ -1454,24 +1459,44 @@ body::before {
 /* La ilustración ya no lleva el texto encima: la temática va en una franja
    propia arriba, la imagen queda limpia en medio y el resultado se ancla al
    fondo del todo, así un título largo nunca tapa el dibujo. */
+/* Sin `border: 0` ni fondo propio: al no cubrir la imagen toda la carta, esta vuelve
+   a ser la misma ficha de papel enmarcada que el resto de la línea. */
 .timeline .animal-timeline-card {
   display: flex;
   flex-direction: column;
-  border: 0;
-  background: var(--surface);
-  box-shadow: 0 5px 12px rgba(73,42,14,.2);
 }
+/* El sello de temática también es parte del papel: colores fijos, no los del tema,
+   porque el fondo de la carta es el mismo de día y de noche. */
+/* En la carta de la línea el sello dispone de 130 px en un móvil estrecho, y el rótulo
+   más largo del juego es «Videojuegos»: se aprieta un punto la letra y se prohíbe partir
+   palabras, que es lo que dejaba un «VIDEOJUEG / OS» a media carta. */
 .timeline .animal-timeline-card .card-category {
   flex: none;
   margin: 8px 8px 0;
+  padding: 2px 7px;
+  border: 1px solid rgba(59,40,22,.22);
+  background: #f4ddb0;
+  color: rgba(59,40,22,.78);
+  font-size: .54rem;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
+/* La lámina va enmarcada por el papel, como un grabado pegado en la ficha. El panel
+   toma la proporción de las propias láminas —todas son 512x768—, así `cover` las
+   encaja enteras: ni se recorta la escena ni quedan franjas a los lados. Se expresa
+   como `aspect-ratio` y no como alto fijo para que acompañe al ancho de la carta,
+   que cambia entre móvil y escritorio. */
 .timeline .animal-timeline-card .card-visual {
   flex: none;
   position: static;
-  width: 100%;
-  height: 128px;
-  margin-top: 6px;
+  width: auto;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  margin: 6px 8px 0;
   padding: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(59,40,22,.22);
   filter: none;
 }
 .timeline .animal-timeline-card .card-content {
@@ -1482,15 +1507,19 @@ body::before {
   padding: 10px 12px 12px;
   background: none;
 }
+/* El resultado no va en una etiqueta pegada encima: va impreso en el propio papel,
+   en tinta roja para que destaque del título, cerrando la carta por abajo. El
+   `margin-top: auto` lo empuja al fondo aunque el título ocupe una o cuatro líneas. */
 .timeline .animal-timeline-card .year {
-  display: inline-block;
-  align-self: flex-start;
-  margin: 10px 0 0;
-  padding: 5px 8px;
+  display: block;
+  margin: auto 0 0;
+  padding: 7px 0 0;
   border: 0;
-  border-radius: 3px;
-  background: var(--paper);
-  box-shadow: 0 1px 3px rgba(62,35,12,.14);
+  border-top: 1px solid rgba(59,40,22,.16);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--carta-dato);
 }
 .timeline .animal-timeline-card h3 { margin: 0; }
 .timeline .animal-timeline-card p { display: none; margin: 6px 0 0; }
@@ -1500,7 +1529,6 @@ body::before {
 @media (max-width: 620px) {
   .animal-hand-card { min-height: 190px; }
   .timeline .animal-timeline-card { min-height: 172px; }
-  .timeline .animal-timeline-card .card-visual { height: 96px; }
 }
 .slot, .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: var(--hueco); }
 .overlay { background: rgba(47,29,14,.68); backdrop-filter: blur(6px) sepia(.2); }

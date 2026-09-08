@@ -78,5 +78,22 @@ check("la ilustración cubre su panel sin franjas ni bordes interiores", /object
 // superponiéndolos): así un título largo nunca tapa el dibujo, solo alarga la carta.
 check("la ilustración colocada no queda tapada por el título ni el resultado", !/position:\s*absolute/.test(embeddedAnimalCard) && !/position:\s*absolute/.test(embeddedAnimalContent));
 
+// `cover` sin franjas tiene un precio: lo que no cabe en el panel se recorta. Mientras el
+// panel conserve la proporción de las láminas no se recorta nada; con un panel apaisado
+// llegó a comerse el 43% del alto de cada escena. Se comprueban las dos mitades del trato:
+// que el CSS mantenga la proporción y que las láminas sigan siendo las que la justifican.
+const cabecera = file => {
+  const d = fs.readFileSync(file).subarray(0, 40);
+  if (d.subarray(0, 4).toString() !== "RIFF" || d.subarray(8, 12).toString() !== "WEBP") return null;
+  const tipo = d.subarray(12, 16).toString();
+  if (tipo === "VP8X") return [d.readUIntLE(24, 3) + 1, d.readUIntLE(27, 3) + 1];
+  if (tipo === "VP8 ") return [d.readUInt16LE(26) & 0x3fff, d.readUInt16LE(28) & 0x3fff];
+  if (tipo === "VP8L") { const b = d.readUInt32LE(21); return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1]; }
+  return null;
+};
+const medidas = illustratedCardIds.map(id => cabecera(path.join(root, "assets", "animal-cards", `${artById.get(id)}.webp`)));
+check("el panel de la lámina conserva la proporción de los archivos", /aspect-ratio:\s*2\s*\/\s*3/.test(embeddedAnimalCard));
+check("todas las láminas mantienen esa proporción 2:3", medidas.every(m => m && Math.abs(m[0] / m[1] - 2 / 3) < 0.01));
+
 console.log(`\n${failures} fallos`);
 process.exit(failures ? 1 : 0);
