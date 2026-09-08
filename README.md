@@ -355,7 +355,7 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene veintiocho suites automáticas: veintidós que corren en cualquier
+`tests/` contiene treinta y dos suites automáticas: veinticinco que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de

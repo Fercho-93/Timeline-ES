@@ -29,7 +29,7 @@ Crear una versión de protocolo independiente con estas fronteras:
 - Resolución de Pulso: conservar las dos respuestas privadas hasta resolver ambas; no publicar la primera respuesta anticipadamente.
 - Resultados: emitir un registro de servidor con versión del motor y catálogo, ganador y secuencia de acciones. Las clasificaciones solo aceptarían estos registros; nunca importaciones locales ni un resultado escrito por el cliente.
 
-Esta migración no se declara implementada por endurecer reglas de las salas actuales. Debe completarse y probarse antes de abrir competición pública o premios.
+El servicio experimental de server/ implementa estas fronteras, transacciones y resultados registrados por servidor, con pruebas independientes. No está desplegado ni integrado en las pantallas; faltan Fantasma, abandono, recuperación del anfitrión y controles globales. Las salas familiares actuales conservan su arquitectura. Véase server/README.md antes de cualquier exposición pública.
 
 ## Fuentes operativas
 

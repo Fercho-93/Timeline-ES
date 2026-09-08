@@ -6,7 +6,7 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm ci
 
-# Juego, guardado, mazos, service worker, accesibilidad y build: veintidós suites y presupuesto de recursos.
+# Juego, guardado, mazos, service worker, accesibilidad y build: veinticinco suites y presupuesto de recursos.
 npm test
 
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
