@@ -355,14 +355,14 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene veintiocho suites automáticas: veintidós que corren en cualquier
+`tests/` contiene treinta y dos suites automáticas: veinticinco que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
 los animales, la marca, el service worker, la página que fuerza una actualización, la
 pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace, la accesibilidad con
 teclado y lector de pantalla, y el build móvil (`npm run build`, `dist/` completo y
-sincronizado con `capacitor.config.json`)— y seis más que necesitan el emulador oficial de Firestore y
+sincronizado con `capacitor.config.json`)— y siete más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 

@@ -7,7 +7,7 @@
 
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
-  const DEFAULTS = { theme: "auto" };
+  const DEFAULTS = { theme: "auto", textSize: "100" };
   // Pendiente de rellenar antes de repartir la beta: el correo donde debe llegar el
   // informe de comentarios. Hasta entonces el botón avisa de que aún no hay dirección.
   const FEEDBACK_EMAIL = CT.Deployment.feedbackEmail;
@@ -28,6 +28,8 @@
   // El tema se aplica en el elemento raíz: «auto» no pone nada y deja mandar a
   // `prefers-color-scheme`, tal como está montada la hoja de estilos.
   function applyTheme() {
+    document.documentElement.style.fontSize = ({100:'100%',125:'125%',150:'150%',200:'200%'})[settings.textSize] || '100%';
+    document.documentElement.dataset.textSize = settings.textSize;
     if (settings.theme === "auto") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", settings.theme);
     // El color de la barra del navegador no lee variables CSS ni `data-theme`: en
@@ -55,6 +57,12 @@
           <option value="auto"${s.theme === "auto" ? " selected" : ""}>Automático, según el móvil</option>
           <option value="light"${s.theme === "light" ? " selected" : ""}>Claro</option>
           <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ajuste-texto">Tamaño del texto</label>
+        <select id="ajuste-texto" data-settings-action="text-size">
+          ${[['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']].map(([value,label])=>`<option value="${value}"${s.textSize===value?' selected':''}>${label}</option>`).join('')}
         </select>
       </div>
       <h2>Efectos opcionales</h2>
@@ -105,6 +113,10 @@
 
   CT.effectPrefs = () => ({ sound: settings.sound === true, haptics: settings.haptics === true });
   document.addEventListener("change", event => {
+    if (event.target.dataset.settingsAction === 'text-size') {
+      if (!['100','125','150','200'].includes(event.target.value)) return;
+      settings.textSize = event.target.value; save(); applyTheme(); return;
+    }
     if (["sound", "haptics"].includes(event.target.dataset.settingsAction)) {
       settings[event.target.dataset.settingsAction] = event.target.checked; save(); return;
     }

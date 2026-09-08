@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function member(id) { return request.auth != null && request.auth.uid in get(/databases/$(database)/documents/matches/$(id)).data.order; }
+  match /matches/{id} {
+   allow get: if request.auth != null && request.auth.uid in resource.data.order;
+   allow list, write: if false;
+   match /private/{uid} { allow get: if request.auth != null && request.auth.uid == uid && member(id); allow list, write: if false; }
+  }
+  match /matchResults/{id} { allow get: if member(id); allow list, write: if false; }
+  match /{document=**} { allow read, write: if false; }
+ }
+}

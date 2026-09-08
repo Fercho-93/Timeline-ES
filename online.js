@@ -744,27 +744,11 @@ async function placeCard(index) {
       const data = snapshot.data();
       const currentUid = data.playerOrder[data.current];
       if (data.status !== "playing" || data.phase !== "turn" || currentUid !== user.uid) throw new Error("NOT_TURN");
-      const hand = [...data.players[user.uid].hand];
-      if (!hand.includes(playedId)) throw new Error("NO_CARD");
-      const card = getCard(playedId);
-      const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
-      const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
-      const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
-      hand.splice(hand.indexOf(playedId), 1);
-      const timeline = [...data.timeline];
-      let deck = [...data.deck];
-      let discard = [...data.discard];
+      const played = CT.Engine.play({...data, hand:data.players[user.uid].hand}, playedId, index, id => sortValue(getCard(id)));
+      const {hand, timeline, deck, discard, correct, returned} = played;
       const ghost = data.ghost ? structuredClone(data.ghost) : null;
       const pulsePower = data.pulsePower ? structuredClone(data.pulsePower) : null;
-      let returned = false;
-      if (correct) timeline.splice(index, 0, playedId);
-      else {
-        const drawn = takeCard(deck, discard);
-        deck = drawn.deck; discard = drawn.discard;
-        if (drawn.cardId != null) { hand.push(drawn.cardId); discard.push(playedId); CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, user.uid, deck); }
-        // Sin mazo ni descarte no hay nada que robar: la carta vuelve a la mano.
-        else { hand.push(playedId); returned = true; }
-      }
+      if (played.drawnCardId != null) CT.Powers.claim({ghost, pulsePower}, played.drawnCardId, user.uid, deck);
       const players = { ...data.players, [user.uid]: { ...data.players[user.uid], hand } };
       transaction.update(roomRef, {
         players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, timeline, phase: "reveal",
@@ -901,10 +885,7 @@ async function placePulse(index) {
 }
 
 function aciertaEn(data, cardId, index) {
-  const card = getCard(cardId);
-  const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
-  const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
-  return (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+  return CT.Engine.fits(data.timeline, cardId, index, id => sortValue(getCard(id)));
 }
 
 // Segunda mitad: defiende quien ha sido retado, y su transacción reparte las
@@ -924,32 +905,16 @@ async function defendPulse(index) {
       // tendrían que validar por su cuenta.
       const byUid = data.playerOrder[data.current];
       if (data.pulseTurn.stage !== "defensa" || targetUid !== user.uid) throw new Error("NOT_DEFENSE");
-      const targetOk = aciertaEn(data, cardId, index);
-      const timeline = [...data.timeline];
-      let deck = [...data.deck];
-      let discard = [...data.discard];
-      const players = { ...data.players };
+      const resolved = CT.Engine.pulse({...data, byHand:data.players[byUid].hand, targetHand:data.players[user.uid].hand},
+        data.pulseTurn, index, id => sortValue(getCard(id)));
+      const {targetOk, timeline, deck, discard, penaltySkipped} = resolved;
+      const players = {...data.players,
+        [byUid]: {...data.players[byUid], hand:resolved.byHand},
+        [user.uid]: {...data.players[user.uid], hand:resolved.targetHand}};
+      if (resolved.giftId != null) players[user.uid].shieldRound = data.round;
       const ghost = data.ghost ? structuredClone(data.ghost) : null;
       const pulsePower = data.pulsePower ? structuredClone(data.pulsePower) : null;
-      const penaltySkipped = !byOk && targetOk && !deck.length && !discard.length;
-      // La carta se queda si alguno supo colocarla, en el hueco de quien acertó.
-      if (byOk || targetOk) timeline.splice(byOk ? data.pulseTurn.byIndex : index, 0, cardId);
-      else discard.push(cardId);
-      if (byOk && !targetOk) {
-        const mano = [...players[byUid].hand];
-        mano.splice(mano.indexOf(giftId), 1);
-        players[byUid] = { ...players[byUid], hand: mano };
-        players[user.uid] = { ...players[user.uid], hand: [...players[user.uid].hand, giftId], shieldRound: data.round };
-      } else if (!byOk) {
-        // Fallar el reto lo paga solo quien lo lanzó: a quien defiende no le pasa nada,
-        // y por eso nadie sin opciones puede fallar aposta para acercar a otro al final.
-        const drawn = takeCard(deck, discard);
-        deck = drawn.deck; discard = drawn.discard;
-        if (drawn.cardId != null) {
-          players[byUid] = { ...players[byUid], hand: [...players[byUid].hand, drawn.cardId] };
-          CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, byUid, deck);
-        }
-      }
+      if (resolved.drawnCardId != null) CT.Powers.claim({ghost, pulsePower}, resolved.drawnCardId, byUid, deck);
       transaction.update(roomRef, {
         players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, timeline, phase: "reveal", pulseTurn: null,
         reveal: {

@@ -542,23 +542,12 @@
     pendingIndex = null;
     const player = currentPlayer();
     const card = cardsById.get(selectedCardId);
-    const previous = index > 0 ? cardsById.get(game.timeline[index - 1]) : null;
-    const next = index < game.timeline.length ? cardsById.get(game.timeline[index]) : null;
-    const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
-    player.hand = player.hand.filter(id => id !== selectedCardId);
-    let returned = false;
-    if (correct) game.timeline.splice(index, 0, selectedCardId);
-    else if (drawCard(player)) {
-      game.discard.push(selectedCardId);
-      // Aparte del descarte, que vuelve al mazo y se puede volver a repartir: para el
-      // repaso final importa que la carta se falló alguna vez, acierte después o no.
-      (game.failed = game.failed || []).push(selectedCardId);
-    } else {
-      // Sin mazo ni descarte no hay nada que robar: la carta vuelve a la mano.
-      player.hand.push(selectedCardId);
-      returned = true;
-      (game.failed = game.failed || []).push(selectedCardId);
-    }
+    const played = CT.Engine.play({...game, hand:player.hand}, selectedCardId, index, id => sortValue(cardsById.get(id)));
+    const {correct, returned} = played;
+    player.hand = played.hand;
+    game.timeline = played.timeline; game.deck = played.deck; game.discard = played.discard;
+    if (played.drawnCardId != null) CT.Powers.claim(game, played.drawnCardId, player.id, game.deck);
+    if (!correct) (game.failed = game.failed || []).push(selectedCardId);
     result = { correct, returned, card, playerName: player.name };
     CT.Effects.feedback(correct);
     selectedCardId = null;
@@ -674,9 +663,7 @@
   }
 
   function aciertaEn(card, index) {
-    const previous = index > 0 ? cardsById.get(game.timeline[index - 1]) : null;
-    const next = index < game.timeline.length ? cardsById.get(game.timeline[index]) : null;
-    return (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+    return CT.Engine.fits(game.timeline, card.id, index, id => sortValue(cardsById.get(id)));
   }
 
   // Primera mitad del duelo: quien reta coloca y la jugada se guarda sin resolverse. No se
@@ -703,29 +690,20 @@
     // señalarían a otras cartas.
     const cartas = game.timeline.map(id => cardsById.get(id));
     const posiciones = { by: posicionEnLinea(byIndex, cartas), target: posicionEnLinea(index, cartas) };
-    let gift = null;
-    let penaltySkipped = false;
-    if (byOk || targetOk) game.timeline.splice(byOk ? byIndex : index, 0, cardId);
-    else {
-      game.discard.push(cardId);
-      (game.failed = game.failed || []).push(cardId);
-    }
-    if (byOk && !targetOk) {
-      // Una partida guardada antes del duelo no traía la carta apalabrada: se sortea ahora.
-      const giftId = game.pulseTurn.giftId != null && player.hand.includes(game.pulseTurn.giftId)
-        ? game.pulseTurn.giftId
-        : player.hand[Math.floor(Math.random() * player.hand.length)];
-      player.hand = player.hand.filter(id => id !== giftId);
-      target.hand.push(giftId);
+    const giftId = player.hand.includes(game.pulseTurn.giftId) ? game.pulseTurn.giftId
+      : player.hand[Math.floor(Math.random() * player.hand.length)];
+    const resolved = CT.Engine.pulse({...game, byHand:player.hand, targetHand:target.hand},
+      {...game.pulseTurn, giftId}, index, id => sortValue(cardsById.get(id)));
+    game.timeline = resolved.timeline; game.deck = resolved.deck; game.discard = resolved.discard;
+    player.hand = resolved.byHand; target.hand = resolved.targetHand;
+    const penaltySkipped = resolved.penaltySkipped;
+    const gift = resolved.giftId == null ? null : cardsById.get(resolved.giftId);
+    if (!byOk && !targetOk) (game.failed = game.failed || []).push(cardId);
+    if (gift) {
       target.shieldRound = game.round;
-      // Quien la recibe la ve al resolverse el duelo, y se la recuerda su pantalla de paso.
-      game.pulseGift = { to: target.id, cardId: giftId, from: player.name };
-      gift = cardsById.get(giftId);
-    } else if (!byOk) {
-      // Nunca falla cuando los dos fallan: la carta del reto acaba de entrar en el
-      // descarte, así que hay al menos una que robar aunque el mazo estuviera vacío.
-      penaltySkipped = !drawCard(player);
+      game.pulseGift = {to:target.id, cardId:gift.id, from:player.name};
     }
+    if (resolved.drawnCardId != null) CT.Powers.claim(game, resolved.drawnCardId, player.id, game.deck);
     game.pulseTurn = null;
     CT.Effects.feedback(targetOk);
     pendingIndex = null;
@@ -835,10 +813,11 @@
   // Devuelve true si la partida ha terminado. Nadie puede empezar un turno con la mano
   // vacía: o gana, o el desempate le da una carta, o se acaba la partida por falta de mazo.
   function resolveRound() {
-    const empty = game.players.filter(player => player.hand.length === 0);
-    if (empty.length === 1) return endGame(empty);
+    const players = Object.fromEntries(game.players.map(player => [player.id, player]));
+    const outcome = CT.Engine.roundOutcome(game.players.map(player => player.id), players, game.deck.length + game.discard.length);
+    const empty = outcome.empty.map(id => players[id]);
+    if (outcome.ended) return endGame(empty);
     if (empty.length > 1) {
-      if (game.deck.length + game.discard.length < empty.length) return endGame(empty);
       empty.forEach(drawCard);
       showToast("Empate: una carta extra para cada finalista");
     }
