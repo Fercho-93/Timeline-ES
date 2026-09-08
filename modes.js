@@ -701,28 +701,28 @@
 
   // Historia se activa cuando su lote esté completo; mientras tanto no se ocultan
   // accidentalmente las bandas de las cartas que aún no tienen lámina.
-  function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey) || modeKey === "astronomy" || modeKey === "medicine" || modeKey === "countries" || modeKey === "population" || modeKey === "distances" || modeKey === "history" || modeKey === "movies" || modeKey === "music" || modeKey === "inventions" || modeKey === "world" || (modeKey === "videogames" && VIDEOGAME_ART_READY); }
+  function usesAnimalArt(modeKey) { return ANIMAL_ART_MODES.includes(modeKey) || modeKey === "astronomy" || modeKey === "medicine" || modeKey === "countries" || modeKey === "population" || modeKey === "distances" || modeKey === "history" || modeKey === "movies" || modeKey === "music" || modeKey === "inventions" || modeKey === "world" || (modeKey === "videogames" && VIDEOGAME_ART_READY) || modeKey === "mixed"; }
 
-  function cardArt(modeKey, card) {
-    if (modeKey === "astronomy") return ASTRONOMY_ART_BY_ID[card.id] || null;
-    if (modeKey === "medicine") return MEDICINE_ART_BY_ID[card.id] || null;
-    if (modeKey === "countries") return COUNTRY_ART_IDS.has(card.id) ? String(card.id) : null;
-    if (modeKey === "population") return POPULATION_ART_BY_ID[card.id] || null;
-    if (modeKey === "distances") return DISTANCE_ART_BY_ID[card.id] || null;
-    if (modeKey === "history") return HISTORY_ART_BY_ID[card.id] || null;
-    if (modeKey === "inventions") return INVENTION_ART_BY_ID[card.id] || null;
-    if (modeKey === "movies") return MOVIE_ART_BY_ID[card.id] || null;
-    if (modeKey === "music") return MUSIC_ART_BY_ID[card.id] || null;
-    if (modeKey === "world") return WORLD_ART_BY_ID[card.id] || null;
-    if (modeKey === "videogames") return VIDEOGAME_ART_BY_ID[card.id] || null;
-    return ANIMAL_ART_MODES.includes(modeKey) ? ANIMAL_ART_BY_ID[card.id] || null : null;
+  function cardArt(modeKey, card) { const sourceMode = modeKey === "mixed" && card.sourceMode ? card.sourceMode : modeKey;
+    if (sourceMode === "astronomy") return ASTRONOMY_ART_BY_ID[card.id] || null;
+    if (sourceMode === "medicine") return MEDICINE_ART_BY_ID[card.id] || null;
+    if (sourceMode === "countries") return COUNTRY_ART_IDS.has(card.id) ? String(card.id) : null;
+    if (sourceMode === "population") return POPULATION_ART_BY_ID[card.id] || null;
+    if (sourceMode === "distances") return DISTANCE_ART_BY_ID[card.id] || null;
+    if (sourceMode === "history") return HISTORY_ART_BY_ID[card.id] || null;
+    if (sourceMode === "inventions") return INVENTION_ART_BY_ID[card.id] || null;
+    if (sourceMode === "movies") return MOVIE_ART_BY_ID[card.id] || null;
+    if (sourceMode === "music") return MUSIC_ART_BY_ID[card.id] || null;
+    if (sourceMode === "world") return WORLD_ART_BY_ID[card.id] || null;
+    if (sourceMode === "videogames") return VIDEOGAME_ART_BY_ID[card.id] || null;
+    return ANIMAL_ART_MODES.includes(sourceMode) ? ANIMAL_ART_BY_ID[card.id] || null : null;
   }
 
-  function animalArt(modeKey, card) {
+  function animalArt(modeKey, card) { const sourceMode = modeKey === "mixed" && card.sourceMode ? card.sourceMode : modeKey;
     const plate = cardArt(modeKey, card);
     if (!plate) return "";
-    const folder = modeKey === "astronomy" ? "astronomy-cards" : modeKey === "medicine" ? "medicine-cards" : modeKey === "countries" ? "country-cards" : modeKey === "population" ? "population-cards" : modeKey === "distances" ? "distance-cards" : modeKey === "history" ? "history-cards" : modeKey === "movies" ? "movie-cards" : modeKey === "music" ? "music-cards" : modeKey === "inventions" ? "invention-cards" : modeKey === "world" ? "world-cards" : modeKey === "videogames" ? "videogame-cards" : "animal-cards";
-    const extension = modeKey === "history" ? "jpg" : modeKey === "inventions" ? "png" : "webp";
+    const folder = sourceMode === "astronomy" ? "astronomy-cards" : sourceMode === "medicine" ? "medicine-cards" : sourceMode === "countries" ? "country-cards" : sourceMode === "population" ? "population-cards" : sourceMode === "distances" ? "distance-cards" : sourceMode === "history" ? "history-cards" : sourceMode === "movies" ? "movie-cards" : sourceMode === "music" ? "music-cards" : sourceMode === "inventions" ? "invention-cards" : sourceMode === "world" ? "world-cards" : sourceMode === "videogames" ? "videogame-cards" : "animal-cards";
+    const extension = sourceMode === "history" ? "jpg" : sourceMode === "inventions" ? "png" : "webp";
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
