@@ -72,8 +72,11 @@ check("las ilustraciones móviles no superan 100 KB", illustratedCardIds.every(i
 const styles = read("styles.css");
 const placedAnimalArt = (styles.match(/\.animal-timeline-card \.animal-card-art\s*\{([\s\S]*?)\}/) || [])[1] || "";
 const embeddedAnimalCard = (styles.match(/\.timeline \.animal-timeline-card \.card-visual\s*\{([\s\S]*?)\}/) || [])[1] || "";
-check("la ilustración cubre la carta sin franjas ni bordes interiores", /object-fit:\s*cover/.test(placedAnimalArt));
-check("la ilustración colocada queda incrustada en toda la carta", /position:\s*absolute/.test(embeddedAnimalCard) && /inset:\s*0/.test(embeddedAnimalCard));
+const embeddedAnimalContent = (styles.match(/\.timeline \.animal-timeline-card \.card-content\s*\{([\s\S]*?)\}/) || [])[1] || "";
+check("la ilustración cubre su panel sin franjas ni bordes interiores", /object-fit:\s*cover/.test(placedAnimalArt));
+// El panel de la imagen y el bloque de texto van uno debajo del otro (sin `position: absolute`
+// superponiéndolos): así un título largo nunca tapa el dibujo, solo alarga la carta.
+check("la ilustración colocada no queda tapada por el título ni el resultado", !/position:\s*absolute/.test(embeddedAnimalCard) && !/position:\s*absolute/.test(embeddedAnimalContent));
 
 console.log(`\n${failures} fallos`);
 process.exit(failures ? 1 : 0);

@@ -544,7 +544,12 @@ function renderGame() {
       const card = timelineCards[index];
       const era = eraForCard(card);
       const animal = usesAnimalArt();
-      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación."><div class="card-visual era-${era.key}">${animal ? animalArt(card) : `<span>${era.symbol}</span><small>${era.name}</small>`}</div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div></article>`);
+      // Con ilustración, la temática va fuera de la imagen (franja propia arriba) y el
+      // resultado al fondo del todo, para que el título no empuje el zócalo sobre el dibujo.
+      const body = animal
+        ? `${categoryBadge(card)}<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content"><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p><div class="year">${formatValue(card)}</div></div>`
+        : `<div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div>`;
+      slots.push(roomState.ghost?.pending.length ? CT.Ghost.hiddenCard(card) : `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación.">${body}</article>`);
     }
   }
   // El primer pintado ya arranca con la cuenta atrás en su punto real, no siempre en 20:
