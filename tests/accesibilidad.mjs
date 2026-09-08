@@ -207,7 +207,7 @@ console.log("\nCada superficie del tema claro tiene su versión oscura");
 
   // Las que son deliberadamente iguales en los dos temas, por ser objetos de la mesa y no
   // superficies de la interfaz: la carta de la línea es papel de día y de noche.
-  const iguales = ["--carta-tinta", "--accent-solid", "--green-solid", "--teal", "--green", "--shadow", "--shadow-soft", "--motion-fast", "--motion-base", "--motion-slow"];
+  const iguales = ["--carta-tinta", "--carta-dato", "--accent-solid", "--green-solid", "--teal", "--green", "--shadow", "--shadow-soft", "--motion-fast", "--motion-base", "--motion-slow"];
   const pendientes = superficies.filter(v => !iguales.includes(v))
     .filter(v => !sistema.includes(`${v}:`) || !interruptor.includes(`${v}:`));
   ok(`ninguna superficie se queda sin versión oscura${pendientes.length ? ` (falta ${pendientes.join(", ")})` : ""}`, !pendientes.length);
@@ -223,7 +223,7 @@ console.log("\nCada superficie del tema claro tiene su versión oscura");
     "#f0d292",              // el mismo círculo en el formato destacado, con su #8d3c1b
     "rgba(232,204,149,.94)", // la barra de la portada, ya sustituida en los bloques oscuros
     "#c9a66b",              // la lámina de la carta de animal
-    "#f4ddb0"               // la cartela del valor, sobre esa misma carta
+    "#f4ddb0"               // el sello de temática, sobre esa misma carta de papel
   ];
   const desde = css.indexOf("--vitela:");
   const hasta = css.indexOf("@media (prefers-color-scheme: dark)", desde);
