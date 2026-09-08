@@ -769,13 +769,13 @@
     let hash = 2166136261;
     // Incluye el eje, el protocolo, el orden y los datos que se ven y se comparan.
     // Una corrección conservando el ID también debe cambiar la huella.
-    const content = JSON.stringify([2, modeKey, mode(modeKey).axis, deck.map(card =>
+    const content = JSON.stringify([3, modeKey, mode(modeKey).axis, deck.map(card =>
       [card.id, sortValue(modeKey, card), card.title, card.detail, card.source || "", card.sourceMode || ""])]);
     for (let i = 0; i < content.length; i++) {
       hash ^= content.charCodeAt(i);
       hash = Math.imul(hash, 16777619);
     }
-    return `v2.${deck.length}.${(hash >>> 0).toString(36)}`;
+    return `v3.${deck.length}.${(hash >>> 0).toString(36)}`;
   }
 
   function formatValue(modeKey, card) { return axis(modeKey).format(card); }

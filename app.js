@@ -187,7 +187,7 @@
     const solo = `<button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
       ${formatBlock("multi", "Multijugador", "Un solo móvil o varios.", multi)}
-      ${formatBlock("solo", "Solitario", "Reto diario o partida libre.", solo)}
+      <div class="direct-solo">${solo}</div>
     </section>`;
   }
 
@@ -205,7 +205,7 @@
   }
 
   function competitionPromo() {
-    return `${loadCompetition() ? '<button class="btn btn-primary btn-block" data-action="resume-competition">Continuar competición guardada →</button>' : ""}<button class="comp-promo" data-action="start-competition">
+    return `${loadCompetition() ? '<button class="btn btn-primary btn-block" data-action="resume-competition">Continuar competición guardada →</button>' : ""}<div class="field"><label for="competition-length">Duración de la competición</label><select id="competition-length"><option value="3">Corta · 3 temas</option><option value="5">Media · 5 temas</option><option value="14" selected>Completa · todos los temas</option></select></div><button class="comp-promo" data-action="start-competition">
       <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
       <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
     </button>`;
@@ -232,10 +232,18 @@
     </nav>`;
   }
 
+  function quickActions() {
+    const resume = game && !game.winners;
+    const room = CT.Storage.getItem("continuum-last-room");
+    return '<section class="quick-actions" aria-label="Jugar ahora"><button class="btn btn-primary" data-action="quick-play">Jugar · ' + escapeHtml(currentMode().name) + '</button>'
+      + (resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '')
+      + (loadSolo() ? '<button class="btn btn-secondary" data-action="resume-solo">Continuar solitario</button>' : '')
+      + (room && /^[A-Z0-9]{8}$/.test(room) ? '<button class="btn btn-secondary" data-action="resume-room">Volver a mi sala</button>' : '') + '</section>';
+  }
   function home() {
     screen = "home";
     paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
+      ${homeMasthead()}${quickActions()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
       <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section></div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
@@ -363,7 +371,8 @@
             <div class="field"><label for="starter">La persona más joven</label><select id="starter"><option value="0">Jugador 1</option><option value="1">Jugador 2</option></select></div>
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
           </div>
-          <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle" checked></label>
+          <div class="field"><label for="local-preset">Tipo de partida</label><select id="local-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div>
+          <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"></label>
           <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"></label>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
@@ -1610,7 +1619,7 @@
     if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${solo.duelo.rival.nombre || "quien te reta"}` : "Duelo · tu tirada";
     // El tema no va aquí: lo lleva su propio rótulo encima del marcador, que es lo que
     // recuerda a qué se está jugando cuando el cartel del principio ya se ha ido.
-    if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
+    if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${(comp.totalThemes || TOTAL_TEMAS) - comp.queue.length} de ${comp.totalThemes || TOTAL_TEMAS}`;
     return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
@@ -1652,7 +1661,8 @@
     if (loadCompetition()) { resumeCompetition(); return; }
     solo = null;
     previousModeKey = selectedModeKey;
-    comp = { decks: CT.Saves.clone(Object.fromEntries(COMP_MODES.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(COMP_MODES), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp = { decks: CT.Saves.clone(Object.fromEntries(COMP_MODES.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(COMP_MODES).slice(0, Number(document.getElementById("competition-length")?.value) || COMP_MODES.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp.totalThemes = comp.queue.length;
     compRoundIntro();
   }
 
@@ -1812,11 +1822,19 @@
     }
   });
 
+  app.addEventListener("change", event => {
+    if (event.target.id !== "local-preset") return;
+    const advanced = event.target.value === "advanced";
+    document.getElementById("ghost-toggle").checked = advanced;
+    document.getElementById("pulse-toggle").checked = advanced;
+  });
   app.addEventListener("click", event => {
     const target = event.target.closest("[data-action]");
     if (!target) return;
     const action = target.dataset.action;
-    if (action === "home") home();
+    if (action === "quick-play") playMenu();
+    else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
+    else if (action === "home") home();
     else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
     else if (action === "home-collection") document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }

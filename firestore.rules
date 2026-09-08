@@ -290,12 +290,13 @@ service cloud.firestore {
         return isHost()
           && prior.status == 'lobby'
           && prior.playerOrder.size() >= 2
-          && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
+          && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'turnSeconds', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
                                 'pulseTurn', 'turnStartedAt', 'version', 'updatedAt'])
           && next.status == 'playing'
           && next.phase == 'turn'
           && next.handSize >= 1 && next.handSize <= 6
+          && next.get('turnSeconds', 20) in [0, 20, 30, 45]
           && next.current >= 0 && next.current < prior.playerOrder.size()
           && next.timeline.size() == 1
           && next.discard.size() == 0
@@ -540,6 +541,25 @@ service cloud.firestore {
           && bumped();
       }
 
+      function hostStale() {
+        let path = /databases/$(database)/documents/rooms/$(roomId)/presence/$(before().hostUid);
+        let host = exists(path) ? get(path).data : {'seenAt': before().updatedAt, 'visible': true};
+        return host.seenAt is timestamp && request.time > host.seenAt + duration.value(host.visible ? 90 : 15, 's');
+      }
+      function validHostClaim() {
+        return isParticipant() && before().status != 'ended'
+          && after().hostUid == uid() && changed().hasOnly(['hostUid', 'version', 'updatedAt'])
+          && hostStale() && bumped();
+      }
+      match /presence/{playerId} {
+        function member() { return request.auth != null && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.playerOrder; }
+        allow get: if member();
+        allow list: if false;
+        allow create, update: if member() && request.auth.uid == playerId
+          && request.resource.data.keys().hasOnly(['seenAt', 'visible'])
+          && request.resource.data.seenAt == request.time && request.resource.data.visible is bool;
+        allow delete: if member() && request.auth.uid == playerId;
+      }
       allow get: if signedIn() && (resource.data.status == 'lobby' || isParticipant());
       allow list: if false;
 
@@ -570,6 +590,7 @@ service cloud.firestore {
         && request.resource.data.playerOrder.size() == 1
         && request.resource.data.playerOrder[0] == uid()
         && request.resource.data.players.size() == 1
+        && request.resource.data.get('turnSeconds', 20) in [0, 20, 30, 45]
         && validName(request.resource.data.players[uid()].name)
         && request.resource.data.players[uid()].hand.size() == 0
         && request.resource.data.deck.size() == 0
@@ -594,6 +615,8 @@ service cloud.firestore {
                   : (after().phase == 'reveal'
                       ? (before().phase == 'pulse' ? validPulseEnd() : validPlay())
                       : (before().phase == 'reveal' ? validAdvance() : validSkip())))))));
+
+      allow update: if request.auth != null && request.resource.data.hostUid != resource.data.hostUid && validHostClaim();
 
       allow delete: if isHost();
     }

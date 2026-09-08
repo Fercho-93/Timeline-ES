@@ -455,3 +455,24 @@ de recarga del código antiguo que ya estuviera abierto.
 
 La corrección del Pulso online requiere publicar también firestore.rules; no basta con
 actualizar los archivos web. Las pruebas del emulador no modifican Firebase de producción.
+
+## Inicio y continuidad de salas (v75)
+
+La portada ofrece Jugar, Continuar y volver a la última sala. Solitario se abre
+directamente. La primera partida se propone sin poderes; el ajuste avanzado activa
+Pulso y Fantasma. Competición permite 3, 5 o todos los temas.
+
+Las salas nuevas ofrecen turnos sin límite, de 20, 30 o 45 segundos. El reloj se ancla
+con una confirmación del servidor y avanza con un contador monotónico: cambiar la hora
+del teléfono no cambia el turno. Antes de sincronizar, muestra «…» y no salta turnos.
+La latencia puede introducir una pequeña diferencia entre contadores visibles.
+
+Cada participante envía una señal de actividad cada 45 segundos mientras está visible;
+la interfaz distingue segundo plano, falta de actividad y pérdida de red local. Esto
+añade lecturas y escrituras de Firestore y debe incluirse en el seguimiento de costes.
+Tras 90 segundos sin señales del anfitrión, o 15 segundos desde una señal de segundo
+plano, otro participante puede tomar el relevo. El servidor comprueba el plazo y la
+pertenencia a la sala; el relevo conserva cartas y turno. No es presencia instantánea.
+
+Publicar las reglas v39 junto con el cliente. Las subcolecciones de presencia deben
+incluirse en la limpieza de salas; borrar el documento padre no las elimina.

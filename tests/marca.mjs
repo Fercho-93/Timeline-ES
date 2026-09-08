@@ -56,7 +56,6 @@ try {
   click("home");
   click("set-block");
   click("set-mode");
-  openFormat("solo");
   click("solo");
   checkScreen("Solitario");
   click("start-free");
