@@ -60,25 +60,23 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 **Naturaleza**
 
-- **Peso de animales:** 38 referencias de masa. Los títulos distinguen sexo, ejemplares grandes,
+- **Peso de animales:** 41 referencias de masa. Los títulos distinguen sexo, ejemplares grandes,
   medias publicadas y extremos de rangos cuando corresponde; no son promedios universales.
 - **Longevidad de animales:** 38 referencias de edad. Se distingue fase adulta, vida en libertad,
   cuidado humano, estadísticos y edades de ejemplares o colonias. Por eso el mazo ya no se
   presenta como «esperanza de vida», que implicaría una medida estadística homogénea.
 - **Velocidad de animales:** 38 referencias que identifican movimiento y tipo de medición:
   esprint, nado, picado, crucero o media de una carrera. No es una tabla de récords absolutos.
-- **Datos pendientes:** 25 cartas de longevidad y velocidad llevan «en revisión» en el título,
-  visible antes de colocarlas, y explican qué falta contrastar. Se conservan sus valores
-  provisionales, sin certificarlos ni sustituirlos por estimaciones inventadas.
-  Véase [correcciones, fuentes y pendientes](VERIFICACION_CORRECCIONES.md).
+- **Revisión de datos:** los mazos actuales ya no llevan etiquetas «en revisión». La cobertura de fuentes estructuradas todavía es desigual; esto no equivale a certificar todos los datos.
+  Véase el historial de [correcciones y fuentes](VERIFICACION_CORRECCIONES.md).
 
 **Geografía**
 
-- **Superficie de países:** 59 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
+- **Superficie de países:** 72 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
   Aquí la línea no es temporal: se ordena por tamaño.
 - **Población de países:** 49 países ordenados de menos a más gente, del Vaticano a la India,
   con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer).
-- **Distancias entre ciudades:** 38 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
+- **Distancias entre ciudades:** 50 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 
 **Gran mezcla temporal** no es de ningún bloque temático, a propósito: concatena los ocho mazos
@@ -357,7 +355,7 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene veintidós comprobaciones automáticas: dieciocho que corren en cualquier
+`tests/` contiene veintitrés comprobaciones automáticas: diecinueve que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
@@ -412,17 +410,17 @@ Su efecto sigue siendo la única jugada que toca la mano de otra persona:
   no hay cronómetro, la dificultad la pone lo llena que esté la línea. Al principio los
   huecos son anchos y aciertas casi seguro, pero es cuando menos daño haces; al final son
   estrechos y es cuando el Pulso decide la partida.
-- **Si aciertas**, la carta se queda en la línea y le pasas una carta al azar de tu mano.
-  Al azar y no a elección: si pudieras escogerla soltarías siempre la que no sabes colocar,
-  y el Pulso dejaría de ser una apuesta para ser un vertedero.
-- **Si fallas**, la carta va al descarte y robas tú una. A la otra persona no le pasa nada.
-  El castigo recae solo en quien reta a propósito: si además le quitara una carta al rival,
-  alguien ya sin opciones podría fallar aposta para regalarle la partida a quien quisiera.
+- Después coloca quien defiende, sin ver la posición elegida por quien reta.
+- **Aciertan los dos:** la carta queda en la línea y ninguna mano cambia.
+- **Solo acierta quien reta:** la carta queda en la línea y pasa al defensor la carta de su mano sorteada al lanzar el Pulso.
+- **Solo acierta quien defiende:** la carta queda en la línea y quien reta roba una.
+- **Fallan los dos:** la carta se descarta y quien reta roba una.
+- **Mazo y descarte agotados:** si corresponde robar pero no queda ninguna carta, no hay robo y el turno continúa. Si ambos fallaron, la carta del reto sí puede reciclarse.
 - Hacen falta **dos cartas** para lanzarlo. Con una sola, ganar el Pulso te dejaría a cero
   regalándola, sin haberla colocado nunca en la línea.
 - Quien recibe una carta **no puede volver a ser retado esa ronda**.
 - Sí se puede retar a quien ya está **a cero cartas** esperando ganar al final de la ronda:
-  acertar le quita la victoria, y es la jugada más tensa del mecanismo.
+  acertar mientras esa persona falla le quita la victoria, y es la jugada más tensa del mecanismo.
 
 Funciona en los dos modos. En un solo móvil, quien recibe la carta se entera al recoger el
 teléfono, en la pantalla de pasar el turno. En varios móviles todo el mundo ve el Pulso en
@@ -432,3 +430,28 @@ implicadas: el resto se entera de que hubo trasvase, no de cuál era la carta.
 En el modo de varios móviles, el anfitrión puede saltar el turno de quien se haya quedado sin
 batería o expulsar a quien ya no juegue, y cualquier participante puede marcharse: sus cartas
 vuelven al descarte y la partida continúa.
+
+## Guardado y actualizaciones (v74)
+
+Competición se guarda en una clave propia: conserva dificultad, orden de temas, marcador,
+ronda y resultado pendiente. «Salir» la deja en pausa; «Continuar competición guardada»
+la recupera sin repetir la carta resuelta ni sobrescribir el solitario de otro mazo.
+
+Las partidas usan formato de guardado 2 con una copia del mazo. Las partidas anteriores
+se migran usando el catálogo disponible; no es posible reconstruir valores históricos
+que nunca se guardaron. Un formato desconocido o dañado se conserva para recuperación.
+Los errores de almacenamiento dejan el progreso en memoria y muestran un aviso con
+reintento y descarga de copia (recuperable desde Ajustes); cerrar sin resolverlos puede perder los cambios pendientes.
+
+La huella compartida incluye orden, identificadores y valores de las cartas, además de
+su texto. Los enlaces y salas con otra huella requieren usar la misma versión del juego.
+
+El trabajador mantiene una caché estable por versión. Avisa de una actualización y solo
+la aplica mediante «Actualizar ahora», fuera de una partida y sin guardados pendientes.
+Hay que cerrar las otras pestañas de Continuum antes de aplicarla. Los errores del modo
+sin conexión muestran un aviso y permiten seguir jugando. Subir CACHE y APP_VERSION
+juntos al publicar cambios. La primera transición desde v73 puede seguir el comportamiento
+de recarga del código antiguo que ya estuviera abierto.
+
+La corrección del Pulso online requiere publicar también firestore.rules; no basta con
+actualizar los archivos web. Las pruebas del emulador no modifican Firebase de producción.

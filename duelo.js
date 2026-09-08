@@ -66,11 +66,11 @@
   // sobra en un mensaje, que es por donde va a viajar.
   //
   //   1 | mazo | semilla | cartas | aciertos | secuencia | huella | nombre
-  function codificar({ mode, seed, total, hits, sequence, nombre }) {
+  function codificar({ mode, seed, total, hits, sequence, nombre, deck }) {
     const campos = [
       "1", mode, seed, total, hits,
       sequence.map(acierto => (acierto ? "1" : "0")).join(""),
-      huella(mode), limpiaNombre(nombre)
+      huella(mode, deck), limpiaNombre(nombre)
     ];
     return aBase64url(campos.join("|"));
   }

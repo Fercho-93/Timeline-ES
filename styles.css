@@ -1635,3 +1635,7 @@ body::before {
 }
 :root[data-theme="dark"] body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
 :root[data-theme="dark"] .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
+
+.system-notice { position:relative; z-index:10000; display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px; border:2px solid #8a5426; background:#fff4da; color:#302114; }
+.system-notice span { flex:1 1 240px; }
+#system-notices { position:fixed; inset:auto 0 0; z-index:10000; max-height:42dvh; overflow:auto; padding-bottom:env(safe-area-inset-bottom); }

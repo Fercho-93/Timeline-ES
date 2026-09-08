@@ -4,15 +4,15 @@ Las versiones de las dependencias están fijadas en `package-lock.json`, así qu
 siempre las mismas. `node_modules` no se guarda en el repositorio.
 
 ```sh
-npm install
+npm ci
 
-# Sintaxis, juego, mazos, service worker, accesibilidad y movimiento: diez suites.
+# Juego, guardado, mazos, service worker, accesibilidad y build: diecinueve suites.
 npm test
 
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npm run test:reglas
 
-# Todas las suites, incluidas las tres del emulador.
+# Todas las suites, incluidas las cuatro del emulador.
 npm run test:todo
 ```
 
@@ -27,7 +27,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `sintaxis.mjs` | Que todos los archivos del juego parsean. Es la única red que cubre `online.js`. Sin dependencias. |
 | `marca.mjs` | Nombre Continuum en metadatos, acceso directo de iOS, manifiesto y pantallas locales. Distingue marca de identificadores técnicos. |
 | `partida-local.mjs` | Partida completa del modo de un solo móvil sobre un DOM simulado. |
-| `partidas-al-azar.mjs` | 40 partidas al azar repartidas entre todos los juegos: bloqueos, conteo de cartas y orden de la línea. |
+| `partidas-al-azar.mjs` | 4 partidas reproducibles en mazos representativos: bloqueos, conteo de cartas y orden de la línea. |
 | `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil, y que ni un guion de `index.html` ni una carátula se queden sin precargar. Sin dependencias. |
 | `actualizar.mjs` | La página que se manda a quien tiene la app atascada en una versión vieja: descarta el service worker y su caché, pero no borra el perfil ni las partidas guardadas. Sin dependencias. |
 | `diagnostico.mjs` | Un error sin capturar enseña un aviso con la versión, la pantalla y el mazo abiertos en vez de dejar la pantalla en blanco, no se duplica con varios errores seguidos y no confunde un ruido conocido del navegador con un fallo. El mismo informe alimenta el botón de comentarios de Ajustes. |
@@ -124,3 +124,5 @@ privado, consumo, victoria sin gastarlo, reparto conjunto sin posiciones compart
 rechazo online de usos o asignaciones inventados. Comprueba los ejemplos de probabilidad
 con 50, 200 y 500 cartas disponibles usando márgenes estadísticos.
 No sustituye una prueba de Safari en un iPhone físico.
+
+`estabilizacion.mjs` comprueba recuperación de Competición, versiones de guardado, valores corregidos, almacenamiento lleno y actualizaciones durante partidas.

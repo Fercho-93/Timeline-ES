@@ -412,6 +412,7 @@ service cloud.firestore {
         // paga una carta solo si acertó él y falló el otro, y roba si falló él.
         let placed = pt.byOk || next.reveal.targetOk;
         let gift = pt.byOk && !next.reveal.targetOk;
+        let draw = !pt.byOk && prior.deck.size() + prior.discard.size() + (placed ? 0 : 1) > 0 ? 1 : 0;
         return isParticipant()
           && uid() == pulseTarget()
           && prior.status == 'playing'
@@ -433,7 +434,7 @@ service cloud.firestore {
           && next.players[uid()].hand == (gift ? prior.players[uid()].hand.concat([pt.giftId]) : prior.players[uid()].hand)
           // La carta que se cobra tiene que salir de la mano de quien retó, no aparecer.
           && (!gift || pt.giftId in prior.players[by].hand)
-          && next.players[by].hand.size() == prior.players[by].hand.size() + (gift ? -1 : (pt.byOk ? 0 : 1))
+          && next.players[by].hand.size() == prior.players[by].hand.size() + (gift ? -1 : draw)
           && next.players[by].get('pulseUsed', false) == true
           && next.players[by].get('shieldRound', 0) == prior.players[by].get('shieldRound', 0)
           // El escudo se gana recibiendo una carta y solo así: defenderse bien no protege
@@ -441,12 +442,13 @@ service cloud.firestore {
           && next.players[uid()].get('shieldRound', 0) == (gift ? prior.round : prior.players[uid()].get('shieldRound', 0))
           && next.players[uid()].get('pulseUsed', false) == prior.players[uid()].get('pulseUsed', false)
           && next.timeline.size() == prior.timeline.size() + (placed ? 1 : 0)
-          && (placed ? (pt.cardId in next.timeline) : (pt.cardId in next.discard))
+          && (placed ? (pt.cardId in next.timeline)
+                     : (pt.cardId in next.discard || pt.cardId in next.deck || pt.cardId in next.players[by].hand))
           // La carta del reto estaba fuera de todo mientras duraba la fase: al colocarse
           // sube la línea y al descartarse sube el descarte, y el robo de quien falló el
           // reto es lo único que puede bajar el montón.
           && next.deck.size() + next.discard.size()
-             == prior.deck.size() + prior.discard.size() + (placed ? 0 : 1) - (pt.byOk ? 0 : 1)
+             == prior.deck.size() + prior.discard.size() + (placed ? 0 : 1) - draw
           && bumped();
       }
 

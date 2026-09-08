@@ -165,5 +165,33 @@ try {
  // Recibir un Pulso en un robo normal no sustituye la penalización.
  const pulseDraw=fixture();pulseDraw.ghost={...pulseDraw.ghost,distribution:2,cards:[6,17]};pulseDraw.pulsePower={distribution:2,cards:[15],owners:[''],used:[]};
  await seed(pulseDraw);await play(clients[0],false);s=await snapshot();assert.equal(s.pulsePower.owners[0],A);assert.equal(s.players[A].hand.length,3);
+ // Las cuatro salidas con una sola carta, contra el servidor real de pruebas.
+ for (const withGhost of [false,true]) for (const [byOk,targetOk] of [[true,true],[true,false],[false,true],[false,false]]) {
+   const last = fixture(); last.deck = [15]; if (!withGhost) delete last.ghost;
+   await seed(last); await clients[0].call('startPulse', B);
+   s = await snapshot();
+   const right = ct.correctIndex('history', s.timeline.map(id=>cards.get(id)), cards.get(s.pulseTurn.cardId));
+   const wrong = right === 0 ? s.timeline.length : 0;
+   await clients[0].call('placePulse', byOk ? right : wrong);
+   await clients[1].call('defendPulse', targetOk ? right : wrong);
+   s = await snapshot();
+   assert.equal(s.phase, 'reveal');
+   const ids = [...s.deck,...s.discard,...s.timeline,...Object.values(s.players).flatMap(p=>p.hand)];
+   assert.equal(ids.length,15); assert.equal(new Set(ids).size,15);
+   assert.equal(s.players[A].hand.length, byOk ? (targetOk ? 3 : 2) : (targetOk ? 3 : 4));
+   assert.equal(s.reveal.penaltySkipped, !byOk && targetOk);
+   await clients[0].call('finishTurn'); assert.equal((await snapshot()).phase,'turn');
+ }
+ // La excepción por agotamiento no permite saltarse un robo disponible.
+ const available = fixture(); available.deck = [15,16]; delete available.ghost;
+ await seed(available); await clients[0].call('startPulse', B);
+ s = await snapshot();
+ const position = ct.correctIndex('history', s.timeline.map(id=>cards.get(id)), cards.get(s.pulseTurn.cardId));
+ await clients[0].call('placePulse', position === 0 ? s.timeline.length : 0);
+ const beforeDefense = await snapshot();
+ await clients[1].call('defendPulse', position);
+ const resolution = await snapshot();
+ await seed(beforeDefense);
+ await assertFails(updateDoc(ref(B), { players:beforeDefense.players, deck:beforeDefense.deck, discard:beforeDefense.discard, timeline:resolution.timeline, phase:'reveal', pulseTurn:null, reveal:resolution.reveal, version:beforeDefense.version+1, updatedAt:2 }));
  console.log('  Inicio, activación, turnos, dos clientes, robos, Pulso, salidas y escrituras rechazadas: OK');
 } finally {clients.forEach(c=>c.w.close());await env.cleanup();}

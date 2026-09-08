@@ -143,20 +143,20 @@
   }
 
   function read() {
-    try { return normalize(JSON.parse(localStorage.getItem(KEY))); } catch { return emptyProfile(); }
+    try { return normalize(JSON.parse(CT.Storage.getItem(KEY))); } catch { return emptyProfile(); }
   }
 
   function save(profile) {
-    try { localStorage.setItem(KEY, JSON.stringify(profile)); } catch { /* almacenamiento lleno */ }
+    try { CT.Storage.setItem(KEY, JSON.stringify(profile)); } catch { /* almacenamiento lleno */ }
     return profile;
   }
 
   function playerId() {
     try {
-      let id = localStorage.getItem(PLAYER_KEY);
+      let id = CT.Storage.getItem(PLAYER_KEY);
       if (!id) {
         id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        localStorage.setItem(PLAYER_KEY, id);
+        CT.Storage.setItem(PLAYER_KEY, id);
       }
       return id;
     } catch { return null; }
@@ -370,7 +370,7 @@
   }
 
   function reset() {
-    try { localStorage.removeItem(KEY); } catch { /* nada que borrar */ }
+    try { CT.Storage.removeItem(KEY); } catch { /* nada que borrar */ }
     return emptyProfile();
   }
 

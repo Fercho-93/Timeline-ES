@@ -238,11 +238,11 @@ function drawQr(canvas, text) {
 }
 
 function rememberRoom(code, name) {
-  localStorage.setItem(`hilo-online-${code}`, JSON.stringify({ name }));
+  CT.Storage.setItem(`hilo-online-${code}`, JSON.stringify({ name }));
 }
 
 function rememberedRoom(code) {
-  try { return JSON.parse(localStorage.getItem(`hilo-online-${code}`)); }
+  try { return JSON.parse(CT.Storage.getItem(`hilo-online-${code}`)); }
   catch { return null; }
 }
 
@@ -374,6 +374,7 @@ function connectToRoom(code) {
       return;
     }
     roomState = snapshot.data();
+    CT.onlineActive = roomState.status !== "ended";
     roomState.mode = roomState.mode || "history";
     selectedModeKey = roomState.mode;
     if (roomState.playerOrder.includes(user.uid)) seenSelfInRoom = true;
@@ -632,7 +633,7 @@ function revealOverlay(currentUid) {
       : reveal.correct
         ? `Solo acierta <b>${escapeHtml(reveal.playerName)}</b>: <b>${escapeHtml(reveal.targetName)}</b> se lleva ${regalo}. La carta se queda en la línea.`
         : reveal.targetOk
-          ? `<b>${escapeHtml(reveal.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(reveal.playerName)}</b> roba una por fallar el reto.`
+          ? `<b>${escapeHtml(reveal.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(reveal.playerName)}</b> ${reveal.penaltySkipped ? "no roba: el mazo y el descarte están agotados" : "roba una por fallar el reto"}.`
           : `No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una por haber lanzado el reto.`;
     return `<div class="overlay"><div class="modal pulse-duel-modal">
       <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
@@ -727,7 +728,7 @@ function openPulse() {
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-pulse-overlay><div class="modal">
     <div class="eyebrow">Pulso</div>
     <h2>¿A quién retas?</h2>
-    <p class="lead" style="margin-inline:auto">El mazo saca una carta que no elige nadie y la colocáis los dos: primero tú y luego esa persona, sin ver tu jugada. Si aciertas y falla, se lleva una carta tuya al azar; si acierta, o si falláis los dos, robas tú.</p>
+    <p class="lead" style="margin-inline:auto">${CT.pulseRules}</p>
     <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
     <button class="btn btn-ghost btn-block" style="margin-top:10px" data-online-action="close-pulse">Mejor no</button>
   </div></div>`);
@@ -848,6 +849,7 @@ async function defendPulse(index) {
       const players = { ...data.players };
       const ghost = data.ghost ? structuredClone(data.ghost) : null;
       const pulsePower = data.pulsePower ? structuredClone(data.pulsePower) : null;
+      const penaltySkipped = !byOk && targetOk && !deck.length && !discard.length;
       // La carta se queda si alguno supo colocarla, en el hueco de quien acertó.
       if (byOk || targetOk) timeline.splice(byOk ? data.pulseTurn.byIndex : index, 0, cardId);
       else discard.push(cardId);
@@ -869,7 +871,7 @@ async function defendPulse(index) {
       transaction.update(roomRef, {
         players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, timeline, phase: "reveal", pulseTurn: null,
         reveal: {
-          cardId, correct: byOk, returned: false, pulse: true, duel: true, targetOk,
+          cardId, correct: byOk, returned: false, pulse: true, duel: true, targetOk, penaltySkipped,
           giftId: byOk && !targetOk ? giftId : null,
           byIndex: data.pulseTurn.byIndex, targetIndex: index,
           playerUid: byUid, playerName: data.players[byUid].name,

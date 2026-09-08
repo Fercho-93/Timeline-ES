@@ -1,7 +1,7 @@
 // El service worker decide qué versión de la aplicación ve el móvil, así que conviene
-// comprobarlo: sirve lo guardado (para jugar sin conexión) pero refresca por detrás, de
-// modo que un archivo nuevo llega en el siguiente arranque aunque se olvide subir el
-// número de la caché. Se ejecuta el archivo real con un entorno de service worker falso.
+// comprobarlo: sirve una copia estable por versión y espera una petición explícita
+// para activar la siguiente, sin interrumpir otra pestaña. Se ejecuta el archivo real
+// con un entorno de service worker falso.
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -23,17 +23,20 @@ function arrancar() {
   const opciones = [];
   const tareas = [];
   const precargas = [];
+  let activaciones = 0;
   let servidor = url => respuesta(`${url} del servidor`);
   const cache = {
-    match: async request => guardado.get(request.url),
+    match: async request => guardado.get(request.url || request),
     put: async (request, response) => { guardado.set(request.url, response); },
     addAll: async requests => { requests.forEach(request => { precargas.push(request); guardado.set(request.url, respuesta(`${request.url} precargado`)); }); }
   };
   const contexto = {
     self: {
+      location: { href: "https://hilo.test/", origin: "https://hilo.test" },
+      registration: { scope: "https://hilo.test/" },
       addEventListener: (name, fn) => { listeners[name] = fn; },
-      skipWaiting: async () => {},
-      clients: { claim: async () => {} }
+      skipWaiting: async () => { activaciones++; },
+      clients: { matchAll: async () => [], claim: async () => {} }
     },
     caches: {
       open: async () => cache,
@@ -44,7 +47,7 @@ function arrancar() {
     fetch: async (request, options) => { peticiones.push(request.url); opciones.push(options); return servidor(request.url); },
     Request: class { constructor(url, options) { this.url = url; this.cache = options.cache; } },
     Response: { error: () => respuesta("error de red", { ok: false }) },
-    setTimeout, Promise
+    setTimeout, Promise, URL
   };
   vm.createContext(contexto);
   vm.runInContext(fs.readFileSync(path.join(REPO, "service-worker.js"), "utf8"), contexto);
@@ -54,7 +57,7 @@ function arrancar() {
     listeners.fetch({ request: { url, method, mode }, respondWith: valor => { devuelta = valor; }, waitUntil: tarea => tareas.push(tarea) });
     return devuelta ? await devuelta : undefined;
   };
-  return { pedir, guardado, peticiones, opciones, tareas, precargas, listeners, cache, servidor: fn => { servidor = fn; } };
+  return { contexto, activaciones: () => activaciones, pedir, guardado, peticiones, opciones, tareas, precargas, listeners, cache, servidor: fn => { servidor = fn; } };
 }
 
 console.log("\nService worker");
@@ -64,6 +67,17 @@ console.log("\nService worker");
   sw.listeners.install({ waitUntil: tarea => { instalada = tarea; } });
   await instalada;
   ok("instalar una versión nueva evita reutilizar archivos viejos de la caché HTTP", sw.precargas.length > 0 && sw.precargas.every(request => request.cache === "reload"));
+  ok("instalar no activa automáticamente una actualización", sw.activaciones() === 0);
+  let tarea;
+  const mensajes = [];
+  sw.contexto.self.clients.matchAll = async () => [{url:"https://hilo.test/"},{url:"https://hilo.test/?room=X"}];
+  sw.listeners.message({data:{type:"ACTIVATE_UPDATE"},source:{postMessage:m=>mensajes.push(m)},waitUntil:p=>{tarea=p;}});
+  await tarea;
+  ok("otra pestaña impide activar el nuevo trabajador", sw.activaciones() === 0 && mensajes[0].type === "UPDATE_BLOCKED");
+  sw.contexto.self.clients.matchAll = async () => [{url:"https://hilo.test/"}];
+  sw.listeners.message({data:{type:"ACTIVATE_UPDATE"},waitUntil:p=>{tarea=p;}});
+  await tarea;
+  ok("se activa al pedirlo desde la única pestaña", sw.activaciones() === 1);
   // Casi cien archivos y 5,5 MB: quien nunca abre Naturaleza no debería pagar esa
   // descarga solo por instalar la aplicación. Se cachean por demanda, no al instalar.
   const animalAssets = fs.readdirSync(path.join(REPO, "assets", "animal-cards"))
@@ -79,12 +93,9 @@ console.log("\nService worker");
   const primera = await sw.pedir("./online.js");
   ok("responde con la copia guardada, para poder jugar sin conexión", primera.cuerpo === "online.js viejo");
   await espera();
-  ok("pero pide la versión del servidor por detrás", sw.peticiones.includes("./online.js"));
-  ok("el refresco revalida la caché HTTP", sw.opciones[0].cache === "no-cache");
-  ok("el trabajador espera a completar el refresco", sw.tareas.length === 1);
-  await Promise.all(sw.tareas);
+  ok("no mezcla código nuevo con la partida abierta", sw.peticiones.length === 0);
   const segunda = await sw.pedir("./online.js");
-  ok("y en el siguiente arranque ya sirve la nueva", segunda.cuerpo === "./online.js del servidor");
+  ok("conserva la misma versión hasta activar una actualización", segunda.cuerpo === "online.js viejo");
 }
 {
   // Una lámina de animal no precargada: la primera vez que se pide viaja a la red
@@ -100,18 +111,9 @@ console.log("\nService worker");
 {
   const sw = arrancar();
   sw.guardado.set("./styles.css", respuesta("estilos anteriores"));
-  let terminaGuardado;
-  const pendiente = new Promise(resolve => { terminaGuardado = resolve; });
-  const guardar = sw.cache.put;
-  sw.cache.put = async (...args) => { await pendiente; await guardar(...args); };
+  sw.cache.put = async () => { throw Error("No debe modificar la copia activa"); };
   const primera = await sw.pedir("./styles.css");
-  let terminada = false;
-  sw.tareas[0].then(() => { terminada = true; });
-  await espera();
-  ok("la respuesta local no espera a una escritura lenta", primera.cuerpo === "estilos anteriores" && !terminada);
-  terminaGuardado();
-  await Promise.all(sw.tareas);
-  ok("la tarea de fondo incluye la escritura completa", sw.guardado.get("./styles.css").cuerpo === "./styles.css del servidor");
+  ok("los estilos activos también permanecen estables", primera.cuerpo === "estilos anteriores" && sw.peticiones.length === 0);
 }
 {
   const sw = arrancar();
