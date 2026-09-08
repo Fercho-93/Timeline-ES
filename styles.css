@@ -1467,19 +1467,32 @@ body::before {
 }
 /* El sello de temática también es parte del papel: colores fijos, no los del tema,
    porque el fondo de la carta es el mismo de día y de noche. */
+/* En la carta de la línea el sello dispone de 130 px en un móvil estrecho, y el rótulo
+   más largo del juego es «Videojuegos»: se aprieta un punto la letra y se prohíbe partir
+   palabras, que es lo que dejaba un «VIDEOJUEG / OS» a media carta. */
 .timeline .animal-timeline-card .card-category {
   flex: none;
   margin: 8px 8px 0;
+  padding: 2px 7px;
   border: 1px solid rgba(59,40,22,.22);
   background: #f4ddb0;
   color: rgba(59,40,22,.78);
+  font-size: .54rem;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
-/* La lámina va enmarcada por el papel, como un grabado pegado en la ficha. */
+/* La lámina va enmarcada por el papel, como un grabado pegado en la ficha. El panel
+   toma la proporción de las propias láminas —todas son 512x768—, así `cover` las
+   encaja enteras: ni se recorta la escena ni quedan franjas a los lados. Se expresa
+   como `aspect-ratio` y no como alto fijo para que acompañe al ancho de la carta,
+   que cambia entre móvil y escritorio. */
 .timeline .animal-timeline-card .card-visual {
   flex: none;
   position: static;
   width: auto;
-  height: 128px;
+  height: auto;
+  aspect-ratio: 2 / 3;
   margin: 6px 8px 0;
   padding: 0;
   border-radius: 4px;
@@ -1516,7 +1529,6 @@ body::before {
 @media (max-width: 620px) {
   .animal-hand-card { min-height: 190px; }
   .timeline .animal-timeline-card { min-height: 172px; }
-  .timeline .animal-timeline-card .card-visual { height: 96px; }
 }
 .slot, .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: var(--hueco); }
 .overlay { background: rgba(47,29,14,.68); backdrop-filter: blur(6px) sepia(.2); }
