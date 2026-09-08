@@ -24,4 +24,16 @@ for(let count=2;count<=9;count++) {
  assert.ok(s.winners.every(uid=>s.players[uid].hand.length===0));
  assert.throws(()=>applyAction(s,ids[0],{type:'endTurn',version:s.version-1},2000),/STALE_VERSION/);
 }
+// Abandono seguro: las cartas vuelven al descarte y el anfitrión se conserva o
+// pasa al siguiente participante, sin dejar un Pulso a medias bloqueado.
+{
+ let s=createMatch(ids[0],catalog,1000,copy);
+ s=applyAction(s,ids[1],{type:'join',version:s.version},2000,copy);
+ s=applyAction(s,ids[0],{type:'start',version:s.version},3000,copy);
+ const before=s.players[ids[1]].hand.length;
+ s=applyAction(s,ids[1],{type:'leave',version:s.version},4000,copy);
+ assert.equal(s.order.length,1); assert.equal(s.host,ids[0]); assert.equal(s.discard.length,before);
+ s=applyAction(s,ids[0],{type:'leave',version:s.version},5000,copy);
+ assert.equal(s.status,'ended'); assert.deepEqual(s.order,[]);
+}
 console.log('Servidor: partidas completas 2–9, Pulso privado, conservación e intentos de manipulación: OK');
