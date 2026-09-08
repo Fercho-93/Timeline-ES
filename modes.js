@@ -217,6 +217,29 @@
     { limit: Infinity, key: "global", name: "Mundo global", symbol: "◍" }
   ];
 
+  // IDs de INVENTION_CARDS que duplican, con el mismo año y casi el mismo título,
+  // una carta ya presente en ASTRONOMY_CARDS o MEDICINE_CARDS. Solo se usan para
+  // depurar el mazo de "Gran mezcla temporal" (ver más abajo); el mazo de
+  // Inventos en solitario no se toca.
+  const MIXED_DUPLICATE_INVENTION_IDS = new Set([
+    4022, // Harvey descubre la circulación de la sangre (medicine: "Harvey explica...")
+    4027, // Los «Principia» de Newton (astronomy: "Newton publica los Principia")
+    4036, // La vacuna de la viruela (medicine: "Primera vacuna contra la viruela")
+    4039, // El estetoscopio (medicine: "Invención del estetoscopio")
+    4046, // La anestesia con éter (medicine: "Demostración pública de anestesia con éter")
+    4062, // La relatividad especial (astronomy: "Relatividad especial")
+    4067, // La relatividad general (astronomy: "Relatividad general")
+    4068, // La insulina (medicine: "Aislamiento de la insulina")
+    4079, // La vacuna de la polio (medicine: "Vacuna de Salk contra la polio")
+    4080, // El Sputnik (astronomy: "Sputnik 1")
+    4088, // El primer bebé por fecundación in vitro (medicine: "Nace el primer bebé...")
+    4094, // El telescopio espacial Hubble (astronomy: "Lanzamiento del telescopio Hubble")
+    4095, // La oveja Dolly (medicine: "Nace la oveja Dolly")
+    4101, // La primera imagen de un agujero negro (astronomy: mismo título)
+    4102, // Las vacunas de ARN mensajero (medicine: "...contra la COVID-19")
+    4103  // Las primeras imágenes del James Webb (astronomy: "...científicas del James Webb")
+  ]);
+
   // Una modalidad hereda las bandas de su eje salvo que declare las suyas, como el cine:
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
   const MODES = {
@@ -238,7 +261,15 @@
         ["history", window.HISTORY_CARDS], ["world", window.WORLD_CARDS], ["inventions", window.INVENTION_CARDS],
         ["movies", window.MOVIE_CARDS], ["music", window.MUSIC_CARDS], ["videogames", window.VIDEOGAME_CARDS],
         ["astronomy", window.ASTRONOMY_CARDS], ["medicine", window.MEDICINE_CARDS]
-      ].flatMap(([sourceMode, deck]) => deck.map(card => ({ ...card, sourceMode }))),
+      ]
+        // Inventos comparte una quincena de hitos con Astronomía y Medicina (misma
+        // fecha, mismo hecho, título casi calcado: relatividad, Sputnik, Hubble,
+        // vacunas...). En su propio mazo no molesta, pero mezclado con esos dos
+        // dejaría al jugador dos cartas casi idénticas en la misma partida. Se
+        // descarta aquí la versión de Inventos y se conserva la más específica.
+        .flatMap(([sourceMode, deck]) => deck
+          .filter(card => sourceMode !== "inventions" || !MIXED_DUPLICATE_INVENTION_IDS.has(card.id))
+          .map(card => ({ ...card, sourceMode }))),
       axis: "time",
       bands: WORLD_BANDS
     },
@@ -926,7 +957,7 @@
   }
 
   window.CONTINUUM = {
-    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK,
+    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS,
     has, mode, axis, cards,
     usesAnimalArt, cardArt, animalArt, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,

@@ -119,9 +119,15 @@ ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.i
 // nada. No se le exige el límite de pares pegados de `fechadas()`: mezclar tantos mazos ya
 // separados a propósito produce muchas más coincidencias de año que cualquiera de ellos
 // por separado, y esa dificultad extra es justo lo que la hace la modalidad más difícil.
+// Excepción: Inventos comparte con Astronomía y Medicina una quincena de hitos con el mismo
+// año y un título casi calcado (relatividad, Sputnik, Hubble, vacunas...). modes.js los
+// descarta al construir la mezcla para no darle al jugador dos cartas casi idénticas; ese
+// descuento se refleja aquí con el mismo conjunto de IDs que usa modes.js, en vez de fijar
+// un número aparte que se desincronizaría en silencio.
 console.log("\nGran mezcla");
 const mixed = CT.cards("mixed");
-ok(`${mixed.length} cartas, las de los mazos de tiempo juntas`, mixed.length === cronologicos.flat().length);
+const esperadasEnMezcla = cronologicos.flat().length - CT.MIXED_DUPLICATE_INVENTION_IDS.size;
+ok(`${mixed.length} cartas, las de los mazos de tiempo juntas menos los duplicados de Inventos`, mixed.length === esperadasEnMezcla);
 ok("identificadores únicos también mezclados", new Set(mixed.map(c => c.id)).size === mixed.length);
 
 console.log(`\n${fail} fallos`);
