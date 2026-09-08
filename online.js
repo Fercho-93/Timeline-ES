@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAT-ELQvHrBdMaCdxJNUJzDRwq1jOOwI44",
@@ -36,6 +36,7 @@ let pendingIndex = null;
 let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
+let lastEffectVersion = null;
 let turnTimerHandle = null;
 // Cada turno tiene 20 segundos para colocar la carta; si se agotan, pasa al siguiente
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
@@ -182,7 +183,7 @@ function cleanCode(value) {
 }
 
 function invitationUrl(code = roomCode) {
-  const url = new URL(location.href);
+  const url = new URL(CT.Links.base());
   url.search = "";
   url.hash = "";
   url.searchParams.set("room", code);
@@ -318,7 +319,20 @@ function rememberedRoom(code) {
   catch { return null; }
 }
 
+let protectionReady;
+async function ensureProtection() {
+  const config = CT.Deployment;
+  if (!config?.appCheckSiteKey || window.Capacitor?.isNativePlatform?.()) {
+    if (config?.audience === 'public') throw Error('Falta configurar la protección de las salas para esta plataforma.');
+    return;
+  }
+  protectionReady ||= import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js').then(({initializeAppCheck,ReCaptchaEnterpriseProvider}) => {
+    initializeAppCheck(firebaseApp,{provider:new ReCaptchaEnterpriseProvider(config.appCheckSiteKey),isTokenAutoRefreshEnabled:true});
+  }).catch(error => { protectionReady=null; throw error; });
+  await protectionReady;
+}
 async function ensureAuth() {
+  await ensureProtection();
   if (auth.currentUser) {
     user = auth.currentUser;
     return user;
@@ -375,7 +389,9 @@ async function createRoom(name) {
     await ensureAuth();
     const code = createRoomCode();
     const reference = doc(db, "rooms", code);
-    await setDoc(reference, {
+    const batch = writeBatch(db);
+    batch.set(doc(db,'roomCreation',user.uid),{lastCreatedAt:serverTimestamp(),roomCode:code});
+    batch.set(reference, {
       roomCode: code,
       mode: selectedModeKey,
       deckFingerprint: CT.deckFingerprint(selectedModeKey),
@@ -385,17 +401,18 @@ async function createRoom(name) {
       version: 1,
       handSize: 4, turnSeconds: 30,
       playerOrder: [user.uid],
-      players: { [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 39 } },
+      players: { [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 40 } },
       deck: [], discard: [], timeline: [], current: 0, starter: user.uid,
       turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
       createdAt: serverTimestamp(), updatedAt: serverTimestamp()
     });
+    await batch.commit();
     rememberRoom(code, name);
     history.replaceState({}, "", invitationUrl(code));
     connectToRoom(code);
   } catch (error) {
     console.error(error);
-    showToast("No se pudo crear la sala. Revisa Firestore y sus reglas.");
+    showToast("No se pudo crear la sala. Espera 30 segundos entre salas y comprueba la conexión.");
   } finally { busy = false; }
 }
 
@@ -418,7 +435,7 @@ async function joinRoom(code, name) {
       if (data.status !== "lobby") throw new Error("ALREADY_STARTED");
       if (data.playerOrder.length >= 9) throw new Error("ROOM_FULL");
       transaction.update(reference, {
-        players: { ...data.players, [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 39 } },
+        players: { ...data.players, [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 40 } },
         playerOrder: [...data.playerOrder, user.uid],
         version: data.version + 1,
         updatedAt: serverTimestamp()
@@ -439,6 +456,7 @@ function connectToRoom(code) {
   roomRef = doc(db, "rooms", code);
   CT.Storage.setItem("continuum-last-room", code);
   seenSelfInRoom = false;
+  lastEffectVersion = null;
   unsubscribeRoom = onSnapshot(roomRef, snapshot => {
     if (!snapshot.exists()) {
       // Mismo motivo: una caché aún sin la sala no significa que la hayan cerrado.
@@ -464,6 +482,11 @@ function connectToRoom(code) {
     anotaProgreso();
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
+    else if (roomState.phase === "tiebreak") {
+      clearTurnTimer();
+      paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Repartiendo el desempate</h1><p>Quedan ${roomState.tieQueue.length} cartas por repartir. La partida continúa cuando termine el reparto.</p><button class="btn btn-primary" data-online-action="continue-tie">Continuar reparto</button></div>`, 'online-tiebreak');
+      if (!snapshot.metadata.fromCache) void continueTie();
+    }
     else renderGame();
   }, error => {
     console.error(error);
@@ -478,6 +501,8 @@ function connectToRoom(code) {
 // ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
 // entre recargas qué versiones de la sala ya vio.
 function anotaProgreso() {
+  if (lastEffectVersion !== null && lastEffectVersion !== roomState.version && roomState.phase === "reveal" && roomState.reveal?.playerUid === user.uid) CT.Effects.feedback(roomState.reveal.correct);
+  lastEffectVersion = roomState.version;
   const nuevos = [];
   if (roomState.phase === "reveal" && roomState.reveal) {
     const { reveal } = roomState;
@@ -526,7 +551,7 @@ async function startRoom(withGhost = true) {
       // El anfitrión pudo abrir la sala y esperar con la pestaña de fondo mientras la
       // aplicación se actualizaba sola: se comprueba también aquí, no solo al entrar.
       if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
-      if (data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < 39)) throw new Error("UPDATE_CLIENTS");
+      if (data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < 40)) throw new Error("UPDATE_CLIENTS");
       const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
       const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
       const powers = CT.Powers.create(deck, data.playerOrder.length, actualHand, enableGhost, pulse);
@@ -667,8 +692,8 @@ function revealOverlay(currentUid) {
   // El título de la carta que cambia de mano solo lo ven las dos personas implicadas: el
   // resto de la sala se entera de que hubo trasvase, pero no de cuál era la carta.
   const implicado = reveal.pulse && (user.uid === reveal.playerUid || user.uid === reveal.targetUid);
-  const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
-  const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
+  const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-dialog-focus data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
+  const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(modeKey(), card)}</div>`;
   // Un duelo no lo gana ni lo pierde una sola persona, así que no lleva la marca grande de
   // acierto: cada jugada trae la suya y debajo se cuenta el desenlace.
   if (reveal.duel) {
@@ -944,15 +969,13 @@ async function defendPulse(index) {
 }
 
 function takeCard(deckInput, discardInput) {
-  let deck = [...deckInput];
-  let discard = [...discardInput];
-  if (!deck.length && discard.length) { deck = shuffle(discard); discard = []; }
-  return { cardId: deck.shift(), deck, discard };
+  return CT.Engine.draw(deckInput, discardInput);
 }
 
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
+  let needsTie = false;
   try {
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
@@ -968,19 +991,17 @@ async function finishTurn() {
       let deck = [...data.deck];
       let discard = [...data.discard];
       if (turnsInRound >= data.playerOrder.length) {
-        const empty = data.playerOrder.filter(uid => players[uid].hand.length === 0);
+        const {empty, ended} = CT.Engine.roundOutcome(data.playerOrder, players, deck.length + discard.length);
         // Sin cartas suficientes para el desempate la partida termina compartida:
         // si no, a esas personas les llegaría el turno con la mano vacía.
-        if (empty.length === 1 || (empty.length > 1 && deck.length + discard.length < empty.length)) {
+        if (ended) {
           transaction.update(roomRef, { status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
         }
         if (empty.length > 1) {
-          empty.forEach(uid => {
-            const drawn = takeCard(deck, discard);
-            deck = drawn.deck; discard = drawn.discard;
-            if (drawn.cardId != null) { players[uid] = { ...players[uid], hand: [...players[uid].hand, drawn.cardId] }; CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, uid, deck); }
-          });
+          transaction.update(roomRef, {phase:'tiebreak',tieQueue:empty,reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
+          needsTie = true;
+          return;
         }
         turnsInRound = 0;
         round += 1;
@@ -998,6 +1019,44 @@ async function finishTurn() {
       showToast("No se pudo avanzar el turno");
     }
   } finally { busy = false; }
+  if (needsTie) await continueTie();
+}
+
+async function continueTie(retries = 1) {
+  if (busy || !roomRef) return;
+  busy = true;
+  let attemptedVersion, retry = false;
+  try {
+    for (let step=0;step<10;step++) {
+      const more = await runTransaction(db, async transaction => {
+        const data=(await transaction.get(roomRef)).data();
+        attemptedVersion = data?.version;
+        if (data?.phase !== 'tiebreak' || !data.playerOrder.includes(user.uid)) return false;
+        const ghost=data.ghost ? structuredClone(data.ghost) : null;
+        if (!data.tieQueue.length) {
+          CT.Ghost.advance(ghost,data.playerOrder[data.current],data.playerOrder);
+          transaction.update(roomRef,{...(ghost?{ghost}:{}),phase:'turn',current:(data.current+1)%data.playerOrder.length,round:data.round+1,turnsInRound:0,turnStartedAt:serverTimestamp(),version:data.version+1,updatedAt:serverTimestamp()});
+          return false;
+        }
+        const who=data.tieQueue[0], drawn=takeCard(data.deck,data.discard);
+        if (drawn.cardId == null) throw Error('Desempate sin cartas');
+        const pulsePower=data.pulsePower ? structuredClone(data.pulsePower) : null;
+        CT.Powers.claim({ghost,pulsePower},drawn.cardId,who,drawn.deck);
+        transaction.update(roomRef,{players:{...data.players,[who]:{...data.players[who],hand:[drawn.cardId]}},deck:drawn.deck,discard:drawn.discard,tieQueue:data.tieQueue.slice(1),...(ghost?{ghost}:{}),...(pulsePower?{pulsePower}:{}),version:data.version+1,updatedAt:serverTimestamp()});
+        return true;
+      });
+      if (!more) break;
+    }
+  } catch(error) {
+    let latest;
+    try { latest=(await getDoc(roomRef)).data(); } catch { /* Se conserva la cola para reintentar con conexión. */ }
+    if (latest && latest.version !== attemptedVersion && latest.playerOrder.includes(user.uid)) {
+      retry = latest.phase === 'tiebreak' && retries > 0;
+      if (latest.phase === 'tiebreak' && !retry) showToast('Otra persona está continuando el reparto.');
+    } else { console.error(error); showToast('El desempate sigue guardado. Pulsa Continuar reparto para reintentarlo.'); }
+  }
+  finally { busy=false; }
+  if (retry) await continueTie(retries - 1);
 }
 
 function renderWinner() {
@@ -1248,6 +1307,7 @@ document.addEventListener("click", event => {
   }
   else if (action === "confirm-place") placeCard(pendingIndex);
   else if (action === "cancel-place") { pendingIndex = null; renderGame(); }
+  else if (action === "continue-tie") void continueTie();
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
   else if (action === "room") roomMenu();

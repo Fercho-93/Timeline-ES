@@ -753,7 +753,7 @@
     const plate = cardArt(modeKey, card);
     if (!plate) return "";
     const folder = sourceMode === "astronomy" ? "astronomy-cards" : sourceMode === "medicine" ? "medicine-cards" : sourceMode === "countries" ? "country-cards" : sourceMode === "population" ? "population-cards" : sourceMode === "distances" ? "distance-cards" : sourceMode === "history" ? "history-cards" : sourceMode === "movies" ? "movie-cards" : sourceMode === "music" ? "music-cards" : sourceMode === "inventions" ? "invention-cards" : sourceMode === "world" ? "world-cards" : sourceMode === "videogames" ? "videogame-cards" : "animal-cards";
-    const extension = sourceMode === "history" ? "jpg" : sourceMode === "inventions" ? "png" : "webp";
+    const extension = sourceMode === "history" ? "jpg" : "webp";
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 

@@ -1,0 +1,39 @@
+# Seguridad y operación de la beta
+
+## Estado y límites
+
+Las reglas validan permisos, fases y transformaciones de cartas. La exactitud factual del acierto sigue calculándose en el cliente: el catálogo es público y una sala comparte mazo, manos y poderes. Esta arquitectura sirve para pruebas entre personas de confianza; no acredita resultados de competición pública ni oculta secretos frente a clientes modificados.
+
+Los desempates se reparten mediante una cola reanudable, una carta por transacción. Esto permite verificar la carta y los poderes sin superar el límite de expresiones de Firestore. Cualquier participante puede continuar la cola tras una desconexión; no se permiten expulsiones ni saltos durante ese reparto.
+
+## Antes de ampliar el acceso
+
+`deployment.js` identifica esta versión como `private-beta`. La integración web de App Check está preparada para una clave pública reCAPTCHA Enterprise. Registrar la app y dominios en Firebase, configurar la clave y observar métricas en ensayo antes de activar enforcement. Confirmar que peticiones sin token son rechazadas y que usuarios legítimos pueden reconectar. No usar tokens de depuración en una distribución. La app nativa necesita su proveedor de atestación y prueba específica; la configuración pública falla cerrada si aún no está preparado.
+
+App Check no sustituye las reglas, no oculta cartas y no evita por sí solo todo abuso. La autenticación anónima puede regenerarse; cualquier cuota por UID debe acompañarse de observación y atestación. Revisar altas de identidades, creación de salas, lecturas, escrituras, errores y consumo. Configurar avisos y un procedimiento de cierre de altas; un presupuesto no es un corte automático.
+
+Las altas de sala llevan una cuota atómica de una sala cada 30 segundos por UID. Crear una sala sin actualizar su registro `roomCreation` en la misma operación es rechazado. Estos registros necesitan limpieza por `lastCreatedAt` con el mismo desplazamiento de siete días. Esta cuota no limita las lecturas ni impide crear otra identidad: no se presenta como un límite global de costes.
+
+La retención objetivo es de siete días para salas y presencia, con configuración separada de TTL y desplazamiento explícito. Ver `CONFIGURAR_MULTIJUGADOR.md`. Verificar en ensayo y después contrastar las políticas reales; no se han inspeccionado ni cambiado reglas o políticas de producción en esta tarea.
+
+Al publicar, comparar el SHA-256 del archivo de reglas aprobado con el contenido activo recuperado de Firebase Rules API o de la consola, y guardar evidencia de proyecto, fecha y versión. No declarar equivalencia solo porque un despliegue local devolvió éxito. Ejecutar las pruebas contra un proyecto de ensayo y comprobar una sala desde dos dispositivos antes de abrir nuevas altas.
+
+## Arquitectura para una futura competición pública
+
+Crear una versión de protocolo independiente con estas fronteras:
+
+- `matches/{id}`: participantes, fase, versión, turno y línea pública, sin manos ni orden del mazo.
+- `matches/{id}/private/{uid}`: lectura únicamente del titular; escritura solo desde servidor.
+- `matchSecrets/{id}`: orden del mazo, semilla y respuestas de Pulso; ningún acceso de cliente.
+- Endpoint de jugada autenticado y atestado: recibe ID de carta, hueco, versión esperada e ID de acción. Verifica pertenencia, turno, catálogo versionado y resultado; actualiza dentro de una transacción e impide repetir la acción.
+- Resolución de Pulso: conservar las dos respuestas privadas hasta resolver ambas; no publicar la primera respuesta anticipadamente.
+- Resultados: emitir un registro de servidor con versión del motor y catálogo, ganador y secuencia de acciones. Las clasificaciones solo aceptarían estos registros; nunca importaciones locales ni un resultado escrito por el cliente.
+
+Esta migración no se declara implementada por endurecer reglas de las salas actuales. Debe completarse y probarse antes de abrir competición pública o premios.
+
+## Fuentes operativas
+
+- https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider
+- https://firebase.google.com/docs/app-check/enable-enforcement
+- https://firebase.google.com/docs/firestore/ttl
+- https://firebase.google.com/docs/firestore/manage-data/delete-data

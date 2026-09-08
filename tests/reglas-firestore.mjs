@@ -1,5 +1,5 @@
 import { initializeTestEnvironment, assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, writeBatch } from "firebase/firestore";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,6 +19,13 @@ const ref = db => doc(db, "rooms", ROOM);
 
 async function seed(data) {
   await env.withSecurityRulesDisabled(async c => { await setDoc(doc(c.firestore(), "rooms", ROOM), data); });
+}
+async function createRoomForTest(code, data) {
+  await env.withSecurityRulesDisabled(c=>deleteDoc(doc(c.firestore(),'roomCreation',HOST)));
+  const db=ctx(HOST), batch=writeBatch(db);
+  batch.set(doc(db,'roomCreation',HOST),{roomCode:code,lastCreatedAt:serverTimestamp()});
+  batch.set(doc(db,'rooms',code),data);
+  return batch.commit();
 }
 async function check(label, expected, promise) {
   try {
@@ -44,7 +51,7 @@ const playing = (over = {}) => ({
 
 console.log("\nCrear y entrar");
 await env.clearFirestore();
-await check("el anfitrión crea la sala", "allow", setDoc(ref(ctx(HOST)), base()));
+await check("el anfitrión crea la sala", "allow", createRoomForTest(ROOM,base()));
 await check("crear sala con hostUid ajeno", "deny", setDoc(doc(ctx(P2), "rooms", "ZZZZ2345"), { ...base(), roomCode: "ZZZZ2345" }));
 await check("crear sala repartiéndose cartas", "deny", setDoc(doc(ctx(P2), "rooms", "YYYY2345"), { ...base(), roomCode: "YYYY2345", hostUid: P2, playerOrder: [P2], players: { [P2]: { name: "Bea", hand: [1, 2, 3], joinedAt: 1 } } }));
 
@@ -55,10 +62,10 @@ await check("entrar con nombre de 30 caracteres", "deny", updateDoc(ref(ctx(P2))
 await check("entrar borrando al anfitrión", "deny", updateDoc(ref(ctx(P2)), { players: { [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [P2], version: 2, updatedAt: serverTimestamp() }));
 await check("entrar cambiando la modalidad", "deny", updateDoc(ref(ctx(P2)), { mode: "movies", players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
 
-await check("crear una sala de la modalidad de países", "allow", setDoc(doc(ctx(HOST), "rooms", "PAIS2345"), { ...base(), roomCode: "PAIS2345", mode: "countries" }));
+await check("crear una sala de la modalidad de países", "allow", createRoomForTest("PAIS2345", { ...base(), roomCode: "PAIS2345", mode: "countries" }));
 // La lista de juegos ya no vive en las reglas, para no republicarlas con cada juego
 // nuevo. Lo que sí se sigue exigiendo es que el campo sea un identificador corto.
-await check("crear una sala de un juego aún no publicado", "allow", setDoc(doc(ctx(HOST), "rooms", "NUEV2345"), { ...base(), roomCode: "NUEV2345", mode: "population" }));
+await check("crear una sala de un juego aún no publicado", "allow", createRoomForTest("NUEV2345", { ...base(), roomCode: "NUEV2345", mode: "population" }));
 await check("crear una sala sin juego", "deny", setDoc(doc(ctx(HOST), "rooms", "SINM2345"), { ...base(), roomCode: "SINM2345", mode: "" }));
 await check("crear una sala con un juego desmesurado", "deny", setDoc(doc(ctx(HOST), "rooms", "LARG2345"), { ...base(), roomCode: "LARG2345", mode: "x".repeat(33) }));
 
@@ -97,13 +104,15 @@ const lastTurn = playing({ phase: "reveal", current: 2, turnsInRound: 2, reveal:
 await seed(lastTurn);
 await check("se declara ganador a quien se quedó sin cartas", "allow", updateDoc(ref(ctx(P3)), { status: "ended", phase: "finished", winner: P3, winners: [P3], reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await seed(lastTurn);
-await check("victoria compartida al agotarse el mazo", "allow", updateDoc(ref(ctx(P3)), { status: "ended", phase: "finished", winner: P3, winners: [P3, HOST], reveal: null, version: 2, updatedAt: serverTimestamp() }));
+await check("TRAMPA: incluir como ganador a alguien con cartas", "deny", updateDoc(ref(ctx(P3)), { status: "ended", phase: "finished", winner: P3, winners: [P3, HOST], reveal: null, version: 2, updatedAt: serverTimestamp() }));
+await seed({...lastTurn, deck:[], discard:[], players:{...lastTurn.players,[HOST]:{name:'Ana',hand:[]}}});
+await check("victoria compartida real sin cartas de desempate", "allow", updateDoc(ref(ctx(P3)), { status: "ended", phase: "finished", winner: P3, winners: [P3, HOST], reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await seed(lastTurn);
 await check("terminar sin declarar ganadores", "deny", updateDoc(ref(ctx(P3)), { status: "ended", phase: "finished", winner: P3, winners: [], reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await seed(lastTurn);
 await check("TRAMPA: declararse ganador con cartas en mano", "deny", updateDoc(ref(ctx(HOST)), { status: "ended", phase: "finished", winner: HOST, winners: [HOST], reveal: null, version: 2, updatedAt: serverTimestamp() }));
 await seed(lastTurn);
-await check("final de ronda: reparto de desempate", "allow", updateDoc(ref(ctx(P3)), { players: { ...lastTurn.players, [P3]: { name: "Cid", hand: [10] } }, deck: [11, 12], discard: [], current: 0, turnsInRound: 0, round: 2, phase: "turn", reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() }));
+await check("TRAMPA: repartir a un ganador único en vez de terminar", "deny", updateDoc(ref(ctx(P3)), { players: { ...lastTurn.players, [P3]: { name: "Cid", hand: [10] } }, deck: [11, 12], discard: [], current: 0, turnsInRound: 0, round: 2, phase: "turn", reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() }));
 
 console.log("\nControles del anfitrión");
 await seed(playing({ current: 1 }));

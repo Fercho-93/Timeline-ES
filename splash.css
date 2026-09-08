@@ -16,7 +16,7 @@ html.splash-active #app-splash {
   background:
     radial-gradient(circle at 50% 36%, rgba(255,255,255,.72), transparent 34%),
     linear-gradient(180deg, #faf6ee 0%, #f6f1e8 52%, #eee4d3 100%);
-  animation: splash-curtain-out 620ms 2350ms cubic-bezier(.22,.61,.36,1) forwards;
+  animation: splash-curtain-out 320ms 1000ms cubic-bezier(.22,.61,.36,1) forwards;
 }
 
 /* Mientras todavía no hemos medido la portada, el contenido permanece invisible sobre

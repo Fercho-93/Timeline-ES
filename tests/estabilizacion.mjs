@@ -133,6 +133,9 @@ try {
   handlers.message({ data: { type: "UPDATE_BLOCKED" } });
   assert.equal(w.document.getElementById("app").hasAttribute("inert"), false);
   assert.match(w.document.getElementById("update-notice").textContent, /otras pestañas/);
+  registration.waiting = null;
+  handlers.controllerchange();
+  assert.equal(w.document.getElementById("update-notice"), null, "una instalación ya activada retira el aviso");
   w = open({}, win => Object.defineProperty(win.navigator, "serviceWorker", { value: {
     async register() { throw Error("Sin conexión"); }, addEventListener() {}
   } }));
