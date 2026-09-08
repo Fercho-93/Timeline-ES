@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v82";
+const CACHE = "continuum-v83";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -10,7 +10,7 @@ const ASSETS = [
   "./deployment.js",
   "./privacidad.html",
   "./engine.js", "./links.js",
-  "./", "./index.html", "./splash.css", "./splash.js", "./styles.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
+  "./", "./index.html", "./splash.css", "./splash.js", "./styles.css", "./edition.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
   "./medicine.js", "./countries.js", "./population.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./enciclopedia.js", "./progreso.js", "./duelo.js",
   "./ghost.js", "./drag.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./app.js", "./online.js",

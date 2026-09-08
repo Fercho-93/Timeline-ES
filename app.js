@@ -9,7 +9,11 @@
   const CT = window.CONTINUUM;
   const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
-  const paint = html => CT.paint(app, html, screen);
+  const paint = html => {
+    const sceneMode = screen === "enciclopedia" ? encMode : screen === "comp-intro" ? comp?.queue[0] : selectedModeKey;
+    CT.Scene.apply(sceneMode, screen);
+    CT.paint(app, html, screen);
+  };
   // Y las capas se abren como diálogos: foco dentro, tabulador atrapado, Escape cierra.
   // `cerrable` distingue las capas que se pueden descartar —las reglas, el menú— de las
   // que son un paso obligado de la jugada, donde Escape no debe hacer nada.
@@ -128,7 +132,7 @@
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
   // en color y las otras quedan como lomos que se pueden tocar.
   function gallery() {
-    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map(item => {
+    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map((item, index) => {
       const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
       const instruction = active ? "Mazos visibles debajo." : "Toca para ampliar y ver sus mazos.";
@@ -137,6 +141,8 @@
         : "";
       return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
+        <span class="collection-index" aria-hidden="true">${String(index + 1).padStart(2, "0")} / ${total} ${total === 1 ? "mazo" : "mazos"}</span>
+        <span class="collection-open" aria-hidden="true">${active ? "−" : "↗"}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
       </button>${mazos}</div>`;
@@ -225,8 +231,8 @@
   // colección, y la barra de arriba ya tiene su trabajo con las acciones de cada pantalla.
   function homeNav() {
     return `<nav class="home-nav" aria-label="Navegación de inicio">
-      <button data-action="home-top" aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
-      <button data-action="home-collection" aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
+      <button data-action="home-top"${!collectionOpen ? ' aria-current="page"' : ''} aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
+      <button data-action="home-collection"${collectionOpen ? ' aria-current="page"' : ''} aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
       <button data-action="perfil" aria-label="Ver tu perfil"><span aria-hidden="true">★</span><small>Perfil</small></button>
       <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
     </nav>`;
@@ -1654,6 +1660,8 @@
     screen = "comp-intro";
     saveCompetition();
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
+      <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(comp.queue[0]).art, true)}</div>
+      <div class="chapter-number">Tema ${comp.roundsSummary.length + 1} de ${comp.totalThemes}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Vas a jugar a</span>${escapeHtml(CT.mode(comp.queue[0]).name)}</h2>
       <button class="btn btn-block comp-splash-start" data-action="comp-next-round">Empezar</button>
     </div></section></div>`);

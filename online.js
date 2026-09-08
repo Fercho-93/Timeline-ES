@@ -22,7 +22,7 @@ const CT = window.CONTINUUM;
 const { escapeHtml, initials, shuffle, announce } = CT;
 // Igual que en el juego local: pintar conserva el foco del teclado, y las capas se abren
 // como diálogos de verdad. Está en `a11y.js`, compartido por los dos motores.
-const paint = (html, pantalla) => { CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
+const paint = (html, pantalla) => { CT.Scene.apply(selectedModeKey, pantalla); CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
 const abreCapa = (capa, cerrable) => CT.openDialog(capa, cerrable);
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 

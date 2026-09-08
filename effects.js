@@ -1,6 +1,14 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
+  // El ambiente pertenece a la mesa y a la navegación, nunca al arte de las cartas.
+  // No añade observadores, esperas ni estado persistido a la partida.
+  CT.Scene = {
+    apply(mode, screen) {
+      const neutral = ["home", "perfil", "comp-end", "online-entry", "online-loading"].includes(screen);
+      document.documentElement.dataset.scene = !neutral && CT.has(mode) ? CT.blockOf(mode).art : "archive";
+    }
+  };
   let audio, haptics;
   async function vibration(kind) {
     if (!CT.effectPrefs?.().haptics) return;

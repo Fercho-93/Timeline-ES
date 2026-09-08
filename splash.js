@@ -1,6 +1,6 @@
 (() => {
   const ROOT_CLASS = "splash-active";
-  const SEEN_KEY = "continuum-splash-seen-v1";
+  const SEEN_KEY = "continuum-splash-seen-v2";
   const root = document.documentElement;
 
   // La marca se pone antes de que el body termine de parsearse. Así, si el service worker
@@ -29,6 +29,7 @@
     const remove = () => {
       if (removed) return;
       removed = true;
+      document.removeEventListener("keydown", skipKeyboard);
       splash.remove();
       root.classList.remove(ROOT_CLASS);
     };
@@ -55,6 +56,9 @@
     nextFrame(() => nextFrame(alignWithHome));
 
     const skip = () => splash.classList.add("splash-skip");
+    // El teclado nunca tiene que esperar al telón para empezar a recorrer la página.
+    const skipKeyboard = () => remove();
+    document.addEventListener("keydown", skipKeyboard, { once: true });
     splash.addEventListener("pointerdown", skip, { once: true, passive: true });
     splash.addEventListener("animationend", event => {
       if (event.target === splash && event.animationName.startsWith("splash-curtain-")) remove();
