@@ -49,10 +49,21 @@ reglas contra el emulador oficial antes de publicarlas. Consulta `tests/README.m
 
 ### Limpiar salas antiguas
 
-Las salas abandonadas se quedan guardadas para siempre. En **Firestore → Copia de seguridad y
-TTL → Directivas de TTL**, crea una directiva sobre la colección `rooms` con el campo
-`updatedAt`: Firestore borrará solas las salas sin actividad reciente y el proyecto se
-mantiene dentro del plan gratuito.
+Objetivo de retención para la beta: siete días desde la última actividad. La configuración
+real de producción sigue pendiente de verificación. Si se utiliza `updatedAt`, configurar
+explícitamente un desplazamiento de expiración de siete días: con desplazamiento cero
+se convierte en una fecha de vencimiento inmediato. No activar una política sin probarla
+primero en un proyecto de ensayo. La eliminación es asíncrona y genera operaciones facturables.
+
+El borrado de una sala no borra sus subcolecciones. Los documentos `presence` requieren su
+propia política (sobre `seenAt`, también con siete días de desplazamiento) o limpieza recursiva
+desde un servicio de confianza. Verificar con una sala caducada que desaparecen ambos.
+Referencia: https://firebase.google.com/docs/firestore/ttl y
+https://firebase.google.com/docs/firestore/manage-data/delete-data .
+
+Configurar alertas de presupuesto y observar lecturas, escrituras y autenticaciones antes
+de ampliar la beta. Una alerta avisa; no limita automáticamente el gasto. Conservar un
+procedimiento de cierre temporal de altas y revisar picos de creación de identidades.
 
 ## 2. Comprobar Authentication
 

@@ -10,7 +10,7 @@
   const DEFAULTS = { theme: "auto" };
   // Pendiente de rellenar antes de repartir la beta: el correo donde debe llegar el
   // informe de comentarios. Hasta entonces el botón avisa de que aún no hay dirección.
-  const FEEDBACK_EMAIL = "";
+  const FEEDBACK_EMAIL = CT.Deployment.feedbackEmail;
 
   function read() {
     try {
@@ -57,6 +57,10 @@
           <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
         </select>
       </div>
+      <h2>Efectos opcionales</h2>
+      <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" ${s.haptics === true ? "checked" : ""}></label>
+      <label class="opt-row"><span>Sonidos breves</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
+      <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
       <h2>Jugar sin conexión</h2>
       <p class="hint">En la web instalada, las reglas y cartas funcionan sin conexión tras completar la instalación. Las ilustraciones que no se precargan necesitan haberse abierto antes con internet. La app nativa lleva el arte incluido. Las salas de varios móviles siempre necesitan conexión.</p>
       <h2>Copias de seguridad</h2>
@@ -65,6 +69,10 @@
       <label for="restore-backup">Recuperar copia de Continuum</label>
       <input id="restore-backup" type="file" accept="application/json,.json" data-settings-action="restore" ${CT.isSessionActive?.() ? "disabled" : ""}>
       <h2>Comentarios</h2>
+      <p><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Privacidad y datos</a></p>
+      <label for="feedback-note">Comentario para la beta</label>
+      <textarea id="feedback-note" rows="3" maxlength="4000" placeholder="Qué ocurrió y qué esperabas"></textarea>
+      <button class="btn btn-secondary btn-block" data-settings-action="download-feedback">Guardar comentario con diagnóstico</button>
       <p class="hint">¿Algo no va bien o se te ocurre algo? Manda un correo con la versión instalada y la pantalla en la que estás, para no tener que describirlo de memoria.</p>
       <button class="btn btn-secondary btn-block" data-settings-action="feedback">Enviar comentario</button>
       <button class="btn btn-primary btn-block" style="margin-top:10px" data-settings-action="close">Hecho</button>
@@ -95,7 +103,11 @@
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
+  CT.effectPrefs = () => ({ sound: settings.sound === true, haptics: settings.haptics === true });
   document.addEventListener("change", event => {
+    if (["sound", "haptics"].includes(event.target.dataset.settingsAction)) {
+      settings[event.target.dataset.settingsAction] = event.target.checked; save(); return;
+    }
     if (event.target.dataset.settingsAction === "restore") {
       const file = event.target.files?.[0];
       if (!file) return;
@@ -123,6 +135,15 @@
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
     else if (target.dataset.settingsAction === "backup") CT.Storage.backup();
+    else if (target.dataset.settingsAction === "download-feedback") {
+      void (async () => {
+        const note = document.getElementById('feedback-note')?.value || '';
+        const diagnostic = await CT.appDiagnostics?.() || '';
+        const url = URL.createObjectURL(new Blob([note + '\n\n' + diagnostic], {type:'text/plain;charset=utf-8'}));
+        const a = document.createElement('a'); a.href=url; a.download='continuum-comentario.txt'; a.click();
+        setTimeout(()=>URL.revokeObjectURL(url),1000);
+      })();
+    }
   });
 
   CT.settingsButton = () => '<button class="icon-btn" data-settings-action="open">Ajustes</button>';

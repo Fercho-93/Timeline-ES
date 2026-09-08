@@ -7,13 +7,13 @@
   // toma el control y recarga esta misma pestaña, el telón no aparece dos veces.
   let alreadySeen = false;
   try {
-    alreadySeen = sessionStorage.getItem(SEEN_KEY) === "1";
-    if (!alreadySeen) sessionStorage.setItem(SEEN_KEY, "1");
+    alreadySeen = localStorage.getItem(SEEN_KEY) === "1";
+    if (!alreadySeen) localStorage.setItem(SEEN_KEY, "1");
   } catch {
-    // Bloquear sessionStorage no debe bloquear el arranque: simplemente se verá el telón.
+    // Bloquear el almacenamiento no debe bloquear el arranque.
   }
 
-  if (alreadySeen) return;
+  if (alreadySeen || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
   root.classList.add(ROOT_CLASS);
 
   function bootSplash() {
@@ -62,7 +62,7 @@
 
     // Red de seguridad: incluso si el navegador no entrega animationend, el telón nunca
     // puede quedarse por encima de la aplicación.
-    window.setTimeout(remove, 3800);
+    window.setTimeout(remove, 1800);
   }
 
   if (document.readyState === "loading") {

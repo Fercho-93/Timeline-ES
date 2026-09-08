@@ -1,0 +1,27 @@
+name: Incidencia de la beta
+description: Un fallo o una confusión al jugar
+title: "[Beta] "
+body:
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos y resultado
+      description: Qué hiciste, qué esperabas y qué ocurrió. No incluyas nombres reales ni información privada.
+    validations:
+      required: true
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Versión y dispositivo
+      description: Pega el diagnóstico de Ajustes y añade modelo de móvil, modo de juego y número de participantes.
+    validations:
+      required: true
+  - type: dropdown
+    id: impacto
+    attributes:
+      label: Impacto
+      options:
+        - Pérdida de partida o datos
+        - No puedo seguir jugando
+        - Funciona pero resulta confuso
+        - Sugerencia

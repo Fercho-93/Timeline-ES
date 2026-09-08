@@ -560,6 +560,7 @@
       (game.failed = game.failed || []).push(selectedCardId);
     }
     result = { correct, returned, card, playerName: player.name };
+    CT.Effects.feedback(correct);
     selectedCardId = null;
     // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
     anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", hidden: !!game.ghost?.pending.length }));
@@ -568,11 +569,9 @@
   }
 
   function drawCard(player) {
-    if (!game.deck.length) {
-      game.deck = shuffle(game.discard);
-      game.discard = [];
-    }
-    const id = game.deck.shift();
+    const drawn = CT.Engine.draw(game.deck, game.discard);
+    game.deck = drawn.deck; game.discard = drawn.discard;
+    const id = drawn.cardId;
     if (id == null) return false;
     player.hand.push(id);
     CT.Powers.claim(game, id, player.id, game.deck);
@@ -728,6 +727,7 @@
       penaltySkipped = !drawCard(player);
     }
     game.pulseTurn = null;
+    CT.Effects.feedback(targetOk);
     pendingIndex = null;
     result = {
       correct: byOk, card, pulse: true, duel: true, targetOk,
@@ -784,18 +784,18 @@
       overlay(`<div class="overlay"><div class="modal pulse-duel-modal">
         <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
         <h2>${escapeHtml(card.title)}</h2>
-        <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>
+        <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(selectedModeKey, card)}</div>
         <div class="pulse-duel-rows">
           ${marcador({ name: result.byName, ok: result.correct, donde: result.posiciones.by })}
           ${marcador({ name: result.targetName, ok: result.targetOk, donde: result.posiciones.target })}
         </div>
         ${duelOutcome(result)}
-        <button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button>
+        <button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button>
       </div></div>`);
       return;
     }
     const desenlace = `<p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(selectedModeKey, card)}</div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   // Las cuatro salidas del duelo, contadas desde la mesa y no desde nadie en concreto.
@@ -1379,6 +1379,7 @@
     (solo.sequence = solo.sequence || []).push(correct);
     pendingIndex = null;
     result = { correct, card, solo: true };
+    CT.Effects.feedback(correct);
     solo.pendingResult = { correct, cardId: card.id };
     anotaLogros(CT.Progreso.record({ mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() }));
     saveSolo();
@@ -1391,7 +1392,7 @@
     const era = eraForCard(card);
     const acabada = soloAcabada();
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(selectedModeKey, card)}</div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
@@ -1926,16 +1927,22 @@
   // en curso pregunta antes de abandonarla, igual que el resto del juego; cualquier otra
   // pantalla vuelve al inicio; y desde el inicio, el gesto cierra la aplicación.
   if (window.Capacitor?.isNativePlatform?.()) {
-    window.Capacitor.Plugins?.App?.addListener("backButton", () => {
+    const nativeApp = window.Capacitor.registerPlugin?.('App') || window.Capacitor.Plugins?.App;
+    nativeApp?.addListener?.("backButton", () => {
       if (CT.backPressed()) return;
       if (screen === "game") { gameMenu(); return; }
       if (screen !== "home") { home(); return; }
-      window.Capacitor.Plugins.App.exitApp();
+      nativeApp.exitApp();
     });
   }
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
-  const params = new URLSearchParams(location.search);
+  CT.Links.start(target => {
+    if (CT.isSessionActive() && !confirm('¿Abrir la invitación? Tu partida local quedará guardada.')) return;
+    if (target.room) launchOnline(target.room);
+    else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo); }
+  });
+  const params = new URLSearchParams(location.hash.slice(1) || location.search);
   const invitedRoom = params.get("room") || "";
   const duelPayload = params.get("duelo") || "";
   if (invitedRoom) launchOnline(invitedRoom);

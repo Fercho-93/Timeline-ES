@@ -97,7 +97,7 @@ console.log("\nLa carga útil da la vuelta entera");
   const vacio = D.descodificar(D.codificar({ mode: "history", seed: "x1", total: 1, hits: 0, sequence: [false], nombre: "" }));
   ok("sin nombre también vale", vacio.ok === true && vacio.duelo.rival.nombre === "");
 
-  ok("el enlace apunta a la propia aplicación", D.enlace(payload).startsWith("https://hilo.test/") && D.enlace(payload).includes("?duelo="));
+  ok("el enlace apunta a la propia aplicación sin enviar el duelo en la consulta HTTP", D.enlace(payload).startsWith("https://hilo.test/") && D.enlace(payload).includes("#duelo="));
 }
 
 console.log("\nLa huella del mazo impide comparar dos partidas distintas");

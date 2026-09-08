@@ -322,7 +322,7 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
   plataforma: iconos, splash, firma, permisos.
 - Los iconos y la pantalla de apertura nativos ya están generados en todos los tamaños que
   piden Android e iOS, a partir de `icon.svg` (el mismo icono de la PWA) y del emblema de la
-  portada, con `npm run icons` (usa `@capacitor/assets`; las fuentes en alta resolución
+  portada, con `npm run icons` (usa `sharp`; las fuentes en alta resolución
   viven en `resources/`). Vuelve a ejecutarlo si cambia el logo definitivo.
 - El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar
   una partida en curso, o vuelve al inicio; ambos comportamientos están en `a11y.js`
@@ -355,14 +355,14 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene veintitrés comprobaciones automáticas: diecinueve que corren en cualquier
+`tests/` contiene veintiocho suites automáticas: veintidós que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
 los animales, la marca, el service worker, la página que fuerza una actualización, la
 pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace, la accesibilidad con
 teclado y lector de pantalla, y el build móvil (`npm run build`, `dist/` completo y
-sincronizado con `capacitor.config.json`)— y cuatro más que necesitan el emulador oficial de Firestore y
+sincronizado con `capacitor.config.json`)— y seis más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 

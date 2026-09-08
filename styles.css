@@ -1643,3 +1643,27 @@ body::before {
 .quick-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin:20px auto; }
 .direct-solo { margin-top:12px; }
 .room-connection { padding:10px; border:1px solid currentColor; border-radius:12px; margin-block:10px; font-family:system-ui,sans-serif; }
+
+/* Tablero compacto; las explicaciones siguen disponibles a tamaño de lectura. */
+#app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"]) .topbar { padding-block:8px; margin-bottom:10px; }
+#app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"]) .turn-name { font-size:clamp(1.25rem,5vw,1.8rem); }
+.rules p, .rules li, .reveal p, .hint, .art-modal { font-family:system-ui,sans-serif; line-height:1.5; }
+.art-modal img { display:block; width:100%; max-height:65dvh; object-fit:contain; margin-block:12px; }
+.modal { overflow-wrap:anywhere; }
+.modal a, .rules a { color:var(--accent-dark); }
+.modal input[type="file"], .modal textarea { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
+.modal textarea { color:var(--ink); background:var(--campo); border:1px solid var(--line); padding:10px; border-radius:8px; font:inherit; }
+.animal-hand-card strong { max-width:none; background:var(--surface); color:var(--ink); text-shadow:none; padding:8px; border-radius:8px; overflow-wrap:anywhere; }
+@media (max-width:600px) {
+  #app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"]) .shell { padding-inline:12px; }
+  .timeline .animal-timeline-card { width:146px; min-height:210px; }
+  .timeline .animal-timeline-card .card-visual { height:128px; }
+  .hand-card { min-width:136px; }
+  .animal-hand-card { min-height:170px; }
+  .animal-hand-card strong { margin-top:40px; font-size:1rem; }
+  .game-head { gap:8px; margin-bottom:10px; }
+  .icon-btn, .btn, .remove { min-height:44px; }
+  input, select, textarea { font-size:max(1rem,16px); }
+  .modal { max-height:calc(100dvh - 32px); overflow-y:auto; }
+}
+@media (prefers-reduced-motion:reduce) { html.splash-active #app-splash { animation:none; display:none; } }

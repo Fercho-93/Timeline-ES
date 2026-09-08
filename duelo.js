@@ -111,8 +111,8 @@
   }
 
   function enlace(payload) {
-    const base = `${location.origin}${location.pathname}`;
-    return `${base}?duelo=${payload}`;
+    const base = CT.Links.base();
+    return `${base}#duelo=${encodeURIComponent(payload)}`;
   }
 
   // El texto que se manda. Lleva el enlace y la marca a batir, pero ninguna carta: quien

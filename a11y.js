@@ -109,6 +109,7 @@
   // El primer pintado no toca el foco: nadie lo tenía y moverlo al entrar sería una
   // sorpresa desagradable.
   function paint(container, html, screen) {
+    container.dataset.screen = screen;
     olvidaDialogos(container);
     const activo = document.activeElement;
     const dentro = activo && activo !== container && container.contains(activo);
@@ -210,7 +211,7 @@
     // Una guía larga debe abrir por su título, no desplazarse hasta «Entendido».
     const lectura = titulo && modal.querySelector(".guide-content");
     if (lectura) titulo.setAttribute("tabindex", "-1");
-    focus(lectura ? titulo : (focusables(modal)[0] || modal), { preventScroll: true });
+    focus(lectura ? titulo : (modal.querySelector("[data-dialog-focus]") || focusables(modal)[0] || modal), { preventScroll: true });
 
     function onKey(event) {
       if (pila.length && pila[pila.length - 1].overlay !== overlay) return;

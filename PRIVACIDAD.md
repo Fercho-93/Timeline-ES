@@ -1,82 +1,27 @@
-# Política de privacidad de Continuum
+# Privacidad de Continuum
 
-Borrador inicial para la fase de beta, redactado a partir de lo que el código
-realmente hace (`online.js`, `settings.js`, `service-worker.js`). Antes de
-publicar en App Store o Google Play conviene una revisión profesional para los
-aspectos legales (aviso legal, jurisdicción, RGPD si aplica), tal como señala
-`CONFIGURAR_MULTIJUGADOR.md`.
+Información de la beta · 8 de septiembre de 2026.
 
-## Qué datos recoge Continuum
+## Partidas y progreso
 
-Continuum no pide nombre real, correo, teléfono ni contraseña para jugar.
+Las partidas locales, ajustes y estadísticas se guardan en este dispositivo. Continuum no incorpora publicidad, compras ni analítica de terceros. Al abrir la web, el alojamiento recibe las peticiones necesarias para servirla y puede conservar registros técnicos, incluida la dirección IP.
 
-- **Modo de un solo móvil (local o solitario):** no envía ningún dato a
-  ningún servidor. Todo se guarda únicamente en el dispositivo (ver más abajo).
-- **Modo de varios móviles (online):** usa Firebase (Google) para conectar a
-  las personas que juegan la misma partida. Ver el apartado siguiente.
-- **Duelo por enlace:** la partida entera viaja codificada dentro del propio
-  enlace que se comparte; no pasa por ningún servidor de Continuum.
+## Salas de varios móviles
 
-## Qué utiliza Firebase
+Para conectar a los participantes utilizamos Firebase, de Google. Se tratan un identificador de autenticación seudónimo, el nombre elegido, el código y estado de sala, las cartas y marcas de actividad y presencia. No necesitas dar tu nombre real. El identificador no equivale a anonimato absoluto. Los participantes pueden ver los datos de la sala; evita incluir información privada en los nombres.
 
-El modo de varios móviles usa dos servicios de Firebase:
+## Invitaciones y comentarios
 
-- **Authentication (anónimo):** al entrar en una sala, Firebase asigna un
-  identificador anónimo (`uid`) al dispositivo. No está vinculado a ningún
-  dato personal ni requiere iniciar sesión.
-- **Firestore:** guarda el documento de la sala mientras dura la partida:
-  el código de sala, el nombre que cada participante escribe para esa
-  partida, el mazo elegido, el mazo de cartas y la línea temporal en curso.
-  Ese nombre lo elige libremente quien juega en cada partida y no tiene por
-  qué ser su nombre real.
+Un duelo incluye el nombre elegido y resultado de quien reta dentro del enlace. Cualquier persona con el enlace puede leerlos. Los enlaces nuevos usan un fragmento; los antiguos pueden incluir la información en la consulta que recibe el alojamiento. Compartir, exportar o enviar un comentario es una acción voluntaria. Los comentarios descargables incluyen el texto que escribas y un diagnóstico de versión y contexto; revísalos antes de compartirlos.
 
-Google procesa esos datos como proveedor de infraestructura; consulta la
-política de privacidad de Firebase/Google para más detalle sobre su parte.
+## Conservación y eliminación
 
-## Cómo funcionan los identificadores
+El progreso local permanece hasta que lo borres o elimines los datos de la aplicación. Puedes exportarlo antes desde Ajustes. El anfitrión puede cerrar la sala. El objetivo de retención de salas y presencia es de siete días tras la última actividad, pero la limpieza automática de producción está pendiente de verificación: este plazo todavía no es una garantía operativa.
 
-- El `uid` anónimo de Firebase se genera por dispositivo/instalación, no por
-  persona. Reinstalar la aplicación o borrar sus datos genera uno nuevo.
-- El código de sala es una cadena aleatoria de 8 caracteres sin relación con
-  ninguna persona.
+## Contacto y estado de la beta
 
-## Qué datos de partidas se almacenan y dónde
+El responsable y la dirección de contacto están pendientes de completar antes de distribuir la beta públicamente. Por ahora puedes guardar un comentario desde Ajustes y entregarlo directamente a quien te haya invitado a probar el juego. Esta versión no está preparada para un lanzamiento comercial.
 
-- **En el dispositivo (`localStorage`):** el perfil, las estadísticas, los
-  logros, la racha del reto diario, el tema elegido y qué nombre se usó la
-  última vez en cada sala. Nada de esto sale del dispositivo salvo que la
-  persona lo exporte ella misma (por ejemplo, para pasarlo a otro móvil).
-- **En Firestore (mientras la sala está activa):** el documento de la sala
-  descrito arriba. Se borra cuando el anfitrión cierra la sala; las salas
-  abandonadas sin actividad quedan pendientes de una directiva de limpieza
-  automática por antigüedad (ver `CONFIGURAR_MULTIJUGADOR.md`, aún por
-  configurar en la consola de Firebase en el momento de escribir esto).
+Información de privacidad de Firebase
 
-## Cuánto tiempo se conservan
-
-- Los datos en el dispositivo se conservan hasta que la propia persona
-  desinstala la aplicación, borra los datos del sitio o los borra a mano
-  desde Ajustes.
-- Las salas de Firestore se conservan mientras están activas y, una vez
-  configurada la directiva de TTL mencionada arriba, un plazo limitado tras
-  su último uso.
-
-## Cómo contactar
-
-Desde **Ajustes → Enviar comentario** se puede escribir directamente. Esa
-dirección de contacto está pendiente de configurarse antes de repartir la
-beta (ver `settings.js`, `FEEDBACK_EMAIL`).
-
-## Cómo solicitar la eliminación de datos
-
-- Los datos guardados en el propio dispositivo se eliminan borrando los
-  datos de la aplicación o desinstalándola.
-- Para pedir el borrado anticipado de una sala concreta en Firestore, basta
-  con escribir a la dirección de contacto indicando el código de sala.
-
-## Lo que Continuum no hace
-
-- No incluye anuncios ni compras dentro de la aplicación.
-- No usa cookies de seguimiento ni analítica de terceros.
-- No comparte datos con nadie salvo la infraestructura de Firebase necesaria
-  para que funcione el modo de varios móviles.
+Volver a Continuum
