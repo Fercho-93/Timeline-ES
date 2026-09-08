@@ -13,7 +13,7 @@ export function createMatch(uid,catalog,now,randomize=shuffle) {
  const values=Object.fromEntries(catalog.map(c=>[c.id,c.value]));
  if(Object.keys(values).length!==catalog.length||catalog.some(c=>!Number.isSafeInteger(c.id)||!Number.isFinite(c.value)))throw Error('INVALID_CATALOG');
  return {protocol:1,version:0,status:'lobby',phase:'lobby',host:uid,order:[uid],players:{[uid]:{hand:[],pulseUsed:false,shieldRound:0}},lastSeen:{[uid]:now},
-   deck:randomize(catalog.map(c=>c.id)),discard:[],timeline:[],values,catalogHash:hash(catalog),current:0,round:1,turnsInRound:0,
+   deck:randomize(catalog.map(c=>c.id)),discard:[],timeline:[],values,catalogHash:hash(catalog),current:0,round:1,turnsInRound:0,turnStartedAt:now,
    pulse:null,reveal:null,winners:[],createdAt:now,updatedAt:now,expiresAt:now+7*86400000,auditHash:hash([uid,now,randomUUID()])};
 }
 export function publicMatch(state) {
@@ -23,7 +23,7 @@ export function publicMatch(state) {
    pulse:state.pulse?{cardId:state.pulse.cardId,by:state.pulse.by,target:state.pulse.target,stage:state.pulse.stage}:null,
    reveal:state.reveal,updatedAt:state.updatedAt,expiresAt:state.expiresAt};
 }
-const fields={join:[],start:[],play:['cardId','index'],pulse:['target'],answer:['index'],endTurn:[],leave:[],heartbeat:[],claimHost:[]};
+const fields={join:[],start:[],play:['cardId','index'],pulse:['target'],answer:['index'],endTurn:[],leave:[],heartbeat:[],claimHost:[],timeout:[]};
 export function applyAction(input,uid,action,now,randomize=shuffle) {
  if(!action||!Object.hasOwn(fields,action.type)||Object.keys(action).some(k=>!['type','version',...fields[action.type]].includes(k)))throw Error('INVALID_ACTION');
  if(!Number.isSafeInteger(action.version)||action.version!==input.version)throw Error('STALE_VERSION');
@@ -40,6 +40,13 @@ export function applyAction(input,uid,action,now,randomize=shuffle) {
   s.order=s.order.filter(id=>id!==uid);delete s.players[uid];delete s.lastSeen[uid];
   if(!s.order.length) { s.status='ended';s.phase='ended';s.winners=[];s.reveal=null; }
   else { if(s.host===uid)s.host=s.order[0]; if(leavingIndex<s.current)s.current--; if(s.current>=s.order.length)s.current=0; if(s.phase==='reveal'&&s.status==='playing'){s.phase='turn';s.reveal=null;} }
+ } else if(action.type==='timeout') {
+  if(!s.order.includes(uid)||s.status!=='playing')throw Error('CANNOT_TIMEOUT');
+  if(now-s.turnStartedAt<45000)throw Error('TURN_ACTIVE');
+  if(s.pulse){s.discard.push(s.pulse.cardId);s.pulse=null;}
+  s.phase='turn';s.reveal=null;s.current=(s.current+1)%s.order.length;s.turnsInRound++;
+  if(s.turnsInRound>=s.order.length){s.turnsInRound=0;s.round++;}
+  s.turnStartedAt=now;
  } else if(action.type==='heartbeat') {
   if(!s.order.includes(uid))throw Error('NOT_MEMBER');
   s.lastSeen[uid]=now;
@@ -54,7 +61,7 @@ export function applyAction(input,uid,action,now,randomize=shuffle) {
   if(action.type==='start') {
    if(uid!==s.host||s.status!=='lobby'||s.order.length<2||s.deck.length<1+s.order.length*3)throw Error('CANNOT_START');
    s.timeline=[s.deck.shift()];for(const id of s.order)s.players[id].hand=s.deck.splice(0,3);
-   s.status='playing';s.phase='turn';
+   s.status='playing';s.phase='turn';s.turnStartedAt=now;
   } else {
    if(s.status!=='playing')throw Error('NOT_PLAYING');
    if(action.type==='play') {

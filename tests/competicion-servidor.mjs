@@ -48,4 +48,14 @@ for(let count=2;count<=9;count++) {
  assert.equal(s.host,ids[1]); assert.equal(s.lastSeen[ids[1]],94000);
  assert.throws(()=>applyAction(s,ids[2],{type:'heartbeat',version:s.version},95000,copy),/NOT_MEMBER/);
 }
+// Un turno bloqueado puede resolverse después de 45 s, pero nunca antes; si
+// había un Pulso abierto, su carta vuelve al descarte antes de pasar el turno.
+{
+ let s=createMatch(ids[0],catalog,1000,copy);
+ s=applyAction(s,ids[1],{type:'join',version:s.version},2000,copy);
+ s=applyAction(s,ids[0],{type:'start',version:s.version},3000,copy);
+ assert.throws(()=>applyAction(s,ids[1],{type:'timeout',version:s.version},47999,copy),/TURN_ACTIVE/);
+ s=applyAction(s,ids[1],{type:'timeout',version:s.version},48000,copy);
+ assert.equal(s.current,1); assert.equal(s.phase,'turn'); assert.equal(s.turnStartedAt,48000);
+}
 console.log('Servidor: partidas completas 2–9, Pulso privado, conservación e intentos de manipulación: OK');
