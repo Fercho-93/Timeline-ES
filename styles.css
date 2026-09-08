@@ -1465,21 +1465,17 @@ body::before {
   height: 100%;
   filter: none;
 }
-.timeline .animal-timeline-card .card-visual::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent 38%, rgba(226,191,125,.2) 58%, rgba(235,205,148,.94) 78%, #e4bd77 100%);
-}
 .timeline .animal-timeline-card .card-content {
   position: absolute;
   z-index: 2;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 48px 12px 12px;
+  padding: 30px 12px 12px;
+  /* El degradado se ancla al propio alto de card-content (no al de la carta),
+     así crece con títulos largos en vez de dejar el zócalo fijo y descubrir
+     la ilustración por debajo. */
+  background: linear-gradient(180deg, transparent 0%, rgba(226,191,125,.35) 28%, rgba(235,205,148,.94) 55%, #e4bd77 78%);
 }
 .timeline .animal-timeline-card .year {
   display: inline-block;
