@@ -1767,8 +1767,8 @@
       await online.openOnlineMode({ roomCode, modeKey: selectedModeKey });
     } catch (error) {
       console.error(error);
-      showToast("No se pudo conectar. Comprueba tu conexión a internet.");
-      home();
+      screen = "online-error";
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo conectar</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión a internet y vuelve a intentarlo. No se ha borrado ninguna partida guardada.</p><button class="btn btn-primary btn-block" data-action="retry-online">Reintentar conexión</button><button class="btn btn-ghost btn-block" data-action="home">Volver al inicio</button></div></section></div>`);
     }
   }
 
@@ -1813,6 +1813,7 @@
     if (!target) return;
     const action = target.dataset.action;
     if (action === "quick-play") playMenu();
+    else if (action === "retry-online") launchOnline();
     else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
     else if (action === "home") home();
     else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
