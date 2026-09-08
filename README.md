@@ -322,7 +322,7 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
   plataforma: iconos, splash, firma, permisos.
 - Los iconos y la pantalla de apertura nativos ya están generados en todos los tamaños que
   piden Android e iOS, a partir de `icon.svg` (el mismo icono de la PWA) y del emblema de la
-  portada, con `npm run icons` (usa `@capacitor/assets`; las fuentes en alta resolución
+  portada, con `npm run icons` (usa `sharp`; las fuentes en alta resolución
   viven en `resources/`). Vuelve a ejecutarlo si cambia el logo definitivo.
 - El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar
   una partida en curso, o vuelve al inicio; ambos comportamientos están en `a11y.js`
@@ -355,14 +355,14 @@ El modo multijugador utiliza el proyecto gratuito de Firebase configurado para e
 
 ## Comprobaciones
 
-`tests/` contiene veintitrés comprobaciones automáticas: diecinueve que corren en cualquier
+`tests/` contiene treinta y dos suites automáticas: veinticinco que corren en cualquier
 ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
 simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
 todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
 los animales, la marca, el service worker, la página que fuerza una actualización, la
 pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace, la accesibilidad con
 teclado y lector de pantalla, y el build móvil (`npm run build`, `dist/` completo y
-sincronizado con `capacitor.config.json`)— y cuatro más que necesitan el emulador oficial de Firestore y
+sincronizado con `capacitor.config.json`)— y siete más que necesitan el emulador oficial de Firestore y
 se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
 en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
 
@@ -455,3 +455,24 @@ de recarga del código antiguo que ya estuviera abierto.
 
 La corrección del Pulso online requiere publicar también firestore.rules; no basta con
 actualizar los archivos web. Las pruebas del emulador no modifican Firebase de producción.
+
+## Inicio y continuidad de salas (v75)
+
+La portada ofrece Jugar, Continuar y volver a la última sala. Solitario se abre
+directamente. La primera partida se propone sin poderes; el ajuste avanzado activa
+Pulso y Fantasma. Competición permite 3, 5 o todos los temas.
+
+Las salas nuevas ofrecen turnos sin límite, de 20, 30 o 45 segundos. El reloj se ancla
+con una confirmación del servidor y avanza con un contador monotónico: cambiar la hora
+del teléfono no cambia el turno. Antes de sincronizar, muestra «…» y no salta turnos.
+La latencia puede introducir una pequeña diferencia entre contadores visibles.
+
+Cada participante envía una señal de actividad cada 45 segundos mientras está visible;
+la interfaz distingue segundo plano, falta de actividad y pérdida de red local. Esto
+añade lecturas y escrituras de Firestore y debe incluirse en el seguimiento de costes.
+Tras 90 segundos sin señales del anfitrión, o 15 segundos desde una señal de segundo
+plano, otro participante puede tomar el relevo. El servidor comprueba el plazo y la
+pertenencia a la sala; el relevo conserva cartas y turno. No es presencia instantánea.
+
+Publicar las reglas v39 junto con el cliente. Las subcolecciones de presencia deben
+incluirse en la limpieza de salas; borrar el documento padre no las elimina.

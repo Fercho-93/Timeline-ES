@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { JSDOM } from 'jsdom';
+const read = name => fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
+const html=read('index.html');
+const w=new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''),{runScripts:'outside-only',url:'https://continuum.test/'}).window;
+w.scrollTo=()=>{};
+for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
+const click=action=>{const button=w.document.querySelector('[data-action="'+action+'"]');assert.ok(button,action);button.click();};
+try {
+ click('quick-play');
+ assert.ok(w.document.querySelector('[data-action="solo"]'));
+ assert.equal(w.document.querySelector('[data-format="solo"]'),null);
+ w.document.querySelector('[data-format="multi"]').click();click('setup');
+ assert.equal(w.document.getElementById('ghost-toggle').checked,false);
+ assert.equal(w.document.getElementById('pulse-toggle').checked,false);
+ const preset=w.document.getElementById('local-preset');preset.value='advanced';preset.dispatchEvent(new w.Event('change',{bubbles:true}));
+ assert.equal(w.document.getElementById('ghost-toggle').checked,true);
+ assert.equal(w.document.getElementById('pulse-toggle').checked,true);
+ click('home');w.document.getElementById('competition-length').value='3';click('start-competition');
+ let state=JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
+ assert.equal(state.totalThemes,3);assert.equal(state.queue.length,3);
+ click('comp-next-round');assert.match(w.document.body.textContent,/tema 1 de 3/);
+ const clock=w.CONTINUUM.Session;
+ assert.equal(clock.now(),null);
+ let monotonic=100;w.performance.now=()=>monotonic;
+ clock.calibrate(100000,0,100);assert.equal(clock.remaining(100000,30),30);
+ w.Date.now=()=>9999999999999;monotonic=2100;assert.equal(clock.remaining(100000,30),28);
+ assert.equal(clock.remaining(100000,0),null);
+ assert.equal(clock.presence({seenAt:100000,visible:false}),'En segundo plano');
+ monotonic=100100;assert.equal(clock.presence({seenAt:100000,visible:true}),'Sin actividad reciente');
+ console.log('Acceso directo, presets, competición corta y reloj independiente del dispositivo: OK');
+} finally {w.close();}

@@ -6,29 +6,50 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "test": "node tests/sintaxis.mjs && node tests/marca.mjs && node tests/referencias-animales.mjs && node tests/partida-local.mjs && node tests/partidas-al-azar.mjs && node tests/service-worker.mjs && node tests/mazos.mjs && node tests/solitario.mjs && node tests/pulso.mjs && node tests/accesibilidad.mjs && node tests/movimiento.mjs && node tests/fantasma.mjs && node tests/enciclopedia.mjs && node tests/progreso.mjs && node tests/duelo.mjs && node tests/actualizar.mjs && node tests/diagnostico.mjs && node tests/build-movil.mjs && node tests/estabilizacion.mjs",
-    "test:reglas": "firebase emulators:exec --project demo-hilo --only firestore \"node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs && node tests/fantasma-online.mjs\"",
+    "test": "node tests/sintaxis.mjs && node tests/marca.mjs && node tests/referencias-animales.mjs && node tests/partida-local.mjs && node tests/partidas-al-azar.mjs && node tests/service-worker.mjs && node tests/mazos.mjs && node tests/solitario.mjs && node tests/pulso.mjs && node tests/accesibilidad.mjs && node tests/movimiento.mjs && node tests/fantasma.mjs && node tests/enciclopedia.mjs && node tests/progreso.mjs && node tests/duelo.mjs && node tests/actualizar.mjs && node tests/diagnostico.mjs && node tests/build-movil.mjs && node tests/estabilizacion.mjs && node tests/ritmo.mjs && node tests/efectos.mjs && node scripts/check-assets.mjs && node tests/motor-enlaces.mjs && node tests/motor-invariantes.mjs && node tests/competicion-servidor.mjs && node tests/servidor-http.mjs && node scripts/audit-content.mjs",
+    "test:reglas": "firebase emulators:exec --project demo-hilo --only firestore \"node tests/reglas-firestore.mjs && node tests/compatibilidad-version-anterior.mjs && node tests/entrada-por-enlace.mjs && node tests/fantasma-online.mjs && node tests/presencia-reglas.mjs && node tests/integridad-reglas.mjs && node tests/servidor-reglas.mjs\"",
     "test:todo": "npm test && npm run test:reglas",
     "dev": "vite",
     "build": "node scripts/build.mjs",
-    "icons": "capacitor-assets generate --assetPath resources --android --ios"
+    "icons": "node scripts/icons.mjs",
+    "server:start": "node server/start.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.1",
     "@firebase/rules-unit-testing": "^5.0.0",
     "firebase": "^12.15.0",
-    "firebase-tools": "^14.0.0",
+    "firebase-admin": "^14.3.0",
+    "firebase-tools": "^15.29.0",
     "jsdom": "^30.0.0",
+    "sharp": "^0.35.4",
     "vite": "^8.2.2"
   },
   "dependencies": {
-    "@capacitor/android": "8.4.3",
+    "@capacitor/android": "^8.5.1",
     "@capacitor/app": "^8.1.1",
-    "@capacitor/cli": "8.4.3",
-    "@capacitor/core": "8.4.3",
-    "@capacitor/ios": "8.4.3"
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.5.1"
+  },
+  "overrides": {
+    "qs": "6.16.0",
+    "xcode": {
+      "uuid": "11.1.1"
+    },
+    "gaxios": {
+      "uuid": "11.1.1"
+    },
+    "@google-cloud/pubsub": {
+      "@opentelemetry/core": "2.11.0"
+    },
+    "firebase-tools": {
+      "csv-parse": "7.0.2"
+    },
+    "teeny-request": {
+      "uuid": "11.1.1"
+    }
   }
 }

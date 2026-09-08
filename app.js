@@ -187,7 +187,7 @@
     const solo = `<button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
       ${formatBlock("multi", "Multijugador", "Un solo móvil o varios.", multi)}
-      ${formatBlock("solo", "Solitario", "Reto diario o partida libre.", solo)}
+      <div class="direct-solo">${solo}</div>
     </section>`;
   }
 
@@ -205,7 +205,7 @@
   }
 
   function competitionPromo() {
-    return `${loadCompetition() ? '<button class="btn btn-primary btn-block" data-action="resume-competition">Continuar competición guardada →</button>' : ""}<button class="comp-promo" data-action="start-competition">
+    return `${loadCompetition() ? '<button class="btn btn-primary btn-block" data-action="resume-competition">Continuar competición guardada →</button>' : ""}<div class="field"><label for="competition-length">Duración de la competición</label><select id="competition-length"><option value="3">Corta · 3 temas</option><option value="5">Media · 5 temas</option><option value="14" selected>Completa · todos los temas</option></select></div><button class="comp-promo" data-action="start-competition">
       <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
       <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
     </button>`;
@@ -232,10 +232,18 @@
     </nav>`;
   }
 
+  function quickActions() {
+    const resume = game && !game.winners;
+    const room = CT.Storage.getItem("continuum-last-room");
+    return '<section class="quick-actions" aria-label="Jugar ahora"><button class="btn btn-primary" data-action="quick-play">Jugar · ' + escapeHtml(currentMode().name) + '</button>'
+      + (resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '')
+      + (loadSolo() ? '<button class="btn btn-secondary" data-action="resume-solo">Continuar solitario</button>' : '')
+      + (room && /^[A-Z0-9]{8}$/.test(room) ? '<button class="btn btn-secondary" data-action="resume-room">Volver a mi sala</button>' : '') + '</section>';
+  }
   function home() {
     screen = "home";
     paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      ${homeMasthead()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
+      ${homeMasthead()}${quickActions()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
       <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section></div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
@@ -363,7 +371,8 @@
             <div class="field"><label for="starter">La persona más joven</label><select id="starter"><option value="0">Jugador 1</option><option value="1">Jugador 2</option></select></div>
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
           </div>
-          <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle" checked></label>
+          <div class="field"><label for="local-preset">Tipo de partida</label><select id="local-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div>
+          <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"></label>
           <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"></label>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
@@ -533,24 +542,14 @@
     pendingIndex = null;
     const player = currentPlayer();
     const card = cardsById.get(selectedCardId);
-    const previous = index > 0 ? cardsById.get(game.timeline[index - 1]) : null;
-    const next = index < game.timeline.length ? cardsById.get(game.timeline[index]) : null;
-    const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
-    player.hand = player.hand.filter(id => id !== selectedCardId);
-    let returned = false;
-    if (correct) game.timeline.splice(index, 0, selectedCardId);
-    else if (drawCard(player)) {
-      game.discard.push(selectedCardId);
-      // Aparte del descarte, que vuelve al mazo y se puede volver a repartir: para el
-      // repaso final importa que la carta se falló alguna vez, acierte después o no.
-      (game.failed = game.failed || []).push(selectedCardId);
-    } else {
-      // Sin mazo ni descarte no hay nada que robar: la carta vuelve a la mano.
-      player.hand.push(selectedCardId);
-      returned = true;
-      (game.failed = game.failed || []).push(selectedCardId);
-    }
+    const played = CT.Engine.play({...game, hand:player.hand}, selectedCardId, index, id => sortValue(cardsById.get(id)));
+    const {correct, returned} = played;
+    player.hand = played.hand;
+    game.timeline = played.timeline; game.deck = played.deck; game.discard = played.discard;
+    if (played.drawnCardId != null) CT.Powers.claim(game, played.drawnCardId, player.id, game.deck);
+    if (!correct) (game.failed = game.failed || []).push(selectedCardId);
     result = { correct, returned, card, playerName: player.name };
+    CT.Effects.feedback(correct);
     selectedCardId = null;
     // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
     anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", hidden: !!game.ghost?.pending.length }));
@@ -559,11 +558,9 @@
   }
 
   function drawCard(player) {
-    if (!game.deck.length) {
-      game.deck = shuffle(game.discard);
-      game.discard = [];
-    }
-    const id = game.deck.shift();
+    const drawn = CT.Engine.draw(game.deck, game.discard);
+    game.deck = drawn.deck; game.discard = drawn.discard;
+    const id = drawn.cardId;
     if (id == null) return false;
     player.hand.push(id);
     CT.Powers.claim(game, id, player.id, game.deck);
@@ -666,9 +663,7 @@
   }
 
   function aciertaEn(card, index) {
-    const previous = index > 0 ? cardsById.get(game.timeline[index - 1]) : null;
-    const next = index < game.timeline.length ? cardsById.get(game.timeline[index]) : null;
-    return (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+    return CT.Engine.fits(game.timeline, card.id, index, id => sortValue(cardsById.get(id)));
   }
 
   // Primera mitad del duelo: quien reta coloca y la jugada se guarda sin resolverse. No se
@@ -695,30 +690,22 @@
     // señalarían a otras cartas.
     const cartas = game.timeline.map(id => cardsById.get(id));
     const posiciones = { by: posicionEnLinea(byIndex, cartas), target: posicionEnLinea(index, cartas) };
-    let gift = null;
-    let penaltySkipped = false;
-    if (byOk || targetOk) game.timeline.splice(byOk ? byIndex : index, 0, cardId);
-    else {
-      game.discard.push(cardId);
-      (game.failed = game.failed || []).push(cardId);
-    }
-    if (byOk && !targetOk) {
-      // Una partida guardada antes del duelo no traía la carta apalabrada: se sortea ahora.
-      const giftId = game.pulseTurn.giftId != null && player.hand.includes(game.pulseTurn.giftId)
-        ? game.pulseTurn.giftId
-        : player.hand[Math.floor(Math.random() * player.hand.length)];
-      player.hand = player.hand.filter(id => id !== giftId);
-      target.hand.push(giftId);
+    const giftId = player.hand.includes(game.pulseTurn.giftId) ? game.pulseTurn.giftId
+      : player.hand[Math.floor(Math.random() * player.hand.length)];
+    const resolved = CT.Engine.pulse({...game, byHand:player.hand, targetHand:target.hand},
+      {...game.pulseTurn, giftId}, index, id => sortValue(cardsById.get(id)));
+    game.timeline = resolved.timeline; game.deck = resolved.deck; game.discard = resolved.discard;
+    player.hand = resolved.byHand; target.hand = resolved.targetHand;
+    const penaltySkipped = resolved.penaltySkipped;
+    const gift = resolved.giftId == null ? null : cardsById.get(resolved.giftId);
+    if (!byOk && !targetOk) (game.failed = game.failed || []).push(cardId);
+    if (gift) {
       target.shieldRound = game.round;
-      // Quien la recibe la ve al resolverse el duelo, y se la recuerda su pantalla de paso.
-      game.pulseGift = { to: target.id, cardId: giftId, from: player.name };
-      gift = cardsById.get(giftId);
-    } else if (!byOk) {
-      // Nunca falla cuando los dos fallan: la carta del reto acaba de entrar en el
-      // descarte, así que hay al menos una que robar aunque el mazo estuviera vacío.
-      penaltySkipped = !drawCard(player);
+      game.pulseGift = {to:target.id, cardId:gift.id, from:player.name};
     }
+    if (resolved.drawnCardId != null) CT.Powers.claim(game, resolved.drawnCardId, player.id, game.deck);
     game.pulseTurn = null;
+    CT.Effects.feedback(targetOk);
     pendingIndex = null;
     result = {
       correct: byOk, card, pulse: true, duel: true, targetOk,
@@ -775,18 +762,18 @@
       overlay(`<div class="overlay"><div class="modal pulse-duel-modal">
         <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
         <h2>${escapeHtml(card.title)}</h2>
-        <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>
+        <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(selectedModeKey, card)}</div>
         <div class="pulse-duel-rows">
           ${marcador({ name: result.byName, ok: result.correct, donde: result.posiciones.by })}
           ${marcador({ name: result.targetName, ok: result.targetOk, donde: result.posiciones.target })}
         </div>
         ${duelOutcome(result)}
-        <button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button>
+        <button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button>
       </div></div>`);
       return;
     }
     const desenlace = `<p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(selectedModeKey, card)}</div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   // Las cuatro salidas del duelo, contadas desde la mesa y no desde nadie en concreto.
@@ -826,10 +813,11 @@
   // Devuelve true si la partida ha terminado. Nadie puede empezar un turno con la mano
   // vacía: o gana, o el desempate le da una carta, o se acaba la partida por falta de mazo.
   function resolveRound() {
-    const empty = game.players.filter(player => player.hand.length === 0);
-    if (empty.length === 1) return endGame(empty);
+    const players = Object.fromEntries(game.players.map(player => [player.id, player]));
+    const outcome = CT.Engine.roundOutcome(game.players.map(player => player.id), players, game.deck.length + game.discard.length);
+    const empty = outcome.empty.map(id => players[id]);
+    if (outcome.ended) return endGame(empty);
     if (empty.length > 1) {
-      if (game.deck.length + game.discard.length < empty.length) return endGame(empty);
       empty.forEach(drawCard);
       showToast("Empate: una carta extra para cada finalista");
     }
@@ -1370,6 +1358,7 @@
     (solo.sequence = solo.sequence || []).push(correct);
     pendingIndex = null;
     result = { correct, card, solo: true };
+    CT.Effects.feedback(correct);
     solo.pendingResult = { correct, cardId: card.id };
     anotaLogros(CT.Progreso.record({ mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() }));
     saveSolo();
@@ -1382,7 +1371,7 @@
     const era = eraForCard(card);
     const acabada = soloAcabada();
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(selectedModeKey, card)}</div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
@@ -1610,7 +1599,7 @@
     if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${solo.duelo.rival.nombre || "quien te reta"}` : "Duelo · tu tirada";
     // El tema no va aquí: lo lleva su propio rótulo encima del marcador, que es lo que
     // recuerda a qué se está jugando cuando el cartel del principio ya se ha ido.
-    if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${TOTAL_TEMAS - comp.queue.length} de ${TOTAL_TEMAS}`;
+    if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${(comp.totalThemes || TOTAL_TEMAS) - comp.queue.length} de ${comp.totalThemes || TOTAL_TEMAS}`;
     return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
@@ -1652,7 +1641,8 @@
     if (loadCompetition()) { resumeCompetition(); return; }
     solo = null;
     previousModeKey = selectedModeKey;
-    comp = { decks: CT.Saves.clone(Object.fromEntries(COMP_MODES.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(COMP_MODES), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp = { decks: CT.Saves.clone(Object.fromEntries(COMP_MODES.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(COMP_MODES).slice(0, Number(document.getElementById("competition-length")?.value) || COMP_MODES.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp.totalThemes = comp.queue.length;
     compRoundIntro();
   }
 
@@ -1812,11 +1802,19 @@
     }
   });
 
+  app.addEventListener("change", event => {
+    if (event.target.id !== "local-preset") return;
+    const advanced = event.target.value === "advanced";
+    document.getElementById("ghost-toggle").checked = advanced;
+    document.getElementById("pulse-toggle").checked = advanced;
+  });
   app.addEventListener("click", event => {
     const target = event.target.closest("[data-action]");
     if (!target) return;
     const action = target.dataset.action;
-    if (action === "home") home();
+    if (action === "quick-play") playMenu();
+    else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
+    else if (action === "home") home();
     else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
     else if (action === "home-collection") document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }
@@ -1908,16 +1906,22 @@
   // en curso pregunta antes de abandonarla, igual que el resto del juego; cualquier otra
   // pantalla vuelve al inicio; y desde el inicio, el gesto cierra la aplicación.
   if (window.Capacitor?.isNativePlatform?.()) {
-    window.Capacitor.Plugins?.App?.addListener("backButton", () => {
+    const nativeApp = window.Capacitor.registerPlugin?.('App') || window.Capacitor.Plugins?.App;
+    nativeApp?.addListener?.("backButton", () => {
       if (CT.backPressed()) return;
       if (screen === "game") { gameMenu(); return; }
       if (screen !== "home") { home(); return; }
-      window.Capacitor.Plugins.App.exitApp();
+      nativeApp.exitApp();
     });
   }
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
-  const params = new URLSearchParams(location.search);
+  CT.Links.start(target => {
+    if (CT.isSessionActive() && !confirm('¿Abrir la invitación? Tu partida local quedará guardada.')) return;
+    if (target.room) launchOnline(target.room);
+    else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo); }
+  });
+  const params = new URLSearchParams(location.hash.slice(1) || location.search);
   const invitedRoom = params.get("room") || "";
   const duelPayload = params.get("duelo") || "";
   if (invitedRoom) launchOnline(invitedRoom);

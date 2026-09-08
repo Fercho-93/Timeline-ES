@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAT-ELQvHrBdMaCdxJNUJzDRwq1jOOwI44",
@@ -22,7 +22,7 @@ const CT = window.CONTINUUM;
 const { escapeHtml, initials, shuffle, announce } = CT;
 // Igual que en el juego local: pintar conserva el foco del teclado, y las capas se abren
 // como diálogos de verdad. Está en `a11y.js`, compartido por los dos motores.
-const paint = (html, pantalla) => CT.paint(appEl, html, pantalla);
+const paint = (html, pantalla) => { CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
 const abreCapa = (capa, cerrable) => CT.openDialog(capa, cerrable);
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -36,11 +36,84 @@ let pendingIndex = null;
 let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
+let lastEffectVersion = null;
 let turnTimerHandle = null;
 // Cada turno tiene 20 segundos para colocar la carta; si se agotan, pasa al siguiente
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
 // en todos los móviles aunque sus relojes no coincidan.
-const TURN_SECONDS = 20;
+const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
+const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
+let presenceRoom = "", presenceTimer = null, presenceBusy = false;
+const presenceListeners = new Map(), presenceRecords = new Map();
+let connectionMessage = "Conectando con la sala…";
+function stopPresence() {
+  clearInterval(presenceTimer); presenceTimer = null; presenceRoom = "";
+  for (const stop of presenceListeners.values()) stop();
+  presenceListeners.clear(); presenceRecords.clear();
+}
+async function heartbeat() {
+  if (presenceBusy || !roomRef || !user || !navigator.onLine) return;
+  presenceBusy = true;
+  const code = roomCode, sent = performance.now();
+  try {
+    const reference = doc(db, "rooms", code, "presence", user.uid);
+    await setDoc(reference, { seenAt: serverTimestamp(), visible: document.visibilityState === "visible" });
+    const confirmed = await getDoc(reference);
+    if (code !== roomCode) return;
+    const time = confirmed.data()?.seenAt?.toMillis?.();
+    CT.Session.calibrate(time, sent);
+    connectionMessage = "Conexión confirmada";
+  } catch { connectionMessage = "Sin confirmación del servidor. Conserva esta pantalla y reintenta al volver la conexión."; }
+  finally { presenceBusy = false; renderPresence(); }
+}
+function ensurePresence() {
+  if (presenceRoom !== roomCode) {
+    stopPresence(); presenceRoom = roomCode;
+    void heartbeat();
+    presenceTimer = setInterval(() => { if (document.visibilityState === "visible") void heartbeat(); }, 45000);
+  }
+  for (const uid of roomState.playerOrder) {
+    if (presenceListeners.has(uid)) continue;
+    const stop = onSnapshot(doc(db, "rooms", roomCode, "presence", uid), snap => {
+      const p = snap.data();
+      if (p?.seenAt?.toMillis) presenceRecords.set(uid, { seenAt: p.seenAt.toMillis(), visible: p.visible });
+      renderPresence();
+    }, () => { connectionMessage = "La presencia requiere las reglas actualizadas de la sala."; renderPresence(); });
+    presenceListeners.set(uid, stop);
+  }
+  for (const [uid, stop] of presenceListeners) if (!roomState.playerOrder.includes(uid)) { stop(); presenceListeners.delete(uid); presenceRecords.delete(uid); }
+}
+function canClaimHost() {
+  if (!roomState || !user || roomState.hostUid === user.uid || !navigator.onLine || roomState.status === "ended") return false;
+  const now = CT.Session.now(), host = presenceRecords.get(roomState.hostUid);
+  const last = host?.seenAt ?? roomState.updatedAt?.toMillis?.();
+  return now !== null && Number.isFinite(last) && now - last > (host?.visible === false ? 15000 : 90000);
+}
+function renderPresence() {
+  if (!roomState || !user) return;
+  const shell = appEl.querySelector(".shell");
+  if (!shell) return;
+  let box = shell.querySelector("#room-connection");
+  if (!box) { box = document.createElement("aside"); box.id = "room-connection"; box.className = "room-connection"; shell.querySelector("header")?.after(box); }
+  const current = roomState.playerOrder[roomState.current];
+  const task = roomState.phase === "pulse" ? (roomState.pulseTurn?.stage === "defensa" ? roomState.pulseTurn.targetUid : current) : current;
+  const instruction = roomState.status === "playing" ? (roomState.phase === "reveal" ? "Resultado listo: podéis continuar." : task === user.uid ? (roomState.phase === "pulse" ? "Te toca colocar la carta del Pulso." : "Te toca elegir una carta y colocarla.") : "Esperando a " + (roomState.players[task]?.name || "otro participante") + ".") : "";
+  box.innerHTML = '<p role="status">' + escapeHtml(navigator.onLine ? connectionMessage : "Sin conexión. La sala se recuperará al volver la red.") + ' ' + escapeHtml(instruction) + '</p><details><summary>Conexión de participantes</summary><ul>'
+    + roomState.playerOrder.map(uid => '<li>' + escapeHtml(roomState.players[uid].name) + ': ' + escapeHtml(CT.Session.presence(presenceRecords.get(uid))) + '</li>').join("") + '</ul></details>'
+    + (canClaimHost() ? '<button class="btn btn-secondary" data-online-action="claim-host">Tomar relevo del anfitrión</button>' : '');
+}
+async function claimHost() {
+  if (busy || !canClaimHost()) return;
+  busy = true;
+  try {
+    await runTransaction(db, async tx => {
+      const current = (await tx.get(roomRef)).data();
+      if (!current.playerOrder.includes(user.uid) || current.status === "ended") throw Error("Sala no disponible");
+      tx.update(roomRef, { hostUid: user.uid, version: current.version + 1, updatedAt: serverTimestamp() });
+    });
+  } catch { showToast("El anfitrión ha vuelto o alguien ya tomó el relevo. La sala sigue guardada."); }
+  finally { busy = false; }
+}
 
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
 function modeKey() { return roomState?.mode || selectedModeKey; }
@@ -110,7 +183,7 @@ function cleanCode(value) {
 }
 
 function invitationUrl(code = roomCode) {
-  const url = new URL(location.href);
+  const url = new URL(CT.Links.base());
   url.search = "";
   url.hash = "";
   url.searchParams.set("room", code);
@@ -246,7 +319,20 @@ function rememberedRoom(code) {
   catch { return null; }
 }
 
+let protectionReady;
+async function ensureProtection() {
+  const config = CT.Deployment;
+  if (!config?.appCheckSiteKey || window.Capacitor?.isNativePlatform?.()) {
+    if (config?.audience === 'public') throw Error('Falta configurar la protección de las salas para esta plataforma.');
+    return;
+  }
+  protectionReady ||= import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js').then(({initializeAppCheck,ReCaptchaEnterpriseProvider}) => {
+    initializeAppCheck(firebaseApp,{provider:new ReCaptchaEnterpriseProvider(config.appCheckSiteKey),isTokenAutoRefreshEnabled:true});
+  }).catch(error => { protectionReady=null; throw error; });
+  await protectionReady;
+}
 async function ensureAuth() {
+  await ensureProtection();
   if (auth.currentUser) {
     user = auth.currentUser;
     return user;
@@ -303,7 +389,9 @@ async function createRoom(name) {
     await ensureAuth();
     const code = createRoomCode();
     const reference = doc(db, "rooms", code);
-    await setDoc(reference, {
+    const batch = writeBatch(db);
+    batch.set(doc(db,'roomCreation',user.uid),{lastCreatedAt:serverTimestamp(),roomCode:code});
+    batch.set(reference, {
       roomCode: code,
       mode: selectedModeKey,
       deckFingerprint: CT.deckFingerprint(selectedModeKey),
@@ -311,19 +399,20 @@ async function createRoom(name) {
       status: "lobby",
       phase: "lobby",
       version: 1,
-      handSize: 4,
+      handSize: 4, turnSeconds: 30,
       playerOrder: [user.uid],
-      players: { [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 38 } },
+      players: { [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 40 } },
       deck: [], discard: [], timeline: [], current: 0, starter: user.uid,
       turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
       createdAt: serverTimestamp(), updatedAt: serverTimestamp()
     });
+    await batch.commit();
     rememberRoom(code, name);
     history.replaceState({}, "", invitationUrl(code));
     connectToRoom(code);
   } catch (error) {
     console.error(error);
-    showToast("No se pudo crear la sala. Revisa Firestore y sus reglas.");
+    showToast("No se pudo crear la sala. Espera 30 segundos entre salas y comprueba la conexión.");
   } finally { busy = false; }
 }
 
@@ -346,7 +435,7 @@ async function joinRoom(code, name) {
       if (data.status !== "lobby") throw new Error("ALREADY_STARTED");
       if (data.playerOrder.length >= 9) throw new Error("ROOM_FULL");
       transaction.update(reference, {
-        players: { ...data.players, [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 38 } },
+        players: { ...data.players, [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 40 } },
         playerOrder: [...data.playerOrder, user.uid],
         version: data.version + 1,
         updatedAt: serverTimestamp()
@@ -365,7 +454,9 @@ function connectToRoom(code) {
   unsubscribeRoom?.();
   roomCode = code;
   roomRef = doc(db, "rooms", code);
+  CT.Storage.setItem("continuum-last-room", code);
   seenSelfInRoom = false;
+  lastEffectVersion = null;
   unsubscribeRoom = onSnapshot(roomRef, snapshot => {
     if (!snapshot.exists()) {
       // Mismo motivo: una caché aún sin la sala no significa que la hayan cerrado.
@@ -386,10 +477,16 @@ function connectToRoom(code) {
       leaveOnline("Ya no estás en esta sala");
       return;
     }
+    ensurePresence();
     if (roomState.phase !== "turn") pendingIndex = null;
     anotaProgreso();
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
+    else if (roomState.phase === "tiebreak") {
+      clearTurnTimer();
+      paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Repartiendo el desempate</h1><p>Quedan ${roomState.tieQueue.length} cartas por repartir. La partida continúa cuando termine el reparto.</p><button class="btn btn-primary" data-online-action="continue-tie">Continuar reparto</button></div>`, 'online-tiebreak');
+      if (!snapshot.metadata.fromCache) void continueTie();
+    }
     else renderGame();
   }, error => {
     console.error(error);
@@ -404,6 +501,8 @@ function connectToRoom(code) {
 // ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
 // entre recargas qué versiones de la sala ya vio.
 function anotaProgreso() {
+  if (lastEffectVersion !== null && lastEffectVersion !== roomState.version && roomState.phase === "reveal" && roomState.reveal?.playerUid === user.uid) CT.Effects.feedback(roomState.reveal.correct);
+  lastEffectVersion = roomState.version;
   const nuevos = [];
   if (roomState.phase === "reveal" && roomState.reveal) {
     const { reveal } = roomState;
@@ -432,7 +531,7 @@ function renderLobby() {
   paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button>${isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>'}`)}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
     <div class="online-lobby-grid"><section class="panel"><div class="section-label">Participantes <small>${people.length}/9</small></div><div class="lobby-players">${roomState.playerOrder.map((uid, index) => { const player = roomState.players[uid]; return `<div class="lobby-player"><span>${escapeHtml(initials(player.name))}</span><div><strong>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</strong><small>${uid === roomState.hostUid ? "Anfitrión" : `Participante ${index + 1}`}</small></div>${isHost && uid !== roomState.hostUid ? `<button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button>` : "<i>✓</i>"}</div>`; }).join("")}</div></section>
-      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir. Requiere reglas v38.</small></span><input type="checkbox" id="online-ghost" checked></label><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
+      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds"><option value="0">Sin límite</option><option value="20">20 segundos</option><option value="30" selected>30 segundos</option><option value="45">45 segundos</option></select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir. Requiere reglas v39.</small></span><input type="checkbox" id="online-ghost"></label><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
     </div>
   </div>`, "online-lobby");
 }
@@ -452,7 +551,7 @@ async function startRoom(withGhost = true) {
       // El anfitrión pudo abrir la sala y esperar con la pestaña de fondo mientras la
       // aplicación se actualizaba sola: se comprueba también aquí, no solo al entrar.
       if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
-      if ((enableGhost || pulse) && data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < 38)) throw new Error("UPDATE_CLIENTS");
+      if (data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < 40)) throw new Error("UPDATE_CLIENTS");
       const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
       const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
       const powers = CT.Powers.create(deck, data.playerOrder.length, actualHand, enableGhost, pulse);
@@ -461,7 +560,7 @@ async function startRoom(withGhost = true) {
       const timeline = [deck.shift()];
       data.playerOrder.forEach(uid => players[uid].hand.forEach(id => CT.Powers.claim(powers, id, uid, deck)));
       transaction.update(roomRef, {
-        handSize: actualHand, pulse, ...(powers.ghost ? { ghost: powers.ghost } : {}), ...(powers.pulsePower ? { pulsePower: powers.pulsePower } : {}), players, deck, timeline, discard: [], status: "playing", phase: "turn",
+        handSize: actualHand, turnSeconds: Number(document.getElementById("online-turn-seconds")?.value ?? 30), pulse, ...(powers.ghost ? { ghost: powers.ghost } : {}), ...(powers.pulsePower ? { pulsePower: powers.pulsePower } : {}), players, deck, timeline, discard: [], status: "playing", phase: "turn",
         current: data.playerOrder.indexOf(starterUid), starter: starterUid,
         turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, pulseTurn: null,
         turnStartedAt: serverTimestamp(),
@@ -470,7 +569,7 @@ async function startRoom(withGhost = true) {
     });
   } catch (error) {
     console.error(error);
-    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? "Para usar los poderes, actualizad todos los móviles a v38 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v38 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
+    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? "Para usar esta sala, actualizad todos los móviles a v39 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v39 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
   } finally { busy = false; }
 }
 
@@ -478,35 +577,18 @@ function clearTurnTimer() {
   if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; }
 }
 
-function turnDeadline() {
-  const started = roomState.turnStartedAt;
-  // Antes de que el servidor confirme la escritura, la caché local todavía puede llevar
-  // `serverTimestamp()` sin resolver (null); mientras tanto se cuenta desde ahora y el
-  // reloj se corrige solo en cuanto llegue la instantánea confirmada.
-  const startedMs = started && typeof started.toMillis === "function" ? started.toMillis() : Date.now();
-  return startedMs + TURN_SECONDS * 1000;
-}
-
-// Solo el anfitrión puede saltar un turno (`skipTurn`), así que es su móvil el que vigila
-// el reloj y lo hace pasar solo si a nadie le da tiempo a jugar. El resto de móviles solo
-// enseñan la cuenta atrás.
+function turnRemaining() { return CT.Session.remaining(roomState?.turnStartedAt?.toMillis?.(), turnSeconds()); }
 function manageTurnTimer() {
   clearTurnTimer();
-  if (!roomState || roomState.status !== "playing" || roomState.phase !== "turn") return;
-  const deadline = turnDeadline();
+  if (!roomState || roomState.status !== "playing" || roomState.phase !== "turn" || !turnSeconds()) return;
   const tick = () => {
-    const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    const remaining = turnRemaining();
     const value = document.getElementById("turn-timer-value");
-    if (value) value.textContent = remaining;
-    const badge = document.getElementById("turn-timer");
-    if (badge) badge.classList.toggle("turn-timer-low", remaining <= 5);
-    if (remaining <= 0) {
-      clearTurnTimer();
-      if (roomState.hostUid === user.uid) skipTurn();
-    }
+    if (value) value.textContent = remaining ?? "…";
+    document.getElementById("turn-timer")?.classList.toggle("turn-timer-low", remaining !== null && remaining <= 5);
+    if (remaining === 0 && roomState.hostUid === user.uid && navigator.onLine) { clearTurnTimer(); skipTurn(roomState.version); }
   };
-  tick();
-  turnTimerHandle = setInterval(tick, 250);
+  tick(); turnTimerHandle = setInterval(tick, 250);
 }
 
 function renderGame() {
@@ -556,11 +638,11 @@ function renderGame() {
   // El primer pintado ya arranca con la cuenta atrás en su punto real, no siempre en 20:
   // quien abre la sala a mitad de turno ve lo que de verdad queda, no un contador que
   // vuelve a empezar de cero en su pantalla.
-  const turnRemaining = roomState.phase === "turn" ? Math.max(0, Math.ceil((turnDeadline() - Date.now()) / 1000)) : null;
+  const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? "…") : null;
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="room">Sala</button>')}
     <div class="connection-strip"><span><i></i> Sala ${roomCode}</span><small>${roomState.playerOrder.length} participantes</small></div>
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
-    <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${turnRemaining !== null ? `<div class="turn-timer ${turnRemaining <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${turnRemaining}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
     ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
@@ -610,8 +692,8 @@ function revealOverlay(currentUid) {
   // El título de la carta que cambia de mano solo lo ven las dos personas implicadas: el
   // resto de la sala se entera de que hubo trasvase, pero no de cuál era la carta.
   const implicado = reveal.pulse && (user.uid === reveal.playerUid || user.uid === reveal.targetUid);
-  const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
-  const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
+  const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-dialog-focus data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
+  const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(modeKey(), card)}</div>`;
   // Un duelo no lo gana ni lo pierde una sola persona, así que no lleva la marca grande de
   // acierto: cada jugada trae la suya y debajo se cuenta el desenlace.
   if (reveal.duel) {
@@ -662,27 +744,11 @@ async function placeCard(index) {
       const data = snapshot.data();
       const currentUid = data.playerOrder[data.current];
       if (data.status !== "playing" || data.phase !== "turn" || currentUid !== user.uid) throw new Error("NOT_TURN");
-      const hand = [...data.players[user.uid].hand];
-      if (!hand.includes(playedId)) throw new Error("NO_CARD");
-      const card = getCard(playedId);
-      const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
-      const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
-      const correct = (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
-      hand.splice(hand.indexOf(playedId), 1);
-      const timeline = [...data.timeline];
-      let deck = [...data.deck];
-      let discard = [...data.discard];
+      const played = CT.Engine.play({...data, hand:data.players[user.uid].hand}, playedId, index, id => sortValue(getCard(id)));
+      const {hand, timeline, deck, discard, correct, returned} = played;
       const ghost = data.ghost ? structuredClone(data.ghost) : null;
       const pulsePower = data.pulsePower ? structuredClone(data.pulsePower) : null;
-      let returned = false;
-      if (correct) timeline.splice(index, 0, playedId);
-      else {
-        const drawn = takeCard(deck, discard);
-        deck = drawn.deck; discard = drawn.discard;
-        if (drawn.cardId != null) { hand.push(drawn.cardId); discard.push(playedId); CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, user.uid, deck); }
-        // Sin mazo ni descarte no hay nada que robar: la carta vuelve a la mano.
-        else { hand.push(playedId); returned = true; }
-      }
+      if (played.drawnCardId != null) CT.Powers.claim({ghost, pulsePower}, played.drawnCardId, user.uid, deck);
       const players = { ...data.players, [user.uid]: { ...data.players[user.uid], hand } };
       transaction.update(roomRef, {
         players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, timeline, phase: "reveal",
@@ -819,10 +885,7 @@ async function placePulse(index) {
 }
 
 function aciertaEn(data, cardId, index) {
-  const card = getCard(cardId);
-  const previous = index > 0 ? getCard(data.timeline[index - 1]) : null;
-  const next = index < data.timeline.length ? getCard(data.timeline[index]) : null;
-  return (!previous || sortValue(card) >= sortValue(previous)) && (!next || sortValue(card) <= sortValue(next));
+  return CT.Engine.fits(data.timeline, cardId, index, id => sortValue(getCard(id)));
 }
 
 // Segunda mitad: defiende quien ha sido retado, y su transacción reparte las
@@ -842,32 +905,16 @@ async function defendPulse(index) {
       // tendrían que validar por su cuenta.
       const byUid = data.playerOrder[data.current];
       if (data.pulseTurn.stage !== "defensa" || targetUid !== user.uid) throw new Error("NOT_DEFENSE");
-      const targetOk = aciertaEn(data, cardId, index);
-      const timeline = [...data.timeline];
-      let deck = [...data.deck];
-      let discard = [...data.discard];
-      const players = { ...data.players };
+      const resolved = CT.Engine.pulse({...data, byHand:data.players[byUid].hand, targetHand:data.players[user.uid].hand},
+        data.pulseTurn, index, id => sortValue(getCard(id)));
+      const {targetOk, timeline, deck, discard, penaltySkipped} = resolved;
+      const players = {...data.players,
+        [byUid]: {...data.players[byUid], hand:resolved.byHand},
+        [user.uid]: {...data.players[user.uid], hand:resolved.targetHand}};
+      if (resolved.giftId != null) players[user.uid].shieldRound = data.round;
       const ghost = data.ghost ? structuredClone(data.ghost) : null;
       const pulsePower = data.pulsePower ? structuredClone(data.pulsePower) : null;
-      const penaltySkipped = !byOk && targetOk && !deck.length && !discard.length;
-      // La carta se queda si alguno supo colocarla, en el hueco de quien acertó.
-      if (byOk || targetOk) timeline.splice(byOk ? data.pulseTurn.byIndex : index, 0, cardId);
-      else discard.push(cardId);
-      if (byOk && !targetOk) {
-        const mano = [...players[byUid].hand];
-        mano.splice(mano.indexOf(giftId), 1);
-        players[byUid] = { ...players[byUid], hand: mano };
-        players[user.uid] = { ...players[user.uid], hand: [...players[user.uid].hand, giftId], shieldRound: data.round };
-      } else if (!byOk) {
-        // Fallar el reto lo paga solo quien lo lanzó: a quien defiende no le pasa nada,
-        // y por eso nadie sin opciones puede fallar aposta para acercar a otro al final.
-        const drawn = takeCard(deck, discard);
-        deck = drawn.deck; discard = drawn.discard;
-        if (drawn.cardId != null) {
-          players[byUid] = { ...players[byUid], hand: [...players[byUid].hand, drawn.cardId] };
-          CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, byUid, deck);
-        }
-      }
+      if (resolved.drawnCardId != null) CT.Powers.claim({ghost, pulsePower}, resolved.drawnCardId, byUid, deck);
       transaction.update(roomRef, {
         players, ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, timeline, phase: "reveal", pulseTurn: null,
         reveal: {
@@ -887,15 +934,13 @@ async function defendPulse(index) {
 }
 
 function takeCard(deckInput, discardInput) {
-  let deck = [...deckInput];
-  let discard = [...discardInput];
-  if (!deck.length && discard.length) { deck = shuffle(discard); discard = []; }
-  return { cardId: deck.shift(), deck, discard };
+  return CT.Engine.draw(deckInput, discardInput);
 }
 
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
+  let needsTie = false;
   try {
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
@@ -911,19 +956,17 @@ async function finishTurn() {
       let deck = [...data.deck];
       let discard = [...data.discard];
       if (turnsInRound >= data.playerOrder.length) {
-        const empty = data.playerOrder.filter(uid => players[uid].hand.length === 0);
+        const {empty, ended} = CT.Engine.roundOutcome(data.playerOrder, players, deck.length + discard.length);
         // Sin cartas suficientes para el desempate la partida termina compartida:
         // si no, a esas personas les llegaría el turno con la mano vacía.
-        if (empty.length === 1 || (empty.length > 1 && deck.length + discard.length < empty.length)) {
+        if (ended) {
           transaction.update(roomRef, { status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
         }
         if (empty.length > 1) {
-          empty.forEach(uid => {
-            const drawn = takeCard(deck, discard);
-            deck = drawn.deck; discard = drawn.discard;
-            if (drawn.cardId != null) { players[uid] = { ...players[uid], hand: [...players[uid].hand, drawn.cardId] }; CT.Powers.claim({ ghost, pulsePower }, drawn.cardId, uid, deck); }
-          });
+          transaction.update(roomRef, {phase:'tiebreak',tieQueue:empty,reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
+          needsTie = true;
+          return;
         }
         turnsInRound = 0;
         round += 1;
@@ -941,6 +984,44 @@ async function finishTurn() {
       showToast("No se pudo avanzar el turno");
     }
   } finally { busy = false; }
+  if (needsTie) await continueTie();
+}
+
+async function continueTie(retries = 1) {
+  if (busy || !roomRef) return;
+  busy = true;
+  let attemptedVersion, retry = false;
+  try {
+    for (let step=0;step<10;step++) {
+      const more = await runTransaction(db, async transaction => {
+        const data=(await transaction.get(roomRef)).data();
+        attemptedVersion = data?.version;
+        if (data?.phase !== 'tiebreak' || !data.playerOrder.includes(user.uid)) return false;
+        const ghost=data.ghost ? structuredClone(data.ghost) : null;
+        if (!data.tieQueue.length) {
+          CT.Ghost.advance(ghost,data.playerOrder[data.current],data.playerOrder);
+          transaction.update(roomRef,{...(ghost?{ghost}:{}),phase:'turn',current:(data.current+1)%data.playerOrder.length,round:data.round+1,turnsInRound:0,turnStartedAt:serverTimestamp(),version:data.version+1,updatedAt:serverTimestamp()});
+          return false;
+        }
+        const who=data.tieQueue[0], drawn=takeCard(data.deck,data.discard);
+        if (drawn.cardId == null) throw Error('Desempate sin cartas');
+        const pulsePower=data.pulsePower ? structuredClone(data.pulsePower) : null;
+        CT.Powers.claim({ghost,pulsePower},drawn.cardId,who,drawn.deck);
+        transaction.update(roomRef,{players:{...data.players,[who]:{...data.players[who],hand:[drawn.cardId]}},deck:drawn.deck,discard:drawn.discard,tieQueue:data.tieQueue.slice(1),...(ghost?{ghost}:{}),...(pulsePower?{pulsePower}:{}),version:data.version+1,updatedAt:serverTimestamp()});
+        return true;
+      });
+      if (!more) break;
+    }
+  } catch(error) {
+    let latest;
+    try { latest=(await getDoc(roomRef)).data(); } catch { /* Se conserva la cola para reintentar con conexión. */ }
+    if (latest && latest.version !== attemptedVersion && latest.playerOrder.includes(user.uid)) {
+      retry = latest.phase === 'tiebreak' && retries > 0;
+      if (latest.phase === 'tiebreak' && !retry) showToast('Otra persona está continuando el reparto.');
+    } else { console.error(error); showToast('El desempate sigue guardado. Pulsa Continuar reparto para reintentarlo.'); }
+  }
+  finally { busy=false; }
+  if (retry) await continueTie(retries - 1);
 }
 
 function renderWinner() {
@@ -993,7 +1074,7 @@ function roomMenu() {
 }
 
 // El anfitrión desatasca la partida cuando alguien se queda sin batería o sin cobertura.
-async function skipTurn() {
+async function skipTurn(expectedVersion = null) {
   if (busy || roomState?.hostUid !== user.uid || roomState?.status !== "playing") return;
   busy = true;
   try {
@@ -1001,6 +1082,7 @@ async function skipTurn() {
       const snapshot = await transaction.get(roomRef);
       const data = snapshot.data();
       if (data.hostUid !== user.uid || data.status !== "playing") throw new Error("NOT_ALLOWED");
+      if (expectedVersion !== null && (data.version !== expectedVersion || data.phase !== "turn")) return;
       const ghost = data.ghost ? structuredClone(data.ghost) : null;
       CT.Ghost.advance(ghost, data.playerOrder[data.current], data.playerOrder);
       const roundEnds = data.turnsInRound + 1 >= data.playerOrder.length;
@@ -1096,6 +1178,8 @@ async function closeRoom() {
 // Con mensaje se recarga un momento después, para que dé tiempo a leerlo.
 function leaveOnline(message = "") {
   clearTurnTimer();
+  stopPresence();
+  CT.onlineActive = false;
   unsubscribeRoom?.();
   unsubscribeRoom = null;
   roomState = null;
@@ -1122,7 +1206,10 @@ async function forceResync() {
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") forceResync();
+  void heartbeat();
 });
+window.addEventListener("offline", renderPresence);
+window.addEventListener("online", () => void heartbeat());
 window.addEventListener("online", forceResync);
 window.addEventListener("pageshow", event => { if (event.persisted) forceResync(); });
 
@@ -1141,6 +1228,12 @@ document.addEventListener("submit", event => {
   }
 });
 
+document.addEventListener("change", event => {
+  if (event.target.id !== "online-preset") return;
+  const advanced = event.target.value === "advanced";
+  document.getElementById("online-pulse").checked = advanced;
+  document.getElementById("online-ghost").checked = advanced;
+});
 document.addEventListener("input", event => {
   if (event.target.matches(".room-code-input")) event.target.value = cleanCode(event.target.value);
 });
@@ -1150,6 +1243,7 @@ document.addEventListener("click", event => {
   if (!target) return;
   const action = target.dataset.onlineAction;
   if (action === "back" || action === "leave") leaveOnline();
+  else if (action === "claim-host") claimHost();
   else if (action === "review-timeline") renderTimelineReview();
   else if (action === "back-from-timeline") renderWinner();
   else if (action === "guide") showGuide();
@@ -1178,6 +1272,7 @@ document.addEventListener("click", event => {
   }
   else if (action === "confirm-place") placeCard(pendingIndex);
   else if (action === "cancel-place") { pendingIndex = null; renderGame(); }
+  else if (action === "continue-tie") void continueTie();
   else if (action === "finish-turn") finishTurn();
   else if (action === "close-room") closeRoom();
   else if (action === "room") roomMenu();

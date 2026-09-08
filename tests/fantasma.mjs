@@ -165,19 +165,19 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
 }
 {
   const initial={kind:'free',mode:'history',difficulty:'hard',ghostTurns:[3],day:'2026-08-31',deck:[7,8,9,10,11,12],timeline:[1,2,3,4,5],current:6,lives:3,hits:3,played:3,total:null,finished:false};
-  const w=boot({[soloKey]:initial});abreMazo(w);openFormat(w, 'solo'); click(w,'solo');click(w,'resume-solo');
+  const w=boot({[soloKey]:initial});abreMazo(w);click(w,'solo');click(w,'resume-solo');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,5);
   play(w,true,true);assert.equal(w.document.querySelectorAll('.ghost-card').length,6);
   click(w,'solo-next');assert.equal(w.document.querySelectorAll('.ghost-card').length,0);
   assert.equal(state(w,soloKey).autoAdded.length,2);w.close();
 }
 for (const difficulty of ['easy','normal','hard','expert']) {
-  let w = boot({ 'continuum-difficulty-v1': difficulty }); abreMazo(w); openFormat(w, 'solo'); click(w,'solo'); click(w,'start-free');
+  let w = boot({ 'continuum-difficulty-v1': difficulty }); abreMazo(w); click(w,'solo'); click(w,'start-free');
   let s = state(w,soloKey); const initialTotal=s.deck.length+s.timeline.length+1;
   assert.equal(s.difficulty,difficulty);
   assert.equal(w.document.querySelectorAll('.ghost-card').length,difficulty==='expert'?1:0);
   play(w,false,true); const saved=state(w,soloKey); w.close();
-  w=boot({[soloKey]:saved,'continuum-difficulty-v1':difficulty});abreMazo(w);openFormat(w, 'solo'); click(w,'solo');click(w,'resume-solo');
+  w=boot({[soloKey]:saved,'continuum-difficulty-v1':difficulty});abreMazo(w);click(w,'solo');click(w,'resume-solo');
   assert.ok(w.document.querySelector('.modal'));click(w,'solo-next');
   s=state(w,soloKey);
   assert.equal(s.lives,2);assert.equal(s.hits,0);assert.equal(s.played,1);

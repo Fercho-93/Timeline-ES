@@ -1,0 +1,4800 @@
+{
+  "note": "Completar derechos y procedencia con evidencia del titular. No se presupone que una imagen pública pueda reutilizarse.",
+  "assets": [
+    {
+      "path": "assets/animal-cards/alaska-moose.webp",
+      "sha256": "892af42fcda5c2a4e52a17cc61a75b61fb1d0f28050cc22ba4df9cef25c7d5d5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/american-bison.webp",
+      "sha256": "a1a90cdf276b895be5b5463453e2c2765d90a3bf98c0ba3b4f1337b2753366a9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/american-black-bear.webp",
+      "sha256": "00bc1cbe99c3f93c3e51689d9287f43db4998d9b00455bae28a9522117ee292a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/american-cockroach.webp",
+      "sha256": "cf84113367675b094d55525ecf70506a95b0109c32ad9d2928d61dd3c1a66d63",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/american-pronghorn.webp",
+      "sha256": "6b494f6afcdb44c4146913ad239f4943ee221d73c82a21030f3ee19c0cefa550",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/australian-dragonfly.webp",
+      "sha256": "1d471690f7cdbc940fcb18a952c78dbee121db2df643926dd957cf8a38d6846a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/bee.webp",
+      "sha256": "0670208f7078cd92f6ed7aa48a3a05765e5438ca182fdecfda562ccf15d1cc27",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/bengal-tiger.webp",
+      "sha256": "9cce2b7fab2d7258da6a377f4f1ed1e1d7e04530a53e219071ae076c57450fcf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/black-coral.webp",
+      "sha256": "c7bb0341349e1a00d8c108e718facea8371c22d495621bc15d2635a4c8ceaf98",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/black-mamba.webp",
+      "sha256": "c49839aad7719046536d223893a5d552fd99d052d2fc097bf7b53293a627373d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/blue-whale.webp",
+      "sha256": "ee19ff975560a7b5a7829f4051cb07d8039185b6b571e7011054e9fe02ccd55b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/blue-wildebeest.webp",
+      "sha256": "8e3d389a31c1078b057dffca0442dbae1ef9a39ed0b20a716a947265fc13de00",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/bowhead-whale.webp",
+      "sha256": "8b108924ec191fa40a6d3dc05cd4a9b24dc9f779af8ad092a665eb01799a14a1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/brazilian-free-tailed-bat.webp",
+      "sha256": "6c48b627631d648432d121d8fa1b1ec6f4eb5ced39cf70cf31ea9cc26db649b4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/brown-rat.webp",
+      "sha256": "b05e950910a98fc02f01587f958b535adbe8208ea642390b7a8d40a7690200d0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/california-sea-lion.webp",
+      "sha256": "ad90340ff5bc93ecc7b1c7354abac75db4e338652035de6c4537fe3b2cd3637d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/capybara.webp",
+      "sha256": "12ba1048dd91550be26f5a14fa779be041178bbbe5e63001947da9526e22cf59",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/cat.webp",
+      "sha256": "8c791fbc862c72e52ea0b11fb847d32ccbddce033548d42ea43452e3cb8707d1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/cheetah.webp",
+      "sha256": "ae500b592089450234025e0aff3a93f4f004b388e568ae3159924a813ba7a461",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/chimpanzee.webp",
+      "sha256": "aa651b59665fd4d75e7537a4fa54440075d1d79b89e59d24219b8297ebb99b4f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/common-hippopotamus.webp",
+      "sha256": "41e95790e9b3c912e11c9ffbaa2630a45087b0497ff5ee22cc9b85dc318c8a5a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/common-limpet.webp",
+      "sha256": "6a00de4689129067d202e4d3fc5a8917bdaf45e25a1be2e6960f3ea5d6f4d5eb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/common-mosquito.webp",
+      "sha256": "fdcc50e9a9eddd88947f47f45536ef2252779be5180ecfa5b4e6d6335d5fd014",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/common-swift.webp",
+      "sha256": "53cf8a8439ddc3948ff8425d1340b5469843571d76e0b6dacae6b52169962b61",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/cookie-cockatoo.webp",
+      "sha256": "cff9550adca4b04ac3d96c9c8ce3e87cc739b8d3692d8b94266e45e669b9f16a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/dolania-mayfly.webp",
+      "sha256": "6a0778c161fa06a74c08cde62c130017876a43c6dc3cc4e39b116942ae846cbd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/domestic-dog.webp",
+      "sha256": "72f241c847e991bb800283137059bcdca3fa0a0ee306072ab9176bcb17ba6058",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/domestic-gerbil.webp",
+      "sha256": "361e8b74b67b72aa675fd6c38b048ed9d026545af149fd62d98a0b543e2c2b5e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/domestic-hamster.webp",
+      "sha256": "1ff1547fe561e9bac90d428feed44d17343b6a72eed8bd13b6f2bbfa8acab1c0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/domestic-horse.webp",
+      "sha256": "d68885221f25293aeb638961a25991e065d192dfb07156406ba985364d7d8a97",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/dromedary-camel.webp",
+      "sha256": "bad1a2a22a2915f80433ed106c93da0e5800578390112ffb96e6228cb5900c9b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/dwarf-seahorse.webp",
+      "sha256": "e582c1d459c3e97b3a325131a2e75e95f2d9002c3d31cd68cf2514c1cc0924c2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/elephant.webp",
+      "sha256": "a5928d4ba81039bfd4d484bf1647438d45ae2fe4dd2ec4b72983aa4124bbbf35",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/emu.webp",
+      "sha256": "9b96e234839961f8ff5bc509f588f52bcb78834f483bdd2f6a4d011c031d917c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/european-beaver.webp",
+      "sha256": "7ba82517334a9631fd2a52b8633282012aec07bd01cb7717fae51aeaa528109b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/european-hare.webp",
+      "sha256": "693bfbfd7f54f80f7494581c6380b406b62a93e704c4acd7fa113dedb248f710",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/european-hedgehog.webp",
+      "sha256": "464d4cd3dd5e596955ce2e449243a783c95e5a42e787301a4aaa5ab6fa49769a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/european-mole.webp",
+      "sha256": "34b5c8513b8c08bce5e263d479c94a629185837767d807142d7efcb427cf53e9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/european-rabbit.webp",
+      "sha256": "de3bc4d05074b77fd4b1eeab1d41265c541f6475430b8f3cabc685707926b2b4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/flamingo.webp",
+      "sha256": "ab577cdb8f8a2db664910974424f976f987daf100bc69291d8cf87ad288e4f0a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/florida-manatee.webp",
+      "sha256": "fe937558489108e9df98f4caac91c86f505ed29109ace2931c163cf82938b3d9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/fox.webp",
+      "sha256": "944b089386561f3e2fc4b8a6e0bcb11db6c6e278d5d9836eb4f991ccdab18536",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/freshwater-pearl-mussel.webp",
+      "sha256": "242a85b0a198c3966af837106b8bf19281d5f40dc58afe139cd7981e5e104c49",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/fruit-fly.webp",
+      "sha256": "41ec2d84000e037dae73820c7120ddb4989ceb215124c579cd0db0e14619d5d0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/galapagos-giant-tortoise.webp",
+      "sha256": "2de06472d6c111b53b224f54318e5b5f34d2825b7c8adc1e51bbab6d9abc4d69",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/gentoo-penguin.webp",
+      "sha256": "9d173dfa7ffa921b5c9f1c0e0694c0f94bdfae06710493a2d00efb44bcef8871",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/ghost-crab.webp",
+      "sha256": "819295ec420836271f15ba6fd18c1224d45a1bdd5b717a8542f75036d5a0f13e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/giant-barrel-sponge.webp",
+      "sha256": "feefedce35a2b0f3d94e11105aee6a16b3af2a2b8064a10b9cbffbf4b8488bd6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/giant-panda.webp",
+      "sha256": "c100d65f72080115090d1fb022b789e3b30e692a0f797bfd5f01b973c11f5773",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/giraffe.webp",
+      "sha256": "87c3d9d74ef13e3d8c748a7f002cac222e85b9508eae3ca569e80f6c2167fb1f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/gold-coral.webp",
+      "sha256": "0c570f733bc1f67d86835c4bac153ebb5eb125d1ccfec26e30b6abeab8431e22",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/golden-eagle.webp",
+      "sha256": "b4fab20539d50fcc754fda5050eb1260e0fdb0c195a3e38c08cf63c3360923d2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/gray-wolf.webp",
+      "sha256": "187a055176a15775eb3aba47ce021c14379ef3ed0bc6de5c2f1a9b19ea2e36ed",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/great-dane.webp",
+      "sha256": "7d9de6edefc3db23e845250c873f6e8601bfff2c14cdc5100869fe93af39c85b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/green-tree-frog.webp",
+      "sha256": "943d8f8bc9502ef5e292d3f5656febbf158394911fc21a0100a83da2acb929df",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/greenland-shark.webp",
+      "sha256": "a406714de1b37be2c19119faec150da9509f877c93caf4645c8406b1a7225d56",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/grevys-zebra.webp",
+      "sha256": "6bff3e864947a92a2886c1adf522bb03bbb097ce5834eee9cef5af2efd02ab91",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/guinea-pig.webp",
+      "sha256": "69bccba9565216bfea1ace40039a143a8386a697f8223526edfdad6f6e816c5f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/gyrfalcon.webp",
+      "sha256": "afce5f270121fbd19fccf28d87654401f2964b49d08f42fc319d3d82ecd27103",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/harpy-eagle.webp",
+      "sha256": "9bcf3101f45038026554bf5a2b2c2b992fe601f8c57a52aa41417e56de0b11b9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/henslow-swimming-crab.webp",
+      "sha256": "458933bf8eaa8eaaf355818e28681ee4103f048cdf2914d8fb2f49eebcdb61cb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/hermit-crab.webp",
+      "sha256": "71f5f091c53166c3f6b0ef2ef6934da5d61edafc464e6293035b2573148b9831",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/house-mouse.webp",
+      "sha256": "a03611341233b54daae4ba68c3243bc37ef5f2936127706c139b9b434b72b655",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/humpback-whale.webp",
+      "sha256": "94b570ae7943818bd886e7a4c2a9790d095848df5f6f49c2874cdfc4543cd316",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/iberian-lynx.webp",
+      "sha256": "77663104437b5d3069bc2a3c9eea22e50d0e5c1c331fd349b12a44cbd79e6f62",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/japanese-koi.webp",
+      "sha256": "2e1a346bd7f4da8a0b382b73e9b680a5fc4bcc0c61c8ed0af3ba73413b4b7fda",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/jonathan-tortoise.webp",
+      "sha256": "b95bf0c60e33b3d318c458acf5fe06fcada160dcfd3c8f7f591a905f1dd1d9ac",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/kangaroo.webp",
+      "sha256": "93dc48b7d90457a4444b5c1e533aaceb790d356fcbd98ec5b47dd9fba4824ce4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/koala.webp",
+      "sha256": "e087938a4365a8e2208a5366240a255f6b54e7a1622d727bbbdc9a28097abc9f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/komodo-dragon.webp",
+      "sha256": "2f359b257816712728708d2723c95d6b45fd2648d3c4c6cb4bcfac0ab5b9db9c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/lion.webp",
+      "sha256": "24025d08d27f04a084cc4bcaae62dcdb2aee4deffee463a00da8a62cb4f6257a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/mantis.webp",
+      "sha256": "3628c9e52a4d011a68bdefca8df0bc84333b9fc27c6e04aeff180a38c197d710",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/monarch-butterfly.webp",
+      "sha256": "ad5444775188b6dba760a95b398c6e34cb3a3a4d1bffa5cdb130767b5ce043ec",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/monorhaphis-chuni.webp",
+      "sha256": "19f86e802c072d400611f6c53d7dda426ff77010d384053236d815ad4dbaaf65",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/moroccan-flic-flac-spider.webp",
+      "sha256": "5057cf62ee7054132358c1fbdacda83aa8fe290a62824c4031e0a40bf84e2096",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/nile-crocodile.webp",
+      "sha256": "9616109cb6df373a61ffa85d295486487fc085962c9b7a4bcf0564de31af28d3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/ocean-quahog.webp",
+      "sha256": "8f2da877dbbc9d91b3646b2891e89ef19ce447c68ef904578420b4cdf450a87a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/octopus.webp",
+      "sha256": "3dca411cc74316e49ed826409ca7dd2305fd93b9652cdf88474b016d6424fe65",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/orca.webp",
+      "sha256": "c6adbee1bc9f8795ca1fc82347aecb7880623b1fad4c4d2e0a2e88146c849824",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/ostrich.webp",
+      "sha256": "ffb574bff18649a862e5df8f756bf44cf9e1ffcaab97f7fd0045210b1d25781c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/penguin.webp",
+      "sha256": "e8c871f560e4835a67ad0fb7b60c20d85a46443e622e9a90e157a4cf1e8f191c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/peregrine-falcon.webp",
+      "sha256": "b4fd6c140f2ea3382010be8c643459d71a90d9c5c671d828368c04d447ce41fd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/polar-bear.webp",
+      "sha256": "0f7b6e778a997f83eed631a341ca7e1fdcb9afa202faf3476ea6b4e4bafcfdf5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/red-sea-urchin.webp",
+      "sha256": "da05dc9b97955afdb2e94f08ebeb0892b14e37c3a7ee8bffdd8a368221bd5e79",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/red-squirrel.webp",
+      "sha256": "f018e2f0d3326994dbfe95a01b0805437949d0a5747d7458fbaaef6f5e4deb82",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/reindeer.webp",
+      "sha256": "c71f4115cff6667968a3d95f3d6fffed56bdd6f55734a7ee08e63b0eef34cdf5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/rock-pigeon.webp",
+      "sha256": "bd87ed44686b18347b4c6403e932d1f0623f437c658d79e8c81451175ab1cb98",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/saharan-silver-ant.webp",
+      "sha256": "c9338be29310553893a797d1395e97fd8092c4fd2ef810919b3ab3aca55dfabc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/scarlet-macaw.webp",
+      "sha256": "e46678a6df2002478e7e8ce51edb6046737b8ccde21140f0f4b244c4ffa4a782",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/solifuge.webp",
+      "sha256": "84bfe2961a84a33f6e37fe0e9365f44be560df4cc2a8c69be2dfe097aa30c8ee",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/southern-elephant-seal.webp",
+      "sha256": "ba168a79e1cc2daa6a0b4b4efb3b137d6f5053b1e2caa1e5b1adb812f7b51554",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/sperm-whale.webp",
+      "sha256": "85db22ddf8e9f59a3423f97108d3e9fdd49f79ead7b8c4965334f825b0ae3bdf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/spiny-tailed-iguana.webp",
+      "sha256": "2d13401ece22b5ed6db3e2e1a40b8def60d86b28ceaa4dce6b60f98ba5a75e52",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/sunflower-sea-star.webp",
+      "sha256": "f181a6a41976be90e5568d9c73402f4a2be923166149c81154c2c966ff572251",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/three-toed-sloth.webp",
+      "sha256": "4528a469fa3f624277cfdbd3246b25d95f31a2459ff9e5df5373393ebf1003fc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/tiger-beetle.webp",
+      "sha256": "874c4d2473fc3decd89dd63f84f38464ede05c7a39d15e3e3496ac501afae7e0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/whale-shark.webp",
+      "sha256": "e4df9be1ae5f1d1aa80c7f923efe62bad3fc81c7cdd041d5a0fc04009d1ea927",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/white-rhinoceros.webp",
+      "sha256": "01ab7bec8df4d460ee6c4ededb6399d026787f6f9a589930b7c1e0da75666b52",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8024_yuri-gagarin.webp",
+      "sha256": "9245e5642bcb51ee84367432be4fbb125fe6fbc42a700589b920734c01d05b57",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8025-valentina-tereshkova.webp",
+      "sha256": "3556d0befc271053aea4763beb6879d7a362580250e24c410d3a3dabee37431c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8026-first-spacewalk.webp",
+      "sha256": "d769338cc73a6b09d303e00c0b544133309225f44ffb4a3a9a71c06264a20b53",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8027-apollo-8.webp",
+      "sha256": "965539426695f0a9a1b2274448b1419d66b391c69f434abfb87f37694e1171de",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8028-apollo-11.webp",
+      "sha256": "ea801851c315518bc4291cbc19fdbcfd321c5e2dc4689b674c6bfe6244d88815",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8029-salyut-1.webp",
+      "sha256": "d1b55c37f884dc53ede91d03bc902173a9a553553ba63e5172d6af8c92eb0919",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8030-pioneer-10.webp",
+      "sha256": "3a627d76320a455680dec311ac3e531e5ba1299a6a5e23712a62de626bd96034",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8031-viking-1.webp",
+      "sha256": "ea82c6047fc828bb900c5ce7f4a01aadbd4a3ab48dcc01b5dc93e637f646f00b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8032-voyager.webp",
+      "sha256": "c69e91484a9f5798c4df1b5411b7e39a097117fdb1a2105a9a5ec3e138d8b681",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8033-space-shuttle.webp",
+      "sha256": "acec43bf5261f64d76353ab151ba02a655cade72a176446927b99deaa1f1989b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8034-giotto-halley.webp",
+      "sha256": "701c2fa542a20b562f716b700cbdf1ff51a20ae4b68888b87da0a6e3b29ded0a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8035-hubble.webp",
+      "sha256": "efa8fa3af1f318e07c4f505bd22c5a49398dd895a029099062b0ce3734bb2528",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8036-first-exoplanets.webp",
+      "sha256": "d6494905635cc8da3b1464f73b855988edd88e206ccfeb9ba338bb9573331d84",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8037-sunlike-exoplanet.webp",
+      "sha256": "402538fe85753cce7ff2390c2e09928e178d7ee2db534ca3b791aef306b347a0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8038-sojourner.webp",
+      "sha256": "e559214aff1b845773ee121f9e6ddcdd973470af67356c94f9e66a2dfb09a159",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8039-cassini.webp",
+      "sha256": "b9eb6d381098c4de87ebc6b502cf13fab40ba9cf1fd539b1c819b591b68ccf80",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8040-pluto-dwarf-planet.webp",
+      "sha256": "a704280af6ee7a9e9c6d94a491b7ef3af68bc274d2d2f9ca327990a3a6b4c2d6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8041-curiosity.webp",
+      "sha256": "ac63a77325b6c634a372261f140868fcfa45f22c1208cbe86607fb7956696c05",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8042-philae.webp",
+      "sha256": "6fa4b0bc2418e57599254eefc17242c5dcdf9bc1ef1a80846b4d42a458900682",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8043-new-horizons.webp",
+      "sha256": "be5c8d1b2624e43f426f720212fa0efd5fb9a2260610bddbc89cdd5f860bc62e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8044-gravitational-waves.webp",
+      "sha256": "c611bd398e54457cdba83c06a50a683658831e61651541f8c41977809a8ecbad",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8045-black-hole.webp",
+      "sha256": "02d7ba45e4704c96e3a86df33b141c56949bac1224deb48e0fbaf536254b1aed",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8046-james-webb-launch.webp",
+      "sha256": "2e00ed1c0cbdf7389c035f6e022c81e8aa86e2b7ce39f672efed82f74ee1dfd6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8047-james-webb-first-images.webp",
+      "sha256": "248a53e4827c7a89f23edb30e1e64c08cfd8c98718c6556a672b1d36d2a11b94",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8048-osiris-rex-bennu.webp",
+      "sha256": "a46499be3b20f03f7117472a01e6b13401ee3c7f3e2f3225f6154e65bce97c16",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/8049-change-6.webp",
+      "sha256": "71ff42a3efd79834c0bb5086cb3b402a6d15a7e4c30f90526e661d4680b5eda9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/andromeda-galaxy.webp",
+      "sha256": "a90fcf83278f3eba53dbf428a38ceabd86cf8e2612787ec57d60c75c9d85da8c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/ceres-discovery.webp",
+      "sha256": "5f9f342da7cd06d02d758d142b7c7c3856e6085970140430c30b2ec200572c61",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/copernicus-heliocentric.webp",
+      "sha256": "2309454b04b687d986bb056f6967b0e36b46ac14b8c04b3606458ff932c2413b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/dark-matter.webp",
+      "sha256": "c7a73acdf8a78b4717fb5a4a27008535fc59149c8538c81667f213476b5c5e11",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/expanding-universe.webp",
+      "sha256": "84890d91c58b7540fcdd9b0dd5e036efc015d598c2e1832cedd58a11344620ce",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/first-earth-photo.webp",
+      "sha256": "ccec354b38c7216e265df7adb9caf27a3e1feb39f342885a8ed5aef03c8a3cf5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/galileo-telescope.webp",
+      "sha256": "4e00f53318790ffc4b176ddd19acb8465317e3bcdcef641d0fbdc6c410e087d6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/general-relativity.webp",
+      "sha256": "b476dac037b796170d7efa87ffdc191e42f134e2f2589703d063f5c6e5fe5085",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/greenwich-observatory.webp",
+      "sha256": "8b4607831ad86e152437cd2c1e6021f61f1ade16f99845b41db6e87ba24a43c4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/halley-comet.webp",
+      "sha256": "74f0eeb9520c3b6fbdb49d2ff539bef8b90fd9831b06aadbbddfc869c7822bcc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/helium-sun.webp",
+      "sha256": "869627adf086d10ec17961d153b6c517eeec05fa9bfb808664b11daa98e731cc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/jupiter-moons.webp",
+      "sha256": "bec784b07bb40072e2eb1559324e5ad0257b5bfa794a2c9ea52445db41446a72",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/kepler-third-law.webp",
+      "sha256": "af1822239d029c03c0e4dbc33c336250a9e585d8bf081b6a554c0284a26233fb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/luna-2.webp",
+      "sha256": "e52a43c3bfcdb9eebe2f8ab21557a6d810ac1361aa0efaf5d0a407771c3ca1b0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/neptune-discovery.webp",
+      "sha256": "e529d9b4656f3dd3d015d8e0dd4dc58e1f9e1385f0770506f8f2024c704052dd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/newton-principia.webp",
+      "sha256": "75f8c968527b947134a768742975059263bfe8c00f3250db42c9f6b4ffa5630b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/pluto-discovery.webp",
+      "sha256": "98735eb5712083a4dbeae6c84709bb9f9969ddec7f853e3d655f5d7312abdb7a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/special-relativity.webp",
+      "sha256": "855731bf30800a6997eb73f883e4ae06740274c55618f857baf75eac34d7a1a5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/sputnik.webp",
+      "sha256": "16cc52a080a01dd73d5bf94f23b2e011598e507c18e99ef5c311f18122727a40",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/stellar-parallax.webp",
+      "sha256": "ee4b0f9c4ea254c728f3465620dd890869c3bd492becb1e78355ee65bbc3ff01",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/titan-discovery.webp",
+      "sha256": "339a35f14c9ec57963d4aad70898cf1daa07f9a09860254bea91f46f0fcc0d7f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/tycho-supernova.webp",
+      "sha256": "9fe655c74dac54bb4d9b9db27cbb97f38e205b1d1de8408ab263b762f20808f7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/uranus-discovery.webp",
+      "sha256": "aceb25af93e170c916c1c86b9d812ca608ca93ed79e7610df8025f02640288a5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/continuum-emblem-800.webp",
+      "sha256": "38bbb95dd3231eec7e52f4a64f9f239868cda70c77d1d1b2753a033fa99039a3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2001.webp",
+      "sha256": "7e2de4bf5ae1ee1fca9778af298afb24b59eba9cf43632144f3e945870832345",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2002.webp",
+      "sha256": "ea47d74fd34a53093f8c44eed1dc17745d574bfd89fc58ac372216c1fe579064",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2003.webp",
+      "sha256": "0594bd9691ad157463c2a2ae2038beaf9f6eba04769d74b78e4aab819b14c399",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2004.webp",
+      "sha256": "6c0917e586789b859c4c26162ba84b9f05a86239edc0409f4339800871cc2373",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2005.webp",
+      "sha256": "daa6d417991d52b08f6e8d94316392c2a8ffa456bbdb76212628c991fdace79e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2006.webp",
+      "sha256": "3c66f236ea73891e6766d77f77b5b7b56297e1609d3f12a0e795dfdbe695d1c2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2007.webp",
+      "sha256": "c47d12bf7ee96f1cffff57538376b10b7c046a9514019d27c56694ab5624400f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2008.webp",
+      "sha256": "a681b90037c72a282819b71c24ae1e132c7112b9e5767226f7dfa14ea22cfd8e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2009.webp",
+      "sha256": "9e6db00a61f35ad8673487c15a7b5c51787364a26779ad8421abb0267851a9c7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2010.webp",
+      "sha256": "2bff2308e595c490f4a0cab6b85762f6ddb645718f9414c41b7e673f8764913e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2011.webp",
+      "sha256": "e6a1e63c622174bfd4cad01ff8edbdfca45906227fcdffb4e003f81d0ef7db14",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2012.webp",
+      "sha256": "841ed953642be2264f124e1d19e8f497851a129ad398b20d7615305cece52207",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2013.webp",
+      "sha256": "d02760d2e16ef81e5dd75721ca64fadfa88fae9bcd25afe469e22a12c64fd10f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2014.webp",
+      "sha256": "ebe6dc21aa1d8313c73f1bf0074e96b8be0a223b426856d75a591380661dfe9f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2015.webp",
+      "sha256": "11de251834b5ffbfa5b5110fdeb5adbe7a4e0d5ede8756c794e812a0ae6439a2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2016.webp",
+      "sha256": "a6c18ac14f352e5fe61ca9971334b906e1e4cae54c81026c345458307dba6ee2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2017.webp",
+      "sha256": "bc32190eff826a5ad0d98a546b0b173e848d15674ac64bdf78fcd57971b9a506",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2018.webp",
+      "sha256": "09685c01880be0ded44405904b55eaa6ab6143b930777ffad7a13e9977c04a76",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2019.webp",
+      "sha256": "7d2fb3f24438fa160481826bc0779f8928dfaf545ed9a720f4fd5c701de86c5b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2020.webp",
+      "sha256": "7499925800db671824910652e41e8ebc2a25747dd1cdc9dfb6d7208aa55bebf9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2021.webp",
+      "sha256": "f01ad5a24299cb3501c32bbf90b1dee575d59e8ae2f9a0ee63fe59577e66ef21",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2022.webp",
+      "sha256": "65d860c4a995992932b1a64d6972549a3706523bbd07cea2914394d9bbf5fdfb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2023.webp",
+      "sha256": "88f42b5d8ccefa9fca2d3a54c2782ea5dce832997fef8d2e8cf5ff568779df18",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2024.webp",
+      "sha256": "db7508f772e04504d54de7d6a8b2faa05ad5465c3e0338e5a04bae07cdd83454",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2025.webp",
+      "sha256": "53608e84d50cb3201431e7ef1e80c129cc6a6f46ac9c485b2c27313f46ee12f6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2026.webp",
+      "sha256": "b3d7c3382966f1f6b48215b093444d216ac88705f3aa159f9b76265d30458a5a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2027.webp",
+      "sha256": "bb0a0a2be55d5c8443be4778614b7bdf1c95532f437a12e06f2abc009c3f41f5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2028.webp",
+      "sha256": "90101620b957ea8e5cc22174d521487904797dae3eaa0a91d65c39b7fe08abcc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2029.webp",
+      "sha256": "965b6093406162a7915167f38df96f403af740765cca272bf69bf05db5eb8a3a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2030.webp",
+      "sha256": "fc9039b3fd494c88c8e7e0295179abcbf54db9c2aa7a67b77dedfe4ddf1ee748",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2031.webp",
+      "sha256": "d9c4937e02aa0d8677c534b71eef1db6cd89698aedf51357539c9093c4c0afa0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2032.webp",
+      "sha256": "df1024dd07b36b6a17dbbde1e1969fad6df35ad08045a333e3756452262b81eb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2033.webp",
+      "sha256": "6ebef392f9da816ad139d3d15713f2db2cdc7eb383182b91167b6b173309a570",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2034.webp",
+      "sha256": "c218ecf0eb74a7dc35629f1f590d818d99d4c364ace2cb46e5b066dc74896345",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2035.webp",
+      "sha256": "939f857ee97788724ca4ca5528fa1a62d1c04cdc2e0c235586277f4a4c355ae0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2036.webp",
+      "sha256": "786f03a8e6179fd08ceb1894a45c8fbed13d016e617ad8c95d3e2d3a5120e4f0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2037.webp",
+      "sha256": "edbe6821b3077299bd845aef6cb4f24b6a783e75a7af1328a5bf886c3028eff6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2038.webp",
+      "sha256": "09736c594002403cac859d1f77a590d3ba0b547b3f7c0515126d260f670b6440",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2039.webp",
+      "sha256": "52f4638b2ec3af560e37db67da988155be84d2c57f2e0c62a1c8238980344543",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2040.webp",
+      "sha256": "1b5c52a00dfb323a34932eee07caa340aed684350d940859be790528f25b8c4d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2041.webp",
+      "sha256": "986d6c727d4eb1821cd92ce22a17117ed12a33c31de9a75c08b0c3b94064dd1c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2042.webp",
+      "sha256": "4453d7291abb99799315f7b342d5d634092ca5495a96585a1d7369898fcd95c7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2043.webp",
+      "sha256": "73373636f9f047950b0aba098965cbb1192fa885a0f344aa6247c4f20af0a195",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2044.webp",
+      "sha256": "5f60b8fb6f7a8428907fc5d405eb0a7a4a80a03483cffab7740857eab868848a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2045.webp",
+      "sha256": "8b0adde340b82ae587b7df8b6b63732f56c9ba6518a0a2a8043315ebee98c065",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2046.webp",
+      "sha256": "41c72feba30f7ce5bb6e6699f11cff6c94e8fbee3895771e48f4c27806a981b6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2047.webp",
+      "sha256": "808cf4e867f0566ca990906c1e9d20abdd4122c0145a8685a0551efa96317ebb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2048.webp",
+      "sha256": "204f330eacb8900daf3135468e37ff79f98bc7335150d6e0f5d6accfc53db3ad",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2049.webp",
+      "sha256": "297c9381218ea25d92b8d2bbbb8c6fd160e069f9a7a8859c18f1506f2c1e7394",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2050.webp",
+      "sha256": "ea42f9991a5e7cb6ac9b29960db9734a2724fa449c6aa56a63c2585eb6fcb63e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2051.webp",
+      "sha256": "657e18d31255970eef78e71516f881bf14045400401140cff62bb3f766755522",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2052.webp",
+      "sha256": "a44b8bf7641a49b5905355dde7ed6f0a0bf4deb3f76f2ec968cb2a4d21719a18",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2053.webp",
+      "sha256": "fe23faa4391e2689de3182083458595c3e3eac2204fed29c7b3ff859d1190f35",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2054.webp",
+      "sha256": "b45052dacdfdeb895f6f5b971dcecc9cdbe2eb4904e982a1adc6ce1976979d70",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2055.webp",
+      "sha256": "5f0e53cebbb68c31ede113a0d3328392ab9e205dffd87c36b01c1fa2b84df70e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2056.webp",
+      "sha256": "274489b12fbab4e4a801af69106d36e1f703e35dfe49c849500ae74f65ee3643",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2057.webp",
+      "sha256": "323e895ac87078ad6d8cfb1a48da1fb472718ccb1d3114c5160f389de8c3c761",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2058.webp",
+      "sha256": "de65e44a8382b3d9f762c038f637b7dab1343a8d7d5a8a7fde4ee47c9ee6273b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2059.webp",
+      "sha256": "6309aa3560218ca0bf136521d628321dd402e06b9757e93ddbcfd978f4ef779c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2060.webp",
+      "sha256": "79fbdd7ca127469824f08f2a8ff52829a464e4403ecfe6980455825d7a0af2ee",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2061.webp",
+      "sha256": "0f45c7498b90f67ecddf069de302e235307ba53417900cd3ae8aeae177def5d9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2062.webp",
+      "sha256": "50b9ea573672677de57ab76889858e5c700cf5b9ded3839bc7a9f7d225afaecb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2063.webp",
+      "sha256": "733ff1df60b9840bc42a2f02290b4979e434edd2b581a6e772369409a30d6813",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2064.webp",
+      "sha256": "2332b19809216546bb32d91b2551ad1829b47af018b7ad968e6fd87c9d41b5b8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2065.webp",
+      "sha256": "85ea8b910bfca91dc6648ebf3fe036fd598ae44ca53959ae006d83b6d7e754de",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2066.webp",
+      "sha256": "5e38a10392d996bef842ea2662865db77434763700453067e6acf685ae5b8163",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2067.webp",
+      "sha256": "ec672ca169967c19b65d04f4188f76b70646a9e5fdc9cd0f5643186a5d046abc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2068.webp",
+      "sha256": "495fc505a8eff8b7d53ea114045b026d8e058932fe6a99e640cf0755e46467c2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2069.webp",
+      "sha256": "84c1921fac9b49489005dc009487d63f74a52879b75738a64b1debbb59cfe313",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2070.webp",
+      "sha256": "d1dd40ef8ff8fc7da36c12e24e42bb1991f61b30f16af4fe96f7e19f94478a62",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2071.webp",
+      "sha256": "1e369ef1ca2777320e0bf6e6bd04597ef805dda2ce77e939dc30cc8400e04e3f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/country-cards/2072.webp",
+      "sha256": "8b492a3f36722a74ad871b45b0a3bb7c26dea7e3c4f0fa22aa540b4cdcb1a8d8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11001-paris-versailles.webp",
+      "sha256": "0deb9544ec532191e7664194a0ccdd913f8201442e9e82a3e17926decec82710",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11002-berlin-potsdam.webp",
+      "sha256": "ec2cb2ce3e97b146e51d6a1e9d5361502e9b9f354787c7f88f247d0c4b9c9a4d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11003-madrid-alcala-de-henares.webp",
+      "sha256": "7330df87ebab4fc2b9339f223885337f2bc54fa235d791e93d65a956cb575a60",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11004-amsterdam-utrecht.webp",
+      "sha256": "205d6fd4377aaadce447aafce1b0d0aada3685bd3fa698346fa79ff295e98f8c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11005-madrid-toledo.webp",
+      "sha256": "fe40c7f9ed4f735683367ce496dd90cfed9e8643e3d8d22835127c9c66158148",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11006-londres-brighton.webp",
+      "sha256": "4003aef209b288a4457613f524a4bc57cac560fef21ffb44f4cf9e630a801bd6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11007-barcelona-girona.webp",
+      "sha256": "6b39caec894e2741987b6507f658694aefefea4a59ef1072ef0b943fca1e583c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11008-paris-ruan.webp",
+      "sha256": "15e38b1ae69125e2b62ba6853e3f6ea9fb4bc8eb011d99e822bde61091fb505b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11009-paris-reims.webp",
+      "sha256": "59884b975bef5b7ac72ad0e646d836f21d7dc5981b7edf75f0f095a85b1585f5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11010-roma-napoles.webp",
+      "sha256": "e8b5b3d7808142db317557d5cf4c11462140d10a389a1cd984bb7352ccdfac0a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11011-paris-lille.webp",
+      "sha256": "59b1750055763a0c7532609be01c4c8beed24f1abe2ee67b1e471c019be86511",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11012-madrid-zaragoza.webp",
+      "sha256": "68980876a5da3b28010ded28a70d7c6d265e1045f80e3fbe32bd2183beebe45a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11013-madrid-valencia.webp",
+      "sha256": "bb6757d7338596a198745acd65b774b44260ce80a3199e1d605f64513804c48c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11014-paris-londres.webp",
+      "sha256": "d1ef214cbb29ce5371205eeddcf4beb736d792583918cde0b6f9690e6566d419",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11015-madrid-sevilla.webp",
+      "sha256": "a88fca8c73affb490745baf156bb01661f667c6b430fb843f42cdfb427b7209b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11016-roma-milan.webp",
+      "sha256": "8cc0747a98f9fc346c0ea5332db2d199ccd1f7b552e42c443eeadbd277ea2036",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11017-paris-barcelona.webp",
+      "sha256": "aedd68c600172c8053a105deb9f0118c59fe13587d84a5bbf7a8edca5970bc18",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11018-madrid-paris.webp",
+      "sha256": "c0960b9b216b623ac4394dd3d009fe900f0fc9d0279fc36b4101aec0eeed5174",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11019-nueva-york-chicago.webp",
+      "sha256": "f7d0b27e4e3c85fc7ad9c9a7823a8723ec6cf62c153d6440d5bd885c2ea0e0a8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11020-madrid-londres.webp",
+      "sha256": "76c4aecbed83d3d213d1c591b243b9c7fc5bfbf5846e0aa4089fdcea08e194e3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11021-madrid-berlin.webp",
+      "sha256": "b5d36502b5adc2e31be3afc0a5f8e01592136cbcd72a697a1d88d918dcd3643c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11022-madrid-atenas.webp",
+      "sha256": "42b5fbd2b6d26116d107f3d7289a19f48426fee50697268fbffd8e3c99238bd3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11023-madrid-reikiavik.webp",
+      "sha256": "1a1fd2135802d0b10158da5acfe2e734dde41c912beefbf4490ab2d67a0ae0d7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11024-madrid-el-cairo.webp",
+      "sha256": "f7519d98213d1dff1ec6a9f18242f36cc57f088886976a9bd4ac1b84c35f2421",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11025-madrid-teheran.webp",
+      "sha256": "0f15be222a31e89eb95f3eaad84dcc659229f897b480e2c0cc7d91974908b39d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11026-singapur-tokio.webp",
+      "sha256": "52d6d4dbecb97b8a0979d33ae82be2f44f2e8ba6f118de47377cd8c7b1411220",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11027-paris-nueva-york.webp",
+      "sha256": "d3a466980ab07d437079d4abf598d58b29616e188607873bb8eeed6251f76b17",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11028-roma-zurich.webp",
+      "sha256": "d471ead13dd5dbb157188710cf452a0a0ea4f9064b08ca9293833ae384fe14f5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11029-londres-bombay.webp",
+      "sha256": "486ca975245f656eeb64b5f187f97304165089dccda944bf00db3af2d92dad84",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11030-estambul-nueva-york.webp",
+      "sha256": "99f61168f3adf06cfbafaa1901010b45753b13831649d053aa599b8dfd832850",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11031-londres-edimburgo.webp",
+      "sha256": "ca4928fd1f679865bc4d302142361155d1960035b308fa6ff55091fb8dd0768e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11032-madrid-los-angeles.webp",
+      "sha256": "203cd126aea74025df12e0f4b703244b27e25616d16e0133124a3ee1c180513b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11033-madrid-santiago.webp",
+      "sha256": "b640359bea6872455aa97b75925eb1bbb99b327901e4c97de6acefd6b11da619",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11034-johannesburgo-pekin.webp",
+      "sha256": "281590f9989980a6f4065169918ef651c7b5a64e465cf14a56dcca094fa289e4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11035-madrid-honolulu.webp",
+      "sha256": "84092920a81586af962fa39053314bfeff803a0dd41a4357b59f87965f9ae7ed",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11036-madrid-perth.webp",
+      "sha256": "7b6822332259ec5564119c6e457829ecb18bd822fab3e6d979f118560f7d78cb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11037-madrid-sidney.webp",
+      "sha256": "babfd44b218127d7bde0970861753013f2c850eb7e849533f6d22de655503018",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11038-madrid-auckland.webp",
+      "sha256": "07eb1fbb47fce50939a6d42f082356653d51609aca2a1dd65325dab9fb3bfb40",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11039-san-francisco-los-angeles.webp",
+      "sha256": "7aa3458558029b77eae562575c877b914d7b306c170a376763ac6e5960cbdcf3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11040-rio-sao-paulo.webp",
+      "sha256": "40888cf27e956c8e53cf0aebd4d6099c7f1d62f09b62756cad3e5207cc32dc91",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11041-buenos-aires-montevideo.webp",
+      "sha256": "d11ee700ffbe9c101113bfeec2eebdc91cf63dc55c4e401576b88ccb870f05e7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11042-el-cairo-jerusalen.webp",
+      "sha256": "d32bc7a1cdf734b492b60ed8e9c55f510d621795cbb762a1af97eb24368f5538",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11043-nairobi-kampala.webp",
+      "sha256": "12431723a864307e1d70847a259dece1e86f65df15785c11173f1c30e2653610",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11044-delhi-bombay.webp",
+      "sha256": "eb54ebfeb8b82539176aea513654cf150e01aa6cdd50dc8c654edd68012f70c4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11045-pekin-shanghai.webp",
+      "sha256": "5f8057696cc1aaf481e2ecda6bdd7c0f14a66c208d245c123d5a2b27ffcc4607",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11046-tokio-seul.webp",
+      "sha256": "e3f6c3f5cba56f7694089e41b447ce27794d546a2dc3edc6e093290e13721b43",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11047-sidney-melbourne.webp",
+      "sha256": "e44bacb90058f3cf6943d0689efaad50f332ada8f2694a55a7970b6631b30c8a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11048-auckland-wellington.webp",
+      "sha256": "c9c5535a763d6e4255f41826afeb66c59154ac3c274abed86066447ac1ba3e01",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11049-ciudad-de-mexico-guadalajara.webp",
+      "sha256": "3c62bd45a90ea41f11dabe655d1d3301b13954f64be9b362470288077850fef0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11050-toronto-montreal.webp",
+      "sha256": "2cb15dd1559ff37d4fdca39ba52ee8e0c3e43d5e3c47855b80b751abf175473b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-cinema-400.webp",
+      "sha256": "a63a99f0dc5f51dba379db2394f6d13338aec24ca4ce0492883a4f98f1d5c7da",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-cinema-700.webp",
+      "sha256": "7e7e142b744cf27bf083b2a7b969c99f0049697d4073727ecbc8b20f0dc95598",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-competicion-400.webp",
+      "sha256": "4f2ebac849fe5651353c2a4eb9677e487fd157c9967cf72856374d97851f02d5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-competicion-700.webp",
+      "sha256": "72cd3dc05f5234f0b80d31d1496e0507fe9c383376e1a6a8cfc4f730209f6e4c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-entertainment-400.webp",
+      "sha256": "a7a0d4020a79e758770fd6f69e3c825d7b4fa0374319867447632f76405fa43f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-entertainment-700.webp",
+      "sha256": "d29e5eef08423eaaf55c3c21b7e7718752ae1516f9a3011992a637c567320cc8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-geography-400.webp",
+      "sha256": "dca4f316a7ded87e2c822c8cea322238371f7a903d7233608577088142e6080a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-geography-700.webp",
+      "sha256": "3d411f5b0fe39cd2a769b572134b02cd4f847e14e288d81e1d0cec59cf0696f9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-history-400.webp",
+      "sha256": "49f9826de63c043cf0c45ddd36d5e6167862be2bf2fc7614db9c29231605e1c8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-history-700.webp",
+      "sha256": "6561c24fdc500a4296031cc0f8281dde9143a3c6bed62820c7f3a408744cfc9c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-mixed-400.webp",
+      "sha256": "50e59eee643cb117385577bd5177956107d58b0ede072e2291f4654b5a39b5a6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-mixed-700.webp",
+      "sha256": "ad875f64f04476fa66b4aa40697d48a44cd02465d23d48ca4cc90baf24ee96f3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-nature-400.webp",
+      "sha256": "8a35cd72332109d845678ac16a85113a4a7cb55d27d1b6ccd3b2eb663bb028a4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-nature-700.webp",
+      "sha256": "5713c20190cc2bb4ce5b57b462b9aebde505c7ed0cc4b2cb30191b16fab1a64d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-science-400.webp",
+      "sha256": "f7a253b05dcdd28ff0bb26b167d1f14fbd11153a07faf413f37e4c60c59086e1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/hero-science-700.webp",
+      "sha256": "aff6cef363eab8383528c23a6983c710274f42cb92d892d0e3035f6f3d72bd6b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/1.jpg",
+      "sha256": "0446c06b2291f6eca4ec7b0b3843b77755edab47e96e4ae3571831a932474341",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/10.jpg",
+      "sha256": "e263338adafb59f1f8c2beb5266c1f72ad010959c2ed88832ec3cd9045364f23",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/100.jpg",
+      "sha256": "975e18646b68a56d43ae98ca431bc99261f83e1e03570395bf89033b1054c7e3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/101.jpg",
+      "sha256": "4f78be53174f44b10710f1943811146be574e5d7589a605ff7285d80125eb257",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/102.jpg",
+      "sha256": "55f08018ebbedc46c1a6e007f5fee78ab3ebacbafbbb488a460e87edb697eafe",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/103.jpg",
+      "sha256": "6ae375f2f7739cdd219b100dd85fb1c1f85c57754ed595039b7a3e3c9247cf40",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/104.jpg",
+      "sha256": "5dd719b658a6457da708f5ba7c3278e02a523aef8022996dbd1bb32e8d2a3bf0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/105.jpg",
+      "sha256": "0bf2e642d3a72800fe8e987c5d3c75b3a713f51c2c8768607a26caa13749ebc7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/107.jpg",
+      "sha256": "44c505ea08ab2f3d714e7b5a87851bac0d3b7e1e4cdad8cd3c7be8a9bd645f87",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/108.jpg",
+      "sha256": "5aa779310cca27805d8b1bb0b0540429bc040b2b7494d80496cc488a60a91caa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/109.jpg",
+      "sha256": "8e392046a3e8e51e1f1cf0c0d96c7f1f479d5b03ede4aa404dbbc6f1971db49a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/11.jpg",
+      "sha256": "c4ca336e8137fc04b52bb05a5f126e96df1af086bd68f779febacb12ed8c4cce",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/111.jpg",
+      "sha256": "c7b43c20714e6a9c69eb1e245547544a3b2eacdc8653a9fc666c2d3419e79c31",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/112.jpg",
+      "sha256": "58c26356c00bfea23b845cd801ab293743bd94eb18298691027e7436c1dd4e09",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/113.jpg",
+      "sha256": "e20a02960dea6669f903eb0e5046f027f56117b97cfa3bab90dc2e08dc7a942d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/114.jpg",
+      "sha256": "805897913a59cbf83d4383d7d4d0eb05ff9bece45352330a39cab71bdfac8669",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/115.jpg",
+      "sha256": "01a6aefcba2991526c17060c606114d0477f7727092ed3d67d1fd39b8ff1cc22",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/117.jpg",
+      "sha256": "7bdcd652921f3b9eb60eef2a8be0c423634e3ea066234bfdb787eb22b02061ac",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/118.jpg",
+      "sha256": "6db36585c154fb4357648275cbd21417461884ff86736e47b1072bbcf189e897",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/12.jpg",
+      "sha256": "eabd60e1351230682852fc18a28d08ca36c0317875c639b429e2507da44b99f6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/120.jpg",
+      "sha256": "d24803f7de32dd30d0b5c9779859b7d384bb49a58c8b8f2ac8925b4471684c86",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/121.jpg",
+      "sha256": "0eaf4920b1cc184bd02bf4b13d9f17f8f415d16c60cf733acdca8388520c7f60",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/122.jpg",
+      "sha256": "61181e0dfc43488e3c2f1db1b1435bdbcb3e208f44238d261e49248c7efc41f8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/123.jpg",
+      "sha256": "fcf1136302067f9704fc64b597a32e19d758196e2a9409f08bccc8ecc33f3597",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/124.jpg",
+      "sha256": "9c6b4d9a40964adb86fbee58b314d931cf748b72137a3fa1cd838619549f6a46",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/125.jpg",
+      "sha256": "6d95c75487b15f9f38a51ea1ee01fe681c684b35b4019b44227b613f28fc1283",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/126.jpg",
+      "sha256": "7bf407b5a0fd9852e9316f38e4b3c0e174b574d02e1c9c66028106e6ae22efb4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/127.jpg",
+      "sha256": "446d06dc2a5344df37ed19f83c55b8b1cd01df6ba0a0acf46a7e015fdf8c4ba0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/128.jpg",
+      "sha256": "73e2f1ea8c25a2e86a2ed12021944b1e535f5661d4c720c5c03744e3cb0e54bb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/129.jpg",
+      "sha256": "463a42859ad1ccdcc51397b60bf193424e7070307a98a1ec79113d45bff389c4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/13.jpg",
+      "sha256": "764636bf49f2b264cda91a7bb9bfce3e5c277a23ea3fa4723ab813f63a261418",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/130.jpg",
+      "sha256": "3fe750346dd0ddda049def9d8abe521737380212bf6602cff0af6d578d00f5f9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/131.jpg",
+      "sha256": "c6953ed1d9d97e70c087f4ebf13217517549acc3abe2430c0ea8360a5a21510d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/132.jpg",
+      "sha256": "19212481ffee329dcc26e015effc062eb1749c0b14ad68348e3e2eb96ec8e403",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/134.jpg",
+      "sha256": "af4bab06de592913b1ce0bfdf2d1b5b4ef31a9ab0c3cb6a515adeea2b1ce12ab",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/135.jpg",
+      "sha256": "fab1a7a24910a5784f0230dd5e333cf6daa6daa6ed2447bf6b2b3ad65575c097",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/136.jpg",
+      "sha256": "c0aabe741344315067a6cab86900fd7d205a2e41c76ff24212353a7015cf582d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/137.jpg",
+      "sha256": "8fa797631bf3c7773042980f8d91b79b8d9cdb4b0968758a7094969bc4ecfb19",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/138.jpg",
+      "sha256": "36fcdde2e400026252a2abed28b010cc34dd66f4062d792609bce71de431d0d8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/14.jpg",
+      "sha256": "9c9da841ac41216202590cb2cd8be114f439ce43d1f7ae1551efe50f91652fb9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/140.jpg",
+      "sha256": "a5d5085b8f27e045454af430d4b51cfd6238304712d430fe7e0d13e74428b62a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/141.jpg",
+      "sha256": "364c2a92d7279112fcb3482dcc0555f566e1bb98b1e88be242055fb3db7bd96f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/144.jpg",
+      "sha256": "22881609b995709b547394bfbc3147d1c89f1730adcab027c6d9ddb96f382485",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/147.jpg",
+      "sha256": "f58f075ff6af32cb346c0a8a1810a1169408dfdc7a471a4194f2c44dbd607f6b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/148.jpg",
+      "sha256": "0c12255d382bb8ec89113dc8f6dc564c33ed290d9de10ae6f585820efaf89dbe",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/15.jpg",
+      "sha256": "476a45b1c841c953fd9369fe4607d96bc6bfd19be603a5fbaabfb32afe529084",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/150.jpg",
+      "sha256": "77e5005a0aecef187bb7765488c1c04972878ba1159d5b4ec8cf53bc485675a1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/152.jpg",
+      "sha256": "87dfde45e3ed52af0bf783da8ed1e50309e16775714279f3c7902cfcae6f17aa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/154.jpg",
+      "sha256": "b6390a354666d4629d3f1c6ea20307fe76a8a2c8f9c5771fe3e259cfd8c389c1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/156.jpg",
+      "sha256": "0f146e06bdfc145eed81d59ca8a2819b21ac068731ebf0b1cb782257d634a8d1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/157.jpg",
+      "sha256": "94dba8467230e7855f4adb34205464f06edc4d0e0126333e89b87b1416cc3774",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/158.jpg",
+      "sha256": "930ace8b8addf6fd8c4de462b67fefe794714a3fc237cd3cc2ea2c89417bdad2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/159.jpg",
+      "sha256": "adb7928ab76aebc6742ba93bd25d91585a9fb7b8c6038edc485f82c1b639e8fb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/16.jpg",
+      "sha256": "45795e5f4157b8737a9e0cacd24213918bf4bece1c9981be409dc86afce4406e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/160.jpg",
+      "sha256": "96c99b329f89a70be95966e5ee69e099af8b937b2e72ed3d596b43ca7b250d70",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/161.jpg",
+      "sha256": "ffdf820c1ca09b4da5b7aa4bfb10cd4f8efbbbb1c5ed1c1e6b6a587cbaf890c2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/162.jpg",
+      "sha256": "9d86c1439d8cd13baa31f6e7978ff522693ae831ff6cf8a4f2b3171542cf64f3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/163.jpg",
+      "sha256": "ef8cdb279319b040f6891f7f6186183fc7eb9f4b7b129d7bee1f44c98efb8ece",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/166.jpg",
+      "sha256": "8e75dc48564e4bc9eb813ea31e88019fc03d09aaa426007feaea8f032e15d707",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/167.jpg",
+      "sha256": "ce1691a7c6c091dc2a16562bc17fc9caab000ced2a63eab37e3cd7163b9a1bb2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/168.jpg",
+      "sha256": "725405d533ed57d42080241cacd1d434e9a79f7e5db6da310f0301debbbcfba7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/169.jpg",
+      "sha256": "381493d6abc420ca504010bbe9d0e1e595be7cf547f1418ad8c4c83bd2aa7e53",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/17.jpg",
+      "sha256": "317e97aeeb35e2dd9dc71dd60bdd4b332ff0936966e5aebc57b6e99218041c61",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/171.jpg",
+      "sha256": "63b4da014fe35f56ddb7ade9db1bbee22ea1ea3dafab74e19b0edf9acdbbcd8b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/172.jpg",
+      "sha256": "abf07e417cc9d001b10806bd1df097ee9ada191693710560b069dc2c3ed0a14b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/174.jpg",
+      "sha256": "7e4742bd849ffaa51e467c4515b4b3974653dd84e636ad50234e1a6ad3ad4bd6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/175.jpg",
+      "sha256": "a02814a6e8b6a7e6efc4988cb85cc6b1b41ac3f607d728ea8f542141fdf535e8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/177.jpg",
+      "sha256": "5f95005ef9c977f2905c8e23a3b73282338f2dac2cfea972776982e2af503de8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/178.jpg",
+      "sha256": "10819191a6cc4f172ae19a6c9b041bebd69c372a3ffc960da465d671ac2e86bf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/179.jpg",
+      "sha256": "29f8cff5f954d1429c76e38c5bf619a5eb4df1e1907aae2ff5d19892a54bf82e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/18.jpg",
+      "sha256": "3f2cc6eb0be4096b682f4b2c5a309f4230bfa3067b62f0bf5fa048e3473d18bd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/181.jpg",
+      "sha256": "53370be3ab2a4f7f40795bc0990f7092b72313086b4d7f61486f454e34bae081",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/183.jpg",
+      "sha256": "a0c8649dce5a3da7463af925cea139930f3eedd5c1202280b251a406ee4b6af7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/185.jpg",
+      "sha256": "e0a6278af0e667c469c52dc65a8d201bf7f4ba1bc78321c48b5b54311daba226",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/186.jpg",
+      "sha256": "7db63f17efa76694e26e4a2d74ffb4f4858e24b9865bda927fb7ec94a0ad650c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/187.jpg",
+      "sha256": "e2efece7a6847f5c682e15b396076bb100425cb359e804dc572b85827e99006b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/188.jpg",
+      "sha256": "d23bf8885ede84b15b73c8b1352a62a2f89a6b45ae8212895db807567cd0ba8c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/189.jpg",
+      "sha256": "e0f95dca42951d7cf99c5548ed4b09cfffa4ce87bccddc9f70307714eff18820",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/19.jpg",
+      "sha256": "e1d3178c8c4f4304b6ca2d196e7bd6d2836fc2685f99e37b896300d8b31ab85b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/190.jpg",
+      "sha256": "8162918d517de5f497918326e2906f894c496a5bb453e76a6c39a275a94ad3f1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/2.jpg",
+      "sha256": "4586b899c7edab8b1015132d552ba86007947a3e112e17416b1d4c3b54875d15",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/20.jpg",
+      "sha256": "96f33c5be3bf78a8835a9a023597c4cb2d2ba6fffcddf199e2e485fd9e2cd20d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/21.jpg",
+      "sha256": "dd05e972e50b33f66afb32b0deaa2aef5971e7d105a8a20d6433d9db556a67cb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/22.jpg",
+      "sha256": "a5ec9ddd229411958d66498855cef16be6cb940b41ae3d6b0a003c87575c162f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/23.jpg",
+      "sha256": "091bca58094909b63a76d25cda90d71ccd39260e663aa0d2667ffcd674a65a32",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/24.jpg",
+      "sha256": "ee26557bf4e6c165c8a0db61ab1685ce766dcf1a38b0aa6832e38c7e485a0fa5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/25.jpg",
+      "sha256": "0168066da184c0942d6a48fcb684094d3bac4ea403d3a505a1c3aab60713b3bb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/26.jpg",
+      "sha256": "3de1b85b75d86404f230cc23a519e862a1ed5fa5f9864643dad107ab70b397f8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/27.jpg",
+      "sha256": "8f039217fa1f218e150bb2332cefc63ca6def19ee7f2102b2d18310b5aca0c8b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/28.jpg",
+      "sha256": "aaacc6d44f6001d2cb2d751538b2ebd85dcd74286a063f719876137739cd0957",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/29.jpg",
+      "sha256": "59c7348f8f25e2cd57c22de042d0a9b68f625b2050976e18ca9b089d72398cdf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/3.jpg",
+      "sha256": "a69dec8d6ec51fe3d7ac2225625842371bdc57d5b37e80742fa14ad54598a161",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/30.jpg",
+      "sha256": "e1c08dcc4cf5aebdf014ee9975dc5c6bffedb040b3b9accdcd1a56dd7dbb2b61",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/31.jpg",
+      "sha256": "264b0bf0173425ac328eb1e2f627112a3e8acb7eb299789d095c81cdf009291e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/32.jpg",
+      "sha256": "ebac8a5bdc80c24aa525a1e1aac2b6040b9a5812fc52ecd98ca573caf757332a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/33.jpg",
+      "sha256": "1ecfe1a12ee58006ea43af6cbe7453411e68e9f51dcbb2384b66c467c0911019",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/34.jpg",
+      "sha256": "206c03329b2d6853a1826875f50c6e43b60b8c29613f55bba27e465d1d575a44",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/35.jpg",
+      "sha256": "ab38748d16fb8ac4800ca2ebb47e6004de7cc4594a450aaa0db7bc524123b632",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/36.jpg",
+      "sha256": "21a5b1b70f784bd1f0e44be71df0769002ebda5d2795f6cb758a88a4a4c8c656",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/37.jpg",
+      "sha256": "c2f1b32cbdfc65bfde60957f9b8d4b95cf7e62a21aa6a6cb67bd1090128f0cd7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/38.jpg",
+      "sha256": "cb40755d0a765a3fe6a8781113a92ba905e552314831df7ecd8bf2e28324d6f1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/39.jpg",
+      "sha256": "3b301283c39ae800fb1d2db3b2329c076522211ad2ad46e57dfa0a8031ae11e1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/4.jpg",
+      "sha256": "fa773af01f41354ee0e571f7efc472f449a9c7727d62440c8255b58302fa3146",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/40.jpg",
+      "sha256": "177f94c5115ea950ad22cf06f683ed53980cf7e4309d31a9233359b43e2fc8f3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/41.jpg",
+      "sha256": "12062f30531453b503eed5b50a1cdee09f56e66cb3a0cf8fe84b90892309141f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/42.jpg",
+      "sha256": "566a86b4072c2d402e027b6dda7a76106563460c773406ebba6a2f44f43ee348",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/43.jpg",
+      "sha256": "041d0fa2c994643d221d93f1d39eba5b074dd10e2f0f4cc07ffa5fab746dbbde",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/44.jpg",
+      "sha256": "432f01b3861e235ed3f4b309141d4a8e459f94ff17427acdfd29eca994a1eea3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/45.jpg",
+      "sha256": "dbadc2d837e0dc77ffb49d53ef1134ade85e812a0009840bc7f856e726fcad76",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/46.jpg",
+      "sha256": "e362a39a9f9c4b48d42536d417ad1f947228f8fa09758cedff822316ed0647a1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/47.jpg",
+      "sha256": "6ff9db24a4d73d1968e065233b95184b6196f0fb780f91b6daf62723ee3e2c52",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/48.jpg",
+      "sha256": "c5d8787ea12c25f20549e20eca5a7601834261df1e39e0db4d793771f6befbbd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/49.jpg",
+      "sha256": "7ca852342068006401c7b2635943af5011afe75bb4efa12f447d9dff35adc833",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/5.jpg",
+      "sha256": "d6742fb516d1e7ab7fce3d5dbdbe09d0cef8a4330ae820c3ad7511422d669815",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/50.jpg",
+      "sha256": "7549df9eae06c01e13513368c53147cc630a21a16e315cf3117b37a0593a0f6c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/51.jpg",
+      "sha256": "e5807d2fb205f200254587ae05603136bf7ac7ef13e68428efb3dd43060d2112",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/52.jpg",
+      "sha256": "e20f937bb0094e42785d5aa40e7f64b415cfbd1cd07bb3e623404ab1ba8079bf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/53.jpg",
+      "sha256": "2b5aadc423a3b0b5508117cecfadee8a72b824940b39ca3d7f13e736f484fbbc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/54.jpg",
+      "sha256": "b5dd50d6dbcc803dc5249168d4116fa36e20a0a3e2e7ba02269c4a23c0998cb2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/55.jpg",
+      "sha256": "83642a881a327ecedb73c4af0c7556a033cbbc0f16cc1fa0f40fa72bfec1b5f8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/56.jpg",
+      "sha256": "30980225d2dd0bbb311bb0e3e11d7edff7f257d352d2df31c858ec628bc5b261",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/57.jpg",
+      "sha256": "642db7c81aebb066a5b73d3161715b5bb59ade55318f3d7f2ab3e625278b3bd7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/58.jpg",
+      "sha256": "4952fab1239c213ae5d99705d883d162749731da40e499a9928618c7e00fae47",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/59.jpg",
+      "sha256": "8e595dd4f1c7eb5ab496237a3072928c986c6e91a3df1f6e277f98d124ae5228",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/6.jpg",
+      "sha256": "155c7b74ab6294b73c853ac2e8457ca06ca4b98de64eb4062acf8aed6867fcca",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/60.jpg",
+      "sha256": "1b419e846c11f8f18f195b98e20fd2ab0e5f62b5bfc7b7c20f93126afe5986e9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/61.jpg",
+      "sha256": "b5a601821f79e01030f39384231322f7d96fe4007a99a378d2061837b9ca19b8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/62.jpg",
+      "sha256": "7466d756d1da713c4e908800d79088c1c531128e9596f396555f0e02dbdd275e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/63.jpg",
+      "sha256": "8f36d7acd9fb0b8d724e2f3a0b0212b8652635e0193402b242848d3813ff447f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/64.jpg",
+      "sha256": "de9184c3efb74709db3a2a6d4472da345907ee62604108e2527365d189b35f29",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/65.jpg",
+      "sha256": "5001e61c4bd8e4d2507d805cc701b0e1d769e25bdf7af3e5230e08624d0c5047",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/66.jpg",
+      "sha256": "4a1c459e1ca1bd0ca638bf98c770533456c12e39eef1c90c2f4d9d92cc478916",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/67.jpg",
+      "sha256": "04070afaa84386381c19b0012601e0326ebc8ed95283e9807c01adebd17667de",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/68.jpg",
+      "sha256": "61d26c609dd71b012864cf96713e77f0c8d79d7db95b6d61e8590d3db847bf68",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/69.jpg",
+      "sha256": "8fb64635613b0f0156b8458aa4cd1e4d7857c3eda648a60295e439a7bee8a39d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/7.jpg",
+      "sha256": "8096319a2c9a5580ed452b11ab522e1f0e0909c4ba52621ac23cb3771cdc2d9b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/70.jpg",
+      "sha256": "a73e2a2f7bb985928078aa0fdf1a340dcc2fe460ae007403579c35c76e0f6c3a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/71.jpg",
+      "sha256": "6a8c4510df6e8057cdacf1aac32fc16117924bfb6cc33f9ed18a8fe1119e3b48",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/72.jpg",
+      "sha256": "e42433e4f363b3ceb3a542fb086913a64151e05cc96b19adbd48a2a5cfd26472",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/73.jpg",
+      "sha256": "0c8d31e7c7a833dde51f687cdba0c8dffd6667ec231f7e4b805d8b72ed5494c4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/74.jpg",
+      "sha256": "399d0a17e097fa92b394bdbb8e778a2fe701047dca20e2309d3c0835e03669e0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/75.jpg",
+      "sha256": "b32b1929f0e00f1d6e8006779d4728ad03d4e0950fbff607b1a54d3bc8d78ea1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/76.jpg",
+      "sha256": "cd3ae8922a84b9921f9ea7f5aeca2f36a939cfe51868581574ba249b09436f25",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/77.jpg",
+      "sha256": "4d820db38c2bc4dc831763529d4be8690eaa23e6d58bb1f6a4edf80bf22bdfa2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/78.jpg",
+      "sha256": "fcee2ba01c518e243a1d4a7cb5510b4b7cd8b5cec66caf2a4dd49cf8a9e2b23f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/79.jpg",
+      "sha256": "a194c65867b568272105877c5b37a5e3f4c83d1430c4cfe24144e64c6014ef16",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/8.jpg",
+      "sha256": "daf469fb03a75e7b1610d5fa91e6a2347593cc4008e72ded7697491ad6b90869",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/80.jpg",
+      "sha256": "09d714ca664a2fcb9d116140d06902cb257421143236efe18f56f2b1eb71d008",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/81.jpg",
+      "sha256": "0d01cbb5e7faba35aaeab7dd34ba14e1ce58afc5c76f15fc1e84251777512816",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/82.jpg",
+      "sha256": "f162684ad11433a37d1d05e347c85960fefff9a5358348decb69c3e44e6bc9b3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/83.jpg",
+      "sha256": "e67734734f0157a74b705e5fe5f5b3e3685996a545061657e429ea5474faa752",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/84.jpg",
+      "sha256": "27df4c6792c3d1443384620b972e25a08eb1857b8c4353f8052132b5db2074b3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/85.jpg",
+      "sha256": "5e3a6c6d4ba5b7f1c41775f50a697fca6faddd6eea04ed3514a6c993535abab4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/86.jpg",
+      "sha256": "9a8c3f4ae6ce6a3b70b1553a24892a1e4747ba7721b30c7cb647eceacc7f3aec",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/87.jpg",
+      "sha256": "e4011945dcc4d15b4f08d0f063a3ef6c21a1d7a670a73e06b62b009d9889f95b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/88.jpg",
+      "sha256": "d5ed64e303656a0c49fb530a01d1caa60fd01e59a179aa96c97bbbcc003c6e15",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/89.jpg",
+      "sha256": "ef730dcc759a6606ba9bb7ac5cd6fe050eac17a2c29b9f7a1ade422e757079de",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/9.jpg",
+      "sha256": "53817c86b28257509e37d9f3b827d137926f6c86781cebb5d5f2f9966ef2f39e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/90.jpg",
+      "sha256": "8947164170d5a22941f38fe1474c39e6142298f35107d82ecf850ff31047fecf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/91.jpg",
+      "sha256": "e563979b5d6f8bf7943fbfc058494bf0946bccf1546eae9ed77bf9727c41451d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/92.jpg",
+      "sha256": "85810c713d8c80e7c0c892220a2559cbf0223f8603df09b7d8f0b8d0966150d1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/93.jpg",
+      "sha256": "af20916558f1745f79f1e595d1c1217030d1060338cc9c15baa92ea2f2233306",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/94.jpg",
+      "sha256": "74ac8da4260de8a61f219b12496b66c133c8c2fe37c8b20d43e8727c7fc46007",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/95.jpg",
+      "sha256": "99be7d1762bd787331e1c3f3a11d30eb71541f0f16717bdb7910f908d8fcdb69",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/97.jpg",
+      "sha256": "8cebead92756448e089e0125f4260e6ec1b507f2b7f18d66519bf24797743729",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/98.jpg",
+      "sha256": "e95a3b9484df3c723f114180386f7b8e4562b330ee4fe90225164a1ec2a188ad",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/history-cards/99.jpg",
+      "sha256": "7c8ac6ed5dab81007a0cdb59b10ef6632b93617f888f0cf3339dfa518ce6ca9d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4001-la-escritura-cuneiforme-fecha-aproximada.webp",
+      "sha256": "7de7395c1f8e03815b8b7c738805bfb5ed37578a7151bdcda5194173950fd6b4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4002-la-rueda-de-alfarero-fecha-aproximada.webp",
+      "sha256": "52bd758050d3bbed5b3c61c547bf2c29bc9e26437193505e46089f5851349de5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4003-el-papiro-egipcio-fecha-aproximada.webp",
+      "sha256": "89c619b8e86a94da1264f89544f2c8ae566a204e4c8715351b3075f8fc524464",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4004-el-codigo-de-hammurabi.webp",
+      "sha256": "984fa892135dcc1d82ab0719e100b3eb4541c925795e38a36896e0f080a3cca8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4005-las-primeras-monedas-acunadas-fecha-aproximada.webp",
+      "sha256": "a942d9d964f42587c4d9daee5eef6b772c9fe6ef52b7596b49fb1b8f4e6e6053",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4006-eratostenes-mide-la-tierra.webp",
+      "sha256": "5e91c60edac811450a1b53a451a8df721b606433362cfc5ae37197896cec7c7a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4007-muere-arquimedes-estudioso-de-la-palanca.webp",
+      "sha256": "2a574366f30a5ed8f771b405103ab941c90826d9358c035af74ddec8813f3f91",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4008-julio-cesar-decreta-la-reforma-del-calendario.webp",
+      "sha256": "1437a83400dc485a95e4a41af563e68d25fc7cff0eeb7c93e1908c8c8a7c9c9b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4009-el-papel-en-china.webp",
+      "sha256": "e31ced6b9fe5596401126fc8fae191022b11390f8d969bd8a870ce5045057003",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4010-el-almagesto-de-ptolomeo.webp",
+      "sha256": "59b5d9514f04b433e4f857cda559e0559d565182fe242e097bb6c19f1805bdd5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4011-el-astrolabio-en-el-mundo-islamico-siglo-viii-fecha-aproximada.webp",
+      "sha256": "710e002a4ab05ea17d76f06c82feb0f4935ec05de036a9311b67bece2f3b51b9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4012-el-tratado-de-algebra-de-al-juarismi-fecha-aproximada.webp",
+      "sha256": "52bc0e4abf1b3991650fae8e7880b43e8b0a0b1397e844c2850ab62dd3b8abff",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4013-la-primera-formula-escrita-de-la-polvora.webp",
+      "sha256": "c887c101c4b91b767a15c617cfe7e16dac32234bdd316214b10879d65f3e1eca",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4014-el-reloj-astronomico-de-su-song.webp",
+      "sha256": "1e969796954717ccff15fac216d105f7c63f107c9c8d7b9cfc105b404e62718e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4015-las-primeras-gafas-fecha-aproximada.webp",
+      "sha256": "34f65fdc82197f2f4c82e59f761eb786742bf6e60a80898268334fbf02811148",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4016-la-imprenta-de-tipos-moviles-de-gutenberg.webp",
+      "sha256": "ca11c21936c2168b113127241ea5e9d268c81045ba69404b88b435b19421dd58",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4017-copernico-pone-el-sol-en-el-centro.webp",
+      "sha256": "b4ddb771d969a1833ee357fb35c8fd176f81812fffe99b1689f17b871a3424ae",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4018-el-calendario-gregoriano.webp",
+      "sha256": "085ff367fa17e99047db8a126f9795d5c1111573ab02f47b5d71a9a9ed0b9a5c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4019-gilbert-explica-el-iman.webp",
+      "sha256": "7c0cfc17cc1a204297d27ec720302b207686bc514c1aa93dccdaf77a206df742",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4020-lippershey-solicita-una-patente-para-el-telescopio.webp",
+      "sha256": "5a6bdb37d6dbaa66e7a0bbff780f673468c586a10104b7af7f1528b2ee57c894",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4021-galileo-publica-lo-que-ve-en-el-cielo.webp",
+      "sha256": "61f0282e6749a52e8fa89d75db0deb2d4183d25bf779bd4ed80c752bb3ee4d55",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4022-harvey-descubre-la-circulacion-de-la-sangre.webp",
+      "sha256": "b1a1fdc1f3a44f123f493f3f23b94ee87042422149a41c2569ec6bfa2e3c38a7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4023-la-calculadora-de-pascal.webp",
+      "sha256": "8e6396445320111297af880e204511af2e98ac92053221e784b6cc7e66b40ef4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4024-el-reloj-de-pendulo.webp",
+      "sha256": "f6362fefd78575bdbb0fa599ede03e371e38806efbdbacafd4c6d11ddb765a55",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4025-hooke-ve-la-celula.webp",
+      "sha256": "29f684c419454837bc1e12e5b1ca8e8cb8d090c45fb91a60d4c7a66bb702d9aa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4026-romer-mide-la-velocidad-de-la-luz.webp",
+      "sha256": "cff4db508b88ea4932bad1ea1750a0adb2fac734f2ab08733af99f2244168798",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4027-los-principia-de-newton.webp",
+      "sha256": "ffa09cf6b0046be6e78fe070bf976b83307d1d5ec1007e274d6a8727b4c1e674",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4028-la-primera-maquina-de-vapor-comercial.webp",
+      "sha256": "eb2f5e84efce1e9a89db5987f1d84c14fe33e1f35adaf2b3d4023972af72132e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4029-la-maquina-atmosferica-de-newcomen.webp",
+      "sha256": "7cdd91d2eb2d1f862940ba8c7c999de0444b1fed8d122cfbba0ce9b00e736ad1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4030-el-termometro-de-mercurio.webp",
+      "sha256": "fc9957fbf12c6e81bc19b60c3317107de415f987f8f80f5e9f1288aef9094946",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4031-linneo-publica-la-primera-edicion-de-systema-naturae.webp",
+      "sha256": "48b98028072f46842d161aa5f5c05c1c612ae946bd4f0518594105d47a3cfa47",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4032-el-pararrayos-de-franklin.webp",
+      "sha256": "8d14c1a4575be78a710133836c2d614cc2ef044ad21f50109f7bb042bccd1353",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4033-watt-patenta-el-condensador-separado.webp",
+      "sha256": "9ce5c3be6db35afe1a9d836c917db2ab8b4e3ee5697c1af45fc8144b15a4e570",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4034-el-descubrimiento-del-oxigeno.webp",
+      "sha256": "446d1452e6448b67af59940862202525d2313150d8938164e0867326b04f5fd8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4035-el-globo-de-los-hermanos-montgolfier.webp",
+      "sha256": "13687d947150307296e225678690a4956b2e2e66905a1bc9db9f37036a6be13d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4036-la-vacuna-de-la-viruela.webp",
+      "sha256": "432495abb21d16ffcb37aa3f6ce83cef56462d4feb7ba5cc118df5e034dccae3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4037-la-pila-de-volta.webp",
+      "sha256": "16a6df62e791acaab03544255f57256ecab3d10f3d2b7dca90f2ee74424cf8b0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4038-la-primera-locomotora-de-vapor.webp",
+      "sha256": "8bae4ba300af9d49d1ada4d38b5bc36ce94051bbbe2e5e6a1215003e65480636",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4039-el-estetoscopio.webp",
+      "sha256": "e9a5a76d571f8db69279d919339b9015cd0b8ef52cdc6a5a579bd86a2201f33e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4040-el-primer-motor-electrico.webp",
+      "sha256": "214659578f4792e9af708bc597a64f34601583d420f7c766523abdd937c79fdc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4041-la-primera-fotografia-conservada-fecha-aproximada.webp",
+      "sha256": "227487bd3abfb395ab7bb0b4b88c79b943c0c067f34b1fabe4eb2d5cec4a54f7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4042-la-induccion-electromagnetica.webp",
+      "sha256": "3a801493e4caccac9a70132588ebd877c52e64f2c97068b91d5b37d5008aae6e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4043-morse-desarrolla-su-telegrafo-electrico.webp",
+      "sha256": "3805e76fb628d748c70ac5776743bf0514c865228f5a4668b1ea443e01baeebe",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4044-el-daguerrotipo.webp",
+      "sha256": "9efbe0b5a60081f0e9d2410cfc4a52d66ce5bfef9973cdeefc17aef426a0aa14",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4045-la-vulcanizacion-del-caucho.webp",
+      "sha256": "c6b4456f0fe4301aa4c8dd7efdc74b70a1b5d3e8e36162a9143304650d145b60",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4046-la-anestesia-con-eter.webp",
+      "sha256": "aeb7e69fc40f70e993ae0154527b01ecb5a7fbf0998013271b814a0e5749b4a7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4047-otis-vende-sus-primeros-ascensores-de-seguridad.webp",
+      "sha256": "75d58ce58e98e0de43e1b34fd8ac85391572d90613adf4d9ace74958698bf278",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4048-el-convertidor-bessemer.webp",
+      "sha256": "db5c6b97e05027ce3b54620fb1e3d9ed92efcd1c57581f596a4362132dbb889d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4049-el-origen-de-las-especies.webp",
+      "sha256": "a08d6c630ad0289711e9e1c5baa024150de8d6448eee594fce1f5abded02499f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4050-la-primera-fotografia-en-color.webp",
+      "sha256": "1f952dd09e0fa080b8342777af08c1a4e4ad9dc9f23239b85ae3906a81f0bc56",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4051-mendel-presenta-sus-experimentos-sobre-la-herencia.webp",
+      "sha256": "7f3eb9c61f507b10227df7107bf274681f417165f7971ec666c69ac72414d9e7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4052-la-dinamita.webp",
+      "sha256": "274b0b67d80e79c202a7c82aadc2067e52667910ad6aa837a1f857d7729aa3c5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4053-la-tabla-periodica.webp",
+      "sha256": "05d5ae2d14710dc8e73a1827818621da69758c72c685b8ffdc2609bbc8f6c0f8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4054-la-patente-del-telefono.webp",
+      "sha256": "fd853f09d3ad2d530add117add814bffd35145cc272c9389ec058b8870b4aff8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4055-la-lampara-incandescente-duradera.webp",
+      "sha256": "d0b622d126329440d2141bdc2b1eecbb01c29be59ee238007bf3ca74ad25d123",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4056-la-patente-del-automovil.webp",
+      "sha256": "c6c31af57c5051fd09dfccf7761f1ffcd9c024d0951cf789aed175941e0e82e5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4057-el-neumatico-hinchable.webp",
+      "sha256": "33fdd060dedf6891fd441430cf8d0413605bff3ead9514c9f9e28102bb8a9e05",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4058-los-rayos-x.webp",
+      "sha256": "51a420dbb89d7c1366f29ae08a551823f578926be1285dbc47c91238c53b4e22",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4059-se-descubren-el-polonio-y-el-radio.webp",
+      "sha256": "349adcbdf94dbe67556363caca9a8c50218f27c1ba5c3f6f9147ea8d048411d5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4060-la-primera-senal-de-radio-transatlantica.webp",
+      "sha256": "cd3611c7861f7520b9a65117b264224a61b727bcefa2ffe31e46c25b2d205d8b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4061-el-primer-vuelo-de-los-hermanos-wright.webp",
+      "sha256": "c95d632f8437f67b4b299a0262386755db8aaf0a7c744ebb0fa847209be625e3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4062-la-relatividad-especial.webp",
+      "sha256": "32f40f23faac766f73cd9056b687bc92de5253e7e0256ac95d8acf368cfd8dd7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4063-la-baquelita-el-primer-plastico-sintetico.webp",
+      "sha256": "4ca167acac78582b2c0a9dd39e8ec7ec67b8ebdefb2c10bb9138b58b270c9d64",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4064-el-proceso-haber-para-el-amoniaco.webp",
+      "sha256": "4abec294a94e08e22b41f96af53ff055df572c8b1a9931f2ce16ddb101fd27e2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4065-rutherford-propone-el-modelo-nuclear-del-atomo.webp",
+      "sha256": "d2586d8ca62d7543e8ed4bf9e101f27b8faec55275e8c6348adced52a478160d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4066-la-cadena-de-montaje-de-ford.webp",
+      "sha256": "a90d2d1c4890a9f279e88b692df47511a568baf688df519fc9a0da0df0e95d42",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4067-la-relatividad-general.webp",
+      "sha256": "8661e5a2e9d4d49607bc5d798b617e19f312403b5f5227e1be54e978c36ebdb7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4068-la-insulina.webp",
+      "sha256": "84053e5f3a9646506570bf40821fd85cabaf95186e25132b8bee1496a02b0491",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4069-la-primera-demostracion-de-la-television.webp",
+      "sha256": "dd2904bbc22eae8838bffad9ec81850cc11a8f47edd012e31940483dfb0a2dba",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4070-la-penicilina.webp",
+      "sha256": "020eff88c611ecb58d9d0eb1099f8ded5395fc8dea10b68cb309d7232c7a18da",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4071-la-patente-del-motor-a-reaccion.webp",
+      "sha256": "bde11b813694c8185ffda5ab6b524effc0583d5eb3f148474f8da1b4774ef9ae",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4072-el-radar.webp",
+      "sha256": "7f6287c217a6a0a854ba97f9645e33f73411463aceb82f87c13a37642e15a6ed",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4073-la-fision-nuclear.webp",
+      "sha256": "3bd7c3ef03565770381f0a281c8b5556e50ed279f02171b9fe2ba59757ed7b06",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4074-las-medias-de-nailon-salen-a-la-venta-en-todo-estados-unidos.webp",
+      "sha256": "2e366675f9142ee45705f881534c78ac603083be78701e709809e408f272a3a3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4075-la-primera-reaccion-nuclear-en-cadena.webp",
+      "sha256": "4aa71a48cdd874459185d1620762792c92ffe870731ca84ed394dfdc3df2a6c1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4076-el-eniac.webp",
+      "sha256": "0bda26c96e2e4e41873d3ad471067cc928f483447e145da491d0572f92edc542",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4077-el-transistor.webp",
+      "sha256": "5c462ff08d33b9ef3c55bb906a6f3b3268b23944fa33ff738775623e4a7a67fd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4078-la-estructura-del-adn.webp",
+      "sha256": "d811737286c5c857269b414bba56b8c5a66a03b7228d306962ea1517eb61d037",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4079-la-vacuna-de-la-polio.webp",
+      "sha256": "3ce976c7f1a9b1656bd07f6ea6243e23a75483fa928971773f984d50721c1826",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4080-el-sputnik.webp",
+      "sha256": "5b29f2217d9dc8d9c8cdbda73be38606cafb08b608d7e0259166f91c94d227f5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4081-el-circuito-integrado.webp",
+      "sha256": "b0dd2b1005a5196ed95207ec0d9e13309dd647f0316f0556518f060eea684183",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4082-el-laser.webp",
+      "sha256": "fb5e17d4c0124c4be8dff133ac9cd46ddc874945a4cc7f4215dcdd4b96f5f9f0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4083-el-primer-humano-en-el-espacio.webp",
+      "sha256": "7112355d76a70fb6a5c82d347767fcc1b49d616f3170be584d9419079468f2a5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4084-el-primer-trasplante-de-corazon.webp",
+      "sha256": "e375401ba501288d4186a83e0f27b565e475585c707a0061b86fa5cf1a45df33",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4085-la-llegada-a-la-luna.webp",
+      "sha256": "58ddadfcba84b5728762d2b6ea72dfe2d8ca0c6d0048df0c59b38b5247dad749",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4086-el-primer-microprocesador.webp",
+      "sha256": "1c2803a59341df05cc8affd462613f864a9c75feb914ca352bb193b2b1c2f17d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4087-la-primera-llamada-desde-un-movil.webp",
+      "sha256": "412dca66076835dbd68659fa14319812f2bc2f450d691351495f8997d7db366d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4088-el-primer-bebe-por-fecundacion-in-vitro.webp",
+      "sha256": "9a6e1c892bcf0c22983ca5f856332380610e9583e977e0d195ca2321118e2482",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4089-el-walkman.webp",
+      "sha256": "40aa116b8f70be77bcf2d98cd36e989dd42a8d1e334cc9a7fcecf83f165e3ae6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4090-el-ibm-pc.webp",
+      "sha256": "430a0349b9d71530b9e600b9a14f1bb06a73551b4f3c039b1aea79d5fc90495f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4091-el-protocolo-tcp-ip.webp",
+      "sha256": "f56020240d047ff5b23b83ac126044873993bd0dc49a61eb6ccd685c2652d427",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4092-la-huella-genetica.webp",
+      "sha256": "0d4870de82783b536a616ad8750ef16da405a7b713045df3ad70d63666b3b772",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4093-la-propuesta-de-la-world-wide-web.webp",
+      "sha256": "5cd88a27d1e54374396596656dd087104fe9a62a79064304afb378726dc76b10",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4094-el-telescopio-espacial-hubble.webp",
+      "sha256": "aa4afc0aa231ce14a7e3d0936aba4ea10034226f5ad622178f2108fc552ec947",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4095-la-oveja-dolly.webp",
+      "sha256": "5bbeca82b0f835f57f275556f7deff833f6e8746b1a3a820f49999a293da4d4e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4096-deep-blue-gana-a-kasparov.webp",
+      "sha256": "c32440be49321e931a498c1a4e13226ee784b18149a887a90452d43f5cdf8542",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4097-el-primer-borrador-del-genoma-humano.webp",
+      "sha256": "1231a368165649f20274f0b12096df327045e1a4a74f2dd96bf1b3d8bca21f21",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4098-el-iphone.webp",
+      "sha256": "f4ea24e98cc57c7b4d815d6550fc4ecf7a3116c06684260daabd423fccedb333",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4099-crispr-como-herramienta-de-edicion-genetica.webp",
+      "sha256": "66725cb754f68d1f057b248617049895f8d11cebf6396c6f1c8f8533b87b486e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4100-la-deteccion-de-ondas-gravitacionales.webp",
+      "sha256": "372761aa112fd0f9ebc45816ffa2c31ac53e512c002b309fbf4d99ccea3432e7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4101-la-primera-imagen-de-un-agujero-negro.webp",
+      "sha256": "02d7ba45e4704c96e3a86df33b141c56949bac1224deb48e0fbaf536254b1aed",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4102-las-vacunas-de-arn-mensajero.webp",
+      "sha256": "cad6b9f3a51e7ee7548d5d94cdd87d9100c5afcaa733800df501a40302750bd6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/invention-cards/4103-las-primeras-imagenes-del-james-webb.webp",
+      "sha256": "f8add9c7230dde8d240fc6e137f78a16a4ada1ec5973e8d917090cf6c290dbf4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9001-hippocratic-corpus.webp",
+      "sha256": "f83dad5f3d02822bb68f74caab98e33ddbb8dc5f0a565d3d1926fa1bcc174c90",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9002-avicenna-canon.webp",
+      "sha256": "48fe6ebce6cc7d833bf815c48189169178abca184c45287de62662df5eb74da7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9003-ibn-al-nafis-pulmonary-circulation.webp",
+      "sha256": "b4a1876ef7bd0a179d163cb204b63125cc7003712a2d0b48e4e9bff22db2ff8d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9004-vesalius-fabrica.webp",
+      "sha256": "9875cef046aff128359a4f5f90872bad2d1e387871139822ef20790778b5db1b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9005-harvey-circulation.webp",
+      "sha256": "a46d70acf2ae960b4a30217c03cca28e045aece2b7d842ef6d3e59a3bd2fa825",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9006-hooke-micrographia.webp",
+      "sha256": "6692426fd72fa874ec87bb96e6a5b8e1cb56f6e70b75ee9355b78ca42a40a2da",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9007-leeuwenhoek-microorganisms.webp",
+      "sha256": "a19124ef89ebc504d59e357cb7d41230db3eb76ce7f3febd0e5784aa8b7026f6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9008-variolization.webp",
+      "sha256": "8977ce0dfa9a12c361373d6a1a44ff295143074577425a569b7620e5b6bd2c7e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9009-lind-scurvy.webp",
+      "sha256": "52e2417d10390830108e74ac4797d14577ddfe4944f1036ddaf215f8c1491f77",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9010-morgagni-pathology.webp",
+      "sha256": "7cd7a8f41f07fcc3fb973ba76553a1abf39a88f4f6c4ed1a5a18b375d75b4cda",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9011-jenner-vaccine.webp",
+      "sha256": "d685dad567f9897c9b9103e0d215476f9a2e97cfe40be7b1047e563a0a7b8b08",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9012-laennec-stethoscope.webp",
+      "sha256": "e1dbb68161238b8ad92e85ed16f5835b8c71235ffab44a2b67f4c99f9ba41b68",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9013-ether-anesthesia.webp",
+      "sha256": "4acceb37c1c924d3403a62f1b192e716e7d5e4c0306ea68e1c2dc5e6f1c097ad",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9014-semmelweis-handwashing.webp",
+      "sha256": "ef07855300fbee351835ca10856e30ffecb7e1af1a44ce8df31af2db8d7a0a89",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9015-snow-cholera.webp",
+      "sha256": "2143ba666da1c6ab269acb636abb00f1dab84b5f2dc6caa2f4eb863e08c4976f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9016-lister-antisepsis.webp",
+      "sha256": "1a4cc1be01980573b1eaa673376233267fc2b6d765050057569918230434e4bd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9017-koch-tuberculosis.webp",
+      "sha256": "d25a6cf97fa3a348571dc48e174a7aa4b156d9cf7895b345c8b556690edd07ab",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9018-pasteur-rabies.webp",
+      "sha256": "545f124c601d30b1fd7ffe5a3cbb55ba2f6701d5f87e4132ff5897bf15dc72d0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9019-rontgen-x-rays.webp",
+      "sha256": "4554f8a3be416730a1a0de23c4ed1e0a7a35a1f050ba9619d211de65401bf747",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9020-landsteiner-blood-groups.webp",
+      "sha256": "ee468d8d0cb726218258a9391b130f74b86c39696b9e5fc23cde5518a2fd095e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9021-insulin.webp",
+      "sha256": "9b38d8fe5c3e9aa549d1a9e090c53e4f0bd241bdfb49f1a211fd6213dee97a92",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9022-fleming-penicillin.webp",
+      "sha256": "319128c1047ae7213dde8642da9f9479de20b6fe65713c269c34220f7a54a470",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9023-prontosil.webp",
+      "sha256": "a348b841372a137ba30ed92ae58c9f72cc9ab19a543aeea907161300b48c53f1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9024-blood-bank.webp",
+      "sha256": "c10be720b17d1f94d8279a89de1f627dd22f4d55003ea69da114cfbb5e6f8256",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9025-kolff-artificial-kidney.webp",
+      "sha256": "08244df79bd743599d7df9b56e311cc8e97fa29a3fee5b51bdd223059299f26b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9026-penicillin-mass-production.webp",
+      "sha256": "99cca5c51b18ea03893a8420e1c5ab1b0696a8506471359a819e0ba141798504",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9027-dna-double-helix.webp",
+      "sha256": "71124c9843e93c9d403666518f302576bdb0f13c8ab344755aa8c470f79abf55",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9028-kidney-transplant.webp",
+      "sha256": "8c9ff3edd886f735e480327be78899336ac47aaba929976bc75298ab0dcb73d5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9029-salk-polio.webp",
+      "sha256": "a707896a2919ba91b6051ee7b54f38d1dcb781f9e17c4d913c4782869ce7a175",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9030-pacemaker.webp",
+      "sha256": "228f887335b85f2f0f48b0f28dde4017d58e83c1cd1de30d35cec97605584d29",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9031-oral-contraceptive.webp",
+      "sha256": "c1ed63642447167c9add27d1e9a597db0d7f47ba17c3572bc8e534c9a251fccc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9032-heart-transplant.webp",
+      "sha256": "a4ca9a0155fe8ac3db999c6205621052422a976bd879f2473cc5f17170da3181",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9033-ct-scanner.webp",
+      "sha256": "82e38e323c49026868030c8c8c40e6bca63309b581d406c50b4f2ccde7200eae",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9034-ivf.webp",
+      "sha256": "22af850a1a97e154c178960121c3d3f4e028298e72d1d0251546f7b53a3220cc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9035-smallpox-eradication.webp",
+      "sha256": "16af55cf21a6aa3d083a119b26941bc95078c708131e33d2b738bb86890a0738",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9036-hiv-virus.webp",
+      "sha256": "070fb31976f66b784f18fdbc8a2c3816c695e6690963ea97cd9833e2f037fd90",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9037-azt.webp",
+      "sha256": "0fb60e5185f5d155f66185f386f2d374872e3f98485ff9450c706e96de0f386f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9038-human-genome-project-begins.webp",
+      "sha256": "0a1d337a7f3442a01250d2aad88bc0db80a211dc9f1d7545a88522141674d786",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9039-dolly.webp",
+      "sha256": "e5fb93b309fa5d888113296b01cfb0669b9176580499e1ee8afa4e185e58ed41",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9040-herceptin.webp",
+      "sha256": "523f1fc053edd2ebe34815971bd42b0cb31c1d37f0691545667e3df558557286",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9041-human-genome-project-complete.webp",
+      "sha256": "ffcc698a4936f15dcef6551742f78277dd8abe528d8674bd120e5afae15183a2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9042-hpv-vaccine.webp",
+      "sha256": "bba67d123780b8104c73ba2c7c1b3ac9cfeb1feaa3098fc4471f81729319fba0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9043-synthetic-genome-cell.webp",
+      "sha256": "cc212017256ee10191b1bf28c51450d3ba860bd5207c405f8bd5d8b7bb006bec",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9044-crispr-cas9.webp",
+      "sha256": "fc7bc7a551636929c9e9b6e7246808abc4c197060d70ecfa37f23f3e8d7e8e6d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9045-mrna-vaccine.webp",
+      "sha256": "7a80460e1f5890673ac3b45be1b118978243c0187082e06b7fc8f9b72867187b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9046-pig-heart-transplant.webp",
+      "sha256": "b40721316c4df7ccc736487f2e7bd2fdc3c72be2f683613f300ecbb8291537e7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9047-crispr-therapy.webp",
+      "sha256": "b7c876bd9e72bc8d04f4d67092fa14355968543bbb51e0d3aafa72727d7391ae",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/9048-pig-kidney-transplant.webp",
+      "sha256": "322470f7eb87df61df6fefb40f7faca5a8ebe05d1b8aaac4e991f5295de3e5f2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1001-moon.webp",
+      "sha256": "473ef92eea6feb2a3e9bb57dea3819ac459bfe0a26fa09d840f244cc80f1e982",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1002-caligari.webp",
+      "sha256": "415a0b73c4e158fcf63b67da888acaad4fe712b6f127270c5d00258f951f76c6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1003-potemkin.webp",
+      "sha256": "83f1c8a97494c40e837c92639b837b25854d3b37e3b438d808a829dc3bc278dc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1004-metropolis.webp",
+      "sha256": "44664688a4d498b658835a7ff43d12be4d79922eeaf8d546799f63ceaad54a1e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1005-city-lights.webp",
+      "sha256": "62f99254c7893e96864fe8fe93be82783b9bb24c76510917fd2d5590064399e1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1006-king-kong.webp",
+      "sha256": "e9d0826e835868241dad08b938b6d7af94aac11fc40a5912f7d6c8b81d3214ad",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1007-modern-times.webp",
+      "sha256": "03df4bb1da1090b71a561ffc60e7a939f5caf942d5b26ec0332bfc717f646e61",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1008-snow-white.webp",
+      "sha256": "9a0e445db4f4032e879e8e0dc95282fbf9067a085e2a6854a367dd32db049846",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1009-gone-with-the-wind.webp",
+      "sha256": "e60869995e0518cec41c9dfd3cb821edb4bbb83354afdeae80887dffb6277087",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1010-great-dictator.webp",
+      "sha256": "5d838005e523691d18d4675d6148d958f6fada24711dd68e6907b8f384b93636",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1011-citizen-kane.webp",
+      "sha256": "c1aab4d400b37f42f5a2e2fef58cd36a6836eed27a37fc2302b7d6813324c1f1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1012-casablanca.webp",
+      "sha256": "2ebb57639537cdff9b822e8ec24ca5d08ca693bc6d267b00810b99fbebffbd8b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1013-its-a-wonderful-life.webp",
+      "sha256": "7d0da04caaf41da10495699f60e8190b0a1026aaeff5f4b14a1bfd0a1c03c739",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1014-bicycle-thieves.webp",
+      "sha256": "5a4ed3e042af4b81bcbc54fb86b004e7e6914739d9528bdee8b76ae331fa6c2d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1015-cinderella.webp",
+      "sha256": "9ebe828f81eba303d4ef43505c5cea6484a91ea5379d893c5cc9c2e89508144a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1016-singing-in-rain.webp",
+      "sha256": "92e59e3c0091346cd3e4533d9391326b28eae8e3fb601e67b26d2925fb355bba",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1017-welcome-mr-marshall.webp",
+      "sha256": "9359c805cd0662c72e6d6ef9a63b0a07168b576465fd360b700c4fe1b54e7ae7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1018-rear-window.webp",
+      "sha256": "0de20fd3279444436080a075a0957653bb8c648439deb55b1f64523ec286a5a0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1019-rebel.webp",
+      "sha256": "774b210233e08a92736db24f0e6f265e89c5e47590d37f913f6069b9a6ad5f13",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1020-ten-commandments.webp",
+      "sha256": "278fc37db72c18ada93a2183925b4443cde3b1f9eedf8cfb6365e2481ee45098",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1021-twelve-angry-men.webp",
+      "sha256": "dea5082a8763593d4810684489c2553f1c3958ea216b2ced2d2fd82886854c99",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1022-vertigo.webp",
+      "sha256": "7e43c2010078b2f01b200682706721de8f24b47944284ac8dc3bf2b9a530faa3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1023-some-like-it-hot.webp",
+      "sha256": "a7ca4fece309e4f3323add5982a8083c9d08940a32905c2b92038ca90c6e799f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1024-psycho.webp",
+      "sha256": "799d1ee1cbf851eddffa90804f8e9fbb282d0a95dcc5c112c7ada27b2585aa63",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1025-viridiana.webp",
+      "sha256": "e51c7941fbaa40d9ca3e8b85bcfbd7c7ef0b2f9c63e0c021b6255573635bd35f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1026-lawrence-arabia.webp",
+      "sha256": "1d234c25c1a84790f059949af07dabfac1a39d6be453dcd6ef124280b35fc0c9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1027-executioner.webp",
+      "sha256": "7acd55d4aaf0bef616748b1bee38127498be0c574cf0b6b2c600cf9be150faa2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1028-mary-poppins.webp",
+      "sha256": "15fe0bfd64355dbd934a0542cafcfbd00dfb49d98fcba2617e468f2415eb168a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1029-sound-of-music.webp",
+      "sha256": "3ccb9c492576d0b3ebc575d9e6194f0e53d9ab76e08a16970eb0628dd0f4e495",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1030-western-cemetery.webp",
+      "sha256": "75004d94a14fba00f8337786cd11eb25805dcaaf7b0e4eb4e605d9e94c5d4d99",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1031-jungle-book.webp",
+      "sha256": "d81db19bd67b78b02935347afcf5bdde6f92cf1f077a85048f06168b159f2771",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1032-2001.webp",
+      "sha256": "74b28563b5c84b506b6772f403e649f0136d4128b8049ba08c29c2cbb6273fa3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1033-tristana.webp",
+      "sha256": "09beac3ce785a9e5e9b1b1d3ef0d29f7397a26f820b1ac8eeec66c5ca5eaf5ab",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1034-clockwork-orange.webp",
+      "sha256": "40506ab93ca43cc8728eb0a3b8b92cbc6214f2b55a59aa0e34e016aaf1470e87",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1035-godfather.webp",
+      "sha256": "6d50aee3a2c2ce2d1b666476ae3a7280e651856392f14136109dac0cf060d32d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1036-exorcist.webp",
+      "sha256": "c2272d9ee067f902ac272b8e24d9b4bc129574de1cbbaabc14761f529ae0f334",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1037-godfather-part-two.webp",
+      "sha256": "27414abaa8484ee7933ddf20f9942b05d71d0f058b1a596c1517ff199015df20",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1038-jaws.webp",
+      "sha256": "76b77132f90f58d2f017c71f9063bd197e3aa7177eeac7158179f0a427c73528",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1039-rocky.webp",
+      "sha256": "e65b69a6e9a090bc1a88ab48d0f81f0d9eb59ab33f8c4d9b922eba48637a532e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1040-star-wars.webp",
+      "sha256": "2a10d4226cf51ffc2e41833067777df6f40bfa63229b608f57a00b75d294a3ce",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1041-grease.webp",
+      "sha256": "572a2a0693ad0eb67e2fe3c9df44154fa3a88263865054f0b9f24226d79f3121",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1042-alien.webp",
+      "sha256": "d843e862ed62905b0b44464125dfd6878a8fe3c195b3deb6678cb77f8d6d8e60",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1043-shining.webp",
+      "sha256": "55e5edef58a684ca1866d44da0eefb9adb9779dfb312ec4fba66d0eab34b27d3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1044-raiders.webp",
+      "sha256": "71fb8cc09bc3b34f366a29b9a0562bdd76131f98d7203bf0eab778b02db05ae9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1045-et.webp",
+      "sha256": "6da325eaceddbce4f1ee9fa049e6e45658ec97d359cd51fff8a31708b3a3a43d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1046-return-jedi.webp",
+      "sha256": "c48f9a01eeaa0d11b043fb226e92bf2f1c542ad5852cd30793a217e1c51d34fd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1047-innocent-saints.webp",
+      "sha256": "66d2e7a10cf96accbf42bbf6f4caf6b84ae36c097f75ef52f789dbd1d79f7271",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1048-back-to-future.webp",
+      "sha256": "f299581867ff14171ae6590f1d68b060a26b76d7460242a8544aad730f9fc6aa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1049-top-gun.webp",
+      "sha256": "21ad6fa8c11b455d8764b4d554eed9edadceff2f1c45b3471460853e88e2717c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1050-dirty-dancing.webp",
+      "sha256": "08900869df67d65834c4c82ae9729f40d43c53a1cd5a83543d8cf3c384400235",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1051-women-on-verge.webp",
+      "sha256": "37d36b95d8593547091627f81643b60c56dea6825cd9215c5e28935eb3627290",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1052-little-mermaid.webp",
+      "sha256": "f7441d3c19d384db7c704bf7c753a02a9917594779e9ee55b0e5653ccb5e0915",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1053-home-alone.webp",
+      "sha256": "4e1cb4fb0aa0739b59fb5ce204336007a040f9eb82e8ca875519a54ee69fd7bb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1054-silence-lambs.webp",
+      "sha256": "da26920df1372f712d7f81745ba88fbe392afcde2ab90ef8c74739f496e508d5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1055-aladdin.webp",
+      "sha256": "d172dcf4f77d731ee0d9457619854b77a78b530ffcc147b597f821fc1d41fcf3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1056-jurassic-park.webp",
+      "sha256": "3e20c6e773ef0dfecd550debada16ac46123070aaf9092c314b7da3814fcbc20",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1057-lion-king.webp",
+      "sha256": "acfb4ad2d7b5d16fdca33571949deb6d71665d2bd9aa0cd8d16a08b55f31ae32",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1058-toy-story.webp",
+      "sha256": "42770c39378f9e5b29b0b40c79fce8b845fe0360c35578d66f255ea11897df79",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1059-independence-day.webp",
+      "sha256": "341358938a3d0757d0577fa7408c3ea346760c64cb1d6c9c53c9e7139d713236",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1060-titanic.webp",
+      "sha256": "5696f518d0ce35e4b6a9d96618d498baecc4f956308aaef7df6f3f2b25b20564",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1061-saving-private-ryan.webp",
+      "sha256": "b37b05095818a3907a1fcda56dae10ecb0338474a473993d4c983cdde55783b5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1062-matrix.webp",
+      "sha256": "643b830dc047895ede0d923a696698e3970c5d262c4720ca4ff6ca5a3f439f65",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1063-gladiator.webp",
+      "sha256": "622f8334dc53ebd4df7706ff35f6056efca5218f70c2b4c5375c89752f11fcd3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1064-fellowship.webp",
+      "sha256": "d43b5763c2b74631fc344e780820370fd2791fbecdbcc93a0e4e34b1a4492961",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1065-spider-man.webp",
+      "sha256": "aac26966f6e9c3d3dae65f6ea572c0c96a9854fae6fb8127721cfd87fd776a93",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1066-finding-nemo.webp",
+      "sha256": "9505df767b7e484d203382a62689f0333c7711dba1f316d6de4a2e17655a13c3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1067-mar-adentro.webp",
+      "sha256": "6ef8de848b34367eece28898159114745c6ba0b8d4b2b763c2d6a6e3db91fe7d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1068-batman-begins.webp",
+      "sha256": "99239486b997f638ecb8a9a200fa41934c3d65343c869c7125379470a607ac1c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1069-pan-labyrinth.webp",
+      "sha256": "35ce12d518c380e913d04ec24616d3218572137e90bcdb21a8f04668ac4cdb16",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1070-orphanage.webp",
+      "sha256": "2231a34f5fa296bb710508f9b75303f44a404ca48f6fd99a2b9e3582053bcd00",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1071-dark-knight.webp",
+      "sha256": "914c9215dff6651492594f5f67b5fa20c2fbec90f00f3d93c4358302c6ba428d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1072-avatar.webp",
+      "sha256": "efa183ba1ba09c41a2f03a9181e343787b92a0876f689bb8b9fa60d66eab85dd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1073-inception.webp",
+      "sha256": "ada725e7e6da71c103dcdb746c3a419fe3c2d4720f528beb21df51da21b2bc0a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1074-harry-potter.webp",
+      "sha256": "99af5616fae9a9a9e7eb8640f79c0841e5fe0dabe0c09b794295cf4c9e13a467",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1075-avengers.webp",
+      "sha256": "cc99c2a7688ebeb11e4796d62d0f7aed668dd812130e19b92cde84c6cd11fe8f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1076-frozen.webp",
+      "sha256": "79c8806a98b08fcfdc67ab7bab5fab43f2ca1c0096259f0d3f9990c27d020ef5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1077-basque-comedy.webp",
+      "sha256": "8c01d6bbe61c27b1d4aeef5ab7c1129b10e7531d620a6fe9b2179e6f9e63f67c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1078-inside-out.webp",
+      "sha256": "3a1eada91d8bfc7489a079936137afdc62675c01449def5100c8f357de08a8ce",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1079-la-la-land.webp",
+      "sha256": "677bc6dfe49cca9891c43c83ca26a46d0b2db5cdc9cc6f34cbc137c90ff36e51",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1080-coco.webp",
+      "sha256": "1013d91c5e1fac1e5ae65ad7b0f94bf7f363858a60ea5bada3e473182c8215e9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1081-champions.webp",
+      "sha256": "b0fe1bf8e30a93133dbcf49ab07d43aebc3b43beb53ed69dbd45ad4abce98804",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1082-parasites.webp",
+      "sha256": "41bd2ee0f80aee3ceeabc26418310f19f93b13e3ac7edbc7c5790f5fe510a123",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1083-soul.webp",
+      "sha256": "617404b95a19573c34b810e1032146d3d7adb097b8415f428c24417b3006e08a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1084-good-boss.webp",
+      "sha256": "4c31961bee65d0634c586363be909e55baeb094a69b3e40078032613a6a02b69",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1085-as-bestas.webp",
+      "sha256": "eb2e2ed2938e5a2cd9977ac57602c80b90f3c07148c7008440e2a0799f9f576b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1086-barbie.webp",
+      "sha256": "152acbf15dcc9622659e1ac143d3b24141a41f237ee56f986809264183fea0e8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1087-inside-out-2.webp",
+      "sha256": "ac2d6d3f32aadf60a8174878f8e1779503de7c2876661243475356af9ccf89e2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/21-album.webp",
+      "sha256": "c9a3ae8f4c823bda61fe21f4ff9cb4a11fe9ba493ac22496a7f752c67a34309f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/automatic-people.webp",
+      "sha256": "9b7ac0a1e32732ab8ffeab8d6c3f2ac3df2f20accba01bf37235dbb8426d050a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/bach-brandenburg.webp",
+      "sha256": "59828c454cb1d5a1dc2381f6bb1b68ced85dfff434fc17f669ce1a5ef2ac6eab",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/beethoven-heroica.webp",
+      "sha256": "260af84a66b32d83b66e97160636acbcbcdea3173ac193bc3367840d5384b1af",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/beethoven-ninth.webp",
+      "sha256": "3ed4594548be69cb374dfedaad2988801ce42862c1e2f8b1d292a5818739f412",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/berlioz-symphonie-fantastique.webp",
+      "sha256": "a89e2cead1f92bb7c7b95b7164c42e7d602c4aeb0854cf22d8957645f26c6528",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/bohemian-rhapsody.webp",
+      "sha256": "c61f4e78ffb733ccf415141e79c33f08539565b8afce2feac492cea9e4fe184b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/caruso-milan-recording.webp",
+      "sha256": "b76998c944f28756e17e8d9865ed0ae98bb23b32a7b5b167ddf8e484f7f47091",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/commercial-radio.webp",
+      "sha256": "0965ed5fe5302986749f493055d8d07aafefa40b2d62869533084bb8bae51f77",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/crystal-palace-recording.webp",
+      "sha256": "42913168f01abf50d042affd7f77a5517961e4b46f867e9aa8c81df9e5ff1752",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/dark-side-moon.webp",
+      "sha256": "de7a31604d4eca74e2a00f7c1144b8ad0a4cef1414e763060e2c201447554057",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/definitely-maybe.webp",
+      "sha256": "b5c2ca96b69a61a6091582774b70fdef6eec63f0d97df1fe53a37357d60dd9e5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/despacito.webp",
+      "sha256": "6a465488f689630d5caba8254649f6aaa9eec26e0114ce46f9275a6f32d2ff45",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/dvorak-new-world.webp",
+      "sha256": "e3d6d6fc160d382dfaa8612abbab338f2a42cd8ce3c6fbc30fcf63d76fc6d4aa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/edison-phonograph.webp",
+      "sha256": "02cb60df3fd7a4ed9f7db1d4532cefa297627d6b4924d4100efab2c62413e5fa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/electrical-recording.webp",
+      "sha256": "29d002a65b0d062631202b4fef3a678b8d2a8ff5aae329c17bfce88a27e604c3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/elvis-debut.webp",
+      "sha256": "fe17583a54f0839a0ed1f423a76beb8890e651f64e11858da504b2f890370fc8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/eras-tour.webp",
+      "sha256": "d51d229fa4e95d5429320475f303c64d4609c76b84b8a7b6aa8f886e0d9a2cc1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/gangnam-style.webp",
+      "sha256": "1ec549f199fcba54ae2d7cc0c252c5d6dec6f50054cc401b16a834c0df877c6c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/goldberg-variations.webp",
+      "sha256": "1e27790781ce4a7b1f9d1ebca94c52578add8ed0a57799961d2ba63a19413988",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/graceland.webp",
+      "sha256": "7b9a1e463c1ffa3edd72432cda8643e48c10a186a2f01c0744c14fbed9bb597f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/in-rainbows.webp",
+      "sha256": "c38987b7d30db889e6f9e0859ccb20fafb011232907934cbffd93ca09a3b8893",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/ipod.webp",
+      "sha256": "ad67d3c839c0b0197fbd25972baae1b2b151e9dfef590bbf51634e3150ed5c55",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/itunes-store.webp",
+      "sha256": "4badbb613af18e70eb5b8d1656380a26b752dc1e90512363481d7b49ab1ac0db",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/joshua-tree.webp",
+      "sha256": "e672da0111bb0cbea8e9ed0a9bf2cb9e49c91c0874edc858cac23d1dc8eabdaa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/kind-of-blue.webp",
+      "sha256": "ac842424d6f291761a254f08500c91c88a17594d0095b8d41a62da7979dd7020",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/last-tour-world.webp",
+      "sha256": "86ddd565554a019ef9ff1fd8f5a74b8bf41c93ce1343980e941755bb91dbc132",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/like-a-prayer.webp",
+      "sha256": "aa4ea9ed448b03226d7ab960a7a30f43c59f44c707c5d7a16b503027e36688cd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/like-a-rolling-stone.webp",
+      "sha256": "2bc3377d06a28f9b7abf477fb973abd9242878134a8b9817a9b9141dc53630a7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/long-playing-record.webp",
+      "sha256": "a8d4d559360914d3251a36196d42b52d7b755c8da2eaf19b51eba6cb8501dd26",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/love-me-do.webp",
+      "sha256": "c392a19b2b03f2a91c66c07ae9d137b8643f65e11882a06a0b96c643b77364fe",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/magnetophon.webp",
+      "sha256": "8bda5fcd4f614a3252246dcb8b7bce0f257aec5c95bedcaa04d65186d0f95615",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/monteverdi-orfeo.webp",
+      "sha256": "465df25847139f9ed2d8ee060a3dee4a85edbc13e124b0ca5bece7d615f0728d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/mozart-don-giovanni.webp",
+      "sha256": "e308c72a5e4b235316cde33cff0eb35f40b117174f9030c5f926381ef2001aff",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/mtv-starts.webp",
+      "sha256": "db240624e5ff63acbe77106e1449084121620552faa915ca2d9d37bce906706e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/napster.webp",
+      "sha256": "67ceaa0e6769606b7dba6b84820324504c7d5c72c150092a3df6a9ad7b70b82b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/nevermind.webp",
+      "sha256": "ac7db2af6fc6fc30710096de1b64714f7485213b56489824791a4053b42b3974",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/ok-computer.webp",
+      "sha256": "23871d59da083bb81ca331fe06055cc514f6790211dd19b453be3ac905982dcf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/purple-rain.webp",
+      "sha256": "f08b03877b8c6a1b956cbfe742136d1810bbba0fa5de71698aa18ef2e5d6be12",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/rappers-delight.webp",
+      "sha256": "59b96e5b152d5aeae4ea043b1292c1e0fab77bbb38e5a33decd9213e2a8a2519",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/rickenbacker-frying-pan.webp",
+      "sha256": "3eed5ba70782b8057f2d101c883afea8406cf7f11482e79b4299c1a0f953b384",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/rite-of-spring.webp",
+      "sha256": "122307727c4efc03ed7e38681c99ca145cc1b87284ab1fe91986c8560402d233",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/rock-around-the-clock.webp",
+      "sha256": "e4df7280d10beadf38ce888713c23354da6582e2a684adc4ab09a3bc180de841",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/rumours.webp",
+      "sha256": "56b667dd9433b45468baf692bfae636ce6697f431baffd881ca6f2de1817885e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/sgt-peppers.webp",
+      "sha256": "736a4ba3dc6a026f761df011f637b5e5e11778b2455484082cc1e5ab620bf968",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/spotify.webp",
+      "sha256": "d7cce04dffc2904a2aa4fa44fd5554d80779a0170f423dda6c9bccab1760c3bf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/thriller.webp",
+      "sha256": "ac7b6216b473df70aa41bd65f348343008b3e37492957b60111457257d218647",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/wagner-tristan-isolde.webp",
+      "sha256": "ff9d6188defc82397c6418b8cb1ef181572b3896bfbc9f0367e130f4e49e1e15",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/whats-going-on.webp",
+      "sha256": "de7a31604d4eca74e2a00f7c1144b8ad0a4cef1414e763060e2c201447554057",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/woodstock.webp",
+      "sha256": "049db532e47abd2abd3ea2460583896cc863b83dc3087d752fd887e694f07977",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/youtube-music-video.webp",
+      "sha256": "6858789a4d0a6a89a4869c24ba2c5ac7e9246280081efc40bf80d2fd9f64a28a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3001.webp",
+      "sha256": "d53f232220ccbd62cdd8f611bad2c3ece527436124c8a44abfb9fd43e951e6b8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3002.webp",
+      "sha256": "d37ac2c9e9685172c1c02aaa65cfa70772ed28ecec86b099a66790a60d4df2c4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3003.webp",
+      "sha256": "af48b3a8b8a25f54a571247ec2731cd3c716cec99444b860c2d0d1ed66125f91",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3004.webp",
+      "sha256": "2dd5f4d7eb20fba694c2705f82234242c9b0d3087deace4c1b8c7cd708072bcd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3005.webp",
+      "sha256": "0622fc101ba91dcab9422506579fba47baad05037bf3c6fe761c12045bf38f23",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3006.webp",
+      "sha256": "f6d79c36a17b776790d684630b18487ecc5d8e41fe2cc9077b82433be27b9226",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3007.webp",
+      "sha256": "3fc16f7231c2be80b2b1f6f02cd01a7c6cb2a46325b4e01baff1028143bd4d43",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3008.webp",
+      "sha256": "f3becea422c526e7cce943cb3ca69beab0931e89722691349c0c11f413fbe0a0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3009.webp",
+      "sha256": "9f81b1b311a18d928c236b8f46b3de2a22b8d9adef18816866a94b16a7e1adaf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3010.webp",
+      "sha256": "c0a095a2a39d821196b151e31ce6b3194178b187c3d3c52aa8a057d401f7f054",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3011.webp",
+      "sha256": "360cd316cd1cf4bbee993aa97f49397f8b7241669ce05c9234b6f2e9a36e5a57",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3012.webp",
+      "sha256": "2fb6c619320f0b0884e73ddc5f8ea15e291ec05ca18730be5f0c32f9d1c83e79",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3013.webp",
+      "sha256": "002d6450166b8c2bac094b265a316412c8ae7cc5bc61ea64e769908fb4dfd161",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3014.webp",
+      "sha256": "45ed6234f3fb424332ec684f69772ed3e9d9aaeebca52e016b0f4e1510c4b307",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3015.webp",
+      "sha256": "807b6cc30fba17603e3b8e928f5b4c0837568c9a1f0f5aceb857cdf8c0043715",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3016.webp",
+      "sha256": "7d0d7fbf22b1db19e358837c8fc5ef6455724ec9027a9c797f03187617b4f083",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3017.webp",
+      "sha256": "1f55071adb2b6c7c61d26d5d89c55cd7e79e829049af467ff233f78bbdf57901",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3018.webp",
+      "sha256": "3339b3fe598470adec3623729ec2b984f8b949d14cce1c52f7d582ca9a78f10b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3019.webp",
+      "sha256": "dcfe4687d4a1c0a5152a5b1b10f938ffb15d940fa26418a52f8f94fa5b087b39",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3020.webp",
+      "sha256": "1447c366cd495f1a66c57b0998ab9719edb7af4c6cfce8d4a66ee9c7f35e442d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3021.webp",
+      "sha256": "e35424c37dc591ab874e6b57338efa61b4c3360837e63717add3871396439795",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3022.webp",
+      "sha256": "cee9a43c301dec110973fdc4b5d7b52f38724448d740724b8eccbf96f8555ddd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3023.webp",
+      "sha256": "9dd5e07908c12799d7fffe0d7d7cef8ccf3c56ac39fbd4b4680779d55fa375c1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3024.webp",
+      "sha256": "07a785045c2d4e7e6f0fef8f716a57cce3fce5d286e4b461eb8d8af97fb1b862",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3025.webp",
+      "sha256": "afad7f9a6e86e24ce84c5a1622d9f9354c4f14dd728b776a0ae2041eadc1c834",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3026.webp",
+      "sha256": "cb28d1f60441b8fa3e7517a0a12dd60e4c2c02ab1b1c130279ed76ab3b15802b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3027.webp",
+      "sha256": "41f996fdbd6a9d966dba86fadf4c1bb89c878c1ebbed2f1236b3df4459c08415",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3028.webp",
+      "sha256": "f9d99801ab53b0221e8ea6da3f0c60530b5ead470c4beb2ee5df6702ff2c3333",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3029.webp",
+      "sha256": "3d207ae6d7357eda2ff5e6b6f34213333f5820954a1cbd62ab1f8812c29df8e9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3030.webp",
+      "sha256": "9b95186e318ed195668515d62f0e9c450cfbc39dde276150603a54fa7f7fd7aa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3031.webp",
+      "sha256": "9ca3997f9cfdf2a86771110af4fdfed71e4846c8552b826f5bf622934984fd6f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3032.webp",
+      "sha256": "fe9e6a3e479f202ff59f032776a3cfb87fc5157e2c2ad8e095fdf22b0877f031",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3033.webp",
+      "sha256": "611d86b1156c9b8dbc7866639b5fab5acbe54bc5903ee76dc41277552c3be46f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3034.webp",
+      "sha256": "0ad2fcb8a13b15ac4839782ca1f6ec52d9341a9022b49a3ba706cb34e192eed3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3035.webp",
+      "sha256": "a5f2f7bef4f9bdea041666b545ce42ffd57548869de7bacb1dd41e7f76eaad57",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3036.webp",
+      "sha256": "53c419255ec42f012daedbb0274e634ddd1f26c1288ae477829341c6d050c1f4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3037.webp",
+      "sha256": "bcee19ae02065b04dedfb09198db3ac2ae0733ea100faeeac9efa45d7fb9de3a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3038.webp",
+      "sha256": "d579e72f0aca0dcdf2d61b979a806116785e0b8b3a10fd8df5a35dc85ce4bba2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3039.webp",
+      "sha256": "705341e9ed4c79bb300b73e96e1e880ed01ed536e309d09d8d325ff6b3347cd1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3040.webp",
+      "sha256": "47ce34db17dad67aad11b189070db7013e560531c8ea7e67210464ca5ab8ab79",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3041.webp",
+      "sha256": "5d4e9bee4d9841cf77bbdd7b25441fdfba9e5df16fe7f1db97a3197a83e7e02d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3042.webp",
+      "sha256": "e021c831953b63c5a1c9ac053e1aeda912d4c054e85055dbee3f1cc48c28ab3a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3043.webp",
+      "sha256": "9ee58ed98a01fea44964631416c579f2bae01f4551cc0d858e03a39d07da0faf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3044.webp",
+      "sha256": "f80f3f82834ef4eb4f470ccaea4ba68bc0a717f5223741523a4bd99733d540f5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3045.webp",
+      "sha256": "ac82442fbe0d8600accff73d13a94d13e075d1fbd2069216ee27afdb571b94fc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3046.webp",
+      "sha256": "45339480a20ae1a6a1ea91be018b3142336fedcbd7ec3093fcabac6779998721",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3047.webp",
+      "sha256": "d9327de570c81349a6ec9d247498342e3cedb45bc7655f09f7b6bb7aa6b93036",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3048.webp",
+      "sha256": "40fd8730fb4a8e6ada01be80238f7328860ddbcb316d864fd67db6dc59344622",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3049.webp",
+      "sha256": "8a90ba6eed6e577d50321c5cb825ea08e75675912dcca8710e8ce9e642fd8f47",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/animal-crossing-new-horizons.webp",
+      "sha256": "2859b9858bee423c5cb1924c805e072290cbaad1ce5ad7ba97fedfad9e0cb2cf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/atari-2600.webp",
+      "sha256": "d2e46c663e41515c501af2ef6cbd87588fd4ce1a95ed379179176699c593b7dc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/balatro.webp",
+      "sha256": "f1a336133b0f73b80f4015e62f1059a5afd12ad1c2ba20357ea64c4fe565462d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/bioshock.webp",
+      "sha256": "25e945cf418c0ea38a6970562096a38d9e6d0a4b32e075486ee60ec9bbc9ce87",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/candy-crush-saga.webp",
+      "sha256": "1f3e6d550d69c03fbfd3b251d80f9958e3a181d47705f74349e38e21bddc7373",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/chrono-trigger.webp",
+      "sha256": "3eb41e104e37aad591f5c83d6a61c3b44de0e90e630e8a9cf5004640cec42975",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/commodore-64.webp",
+      "sha256": "1b7836718a1921e3620c66658cbbf779c987aa4de33d101742ee3b3b04e5c1f6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/computer-space.webp",
+      "sha256": "72d30a75593fc9827b2730ec9ae2f65304153fd393b890c80f0605a88682568f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/disco-elysium.webp",
+      "sha256": "f2bb9a15cd4ca70dc84b0b9c231a4150549383035b94680d507b814ec261d23f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/donkey-kong.webp",
+      "sha256": "1146c58e5bf0d3d6360d3f8bab6a9192011ee164a5c84a02f139afac1a3595d9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/doom.webp",
+      "sha256": "f1607914d16a3adc4a8e6ca8c517dbb3eecaa551bd884676636afdcf95797455",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/dreamcast.webp",
+      "sha256": "521bb9eedc0e079dbf15ecc9a6ce27a9c010bc90359d1a1c9e8920f472e95fbe",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/elden-ring.webp",
+      "sha256": "5f724997e54eb95b827ed2ee22579b3136f7a62e4bf3d05d955a1d2bc3e555d5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/famicom.webp",
+      "sha256": "006305fc57fd8cd2429f05a013e1c25e1d91b7a6853371234766dd08179a50c9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/final-fantasy-vii.webp",
+      "sha256": "ea8add6af605d7ea4727c84b24e3533f57cb1fb2a39741e5c2cd6e70615bced6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/final-fantasy.webp",
+      "sha256": "65e8a555ceebe15b4449788fb018309b24eb2d8c0e018320275ccb4a15d093e9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/game-boy.webp",
+      "sha256": "20d4f0a280d971ca42a4c3c470e90659bd4176041553ad888c0476585b0992b8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/god-of-war.webp",
+      "sha256": "bcea11a3f8369e0e318d5a07c5e090b70cb51a815c5c302a6ecb110d0bed71cc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/gta-iv.webp",
+      "sha256": "b19a3308ee1b133f78febcec16882ddca0da01947cc5732e9d0fa459a44c51b9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/gta-v.webp",
+      "sha256": "9098563efc89e62d1eee550cdbb394b7565ea4e10071918089bd83c992413cbe",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/gta-vice-city.webp",
+      "sha256": "f260159f6007f2a8d1cf51bbe7925f526da9829d53c5e9eeb240872ae1b75c2d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/half-life.webp",
+      "sha256": "9c25607a45644bd493d5d5ca97bc13d783d9c1bd99eb7779be3f718d4e411ea3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/halo.webp",
+      "sha256": "84413040f7d39d8758b310f80183cbe9f1b859b5092e4abc5844796e27204c20",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/hearthstone.webp",
+      "sha256": "13b662deca46142f8f780fe698ed4455c1983933407039ba5981c682218448fb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/legend-of-zelda.webp",
+      "sha256": "de412a8a25edd67056c2f3c6d4bcb22eafeccc5d164ee790c27a2ab73b5d2064",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/mega-drive.webp",
+      "sha256": "62be42c7f97b8be35b8c627b2d27fdbc9c2013dd9555963369b0e1b77abe70a1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/minecraft.webp",
+      "sha256": "48250b9f92f13c750645c93aa905323cac505ebe885befc8605441fcd2bb1a16",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/mortal-kombat.webp",
+      "sha256": "9632c31f2857b59fb12817a57c400bfdfec631c63ce17904a315c010a974ebed",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/nintendo-switch.webp",
+      "sha256": "0998c2310c930b36d0f3c21ee2b444132fc438f1bd25291a3f06040b0da5260f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/nintendo-wii.webp",
+      "sha256": "acb792ee6f4486dbdd87d44393f708c3d4577c171e2a4894a241bcac001abce7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/oxo.webp",
+      "sha256": "50c6fbc6c76647bcdb101c1c38c0a7a450b8adca0da588b4c52fb4b10a547ff9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/pac-man.webp",
+      "sha256": "912fe759b7c9effd83178eb764e365f5cad121f47f3b396b7bf9a9fc930c713a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/playstation.webp",
+      "sha256": "43721acc24909d7f862afb1b1ceeed807fc3803e9d1e92346ccc9d8927dc5843",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/pokemon-go.webp",
+      "sha256": "842ef707c2a3bc7f7acfc87230ae206edf135f688254232b41e2d96ee810f460",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/pokemon-red-green.webp",
+      "sha256": "3516c65a9a02c6281ac3c5e50469c413125bb5debf83b1f97fed29895925b74c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/pong.webp",
+      "sha256": "62e19396114848648e71d19f12d0123ea21851753da3bd7957816181a9ce2c1b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/red-dead-redemption.webp",
+      "sha256": "88bf9589bfaa168d21aba1ce05a03e09a11d390853f2c2049511eff68a8a5efa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/secret-of-monkey-island.webp",
+      "sha256": "5f2d08fe76cccefb11a13bb2a664b80ccaac7489732e1229eeb603a1e07648de",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/shadow-of-the-colossus.webp",
+      "sha256": "4a3d2e97c55da75334a64aa5ac1100d5841c6b413d8d6e1bf094db427f99369f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/skyrim.webp",
+      "sha256": "f8f6e3e8f308358292ce05ad0c152582c9e0e25410d3814632963a84938bbeef",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/sonic-the-hedgehog.webp",
+      "sha256": "31caa78838c468fed59b6e9ee701e03d500040c6f0c6c79e0e571be2a458d2f4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/space-invaders.webp",
+      "sha256": "dbea1b6cd331bc693f24497a84b37072fd2a4a4c50dd26908f19d1aca7519ab8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/spacewar.webp",
+      "sha256": "cafc3aeb2a4cab87dcf8bd85c63ee7fe8b652adbda991faaaf79184e61645a1f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/steam.webp",
+      "sha256": "33ec0333ebcb7b7b18a5076e782522a246444f70b7e0de785af49238051730bf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/super-mario-bros.webp",
+      "sha256": "0bdf4732b4a6ea4faa814e443d13ce005a61df9da94bf33c91d6033fcc4ca8b2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/tennis-for-two.webp",
+      "sha256": "ed9388be9c245474301fda5c5f67992d02c39982a7805d016e8f41555220a792",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/tetris.webp",
+      "sha256": "e7d23b3d2e29b5a1001ac59f0db71157bdb3ace88de6a23f6485202a8ca28a82",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/the-sims.webp",
+      "sha256": "b8d4efc7d96763d2a17f80a272e338de7736a88fd177b8239f4dc021eaff84aa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/the-witcher-3.webp",
+      "sha256": "3378e00da80ec30939965d38c6ee2a0080c5a67cea1f2e8382d5577bcafa536d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/world-of-warcraft.webp",
+      "sha256": "d8494e6bf128e53c01b1b364a3bfaddf5cb449e59e21e90e95008e97e892d899",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/zelda-tears-of-the-kingdom.webp",
+      "sha256": "22eccdc92fbc5d64a4a0b9ad66be143356d771e732ea22718ae433ce473cc722",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5001-egypt-unification.webp",
+      "sha256": "15ed024b266a348ff9ac7ce3be4a00f9abc6a02cbefee89b12d81158bf502eaa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5002-great-pyramid-giza.webp",
+      "sha256": "971b561a63bc7139be0efc337cc399b32a9b481ddf1f9b28627ba20a0af45e0c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5003-battle-kadesh.webp",
+      "sha256": "ab76e55ac6b117078658995f9bc7d88122d340680cadcdb635cdd7b4d3777b06",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5004-bronze-age-collapse.webp",
+      "sha256": "6eab39fd2d413388e13d86252919984c4285393cf4c664ec2a2c787f7e7db989",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5005-foundation-rome.webp",
+      "sha256": "4dd90d71c56350705d0edd6b797b58e68d3cfca57bcc8e8dddffa043fb7f35d6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5006-first-temple-destruction.webp",
+      "sha256": "686dfa969185a20d9ee040aaf122209d1508eb196739bdab4908a842bcc7aa73",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5007-cyrus-conquers-babylon.webp",
+      "sha256": "43801122a71340df8a48a9356f98126c3f4bdf65d57dc24e5173e3e5f8127c32",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5008-roman-republic.webp",
+      "sha256": "d793de668948d7fca1b141bf7f185852e6833c1c5cd9a73550543762c9ea8c0c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5009-battle-marathon.webp",
+      "sha256": "f7e9628bc004c54eb4d2a5b62626f233d5049471f5ba7c735c12c5bedb473065",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5010-thermopylae-salamis.webp",
+      "sha256": "12fb41eae3b52a21caece49daeae5feb95abbecbf901db1e084ba139277f971b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5011-peloponnesian-war.webp",
+      "sha256": "a468e016a16a5505a37bc2e34bf840ab32b1ca20980a09270b2d80df1f5f1403",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5012-socrates-trial.webp",
+      "sha256": "3f01816881f687000ea1a42ca457e73e9417c302f6f5e701a0b759fcb3882828",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5013-battle-gaugamela.webp",
+      "sha256": "7bde903d4e458eda8232bdecc3df2de5a70b8d4ef821009356ae32f35dff7e20",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5014-alexander-final-illness.webp",
+      "sha256": "e17bbe6bdbb7467a181369d91ed92113170ca4c65eed3ba78c0e68ff8ce78063",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5015-first-punic-war.webp",
+      "sha256": "03dc9432f3c1ec468586da764f7bbe10bbe6dfd531234ac52e0b077d04c5ce54",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5016-battle-cannae.webp",
+      "sha256": "270360cd4bb4db14a896b53767148d682cd126391a0a1c1cda9b594ccee37a38",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5017-destruction-carthage.webp",
+      "sha256": "5b24a95bfe803fd3f549e670351a3a95e3bc4902f7980ca66b537bd3bbe85b71",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5018-assassination-julius-caesar.webp",
+      "sha256": "9799679576ae4f9d60d8134f0cfd5fbece91ab8a5badd07363e1e45947eb6e4a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5019-battle-actium.webp",
+      "sha256": "12adadf2df4d24a53c761e07e53dfc214769ec9f87323207dd84ced5c63be99a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5020-augustus-first-emperor.webp",
+      "sha256": "4369451d7c877bcb9c4c3466225d600d84ea11da9fc47affc5f651f26332593f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5021-great-fire-rome.webp",
+      "sha256": "1a63205d631fb8b483a3d027fabbcd366ca1ca1bc8539e297b91244c6ccf5c74",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5022-vesuvius-eruption.webp",
+      "sha256": "dff37640d5e3b4cffc9cd136970da9d08be61dc32022025f0a1322a895523ab3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5023-roman-empire-maximum.webp",
+      "sha256": "5010ce80c57580517aab8fe690c92b5146ca150fc2028e43c77c67018f0add4d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5024-edict-milan.webp",
+      "sha256": "c01a4f492cd09f73379e144c7034d94994cc4bf854d29ddf12273fb9c472a834",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5025-council-nicaea.webp",
+      "sha256": "0951ec3d9b60f0df3fb8ae292b3551855d55de951085f949fff9093f705afe45",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5026-constantinople-new-rome.webp",
+      "sha256": "6b04d7ae7241d12a908dd59a10739592c91ab4836a78fe6c1d113d3762af119b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5027-division-roman-empire.webp",
+      "sha256": "07e1c91574c161e8eaa8885d2c3c974a9f5125266a8c88142327683f6f8dd80d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5028-sack-rome-visigoths.webp",
+      "sha256": "3a21f95776ac8d27a2de61a1e0a3ad8e219eb215fadd2af1399539c641166942",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5029-fall-western-rome.webp",
+      "sha256": "39b1530ec70c6a386c490306093b713e205d2fe577c949ab2be4ada516654c0a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5030-code-justinian.webp",
+      "sha256": "a02706a9f668b5162633fd0866e407e580781586a490ea345a09c6664b3666c0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5031-hejira.webp",
+      "sha256": "16be70829da21f0fce2de191a5d5608b6c60692ff115da202d1f117e1ad4ba49",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5032-battle-poitiers.webp",
+      "sha256": "41d672c1c3f79a79b4d0f2459d8619c89ef3858a104593341f2c7fd2f1191148",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5033-charlemagne-emperor.webp",
+      "sha256": "d19369a3a80340c1efabf1ac905a6aa976a8f97d81b82f650b528a31f9ca73e2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5034-treaty-verdun.webp",
+      "sha256": "9321b54f468d1ad1ffd0d5e090c9b92b952a5f12d25117fe54343c949037826b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5035-east-west-schism.webp",
+      "sha256": "f49d78803bc945f3a5eb5fa8a1d4b502c5dccd91600a5685449acaa03bf481f6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5036-battle-hastings.webp",
+      "sha256": "1e172efff5fc74d508eeb5f719fc7f4bb1aa38193185a5733b49ba64dd172400",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5037-urban-preaches-crusade.webp",
+      "sha256": "65f71e9b2519ae2bef1076db0cce742b91d5b9a5c2c2cf54154d90d57519b0c4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5038-crusaders-take-jerusalem.webp",
+      "sha256": "e2adbf45c791bdb49bfc3c7466278a2aa61700f7f37d72c737d6ee655ac9a6fc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5039-genghis-kan-unifies.webp",
+      "sha256": "f0a13eeae2c45c98a968fb3a88703ff312b484e4d2e68d3e6b127d00a98336ec",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5040-magna-carta.webp",
+      "sha256": "c4157ef9b708c832739465db6e236f0e7e3331270a74c93451b4f049abad8c66",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5041-mongols-sack-baghdad.webp",
+      "sha256": "049145078769fbbde906ece558fd7c6aaae8e282439c5f514379e38e989cb5c9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5042-fall-acre.webp",
+      "sha256": "9965ddafd2c65ec0bcd103204bef20377d8ef9b01774fdecd42b45f770f841b1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5043-hundred-years-war.webp",
+      "sha256": "9dd5aa6b399495b46cd2824cf3dc45248f16c9dc3ba99d0fbd701465fc0b58f7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5044-black-death-europe.webp",
+      "sha256": "975bba07338bb291b7a7e92318510b9920b6b6abd9ee9e47bb51fbffb7e2a49b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5045-joan-of-arc-rouen.webp",
+      "sha256": "ece0cb41829f9bc7dff549da1ac40c210c2ef09ee20eda5af2e739c433638139",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5046-fall-constantinople.webp",
+      "sha256": "80629e11e6c70679d16a476374d6b766fa9706ddcb56e4b35d33b1f62400cf3d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5047-columbus-caribbean.webp",
+      "sha256": "2ac5a351fdbabcfdf8f5117a28cb9324aed55ee9cadeef30570c2f16729d9672",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5048-luther-theses.webp",
+      "sha256": "59fb2045111ba0ae987d02057318cf25ee7a6b79a4ff82fc282ed1f6a3070e0a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5049-fall-tenochtitlan.webp",
+      "sha256": "84b07e88f0dc2bc1207c215c124188f26caaee3e770446d6a2aa502288b2d21b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5050-first-circumnavigation.webp",
+      "sha256": "833388a41f37210f8484b522a22b59f5d76bdcbf1d45ccf7e2cf575077c96b49",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5051-atahualpa-captured.webp",
+      "sha256": "73b5401116462d99c1b01fbfb053624fbaed55db96d571633fab7d31cdc35721",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5052-peace-augsburg.webp",
+      "sha256": "c941ab61f8adc7affcf5856ebb3576824637aef74dc4eed4cc6da7c975ddf969",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5053-thirty-years-war.webp",
+      "sha256": "1c7ac4b74c866639d58be106715290f05ec2477fa17e6c739fd6e7151de0e7dc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5054-peace-westphalia.webp",
+      "sha256": "0a460409bb2fa79be190412b597978f9d3c052222393186deb9344673326194e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5055-english-bill-rights.webp",
+      "sha256": "9ee8d263182dcd667323bec7bf7808605306272142382c3090544ba6f5475008",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5056-act-union.webp",
+      "sha256": "6b5e61e36ad7a28d8ae7e474d068cf48c62cc80fa1f9f8193a913dcad55b8b6f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5057-peter-great-emperor.webp",
+      "sha256": "bf810ee0f61618269c2f0c3db0f7880af794931a2615aacb1da2cbfab682cecf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5058-seven-years-war.webp",
+      "sha256": "b34a6f7ee533d3e73cc3c51dc27c17f2e138e4c99a2e0d50d18713cb945d41c5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5059-us-declaration-independence.webp",
+      "sha256": "9abb44769db16e7f2909434764768cb929bb01dd331e4dd016877c30c47c514b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5060-storm-bastille.webp",
+      "sha256": "e5952c7f227de69918b93a921d75c1f97e0840b1c35b63e8832941ec707ad5f9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5061-execution-louis-xvi.webp",
+      "sha256": "d02341429886fe279410852f3bc2262c6780df375ba3e95f9d0be2795d0eb2af",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5062-haiti-independence.webp",
+      "sha256": "671738c583e7e6b447fabcd35c43bea52f64399585828001a08462775a2f33f9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5063-battle-austerlitz.webp",
+      "sha256": "e383accc20895ccf4935a41ea2932e9156de109567fb9cb124060e56d4d6c8e9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5064-latin-american-independence.webp",
+      "sha256": "b5cf08936bbc41459efaa51203a42292654fa92d3e2daa836df431c8bfda24c3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5065-battle-waterloo.webp",
+      "sha256": "d6f6f644288e8a335278f34cb34ff6d4511ba62b064f6e4c2551d3bef3f39e5f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5066-mexico-independence.webp",
+      "sha256": "280967544f2ec153160f1915c7e1a15f483d627e55b49f324750bbb9ea405629",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5067-july-revolution-france.webp",
+      "sha256": "857717d691d3dd307f8fe2f68ff37859c12df2b85fb341377089369511d648e3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5068-abolition-slavery-britain.webp",
+      "sha256": "b6d651e234e572c849438aa02ba11adcfe75d4794fbd6ccac4557460dcc6958a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5069-first-opium-war.webp",
+      "sha256": "21b194e6ebca0c86bc7cc30450dbe1dd9ac5d7387b84cffc141111095c17904c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5070-springtime-peoples.webp",
+      "sha256": "fd3ea5349829ffaa194d0843df8eaf481b228db21cdbbf9de26a615d2b216c22",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5071-perry-japan.webp",
+      "sha256": "a42b0cc9b5cf5dd8011331dbc8a13ca0624e140f01f143b055dac52bc522ac76",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5072-sepoy-rebellion.webp",
+      "sha256": "85e40eb841f2af3d532fa085ab7970a3d6e425f8c05ec57a0a68a85b0210e01c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5073-american-civil-war.webp",
+      "sha256": "c16198bae649ac8b4e5a93a04e6815f5e30116d7210e64c76e6e0d612c30285f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5074-assassination-lincoln.webp",
+      "sha256": "e7be98105497003d65f144ee38c365880949c4be256beb6b1048d8074d5e6342",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5075-suez-canal-opens.webp",
+      "sha256": "ad67c11c39b7129929e830ada4f19c9b88c816c8defa78c7045bbf34b4f2ea43",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5076-german-empire-proclaimed.webp",
+      "sha256": "6ced9a60e9608a0c8d2e15439317c109557f506852be3e17d07dc5d449876c3b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5077-berlin-conference.webp",
+      "sha256": "d31a3ca67f4fd3c7b9ac038d1b524aded0a02a0e366c8fbd731db9a399ffd398",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5078-dreyfus-affair.webp",
+      "sha256": "a91c7895e3523bfdeaf50b462ba60a89edb0609317c6eee9150ca76d30307572",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5079-boxer-rebellion.webp",
+      "sha256": "15502e04d0360dc585eb6335026aea062a503e4de3d76f34b9a443eea0bf05d2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5080-bloody-sunday-russia.webp",
+      "sha256": "a54cce9c7de1bf9eb3d1fe7a55c8fb3ebc902de8324a534b9e8e666efe4aba30",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5081-mexican-revolution.webp",
+      "sha256": "48351367a13988af5796c92fc0833cd107abbb1d2a7ea4e554c2e6417f8df11c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5082-titanic-sinking.webp",
+      "sha256": "a00aba5aebbb6b05d6bc11e49a59f2350cbdaa56a4a1ac66faf1ecb6abaca529",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5083-first-world-war.webp",
+      "sha256": "1d123454f575b0e54c21a6792f7c393d4094f0c453e26881b050df3c06afcc04",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5084-october-revolution.webp",
+      "sha256": "9adf0925fb6c9e630d7a9bf25604df564acb92a3dda6dc21be0c3e64c5a95446",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5085-treaty-versailles.webp",
+      "sha256": "3ae285790c84368146ebad698c34022bdad115152a203d2bb9ddfb3865cbe57a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5086-march-rome.webp",
+      "sha256": "fc78360b36472d1e89b3b90913e452957c6f7885cc37e5d21a82c416a2c13549",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5087-crash-1929.webp",
+      "sha256": "f459bca0dd83818a655c466d74057b1ce431c15524c0b88dc23287621fe234c5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5088-new-chancellor-1933.webp",
+      "sha256": "bcfbcf18f92cba039aaa646fdf26918d126ab9dfe5fdb06096f67434d2309a4a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5089-european-war-begins-1939.webp",
+      "sha256": "2992cff26d1619a361be95c0a56abb1ecad04dd1b45c36b3b827573b458581c8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5090-pearl-harbor.webp",
+      "sha256": "7f1465ae49ec327bc16bf27c111a8e002a20872d114e82e424e5aaecba23beaa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5091-normandy-landing.webp",
+      "sha256": "764401316b125e356a97aeb1ddb9232ab3b48c65982a69fffac68b71a5735dcf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5092-hiroshima-nagasaki.webp",
+      "sha256": "9a659f4209d360faff3052640192f36ef001a669edcd8c9ee7f53a86a4dd9006",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5093-india-partition.webp",
+      "sha256": "d9f495b5d4af19b70b66bedf0bc216e681d9011e37a99269082793c5291ac8e7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5094-israel-founded.webp",
+      "sha256": "9f830152636a334fe1d5d50e19ea8f46f8cdb6600ade6594f0a49d5f4955623f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5095-peoples-china.webp",
+      "sha256": "962bffb7a90b5cfb5711b863a80e6a37ac15e8ac26abf21355a7b2661211f7de",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5096-korean-armistice.webp",
+      "sha256": "c7a80b7b2937368f69f5420b4ef0713f8b084cfbbedf62db5f899d1d2498ba31",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5097-rosa-parks.webp",
+      "sha256": "77fb88f15c8a26e7165df3de54d51357d8542405e97f7077d0fb0044db840be6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5098-suez-crisis.webp",
+      "sha256": "cfc73bb8f2cb1f0224d2baac37c5de5bf438c72edcdf5bf0262deeba7a984401",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5099-cuban-revolution.webp",
+      "sha256": "aaa591308f017b7b99c2f0d85369fc11ea107fa3a1f543fc31ffcbf19891ebff",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5100-africa-independence.webp",
+      "sha256": "71382e5e52fbb045ba69e5dd64984dd01c5d48b6d56ab1623b26e07269da54fd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5101-cuban-missile-crisis.webp",
+      "sha256": "09f0dd8290bfce45b599595bd6ff1eb6529f51a30b84e6ee114cc647a878cc5c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5102-kennedy-dallas.webp",
+      "sha256": "80091825146d88916635c012d6d32ea17584efb46dc8e56ca95ee8232c3cecda",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5103-prague-spring.webp",
+      "sha256": "335c39c4c0b4c2716b2a5e999d332fd0d4e4327f595d9157191d6a89d6d4696d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5104-chile-coup.webp",
+      "sha256": "9a635d4fb063dab12339e0f9e1863e76e29418852d07f6a4647913807e6d7542",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5105-saigon-fall.webp",
+      "sha256": "26f62f546bd074fe1e69076ee306b09b8636eb8640b57d4992283b362545e5ce",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5106-iranian-revolution.webp",
+      "sha256": "b0fa38abb9a476c74ed487089b7a6f7f8bdfb18cba40fc9a4b58e91c65aa70f1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5107-gorbachev-perestroika.webp",
+      "sha256": "73f5108872bb13911bf4ebd2c9c67f80619a2cf09540159856263828e6ebe1f3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5108-berlin-wall-fall.webp",
+      "sha256": "c0d0f4a238058259c3ae29b2e23c94392e7aa7ff4a0712a2f206f6c32056804b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5109-mandela-president.webp",
+      "sha256": "79f21eecc6790630e7e3eb106b6fd44c63aee0a97d7c9a51d71646ecb54ce178",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5110-hong-kong-handover.webp",
+      "sha256": "0b448a309af0a2eb077325a77d25885004ac3429d6d7fe8730558206c6fc01e4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5111-september-eleven.webp",
+      "sha256": "9f479581cb80826d195ebaff5257a64db760dff0e9c4b1db6861be4bf68fbb52",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5112-iraq-invasion.webp",
+      "sha256": "1ef7c0c394f5e2cd95659b36aae230ecb5dd041dafa35f3fe63ddd9138732d8b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5113-lehman-collapse.webp",
+      "sha256": "24f08d0da550e033da1411918a3569dd343090fb97d6ac834c2dffc4d11061c8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5114-arab-spring.webp",
+      "sha256": "ca74b2b786932eb8ccf4b3fc0c59c84ec957dc8b76310073f2ed5274fd706b2a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5115-brexit-referendum.webp",
+      "sha256": "745f40b1498480f5cf7acc6a09f10288662c4552dbe0c42491675c8bc3679279",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5116-pandemic-declared.webp",
+      "sha256": "e80e4940a7630401b9f102d9aa2cc61eb3f9457449dbddc55926277b3a78d310",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/world-cards/5117-ukraine-invasion.webp",
+      "sha256": "7f8e7fe7faa6e668e6de0cb18cd3674d4f834555e04c867258c0c7a74331c498",
+      "rightsEvidence": null
+    }
+  ]
+}

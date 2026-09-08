@@ -91,9 +91,8 @@ console.log("\nLas reglas se adaptan al mazo");
   click(w, '[data-action="rules"]');
   const texto = el(w, ".overlay .modal").textContent;
   ok("peso muestra su dato oculto", /peso oculto/i.test(texto));
-  // Ya no se publica ninguna carta sin dato atado, así que el aviso «en revisión» debe
-  // estar apagado en los tres mazos. Si vuelve a encenderse es que se ha colado una.
-  ["animals", "lifespan", "speed"].forEach(mazo => ok(`${mazo} no muestra el aviso de revisión`, !/en revisión/.test(w.CONTINUUM.guideMarkup(mazo, "local"))));
+  // El aviso debe reflejar las referencias pendientes, sin ocultarlas ni inventarlas.
+  ["animals", "lifespan", "speed"].forEach(mazo => ok(`${mazo} explica sus cartas pendientes de revisión`, /en revisión/.test(w.CONTINUUM.guideMarkup(mazo, "local")) === w.CONTINUUM.cards(mazo).some(card => card.reviewStatus === 'pending')));
   ok("los empates exactos se admiten", /mismo valor/.test(texto));
   // Los dos poderes se explican fuera del solitario, y la ficha dice además si están en
   // juego o hay que encenderlos antes de empezar.

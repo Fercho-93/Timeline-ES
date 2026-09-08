@@ -37,6 +37,37 @@ jobs:
       # Comprueba que Android e iPhone siguen aceptando el build actual sin tocar los
       # proyectos nativos ya generados (los mismos que hay en android/ e ios/).
       - run: npx cap sync
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Compilar Android
+        working-directory: android
+        run: bash gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Continuum-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
+  iphone:
+    name: Compilar iPhone sin firma
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync ios
+      - name: Verificar SDK y compilar
+        working-directory: ios/App
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
 
   reglas:
     name: Reglas de Firestore

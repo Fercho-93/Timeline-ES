@@ -753,7 +753,7 @@
     const plate = cardArt(modeKey, card);
     if (!plate) return "";
     const folder = sourceMode === "astronomy" ? "astronomy-cards" : sourceMode === "medicine" ? "medicine-cards" : sourceMode === "countries" ? "country-cards" : sourceMode === "population" ? "population-cards" : sourceMode === "distances" ? "distance-cards" : sourceMode === "history" ? "history-cards" : sourceMode === "movies" ? "movie-cards" : sourceMode === "music" ? "music-cards" : sourceMode === "inventions" ? "invention-cards" : sourceMode === "world" ? "world-cards" : sourceMode === "videogames" ? "videogame-cards" : "animal-cards";
-    const extension = sourceMode === "history" ? "jpg" : sourceMode === "inventions" ? "png" : "webp";
+    const extension = sourceMode === "history" ? "jpg" : "webp";
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
@@ -769,13 +769,13 @@
     let hash = 2166136261;
     // Incluye el eje, el protocolo, el orden y los datos que se ven y se comparan.
     // Una corrección conservando el ID también debe cambiar la huella.
-    const content = JSON.stringify([2, modeKey, mode(modeKey).axis, deck.map(card =>
+    const content = JSON.stringify([3, modeKey, mode(modeKey).axis, deck.map(card =>
       [card.id, sortValue(modeKey, card), card.title, card.detail, card.source || "", card.sourceMode || ""])]);
     for (let i = 0; i < content.length; i++) {
       hash ^= content.charCodeAt(i);
       hash = Math.imul(hash, 16777619);
     }
-    return `v2.${deck.length}.${(hash >>> 0).toString(36)}`;
+    return `v3.${deck.length}.${(hash >>> 0).toString(36)}`;
   }
 
   function formatValue(modeKey, card) { return axis(modeKey).format(card); }

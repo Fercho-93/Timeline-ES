@@ -14,13 +14,13 @@ const dist = path.join(root, "dist");
 // y scripts que no pasan por el service worker (actualizar.*) y las carpetas
 // de imágenes que se piden bajo demanda.
 const FILES = [
-  "index.html", "actualizar.html", "manifest.webmanifest", "icon.svg",
+  "index.html", "actualizar.html", "privacidad.html", "manifest.webmanifest", "icon.svg",
   "splash.css", "splash.js", "styles.css", "service-worker.js",
   "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",
   "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js",
   "medicine.js", "countries.js", "population.js", "distances.js", "modes.js",
-  "storage.js", "saves.js", "updates.js", "enciclopedia.js", "progreso.js", "duelo.js", "ghost.js", "drag.js",
-  "a11y.js", "mapa.js", "settings.js", "app.js", "online.js", "actualizar.js"
+  "deployment.js", "engine.js", "links.js", "storage.js", "saves.js", "updates.js", "session.js", "enciclopedia.js", "progreso.js", "duelo.js", "ghost.js", "drag.js",
+  "a11y.js", "mapa.js", "settings.js", "effects.js", "app.js", "online.js", "actualizar.js"
 ];
 
 const DIRS = ["assets"];

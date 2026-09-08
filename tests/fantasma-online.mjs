@@ -23,7 +23,7 @@ function client(uid){
  // no lo reconoce como marca de hora del servidor.
  w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];
@@ -94,25 +94,25 @@ try {
  s=await snapshot();assert.equal(s.phase,'reveal');await clients[0].call('finishTurn');assert.deepEqual((await snapshot()).ghost.pending,[C]);
  // No se inicia Fantasma si un cliente anterior todavía podría enseñar valores.
  const outdated=fixture();outdated.status='lobby';outdated.phase='lobby';delete outdated.ghost;outdated.timeline=[];outdated.deck=[];Object.values(outdated.players).forEach(p=>p.hand=[]);await seed(outdated);
- await clients[0].call('renderLobby');await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
+ await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
  // No se reparte si la sala lleva la huella de un mazo distinto al de este cliente:
  // alguien lleva otra versión del juego y las cartas ya no significarían lo mismo.
  const mismatched=fixture();mismatched.status='lobby';mismatched.phase='lobby';delete mismatched.ghost;mismatched.timeline=[];mismatched.deck=[];mismatched.deckFingerprint='huella-de-otra-version';Object.values(mismatched.players).forEach(p=>p.hand=[]);await seed(mismatched);
- await clients[0].call('renderLobby');await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/DECK_MISMATCH/);assert.equal((await snapshot()).status,'lobby');
+ await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/DECK_MISMATCH/);assert.equal((await snapshot()).status,'lobby');
  // Arranque real, nueve personas y mazo pequeño: reparto igual y una carta reservada.
- const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:38} ]));await seed(lobby);
- await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
+ const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:40} ]));await seed(lobby);
+ await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
  assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,41);
  assert.equal(s.ghost.distribution,2);assert.equal(s.ghost.cards.length,3);
  // Pulso usa el mismo reparto, sin compartir posiciones con Fantasma.
- await seed(lobby);await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-pulse').checked=true;await clients[0].call('startRoom');
+ await seed(lobby);await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-pulse').checked=true;await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.pulsePower.cards.length,3);assert.equal(s.pulsePower.used.length,0);
  assert.equal(s.pulsePower.cards.filter(id=>s.ghost.cards.includes(id)).length,0);
  assert.equal(new Set([...s.pulsePower.cards,...s.ghost.cards]).size,6);
  // Pulso también bloquea el arranque normal si queda un cliente v37 en la mesa.
  const pulsePrevious=clone(lobby);pulsePrevious.players[B].clientVersion=37;await seed(pulsePrevious);
- await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-pulse').checked=true;
+ await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-pulse').checked=true;
  await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
  const three=fixture();three.phase='reveal';three.current=2;three.turnsInRound=2;Object.values(three.players).forEach(p=>p.hand=[]);three.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};three.ghost.cards=[15,16,17];three.ghost.owners=['','',''];
  await seed(three);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).ghost.owners,[A,B,C]);
@@ -193,5 +193,11 @@ try {
  const resolution = await snapshot();
  await seed(beforeDefense);
  await assertFails(updateDoc(ref(B), { players:beforeDefense.players, deck:beforeDefense.deck, discard:beforeDefense.discard, timeline:resolution.timeline, phase:'reveal', pulseTurn:null, reveal:resolution.reveal, version:beforeDefense.version+1, updatedAt:2 }));
- console.log('  Inicio, activación, turnos, dos clientes, robos, Pulso, salidas y escrituras rechazadas: OK');
+ const resumable=fixture();resumable.phase='tiebreak';resumable.turnsInRound=2;resumable.current=2;resumable.tieQueue=[A,B];resumable.players[A].hand=[];resumable.players[B].hand=[];
+ await seed(resumable);
+ await Promise.all([clients[0].call('continueTie'),clients[1].call('continueTie')]);
+ s=await snapshot();assert.equal(s.phase,'turn');assert.deepEqual(s.tieQueue,[]);assert.equal(s.players[A].hand.length,1);assert.equal(s.players[B].hand.length,1);assert.notEqual(s.players[A].hand[0],s.players[B].hand[0]);
+ const large=fixture();large.phase='tiebreak';large.current=0;large.turnsInRound=8;large.playerOrder=[A,B,C,'d','e','f','g','h','i'];large.players=Object.fromEntries(large.playerOrder.map(id=>[id,{name:id,hand:[]}]));large.tieQueue=[...large.playerOrder];large.deck=Array.from({length:12},(_,i)=>15+i);delete large.ghost;
+ await seed(large);await clients[0].call('continueTie');s=await snapshot();assert.equal(s.phase,'turn');assert.equal(s.deck.length,3);assert.equal(new Set(Object.values(s.players).flatMap(p=>p.hand)).size,9);
+ console.log('  Inicio, poderes, Pulso, salidas, desempate simultáneo y nueve participantes: OK');
 } finally {clients.forEach(c=>c.w.close());await env.cleanup();}

@@ -6,13 +6,13 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm ci
 
-# Juego, guardado, mazos, service worker, accesibilidad y build: diecinueve suites.
+# Juego, guardado, mazos, service worker, accesibilidad y build: veinticinco suites y presupuesto de recursos.
 npm test
 
 # Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
 npm run test:reglas
 
-# Todas las suites, incluidas las cuatro del emulador.
+# Todas las suites, incluidas las siete del emulador.
 npm run test:todo
 ```
 
@@ -126,3 +126,5 @@ con 50, 200 y 500 cartas disponibles usando márgenes estadísticos.
 No sustituye una prueba de Safari en un iPhone físico.
 
 `estabilizacion.mjs` comprueba recuperación de Competición, versiones de guardado, valores corregidos, almacenamiento lleno y actualizaciones durante partidas.
+
+El motor puro se verifica en motor-invariantes.mjs. competicion-servidor.mjs juega partidas completas de 2–9 participantes; servidor-http.mjs verifica autenticación, App Check y límites; servidor-reglas.mjs comprueba privacidad, carreras e idempotencia en el proyecto demo-competicion del emulador. Este último no cambia las reglas de las salas familiares ni accede a producción.

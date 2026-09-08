@@ -1,0 +1,8 @@
+{
+  "assetsBytes": 173015040,
+  "precacheBytes": 26214400,
+  "singleImageBytes": 819200,
+  "cardWidth": 512,
+  "cardHeight": 768,
+  "policy": "Arte de cartas 512×768; WebP por defecto y JPEG heredado cuando ya cumple. No añadir originales duplicados al paquete. Presupuesto de recursos sin compresión de tienda, no tamaño final de IPA/AAB."
+}

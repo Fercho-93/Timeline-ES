@@ -6,20 +6,32 @@ rules_version = '2';
 // hay forma de verificarla, porque las fechas viven en cards.js / movies.js.
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /roomCreation/{owner} {
+      allow get: if request.auth != null && request.auth.uid == owner;
+      allow create, update: if request.auth != null && request.auth.uid == owner
+        && request.resource.data.keys().hasOnly(['lastCreatedAt','roomCode'])
+        && request.resource.data.lastCreatedAt == request.time
+        && request.resource.data.roomCode is string
+        && (!exists(/databases/$(database)/documents/roomCreation/$(owner)) || request.time >= resource.data.lastCreatedAt + duration.value(30,'s'))
+        && !exists(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode))
+        && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.hostUid == owner
+        && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.createdAt == request.time;
+      allow list, delete: if false;
+    }
     match /rooms/{roomId} {
       function signedIn() { return request.auth != null; }
       function uid() { return request.auth.uid; }
       function before() { return resource.data; }
       function after() { return request.resource.data; }
-      function changed() { return after().diff(before()).affectedKeys(); }
+      function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
 
-      function isParticipant() { return signedIn() && uid() in before().playerOrder; }
-      function isHost() { return signedIn() && before().hostUid == uid(); }
-      function isCurrent() { return isParticipant() && before().playerOrder[before().current] == uid(); }
+      function isParticipant() { return signedIn() && request.auth.uid in resource.data.playerOrder; }
+      function isHost() { return signedIn() && resource.data.hostUid == request.auth.uid; }
+      function isCurrent() { return isParticipant() && resource.data.playerOrder[resource.data.current] == request.auth.uid; }
       // El número de versión sube de uno en uno y `updatedAt` es siempre la hora real del
       // servidor: nadie puede fecharla a mano ni adelantarla, que es lo único que evita
       // que una sala abandonada burle la directiva de TTL que la borra sola.
-      function bumped() { return after().version == before().version + 1 && after().updatedAt == request.time; }
+      function bumped() { return request.resource.data.version == resource.data.version + 1 && request.resource.data.updatedAt == request.time; }
       function validName(name) { return name is string && name.size() >= 1 && name.size() <= 18; }
 
       // Identidad de la sala: nunca cambia después de crearla.
@@ -28,23 +40,23 @@ service cloud.firestore {
         // en su changed().hasOnly([...]), así que ya no se puede tocar sin repetir el
         // chequeo en cada escritura y agotar el límite de 1000 expresiones de Firestore
         // que ya rozan las jugadas del Pulso.
-        return after().roomCode == before().roomCode
-          && after().mode == before().mode
-          && after().hostUid == before().hostUid
-          && after().createdAt == before().createdAt;
+        return request.resource.data.roomCode == resource.data.roomCode
+          && request.resource.data.mode == resource.data.mode
+          && request.resource.data.hostUid == resource.data.hostUid
+          && request.resource.data.createdAt == resource.data.createdAt;
       }
 
       // Las cartas ni se crean ni se destruyen: mazo + descarte + línea + mi mano.
       function myCardsBefore() {
-        return before().deck.size() + before().discard.size() + before().timeline.size()
-          + before().players[uid()].hand.size();
+        return resource.data.deck.size() + resource.data.discard.size() + resource.data.timeline.size()
+          + resource.data.players[request.auth.uid].hand.size();
       }
       function myCardsAfter() {
-        return after().deck.size() + after().discard.size() + after().timeline.size()
-          + after().players[uid()].hand.size();
+        return request.resource.data.deck.size() + request.resource.data.discard.size() + request.resource.data.timeline.size()
+          + request.resource.data.players[request.auth.uid].hand.size();
       }
       function onlyMyHand() {
-        return after().players.diff(before().players).affectedKeys().hasOnly([uid()]);
+        return request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid]);
       }
 
 
@@ -54,7 +66,7 @@ service cloud.firestore {
       function gb() { return before().ghost; }
       function ga() { return after().ghost; }
       function ghostShape() {
-        let next = after().get('ghost', null);
+        let next = request.resource.data.get('ghost', null);
         return next is map
           && next.keys().hasOnly(['distribution', 'cards', 'owners', 'used', 'pending', 'cooldown', 'actor', 'fresh'])
           && next.get('distribution', 2) == 2
@@ -65,7 +77,7 @@ service cloud.firestore {
           && next.actor is string && next.fresh is bool;
       }
       function ghostStart() {
-        let data = after();
+        let data = request.resource.data;
         let next = data.get('ghost', null);
         return !('ghost' in data) || (ghostShape()
           && next.cards.size() <= (data.playerOrder.size() + 2) / 3
@@ -81,7 +93,7 @@ service cloud.firestore {
           && (card in data.deck || card in data.discard)
           && !(card in next.deck) && !(card in next.discard)
           && (card in next.players[owner].hand
-            || (next.phase == 'pulse' && owner == uid() && next.pulseTurn.cardId == card));
+            || (next.phase == 'pulse' && owner == request.auth.uid && next.pulseTurn.cardId == card));
       }
       function otherOwner(i, owner, owners) {
         return (i != 0 && owners.size() > 0 && owners[0] == owner)
@@ -114,8 +126,8 @@ service cloud.firestore {
               : drawnTo(next.cards[i], next.owners[i], prior, data))));
       }
       function ghostClaims() {
-        let prior = before();
-        let data = after();
+        let prior = resource.data;
+        let data = request.resource.data;
         let g = prior.ghost;
         let next = data.ghost;
         let owners = next.owners.removeAll(['']);
@@ -124,21 +136,21 @@ service cloud.firestore {
           && drawnOwner(0, prior, data, uniqueOwners) && drawnOwner(1, prior, data, uniqueOwners) && drawnOwner(2, prior, data, uniqueOwners);
       }
       function ghostActivate() {
-        let g = before().get('ghost', null);
-        let next = after().get('ghost', null);
-        return isCurrent() && before().status == 'playing' && before().phase == 'turn'
+        let g = resource.data.get('ghost', null);
+        let next = request.resource.data.get('ghost', null);
+        return isCurrent() && resource.data.status == 'playing' && resource.data.phase == 'turn'
           && changed().hasOnly(['ghost', 'version', 'updatedAt']) && bumped()
-          && before().timeline.size() >= 5 && before().players[uid()].hand.size() > 0
-          && uid() in g.owners && !(uid() in g.used)
+          && resource.data.timeline.size() >= 5 && resource.data.players[request.auth.uid].hand.size() > 0
+          && request.auth.uid in g.owners && !(request.auth.uid in g.used)
           && g.pending == [] && g.cooldown == []
           && ghostShape() && next.cards == g.cards && next.owners == g.owners
-          && next.used == g.used.concat([uid()]) && next.actor == uid() && next.fresh == true
-          && next.cooldown == [] && next.pending.size() == before().playerOrder.size()
-          && next.pending.toSet() == before().playerOrder.toSet();
+          && next.used == g.used.concat([request.auth.uid]) && next.actor == request.auth.uid && next.fresh == true
+          && next.cooldown == [] && next.pending.size() == resource.data.playerOrder.size()
+          && next.pending.toSet() == resource.data.playerOrder.toSet();
       }
       function ghostTick() {
-        let prior = before();
-        let data = after();
+        let prior = resource.data;
+        let data = request.resource.data;
         let g = prior.get('ghost', null);
         let next = data.get('ghost', null);
         let player = prior.playerOrder[prior.current];
@@ -150,38 +162,38 @@ service cloud.firestore {
             : g.cooldown.removeAll([player]));
       }
       function ghostLeave() {
-        let g = before().get('ghost', null);
-        let next = after().get('ghost', null);
-        let removed = before().playerOrder.removeAll(after().playerOrder);
+        let g = resource.data.get('ghost', null);
+        let next = request.resource.data.get('ghost', null);
+        let removed = resource.data.playerOrder.removeAll(request.resource.data.playerOrder);
         let remaining = g.pending.removeAll(removed);
         return ghostShape() && next.cards == g.cards && next.owners == g.owners
           && next.used == g.used && next.actor == g.actor
           && next.pending == remaining
-          && next.fresh == (before().playerOrder[before().current] in removed ? false : g.fresh)
+          && next.fresh == (resource.data.playerOrder[resource.data.current] in removed ? false : g.fresh)
           && next.cooldown == (g.pending.size() > 0 && remaining.size() == 0
-            ? after().playerOrder : g.cooldown.removeAll(removed));
+            ? request.resource.data.playerOrder : g.cooldown.removeAll(removed));
       }
       function ghostKept() {
-        let g = before().get('ghost', null);
-        let next = after().get('ghost', null);
+        let g = resource.data.get('ghost', null);
+        let next = request.resource.data.get('ghost', null);
         return ghostClaims() && next.diff(g).affectedKeys().hasOnly(['cards', 'owners']);
       }
       function ghostSafe() {
-        let prior = before();
-        let data = after();
+        let prior = resource.data;
+        let data = request.resource.data;
         return prior.status == 'lobby' ? ghostStart()
           : (!('ghost' in prior) ? !('ghost' in data)
             : (!('ghost' in data) ? false
               : (data.ghost == prior.ghost ? true
                 : (data.playerOrder.size() < prior.playerOrder.size() ? ghostLeave()
-                : (data.status == 'ended' ? ga() == gb()
+                : (data.status == 'ended' ? request.resource.data.ghost == resource.data.ghost
                   : (data.phase == 'turn' ? ghostTick() : ghostKept()))))));
       }
 
       // Pulso robable v38. Su efecto sigue usando pulseUsed; este inventario privado
       // demuestra quién encontró el poder y evita que cualquier cliente lo invente.
       function pulsePowerShape() {
-        let p = after().get('pulsePower', null);
+        let p = request.resource.data.get('pulsePower', null);
         return p is map
           && p.keys().hasOnly(['distribution', 'cards', 'owners', 'used'])
           && p.distribution == 2
@@ -191,7 +203,7 @@ service cloud.firestore {
           && p.used is list;
       }
       function pulsePowerStartShape() {
-        let data = after();
+        let data = request.resource.data;
         let p = data.get('pulsePower', null);
         return !('pulsePower' in data) || (data.pulse == true && pulsePowerShape()
           && p.cards.size() <= (data.playerOrder.size() + 2) / 3
@@ -233,8 +245,8 @@ service cloud.firestore {
               : drawnTo(next.cards[i], next.owners[i], prior, data))));
       }
       function pulseClaimCore() {
-        let prior = before();
-        let data = after();
+        let prior = resource.data;
+        let data = request.resource.data;
         let p = prior.pulsePower;
         let next = data.pulsePower;
         let owners = next.owners.removeAll(['']);
@@ -246,56 +258,64 @@ service cloud.firestore {
           && pulseDrawnOwner(2, prior, data, uniqueOwners);
       }
       function pulsePowerSafe() {
-        let prior = before();
-        let data = after();
+        let prior = resource.data;
+        let data = request.resource.data;
         return !('pulsePower' in prior) ? !('pulsePower' in data)
           : ('pulsePower' in data && (data.pulsePower == prior.pulsePower
             || (pulseClaimCore() && data.pulsePower.used == prior.pulsePower.used
               && data.pulsePower.diff(prior.pulsePower).affectedKeys().hasOnly(['cards', 'owners']))));
       }
       function pulsePowerUse() {
-        let prior = before();
-        let data = after();
+        let prior = resource.data;
+        let data = request.resource.data;
         return !('pulsePower' in prior) ? !('pulsePower' in data)
-          : ('pulsePower' in data && uid() in prior.pulsePower.owners
-            && !(uid() in prior.pulsePower.used)
-            && data.pulsePower.used == prior.pulsePower.used.concat([uid()])
+          : ('pulsePower' in data && request.auth.uid in prior.pulsePower.owners
+            && !(request.auth.uid in prior.pulsePower.used)
+            && data.pulsePower.used == prior.pulsePower.used.concat([request.auth.uid])
             && ((data.pulsePower.cards == prior.pulsePower.cards
                 && data.pulsePower.owners == prior.pulsePower.owners)
               || pulseClaimCore())
             && data.pulsePower.diff(prior.pulsePower).affectedKeys().hasOnly(['cards', 'owners', 'used']));
       }
 
-      function roundEnds() { return before().turnsInRound + 1 >= before().playerOrder.size(); }
+      function roundEnds() { return resource.data.turnsInRound + 1 >= resource.data.playerOrder.size(); }
+      function emptyAt(data, i) {
+        return i < data.playerOrder.size() && data.players[data.playerOrder[i]].hand.size() == 0 ? [data.playerOrder[i]] : [];
+      }
+      function emptyPlayers(data) {
+        return emptyAt(data, 0).concat(emptyAt(data, 1)).concat(emptyAt(data, 2))
+          .concat(data.playerOrder.size() > 3 ? emptyAt(data, 3).concat(emptyAt(data, 4)).concat(emptyAt(data, 5))
+            .concat(data.playerOrder.size() > 6 ? emptyAt(data, 6).concat(emptyAt(data, 7)).concat(emptyAt(data, 8)) : []) : []);
+      }
 
       // Entrar en una sala que aún está en el vestíbulo.
       function validJoin() {
         return signedIn()
-          && before().status == 'lobby'
-          && !(uid() in before().playerOrder)
-          && before().playerOrder.size() < 9
+          && resource.data.status == 'lobby'
+          && !(request.auth.uid in resource.data.playerOrder)
+          && resource.data.playerOrder.size() < 9
           && changed().hasOnly(['players', 'playerOrder', 'version', 'updatedAt'])
-          && after().playerOrder.size() == before().playerOrder.size() + 1
-          && after().playerOrder[before().playerOrder.size()] == uid()
-          && after().players.diff(before().players).affectedKeys().hasOnly([uid()])
-          && validName(after().players[uid()].name)
-          && after().players[uid()].hand.size() == 0
+          && request.resource.data.playerOrder == resource.data.playerOrder.concat([request.auth.uid])
+          && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid])
+          && validName(request.resource.data.players[request.auth.uid].name)
+          && request.resource.data.players[request.auth.uid].hand.size() == 0
           && bumped();
       }
 
       // El anfitrión reparte y arranca la partida.
       function validStart() {
-        let prior = before();
-        let next = after();
+        let prior = resource.data;
+        let next = request.resource.data;
         return isHost()
           && prior.status == 'lobby'
           && prior.playerOrder.size() >= 2
-          && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
+          && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'turnSeconds', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
                                 'pulseTurn', 'turnStartedAt', 'version', 'updatedAt'])
           && next.status == 'playing'
           && next.phase == 'turn'
           && next.handSize >= 1 && next.handSize <= 6
+          && next.get('turnSeconds', 20) in [0, 20, 30, 45]
           && next.current >= 0 && next.current < prior.playerOrder.size()
           && next.timeline.size() == 1
           && next.discard.size() == 0
@@ -313,9 +333,26 @@ service cloud.firestore {
       }
 
       // Colocar una carta: solo el jugador de turno, solo su mano, sin inventar cartas.
+      function exactPlay(prior, next) {
+        let card = next.reveal.cardId;
+        let hand = prior.players[request.auth.uid].hand.removeAll([card]);
+        let nextHand = next.players[request.auth.uid].hand;
+        return card in prior.players[request.auth.uid].hand
+          && (next.reveal.correct
+            ? (nextHand == hand && next.deck == prior.deck && next.discard == prior.discard
+              && !(card in prior.timeline) && next.timeline.size() == prior.timeline.size() + 1 && next.timeline.removeAll([card]) == prior.timeline)
+            : (next.timeline == prior.timeline && (prior.deck.size() > 0
+              ? (nextHand == hand.concat([prior.deck[0]]) && prior.deck == [prior.deck[0]].concat(next.deck)
+                && next.discard == prior.discard.concat([card]))
+              : (prior.discard.size() > 0
+                ? (nextHand.size() == hand.size() + 1 && nextHand.removeAll(prior.discard) == hand
+                  && next.discard == [card] && next.deck.size() + 1 == prior.discard.size()
+                  && next.deck.concat(nextHand.removeAll(hand)).toSet() == prior.discard.toSet())
+                : (nextHand == hand.concat([card]) && next.deck == [] && next.discard == [])))));
+      }
       function validPlay() {
-        let prior = before();
-        let next = after();
+        let prior = resource.data;
+        let next = request.resource.data;
         return isCurrent()
           && prior.status == 'playing'
           && prior.phase == 'turn'
@@ -323,18 +360,10 @@ service cloud.firestore {
                                 'version', 'updatedAt'])
           && next.phase == 'reveal'
           && onlyMyHand()
-          && myCardsAfter() == myCardsBefore()
-          && next.reveal.playerUid == uid()
+          && next.reveal.playerUid == request.auth.uid
           && next.reveal.cardId is int
           && next.reveal.correct is bool
-          && (next.reveal.correct
-              ? (next.timeline.size() == prior.timeline.size() + 1
-                 && next.deck.size() == prior.deck.size()
-                 && next.discard.size() == prior.discard.size()
-                 && next.players[uid()].hand.size() == prior.players[uid()].hand.size() - 1)
-              : (next.timeline.size() == prior.timeline.size()
-                 && next.players[uid()].hand.size() <= prior.players[uid()].hand.size()
-                 && next.players[uid()].hand.size() >= prior.players[uid()].hand.size() - 1))
+          && exactPlay(prior, next)
           && bumped();
       }
 
@@ -346,35 +375,40 @@ service cloud.firestore {
       // Va en dos pasos porque entre lanzarlo y colocar la carta hay que enseñársela a
       // quien reta: `turn` -> `pulse` la saca del mazo, y `pulse` -> `reveal` la resuelve.
 
-      function pulseTarget() { return before().pulseTurn.targetUid; }
+      function pulseTarget() { return resource.data.pulseTurn.targetUid; }
 
       // Paso 1: gastar el Pulso y sacar la carta del mazo. Ninguna mano cambia todavía.
+      function exactDraw(deck, discard, nextDeck, nextDiscard, card) {
+        return deck.size() > 0 ? (deck == [card].concat(nextDeck) && nextDiscard == discard)
+          : (card in discard && nextDiscard == [] && nextDeck.size() + 1 == discard.size()
+            && nextDeck.concat([card]).toSet() == discard.toSet());
+      }
       function validPulseStart() {
-        let prior = before();
-        let next = after();
+        let prior = resource.data;
+        let next = request.resource.data;
         return isCurrent()
           && prior.status == 'playing'
           && prior.phase == 'turn'
           && prior.get('pulse', false) == true
-          && (!('ghost' in prior) || gb().fresh == false)
+          && (!('ghost' in prior) || resource.data.ghost.fresh == false)
           && changed().hasOnly(['ghost', 'pulsePower', 'players', 'deck', 'discard', 'phase', 'pulseTurn', 'version', 'updatedAt'])
           && next.phase == 'pulse'
           // Solo se marca el Pulso como gastado: la mano no se toca en este paso.
           && onlyMyHand()
-          && prior.players[uid()].get('pulseUsed', false) == false
-          && next.players[uid()].pulseUsed == true
-          && next.players[uid()].hand.size() == prior.players[uid()].hand.size()
-          && next.players[uid()].hand.size() >= 2
+          && prior.players[request.auth.uid].get('pulseUsed', false) == false
+          && next.players[request.auth.uid].pulseUsed == true
+          && next.players[request.auth.uid].hand == prior.players[request.auth.uid].hand
+          && next.players[request.auth.uid].hand.size() >= 2
           // Un objetivo real, distinto de uno mismo y sin escudo de esta ronda.
           && next.pulseTurn.targetUid in prior.playerOrder
-          && next.pulseTurn.targetUid != uid()
+          && next.pulseTurn.targetUid != request.auth.uid
           && prior.players[next.pulseTurn.targetUid].get('shieldRound', 0) != prior.round
           && next.pulseTurn.cardId is int
           // El duelo empieza por su primera mitad: sin esto se podría entrar directamente
           // en la defensa dando por acertada una jugada que nadie ha hecho.
           && next.pulseTurn.stage == 'reto'
           // Sale exactamente una carta de mazo + descarte (barajar el descarte no cuenta).
-          && next.deck.size() + next.discard.size() == prior.deck.size() + prior.discard.size() - 1
+          && exactDraw(prior.deck,prior.discard,next.deck,next.discard,next.pulseTurn.cardId)
           && next.timeline == prior.timeline
           && bumped();
       }
@@ -383,8 +417,8 @@ service cloud.firestore {
       // ni el mazo: lo único que se guarda es dónde ha colocado y si acertó, para poder
       // resolverlo cuando defienda la otra persona.
       function validPulseChallenge() {
-        let prior = before();
-        let next = after();
+        let prior = resource.data;
+        let next = request.resource.data;
         return isCurrent()
           && prior.status == 'playing'
           && prior.phase == 'pulse'
@@ -402,9 +436,19 @@ service cloud.firestore {
       // Paso 3: defiende quien fue retado y se reparten las consecuencias de las dos
       // jugadas. Es la única escritura del juego que hace alguien que no tiene el turno,
       // así que aquí no vale `isCurrent()`: quien firma es el objetivo del duelo.
+      function exactPulseEnd(prior,next,by,placed,gift,draw) {
+        let card = prior.pulseTurn.cardId;
+        let hand = prior.players[by].hand;
+        let nextHand = next.players[by].hand;
+        let discard = placed ? prior.discard : prior.discard.concat([card]);
+        return (placed ? (!(card in prior.timeline) && next.timeline.size() == prior.timeline.size()+1 && next.timeline.removeAll([card]) == prior.timeline) : next.timeline == prior.timeline)
+          && (draw == 1 ? (nextHand.size() == hand.size()+1 && nextHand == hand.concat([nextHand[hand.size()]])
+              && exactDraw(prior.deck,discard,next.deck,next.discard,nextHand[hand.size()]))
+            : (nextHand == (gift ? hand.removeAll([prior.pulseTurn.giftId]) : hand) && next.deck == prior.deck && next.discard == discard));
+      }
       function validPulseEnd() {
-        let prior = before();
-        let next = after();
+        let prior = resource.data;
+        let next = request.resource.data;
         let pt = prior.pulseTurn;
         // Quien retó es quien tiene el turno: el turno no cambia de manos durante el duelo.
         let by = prior.playerOrder[prior.current];
@@ -414,7 +458,7 @@ service cloud.firestore {
         let gift = pt.byOk && !next.reveal.targetOk;
         let draw = !pt.byOk && prior.deck.size() + prior.discard.size() + (placed ? 0 : 1) > 0 ? 1 : 0;
         return isParticipant()
-          && uid() == pulseTarget()
+          && request.auth.uid == pulseTarget()
           && prior.status == 'playing'
           && prior.phase == 'pulse'
           && pt.stage == 'defensa'
@@ -426,36 +470,94 @@ service cloud.firestore {
           && next.reveal.correct == pt.byOk
           && next.reveal.targetOk is bool
           && next.reveal.playerUid == by
-          && next.reveal.targetUid == uid()
+          && next.reveal.targetUid == request.auth.uid
           // Solo se tocan las dos manos del duelo. La de quien defiende únicamente puede
           // crecer con la carta apalabrada al lanzarlo, así que quien cobra no elige qué
           // cobra; y el Pulso gastado de quien retó no se puede devolver desde aquí.
-          && next.players.diff(prior.players).affectedKeys().hasOnly([by, uid()])
-          && next.players[uid()].hand == (gift ? prior.players[uid()].hand.concat([pt.giftId]) : prior.players[uid()].hand)
+          && next.players.diff(prior.players).affectedKeys().hasOnly([by, request.auth.uid])
+          && next.players[request.auth.uid].hand == (gift ? prior.players[request.auth.uid].hand.concat([pt.giftId]) : prior.players[request.auth.uid].hand)
           // La carta que se cobra tiene que salir de la mano de quien retó, no aparecer.
           && (!gift || pt.giftId in prior.players[by].hand)
-          && next.players[by].hand.size() == prior.players[by].hand.size() + (gift ? -1 : draw)
+          && exactPulseEnd(prior,next,by,placed,gift,draw)
           && next.players[by].get('pulseUsed', false) == true
           && next.players[by].get('shieldRound', 0) == prior.players[by].get('shieldRound', 0)
           // El escudo se gana recibiendo una carta y solo así: defenderse bien no protege
           // de la siguiente. Y nadie se devuelve su propio Pulso al firmar el desenlace.
-          && next.players[uid()].get('shieldRound', 0) == (gift ? prior.round : prior.players[uid()].get('shieldRound', 0))
-          && next.players[uid()].get('pulseUsed', false) == prior.players[uid()].get('pulseUsed', false)
-          && next.timeline.size() == prior.timeline.size() + (placed ? 1 : 0)
-          && (placed ? (pt.cardId in next.timeline)
-                     : (pt.cardId in next.discard || pt.cardId in next.deck || pt.cardId in next.players[by].hand))
+          && next.players[request.auth.uid].get('shieldRound', 0) == (gift ? prior.round : prior.players[request.auth.uid].get('shieldRound', 0))
+          && next.players[request.auth.uid].get('pulseUsed', false) == prior.players[request.auth.uid].get('pulseUsed', false)
           // La carta del reto estaba fuera de todo mientras duraba la fase: al colocarse
           // sube la línea y al descartarse sube el descarte, y el robo de quien falló el
           // reto es lo único que puede bajar el montón.
-          && next.deck.size() + next.discard.size()
-             == prior.deck.size() + prior.discard.size() + (placed ? 0 : 1) - draw
           && bumped();
       }
 
       // Cerrar el turno: el jugador de turno o el anfitrión, nunca antes de revelar.
+      function validWinners(prior, next) {
+        let empty = emptyPlayers(prior);
+        let winners = next.get('winners', [next.winner]);
+        return winners.size() == empty.size() && winners.toSet() == empty.toSet()
+          && (empty.size() == 1 || prior.deck.size() + prior.discard.size() < empty.size());
+      }
+      function tieCard(prior, next, who) {
+        let player = next.players[who];
+        return player.hand.size() == 1 && player.diff(prior.players[who]).affectedKeys().hasOnly(['hand']) ? player.hand : [];
+      }
+      function tieAt(prior, next, empty, i) {
+        return i < empty.size() ? tieCard(prior, next, empty[i]) : [];
+      }
+      function validTie(prior, next) {
+        let empty = emptyPlayers(prior);
+        return empty.size() == 0 && next.players == prior.players && next.deck == prior.deck && next.discard == prior.discard;
+      }
+      // Un robo por transacción mantiene la validación exacta bajo el límite de
+      // expresiones, incluso si se recolocan varios poderes. La cola se reanuda.
+      function validTieStart() {
+        let prior = resource.data;
+        let next = request.resource.data;
+        let empty = emptyPlayers(prior);
+        return (isCurrent() || isHost()) && prior.status == 'playing' && prior.phase == 'reveal' && roundEnds()
+          && changed().hasOnly(['phase','reveal','tieQueue','version','updatedAt'])
+          && next.phase == 'tiebreak' && next.reveal == null && next.tieQueue == empty
+          && empty.size() > 1 && prior.deck.size() + prior.discard.size() >= empty.size() && bumped();
+      }
+      function validTieStep() {
+        let prior = resource.data;
+        let next = request.resource.data;
+        let who = prior.tieQueue[0];
+        let card = next.players[who].hand[0];
+        return isParticipant() && prior.status == 'playing' && prior.phase == 'tiebreak' && next.phase == 'tiebreak'
+          && changed().hasOnly(['ghost','pulsePower','players','deck','discard','tieQueue','version','updatedAt'])
+          && prior.tieQueue == [who].concat(next.tieQueue)
+          && prior.players[who].hand == [] && next.players[who].hand.size() == 1
+          && next.players.diff(prior.players).affectedKeys().hasOnly([who])
+          && next.players[who].diff(prior.players[who]).affectedKeys().hasOnly(['hand'])
+          && (prior.deck.size() > 0 ? (prior.deck == [card].concat(next.deck) && next.discard == prior.discard)
+            : (card in prior.discard && next.discard == [] && next.deck.size() + 1 == prior.discard.size()
+              && next.deck.concat([card]).toSet() == prior.discard.toSet())) && bumped();
+      }
+      function validTieFinish() {
+        let prior = resource.data;
+        let next = request.resource.data;
+        return isParticipant() && prior.status == 'playing' && prior.phase == 'tiebreak' && prior.tieQueue == []
+          && changed().hasOnly(['ghost','phase','current','round','turnsInRound','turnStartedAt','version','updatedAt'])
+          && next.phase == 'turn' && next.current == (prior.current + 1) % prior.playerOrder.size()
+          && next.round == prior.round + 1 && next.turnsInRound == 0 && next.turnStartedAt == request.time && bumped();
+      }
+      function validTieDraw(prior, next, empty) {
+        let drawn = tieAt(prior,next,empty,0).concat(tieAt(prior,next,empty,1)).concat(tieAt(prior,next,empty,2))
+          .concat(empty.size()>3 ? tieAt(prior,next,empty,3).concat(tieAt(prior,next,empty,4)).concat(tieAt(prior,next,empty,5))
+            .concat(empty.size()>6 ? tieAt(prior,next,empty,6).concat(tieAt(prior,next,empty,7)).concat(tieAt(prior,next,empty,8)) : []) : []);
+        return (empty.size() > 1 && drawn.size() == empty.size() && drawn.toSet().size() == drawn.size()
+            && next.players.diff(prior.players).affectedKeys() == empty.toSet()
+            && (prior.deck.size() >= drawn.size()
+              ? (prior.deck == drawn.concat(next.deck) && next.discard == prior.discard)
+              : (next.discard == [] && drawn.removeAll(prior.discard) == prior.deck
+                && next.deck.size() + drawn.size() == prior.deck.size() + prior.discard.size()
+                && next.deck.concat(drawn).toSet() == prior.deck.concat(prior.discard).toSet())));
+      }
       function validAdvance() {
-        let prior = before();
-        let next = after();
+        let prior = resource.data;
+        let next = request.resource.data;
         return (isCurrent() || isHost())
           && prior.status == 'playing'
           && prior.phase == 'reveal'
@@ -463,9 +565,10 @@ service cloud.firestore {
           && (next.status == 'ended'
               ? (changed().hasOnly(['status', 'phase', 'winner', 'winners', 'reveal', 'version', 'updatedAt'])
                  && next.phase == 'finished'
+                 && roundEnds()
                  && next.winner in prior.playerOrder
                  && prior.players[next.winner].hand.size() == 0
-                 && next.get('winners', [next.winner]).size() >= 1)
+                 && validWinners(prior, next))
               : (changed().hasOnly(['ghost', 'pulsePower', 'players', 'deck', 'discard', 'current', 'turnsInRound', 'round',
                                     'phase', 'reveal', 'turnStartedAt', 'version', 'updatedAt'])
                  && next.status == 'playing'
@@ -477,7 +580,7 @@ service cloud.firestore {
                  // Optativo por compatibilidad con clientes sin actualizar; ver `validStart`.
                  && (!('turnStartedAt' in next) || next.turnStartedAt is timestamp)
                  // Solo el desempate de final de ronda puede repartir cartas.
-                 && (roundEnds() || (next.players == prior.players
+                 && (roundEnds() ? validTie(prior, next) : (next.players == prior.players
                                      && next.deck == prior.deck
                                      && next.discard == prior.discard))))
           && bumped();
@@ -486,67 +589,94 @@ service cloud.firestore {
       // El anfitrión salta el turno de quien se ha desconectado.
       function validSkip() {
         return isHost()
-          && before().status == 'playing'
+          && resource.data.phase != 'tiebreak'
+          && resource.data.status == 'playing'
           && changed().hasOnly(['ghost', 'discard', 'pulseTurn', 'current', 'turnsInRound', 'round', 'phase', 'reveal',
                                 'turnStartedAt', 'version', 'updatedAt'])
-          && after().phase == 'turn'
-          && after().reveal == null
-          && after().current == (before().current + 1) % before().playerOrder.size()
-          && after().turnsInRound == (roundEnds() ? 0 : before().turnsInRound + 1)
-          && after().round == (roundEnds() ? before().round + 1 : before().round)
-          && after().discard == (before().phase == 'pulse' ? before().discard.concat([before().pulseTurn.cardId]) : before().discard)
-          && after().get('pulseTurn', null) == (before().phase == 'pulse' ? null : before().get('pulseTurn', null))
+          && request.resource.data.phase == 'turn'
+          && request.resource.data.reveal == null
+          && request.resource.data.current == (resource.data.current + 1) % resource.data.playerOrder.size()
+          && request.resource.data.turnsInRound == (roundEnds() ? 0 : resource.data.turnsInRound + 1)
+          && request.resource.data.round == (roundEnds() ? resource.data.round + 1 : resource.data.round)
+          && request.resource.data.discard == (resource.data.phase == 'pulse' ? resource.data.discard.concat([resource.data.pulseTurn.cardId]) : resource.data.discard)
+          && request.resource.data.get('pulseTurn', null) == (resource.data.phase == 'pulse' ? null : resource.data.get('pulseTurn', null))
           // Optativo por compatibilidad con clientes sin actualizar; ver `validStart`.
-          && (!('turnStartedAt' in after()) || after().turnStartedAt is timestamp)
+          && (!('turnStartedAt' in request.resource.data) || request.resource.data.turnStartedAt is timestamp)
           && bumped();
       }
 
       // El anfitrión expulsa a alguien, o alguien se marcha: sus cartas van al descarte.
       function validKick() {
+        let removed = resource.data.playerOrder.removeAll(request.resource.data.playerOrder);
         // Quien se marcha o es expulsado puede ser justo quien tenía el turno.
-        let currentLeft = !(before().playerOrder[before().current] in after().playerOrder);
-        let cancelPulse = before().phase == 'pulse' && (currentLeft || !(before().pulseTurn.targetUid in after().playerOrder));
+        let currentLeft = !(resource.data.playerOrder[resource.data.current] in request.resource.data.playerOrder);
+        let cancelPulse = resource.data.phase == 'pulse' && (currentLeft || !(resource.data.pulseTurn.targetUid in request.resource.data.playerOrder));
         // Ganar de verdad por abandono: solo cuando de verdad queda una única persona.
         // Sin esto, cualquiera que se marchara podría declararse ganador o dar la
         // victoria a otra persona con la mesa todavía llena.
-        let soleWinner = after().playerOrder.size() == 1
-          && after().status == 'ended' && after().phase == 'finished'
-          && after().winner == after().playerOrder[0]
-          && after().get('reveal', null) == null;
+        let soleWinner = request.resource.data.playerOrder.size() == 1
+          && request.resource.data.status == 'ended' && request.resource.data.phase == 'finished'
+          && request.resource.data.winner == request.resource.data.playerOrder[0]
+          && request.resource.data.get('reveal', null) == null;
         // La partida sigue: ni el estado ni el resultado se inventan al salir. Solo se
         // permite descartar una jugada a medio revelar si era justo la de quien se fue.
-        let stillPlaying = after().status == before().status
-          && after().winner == before().winner
-          && after().get('reveal', null) == (currentLeft ? null : before().get('reveal', null))
-          && after().phase == (cancelPulse || currentLeft ? 'turn' : before().phase);
+        let stillPlaying = request.resource.data.status == resource.data.status
+          && request.resource.data.winner == resource.data.winner
+          && request.resource.data.get('reveal', null) == (currentLeft ? null : resource.data.get('reveal', null))
+          && request.resource.data.phase == (cancelPulse || currentLeft ? 'turn' : resource.data.phase);
         return isParticipant()
-          && (isHost() || !(uid() in after().playerOrder))
+          && resource.data.phase != 'tiebreak'
+          && (isHost() || !(request.auth.uid in request.resource.data.playerOrder))
           && changed().hasOnly(['ghost', 'pulseTurn', 'players', 'playerOrder', 'discard', 'current', 'turnsInRound',
                                 'phase', 'status', 'winner', 'reveal', 'version', 'updatedAt'])
-          && after().playerOrder.size() == before().playerOrder.size() - 1
-          && after().playerOrder.size() >= 1
-          && after().players.size() == before().players.size() - 1
-          && before().hostUid in after().playerOrder
-          && after().current >= 0
-          && after().current < after().playerOrder.size()
-          && after().deck.size() == before().deck.size()
-          && after().timeline.size() == before().timeline.size()
-          && after().get('pulseTurn', null) == (cancelPulse ? null : before().get('pulseTurn', null))
-          && (before().status != 'playing'
+          && request.resource.data.playerOrder.size() == resource.data.playerOrder.size() - 1
+          && request.resource.data.playerOrder.size() >= 1
+          && removed.size() == 1 && request.resource.data.playerOrder == resource.data.playerOrder.removeAll(removed)
+          && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly(removed)
+          && request.resource.data.discard == resource.data.discard.concat(resource.data.players[removed[0]].hand).concat(cancelPulse ? [resource.data.pulseTurn.cardId] : [])
+          && request.resource.data.players.size() == resource.data.players.size() - 1
+          && resource.data.hostUid in request.resource.data.playerOrder
+          && request.resource.data.current >= 0
+          && request.resource.data.current < request.resource.data.playerOrder.size()
+          && request.resource.data.deck.size() == resource.data.deck.size()
+          && request.resource.data.timeline.size() == resource.data.timeline.size()
+          && request.resource.data.get('pulseTurn', null) == (cancelPulse ? null : resource.data.get('pulseTurn', null))
+          && (resource.data.status != 'playing'
               // Fuera de partida (vestíbulo o ya terminada) nada de esto se toca.
-              ? (after().status == before().status && after().phase == before().phase
-                 && after().winner == before().winner && after().get('reveal', null) == before().get('reveal', null))
+              ? (request.resource.data.status == resource.data.status && request.resource.data.phase == resource.data.phase
+                 && request.resource.data.winner == resource.data.winner && request.resource.data.get('reveal', null) == resource.data.get('reveal', null))
               : (soleWinner || stillPlaying))
           && bumped();
       }
 
+      function hostStale() {
+        let path = /databases/$(database)/documents/rooms/$(roomId)/presence/$(resource.data.hostUid);
+        let host = exists(path) ? get(path).data : {'seenAt': resource.data.updatedAt, 'visible': true};
+        return host.seenAt is timestamp && request.time > host.seenAt + duration.value(host.visible ? 90 : 15, 's');
+      }
+      function validHostClaim() {
+        return isParticipant() && resource.data.status != 'ended'
+          && request.resource.data.hostUid == request.auth.uid && changed().hasOnly(['hostUid', 'version', 'updatedAt'])
+          && hostStale() && bumped();
+      }
+      match /presence/{playerId} {
+        function member() { return request.auth != null && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.playerOrder; }
+        allow get: if member();
+        allow list: if false;
+        allow create, update: if member() && request.auth.uid == playerId
+          && request.resource.data.keys().hasOnly(['seenAt', 'visible'])
+          && request.resource.data.seenAt == request.time && request.resource.data.visible is bool;
+        allow delete: if member() && request.auth.uid == playerId;
+      }
       allow get: if signedIn() && (resource.data.status == 'lobby' || isParticipant());
       allow list: if false;
 
       allow create: if signedIn()
+        && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.roomCode == roomId
+        && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.lastCreatedAt == request.time
         && !('ghost' in request.resource.data)
         && !('pulsePower' in request.resource.data)
-        && request.resource.data.hostUid == uid()
+        && request.resource.data.hostUid == request.auth.uid
         && request.resource.data.roomCode == roomId
         // El juego solo elige qué mazo usan todos los móviles de la sala, y las reglas
         // nunca han podido validar su contenido: las cartas viven en el cliente. Con una
@@ -568,10 +698,11 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time
         && request.resource.data.playerOrder.size() == 1
-        && request.resource.data.playerOrder[0] == uid()
+        && request.resource.data.playerOrder[0] == request.auth.uid
         && request.resource.data.players.size() == 1
-        && validName(request.resource.data.players[uid()].name)
-        && request.resource.data.players[uid()].hand.size() == 0
+        && request.resource.data.get('turnSeconds', 20) in [0, 20, 30, 45]
+        && validName(request.resource.data.players[request.auth.uid].name)
+        && request.resource.data.players[request.auth.uid].hand.size() == 0
         && request.resource.data.deck.size() == 0
         && request.resource.data.timeline.size() == 0
         && request.resource.data.winner == null
@@ -580,20 +711,23 @@ service cloud.firestore {
       // Cada escritura entra por una sola rama: encadenar seis validaciones agota
       // el límite de 1000 expresiones que Firestore evalúa por petición.
       allow update: if signedIn() && identityKept() && (
-        ('ghost' in before() && changed().hasOnly(['ghost', 'version', 'updatedAt']))
+        ('ghost' in resource.data && changed().hasOnly(['ghost', 'version', 'updatedAt']))
         ? ghostActivate() : (ghostSafe()
-          && (before().status == 'lobby' ? true
-            : (!('pulsePower' in before()) ? !('pulsePower' in after())
-              : (before().phase == 'turn' && after().phase == 'pulse' ? pulsePowerUse() : pulsePowerSafe()))) && (
-        after().playerOrder.size() < before().playerOrder.size()
+          && (resource.data.status == 'lobby' ? true
+            : (!('pulsePower' in resource.data) ? !('pulsePower' in request.resource.data)
+              : (resource.data.phase == 'turn' && request.resource.data.phase == 'pulse' ? pulsePowerUse() : pulsePowerSafe()))) && (
+        request.resource.data.playerOrder.size() < resource.data.playerOrder.size()
           ? validKick()
-          : (before().status == 'lobby'
-              ? (after().status == 'lobby' ? validJoin() : validStart())
-              : (after().phase == 'pulse'
-                  ? (before().phase == 'turn' ? validPulseStart() : validPulseChallenge())
-                  : (after().phase == 'reveal'
-                      ? (before().phase == 'pulse' ? validPulseEnd() : validPlay())
-                      : (before().phase == 'reveal' ? validAdvance() : validSkip())))))));
+          : (resource.data.status == 'lobby'
+              ? (request.resource.data.status == 'lobby' ? validJoin() : validStart())
+              : (request.resource.data.phase == 'tiebreak' ? (resource.data.phase == 'reveal' ? validTieStart() : validTieStep())
+                : resource.data.phase == 'tiebreak' ? validTieFinish() : (request.resource.data.phase == 'pulse'
+                  ? (resource.data.phase == 'turn' ? validPulseStart() : validPulseChallenge())
+                  : (request.resource.data.phase == 'reveal'
+                      ? (resource.data.phase == 'pulse' ? validPulseEnd() : validPlay())
+                      : (resource.data.phase == 'reveal' ? validAdvance() : validSkip()))))))));
+
+      allow update: if request.auth != null && request.resource.data.hostUid != resource.data.hostUid && validHostClaim();
 
       allow delete: if isHost();
     }

@@ -1,6 +1,6 @@
 // Velocidades de referencia en km/h, no un ranking homogéneo de récords absolutos.
 // El título identifica el movimiento y si se trata de crucero, carrera o muestra medida.
-// Ya no se publican cartas sin dato atado: cada una lleva su fuente o no está en el mazo.
+// Las cartas aún sin referencia se señalan explícitamente como pendientes de revisión.
 // Véase VERIFICACION_CORRECCIONES.md para fuentes y limitaciones.
 window.ANIMAL_SPEED_CARDS = [
   { id: 13001, value: 9, title: "Escarabajo tigre (carrera en tierra)", detail: "Guinness reconoce a Cicindela hudsoni como el insecto terrestre más rápido: 2,5 metros por segundo, unos 9 km/h. Sustituye al caracol de jardín, cuya cifra superaba ese récord.", source: "https://www.guinnessworldrecords.com/world-records/70631-fastest-insect-on-land" },
@@ -38,7 +38,7 @@ window.ANIMAL_SPEED_CARDS = [
   { id: 13033, value: 40, title: "León marino de California (nadando)", detail: "Guinness le atribuye unos 40 km/h nadando, la mayor velocidad reconocida a un mamífero marino. Sustituye al caracol marino, que no tenía ni especie ni cifra documentada.", source: "https://www.guinnessworldrecords.com/world-records/70461-fastest-marine-mammal" },
   { id: 13034, value: 64, title: "Cebra (huida)", detail: "San Diego Zoo indica que corre a más de 40 millas por hora, unos 64 km/h. Sustituye al cangrejo de río, sin cifra documentada.", source: "https://animals.sandiegozoo.org/animals/zebra" },
   { id: 13035, value: 6.12, title: "Araña flic-flac de Marruecos (huida)", detail: "Guinness reconoce a Cebrennus rechenbergi como la araña más rápida: 1,7 m/s, 6,12 km/h, huyendo de un depredador dando volteretas. Sustituye al cangrejo araña, sin velocidad publicada.", source: "https://www.guinnessworldrecords.com/world-records/82841-fastest-spider" },
-  { id: 13036, value: 3.5, title: "Topo europeo", detail: "Bajo tierra excava con potencia, pero sobre la superficie se desplaza a poca velocidad. Cifra sin fuente cerrada: la que circula procede de una confusión de unidades documentada en VERIFICACION_CORRECCIONES.md." },
+  { id: 13036, value: 3.5, title: "Topo europeo (en revisión)", detail: "Bajo tierra excava con potencia, pero sobre la superficie se desplaza a poca velocidad. Cifra sin fuente cerrada: la que circula procede de una confusión de unidades documentada en VERIFICACION_CORRECCIONES.md. Dato pendiente de verificación: el valor de juego se conserva provisionalmente.", reviewStatus: "pending" },
   { id: 13037, value: 5.4, title: "Cucaracha americana (carrera medida)", detail: "Full y Tu midieron carreras de hasta 1,5 m/s, unos 5,4 km/h y cincuenta longitudes de cuerpo por segundo. A esa velocidad deja el trípode y corre con cuatro patas, incluso con dos.", source: "https://journals.biologists.com/jeb/article/156/1/215/6299/Mechanics-of-A-Rapid-Running-Insect-Two-Four-and" },
   { id: 13038, value: 27, title: "Abeja melífera (vuelo de crucero sin carga)", detail: "La literatura experimental cita alrededor de 7,5 m/s en vuelo sin carga, equivalentes a 27 km/h. Es una referencia de crucero; el viento, la carga y el método de medición importan.", source: "https://journals.biologists.com/jeb/article/209/5/978/16690/Visual-regulation-of-ground-speed-and-headwind" }
 ];

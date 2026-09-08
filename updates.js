@@ -1,11 +1,11 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  CT.APP_VERSION = "continuum-v74";
+  CT.APP_VERSION = "continuum-v82";
   CT.Updates = { start };
   function start() {
     if (!("serviceWorker" in navigator) || window.Capacitor?.isNativePlatform?.()) return;
-    let registration, applying = false, timer;
+    let registration, applying = false, timer, offlineFailure = false;
     const box = document.createElement("aside");
     box.id = "update-notice"; box.className = "system-notice";
     box.setAttribute("role", "status");
@@ -13,13 +13,15 @@
     button.className = "btn btn-secondary"; button.textContent = "Actualizar ahora";
     box.append(label, button);
     function refresh() {
-      if (!registration?.waiting || applying) return;
+      if (applying) return;
+      if (!registration?.waiting) { if (!offlineFailure) box.remove(); return; }
       CT.Storage.noticeHost().append(box);
       button.hidden = false;
       button.disabled = !!CT.isSessionActive?.() || CT.Storage.hasPending();
       label.textContent = button.disabled ? "Nueva versión disponible. Podrás actualizar al terminar o salir de la partida." : "Nueva versión lista. Tu progreso guardado se conservará.";
     }
     function optionalError() {
+      offlineFailure = true;
       if (registration?.waiting) { refresh(); return; }
       label.textContent = "No se pudo preparar el modo sin conexión. Puedes seguir jugando y reintentarlo al recuperar la conexión.";
       button.hidden = true; CT.Storage.noticeHost().append(box);
@@ -53,7 +55,7 @@
             registration.installing?.addEventListener("statechange", refresh);
           });
         } else await registration.update();
-        refresh();
+        offlineFailure = false; refresh();
       } catch { optionalError(); }
     }
     new MutationObserver(refresh).observe(document.getElementById("app"), { childList: true, subtree: true });
