@@ -1460,10 +1460,12 @@ body::before {
    propia arriba, la imagen queda limpia en medio y el resultado se ancla al
    fondo del todo, así un título largo nunca tapa el dibujo. */
 /* Sin `border: 0` ni fondo propio: al no cubrir la imagen toda la carta, esta vuelve
-   a ser la misma ficha de papel enmarcada que el resto de la línea. */
+   a ser la misma ficha de papel enmarcada que el resto de la línea. `isolation` deja
+   dentro de la carta la mezcla de la lámina (ver `mix-blend-mode` más abajo). */
 .timeline .animal-timeline-card {
   display: flex;
   flex-direction: column;
+  isolation: isolate;
 }
 /* El sello de temática también es parte del papel: colores fijos, no los del tema,
    porque el fondo de la carta es el mismo de día y de noche. */
@@ -1482,11 +1484,14 @@ body::before {
   white-space: nowrap;
   overflow-wrap: normal;
 }
-/* La lámina va enmarcada por el papel, como un grabado pegado en la ficha. El panel
-   toma la proporción de las propias láminas —todas son 512x768—, así `cover` las
-   encaja enteras: ni se recorta la escena ni quedan franjas a los lados. Se expresa
-   como `aspect-ratio` y no como alto fijo para que acompañe al ancho de la carta,
-   que cambia entre móvil y escritorio. */
+/* La lámina no va enmarcada ni pegada encima: va estampada en el papel. Sin filete ni
+   sombra —un borde alrededor la delataba como fotografía—, y sin fondo propio, para que
+   la tinta se mezcle directamente con la ficha.
+
+   El panel toma la proporción de las propias láminas —todas son 512x768—, así `cover`
+   las encaja enteras: ni se recorta la escena ni quedan franjas a los lados. Se expresa
+   como `aspect-ratio` y no como alto fijo para que acompañe al ancho de la carta, que
+   cambia entre móvil y escritorio. */
 .timeline .animal-timeline-card .card-visual {
   flex: none;
   position: static;
@@ -1495,9 +1500,21 @@ body::before {
   aspect-ratio: 2 / 3;
   margin: 6px 8px 0;
   padding: 0;
-  border-radius: 4px;
-  box-shadow: 0 0 0 1px rgba(59,40,22,.22);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
   filter: none;
+}
+/* Los tres gestos que la vuelven estampada y no pegada:
+   - `multiply` funde el blanco del grabado con el papel, así comparten fondo;
+   - el sepia iguala la tinta fría del original con el tostado de la ficha;
+   - la máscara disuelve el pie de la lámina en el papel, para que la escena no termine
+     en un canto recto justo encima del título. */
+.timeline .animal-timeline-card .animal-card-art {
+  mix-blend-mode: multiply;
+  filter: sepia(.42) saturate(.8) contrast(1.02);
+  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
 }
 .timeline .animal-timeline-card .card-content {
   flex: 1;
