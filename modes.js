@@ -957,7 +957,7 @@
   }
 
   window.CONTINUUM = {
-    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK,
+    MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS,
     has, mode, axis, cards,
     usesAnimalArt, cardArt, animalArt, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
