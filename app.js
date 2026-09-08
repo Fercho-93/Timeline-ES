@@ -17,7 +17,7 @@
     app.insertAdjacentHTML("beforeend", html);
     CT.openDialog(app.lastElementChild, cerrable);
   }
-  let selectedModeKey = localStorage.getItem(MODE_STORAGE_KEY) || CT.DEFAULT_MODE;
+  let selectedModeKey = CT.Storage.getItem(MODE_STORAGE_KEY) || CT.DEFAULT_MODE;
   if (!CT.has(selectedModeKey)) selectedModeKey = CT.DEFAULT_MODE;
   // El bloque en pantalla se deduce siempre del juego elegido, así que no se guarda aparte.
   let selectedBlockKey = CT.blockOf(selectedModeKey).key;
@@ -64,7 +64,7 @@
     if (!CT.has(modeKey)) return;
     selectedModeKey = modeKey;
     selectedBlockKey = CT.blockOf(modeKey).key;
-    localStorage.setItem(MODE_STORAGE_KEY, modeKey);
+    CT.Storage.setItem(MODE_STORAGE_KEY, modeKey);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     game = loadGame();
     selectedCardId = null;
@@ -85,14 +85,13 @@
   function categoryBadge(card) { return CT.categoryBadge(selectedModeKey, card); }
 
   function saveGame() {
-    if (game) localStorage.setItem(storageKey(), JSON.stringify(game));
-    else localStorage.removeItem(storageKey());
+    if (game) CT.Storage.setItem(storageKey(), JSON.stringify(CT.Saves.prepare(game, selectedModeKey)));
+    else CT.Storage.removeItem(storageKey());
   }
 
   function loadGame() {
     try {
-      const raw = localStorage.getItem(storageKey());
-      const stored = JSON.parse(raw);
+      const stored = CT.Saves.read(storageKey(), selectedModeKey);
       if (!stored || !stored.players || !stored.timeline) return null;
       stored.mode = stored.mode || selectedModeKey;
       if (!stored.winners && stored.winner != null) stored.winners = [stored.winner];
@@ -206,7 +205,7 @@
   }
 
   function competitionPromo() {
-    return `<button class="comp-promo" data-action="start-competition">
+    return `${loadCompetition() ? '<button class="btn btn-primary btn-block" data-action="resume-competition">Continuar competición guardada →</button>' : ""}<button class="comp-promo" data-action="start-competition">
       <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
       <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
     </button>`;
@@ -260,9 +259,7 @@
 
   // Compartida con el diagnóstico de más abajo: es la misma búsqueda, una sola vez.
   async function cacheVersion() {
-    if (!("caches" in window)) return null;
-    try { return (await caches.keys()).find(name => name.startsWith("continuum-")) || null; }
-    catch { return null; }
+    return CT.APP_VERSION;
   }
 
   async function showCacheVersion() {
@@ -384,6 +381,7 @@
   }
 
   function startGame() {
+    cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     const inputs = [...document.querySelectorAll("#players input")];
     if (inputs.length < 2) return showToast("Se necesitan al menos 2 jugadores");
     const names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
@@ -698,6 +696,7 @@
     const cartas = game.timeline.map(id => cardsById.get(id));
     const posiciones = { by: posicionEnLinea(byIndex, cartas), target: posicionEnLinea(index, cartas) };
     let gift = null;
+    let penaltySkipped = false;
     if (byOk || targetOk) game.timeline.splice(byOk ? byIndex : index, 0, cardId);
     else {
       game.discard.push(cardId);
@@ -717,13 +716,13 @@
     } else if (!byOk) {
       // Nunca falla cuando los dos fallan: la carta del reto acaba de entrar en el
       // descarte, así que hay al menos una que robar aunque el mazo estuviera vacío.
-      drawCard(player);
+      penaltySkipped = !drawCard(player);
     }
     game.pulseTurn = null;
     pendingIndex = null;
     result = {
       correct: byOk, card, pulse: true, duel: true, targetOk,
-      byName: player.name, targetName: target.name, gift, posiciones
+      byName: player.name, targetName: target.name, gift, posiciones, penaltySkipped
     };
     anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: targetOk, kind: "local", hidden: !!game.ghost?.pending.length, pulse: true }));
     saveGame();
@@ -753,7 +752,7 @@
     overlay(`<div class="overlay"><div class="modal">
       <div class="eyebrow">Pulso</div>
       <h2>¿A quién retas?</h2>
-      <p class="lead" style="margin-inline:auto">El mazo saca una carta que no elige nadie y la colocáis los dos: primero tú y luego esa persona, sin ver tu jugada. Si aciertas y falla, se lleva una carta tuya al azar; si acierta, o si falláis los dos, robas tú.</p>
+      <p class="lead" style="margin-inline:auto">${CT.pulseRules}</p>
       <div class="actions" style="display:grid;margin-top:6px">${opciones}</div>
       ${protegidos.length ? `<p class="hint" style="margin-top:12px">Ya recibieron una carta esta ronda: ${protegidos.map(player => escapeHtml(player.name)).join(", ")}.</p>` : ""}
       <button class="btn btn-ghost btn-block" style="margin-top:10px" data-action="close-menu">Mejor no</button>
@@ -799,7 +798,7 @@
       return `<p class="pulse-outcome">Solo acierta <b>${escapeHtml(result.byName)}</b>: <b>${escapeHtml(result.targetName)}</b> se lleva su <b>${escapeHtml(result.gift.title)}</b>. La carta se queda en la línea.</p>`;
     }
     if (result.targetOk) {
-      return `<p class="pulse-outcome"><b>${escapeHtml(result.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(result.byName)}</b> roba una por fallar el reto.</p>`;
+      return `<p class="pulse-outcome"><b>${escapeHtml(result.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(result.byName)}</b> ${result.penaltySkipped ? "no roba: el mazo y el descarte están agotados" : "roba una por fallar el reto"}.</p>`;
     }
     return `<p class="pulse-outcome">No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(result.byName)}</b> roba una por haber lanzado el reto.</p>`;
   }
@@ -1157,7 +1156,7 @@
   }
 
   function readRecords() {
-    try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || {}; } catch { return {}; }
+    try { return JSON.parse(CT.Storage.getItem(RECORDS_KEY)) || {}; } catch { return {}; }
   }
 
   function modeRecords() {
@@ -1168,21 +1167,19 @@
   function saveRecords(entry) {
     const records = readRecords();
     records[selectedModeKey] = entry;
-    try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* almacenamiento lleno */ }
+    try { CT.Storage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* almacenamiento lleno */ }
   }
 
   function saveSolo() {
-    // La competición no se guarda: cada ronda cambia de tema y, con él, de modalidad
-    // seleccionada, así que su clave de guardado (soloKey, atada a esa modalidad)
-    // pisaría la partida libre o el reto diario que hubiera guardados en ese tema.
-    if (solo && solo.kind === "comp") return;
-    if (solo) localStorage.setItem(soloKey(), JSON.stringify(solo));
-    else localStorage.removeItem(soloKey());
+    // La competición usa su propio guardado y conserva las partidas por mazo.
+    if (solo && solo.kind === "comp") { saveCompetition(); return; }
+    if (solo) CT.Storage.setItem(soloKey(), JSON.stringify(CT.Saves.prepare(solo, selectedModeKey)));
+    else CT.Storage.removeItem(soloKey());
   }
 
   function loadSolo() {
     try {
-      const stored = JSON.parse(localStorage.getItem(soloKey()));
+      const stored = CT.Saves.read(soloKey(), selectedModeKey);
       if (!stored || !stored.timeline || stored.finished) return null;
       // El reto diario caduca: si es de otro día ya no vale continuarlo.
       if (stored.kind === "daily" && stored.day !== today()) return null;
@@ -1211,7 +1208,7 @@
     return `<div class="cal-grid" role="img" aria-label="Calendario de los últimos ${CALENDARIO_DIAS} días del reto diario">${celdas.join("")}</div>`;
   }
 
-  let selectedDifficulty = localStorage.getItem("continuum-difficulty-v1") || "easy";
+  let selectedDifficulty = CT.Storage.getItem("continuum-difficulty-v1") || "easy";
   if (!CT.Ghost.LEVELS[selectedDifficulty]) selectedDifficulty = "easy";
   function soloHidden() { return solo.difficulty === "expert" || !!solo.ghostTurns?.includes(solo.played - (solo.pendingResult ? 1 : 0)); }
   function soloHome() {
@@ -1273,11 +1270,11 @@
   const DUEL_NAME_KEY = "hilo-nombre-v1";
 
   function duelName() {
-    try { return CT.Duelo.limpiaNombre(localStorage.getItem(DUEL_NAME_KEY) || ""); } catch { return ""; }
+    try { return CT.Duelo.limpiaNombre(CT.Storage.getItem(DUEL_NAME_KEY) || ""); } catch { return ""; }
   }
 
   function saveDuelName(nombre) {
-    try { localStorage.setItem(DUEL_NAME_KEY, CT.Duelo.limpiaNombre(nombre)); } catch { /* almacenamiento lleno */ }
+    try { CT.Storage.setItem(DUEL_NAME_KEY, CT.Duelo.limpiaNombre(nombre)); } catch { /* almacenamiento lleno */ }
   }
 
   function guardaNombreSiLoHay() {
@@ -1289,6 +1286,7 @@
   // se estrena uno propio con semilla nueva. En los dos casos el reparto sale de la misma
   // función, que es justo lo que garantiza que los dos móviles jueguen lo mismo.
   function startSolo(kind, duel = null) {
+    cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     // El duelo se juega siempre en Fácil, como el reto diario: si cada parte lo jugara en
     // una dificultad, el marcador compararía dos cosas distintas.
     const difficulty = kind === "daily" || kind === "duel" ? "easy" : selectedDifficulty;
@@ -1469,7 +1467,7 @@
     const mio = { hits: partida.hits, sequence: partida.sequence || [] };
     const rival = partida.duelo?.rival || null;
     const payload = CT.Duelo.codificar({
-      mode: partida.mode, seed: partida.duelo.seed, total,
+      mode: partida.mode, seed: partida.duelo.seed, total, deck: partida.savedDeck,
       hits: mio.hits, sequence: mio.sequence, nombre: duelName()
     });
 
@@ -1596,11 +1594,7 @@
   // vive en `comp`: qué temas quedan por jugar y el marcador acumulado de las rondas ya
   // resueltas.
   //
-  // No se guarda en `localStorage`: cada ronda cambia la modalidad seleccionada, y esa
-  // modalidad es la que decide dónde se guardan las partidas normales de solitario. Si
-  // la competición sobreviviera a un cierre de la aplicación, arrastraría esa modalidad
-  // cambiada consigo. Se pierde si se recarga la página a mitad, igual que se perdería
-  // una mano de cartas repartida y no anotada en cualquier juego de mesa.
+  // La competición se guarda con una clave independiente de las partidas por mazo.
   const ROUND_CARDS = 5;
   // «Gran mezcla temporal» no es un género propio: combina los demás mazos con eje temporal.
   // Un tema de
@@ -1620,9 +1614,45 @@
     return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
+  const COMP_KEY = "continuum-competition-v1";
+  function saveCompetition() {
+    if (!comp) return;
+    comp.saveVersion = CT.Saves.VERSION;
+    comp.previousModeKey = previousModeKey;
+    comp.solo = solo?.kind === "comp" ? CT.Saves.prepare(solo, solo.mode) : null;
+    CT.Storage.setItem(COMP_KEY, JSON.stringify(comp));
+  }
+  function loadCompetition() {
+    const raw = CT.Storage.getItem(COMP_KEY);
+    if (!raw) return null;
+    try {
+      const saved = JSON.parse(raw);
+      if (saved.saveVersion !== CT.Saves.VERSION || !Array.isArray(saved.queue) || !Array.isArray(saved.roundsSummary) || !CT.has(saved.previousModeKey) || !CT.Ghost.LEVELS[saved.difficulty] || !saved.decks || !saved.queue.every(key => CT.has(key) && Array.isArray(saved.decks[key]))) throw Error("Formato de competición desconocido");
+      if (!Array.isArray(saved.totalFailed) || !Number.isInteger(saved.totalHits) || saved.totalHits < 0 || saved.roundsSummary.some(round => !CT.has(round.mode) || !Number.isInteger(round.hits) || round.hits < 0 || round.hits > ROUND_CARDS || round.total !== ROUND_CARDS)) throw Error("Marcador inválido");
+      if (saved.solo) CT.Saves.validate(saved.solo, saved.solo.mode);
+      const themes = [...saved.queue, ...saved.roundsSummary.map(round => round.mode), ...(saved.solo ? [saved.solo.mode] : [])];
+      if (!themes.length || new Set(themes).size !== themes.length || (!saved.finished && !saved.solo && !saved.queue.length)) throw Error("Rondas inválidas");
+      return saved.finished ? null : saved;
+    } catch { CT.Storage.protect(COMP_KEY); return null; }
+  }
+  function resumeCompetition() {
+    comp = loadCompetition();
+    if (!comp) { home(); return; }
+    previousModeKey = comp.previousModeKey;
+    solo = comp.solo; pendingIndex = null; result = null;
+    if (!solo) { compRoundIntro(); return; }
+    selectedModeKey = solo.mode;
+    cardsById = new Map(solo.savedDeck.map(card => [card.id, card]));
+    if (solo.pendingResult) {
+      result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true };
+      soloResult();
+    } else soloView();
+  }
   function startCompetition() {
+    if (loadCompetition()) { resumeCompetition(); return; }
+    solo = null;
     previousModeKey = selectedModeKey;
-    comp = { difficulty: selectedDifficulty, queue: shuffle(COMP_MODES), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp = { decks: CT.Saves.clone(Object.fromEntries(COMP_MODES.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(COMP_MODES), roundsSummary: [], totalHits: 0, totalFailed: [] };
     compRoundIntro();
   }
 
@@ -1632,6 +1662,7 @@
   // retira solo; hace falta tocar «Empezar», igual en el primer tema que en los demás.
   function compRoundIntro() {
     screen = "comp-intro";
+    saveCompetition();
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Vas a jugar a</span>${escapeHtml(CT.mode(comp.queue[0]).name)}</h2>
       <button class="btn btn-block comp-splash-start" data-action="comp-next-round">Empezar</button>
@@ -1641,17 +1672,18 @@
   function beginCompRound() {
     const modeKey = comp.queue.shift();
     selectedModeKey = modeKey;
-    cardsById = new Map(CT.cards(modeKey).map(card => [card.id, card]));
+    cardsById = new Map(comp.decks[modeKey].map(card => [card.id, card]));
     const extra = CT.Ghost.level(comp.difficulty).extra;
-    const barajado = shuffle(CT.cards(modeKey).map(card => card.id)).slice(0, ROUND_CARDS + 1 + extra * (ROUND_CARDS - 1));
+    const barajado = shuffle(comp.decks[modeKey].map(card => card.id)).slice(0, ROUND_CARDS + 1 + extra * (ROUND_CARDS - 1));
     const timeline = [barajado.shift()];
     solo = {
-      kind: "comp", difficulty: comp.difficulty, ghostTurns: comp.difficulty === "hard" ? CT.Ghost.soloSchedule(ROUND_CARDS) : [], mode: modeKey, timeline, deck: barajado,
+      savedDeck: comp.decks[modeKey], kind: "comp", difficulty: comp.difficulty, ghostTurns: comp.difficulty === "hard" ? CT.Ghost.soloSchedule(ROUND_CARDS) : [], mode: modeKey, timeline, deck: barajado,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: ROUND_CARDS, finished: false, failed: []
     };
     pendingIndex = null;
     result = null;
+    saveCompetition();
     soloView();
   }
 
@@ -1669,6 +1701,8 @@
 
   function compFinish() {
     screen = "comp-end";
+    comp.finished = true;
+    saveCompetition();
     selectedModeKey = previousModeKey;
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     const totalCards = comp.roundsSummary.length * ROUND_CARDS;
@@ -1688,6 +1722,7 @@
   // Salir a mitad de una competición no debe dejar la modalidad cambiada puesta: se
   // restaura la de antes de empezar, igual que hace `compFinish` al terminarla entera.
   function abandonCompetition() {
+    saveCompetition();
     selectedModeKey = previousModeKey;
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     solo = null;
@@ -1759,7 +1794,7 @@
     if (!CT.Ghost.LEVELS[key]) return;
     event.target.closest(".difficulty-field").querySelector("[data-difficulty-help]").textContent = CT.Ghost.level(key).description;
     selectedDifficulty = key;
-    localStorage.setItem("continuum-difficulty-v1", key);
+    CT.Storage.setItem("continuum-difficulty-v1", key);
     const record = app.querySelector("[data-level-record]");
     const records = modeRecords();
     if (record) record.textContent = `Mejor marca en ${CT.Ghost.level(key).name}: ${records.bestByDifficulty?.[key] || (key === "easy" ? records.best || 0 : 0)}`;
@@ -1798,7 +1833,7 @@
     else if (action === "online") launchOnline();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
-    else if (action === "continue") { game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : pulseStage() === PULSE_PASE ? renderPulsePass() : renderPass(); }
+    else if (action === "continue") { cardsById = new Map(game.savedDeck.map(card => [card.id, card])); game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : pulseStage() === PULSE_PASE ? renderPulsePass() : renderPass(); }
     else if (action === "add-player") {
       const count = document.querySelectorAll("#players .player-row").length;
       if (count >= 9) return showToast("El máximo es de 9 jugadores");
@@ -1831,7 +1866,7 @@
     else if (action === "start-duel") { guardaNombreSiLoHay(); startSolo("duel"); }
     else if (action === "accept-duel") acceptDuel();
     else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
-    else if (action === "resume-solo") { solo = loadSolo(); pendingIndex = null; if (!solo) soloHome(); else if (solo.pendingResult) { result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true }; soloResult(); } else { result = null; soloView(); } }
+    else if (action === "resume-solo") { solo = loadSolo(); if (solo) cardsById = new Map(solo.savedDeck.map(card => [card.id, card])); pendingIndex = null; if (!solo) soloHome(); else if (solo.pendingResult) { result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true }; soloResult(); } else { result = null; soloView(); } }
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") soloHome();
@@ -1849,6 +1884,7 @@
     else if (action === "review-solo") reviewScreen(soloFailedForReview, `<button class="btn btn-primary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
     else if (action === "share-daily") compartir(lastShareText, "Resultado copiado");
     else if (action === "review-comp") reviewScreen(comp.totalFailed, `<button class="btn btn-primary" data-action="start-competition">Jugar otra vez</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`);
+    else if (action === "resume-competition") resumeCompetition();
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
     else if (action === "abandon-comp") abandonCompetition();
@@ -1864,31 +1900,8 @@
     else if (action === "perfil-reset-confirm") { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
   });
 
-  // `skipWaiting` y `clients.claim`, en el propio service worker, hacen que la versión
-  // nueva tome el control sin esperar a cerrar la pestaña. Pero eso no basta: la página ya
-  // abierta sigue ejecutando el código antiguo hasta que se recarga, así que sin esta
-  // línea la actualización llega pero no se ve —exactamente lo que pasa en una PWA
-  // instalada, donde «entrar y salir» a veces reanuda la misma pestaña en vez de abrir
-  // una de verdad—. En cuanto cambia quién controla la página, se recarga sola.
-  //
-  // Y como el navegador no siempre comprueba si hay una versión nueva por su cuenta al
-  // reabrir la aplicación, se le pide explícitamente cada vez que vuelve a primer plano:
-  // así una actualización ya subida a GitHub Pages no depende de que el navegador decida
-  // por sí mismo cuándo mirar.
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-      const registro = await navigator.serviceWorker.register("service-worker.js");
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") registro.update();
-      });
-    });
-    let recargando = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (recargando) return;
-      recargando = true;
-      location.reload();
-    });
-  }
+  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "solo", "comp-intro"].includes(screen) || !!CT.onlineActive;
+  CT.Updates.start();
   // El botón/gesto Atrás de Android: `window.Capacitor` solo existe dentro del contenedor
   // nativo (Capacitor lo inyecta al arrancar la WebView), así que esto no toca la versión
   // web ni iOS, que no lo tienen. Un diálogo abierto se cierra como con Escape; una partida

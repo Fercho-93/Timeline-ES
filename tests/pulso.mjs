@@ -280,5 +280,19 @@ console.log("\nUna partida guardada de antes del Pulso");
   ok("y sin Pulso, que no existía cuando se guardó", !existe(w, '[data-action="pulse-open"]'));
 }
 
+console.log("\nPulso con la última carta disponible");
+for (const [reto, defensa] of [[1,1],[1,0],[0,1],[0,0]]) {
+  const w = boot({ [CLAVE]: partida({ manos: [[1,2],[3,4]], timeline: [15,21], deck: [20] }) });
+  entrar(w); const before = inventario(w);
+  duelo(w, reto, defensa);
+  const s = estado(w);
+  ok("última carta: " + reto + "/" + defensa + " resuelve el Pulso", !s.pulseTurn && !!s.pendingResult);
+  ok("conserva todas las cartas", inventario(w).total === before.total && inventario(w).unicas === before.total);
+  if (!reto && defensa) {
+    ok("no exige un robo imposible", s.players[0].hand.length === 2 && s.pendingResult.penaltySkipped);
+    ok("explica que no quedan cartas", /agotados/.test(w.document.body.textContent));
+  }
+  w.close();
+}
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

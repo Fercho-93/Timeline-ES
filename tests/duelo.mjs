@@ -105,7 +105,7 @@ console.log("\nLa huella del mazo impide comparar dos partidas distintas");
   const w = boot();
   const D = w.CONTINUUM.Duelo;
   const original = D.huella("history");
-  ok("la huella lleva el número de cartas", original.startsWith(`${w.HISTORY_CARDS.length}.`));
+  ok("la huella lleva su versión y el número de cartas", original.startsWith(`v2.${w.HISTORY_CARDS.length}.`));
   ok("mazos distintos dan huellas distintas", D.huella("history") !== D.huella("movies"));
 
   const payload = D.codificar({ mode: "history", seed: "abc", total: 2, hits: 1, sequence: [true, false], nombre: "Ana" });

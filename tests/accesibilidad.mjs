@@ -98,7 +98,7 @@ console.log("\nLas reglas se adaptan al mazo");
   // Los dos poderes se explican fuera del solitario, y la ficha dice además si están en
   // juego o hay que encenderlos antes de empezar.
   const conPulso = w.CONTINUUM.guideMarkup("history", "local", { pulse: true });
-  ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /la colocáis los dos/.test(conPulso));
+  ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Los dos colocáis/.test(conPulso));
   ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
   ok("los tres pasos de una jugada están numerados", [1, 2, 3].every(n => new RegExp(`gs-num[^>]*>${n}<`).test(conPulso)));
   ok("la demostración usa cartas de verdad del mazo", /gd-play/.test(conPulso) && /Fecha oculta/.test(conPulso));

@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v73";
+const CACHE = "continuum-v74";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -9,7 +9,7 @@ const CACHE = "continuum-v73";
 const ASSETS = [
   "./", "./index.html", "./splash.css", "./splash.js", "./styles.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
-  "./medicine.js", "./countries.js", "./population.js", "./distances.js", "./modes.js", "./enciclopedia.js", "./progreso.js", "./duelo.js",
+  "./medicine.js", "./countries.js", "./population.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./enciclopedia.js", "./progreso.js", "./duelo.js",
   "./ghost.js", "./drag.js", "./a11y.js", "./mapa.js", "./settings.js", "./app.js", "./online.js",
   "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/hero-history-400.webp", "./assets/hero-history-700.webp",
   "./assets/hero-entertainment-400.webp", "./assets/hero-entertainment-700.webp", "./assets/hero-science-400.webp",
@@ -85,32 +85,40 @@ const ASSETS = [
 self.addEventListener("install", event => {
   // Una caché de aplicación nueva no basta si la caché HTTP aún considera frescos los
   // archivos antiguos. Cada instalación debe obtener realmente la versión publicada.
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS.map(url => new Request(url, { cache: "reload" })))).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS.map(url => new Request(url, { cache: "reload" })))));
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE && /^(continuum-|hilo-modos-)/.test(key)).map(key => caches.delete(key)))).then(() => self.clients.claim()));
 });
 
-// Se responde con la copia guardada, que es lo que permite jugar sin conexión, pero
-// además se pide la versión del servidor y se guarda para el próximo arranque. Así, si
-// se olvida subir el número de la caché, la actualización llega igualmente al abrir la
-// aplicación la siguiente vez, en lugar de quedarse congelada.
+// Activar solo por petición explícita y sin otras pestañas que puedan estar jugando.
+self.addEventListener("message", event => {
+  if (event.data?.type !== "ACTIVATE_UPDATE") return;
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(clients => {
+    const own = clients.filter(client => client.url.startsWith(self.registration.scope));
+    if (own.length > 1) event.source?.postMessage({ type: "UPDATE_BLOCKED" });
+    else return self.skipWaiting();
+  }));
+});
+
+// Cada versión sirve su propia copia estable; nunca mezcla código de dos despliegues.
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
-  const fresh = fetch(event.request, { cache: "no-cache" }).then(async response => {
-    // Solo se guardan respuestas propias y correctas: un 404 cacheado sobrevive a los despliegues.
-    if (response.ok && response.type === "basic") {
-      try { await (await caches.open(CACHE)).put(event.request, response.clone()); }
-      catch { /* Sin espacio para guardar, la respuesta de red sigue siendo utilizable. */ }
-    }
-    return response;
-  });
-  // Servir la copia local termina pronto, pero el trabajador debe seguir vivo hasta
-  // acabar la actualización que prometió hacer por detrás.
-  event.waitUntil(fresh.catch(() => {}));
-  event.respondWith(caches.match(event.request).then(cached => {
+  const url = new URL(event.request.url, self.location.href);
+  if (url.origin !== self.location.origin) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(event.request, { ignoreSearch: true });
     if (cached) return cached;
-    return fresh.catch(() => event.request.mode === "navigate" ? caches.match("./index.html") : Response.error());
-  }));
+    try {
+      const response = await fetch(event.request);
+      if (response.ok && response.type === "basic") {
+        try { await cache.put(event.request, response.clone()); } catch { /* La red sigue disponible aunque no quepa la imagen. */ }
+      }
+      return response;
+    } catch {
+      return event.request.mode === "navigate" ? (await cache.match("./index.html")) || Response.error() : Response.error();
+    }
+  })());
 });

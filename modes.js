@@ -373,12 +373,12 @@
     },
     lifespan: {
       key: "lifespan", name: "Longevidad de animales",
-      cardLabel: "animales", blurb: "Edades de referencia, con contexto y casos en revisión.", cards: window.ANIMAL_LIFESPAN_CARDS,
+      cardLabel: "animales", blurb: "Edades de referencia, con contexto sobre su medición.", cards: window.ANIMAL_LIFESPAN_CARDS,
       axis: "lifespan"
     },
     speed: {
       key: "speed", name: "Velocidad de animales",
-      cardLabel: "animales", blurb: "Movimiento y medición indicados; hay datos en revisión.", cards: window.ANIMAL_SPEED_CARDS,
+      cardLabel: "animales", blurb: "Movimiento y tipo de medición indicados en cada referencia.", cards: window.ANIMAL_SPEED_CARDS,
       axis: "speed"
     },
     countries: {
@@ -757,21 +757,25 @@
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
-  // La huella de un mazo: no el contenido —eso vive en el cliente y las reglas nunca han
-  // podido comprobarlo—, sino una forma barata de detectar que dos móviles no llevan el
+  // La huella detecta versiones distintas del contenido; no es una validación del
+  // servidor ni una protección contra trampas. Permite detectar que dos móviles no llevan el
   // mismo mazo. Cuenta el orden, no solo el conjunto: el reparto depende de en qué
   // posición está cada identificador, así que dos mazos con las mismas cartas
   // recolocadas no son el mismo. La usan el duelo por enlace —para no comparar dos
   // partidas que no son la misma— y las salas compartidas —para no repartir ni empezar
   // con un móvil que lleva una versión distinta del juego.
-  function deckFingerprint(modeKey) {
-    const deck = cards(modeKey);
+  const PULSE_RULES = "Los dos colocáis la misma carta a ciegas. Si acertáis los dos, no cambia ninguna mano. Si solo acierta quien reta, pasa una carta suya al defensor. Si solo acierta quien defiende, quien reta roba una carta. Si falláis los dos, la carta se descarta y quien reta roba una. Si no quedan cartas en el mazo ni en el descarte, no hay robo. Una vez por persona.";
+  function deckFingerprint(modeKey, deck = cards(modeKey)) {
     let hash = 2166136261;
-    for (const card of deck) {
-      hash ^= card.id;
+    // Incluye el eje, el protocolo, el orden y los datos que se ven y se comparan.
+    // Una corrección conservando el ID también debe cambiar la huella.
+    const content = JSON.stringify([2, modeKey, mode(modeKey).axis, deck.map(card =>
+      [card.id, sortValue(modeKey, card), card.title, card.detail, card.source || "", card.sourceMode || ""])]);
+    for (let i = 0; i < content.length; i++) {
+      hash ^= content.charCodeAt(i);
       hash = Math.imul(hash, 16777619);
     }
-    return `${deck.length}.${(hash >>> 0).toString(36)}`;
+    return `v2.${deck.length}.${(hash >>> 0).toString(36)}`;
   }
 
   function formatValue(modeKey, card) { return axis(modeKey).format(card); }
@@ -870,7 +874,7 @@
 
     const poderes = shared ? `<h3>Poderes</h3><div class="guide-cards">
       ${guideCard("◌", "Fantasma", ghost ? "en juego" : "opcional", `Una vuelta a ciegas: durante toda ella nadie ve ningún valor. Una vez por persona, con cinco cartas ya en la línea.${ghost ? "" : seActiva}`)}
-      ${guideCard("⚡", "Pulso", pulse ? "en juego" : "opcional", `Un duelo: el mazo saca una carta y la colocáis los dos, a ciegas. Si solo aciertas tú, le pasas una carta tuya; si acierta quien defiende, o si falláis los dos, robas tú. Una vez por persona.${pulse ? "" : seActiva}`)}
+      ${guideCard("⚡", "Pulso", pulse ? "en juego" : "opcional", `${PULSE_RULES}${pulse ? "" : seActiva}`)}
     </div>` : "";
 
     const dificultad = `<h3>Dificultad</h3><div class="guide-levels">
@@ -959,6 +963,7 @@
   window.CONTINUUM = {
     MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS,
     has, mode, axis, cards,
+    pulseRules: PULSE_RULES,
     usesAnimalArt, cardArt, animalArt, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,

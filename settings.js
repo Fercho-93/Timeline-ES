@@ -14,7 +14,7 @@
 
   function read() {
     try {
-      const stored = JSON.parse(localStorage.getItem(KEY));
+      const stored = JSON.parse(CT.Storage.getItem(KEY));
       return { ...DEFAULTS, ...stored };
     } catch { return { ...DEFAULTS }; }
   }
@@ -22,7 +22,7 @@
   let settings = read();
 
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch { /* almacenamiento lleno */ }
+    try { CT.Storage.setItem(KEY, JSON.stringify(settings)); } catch { /* almacenamiento lleno */ }
   }
 
   // El tema se aplica en el elemento raíz: «auto» no pone nada y deja mandar a
@@ -57,6 +57,11 @@
           <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
         </select>
       </div>
+      <h2>Copias de seguridad</h2>
+      <button class="btn btn-secondary btn-block" data-settings-action="backup">Descargar partidas y progreso</button>
+      <p class="hint">Recuperar una copia sustituye los datos que contiene y conserva un archivo de los anteriores. Sal de la partida antes de recuperarla.</p>
+      <label for="restore-backup">Recuperar copia de Continuum</label>
+      <input id="restore-backup" type="file" accept="application/json,.json" data-settings-action="restore" ${CT.isSessionActive?.() ? "disabled" : ""}>
       <h2>Comentarios</h2>
       <p class="hint">¿Algo no va bien o se te ocurre algo? Manda un correo con la versión instalada y la pantalla en la que estás, para no tener que describirlo de memoria.</p>
       <button class="btn btn-secondary btn-block" data-settings-action="feedback">Enviar comentario</button>
@@ -89,6 +94,20 @@
   }
 
   document.addEventListener("change", event => {
+    if (event.target.dataset.settingsAction === "restore") {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          if (CT.Storage.restore(reader.result)) location.reload();
+          else showToast("La copia está en memoria. Reintenta el guardado antes de cerrar.");
+        } catch (error) { showToast(error.message || "No se pudo recuperar la copia."); }
+      };
+      reader.onerror = () => showToast("No se pudo leer la copia.");
+      reader.readAsText(file);
+      return;
+    }
     if (event.target.dataset.settingsAction !== "theme") return;
     settings.theme = event.target.value;
     save();
@@ -101,6 +120,7 @@
     if (target.dataset.settingsAction === "open") open();
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
+    else if (target.dataset.settingsAction === "backup") CT.Storage.backup();
   });
 
   CT.settingsButton = () => '<button class="icon-btn" data-settings-action="open">Ajustes</button>';
