@@ -75,7 +75,7 @@ console.log("\nGalería continua y navegación repetida");
     click(w, '[data-action="home"]');
     click(w, '[data-block="historia"]');
     click(w, '[data-mode="history"]');
-    click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
+    click(w, '[data-action="solo"]');
     click(w, '[data-action="home"]');
   }
   ok("seis recorridos inicio–configuración–solitario conservan controles y foco", true);

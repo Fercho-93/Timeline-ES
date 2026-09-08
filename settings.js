@@ -57,6 +57,8 @@
           <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
         </select>
       </div>
+      <h2>Jugar sin conexión</h2>
+      <p class="hint">En la web instalada, las reglas y cartas funcionan sin conexión tras completar la instalación. Las ilustraciones que no se precargan necesitan haberse abierto antes con internet. La app nativa lleva el arte incluido. Las salas de varios móviles siempre necesitan conexión.</p>
       <h2>Copias de seguridad</h2>
       <button class="btn btn-secondary btn-block" data-settings-action="backup">Descargar partidas y progreso</button>
       <p class="hint">Recuperar una copia sustituye los datos que contiene y conserva un archivo de los anteriores. Sal de la partida antes de recuperarla.</p>

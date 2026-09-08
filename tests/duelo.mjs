@@ -105,7 +105,7 @@ console.log("\nLa huella del mazo impide comparar dos partidas distintas");
   const w = boot();
   const D = w.CONTINUUM.Duelo;
   const original = D.huella("history");
-  ok("la huella lleva su versión y el número de cartas", original.startsWith(`v2.${w.HISTORY_CARDS.length}.`));
+  ok("la huella lleva su versión y el número de cartas", original.startsWith(`v3.${w.HISTORY_CARDS.length}.`));
   ok("mazos distintos dan huellas distintas", D.huella("history") !== D.huella("movies"));
 
   const payload = D.codificar({ mode: "history", seed: "abc", total: 2, hits: 1, sequence: [true, false], nombre: "Ana" });
@@ -169,7 +169,7 @@ console.log("\nCrear un duelo y jugarlo");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-format="solo"]'); click(w, '[data-action="solo"]');
+  click(w, '[data-action="solo"]');
   ok("el duelo es un formato más del solitario", /Duelo por enlace/.test(texto(w)));
   w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-duel"]');
