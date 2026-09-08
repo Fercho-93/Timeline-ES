@@ -2,7 +2,7 @@
 
 Este servicio es independiente de las salas familiares del protocolo 40. Implementa creación y entrada a sala, inicio con tres cartas, jugadas normales, Pulso con respuestas privadas, cierre de ronda, desempates y resultados registrados por el servidor. Comparte la resolución de cartas con `engine.js`.
 
-**No está desplegado ni conectado a las pantallas de la aplicación.** No ofrece todavía Fantasma, expulsión, recuperación de anfitrión ni resolución por tiempo: una desconexión conserva la partida, pero no sustituye al participante. El abandono voluntario sí está validado: devuelve las cartas al descarte, cancela un Pulso a medias y transfiere el anfitrión si procede. No debe anunciarse como una modalidad pública disponible.
+**No está desplegado ni conectado a las pantallas de la aplicación.** No ofrece todavía Fantasma, expulsión ni resolución por tiempo: una desconexión conserva la partida, pero no sustituye al participante. El abandono voluntario y la recuperación del anfitrión sí están validados: devuelve las cartas al descarte, cancela un Pulso a medias y permite tomar el relevo tras 90 segundos sin presencia. No debe anunciarse como una modalidad pública disponible.
 
 ## Fronteras de seguridad
 
@@ -25,7 +25,7 @@ Configurar credenciales del entorno mediante Application Default Credentials y `
 
 `POST /actions` recibe `{ "matchId": "...", "requestId": "...", "command": { ... } }`. El usuario se obtiene exclusivamente del token Firebase de `Authorization: Bearer ...`; también exige `X-Firebase-AppCheck`. El cuerpo tiene un límite de 8 KiB y los comandos, 2 KiB. Las acciones después de crear requieren `version`; ante 409, volver a leer el estado y pedir una nueva acción al jugador, sin mover automáticamente su carta a otro hueco. Ante una respuesta perdida, reenviar la misma acción y el mismo `requestId`.
 
-Acciones: `create` con `catalog`; `join`; `start`; `play` con `cardId,index`; `pulse` con `target`; `answer` con `index`; `endTurn`; `leave` para abandonar voluntariamente.
+Acciones: `create` con `catalog`; `join`; `start`; `play` con `cardId,index`; `pulse` con `target`; `answer` con `index`; `endTurn`; `leave`; `heartbeat` para registrar presencia; `claimHost` tras 90 segundos sin señal del anfitrión.
 
 Antes de cualquier exposición: integrar la interfaz, completar reconexión/abandono, añadir control global de abuso y alertas, revisar IAM, probar revocación real y proveedores App Check web/nativos. El HTTP verifica tokens, pero la atestación de dispositivos necesita configurar el proyecto y las aplicaciones.
 

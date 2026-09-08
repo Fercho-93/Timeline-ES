@@ -12,7 +12,7 @@ export function createMatch(uid,catalog,now,randomize=shuffle) {
  if(!uid||!Array.isArray(catalog)||catalog.length<7||catalog.length>1500)throw Error('INVALID_CATALOG');
  const values=Object.fromEntries(catalog.map(c=>[c.id,c.value]));
  if(Object.keys(values).length!==catalog.length||catalog.some(c=>!Number.isSafeInteger(c.id)||!Number.isFinite(c.value)))throw Error('INVALID_CATALOG');
- return {protocol:1,version:0,status:'lobby',phase:'lobby',host:uid,order:[uid],players:{[uid]:{hand:[],pulseUsed:false,shieldRound:0}},
+ return {protocol:1,version:0,status:'lobby',phase:'lobby',host:uid,order:[uid],players:{[uid]:{hand:[],pulseUsed:false,shieldRound:0}},lastSeen:{[uid]:now},
    deck:randomize(catalog.map(c=>c.id)),discard:[],timeline:[],values,catalogHash:hash(catalog),current:0,round:1,turnsInRound:0,
    pulse:null,reveal:null,winners:[],createdAt:now,updatedAt:now,expiresAt:now+7*86400000,auditHash:hash([uid,now,randomUUID()])};
 }
@@ -23,7 +23,7 @@ export function publicMatch(state) {
    pulse:state.pulse?{cardId:state.pulse.cardId,by:state.pulse.by,target:state.pulse.target,stage:state.pulse.stage}:null,
    reveal:state.reveal,updatedAt:state.updatedAt,expiresAt:state.expiresAt};
 }
-const fields={join:[],start:[],play:['cardId','index'],pulse:['target'],answer:['index'],endTurn:[],leave:[]};
+const fields={join:[],start:[],play:['cardId','index'],pulse:['target'],answer:['index'],endTurn:[],leave:[],heartbeat:[],claimHost:[]};
 export function applyAction(input,uid,action,now,randomize=shuffle) {
  if(!action||!Object.hasOwn(fields,action.type)||Object.keys(action).some(k=>!['type','version',...fields[action.type]].includes(k)))throw Error('INVALID_ACTION');
  if(!Number.isSafeInteger(action.version)||action.version!==input.version)throw Error('STALE_VERSION');
@@ -31,15 +31,23 @@ export function applyAction(input,uid,action,now,randomize=shuffle) {
  const s=structuredClone(input), value=id=>s.values[id];
  if(action.type==='join') {
   if(s.status!=='lobby'||s.order.includes(uid)||s.order.length>=9)throw Error('CANNOT_JOIN');
-  s.order.push(uid);s.players[uid]={hand:[],pulseUsed:false,shieldRound:0};
+  s.order.push(uid);s.players[uid]={hand:[],pulseUsed:false,shieldRound:0};s.lastSeen[uid]=now;
  } else if(action.type==='leave') {
   if(!s.order.includes(uid))throw Error('NOT_MEMBER');
   const leavingIndex=s.order.indexOf(uid), leavingHand=s.players[uid].hand;
   s.discard.push(...leavingHand);
   if(s.pulse && (s.pulse.by===uid||s.pulse.target===uid)) { s.discard.push(s.pulse.cardId); s.pulse=null; s.phase='turn'; }
-  s.order=s.order.filter(id=>id!==uid);delete s.players[uid];
+  s.order=s.order.filter(id=>id!==uid);delete s.players[uid];delete s.lastSeen[uid];
   if(!s.order.length) { s.status='ended';s.phase='ended';s.winners=[];s.reveal=null; }
   else { if(s.host===uid)s.host=s.order[0]; if(leavingIndex<s.current)s.current--; if(s.current>=s.order.length)s.current=0; if(s.phase==='reveal'&&s.status==='playing'){s.phase='turn';s.reveal=null;} }
+ } else if(action.type==='heartbeat') {
+  if(!s.order.includes(uid))throw Error('NOT_MEMBER');
+  s.lastSeen[uid]=now;
+ } else if(action.type==='claimHost') {
+  if(!s.order.includes(uid)||s.status==='ended')throw Error('CANNOT_CLAIM_HOST');
+  const seen=s.lastSeen[s.host] ?? s.updatedAt;
+  if(now-seen<90000)throw Error('HOST_ACTIVE');
+  s.host=uid;s.lastSeen[uid]=now;
  } else {
   if(!s.order.includes(uid))throw Error('NOT_MEMBER');
   const actor=s.order[s.current],me=s.players[uid];

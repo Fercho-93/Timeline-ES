@@ -36,4 +36,16 @@ for(let count=2;count<=9;count++) {
  s=applyAction(s,ids[0],{type:'leave',version:s.version},5000,copy);
  assert.equal(s.status,'ended'); assert.deepEqual(s.order,[]);
 }
+// Presencia y recuperación del anfitrión: no se permite relevo prematuro y la
+// reclamación válida actualiza la identidad que firma las siguientes acciones.
+{
+ let s=createMatch(ids[0],catalog,1000,copy);
+ s=applyAction(s,ids[1],{type:'join',version:s.version},2000,copy);
+ assert.throws(()=>applyAction(s,ids[1],{type:'claimHost',version:s.version},3000,copy),/HOST_ACTIVE/);
+ s=applyAction(s,ids[1],{type:'heartbeat',version:s.version},4000,copy);
+ assert.throws(()=>applyAction(s,ids[1],{type:'claimHost',version:s.version},89999,copy),/HOST_ACTIVE/);
+ s=applyAction(s,ids[1],{type:'claimHost',version:s.version},94000,copy);
+ assert.equal(s.host,ids[1]); assert.equal(s.lastSeen[ids[1]],94000);
+ assert.throws(()=>applyAction(s,ids[2],{type:'heartbeat',version:s.version},95000,copy),/NOT_MEMBER/);
+}
 console.log('Servidor: partidas completas 2–9, Pulso privado, conservación e intentos de manipulación: OK');
