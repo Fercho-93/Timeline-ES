@@ -1255,7 +1255,7 @@ body::before {
   height: auto;
   margin: 0;
 }
-.collection-entry { min-width: 0; }
+.collection-entry { min-width: 0; scroll-margin-top: 14px; }
 .collection-entry.active { grid-column: 1 / -1; }
 .home-shell .gallery-panel {
   width: 100%;

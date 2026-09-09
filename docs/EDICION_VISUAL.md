@@ -37,7 +37,7 @@ cartel de competición y el tema siguiente. También cubre apertura ya vista,
 movimiento reducido y salida mediante teclado.
 
 `npm run build` incluye `edition.css` en el paquete para Capacitor. La caché y la
-versión visible avanzan juntas a `continuum-v85`. Para la revisión visual se sirve
+versión visible avanzan juntas a `continuum-v86`. Para la revisión visual se sirve
 `dist/` como contenido estático, igual que la distribución, evitando mezclar las
 transformaciones de Vite con la caché del service worker.
 
