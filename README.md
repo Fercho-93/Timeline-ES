@@ -1,5 +1,10 @@
 # Continuum
 
+## Documentación de beta y lanzamiento
+
+- [Hoja de ruta consolidada](ROADMAP.md): estado actual, prioridades y criterios para avanzar.
+- [Checklist de beta y lanzamiento](BETA_CHECKLIST.md): pruebas automáticas, móviles, testers y tiendas.
+
 Juego de ordenar para 2–9 personas, diseñado para jugarse pasando un solo móvil o mediante una sala compartida. Funciona sin conexión después de instalarse como aplicación web, salvo cuando se utiliza el modo de varios móviles.
 
 ## Nombre y destino del producto
