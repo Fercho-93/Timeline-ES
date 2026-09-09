@@ -141,7 +141,7 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
 .home-shell .choice-icon { background: var(--edition-paper); color: var(--edition-brass); }
 .panel, .modal, .room-code-card, .connection-strip { background: var(--edition-surface); border-color: var(--edition-line); box-shadow: var(--edition-shade); }
 .panel > h1, .panel > h2, .panel > p, .modal > h2, .modal > p, .settings-modal, .setup-section, .pass-screen { color: var(--edition-ink); }
-.field input, .field select, .modal textarea, .player-row input { background-color: var(--edition-surface); border-color: var(--edition-line); color: var(--edition-ink); }
+.field input, .field select, .modal textarea, .player-row input, .file-field { background-color: var(--edition-surface); border-color: var(--edition-line); color: var(--edition-ink); }
 .overlay { background: #111a17a6; backdrop-filter: blur(8px); }
 .modal { border-radius: 12px; }
 .player-medallion { border: 1px solid var(--edition-brass); background: var(--edition-paper); color: var(--edition-brass); box-shadow: 0 0 0 7px var(--edition-surface), 0 0 0 8px var(--edition-line); }
