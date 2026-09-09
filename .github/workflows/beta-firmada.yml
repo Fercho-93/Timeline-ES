@@ -15,7 +15,7 @@ permissions:
   contents: read
 jobs:
   android:
-    if: inputs.platform == 'android'
+    if: github.event_name == 'workflow_dispatch' && inputs.platform == 'android'
     environment: android-beta
     runs-on: ubuntu-latest
     env:
@@ -56,7 +56,7 @@ jobs:
         if: always()
         run: rm -f -- "$ANDROID_KEYSTORE_PATH"
   ios:
-    if: inputs.platform == 'ios'
+    if: github.event_name == 'workflow_dispatch' && inputs.platform == 'ios'
     environment: ios-beta
     runs-on: macos-26
     env:
