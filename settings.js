@@ -85,7 +85,7 @@
 
       <section class="settings-section">
         <h2>Jugar sin conexión</h2>
-        <p class="hint">En la web instalada, las reglas y cartas funcionan sin conexión tras completar la instalación. Las ilustraciones que no se precargan necesitan haberse abierto antes con internet. La app nativa lleva el arte incluido. Las salas de varios móviles siempre necesitan conexión.</p>
+        <p class="hint">Las cartas y reglas funcionan sin conexión. Si una ilustración no se ve, es que no se cargó antes con internet.</p>
       </section>
 
       <section class="settings-section">
