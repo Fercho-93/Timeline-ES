@@ -223,7 +223,6 @@
       <div class="home-wordmark">Continuum</div>
       <div class="home-tagline">Ordena. Compara. Descubre.</div>
       <div class="home-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
-      <p>Coloca cada carta en su sitio:<br>fechas, tamaños, distancias y más.</p>
     </section>`;
   }
 
