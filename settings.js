@@ -89,25 +89,6 @@
       </section>
 
       <section class="settings-section">
-        <h2>Copias de seguridad</h2>
-        <button class="btn btn-secondary btn-block" data-settings-action="backup">Descargar partidas y progreso</button>
-        <p class="hint">Recuperar una copia sustituye los datos que contiene y conserva un archivo de los anteriores. Sal de la partida antes de recuperarla.</p>
-        <div class="field">
-          <label for="restore-backup">Recuperar copia de Continuum</label>
-          <!-- El control nativo trunca el nombre del archivo con puntos suspensivos y no
-               hay forma de hacer que ese texto envuelva línea: es el propio navegador quien
-               lo dibuja, no algo que arregle una regla CSS. El botón y el nombre de aquí son
-               los que se ven; el input real sigue existiendo pero oculto, y la etiqueta de
-               fuera ya lo abre sin necesitar JavaScript. -->
-          <div class="file-field${CT.isSessionActive?.() ? " file-field-disabled" : ""}">
-            <label class="btn btn-secondary" for="restore-backup">Seleccionar archivo</label>
-            <span id="restore-backup-name">Ningún archivo seleccionado</span>
-          </div>
-          <input id="restore-backup" class="solo-lectores" type="file" accept="application/json,.json" data-settings-action="restore" ${CT.isSessionActive?.() ? "disabled" : ""}>
-        </div>
-      </section>
-
-      <section class="settings-section">
         <h2>Comentarios</h2>
         <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Privacidad y datos</a></p>
         <div class="field">
@@ -156,24 +137,6 @@
     if (["sound", "haptics"].includes(event.target.dataset.settingsAction)) {
       settings[event.target.dataset.settingsAction] = event.target.checked; save(); return;
     }
-    if (event.target.id === "restore-backup") {
-      const nombre = document.getElementById("restore-backup-name");
-      if (nombre) nombre.textContent = event.target.files?.[0]?.name || "Ningún archivo seleccionado";
-    }
-    if (event.target.dataset.settingsAction === "restore") {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          if (CT.Storage.restore(reader.result)) location.reload();
-          else showToast("La copia está en memoria. Reintenta el guardado antes de cerrar.");
-        } catch (error) { showToast(error.message || "No se pudo recuperar la copia."); }
-      };
-      reader.onerror = () => showToast("No se pudo leer la copia.");
-      reader.readAsText(file);
-      return;
-    }
     if (event.target.dataset.settingsAction !== "theme") return;
     settings.theme = event.target.value;
     save();
@@ -186,7 +149,6 @@
     if (target.dataset.settingsAction === "open") open();
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
-    else if (target.dataset.settingsAction === "backup") CT.Storage.backup();
     else if (target.dataset.settingsAction === "download-feedback") {
       void (async () => {
         const note = document.getElementById('feedback-note')?.value || '';
