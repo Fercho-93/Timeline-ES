@@ -1178,10 +1178,9 @@ body::before {
 }
 .home-wordmark { font: 500 clamp(2.55rem, 9vw, 4.3rem)/.9 var(--font-display); letter-spacing: -.055em; text-transform: uppercase; }
 .home-tagline { margin-top: 10px; color: var(--accent); font-size: .72rem; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; }
-.home-ornament { display: grid; grid-template-columns: 58px 10px 58px; align-items: center; justify-content: center; gap: 7px; margin: 27px 0 20px; }
+.home-ornament { display: grid; grid-template-columns: 58px 10px 58px; align-items: center; justify-content: center; gap: 7px; margin: 27px 0 0; }
 .home-ornament span { height: 1px; background: rgba(137,87,36,.58); }
 .home-ornament i { width: 8px; height: 8px; border: 1px solid #a36d2d; transform: rotate(45deg); }
-.home-masthead p { max-width: 30ch; margin: 0 auto; font: 1.06rem/1.45 var(--font-display); }
 
 .home-shell .hero { display: block; padding: 0; }
 .home-shell .hero-copy { display: grid; gap: 24px; }

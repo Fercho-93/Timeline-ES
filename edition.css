@@ -60,10 +60,9 @@ html body::before {
 .home-crest { width: clamp(180px, 46vw, 248px); }
 .home-wordmark { font-size: clamp(2.55rem, 9vw, 4rem); font-weight: 400; letter-spacing: -.045em; }
 .home-tagline { color: var(--edition-brass); font-family: var(--ui-font); font-size: .75rem; letter-spacing: .2em; line-height: 1.7; }
-.home-ornament { margin: 18px 0 14px; }
+.home-ornament { margin: 18px 0 0; }
 .home-ornament span { background: var(--edition-line); }
 .home-ornament i { border-color: var(--edition-brass); }
-.home-masthead p { color: var(--edition-muted); font-size: 1rem; }
 .system-notice {
   gap: 14px;
   padding: 16px 18px;
@@ -182,7 +181,6 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .home-wordmark { align-self: end; font-size: 3.6rem; }
   .home-tagline { margin-top: 8px; }
   .home-ornament { justify-content: start; margin: 12px 0; }
-  .home-masthead p { margin: 0; font-size: 1rem; }
   .collection-entry.active { display: grid; grid-template-columns: 1fr 1fr; }
   .home-shell .gallery-panel.active { height: 100%; min-height: 300px; border-radius: 8px 0 0 8px; }
   .collection-decks { border: 1px solid var(--edition-line); border-left: 0; border-radius: 0 8px 8px 0; }
@@ -213,7 +211,6 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
 :root:is([data-text-size="150"], [data-text-size="200"]) .collection-entry.active { display: block; }
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-shell .gallery-panel { min-height: 310px; height: auto; }
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-masthead { display: block; text-align: center; }
-:root:is([data-text-size="150"], [data-text-size="200"]) .home-masthead p { margin-inline: auto; }
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-ornament { justify-content: center; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
