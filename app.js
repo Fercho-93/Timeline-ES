@@ -133,7 +133,7 @@
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
   // en color y las otras quedan como lomos que se pueden tocar.
   function gallery() {
-    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map(item => {
+    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map((item, index) => {
       const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
       const instruction = active ? "Mazos visibles debajo." : "Toca para ampliar y ver sus mazos.";
@@ -142,7 +142,7 @@
         : "";
       return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
-        <span class="collection-index" aria-hidden="true">${total} ${total === 1 ? "mazo" : "mazos"}</span>
+        <span class="collection-index" aria-hidden="true">${String(index + 1).padStart(2, "0")} / ${total} ${total === 1 ? "mazo" : "mazos"}</span>
         <span class="collection-open" aria-hidden="true">${active ? "−" : "↗"}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
@@ -1832,14 +1832,7 @@
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }
     else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
     else if (action === "set-block") {
-      const sameCollection = collectionOpen && target.dataset.block === selectedBlockKey;
-      if (sameCollection) {
-        collectionOpen = false;
-        collectionDetails = false;
-        home();
-        return;
-      }
-      setBlock(target.dataset.block);
+      if (!collectionOpen || target.dataset.block !== selectedBlockKey) setBlock(target.dataset.block);
       collectionOpen = true;
       collectionDetails = true;
       home();

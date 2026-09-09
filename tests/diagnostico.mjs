@@ -73,7 +73,7 @@ console.log("\nComentarios en Ajustes");
   ok("el panel de Ajustes tiene un botón de comentarios", !!w.document.querySelector('[data-settings-action="feedback"]'));
   click(w, '[data-settings-action="feedback"]');
   await espera();
-  ok("sin dirección configurada, avisa en vez de abrir un correo roto", /todavía no hay/i.test(w.document.getElementById("toast").textContent));
+  ok("el comentario usa el correo de beta configurado", Boolean(w.CONTINUUM.Deployment.feedbackEmail) && !/todavía no hay/i.test(w.document.getElementById("toast").textContent));
 }
 
 console.log(`\n${fail} fallos`);
