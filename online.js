@@ -39,6 +39,8 @@ let seenSelfInRoom = false;
 let lastEffectVersion = null;
 let lastObservedTurnUid = null;
 let lastObservedRoomVersion = null;
+let fallbackTimerVersion = null;
+let fallbackTimerStartedAt = 0;
 let turnTimerHandle = null;
 // Cada turno tiene 20 segundos para colocar la carta; si se agotan, pasa al siguiente
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
@@ -468,6 +470,8 @@ function connectToRoom(code) {
   lastEffectVersion = null;
   lastObservedTurnUid = null;
   lastObservedRoomVersion = null;
+  fallbackTimerVersion = null;
+  fallbackTimerStartedAt = 0;
   unsubscribeRoom = onSnapshot(roomRef, snapshot => {
     if (!snapshot.exists()) {
       // Mismo motivo: una caché aún sin la sala no significa que la hayan cerrado.
@@ -620,7 +624,17 @@ function clearTurnTimer() {
   if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; }
 }
 
-function turnRemaining() { return CT.Session.remaining(roomState?.turnStartedAt?.toMillis?.(), turnSeconds()); }
+function turnRemaining() {
+  const seconds = turnSeconds();
+  const serverStartedAt = roomState?.turnStartedAt?.toMillis?.();
+  const serverRemaining = CT.Session.remaining(serverStartedAt, seconds);
+  if (serverRemaining !== null) return serverRemaining;
+  if (fallbackTimerVersion !== roomState?.version) {
+    fallbackTimerVersion = roomState?.version;
+    fallbackTimerStartedAt = performance.now();
+  }
+  return Math.max(0, seconds - Math.floor((performance.now() - fallbackTimerStartedAt) / 1000));
+}
 function manageTurnTimer() {
   clearTurnTimer();
   if (!roomState || roomState.status !== "playing" || roomState.phase !== "turn" || !turnSeconds()) return;
