@@ -92,6 +92,12 @@ function canClaimHost() {
 }
 function renderPresence() {
   if (!roomState || !user) return;
+  // La presencia sigue activa para reconexión y relevo del anfitrión, pero durante la
+  // partida no se muestra: la pantalla debe quedar centrada en el juego.
+  if (roomState.status === "playing") {
+    appEl.querySelector("#room-connection")?.remove();
+    return;
+  }
   const shell = appEl.querySelector(".shell");
   if (!shell) return;
   let box = shell.querySelector("#room-connection");
@@ -640,8 +646,8 @@ function renderGame() {
   // quien abre la sala a mitad de turno ve lo que de verdad queda, no un contador que
   // vuelve a empezar de cero en su pantalla.
   const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? "…") : null;
-  paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="room">Sala</button>')}
-    <div class="connection-strip"><span><i></i> Sala ${roomCode}</span><small>${roomState.playerOrder.length} participantes</small></div>
+  paint(`<div class="shell">${header("")}
+    <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
     <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
