@@ -681,7 +681,7 @@ function renderGame() {
   // El primer pintado ya arranca con la cuenta atrás en su punto real, no siempre en 20:
   // quien abre la sala a mitad de turno ve lo que de verdad queda, no un contador que
   // vuelve a empezar de cero en su pantalla.
-  const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? "…") : null;
+  const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? turnSeconds()) : null;
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room" aria-label="Abrir menú de la sala">Menú</button>')}
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
     <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
