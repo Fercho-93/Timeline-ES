@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const source = fs.readFileSync(new URL("../online.js", import.meta.url), "utf8");
+const appSource = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
 const joinAt = source.indexOf('data-online-form="join"');
 const createAt = source.indexOf('data-online-form="create"');
 
@@ -16,5 +17,8 @@ assert.ok(source.includes('paint(`<div class="shell">${header("")}'), "la partid
 assert.doesNotMatch(source, /data-online-action="room"[^]*?renderGame/, "la partida no debe incluir el botón de gestión de sala");
 assert.match(source, /roomState\.status === "playing"[\s\S]*?room-connection/, "la presencia debe ocultarse durante la partida");
 assert.match(source, /invited \? "" : '<form class="panel online-form" data-online-form="create"/, "una invitación no debe mostrar el formulario de creación");
+
+assert.doesNotMatch(appSource, /Volver a mi sala/, "la portada no debe mostrar el acceso rápido a la sala");
+assert.match(appSource, /Continuar partida/, "la portada debe conservar la continuación de partidas locales");
 
 console.log("ok  el flujo de entrada prioriza unirse y oculta crear cuando hay invitación");
