@@ -54,40 +54,60 @@
     // de inmediato, como si ya se hubiera tocado. El foco inicial va aquí en su lugar.
     return `<div class="overlay" data-overlay="settings"><div class="modal settings-modal">
       <div class="eyebrow" tabindex="-1" data-dialog-focus>Ajustes</div>
-      <h2>Tema</h2>
-      <div class="field">
-        <label for="ajuste-tema">Cómo se ve la aplicación</label>
-        <select id="ajuste-tema" data-settings-action="theme">
-          <option value="auto"${s.theme === "auto" ? " selected" : ""}>Automático, según el móvil</option>
-          <option value="light"${s.theme === "light" ? " selected" : ""}>Claro</option>
-          <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="ajuste-texto">Tamaño del texto</label>
-        <select id="ajuste-texto" data-settings-action="text-size">
-          ${[['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']].map(([value,label])=>`<option value="${value}"${s.textSize===value?' selected':''}>${label}</option>`).join('')}
-        </select>
-      </div>
-      <h2>Efectos opcionales</h2>
-      <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" ${s.haptics === true ? "checked" : ""}></label>
-      <label class="opt-row"><span>Sonidos breves</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
-      <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
-      <h2>Jugar sin conexión</h2>
-      <p class="hint">En la web instalada, las reglas y cartas funcionan sin conexión tras completar la instalación. Las ilustraciones que no se precargan necesitan haberse abierto antes con internet. La app nativa lleva el arte incluido. Las salas de varios móviles siempre necesitan conexión.</p>
-      <h2>Copias de seguridad</h2>
-      <button class="btn btn-secondary btn-block" data-settings-action="backup">Descargar partidas y progreso</button>
-      <p class="hint">Recuperar una copia sustituye los datos que contiene y conserva un archivo de los anteriores. Sal de la partida antes de recuperarla.</p>
-      <label for="restore-backup">Recuperar copia de Continuum</label>
-      <input id="restore-backup" type="file" accept="application/json,.json" data-settings-action="restore" ${CT.isSessionActive?.() ? "disabled" : ""}>
-      <h2>Comentarios</h2>
-      <p><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Privacidad y datos</a></p>
-      <label for="feedback-note">Comentario para la beta</label>
-      <textarea id="feedback-note" rows="3" maxlength="4000" placeholder="Qué ocurrió y qué esperabas"></textarea>
-      <button class="btn btn-secondary btn-block" data-settings-action="download-feedback">Guardar comentario con diagnóstico</button>
-      <p class="hint">¿Algo no va bien o se te ocurre algo? Manda un correo con la versión instalada y la pantalla en la que estás, para no tener que describirlo de memoria.</p>
-      <button class="btn btn-secondary btn-block" data-settings-action="feedback">Enviar comentario</button>
-      <button class="btn btn-primary btn-block" style="margin-top:10px" data-settings-action="close">Hecho</button>
+
+      <section class="settings-section">
+        <h2>Tema</h2>
+        <div class="field">
+          <label for="ajuste-tema">Cómo se ve la aplicación</label>
+          <select id="ajuste-tema" data-settings-action="theme">
+            <option value="auto"${s.theme === "auto" ? " selected" : ""}>Automático, según el móvil</option>
+            <option value="light"${s.theme === "light" ? " selected" : ""}>Claro</option>
+            <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="ajuste-texto">Tamaño del texto</label>
+          <select id="ajuste-texto" data-settings-action="text-size">
+            ${[['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']].map(([value,label])=>`<option value="${value}"${s.textSize===value?' selected':''}>${label}</option>`).join('')}
+          </select>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>Efectos opcionales</h2>
+        <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" ${s.haptics === true ? "checked" : ""}></label>
+        <label class="opt-row"><span>Sonidos breves</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
+        <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
+      </section>
+
+      <section class="settings-section">
+        <h2>Jugar sin conexión</h2>
+        <p class="hint">En la web instalada, las reglas y cartas funcionan sin conexión tras completar la instalación. Las ilustraciones que no se precargan necesitan haberse abierto antes con internet. La app nativa lleva el arte incluido. Las salas de varios móviles siempre necesitan conexión.</p>
+      </section>
+
+      <section class="settings-section">
+        <h2>Copias de seguridad</h2>
+        <button class="btn btn-secondary btn-block" data-settings-action="backup">Descargar partidas y progreso</button>
+        <p class="hint">Recuperar una copia sustituye los datos que contiene y conserva un archivo de los anteriores. Sal de la partida antes de recuperarla.</p>
+        <div class="field">
+          <label for="restore-backup">Recuperar copia de Continuum</label>
+          <input id="restore-backup" type="file" accept="application/json,.json" data-settings-action="restore" ${CT.isSessionActive?.() ? "disabled" : ""}>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>Comentarios</h2>
+        <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Privacidad y datos</a></p>
+        <div class="field">
+          <label for="feedback-note">Comentario para la beta</label>
+          <textarea id="feedback-note" rows="3" maxlength="4000" placeholder="Qué ocurrió y qué esperabas"></textarea>
+        </div>
+        <button class="btn btn-secondary btn-block" data-settings-action="download-feedback">Guardar comentario con diagnóstico</button>
+        <p class="hint">¿Algo no va bien o se te ocurre algo? Manda un correo con la versión instalada y la pantalla en la que estás, para no tener que describirlo de memoria.</p>
+        <button class="btn btn-secondary btn-block" data-settings-action="feedback">Enviar comentario</button>
+      </section>
+
+      <button class="btn btn-primary btn-block settings-done" data-settings-action="close">Hecho</button>
     </div></div>`;
   }
 
