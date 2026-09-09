@@ -239,9 +239,7 @@
 
   function quickActions() {
     const resume = game && !game.winners;
-    const room = CT.Storage.getItem("continuum-last-room");
-    const buttons = (resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '')
-      + (room && /^[A-Z0-9]{8}$/.test(room) ? '<button class="btn btn-secondary" data-action="resume-room">Volver a mi sala</button>' : '');
+    const buttons = resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '';
     return buttons ? `<section class="quick-actions" aria-label="Jugar ahora">${buttons}</section>` : '';
   }
   function home() {
