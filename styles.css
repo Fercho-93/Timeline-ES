@@ -1838,3 +1838,83 @@ body::before {
   #app[data-platform="android"][data-screen="online-game"] .hand-card .hidden-date { font-size: .52rem; }
   #app[data-platform="android"][data-screen="online-game"] .hint { font-size: .7rem; margin-block: 5px; }
 }
+
+/* iPhone y otros móviles: recuperar la escala visual anterior.
+   Las reducciones compactas quedan reservadas al Android detectado. */
+@media (max-width: 600px) {
+  #app[data-platform="other"][data-screen="online-game"] .topbar {
+    flex-direction: column;
+    gap: 9px;
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .brand {
+    min-height: 44px;
+    font-size: .78rem;
+    letter-spacing: .2em;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .topbar-actions {
+    width: auto;
+    padding: 3px;
+    gap: 2px;
+    margin-left: 0;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .topbar-actions .icon-btn {
+    min-height: 44px;
+    padding: 9px 12px;
+    font-size: .78rem;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .game-head {
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 12px;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .turn-name {
+    max-width: none;
+    max-height: none;
+    font-size: clamp(1.25rem, 5vw, 1.8rem);
+    line-height: 1.15;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .turn-label {
+    font-size: inherit;
+    white-space: normal;
+  }
+  #app[data-platform="other"][data-screen="online-game"] :is(.turn-timer, .deck-count) {
+    width: auto;
+    min-width: 62px;
+    height: auto;
+    aspect-ratio: auto;
+    padding: 9px 10px;
+    border-radius: 50%;
+  }
+  #app[data-platform="other"][data-screen="online-game"] :is(.turn-timer, .deck-count) strong {
+    font-size: 1.2rem;
+  }
+  #app[data-platform="other"][data-screen="online-game"] :is(.turn-timer, .deck-count) span {
+    font-size: .62rem;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .hand-card {
+    min-height: 164px;
+    height: auto;
+    padding: 14px;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .animal-hand-card {
+    min-height: 170px;
+    height: auto;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .animal-hand-card strong {
+    margin-top: 40px;
+    padding: 8px;
+    font-size: 1rem;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .animal-hand-card .hidden-date {
+    font-size: inherit;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .hand-title h3 {
+    font-size: inherit;
+  }
+  #app[data-platform="other"][data-screen="online-game"] .timeline-wrap {
+    margin: 10px 0 22px;
+    padding: 8px 0 18px;
+  }
+}
