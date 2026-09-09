@@ -53,7 +53,10 @@
     // mismo gesto que abre el diálogo hace que el propio selector nativo se despliegue
     // de inmediato, como si ya se hubiera tocado. El foco inicial va aquí en su lugar.
     return `<div class="overlay" data-overlay="settings"><div class="modal settings-modal">
-      <div class="eyebrow" tabindex="-1" data-dialog-focus>Ajustes</div>
+      <div class="settings-head">
+        <div class="eyebrow" tabindex="-1" data-dialog-focus>Ajustes</div>
+        <button class="settings-close" data-settings-action="close" aria-label="Cerrar ajustes">×</button>
+      </div>
 
       <section class="settings-section">
         <h2>Tema</h2>
