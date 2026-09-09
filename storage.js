@@ -9,7 +9,7 @@
     if (!host) { host = document.createElement("div"); host.id = "system-notices"; document.body.append(host); }
     return host;
   }
-  function notice(text) {
+  function notice(text, actions = [["Reintentar guardado", flush], ["Descargar copia", backup]]) {
     message = text;
     let box = document.getElementById("storage-notice");
     if (!box) {
@@ -23,13 +23,17 @@
     const label = document.createElement("span");
     label.textContent = text;
     box.append(label);
-    for (const [title, action] of [["Reintentar guardado", flush], ["Descargar copia", backup]]) {
+    for (const [title, action] of actions) {
       const button = document.createElement("button");
       button.className = "btn btn-secondary";
       button.textContent = title;
       button.addEventListener("click", action);
       box.append(button);
     }
+  }
+  function dismiss(key) {
+    protectedKeys.delete(key);
+    if (!pending.size && !protectedKeys.size) document.getElementById("storage-notice")?.remove();
   }
   function failed() { notice("No se ha podido guardar. El progreso sigue en esta pantalla: mantén la app abierta y reintenta o descarga una copia."); }
   function getItem(key) {
@@ -84,7 +88,14 @@
   CT.Storage = {
     getItem, setItem: (key, value) => write(key, String(value)), removeItem: key => write(key, null),
     flush, backup, restore, hasPending: () => pending.size > 0,
-    protect(key) { protectedKeys.add(key); notice("No podemos abrir una partida guardada con este formato. Su original se conserva para recuperarlo; no se ha borrado."); },
+    protect(key) {
+      const isNew = !protectedKeys.has(key);
+      protectedKeys.add(key);
+      if (isNew) notice("No podemos abrir una partida guardada con este formato. Su original se conserva para recuperarlo; no se ha borrado.", [
+        ["Descargar copia", backup],
+        ["Descartar aviso", () => dismiss(key)]
+      ]);
+    },
     notice, noticeHost, get message() { return message; }
   };
   window.addEventListener("beforeunload", event => {

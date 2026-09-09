@@ -132,7 +132,7 @@
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
   // en color y las otras quedan como lomos que se pueden tocar.
   function gallery() {
-    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map((item, index) => {
+    return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map(item => {
       const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
       const instruction = active ? "Mazos visibles debajo." : "Toca para ampliar y ver sus mazos.";
@@ -141,7 +141,7 @@
         : "";
       return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
-        <span class="collection-index" aria-hidden="true">${String(index + 1).padStart(2, "0")} / ${total} ${total === 1 ? "mazo" : "mazos"}</span>
+        <span class="collection-index" aria-hidden="true">${total} ${total === 1 ? "mazo" : "mazos"}</span>
         <span class="collection-open" aria-hidden="true">${active ? "−" : "↗"}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
@@ -241,10 +241,10 @@
   function quickActions() {
     const resume = game && !game.winners;
     const room = CT.Storage.getItem("continuum-last-room");
-    return '<section class="quick-actions" aria-label="Jugar ahora"><button class="btn btn-primary" data-action="quick-play">Jugar · ' + escapeHtml(currentMode().name) + '</button>'
-      + (resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '')
+    const buttons = (resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '')
       + (loadSolo() ? '<button class="btn btn-secondary" data-action="resume-solo">Continuar solitario</button>' : '')
-      + (room && /^[A-Z0-9]{8}$/.test(room) ? '<button class="btn btn-secondary" data-action="resume-room">Volver a mi sala</button>' : '') + '</section>';
+      + (room && /^[A-Z0-9]{8}$/.test(room) ? '<button class="btn btn-secondary" data-action="resume-room">Volver a mi sala</button>' : '');
+    return buttons ? `<section class="quick-actions" aria-label="Jugar ahora">${buttons}</section>` : '';
   }
   function home() {
     screen = "home";
@@ -1820,8 +1820,7 @@
     const target = event.target.closest("[data-action]");
     if (!target) return;
     const action = target.dataset.action;
-    if (action === "quick-play") playMenu();
-    else if (action === "retry-online") launchOnline();
+    if (action === "retry-online") launchOnline();
     else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
     else if (action === "home") home();
     else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
