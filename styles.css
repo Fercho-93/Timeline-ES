@@ -1813,3 +1813,28 @@ body::before {
     line-height: 1.1;
   }
 }
+
+/* Reducción adicional exclusiva para Android; las zonas táctiles del menú
+   conservan 44 px y los indicadores mantienen ancho y alto iguales. */
+@media (max-width: 600px) {
+  #app[data-platform="android"][data-screen="online-game"] .turn-name { font-size: 1rem; line-height: 1.12; }
+  #app[data-platform="android"][data-screen="online-game"] .hand-title h3 { font-size: 1rem; }
+  #app[data-platform="android"][data-screen="online-game"] .hand-title small { font-size: .66rem; }
+  #app[data-platform="android"][data-screen="online-game"] .score { font-size: .68rem; gap: 5px; padding: 4px 6px; grid-template-columns: 24px auto 20px; }
+  #app[data-platform="android"][data-screen="online-game"] .score i { width: 24px; height: 24px; font-size: .56rem; }
+  #app[data-platform="android"][data-screen="online-game"] .score em { width: 20px; height: 20px; }
+  #app[data-platform="android"][data-screen="online-game"] :is(.turn-timer, .deck-count) { width: 44px; min-width: 44px; height: 44px; padding: 2px; }
+  #app[data-platform="android"][data-screen="online-game"] :is(.turn-timer, .deck-count) strong { font-size: .8rem; }
+  #app[data-platform="android"][data-screen="online-game"] .timeline .timeline-card { width: 130px; min-height: 188px; }
+  #app[data-platform="android"][data-screen="online-game"] .timeline .animal-timeline-card .card-visual { height: 114px; }
+  #app[data-platform="android"][data-screen="online-game"] .timeline .animal-timeline-card .card-content { padding: 8px 10px 10px; }
+  #app[data-platform="android"][data-screen="online-game"] .timeline .timeline-card h3 { font-size: .76rem; line-height: 1.14; }
+  #app[data-platform="android"][data-screen="online-game"] .timeline .timeline-card .year { font-size: 1.06rem; }
+  #app[data-platform="android"][data-screen="online-game"] .timeline :is(.slot, .slot-confirm) { min-height: 188px; }
+  #app[data-platform="android"][data-screen="online-game"] .hand { gap: 5px; }
+  #app[data-platform="android"][data-screen="online-game"] .hand-card { height: 96px; min-height: 96px; padding: 6px; }
+  #app[data-platform="android"][data-screen="online-game"] .hand-card strong { font-size: .7rem; line-height: 1.12; }
+  #app[data-platform="android"][data-screen="online-game"] .animal-hand-card strong { margin-top: 14px; }
+  #app[data-platform="android"][data-screen="online-game"] .hand-card .hidden-date { font-size: .52rem; }
+  #app[data-platform="android"][data-screen="online-game"] .hint { font-size: .7rem; margin-block: 5px; }
+}
