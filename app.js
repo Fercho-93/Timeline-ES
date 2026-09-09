@@ -1812,6 +1812,13 @@
     document.getElementById("ghost-toggle").checked = advanced;
     document.getElementById("pulse-toggle").checked = advanced;
   });
+  document.addEventListener("contextmenu", event => {
+    if (event.target.closest(".hand-card, .timeline-card, .card-visual, .animal-card-art")) event.preventDefault();
+  });
+  document.addEventListener("dragstart", event => {
+    if (event.target.closest(".hand-card, .timeline-card, .card-visual, .animal-card-art")) event.preventDefault();
+  });
+
   app.addEventListener("click", event => {
     const target = event.target.closest("[data-action]");
     if (!target) return;
