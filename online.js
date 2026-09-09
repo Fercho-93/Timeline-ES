@@ -436,7 +436,7 @@ async function joinRoom(code, name) {
       if (data.status !== "lobby") throw new Error("ALREADY_STARTED");
       if (data.playerOrder.length >= 9) throw new Error("ROOM_FULL");
       transaction.update(reference, {
-        players: { ...data.players, [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 40 } },
+        players: { ...data.players, [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: CLIENT_VERSION } },
         playerOrder: [...data.playerOrder, user.uid],
         version: data.version + 1,
         updatedAt: serverTimestamp()
