@@ -13,8 +13,9 @@ assert.match(source, /online-entry-invited/, "las invitaciones deben tener un es
 assert.match(source, /const CLIENT_VERSION = 40/, "la versión mínima debe estar centralizada");
 assert.equal((source.match(/clientVersion: CLIENT_VERSION/g) || []).length, 2, "crear y unirse deben registrar la misma versión");
 assert.doesNotMatch(source, /Para usar esta sala, actualizad todos los móviles a v39/, "el aviso no debe seguir mostrando la versión antigua");
-assert.ok(source.includes('paint(`<div class="shell">${header("")}'), "la partida no debe mostrar controles de sala en el encabezado");
-assert.doesNotMatch(source, /data-online-action="room"[^]*?renderGame/, "la partida no debe incluir el botón de gestión de sala");
+assert.match(source, /paint\(`<div class="shell">\$\{header\(\x27<button class="icon-btn" data-online-action="room"/, "la partida debe mostrar un menú de controles de sala");
+assert.match(source, /Terminar partida y cerrar sala/, "el anfitrión debe poder terminar y cerrar la sala durante la partida");
+assert.match(source, /Salir de la partida/, "un jugador debe poder salir de la partida");
 assert.match(source, /roomState\.status === "playing"[\s\S]*?room-connection/, "la presencia debe ocultarse durante la partida");
 assert.match(source, /invited \? "" : '<form class="panel online-form" data-online-form="create"/, "una invitación no debe mostrar el formulario de creación");
 
