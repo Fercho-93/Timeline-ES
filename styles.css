@@ -266,6 +266,21 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .field { display: grid; gap: 7px; }
 .field label { font-size: .85rem; font-weight: 700; color: var(--muted); }
 .field input, .field select { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; min-height: 49px; padding: 11px 13px; color: var(--ink); }
+/* Los `<select>` nativos ignoran buena parte de lo anterior en iOS/Android salvo que se
+   quite su apariencia de sistema: si no, aparecen en blanco encima del pergamino. La
+   flecha se redibuja con dos gradientes en vez de un icono, así toma `--muted` y cambia
+   con el tema en vez de quedar fija. */
+.field select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 22px) calc(50% - 3px), calc(100% - 16px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 38px;
+}
 .player-row { display: grid; grid-template-columns: 1fr auto; gap: 9px; margin-bottom: 9px; }
 .remove { width: 48px; min-height: 44px; border: 0; border-radius: 10px; background: var(--paper); color: var(--accent); font-weight: 700; cursor: pointer; }
 .section-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 22px 0 10px; font-weight: 700; }
@@ -910,7 +925,9 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 }
 /* La promo de la competición vive junto a los botones de inicio, no dentro del
    acordeón de bloques: no es un mazo más, es una forma distinta de jugar con todos. */
-.comp-promo { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft); cursor: pointer; padding: 0; margin-top: 6px; }
+.comp-promo { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft); cursor: pointer; padding: 0; margin-top: 18px; }
+.home-competition .field { margin: 16px 0; }
+.home-competition .btn-block { margin-bottom: 4px; }
 .comp-promo-art { display: block; height: 120px; overflow: hidden; }
 .comp-promo-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .comp-promo-copy { display: block; padding: 14px 16px 16px; }
@@ -1212,7 +1229,7 @@ body::before {
   display: grid;
   grid-template-columns: 94px 1fr;
   min-height: 82px;
-  margin-top: 9px;
+  margin-top: 18px;
   border-color: rgba(139,88,39,.48);
   border-radius: 8px;
   background: var(--promo);
@@ -1388,7 +1405,7 @@ body::before {
 .btn { border-radius: 7px; font-family: var(--font-display); font-size: .96rem; }
 .btn-primary { background: linear-gradient(110deg, #9e451f, #813112); }
 .btn-secondary { border-color: var(--borde-suave); background: var(--boton-suave); }
-.field input, .field select { border-color: var(--borde-suave); border-radius: 6px; background: var(--campo); }
+.field input, .field select { border-color: var(--borde-suave); border-radius: 6px; background-color: var(--campo); }
 .eyebrow { color: var(--accent-dark); font-family: var(--font-display); }
 .game-head { padding-bottom: 12px; border-bottom: 1px solid rgba(132,84,35,.36); }
 .turn-label { color: var(--accent-dark); font-family: var(--font-display); }
@@ -1397,10 +1414,10 @@ body::before {
 .turn-timer-low { border-color: #d33; }
 .score { border-color: var(--borde-suave); background: var(--ficha); }
 .timeline-card {
-  border-color: #9d713c;
+  border-color: #b89563;
   border-radius: 8px;
-  background: linear-gradient(145deg, rgba(249,230,190,.96), rgba(224,188,123,.88));
-  box-shadow: inset 0 0 0 3px rgba(247,222,171,.55), 0 5px 11px rgba(73,42,14,.18);
+  background: linear-gradient(145deg, rgba(246,236,212,.96), rgba(236,220,188,.9));
+  box-shadow: 0 5px 11px rgba(73,42,14,.18);
 }
 .card-visual { filter: sepia(.25) saturate(.72); }
 .timeline-card { color: var(--carta-tinta); }
@@ -1559,7 +1576,7 @@ body::before {
   .home-masthead { margin-top: 4px; }
   .home-shell .play-choice-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .home-shell .play-choice { min-height: 118px; }
-  .home-shell .gallery { grid-template-columns: repeat(2, 1fr); }
+  .home-shell .gallery { grid-template-columns: 1fr; }
   .home-shell .gallery-panel.active { height: 300px; }
   .home-shell .comp-promo { max-width: 100%; }
 }

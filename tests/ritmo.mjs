@@ -8,7 +8,9 @@ w.scrollTo=()=>{};
 for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
 const click=action=>{const button=w.document.querySelector('[data-action="'+action+'"]');assert.ok(button,action);button.click();};
 try {
- click('quick-play');
+ const defaultBlock=w.CONTINUUM.blockOf(w.CONTINUUM.DEFAULT_MODE).key;
+ w.document.querySelector(`[data-action="set-block"][data-block="${defaultBlock}"]`).click();
+ w.document.querySelector(`[data-action="set-mode"][data-mode="${w.CONTINUUM.DEFAULT_MODE}"]`).click();
  assert.ok(w.document.querySelector('[data-action="solo"]'));
  assert.equal(w.document.querySelector('[data-format="solo"]'),null);
  w.document.querySelector('[data-format="multi"]').click();click('setup');

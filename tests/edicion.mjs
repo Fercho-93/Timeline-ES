@@ -55,7 +55,7 @@ for (const options of [{ reduce: true }, { seen: true }]) {
     assert.ok(w.document.documentElement.classList.contains('splash-active'));
     w.document.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
     assert.equal(w.document.getElementById('app-splash'), null, 'el teclado retira la apertura');
-    assert.ok(w.document.querySelector('[data-action="quick-play"]'), 'la aplicación sigue disponible');
+    assert.ok(w.document.querySelector('[data-action="rules"]'), 'la aplicación sigue disponible');
   } finally { w.close(); }
 }
 console.log('Edición: seis ambientes, regreso, competición, apertura reducida y teclado: OK');
