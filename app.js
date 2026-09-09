@@ -2,6 +2,7 @@
   "use strict";
 
   const app = document.getElementById("app");
+  app.dataset.platform = /Android/i.test(navigator.userAgent) ? "android" : "other";
   const toast = document.getElementById("toast");
   const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
