@@ -265,7 +265,7 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .setup-grid { display: grid; gap: 16px; }
 .field { display: grid; gap: 7px; }
 .field label { font-size: .85rem; font-weight: 700; color: var(--muted); }
-.field input, .field select { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; min-height: 49px; padding: 11px 13px; color: var(--ink); }
+.field input, .field select, .file-field { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; min-height: 49px; padding: 11px 13px; color: var(--ink); }
 /* Los `<select>` nativos ignoran buena parte de lo anterior en iOS/Android salvo que se
    quite su apariencia de sistema: si no, aparecen en blanco encima del pergamino. La
    flecha se redibuja con dos gradientes en vez de un icono, así toma `--muted` y cambia
@@ -785,12 +785,16 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .settings-modal .opt-row:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
 .settings-modal .btn-block { margin-top: 18px; }
 .settings-modal .settings-done { margin-top: 30px; }
-/* El selector nativo de archivo no comparte ni una propiedad con el resto de campos:
-   sin esto quedaba como el único control «de fábrica» en un panel por lo demás propio.
-   `.field input` ya le da el mismo borde y fondo que a los desplegables; falta el botón
-   que trae incrustado, que no hereda nada de eso porque es un elemento aparte. */
-.settings-modal input[type="file"] { font: inherit; }
-.settings-modal input[type="file"]::file-selector-button { margin-right: 12px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit; font-weight: 650; cursor: pointer; }
+/* El nombre del archivo elegido lo dibuja el propio control nativo, truncado con puntos
+   suspensivos y sin forma de hacer que envuelva línea: no es un ajuste de overflow, es
+   el navegador quien decide ese ancho. Por eso el input real va oculto (`.solo-lectores`
+   en el HTML) y lo que se ve es este botón más un texto propio, que sí es una etiqueta
+   normal y envuelve como cualquier otra. */
+.file-field { display: flex; align-items: center; gap: 12px; padding: 7px 13px; }
+.file-field .btn { flex: none; padding: 9px 14px; font-size: .85rem; }
+.file-field span { min-width: 0; overflow-wrap: anywhere; color: var(--muted); font-size: .85rem; }
+.file-field-disabled { opacity: .55; }
+.file-field-disabled .btn { pointer-events: none; }
 /* El aviso se esconde bajando su propia altura MÁS lo que está separado del borde. Con
    un porcentaje a secas no basta: vacío mide lo que su relleno, 24 px, y un 150% son 36,
    que no alcanzan a tapar los 18 px de separación; asomaban seis píxeles de barrita
@@ -1419,7 +1423,7 @@ body::before {
 .btn { border-radius: 7px; font-family: var(--font-display); font-size: .96rem; }
 .btn-primary { background: linear-gradient(110deg, #9e451f, #813112); }
 .btn-secondary { border-color: var(--borde-suave); background: var(--boton-suave); }
-.field input, .field select { border-color: var(--borde-suave); border-radius: 6px; background-color: var(--campo); }
+.field input, .field select, .file-field { border-color: var(--borde-suave); border-radius: 6px; background-color: var(--campo); }
 .eyebrow { color: var(--accent-dark); font-family: var(--font-display); }
 .game-head { padding-bottom: 12px; border-bottom: 1px solid rgba(132,84,35,.36); }
 .turn-label { color: var(--accent-dark); font-family: var(--font-display); }
