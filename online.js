@@ -42,6 +42,7 @@ let turnTimerHandle = null;
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
 // en todos los móviles aunque sus relojes no coincidan.
 const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
+const CLIENT_VERSION = 40; // Protocolo mínimo compatible con las salas actuales.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false;
 const presenceListeners = new Map(), presenceRecords = new Map();
@@ -401,7 +402,7 @@ async function createRoom(name) {
       version: 1,
       handSize: 4, turnSeconds: 30,
       playerOrder: [user.uid],
-      players: { [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: 40 } },
+      players: { [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: CLIENT_VERSION } },
       deck: [], discard: [], timeline: [], current: 0, starter: user.uid,
       turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
       createdAt: serverTimestamp(), updatedAt: serverTimestamp()
@@ -551,7 +552,7 @@ async function startRoom(withGhost = true) {
       // El anfitrión pudo abrir la sala y esperar con la pestaña de fondo mientras la
       // aplicación se actualizaba sola: se comprueba también aquí, no solo al entrar.
       if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
-      if (data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < 40)) throw new Error("UPDATE_CLIENTS");
+      if (data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < CLIENT_VERSION)) throw new Error("UPDATE_CLIENTS");
       const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
       const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
       const powers = CT.Powers.create(deck, data.playerOrder.length, actualHand, enableGhost, pulse);
@@ -569,7 +570,7 @@ async function startRoom(withGhost = true) {
     });
   } catch (error) {
     console.error(error);
-    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? "Para usar esta sala, actualizad todos los móviles a v39 y cread una sala nueva." : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v39 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
+    showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? `Para usar esta sala, actualizad todos los móviles a v${CLIENT_VERSION} y cread una sala nueva.` : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v39 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
   } finally { busy = false; }
 }
 
