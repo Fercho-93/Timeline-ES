@@ -12,6 +12,9 @@ assert.match(source, /online-entry-invited/, "las invitaciones deben tener un es
 assert.match(source, /const CLIENT_VERSION = 40/, "la versión mínima debe estar centralizada");
 assert.equal((source.match(/clientVersion: CLIENT_VERSION/g) || []).length, 2, "crear y unirse deben registrar la misma versión");
 assert.doesNotMatch(source, /UPDATE_CLIENTS.*v39/, "el aviso no debe seguir mostrando la versión antigua");
+assert.match(source, /paint\(`<div class="shell">\$\{header\("?"?"\)\}/, "la partida no debe mostrar controles de sala en el encabezado");
+assert.doesNotMatch(source, /data-online-action="room"[^]*?renderGame/, "la partida no debe incluir el botón de gestión de sala");
+assert.match(source, /roomState\.status === "playing"[\s\S]*?room-connection/, "la presencia debe ocultarse durante la partida");
 assert.match(source, /invited \? "" : '<form class="panel online-form" data-online-form="create"/, "una invitación no debe mostrar el formulario de creación");
 
 console.log("ok  el flujo de entrada prioriza unirse y oculta crear cuando hay invitación");
