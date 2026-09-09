@@ -37,6 +37,8 @@ let busy = false;
 let selectedModeKey = "history";
 let seenSelfInRoom = false;
 let lastEffectVersion = null;
+let lastObservedTurnUid = null;
+let lastObservedRoomVersion = null;
 let turnTimerHandle = null;
 // Cada turno tiene 20 segundos para colocar la carta; si se agotan, pasa al siguiente
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
@@ -464,6 +466,8 @@ function connectToRoom(code) {
   CT.Storage.setItem("continuum-last-room", code);
   seenSelfInRoom = false;
   lastEffectVersion = null;
+  lastObservedTurnUid = null;
+  lastObservedRoomVersion = null;
   unsubscribeRoom = onSnapshot(roomRef, snapshot => {
     if (!snapshot.exists()) {
       // Mismo motivo: una caché aún sin la sala no significa que la hayan cerrado.
@@ -471,8 +475,22 @@ function connectToRoom(code) {
       leaveOnline("La sala ha sido cerrada");
       return;
     }
+    const previousTurnUid = lastObservedTurnUid;
+    const previousRoomVersion = lastObservedRoomVersion;
     roomState = snapshot.data();
     CT.onlineActive = roomState.status !== "ended";
+    const observedTurnUid = roomState.status === "playing"
+      ? roomState.playerOrder[roomState.current]
+      : null;
+    const turnChanged = Boolean(
+      previousTurnUid &&
+      observedTurnUid &&
+      previousTurnUid !== observedTurnUid &&
+      previousRoomVersion !== roomState.version &&
+      roomState.phase === "turn"
+    );
+    lastObservedTurnUid = observedTurnUid;
+    lastObservedRoomVersion = roomState.version;
     roomState.mode = roomState.mode || "history";
     selectedModeKey = roomState.mode;
     if (roomState.playerOrder.includes(user.uid)) seenSelfInRoom = true;
@@ -494,7 +512,10 @@ function connectToRoom(code) {
       paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Repartiendo el desempate</h1><p>Quedan ${roomState.tieQueue.length} cartas por repartir. La partida continúa cuando termine el reparto.</p><button class="btn btn-primary" data-online-action="continue-tie">Continuar reparto</button></div>`, 'online-tiebreak');
       if (!snapshot.metadata.fromCache) void continueTie();
     }
-    else renderGame();
+    else {
+      renderGame();
+      if (turnChanged) showTurnChangeSplash(observedTurnUid);
+    }
   }, error => {
     console.error(error);
     if (error.code === "permission-denied") leaveOnline("Ya no estás en esta sala");
@@ -507,6 +528,21 @@ function connectToRoom(code) {
 // instantánea que la confirma es la que cuenta. Todo lo demás —no contar las jugadas
 // ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
 // entre recargas qué versiones de la sala ya vio.
+function showTurnChangeSplash(nextUid) {
+  const nextName = roomState?.players?.[nextUid]?.name || "el siguiente jugador";
+  const isMine = nextUid === user.uid;
+  appEl.querySelector("[data-turn-change-splash]")?.remove();
+  appEl.insertAdjacentHTML("beforeend", `<div class="overlay turn-change-splash" data-turn-change-splash role="status" aria-live="assertive">
+    <div class="modal turn-change-card">
+      <div class="turn-change-mark" aria-hidden="true">${isMine ? "✦" : "→"}</div>
+      <div class="eyebrow">${isMine ? "Tu turno" : "Cambio de turno"}</div>
+      <h2>${isMine ? "Ahora te toca a ti" : "Has perdido el turno"}</h2>
+      <p>${isMine ? "Elige una carta y colócala en la línea temporal." : `Le toca a <strong>${escapeHtml(nextName)}</strong>.`}</p>
+    </div>
+  </div>`);
+  const splash = appEl.querySelector("[data-turn-change-splash]");
+  window.setTimeout(() => splash?.remove(), 2000);
+}
 function anotaProgreso() {
   if (lastEffectVersion !== null && lastEffectVersion !== roomState.version && roomState.phase === "reveal" && roomState.reveal?.playerUid === user.uid) CT.Effects.feedback(roomState.reveal.correct);
   lastEffectVersion = roomState.version;
