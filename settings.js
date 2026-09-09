@@ -48,8 +48,12 @@
 
   function panelHtml() {
     const s = settings;
+    // Sin `data-dialog-focus`, `openDialog` mete el foco en el primer control del
+    // panel: el desplegable de tema. En iOS/Safari, enfocar un `<select>` dentro del
+    // mismo gesto que abre el diálogo hace que el propio selector nativo se despliegue
+    // de inmediato, como si ya se hubiera tocado. El foco inicial va aquí en su lugar.
     return `<div class="overlay" data-overlay="settings"><div class="modal settings-modal">
-      <div class="eyebrow">Ajustes</div>
+      <div class="eyebrow" tabindex="-1" data-dialog-focus>Ajustes</div>
       <h2>Tema</h2>
       <div class="field">
         <label for="ajuste-tema">Cómo se ve la aplicación</label>
