@@ -114,7 +114,10 @@ html body::before {
 .home-shell .comp-promo-copy { padding: 22px; }
 .home-shell .comp-promo-copy b { color: var(--edition-ink); text-transform: none; font-size: 1.4rem; font-weight: 400; }
 .home-shell .comp-promo-copy small { color: var(--edition-muted); font: .9375rem/1.6 var(--ui-font); }
-html .home-nav { width: min(calc(100% - 24px), 520px); bottom: max(12px, env(safe-area-inset-bottom)); min-height: 66px; padding: 5px; border: 1px solid var(--edition-line); border-radius: 12px; background: var(--edition-surface); box-shadow: 0 8px 32px #0002; }
+/* Anclada al borde inferior y a todo el ancho, no flotante: separada del borde dejaba
+   ver el contenido de la página por debajo, que es justo lo que una barra fija no debe
+   hacer. El relleno inferior absorbe la franja de gestos del teléfono. */
+html .home-nav { bottom: 0; min-height: 66px; padding: 5px 5px calc(5px + env(safe-area-inset-bottom)); border: 0; border-top: 1px solid var(--edition-line); border-radius: 0; background: var(--edition-surface); box-shadow: 0 -8px 32px #0002; }
 html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-surface) 94%, transparent); border-color: var(--edition-line); }
 .home-nav button { gap: 4px; padding: 7px 4px; border-radius: 7px; color: var(--edition-muted); }
 .home-nav small { font: .75rem/1.3 var(--ui-font); }
