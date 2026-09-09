@@ -223,7 +223,7 @@
       <div class="home-wordmark">Continuum</div>
       <div class="home-tagline">Ordena. Compara. Descubre.</div>
       <div class="home-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
-      <p>Coloca las cartas en el orden correcto<br>y construye la línea del tiempo.</p>
+      <p>Coloca cada carta en su sitio:<br>fechas, tamaños, distancias y más.</p>
     </section>`;
   }
 
@@ -242,7 +242,6 @@
     const resume = game && !game.winners;
     const room = CT.Storage.getItem("continuum-last-room");
     const buttons = (resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '')
-      + (loadSolo() ? '<button class="btn btn-secondary" data-action="resume-solo">Continuar solitario</button>' : '')
       + (room && /^[A-Z0-9]{8}$/.test(room) ? '<button class="btn btn-secondary" data-action="resume-room">Volver a mi sala</button>' : '');
     return buttons ? `<section class="quick-actions" aria-label="Jugar ahora">${buttons}</section>` : '';
   }

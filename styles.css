@@ -1567,7 +1567,10 @@ body::before {
   .animal-hand-card { min-height: 190px; }
   .timeline .animal-timeline-card { min-height: 172px; }
 }
-.slot, .slot-confirm { border-color: #9c6c35; border-radius: 8px; background: var(--hueco); }
+/* El hueco se dibuja solo con el contorno discontinuo de su interior: rellenarlo ponía
+   una lámina dorada entre carta y carta que competía con las propias cartas. */
+.slot { border-color: #9c6c35; border-radius: 8px; }
+.slot-confirm { border-color: #9c6c35; border-radius: 8px; background: var(--hueco); }
 .overlay { background: rgba(47,29,14,.68); backdrop-filter: blur(6px) sepia(.2); }
 .modal { background: var(--modal-fondo); }
 .toast { border: 1px solid #c08a47; border-radius: 7px; background: #3d2815; color: #f7dfaa; }
