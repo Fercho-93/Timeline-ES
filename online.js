@@ -646,7 +646,7 @@ function renderGame() {
   // quien abre la sala a mitad de turno ve lo que de verdad queda, no un contador que
   // vuelve a empezar de cero en su pantalla.
   const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? "…") : null;
-  paint(`<div class="shell">${header("")}
+  paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room" aria-label="Abrir menú de la sala">Menú</button>')}
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
     <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
@@ -1072,7 +1072,7 @@ function roomMenu() {
     </div>
     ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span>${escapeHtml(initials(roomState.players[uid].name))}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong><button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
     <div class="actions" style="display:grid">
-      ${isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
+      ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
       <button class="btn btn-primary" data-online-action="close-room-menu">Volver a la partida</button>
     </div>
   </div></div>`);
