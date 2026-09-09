@@ -773,9 +773,24 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .rules .btn-block { margin-top: 22px; }
 
 .settings-modal { text-align: left; }
-.settings-modal h2 { margin: 4px 0 20px; }
-.settings-modal .field { margin-bottom: 0; }
-.settings-modal .btn-block { margin-top: 22px; }
+/* Cada tema (Tema, Efectos, Copias de seguridad…) es su propio bloque, separado del
+   siguiente por una línea y aire de sobra. Sin esto los títulos quedaban pegados al
+   control de arriba y el panel entero se leía como una sola lista sin orden. */
+.settings-section { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--line); }
+.settings-section:first-of-type { margin-top: 20px; padding-top: 0; border-top: 0; }
+.settings-modal h2 { margin: 0 0 16px; font-size: 1.3rem; }
+.settings-modal .field { margin-bottom: 16px; }
+.settings-modal .field:last-child { margin-bottom: 0; }
+.settings-modal .hint + .field { margin-top: 12px; }
+.settings-modal .opt-row:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+.settings-modal .btn-block { margin-top: 18px; }
+.settings-modal .settings-done { margin-top: 30px; }
+/* El selector nativo de archivo no comparte ni una propiedad con el resto de campos:
+   sin esto quedaba como el único control «de fábrica» en un panel por lo demás propio.
+   `.field input` ya le da el mismo borde y fondo que a los desplegables; falta el botón
+   que trae incrustado, que no hereda nada de eso porque es un elemento aparte. */
+.settings-modal input[type="file"] { font: inherit; }
+.settings-modal input[type="file"]::file-selector-button { margin-right: 12px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: inherit; font-weight: 650; cursor: pointer; }
 /* El aviso se esconde bajando su propia altura MÁS lo que está separado del borde. Con
    un porcentaje a secas no basta: vacío mide lo que su relleno, 24 px, y un 150% son 36,
    que no alcanzan a tapar los 18 px de separación; asomaban seis píxeles de barrita
