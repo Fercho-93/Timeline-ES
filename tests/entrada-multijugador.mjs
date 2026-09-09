@@ -12,7 +12,7 @@ assert.ok(joinAt < createAt, "entrar en una sala debe aparecer antes que crear u
 assert.match(source, /online-entry-invited/, "las invitaciones deben tener un estado visual propio");
 assert.match(source, /const CLIENT_VERSION = 40/, "la versión mínima debe estar centralizada");
 assert.equal((source.match(/clientVersion: CLIENT_VERSION/g) || []).length, 2, "crear y unirse deben registrar la misma versión");
-assert.doesNotMatch(source, /UPDATE_CLIENTS.*v39/, "el aviso no debe seguir mostrando la versión antigua");
+assert.doesNotMatch(source, /Para usar esta sala, actualizad todos los móviles a v39/, "el aviso no debe seguir mostrando la versión antigua");
 assert.ok(source.includes('paint(`<div class="shell">${header("")}'), "la partida no debe mostrar controles de sala en el encabezado");
 assert.doesNotMatch(source, /data-online-action="room"[^]*?renderGame/, "la partida no debe incluir el botón de gestión de sala");
 assert.match(source, /roomState\.status === "playing"[\s\S]*?room-connection/, "la presencia debe ocultarse durante la partida");
