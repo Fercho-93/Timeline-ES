@@ -214,10 +214,37 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
 #app[data-screen="home"] .topbar-actions .icon-btn { width: auto; min-width: 100px; border: 1px solid var(--edition-line); border-radius: 9px; background: var(--edition-surface); }
 #app[data-screen="home"] .home-masthead { margin-top: 24px; }
 .home-shell .gallery-panel, .collection-decks .game-row {
-  box-shadow: inset 0 1px 0 #fff3, 0 2px 3px #0001, 0 7px 16px #0002;
-  border-bottom: 2px solid var(--edition-line);
+  box-shadow: none;
 }
-.collection-decks .game-row { border-radius: 9px; margin-block: 10px; padding: 15px; }
+/* Un archivo de libros: estampación metálica, capítulos y apertura escalonada.
+   Sin sombras ni animación permanente; la luz responde al descubrimiento. */
+.home-shell .gallery-panel { border-radius: 2px 16px 16px 2px; }
+.home-shell .gallery-panel::before { border-inline-start: 3px double #eee0bd88; }
+.collection-foil { position: absolute; z-index: 3; inset: 0; pointer-events: none; overflow: hidden; }
+.collection-foil::after { content: ""; position: absolute; inset: -35% -65%; background: linear-gradient(115deg, transparent 40%, #fff0bc08 45%, #fff0bc60 50%, #fff0bc08 55%, transparent 60%); transform: translateX(-65%); opacity: 0; }
+.home-shell .collection-open { border-radius: 0; transform: rotate(45deg); font-size: 0; background: transparent; }
+.home-shell .collection-open::after { content: "+"; font-size: 1.25rem; transform: rotate(-45deg); }
+.home-shell .gallery-panel.active .collection-open::after { content: "−"; }
+.collection-decks .games { counter-reset: chapter; }
+.collection-decks .game-row { overflow: hidden; border-radius: 0 12px 12px 0; margin-block: 10px; padding: 17px 20px 19px; border-left: 3px double var(--edition-brass); background: linear-gradient(100deg, color-mix(in srgb, var(--edition-brass) 10%, var(--edition-paper)), var(--edition-paper) 35%); }
+.collection-decks .game-row::after { content: none; }
+.deck-chapter { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; color: var(--edition-brass); font: 500 .65rem/1.4 var(--ui-font); letter-spacing: .17em; text-transform: uppercase; }
+.deck-chapter i { font-style: normal; font-size: 1.2rem; line-height: 1; }
+.collection-decks .game-row .game-name { display: block; padding-top: 11px; border-top: 1px solid var(--edition-line); }
+.collection-decks .game-row .game-meta { display: block; margin-top: 7px; }
+@keyframes foil-reveal { 0% { opacity: 0; transform: translateX(-65%); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateX(65%); } }
+@keyframes chapter-reveal { from { opacity: 0; transform: perspective(800px) rotateY(-28deg) translateX(-12px); } to { opacity: 1; transform: perspective(800px) rotateY(0) translateX(0); } }
+@media (prefers-reduced-motion: no-preference) {
+  .gallery-panel.active .collection-foil::after { animation: foil-reveal 1100ms ease-out both; }
+  .collection-decks .game-row { transform-origin: left center; animation: chapter-reveal 520ms cubic-bezier(.2,.7,.2,1) both; }
+  .collection-decks .game-row:nth-child(2) { animation-delay: 80ms; }
+  .collection-decks .game-row:nth-child(3) { animation-delay: 160ms; }
+  .collection-open, .deck-chapter i { transition: transform 250ms ease; }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .gallery-panel:hover .collection-foil::after { animation: foil-reveal 1100ms ease-out both; }
+  .collection-decks .game-row:hover .deck-chapter i { transform: translate(3px, -3px); }
+}
 html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(--edition-brass) 24%, var(--edition-surface)); box-shadow: inset 0 1px 3px #0002; }
 #app[data-screen="perfil"] > .shell { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
 .solo-home .solo-intro { margin-bottom: 14px; }

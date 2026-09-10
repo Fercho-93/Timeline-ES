@@ -165,6 +165,7 @@
         : "";
       return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
+        <span class="collection-foil" aria-hidden="true"></span>
         <span class="collection-index" aria-hidden="true">${total} ${total === 1 ? "mazo" : "mazos"}</span>
         <span class="collection-open" aria-hidden="true">${active ? "−" : "↗"}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
@@ -176,9 +177,10 @@
   // Los juegos del bloque en pantalla.
   function gameList() {
     const games = CT.blockGames(selectedBlockKey);
-    return `<div class="games" role="group" aria-label="Elige el juego">${games.map(item => {
+    return `<div class="games" role="group" aria-label="Elige el juego">${games.map((item, index) => {
       const active = item.key === selectedModeKey;
       return `<button class="game-row${active ? " active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}">
+        <span class="deck-chapter" aria-hidden="true">Capítulo ${["I", "II", "III"][index] || index + 1}<i>↗</i></span>
         <span class="game-name">${item.name}</span>
         <span class="game-meta">${item.cards.length} ${item.cardLabel} · ${item.blurb}</span>
       </button>`;
