@@ -76,13 +76,13 @@ Para cada sesión registrar solo versión, dispositivo, modo y duración.
 - [ ] Ningún bloqueo P0 o P1 abierto.
 - [ ] Invitaciones funcionando entre iPhone y Android.
 - [ ] Evidencia de repetición voluntaria.
-- [ ] FeedbackEmail configurado.
+- [x] FeedbackEmail configurado.
 - [ ] Privacidad revisada para el alcance de la beta.
 
 ## F. Requisitos previos a tiendas
 
 - [ ] Nombre Continuum revisado.
-- [ ] Derechos del arte documentados.
+- [x] Derechos/procedencia del arte documentados.
 - [ ] 17 cartas de Naturaleza revisadas o retiradas de la beta.
 - [ ] Política de privacidad final.
 - [ ] Responsable y correo de soporte.
