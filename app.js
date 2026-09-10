@@ -1832,7 +1832,14 @@
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }
     else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
     else if (action === "set-block") {
-      if (!collectionOpen || target.dataset.block !== selectedBlockKey) setBlock(target.dataset.block);
+      const sameOpenBlock = collectionOpen && target.dataset.block === selectedBlockKey;
+      if (sameOpenBlock) {
+        collectionOpen = false;
+        collectionDetails = false;
+        home();
+        return;
+      }
+      setBlock(target.dataset.block);
       collectionOpen = true;
       collectionDetails = true;
       home();
