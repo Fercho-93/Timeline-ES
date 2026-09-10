@@ -206,9 +206,15 @@ console.log('Hoja en toda la preparación, sin animar las jugadas posteriores: O
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     assert.ok(reveal.cancelled);
+    const originalBounds = w.Element.prototype.getBoundingClientRect;
+    w.Element.prototype.getBoundingClientRect = function () {
+      return this.matches('.home-nav') ? { top: 600, height: 60 } : originalBounds.call(this);
+    };
     click(w, '[data-block="historia"]');
-    assert.ok(w.document.querySelector('.collection-decks.parchment-unrolling'));
-    assert.equal(w.document.querySelector('.profile-roll-edge').style.position, 'absolute');
+    assert.ok(w.document.querySelector('.collection-entry.parchment-unrolling'));
+    assert.equal(effects.filter(effect => effect.frames[0].clipPath).at(-1).timing.duration, 3100);
+    assert.match(effects.filter(effect => effect.frames[0].clipPath).at(-1).frames.at(-1).clipPath, /600px/);
+    assert.equal(effects.filter(effect => effect.target.classList.contains('profile-roll-edge')).at(-1).frames.at(-1).transform, 'translateY(572px)');
     assert.equal(w.document.querySelectorAll('.parchment-dust').length, 0, 'colecciones sin polvo');
     click(w, '[data-block="historia"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);

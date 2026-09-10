@@ -173,6 +173,8 @@ console.log("\nCierres animados, interrupciones y movimiento reducido");
     return this.matches('.timeline-wrap') ? { top: 900, bottom: 1100, left: 0 } : originalRect.call(this);
   };
   game(w);
+  // La colección se alinea arriba al abrirla; aquí medimos solo la mesa de juego.
+  scrolls.length = 0;
   click(w, '.hand-card');
   await sleep(10);
   ok("acercar una línea fuera de vista respeta movimiento reducido", scrolls.length === 1 && scrolls[0].behavior === 'auto');

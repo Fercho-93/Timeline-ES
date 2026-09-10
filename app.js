@@ -1889,17 +1889,10 @@
       collectionOpen = true;
       collectionDetails = true;
       home();
-      // Abrir un bloque no cambia de pantalla, así que la vista se queda donde estaba
-      // mientras la carátula crece: quedaba media lámina fuera y los mazos del bloque
-      // ya asomando. Se lleva su borde superior al de la ventana, de modo que la lámina
-      // se ve entera y sus mazos esperan justo debajo. Se aplaza un turno porque el
-      // repintado acaba de sustituir el elemento que hay que desplazar.
-      setTimeout(() => {
-        const abierta = app.querySelector(".collection-entry.active");
-        if (!abierta?.isConnected) return;
-        const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-        abierta.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
-      }, 0);
+      // Fijar primero la portada arriba evita que el desplazamiento y el
+      // desenrollado compitan. El pergamino descubre portada y mazos juntos.
+      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      app.querySelector('.collection-entry.active')?.scrollIntoView?.({ block: 'start', behavior: reduce ? 'auto' : 'instant' });
       CT.unrollCollection(app.querySelector('.collection-decks'));
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }

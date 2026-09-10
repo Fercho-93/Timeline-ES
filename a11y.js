@@ -107,14 +107,18 @@
     cancelProfileRoll?.();
     sheet.classList.add('parchment-unrolling');
     const bounds = sheet.getBoundingClientRect();
-    const height = Math.max(1, collection ? sheet.offsetHeight : Math.min(sheet.offsetHeight || Infinity, window.innerHeight - bounds.top));
+    const navigation = document.querySelector('#app .home-nav')?.getBoundingClientRect();
+    const bottom = navigation?.height > 0 ? Math.min(window.innerHeight, navigation.top) : window.innerHeight;
+    const height = Math.max(1, collection ? bottom - bounds.top : Math.min(sheet.offsetHeight || Infinity, window.innerHeight - bounds.top));
     const edge = document.createElement("div");
     edge.className = "profile-roll-edge";
     edge.setAttribute("aria-hidden", "true");
     edge.style.left = `${bounds.left}px`;
     edge.style.width = `${bounds.width}px`;
-    edge.style.top = `${bounds.top + (collection ? window.scrollY : 0)}px`;
-    if (collection) edge.style.position = 'absolute';
+    edge.style.top = `${bounds.top}px`;
+    // La colección comienza en su portada y termina sobre la navegación fija.
+    // Si se desplaza la página durante la apertura, retiramos el efecto.
+    if (collection) sheet.style.minHeight = `${height}px`;
     // Granos ligeros, sin bucle permanente ni superficie interactiva.
     if (!collection) edge.classList.add('has-dust');
     for (let index = 0; index < (collection ? 0 : 40); index++) {
@@ -127,19 +131,21 @@
       edge.append(grain);
     }
     document.body.append(edge);
-    const timing = { duration: 2300, easing: "cubic-bezier(.22,.55,.25,1)" };
+    const timing = { duration: collection ? 3100 : 2300, easing: "cubic-bezier(.22,.55,.25,1)" };
     const reveal = sheet.animate([
       { clipPath: 'polygon(0 0, 100% 0, 100% 0px, 0 0px)' },
       { clipPath: `polygon(0 0, 100% 0, 100% ${height}px, 0 ${height}px)` }
     ], timing);
+    const lip = collection ? 28 : 14;
     const roll = edge.animate([
-      { transform: 'translateY(-14px)', opacity: 0, offset: 0 },
-      { transform: `translateY(${height * .08 - 14}px)`, opacity: 1, offset: .08 },
-      { transform: `translateY(${height * .92 - 14}px)`, opacity: 1, offset: .92 },
-      { transform: `translateY(${height - 14}px)`, opacity: 0, offset: 1 }
+      { transform: `translateY(${-lip}px)`, opacity: 0, offset: 0 },
+      { transform: `translateY(${height * .08 - lip}px)`, opacity: 1, offset: .08 },
+      { transform: `translateY(${height * .92 - lip}px)`, opacity: 1, offset: .92 },
+      { transform: `translateY(${height - lip}px)`, opacity: 0, offset: 1 }
     ], timing);
-    const cleanup = () => { edge.remove(); sheet.classList.remove('parchment-unrolling'); if (cancelProfileRoll === cancel) cancelProfileRoll = null; };
+    const cleanup = () => { edge.remove(); sheet.classList.remove('parchment-unrolling'); window.removeEventListener('wheel', cancel); window.removeEventListener('touchmove', cancel); if (cancelProfileRoll === cancel) cancelProfileRoll = null; };
     const cancel = () => { reveal.cancel(); roll.cancel(); cleanup(); };
+    if (collection) { window.addEventListener('wheel', cancel, { passive: true }); window.addEventListener('touchmove', cancel, { passive: true }); }
     cancelProfileRoll = cancel;
     reveal.finished.then(cleanup, cleanup);
     roll.finished.catch(() => {});
@@ -429,7 +435,7 @@
 
   window.CONTINUUM = window.CONTINUUM || {};
   window.CONTINUUM.paint = paint;
-  window.CONTINUUM.unrollCollection = sheet => unrollSheet(sheet, true);
+  window.CONTINUUM.unrollCollection = sheet => unrollSheet(sheet?.closest('.collection-entry') || sheet, true);
   window.CONTINUUM.resizeContent = resizeContent;
   window.CONTINUUM.announce = announce;
   window.CONTINUUM.openDialog = openDialog;
