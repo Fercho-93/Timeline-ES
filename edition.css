@@ -264,9 +264,13 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 }
 .book-turn { position: fixed; inset: 0; z-index: 90; overflow: hidden; pointer-events: none; perspective: 1800px; }
 .book-turn-leaf { position: absolute; inset: 0; transform-style: preserve-3d; }
+.book-turn-sheet { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: top left; }
+.book-turn-sheet[data-direction="back"] { transform-origin: bottom right; }
 .book-turn-front, .book-turn-back { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; background: var(--edition-paper); }
 .book-turn-back { transform: rotateY(180deg); background: linear-gradient(90deg, var(--edition-paper), color-mix(in srgb, var(--edition-brass) 18%, var(--edition-paper)) 96%, var(--edition-brass)); }
-.book-turn-front::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, #fff0 65%, #fff2 88%, #87633033 100%); border-inline-end: 1px solid var(--edition-brass); }
+.book-turn-front::after, .book-turn-back::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(135deg, transparent 48%, #87633008 60%, #87633030 73%, #fff7 84%, #fff0 96%); background-size: 180% 180%; animation: paper-flex-light 1200ms cubic-bezier(.32,.05,.18,1) both; }
+.book-turn-sheet[data-direction="back"] :is(.book-turn-front, .book-turn-back)::after { transform: rotate(180deg); }
+@keyframes paper-flex-light { 0%, 100% { opacity: 0; background-position: 0% 0%; } 42% { opacity: 1; background-position: 70% 70%; } 75% { opacity: .65; background-position: 100% 100%; } }
 .book-turn-copy *, .book-turn-copy *::before, .book-turn-copy *::after { animation: none !important; transition: none !important; }
 @keyframes parchment-open {
   from { opacity: .2; clip-path: inset(0 0 95% 0 round 12px); transform: translateY(-8px); }

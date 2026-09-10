@@ -121,20 +121,40 @@
     front.append(copy);
     const back = document.createElement("div");
     back.className = "book-turn-back";
-    leaf.append(front, back);
+    const sheet = document.createElement("div");
+    sheet.className = "book-turn-sheet";
+    sheet.append(front, back);
+    leaf.append(sheet);
     layer.append(leaf);
     document.body.append(layer);
     // El eje oblicuo levanta la esquina inferior derecha hacia la superior
     // izquierda; al volver, el pivote y el signo invierten el recorrido.
     const angle = backwards ? -1 : 1;
+    const timing = { duration: 1200, easing: "cubic-bezier(.32,.05,.18,1)", fill: "forwards" };
+    // La esquina se recoge y el papel se arquea antes de extenderse de nuevo.
+    // La deformación vive dentro del giro: no cambia ni el recorrido ni su duración.
+    const flex = sheet.animate([
+      { transform: "translateZ(0px) skew(0deg, 0deg)", offset: 0 },
+      { transform: `translateZ(45px) skew(${-angle * 5}deg, ${angle * 3}deg)`, offset: .42 },
+      { transform: `translateZ(22px) skew(${-angle * 2}deg, ${angle}deg)`, offset: .75 },
+      { transform: "translateZ(0px) skew(0deg, 0deg)", offset: 1 }
+    ], timing);
+    const curves = [front, back].map(face => face.animate([
+      { borderRadius: "0% 0% 0% 0%", offset: 0 },
+      { borderRadius: backwards ? "32% 4% 0% 4%" : "0% 4% 32% 4%", offset: .42 },
+      { borderRadius: backwards ? "16% 2% 0% 2%" : "0% 2% 16% 2%", offset: .75 },
+      { borderRadius: "0% 0% 0% 0%", offset: 1 }
+    ], timing));
+    [flex, ...curves].forEach(effect => effect.finished.catch(() => {}));
+    sheet.dataset.direction = backwards ? "back" : "forward";
     const animation = leaf.animate([
       { transform: "rotate3d(1, -1, 0, 0deg)", offset: 0 },
       { transform: `rotate3d(1, -1, 0, ${angle * 32}deg)`, offset: .3 },
       { transform: `rotate3d(1, -1, 0, ${angle * 105}deg)`, offset: .72 },
       { transform: `rotate3d(1, -1, 0, ${angle * 178}deg)`, offset: 1 }
-    ], { duration: 1200, easing: "cubic-bezier(.32,.05,.18,1)", fill: "forwards" });
+    ], timing);
     const cleanup = () => { layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
-    const cancel = () => { animation.cancel(); cleanup(); };
+    const cancel = () => { animation.cancel(); flex.cancel(); curves.forEach(curve => curve.cancel()); cleanup(); };
     cancelPageTurn = cancel;
     animation.finished.then(cleanup, cleanup);
   }

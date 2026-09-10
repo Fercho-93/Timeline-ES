@@ -119,22 +119,29 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
 {
   const w = boot({ seen: true });
   const turns = [];
+  const bends = [];
   try {
     w.Element.prototype.animate = function (frames) {
       const entry = { frames, cancelled: false };
       if (this.classList.contains('book-turn-leaf')) turns.push(entry);
+      if (this.classList.contains('book-turn-sheet') || this.classList.contains('book-turn-front') || this.classList.contains('book-turn-back')) bends.push(entry);
       return { finished: new Promise(() => {}), cancel() { entry.cancelled = true; } };
     };
     click(w, '[data-block="historia"]');
     click(w, '[data-mode="history"]');
     assert.equal(turns[0].frames.at(-1).transform, 'rotate3d(1, -1, 0, 178deg)');
     assert.equal(w.document.querySelector('.book-turn-leaf').style.transformOrigin, 'left top');
+    assert.equal(bends.length, 3);
+    assert.match(bends[0].frames[1].transform, /translateZ\(45px\)/);
+    assert.equal(bends[1].frames[1].borderRadius, '0% 4% 32% 4%');
     assert.equal(w.document.querySelector('.book-turn').getAttribute('aria-hidden'), 'true');
     assert.equal(w.document.querySelector('.book-turn [id]'), null);
     click(w, '#app [data-action="collection-back"]');
     assert.equal(turns[0].cancelled, true);
+    assert.ok(bends.slice(0, 3).every(effect => effect.cancelled));
     assert.equal(turns[1].frames.at(-1).transform, 'rotate3d(1, -1, 0, -178deg)');
     assert.equal(w.document.querySelector('.book-turn-leaf').style.transformOrigin, 'right bottom');
+    assert.equal(bends[4].frames[1].borderRadius, '32% 4% 0% 4%');
     assert.equal(w.document.querySelectorAll('.book-turn').length, 1);
     w.matchMedia = () => ({ matches: true });
     click(w, '#app [data-mode="history"]');
