@@ -45,6 +45,24 @@ const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); clic
 console.log("\nFiltrado puro (CT.Enciclopedia)");
 {
   const w = boot();
+  const ct = w.CONTINUUM;
+  for (const key of Object.keys(ct.MODES)) {
+    const card = ct.cards(key).find(card => ct.cardArt(key, card));
+    if (!card) continue;
+    const fragment = w.document.createElement('div');
+    fragment.innerHTML = ct.Enciclopedia.cardMarkup(key, card);
+    const img = fragment.querySelector('img');
+    ok(`${key}: la enciclopedia usa su ilustración existente`, !!img && fs.existsSync(path.join(REPO, img.getAttribute('src'))));
+    ok(`${key}: imagen diferida y contenido conservado`, img?.loading === 'lazy' || img?.getAttribute('loading') === 'lazy');
+    ok(`${key}: conserva el título y la explicación`, fragment.textContent.includes(card.title) && fragment.textContent.includes(card.detail));
+  }
+  const withoutArt = { ...ct.cards('history')[0], id: -999 };
+  const markup = ct.Enciclopedia.cardMarkup('history', withoutArt);
+  ok('sin lámina conserva el símbolo de época sin imagen rota', !markup.includes('<img') && markup.includes('card-visual era-'));
+  w.close();
+}
+{
+  const w = boot();
   const todas = w.CONTINUUM.Enciclopedia.filterCards("history", {});
   ok("sin filtro devuelve las 167 cartas", todas.length === 167);
   const ordenado = todas.every((card, i) => i === 0 || card.year >= todas[i - 1].year);

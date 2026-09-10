@@ -324,6 +324,9 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .perfil-section .game-name { font-size: 1.05rem; line-height: 1.4; }
 .perfil-section .game-meta { font-size: .85rem; line-height: 1.55; margin-top: 6px; }
 .guide-tools { position: sticky; top: 0; z-index: 3; display: flex; justify-content: flex-end; margin-bottom: 10px; pointer-events: none; }
+.enc-card-illustrated .card-visual { height: auto; aspect-ratio: 2 / 3; padding: 0; background: var(--edition-paper); }
+.enc-card-illustrated .card-visual .animal-card-art { display: block; width: 100%; height: 100%; object-fit: contain; filter: none; }
+.enc-era { margin-bottom: 10px; color: var(--edition-muted); font: .8rem/1.5 var(--ui-font); }
 .guide-tools .guide-close { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 1.35rem; font-weight: 400; line-height: 1; border: 0; background: transparent; color: var(--edition-muted); box-shadow: none; }
 .home-shell .play-choice-block .play-choice-grid { margin-left: clamp(14px, 4vw, 28px); padding-left: 12px; border-left: 1px solid var(--edition-line); }
 .home-shell .play-choice-block .play-choice { background: linear-gradient(125deg, var(--edition-surface), color-mix(in srgb, var(--edition-brass) 18%, var(--edition-paper))); color: var(--edition-ink); border-color: var(--edition-line); }

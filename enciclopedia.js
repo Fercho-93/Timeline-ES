@@ -38,10 +38,12 @@
   // carta la lleva: aquí no hay nada que ocultar hasta confirmar una jugada.
   function cardMarkup(modeKey, card, { highlight = false } = {}) {
     const era = CT.eraForCard(modeKey, card);
+    const art = CT.animalArt(modeKey, card);
+    const visual = art || `<span>${era.symbol}</span><small>${era.name}</small>`;
     const fuente = card.source
       ? `<p class="enc-source"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Fuente <span aria-hidden="true">↗</span><span class="solo-lectores"> (se abre en una pestaña nueva)</span></a></p>`
       : "";
-    return `<article class="timeline-card enc-card${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"><div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${CT.categoryBadge(modeKey, card)}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
+    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
   }
 
   function resultsMarkup(modeKey, cards, { highlight = null } = {}) {
