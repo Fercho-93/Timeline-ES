@@ -31,6 +31,12 @@ const openFormat = format => {
   assert.ok(button, `Existe el bloque de formato ${format}`);
   button.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 };
+// Al volver desde otra pantalla, la colección elegida puede seguir desplegada. Solo
+// tocamos su carátula cuando aún no se ven los mazos; volver a tocar una colección ya
+// abierta ahora la pliega de forma intencionada.
+const openSelectedCollection = () => {
+  if (!w.document.querySelector('[data-action="set-mode"]')) click("set-block");
+};
 const checkScreen = label => {
   check(`${label}: cabecera Continuum`, w.document.querySelector(".brand")?.textContent.trim() === brand);
   check(`${label}: sin la denominación antigua`, !formerBrand.test(w.document.getElementById("app").textContent));
@@ -47,14 +53,14 @@ try {
   check("título de las auditorías", read("VERIFICACION_CORRECCIONES.md").startsWith(`# Correcciones de las auditorías de ${brand}\n`));
   for (const script of w.document.querySelectorAll("script[src]")) w.eval(read(script.getAttribute("src")));
   checkScreen("Inicio");
-  click("set-block");
+  openSelectedCollection();
   click("set-mode");
   checkScreen("Menú de formatos");
   openFormat("multi");
   click("setup");
   checkScreen("Configuración");
   click("home");
-  click("set-block");
+  openSelectedCollection();
   click("set-mode");
   click("solo");
   checkScreen("Solitario");

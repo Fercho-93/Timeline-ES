@@ -32,6 +32,15 @@ ok("Capacitor apunta a dist/ como webDir", capacitorConfig.webDir === "dist");
 ok("el nombre de la app es Continuum", capacitorConfig.appName === "Continuum");
 ok("hay un identificador de app definido", /^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/i.test(capacitorConfig.appId || ""));
 
+// Las tiendas leen la versión pública desde dos proyectos distintos. Si una plataforma
+// se queda atrás, la actualización puede compilar bien pero llegar con otra versión.
+const androidGradle = fs.readFileSync(path.join(REPO, "android", "app", "build.gradle"), "utf8");
+const androidVersion = androidGradle.match(/versionName\s+["']([^"']+)["']/)?.[1];
+const iosProject = fs.readFileSync(path.join(REPO, "ios", "App", "App.xcodeproj", "project.pbxproj"), "utf8");
+const iosVersions = [...iosProject.matchAll(/MARKETING_VERSION\s*=\s*([^;]+);/g)].map(match => match[1].trim());
+ok("la versión pública de Android tiene formato válido", /^\d+\.\d+\.\d+$/.test(androidVersion || ""));
+ok("iPhone y Android llevan la misma versión pública", iosVersions.length > 0 && iosVersions.every(version => version === androidVersion));
+
 // Rutas rotas: cada imagen referenciada de forma literal (no armada a partir de una
 // variable en tiempo de ejecución) debe existir de verdad dentro de dist/assets.
 const jsFuentes = fs.readdirSync(REPO).filter(f => f.endsWith(".js")).map(f => fs.readFileSync(path.join(REPO, f), "utf8")).join("\n");

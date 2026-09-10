@@ -34,7 +34,12 @@ const el = (w, selector) => {
 function click(w, selector) { const element = el(w, selector); element.focus(); element.click(); }
 // Un mazo concreto se elige ahora desde la portada antes de llegar al menú de
 // formatos (`playMenu`), donde de verdad viven «setup»/«start»/«ready».
-function abreMazo(w, block, mode) { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); }
+function abreMazo(w, block, mode) {
+  // Si ya se volvió a la colección elegida, sus mazos siguen visibles. Pulsar otra vez
+  // esa misma carátula la plegaría, así que solo la abrimos cuando el mazo no está aún.
+  if (!w.document.querySelector(`[data-mode="${mode}"]`)) click(w, `[data-block="${block}"]`);
+  click(w, `[data-mode="${mode}"]`);
+}
 function game(w) { abreMazo(w, "historia", "history"); click(w, '[data-format="multi"]'); ["setup", "start", "ready"].forEach(action => click(w, `[data-action="${action}"]`)); }
 function animationEnd(w, target, name) {
   const event = new w.Event("animationend", { bubbles: true });
@@ -68,13 +73,11 @@ console.log("\nGalería continua y navegación repetida");
   click(w, '[data-block="ciencia"]');
   ok("la imagen de Ciencia pide el tamaño grande al desplegarse", el(w, ".panel-science img").getAttribute("src").endsWith("700.webp"));
   for (let round = 0; round < 6; round++) {
-    click(w, '[data-block="historia"]');
-    click(w, '[data-mode="history"]');
+    abreMazo(w, "historia", "history");
     click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
     assert.ok(el(w, ".shell").classList.contains("screen-enter"));
     click(w, '[data-action="home"]');
-    click(w, '[data-block="historia"]');
-    click(w, '[data-mode="history"]');
+    abreMazo(w, "historia", "history");
     click(w, '[data-action="solo"]');
     click(w, '[data-action="home"]');
   }

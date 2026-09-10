@@ -335,7 +335,7 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
   (`window.Capacitor`), así que no tocan la versión web ni iOS.
 - `npm run build && npx cap sync` deja `android/` e `ios/` al día con el último `dist/`
   antes de abrirlos en Android Studio o Xcode.
-- El número de versión de la beta (`0.1.0`, distinto del número interno de caché del
+- El número de versión de la beta (`0.1.1`, distinto del número interno de caché del
   service worker) vive en `android/app/build.gradle` (`versionName`) y en
   `ios/App/App.xcodeproj/project.pbxproj` (`MARKETING_VERSION`).
 - Ya probada en iPhone real (compilada sin firma vía GitHub Actions e instalada con
