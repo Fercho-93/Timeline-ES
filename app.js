@@ -1777,7 +1777,7 @@
     const enSolitario = ["solo-home", "solo", "solo-end", "duelo-intro"].includes(screen);
     const context = comp ? "competition" : solo || enSolitario ? "solo" : "local";
     const modeKey = game?.mode || solo?.mode || selectedModeKey;
-    overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
+    overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
   }
 
   function gameMenu() {

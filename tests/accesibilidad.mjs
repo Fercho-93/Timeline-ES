@@ -83,6 +83,11 @@ console.log("\nLas capas son diálogos de verdad");
   // Devolver el foco espera a que el navegador confirme que la capa se ha ido.
   await respira();
   ok("y el foco vuelve al botón que las abrió", activo(w) === abrio);
+  click(w, '[data-action="rules"]');
+  ok("la guía ofrece un aspa con nombre accesible", el(w, '.guide-close')?.getAttribute('aria-label') === 'Cerrar guía');
+  click(w, '.guide-close');
+  await respira();
+  ok("el aspa cierra la guía y recupera el foco", !el(w, '.overlay') && activo(w) === abrio);
 }
 
 console.log("\nLas reglas se adaptan al mazo");

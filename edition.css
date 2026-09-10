@@ -284,9 +284,39 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 }
 @media (prefers-reduced-motion: no-preference) {
   #app[data-screen="play-menu"] > .screen-enter { animation: none; }
-  #app[data-screen="perfil"] .screen-enter .perfil-section,
+  #app[data-screen="perfil"] .screen-enter .perfil-section { animation: profile-unroll 480ms ease-out backwards; }
   .dialog-enter .settings-modal { animation: parchment-open 480ms ease-out both; }
 }
+/* La sección Perfil es mucho más larga que un diálogo. El despliegue recorre
+   una pantalla visible, no un porcentaje de miles de píxeles de contenido. */
+@keyframes profile-unroll {
+  from { opacity: .2; clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); transform: translateY(-8px); }
+  to { opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100vh, 0 100vh); transform: translateY(0); }
+}
+.perfil-section > h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.12; margin: 10px 0 18px; }
+.perfil-section > .lead { font-size: 1rem; line-height: 1.65; margin-bottom: 26px; max-width: 62ch; }
+.perfil-section > .section-label { margin: 36px 0 18px; font-family: var(--font-display); font-size: 1.5rem; line-height: 1.3; letter-spacing: 0; text-transform: none; color: var(--edition-ink); gap: 12px; flex-wrap: wrap; }
+.perfil-section > .section-label small { font: .85rem/1.5 var(--ui-font); color: var(--edition-muted); }
+.perfil-section h3 { margin: 24px 0 14px; font-size: 1.1rem; line-height: 1.4; }
+.perfil-section h3.logro-grupo { margin-top: 28px; font: 600 .85rem/1.5 var(--ui-font); letter-spacing: .1em; color: var(--edition-brass); }
+.perfil-section .logro-grid, .perfil-section .weak-list { gap: 12px; }
+.perfil-section .logro { padding: 17px 16px; gap: 14px; }
+.perfil-section .logro b, .perfil-section .weak-row b { font-size: 1rem; line-height: 1.4; color: var(--edition-ink); }
+.perfil-section .logro small, .perfil-section .weak-row small { font-size: .85rem; line-height: 1.55; margin-top: 6px; }
+.perfil-section .weak-list + h3 { margin-top: 30px; }
+.perfil-section .perfil-stats { gap: 12px; }
+.perfil-section .perfil-stats b { font-size: 1.7rem; line-height: 1.25; }
+.perfil-section .perfil-stats small { font-size: .8rem; line-height: 1.45; margin-top: 7px; }
+.perfil-section .game-row { padding-block: 17px; }
+.perfil-section .game-name { font-size: 1.05rem; line-height: 1.4; }
+.perfil-section .game-meta { font-size: .85rem; line-height: 1.55; margin-top: 6px; }
+.guide-tools { position: sticky; top: 0; z-index: 3; display: flex; justify-content: flex-start; margin-bottom: 14px; pointer-events: none; }
+.guide-tools .guide-close { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 1.8rem; line-height: 1; background: var(--edition-surface); color: var(--edition-ink); }
+.home-shell .play-choice-block .play-choice-grid { margin-left: clamp(14px, 4vw, 28px); padding-left: 12px; border-left: 1px solid var(--edition-line); }
+.home-shell .play-choice-block .play-choice { background: linear-gradient(125deg, var(--scene-color), color-mix(in srgb, var(--scene-color) 88%, #181812)); color: #fff9ed; border-color: transparent; }
+.home-shell .play-choice-block .play-choice small { color: #f0e9db; }
+.home-shell .play-choice-block .play-choice .choice-icon { background: #f0d292; color: #6d361f; }
+.home-shell .play-choice-block .play-choice > i { color: #f0d292; }
 /* La ampliación vuelve a una columna; ningún título queda encerrado en una lámina. */
 /* Android estrecho: menos escala visual sin alterar coordenadas de arrastre,
    el zoom del navegador ni las preferencias de texto ampliado del usuario. */
