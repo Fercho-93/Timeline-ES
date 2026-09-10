@@ -14,7 +14,7 @@ documentación y futuras fichas comerciales. El objetivo es comercializarlo como
 en App Store; la versión actual es una aplicación web instalable, no una app iOS publicada.
 
 El nombre del repositorio y el nombre visible del proyecto de Firebase se administran fuera
-del código. Sigue pendiente unificarlos a **Continuum** desde sus respectivas configuraciones.
+del código. Sigue pendiente unificar el nombre visible del repositorio y del proyecto de Firebase a **Continuum** desde sus respectivas configuraciones.
 Al renombrar el repositorio, hay que comprobar de nuevo GitHub Pages y actualizar enlaces de
 invitación e instalaciones existentes: el sitio publicado no hereda automáticamente las
 redirecciones del repositorio. No se cambia ninguna dirección de servicio hasta que exista
@@ -344,8 +344,7 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
 - `PRIVACIDAD.md` es un primer borrador de la política de privacidad y `TESTERS.md` la
   guía para elegir testers y qué preguntarles; ambos listos para cuando toque repartir la
   beta, sin que haga falta tocarlos hasta entonces.
-- Sigue pendiente (decisiones o pasos que necesitan intervención humana): configurar
-  `FEEDBACK_EMAIL` en `settings.js` con la dirección de contacto real, revisión
+- Sigue pendiente (decisiones o pasos que necesitan intervención humana): revisión
   profesional de `PRIVACIDAD.md` antes de publicar, y la cuenta de pago de Apple
   Developer (con TestFlight) cuando llegue el momento de repartir la beta más allá de
   este repositorio.
