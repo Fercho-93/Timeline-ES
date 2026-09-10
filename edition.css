@@ -262,16 +262,18 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
   #app[data-screen="online-game"] .hand .hand-card { height: 145px; min-height: 145px; }
   #app[data-screen="online-game"] .hand .animal-hand-card strong { margin-top: 48px; }
 }
-@keyframes page-open {
-  from { opacity: .3; transform: perspective(1100px) rotateY(-45deg); }
-  to { opacity: 1; transform: perspective(1100px) rotateY(0); }
-}
+.book-turn { position: fixed; inset: 0; z-index: 90; overflow: hidden; pointer-events: none; perspective: 1800px; }
+.book-turn-leaf { position: absolute; inset: 0; transform-style: preserve-3d; }
+.book-turn-front, .book-turn-back { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; background: var(--edition-paper); }
+.book-turn-back { transform: rotateY(180deg); background: linear-gradient(90deg, var(--edition-paper), color-mix(in srgb, var(--edition-brass) 18%, var(--edition-paper)) 96%, var(--edition-brass)); }
+.book-turn-front::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, #fff0 65%, #fff2 88%, #87633033 100%); border-inline-end: 1px solid var(--edition-brass); }
+.book-turn-copy *, .book-turn-copy *::before, .book-turn-copy *::after { animation: none !important; transition: none !important; }
 @keyframes parchment-open {
   from { opacity: .2; clip-path: inset(0 0 95% 0 round 12px); transform: translateY(-8px); }
   to { opacity: 1; clip-path: inset(0 0 0 0 round 12px); transform: translateY(0); }
 }
 @media (prefers-reduced-motion: no-preference) {
-  #app[data-screen="play-menu"] > .screen-enter { transform-origin: left center; animation: page-open 460ms ease-out both; }
+  #app[data-screen="play-menu"] > .screen-enter { animation: none; }
   #app[data-screen="perfil"] .screen-enter .perfil-section,
   .dialog-enter .settings-modal { animation: parchment-open 480ms ease-out both; }
 }

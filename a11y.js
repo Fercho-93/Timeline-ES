@@ -97,6 +97,45 @@
   }
 
   let homePosition = null;
+  let cancelPageTurn = null;
+
+  // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino
+  // la hoja anterior girando sobre el lomo y descubriendo el destino debajo.
+  function turnPage(container, backwards) {
+    if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const layer = document.createElement("div");
+    layer.className = "book-turn";
+    layer.setAttribute("aria-hidden", "true");
+    layer.inert = true;
+    const leaf = document.createElement("div");
+    leaf.className = "book-turn-leaf";
+    leaf.style.transformOrigin = backwards ? "right center" : "left center";
+    const front = document.createElement("div");
+    front.className = "book-turn-front";
+    const copy = container.cloneNode(true);
+    copy.removeAttribute("id");
+    copy.classList.add("book-turn-copy");
+    copy.style.transform = `translateY(${-window.scrollY}px)`;
+    copy.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
+    copy.querySelectorAll(".home-nav, .overlay").forEach(node => node.remove());
+    front.append(copy);
+    const back = document.createElement("div");
+    back.className = "book-turn-back";
+    leaf.append(front, back);
+    layer.append(leaf);
+    document.body.append(layer);
+    const angle = backwards ? 1 : -1;
+    const animation = leaf.animate([
+      { transform: "rotateY(0deg)", offset: 0 },
+      { transform: `rotateY(${angle * 32}deg)`, offset: .3 },
+      { transform: `rotateY(${angle * 105}deg)`, offset: .72 },
+      { transform: `rotateY(${angle * 178}deg)`, offset: 1 }
+    ], { duration: 850, easing: "cubic-bezier(.32,.05,.18,1)", fill: "forwards" });
+    const cleanup = () => { layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
+    const cancel = () => { animation.cancel(); cleanup(); };
+    cancelPageTurn = cancel;
+    animation.finished.then(cleanup, cleanup);
+  }
 
   // Pinta y decide dónde queda el foco:
   //
@@ -109,6 +148,10 @@
   // El primer pintado no toca el foco: nadie lo tenía y moverlo al entrar sería una
   // sorpresa desagradable.
   function paint(container, html, screen) {
+    cancelPageTurn?.();
+    const leafForward = paint.screen === "home" && screen === "play-menu";
+    const leafBack = paint.screen === "play-menu" && screen === "home";
+    if (leafForward || leafBack) turnPage(container, leafBack);
     container.dataset.screen = screen;
     olvidaDialogos(container);
     const activo = document.activeElement;

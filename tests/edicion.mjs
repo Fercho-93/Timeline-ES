@@ -116,3 +116,28 @@ for (const options of [{ reduce: true }, { seen: true }]) {
   } finally { w.close(); }
 }
 console.log('Edición: ambientes, navegación, menús plegables y confirmación de competición: OK');
+{
+  const w = boot({ seen: true });
+  const turns = [];
+  try {
+    w.Element.prototype.animate = function (frames) {
+      const entry = { frames, cancelled: false };
+      if (this.classList.contains('book-turn-leaf')) turns.push(entry);
+      return { finished: new Promise(() => {}), cancel() { entry.cancelled = true; } };
+    };
+    click(w, '[data-block="historia"]');
+    click(w, '[data-mode="history"]');
+    assert.match(turns[0].frames.at(-1).transform, /-178deg/);
+    assert.equal(w.document.querySelector('.book-turn').getAttribute('aria-hidden'), 'true');
+    assert.equal(w.document.querySelector('.book-turn [id]'), null);
+    click(w, '#app [data-action="collection-back"]');
+    assert.equal(turns[0].cancelled, true);
+    assert.match(turns[1].frames.at(-1).transform, /\(178deg/);
+    assert.equal(w.document.querySelectorAll('.book-turn').length, 1);
+    w.matchMedia = () => ({ matches: true });
+    click(w, '#app [data-mode="history"]');
+    assert.equal(w.document.querySelector('.book-turn'), null);
+    assert.equal(turns.length, 2, 'movimiento reducido evita el giro');
+  } finally { w.close(); }
+}
+console.log('Paso de página: giro inverso, interrupciones y movimiento reducido: OK');
