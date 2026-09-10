@@ -1,6 +1,6 @@
 # Distribución de Continuum desde Windows
 
-Las comprobaciones de cada propuesta compilan Android y un simulador de iPhone en GitHub Actions. No requieren un Mac propio ni credenciales de tiendas. El trabajo manual de iPhone genera un IPA sin firma; no está listo para TestFlight ni para instalar directamente sin un proceso adicional de firma. El resultado de CI no sustituye una prueba física.
+Las comprobaciones de cada propuesta compilan Android y un simulador de iPhone en GitHub Actions. Además, el workflow manual de beta firmada ya ha generado y subido un IPA a TestFlight. No requieren un Mac propio ni credenciales de tiendas. El trabajo manual de iPhone genera un IPA sin firma; no está listo para TestFlight ni para instalar directamente sin un proceso adicional de firma. El resultado de CI no sustituye una prueba física.
 
 `beta-firmada.yml` prepara APK/AAB o IPA firmados cuando el titular haya configurado los
 entornos y secretos descritos. Solo se lanza manualmente; la subida a TestFlight requiere
@@ -28,7 +28,7 @@ Se necesita Apple Developer y una app en App Store Connect con identificador `co
 
 Crear un entorno de GitHub `ios-beta` con acceso restringido a la rama de lanzamiento. Guardar certificado de distribución, contraseña, perfil y clave de App Store Connect únicamente como secretos. Importar el certificado en un llavero temporal del runner, compilar un archive con el Team ID real, exportar con método `app-store-connect` y cargar a App Store Connect con la clave API. Eliminar llavero, perfil y archivos de clave en un paso `always()`. Nunca incluirlos en repositorio, logs ni artefactos. Cada subida necesita un número de compilación nuevo.
 
-La primera beta externa requiere el proceso de revisión correspondiente. Añadir las personas como testers, no como miembros administradores del equipo. La firma y la subida están pendientes: no hay credenciales aportadas ni se ha publicado una beta con esta tarea.
+La primera beta externa requiere el proceso de revisión correspondiente. Añadir las personas como testers, no como miembros administradores del equipo. La firma y la subida inicial a TestFlight ya se han ejecutado correctamente mediante GitHub Actions. Sigue pendiente la incorporación y prueba con testers externos.
 
 ## Android
 
