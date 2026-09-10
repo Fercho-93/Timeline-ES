@@ -107,7 +107,7 @@
     cancelProfileRoll?.();
     sheet.classList.add('parchment-unrolling');
     const bounds = sheet.getBoundingClientRect();
-    const height = Math.max(1, collection ? sheet.offsetHeight : window.innerHeight - bounds.top);
+    const height = Math.max(1, collection ? sheet.offsetHeight : Math.min(sheet.offsetHeight || Infinity, window.innerHeight - bounds.top));
     const edge = document.createElement("div");
     edge.className = "profile-roll-edge";
     edge.setAttribute("aria-hidden", "true");
@@ -116,17 +116,18 @@
     edge.style.top = `${bounds.top + (collection ? window.scrollY : 0)}px`;
     if (collection) edge.style.position = 'absolute';
     // Granos ligeros, sin bucle permanente ni superficie interactiva.
-    for (let index = 0; index < 24; index++) {
+    if (!collection) edge.classList.add('has-dust');
+    for (let index = 0; index < (collection ? 0 : 40); index++) {
       const grain = document.createElement('i');
       grain.className = 'parchment-dust';
       grain.style.left = `${3 + (index * 37 % 94)}%`;
-      grain.style.setProperty('--dust-drift', `${(index % 7 - 3) * 7}px`);
+      grain.style.setProperty('--dust-drift', `${(index % 7 - 3) * 12}px`);
       grain.style.animationDelay = `${index % 6 * 110}ms`;
-      grain.style.width = grain.style.height = `${index % 3 + 2}px`;
+      grain.style.width = grain.style.height = `${index % 4 + 3}px`;
       edge.append(grain);
     }
     document.body.append(edge);
-    const timing = { duration: 1700, easing: "cubic-bezier(.22,.55,.25,1)" };
+    const timing = { duration: 2300, easing: "cubic-bezier(.22,.55,.25,1)" };
     const reveal = sheet.animate([
       { clipPath: 'polygon(0 0, 100% 0, 100% 0px, 0 0px)' },
       { clipPath: `polygon(0 0, 100% 0, 100% ${height}px, 0 ${height}px)` }
@@ -142,6 +143,7 @@
     cancelProfileRoll = cancel;
     reveal.finished.then(cleanup, cleanup);
     roll.finished.catch(() => {});
+    return cancel;
   }
   let firstLocalReveal = false;
   const preparationDepth = { home: 0, "play-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
@@ -349,7 +351,8 @@
       else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
     }
     document.addEventListener("keydown", onKey);
-    pila.push({ overlay, previo, onKey, cerrable });
+    const cancelRoll = modal.classList.contains('rules') ? unrollSheet(modal) : null;
+    pila.push({ overlay, previo, onKey, cerrable, cancelRoll });
   }
 
   // Mismo criterio que Escape, para el botón/gesto Atrás de Android: si hay un diálogo
@@ -365,6 +368,7 @@
   function closeDialog() {
     const dialogo = pila.pop();
     if (!dialogo) return;
+    dialogo.cancelRoll?.();
     document.removeEventListener("keydown", dialogo.onKey);
     const anteriorEnPila = pila[pila.length - 1];
     const termina = () => {

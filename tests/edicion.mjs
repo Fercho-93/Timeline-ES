@@ -200,8 +200,8 @@ console.log('Hoja en toda la preparación, sin animar las jugadas posteriores: O
     assert.ok(w.document.querySelector('.profile-roll-edge'));
     const reveal = effects.find(effect => effect.frames[0].clipPath);
     assert.ok(reveal.target.classList.contains('shell'), 'se desenrolla la hoja completa');
-    assert.equal(reveal.timing.duration, 1700);
-    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 24);
+    assert.equal(reveal.timing.duration, 2300);
+    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 40);
     assert.match(reveal.frames[1].clipPath, new RegExp(w.innerHeight + 'px'));
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
@@ -209,8 +209,14 @@ console.log('Hoja en toda la preparación, sin animar las jugadas posteriores: O
     click(w, '[data-block="historia"]');
     assert.ok(w.document.querySelector('.collection-decks.parchment-unrolling'));
     assert.equal(w.document.querySelector('.profile-roll-edge').style.position, 'absolute');
+    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 0, 'colecciones sin polvo');
     click(w, '[data-block="historia"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
+    click(w, '[data-action="rules"]');
+    assert.ok(w.document.querySelector('.rules.parchment-unrolling'));
+    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 40, 'guía con polvo');
+    click(w, '.guide-close');
+    assert.equal(w.document.querySelector('.profile-roll-edge'), null, 'cerrar guía limpia el efecto');
     w.matchMedia = () => ({ matches: true });
     click(w, '[data-action="perfil"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
