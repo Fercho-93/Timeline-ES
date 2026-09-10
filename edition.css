@@ -85,7 +85,7 @@ html body::before {
 .collection-heading .eyebrow-line { display: none; }
 .collection-heading h2 { margin: 0; color: var(--edition-ink); font-size: 1.9rem; font-weight: 400; }
 .home-shell .hero-copy { gap: 38px; }
-.home-shell .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.home-shell .gallery { grid-template-columns: minmax(0, 1fr); gap: 18px; }
 .home-shell .gallery-panel { height: 250px; border-radius: 8px; border: 1px solid #78634366; box-shadow: var(--edition-shade); }
 .home-shell .gallery-panel::after { background: linear-gradient(180deg, #17150f40, transparent 30%, #17150f30 45%, #17150feb); }
 .home-shell .gallery-panel::before { content: ""; position: absolute; z-index: 3; inset: 9px; border: 1px solid #eee0bd55; border-radius: 3px; pointer-events: none; }
@@ -175,7 +175,7 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .collection-decks .game-row:hover, .home-nav button:hover { background: color-mix(in srgb, var(--edition-brass) 12%, var(--edition-surface)); }
 }
 @media (min-width: 960px) {
-.home-shell .gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-shell .gallery { grid-template-columns: minmax(0, 1fr); }
   .home-masthead { display: grid; grid-template-columns: 195px 1fr; align-items: center; column-gap: 26px; max-width: 650px; text-align: left; padding-block: 12px; }
   .home-crest { grid-row: 1 / 5; width: 195px; }
   .home-wordmark { align-self: end; font-size: 3.6rem; }
