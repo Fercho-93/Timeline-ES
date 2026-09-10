@@ -3,6 +3,7 @@
 
   const app = document.getElementById("app");
   app.dataset.platform = /Android/i.test(navigator.userAgent) ? "android" : "other";
+  app.dataset.device = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? "ios" : app.dataset.platform;
   const toast = document.getElementById("toast");
   const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios

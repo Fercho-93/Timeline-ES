@@ -276,6 +276,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
   #app .hand-solo { grid-template-columns: minmax(0, 230px); }
   #app[data-screen="online-game"] .hand .hand-card { height: 145px; min-height: 145px; }
   #app[data-screen="online-game"] .hand .animal-hand-card strong { margin-top: 48px; }
+  #app[data-device="ios"]:is([data-screen="online-game"], [data-screen="game"]) .hand .hand-card { height: auto; min-height: 215px; }
 }
 .book-turn { position: fixed; inset: 0; z-index: 90; overflow: hidden; pointer-events: none; perspective: 1800px; }
 .book-turn-leaf { position: absolute; inset: 0; transform-style: preserve-3d; }

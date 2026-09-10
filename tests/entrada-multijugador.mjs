@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import { JSDOM } from "jsdom";
 
 const source = fs.readFileSync(new URL("../online.js", import.meta.url), "utf8");
 const appSource = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
@@ -23,3 +24,28 @@ assert.doesNotMatch(appSource, /Volver a mi sala/, "la portada no debe mostrar e
 assert.match(appSource, /Continuar partida/, "la portada debe conservar la continuación de partidas locales");
 
 console.log("ok  el flujo de entrada prioriza unirse y oculta crear cuando hay invitación");
+
+// Ejecutar el renderizador real sin conectar los tests a una sala de producción.
+const w = new JSDOM('<div id="app"></div>', { runScripts: 'outside-only' }).window;
+try {
+  w.eval(`const appEl = document.getElementById('app');
+    const user = {uid:'yo'};
+    const roomState = {players:{otro:{name:'Ana <López>'},yo:{name:'Yo'}}};
+    const escapeHtml = s => s.replaceAll('<','&lt;').replaceAll('>','&gt;');
+    ${source.slice(source.indexOf('function showTurnChangeSplash('), source.indexOf('function anotaProgreso('))}`);
+  const result = (uid, state) => {
+    w.showTurnChangeSplash(uid, state);
+    assert.equal(w.document.querySelectorAll('[data-turn-change-splash]').length, 1);
+    return w.document.querySelector('[data-turn-change-splash]').textContent;
+  };
+  const reveal = correct => ({phase:'reveal', reveal:{playerUid:'yo',correct}});
+  assert.match(result('otro', reveal(true)), /¡Carta bien colocada!/);
+  assert.match(result('otro', reveal(false)), /Turno completado/);
+  assert.match(result('otro', {phase:'turn'}), /Cambio de turno/);
+  assert.doesNotMatch(result('otro', {phase:'turn'}), /perdido|bien colocada/);
+  assert.match(result('yo', reveal(true)), /Ahora te toca a ti/);
+  assert.doesNotMatch(result('otro', null), /perdido|bien colocada/);
+  assert.match(result('otro', {phase:'reveal',reveal:{playerUid:'tercero',correct:true}}), /Cambio de turno/);
+  assert.match(w.document.body.textContent, /Ana <López>/);
+  console.log('ok  acierto, fallo, salto, reconexión y espectadores tienen avisos coherentes');
+} finally { w.close(); }

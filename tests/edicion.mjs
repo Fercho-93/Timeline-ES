@@ -21,6 +21,11 @@ const click = (w, selector) => {
   const node = w.document.querySelector(selector);
   assert.ok(node, selector); node.click();
 };
+for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)', 'ios'], ['Mozilla/5.0 (Linux; Android 14)', 'android']]) {
+  const w = boot({userAgent});
+  try { assert.equal(w.document.getElementById('app').dataset.device, expected); }
+  finally { w.close(); }
+}
 {
   const w = boot();
   try {

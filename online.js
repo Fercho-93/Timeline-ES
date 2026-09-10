@@ -487,6 +487,7 @@ function connectToRoom(code) {
     }
     const previousTurnUid = lastObservedTurnUid;
     const previousRoomVersion = lastObservedRoomVersion;
+    const previousState = roomState;
     roomState = snapshot.data();
     CT.onlineActive = roomState.status !== "ended";
     const observedTurnUid = roomState.status === "playing"
@@ -524,7 +525,7 @@ function connectToRoom(code) {
     }
     else {
       renderGame();
-      if (turnChanged) showTurnChangeSplash(observedTurnUid);
+      if (turnChanged) showTurnChangeSplash(observedTurnUid, previousState);
     }
   }, error => {
     console.error(error);
@@ -538,15 +539,20 @@ function connectToRoom(code) {
 // instantánea que la confirma es la que cuenta. Todo lo demás —no contar las jugadas
 // ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
 // entre recargas qué versiones de la sala ya vio.
-function showTurnChangeSplash(nextUid) {
+function showTurnChangeSplash(nextUid, previousState = null) {
   const nextName = roomState?.players?.[nextUid]?.name || "el siguiente jugador";
   const isMine = nextUid === user.uid;
+  // El cambio de jugador no implica perder el turno: también ocurre al acertar.
+  // Sin un resultado confirmado, mostramos un mensaje neutral (salto o reconexión).
+  const myResult = previousState?.phase === "reveal" && previousState.reveal?.playerUid === user.uid
+    ? previousState.reveal : null;
+  const heading = isMine ? "Ahora te toca a ti" : myResult?.correct ? "¡Carta bien colocada!" : myResult ? "Turno completado" : "Cambio de turno";
   appEl.querySelector("[data-turn-change-splash]")?.remove();
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay turn-change-splash" data-turn-change-splash role="status" aria-live="assertive">
     <div class="modal turn-change-card">
-      <div class="turn-change-mark" aria-hidden="true">${isMine ? "✦" : "→"}</div>
+      <div class="turn-change-mark" aria-hidden="true">${myResult?.correct && !isMine ? "✓" : isMine ? "✦" : "→"}</div>
       <div class="eyebrow">${isMine ? "Tu turno" : "Cambio de turno"}</div>
-      <h2>${isMine ? "Ahora te toca a ti" : "Has perdido el turno"}</h2>
+      <h2>${heading}</h2>
       <p>${isMine ? "Elige una carta y colócala en la línea temporal." : `Le toca a <strong>${escapeHtml(nextName)}</strong>.`}</p>
     </div>
   </div>`);
