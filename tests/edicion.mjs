@@ -127,12 +127,14 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     };
     click(w, '[data-block="historia"]');
     click(w, '[data-mode="history"]');
-    assert.match(turns[0].frames.at(-1).transform, /-178deg/);
+    assert.equal(turns[0].frames.at(-1).transform, 'rotate3d(1, -1, 0, 178deg)');
+    assert.equal(w.document.querySelector('.book-turn-leaf').style.transformOrigin, 'left top');
     assert.equal(w.document.querySelector('.book-turn').getAttribute('aria-hidden'), 'true');
     assert.equal(w.document.querySelector('.book-turn [id]'), null);
     click(w, '#app [data-action="collection-back"]');
     assert.equal(turns[0].cancelled, true);
-    assert.match(turns[1].frames.at(-1).transform, /\(178deg/);
+    assert.equal(turns[1].frames.at(-1).transform, 'rotate3d(1, -1, 0, -178deg)');
+    assert.equal(w.document.querySelector('.book-turn-leaf').style.transformOrigin, 'right bottom');
     assert.equal(w.document.querySelectorAll('.book-turn').length, 1);
     w.matchMedia = () => ({ matches: true });
     click(w, '#app [data-mode="history"]');

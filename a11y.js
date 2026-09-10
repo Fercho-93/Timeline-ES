@@ -100,7 +100,7 @@
   let cancelPageTurn = null;
 
   // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino
-  // la hoja anterior girando sobre el lomo y descubriendo el destino debajo.
+  // la hoja anterior levantándose desde una esquina y descubriendo el destino debajo.
   function turnPage(container, backwards) {
     if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const layer = document.createElement("div");
@@ -109,7 +109,7 @@
     layer.inert = true;
     const leaf = document.createElement("div");
     leaf.className = "book-turn-leaf";
-    leaf.style.transformOrigin = backwards ? "right center" : "left center";
+    leaf.style.transformOrigin = backwards ? "right bottom" : "left top";
     const front = document.createElement("div");
     front.className = "book-turn-front";
     const copy = container.cloneNode(true);
@@ -124,12 +124,14 @@
     leaf.append(front, back);
     layer.append(leaf);
     document.body.append(layer);
-    const angle = backwards ? 1 : -1;
+    // El eje oblicuo levanta la esquina inferior derecha hacia la superior
+    // izquierda; al volver, el pivote y el signo invierten el recorrido.
+    const angle = backwards ? -1 : 1;
     const animation = leaf.animate([
-      { transform: "rotateY(0deg)", offset: 0 },
-      { transform: `rotateY(${angle * 32}deg)`, offset: .3 },
-      { transform: `rotateY(${angle * 105}deg)`, offset: .72 },
-      { transform: `rotateY(${angle * 178}deg)`, offset: 1 }
+      { transform: "rotate3d(1, -1, 0, 0deg)", offset: 0 },
+      { transform: `rotate3d(1, -1, 0, ${angle * 32}deg)`, offset: .3 },
+      { transform: `rotate3d(1, -1, 0, ${angle * 105}deg)`, offset: .72 },
+      { transform: `rotate3d(1, -1, 0, ${angle * 178}deg)`, offset: 1 }
     ], { duration: 1200, easing: "cubic-bezier(.32,.05,.18,1)", fill: "forwards" });
     const cleanup = () => { layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
     const cancel = () => { animation.cancel(); cleanup(); };
