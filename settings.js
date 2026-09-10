@@ -90,7 +90,7 @@
 
       <section class="settings-section">
         <h2>Comentarios</h2>
-        <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Privacidad y datos</a></p>
+        <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html#arte" target="_blank" rel="noopener noreferrer">Privacidad, datos y procedencia del arte</a></p>
         <div class="field">
           <label for="feedback-note">Comentario para la beta</label>
           <textarea id="feedback-note" rows="3" maxlength="4000" placeholder="Qué ocurrió y qué esperabas"></textarea>
