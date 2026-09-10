@@ -224,7 +224,7 @@ console.log("\nLa pantalla del perfil");
   ok("todos los logros se pintan aunque estén bloqueados", w.document.querySelectorAll(".logro").length === w.CONTINUUM.Progreso.ACHIEVEMENTS.length);
   ok("ninguno aparece como conseguido", w.document.querySelectorAll(".logro.unlocked").length === 0);
   ok("sin cartas jugadas no se inventa un punto débil", !existe(w, ".weak-row"));
-  click(w, '[data-action="home"]');
+  click(w, '[data-action="back-menu"]');
   ok("se vuelve a la portada", existe(w, ".home-masthead"));
 }
 {

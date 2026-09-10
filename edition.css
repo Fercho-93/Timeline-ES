@@ -190,7 +190,7 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .home-shell:not(.play-menu-shell) .topbar { align-items: center; margin: 0; border: 0; }
   .home-shell:not(.play-menu-shell) .topbar-actions { width: auto; background: transparent; border: 1px solid var(--edition-line); box-shadow: none; border-radius: 6px; }
   .topbar-actions { background: var(--edition-surface); border-color: var(--edition-line); box-shadow: none; }
-  .home-shell:not(.play-menu-shell) .home-masthead { margin-top: -8px; }
+  .home-shell:not(.play-menu-shell) .home-masthead { margin-top: 24px; }
   .home-shell:not(.play-menu-shell) .topbar-actions::after { background: var(--edition-line); }
   .home-shell .gallery { gap: 12px; }
   .home-shell .gallery-panel { height: 225px; }
@@ -207,6 +207,47 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .quick-actions { margin-bottom: 28px; }
 }
 @media (max-width: 359px) { .home-shell .gallery { grid-template-columns: minmax(0, 1fr); } }
+/* Presentación de menús para la prueba móvil de septiembre. */
+#app[data-screen="home"] .topbar { justify-content: center; align-items: center; }
+#app[data-screen="home"] .topbar-actions { display: flex; justify-content: center; width: auto; padding: 0; border: 0; background: transparent; }
+#app[data-screen="home"] .topbar-actions::after { content: none; }
+#app[data-screen="home"] .topbar-actions .icon-btn { width: auto; min-width: 100px; border: 1px solid var(--edition-line); border-radius: 9px; background: var(--edition-surface); }
+#app[data-screen="home"] .home-masthead { margin-top: 24px; }
+.home-shell .gallery-panel, .collection-decks .game-row {
+  box-shadow: inset 0 1px 0 #fff3, 0 2px 3px #0001, 0 7px 16px #0002;
+  border-bottom: 2px solid var(--edition-line);
+}
+.collection-decks .game-row { border-radius: 9px; margin-block: 10px; padding: 15px; }
+html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(--edition-brass) 24%, var(--edition-surface)); box-shadow: inset 0 1px 3px #0002; }
+#app[data-screen="perfil"] > .shell { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+.solo-home .solo-intro { margin-bottom: 14px; }
+.solo-home .solo-intro .lead { font-size: .9rem; line-height: 1.45; margin-block: 8px 14px; }
+.solo-home .solo-fold { padding: 0; margin-block: 12px; }
+.solo-fold summary { cursor: pointer; padding: 17px 16px; min-height: 54px; }
+.solo-fold summary h3 { display: inline; margin: 0 8px; font-size: 1.05rem; }
+.solo-fold summary time { font-size: .7rem; color: var(--edition-muted); }
+.solo-fold-body { padding: 0 16px 18px; }
+#app .hand-solo { grid-template-columns: minmax(0, 300px); justify-content: center; }
+#app .hand-solo .hand-card { min-height: 300px; }
+#app .hand-solo .animal-hand-card { aspect-ratio: 2 / 3; min-height: 0; width: 100%; }
+@media (max-width: 600px) {
+  #app .hand-solo { grid-template-columns: minmax(0, 230px); }
+  #app[data-screen="online-game"] .hand .hand-card { height: 145px; min-height: 145px; }
+  #app[data-screen="online-game"] .hand .animal-hand-card strong { margin-top: 48px; }
+}
+@keyframes page-open {
+  from { opacity: .3; transform: perspective(1100px) rotateY(-45deg); }
+  to { opacity: 1; transform: perspective(1100px) rotateY(0); }
+}
+@keyframes parchment-open {
+  from { opacity: .2; clip-path: inset(0 0 95% 0 round 12px); transform: translateY(-8px); }
+  to { opacity: 1; clip-path: inset(0 0 0 0 round 12px); transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  #app[data-screen="play-menu"] > .screen-enter { transform-origin: left center; animation: page-open 460ms ease-out both; }
+  #app[data-screen="perfil"] .screen-enter .perfil-section,
+  .dialog-enter .settings-modal { animation: parchment-open 480ms ease-out both; }
+}
 /* La ampliación vuelve a una columna; ningún título queda encerrado en una lámina. */
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-shell .gallery { grid-template-columns: minmax(0, 1fr); }
 :root:is([data-text-size="150"], [data-text-size="200"]) .collection-entry.active { display: block; }

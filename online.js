@@ -27,6 +27,8 @@ const abreCapa = (capa, cerrable) => CT.openDialog(capa, cerrable);
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 let user = null;
+let returnToMenu = null;
+let entryRequest = 0;
 let roomCode = "";
 let roomRef = null;
 let roomState = null;
@@ -365,14 +367,18 @@ async function ensureAuth() {
 }
 
 export async function openOnlineMode(options = {}) {
+  const request = ++entryRequest;
+  returnToMenu = typeof options.onBack === "function" ? options.onBack : null;
   selectedModeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
   renderEntry(cleanCode(options.roomCode));
   await ensureAuth();
+  if (request !== entryRequest) return;
   const invited = cleanCode(options.roomCode);
   if (!invited) return;
   try {
     const reference = doc(db, "rooms", invited);
     const snapshot = await getDoc(reference);
+    if (request !== entryRequest) return;
     if (snapshot.exists() && snapshot.data().playerOrder.includes(user.uid)) {
       connectToRoom(invited);
     }
@@ -1298,7 +1304,8 @@ document.addEventListener("click", event => {
   const target = event.target.closest("[data-online-action]");
   if (!target) return;
   const action = target.dataset.onlineAction;
-  if (action === "back" || action === "leave") leaveOnline();
+  if (action === "back" && !roomRef && returnToMenu) { entryRequest++; CT.onlineActive = false; returnToMenu(); }
+  else if (action === "back" || action === "leave") leaveOnline();
   else if (action === "claim-host") claimHost();
   else if (action === "review-timeline") renderTimelineReview();
   else if (action === "back-from-timeline") renderWinner();

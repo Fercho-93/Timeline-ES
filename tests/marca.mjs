@@ -59,7 +59,8 @@ try {
   openFormat("multi");
   click("setup");
   checkScreen("Configuración");
-  click("home");
+  click("back-menu");
+  click("collection-back");
   openSelectedCollection();
   click("set-mode");
   click("solo");

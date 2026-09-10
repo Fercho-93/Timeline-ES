@@ -42,6 +42,7 @@ try {
   // Cerrar en medio de la ronda mantiene exactamente el reparto.
   w = open(entries(w)); click(w, "resume-competition");
   assert.deepEqual(saved(w).solo, beforePlay);
+  click(w, "comp-confirm-resume");
   const ct = w.CONTINUUM;
   const cards = new Map(state.solo.savedDeck.map(c => [c.id, c]));
   const at = ct.correctIndex(state.solo.mode, state.solo.timeline.map(id => cards.get(id)), cards.get(state.solo.current));
@@ -49,6 +50,7 @@ try {
   click(w, "confirm-place");
   state = saved(w); assert.equal(state.solo.hits, 1); assert.ok(state.solo.pendingResult);
   w = open(entries(w)); click(w, "resume-competition");
+  click(w, "comp-confirm-resume");
   assert.ok(w.document.querySelector('[data-action="solo-next"]'));
   assert.equal(saved(w).solo.hits, 1);
   click(w, "solo-next"); assert.equal(saved(w).solo.played, 1);
@@ -57,6 +59,7 @@ try {
   assert.ok(w.document.querySelector('[data-action="resume-competition"]'));
   // Jugar el resto: cada resultado y cada cambio de tema sobrevive a recargar.
   click(w, "resume-competition");
+  click(w, "comp-confirm-resume");
   let steps = 0;
   while (!saved(w).finished && steps++ < 100) {
     state = saved(w);

@@ -11,9 +11,29 @@
   const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
   const paint = html => {
-    const sceneMode = screen === "enciclopedia" ? encMode : screen === "comp-intro" ? comp?.queue[0] : selectedModeKey;
+    const sceneMode = screen === "enciclopedia" ? encMode : selectedModeKey;
     CT.Scene.apply(sceneMode, screen);
     CT.paint(app, html, screen);
+    if (screen === "solo-home") {
+      app.querySelectorAll(".solo-panel").forEach(panel => {
+        const details = document.createElement("details");
+        details.className = "panel solo-panel solo-fold";
+        details.name = "solo-options";
+        const summary = document.createElement("summary");
+        const heading = panel.querySelector(".solo-panel-head");
+        summary.append(...heading.childNodes);
+        heading.remove();
+        details.append(summary);
+        const body = document.createElement("div");
+        body.className = "solo-fold-body";
+        body.append(...panel.childNodes);
+        details.append(body);
+        panel.replaceWith(details);
+        details.addEventListener("toggle", () => {
+          if (details.open) app.querySelectorAll(".solo-fold").forEach(other => { if (other !== details) other.open = false; });
+        });
+      });
+    }
   };
   // Y las capas se abren como diálogos: foco dentro, tabulador atrapado, Escape cierra.
   // `cerrable` distingue las capas que se pueden descartar —las reglas, el menú— de las
@@ -47,9 +67,12 @@
   // o al perfil si se llegó desde un punto débil. Sin esto, «Volver» siempre mandaba al
   // inicio, deshaciendo de un toque la navegación que trajo hasta aquí.
   let encReturn = "home";
+  let reviewReturnView = null;
   // La portada empieza mostrando la colección, no un mazo abierto. Un toque descubre
   // una categoría y enseña directamente los mazos que contiene.
   let collectionOpen = false;
+  let homeDestination = "home";
+  let profileReturn = "home";
   let collectionDetails = false;
   // Qué bloque de formato está desplegado en el menú del mazo: "multi", "solo" o
   // ninguno de los dos. Empiezan los dos cerrados, como la colección de la portada.
@@ -230,8 +253,8 @@
   // El perfil entra por aquí y no por la cabecera: es un destino de la portada, como la
   // colección, y la barra de arriba ya tiene su trabajo con las acciones de cada pantalla.
   function homeNav() {
-    const homeActive = screen === "home" && !collectionOpen;
-    const collectionActive = screen === "home" && collectionOpen;
+    const homeActive = screen === "home" && homeDestination === "home";
+    const collectionActive = screen === "home" && homeDestination === "collection";
     const profileActive = screen === "perfil";
     return `<nav class="home-nav" aria-label="Navegación de inicio">
       <button data-action="home-top"${homeActive ? ' aria-current="page"' : ''} aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
@@ -239,6 +262,15 @@
       <button data-action="perfil"${profileActive ? ' aria-current="page"' : ''} aria-label="Ver tu perfil"><span aria-hidden="true">★</span><small>Perfil</small></button>
       <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
     </nav>`;
+  }
+
+  function backMenu() {
+    if (["setup", "solo-home", "online-loading", "online-error"].includes(screen)) playMenu();
+    else if (screen === "play-menu") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
+    else if (screen === "enciclopedia") app.querySelector('[data-action="enc-back"]')?.click();
+    else if (screen === "perfil" && profileReturn === "play-menu") playMenu();
+    else if (screen === "perfil" && profileReturn === "solo-home") soloHome();
+    else home();
   }
 
   function quickActions() {
@@ -368,7 +400,7 @@
 
   function setup() {
     screen = "setup";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
@@ -856,6 +888,7 @@
   // La pantalla de fin solo enseñaba lo fallado: quien gana su partida también quiere
   // repasar la línea entera tal y como quedó, no solo lo que se le atragantó por el camino.
   function timelineReviewScreen(ids, mode, actionsHtml) {
+    reviewReturnView = () => timelineReviewScreen(ids, mode, actionsHtml);
     screen = "timeline-review";
     paint(`<div class="shell">${header()}<section>
       <div class="eyebrow">Línea de tiempo completa</div>
@@ -876,6 +909,7 @@
   // competición mezcla fallos de varios temas y cada uno se formatea con las reglas de
   // su propio eje (fecha, superficie o población).
   function reviewScreen(items, actionsHtml) {
+    reviewReturnView = () => reviewScreen(items, actionsHtml);
     screen = "review";
     const counts = new Map();
     items.forEach(({ id, mode }) => counts.set(id, { mode, veces: (counts.get(id)?.veces || 0) + 1 }));
@@ -1055,11 +1089,12 @@
   }
 
   function perfilView() {
+    if (screen !== "perfil" && screen !== "enciclopedia") profileReturn = screen;
     screen = "perfil";
     const resumen = CT.Progreso.summary();
     const filas = CT.Progreso.modeRows();
     const estrenado = resumen.cards > 0 || resumen.games > 0;
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
         <div class="eyebrow"><span class="eyebrow-line"></span> Tu progreso</div>
         <h1 data-focus tabindex="-1">Perfil</h1>
@@ -1214,7 +1249,7 @@
     const doneToday = records.days && records.days[today()];
     const mode = currentMode();
     const pendiente = solo && solo.kind === "free";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
         <p class="lead">Coloca las cartas tú solo. Tienes ${SOLO_LIVES} vidas: cada fallo te cuesta una. Salvo en el duelo, donde se juegan las ${CT.Duelo.CARTAS} cartas siempre.</p></div>
         <div class="panel solo-panel">
@@ -1509,7 +1544,7 @@
     const { mode, total, rival } = pendingDuel;
     const juego = CT.mode(mode);
     const quien = rival.nombre || "Alguien";
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="pass-screen"><div class="panel">
         <div class="big-icon">⚔️</div>
         <div class="eyebrow">Duelo</div>
@@ -1631,13 +1666,14 @@
       return saved.finished ? null : saved;
     } catch { CT.Storage.protect(COMP_KEY); return null; }
   }
-  function resumeCompetition() {
+  function resumeCompetition(confirmed = false) {
     comp = loadCompetition();
     if (!comp) { home(); return; }
     previousModeKey = comp.previousModeKey;
     solo = comp.solo; pendingIndex = null; result = null;
     if (!solo) { compRoundIntro(); return; }
     selectedModeKey = solo.mode;
+    if (!confirmed) { compRoundIntro(true); return; }
     cardsById = new Map(solo.savedDeck.map(card => [card.id, card]));
     if (solo.pendingResult) {
       result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true };
@@ -1657,14 +1693,16 @@
   // no dice nada más que a qué se va a jugar. Nada de dificultad, marcador ni número de
   // cartas —eso ya se ve dentro de la partida—: un cartel, un botón y a jugar. No se
   // retira solo; hace falta tocar «Empezar», igual en el primer tema que en los demás.
-  function compRoundIntro() {
+  function compRoundIntro(resuming = false) {
     screen = "comp-intro";
+    const introMode = resuming ? solo.mode : comp.queue[0];
+    selectedModeKey = introMode;
     saveCompetition();
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="abandon-comp">Salir</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
-      <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(comp.queue[0]).art, true)}</div>
+      <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(introMode).art, true)}</div>
       <div class="chapter-number">Tema ${comp.roundsSummary.length + 1} de ${comp.totalThemes}</div>
-      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Vas a jugar a</span>${escapeHtml(CT.mode(comp.queue[0]).name)}</h2>
-      <button class="btn btn-block comp-splash-start" data-action="comp-next-round">Empezar</button>
+      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">${resuming ? "Vas a continuar" : "Vas a jugar a"}</span>${escapeHtml(CT.mode(introMode).name)}</h2>
+      <button class="btn btn-block comp-splash-start" data-action="${resuming ? "comp-confirm-resume" : "comp-next-round"}">${resuming ? "Continuar partida" : "Empezar"}</button>
     </div></section></div>`);
   }
 
@@ -1773,7 +1811,7 @@
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
     try {
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey });
+      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, onBack: playMenu });
     } catch (error) {
       console.error(error);
       screen = "online-error";
@@ -1831,9 +1869,10 @@
     if (action === "retry-online") launchOnline();
     else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
     else if (action === "home") home();
-    else if (action === "home-top") window.scrollTo({ top: 0, behavior: "smooth" });
-    else if (action === "home-collection") document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; home(); }
+    else if (action === "back-menu") backMenu();
+    else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    else if (action === "home-collection") { homeDestination = "collection"; home(); document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
     else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
     else if (action === "set-block") {
       const sameOpenBlock = collectionOpen && target.dataset.block === selectedBlockKey;
@@ -1844,6 +1883,7 @@
         return;
       }
       setBlock(target.dataset.block);
+      homeDestination = "collection";
       collectionOpen = true;
       collectionDetails = true;
       home();
@@ -1919,12 +1959,13 @@
     else if (action === "resume-competition") resumeCompetition();
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
+    else if (action === "comp-confirm-resume") resumeCompetition(true);
     else if (action === "abandon-comp") abandonCompetition();
     else if (action === "enciclopedia") openEnciclopedia(selectedModeKey, { returnTo: "play-menu" });
-    else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: "perfil" });
+    else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
     else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
-    else if (action === "enc-back") { if (encReturn === "play-menu") playMenu(); else if (encReturn === "perfil") perfilView(); else home(); }
+    else if (action === "enc-back") { if (encReturn === "review" && reviewReturnView) reviewReturnView(); else if (encReturn === "play-menu") playMenu(); else if (encReturn === "perfil") perfilView(); else home(); }
     else if (action === "perfil") perfilView();
     else if (action === "perfil-export") perfilExport();
     else if (action === "perfil-import") perfilImport();
@@ -1938,13 +1979,17 @@
   // nativo (Capacitor lo inyecta al arrancar la WebView), así que esto no toca la versión
   // web ni iOS, que no lo tienen. Un diálogo abierto se cierra como con Escape; una partida
   // en curso pregunta antes de abandonarla, igual que el resto del juego; cualquier otra
-  // pantalla vuelve al inicio; y desde el inicio, el gesto cierra la aplicación.
+  // pantalla recupera su menú anterior; desde el inicio, el gesto cierra la aplicación.
   if (window.Capacitor?.isNativePlatform?.()) {
     const nativeApp = window.Capacitor.registerPlugin?.('App') || window.Capacitor.Plugins?.App;
     nativeApp?.addListener?.("backButton", () => {
       if (CT.backPressed()) return;
-      if (screen === "game") { gameMenu(); return; }
-      if (screen !== "home") { home(); return; }
+      if (["game", "pass", "pulse-pass"].includes(screen)) { gameMenu(); return; }
+      if (["solo", "comp-intro"].includes(screen)) {
+        app.querySelector('[data-action="solo-menu"], [data-action="game-menu"], [data-action="abandon-comp"]')?.click();
+        return;
+      }
+      if (screen !== "home") { backMenu(); return; }
       nativeApp.exitApp();
     });
   }

@@ -187,6 +187,8 @@ console.log("\nEl repaso enlaza con la enciclopedia");
   ok("la enciclopedia abre en el mazo de la carta fallada", w.document.getElementById("enc-mode-select").value === cardMode);
   const carta = w.document.querySelector(`[data-enc-card="${cardId}"]`);
   ok("la carta fallada aparece destacada", !!carta && carta.classList.contains("enc-card-highlight"));
+  click(w, '[data-action="enc-back"]');
+  ok("Volver recupera el repaso, no abre Perfil", w.document.getElementById("app").dataset.screen === "review");
 }
 
 console.log(`\n${fail} fallos`);

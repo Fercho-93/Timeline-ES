@@ -4,13 +4,14 @@ import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = read('index.html');
-function boot({ reduce = false, seen = false } = {}) {
+function boot({ reduce = false, seen = false, saved = {} } = {}) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {
     runScripts: 'outside-only', url: 'https://continuum.test/'
   }).window;
   w.scrollTo = () => {};
   w.Element.prototype.scrollIntoView = () => {};
   w.matchMedia = () => ({ matches: reduce });
+  for (const [key, value] of Object.entries(saved)) w.localStorage.setItem(key, value);
   if (seen) w.localStorage.setItem('continuum-splash-seen-v2', '1');
   for (const m of html.matchAll(/<script src="([^"]+)"><\/script>/g)) w.eval(read(m[1]));
   return w;
@@ -31,7 +32,8 @@ const click = (w, selector) => {
       assert.equal(w.document.documentElement.dataset.scene, block.art);
       assert.ok(w.document.querySelector('.hand-card'), 'el ambiente no sustituye la partida');
       click(w, '[data-action="solo-menu"]');
-      click(w, '[data-action="home"]');
+      click(w, '[data-action="back-menu"]');
+      click(w, '[data-action="collection-back"]');
       assert.equal(w.document.documentElement.dataset.scene, 'archive');
     }
     click(w, '[data-action="start-competition"]');
@@ -58,4 +60,59 @@ for (const options of [{ reduce: true }, { seen: true }]) {
     assert.ok(w.document.querySelector('[data-action="rules"]'), 'la aplicación sigue disponible');
   } finally { w.close(); }
 }
-console.log('Edición: seis ambientes, regreso, competición, apertura reducida y teclado: OK');
+{
+  const w = boot({ seen: true });
+  try {
+    const doc = w.document;
+    click(w, '[data-action="perfil"]');
+    click(w, '[data-action="home-collection"]');
+    assert.equal(doc.getElementById('app').dataset.screen, 'home');
+    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-collection');
+    click(w, '[data-block="historia"]');
+    click(w, '[data-mode="history"]');
+    click(w, '[data-action="solo"]');
+    const folds = [...doc.querySelectorAll('.solo-fold')];
+    assert.equal(folds.length, 3);
+    assert.ok(folds.every(fold => !fold.open && fold.querySelector('summary')));
+    folds[0].open = true;
+    folds[0].dispatchEvent(new w.Event('toggle'));
+    folds[1].open = true;
+    folds[1].dispatchEvent(new w.Event('toggle'));
+    assert.equal(folds[0].open, false);
+    click(w, '[data-action="back-menu"]');
+    assert.equal(doc.getElementById('app').dataset.screen, 'play-menu');
+    click(w, '[data-format="multi"]');
+    click(w, '[data-action="setup"]');
+    click(w, '[data-action="back-menu"]');
+    assert.equal(doc.getElementById('app').dataset.screen, 'play-menu');
+    click(w, '[data-action="collection-back"]');
+    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-collection');
+    click(w, '[data-action="home-top"]');
+    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-top');
+  } finally { w.close(); }
+}
+{
+  const key = 'continuum-competition-v1';
+  let w = boot({ seen: true });
+  let saved;
+  try {
+    click(w, '[data-action="start-competition"]');
+    assert.equal(w.document.querySelector('.hand-card'), null);
+    click(w, '[data-action="comp-next-round"]');
+    saved = w.localStorage.getItem(key);
+  } finally { w.close(); }
+  w = boot({ seen: true, saved: { [key]: saved } });
+  try {
+    click(w, '[data-action="resume-competition"]');
+    assert.ok(w.document.querySelector('.comp-splash'));
+    assert.equal(w.document.querySelector('.hand-card'), null);
+    const before = JSON.parse(saved);
+    assert.equal(w.document.documentElement.dataset.scene, w.CONTINUUM.blockOf(before.solo.mode).art);
+    click(w, '[data-action="comp-confirm-resume"]');
+    const after = JSON.parse(w.localStorage.getItem(key));
+    assert.deepEqual(after.queue, before.queue);
+    assert.equal(after.solo.current, before.solo.current);
+    assert.ok(w.document.querySelector('.hand-card'));
+  } finally { w.close(); }
+}
+console.log('Edición: ambientes, navegación, menús plegables y confirmación de competición: OK');
