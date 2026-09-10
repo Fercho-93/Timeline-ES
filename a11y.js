@@ -98,6 +98,9 @@
 
   let homePosition = null;
   let cancelPageTurn = null;
+  let firstLocalReveal = false;
+  const preparationDepth = { home: 0, "play-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
+  const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
 
   // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino
   // la hoja anterior levantándose desde una esquina y descubriendo el destino debajo.
@@ -171,9 +174,14 @@
   // sorpresa desagradable.
   function paint(container, html, screen) {
     cancelPageTurn?.();
-    const leafForward = paint.screen === "home" && screen === "play-menu";
-    const leafBack = paint.screen === "play-menu" && screen === "home";
-    if (leafForward || leafBack) turnPage(container, leafBack);
+    const previousDepth = preparationDepth[paint.screen];
+    const nextDepth = preparationDepth[screen];
+    const changed = paint.screen !== screen;
+    const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
+    const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
+    if (preparationTurn || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
+    if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
+    else if (changed && screen !== "pass") firstLocalReveal = false;
     container.dataset.screen = screen;
     olvidaDialogos(container);
     const activo = document.activeElement;

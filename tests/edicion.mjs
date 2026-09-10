@@ -163,3 +163,27 @@ for (const userAgent of ['Mozilla/5.0 (Linux; Android 14; Samsung)', 'Mozilla/5.
   }
 }
 console.log('Vista Android compacta: detección independiente y ampliación del usuario conservada: OK');
+{
+  const w = boot({ seen: true });
+  const turns = [];
+  try {
+    w.Element.prototype.animate = function (frames) {
+      if (this.classList.contains('book-turn-leaf')) turns.push(frames);
+      return { finished: new Promise(() => {}), cancel() {} };
+    };
+    const render = screen => w.CONTINUUM.paint(w.document.getElementById('app'), '<div class="shell"><h2 data-focus tabindex="-1">Pantalla</h2></div>', screen);
+    for (const screen of ['play-menu', 'setup', 'pass', 'game']) render(screen);
+    assert.equal(turns.length, 4, 'cada paso hasta la primera mano gira la hoja');
+    for (const screen of ['game', 'pass', 'game']) render(screen);
+    assert.equal(turns.length, 4, 'las jugadas y los siguientes turnos no giran la hoja');
+    render('home'); render('play-menu'); render('solo-home'); render('solo');
+    assert.equal(turns.length, 7, 'solitario incluye la entrada a partida');
+    render('home'); render('comp-intro'); render('solo');
+    assert.equal(turns.length, 9, 'competición incluye el cartel y el inicio');
+    render('home'); render('play-menu'); render('online-loading'); render('online-entry'); render('online-lobby'); render('online-game');
+    assert.equal(turns.length, 14, 'la preparación online completa usa el efecto');
+    render('home'); render('play-menu'); render('setup'); render('play-menu');
+    assert.match(turns.at(-1).at(-1).transform, /-178deg/);
+  } finally { w.close(); }
+}
+console.log('Hoja en toda la preparación, sin animar las jugadas posteriores: OK');

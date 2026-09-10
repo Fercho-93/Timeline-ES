@@ -257,6 +257,12 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 #app .hand-solo { grid-template-columns: minmax(0, 300px); justify-content: center; }
 #app .hand-solo .hand-card { min-height: 300px; }
 #app .hand-solo .animal-hand-card { aspect-ratio: 2 / 3; min-height: 0; width: 100%; }
+/* El título se apoya en el pie, dejando libre el centro de la ilustración.
+   Flujo flexible en vez de coordenadas fijas: admite títulos largos y texto grande. */
+#app[data-platform][data-screen] .hand .hand-card { display: flex; flex-direction: column; align-items: stretch; }
+#app[data-platform][data-screen] .hand .hand-card > strong { margin-top: auto; margin-bottom: 0; flex-shrink: 0; }
+#app[data-platform][data-screen] .hand .hand-card > .hidden-date { margin-bottom: 12px; }
+#app[data-platform][data-screen] .hand .hand-card > .card-arrow { left: auto; right: 12px; top: 10px; bottom: auto; }
 @media (max-width: 600px) {
   #app .hand-solo { grid-template-columns: minmax(0, 230px); }
   #app[data-screen="online-game"] .hand .hand-card { height: 145px; min-height: 145px; }
