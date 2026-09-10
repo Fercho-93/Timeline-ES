@@ -200,11 +200,17 @@ console.log('Hoja en toda la preparación, sin animar las jugadas posteriores: O
     assert.ok(w.document.querySelector('.profile-roll-edge'));
     const reveal = effects.find(effect => effect.frames[0].clipPath);
     assert.ok(reveal.target.classList.contains('shell'), 'se desenrolla la hoja completa');
-    assert.equal(reveal.timing.duration, 1200);
+    assert.equal(reveal.timing.duration, 1700);
+    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 24);
     assert.match(reveal.frames[1].clipPath, new RegExp(w.innerHeight + 'px'));
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     assert.ok(reveal.cancelled);
+    click(w, '[data-block="historia"]');
+    assert.ok(w.document.querySelector('.collection-decks.parchment-unrolling'));
+    assert.equal(w.document.querySelector('.profile-roll-edge').style.position, 'absolute');
+    click(w, '[data-block="historia"]');
+    assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     w.matchMedia = () => ({ matches: true });
     click(w, '[data-action="perfil"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);

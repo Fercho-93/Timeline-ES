@@ -1900,6 +1900,7 @@
         const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
         abierta.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
       }, 0);
+      CT.unrollCollection(app.querySelector('.collection-decks'));
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; playMenu(); }

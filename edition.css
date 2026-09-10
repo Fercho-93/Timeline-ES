@@ -290,6 +290,10 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 /* La sección Perfil es mucho más larga que un diálogo. El despliegue recorre
    una pantalla visible, no un porcentaje de miles de píxeles de contenido. */
 .profile-roll-edge { position: fixed; height: 28px; z-index: 95; pointer-events: none; border-radius: 50% / 18%; background: linear-gradient(to bottom, var(--edition-line), var(--edition-paper) 18%, var(--edition-surface) 43%, var(--edition-paper) 65%, var(--edition-brass) 96%, var(--edition-line)); box-shadow: 0 5px 10px #302d2726; }
+.collection-decks, .collection-decks .game-row { animation: none !important; }
+.parchment-dust { position: absolute; top: 22px; border-radius: 50%; background: var(--edition-brass); opacity: 0; pointer-events: none; animation: parchment-dust-fall 850ms ease-out 2; }
+@keyframes parchment-dust-fall { 0% { opacity: 0; transform: translate(0, 0) scale(.5); } 22% { opacity: .45; } 100% { opacity: 0; transform: translate(var(--dust-drift), 48px) scale(.2); } }
+@media (prefers-reduced-motion: reduce) { .parchment-dust { display: none; animation: none; } }
 .perfil-section > h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.12; margin: 10px 0 18px; }
 .perfil-section > .lead { font-size: 1rem; line-height: 1.65; margin-bottom: 26px; max-width: 62ch; }
 .perfil-section > .section-label { margin: 36px 0 18px; font-family: var(--font-display); font-size: 1.5rem; line-height: 1.3; letter-spacing: 0; text-transform: none; color: var(--edition-ink); gap: 12px; flex-wrap: wrap; }
