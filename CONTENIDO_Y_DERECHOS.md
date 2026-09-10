@@ -8,7 +8,7 @@ Una muestra revisada durante este trabajo ya muestra por qué importa: Animal Di
 
 Fuentes consultadas para orientar las revisiones: https://animaldiversity.org/accounts/Apis_mellifera/ y https://pmc.ncbi.nlm.nih.gov/articles/PMC6131963/ .
 
-Para el arte, incorporar al inventario: autor o generador, fecha, origen, condiciones aplicables y autorización de uso comercial. Mantener la evidencia fuera de los recursos distribuidos si contiene datos privados. Revisar también tipografías, textos y dependencias. Los PNG de Inventos se han convertido a WebP sin cambiar sus píxeles; sus originales permanecen en el historial de Git.
+Para el arte, consultar `PROCEDENCIA_ARTE_IA.md` y `docs/inventario-arte.json`. El titular declara que todos los recursos visuales incorporados fueron generados con ChatGPT/OpenAI. El inventario identifica esa procedencia y conserva huellas SHA-256; los prompts y fechas individuales no se han recuperado de forma completa y deben conservarse cuando existan. La procedencia de la imagen no sustituye la revisión de términos comerciales del servicio ni la revisión independiente de textos, datos, marcas o elementos de terceros. Mantener la evidencia fuera de los recursos distribuidos si contiene datos privados. Revisar también tipografías, textos y dependencias. Los PNG de Inventos se han convertido a WebP sin cambiar sus píxeles; sus originales permanecen en el historial de Git.
 
 Las cartas con referencias deben mostrar el mismo criterio que se usa para ordenar. Los datos aproximados no deben presentarse como récords exactos ni compararse como si fueran medidas homogéneas. Las fuentes y los avisos pendientes se revisan editorialmente antes de ampliar la beta; no se considera terminada esta validación por haber creado el inventario.
 
