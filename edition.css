@@ -285,7 +285,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 /* Android estrecho: menos escala visual sin alterar coordenadas de arrastre,
    el zoom del navegador ni las preferencias de texto ampliado del usuario. */
 @media (max-width: 420px) {
-  :root[data-platform="android"] { --normal-text-size: 94%; }
+  :root[data-platform="android"] { --normal-text-size: 90%; }
   :root[data-platform="android"][data-text-size="100"] .home-crest { width: clamp(160px, 43vw, 180px); }
   :root[data-platform="android"][data-text-size="100"] .home-wordmark { font-size: clamp(2.3rem, 8.4vw, 3.2rem); }
   :root[data-platform="android"][data-text-size="100"] #app[data-screen="home"] .home-masthead { margin-top: 16px; margin-bottom: 18px; }
