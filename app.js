@@ -105,7 +105,7 @@
   }
 
   function header(extra = "") {
-    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${extra}${CT.settingsButton()}</div></header>`;
+    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${extra}</div></header>`;
   }
 
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
@@ -230,10 +230,13 @@
   // El perfil entra por aquí y no por la cabecera: es un destino de la portada, como la
   // colección, y la barra de arriba ya tiene su trabajo con las acciones de cada pantalla.
   function homeNav() {
+    const homeActive = screen === "home" && !collectionOpen;
+    const collectionActive = screen === "home" && collectionOpen;
+    const profileActive = screen === "perfil";
     return `<nav class="home-nav" aria-label="Navegación de inicio">
-      <button data-action="home-top"${!collectionOpen ? ' aria-current="page"' : ''} aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
-      <button data-action="home-collection"${collectionOpen ? ' aria-current="page"' : ''} aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
-      <button data-action="perfil" aria-label="Ver tu perfil"><span aria-hidden="true">★</span><small>Perfil</small></button>
+      <button data-action="home-top"${homeActive ? ' aria-current="page"' : ''} aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
+      <button data-action="home-collection"${collectionActive ? ' aria-current="page"' : ''} aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
+      <button data-action="perfil"${profileActive ? ' aria-current="page"' : ''} aria-label="Ver tu perfil"><span aria-hidden="true">★</span><small>Perfil</small></button>
       <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
     </nav>`;
   }
@@ -1069,6 +1072,7 @@
         ${perfilLogros(CT.Progreso.achievements())}
         ${perfilCopia()}
       </section>
+      ${homeNav()}
     </div>`);
   }
 
