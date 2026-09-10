@@ -87,7 +87,7 @@ console.log("\nLas capas son diálogos de verdad");
   ok("la guía ofrece un aspa con nombre accesible", el(w, '.guide-close')?.getAttribute('aria-label') === 'Cerrar guía');
   click(w, '.guide-close');
   await respira();
-  ok("el aspa cierra la guía y recupera el foco", !el(w, '.overlay') && activo(w) === abrio);
+  ok("el aspa cierra la guía y recupera el foco", !w.document.querySelector('.overlay') && activo(w) === abrio);
 }
 
 console.log("\nLas reglas se adaptan al mazo");

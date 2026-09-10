@@ -310,8 +310,8 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .perfil-section .game-row { padding-block: 17px; }
 .perfil-section .game-name { font-size: 1.05rem; line-height: 1.4; }
 .perfil-section .game-meta { font-size: .85rem; line-height: 1.55; margin-top: 6px; }
-.guide-tools { position: sticky; top: 0; z-index: 3; display: flex; justify-content: flex-start; margin-bottom: 14px; pointer-events: none; }
-.guide-tools .guide-close { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 1.8rem; line-height: 1; background: var(--edition-surface); color: var(--edition-ink); }
+.guide-tools { position: sticky; top: 0; z-index: 3; display: flex; justify-content: flex-end; margin-bottom: 10px; pointer-events: none; }
+.guide-tools .guide-close { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 1.35rem; font-weight: 400; line-height: 1; border: 0; background: transparent; color: var(--edition-muted); box-shadow: none; }
 .home-shell .play-choice-block .play-choice-grid { margin-left: clamp(14px, 4vw, 28px); padding-left: 12px; border-left: 1px solid var(--edition-line); }
 .home-shell .play-choice-block .play-choice { background: linear-gradient(125deg, var(--scene-color), color-mix(in srgb, var(--scene-color) 88%, #181812)); color: #fff9ed; border-color: transparent; }
 .home-shell .play-choice-block .play-choice small { color: #f0e9db; }
