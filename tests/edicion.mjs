@@ -187,3 +187,27 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
   } finally { w.close(); }
 }
 console.log('Hoja en toda la preparación, sin animar las jugadas posteriores: OK');
+{
+  const w = boot({ seen: true });
+  const effects = [];
+  try {
+    w.Element.prototype.animate = function (frames, timing) {
+      const effect = { frames, timing, target: this, cancelled: false };
+      effects.push(effect);
+      return { finished: new Promise(() => {}), cancel() { effect.cancelled = true; } };
+    };
+    click(w, '[data-action="perfil"]');
+    assert.ok(w.document.querySelector('.profile-roll-edge'));
+    const reveal = effects.find(effect => effect.frames[0].clipPath);
+    assert.ok(reveal.target.classList.contains('shell'), 'se desenrolla la hoja completa');
+    assert.equal(reveal.timing.duration, 1200);
+    assert.match(reveal.frames[1].clipPath, new RegExp(w.innerHeight + 'px'));
+    click(w, '[data-action="back-menu"]');
+    assert.equal(w.document.querySelector('.profile-roll-edge'), null);
+    assert.ok(reveal.cancelled);
+    w.matchMedia = () => ({ matches: true });
+    click(w, '[data-action="perfil"]');
+    assert.equal(w.document.querySelector('.profile-roll-edge'), null);
+  } finally { w.close(); }
+}
+console.log('Perfil: desenrollado completo, borde móvil y cancelación segura: OK');

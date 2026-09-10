@@ -98,6 +98,36 @@
 
   let homePosition = null;
   let cancelPageTurn = null;
+  let cancelProfileRoll = null;
+  function unrollProfile(container) {
+    const sheet = container.firstElementChild;
+    if (!sheet?.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const bounds = sheet.getBoundingClientRect();
+    const height = Math.max(1, window.innerHeight - bounds.top);
+    const edge = document.createElement("div");
+    edge.className = "profile-roll-edge";
+    edge.setAttribute("aria-hidden", "true");
+    edge.style.left = `${bounds.left}px`;
+    edge.style.width = `${bounds.width}px`;
+    edge.style.top = `${bounds.top}px`;
+    document.body.append(edge);
+    const timing = { duration: 1200, easing: "cubic-bezier(.22,.55,.25,1)" };
+    const reveal = sheet.animate([
+      { clipPath: 'polygon(0 0, 100% 0, 100% 0px, 0 0px)' },
+      { clipPath: `polygon(0 0, 100% 0, 100% ${height}px, 0 ${height}px)` }
+    ], timing);
+    const roll = edge.animate([
+      { transform: 'translateY(-14px)', opacity: 0, offset: 0 },
+      { transform: `translateY(${height * .08 - 14}px)`, opacity: 1, offset: .08 },
+      { transform: `translateY(${height * .92 - 14}px)`, opacity: 1, offset: .92 },
+      { transform: `translateY(${height - 14}px)`, opacity: 0, offset: 1 }
+    ], timing);
+    const cleanup = () => { edge.remove(); if (cancelProfileRoll === cancel) cancelProfileRoll = null; };
+    const cancel = () => { reveal.cancel(); roll.cancel(); cleanup(); };
+    cancelProfileRoll = cancel;
+    reveal.finished.then(cleanup, cleanup);
+    roll.finished.catch(() => {});
+  }
   let firstLocalReveal = false;
   const preparationDepth = { home: 0, "play-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
   const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
@@ -174,6 +204,7 @@
   // sorpresa desagradable.
   function paint(container, html, screen) {
     cancelPageTurn?.();
+    cancelProfileRoll?.();
     const previousDepth = preparationDepth[paint.screen];
     const nextDepth = preparationDepth[screen];
     const changed = paint.screen !== screen;
@@ -226,6 +257,7 @@
       focus(destino || container.querySelector("[data-focus]"), { preventScroll: true });
       const top = regreso ? regreso.top : 0;
       if (window.scrollY !== top || window.scrollX !== 0) window.scrollTo({ top, left: 0, behavior: "instant" });
+      if (screen === "perfil") unrollProfile(container);
       return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que
