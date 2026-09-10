@@ -89,7 +89,7 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - [ ] Completar cuestionarios de edad, Data Safety y privacidad de cada tienda.
 - [ ] Generar capturas reales desde una compilación final.
 - [ ] Validar comprensión, repetición y disposición a pagar.
-- [ ] Decidir monetización después de la beta.
+- [ ] Decidir monetización después de la beta, siguiendo [MONETIZACION.md](MONETIZACION.md).
 - [ ] Si se venden mazos: implementar compras oficiales, restauración, reembolsos y validación en servidor.
 
 ## 8. Límites de este roadmap
