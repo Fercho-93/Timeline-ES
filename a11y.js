@@ -130,7 +130,7 @@
       { transform: `rotateY(${angle * 32}deg)`, offset: .3 },
       { transform: `rotateY(${angle * 105}deg)`, offset: .72 },
       { transform: `rotateY(${angle * 178}deg)`, offset: 1 }
-    ], { duration: 850, easing: "cubic-bezier(.32,.05,.18,1)", fill: "forwards" });
+    ], { duration: 1200, easing: "cubic-bezier(.32,.05,.18,1)", fill: "forwards" });
     const cleanup = () => { layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
     const cancel = () => { animation.cancel(); cleanup(); };
     cancelPageTurn = cancel;
