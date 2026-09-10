@@ -1,6 +1,6 @@
 # Continuum — hoja de ruta
 
-Estado revisado: 9 de septiembre de 2026.
+Estado revisado: 10 de septiembre de 2026.
 
 Este documento distingue lo que está implementado en el repositorio de lo que requiere pruebas reales, credenciales, configuración externa o una decisión del titular.
 
@@ -35,7 +35,7 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - [ ] Verificar App Check, cuotas, retención y alertas en un proyecto de ensayo.
 - [ ] Probar la compilación en un Android físico.
 - [ ] Repetir las pruebas en iPhone y Android: reconexión, bloqueo, pérdida de red, enlaces, actualización, orientación y áreas seguras.
-- [ ] Configurar el correo de feedback real.
+- [x] Configurar el correo de feedback real.
 - [ ] Preparar un registro de incidencias con prioridad P0–P3.
 - [ ] Reclutar testers y registrar resultados sin datos personales innecesarios.
 
@@ -44,7 +44,7 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - [ ] Revisar las 17 cartas de Naturaleza sin fuente cerrada.
 - [ ] Comenzar por topo europeo y valores que mezclan medias, máximos, rangos o cautividad.
 - [ ] Documentar población, unidad, criterio, fecha y fuente de cada cifra.
-- [ ] Completar evidencia de derechos del arte, icono y splash.
+- [x] Documentar la procedencia declarada del arte, icono y splash; queda conservar la evidencia privada de generación.
 - [ ] Registrar autor/generador, fecha, origen y condiciones de uso comercial.
 - [ ] Revisar textos, fuentes y dependencias de terceros.
 - [ ] No considerar una carta o recurso validado solo porque tenga una URL de referencia.
@@ -64,8 +64,8 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - [ ] Crear/configurar cuenta Google Play Console.
 - [ ] Configurar certificados y secretos únicamente en GitHub Actions.
 - [ ] Generar un AAB Android firmado.
-- [ ] Generar un archive iOS firmado.
-- [ ] Probar TestFlight y Google Play Closed Testing.
+- [x] Generar un archive iOS firmado.
+- [ ] Probar TestFlight con testers externos y Google Play Closed Testing.
 - [ ] Completar asociaciones de enlaces iOS/Android desde la raíz del dominio.
 - [ ] Probar actualización conservando una partida y una sala pendiente.
 
