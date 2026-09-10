@@ -4,7 +4,7 @@ Las comprobaciones de cada propuesta compilan Android y un simulador de iPhone e
 
 `beta-firmada.yml` prepara APK/AAB o IPA firmados cuando el titular haya configurado los
 entornos y secretos descritos. Solo se lanza manualmente; la subida a TestFlight requiere
-marcar su opción y está desactivada por defecto. No se ha ejecutado con credenciales reales.
+marcar su opción y está desactivada por defecto. Ya se ha ejecutado con credenciales reales en el entorno configurado; debe repetirse para cada versión candidata.
 Para iOS se utilizan `APPLE_TEAM_ID`, `APPLE_PROFILE_NAME`, `APPSTORE_ISSUER_ID` y
 `APPSTORE_API_KEY_ID` como variables, y `APPSTORE_CERTIFICATES_FILE_BASE64`,
 `APPSTORE_CERTIFICATES_PASSWORD` y `APPSTORE_API_PRIVATE_KEY` como secretos. El flujo usa
