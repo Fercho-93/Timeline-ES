@@ -28,7 +28,8 @@
   // El tema se aplica en el elemento raíz: «auto» no pone nada y deja mandar a
   // `prefers-color-scheme`, tal como está montada la hoja de estilos.
   function applyTheme() {
-    document.documentElement.style.fontSize = ({100:'100%',125:'125%',150:'150%',200:'200%'})[settings.textSize] || '100%';
+    document.documentElement.dataset.platform = /Android/i.test(navigator.userAgent) ? 'android' : 'other';
+    document.documentElement.style.fontSize = ({100:'var(--normal-text-size, 100%)',125:'125%',150:'150%',200:'200%'})[settings.textSize] || '100%';
     document.documentElement.dataset.textSize = settings.textSize;
     if (settings.theme === "auto") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", settings.theme);

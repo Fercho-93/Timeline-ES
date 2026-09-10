@@ -4,11 +4,12 @@ import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = read('index.html');
-function boot({ reduce = false, seen = false, saved = {} } = {}) {
+function boot({ reduce = false, seen = false, saved = {}, userAgent = null } = {}) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {
     runScripts: 'outside-only', url: 'https://continuum.test/'
   }).window;
   w.scrollTo = () => {};
+  if (userAgent) Object.defineProperty(w.navigator, 'userAgent', { value: userAgent });
   w.Element.prototype.scrollIntoView = () => {};
   w.matchMedia = () => ({ matches: reduce });
   for (const [key, value] of Object.entries(saved)) w.localStorage.setItem(key, value);
@@ -150,3 +151,15 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
   } finally { w.close(); }
 }
 console.log('Paso de página: giro inverso, interrupciones y movimiento reducido: OK');
+for (const userAgent of ['Mozilla/5.0 (Linux; Android 14; Samsung)', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)']) {
+  for (const textSize of ['100', '150', '200']) {
+    const w = boot({ userAgent, seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: 'auto', textSize }) } });
+    try {
+      const root = w.document.documentElement;
+      assert.equal(root.dataset.platform, userAgent.includes('Android') ? 'android' : 'other');
+      assert.equal(root.dataset.textSize, textSize);
+      assert.equal(root.style.fontSize, textSize === '100' ? 'var(--normal-text-size, 100%)' : textSize + '%');
+    } finally { w.close(); }
+  }
+}
+console.log('Vista Android compacta: detección independiente y ampliación del usuario conservada: OK');

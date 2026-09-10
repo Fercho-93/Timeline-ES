@@ -282,6 +282,19 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
   .dialog-enter .settings-modal { animation: parchment-open 480ms ease-out both; }
 }
 /* La ampliación vuelve a una columna; ningún título queda encerrado en una lámina. */
+/* Android estrecho: menos escala visual sin alterar coordenadas de arrastre,
+   el zoom del navegador ni las preferencias de texto ampliado del usuario. */
+@media (max-width: 420px) {
+  :root[data-platform="android"] { --normal-text-size: 94%; }
+  :root[data-platform="android"][data-text-size="100"] .home-crest { width: clamp(160px, 43vw, 180px); }
+  :root[data-platform="android"][data-text-size="100"] .home-wordmark { font-size: clamp(2.3rem, 8.4vw, 3.2rem); }
+  :root[data-platform="android"][data-text-size="100"] #app[data-screen="home"] .home-masthead { margin-top: 16px; margin-bottom: 18px; }
+  :root[data-platform="android"][data-text-size="100"] .home-shell .gallery-panel { height: 205px; }
+  :root[data-platform="android"][data-text-size="100"] .collection-decks { padding: 15px; }
+  :root[data-platform="android"][data-text-size="100"] .collection-decks .game-row { padding: 13px 16px 15px; margin-block: 8px; }
+  :root[data-platform="android"][data-text-size="100"] .mode-masthead { min-height: 240px; padding: 20px; }
+  :root[data-platform="android"][data-text-size="100"] .solo-fold summary { padding-block: 14px; }
+}
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-shell .gallery { grid-template-columns: minmax(0, 1fr); }
 :root:is([data-text-size="150"], [data-text-size="200"]) .collection-entry.active { display: block; }
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-shell .gallery-panel { min-height: 310px; height: auto; }
