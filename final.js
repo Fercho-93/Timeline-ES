@@ -44,7 +44,7 @@
   }
   function question(mode, final) {
     const card = CT.cards(mode).find(card => card.id === final.cardId);
-    return `<article class="panel final-card"><small>Carta neutral · Final ${final.round}</small><h2>${CT.escapeHtml(card.title)}</h2><p>¿Cuál es su cifra en ${units[CT.mode(mode).axis]}?</p></article>`;
+    return `<article class="panel final-card"><small>Carta neutral · Final ${final.round}</small>${CT.animalArt(mode, card)}<h2>${CT.escapeHtml(card.title)}</h2><p>¿Cuál es su cifra en ${units[CT.mode(mode).axis]}?</p></article>`;
   }
   function form(mode, attribute) {
     return `<form ${attribute} class="panel final-form"><div class="field"><label for="final-guess">Tu cifra secreta (${units[CT.mode(mode).axis]})</label><input id="final-guess" name="guess" inputmode="decimal" type="text" autocomplete="off" required aria-describedby="final-number-hint"></div>
