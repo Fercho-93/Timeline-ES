@@ -296,6 +296,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
   #app[data-screen="play-menu"] > .screen-enter { animation: none; }
   #app[data-screen="perfil"] .screen-enter > * { animation: none; }
   .dialog-enter .settings-modal { animation: parchment-open 480ms ease-out both; }
+  .dialog-enter .enc-modal { animation-duration: 1400ms; }
 }
 /* La sección Perfil es mucho más larga que un diálogo. El despliegue recorre
    una pantalla visible, no un porcentaje de miles de píxeles de contenido. */
