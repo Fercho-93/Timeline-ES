@@ -1018,6 +1018,7 @@
         </div>
         ${all ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
         <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
+        <button type="button" class="btn btn-secondary btn-block" data-action="enc-back">Cerrar enciclopedia</button>
       </section>
     </div></div>`);
     app.querySelectorAll('.home-nav [aria-current]').forEach(button => button.removeAttribute('aria-current'));
