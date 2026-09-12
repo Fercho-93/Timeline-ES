@@ -203,6 +203,32 @@ function invitationUrl(code = roomCode) {
   return url.toString();
 }
 
+// El enlace público sirve para compartir, no para cambiar la URL de Capacitor.
+// Actualizar la barra del navegador es opcional: nunca debe impedir entrar a una
+// sala que Firebase ya ha guardado.
+function updateRoomAddress(code) {
+  if (window.Capacitor?.isNativePlatform?.()) return;
+  try {
+    const url = new URL(location.href);
+    url.search = "";
+    url.hash = "";
+    url.searchParams.set("room", code);
+    history.replaceState({}, "", url.toString());
+  } catch (error) {
+    console.warn("No se pudo actualizar la dirección de la sala", error);
+  }
+}
+
+function roomErrorMessage(error, fallback) {
+  if (error.code === "unavailable" || error.code === "auth/network-request-failed") {
+    return "No se pudo contactar con el servidor. Comprueba la conexión y vuelve a intentarlo.";
+  }
+  if (error.code === "permission-denied") {
+    return "El servidor ha rechazado la operación. Si acabas de crear una sala, espera 30 segundos; si persiste, hay que revisar los permisos del juego.";
+  }
+  return fallback;
+}
+
 function gfMultiply(x, y) {
   let result = 0;
   for (let i = 7; i >= 0; i--) {
@@ -425,11 +451,11 @@ async function createRoom(name) {
     });
     await batch.commit();
     rememberRoom(code, name);
-    history.replaceState({}, "", invitationUrl(code));
+    updateRoomAddress(code);
     connectToRoom(code);
   } catch (error) {
     console.error(error);
-    showToast("No se pudo crear la sala. Espera 30 segundos entre salas y comprueba la conexión.");
+    showToast(roomErrorMessage(error, "No se pudo crear la sala. Vuelve a intentarlo; si persiste, comunica el error."));
   } finally { busy = false; }
 }
 
@@ -459,11 +485,12 @@ async function joinRoom(code, name) {
       });
     });
     rememberRoom(code, name);
-    history.replaceState({}, "", invitationUrl(code));
+    updateRoomAddress(code);
     connectToRoom(code);
   } catch (error) {
     const messages = { ROOM_NOT_FOUND: "No existe ninguna sala con ese código", ALREADY_STARTED: "La partida ya ha comenzado", ROOM_FULL: "La sala ya tiene 9 participantes", DECK_MISMATCH: "Tu móvil lleva una versión distinta del juego. Actualiza la aplicación para poder entrar." };
-    showToast(messages[error.message] || "No se pudo entrar. Comprueba el código y las reglas de Firebase.");
+    console.error(error);
+    showToast(messages[error.message] || roomErrorMessage(error, "No se pudo entrar en la sala. Vuelve a intentarlo; si persiste, comunica el error."));
   } finally { busy = false; }
 }
 
