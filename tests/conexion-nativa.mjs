@@ -38,7 +38,7 @@ function setup(href, native, { blockedHistory = false, serverError = null } = {}
   });
   vm.runInContext(links, context);
   vm.runInContext(`const CT = window.CONTINUUM, db = {}, user = {uid:'guest'}, CLIENT_VERSION = 40;
-    let busy = false, selectedModeKey = 'history', roomCode = '';
+    let busy = false, selectedModeKey = 'history', roomCode = '', competitionOptions = null;
     ${helpers}\n${operations}`, context);
   return { context, events, messages, warnings, location };
 }

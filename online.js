@@ -655,7 +655,8 @@ async function nextTournamentRound() {
       if(data.status!=='ended' || data.tournament.index!==expected || data.hostUid!==user.uid) return;
       const tournament=CT.Tournament.next(data.tournament,data.winners || [data.winner]);
       const mode=tournament.queue[tournament.index];
-      const next={...data,tournament,mode,deckFingerprint:CT.deckFingerprint(mode),status:'lobby',phase:'lobby',handSize:tournament.handSize,players:Object.fromEntries(data.playerOrder.map(uid=>[uid,{...data.players[uid],hand:[],pulseUsed:false,shieldRound:0}])),deck:[],discard:[],timeline:[],current:0,starter:data.playerOrder[0],turnsInRound:0,round:1,winner:null,winners:null,reveal:null,pulseTurn:null,version:data.version+1,updatedAt:serverTimestamp()};
+      const next={...data,tournament,mode,deckFingerprint:CT.deckFingerprint(mode),status:'lobby',phase:'lobby',handSize:tournament.handSize,players:data.players,deck:[],discard:[],timeline:[],current:0,starter:data.playerOrder[0],turnsInRound:0,round:1,winner:null,winners:null,reveal:null,pulseTurn:null,version:data.version+1,updatedAt:serverTimestamp()};
+      next.finalRoundOffset=data.final?.round || data.finalRoundOffset || 0;
       for(const key of ['ghost','pulsePower','final','tieQueue','turnStartedAt']) delete next[key];
       tx.set(reference,next);
     });
@@ -1104,7 +1105,7 @@ async function finishTurn() {
           return;
         }
         if (empty.length > 1) {
-          transaction.update(roomRef, {phase:'final',final:CT.Final.create(data.mode, empty, null, data.timeline),reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
+          transaction.update(roomRef, {phase:'final',final:CT.Final.create(data.mode, empty, data.finalRoundOffset ? {round:data.finalRoundOffset,used:[]} : null, data.timeline),reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
           return;
         }
         turnsInRound = 0;

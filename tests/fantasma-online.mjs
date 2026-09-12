@@ -211,18 +211,21 @@ try {
  const large=fixture();large.phase='tiebreak';large.current=0;large.turnsInRound=8;large.playerOrder=[A,B,C,'d','e','f','g','h','i'];large.players=Object.fromEntries(large.playerOrder.map(id=>[id,{name:id,hand:[]}]));large.tieQueue=[...large.playerOrder];large.deck=Array.from({length:12},(_,i)=>15+i);delete large.ghost;
  await seed(large);await clients[0].call('continueTie');s=await snapshot();assert.equal(s.phase,'turn');assert.equal(s.deck.length,3);assert.equal(new Set(Object.values(s.players).flatMap(p=>p.hand)).size,9);
  // Competición real: misma sala, nueve participantes, otro eje, puntuación inmutable.
- const tournament={...clone(lobby),status:'ended',phase:'finished',winner:A,winners:[A],tournament:{queue:['animals','countries','history'],index:0,history:[],handSize:1}};
+ const tournament={...clone(lobby),status:'ended',phase:'finished',winner:A,winners:[A],final:{round:2},tournament:{queue:['animals','countries','history'],index:0,history:[],handSize:1}};
  await seed(tournament);
  await clients[0].call('nextTournamentRound');s=await snapshot();
  assert.equal(s.mode,'countries');assert.equal(s.status,'lobby');assert.equal(s.roomCode,ROOM);
  assert.deepEqual(s.playerOrder,tournament.playerOrder);assert.equal(s.tournament.index,1);
  assert.deepEqual(s.tournament.history,[{mode:'animals',winners:[A]}]);
+ assert.equal(s.finalRoundOffset,2);assert.equal(s.final,undefined);
  await assertFails(updateDoc(ref(B),{tournament:{...s.tournament,index:2},version:s.version+1,updatedAt:serverTimestamp()}));
  await assertFails(updateDoc(ref(A),{tournament:{...s.tournament,history:[{mode:'animals',winners:[B]}]},version:s.version+1,updatedAt:serverTimestamp()}));
  await clients[0].call('nextTournamentRound');assert.equal((await snapshot()).tournament.index,1);
  await clients[0].call('renderLobby');assert.equal(clients[0].w.document.getElementById('online-hand-size').disabled,true);
  await clients[0].call('startRoom');s=await snapshot();assert.equal(s.status,'playing');assert.ok(Object.values(s.players).every(p=>p.hand.length===1));
  await clients[1].call('renderGame');assert.match(clients[1].w.document.body.textContent,/Competición · ronda 2 de 3/);
+ s.phase='reveal';s.turnsInRound=8;s.current=8;s.players[A].hand=[];s.players[B].hand=[];await seed(s);
+ await clients[0].call('finishTurn');s=await snapshot();assert.equal(s.final.round,3,'las respuestas de otra ronda no se reutilizan');
  s.status='ended';s.phase='finished';s.winner=B;s.winners=[B];await seed(s);
  await clients[0].call('nextTournamentRound');s=await snapshot();assert.equal(s.mode,'history');assert.equal(s.tournament.history.length,2);
  s.status='ended';s.phase='finished';s.winner=A;s.winners=[A];await seed(s);

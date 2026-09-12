@@ -64,29 +64,22 @@ service cloud.firestore {
           && t.history is list && t.history.size() == t.index
           && t.handSize is int && t.handSize >= 1 && t.handSize <= 6;
       }
-      function tournamentPlayerReset(i) {
-        let p = resource.data.playerOrder;
-        let uid = p[i < p.size() ? i : 0];
-        let next = request.resource.data.players[uid];
-        return i >= p.size() || (next.diff(resource.data.players[uid]).affectedKeys().hasOnly(['hand','pulseUsed','shieldRound'])
-          && next.hand == [] && next.pulseUsed == false && next.shieldRound == 0);
-      }
       function validTournamentNext() {
         let prior = resource.data;
         let next = request.resource.data;
         let t = prior.tournament;
         let n = next.tournament;
         return isHost() && prior.status == 'ended' && t.index+1 < t.queue.size()
-          && changed().hasOnly(['tournament','mode','deckFingerprint','status','phase','handSize','players','deck','discard','timeline','current','starter','turnsInRound','round','winner','winners','reveal','pulseTurn','version','updatedAt','ghost','pulsePower','final','tieQueue','turnStartedAt'])
+          && changed().hasOnly(['tournament','mode','deckFingerprint','status','phase','handSize','players','deck','discard','timeline','current','starter','turnsInRound','round','winner','winners','reveal','pulseTurn','version','updatedAt','ghost','pulsePower','final','tieQueue','turnStartedAt','finalRoundOffset'])
+          && next.finalRoundOffset == ('final' in prior ? prior.final.round : prior.get('finalRoundOffset',0))
           && tournamentShape(n) && n.queue == t.queue && n.handSize == t.handSize && n.index == t.index+1
           && n.history == t.history.concat([{'mode':prior.mode,'winners':prior.get('winners',null) is list ? prior.winners : [prior.winner]}])
           && next.mode == n.queue[n.index] && next.mode is string && next.mode.size() >= 1 && next.mode.size() <= 32
           && next.deckFingerprint is string && next.deckFingerprint.size() >= 1 && next.deckFingerprint.size() <= 24
           && next.status == 'lobby' && next.phase == 'lobby' && next.handSize == n.handSize
-          && next.players.keys().toSet() == prior.players.keys().toSet()
-          && tournamentPlayerReset(0) && tournamentPlayerReset(1) && tournamentPlayerReset(2)
-          && tournamentPlayerReset(3) && tournamentPlayerReset(4) && tournamentPlayerReset(5)
-          && tournamentPlayerReset(6) && tournamentPlayerReset(7) && tournamentPlayerReset(8)
+          // El reparto de validStart sustituye las manos al comenzar; aquí solo
+          // cambia el tema, sin permitir tocar nombres ni datos de participantes.
+          && next.players == prior.players
           && next.deck == [] && next.discard == [] && next.timeline == [] && next.current == 0
           && next.starter == prior.playerOrder[0] && next.turnsInRound == 0 && next.round == 1
           && next.winner == null && next.winners == null && next.reveal == null && next.pulseTurn == null
@@ -572,7 +565,7 @@ service cloud.firestore {
         return (isCurrent() || isHost()) && before().status == 'playing' && before().phase == 'reveal' && roundEnds()
           && changed().hasOnly(['phase','final','reveal','version','updatedAt'])
           && next.phase == 'final' && next.reveal == null && finalShape(next.final)
-          && next.final.round == 1 && next.final.players == emptyPlayers(before())
+          && next.final.round == before().get('finalRoundOffset',0)+1 && next.final.players == emptyPlayers(before())
           && next.final.used == [next.final.cardId] && bumped();
       }
       function validFinalSubmit() {
@@ -798,6 +791,7 @@ service cloud.firestore {
       allow list: if false;
 
       allow create: if signedIn()
+        && request.resource.data.get('finalRoundOffset',0) == 0
         && (!('tournament' in request.resource.data) || (tournamentShape(request.resource.data.tournament)
           && request.resource.data.tournament.index == 0 && request.resource.data.tournament.history == []
           && request.resource.data.mode == request.resource.data.tournament.queue[0]))
