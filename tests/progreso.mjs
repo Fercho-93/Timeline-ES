@@ -2,6 +2,7 @@
 // pantalla que lo enseña aguante un almacenamiento vacío, corrupto o de una versión
 // anterior. Se juega de verdad contra el DOM de index.html, igual que el resto.
 import { JSDOM } from "jsdom";
+import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -97,6 +98,10 @@ console.log("\nUna partida a un solo móvil");
   const cards = new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
   let turnos = 0;
   while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML) && turnos < 600) {
+    if (JSON.parse(w.localStorage.getItem('hilo-game-history-v1'))?.final) {
+      finishLocalFinal(w, 'hilo-game-history-v1');
+      break;
+    }
     turnos++;
     click(w, '[data-action="ready"]');
     const mano = [...w.document.querySelectorAll('[data-action="select-card"]')];

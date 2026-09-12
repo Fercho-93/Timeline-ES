@@ -48,7 +48,7 @@ let turnTimerHandle = null;
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
 // en todos los móviles aunque sus relojes no coincidan.
 const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
-const CLIENT_VERSION = 40; // Protocolo mínimo compatible con las salas actuales.
+const CLIENT_VERSION = 41; // Incluye la final con respuestas privadas.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false;
 const presenceListeners = new Map(), presenceRecords = new Map();
@@ -545,6 +545,7 @@ function connectToRoom(code) {
     anotaProgreso();
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
+    else if (roomState.phase === "final") { clearTurnTimer(); void renderOnlineFinal(); }
     else if (roomState.phase === "tiebreak") {
       clearTurnTimer();
       paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Repartiendo el desempate</h1><p>Quedan ${roomState.tieQueue.length} cartas por repartir. La partida continúa cuando termine el reparto.</p><button class="btn btn-primary" data-online-action="continue-tie">Continuar reparto</button></div>`, 'online-tiebreak');
@@ -630,6 +631,11 @@ async function startRoom(withGhost = true) {
   const enableGhost = withGhost && !!document.getElementById("online-ghost")?.checked;
   busy = true;
   try {
+    try { await getDoc(doc(db, 'capabilities', 'secretFinal')); }
+    catch (error) {
+      if (error.code === 'permission-denied') throw Error('FINAL_RULES_REQUIRED');
+      throw error;
+    }
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
       const data = snapshot.data();
@@ -655,6 +661,7 @@ async function startRoom(withGhost = true) {
     });
   } catch (error) {
     console.error(error);
+    if (error.message === 'FINAL_RULES_REQUIRED') { showToast('El servicio de salas necesita actualizarse para la final secreta. Contacta con el organizador de la beta.'); return; }
     showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? `Para usar esta sala, actualizad todos los móviles a v${CLIENT_VERSION} y cread una sala nueva.` : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v39 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
   } finally { busy = false; }
 }
@@ -1054,13 +1061,12 @@ async function finishTurn() {
         const {empty, ended} = CT.Engine.roundOutcome(data.playerOrder, players, deck.length + discard.length);
         // Sin cartas suficientes para el desempate la partida termina compartida:
         // si no, a esas personas les llegaría el turno con la mano vacía.
-        if (ended) {
+        if (empty.length === 1) {
           transaction.update(roomRef, { status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
         }
         if (empty.length > 1) {
-          transaction.update(roomRef, {phase:'tiebreak',tieQueue:empty,reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
-          needsTie = true;
+          transaction.update(roomRef, {phase:'final',final:CT.Final.create(data.mode, empty, null, data.timeline),reveal:null,version:data.version+1,updatedAt:serverTimestamp()});
           return;
         }
         turnsInRound = 0;
@@ -1119,12 +1125,87 @@ async function continueTie(retries = 1) {
   if (retry) await continueTie(retries - 1);
 }
 
+let finalRenderId = 0;
+const finalDrafts = new Map();
+function finalAnswerRef(code, round, uid) {
+  return doc(db, 'rooms', code, 'finalRounds', String(round), 'answers', uid);
+}
+async function renderOnlineFinal() {
+  const request = ++finalRenderId, code = roomCode, final = roomState.final;
+  const draftKey = `${code}:${final.round}`;
+  const oldForm = appEl.querySelector('[data-final-online]');
+  if (oldForm?.dataset.round === String(final.round)) finalDrafts.set(draftKey, {guess:oldForm.elements.guess.value, era:oldForm.elements.era?.value});
+  const complete = final.submitted.length === final.players.length;
+  const submitted = final.submitted.includes(user.uid);
+  const finalist = final.players.includes(user.uid);
+  const name = uid => roomState.players[uid].name;
+  const shell = body => `<div class="shell">${header(roomState.hostUid === user.uid ? '<button class="icon-btn" data-online-action="close-room">Cerrar sala</button>' : '')}<h1 data-focus tabindex="-1">Final de desempate</h1>${CT.Final.question(modeKey(), final)}${body}</div>`;
+  paint(shell(complete ? '<p role="status">Revelando las respuestas…</p>' : `<p>Respuestas guardadas: ${final.submitted.length} de ${final.players.length}.</p>${finalist && !submitted ? CT.Final.form(modeKey(), `data-final-online data-round="${final.round}"`) : `<section class="panel"><h2>${submitted ? 'Tu respuesta está guardada' : 'Estás siguiendo la final'}</h2><p>Esperando a ${final.players.filter(uid => !final.submitted.includes(uid)).map(uid => escapeHtml(name(uid))).join(', ')}. Las cifras se revelan cuando todos hayan respondido.</p></section>`}`), 'online-final');
+  const form = appEl.querySelector('[data-final-online]'), draft = finalDrafts.get(draftKey);
+  if (form && draft) { form.elements.guess.value = draft.guess; if (form.elements.era) form.elements.era.value = draft.era || 'ad'; }
+  if (!complete) return;
+  try {
+    const answers = Object.fromEntries(await Promise.all(final.players.map(async uid => [uid, (await getDoc(finalAnswerRef(code, final.round, uid))).data().value])));
+    if (request !== finalRenderId || roomCode !== code || roomState.phase !== 'final' || roomState.final.round !== final.round) return;
+    const ranking = CT.Final.rank(final, answers);
+    paint(shell(`${CT.Final.results(modeKey(), final, answers, name)}<button class="btn btn-primary btn-block" data-online-action="final-next">${ranking.winners.length === 1 ? 'Ver ganador' : 'Otra carta de desempate'}</button>`), 'online-final');
+    finalDrafts.delete(draftKey);
+  } catch (error) {
+    if (request !== finalRenderId || roomState?.phase !== 'final' || roomCode !== code) return;
+    console.error(error);
+    paint(shell('<p>Las respuestas siguen guardadas. No se pudo cargar el resultado.</p><button class="btn btn-primary" data-online-action="final-refresh">Reintentar</button>'), 'online-final');
+  }
+}
+
+document.addEventListener('submit', async event => {
+  if (!event.target.matches('[data-final-online]')) return;
+  event.preventDefault();
+  if (busy || roomState?.phase !== 'final') return;
+  const round = roomState.final.round, code = roomCode;
+  let value;
+  try {
+    const values = new FormData(event.target);
+    value = CT.Final.parse(modeKey(), values.get('guess'), values.get('era') === 'bc');
+  } catch (error) { showToast(error.message); return; }
+  busy = true;
+  const button = event.target.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    await runTransaction(db, async tx => {
+      const reference = doc(db, 'rooms', code), data = (await tx.get(reference)).data();
+      if (data.phase !== 'final' || data.final.round !== round || !data.final.players.includes(user.uid)) throw Error('La final ha cambiado.');
+      if (data.final.submitted.includes(user.uid)) return;
+      tx.set(finalAnswerRef(code, round, user.uid), {value});
+      tx.update(reference, {final:{...data.final, submitted:[...data.final.submitted, user.uid]}, version:data.version + 1, updatedAt:serverTimestamp()});
+    });
+  } catch (error) { console.error(error); showToast('No se pudo guardar tu respuesta. Reintenta cuando vuelva la conexión.'); }
+  finally { busy = false; if (button.isConnected) button.disabled = false; }
+});
+
+async function nextOnlineFinal() {
+  if (busy || roomState?.phase !== 'final') return;
+  busy = true;
+  const reference = roomRef, code = roomCode, expectedRound = roomState.final.round;
+  try {
+    await runTransaction(db, async tx => {
+      const data = (await tx.get(reference)).data(), final = data.final;
+      if (data.phase !== 'final' || final.round !== expectedRound || final.submitted.length !== final.players.length) return;
+      const answers = Object.fromEntries(await Promise.all(final.players.map(async uid => [uid, (await tx.get(finalAnswerRef(code, final.round, uid))).data().value])));
+      const ranking = CT.Final.rank(final, answers);
+      tx.update(reference, ranking.winners.length === 1
+        ? {status:'ended', phase:'finished', winner:ranking.winners[0], winners:ranking.winners, version:data.version + 1, updatedAt:serverTimestamp()}
+        : {final:CT.Final.create(data.mode, ranking.winners, final, data.timeline), version:data.version + 1, updatedAt:serverTimestamp()});
+    });
+  } catch (error) { console.error(error); showToast('No se pudo continuar la final. Puedes reintentarlo.'); }
+  finally { busy = false; }
+}
+
 function renderWinner() {
   clearTurnTimer();
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
   const names = uids.map(uid => escapeHtml(roomState.players[uid].name));
   const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
-  const lead = names.length === 1
+  const lead = roomState.final ? "Ha ganado la final con la cifra más cercana." : names.length === 1
     ? "Ha sido la única persona en terminar la ronda sin cartas."
     : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
   paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(roomState.players[uids[0]].name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} cartas jugadas</button><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`, "online-winner");
@@ -1370,6 +1451,8 @@ document.addEventListener("click", event => {
   else if (action === "cancel-place") { pendingIndex = null; renderGame(); }
   else if (action === "continue-tie") void continueTie();
   else if (action === "finish-turn") finishTurn();
+  else if (action === "final-refresh") void renderOnlineFinal();
+  else if (action === "final-next") void nextOnlineFinal();
   else if (action === "close-room") closeRoom();
   else if (action === "room") roomMenu();
   else if (action === "close-room-menu") CT.closeDialog();

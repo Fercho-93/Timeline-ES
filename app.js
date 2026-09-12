@@ -459,6 +459,7 @@
   function currentPlayer() { return game.players[game.current]; }
 
   function renderPass() {
+    if (game.final) return renderFinalPass();
     screen = "pass";
     const player = currentPlayer();
     // Quien recibió una carta en el Pulso de otro se entera aquí, al recoger el móvil, y
@@ -851,17 +852,19 @@
     renderPass();
   }
 
-  // Devuelve true si la partida ha terminado. Nadie puede empezar un turno con la mano
-  // vacía: o gana, o el desempate le da una carta, o se acaba la partida por falta de mazo.
+  // Devuelve true si se abandona la ronda normal para ganar o pasar a la final.
   function resolveRound() {
     const players = Object.fromEntries(game.players.map(player => [player.id, player]));
     const outcome = CT.Engine.roundOutcome(game.players.map(player => player.id), players, game.deck.length + game.discard.length);
     const empty = outcome.empty.map(id => players[id]);
-    if (outcome.ended) return endGame(empty);
     if (empty.length > 1) {
-      empty.forEach(drawCard);
-      showToast("Empate: una carta extra para cada finalista");
+      game.final = CT.Final.create(selectedModeKey, empty.map(player => player.id), null, game.timeline);
+      game.finalAnswers = {};
+      result = null;
+      saveGame(); renderFinalPass();
+      return true;
     }
+    if (outcome.ended) return endGame(empty);
     game.round += 1;
     game.turnsInRound = 0;
     return false;
@@ -876,12 +879,46 @@
     return true;
   }
 
+  function renderFinalPass(revealInput = false) {
+    screen = "final-local";
+    const final = game.final;
+    const name = uid => game.players.find(player => player.id === uid).name;
+    const next = final.players.find(uid => !(uid in game.finalAnswers));
+    if (next == null) {
+      const ranking = CT.Final.rank(final, game.finalAnswers);
+      paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Resultado de la final</h1>${CT.Final.question(selectedModeKey, final)}${CT.Final.results(selectedModeKey, final, game.finalAnswers, name)}<button class="btn btn-primary btn-block" data-action="final-next">${ranking.winners.length === 1 ? 'Ver ganador' : 'Otra carta de desempate'}</button></div>`);
+      return;
+    }
+    paint(`<div class="shell">${header()}<h1 data-focus tabindex="-1">Final de desempate</h1><p>Solo juegan ${final.players.map(uid => escapeHtml(name(uid))).join(', ')}.</p>${revealInput ? `${CT.Final.question(selectedModeKey, final)}<h3>Responde ${escapeHtml(name(next))}</h3>${CT.Final.form(selectedModeKey, 'data-final-local')}` : `<section class="panel pass-card"><h2>Pásale el móvil a ${escapeHtml(name(next))}</h2><p>Los demás no deben mirar. Las cifras se mostrarán cuando todos hayan respondido.</p><button class="btn btn-primary btn-block" data-action="final-ready">Soy ${escapeHtml(name(next))}</button></section>`}</div>`);
+  }
+
+  app.addEventListener('submit', event => {
+    if (!event.target.matches('[data-final-local]')) return;
+    event.preventDefault();
+    const final = game.final;
+    const next = final.players.find(uid => !(uid in game.finalAnswers));
+    if (next == null) return;
+    try {
+      const data = new FormData(event.target);
+      game.finalAnswers[next] = CT.Final.parse(selectedModeKey, data.get('guess'), data.get('era') === 'bc');
+      saveGame(); renderFinalPass();
+    } catch (error) { showToast(error.message); }
+  });
+
+  function nextLocalFinal() {
+    const ranking = CT.Final.rank(game.final, game.finalAnswers);
+    if (ranking.winners.length === 1) return endGame(game.players.filter(player => ranking.winners.includes(player.id)));
+    game.final = CT.Final.create(selectedModeKey, ranking.winners, game.final, game.timeline);
+    game.finalAnswers = {};
+    saveGame(); renderFinalPass();
+  }
+
   function renderWinner(winners) {
     screen = "winner";
     const list = [].concat(winners);
     const names = list.map(player => escapeHtml(player.name));
     const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
-    const lead = names.length === 1
+    const lead = game.final ? "Ha ganado la final con la cifra más cercana." : names.length === 1
       ? "Ha sido la única persona en terminar la ronda sin cartas."
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
     const fallosUnicos = new Set(game.failed || []).size;
@@ -1940,6 +1977,8 @@
     else if (action === "confirm-place") { screen === "solo" ? soloPlace(pendingIndex) : game.pulseTurn ? (pulseStage() === PULSE_DEFENSA ? placePulseDefense(pendingIndex) : placePulse(pendingIndex)) : placeCard(pendingIndex); }
     else if (action === "cancel-place") { pendingIndex = null; screen === "solo" ? soloView() : gameView(); }
     else if (action === "finish-turn") finishTurn();
+    else if (action === "final-ready") renderFinalPass(true);
+    else if (action === "final-next") nextLocalFinal();
     else if (action === "solo") soloHome();
     else if (action === "start-daily") startSolo("daily");
     else if (action === "start-free") startSolo("free");

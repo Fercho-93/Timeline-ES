@@ -906,7 +906,7 @@
         ${guideStep(3, "Confirma", "Se descubre el valor. Si aciertas, se queda en la línea.")}
       </ol>
       <p class="guide-note">¿Dos cartas con el mismo valor? Entonces valen los dos órdenes.${pending ? " Las cartas «en revisión» se juegan igual, con el valor que muestran." : ""}</p>
-      ${shared ? `<h3>Cómo se gana</h3><p class="guide-lead">Gana quien se quede sin cartas al acabar la ronda. Cada fallo te hace robar otra.</p>` : ""}
+      ${shared ? `<h3>Cómo se gana</h3><p class="guide-lead">Gana quien sea la única persona sin cartas al acabar la ronda. Cada fallo te hace robar otra.</p><p>Si dos o más personas terminan la ronda sin cartas, pasan a una final: aparece una carta neutral y cada finalista escribe una cifra secreta. Se revelan todas juntas. Gana quien más se acerque al valor real, por encima o por debajo. Si empatan en la mejor respuesta, solo esas personas repiten con otra carta hasta que haya un ganador. No se usan poderes en la final.</p>` : ""}
       ${poderes}${contextGuide}`;
   }
 

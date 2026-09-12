@@ -293,7 +293,7 @@
       focus(destino || container.querySelector("[data-focus]"), { preventScroll: true });
       const top = regreso ? regreso.top : 0;
       if (window.scrollY !== top || window.scrollX !== 0) window.scrollTo({ top, left: 0, behavior: "instant" });
-      if (screen === "perfil") unrollProfile(container);
+      if (screen === "perfil" || screen === "enciclopedia") unrollProfile(container);
       return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que

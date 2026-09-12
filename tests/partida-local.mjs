@@ -1,5 +1,6 @@
 // Juega partidas completas del modo de un solo móvil sobre el DOM real de index.html.
 import { JSDOM } from "jsdom";
+import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,6 +49,7 @@ ok("empieza pidiendo pasar el móvil", /El turno es de/.test(w.document.body.inn
 const cardsById = new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
 let turns = 0, revealed = 0, emptyTurn = false;
 while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML) && turns < 4000) {
+  if (JSON.parse(w.localStorage.getItem('hilo-game-history-v1'))?.final) { finishLocalFinal(w, 'hilo-game-history-v1'); continue; }
   turns++;
   click(w, '[data-action="ready"]');
   const hand = [...w.document.querySelectorAll('[data-action="select-card"]')];
