@@ -1042,7 +1042,6 @@ function takeCard(deckInput, discardInput) {
 async function finishTurn() {
   if (busy || roomState?.phase !== "reveal") return;
   busy = true;
-  let needsTie = false;
   try {
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
@@ -1058,9 +1057,8 @@ async function finishTurn() {
       let deck = [...data.deck];
       let discard = [...data.discard];
       if (turnsInRound >= data.playerOrder.length) {
-        const {empty, ended} = CT.Engine.roundOutcome(data.playerOrder, players, deck.length + discard.length);
-        // Sin cartas suficientes para el desempate la partida termina compartida:
-        // si no, a esas personas les llegaría el turno con la mano vacía.
+        const {empty} = CT.Engine.roundOutcome(data.playerOrder, players, deck.length + discard.length);
+        // Varios jugadores sin cartas disputan una final numérica secreta.
         if (empty.length === 1) {
           transaction.update(roomRef, { status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
           return;
@@ -1085,7 +1083,6 @@ async function finishTurn() {
       showToast("No se pudo avanzar el turno");
     }
   } finally { busy = false; }
-  if (needsTie) await continueTie();
 }
 
 async function continueTie(retries = 1) {
