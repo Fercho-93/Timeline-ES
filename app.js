@@ -134,7 +134,7 @@
   }
 
   function header(extra = "") {
-    const competition = game?.tournament && ['pass','game','final-local','winner'].includes(screen) ? `<p class="eyebrow">Competición · ronda ${game.tournament.index+1} de ${game.tournament.queue.length} · ${escapeHtml(currentMode().name)}</p>` : '';
+    const competition = game?.tournament && ['pass','game','final-local','winner'].includes(screen) ? `<div class="competition-current-deck"><span>Competición · ronda ${game.tournament.index+1} de ${game.tournament.queue.length}</span><strong>${escapeHtml(currentMode().name)}</strong></div>` : '';
     return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${extra}</div></header>${competition}`;
   }
 
