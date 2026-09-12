@@ -289,8 +289,8 @@
     const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
     const timeline=[deck.shift()];
     roster.forEach(p=>p.hand.forEach(id=>CT.Powers.claim(powers,id,p.id,deck)));
-    game={mode:selectedModeKey,tournament:t,competitionGhost:ghost,pulse,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,pulseTurn:null,pulseGift:null};
-    selectedCardId=null;pendingIndex=null;result=null;saveGame();renderPass();
+    game={mode:selectedModeKey,tournament:t,competitionGhost:ghost,pulse,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,tournamentIntro:true,pulseTurn:null,pulseGift:null};
+    selectedCardId=null;pendingIndex=null;result=null;saveGame();renderTournamentIntro();
   }
   function nextTournamentRound() {
     if (!game?.tournament || !game.winners || game.tournament.index+1>=game.tournament.queue.length) return;
@@ -303,8 +303,18 @@
       if (!saved.tournament?.queue?.every(CT.has) || saved.tournament.queue[saved.tournament.index]!==saved.mode) throw Error('Competición inválida');
       game=saved;selectedModeKey=game.mode;selectedBlockKey=CT.blockOf(game.mode).key;
       cardsById=new Map(game.savedDeck.map(c=>[c.id,c]));selectedCardId=null;pendingIndex=null;result=null;
-      if(game.winners) renderWinner(game.players.filter(p=>game.winners.includes(p.id))); else renderPass();
+      if(game.winners) renderWinner(game.players.filter(p=>game.winners.includes(p.id))); else if(game.tournamentIntro !== false) renderTournamentIntro(); else renderPass();
     } catch { showToast('No se pudo recuperar la competición guardada.'); }
+  }
+  function renderTournamentIntro() {
+    screen = "tournament-intro";
+    const mode = currentMode();
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
+      <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(game.mode).art, true)}</div>
+      <div class="chapter-number">Tema ${game.tournament.index + 1} de ${game.tournament.queue.length}</div>
+      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · ronda ${game.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
+      <button class="btn btn-block comp-splash-start" data-action="competition-round-start">Empezar ronda</button>
+    </div></section></div>`);
   }
 
   function homeMasthead() {
@@ -2048,6 +2058,7 @@
     else if (action === "competition-online") launchOnline('',competitionOptions());
     else if (action === "competition-next") nextTournamentRound();
     else if (action === "competition-resume") resumeMultiCompetition();
+    else if (action === "competition-round-start") { game.tournamentIntro = false; saveGame(); renderPass(); }
     else if (action === "online") launchOnline();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.

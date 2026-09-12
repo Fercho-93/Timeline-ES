@@ -152,7 +152,7 @@
     return cancel;
   }
   let firstLocalReveal = false;
-  const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
+  const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
   const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
 
   // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino

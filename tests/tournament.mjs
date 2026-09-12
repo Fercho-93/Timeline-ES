@@ -26,6 +26,7 @@ assert.ok(w.document.querySelector('[data-action="competition-online"]'));
 click('[data-action="competition-local"]');click('[data-action="back-menu"]');
 assert.equal(w.document.getElementById('competition-cards').value,'1');
 click('[data-action="competition-local"]');click('[data-action="start"]');
+click('[data-action="competition-round-start"]');
 assert.equal(state().tournament.queue.length,3);assert.equal(new Set(state().tournament.queue).size,3);
 assert.ok(state().players.every(p=>p.hand.length===1));
 for(let round=0;round<3;round++) {
@@ -42,7 +43,7 @@ for(let round=0;round<3;round++) {
  assert.equal(state().tournament.index,round);
  const saved=w.localStorage.getItem(key);w.close();w=boot(saved);click('[data-action="competition-menu"]');click('[data-action="competition-resume"]');
  assert.ok(w.document.querySelector('.tournament-board'));
- if(round<2){const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));}
+ if(round<2){const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));click('[data-action="competition-round-start"]');}
 }
 assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
 assert.match(w.document.querySelector('.tournament-board').textContent,/3 rondas ganadas/);

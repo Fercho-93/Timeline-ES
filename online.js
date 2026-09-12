@@ -38,6 +38,7 @@ let pendingIndex = null;
 let busy = false;
 let selectedModeKey = "history";
 let competitionOptions = null;
+let onlineCompetitionIntroIndex = null;
 let seenSelfInRoom = false;
 let lastEffectVersion = null;
 let lastObservedTurnUid = null;
@@ -565,6 +566,11 @@ function connectToRoom(code) {
       if (!snapshot.metadata.fromCache) void continueTie();
     }
     else {
+      if (roomState.tournament && onlineCompetitionIntroIndex !== roomState.tournament.index) {
+        onlineCompetitionIntroIndex = roomState.tournament.index;
+        renderCompetitionIntro();
+        return;
+      }
       renderGame();
       if (turnChanged) showTurnChangeSplash(observedTurnUid, previousState);
     }
@@ -643,6 +649,17 @@ function renderLobby() {
 
 function tournamentBoard(winners = []) {
   return CT.Tournament.board(roomState.tournament,roomState.playerOrder.map(id=>({id,name:roomState.players[id].name})),winners);
+}
+
+function renderCompetitionIntro() {
+  const mode = CT.mode(roomState.mode);
+  const art = { history: ["hero-history", 467], entertainment: ["hero-entertainment", 1050], science: ["hero-science", 1050], nature: ["hero-nature", 1050], globe: ["hero-geography", 859], mixed: ["hero-mixed", 992] }[CT.blockOf(roomState.mode).art] || ["hero-history", 467];
+  paint(`<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="room">Partida</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
+    <div class="chapter-art" aria-hidden="true"><img src="assets/${art[0]}-700.webp" alt="" width="700" height="${art[1]}" decoding="async" fetchpriority="high"></div>
+    <div class="chapter-number">Tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}</div>
+    <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · ronda ${roomState.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
+    <button class="btn btn-block comp-splash-start" data-online-action="competition-round-start">Empezar ronda</button>
+  </div></section></div>`, "online-competition-intro");
 }
 
 async function nextTournamentRound() {
@@ -1475,6 +1492,7 @@ document.addEventListener("click", event => {
   else if (action === "close-qr") CT.closeDialog();
   else if (action === "start") startRoom();
   else if (action === "competition-next") nextTournamentRound();
+  else if (action === "competition-round-start") renderGame();
   else if (action === "select") {
     selectedCardId = Number(target.dataset.id);
     pendingIndex = null;
