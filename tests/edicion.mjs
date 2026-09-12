@@ -213,9 +213,10 @@ console.log('Hoja en toda la preparación, sin animar las jugadas posteriores: O
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     assert.ok(reveal.cancelled);
     click(w, '[data-action="home-encyclopedia"]');
-    assert.ok(w.document.querySelector('.shell.parchment-unrolling'), 'Enciclopedia se despliega como Perfil');
-    assert.equal(effects.filter(effect => effect.frames[0].clipPath).at(-1).timing.duration, 2300);
-    click(w, '[data-action="home-top"]');
+    assert.ok(w.document.querySelector('.dialog-enter .settings-modal.enc-modal[role="dialog"]'), 'Enciclopedia se despliega como Ajustes');
+    assert.ok(w.document.querySelector('.enc-background[inert]'), 'el fondo no recibe pulsaciones');
+    w.document.dispatchEvent(new w.KeyboardEvent('keydown', {key:'Escape',bubbles:true}));
+    assert.equal(w.document.querySelector('[data-overlay="encyclopedia"]'), null);
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     const originalBounds = w.Element.prototype.getBoundingClientRect;
     w.Element.prototype.getBoundingClientRect = function () {

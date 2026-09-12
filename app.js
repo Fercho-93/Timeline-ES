@@ -68,6 +68,7 @@
   // o al perfil si se llegó desde un punto débil. Sin esto, «Volver» siempre mandaba al
   // inicio, deshaciendo de un toque la navegación que trajo hasta aquí.
   let encReturn = "home";
+  let encBackground = '';
   let reviewReturnView = null;
   // La portada empieza mostrando la colección, no un mazo abierto. Un toque descubre
   // una categoría y enseña directamente los mazos que contiene.
@@ -989,12 +990,14 @@
   // Solo se entra aquí desde la portada o desde un repaso: nunca desde dentro de una
   // partida, donde ver el mazo entero volvería trivial cualquier jugada pendiente.
   function enciclopediaView() {
+    if (screen !== 'enciclopedia') encBackground = app.innerHTML;
     screen = "enciclopedia";
     const all = encMode === "all";
     const mode = all ? {name: "Todas las cartas"} : CT.mode(encMode);
     const bands = all ? [] : CT.Enciclopedia.bands(encMode);
     const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
-    paint(`<div class="shell enc-shell">${header('<button class="icon-btn" data-action="enc-back">Volver</button>')}
+    paint(`<div class="enc-background" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
+      <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
       <section class="setup-section enc-section">
         <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
         <h1 data-focus tabindex="-1">${escapeHtml(mode.name)}</h1>
@@ -1016,8 +1019,18 @@
         ${all ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
         <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
       </section>
-      ${homeNav()}
-    </div>`);
+    </div></div>`);
+    app.querySelectorAll('.home-nav [aria-current]').forEach(button => button.removeAttribute('aria-current'));
+    app.querySelector('.home-nav [data-action="home-encyclopedia"]')?.setAttribute('aria-current', 'page');
+    CT.openDialog(app.querySelector('[data-overlay="encyclopedia"]'), true, closeEnciclopedia);
+  }
+
+  function closeEnciclopedia() {
+    if (encReturn === "review" && reviewReturnView) reviewReturnView();
+    else if (encReturn === "play-menu") playMenu();
+    else if (encReturn === "perfil") perfilView();
+    else home();
+    app.querySelector('[data-action="home-encyclopedia"]')?.focus({preventScroll:true});
   }
 
   function openEnciclopedia(modeKey, { highlight = null, band = "all", returnTo = "home" } = {}) {
@@ -2017,7 +2030,8 @@
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
     else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
-    else if (action === "enc-back") { if (encReturn === "review" && reviewReturnView) reviewReturnView(); else if (encReturn === "play-menu") playMenu(); else if (encReturn === "perfil") perfilView(); else home(); }
+    else if (action === "enc-close") CT.closeDialog();
+    else if (action === "enc-back") CT.closeDialog();
     else if (action === "perfil") perfilView();
     else if (action === "perfil-export") perfilExport();
     else if (action === "perfil-import") perfilImport();
@@ -2025,7 +2039,7 @@
     else if (action === "perfil-reset-confirm") { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
   });
 
-  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "solo", "comp-intro"].includes(screen) || !!CT.onlineActive;
+  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "comp-intro"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();
   // El botón/gesto Atrás de Android: `window.Capacitor` solo existe dentro del contenedor
   // nativo (Capacitor lo inyecta al arrancar la WebView), así que esto no toca la versión

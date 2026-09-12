@@ -293,7 +293,7 @@
       focus(destino || container.querySelector("[data-focus]"), { preventScroll: true });
       const top = regreso ? regreso.top : 0;
       if (window.scrollY !== top || window.scrollX !== 0) window.scrollTo({ top, left: 0, behavior: "instant" });
-      if (screen === "perfil" || screen === "enciclopedia") unrollProfile(container);
+      if (screen === "perfil") unrollProfile(container);
       return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que
@@ -335,7 +335,7 @@
       .filter(el => !el.disabled && !el.hasAttribute("hidden"));
   }
 
-  function openDialog(overlay, cerrable) {
+  function openDialog(overlay, cerrable, onClose) {
     if (!overlay) return;
     const modal = overlay.querySelector(".modal") || overlay;
     overlay.classList.add("dialog-enter");
@@ -371,7 +371,7 @@
     }
     document.addEventListener("keydown", onKey);
     const cancelRoll = modal.classList.contains('rules') ? unrollSheet(modal) : null;
-    pila.push({ overlay, previo, onKey, cerrable, cancelRoll });
+    pila.push({ overlay, previo, onKey, cerrable, cancelRoll, onClose });
   }
 
   // Mismo criterio que Escape, para el botón/gesto Atrás de Android: si hay un diálogo
@@ -393,6 +393,7 @@
     const termina = () => {
       if (!dialogo.overlay.isConnected) return;
       dialogo.overlay.remove();
+      dialogo.onClose?.();
       // Un diálogo nuevo puede haberse abierto durante la salida: el cierre anterior no
       // debe quitarle el foco. Tampoco dejamos controles accionables mientras salen.
       if (pila[pila.length - 1] === anteriorEnPila && dialogo.previo?.isConnected) dialogo.previo.focus({ preventScroll: true });

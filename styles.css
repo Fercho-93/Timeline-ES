@@ -774,6 +774,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .rules .btn-block { margin-top: 22px; }
 
 .settings-modal { text-align: left; }
+.enc-modal { width: min(100%, 980px); }
+.enc-modal .enc-section { padding-top: 16px; }
 .settings-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .settings-close { flex: none; width: 32px; height: 32px; margin: -6px -6px 0 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer; }
 .settings-close:hover, .settings-close:focus-visible { background: var(--paper); color: var(--ink); }
