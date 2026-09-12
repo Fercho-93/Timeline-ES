@@ -543,42 +543,39 @@ service cloud.firestore {
           && n.submitted == f.submitted.concat([request.auth.uid])
           && !exists(path) && getAfter(path).data.value is int && bumped();
       }
-      function finalDistance(f, i) {
-        let who = f.players[i < f.players.size() ? i : 0];
+      function finalPlacement(f, who, best, winners) {
         let answer = get(/databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(f.round))/answers/$(who)).data.value;
-        return i >= f.players.size() ? 8000000000000001 : (answer >= f.target ? answer - f.target : f.target - answer);
+        let distance = answer >= f.target ? answer - f.target : f.target - answer;
+        return distance >= best && ((who in winners) == (distance == best));
       }
-      function finalDistances(f) {
-        return [finalDistance(f,0),finalDistance(f,1),finalDistance(f,2),finalDistance(f,3),finalDistance(f,4),finalDistance(f,5),finalDistance(f,6),finalDistance(f,7),finalDistance(f,8)];
-      }
-      function finalAt(players, distances, i, best) {
-        return i < players.size() && distances[i] == best ? [players[i]] : [];
-      }
-      function finalWinners(players, distances, best) {
-        return finalAt(players,distances,0,best).concat(finalAt(players,distances,1,best)).concat(finalAt(players,distances,2,best))
-          .concat(finalAt(players,distances,3,best)).concat(finalAt(players,distances,4,best)).concat(finalAt(players,distances,5,best))
-          .concat(finalAt(players,distances,6,best)).concat(finalAt(players,distances,7,best)).concat(finalAt(players,distances,8,best));
-      }
-      function finalMinimum(d, best) {
-        return best <= d[0] && best <= d[1] && best <= d[2] && best <= d[3] && best <= d[4]
-          && best <= d[5] && best <= d[6] && best <= d[7] && best <= d[8];
+      function finalPlacements(f, best, winners) {
+        let p = f.players;
+        let n = p.size();
+        return winners.toSet().hasOnly(p)
+          && finalPlacement(f,p[0],best,winners) && finalPlacement(f,p[1],best,winners)
+          && (n<3 || finalPlacement(f,p[2],best,winners))
+          && (n<4 || finalPlacement(f,p[3],best,winners))
+          && (n<5 || finalPlacement(f,p[4],best,winners))
+          && (n<6 || finalPlacement(f,p[5],best,winners))
+          && (n<7 || finalPlacement(f,p[6],best,winners))
+          && (n<8 || finalPlacement(f,p[7],best,winners))
+          && (n<9 || finalPlacement(f,p[8],best,winners));
       }
       function validFinalResolve() {
         let prior = before().final;
         let next = after();
         let ending = next.status == 'ended';
         let candidate = ending ? next.winner : next.final.players[0];
-        let distances = finalDistances(prior);
         let answer = get(/databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(prior.round))/answers/$(candidate)).data.value;
         let best = answer >= prior.target ? answer - prior.target : prior.target - answer;
-        let winners = finalWinners(prior.players, distances, best);
+        let winners = ending ? [candidate] : next.final.players;
         return prior.submitted.toSet() == prior.players.toSet()
-          && candidate in prior.players && finalMinimum(distances, best)
+          && candidate in prior.players && finalPlacements(prior, best, winners)
           && (ending
             ? (changed().hasOnly(['status','phase','winner','winners','version','updatedAt'])
-              && next.phase == 'finished' && next.winners == [candidate] && winners == [candidate])
+              && next.phase == 'finished' && next.winners == [candidate])
             : (changed().hasOnly(['final','version','updatedAt']) && finalShape(next.final)
-              && next.final.round == prior.round + 1 && next.final.players == winners
+              && next.final.round == prior.round + 1
               && next.final.cardId != prior.cardId
               && next.final.used == (next.final.cardId in prior.used ? [next.final.cardId] : prior.used.concat([next.final.cardId]))))
           && bumped();
