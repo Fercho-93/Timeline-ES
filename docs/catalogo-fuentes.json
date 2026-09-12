@@ -9374,46 +9374,6 @@
     {
       "file": "idiomas.js",
       "id": 14026,
-      "title": "Árabe levantino",
-      "value": 51000000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14027,
-      "title": "Chino min nan",
-      "value": 50100000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14028,
-      "title": "Chino hakka",
-      "value": 48200000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14029,
-      "title": "Chino jin",
-      "value": 46900000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14030,
       "title": "Hausa",
       "value": 43900000,
       "source": null,
@@ -9423,7 +9383,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14031,
+      "id": 14027,
       "title": "Indonesio",
       "value": 43600000,
       "source": null,
@@ -9433,7 +9393,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14032,
+      "id": 14028,
       "title": "Polaco",
       "value": 40000000,
       "source": null,
@@ -9443,17 +9403,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14033,
-      "title": "Chino xiang",
-      "value": 37300000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14034,
+      "id": 14029,
       "title": "Malayálam",
       "value": 37100000,
       "source": null,
@@ -9463,17 +9413,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14035,
-      "title": "Árabe argelino",
-      "value": 34700000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14036,
+      "id": 14030,
       "title": "Oriya",
       "value": 34500000,
       "source": null,
@@ -9483,7 +9423,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14037,
+      "id": 14031,
       "title": "Maithili",
       "value": 33900000,
       "source": null,
@@ -9493,17 +9433,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14038,
-      "title": "Árabe sudanés",
-      "value": 33300000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14039,
+      "id": 14032,
       "title": "Birmano",
       "value": 33000000,
       "source": null,
@@ -9513,7 +9443,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14040,
+      "id": 14033,
       "title": "Panyabí",
       "value": 32600000,
       "source": null,
@@ -9523,7 +9453,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14041,
+      "id": 14034,
       "title": "Sondanés",
       "value": 32400000,
       "source": null,
@@ -9533,17 +9463,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14042,
-      "title": "Árabe marroquí",
-      "value": 27500000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14043,
+      "id": 14035,
       "title": "Ucraniano",
       "value": 27300000,
       "source": null,
@@ -9553,7 +9473,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14044,
+      "id": 14036,
       "title": "Igbo",
       "value": 27000000,
       "source": null,
@@ -9563,7 +9483,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14045,
+      "id": 14037,
       "title": "Uzbeko",
       "value": 25100000,
       "source": null,
@@ -9573,7 +9493,7 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14046,
+      "id": 14038,
       "title": "Sindhi",
       "value": 24600000,
       "source": null,
@@ -9583,9 +9503,89 @@
     },
     {
       "file": "idiomas.js",
-      "id": 14047,
+      "id": 14039,
       "title": "Rumano",
       "value": 24300000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14040,
+      "title": "Danés",
+      "value": 5500000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14041,
+      "title": "Finés",
+      "value": 5400000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14042,
+      "title": "Eslovaco",
+      "value": 5200000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14043,
+      "title": "Lituano",
+      "value": 3000000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14044,
+      "title": "Gallego",
+      "value": 2400000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14045,
+      "title": "Maltés",
+      "value": 570000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14046,
+      "title": "Islandés",
+      "value": 390000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14047,
+      "title": "Feroés",
+      "value": 69000,
       "source": null,
       "reviewStatus": null,
       "comparison": null,

@@ -2,15 +2,26 @@
 // aprende un idioma de adulto no cuenta aquí. Por eso el inglés aparece por detrás del
 // español, y no al revés como en las listas de «idiomas más hablados del mundo».
 //
-// Las cifras salen de la recopilación de Wikipedia que cita Ethnologue 2022, en millones
-// y con un decimal, que es el grano en que las publica la fuente: la carta enseña ese
-// decimal y no finge una precisión mayor. Es una compilación secundaria y su corte es de
-// 2022, no de hoy; véase VERIFICACION_IDIOMAS.md.
+// El grueso del mazo sale de la recopilación de Wikipedia que cita Ethnologue 2022, en
+// millones y con un decimal, que es el grano en que las publica la fuente: la carta enseña
+// ese decimal y no finge una precisión mayor. Es una compilación secundaria y su corte es
+// de 2022, no de hoy.
 //
-// No se exige separación mínima entre cartas contiguas: se conserva la lista entera salvo
-// las lenguas cuya cifra repetía la de otra ya incluida, porque dos cartas con el mismo
-// número no se pueden ordenar. Se cayeron así el chino wu (81,7, como el coreano) y el
-// canarés y el yoruba (43,6, como el indonesio). Ninguna cifra se ha retocado.
+// Las ocho lenguas por debajo de los seis millones —del danés al feroés— no salen de esa
+// lista, que se corta en los 24 millones, sino de cifras aproximadas aportadas aparte. Son
+// las que dan cola a la línea, pero no comparten corte temporal con el resto: es una
+// mezcla de fuentes asumida a conciencia y explicada en VERIFICACION_IDIOMAS.md.
+//
+// Del chino y del árabe se conservan solo las variedades principales —mandarín y cantonés;
+// árabe egipcio—. Las demás que publica la fuente por separado (min nan, hakka, jin,
+// xiang; árabe levantino, argelino, sudanés y marroquí) se descartaron por no ser
+// situables para quien juega: ordenarlas era adivinar. No se suman entre sí para fabricar
+// una carta de «chino» o de «árabe», porque la fuente no da ese dato.
+//
+// No se exige separación mínima entre cartas contiguas: se conserva la lista salvo las
+// lenguas cuya cifra repetía la de otra ya incluida, porque dos cartas con el mismo número
+// no se pueden ordenar. Se cayeron así el chino wu (81,7, como el coreano) y el canarés y
+// el yoruba (43,6, como el indonesio). Ninguna cifra se ha retocado.
 window.LANGUAGE_CARDS = [
   { id: 14001, value: 929000000, title: "Chino mandarín", detail: "La lengua materna de más gente en el mundo, y por mucho: oficial en China, en Taiwán y una de las cuatro de Singapur." },
   { id: 14002, value: 474700000, title: "Español", detail: "La segunda por lengua materna, oficial en una veintena de países y con la mayoría de sus hablantes en América." },
@@ -37,26 +48,26 @@ window.LANGUAGE_CARDS = [
   { id: 14023, value: 57000000, title: "Guyaratí", detail: "La lengua del estado indio de Guyarat, y la materna de Gandhi." },
   { id: 14024, value: 56400000, title: "Persa", detail: "Oficial en Irán. Sus variedades de Afganistán y Tayikistán reciben los nombres de darí y tayiko." },
   { id: 14025, value: 52200000, title: "Bhojpuri", detail: "Se habla en el noreste de la India y en Nepal; la emigración del siglo XIX la llevó hasta Mauricio, Fiyi y Surinam." },
-  { id: 14026, value: 51000000, title: "Árabe levantino", detail: "El árabe hablado en Siria, Líbano, Jordania y Palestina." },
-  { id: 14027, value: 50100000, title: "Chino min nan", detail: "El chino del sur de Fujian y de buena parte de Taiwán, donde se le llama taiwanés. También se habla en el sudeste asiático." },
-  { id: 14028, value: 48200000, title: "Chino hakka", detail: "La lengua de los hakka, un grupo que fue migrando por el sur de China durante siglos y conservó su habla allí donde se asentaba." },
-  { id: 14029, value: 46900000, title: "Chino jin", detail: "Se habla en Shanxi y alrededores. La fuente lo cuenta como lengua aparte; otras clasificaciones lo consideran parte del mandarín." },
-  { id: 14030, value: 43900000, title: "Hausa", detail: "Lengua del norte de Nigeria y del sur de Níger, y la lengua del comercio en buena parte del Sahel." },
-  { id: 14031, value: 43600000, title: "Indonesio", detail: "Una variedad estandarizada del malayo, adoptada como lengua nacional por un país con centenares de lenguas propias." },
-  { id: 14032, value: 40000000, title: "Polaco", detail: "La lengua eslava occidental con más hablantes, y casi todos en un solo país." },
-  { id: 14033, value: 37300000, title: "Chino xiang", detail: "El chino de Hunan, en el centro-sur del país." },
-  { id: 14034, value: 37100000, title: "Malayálam", detail: "La lengua del estado indio de Kerala. Escrito en alfabeto latino, su nombre se lee igual del derecho y del revés." },
-  { id: 14035, value: 34700000, title: "Árabe argelino", detail: "El árabe de Argelia, con préstamos del bereber y del francés." },
-  { id: 14036, value: 34500000, title: "Oriya", detail: "La lengua de Odisha, en la costa oriental de la India." },
-  { id: 14037, value: 33900000, title: "Maithili", detail: "Se habla a los dos lados de la frontera, en el norte de la India y en el sur de Nepal." },
-  { id: 14038, value: 33300000, title: "Árabe sudanés", detail: "El árabe de Sudán, en contacto con las lenguas nilóticas del sur del país." },
-  { id: 14039, value: 33000000, title: "Birmano", detail: "Oficial de Birmania. Se escribe con un alfabeto de letras redondeadas heredado de las escrituras del sur de la India." },
-  { id: 14040, value: 32600000, title: "Panyabí", detail: "El panyabí oriental, el de la India, que se escribe en alfabeto gurmují. Las variedades del oeste de Pakistán van aparte, en la carta del lahnda." },
-  { id: 14041, value: 32400000, title: "Sondanés", detail: "La segunda lengua de la isla de Java, hablada en su extremo occidental." },
-  { id: 14042, value: 27500000, title: "Árabe marroquí", detail: "El dariya, la variedad con más huella bereber y francesa; cuesta entenderla desde el este del mundo árabe." },
-  { id: 14043, value: 27300000, title: "Ucraniano", detail: "Lengua eslava oriental, hermana del ruso y del bielorruso, con alfabeto cirílico propio." },
-  { id: 14044, value: 27000000, title: "Igbo", detail: "Una de las tres grandes lenguas de Nigeria, hablada en el sureste del país." },
-  { id: 14045, value: 25100000, title: "Uzbeko", detail: "La lengua túrquica con más hablantes después del turco." },
-  { id: 14046, value: 24600000, title: "Sindhi", detail: "Se habla en la provincia pakistaní de Sind y, tras la partición de 1947, también en la India." },
-  { id: 14047, value: 24300000, title: "Rumano", detail: "La lengua románica del este de Europa, aislada entre lenguas eslavas y húngara. También es la oficial de Moldavia." }
+  { id: 14026, value: 43900000, title: "Hausa", detail: "Lengua del norte de Nigeria y del sur de Níger, y la lengua del comercio en buena parte del Sahel." },
+  { id: 14027, value: 43600000, title: "Indonesio", detail: "Una variedad estandarizada del malayo, adoptada como lengua nacional por un país con centenares de lenguas propias." },
+  { id: 14028, value: 40000000, title: "Polaco", detail: "La lengua eslava occidental con más hablantes, y casi todos en un solo país." },
+  { id: 14029, value: 37100000, title: "Malayálam", detail: "La lengua del estado indio de Kerala. Escrito en alfabeto latino, su nombre se lee igual del derecho y del revés." },
+  { id: 14030, value: 34500000, title: "Oriya", detail: "La lengua de Odisha, en la costa oriental de la India." },
+  { id: 14031, value: 33900000, title: "Maithili", detail: "Se habla a los dos lados de la frontera, en el norte de la India y en el sur de Nepal." },
+  { id: 14032, value: 33000000, title: "Birmano", detail: "Oficial de Birmania. Se escribe con un alfabeto de letras redondeadas heredado de las escrituras del sur de la India." },
+  { id: 14033, value: 32600000, title: "Panyabí", detail: "El panyabí oriental, el de la India, que se escribe en alfabeto gurmují. Las variedades del oeste de Pakistán van aparte, en la carta del lahnda." },
+  { id: 14034, value: 32400000, title: "Sondanés", detail: "La segunda lengua de la isla de Java, hablada en su extremo occidental." },
+  { id: 14035, value: 27300000, title: "Ucraniano", detail: "Lengua eslava oriental, hermana del ruso y del bielorruso, con alfabeto cirílico propio." },
+  { id: 14036, value: 27000000, title: "Igbo", detail: "Una de las tres grandes lenguas de Nigeria, hablada en el sureste del país." },
+  { id: 14037, value: 25100000, title: "Uzbeko", detail: "La lengua túrquica con más hablantes después del turco." },
+  { id: 14038, value: 24600000, title: "Sindhi", detail: "Se habla en la provincia pakistaní de Sind y, tras la partición de 1947, también en la India." },
+  { id: 14039, value: 24300000, title: "Rumano", detail: "La lengua románica del este de Europa, aislada entre lenguas eslavas y húngara. También es la oficial de Moldavia." },
+  { id: 14040, value: 5500000, title: "Danés", detail: "Un danés lee el noruego y el sueco con relativa soltura; entenderlos hablados, y que le entiendan, ya cuesta bastante más." },
+  { id: 14041, value: 5400000, title: "Finés", detail: "No es una lengua indoeuropea: pertenece a la familia urálica, como el estonio y, de mucho más lejos, el húngaro." },
+  { id: 14042, value: 5200000, title: "Eslovaco", detail: "Tan cercano al checo que quien habla uno entiende al otro sin haberlo estudiado nunca." },
+  { id: 14043, value: 3000000, title: "Lituano", detail: "Conserva más rasgos del indoeuropeo antiguo que ninguna otra lengua viva de Europa, lo que la hace muy valiosa para los lingüistas." },
+  { id: 14044, value: 2400000, title: "Gallego", detail: "Cooficial en Galicia. Comparte origen con el portugués: los dos vienen del galaicoportugués medieval." },
+  { id: 14045, value: 570000, title: "Maltés", detail: "La única lengua semítica oficial de la Unión Europea, y la única que se escribe habitualmente en alfabeto latino." },
+  { id: 14046, value: 390000, title: "Islandés", detail: "Ha cambiado tan poco en mil años que un islandés de hoy puede leer las sagas medievales sin traducción." },
+  { id: 14047, value: 69000, title: "Feroés", detail: "La lengua de las islas Feroe, en mitad del Atlántico norte. Es la carta con menos hablantes del mazo." }
 ];

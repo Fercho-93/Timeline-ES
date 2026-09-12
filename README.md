@@ -89,11 +89,13 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
   Aquí la línea no es temporal: se ordena por tamaño.
 - **Población de países:** 49 países ordenados de menos a más gente, del Vaticano a la India,
   con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer).
-- **Idiomas por hablantes nativos:** 47 lenguas del chino mandarín al rumano, ordenadas por
-  hablantes de lengua materna. No es la lista de «idiomas más hablados del mundo»: quien aprende
-  un idioma de adulto no cuenta aquí, y por eso el inglés aparece por detrás del español. Las
-  cifras son de Ethnologue 2022 a través de una recopilación de Wikipedia, con el decimal de
-  millón que publica la fuente. Véase [la verificación del mazo](VERIFICACION_IDIOMAS.md).
+- **Idiomas por hablantes nativos:** 47 lenguas del chino mandarín (929 millones) al feroés
+  (69.000), ordenadas por hablantes de lengua materna. No es la lista de «idiomas más hablados
+  del mundo»: quien aprende un idioma de adulto no cuenta aquí, y por eso el inglés aparece por
+  detrás del español. Del chino y del árabe solo están las variedades principales. Las cifras
+  grandes son de Ethnologue 2022 a través de una recopilación de Wikipedia; las ocho lenguas por
+  debajo de los seis millones llegan aparte y con otro corte temporal.
+  Véase [la verificación del mazo](VERIFICACION_IDIOMAS.md).
 - **Distancias entre ciudades:** 50 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 

@@ -137,10 +137,12 @@
       hiddenLabel: "Hablantes ocultos",
       timelineTitle: "De menos a más hablado",
       question: "¿Menos o más hablantes?",
-      // Los cortes están puestos sobre el rango real del mazo, que empieza en los 24
-      // millones: aquí no hay lenguas pequeñas, así que una banda «minúscula» se quedaría
-      // siempre vacía. Con estos cinco tramos caen 13, 12, 13, 5 y 4 cartas.
+      // Los cortes están puestos sobre el rango real del mazo, que va del feroés (69.000)
+      // al chino mandarín (929 millones). Con estos siete tramos caen 3, 5, 10, 7, 13, 5 y
+      // 4 cartas, sin ninguna banda vacía.
       bands: [
+        { limit: 1000000, key: "minoritario", name: "Minoritario", symbol: "·" },
+        { limit: 10000000, key: "pequeno", name: "Pequeño", symbol: "▪" },
         { limit: 35000000, key: "medio", name: "Medio", symbol: "◈" },
         { limit: 60000000, key: "grande", name: "Grande", symbol: "◆" },
         { limit: 90000000, key: "muygrande", name: "Muy grande", symbol: "★" },

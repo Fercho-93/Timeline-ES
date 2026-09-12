@@ -73,11 +73,11 @@ ok("las poblaciones son números enteros de personas", POPULATION_CARDS.every(c 
 // El mazo de idiomas no exige separación entre cartas contiguas: conserva la lista de la
 // fuente entera y solo descarta las lenguas cuya cifra repetía la de otra, porque dos
 // cartas con el mismo número no se pueden ordenar. Lo que sí se comprueba es eso: que no
-// haya quedado ninguna repetida. La fuente publica millones con un decimal, así que el
-// valor en hablantes tiene que ser múltiplo de cien mil; un dato con más precisión que la
-// original sería inventado.
+// haya quedado ninguna repetida. Las cifras llegan redondeadas —millones con un decimal en
+// las lenguas grandes, millares en las pequeñas—, así que ninguna puede traer más
+// precisión que su fuente: un valor que no llegue al millar sería inventado.
 separadas("Idiomas por hablantes nativos", LANGUAGE_CARDS, "cifras de hablantes");
-ok("las cifras respetan el decimal de millón de la fuente", LANGUAGE_CARDS.every(c => Number.isInteger(c.value / 1e5)));
+ok("las cifras respetan el redondeo de su fuente", LANGUAGE_CARDS.every(c => Number.isInteger(c.value / 1000)));
 
 // Las cifras grandes se muestran redondeadas a millones. El redondeo solo vale si no
 // borra el orden: dos cartas contiguas nunca pueden acabar enseñando la misma cifra, o
