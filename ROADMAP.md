@@ -4,6 +4,10 @@ Estado revisado: 10 de septiembre de 2026.
 
 Este documento distingue lo que está implementado en el repositorio de lo que requiere pruebas reales, credenciales, configuración externa o una decisión del titular.
 
+Las funcionalidades que todavía no se han decidido no entran aquí: viven en
+[docs/IDEAS_NIVEL.md](docs/IDEAS_NIVEL.md) con su coste y sus riesgos, y solo pasan a este
+documento cuando se eligen.
+
 ## Estado resumido
 
 - **Beta técnica privada:** aproximadamente 80–85%.
