@@ -187,7 +187,7 @@
     return `<div class="games" role="group" aria-label="Elige el juego">${games.map((item, index) => {
       const active = item.key === selectedModeKey;
       return `<button class="game-row${active ? " active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}">
-        <span class="deck-chapter" aria-hidden="true">Capítulo ${["I", "II", "III"][index] || index + 1}<i>↗</i></span>
+        <span class="deck-chapter" aria-hidden="true">Capítulo ${["I", "II", "III", "IV", "V", "VI", "VII", "VIII"][index] || index + 1}<i>↗</i></span>
         <span class="game-name">${item.name}</span>
         <span class="game-meta">${item.cards.length} ${item.cardLabel} · ${item.blurb}</span>
       </button>`;
