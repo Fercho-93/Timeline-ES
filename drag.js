@@ -1,19 +1,9 @@
-// Arrastrar una carta hasta un hueco, como alternativa a tocar la carta y luego el hueco.
-// Las dos formas conviven: un toque corto sigue seleccionando.
-//
-// Se usa Pointer Events y no la API de arrastre de HTML5, que no existe en los
-// navegadores móviles. Y el arranque del gesto es distinto según el dispositivo:
-//
-// - Con ratón basta mover unos píxeles, que es lo natural en un escritorio.
-// - Con el dedo hace falta mantener pulsado un instante. Si empezáramos al primer
-//   movimiento habría que renunciar al desplazamiento de la página con el dedo sobre
-//   una carta, y las cartas ocupan media pantalla. Con la pulsación previa, un
-//   deslizamiento rápido sigue moviendo la página y solo la pulsación sostenida arrastra.
+// Con ratón se puede arrastrar una carta hasta un hueco.
+// En móvil, deslizar desplaza la pantalla y tocar selecciona la carta.
 (function () {
   "use strict";
 
   const MOVE_THRESHOLD = 8;   // píxeles que hay que moverse para que sea un arrastre
-  const TOUCH_HOLD = 160;     // milisegundos de pulsación antes de arrastrar con el dedo
   const EDGE = 56;            // margen en el que la línea temporal se desplaza sola
   const EDGE_STEP = 14;
   const GHOST_WIDTH = 150;    // la copia que sigue al dedo va encogida, para no tapar la línea
@@ -102,6 +92,9 @@
   }
 
   function onPointerDown(event) {
+    // En pantallas táctiles, deslizar siempre desplaza y tocar selecciona.
+    // El arrastre se conserva únicamente para el ratón.
+    if (event.pointerType !== "mouse") return;
     if (session || event.button > 0) return;
     const card = event.target.closest(this.cardSelector);
     if (!card || card.disabled) return;
@@ -115,14 +108,6 @@
       armed: event.pointerType === "mouse", dragging: false, slot: null, ghost: null, timer: 0, frame: 0
     };
 
-    if (!session.armed) {
-      session.timer = setTimeout(() => {
-        if (!session || session.dragging) return;
-        session.armed = true;
-        session.card.classList.add("armed");
-        try { session.card.setPointerCapture(session.pointerId); } catch { /* el puntero ya no está */ }
-      }, TOUCH_HOLD);
-    }
   }
 
   function onPointerMove(event) {
@@ -132,9 +117,6 @@
     const moved = Math.hypot(session.x - session.startX, session.y - session.startY);
 
     if (!session.dragging) {
-      // Con el dedo, moverse antes de que la pulsación cuaje significa desplazar la
-      // página: se abandona el gesto y el navegador sigue con lo suyo.
-      if (!session.armed) { if (moved > MOVE_THRESHOLD) cleanup(); return; }
       if (moved <= MOVE_THRESHOLD) return;
       event.preventDefault();
       try { session.card.setPointerCapture(session.pointerId); } catch { /* el puntero ya no está */ }
@@ -183,12 +165,6 @@
       if (!enableDrag.options) return;
       ({ down: onPointerDown, move: onPointerMove, up: onPointerUp })[name].call(enableDrag.options, event);
     };
-    // Con el dedo no basta con cancelar el `pointermove`: el navegador decide desplazar
-    // la página a partir del evento táctil, así que hay que frenar ese. Solo se frena
-    // cuando la pulsación ya ha cuajado; antes, deslizar sigue moviendo la página.
-    document.addEventListener("touchmove", event => {
-      if (session && (session.armed || session.dragging) && event.cancelable) event.preventDefault();
-    }, { passive: false });
     document.addEventListener("pointerdown", at("down"));
     document.addEventListener("pointermove", at("move"), { passive: false });
     document.addEventListener("pointerup", at("up"));

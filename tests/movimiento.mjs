@@ -265,14 +265,23 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   ok("deslizar antes de mantener no inicia un arrastre", !w.document.querySelector(".armed, .drag-ghost"));
   pointer(w, "pointerdown", card, 100, 400);
   await sleep(180);
-  ok("mantener activa la señal táctil", card.classList.contains("armed"));
-  w.document.elementFromPoint = () => el(w, '.slot[data-index="0"]');
+  ok("mantener tampoco bloquea el desplazamiento táctil", !card.classList.contains("armed"));
   pointer(w, "pointermove", card, 100, 280);
+  const touch = new w.Event('touchmove', {bubbles:true, cancelable:true});
+  card.dispatchEvent(touch);
+  ok("deslizar después de mantener no cancela el gesto del navegador", !touch.defaultPrevented && !w.document.querySelector('.drag-ghost'));
+  pointer(w, "pointerup", card, 100, 280);
+  click(w, '.hand-card');
+  card = el(w, '.hand-card.selected');
+  ok("un toque selecciona la carta", !!card);
+  pointer(w, "pointerdown", card, 100, 400, "mouse");
+  w.document.elementFromPoint = () => el(w, '.slot[data-index="0"]');
+  pointer(w, "pointermove", card, 100, 280, "mouse");
   const ghost = el(w, ".drag-ghost");
   ok("la copia usa composición y no duplica el control accesible", ghost.style.transform.includes("translate3d") && ghost.getAttribute("aria-hidden") === "true" && ghost.tabIndex === -1);
   // Soltar en otro hueco antes del siguiente frame debe elegir la posición final.
   w.document.elementFromPoint = () => el(w, '.slot[data-index="1"]');
-  pointer(w, "pointerup", card, 300, 280);
+  pointer(w, "pointerup", card, 300, 280, "mouse");
   ok("soltar usa el destino final y pide confirmación", el(w, ".slot-confirm").dataset.index === "1" && !w.document.querySelector(".drag-ghost"));
   await sleep(5); // siguiente evento real: el clic sintético del arrastre ya se ha consumido
   click(w, '[data-action="cancel-place"]');

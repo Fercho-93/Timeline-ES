@@ -208,17 +208,20 @@ console.log("\nEl mapa de la línea");
   };
 
   const corta = conLinea([1, 2, 3, 4]);
-  ok("con cuatro cartas no hay mapa: la línea ya casi cabe", !existe(corta, ".timeline-map"));
+  ok("el zoom está disponible también en líneas cortas", existe(corta, ".timeline-zoom"));
 
   const w = conLinea([1, 2, 3, 4, 5, 6, 7, 8]);
-  const paradas = [...w.document.querySelectorAll(".map-stop")];
-  ok(`hay una parada por carta (${paradas.length} de 8)`, paradas.length === 8);
-  ok("cada parada dice a dónde lleva", paradas.every(p => /^Ir a .+, .+/.test(p.getAttribute("aria-label") || "")));
-  ok("y lleva el color de su época", paradas.every(p => /\bera-[a-z]+\b/.test(p.className)));
-  // Lo que se ve es la versión corta: «218 a.C.», no «218 a. C.» con su título detrás.
-  ok("la primera parada enseña el año en corto", paradas[0].textContent.trim() === "218 a.C.");
-  ok("y su etiqueta, la carta entera", paradas[0].getAttribute("aria-label") === "Ir a Desembarco romano en Emporion, 218 a. C.");
-  ok("las paradas no son huecos: no colocan nada", paradas.every(p => !p.hasAttribute("data-action")));
+  ok("el minimapa se sustituye por zoom sobre las cartas reales", !existe(w, '.map-stop') && existe(w, '.timeline-zoom'));
+  click(w, '[data-timeline-zoom="out"]');
+  click(w, '[data-timeline-zoom="out"]');
+  ok("se puede alejar hasta el 50%", w.document.querySelector('.timeline-zoom output').textContent === '50%');
+  ok("alejar conserva las ocho cartas", w.document.querySelectorAll('.timeline .timeline-card').length === 8);
+  click(w, '[data-action="solo-place"][data-index="8"]');
+  ok("confirmar en el extremo vuelve a tamaño legible", w.document.querySelector('.timeline-zoom output').textContent === '100%' && w.document.querySelector('.slot-confirm').dataset.index === '8');
+  click(w, '[data-action="cancel-place"]');
+  click(w, '[data-timeline-zoom="out"]');
+  click(w, '[data-timeline-zoom="reset"]');
+  ok("tamaño normal restaura el 100%", w.document.querySelector('.timeline-zoom output').textContent === '100%');
 }
 
 console.log(`\n${fail} fallos`);

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import './conexion-nativa.mjs';
+import './confirmacion-extremos.mjs';
 const CT = {shuffle: cards => [...cards].reverse()};
 const context = vm.createContext({window:{CONTINUUM:CT},location:{origin:'https://local.test',pathname:'/'},URL,URLSearchParams});
 for(const file of ['engine.js','links.js']) vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);

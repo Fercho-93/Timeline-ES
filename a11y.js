@@ -15,7 +15,7 @@
   // Atributos que identifican a un elemento entre dos repintados. Son los mismos que usan
   // los dos motores para saber en qué se ha pulsado, así que si el elemento vuelve a
   // pintarse, vuelve con ellos.
-  const KEYS = ["data-action", "data-online-action", "data-id", "data-index", "data-mode", "data-block"];
+  const KEYS = ["data-action", "data-online-action", "data-id", "data-index", "data-mode", "data-block", "data-timeline-zoom"];
 
   function selectorFor(el) {
     if (!el || el.nodeType !== 1) return null;
@@ -270,7 +270,20 @@
       const nuevaConfirmacion = container.querySelector(".slot-confirm");
       if (nuevaConfirmacion && nuevaConfirmacion.dataset.index !== confirmacionAnterior) nuevaConfirmacion.classList.add("placement-enter");
     }
+    const confirmation = container.querySelector(".slot-confirm");
+    const newConfirmation = confirmation && confirmation.dataset.index !== confirmacionAnterior;
+    // Confirmar vuelve al tamaño legible y conserva el hueco elegido, también
+    // en los extremos. Se resuelve antes de devolver el foco al botón.
+    window.CONTINUUM.applyTimelineZoom?.(container, cambioDePantalla || !!newConfirmation);
     restauraAnclas(container);
+    if (newConfirmation) {
+      const wrap = container.querySelector(".timeline-wrap");
+      if (wrap) {
+        const target = confirmation.getBoundingClientRect();
+        const frame = wrap.getBoundingClientRect();
+        wrap.scrollLeft += target.left - frame.left - (frame.width - target.width) / 2;
+      }
+    }
     if (primero) return;
     if (cambioDePantalla) {
       // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil

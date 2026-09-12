@@ -1,58 +1,36 @@
-// El mapa de la línea: una tira de paradas, una por carta colocada, con su época y su
-// dato en corto.
-//
-// La línea temporal es más ancha que cualquier móvil. Cada carta ocupa 174 px y cada
-// hueco 54, así que en una pantalla de 390 no caben ni dos: en una partida avanzada,
-// buscar dónde va la tuya es desplazarse a ciegas de un extremo a otro sin ver nunca el
-// conjunto. Y no se arregla encogiendo las cartas, porque los huecos son botones y por
-// debajo de 44 px dejan de ser pulsables con el dedo.
-//
-// Por eso el mapa no coloca nada: solo enseña de un vistazo qué años hay puestos y lleva
-// la línea hasta el que elijas. Las cartas y los huecos siguen con su tamaño de siempre.
-//
-// Las paradas se colocan a escala real dentro del rango que abarcan las cartas puestas,
-// no repartidas a partes iguales: así se ve la forma de verdad de la línea, con sus
-// racimos apretados y sus huecos de siglos, que es justo lo que un índice a partes
-// iguales no puede enseñar. Pero a escala real dos paradas seguidas pueden caer
-// prácticamente encima si sus cartas están muy cerca en el tiempo, y por debajo de 44 px
-// un botón deja de ser pulsable con el dedo — así que, tras calcular la posición
-// proporcional de cada una, se empuja hacia la derecha a la que quede demasiado cerca de
-// la anterior. El orden nunca cambia, la tira solo se alarga donde hace falta.
+// Zoom compartido por las partidas locales, solitarias y en línea.
+// Se reducen las cartas reales para respetar los datos ocultos por el Fantasma.
 (function () {
   "use strict";
-
   const CT = window.CONTINUUM;
-  // Con cuatro cartas o menos la línea ya cabe casi entera y el mapa sobra.
-  const MINIMO = 5;
-  const ANCHO_PARADA = 44;
+  const levels = [0.5, 0.75, 1];
+  let level = 2;
 
-  function timelineMap(modeKey, cards, { hidden = false } = {}) {
-    if (cards.length < MINIMO) return "";
-    const valores = cards.map(card => CT.sortValue(modeKey, card));
-    const minimo = Math.min(...valores), maximo = Math.max(...valores);
-    const rango = maximo - minimo || 1;
-    // El lienzo de partida es tan ancho como si las paradas ya fueran a partes iguales;
-    // a partir de ahí, solo crece si un racimo lo necesita.
-    const lienzo = Math.max(320, cards.length * ANCHO_PARADA);
-    let anterior = -Infinity;
-    const paradas = cards.map((card, i) => {
-      const era = hidden ? { key: "ghost" } : CT.eraForCard(modeKey, card);
-      const nombre = `${card.title}, ${hidden ? "valor oculto" : CT.formatValue(modeKey, card)}`;
-      const proporcional = hidden ? i * ANCHO_PARADA : ((valores[i] - minimo) / rango) * (lienzo - ANCHO_PARADA);
-      const izquierda = Math.max(proporcional, anterior + ANCHO_PARADA);
-      anterior = izquierda;
-      return { izquierda, html: `<button class="map-stop era-${era.key}" style="left:${izquierda}px" data-goto="${i}" data-id="${card.id}" aria-label="Ir a ${CT.escapeHtml(nombre)}"><span>${hidden ? i + 1 : CT.escapeHtml(CT.shortValue(modeKey, card))}</span></button>` };
-    });
-    const anchoTotal = Math.max(lienzo, paradas[paradas.length - 1].izquierda + ANCHO_PARADA);
-    // +36: el relleno lateral de 18px a cada lado, que con box-sizing: border-box cuenta
-    // dentro del ancho y si no se suma le roba sitio a la última parada.
-    return `<div class="timeline-map" role="group" aria-label="Recorrer la línea: ${cards.length} cartas colocadas" style="width:${anchoTotal + 36}px;min-width:100%">${paradas.map(p => p.html).join("")}</div>`;
+  function timelineMap(_modeKey, cards) {
+    if (!cards.length) return "";
+    return `<div class="timeline-zoom" role="group" aria-label="Tamaño de las cartas en juego">
+      <span>Vista de la mesa</span>
+      <button type="button" data-timeline-zoom="out" aria-label="Alejar para ver más cartas">−</button>
+      <output aria-live="polite">${Math.round(levels[level] * 100)}%</output>
+      <button type="button" data-timeline-zoom="in" aria-label="Acercar las cartas">+</button>
+      <button type="button" data-timeline-zoom="reset">Tamaño normal</button>
+    </div>`;
   }
 
-  // Centra un elemento dentro de la tira que se desplaza en horizontal. Con rectángulos
-  // y no con offsetLeft: el elemento no cuelga del contenedor que se desplaza, así que
-  // su offsetLeft se mide desde otro sitio. La usan tanto el mapa como el resaltado del
-  // hueco correcto al fallar, así que vive aquí y ninguno de los dos la repite.
+  function applyTimelineZoom(container, reset = false) {
+    if (reset) level = 2;
+    const wrap = container.querySelector(".timeline-wrap");
+    const timeline = wrap?.querySelector(".timeline");
+    if (!timeline) return;
+    timeline.style.zoom = levels[level];
+    timeline.style.setProperty("--timeline-scale", levels[level]);
+    const controls = container.querySelector(".timeline-zoom");
+    if (!controls) return;
+    controls.querySelector("output").textContent = `${Math.round(levels[level] * 100)}%`;
+    controls.querySelector('[data-timeline-zoom="out"]').disabled = level === 0;
+    controls.querySelector('[data-timeline-zoom="in"]').disabled = level === levels.length - 1;
+  }
+
   function scrollToElement(wrap, el) {
     if (!wrap || !el || typeof wrap.scrollBy !== "function") return;
     const caja = el.getBoundingClientRect();
@@ -61,17 +39,27 @@
     wrap.scrollBy({ left: caja.left - marco.left - (marco.width - caja.width) / 2, behavior: reduce ? "auto" : "smooth" });
   }
 
-  // Llevar la línea hasta una carta no necesita saber nada de la partida, así que se
-  // resuelve aquí y ningún motor tiene que enterarse.
   document.addEventListener("click", event => {
-    const parada = event.target.closest("[data-goto]");
-    if (!parada) return;
-    const wrap = document.querySelector(".timeline-wrap");
-    const carta = wrap?.querySelectorAll(".timeline-card")[Number(parada.dataset.goto)];
-    if (!carta) return;
-    scrollToElement(wrap, carta);
+    const button = event.target.closest("[data-timeline-zoom]");
+    if (!button || button.disabled) return;
+    const container = button.closest("#app");
+    const wrap = container?.querySelector(".timeline-wrap");
+    if (!wrap) return;
+    const center = wrap.getBoundingClientRect().left + wrap.clientWidth / 2;
+    const cards = [...wrap.querySelectorAll(".timeline-card, .slot-confirm")];
+    const anchor = cards.reduce((nearest, card) => {
+      const box = card.getBoundingClientRect();
+      const distance = Math.abs(box.left + box.width / 2 - center);
+      return !nearest || distance < nearest.distance ? { card, distance } : nearest;
+    }, null)?.card;
+    const oldLeft = anchor?.getBoundingClientRect().left;
+    const action = button.dataset.timelineZoom;
+    level = action === "reset" ? 2 : Math.max(0, Math.min(levels.length - 1, level + (action === "out" ? -1 : 1)));
+    applyTimelineZoom(container);
+    if (anchor) wrap.scrollLeft += anchor.getBoundingClientRect().left - oldLeft;
   });
 
   CT.timelineMap = timelineMap;
+  CT.applyTimelineZoom = applyTimelineZoom;
   CT.scrollToElement = scrollToElement;
 })();
