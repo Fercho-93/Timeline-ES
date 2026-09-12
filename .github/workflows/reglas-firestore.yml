@@ -1,0 +1,64 @@
+name: Publicar reglas de Firestore
+
+# Las reglas del repositorio no son las que aplica Firestore: hay que publicarlas en el
+# proyecto. Cuando las dos cosas se separan, la partida falla para quien juega aunque las
+# pruebas estén en verde, que es exactamente lo que pasó con la puntuación de la
+# competición. Este flujo cierra esa distancia sin necesidad de un ordenador.
+#
+# Se dispara solo cuando cambia `firestore.rules` en main, y también a mano desde la
+# pestaña Actions —botón «Run workflow»—, que funciona igual desde el móvil.
+#
+# Antes de publicar se pasan las pruebas de reglas contra el emulador: si fallan, no se
+# despliega nada. Publicar unas reglas rotas deja la sala inservible para todo el mundo.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['firestore.rules', '.github/workflows/reglas-firestore.yml']
+
+permissions:
+  contents: read
+
+# Dos publicaciones a la vez sobre el mismo proyecto se pisarían; la última en entrar gana
+# y la otra se cancela antes de escribir.
+concurrency:
+  group: reglas-firestore
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    name: Probar y publicar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Probar las reglas contra el emulador
+        run: npm run test:reglas
+      - name: Escribir la credencial
+        env:
+          CUENTA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$CUENTA" ]; then
+            echo "Falta el secreto FIREBASE_SERVICE_ACCOUNT del repositorio: sin él no se" >&2
+            echo "puede publicar. Se crea en Firebase, Configuración del proyecto ->" >&2
+            echo "Cuentas de servicio -> Generar nueva clave privada, y se pega entero en" >&2
+            echo "Settings -> Secrets and variables -> Actions." >&2
+            exit 1
+          fi
+          # Fuera del espacio de trabajo para que no acabe en un artefacto por descuido.
+          printf '%s' "$CUENTA" > "$RUNNER_TEMP/cuenta.json"
+      - name: Publicar en el proyecto
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/cuenta.json
+        run: npx firebase deploy --only firestore:rules --project timeline-es --non-interactive
+      - name: Borrar la credencial
+        if: always()
+        run: rm -f "$RUNNER_TEMP/cuenta.json"
