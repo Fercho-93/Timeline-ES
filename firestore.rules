@@ -543,43 +543,42 @@ service cloud.firestore {
           && n.submitted == f.submitted.concat([request.auth.uid])
           && !exists(path) && getAfter(path).data.value is int && bumped();
       }
-      function finalDistance(who) {
-        let answer = get(/databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(before().final.round))/answers/$(who)).data.value;
-        let target = before().final.target;
-        return answer >= target ? answer - target : target - answer;
+      function finalDistance(f, i) {
+        let who = f.players[i < f.players.size() ? i : 0];
+        let answer = get(/databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(f.round))/answers/$(who)).data.value;
+        return i >= f.players.size() ? 8000000000000001 : (answer >= f.target ? answer - f.target : f.target - answer);
       }
-      function finalAt(i, best) {
-        let players = before().final.players;
-        return i < players.size() && finalDistance(players[i]) == best ? [players[i]] : [];
+      function finalDistances(f) {
+        return [finalDistance(f,0),finalDistance(f,1),finalDistance(f,2),finalDistance(f,3),finalDistance(f,4),finalDistance(f,5),finalDistance(f,6),finalDistance(f,7),finalDistance(f,8)];
       }
-      function finalNotCloser(i, best) {
-        let players = before().final.players;
-        return i >= players.size() || finalDistance(players[i]) >= best;
+      function finalAt(players, distances, i, best) {
+        return i < players.size() && distances[i] == best ? [players[i]] : [];
       }
-      function finalWinners(candidate) {
-        let best = finalDistance(candidate);
-        return finalAt(0,best).concat(finalAt(1,best)).concat(finalAt(2,best))
-          .concat(finalAt(3,best)).concat(finalAt(4,best)).concat(finalAt(5,best))
-          .concat(finalAt(6,best)).concat(finalAt(7,best)).concat(finalAt(8,best));
+      function finalWinners(players, distances, best) {
+        return finalAt(players,distances,0,best).concat(finalAt(players,distances,1,best)).concat(finalAt(players,distances,2,best))
+          .concat(finalAt(players,distances,3,best)).concat(finalAt(players,distances,4,best)).concat(finalAt(players,distances,5,best))
+          .concat(finalAt(players,distances,6,best)).concat(finalAt(players,distances,7,best)).concat(finalAt(players,distances,8,best));
       }
-      function finalMinimum(candidate) {
-        let best = finalDistance(candidate);
-        return finalNotCloser(0,best) && finalNotCloser(1,best) && finalNotCloser(2,best)
-          && finalNotCloser(3,best) && finalNotCloser(4,best) && finalNotCloser(5,best)
-          && finalNotCloser(6,best) && finalNotCloser(7,best) && finalNotCloser(8,best);
+      function finalMinimum(d, best) {
+        return best <= d[0] && best <= d[1] && best <= d[2] && best <= d[3] && best <= d[4]
+          && best <= d[5] && best <= d[6] && best <= d[7] && best <= d[8];
       }
       function validFinalResolve() {
         let prior = before().final;
         let next = after();
         let ending = next.status == 'ended';
         let candidate = ending ? next.winner : next.final.players[0];
+        let distances = finalDistances(prior);
+        let answer = get(/databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(prior.round))/answers/$(candidate)).data.value;
+        let best = answer >= prior.target ? answer - prior.target : prior.target - answer;
+        let winners = finalWinners(prior.players, distances, best);
         return prior.submitted.toSet() == prior.players.toSet()
-          && candidate in prior.players && finalMinimum(candidate)
+          && candidate in prior.players && finalMinimum(distances, best)
           && (ending
             ? (changed().hasOnly(['status','phase','winner','winners','version','updatedAt'])
-              && next.phase == 'finished' && next.winners == [candidate] && finalWinners(candidate) == [candidate])
+              && next.phase == 'finished' && next.winners == [candidate] && winners == [candidate])
             : (changed().hasOnly(['final','version','updatedAt']) && finalShape(next.final)
-              && next.final.round == prior.round + 1 && next.final.players == finalWinners(candidate)
+              && next.final.round == prior.round + 1 && next.final.players == winners
               && next.final.cardId != prior.cardId
               && next.final.used == (next.final.cardId in prior.used ? [next.final.cardId] : prior.used.concat([next.final.cardId]))))
           && bumped();

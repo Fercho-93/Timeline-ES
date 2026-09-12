@@ -21,9 +21,9 @@ function client(uid){
  // `clone` pasa los datos por JSON para normalizarlos al realm de este módulo, pero
  // `serverTimestamp()` no es JSON: hay que conservar ese centinela tal cual o Firestore
  // no lo reconoce como marca de hora del servidor.
- w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
+ w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>tx.set(ref,clone(data)),update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];
@@ -87,6 +87,19 @@ try {
  assert.equal(s.ghost.owners.filter(o=>o===A).length,1,'Ana no puede quedar dueña de dos Fantasmas');
  assert.equal(s.phase,'final');assert.deepEqual(s.final.players,[A,B]);
  assert.deepEqual(s.players[A].hand,[]);assert.deepEqual(s.players[B].hand,[]);assert.deepEqual(s.ghost,tie.ghost);
+ // Formularios reales, respuestas privadas y resultado compartido entre móviles.
+ const target=s.final.target;
+ for (const [i,cl] of clients.slice(0,2).entries()) {
+   await cl.call('renderOnlineFinal');
+   cl.w.document.querySelector('#final-guess').value=String(target+i);
+   cl.w.document.querySelector('[data-final-online]').dispatchEvent(new cl.w.Event('submit',{bubbles:true,cancelable:true}));
+   for(let n=0;n<100 && !(await snapshot()).final.submitted.includes([A,B][i]);n++) await new Promise(r=>setTimeout(r,20));
+   assert.equal(cl.errors.length,0,cl.errors.map(String).join('\n'));
+   assert.ok((await snapshot()).final.submitted.includes([A,B][i]));
+   if(i===0) {await clients[2].call('renderOnlineFinal');assert.equal(clients[2].w.document.querySelector('.final-results'),null);}
+ }
+ await clients[2].call('renderOnlineFinal');assert.ok(clients[2].w.document.querySelector('.final-results'));
+ await clients[2].call('nextOnlineFinal');assert.equal((await snapshot()).winner,A);
  // Una salida ajena no cierra ni repite un resultado ya resuelto.
  await seed(fixture());await clients[0].call('useGhost');await play(clients[0]);await clients[0].call('removePlayer',B);
  s=await snapshot();assert.equal(s.phase,'reveal');await clients[0].call('finishTurn');assert.deepEqual((await snapshot()).ghost.pending,[C]);

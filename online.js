@@ -1227,6 +1227,7 @@ function renderTimelineReview() {
 function roomMenu() {
   const isHost = roomState?.hostUid === user.uid;
   const playing = roomState?.status === "playing";
+  const inFinal = roomState?.phase === 'final';
   const currentUid = playing ? roomState.playerOrder[roomState.current] : null;
   const currentName = currentUid ? roomState.players[currentUid].name : "";
   const others = (roomState?.playerOrder || []).filter(uid => uid !== roomState.hostUid);
@@ -1235,11 +1236,12 @@ function roomMenu() {
     <div class="actions" style="display:grid">
       <button class="btn btn-secondary" data-online-action="share">Compartir enlace</button>
       <button class="btn btn-secondary" data-online-action="qr">Mostrar QR</button>
-      ${isHost && playing ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
+      ${isHost && playing && !inFinal ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
     </div>
-    ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span>${escapeHtml(initials(roomState.players[uid].name))}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong><button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
+    ${isHost && others.length && !inFinal ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span>${escapeHtml(initials(roomState.players[uid].name))}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong><button class="kick-btn" data-online-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
+    ${inFinal ? '<p>La final espera a todos los finalistas. Si alguien se desconecta, puede volver a entrar y responder.</p>' : ''}
     <div class="actions" style="display:grid">
-      ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
+      ${isHost && playing ? '<button class="btn btn-ghost" data-online-action="close-room">Terminar partida y cerrar sala</button>' : isHost ? '<button class="btn btn-ghost" data-online-action="close-room">Cerrar la sala</button>' : inFinal ? '<button class="btn btn-ghost" data-online-action="back">Ir al inicio</button>' : '<button class="btn btn-ghost" data-online-action="leave-room">Salir de la partida</button>'}
       <button class="btn btn-primary" data-online-action="close-room-menu">Volver a la partida</button>
     </div>
   </div></div>`);
