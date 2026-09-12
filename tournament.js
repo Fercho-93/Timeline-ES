@@ -1,0 +1,21 @@
+(function () {
+  'use strict';
+  const CT = window.CONTINUUM;
+  const modes = () => Object.keys(CT.MODES).filter(key => key !== 'mixed');
+  function create(rounds, cards) {
+    const queue = CT.shuffle(modes()).slice(0, Math.max(1, Math.min(modes().length, Number(rounds) || modes().length)));
+    return {queue, index:0, history:[], handSize:Math.max(1, Math.min(6, Number(cards) || 5))};
+  }
+  function next(t, winners) {
+    if (t.index + 1 >= t.queue.length) throw Error('La competición ha terminado.');
+    return {...t, index:t.index+1, history:[...t.history,{mode:t.queue[t.index],winners:[...winners]}]};
+  }
+  function board(t, players, winners = []) {
+    const history = [...t.history, ...(winners.length ? [{winners}] : [])];
+    const rows = players.map(p=>({...p,points:history.filter(r=>r.winners.includes(p.id)).length})).sort((a,b)=>b.points-a.points);
+    const finished = winners.length && t.index+1 === t.queue.length;
+    const leaders = rows.filter(p=>p.points === rows[0].points).map(p=>CT.escapeHtml(p.name));
+    return `<section class="panel tournament-board"><h2>${finished ? 'Resultado de la competición' : `Competición · ronda ${t.index+1} de ${t.queue.length}`}</h2><p>${CT.escapeHtml(CT.mode(t.queue[t.index]).name)} · ${t.handSize} cartas iniciales por persona</p><ol>${rows.map(p=>`<li><strong>${CT.escapeHtml(p.name)}</strong><span>${p.points} ${p.points===1?'ronda ganada':'rondas ganadas'}</span></li>`).join('')}</ol>${finished ? `<p><strong>${leaders.join(' y ')} ${leaders.length===1?'gana':'empatan en'} la competición.</strong></p>` : '<p class="hint">Cada ronda ganada suma un punto. El siguiente mazo se elige sin repetir.</p>'}</section>`;
+  }
+  CT.Tournament = {modes,create,next,board};
+})();

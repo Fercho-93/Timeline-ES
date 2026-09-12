@@ -58,6 +58,8 @@
   let selectedCardId = null;
   let result = null;
   let pendingIndex = null;
+  let pendingTournament = null;
+  const MULTI_COMP_KEY = 'continuum-multi-competition-v1';
   // Estado de la enciclopedia: qué mazo se consulta, la búsqueda y el filtro de banda en
   // curso, y qué carta destacar al llegar desde el repaso de una carta fallada.
   let encMode = null;
@@ -115,6 +117,7 @@
   function categoryBadge(card) { return CT.categoryBadge(selectedModeKey, card); }
 
   function saveGame() {
+    if (game?.tournament) { CT.Storage.setItem(MULTI_COMP_KEY, JSON.stringify(CT.Saves.prepare(game, selectedModeKey))); return; }
     if (game) CT.Storage.setItem(storageKey(), JSON.stringify(CT.Saves.prepare(game, selectedModeKey)));
     else CT.Storage.removeItem(storageKey());
   }
@@ -130,7 +133,8 @@
   }
 
   function header(extra = "") {
-    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${extra}</div></header>`;
+    const competition = game?.tournament && ['pass','game','final-local','winner'].includes(screen) ? `<p class="eyebrow">Competición · ronda ${game.tournament.index+1} de ${game.tournament.queue.length} · ${escapeHtml(currentMode().name)}</p>` : '';
+    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${extra}</div></header>${competition}`;
   }
 
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
@@ -241,8 +245,48 @@
   function competitionPromo() {
     return `${loadCompetition() ? '<button class="btn btn-primary btn-block" data-action="resume-competition">Continuar competición guardada →</button>' : ""}<div class="field"><label for="competition-length">Duración de la competición</label><select id="competition-length"><option value="3">Corta · 3 temas</option><option value="5">Media · 5 temas</option><option value="14" selected>Completa · todos los temas</option></select></div><button class="comp-promo" data-action="start-competition">
       <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
-      <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un tema al azar tras otro, sin repetirse. ${ROUND_CARDS} cartas por tema, ${SOLO_LIVES} vidas cada vez.</small></span>
-    </button>`;
+      <span class="comp-promo-copy"><b>Jugar solo 🏆</b><small>Un mazo aleatorio por ronda, sin repetirse. Suma tus aciertos.</small></span>
+    </button><div class="field"><label for="competition-cards">Cartas por ronda (por persona en multijugador)</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===5?' selected':''}>${n}</option>`).join('')}</select></div>
+    <div class="play-choice-grid"><button class="play-choice" data-action="competition-local"><span class="choice-icon">${playIcon('local')}</span><span><b>Multijugador · un móvil</b><small>Pasad el teléfono. Un punto por ronda ganada.</small></span></button><button class="play-choice" data-action="competition-online"><span class="choice-icon">${playIcon('online')}</span><span><b>Multijugador · varios móviles</b><small>Una sala compartida para todas las rondas.</small></span></button></div>
+    ${CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}`;
+  }
+
+  function competitionOptions() {
+    return {rounds:Number(document.getElementById('competition-length')?.value)||CT.Tournament.modes().length, cards:Number(document.getElementById('competition-cards')?.value)||5};
+  }
+  function prepareMultiCompetition() {
+    pendingTournament = competitionOptions();
+    setup();
+    document.getElementById('hand-size').value = String(pendingTournament.cards);
+    app.querySelector('.setup-section h2').textContent = 'Competición multijugador';
+    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios. Un punto por ronda ganada.`;
+  }
+  function startTournamentRound(t, players, starter, ghost, pulse) {
+    selectedModeKey = t.queue[t.index];
+    selectedBlockKey = CT.blockOf(selectedModeKey).key;
+    cardsById = new Map(CT.cards(selectedModeKey).map(c=>[c.id,c]));
+    const deck = shuffle(CT.cards(selectedModeKey).map(c=>c.id));
+    const handSize = Math.min(t.handSize, Math.floor((deck.length-1)/players.length));
+    const powers = CT.Powers.create(deck,players.length,handSize,ghost,pulse);
+    const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
+    const timeline=[deck.shift()];
+    roster.forEach(p=>p.hand.forEach(id=>CT.Powers.claim(powers,id,p.id,deck)));
+    game={mode:selectedModeKey,tournament:t,competitionGhost:ghost,pulse,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,pulseTurn:null,pulseGift:null};
+    selectedCardId=null;pendingIndex=null;result=null;saveGame();renderPass();
+  }
+  function nextTournamentRound() {
+    if (!game?.tournament || !game.winners || game.tournament.index+1>=game.tournament.queue.length) return;
+    startTournamentRound(CT.Tournament.next(game.tournament,game.winners),game.players,(game.starter+1)%game.players.length,game.competitionGhost,game.pulse);
+  }
+  function resumeMultiCompetition() {
+    try {
+      const saved=JSON.parse(CT.Storage.getItem(MULTI_COMP_KEY));
+      CT.Saves.validate(saved,saved.mode);
+      if (!saved.tournament?.queue?.every(CT.has) || saved.tournament.queue[saved.tournament.index]!==saved.mode) throw Error('Competición inválida');
+      game=saved;selectedModeKey=game.mode;selectedBlockKey=CT.blockOf(game.mode).key;
+      cardsById=new Map(game.savedDeck.map(c=>[c.id,c]));selectedCardId=null;pendingIndex=null;result=null;
+      if(game.winners) renderWinner(game.players.filter(p=>game.winners.includes(p.id))); else renderPass();
+    } catch { showToast('No se pudo recuperar la competición guardada.'); }
   }
 
   function homeMasthead() {
@@ -283,6 +327,7 @@
     return buttons ? `<section class="quick-actions" aria-label="Jugar ahora">${buttons}</section>` : '';
   }
   function home() {
+    pendingTournament = null;
     screen = "home";
     paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
       ${homeMasthead()}${quickActions()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
@@ -442,6 +487,10 @@
     const starter = Number(document.getElementById("starter").value);
     const ghost = !!document.getElementById("ghost-toggle")?.checked;
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
+    if (pendingTournament) {
+      const t=CT.Tournament.create(pendingTournament.rounds,requestedHand);pendingTournament=null;
+      startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse);return;
+    }
     const shuffled = shuffle(currentMode().cards.map(card => card.id));
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
@@ -924,6 +973,12 @@
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
     const fallosUnicos = new Set(game.failed || []).size;
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} cartas jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+    if (game.tournament) {
+      app.querySelector('.pass-screen').insertAdjacentHTML('afterbegin',CT.Tournament.board(game.tournament,game.players,game.winners));
+      const button=app.querySelector('[data-action="setup"]');
+      if (game.tournament.index+1<game.tournament.queue.length) { button.dataset.action='competition-next';button.textContent='Siguiente ronda · nuevo mazo'; }
+      else { button.dataset.action='home';button.textContent='Elegir otra competición'; }
+    }
   }
 
   // La pantalla de fin solo enseñaba lo fallado: quien gana su partida también quiere
@@ -1721,7 +1776,8 @@
     try {
       const saved = JSON.parse(raw);
       if (saved.saveVersion !== CT.Saves.VERSION || !Array.isArray(saved.queue) || !Array.isArray(saved.roundsSummary) || !CT.has(saved.previousModeKey) || !CT.Ghost.LEVELS[saved.difficulty] || !saved.decks || !saved.queue.every(key => CT.has(key) && Array.isArray(saved.decks[key]))) throw Error("Formato de competición desconocido");
-      if (!Array.isArray(saved.totalFailed) || !Number.isInteger(saved.totalHits) || saved.totalHits < 0 || saved.roundsSummary.some(round => !CT.has(round.mode) || !Number.isInteger(round.hits) || round.hits < 0 || round.hits > ROUND_CARDS || round.total !== ROUND_CARDS)) throw Error("Marcador inválido");
+      saved.cardsPerRound ??= ROUND_CARDS;
+      if (!Number.isInteger(saved.cardsPerRound) || saved.cardsPerRound<1 || saved.cardsPerRound>6 || !Array.isArray(saved.totalFailed) || !Number.isInteger(saved.totalHits) || saved.totalHits < 0 || saved.roundsSummary.some(round => !CT.has(round.mode) || !Number.isInteger(round.hits) || round.hits < 0 || round.hits > saved.cardsPerRound || round.total !== saved.cardsPerRound)) throw Error("Marcador inválido");
       if (saved.solo) CT.Saves.validate(saved.solo, saved.solo.mode);
       const themes = [...saved.queue, ...saved.roundsSummary.map(round => round.mode), ...(saved.solo ? [saved.solo.mode] : [])];
       if (!themes.length || new Set(themes).size !== themes.length || (!saved.finished && !saved.solo && !saved.queue.length)) throw Error("Rondas inválidas");
@@ -1748,6 +1804,7 @@
     previousModeKey = selectedModeKey;
     comp = { decks: CT.Saves.clone(Object.fromEntries(COMP_MODES.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(COMP_MODES).slice(0, Number(document.getElementById("competition-length")?.value) || COMP_MODES.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
     comp.totalThemes = comp.queue.length;
+    comp.cardsPerRound = competitionOptions().cards;
     compRoundIntro();
   }
 
@@ -1773,12 +1830,13 @@
     selectedModeKey = modeKey;
     cardsById = new Map(comp.decks[modeKey].map(card => [card.id, card]));
     const extra = CT.Ghost.level(comp.difficulty).extra;
-    const barajado = shuffle(comp.decks[modeKey].map(card => card.id)).slice(0, ROUND_CARDS + 1 + extra * (ROUND_CARDS - 1));
+    const count = comp.cardsPerRound || ROUND_CARDS;
+    const barajado = shuffle(comp.decks[modeKey].map(card => card.id)).slice(0, count + 1 + extra * (count - 1));
     const timeline = [barajado.shift()];
     solo = {
-      savedDeck: comp.decks[modeKey], kind: "comp", difficulty: comp.difficulty, ghostTurns: comp.difficulty === "hard" ? CT.Ghost.soloSchedule(ROUND_CARDS) : [], mode: modeKey, timeline, deck: barajado,
+      savedDeck: comp.decks[modeKey], kind: "comp", difficulty: comp.difficulty, ghostTurns: comp.difficulty === "hard" ? CT.Ghost.soloSchedule(count) : [], mode: modeKey, timeline, deck: barajado,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
-      total: ROUND_CARDS, finished: false, failed: []
+      total: count, finished: false, failed: []
     };
     pendingIndex = null;
     result = null;
@@ -1804,7 +1862,7 @@
     saveCompetition();
     selectedModeKey = previousModeKey;
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
-    const totalCards = comp.roundsSummary.length * ROUND_CARDS;
+    const totalCards = comp.roundsSummary.reduce((sum,r)=>sum+r.total,0);
     const fallosUnicos = new Set(comp.totalFailed.map(item => item.id)).size;
     const filas = comp.roundsSummary.map(r => `<li><b>${escapeHtml(CT.mode(r.mode).name)}</b><span>${r.hits} de ${r.total}</span></li>`).join("");
     const logros = CT.Progreso.finishCompetition();
@@ -1868,12 +1926,12 @@
     </div>`;
   }
 
-  async function launchOnline(roomCode = "") {
+  async function launchOnline(roomCode = "", competition = null) {
     screen = "online-loading";
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
     try {
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, onBack: playMenu });
+      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, competition, onBack: competition ? home : playMenu });
     } catch (error) {
       console.error(error);
       screen = "online-error";
@@ -1965,7 +2023,11 @@
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; playMenu(); }
-    else if (action === "setup") setup();
+    else if (action === "setup") { pendingTournament=null;setup(); }
+    else if (action === "competition-local") prepareMultiCompetition();
+    else if (action === "competition-online") launchOnline('',competitionOptions());
+    else if (action === "competition-next") nextTournamentRound();
+    else if (action === "competition-resume") resumeMultiCompetition();
     else if (action === "online") launchOnline();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.

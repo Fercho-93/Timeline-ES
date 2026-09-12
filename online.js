@@ -37,6 +37,7 @@ let selectedCardId = null;
 let pendingIndex = null;
 let busy = false;
 let selectedModeKey = "history";
+let competitionOptions = null;
 let seenSelfInRoom = false;
 let lastEffectVersion = null;
 let lastObservedTurnUid = null;
@@ -48,7 +49,7 @@ let turnTimerHandle = null;
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
 // en todos los móviles aunque sus relojes no coincidan.
 const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
-const CLIENT_VERSION = 41; // Incluye la final con respuestas privadas.
+const CLIENT_VERSION = 42; // Competición con cambio de mazo entre rondas.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false;
 const presenceListeners = new Map(), presenceRecords = new Map();
@@ -169,7 +170,7 @@ function getCard(id) {
 }
 
 function header(extra = "") {
-  return `<header class="topbar"><div class="brand">Continuum <span class="live-badge"><i></i> EN DIRECTO</span></div><div class="topbar-actions">${extra}${CT.settingsButton()}</div></header>`;
+  return `<header class="topbar"><div class="brand">Continuum <span class="live-badge"><i></i> EN DIRECTO</span></div><div class="topbar-actions">${extra}${CT.settingsButton()}</div></header>${roomState?.tournament ? `<p class="eyebrow">Competición · ronda ${roomState.tournament.index+1} de ${roomState.tournament.queue.length} · ${escapeHtml(CT.mode(modeKey()).name)}</p>` : ''}`;
 }
 
 function showToast(message) {
@@ -396,6 +397,7 @@ export async function openOnlineMode(options = {}) {
   const request = ++entryRequest;
   returnToMenu = typeof options.onBack === "function" ? options.onBack : null;
   selectedModeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
+  competitionOptions = options.competition || null;
   renderEntry(cleanCode(options.roomCode));
   await ensureAuth();
   if (request !== entryRequest) return;
@@ -423,6 +425,10 @@ function renderEntry(invited = "") {
     </div>
     <p class="online-note">Necesita conexión a internet durante la partida compartida.</p>
   </div>`, "online-entry");
+  if (competitionOptions && !invited) {
+    appEl.querySelector('.online-intro .eyebrow').textContent='Competición multijugador';
+    appEl.querySelector('.online-intro .lead').textContent=`${competitionOptions.rounds} rondas con mazos aleatorios, ${competitionOptions.cards} cartas por persona. Un punto por ronda ganada.`;
+  }
 }
 
 async function createRoom(name) {
@@ -430,19 +436,26 @@ async function createRoom(name) {
   busy = true;
   try {
     await ensureAuth();
+    const tournament = competitionOptions ? CT.Tournament.create(competitionOptions.rounds,competitionOptions.cards) : null;
+    if (tournament) {
+      try { await getDoc(doc(db,'capabilities','multiCompetition')); }
+      catch { showToast('Falta actualizar el servicio de salas para Competición multijugador.'); return; }
+      selectedModeKey=tournament.queue[0];
+    }
     const code = createRoomCode();
     const reference = doc(db, "rooms", code);
     const batch = writeBatch(db);
     batch.set(doc(db,'roomCreation',user.uid),{lastCreatedAt:serverTimestamp(),roomCode:code});
     batch.set(reference, {
       roomCode: code,
+      ...(tournament ? {tournament} : {}),
       mode: selectedModeKey,
       deckFingerprint: CT.deckFingerprint(selectedModeKey),
       hostUid: user.uid,
       status: "lobby",
       phase: "lobby",
       version: 1,
-      handSize: 4, turnSeconds: 30,
+      handSize: tournament?.handSize || 4, turnSeconds: 30,
       playerOrder: [user.uid],
       players: { [user.uid]: { name, hand: [], joinedAt: Date.now(), clientVersion: CLIENT_VERSION } },
       deck: [], discard: [], timeline: [], current: 0, starter: user.uid,
@@ -621,11 +634,38 @@ function renderLobby() {
       <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds"><option value="0">Sin límite</option><option value="20">20 segundos</option><option value="30" selected>30 segundos</option><option value="45">45 segundos</option></select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir. Requiere reglas v39.</small></span><input type="checkbox" id="online-ghost"></label><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
     </div>
   </div>`, "online-lobby");
+  if (roomState.tournament) {
+    appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', tournamentBoard());
+    const hand = document.getElementById('online-hand-size');
+    if (hand) {hand.value=String(roomState.tournament.handSize);hand.disabled=true;}
+  }
+}
+
+function tournamentBoard(winners = []) {
+  return CT.Tournament.board(roomState.tournament,roomState.playerOrder.map(id=>({id,name:roomState.players[id].name})),winners);
+}
+
+async function nextTournamentRound() {
+  if(busy || !roomState?.tournament || user.uid!==roomState.hostUid || roomState.tournament.index+1>=roomState.tournament.queue.length) return;
+  busy=true;
+  const reference=roomRef, expected=roomState.tournament.index;
+  try {
+    await runTransaction(db,async tx=>{
+      const data=(await tx.get(reference)).data();
+      if(data.status!=='ended' || data.tournament.index!==expected || data.hostUid!==user.uid) return;
+      const tournament=CT.Tournament.next(data.tournament,data.winners || [data.winner]);
+      const mode=tournament.queue[tournament.index];
+      const next={...data,tournament,mode,deckFingerprint:CT.deckFingerprint(mode),status:'lobby',phase:'lobby',handSize:tournament.handSize,players:Object.fromEntries(data.playerOrder.map(uid=>[uid,{...data.players[uid],hand:[],pulseUsed:false,shieldRound:0}])),deck:[],discard:[],timeline:[],current:0,starter:data.playerOrder[0],turnsInRound:0,round:1,winner:null,winners:null,reveal:null,pulseTurn:null,version:data.version+1,updatedAt:serverTimestamp()};
+      for(const key of ['ghost','pulsePower','final','tieQueue','turnStartedAt']) delete next[key];
+      tx.set(reference,next);
+    });
+  } catch(error) {console.error(error);showToast('No se pudo abrir la siguiente ronda. La sala y el resultado siguen guardados.');}
+  finally {busy=false;}
 }
 
 async function startRoom(withGhost = true) {
   if (busy || roomState.hostUid !== user.uid) return;
-  const handSize = Number(document.getElementById("online-hand-size").value);
+  const handSize = roomState.tournament?.handSize || Number(document.getElementById("online-hand-size").value);
   const starterUid = document.getElementById("online-starter").value;
   const pulse = !!document.getElementById("online-pulse")?.checked;
   const enableGhost = withGhost && !!document.getElementById("online-ghost")?.checked;
@@ -1206,6 +1246,11 @@ function renderWinner() {
     ? "Ha sido la única persona en terminar la ronda sin cartas."
     : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
   paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online"><div class="player-medallion">${escapeHtml(initials(roomState.players[uids[0]].name))}</div><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} cartas jugadas</button><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`, "online-winner");
+  if(roomState.tournament) {
+    const section=appEl.querySelector('.pass-screen');
+    section.insertAdjacentHTML('afterbegin',tournamentBoard(uids));
+    if(roomState.tournament.index+1<roomState.tournament.queue.length) section.insertAdjacentHTML('beforeend',roomState.hostUid===user.uid ? '<button class="btn btn-primary btn-block" data-online-action="competition-next">Siguiente ronda · nuevo mazo</button>' : '<p role="status">Esperando al anfitrión para pasar al siguiente mazo.</p>');
+  }
 }
 
 // Igual que en el juego local: quien gana su partida también quiere repasar la línea
@@ -1428,6 +1473,7 @@ document.addEventListener("click", event => {
   else if (action === "qr") showQr();
   else if (action === "close-qr") CT.closeDialog();
   else if (action === "start") startRoom();
+  else if (action === "competition-next") nextTournamentRound();
   else if (action === "select") {
     selectedCardId = Number(target.dataset.id);
     pendingIndex = null;
