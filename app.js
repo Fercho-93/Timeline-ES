@@ -12,7 +12,7 @@
   const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
   const paint = html => {
-    const sceneMode = screen === "enciclopedia" ? encMode : selectedModeKey;
+    const sceneMode = screen === "enciclopedia" && encMode !== "all" ? encMode : selectedModeKey;
     CT.Scene.apply(sceneMode, screen);
     CT.paint(app, html, screen);
     if (screen === "solo-home") {
@@ -256,12 +256,12 @@
   // El perfil entra por aquí y no por la cabecera: es un destino de la portada, como la
   // colección, y la barra de arriba ya tiene su trabajo con las acciones de cada pantalla.
   function homeNav() {
-    const homeActive = screen === "home" && homeDestination === "home";
-    const collectionActive = screen === "home" && homeDestination === "collection";
+    const homeActive = screen === "home";
+    const encyclopediaActive = screen === "enciclopedia";
     const profileActive = screen === "perfil";
     return `<nav class="home-nav" aria-label="Navegación de inicio">
       <button data-action="home-top"${homeActive ? ' aria-current="page"' : ''} aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
-      <button data-action="home-collection"${collectionActive ? ' aria-current="page"' : ''} aria-label="Ir a la colección de mazos"><span aria-hidden="true">▣</span><small>Colección</small></button>
+      <button data-action="home-encyclopedia"${encyclopediaActive ? ' aria-current="page"' : ''} aria-label="Abrir la enciclopedia de todas las cartas"><span aria-hidden="true">▤</span><small>Enciclopedia</small></button>
       <button data-action="perfil"${profileActive ? ' aria-current="page"' : ''} aria-label="Ver tu perfil"><span aria-hidden="true">★</span><small>Perfil</small></button>
       <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
     </nav>`;
@@ -933,13 +933,18 @@
   // El desplegable de mazos agrupado por bloque, igual que la portada los agrupa en la
   // galería: así la enciclopedia no inventa un segundo orden de los catorce juegos.
   function encModeOptions(modeKey) {
-    return Object.values(CT.BLOCKS).map(item => `<optgroup label="${escapeHtml(item.name)}">${item.games.map(key => {
+    return `<option value="all"${modeKey === "all" ? " selected" : ""}>Todas las cartas</option>` + Object.values(CT.BLOCKS).map(item => `<optgroup label="${escapeHtml(item.name)}">${item.games.map(key => {
       const mode = CT.mode(key);
       return `<option value="${key}"${key === modeKey ? " selected" : ""}>${escapeHtml(mode.name)} (${mode.cards.length})</option>`;
     }).join("")}</optgroup>`).join("");
   }
 
   function encCountText(modeKey, count) {
+    if (modeKey === "all") {
+      const groups = CT.Enciclopedia.catalogGroups();
+      const decks = groups.flatMap(group => group.decks);
+      return `${count} de ${decks.reduce((sum, deck) => sum + deck.cards.length, 0)} cartas · ${decks.length} mazos · ${groups.length} temáticas`;
+    }
     const mode = CT.mode(modeKey);
     return `${count} de ${mode.cards.length} ${escapeHtml(mode.cardLabel)} · ${escapeHtml(CT.axis(modeKey).timelineTitle)}`;
   }
@@ -948,10 +953,11 @@
   // partida, donde ver el mazo entero volvería trivial cualquier jugada pendiente.
   function enciclopediaView() {
     screen = "enciclopedia";
-    const mode = CT.mode(encMode);
-    const bands = CT.Enciclopedia.bands(encMode);
-    const cards = CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="enc-back">Volver</button>')}
+    const all = encMode === "all";
+    const mode = all ? {name: "Todas las cartas"} : CT.mode(encMode);
+    const bands = all ? [] : CT.Enciclopedia.bands(encMode);
+    const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
+    paint(`<div class="shell enc-shell">${header('<button class="icon-btn" data-action="enc-back">Volver</button>')}
       <section class="setup-section enc-section">
         <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
         <h1 data-focus tabindex="-1">${escapeHtml(mode.name)}</h1>
@@ -965,18 +971,20 @@
             <label for="enc-search-input">Buscar</label>
             <input id="enc-search-input" type="search" autocomplete="off" placeholder="Título, explicación o fuente…" value="${escapeHtml(encQuery)}">
           </div>
-          <div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
+          ${all ? '' : `<div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
             <button type="button" id="enc-band-all" class="band-chip${encBand === "all" ? " active" : ""}" data-action="enc-band" data-band="all" aria-pressed="${encBand === "all"}">Todas</button>
             ${bands.map(band => `<button type="button" id="enc-band-${band.key}" class="band-chip${encBand === band.key ? " active" : ""}" data-action="enc-band" data-band="${band.key}" aria-pressed="${encBand === band.key}"><span aria-hidden="true">${band.symbol}</span> ${escapeHtml(band.name)}</button>`).join("")}
-          </div>
+          </div>`}
         </div>
-        <div id="enc-results">${CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
+        ${all ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
+        <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
       </section>
+      ${homeNav()}
     </div>`);
   }
 
   function openEnciclopedia(modeKey, { highlight = null, band = "all", returnTo = "home" } = {}) {
-    encMode = CT.has(modeKey) ? modeKey : selectedModeKey;
+    encMode = modeKey === "all" || CT.has(modeKey) ? modeKey : selectedModeKey;
     encQuery = "";
     encBand = band;
     encHighlight = highlight;
@@ -1840,14 +1848,22 @@
     if (record) record.textContent = `Mejor marca en ${CT.Ghost.level(key).name}: ${records.bestByDifficulty?.[key] || (key === "easy" ? records.best || 0 : 0)}`;
   });
 
+  app.addEventListener("toggle", event => {
+    const deck = event.target;
+    if (screen !== "enciclopedia" || encMode !== "all" || !deck.matches?.("[data-enc-deck]") || !deck.open || deck.dataset.loaded) return;
+    deck.querySelector(".enc-deck-cards").innerHTML = CT.Enciclopedia.resultsMarkup(deck.dataset.encDeck, CT.Enciclopedia.filterCards(deck.dataset.encDeck, {query: encQuery}));
+    deck.dataset.loaded = "true";
+  }, true);
+
   app.addEventListener("input", event => {
     if (event.target.closest("#players")) syncStarterOptions();
     else if (event.target.id === "enc-search-input") {
       // Se actualiza solo el resultado, sin repintar la pantalla entera: repintarla
       // destruiría el campo justo mientras se escribe en él.
       encQuery = event.target.value;
-      const cards = CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
-      document.getElementById("enc-results").innerHTML = CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight });
+      const all = encMode === "all";
+      const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
+      document.getElementById("enc-results").innerHTML = all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight });
       document.getElementById("enc-count").textContent = encCountText(encMode, cards.length);
     }
   });
@@ -1874,7 +1890,7 @@
     else if (action === "home") home();
     else if (action === "back-menu") backMenu();
     else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-    else if (action === "home-collection") { homeDestination = "collection"; home(); document.getElementById("deck-collection")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    else if (action === "home-encyclopedia") openEnciclopedia("all");
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
     else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
     else if (action === "set-block") {

@@ -872,6 +872,16 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .band-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 9px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; font-size: .78rem; font-weight: 650; cursor: pointer; }
 .band-chip.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-dark); }
 .enc-empty { margin: 16px 0 22px; padding: 22px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); text-align: center; }
+.enc-shell { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+.enc-topic { margin: 28px 0; }
+.enc-topic h2 { font-size: 1.35rem; margin: 0 0 12px; }
+.enc-deck { margin: 10px 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.enc-deck summary { padding: 16px; min-height: 54px; cursor: pointer; font-weight: 700; }
+.enc-deck summary span { overflow-wrap: anywhere; }
+.enc-deck summary small { margin-left: 10px; color: var(--muted); font-weight: 400; white-space: nowrap; }
+.enc-deck[open] summary { border-bottom: 1px solid var(--line); }
+.enc-deck-cards:not(:empty) { padding: 14px; }
+.enc-deck .enc-grid { margin-top: 0; }
 .enc-source { margin-top: 8px; }
 .enc-source a { color: var(--accent); font-size: .74rem; font-weight: 700; }
 /* La carta a la que se llega desde un repaso se ve entre las demás sin depender solo

@@ -52,5 +52,35 @@
     return `<div class="review-grid enc-grid" role="group" aria-label="Cartas de ${CT.escapeHtml(mode.name)}">${cards.map(card => cardMarkup(modeKey, card, { highlight: highlight === card.id })).join("")}</div>`;
   }
 
-  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup };
+  // Gran mezcla reutiliza cartas de otros mazos: el catálogo las muestra una sola
+  // vez, dentro de su temática original.
+  function catalogGroups(query = "") {
+    const seen = new Set();
+    return Object.values(CT.BLOCKS).map(block => ({
+      ...block,
+      decks: block.games.filter(key => key !== 'mixed').map(key => ({
+        key, name: CT.mode(key).name,
+        cards: filterCards(key, {query}).filter(card => {
+          if (seen.has(card.id)) return false;
+          seen.add(card.id);
+          return true;
+        })
+      })).filter(deck => deck.cards.length)
+    })).filter(block => block.decks.length);
+  }
+
+  function catalogMarkup(query = "") {
+    const groups = catalogGroups(query);
+    if (!groups.length) return '<p class="enc-empty">Ninguna carta coincide con la búsqueda.</p>';
+    const searching = !!query.trim();
+    return groups.map(block => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
+      <h2 id="enc-topic-${block.key}"><span aria-hidden="true">${block.icon}</span> ${CT.escapeHtml(block.name)}</h2>
+      ${block.decks.map(deck => `<details class="enc-deck" data-enc-deck="${deck.key}"${searching ? ' open data-loaded="true"' : ''}>
+        <summary><span>${CT.escapeHtml(deck.name)}</span><small>${deck.cards.length} cartas</small></summary>
+        <div class="enc-deck-cards">${searching ? resultsMarkup(deck.key, deck.cards) : ''}</div>
+      </details>`).join('')}
+    </section>`).join('');
+  }
+
+  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup, catalogGroups, catalogMarkup };
 })();

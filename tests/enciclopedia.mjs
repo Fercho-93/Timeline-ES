@@ -209,5 +209,44 @@ console.log("\nEl repaso enlaza con la enciclopedia");
   ok("Volver recupera el repaso, no abre Perfil", w.document.getElementById("app").dataset.screen === "review");
 }
 
+console.log("\nCatálogo completo desde la barra inferior");
+{
+  const w = boot();
+  click(w, '[data-action="home-encyclopedia"]');
+  const doc = w.document;
+  ok("la barra abre una pantalla distinta a Inicio", doc.getElementById('app').dataset.screen === 'enciclopedia');
+  ok("Enciclopedia queda marcada en la barra", doc.querySelector('.home-nav [aria-current="page"]').dataset.action === 'home-encyclopedia');
+  ok("se abre con todas las cartas", doc.getElementById('enc-mode-select').value === 'all');
+  const groups = w.CONTINUUM.Enciclopedia.catalogGroups();
+  const catalog = groups.flatMap(group => group.decks.flatMap(deck => deck.cards));
+  const allIds = new Set(Object.values(w.CONTINUUM.MODES).flatMap(mode => mode.cards).map(card => card.id));
+  ok("el catálogo contiene todas las cartas sin duplicar Gran mezcla", catalog.length === allIds.size && new Set(catalog.map(card => card.id)).size === allIds.size);
+  ok("las temáticas y los mazos tienen sus propios apartados", doc.querySelectorAll('.enc-topic').length === groups.length && doc.querySelectorAll('[data-enc-deck]').length === groups.flatMap(group => group.decks).length);
+  ok("las cartas se cargan al desplegar, sin saturar el móvil al entrar", doc.querySelectorAll('[data-enc-card]').length === 0);
+  for (const deck of doc.querySelectorAll('[data-enc-deck]')) {
+    deck.open = true;
+    deck.dispatchEvent(new w.Event('toggle'));
+  }
+  ok("todos los mazos se pueden desplegar y consultar", doc.querySelectorAll('[data-enc-card]').length === catalog.length);
+  const input = doc.getElementById('enc-search-input');
+  input.focus();
+  escribir(w, '#enc-search-input', 'cordoba');
+  ok("la búsqueda global mantiene el foco", doc.activeElement === input);
+  ok("los resultados globales abren sus mazos", doc.querySelectorAll('[data-enc-card]').length > 0 && [...doc.querySelectorAll('[data-enc-deck]')].every(deck => deck.open));
+  escribir(w, '#enc-search-input', 'esto-no-existe-en-ningun-hecho-xyz');
+  ok("se informa si la búsqueda global está vacía", /Ninguna carta coincide/.test(doc.getElementById('enc-results').textContent));
+  escribir(w, '#enc-search-input', '');
+  ok("borrar la búsqueda recupera todas las temáticas", doc.querySelectorAll('.enc-topic').length === groups.length);
+  elegir(w, '#enc-mode-select', 'animals');
+  ok("se puede consultar un mazo con sus filtros propios", doc.querySelectorAll('[data-enc-card]').length === w.CONTINUUM.cards('animals').length && existe(w, '.enc-bands'));
+  elegir(w, '#enc-mode-select', 'all');
+  ok("se puede volver al catálogo completo", existe(w, '.enc-topic'));
+  click(w, '[data-action="perfil"]');
+  ok("el perfil conserva la barra", existe(w, '.home-nav'));
+  click(w, '[data-action="home-top"]');
+  ok("Inicio vuelve a la portada y queda marcado", doc.getElementById('app').dataset.screen === 'home' && doc.querySelector('.home-nav [aria-current="page"]').dataset.action === 'home-top');
+  w.close();
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

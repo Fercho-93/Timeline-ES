@@ -71,9 +71,10 @@ for (const options of [{ reduce: true }, { seen: true }]) {
   try {
     const doc = w.document;
     click(w, '[data-action="perfil"]');
-    click(w, '[data-action="home-collection"]');
-    assert.equal(doc.getElementById('app').dataset.screen, 'home');
-    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-collection');
+    click(w, '[data-action="home-encyclopedia"]');
+    assert.equal(doc.getElementById('app').dataset.screen, 'enciclopedia');
+    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-encyclopedia');
+    click(w, '[data-action="home-top"]');
     click(w, '[data-block="historia"]');
     click(w, '[data-mode="history"]');
     click(w, '[data-action="solo"]');
@@ -92,7 +93,7 @@ for (const options of [{ reduce: true }, { seen: true }]) {
     click(w, '[data-action="back-menu"]');
     assert.equal(doc.getElementById('app').dataset.screen, 'play-menu');
     click(w, '[data-action="collection-back"]');
-    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-collection');
+    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-top');
     click(w, '[data-action="home-top"]');
     assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-top');
   } finally { w.close(); }
