@@ -42,7 +42,7 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       click(w, '[data-action="collection-back"]');
       assert.equal(w.document.documentElement.dataset.scene, 'archive');
     }
-    click(w, '[data-action="start-competition"]');
+    click(w, '[data-action="competition-menu"]'); click(w, '[data-action="start-competition"]');
     const saved = JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
     const expected = w.CONTINUUM.blockOf(saved.queue[0]).art;
     assert.equal(w.document.documentElement.dataset.scene, expected, 'el cartel usa el tema siguiente');
@@ -103,14 +103,14 @@ for (const options of [{ reduce: true }, { seen: true }]) {
   let w = boot({ seen: true });
   let saved;
   try {
-    click(w, '[data-action="start-competition"]');
+    click(w, '[data-action="competition-menu"]'); click(w, '[data-action="start-competition"]');
     assert.equal(w.document.querySelector('.hand-card'), null);
     click(w, '[data-action="comp-next-round"]');
     saved = w.localStorage.getItem(key);
   } finally { w.close(); }
   w = boot({ seen: true, saved: { [key]: saved } });
   try {
-    click(w, '[data-action="resume-competition"]');
+    click(w, '[data-action="competition-menu"]'); click(w, '[data-action="resume-competition"]');
     assert.ok(w.document.querySelector('.comp-splash'));
     assert.equal(w.document.querySelector('.hand-card'), null);
     const before = JSON.parse(saved);

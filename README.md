@@ -2,7 +2,7 @@
 
 ## Competición por rondas
 
-Desde la portada se elige jugar solo, multijugador en un móvil o multijugador en varios móviles. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por ronda. Cada ronda usa un mazo aleatorio diferente; Gran mezcla se excluye porque combina otros mazos.
+Desde la portada se abre Modo competición. En la siguiente hoja se elige Jugar solo o Multijugador; este último se despliega para escoger un móvil o varios móviles. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por ronda. Cada ronda usa un mazo aleatorio diferente; Gran mezcla se excluye porque combina otros mazos.
 
 En solitario se suman los aciertos. En multijugador se reparten las cartas elegidas a cada participante (ajustadas si el mazo es pequeño), gana quien termine una vuelta completa sin cartas y se usa la final numérica secreta si hay varios. Cada ronda ganada suma un punto. Al terminar, el marcador muestra el ganador o el empate global en rondas ganadas.
 

@@ -14,8 +14,17 @@ function boot(saved) {
 let w=boot();
 const click=sel=>{const el=w.document.querySelector(sel);assert.ok(el,sel);el.click();};
 const state=()=>JSON.parse(w.localStorage.getItem(key));
-assert.ok(w.document.querySelector('[data-action="competition-online"]'));
+assert.equal(w.document.querySelector('[data-action="start-competition"]'),null);
+assert.equal(w.document.getElementById('competition-length'),null);
+click('[data-action="competition-menu"]');
+assert.ok(w.document.querySelector('[data-action="start-competition"]'));
 w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='1';
+click('[data-format="competition-multi"]');
+assert.equal(w.document.getElementById('competition-length').value,'3');
+assert.equal(w.document.getElementById('competition-cards').value,'1');
+assert.ok(w.document.querySelector('[data-action="competition-online"]'));
+click('[data-action="competition-local"]');click('[data-action="back-menu"]');
+assert.equal(w.document.getElementById('competition-cards').value,'1');
 click('[data-action="competition-local"]');click('[data-action="start"]');
 assert.equal(state().tournament.queue.length,3);assert.equal(new Set(state().tournament.queue).size,3);
 assert.ok(state().players.every(p=>p.hand.length===1));
@@ -31,7 +40,7 @@ for(let round=0;round<3;round++) {
  finishLocalFinal(w,key);
  assert.ok(w.document.querySelector('.tournament-board'));
  assert.equal(state().tournament.index,round);
- const saved=w.localStorage.getItem(key);w.close();w=boot(saved);click('[data-action="competition-resume"]');
+ const saved=w.localStorage.getItem(key);w.close();w=boot(saved);click('[data-action="competition-menu"]');click('[data-action="competition-resume"]');
  assert.ok(w.document.querySelector('.tournament-board'));
  if(round<2){const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));}
 }
@@ -39,7 +48,7 @@ assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
 assert.match(w.document.querySelector('.tournament-board').textContent,/3 rondas ganadas/);
 w.close();
 // Solitario conserva el mismo ciclo y respeta el número de cartas elegido.
-w=boot();w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';
+w=boot();click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';
 click('[data-action="start-competition"]');click('[data-action="comp-next-round"]');
 let solo=JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
 assert.equal(solo.cardsPerRound,2);assert.equal(solo.solo.total,2);
