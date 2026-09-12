@@ -648,7 +648,7 @@ function renderLobby() {
 }
 
 function tournamentBoard(winners = []) {
-  return CT.Tournament.board(roomState.tournament,roomState.playerOrder.map(id=>({id,name:roomState.players[id].name})),winners);
+  return CT.Tournament.board(roomState.tournament,roomState.playerOrder.map(id=>({id,name:roomState.players[id].name,hand:roomState.players[id].hand})),winners);
 }
 
 function renderCompetitionIntro() {
@@ -670,7 +670,7 @@ async function nextTournamentRound() {
     await runTransaction(db,async tx=>{
       const data=(await tx.get(reference)).data();
       if(data.status!=='ended' || data.tournament.index!==expected || data.hostUid!==user.uid) return;
-      const tournament=CT.Tournament.next(data.tournament,data.winners || [data.winner]);
+      const tournament=CT.Tournament.next(data.tournament,data.players,data.winners || [data.winner]);
       const mode=tournament.queue[tournament.index];
       const next={...data,tournament,mode,deckFingerprint:CT.deckFingerprint(mode),status:'lobby',phase:'lobby',handSize:tournament.handSize,players:data.players,deck:[],discard:[],timeline:[],current:0,starter:data.playerOrder[0],turnsInRound:0,round:1,winner:null,winners:null,reveal:null,pulseTurn:null,version:data.version+1,updatedAt:serverTimestamp()};
       next.finalRoundOffset=data.final?.round || data.finalRoundOffset || 0;

@@ -46,7 +46,7 @@ for(let round=0;round<3;round++) {
  if(round<2){const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));click('[data-action="competition-round-start"]');}
 }
 assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
-assert.match(w.document.querySelector('.tournament-board').textContent,/3 rondas ganadas/);
+assert.match(w.document.querySelector('.tournament-board').textContent,/3 puntos/);
 w.close();
 // Solitario conserva el mismo ciclo y respeta el número de cartas elegido.
 w=boot();click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';

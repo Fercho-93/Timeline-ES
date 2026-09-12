@@ -4,7 +4,7 @@
 
 Desde la portada se abre Modo competición. En la siguiente hoja se elige Jugar solo o Multijugador; este último se despliega para escoger un móvil o varios móviles. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por ronda. Cada ronda usa un mazo aleatorio diferente; Gran mezcla se excluye porque combina otros mazos.
 
-En solitario se suman los aciertos. En multijugador se reparten las cartas elegidas a cada participante (ajustadas si el mazo es pequeño), gana quien termine una vuelta completa sin cartas y se usa la final numérica secreta si hay varios. Cada ronda ganada suma un punto. Al terminar, el marcador muestra el ganador o el empate global en rondas ganadas.
+En solitario se suman los aciertos. En multijugador se reparten las cartas elegidas a cada participante (ajustadas si el mazo es pequeño), gana quien termine una vuelta completa sin cartas y se usa la final numérica secreta si hay varios. Ganar una ronda suma un punto; quedarse con cartas en la mano al terminarla penaliza con su número menos uno (una carta no resta nada, dos cartas restan un punto, tres restan dos, y así sucesivamente). Al terminar, el marcador muestra el ganador o el empate global en puntos.
 
 En un móvil se conserva la competición por separado de las partidas normales. En varios móviles, el anfitrión pasa al siguiente mazo dentro de la misma sala; se conservan participantes e historial y se preparan nuevas manos. Se puede reconectar con el mismo código. El multijugador online necesita las reglas actualizadas para el cliente 42.
 

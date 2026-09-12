@@ -277,7 +277,7 @@
     setup();
     document.getElementById('hand-size').value = String(pendingTournament.cards);
     app.querySelector('.setup-section h2').textContent = 'Competición multijugador';
-    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios. Un punto por ronda ganada.`;
+    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
   function startTournamentRound(t, players, starter, ghost, pulse) {
     selectedModeKey = t.queue[t.index];
@@ -294,7 +294,7 @@
   }
   function nextTournamentRound() {
     if (!game?.tournament || !game.winners || game.tournament.index+1>=game.tournament.queue.length) return;
-    startTournamentRound(CT.Tournament.next(game.tournament,game.winners),game.players,(game.starter+1)%game.players.length,game.competitionGhost,game.pulse);
+    startTournamentRound(CT.Tournament.next(game.tournament,game.players,game.winners),game.players,(game.starter+1)%game.players.length,game.competitionGhost,game.pulse);
   }
   function resumeMultiCompetition() {
     try {
