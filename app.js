@@ -1053,7 +1053,7 @@
   }
 
   // El desplegable de mazos agrupado por bloque, igual que la portada los agrupa en la
-  // galería: así la enciclopedia no inventa un segundo orden de los catorce juegos.
+  // galería: así la enciclopedia no inventa un segundo orden de los quince juegos.
   function encModeOptions(modeKey) {
     return `<option value="all"${modeKey === "all" ? " selected" : ""}>Todas las cartas</option>` + Object.values(CT.BLOCKS).map(item => `<optgroup label="${escapeHtml(item.name)}">${item.games.map(key => {
       const mode = CT.mode(key);

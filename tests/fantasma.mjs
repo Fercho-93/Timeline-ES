@@ -206,8 +206,11 @@ for (const difficulty of ['easy','normal','hard','expert']) {
   const w=boot({'continuum-difficulty-v1':'expert'});click(w,'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
   let rounds=0;
+  // La competición pasa por todos los mazos menos la Gran mezcla, así que el número de
+  // rondas se deduce del catálogo: añadir un mazo no debe obligar a tocar esta cuenta.
+  const temas=Object.keys(w.CONTINUUM.MODES).filter(key=>key!=='mixed').length;
   // Las cinco cartas del usuario nunca se consumen como incorporaciones automáticas.
-  while(rounds++<14){
+  while(rounds++<temas){
     for(let i=0;i<5;i++){
       const id=Number(w.document.querySelector('.hand-card').dataset.id),ct=w.CONTINUUM;
       const cards=Object.values(ct.MODES).flatMap(m=>m.cards),byId=new Map(cards.map(c=>[c.id,c]));
@@ -216,8 +219,8 @@ for (const difficulty of ['easy','normal','hard','expert']) {
       const at=ct.correctIndex(mode,board,card);
       w.document.querySelectorAll('[data-action="solo-place"]')[at].click();click(w,'confirm-place');click(w,'solo-next');
     }
-    if(rounds<14){click(w,'comp-next-round');}
+    if(rounds<temas){click(w,'comp-next-round');}
   }
-  assert.match(w.document.body.textContent,/70/);w.close();
+  assert.match(w.document.body.textContent,new RegExp(String(temas*5)));w.close();
 }
 console.log('  Fantasma, conservación de cartas, guardado y cuatro dificultades: OK');

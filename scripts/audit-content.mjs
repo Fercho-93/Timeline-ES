@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
-const files=['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','distances.js'];
+const files=['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js'];
 const cards=[];
 for(const file of files) {
   const window={}; vm.runInNewContext(await fs.readFile(file,'utf8'),{window});

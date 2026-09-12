@@ -51,6 +51,16 @@
     return `${Math.round(value).toLocaleString("es-ES")} km`;
   }
 
+  // Los hablantes se publican en millones con un decimal y ese decimal hace falta: entre
+  // el turco y el télugu hay dos décimas de millón, y `compact()` los redondearía a la
+  // misma cifra por encima de los cien millones. Por debajo del millón manda `compact()`,
+  // que ahí ya da la cifra exacta.
+  function compactSpeakers(value) {
+    if (value < 1e6) return `${compact(value)} hablantes`;
+    const millones = (value / 1e6).toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return `${millones} millones`;
+  }
+
   function compactLifespan(value) {
     const dias = value * 365;
     // Hay vidas adultas que se miden en minutos. Redondearlas a días las enseñaba como
@@ -118,6 +128,24 @@
         { limit: 50000000, key: "medio", name: "Medio", symbol: "◆" },
         { limit: 150000000, key: "grande", name: "Grande", symbol: "★" },
         { limit: Infinity, key: "gigante", name: "Gigante", symbol: "⬢" }
+      ]
+    },
+    speakers: {
+      sortValue: card => card.value,
+      format: card => compactSpeakers(card.value),
+      shortValue: card => shortMillions(card.value),
+      hiddenLabel: "Hablantes ocultos",
+      timelineTitle: "De menos a más hablado",
+      question: "¿Menos o más hablantes?",
+      // Los cortes están puestos sobre el rango real del mazo, que empieza en los 24
+      // millones: aquí no hay lenguas pequeñas, así que una banda «minúscula» se quedaría
+      // siempre vacía. Con estos cinco tramos caen 13, 12, 13, 5 y 4 cartas.
+      bands: [
+        { limit: 35000000, key: "medio", name: "Medio", symbol: "◈" },
+        { limit: 60000000, key: "grande", name: "Grande", symbol: "◆" },
+        { limit: 90000000, key: "muygrande", name: "Muy grande", symbol: "★" },
+        { limit: 250000000, key: "gigante", name: "Gigante", symbol: "⬢" },
+        { limit: Infinity, key: "colosal", name: "Colosal", symbol: "◉" }
       ]
     },
     area: {
@@ -391,6 +419,11 @@
       cardLabel: "países", blurb: "Proyección ONU a 1 de julio de 2026.", cards: window.POPULATION_CARDS,
       axis: "population"
     },
+    languages: {
+      key: "languages", name: "Idiomas por hablantes nativos",
+      cardLabel: "idiomas", blurb: "Hablantes de lengua materna, no totales.", cards: window.LANGUAGE_CARDS,
+      axis: "speakers"
+    },
     distances: {
       key: "distances", name: "Distancias entre ciudades",
       cardLabel: "pares", blurb: "En línea recta, de París a Auckland.", cards: window.CITY_DISTANCE_CARDS,
@@ -412,7 +445,7 @@
     cine: { key: "cine", name: "Entretenimiento", icon: "🎭", art: "entertainment", tagline: "Ordena la cultura popular.", games: ["movies", "music", "videogames"] },
     ciencia: { key: "ciencia", name: "Ciencia", icon: "🔬", art: "science", tagline: "Ordena los descubrimientos.", games: ["astronomy", "medicine"] },
     naturaleza: { key: "naturaleza", name: "Naturaleza", icon: "🦋", art: "nature", tagline: "Ordena la vida.", games: ["animals", "lifespan", "speed"] },
-    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population", "distances"] },
+    geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population", "languages", "distances"] },
     mezcla: { key: "mezcla", name: "Gran mezcla temporal", icon: "⏳", art: "mixed", tagline: "Solo mazos de línea temporal.", games: ["mixed"] }
   };
 

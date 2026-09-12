@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.window = {};
-for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "animals.js", "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "distances.js", "modes.js"]) {
+for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "animals.js", "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js"]) {
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
-const { HISTORY_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ANIMAL_WEIGHT_CARDS, ANIMAL_LIFESPAN_CARDS, ANIMAL_SPEED_CARDS, INVENTION_CARDS, WORLD_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS, COUNTRY_CARDS, POPULATION_CARDS, CITY_DISTANCE_CARDS } = globalThis.window;
+const { HISTORY_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ANIMAL_WEIGHT_CARDS, ANIMAL_LIFESPAN_CARDS, ANIMAL_SPEED_CARDS, INVENTION_CARDS, WORLD_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS, COUNTRY_CARDS, POPULATION_CARDS, LANGUAGE_CARDS, CITY_DISTANCE_CARDS } = globalThis.window;
 const CT = globalThis.window.CONTINUUM;
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
@@ -70,6 +70,15 @@ separadas("Velocidad de animales", ANIMAL_SPEED_CARDS, "velocidades", { unicos: 
 separadas("Distancias entre ciudades", CITY_DISTANCE_CARDS, "distancias");
 ok("las poblaciones son números enteros de personas", POPULATION_CARDS.every(c => Number.isInteger(c.value)));
 
+// El mazo de idiomas no exige separación entre cartas contiguas: conserva la lista de la
+// fuente entera y solo descarta las lenguas cuya cifra repetía la de otra, porque dos
+// cartas con el mismo número no se pueden ordenar. Lo que sí se comprueba es eso: que no
+// haya quedado ninguna repetida. La fuente publica millones con un decimal, así que el
+// valor en hablantes tiene que ser múltiplo de cien mil; un dato con más precisión que la
+// original sería inventado.
+separadas("Idiomas por hablantes nativos", LANGUAGE_CARDS, "cifras de hablantes");
+ok("las cifras respetan el decimal de millón de la fuente", LANGUAGE_CARDS.every(c => Number.isInteger(c.value / 1e5)));
+
 // Las cifras grandes se muestran redondeadas a millones. El redondeo solo vale si no
 // borra el orden: dos cartas contiguas nunca pueden acabar enseñando la misma cifra, o
 // la partida pediría adivinar en vez de razonar.
@@ -89,6 +98,7 @@ redondeoLegible("Población de países", "population", POPULATION_CARDS);
 redondeoLegible("Peso de animales", "animals", ANIMAL_WEIGHT_CARDS);
 redondeoLegible("Esperanza de vida de animales", "lifespan", ANIMAL_LIFESPAN_CARDS);
 redondeoLegible("Velocidad de animales", "speed", ANIMAL_SPEED_CARDS);
+redondeoLegible("Idiomas por hablantes nativos", "languages", LANGUAGE_CARDS);
 redondeoLegible("Distancias entre ciudades", "distances", CITY_DISTANCE_CARDS);
 
 // Deuda de fuentes. El campo `source` es lo único que separa un dato contrastado de un
@@ -111,7 +121,7 @@ console.log("\nDeuda de fuentes en Naturaleza");
 }
 
 const cronologicos = [HISTORY_CARDS, WORLD_CARDS, INVENTION_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS];
-const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS, ...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS, ...CITY_DISTANCE_CARDS];
+const todos = [...cronologicos.flat(), ...COUNTRY_CARDS, ...POPULATION_CARDS, ...LANGUAGE_CARDS, ...ANIMAL_WEIGHT_CARDS, ...ANIMAL_LIFESPAN_CARDS, ...ANIMAL_SPEED_CARDS, ...CITY_DISTANCE_CARDS];
 console.log("\nEntre mazos");
 ok("los identificadores no chocan entre modalidades", new Set(todos.map(c => c.id)).size === todos.length);
 

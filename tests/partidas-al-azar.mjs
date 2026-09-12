@@ -24,7 +24,7 @@ const catalogo = [
   ["animals", "naturaleza", "ANIMAL_WEIGHT_CARDS"], ["lifespan", "naturaleza", "ANIMAL_LIFESPAN_CARDS"], ["speed", "naturaleza", "ANIMAL_SPEED_CARDS"],
   ["astronomy", "ciencia", "ASTRONOMY_CARDS"], ["medicine", "ciencia", "MEDICINE_CARDS"],
   ["countries", "geografia", "COUNTRY_CARDS"], ["population", "geografia", "POPULATION_CARDS"],
-  ["distances", "geografia", "CITY_DISTANCE_CARDS"]
+  ["languages", "geografia", "LANGUAGE_CARDS"], ["distances", "geografia", "CITY_DISTANCE_CARDS"]
 ];
 
 const muestras = [catalogo[0], catalogo[3], catalogo[6], catalogo[11]];
@@ -40,7 +40,7 @@ for (let g = 0; g < muestras.length; g++) {
   const mazo = w[globalName];
   const total = mazo.length;
   const cardsById = new Map(mazo.map(c => [c.id, c]));
-  const orden = card => (["countries", "population", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
+  const orden = card => (["countries", "population", "languages", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
   fire(w, w.document.querySelector('[data-format="multi"]'));
   fire(w, w.document.querySelector('[data-action="setup"]'));
   // Dos jugadores y una carta reducen el coste de cada navegador aislado sin dejar

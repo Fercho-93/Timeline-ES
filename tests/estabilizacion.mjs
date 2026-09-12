@@ -26,9 +26,12 @@ const tick = () => new Promise(resolve => setTimeout(resolve, 5));
 try {
   console.log("\nEstabilización: guardados, competición y actualizaciones");
   let w = open();
+  // La competición recorre todos los mazos menos la Gran mezcla. Se deduce del catálogo
+  // para que dar de alta un mazo nuevo no obligue a repasar las cuentas de esta prueba.
+  const temas = Object.keys(w.CONTINUUM.MODES).filter(key => key !== "mixed").length;
   click(w, "competition-menu"); click(w, "start-competition");
   const intro = saved(w);
-  assert.equal(intro.queue.length, 14);
+  assert.equal(intro.queue.length, temas);
   assert.equal(intro.saveVersion, 2);
   const originalMode = intro.previousModeKey;
   w = open(entries(w)); click(w, "competition-menu"); click(w, "resume-competition");
@@ -36,7 +39,7 @@ try {
   click(w, "comp-next-round");
   let state = saved(w);
   assert.equal(state.solo.mode, intro.queue[0]);
-  assert.equal(state.queue.length, 13);
+  assert.equal(state.queue.length, temas - 1);
   assert.equal(state.difficulty, intro.difficulty);
   const beforePlay = json(state.solo);
   // Cerrar en medio de la ronda mantiene exactamente el reparto.
@@ -62,7 +65,7 @@ try {
   click(w, "resume-competition");
   click(w, "comp-confirm-resume");
   let steps = 0;
-  while (!saved(w).finished && steps++ < 100) {
+  while (!saved(w).finished && steps++ < temas * 8) {
     state = saved(w);
     if (!state.solo) { w = open(entries(w)); click(w, "competition-menu"); click(w, "resume-competition"); click(w, "comp-next-round"); continue; }
     const s = state.solo, c = new Map(s.savedDeck.map(c => [c.id, c]));
@@ -70,10 +73,10 @@ try {
     w.document.querySelector(`[data-action="solo-place"][data-index="${index}"]`).click();
     click(w, "confirm-place"); click(w, "solo-next");
   }
-  assert.ok(saved(w).finished); assert.equal(saved(w).roundsSummary.length, 14);
-  assert.equal(saved(w).totalHits, 70);
+  assert.ok(saved(w).finished); assert.equal(saved(w).roundsSummary.length, temas);
+  assert.equal(saved(w).totalHits, temas * 5);
   assert.equal(saved(w).queue.length, 0);
-  console.log("  ok competición: reparto, resultado pendiente, pausa, 14 rondas y marcador sin duplicación");
+  console.log(`  ok competición: reparto, resultado pendiente, pausa, ${temas} rondas y marcador sin duplicación`);
 
   w = open();
   const CT = w.CONTINUUM;
@@ -111,7 +114,7 @@ try {
   assert.ok(JSON.parse(w.CONTINUUM.Storage.getItem(key)).queue.length);
   w.full = false; w.CONTINUUM.Storage.flush();
   assert.equal(w.CONTINUUM.Storage.hasPending(), false);
-  assert.equal(saved(w).queue.length, 14);
+  assert.equal(saved(w).queue.length, temas);
   assert.equal(w.document.querySelector("#storage-notice"), null);
   assert.throws(() => w.CONTINUUM.Storage.restore(JSON.stringify({ format: "continuum-backup", version: 1, entries: {} })), /Sal de la partida/);
   click(w, "abandon-comp");

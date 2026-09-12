@@ -147,9 +147,10 @@ console.log("\nBloque de geografía");
   const w = boot();
   click(w, '[data-block="geografia"]');
   ok("elegir el bloque selecciona su primer juego", /72 países/.test(texto(w)));
-  ok("el bloque lista sus tres juegos", w.document.querySelectorAll(".game-row").length === 3);
-  ok("los tres juegos del bloque aparecen por su nombre",
-     /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w)) && /Distancias entre ciudades/.test(texto(w)));
+  ok("el bloque lista sus cuatro juegos", w.document.querySelectorAll(".game-row").length === 4);
+  ok("los cuatro juegos del bloque aparecen por su nombre",
+     /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w))
+     && /Idiomas por hablantes nativos/.test(texto(w)) && /Distancias entre ciudades/.test(texto(w)));
   ok("la galería ofrece los seis bloques", w.document.querySelectorAll(".gallery-panel").length === 6);
   const portada = w.document.querySelector(".gallery-panel.active").outerHTML;
   // Las tres carátulas están siempre, pero solo la desplegada pide el tamaño grande.
