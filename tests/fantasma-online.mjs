@@ -21,9 +21,9 @@ function client(uid){
  // `clone` pasa los datos por JSON para normalizarlos al realm de este módulo, pero
  // `serverTimestamp()` no es JSON: hay que conservar ese centinela tal cual o Firestore
  // no lo reconoce como marca de hora del servidor.
- w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>tx.set(ref,clone(data)),update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
+ w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.set(ref,limpio);},update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];
@@ -111,7 +111,7 @@ try {
  const mismatched=fixture();mismatched.status='lobby';mismatched.phase='lobby';delete mismatched.ghost;mismatched.timeline=[];mismatched.deck=[];mismatched.deckFingerprint='huella-de-otra-version';Object.values(mismatched.players).forEach(p=>p.hand=[]);await seed(mismatched);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/DECK_MISMATCH/);assert.equal((await snapshot()).status,'lobby');
  // Arranque real, nueve personas y mazo pequeño: reparto igual y una carta reservada.
- const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:41} ]));await seed(lobby);
+ const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:42} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
  assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,41);
@@ -210,5 +210,25 @@ try {
  s=await snapshot();assert.equal(s.phase,'turn');assert.deepEqual(s.tieQueue,[]);assert.equal(s.players[A].hand.length,1);assert.equal(s.players[B].hand.length,1);assert.notEqual(s.players[A].hand[0],s.players[B].hand[0]);
  const large=fixture();large.phase='tiebreak';large.current=0;large.turnsInRound=8;large.playerOrder=[A,B,C,'d','e','f','g','h','i'];large.players=Object.fromEntries(large.playerOrder.map(id=>[id,{name:id,hand:[]}]));large.tieQueue=[...large.playerOrder];large.deck=Array.from({length:12},(_,i)=>15+i);delete large.ghost;
  await seed(large);await clients[0].call('continueTie');s=await snapshot();assert.equal(s.phase,'turn');assert.equal(s.deck.length,3);assert.equal(new Set(Object.values(s.players).flatMap(p=>p.hand)).size,9);
- console.log('  Inicio, poderes, Pulso, salidas, desempate simultáneo y nueve participantes: OK');
+ // Competición real: misma sala, nueve participantes, otro eje, puntuación inmutable.
+ const tournament={...clone(lobby),status:'ended',phase:'finished',winner:A,winners:[A],final:{round:2},tournament:{queue:['animals','countries','history'],index:0,history:[],handSize:1}};
+ await seed(tournament);
+ await clients[0].call('nextTournamentRound');s=await snapshot();
+ assert.equal(s.mode,'countries');assert.equal(s.status,'lobby');assert.equal(s.roomCode,ROOM);
+ assert.deepEqual(s.playerOrder,tournament.playerOrder);assert.equal(s.tournament.index,1);
+ assert.deepEqual(s.tournament.history,[{mode:'animals',winners:[A]}]);
+ assert.equal(s.finalRoundOffset,2);assert.equal(s.final,undefined);
+ await assertFails(updateDoc(ref(B),{tournament:{...s.tournament,index:2},version:s.version+1,updatedAt:serverTimestamp()}));
+ await assertFails(updateDoc(ref(A),{tournament:{...s.tournament,history:[{mode:'animals',winners:[B]}]},version:s.version+1,updatedAt:serverTimestamp()}));
+ await clients[0].call('nextTournamentRound');assert.equal((await snapshot()).tournament.index,1);
+ await clients[0].call('renderLobby');assert.equal(clients[0].w.document.getElementById('online-hand-size').disabled,true);
+ await clients[0].call('startRoom');s=await snapshot();assert.equal(s.status,'playing');assert.ok(Object.values(s.players).every(p=>p.hand.length===1));
+ await clients[1].call('renderGame');assert.match(clients[1].w.document.body.textContent,/Competición · ronda 2 de 3/);
+ s.phase='reveal';s.turnsInRound=8;s.current=8;s.players[A].hand=[];s.players[B].hand=[];await seed(s);
+ await clients[0].call('finishTurn');s=await snapshot();assert.equal(s.final.round,3,'las respuestas de otra ronda no se reutilizan');
+ s.status='ended';s.phase='finished';s.winner=B;s.winners=[B];await seed(s);
+ await clients[0].call('nextTournamentRound');s=await snapshot();assert.equal(s.mode,'history');assert.equal(s.tournament.history.length,2);
+ s.status='ended';s.phase='finished';s.winner=A;s.winners=[A];await seed(s);
+ const lastVersion=s.version;await clients[0].call('nextTournamentRound');assert.equal((await snapshot()).version,lastVersion);
+ console.log('  Inicio, poderes, Pulso, salidas, desempate y competición de nueve participantes con cambio de mazo: OK');
 } finally {clients.forEach(c=>c.w.close());await env.cleanup();}

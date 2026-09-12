@@ -12,6 +12,10 @@ service cloud.firestore {
       allow get: if request.auth != null;
       allow write, list: if false;
     }
+    match /capabilities/multiCompetition {
+      allow get: if request.auth != null;
+      allow write, list: if false;
+    }
     match /roomCreation/{owner} {
       allow get: if request.auth != null && request.auth.uid == owner;
       allow create, update: if request.auth != null && request.auth.uid == owner
@@ -50,6 +54,37 @@ service cloud.firestore {
           && request.resource.data.mode == resource.data.mode
           && request.resource.data.hostUid == resource.data.hostUid
           && request.resource.data.createdAt == resource.data.createdAt;
+      }
+
+      function tournamentShape(t) {
+        return t.keys().hasOnly(['queue','index','history','handSize'])
+          && t.queue is list && t.queue.size() >= 1 && t.queue.size() <= 32
+          && t.queue.toSet().size() == t.queue.size()
+          && t.index is int && t.index >= 0 && t.index < t.queue.size()
+          && t.history is list && t.history.size() == t.index
+          && t.handSize is int && t.handSize >= 1 && t.handSize <= 6;
+      }
+      function validTournamentNext() {
+        let prior = resource.data;
+        let next = request.resource.data;
+        let t = prior.tournament;
+        let n = next.tournament;
+        return isHost() && prior.status == 'ended' && t.index+1 < t.queue.size()
+          && changed().hasOnly(['tournament','mode','deckFingerprint','status','phase','handSize','players','deck','discard','timeline','current','starter','turnsInRound','round','winner','winners','reveal','pulseTurn','version','updatedAt','ghost','pulsePower','final','tieQueue','turnStartedAt','finalRoundOffset'])
+          && next.finalRoundOffset == ('final' in prior ? prior.final.round : prior.get('finalRoundOffset',0))
+          && tournamentShape(n) && n.queue == t.queue && n.handSize == t.handSize && n.index == t.index+1
+          && n.history == t.history.concat([{'mode':prior.mode,'winners':prior.get('winners',null) is list ? prior.winners : [prior.winner]}])
+          && next.mode == n.queue[n.index] && next.mode is string && next.mode.size() >= 1 && next.mode.size() <= 32
+          && next.deckFingerprint is string && next.deckFingerprint.size() >= 1 && next.deckFingerprint.size() <= 24
+          && next.status == 'lobby' && next.phase == 'lobby' && next.handSize == n.handSize
+          // El reparto de validStart sustituye las manos al comenzar; aquí solo
+          // cambia el tema, sin permitir tocar nombres ni datos de participantes.
+          && next.players == prior.players
+          && next.deck == [] && next.discard == [] && next.timeline == [] && next.current == 0
+          && next.starter == prior.playerOrder[0] && next.turnsInRound == 0 && next.round == 1
+          && next.winner == null && next.winners == null && next.reveal == null && next.pulseTurn == null
+          && !('ghost' in next) && !('pulsePower' in next) && !('final' in next) && !('tieQueue' in next) && !('turnStartedAt' in next)
+          && bumped();
       }
 
       // Las cartas ni se crean ni se destruyen: mazo + descarte + línea + mi mano.
@@ -530,7 +565,7 @@ service cloud.firestore {
         return (isCurrent() || isHost()) && before().status == 'playing' && before().phase == 'reveal' && roundEnds()
           && changed().hasOnly(['phase','final','reveal','version','updatedAt'])
           && next.phase == 'final' && next.reveal == null && finalShape(next.final)
-          && next.final.round == 1 && next.final.players == emptyPlayers(before())
+          && next.final.round == before().get('finalRoundOffset',0)+1 && next.final.players == emptyPlayers(before())
           && next.final.used == [next.final.cardId] && bumped();
       }
       function validFinalSubmit() {
@@ -756,6 +791,10 @@ service cloud.firestore {
       allow list: if false;
 
       allow create: if signedIn()
+        && request.resource.data.get('finalRoundOffset',0) == 0
+        && (!('tournament' in request.resource.data) || (tournamentShape(request.resource.data.tournament)
+          && request.resource.data.tournament.index == 0 && request.resource.data.tournament.history == []
+          && request.resource.data.mode == request.resource.data.tournament.queue[0]))
         && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.roomCode == roomId
         && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.lastCreatedAt == request.time
         && !('ghost' in request.resource.data)
@@ -817,6 +856,7 @@ service cloud.firestore {
         && (before().phase == 'final' ? (before().status == 'playing' && (validFinalSubmit() || validFinalResolve())) : validFinalStart());
 
       allow delete: if isHost();
+      allow update: if 'tournament' in resource.data && validTournamentNext();
     }
   }
 }

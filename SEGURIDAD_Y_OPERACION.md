@@ -2,6 +2,8 @@
 
 ## Estado y límites
 
+Competición multijugador (cliente 42): desplegar las reglas actuales antes de distribuir la app. La lectura autenticada de `/capabilities/multiCompetition` detecta soporte sin crear un documento. Sin soporte, se informa antes de crear una sala de competición. El paso entre temas solo puede hacerlo el anfitrión después de acabar una ronda; las reglas conservan sala y participantes, exigen el siguiente tema de la cola, anexan el resultado real y reinician las manos. El catálogo y la aleatoriedad siguen siendo del cliente. No se han desplegado estas reglas a producción desde este entorno.
+
 Las reglas validan permisos, fases y transformaciones de cartas. La exactitud factual del acierto sigue calculándose en el cliente: el catálogo es público y una sala comparte mazo, manos y poderes. Esta arquitectura sirve para pruebas entre personas de confianza; no acredita resultados de competición pública ni oculta secretos frente a clientes modificados.
 
 Las nuevas partidas usan una final numérica. Cada respuesta se guarda de forma inmutable en `rooms/{sala}/finalRounds/{ronda}/answers/{uid}` junto con un recibo público en una transacción. Antes de que todos respondan, solo su autor puede leerla; después pueden leerlas los participantes de la sala. Las reglas comprueban las diferencias y quién puede ganar o continuar. No se permiten saltos ni expulsiones durante la final. La cola antigua se conserva solo para reanudar salas de versiones anteriores.
