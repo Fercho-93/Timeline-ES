@@ -21,9 +21,9 @@ function client(uid){
  // `clone` pasa los datos por JSON para normalizarlos al realm de este módulo, pero
  // `serverTimestamp()` no es JSON: hay que conservar ese centinela tal cual o Firestore
  // no lo reconoce como marca de hora del servidor.
- w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
+ w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>tx.set(ref,clone(data)),update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];
@@ -81,14 +81,25 @@ try {
  // Ganar conservando el poder y desempatar con un robo que lo entrega.
  const winning=fixture();winning.phase='reveal';winning.turnsInRound=2;winning.players[A].hand=[];winning.reveal={cardId:6,correct:true,playerUid:A,playerName:'Ana'};
  await seed(winning);await clients[0].call('finishTurn');assert.equal((await snapshot()).winner,A);
- // Ana ya tiene un Fantasma: el segundo que le toque en el desempate se recoloca, no se
- // le asigna también a ella. La carta en sí sí llega a su mano igualmente. La posición
- // recolocada puede acabar en manos de quien reciba después esa misma carta en el mismo
- // reparto —es azar, no fallo—; lo que nunca puede pasar es que Ana quede dueña de dos.
+ // El empate abre la final secreta sin repartir cartas ni poderes.
  const tie=fixture();tie.phase='reveal';tie.current=2;tie.turnsInRound=2;tie.players[A].hand=[];tie.players[B].hand=[];tie.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};
  await seed(tie);await clients[2].call('finishTurn');s=await snapshot();
  assert.equal(s.ghost.owners.filter(o=>o===A).length,1,'Ana no puede quedar dueña de dos Fantasmas');
- assert.ok(s.players[A].hand.includes(15));assert.equal(s.players[A].hand.length,1);assert.equal(s.players[B].hand.length,1);
+ assert.equal(s.phase,'final');assert.deepEqual(s.final.players,[A,B]);
+ assert.deepEqual(s.players[A].hand,[]);assert.deepEqual(s.players[B].hand,[]);assert.deepEqual(s.ghost,tie.ghost);
+ // Formularios reales, respuestas privadas y resultado compartido entre móviles.
+ const target=s.final.target;
+ for (const [i,cl] of clients.slice(0,2).entries()) {
+   await cl.call('renderOnlineFinal');
+   cl.w.document.querySelector('#final-guess').value=String(target+i);
+   cl.w.document.querySelector('[data-final-online]').dispatchEvent(new cl.w.Event('submit',{bubbles:true,cancelable:true}));
+   for(let n=0;n<100 && !(await snapshot()).final.submitted.includes([A,B][i]);n++) await new Promise(r=>setTimeout(r,20));
+   assert.equal(cl.errors.length,0,cl.errors.map(String).join('\n'));
+   assert.ok((await snapshot()).final.submitted.includes([A,B][i]));
+   if(i===0) {await clients[2].call('renderOnlineFinal');assert.equal(clients[2].w.document.querySelector('.final-results'),null);}
+ }
+ await clients[2].call('renderOnlineFinal');assert.ok(clients[2].w.document.querySelector('.final-results'));
+ await clients[2].call('nextOnlineFinal');assert.equal((await snapshot()).winner,A);
  // Una salida ajena no cierra ni repite un resultado ya resuelto.
  await seed(fixture());await clients[0].call('useGhost');await play(clients[0]);await clients[0].call('removePlayer',B);
  s=await snapshot();assert.equal(s.phase,'reveal');await clients[0].call('finishTurn');assert.deepEqual((await snapshot()).ghost.pending,[C]);
@@ -100,7 +111,7 @@ try {
  const mismatched=fixture();mismatched.status='lobby';mismatched.phase='lobby';delete mismatched.ghost;mismatched.timeline=[];mismatched.deck=[];mismatched.deckFingerprint='huella-de-otra-version';Object.values(mismatched.players).forEach(p=>p.hand=[]);await seed(mismatched);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/DECK_MISMATCH/);assert.equal((await snapshot()).status,'lobby');
  // Arranque real, nueve personas y mazo pequeño: reparto igual y una carta reservada.
- const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:40} ]));await seed(lobby);
+ const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:41} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
  assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,41);
@@ -115,9 +126,9 @@ try {
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-pulse').checked=true;
  await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
  const three=fixture();three.phase='reveal';three.current=2;three.turnsInRound=2;Object.values(three.players).forEach(p=>p.hand=[]);three.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};three.ghost.cards=[15,16,17];three.ghost.owners=['','',''];
- await seed(three);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).ghost.owners,[A,B,C]);
+ await seed(three);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).final.players,[A,B,C]);assert.deepEqual((await snapshot()).ghost.owners,['','','']);
  const modernThree=clone(three);modernThree.ghost.distribution=2;
- await seed(modernThree);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).ghost.owners,[A,B,C]);
+ await seed(modernThree);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).final.players,[A,B,C]);assert.deepEqual((await snapshot()).ghost.owners,['','','']);
  // Reparto v37: recolocar solo después de un robo real de un poder duplicado.
  const balanced=fixture();balanced.ghost.distribution=2;
  await seed(balanced);await play(clients[0],false);s=await snapshot();
@@ -143,10 +154,10 @@ try {
  // Pulso roba sin cambiar el contador, y también recoloca duplicados.
  await seed(balanced);await clients[0].call('startPulse',B);s=await snapshot();
  assert.equal(s.players[A].hand.length,3);assert.equal(s.ghost.owners[1],'');assert.ok(s.deck.includes(s.ghost.cards[1]));
- // Dos robos en una transacción: el duplicado puede llegar a otra persona.
- const retie=clone(tie);retie.ghost.distribution=2;await seed(retie);
+ // Compatibilidad con un desempate antiguo guardado: se termina su reparto.
+ const retie=clone(tie);retie.phase='tiebreak';retie.reveal=null;retie.tieQueue=[A,B];retie.ghost.distribution=2;await seed(retie);
  const savedRandom=clients[2].w.Math.random;clients[2].w.Math.random=()=>0;
- await clients[2].call('finishTurn');clients[2].w.Math.random=savedRandom;s=await snapshot();
+ await clients[2].call('continueTie');clients[2].w.Math.random=savedRandom;s=await snapshot();
  assert.equal(s.ghost.cards[1],16);assert.equal(s.ghost.owners[1],B);
  // Sin sitio se consume, sin conceder otro uso ni volver al reciclar descartes.
  const exhausted=clone(balanced);exhausted.deck=[15];exhausted.ghost.used=[A];await seed(exhausted);await play(clients[0],false);s=await snapshot();

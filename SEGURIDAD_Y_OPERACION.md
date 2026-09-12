@@ -4,7 +4,11 @@
 
 Las reglas validan permisos, fases y transformaciones de cartas. La exactitud factual del acierto sigue calculándose en el cliente: el catálogo es público y una sala comparte mazo, manos y poderes. Esta arquitectura sirve para pruebas entre personas de confianza; no acredita resultados de competición pública ni oculta secretos frente a clientes modificados.
 
-Los desempates se reparten mediante una cola reanudable, una carta por transacción. Esto permite verificar la carta y los poderes sin superar el límite de expresiones de Firestore. Cualquier participante puede continuar la cola tras una desconexión; no se permiten expulsiones ni saltos durante ese reparto.
+Las nuevas partidas usan una final numérica. Cada respuesta se guarda de forma inmutable en `rooms/{sala}/finalRounds/{ronda}/answers/{uid}` junto con un recibo público en una transacción. Antes de que todos respondan, solo su autor puede leerla; después pueden leerlas los participantes de la sala. Las reglas comprueban las diferencias y quién puede ganar o continuar. No se permiten saltos ni expulsiones durante la final. La cola antigua se conserva solo para reanudar salas de versiones anteriores.
+
+Antes de distribuir el cliente v41, publicar `firestore.rules` en el proyecto `timeline-es` (Firebase Console → Firestore Database → Reglas, o `firebase deploy --only firestore:rules --project timeline-es`). La lectura de capacidad `/capabilities/secretFinal` confirma que las reglas están actualizadas; no requiere crear ese documento. Sin ellas, el cliente muestra un aviso antes de iniciar una partida, evitando fallar a mitad de la final. Todos los participantes necesitan el cliente actualizado.
+
+El catálogo y los valores correctos siguen estando en el cliente, como el resto del juego. Las reglas validan las respuestas privadas y la clasificación contra el valor de la carta registrado en la sala; no son un servidor autoritativo del catálogo. No se promete resistencia a clientes modificados que falseen dicho valor.
 
 ## Antes de ampliar el acceso
 

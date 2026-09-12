@@ -394,8 +394,8 @@ gestión de sala.
   mientras permanezcan en el mazo se resuelven con el valor mostrado.
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
-- Gana quien sea la única persona sin cartas. Si varias personas llegan a cero en la misma ronda, cada una recibe una carta para desempatar.
-- Si al desempatar ya no quedan cartas que repartir, la partida termina y ganan todas ellas.
+- Gana quien sea la única persona sin cartas al acabar la ronda. Si hay varias, pasan a una final numérica con una carta neutral y cifras secretas.
+- Se revelan las cifras cuando todos los finalistas responden. Gana la menor diferencia absoluta; si empatan, solo quienes comparten la mejor respuesta repiten con otra carta. La final no usa poderes ni reparte cartas a las manos.
 - Si al fallar no queda nada que robar, la carta vuelve a la mano en lugar de descartarse.
 
 ## El Pulso

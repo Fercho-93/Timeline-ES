@@ -6,6 +6,12 @@ rules_version = '2';
 // hay forma de verificarla, porque las fechas viven en cards.js / movies.js.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Lectura de capacidad: el documento puede no existir. Las reglas anteriores
+    // deniegan esta ruta y permiten detectar que falta desplegar la final privada.
+    match /capabilities/secretFinal {
+      allow get: if request.auth != null;
+      allow write, list: if false;
+    }
     match /roomCreation/{owner} {
       allow get: if request.auth != null && request.auth.uid == owner;
       allow create, update: if request.auth != null && request.auth.uid == owner
@@ -511,6 +517,84 @@ service cloud.firestore {
       }
       // Un robo por transacción mantiene la validación exacta bajo el límite de
       // expresiones, incluso si se recolocan varios poderes. La cola se reanuda.
+      function finalShape(f) {
+        return f.keys().hasOnly(['round','players','cardId','target','submitted','used'])
+          && f.round is int && f.round >= 1 && f.cardId is int
+          && f.target is int && f.target >= -4000000000000000 && f.target <= 4000000000000000
+          && f.players is list && f.players.size() >= 2 && f.players.size() <= 9
+          && f.players.toSet().size() == f.players.size()
+          && f.submitted is list && f.submitted == [] && f.used is list;
+      }
+      function validFinalStart() {
+        let next = request.resource.data;
+        return (isCurrent() || isHost()) && before().status == 'playing' && before().phase == 'reveal' && roundEnds()
+          && changed().hasOnly(['phase','final','reveal','version','updatedAt'])
+          && next.phase == 'final' && next.reveal == null && finalShape(next.final)
+          && next.final.round == 1 && next.final.players == emptyPlayers(before())
+          && next.final.used == [next.final.cardId] && bumped();
+      }
+      function validFinalSubmit() {
+        let f = before().final;
+        let n = after().final;
+        let path = /databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(f.round))/answers/$(request.auth.uid);
+        return request.auth.uid in f.players && !(request.auth.uid in f.submitted)
+          && changed().hasOnly(['final','version','updatedAt'])
+          && n.diff(f).affectedKeys().hasOnly(['submitted'])
+          && n.submitted == f.submitted.concat([request.auth.uid])
+          && !exists(path) && getAfter(path).data.value is int && bumped();
+      }
+      function finalPlacement(f, who, best, winners) {
+        let answer = get(/databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(f.round))/answers/$(who)).data.value;
+        let distance = answer >= f.target ? answer - f.target : f.target - answer;
+        return distance >= best && ((who in winners) == (distance == best));
+      }
+      function finalPlacements(f, best, winners) {
+        let p = f.players;
+        let n = p.size();
+        return winners.toSet().hasOnly(p)
+          && finalPlacement(f,p[0],best,winners) && finalPlacement(f,p[1],best,winners)
+          && (n<3 || finalPlacement(f,p[2],best,winners))
+          && (n<4 || finalPlacement(f,p[3],best,winners))
+          && (n<5 || finalPlacement(f,p[4],best,winners))
+          && (n<6 || finalPlacement(f,p[5],best,winners))
+          && (n<7 || finalPlacement(f,p[6],best,winners))
+          && (n<8 || finalPlacement(f,p[7],best,winners))
+          && (n<9 || finalPlacement(f,p[8],best,winners));
+      }
+      function validFinalResolve() {
+        let prior = before().final;
+        let next = after();
+        let ending = next.status == 'ended';
+        let candidate = ending ? next.winner : next.final.players[0];
+        let answer = get(/databases/$(database)/documents/rooms/$(roomId)/finalRounds/$(string(prior.round))/answers/$(candidate)).data.value;
+        let best = answer >= prior.target ? answer - prior.target : prior.target - answer;
+        let winners = ending ? [candidate] : next.final.players;
+        return prior.submitted.toSet() == prior.players.toSet()
+          && candidate in prior.players && finalPlacements(prior, best, winners)
+          && (ending
+            ? (changed().hasOnly(['status','phase','winner','winners','version','updatedAt'])
+              && next.phase == 'finished' && next.winners == [candidate])
+            : (changed().hasOnly(['final','version','updatedAt']) && finalShape(next.final)
+              && next.final.round == prior.round + 1
+              && next.final.cardId != prior.cardId
+              && next.final.used == (next.final.cardId in prior.used ? [next.final.cardId] : prior.used.concat([next.final.cardId]))))
+          && bumped();
+      }
+      match /finalRounds/{roundId}/answers/{owner} {
+        function room() { return get(/databases/$(database)/documents/rooms/$(roomId)).data; }
+        function roomAfter() { return getAfter(/databases/$(database)/documents/rooms/$(roomId)).data; }
+        allow get: if request.auth != null && request.auth.uid in room().playerOrder
+          && roundId == string(room().final.round)
+          && (request.auth.uid == owner || room().final.submitted.toSet() == room().final.players.toSet());
+        allow create: if request.auth != null && request.auth.uid == owner
+          && room().phase == 'final' && room().status == 'playing'
+          && roundId == string(room().final.round) && owner in room().final.players
+          && !(owner in room().final.submitted) && owner in roomAfter().final.submitted
+          && request.resource.data.keys().hasOnly(['value']) && request.resource.data.value is int
+          && request.resource.data.value >= -4000000000000000 && request.resource.data.value <= 4000000000000000;
+        allow list, update, delete: if false;
+      }
+
       function validTieStart() {
         let prior = resource.data;
         let next = request.resource.data;
@@ -710,7 +794,7 @@ service cloud.firestore {
 
       // Cada escritura entra por una sola rama: encadenar seis validaciones agota
       // el límite de 1000 expresiones que Firestore evalúa por petición.
-      allow update: if signedIn() && identityKept() && (
+      allow update: if signedIn() && before().phase != 'final' && after().phase != 'final' && identityKept() && (
         ('ghost' in resource.data && changed().hasOnly(['ghost', 'version', 'updatedAt']))
         ? ghostActivate() : (ghostSafe()
           && (resource.data.status == 'lobby' ? true
@@ -728,6 +812,9 @@ service cloud.firestore {
                       : (resource.data.phase == 'reveal' ? validAdvance() : validSkip()))))))));
 
       allow update: if request.auth != null && request.resource.data.hostUid != resource.data.hostUid && validHostClaim();
+
+      allow update: if isParticipant() && identityKept()
+        && (before().phase == 'final' ? (before().status == 'playing' && (validFinalSubmit() || validFinalResolve())) : validFinalStart());
 
       allow delete: if isHost();
     }

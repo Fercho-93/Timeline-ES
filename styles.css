@@ -873,6 +873,13 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .band-chip.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-dark); }
 .enc-empty { margin: 16px 0 22px; padding: 22px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); text-align: center; }
 .enc-shell { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+.final-card { text-align: center; margin: 18px 0; }
+.final-card small { color: var(--muted); }
+.final-form { margin: 18px 0; }
+.final-results { overflow-x: auto; margin: 18px 0; }
+.final-results table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.final-results th, .final-results td { padding: 10px 6px; text-align: left; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.final-best { background: var(--accent-soft); font-weight: 700; }
 .enc-topic { margin: 28px 0; }
 .enc-topic h2 { font-size: 1.35rem; margin: 0 0 12px; }
 .enc-deck { margin: 10px 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }

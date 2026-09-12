@@ -1,5 +1,6 @@
 // Cuatro mazos representativos: nadie debe quedarse bloqueado y las cartas no se crean ni se pierden.
 import { JSDOM } from "jsdom";
+import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -50,6 +51,7 @@ for (let g = 0; g < muestras.length; g++) {
   const key = `hilo-game-${mode}-v1`;
   let turns = 0;
   while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML)) {
+    if (JSON.parse(w.localStorage.getItem(key))?.final) { finishLocalFinal(w, key); continue; }
     if (++turns > 300) { console.log(`  FALLA partida ${g}: no termina`); problems++; break; }
     const ready = w.document.querySelector('[data-action="ready"]');
     if (!ready) { console.log(`  FALLA partida ${g}: pantalla sin salida`); problems++; break; }

@@ -11,7 +11,7 @@ assert.ok(joinAt >= 0, "el formulario para entrar debe existir");
 assert.ok(createAt >= 0, "el formulario para crear debe existir");
 assert.ok(joinAt < createAt, "entrar en una sala debe aparecer antes que crear una sala");
 assert.match(source, /online-entry-invited/, "las invitaciones deben tener un estado visual propio");
-assert.match(source, /const CLIENT_VERSION = 40/, "la versión mínima debe estar centralizada");
+assert.match(source, /const CLIENT_VERSION = 41/, "la versión mínima debe estar centralizada");
 assert.equal((source.match(/clientVersion: CLIENT_VERSION/g) || []).length, 2, "crear y unirse deben registrar la misma versión");
 assert.doesNotMatch(source, /Para usar esta sala, actualizad todos los móviles a v39/, "el aviso no debe seguir mostrando la versión antigua");
 assert.match(source, /paint\(`<div class="shell">\$\{header\(\x27<button class="icon-btn" data-online-action="room"/, "la partida debe mostrar un menú de controles de sala");
