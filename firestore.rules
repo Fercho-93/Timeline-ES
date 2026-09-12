@@ -64,16 +64,35 @@ service cloud.firestore {
           && t.history is list && t.history.size() == t.index
           && t.handSize is int && t.handSize >= 1 && t.handSize <= 6;
       }
+      // La ronda que se cierra apunta cuántas cartas le quedaron a cada participante: es
+      // lo que resta puntos en el marcador, así que el anfitrión no puede inventárselo. El
+      // lenguaje de reglas no sabe recorrer un mapa, de modo que se comprueba jugador a
+      // jugador con el mismo recurso que `emptyPlayers`, y nueve es el máximo de la sala.
+      function handAt(prior, hands, i) {
+        return i >= prior.playerOrder.size()
+          || hands[prior.playerOrder[i]] == prior.players[prior.playerOrder[i]].hand.size();
+      }
+      function handsKept(prior, hands) {
+        return hands.keys().toSet() == prior.playerOrder.toSet()
+          && handAt(prior, hands, 0) && handAt(prior, hands, 1) && handAt(prior, hands, 2)
+          && handAt(prior, hands, 3) && handAt(prior, hands, 4) && handAt(prior, hands, 5)
+          && handAt(prior, hands, 6) && handAt(prior, hands, 7) && handAt(prior, hands, 8);
+      }
       function validTournamentNext() {
         let prior = resource.data;
         let next = request.resource.data;
         let t = prior.tournament;
         let n = next.tournament;
+        // Las manos se toman de la propia petición para poder exigir que el resto de la
+        // entrada —y todo el historial anterior— sea exactamente el esperado; que esas
+        // cifras sean las de verdad lo comprueba `handsKept` aparte.
+        let hands = n.history[n.history.size()-1].hands;
         return isHost() && prior.status == 'ended' && t.index+1 < t.queue.size()
           && changed().hasOnly(['tournament','mode','deckFingerprint','status','phase','handSize','players','deck','discard','timeline','current','starter','turnsInRound','round','winner','winners','reveal','pulseTurn','version','updatedAt','ghost','pulsePower','final','tieQueue','turnStartedAt','finalRoundOffset'])
           && next.finalRoundOffset == ('final' in prior ? prior.final.round : prior.get('finalRoundOffset',0))
           && tournamentShape(n) && n.queue == t.queue && n.handSize == t.handSize && n.index == t.index+1
-          && n.history == t.history.concat([{'mode':prior.mode,'winners':prior.get('winners',null) is list ? prior.winners : [prior.winner]}])
+          && n.history == t.history.concat([{'mode':prior.mode,'winners':prior.get('winners',null) is list ? prior.winners : [prior.winner],'hands':hands}])
+          && handsKept(prior, hands)
           && next.mode == n.queue[n.index] && next.mode is string && next.mode.size() >= 1 && next.mode.size() <= 32
           && next.deckFingerprint is string && next.deckFingerprint.size() >= 1 && next.deckFingerprint.size() <= 24
           && next.status == 'lobby' && next.phase == 'lobby' && next.handSize == n.handSize

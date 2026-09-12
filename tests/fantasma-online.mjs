@@ -212,14 +212,31 @@ try {
  await seed(large);await clients[0].call('continueTie');s=await snapshot();assert.equal(s.phase,'turn');assert.equal(s.deck.length,3);assert.equal(new Set(Object.values(s.players).flatMap(p=>p.hand)).size,9);
  // Competición real: misma sala, nueve participantes, otro eje, puntuación inmutable.
  const tournament={...clone(lobby),status:'ended',phase:'finished',winner:A,winners:[A],final:{round:2},tournament:{queue:['animals','countries','history'],index:0,history:[],handSize:1}};
+ // Las cartas que quedan en la mano al acabar la ronda son las que restan puntos, así que
+ // el historial tiene que recogerlas. Con todas a cero esta prueba no distinguiría un
+ // recuento verdadero de uno inventado, de modo que dos participantes acaban con cartas.
+ tournament.players={...tournament.players,[B]:{...tournament.players[B],hand:[9,10]},[C]:{...tournament.players[C],hand:[11]}};
  await seed(tournament);
  await clients[0].call('nextTournamentRound');s=await snapshot();
  assert.equal(s.mode,'countries');assert.equal(s.status,'lobby');assert.equal(s.roomCode,ROOM);
  assert.deepEqual(s.playerOrder,tournament.playerOrder);assert.equal(s.tournament.index,1);
- assert.deepEqual(s.tournament.history,[{mode:'animals',winners:[A]}]);
+ assert.deepEqual(s.tournament.history,[{mode:'animals',winners:[A],hands:{[A]:0,[B]:2,[C]:1,d:0,e:0,f:0,g:0,h:0,i:0}}]);
  assert.equal(s.finalRoundOffset,2);assert.equal(s.final,undefined);
  await assertFails(updateDoc(ref(B),{tournament:{...s.tournament,index:2},version:s.version+1,updatedAt:serverTimestamp()}));
  await assertFails(updateDoc(ref(A),{tournament:{...s.tournament,history:[{mode:'animals',winners:[B]}]},version:s.version+1,updatedAt:serverTimestamp()}));
+ // Y el recuento de cartas tampoco se puede retocar: es lo que decide los puntos. Se
+ // intenta desde el estado que sí permite avanzar de ronda, y copiando el documento que
+ // acaba de escribir el anfitrión, para que lo único distinto sean las cartas de Bea.
+ const forjada=await snapshot();
+ await seed(tournament);
+ forjada.tournament.history[0].hands[B]=5;
+ forjada.version=tournament.version+1;
+ forjada.updatedAt=serverTimestamp();
+ await assertFails(setDoc(ref(A),forjada));
+ // Se rehace el avance legítimo para volver al punto donde estaba: repetirlo no debe
+ // saltarse una ronda.
+ await seed(tournament);
+ await clients[0].call('nextTournamentRound');
  await clients[0].call('nextTournamentRound');assert.equal((await snapshot()).tournament.index,1);
  await clients[0].call('renderLobby');assert.equal(clients[0].w.document.getElementById('online-hand-size').disabled,true);
  await clients[0].call('startRoom');s=await snapshot();assert.equal(s.status,'playing');assert.ok(Object.values(s.players).every(p=>p.hand.length===1));
