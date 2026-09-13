@@ -34,6 +34,11 @@
       byMode: {},
       byBand: {},
       misses: {},
+      // Las cartas ya descubiertas: las que han pasado por tu mano y te han enseñado su
+      // valor al resolverlas, aciertos y fallos por igual. Es lo que decide qué
+      // ilustraciones se ven en la enciclopedia. Son identificadores únicos en todo el
+      // juego, así que descubrir una carta en «Gran mezcla» la descubre en su mazo.
+      seen: [],
       achievements: {},
       // Las últimas jugadas de sala ya contadas, como `CÓDIGO:versión`. Ver `recordOnline`.
       seenOnline: [],
@@ -109,6 +114,13 @@
     return out;
   }
 
+  // Solo cartas que existen hoy en algún mazo, sin repetir y en número: una lista traída
+  // de una copia ajena no puede colar identificadores inventados ni texto.
+  function normalizeSeen(stored) {
+    if (!Array.isArray(stored)) return [];
+    return [...new Set(stored.filter(id => typeof id === "number" && Number.isFinite(id) && anyCard(id)))];
+  }
+
   // Solo logros que existen hoy.
   function normalizeAchievements(stored) {
     const out = {};
@@ -136,6 +148,7 @@
       byMode: normalizeByMode(stored.byMode),
       byBand: normalizeByBand(stored.byBand),
       misses: normalizeMisses(stored.misses),
+      seen: normalizeSeen(stored.seen),
       achievements: normalizeAchievements(stored.achievements),
       seenOnline: Array.isArray(stored.seenOnline) ? stored.seenOnline.filter(item => typeof item === "string").slice(-SEEN_ONLINE) : [],
       lastOnline: str(stored.lastOnline, base.lastOnline)
@@ -169,6 +182,14 @@
   function cardById(modeKey, cardId) {
     if (!cardCache.has(modeKey)) cardCache.set(modeKey, new Map(CT.cards(modeKey).map(card => [card.id, card])));
     return cardCache.get(modeKey).get(cardId) || null;
+  }
+
+  // Y el mismo mapa sin mazo, para las cartas descubiertas: su lista no guarda de qué
+  // mazo venía cada una porque los identificadores no se repiten en todo el juego.
+  let todas = null;
+  function anyCard(cardId) {
+    if (!todas) todas = new Set(Object.values(CT.MODES).flatMap(mode => mode.cards).map(card => card.id));
+    return todas.has(cardId);
   }
 
   function modeEntry(profile, modeKey) {
@@ -253,6 +274,10 @@
     entry.byKind[kind] = (entry.byKind[kind] || 0) + 1;
 
     const card = cardById(mode, cardId);
+    // Jugar una carta la descubre, se acierte o se falle: en los dos casos la pantalla de
+    // resultado te enseña su valor, su explicación y su lámina. Lo contrario —descubrir
+    // solo con los aciertos— dejaría escondidas justo las cartas que más interesa repasar.
+    if (card && !profile.seen.includes(cardId)) profile.seen.push(cardId);
     if (card) {
       const band = CT.eraForCard(mode, card);
       // La clave lleva el mazo delante: «antigua» existe en varios ejes y sin él se
@@ -491,10 +516,17 @@
     return { ok: true, summary: summary(profile), nuevos };
   }
 
+  // Las cartas descubiertas se consultan una vez por pantalla y se preguntan muchas
+  // veces —una por carta de la enciclopedia—, así que se devuelve el conjunto entero y
+  // no un `isSeen(id)` que volvería a leer el almacenamiento en cada tarjeta.
+  function seenCards() {
+    return new Set(read().seen);
+  }
+
   CT.Progreso = {
     KEY, ACHIEVEMENTS,
     read, record, recordOnline, finishGame, finishOnline, finishCompetition, reset, playerId,
-    summary, modeRows, weakBands, weakCards, achievements,
+    summary, modeRows, weakBands, weakCards, achievements, seenCards,
     exportJson, importJson
   };
 })();

@@ -248,5 +248,50 @@ console.log("\nCatálogo completo desde la barra inferior");
   w.close();
 }
 
+// Las láminas se descubren jugando. Lo que no se vela nunca es el texto: la enciclopedia
+// sigue sirviendo para consultar valor, época y explicación sin haber jugado una carta.
+console.log("\nLáminas por descubrir");
+{
+  const w = boot();
+  const CT = w.CONTINUUM;
+  // Un mazo con ilustración en todas sus cartas; en uno sin láminas no hay nada que velar.
+  const mazo = "animals";
+  const carta = CT.cards(mazo)[0];
+  const ficha = modeKey => w.document.createRange().createContextualFragment(
+    CT.Enciclopedia.cardMarkup(modeKey, carta)).querySelector("[data-enc-card]");
+
+  const velada = ficha(mazo);
+  ok("una carta sin jugar llega con la lámina velada", velada.classList.contains("enc-card-velada") && !!velada.querySelector(".enc-veil"));
+  ok("y dice qué hace falta para descubrirla", /Descúbrela/.test(velada.textContent));
+  ok("pero su valor y su explicación se leen igual", velada.textContent.includes(carta.title) && velada.textContent.includes(carta.detail) && !!velada.querySelector(".year"));
+  const antes = CT.Enciclopedia.seenProgress(mazo);
+  ok(`el recuento empieza a cero (0 de ${antes.total})`, antes.seen === 0 && antes.total === CT.cards(mazo).length);
+
+  // Jugarla la descubre, se acierte o se falle: en los dos casos se ha visto la carta.
+  CT.Progreso.record({ mode: mazo, cardId: carta.id, correct: false });
+  const descubierta = ficha(mazo);
+  ok("jugarla descubre la lámina, aunque se falle", !descubierta.classList.contains("enc-card-velada") && !descubierta.querySelector(".enc-veil"));
+  ok("y el recuento del mazo lo refleja", CT.Enciclopedia.seenProgress(mazo).seen === 1);
+  ok("la carta descubierta sigue trayendo su imagen", !!descubierta.querySelector("img"));
+
+  // Los identificadores no se repiten entre mazos, así que una carta descubierta en
+  // «Gran mezcla» —que reutiliza cartas de otros— queda descubierta en el suyo.
+  const enMezcla = CT.cards("mixed").find(c => CT.cards(mazo).some(a => a.id === c.id));
+  if (enMezcla) {
+    CT.Progreso.record({ mode: "mixed", cardId: enMezcla.id, correct: true });
+    ok("descubrir en Gran mezcla descubre en el mazo de origen", CT.Progreso.seenCards().has(enMezcla.id));
+  }
+
+  // Un mazo sin ilustraciones no anuncia láminas que no existen.
+  const sinLamina = Object.keys(CT.MODES).find(key => CT.cards(key).every(c => !CT.animalArt(key, c)));
+  if (sinLamina) ok(`un mazo sin láminas no promete ninguna (${sinLamina})`, CT.Enciclopedia.seenProgress(sinLamina).total === 0);
+
+  // Y lo guardado aguanta una copia ajena: identificadores inventados o de otro tipo.
+  CT.Storage.setItem(CT.Progreso.KEY, JSON.stringify({ ...CT.Progreso.read(), seen: [carta.id, 99999999, "x", null] }));
+  const limpio = CT.Progreso.seenCards();
+  ok("una lista de descubiertas con basura se queda solo con las cartas reales", limpio.has(carta.id) && limpio.size === 1);
+  w.close();
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

@@ -135,7 +135,14 @@
 
   function header(extra = "") {
     const competition = game?.tournament && ['pass','game','final-local','winner'].includes(screen) ? `<div class="competition-current-deck"><span>Competición · ronda ${game.tournament.index+1} de ${game.tournament.queue.length}</span><strong>${escapeHtml(currentMode().name)}</strong></div>` : '';
-    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${extra}</div></header>${competition}`;
+    // La casita es el atajo al inicio: «Volver» retrocede un paso y esta salta el resto
+    // del camino de una vez. No aparece en el propio inicio, donde no llevaría a ninguna
+    // parte, ni durante una partida: de ahí se sale por el menú de la partida, que
+    // pregunta antes de abandonarla, y un atajo sin pregunta al lado sería una trampa.
+    const inicio = screen !== "home" && !CT.isSessionActive?.()
+      ? '<button class="icon-btn icon-btn-home" data-action="home-top" aria-label="Ir al inicio" title="Inicio"><span aria-hidden="true">⌂</span></button>'
+      : '';
+    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${inicio}${extra}</div></header>${competition}`;
   }
 
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
@@ -589,7 +596,7 @@
         : `Colócala. Si aciertas y ${escapeHtml(pulseTarget.name)} falla, le pasas una carta tuya`;
     const manoHtml = pulseCard
       ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${pulseCard.id}">${animalArt(pulseCard)}${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pistaPulso()}</p></section>`
-      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
+      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""} ${usesAnimalArt() ? "animal-hand-card" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${animalArt(card)}${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
@@ -1068,7 +1075,11 @@
       return `${count} de ${decks.reduce((sum, deck) => sum + deck.cards.length, 0)} cartas · ${decks.length} mazos · ${groups.length} temáticas`;
     }
     const mode = CT.mode(modeKey);
-    return `${count} de ${mode.cards.length} ${escapeHtml(mode.cardLabel)} · ${escapeHtml(CT.axis(modeKey).timelineTitle)}`;
+    // Las láminas descubiertas van aquí y no en cada carta: es un recuento del mazo, y
+    // además explica de una vez por qué algunas ilustraciones se ven veladas.
+    const laminas = CT.Enciclopedia.seenProgress(modeKey);
+    const descubiertas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas descubiertas` : "";
+    return `${count} de ${mode.cards.length} ${escapeHtml(mode.cardLabel)} · ${escapeHtml(CT.axis(modeKey).timelineTitle)}${descubiertas}`;
   }
 
   // Solo se entra aquí desde la portada o desde un repaso: nunca desde dentro de una
@@ -1385,6 +1396,8 @@
   }
 
   let selectedDifficulty = CT.Storage.getItem("continuum-difficulty-v1") || "easy";
+  // Las cartas que el tablero acaba de colocar y todavía no se han visto llegar.
+  let recienColocadas = [];
   if (!CT.Ghost.LEVELS[selectedDifficulty]) selectedDifficulty = "easy";
   function soloHidden() { return solo.difficulty === "expert" || !!solo.ghostTurns?.includes(solo.played - (solo.pendingResult ? 1 : 0)); }
   function soloHome() {
@@ -1513,9 +1526,25 @@
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} cartas</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
-      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${card.id}">${animalArt(card)}${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta"}</p></section>
+      <section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected ${usesAnimalArt() ? "animal-hand-card" : ""}" data-id="${card.id}">${animalArt(card)}${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span><strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
     </div>`);
     if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
+    // Las cartas que acaba de colocar el tablero se ven llegar, una detrás de otra, y la
+    // línea se desplaza hasta la primera para que el movimiento no ocurra fuera de la
+    // pantalla. Solo la primera vez que se pintan: repintar al elegir un hueco no vuelve
+    // a repartirlas, así que tampoco vuelve a animarlas.
+    if (recienColocadas.length) {
+      const llegan = recienColocadas.map(id => app.querySelector(`.timeline-card[data-id="${id}"]`)).filter(Boolean);
+      recienColocadas = [];
+      const wrap = app.querySelector(".timeline-wrap");
+      if (llegan.length && wrap) {
+        // El desplazamiento es seco y no suave: la carta todavía no se ve (entra desde el
+        // centro) y así el sitio al que llega ya está quieto cuando empieza a moverse.
+        const caja = llegan[0].getBoundingClientRect(), marco = wrap.getBoundingClientRect();
+        wrap.scrollLeft += caja.left - marco.left - (marco.width - caja.width) / 2;
+        CT.dealIn(llegan);
+      }
+    }
     CT.enableDrag({
       cardSelector: ".hand-card", slotSelector: ".slot",
       onDrop: (id, index) => {
@@ -1577,6 +1606,10 @@
       const at = CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), cardsById.get(id));
       solo.timeline.splice(at, 0, id); solo.autoAdded.push(id);
     }
+    // `autoAdded` se guarda con la partida y sigue ahí al reanudarla, así que no sirve
+    // para saber si el movimiento está por enseñar: eso lo dice esta lista, que vive solo
+    // en esta pantalla y se vacía en cuanto se ha visto llegar las cartas.
+    recienColocadas = solo.autoAdded.slice();
     saveSolo();
     soloView();
   }
