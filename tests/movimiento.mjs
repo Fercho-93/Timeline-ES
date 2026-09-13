@@ -293,6 +293,80 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   w.close();
 }
 
+console.log("\nDeslizar de izquierda a derecha para volver");
+// El gesto tiene que hacer exactamente lo que el botón «Volver» de cada pantalla, y no
+// hacer nada donde ese botón no existe: dentro de una partida, en el inicio, o cuando el
+// dedo está desplazando una tira o escribiendo en un campo.
+function swipe(w, { target = el(w, "#app"), from = 30, to = 170, y = 320, dy = 0, pointerType = "touch", steps = 3, cancelado = false } = {}) {
+  pointer(w, "pointerdown", target, from, y, pointerType);
+  for (let paso = 1; paso <= steps; paso++) pointer(w, "pointermove", target, from + ((to - from) * paso) / steps, y + (dy * paso) / steps, pointerType);
+  pointer(w, cancelado ? "pointercancel" : "pointerup", target, to, y + dy, pointerType);
+}
+const pantalla = w => el(w, "#app").dataset.screen;
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  assert.equal(pantalla(w), "play-menu");
+  swipe(w);
+  ok("deslizar en el menú del mazo vuelve a la colección, como «Volver»", pantalla(w) === "home" && !!w.document.querySelector('[data-mode="history"]'));
+  swipe(w);
+  ok("en el inicio no hay nada detrás: el gesto no hace nada", pantalla(w) === "home");
+  // Igual que tras un arrastre: el gesto se come el clic que el navegador puede disparar
+  // al soltar, así que el siguiente toque de verdad llega en el turno siguiente.
+  await sleep(5);
+  click(w, '[data-mode="history"]');
+  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  assert.equal(pantalla(w), "setup");
+  swipe(w, { cancelado: true });
+  ok("un gesto que el navegador cancela a mitad, ya cumplido, vuelve igual", pantalla(w) === "play-menu");
+  await sleep(5);
+  click(w, '[data-action="setup"]');
+  swipe(w, { from: 200, to: 40 });
+  ok("de derecha a izquierda no vuelve: ese no es el gesto", pantalla(w) === "setup");
+  swipe(w, { dy: 130 });
+  ok("un desplazamiento en diagonal tampoco vuelve", pantalla(w) === "setup");
+  swipe(w, { to: 70 });
+  ok("un roce corto no vuelve", pantalla(w) === "setup");
+  swipe(w, { pointerType: "mouse" });
+  ok("con el ratón se navega con los botones, no arrastrando", pantalla(w) === "setup");
+  swipe(w, { target: el(w, "#players input") });
+  ok("deslizar sobre un campo de texto lo respeta", pantalla(w) === "setup");
+  const tira = w.document.createElement("div");
+  tira.style.overflowX = "auto";
+  Object.defineProperties(tira, { scrollWidth: { value: 900 }, clientWidth: { value: 360 } });
+  el(w, ".shell").append(tira);
+  swipe(w, { target: tira });
+  ok("una tira que se desplaza a los lados se queda el gesto", pantalla(w) === "setup");
+  swipe(w);
+  ok("y fuera de ella el gesto sigue volviendo", pantalla(w) === "play-menu");
+  w.close();
+}
+{
+  const w = boot();
+  click(w, '[data-action="rules"]');
+  swipe(w, { target: el(w, ".modal") });
+  ok("con la guía abierta, el gesto la cierra como Escape", !w.document.querySelector(".overlay") && pantalla(w) === "home");
+  await sleep(5);
+  click(w, '[data-action="home-encyclopedia"]');
+  swipe(w, { target: el(w, "#enc-search-input") });
+  ok("buscando en la enciclopedia, deslizar no la cierra", !!w.document.querySelector('[data-overlay="encyclopedia"]'));
+  swipe(w, { target: el(w, ".enc-modal") });
+  ok("y desde el resto de la enciclopedia el gesto la cierra", !w.document.querySelector('[data-overlay="encyclopedia"]') && pantalla(w) === "home");
+  w.close();
+}
+{
+  const w = boot();
+  game(w);
+  assert.equal(pantalla(w), "game");
+  swipe(w);
+  ok("en mitad de una partida el gesto no navega ni abre nada", pantalla(w) === "game" && !w.document.querySelector(".overlay"));
+  await sleep(5);
+  click(w, '[data-action="game-menu"]');
+  swipe(w, { target: el(w, ".modal") });
+  ok("pero cierra el menú de la partida, que sí es descartable", !w.document.querySelector(".overlay") && pantalla(w) === "game");
+  w.close();
+}
+
 const css = read("styles.css");
 const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
 ok("el estilo reducido cubre navegación, cartas, diálogos y espera", [".selection-enter", ".placement-enter", ".dialog-exit", ".game-row.active", ".spinner", ".drag-ghost"].every(selector => reduced.includes(selector)));

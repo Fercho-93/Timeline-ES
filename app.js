@@ -2153,6 +2153,34 @@
       nativeApp.exitApp();
     });
   }
+  // Y deslizar de izquierda a derecha hace lo mismo que el botón «Volver» de la pantalla,
+  // en todas las versiones: web, Android e iOS. Cuándo un movimiento del dedo cuenta como
+  // «atrás» lo decide swipe.js; a dónde se vuelve, esto:
+  //
+  // - Con un diálogo descartable encima (la guía, los ajustes, la enciclopedia) se cierra,
+  //   igual que con Escape o con el botón Atrás. Un paso obligado de la jugada se queda
+  //   donde está y se come el gesto, que para eso `backPressed` devuelve `true`.
+  // - Dentro de una partida no navega. Un deslizamiento se puede hacer sin querer mirando
+  //   la mesa, y abandonar una partida no puede depender de eso: ahí se sale por el menú
+  //   de la partida, que pregunta primero, como hasta ahora.
+  // - El modo de varios móviles pinta sus propias pantallas y sabe cómo salir de una sala,
+  //   así que el gesto pulsa su salida en vez de repintar por encima de la sala.
+  // - Desde el inicio no hay nada detrás: el gesto no hace nada. Cerrar la aplicación sigue
+  //   siendo cosa del botón Atrás de Android y de nadie más.
+  // La llamada es opcional a propósito: el service worker sirve cada archivo de su propia
+  // copia, así que en el primer arranque tras una actualización puede convivir este `app.js`
+  // nuevo con un `index.html` viejo que todavía no carga `swipe.js`. Sin gesto se sigue
+  // jugando; con una excepción aquí, la aplicación no arrancaría.
+  CT.enableSwipeBack?.(() => {
+    if (CT.backPressed()) return;
+    if (CT.isSessionActive()) return;
+    // La pantalla la manda el DOM y no la variable local: durante una sala es online.js
+    // quien pinta, y `screen` se quedó en la última pantalla que pintó este archivo.
+    if ((app.dataset.screen || screen) === "home") return;
+    const salidaOnline = app.querySelector('[data-online-action="back"]');
+    if (salidaOnline) { salidaOnline.click(); return; }
+    backMenu();
+  });
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
   CT.Links.start(target => {

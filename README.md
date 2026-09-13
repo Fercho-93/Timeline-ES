@@ -322,6 +322,16 @@ Ningún control baja de los 44 px que necesita una yema, y las
 carátulas se sirven en dos tamaños —una para el lomo y otra para la portada desplegada—,
 así que la primera visita baja unos 150 KB de imagen en vez de los 698 KB de antes.
 
+Deslizar de izquierda a derecha vuelve a la pantalla de detrás, exactamente igual que el
+botón **Volver** de esa pantalla: cierra el diálogo que haya encima (la guía, los ajustes,
+la enciclopedia) o retrocede un paso en la navegación. Funciona en la web y en las dos
+tiendas, no solo en Android. El gesto pide un recorrido claramente horizontal y hacia la
+derecha (`swipe.js`), y no navega en tres sitios a propósito: dentro de una partida —una
+partida se abandona por su menú, que pregunta antes, y no por un gesto que se puede hacer
+sin querer al mirar la mesa—, encima de una tira que se desplaza a los lados, como la línea
+temporal o el marcador, y sobre un campo de texto o un desplegable. Desde el inicio no hace
+nada: cerrar la aplicación sigue siendo cosa del botón Atrás de Android.
+
 ## Preparación para App Store / Google Play (beta móvil)
 
 Continuum se sigue sirviendo como PWA (la sección anterior), y en paralelo se está
@@ -347,7 +357,9 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
 - El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar
   una partida en curso, o vuelve al inicio; ambos comportamientos están en `a11y.js`
   (`backPressed`) y `app.js`, y solo se activan dentro del contenedor nativo de Capacitor
-  (`window.Capacitor`), así que no tocan la versión web ni iOS.
+  (`window.Capacitor`), así que no tocan la versión web ni iOS. El deslizamiento de
+  izquierda a derecha comparte con él ese mismo «atrás» y sí funciona en las tres versiones;
+  la diferencia es que no interrumpe una partida ni cierra la aplicación.
 - `npm run build && npx cap sync` deja `android/` e `ios/` al día con el último `dist/`
   antes de abrirlos en Android Studio o Xcode.
 - El número de versión de la beta (`0.1.1`, distinto del número interno de caché del
