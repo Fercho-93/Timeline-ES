@@ -225,5 +225,72 @@ console.log("\nEl mapa de la línea");
   ok("tamaño normal restaura el 100%", w.document.querySelector('.timeline-zoom output').textContent === '100%');
 }
 
+// De Normal en adelante el tablero coloca cartas por su cuenta. Antes aparecían ya
+// puestas y solo lo contaba un aviso de texto; ahora se ven llegar desde el centro hasta
+// su sitio, que es lo que permite entender qué ha cambiado en la línea.
+console.log("\nLas cartas que coloca el tablero se ven llegar");
+{
+  const w = boot({ "continuum-difficulty-v1": "normal" });
+  const animaciones = [];
+  // jsdom no maquetiza: sin una caja con medidas, no hay recorrido que calcular.
+  w.Element.prototype.getBoundingClientRect = function () {
+    return { left: 40, top: 60, width: 150, height: 220, right: 190, bottom: 280, x: 40, y: 60 };
+  };
+  w.Element.prototype.animate = function (frames, timing) {
+    animaciones.push({ elemento: this, frames, timing });
+    return { finished: new Promise(() => {}), cancel() {} };
+  };
+  const llegadas = () => animaciones.filter(a => a.elemento.classList?.contains("timeline-card"));
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-free"]');
+  click(w, '[data-action="solo-place"]');
+  click(w, '[data-action="confirm-place"]');
+  ok("en Normal el tablero coloca una carta por turno", /incorporado/.test(texto(w)) === false);
+  click(w, '[data-action="solo-next"]');
+  const vistas = llegadas();
+  ok(`la carta automática se anima al llegar (${vistas.length})`, vistas.length === 1);
+  ok("entra desde el centro de la pantalla y acaba en su sitio",
+    /translate3d/.test(vistas[0].frames[0].transform) && vistas[0].frames.at(-1).transform === "none");
+  ok("empieza invisible, para no verse dos veces", vistas[0].frames[0].opacity === 0 && vistas[0].timing.fill === "backwards");
+  ok("la línea la ha incorporado de verdad, no solo en la animación", /incorporado/.test(texto(w)));
+  click(w, '[data-action="solo-place"]');
+  ok("repintar al elegir hueco no la vuelve a repartir", llegadas().length === 1);
+  w.close();
+}
+{
+  // Con movimiento reducido la carta sigue apareciendo: lo que no hay es recorrido.
+  const w = boot({ "continuum-difficulty-v1": "normal" });
+  const animaciones = [];
+  w.matchMedia = () => ({ matches: true });
+  w.Element.prototype.getBoundingClientRect = function () {
+    return { left: 40, top: 60, width: 150, height: 220, right: 190, bottom: 280, x: 40, y: 60 };
+  };
+  w.Element.prototype.animate = function () { animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-free"]');
+  click(w, '[data-action="solo-place"]');
+  click(w, '[data-action="confirm-place"]');
+  click(w, '[data-action="solo-next"]');
+  ok("con movimiento reducido no se anima nada", !animaciones.some(el => el.classList?.contains("timeline-card")));
+  ok("y la carta automática está igualmente en la línea", /incorporado/.test(texto(w)));
+  w.close();
+}
+{
+  // En Fácil no hay cartas automáticas, así que tampoco hay nada que ver llegar.
+  const w = boot({ "continuum-difficulty-v1": "easy" });
+  const animaciones = [];
+  w.Element.prototype.animate = function () { animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-free"]');
+  click(w, '[data-action="solo-place"]');
+  click(w, '[data-action="confirm-place"]');
+  click(w, '[data-action="solo-next"]');
+  ok("en Fácil no llega ninguna carta automática", !animaciones.some(el => el.classList?.contains("timeline-card")) && !/incorporado/.test(texto(w)));
+  w.close();
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

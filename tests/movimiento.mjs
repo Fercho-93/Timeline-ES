@@ -259,18 +259,40 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   const w = boot();
   game(w);
   let card = el(w, ".hand-card");
+  // jsdom no maquetiza y no trae `elementFromPoint`: mientras no se diga otra cosa, bajo
+  // el dedo no hay ningún hueco. Es también lo que ve el juego en un navegador que no la
+  // tenga, y por eso `slotUnder` no puede darla por hecha.
+  w.document.elementFromPoint = () => null;
+  // Deslizar sin esperar es desplazar la página: ni se levanta la carta ni se le quita
+  // el gesto al navegador. Es la mitad del trato del arrastre con el dedo.
   pointer(w, "pointerdown", card, 100, 400);
   pointer(w, "pointermove", card, 100, 360);
-  await sleep(180);
-  ok("deslizar antes de mantener no inicia un arrastre", !w.document.querySelector(".armed, .drag-ghost"));
+  await sleep(360);
+  const scroll = new w.Event('touchmove', { bubbles: true, cancelable: true });
+  card.dispatchEvent(scroll);
+  ok("deslizar antes de mantener desplaza y no arrastra", !w.document.querySelector(".armed, .holding, .drag-ghost") && !scroll.defaultPrevented);
+  pointer(w, "pointerup", card, 100, 360);
+  // Y la otra mitad: mantenerla pulsada sin mover la levanta, y a partir de ahí el dedo
+  // arrastra la carta en vez de desplazar la página.
   pointer(w, "pointerdown", card, 100, 400);
-  await sleep(180);
-  ok("mantener tampoco bloquea el desplazamiento táctil", !card.classList.contains("armed"));
-  pointer(w, "pointermove", card, 100, 280);
-  const touch = new w.Event('touchmove', {bubbles:true, cancelable:true});
-  card.dispatchEvent(touch);
-  ok("deslizar después de mantener no cancela el gesto del navegador", !touch.defaultPrevented && !w.document.querySelector('.drag-ghost'));
-  pointer(w, "pointerup", card, 100, 280);
+  ok("mientras se espera, la carta avisa de que se está pulsando", card.classList.contains("holding"));
+  await sleep(360);
+  ok("mantenerla pulsada la levanta", !!w.document.querySelector(".drag-ghost") && !card.classList.contains("holding"));
+  const arrastre = new w.Event('touchmove', { bubbles: true, cancelable: true });
+  card.dispatchEvent(arrastre);
+  ok("con la carta levantada, el dedo ya no desplaza la página", arrastre.defaultPrevented);
+  w.document.elementFromPoint = () => el(w, '.slot[data-index="0"]');
+  pointer(w, "pointermove", card, 220, 300);
+  pointer(w, "pointerup", card, 220, 300);
+  ok("soltar sobre un hueco pide confirmación, igual que con el ratón", el(w, ".slot-confirm").dataset.index === "0" && !w.document.querySelector(".drag-ghost"));
+  await sleep(5);
+  click(w, '[data-action="cancel-place"]');
+  card = el(w, ".hand-card");
+  // Un toque corto sigue siendo un toque: elige la carta y no arrastra nada.
+  pointer(w, "pointerdown", card, 100, 400);
+  await sleep(60);
+  pointer(w, "pointerup", card, 100, 400);
+  ok("un toque corto no levanta la carta", !w.document.querySelector(".drag-ghost, .holding"));
   click(w, '.hand-card');
   card = el(w, '.hand-card.selected');
   ok("un toque selecciona la carta", !!card);
@@ -290,6 +312,26 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   pointer(w, "pointermove", card, 150, 280, "mouse");
   pointer(w, "pointercancel", card, 150, 280, "mouse");
   ok("una interrupción del sistema limpia la copia y el estado de arrastre", !w.document.querySelector(".drag-ghost, .dragging, .armed") && !w.document.body.classList.contains("dragging-card"));
+  w.close();
+}
+
+// «Volver» retrocede un paso y la casita salta al inicio de una vez. Donde no aparece es
+// tan importante como donde sí: en el propio inicio no llevaría a ninguna parte, y en una
+// partida sería una salida sin la pregunta que protege lo jugado.
+console.log("\nLa casita del inicio");
+{
+  const w = boot();
+  const casa = () => w.document.querySelector('.topbar [data-action="home-top"]');
+  ok("en el inicio no hay casita: ya se está en él", !casa());
+  abreMazo(w, "historia", "history");
+  ok("en el menú del mazo aparece, junto a «Volver»", !!casa() && !!w.document.querySelector('.topbar [data-action="collection-back"]'));
+  ok("y se anuncia como lo que es", casa().getAttribute("aria-label") === "Ir al inicio");
+  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  ok("en la configuración también", !!casa());
+  casa().click();
+  ok("la casita salta al inicio de una vez, sin pasar por el menú", el(w, "#app").dataset.screen === "home");
+  game(w);
+  ok("dentro de una partida no está: de ahí se sale por su menú", !casa() && !!w.document.querySelector('[data-action="game-menu"]'));
   w.close();
 }
 

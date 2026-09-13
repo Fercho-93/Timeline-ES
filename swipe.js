@@ -73,6 +73,10 @@
     const gesto = gesture;
     gesture = null;
     if (!gesto || event.pointerId !== gesto.id) return;
+    // Arrastrar una carta hasta un hueco es un recorrido horizontal como cualquier otro:
+    // si además contara como «atrás», colocar una carta hacia la derecha se llevaría la
+    // pantalla por delante. Mientras haya una carta en el dedo, aquí no hay gesto.
+    if (document.body.classList.contains("dragging-card")) return;
     // Al soltar vale la posición del propio evento; al cancelar, la última que se vio.
     const x = event.type === "pointerup" ? event.clientX : gesto.x;
     const y = event.type === "pointerup" ? event.clientY : gesto.y;

@@ -121,6 +121,9 @@ button { touch-action: manipulation; color: inherit; }
 /* 44 px es lo que necesita un dedo. Los botones pequeños llegaban a 36 y a 29, y son
    justo los que más se usan: el de la esquina en cada pantalla de partida. */
 .icon-btn { min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 16px; font-size: .85rem; font-weight: 650; cursor: pointer; }
+/* La casita no lleva texto, así que necesita su propio ancho de dedo: sin esto se queda
+   en un botón estrecho al lado de «Guía» y «Volver», que sí lo tienen por el texto. */
+.icon-btn-home { min-width: 44px; padding-inline: 12px; font-size: 1.15rem; line-height: 1; }
 
 .hero { padding: 8px 0; display: grid; gap: 26px; align-items: center; }
 .hero-copy { position: relative; z-index: 2; }
@@ -391,6 +394,9 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 /* Arrastrar cartas. La carta original se queda apagada en su sitio, como hueco de
    donde salió, y lo que sigue al dedo es una copia flotante. */
 .hand-card.armed { transform: scale(.97); box-shadow: inset 0 0 0 2px var(--accent); }
+/* La carta se encoge mientras se mantiene pulsada y termina de encogerse justo cuando se
+   levanta: esa es toda la explicación que necesita el gesto la primera vez que se usa. */
+.hand-card.holding { transform: scale(.96); box-shadow: inset 0 0 0 2px var(--accent); transition: transform 300ms linear, box-shadow var(--motion-fast) ease; }
 .hand-card.dragging { opacity: .3; filter: grayscale(1); cursor: grabbing; }
 .drag-ghost { position: fixed; left: 0; top: 0; z-index: 60; margin: 0; min-height: 0; padding: 11px 13px; pointer-events: none; transition: none; border-color: var(--accent); box-shadow: 0 16px 34px rgba(40,28,18,.3); animation: ghost-lift 180ms var(--ease-spring) both; }
 @keyframes ghost-lift { from { opacity: .65; } }
@@ -899,6 +905,20 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 /* La carta a la que se llega desde un repaso se ve entre las demás sin depender solo
    del color: el desplazamiento ya la deja centrada, esto confirma cuál es. */
 .enc-card-highlight { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* La lámina que todavía no se ha descubierto. Se vela la imagen y nada más: el valor, la
+   época, la explicación y la fuente siguen legibles, porque consultar es para lo que está
+   la enciclopedia. El desenfoque va acompañado de un texto —y no solo de un efecto—, para
+   que se entienda que falta jugarla y no que la imagen se haya cargado mal. */
+.enc-card-velada .card-visual { position: relative; overflow: hidden; }
+/* El desenfoque de la lámina se declara en edition.css, que es donde vive la regla que
+   quita el filtro a las ilustraciones de la enciclopedia y que si no ganaría a esta. */
+/* Con `.card-visual` delante, porque el símbolo de época de las cartas sin ilustración
+   («.card-visual span») ya declara su propia posición y ganaría a un selector más corto. */
+.card-visual .enc-veil { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; text-align: center; background: color-mix(in srgb, var(--paper) 42%, transparent); color: var(--ink); }
+.enc-veil b { font-size: 1.3rem; line-height: 1; opacity: .75; }
+.enc-veil small { font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; text-shadow: 0 1px 3px color-mix(in srgb, var(--paper) 80%, transparent); }
+@media (prefers-reduced-motion: reduce) { .enc-card-velada .card-visual img { transform: none; } }
 
 /* El perfil. Reutiliza la rejilla de cifras del solitario y las filas de la colección:
    son los mismos datos leídos de otra manera, no una interfaz aparte. Lo único propio

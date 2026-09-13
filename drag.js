@@ -1,9 +1,18 @@
-// Con ratón se puede arrastrar una carta hasta un hueco.
-// En móvil, deslizar desplaza la pantalla y tocar selecciona la carta.
+// Arrastrar una carta hasta un hueco. Con ratón, desde el primer movimiento.
+//
+// Con el dedo hay que mantener la carta pulsada un momento antes de arrastrarla, y ese
+// momento es justo lo que deja intacto el desplazamiento de la página: si el dedo se
+// mueve antes de que la carta se levante, manda el desplazamiento y aquí no pasa nada.
+// Solo cuando la carta ya está levantada se le quita el gesto al navegador, y para
+// entonces no había ningún desplazamiento en marcha que interrumpir: el dedo llevaba
+// quieto toda la espera. Tocar sin más sigue eligiendo la carta, y los huecos «+»
+// siguen estando ahí para quien prefiera colocar tocando.
 (function () {
   "use strict";
 
   const MOVE_THRESHOLD = 8;   // píxeles que hay que moverse para que sea un arrastre
+  const HOLD = 300;           // lo que hay que mantener pulsada la carta para levantarla
+  const HOLD_SLOP = 10;       // cuánto se le perdona al dedo mientras espera, sin cancelar
   const EDGE = 56;            // margen en el que la línea temporal se desplaza sola
   const EDGE_STEP = 14;
   const GHOST_WIDTH = 150;    // la copia que sigue al dedo va encogida, para no tapar la línea
@@ -17,14 +26,14 @@
     cancelAnimationFrame(session.frame);
     session.ghost?.remove();
     session.enabledSlots?.forEach(slot => { if (slot.isConnected) slot.disabled = true; });
-    session.card.classList.remove("dragging", "armed");
+    session.card.classList.remove("dragging", "armed", "holding");
     document.querySelectorAll(".drop-target").forEach(el => el.classList.remove("drop-target"));
     document.body.classList.remove("dragging-card");
     session = null;
   }
 
   function slotUnder(x, y) {
-    if (!session) return null;
+    if (!session || typeof document.elementFromPoint !== "function") return null;
     // La copia ya tiene pointer-events:none: no hace falta ocultarla (ni forzar un
     // repintado extra) en cada frame para encontrar el hueco que hay debajo.
     const target = document.elementFromPoint(x, y);
@@ -92,22 +101,34 @@
   }
 
   function onPointerDown(event) {
-    // En pantallas táctiles, deslizar siempre desplaza y tocar selecciona.
-    // El arrastre se conserva únicamente para el ratón.
-    if (event.pointerType !== "mouse") return;
     if (session || event.button > 0) return;
+    if (event.isPrimary === false) return;   // un segundo dedo no arrastra nada
     const card = event.target.closest(this.cardSelector);
     if (!card || card.disabled) return;
     const cardId = Number(card.dataset.id);
     if (!Number.isFinite(cardId)) return;
 
+    const raton = event.pointerType === "mouse";
     session = {
       card, cardId, pointerId: event.pointerId,
       slotSelector: this.slotSelector, onDrop: this.onDrop,
       startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY,
-      armed: event.pointerType === "mouse", dragging: false, slot: null, ghost: null, timer: 0, frame: 0
+      armed: raton, dragging: false, slot: null, ghost: null, timer: 0, frame: 0
     };
-
+    // Con el dedo, la carta se levanta al mantenerla pulsada. Hasta que eso pasa, el
+    // navegador es dueño del gesto y desplazar la página funciona como siempre.
+    if (raton) return;
+    card.classList.add("holding");
+    session.timer = setTimeout(() => {
+      if (!session) return;
+      session.armed = true;
+      session.card.classList.remove("holding");
+      // Un toque corto avisa de que la carta ya va en el dedo; sin él no hay manera de
+      // saber que ha terminado la espera sin mirar fijamente la pantalla.
+      window.CONTINUUM.Effects?.tap?.();
+      try { session.card.setPointerCapture(session.pointerId); } catch { /* el puntero ya no está */ }
+      startDrag();
+    }, HOLD);
   }
 
   function onPointerMove(event) {
@@ -116,6 +137,13 @@
     session.y = event.clientY;
     const moved = Math.hypot(session.x - session.startX, session.y - session.startY);
 
+    if (!session.armed) {
+      // Moverse durante la espera es desplazar la página, no arrastrar: se suelta la
+      // carta y no se vuelve a intentar hasta el siguiente toque. El margen es pequeño
+      // porque un dedo quieto nunca lo está del todo.
+      if (moved > HOLD_SLOP) cleanup();
+      return;
+    }
     if (!session.dragging) {
       if (moved <= MOVE_THRESHOLD) return;
       event.preventDefault();
@@ -126,6 +154,14 @@
     event.preventDefault();
     // El frame de autoScroll dibuja la última posición una vez por refresco, aunque el
     // móvil emita varios pointermove. También actualiza el destino al desplazar la tira.
+  }
+
+  // Lo que de verdad impide que la página se desplace bajo una carta ya levantada: el
+  // navegador solo respeta `preventDefault` en el primer `touchmove` del gesto, y aquí
+  // llega intacto porque durante la espera el dedo no se movió. `pointermove` no sirve
+  // para esto: el navegador no lo deja cancelar una vez ha decidido desplazar.
+  function onTouchMove(event) {
+    if (session?.armed && event.cancelable) event.preventDefault();
   }
 
   function onPointerUp(event) {
@@ -169,6 +205,7 @@
     document.addEventListener("pointermove", at("move"), { passive: false });
     document.addEventListener("pointerup", at("up"));
     document.addEventListener("pointercancel", () => cleanup());
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
   }
 
   window.CONTINUUM = window.CONTINUUM || {};

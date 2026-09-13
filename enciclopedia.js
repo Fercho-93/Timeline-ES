@@ -34,22 +34,50 @@
       .sort((a, b) => CT.sortValue(modeKey, a) - CT.sortValue(modeKey, b));
   }
 
+  // Qué cartas tienen la lámina a la vista. Se pide una vez por pantalla y se pasa a cada
+  // tarjeta, en vez de consultarlo carta a carta: la enciclopedia pinta cientos de golpe.
+  function seen() {
+    return CT.Progreso?.seenCards?.() || new Set();
+  }
+
   // Igual que las cartas de la partida, pero siempre reveladas y con la fuente cuando la
-  // carta la lleva: aquí no hay nada que ocultar hasta confirmar una jugada.
-  function cardMarkup(modeKey, card, { highlight = false } = {}) {
+  // carta la lleva: el valor, la época y la explicación se leen sin haber jugado nunca.
+  //
+  // Lo único que se gana jugando es la lámina: hasta que la carta pasa por tu mano se ve
+  // velada. La enciclopedia sigue sirviendo para consultar —que es para lo que está—,
+  // pero las ilustraciones se descubren, que es lo que invita a volver a ella.
+  function cardMarkup(modeKey, card, { highlight = false, descubiertas = null } = {}) {
     const era = CT.eraForCard(modeKey, card);
     const art = CT.animalArt(modeKey, card);
-    const visual = art || `<span>${era.symbol}</span><small>${era.name}</small>`;
+    const velada = !!art && !(descubiertas || seen()).has(card.id);
+    const visual = art
+      ? `${art}${velada ? '<span class="enc-veil"><b aria-hidden="true">◌</b><small>Descúbrela jugándola</small></span>' : ""}`
+      : `<span>${era.symbol}</span><small>${era.name}</small>`;
     const fuente = card.source
       ? `<p class="enc-source"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Fuente <span aria-hidden="true">↗</span><span class="solo-lectores"> (se abre en una pestaña nueva)</span></a></p>`
       : "";
-    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
+    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${velada ? " enc-card-velada" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
   }
 
-  function resultsMarkup(modeKey, cards, { highlight = null } = {}) {
+  function resultsMarkup(modeKey, cards, { highlight = null, descubiertas = null } = {}) {
     if (!cards.length) return `<p class="enc-empty">Ninguna carta coincide con la búsqueda.</p>`;
     const mode = CT.mode(modeKey);
-    return `<div class="review-grid enc-grid" role="group" aria-label="Cartas de ${CT.escapeHtml(mode.name)}">${cards.map(card => cardMarkup(modeKey, card, { highlight: highlight === card.id })).join("")}</div>`;
+    descubiertas = descubiertas || seen();
+    return `<div class="review-grid enc-grid" role="group" aria-label="Cartas de ${CT.escapeHtml(mode.name)}">${cards.map(card => cardMarkup(modeKey, card, { highlight: highlight === card.id, descubiertas })).join("")}</div>`;
+  }
+
+  // Cuántas cartas de un mazo están ya descubiertas. Solo cuentan las que tienen lámina:
+  // las demás no esconden nada, y meterlas en el recuento haría creer que faltan cartas
+  // por descubrir en un mazo que ya está entero a la vista.
+  function seenProgress(modeKey, descubiertas = seen()) {
+    const conLamina = CT.cards(modeKey).filter(card => CT.animalArt(modeKey, card));
+    return { total: conLamina.length, seen: conLamina.filter(card => descubiertas.has(card.id)).length };
+  }
+
+  // «· 12 de 40 láminas», o nada en un mazo sin ilustraciones.
+  function laminaResumen(modeKey, descubiertas) {
+    const { total, seen: vistas } = seenProgress(modeKey, descubiertas);
+    return total ? ` · ${vistas} de ${total} láminas` : "";
   }
 
   // Gran mezcla reutiliza cartas de otros mazos: el catálogo las muestra una sola
@@ -73,14 +101,16 @@
     const groups = catalogGroups(query);
     if (!groups.length) return '<p class="enc-empty">Ninguna carta coincide con la búsqueda.</p>';
     const searching = !!query.trim();
+    // Una sola lectura de las descubiertas para todo el catálogo, que son treinta mazos.
+    const descubiertas = seen();
     return groups.map(block => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
       <h2 id="enc-topic-${block.key}"><span aria-hidden="true">${block.icon}</span> ${CT.escapeHtml(block.name)}</h2>
       ${block.decks.map(deck => `<details class="enc-deck" data-enc-deck="${deck.key}"${searching ? ' open data-loaded="true"' : ''}>
-        <summary><span>${CT.escapeHtml(deck.name)}</span><small>${deck.cards.length} cartas</small></summary>
-        <div class="enc-deck-cards">${searching ? resultsMarkup(deck.key, deck.cards) : ''}</div>
+        <summary><span>${CT.escapeHtml(deck.name)}</span><small>${deck.cards.length} cartas${laminaResumen(deck.key, descubiertas)}</small></summary>
+        <div class="enc-deck-cards">${searching ? resultsMarkup(deck.key, deck.cards, { descubiertas }) : ''}</div>
       </details>`).join('')}
     </section>`).join('');
   }
 
-  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup, catalogGroups, catalogMarkup };
+  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup, catalogGroups, catalogMarkup, seenProgress };
 })();

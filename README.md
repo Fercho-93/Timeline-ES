@@ -132,6 +132,17 @@ partida también lleva a su ficha en la enciclopedia, ya con esa carta destacada
 en ninguna pantalla de partida: vería el mazo entero y volvería trivial cualquier jugada
 pendiente.
 
+Lo único que hay que ganarse son las láminas: la ilustración de una carta se ve velada
+—desenfocada, con un «descúbrela jugándola» encima— hasta que esa carta pasa por tu mano.
+Descubre tanto acertarla como fallarla: en los dos casos la pantalla de resultado te la ha
+enseñado entera, y esconder justo las que se fallan sería esconder las que más interesa
+repasar. El texto no se vela nunca —valor, época, explicación y fuente se leen desde el
+primer día—, así que la enciclopedia sigue sirviendo para consultar; lo que se colecciona
+es el dibujo. Cada mazo lleva su recuento («12 de 41 láminas descubiertas») y las cartas
+descubiertas viajan en el perfil, así que se conservan al exportarlo e importarlo. Los
+identificadores no se repiten entre mazos: descubrir una carta en «Gran mezcla» la
+descubre también en su mazo de origen.
+
 ## Duelo por enlace
 
 Un formato más dentro de «Jugar en solitario». Juegas 15 cartas al azar del mazo abierto y
@@ -301,7 +312,11 @@ ausencia de posiciones duplicadas, recolocación y conservación de las cartas n
 
 Las incorporaciones se hacen al continuar, tras acierto o fallo, antes de la nueva decisión.
 Primero se reserva la siguiente carta del jugador; si faltan cartas se añaden menos. No
-suman aciertos ni cambian vidas. En Difícil se sortea, con probabilidad del 70%, un turno
+suman aciertos ni cambian vidas. Y se ven llegar: la línea se desplaza hasta el hueco donde
+va la carta y esta entra desde el centro de la pantalla hasta su sitio, una detrás de otra
+si son dos. Son cartas que nadie ha jugado y que cambian el tablero, así que se ve de dónde
+salen y dónde caen en vez de aparecer ya puestas. El aviso de texto sigue estando, para
+quien no mire en ese momento, y con «reducir movimiento» la carta aparece sin recorrido. En Difícil se sortea, con probabilidad del 70%, un turno
 Fantasma en cada bloque de cuatro turnos a partir del cuarto; nunca son consecutivos.
 El calendario se guarda al iniciar, no al repintar. En Experto el resultado sigue revelando
 el valor y la explicación de la carta jugada para aprender de ella.
@@ -337,6 +352,19 @@ por separado, se separan lo justo para seguir siendo un botón de dedo.
 Ningún control baja de los 44 px que necesita una yema, y las
 carátulas se sirven en dos tamaños —una para el lomo y otra para la portada desplegada—,
 así que la primera visita baja unos 150 KB de imagen en vez de los 698 KB de antes.
+
+Colocar una carta se puede hacer de dos maneras, y las dos acaban en la misma
+confirmación: tocar la carta y después el hueco «+», o **mantener pulsada la carta y
+arrastrarla** hasta el hueco. Con el dedo, el arrastre pide esa espera corta a propósito:
+mientras la carta no se ha levantado, el gesto es del navegador y deslizar sigue
+desplazando la página como siempre; solo cuando se levanta —la carta se encoge y el móvil
+da un toque— se le quita el gesto al navegador, y para entonces no había ningún
+desplazamiento en marcha que interrumpir. Con ratón se arrastra desde el primer
+movimiento, sin espera.
+
+Junto a **Volver** hay una casita: «Volver» retrocede un paso y la casita salta al inicio
+de una vez. No aparece durante una partida, que se abandona por su propio menú para que
+haya una pregunta de por medio.
 
 Deslizar de izquierda a derecha vuelve a la pantalla de detrás, exactamente igual que el
 botón **Volver** de esa pantalla: cierra el diálogo que haya encima (la guía, los ajustes,

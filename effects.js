@@ -37,7 +37,12 @@
       oscillator.start(); oscillator.stop(audio.currentTime + 0.16);
     } catch { /* El texto y el resultado visual siguen disponibles. */ }
   }
-  CT.Effects = { feedback(correct) { void vibration(correct ? "success" : "failure"); void tone(correct); } };
+  // `tap` es el toque seco de «ya lo tienes»: lo usa la carta al levantarse para
+  // arrastrarla. Como el resto de los efectos, respeta el ajuste y nunca suena.
+  CT.Effects = {
+    feedback(correct) { void vibration(correct ? "success" : "failure"); void tone(correct); },
+    tap() { void vibration("confirm"); }
+  };
   document.addEventListener("click", event => {
     if (event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"]')) void vibration("confirm");
   }, true);

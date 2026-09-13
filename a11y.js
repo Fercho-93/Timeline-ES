@@ -155,6 +155,31 @@
   const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
   const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
 
+  // Las cartas que el tablero coloca solo —las automáticas de Normal en adelante— llegan
+  // desde el centro de la pantalla hasta su sitio en la línea, en vez de aparecer ya
+  // puestas. No es adorno: son cartas que nadie ha jugado y que cambian el tablero, así
+  // que se ve de dónde salen y dónde caen. Se anima el hueco final hacia atrás (la carta
+  // ya está en su posición definitiva y se la lleva al centro para traerla de vuelta),
+  // porque así el sitio que ocupa la línea es el de verdad en todo momento y ninguna
+  // carta se mueve al terminar. Con movimiento reducido no se anima nada.
+  function dealIn(cards) {
+    const lista = [...cards].filter(card => card?.isConnected && card.animate);
+    if (!lista.length || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    lista.forEach((card, orden) => {
+      const caja = card.getBoundingClientRect();
+      if (!caja.width) return;
+      const dx = window.innerWidth / 2 - (caja.left + caja.width / 2);
+      const dy = window.innerHeight / 2 - (caja.top + caja.height / 2);
+      const efecto = card.animate([
+        { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 0, offset: 0 },
+        { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 1, offset: .18 },
+        { transform: `translate3d(${dx * .35}px, ${dy * .35}px, 0) scale(1.06) rotate(-1deg)`, opacity: 1, offset: .62 },
+        { transform: "none", opacity: 1, offset: 1 }
+      ], { duration: 760, delay: orden * 260, easing: "cubic-bezier(.22,.61,.36,1)", fill: "backwards" });
+      efecto.finished.catch(() => {});
+    });
+  }
+
   // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino
   // la hoja anterior levantándose desde una esquina y descubriendo el destino debajo.
   function turnPage(container, backwards) {
@@ -449,6 +474,7 @@
 
   window.CONTINUUM = window.CONTINUUM || {};
   window.CONTINUUM.paint = paint;
+  window.CONTINUUM.dealIn = dealIn;
   window.CONTINUUM.unrollCollection = sheet => unrollSheet(sheet?.closest('.collection-entry') || sheet, true);
   window.CONTINUUM.resizeContent = resizeContent;
   window.CONTINUUM.announce = announce;
