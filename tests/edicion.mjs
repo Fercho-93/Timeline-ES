@@ -227,6 +227,33 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
   }
 }
 console.log('Aspectos: raíz, barra del navegador, desplegable, paleta en la hoja y valores retirados: OK');
+// El atajo al inicio es el único botón de la barra que es un dibujo y no una palabra, así
+// que necesita su propia caja. Se le escapó una vez: el tamaño estaba puesto en styles.css
+// y lo pisaba la barra agrupada del móvil, que aprieta todos sus botones y les quita el
+// ancho mínimo. Esto fija las dos cosas a la vez —que ese aprieto sigue existiendo y que
+// el del atajo le gana—, porque comprobar solo la caja dejaría pasar el mismo fallo.
+{
+  const styles = read('styles.css'), edition = read('edition.css');
+  const apretada = /\.topbar-actions \.icon-btn \{[^}]*min-width: 0/.test(styles);
+  assert.ok(apretada, 'la barra agrupada del móvil sigue quitando el ancho mínimo');
+  const atajo = edition.match(/\.topbar-actions \.icon-btn\.icon-btn-home \{([^}]*)\}/);
+  assert.ok(atajo, 'el atajo declara su caja con un selector que le gana a esa barra');
+  assert.match(atajo[1], /min-width: 52px/, 'y recupera el ancho de un dedo');
+
+  const w = boot({ seen: true });
+  try {
+    click(w, '[data-block="historia"]');
+    click(w, '[data-mode="history"]');
+    const boton = w.document.querySelector('.topbar [data-action="home-top"]');
+    assert.ok(boton, 'el atajo está en la cabecera del menú del mazo');
+    const marca = boton.querySelector('svg.brand-mark');
+    assert.ok(marca, 'y es la marca dibujada, no un glifo de la fuente');
+    assert.equal(marca.getAttribute('aria-hidden'), 'true', 'el dibujo no se lee: lo hace la etiqueta del botón');
+    assert.equal(boton.getAttribute('aria-label'), 'Ir al inicio');
+    assert.ok(Number(marca.getAttribute('width')) >= 24, `se dibuja a tamaño de dedo (${marca.getAttribute('width')}px)`);
+  } finally { w.close(); }
+}
+console.log('Atajo al inicio: marca dibujada, caja propia y especificidad que gana a la barra agrupada: OK');
 {
   const w = boot({ seen: true });
   const turns = [];

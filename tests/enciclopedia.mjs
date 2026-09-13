@@ -50,7 +50,9 @@ console.log("\nFiltrado puro (CT.Enciclopedia)");
     const card = ct.cards(key).find(card => ct.cardArt(key, card));
     if (!card) continue;
     const fragment = w.document.createElement('div');
-    fragment.innerHTML = ct.Enciclopedia.cardMarkup(key, card);
+    // Ya descubierta: una carta que no se ha jugado no monta su `<img>`, y lo que se
+    // comprueba aquí es que la ilustración que sí se pinta apunte a un archivo real.
+    fragment.innerHTML = ct.Enciclopedia.cardMarkup(key, card, { descubiertas: new Set([card.id]) });
     const img = fragment.querySelector('img');
     ok(`${key}: la enciclopedia usa su ilustración existente`, !!img && fs.existsSync(path.join(REPO, img.getAttribute('src'))));
     ok(`${key}: imagen diferida y contenido conservado`, img?.loading === 'lazy' || img?.getAttribute('loading') === 'lazy');
@@ -261,8 +263,11 @@ console.log("\nLáminas por descubrir");
     CT.Enciclopedia.cardMarkup(modeKey, carta)).querySelector("[data-enc-card]");
 
   const velada = ficha(mazo);
-  ok("una carta sin jugar llega con la lámina velada", velada.classList.contains("enc-card-velada") && !!velada.querySelector(".enc-veil"));
-  ok("y dice qué hace falta para descubrirla", /Descúbrela/.test(velada.textContent));
+  ok("una carta sin jugar llega con el sello cerrado", velada.classList.contains("enc-card-velada") && !!velada.querySelector(".enc-sello"));
+  ok("con su candado y dicho con todas las letras", !!velada.querySelector("svg.enc-candado") && /Bloqueada/.test(velada.textContent) && /Descúbrela/.test(velada.textContent));
+  // Ni se descarga ni se difumina lo que no se va a ver: es lo que dejaba pesada la
+  // enciclopedia al abrir un mazo entero por descubrir.
+  ok("y sin la imagen detrás, que no se llega a pedir", !velada.querySelector("img"));
   ok("pero su valor y su explicación se leen igual", velada.textContent.includes(carta.title) && velada.textContent.includes(carta.detail) && !!velada.querySelector(".year"));
   const antes = CT.Enciclopedia.seenProgress(mazo);
   ok(`el recuento empieza a cero (0 de ${antes.total})`, antes.seen === 0 && antes.total === CT.cards(mazo).length);
@@ -270,7 +275,7 @@ console.log("\nLáminas por descubrir");
   // Jugarla la descubre, se acierte o se falle: en los dos casos se ha visto la carta.
   CT.Progreso.record({ mode: mazo, cardId: carta.id, correct: false });
   const descubierta = ficha(mazo);
-  ok("jugarla descubre la lámina, aunque se falle", !descubierta.classList.contains("enc-card-velada") && !descubierta.querySelector(".enc-veil"));
+  ok("jugarla descubre la lámina, aunque se falle", !descubierta.classList.contains("enc-card-velada") && !descubierta.querySelector(".enc-sello"));
   ok("y el recuento del mazo lo refleja", CT.Enciclopedia.seenProgress(mazo).seen === 1);
   ok("la carta descubierta sigue trayendo su imagen", !!descubierta.querySelector("img"));
 

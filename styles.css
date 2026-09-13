@@ -122,8 +122,17 @@ button { touch-action: manipulation; color: inherit; }
    justo los que más se usan: el de la esquina en cada pantalla de partida. */
 .icon-btn { min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 16px; font-size: .85rem; font-weight: 650; cursor: pointer; }
 /* La casita no lleva texto, así que necesita su propio ancho de dedo: sin esto se queda
-   en un botón estrecho al lado de «Guía» y «Volver», que sí lo tienen por el texto. */
-.icon-btn-home { min-width: 44px; padding-inline: 12px; font-size: 1.15rem; line-height: 1; }
+   en un botón estrecho al lado de «Guía» y «Volver», que sí lo tienen por el texto. El
+   tamaño del glifo se declara en edition.css, junto a la regla de `.icon-btn` que se
+   carga después y que ganaría a cualquier tamaño puesto aquí. */
+/* Sin relleno vertical propio: el dibujo ya llena la altura y, con los 9 px del resto de
+   los botones, el atajo acababa dos píxeles más alto que «Volver» al lado. */
+.icon-btn-home { display: grid; place-items: center; min-width: 52px; padding: 0 10px; line-height: 1; }
+/* La rosa gira al pulsarla: es el único adorno del atajo y dura lo que el toque. */
+.icon-btn-home .brand-mark { display: block; transition: transform var(--motion-base) var(--ease-spring); }
+.icon-btn-home:active .brand-mark { transform: rotate(90deg) scale(.92); }
+@media (hover: hover) and (pointer: fine) { .icon-btn-home:hover .brand-mark { transform: rotate(45deg); } }
+@media (prefers-reduced-motion: reduce) { .icon-btn-home .brand-mark { transition: none; } }
 
 .hero { padding: 8px 0; display: grid; gap: 26px; align-items: center; }
 .hero-copy { position: relative; z-index: 2; }
@@ -906,19 +915,20 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
    del color: el desplazamiento ya la deja centrada, esto confirma cuál es. */
 .enc-card-highlight { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* La lámina que todavía no se ha descubierto. Se vela la imagen y nada más: el valor, la
-   época, la explicación y la fuente siguen legibles, porque consultar es para lo que está
-   la enciclopedia. El desenfoque va acompañado de un texto —y no solo de un efecto—, para
-   que se entienda que falta jugarla y no que la imagen se haya cargado mal. */
+/* La lámina que todavía no se ha descubierto: en su sitio va un sello cerrado, con su
+   candado y dicho con todas las letras. Se vela la imagen y nada más: el valor, la época,
+   la explicación y la fuente siguen legibles, porque consultar es para lo que está la
+   enciclopedia. El dibujo no se pinta siquiera —lo decide `enciclopedia.js`—, así que
+   esto es un papel sellado y no una imagen tapada: ni se descarga ni se compone. */
+/* El fondo tramado del sello se declara en edition.css, que pinta `.card-visual` después
+   y con más peso: aquí solo queda la caja. */
 .enc-card-velada .card-visual { position: relative; overflow: hidden; }
-/* El desenfoque de la lámina se declara en edition.css, que es donde vive la regla que
-   quita el filtro a las ilustraciones de la enciclopedia y que si no ganaría a esta. */
 /* Con `.card-visual` delante, porque el símbolo de época de las cartas sin ilustración
    («.card-visual span») ya declara su propia posición y ganaría a un selector más corto. */
-.card-visual .enc-veil { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; text-align: center; background: color-mix(in srgb, var(--paper) 42%, transparent); color: var(--ink); }
-.enc-veil b { font-size: 1.3rem; line-height: 1; opacity: .75; }
-.enc-veil small { font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; text-shadow: 0 1px 3px color-mix(in srgb, var(--paper) 80%, transparent); }
-@media (prefers-reduced-motion: reduce) { .enc-card-velada .card-visual img { transform: none; } }
+.card-visual .enc-sello { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 10px; text-align: center; color: var(--enc-sello-tinta); }
+.enc-sello .enc-candado { display: block; filter: drop-shadow(0 2px 4px rgba(40,26,10,.22)); }
+.enc-sello b { font-size: .82rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.enc-sello small { max-width: 16ch; font-size: .72rem; line-height: 1.35; opacity: .82; }
 
 /* El perfil. Reutiliza la rejilla de cifras del solitario y las filas de la colección:
    son los mismos datos leídos de otra manera, no una interfaz aparte. Lo único propio

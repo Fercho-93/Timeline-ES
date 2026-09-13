@@ -91,6 +91,12 @@ html body::before {
 .topbar { color: var(--edition-ink); border-color: var(--edition-line); }
 .brand { color: var(--edition-ink); font-size: .8rem; letter-spacing: .24em; }
 .icon-btn { font-family: var(--ui-font); font-size: .875rem; border: 1px solid var(--edition-line); border-radius: 6px; background: var(--edition-surface); box-shadow: none; }
+/* El atajo al inicio es un dibujo, no una palabra, así que necesita su propia caja. El
+   selector lleva `.topbar-actions` delante para ganarle a la barra agrupada del móvil,
+   que aprieta todos sus botones y les quita el ancho mínimo; sin eso, el atajo se queda
+   estrecho justo donde más falta hace el ancho de un dedo. */
+.topbar-actions .icon-btn.icon-btn-home { min-width: 52px; padding: 0 10px; color: var(--edition-brass); }
+.topbar-actions .icon-btn.icon-btn-home:active { color: var(--edition-ink); }
 .home-shell:not(.play-menu-shell) .brand { visibility: visible; }
 .home-shell:not(.play-menu-shell) .topbar { margin: 0 0 10px; border-bottom: 1px solid var(--edition-line); }
 .home-masthead { color: var(--edition-ink); margin: 6px auto 24px; }
@@ -368,11 +374,18 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .guide-tools { position: sticky; top: 0; z-index: 3; display: flex; justify-content: flex-end; margin-bottom: 10px; pointer-events: none; }
 .enc-card-illustrated .card-visual { height: auto; aspect-ratio: 2 / 3; padding: 0; background: var(--edition-paper); }
 .enc-card-illustrated .card-visual .animal-card-art { display: block; width: 100%; height: 100%; object-fit: contain; filter: none; }
-/* La lámina todavía por descubrir. El velo va aquí y no en styles.css porque la regla de
-   arriba —que quita el filtro a la ilustración de la enciclopedia— gana por especificidad
-   a cualquier `filter` declarado antes: si no, el desenfoque no llegaría a verse. */
-.enc-card-velada.enc-card-illustrated .card-visual .animal-card-art { filter: blur(13px) saturate(.45) contrast(.92); transform: scale(1.14); }
-@media (prefers-reduced-motion: reduce) { .enc-card-velada.enc-card-illustrated .card-visual .animal-card-art { transform: none; } }
+/* El sello de la lámina por descubrir: un papel tramado, la tinta del aspecto en curso y
+   el hueco del candado del color del papel. Se derivan de las variables de la edición, así
+   que los cinco aspectos —incluido alto contraste— traen el suyo sin declarar nada más. */
+:root {
+  --enc-sello: repeating-linear-gradient(135deg,
+    color-mix(in srgb, var(--edition-brass) 14%, var(--edition-paper)) 0 9px,
+    color-mix(in srgb, var(--edition-brass) 6%, var(--edition-paper)) 9px 18px);
+  --enc-sello-tinta: color-mix(in srgb, var(--edition-ink) 82%, var(--edition-brass));
+  --enc-sello-hueco: var(--edition-paper);
+}
+/* Con `.enc-card-illustrated` delante, que es quien pinta ahí el papel liso justo encima. */
+.enc-card-velada.enc-card-illustrated .card-visual { background: var(--enc-sello); }
 .enc-era { margin-bottom: 10px; color: var(--edition-muted); font: .8rem/1.5 var(--ui-font); }
 .guide-tools .guide-close { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 1.35rem; font-weight: 400; line-height: 1; border: 0; background: transparent; color: var(--edition-muted); box-shadow: none; }
 .home-shell .play-choice-block .play-choice-grid { margin-left: clamp(14px, 4vw, 28px); padding-left: 12px; border-left: 1px solid var(--edition-line); }

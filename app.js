@@ -133,14 +133,30 @@
     } catch { return null; }
   }
 
+  // La rosa de los vientos del emblema, reducida a lo que se reconoce en 27 píxeles: el
+  // aro, la estrella de cuatro puntas y los cuatro rayos cortos en diagonal.
+  const MARCA = `<svg class="brand-mark" viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false">
+    <circle cx="12" cy="12" r="10.3" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".38"/>
+    <path d="M12 1.7 13.85 9.45 21.6 12 13.85 14.55 12 22.3 10.15 14.55 2.4 12 10.15 9.45Z" fill="currentColor"/>
+    <g stroke="currentColor" stroke-width="1.15" stroke-linecap="round" opacity=".5">
+      <path d="M16.3 7.7 18.3 5.7"/><path d="M16.3 16.3 18.3 18.3"/>
+      <path d="M7.7 16.3 5.7 18.3"/><path d="M7.7 7.7 5.7 5.7"/>
+    </g>
+  </svg>`;
+
   function header(extra = "") {
     const competition = game?.tournament && ['pass','game','final-local','winner'].includes(screen) ? `<div class="competition-current-deck"><span>Competición · ronda ${game.tournament.index+1} de ${game.tournament.queue.length}</span><strong>${escapeHtml(currentMode().name)}</strong></div>` : '';
-    // La casita es el atajo al inicio: «Volver» retrocede un paso y esta salta el resto
-    // del camino de una vez. No aparece en el propio inicio, donde no llevaría a ninguna
-    // parte, ni durante una partida: de ahí se sale por el menú de la partida, que
-    // pregunta antes de abandonarla, y un atajo sin pregunta al lado sería una trampa.
+    // El atajo al inicio: «Volver» retrocede un paso y esto salta el resto del camino de
+    // una vez. No aparece en el propio inicio, donde no llevaría a ninguna parte, ni
+    // durante una partida: de ahí se sale por el menú de la partida, que pregunta antes de
+    // abandonarla, y un atajo sin pregunta al lado sería una trampa.
+    //
+    // El dibujo es la rosa de los vientos del emblema, no una casita: es la marca del
+    // juego, que es exactamente lo que se pulsa para volver a la portada. Va en línea y
+    // no como imagen —se recorta al tamaño de un botón sin emborronarse, toma el color de
+    // la tinta de cada aspecto y no pide ninguna descarga más.
     const inicio = screen !== "home" && !CT.isSessionActive?.()
-      ? '<button class="icon-btn icon-btn-home" data-action="home-top" aria-label="Ir al inicio" title="Inicio"><span aria-hidden="true">⌂</span></button>'
+      ? `<button class="icon-btn icon-btn-home" data-action="home-top" aria-label="Ir al inicio" title="Inicio">${MARCA}</button>`
       : '';
     return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${inicio}${extra}</div></header>${competition}`;
   }
@@ -1538,11 +1554,15 @@
       recienColocadas = [];
       const wrap = app.querySelector(".timeline-wrap");
       if (llegan.length && wrap) {
-        // El desplazamiento es seco y no suave: la carta todavía no se ve (entra desde el
-        // centro) y así el sitio al que llega ya está quieto cuando empieza a moverse.
-        const caja = llegan[0].getBoundingClientRect(), marco = wrap.getBoundingClientRect();
-        wrap.scrollLeft += caja.left - marco.left - (marco.width - caja.width) / 2;
-        CT.dealIn(llegan);
+        // La vista acompaña a cada carta hasta donde cae. El desplazamiento es seco y no
+        // suave: la carta todavía no se ve —entra desde el centro— y así el sitio al que
+        // llega ya está quieto cuando empieza a moverse.
+        CT.dealIn(llegan, {
+          seguir: carta => {
+            const caja = carta.getBoundingClientRect(), marco = wrap.getBoundingClientRect();
+            wrap.scrollLeft += caja.left - marco.left - (marco.width - caja.width) / 2;
+          }
+        });
       }
     }
     CT.enableDrag({
