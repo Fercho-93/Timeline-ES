@@ -6,7 +6,9 @@
   --edition-ink: #302d27;
   --edition-muted: #70695d;
   --edition-line: #d7cbb6;
-  --edition-brass: #92703c;
+  /* Un punto más oscuro que el latón de origen (#92703c): con aquel, el lema, los
+     capítulos y el resto de rótulos pequeños se quedaban en 3,9:1 sobre el papel. */
+  --edition-brass: #866430;
   --edition-shade: 0 18px 45px #352a1710;
   --scene-color: #745039;
   --scene-wash: #bda27a;
@@ -34,6 +36,41 @@
   --edition-line: #4c5045; --edition-brass: #ceb483;
   --edition-shade: 0 18px 45px #0003;
 }
+
+/* Pergamino: la edición se pasa al papel de la mesa. No hace falta nada en styles.css
+   —la mesa ya es de papel en el tema claro—, así que el aspecto entero cabe aquí. */
+:root[data-theme="sepia"] {
+  --edition-paper: #ecdfc4; --edition-surface: #f7efdc;
+  --edition-ink: #3a2d19; --edition-muted: #6f5a37;
+  --edition-line: #cbb489; --edition-brass: #7d5c28;
+  --edition-shade: 0 18px 45px #5a401820;
+}
+
+/* Noche profunda: negro de verdad, con la línea y el latón un punto más vivos para que
+   los bordes no se traguen el fondo. */
+:root[data-theme="night"] {
+  --edition-paper: #000; --edition-surface: #0f1211;
+  --edition-ink: #f4eee2; --edition-muted: #b6b1a3;
+  --edition-line: #3e433b; --edition-brass: #d9bd88;
+  --edition-shade: 0 18px 45px #000c;
+}
+/* Y sin el velo de color del bloque abierto, que sobre negro se ve como una mancha. */
+:root[data-theme="night"] body { background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 7%, transparent), transparent 45%), var(--edition-paper); }
+
+/* Alto contraste: blanco, tinta casi negra y bordes que se ven. El color del bloque se
+   apaga aquí y no en cada regla, así que también lo pierden el botón principal, el
+   cartel de competición y el velo de la portada. La segunda mitad del selector gana al
+   `[data-scene]` de arriba, que tiene la misma especificidad y va antes. */
+:root[data-theme="contrast"], :root[data-theme="contrast"][data-scene] {
+  --edition-paper: #fff; --edition-surface: #fff;
+  --edition-ink: #0b0b0b; --edition-muted: #2e2e2e;
+  --edition-line: #1a1a1a; --edition-brass: #5a3d00;
+  --edition-shade: none;
+  --scene-color: #1c1c1c; --scene-wash: #fff;
+}
+/* Las circunferencias del fondo se dibujan con la línea, y con una línea tan marcada
+   dejan de ser un adorno para convertirse en trazos cruzando el texto. */
+:root[data-theme="contrast"] body::before { display: none; }
 html { background: var(--edition-paper); }
 html body {
   background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 18%, transparent), transparent 55%), var(--edition-paper);
