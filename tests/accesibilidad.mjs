@@ -263,6 +263,81 @@ console.log("\nLa cabecera se centra en móvil");
   ok("y centrando las acciones", /\.topbar-actions \{[^}]*justify-content: center/.test(columna));
 }
 
+// Cada aspecto nuevo es una paleta entera, y una paleta se estropea sin que falle nada:
+// basta con un papel un punto más claro para que el rótulo pequeño de encima deje de
+// leerse. Esto es puro dato —los seis colores de la edición, el mismo cálculo de la WCAG
+// que las bandas— y cubre los cinco aspectos de una vez.
+console.log("\nContraste de los aspectos de la interfaz");
+{
+  const css = read("edition.css");
+  const lineal = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  const completo = hex => hex.length === 4 ? "#" + [...hex.slice(1)].map(c => c + c).join("") : hex;
+  const canales = hex => [1, 3, 5].map(i => parseInt(completo(hex).slice(i, i + 2), 16));
+  const luz = hex => { const [r, g, b] = canales(hex).map(lineal); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const razon = (a, b) => (Math.max(luz(a), luz(b)) + 0.05) / (Math.min(luz(a), luz(b)) + 0.05);
+
+  // El primer `:root` es el aspecto claro; los demás llevan su `data-theme` en el selector.
+  const paleta = selector => {
+    const desde = css.indexOf(selector);
+    if (desde === -1) return null;
+    const bloque = css.slice(desde, css.indexOf("}", desde));
+    const color = nombre => bloque.match(new RegExp(`--edition-${nombre}: *(#[0-9a-f]{3,6})`))?.[1];
+    const valores = { paper: color("paper"), surface: color("surface"), ink: color("ink"), muted: color("muted"), brass: color("brass") };
+    return Object.values(valores).every(Boolean) ? valores : null;
+  };
+  const aspectos = {
+    "claro": ":root {",
+    "oscuro": ':root[data-theme="dark"] {',
+    "pergamino": ':root[data-theme="sepia"] {',
+    "noche profunda": ':root[data-theme="night"] {',
+    "alto contraste": ':root[data-theme="contrast"],'
+  };
+
+  for (const [nombre, selector] of Object.entries(aspectos)) {
+    const tema = paleta(selector);
+    ok(`${nombre}: se encuentran sus seis colores`, !!tema);
+    if (!tema) continue;
+    // Tinta y texto apagado son texto corriente; el latón son los rótulos pequeños (el
+    // lema, los capítulos, la numeración), que es donde más se nota quedarse corto.
+    const pares = [
+      ["tinta sobre papel", tema.ink, tema.paper],
+      ["tinta sobre superficie", tema.ink, tema.surface],
+      ["texto apagado sobre papel", tema.muted, tema.paper],
+      ["texto apagado sobre superficie", tema.muted, tema.surface],
+      ["latón sobre papel", tema.brass, tema.paper],
+      ["latón sobre superficie", tema.brass, tema.surface]
+    ];
+    const flojos = pares.filter(([, a, b]) => razon(a, b) < 4.5);
+    ok(`${nombre}: sus seis pares llegan a 4,5:1${flojos.length ? ` (falla ${flojos.map(([e, a, b]) => `${e} ${razon(a, b).toFixed(2)}`).join(", ")})` : ""}`, !flojos.length);
+  }
+}
+
+// Y lo mismo que se comprueba del tema oscuro vale para cualquier aspecto que cambie el
+// fondo: si una superficie se queda sin su versión, el texto de encima se pierde.
+console.log("\nCada aspecto nuevo trae todas sus superficies");
+{
+  const css = read("styles.css");
+  const pergamino = css.slice(css.lastIndexOf(":root {", css.indexOf("--vitela:")));
+  const superficies = [...pergamino.slice(0, pergamino.indexOf("}")).matchAll(/(--[a-z-]+):/g)].map(m => m[1]);
+  const bloque = selector => {
+    const desde = css.lastIndexOf(selector);
+    return desde === -1 ? "" : css.slice(desde, css.indexOf("}", desde));
+  };
+  // Las mismas de siempre: la carta de la línea es un objeto de la mesa, y los `-solid`
+  // son fondos con su propio texto claro encima, iguales con cualquier luz.
+  const DE_LA_MESA = ["--carta-tinta", "--carta-dato", "--accent-solid", "--green-solid"];
+  const aspectos = {
+    "noche profunda": { selector: ':root[data-theme="night"] {', heredadas: DE_LA_MESA },
+    "alto contraste": { selector: ':root[data-theme="contrast"] {', heredadas: [] }
+  };
+  for (const [nombre, { selector, heredadas }] of Object.entries(aspectos)) {
+    const declarado = bloque(selector);
+    ok(`${nombre}: se encuentra su bloque`, declarado.length > 200);
+    const pendientes = superficies.filter(v => !heredadas.includes(v)).filter(v => !declarado.includes(`${v}:`));
+    ok(`${nombre}: ninguna superficie se queda sin su versión${pendientes.length ? ` (falta ${pendientes.join(", ")})` : ""}`, !pendientes.length);
+  }
+}
+
 console.log("\nContraste de las bandas de época");
 {
   const css = read("styles.css");

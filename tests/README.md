@@ -34,7 +34,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `mazos.mjs` | Calidad de todos los mazos: repeticiones, huecos, años únicos, espaciado cuando corresponde y cifras que el redondeo no confunda. Sin dependencias. |
 | `solitario.mjs` | Solitario, reto diario, confirmación al colocar, modalidad de países y el mapa de la línea. |
 | `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
-| `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie y que las bandas tengan contraste. |
+| `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie, y el contraste de las bandas y de los cinco aspectos de la interfaz. |
 | `movimiento.mjs` | Navegación repetida, galería persistente, selección de cartas, cierres interrumpidos, arrastre, deslizar para volver y movimiento reducido. |
 | `enciclopedia.mjs` | Filtrado y búsqueda de `CT.Enciclopedia`, la pantalla que consulta cualquier mazo fuera de partida y su enlace desde el repaso de fin de partida. Comprueba también que no aparece dentro de ninguna partida. |
 | `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
@@ -61,7 +61,12 @@ todavía no incluye a quien acaba de entrar. Comprueba el SDK y la condición, n
 `accesibilidad.mjs` juega con teclado sobre el DOM simulado: comprueba que tras cada
 repintado el foco vuelve donde debe, que las capas se anuncian como diálogos y devuelven
 el foco al cerrarse, que elegir carta y hueco pasa por la región viva, y que el texto de
-las bandas de época llega a 4,5:1 de contraste. Ese último es puro dato: no necesita
+las bandas de época llega a 4,5:1 de contraste. Los aspectos de la interfaz —claro,
+pergamino, alto contraste, oscuro y noche profunda— pasan por ese mismo cálculo en sus
+seis pares con texto, y los que cambian el fondo tienen que declarar todas las superficies
+de la mesa, no solo el papel. `edicion.mjs` comprueba el resto del ajuste: que lo elegido
+llega al elemento raíz, a las dos etiquetas de color del navegador y al almacenamiento, y
+que un aspecto retirado vuelve a «automático» en lugar de dejar la aplicación sin paleta. Ese último es puro dato: no necesita
 navegador y avisa en cuanto alguien añade una banda demasiado clara.
 
 `service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado.

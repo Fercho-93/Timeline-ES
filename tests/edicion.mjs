@@ -169,6 +169,64 @@ for (const userAgent of ['Mozilla/5.0 (Linux; Android 14; Samsung)', 'Mozilla/5.
   }
 }
 console.log('Vista Android compacta: detección independiente y ampliación del usuario conservada: OK');
+// Los aspectos. Lo que se elige tiene que llegar a tres sitios: al elemento raíz (de ahí
+// cuelgan todas las paletas), a las dos etiquetas de color de la barra del navegador —que
+// no leen variables CSS— y al almacenamiento. Y la hoja de estilo tiene que traer la
+// paleta de cada uno: un `data-theme` sin bloque detrás deja la aplicación a medio pintar.
+{
+  const ASPECTOS = ['auto', 'light', 'sepia', 'contrast', 'dark', 'night'];
+  const CLARO = '#f3eee4', OSCURO = '#1c211f';
+  const colores = w => [...w.document.querySelectorAll('meta[name="theme-color"]')].map(m => m.getAttribute('content'));
+  for (const theme of ASPECTOS) {
+    const w = boot({ seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme, textSize: '100' }) } });
+    try {
+      const root = w.document.documentElement;
+      assert.equal(root.dataset.theme, theme === 'auto' ? undefined : theme, `el aspecto ${theme} llega al elemento raíz`);
+      // En «automático» cada etiqueta conserva la suya y manda la preferencia del móvil;
+      // con un aspecto elegido, las dos dicen su papel para que no parpadee al abrir.
+      if (theme === 'auto') assert.deepEqual(colores(w), [CLARO, OSCURO]);
+      else assert.equal(new Set(colores(w)).size, 1, `${theme} fija las dos etiquetas`);
+      // El desplegable ofrece todos los aspectos y llega marcando el que está puesto.
+      w.document.querySelector('[data-settings-action="open"]').click();
+      const opciones = [...w.document.querySelectorAll('#ajuste-tema option')];
+      assert.deepEqual(opciones.map(o => o.value), ASPECTOS);
+      assert.equal(w.document.querySelector('#ajuste-tema option[selected]').value, theme);
+      assert.ok(opciones.every(o => o.textContent.trim()), 'cada aspecto tiene su nombre');
+      assert.equal(w.document.querySelectorAll('#ajuste-tema optgroup').length, 2, 'claros y oscuros, separados');
+    } finally { w.close(); }
+  }
+  const estilos = read('edition.css') + read('styles.css');
+  for (const theme of ASPECTOS.filter(t => !['auto', 'light'].includes(t))) {
+    assert.ok(estilos.includes(`[data-theme="${theme}"]`), `el aspecto ${theme} tiene paleta en la hoja de estilo`);
+  }
+  // Elegir en el desplegable aplica y guarda sin recargar.
+  {
+    const w = boot({ seen: true });
+    try {
+      w.document.querySelector('[data-settings-action="open"]').click();
+      const select = w.document.querySelector('#ajuste-tema');
+      select.value = 'night';
+      select.dispatchEvent(new w.Event('change', { bubbles: true }));
+      assert.equal(w.document.documentElement.dataset.theme, 'night');
+      assert.equal(colores(w).join('|'), '#000000|#000000');
+      assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).theme, 'night');
+      // Y un valor que no existe no llega a aplicarse: el aspecto anterior se queda.
+      select.value = 'inventado';
+      select.dispatchEvent(new w.Event('change', { bubbles: true }));
+      assert.equal(w.document.documentElement.dataset.theme, 'night');
+    } finally { w.close(); }
+  }
+  // Un aspecto retirado (o cualquier cosa rara guardada) vuelve a «automático» en vez de
+  // dejar un `data-theme` sin estilos detrás.
+  {
+    const w = boot({ seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: 'retirado', textSize: '100' }) } });
+    try {
+      assert.equal(w.document.documentElement.dataset.theme, undefined);
+      assert.deepEqual(colores(w), [CLARO, OSCURO]);
+    } finally { w.close(); }
+  }
+}
+console.log('Aspectos: raíz, barra del navegador, desplegable, paleta en la hoja y valores retirados: OK');
 {
   const w = boot({ seen: true });
   const turns = [];

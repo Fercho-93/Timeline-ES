@@ -1725,6 +1725,100 @@ body::before {
 :root[data-theme="dark"] body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
 :root[data-theme="dark"] .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
 
+/* Los demás aspectos. «Pergamino» es un tema claro y no aparece aquí: la mesa ya es de
+   papel en el tema claro, y lo único que cambia es la edición (edition.css). Los dos de
+   abajo sí tienen que redefinir cada superficie, porque las del `:root` son claras y una
+   tinta clara encima de una de ellas no se lee. La lista es la misma del tema oscuro:
+   `accesibilidad.mjs` comprueba que ninguna se quede sin su versión en cada aspecto. */
+
+/* Noche profunda: el mismo cuero del tema oscuro, pero sobre negro de verdad. En una
+   pantalla OLED el negro son píxeles apagados —ni luz ni batería—, así que es el aspecto
+   para jugar a oscuras; las líneas suben de tono para no perderse sobre el fondo. */
+:root[data-theme="night"] {
+  color-scheme: dark;
+  --ink: #f6e3bc;
+  --muted: #c9b285;
+  --line: #7a5f39;
+  --paper: #000;
+  --surface: rgba(20,15,8,.95);
+  --accent: #e08a52;
+  --accent-dark: #f3b478;
+  --accent-soft: #55360f;
+  --teal: #79bec7;
+  --green: #79bd94;
+  --ink-solid: #c9662f;
+  --ink-solid-contrast: #fff0cf;
+  --shadow: 0 12px 32px rgba(0, 0, 0, .6);
+  --shadow-soft: 0 4px 14px rgba(0, 0, 0, .5);
+  --vitela: rgba(18,13,7,.96);
+  --vitela-luz: rgba(255,226,170,.06);
+  --vitela-borde: rgba(184,140,78,.46);
+  --borde-suave: rgba(184,140,78,.46);
+  --boton-suave: rgba(32,23,12,.92);
+  --boton-icono: rgba(28,20,11,.9);
+  --boton-icono-luz: rgba(255,228,172,.06);
+  --campo: rgba(10,7,4,.92);
+  --ficha: rgba(30,21,11,.9);
+  --contador: rgba(28,20,11,.92);
+  --hueco: rgba(18,13,7,.8);
+  --modal-fondo: #120d06;
+  --fila: rgba(24,17,9,.92);
+  --fila-activa: rgba(48,34,18,.92);
+  --reja: rgba(140,102,52,.38);
+  --estante: rgba(14,10,5,.8);
+  --formato: linear-gradient(100deg, rgba(40,28,15,.92), rgba(20,14,8,.94));
+  --formato-luz: rgba(255,228,172,.06);
+  --formato-detalle: #c9b285;
+  --promo: rgba(28,20,11,.9);
+}
+
+/* Alto contraste: negro sobre blanco, bordes de 1 px bien visibles y ninguna veladura.
+   El color de bloque también se apaga —un botón principal pasa a ser casi negro con
+   texto blanco— porque aquí manda leer, no ambientar. */
+:root[data-theme="contrast"] {
+  color-scheme: light;
+  --ink: #0b0b0b;
+  --muted: #2e2e2e;
+  --line: #1a1a1a;
+  --paper: #fff;
+  --surface: #fff;
+  --accent: #8a2b00;
+  --accent-dark: #6b2100;
+  --accent-soft: #ffe4d8;
+  --teal: #14454e;
+  --green: #1f5136;
+  --accent-solid: #8a2b00;
+  --green-solid: #1f5136;
+  --ink-solid: #0b0b0b;
+  --ink-solid-contrast: #fff;
+  --shadow: none;
+  --shadow-soft: none;
+  --vitela: #fff;
+  --vitela-luz: #fff;
+  --vitela-borde: #1a1a1a;
+  --borde-suave: #1a1a1a;
+  --boton-suave: #fff;
+  --boton-icono: #fff;
+  --boton-icono-luz: #fff;
+  --campo: #fff;
+  --ficha: #fff;
+  --contador: #f1f1f1;
+  --hueco: #ededed;
+  --modal-fondo: #fff;
+  --fila: #fff;
+  --fila-activa: #e6e6e6;
+  --reja: #1a1a1a;
+  --estante: #f5f5f5;
+  --formato: linear-gradient(100deg, #fff, #fff);
+  --formato-luz: #fff;
+  --formato-detalle: #2e2e2e;
+  --promo: #fff;
+  /* La carta de la línea es papel en los demás aspectos y aquí también, pero su tinta sí
+     sube: es texto, y este aspecto existe justo para que el texto se lea. */
+  --carta-tinta: #0b0b0b;
+  --carta-dato: #8a2b00;
+}
+
 .system-notice { position:relative; z-index:10000; display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px; border:2px solid #8a5426; background:#fff4da; color:#302114; }
 .system-notice span { flex:1 1 240px; }
 #system-notices { position:fixed; inset:auto 0 0; z-index:10000; max-height:42dvh; overflow:auto; padding-bottom:env(safe-area-inset-bottom); }

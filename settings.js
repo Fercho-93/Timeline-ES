@@ -8,6 +8,18 @@
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
   const DEFAULTS = { theme: "auto", textSize: "100" };
+  // Los aspectos, en un solo sitio: de aquí salen el desplegable, la validación de lo
+  // guardado y el color de la barra del navegador. `barra` es el color del papel de cada
+  // uno; «automático» no tiene porque ahí manda la preferencia del móvil. Quien añada un
+  // aspecto nuevo tiene que dar también sus variables en `styles.css` y `edition.css`.
+  const THEMES = {
+    auto: { label: "Automático, según el móvil" },
+    light: { label: "Claro", grupo: "Claros", barra: "#f3eee4" },
+    sepia: { label: "Pergamino", grupo: "Claros", barra: "#ecdfc4" },
+    contrast: { label: "Alto contraste", grupo: "Claros", barra: "#ffffff" },
+    dark: { label: "Oscuro", grupo: "Oscuros", barra: "#1c211f" },
+    night: { label: "Noche profunda", grupo: "Oscuros", barra: "#000000" }
+  };
   // Pendiente de rellenar antes de repartir la beta: el correo donde debe llegar el
   // informe de comentarios. Hasta entonces el botón avisa de que aún no hay dirección.
   const FEEDBACK_EMAIL = CT.Deployment.feedbackEmail;
@@ -15,7 +27,12 @@
   function read() {
     try {
       const stored = JSON.parse(CT.Storage.getItem(KEY));
-      return { ...DEFAULTS, ...stored };
+      const settings = { ...DEFAULTS, ...stored };
+      // Un aspecto que ya no exista —o cualquier cosa rara en el almacenamiento— vuelve a
+      // «automático»: si no, `data-theme` se quedaría con un valor sin estilos y la
+      // aplicación se vería a medio pintar sin que nada lo explicara.
+      if (!THEMES[settings.theme]) settings.theme = DEFAULTS.theme;
+      return settings;
     } catch { return { ...DEFAULTS }; }
   }
 
@@ -35,17 +52,28 @@
     else document.documentElement.setAttribute("data-theme", settings.theme);
     // El color de la barra del navegador no lee variables CSS ni `data-theme`: en
     // `index.html` hay dos etiquetas, una por preferencia del sistema, para que sea
-    // correcto antes incluso de que este script se ejecute. Con una preferencia
-    // explícita que no coincida con el sistema, se fuerzan las dos al mismo color; en
-    // «auto» se les devuelve el suyo y vuelve a mandar el sistema.
-    const claro = "#f3eee4", oscuro = "#1c211f";
+    // correcto antes incluso de que este script se ejecute. Con un aspecto elegido a
+    // mano se fuerzan las dos al papel de ese aspecto; en «auto» se les devuelve el suyo
+    // y vuelve a mandar el sistema.
+    const claro = THEMES.light.barra, oscuro = THEMES.dark.barra;
+    const elegido = THEMES[settings.theme]?.barra;
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => {
-      if (settings.theme === "auto") meta.setAttribute("content", (meta.getAttribute("media") || "").includes("dark") ? oscuro : claro);
-      else meta.setAttribute("content", settings.theme === "dark" ? oscuro : claro);
+      if (elegido) meta.setAttribute("content", elegido);
+      else meta.setAttribute("content", (meta.getAttribute("media") || "").includes("dark") ? oscuro : claro);
     });
   }
 
   applyTheme();
+
+  // «Automático» va suelto arriba, y los demás repartidos en claros y oscuros: así el
+  // desplegable dice de un vistazo con qué luz se lleva cada uno, que es lo que se busca
+  // al abrirlo de noche o al sol.
+  function themeOptions(elegido) {
+    const opcion = key => `<option value="${key}"${key === elegido ? " selected" : ""}>${THEMES[key].label}</option>`;
+    const grupos = [...new Set(Object.values(THEMES).map(tema => tema.grupo).filter(Boolean))];
+    return Object.keys(THEMES).filter(key => !THEMES[key].grupo).map(opcion).join("") +
+      grupos.map(grupo => `<optgroup label="${grupo}">${Object.keys(THEMES).filter(key => THEMES[key].grupo === grupo).map(opcion).join("")}</optgroup>`).join("");
+  }
 
   function panelHtml() {
     const s = settings;
@@ -63,11 +91,7 @@
         <h2>Tema</h2>
         <div class="field">
           <label for="ajuste-tema">Cómo se ve la aplicación</label>
-          <select id="ajuste-tema" data-settings-action="theme">
-            <option value="auto"${s.theme === "auto" ? " selected" : ""}>Automático, según el móvil</option>
-            <option value="light"${s.theme === "light" ? " selected" : ""}>Claro</option>
-            <option value="dark"${s.theme === "dark" ? " selected" : ""}>Oscuro</option>
-          </select>
+          <select id="ajuste-tema" data-settings-action="theme">${themeOptions(s.theme)}</select>
         </div>
         <div class="field">
           <label for="ajuste-texto">Tamaño del texto</label>
@@ -139,6 +163,7 @@
       settings[event.target.dataset.settingsAction] = event.target.checked; save(); return;
     }
     if (event.target.dataset.settingsAction !== "theme") return;
+    if (!THEMES[event.target.value]) return;
     settings.theme = event.target.value;
     save();
     applyTheme();
