@@ -35,7 +35,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `solitario.mjs` | Solitario, reto diario, confirmación al colocar, modalidad de países y el mapa de la línea. |
 | `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
 | `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie y que las bandas tengan contraste. |
-| `movimiento.mjs` | Navegación repetida, galería persistente, selección de cartas, cierres interrumpidos, arrastre y movimiento reducido. |
+| `movimiento.mjs` | Navegación repetida, galería persistente, selección de cartas, cierres interrumpidos, arrastre, deslizar para volver y movimiento reducido. |
 | `enciclopedia.mjs` | Filtrado y búsqueda de `CT.Enciclopedia`, la pantalla que consulta cualquier mazo fuera de partida y su enlace desde el repaso de fin de partida. Comprueba también que no aparece dentro de ninguna partida. |
 | `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
 | `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |
@@ -83,6 +83,10 @@ zoológicos: las fuentes y los límites están en `VERIFICACION_CORRECCIONES.md`
 `node tests/movimiento.mjs` recorre tres veces todos los bloques y mazos, seis veces la
 navegación y los diálogos, y ocho veces la elección y cancelación de huecos. Simula
 deslizamiento, pulsación mantenida, arrastre, suelta entre frames y cancelación del sistema.
+Fija también el gesto de volver: deslizar de izquierda a derecha hace lo mismo que «Volver»
+y cierra el diálogo de encima, y no navega hacia la izquierda, en diagonal, con un roce
+corto, con el ratón, dentro de una partida, sobre un campo de texto, sobre una tira que se
+desplaza a los lados, ni en el inicio, donde no hay nada detrás.
 Comprueba también el foco al interrumpir un cierre y el desplazamiento sin animación cuando
 se solicita movimiento reducido. Captura excepciones de los manejadores, no solo aserciones.
 
