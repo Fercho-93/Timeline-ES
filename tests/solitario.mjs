@@ -259,6 +259,41 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   w.close();
 }
 {
+  // En Difícil son dos, y cada una cae en un punto distinto de la línea: llegan de una en
+  // una y la vista va con cada una, o la segunda se colocaría fuera de la pantalla.
+  const w = boot({ "continuum-difficulty-v1": "hard" });
+  const animaciones = [];
+  const seguidas = [];
+  w.Element.prototype.getBoundingClientRect = function () {
+    return { left: 40, top: 60, width: 150, height: 220, right: 190, bottom: 280, x: 40, y: 60 };
+  };
+  w.Element.prototype.animate = function (frames, timing) {
+    if (this.classList?.contains("timeline-card")) animaciones.push({ elemento: this, frames, timing });
+    return { finished: new Promise(() => {}), cancel() {} };
+  };
+  // La vista se mueve escribiendo en el desplazamiento de la tira. Se anota en el
+  // prototipo y no en el elemento: cada repintado trae una tira nueva.
+  Object.defineProperty(w.HTMLElement.prototype, "scrollLeft", {
+    configurable: true,
+    get() { return 0; },
+    set(valor) { if (this.classList?.contains("timeline-wrap")) seguidas.push(valor); }
+  });
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-free"]');
+  click(w, '[data-action="solo-place"]');
+  click(w, '[data-action="confirm-place"]');
+  click(w, '[data-action="solo-next"]');
+  ok("la primera llega sola, no las dos a la vez", animaciones.length === 1);
+  const segunda = w.document.querySelectorAll(".timeline-card")[1];
+  ok("la que espera su turno no está puesta todavía", [...w.document.querySelectorAll(".timeline-card")].some(c => c.style.visibility === "hidden"));
+  ok("y la vista ya se ha movido hasta la primera", seguidas.length >= 1);
+  await new Promise(resolve => w.setTimeout(resolve, 800));
+  ok("la segunda llega después, con la vista detrás", animaciones.length === 2 && seguidas.length >= 2);
+  ok("y ninguna se queda escondida al terminar", ![...w.document.querySelectorAll(".timeline-card")].some(c => c.style.visibility === "hidden"));
+  w.close();
+}
+{
   // Con movimiento reducido la carta sigue apareciendo: lo que no hay es recorrido.
   const w = boot({ "continuum-difficulty-v1": "normal" });
   const animaciones = [];

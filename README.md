@@ -132,8 +132,11 @@ partida también lleva a su ficha en la enciclopedia, ya con esa carta destacada
 en ninguna pantalla de partida: vería el mazo entero y volvería trivial cualquier jugada
 pendiente.
 
-Lo único que hay que ganarse son las láminas: la ilustración de una carta se ve velada
-—desenfocada, con un «descúbrela jugándola» encima— hasta que esa carta pasa por tu mano.
+Lo único que hay que ganarse son las láminas: hasta que una carta pasa por tu mano, en el
+sitio de su ilustración hay un sello cerrado —papel tramado, un candado y «bloqueada ·
+descúbrela jugándola»—. La ilustración no se difumina: no se pinta siquiera, así que un
+mazo entero por descubrir no baja ni compone cuarenta imágenes, que es lo que dejaba la
+enciclopedia pesada al abrirla.
 Descubre tanto acertarla como fallarla: en los dos casos la pantalla de resultado te la ha
 enseñado entera, y esconder justo las que se fallan sería esconder las que más interesa
 repasar. El texto no se vela nunca —valor, época, explicación y fuente se leen desde el
@@ -312,9 +315,10 @@ ausencia de posiciones duplicadas, recolocación y conservación de las cartas n
 
 Las incorporaciones se hacen al continuar, tras acierto o fallo, antes de la nueva decisión.
 Primero se reserva la siguiente carta del jugador; si faltan cartas se añaden menos. No
-suman aciertos ni cambian vidas. Y se ven llegar: la línea se desplaza hasta el hueco donde
-va la carta y esta entra desde el centro de la pantalla hasta su sitio, una detrás de otra
-si son dos. Son cartas que nadie ha jugado y que cambian el tablero, así que se ve de dónde
+suman aciertos ni cambian vidas. Y se ven llegar: la carta entra desde el centro de la
+pantalla hasta su sitio, y la vista va con ella —una detrás de otra si son dos, porque la
+segunda suele caer en otro punto de la línea y sin mover la vista se colocaría fuera de la
+pantalla—. Son cartas que nadie ha jugado y que cambian el tablero, así que se ve de dónde
 salen y dónde caen en vez de aparecer ya puestas. El aviso de texto sigue estando, para
 quien no mire en ese momento, y con «reducir movimiento» la carta aparece sin recorrido. En Difícil se sortea, con probabilidad del 70%, un turno
 Fantasma en cada bloque de cuatro turnos a partir del cuarto; nunca son consecutivos.
@@ -362,9 +366,11 @@ da un toque— se le quita el gesto al navegador, y para entonces no había ning
 desplazamiento en marcha que interrumpir. Con ratón se arrastra desde el primer
 movimiento, sin espera.
 
-Junto a **Volver** hay una casita: «Volver» retrocede un paso y la casita salta al inicio
-de una vez. No aparece durante una partida, que se abandona por su propio menú para que
-haya una pregunta de por medio.
+Junto a **Volver** hay un atajo al inicio, con la rosa de los vientos del emblema: «Volver»
+retrocede un paso y la rosa salta al inicio de una vez (y gira al pulsarla). Va dibujada en
+línea, no como imagen: se recorta al tamaño de un botón sin emborronarse, toma la tinta de
+cada aspecto y no pide ninguna descarga. No aparece durante una partida, que se abandona
+por su propio menú para que haya una pregunta de por medio.
 
 Deslizar de izquierda a derecha vuelve a la pantalla de detrás, exactamente igual que el
 botón **Volver** de esa pantalla: cierra el diálogo que haya encima (la guía, los ajustes,

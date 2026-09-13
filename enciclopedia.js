@@ -40,19 +40,33 @@
     return CT.Progreso?.seenCards?.() || new Set();
   }
 
+  // El candado del sello. Va dibujado y no como emoji: se ve igual en los dos temas, toma
+  // el color de la tinta y no depende de la fuente de cada móvil.
+  const CANDADO = `<svg class="enc-candado" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true" focusable="false">
+    <path d="M7.4 10.5V7.6a4.6 4.6 0 0 1 9.2 0v2.9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    <rect x="4.3" y="10.3" width="15.4" height="11.2" rx="2.4" fill="currentColor"/>
+    <circle cx="12" cy="15" r="1.6" fill="var(--enc-sello-hueco)"/>
+    <path d="M12 15.9v2.4" stroke="var(--enc-sello-hueco)" stroke-width="1.7" stroke-linecap="round"/>
+  </svg>`;
+
   // Igual que las cartas de la partida, pero siempre reveladas y con la fuente cuando la
   // carta la lleva: el valor, la época y la explicación se leen sin haber jugado nunca.
   //
-  // Lo único que se gana jugando es la lámina: hasta que la carta pasa por tu mano se ve
-  // velada. La enciclopedia sigue sirviendo para consultar —que es para lo que está—,
-  // pero las ilustraciones se descubren, que es lo que invita a volver a ella.
+  // Lo único que se gana jugando es la lámina: hasta que la carta pasa por tu mano, en su
+  // sitio hay un sello cerrado. La enciclopedia sigue sirviendo para consultar —que es
+  // para lo que está—, pero las ilustraciones se descubren, que es lo que invita a volver.
   function cardMarkup(modeKey, card, { highlight = false, descubiertas = null } = {}) {
     const era = CT.eraForCard(modeKey, card);
-    const art = CT.animalArt(modeKey, card);
-    const velada = !!art && !(descubiertas || seen()).has(card.id);
-    const visual = art
-      ? `${art}${velada ? '<span class="enc-veil"><b aria-hidden="true">◌</b><small>Descúbrela jugándola</small></span>' : ""}`
-      : `<span>${era.symbol}</span><small>${era.name}</small>`;
+    // `cardArt` solo dice si hay lámina; el `<img>` se monta únicamente si se va a ver.
+    // Una carta bloqueada no descarga su ilustración ni la difumina: un mazo entero por
+    // descubrir son cuarenta imágenes que el móvil se ahorra bajar y componer, que es
+    // justo lo que dejaba la enciclopedia pesada al abrirla.
+    const tieneLamina = !!CT.cardArt(modeKey, card);
+    const velada = tieneLamina && !(descubiertas || seen()).has(card.id);
+    const visual = velada
+      ? `<span class="enc-sello">${CANDADO}<b>Bloqueada</b><small>Descúbrela jugándola</small></span>`
+      : tieneLamina ? CT.animalArt(modeKey, card) : `<span>${era.symbol}</span><small>${era.name}</small>`;
+    const art = tieneLamina;
     const fuente = card.source
       ? `<p class="enc-source"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Fuente <span aria-hidden="true">↗</span><span class="solo-lectores"> (se abre en una pestaña nueva)</span></a></p>`
       : "";
@@ -70,7 +84,11 @@
   // las demás no esconden nada, y meterlas en el recuento haría creer que faltan cartas
   // por descubrir en un mazo que ya está entero a la vista.
   function seenProgress(modeKey, descubiertas = seen()) {
-    const conLamina = CT.cards(modeKey).filter(card => CT.animalArt(modeKey, card));
+    // Un mazo sin ilustraciones se descarta de una vez, y los demás se cuentan con
+    // `cardArt`, que devuelve el nombre de la lámina: `animalArt` montaría el `<img>`
+    // entero de cada carta solo para contarla, y el catálogo son casi mil.
+    if (!CT.usesAnimalArt(modeKey)) return { total: 0, seen: 0 };
+    const conLamina = CT.cards(modeKey).filter(card => CT.cardArt(modeKey, card));
     return { total: conLamina.length, seen: conLamina.filter(card => descubiertas.has(card.id)).length };
   }
 

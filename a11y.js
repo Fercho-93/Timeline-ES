@@ -162,21 +162,38 @@
   // ya está en su posición definitiva y se la lleva al centro para traerla de vuelta),
   // porque así el sitio que ocupa la línea es el de verdad en todo momento y ninguna
   // carta se mueve al terminar. Con movimiento reducido no se anima nada.
-  function dealIn(cards) {
+  // `seguir` lleva la vista hasta cada carta justo antes de que entre, no solo hasta la
+  // primera: con dos cartas automáticas, la segunda suele caer en otro punto de la línea
+  // y sin mover la vista se colocaría fuera de la pantalla. Se llama con la carta todavía
+  // invisible, así que primero se ve viajar la línea y después llegar la carta.
+  const TURNO = 640;
+  function dealIn(cards, { seguir = null } = {}) {
     const lista = [...cards].filter(card => card?.isConnected && card.animate);
-    if (!lista.length || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (!lista.length) return;
+    // Con movimiento reducido no hay recorrido, pero la vista sí va hasta la última: saber
+    // dónde ha caído la carta no es decoración, es la mitad de la información.
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { seguir?.(lista[lista.length - 1]); return; }
     lista.forEach((card, orden) => {
-      const caja = card.getBoundingClientRect();
-      if (!caja.width) return;
-      const dx = window.innerWidth / 2 - (caja.left + caja.width / 2);
-      const dy = window.innerHeight / 2 - (caja.top + caja.height / 2);
-      const efecto = card.animate([
-        { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 0, offset: 0 },
-        { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 1, offset: .18 },
-        { transform: `translate3d(${dx * .35}px, ${dy * .35}px, 0) scale(1.06) rotate(-1deg)`, opacity: 1, offset: .62 },
-        { transform: "none", opacity: 1, offset: 1 }
-      ], { duration: 760, delay: orden * 260, easing: "cubic-bezier(.22,.61,.36,1)", fill: "backwards" });
-      efecto.finished.catch(() => {});
+      // Las que esperan su turno no se ven: si no, estarían puestas antes de llegar.
+      if (orden > 0) card.style.visibility = "hidden";
+      const entra = () => {
+        if (!card.isConnected) return;   // un repintado se llevó la mesa por delante
+        card.style.visibility = "";
+        seguir?.(card);
+        const caja = card.getBoundingClientRect();
+        if (!caja.width) return;
+        const dx = window.innerWidth / 2 - (caja.left + caja.width / 2);
+        const dy = window.innerHeight / 2 - (caja.top + caja.height / 2);
+        const efecto = card.animate([
+          { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 0, offset: 0 },
+          { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 1, offset: .18 },
+          { transform: `translate3d(${dx * .35}px, ${dy * .35}px, 0) scale(1.06) rotate(-1deg)`, opacity: 1, offset: .62 },
+          { transform: "none", opacity: 1, offset: 1 }
+        ], { duration: 760, easing: "cubic-bezier(.22,.61,.36,1)", fill: "backwards" });
+        efecto.finished.catch(() => {});
+      };
+      if (orden === 0) entra();
+      else setTimeout(entra, orden * TURNO);
     });
   }
 
