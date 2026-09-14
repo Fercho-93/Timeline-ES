@@ -365,11 +365,12 @@ console.log("\nFiltro de láminas en la pantalla");
   ok("y «todas» devuelve las temáticas enteras", doc.querySelectorAll(".enc-topic").length === temasTodas);
   elegir(w, '#enc-mode-select', 'animals');
 
-  // Cambiar de mazo vuelve a «todas», también en uno sin láminas, donde no hay filtro.
+  // Cambiar de mazo vuelve a «todas». Idiomas también ofrece ya su colección completa.
   elegir(w, '#enc-mode-select', 'history');
   ok("al cambiar de mazo el filtro vuelve a «todas»", activo() === "all");
   elegir(w, '#enc-mode-select', 'languages');
-  ok("un mazo sin láminas no enseña el filtro", chips().length === 0 && cartas() === CT.cards("languages").length);
+  ok("Idiomas enseña sus láminas y el filtro de colección",
+    chips().length === 3 && activo() === "all" && cartas() === CT.cards("languages").length);
   w.close();
 }
 
