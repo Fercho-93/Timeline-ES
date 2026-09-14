@@ -139,11 +139,18 @@ candado dice sin decirlo va en el texto que solo leen los lectores de pantalla�
 ilustración no se difumina: no se pinta siquiera, así que un mazo entero por descubrir no
 baja ni compone cuarenta imágenes, que es lo que dejaba la enciclopedia pesada al abrirla.
 
-Cada mazo con láminas lleva además un filtro —**Todas · Desbloqueadas · Bloqueadas**— que
-empieza siempre en «todas» y vuelve ahí al cambiar de mazo: llegar a uno nuevo con media
-colección escondida y sin saber por qué es la manera más rápida de perderse. Se combina
-con la búsqueda y con el filtro de épocas, y no aparece en los mazos sin ilustraciones,
-donde no habría nada que bloquear.
+El filtro **Todas · Desbloqueadas · Bloqueadas** está tanto en el catálogo completo —la
+enciclopedia del menú principal— como en cada mazo con ilustraciones. Empieza siempre en
+«todas» y vuelve ahí al cambiar de mazo: llegar a uno nuevo con media colección escondida
+y sin saber por qué es la manera más rápida de perderse. Se combina con la búsqueda y con
+el filtro de épocas, y no aparece en los mazos sin ilustraciones, donde no habría nada que
+bloquear.
+
+En el catálogo, un filtro o una búsqueda abren los mazos para enseñar lo que han
+encontrado, pero solo mientras quepa: por encima de 120 cartas se enseñan los mazos con su
+recuento y se despliega el que se quiera. «Bloqueadas» sobre el catálogo entero son casi
+mil cartas, y pintarlas de una vez cuesta más de un segundo en un móvil modesto; con los
+mazos plegados, cincuenta milisegundos y la misma respuesta: cuántas faltan y dónde.
 Descubre tanto acertarla como fallarla: en los dos casos la pantalla de resultado te la ha
 enseñado entera, y esconder justo las que se fallan sería esconder las que más interesa
 repasar. El texto no se vela nunca —valor, época, explicación y fuente se leen desde el
