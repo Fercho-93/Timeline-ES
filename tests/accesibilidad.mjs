@@ -155,7 +155,7 @@ console.log("\nEl perfil");
 {
   const w = boot();
   const nav = [...w.document.querySelectorAll(".home-nav button")];
-  ok("los cuatro destinos de la portada tienen nombre", nav.length === 4 && nav.every(b => b.getAttribute("aria-label")));
+  ok("los cinco destinos de la portada tienen nombre", nav.length === 5 && nav.every(b => b.getAttribute("aria-label")));
 
   click(w, '[data-action="perfil"]');
   ok("el foco va al titular de la pantalla", activo(w) === el(w, "h1[data-focus]"));

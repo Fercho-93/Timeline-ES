@@ -187,6 +187,7 @@ console.log("\nCierres animados, interrupciones y movimiento reducido");
   click(w, '[data-action="game-menu"]');
   // Una navegación inmediata invalida el desplazamiento pendiente de la mesa vieja.
   click(w, '[data-action="abandon"]');
+  click(w, '[data-exit-confirm]');
   await sleep(10);
   ok("un desplazamiento pendiente no arrastra una pantalla nueva", scrolls.length === 1);
   w.close();
@@ -321,11 +322,11 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
 console.log("\nLa casita del inicio");
 {
   const w = boot();
-  const casa = () => w.document.querySelector('.topbar [data-action="home-top"]');
-  ok("en el inicio no hay casita: ya se está en él", !casa());
+  const casa = () => w.document.querySelector('.home-nav [data-action="home-top"]');
+  ok("en el inicio la casa aparece activa en la barra", casa()?.getAttribute("aria-current") === "page");
   abreMazo(w, "historia", "history");
   ok("en el menú del mazo aparece, junto a «Volver»", !!casa() && !!w.document.querySelector('.topbar [data-action="collection-back"]'));
-  ok("y se anuncia como lo que es", casa().getAttribute("aria-label") === "Ir al inicio");
+  ok("y se anuncia como lo que es", casa().textContent.trim() === "Inicio");
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   ok("en la configuración también", !!casa());
   casa().click();

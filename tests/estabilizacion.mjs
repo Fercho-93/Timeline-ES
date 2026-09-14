@@ -57,7 +57,7 @@ try {
   assert.ok(w.document.querySelector('[data-action="solo-next"]'));
   assert.equal(saved(w).solo.hits, 1);
   click(w, "solo-next"); assert.equal(saved(w).solo.played, 1);
-  click(w, "abandon-comp");
+  click(w, "ui-back"); w.document.querySelector("[data-exit-confirm]").click(); click(w, "home-top");
   assert.equal(saved(w).previousModeKey, originalMode);
   click(w, "competition-menu");
   assert.ok(w.document.querySelector('[data-action="resume-competition"]'));
@@ -117,7 +117,7 @@ try {
   assert.equal(saved(w).queue.length, temas);
   assert.equal(w.document.querySelector("#storage-notice"), null);
   assert.throws(() => w.CONTINUUM.Storage.restore(JSON.stringify({ format: "continuum-backup", version: 1, entries: {} })), /Sal de la partida/);
-  click(w, "abandon-comp");
+  click(w, "ui-back"); w.document.querySelector("[data-exit-confirm]").click(); click(w, "home-top");
   const copy = JSON.stringify({ format: "continuum-backup", version: 1, entries: { "hilo-ejemplo": "recuperado" } });
   assert.equal(w.CONTINUUM.Storage.restore(copy), true);
   assert.equal(w.localStorage.getItem("hilo-ejemplo"), "recuperado");
@@ -134,7 +134,7 @@ try {
   click(w, "competition-menu"); click(w, "start-competition"); await tick(); assert.equal(updateButton.disabled, true);
   updateButton.click(); assert.equal(messages.length, 0);
   handlers.controllerchange(); assert.equal(w.document.getElementById("app").hasAttribute("inert"), false);
-  click(w, "abandon-comp"); await tick(); assert.equal(updateButton.disabled, false);
+  click(w, "ui-back"); w.document.querySelector("[data-exit-confirm]").click(); click(w, "home-top"); await tick(); assert.equal(updateButton.disabled, false);
   updateButton.click(); assert.equal(messages[0].type, "ACTIVATE_UPDATE");
   assert.ok(w.document.getElementById("app").hasAttribute("inert"));
   handlers.message({ data: { type: "UPDATE_BLOCKED" } });

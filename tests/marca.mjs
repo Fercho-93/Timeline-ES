@@ -38,7 +38,7 @@ const openSelectedCollection = () => {
   if (!w.document.querySelector('[data-action="set-mode"]')) click("set-block");
 };
 const checkScreen = label => {
-  check(`${label}: cabecera Continuum`, w.document.querySelector(".brand")?.textContent.trim() === brand);
+  check(`${label}: marca o cabecera de partida despejada`, w.CONTINUUM.UI.isPlaying(w.document.getElementById('app').dataset.screen) ? !!w.document.querySelector('.atlas-back') && !!w.document.querySelector('.atlas-menu') : w.document.querySelector('.brand')?.textContent.trim() === brand);
   check(`${label}: sin la denominación antigua`, !formerBrand.test(w.document.getElementById("app").textContent));
 };
 
@@ -67,7 +67,7 @@ try {
   checkScreen("Solitario");
   click("start-free");
   checkScreen("Partida libre");
-  check("cabecera del modo online", /class="brand">Continuum\s*</.test(read("online.js")));
+  check("cabecera compartida del modo online", /CT.UI.header/.test(read("online.js")));
   console.log(`\n${checks} comprobaciones de marca correctas`);
 } finally {
   w.close();

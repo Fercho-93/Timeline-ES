@@ -339,7 +339,7 @@ console.log("\nNo se cuela en ninguna pantalla de partida");
   const w = boot();
   abreMazo(w, "historia", "history");
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
-  ok("no hay perfil en la preparación de la partida", !existe(w, '[data-action="perfil"]'));
+  ok("la preparación conserva el perfil en el menú inferior", existe(w, '.home-nav [data-action="perfil"]'));
   click(w, '[data-action="start"]');
   click(w, '[data-action="ready"]');
   ok("ni dentro de la partida local", !existe(w, '[data-action="perfil"]'));
