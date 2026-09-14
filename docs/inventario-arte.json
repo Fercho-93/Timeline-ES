@@ -2144,7 +2144,7 @@
     },
     {
       "path": "assets/country-cards/2005.webp",
-      "sha256": "daa6d417991d52b08f6e8d94316392c2a8ffa456bbdb76212628c991fdace79e",
+      "sha256": "c47d12bf7ee96f1cffff57538376b10b7c046a9514019d27c56694ab5624400f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2158,7 +2158,7 @@
     },
     {
       "path": "assets/country-cards/2006.webp",
-      "sha256": "3c66f236ea73891e6766d77f77b5b7b56297e1609d3f12a0e795dfdbe695d1c2",
+      "sha256": "daa6d417991d52b08f6e8d94316392c2a8ffa456bbdb76212628c991fdace79e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2172,7 +2172,7 @@
     },
     {
       "path": "assets/country-cards/2007.webp",
-      "sha256": "c47d12bf7ee96f1cffff57538376b10b7c046a9514019d27c56694ab5624400f",
+      "sha256": "79fbdd7ca127469824f08f2a8ff52829a464e4403ecfe6980455825d7a0af2ee",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2214,7 +2214,7 @@
     },
     {
       "path": "assets/country-cards/2010.webp",
-      "sha256": "2bff2308e595c490f4a0cab6b85762f6ddb645718f9414c41b7e673f8764913e",
+      "sha256": "0f45c7498b90f67ecddf069de302e235307ba53417900cd3ae8aeae177def5d9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2256,20 +2256,6 @@
     },
     {
       "path": "assets/country-cards/2013.webp",
-      "sha256": "d02760d2e16ef81e5dd75721ca64fadfa88fae9bcd25afe469e22a12c64fd10f",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/country-cards/2014.webp",
       "sha256": "ebe6dc21aa1d8313c73f1bf0074e96b8be0a223b426856d75a591380661dfe9f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
@@ -2283,8 +2269,8 @@
       }
     },
     {
-      "path": "assets/country-cards/2015.webp",
-      "sha256": "11de251834b5ffbfa5b5110fdeb5adbe7a4e0d5ede8756c794e812a0ae6439a2",
+      "path": "assets/country-cards/2014.webp",
+      "sha256": "d02760d2e16ef81e5dd75721ca64fadfa88fae9bcd25afe469e22a12c64fd10f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2297,7 +2283,7 @@
       }
     },
     {
-      "path": "assets/country-cards/2016.webp",
+      "path": "assets/country-cards/2015.webp",
       "sha256": "a6c18ac14f352e5fe61ca9971334b906e1e4cae54c81026c345458307dba6ee2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
@@ -2311,8 +2297,22 @@
       }
     },
     {
+      "path": "assets/country-cards/2016.webp",
+      "sha256": "733ff1df60b9840bc42a2f02290b4979e434edd2b581a6e772369409a30d6813",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": null,
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/country-cards/2017.webp",
-      "sha256": "bc32190eff826a5ad0d98a546b0b173e848d15674ac64bdf78fcd57971b9a506",
+      "sha256": "09685c01880be0ded44405904b55eaa6ab6143b930777ffad7a13e9977c04a76",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2326,7 +2326,7 @@
     },
     {
       "path": "assets/country-cards/2018.webp",
-      "sha256": "09685c01880be0ded44405904b55eaa6ab6143b930777ffad7a13e9977c04a76",
+      "sha256": "bc32190eff826a5ad0d98a546b0b173e848d15674ac64bdf78fcd57971b9a506",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2424,7 +2424,7 @@
     },
     {
       "path": "assets/country-cards/2025.webp",
-      "sha256": "53608e84d50cb3201431e7ef1e80c129cc6a6f46ac9c485b2c27313f46ee12f6",
+      "sha256": "ec672ca169967c19b65d04f4188f76b70646a9e5fdc9cd0f5643186a5d046abc",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2634,7 +2634,7 @@
     },
     {
       "path": "assets/country-cards/2040.webp",
-      "sha256": "1b5c52a00dfb323a34932eee07caa340aed684350d940859be790528f25b8c4d",
+      "sha256": "73373636f9f047950b0aba098965cbb1192fa885a0f344aa6247c4f20af0a195",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2648,7 +2648,7 @@
     },
     {
       "path": "assets/country-cards/2041.webp",
-      "sha256": "986d6c727d4eb1821cd92ce22a17117ed12a33c31de9a75c08b0c3b94064dd1c",
+      "sha256": "1b5c52a00dfb323a34932eee07caa340aed684350d940859be790528f25b8c4d",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2662,7 +2662,7 @@
     },
     {
       "path": "assets/country-cards/2042.webp",
-      "sha256": "4453d7291abb99799315f7b342d5d634092ca5495a96585a1d7369898fcd95c7",
+      "sha256": "986d6c727d4eb1821cd92ce22a17117ed12a33c31de9a75c08b0c3b94064dd1c",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2676,7 +2676,7 @@
     },
     {
       "path": "assets/country-cards/2043.webp",
-      "sha256": "73373636f9f047950b0aba098965cbb1192fa885a0f344aa6247c4f20af0a195",
+      "sha256": "4453d7291abb99799315f7b342d5d634092ca5495a96585a1d7369898fcd95c7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2704,7 +2704,7 @@
     },
     {
       "path": "assets/country-cards/2045.webp",
-      "sha256": "8b0adde340b82ae587b7df8b6b63732f56c9ba6518a0a2a8043315ebee98c065",
+      "sha256": "41c72feba30f7ce5bb6e6699f11cff6c94e8fbee3895771e48f4c27806a981b6",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2718,7 +2718,7 @@
     },
     {
       "path": "assets/country-cards/2046.webp",
-      "sha256": "41c72feba30f7ce5bb6e6699f11cff6c94e8fbee3895771e48f4c27806a981b6",
+      "sha256": "8b0adde340b82ae587b7df8b6b63732f56c9ba6518a0a2a8043315ebee98c065",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2774,7 +2774,7 @@
     },
     {
       "path": "assets/country-cards/2050.webp",
-      "sha256": "ea42f9991a5e7cb6ac9b29960db9734a2724fa449c6aa56a63c2585eb6fcb63e",
+      "sha256": "657e18d31255970eef78e71516f881bf14045400401140cff62bb3f766755522",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2788,7 +2788,7 @@
     },
     {
       "path": "assets/country-cards/2051.webp",
-      "sha256": "657e18d31255970eef78e71516f881bf14045400401140cff62bb3f766755522",
+      "sha256": "ea42f9991a5e7cb6ac9b29960db9734a2724fa449c6aa56a63c2585eb6fcb63e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2914,7 +2914,7 @@
     },
     {
       "path": "assets/country-cards/2060.webp",
-      "sha256": "79fbdd7ca127469824f08f2a8ff52829a464e4403ecfe6980455825d7a0af2ee",
+      "sha256": "3c66f236ea73891e6766d77f77b5b7b56297e1609d3f12a0e795dfdbe695d1c2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2928,7 +2928,7 @@
     },
     {
       "path": "assets/country-cards/2061.webp",
-      "sha256": "0f45c7498b90f67ecddf069de302e235307ba53417900cd3ae8aeae177def5d9",
+      "sha256": "2bff2308e595c490f4a0cab6b85762f6ddb645718f9414c41b7e673f8764913e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -2956,7 +2956,7 @@
     },
     {
       "path": "assets/country-cards/2063.webp",
-      "sha256": "733ff1df60b9840bc42a2f02290b4979e434edd2b581a6e772369409a30d6813",
+      "sha256": "11de251834b5ffbfa5b5110fdeb5adbe7a4e0d5ede8756c794e812a0ae6439a2",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -3012,7 +3012,7 @@
     },
     {
       "path": "assets/country-cards/2067.webp",
-      "sha256": "ec672ca169967c19b65d04f4188f76b70646a9e5fdc9cd0f5643186a5d046abc",
+      "sha256": "53608e84d50cb3201431e7ef1e80c129cc6a6f46ac9c485b2c27313f46ee12f6",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -3054,7 +3054,7 @@
     },
     {
       "path": "assets/country-cards/2070.webp",
-      "sha256": "d1dd40ef8ff8fc7da36c12e24e42bb1991f61b30f16af4fe96f7e19f94478a62",
+      "sha256": "1e369ef1ca2777320e0bf6e6bd04597ef805dda2ce77e939dc30cc8400e04e3f",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -3068,7 +3068,7 @@
     },
     {
       "path": "assets/country-cards/2071.webp",
-      "sha256": "1e369ef1ca2777320e0bf6e6bd04597ef805dda2ce77e939dc30cc8400e04e3f",
+      "sha256": "d1dd40ef8ff8fc7da36c12e24e42bb1991f61b30f16af4fe96f7e19f94478a62",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
