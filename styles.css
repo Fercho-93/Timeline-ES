@@ -1492,16 +1492,37 @@ body::before {
 .timeline-card { color: var(--carta-tinta); }
 .timeline-card .year { color: var(--carta-tinta); font-family: var(--font-display); }
 .reveal .year { color: var(--ink); font-family: var(--font-display); }
+/* La carta en la mano es siempre un reverso: el cuero repujado con su doble filete de
+   oro, y en el centro el emblema de la colección. Antes había aquí un aro dorado suelto
+   en el centro de la carta; ahora el aro viene dentro del propio emblema, que es quien
+   ocupa ese sitio, y así los dos círculos no compiten. */
 .hand-card {
+  min-height: 210px;
   border-color: #9b6d35;
   border-radius: 8px;
   color: #f4dca8;
-  background:
-    radial-gradient(circle at center, transparent 0 24px, rgba(210,158,80,.17) 25px 26px, transparent 27px),
-    linear-gradient(135deg, #47301d, #24180e 58%, #54371f);
+  background: linear-gradient(135deg, #47301d, #24180e 58%, #54371f);
   box-shadow: inset 0 0 0 3px #2b1b0f, inset 0 0 0 5px rgba(190,134,57,.38), 0 6px 13px rgba(55,31,12,.25);
 }
 .hand-card .hidden-date, .hand-card .card-arrow { color: #d3a960; }
+.hand-card strong { max-width: none; font-size: 1.28rem; overflow-wrap: anywhere; }
+/* El emblema ocupa la franja libre que queda entre el rótulo del dato oculto y el
+   título, y crece o mengua con ella: vale igual para la carta grande del solitario y
+   para la mano apretada de una sala en un móvil estrecho, sin medidas por pantalla. */
+.carta-reverso {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-block: 8px;
+  pointer-events: none;
+  /* La tinta de la colección en curso, siempre tirando al oro de la carta: cada mazo
+     tiene su reverso sin salirse de la paleta de la edición. */
+  color: color-mix(in srgb, var(--scene-wash, #bda27a) 70%, #d3a960);
+  opacity: .72;
+}
+.reverso-emblema { display: block; width: min(76%, 108px); height: auto; max-height: 100%; }
 .hand-card.selected {
   border-color: #ffe1a0;
   outline: 3px solid #a66123;
@@ -1535,21 +1556,8 @@ body::before {
 .timeline .slot { min-width: calc(44px / var(--timeline-scale, 1)); }
 @media (pointer: coarse) { .hand-card { cursor: pointer; } }
 
-/* Ilustraciones del mazo de animales: la criatura se muestra, pero la masa sigue
-   oculta en la mano. Al revelar la carta, la lámina pasa a ser su cabecera. */
-.animal-hand-card {
-  min-height: 210px;
-  isolation: isolate;
-  border-color: #b98742;
-  background: #2d1b0e;
-}
-.animal-hand-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(0deg, rgba(25,14,7,.94) 0%, rgba(25,14,7,.38) 58%, rgba(25,14,7,.15) 100%);
-}
+/* Las láminas: la carta colocada las enseña —ahí el valor ya está a la vista y no hay
+   nada que adivinar— y la enciclopedia las guarda. En la mano no aparece ninguna. */
 .animal-card-art {
   display: block;
   width: 100%;
@@ -1558,15 +1566,6 @@ body::before {
   object-position: center;
   filter: sepia(.25) saturate(.82) contrast(1.04);
 }
-.animal-hand-card .animal-card-art {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-}
-.animal-hand-card .hidden-date,
-.animal-hand-card strong,
-.animal-hand-card .card-arrow { text-shadow: 0 2px 6px #160d05; }
-.animal-hand-card strong { max-width: 11ch; margin-top: 66px; font-size: 1.28rem; }
 .animal-timeline-card .card-visual {
   height: 150px;
   padding: 0;
@@ -1665,7 +1664,7 @@ body::before {
 .timeline .animal-timeline-card.card-flippable.is-flipped .card-content p { display: block; }
 .review-grid .animal-timeline-card .card-visual { height: 110px; }
 @media (max-width: 620px) {
-  .animal-hand-card { min-height: 190px; }
+  .hand-card { min-height: 190px; }
   .timeline .animal-timeline-card { min-height: 172px; }
 }
 /* El hueco se dibuja solo con el contorno discontinuo de su interior: rellenarlo ponía
@@ -1871,14 +1870,12 @@ body::before {
 .modal a, .rules a { color:var(--accent-dark); }
 .modal input[type="file"], .modal textarea { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
 .modal textarea { color:var(--ink); background:var(--campo); border:1px solid var(--line); padding:10px; border-radius:8px; font:inherit; }
-.animal-hand-card strong { max-width:none; background:var(--surface); color:var(--ink); text-shadow:none; padding:8px; border-radius:8px; overflow-wrap:anywhere; }
 @media (max-width:600px) {
   #app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"]) .shell { padding-inline:12px; }
   .timeline .animal-timeline-card { width:146px; min-height:210px; }
   .timeline .animal-timeline-card .card-visual { height:128px; }
-  .hand-card { min-width:136px; }
-  .animal-hand-card { min-height:170px; }
-  .animal-hand-card strong { margin-top:40px; font-size:1rem; }
+  .hand-card { min-width:136px; min-height:170px; }
+  .hand-card strong { font-size:1rem; }
   .game-head { gap:8px; margin-bottom:10px; }
   .icon-btn, .btn, .remove { min-height:44px; }
   input, select, textarea { font-size:max(1rem,16px); }
@@ -1953,25 +1950,22 @@ body::before {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
   }
-  #app[data-screen="online-game"] .hand-card,
-  #app[data-screen="online-game"] .animal-hand-card {
+  #app[data-screen="online-game"] .hand-card {
     min-width: 0;
     min-height: 104px;
     height: 104px;
     padding: 7px;
     border-radius: 10px;
   }
-  #app[data-screen="online-game"] .animal-hand-card strong {
-    margin-top: 18px;
-    padding: 4px 5px;
+  #app[data-screen="online-game"] .hand-card strong {
     font-size: .72rem;
     line-height: 1.05;
   }
-  #app[data-screen="online-game"] .animal-hand-card .hidden-date {
+  #app[data-screen="online-game"] .hand-card .hidden-date {
     font-size: .55rem;
     letter-spacing: .04em;
   }
-  #app[data-screen="online-game"] .animal-hand-card .card-arrow {
+  #app[data-screen="online-game"] .hand-card .card-arrow {
     font-size: .8rem;
   }
   #app[data-screen="online-game"] :is(.turn-timer, .deck-count) {
@@ -2017,7 +2011,6 @@ body::before {
   #app[data-platform="android"][data-screen="online-game"] .hand { gap: 5px; }
   #app[data-platform="android"][data-screen="online-game"] .hand-card { height: 96px; min-height: 96px; padding: 6px; }
   #app[data-platform="android"][data-screen="online-game"] .hand-card strong { font-size: .7rem; line-height: 1.12; }
-  #app[data-platform="android"][data-screen="online-game"] .animal-hand-card strong { margin-top: 14px; }
   #app[data-platform="android"][data-screen="online-game"] .hand-card .hidden-date { font-size: .52rem; }
   #app[data-platform="android"][data-screen="online-game"] .hint { font-size: .7rem; margin-block: 5px; }
 }
@@ -2077,20 +2070,14 @@ body::before {
     font-size: .62rem;
   }
   #app[data-platform="other"][data-screen="online-game"] .hand-card {
-    min-height: 164px;
+    min-height: 170px;
     height: auto;
     padding: 14px;
   }
-  #app[data-platform="other"][data-screen="online-game"] .animal-hand-card {
-    min-height: 170px;
-    height: auto;
-  }
-  #app[data-platform="other"][data-screen="online-game"] .animal-hand-card strong {
-    margin-top: 40px;
-    padding: 8px;
+  #app[data-platform="other"][data-screen="online-game"] .hand-card strong {
     font-size: 1rem;
   }
-  #app[data-platform="other"][data-screen="online-game"] .animal-hand-card .hidden-date {
+  #app[data-platform="other"][data-screen="online-game"] .hand-card .hidden-date {
     font-size: inherit;
   }
   #app[data-platform="other"][data-screen="online-game"] .hand-title h3 {

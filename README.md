@@ -472,6 +472,14 @@ gestión de sala.
 - Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
 - El dato que ordena el mazo —fecha, superficie, población, peso, longevidad, velocidad o
   distancia— permanece oculto hasta colocar la carta en un hueco de la línea.
+- La ilustración también. En la mano, todas las cartas enseñan el reverso de su colección
+  —el cuero con su filete de oro y el emblema del bloque, el mismo para todas—, y la
+  lámina aparece cuando la carta ya está colocada y su valor está a la vista. Una lámina
+  cuenta demasiado antes de tiempo: por los ropajes, por las naves del fondo o por el color
+  de un grabado se sitúa una carta en su siglo sin saber nada del hecho que cuenta, y eso
+  valía por igual en los treinta y pico mazos. De paso, una mano de cuatro cartas deja de
+  bajar cuatro imágenes y la dirección de la lámina —que lleva el nombre del hecho— ya no
+  viaja al documento.
 - Hay dos formas de colocar: tocar la carta y luego el hueco, o arrastrar la carta hasta cualquiera
   de los huecos. Con el dedo, el arrastre empieza tras una pulsación breve, para que deslizar sobre
   una carta siga desplazando la pantalla.
