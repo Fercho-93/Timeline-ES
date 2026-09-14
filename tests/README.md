@@ -69,6 +69,9 @@ seis pares con texto, y los que cambian el fondo tienen que declarar todas las s
 de la mesa, no solo el papel. `edicion.mjs` comprueba el resto del ajuste: que lo elegido
 llega al elemento raíz, a las dos etiquetas de color del navegador y al almacenamiento, y
 que un aspecto retirado vuelve a «automático» en lugar de dejar la aplicación sin paleta.
+También recorre las seis colecciones comprobando que en la mano no aparece ninguna lámina
+—ni ninguna imagen— sino el reverso de la colección, que cada una tiene su propio emblema
+y que la lámina se sigue montando para la carta ya colocada y para la enciclopedia.
 
 `service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado.
 Comprueba lo que decide qué versión ve cada móvil: se responde con la copia guardada,

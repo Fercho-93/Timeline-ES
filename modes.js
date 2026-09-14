@@ -475,10 +475,10 @@
 
   function cards(modeKey) { return mode(modeKey).cards; }
 
-  // Las láminas de los mazos de animales. No llevan cifras, así que pueden verse en la
-  // mano sin revelar el peso, la longevidad o la velocidad que hay que ordenar. Un id
-  // por carta y no una tabla por mazo: los tres comparten ilustraciones —el mismo león
-  // pesa, vive y corre— y así no hace falta repetir la lámina en cada uno.
+  // Las láminas de los mazos de animales. Un id por carta y no una tabla por mazo: los
+  // tres comparten ilustraciones —el mismo león pesa, vive y corre— y así no hace falta
+  // repetir la lámina en cada uno. En la mano no se enseñan: ahí va el reverso de la
+  // colección, y el porqué está junto a `cardBack`, más abajo.
   //
   // Se comparte entre los dos motores —`app.js` para un móvil, `online.js` para varios—
   // para que una lámina se vea igual en los dos y una carta nueva solo se dé de alta aquí.
@@ -792,6 +792,51 @@
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
+  // El reverso de la carta mientras está en la mano.
+  //
+  // Una lámina cuenta demasiado antes de tiempo: por los ropajes, por las naves del
+  // fondo, por el grano del papel o por el color, se sitúa la carta en su siglo sin saber
+  // nada del hecho que cuenta. Así que en la mano no se enseña ninguna lámina: se enseña
+  // el reverso de la colección —el mismo para todas sus cartas, sin excepciones por
+  // mazo— y la ilustración se descubre cuando la carta ya está colocada y su valor está
+  // a la vista. De paso, una mano de cuatro cartas deja de bajar cuatro imágenes, y la
+  // dirección de la lámina —que lleva el nombre del hecho— ya no viaja al documento.
+  //
+  // El emblema va dibujado y no como emoji, igual que la marca de la cabecera y el
+  // candado de la enciclopedia: se ve igual en todos los móviles, no depende de ninguna
+  // fuente, no pide ninguna descarga y toma su tinta del color de la colección en curso.
+  const EMBLEMAS = {
+    // Frontón, columnata y estilóbato: la fachada clásica de Historia.
+    history: `<path d="M32 12.5 50 24H14Z" fill="currentColor"/><rect x="13.6" y="25.4" width="36.8" height="2.8" rx="1" fill="currentColor"/>
+      <g fill="currentColor"><rect x="18.4" y="29.6" width="4.4" height="14.8" rx=".8"/><rect x="26.1" y="29.6" width="4.4" height="14.8" rx=".8"/><rect x="33.5" y="29.6" width="4.4" height="14.8" rx=".8"/><rect x="41.2" y="29.6" width="4.4" height="14.8" rx=".8"/></g>
+      <rect x="13.2" y="45.8" width="37.6" height="3.2" rx="1.1" fill="currentColor"/>`,
+    // La máscara del teatro, que vale igual para el cine, la música y el videojuego.
+    entertainment: `<path d="M32 14c9.4 0 15 4.6 15 12.4 0 12.6-7 23.6-15 23.6s-15-11-15-23.6C17 18.6 22.6 14 32 14Z" fill="none" stroke="currentColor" stroke-width="2.1"/>
+      <ellipse cx="25.8" cy="29.6" rx="2.7" ry="2.1" fill="currentColor"/><ellipse cx="38.2" cy="29.6" rx="2.7" ry="2.1" fill="currentColor"/>
+      <path d="M24.6 39.4c4.4 3.8 10.4 3.8 14.8 0" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>`,
+    // El átomo de Ciencia: núcleo y tres órbitas.
+    science: `<g fill="none" stroke="currentColor" stroke-width="1.9"><ellipse cx="32" cy="32" rx="18" ry="7.4"/><ellipse cx="32" cy="32" rx="18" ry="7.4" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="18" ry="7.4" transform="rotate(120 32 32)"/></g>
+      <circle cx="32" cy="32" r="3.6" fill="currentColor"/>`,
+    // La hoja de Naturaleza, con nervio central y nervaduras.
+    nature: `<path d="M32 12.4c9.2 8.2 13.2 16.8 13.2 24 0 8.4-5.9 15.2-13.2 15.2s-13.2-6.8-13.2-15.2c0-7.2 4-15.8 13.2-24Z" fill="none" stroke="currentColor" stroke-width="2.1"/>
+      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M32 18.6v29.8"/><path d="M32 33 25.2 27.8"/><path d="M32 33 38.8 27.8"/><path d="M32 41.4 25.8 36.2"/><path d="M32 41.4 38.2 36.2"/></g>`,
+    // La esfera de Geografía: meridiano, ecuador y eje.
+    globe: `<g fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="32" cy="32" r="19"/><ellipse cx="32" cy="32" rx="7.6" ry="19"/><path d="M13 32h38"/><path d="M15.6 23.4h32.8"/><path d="M15.6 40.6h32.8"/></g>`,
+    // El reloj de arena de la Gran mezcla, que es de lo que va el juego entero.
+    mixed: `<g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"><path d="M23 16.8c0 7.4 9 11.2 9 15.2s-9 7.8-9 15.2h18c0-7.4-9-11.2-9-15.2s9-7.8 9-15.2Z"/></g>
+      <path d="M26.6 20.4h10.8c-.5 4.2-5.4 6.6-5.4 6.6s-4.9-2.4-5.4-6.6Z" fill="currentColor"/>
+      <g fill="currentColor"><rect x="19.4" y="13" width="25.2" height="3.2" rx="1.1"/><rect x="19.4" y="47.8" width="25.2" height="3.2" rx="1.1"/></g>`
+  };
+
+  // El reverso es de la colección, no de la carta: todas las cartas de un mazo enseñan el
+  // mismo, que es justo lo que hace que no diga nada de ninguna.
+  function cardBack(modeKey) {
+    const emblema = EMBLEMAS[blockOf(modeKey).art] || EMBLEMAS.mixed;
+    return `<span class="carta-reverso" aria-hidden="true"><svg class="reverso-emblema" viewBox="0 0 64 64" width="64" height="64" focusable="false">
+      <circle cx="32" cy="32" r="29.4" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".5"/>
+      <circle cx="32" cy="32" r="26.6" fill="none" stroke="currentColor" stroke-width=".7" opacity=".34"/>${emblema}</svg></span>`;
+  }
+
   // La huella detecta versiones distintas del contenido; no es una validación del
   // servidor ni una protección contra trampas. Permite detectar que dos móviles no llevan el
   // mismo mazo. Cuenta el orden, no solo el conjunto: el reparto depende de en qué
@@ -999,7 +1044,7 @@
     MODES, BLOCKS, DEFAULT_MODE, DEFAULT_BLOCK, MIXED_DUPLICATE_INVENTION_IDS,
     has, mode, axis, cards,
     pulseRules: PULSE_RULES,
-    usesAnimalArt, cardArt, animalArt, deckFingerprint, categoryFor, categoryBadge,
+    usesAnimalArt, cardArt, animalArt, cardBack, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
     formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
     correctIndex, placementHint, guideMarkup,

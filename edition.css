@@ -310,9 +310,13 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .solo-fold summary time { font-size: .7rem; color: var(--edition-muted); }
 .solo-fold-body { padding: 0 16px 18px; }
 #app .hand-solo { grid-template-columns: minmax(0, 300px); justify-content: center; }
-#app .hand-solo .hand-card { min-height: 300px; }
-#app .hand-solo .animal-hand-card { aspect-ratio: 2 / 3; min-height: 0; width: 100%; }
-/* El título se apoya en el pie, dejando libre el centro de la ilustración.
+/* La carta única del solitario y del duelo conserva la proporción de una carta de
+   verdad, que es lo que pide un reverso: antes solo la tenían los mazos con lámina. */
+#app .hand-solo .hand-card { aspect-ratio: 2 / 3; min-height: 0; width: 100%; }
+/* Aquí la carta va sola y no tiene que parecerse a ninguna otra al lado, así que el
+   emblema puede ocupar lo que le corresponde en una carta de este tamaño. */
+#app .hand-solo .reverso-emblema { width: min(78%, 176px); }
+/* El título se apoya en el pie, dejando libre el centro del reverso.
    Flujo flexible en vez de coordenadas fijas: admite títulos largos y texto grande. */
 #app[data-platform][data-screen] .hand .hand-card { display: flex; flex-direction: column; align-items: stretch; }
 #app[data-platform][data-screen] .hand .hand-card > strong { margin-top: auto; margin-bottom: 0; flex-shrink: 0; }
@@ -321,7 +325,6 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 @media (max-width: 600px) {
   #app .hand-solo { grid-template-columns: minmax(0, 230px); }
   #app[data-screen="online-game"] .hand .hand-card { height: 145px; min-height: 145px; }
-  #app[data-screen="online-game"] .hand .animal-hand-card strong { margin-top: 48px; }
   #app[data-device="ios"]:is([data-screen="online-game"], [data-screen="game"]) .hand .hand-card { height: auto; min-height: 215px; }
 }
 .book-turn { position: fixed; inset: 0; z-index: 90; overflow: hidden; pointer-events: none; perspective: 1800px; }

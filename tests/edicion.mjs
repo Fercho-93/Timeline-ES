@@ -37,6 +37,12 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       click(w, '[data-action="start-free"]');
       assert.equal(w.document.documentElement.dataset.scene, block.art);
       assert.ok(w.document.querySelector('.hand-card'), 'el ambiente no sustituye la partida');
+      // Ninguna lámina en la mano: situaría la carta en su época sin saber nada del hecho
+      // que cuenta, y eso vale para los treinta y pico mazos por igual. En su sitio va el
+      // reverso de la colección, el mismo para todas sus cartas.
+      assert.equal(w.document.querySelector('.hand .animal-card-art'), null, `${block.key}: la mano no enseña láminas`);
+      assert.equal(w.document.querySelector('.hand img'), null, `${block.key}: la mano no descarga ninguna imagen`);
+      assert.ok(w.document.querySelector('.hand .carta-reverso .reverso-emblema'), `${block.key}: la mano enseña el reverso del mazo`);
       click(w, '[data-action="solo-menu"]');
       click(w, '[data-action="back-menu"]');
       click(w, '[data-action="collection-back"]');
@@ -49,6 +55,23 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
     assert.ok(w.document.querySelector('.chapter-art img').getAttribute('src').startsWith('assets/hero-'));
     click(w, '[data-action="comp-next-round"]');
     assert.equal(w.document.documentElement.dataset.scene, expected, 'cartel y mesa comparten tema');
+  } finally { w.close(); }
+}
+{
+  const w = boot();
+  try {
+    // Cada colección tiene su emblema, que es lo que hace que el reverso diga de qué se
+    // está jugando sin decir nada de la carta que tapa.
+    const reversos = Object.values(w.CONTINUUM.BLOCKS).map(block => w.CONTINUUM.cardBack(block.games[0]));
+    assert.equal(new Set(reversos).size, reversos.length, 'cada colección trae su propio emblema');
+    for (const reverso of reversos) {
+      assert.match(reverso, /class="carta-reverso" aria-hidden="true"/, 'el reverso no se lee en voz alta');
+      assert.doesNotMatch(reverso, /<img|assets\//, 'el reverso va dibujado, sin descargas');
+    }
+    // Y la lámina no desaparece del juego: la enseñan la carta ya colocada —donde su
+    // valor está a la vista y no hay nada que adivinar— y la enciclopedia.
+    const conLamina = w.CONTINUUM.cards('history').find(card => w.CONTINUUM.cardArt('history', card));
+    assert.match(w.CONTINUUM.animalArt('history', conLamina), /<img class="animal-card-art"/, 'la carta colocada sigue enseñando su lámina');
   } finally { w.close(); }
 }
 for (const options of [{ reduce: true }, { seen: true }]) {
