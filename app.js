@@ -1090,9 +1090,17 @@
 
   function encCountText(modeKey, count) {
     if (modeKey === "all") {
+      // El total del catálogo se cuenta sin filtros: es el denominador, y con el filtro de
+      // láminas puesto diría «12 de 12 cartas» en vez de decir cuántas hay en total.
       const groups = CT.Enciclopedia.catalogGroups();
       const decks = groups.flatMap(group => group.decks);
-      return `${count} de ${decks.reduce((sum, deck) => sum + deck.cards.length, 0)} cartas · ${decks.length} mazos · ${groups.length} temáticas`;
+      // Y las láminas de todo el juego, que es el recuento que da sentido al filtro aquí.
+      const laminas = decks.reduce((suma, deck) => {
+        const progreso = CT.Enciclopedia.seenProgress(deck.key);
+        return { seen: suma.seen + progreso.seen, total: suma.total + progreso.total };
+      }, { seen: 0, total: 0 });
+      const desbloqueadas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas desbloqueadas` : "";
+      return `${count} de ${decks.reduce((sum, deck) => sum + deck.cards.length, 0)} cartas · ${decks.length} mazos · ${groups.length} temáticas${desbloqueadas}`;
     }
     const mode = CT.mode(modeKey);
     // Las láminas descubiertas van aquí y no en cada carta: es un recuento del mazo, y
@@ -1110,10 +1118,13 @@
     const all = encMode === "all";
     const mode = all ? {name: "Todas las cartas"} : CT.mode(encMode);
     const bands = all ? [] : CT.Enciclopedia.bands(encMode);
-    const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand, lock: encLock });
-    // El filtro de láminas solo aparece donde hay láminas: en un mazo sin ilustraciones no
-    // habría nada que bloquear y las dos opciones saldrían vacías.
-    const conLaminas = !all && CT.Enciclopedia.seenProgress(encMode).total > 0;
+    const cards = all
+      ? CT.Enciclopedia.catalogGroups(encQuery, { lock: encLock }).flatMap(group => group.decks.flatMap(deck => deck.cards))
+      : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand, lock: encLock });
+    // El filtro de láminas está en el catálogo completo y en cualquier mazo que tenga
+    // ilustraciones. Donde no aparece es en un mazo sin ninguna: no habría nada que
+    // bloquear y las dos opciones saldrían vacías.
+    const conLaminas = all || CT.Enciclopedia.seenProgress(encMode).total > 0;
     const chipLock = (key, etiqueta) => `<button type="button" class="band-chip${encLock === key ? " active" : ""}" data-action="enc-lock" data-lock="${key}" aria-pressed="${encLock === key}">${etiqueta}</button>`;
     paint(`<div class="enc-background" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
       <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
@@ -1141,8 +1152,8 @@
             </div>
           </div>` : ''}
         </div>
-        ${all ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
-        <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
+        ${all && encLock === "all" ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
+        <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery, { lock: encLock }) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
         <button type="button" class="btn btn-secondary btn-block" data-action="enc-back">Cerrar enciclopedia</button>
       </section>
     </div></div>`);
@@ -2061,7 +2072,7 @@
   app.addEventListener("toggle", event => {
     const deck = event.target;
     if (screen !== "enciclopedia" || encMode !== "all" || !deck.matches?.("[data-enc-deck]") || !deck.open || deck.dataset.loaded) return;
-    deck.querySelector(".enc-deck-cards").innerHTML = CT.Enciclopedia.resultsMarkup(deck.dataset.encDeck, CT.Enciclopedia.filterCards(deck.dataset.encDeck, {query: encQuery}));
+    deck.querySelector(".enc-deck-cards").innerHTML = CT.Enciclopedia.resultsMarkup(deck.dataset.encDeck, CT.Enciclopedia.filterCards(deck.dataset.encDeck, { query: encQuery, lock: encLock }));
     deck.dataset.loaded = "true";
   }, true);
 
@@ -2072,8 +2083,10 @@
       // destruiría el campo justo mientras se escribe en él.
       encQuery = event.target.value;
       const all = encMode === "all";
-      const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand, lock: encLock });
-      document.getElementById("enc-results").innerHTML = all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight });
+      const cards = all
+        ? CT.Enciclopedia.catalogGroups(encQuery, { lock: encLock }).flatMap(group => group.decks.flatMap(deck => deck.cards))
+        : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand, lock: encLock });
+      document.getElementById("enc-results").innerHTML = all ? CT.Enciclopedia.catalogMarkup(encQuery, { lock: encLock }) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight });
       document.getElementById("enc-count").textContent = encCountText(encMode, cards.length);
     }
   });

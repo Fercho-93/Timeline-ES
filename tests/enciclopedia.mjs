@@ -342,6 +342,29 @@ console.log("\nFiltro de láminas en la pantalla");
   click(w, '[data-action="enc-lock"][data-lock="seen"]');
   ok("«desbloqueadas» deja justo la contraria", activo() === "seen" && cartas() === 1 && !doc.querySelector(".enc-card-velada"));
 
+  // El mismo filtro en «Todas las cartas», que es la enciclopedia del menú principal.
+  elegir(w, '#enc-mode-select', 'all');
+  ok("el catálogo completo también trae el filtro, en «todas»", chips().length === 3 && activo() === "all");
+  const temasTodas = doc.querySelectorAll(".enc-topic").length;
+  click(w, '[data-action="enc-lock"][data-lock="seen"]');
+  ok("«desbloqueadas» deja solo la carta jugada, ya abierta para verla",
+    doc.querySelectorAll("[data-enc-card]").length === 1 && !!doc.querySelector(".enc-deck[open]"));
+  ok("y los mazos y temáticas vacíos desaparecen", doc.querySelectorAll(".enc-topic").length < temasTodas);
+  // «Bloqueadas» sobre el catálogo entero son casi mil cartas: se enseñan los mazos con su
+  // recuento en vez de pintarlas todas, que en un móvil modesto cuesta más de un segundo.
+  click(w, '[data-action="enc-lock"][data-lock="locked"]');
+  ok("«bloqueadas» no vuelca el catálogo entero de golpe",
+    doc.querySelectorAll("[data-enc-card]").length === 0 && /son muchas para abrirlas/.test(doc.getElementById("enc-results").textContent));
+  ok("pero dice cuántas son y en qué mazos", doc.querySelectorAll(".enc-deck").length > 5);
+  const mazo = doc.querySelector(".enc-deck");
+  mazo.open = true;
+  mazo.dispatchEvent(new w.Event("toggle", { bubbles: true }));
+  ok("y al desplegar uno trae solo las bloqueadas de ese mazo",
+    mazo.querySelectorAll("[data-enc-card]").length > 0 && !mazo.querySelector("[data-enc-card]:not(.enc-card-velada)"));
+  click(w, '[data-action="enc-lock"][data-lock="all"]');
+  ok("y «todas» devuelve las temáticas enteras", doc.querySelectorAll(".enc-topic").length === temasTodas);
+  elegir(w, '#enc-mode-select', 'animals');
+
   // Cambiar de mazo vuelve a «todas», también en uno sin láminas, donde no hay filtro.
   elegir(w, '#enc-mode-select', 'history');
   ok("al cambiar de mazo el filtro vuelve a «todas»", activo() === "all");

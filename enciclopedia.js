@@ -47,6 +47,9 @@
 
   // El candado del sello. Va dibujado y no como emoji: se ve igual en los dos temas, toma
   // el color de la tinta y no depende de la fuente de cada móvil.
+  // Cuántas cartas se pintan de golpe en el catálogo antes de dejar los mazos plegados.
+  const MAX_ABIERTAS = 120;
+
   const CANDADO = `<svg class="enc-candado" viewBox="0 0 24 24" width="46" height="46" aria-hidden="true" focusable="false">
     <path d="M7.4 10.5V7.6a4.6 4.6 0 0 1 9.2 0v2.9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
     <rect x="4.3" y="10.3" width="15.4" height="11.2" rx="2.4" fill="currentColor"/>
@@ -108,28 +111,42 @@
 
   // Gran mezcla reutiliza cartas de otros mazos: el catálogo las muestra una sola
   // vez, dentro de su temática original.
-  function catalogGroups(query = "") {
-    const seen = new Set();
+  function catalogGroups(query = "", { lock = "all", descubiertas = null } = {}) {
+    // Las ya colocadas en su temática, para no repetirlas cuando otra las reutilice.
+    const puestas = new Set();
+    // Y una sola lectura de las descubiertas para los treinta y pico mazos de abajo.
+    const vistas = lock === "all" ? null : (descubiertas || seen());
     return Object.values(CT.BLOCKS).map(block => ({
       ...block,
       decks: block.games.filter(key => key !== 'mixed').map(key => ({
         key, name: CT.mode(key).name,
-        cards: filterCards(key, {query}).filter(card => {
-          if (seen.has(card.id)) return false;
-          seen.add(card.id);
+        cards: filterCards(key, { query, lock, descubiertas: vistas }).filter(card => {
+          if (puestas.has(card.id)) return false;
+          puestas.add(card.id);
           return true;
         })
       })).filter(deck => deck.cards.length)
     })).filter(block => block.decks.length);
   }
 
-  function catalogMarkup(query = "") {
-    const groups = catalogGroups(query);
-    if (!groups.length) return '<p class="enc-empty">Ninguna carta coincide con la búsqueda.</p>';
-    const searching = !!query.trim();
+  function catalogMarkup(query = "", { lock = "all" } = {}) {
     // Una sola lectura de las descubiertas para todo el catálogo, que son treinta mazos.
     const descubiertas = seen();
-    return groups.map(block => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
+    const groups = catalogGroups(query, { lock, descubiertas });
+    if (!groups.length) {
+      return `<p class="enc-empty">${lock === "locked" ? "No queda ninguna lámina por desbloquear." : lock === "seen" ? "Todavía no has desbloqueado ninguna lámina." : "Ninguna carta coincide con la búsqueda."}</p>`;
+    }
+    // Con una búsqueda o un filtro puesto, los mazos se abren solos: si no, lo único que
+    // se vería es una lista de nombres. Pero solo mientras quepan: «bloqueadas» sobre el
+    // catálogo entero son casi mil cartas, y pintarlas de una vez cuesta más de un
+    // segundo en un móvil modesto. Pasado el tope se enseñan los mazos con su recuento,
+    // que es la misma respuesta —cuántas faltan y dónde— sin la espera.
+    const encontradas = groups.reduce((suma, block) => suma + block.decks.reduce((n, deck) => n + deck.cards.length, 0), 0);
+    const searching = (!!query.trim() || lock !== "all") && encontradas <= MAX_ABIERTAS;
+    const plegados = !searching && (query.trim() || lock !== "all")
+      ? `<p class="hint">${encontradas} cartas: son muchas para abrirlas de golpe. Despliega el mazo que quieras ver.</p>`
+      : "";
+    return plegados + groups.map(block => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
       <h2 id="enc-topic-${block.key}"><span aria-hidden="true">${block.icon}</span> ${CT.escapeHtml(block.name)}</h2>
       ${block.decks.map(deck => `<details class="enc-deck" data-enc-deck="${deck.key}"${searching ? ' open data-loaded="true"' : ''}>
         <summary><span>${CT.escapeHtml(deck.name)}</span><small>${deck.cards.length} cartas${laminaResumen(deck.key, descubiertas)}</small></summary>
