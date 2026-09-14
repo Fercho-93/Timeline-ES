@@ -886,6 +886,10 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .enc-link { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; margin-top: 4px; padding: 0; border: 0; background: none; color: var(--accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
 .enc-toolbar { display: grid; gap: 16px; margin: 16px 0 22px; }
 .enc-bands { display: flex; flex-wrap: wrap; gap: 8px; }
+/* El filtro de láminas va rotulado como los campos de arriba: sin el rótulo, su «Todas»
+   y el de las épocas son dos botones idénticos uno debajo del otro. */
+.enc-lock-field { display: grid; gap: 7px; }
+.enc-lock-label { font-size: .85rem; font-weight: 700; color: var(--muted); }
 .band-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 9px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; font-size: .78rem; font-weight: 650; cursor: pointer; }
 .band-chip.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-dark); }
 .enc-empty { margin: 16px 0 22px; padding: 22px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); text-align: center; }
@@ -925,10 +929,11 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .enc-card-velada .card-visual { position: relative; overflow: hidden; }
 /* Con `.card-visual` delante, porque el símbolo de época de las cartas sin ilustración
    («.card-visual span») ya declara su propia posición y ganaría a un selector más corto. */
-.card-visual .enc-sello { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 10px; text-align: center; color: var(--enc-sello-tinta); }
+/* Solo el candado, centrado: el rótulo se partía en dos líneas en una tarjeta estrecha y
+   el sello acababa pareciendo un aviso de error. Lo que decía sigue estando para quien
+   usa lector de pantalla, en el texto que no se ve. */
+.card-visual .enc-sello { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; padding: 10px; color: var(--enc-sello-tinta); }
 .enc-sello .enc-candado { display: block; filter: drop-shadow(0 2px 4px rgba(40,26,10,.22)); }
-.enc-sello b { font-size: .82rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.enc-sello small { max-width: 16ch; font-size: .72rem; line-height: 1.35; opacity: .82; }
 
 /* El perfil. Reutiliza la rejilla de cifras del solitario y las filas de la colección:
    son los mismos datos leídos de otra manera, no una interfaz aparte. Lo único propio

@@ -36,7 +36,7 @@ Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
 | `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
 | `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie, y el contraste de las bandas y de los cinco aspectos de la interfaz. |
 | `movimiento.mjs` | Navegación repetida, galería persistente, selección de cartas, cierres interrumpidos, arrastre, deslizar para volver y movimiento reducido. |
-| `enciclopedia.mjs` | Filtrado y búsqueda de `CT.Enciclopedia`, la pantalla que consulta cualquier mazo fuera de partida y su enlace desde el repaso de fin de partida. Comprueba también que no aparece dentro de ninguna partida, y que las láminas se velan hasta jugar la carta sin velar nunca el texto. |
+| `enciclopedia.mjs` | Filtrado y búsqueda de `CT.Enciclopedia`, la pantalla que consulta cualquier mazo fuera de partida y su enlace desde el repaso de fin de partida. Comprueba también que no aparece dentro de ninguna partida, que las láminas se sellan hasta jugar la carta sin velar nunca el texto, y el filtro de bloqueadas y desbloqueadas. |
 | `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
 | `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |
 | `entrada-por-enlace.mjs` | La secuencia del SDK al entrar por una invitación. Necesita el emulador. |
@@ -61,13 +61,13 @@ todavía no incluye a quien acaba de entrar. Comprueba el SDK y la condición, n
 `accesibilidad.mjs` juega con teclado sobre el DOM simulado: comprueba que tras cada
 repintado el foco vuelve donde debe, que las capas se anuncian como diálogos y devuelven
 el foco al cerrarse, que elegir carta y hueco pasa por la región viva, y que el texto de
-las bandas de época llega a 4,5:1 de contraste. Los aspectos de la interfaz —claro,
+las bandas de época llega a 4,5:1 de contraste; eso último es puro dato, no necesita
+navegador y avisa en cuanto alguien añade una banda demasiado clara. Los aspectos —claro,
 pergamino, alto contraste, oscuro y noche profunda— pasan por ese mismo cálculo en sus
 seis pares con texto, y los que cambian el fondo tienen que declarar todas las superficies
 de la mesa, no solo el papel. `edicion.mjs` comprueba el resto del ajuste: que lo elegido
 llega al elemento raíz, a las dos etiquetas de color del navegador y al almacenamiento, y
-que un aspecto retirado vuelve a «automático» en lugar de dejar la aplicación sin paleta. Ese último es puro dato: no necesita
-navegador y avisa en cuanto alguien añade una banda demasiado clara.
+que un aspecto retirado vuelve a «automático» en lugar de dejar la aplicación sin paleta.
 
 `service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado.
 Comprueba lo que decide qué versión ve cada móvil: se responde con la copia guardada,
@@ -89,7 +89,7 @@ zoológicos: las fuentes y los límites están en `VERIFICACION_CORRECCIONES.md`
 navegación y los diálogos, y ocho veces la elección y cancelación de huecos. Simula
 deslizamiento, pulsación mantenida, arrastre, suelta entre frames y cancelación del sistema.
 Fija las dos mitades del arrastre con el dedo: deslizar sin esperar desplaza la página y no
-levanta nada, y mantener pulsada la carta la levanta y deja de desplazar. Y la casita del
+levanta nada, y mantener pulsada la carta la levanta y deja de desplazar. Y el atajo al
 inicio: dónde aparece, dónde no —ni en el inicio ni en una partida— y a dónde lleva.
 Fija también el gesto de volver: deslizar de izquierda a derecha hace lo mismo que «Volver»
 y cierra el diálogo de encima, y no navega hacia la izquierda, en diagonal, con un roce

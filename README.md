@@ -133,10 +133,17 @@ en ninguna pantalla de partida: vería el mazo entero y volvería trivial cualqu
 pendiente.
 
 Lo único que hay que ganarse son las láminas: hasta que una carta pasa por tu mano, en el
-sitio de su ilustración hay un sello cerrado —papel tramado, un candado y «bloqueada ·
-descúbrela jugándola»—. La ilustración no se difumina: no se pinta siquiera, así que un
-mazo entero por descubrir no baja ni compone cuarenta imágenes, que es lo que dejaba la
-enciclopedia pesada al abrirla.
+sitio de su ilustración hay un sello cerrado —papel tramado y un candado, sin rótulo, que
+en una tarjeta estrecha se partía en dos líneas y parecía un aviso de error; lo que el
+candado dice sin decirlo va en el texto que solo leen los lectores de pantalla—. La
+ilustración no se difumina: no se pinta siquiera, así que un mazo entero por descubrir no
+baja ni compone cuarenta imágenes, que es lo que dejaba la enciclopedia pesada al abrirla.
+
+Cada mazo con láminas lleva además un filtro —**Todas · Desbloqueadas · Bloqueadas**— que
+empieza siempre en «todas» y vuelve ahí al cambiar de mazo: llegar a uno nuevo con media
+colección escondida y sin saber por qué es la manera más rápida de perderse. Se combina
+con la búsqueda y con el filtro de épocas, y no aparece en los mazos sin ilustraciones,
+donde no habría nada que bloquear.
 Descubre tanto acertarla como fallarla: en los dos casos la pantalla de resultado te la ha
 enseñado entera, y esconder justo las que se fallan sería esconder las que más interesa
 repasar. El texto no se vela nunca —valor, época, explicación y fuente se leen desde el

@@ -25,10 +25,15 @@
     return texto.includes(query);
   }
 
-  function filterCards(modeKey, { query = "", band = "all" } = {}) {
+  // `lock` reparte por lámina: «seen» son las desbloqueadas y «locked» las que faltan. Una
+  // carta sin ilustración no es ni una cosa ni la otra, así que solo sale en «all»; los
+  // mazos que no tienen ninguna tampoco enseñan el filtro, y no hay dónde perderse.
+  function filterCards(modeKey, { query = "", band = "all", lock = "all", descubiertas = null } = {}) {
     const q = normalize(query.trim());
+    const vistas = lock === "all" ? null : (descubiertas || seen());
     return CT.cards(modeKey)
       .filter(card => band === "all" || CT.eraForCard(modeKey, card).key === band)
+      .filter(card => !vistas || (!!CT.cardArt(modeKey, card) && vistas.has(card.id) === (lock === "seen")))
       .filter(card => matches(modeKey, card, q))
       .slice()
       .sort((a, b) => CT.sortValue(modeKey, a) - CT.sortValue(modeKey, b));
@@ -42,7 +47,7 @@
 
   // El candado del sello. Va dibujado y no como emoji: se ve igual en los dos temas, toma
   // el color de la tinta y no depende de la fuente de cada móvil.
-  const CANDADO = `<svg class="enc-candado" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true" focusable="false">
+  const CANDADO = `<svg class="enc-candado" viewBox="0 0 24 24" width="46" height="46" aria-hidden="true" focusable="false">
     <path d="M7.4 10.5V7.6a4.6 4.6 0 0 1 9.2 0v2.9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
     <rect x="4.3" y="10.3" width="15.4" height="11.2" rx="2.4" fill="currentColor"/>
     <circle cx="12" cy="15" r="1.6" fill="var(--enc-sello-hueco)"/>
@@ -63,8 +68,11 @@
     // justo lo que dejaba la enciclopedia pesada al abrirla.
     const tieneLamina = !!CT.cardArt(modeKey, card);
     const velada = tieneLamina && !(descubiertas || seen()).has(card.id);
+    // Solo el candado: en una tarjeta estrecha, el rótulo se partía en dos líneas y el
+    // sello acababa pareciendo un aviso de error. Lo que dice el candado sin decirlo va
+    // igualmente para quien no lo ve, en el texto que solo leen los lectores de pantalla.
     const visual = velada
-      ? `<span class="enc-sello">${CANDADO}<b>Bloqueada</b><small>Descúbrela jugándola</small></span>`
+      ? `<span class="enc-sello">${CANDADO}<span class="solo-lectores">Lámina bloqueada. Descúbrela jugando esta carta.</span></span>`
       : tieneLamina ? CT.animalArt(modeKey, card) : `<span>${era.symbol}</span><small>${era.name}</small>`;
     const art = tieneLamina;
     const fuente = card.source
