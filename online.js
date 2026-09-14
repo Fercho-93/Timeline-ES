@@ -22,7 +22,7 @@ const CT = window.CONTINUUM;
 const { escapeHtml, initials, shuffle, announce } = CT;
 // Igual que en el juego local: pintar conserva el foco del teclado, y las capas se abren
 // como diálogos de verdad. Está en `a11y.js`, compartido por los dos motores.
-const paint = (html, pantalla) => { CT.Scene.apply(selectedModeKey, pantalla); CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
+const paint = (html, pantalla) => { CT.Scene.apply(modeKey(), pantalla); CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
 const abreCapa = (capa, cerrable) => CT.openDialog(capa, cerrable);
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -172,7 +172,8 @@ function getCard(id) {
 }
 
 function header(extra = "") {
-  return `<header class="topbar"><div class="brand">Continuum <span class="live-badge"><i></i> EN DIRECTO</span></div><div class="topbar-actions">${extra}${CT.settingsButton()}</div></header>${roomState?.tournament ? `<p class="eyebrow">Competición · ronda ${roomState.tournament.index+1} de ${roomState.tournament.queue.length} · ${escapeHtml(CT.mode(modeKey()).name)}</p>` : ''}`;
+  const playing = roomState?.status === 'playing';
+  return CT.UI.header('data-online-action="back"', playing || roomRef ? 'data-online-action="room"' : '', !!playing);
 }
 
 function showToast(message) {
@@ -803,7 +804,7 @@ function renderGame() {
   const secondsLeft = roomState.phase === "turn" && turnSeconds() ? (turnRemaining() ?? turnSeconds()) : null;
   paint(`<div class="shell">${header('<button class="icon-btn" data-online-action="room" aria-label="Abrir menú de la sala">Menú</button>')}
     <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
-    <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+    <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · ronda ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length}` : `Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}`}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
     <div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(player.name))}</i><b>${escapeHtml(player.name)}${uid === user.uid ? " · tú" : ""}</b><em>${player.hand.length}</em></span>`; }).join("")}</div>
     ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
     ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
@@ -838,6 +839,8 @@ function renderGame() {
   // saltaría dentro de ella una y otra vez.
   const revelando = roomState.phase === "reveal";
   if (revelando && !renderGame.revelando) abreCapa(appEl.querySelector(".overlay"), false);
+  if (revelando && renderGame.revealVersion === roomState.version) appEl.querySelector('.reveal')?.classList.remove('atlas-reveal');
+  else if (revelando) { CT.UI.reveal(appEl.querySelector('.modal')); renderGame.revealVersion = roomState.version; }
   renderGame.revelando = revelando;
   if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
 }
@@ -1296,8 +1299,10 @@ function roomMenu() {
   const currentName = currentUid ? roomState.players[currentUid].name : "";
   const others = (roomState?.playerOrder || []).filter(uid => uid !== roomState.hostUid);
   appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-room-overlay><div class="modal">
-    <div class="eyebrow">Sala ${roomCode}</div><h2>Gestionar la partida</h2>
+    <div class="eyebrow">Sala ${roomCode}</div><h2>Opciones de la partida</h2><p class="hint">La partida continúa mientras consultas este menú.</p>
     <div class="actions" style="display:grid">
+      <button class="btn btn-secondary" data-online-action="guide">Guía</button>${CT.settingsButton()}
+      <button class="btn btn-secondary" data-online-action="back">Volver a la pantalla anterior</button>
       <button class="btn btn-secondary" data-online-action="share">Compartir enlace</button>
       <button class="btn btn-secondary" data-online-action="qr">Mostrar QR</button>
       ${isHost && playing && !inFinal ? `<button class="btn btn-ghost" data-online-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
@@ -1414,21 +1419,39 @@ async function closeRoom() {
   await deleteDoc(roomRef);
 }
 
-// Con mensaje se recarga un momento después, para que dé tiempo a leerlo.
-function leaveOnline(message = "") {
-  clearTurnTimer();
-  stopPresence();
+// Desconecta la vista sin eliminar al participante ni recargar la aplicación.
+function detachOnline() {
+  entryRequest++;
+  clearTurnTimer(); stopPresence();
   CT.onlineActive = false;
-  unsubscribeRoom?.();
-  unsubscribeRoom = null;
-  roomState = null;
-  roomRef = null;
-  roomCode = "";
-  history.replaceState({}, "", location.pathname);
-  if (!message) return location.reload();
-  showToast(message);
-  setTimeout(() => location.reload(), 1600);
+  unsubscribeRoom?.(); unsubscribeRoom = null;
+  roomState = null; roomRef = null; roomCode = '';
+  selectedCardId = null; pendingIndex = null;
+  history.replaceState({}, '', location.pathname);
 }
+function leaveOnline(message = '') {
+  detachOnline();
+  if (returnToMenu) returnToMenu(); else CT.localNavigate?.('home-top');
+  if (message) showToast(message);
+}
+function navigateOnline(action) {
+  if (action === 'rules') { showGuide(); return; }
+  const go = () => {
+    const code = roomCode;
+    const wasInRoom = !!roomRef;
+    detachOnline();
+    if (action === 'back') {
+      // La sala se conserva en el servidor. «Volver» muestra la entrada y permite
+      // reanudar; solo «Salir de la sala» devuelve las cartas al mazo.
+      if (wasInRoom) renderEntry(code);
+      else if (returnToMenu) returnToMenu();
+      else CT.localNavigate?.('home-top');
+    } else CT.localNavigate?.(action);
+  };
+  if (roomState?.status === 'playing') CT.UI.confirmExit('La sala seguirá en marcha. Podrás volver a entrar con su código; tu turno no se pausa.', go, '¿Salir de esta pantalla?', 'Salir de la pantalla');
+  else go();
+}
+CT.onlineNavigate = navigateOnline;
 
 // Un móvil que se bloquea, cambia de pestaña o pierde cobertura un momento puede dejar el
 // listener de Firestore colgado: la conexión persistente se corta y, en algunos
@@ -1481,8 +1504,8 @@ document.addEventListener("click", event => {
   const target = event.target.closest("[data-online-action]");
   if (!target) return;
   const action = target.dataset.onlineAction;
-  if (action === "back" && !roomRef && returnToMenu) { entryRequest++; CT.onlineActive = false; returnToMenu(); }
-  else if (action === "back" || action === "leave") leaveOnline();
+  if (action === "back") navigateOnline("back");
+  else if (action === "leave") navigateOnline("back");
   else if (action === "claim-host") claimHost();
   else if (action === "review-timeline") renderTimelineReview();
   else if (action === "back-from-timeline") renderWinner();

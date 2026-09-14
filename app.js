@@ -11,12 +11,26 @@
   const CT = window.CONTINUUM;
   const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
+  let playReturn = 'play-menu';
+  let lastPaintedScreen = 'home';
+  let previousView = null, navigatingBack = false;
+  const navigationTrail = [];
   const paint = html => {
+    if (CT.UI.isPlaying(screen) && !CT.UI.isPlaying(lastPaintedScreen)) {
+      playReturn = ['setup', 'solo-home', 'competition-menu', 'duelo-intro'].includes(lastPaintedScreen) ? lastPaintedScreen : 'play-menu';
+    }
+    if (screen !== lastPaintedScreen && !navigatingBack) {
+      if (screen === 'home') navigationTrail.length = 0;
+      else if (previousView && !CT.UI.isPlaying(lastPaintedScreen) && !CT.UI.isPlaying(screen) && screen !== 'enciclopedia' && lastPaintedScreen !== 'enciclopedia') navigationTrail.push(previousView);
+    }
+    navigatingBack = false;
+    previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, format: formatOpen, tournament: pendingTournament, collectionOpen, collectionDetails, homeDestination, profileReturn};
+    lastPaintedScreen = screen;
     const sceneMode = screen === "enciclopedia" && encMode !== "all" ? encMode : selectedModeKey;
     CT.Scene.apply(sceneMode, screen);
     CT.paint(app, html, screen);
     if (screen === "solo-home") {
-      app.querySelectorAll(".solo-panel").forEach(panel => {
+      app.querySelectorAll(".solo-panel:not(.solo-fold)").forEach(panel => {
         const details = document.createElement("details");
         details.className = "panel solo-panel solo-fold";
         details.name = "solo-options";
@@ -139,32 +153,15 @@
     } catch { return null; }
   }
 
-  // La rosa de los vientos del emblema, reducida a lo que se reconoce en 27 píxeles: el
-  // aro, la estrella de cuatro puntas y los cuatro rayos cortos en diagonal.
-  const MARCA = `<svg class="brand-mark" viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false">
-    <circle cx="12" cy="12" r="10.3" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".38"/>
-    <path d="M12 1.7 13.85 9.45 21.6 12 13.85 14.55 12 22.3 10.15 14.55 2.4 12 10.15 9.45Z" fill="currentColor"/>
-    <g stroke="currentColor" stroke-width="1.15" stroke-linecap="round" opacity=".5">
-      <path d="M16.3 7.7 18.3 5.7"/><path d="M16.3 16.3 18.3 18.3"/>
-      <path d="M7.7 16.3 5.7 18.3"/><path d="M7.7 7.7 5.7 5.7"/>
-    </g>
-  </svg>`;
-
+  // Flecha para retroceder; la casa del menú inferior vuelve al inicio.
   function header(extra = "") {
-    const competition = game?.tournament && ['pass','game','final-local','winner'].includes(screen) ? `<div class="competition-current-deck"><span>Competición · ronda ${game.tournament.index+1} de ${game.tournament.queue.length}</span><strong>${escapeHtml(currentMode().name)}</strong></div>` : '';
-    // El atajo al inicio: «Volver» retrocede un paso y esto salta el resto del camino de
-    // una vez. No aparece en el propio inicio, donde no llevaría a ninguna parte, ni
-    // durante una partida: de ahí se sale por el menú de la partida, que pregunta antes de
-    // abandonarla, y un atajo sin pregunta al lado sería una trampa.
-    //
-    // El dibujo es la rosa de los vientos del emblema, no una casita: es la marca del
-    // juego, que es exactamente lo que se pulsa para volver a la portada. Va en línea y
-    // no como imagen —se recorta al tamaño de un botón sin emborronarse, toma el color de
-    // la tinta de cada aspecto y no pide ninguna descarga más.
-    const inicio = screen !== "home" && !CT.isSessionActive?.()
-      ? `<button class="icon-btn icon-btn-home" data-action="home-top" aria-label="Ir al inicio" title="Inicio">${MARCA}</button>`
-      : '';
-    return `<header class="topbar"><div class="brand">Continuum</div><div class="topbar-actions">${inicio}${extra}</div></header>${competition}`;
+    const playing = CT.UI.isPlaying(screen);
+    if (playing) {
+      const menu = screen === 'solo' || screen === 'comp-intro' ? 'solo-options' : 'game-menu';
+      return CT.UI.header('data-action="ui-back"', `data-action="${menu}"`, true);
+    }
+    const backAction = extra.match(/data-action="(collection-back|back-menu|home)"/)?.[1] || 'ui-back';
+    return CT.UI.header(screen === 'home' ? '' : `data-action="${backAction}"`);
   }
 
   // Las carátulas van a la caché de la aplicación y se bajan en la primera visita, así
@@ -358,20 +355,27 @@
   // El perfil entra por aquí y no por la cabecera: es un destino de la portada, como la
   // colección, y la barra de arriba ya tiene su trabajo con las acciones de cada pantalla.
   function homeNav() {
-    const homeActive = screen === "home";
-    const encyclopediaActive = screen === "enciclopedia";
-    const profileActive = screen === "perfil";
-    return `<nav class="home-nav" aria-label="Navegación de inicio">
-      <button data-action="home-top"${homeActive ? ' aria-current="page"' : ''} aria-label="Ir al inicio"><span aria-hidden="true">⌂</span><small>Inicio</small></button>
-      <button data-action="home-encyclopedia"${encyclopediaActive ? ' aria-current="page"' : ''} aria-label="Abrir la enciclopedia de todas las cartas"><span aria-hidden="true">▤</span><small>Enciclopedia</small></button>
-      <button data-action="perfil"${profileActive ? ' aria-current="page"' : ''} aria-label="Ver tu perfil"><span aria-hidden="true">★</span><small>Perfil</small></button>
-      <button data-settings-action="open" aria-label="Abrir ajustes"><span aria-hidden="true">⚙</span><small>Ajustes</small></button>
-    </nav>`;
+    return CT.UI.nav(screen);
   }
 
+
   function backMenu() {
+    if (screen !== 'enciclopedia' && navigationTrail.length) {
+      const previous = navigationTrail.pop();
+      if (previous.screen !== screen) {
+        navigatingBack = true;
+        if (previous.mode !== selectedModeKey) setMode(previous.mode);
+        selectedBlockKey = previous.block; formatOpen = previous.format;
+        pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
+        collectionDetails = previous.collectionDetails; homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
+        const render = {'home':home, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'perfil':perfilView, 'duelo-intro':duelIntro}[previous.screen];
+        if (render) render(); else { screen = previous.screen; paint(previous.html); }
+        return;
+      }
+    }
     if (screen === 'setup' && pendingTournament) { pendingTournament=null;competitionMenu();return; }
     if (["setup", "solo-home", "online-loading", "online-error"].includes(screen)) playMenu();
+    else if (screen === "duelo-intro") soloHome();
     else if (screen === "play-menu") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
     else if (screen === "enciclopedia") app.querySelector('[data-action="enc-back"]')?.click();
     else if (screen === "perfil" && profileReturn === "play-menu") playMenu();
@@ -404,7 +408,7 @@
     const block = CT.block(selectedBlockKey);
     const art = BLOCK_ART[block.art];
     paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="collection-back">Volver</button>')}
-      <section class="mode-masthead"><img src="assets/${art.archivo}-700.webp" alt="" width="700" height="${art.alto[700]}" decoding="async"><div><div class="eyebrow">${block.name}</div><h1 data-focus tabindex="-1">${currentMode().name}</h1><p>${currentMode().blurb}</p></div></section>
+      ${CT.UI.deckIntro(selectedModeKey, `assets/${art.archivo}-700.webp`)}
       <section class="home-play">${playChoices(resume)}${deckBrowse()}</section>
     </div>`);
     window.scrollTo(0, 0);
@@ -576,7 +580,7 @@
       ? `<p class="pulse-gift">⚡ <b>${escapeHtml(game.pulseGift.from)}</b> te ha pasado <b>${escapeHtml(cardsById.get(game.pulseGift.cardId).title)}</b> con su Pulso.</p>`
       : "";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
-      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion">${escapeHtml(initials(player.name))}</div><div class="eyebrow">Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
+      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion">${escapeHtml(initials(player.name))}</div><div class="eyebrow">${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
     </div>`);
   }
 
@@ -621,7 +625,7 @@
       : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
       <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
       ${pulseCard ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
       ${CT.Ghost.banner(game.ghost, game.players)}
@@ -2008,12 +2012,40 @@
     const returnTo = screen;
     const enSolitario = ["solo-home", "solo", "solo-end", "duelo-intro"].includes(screen);
     const context = comp ? "competition" : solo || enSolitario ? "solo" : "local";
-    const modeKey = game?.mode || solo?.mode || selectedModeKey;
+    const modeKey = screen === 'solo' ? solo.mode : CT.UI.isPlaying(screen) ? (game?.mode || selectedModeKey) : selectedModeKey;
     overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
   }
 
+  function returnFromPlay() {
+    if ((screen === 'solo' && solo?.kind === 'comp') || screen === 'comp-intro') {
+      saveCompetition(); solo = null; comp = null; competitionMenu(); return;
+    }
+    if (solo && screen === 'solo') saveSolo();
+    else if (game) saveGame();
+    result = null; selectedCardId = null; pendingIndex = null;
+    if (screen !== 'solo' && game?.tournament) { competitionMenu(); return; }
+    if (playReturn === 'setup') setup();
+    else if (playReturn === 'solo-home' || screen === 'solo') soloHome();
+    else if (playReturn === 'duelo-intro') duelIntro();
+    else playMenu();
+  }
+  function requestPlayExit() {
+    CT.UI.confirmExit('Tu partida quedará guardada para continuar después.', returnFromPlay);
+  }
+  function uiBack() {
+    if (app.dataset.screen?.startsWith('online-')) { CT.onlineNavigate?.('back'); return; }
+    if (CT.UI.isPlaying(screen)) { requestPlayExit(); return; }
+    backMenu();
+  }
+  function soloOptions() {
+    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid">
+      <button class="btn btn-primary" data-action="close-menu">Seguir jugando</button>
+      <button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}
+      <button class="btn btn-secondary" data-action="solo-menu">Guardar y salir</button>
+    </div></div></div>`, true);
+  }
   function gameMenu() {
-    overlay(`<div class="overlay"><div class="modal"><div class="eyebrow">Partida en pausa</div><h2>¿Qué quieres hacer?</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Ver la guía</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`, true);
+    overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`, true);
   }
 
   function showToast(message) {
@@ -2110,7 +2142,12 @@
     const target = event.target.closest("[data-action]");
     if (!target) return;
     const action = target.dataset.action;
-    if (action === "retry-online") launchOnline();
+    if (app.dataset.screen?.startsWith('online-') && ['home-top', 'home-encyclopedia', 'perfil', 'rules'].includes(action)) {
+      CT.onlineNavigate?.(action); return;
+    }
+    if (action === 'ui-back') uiBack();
+    else if (action === 'solo-options') soloOptions();
+    else if (action === "retry-online") launchOnline();
     else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
     else if (action === "home") home();
     else if (action === "back-menu") backMenu();
@@ -2187,12 +2224,12 @@
     else if (action === "resume-solo") { solo = loadSolo(); if (solo) cardsById = new Map(solo.savedDeck.map(card => [card.id, card])); pendingIndex = null; if (!solo) soloHome(); else if (solo.pendingResult) { result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true }; soloResult(); } else { result = null; soloView(); } }
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
-    else if (action === "solo-menu") soloHome();
+    else if (action === "solo-menu") requestPlayExit();
     else if (action === "rules") rules();
     else if (action === "close-rules") CT.closeDialog();
     else if (action === "game-menu") gameMenu();
     else if (action === "close-menu") CT.closeDialog();
-    else if (action === "abandon") { game = null; saveGame(); home(); }
+    else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual. Esta acción no se puede deshacer.', () => { game = null; saveGame(); home(); }, '¿Abandonar partida?', 'Abandonar');
     else if (action === "pulse-open") pulseTargetMenu();
     else if (action === "pulse-defend") { game.pulseTurn.stage = PULSE_DEFENSA; pendingIndex = null; saveGame(); gameView(); }
     else if (action === "pulse-target") { CT.closeDialog(); startPulse(Number(target.dataset.target)); }
@@ -2206,7 +2243,7 @@
     else if (action === "start-competition") startCompetition();
     else if (action === "comp-next-round") beginCompRound();
     else if (action === "comp-confirm-resume") resumeCompetition(true);
-    else if (action === "abandon-comp") abandonCompetition();
+    else if (action === "abandon-comp") requestPlayExit();
     else if (action === "enciclopedia") openEnciclopedia(selectedModeKey, { returnTo: "play-menu" });
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
     else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
@@ -2221,6 +2258,11 @@
     else if (action === "perfil-reset-confirm") { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
   });
 
+  CT.localNavigate = action => {
+    if (action === 'home-encyclopedia') openEnciclopedia('all');
+    else if (action === 'perfil') perfilView();
+    else { homeDestination = 'home'; home(); window.scrollTo(0, 0); }
+  };
   CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "comp-intro"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();
   // El botón/gesto Atrás de Android: `window.Capacitor` solo existe dentro del contenedor
@@ -2232,11 +2274,7 @@
     const nativeApp = window.Capacitor.registerPlugin?.('App') || window.Capacitor.Plugins?.App;
     nativeApp?.addListener?.("backButton", () => {
       if (CT.backPressed()) return;
-      if (["game", "pass", "pulse-pass"].includes(screen)) { gameMenu(); return; }
-      if (["solo", "comp-intro"].includes(screen)) {
-        app.querySelector('[data-action="solo-menu"], [data-action="game-menu"], [data-action="abandon-comp"]')?.click();
-        return;
-      }
+      if (app.dataset.screen?.startsWith('online-') || CT.UI.isPlaying(screen)) { uiBack(); return; }
       if (screen !== "home") { backMenu(); return; }
       nativeApp.exitApp();
     });

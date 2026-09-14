@@ -43,7 +43,8 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       assert.equal(w.document.querySelector('.hand .animal-card-art'), null, `${block.key}: la mano no enseña láminas`);
       assert.equal(w.document.querySelector('.hand img'), null, `${block.key}: la mano no descarga ninguna imagen`);
       assert.ok(w.document.querySelector('.hand .carta-reverso .reverso-emblema'), `${block.key}: la mano enseña el reverso del mazo`);
-      click(w, '[data-action="solo-menu"]');
+      click(w, '[data-action="ui-back"]');
+      click(w, '[data-exit-confirm]');
       click(w, '[data-action="back-menu"]');
       click(w, '[data-action="collection-back"]');
       assert.equal(w.document.documentElement.dataset.scene, 'archive');
@@ -256,24 +257,14 @@ console.log('Aspectos: raíz, barra del navegador, desplegable, paleta en la hoj
 // ancho mínimo. Esto fija las dos cosas a la vez —que ese aprieto sigue existiendo y que
 // el del atajo le gana—, porque comprobar solo la caja dejaría pasar el mismo fallo.
 {
-  const styles = read('styles.css'), edition = read('edition.css');
-  const apretada = /\.topbar-actions \.icon-btn \{[^}]*min-width: 0/.test(styles);
-  assert.ok(apretada, 'la barra agrupada del móvil sigue quitando el ancho mínimo');
-  const atajo = edition.match(/\.topbar-actions \.icon-btn\.icon-btn-home \{([^}]*)\}/);
-  assert.ok(atajo, 'el atajo declara su caja con un selector que le gana a esa barra');
-  assert.match(atajo[1], /min-width: 52px/, 'y recupera el ancho de un dedo');
-
   const w = boot({ seen: true });
   try {
-    click(w, '[data-block="historia"]');
-    click(w, '[data-mode="history"]');
-    const boton = w.document.querySelector('.topbar [data-action="home-top"]');
-    assert.ok(boton, 'el atajo está en la cabecera del menú del mazo');
-    const marca = boton.querySelector('svg.brand-mark');
-    assert.ok(marca, 'y es la marca dibujada, no un glifo de la fuente');
-    assert.equal(marca.getAttribute('aria-hidden'), 'true', 'el dibujo no se lee: lo hace la etiqueta del botón');
-    assert.equal(boton.getAttribute('aria-label'), 'Ir al inicio');
-    assert.ok(Number(marca.getAttribute('width')) >= 24, `se dibuja a tamaño de dedo (${marca.getAttribute('width')}px)`);
+    click(w, '[data-block="historia"]'); click(w, '[data-mode="history"]');
+    const boton = w.document.querySelector('.home-nav [data-action="home-top"]');
+    assert.ok(boton, 'la casa vive en el menú inferior');
+    assert.ok(boton.querySelector('svg[aria-hidden="true"]'), 'icono de casa dibujado');
+    assert.equal(w.document.querySelector('.brand-mark'), null, 'sin rosa de los vientos de navegación');
+    assert.ok(w.document.querySelector('.topbar .atlas-back'), 'flecha de vuelta a la izquierda');
   } finally { w.close(); }
 }
 console.log('Atajo al inicio: marca dibujada, caja propia y especificidad que gana a la barra agrupada: OK');

@@ -297,6 +297,7 @@
     paint.screen = screen;
 
     container.innerHTML = html;
+    window.CONTINUUM.UI?.mount(container, screen);
     // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
     // muchas veces y no debe convertir cada toque en una animación.
     if (!primero && cambioDePantalla) {
@@ -380,6 +381,9 @@
   function openDialog(overlay, cerrable, onClose) {
     if (!overlay) return;
     const modal = overlay.querySelector(".modal") || overlay;
+    window.CONTINUUM.UI?.reveal(modal);
+    const openingFocus = document.activeElement;
+    window.CONTINUUM.UI?.openSurface(modal);
     overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", "true");
@@ -390,7 +394,7 @@
       modal.setAttribute("aria-labelledby", titulo.id);
     }
 
-    const previo = document.activeElement;
+    const previo = openingFocus;
     // Una guía larga debe abrir por su título, no desplazarse hasta «Entendido».
     const lectura = titulo && modal.querySelector(".guide-content");
     if (lectura) titulo.setAttribute("tabindex", "-1");
@@ -434,6 +438,7 @@
     const anteriorEnPila = pila[pila.length - 1];
     const termina = () => {
       if (!dialogo.overlay.isConnected) return;
+      window.CONTINUUM.UI?.closeSurface(dialogo.overlay.querySelector(".modal"));
       dialogo.overlay.remove();
       dialogo.onClose?.();
       // Un diálogo nuevo puede haberse abierto durante la salida: el cierre anterior no

@@ -215,13 +215,15 @@ console.log("\nEl mapa de la línea");
   ok("el minimapa se sustituye por zoom sobre las cartas reales", !existe(w, '.map-stop') && existe(w, '.timeline-zoom'));
   click(w, '[data-timeline-zoom="out"]');
   click(w, '[data-timeline-zoom="out"]');
+  click(w, '[data-timeline-zoom="out"]');
   ok("se puede alejar hasta el 50%", w.document.querySelector('.timeline-zoom output').textContent === '50%');
   ok("alejar conserva las ocho cartas", w.document.querySelectorAll('.timeline .timeline-card').length === 8);
   click(w, '[data-action="solo-place"][data-index="8"]');
   ok("confirmar en el extremo vuelve a tamaño legible", w.document.querySelector('.timeline-zoom output').textContent === '100%' && w.document.querySelector('.slot-confirm').dataset.index === '8');
   click(w, '[data-action="cancel-place"]');
   click(w, '[data-timeline-zoom="out"]');
-  click(w, '[data-timeline-zoom="reset"]');
+  const zoom = w.document.querySelector('[data-timeline-range]'); zoom.value = '3';
+  zoom.dispatchEvent(new w.Event('input', {bubbles:true}));
   ok("tamaño normal restaura el 100%", w.document.querySelector('.timeline-zoom output').textContent === '100%');
 }
 

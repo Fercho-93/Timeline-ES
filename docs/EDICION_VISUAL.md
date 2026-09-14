@@ -44,3 +44,36 @@ transformaciones de Vite con la caché del service worker.
 Revisión visual: escritorio, móvil de 390 px, tema oscuro y texto al 200 %.
 Las salas con varios dispositivos y las compilaciones nativas requieren sus
 entornos de prueba habituales; este cambio no modifica reglas ni motor de juego.
+
+## Atlas — v153
+
+La entrada de cada mazo integra la portada existente en el papel, con tres muestras
+fijas de sus ilustraciones. Las muestras nunca proceden de una mano repartida ni
+muestran valores. Las manos conservan los reversos actuales, para no introducir
+pistas visuales antes de colocar las cartas.
+
+La barra inferior mantiene Inicio (casa), Enciclopedia, Guía, Perfil y Ajustes en
+la navegación y los paneles. Se retira durante la partida. La cabecera de partida
+solo contiene la flecha de vuelta y el menú de tres puntos. Salir pide confirmación:
+en local guarda; en línea desconecta la vista y regresa a la entrada con el código,
+sin borrar la sala ni pausar los turnos. «Salir de la sala» y «Cerrar sala» siguen
+siendo acciones explícitas de gestión. Atrás conserva el recorrido de preparación.
+
+La mesa presenta la mano en dos columnas en móvil (cuatro en escritorio). Las
+manos de más de cuatro se desplazan; los nombres completos siguen en el DOM y el
+texto ampliado puede extender la página. Solitario y Pulso conservan su carta única.
+La selección se eleva y se marca en terracota. La confirmación se mueve del hueco a
+un único botón debajo de la mano. Zoom de 50 a 120 %, botones circulares y deslizador,
+conservando el anclaje y los valores ocultos del Fantasma.
+
+Las portadas se desplazan suavemente; la imagen se funde al entrar al tablero y el
+revelado hace un giro breve. Movimiento reducido elimina estos efectos. Ajustes
+ofrece sonido de papel/resultados, ambiente tenue y profundidad por orientación,
+independientes y desactivados por defecto. Los sensores solo se escuchan en
+portadas visibles, después del permiso del dispositivo; denegarlo no afecta al
+juego. El sonido se sintetiza localmente y se detiene al ocultar la aplicación.
+
+`tests/interfaz-atlas.mjs` cubre la confirmación única, salida cancelada y confirmada,
+guardado/reanudación, zoom, muestras, navegación online con SDK inerte y denegación
+de sensores. Se mantienen las pruebas del motor y del Fantasma. Las pruebas DOM
+no sustituyen probar sensores, audio y salas reales en iPhone y Android físicos.

@@ -104,7 +104,10 @@
       <section class="settings-section">
         <h2>Efectos opcionales</h2>
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" ${s.haptics === true ? "checked" : ""}></label>
-        <label class="opt-row"><span>Sonidos breves</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
+        <label class="opt-row"><span>Sonidos de papel y resultados</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
+        <label class="opt-row"><span>Ambiente suave</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
+        <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
+        <p class="hint" data-depth-help>La profundidad solo actúa en las portadas y respeta «reducir movimiento».</p>
         <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
       </section>
 
@@ -153,14 +156,24 @@
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
-  CT.effectPrefs = () => ({ sound: settings.sound === true, haptics: settings.haptics === true });
-  document.addEventListener("change", event => {
+  CT.effectPrefs = () => ({ sound: settings.sound === true, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true });
+  document.addEventListener("change", async event => {
     if (event.target.dataset.settingsAction === 'text-size') {
       if (!['100','125','150','200'].includes(event.target.value)) return;
       settings.textSize = event.target.value; save(); applyTheme(); return;
     }
-    if (["sound", "haptics"].includes(event.target.dataset.settingsAction)) {
-      settings[event.target.dataset.settingsAction] = event.target.checked; save(); return;
+    if (["sound", "haptics", "ambience", "depth"].includes(event.target.dataset.settingsAction)) {
+      const key = event.target.dataset.settingsAction;
+      let enabled = event.target.checked;
+      if (key === 'depth' && enabled) {
+        event.target.disabled = true;
+        enabled = await CT.UI.requestDepth();
+        event.target.disabled = false;
+        event.target.checked = enabled;
+        const help = document.querySelector('[data-depth-help]');
+        if (!enabled && help) help.textContent = 'Este dispositivo no ha permitido usar el movimiento. Las portadas siguen funcionando.';
+      }
+      settings[key] = enabled; save(); CT.UI?.updateEffects(); return;
     }
     if (event.target.dataset.settingsAction !== "theme") return;
     if (!THEMES[event.target.value]) return;
