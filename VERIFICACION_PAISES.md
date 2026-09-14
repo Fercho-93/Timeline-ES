@@ -1,15 +1,16 @@
 # Verificación del mazo de superficies
 
-Fecha de revisión: 25 de agosto de 2026.
+Fecha de revisión de datos: 25 de agosto de 2026. Revisión visual de ilustraciones: 14 de
+septiembre de 2026.
 
 ## Resultado
 
-- 59 países revisados uno a uno, con la superficie total en km².
-- 59 identificadores, títulos y valores únicos.
+- 72 países y territorios revisados uno a uno, con la superficie total en km².
+- 72 identificadores, títulos y valores únicos.
 - Rango: de 0,49 km² (Ciudad del Vaticano) a 17.098.246 km² (Rusia). La línea se ordena de menor
   a mayor, igual que la del tiempo avanza de lo antiguo a lo reciente.
-- **Separación mínima entre cartas contiguas: 8%** (Afganistán y Ucrania). El resto está más
-  separado, y la mayoría por encima del 15%.
+- La selección prioriza cartas distinguibles, aunque ya no se exige un margen porcentual mínimo
+  entre valores contiguos.
 
 ## Por qué faltan países muy conocidos
 
@@ -24,8 +25,8 @@ Ausencias que llaman la atención, con su motivo:
 - **Alemania:** a un 5% de Japón.
 - **Francia sí está**, pero obligó a ajustar España, que queda a un 9%.
 - **Suecia y Noruega:** chocaban con Marruecos y Finlandia respectivamente.
-- **Chile, Colombia, Perú, Países Bajos, Dinamarca, Polonia, Austria:** todos a menos de un 8% de
-  alguna carta ya incluida.
+- Otros países se omiten cuando quedan demasiado próximos a una carta ya incluida o aportan poca
+  variedad al mazo.
 
 También se dejaron fuera países pequeños poco conocidos para el público general (Kiribati, Santo
 Tomé y Príncipe, San Cristóbal y Nieves, Islas Marshall…), con el mismo criterio que en el mazo
@@ -43,5 +44,15 @@ de cine: ni rarezas ni cartas imposibles de situar.
 ## Comprobación automática
 
 `node tests/mazos.mjs` verifica en cada cambio que no haya identificadores, títulos ni
-superficies repetidas, que ninguna carta esté a menos de un 8% de otra y que el mazo tenga
-cartas suficientes para nueve jugadores.
+superficies repetidas y que el mazo tenga cartas suficientes para nueve jugadores.
+
+`node tests/referencias-paises.mjs` comprueba que las 72 cartas tienen una lámina WebP única y
+que las 25 asociaciones corregidas en la revisión visual no vuelven a intercambiarse por error.
+
+## Revisión visual de ilustraciones
+
+Se contrastaron las 72 láminas de `assets/country-cards/` con el ID y el título declarados en
+`countries.js`. Se corrigieron 25 archivos que estaban asociados a otro país: India, Argentina,
+Kazajistán, Argelia, Indonesia, Irán, Egipto, Nigeria, Turquía, Chile, Afganistán, Ucrania,
+Francia, Reino Unido, Uganda, Suiza, Bélgica, Israel, Eslovenia, Catar, Líbano, Luxemburgo,
+Mauricio, Panamá y Sri Lanka.
