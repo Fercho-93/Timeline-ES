@@ -7758,14 +7758,14 @@
     },
     {
       "path": "assets/invention-cards/4101-la-primera-imagen-de-un-agujero-negro.webp",
-      "sha256": "02d7ba45e4704c96e3a86df33b141c56949bac1224deb48e0fbaf536254b1aed",
+      "sha256": "166cfdf04c85e0d40e2fad9813ea36c1e1e3817d4d74fd5ff251076223512fce",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
         "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
         "exactPrompt": null,
-        "generatedAt": null,
+        "generatedAt": "2026-09-14",
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
@@ -9830,14 +9830,14 @@
     },
     {
       "path": "assets/music-cards/dark-side-moon.webp",
-      "sha256": "de7a31604d4eca74e2a00f7c1144b8ad0a4cef1414e763060e2c201447554057",
+      "sha256": "2d111fbec5e03446b5057da315495b980b026675c1f8abb0efa37d9e58993628",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
         "declaredBy": "Fercho-93",
         "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
         "exactPrompt": null,
-        "generatedAt": null,
+        "generatedAt": "2026-09-14",
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
