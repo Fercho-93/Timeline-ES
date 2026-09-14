@@ -66,6 +66,10 @@
   let encMode = null;
   let encQuery = "";
   let encBand = "all";
+  // Y el filtro de láminas: todas, solo las desbloqueadas o solo las que faltan. Empieza
+  // en «todas» siempre —la enciclopedia se abre para consultar, no para coleccionar— y
+  // vuelve ahí al cambiar de mazo, como la banda.
+  let encLock = "all";
   let encHighlight = null;
   // A dónde vuelve el botón «Volver» de la enciclopedia: al mazo desde el que se abrió,
   // o al perfil si se llegó desde un punto débil. Sin esto, «Volver» siempre mandaba al
@@ -1094,7 +1098,7 @@
     // Las láminas descubiertas van aquí y no en cada carta: es un recuento del mazo, y
     // además explica de una vez por qué algunas ilustraciones se ven veladas.
     const laminas = CT.Enciclopedia.seenProgress(modeKey);
-    const descubiertas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas descubiertas` : "";
+    const descubiertas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas desbloqueadas` : "";
     return `${count} de ${mode.cards.length} ${escapeHtml(mode.cardLabel)} · ${escapeHtml(CT.axis(modeKey).timelineTitle)}${descubiertas}`;
   }
 
@@ -1106,7 +1110,11 @@
     const all = encMode === "all";
     const mode = all ? {name: "Todas las cartas"} : CT.mode(encMode);
     const bands = all ? [] : CT.Enciclopedia.bands(encMode);
-    const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
+    const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand, lock: encLock });
+    // El filtro de láminas solo aparece donde hay láminas: en un mazo sin ilustraciones no
+    // habría nada que bloquear y las dos opciones saldrían vacías.
+    const conLaminas = !all && CT.Enciclopedia.seenProgress(encMode).total > 0;
+    const chipLock = (key, etiqueta) => `<button type="button" class="band-chip${encLock === key ? " active" : ""}" data-action="enc-lock" data-lock="${key}" aria-pressed="${encLock === key}">${etiqueta}</button>`;
     paint(`<div class="enc-background" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
       <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
       <section class="setup-section enc-section">
@@ -1126,6 +1134,12 @@
             <button type="button" id="enc-band-all" class="band-chip${encBand === "all" ? " active" : ""}" data-action="enc-band" data-band="all" aria-pressed="${encBand === "all"}">Todas</button>
             ${bands.map(band => `<button type="button" id="enc-band-${band.key}" class="band-chip${encBand === band.key ? " active" : ""}" data-action="enc-band" data-band="${band.key}" aria-pressed="${encBand === band.key}"><span aria-hidden="true">${band.symbol}</span> ${escapeHtml(band.name)}</button>`).join("")}
           </div>`}
+          ${conLaminas ? `<div class="field enc-lock-field">
+            <span class="enc-lock-label" id="enc-lock-label">Láminas</span>
+            <div class="enc-bands enc-locks" role="group" aria-labelledby="enc-lock-label">
+              ${chipLock("all", "Todas")}${chipLock("seen", "Desbloqueadas")}${chipLock("locked", "Bloqueadas")}
+            </div>
+          </div>` : ''}
         </div>
         ${all ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
         <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
@@ -1149,6 +1163,11 @@
     encMode = modeKey === "all" || CT.has(modeKey) ? modeKey : selectedModeKey;
     encQuery = "";
     encBand = band;
+    // Cada mazo entra por «todas»: llegar a uno nuevo con el filtro de otro puesto —y con
+    // media colección escondida sin saber por qué— es la manera más rápida de perderse.
+    // Vale también al llegar desde un punto débil del perfil, donde lo que se busca es
+    // una carta concreta y no puede quedarse fuera por estar bloqueada.
+    encLock = "all";
     encHighlight = highlight;
     encReturn = returnTo;
     enciclopediaView();
@@ -2053,7 +2072,7 @@
       // destruiría el campo justo mientras se escribe en él.
       encQuery = event.target.value;
       const all = encMode === "all";
-      const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand });
+      const cards = all ? CT.Enciclopedia.catalogGroups(encQuery).flatMap(group => group.decks.flatMap(deck => deck.cards)) : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand, lock: encLock });
       document.getElementById("enc-results").innerHTML = all ? CT.Enciclopedia.catalogMarkup(encQuery) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight });
       document.getElementById("enc-count").textContent = encCountText(encMode, cards.length);
     }
@@ -2177,6 +2196,7 @@
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
     else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
+    else if (action === "enc-lock") { encLock = ["all", "seen", "locked"].includes(target.dataset.lock) ? target.dataset.lock : "all"; enciclopediaView(); }
     else if (action === "enc-close") CT.closeDialog();
     else if (action === "enc-back") CT.closeDialog();
     else if (action === "perfil") perfilView();

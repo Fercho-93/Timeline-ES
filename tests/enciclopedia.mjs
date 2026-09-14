@@ -264,7 +264,8 @@ console.log("\nLáminas por descubrir");
 
   const velada = ficha(mazo);
   ok("una carta sin jugar llega con el sello cerrado", velada.classList.contains("enc-card-velada") && !!velada.querySelector(".enc-sello"));
-  ok("con su candado y dicho con todas las letras", !!velada.querySelector("svg.enc-candado") && /Bloqueada/.test(velada.textContent) && /Descúbrela/.test(velada.textContent));
+  ok("con su candado y sin rótulo debajo", !!velada.querySelector("svg.enc-candado") && !velada.querySelector(".enc-sello b, .enc-sello small"));
+  ok("y lo que el candado dice sin decirlo, para quien no lo ve", /bloqueada/i.test(velada.querySelector(".enc-sello .solo-lectores")?.textContent || ""));
   // Ni se descarga ni se difumina lo que no se va a ver: es lo que dejaba pesada la
   // enciclopedia al abrir un mazo entero por descubrir.
   ok("y sin la imagen detrás, que no se llega a pedir", !velada.querySelector("img"));
@@ -291,10 +292,61 @@ console.log("\nLáminas por descubrir");
   const sinLamina = Object.keys(CT.MODES).find(key => CT.cards(key).every(c => !CT.animalArt(key, c)));
   if (sinLamina) ok(`un mazo sin láminas no promete ninguna (${sinLamina})`, CT.Enciclopedia.seenProgress(sinLamina).total === 0);
 
+  // El filtro de láminas, sobre el filtrado puro: dos jugadas y el mazo se parte en dos.
+  const jugadas = CT.cards(mazo).slice(0, 3);
+  jugadas.forEach(c => CT.Progreso.record({ mode: mazo, cardId: c.id, correct: true }));
+  const todas = CT.Enciclopedia.filterCards(mazo, {});
+  const abiertas = CT.Enciclopedia.filterCards(mazo, { lock: "seen" });
+  const cerradas = CT.Enciclopedia.filterCards(mazo, { lock: "locked" });
+  ok(`«todas» sigue trayendo el mazo entero (${todas.length})`, todas.length === CT.cards(mazo).length);
+  ok(`«desbloqueadas» trae solo las jugadas (${abiertas.length})`, abiertas.length === 3 && abiertas.every(c => CT.Progreso.seenCards().has(c.id)));
+  ok("«bloqueadas» trae justo las demás", cerradas.length === todas.length - abiertas.length && cerradas.every(c => !CT.Progreso.seenCards().has(c.id)));
+  ok("y los dos filtros se combinan con la búsqueda", CT.Enciclopedia.filterCards(mazo, { lock: "locked", query: jugadas[0].title }).length === 0);
+  // Una carta sin lámina no está ni bloqueada ni desbloqueada: solo sale en «todas».
+  const sinLaminas = Object.keys(CT.MODES).find(key => CT.cards(key).every(c => !CT.cardArt(key, c)));
+  if (sinLaminas) {
+    ok(`un mazo sin láminas no reparte nada por candado (${sinLaminas})`,
+      CT.Enciclopedia.filterCards(sinLaminas, { lock: "seen" }).length === 0 &&
+      CT.Enciclopedia.filterCards(sinLaminas, { lock: "locked" }).length === 0 &&
+      CT.Enciclopedia.filterCards(sinLaminas, {}).length === CT.cards(sinLaminas).length);
+  }
+
   // Y lo guardado aguanta una copia ajena: identificadores inventados o de otro tipo.
   CT.Storage.setItem(CT.Progreso.KEY, JSON.stringify({ ...CT.Progreso.read(), seen: [carta.id, 99999999, "x", null] }));
   const limpio = CT.Progreso.seenCards();
   ok("una lista de descubiertas con basura se queda solo con las cartas reales", limpio.has(carta.id) && limpio.size === 1);
+  w.close();
+}
+
+// El filtro en la pantalla: llega en «todas», reparte al pulsarlo y no se queda pegado al
+// cambiar de mazo, que es como se acaba mirando media colección sin saber por qué falta.
+console.log("\nFiltro de láminas en la pantalla");
+{
+  const w = boot();
+  const doc = w.document;
+  const CT = w.CONTINUUM;
+  const chips = () => [...doc.querySelectorAll('[data-action="enc-lock"]')];
+  const activo = () => chips().find(chip => chip.classList.contains("active"))?.dataset.lock;
+  const cartas = () => doc.querySelectorAll("[data-enc-card]").length;
+
+  CT.Progreso.record({ mode: "animals", cardId: CT.cards("animals")[0].id, correct: true });
+  click(w, '[data-action="home-encyclopedia"]');
+  elegir(w, '#enc-mode-select', 'animals');
+  ok("el mazo llega con las tres opciones y «todas» puesta", chips().length === 3 && activo() === "all");
+  ok("y con el mazo entero a la vista", cartas() === CT.cards("animals").length);
+  ok("cada opción se anuncia como lo que es", chips().every(chip => chip.getAttribute("aria-pressed") === String(chip.dataset.lock === activo())));
+
+  click(w, '[data-action="enc-lock"][data-lock="locked"]');
+  ok("«bloqueadas» deja fuera la que ya se jugó", activo() === "locked" && cartas() === CT.cards("animals").length - 1);
+  ok("y todas las que quedan traen su candado", cartas() === doc.querySelectorAll(".enc-card-velada").length);
+  click(w, '[data-action="enc-lock"][data-lock="seen"]');
+  ok("«desbloqueadas» deja justo la contraria", activo() === "seen" && cartas() === 1 && !doc.querySelector(".enc-card-velada"));
+
+  // Cambiar de mazo vuelve a «todas», también en uno sin láminas, donde no hay filtro.
+  elegir(w, '#enc-mode-select', 'history');
+  ok("al cambiar de mazo el filtro vuelve a «todas»", activo() === "all");
+  elegir(w, '#enc-mode-select', 'languages');
+  ok("un mazo sin láminas no enseña el filtro", chips().length === 0 && cartas() === CT.cards("languages").length);
   w.close();
 }
 
