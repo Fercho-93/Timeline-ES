@@ -4,7 +4,7 @@
   async function start() {
     if (starting) return;
     starting = true;
-    app.innerHTML = '<section class="account-shell"><h1>Continuum</h1><p role="status">Conectando con tu cuenta…</p></section>';
+    app.innerHTML = '<section class="account-shell"><h1>Continuum</h1><p role="status">Preparando tu invitado…</p></section>';
     try {
       const { startAccounts } = await import('./accounts.js');
       await startAccounts(() => {
@@ -16,7 +16,7 @@
     } catch { starting = false; failed(); }
   }
   function failed() {
-    app.innerHTML = '<section class="account-shell"><h1>Continuum</h1><p role="alert">No se ha podido conectar. Necesitas internet para abrir tu cuenta.</p><button class="btn btn-primary" id="account-retry">Reintentar</button></section>';
+    app.innerHTML = '<section class="account-shell"><h1>Continuum</h1><p role="alert">No se ha podido conectar. Necesitas internet para preparar tu invitado.</p><button class="btn btn-primary" id="account-retry">Reintentar</button></section>';
     document.getElementById('account-retry').onclick = start;
   }
   start();

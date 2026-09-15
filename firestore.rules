@@ -6,11 +6,9 @@ rules_version = '2';
 // hay forma de verificarla, porque las fechas viven en cards.js / movies.js.
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Temporada de lanzamiento: cuentas verificadas y datos nuevos por UID.
+    // Temporada de lanzamiento: invitados automáticos y datos nuevos por UID.
     function registered() {
-      return request.auth != null
-        && request.auth.token.email_verified == true
-        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+      return request.auth != null;
     }
     function owner(uid) { return registered() && request.auth.uid == uid; }
     match /playerProfiles/{uid} {
@@ -24,7 +22,10 @@ service cloud.firestore {
         && request.resource.data.season == 'launch-1'
         && request.resource.data.privacyVersion == 1
         && request.resource.data.createdAt == request.time;
-      allow update: if false;
+      allow update: if owner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['alias'])
+        && request.resource.data.alias is string
+        && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24;
       allow delete: if owner(uid);
     }
     match /playerProgress/{uid} {
@@ -48,7 +49,7 @@ service cloud.firestore {
     match /socialRanking/{uid} {
       function valid() {
         let d = request.resource.data;
-        let p = get(/databases/$(database)/documents/playerProfiles/$(uid)).data;
+        let p = getAfter(/databases/$(database)/documents/playerProfiles/$(uid)).data;
         let s = getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data;
         return d.keys().hasOnly(['alias','avatar','hits','games','season','updatedAt'])
           && d.alias == p.alias && d.avatar == p.avatar && d.season == 'launch-1'

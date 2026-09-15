@@ -2,7 +2,7 @@
   "name": "continuum",
   "version": "1.0.0",
   "private": true,
-  "description": "CONTINUUM: juego instalable de historia, entretenimiento, ciencia y geograf\u00eda, con modo local y multijugador.",
+  "description": "CONTINUUM: juego instalable de historia, entretenimiento, ciencia y geografía, con modo local y multijugador.",
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
@@ -28,7 +28,6 @@
     "vite": "^8.2.2"
   },
   "dependencies": {
-    "@capacitor-firebase/authentication": "^8.5.1",
     "@capacitor/android": "^8.5.1",
     "@capacitor/app": "^8.1.1",
     "@capacitor/core": "^8.5.1",

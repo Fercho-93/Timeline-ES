@@ -364,7 +364,7 @@ async function ensureProtection() {
 async function ensureAuth() {
   await ensureProtection();
   const current = auth.currentUser;
-  if (!current || current.isAnonymous || !current.emailVerified || !CT.Accounts?.ready) throw Error('Inicia sesión con tu cuenta para jugar.');
+  if (!current || !CT.Accounts?.ready) throw Error('Espera a que se prepare tu invitado para jugar.');
   user = current;
   return user;
 }

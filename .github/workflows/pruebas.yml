@@ -44,10 +44,7 @@ jobs:
       - name: Compilar Android
         working-directory: android
         run: bash gradlew assembleDebug
-      # Sin configuración Firebase real, el APK solo acredita compilación.
-      # No distribuir un binario cuyo inicio nativo no puede inicializar Firebase.
       - uses: actions/upload-artifact@v4
-        if: hashFiles('android/app/google-services.json') != ''
         with:
           name: Continuum-Android-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
