@@ -46,7 +46,8 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
   try {
     // Real online rendering with an inert SDK: no server calls are made by UI navigation.
     w.eval(`(() => {
-      const initializeApp=()=>({}),getAuth=()=>({}),getFirestore=()=>({});
+      // Lo que online.js recibe de nube.js, inerte: esta prueba solo pinta.
+      const db={},abrirSesion=async()=>({uid:'fer'});
       ${read('online.js').replace(/^import .*;$/gm,'').replace('export async function','async function')}
       const ids=CT.cards('animals').map(c=>c.id);
       user={uid:'fer'};selectedModeKey='animals';roomCode='ABCD2345';roomRef={};

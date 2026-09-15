@@ -127,8 +127,11 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
 
 ## Privacidad y límites
 
-- No se solicitan correos, teléfonos ni contraseñas.
+- Para jugar una sala no se solicitan correos, teléfonos ni contraseñas.
 - Las cuentas anónimas las administra Firebase.
+- Registrarse es voluntario y solo hace falta para la clasificación del reto diario; ver
+  `docs/RANKING_Y_CUENTAS.md`. Una cuenta creada desde una sesión anónima conserva su
+  mismo identificador, así que no cambia nada de lo anterior.
 - Las salas utilizan códigos aleatorios de ocho caracteres.
 - Los códigos QR se generan dentro del propio dispositivo y no envían la invitación a servicios externos.
 - La interfaz solo enseña a cada participante su propia mano.

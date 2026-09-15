@@ -1,19 +1,8 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+// La aplicación de Firebase, la sesión y la base de datos viven en `nube.js`: las
+// comparten este módulo, el de cuentas y el del ranking, y solo puede haber una.
+import { db, ensureAuth as abrirSesion } from "./nube.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAT-ELQvHrBdMaCdxJNUJzDRwq1jOOwI44",
-  authDomain: "timeline-es.firebaseapp.com",
-  projectId: "timeline-es",
-  storageBucket: "timeline-es.firebasestorage.app",
-  messagingSenderId: "572227626442",
-  appId: "1:572227626442:web:f7c1ad0d66de6f02d79b33"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-const db = getFirestore(firebaseApp);
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
 // Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
@@ -362,38 +351,12 @@ function rememberedRoom(code) {
   catch { return null; }
 }
 
-let protectionReady;
-async function ensureProtection() {
-  const config = CT.Deployment;
-  if (!config?.appCheckSiteKey || window.Capacitor?.isNativePlatform?.()) {
-    if (config?.audience === 'public') throw Error('Falta configurar la protección de las salas para esta plataforma.');
-    return;
-  }
-  protectionReady ||= import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js').then(({initializeAppCheck,ReCaptchaEnterpriseProvider}) => {
-    initializeAppCheck(firebaseApp,{provider:new ReCaptchaEnterpriseProvider(config.appCheckSiteKey),isTokenAutoRefreshEnabled:true});
-  }).catch(error => { protectionReady=null; throw error; });
-  await protectionReady;
-}
+// La sala solo necesita saber quién es quien juega. Abrir la sesión —anónima si no hay
+// cuenta— y activar App Check es cosa de `nube.js`; aquí se guarda el resultado en
+// `user`, que es lo que leen las tres docenas de sitios que escriben en la sala.
 async function ensureAuth() {
-  await ensureProtection();
-  if (auth.currentUser) {
-    user = auth.currentUser;
-    return user;
-  }
-  return new Promise((resolve, reject) => {
-    let signingIn = false;
-    const stop = onAuthStateChanged(auth, async current => {
-      if (current) {
-        user = current;
-        stop();
-        resolve(current);
-      } else if (!signingIn) {
-        signingIn = true;
-        try { await signInAnonymously(auth); }
-        catch (error) { stop(); reject(error); }
-      }
-    }, reject);
-  });
+  user = await abrirSesion();
+  return user;
 }
 
 export async function openOnlineMode(options = {}) {

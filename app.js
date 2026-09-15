@@ -1005,6 +1005,11 @@
   }
 
   app.addEventListener('submit', event => {
+    if (event.target.matches('[data-cuenta-form]')) {
+      event.preventDefault();
+      cuentaEnvia(event.target);
+      return;
+    }
     if (!event.target.matches('[data-final-local]')) return;
     event.preventDefault();
     const final = game.final;
@@ -1278,9 +1283,34 @@
     </div>`;
   }
 
+  // El bloque de la cuenta en el perfil. Se pinta con lo último que se sabe de la sesión
+  // —normalmente nada, la primera vez— y `perfilView` lo repinta cuando Firebase
+  // responde. Sin eso, entrar en el perfil obligaría a esperar a la red para ver las
+  // estadísticas, que son de este móvil y no la necesitan para nada.
+  function perfilCuenta(sesion) {
+    if (sesion?.registrada) {
+      return `<div class="panel perfil-panel">
+        <div class="cuenta-identidad">
+          <span class="cuenta-avatar" aria-hidden="true">${escapeHtml(initials(sesion.nick || "?"))}</span>
+          <div><strong>${escapeHtml(sesion.nick || "Sin nombre")}</strong><small>Tu perfil está asociado a tu cuenta</small></div>
+        </div>
+        <div class="actions" style="display:grid">
+          <button class="btn btn-secondary" data-action="ranking">Ver la clasificación</button>
+          <button class="btn btn-ghost" data-action="cuenta">Gestionar la cuenta</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="panel perfil-panel">
+      <h3>Tu cuenta</h3>
+      <p class="hint">Ahora mismo este perfil vive solo en este móvil. Con una cuenta pasa a ser tuyo: puedes recuperarlo en otro aparato y tu nombre aparece en la clasificación del reto diario.</p>
+      <button class="btn btn-primary btn-block" data-action="cuenta">Crear una cuenta o entrar</button>
+    </div>`;
+  }
+
   // Todo esto vive en un solo móvil: borrar los datos del navegador, cambiar de teléfono
   // o jugar en una ventana privada se lo lleva sin aviso. La copia no es un extra, es lo
-  // que hace razonable pedirle a alguien treinta días seguidos por un logro.
+  // que hace razonable pedirle a alguien treinta días seguidos por un logro. Con cuenta
+  // hay además una copia en la nube, que se maneja desde la pantalla de la cuenta.
   function perfilCopia() {
     return `<div class="section-label">Copia de seguridad</div>
       <div class="panel">
@@ -1310,6 +1340,7 @@
         ${estrenado
           ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
           : `<p class="lead">Aquí se irá guardando lo que juegues: aciertos, mazos, puntos débiles y logros. Todavía no hay nada que contar.</p>`}
+        ${perfilCuenta(sesionConocida)}
         ${perfilResumen(resumen)}
         ${perfilPorJuego(filas)}
         ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
@@ -1318,6 +1349,14 @@
       </section>
       ${homeNav()}
     </div>`);
+    // Con cuenta guardada se comprueba de fondo que sigue abierta —una contraseña
+    // cambiada en otro móvil la cierra— y se repinta solo si ha cambiado algo. Sin
+    // cuenta guardada no se pregunta nada: no hay nada que Firebase pueda añadir.
+    if (!sesionConocida?.registrada) return;
+    const previa = sesionConocida;
+    sesionActual().then(sesion => {
+      if (screen === "perfil" && sesion?.uid !== previa.uid) perfilView();
+    });
   }
 
   async function perfilExport() {
@@ -1357,7 +1396,327 @@
     </div></div>`, true);
   }
 
+  // ---------------------------------------------------------------------------
+  // La cuenta y la clasificación
+  //
+  // Los dos módulos que hablan con Firebase —`cuenta.js` y `ranking.js`— se descargan
+  // cuando se piden y no antes, igual que `online.js`: el juego entero funciona sin
+  // conexión y nadie debería pagar la descarga de Firebase por jugar en solitario.
+  //
+  // Todo lo de aquí está construido para fallar sin ruido. Si no hay red, si no hay
+  // cuenta o si Firebase no responde, el reto diario ya está guardado en este móvil y
+  // la racha ya está contada: la clasificación es un añadido, no un requisito.
+  // ---------------------------------------------------------------------------
+
+  let moduloCuenta = null, moduloRanking = null;
+  // El texto del perfil que se acaba de bajar de la nube, mientras se confirma si
+  // sustituye al de este móvil. Ver `perfilBajar`.
+  let perfilDeLaNube = "";
+  const cargaCuenta = () => (moduloCuenta ||= import("./cuenta.js"));
+  const cargaRanking = () => (moduloRanking ||= import("./ranking.js"));
+
+  // Quién eres, guardado en este móvil. No sustituye a Firebase —la sesión de verdad la
+  // lleva él—, sirve para no tener que preguntárselo: sin esta nota, abrir el perfil
+  // descargaría Firebase entero desde la CDN para acabar enseñando «no tienes cuenta»,
+  // y se lo descargaría también quien nunca se haya registrado y esté jugando sin red.
+  const CUENTA_KEY = "continuum-cuenta-v1";
+  let sesionConocida = leeSesionGuardada();
+
+  function leeSesionGuardada() {
+    try {
+      const guardada = JSON.parse(CT.Storage.getItem(CUENTA_KEY));
+      return guardada && typeof guardada === "object" && typeof guardada.uid === "string" ? guardada : null;
+    } catch { return null; }
+  }
+
+  function recuerdaSesion(sesion) {
+    sesionConocida = sesion;
+    try {
+      if (sesion?.registrada) CT.Storage.setItem(CUENTA_KEY, JSON.stringify(sesion));
+      else CT.Storage.removeItem(CUENTA_KEY);
+    } catch { /* almacenamiento lleno: solo se pierde el atajo */ }
+    return sesion;
+  }
+
+  async function sesionActual() {
+    try {
+      const { sesion } = await cargaCuenta();
+      return recuerdaSesion(sesion());
+    } catch { return sesionConocida; }
+  }
+
+  function tiempoBreve(ms) {
+    if (!ms) return "";
+    const segundos = Math.round(ms / 1000);
+    return segundos < 60 ? `${segundos} s` : `${Math.floor(segundos / 60)} min ${String(segundos % 60).padStart(2, "0")} s`;
+  }
+
+  async function enviarRetoAlRanking(datos) {
+    const aviso = texto => {
+      const caja = document.getElementById("ranking-aviso");
+      if (caja) caja.innerHTML = texto;
+    };
+    // Sin cuenta no hay nada que enviar, y comprobarlo con Firebase costaría descargarlo
+    // entero para llegar a la misma conclusión. La nota local basta.
+    if (!sesionConocida?.registrada) {
+      return aviso('<p class="hint">Tu resultado se ha guardado en este móvil. <button class="btn btn-ghost btn-inline" data-action="cuenta">Crea una cuenta</button> para aparecer en la clasificación.</p>');
+    }
+    try {
+      const [{ sesion }, ranking] = await Promise.all([cargaCuenta(), cargaRanking()]);
+      recuerdaSesion(sesion());
+      if (!sesionConocida.registrada || !sesionConocida.nick) {
+        return aviso('<p class="hint">Tu resultado se ha guardado en este móvil. <button class="btn btn-ghost btn-inline" data-action="cuenta">Crea una cuenta</button> para aparecer en la clasificación.</p>');
+      }
+      aviso('<p class="hint">Enviando tu resultado…</p>');
+      const { enviada, motivo } = await ranking.enviarReto({ ...datos, huella: CT.deckFingerprint(datos.mazo) });
+      if (!enviada) {
+        return aviso(`<p class="hint">${motivo === "ya-enviada" ? "El reto de hoy ya estaba enviado." : "No se ha podido enviar el resultado."}</p>`);
+      }
+      const [puesto, cuantos] = await Promise.all([
+        ranking.puesto({ dia: datos.dia, mazo: datos.mazo, aciertos: datos.aciertos }),
+        ranking.participantes({ dia: datos.dia, mazo: datos.mazo })
+      ]);
+      aviso(`<p class="ranking-puesto">Vas <strong>${puesto}.º</strong> de ${cuantos} en ${escapeHtml(CT.mode(datos.mazo).name)}.</p>`);
+    } catch (error) {
+      console.error(error);
+      // Sin red no hay clasificación, y ya está. El reto está guardado.
+      aviso('<p class="hint">Tu resultado se ha guardado en este móvil. La clasificación necesita conexión.</p>');
+    }
+  }
+
+  // --- La pantalla de la cuenta ---------------------------------------------
+
+  let cuentaModo = "registro"; // o "entrar"
+
+  function cuentaVista(sesion, mensaje = "") {
+    screen = "cuenta";
+    const cuerpo = sesion?.registrada ? cuentaConSesion(sesion) : cuentaSinSesion();
+    // La flecha de la cabecera es la de siempre: `paint` guarda cada pantalla en el
+    // rastro de navegación y `backMenu` la devuelve tal cual estaba. No hace falta que
+    // esta pantalla recuerde de dónde se ha llegado.
+    paint(`<div class="shell">${header()}
+      <section class="setup-section perfil-section">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Tu cuenta</div>
+        <h1 data-focus tabindex="-1">Cuenta</h1>
+        ${mensaje ? `<p class="cuenta-mensaje" role="status">${escapeHtml(mensaje)}</p>` : ""}
+        ${cuerpo}
+      </section>
+    </div>`);
+  }
+
+  function cuentaSinSesion() {
+    const registro = cuentaModo === "registro";
+    return `<div class="panel cuenta-panel">
+      <p class="lead">Con una cuenta tu nombre aparece en la clasificación del reto diario y tu perfil deja de depender de este móvil.</p>
+      <div class="cuenta-pestanas" role="tablist">
+        <button role="tab" aria-selected="${registro}" data-action="cuenta-modo" data-modo="registro">Crear cuenta</button>
+        <button role="tab" aria-selected="${!registro}" data-action="cuenta-modo" data-modo="entrar">Ya tengo una</button>
+      </div>
+      <form data-cuenta-form="${registro ? "registro" : "entrar"}">
+        ${registro ? `<div class="field"><label for="cuenta-nick">Nombre en la clasificación</label><input id="cuenta-nick" name="nick" maxlength="18" required autocomplete="nickname" placeholder="Ej. Lucía"><small class="hint">Lo verá cualquiera que mire la tabla. No hace falta que sea tu nombre real.</small></div>` : ""}
+        <div class="field"><label for="cuenta-correo">Correo</label><input id="cuenta-correo" name="correo" type="email" required autocomplete="email" inputmode="email"></div>
+        <div class="field"><label for="cuenta-clave">Contraseña</label><input id="cuenta-clave" name="clave" type="password" required minlength="8" autocomplete="${registro ? "new-password" : "current-password"}"></div>
+        <button class="btn btn-primary btn-block" type="submit">${registro ? "Crear la cuenta" : "Entrar"}</button>
+      </form>
+      ${registro
+        ? '<p class="hint">Al crear la cuenta conservas todo lo jugado en este móvil: la sesión que ya tenías se convierte en tu cuenta, no se estrena otra.</p>'
+        : '<button class="btn btn-ghost btn-block" data-action="cuenta-recuperar">He olvidado la contraseña</button><p class="hint">Cuidado: entrar con otra cuenta en este móvil sustituye la sesión actual. El perfil guardado aquí no se borra, pero deja de estar asociado a lo que juegues a partir de ahora.</p>'}
+    </div>`;
+  }
+
+  function cuentaConSesion(sesion) {
+    return `<div class="panel cuenta-panel">
+      <div class="cuenta-identidad">
+        <span class="cuenta-avatar" aria-hidden="true">${escapeHtml(initials(sesion.nick || "?"))}</span>
+        <div><strong>${escapeHtml(sesion.nick || "Sin nombre")}</strong><small>${escapeHtml(sesion.correo)}</small></div>
+      </div>
+      ${sesion.verificado ? "" : '<p class="hint">Tu correo está sin verificar. <button class="btn btn-ghost btn-inline" data-action="cuenta-verificar">Reenviar el mensaje</button></p>'}
+      <form data-cuenta-form="nick">
+        <div class="field"><label for="cuenta-nick">Nombre en la clasificación</label><input id="cuenta-nick" name="nick" maxlength="18" required value="${escapeHtml(sesion.nick || "")}"></div>
+        <button class="btn btn-secondary btn-block" type="submit">Cambiar el nombre</button>
+      </form>
+    </div>
+    <div class="panel cuenta-panel">
+      <h3>El perfil en la nube</h3>
+      <p class="hint">Una copia de tus estadísticas y logros, para recuperarlos en otro móvil. Manda siempre lo que hay en este aparato: súbelo cuando termines de jugar aquí y bájalo al estrenar otro.</p>
+      <div class="actions" style="display:grid">
+        <button class="btn btn-secondary" data-action="perfil-subir">Guardar mi perfil en la nube</button>
+        <button class="btn btn-secondary" data-action="perfil-bajar">Traer el perfil de la nube</button>
+      </div>
+    </div>
+    <div class="panel cuenta-panel">
+      <button class="btn btn-ghost btn-block" data-action="cuenta-salir">Cerrar sesión</button>
+    </div>`;
+  }
+
+  async function abreCuenta() {
+    cuentaVista(sesionConocida);
+    cuentaVista(await sesionActual());
+  }
+
+  async function cuentaEnvia(formulario) {
+    const tipo = formulario.dataset.cuentaForm;
+    const valor = nombre => formulario.querySelector(`[name="${nombre}"]`)?.value || "";
+    try {
+      const cuenta = await cargaCuenta();
+      if (tipo === "nick") {
+        const nick = await cuenta.cambiarNick(valor("nick"));
+        cuentaVista(await sesionActual(), `Ahora te llamas ${nick} en la clasificación.`);
+      } else if (tipo === "registro") {
+        await cuenta.registrar({ correo: valor("correo"), clave: valor("clave"), nick: valor("nick") });
+        cuentaVista(await sesionActual(), "Cuenta creada. Te hemos mandado un correo para verificarla.");
+      } else {
+        await cuenta.entrar({ correo: valor("correo"), clave: valor("clave") });
+        cuentaVista(await sesionActual(), "Ya has entrado.");
+      }
+    } catch (error) {
+      cuentaVista(sesionConocida, error.message);
+    }
+  }
+
+  // Cerrar sesión no toca el perfil de este móvil: lo que hay en `localStorage` sigue
+  // donde estaba. Lo único que se pierde es la asociación con la cuenta, y por eso se
+  // recuerda que la copia de la nube sigue ahí para quien vuelva a entrar.
+  function cuentaSalir() {
+    overlay(`<div class="overlay"><div class="modal">
+      <div class="eyebrow">Cerrar sesión</div>
+      <h2>¿Salir de tu cuenta?</h2>
+      <p class="lead" style="margin-inline:auto">El progreso guardado en este móvil no se borra, pero dejarás de aparecer en la clasificación hasta que vuelvas a entrar.</p>
+      <div class="actions" style="display:grid">
+        <button class="btn btn-ghost" data-action="cuenta-salir-confirmar">Sí, cerrar sesión</button>
+        <button class="btn btn-primary" data-action="close-menu">Mejor no</button>
+      </div>
+    </div></div>`, true);
+  }
+
+  async function cuentaSalirConfirmar() {
+    CT.closeDialog();
+    try {
+      const cuenta = await cargaCuenta();
+      await cuenta.salir();
+      recuerdaSesion(null);
+      cuentaVista(await sesionActual(), "Has cerrado la sesión.");
+    } catch (error) { showToast(error.message); }
+  }
+
+  async function cuentaVerificar() {
+    try {
+      const cuenta = await cargaCuenta();
+      await cuenta.reenviarVerificacion();
+      showToast("Mensaje de verificación enviado");
+    } catch (error) { showToast(error.message); }
+  }
+
+  async function cuentaRecuperar() {
+    const correo = document.querySelector('[name="correo"]')?.value || "";
+    if (!correo) return showToast("Escribe antes tu correo");
+    try {
+      const cuenta = await cargaCuenta();
+      await cuenta.recuperarClave(correo);
+      cuentaVista(sesionConocida, "Te hemos mandado un correo para cambiar la contraseña.");
+    } catch (error) { showToast(error.message); }
+  }
+
+  async function perfilSubir() {
+    try {
+      const cuenta = await cargaCuenta();
+      await cuenta.subirPerfil(CT.Progreso.exportJson());
+      showToast("Perfil guardado en la nube");
+    } catch (error) { showToast(error.message); }
+  }
+
+  // Bajar el perfil sustituye el de este móvil, así que se pregunta antes: es la misma
+  // cautela que «Empezar de cero», y por el mismo motivo —no se puede deshacer.
+  async function perfilBajar() {
+    try {
+      const cuenta = await cargaCuenta();
+      const copia = await cuenta.bajarPerfil();
+      if (!copia) return showToast("No hay ningún perfil guardado en la nube");
+      const fecha = copia.guardadoEn ? copia.guardadoEn.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }) : "fecha desconocida";
+      overlay(`<div class="overlay"><div class="modal">
+        <div class="eyebrow">Traer el perfil</div>
+        <h2>¿Sustituir el perfil de este móvil?</h2>
+        <p class="lead" style="margin-inline:auto">La copia de la nube es del ${escapeHtml(fecha)}. Lo que haya en este aparato se pierde y no se puede deshacer.</p>
+        <div class="actions" style="display:grid">
+          <button class="btn btn-ghost" data-action="perfil-bajar-confirmar">Sí, traerlo</button>
+          <button class="btn btn-primary" data-action="close-menu">Mejor no</button>
+        </div>
+      </div></div>`, true);
+      perfilDeLaNube = copia.json;
+    } catch (error) { showToast(error.message); }
+  }
+
+  function perfilBajarConfirmar() {
+    const resultado = CT.Progreso.importJson(perfilDeLaNube);
+    CT.closeDialog();
+    perfilDeLaNube = "";
+    // `importJson` devuelve `{ok, error}`, no un booleano: un objeto siempre es cierto y
+    // dar por buena una copia ilegible dejaría el perfil como estaba diciendo lo contrario.
+    if (!resultado.ok) return showToast(resultado.error);
+    showToast("Perfil recuperado");
+    perfilView();
+  }
+
+  // --- La pantalla de la clasificación --------------------------------------
+
+  let rankingMazo = null, rankingDia = null;
+
+  function rankingVista(estado) {
+    screen = "ranking";
+    const mazo = rankingMazo || selectedModeKey;
+    paint(`<div class="shell">${header()}
+      <section class="setup-section ranking-section">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Reto diario · ${escapeHtml(CT.mode(mazo).name)}</div>
+        <h1 data-focus tabindex="-1">Clasificación</h1>
+        <p class="lead">Las mismas ${DAILY_CARDS} cartas para todo el mundo. Gana quien más coloca bien; a igualdad de aciertos, quien tarda menos.</p>
+        ${estado.cargando ? '<p class="hint" role="status">Cargando la clasificación…</p>' : ""}
+        ${estado.error ? `<div class="panel"><p>${escapeHtml(estado.error)}</p></div>` : ""}
+        ${estado.tabla ? rankingPanel(`Hoy · ${rankingDia.split("-").reverse().join("/")}`, estado.tabla, estado.uid, "aciertos") : ""}
+        ${estado.semanal ? rankingPanel("Esta semana", estado.semanal, estado.uid, "puntos") : ""}
+        ${estado.sinVerificar ? '<p class="hint">Los resultados marcados «sin verificar» son los que el servidor todavía no ha repasado. Se repasan solos al poco de enviarse.</p>' : ""}
+        ${estado.sinCuenta ? '<div class="panel"><p>Juegas sin cuenta, así que no apareces en la tabla.</p><button class="btn btn-primary btn-block" data-action="cuenta">Crear una cuenta</button></div>' : ""}
+      </section>
+    </div>`);
+  }
+
+  function rankingPanel(titulo, filas, uid, columna) {
+    if (!filas.length) {
+      return `<div class="panel ranking-panel"><h3>${escapeHtml(titulo)}</h3><p class="hint">Todavía no hay nadie. Sé la primera persona en jugarlo.</p></div>`;
+    }
+    return `<div class="panel ranking-panel"><h3>${escapeHtml(titulo)}</h3>
+      <ol class="ranking-tabla">${filas.map(fila => `<li class="${fila.uid === uid ? "ranking-yo" : ""}">
+        <span class="ranking-puesto-num">${fila.puesto}</span>
+        <span class="ranking-nombre">${escapeHtml(fila.nick || "Sin nombre")}${fila.verificada === false ? ' <small class="ranking-marca">sin verificar</small>' : ""}</span>
+        <span class="ranking-cifra">${columna === "puntos" ? `${fila.puntos} pts` : `${fila.aciertos}/${fila.total}`}</span>
+        <span class="ranking-tiempo">${columna === "puntos" ? `${fila.dias} ${fila.dias === 1 ? "día" : "días"}` : escapeHtml(tiempoBreve(fila.ms))}</span>
+      </li>`).join("")}</ol>
+    </div>`;
+  }
+
+  async function abreRanking(mazo = selectedModeKey) {
+    rankingMazo = CT.has(mazo) ? mazo : CT.DEFAULT_MODE;
+    rankingDia = today();
+    rankingVista({ cargando: true });
+    try {
+      const [ranking, sesion] = await Promise.all([cargaRanking(), sesionActual()]);
+      const [tabla, semanal] = await Promise.all([
+        ranking.tabla({ dia: rankingDia, mazo: rankingMazo }),
+        ranking.tablaSemanal({ semana: ranking.semanaDe(rankingDia) })
+      ]);
+      rankingVista({
+        tabla, semanal, uid: sesion?.uid || "",
+        sinCuenta: !sesion?.registrada,
+        sinVerificar: tabla.some(fila => fila.verificada !== true)
+      });
+    } catch (error) {
+      console.error(error);
+      rankingVista({ error: "No se ha podido cargar la clasificación. Necesita conexión a internet." });
+    }
+  }
+
   const DAILY_CARDS = 15;
+  // Lo más que cuenta una sola carta en el cronómetro del reto. Ver `soloPlace`.
+  const MAX_MS_POR_CARTA = 60000;
   const SOLO_LIVES = 3;
   const RECORDS_KEY = "hilo-retos-v1";
   let solo = null;
@@ -1469,6 +1828,7 @@
             ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
             : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
           <div class="solo-stats"><span><b>${records.streak || 0}</b><small>días seguidos</small></span><span><b>${records.best || 0}</b><small>mejor marca · Fácil</small></span></div>
+          <button class="btn btn-ghost btn-block" data-action="ranking">Ver la clasificación de hoy</button>
           ${calendarHtml(records)}
         </div>
         <div class="panel solo-panel">
@@ -1548,6 +1908,12 @@
       mode: selectedModeKey, day: today(), deck: barajado, timeline,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : null,
+      // El hueco elegido para cada carta y la carta que tocaba, en orden. `sequence` ya
+      // guardaba si cada jugada fue acierto o fallo, pero eso no se puede comprobar
+      // desde fuera: una lista de quince aciertos se escribe sola. Esto sí —el mazo del
+      // día sale de la fecha, así que el ranking puede repartirlo otra vez y repetir la
+      // partida. Ver `ranking.js` y `functions/juego.mjs`.
+      jugadas: [], cartas: [], ultimaMs: Date.now(), ms: 0,
       duelo, finished: false
     };
     pendingIndex = null;
@@ -1629,6 +1995,14 @@
     // Un acierto o un fallo por carta, en el orden en que se jugaron: es lo único que
     // hace falta para dibujar la cuadrícula de aciertos al compartir el reto diario.
     (solo.sequence = solo.sequence || []).push(correct);
+    // Y la jugada en crudo, que es lo que permite repetir la partida fuera del móvil.
+    (solo.jugadas = solo.jugadas || []).push(index);
+    (solo.cartas = solo.cartas || []).push(card.id);
+    // El tiempo se suma jugada a jugada, no de principio a fin, y cada tramo se topa en
+    // un minuto. Quien deja el reto a medias y lo retoma por la tarde no debe aparecer
+    // con seis horas en la tabla, que es lo que daría mirar el reloj de pared.
+    solo.ms = (solo.ms || 0) + Math.min(MAX_MS_POR_CARTA, Math.max(0, Date.now() - (solo.ultimaMs || Date.now())));
+    solo.ultimaMs = Date.now();
     pendingIndex = null;
     result = { correct, card, solo: true };
     CT.Effects.feedback(correct);
@@ -1695,6 +2069,12 @@
       const dias = Object.keys(records.days).sort().slice(-60);
       records.days = Object.fromEntries(dias.map(clave => [clave, records.days[clave]]));
       saveRecords(records);
+      // Al ranking va una copia, y va sola: el reto ya está guardado en este móvil y
+      // lo que pase con la red no puede cambiar ni el resultado ni la racha.
+      enviarRetoAlRanking({
+        dia, mazo: solo.mode, aciertos: solo.hits, total,
+        jugadas: solo.jugadas || [], cartas: solo.cartas || [], ms: solo.ms || 0
+      });
     } else if (solo.kind === "free") {
       const difficulty = solo.difficulty || "easy";
       records.bestByDifficulty = records.bestByDifficulty || { easy: records.best || 0 };
@@ -1721,7 +2101,7 @@
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${duelo ? duelo.icono : superado ? "🏅" : "🎯"}</div><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${duelo ? duelo.titular : resumen}</h1>${duelo ? duelo.cuerpo : ""}${logrosMarkup(logros)}<div class="actions" style="justify-content:center">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${duelo ? duelo.icono : superado ? "🏅" : "🎯"}</div><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${duelo ? duelo.titular : resumen}</h1>${duelo ? duelo.cuerpo : ""}${logrosMarkup(logros)}${esReto ? '<div class="ranking-aviso" id="ranking-aviso" role="status"></div>' : ""}<div class="actions" style="justify-content:center">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${esReto ? `<button class="btn btn-ghost" data-action="ranking">Ver la clasificación</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -2256,6 +2636,16 @@
     else if (action === "perfil-import") perfilImport();
     else if (action === "perfil-reset") perfilResetMenu();
     else if (action === "perfil-reset-confirm") { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
+    else if (action === "cuenta") abreCuenta();
+    else if (action === "cuenta-modo") { cuentaModo = target.dataset.modo === "entrar" ? "entrar" : "registro"; cuentaVista(sesionConocida); }
+    else if (action === "cuenta-salir") cuentaSalir();
+    else if (action === "cuenta-salir-confirmar") cuentaSalirConfirmar();
+    else if (action === "cuenta-verificar") cuentaVerificar();
+    else if (action === "cuenta-recuperar") cuentaRecuperar();
+    else if (action === "perfil-subir") perfilSubir();
+    else if (action === "perfil-bajar") perfilBajar();
+    else if (action === "perfil-bajar-confirmar") perfilBajarConfirmar();
+    else if (action === "ranking") abreRanking(selectedModeKey);
   });
 
   CT.localNavigate = action => {

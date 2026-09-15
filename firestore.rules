@@ -28,6 +28,99 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.createdAt == request.time;
       allow list, delete: if false;
     }
+    // ---------------------------------------------------------------------
+    // Cuentas, nombres visibles y ranking del reto diario
+    //
+    // El nombre de quien juega es público —una tabla de clasificación sin nombres no
+    // clasifica nada—, pero solo para quien tenga sesión abierta. Lo demás que hay en
+    // una cuenta, empezando por la copia del perfil, no sale de su dueño.
+    // ---------------------------------------------------------------------
+    match /users/{owner} {
+      allow get, list: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == owner
+        && request.resource.data.keys().hasOnly(['nick', 'nickLower', 'registered', 'createdAt', 'updatedAt'])
+        && request.resource.data.nick is string
+        && request.resource.data.nick.size() >= 3 && request.resource.data.nick.size() <= 40
+        && request.resource.data.nickLower is string
+        && request.resource.data.nickLower.size() >= 3 && request.resource.data.nickLower.size() <= 40
+        && request.resource.data.updatedAt == request.time
+        && (!('createdAt' in request.resource.data) || request.resource.data.createdAt is timestamp)
+        // `registered` solo puede ponerse, nunca quitarse: una cuenta con correo no
+        // vuelve a ser anónima, y dejar que se reescriba a `false` solo serviría para
+        // aparentar en el ranking que una entrada vino de una sesión sin cuenta.
+        && (!('registered' in request.resource.data) || request.resource.data.registered == true)
+        // La reserva del nombre tiene que quedar a nombre de quien escribe. Es lo que
+        // hace único el nombre: sin esto, dos personas podrían llamarse igual en la
+        // tabla y una de ellas estaría cobrando la reputación de la otra.
+        && getAfter(/databases/$(database)/documents/nicks/$(request.resource.data.nickLower)).data.uid == owner;
+      allow delete: if false;
+
+      // La copia del perfil y cualquier otro dato personal que venga después.
+      match /datos/{documento} {
+        allow read, write: if request.auth != null && request.auth.uid == owner;
+      }
+    }
+
+    // La reserva de un nombre. Que el documento exista es toda la exclusión mutua que
+    // hace falta: `create` solo se concede cuando no existe, así que quien llega segundo
+    // recibe `permission-denied` y la aplicación le pide otro nombre.
+    match /nicks/{clave} {
+      allow get: if request.auth != null;
+      // Listar los nombres reservados no lo necesita la aplicación y sería un censo.
+      allow list: if false;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      // Reescribir la propia reserva con el mismo dueño no cambia nada y evita que un
+      // reintento a medias deje a alguien sin poder volver a guardar su nombre.
+      allow update: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // El resultado del reto diario. Un documento por persona, día y mazo, y el
+    // identificador lo dice: `2026-09-15__history__UID`. Exigir esa forma es lo que
+    // impide enviar el resultado de otra persona o enviar dos veces el propio.
+    //
+    // Aquí no se comprueba que los aciertos declarados sean ciertos: para eso haría
+    // falta conocer las fechas de las cartas, que viven en el móvil. Lo comprueba la
+    // función de `functions/`, que reparte otra vez el mazo del día y repite las
+    // jugadas. Estas reglas se ocupan de lo que sí pueden: de quién escribe, de que
+    // escriba una sola vez y de que el documento tenga la forma que la función espera.
+    match /retosDiarios/{entrada} {
+      allow get, list: if request.auth != null;
+      allow create: if request.auth != null
+        && entrada == request.resource.data.dia + '__' + request.resource.data.mazo + '__' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'nick', 'dia', 'mazo', 'semana', 'aciertos', 'total', 'jugadas', 'cartas', 'ms', 'huella', 'creadaEn'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.nick is string
+        && request.resource.data.nick.size() >= 3 && request.resource.data.nick.size() <= 40
+        && request.resource.data.dia is string && request.resource.data.dia.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.mazo is string && request.resource.data.mazo.size() > 0 && request.resource.data.mazo.size() <= 20
+        && request.resource.data.semana is string && request.resource.data.semana.size() <= 10
+        && request.resource.data.total is int && request.resource.data.total > 0 && request.resource.data.total <= 50
+        && request.resource.data.aciertos is int && request.resource.data.aciertos >= 0
+        && request.resource.data.aciertos <= request.resource.data.total
+        && request.resource.data.jugadas is list && request.resource.data.jugadas.size() <= request.resource.data.total
+        && request.resource.data.cartas is list && request.resource.data.cartas.size() == request.resource.data.jugadas.size()
+        && request.resource.data.ms is int && request.resource.data.ms >= 0 && request.resource.data.ms <= 86400000
+        && request.resource.data.huella is string && request.resource.data.huella.size() <= 64
+        && request.resource.data.creadaEn == request.time;
+      // Un intento al día. Ni reescribir el resultado ni borrarlo para volver a enviarlo.
+      // La función verificadora escribe con credenciales de administrador y no pasa por
+      // aquí, que es lo que le permite añadir `verificada`, `puntos` y `motivo`.
+      allow update, delete: if false;
+    }
+
+    // El acumulado semanal lo lleva entero la función: es la suma de los retos ya
+    // verificados y no hay nada que un cliente pueda aportarle.
+    match /retosSemanales/{entrada} {
+      allow get, list: if request.auth != null;
+      allow write: if false;
+    }
+
     match /rooms/{roomId} {
       function signedIn() { return request.auth != null; }
       function uid() { return request.auth.uid; }

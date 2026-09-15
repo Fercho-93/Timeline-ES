@@ -2088,3 +2088,71 @@ body::before {
     padding: 8px 0 18px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   La cuenta y la clasificación del reto diario
+
+   Dos pantallas nuevas que reutilizan `.panel`, `.field` y los botones de siempre: lo
+   único que necesita estilo propio es la tabla, que tiene que leerse de un vistazo en
+   una pantalla estrecha, y la ficha de identidad.
+   --------------------------------------------------------------------------- */
+.cuenta-panel + .cuenta-panel, .perfil-panel + .perfil-panel { margin-top: 14px; }
+.cuenta-panel h3, .ranking-panel h3 { margin: 0 0 10px; font-size: 1.08rem; letter-spacing: -.015em; }
+.cuenta-panel .field { margin-bottom: 14px; }
+.cuenta-panel .hint { font-size: .78rem; color: var(--muted); margin: 12px 0 0; }
+.cuenta-mensaje {
+  margin: 0 0 16px; padding: 12px 14px; border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  font-size: .85rem;
+}
+/* Un botón que vive dentro de un párrafo y tiene que leerse como parte de la frase. */
+.btn-inline { display: inline; padding: 0; min-height: 0; font-size: inherit; text-decoration: underline; }
+
+.cuenta-pestanas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 18px; }
+.cuenta-pestanas button {
+  padding: 10px 8px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--paper); color: var(--muted); font-weight: 700; font-size: .84rem;
+}
+.cuenta-pestanas button[aria-selected="true"] { background: var(--accent); border-color: transparent; color: #fff; }
+
+.cuenta-identidad { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+.cuenta-identidad strong { display: block; font-size: 1.05rem; }
+.cuenta-identidad small { display: block; color: var(--muted); font-size: .76rem; word-break: break-all; }
+.cuenta-avatar {
+  flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--accent); color: #fff;
+  font-family: var(--font-display); font-size: 1.1rem;
+}
+
+/* El aviso de puesto en la pantalla de resultado del reto. Ocupa sitio desde el primer
+   momento aunque llegue vacío: si apareciera de golpe al responder la red, empujaría
+   los botones justo cuando alguien va a pulsarlos. */
+.ranking-aviso { min-height: 2.6em; display: grid; align-content: center; margin: 4px 0 10px; }
+.ranking-aviso .hint { color: var(--muted); font-size: .82rem; margin: 0; }
+.ranking-puesto { margin: 0; font-size: .95rem; }
+.ranking-puesto strong { color: var(--accent); font-family: var(--font-display); font-size: 1.25rem; }
+
+.ranking-panel + .ranking-panel { margin-top: 14px; }
+.ranking-tabla { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ranking-tabla li {
+  display: grid; grid-template-columns: 2.1rem 1fr auto auto; gap: 10px;
+  align-items: baseline; padding: 9px 10px; border-radius: 9px;
+  font-size: .87rem;
+}
+.ranking-tabla li:nth-child(odd) { background: var(--paper); }
+.ranking-tabla .ranking-yo { background: color-mix(in srgb, var(--accent) 16%, var(--paper)); font-weight: 700; }
+.ranking-puesto-num { font-family: var(--font-display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.ranking-yo .ranking-puesto-num { color: var(--accent); }
+.ranking-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ranking-cifra { font-variant-numeric: tabular-nums; font-weight: 700; }
+.ranking-tiempo { color: var(--muted); font-size: .74rem; font-variant-numeric: tabular-nums; }
+.ranking-marca { color: var(--muted); font-size: .68rem; font-weight: 400; }
+.ranking-section .hint code { font-size: .92em; }
+
+@media (max-width: 380px) {
+  /* En las pantallas más estrechas el tiempo es lo primero que sobra: el puesto, el
+     nombre y los aciertos son lo que se viene a mirar. */
+  .ranking-tabla li { grid-template-columns: 1.9rem 1fr auto; }
+  .ranking-tiempo { display: none; }
+}

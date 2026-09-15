@@ -24,6 +24,8 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - `capacitor.config.json`, `dist/`, iconos y splash generables.
 - Tests de juego, mazos, build, enlaces, reglas, Pulso, Fantasma y servidor experimental.
 - Servidor experimental con validación de cartas y resultados del servidor.
+- Cuentas con correo, nombre único, perfil en la nube y clasificación del reto diario,
+  con verificación de resultados en Cloud Functions (`docs/RANKING_Y_CUENTAS.md`).
 - Documentación inicial de beta, distribución, privacidad, seguridad y derechos.
 - Inventario de fuentes y arte.
 
@@ -57,6 +59,11 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - [ ] Preparar borrado explícito de datos por usuario.
 - [ ] Configurar límites, alertas y procedimiento de cierre ante abuso o costes anómalos.
 - [ ] Mantener la competición pública desactivada mientras el servidor no esté desplegado.
+- [ ] Activar el acceso con correo y contraseña en Authentication y publicar los índices.
+- [ ] Decidir si se despliega la función verificadora del reto diario (requiere plan
+      Blaze) o si la beta sale con la clasificación marcada «sin verificar».
+- [ ] Configurar retención y borrado por persona de `retosDiarios`, `retosSemanales`,
+      `users` y `nicks`.
 
 ## 5. Distribución móvil
 

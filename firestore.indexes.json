@@ -1,0 +1,38 @@
+{
+  "//": "Índices compuestos del ranking. Firestore resuelve solo las consultas de un campo; en cuanto una consulta filtra por día y mazo y además ordena, hace falta declararlos. Se publican con `firebase deploy --only firestore:indexes`.",
+  "indexes": [
+    {
+      "//": "La tabla de un día y un mazo: más aciertos primero y, a igualdad, menos tiempo. Este mismo índice sirve para contar cuánta gente lleva más aciertos que tú, que es como se calcula el puesto.",
+      "collectionGroup": "retosDiarios",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "dia", "order": "ASCENDING" },
+        { "fieldPath": "mazo", "order": "ASCENDING" },
+        { "fieldPath": "aciertos", "order": "DESCENDING" },
+        { "fieldPath": "ms", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "La misma tabla enseñando solo las entradas que la función ha verificado.",
+      "collectionGroup": "retosDiarios",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "dia", "order": "ASCENDING" },
+        { "fieldPath": "mazo", "order": "ASCENDING" },
+        { "fieldPath": "verificada", "order": "ASCENDING" },
+        { "fieldPath": "aciertos", "order": "DESCENDING" },
+        { "fieldPath": "ms", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "El acumulado de la semana.",
+      "collectionGroup": "retosSemanales",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "semana", "order": "ASCENDING" },
+        { "fieldPath": "puntos", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

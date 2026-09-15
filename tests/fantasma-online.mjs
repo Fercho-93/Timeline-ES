@@ -18,12 +18,16 @@ function client(uid){
  w.structuredClone=structuredClone;
  for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
  const errors=[];w.console.error=e=>errors.push(e);
+ // Lo que `online.js` importa, sustituido: la base de datos es la del emulador y la
+ // sesión, de mentira. `online.js` no inicializa Firebase —eso es cosa de `nube.js`—,
+ // así que aquí solo hacen falta `db` y `abrirSesion`.
+ //
  // `clone` pasa los datos por JSON para normalizarlos al realm de este módulo, pero
  // `serverTimestamp()` no es JSON: hay que conservar ese centinela tal cual o Firestore
  // no lo reconoce como marca de hora del servidor.
- w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.set(ref,limpio);},update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
+ w.__sdk={db:db(uid),abrirSesion:async()=>({uid}),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.set(ref,limpio);},update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
+ w.eval(`(()=>{const {db,abrirSesion,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];

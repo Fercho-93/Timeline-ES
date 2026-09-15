@@ -1,4 +1,7 @@
 node_modules/
 firestore-debug.log
 dist/
-
+# Copia de los mazos para la función verificadora. La genera `functions/preparar.mjs`
+# antes de cada despliegue y antes de la prueba `tests/ranking.mjs`: guardarla en el
+# repositorio sería tener dos veces las mismas fechas, con una de ellas quedándose atrás.
+functions/juego/
