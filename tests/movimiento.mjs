@@ -304,7 +304,7 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   w.document.elementFromPoint = () => el(w, '.slot[data-index="0"]');
   pointer(w, "pointermove", card, 100, 280, "mouse");
   const ghost = el(w, ".drag-ghost");
-  ok("la copia conserva proporciones y limita su escala",ghost.style.width === "240px" && ghost.style.height === "320px" && ghost.style.transform.includes("scale(0.625)"));
+  ok("la copia es mayor y vertical aunque la mano tenga otras proporciones",ghost.style.width === "180px" && ghost.style.height === "270px" && ghost.style.transform.includes("scale(1)"));
   ok("la copia usa composición y no duplica el control accesible", ghost.style.transform.includes("translate3d") && ghost.getAttribute("aria-hidden") === "true" && ghost.tabIndex === -1);
   // Soltar en otro hueco antes del siguiente frame debe elegir la posición final.
   w.document.elementFromPoint = () => el(w, '.slot[data-index="1"]');
@@ -399,6 +399,36 @@ function arrastra(w, card, hasta) {
   pointer(w, "pointerdown", card, 100, 400, "mouse");
   pointer(w, "pointermove", card, 150, 300, "mouse");
   pointer(w, "pointerup", card, hasta.x, hasta.y, "mouse");
+}
+console.log('\nContacto de la carta con el área del hueco');
+{
+  const w = boot();
+  game(w);
+  const card = el(w, '.hand-card');
+  const slots = [...w.document.querySelectorAll('.slot')];
+  const wrap = el(w, '.timeline-wrap');
+  caja(wrap, 20, 180, 420, 180);
+  caja(slots[0], 40, 200, 46, 140);
+  caja(slots[1], 360, 200, 46, 140);
+  w.document.elementFromPoint = () => null;
+  pointer(w, 'pointerdown', card, 300, 580, 'mouse');
+  pointer(w, 'pointermove', card, 300, 560, 'mouse');
+  const ghost = el(w, '.drag-ghost');
+  caja(ghost, 190, 330, 180, 270); // solo toca 10 × 10 px del segundo hueco
+  await sleep(40);
+  ok('rozar el área resalta el hueco aunque el puntero no esté sobre el más', slots[1].classList.contains('drop-target'));
+  caja(ghost, 190, 341, 180, 270);
+  await sleep(40);
+  ok('se quita el resaltado al dejar de tocar el área', !w.document.querySelector('.drop-target'));
+  caja(slots[1], 460, 200, 46, 140);
+  caja(ghost, 440, 220, 180, 270);
+  await sleep(40);
+  ok('los huecos fuera de la zona visible no reciben la carta', !w.document.querySelector('.drop-target'));
+  caja(slots[1], 360, 200, 46, 140);
+  caja(ghost, 190, 330, 180, 270);
+  pointer(w, 'pointerup', card, 280, 616, 'mouse');
+  ok('soltar por contacto usa el mismo hueco y mantiene la confirmación', el(w, '.slot-confirm').dataset.index === '1');
+  w.close();
 }
 {
   const w = boot();

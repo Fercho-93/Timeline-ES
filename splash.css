@@ -37,13 +37,8 @@ html.splash-active #app-splash {
   animation: splash-content-in 720ms 70ms cubic-bezier(.2,.78,.28,1.04) both;
 }
 
-/* Si todavía no hay coordenadas de la portada, el fallback usa left:50%; cuando sí las
-   hay, splash.js escribe un valor en píxeles y anulamos el centrado por transform. */
-#app-splash .splash-masthead:not([style*="--splash-left"]) { transform-origin: 50% 50%; }
-#app-splash.splash-ready .splash-masthead:not([style*="--splash-left"]) {
-  left: 50%;
-  margin-left: calc(var(--splash-width, min(calc(100% - 36px), 540px)) / -2);
-}
+/* El centrado de apertura usa únicamente translate(-50%, -50%); un margen
+   negativo adicional desplazaría el emblema fuera de pantalla en el móvil. */
 
 #app-splash .splash-crest img {
   animation: splash-gold-glow 920ms 820ms ease-in-out both;

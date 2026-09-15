@@ -160,7 +160,16 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
       return { finished: new Promise(() => {}), cancel() { entry.cancelled = true; } };
     };
     click(w, '[data-block="historia"]');
+    const style = w.document.createElement('style');
+    style.textContent = '#app .snapshot-probe { width: 28px; height: 28px; display: none; }';
+    w.document.head.append(style);
+    const probe = w.document.createElement('span');
+    probe.className = 'snapshot-probe';
+    w.document.getElementById('app').append(probe);
     click(w, '[data-mode="history"]');
+    const frozen = w.document.querySelector('.book-turn-copy .snapshot-probe');
+    assert.equal(w.getComputedStyle(frozen).width, '28px', 'la hoja conserva tamaños que dependían de #app');
+    assert.equal(w.getComputedStyle(frozen).display, 'none', 'un icono oculto no reaparece al girar la página');
     assert.equal(turns[0].frames.at(-1).transform, 'rotate3d(1, -1, 0, 178deg)');
     assert.equal(w.document.querySelector('.book-turn-leaf').style.transformOrigin, 'left top');
     assert.equal(bends.length, 3);
