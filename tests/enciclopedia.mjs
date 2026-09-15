@@ -98,9 +98,10 @@ console.log("\nSe entra desde el menú del mazo elegido");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  ok("el menú de formatos ofrece la enciclopedia", existe(w, '[data-action="enciclopedia"]'));
-  click(w, '[data-action="enciclopedia"]');
-  ok("se abre con el mazo elegido (Historia de España)", /Historia de España/.test(texto(w)));
+  ok("la barra del menú ofrece la enciclopedia", existe(w, '[data-action="home-encyclopedia"]'));
+  click(w, '[data-action="home-encyclopedia"]');
+  elegir(w, '#enc-mode-select', 'history');
+  ok("se puede elegir Historia de España desde la barra", /Historia de España/.test(texto(w)));
   ok("aparece el selector de mazo", existe(w, "#enc-mode-select"));
   ok("aparece el buscador", existe(w, "#enc-search-input"));
   ok("aparecen las bandas como filtro", w.document.querySelectorAll(".band-chip").length > 1);
@@ -112,7 +113,8 @@ console.log("\nCambiar de mazo desde el desplegable");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="enciclopedia"]');
+  click(w, '[data-action="home-encyclopedia"]');
+  elegir(w, '#enc-mode-select', 'history');
   elegir(w, "#enc-mode-select", "movies");
   ok("el título cambia al mazo elegido", /Estrenos de cine/.test(texto(w)));
   ok("se listan las 87 películas", w.document.querySelectorAll("#enc-results .timeline-card").length === 87);
@@ -122,7 +124,8 @@ console.log("\nBuscar sin perder el campo ni el foco");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="enciclopedia"]');
+  click(w, '[data-action="home-encyclopedia"]');
+  elegir(w, '#enc-mode-select', 'history');
   const antes = w.document.getElementById("enc-search-input");
   antes.focus();
   escribir(w, "#enc-search-input", "cordoba");
@@ -141,7 +144,8 @@ console.log("\nFiltrar por banda desde la pantalla");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="enciclopedia"]');
+  click(w, '[data-action="home-encyclopedia"]');
+  elegir(w, '#enc-mode-select', 'history');
   const total = w.document.querySelectorAll("#enc-results .timeline-card").length;
   const chip = w.document.querySelector(".band-chip:not(#enc-band-all)");
   const clave = chip.dataset.band;
@@ -157,19 +161,19 @@ console.log("\nSin entrada desde dentro de una partida");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  ok("el menú de formatos sí la ofrece, antes de empezar a jugar", existe(w, '[data-action="enciclopedia"]'));
+  ok("la barra sí la ofrece, antes de empezar a jugar", existe(w, '[data-action="home-encyclopedia"]'));
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   click(w, '[data-action="start"]');
-  ok("no hay enciclopedia en la pantalla de pasar el móvil", !existe(w, '[data-action="enciclopedia"]'));
+  ok("no hay enciclopedia en la pantalla de pasar el móvil", !existe(w, '[data-action="home-encyclopedia"]'));
   click(w, '[data-action="ready"]');
-  ok("no hay enciclopedia en la partida local", !existe(w, '[data-action="enciclopedia"]'));
+  ok("no hay enciclopedia en la partida local", !existe(w, '[data-action="home-encyclopedia"]'));
 }
 {
   const w = boot();
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
-  ok("no hay enciclopedia en el solitario", !existe(w, '[data-action="enciclopedia"]'));
+  ok("no hay enciclopedia en el solitario", !existe(w, '[data-action="home-encyclopedia"]'));
 }
 {
   // online.js no se puede ejecutar en Node (carga Firebase desde una CDN), así que se
@@ -366,7 +370,6 @@ console.log("\nFiltro de láminas en la pantalla");
   elegir(w, '#enc-mode-select', 'animals');
 
   // Cambiar de mazo vuelve a «todas». Idiomas también ofrece ya su colección completa.
-  elegir(w, '#enc-mode-select', 'history');
   ok("al cambiar de mazo el filtro vuelve a «todas»", activo() === "all");
   elegir(w, '#enc-mode-select', 'languages');
   ok("Idiomas enseña sus láminas y el filtro de colección",
