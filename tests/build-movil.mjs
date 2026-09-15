@@ -48,8 +48,9 @@ const imagenesLiterales = [...jsFuentes.matchAll(/assets\/([a-z0-9_-]+\.(?:webp|
 const imagenesRotas = imagenesLiterales.filter(ruta => !fs.existsSync(path.join(DIST, ruta)));
 ok(`ninguna imagen referenciada de forma literal falta en dist/${imagenesRotas.length ? ` (falta ${[...new Set(imagenesRotas)].join(", ")})` : ""}`, !imagenesRotas.length);
 
+// El dominio real de Firebase en CSP es infraestructura, no la marca visible.
 const formerBrand = /\btimeline(?:[-_ ]es)?\b/i;
-ok("dist/index.html no menciona el nombre antiguo (Timeline)", !formerBrand.test(fs.readFileSync(path.join(DIST, "index.html"), "utf8")));
+ok("dist/index.html no menciona el nombre antiguo (Timeline)", !formerBrand.test(fs.readFileSync(path.join(DIST, "index.html"), "utf8").replaceAll("timeline-es.firebaseapp.com", "firebase-auth-domain")));
 
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

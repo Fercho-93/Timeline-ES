@@ -6,19 +6,74 @@ rules_version = '2';
 // hay forma de verificarla, porque las fechas viven en cards.js / movies.js.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Temporada de lanzamiento: invitados automáticos y datos nuevos por UID.
+    function registered() {
+      return request.auth != null;
+    }
+    function owner(uid) { return registered() && request.auth.uid == uid; }
+    match /playerProfiles/{uid} {
+      allow get: if owner(uid);
+      allow list: if false;
+      allow create: if owner(uid)
+        && request.resource.data.keys().hasOnly(['alias','avatar','season','createdAt','privacyVersion'])
+        && request.resource.data.alias is string
+        && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24
+        && request.resource.data.avatar in ['compass','globe','star','book','rocket','owl']
+        && request.resource.data.season == 'launch-1'
+        && request.resource.data.privacyVersion == 1
+        && request.resource.data.createdAt == request.time;
+      allow update: if owner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['alias'])
+        && request.resource.data.alias is string
+        && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24;
+      allow delete: if owner(uid);
+    }
+    match /playerProgress/{uid} {
+      function valid() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['progress','records','hits','games','season','revision','updatedAt'])
+          && d.progress is string && d.progress.size() <= 350000
+          && d.records is string && d.records.size() <= 350000
+          && d.hits is int && d.hits >= 0 && d.hits <= 100000000
+          && d.games is int && d.games >= 0 && d.games <= 10000000
+          && d.season == 'launch-1' && d.revision is int && d.updatedAt == request.time
+          && exists(/databases/$(database)/documents/playerProfiles/$(uid));
+      }
+      allow get: if owner(uid);
+      allow list: if false;
+      allow create: if owner(uid) && valid() && request.resource.data.revision == 1;
+      allow update: if owner(uid) && valid() && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if owner(uid);
+    }
+    // Marcador social: datos declarados por cliente, nunca resultados competitivos certificados.
+    match /socialRanking/{uid} {
+      function valid() {
+        let d = request.resource.data;
+        let p = getAfter(/databases/$(database)/documents/playerProfiles/$(uid)).data;
+        let s = getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data;
+        return d.keys().hasOnly(['alias','avatar','hits','games','season','updatedAt'])
+          && d.alias == p.alias && d.avatar == p.avatar && d.season == 'launch-1'
+          && d.hits == s.hits && d.games == s.games && d.updatedAt == request.time;
+      }
+      allow get: if registered();
+      allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
+      allow create, update: if owner(uid) && valid();
+      allow delete: if owner(uid);
+    }
+
     // Lectura de capacidad: el documento puede no existir. Las reglas anteriores
     // deniegan esta ruta y permiten detectar que falta desplegar la final privada.
     match /capabilities/secretFinal {
-      allow get: if request.auth != null;
+      allow get: if registered();
       allow write, list: if false;
     }
     match /capabilities/multiCompetition {
-      allow get: if request.auth != null;
+      allow get: if registered();
       allow write, list: if false;
     }
     match /roomCreation/{owner} {
-      allow get: if request.auth != null && request.auth.uid == owner;
-      allow create, update: if request.auth != null && request.auth.uid == owner
+      allow get: if registered() && request.auth.uid == owner;
+      allow create, update: if registered() && request.auth.uid == owner
         && request.resource.data.keys().hasOnly(['lastCreatedAt','roomCode'])
         && request.resource.data.lastCreatedAt == request.time
         && request.resource.data.roomCode is string
@@ -50,10 +105,7 @@ service cloud.firestore {
         // en su changed().hasOnly([...]), así que ya no se puede tocar sin repetir el
         // chequeo en cada escritura y agotar el límite de 1000 expresiones de Firestore
         // que ya rozan las jugadas del Pulso.
-        return request.resource.data.roomCode == resource.data.roomCode
-          && request.resource.data.mode == resource.data.mode
-          && request.resource.data.hostUid == resource.data.hostUid
-          && request.resource.data.createdAt == resource.data.createdAt;
+        return !changed().hasAny(['roomCode','mode','hostUid','createdAt']);
       }
 
       function tournamentShape(t) {
@@ -637,10 +689,10 @@ service cloud.firestore {
       match /finalRounds/{roundId}/answers/{owner} {
         function room() { return get(/databases/$(database)/documents/rooms/$(roomId)).data; }
         function roomAfter() { return getAfter(/databases/$(database)/documents/rooms/$(roomId)).data; }
-        allow get: if request.auth != null && request.auth.uid in room().playerOrder
+        allow get: if registered() && request.auth.uid in room().playerOrder
           && roundId == string(room().final.round)
           && (request.auth.uid == owner || room().final.submitted.toSet() == room().final.players.toSet());
-        allow create: if request.auth != null && request.auth.uid == owner
+        allow create: if registered() && request.auth.uid == owner
           && room().phase == 'final' && room().status == 'playing'
           && roundId == string(room().final.round) && owner in room().final.players
           && !(owner in room().final.submitted) && owner in roomAfter().final.submitted
@@ -798,7 +850,7 @@ service cloud.firestore {
           && hostStale() && bumped();
       }
       match /presence/{playerId} {
-        function member() { return request.auth != null && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.playerOrder; }
+        function member() { return registered() && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.playerOrder; }
         allow get: if member();
         allow list: if false;
         allow create, update: if member() && request.auth.uid == playerId
@@ -806,10 +858,10 @@ service cloud.firestore {
           && request.resource.data.seenAt == request.time && request.resource.data.visible is bool;
         allow delete: if member() && request.auth.uid == playerId;
       }
-      allow get: if signedIn() && (resource.data.status == 'lobby' || isParticipant());
+      allow get: if registered() && (resource.data.status == 'lobby' || isParticipant());
       allow list: if false;
 
-      allow create: if signedIn()
+      allow create: if registered()
         && request.resource.data.get('finalRoundOffset',0) == 0
         && (!('tournament' in request.resource.data) || (tournamentShape(request.resource.data.tournament)
           && request.resource.data.tournament.index == 0 && request.resource.data.tournament.history == []
@@ -852,7 +904,7 @@ service cloud.firestore {
 
       // Cada escritura entra por una sola rama: encadenar seis validaciones agota
       // el límite de 1000 expresiones que Firestore evalúa por petición.
-      allow update: if signedIn() && before().phase != 'final' && after().phase != 'final' && identityKept() && (
+      allow update: if registered() && resource.data.phase != 'final' && request.resource.data.phase != 'final' && identityKept() && (
         ('ghost' in resource.data && changed().hasOnly(['ghost', 'version', 'updatedAt']))
         ? ghostActivate() : (ghostSafe()
           && (resource.data.status == 'lobby' ? true
@@ -869,13 +921,13 @@ service cloud.firestore {
                       ? (resource.data.phase == 'pulse' ? validPulseEnd() : validPlay())
                       : (resource.data.phase == 'reveal' ? validAdvance() : validSkip()))))))));
 
-      allow update: if request.auth != null && request.resource.data.hostUid != resource.data.hostUid && validHostClaim();
+      allow update: if registered() && request.resource.data.hostUid != resource.data.hostUid && validHostClaim();
 
-      allow update: if isParticipant() && identityKept()
+      allow update: if registered() && isParticipant() && identityKept()
         && (before().phase == 'final' ? (before().status == 'playing' && (validFinalSubmit() || validFinalResolve())) : validFinalStart());
 
-      allow delete: if isHost();
-      allow update: if 'tournament' in resource.data && validTournamentNext();
+      allow delete: if registered() && isHost();
+      allow update: if registered() && 'tournament' in resource.data && validTournamentNext();
     }
   }
 }

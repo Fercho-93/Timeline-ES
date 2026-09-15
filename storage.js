@@ -66,10 +66,10 @@
     try {
       for (let i = 0; i < window.localStorage.length; i++) {
         const key = window.localStorage.key(i);
-        if (/^(hilo-|continuum-)/.test(key)) entries[key] = window.localStorage.getItem(key);
+        if (CT.AccountStorage ? CT.AccountStorage.ownsKey(key) : /^(hilo-|continuum-)/.test(key)) entries[key] = window.localStorage.getItem(key);
       }
     } catch { /* La copia incluye al menos todos los cambios pendientes. */ }
-    for (const [key, value] of pending) entries[key] = value;
+    for (const [key, value] of pending) if (!CT.AccountStorage || CT.AccountStorage.ownsKey(key)) entries[key] = value;
     const url = URL.createObjectURL(new Blob([JSON.stringify({ format: "continuum-backup", version: 1, entries }, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url; a.download = "continuum-recuperacion.json"; a.click();

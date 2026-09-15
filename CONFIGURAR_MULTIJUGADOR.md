@@ -81,7 +81,7 @@ y una migración planificada de configuración y datos.
 
 ### Proveedor y dominios
 
-En **Authentication → Método de inicio de sesión**, el proveedor **Anónimo** debe aparecer como habilitado.
+La temporada nueva crea invitados automáticamente. Mantén habilitado Anónimo en Firebase Authentication. Publica las reglas de `firestore.rules` y el cliente nuevo; consulta `CUENTAS_Y_RANKING.md`. No hacen falta Google, Apple ni correo/contraseña.
 
 Si Firebase muestra un error de dominio al probar desde GitHub Pages:
 
@@ -127,8 +127,8 @@ El orden de entrada en la sala determina el orden de los turnos; la persona marc
 
 ## Privacidad y límites
 
-- No se solicitan correos, teléfonos ni contraseñas.
-- Las cuentas anónimas las administra Firebase.
+- La identidad de invitado se gestiona mediante Firebase Authentication; no se solicita correo.
+- Cada participante usa el UID de su invitado.
 - Las salas utilizan códigos aleatorios de ocho caracteres.
 - Los códigos QR se generan dentro del propio dispositivo y no envían la invitación a servicios externos.
 - La interfaz solo enseña a cada participante su propia mano.

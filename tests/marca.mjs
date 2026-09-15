@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // La marca se comprueba en texto visible y metadatos, no sustituyendo campos de datos.
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -11,7 +12,7 @@ const brand = "Continuum";
 const formerBrand = /\btimeline(?:[-_ ]es)?\b/i;
 const manifest = JSON.parse(read("manifest.webmanifest"));
 const pkg = JSON.parse(read("package.json"));
-const dom = new JSDOM(read("index.html"), { runScripts: "outside-only", url: "https://continuum.test/" });
+const dom = new JSDOM(gameHtml(read("index.html")), { runScripts: "outside-only", url: "https://continuum.test/" });
 const w = dom.window;
 let checks = 0;
 const check = (name, condition) => {

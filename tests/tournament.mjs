@@ -1,9 +1,10 @@
+import {gameHtml} from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 import {finishLocalFinal} from './final-helper.mjs';
 const read=f=>fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
-const html=read('index.html'), key='continuum-multi-competition-v1';
+const html=gameHtml(read('index.html')), key='continuum-multi-competition-v1';
 function boot(saved) {
  const w=new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''),{runScripts:'outside-only',url:'https://continuum.test/'}).window;
  w.scrollTo=()=>{};w.Element.prototype.scrollIntoView=()=>{};

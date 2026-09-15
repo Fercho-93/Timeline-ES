@@ -1,9 +1,10 @@
+import {gameHtml} from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const root = new URL('../', import.meta.url);
 const read = name => fs.readFileSync(new URL(name, root), 'utf8');
-const html = read('index.html');
+const html = gameHtml(read('index.html'));
 const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 const plain = value => JSON.parse(JSON.stringify(value));
 function boot(storage = {}) {

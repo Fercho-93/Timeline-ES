@@ -4,7 +4,7 @@ import {initializeTestEnvironment, assertSucceeds, assertFails} from '@firebase/
 import {doc, setDoc, getDoc, updateDoc, deleteDoc, writeBatch, serverTimestamp} from 'firebase/firestore';
 const env = await initializeTestEnvironment({projectId:'demo-hilo',firestore:{host:'127.0.0.1',port:8080,rules:fs.readFileSync(new URL('../firestore.rules',import.meta.url),'utf8')}});
 const ids=Array.from({length:9},(_,i)=>'p'+i), code='FINAL234';
-const db=uid=>env.authenticatedContext(uid).firestore();
+const db=uid=>env.authenticatedContext(uid, {email_verified:true, firebase:{sign_in_provider:'password'}}).firestore();
 const room=client=>doc(client,'rooms',code);
 const answer=(client,round,uid)=>doc(client,'rooms',code,'finalRounds',String(round),'answers',uid);
 let state;
