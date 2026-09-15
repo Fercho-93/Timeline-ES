@@ -28,8 +28,8 @@
     success: [['wood', 0, .24], ['high', .13, .19]],
     failure: [['low', 0, .22], ['paper', .09, .16]],
     tap: [['wood', 0, .12]],
-    page: [['paper', 0, .3, .85]],
-    back: [['paper', 0, .24, .7]],
+    page: [['leaf', 0, .18, .85]],
+    back: [['leaf', 0, .15, .7]],
     unroll: [['parchment', 0, .2]],
     expand: [['paper', 0, .19, .9]],
     open: [['paper', 0, .18, 1.1], ['wood', .06, .07]],
@@ -63,21 +63,26 @@
   // La textura utiliza su propia semilla: nunca consume el azar del reparto.
   function sample(kind) {
     if (samples.has(kind)) return samples.get(kind);
-    const paper = kind === 'paper' || kind === 'parchment';
-    const duration = kind === 'parchment' ? .85 : paper ? .22 : .38;
+    const leaf = kind === 'leaf';
+    const paper = leaf || kind === 'paper' || kind === 'parchment';
+    const duration = leaf ? .42 : kind === 'parchment' ? .85 : paper ? .22 : .38;
     const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * duration), audio.sampleRate);
     const data = buffer.getChannelData(0);
     const base = kind === 'low' ? 145 : kind === 'high' ? 330 : 245;
-    let seed = 731, soft = 0;
+    // La hoja de navegación tiene un roce más largo y dos filtros suaves:
+    // quitar agudos evita el golpe áspero, incluso en altavoces de móvil.
+    const smoothing = leaf ? 1 - Math.exp(-2 * Math.PI * 900 / audio.sampleRate) : .18;
+    let seed = 731, soft = 0, softer = 0;
     for (let i = 0; i < data.length; i++) {
       const t = i / audio.sampleRate;
       seed = (Math.imul(seed, 1664525) + 1013904223) | 0;
       const noise = (seed >>> 0) / 2147483648 - 1;
-      soft += .18 * (noise - soft);
+      soft += smoothing * (noise - soft);
+      softer += smoothing * (soft - softer);
       const attack = Math.min(1, t / .012);
       const tail = Math.min(1, (duration - t) / .035);
       data[i] = paper
-        ? soft * Math.sin(Math.PI * t / duration) ** 2 * .32
+        ? (leaf ? softer : soft) * Math.sin(Math.PI * t / duration) ** 2 * .32
         : attack * tail * (Math.sin(2 * Math.PI * base * t) * Math.exp(-t * 19) * .22 +
           Math.sin(2 * Math.PI * base * 1.47 * t) * Math.exp(-t * 32) * .09 +
           soft * Math.exp(-t * 65) * .12);
