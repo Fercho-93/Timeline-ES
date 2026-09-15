@@ -1,5 +1,14 @@
 # Música de Continuum
 
+## Lista de reproducción actual
+
+`v1.mp3` a `v6.mp3`: seis pistas proporcionadas por el propietario del proyecto
+para incorporarlas al juego, el 15 de septiembre de 2026. Se conservan los MP3
+originales. La atribución y licencia de la guitarra de abajo corresponden
+exclusivamente a `entre-paginas.mp3`, que ya no se usa en el reproductor.
+
+## Pista anterior
+
 «Entre páginas» — composición y arreglo original para Continuum, 2026.
 Guitarra acústica muestreada; sin voces ni percusión. Duración: 64 segundos.
 
