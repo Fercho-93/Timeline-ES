@@ -721,3 +721,14 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 }
 #app .solo-fold { scroll-margin-top: 12px; scroll-margin-bottom: calc(90px + env(safe-area-inset-bottom)); }
 #app .deck-preview img { position: static; opacity: 1; }
+
+/* Reversos ilustrados: la portada común nunca anticipa la carta individual. */
+#app .hand-card { isolation: isolate; background: #f3eee4; color: #302d27; }
+#app.atlas-board[data-screen] .hand .hand-card .carta-reverso {
+  position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0;
+  padding: 0; margin: 0; opacity: 1; z-index: -1; overflow: hidden;
+}
+#app .carta-reverso .reverso-coleccion { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; filter: sepia(1) saturate(.5); }
+#app .carta-reverso::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,#f3eee4e8 0%,#f3eee433 30%,#f3eee426 44%,#f3eee4e8 76%,#f3eee4 100%); }
+#app .hand-card > .hidden-date { color: #66451f; position: relative; }
+#app .hand-card > strong { color: #302d27; position: relative; text-shadow: 0 1px 3px #f3eee4; }
