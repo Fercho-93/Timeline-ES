@@ -6,9 +6,9 @@ Información de la beta · 15 de septiembre de 2026.
 
 Al abrir el juego se crea automáticamente un invitado mediante Firebase Authentication, sin pedir correo, contraseña ni nombre real. Se asignan un identificador aleatorio y un nombre público como Player 4821, editable desde Perfil. El identificador se conserva en los datos de esta instalación o navegador; no es un identificador de hardware. El perfil, estadísticas, logros, cartas descubiertas y récords se guardan en Firestore y localmente. Si cambias de móvil, desinstalas y se eliminan los datos, o borras los datos del navegador, no hay un método de recuperación del invitado. La temporada de lanzamiento empieza de cero y no importa copias de la beta. Continuum no incorpora publicidad, compras ni analítica de terceros. Al abrir la web, el alojamiento recibe las peticiones necesarias para servirla y puede conservar registros técnicos, incluida la dirección IP.
 
-## Ranking social
+## Ranking de retos diarios
 
-Otros invitados pueden ver tu alias, avatar, aciertos acumulados y partidas. No se solicita correo electrónico para jugar. Los resultados son declarados por el juego en el dispositivo y no constituyen una clasificación competitiva validada. Usa un alias sin datos personales.
+Otros invitados pueden ver tu alias, avatar, aciertos acumulados y retos diarios completados. No se solicita correo electrónico para jugar. Los resultados son declarados por el juego en el dispositivo y no constituyen una clasificación competitiva validada. Usa un alias sin datos personales.
 
 ## Salas de varios móviles
 

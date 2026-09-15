@@ -20,7 +20,7 @@ async function acquireTab(uid) {
     }).catch(() => resolve(false));
   });
 }
-const refs = uid => ({profile:doc(db,'playerProfiles',uid), progress:doc(db,'playerProgress',uid), ranking:doc(db,'socialRanking',uid)});
+const refs = uid => ({profile:doc(db,'playerProfiles',uid), progress:doc(db,'playerProgress',uid), ranking:doc(db,'dailyRanking',uid)});
 function message(error) {
   const texts = {
     'auth/operation-not-allowed':'El acceso de invitado aún no está activado. Contacta con soporte.',
@@ -34,6 +34,7 @@ function message(error) {
 }
 function feedback(text) { const el = document.getElementById('account-message'); if (el) el.textContent = text; }
 function shell(body) {
+  window.CONTINUUM_SPLASH?.finish();
   CT.Scene?.apply(CT.DEFAULT_MODE, 'account');
   app.dataset.screen = 'account';
   app.innerHTML = `<section class="account-shell"><img class="account-emblem" src="assets/continuum-emblem-800.webp" alt=""><h1>Continuum</h1>${body}<p id="account-message" class="account-error" role="status" aria-live="polite"></p><p class="account-foot"><a href="privacidad.html" target="_blank" rel="noopener">Privacidad y datos de tu cuenta</a></p></section>`;
@@ -94,7 +95,7 @@ function payload() {
   const progress = CT.Storage.getItem(P) || '{}', records = CT.Storage.getItem(R) || '{}';
   const totals = JSON.parse(progress).totals || {};
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
-  return {progress,records,hits:count(totals.rankedHits),games:count(totals.rankedGames),season};
+  return {progress,records,hits:count(totals.dailyHits),games:count(totals.dailyGames),season};
 }
 function restoreRemote(data) {
   suppress = true;
@@ -128,7 +129,7 @@ async function flush() {
     const snap=await tx.get(r.progress), remote=snap.exists()?snap.data():null;
     if ((remote?.revision || 0) !== expected) { const e=Error('Conflicto de progreso');e.code='account/conflict';throw e; }
     tx.set(r.progress,{...data,revision:expected+1,updatedAt:serverTimestamp()});
-    tx.set(r.ranking,{alias:profile.alias,avatar:profile.avatar,hits:data.hits,games:data.games,season,updatedAt:serverTimestamp()});
+    if (data.games > 0) tx.set(r.ranking,{alias:profile.alias,avatar:profile.avatar,hits:data.hits,games:data.games,season,updatedAt:serverTimestamp()});
   }).then(() => {
     revision=expected+1;setMeta(change !== generation);
     if (!metadata().dirty) document.getElementById('storage-notice')?.remove();
@@ -154,7 +155,7 @@ async function enter() {
     button('account-tab',enter);return;
   }
   identity=u;CT.AccountStorage.use(u.uid);
-  shell('<p role="status">Abriendo tu perfil…</p>');
+
   try {
     await u.getIdToken(true);
     const r=refs(u.uid);
@@ -177,13 +178,13 @@ async function enter() {
   }
 }
 function accountCard() {
-  return `<div class="account-card"><strong>${avatars[profile?.avatar] || '🧭'} ${esc(profile?.alias || '')}</strong><span>Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.</span><span>${metadata().dirty ? 'Hay cambios pendientes de guardar.' : 'Progreso guardado.'}</span><div class="account-actions"><button class="btn btn-secondary" data-account-action="edit-name">Cambiar nombre</button><button class="btn btn-secondary" data-account-action="ranking">Ranking social</button><button class="btn btn-secondary" data-account-action="sync">Guardar ahora</button><button class="btn btn-ghost" data-account-action="delete">Eliminar invitado y progreso</button></div><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></div>`;
+  return `<div class="account-card"><strong>${avatars[profile?.avatar] || '🧭'} ${esc(profile?.alias || '')}</strong><span>Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.</span><span>${metadata().dirty ? 'Hay cambios pendientes de guardar.' : 'Progreso guardado.'}</span><div class="account-actions"><button class="btn btn-secondary" data-account-action="edit-name">Cambiar nombre</button><button class="btn btn-secondary" data-account-action="ranking">Ranking de retos diarios</button><button class="btn btn-secondary" data-account-action="sync">Guardar ahora</button><button class="btn btn-ghost" data-account-action="delete">Eliminar invitado y progreso</button></div><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></div>`;
 }
 async function ranking() {
   await flush();
   if (failedConflict) return;
-  const snap=await getDocsFromServer(query(collection(db,'socialRanking'),orderBy('hits','desc'),limit(50)));
-  accountDialog(`<div class="overlay"><section class="modal"><h2>Ranking social</h2><p>Aciertos personales en solitario y varios móviles. Las partidas pasando un móvil no puntúan. Resultados enviados por los jugadores, sin validación competitiva.</p><table class="account-ranking"><thead><tr><th>Puesto</th><th>Jugador</th><th>Aciertos</th></tr></thead><tbody>${snap.docs.map((d,i)=>{const v=d.data();return `<tr><td>${i+1}</td><td>${avatars[v.avatar] || '🧭'} ${esc(v.alias)}${d.id===identity.uid?' · tú':''}</td><td>${Number(v.hits)||0}</td></tr>`;}).join('') || '<tr><td colspan="3">Todavía no hay resultados. ¡Estrena el ranking!</td></tr>'}</tbody></table><p>Primeros 50 jugadores. Las igualdades no se consideran un desempate competitivo.</p><button class="btn btn-primary" data-account-action="close">Cerrar</button></section></div>`,true);
+  const snap=await getDocsFromServer(query(collection(db,'dailyRanking'),orderBy('hits','desc'),limit(50)));
+  accountDialog(`<div class="overlay"><section class="modal"><h2>Ranking de retos diarios</h2><p>Aciertos acumulados en retos diarios completados. Cada reto cuenta una vez por día y mazo; las partidas libres y multijugador no puntúan. Resultados enviados por el juego, sin validación competitiva.</p><table class="account-ranking"><thead><tr><th>Puesto</th><th>Jugador</th><th>Aciertos</th></tr></thead><tbody>${snap.docs.map((d,i)=>{const v=d.data();return `<tr><td>${i+1}</td><td>${avatars[v.avatar] || '🧭'} ${esc(v.alias)}${d.id===identity.uid?' · tú':''}</td><td>${Number(v.hits)||0}</td></tr>`;}).join('') || '<tr><td colspan="3">Todavía no hay resultados. ¡Estrena el ranking!</td></tr>'}</tbody></table><p>Primeros 50 jugadores. Las igualdades no se consideran un desempate competitivo.</p><button class="btn btn-primary" data-account-action="close">Cerrar</button></section></div>`,true);
 }
 function deleteScreen() {
   if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de eliminar el invitado.');
@@ -193,7 +194,7 @@ async function removeAccount() {
   const u=auth.currentUser;
   clearTimeout(timer);stopStorage?.();if (saving) await saving;
   const r=refs(u.uid), batch=writeBatch(db);
-  batch.delete(r.ranking);batch.delete(r.progress);batch.delete(r.profile);await batch.commit();
+  batch.delete(r.ranking);batch.delete(doc(db,'socialRanking',u.uid));batch.delete(r.progress);batch.delete(r.profile);await batch.commit();
   active=false;
   try { await deleteUser(u); } catch(error) { active=true; throw error; }
   CT.AccountStorage.clear();ready=false;location.reload();

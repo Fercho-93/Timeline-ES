@@ -60,6 +60,20 @@ service cloud.firestore {
       allow create, update: if owner(uid) && valid();
       allow delete: if owner(uid);
     }
+    match /dailyRanking/{uid} {
+      function valid() {
+        let d = request.resource.data;
+        let p = getAfter(/databases/$(database)/documents/playerProfiles/$(uid)).data;
+        let s = getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data;
+        return d.keys().hasOnly(['alias','avatar','hits','games','season','updatedAt'])
+          && d.alias == p.alias && d.avatar == p.avatar && d.season == 'launch-1'
+          && d.hits == s.hits && d.games == s.games && d.updatedAt == request.time;
+      }
+      allow get: if registered();
+      allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
+      allow create, update: if owner(uid) && valid();
+      allow delete: if owner(uid);
+    }
 
     // Lectura de capacidad: el documento puede no existir. Las reglas anteriores
     // deniegan esta ruta y permiten detectar que falta desplegar la final privada.

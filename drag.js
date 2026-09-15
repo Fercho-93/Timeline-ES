@@ -60,15 +60,25 @@
     const { card } = session;
     const ghost = card.cloneNode(true);
     ghost.classList.add("drag-ghost");
-    ghost.classList.remove("dragging", "armed", "selection-enter");
+    ghost.classList.remove("dragging", "armed", "holding", "selected", "selection-enter");
     ghost.setAttribute("aria-hidden", "true");
     ghost.setAttribute("tabindex", "-1");
     ghost.removeAttribute("disabled");
-    ghost.style.width = `${Math.min(card.getBoundingClientRect().width, GHOST_WIDTH)}px`;
+    const box=card.getBoundingClientRect();
+    const scale=Math.min(1,GHOST_WIDTH / Math.max(1,box.width));
+    // La copia sale de #app: conservar sus estilos calculados evita que la lámina
+    // recupere su tamaño natural al perder los selectores del tablero.
+    const sources=[card,...card.querySelectorAll('*')], copies=[ghost,...ghost.querySelectorAll('*')];
+    sources.forEach((source,i)=>{
+      const computed=getComputedStyle(source);
+      for(const property of Array.from(computed)) copies[i].style.setProperty(property,computed.getPropertyValue(property));
+    });
+    Object.assign(ghost.style,{position:'fixed',left:'0',top:'0',width:`${box.width}px`,height:`${box.height}px`,minWidth:'0',minHeight:'0',margin:'0',overflow:'hidden',transform:`scale(${scale})`,transformOrigin:'top left',pointerEvents:'none',zIndex:'60',transition:'none',animation:'none'});
     document.body.appendChild(ghost);
 
     const ghostBox = ghost.getBoundingClientRect();
     session.ghost = ghost;
+    session.ghostScale = scale;
     session.ghostWidth = ghostBox.width;
     session.ghostHeight = ghostBox.height;
     session.dragging = true;
@@ -91,7 +101,7 @@
     const { ghostWidth: w, ghostHeight: h } = session;
     const left = Math.min(Math.max(4, session.x - w / 2), window.innerWidth - w - 4);
     const top = Math.min(Math.max(4, session.y - h - LIFT), window.innerHeight - h - 4);
-    session.ghost.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(-1.5deg)`;
+    session.ghost.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(-1.5deg) scale(${session.ghostScale})`;
     const slot = slotUnder(session.x, session.y);
     if (slot !== session.slot) {
       session.slot?.classList.remove("drop-target");

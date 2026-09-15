@@ -21,6 +21,16 @@ function boot(almacen = {}) {
   guiones().forEach(archivo => window.eval(read(archivo)));
   return window;
 }
+{
+ const w=boot(), p=w.CONTINUUM.Progreso;
+ p.finishGame({mode:'history',kind:'free',hits:10,total:15,rankedDaily:true});
+ p.finishGame({mode:'history',kind:'online',hits:10,total:15});
+ ok('las partidas normales no puntúan en retos',p.read().totals.dailyHits===0);
+ p.finishGame({mode:'history',kind:'daily',hits:9,total:15,rankedDaily:true});
+ p.finishGame({mode:'history',kind:'daily',hits:15,total:15,rankedDaily:false});
+ ok('solo el resultado diario nuevo suma puntos',p.read().totals.dailyHits===9 && p.read().totals.dailyGames===1);
+ w.close();
+}
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);
   if (!el) throw new Error(`no existe ${sel}`);

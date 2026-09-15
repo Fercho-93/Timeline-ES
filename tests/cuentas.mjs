@@ -10,7 +10,7 @@ function setup(user=null,seed={}){
  w.eval(read('account-storage.js'));
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
- Object.assign(w,{collection:(_,name)=>name,query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async()=>({docs:[...data].filter(([k])=>k.startsWith('socialRanking/')).map(([k,v])=>({id:k.split('/')[1],data:()=>v}))}),browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,col,id)=>`${col}/${id}`,getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
+ Object.assign(w,{collection:(_,name)=>name,query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async()=>({docs:[...data].filter(([k])=>k.startsWith('dailyRanking/')).map(([k,v])=>({id:k.split('/')[1],data:()=>v}))}),browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,col,id)=>`${col}/${id}`,getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
   const pending=[];const result=await fn({get:async key=>snap(key),set:(key,value)=>pending.push([key,value])});for(const [k,v]of pending)data.set(k,v);return result;
  }});
  let source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts');
@@ -38,18 +38,18 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});let started=0;
  w.localStorage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:999}}));
  await w.testAccounts.startAccounts(()=>started++);assert.equal(started,1);assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),'{}');
- w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:9,games:4,rankedHits:5,rankedGames:2}}));await w.testAccounts.flush();
- assert.equal(data.get('playerProgress/a').revision,1);assert.equal(data.get('socialRanking/a').hits,5);
+ w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:9,games:4,rankedHits:500,rankedGames:200,dailyHits:5,dailyGames:2}}));await w.testAccounts.flush();
+ assert.equal(data.get('playerProgress/a').revision,1);assert.equal(data.get('dailyRanking/a').hits,5);
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='Fulanito';await w.testAccounts.rename();
- assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get('socialRanking/a').alias,'Fulanito');
- assert.equal(data.get('socialRanking/a').hits,5);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
+ assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get('dailyRanking/a').alias,'Fulanito');
+ assert.equal(data.get('dailyRanking/a').hits,5);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='<bad>';await assert.rejects(w.testAccounts.rename());
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');w.CONTINUUM.closeDialog();
  assert.equal(w.localStorage.getItem('hilo-perfil-v1'),JSON.stringify({totals:{hits:999}}));
  w.CONTINUUM.AccountStorage.use('b');assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),null);w.CONTINUUM.AccountStorage.use('a');
  // A simultaneous device update must never be overwritten.
  data.set('playerProgress/a',{...data.get('playerProgress/a'),revision:2,hits:20});
- w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:10,games:4,rankedHits:6,rankedGames:2}}));
+ w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:10,games:4,dailyHits:6,dailyGames:2}}));
  await assert.rejects(w.testAccounts.flush());assert.equal(data.get('playerProgress/a').hits,20);assert.equal(w.CONTINUUM.Accounts.ready,false);assert.ok(w.document.querySelector('#account-cloud'));
  dom.window.close();
 }
@@ -58,7 +58,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await w.testAccounts.startAccounts(()=>{});assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),p);dom.window.close();
 }
 {
- const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'socialRanking/a':{alias:'Fer',avatar:'compass',hits:5}});
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'dailyRanking/a':{alias:'Fer',avatar:'compass',hits:5}});
  await w.testAccounts.startAccounts(()=>{});
  w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
  const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();await new Promise(r=>setTimeout(r,0));};

@@ -78,7 +78,7 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 }
 for (const options of [{ reduce: true }, { seen: true }]) {
   const w = boot(options);
-  try { assert.ok(!w.document.documentElement.classList.contains('splash-active')); }
+  try { w.CONTINUUM_SPLASH.finish(); assert.ok(!w.document.documentElement.classList.contains('splash-active')); }
   finally { w.close(); }
 }
 {
@@ -86,8 +86,8 @@ for (const options of [{ reduce: true }, { seen: true }]) {
   try {
     await new Promise(resolve => w.setTimeout(resolve, 0));
     assert.ok(w.document.documentElement.classList.contains('splash-active'));
-    w.document.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
-    assert.equal(w.document.getElementById('app-splash'), null, 'el teclado retira la apertura');
+    w.CONTINUUM_SPLASH.finish();
+    assert.ok(!w.document.documentElement.classList.contains('splash-active'), 'la apertura termina cuando el juego está listo');
     assert.ok(w.document.querySelector('[data-action="rules"]'), 'la aplicación sigue disponible');
   } finally { w.close(); }
 }

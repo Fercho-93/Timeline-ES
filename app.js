@@ -1707,7 +1707,7 @@
     const enDueloEsta = solo.kind === "duel";
     const superado = enDueloEsta ? solo.hits === total : solo.lives > 0;
     const logros = CT.Progreso.finishGame({
-      mode: solo.mode, kind: solo.kind, hits: solo.hits, total,
+      mode: solo.mode, kind: solo.kind, hits: solo.hits, total, rankedDaily: esReto,
       difficulty: solo.difficulty || "easy", streak: records.streak || 0, lives: solo.lives,
       // Ganar un duelo solo se puede afirmar cuando hay alguien contra quien ganarlo: al
       // crearlo todavía no hay rival, solo una marca que mandar.
