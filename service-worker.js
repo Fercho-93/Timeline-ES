@@ -1,12 +1,13 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v154";
+const CACHE = "continuum-v155";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
 // se pide, así que la primera carta de un mazo de animales la baja de la red y a partir
 // de ahí, con esa carta ya vista, funciona sin conexión igual que el resto.
 const ASSETS = [
+  "./assets/mode-walk-solo.webp", "./assets/mode-walk-multi.webp",
   "./deployment.js",
   "./privacidad.html",
   "./engine.js", "./final.js", "./tournament.js", "./links.js",
