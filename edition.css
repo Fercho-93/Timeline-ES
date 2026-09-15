@@ -662,3 +662,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app .dialog-enter .modal:has(.atlas-nav) { animation-name: atlas-surface-open; }
 }
 #app .modal .atlas-nav { position: fixed; inset: auto 0 0; }
+
+/* Las consultas se abren sin barra inferior y conservan sus controles de volver. */
+#app :is(.enc-modal, .settings-modal, .rules) .atlas-nav { display: none; }
+#app :is(.enc-modal, .settings-modal, .rules):has(.atlas-nav) { padding-bottom: 26px; }
