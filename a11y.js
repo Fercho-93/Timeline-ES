@@ -211,6 +211,39 @@
     const front = document.createElement("div");
     front.className = "book-turn-front";
     const copy = container.cloneNode(true);
+    // La hoja sale de #app: fijar el aspecto ANTES de repintar conserva también
+    // los tamaños de SVG, las imágenes y las reglas específicas de cada pantalla.
+    const sources = [container, ...container.querySelectorAll('*')];
+    const copies = [copy, ...copy.querySelectorAll('*')];
+    const decorations = document.createElement('style');
+    const rules = [];
+    const hasLayout = container.getBoundingClientRect().width > 0;
+    const frozenStyle = computed => Array.from(computed, property =>
+      `${property}:${computed.getPropertyValue(property)};`).join('');
+    sources.forEach((source, index) => {
+      const target = copies[index];
+      const computed = getComputedStyle(source);
+      target.style.cssText = frozenStyle(computed);
+      target.style.setProperty('animation', 'none', 'important');
+      target.style.setProperty('transition', 'none', 'important');
+      // Los degradados y veladuras también pueden depender de #app.
+      if (hasLayout) {
+        for (const pseudo of ['::before', '::after']) {
+          const style = getComputedStyle(source, pseudo);
+          if (!style.content || style.content === 'none' || style.content === 'normal') continue;
+          target.dataset.pageNode = index;
+          rules.push(`.book-turn [data-page-node="${index}"]${pseudo}{${frozenStyle(style)}animation:none!important;transition:none!important;}`);
+        }
+      }
+      if (source instanceof HTMLImageElement) {
+        target.removeAttribute('srcset');
+        target.removeAttribute('sizes');
+        target.src = source.currentSrc || source.src;
+        target.loading = 'eager';
+      }
+    });
+    decorations.textContent = rules.join('\n');
+    layer.append(decorations);
     copy.removeAttribute("id");
     copy.classList.add("book-turn-copy");
     copy.style.transform = `translateY(${-window.scrollY}px)`;
@@ -225,6 +258,10 @@
     leaf.append(sheet);
     layer.append(leaf);
     document.body.append(layer);
+    sources.forEach((source, index) => {
+      copies[index].scrollLeft = source.scrollLeft;
+      copies[index].scrollTop = source.scrollTop;
+    });
     // El eje oblicuo levanta la esquina inferior derecha hacia la superior
     // izquierda; al volver, el pivote y el signo invierten el recorrido.
     const angle = backwards ? -1 : 1;

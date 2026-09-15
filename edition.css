@@ -746,6 +746,15 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app .hand-card > .hidden-date { color: #66451f; position: relative; }
 #app .hand-card > strong { color: #302d27; position: relative; text-shadow: 0 1px 3px #f3eee4; }
 
+/* La carta levantada conserva proporción 2:3 aunque la mano sea horizontal. */
+.drag-card-preview { display: flex; flex-direction: column; align-items: stretch; isolation: isolate; padding: 12px; border: 2px solid var(--atlas-selection); border-radius: 10px; background: #f3eee4; color: #302d27; }
+.drag-card-preview .carta-reverso { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; z-index: -1; overflow: hidden; }
+.drag-card-preview .reverso-coleccion { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; filter: sepia(1) saturate(.5); }
+.drag-card-preview .carta-reverso::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,#f3eee4e8 0%,#f3eee433 30%,#f3eee426 44%,#f3eee4e8 76%,#f3eee4 100%); }
+.drag-card-preview > .hidden-date { position: relative; color: #66451f; font-size: .65rem; }
+.drag-card-preview > strong { position: relative; margin-top: auto; margin-bottom: 0; font-size: 1rem; line-height: 1.2; color: #302d27; text-shadow: 0 1px 3px #f3eee4; }
+#app.atlas-board .slot.drop-target { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); border-radius: 12px; }
+
 /* Competición: una lámina de atlas al final de las colecciones. */
 #app .home-competition { margin-top: 26px; }
 #app .home-shell .comp-promo { display: flex; position: relative; isolation: isolate; align-items: center; min-height: 270px; margin-top: 0; border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-paper); box-shadow: 0 8px 24px #352a1710; }

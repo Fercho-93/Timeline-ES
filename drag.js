@@ -15,7 +15,7 @@
   const HOLD_SLOP = 10;       // cuánto se le perdona al dedo mientras espera, sin cancelar
   const EDGE = 56;            // margen en el que la línea temporal se desplaza sola
   const EDGE_STEP = 14;
-  const GHOST_WIDTH = 150;    // la copia que sigue al dedo va encogida, para no tapar la línea
+  const GHOST_WIDTH = 180;    // carta vertical legible, independiente del formato de la mano
   const LIFT = 16;            // y por encima del dedo, que si no lo tapa él
   const MARGIN = 4;           // aire mínimo entre la copia y el borde de la pantalla
   const RUBBER = .55;         // cuánto cede el borde cuando el dedo empuja más allá
@@ -73,11 +73,25 @@
   }
 
   function slotUnder(x, y) {
-    if (!session || typeof document.elementFromPoint !== "function") return null;
-    // La copia ya tiene pointer-events:none: no hace falta ocultarla (ni forzar un
-    // repintado extra) en cada frame para encontrar el hueco que hay debajo.
-    const target = document.elementFromPoint(x, y);
-    return target?.closest(session.slotSelector) || null;
+    if (!session) return null;
+    const direct = document.elementFromPoint?.(x, y)?.closest(session.slotSelector);
+    if (direct && !direct.disabled) return direct;
+    const ghost = session.ghost.getBoundingClientRect();
+    const wrap = document.querySelector('.timeline-wrap')?.getBoundingClientRect();
+    let best = null, bestArea = 0;
+    document.querySelectorAll(session.slotSelector).forEach(slot => {
+      if (slot.disabled) return;
+      const box = slot.getBoundingClientRect();
+      // Solo cuenta la parte visible: un hueco fuera de la tira no puede recibir cartas.
+      const left = Math.max(box.left, wrap?.left ?? 0, 0);
+      const right = Math.min(box.right, wrap?.right ?? window.innerWidth, window.innerWidth);
+      const top = Math.max(box.top, wrap?.top ?? 0, 0);
+      const bottom = Math.min(box.bottom, wrap?.bottom ?? window.innerHeight, window.innerHeight);
+      const area = Math.max(0, Math.min(ghost.right, right) - Math.max(ghost.left, left)) *
+        Math.max(0, Math.min(ghost.bottom, bottom) - Math.max(ghost.top, top));
+      if (area > bestArea) { best = slot; bestArea = area; }
+    });
+    return best;
   }
 
   // Al arrastrar hacia un borde de la línea temporal, esta se desplaza sola: la línea es
@@ -108,16 +122,11 @@
     ghost.setAttribute("aria-hidden", "true");
     ghost.setAttribute("tabindex", "-1");
     ghost.removeAttribute("disabled");
-    const box=card.getBoundingClientRect();
-    const scale=Math.min(1,GHOST_WIDTH / Math.max(1,box.width));
-    // La copia sale de #app: conservar sus estilos calculados evita que la lámina
-    // recupere su tamaño natural al perder los selectores del tablero.
-    const sources=[card,...card.querySelectorAll('*')], copies=[ghost,...ghost.querySelectorAll('*')];
-    sources.forEach((source,i)=>{
-      const computed=getComputedStyle(source);
-      for(const property of Array.from(computed)) copies[i].style.setProperty(property,computed.getPropertyValue(property));
-    });
-    Object.assign(ghost.style,{position:'fixed',left:'0',top:'0',width:`${box.width}px`,height:`${box.height}px`,minWidth:'0',minHeight:'0',margin:'0',overflow:'hidden',transform:`scale(${scale})`,transformOrigin:'top left',pointerEvents:'none',zIndex:'60',transition:'none',animation:'none'});
+    const scale = Math.min(1, (window.innerWidth - 2 * MARGIN) / GHOST_WIDTH, (window.innerHeight - 2 * MARGIN) / (GHOST_WIDTH * 1.5));
+    ghost.classList.add('drag-card-preview');
+    ghost.removeAttribute('id');
+    ghost.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    Object.assign(ghost.style,{width:`${GHOST_WIDTH}px`,height:`${GHOST_WIDTH * 1.5}px`,transform:`scale(${scale})`,transformOrigin:'top left',transition:'none',animation:'none'});
     document.body.appendChild(ghost);
 
     const ghostBox = ghost.getBoundingClientRect();
