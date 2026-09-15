@@ -5,7 +5,7 @@
   const TRACKS = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'].map(name => `assets/audio/${name}.mp3`);
   const OVERLAP = 4, VOLUME = .12, FADE_IN = 1.5, FADE_OUT = .3;
   let queue = [], last = null, audio, master, loading = false;
-  let pageActive = true, nativeActive = true, unlocked = false, pauseTimer;
+  let pageActive = true, nativeActive = true, startRequested = false, pauseTimer;
   let transport = Promise.resolve(), targetVolume = 0;
   const voices = new Set();
   const enabled = () => CT.effectPrefs?.().ambience === true && pageActive && nativeActive && !document.hidden;
@@ -50,7 +50,7 @@
   function reconcile() {
     transport = transport.catch(() => {}).then(async () => {
       if (!audio) return;
-      if (enabled() && unlocked) {
+      if (enabled() && startRequested) {
         const resuming = audio.state !== 'running';
         if (resuming) await audio.resume();
         if (!enabled()) { await audio.suspend(); return; }
@@ -100,12 +100,13 @@
     void prepareNext();
   }
 
-  function sync(fromGesture = false) {
-    if (fromGesture && enabled()) {
-      unlocked = true;
+  function sync(tryStart = false) {
+    if (tryStart && enabled()) {
+      startRequested = true;
       try {
         const ctx = context();
-        // Invocar resume dentro del gesto también funciona en Safari/iPhone.
+        // Intentar al cargar; si autoplay está bloqueado, repetir resume dentro
+        // del primer gesto, también durante el splash (Safari/iPhone incluido).
         if (ctx && ctx.state !== 'running') void ctx.resume().catch(() => {});
       } catch { return; }
     }
@@ -130,7 +131,9 @@
   document.addEventListener('visibilitychange', () => sync());
   window.addEventListener('pagehide', () => { pageActive = false; sync(); });
   window.addEventListener('pageshow', () => { pageActive = true; sync(); });
-  document.addEventListener('click', () => sync(true), true);
+  for (const event of ['pointerdown', 'touchend', 'keydown', 'click']) {
+    document.addEventListener(event, () => sync(true), {capture: true, passive: true});
+  }
   try {
     const cap = window.Capacitor;
     if (cap?.isNativePlatform?.()) {
@@ -142,4 +145,7 @@
     }
   } catch { /* La visibilidad del documento sigue cubriendo la pausa. */ }
   CT.Ambience = {sync};
+  // Los ajustes ya están cargados y el splash sigue visible. No esperar al
+  // inicio de sesión ni a la primera pantalla del juego para pedir la música.
+  sync(true);
 })();

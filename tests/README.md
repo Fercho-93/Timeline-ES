@@ -115,6 +115,9 @@ carta arrastrada se posiciona una vez por frame, sin interpolación que la retra
 ciclo sin repeticiones en sus límites, el solapamiento de cuatro segundos,
 la pausa y reanudación de ambas pistas durante el fundido, el interruptor,
 los eventos de segundo plano de Capacitor, los reintentos y las descargas tardías.
+Verifica también el inicio durante el splash con el ajuste activado, el bloqueo
+de autoplay (rechazado o pendiente), el desbloqueo por toque/tecla y la continuidad
+al entrar al juego, sin duplicar pistas ni ignorar el ajuste de silencio.
 El reloj simulado permite recorrer varias listas completas. `build-movil.mjs`
 comprueba además que los seis MP3 llegan íntegros al paquete sin conexión.
 La comprobación auditiva final en Android e iPhone físicos sigue siendo necesaria.
