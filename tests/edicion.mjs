@@ -1,9 +1,10 @@
+import {gameHtml} from './game-fixture.mjs';
 // Recorridos que podrían desincronizar la ambientación o bloquear la apertura.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
-const html = read('index.html');
+const html = gameHtml(read('index.html'));
 function boot({ reduce = false, seen = false, saved = {}, userAgent = null } = {}) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {
     runScripts: 'outside-only', url: 'https://continuum.test/'

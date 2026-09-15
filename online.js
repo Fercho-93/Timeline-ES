@@ -1,19 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, getFirestore, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+import { firebaseApp, auth, db } from './firebase-client.js';
+import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAT-ELQvHrBdMaCdxJNUJzDRwq1jOOwI44",
-  authDomain: "timeline-es.firebaseapp.com",
-  projectId: "timeline-es",
-  storageBucket: "timeline-es.firebasestorage.app",
-  messagingSenderId: "572227626442",
-  appId: "1:572227626442:web:f7c1ad0d66de6f02d79b33"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-const db = getFirestore(firebaseApp);
 const appEl = document.getElementById("app");
 const toastEl = document.getElementById("toast");
 // Las modalidades, sus ejes y estos ayudantes están en modes.js, que ya está cargado
@@ -22,7 +9,7 @@ const CT = window.CONTINUUM;
 const { escapeHtml, initials, shuffle, announce } = CT;
 // Igual que en el juego local: pintar conserva el foco del teclado, y las capas se abren
 // como diálogos de verdad. Está en `a11y.js`, compartido por los dos motores.
-const paint = (html, pantalla) => { CT.Scene.apply(modeKey(), pantalla); CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
+const paint = (html, pantalla) => { if (CT.Accounts && !CT.Accounts.ready) return; CT.Scene.apply(modeKey(), pantalla); CT.paint(appEl, html, pantalla); queueMicrotask(renderPresence); };
 const abreCapa = (capa, cerrable) => CT.openDialog(capa, cerrable);
 const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -376,24 +363,10 @@ async function ensureProtection() {
 }
 async function ensureAuth() {
   await ensureProtection();
-  if (auth.currentUser) {
-    user = auth.currentUser;
-    return user;
-  }
-  return new Promise((resolve, reject) => {
-    let signingIn = false;
-    const stop = onAuthStateChanged(auth, async current => {
-      if (current) {
-        user = current;
-        stop();
-        resolve(current);
-      } else if (!signingIn) {
-        signingIn = true;
-        try { await signInAnonymously(auth); }
-        catch (error) { stop(); reject(error); }
-      }
-    }, reject);
-  });
+  const current = auth.currentUser;
+  if (!current || current.isAnonymous || !current.emailVerified || !CT.Accounts?.ready) throw Error('Inicia sesión con tu cuenta para jugar.');
+  user = current;
+  return user;
 }
 
 export async function openOnlineMode(options = {}) {

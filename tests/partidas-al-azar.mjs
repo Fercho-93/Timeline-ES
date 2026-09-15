@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Cuatro mazos representativos: nadie debe quedarse bloqueado y las cartas no se crean ni se pierden.
 import { JSDOM } from "jsdom";
 import { finishLocalFinal } from './final-helper.mjs';
@@ -8,9 +9,9 @@ import { fileURLToPath } from "node:url";
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
 // La lista de scripts sale de index.html, para no repetirla en cada prueba.
-const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 const boot = () => {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   guiones().forEach(archivo => dom.window.eval(read(archivo)));
   return dom.window;
 };

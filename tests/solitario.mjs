@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Modo solitario, reto diario y confirmación antes de colocar, sobre el DOM real.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
@@ -6,12 +7,12 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(almacen = {}) {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   // Los scripts se toman de index.html, que es la única lista de verdad: así un mazo

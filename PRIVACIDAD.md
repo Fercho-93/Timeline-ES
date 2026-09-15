@@ -1,10 +1,14 @@
 # Privacidad de Continuum
 
-Información de la beta · 8 de septiembre de 2026.
+Información de la beta · 15 de septiembre de 2026.
 
 ## Partidas y progreso
 
-Las partidas locales, ajustes y estadísticas se guardan en este dispositivo. Continuum no incorpora publicidad, compras ni analítica de terceros. Al abrir la web, el alojamiento recibe las peticiones necesarias para servirla y puede conservar registros técnicos, incluida la dirección IP.
+El acceso requiere una cuenta de Firebase Authentication, mediante correo y contraseña, Google o Apple según la configuración disponible. Firebase gestiona las credenciales; las contraseñas no se guardan en la base de datos del juego. Se tratan un identificador de usuario, correo, proveedores de acceso y estado de verificación. El alias, avatar, estadísticas, logros, cartas descubiertas y récords se guardan en Firestore para recuperar el progreso. Los ajustes y las partidas en curso se conservan en el dispositivo, separados por cuenta. La temporada de lanzamiento empieza de cero y no importa copias de la beta. Continuum no incorpora publicidad, compras ni analítica de terceros. Al abrir la web, el alojamiento recibe las peticiones necesarias para servirla y puede conservar registros técnicos, incluida la dirección IP.
+
+## Ranking social
+
+Otros usuarios registrados pueden ver tu alias, avatar, aciertos acumulados y partidas. Tu correo no aparece en el ranking. Los resultados son declarados por el juego en el dispositivo y no constituyen una clasificación competitiva validada. Usa un alias sin datos personales.
 
 ## Salas de varios móviles
 
@@ -16,7 +20,7 @@ Un duelo incluye el nombre elegido y resultado de quien reta dentro del enlace. 
 
 ## Conservación y eliminación
 
-El progreso local permanece hasta que lo borres o elimines los datos de la aplicación. Puedes exportarlo antes desde Ajustes. El anfitrión puede cerrar la sala. El objetivo de retención de salas y presencia es de siete días tras la última actividad, pero la limpieza automática de producción está pendiente de verificación: este plazo todavía no es una garantía operativa.
+El perfil y el progreso se conservan mientras mantengas la cuenta. En Perfil puedes descargar una copia desde los avisos de guardado, cerrar sesión o solicitar la eliminación confirmando tu identidad. El botón Eliminar cuenta borra la identidad de acceso, el perfil, el progreso y la entrada del ranking, además de la copia local de esta cuenta en este dispositivo. Las copias descargadas y los datos almacenados en otros dispositivos no se borran remotamente. Los registros de salas compartidas conservan el identificador y alias usados durante la partida hasta que se elimine la sala; no forman parte del borrado inmediato del perfil. El anfitrión puede cerrar la sala. El objetivo de retención de salas y presencia es de siete días tras la última actividad, pero la limpieza automática de producción está pendiente de verificación: este plazo todavía no es una garantía operativa.
 
 ## Contacto y estado de la beta
 

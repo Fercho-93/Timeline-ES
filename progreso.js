@@ -27,7 +27,7 @@
       playerId: null,
       createdAt: new Date().toISOString(),
       // `run` es la tirada de aciertos en curso; `bestRun`, la mejor que se ha tenido.
-      totals: { games: 0, cards: 0, hits: 0, wins: 0, run: 0, bestRun: 0 },
+      totals: { games: 0, cards: 0, hits: 0, wins: 0, run: 0, bestRun: 0, rankedHits: 0, rankedGames: 0 },
       // Los hitos que no se deducen de los totales: hacen falta para los logros y son
       // más baratos de contar en el momento que de reconstruir después.
       marks: { perfectDaily: 0, bestStreak: 0, ghostHits: 0, pulseHits: 0, expertClears: 0, comps: 0, bigWins: 0, onlineWins: 0, duelWins: 0 },
@@ -62,7 +62,8 @@
     const base = emptyProfile().totals;
     if (!stored || typeof stored !== "object") return base;
     return { games: num(stored.games), cards: num(stored.cards), hits: num(stored.hits),
-      wins: num(stored.wins), run: num(stored.run), bestRun: num(stored.bestRun) };
+      wins: num(stored.wins), run: num(stored.run), bestRun: num(stored.bestRun),
+      rankedHits: num(stored.rankedHits), rankedGames: num(stored.rankedGames) };
   }
 
   function normalizeMarks(stored) {
@@ -165,6 +166,7 @@
   }
 
   function playerId() {
+    if (CT.AccountStorage?.uid) return CT.AccountStorage.uid;
     try {
       let id = CT.Storage.getItem(PLAYER_KEY);
       if (!id) {
@@ -289,6 +291,8 @@
 
     if (correct) {
       profile.totals.hits += 1;
+      // Pasar un móvil entre varios no identifica al autor de cada acierto.
+      if (kind !== "local") profile.totals.rankedHits += 1;
       entry.hits += 1;
       profile.totals.run += 1;
       profile.totals.bestRun = Math.max(profile.totals.bestRun, profile.totals.run);
@@ -323,6 +327,7 @@
     if (!CT.has(mode)) return [];
     profile.playerId = profile.playerId || playerId();
     profile.totals.games += 1;
+    if (kind !== "local") profile.totals.rankedGames += 1;
     modeEntry(profile, mode).games += 1;
     if (won && (kind === "online" || kind === "duel")) profile.totals.wins += 1;
     if (kind === "daily") {

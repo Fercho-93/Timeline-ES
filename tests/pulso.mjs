@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // El Pulso: la jugada de una vez por partida que sustituye al turno y enfrenta a dos
 // personas con la misma carta. Es la única jugada del juego que toca la mano de otra
 // persona —y la única que se juega en dos mitades, una por cabeza—, así que lo que más se
@@ -10,12 +11,12 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(almacen = {}) {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   guiones().forEach(archivo => window.eval(read(archivo)));

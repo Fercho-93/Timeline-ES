@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Contratos de interacción. No son una prueba visual de Safari: verifican que el
 // movimiento no repita acciones, pierda foco ni altere un arrastre o la partida.
 import assert from "node:assert/strict";
@@ -6,7 +7,7 @@ import { JSDOM } from "jsdom";
 
 const root = new URL("../", import.meta.url);
 const read = file => fs.readFileSync(new URL(file, root), "utf8");
-const source = read("index.html");
+const source = gameHtml(read("index.html"));
 const scripts = [...source.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 let checks = 0;

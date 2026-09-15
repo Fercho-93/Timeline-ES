@@ -11,7 +11,7 @@ const env = await initializeTestEnvironment({
   firestore: { rules: fs.readFileSync(path.join(REPO, "firestore.rules"), "utf8"), host: "127.0.0.1", port: 8080 }
 });
 const HOST = "host-uid", P2 = "p2-uid", ROOM = "ABCD2345";
-const ctx = uid => env.authenticatedContext(uid).firestore();
+const ctx = uid => env.authenticatedContext(uid, {email_verified:true, firebase:{sign_in_provider:'password'}}).firestore();
 const ref = db => doc(db, "rooms", ROOM);
 let pass = 0, fail = 0;
 async function check(label, expected, p) {

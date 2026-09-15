@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Que la partida se pueda seguir con teclado y con lector de pantalla. Son dos cosas
 // distintas y las dos se rompen solas en cuanto alguien añade una pantalla nueva:
 //
@@ -15,12 +16,12 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(mode = null) {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://continuum.test/" });
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://continuum.test/" });
   const { window } = dom;
   // jsdom no maquetiza, así que no tiene scrollIntoView; y al pulsar tampoco enfoca, que
   // es lo que hace un navegador de verdad con un botón. Las dos cosas se suplen aquí.

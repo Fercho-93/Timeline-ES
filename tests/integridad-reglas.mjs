@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import {initializeTestEnvironment,assertFails,assertSucceeds} from '@firebase/rules-unit-testing';
 import {doc,setDoc,updateDoc,deleteDoc,writeBatch,serverTimestamp,Timestamp} from 'firebase/firestore';
 const env=await initializeTestEnvironment({projectId:'demo-integrity',firestore:{host:'127.0.0.1',port:8080,rules:fs.readFileSync(new URL('../firestore.rules',import.meta.url),'utf8')}});
-const db=env.authenticatedContext('a').firestore(), ref=doc(db,'rooms','ABCD2345');
+const db=env.authenticatedContext('a', {email_verified:true, firebase:{sign_in_provider:'password'}}).firestore(), ref=doc(db,'rooms','ABCD2345');
 const original={roomCode:'ABCD2345',mode:'history',deckFingerprint:'test',hostUid:'a',status:'playing',phase:'turn',version:1,handSize:2,playerOrder:['a','b','c'],players:{a:{name:'Ana',hand:[1,2]},b:{name:'Bea',hand:[3]},c:{name:'Cid',hand:[4]}},deck:[5,6],discard:[],timeline:[7,8],current:0,starter:'a',turnsInRound:0,round:1,winner:null,winners:null,reveal:null,createdAt:Timestamp.fromMillis(1),updatedAt:Timestamp.fromMillis(1)};
 const seed = data=>env.withSecurityRulesDisabled(c=>setDoc(doc(c.firestore(),'rooms','ABCD2345'),data));
 const stamp=()=>({version:2,updatedAt:serverTimestamp()});

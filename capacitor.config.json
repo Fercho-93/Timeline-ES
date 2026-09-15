@@ -2,5 +2,14 @@
   "appId": "com.continuum.game",
   "appName": "Continuum",
   "webDir": "dist",
-  "backgroundColor": "#f6f1e8"
+  "backgroundColor": "#f6f1e8",
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": true,
+      "providers": [
+        "google.com",
+        "apple.com"
+      ]
+    }
+  }
 }

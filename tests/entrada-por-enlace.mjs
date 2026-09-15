@@ -13,7 +13,7 @@ const env = await initializeTestEnvironment({
 
 const INVITADO = "invitado-uid";
 const ROOM = "ABCD2345";
-const db = env.authenticatedContext(INVITADO).firestore();
+const db = env.authenticatedContext(INVITADO, {email_verified:true, firebase:{sign_in_provider:'password'}}).firestore();
 const ref = doc(db, "rooms", ROOM);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };

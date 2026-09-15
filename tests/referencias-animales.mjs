@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Regresiones introducidas por cifras documentadas cercanas y empates reales.
 // Se juega sobre el DOM y el motor local, sin reemplazar su comparación.
 import { JSDOM } from "jsdom";
@@ -6,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
-const scripts = [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const scripts = [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let failures = 0;
 function check(label, condition) {
   if (!condition) failures++;
@@ -18,7 +19,7 @@ function click(w, selector) {
   element.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 }
 function play(cardId, neighbourId, slot, expected) {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), {
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), {
     runScripts: "outside-only", url: "https://hilo.test/"
   });
   const w = dom.window;

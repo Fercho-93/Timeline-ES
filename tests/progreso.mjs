@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // El perfil: qué se cuenta al jugar, qué logros se desbloquean y cuándo, y que la
 // pantalla que lo enseña aguante un almacenamiento vacío, corrupto o de una versión
 // anterior. Se juega de verdad contra el DOM de index.html, igual que el resto.
@@ -9,12 +10,12 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 function boot(almacen = {}) {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   guiones().forEach(archivo => window.eval(read(archivo)));
@@ -78,6 +79,7 @@ console.log("\nUna partida en solitario cuadra con lo anotado");
   ok("la partida cuenta como una sola", p.totals.games === 1);
   ok("el mazo jugado queda registrado", p.byMode.history && p.byMode.history.cards === jugadas && p.byMode.history.hits === aciertos);
   ok("se guarda de qué formato era", p.byMode.history.byKind.free === jugadas);
+  ok("los aciertos en solitario sí cuentan para el ranking", p.totals.rankedHits === p.totals.hits);
   const bandas = Object.values(p.byBand);
   const sumaBandas = bandas.reduce((total, b) => total + b.hits + b.misses, 0);
   ok("las bandas suman las mismas cartas", sumaBandas === jugadas);
@@ -120,6 +122,7 @@ console.log("\nUna partida a un solo móvil");
   const p = perfil(w);
   ok("la partida local termina", /gana(n)?<\/h1>/.test(w.document.body.innerHTML));
   ok("cada colocación quedó anotada como local", p.byMode.history.byKind.local === p.totals.cards);
+  ok("pasar el móvil no suma aciertos ajenos al ranking personal", p.totals.rankedHits === 0 && p.totals.rankedGames === 0);
   ok("la partida local se cuenta al terminar", p.totals.games === 1);
   // Con dos personas no se sabe cuál sostiene el móvil, así que la victoria no es de
   // nadie en el perfil: se cuenta la partida, no un triunfo inventado.

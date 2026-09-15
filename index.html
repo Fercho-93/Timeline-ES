@@ -12,12 +12,13 @@
          resto de la aplicación —incluida la carga de todos los mazos— es de este origen.
          `frame-ancestors` no se puede fijar aquí: los navegadores solo la respetan si la
          manda una cabecera HTTP de verdad, y GitHub Pages no permite añadir cabeceras. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com; frame-src https://timeline-es.firebaseapp.com https://accounts.google.com https://appleid.apple.com; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="splash.css" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="edition.css" />
+    <link rel="stylesheet" href="accounts.css" />
     <!-- Se ejecuta en <head> para decidir si hay telón antes de que el body pueda pintarse. -->
     <script src="splash.js"></script>
     <title>Continuum</title>
@@ -58,6 +59,7 @@
     <script src="tournament.js"></script>
     <script src="links.js"></script>
   <script src="storage.js"></script>
+  <script src="account-storage.js"></script>
   <script src="saves.js"></script>
   <script src="updates.js"></script>
   <script src="session.js"></script>
@@ -72,6 +74,6 @@
     <script src="settings.js"></script>
   <script src="effects.js"></script>
     <script src="immersion.js"></script>
-    <script src="app.js"></script>
+    <script src="boot.js"></script>
   </body>
 </html>
