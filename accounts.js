@@ -63,8 +63,12 @@ async function ensureProfile(uid) {
     return value;
   });
 }
+function accountDialog(html) {
+  app.insertAdjacentHTML('beforeend',html);
+  CT.openDialog(app.lastElementChild,true);
+}
 function editNameScreen() {
-  CT.openDialog(`<div class="overlay"><section class="modal"><h2>Cambiar nombre</h2><p>Este nombre será público en el ranking. No uses datos personales.</p><label>Nombre<input id="account-alias" minlength="2" maxlength="24" autocomplete="nickname" value="${esc(profile.alias)}"></label><p id="account-delete-message" role="status"></p><button class="btn btn-primary" data-account-action="rename">Guardar nombre</button><button class="btn btn-secondary" data-account-action="close">Cancelar</button></section></div>`,true);
+  accountDialog(`<div class="overlay"><section class="modal"><h2>Cambiar nombre</h2><p>Este nombre será público en el ranking. No uses datos personales.</p><label>Nombre<input id="account-alias" minlength="2" maxlength="24" autocomplete="nickname" value="${esc(profile.alias)}"></label><p id="account-delete-message" role="status"></p><button class="btn btn-primary" data-account-action="rename">Guardar nombre</button><button class="btn btn-secondary" data-account-action="close">Cancelar</button></section></div>`,true);
 }
 async function rename() {
   const alias = document.getElementById('account-alias').value.trim();
@@ -179,11 +183,11 @@ async function ranking() {
   await flush();
   if (failedConflict) return;
   const snap=await getDocsFromServer(query(collection(db,'socialRanking'),orderBy('hits','desc'),limit(50)));
-  CT.openDialog(`<div class="overlay"><section class="modal"><h2>Ranking social</h2><p>Aciertos personales en solitario y varios móviles. Las partidas pasando un móvil no puntúan. Resultados enviados por los jugadores, sin validación competitiva.</p><table class="account-ranking"><thead><tr><th>Puesto</th><th>Jugador</th><th>Aciertos</th></tr></thead><tbody>${snap.docs.map((d,i)=>{const v=d.data();return `<tr><td>${i+1}</td><td>${avatars[v.avatar] || '🧭'} ${esc(v.alias)}${d.id===identity.uid?' · tú':''}</td><td>${Number(v.hits)||0}</td></tr>`;}).join('') || '<tr><td colspan="3">Todavía no hay resultados. ¡Estrena el ranking!</td></tr>'}</tbody></table><p>Primeros 50 jugadores. Las igualdades no se consideran un desempate competitivo.</p><button class="btn btn-primary" data-account-action="close">Cerrar</button></section></div>`,true);
+  accountDialog(`<div class="overlay"><section class="modal"><h2>Ranking social</h2><p>Aciertos personales en solitario y varios móviles. Las partidas pasando un móvil no puntúan. Resultados enviados por los jugadores, sin validación competitiva.</p><table class="account-ranking"><thead><tr><th>Puesto</th><th>Jugador</th><th>Aciertos</th></tr></thead><tbody>${snap.docs.map((d,i)=>{const v=d.data();return `<tr><td>${i+1}</td><td>${avatars[v.avatar] || '🧭'} ${esc(v.alias)}${d.id===identity.uid?' · tú':''}</td><td>${Number(v.hits)||0}</td></tr>`;}).join('') || '<tr><td colspan="3">Todavía no hay resultados. ¡Estrena el ranking!</td></tr>'}</tbody></table><p>Primeros 50 jugadores. Las igualdades no se consideran un desempate competitivo.</p><button class="btn btn-primary" data-account-action="close">Cerrar</button></section></div>`,true);
 }
 function deleteScreen() {
   if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de eliminar el invitado.');
-  CT.openDialog(`<div class="overlay"><section class="modal"><h2>Eliminar invitado y progreso</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p><button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
+  accountDialog(`<div class="overlay"><section class="modal"><h2>Eliminar invitado y progreso</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p><button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
 }
 async function removeAccount() {
   const u=auth.currentUser;

@@ -5,11 +5,12 @@ const read=name=>fs.readFileSync(name,'utf8');
 function setup(user=null,seed={}){
  const dom=new JSDOM('<main id="app"></main>',{url:'https://example.com',runScripts:'outside-only'}),w=dom.window;
  const data=new Map(Object.entries(seed));
- w.CONTINUUM={escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),Scene:{apply(){}},Storage:{getItem:k=>w.localStorage.getItem(k),setItem:(k,v)=>{w.localStorage.setItem(k,v);return true;},removeItem:k=>w.localStorage.removeItem(k),notice(){}},openDialog:html=>w.document.body.insertAdjacentHTML('beforeend',html),closeDialog(){},isSessionActive:()=>false};
+ w.CONTINUUM={escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),Scene:{apply(){}},Storage:{getItem:k=>w.localStorage.getItem(k),setItem:(k,v)=>{w.localStorage.setItem(k,v);return true;},removeItem:k=>w.localStorage.removeItem(k),notice(){}},isSessionActive:()=>false};
+ w.eval(read('a11y.js'));
  w.eval(read('account-storage.js'));
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
- Object.assign(w,{browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,col,id)=>`${col}/${id}`,getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
+ Object.assign(w,{collection:(_,name)=>name,query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async()=>({docs:[...data].filter(([k])=>k.startsWith('socialRanking/')).map(([k,v])=>({id:k.split('/')[1],data:()=>v}))}),browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,col,id)=>`${col}/${id}`,getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
   const pending=[];const result=await fn({get:async key=>snap(key),set:(key,value)=>pending.push([key,value])});for(const [k,v]of pending)data.set(k,v);return result;
  }});
  let source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts');
@@ -42,8 +43,8 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='Fulanito';await w.testAccounts.rename();
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get('socialRanking/a').alias,'Fulanito');
  assert.equal(data.get('socialRanking/a').hits,5);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
- w.document.getElementById('account-alias').value='<bad>';await assert.rejects(w.testAccounts.rename());
- assert.equal(data.get('playerProfiles/a').alias,'Fulanito');
+ w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='<bad>';await assert.rejects(w.testAccounts.rename());
+ assert.equal(data.get('playerProfiles/a').alias,'Fulanito');w.CONTINUUM.closeDialog();
  assert.equal(w.localStorage.getItem('hilo-perfil-v1'),JSON.stringify({totals:{hits:999}}));
  w.CONTINUUM.AccountStorage.use('b');assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),null);w.CONTINUUM.AccountStorage.use('a');
  // A simultaneous device update must never be overwritten.
@@ -55,6 +56,21 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 {
  const p=JSON.stringify({totals:{hits:42}});const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'playerProgress/a':{progress:p,records:'{}',revision:4}});
  await w.testAccounts.startAccounts(()=>{});assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),p);dom.window.close();
+}
+{
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'socialRanking/a':{alias:'Fer',avatar:'compass',hits:5}});
+ await w.testAccounts.startAccounts(()=>{});
+ w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
+ const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();await new Promise(r=>setTimeout(r,0));};
+ await click('edit-name');
+ assert.ok(w.document.querySelector('[role="dialog"] #account-alias'));
+ await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
+ await click('ranking');assert.match(w.document.querySelector('[role="dialog"]').textContent,/Fer/);
+ await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
+ await click('delete');assert.ok(w.document.querySelector('[role="dialog"] [data-account-action="delete-confirm"]'));
+ w.document.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+ assert.equal(w.document.querySelector('[role="dialog"]'),null);
+ dom.window.close();
 }
 assert.match(read('index.html'),/src="boot.js"/);assert.doesNotMatch(read('index.html'),/src="app.js"/);
 assert.doesNotMatch(read('online.js'),/signInAnonymously/);
