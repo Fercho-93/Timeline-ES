@@ -22,11 +22,49 @@
     } catch { /* Un efecto opcional nunca impide jugar. */ }
   }
   const samples = new Map(), voices = new Set(), lastCue = new Map();
+  // [textura, instante, volumen, velocidad]. El gesto decide el sonido,
+  // nunca animationstart: una animación decorativa puede repetirse indefinidamente.
+  const scores = {
+    success: [['wood', 0, .24], ['high', .13, .19]],
+    failure: [['low', 0, .22], ['paper', .09, .16]],
+    tap: [['wood', 0, .12]],
+    page: [['paper', 0, .3, .85]],
+    back: [['paper', 0, .24, .7]],
+    unroll: [['parchment', 0, .2]],
+    expand: [['paper', 0, .19, .9]],
+    open: [['paper', 0, .18, 1.1], ['wood', .06, .07]],
+    close: [['paper', 0, .14, .85]],
+    select: [['wood', 0, .12]],
+    place: [['wood', 0, .19], ['paper', .03, .08]],
+    return: [['paper', 0, .15, .85], ['low', .05, .08]],
+    hover: [['wood', 0, .05, 1.1]],
+    flip: [['paper', 0, .22, 1.45]],
+    deal: [['paper', 0, .18, 1.2], ['wood', .09, .08]],
+    turn: [['wood', 0, .13], ['high', .15, .08]],
+    end: [['wood', 0, .17], ['high', .17, .14], ['wood', .34, .09]],
+    zoom: [['wood', 0, .07, 1.15]],
+    notice: [['high', 0, .09]]
+  };
+  const priority = {hover:0, zoom:1, select:2, notice:2, close:3, expand:4, open:4, flip:5, deal:6, return:6, place:7, page:8, back:8, unroll:9, turn:10, end:11};
+  let pending = null, transitionTimer = null, lastResult = -Infinity;
+  function transition(kind) {
+    if (!(kind in priority) || !CT.effectPrefs?.().sound || document.hidden) return;
+    if (!pending || priority[kind] >= priority[pending]) pending = kind;
+    if (transitionTimer !== null) return;
+    // Un clic puede cerrar un diálogo, seleccionar y navegar: escuchar solo
+    // su desenlace. El timeout abarca todos los oyentes y el gesto nativo de details.
+    transitionTimer = setTimeout(() => {
+      const next = pending;
+      pending = null; transitionTimer = null;
+      if (next && performance.now() - lastResult >= 100) void cue(next);
+    }, 0);
+  }
   // Papel y resonancias de madera, sin imponer otra melodía a las seis pistas.
   // La textura utiliza su propia semilla: nunca consume el azar del reparto.
   function sample(kind) {
     if (samples.has(kind)) return samples.get(kind);
-    const paper = kind === 'paper', duration = paper ? .22 : .38;
+    const paper = kind === 'paper' || kind === 'parchment';
+    const duration = kind === 'parchment' ? .85 : paper ? .22 : .38;
     const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * duration), audio.sampleRate);
     const data = buffer.getChannelData(0);
     const base = kind === 'low' ? 145 : kind === 'high' ? 330 : 245;
@@ -50,21 +88,19 @@
   async function cue(kind) {
     if (!CT.effectPrefs?.().sound || document.hidden) return;
     const now = performance.now();
-    if (now - (lastCue.get(kind) ?? -Infinity) < 80) return;
+    if (now - (lastCue.get(kind) ?? -Infinity) < (kind === 'hover' ? 180 : 80)) return;
     lastCue.set(kind, now);
     try {
       const Audio = window.AudioContext || window.webkitAudioContext;
       if (!Audio) return;
       audio ||= new Audio();
       if (audio.state === "suspended") await audio.resume();
-      if (!CT.effectPrefs?.().sound || document.hidden) return;
-      const score = kind === 'success' ? [['wood', 0, .24], ['high', .13, .19]]
-        : kind === 'failure' ? [['low', 0, .22], ['paper', .09, .16]]
-        : kind === 'page' ? [['paper', 0, .3]] : [['wood', 0, .12]];
-      for (const [texture, delay, volume] of score) {
+      if (!CT.effectPrefs?.().sound || document.hidden || performance.now() - now > 300) return;
+      for (const [texture, delay, volume, rate = 1] of scores[kind]) {
         if (voices.size >= 6) break;
         const source = audio.createBufferSource(), gain = audio.createGain();
         source.buffer = sample(texture);
+        if (source.playbackRate) source.playbackRate.value = rate;
         gain.gain.value = volume;
         source.connect(gain); gain.connect(audio.destination);
         voices.add(source);
@@ -75,13 +111,16 @@
   }
   // El sonido y la vibración siguen siendo preferencias independientes.
   CT.Effects = {
-    feedback(correct) { void vibration(correct ? "success" : "failure"); void cue(correct ? 'success' : 'failure'); },
+    feedback(correct) { lastResult = performance.now(); pending = null; void vibration(correct ? "success" : "failure"); void cue(correct ? 'success' : 'failure'); },
     tap() { void vibration("confirm"); void cue('tap'); },
-    page() { void cue('page'); }
+    page(backwards = false) { transition(backwards ? 'back' : 'page'); },
+    transition
   };
   document.addEventListener("click", event => {
     if (event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"]')) void vibration("confirm");
-    if (event.target.closest('.hand-card:not([disabled]), .slot:not([disabled])')) void cue('tap');
+    const summary = event.target.closest('summary');
+    const details = summary?.parentElement;
+    if (details?.matches('.solo-fold, .enc-deck')) transition(details.open ? 'close' : 'expand');
   }, true);
   CT.Art = {
     button(mode, card) {

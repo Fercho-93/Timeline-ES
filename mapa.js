@@ -56,8 +56,10 @@
     }, null)?.card;
     const oldLeft = anchor?.getBoundingClientRect().left;
     const action = button.dataset.timelineZoom;
+    const previousLevel = level;
     level = button.hasAttribute('data-timeline-range') ? Number(button.value) : action === "reset" ? 3 : Math.max(0, Math.min(levels.length - 1, level + (action === "out" ? -1 : 1)));
     applyTimelineZoom(container);
+    if (level !== previousLevel) CT.Effects?.transition?.('zoom');
     if (anchor) wrap.scrollLeft += anchor.getBoundingClientRect().left - oldLeft;
   }
   document.addEventListener('click', event => { if (event.target.closest('[data-timeline-zoom]')) changeZoom(event); });

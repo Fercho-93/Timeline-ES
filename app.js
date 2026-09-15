@@ -2051,6 +2051,7 @@
   }
 
   function showToast(message) {
+    if (!toast.classList.contains('show') || toast.textContent !== message) CT.Effects.transition('notice');
     toast.textContent = message;
     toast.classList.add("show");
     clearTimeout(showToast.timer);
@@ -2160,6 +2161,7 @@
     else if (action === "set-block") {
       const sameOpenBlock = collectionOpen && target.dataset.block === selectedBlockKey;
       if (sameOpenBlock) {
+        CT.Effects.transition('close');
         collectionOpen = false;
         collectionDetails = false;
         home();
@@ -2177,7 +2179,7 @@
       CT.unrollCollection(app.querySelector('.collection-decks'));
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }
-    else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; if(screen==='competition-menu') {competitionOptions();competitionMenu();} else playMenu(); }
+    else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; CT.Effects.transition(formatOpen ? 'expand' : 'close'); if(screen==='competition-menu') {competitionOptions();competitionMenu();} else playMenu(); }
     else if (action === "competition-menu") { formatOpen=null;competitionMenu(); }
     else if (action === "setup") { pendingTournament=null;setup(); }
     else if (action === "competition-local") prepareMultiCompetition();

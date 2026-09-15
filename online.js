@@ -164,6 +164,7 @@ function header(extra = "") {
 }
 
 function showToast(message) {
+  if (!toastEl.classList.contains('show') || toastEl.textContent !== message) CT.Effects.transition('notice');
   toastEl.textContent = message;
   toastEl.classList.add("show");
   clearTimeout(showToast.timer);
@@ -562,6 +563,7 @@ function connectToRoom(code) {
 // ajenas, no contar dos veces la misma— lo resuelve `CT.Progreso`, que es quien recuerda
 // entre recargas qué versiones de la sala ya vio.
 function showTurnChangeSplash(nextUid, previousState = null) {
+  CT.Effects.transition('turn');
   const nextName = roomState?.players?.[nextUid]?.name || "el siguiente jugador";
   const isMine = nextUid === user.uid;
   // El cambio de jugador no implica perder el turno: también ocurre al acertar.

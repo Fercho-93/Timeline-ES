@@ -136,6 +136,7 @@
   function showToast(message) {
     const toast = document.getElementById("toast");
     if (!toast) return;
+    if (!toast.classList.contains('show') || toast.textContent !== message) CT.Effects?.transition?.('notice');
     toast.textContent = message;
     toast.classList.add("show");
     clearTimeout(showToast.timer);
@@ -161,7 +162,7 @@
   document.addEventListener("change", async event => {
     if (event.target.dataset.settingsAction === 'text-size') {
       if (!['100','125','150','200'].includes(event.target.value)) return;
-      settings.textSize = event.target.value; save(); applyTheme(); return;
+      settings.textSize = event.target.value; save(); applyTheme(); CT.Effects?.transition?.('select'); return;
     }
     if (["sound", "haptics", "ambience", "depth"].includes(event.target.dataset.settingsAction)) {
       const key = event.target.dataset.settingsAction;
@@ -174,11 +175,12 @@
         const help = document.querySelector('[data-depth-help]');
         if (!enabled && help) help.textContent = 'Este dispositivo no ha permitido usar el movimiento. Las portadas siguen funcionando.';
       }
-      settings[key] = enabled; save(); CT.UI?.updateEffects(); return;
+      settings[key] = enabled; save(); CT.UI?.updateEffects(); CT.Effects?.transition?.('select'); return;
     }
     if (event.target.dataset.settingsAction !== "theme") return;
     if (!THEMES[event.target.value]) return;
     settings.theme = event.target.value;
+    CT.Effects?.transition?.('select');
     save();
     applyTheme();
   });

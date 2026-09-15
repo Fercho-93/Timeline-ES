@@ -81,8 +81,9 @@
   function resizeContent(container, from) {
     resizing.get(container)?.cancel();
     resizing.delete(container);
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !container.animate) return;
     const to = container.getBoundingClientRect().height;
+    if (Math.abs(to - from) >= 1) window.CONTINUUM.Effects?.transition?.(to > from ? 'expand' : 'close');
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !container.animate) return;
     container.classList.remove("section-enter");
     void container.offsetWidth;
     container.classList.add("section-enter");
@@ -103,6 +104,7 @@
     unrollSheet(container.firstElementChild);
   }
   function unrollSheet(sheet, collection = false) {
+    if (sheet) window.CONTINUUM.Effects?.transition?.('unroll');
     if (!sheet?.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     cancelProfileRoll?.();
     sheet.classList.add('parchment-unrolling');
@@ -168,18 +170,21 @@
   // invisible, así que primero se ve viajar la línea y después llegar la carta.
   const TURNO = 640;
   function dealIn(cards, { seguir = null } = {}) {
-    const lista = [...cards].filter(card => card?.isConnected && card.animate);
+    const lista = [...cards].filter(card => card?.isConnected);
     if (!lista.length) return;
+    window.CONTINUUM.Effects?.transition?.('deal');
     // Con movimiento reducido no hay recorrido, pero la vista sí va hasta la última: saber
     // dónde ha caído la carta no es decoración, es la mitad de la información.
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { seguir?.(lista[lista.length - 1]); return; }
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !lista.every(card => typeof card.animate === 'function')) { seguir?.(lista[lista.length - 1]); return; }
     lista.forEach((card, orden) => {
       // Las que esperan su turno no se ven: si no, estarían puestas antes de llegar.
       if (orden > 0) card.style.visibility = "hidden";
       const entra = () => {
         if (!card.isConnected) return;   // un repintado se llevó la mesa por delante
+        if (orden > 0) window.CONTINUUM.Effects?.transition?.('deal');
         card.style.visibility = "";
         seguir?.(card);
+        if (!card.animate) return;
         const caja = card.getBoundingClientRect();
         if (!caja.width) return;
         const dx = window.innerWidth / 2 - (caja.left + caja.width / 2);
@@ -200,7 +205,7 @@
   // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino
   // la hoja anterior levantándose desde una esquina y descubriendo el destino debajo.
   function turnPage(container, backwards) {
-    window.CONTINUUM.Effects?.page?.();
+    window.CONTINUUM.Effects?.page?.(backwards);
     if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const layer = document.createElement("div");
     layer.className = "book-turn";
@@ -332,11 +337,20 @@
     }
     const cartaElegida = container.querySelector(".hand-card.selected")?.dataset.id || null;
     const confirmacionAnterior = container.querySelector(".slot-confirm")?.dataset.index ?? null;
+    const oldFinal = container.querySelector('.final-results')?.textContent;
+    const oldQuestion = container.querySelector('.final-card')?.textContent;
+    const hadFinalForm = !!container.querySelector('.final-form');
     actualizaAnclas(container);
     paint.screen = screen;
 
     container.innerHTML = html;
     window.CONTINUUM.UI?.mount(container, screen);
+    if (!primero && cambioDePantalla) {
+      const kind = ['winner', 'online-winner', 'solo-end', 'comp-end'].includes(screen) ? 'end'
+        : ['pass', 'pulse-pass', 'comp-intro', 'tournament-intro', 'online-competition-intro'].includes(screen) ? 'turn'
+        : vuelve || (nextDepth !== undefined && nextDepth < previousDepth) ? 'back' : 'page';
+      window.CONTINUUM.Effects?.transition?.(kind);
+    }
     // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
     // muchas veces y no debe convertir cada toque en una animación.
     if (!primero && cambioDePantalla && !closingEncyclopedia) {
@@ -348,9 +362,20 @@
     // toque con el mismo efecto.
     if (!cambioDePantalla) {
       const nuevaCarta = container.querySelector(".hand-card.selected");
-      if (nuevaCarta && nuevaCarta.dataset.id !== cartaElegida) nuevaCarta.classList.add("selection-enter");
+      if (nuevaCarta && nuevaCarta.dataset.id !== cartaElegida) {
+        nuevaCarta.classList.add("selection-enter");
+        window.CONTINUUM.Effects?.transition?.(screen === 'solo' && cartaElegida ? 'deal' : 'select');
+      }
       const nuevaConfirmacion = container.querySelector(".slot-confirm");
-      if (nuevaConfirmacion && nuevaConfirmacion.dataset.index !== confirmacionAnterior) nuevaConfirmacion.classList.add("placement-enter");
+      if (nuevaConfirmacion && nuevaConfirmacion.dataset.index !== confirmacionAnterior) {
+        nuevaConfirmacion.classList.add("placement-enter");
+        window.CONTINUUM.Effects?.transition?.('place');
+      } else if (!nuevaConfirmacion && confirmacionAnterior !== null) window.CONTINUUM.Effects?.transition?.('return');
+      const newFinal = container.querySelector('.final-results')?.textContent;
+      const newQuestion = container.querySelector('.final-card')?.textContent;
+      if (newFinal && newFinal !== oldFinal) window.CONTINUUM.Effects?.transition?.('flip');
+      else if (newQuestion && newQuestion !== oldQuestion) window.CONTINUUM.Effects?.transition?.('deal');
+      else if (hadFinalForm && !container.querySelector('.final-form')) window.CONTINUUM.Effects?.transition?.('place');
     }
     const confirmation = container.querySelector(".slot-confirm");
     const newConfirmation = confirmation && confirmation.dataset.index !== confirmacionAnterior;
@@ -419,6 +444,7 @@
 
   function openDialog(overlay, cerrable, onClose) {
     if (!overlay) return;
+    if (!pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
     const modal = overlay.querySelector(".modal") || overlay;
     window.CONTINUUM.UI?.reveal(modal);
     const openingFocus = document.activeElement;
@@ -472,6 +498,9 @@
   function closeDialog() {
     const dialogo = pila.pop();
     if (!dialogo) return;
+    // La enciclopedia vuelve a su pantalla desde onClose; ese pintado da la
+    // respuesta de navegación sin añadir primero otro sonido de cierre.
+    if (!dialogo.onClose) window.CONTINUUM.Effects?.transition?.('close');
     dialogo.cancelRoll?.();
     document.removeEventListener("keydown", dialogo.onKey);
     const anteriorEnPila = pila[pila.length - 1];
@@ -513,6 +542,7 @@
   // carta sería spam en el historial de partida, y además perdería el resto de la mano.
   function toggleFlip(carta) {
     if (carta.classList.contains("flip-anim")) return;
+    window.CONTINUUM.Effects?.transition?.('flip');
     const giraHaciaAtras = !carta.classList.contains("is-flipped");
     carta.setAttribute("aria-pressed", String(giraHaciaAtras));
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
