@@ -454,6 +454,19 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app .atlas-intro { display: grid; grid-template-columns: 1fr; position: relative; isolation: isolate; min-height: 500px; padding: 28px 24px 16px; overflow: hidden; background: var(--edition-paper); border: 0; box-shadow: none; border-radius: 0; }
 #app .atlas-intro::after { display: none; }
 #app .atlas-landscape { position: absolute; inset: 0; z-index: -1; max-width: none; overflow: hidden; }
+/* La profundidad de las portadas la escribe immersion.js en cada aviso del giroscopio, y
+   eso llega a ser sesenta veces por segundo. Declarar aquí que estas variables no se
+   heredan es lo que impide que cada escritura obligue a recalcular el estilo de la
+   portada entera —fondo, dibujo, rótulo, índice, lámina— en lugar del de la capa que de
+   verdad cambia. A cambio, quien las escribe tiene que ponerlas en cada capa y no en la
+   portada que las contiene: esa lista vive en immersion.js, junto a esta explicación.
+   En un navegador sin @property el efecto se ve exactamente igual; solo se pierde el
+   ahorro, que es lo que había antes de todo esto. */
+@property --depth-x { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --depth-y { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --scene-scroll { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --cover-rx { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@property --cover-ry { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 #app .atlas-landscape img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; filter: sepia(1) saturate(.55); transform: translate(var(--depth-x,0px), var(--depth-y,0px)) scale(1.06); transition: transform 350ms ease-out; }
 #app .atlas-landscape::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--edition-paper) 0%, color-mix(in srgb,var(--edition-paper) 88%,transparent) 18%, transparent 47%, color-mix(in srgb,var(--edition-paper) 35%,transparent) 70%,var(--edition-paper) 100%); }
 #app .atlas-intro-copy { color: var(--edition-ink); max-width: 42ch; margin-bottom: 165px; z-index: 1; }

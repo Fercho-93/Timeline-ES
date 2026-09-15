@@ -122,6 +122,22 @@
     if (value && !reduced()) value.classList.add('atlas-reveal');
   }
 
+  // Las capas que leen la profundidad, en el mismo orden en que edition.css las dibuja:
+  // el paisaje y las láminas del atlas, y el fondo y el dibujo de cada portada. La lista
+  // está aquí y no marcada con una clase porque la fórmula de cada capa vive en la hoja:
+  // esto es el índice de esas reglas. Si allí aparece una capa nueva, aquí se añade su
+  // selector. Las variables se escriben en la capa y no en la portada a propósito —
+  // están declaradas sin herencia, así que ponerlas arriba ya no llegaría abajo, y esa
+  // es justo la razón de que una escritura no recalcule toda la portada.
+  const DEPTH_LAYERS = '.atlas-landscape img, .atlas-specimens, .panel-backdrop img, .panel-art img';
+
+  // Volver a escribir una variable con el valor que ya tenía cuesta lo mismo que
+  // cambiarla. Con el móvil quieto sobre la mesa el giroscopio sigue avisando, y sin esta
+  // comparación cada aviso repintaría lo mismo otra vez.
+  function setVar(node, name, value) {
+    if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
+  }
+
   // Un único listener de orientación, conectado solo con permiso y en las portadas.
   let depthListening = false, depthFrame = 0, origin = null, tilt = {x: 0, y: 0};
   function depthTarget() {
@@ -140,13 +156,20 @@
       if (!scene) return;
       const scenes = scene.matches('.gallery-panel')
         ? document.querySelectorAll('#app .gallery-panel') : [scene];
+      // Dos decimales: por debajo de eso el desplazamiento no se ve, y redondear es lo
+      // que hace que un móvil casi quieto deje de escribir en cada aviso.
+      const x = `${(tilt.x * 7).toFixed(2)}px`, y = `${(tilt.y * 5).toFixed(2)}px`;
+      const rx = `${(-tilt.y * 2).toFixed(2)}deg`, ry = `${(tilt.x * 2.5).toFixed(2)}deg`;
       scenes.forEach(target => {
         const rect = target.getBoundingClientRect();
         if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-        target.style.setProperty('--depth-x', `${tilt.x * 7}px`);
-        target.style.setProperty('--depth-y', `${tilt.y * 5}px`);
-        target.style.setProperty('--cover-rx', `${-tilt.y * 2}deg`);
-        target.style.setProperty('--cover-ry', `${tilt.x * 2.5}deg`);
+        target.querySelectorAll(DEPTH_LAYERS).forEach(layer => {
+          setVar(layer, '--depth-x', x);
+          setVar(layer, '--depth-y', y);
+        });
+        // El giro sí lo usa la portada en su propia regla, así que ahí se queda.
+        setVar(target, '--cover-rx', rx);
+        setVar(target, '--cover-ry', ry);
       });
     });
   }
@@ -156,7 +179,15 @@
     else if (!enabled && depthListening) {
       window.removeEventListener('deviceorientation', onTilt); depthListening = false; origin = null;
       cancelAnimationFrame(depthFrame); depthFrame = 0;
-      document.querySelectorAll('[data-depth-scene], .gallery-panel').forEach(scene => { scene.style.removeProperty('--depth-x'); scene.style.removeProperty('--depth-y'); scene.style.removeProperty('--cover-rx'); scene.style.removeProperty('--cover-ry'); });
+      document.querySelectorAll('[data-depth-scene], .gallery-panel').forEach(scene => {
+        scene.style.removeProperty('--cover-rx');
+        scene.style.removeProperty('--cover-ry');
+        scene.querySelectorAll(DEPTH_LAYERS).forEach(layer => {
+          layer.style.removeProperty('--depth-x');
+          layer.style.removeProperty('--depth-y');
+          layer.style.removeProperty('--scene-scroll');
+        });
+      });
     }
   }
   // Fondo y dibujo recorren distancias distintas al desplazarse por la galería.
@@ -171,7 +202,8 @@
         const rect = panel.getBoundingClientRect();
         if (rect.bottom < 0 || rect.top > window.innerHeight) return;
         const offset = Math.max(-6, Math.min(6, (rect.top + rect.height / 2 - window.innerHeight / 2) * .025));
-        panel.style.setProperty('--scene-scroll', `${offset}px`);
+        const valor = `${offset.toFixed(2)}px`;
+        panel.querySelectorAll(DEPTH_LAYERS).forEach(layer => setVar(layer, '--scene-scroll', valor));
       });
     });
   }
