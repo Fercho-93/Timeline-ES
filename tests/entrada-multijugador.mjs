@@ -28,13 +28,17 @@ console.log("ok  el flujo de entrada prioriza unirse y oculta crear cuando hay i
 // Ejecutar el renderizador real sin conectar los tests a una sala de producción.
 const w = new JSDOM('<div id="app"></div>', { runScripts: 'outside-only' }).window;
 try {
+  w.turnSounds = [];
   w.eval(`const appEl = document.getElementById('app');
+    const CT = {Effects:{transition:kind=>window.turnSounds.push(kind)}};
     const user = {uid:'yo'};
     const roomState = {players:{otro:{name:'Ana <López>'},yo:{name:'Yo'}}};
     const escapeHtml = s => s.replaceAll('<','&lt;').replaceAll('>','&gt;');
     ${source.slice(source.indexOf('function showTurnChangeSplash('), source.indexOf('function anotaProgreso('))}`);
   const result = (uid, state) => {
+    const before = w.turnSounds.length;
     w.showTurnChangeSplash(uid, state);
+    assert.deepEqual(w.turnSounds.slice(before), ['turn'], 'el cambio de turno tiene una sola respuesta sonora');
     assert.equal(w.document.querySelectorAll('[data-turn-change-splash]').length, 1);
     return w.document.querySelector('[data-turn-change-splash]').textContent;
   };

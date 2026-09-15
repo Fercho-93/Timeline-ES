@@ -215,35 +215,8 @@
       return true;
     } catch { return false; }
   }
-  // Papel sintetizado de 130 ms; la música tiene su propio reloj en ambience.js.
-  let audio;
-  function context() {
-    const Audio = window.AudioContext || window.webkitAudioContext;
-    if (!Audio) return null;
-    audio ||= new Audio();
-    if (audio.state === 'suspended') void audio.resume().catch(() => {});
-    return audio;
-  }
-  function paper() {
-    if (!CT.effectPrefs?.().sound || document.hidden) return;
-    try {
-      const ctx = context(); if (!ctx) return;
-      const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * .13), ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * .12;
-      const source = ctx.createBufferSource(), filter = ctx.createBiquadFilter(), gain = ctx.createGain();
-      source.buffer = buffer; filter.type = 'lowpass'; filter.frequency.value = 1300;
-      gain.gain.setValueAtTime(.12, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .13);
-      source.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
-      source.onended = () => { source.disconnect(); filter.disconnect(); gain.disconnect(); };
-      source.start(); source.stop(ctx.currentTime + .14);
-    } catch { /* Un efecto nunca interrumpe el juego. */ }
-  }
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  document.addEventListener('click', event => {
-    if (event.target.closest('.gallery-panel, .game-row, .play-choice, .hand-card:not(:disabled), [data-action="confirm-place"], [data-online-action="confirm-place"]')) paper();
-  }, true);
   CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, confirmExit, reveal, openSurface, closeSurface, requestDepth,
     updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

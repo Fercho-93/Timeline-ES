@@ -116,6 +116,7 @@
 
   function startDrag() {
     const { card } = session;
+    window.CONTINUUM.Effects?.tap?.();
     const ghost = card.cloneNode(true);
     ghost.classList.add("drag-ghost");
     ghost.classList.remove("dragging", "armed", "holding", "selected", "selection-enter");
@@ -177,6 +178,7 @@
     if (slot !== session.slot) {
       session.slot?.classList.remove("drop-target");
       slot?.classList.add("drop-target");
+      if (slot) window.CONTINUUM.Effects?.transition?.('hover');
       session.slot = slot;
     }
   }
@@ -243,7 +245,6 @@
       session.card.classList.remove("holding");
       // Un toque corto avisa de que la carta ya va en el dedo; sin él no hay manera de
       // saber que ha terminado la espera sin mirar fijamente la pantalla.
-      window.CONTINUUM.Effects?.tap?.();
       try { session.card.setPointerCapture(session.pointerId); } catch { /* el puntero ya no está */ }
       startDrag();
     }, HOLD);
@@ -316,6 +317,7 @@
     cleanup();
     if (ghost) settle(ghost, from, target, medida, velocity, duration);
     if (!dragging) return;          // fue un toque: que siga su curso y seleccione
+    window.CONTINUUM.Effects?.transition?.(slot ? 'place' : 'return');
     // Tras un arrastre el navegador suele disparar un clic sobre lo que haya debajo; se
     // ignora, para que soltar fuera de un hueco no acabe seleccionando otra cosa. Pero
     // no siempre lo dispara, según dónde empezara y acabara el gesto, así que el oyente
