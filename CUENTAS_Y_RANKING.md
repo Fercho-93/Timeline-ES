@@ -3,7 +3,7 @@
 ## Experiencia
 
 - La primera apertura con conexión crea un invitado Firebase automáticamente y un alias aleatorio `Player 4821`. No hay formulario ni registro previo.
-- Firebase conserva la sesión local. Volver a abrir usa el mismo UID; el nombre puede repetirse entre invitados, pero sus puntos se separan por UID.
+- Firebase conserva la sesión local. Volver a abrir usa el mismo UID; el nombre se reserva de forma única en `playerNames`, sin distinguir mayúsculas. Los puntos se separan por UID.
 - Perfil → Cambiar nombre actualiza el perfil y la entrada del ranking de forma atómica, conservando los puntos. Los nombres aceptan de 2 a 24 caracteres.
 - No hay cierre de sesión ni recuperación por correo. Si se pierde la instalación o se borran sus datos, se pierde acceso al invitado. No se promete recuperación por copias del sistema operativo.
 - La apertura requiere conexión para preparar el invitado y leer su progreso. Una vez abierto, el juego conserva cambios locales y reintenta guardarlos al recuperar conexión. No se crea otro invitado ante un fallo de red.
@@ -31,3 +31,5 @@ El progreso se guarda con revisiones para evitar sobrescribir cambios concurrent
 `node tests/cuentas.mjs` prueba alta automática, reentrada, fallo de red, nombre editable, ranking, aislamiento y conflictos. `npm run test:reglas` ejecuta el emulador real de Firestore. Las compilaciones y estas pruebas no sustituyen la comprobación en dispositivos reales.
 
 El splash cubre el arranque real en cada apertura, con animaciones reducidas si el dispositivo lo solicita y salida ante errores de conexión. La publicación del ranking diario requiere actualizar las reglas de Firestore incluidas.
+
+Los nombres ocupados muestran un error. Alta, cambio de nombre y liberación del anterior son transacciones atómicas. Se admiten letras españolas, números, espacios interiores, guiones y guion bajo (2–24 caracteres). Los perfiles previos reservan su nombre al entrar; si ya fue reservado por otro invitado reciben un nuevo Player aleatorio. Actualizar Firestore antes de abrir esta versión.

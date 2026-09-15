@@ -11,7 +11,7 @@ function setup(user=null,seed={}){
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
  Object.assign(w,{collection:(_,name)=>name,query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async()=>({docs:[...data].filter(([k])=>k.startsWith('dailyRanking/')).map(([k,v])=>({id:k.split('/')[1],data:()=>v}))}),browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,col,id)=>`${col}/${id}`,getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
-  const pending=[];const result=await fn({get:async key=>snap(key),set:(key,value)=>pending.push([key,value])});for(const [k,v]of pending)data.set(k,v);return result;
+  const pending=[];const result=await fn({delete:key=>pending.push([key,null]),get:async key=>snap(key),set:(key,value)=>pending.push([key,value])});for(const [k,v]of pending)v===null?data.delete(k):data.set(k,v);return result;
  }});
  let source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts');
  w.eval(source+'\nwindow.testAccounts={startAccounts,enter,flush,rename,editNameScreen};');
@@ -44,6 +44,10 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get('dailyRanking/a').alias,'Fulanito');
  assert.equal(data.get('dailyRanking/a').hits,5);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='<bad>';await assert.rejects(w.testAccounts.rename());
+ data.set('playerNames/ocupado',{uid:'someone-else'});
+ w.document.getElementById('account-alias').value='OCUPADO';await assert.rejects(w.testAccounts.rename(),/ya está en uso/);
+ assert.equal(data.get('playerNames/fulanito').uid,'a');
+ assert.equal(data.has('playerNames/fer'),false);
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');w.CONTINUUM.closeDialog();
  assert.equal(w.localStorage.getItem('hilo-perfil-v1'),JSON.stringify({totals:{hits:999}}));
  w.CONTINUUM.AccountStorage.use('b');assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),null);w.CONTINUUM.AccountStorage.use('a');

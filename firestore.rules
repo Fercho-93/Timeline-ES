@@ -11,19 +11,39 @@ service cloud.firestore {
       return request.auth != null;
     }
     function owner(uid) { return registered() && request.auth.uid == uid; }
+    function validName(uid) {
+      let d=request.resource.data;
+      return d.alias is string && d.alias.size() >= 2 && d.alias.size() <= 24
+        && d.alias.matches('^[a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ_-][a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ _-]*[a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ_-]$')
+        && d.aliasKey == d.alias.lower()
+        && getAfter(/databases/$(database)/documents/playerNames/$(d.aliasKey)).data.uid == uid;
+    }
+    match /playerNames/{key} {
+      allow get: if registered();
+      allow list: if false;
+      allow create: if registered() && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid
+        && getAfter(/databases/$(database)/documents/playerProfiles/$(request.auth.uid)).data.aliasKey == key;
+      allow update: if registered() && resource.data.uid == request.auth.uid && request.resource.data == resource.data;
+      allow delete: if registered() && resource.data.uid == request.auth.uid
+        && (!existsAfter(/databases/$(database)/documents/playerProfiles/$(request.auth.uid))
+          || getAfter(/databases/$(database)/documents/playerProfiles/$(request.auth.uid)).data.aliasKey != key);
+    }
     match /playerProfiles/{uid} {
       allow get: if owner(uid);
       allow list: if false;
-      allow create: if owner(uid)
-        && request.resource.data.keys().hasOnly(['alias','avatar','season','createdAt','privacyVersion'])
+      allow create: if owner(uid) && validName(uid)
+        && request.resource.data.keys().hasOnly(['alias','aliasKey','avatar','season','createdAt','privacyVersion'])
         && request.resource.data.alias is string
         && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24
         && request.resource.data.avatar in ['compass','globe','star','book','rocket','owl']
         && request.resource.data.season == 'launch-1'
         && request.resource.data.privacyVersion == 1
         && request.resource.data.createdAt == request.time;
-      allow update: if owner(uid)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['alias'])
+      allow update: if owner(uid) && validName(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['alias','aliasKey'])
+        && (!('aliasKey' in resource.data) || resource.data.aliasKey == request.resource.data.aliasKey
+          || !existsAfter(/databases/$(database)/documents/playerNames/$(resource.data.aliasKey)))
         && request.resource.data.alias is string
         && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24;
       allow delete: if owner(uid);

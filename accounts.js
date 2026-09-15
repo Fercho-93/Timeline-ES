@@ -53,16 +53,32 @@ function randomAlias() {
   crypto.getRandomValues(number);
   return `Player ${1000 + number[0] % 9000}`;
 }
+const nameRef = key => doc(db,'playerNames',key);
+const nameKey = alias => alias.toLowerCase();
+function validateAlias(alias) {
+  if (alias.length < 2 || alias.length > 24 || !/^[a-z0-9áéíóúüñ_-](?:[a-z0-9áéíóúüñ _-]*[a-z0-9áéíóúüñ_-])$/i.test(alias)) throw Error('Usa de 2 a 24 caracteres: letras, números, espacios, guion o guion bajo.');
+}
 async function ensureProfile(uid) {
-  const ref = refs(uid).profile;
-  const alias = randomAlias();
-  return runTransaction(db, async tx => {
-    const existing = await tx.get(ref);
-    if (existing.exists()) return existing.data();
-    const value = {alias,avatar:'compass',season,createdAt:serverTimestamp(),privacyVersion:1};
-    tx.set(ref,value);
-    return value;
-  });
+  const ref=refs(uid).profile;
+  for(let attempt=0;attempt<12;attempt++) {
+    const fallback=randomAlias();
+    try {
+      return await runTransaction(db,async tx=>{
+        const existing=await tx.get(ref), old=existing.exists()?existing.data():null;
+        if(old?.aliasKey) return old;
+        let alias=attempt===0 && old ? old.alias : fallback;
+        try {validateAlias(alias);} catch {alias=fallback;}
+        const aliasKey=nameKey(alias), reservation=await tx.get(nameRef(aliasKey));
+        if(reservation.exists() && reservation.data().uid!==uid) throw Object.assign(Error('Nombre ocupado'),{code:'name/taken'});
+        const rank=await tx.get(refs(uid).ranking);
+        const value=old ? {...old,alias,aliasKey} : {alias,aliasKey,avatar:'compass',season,createdAt:serverTimestamp(),privacyVersion:1};
+        tx.set(nameRef(aliasKey),{uid});tx.set(ref,value);
+        if(rank.exists())tx.set(refs(uid).ranking,{...rank.data(),alias,updatedAt:serverTimestamp()});
+        return value;
+      });
+    } catch(error) {if(error.code!=='name/taken')throw error;}
+  }
+  throw Error('No se pudo reservar un nombre. Vuelve a intentarlo.');
 }
 function accountDialog(html) {
   app.insertAdjacentHTML('beforeend',html);
@@ -73,17 +89,23 @@ function editNameScreen() {
 }
 async function rename() {
   const alias = document.getElementById('account-alias').value.trim();
+  validateAlias(alias);
+  const aliasKey=nameKey(alias);
   if (alias.length < 2 || alias.length > 24 || /[<>\x00-\x1f]/.test(alias)) throw Error('Elige un nombre de 2 a 24 caracteres sin símbolos < o >.');
   await flush();
   if (failedConflict) return;
   const r=refs(identity.uid);
   await runTransaction(db,async tx => {
-    const p=await tx.get(r.profile), rank=await tx.get(r.ranking);
+    const p=await tx.get(r.profile), rank=await tx.get(r.ranking), reservation=await tx.get(nameRef(aliasKey));
+    if(reservation.exists() && reservation.data().uid!==identity.uid) throw Error('Este nombre de usuario ya está en uso. Elige otro.');
     if (!p.exists()) throw Error('No se ha encontrado tu perfil. Vuelve a abrir el juego.');
-    tx.set(r.profile,{...p.data(),alias});
+    const previous=p.data().aliasKey;
+    tx.set(nameRef(aliasKey),{uid:identity.uid});
+    tx.set(r.profile,{...p.data(),alias,aliasKey});
+    if(previous && previous!==aliasKey) tx.delete(nameRef(previous));
     if (rank.exists()) tx.set(r.ranking,{...rank.data(),alias,updatedAt:serverTimestamp()});
   });
-  profile={...profile,alias};
+  profile={...profile,alias,aliasKey};
   CT.Storage.setItem('hilo-nombre-v1',alias);
   const card=document.querySelector('.account-card');
   if(card) card.outerHTML=accountCard();
@@ -194,6 +216,7 @@ async function removeAccount() {
   const u=auth.currentUser;
   clearTimeout(timer);stopStorage?.();if (saving) await saving;
   const r=refs(u.uid), batch=writeBatch(db);
+  if(profile?.aliasKey) batch.delete(nameRef(profile.aliasKey));
   batch.delete(r.ranking);batch.delete(doc(db,'socialRanking',u.uid));batch.delete(r.progress);batch.delete(r.profile);await batch.commit();
   active=false;
   try { await deleteUser(u); } catch(error) { active=true; throw error; }

@@ -6,12 +6,14 @@ const verified={firebase:{sign_in_provider:'anonymous'}};
 const db=env.authenticatedContext('account-a',verified).firestore(), other=env.authenticatedContext('account-b',verified).firestore();
 const anonymous=env.authenticatedContext('anonymous',{firebase:{sign_in_provider:'anonymous'}}).firestore();
 const unauthenticated=env.unauthenticatedContext().firestore();
-const data={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1,createdAt:serverTimestamp()};
+const data={aliasKey:'fer',alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1,createdAt:serverTimestamp()};
 try {
- await assertSucceeds(setDoc(doc(db,'playerProfiles','account-a'),data));
+ let registration=writeBatch(db);registration.set(doc(db,'playerProfiles','account-a'),data);registration.set(doc(db,'playerNames','fer'),{uid:'account-a'});await assertSucceeds(registration.commit());
+ await assertFails(setDoc(doc(other,'playerNames','fer'),{uid:'account-b'}));
+ await assertFails(setDoc(doc(other,'playerProfiles','account-b'),data));
  await assertFails(setDoc(doc(other,'playerProfiles','account-a'),data));
  await assertFails(getDoc(doc(other,'playerProfiles','account-a')));
- await assertSucceeds(setDoc(doc(anonymous,'playerProfiles','anonymous'),data));
+ registration=writeBatch(anonymous);registration.set(doc(anonymous,'playerProfiles','anonymous'),{...data,alias:'Guest',aliasKey:'guest'});registration.set(doc(anonymous,'playerNames','guest'),{uid:'anonymous'});await assertSucceeds(registration.commit());
  await assertFails(setDoc(doc(unauthenticated,'playerProfiles','outsider'),data));
  await assertSucceeds(getDoc(doc(anonymous,'capabilities','multiCompetition')));
  await assertFails(getDocs(collection(db,'playerProfiles')));
@@ -30,9 +32,19 @@ try {
  await assertSucceeds(getDocs(query(collection(anonymous,'dailyRanking'),limit(50))));
  await assertFails(getDocs(query(collection(unauthenticated,'dailyRanking'),limit(50))));
  await assertFails(deleteDoc(doc(other,'dailyRanking','account-a')));
- batch=writeBatch(db);batch.update(doc(db,'playerProfiles','account-a'),{alias:'Fulanito'});batch.update(doc(db,'dailyRanking','account-a'),{alias:'Fulanito',updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
+ batch=writeBatch(db);batch.update(doc(db,'playerProfiles','account-a'),{alias:'Fulanito',aliasKey:'fulanito'});batch.set(doc(db,'playerNames','fulanito'),{uid:'account-a'});batch.delete(doc(db,'playerNames','fer'));batch.update(doc(db,'dailyRanking','account-a'),{alias:'Fulanito',updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'x'}));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,season:'other'}));
- batch=writeBatch(db);for(const name of ['playerProfiles','playerProgress','dailyRanking'])batch.delete(doc(db,name,'account-a'));await assertSucceeds(batch.commit());
+ await assertFails(deleteDoc(doc(db,'playerNames','fulanito')));
+ await assertFails(setDoc(doc(other,'playerNames','fulanito'),{uid:'account-b'}));
+ batch=writeBatch(db);batch.delete(doc(db,'playerNames','fulanito'));for(const name of ['playerProfiles','playerProgress','dailyRanking'])batch.delete(doc(db,name,'account-a'));await assertSucceeds(batch.commit());
+ const race=await Promise.allSettled(['race-a','race-b'].map(async uid=>{
+   const client=env.authenticatedContext(uid,verified).firestore(), claim=writeBatch(client);
+   claim.set(doc(client,'playerProfiles',uid),{...data,alias:'Unico',aliasKey:'unico'});
+   claim.set(doc(client,'playerNames','unico'),{uid});
+   return claim.commit();
+ }));
+ if(race.filter(r=>r.status==='fulfilled').length!==1)throw Error('Dos jugadores reservaron el mismo nombre');
+ registration=writeBatch(other);registration.set(doc(other,'playerProfiles','account-b'),{...data,alias:'UNICO',aliasKey:'UNICO'});registration.set(doc(other,'playerNames','UNICO'),{uid:'account-b'});await assertFails(registration.commit());
  console.log('Cuentas: invitados, aislamiento, nombres, revisiones, privacidad del ranking y borrado correctos.');
 } finally {await env.cleanup();}
