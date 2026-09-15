@@ -215,15 +215,13 @@
       return true;
     } catch { return false; }
   }
-  // Papel sintetizado de 130 ms y una grabación de guitarra, ambos optativos.
-  let audio, ambient = [], guitarBuffer, audioStarted = false;
-  let ambientRequest = 0, ambientLoading = false, pageActive = true;
+  // Papel sintetizado de 130 ms; la música tiene su propio reloj en ambience.js.
+  let audio;
   function context() {
     const Audio = window.AudioContext || window.webkitAudioContext;
     if (!Audio) return null;
     audio ||= new Audio();
     if (audio.state === 'suspended') void audio.resume().catch(() => {});
-    audioStarted = true;
     return audio;
   }
   function paper() {
@@ -241,62 +239,11 @@
       source.start(); source.stop(ctx.currentTime + .14);
     } catch { /* Un efecto nunca interrumpe el juego. */ }
   }
-  // Composición original con muestras de guitarra acústica real. Se descarga y
-  // decodifica una vez; el service worker la conserva también sin conexión.
-  function guitarLoop(ctx) {
-    if (!guitarBuffer) {
-      guitarBuffer = fetch('assets/audio/entre-paginas.mp3')
-        .then(response => {
-          if (!response.ok) throw new Error('Audio unavailable');
-          return response.arrayBuffer();
-        })
-        .then(data => ctx.decodeAudioData(data))
-        .catch(error => { guitarBuffer = null; throw error; });
-    }
-    return guitarBuffer;
-  }
-  function stopAmbient(immediate = false) {
-    ++ambientRequest; ambientLoading = false;
-    const nodes = ambient; ambient = [];
-    nodes.forEach(({source,gain}) => {
-      try {
-        if (immediate) { source.stop(); source.disconnect(); gain.disconnect(); }
-        else {
-          gain.gain.cancelScheduledValues(audio.currentTime);
-          gain.gain.setTargetAtTime(0,audio.currentTime,.06);
-          source.stop(audio.currentTime + .3);
-        }
-      } catch { source.disconnect(); gain.disconnect(); }
-    });
-  }
-  async function syncAmbient(fromGesture = false) {
-    const enabled = CT.effectPrefs?.().ambience && !document.hidden && pageActive;
-    if (!enabled) { stopAmbient(document.hidden); return; }
-    if (ambient.length || ambientLoading || (!fromGesture && !audioStarted)) return;
-    const request = ++ambientRequest;
-    try {
-      const ctx = context(); if (!ctx) return;
-      ambientLoading = true;
-      const buffer = await guitarLoop(ctx);
-      if (request !== ambientRequest || !CT.effectPrefs?.().ambience || document.hidden || !pageActive) return;
-      const source = ctx.createBufferSource(), gain = ctx.createGain();
-      source.buffer = buffer; source.loop = true;
-      gain.gain.setValueAtTime(0,ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(.12,ctx.currentTime + 1.5);
-      source.connect(gain); gain.connect(ctx.destination);
-      source.onended = () => { source.disconnect(); gain.disconnect(); };
-      ambient = [{source,gain}]; source.start();
-    } catch { if (request === ambientRequest) stopAmbient(true); }
-    finally { if (request === ambientRequest) ambientLoading = false; }
-  }
-  document.addEventListener('visibilitychange', () => { refreshDepth(); syncAmbient(); });
-  window.addEventListener('pagehide', () => { pageActive = false; stopAmbient(true); });
-  window.addEventListener('pageshow', () => { pageActive = true; syncAmbient(); });
+  document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
   document.addEventListener('click', event => {
     if (event.target.closest('.gallery-panel, .game-row, .play-choice, .hand-card:not(:disabled), [data-action="confirm-place"], [data-online-action="confirm-place"]')) paper();
-    syncAmbient(true);
   }, true);
   CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, confirmExit, reveal, openSurface, closeSurface, requestDepth,
-    updateEffects() { refreshDepth(); syncAmbient(true); }};
+    updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

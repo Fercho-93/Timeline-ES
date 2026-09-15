@@ -1,13 +1,13 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v171";
+const CACHE = "continuum-v172";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
 // se pide, así que la primera carta de un mazo de animales la baja de la red y a partir
 // de ahí, con esa carta ya vista, funciona sin conexión igual que el resto.
 const ASSETS = [
-  "./assets/audio/entre-paginas.mp3", "./assets/audio/CREDITS.md",
+  "./assets/audio/v1.mp3", "./assets/audio/v2.mp3", "./assets/audio/v3.mp3", "./assets/audio/v4.mp3", "./assets/audio/v5.mp3", "./assets/audio/v6.mp3", "./assets/audio/CREDITS.md",
   "./assets/competition-engraving.webp",
   "./assets/mode-walk-solo.webp", "./assets/mode-walk-multi.webp",
   "./deployment.js", "./accounts.css", "./firebase-client.js", "./account-storage.js", "./accounts.js", "./boot.js",
@@ -16,7 +16,7 @@ const ASSETS = [
   "./", "./index.html", "./splash.css", "./splash.js", "./styles.css", "./edition.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
   "./medicine.js", "./countries.js", "./population.js", "./idiomas.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./enciclopedia.js", "./progreso.js", "./duelo.js",
-  "./ghost.js", "./drag.js", "./swipe.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./immersion.js", "./app.js", "./online.js",
+  "./ghost.js", "./drag.js", "./swipe.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./ambience.js", "./immersion.js", "./app.js", "./online.js",
   "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/hero-history-400.webp", "./assets/hero-history-700.webp",
   "./assets/hero-entertainment-400.webp", "./assets/hero-entertainment-700.webp", "./assets/hero-science-400.webp",
   "./assets/hero-science-700.webp", "./assets/hero-nature-400.webp", "./assets/hero-nature-700.webp",

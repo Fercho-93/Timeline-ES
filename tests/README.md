@@ -109,6 +109,16 @@ suave de la carátula; no se anima la mesa completa al elegir carta o hueco. La 
 carta arrastrada se posiciona una vez por frame, sin interpolación que la retrase respecto al dedo.
 # Revisión visual de las transiciones
 
+## Música ambiente
+
+`node tests/musica-ambiente.mjs` comprueba las seis pistas, el barajado de cada
+ciclo sin repeticiones en sus límites, el solapamiento de cuatro segundos,
+la pausa y reanudación de ambas pistas durante el fundido, el interruptor,
+los eventos de segundo plano de Capacitor, los reintentos y las descargas tardías.
+El reloj simulado permite recorrer varias listas completas. `build-movil.mjs`
+comprueba además que los seis MP3 llegan íntegros al paquete sin conexión.
+La comprobación auditiva final en Android e iPhone físicos sigue siendo necesaria.
+
 `npm run dev` sirve los archivos originales con Vite, solo durante el desarrollo.
 Abre `/tests/preview.html` en ese servidor para revisar anchos de 360, 390, 430,
 768 y 1080 px. La publicación en GitHub Pages sigue siendo estática: no necesita
