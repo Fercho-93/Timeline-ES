@@ -800,3 +800,61 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 @media (prefers-reduced-motion: reduce) {
   #app .home-gallery-shell .gallery-panel { transform: none !important; transition: none; }
 }
+
+/* Dioramas: fondo atmosférico, ilustración enfocada y suelo en primer plano.
+   Las capas reutilizan el mismo recurso: sin nuevas descargas ni WebGL. */
+#app .home-gallery-shell .gallery-panel {
+  --scene-glow: #edb85c;
+  --scene-shade: #392719;
+  --scene-focus: 72%;
+  overflow: hidden;
+  background: var(--scene-shade);
+  box-shadow: 0 3px 0 #a68b64, 0 6px 0 #d2bf9c, 0 13px 20px #3c2b2333;
+}
+#app .home-gallery-shell .panel-entertainment { --scene-glow: #dda452; --scene-shade: #302118; --scene-focus: 65%; }
+#app .home-gallery-shell .panel-science { --scene-glow: #73c4cd; --scene-shade: #123b42; --scene-focus: 60%; }
+#app .home-gallery-shell .panel-nature { --scene-glow: #a6bb68; --scene-shade: #233c26; --scene-focus: 62%; }
+#app .home-gallery-shell .panel-globe { --scene-glow: #91c7ca; --scene-shade: #233b41; --scene-focus: 62%; }
+#app .home-gallery-shell .panel-mixed { --scene-glow: #c0acdb; --scene-shade: #3b3043; --scene-focus: 65%; }
+#app .home-gallery-shell .panel-backdrop {
+  position: absolute; inset: -12px; pointer-events: none;
+  filter: blur(7px) saturate(.9) brightness(.72);
+}
+#app .home-gallery-shell .panel-backdrop img {
+  width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 43%;
+  transform: translate(calc(var(--depth-x, 0px) * -.45), calc(var(--depth-y, 0px) * -.45 - var(--scene-scroll, 0px) * .6)) scale(1.12);
+}
+#app .home-gallery-shell .panel-depth-light {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 22% 18%, color-mix(in srgb, var(--scene-glow) 65%, transparent), transparent 70%);
+  opacity: .8;
+}
+#app .home-gallery-shell .gallery-panel .panel-art {
+  inset: 0;
+  -webkit-mask-image: radial-gradient(ellipse 76% 110% at var(--scene-focus) 48%, #000 30%, #000e 53%, transparent 90%);
+  mask-image: radial-gradient(ellipse 76% 110% at var(--scene-focus) 48%, #000 30%, #000e 53%, transparent 90%);
+}
+#app .home-gallery-shell .gallery-panel .panel-art img {
+  transform: translate(var(--depth-x, 0px), calc(var(--depth-y, 0px) + var(--scene-scroll, 0px))) scale(1.055);
+}
+#app .home-gallery-shell .panel-depth-ground {
+  position: absolute; z-index: 1; inset: auto 0 0; height: 28%; pointer-events: none;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--scene-shade) 75%, transparent));
+  box-shadow: inset 0 -7px 8px #130e0a55;
+}
+#app .home-gallery-shell .gallery-panel::before {
+  inset: 0; border: 1px solid #fff0ce77; border-radius: inherit;
+  box-shadow: inset 5px 5px 9px #140f084d, inset -2px -2px 1px #ffe3aa66, inset 0 0 0 7px #d2b78221;
+}
+#app .home-gallery-shell .gallery-panel::after {
+  background: linear-gradient(180deg, #16120d24, transparent 30%, transparent 44%, #17110bd9);
+}
+#app .home-gallery-shell .gallery-panel .collection-foil { inset: 7px; border: 1px solid #ffedbf38; border-radius: 1px 10px 10px 1px; }
+#app .home-gallery-shell .gallery-panel .panel-label { z-index: 4; }
+@media (prefers-reduced-motion: no-preference) {
+  #app .home-gallery-shell .panel-backdrop img { transition: transform 600ms ease-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .home-gallery-shell .gallery-panel .panel-art img { transform: scale(1.055); }
+  #app .home-gallery-shell .panel-backdrop img { transform: scale(1.12); }
+}

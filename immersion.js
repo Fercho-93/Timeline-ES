@@ -159,6 +159,23 @@
       document.querySelectorAll('[data-depth-scene], .gallery-panel').forEach(scene => { scene.style.removeProperty('--depth-x'); scene.style.removeProperty('--depth-y'); scene.style.removeProperty('--cover-rx'); scene.style.removeProperty('--cover-ry'); });
     }
   }
+  // Fondo y dibujo recorren distancias distintas al desplazarse por la galería.
+  // Sin sensores ni animación permanente; un solo frame por evento de scroll.
+  let galleryScrollFrame = 0;
+  function scrollGalleryDepth() {
+    if (galleryScrollFrame || reduced() || document.hidden) return;
+    galleryScrollFrame = requestAnimationFrame(() => {
+      galleryScrollFrame = 0;
+      if (reduced() || !depthTarget()) return;
+      document.querySelectorAll('#app .home-gallery-shell .gallery-panel').forEach(panel => {
+        const rect = panel.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        const offset = Math.max(-6, Math.min(6, (rect.top + rect.height / 2 - window.innerHeight / 2) * .025));
+        panel.style.setProperty('--scene-scroll', `${offset}px`);
+      });
+    });
+  }
+  window.addEventListener('scroll', scrollGalleryDepth, {passive: true});
   async function requestDepth() {
     try {
       if (!window.DeviceOrientationEvent) return false;
