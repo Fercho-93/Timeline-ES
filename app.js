@@ -269,7 +269,7 @@
   function competitionPromo() {
     return `<button class="comp-promo" data-action="competition-menu">
       <span class="comp-promo-art"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" loading="lazy"></span>
-      <span class="comp-promo-copy"><span class="competition-kicker">Explora · Compite · Descubre</span><b>Un viaje<br>entre mazos</b><small>Un nuevo tema en cada ronda.<br>Solo o en compañía.</small><span class="competition-cta">Elegir cómo jugar <span aria-hidden="true">→</span></span></span>
+      <span class="comp-promo-copy"><span class="competition-kicker">Explora · Compite · Descubre</span><b>Cada ronda,<br>un nuevo reto</b><small>Un nuevo tema en cada ronda.<br>Solo o en compañía.</small><span class="competition-cta">Elegir cómo jugar <span aria-hidden="true">→</span></span></span>
     </button>`;
   }
 
