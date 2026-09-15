@@ -105,7 +105,7 @@
         <h2>Efectos opcionales</h2>
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" ${s.haptics === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Sonidos de papel y resultados</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
-        <label class="opt-row"><span>Ambiente suave</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
+        <label class="opt-row"><span>Ambiente suave · guitarra</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
         <p class="hint" data-depth-help>La profundidad solo actúa en las portadas y respeta «reducir movimiento».</p>
         <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
