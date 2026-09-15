@@ -732,3 +732,29 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app .carta-reverso::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,#f3eee4e8 0%,#f3eee433 30%,#f3eee426 44%,#f3eee4e8 76%,#f3eee4 100%); }
 #app .hand-card > .hidden-date { color: #66451f; position: relative; }
 #app .hand-card > strong { color: #302d27; position: relative; text-shadow: 0 1px 3px #f3eee4; }
+
+/* Competición: una lámina de atlas al final de las colecciones. */
+#app .home-competition { margin-top: 26px; }
+#app .home-shell .comp-promo { display: flex; position: relative; isolation: isolate; align-items: center; min-height: 270px; margin-top: 0; border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-paper); box-shadow: 0 8px 24px #352a1710; }
+#app .home-shell .comp-promo-art { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; z-index: -1; -webkit-mask-image: radial-gradient(ellipse at 65% 50%,#000 30%,transparent 78%); mask-image: radial-gradient(ellipse at 65% 50%,#000 30%,transparent 78%); }
+#app .home-shell .comp-promo-art img { object-fit: cover; object-position: center; filter: sepia(1); mix-blend-mode: multiply; }
+#app .home-shell .comp-promo-copy { padding: 24px 20px; width: 62%; text-shadow: 0 1px 6px var(--edition-paper); }
+#app .competition-kicker { display: block; margin-bottom: 14px; font: .58rem/1.5 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; color: var(--edition-brass); }
+#app .home-shell .comp-promo-copy b { font-size: clamp(1.6rem,5vw,2.2rem); font-weight: 400; line-height: 1.07; margin-bottom: 12px; }
+#app .home-shell .comp-promo-copy small { font: .79rem/1.5 var(--ui-font); color: var(--edition-ink); }
+#app .competition-cta { display: inline-flex; gap: 12px; align-items: center; margin-top: 20px; padding: 9px 0; border-bottom: 1px solid var(--edition-brass); color: var(--edition-brass); font: 600 .77rem/1.3 var(--ui-font); }
+#app .comp-atlas-intro { min-height: 250px; padding: 24px 18px; border: 0; background: transparent; box-shadow: none; }
+#app .comp-atlas-intro > img { filter: sepia(1); opacity: .7; -webkit-mask-image: radial-gradient(ellipse at 65% 50%,#000 18%,transparent 76%); mask-image: radial-gradient(ellipse at 65% 50%,#000 18%,transparent 76%); }
+#app .comp-atlas-intro::after { display: none; }
+#app .comp-atlas-intro > div { max-width: 65%; }
+#app .comp-atlas-intro :is(h1,p) { color: var(--edition-ink); text-shadow: 0 1px 6px var(--edition-paper); }
+#app .comp-atlas-intro .eyebrow { color: var(--edition-brass); }
+#app .comp-atlas-intro h1 { font-size: clamp(1.8rem,6vw,3rem); }
+#app .comp-atlas-intro p { font: .82rem/1.45 var(--ui-font); }
+@media (min-width: 700px) { #app .home-shell .comp-promo { min-height: 310px; } #app .home-shell .comp-promo-copy { padding: 36px; width: 55%; } }
+@media (max-width: 699px) {
+  #app[data-screen="competition-menu"] .comp-atlas-intro { min-height: 195px; padding-block: 16px; }
+  #app[data-screen="competition-menu"] .setup-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 14px; margin-bottom: 14px; }
+  #app[data-screen="competition-menu"] .setup-grid label { min-height: 2.6em; font: 600 .76rem/1.3 var(--ui-font); }
+  #app[data-screen="competition-menu"] .setup-grid select { padding-inline: 8px; font-size: .82rem; }
+}
