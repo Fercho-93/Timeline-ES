@@ -207,7 +207,10 @@
         ? `<div class="collection-decks"><h2 data-focus tabindex="-1">${item.name}</h2><p class="lead">Elige un mazo para continuar.</p>${gameList()}</div>`
         : "";
       return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
+        <span class="panel-backdrop" aria-hidden="true">${blockArt(item.art, active)}</span>
+        <span class="panel-depth-light" aria-hidden="true"></span>
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
+        <span class="panel-depth-ground" aria-hidden="true"></span>
         <span class="collection-foil" aria-hidden="true"></span>
         <span class="collection-index" aria-hidden="true">${total} ${total === 1 ? "mazo" : "mazos"}</span>
         <span class="collection-open" aria-hidden="true">${active ? "−" : "↗"}</span>
