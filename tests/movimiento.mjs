@@ -316,6 +316,151 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   w.close();
 }
 
+console.log("\nLo que separa una app instalada de una web en un navegador");
+// Ninguno de estos fallos se reproduce en el navegador de escritorio con la vista de
+// móvil puesta: son comportamientos del aparato. Lo que sí se puede sujetar desde aquí es
+// que las declaraciones que los evitan sigan en su sitio cuando alguien toque la hoja.
+{
+  const hojas = { "styles.css": read("styles.css"), "edition.css": read("edition.css"), "splash.css": read("splash.css") };
+  // En una pantalla táctil no hay puntero que se retire: el primer toque deja el estado
+  // `:hover` puesto hasta que se toca en otro sitio. Un hueco que se queda resaltado
+  // parece que sigue esperando la carta; un botón, que sigue pulsado.
+  const hoversSinPuerta = css => {
+    // Los comentarios se sustituyen por espacios y no se borran: así las posiciones del
+    // texto siguen valiendo y se puede mirar si la regla trae su propia excepción.
+    const limpio = css.replace(/\/\*[\s\S]*?\*\//g, hueco => " ".repeat(hueco.length));
+    const sueltos = [], abiertos = [];
+    let inicio = 0;
+    for (let i = 0; i < limpio.length; i++) {
+      const c = limpio[i];
+      if (c === "{") {
+        const cabecera = limpio.slice(inicio, i).trim();
+        const tienePuerta = abiertos.some(regla => regla && /hover\s*:\s*hover/.test(regla));
+        const neutro = /hover-neutro/.test(css.slice(Math.max(0, inicio - 160), i));
+        if (!cabecera.startsWith("@") && /:hover\b/.test(cabecera) && !tienePuerta && !neutro)
+          sueltos.push(cabecera.replace(/\s+/g, " ").slice(0, 80));
+        abiertos.push(cabecera.startsWith("@") ? cabecera : null);
+        inicio = i + 1;
+      } else if (c === "}") { abiertos.pop(); inicio = i + 1; }
+      else if (c === ";") inicio = i + 1;
+    }
+    return sueltos;
+  };
+  for (const [nombre, css] of Object.entries(hojas)) {
+    const sueltos = hoversSinPuerta(css);
+    ok(`${nombre}: todo :hover está tras (hover: hover)${sueltos.length ? ` — falta en ${sueltos.join(" | ")}` : ""}`, !sueltos.length);
+  }
+  const raiz = hojas["styles.css"].slice(hojas["styles.css"].indexOf("html {"), hojas["styles.css"].indexOf("}", hojas["styles.css"].indexOf("html {")));
+  // El recuadro gris que el navegador pinta al tocar es el aviso más ruidoso de que esto
+  // es una página. En `button` no basta: las filas de partida son `div` y los enlaces no
+  // son botones, y destellaban igual.
+  ok("el resalte de toque se apaga en la raíz, no solo en los botones", /-webkit-tap-highlight-color:\s*transparent/.test(raiz));
+  // Safari agranda el texto por su cuenta al girar el móvil y descuadra la mano de cartas.
+  ok("el texto no se infla solo al girar el móvil", /-webkit-text-size-adjust:\s*100%/.test(raiz));
+  // La tira temporal se desplaza a los lados: al llegar al extremo, el gesto encadenaba
+  // con la página y con el «atrás» del navegador en mitad de una jugada.
+  ok("la línea temporal se queda su propio desplazamiento en los extremos",
+    /\.timeline-wrap \{[^}]*overscroll-behavior-x:\s*contain/.test(hojas["styles.css"]));
+  // Por debajo de 16px, Safari amplía la página al enfocar el campo y no la devuelve.
+  ok("ningún campo de texto hace que la página se amplíe al escribir",
+    /input, select, textarea \{ font-size:max\(1rem,16px\); \}/.test(hojas["styles.css"]));
+}
+
+console.log("\nAterrizaje de la carta al soltarla");
+// Soltar no hace desaparecer la copia donde estaba el dedo: la lleva al hueco elegido, o
+// de vuelta a la mano si no se eligió ninguno, que es lo que cuenta dónde ha ido la carta.
+// jsdom no anima, así que se anota lo que se le pide al navegador —el destino del último
+// fotograma— y se comprueba que la copia se retira sola al terminar el recorrido.
+function stubAnimate(w, settles) {
+  w.Element.prototype.animate = function (keyframes, options) {
+    let cumplida;
+    const listeners = {};
+    const animation = {
+      // `finished` queda pendiente a propósito: resolverla sola dispararía las limpiezas
+      // que el resto de la interfaz cuelga de sus propias animaciones.
+      finished: new Promise(resolve => { cumplida = resolve; }),
+      addEventListener(name, fn) { listeners[name] = fn; },
+      cancel() { listeners.cancel?.(); cumplida(); },
+      finish() { listeners.finish?.(); cumplida(); }
+    };
+    if (this.classList?.contains("drag-settle")) settles.push({ node: this, keyframes, options, animation });
+    return animation;
+  };
+}
+const caja = (node, left, top, width, height) => {
+  node.getBoundingClientRect = () => ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top });
+};
+function arrastra(w, card, hasta) {
+  pointer(w, "pointerdown", card, 100, 400, "mouse");
+  pointer(w, "pointermove", card, 150, 300, "mouse");
+  pointer(w, "pointerup", card, hasta.x, hasta.y, "mouse");
+}
+{
+  const w = boot();
+  const settles = [];
+  stubAnimate(w, settles);
+  game(w);
+  let card = el(w, ".hand-card");
+  const slot = el(w, '.slot[data-index="0"]');
+  caja(card, 40, 380, 120, 160);   // centro en (100, 460)
+  caja(slot, 300, 200, 40, 100);   // centro en (320, 250)
+  w.document.elementFromPoint = () => slot;
+  arrastra(w, card, { x: 320, y: 250 });
+  ok("soltar termina el gesto: la copia deja de seguir al dedo", !w.document.querySelector(".drag-ghost"));
+  const aterrizaje = settles.at(-1);
+  ok("y va a parar al hueco elegido, no al punto donde se soltó",
+    !!aterrizaje && aterrizaje.keyframes.at(-1).transform.includes("translate3d(320px, 250px, 0)"));
+  ok("el recorrido hacia un hueco es corto: es la respuesta del sistema, no el gesto",
+    aterrizaje.options.duration === 190 && aterrizaje.options.easing.startsWith("cubic-bezier"));
+  ok("mientras recorre sigue en pantalla", aterrizaje.node.isConnected);
+  aterrizaje.animation.finish();
+  ok("y se retira sola al llegar, sin dejar copias sueltas", !aterrizaje.node.isConnected);
+
+  await sleep(5);
+  click(w, '[data-action="cancel-place"]');
+  card = el(w, ".hand-card");
+  caja(card, 40, 380, 120, 160);
+  // Sin hueco debajo, soltar no es un error: la carta se queda elegida. Lo que no puede
+  // es parecer que se ha perdido, así que la copia vuelve a la mano de donde salió.
+  w.document.elementFromPoint = () => null;
+  arrastra(w, card, { x: 600, y: 120 });
+  const vuelta = settles.at(-1);
+  ok("soltar fuera de un hueco devuelve la copia a la mano en vez de esfumarla",
+    vuelta.keyframes.at(-1).transform.includes("translate3d(100px, 460px, 0)") && vuelta.options.duration === 260);
+  ok("el recorrido arranca donde estaba la copia, para no dar un salto",
+    vuelta.keyframes[0].transform.includes("translate3d") && vuelta.keyframes.length === 3);
+
+  // Dos copias a la vez no cuentan ninguna historia: empezar otro arrastre se lleva la
+  // que aún estaba volviendo.
+  ok("mientras vuelve, la copia sigue en pantalla", vuelta.node.isConnected);
+  await sleep(5);
+  card = el(w, ".hand-card");
+  pointer(w, "pointerdown", card, 100, 400, "mouse");
+  ok("empezar otro arrastre retira la copia que aún volvía",
+    !vuelta.node.isConnected && w.document.querySelectorAll(".drag-settle").length === 0);
+  pointer(w, "pointercancel", card, 100, 400, "mouse");
+  w.close();
+}
+{
+  // Con movimiento reducido no hay recorrido que valga: el estado final es el mismo y la
+  // copia se retira en el acto.
+  const w = boot({ reduce: true });
+  const settles = [];
+  stubAnimate(w, settles);
+  game(w);
+  const card = el(w, ".hand-card");
+  const slot = el(w, '.slot[data-index="0"]');
+  caja(card, 40, 380, 120, 160);
+  caja(slot, 300, 200, 40, 100);
+  w.document.elementFromPoint = () => slot;
+  arrastra(w, card, { x: 320, y: 250 });
+  ok("con movimiento reducido la copia se retira sin recorrido",
+    settles.length === 0 && !w.document.querySelector(".drag-ghost, .drag-settle"));
+  ok("y la jugada llega igual: soltar sobre el hueco sigue pidiendo confirmación",
+    el(w, ".slot-confirm").dataset.index === "0");
+  w.close();
+}
+
 // «Volver» retrocede un paso y la casita salta al inicio de una vez. Donde no aparece es
 // tan importante como donde sí: en el propio inicio no llevaría a ninguna parte, y en una
 // partida sería una salida sin la pregunta que protege lo jugado.

@@ -70,7 +70,16 @@
 }
 
 * { box-sizing: border-box; }
-html { min-height: 100%; background: var(--paper); }
+html {
+  min-height: 100%;
+  background: var(--paper);
+  /* El navegador pinta un recuadro gris sobre cualquier elemento con clic. Es el
+     aviso más ruidoso de «esto es una web»: los botones ya lo quitaban, pero las
+     filas de partida y los enlaces no son botones y seguían destellando. */
+  -webkit-tap-highlight-color: transparent;
+  /* Safari agranda el texto por su cuenta al girar el móvil y descuadra la mano. */
+  -webkit-text-size-adjust: 100%;
+}
 button, label, .modal, .field { min-inline-size: 0; }
 .modal, .btn, .icon-btn, .hand-card h3 { overflow-wrap: anywhere; }
 .settings-modal select { max-width: 100%; }
@@ -83,7 +92,6 @@ body {
   background: var(--paper);
 }
 button, input, select { font: inherit; }
-button { -webkit-tap-highlight-color: transparent; }
 /* Para lectores de pantalla: fuera de la vista pero dentro del árbol de accesibilidad.
    Aquí viven los titulares de la partida y los avisos de lo que acaba de pasar. */
 .solo-lectores { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
@@ -332,9 +340,10 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .timeline-map { position: relative; height: 48px; margin: 12px -18px 0; padding: 0 18px 4px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .timeline-map::-webkit-scrollbar { display: none; }
 .map-stop { position: absolute; top: 0; width: 44px; height: 44px; display: grid; place-items: center; padding: 4px; border: 0; border-radius: 8px; color: rgba(255,255,255,.92); font-size: .64rem; font-weight: 700; line-height: 1.1; cursor: pointer; opacity: .82; transition: opacity .15s ease; }
-.map-stop:hover, .map-stop:focus-visible { opacity: 1; }
+.map-stop:focus-visible { opacity: 1; }
+@media (hover: hover) and (pointer: fine) { .map-stop:hover { opacity: 1; } }
 .map-stop:active { transform: scale(.96); }
-.timeline-wrap { margin: 10px -18px 22px; padding: 8px 18px 18px; overflow-x: auto; scrollbar-width: thin; }
+.timeline-wrap { margin: 10px -18px 22px; padding: 8px 18px 18px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
 .timeline { display: flex; align-items: stretch; min-width: max-content; padding: 8px 0; }
 .timeline-card { width: 174px; min-height: 244px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
 .card-visual { height: 74px; padding: 12px 13px; display: flex; align-items: flex-end; justify-content: space-between; color: rgba(255,255,255,.92); position: relative; overflow: hidden; }
@@ -373,7 +382,12 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .card-flippable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .slot { width: 54px; min-height: 244px; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; }
 .slot span { display: grid; place-items: center; width: 38px; height: 100%; min-height: 116px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: 1.4rem; transition: border-color var(--motion-fast) ease, color var(--motion-fast) ease, background var(--motion-fast) ease, transform var(--motion-fast) var(--ease-spring), box-shadow var(--motion-fast) ease; }
-.slot:hover span, .slot:focus-visible span { border-color: var(--accent); color: var(--accent); }
+/* En táctil el hueco tocado conservaba el resalte de destino aunque el dedo se
+   hubiera ido: parecía que la carta seguía a punto de caer ahí. */
+.slot:focus-visible span { border-color: var(--accent); color: var(--accent); }
+@media (hover: hover) and (pointer: fine) {
+  .slot:hover span { border-color: var(--accent); color: var(--accent); }
+}
 .slot:disabled { cursor: default; }
 .slot:disabled span { opacity: .25; }
 /* El hueco donde iba de verdad la carta que se acaba de fallar: se resalta detrás del
@@ -407,10 +421,16 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
    levanta: esa es toda la explicación que necesita el gesto la primera vez que se usa. */
 .hand-card.holding { transform: scale(.96); box-shadow: inset 0 0 0 2px var(--accent); transition: transform 300ms linear, box-shadow var(--motion-fast) ease; }
 .hand-card.dragging { opacity: .3; filter: grayscale(1); cursor: grabbing; }
-.drag-ghost { position: fixed; left: 0; top: 0; z-index: 60; margin: 0; min-height: 0; padding: 11px 13px; pointer-events: none; transition: none; border-color: var(--accent); box-shadow: 0 16px 34px rgba(40,28,18,.3); animation: ghost-lift 180ms var(--ease-spring) both; }
+.drag-ghost, .drag-settle { position: fixed; left: 0; top: 0; z-index: 60; margin: 0; min-height: 0; padding: 11px 13px; pointer-events: none; transition: none; border-color: var(--accent); box-shadow: 0 16px 34px rgba(40,28,18,.3); }
+.drag-ghost { animation: ghost-lift 180ms var(--ease-spring) both; }
 @keyframes ghost-lift { from { opacity: .65; } }
-.drag-ghost .card-arrow, .drag-ghost .card-era { display: none; }
-.drag-ghost strong { margin-top: 7px; font-size: .9rem; }
+/* Al soltar, la copia deja de ser «lo que sigue al dedo» y pasa a ser «lo que va
+   hacia algún sitio»: el recorrido lo dibuja drag.js, aquí solo cambia el nombre
+   para que la copia de un gesto ya terminado no se confunda con la de uno vivo. */
+.drag-settle { animation: none; }
+.drag-ghost .card-arrow, .drag-ghost .card-era,
+.drag-settle .card-arrow, .drag-settle .card-era { display: none; }
+.drag-ghost strong, .drag-settle strong { margin-top: 7px; font-size: .9rem; }
 .slot.drop-target span { border-style: solid; border-color: var(--accent); background: var(--accent-soft); color: var(--accent); transform: scale(1.08); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent); }
 body.dragging-card { touch-action: none; user-select: none; -webkit-user-select: none; }
 body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
@@ -793,7 +813,10 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .enc-modal .enc-section { padding-top: 16px; }
 .settings-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .settings-close { flex: none; width: 32px; height: 32px; margin: -6px -6px 0 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer; }
-.settings-close:hover, .settings-close:focus-visible { background: var(--paper); color: var(--ink); }
+.settings-close:focus-visible { background: var(--paper); color: var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+  .settings-close:hover { background: var(--paper); color: var(--ink); }
+}
 /* Cada tema (Tema, Efectos, Copias de seguridad…) es su propio bloque, separado del
    siguiente por una línea y aire de sobra. Sin esto los títulos quedaban pegados al
    control de arriba y el panel entero se leía como una sola lista sin orden. */

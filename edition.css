@@ -765,6 +765,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   box-shadow: 0 3px 0 #aa916b, 0 5px 0 #d3c1a0, 0 10px 18px #49361f22;
   background: #756044;
 }
+/* hover-neutro: el estado con puntero encima recibe exactamente lo mismo que el estado
+   normal, que es justo el modo de anular el filtro que aplica la hoja base. No hay nada
+   que se pueda quedar pegado tras un toque, así que no necesita la puerta de (hover: hover). */
 #app .home-gallery-shell .gallery-panel .panel-art,
 #app .home-gallery-shell .gallery-panel:not(.active):hover .panel-art {
   filter: saturate(1.12) brightness(1.05) contrast(1.025);
