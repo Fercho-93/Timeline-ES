@@ -21,30 +21,67 @@
       } else navigator.vibrate?.(kind === "failure" ? [12, 35, 12] : 12);
     } catch { /* Un efecto opcional nunca impide jugar. */ }
   }
-  async function tone(correct) {
-    if (!CT.effectPrefs?.().sound) return;
+  const samples = new Map(), voices = new Set(), lastCue = new Map();
+  // Papel y resonancias de madera, sin imponer otra melodía a las seis pistas.
+  // La textura utiliza su propia semilla: nunca consume el azar del reparto.
+  function sample(kind) {
+    if (samples.has(kind)) return samples.get(kind);
+    const paper = kind === 'paper', duration = paper ? .22 : .38;
+    const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * duration), audio.sampleRate);
+    const data = buffer.getChannelData(0);
+    const base = kind === 'low' ? 145 : kind === 'high' ? 330 : 245;
+    let seed = 731, soft = 0;
+    for (let i = 0; i < data.length; i++) {
+      const t = i / audio.sampleRate;
+      seed = (Math.imul(seed, 1664525) + 1013904223) | 0;
+      const noise = (seed >>> 0) / 2147483648 - 1;
+      soft += .18 * (noise - soft);
+      const attack = Math.min(1, t / .012);
+      const tail = Math.min(1, (duration - t) / .035);
+      data[i] = paper
+        ? soft * Math.sin(Math.PI * t / duration) ** 2 * .32
+        : attack * tail * (Math.sin(2 * Math.PI * base * t) * Math.exp(-t * 19) * .22 +
+          Math.sin(2 * Math.PI * base * 1.47 * t) * Math.exp(-t * 32) * .09 +
+          soft * Math.exp(-t * 65) * .12);
+    }
+    samples.set(kind, buffer);
+    return buffer;
+  }
+  async function cue(kind) {
+    if (!CT.effectPrefs?.().sound || document.hidden) return;
+    const now = performance.now();
+    if (now - (lastCue.get(kind) ?? -Infinity) < 80) return;
+    lastCue.set(kind, now);
     try {
       const Audio = window.AudioContext || window.webkitAudioContext;
       if (!Audio) return;
       audio ||= new Audio();
       if (audio.state === "suspended") await audio.resume();
-      const oscillator = audio.createOscillator(), gain = audio.createGain();
-      oscillator.type = "sine"; oscillator.frequency.value = correct ? 660 : 220;
-      gain.gain.setValueAtTime(0.035, audio.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.15);
-      oscillator.connect(gain); gain.connect(audio.destination);
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
-      oscillator.start(); oscillator.stop(audio.currentTime + 0.16);
+      if (!CT.effectPrefs?.().sound || document.hidden) return;
+      const score = kind === 'success' ? [['wood', 0, .24], ['high', .13, .19]]
+        : kind === 'failure' ? [['low', 0, .22], ['paper', .09, .16]]
+        : kind === 'page' ? [['paper', 0, .3]] : [['wood', 0, .12]];
+      for (const [texture, delay, volume] of score) {
+        if (voices.size >= 6) break;
+        const source = audio.createBufferSource(), gain = audio.createGain();
+        source.buffer = sample(texture);
+        gain.gain.value = volume;
+        source.connect(gain); gain.connect(audio.destination);
+        voices.add(source);
+        source.onended = () => { voices.delete(source); source.disconnect(); gain.disconnect(); };
+        source.start(audio.currentTime + delay);
+      }
     } catch { /* El texto y el resultado visual siguen disponibles. */ }
   }
-  // `tap` es el toque seco de «ya lo tienes»: lo usa la carta al levantarse para
-  // arrastrarla. Como el resto de los efectos, respeta el ajuste y nunca suena.
+  // El sonido y la vibración siguen siendo preferencias independientes.
   CT.Effects = {
-    feedback(correct) { void vibration(correct ? "success" : "failure"); void tone(correct); },
-    tap() { void vibration("confirm"); }
+    feedback(correct) { void vibration(correct ? "success" : "failure"); void cue(correct ? 'success' : 'failure'); },
+    tap() { void vibration("confirm"); void cue('tap'); },
+    page() { void cue('page'); }
   };
   document.addEventListener("click", event => {
     if (event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"]')) void vibration("confirm");
+    if (event.target.closest('.hand-card:not([disabled]), .slot:not([disabled])')) void cue('tap');
   }, true);
   CT.Art = {
     button(mode, card) {
