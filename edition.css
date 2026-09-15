@@ -663,3 +663,61 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 /* Las consultas se abren sin barra inferior y conservan sus controles de volver. */
 #app :is(.enc-modal, .settings-modal, .rules) .atlas-nav { display: none; }
 #app :is(.enc-modal, .settings-modal, .rules):has(.atlas-nav) { padding-bottom: 26px; }
+
+/* Ritmo de lectura móvil: pequeñas láminas y espacios proporcionales. */
+.deck-preview { float: right; width: 64px; height: 78px; margin: 0 0 6px 12px; object-fit: cover; border-radius: 3px; filter: sepia(1); mix-blend-mode: multiply; -webkit-mask-image: linear-gradient(#000 72%,transparent); mask-image: linear-gradient(#000 72%,transparent); }
+#app .solo-intro { position: relative; isolation: isolate; padding: 16px 0 18px; }
+#app .solo-intro::before { content: ''; position: absolute; z-index: -1; inset: -8px -8px 0 35%; background: url('assets/mode-walk-solo.webp') right center / cover no-repeat; opacity: .3; mix-blend-mode: multiply; -webkit-mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); }
+#app .solo-intro .lead { margin: 10px 0; font: .95rem/1.4 var(--ui-font); }
+#app .solo-intro-rule { max-width: 37ch; margin: 0; color: var(--edition-muted); font: .77rem/1.45 var(--ui-font); }
+#app .solo-fold summary { display: flex; align-items: center; gap: 12px; list-style: none; }
+#app .solo-fold summary::-webkit-details-marker { display: none; }
+#app .solo-fold summary::after { content: '+'; margin-left: auto; color: var(--edition-brass); font: 1.3rem var(--ui-font); }
+#app .solo-fold[open] summary::after { content: '−'; }
+#app .solo-option-mark { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border: 1px solid var(--edition-line); border-radius: 50%; color: var(--edition-brass); background: color-mix(in srgb,var(--edition-brass) 7%,transparent); }
+#app .solo-option-mark svg { width: 25px; height: 25px; }
+#app .solo-option-copy h3 { margin: 0; }
+#app .solo-option-copy small { display: block; margin-top: 5px; color: var(--edition-muted); font: .72rem/1.3 var(--ui-font); }
+#app .solo-option-copy time { display: block; margin-top: 3px; }
+#app .solo-fold[open] { border-color: var(--edition-brass); box-shadow: 0 5px 18px #352a1710; }
+#app .solo-fold[open] summary { border-bottom: 1px solid var(--edition-line); }
+#app .solo-fold-body { padding-top: 12px; }
+#app .solo-fold-body .btn + .btn { margin-top: 8px; }
+#app .solo-fold-body > p { font: .84rem/1.45 var(--ui-font); margin: 8px 0 14px; }
+#app .solo-fold-body .hint { font-size: .76rem; margin: 10px 0; }
+#app .solo-fold-body .field { margin-bottom: 12px; }
+#app .solo-fold-body .field-hint { text-align: left; }
+#app.atlas-board .deck-count { width: auto; min-width: 72px; height: 46px; padding: 4px 10px; border-radius: 12px; }
+#app.atlas-board .deck-count span { font-size: .52rem; white-space: nowrap; letter-spacing: .03em; }
+#app.atlas-board .placement-dock .btn-primary:disabled { background: color-mix(in srgb,var(--atlas-selection) 12%,var(--edition-paper)); color: var(--edition-muted); border: 1px solid var(--edition-line); box-shadow: none; }
+#app.atlas-board .placement-instruction { font: .74rem/1.4 var(--ui-font); text-align: center; color: var(--edition-muted); margin-top: 4px; }
+@media (max-width: 699px) {
+  #app .home-gallery-shell .collection-decks { padding: 14px; }
+  #app .home-gallery-shell .collection-decks > h2 { display: none; }
+  #app .home-gallery-shell .collection-decks > .lead { text-align: left; font: .82rem/1.4 var(--ui-font); margin: 0 0 12px; }
+  #app .collection-decks .games { gap: 10px; }
+  #app .collection-decks .games .game-row { padding: 12px 14px 16px; margin: 0; }
+  #app .collection-decks .game-row .deck-chapter { font-size: .55rem; margin-bottom: 5px; }
+  #app .collection-decks .game-row .game-name { padding-top: 6px; font-size: 1.12rem; }
+  #app .collection-decks .game-row .game-meta { font: .75rem/1.4 var(--ui-font); margin-top: 5px; }
+  #app .atlas-specimens figure { padding-bottom: 5px; }
+  #app .atlas-specimens figcaption { height: 2.3em; padding: 0 2px; margin-top: 4px; }
+  #app[data-screen="solo-home"] .solo-title { font-size: clamp(1.7rem,7vw,2.1rem); margin: 8px 0; }
+  #app[data-screen="solo-home"] .setup-section { margin-top: 4px; }
+  #app[data-screen="solo-home"] .solo-fold { margin-block: 10px; }
+  #app .solo-fold summary { padding: 13px 12px; min-height: 80px; }
+  #app.atlas-board .hand-solo { grid-template-columns: minmax(0,320px); }
+  #app.atlas-board .hand-solo .hand-card { min-height: 144px !important; }
+}
+#app .collection-decks .game-row { grid-template-columns: minmax(0,1fr) 64px; column-gap: 12px; }
+#app .collection-decks .game-row > :not(.deck-preview) { grid-column: 1; }
+#app .collection-decks .deck-preview { grid-column: 2; grid-row: 1 / 4; align-self: center; margin: 0; float: none; }
+#app .deck-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
+#app.atlas-board .timeline { justify-content: center; }
+@media (max-width: 699px) {
+  #app .solo-home:has(.solo-fold[open]) .solo-fold:not([open]) summary { min-height: 52px; padding-block: 8px; }
+  #app .solo-home:has(.solo-fold[open]) .solo-fold:not([open]) .solo-option-copy :is(small,time) { display: none; }
+  #app .solo-home:has(.solo-fold[open]) .solo-fold:not([open]) .solo-option-mark { width: 32px; height: 32px; flex-basis: 32px; }
+}
+#app .solo-fold { scroll-margin-top: 12px; scroll-margin-bottom: calc(90px + env(safe-area-inset-bottom)); }
+#app .deck-preview img { position: static; opacity: 1; }

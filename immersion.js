@@ -71,7 +71,7 @@
         // Se desplaza la mano cuando hay más de cuatro; nunca se eliminan cartas.
         hand.classList.toggle('atlas-hand-many', hand.children.length > 4);
         const hint = hand.parentElement.querySelector('.hint');
-        if (hint && /manten|arrástrala|Ahora toca/.test(hint.textContent)) hint.textContent = 'Toca una carta y elige su lugar en la línea.';
+        if (hint) hint.hidden = true;
       }
       const slot = container.querySelector('.slot-confirm');
       const dock = document.createElement('div'); dock.className = 'placement-dock';
@@ -81,7 +81,7 @@
         if (confirm) { confirm.textContent = 'Confirmar posición'; dock.append(confirm); }
         if (cancel) { cancel.textContent = 'Cambiar posición'; dock.append(cancel); }
       } else {
-        dock.innerHTML = '<button class="btn btn-primary btn-block" disabled>Confirmar posición</button><span class="placement-instruction">Elige una carta y un hueco de la línea</span>';
+        dock.innerHTML = `<button class="btn btn-primary btn-block" disabled>Confirmar posición</button><span class="placement-instruction">${screen === 'solo' ? 'Toca un hueco de la línea para colocar tu carta' : 'Elige una carta y un hueco de la línea'}</span>`;
       }
       container.querySelector('.shell')?.append(dock);
     }
