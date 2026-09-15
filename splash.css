@@ -1,8 +1,5 @@
-/* Telón de apertura de Continuum.
-   Reutiliza las clases de la cabecera real para que emblema, rótulo y lema tengan
-   exactamente la misma tipografía y proporciones que la portada que queda debajo. */
+/* La apertura comparte la tinta y el papel del tema elegido. */
 #app-splash { display: none; }
-
 html.splash-active #app-splash {
   display: block;
   position: fixed;
@@ -12,115 +9,54 @@ html.splash-active #app-splash {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  color: #2b2927;
-  background:
-    radial-gradient(circle at 50% 36%, rgba(255,255,255,.72), transparent 34%),
-    linear-gradient(180deg, #faf6ee 0%, #f6f1e8 52%, #eee4d3 100%);
-  animation: splash-curtain-out 320ms 1000ms cubic-bezier(.22,.61,.36,1) forwards;
+  color: var(--edition-ink, #302d27);
+  background: var(--edition-paper, #f3eee4);
+  opacity: 1;
+  transition: opacity 300ms ease-out;
 }
-
-/* Mientras todavía no hemos medido la portada, el contenido permanece invisible sobre
-   el pergamino. splash.js lo alinea y entonces deja entrar el emblema ya en su sitio. */
-#app-splash .splash-masthead {
-  position: fixed;
-  top: var(--splash-top, max(56px, calc(env(safe-area-inset-top) + 38px)));
-  left: var(--splash-left, 50%);
-  width: var(--splash-width, min(calc(100% - 36px), 540px));
+html.splash-active #app-splash.splash-exit { opacity: 0; }
+html.splash-active #app-splash .splash-masthead {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: min(85vw, 520px);
   max-width: none;
   margin: 0;
-  opacity: 0;
-  transform: translateY(9px) scale(.988);
+  opacity: 1;
+  transform: translate(-50%, -50%);
   pointer-events: none;
 }
-
-#app-splash.splash-ready .splash-masthead {
-  animation: splash-content-in 720ms 70ms cubic-bezier(.2,.78,.28,1.04) both;
+#app-splash .home-wordmark {
+  color: var(--edition-ink, #302d27);
+  text-shadow: none;
 }
-
-/* El centrado de apertura usa únicamente translate(-50%, -50%); un margen
-   negativo adicional desplazaría el emblema fuera de pantalla en el móvil. */
-
-#app-splash .splash-crest img {
-  animation: splash-gold-glow 920ms 820ms ease-in-out both;
-}
-
-/* Una veta de luz muy tenue cruza el escudo sin convertir la apertura en una animación
-   llamativa: la sensación buscada es de acabado editorial, no de pantalla de videojuego. */
-#app-splash .splash-crest::after {
-  content: "";
+#app-splash .home-tagline { color: var(--edition-muted, #70695d); }
+/* Solo se anima el emblema: el título y el lema se leen desde el primer instante. */
+#app-splash.splash-ready .splash-crest { animation: launch-reveal 700ms ease-out both; }
+html.splash-active #app-splash::before,
+html.splash-active #app-splash::after {
+  content: '';
   position: absolute;
-  z-index: 3;
-  top: 10%;
-  bottom: 10%;
-  left: -34%;
-  width: 20%;
-  transform: skewX(-18deg);
-  background: linear-gradient(90deg, transparent, rgba(205,157,76,.26), rgba(255,242,196,.42), transparent);
-  filter: blur(3px);
-  opacity: 0;
+  width: min(78vw, 650px);
+  aspect-ratio: 1;
+  border: 1px solid var(--edition-brass, #876330);
+  border-radius: 50%;
+  left: 50%; top: 46%;
+  opacity: .2;
+  transform: translate(-50%, -50%) rotateX(60deg) rotate(-25deg);
+  animation: launch-orbit 14s linear infinite;
   pointer-events: none;
-  animation: splash-shine 900ms 840ms cubic-bezier(.22,.61,.36,1) both;
 }
-
-#app-splash.splash-skip {
-  animation-name: splash-curtain-skip;
-  animation-duration: 420ms;
-  animation-delay: 0ms;
-}
-
-#app-splash.splash-skip .splash-masthead,
-#app-splash.splash-skip .splash-crest img,
-#app-splash.splash-skip .splash-crest::after {
-  animation-play-state: paused;
-}
-
-@keyframes splash-content-in {
-  from { opacity: 0; transform: translateY(9px) scale(.988); }
+html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direction: reverse; opacity: .1; }
+@keyframes launch-reveal {
+  from { opacity: .65; transform: translateY(8px) scale(.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-
-@keyframes splash-gold-glow {
-  0%, 100% { filter: sepia(.1) saturate(.78) contrast(.94); }
-  48% { filter: sepia(.22) saturate(.92) contrast(.96) drop-shadow(0 0 16px rgba(174,116,48,.30)); }
+@keyframes launch-orbit {
+  to { transform: translate(-50%, -50%) rotateX(60deg) rotate(335deg); }
 }
-
-@keyframes splash-shine {
-  0% { left: -34%; opacity: 0; }
-  18% { opacity: .55; }
-  78% { opacity: .18; }
-  100% { left: 112%; opacity: 0; }
-}
-
-@keyframes splash-curtain-out {
-  to { opacity: 0; visibility: hidden; pointer-events: none; }
-}
-
-@keyframes splash-curtain-skip {
-  to { opacity: 0; visibility: hidden; pointer-events: none; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  html.splash-active #app-splash {
-    animation-duration: 320ms;
-    animation-delay: 1250ms;
-  }
-  #app-splash.splash-ready .splash-masthead {
-    opacity: 1;
-    transform: none;
-    animation: none;
-  }
-  #app-splash .splash-crest img,
-  #app-splash .splash-crest::after { animation: none; }
-  #app-splash.splash-skip { animation-duration: 180ms; animation-delay: 0ms; }
+  html.splash-active #app-splash { transition: none; }
+  html.splash-active #app-splash *,
+  html.splash-active #app-splash::before,
+  html.splash-active #app-splash::after { animation: none !important; }
 }
-
-/* Apertura vinculada al arranque real, sin formularios ni esperas artificiales. */
-html.splash-active #app-splash { animation: none; color:#f8e5b8; background:radial-gradient(ellipse at 50% 45%,#314753 0%,#142630 40%,#070e18 100%); }
-html.splash-active #app-splash .splash-masthead { position:absolute; top:50%; left:50%; width:min(85vw,520px); opacity:1; transform:translate(-50%,-50%); animation: launch-reveal 1.1s ease-out both; }
-#app-splash .home-wordmark { color:#f8e5b8; text-shadow:0 0 30px #eac77a66; }
-#app-splash .home-tagline { color:#ead8ae; }
-html.splash-active #app-splash::before,html.splash-active #app-splash::after { content:''; position:absolute; width:min(78vw,650px); aspect-ratio:1; border:1px solid #d8b67b55; border-radius:50%; left:50%; top:46%; transform:translate(-50%,-50%) rotateX(60deg) rotate(-25deg); box-shadow:0 0 60px #d8b67b18; animation:launch-orbit 7s linear infinite; }
-html.splash-active #app-splash::after { width:min(95vw,850px); animation-direction:reverse; opacity:.5; }
-@keyframes launch-reveal { from { opacity:0; filter:blur(12px); transform:translate(-50%,-45%) scale(.9); } to { opacity:1; filter:blur(0); transform:translate(-50%,-50%) scale(1); } }
-@keyframes launch-orbit { to { transform:translate(-50%,-50%) rotateX(60deg) rotate(335deg); } }
-@media(prefers-reduced-motion:reduce) { html.splash-active #app-splash *,html.splash-active #app-splash::before,html.splash-active #app-splash::after { animation:none!important; } }

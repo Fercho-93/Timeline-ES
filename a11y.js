@@ -200,6 +200,7 @@
   // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino
   // la hoja anterior levantándose desde una esquina y descubriendo el destino debajo.
   function turnPage(container, backwards) {
+    window.CONTINUUM.Effects?.page?.();
     if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const layer = document.createElement("div");
     layer.className = "book-turn";

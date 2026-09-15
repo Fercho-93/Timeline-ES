@@ -76,19 +76,56 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
     assert.match(w.CONTINUUM.animalArt('history', conLamina), /<img class="animal-card-art"/, 'la carta colocada sigue enseñando su lámina');
   } finally { w.close(); }
 }
-for (const options of [{ reduce: true }, { seen: true }]) {
-  const w = boot(options);
-  try { w.CONTINUUM_SPLASH.finish(); assert.ok(!w.document.documentElement.classList.contains('splash-active')); }
-  finally { w.close(); }
+// Reloj virtual: la lectura mínima, el arranque lento y el límite de espera
+// se comprueban sin hacer esperar veinte segundos a cada ejecución.
+function splashClock(reduce = false) {
+  const w = new JSDOM('<div id="app-splash"></div><main id="app">Juego listo</main>', {runScripts:'outside-only'}).window;
+  let time = 0, id = 0;
+  const timers = new Map();
+  w.performance.now = () => time;
+  w.matchMedia = () => ({matches:reduce});
+  w.setTimeout = (callback, delay = 0) => { timers.set(++id, {callback, at:time + delay}); return id; };
+  w.clearTimeout = id => timers.delete(id);
+  Object.defineProperty(w.document, 'readyState', {value:'complete'});
+  w.eval(read('splash.js'));
+  const advance = ms => {
+    const end = time + ms;
+    for (;;) {
+      const next = [...timers].sort((a,b) => a[1].at-b[1].at)[0];
+      if (!next || next[1].at > end) break;
+      timers.delete(next[0]); time = next[1].at; next[1].callback();
+    }
+    time = end;
+  };
+  return {w, advance, active:()=>w.document.documentElement.classList.contains('splash-active')};
+}
+for (const reduce of [false, true]) {
+  const {w, advance, active} = splashClock(reduce);
+  try {
+    advance(100); w.CONTINUUM_SPLASH.show(); w.CONTINUUM_SPLASH.finish();
+    advance(3399);
+    assert.ok(active(), 'una carga rápida mantiene tiempo para leer');
+    w.CONTINUUM_SPLASH.finish(); // la segunda notificación no prolonga el mínimo
+    advance(1);
+    if (!reduce) {
+      assert.ok(w.document.getElementById('app-splash').classList.contains('splash-exit'));
+      advance(299); assert.ok(active()); advance(1);
+    }
+    assert.ok(!active(), 'el splash cierra tras lectura y fundido');
+    assert.equal(w.document.getElementById('app-splash').getAttribute('aria-hidden'), 'true');
+  } finally { w.close(); }
 }
 {
-  const w = boot();
+  const {w, advance, active} = splashClock();
   try {
-    await new Promise(resolve => w.setTimeout(resolve, 0));
-    assert.ok(w.document.documentElement.classList.contains('splash-active'));
-    w.CONTINUUM_SPLASH.finish();
-    assert.ok(!w.document.documentElement.classList.contains('splash-active'), 'la apertura termina cuando el juego está listo');
-    assert.ok(w.document.querySelector('[data-action="rules"]'), 'la aplicación sigue disponible');
+    advance(6000); assert.ok(active(), 'una carga lenta no descubre una pantalla vacía');
+    w.CONTINUUM_SPLASH.finish(); advance(300);
+    assert.ok(!active(), 'una carga lenta no añade otros 3,5 segundos');
+    w.CONTINUUM_SPLASH.show();
+    w.document.getElementById('app').textContent = '';
+    advance(20000);
+    assert.ok(!active(), 'el arranque bloqueado libera la pantalla');
+    assert.ok(w.document.getElementById('splash-retry'), 'se puede reintentar');
   } finally { w.close(); }
 }
 {
