@@ -268,8 +268,8 @@
 
   function competitionPromo() {
     return `<button class="comp-promo" data-action="competition-menu">
-      <span class="comp-promo-art"><img src="assets/hero-competicion-400.webp" srcset="assets/hero-competicion-400.webp 400w, assets/hero-competicion-700.webp 700w" sizes="(min-width: 700px) 340px, 100vw" alt="" width="400" height="200" decoding="async" loading="lazy"></span>
-      <span class="comp-promo-copy"><b>Modo competición 🏆</b><small>Un mazo aleatorio por ronda. Elige cómo jugar en la siguiente hoja.</small></span>
+      <span class="comp-promo-art"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" loading="lazy"></span>
+      <span class="comp-promo-copy"><span class="competition-kicker">Explora · Compite · Descubre</span><b>Un viaje<br>entre mazos</b><small>Un nuevo tema en cada ronda.<br>Solo o en compañía.</small><span class="competition-cta">Elegir cómo jugar <span aria-hidden="true">→</span></span></span>
     </button>`;
   }
 
@@ -278,9 +278,9 @@
     const multi = `<button class="play-choice primary" data-action="competition-local"><span class="choice-icon">${playIcon('local')}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="competition-online"><span class="choice-icon">${playIcon('online')}</span><span><b>Varios móviles</b><small>La misma sala durante todas las rondas.</small></span><i aria-hidden="true">→</i></button>`;
     paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
-      <section class="mode-masthead"><img src="assets/hero-competicion-700.webp" alt="" width="700" height="350" decoding="async"><div><div class="eyebrow">Mazos aleatorios</div><h1 data-focus tabindex="-1">Modo competición</h1><p>Termina una ronda y descubre otro mazo, sin repetir temáticas.</p></div></section>
+      <section class="mode-masthead comp-atlas-intro"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async"><div><div class="eyebrow">Mazos aleatorios</div><h1 data-focus tabindex="-1">Modo competición</h1><p>Termina una ronda y descubre otro mazo, sin repetir temáticas.</p></div></section>
       <section class="home-play"><div class="panel setup-grid">
-        <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'Corta · 3 temas'],[5,'Media · 5 temas'],[CT.Tournament.modes().length,'Completa · todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
+        <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
         <div class="field"><label for="competition-cards">Cartas por ronda y persona</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
       </div><section class="play-choices"><div class="play-choices-head"><h2>¿Cómo quieres jugar?</h2></div>
         ${formatBlock('competition-multi','Multijugador','Un solo móvil o varios.',multi)}
