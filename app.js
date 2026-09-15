@@ -378,7 +378,7 @@
   function home() {
     pendingTournament = null;
     screen = "home";
-    paint(`<div class="shell home-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
+    paint(`<div class="shell home-shell home-gallery-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
       ${homeMasthead()}${quickActions()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
       <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section></div></section>
       ${homeNav()}
