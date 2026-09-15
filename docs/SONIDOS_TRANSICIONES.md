@@ -5,7 +5,7 @@ Los sonidos de acción usan texturas suaves de papel y madera. Se activan con
 
 | Acción | Respuesta | Punto de conexión |
 | --- | --- | --- |
-| Avanzar o volver entre pantallas, con botón o gesto | Papel en sentidos y velocidades distintos | `a11y.js`: `paint`, `turnPage` |
+| Avanzar o volver entre pantallas, con botón o gesto | Roce de hoja tenue, filtrado y con entrada/salida gradual; velocidad distinta al volver | `a11y.js`: `paint`, `turnPage` |
 | Desenrollar colección, perfil o guía | Roce de pergamino más largo | `a11y.js`: `unrollSheet` |
 | Desplegar o plegar formatos, solitario y mazos de enciclopedia | Papel breve | `app.js`, `effects.js`: activación de `summary` |
 | Abrir/cerrar ajustes, guía, ilustraciones, QR, menús y confirmaciones | Papel y toque tenue al abrir; papel al cerrar | `a11y.js`: `openDialog`, `closeDialog` |
