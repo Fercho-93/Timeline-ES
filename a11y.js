@@ -273,6 +273,7 @@
     const previousDepth = preparationDepth[paint.screen];
     const nextDepth = preparationDepth[screen];
     const changed = paint.screen !== screen;
+    const closingEncyclopedia = paint.screen === "enciclopedia" && changed;
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (preparationTurn || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
@@ -300,7 +301,7 @@
     window.CONTINUUM.UI?.mount(container, screen);
     // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
     // muchas veces y no debe convertir cada toque en una animación.
-    if (!primero && cambioDePantalla) {
+    if (!primero && cambioDePantalla && !closingEncyclopedia) {
       container.firstElementChild?.classList.add("screen-enter");
       if (vuelve) container.firstElementChild?.classList.add("screen-return");
     }

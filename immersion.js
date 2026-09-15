@@ -48,13 +48,7 @@
     layer.querySelector('[data-exit-confirm]').addEventListener('click', () => { CT.closeDialog(); proceed(); });
     app.append(layer); CT.openDialog(layer, true);
   }
-  let lastScreen = '', introCover = '';
   function mount(container, screen) {
-    const entryImage = container.querySelector('.atlas-landscape img, .chapter-art img');
-    if (entryImage) introCover = entryImage.getAttribute('src');
-    const enteringBoard = board.has(screen) && !board.has(lastScreen) && lastScreen !== 'pass';
-    const firstLocalBoard = screen === 'game' && lastScreen === 'pass' && introCover;
-    lastScreen = screen;
     surfaceNav.clear();
     const inGame = playing.has(screen);
     container.classList.toggle('atlas-playing', inGame);
@@ -69,13 +63,6 @@
     container.classList.toggle('atlas-has-nav', !inGame);
     if (board.has(screen)) {
       const wrap = container.querySelector('.timeline-wrap');
-      if ((enteringBoard || firstLocalBoard) && introCover && wrap && !reduced()) {
-        const portal = document.createElement('img'); portal.className = 'atlas-board-arrival';
-        portal.src = introCover; portal.alt = ''; portal.setAttribute('aria-hidden','true');
-        container.querySelector('.shell')?.append(portal);
-        setTimeout(() => portal.remove(), 750);
-        introCover = '';
-      }
       const zoom = container.querySelector('.timeline-zoom');
       if (wrap && zoom) wrap.after(zoom);
       const hand = container.querySelector('.hand');
