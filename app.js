@@ -237,8 +237,8 @@
   function formatBlock(key, title, subtitle, choicesHtml) {
     const open = formatOpen === key;
     return `<div class="play-choice-block${open ? " open" : ""}">
-      <button class="play-block-toggle" data-action="toggle-format-block" data-format="${key}" aria-expanded="${open}">
-        <span><b>${title}</b><small>${subtitle}</small></span>
+      <button class="play-block-toggle walking-choice" data-action="toggle-format-block" data-format="${key}" aria-expanded="${open}">
+        <img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>${title}</b><small>${subtitle}</small></span>
         <i class="play-block-chevron" aria-hidden="true">⌄</i>
       </button>
       ${open ? `<div class="play-choice-grid">${choicesHtml}</div>` : ""}
@@ -249,24 +249,11 @@
     const multi = `<button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
       ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}`;
-    const solo = `<button class="play-choice" data-action="solo"><span class="choice-icon">${playIcon("solo")}</span><span><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>`;
+    const solo = `<button class="play-choice walking-choice" data-action="solo"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
       ${formatBlock("multi", "Multijugador", "Un solo móvil o varios.", multi)}
       <div class="direct-solo">${solo}</div>
     </section>`;
-  }
-
-  // Consultar el mazo no es una forma de jugar, así que no comparte fila con los
-  // formatos ni se cuela como un botón más de la cabecera: va debajo, con sitio para
-  // decir de cuántas cartas habla. Sin artículo delante del recuento: `cardLabel`
-  // cambia de género según el mazo («hechos», «películas», «pares»).
-  function deckBrowse() {
-    const mode = currentMode();
-    return `<button class="deck-browse" data-action="enciclopedia">
-      <span class="choice-icon">${playIcon("deck")}</span>
-      <span><b>Enciclopedia</b><small>Consulta sus ${mode.cards.length} ${escapeHtml(mode.cardLabel)}, con su valor y su explicación.</small></span>
-      <i aria-hidden="true">→</i>
-    </button>`;
   }
 
   function competitionPromo() {
@@ -287,7 +274,7 @@
         <div class="field"><label for="competition-cards">Cartas por ronda y persona</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
       </div><section class="play-choices"><div class="play-choices-head"><h2>¿Cómo quieres jugar?</h2></div>
         ${formatBlock('competition-multi','Multijugador','Un solo móvil o varios.',multi)}
-        <div class="direct-solo"><button class="play-choice" data-action="start-competition"><span class="choice-icon">${playIcon('solo')}</span><span><b>Jugar solo</b><small>Suma tus aciertos a lo largo de las rondas.</small></span><i aria-hidden="true">→</i></button></div>
+        <div class="direct-solo"><button class="play-choice walking-choice" data-action="start-competition"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Suma tus aciertos a lo largo de las rondas.</small></span><i aria-hidden="true">→</i></button></div>
       </section>
       ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
       ${CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}
@@ -409,7 +396,7 @@
     const art = BLOCK_ART[block.art];
     paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="collection-back">Volver</button>')}
       ${CT.UI.deckIntro(selectedModeKey, `assets/${art.archivo}-700.webp`)}
-      <section class="home-play">${playChoices(resume)}${deckBrowse()}</section>
+      <section class="home-play">${playChoices(resume)}</section>
     </div>`);
     window.scrollTo(0, 0);
   }

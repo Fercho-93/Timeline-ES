@@ -628,3 +628,27 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app .atlas-intro-copy { margin-bottom: 8px; }
   #app .atlas-specimens figcaption { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 }
+
+/* Las modalidades se presentan como pequeños viajes sobre el mismo papel. */
+#app .home-shell .walking-choice { position: relative; isolation: isolate; overflow: hidden; display: flex; justify-content: space-between; min-height: 98px; padding: 16px; text-align: left; }
+#app .walking-art { position: absolute; z-index: -1; inset: 0 18px 0 auto; width: 58%; height: 100%; object-fit: cover; object-position: right 65%; mix-blend-mode: multiply; opacity: .82; -webkit-mask-image: linear-gradient(90deg,transparent,#000 38%,#000 92%,transparent); mask-image: linear-gradient(90deg,transparent,#000 38%,#000 92%,transparent); }
+#app .walking-copy { max-width: 65%; text-shadow: 0 1px 3px var(--edition-surface),0 0 8px var(--edition-surface); }
+#app .walking-choice > i { align-self: center; z-index: 1; }
+:root:is([data-theme="dark"],[data-theme="night"]) #app .walking-art { mix-blend-mode: normal; opacity: .3; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) #app .walking-art { mix-blend-mode: normal; opacity: .3; } }
+@media (max-width: 699px) {
+  #app.atlas-has-nav > .play-menu-shell:has(> .atlas-intro) { display: flex; flex-direction: column; min-height: 100svh; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  #app .play-menu-shell > .atlas-intro { flex: 1; align-content: space-between; }
+  #app .play-menu-shell > .atlas-intro .atlas-intro-copy { margin-bottom: clamp(12px, 3svh, 32px); }
+  #app .play-menu-shell > .atlas-intro .atlas-specimens { max-width: 275px; }
+  #app .play-menu-shell > .home-play { margin-top: 12px; }
+  #app .play-menu-shell .walking-choice { min-height: clamp(76px, 12svh, 104px); padding: 12px; }
+  #app .play-menu-shell .play-choices { margin-bottom: 0; }
+}
+@media (max-width: 699px) and (max-height: 650px) {
+  #app .play-menu-shell > .atlas-intro .atlas-specimens { max-width: 255px; }
+  #app .play-menu-shell > .atlas-intro .atlas-intro-copy { margin-bottom: 8px; }
+}
+@media (max-width: 699px) {
+  #app .play-menu-shell > .atlas-intro .atlas-specimens figcaption { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+}
