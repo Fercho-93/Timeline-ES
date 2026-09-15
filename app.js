@@ -16,6 +16,7 @@
   let previousView = null, navigatingBack = false;
   const navigationTrail = [];
   const paint = html => {
+    if (CT.Accounts && !CT.Accounts.ready) return;
     if (CT.UI.isPlaying(screen) && !CT.UI.isPlaying(lastPaintedScreen)) {
       playReturn = ['setup', 'solo-home', 'competition-menu', 'duelo-intro'].includes(lastPaintedScreen) ? lastPaintedScreen : 'play-menu';
     }
@@ -1307,6 +1308,7 @@
       <section class="setup-section perfil-section">
         <div class="eyebrow"><span class="eyebrow-line"></span> Tu progreso</div>
         <h1 data-focus tabindex="-1">Perfil</h1>
+        ${CT.Accounts?.card() || ""}
         ${estrenado
           ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
           : `<p class="lead">Aquí se irá guardando lo que juegues: aciertos, mazos, puntos débiles y logros. Todavía no hay nada que contar.</p>`}
@@ -1314,7 +1316,7 @@
         ${perfilPorJuego(filas)}
         ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
         ${perfilLogros(CT.Progreso.achievements())}
-        ${perfilCopia()}
+        ${CT.Accounts ? "" : perfilCopia()}
       </section>
       ${homeNav()}
     </div>`);
@@ -1705,7 +1707,7 @@
     const enDueloEsta = solo.kind === "duel";
     const superado = enDueloEsta ? solo.hits === total : solo.lives > 0;
     const logros = CT.Progreso.finishGame({
-      mode: solo.mode, kind: solo.kind, hits: solo.hits, total,
+      mode: solo.mode, kind: solo.kind, hits: solo.hits, total, rankedDaily: esReto,
       difficulty: solo.difficulty || "easy", streak: records.streak || 0, lives: solo.lives,
       // Ganar un duelo solo se puede afirmar cuando hay alguien contra quien ganarlo: al
       // crearlo todavía no hay rival, solo una marca que mandar.
@@ -2253,9 +2255,9 @@
     else if (action === "enc-back") CT.closeDialog();
     else if (action === "perfil") perfilView();
     else if (action === "perfil-export") perfilExport();
-    else if (action === "perfil-import") perfilImport();
-    else if (action === "perfil-reset") perfilResetMenu();
-    else if (action === "perfil-reset-confirm") { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
+    else if (action === "perfil-import" && !CT.Accounts) perfilImport();
+    else if (action === "perfil-reset" && !CT.Accounts) perfilResetMenu();
+    else if (action === "perfil-reset-confirm" && !CT.Accounts) { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
   });
 
   CT.localNavigate = action => {

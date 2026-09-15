@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Ejecuta online.js real con dos clientes DOM y transacciones contra las reglas reales.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -7,14 +8,14 @@ import { doc, getDoc, setDoc, updateDoc, runTransaction, serverTimestamp } from 
 const read = name => fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
 const env = await initializeTestEnvironment({projectId:'demo-ghost',firestore:{host:'127.0.0.1',port:8080,rules:read('firestore.rules')}});
 const ROOM='GHOST123', A='ana', B='bea', C='carlos';
-const db=uid=>env.authenticatedContext(uid).firestore();
+const db=uid=>env.authenticatedContext(uid, {email_verified:true, firebase:{sign_in_provider:'password'}}).firestore();
 const ref=uid=>doc(db(uid),'rooms',ROOM);
 const snapshot=async()=> (await getDoc(ref(A))).data();
 const seed=async data=>env.withSecurityRulesDisabled(c=>setDoc(doc(c.firestore(),'rooms',ROOM),data));
 const clone=x=>JSON.parse(JSON.stringify(x));
 function fixture(){return {roomCode:ROOM,mode:'history',hostUid:A,status:'playing',phase:'turn',version:1,handSize:3,playerOrder:[A,B,C],players:{[A]:{name:'Ana',hand:[6,7,8],pulseUsed:false,shieldRound:0},[B]:{name:'Bea',hand:[9,10,11],pulseUsed:false,shieldRound:0},[C]:{name:'Carlos',hand:[12,13,14],pulseUsed:false,shieldRound:0}},deck:[15,16,17,18],discard:[],timeline:[1,2,3,4,5],current:0,starter:A,turnsInRound:0,round:1,winner:null,winners:null,reveal:null,createdAt:1,updatedAt:1,pulse:true,pulseTurn:null,ghost:{cards:[6,15],owners:[A,''],used:[],pending:[],cooldown:[],actor:'',fresh:false}};}
 function client(uid){
- const html=read('index.html'),w=new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''),{runScripts:'outside-only',url:'https://continuum.test'}).window;
+ const html=gameHtml(read('index.html')),w=new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''),{runScripts:'outside-only',url:'https://continuum.test'}).window;
  w.structuredClone=structuredClone;
  for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
  const errors=[];w.console.error=e=>errors.push(e);
@@ -23,7 +24,7 @@ function client(uid){
  // no lo reconoce como marca de hora del servidor.
  w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.set(ref,limpio);},update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];

@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Contratos de interacción. No son una prueba visual de Safari: verifican que el
 // movimiento no repita acciones, pierda foco ni altere un arrastre o la partida.
 import assert from "node:assert/strict";
@@ -6,7 +7,7 @@ import { JSDOM } from "jsdom";
 
 const root = new URL("../", import.meta.url);
 const read = file => fs.readFileSync(new URL(file, root), "utf8");
-const source = read("index.html");
+const source = gameHtml(read("index.html"));
 const scripts = [...source.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 let checks = 0;
@@ -249,6 +250,7 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   const slots = [...w.document.querySelectorAll(".slot")];
   assert.ok(slots.every(slot => slot.disabled));
   w.document.elementFromPoint = () => slots[0];
+  card.getBoundingClientRect = () => ({width:240,height:320,left:0,top:0,right:240,bottom:320});
   pointer(w, "pointerdown", card, 100, 400, "mouse");
   pointer(w, "pointermove", card, 150, 280, "mouse");
   assert.ok(slots.every(slot => !slot.disabled));
@@ -297,10 +299,12 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   click(w, '.hand-card');
   card = el(w, '.hand-card.selected');
   ok("un toque selecciona la carta", !!card);
+  card.getBoundingClientRect = () => ({width:240,height:320,left:0,top:0,right:240,bottom:320});
   pointer(w, "pointerdown", card, 100, 400, "mouse");
   w.document.elementFromPoint = () => el(w, '.slot[data-index="0"]');
   pointer(w, "pointermove", card, 100, 280, "mouse");
   const ghost = el(w, ".drag-ghost");
+  ok("la copia conserva proporciones y limita su escala",ghost.style.width === "240px" && ghost.style.height === "320px" && ghost.style.transform.includes("scale(0.625)"));
   ok("la copia usa composición y no duplica el control accesible", ghost.style.transform.includes("translate3d") && ghost.getAttribute("aria-hidden") === "true" && ghost.tabIndex === -1);
   // Soltar en otro hueco antes del siguiente frame debe elegir la posición final.
   w.document.elementFromPoint = () => el(w, '.slot[data-index="1"]');
@@ -309,6 +313,7 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   await sleep(5); // siguiente evento real: el clic sintético del arrastre ya se ha consumido
   click(w, '[data-action="cancel-place"]');
   card = el(w, ".hand-card");
+  card.getBoundingClientRect = () => ({width:240,height:320,left:0,top:0,right:240,bottom:320});
   pointer(w, "pointerdown", card, 100, 400, "mouse");
   pointer(w, "pointermove", card, 150, 280, "mouse");
   pointer(w, "pointercancel", card, 150, 280, "mouse");

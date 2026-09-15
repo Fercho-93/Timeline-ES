@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // El duelo por enlace: que dos móviles independientes reciban las mismas cartas, que la
 // carga útil dé la vuelta entera, que un enlace manipulado o de otra versión del mazo se
 // rechace sin romper nada, y que la partida se juegue con el motor del solitario.
@@ -8,14 +9,14 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
 // `url` permite arrancar un «móvil» directamente sobre un enlace de duelo, que es como
 // llega de verdad: alguien abre la dirección que le han mandado.
 function boot({ url = "https://hilo.test/", almacen = {} } = {}) {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
   const { window } = dom;
   window.Element.prototype.scrollIntoView = function () {};
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));

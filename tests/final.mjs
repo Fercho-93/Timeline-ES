@@ -1,8 +1,9 @@
+import {gameHtml} from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { finishLocalFinal } from './final-helper.mjs';
-const html = fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html = gameHtml(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'));
 const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m=>m[1]);
 const key = 'hilo-game-history-v1';
 function boot(saved) {

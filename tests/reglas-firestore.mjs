@@ -14,7 +14,7 @@ const env = await initializeTestEnvironment({
 const HOST = "host-uid", P2 = "p2-uid", P3 = "p3-uid", OUT = "outsider-uid";
 const ROOM = "ABCD2345";
 let pass = 0, fail = 0;
-const ctx = uid => env.authenticatedContext(uid).firestore();
+const ctx = uid => env.authenticatedContext(uid, {email_verified:true, firebase:{sign_in_provider:'password'}}).firestore();
 const ref = db => doc(db, "rooms", ROOM);
 
 async function seed(data) {

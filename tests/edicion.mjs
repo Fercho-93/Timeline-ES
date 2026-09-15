@@ -1,9 +1,10 @@
+import {gameHtml} from './game-fixture.mjs';
 // Recorridos que podrían desincronizar la ambientación o bloquear la apertura.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
-const html = read('index.html');
+const html = gameHtml(read('index.html'));
 function boot({ reduce = false, seen = false, saved = {}, userAgent = null } = {}) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {
     runScripts: 'outside-only', url: 'https://continuum.test/'
@@ -77,7 +78,7 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 }
 for (const options of [{ reduce: true }, { seen: true }]) {
   const w = boot(options);
-  try { assert.ok(!w.document.documentElement.classList.contains('splash-active')); }
+  try { w.CONTINUUM_SPLASH.finish(); assert.ok(!w.document.documentElement.classList.contains('splash-active')); }
   finally { w.close(); }
 }
 {
@@ -85,8 +86,8 @@ for (const options of [{ reduce: true }, { seen: true }]) {
   try {
     await new Promise(resolve => w.setTimeout(resolve, 0));
     assert.ok(w.document.documentElement.classList.contains('splash-active'));
-    w.document.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
-    assert.equal(w.document.getElementById('app-splash'), null, 'el teclado retira la apertura');
+    w.CONTINUUM_SPLASH.finish();
+    assert.ok(!w.document.documentElement.classList.contains('splash-active'), 'la apertura termina cuando el juego está listo');
     assert.ok(w.document.querySelector('[data-action="rules"]'), 'la aplicación sigue disponible');
   } finally { w.close(); }
 }

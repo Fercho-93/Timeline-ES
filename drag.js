@@ -104,15 +104,25 @@
     const { card } = session;
     const ghost = card.cloneNode(true);
     ghost.classList.add("drag-ghost");
-    ghost.classList.remove("dragging", "armed", "selection-enter");
+    ghost.classList.remove("dragging", "armed", "holding", "selected", "selection-enter");
     ghost.setAttribute("aria-hidden", "true");
     ghost.setAttribute("tabindex", "-1");
     ghost.removeAttribute("disabled");
-    ghost.style.width = `${Math.min(card.getBoundingClientRect().width, GHOST_WIDTH)}px`;
+    const box=card.getBoundingClientRect();
+    const scale=Math.min(1,GHOST_WIDTH / Math.max(1,box.width));
+    // La copia sale de #app: conservar sus estilos calculados evita que la lámina
+    // recupere su tamaño natural al perder los selectores del tablero.
+    const sources=[card,...card.querySelectorAll('*')], copies=[ghost,...ghost.querySelectorAll('*')];
+    sources.forEach((source,i)=>{
+      const computed=getComputedStyle(source);
+      for(const property of Array.from(computed)) copies[i].style.setProperty(property,computed.getPropertyValue(property));
+    });
+    Object.assign(ghost.style,{position:'fixed',left:'0',top:'0',width:`${box.width}px`,height:`${box.height}px`,minWidth:'0',minHeight:'0',margin:'0',overflow:'hidden',transform:`scale(${scale})`,transformOrigin:'top left',pointerEvents:'none',zIndex:'60',transition:'none',animation:'none'});
     document.body.appendChild(ghost);
 
     const ghostBox = ghost.getBoundingClientRect();
     session.ghost = ghost;
+    session.ghostScale = scale;
     session.ghostWidth = ghostBox.width;
     session.ghostHeight = ghostBox.height;
     session.dragging = true;
@@ -151,7 +161,9 @@
 
   function moveGhost() {
     const { left, top } = ghostPosition();
-    session.ghost.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(-1.5deg)`;
+    // La copia ya viene encogida desde `startDrag` para no tapar la línea, y su escala
+    // tiene que acompañar a cada movimiento o recuperaría su tamaño natural.
+    session.ghost.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(-1.5deg) scale(${session.ghostScale})`;
     const slot = slotUnder(session.x, session.y);
     if (slot !== session.slot) {
       session.slot?.classList.remove("drop-target");
@@ -164,19 +176,23 @@
   // al hueco elegido, o vuelve a la mano si no se eligió ninguno. Ese recorrido es lo
   // que dice dónde ha ido la carta; sin él, soltar fuera de un hueco parecía perderla.
   // Arranca con el resto de la velocidad que traía el dedo, para que no frene en seco.
-  function settle(ghost, from, target, velocity, duration) {
+  function settle(ghost, from, target, medida, velocity, duration) {
     // La copia de un gesto terminado deja de llamarse como la de uno vivo: así el resto
     // del programa (y quien lea la pantalla) no las confunde.
     ghost.classList.replace("drag-ghost", "drag-settle");
     // Sin animaciones —por preferencia del sistema o porque el navegador no las ofrece—
     // la copia se va en el acto. El estado final de la partida es exactamente el mismo.
     if (!target || reduced() || typeof ghost.animate !== "function") { ghost.remove(); return; }
+    // El recorrido habla el mismo idioma que `moveGhost`: posición de la esquina superior
+    // izquierda y escala encima. Por eso el centrado usa el tamaño que la copia ocupa en
+    // pantalla —ya encogido— y no el que tendría a tamaño natural.
     const to = {
-      left: target.left + target.width / 2 - ghost.offsetWidth / 2,
-      top: target.top + target.height / 2 - ghost.offsetHeight / 2
+      left: target.left + target.width / 2 - medida.width / 2,
+      top: target.top + target.height / 2 - medida.height / 2
     };
     const lead = d => Math.max(-LEAD_MAX, Math.min(LEAD_MAX, d * LEAD_MS));
-    const at = (x, y, rot, scale) => `translate3d(${x}px, ${y}px, 0) rotate(${rot}deg) scale(${scale})`;
+    const escala = medida.scale;
+    const at = (x, y, rot, factor) => `translate3d(${x}px, ${y}px, 0) rotate(${rot}deg) scale(${escala * factor})`;
     const animation = ghost.animate([
       { transform: at(from.left, from.top, -1.5, 1), opacity: 1 },
       { transform: at(from.left + lead(velocity.x), from.top + lead(velocity.y), -1.1, .98), opacity: .92, offset: .22 },
@@ -269,7 +285,7 @@
 
   function onPointerUp(event) {
     if (!session || event.pointerId !== session.pointerId) return;
-    let ghost = null, from = null, target = null, velocity = { x: 0, y: 0 }, duration = 0;
+    let ghost = null, from = null, target = null, medida = null, velocity = { x: 0, y: 0 }, duration = 0;
     if (session.dragging) {
       session.x = event.clientX;
       session.y = event.clientY;
@@ -279,6 +295,8 @@
       target = (session.slot || session.card).getBoundingClientRect();
       duration = session.slot ? SETTLE_SLOT : SETTLE_BACK;
       from = ghostPosition();
+      // La sesión se borra en `cleanup`, así que lo que el recorrido necesite se copia ya.
+      medida = { width: session.ghostWidth, height: session.ghostHeight, scale: session.ghostScale };
       // Un dedo que llevaba un rato quieto suelta sin inercia, por mucho que antes
       // hubiera venido lanzado: la carta se posa donde se dejó, no sale disparada.
       if (event.timeStamp - session.moveT < STILL_MS) velocity = { x: session.vx, y: session.vy };
@@ -287,7 +305,7 @@
     }
     const { dragging, slot, cardId, onDrop } = session;
     cleanup();
-    if (ghost) settle(ghost, from, target, velocity, duration);
+    if (ghost) settle(ghost, from, target, medida, velocity, duration);
     if (!dragging) return;          // fue un toque: que siga su curso y seleccione
     // Tras un arrastre el navegador suele disparar un clic sobre lo que haya debajo; se
     // ignora, para que soltar fuera de un hueco no acabe seleccionando otra cosa. Pero

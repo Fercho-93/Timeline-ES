@@ -1,3 +1,4 @@
+import {gameHtml} from './game-fixture.mjs';
 // Cuando algo se rompe de verdad, quien prueba la aplicación no debería quedarse ante
 // una pantalla en blanco sin nada que contar. Comprueba que un error sin capturar
 // enseña un aviso con lo necesario para depurarlo a distancia, que no se duplica si
@@ -10,13 +11,13 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
-const guiones = () => [...read("index.html").matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 const espera = () => new Promise(resolve => setTimeout(resolve, 30));
 
 function boot() {
-  const dom = new JSDOM(read("index.html").replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
+  const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
   guiones().forEach(archivo => window.eval(read(archivo)));
   return window;
