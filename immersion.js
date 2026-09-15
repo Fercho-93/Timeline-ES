@@ -157,8 +157,9 @@
       return true;
     } catch { return false; }
   }
-  // Audio sintetizado local: papel de 130 ms y un ambiente tenue, ambos optativos.
+  // Papel sintetizado de 130 ms y una grabación de guitarra, ambos optativos.
   let audio, ambient = [], guitarBuffer, audioStarted = false;
+  let ambientRequest = 0, ambientLoading = false, pageActive = true;
   function context() {
     const Audio = window.AudioContext || window.webkitAudioContext;
     if (!Audio) return null;
@@ -182,49 +183,22 @@
       source.start(); source.stop(ctx.currentTime + .14);
     } catch { /* Un efecto nunca interrumpe el juego. */ }
   }
-  // Arpegio original de ocho compases. Cuerdas pulsadas por síntesis Karplus–Strong,
-  // filtradas para un timbre de nailon cálido; las colas se envuelven al inicio del
-  // buffer, evitando un corte en el bucle. Se calcula una sola vez, sin descargas.
+  // Composición original con muestras de guitarra acústica real. Se descarga y
+  // decodifica una vez; el service worker la conserva también sin conexión.
   function guitarLoop(ctx) {
-    if (guitarBuffer) return guitarBuffer;
-    const rate = 24000, beat = 60 / 72, bar = beat * 4;
-    const chords = [[50,57,62,66,69,64],[43,55,59,62,66,62],
-      [47,54,59,62,66,62],[45,57,62,64,69,64],
-      [50,57,62,66,69,64],[43,55,59,62,66,62],
-      [40,55,59,62,66,62],[45,57,61,64,69,64]];
-    const buffer = ctx.createBuffer(1, Math.round(bar * chords.length * rate), rate);
-    const out = buffer.getChannelData(0), offsets = [0,.5,1,1.5,2,3];
-    let seed = 731;
-    const random = () => { seed = (Math.imul(seed,1664525) + 1013904223) >>> 0; return seed / 4294967296; };
-    chords.forEach((chord, measure) => chord.forEach((note, index) => {
-      const frequency = 440 * 2 ** ((note - 69) / 12);
-      const period = Math.round(rate / frequency), string = new Float32Array(period);
-      let mean = 0;
-      for (let n = 0; n < period; n++) { string[n] = random() * 2 - 1; mean += string[n]; }
-      mean /= period;
-      for (let n = 0; n < period; n++) string[n] -= mean;
-      const start = Math.round((measure * bar + offsets[index] * beat) * rate);
-      const length = rate * 4, velocity = index === 0 ? .65 : .42;
-      let warm = 0;
-      for (let n = 0; n < length; n++) {
-        const pos = n % period, value = string[pos];
-        string[pos] = .498 * (value + string[(pos + 1) % period]);
-        warm += .3 * (value - warm);
-        const envelope = Math.min(1,n / (rate * .008)) * Math.exp(-n / (rate * 1.4));
-        const sample = warm * envelope * velocity;
-        out[(start + n) % out.length] += sample;
-        // Reflejos muy discretos, sin una reverberación que enturbie las cartas.
-        out[(start + n + Math.round(rate * .12)) % out.length] += sample * .16;
-        out[(start + n + Math.round(rate * .23)) % out.length] += sample * .07;
-      }
-    }));
-    let peak = 0;
-    for (const sample of out) peak = Math.max(peak,Math.abs(sample));
-    if (peak) for (let n = 0; n < out.length; n++) out[n] *= .6 / peak;
-    guitarBuffer = buffer;
-    return buffer;
+    if (!guitarBuffer) {
+      guitarBuffer = fetch('assets/audio/entre-paginas.mp3')
+        .then(response => {
+          if (!response.ok) throw new Error('Audio unavailable');
+          return response.arrayBuffer();
+        })
+        .then(data => ctx.decodeAudioData(data))
+        .catch(error => { guitarBuffer = null; throw error; });
+    }
+    return guitarBuffer;
   }
   function stopAmbient(immediate = false) {
+    ++ambientRequest; ambientLoading = false;
     const nodes = ambient; ambient = [];
     nodes.forEach(({source,gain}) => {
       try {
@@ -237,23 +211,29 @@
       } catch { source.disconnect(); gain.disconnect(); }
     });
   }
-  function syncAmbient(fromGesture = false) {
-    const enabled = CT.effectPrefs?.().ambience && !document.hidden;
+  async function syncAmbient(fromGesture = false) {
+    const enabled = CT.effectPrefs?.().ambience && !document.hidden && pageActive;
     if (!enabled) { stopAmbient(document.hidden); return; }
-    if (ambient.length || (!fromGesture && !audioStarted)) return;
+    if (ambient.length || ambientLoading || (!fromGesture && !audioStarted)) return;
+    const request = ++ambientRequest;
     try {
       const ctx = context(); if (!ctx) return;
+      ambientLoading = true;
+      const buffer = await guitarLoop(ctx);
+      if (request !== ambientRequest || !CT.effectPrefs?.().ambience || document.hidden || !pageActive) return;
       const source = ctx.createBufferSource(), gain = ctx.createGain();
-      source.buffer = guitarLoop(ctx); source.loop = true;
+      source.buffer = buffer; source.loop = true;
       gain.gain.setValueAtTime(0,ctx.currentTime);
       gain.gain.linearRampToValueAtTime(.12,ctx.currentTime + 1.5);
       source.connect(gain); gain.connect(ctx.destination);
       source.onended = () => { source.disconnect(); gain.disconnect(); };
       ambient = [{source,gain}]; source.start();
-    } catch { stopAmbient(true); }
+    } catch { if (request === ambientRequest) stopAmbient(true); }
+    finally { if (request === ambientRequest) ambientLoading = false; }
   }
   document.addEventListener('visibilitychange', () => { refreshDepth(); syncAmbient(); });
-  window.addEventListener('pagehide', () => stopAmbient(true));
+  window.addEventListener('pagehide', () => { pageActive = false; stopAmbient(true); });
+  window.addEventListener('pageshow', () => { pageActive = true; syncAmbient(); });
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
   document.addEventListener('click', event => {
     if (event.target.closest('.gallery-panel, .game-row, .play-choice, .hand-card:not(:disabled), [data-action="confirm-place"], [data-online-action="confirm-place"]')) paper();
