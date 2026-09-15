@@ -41,8 +41,8 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       // que cuenta, y eso vale para los treinta y pico mazos por igual. En su sitio va el
       // reverso de la colección, el mismo para todas sus cartas.
       assert.equal(w.document.querySelector('.hand .animal-card-art'), null, `${block.key}: la mano no enseña láminas`);
-      assert.equal(w.document.querySelector('.hand img'), null, `${block.key}: la mano no descarga ninguna imagen`);
-      assert.ok(w.document.querySelector('.hand .carta-reverso .reverso-emblema'), `${block.key}: la mano enseña el reverso del mazo`);
+      assert.ok(w.document.querySelector('.hand img').getAttribute('src').startsWith('assets/hero-'), `${block.key}: solo se usa la portada común`);
+      assert.ok(w.document.querySelector('.hand .carta-reverso .reverso-coleccion'), `${block.key}: la mano enseña el reverso del mazo`);
       click(w, '[data-action="ui-back"]');
       click(w, '[data-exit-confirm]');
       click(w, '[data-action="back-menu"]');
@@ -61,13 +61,13 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 {
   const w = boot();
   try {
-    // Cada colección tiene su emblema, que es lo que hace que el reverso diga de qué se
+    // Cada colección tiene su portada, que es lo que hace que el reverso diga de qué se
     // está jugando sin decir nada de la carta que tapa.
     const reversos = Object.values(w.CONTINUUM.BLOCKS).map(block => w.CONTINUUM.cardBack(block.games[0]));
-    assert.equal(new Set(reversos).size, reversos.length, 'cada colección trae su propio emblema');
+    assert.equal(new Set(reversos).size, reversos.length, 'cada colección trae su propia portada');
     for (const reverso of reversos) {
       assert.match(reverso, /class="carta-reverso" aria-hidden="true"/, 'el reverso no se lee en voz alta');
-      assert.doesNotMatch(reverso, /<img|assets\//, 'el reverso va dibujado, sin descargas');
+      assert.match(reverso, /src="assets\/hero-[a-z]+-400\.webp"/, 'el reverso usa la portada común de la colección');
     }
     // Y la lámina no desaparece del juego: la enseñan la carta ya colocada —donde su
     // valor está a la vista y no hay nada que adivinar— y la enciclopedia.
