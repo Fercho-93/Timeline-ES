@@ -127,7 +127,7 @@
   function depthTarget() {
     const app = document.getElementById('app');
     if (!app || playing.has(app.dataset.screen) || app.querySelector('.overlay')) return null;
-    return app.querySelector('[data-depth-scene]') || app.querySelector('.gallery-panel.active');
+    return app.querySelector('[data-depth-scene]') || app.querySelector('.gallery-panel.active') || app.querySelector('.gallery-panel');
   }
   function onTilt(event) {
     if (!Number.isFinite(event.beta) || !Number.isFinite(event.gamma)) return;
@@ -137,8 +137,17 @@
     depthFrame = requestAnimationFrame(() => {
       depthFrame = 0;
       const scene = depthTarget();
-      scene?.style.setProperty('--depth-x', `${tilt.x * 7}px`);
-      scene?.style.setProperty('--depth-y', `${tilt.y * 5}px`);
+      if (!scene) return;
+      const scenes = scene.matches('.gallery-panel')
+        ? document.querySelectorAll('#app .gallery-panel') : [scene];
+      scenes.forEach(target => {
+        const rect = target.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        target.style.setProperty('--depth-x', `${tilt.x * 7}px`);
+        target.style.setProperty('--depth-y', `${tilt.y * 5}px`);
+        target.style.setProperty('--cover-rx', `${-tilt.y * 2}deg`);
+        target.style.setProperty('--cover-ry', `${tilt.x * 2.5}deg`);
+      });
     });
   }
   function refreshDepth() {
@@ -147,7 +156,7 @@
     else if (!enabled && depthListening) {
       window.removeEventListener('deviceorientation', onTilt); depthListening = false; origin = null;
       cancelAnimationFrame(depthFrame); depthFrame = 0;
-      document.querySelectorAll('[data-depth-scene], .gallery-panel').forEach(scene => { scene.style.removeProperty('--depth-x'); scene.style.removeProperty('--depth-y'); });
+      document.querySelectorAll('[data-depth-scene], .gallery-panel').forEach(scene => { scene.style.removeProperty('--depth-x'); scene.style.removeProperty('--depth-y'); scene.style.removeProperty('--cover-rx'); scene.style.removeProperty('--cover-ry'); });
     }
   }
   async function requestDepth() {

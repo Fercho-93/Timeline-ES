@@ -758,3 +758,45 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app[data-screen="competition-menu"] .setup-grid label { min-height: 2.6em; font: 600 .76rem/1.3 var(--ui-font); }
   #app[data-screen="competition-menu"] .setup-grid select { padding-inline: 8px; font-size: .82rem; }
 }
+
+/* Colecciones: pigmentos originales y relieve ligero sobre el papel. */
+#app .home-gallery-shell .gallery-panel {
+  border-color: #a58b60;
+  box-shadow: 0 3px 0 #aa916b, 0 5px 0 #d3c1a0, 0 10px 18px #49361f22;
+  background: #756044;
+}
+#app .home-gallery-shell .gallery-panel .panel-art,
+#app .home-gallery-shell .gallery-panel:not(.active):hover .panel-art {
+  filter: saturate(1.12) brightness(1.05) contrast(1.025);
+  transition: none;
+}
+#app .home-gallery-shell .gallery-panel::after {
+  background: linear-gradient(180deg, #211b162b, transparent 28%, #211b160d 40%, #211b16d9 100%);
+}
+#app .home-gallery-shell .gallery-panel::before {
+  border-color: #fff0c57a;
+  box-shadow: inset 0 1px 0 #fff9, inset 1px 0 0 #fff4;
+}
+#app .home-gallery-shell .gallery-panel .panel-label {
+  text-shadow: 0 2px 5px #160f09a8;
+}
+#app .home-gallery-shell .gallery-panel .panel-label small { color: #fff2d9; }
+#app .home-gallery-shell .gallery-panel .collection-index { text-shadow: 0 1px 4px #16120a; }
+#app .home-gallery-shell .gallery-panel .collection-foil {
+  background: radial-gradient(ellipse at 12% 0%, #fff4cd24, transparent 65%);
+}
+/* El encuadre es estable: no se vuelve a ampliar al abrir un menú. */
+#app .home-gallery-shell .gallery-panel img { animation: none; scale: none; }
+@media (prefers-reduced-motion: no-preference) {
+  #app .home-gallery-shell .gallery-panel {
+    transform: perspective(1100px) rotateX(var(--cover-rx, 0deg)) rotateY(var(--cover-ry, 0deg));
+    transition: transform 350ms ease-out, box-shadow 250ms ease;
+  }
+  #app .home-gallery-shell .gallery-panel:active {
+    transform: perspective(1100px) rotateX(1.5deg) translateY(2px);
+    box-shadow: 0 1px 0 #aa916b, 0 3px 0 #d3c1a0, 0 5px 10px #49361f26;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .home-gallery-shell .gallery-panel { transform: none !important; transition: none; }
+}
