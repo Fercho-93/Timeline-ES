@@ -131,7 +131,10 @@
     button(mode, card) {
       const src = CT.animalArt(mode, card).match(/src="([^"]+)"/)?.[1];
       const source = /^https:\/\//.test(card.source || '') ? `<p class="hint"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Consultar fuente</a></p>` : ['animals','lifespan','speed'].includes(mode) ? '<p class="hint">Cifra pendiente de documentar con una fuente. Puede variar según las condiciones indicadas.</p>' : '';
-      return (src ? `<button class="btn btn-secondary" data-art-src="${CT.escapeHtml(src)}" data-art-title="${CT.escapeHtml(card.title)}">Ver ilustración</button>` : "") + source;
+      // La lámina se ve aquí mismo, no detrás de un botón: el aviso de resultado tapa la
+      // mesa justo cuando uno quiere mirar la carta que acaba de colocar. Sigue siendo
+      // pulsable para verla a pantalla completa.
+      return (src ? `<button class="art-thumb" data-art-src="${CT.escapeHtml(src)}" data-art-title="${CT.escapeHtml(card.title)}" aria-label="Ver la ilustración de ${CT.escapeHtml(card.title)} a pantalla completa"><img src="${CT.escapeHtml(src)}" alt="" width="512" height="768" decoding="async"><span aria-hidden="true">Ampliar</span></button>` : "") + source;
     }
   };
   document.addEventListener("click", event => {

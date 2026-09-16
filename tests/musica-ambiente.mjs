@@ -47,9 +47,14 @@ function boot({native = false, delayed = false, fails = 0, random = .5, initiall
     async suspend() {this.state = 'suspended';}
     async decodeAudioData(path) {return {path, duration: 30};}
     createGain() {const gain = {...node(), gain: new Param(this)}; this.gains.push(gain); return gain;}
+    // El desbloqueo de Safari: un búfer mudo de una muestra que suena dentro del gesto.
+    // No es una canción, así que no cuenta como pista programada.
+    unlocks = 0;
+    createBuffer(channels, length, rate) {this.unlocks++; return {silent: true, duration: length / rate};}
     createBufferSource() {
-      const source = {...node(), start(time) {this.startTime = time; this.path = this.buffer.path; this.duration = this.buffer.duration;}, ended: false};
-      this.sources.push(source); return source;
+      const ctx = this;
+      const source = {...node(), start(time) {this.startTime = time; this.path = this.buffer.path; this.duration = this.buffer.duration; if (!this.buffer.silent) ctx.sources.push(this);}, ended: false};
+      return source;
     }
     async advance(seconds) {
       if (this.state !== 'running') return;
@@ -111,6 +116,7 @@ for (const autoplay of ['pending', 'reject']) {
       // presentación, para que el gesto solo tenga que programarla.
       assert.equal(h.requests.length, 1, 'con el audio bloqueado la canción ya se está bajando');
       h.gesture(event); await settle();
+      assert.ok(ctx.unlocks > 0, `${autoplay}: el gesto suena un búfer mudo para desbloquear el audio`);
       assert.equal(ctx.state, 'running', `${autoplay}: el primer ${event} desbloquea el audio`);
       assert.equal(ctx.sources.length, 2);
       assert.equal(h.requests[0], ctx.sources[0].path, 'suena la que ya estaba lista, sin volver a bajarla');

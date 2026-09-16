@@ -126,6 +126,21 @@
     void prepareNext();
   }
 
+  // Safari solo da el audio por desbloqueado si algo suena dentro del propio gesto, y
+  // `resume()` devuelve una promesa que se resuelve más tarde, ya fuera de él. Un búfer
+  // de una sola muestra no se oye y basta para que el contexto arranque de verdad: sin
+  // esto, la primera pista se programaba en un contexto todavía suspendido y no sonaba
+  // hasta el toque siguiente, o el otro.
+  function unlock() {
+    try {
+      const buffer = audio.createBuffer(1, 1, audio.sampleRate);
+      const source = audio.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audio.destination);
+      source.start(0);
+    } catch { /* El siguiente gesto vuelve a intentarlo. */ }
+  }
+
   function sync(tryStart = false) {
     if (tryStart && enabled()) {
       startRequested = true;
@@ -133,7 +148,7 @@
         const ctx = context();
         // Intentar al cargar; si autoplay está bloqueado, repetir resume dentro
         // del primer gesto, también durante el splash (Safari/iPhone incluido).
-        if (ctx && ctx.state !== 'running') void ctx.resume().catch(() => {});
+        if (ctx && ctx.state !== 'running') { void ctx.resume().catch(() => {}); unlock(); }
       } catch { return; }
     }
     if (!audio) return;
@@ -162,7 +177,7 @@
   document.addEventListener('visibilitychange', () => sync());
   window.addEventListener('pagehide', () => { pageActive = false; sync(); });
   window.addEventListener('pageshow', () => { pageActive = true; sync(); });
-  for (const event of ['pointerdown', 'touchend', 'keydown', 'click']) {
+  for (const event of ['pointerdown', 'touchstart', 'touchend', 'keydown', 'click']) {
     document.addEventListener(event, () => sync(true), {capture: true, passive: true});
   }
   try {
