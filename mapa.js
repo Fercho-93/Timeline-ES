@@ -5,6 +5,17 @@
   const CT = window.CONTINUUM;
   const levels = [0.5, 0.65, 0.8, 1, 1.2];
   let level = 3;
+  let observedTimeline = null, sizeObserver = null;
+
+  // Transformar la tira completa conserva exactamente las proporciones: CSS zoom
+  // puede recalcular sus medidas relativas al viewport y sus imágenes flexibles.
+  function sizeTimeline(timeline) {
+    const frame = timeline.parentElement;
+    if (!frame?.classList.contains('timeline-scale-frame')) return;
+    const scale = levels[level];
+    frame.style.width = `${timeline.offsetWidth * scale}px`;
+    frame.style.height = `${timeline.offsetHeight * scale}px`;
+  }
 
   function timelineMap(_modeKey, cards) {
     if (!cards.length) return "";
@@ -12,7 +23,7 @@
       <button type="button" data-timeline-zoom="out" aria-label="Alejar para ver más cartas">−</button>
       <input type="range" min="0" max="4" step="1" value="${level}" data-timeline-range aria-label="Zoom del tablero" aria-valuetext="${Math.round(levels[level]*100)} por ciento">
       <button type="button" data-timeline-zoom="in" aria-label="Acercar las cartas">+</button>
-      <output class="solo-lectores" aria-live="polite">${Math.round(levels[level] * 100)}%</output>
+      <output aria-live="polite">${Math.round(levels[level] * 100)}%</output>
     </div>`;
   }
 
@@ -20,9 +31,29 @@
     if (reset) level = 3;
     const wrap = container.querySelector(".timeline-wrap");
     const timeline = wrap?.querySelector(".timeline");
-    if (!timeline) return;
-    timeline.style.zoom = levels[level];
+    if (!timeline) { sizeObserver?.disconnect(); observedTimeline = null; return; }
+    let frame = timeline.parentElement;
+    if (!frame.classList.contains('timeline-scale-frame')) {
+      frame = document.createElement('div');
+      frame.className = 'timeline-scale-frame';
+      timeline.before(frame);
+      frame.append(timeline);
+    }
+    timeline.style.transform = `scale(${levels[level]})`;
     timeline.style.setProperty("--timeline-scale", levels[level]);
+    sizeTimeline(timeline);
+    if (observedTimeline !== timeline) {
+      sizeObserver?.disconnect();
+      observedTimeline = timeline;
+      // También cubre giros del móvil, barras de Safari, fuentes e imágenes tardías.
+      if (typeof ResizeObserver === 'function') {
+        sizeObserver ||= new ResizeObserver(() => {
+          if (observedTimeline?.isConnected) sizeTimeline(observedTimeline);
+          else sizeObserver.disconnect();
+        });
+        sizeObserver.observe(timeline);
+      }
+    }
     const controls = container.querySelector(".timeline-zoom");
     if (!controls) return;
     controls.querySelector("output").textContent = `${Math.round(levels[level] * 100)}%`;

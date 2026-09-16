@@ -1576,6 +1576,11 @@ body::before {
 .timeline-zoom button:disabled { opacity: .4; }
 .timeline-zoom output { min-width: 3ch; font-size: .75rem; text-align: center; }
 .timeline-wrap { overflow-anchor: none; }
+/* Reserva el tamaño pintado, sin dejar una cola de scroll al alejar. La tira
+   mantiene una maquetación al 100%; imagen, texto y borde se escalan juntos. */
+.timeline-scale-frame { position: relative; flex: none; margin-inline: auto; overflow: hidden; overflow: clip; overflow-clip-margin: 8px; }
+.timeline-scale-frame > .timeline { position: absolute; top: 0; left: 0; width: max-content; transform-origin: top left; }
+
 .timeline .slot { min-width: calc(44px / var(--timeline-scale, 1)); }
 @media (pointer: coarse) { .hand-card { cursor: pointer; } }
 
@@ -2111,3 +2116,7 @@ body::before {
     padding: 8px 0 18px;
   }
 }
+
+/* La imagen ocupa el panel completo también cuando su altura sale de aspect-ratio. */
+.timeline .animal-timeline-card .card-visual { position: relative; }
+.timeline .animal-timeline-card .card-visual > .animal-card-art { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; }
