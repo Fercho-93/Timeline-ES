@@ -6,8 +6,17 @@
     starting = true;
     app.innerHTML = '';
     window.CONTINUUM_SPLASH?.show();
+    // El invitado se prepara mientras se ve la portada: el botón no espera a la red.
+    const accounts = import('./accounts.js');
+    accounts.catch(() => { /* El fallo se atiende abajo, al pedir el módulo. */ });
     try {
-      const { startAccounts } = await import('./accounts.js');
+      // Entrar es un acto de quien juega, no del reloj. Y ese primer toque es lo único
+      // que deja al navegador encender el audio, así que la música arranca aquí y ya
+      // está sonando cuando aparece el menú.
+      await window.CONTINUUM_SPLASH?.gate();
+      window.CONTINUUM?.Ambience?.sync(true);
+      window.CONTINUUM_SPLASH?.entering();
+      const { startAccounts } = await accounts;
       await startAccounts(() => {
         const script = document.createElement('script');
         script.src = 'app.js';

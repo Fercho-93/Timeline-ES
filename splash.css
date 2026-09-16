@@ -54,6 +54,60 @@ html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direc
 @keyframes launch-orbit {
   to { transform: translate(-50%, -50%) rotateX(60deg) rotate(335deg); }
 }
+/* La entrada al juego: un botón ancho, del rojo de la tinta de las fechas, esperando el
+   toque de quien juega. Es la puerta —el juego no entra solo— y de paso es el gesto que
+   los navegadores exigen para dejar sonar la música. */
+#app-splash .splash-play {
+  position: absolute;
+  left: 50%;
+  bottom: max(13vh, 92px);
+  transform: translateX(-50%);
+  width: min(84vw, 420px);
+  min-height: 58px;
+  padding: 16px 28px;
+  border: 1px solid #7b3220;
+  border-radius: 9px;
+  background: var(--atlas-selection, #9b452b);
+  color: #fdf6e8;
+  font: 700 1.2rem/1 var(--font-display, Georgia, 'Times New Roman', serif);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 26px #3a2a1c47;
+  cursor: pointer;
+  animation: splash-play-in 480ms 520ms ease-out both;
+}
+#app-splash .splash-play:active { transform: translateX(-50%) translateY(1px); }
+#app-splash .splash-play:focus-visible { outline: 2px solid var(--edition-brass, #876330); outline-offset: 3px; }
+#app-splash .splash-status {
+  position: absolute;
+  left: 50%;
+  bottom: max(13vh, 92px);
+  transform: translateX(-50%);
+  width: min(84vw, 420px);
+  margin: 0;
+  color: var(--edition-muted, #70695d);
+  font: .82rem/1.4 system-ui, sans-serif;
+  letter-spacing: .06em;
+  text-align: center;
+  animation: splash-play-in 400ms ease-out both;
+}
+/* Mientras se monta la partida, los hitos de la línea laten uno detrás de otro: el
+   segundo telón no se lee, se cruza, y conviene que se note que algo avanza. */
+@media (prefers-reduced-motion: no-preference) {
+  #app-splash.splash-entering .splash-hitos i { animation: splash-hito-latido 1.4s ease-in-out infinite; }
+  #app-splash.splash-entering .splash-hitos i:nth-child(2) { animation-delay: .14s; }
+  #app-splash.splash-entering .splash-hitos i:nth-child(3) { animation-delay: .28s; }
+  #app-splash.splash-entering .splash-hitos i:nth-child(4) { animation-delay: .42s; }
+  #app-splash.splash-entering .splash-hitos i:nth-child(5) { animation-delay: .56s; }
+}
+@keyframes splash-hito-latido {
+  0%, 60%, 100% { background: var(--edition-paper, #f3eee4); }
+  25% { background: var(--edition-brass, #876330); }
+}
+@keyframes splash-play-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
 @media (prefers-reduced-motion: reduce) {
   html.splash-active #app-splash { transition: none; }
   html.splash-active #app-splash *,

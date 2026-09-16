@@ -116,6 +116,38 @@ for (const reduce of [false, true]) {
   } finally { w.close(); }
 }
 {
+  // La puerta de entrada: el juego no entra solo, entra cuando alguien pulsa «Jugar».
+  // Ese toque es además lo único que deja al navegador encender el audio, así que el
+  // botón tiene que estar antes de que se monte nada y esperar lo que haga falta.
+  const {w, advance, active} = splashClock();
+  try {
+    let abierto = false;
+    w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
+    await new Promise(resolve => setImmediate(resolve));
+    const boton = w.document.getElementById('splash-play');
+    assert.ok(boton, 'la portada ofrece el botón de jugar');
+    assert.equal(boton.textContent, 'Jugar');
+    advance(20000);
+    assert.ok(active(), 'esperar a una persona no dispara el aviso de carga lenta');
+    boton.click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(abierto, 'pulsar abre el juego');
+    assert.ok(!w.document.getElementById('splash-play'), 'y el botón deja paso');
+    w.CONTINUUM_SPLASH.entering();
+    assert.equal(w.document.getElementById('splash-status').textContent, 'Entrando al juego…');
+    w.CONTINUUM_SPLASH.finish();
+    advance(1199); assert.ok(active(), 'el segundo telón se ve un momento');
+    advance(1); advance(300);
+    assert.ok(!active(), 'y se retira sin repetir la lectura entera de la portada');
+  } finally { w.close(); }
+}
+{
+  const arranque = read('boot.js');
+  assert.match(arranque, /CONTINUUM_SPLASH\?\.gate\(\)/, 'el arranque espera al botón');
+  assert.ok(arranque.indexOf('gate()') < arranque.indexOf('startAccounts('), 'y lo espera antes de montar la cuenta');
+  assert.match(arranque, /Ambience\?\.sync\(true\)/, 'y aprovecha ese toque para encender la música');
+}
+{
   const {w, advance, active} = splashClock();
   try {
     advance(6000); assert.ok(active(), 'una carga lenta no descubre una pantalla vacía');
