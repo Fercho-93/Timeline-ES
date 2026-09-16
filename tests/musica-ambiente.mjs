@@ -5,7 +5,7 @@ import {JSDOM} from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const settle = async () => { for (let i = 0; i < 8; i++) await new Promise(resolve => setImmediate(resolve)); };
 
-function boot({native = false, delayed = false, failOnce = false, random = .5, initiallyEnabled = false, autoplay = 'allowed', hidden = false} = {}) {
+function boot({native = false, delayed = false, fails = 0, random = .5, initiallyEnabled = false, autoplay = 'allowed', hidden = false} = {}) {
   const w = new JSDOM('<div id="app"></div>', {runScripts: 'outside-only', pretendToBeVisual: true}).window;
   let enabled = initiallyEnabled, nativeListener, resolveFetch, requests = [], contexts = [], pendingTimers = new Map(), timerId = 0;
   let permitted = autoplay === 'allowed';
@@ -67,7 +67,7 @@ function boot({native = false, delayed = false, failOnce = false, random = .5, i
   w.fetch = async path => {
     requests.push(path);
     if (delayed) {delayed = false; await new Promise(resolve => {resolveFetch = resolve;});}
-    if (failOnce) {failOnce = false; return {ok:false};}
+    if (fails > 0) {fails--; return {ok:false};}
     return {ok: true, arrayBuffer: async () => path};
   };
   w.CONTINUUM = {effectPrefs: () => ({ambience:enabled})};
@@ -107,9 +107,13 @@ for (const autoplay of ['pending', 'reject']) {
       assert.ok(ctx.resumes > 0, 'solicita autoplay durante la presentación');
       assert.equal(ctx.state, 'suspended');
       assert.equal(ctx.sources.length, 0, 'un bloqueo no programa pistas inaudibles');
+      // Descargar no es sonar: la primera canción se prepara mientras se ve la
+      // presentación, para que el gesto solo tenga que programarla.
+      assert.equal(h.requests.length, 1, 'con el audio bloqueado la canción ya se está bajando');
       h.gesture(event); await settle();
       assert.equal(ctx.state, 'running', `${autoplay}: el primer ${event} desbloquea el audio`);
       assert.equal(ctx.sources.length, 2);
+      assert.equal(h.requests[0], ctx.sources[0].path, 'suena la que ya estaba lista, sin volver a bajarla');
       h.gesture(event); h.click(); await settle();
       assert.equal(h.contexts.length, 1); assert.equal(ctx.sources.length, 2);
     } finally {h.w.close();}
@@ -118,8 +122,11 @@ for (const autoplay of ['pending', 'reject']) {
 {
   const h = boot({initiallyEnabled:true, autoplay:'pending'});
   try {
-    await settle(); h.enable(false); h.timers(); h.gesture('touchend'); await settle();
-    assert.equal(h.requests.length, 0, 'silenciar mientras espera permiso impide el arranque');
+    await settle();
+    const bajadas = h.requests.length;
+    h.enable(false); h.timers(); h.gesture('touchend'); await settle();
+    assert.equal(h.contexts[0].sources.length, 0, 'silenciar mientras espera permiso impide el arranque');
+    assert.equal(h.requests.length, bajadas, 'y con el ajuste apagado no se baja nada más');
     h.enable(true); await settle();
     assert.equal(h.contexts[0].sources.length, 2, 'se recupera al volver a activar la música');
   } finally {h.w.close();}
@@ -206,17 +213,28 @@ for (const autoplay of ['pending', 'reject']) {
   try {
     h.enable(true); await settle(); h.hidden(true); await settle(); h.resolve(); await settle();
     const ctx = h.contexts[0]; assert.equal(ctx.state,'suspended', 'descarga tardía no arranca en segundo plano');
-    assert.equal(ctx.sources.length,1); h.hidden(false); await settle(); assert.equal(ctx.sources.length,2);
+    assert.equal(ctx.sources.length,0, 'la descarga que llega tarde queda lista, pero no suena en segundo plano');
+    h.hidden(false); await settle(); assert.equal(ctx.sources.length,2);
     h.enable(false); h.enable(true); h.enable(false); h.timers(); await settle(); assert.equal(ctx.state,'suspended', 'la última intención gana al alternar rápidamente');
     h.enable(true); await settle(); assert.equal(ctx.state,'running');
   } finally {h.w.close();}
 }
 {
-  const h = boot({failOnce:true});
+  const h = boot({fails:1});
   try {
-    h.enable(true); await settle(); assert.equal(h.contexts[0].sources.length,0);
-    h.click(); await settle(); assert.equal(h.requests[0],h.requests[1], 'el fallo no salta la canción');
-    assert.equal(h.contexts[0].sources.length,2, 'un gesto reintenta la descarga');
+    h.enable(true); await settle();
+    assert.equal(h.requests[0], h.requests[1], 'el fallo no salta la canción');
+    assert.equal(h.contexts[0].sources.length, 2, 'una descarga fallida se reintenta al momento');
+  } finally {h.w.close();}
+}
+{
+  const h = boot({fails:2});
+  try {
+    h.enable(true); await settle();
+    assert.equal(h.contexts[0].sources.length, 0, 'dos fallos seguidos no dejan media pista programada');
+    h.click(); await settle();
+    assert.equal(h.requests[0], h.requests[2], 'el siguiente toque vuelve a por la misma canción');
+    assert.equal(h.contexts[0].sources.length, 2, 'un gesto reintenta la descarga');
   } finally {h.w.close();}
 }
 

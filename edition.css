@@ -615,9 +615,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app.atlas-board .timeline-card .card-visual { height: clamp(98px, 13.6dvh, 128px); }
   #app.atlas-board :is(.slot, .slot-confirm) { min-height: clamp(164px, 22.5dvh, 212px); }
   #app.atlas-board .slot { width: clamp(46px, 5.6dvh, 54px); }
-  #app.atlas-board:has(.hand-solo) .timeline-card { width: clamp(124px, 20dvh, 182px); min-height: clamp(164px, 29dvh, 262px); }
-  #app.atlas-board:has(.hand-solo) .timeline-card .card-visual { height: clamp(98px, 17.5dvh, 160px); }
-  #app.atlas-board:has(.hand-solo) :is(.slot, .slot-confirm) { min-height: clamp(164px, 29dvh, 262px); }
+  #app.atlas-board:has(.hand-solo) .timeline-card { width: clamp(124px, 24dvh, 210px); min-height: clamp(164px, 33dvh, 292px); }
+  #app.atlas-board:has(.hand-solo) .timeline-card .card-visual { height: clamp(98px, 21dvh, 186px); }
+  #app.atlas-board:has(.hand-solo) :is(.slot, .slot-confirm) { min-height: clamp(164px, 33dvh, 292px); }
   #app.atlas-board:has(.hand-solo) .slot { width: clamp(46px, 6.4dvh, 60px); }
 }
 
@@ -764,6 +764,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app .solo-fold summary { padding: 13px 12px; min-height: 80px; }
   #app.atlas-board .hand-solo { grid-template-columns: minmax(0,320px); }
   #app.atlas-board .hand-solo .hand-card { min-height: 144px !important; }
+}
+/* En una pantalla alta la carta de la mano también sube: debajo de ella quedaba una
+   franja de papel hasta el botón de confirmar. */
+@media (min-width: 381px) and (max-width: 699px) and (min-height: 741px) {
+  #app.atlas-board .hand-solo { grid-template-columns: minmax(0,340px); }
+  #app.atlas-board .hand-solo .hand-card { min-height: clamp(144px, 19dvh, 190px) !important; }
 }
 #app .collection-decks .game-row { grid-template-columns: minmax(0,1fr) 64px; column-gap: 12px; }
 #app .collection-decks .game-row > :not(.deck-preview) { grid-column: 1; }

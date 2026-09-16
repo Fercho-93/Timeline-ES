@@ -1,13 +1,13 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v177";
+const CACHE = "continuum-v178";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
 // se pide, así que la primera carta de un mazo de animales la baja de la red y a partir
 // de ahí, con esa carta ya vista, funciona sin conexión igual que el resto.
 const ASSETS = [
-  "./assets/audio/v1.mp3", "./assets/audio/v2.mp3", "./assets/audio/v3.mp3", "./assets/audio/v4.mp3", "./assets/audio/v5.mp3", "./assets/audio/v6.mp3", "./assets/audio/CREDITS.md",
+  "./assets/audio/CREDITS.md",
   "./assets/competition-engraving.webp",
   "./assets/mode-walk-solo.webp", "./assets/mode-walk-multi.webp",
   "./deployment.js", "./accounts.css", "./firebase-client.js", "./account-storage.js", "./accounts.js", "./boot.js",
@@ -88,6 +88,28 @@ const ASSETS = [
   "./assets/country-cards/2072.webp"
 ];
 
+// Las seis canciones —27 MB— tampoco entran en la instalación. La música es un ajuste
+// opcional y apagado de fábrica: nadie debería descargar eso solo por abrir el juego, y
+// mientras se descargaba competía por la conexión justo cuando la primera pista tiene
+// que sonar. Se guardan de una en una al activar la versión, sin bloquear la instalación,
+// y si esa tarea se interrumpe la ruta `fetch` las conserva la primera vez que suenan.
+const MUSIC = [
+  "./assets/audio/v1.mp3", "./assets/audio/v2.mp3", "./assets/audio/v3.mp3",
+  "./assets/audio/v4.mp3", "./assets/audio/v5.mp3", "./assets/audio/v6.mp3"
+];
+
+async function storeMusic() {
+  const cache = await caches.open(CACHE);
+  for (const url of MUSIC) {
+    try {
+      if (await cache.match(url)) continue;
+      const request = new Request(url, { cache: "reload" });
+      const response = await fetch(request);
+      if (response.ok && response.type === "basic") await cache.put(request, response);
+    } catch { return; /* Sin conexión: se intentará en la siguiente activación. */ }
+  }
+}
+
 self.addEventListener("install", event => {
   // Una caché de aplicación nueva no basta si la caché HTTP aún considera frescos los
   // archivos antiguos. Cada instalación debe obtener realmente la versión publicada.
@@ -96,6 +118,11 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE && /^(continuum-|hilo-modos-)/.test(key)).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+  // Fuera de `waitUntil` a propósito: mientras el trabajador está activándose, las
+  // peticiones de la página esperan, y esto son 27 MB. La música se va guardando por su
+  // cuenta; si el navegador detiene el trabajador antes de acabar, la ruta `fetch` la
+  // guarda igual la primera vez que suena y la siguiente activación retoma el resto.
+  void storeMusic();
 });
 
 // Activar solo por petición explícita y sin otras pestañas que puedan estar jugando.
