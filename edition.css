@@ -612,13 +612,28 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
    pantalla corta; el techo evita una carta desproporcionada en una tableta estrecha. */
 @media (min-width: 381px) and (max-width: 699px) {
   /* La mano repartida entre varias personas ocupa el doble de alto que la de una sola
-     carta, así que a la mesa compartida le quedan unos cien píxeles menos. */
+     carta, así que a la mesa compartida le quedan unos cien píxeles menos. En solitario
+     el hueco libre —lo que queda tras la barra, la cabecera, el zoom y el botón de
+     confirmar— se reparte entre la línea y la mano, 62 % y 36 %, dejando el resto de
+     aire entre las dos. */
   #app.atlas-board { --atlas-card: clamp(142px, calc(100dvh - 610px), 218px); }
-  #app.atlas-board:has(.hand-solo) { --atlas-card: clamp(142px, calc(100dvh - 504px), 316px); }
+  #app.atlas-board:has(.hand-solo) {
+    --atlas-card: clamp(142px, calc((100dvh - 366px) * .62), 306px);
+    --atlas-hand: clamp(124px, calc((100dvh - 366px) * .36), 212px);
+  }
   #app.atlas-board .timeline-card { width: max(112px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: max(76px, calc(var(--atlas-card) * .66 - 18px)); }
   #app.atlas-board :is(.slot, .slot-confirm) { min-height: var(--atlas-card); }
   #app.atlas-board .slot { width: max(46px, calc(var(--atlas-card) * .2)); }
+  /* La lámina toma la proporción de las propias láminas —todas son 512×768—, así se ve
+     la escena entera en vez de una franja recortada por el centro, y la carta deja de
+     ser un rectángulo ancho para parecer lo que es. El ancho sale de esa misma cuenta al
+     revés: lo que quepa de alto menos el título y la fecha. En una pantalla corta el
+     `max-height` vuelve a recortarla antes que dejar la mesa sin caber. */
+  #app.atlas-board:has(.hand-solo) .timeline-card { width: max(112px, calc((var(--atlas-card) - 92px) / 1.5 + 16px)); }
+  #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .timeline .card-visual {
+    aspect-ratio: 2 / 3; height: auto; max-height: calc(var(--atlas-card) - 92px);
+  }
   #app.atlas-board:has(.hand-solo) .timeline-card h3 { font-size: clamp(.76rem, 1.12dvh, .92rem); }
   #app.atlas-board:has(.hand-solo) .timeline-card .year { font-size: clamp(1rem, 1.5dvh, 1.22rem); }
 }
@@ -767,11 +782,24 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app.atlas-board .hand-solo { grid-template-columns: minmax(0,320px); }
   #app.atlas-board .hand-solo .hand-card { min-height: 144px !important; }
 }
-/* La carta de la mano sube con la pantalla por la misma razón: debajo de ella quedaba
-   una franja de papel hasta el botón de confirmar. */
+/* La carta que tienes en la mano también es una carta, no una pancarta: toma la
+   proporción de una carta de baraja y crece con la pantalla, que es lo que cierra la
+   franja de papel que quedaba hasta el botón de confirmar. */
 @media (min-width: 381px) and (max-width: 699px) {
-  #app.atlas-board .hand-solo { grid-template-columns: minmax(0,340px); }
-  #app.atlas-board .hand-solo .hand-card { min-height: clamp(132px, 18dvh, 186px) !important; }
+  #app.atlas-board .hand-solo { grid-template-columns: minmax(0, calc(var(--atlas-hand) * .75)); }
+  /* Los mismos atributos que la regla compacta de la mesa, o esa gana y la deja plana. */
+  #app.atlas-board[data-platform][data-device][data-screen] .hand-solo .hand-card {
+    aspect-ratio: 3 / 4; height: var(--atlas-hand); min-height: 0 !important;
+  }
+  /* En una carta estrecha el rótulo llegaba hasta debajo del sello de elegida, y el
+     título partía las palabras por donde caía: se separa con guion, como en el papel. */
+  #app.atlas-board[data-platform][data-screen] .hand-solo .hand-card > .hidden-date {
+    padding-right: 26px; font-size: .5rem; letter-spacing: .1em;
+  }
+  #app.atlas-board[data-platform][data-screen] .hand-solo .hand-card > strong {
+    font-size: .8rem; line-height: 1.2; padding-right: 0;
+    overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto;
+  }
 }
 #app .collection-decks .game-row { grid-template-columns: minmax(0,1fr) 64px; column-gap: 12px; }
 #app .collection-decks .game-row > :not(.deck-preview) { grid-column: 1; }
