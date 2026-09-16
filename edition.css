@@ -588,6 +588,38 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: 76px; }
   #app.atlas-board .timeline-card .year { padding-top: 4px; }
 }
+/* La mesa se mide con la altura visible y no con la mínima: la barra inferior del
+   navegador se repliega en cuanto se juega, y con `svh` quedaba una franja de papel
+   muerta bajo el botón de confirmar. El hueco que sobra se lo queda la línea temporal
+   —con sus cartas centradas— en lugar de acumularse al final de la pantalla. */
+@media (max-width: 699px) {
+  #app.atlas-board > .shell { display: flex; flex-direction: column; min-height: 100dvh; }
+  #app.atlas-board > .shell > section:has(.timeline-wrap) { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+  #app.atlas-board > .shell > section:has(.timeline-wrap) .timeline-wrap { flex: 1 1 auto; display: flex; align-items: center; }
+}
+/* Y en pantallas altas ese hueco no se queda en blanco: las cartas ya colocadas crecen
+   con él, así el grabado y la fecha se leen sin tocar el zoom. Los móviles cortos o
+   estrechos conservan la mesa compacta de arriba. En solitario la mano es una sola
+   carta y sobra sitio; con la mano repartida entre varias personas ocupa el doble de
+   alto, así que allí la línea crece solo lo que puede sin empujar el confirmar. */
+@media (min-width: 381px) and (max-width: 699px) and (min-height: 741px) {
+  #app.atlas-board:has(.hand-solo) .timeline-card { width: clamp(124px, 20dvh, 182px); min-height: clamp(164px, 29dvh, 262px); }
+  #app.atlas-board:has(.hand-solo) .timeline-card .card-visual { height: clamp(98px, 17.5dvh, 160px); }
+  #app.atlas-board:has(.hand-solo) :is(.slot, .slot-confirm) { min-height: clamp(164px, 29dvh, 262px); }
+  #app.atlas-board:has(.hand-solo) .slot { width: clamp(46px, 6.4dvh, 60px); }
+  #app.atlas-board:has(.hand-solo) .timeline-card h3 { font-size: clamp(.76rem, 1.12dvh, .92rem); }
+  #app.atlas-board:has(.hand-solo) .timeline-card .year { font-size: clamp(1rem, 1.5dvh, 1.22rem); }
+}
+@media (min-width: 381px) and (max-width: 699px) and (min-height: 800px) {
+  #app.atlas-board .timeline-card { width: clamp(124px, 16dvh, 152px); min-height: clamp(164px, 22.5dvh, 212px); }
+  #app.atlas-board .timeline-card .card-visual { height: clamp(98px, 13.6dvh, 128px); }
+  #app.atlas-board :is(.slot, .slot-confirm) { min-height: clamp(164px, 22.5dvh, 212px); }
+  #app.atlas-board .slot { width: clamp(46px, 5.6dvh, 54px); }
+  #app.atlas-board:has(.hand-solo) .timeline-card { width: clamp(124px, 20dvh, 182px); min-height: clamp(164px, 29dvh, 262px); }
+  #app.atlas-board:has(.hand-solo) .timeline-card .card-visual { height: clamp(98px, 17.5dvh, 160px); }
+  #app.atlas-board:has(.hand-solo) :is(.slot, .slot-confirm) { min-height: clamp(164px, 29dvh, 262px); }
+  #app.atlas-board:has(.hand-solo) .slot { width: clamp(46px, 6.4dvh, 60px); }
+}
 
 /* Portadas impresas en el papel: el alfa deja ver el fondo real en los cuatro bordes. */
 #app .atlas-intro { background: transparent; }
@@ -647,10 +679,21 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 :root:is([data-theme="dark"],[data-theme="night"]) #app .walking-art { mix-blend-mode: normal; opacity: .3; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme]) #app .walking-art { mix-blend-mode: normal; opacity: .3; } }
 @media (max-width: 699px) {
-  #app.atlas-has-nav > .play-menu-shell:has(> .atlas-intro) { display: flex; flex-direction: column; min-height: 100svh; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  /* `dvh` y no `svh`: la barra inferior se pliega al desplazarse y la barra de menús va
+     fija al borde real de la ventana, así que midiendo con la altura mínima la columna
+     terminaba un dedo por encima de ella. Con la altura visible, portada y formatos
+     llegan hasta la barra sin dejar papel en blanco. */
+  #app.atlas-has-nav > .play-menu-shell:has(> .atlas-intro) { display: flex; flex-direction: column; min-height: 100dvh; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   #app .play-menu-shell > .atlas-intro { flex: 1; align-content: space-between; }
   #app .play-menu-shell > .atlas-intro .atlas-intro-copy { margin-bottom: clamp(12px, 3svh, 32px); }
   #app .play-menu-shell > .atlas-intro .atlas-specimens { max-width: 275px; }
+  /* El grabado del mazo es la portada del capítulo: se estampa más grande y con el velo
+     abierto, para que se vea la escena entera y no solo su centro. */
+  #app .play-menu-shell > .atlas-intro .atlas-landscape {
+    -webkit-mask-image: radial-gradient(ellipse at 50% 46%, #000 40%, #0009 68%, transparent 86%);
+    mask-image: radial-gradient(ellipse at 50% 46%, #000 40%, #0009 68%, transparent 86%);
+  }
+  #app .play-menu-shell > .atlas-intro .atlas-landscape img { transform: translate(var(--depth-x,0px), var(--depth-y,0px)) scale(1.18); }
   #app .play-menu-shell > .home-play { margin-top: 12px; }
   #app .play-menu-shell .walking-choice { min-height: clamp(76px, 12svh, 104px); padding: 12px; }
   #app .play-menu-shell .play-choices { margin-bottom: 0; }
