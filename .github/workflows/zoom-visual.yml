@@ -1,0 +1,33 @@
+name: Zoom visual móvil
+on:
+  push:
+    branches: [main, codex/zoom-safari-review]
+    paths:
+      - 'mapa.js'
+      - '*.css'
+      - 'tests/zoom-browser.mjs'
+      - '.github/workflows/zoom-visual.yml'
+  pull_request:
+    paths: ['mapa.js', '*.css', 'tests/zoom-browser.mjs', '.github/workflows/zoom-visual.yml']
+permissions:
+  contents: read
+jobs:
+  zoom:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          npm install --prefix "$RUNNER_TEMP/zoom-browser" --ignore-scripts playwright@1.62.1
+          ln -s "$RUNNER_TEMP/zoom-browser/node_modules" node_modules
+      - run: npx playwright install --with-deps webkit chromium
+      - run: node tests/zoom-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zoom-mobile-measurements
+          path: test-results/zoom/
+          retention-days: 7

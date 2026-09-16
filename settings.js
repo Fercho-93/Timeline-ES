@@ -113,7 +113,8 @@
       </section>
 
       <section class="settings-section">
-        <h2>Jugar sin conexión</h2>
+        <h2>Versión y conexión</h2>
+        <p class="hint">Versión instalada: ${CT.escapeHtml(CT.APP_VERSION || "desconocida")}</p>
         <p class="hint">Las cartas y reglas funcionan sin conexión. Si una ilustración no se ve, es que no se cargó antes con internet.</p>
       </section>
 
