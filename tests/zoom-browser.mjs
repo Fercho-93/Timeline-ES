@@ -44,7 +44,7 @@ try {
       return {card:box(card),image:box(img),panel:box(panel),label:document.querySelector('.timeline-zoom output').textContent};
     });
     const base=await measure();
-    for(const [index,scale] of [.8,1,1.2,1.4].entries()) {
+    for(const [index,scale] of [.8,1,1.2].entries()) {
       await page.locator('[data-timeline-range]').fill(String(index));
       const now=await measure();
       assert.equal(now.label,`${Math.round(scale*100)}%`);
@@ -84,7 +84,7 @@ try {
    }
   } finally {await browser.close();}
  }
- console.log('OK: carta e imagen proporcionales en 32 combinaciones (WebKit/Chromium, 4 pantallas, 4 niveles).');
+ console.log('OK: carta e imagen proporcionales en 24 combinaciones (WebKit/Chromium, 4 pantallas, 3 niveles).');
 } finally {
  await fs.writeFile('test-results/zoom/measurements.json',JSON.stringify(records,null,2));
  server.close();

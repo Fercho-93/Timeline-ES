@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  const levels = [0.8, 1, 1.2, 1.4];
+  const levels = [0.8, 1, 1.2];
   let level = 1;
   let observedTimeline = null, sizeObserver = null;
 
