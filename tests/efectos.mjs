@@ -60,8 +60,8 @@ try {
     enabled=true;
     effects.feedback(true); effects.feedback(true);
     assert.equal(sources.length,2,'repetir el mismo aviso no acumula notas');
-    assert.equal(gains[0].gain.value,.24*.45,'los efectos usan el 45% de la ganancia anterior');
-    assert.equal(gains[1].gain.value,.19*.45);
+    assert.equal(gains[0].gain.value,.24*.32,'los efectos usan el 32% de la ganancia anterior');
+    assert.equal(gains[1].gain.value,.19*.32);
     assert.equal(sources[1].at,.13,'el acierto es una respuesta doble breve');
     effects.feedback(false); effects.page(); effects.tap();
     assert.equal(sources.length,5,'la navegación queda pendiente, no se superpone al resultado');

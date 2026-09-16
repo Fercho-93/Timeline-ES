@@ -2120,3 +2120,7 @@ body::before {
 /* La imagen ocupa el panel completo también cuando su altura sale de aspect-ratio. */
 .timeline .animal-timeline-card .card-visual { position: relative; width: calc(100% - 16px); }
 .timeline .animal-timeline-card .card-visual > .animal-card-art { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; }
+
+/* El acierto se ve en el tablero antes del resultado; no cambia el layout. */
+.overlay.result-preview { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.overlay.result-preview > .modal { visibility: hidden; pointer-events: none; }

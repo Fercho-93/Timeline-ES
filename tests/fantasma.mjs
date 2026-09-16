@@ -120,7 +120,7 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
   w.document.querySelector('[data-timeline-zoom="out"]').click();
   w.document.querySelector('[data-timeline-zoom="out"]').click();
   w.document.querySelector('[data-timeline-zoom="out"]').click();
-  assert.equal(w.document.querySelector('.timeline-zoom output').textContent, '50%');
+  assert.equal(w.document.querySelector('.timeline-zoom output').textContent, '80%');
   assert.equal(w.document.querySelectorAll('.ghost-card').length, 5, 'el zoom conserva las cartas ocultas');
   assert.ok([...w.document.querySelectorAll('.timeline-card')].every(x => !/era-/.test(x.innerHTML)));
   play(w);

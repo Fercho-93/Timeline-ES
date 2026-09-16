@@ -319,6 +319,7 @@
     const closingEncyclopedia = paint.screen === "enciclopedia" && changed;
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
+    if (changed) resultPreview = null;
     if (preparationTurn || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
     if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
     else if (changed && screen !== "pass") firstLocalReveal = false;
@@ -436,6 +437,7 @@
   // arriba escucha a Escape y solo él se cierra.
   const pila = [];
   let dialogos = 0;
+  let resultPreview = null;
 
   function focusables(modal) {
     return [...modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
@@ -444,6 +446,44 @@
 
   function openDialog(overlay, cerrable, onClose) {
     if (!overlay) return;
+    // Enseñar primero la carta colocada. La capa transparente bloquea otra jugada
+    // mientras el foco espera aquí; el diálogo y su revelado arrancan al terminar.
+    const id = overlay.dataset.resultCard;
+    const card = id && [...document.querySelectorAll('.timeline-card[data-id]')].find(el => el.dataset.id === id);
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (card && card.animate && !reduce && !overlay.dataset.resultReady) {
+      if (resultPreview?.id !== id) resultPreview = {id, until: performance.now() + 1100};
+      const remaining = resultPreview.until - performance.now();
+      if (remaining > 0) {
+        overlay.classList.add('result-preview');
+        overlay.setAttribute('tabindex', '-1');
+        overlay.setAttribute('role', 'status');
+        overlay.setAttribute('aria-label', '¡Bien colocado!');
+        focus(overlay, {preventScroll: true});
+        window.CONTINUUM.scrollToElement?.(card.closest('.timeline-wrap'), card);
+        const animation = card.animate([
+          {filter: 'brightness(1)', offset: 0},
+          {filter: 'brightness(1.2)', offset: .35},
+          {filter: 'brightness(1)', offset: 1}
+        ], {duration: remaining, easing: 'ease-out'});
+        const onKey = event => { if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ') event.preventDefault(); };
+        document.addEventListener('keydown', onKey);
+        const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); animation.cancel(); }};
+        pila.push(pending);
+        const timer = setTimeout(() => {
+          const index = pila.indexOf(pending);
+          if (index >= 0) pila.splice(index, 1);
+          document.removeEventListener('keydown', onKey);
+          if (!overlay.isConnected) return;
+          overlay.classList.remove('result-preview');
+          overlay.removeAttribute('role');
+          overlay.removeAttribute('aria-label');
+          overlay.dataset.resultReady = 'true';
+          openDialog(overlay, cerrable, onClose);
+        }, remaining);
+        return;
+      }
+    }
     if (!pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
     const modal = overlay.querySelector(".modal") || overlay;
     window.CONTINUUM.UI?.reveal(modal);
@@ -531,6 +571,7 @@
   function olvidaDialogos(container) {
     for (let i = pila.length - 1; i >= 0; i--) {
       if (!container.contains(pila[i].overlay)) continue;
+      pila[i].cancelRoll?.();
       document.removeEventListener("keydown", pila[i].onKey);
       pila.splice(i, 1);
     }

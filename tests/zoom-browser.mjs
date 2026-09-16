@@ -44,7 +44,7 @@ try {
       return {card:box(card),image:box(img),panel:box(panel),label:document.querySelector('.timeline-zoom output').textContent};
     });
     const base=await measure();
-    for(const [index,scale] of [.5,.65,.8,1,1.2].entries()) {
+    for(const [index,scale] of [.8,1,1.2,1.4].entries()) {
       await page.locator('[data-timeline-range]').fill(String(index));
       const now=await measure();
       assert.equal(now.label,`${Math.round(scale*100)}%`);
@@ -57,6 +57,22 @@ try {
       records.push({engine,width,height,scale,...now});
       if(width===414)await page.screenshot({path:`test-results/zoom/${engine}-${Math.round(scale*100)}.png`,fullPage:true});
     }
+    if (width === 414) {
+      await page.emulateMedia({reducedMotion:'no-preference'});
+      await page.locator('[data-action="solo-place"][data-index="1"]').click();
+      await page.locator('[data-action="confirm-place"]').click();
+      const preview=page.locator('.overlay.result-preview');
+      await preview.waitFor({state:'visible',timeout:800});
+      assert.equal(await page.locator('.modal').isVisible(),false,'el resultado no tapa la carta');
+      const style=await preview.evaluate(el=>({background:getComputedStyle(el).backgroundColor,blur:getComputedStyle(el).backdropFilter}));
+      assert.equal(style.background,'rgba(0, 0, 0, 0)');
+      assert.equal(style.blur,'none');
+      await page.screenshot({path:`test-results/zoom/${engine}-acierto-tablero.png`});
+      await page.locator('.modal').waitFor({state:'visible',timeout:2500});
+      assert.equal(await page.locator('[data-action="solo-next"]').evaluate(el=>document.activeElement===el),true);
+      await page.screenshot({path:`test-results/zoom/${engine}-acierto-resultado.png`});
+      await page.locator('[data-action="solo-next"]').click();
+    }
     // Cambiar orientación debe recalcular el espacio reservado sin recortar la tira.
     await page.setViewportSize({width:height,height:width});
     await page.waitForFunction(()=>{
@@ -68,7 +84,7 @@ try {
    }
   } finally {await browser.close();}
  }
- console.log('OK: carta e imagen proporcionales en 40 combinaciones (WebKit/Chromium, 4 pantallas, 5 niveles).');
+ console.log('OK: carta e imagen proporcionales en 32 combinaciones (WebKit/Chromium, 4 pantallas, 4 niveles).');
 } finally {
  await fs.writeFile('test-results/zoom/measurements.json',JSON.stringify(records,null,2));
  server.close();

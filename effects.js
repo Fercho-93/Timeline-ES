@@ -10,7 +10,7 @@
     }
   };
   let audio, haptics;
-  const EFFECT_VOLUME = .45; // Solo efectos de acciones; no afecta a ambience.js.
+  const EFFECT_VOLUME = .32; // Solo efectos de acciones; no afecta a ambience.js.
   function hapticsAvailable() {
     try {
       const cap = window.Capacitor;

@@ -1,9 +1,12 @@
 name: Zoom visual móvil
 on:
   push:
-    branches: [main, codex/zoom-safari-review]
+    branches: [main, codex/result-flow-v187]
     paths:
       - 'mapa.js'
+      - 'a11y.js'
+      - 'app.js'
+      - 'online.js'
       - '*.css'
       - 'tests/zoom-browser.mjs'
       - '.github/workflows/zoom-visual.yml'

@@ -813,9 +813,7 @@ function renderGame() {
   // instantánea que llega de la sala. Solo se abre como diálogo al aparecer, o el foco
   // saltaría dentro de ella una y otra vez.
   const revelando = roomState.phase === "reveal";
-  if (revelando && !renderGame.revelando) abreCapa(appEl.querySelector(".overlay"), false);
-  if (revelando && renderGame.revealVersion === roomState.version) appEl.querySelector('.reveal')?.classList.remove('atlas-reveal');
-  else if (revelando) { CT.UI.reveal(appEl.querySelector('.modal')); renderGame.revealVersion = roomState.version; }
+  if (revelando) abreCapa(appEl.querySelector(".overlay"), false);
   renderGame.revelando = revelando;
   if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
 }
@@ -856,7 +854,7 @@ function revealOverlay(currentUid) {
         : reveal.targetOk
           ? `<b>${escapeHtml(reveal.targetName)}</b> se defiende y coloca la carta en la línea. <b>${escapeHtml(reveal.playerName)}</b> ${reveal.penaltySkipped ? "no roba: el mazo y el descarte están agotados" : "roba una por fallar el reto"}.`
           : `No la acierta ninguno de los dos: la carta va al descarte y <b>${escapeHtml(reveal.playerName)}</b> roba una por haber lanzado el reto.`;
-    return `<div class="overlay"><div class="modal pulse-duel-modal">
+    return `<div class="overlay" data-result-card="${reveal.correct || reveal.targetOk ? card.id : ''}"><div class="modal pulse-duel-modal">
       <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(reveal.playerName)} contra ${escapeHtml(reveal.targetName)}</div>
       <h2>${escapeHtml(card.title)}</h2>
       ${fichaCarta}
@@ -869,7 +867,7 @@ function revealOverlay(currentUid) {
     </div></div>`;
   }
   const desenlace = `<p>${reveal.correct ? "La carta permanece en la línea temporal." : reveal.returned ? "No quedan cartas que robar, así que vuelve a su mano." : `${escapeHtml(reveal.playerName)} descarta la carta y roba una nueva.`}</p>`;
-  return `<div class="overlay"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2>${fichaCarta}${hint}${desenlace}${seguir}</div></div>`;
+  return `<div class="overlay" data-result-card="${reveal.correct ? card.id : ''}"><div class="modal ${reveal.correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${reveal.correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${reveal.correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${reveal.correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2>${fichaCarta}${hint}${desenlace}${seguir}</div></div>`;
 }
 
 async function placeCard(index) {

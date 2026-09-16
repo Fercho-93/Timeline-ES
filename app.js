@@ -914,7 +914,7 @@
     // de acierto: cada jugada trae la suya y debajo se cuenta el desenlace.
     if (result.duel) {
       const marcador = jugada => `<div class="pulse-duel-row ${jugada.ok ? "pulse-duel-hit" : "pulse-duel-miss"}"><span class="pulse-duel-mark" aria-hidden="true">${jugada.ok ? "✓" : "×"}</span><span><b>${escapeHtml(jugada.name)}</b><small>${jugada.ok ? "Acierta" : "Falla"}: la puso ${jugada.donde}</small></span></div>`;
-      overlay(`<div class="overlay"><div class="modal pulse-duel-modal">
+      overlay(`<div class="overlay" data-result-card="${correct || result.targetOk ? card.id : ''}"><div class="modal pulse-duel-modal">
         <div class="eyebrow" aria-hidden="true">⚡ Duelo · ${escapeHtml(result.byName)} contra ${escapeHtml(result.targetName)}</div>
         <h2>${escapeHtml(card.title)}</h2>
         <div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>
@@ -928,7 +928,7 @@
       return;
     }
     const desenlace = `<p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   // Las cuatro salidas del duelo, contadas desde la mesa y no desde nadie en concreto.
@@ -1646,7 +1646,7 @@
     const era = eraForCard(card);
     const acabada = soloAcabada();
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    overlay(`<div class="overlay"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {

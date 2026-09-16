@@ -3,8 +3,8 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  const levels = [0.5, 0.65, 0.8, 1, 1.2];
-  let level = 3;
+  const levels = [0.8, 1, 1.2, 1.4];
+  let level = 1;
   let observedTimeline = null, sizeObserver = null;
 
   // Transformar la tira completa conserva exactamente las proporciones: CSS zoom
@@ -21,14 +21,14 @@
     if (!cards.length) return "";
     return `<div class="timeline-zoom" role="group" aria-label="Tamaño de las cartas en juego">
       <button type="button" data-timeline-zoom="out" aria-label="Alejar para ver más cartas">−</button>
-      <input type="range" min="0" max="4" step="1" value="${level}" data-timeline-range aria-label="Zoom del tablero" aria-valuetext="${Math.round(levels[level]*100)} por ciento">
+      <input type="range" min="0" max="${levels.length - 1}" step="1" value="${level}" data-timeline-range aria-label="Zoom del tablero" aria-valuetext="${Math.round(levels[level]*100)} por ciento">
       <button type="button" data-timeline-zoom="in" aria-label="Acercar las cartas">+</button>
       <output aria-live="polite">${Math.round(levels[level] * 100)}%</output>
     </div>`;
   }
 
   function applyTimelineZoom(container, reset = false) {
-    if (reset) level = 3;
+    if (reset) level = 1;
     const wrap = container.querySelector(".timeline-wrap");
     const timeline = wrap?.querySelector(".timeline");
     if (!timeline) { sizeObserver?.disconnect(); observedTimeline = null; return; }
@@ -88,7 +88,7 @@
     const oldLeft = anchor?.getBoundingClientRect().left;
     const action = button.dataset.timelineZoom;
     const previousLevel = level;
-    level = button.hasAttribute('data-timeline-range') ? Number(button.value) : action === "reset" ? 3 : Math.max(0, Math.min(levels.length - 1, level + (action === "out" ? -1 : 1)));
+    level = button.hasAttribute('data-timeline-range') ? Number(button.value) : action === "reset" ? 1 : Math.max(0, Math.min(levels.length - 1, level + (action === "out" ? -1 : 1)));
     applyTimelineZoom(container);
     if (level !== previousLevel) CT.Effects?.transition?.('zoom');
     if (anchor) wrap.scrollLeft += anchor.getBoundingClientRect().left - oldLeft;

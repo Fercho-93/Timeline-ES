@@ -21,7 +21,7 @@ for (const screen of ['game','solo','online-game']) {
   };
   let timeline=paint();
   const image=app.querySelector('img'), selected=app.querySelector('.selected');
-  for(const [index,scale] of [0.5,0.65,0.8,1,1.2].entries()) {
+  for(const [index,scale] of [0.8,1,1.2,1.4].entries()) {
     const range=app.querySelector('input');range.value=index;range.dispatchEvent(new w.Event('input',{bubbles:true}));
     assert.equal(app.querySelector('output').textContent,`${Math.round(scale*100)}%`);
     assert.equal(range.getAttribute('aria-valuetext'),`${Math.round(scale*100)} por ciento`);
@@ -34,15 +34,15 @@ for (const screen of ['game','solo','online-game']) {
   }
   assert.equal(app.querySelector('[data-timeline-zoom="in"]').disabled,true);
   Object.defineProperty(timeline,'offsetHeight',{get:()=>300});resize();
-  assert.equal(parseFloat(timeline.parentElement.style.height),360,'un cambio de alto reserva espacio al 120%');
+  assert.equal(parseFloat(timeline.parentElement.style.height),420,'un cambio de alto reserva espacio al 140%');
   for(let i=0;i<8;i++)app.querySelector('[data-timeline-zoom="out"]').click();
-  assert.equal(app.querySelector('output').textContent,'50%');
+  assert.equal(app.querySelector('output').textContent,'80%');
   assert.equal(app.querySelector('[data-timeline-zoom="out"]').disabled,true);
   timeline=paint();assert.equal(observed,timeline,'tras repintar se observa la tira nueva');
-  assert.equal(app.querySelector('output').textContent,'50%','el zoom persiste al repintar');
+  assert.equal(app.querySelector('output').textContent,'80%','el zoom persiste al repintar');
   w.CONTINUUM.applyTimelineZoom(app,true);
   assert.equal(app.querySelector('output').textContent,'100%');
   assert.equal(app.querySelectorAll('.timeline-scale-frame').length,1,'no se anidan escalas');
   dom.window.close();
 }
-console.log('Zoom: cinco porcentajes, límites, dimensiones reservadas, resize, selección, Fantasma y repintado correctos en local, solitario y online.');
+console.log('Zoom: cuatro porcentajes, límites, dimensiones reservadas, resize, selección, Fantasma y repintado correctos en local, solitario y online.');

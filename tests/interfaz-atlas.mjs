@@ -31,7 +31,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     assert.ok(w.document.querySelector('.placement-dock [data-action="confirm-place"]'));
     assert.equal(w.document.querySelector('.slot-confirm button'),null);
     const zoom=w.document.querySelector('[data-timeline-range]');zoom.value='0';zoom.dispatchEvent(new w.Event('input',{bubbles:true}));
-    assert.equal(w.document.querySelector('.timeline-zoom output').textContent,'50%');
+    assert.equal(w.document.querySelector('.timeline-zoom output').textContent,'80%');
     assert.equal(w.document.querySelector('.hand-card.selected').dataset.id,selected);
     const saved=w.localStorage.getItem('hilo-game-animals-v1');
     click(w,'[data-action="ui-back"]');assert.ok(w.document.querySelector('[data-exit-dialog]'));
