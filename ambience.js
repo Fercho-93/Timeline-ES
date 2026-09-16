@@ -3,7 +3,7 @@
   'use strict';
   const CT = window.CONTINUUM;
   const TRACKS = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'].map(name => `assets/audio/${name}.mp3`);
-  const OVERLAP = 4, VOLUME = .12, FADE_IN = 1.5, FADE_OUT = .3;
+  const OVERLAP = 4, VOLUME = .12, FADE_IN = 2.2, FADE_OUT = .3;
   let queue = [], last = null, audio, master, loading = false, ready = null;
   let pageActive = true, nativeActive = true, startRequested = false, pauseTimer;
   let transport = Promise.resolve(), targetVolume = 0;

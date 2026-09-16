@@ -12,9 +12,21 @@ html.splash-active #app-splash {
   color: var(--edition-ink, #302d27);
   background: var(--edition-paper, #f3eee4);
   opacity: 1;
-  transition: opacity 300ms ease-out;
+  transition: opacity 1100ms cubic-bezier(.4, .08, .4, .94);
 }
+/* La salida es larga a propósito: el telón se disuelve, no se retira. */
 html.splash-active #app-splash.splash-exit { opacity: 0; }
+/* El emblema se apaga antes que el papel: si aguantara hasta el final se cruzaría con
+   el rótulo de la portada del juego y se verían dos Continuum a la vez. */
+html.splash-active #app-splash.splash-exit .splash-masthead,
+html.splash-active #app-splash.splash-exit .splash-status { opacity: 0; }
+html.splash-active #app-splash.splash-exit .splash-masthead { transform: translate(-50%, -50%) scale(1.05); }
+html.splash-active #app-splash .splash-masthead { transition: opacity 560ms ease-out, transform 1100ms cubic-bezier(.4, .08, .4, .94); }
+html.splash-active #app-splash .splash-status { transition: opacity 460ms ease-out; }
+/* Y la pantalla que aparece detrás se aclara a su ritmo, en el mismo compás en que la
+   música termina de entrar. */
+#app.app-arrive { animation: app-arrive 1400ms cubic-bezier(.4, .08, .4, .94) both; }
+@keyframes app-arrive { from { opacity: 0; } to { opacity: 1; } }
 html.splash-active #app-splash .splash-masthead {
   position: absolute;
   top: 50%; left: 50%;
@@ -109,7 +121,10 @@ html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direc
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  html.splash-active #app-splash { transition: none; }
+  html.splash-active #app-splash,
+  html.splash-active #app-splash .splash-masthead,
+  html.splash-active #app-splash .splash-status { transition: none; }
+  #app.app-arrive { animation: none; }
   html.splash-active #app-splash *,
   html.splash-active #app-splash::before,
   html.splash-active #app-splash::after { animation: none !important; }

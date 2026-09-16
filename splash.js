@@ -1,6 +1,6 @@
 (() => {
   const root = document.documentElement;
-  const MIN_VISIBLE = 3500, ENTER_VISIBLE = 1200, FADE_OUT = 300, MAX_WAIT = 20000;
+  const MIN_VISIBLE = 3500, ENTER_VISIBLE = 1200, FADE_OUT = 1100, MAX_WAIT = 20000;
   root.classList.add('splash-active');
   let startedAt = null, ready = false, minVisible = MIN_VISIBLE, timeout, finishTimer, hideTimer;
   const splash = () => document.getElementById('app-splash');
@@ -86,7 +86,17 @@
     clearTimeout(timeout);
     finishTimer = setTimeout(() => {
       splash()?.classList.add('splash-exit');
+      // El juego no se descubre de golpe: el telón se disuelve mientras la pantalla que
+      // hay detrás se aclara, con la música ya subiendo. Solo se anima la opacidad —una
+      // transformación aquí convertiría a `#app` en el marco de su barra fija.
       const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const app = document.getElementById('app');
+      if (app && !reduced) {
+        app.classList.add('app-arrive');
+        const limpiar = () => app.classList.remove('app-arrive');
+        app.addEventListener('animationend', limpiar, { once: true });
+        setTimeout(limpiar, FADE_OUT + 700);
+      }
       hideTimer = setTimeout(hide, reduced ? 0 : FADE_OUT);
     }, Math.max(0, minVisible - (performance.now() - startedAt)));
   };

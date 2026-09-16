@@ -109,7 +109,8 @@ for (const reduce of [false, true]) {
     advance(1);
     if (!reduce) {
       assert.ok(w.document.getElementById('app-splash').classList.contains('splash-exit'));
-      advance(299); assert.ok(active()); advance(1);
+      assert.ok(w.document.getElementById('app').classList.contains('app-arrive'), 'la pantalla de detrás se aclara mientras el telón se disuelve');
+      advance(1099); assert.ok(active()); advance(1);
     }
     assert.ok(!active(), 'el splash cierra tras lectura y fundido');
     assert.equal(w.document.getElementById('app-splash').getAttribute('aria-hidden'), 'true');
@@ -137,8 +138,8 @@ for (const reduce of [false, true]) {
     assert.equal(w.document.getElementById('splash-status').textContent, 'Entrando al juego…');
     w.CONTINUUM_SPLASH.finish();
     advance(1199); assert.ok(active(), 'el segundo telón se ve un momento');
-    advance(1); advance(300);
-    assert.ok(!active(), 'y se retira sin repetir la lectura entera de la portada');
+    advance(1); advance(1100);
+    assert.ok(!active(), 'y se disuelve sin repetir la lectura entera de la portada');
   } finally { w.close(); }
 }
 {
@@ -151,7 +152,7 @@ for (const reduce of [false, true]) {
   const {w, advance, active} = splashClock();
   try {
     advance(6000); assert.ok(active(), 'una carga lenta no descubre una pantalla vacía');
-    w.CONTINUUM_SPLASH.finish(); advance(300);
+    w.CONTINUUM_SPLASH.finish(); advance(1100);
     assert.ok(!active(), 'una carga lenta no añade otros 3,5 segundos');
     w.CONTINUUM_SPLASH.show();
     w.document.getElementById('app').textContent = '';
