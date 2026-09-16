@@ -1,12 +1,14 @@
 name: Zoom visual móvil
 on:
   push:
-    branches: [main, codex/result-flow-v187]
+    branches: [main, codex/wow-v189]
     paths:
       - 'mapa.js'
       - 'a11y.js'
       - 'app.js'
       - 'online.js'
+      - 'immersion.js'
+      - 'effects.js'
       - '*.css'
       - 'tests/zoom-browser.mjs'
       - '.github/workflows/zoom-visual.yml'

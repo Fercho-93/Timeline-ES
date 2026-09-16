@@ -48,7 +48,33 @@
     layer.querySelector('[data-exit-confirm]').addEventListener('click', () => { CT.closeDialog(); proceed(); });
     app.append(layer); CT.openDialog(layer, true);
   }
+  let finalCards = [];
+  function captureBoard(container) {
+    const cards = [...container.querySelectorAll('.timeline .timeline-card')];
+    if (cards.length) finalCards = cards.slice(-7).map(card => card.cloneNode(true));
+  }
+  function atlasFinal(container) {
+    const panel = container.querySelector('.pass-screen .panel, .panel');
+    if (!panel || panel.querySelector('.atlas-final-fan')) return;
+    panel.classList.add('atlas-final-page');
+    const fan = document.createElement('div');
+    fan.className = 'atlas-final-fan'; fan.setAttribute('aria-hidden', 'true'); fan.inert = true;
+    finalCards.forEach((source, index) => {
+      const card = source.cloneNode(true);
+      card.removeAttribute('style'); card.classList.remove('card-fitting', 'is-flipped');
+      card.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+      card.removeAttribute('id'); card.removeAttribute('tabindex');
+      card.style.setProperty('--fan-angle', `${(index - (finalCards.length - 1) / 2) * 10}deg`);
+      card.style.setProperty('--fan-x', `${(index - (finalCards.length - 1) / 2) * 22}px`);
+      card.style.setProperty('--fan-start', `${(index - (finalCards.length - 1) / 2) * 95}px`);
+      fan.append(card);
+    });
+    if (finalCards.length) panel.prepend(fan);
+  }
   function mount(container, screen) {
+    if (['solo-end', 'winner', 'online-winner', 'comp-end'].includes(screen)) atlasFinal(container);
+    if (screen === 'home') finalCards = [];
+
     surfaceNav.clear();
     const inGame = playing.has(screen);
     container.classList.toggle('atlas-playing', inGame);
@@ -119,7 +145,16 @@
   }
   function reveal(modal) {
     const value = modal?.querySelector('.reveal');
-    if (value && !reduced()) value.classList.add('atlas-reveal');
+    if (value && !reduced()) {
+      value.classList.add('atlas-reveal');
+      const year = value.querySelector('.year');
+      if (year && !year.classList.contains('date-ink')) {
+        year.classList.add('date-ink');
+        year.addEventListener('animationend', event => {
+          if (event.animationName === 'date-ink-stamp' && year.isConnected) CT.Effects?.stamp?.();
+        }, {once: true});
+      }
+    }
   }
 
   // Las capas que leen la profundidad, en el mismo orden en que edition.css las dibuja:
@@ -217,6 +252,6 @@
   }
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, confirmExit, reveal, openSurface, closeSurface, requestDepth,
+  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, confirmExit, reveal, openSurface, closeSurface, requestDepth,
     updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

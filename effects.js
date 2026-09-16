@@ -127,6 +127,7 @@
   // El sonido y la vibración siguen siendo preferencias independientes.
   CT.Effects = {
     hapticsAvailable,
+    stamp() { void vibration("confirm"); void cue('tap'); },
     testHaptics() { return vibration("confirm"); },
     feedback(correct) { lastResult = performance.now(); pending = null; void vibration(correct ? "success" : "failure"); void cue(correct ? 'success' : 'failure'); },
     tap() { void vibration("confirm"); void cue('tap'); },

@@ -169,9 +169,27 @@
   // y sin mover la vista se colocaría fuera de la pantalla. Se llama con la carta todavía
   // invisible, así que primero se ve viajar la línea y después llegar la carta.
   const TURNO = 640;
-  function dealIn(cards, { seguir = null } = {}) {
+  let cancelDeal = null;
+  function dealIn(cards, { seguir = null, delay = 0 } = {}) {
     const lista = [...cards].filter(card => card?.isConnected);
     if (!lista.length) return;
+    if (delay > 0 && lista.every(card => typeof card.animate === 'function')) {
+      cancelDeal?.();
+      const shell = lista[0].closest('.shell');
+      const wasInert = shell?.inert;
+      if (shell) shell.inert = true;
+      lista.forEach(card => { card.style.visibility = 'hidden'; });
+      const restore = () => {
+        lista.forEach(card => { card.style.visibility = ''; });
+        if (shell) shell.inert = wasInert || false;
+      };
+      const timer = setTimeout(() => {
+        cancelDeal = null; restore();
+        if (lista.every(card => card.isConnected)) dealIn(lista, {seguir});
+      }, delay);
+      cancelDeal = () => { clearTimeout(timer); restore(); cancelDeal = null; };
+      return;
+    }
     window.CONTINUUM.Effects?.transition?.('deal');
     // Con movimiento reducido no hay recorrido, pero la vista sí va hasta la última: saber
     // dónde ha caído la carta no es decoración, es la mitad de la información.
@@ -311,6 +329,7 @@
   // El primer pintado no toca el foco: nadie lo tenía y moverlo al entrar sería una
   // sorpresa desagradable.
   function paint(container, html, screen) {
+    cancelDeal?.();
     cancelPageTurn?.();
     cancelProfileRoll?.();
     const previousDepth = preparationDepth[paint.screen];
@@ -344,6 +363,7 @@
     actualizaAnclas(container);
     paint.screen = screen;
 
+    window.CONTINUUM.UI?.captureBoard?.(container);
     container.innerHTML = html;
     window.CONTINUUM.UI?.mount(container, screen);
     if (!primero && cambioDePantalla) {
@@ -461,20 +481,40 @@
         overlay.setAttribute('aria-label', '¡Bien colocado!');
         focus(overlay, {preventScroll: true});
         window.CONTINUUM.scrollToElement?.(card.closest('.timeline-wrap'), card);
-        const animation = card.animate([
-          {filter: 'brightness(1)', offset: 0},
-          {filter: 'brightness(1.2)', offset: .35},
-          {filter: 'brightness(1)', offset: 1}
-        ], {duration: remaining, easing: 'ease-out'});
+        const animations = [];
+        const wrap = card.closest('.timeline-wrap');
+        // Centrar antes del movimiento evita sumar dos desplazamientos a la vez.
+        if (wrap) {
+          const box = card.getBoundingClientRect(), view = wrap.getBoundingClientRect();
+          wrap.scrollLeft += box.left - view.left - (view.width - box.width) / 2;
+        }
+        const scale = parseFloat(card.closest('.timeline')?.style.getPropertyValue('--timeline-scale')) || 1;
+        const box = card.getBoundingClientRect();
+        const hand = document.querySelector('.hand-card.selected')?.getBoundingClientRect();
+        const dx = hand ? Math.max(-180, Math.min(180, (hand.left - box.left) / scale)) : 0;
+        const dy = hand ? Math.max(60, Math.min(180, (hand.top - box.top) / scale)) : 90;
+        animations.push(card.animate([
+          {transform: `translate(${dx}px, ${dy}px) rotate(-5deg) scale(.86)`, opacity: 0},
+          {transform: 'translate(0, 0) rotate(0) scale(1)', opacity: 1}
+        ], {duration: Math.min(650, remaining), easing: 'cubic-bezier(.2,.7,.2,1)'}));
+        const cards = [...card.parentElement.querySelectorAll('.timeline-card')];
+        const at = cards.indexOf(card);
+        [cards[at - 1], cards[at + 1]].forEach((neighbor, i) => {
+          if (neighbor?.animate) animations.push(neighbor.animate([
+            {transform: `translateX(${i === 0 ? 24 : -24}px)`}, {transform: 'translateX(0)'}
+          ], {duration: Math.min(650, remaining), easing: 'cubic-bezier(.2,.7,.2,1)'}));
+        });
+        card.classList.add('card-fitting');
         const onKey = event => { if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ') event.preventDefault(); };
         document.addEventListener('keydown', onKey);
-        const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); animation.cancel(); }};
+        const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); animations.forEach(animation => animation.cancel()); card.classList.remove('card-fitting'); }};
         pila.push(pending);
         const timer = setTimeout(() => {
           const index = pila.indexOf(pending);
           if (index >= 0) pila.splice(index, 1);
           document.removeEventListener('keydown', onKey);
           if (!overlay.isConnected) return;
+          card.classList.remove('card-fitting');
           overlay.classList.remove('result-preview');
           overlay.removeAttribute('role');
           overlay.removeAttribute('aria-label');

@@ -1035,7 +1035,7 @@
       ? "Ha sido la única persona en terminar la ronda sin cartas."
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
     const fallosUnicos = new Set(game.failed || []).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p><div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p>${logrosMarkup(game.earnedAchievements || [])}<div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
     if (game.tournament) {
       app.querySelector('.pass-screen').insertAdjacentHTML('afterbegin',CT.Tournament.board(game.tournament,game.players,game.winners));
       const button=app.querySelector('[data-action="setup"]');
@@ -1596,6 +1596,7 @@
         // suave: la carta todavía no se ve —entra desde el centro— y así el sitio al que
         // llega ya está quieto cuando empieza a moverse.
         CT.dealIn(llegan, {
+          delay: 1000,
           seguir: carta => {
             const caja = carta.getBoundingClientRect(), marco = wrap.getBoundingClientRect();
             wrap.scrollLeft += caja.left - marco.left - (marco.width - caja.width) / 2;
@@ -1719,11 +1720,13 @@
     soloFailedForReview = (solo.failed || []).map(id => ({ id, mode: solo.mode }));
     const compartir = solo.kind === "daily" ? shareText(currentMode().name, dia, solo.hits, total, solo.sequence || [], records.streak) : null;
     const duelo = enDueloEsta ? cierreDuelo(solo, total) : null;
+    const earned = [...(solo.earnedAchievements || []), ...logros];
+    const sessionLogros = [...new Map(earned.map(item => [item.id || item.name, item])).values()];
     solo.finished = true;
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${duelo ? duelo.icono : superado ? "🏅" : "🎯"}</div><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${duelo ? duelo.titular : resumen}</h1>${duelo ? duelo.cuerpo : ""}${logrosMarkup(logros)}<div class="actions" style="justify-content:center">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${duelo ? duelo.icono : superado ? "🏅" : "🎯"}</div><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${duelo ? duelo.titular : resumen}</h1>${duelo ? duelo.cuerpo : ""}${logrosMarkup(sessionLogros)}<div class="actions" style="justify-content:center">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -2063,6 +2066,8 @@
   // entero, así que ahí se usa `logrosMarkup` en vez de esto.
   function anotaLogros(nuevos) {
     if (!nuevos || !nuevos.length) return;
+    if (solo) { solo.earnedAchievements = [...(solo.earnedAchievements || []), ...nuevos]; }
+    else if (game) { game.earnedAchievements = [...(game.earnedAchievements || []), ...nuevos]; }
     showToast(nuevos.length === 1 ? `Logro: ${nuevos[0].name}` : `${nuevos.length} logros nuevos`);
     announce(nuevos.map(item => `Logro desbloqueado: ${item.name}.`).join(" "));
   }

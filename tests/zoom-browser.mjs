@@ -29,7 +29,7 @@ try {
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
     const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
     await page.addInitScript(()=>{
-      localStorage.setItem('hilo-solo-history-v1',JSON.stringify({kind:'free',mode:'history',day:new Date().toLocaleDateString('sv-SE'),deck:[1,2,3],timeline:[74],current:67,lives:3,hits:0,played:0,total:null,finished:false}));
+      localStorage.setItem('hilo-solo-history-v1',JSON.stringify({kind:'free',difficulty:'normal',mode:'history',day:new Date().toLocaleDateString('sv-SE'),deck:[1,2,3],timeline:[74],current:67,lives:3,hits:0,played:0,total:null,finished:false}));
     });
     await page.goto(url);
     await page.locator('[data-block="historia"]').click();
@@ -72,6 +72,33 @@ try {
       assert.equal(await page.locator('[data-action="solo-next"]').evaluate(el=>document.activeElement===el),true);
       await page.screenshot({path:`test-results/zoom/${engine}-acierto-resultado.png`});
       await page.locator('[data-action="solo-next"]').click();
+      assert.equal(await page.locator('.shell').evaluate(el=>el.inert),true,'el tablero espera antes de repartir');
+      const hiddenAI=page.locator('.timeline-card[style*="visibility: hidden"]');
+      assert.ok(await hiddenAI.count()>0,'la carta de IA aún no aparece');
+      await page.waitForTimeout(500);
+      assert.ok(await hiddenAI.count()>0,'la espera dura más de medio segundo');
+      await page.waitForFunction(()=>!document.querySelector('.shell').inert);
+      await page.waitForTimeout(800);
+      // Completar la partida permite revisar el abanico y la página de resultados reales.
+      for(let turn=0;turn<8 && await page.locator('[data-action="solo-place"]').count();turn++) {
+        const at=await page.evaluate(()=>{
+          const cards=new Map(window.HISTORY_CARDS.map(c=>[c.id,c]));
+          const board=[...document.querySelectorAll('.timeline .timeline-card')].map(el=>cards.get(Number(el.dataset.id)));
+          const card=cards.get(Number(document.querySelector('.hand-card').dataset.id));
+          return window.CONTINUUM.correctIndex('history',board,card);
+        });
+        await page.locator(`[data-action="solo-place"][data-index="${at}"]`).click();
+        await page.locator('[data-action="confirm-place"]').click();
+        await page.locator('.modal').waitFor({state:'visible'});
+        await page.locator('[data-action="solo-next"]').click();
+        if(await page.locator('.shell[inert]').count()) await page.waitForFunction(()=>!document.querySelector('.shell').inert);
+      }
+      await page.locator('.atlas-final-page').waitFor();
+      assert.ok(await page.locator('.atlas-final-fan .timeline-card').count()>0);
+      await page.waitForTimeout(1500);
+      await page.screenshot({path:`test-results/zoom/${engine}-final-atlas.png`,fullPage:true});
+      await page.close();
+      continue;
     }
     // Cambiar orientación debe recalcular el espacio reservado sin recortar la tira.
     await page.setViewportSize({width:height,height:width});

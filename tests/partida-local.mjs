@@ -70,7 +70,7 @@ while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML) && turns < 4000) {
   slots[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   click(w, '[data-action="confirm-place"]');
   const modal = w.document.querySelector(".modal");
-  if (modal && /class="year"/.test(modal.innerHTML)) revealed++;
+  if (modal && modal.querySelector(".year")) revealed++;
   click(w, '[data-action="finish-turn"]');
 }
 ok("nadie empieza un turno con la mano vacía", !emptyTurn);

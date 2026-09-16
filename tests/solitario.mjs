@@ -47,7 +47,7 @@ console.log("\nConfirmar antes de colocar");
   ok("cancelar deja la partida como estaba", !existe(w, '[data-action="confirm-place"]') && !existe(w, ".modal"));
   click(w, '[data-action="solo-place"]');
   click(w, '[data-action="confirm-place"]');
-  ok("al confirmar se revela la carta", existe(w, ".modal") && /class="year"/.test(w.document.querySelector(".modal").innerHTML));
+  ok("al confirmar se revela la carta", existe(w, ".modal") && !!w.document.querySelector(".modal .year"));
 }
 
 console.log("\nPartida libre");
@@ -243,7 +243,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
     animaciones.push({ elemento: this, frames, timing });
     return { finished: new Promise(() => {}), cancel() {} };
   };
-  const llegadas = () => animaciones.filter(a => a.elemento.classList?.contains("timeline-card") && a.frames[0].transform);
+  const llegadas = () => animaciones.filter(a => a.elemento.classList?.contains("timeline-card") && /translate3d/.test(a.frames[0].transform));
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
@@ -251,6 +251,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="confirm-place"]');
   ok("en Normal el tablero coloca una carta por turno", /incorporado/.test(texto(w)) === false);
   click(w, '[data-action="solo-next"]');
+  await new Promise(resolve => w.setTimeout(resolve, 1050));
   const vistas = llegadas();
   ok(`la carta automática se anima al llegar (${vistas.length})`, vistas.length === 1);
   ok("entra desde el centro de la pantalla y acaba en su sitio",
@@ -271,7 +272,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
     return { left: 40, top: 60, width: 150, height: 220, right: 190, bottom: 280, x: 40, y: 60 };
   };
   w.Element.prototype.animate = function (frames, timing) {
-    if (this.classList?.contains("timeline-card")) animaciones.push({ elemento: this, frames, timing });
+    if (this.classList?.contains("timeline-card") && /translate3d/.test(frames[0].transform)) animaciones.push({ elemento: this, frames, timing });
     return { finished: new Promise(() => {}), cancel() {} };
   };
   // La vista se mueve escribiendo en el desplazamiento de la tira. Se anota en el
@@ -287,6 +288,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="solo-place"]');
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
+  await new Promise(resolve => w.setTimeout(resolve, 1050));
   ok("la primera llega sola, no las dos a la vez", animaciones.length === 1);
   const segunda = w.document.querySelectorAll(".timeline-card")[1];
   ok("la que espera su turno no está puesta todavía", [...w.document.querySelectorAll(".timeline-card")].some(c => c.style.visibility === "hidden"));
@@ -304,13 +306,14 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   w.Element.prototype.getBoundingClientRect = function () {
     return { left: 40, top: 60, width: 150, height: 220, right: 190, bottom: 280, x: 40, y: 60 };
   };
-  w.Element.prototype.animate = function (frames) { if (frames[0].transform) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
+  w.Element.prototype.animate = function (frames) { if (/translate3d/.test(frames[0].transform)) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   click(w, '[data-action="solo-place"]');
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
+  await new Promise(resolve => w.setTimeout(resolve, 1050));
   ok("con movimiento reducido no se anima nada", !animaciones.some(el => el.classList?.contains("timeline-card")));
   ok("y la carta automática está igualmente en la línea", /incorporado/.test(texto(w)));
   w.close();
@@ -319,13 +322,14 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   // En Fácil no hay cartas automáticas, así que tampoco hay nada que ver llegar.
   const w = boot({ "continuum-difficulty-v1": "easy" });
   const animaciones = [];
-  w.Element.prototype.animate = function (frames) { if (frames[0].transform) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
+  w.Element.prototype.animate = function (frames) { if (/translate3d/.test(frames[0].transform)) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
   click(w, '[data-action="solo-place"]');
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
+  await new Promise(resolve => w.setTimeout(resolve, 1050));
   ok("en Fácil no llega ninguna carta automática", !animaciones.some(el => el.classList?.contains("timeline-card")) && !/incorporado/.test(texto(w)));
   w.close();
 }
