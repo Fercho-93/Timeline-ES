@@ -35,6 +35,7 @@ try {
     await page.locator('[data-block="historia"]').click();
     await page.locator('[data-mode="history"]').click();
     await page.locator('[data-action="solo"]').click();
+    await page.locator('.solo-fold').filter({has:page.locator('[data-action="resume-solo"]')}).locator('summary').click();
     await page.locator('[data-action="resume-solo"]').click();
     await page.locator('.timeline-card img').evaluate(img=>img.decode());
     const measure=()=>page.evaluate(()=>{
