@@ -67,6 +67,7 @@ try {
       const style=await preview.evaluate(el=>({background:getComputedStyle(el).backgroundColor,blur:getComputedStyle(el).backdropFilter}));
       assert.equal(style.background,'rgba(0, 0, 0, 0)');
       assert.equal(style.blur,'none');
+      await page.waitForTimeout(450);
       await page.screenshot({path:`test-results/zoom/${engine}-acierto-tablero.png`});
       await page.locator('.modal').waitFor({state:'visible',timeout:2500});
       assert.equal(await page.locator('[data-action="solo-next"]').evaluate(el=>document.activeElement===el),true);
