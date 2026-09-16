@@ -200,13 +200,27 @@ async function enter() {
   }
 }
 function accountCard() {
-  return `<div class="account-card"><strong>${avatars[profile?.avatar] || '🧭'} ${esc(profile?.alias || '')}</strong><span>Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.</span><span>${metadata().dirty ? 'Hay cambios pendientes de guardar.' : 'Progreso guardado.'}</span><div class="account-actions"><button class="btn btn-secondary" data-account-action="edit-name">Cambiar nombre</button><button class="btn btn-secondary" data-account-action="ranking">Ranking de retos diarios</button><button class="btn btn-secondary" data-account-action="sync">Guardar ahora</button><button class="btn btn-ghost" data-account-action="delete">Eliminar invitado y progreso</button></div><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></div>`;
+  const stats=payload(), dirty=metadata().dirty;
+  return `<div class="account-card">
+    <div class="account-hero"><span class="account-kicker">TU HISTORIA EN CONTINUUM</span><div class="account-identity"><span class="account-avatar" aria-hidden="true">${avatars[profile?.avatar] || '🧭'}</span><div><span class="account-kicker">EXPLORADOR</span><strong>${esc(profile?.alias || '')}</strong><span class="account-save-state" role="status">${dirty ? '◌ Cambios pendientes' : '✓ Progreso guardado'}</span></div></div>
+    <div class="account-metrics"><div><b>${stats.hits}</b><span>Aciertos diarios</span></div><div><b>${stats.games}</b><span>Retos completados</span></div></div></div>
+    <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking de retos diarios</b><span>Descubre tu lugar entre exploradores</span></span><span aria-hidden="true">↗</span></button>
+    <div class="account-actions"><button class="btn btn-secondary" data-account-action="edit-name"><span aria-hidden="true">✎</span> Cambiar nombre</button><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>
+    <details class="account-details"><summary>Tu invitado y tus datos</summary><p>Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.</p><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a><button class="btn btn-ghost account-delete" data-account-action="delete">Eliminar invitado y progreso</button></details>
+  </div>`;
 }
 async function ranking() {
   await flush();
   if (failedConflict) return;
   const snap=await getDocsFromServer(query(collection(db,'dailyRanking'),orderBy('hits','desc'),limit(50)));
-  accountDialog(`<div class="overlay"><section class="modal"><h2>Ranking de retos diarios</h2><p>Aciertos acumulados en retos diarios completados. Cada reto cuenta una vez por día y mazo; las partidas libres y multijugador no puntúan. Resultados enviados por el juego, sin validación competitiva.</p><table class="account-ranking"><thead><tr><th>Puesto</th><th>Jugador</th><th>Aciertos</th></tr></thead><tbody>${snap.docs.map((d,i)=>{const v=d.data();return `<tr><td>${i+1}</td><td>${avatars[v.avatar] || '🧭'} ${esc(v.alias)}${d.id===identity.uid?' · tú':''}</td><td>${Number(v.hits)||0}</td></tr>`;}).join('') || '<tr><td colspan="3">Todavía no hay resultados. ¡Estrena el ranking!</td></tr>'}</tbody></table><p>Primeros 50 jugadores. Las igualdades no se consideran un desempate competitivo.</p><button class="btn btn-primary" data-account-action="close">Cerrar</button></section></div>`,true);
+  const entries=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const position=i=>1+entries.filter(v=>(Number(v.hits)||0)>(Number(entries[i].hits)||0)).length;
+  const mine=entries.findIndex(v=>v.id===identity.uid);
+  const player=(v,i)=>`<tr class="${v.id===identity.uid?'is-you':''}"><td><span class="ranking-place ${position(i)<=3?'is-medal':''}">${position(i)<=3?['🥇','🥈','🥉'][position(i)-1]:position(i)}</span></td><td><span aria-hidden="true">${avatars[v.avatar] || '🧭'}</span> <span class="ranking-name">${esc(v.alias)}</span>${v.id===identity.uid?'<small class="ranking-you">Tú</small>':''}</td><td><b>${Number(v.hits)||0}</b></td></tr>`;
+  accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETOS DIARIOS</span><span class="ranking-emblem" aria-hidden="true">✦</span><h2>La cima te espera</h2><p>Un nuevo día. Un nuevo reto. Tu siguiente puesto.</p><span class="ranking-caption">Ranking de retos diarios · Top 50</span></header>
+    <div class="ranking-body">${entries.length?`<div class="ranking-personal">${mine>=0?`<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${Number(entries[mine].hits)||0}</b> aciertos</span>`:'Completa un reto diario para sumar tus aciertos al ranking.'}</div><table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.map(player).join('')}</tbody></table>`:`<div class="ranking-empty"><span aria-hidden="true">✧</span><h3>La primera huella puede ser tuya</h3><p>Todavía no hay resultados. Completa un reto diario y estrena el ranking.</p></div>`}
+    <details class="account-details ranking-rules"><summary>Cómo se suman los aciertos</summary><p>Aciertos acumulados en retos diarios completados. Cada reto cuenta una vez por día y mazo; las partidas libres y multijugador no puntúan. Resultados enviados por el juego, sin validación competitiva.</p><p>Primeros 50 jugadores. Las igualdades comparten puesto y no se consideran un desempate competitivo.</p></details></div>
+    <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`,true);
 }
 function deleteScreen() {
   if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de eliminar el invitado.');
@@ -240,7 +254,7 @@ export async function startAccounts(callback) {
     const action=target.dataset.accountAction;
     if(action==='close'){CT.closeDialog();return;}
     if(busy)return;busy=true;target.disabled=true;
-    const fn={ranking,sync:flush,'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
+    const fn={ranking,sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
     Promise.resolve().then(fn).catch(error=>{
       const text=message(error), el=document.getElementById('account-delete-message');
       if(el)el.textContent=text;else if(!failedConflict)syncNotice(text);
