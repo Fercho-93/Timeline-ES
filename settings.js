@@ -77,6 +77,7 @@
 
   function panelHtml() {
     const s = settings;
+    const hapticsSupported = CT.Effects?.hapticsAvailable?.() === true;
     // Sin `data-dialog-focus`, `openDialog` mete el foco en el primer control del
     // panel: el desplegable de tema. En iOS/Safari, enfocar un `<select>` dentro del
     // mismo gesto que abre el diálogo hace que el propio selector nativo se despliegue
@@ -103,7 +104,9 @@
 
       <section class="settings-section">
         <h2>Efectos opcionales</h2>
-        <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" ${s.haptics === true ? "checked" : ""}></label>
+        <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" aria-describedby="haptics-help" ${s.haptics === true && hapticsSupported ? "checked" : ""} ${hapticsSupported ? "" : "disabled"}></label>
+        <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
+        ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
         <label class="opt-row"><span>Sonidos suaves de cartas y resultados</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Música ambiente</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
@@ -144,6 +147,14 @@
     showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
   }
 
+  async function testHaptics() {
+    const accepted = await CT.Effects?.testHaptics?.();
+    const help = document.getElementById('haptics-help');
+    if (help) help.textContent = accepted
+      ? 'Prueba enviada. Si no la notas, revisa la vibración en los ajustes del teléfono.'
+      : 'No se pudo activar la vibración en este dispositivo.';
+  }
+
   async function sendFeedback() {
     if (!FEEDBACK_EMAIL) { showToast("Todavía no hay una dirección de contacto configurada."); return; }
     const detalle = await CT.appDiagnostics?.() ?? "";
@@ -176,7 +187,13 @@
         const help = document.querySelector('[data-depth-help]');
         if (!enabled && help) help.textContent = 'Este dispositivo no ha permitido usar el movimiento. Las portadas siguen funcionando.';
       }
-      settings[key] = enabled; save(); CT.UI?.updateEffects(); CT.Effects?.transition?.('select'); return;
+      settings[key] = enabled; save(); CT.UI?.updateEffects(); CT.Effects?.transition?.('select');
+      if (key === 'haptics') {
+        const test = document.querySelector('[data-settings-action="test-haptics"]');
+        if (test) test.disabled = !enabled;
+        if (enabled) await testHaptics();
+      }
+      return;
     }
     if (event.target.dataset.settingsAction !== "theme") return;
     if (!THEMES[event.target.value]) return;
@@ -192,6 +209,7 @@
     if (target.dataset.settingsAction === "open") open();
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
+    else if (target.dataset.settingsAction === "test-haptics") void testHaptics();
     else if (target.dataset.settingsAction === "download-feedback") {
       void (async () => {
         const note = document.getElementById('feedback-note')?.value || '';

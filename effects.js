@@ -10,16 +10,26 @@
     }
   };
   let audio, haptics;
-  async function vibration(kind) {
-    if (!CT.effectPrefs?.().haptics) return;
+  const EFFECT_VOLUME = .45; // Solo efectos de acciones; no afecta a ambience.js.
+  function hapticsAvailable() {
     try {
       const cap = window.Capacitor;
-      if (cap?.isNativePlatform?.()) {
-        haptics ||= cap.registerPlugin?.("Haptics") || cap.Plugins?.Haptics;
-        if (kind === "confirm") await haptics?.impact({ style: "LIGHT" });
-        else await haptics?.notification({ type: kind === "success" ? "SUCCESS" : "WARNING" });
-      } else navigator.vibrate?.(kind === "failure" ? [12, 35, 12] : 12);
-    } catch { /* Un efecto opcional nunca impide jugar. */ }
+      if (!cap?.isNativePlatform?.()) return typeof navigator.vibrate === 'function';
+      if (cap.isPluginAvailable?.('Haptics') === false) return false;
+      haptics ||= cap.registerPlugin?.('Haptics') || cap.Plugins?.Haptics;
+      return typeof haptics?.impact === 'function' && typeof haptics?.notification === 'function';
+    } catch { return false; }
+  }
+  async function vibration(kind) {
+    if (!CT.effectPrefs?.().haptics || !hapticsAvailable()) return false;
+    try {
+      if (window.Capacitor?.isNativePlatform?.()) {
+        if (kind === 'confirm') await haptics.impact({ style: 'LIGHT' });
+        else await haptics.notification({ type: kind === 'success' ? 'SUCCESS' : 'WARNING' });
+        return true;
+      }
+      return navigator.vibrate(kind === 'failure' ? [18, 35, 18] : 18) !== false;
+    } catch { return false; /* Un efecto opcional nunca impide jugar. */ }
   }
   const samples = new Map(), voices = new Set(), lastCue = new Map();
   // [textura, instante, volumen, velocidad]. El gesto decide el sonido,
@@ -106,7 +116,7 @@
         const source = audio.createBufferSource(), gain = audio.createGain();
         source.buffer = sample(texture);
         if (source.playbackRate) source.playbackRate.value = rate;
-        gain.gain.value = volume;
+        gain.gain.value = volume * EFFECT_VOLUME;
         source.connect(gain); gain.connect(audio.destination);
         voices.add(source);
         source.onended = () => { voices.delete(source); source.disconnect(); gain.disconnect(); };
@@ -116,13 +126,16 @@
   }
   // El sonido y la vibración siguen siendo preferencias independientes.
   CT.Effects = {
+    hapticsAvailable,
+    testHaptics() { return vibration("confirm"); },
     feedback(correct) { lastResult = performance.now(); pending = null; void vibration(correct ? "success" : "failure"); void cue(correct ? 'success' : 'failure'); },
     tap() { void vibration("confirm"); void cue('tap'); },
     page(backwards = false) { transition(backwards ? 'back' : 'page'); },
     transition
   };
   document.addEventListener("click", event => {
-    if (event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"]')) void vibration("confirm");
+    const tactile = event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-action="select-card"], [data-action="solo-place"], [data-action="place"], [data-online-action="select"], [data-online-action="place"]');
+    if (tactile && !tactile.disabled) void vibration("confirm");
     const summary = event.target.closest('summary');
     const details = summary?.parentElement;
     if (details?.matches('.solo-fold, .enc-deck')) transition(details.open ? 'close' : 'expand');

@@ -60,6 +60,8 @@ try {
     enabled=true;
     effects.feedback(true); effects.feedback(true);
     assert.equal(sources.length,2,'repetir el mismo aviso no acumula notas');
+    assert.equal(gains[0].gain.value,.24*.45,'los efectos usan el 45% de la ganancia anterior');
+    assert.equal(gains[1].gain.value,.19*.45);
     assert.equal(sources[1].at,.13,'el acierto es una respuesta doble breve');
     effects.feedback(false); effects.page(); effects.tap();
     assert.equal(sources.length,5,'la navegación queda pendiente, no se superpone al resultado');
@@ -194,3 +196,30 @@ console.log('Texturas de papel y madera, silencio, volumen y liberación de voce
     console.log('Navegación, colecciones, diálogos, cartas, zoom, turnos y finales con sonido: OK');
   } finally {w.close();}
 }
+
+// Disponibilidad real y prueba inmediata del ajuste (sin depender del sonido).
+for (const platform of ['unsupported','web','native','native-missing','native-error']) {
+  const dom=new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''),{runScripts:'outside-only',url:'https://continuum.test/'});
+  const w=dom.window, pulses=[];
+  w.scrollTo=()=>{};
+  if(platform==='web')w.navigator.vibrate=value=>{pulses.push(value);return true;};
+  if(platform.startsWith('native'))w.Capacitor={isNativePlatform:()=>true,isPluginAvailable:()=>platform!=='native-missing',registerPlugin:()=>({impact:async()=>{if(platform==='native-error')throw Error('Unavailable');pulses.push('LIGHT');},notification:async()=>{}})};
+  for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
+  try {
+    w.document.querySelector('[data-settings-action="open"]').click();
+    const toggle=w.document.querySelector('[data-settings-action="haptics"]');
+    const supported=!['unsupported','native-missing'].includes(platform);
+    assert.equal(toggle.disabled,!supported);
+    if(!supported){assert.match(w.document.querySelector('#haptics-help').textContent,/no está disponible|no ofrece vibración/);continue;}
+    toggle.checked=true;toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
+    await new Promise(resolve=>setTimeout(resolve,0));
+    assert.equal(w.CONTINUUM.effectPrefs().sound,false,'vibración independiente del sonido');
+    if(platform==='native-error'){assert.match(w.document.querySelector('#haptics-help').textContent,/No se pudo/);continue;}
+    assert.equal(pulses.length,1,'activar produce una prueba inmediata');
+    const test=w.document.querySelector('[data-settings-action="test-haptics"]');test.click();
+    await new Promise(resolve=>setTimeout(resolve,0));assert.equal(pulses.length,2);
+    toggle.checked=false;toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
+    assert.equal(test.disabled,true);await w.CONTINUUM.Effects.testHaptics();assert.equal(pulses.length,2,'apagar detiene también las pruebas');
+  } finally {w.close();}
+}
+console.log('Vibración: prueba inmediata, independencia del sonido, navegador no compatible y errores nativos: OK');
