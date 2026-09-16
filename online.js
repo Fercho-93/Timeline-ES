@@ -832,7 +832,7 @@ function revealOverlay(currentUid) {
   // resto de la sala se entera de que hubo trasvase, pero no de cuál era la carta.
   const implicado = reveal.pulse && (user.uid === reveal.playerUid || user.uid === reveal.targetUid);
   const seguir = canContinue ? '<button class="btn btn-primary btn-block" data-dialog-focus data-online-action="finish-turn">Continuar <span>→</span></button>' : `<div class="waiting-inline"><i></i> Esperando a ${escapeHtml(reveal.playerName)}…</div>`;
-  const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div><div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p>${CT.Art.button(modeKey(), card)}</div>`;
+  const fichaCarta = `<div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(modeKey(), card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>`;
   // Un duelo no lo gana ni lo pierde una sola persona, así que no lleva la marca grande de
   // acierto: cada jugada trae la suya y debajo se cuenta el desenlace.
   if (reveal.duel) {

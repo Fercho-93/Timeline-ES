@@ -814,6 +814,34 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app .solo-fold { scroll-margin-top: 12px; scroll-margin-bottom: calc(90px + env(safe-area-inset-bottom)); }
 #app .deck-preview img { position: static; opacity: 1; }
 
+/* La lámina del resultado: la escena entera, estampada en el papel como en la carta,
+   y pulsable para verla a pantalla completa. Toma la proporción de las propias láminas
+   —512×768— y se queda con lo que el aviso puede darle de alto sin empujar el botón de
+   continuar fuera de la pantalla. */
+#app .art-thumb {
+  display: block; width: fit-content; margin: 12px auto 2px; padding: 0;
+  border: 1px solid var(--edition-line); border-radius: 4px; background: var(--edition-surface);
+  box-shadow: 0 6px 16px #3a2a1c26; cursor: pointer; overflow: hidden; min-height: 0;
+}
+/* Se mide por el alto —no por el ancho del aviso— para que el botón de continuar siga
+   cabiendo en la pantalla junto con el texto más largo. */
+#app .art-thumb img {
+  display: block; height: clamp(88px, 18dvh, 190px); width: auto; aspect-ratio: 2 / 3;
+  object-fit: cover; filter: sepia(.42) saturate(.8) contrast(1.02); mix-blend-mode: multiply;
+}
+#app .art-thumb span {
+  display: block; padding: 4px 2px 5px; color: var(--edition-muted);
+  font: .6rem/1.2 var(--ui-font); letter-spacing: .08em; text-transform: uppercase;
+}
+/* En el móvil va al lado del texto, como el grabado de una página: apilada debajo, el
+   aviso crecía tanto que el botón de continuar se iba debajo del pliegue. */
+@media (max-width: 699px) {
+  #app .reveal .art-thumb { float: left; margin: 2px 14px 6px 0; }
+  #app .reveal .year { margin-top: 0; }
+}
+:root:is([data-theme="dark"],[data-theme="night"]) #app .art-thumb img { mix-blend-mode: normal; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) #app .art-thumb img { mix-blend-mode: normal; } }
+
 /* Reversos ilustrados: la portada común nunca anticipa la carta individual. */
 #app .hand-card { isolation: isolate; background: #f3eee4; color: #302d27; }
 #app.atlas-board[data-screen] .hand .hand-card .carta-reverso {
