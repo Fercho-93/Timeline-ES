@@ -597,28 +597,30 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app.atlas-board > .shell > section:has(.timeline-wrap) { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
   #app.atlas-board > .shell > section:has(.timeline-wrap) .timeline-wrap { flex: 1 1 auto; display: flex; align-items: center; }
 }
-/* Y en pantallas altas ese hueco no se queda en blanco: las cartas ya colocadas crecen
-   con él, así el grabado y la fecha se leen sin tocar el zoom. Los móviles cortos o
-   estrechos conservan la mesa compacta de arriba. En solitario la mano es una sola
-   carta y sobra sitio; con la mano repartida entre varias personas ocupa el doble de
-   alto, así que allí la línea crece solo lo que puede sin empujar el confirmar. */
-@media (min-width: 381px) and (max-width: 699px) and (min-height: 741px) {
-  #app.atlas-board:has(.hand-solo) .timeline-card { width: clamp(124px, 20dvh, 182px); min-height: clamp(164px, 29dvh, 262px); }
-  #app.atlas-board:has(.hand-solo) .timeline-card .card-visual { height: clamp(98px, 17.5dvh, 160px); }
-  #app.atlas-board:has(.hand-solo) :is(.slot, .slot-confirm) { min-height: clamp(164px, 29dvh, 262px); }
-  #app.atlas-board:has(.hand-solo) .slot { width: clamp(46px, 6.4dvh, 60px); }
+/* Y ese hueco no se queda en blanco: las cartas ya colocadas crecen con él, así el
+   grabado y la fecha se leen sin tocar el zoom.
+
+   La medida sale de `dvh` y nunca de una media query de alto: Safari en el iPhone las
+   resuelve con la ventana pequeña —barras desplegadas—, y por eso una pantalla con
+   sitio de sobra se quedaba con la mesa de un móvil corto.
+
+   Y sale de una resta, no de un porcentaje: lo que rodea a la línea (barra, cabecera,
+   vidas, rótulo, zoom, mano y botón de confirmar) ocupa lo mismo en un móvil largo que
+   en uno bajito, así que el hueco disponible es la altura menos esa cantidad fija. Un
+   porcentaje de la pantalla se pasaría de largo justo en los móviles donde no cabe. El
+   suelo de cada `clamp` es la mesa compacta de siempre, que es lo que se queda en una
+   pantalla corta; el techo evita una carta desproporcionada en una tableta estrecha. */
+@media (min-width: 381px) and (max-width: 699px) {
+  /* La mano repartida entre varias personas ocupa el doble de alto que la de una sola
+     carta, así que a la mesa compartida le quedan unos cien píxeles menos. */
+  #app.atlas-board { --atlas-card: clamp(142px, calc(100dvh - 610px), 218px); }
+  #app.atlas-board:has(.hand-solo) { --atlas-card: clamp(142px, calc(100dvh - 504px), 316px); }
+  #app.atlas-board .timeline-card { width: max(112px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
+  #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: max(76px, calc(var(--atlas-card) * .66 - 18px)); }
+  #app.atlas-board :is(.slot, .slot-confirm) { min-height: var(--atlas-card); }
+  #app.atlas-board .slot { width: max(46px, calc(var(--atlas-card) * .2)); }
   #app.atlas-board:has(.hand-solo) .timeline-card h3 { font-size: clamp(.76rem, 1.12dvh, .92rem); }
   #app.atlas-board:has(.hand-solo) .timeline-card .year { font-size: clamp(1rem, 1.5dvh, 1.22rem); }
-}
-@media (min-width: 381px) and (max-width: 699px) and (min-height: 800px) {
-  #app.atlas-board .timeline-card { width: clamp(124px, 16dvh, 152px); min-height: clamp(164px, 22.5dvh, 212px); }
-  #app.atlas-board .timeline-card .card-visual { height: clamp(98px, 13.6dvh, 128px); }
-  #app.atlas-board :is(.slot, .slot-confirm) { min-height: clamp(164px, 22.5dvh, 212px); }
-  #app.atlas-board .slot { width: clamp(46px, 5.6dvh, 54px); }
-  #app.atlas-board:has(.hand-solo) .timeline-card { width: clamp(124px, 24dvh, 210px); min-height: clamp(164px, 33dvh, 292px); }
-  #app.atlas-board:has(.hand-solo) .timeline-card .card-visual { height: clamp(98px, 21dvh, 186px); }
-  #app.atlas-board:has(.hand-solo) :is(.slot, .slot-confirm) { min-height: clamp(164px, 33dvh, 292px); }
-  #app.atlas-board:has(.hand-solo) .slot { width: clamp(46px, 6.4dvh, 60px); }
 }
 
 /* Portadas impresas en el papel: el alfa deja ver el fondo real en los cuatro bordes. */
@@ -765,11 +767,11 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app.atlas-board .hand-solo { grid-template-columns: minmax(0,320px); }
   #app.atlas-board .hand-solo .hand-card { min-height: 144px !important; }
 }
-/* En una pantalla alta la carta de la mano también sube: debajo de ella quedaba una
-   franja de papel hasta el botón de confirmar. */
-@media (min-width: 381px) and (max-width: 699px) and (min-height: 741px) {
+/* La carta de la mano sube con la pantalla por la misma razón: debajo de ella quedaba
+   una franja de papel hasta el botón de confirmar. */
+@media (min-width: 381px) and (max-width: 699px) {
   #app.atlas-board .hand-solo { grid-template-columns: minmax(0,340px); }
-  #app.atlas-board .hand-solo .hand-card { min-height: clamp(144px, 19dvh, 190px) !important; }
+  #app.atlas-board .hand-solo .hand-card { min-height: clamp(132px, 18dvh, 186px) !important; }
 }
 #app .collection-decks .game-row { grid-template-columns: minmax(0,1fr) 64px; column-gap: 12px; }
 #app .collection-decks .game-row > :not(.deck-preview) { grid-column: 1; }
