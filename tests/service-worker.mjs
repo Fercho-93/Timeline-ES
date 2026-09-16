@@ -86,6 +86,19 @@ console.log("\nService worker");
   const cachedAssets = new Set(sw.precargas.map(request => request.url));
   const animalesPrecargados = animalAssets.filter(file => cachedAssets.has(file));
   ok(`las ${animalAssets.length} ilustraciones de animales NO se precargan al instalar${animalesPrecargados.length ? ` (se coló ${animalesPrecargados.join(", ")})` : ""}`, !animalesPrecargados.length);
+  // Lo mismo con las seis canciones —27 MB de un ajuste que viene apagado—: instalar no
+  // las baja, pero quedan guardadas para poder sonar sin conexión.
+  const musica = Array.from({ length: 6 }, (unused, i) => `./assets/audio/v${i + 1}.mp3`);
+  ok("las seis canciones NO se precargan al instalar", musica.every(file => !cachedAssets.has(file)));
+  let activada;
+  sw.listeners.activate({ waitUntil: tarea => { activada = tarea; } });
+  await activada;
+  // La descarga va aparte del `waitUntil`: activar no puede quedarse esperando 27 MB,
+  // porque mientras tanto las peticiones de la página no se atienden.
+  ok("activar no espera a que baje la música", sw.guardado.get(musica[5]) === undefined);
+  for (let i = 0; i < 8; i++) await espera();
+  ok("y la música se guarda al activar la versión", musica.every(file => sw.guardado.get(file)?.cuerpo === `${file} del servidor`));
+  ok("activar solo va a la red a por la música", sw.peticiones.every(url => musica.includes(url)));
 }
 {
   const sw = arrancar();
