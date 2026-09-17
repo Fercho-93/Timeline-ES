@@ -6,6 +6,7 @@
   app.dataset.device = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1) ? "ios" : app.dataset.platform;
   const toast = document.getElementById("toast");
   const MODE_STORAGE_KEY = "hilo-selected-mode-v1";
+  const VIEW_STORAGE_KEY = "continuum-tab-view-v1";
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
@@ -27,6 +28,7 @@
     navigatingBack = false;
     previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, format: formatOpen, tournament: pendingTournament, collectionOpen, collectionDetails, homeDestination, profileReturn};
     lastPaintedScreen = screen;
+    rememberView();
     const sceneMode = screen === "enciclopedia" && encMode !== "all" ? encMode : selectedModeKey;
     CT.Scene.apply(sceneMode, screen);
     CT.paint(app, html, screen);
@@ -61,6 +63,45 @@
       });
     }
   };
+  // Solo una ruta y preferencias de navegación, nunca HTML ni estado de una jugada.
+  // sessionStorage mantiene independiente cada pestaña y sobrevive a una recarga.
+  function rememberView() {
+    try {
+      sessionStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({screen, mode: selectedModeKey,
+        block: selectedBlockKey, format: formatOpen, collectionOpen, collectionDetails,
+        homeDestination, profileReturn, soloKind: solo?.kind}));
+    } catch { /* El bloqueo del almacenamiento no impide jugar. */ }
+  }
+  function restoreView() {
+    let view;
+    try { view = JSON.parse(sessionStorage.getItem(VIEW_STORAGE_KEY)); } catch { return false; }
+    if (!view || !CT.has(view.mode)) return false;
+    const routes = {'home': home, 'play-menu': playMenu, 'solo-home': soloHome,
+      'competition-menu': competitionMenu, 'perfil': perfilView};
+    // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
+    if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
+    if (!routes[view.screen]) return false;
+    setMode(view.mode);
+    if (CT.hasBlock(view.block)) selectedBlockKey = view.block;
+    formatOpen = ['multi', 'competition-multi'].includes(view.format) ? view.format : null;
+    collectionOpen = view.collectionOpen === true;
+    collectionDetails = view.collectionDetails === true;
+    homeDestination = view.homeDestination === 'collection' ? 'collection' : 'home';
+    profileReturn = ['play-menu','solo-home'].includes(view.profileReturn) ? view.profileReturn : 'home';
+    if (view.screen === 'perfil') screen = 'perfil';
+    routes[view.screen]();
+    return true;
+  }
+  function resumeSolo() {
+    solo = loadSolo();
+    if (solo) cardsById = new Map(solo.savedDeck.map(card => [card.id, card]));
+    pendingIndex = null;
+    if (!solo) soloHome();
+    else if (solo.pendingResult) {
+      result = {correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true};
+      soloResult();
+    } else { result = null; soloView(); }
+  }
   // Y las capas se abren como diálogos: foco dentro, tabulador atrapado, Escape cierra.
   // `cerrable` distingue las capas que se pueden descartar —las reglas, el menú— de las
   // que son un paso obligado de la jugada, donde Escape no debe hacer nada.
@@ -2240,7 +2281,7 @@
     else if (action === "start-duel") { guardaNombreSiLoHay(); startSolo("duel"); }
     else if (action === "accept-duel") acceptDuel();
     else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
-    else if (action === "resume-solo") { solo = loadSolo(); if (solo) cardsById = new Map(solo.savedDeck.map(card => [card.id, card])); pendingIndex = null; if (!solo) soloHome(); else if (solo.pendingResult) { result = { correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true }; soloResult(); } else { result = null; soloView(); } }
+    else if (action === "resume-solo") resumeSolo();
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();
@@ -2341,5 +2382,5 @@
     const leido = CT.Duelo.descodificar(duelPayload);
     if (leido.ok) { pendingDuel = leido.duelo; duelIntro(); }
     else duelInvalido(leido.motivo);
-  } else home();
+  } else if (!restoreView()) home();
 })();
