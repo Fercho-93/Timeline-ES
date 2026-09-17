@@ -145,7 +145,7 @@ console.log("\nUn enlace roto no rompe nada");
     ["con un número desmesurado de cartas", cruda(w, "1|history|abc|9999|0|" + "0".repeat(9999) + "|" + D.huella("history") + "|Ana")],
     ["con una semilla rara", cruda(w, "1|history|../etc|3|2|110|" + D.huella("history") + "|Ana")],
     ["de un mazo que no existe", cruda(w, "1|inventado|abc|3|2|110|x|Ana")],
-    ["de una versión futura", cruda(w, "2|history|abc|3|2|110|" + D.huella("history") + "|Ana")]
+    ["de una versión futura", cruda(w, "9|history|abc|3|2|110|" + D.huella("history") + "|Ana")]
   ];
   for (const [nombre, payload] of casos) {
     let resultado;
@@ -154,7 +154,7 @@ console.log("\nUn enlace roto no rompe nada");
     ok(`un enlace ${nombre} se rechaza sin excepción`, resultado.ok === false && !resultado.excepcion);
   }
   ok("un mazo desconocido se distingue de un enlace roto", D.descodificar(cruda(w, "1|inventado|abc|3|2|110|x|Ana")).motivo === "mazo");
-  ok("una versión futura también", D.descodificar(cruda(w, "2|history|abc|3|2|110|x|Ana")).motivo === "version");
+  ok("una versión futura también", D.descodificar(cruda(w, "9|history|abc|3|2|110|x|Ana")).motivo === "version");
 }
 
 function cruda(w, texto) {
@@ -277,7 +277,7 @@ console.log("\nUn enlace que no vale se explica y no rompe la aplicación");
 
   const w = boot();
   const D = w.CONTINUUM.Duelo;
-  const futuro = cruda(w, "2|history|abc|3|2|110|" + D.huella("history") + "|Ana");
+  const futuro = cruda(w, "9|history|abc|3|2|110|" + D.huella("history") + "|Ana");
   const conVersion = boot({ url: `https://hilo.test/?duelo=${futuro}` });
   ok("un enlace de una versión más nueva pide actualizar", /Actualiza la aplicación/.test(texto(conVersion)));
 }

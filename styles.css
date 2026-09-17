@@ -1005,6 +1005,32 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .duel-row i { width: 15px; height: 15px; border-radius: 3px; border: 1px solid var(--accent); }
 .duel-row i.ok { background: var(--accent); }
 .duel-row i.ko { background: transparent; opacity: .45; }
+/* El duelo de cifras puntúa por tramos, así que su cuadrícula tiene un estado más: la
+   carta que se acercó sin clavarla. Y uno aparte para la que se cerró al salir de la
+   aplicación, que no es lo mismo que fallarla. */
+.duel-row i.mid { background: color-mix(in srgb, var(--accent) 45%, transparent); }
+.duel-row i.out { background: var(--ink); border-color: var(--ink); opacity: .55; }
+
+/* La carta a contrarreloj: el tiempo arriba, la pregunta en medio y la cifra abajo, sin
+   nada más alrededor que distraiga durante diez segundos. */
+.cifra-panel { display: grid; gap: 14px; max-width: 460px; margin: 6px auto 0; }
+.cifra-rival { grid-template-columns: 1fr; margin-bottom: 2px; }
+.cifra-clock { display: flex; align-items: center; gap: 10px; }
+.cifra-bar { flex: 1; height: 10px; border: 0; border-radius: 999px; overflow: hidden; background: var(--line); appearance: none; }
+.cifra-bar::-webkit-progress-bar { background: var(--line); border-radius: 999px; }
+.cifra-bar::-webkit-progress-value { background: var(--accent); border-radius: 999px; transition: width .1s linear; }
+.cifra-bar::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
+.cifra-bar.cifra-apura::-webkit-progress-value { background: var(--accent-solid); }
+.cifra-bar.cifra-apura::-moz-progress-bar { background: var(--accent-solid); }
+.cifra-left { min-width: 3ch; font-variant-numeric: tabular-nums; font-size: .95rem; text-align: right; }
+.cifra-card { padding: 20px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); text-align: center; }
+.cifra-card strong { display: block; margin: 8px 0 6px; font-size: clamp(1.25rem, 5vw, 1.7rem); line-height: 1.25; }
+.cifra-card span { display: block; color: var(--muted); font-size: .9rem; }
+.cifra-field input { font-size: 1.3rem; font-variant-numeric: tabular-nums; text-align: center; }
+.cifra-aviso { text-align: center; }
+.cifra-puntos { margin-top: 10px; font-size: 1.05rem; }
+.cifra-puntos b { font-size: 1.5rem; color: var(--accent-dark); }
+@media (prefers-reduced-motion: reduce) { .cifra-bar::-webkit-progress-value { transition: none; } }
 
 /* Los logros recién desbloqueados, en la pantalla de fin de partida: se enseñan una vez
    y en el sitio donde ya se está mirando el resultado. */
