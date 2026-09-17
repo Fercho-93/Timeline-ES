@@ -106,10 +106,15 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("el Pulso se explica fuera de solitario", /Pulso/.test(conPulso) && /Los dos colocáis/.test(conPulso));
   ok("y la guía dice si está en juego o no", /en juego/.test(conPulso) && /opcional/.test(w.CONTINUUM.guideMarkup("history", "local", { pulse: false })));
   ok("los tres pasos de una jugada están numerados", [1, 2, 3].every(n => new RegExp(`gs-num[^>]*>${n}<`).test(conPulso)));
-  ok("la demostración usa cartas de verdad del mazo", /gd-play/.test(conPulso) && /Fecha oculta/.test(conPulso));
+  ok("la primera colocación usa cartas de verdad del mazo", /data-guide-practice/.test(conPulso) && /Fecha oculta/.test(conPulso));
+  ok("la colocación ofrece tres huecos interactivos", (conPulso.match(/data-guide-place=/g)||[]).length === 3);
   ok("el reto diario se explica en solitario", /reto diario/i.test(w.CONTINUUM.guideMarkup("history", "solo")));
   ok("la competición explica sus rondas", /cinco cartas/i.test(w.CONTINUUM.guideMarkup("history", "competition")));
   ok("la guía online explica al anfitrión", /anfitrión/i.test(w.CONTINUUM.guideMarkup("history", "online")));
+  click(w,'[data-guide-place="1"]');
+  ok("acertar la práctica revela el valor", !el(w,'[data-guide-value]').hidden && /Exacto/.test(el(w,'[data-guide-feedback]').textContent));
+  click(w,'[data-guide-reset]');
+  ok("la práctica se puede repetir", el(w,'[data-guide-value]').hidden && !el(w,'[data-guide-place="0"]').disabled);
 }
 {
   const w = boot();

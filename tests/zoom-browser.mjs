@@ -37,6 +37,18 @@ try {
     if(width===414) {
       await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
+      await page.locator('[data-action="rules"]').click();
+      await page.locator('[data-guide-place="1"]').click();
+      assert.ok(await page.locator('.guide-practice.is-correct').count(),'la guía permite completar la primera colocación');
+      await page.screenshot({path:`test-results/zoom/${engine}-guia-interactiva.png`,fullPage:true});
+      await page.locator('.guide-close').click();
+      await page.locator('[data-settings-action="open"]').click();
+      await page.locator('#ajuste-tema').selectOption('night');
+      await page.locator('#ajuste-texto').selectOption('150');
+      assert.equal(await page.locator('[data-look-preview]').getAttribute('data-preview-theme'),'night');
+      assert.equal(await page.locator('html').getAttribute('data-theme'),null,'la muestra no aplica el tema antes de confirmar');
+      await page.screenshot({path:`test-results/zoom/${engine}-ajustes-muestra.png`,fullPage:true});
+      await page.locator('.settings-close').click();
       await page.evaluate(()=>{
         for (const key of ['history','movies','animals','countries','languages']) {
           const card=window.CONTINUUM.cards(key).find(item=>window.CONTINUUM.cardArt(key,item));
@@ -160,6 +172,9 @@ try {
       }
       await page.locator('.atlas-final-page').waitFor();
       assert.ok(await page.locator('.atlas-final-fan .timeline-card').count()>0);
+      assert.ok(await page.locator('.final-metrics').count(),'el resultado abre con sus cifras clave');
+      const finalAction=await page.locator('.final-actions .btn-primary').first().boundingBox();
+      assert.ok(finalAction && finalAction.y<height,'la acción principal asoma sin tener que recorrer el texto');
       await page.waitForTimeout(1500);
       await page.screenshot({path:`test-results/zoom/${engine}-final-atlas.png`,fullPage:true});
       await page.close();
