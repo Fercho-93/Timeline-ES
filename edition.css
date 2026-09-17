@@ -1042,7 +1042,10 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 .board-progress span:empty { display: none; }
 #app.atlas-board .atlas-hand-section { margin-top: 4px; }
 .drag-card-preview > strong { font-size: .78rem; padding-right: 0; line-height: 1.16; hyphens: none; overflow-wrap: normal; }
-#app.atlas-board .hand-solo .hand-card strong { font-size: clamp(.68rem,2.8vw,.84rem); padding-right: 0; line-height: 1.12; hyphens: none; overflow-wrap: normal; }
+#app.atlas-board[data-platform][data-screen] .hand-solo .hand-card > strong {
+  font-size: clamp(.66rem,2.65vw,.78rem); padding-right: 0; line-height: 1.12;
+  -webkit-hyphens: none; hyphens: none; overflow-wrap: normal; word-break: normal;
+}
 
 /* El zoom comparte cabecera con la línea: el espacio recuperado es para el grabado. */
 #app.atlas-board .hand-title.timeline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0 6px; }
