@@ -27,6 +27,12 @@ const click = (w, sel) => {
 };
 const existe = (w, sel) => !!w.document.querySelector(sel);
 const texto = w => w.document.body.textContent;
+const colocaHistoriaBien = w => {
+  const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+  const cards = new Map([...w.HISTORY_CARDS].map(card => [card.id, card]));
+  const at = w.CONTINUUM.correctIndex("history", estado.timeline.map(id => cards.get(id)), cards.get(estado.current));
+  click(w, `[data-action="solo-place"][data-index="${at}"]`);
+};
 
 // El solitario, como cualquier otro formato, se elige ahora desde el menú de un mazo
 // concreto (`playMenu`), al que se llega desplegando su bloque en la portada.
@@ -243,11 +249,11 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
     animaciones.push({ elemento: this, frames, timing });
     return { finished: new Promise(() => {}), cancel() {} };
   };
-  const llegadas = () => animaciones.filter(a => a.elemento.classList?.contains("timeline-card") && /translate3d/.test(a.frames[0].transform));
+  const llegadas = () => animaciones.filter(a => a.elemento.classList?.contains("timeline-card") && /translate3d\([^,]+,\s*-/.test(a.frames[0].transform));
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
-  click(w, '[data-action="solo-place"]');
+  colocaHistoriaBien(w);
   click(w, '[data-action="confirm-place"]');
   ok("en Normal el tablero coloca una carta por turno", /incorporado/.test(texto(w)) === false);
   click(w, '[data-action="solo-next"]');
@@ -272,7 +278,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
     return { left: 40, top: 60, width: 150, height: 220, right: 190, bottom: 280, x: 40, y: 60 };
   };
   w.Element.prototype.animate = function (frames, timing) {
-    if (this.classList?.contains("timeline-card") && /translate3d/.test(frames[0].transform)) animaciones.push({ elemento: this, frames, timing });
+    if (this.classList?.contains("timeline-card") && /translate3d\([^,]+,\s*-/.test(frames[0].transform)) animaciones.push({ elemento: this, frames, timing });
     return { finished: new Promise(() => {}), cancel() {} };
   };
   // La vista se mueve escribiendo en el desplazamiento de la tira. Se anota en el
@@ -285,7 +291,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
-  click(w, '[data-action="solo-place"]');
+  colocaHistoriaBien(w);
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
@@ -293,7 +299,9 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   const segunda = w.document.querySelectorAll(".timeline-card")[1];
   ok("la que espera su turno no está puesta todavía", [...w.document.querySelectorAll(".timeline-card")].some(c => c.style.visibility === "hidden"));
   ok("y la vista ya se ha movido hasta la primera", seguidas.length >= 1);
-  await new Promise(resolve => w.setTimeout(resolve, 800));
+  // Tras el segundo extra solicitado antes de que actúe la IA, la segunda carta
+  // empieza su llegada algo después de los dos segundos desde «Siguiente carta».
+  await new Promise(resolve => w.setTimeout(resolve, 1100));
   ok("la segunda llega después, con la vista detrás", animaciones.length === 2 && seguidas.length >= 2);
   ok("y ninguna se queda escondida al terminar", ![...w.document.querySelectorAll(".timeline-card")].some(c => c.style.visibility === "hidden"));
   w.close();
@@ -306,11 +314,11 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   w.Element.prototype.getBoundingClientRect = function () {
     return { left: 40, top: 60, width: 150, height: 220, right: 190, bottom: 280, x: 40, y: 60 };
   };
-  w.Element.prototype.animate = function (frames) { if (/translate3d/.test(frames[0].transform)) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
+  w.Element.prototype.animate = function (frames) { if (/translate3d\([^,]+,\s*-/.test(frames[0].transform)) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
-  click(w, '[data-action="solo-place"]');
+  colocaHistoriaBien(w);
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
@@ -322,11 +330,11 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   // En Fácil no hay cartas automáticas, así que tampoco hay nada que ver llegar.
   const w = boot({ "continuum-difficulty-v1": "easy" });
   const animaciones = [];
-  w.Element.prototype.animate = function (frames) { if (/translate3d/.test(frames[0].transform)) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
+  w.Element.prototype.animate = function (frames) { if (/translate3d\([^,]+,\s*-/.test(frames[0].transform)) animaciones.push(this); return { finished: new Promise(() => {}), cancel() {} }; };
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');
-  click(w, '[data-action="solo-place"]');
+  colocaHistoriaBien(w);
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));

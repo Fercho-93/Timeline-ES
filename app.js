@@ -98,7 +98,10 @@
     pendingIndex = null;
     if (!solo) soloHome();
     else if (solo.pendingResult) {
-      result = {correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true};
+      result = {
+        correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true,
+        attemptedIndex: solo.pendingResult.attemptedIndex, correctIndex: solo.pendingResult.correctIndex
+      };
       soloResult();
     } else { result = null; soloView(); }
   }
@@ -456,6 +459,23 @@
     window.scrollTo(0, 0);
   }
 
+  // La carátula no desaparece entre la colección y el mazo: en navegadores con
+  // View Transitions viaja hasta convertirse en la cabecera. En los demás, y con
+  // movimiento reducido, la navegación conserva exactamente el comportamiento normal.
+  function openMode(modeKey, source) {
+    const render = () => { setMode(modeKey); collectionOpen = true; collectionDetails = true; playMenu(); };
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const cover = source?.closest('.collection-entry')?.querySelector('.gallery-panel .panel-art img');
+    if (!document.startViewTransition || reduce || !cover) { render(); return; }
+    cover.style.viewTransitionName = 'continuum-deck-cover';
+    document.documentElement.classList.add('deck-cover-transition');
+    const transition = document.startViewTransition(render);
+    transition.finished.finally(() => {
+      cover.style.viewTransitionName = '';
+      document.documentElement.classList.remove('deck-cover-transition');
+    }).catch(() => {});
+  }
+
   // Compartida con el diagnóstico de más abajo: es la misma búsqueda, una sola vez.
   async function cacheVersion() {
     return CT.APP_VERSION;
@@ -744,7 +764,10 @@
     game.timeline = played.timeline; game.deck = played.deck; game.discard = played.discard;
     if (played.drawnCardId != null) CT.Powers.claim(game, played.drawnCardId, player.id, game.deck);
     if (!correct) (game.failed = game.failed || []).push(selectedCardId);
-    result = { correct, returned, card, playerName: player.name };
+    result = {
+      correct, returned, card, playerName: player.name, attemptedIndex: index,
+      correctIndex: correct ? null : CT.correctIndex(selectedModeKey, game.timeline.map(id => cardsById.get(id)), card)
+    };
     CT.Effects.feedback(correct);
     selectedCardId = null;
     // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
@@ -969,7 +992,7 @@
       return;
     }
     const desenlace = `<p>${correct ? "La carta se queda en la línea temporal." : returned ? "No quedan cartas que robar, así que esta vuelve a tu mano." : "La carta va al descarte y has robado una nueva."}</p>`;
-    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal"><div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}${desenlace}<button class="btn btn-primary btn-block" data-dialog-focus data-action="finish-turn">Terminar turno <span>→</span></button></div></div>`);
   }
 
   // Las cuatro salidas del duelo, contadas desde la mesa y no desde nadie en concreto.
@@ -1684,9 +1707,12 @@
     // hace falta para dibujar la cuadrícula de aciertos al compartir el reto diario.
     (solo.sequence = solo.sequence || []).push(correct);
     pendingIndex = null;
-    result = { correct, card, solo: true };
+    result = {
+      correct, card, solo: true, attemptedIndex: index,
+      correctIndex: correct ? null : CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)
+    };
     CT.Effects.feedback(correct);
-    solo.pendingResult = { correct, cardId: card.id };
+    solo.pendingResult = { correct, cardId: card.id, attemptedIndex: result.attemptedIndex, correctIndex: result.correctIndex };
     anotaLogros(CT.Progreso.record({ mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() }));
     saveSolo();
     soloResult();
@@ -1698,7 +1724,7 @@
     const era = eraForCard(card);
     const acabada = soloAcabada();
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
@@ -2213,7 +2239,7 @@
     else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "smooth" }); }
     else if (action === "home-encyclopedia") openEnciclopedia("all");
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
-    else if (action === "set-mode") { setMode(target.dataset.mode); collectionOpen = true; collectionDetails = true; playMenu(); }
+    else if (action === "set-mode") openMode(target.dataset.mode, target);
     else if (action === "set-block") {
       const sameOpenBlock = collectionOpen && target.dataset.block === selectedBlockKey;
       if (sameOpenBlock) {

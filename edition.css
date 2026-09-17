@@ -1111,3 +1111,105 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="sepia"]) #app .play-menu-shell .atlas-intro h1 { color: var(--edition-ink); }
 }
+
+/* Botones como piezas de papel prensado: un canto fino, contacto con la mesa y una
+   respuesta corta al dedo. Conservan la tinta propia de cada acción. */
+#app :is(.btn, .play-block-toggle, .play-choice, .game-row, .solo-fold > summary, .comp-promo) {
+  border-color: color-mix(in srgb, var(--edition-brass) 42%, var(--edition-line));
+  box-shadow: inset 0 1px 0 #fff8, 0 1px 0 #9a74484a, 0 4px 10px #49331d12;
+}
+#app .btn-primary { border: 1px solid color-mix(in srgb, var(--scene-color) 72%, #f2d89d); }
+@media (prefers-reduced-motion: no-preference) {
+  #app :is(.btn, .play-block-toggle, .play-choice, .game-row, .solo-fold > summary, .comp-promo) {
+    transition: transform 120ms ease-out, box-shadow 120ms ease-out, border-color 180ms ease;
+  }
+  #app :is(.btn, .play-block-toggle, .play-choice, .game-row, .solo-fold > summary, .comp-promo):active {
+    transform: translateY(2px) scale(.995);
+    box-shadow: inset 0 2px 4px #5a3c1717, 0 1px 1px #49331d18;
+  }
+}
+
+/* La portada elegida continúa hasta la cabecera de su mazo. */
+#app .play-menu-shell .atlas-landscape img { view-transition-name: continuum-deck-cover; }
+.deck-cover-transition .book-turn { display: none; }
+::view-transition-group(continuum-deck-cover) { animation-duration: 680ms; animation-timing-function: cubic-bezier(.2,.72,.2,1); }
+::view-transition-old(continuum-deck-cover), ::view-transition-new(continuum-deck-cover) { mix-blend-mode: normal; }
+
+/* La mesa tiene fibra, luz cálida y una incisión doble bajo la cronología. */
+#app.atlas-board {
+  background:
+    radial-gradient(ellipse at 48% 28%, #fff4cf70 0 16%, transparent 58%),
+    repeating-linear-gradient(4deg, transparent 0 7px, #74502c08 7px 8px),
+    repeating-linear-gradient(94deg, transparent 0 29px, #fff8e414 29px 30px),
+    var(--edition-paper);
+}
+#app.atlas-board > .shell > section:has(.timeline-wrap) {
+  position: relative; padding: 8px 6px 5px; border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--board-brass) 18%, transparent);
+  background: radial-gradient(ellipse at 50% 0%, #fff8df5c, transparent 74%);
+  box-shadow: inset 0 1px 0 #fff8, inset 0 -10px 24px #6e4d2910;
+}
+#app.atlas-board .timeline-wrap {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 11px, #000 calc(100% - 11px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 11px, #000 calc(100% - 11px), transparent);
+}
+#app.atlas-board .timeline {
+  position: relative;
+  background:
+    linear-gradient(#fff8e799,#fff8e799) center calc(50% - 1px) / 100% 1px no-repeat,
+    linear-gradient(#8a673e78,#8a673e78) center calc(50% + 1px) / 100% 1px no-repeat;
+}
+
+/* Al elegirla, el papel se despega de la mesa y la esquina inferior se curva. */
+#app.atlas-board .hand .hand-card.selected {
+  transform: translateY(-6px) rotate(-.35deg);
+  box-shadow: 0 2px 0 #b78f5f, 0 13px 22px #3d271c2d, inset 0 1px 0 #fff9e7;
+}
+#app.atlas-board .hand .hand-card.selected::before {
+  content: ''; display: block; position: absolute; z-index: 4; left: 0; bottom: 0;
+  width: 29px; height: 29px; pointer-events: none;
+  background: linear-gradient(35deg, #9c744244 0 46%, #fff8e9 49% 70%, #c5a36c 73%);
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  filter: drop-shadow(3px -3px 3px #5037192a);
+}
+
+/* Al acercar una carta, el hueco enseña solo su volumen: no revela el resultado. */
+#app.atlas-board .slot.drop-target::before {
+  content: ''; position: absolute; z-index: 0; inset: 8px 5px; border-radius: 9px;
+  border: 1px solid #a9823c88;
+  background: repeating-linear-gradient(135deg,#c5a25d18 0 5px,transparent 5px 10px),#fff8e52b;
+  box-shadow: 0 7px 14px #4b321825; transform: translateY(-5px) rotate(-1deg);
+  pointer-events: none;
+}
+#app.atlas-board .slot.drop-target > * { position: relative; z-index: 1; }
+
+/* Una onda recorre la incisión cuando la carta encaja; el error usa terracota. */
+.timeline-ink-wave {
+  position: absolute; z-index: 5; top: 50%; width: 76px; height: 7px; margin: -3px 0 0 -38px;
+  border-radius: 50%; pointer-events: none; transform-origin: center;
+  background: radial-gradient(ellipse, #9c783bc4 0 9%, #c69c4f80 25%, transparent 66%);
+  animation: timeline-ink-spread 980ms cubic-bezier(.12,.65,.2,1) both;
+}
+.timeline-ink-wave.ink-error { background: radial-gradient(ellipse, #9a4c32c9 0 9%, #b66d4d75 25%, transparent 66%); }
+@keyframes timeline-ink-spread {
+  0% { opacity: 0; transform: scaleX(.12) scaleY(.5); filter: blur(1px); }
+  22% { opacity: .9; }
+  100% { opacity: 0; transform: scaleX(6.5) scaleY(1.5); filter: blur(3px); }
+}
+.slot-correct.correction-target { animation: correction-slot-pulse 900ms ease-out both; }
+@keyframes correction-slot-pulse { 35% { background: #ad6a4933; box-shadow: inset 0 0 0 3px #fff7dc, 0 0 22px #9b4f3640; } }
+.placement-correction-card {
+  position: fixed; z-index: 80; left: 0; top: 0; width: 126px; min-height: 78px; box-sizing: border-box;
+  display: grid; align-content: center; gap: 3px; padding: 9px 10px; border: 1px solid #b88d4d;
+  border-radius: 9px; color: var(--edition-ink); background: #f6ead0;
+  box-shadow: 0 16px 30px #36210d35, inset 0 0 0 3px #fff8e9; pointer-events: none;
+}
+.placement-correction-card small { color: #944e35; font: 600 .52rem/1.2 var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
+.placement-correction-card b { font: 600 .72rem/1.15 var(--font-display,Georgia); }
+.placement-correction-card span { color: #93482e; font: 700 .78rem/1 var(--font-display,Georgia); }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(continuum-deck-cover) { animation: none; }
+  .timeline-ink-wave { animation: none; display: none; }
+  .slot-correct.correction-target { animation: none; }
+}

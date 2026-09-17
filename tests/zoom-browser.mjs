@@ -110,6 +110,23 @@ try {
       assert.ok(await hiddenAI.count()>0,'la espera dura más de medio segundo');
       await page.waitForFunction(()=>!document.querySelector('.shell').inert);
       await page.waitForTimeout(800);
+      // Un fallo enseña el destino real sobre el tablero antes del resultado.
+      const wrong=await page.evaluate(()=>{
+        const cards=new Map(window.HISTORY_CARDS.map(c=>[c.id,c]));
+        const board=[...document.querySelectorAll('.timeline .timeline-card')].map(el=>cards.get(Number(el.dataset.id)));
+        const card=cards.get(Number(document.querySelector('.hand-card').dataset.id));
+        const right=window.CONTINUUM.correctIndex('history',board,card);
+        return right===0 ? board.length : 0;
+      });
+      await page.locator(`[data-action="solo-place"][data-index="${wrong}"]`).click();
+      await page.locator('[data-action="confirm-place"]').click();
+      await page.locator('.placement-correction-card').waitFor({state:'visible',timeout:800});
+      assert.ok(await page.locator('.slot-correct.correction-target').count()>0,'el hueco correcto se señala tras confirmar el fallo');
+      await page.screenshot({path:`test-results/zoom/${engine}-correccion-error.png`});
+      await page.locator('.modal').waitFor({state:'visible',timeout:2500});
+      assert.equal(await page.locator('.placement-correction-card').count(),0,'la explicación se retira antes de abrir el resultado');
+      await page.locator('[data-action="solo-next"]').click();
+      if(await page.locator('.shell[inert]').count()) await page.waitForFunction(()=>!document.querySelector('.shell').inert);
       // Completar la partida permite revisar el abanico y la página de resultados reales.
       for(let turn=0;turn<8 && await page.locator('[data-action="solo-place"]').count();turn++) {
         const at=await page.evaluate(()=>{
