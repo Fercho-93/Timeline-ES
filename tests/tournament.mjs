@@ -41,6 +41,9 @@ for(let round=0;round<3;round++) {
  assert.equal(state().final.players.length,2);
  finishLocalFinal(w,key);
  assert.ok(w.document.querySelector('.tournament-board'));
+ assert.equal(w.document.querySelectorAll('.chapter-stop').length,3);
+ assert.equal(w.document.querySelectorAll('.chapter-stop.current').length,1);
+ assert.ok(w.document.querySelector('.final-metrics'),'el cierre resume el resultado antes de las acciones');
  assert.equal(state().tournament.index,round);
  const saved=w.localStorage.getItem(key);w.close();w=boot(saved);click('[data-action="competition-menu"]');click('[data-action="competition-resume"]');
  assert.ok(w.document.querySelector('.tournament-board'));
@@ -48,6 +51,7 @@ for(let round=0;round<3;round++) {
 }
 assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
 assert.match(w.document.querySelector('.tournament-board').textContent,/3 puntos/);
+assert.equal(w.document.querySelectorAll('.chapter-stop.complete').length,2);
 w.close();
 // Solitario conserva el mismo ciclo y respeta el número de cartas elegido.
 w=boot();click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';

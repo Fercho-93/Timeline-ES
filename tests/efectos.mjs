@@ -29,122 +29,36 @@ try {
   console.log('Efectos opcionales, fallo de audio y ampliación con retorno de foco: OK');
 } finally { w.close(); }
 
-// Render de las texturas en memoria y contrato del reproductor: volumen limitado,
-// liberación de voces y respeto del interruptor incluso durante resume().
-{
-  const w = new JSDOM('<main id="app"></main>', {runScripts:'outside-only',pretendToBeVisual:true}).window;
-  let enabled = false, time = 0, created = 0, resume;
-  const sources = [], gains = [], buffers = [];
-  w.performance.now = () => time;
-  w.CONTINUUM = {effectPrefs:()=>({sound:enabled,haptics:false})};
-  class Audio {
-    state = 'running'; sampleRate = 24000; currentTime = 0; destination = {};
-    constructor() { created++; }
-    createBuffer(channels, length) {
-      const data = new Float32Array(length);
-      const buffer = {getChannelData:()=>data}; buffers.push(data); return buffer;
-    }
-    createBufferSource() {
-      const source = {connect(){},disconnect(){this.disconnected=true;},start(at){this.at=at;}};
-      sources.push(source); return source;
-    }
-    createGain() { const gain={gain:{value:0},connect(){},disconnect(){this.disconnected=true;}}; gains.push(gain); return gain; }
-    resume() { return new Promise(resolve=>{resume=resolve;}); }
-  }
-  w.AudioContext = Audio;
-  w.eval(read('effects.js'));
-  try {
-    const effects = w.CONTINUUM.Effects;
-    effects.feedback(true); effects.page(); effects.tap();
-    assert.equal(created,0,'silenciado no crea un contexto');
-    enabled=true;
-    effects.feedback(true); effects.feedback(true);
-    assert.equal(sources.length,2,'repetir el mismo aviso no acumula notas');
-    assert.equal(gains[0].gain.value,.24*.32,'los efectos usan el 32% de la ganancia anterior');
-    assert.equal(gains[1].gain.value,.19*.32);
-    assert.equal(sources[1].at,.13,'el acierto es una respuesta doble breve');
-    effects.feedback(false); effects.page(); effects.tap();
-    assert.equal(sources.length,5,'la navegación queda pendiente, no se superpone al resultado');
-    time=100; effects.feedback(true);
-    assert.equal(sources.length,6,'el número de voces simultáneas está limitado');
-    assert.equal(buffers.length,4,'las texturas se reutilizan');
-    assert.notDeepEqual(sources[0].buffer.getChannelData(0),sources[2].buffer.getChannelData(0),'acierto y fallo son distinguibles');
-    for(const samples of buffers) {
-      assert.ok(samples.every(Number.isFinite));
-      assert.ok(Math.max(...samples.map(Math.abs))<.4,'sin picos fuertes');
-      assert.equal(samples[0],0,'ataque sin clic inicial');
-      assert.ok(Math.abs(samples.at(-1))<.001,'final amortiguado');
-    }
-    sources.forEach(source=>source.onended());
-    assert.ok(sources.every(source=>source.disconnected) && gains.every(gain=>gain.disconnected),'se liberan los nodos');
-    time=300;
-    effects.transition('close'); effects.transition('open'); effects.page();
-    assert.equal(sources.length,6,'las transiciones esperan al desenlace de la acción');
-    await new Promise(resolve=>w.setTimeout(resolve,5));
-    assert.equal(sources.length,7,'cerrar, abrir y navegar generan una sola respuesta de página');
-    sources.at(-1).onended();
-    time=500;
-    effects.transition('open'); effects.feedback(true);
-    await new Promise(resolve=>w.setTimeout(resolve,5));
-    assert.equal(sources.length,9,'el resultado sustituye al sonido de apertura del diálogo');
-    sources.slice(-2).forEach(source=>source.onended());
-    time=700;
-    effects.transition('page'); enabled=false;
-    await new Promise(resolve=>w.setTimeout(resolve,5));
-    assert.equal(sources.length,9,'silenciar cancela también la transición pendiente');
-    effects.feedback(false);
-    assert.equal(sources.length,9,'silenciar impide nuevos sonidos');
-    enabled=true; time=900;
-    const details=w.document.createElement('details');details.className='solo-fold';details.innerHTML='<summary>Partida libre</summary>';
-    w.document.body.append(details);details.firstElementChild.click();
-    await new Promise(resolve=>w.setTimeout(resolve,5));
-    assert.equal(sources.length,10,'el despliegue nativo también tiene respuesta sonora');
-    sources.at(-1).onended();time=1100;details.firstElementChild.click();
-    await new Promise(resolve=>w.setTimeout(resolve,5));
-    assert.equal(sources.length,11,'plegar produce una sola respuesta');
-  } finally { w.close(); }
-}
-{
-  const w = new JSDOM('',{runScripts:'outside-only',pretendToBeVisual:true}).window;
-  let enabled=true, unlock, played=false;
-  w.CONTINUUM={effectPrefs:()=>({sound:enabled})};
-  w.AudioContext=function(){return {state:'suspended',resume:()=>new Promise(resolve=>{unlock=resolve;}),createBufferSource(){played=true;}};};
-  w.eval(read('effects.js'));
-  try {
-    w.CONTINUUM.Effects.feedback(true);
-    enabled=false; unlock(); await Promise.resolve(); await Promise.resolve();
-    assert.equal(played,false,'silenciar mientras se desbloquea el audio cancela el sonido pendiente');
-  } finally {w.close();}
-}
-console.log('Texturas de papel y madera, silencio, volumen y liberación de voces: OK');
-
-// Todos los módulos cargados: protege contra volver a registrar otro reproductor
-// genérico de clics además del que responde a las transiciones.
-{
+// Los efectos se han retirado, no solo silenciado con una preferencia nueva.
+// Un usuario que tenía sound:true tampoco debe crear contextos de audio.
+for (const savedSound of [false, true]) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
   w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});w.Element.prototype.scrollIntoView=()=>{};
-  const starts=[];
-  const param=()=>({value:1,setValueAtTime(){},exponentialRampToValueAtTime(){}});
-  w.AudioContext=function(){return {
-    state:'running',sampleRate:8000,currentTime:0,destination:{},
-    createBuffer(_channels,length){return {duration:length/8000,getChannelData:()=>new Float32Array(length)};},
-    createGain(){return {gain:param(),connect(){},disconnect(){}};},
-    createBiquadFilter(){return {frequency:param(),connect(){},disconnect(){}};},
-    createBufferSource(){return {playbackRate:param(),connect(){},disconnect(){},stop(){},start(){starts.push({duration:this.buffer.duration,rate:this.playbackRate.value});w.queueMicrotask(()=>this.onended?.());}};}
-  };};
+  w.localStorage.setItem('hilo-ajustes-v1',JSON.stringify({sound:savedSound,ambience:false,haptics:true}));
+  let contexts=0;
+  w.AudioContext=w.webkitAudioContext=function(){contexts++;throw Error('No debe crearse audio de efectos');};
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
-  w.CONTINUUM.effectPrefs=()=>({sound:true});
   try {
-    for(const [selector,rate] of [['[data-block="historia"]',1],['[data-mode="history"]',.85],['[data-action="solo"]',.85],['[data-action="back-menu"]',.7]]) {
-      starts.length=0;w.document.querySelector('#app '+selector).click();
-      await new Promise(resolve=>w.setTimeout(resolve,100));
-      assert.equal(starts.length,1,`${selector}: solo su transición, sin otro sonido genérico de clic`);
-      assert.equal(starts[0].rate,rate,'el regreso conserva su sentido sonoro');
+    assert.equal(w.CONTINUUM.effectPrefs().sound,false,'las preferencias antiguas no reactivan efectos');
+    for(const selector of ['[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
+      w.document.querySelector('#app '+selector).click();
     }
+    w.document.querySelector('[data-settings-action="open"]').click();
+    assert.equal(w.document.querySelector('[data-settings-action="sound"]'),null,'no queda un interruptor sin función');
+    assert.ok(w.document.querySelector('[data-settings-action="ambience"]'),'la música conserva su ajuste');
+    assert.ok(w.document.querySelector('[data-settings-action="haptics"]'),'la vibración conserva su ajuste');
+    // Ni siquiera otro módulo con preferencias antiguas puede hacerlos sonar.
+    w.CONTINUUM.effectPrefs=()=>({sound:true,haptics:false,ambience:false});
+    const effects=w.CONTINUUM.Effects;
+    effects.feedback(true);effects.feedback(false);effects.tap();effects.stamp();effects.page();effects.page(true);
+    for(const kind of ['page','back','unroll','expand','open','close','select','place','return','hover','flip','deal','turn','end','zoom','notice']) effects.transition(kind);
+    await new Promise(resolve=>w.setTimeout(resolve,20));
+    assert.equal(contexts,0,'todas las acciones y transiciones son silenciosas');
   } finally {w.close();}
 }
+console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibración: OK');
 
-// Recorridos reales: el sonido pertenece al cambio de estado, también con
+// Recorridos reales: los avisos internos conservan el cambio de estado, también con
 // movimiento reducido. Repintar la misma pantalla o tocar lo ya elegido es silencio.
 {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
@@ -193,7 +107,7 @@ console.log('Texturas de papel y madera, silencio, volumen y liberación de voce
     w.CONTINUUM.paint(app,'<div class="shell"><article class="final-card">Carta neutral</article><section class="final-results">Resultado</section></div>','final-local');has('flip');
     cues.length=0;
     w.CONTINUUM.paint(app,app.innerHTML,'final-local');assert.deepEqual(cues,[],'las cifras ya reveladas no vuelven a sonar');
-    console.log('Navegación, colecciones, diálogos, cartas, zoom, turnos y finales con sonido: OK');
+    console.log('Avisos internos de navegación, cartas, turnos y finales conservados: OK');
   } finally {w.close();}
 }
 

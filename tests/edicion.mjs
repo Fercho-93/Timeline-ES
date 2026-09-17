@@ -231,13 +231,15 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
       return { finished: new Promise(() => {}), cancel() { entry.cancelled = true; } };
     };
     click(w, '[data-block="historia"]');
+    click(w, '[data-mode="history"]');
+    assert.equal(w.document.querySelector('.book-turn'), null, 'el mazo entra con un fundido, sin hoja');
     const style = w.document.createElement('style');
     style.textContent = '#app .snapshot-probe { width: 28px; height: 28px; display: none; }';
     w.document.head.append(style);
     const probe = w.document.createElement('span');
     probe.className = 'snapshot-probe';
     w.document.getElementById('app').append(probe);
-    click(w, '[data-mode="history"]');
+    click(w, '[data-action="solo"]');
     const frozen = w.document.querySelector('.book-turn-copy .snapshot-probe');
     assert.equal(w.getComputedStyle(frozen).width, '28px', 'la hoja conserva tamaños que dependían de #app');
     assert.equal(w.getComputedStyle(frozen).display, 'none', 'un icono oculto no reaparece al girar la página');
@@ -248,7 +250,7 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     assert.equal(bends[1].frames[1].borderRadius, '0% 4% 32% 4%');
     assert.equal(w.document.querySelector('.book-turn').getAttribute('aria-hidden'), 'true');
     assert.equal(w.document.querySelector('.book-turn [id]'), null);
-    click(w, '#app [data-action="collection-back"]');
+    click(w, '#app [data-action="back-menu"]');
     assert.equal(turns[0].cancelled, true);
     assert.ok(bends.slice(0, 3).every(effect => effect.cancelled));
     assert.equal(turns[1].frames.at(-1).transform, 'rotate3d(1, -1, 0, -178deg)');
@@ -256,7 +258,7 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     assert.equal(bends[4].frames[1].borderRadius, '32% 4% 0% 4%');
     assert.equal(w.document.querySelectorAll('.book-turn').length, 1);
     w.matchMedia = () => ({ matches: true });
-    click(w, '#app [data-mode="history"]');
+    click(w, '#app [data-action="solo"]');
     assert.equal(w.document.querySelector('.book-turn'), null);
     assert.equal(turns.length, 2, 'movimiento reducido evita el giro');
   } finally { w.close(); }
@@ -304,7 +306,7 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
   for (const theme of ASPECTOS.filter(t => !['auto', 'light'].includes(t))) {
     assert.ok(estilos.includes(`[data-theme="${theme}"]`), `el aspecto ${theme} tiene paleta en la hoja de estilo`);
   }
-  // Elegir en el desplegable aplica y guarda sin recargar.
+  // Elegir se ve primero en la muestra; la apariencia solo cambia al confirmarla.
   {
     const w = boot({ seen: true });
     try {
@@ -312,6 +314,9 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
       const select = w.document.querySelector('#ajuste-tema');
       select.value = 'night';
       select.dispatchEvent(new w.Event('change', { bubbles: true }));
+      assert.equal(w.document.documentElement.dataset.theme, undefined);
+      assert.equal(w.document.querySelector('[data-look-preview]').dataset.previewTheme, 'night');
+      w.document.querySelector('[data-settings-action="apply-look"]').click();
       assert.equal(w.document.documentElement.dataset.theme, 'night');
       assert.equal(colores(w).join('|'), '#000000|#000000');
       assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).theme, 'night');
@@ -359,15 +364,15 @@ console.log('Atajo al inicio: marca dibujada, caja propia y especificidad que ga
     };
     const render = screen => w.CONTINUUM.paint(w.document.getElementById('app'), '<div class="shell"><h2 data-focus tabindex="-1">Pantalla</h2></div>', screen);
     for (const screen of ['play-menu', 'setup', 'pass', 'game']) render(screen);
-    assert.equal(turns.length, 4, 'cada paso hasta la primera mano gira la hoja');
+    assert.equal(turns.length, 3, 'el mazo entra con fundido; la preparación posterior conserva la hoja');
     for (const screen of ['game', 'pass', 'game']) render(screen);
-    assert.equal(turns.length, 4, 'las jugadas y los siguientes turnos no giran la hoja');
+    assert.equal(turns.length, 3, 'las jugadas y los siguientes turnos no giran la hoja');
     render('home'); render('play-menu'); render('solo-home'); render('solo');
-    assert.equal(turns.length, 7, 'solitario incluye la entrada a partida');
+    assert.equal(turns.length, 5, 'solitario incluye la entrada a partida');
     render('home'); render('comp-intro'); render('solo');
-    assert.equal(turns.length, 9, 'competición incluye el cartel y el inicio');
+    assert.equal(turns.length, 7, 'competición incluye el cartel y el inicio');
     render('home'); render('play-menu'); render('online-loading'); render('online-entry'); render('online-lobby'); render('online-game');
-    assert.equal(turns.length, 14, 'la preparación online completa usa el efecto');
+    assert.equal(turns.length, 11, 'la preparación online completa usa el efecto');
     render('home'); render('play-menu'); render('setup'); render('play-menu');
     assert.match(turns.at(-1).at(-1).transform, /-178deg/);
   } finally { w.close(); }

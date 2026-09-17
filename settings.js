@@ -37,6 +37,7 @@
   }
 
   let settings = read();
+  let draftLook = { theme: settings.theme, textSize: settings.textSize };
 
   function save() {
     try { CT.Storage.setItem(KEY, JSON.stringify(settings)); } catch { /* almacenamiento lleno */ }
@@ -90,6 +91,9 @@
 
       <section class="settings-section">
         <h2>Tema</h2>
+        <div class="settings-look-preview" data-look-preview data-preview-theme="${s.theme}" style="--preview-text:${Number(s.textSize)/100}">
+          <div class="look-preview-page"><span>CONTINUUM</span><h3>Una página del atlas</h3><p>Así se verán el papel, la tinta y el tamaño de lectura.</p><div><i></i><b>1640</b></div></div>
+        </div>
         <div class="field">
           <label for="ajuste-tema">Cómo se ve la aplicación</label>
           <select id="ajuste-tema" data-settings-action="theme">${themeOptions(s.theme)}</select>
@@ -100,6 +104,7 @@
             ${[['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']].map(([value,label])=>`<option value="${value}"${s.textSize===value?' selected':''}>${label}</option>`).join('')}
           </select>
         </div>
+        <button class="btn btn-secondary btn-block settings-apply-look" data-settings-action="apply-look" disabled>Aplicar apariencia</button>
       </section>
 
       <section class="settings-section">
@@ -107,7 +112,6 @@
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" aria-describedby="haptics-help" ${s.haptics === true && hapticsSupported ? "checked" : ""} ${hapticsSupported ? "" : "disabled"}></label>
         <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
         ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
-        <label class="opt-row"><span>Sonidos suaves de cartas y resultados</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Música ambiente</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
         <p class="hint"><a href="assets/audio/CREDITS.md" target="_blank" rel="noopener noreferrer">Créditos de la música</a></p>
@@ -166,17 +170,26 @@
   // tienen: `CT.openDialog`/`CT.closeDialog`, los mismos diálogos que usan las reglas o
   // el menú de partida.
   function open() {
+    draftLook = { theme: settings.theme, textSize: settings.textSize };
     document.getElementById("app").insertAdjacentHTML("beforeend", panelHtml());
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
-  CT.effectPrefs = () => ({ sound: settings.sound === true, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true });
+  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true });
+  function previewLook() {
+    const preview=document.querySelector('[data-look-preview]'), apply=document.querySelector('[data-settings-action="apply-look"]');
+    if(!preview||!apply)return;
+    preview.dataset.previewTheme=draftLook.theme;
+    preview.style.setProperty('--preview-text',String(Number(draftLook.textSize)/100));
+    apply.disabled=draftLook.theme===settings.theme&&draftLook.textSize===settings.textSize;
+    apply.textContent=apply.disabled?'Apariencia aplicada':'Aplicar apariencia';
+  }
   document.addEventListener("change", async event => {
     if (event.target.dataset.settingsAction === 'text-size') {
       if (!['100','125','150','200'].includes(event.target.value)) return;
-      settings.textSize = event.target.value; save(); applyTheme(); CT.Effects?.transition?.('select'); return;
+      draftLook.textSize = event.target.value; previewLook(); CT.Effects?.transition?.('select'); return;
     }
-    if (["sound", "haptics", "ambience", "depth"].includes(event.target.dataset.settingsAction)) {
+    if (["haptics", "ambience", "depth"].includes(event.target.dataset.settingsAction)) {
       const key = event.target.dataset.settingsAction;
       let enabled = event.target.checked;
       if (key === 'depth' && enabled) {
@@ -197,10 +210,9 @@
     }
     if (event.target.dataset.settingsAction !== "theme") return;
     if (!THEMES[event.target.value]) return;
-    settings.theme = event.target.value;
+    draftLook.theme = event.target.value;
     CT.Effects?.transition?.('select');
-    save();
-    applyTheme();
+    previewLook();
   });
 
   document.addEventListener("click", event => {
@@ -208,6 +220,9 @@
     if (!target) return;
     if (target.dataset.settingsAction === "open") open();
     else if (target.dataset.settingsAction === "close") CT.closeDialog();
+    else if (target.dataset.settingsAction === "apply-look") {
+      settings.theme=draftLook.theme;settings.textSize=draftLook.textSize;save();applyTheme();CT.Effects?.transition?.('select');previewLook();
+    }
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
     else if (target.dataset.settingsAction === "test-haptics") void testHaptics();
     else if (target.dataset.settingsAction === "download-feedback") {

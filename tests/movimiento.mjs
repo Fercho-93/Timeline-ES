@@ -113,6 +113,27 @@ console.log("\nVolver al menú sin saltos de lectura");
   w.close();
 }
 
+console.log("\nEntrada editorial del mazo, sin portada voladora");
+for (const reduce of [false, true]) {
+  const w = boot({reduce});
+  w.scrollTo = () => {};
+  click(w, '[data-block="historia"]');
+  const animated = [];
+  w.Element.prototype.animate = function() {
+    animated.push(this.className);
+    return {finished: Promise.resolve(), cancel() {}};
+  };
+  click(w, '[data-mode="history"]');
+  ok("la cabecera está disponible desde el primer momento", !!el(w, '.atlas-landscape img') && !el(w, '.atlas-landscape').classList.contains('cover-arriving'));
+  ok("no se crea un vuelo ni una hoja superpuesta", !w.document.querySelector('.deck-cover-flight, .book-turn') && animated.length === 0);
+  ok("el foco llega al título sin esperar la transición", w.document.activeElement === el(w, 'h1'));
+  click(w, '[data-action="collection-back"]');
+  click(w, '[data-mode="history"]');
+  ok("se puede volver y entrar inmediatamente", el(w, '#app').dataset.screen === 'play-menu' && !w.document.querySelector('.deck-cover-flight'));
+  await Promise.resolve();
+  w.close();
+}
+
 console.log("\nCambiar de categoría durante un ajuste de altura");
 {
   const w = boot();
@@ -593,4 +614,6 @@ const pantalla = w => el(w, "#app").dataset.screen;
 const css = read("styles.css");
 const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
 ok("el estilo reducido cubre navegación, cartas, diálogos y espera", [".selection-enter", ".placement-enter", ".dialog-exit", ".game-row.active", ".spinner", ".drag-ghost"].every(selector => reduced.includes(selector)));
+const edition = read("edition.css");
+ok("la nueva entrada es un fundido sin traslación ni escala", /@keyframes deck-menu-reveal \{ from \{ opacity: 0; \} to \{ opacity: 1; \} \}/.test(edition) && !edition.includes(".deck-cover-flight"));
 console.log(`\n${checks} comprobaciones de movimiento correctas`);

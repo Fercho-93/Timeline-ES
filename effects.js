@@ -9,8 +9,7 @@
       document.documentElement.dataset.scene = !neutral && CT.has(mode) ? CT.blockOf(mode).art : "archive";
     }
   };
-  let audio, haptics;
-  const EFFECT_VOLUME = .32; // Solo efectos de acciones; no afecta a ambience.js.
+  let haptics;
   function hapticsAvailable() {
     try {
       const cap = window.Capacitor;
@@ -31,115 +30,21 @@
       return navigator.vibrate(kind === 'failure' ? [18, 35, 18] : 18) !== false;
     } catch { return false; /* Un efecto opcional nunca impide jugar. */ }
   }
-  const samples = new Map(), voices = new Set(), lastCue = new Map();
-  // [textura, instante, volumen, velocidad]. El gesto decide el sonido,
-  // nunca animationstart: una animación decorativa puede repetirse indefinidamente.
-  const scores = {
-    success: [['wood', 0, .24], ['high', .13, .19]],
-    failure: [['low', 0, .22], ['paper', .09, .16]],
-    tap: [['wood', 0, .12]],
-    page: [['leaf', 0, .18, .85]],
-    back: [['leaf', 0, .15, .7]],
-    unroll: [['parchment', 0, .2]],
-    expand: [['paper', 0, .19, .9]],
-    open: [['paper', 0, .18, 1.1], ['wood', .06, .07]],
-    close: [['paper', 0, .14, .85]],
-    select: [['wood', 0, .12]],
-    place: [['wood', 0, .19], ['paper', .03, .08]],
-    return: [['paper', 0, .15, .85], ['low', .05, .08]],
-    hover: [['wood', 0, .05, 1.1]],
-    flip: [['paper', 0, .22, 1.45]],
-    deal: [['paper', 0, .18, 1.2], ['wood', .09, .08]],
-    turn: [['wood', 0, .13], ['high', .15, .08]],
-    end: [['wood', 0, .17], ['high', .17, .14], ['wood', .34, .09]],
-    zoom: [['wood', 0, .07, 1.15]],
-    notice: [['high', 0, .09]]
-  };
-  const priority = {hover:0, zoom:1, select:2, notice:2, close:3, expand:4, open:4, flip:5, deal:6, return:6, place:7, page:8, back:8, unroll:9, turn:10, end:11};
-  let pending = null, transitionTimer = null, lastResult = -Infinity;
-  function transition(kind) {
-    if (!(kind in priority) || !CT.effectPrefs?.().sound || document.hidden) return;
-    if (!pending || priority[kind] >= priority[pending]) pending = kind;
-    if (transitionTimer !== null) return;
-    // Un clic puede cerrar un diálogo, seleccionar y navegar: escuchar solo
-    // su desenlace. El timeout abarca todos los oyentes y el gesto nativo de details.
-    transitionTimer = setTimeout(() => {
-      const next = pending;
-      pending = null; transitionTimer = null;
-      if (next && performance.now() - lastResult >= 100) void cue(next);
-    }, 0);
-  }
-  // Papel y resonancias de madera, sin imponer otra melodía a las seis pistas.
-  // La textura utiliza su propia semilla: nunca consume el azar del reparto.
-  function sample(kind) {
-    if (samples.has(kind)) return samples.get(kind);
-    const leaf = kind === 'leaf';
-    const paper = leaf || kind === 'paper' || kind === 'parchment';
-    const duration = leaf ? .42 : kind === 'parchment' ? .85 : paper ? .22 : .38;
-    const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * duration), audio.sampleRate);
-    const data = buffer.getChannelData(0);
-    const base = kind === 'low' ? 145 : kind === 'high' ? 330 : 245;
-    // La hoja de navegación tiene un roce más largo y dos filtros suaves:
-    // quitar agudos evita el golpe áspero, incluso en altavoces de móvil.
-    const smoothing = leaf ? 1 - Math.exp(-2 * Math.PI * 900 / audio.sampleRate) : .18;
-    let seed = 731, soft = 0, softer = 0;
-    for (let i = 0; i < data.length; i++) {
-      const t = i / audio.sampleRate;
-      seed = (Math.imul(seed, 1664525) + 1013904223) | 0;
-      const noise = (seed >>> 0) / 2147483648 - 1;
-      soft += smoothing * (noise - soft);
-      softer += smoothing * (soft - softer);
-      const attack = Math.min(1, t / .012);
-      const tail = Math.min(1, (duration - t) / .035);
-      data[i] = paper
-        ? (leaf ? softer : soft) * Math.sin(Math.PI * t / duration) ** 2 * .32
-        : attack * tail * (Math.sin(2 * Math.PI * base * t) * Math.exp(-t * 19) * .22 +
-          Math.sin(2 * Math.PI * base * 1.47 * t) * Math.exp(-t * 32) * .09 +
-          soft * Math.exp(-t * 65) * .12);
-    }
-    samples.set(kind, buffer);
-    return buffer;
-  }
-  async function cue(kind) {
-    if (!CT.effectPrefs?.().sound || document.hidden) return;
-    const now = performance.now();
-    if (now - (lastCue.get(kind) ?? -Infinity) < (kind === 'hover' ? 180 : 80)) return;
-    lastCue.set(kind, now);
-    try {
-      const Audio = window.AudioContext || window.webkitAudioContext;
-      if (!Audio) return;
-      audio ||= new Audio();
-      if (audio.state === "suspended") await audio.resume();
-      if (!CT.effectPrefs?.().sound || document.hidden || performance.now() - now > 300) return;
-      for (const [texture, delay, volume, rate = 1] of scores[kind]) {
-        if (voices.size >= 6) break;
-        const source = audio.createBufferSource(), gain = audio.createGain();
-        source.buffer = sample(texture);
-        if (source.playbackRate) source.playbackRate.value = rate;
-        gain.gain.value = volume * EFFECT_VOLUME;
-        source.connect(gain); gain.connect(audio.destination);
-        voices.add(source);
-        source.onended = () => { voices.delete(source); source.disconnect(); gain.disconnect(); };
-        source.start(audio.currentTime + delay);
-      }
-    } catch { /* El texto y el resultado visual siguen disponibles. */ }
-  }
-  // El sonido y la vibración siguen siendo preferencias independientes.
+  // Las acciones son silenciosas, incluso con preferencias antiguas sound:true.
+  // Conservamos la API de avisos para no afectar al juego ni a la vibración.
+  // La música ambiente tiene su reproductor independiente en ambience.js.
   CT.Effects = {
     hapticsAvailable,
-    stamp() { void vibration("confirm"); void cue('tap'); },
+    stamp() { void vibration("confirm"); },
     testHaptics() { return vibration("confirm"); },
-    feedback(correct) { lastResult = performance.now(); pending = null; void vibration(correct ? "success" : "failure"); void cue(correct ? 'success' : 'failure'); },
-    tap() { void vibration("confirm"); void cue('tap'); },
-    page(backwards = false) { transition(backwards ? 'back' : 'page'); },
-    transition
+    feedback(correct) { void vibration(correct ? "success" : "failure"); },
+    tap() { void vibration("confirm"); },
+    page() {},
+    transition() {}
   };
   document.addEventListener("click", event => {
     const tactile = event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-action="select-card"], [data-action="solo-place"], [data-action="place"], [data-online-action="select"], [data-online-action="place"]');
     if (tactile && !tactile.disabled) void vibration("confirm");
-    const summary = event.target.closest('summary');
-    const details = summary?.parentElement;
-    if (details?.matches('.solo-fold, .enc-deck')) transition(details.open ? 'close' : 'expand');
   }, true);
   CT.Art = {
     button(mode, card) {

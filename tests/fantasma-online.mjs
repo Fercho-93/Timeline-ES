@@ -240,6 +240,8 @@ try {
  await clients[0].call('nextTournamentRound');
  await clients[0].call('nextTournamentRound');assert.equal((await snapshot()).tournament.index,1);
  await clients[0].call('renderLobby');assert.equal(clients[0].w.document.getElementById('online-hand-size').disabled,true);
+ assert.equal(clients[0].w.document.querySelectorAll('.table-seat.occupied').length,9);
+ assert.equal(clients[0].w.document.querySelectorAll('.ready-seal').length,9);
  await clients[0].call('startRoom');s=await snapshot();assert.equal(s.status,'playing');assert.ok(Object.values(s.players).every(p=>p.hand.length===1));
  await clients[1].call('renderGame');assert.match(clients[1].w.document.body.textContent,/Competición · ronda 2 de 3/);
  s.phase='reveal';s.turnsInRound=8;s.current=8;s.players[A].hand=[];s.players[B].hand=[];await seed(s);

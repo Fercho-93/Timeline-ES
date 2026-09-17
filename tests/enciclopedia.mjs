@@ -224,11 +224,14 @@ console.log("\nCatálogo completo desde la barra inferior");
   ok("la barra abre una pantalla distinta a Inicio", doc.getElementById('app').dataset.screen === 'enciclopedia');
   ok("Enciclopedia queda marcada en la barra", doc.querySelector('.home-nav [aria-current="page"]').dataset.action === 'home-encyclopedia');
   ok("se abre con todas las cartas", doc.getElementById('enc-mode-select').value === 'all');
+  ok("el álbum abre con los últimos descubrimientos arriba", !!doc.querySelector('.enc-recent') && /Últimos descubrimientos/.test(doc.querySelector('.enc-recent').textContent));
+  ok("sin cartas jugadas invita a estrenar la primera lámina", !!doc.querySelector('.enc-recent-empty'));
   const groups = w.CONTINUUM.Enciclopedia.catalogGroups();
   const catalog = groups.flatMap(group => group.decks.flatMap(deck => deck.cards));
   const allIds = new Set(Object.values(w.CONTINUUM.MODES).flatMap(mode => mode.cards).map(card => card.id));
   ok("el catálogo contiene todas las cartas sin duplicar Gran mezcla", catalog.length === allIds.size && new Set(catalog.map(card => card.id)).size === allIds.size);
   ok("las temáticas y los mazos tienen sus propios apartados", doc.querySelectorAll('.enc-topic').length === groups.length && doc.querySelectorAll('[data-enc-deck]').length === groups.flatMap(group => group.decks).length);
+  ok("cada mazo se presenta con portada y separador de cuaderno", doc.querySelectorAll('.enc-deck-cover img').length === doc.querySelectorAll('[data-enc-deck]').length && doc.querySelectorAll('.enc-topic-divider').length === groups.length);
   ok("las cartas se cargan al desplegar, sin saturar el móvil al entrar", doc.querySelectorAll('[data-enc-card]').length === 0);
   for (const deck of doc.querySelectorAll('[data-enc-deck]')) {
     deck.open = true;
@@ -300,6 +303,8 @@ console.log("\nLáminas por descubrir");
   // El filtro de láminas, sobre el filtrado puro: dos jugadas y el mazo se parte en dos.
   const jugadas = CT.cards(mazo).slice(0, 3);
   jugadas.forEach(c => CT.Progreso.record({ mode: mazo, cardId: c.id, correct: true }));
+  const recientes = CT.Enciclopedia.recentDiscoveries();
+  ok("los últimos descubrimientos respetan el orden real del álbum", recientes[0]?.card.id === jugadas.at(-1).id && recientes.every(item => !!CT.cardArt(item.modeKey, item.card)));
   const todas = CT.Enciclopedia.filterCards(mazo, {});
   const abiertas = CT.Enciclopedia.filterCards(mazo, { lock: "seen" });
   const cerradas = CT.Enciclopedia.filterCards(mazo, { lock: "locked" });

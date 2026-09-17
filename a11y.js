@@ -157,6 +157,19 @@
   const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
   const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
 
+  function inkWave(anchor, kind = 'success') {
+    const timeline = anchor?.closest('.timeline');
+    if (!timeline) return () => {};
+    const wave = document.createElement('span');
+    wave.className = `timeline-ink-wave ink-${kind}`;
+    wave.setAttribute('aria-hidden', 'true');
+    const box = anchor.getBoundingClientRect(), line = timeline.getBoundingClientRect();
+    wave.style.left = `${Math.max(0, box.left - line.left + box.width / 2)}px`;
+    timeline.append(wave);
+    const timer = setTimeout(() => wave.remove(), 1150);
+    return () => { clearTimeout(timer); wave.remove(); };
+  }
+
   // Un mismo gesto físico para ambas llegadas: elevar, viajar y posar el papel.
   // Las coordenadas pertenecen a la línea ya escalada: compensar su zoom evita
   // que el recorrido cambie al elegir 80/100/120%.
@@ -185,12 +198,13 @@
     });
     card.classList.add('card-fitting');
     card.querySelector('.year')?.classList.add('date-ink');
+    const clearWave = automatic ? () => {} : inkWave(card);
     const clean = () => {
       card.classList.remove('card-fitting');
       card.querySelector('.year')?.classList.remove('date-ink');
     };
     Promise.all(animations.map(animation => animation.finished)).then(clean, clean);
-    return () => { animations.forEach(animation => animation.cancel()); clean(); };
+    return () => { animations.forEach(animation => animation.cancel()); clearWave(); clean(); };
   }
   // Una llegada termina antes de que empiece la siguiente.
   const TURNO = 1040;
@@ -368,7 +382,8 @@
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
-    if (preparationTurn || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
+    const enteringDeck = paint.screen === 'home' && screen === 'play-menu';
+    if ((preparationTurn && !enteringDeck) || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
     if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
     else if (changed && screen !== "pass") firstLocalReveal = false;
     container.dataset.screen = screen;
@@ -500,6 +515,61 @@
     const id = overlay.dataset.resultCard;
     const card = id && [...document.querySelectorAll('.timeline-card[data-id]')].find(el => el.dataset.id === id);
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const correctionId = overlay.dataset.correctionCard;
+    const correctSlot = correctionId && document.querySelector('.slot-correct');
+    if (correctSlot && correctSlot.animate && !reduce && !overlay.dataset.resultReady) {
+      const key = `error:${correctionId}:${overlay.dataset.attemptedSlot}:${overlay.dataset.correctSlot}`;
+      if (resultPreview?.id !== key) resultPreview = {id: key, until: performance.now() + 1350};
+      const remaining = resultPreview.until - performance.now();
+      if (remaining > 0) {
+        overlay.classList.add('result-preview');
+        overlay.setAttribute('tabindex', '-1');
+        overlay.setAttribute('role', 'status');
+        overlay.setAttribute('aria-label', 'Mostrando la posición correcta');
+        focus(overlay, {preventScroll: true});
+        const wrap = correctSlot.closest('.timeline-wrap');
+        window.CONTINUUM.scrollToElement?.(wrap, correctSlot);
+        if (wrap) {
+          const box = correctSlot.getBoundingClientRect(), view = wrap.getBoundingClientRect();
+          wrap.scrollLeft += box.left - view.left - (view.width - box.width) / 2;
+        }
+        const attempted = document.querySelector(`.slot[data-index="${overlay.dataset.attemptedSlot}"]`);
+        const from = attempted?.getBoundingClientRect() || correctSlot.getBoundingClientRect();
+        const to = correctSlot.getBoundingClientRect();
+        const lesson = document.createElement('div');
+        lesson.className = 'placement-correction-card'; lesson.setAttribute('aria-hidden', 'true');
+        const heading = overlay.querySelector('h2')?.cloneNode(true);
+        heading?.querySelectorAll('.solo-lectores').forEach(node => node.remove());
+        lesson.innerHTML = `<small>Su posición era</small><b>${heading?.textContent?.trim() || ''}</b><span>${overlay.querySelector('.year')?.textContent || ''}</span>`;
+        document.body.append(lesson);
+        const w = 126, h = 78;
+        const clampX = x => Math.max(6, Math.min(window.innerWidth - w - 6, x));
+        const clampY = y => Math.max(6, Math.min(window.innerHeight - h - 6, y));
+        const startX = clampX(from.left + from.width / 2 - w / 2), startY = clampY(from.top + from.height / 2 - h / 2);
+        const endX = clampX(to.left + to.width / 2 - w / 2), endY = clampY(to.top + to.height / 2 - h / 2);
+        const flight = lesson.animate([
+          {transform:`translate3d(${startX}px,${startY}px,0) rotate(-4deg) scale(.88)`,opacity:.35},
+          {transform:`translate3d(${startX}px,${startY - 12}px,0) rotate(-3deg) scale(1)`,opacity:1,offset:.22},
+          {transform:`translate3d(${endX}px,${endY}px,0) rotate(0) scale(.94)`,opacity:1,offset:.78},
+          {transform:`translate3d(${endX}px,${endY}px,0) rotate(0) scale(.9)`,opacity:0}
+        ], {duration:Math.min(1120, remaining),easing:'cubic-bezier(.2,.72,.22,1)',fill:'forwards'});
+        correctSlot.classList.add('correction-target');
+        const clearWave = inkWave(correctSlot, 'error');
+        const onKey = event => { if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ') event.preventDefault(); };
+        document.addEventListener('keydown', onKey);
+        const clean = () => { lesson.remove(); correctSlot.classList.remove('correction-target'); clearWave(); };
+        const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); flight.cancel(); clean(); }};
+        pila.push(pending);
+        const timer = setTimeout(() => {
+          const index = pila.indexOf(pending); if (index >= 0) pila.splice(index, 1);
+          document.removeEventListener('keydown', onKey); clean();
+          if (!overlay.isConnected) return;
+          overlay.classList.remove('result-preview'); overlay.removeAttribute('role'); overlay.removeAttribute('aria-label');
+          overlay.dataset.resultReady = 'true'; openDialog(overlay, cerrable, onClose);
+        }, remaining);
+        return;
+      }
+    }
     if (card && card.animate && !reduce && !overlay.dataset.resultReady) {
       if (resultPreview?.id !== id) resultPreview = {id, until: performance.now() + 1100};
       const remaining = resultPreview.until - performance.now();

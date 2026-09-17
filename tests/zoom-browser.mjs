@@ -26,6 +26,22 @@ try {
  for(const [engine,type] of [['webkit',webkit],['chromium',chromium]]) {
   const browser=await type.launch();
   try {
+   const transitionPage=await browser.newPage({viewport:{width:414,height:714},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
+   await transitionPage.goto(url);
+   await transitionPage.locator('[data-block="historia"]').click();
+   await transitionPage.locator('[data-mode="history"]').click();
+   const header=transitionPage.locator('.atlas-landscape');
+   const initialHeader=await header.boundingBox();
+   assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'sin portada voladora ni hoja superpuesta');
+   await transitionPage.waitForTimeout(300);
+   const finalHeader=await header.boundingBox();
+   assert.deepEqual(finalHeader,initialHeader,'el marco no cambia de posición ni tamaño durante la entrada');
+   assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
+   await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
+   await transitionPage.locator('[data-action="collection-back"]').click();
+   await transitionPage.locator('[data-mode="history"]').click();
+   assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
+   await transitionPage.close();
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
     const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
     await page.addInitScript(()=>{
@@ -37,6 +53,42 @@ try {
     if(width===414) {
       await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
+      await page.locator('[data-action="rules"]').click();
+      await page.locator('[data-guide-place="1"]').click();
+      assert.ok(await page.locator('.guide-practice.is-correct').count(),'la guía permite completar la primera colocación');
+      await page.screenshot({path:`test-results/zoom/${engine}-guia-interactiva.png`,fullPage:true});
+      await page.locator('[data-guide-chapter="02"] > summary').click();
+      assert.equal(await page.locator('[data-guide-chapter][open]').count(),1);
+      await page.locator('[data-guide-chapter="03"] > summary').click();
+      await page.waitForFunction(()=>document.querySelectorAll('[data-guide-chapter][open]').length===1 && document.querySelector('[data-guide-chapter="03"]').open);
+      assert.equal(await page.locator('.guide-pulse-table tbody tr').count(),4);
+      assert.ok(await page.locator('.guide-handbook').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'la guía cabe en el móvil');
+      await page.screenshot({path:`test-results/zoom/${engine}-guia-poderes.png`,fullPage:true});
+      await page.locator('.guide-close').click();
+      await page.locator('[data-settings-action="open"]').click();
+      await page.locator('#ajuste-tema').selectOption('night');
+      await page.locator('#ajuste-texto').selectOption('150');
+      assert.equal(await page.locator('[data-look-preview]').getAttribute('data-preview-theme'),'night');
+      assert.equal(await page.locator('html').getAttribute('data-theme'),null,'la muestra no aplica el tema antes de confirmar');
+      await page.screenshot({path:`test-results/zoom/${engine}-ajustes-muestra.png`,fullPage:true});
+      await page.locator('.settings-close').click();
+      await page.evaluate(()=>{
+        for (const key of ['history','movies','animals','countries','languages']) {
+          const card=window.CONTINUUM.cards(key).find(item=>window.CONTINUUM.cardArt(key,item));
+          if(card) window.CONTINUUM.Progreso.record({mode:key,cardId:card.id,correct:true});
+        }
+      });
+      await page.locator('[data-action="home-encyclopedia"]').click();
+      assert.equal(await page.locator('.enc-recent-card').count(),5,'los descubrimientos abren el álbum');
+      assert.ok(await page.locator('.enc-deck-cover img').count()>5,'los mazos tienen portada');
+      const toolbar=await page.locator('.enc-toolbar-compact').boundingBox();
+      assert.ok(toolbar.height<260,'los filtros dejan protagonismo al álbum');
+      await page.locator('.enc-recent-card img, .enc-deck-cover img').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
+      await page.screenshot({path:`test-results/zoom/${engine}-enciclopedia-album.png`,fullPage:true});
+      await page.locator('[data-action="enc-back"]').first().click();
+      const historyMode=page.locator('[data-mode="history"]');
+      if(!await historyMode.isVisible())await page.locator('[data-block="historia"]').click();
+      await historyMode.click();
     }
     await page.locator('[data-action="solo"]').click();
     await page.locator('.solo-fold').filter({has:page.locator('[data-action="resume-solo"]')}).locator('summary').click();
@@ -110,6 +162,23 @@ try {
       assert.ok(await hiddenAI.count()>0,'la espera dura más de medio segundo');
       await page.waitForFunction(()=>!document.querySelector('.shell').inert);
       await page.waitForTimeout(800);
+      // Un fallo enseña el destino real sobre el tablero antes del resultado.
+      const wrong=await page.evaluate(()=>{
+        const cards=new Map(window.HISTORY_CARDS.map(c=>[c.id,c]));
+        const board=[...document.querySelectorAll('.timeline .timeline-card')].map(el=>cards.get(Number(el.dataset.id)));
+        const card=cards.get(Number(document.querySelector('.hand-card').dataset.id));
+        const right=window.CONTINUUM.correctIndex('history',board,card);
+        return right===0 ? board.length : 0;
+      });
+      await page.locator(`[data-action="solo-place"][data-index="${wrong}"]`).click();
+      await page.locator('[data-action="confirm-place"]').click();
+      await page.locator('.placement-correction-card').waitFor({state:'visible',timeout:800});
+      assert.ok(await page.locator('.slot-correct.correction-target').count()>0,'el hueco correcto se señala tras confirmar el fallo');
+      await page.screenshot({path:`test-results/zoom/${engine}-correccion-error.png`});
+      await page.locator('.modal').waitFor({state:'visible',timeout:2500});
+      assert.equal(await page.locator('.placement-correction-card').count(),0,'la explicación se retira antes de abrir el resultado');
+      await page.locator('[data-action="solo-next"]').click();
+      if(await page.locator('.shell[inert]').count()) await page.waitForFunction(()=>!document.querySelector('.shell').inert);
       // Completar la partida permite revisar el abanico y la página de resultados reales.
       for(let turn=0;turn<8 && await page.locator('[data-action="solo-place"]').count();turn++) {
         const at=await page.evaluate(()=>{
@@ -126,6 +195,9 @@ try {
       }
       await page.locator('.atlas-final-page').waitFor();
       assert.ok(await page.locator('.atlas-final-fan .timeline-card').count()>0);
+      assert.ok(await page.locator('.final-metrics').count(),'el resultado abre con sus cifras clave');
+      const finalAction=await page.locator('.final-actions .btn-primary').first().boundingBox();
+      assert.ok(finalAction && finalAction.y<height,'la acción principal asoma sin tener que recorrer el texto');
       await page.waitForTimeout(1500);
       await page.screenshot({path:`test-results/zoom/${engine}-final-atlas.png`,fullPage:true});
       await page.close();
