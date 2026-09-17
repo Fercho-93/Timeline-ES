@@ -1574,11 +1574,12 @@
     const etiqueta = soloLabel();
     const streak = (solo.sequence || []).slice().reverse().findIndex(value => !value);
     const run = streak < 0 ? (solo.sequence || []).length : streak;
-    const nextGoal = (Math.floor(solo.hits / 5) + 1) * 5;
+    const nextGoal = Math.min((Math.floor(solo.hits / 5) + 1) * 5, solo.hits + restantes);
+    const goalSpan = Math.max(1, nextGoal - Math.floor(solo.hits / 5) * 5);
     const records = modeRecords();
     const best = records.bestByDifficulty?.[solo.difficulty || 'easy'] || ((solo.difficulty || 'easy') === 'easy' ? records.best || 0 : 0);
     const milestone = result?.correct && [3, 5, 10].includes(run);
-    const progress = `<div class="board-progress ${milestone ? 'board-milestone' : ''}" role="status"><div><b>${milestone ? `¡${run} aciertos seguidos!` : `Próximo hito: ${nextGoal} aciertos`}</b><span>${run ? `Racha: ${run} · ` : ''}${solo.kind === 'free' && best ? solo.hits > best ? '¡Nueva mejor marca!' : `Mejor marca: ${best} · A ${best - solo.hits + 1} de superarla` : ''}</span></div><progress max="5" value="${solo.hits % 5}" aria-label="Progreso hacia el próximo hito"></progress></div>`;
+    const progress = `<div class="board-progress ${milestone ? 'board-milestone' : ''}" role="status"><div><b>${milestone ? `¡${run} aciertos seguidos!` : nextGoal === solo.hits ? "¡Tramo completado!" : `Próximo hito: ${nextGoal} aciertos`}</b><span>${run ? `Racha: ${run}${solo.kind === "free" && best ? " · " : ""}` : ''}${solo.kind === 'free' && best ? solo.hits > best ? '¡Nueva mejor marca!' : `Mejor marca: ${best} · A ${best - solo.hits + 1} de superarla` : ''}</span></div><progress max="${goalSpan}" value="${nextGoal === solo.hits ? goalSpan : solo.hits % 5}" aria-label="Progreso hacia el próximo hito"></progress></div>`;
 
     paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${enDuelo() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
