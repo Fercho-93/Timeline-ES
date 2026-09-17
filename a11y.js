@@ -505,16 +505,17 @@
           ], {duration: Math.min(650, remaining), easing: 'cubic-bezier(.2,.7,.2,1)'}));
         });
         card.classList.add('card-fitting');
+        card.querySelector('.year')?.classList.add('date-ink');
         const onKey = event => { if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ') event.preventDefault(); };
         document.addEventListener('keydown', onKey);
-        const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); animations.forEach(animation => animation.cancel()); card.classList.remove('card-fitting'); }};
+        const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); animations.forEach(animation => animation.cancel()); card.classList.remove('card-fitting'); card.querySelector('.year')?.classList.remove('date-ink'); }};
         pila.push(pending);
         const timer = setTimeout(() => {
           const index = pila.indexOf(pending);
           if (index >= 0) pila.splice(index, 1);
           document.removeEventListener('keydown', onKey);
           if (!overlay.isConnected) return;
-          card.classList.remove('card-fitting');
+          card.classList.remove('card-fitting'); card.querySelector('.year')?.classList.remove('date-ink');
           overlay.classList.remove('result-preview');
           overlay.removeAttribute('role');
           overlay.removeAttribute('aria-label');
