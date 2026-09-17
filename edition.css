@@ -1043,3 +1043,23 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app.atlas-board .atlas-hand-section { margin-top: 4px; }
 .drag-card-preview > strong { font-size: .78rem; padding-right: 0; line-height: 1.16; hyphens: auto; }
 #app.atlas-board .hand-solo .hand-card strong { font-size: clamp(.72rem,3vw,.88rem); padding-right: 0; line-height: 1.16; hyphens: auto; }
+
+/* El zoom comparte cabecera con la línea: el espacio recuperado es para el grabado. */
+#app.atlas-board .hand-title.timeline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0 6px; }
+#app .timeline-caption { min-width: 0; flex: 1; }
+#app.atlas-board .timeline-caption h3 { margin: 0; font-size: .98rem; line-height: 1.2; }
+#app .timeline-caption > small { display: block; margin-top: 3px; font-size: .65rem; }
+#app .timeline-toolbar .timeline-zoom { flex: none; margin: 0; padding: 2px; border-radius: 10px; }
+#app .timeline-toolbar .timeline-zoom [data-zoom-level] { min-width: 44px; width: 44px; height: 40px; min-height: 40px; font-size: .7rem; border-radius: 8px; }
+@media (max-width: 699px) {
+  #app.atlas-board { --atlas-card: clamp(172px, calc(100dvh - 550px), 268px); }
+  #app.atlas-board .timeline-card { width: max(128px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
+  #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: max(108px, calc(var(--atlas-card) * .66 + 12px)); }
+  #app.atlas-board:has(.hand-solo) { --atlas-card: clamp(224px, calc((100dvh - 366px) * .62 + 56px), 360px); }
+  #app.atlas-board:has(.hand-solo) .timeline-card { width: max(128px, calc((var(--atlas-card) - 92px) / 1.5 + 16px)); }
+  #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .timeline .card-visual { aspect-ratio: 2 / 3; height: auto; max-height: none; flex: none; }
+  #app.atlas-board :is(.slot, .slot-confirm) { min-height: var(--atlas-card); }
+}
+@media (min-width: 700px) {
+  #app.atlas-board .timeline-toolbar .timeline-zoom [data-zoom-level] { min-width: 50px; }
+}

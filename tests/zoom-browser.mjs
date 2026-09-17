@@ -44,6 +44,14 @@ try {
       return {card:box(card),image:box(img),panel:box(panel),label:document.querySelector('.timeline-zoom output').textContent};
     });
     const base=await measure();
+    assert.ok(base.card.width >= 127, 'la carta conserva un ancho legible');
+    assert.ok(base.image.height >= 165, 'la ilustración gana altura al recuperar la fila de zoom');
+    const heading=await page.locator('.timeline-toolbar').boundingBox();
+    const zoom=await page.locator('.timeline-zoom').boundingBox();
+    const board=await page.locator('.timeline-wrap').boundingBox();
+    assert.ok(zoom.y >= heading.y && zoom.y+zoom.height <= heading.y+heading.height+1,'zoom integrado en la cabecera');
+    assert.ok(zoom.y+zoom.height <= board.y+1,'zoom situado encima de las cartas');
+    assert.ok(heading.x+heading.width <= width,'los controles caben sin desbordamiento horizontal');
     for(const [index,scale] of [.8,1,1.2].entries()) {
       await page.locator(`[data-zoom-level="${index}"]`).click();
       const now=await measure();

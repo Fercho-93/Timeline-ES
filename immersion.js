@@ -93,7 +93,13 @@
       if (lives && counters) counters.insertBefore(lives, counters.querySelector('.deck-count'));
       const wrap = container.querySelector('.timeline-wrap');
       const zoom = container.querySelector('.timeline-zoom');
-      if (wrap && zoom) wrap.after(zoom);
+      const timelineHeading = wrap?.parentElement.querySelector('.hand-title');
+      if (timelineHeading && zoom) {
+        timelineHeading.classList.add('timeline-toolbar');
+        const caption = document.createElement('div'); caption.className = 'timeline-caption';
+        caption.append(...timelineHeading.childNodes);
+        timelineHeading.append(caption, zoom);
+      }
       const hand = container.querySelector('.hand');
       if (hand) {
         hand.closest('section')?.classList.add('atlas-hand-section');

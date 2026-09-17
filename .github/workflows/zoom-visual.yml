@@ -1,7 +1,7 @@
 name: Zoom visual móvil
 on:
   push:
-    branches: [main, codex/board-v190]
+    branches: [main, codex/art-space-v191]
     paths:
       - 'mapa.js'
       - 'drag.js'
