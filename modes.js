@@ -108,7 +108,9 @@
       // en dos cosas: admiten negativos —los años antes de Cristo— y se puntúan por años
       // de diferencia y no por porcentaje, porque errar un siglo es errar un siglo tanto
       // en el año 200 como en el 1900.
-      cifra: { pregunta: "¿En qué año fue?", unidad: "año", decimales: 0, anos: true, negativos: true, pista: "Los años antes de Cristo, con un menos delante: −218" },
+      cifra: { pregunta: "¿En qué año fue?", unidad: "año", decimales: 0, anos: true, negativos: true,
+        unidades: [["d. C.", 1]], ejemplo: "1492",
+        pista: "El año. Los anteriores a Cristo, con un menos delante: −218" },
       bands: [
         { limit: 711, key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" },
         { limit: 1492, key: "medieval", name: "Edad Media", symbol: "♜" },
@@ -127,7 +129,9 @@
       hiddenLabel: "Población oculta",
       timelineTitle: "De menos a más",
       question: "¿Menos o más gente?",
-      cifra: { pregunta: "¿Cuántos habitantes tiene?", unidad: "habitantes", decimales: 0, pista: "El número entero, sin puntos: 47000000" },
+      cifra: { pregunta: "¿Cuántos habitantes tiene?", unidad: "habitantes", decimales: 0,
+        unidades: [["habitantes", 1], ["mil", 1e3], ["millones", 1e6], ["millón", 1e6], ["M", 1e6]], ejemplo: "47 millones",
+        pista: "Vale «47 millones» o el número entero: 47000000" },
       bands: [
         { limit: 100000, key: "minusculo", name: "Minúsculo", symbol: "·" },
         { limit: 2000000, key: "muypequeno", name: "Muy pequeño", symbol: "▪" },
@@ -144,7 +148,9 @@
       hiddenLabel: "Hablantes ocultos",
       timelineTitle: "De menos a más hablado",
       question: "¿Menos o más hablantes?",
-      cifra: { pregunta: "¿Cuántos hablantes tiene?", unidad: "hablantes", decimales: 0, pista: "El número entero, sin puntos: 93000000" },
+      cifra: { pregunta: "¿Cuántos hablantes tiene?", unidad: "hablantes", decimales: 0,
+        unidades: [["hablantes", 1], ["mil", 1e3], ["millones", 1e6], ["millón", 1e6], ["M", 1e6]], ejemplo: "93 millones",
+        pista: "Vale «93 millones» o el número entero: 93000000" },
       // Los cortes están puestos sobre el rango real del mazo, que va del feroés (69.000)
       // al chino mandarín (929 millones). Con estos siete tramos caen 3, 5, 10, 7, 13, 5 y
       // 4 cartas, sin ninguna banda vacía.
@@ -166,7 +172,9 @@
       hiddenLabel: "Superficie oculta",
       timelineTitle: "De menor a mayor",
       question: "¿Más pequeño o más grande?",
-      cifra: { pregunta: "¿Cuántos kilómetros cuadrados tiene?", unidad: "km²", decimales: 0, pista: "En km², sin puntos: 505000" },
+      cifra: { pregunta: "¿Cuántos kilómetros cuadrados tiene?", unidad: "km²", decimales: 0,
+        unidades: [["km²", 1], ["millones de km²", 1e6], ["ha", 0.01], ["m²", 1e-6]], ejemplo: "505.000 km²",
+        pista: "En km². Vale «17 millones de km²» para los enormes" },
       bands: [
         { limit: 1000, key: "diminuto", name: "Diminuto", symbol: "·" },
         { limit: 50000, key: "pequeno", name: "Pequeño", symbol: "▪" },
@@ -183,7 +191,9 @@
       hiddenLabel: "Peso oculto",
       timelineTitle: "De más ligero a más pesado",
       question: "¿Más ligero o más pesado?",
-      cifra: { pregunta: "¿Cuánto pesa?", unidad: "kg", decimales: 3, pista: "En kilos. Para los muy pequeños valen decimales: 0,02" },
+      cifra: { pregunta: "¿Cuánto pesa?", unidad: "kg", decimales: 6,
+        unidades: [["kg", 1], ["g", 1e-3], ["mg", 1e-6], ["t", 1e3], ["toneladas", 1e3]], ejemplo: "2,5 t",
+        pista: "Con su unidad: «40 g», «2,5 t», «1 mg». Sin unidad se entiende en kg" },
       bands: [
         { limit: 0.01, key: "microscopico", name: "Minúsculo", symbol: "·" },
         { limit: 1, key: "pequenisimo", name: "Muy pequeño", symbol: "▪" },
@@ -201,7 +211,9 @@
       hiddenLabel: "Vida oculta",
       timelineTitle: "De menos a más longevos",
       question: "¿Vive menos o más?",
-      cifra: { pregunta: "¿Cuántos años vive?", unidad: "años", decimales: 2, pista: "En años. Menos de uno, con decimales: 0,5" },
+      cifra: { pregunta: "¿Cuántos años vive?", unidad: "años", decimales: 6,
+        unidades: [["años", 1], ["meses", 1 / 12], ["semanas", 7 / 365], ["días", 1 / 365], ["horas", 1 / 8760], ["minutos", 1 / 525600]], ejemplo: "18 meses",
+        pista: "Con su unidad: «3 días», «18 meses», «40 minutos». Sin unidad se entiende en años" },
       bands: [
         { limit: 1, key: "fugaz", name: "Fugaz", symbol: "·" },
         { limit: 10, key: "breve", name: "Breve", symbol: "▪" },
@@ -218,7 +230,9 @@
       hiddenLabel: "Velocidad oculta",
       timelineTitle: "De más lento a más rápido",
       question: "¿Más lento o más rápido?",
-      cifra: { pregunta: "¿A qué velocidad llega?", unidad: "km/h", decimales: 3, pista: "En km/h. Los más lentos, con decimales: 0,3" },
+      cifra: { pregunta: "¿A qué velocidad llega?", unidad: "km/h", decimales: 6,
+        unidades: [["km/h", 1], ["m/s", 3.6], ["m/h", 1e-3], ["cm/s", 0.036], ["mm/s", 0.0036]], ejemplo: "30 m/s",
+        pista: "Con su unidad: «30 m/s», «5 cm/s». Sin unidad se entiende en km/h" },
       bands: [
         { limit: 1, key: "pausado", name: "Pausado", symbol: "·" },
         { limit: 20, key: "tranquilo", name: "Tranquilo", symbol: "▪" },
@@ -235,7 +249,9 @@
       hiddenLabel: "Distancia oculta",
       timelineTitle: "De más cerca a más lejos",
       question: "¿Más cerca o más lejos?",
-      cifra: { pregunta: "¿A cuántos kilómetros está?", unidad: "km", decimales: 0, pista: "En kilómetros, sin puntos: 1800" },
+      cifra: { pregunta: "¿A cuántos kilómetros está?", unidad: "km", decimales: 3,
+        unidades: [["km", 1], ["m", 1e-3]], ejemplo: "1.800 km",
+        pista: "En kilómetros: 1800. Sin unidad se entiende en km" },
       bands: [
         { limit: 100, key: "cercana", name: "Cercana", symbol: "·" },
         { limit: 500, key: "regional", name: "Regional", symbol: "▪" },

@@ -50,13 +50,21 @@ const texto = w => w.document.body.textContent;
 const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
 const estado = (w, mode) => JSON.parse(w.localStorage.getItem(`hilo-cifras-${mode}-v1`) || "null");
 const duerme = ms => new Promise(listo => setTimeout(listo, ms));
+// Entre elegir el duelo y jugarlo hay una pantalla que explica la modalidad y una cuenta
+// atrás. Las pruebas la acortan a unos milisegundos: lo que importa aquí es la partida.
+async function jugar(w) {
+  w.CONTINUUM.Duelo.CUENTA_PASO_MS = 4;
+  click(w, '[data-action="duel-play"]');
+  await duerme(80);
+}
 
 // Entra en el duelo de cifras de un mazo, con el nombre puesto.
-function abreDuelo(w, { block = "geografia", mode = "population", nombre = "Fernando" } = {}) {
+async function abreDuelo(w, { block = "geografia", mode = "population", nombre = "Fernando" } = {}) {
   abreMazo(w, block, mode);
   click(w, '[data-action="solo"]');
   w.document.getElementById("duel-name").value = nombre;
   click(w, '[data-action="start-cifras"]');
+  await jugar(w);
 }
 
 // Juega el duelo en curso hasta el final. `responde` recibe la carta y decide qué
@@ -253,6 +261,8 @@ console.log("\nCrear un duelo de cifras y jugarlo");
 
   w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-cifras"]');
+  ok("antes de jugar se explica la modalidad", existe(w, ".demo-cifras") && existe(w, '[data-action="duel-play"]'));
+  await jugar(w);
   ok("empieza la partida", existe(w, '[data-action="cifra-answer"]'));
   ok("el nombre se guarda para la próxima", w.localStorage.getItem("hilo-nombre-v1") === "Fernando");
   ok("se ve el reloj", existe(w, ".reloj-bar"));
@@ -291,7 +301,9 @@ console.log("\nAceptar un duelo de cifras por enlace");
 
   rival.document.getElementById("duel-name").value = "Marta";
   click(rival, '[data-action="accept-duel"]');
-  ok("aceptar reparte el duelo", existe(rival, '[data-action="cifra-answer"]'));
+  ok("aceptar lleva a la pantalla de preparación", existe(rival, '[data-action="duel-play"]'));
+  await jugar(rival);
+  ok("y al jugar reparte el duelo", existe(rival, '[data-action="cifra-answer"]'));
   ok("y se ve la marca del rival durante la partida", new RegExp(`${marca}`).test(texto(rival)));
 
   const guardado = estado(rival, "population");
@@ -312,7 +324,7 @@ console.log("\nAceptar un duelo de cifras por enlace");
 console.log("\nEl reloj no se para: salir de la aplicación cierra la carta");
 {
   const w = boot();
-  abreDuelo(w);
+  await abreDuelo(w);
   const antes = estado(w, "population");
   ok("la carta lleva apuntado el instante en que empezó", Number.isFinite(antes.empezadaEn));
 
@@ -337,7 +349,7 @@ console.log("\nEl reloj no se para: salir de la aplicación cierra la carta");
 console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
 {
   const w = boot();
-  abreDuelo(w);
+  await abreDuelo(w);
   const guardado = estado(w, "population");
   ok("la partida se guarda con el reloj en marcha", Number.isFinite(guardado.empezadaEn));
 
@@ -368,7 +380,7 @@ console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
 console.log("\nSe acaba el plazo");
 {
   const w = boot();
-  abreDuelo(w);
+  await abreDuelo(w);
   w.document.querySelector("#cifra-input").value = "1000000";
   w.avanza(w.CONTINUUM.Duelo.Cifras.MS + 200);
   await duerme(250);
@@ -382,7 +394,7 @@ console.log("\nSe acaba el plazo");
 console.log("\nLo que escribe una persona en español");
 {
   const w = boot();
-  abreDuelo(w);
+  await abreDuelo(w);
   const escribe = valor => { w.document.querySelector("#cifra-input").value = valor; click(w, '[data-action="cifra-answer"]'); const jugada = estado(w, "population").jugadas.at(-1); click(w, '[data-action="cifras-next"]'); return jugada.respuesta; };
   ok("los puntos de millar se entienden", escribe("47.000.000") === 47000000);
   ok("los espacios también", escribe("47 000 000") === 47000000);
@@ -441,6 +453,78 @@ console.log("\nUn enlace de cifras de otro plazo se puntúa con el suyo");
   const deHoy = C.codificar({ mode: "population", seed: "diezseg", total: 3, jugadas, nombre: "Ana" });
   ok("un duelo de cifras creado hoy va con las reglas de hoy", D.descodificar(deHoy).duelo.ms === C.MS);
   ok("y las dos modalidades comparten plazo", C.MS === D.MS && C.SEGUNDOS === 15);
+}
+
+
+console.log("\nLa respuesta admite la unidad, porque la carta no siempre va en la del mazo");
+{
+  // Una hormiga pesa 0,0001 kg y una ballena 150.000. Obligar a responder las dos «en
+  // kilos» dejaba el mazo injugable por un extremo, así que se acepta la unidad escrita.
+  const w = boot();
+  const C = w.CONTINUUM.Duelo.Cifras;
+  ok("el eje declara en qué unidades se le puede responder", C.unidades("animals").length >= 4);
+  ok("la primera de la lista es la del propio mazo", C.unidades("animals")[0].nombre === "kg" && C.unidades("animals")[0].factor === 1);
+
+  const enKilos = (mazo, texto) => {
+    const partes = String(texto).match(/^([\d.,]+)\s*(.*)$/);
+    const factor = C.factorDe(mazo, partes[2]);
+    return factor === null ? null : Number(partes[1].replace(",", ".")) * factor;
+  };
+  ok("«40 g» son cuarenta gramos, no cuarenta kilos", enKilos("animals", "40 g") === 0.04);
+  ok("«2,5 t» son dos toneladas y media", enKilos("animals", "2,5 t") === 2500);
+  ok("«1 mg» es un miligramo", enKilos("animals", "1 mg") === 0.000001);
+  ok("sin unidad se entiende la del mazo", enKilos("animals", "3") === 3);
+  ok("una unidad que no existe se rechaza entera", C.factorDe("animals", "lunas") === null);
+  ok("el singular vale igual que el plural", C.factorDe("animals", "tonelada") === 1000);
+
+  ok("«3 días» en un mazo de años", Math.abs(enKilos("lifespan", "3 días") - 3 / 365) < 1e-12);
+  ok("«18 meses» también", Math.abs(enKilos("lifespan", "18 meses") - 1.5) < 1e-12);
+  ok("«30 m/s» son 108 km/h", Math.abs(enKilos("speed", "30 m/s") - 108) < 1e-9);
+  ok("«47 millones» de habitantes", enKilos("population", "47 millones") === 47000000);
+
+  // Y el mazo de fechas no admite unidades raras: un año es un año.
+  ok("en fechas no hay unidades que elegir", C.unidades("history").length <= 1);
+}
+
+console.log("\nEl campo de respuesta dice en qué se puede responder");
+{
+  const w = boot();
+  await abreDuelo(w, { block: "naturaleza", mode: "animals" });
+  ok("se enseñan las unidades admitidas", /Se aceptan:/.test(texto(w)) && /kg/.test(texto(w)) && /mg/.test(texto(w)));
+  ok("y se dice cuál se entiende si no pones ninguna", /en kg si no pones otra/.test(texto(w)));
+
+  // Escribir con unidad puntúa como el valor convertido, no como el número a secas.
+  const guardado = estado(w, "animals");
+  const carta = w.CONTINUUM.Duelo.Cifras.cartas(guardado.mode, guardado.seed, guardado.total)[0];
+  const real = w.CONTINUUM.sortValue("animals", carta);
+  w.document.querySelector("#cifra-input").value = `${real * 1000} g`;
+  click(w, '[data-action="cifra-answer"]');
+  const jugada = estado(w, "animals").jugadas[0];
+  ok("responder en gramos se guarda ya convertido a la unidad del mazo", Math.abs(jugada.respuesta - real) < real * 1e-9);
+  ok("y cuenta como clavada", /Clavado/.test(texto(w)));
+}
+
+console.log("\nAntes de jugar se explica, y hay una cuenta atrás");
+{
+  const w = boot();
+  abreMazo(w, "geografia", "population");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-cifras"]');
+  ok("no se entra directamente a la partida", !existe(w, '[data-action="cifra-answer"]'));
+  ok("se explica cómo funciona la modalidad", existe(w, ".demo-cifras") && /Puntúa lo cerca/.test(texto(w)));
+  ok("se dicen el plazo y lo que pasa al salirse", /15 segundos por carta/.test(texto(w)) && /la carta se cierra/.test(texto(w)));
+  ok("y hay un botón para empezar", existe(w, '[data-action="duel-play"]'));
+
+  w.CONTINUUM.Duelo.CUENTA_PASO_MS = 30;
+  click(w, '[data-action="duel-play"]');
+  ok("al pulsar aparece la cuenta atrás", existe(w, ".cuenta-numero") && w.document.querySelector(".cuenta-numero").textContent === "3");
+  ok("y la partida todavía no ha empezado", !existe(w, '[data-action="cifra-answer"]') && !estado(w, "population"));
+  await duerme(45);
+  ok("la cuenta baja", w.document.querySelector(".cuenta-numero")?.textContent === "2");
+  await duerme(120);
+  ok("al acabar empieza la partida", existe(w, '[data-action="cifra-answer"]'));
+  ok("y el reloj de la primera carta arranca ahí, no antes", Number.isFinite(estado(w, "population").empezadaEn));
+  ok("la cuenta atrás ya no está", !existe(w, ".cuenta-numero"));
 }
 
 console.log(`\n${fail} fallos`);

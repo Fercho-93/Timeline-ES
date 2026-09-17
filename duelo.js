@@ -32,6 +32,10 @@
   // de multitarea, y ninguna de esas tres cosas puede costar una carta. Por debajo de él
   // tampoco da tiempo a consultar nada en ninguna parte.
   const GRACIA_MS = 1500;
+  // Lo que dura cada número de la cuenta atrás de antes de empezar. Vive aquí, con el
+  // resto de las reglas del duelo, para poder acortarlo en las pruebas y no gastar tres
+  // segundos de reloj real en cada partida que se juega.
+  const CUENTA_PASO_MS = 700;
 
   // Qué reglas lleva cada versión de la carga útil. La versión no numera el formato:
   // numera las reglas con las que se jugó, porque dos partidas con plazos distintos no se
@@ -166,6 +170,51 @@
     if (valor === null || !Number.isFinite(valor)) return "sin respuesta";
     try { return CT.formatValue(modeKey, { value: valor, year: valor }); }
     catch { return String(valor); }
+  }
+
+  // ——— Las unidades ———
+  //
+  // Cada mazo ordena sus cartas por un número en una sola unidad —kilos, años, km/h—,
+  // pero las cartas se enseñan en la que toque: la hormiga en miligramos y la ballena en
+  // toneladas. Pedir las dos «en kilos» obligaría a escribir 0,0000001 para una y sería
+  // injugable, así que la respuesta admite su unidad y aquí se convierte a la del mazo.
+  //
+  // No se acepta una unidad por carta, que sería regalar el orden de magnitud: se
+  // aceptan todas las del mazo, y elegir la correcta sigue siendo parte de saberlo.
+  const SIN_TILDES = { "á": "a", "é": "e", "í": "i", "ó": "o", "ú": "u", "ü": "u", "²": "2", "³": "3" };
+
+  function normaliza(texto) {
+    return String(texto || "").trim().toLowerCase()
+      .replace(/[áéíóúü²³]/g, letra => SIN_TILDES[letra])
+      .replace(/\s+/g, " ")
+      .replace(/\.$/, "");
+  }
+
+  // Las unidades del mazo, de la más grande a la más pequeña, para enseñarlas y para
+  // buscarlas. La primera de la lista es siempre la del propio mazo.
+  function unidades(modeKey) {
+    return (reglaCifra(modeKey).unidades || []).map(([nombre, factor]) => ({ nombre, factor }));
+  }
+
+  // A cuánto equivale una unidad escrita. Devuelve `null` si no la reconoce, que es lo
+  // que distingue «2 lunas» —que no significa nada aquí— de «2», que son las del mazo.
+  function factorDe(modeKey, escrita) {
+    const busca = normaliza(escrita);
+    if (!busca) return 1;
+    for (const { nombre, factor } of unidades(modeKey)) {
+      const clave = normaliza(nombre);
+      // El plural y el singular valen igual: «3 dias» y «1 dia», «40 g» y «40 gramos».
+      if (busca === clave || busca + "s" === clave || busca === clave + "s" || busca === clave.replace(/es$/, "")) return factor;
+    }
+    // Unos cuantos sinónimos que la gente escribe y que no merecen una fila en el eje.
+    const sinonimos = {
+      kilo: "kg", kilos: "kg", kilogramos: "kg", gramos: "g", miligramos: "mg",
+      tonelada: "t", toneladas: "t", ano: "años", anos: "años", "año": "años",
+      dia: "días", hectareas: "ha", hectarea: "ha", metros: "m", kilometros: "km",
+      millon: "millones", "millon de": "millones", habitante: "habitantes", hablante: "hablantes"
+    };
+    const alias = sinonimos[busca];
+    return alias ? factorDe(modeKey, alias) : null;
   }
 
   // Un número tal cual se guarda en el enlace: sin notación científica, que no pasaría
@@ -360,13 +409,13 @@
   }
 
   CT.Duelo = {
-    CARTAS, MAX_CARTAS, MAX_NOMBRE, SEGUNDOS, MS, GRACIA_MS,
+    CARTAS, MAX_CARTAS, MAX_NOMBRE, SEGUNDOS, MS, GRACIA_MS, CUENTA_PASO_MS,
     huella, crearSemilla, reparto, codificar, descodificar,
     enlace, invitacion, marcador, limpiaNombre,
     Cifras: {
       CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
-      regla: reglaCifra, reparto: repartoCifras, cartas: cartasCifras,
+      regla: reglaCifra, unidades, factorDe, reparto: repartoCifras, cartas: cartasCifras,
       banda, puntosCarta, puntosPartida, formato: formatoCifra, texto: textoCifra,
       codificar: codificarCifras, invitacion: invitacionCifras, marcador: marcadorCifras, rejilla: rejillaCifras
     }
