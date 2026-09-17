@@ -35,7 +35,7 @@ try {
     await page.locator('[data-block="historia"]').click();
     await page.locator('[data-mode="history"]').click();
     if(width===414) {
-      await page.locator('.atlas-landscape img').evaluate(img=>img.decode());
+      await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
     }
     await page.locator('[data-action="solo"]').click();
