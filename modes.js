@@ -872,10 +872,10 @@
     const ordenadas = [...deck].sort((a, b) => sortValue(modeKey, a) - sortValue(modeKey, b));
     const en = fraccion => ordenadas[Math.floor(ordenadas.length * fraccion)];
     const [izquierda, medio, derecha] = [en(0.2), en(0.5), en(0.8)];
-    const mini = card => `<b>${escapeHtml(shortValue(modeKey, card))}</b><small>${escapeHtml(card.title)}</small>`;
+    const mini = card => `${animalArt(modeKey, card)}<b>${escapeHtml(shortValue(modeKey, card))}</b><small>${escapeHtml(card.title)}</small>`;
     return `<section class="guide-practice" data-guide-practice data-correct="1">
       <div class="guide-practice-head"><span>Tu primera colocación</span><small>Prueba sin gastar ninguna carta</small></div>
-      <div class="gp-card" data-guide-card><i>${escapeHtml(hiddenLabel(modeKey))}</i><b data-guide-hidden>?</b><small>${escapeHtml(medio.title)}</small><em data-guide-value hidden>${escapeHtml(shortValue(modeKey, medio))}</em></div>
+      <div class="gp-card" data-guide-card>${animalArt(modeKey, medio)}<i>${escapeHtml(hiddenLabel(modeKey))}</i><b data-guide-hidden>?</b><small>${escapeHtml(medio.title)}</small><em data-guide-value hidden>${escapeHtml(shortValue(modeKey, medio))}</em></div>
       <p>¿Dónde encaja esta carta?</p>
       <div class="gp-line">
         <button type="button" data-guide-place="0" aria-label="Colocar antes de ${escapeHtml(izquierda.title)}">+</button>
@@ -913,7 +913,12 @@
       practice.querySelector('[data-guide-hidden]').hidden=true;
       feedback.textContent='¡Exacto! La carta revela su valor y se queda entre las dos.';
       reset.hidden=false;
-    } else feedback.textContent='No encaja ahí. Prueba otro hueco: aquí puedes ensayar sin perder nada.';
+    } else {
+      practice.querySelector('[data-guide-value]').hidden=false;
+      practice.querySelector('[data-guide-hidden]').hidden=true;
+      const references=[...practice.querySelectorAll('.gp-reference > b')].map(node=>node.textContent);
+      feedback.textContent=`Prueba otro hueco: ${practice.querySelector('[data-guide-value]').textContent} va entre ${references[0]} y ${references[1]}. Aquí no pierdes vidas.`;
+    }
   });
 
   function guideStep(numero, titulo, texto) {
@@ -924,59 +929,75 @@
     return `<div class="guide-card"><i aria-hidden="true">${icono}</i><span class="gc-body"><b>${titulo}</b>${estado ? `<em>${estado}</em>` : ""}<small>${texto}</small></span></div>`;
   }
 
-  // La guía la lee quien quiere jugar ya, no quien quiere estudiarse un reglamento: una
-  // jugada de ejemplo, tres pasos y una ficha de una línea por cada cosa que de verdad
-  // hay que decidir. Lo que no hace falta para la primera partida se queda fuera a
-  // propósito — el detalle fino de cada poder ya lo explica la pantalla donde se usa.
-  //
-  // Se comparte entre los dos motores —`app.js` y `online.js`— y el último bloque cambia
-  // según la forma de jugar, para no presentar como regla universal algo que solo existe
-  // en solitario o en una sala compartida.
+  function guideDrawing(kind) {
+    const paths = {
+      line: '<rect x="12" y="20" width="44" height="62" rx="5"/><rect x="78" y="10" width="44" height="62" rx="5"/><rect x="144" y="20" width="44" height="62" rx="5"/><path d="M18 96h164m-8-6 8 6-8 6M64 48h8m-4-4v8m58-4h10m-5-5v10"/>',
+      result: '<rect x="24" y="16" width="56" height="76" rx="6"/><path d="m38 52 10 10 20-25M122 37l34 34m0-34-34 34"/><circle cx="139" cy="54" r="33"/>',
+      modes: '<rect x="18" y="14" width="50" height="82" rx="8"/><path d="M36 86h14"/><circle cx="128" cy="36" r="14"/><circle cx="168" cy="43" r="11"/><path d="M101 89v-9a27 27 0 0 1 54 0v9m2-27q24 0 24 27"/>',
+      powers: '<path d="M38 82V44a26 26 0 0 1 52 0v38l-13-9-13 9-13-9-13 9m18-41v7m16-7v7M143 14l-26 44h23l-7 35 39-53h-26l8-26Z"/>',
+      chapters: '<path d="M24 55h152"/><circle cx="30" cy="55" r="17"/><circle cx="100" cy="55" r="17"/><circle cx="170" cy="55" r="17"/><path d="m21 55 6 6 12-13M95 48l10 7-10 7m-83 23h36m34 0h36m34 0h36"/>',
+      atlas: '<path d="M100 26Q59 8 20 22v70q39-14 80 4 41-18 80-4V22q-39-14-80 4v70M36 38h44m-44 14h44m-44 14h30"/><rect x="118" y="38" width="44" height="34" rx="3"/><path d="m124 66 12-15 10 10 8-7"/>'
+    };
+    return '<svg class="guide-drawing" viewBox="0 0 200 110" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths[kind]+'</svg>';
+  }
+  function guideChapter(key, title, caption, drawing, content) {
+    return '<details class="guide-chapter" data-guide-chapter="'+key+'"><summary><span class="guide-chapter-number" aria-hidden="true">'+key+'</span><span><b>'+title+'</b><small>'+caption+'</small></span><i aria-hidden="true">+</i></summary><div class="guide-chapter-body">'+guideDrawing(drawing)+content+'</div></details>';
+  }
+  // Un capítulo abierto cada vez; navegación nativa con teclado y lector de pantalla.
+  if (typeof document !== 'undefined') document.addEventListener('toggle', event => {
+    const chapter = event.target;
+    if (!chapter.matches?.('[data-guide-chapter]') || !chapter.open) return;
+    chapter.closest('.guide-handbook')?.querySelectorAll('[data-guide-chapter]').forEach(other => {
+      if (other !== chapter) other.open = false;
+    });
+  }, true);
+
   function guideMarkup(modeKey, context = "local", { pulse = false, ghost = true } = {}) {
     const selectedMode = mode(modeKey);
     const order = selectedMode.axis === "time" ? "de antes a después" : "de menor a mayor";
     const pending = cards(modeKey).some(card => card.reviewStatus === "pending");
     const shared = context === "local" || context === "online";
-    // Un poder apagado se explica igual —hay que saber qué te estás dejando—, pero
-    // diciendo además quién lo enciende, que en una sala es solo el anfitrión.
-    const seActiva = context === "online" ? " La activa el anfitrión antes de empezar." : " Se activa antes de empezar.";
-
-    const poderes = shared ? `<h3>Poderes</h3><div class="guide-cards">
-      ${guideCard("◌", "Fantasma", ghost ? "en juego" : "opcional", `Una vuelta a ciegas: durante toda ella nadie ve ningún valor. Una vez por persona, con cinco cartas ya en la línea.${ghost ? "" : seActiva}`)}
-      ${guideCard("⚡", "Pulso", pulse ? "en juego" : "opcional", `${PULSE_RULES}${pulse ? "" : seActiva}`)}
-    </div>` : "";
-
-    const dificultad = `<h3>Dificultad</h3><div class="guide-levels">
-      <div><b>Fácil</b><span>Ves todos los valores de la línea.</span></div>
-      <div><b>Normal</b><span>Cada turno se coloca sola una carta más.</span></div>
-      <div><b>Difícil</b><span>Dos, y algún turno a ciegas.</span></div>
-      <div><b>Experto</b><span>Dos, y la línea siempre a ciegas.</span></div>
-    </div>`;
-
-    const contextGuide = context === "solo"
-      ? `<h3>Tú contra el mazo</h3><p class="guide-lead">Tienes tres vidas: cada fallo cuesta una.</p><div class="guide-cards">
-          ${guideCard("☼", "Reto diario", "", "Quince cartas, las mismas para todo el mundo. Un intento al día.")}
-          ${guideCard("∞", "Partida libre", "", "El mazo entero, a tu ritmo. Se guarda para seguir luego.")}
-          ${guideCard("⚔", "Duelo por enlace", "", "Mandas un enlace y quien lo abra juega tus mismas cartas. Al final, cara a cara.")}
-        </div>${dificultad}`
-      : context === "competition"
-        ? `<h3>🏆 Competición</h3><p class="guide-lead">Cinco cartas de cada tema, uno tras otro y sin repetir. Tres vidas nuevas en cada ronda, y los aciertos se van sumando.</p>${dificultad}`
-        : context === "online"
-          ? `<h3>Varios móviles</h3><p class="guide-lead">El anfitrión abre la sala y reparte el código, el enlace o el QR. Cada cual juega desde su pantalla, con conexión. Cada turno tiene 20 segundos para colocar la carta; si se agotan, el turno pasa solo a la siguiente persona.</p>`
-          : `<h3>Un solo móvil</h3><p class="guide-lead">De 2 a 9 personas, pasándoos el teléfono en cada turno. Antes de empezar elegís cuántas cartas lleva cada uno y quién comienza.</p>`;
-
-    return `<div class="eyebrow">Guía · ${escapeHtml(selectedMode.name)}</div>
-      <h2>Cómo se juega</h2>
-      ${guideDemo(modeKey)}
-      <p class="guide-lead">Ordena las cartas en una sola línea, ${order}. El valor va oculto: solo se descubre al confirmar.</p>
-      <ol class="guide-steps">
-        ${guideStep(1, "Elige una carta", "Tócala, o arrástrala hasta la línea.")}
-        ${guideStep(2, "Marca el hueco", "Entre qué dos cartas crees que encaja.")}
-        ${guideStep(3, "Confirma", "Se descubre el valor. Si aciertas, se queda en la línea.")}
-      </ol>
-      <p class="guide-note">¿Dos cartas con el mismo valor? Entonces valen los dos órdenes.${pending ? " Las cartas «en revisión» se juegan igual, con el valor que muestran." : ""}</p>
-      ${shared ? `<h3>Cómo se gana</h3><p class="guide-lead">Gana quien sea la única persona sin cartas al acabar la ronda. Cada fallo te hace robar otra.</p><p>Si dos o más personas terminan la ronda sin cartas, pasan a una final: aparece una carta neutral y cada finalista escribe una cifra secreta. Se revelan todas juntas. Gana quien más se acerque al valor real, por encima o por debajo. Si empatan en la mejor respuesta, solo esas personas repiten con otra carta hasta que haya un ganador. No se usan poderes en la final.</p>` : ""}
-      ${poderes}${contextGuide}`;
+    const here = context === 'competition' ? 'Competición en solitario' : context === 'solo' ? 'Solitario' : context === 'online' ? 'Varios móviles' : 'Un solo móvil';
+    const difficulty = '<div class="guide-levels">'+Object.values(window.CONTINUUM.Ghost?.LEVELS || {}).map(level => '<div><b>'+escapeHtml(level.name)+'</b><span>'+escapeHtml(level.description)+'</span></div>').join('')+'</div>';
+    const result = '<div class="guide-cards">'+
+      guideCard('✓','Si aciertas','','La carta revela su valor y se queda en la línea. En multijugador tienes una carta menos; en solitario sumas un acierto.')+
+      guideCard('↺','Si fallas','','La corrección enseña dónde encajaba, pero la carta fallada no se añade a la línea. En multijugador la sustituyes por otra; si no queda ninguna para robar, conservas la fallada. En solitario pierdes una vida, excepto en el duelo por enlace.')+'</div>'+
+      '<h4>Cómo se gana</h4><p>En multijugador se completa la ronda para que todos tengan su turno. Gana quien termine como única persona sin cartas. Los poderes que guardes no cuentan como cartas pendientes.</p>'+
+      '<h4>La final de desempate</h4><p>Si varias personas quedan sin cartas, cada finalista escribe una cifra secreta para una carta neutral, en la unidad indicada. Se revelan juntas: gana la más cercana, por encima o por debajo. Si persiste el empate, solo quienes empataron repiten con otra carta. Sin poderes en la final.</p>';
+    const formats = '<div class="guide-cards">'+
+      guideCard('☼','Reto diario','15 cartas · 3 vidas','Las mismas cartas del mazo para todos, un intento al día. En Fácil; termina al completar las cartas o agotar las vidas.')+
+      guideCard('∞','Partida libre','3 vidas','Elige dificultad y juega hasta completar el mazo o agotar las vidas. Puedes continuar más tarde la partida guardada.')+
+      guideCard('↗','Duelo por enlace','Sin límite de vidas','Comparte un enlace: la otra persona juega las mismas 15 cartas, sin coincidir a la vez. Compara los aciertos al terminar.')+
+      guideCard('♟','Un solo móvil','2–9 personas','Elegid cartas iniciales y quién empieza. Pasad el teléfono a la persona indicada; mantened en secreto las manos ajenas.')+
+      guideCard('⌁','Varios móviles','Sala con conexión','El anfitrión crea la sala y comparte código, enlace o QR. Los demás entran y se preparan. El anfitrión elige cartas y reloj: sin límite, 20, 30 o 45 segundos. Si se agota el tiempo, el turno pasa.')+'</div><h4>Dificultad: libre y competición en solitario</h4>'+difficulty+
+      '<p>Las cartas automáticas hacen crecer la línea después de tu jugada; no suman aciertos tuyos. El reto diario y el duelo por enlace se juegan en Fácil.</p>';
+    const powers = '<p>Opcionales en multijugador: se activan antes de empezar; en una sala decide el anfitrión. Se consiguen al azar al recibir cartas: no todos tendrán uno. Cada poder recibido tiene un uso y no ocupa la mano.</p><div class="guide-cards">'+
+      guideCard('◌','Fantasma',shared?(ghost?'en juego':'opcional'):'Multijugador','Necesitas el poder, alguna carta en la mano y cinco cartas en la línea. Oculta los valores durante una vuelta completa. No se superpone a otro Fantasma; después hay una vuelta con valores visibles.')+
+      guideCard('ϟ','Pulso',shared?(pulse?'en juego':'opcional'):'Multijugador','Necesitas el poder y dos cartas en la mano. Elige rival y la carta que podrías pasarle. Los dos colocáis la misma carta del mazo a ciegas, sin ver la elección del otro.')+'</div>'+
+      '<table class="guide-pulse-table"><caption>Resultado del Pulso</caption><thead><tr><th scope="col">Quién acierta</th><th scope="col">Qué ocurre</th></tr></thead><tbody><tr><td>Los dos</td><td>Ninguna mano cambia.</td></tr><tr><td>Solo quien reta</td><td>Pasa su carta elegida al defensor.</td></tr><tr><td>Solo quien defiende</td><td>Quien reta roba una carta.</td></tr><tr><td>Ninguno</td><td>Se descarta la carta del reto; quien reta roba una.</td></tr></tbody></table><p>Si se agota el mazo se reutiliza el descarte; si ambos están vacíos se omite el robo. Quien recibe una carta por Pulso queda protegido de recibir otra por Pulso durante esa ronda. En Difícil y Experto el ocultamiento es parte de la dificultad: no necesitas recibir un poder.</p>';
+    const chapters = '<p>Elige uno o varios jugadores, rondas y cartas. Cada capítulo propone un mazo aleatorio distinto que se presenta antes de empezar.</p><div class="guide-cards">'+
+      guideCard('1','En solitario','','Cinco cartas por ronda por defecto, o las que elijas. Recuperas tres vidas en cada tema y acumulas los aciertos del recorrido.')+
+      guideCard('2','En multijugador','','Puntos por ronda: sin cartas, +1; con una, 0; con tres, −2. Se resta el número de cartas restantes menos uno. Al final gana la puntuación mayor; puede haber empate en el total.')+'</div><p>«Siguiente ronda» abre el nuevo tema. La competición no puntúa en el ranking diario.</p>';
+    const controls = '<div class="guide-cards">'+
+      guideCard('↔','Explora la línea','','Desliza a los lados para ver las cartas. También puedes colocar en los extremos. Desliza sobre una carta para desplazar la pantalla; mantén pulsado para arrastrarla.')+
+      guideCard('＋','Acerca el tablero','80 % · 100 % · 120 %','El zoom está junto al título de la línea. Amplía las ilustraciones y vuelve al 100 % cuando quieras.')+
+      guideCard('⋯','Pausa y salida','','El menú de partida reúne guía y opciones de salida. En partidas guardadas usa «Continuar». Salir de una sala online no pausa a los demás; el anfitrión puede cerrarla.')+'</div>';
+    const progress = '<div class="guide-cards">'+
+      guideCard('▤','Enciclopedia','','Explora mazos, busca cartas y filtra. Descubres las ilustraciones al jugar sus cartas, también si fallas. Los descubrimientos recientes aparecen arriba.')+
+      guideCard('☆','Perfil, ranking y logros','','Consulta aciertos, marcas y logros. Solo los aciertos de retos diarios completados suman al ranking, una vez por día y mazo. Al terminar puedes repasar los fallos.')+
+      guideCard('☼','A tu gusto','','En Ajustes prueba tema y tamaño del texto antes de aplicarlos. Música ambiente y vibración son independientes; la vibración depende del dispositivo.')+'</div><p>Tu perfil invitado pertenece a esta instalación: cambiar de móvil o borrar sus datos puede hacerte perder el progreso.</p>';
+    return '<div class="guide-handbook"><div class="eyebrow">Guía · '+escapeHtml(selectedMode.name)+'</div><h2>Una carta. Su lugar.</h2>'+
+      '<p class="guide-context">'+here+' · Ejemplo del mazo elegido</p><p class="guide-lead">Ordena las cartas '+order+'. La partida empieza con una carta de referencia. Tu carta tiene el valor oculto: elige su lugar y confirma para descubrirlo.</p>'+
+      '<ol class="guide-steps">'+guideStep(1,'Elige','Toca una carta de tu mano.')+guideStep(2,'Sitúa','Toca un hueco o arrastra la carta. Puedes cambiar de idea.')+guideStep(3,'Confirma','Pulsa «Confirmar posición» para resolver.')+'</ol>'+
+      guideDemo(modeKey)+'<p class="guide-note">El ensayo se resuelve al tocar el hueco; en la partida debes confirmar. No gasta vidas ni modifica tu progreso.</p>'+
+      '<p class="guide-note">¿Dos cartas con el mismo valor? Valen los dos órdenes.'+(selectedMode.axis==='time'?' Las fechas a. C. van antes que las d. C.; 500 a. C. va antes que 100 a. C.':' Compara la cifra y su unidad, no el tamaño del dibujo.')+(pending?' Las cartas «en revisión» se juegan con el valor mostrado.':'')+'</p>'+
+      '<p class="guide-index-hint">Abre un capítulo para ver sus dibujos y reglas.</p>'+
+      guideChapter('01','Aciertos, fallos y victoria','Qué cambia después de confirmar','result',result)+
+      guideChapter('02','Elige cómo jugar','Solo, con amigos o por enlace','modes',formats)+
+      guideChapter('03','Fantasma y Pulso','Poderes opcionales y sus consecuencias','powers',powers)+
+      guideChapter('04','Competición por capítulos','Rondas, vidas y puntuación','chapters',chapters)+
+      guideChapter('05','Muévete por el tablero','Gestos, zoom y salir de la partida','line',controls)+
+      guideChapter('06','Tu colección y tu progreso','Álbum, ranking, logros y ajustes','atlas',progress)+'</div>';
   }
 
   function escapeHtml(value) {

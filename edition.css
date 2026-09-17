@@ -1281,6 +1281,50 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 
 /* Una colocación real dentro de la guía, pequeña pero con la misma lógica material. */
 .guide-practice { margin: 16px 0 10px; padding: 14px 10px 12px; border: 1px solid var(--edition-line); border-radius: 14px; background: radial-gradient(ellipse at 50% 0,#fff8e8,var(--edition-paper) 76%); text-align: center; }
+.guide-handbook { --guide-accent: var(--edition-rust); }
+.guide-handbook .guide-context { margin: 8px 0; color: var(--edition-brass); font: 600 .7rem/1.4 var(--ui-font); }
+.guide-handbook .guide-steps { margin-top: 14px; }
+.guide-handbook .gp-card { width: 122px; min-height: 164px; overflow: hidden; isolation: isolate; }
+.guide-handbook .gp-card > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .22; z-index: -1; }
+.guide-handbook .gp-reference > img { width: 100%; height: 60px; object-fit: cover; border-radius: 3px; margin-bottom: 6px; }
+.guide-handbook .gp-reference { align-content: start; }
+.guide-handbook .gp-reference small { display: block; font-size: .6rem; }
+.guide-handbook .gp-card small { font-size: .7rem; }
+.guide-handbook .gp-card em { top: 57px; font-size: 1rem; line-height: 1.2; overflow-wrap: anywhere; }
+.guide-handbook .gp-feedback { font-size: .76rem; min-height: 44px; }
+.guide-handbook .gp-line button { min-width: 32px; touch-action: manipulation; }
+.guide-handbook .gp-reset { min-height: 44px; }
+.guide-index-hint { margin: 22px 0 10px; color: var(--edition-muted); font: .76rem/1.5 var(--ui-font); }
+.guide-chapter { border: 1px solid var(--edition-line); border-radius: 13px; margin: 9px 0; background: var(--edition-surface); overflow: hidden; }
+.guide-chapter > summary { display: grid; grid-template-columns: 32px minmax(0,1fr) 20px; align-items: center; gap: 10px; padding: 15px 12px; cursor: pointer; list-style: none; min-height: 56px; }
+.guide-chapter > summary::-webkit-details-marker { display: none; }
+.guide-chapter > summary:focus-visible { outline: 2px solid var(--edition-rust); outline-offset: -4px; border-radius: 12px; }
+.guide-chapter-number { color: var(--edition-brass); font: 600 .85rem var(--font-display); }
+.guide-chapter summary b { display: block; color: var(--edition-ink); font: 600 1rem/1.15 var(--font-display); }
+.guide-chapter summary small { display: block; margin-top: 4px; color: var(--edition-muted); font: .68rem/1.4 var(--ui-font); }
+.guide-chapter summary i { color: var(--edition-rust); font: normal 1.3rem var(--ui-font); transition: transform 180ms ease; }
+.guide-chapter[open] summary i { transform: rotate(45deg); }
+.guide-chapter[open] { border-color: var(--edition-brass); }
+.guide-chapter-body { padding: 0 14px 16px; }
+.guide-chapter-body h4 { margin: 18px 0 6px; color: var(--edition-ink); font: 600 1rem var(--font-display); }
+.guide-chapter-body p { margin: 10px 0; color: var(--edition-muted); font-size: .8rem; }
+.guide-drawing { display: block; width: min(100%,220px); height: 105px; margin: 4px auto 14px; padding: 8px; color: var(--edition-brass); background: radial-gradient(ellipse,#b78a3820,transparent 72%); }
+.guide-handbook .guide-card { background: var(--edition-paper); }
+.guide-handbook .guide-card small { font-size: .78rem; }
+.guide-handbook .guide-levels > div { grid-template-columns: minmax(65px,.6fr) minmax(0,1.4fr); background: var(--edition-paper); }
+.guide-pulse-table { width: 100%; border-collapse: collapse; font: .75rem/1.45 var(--ui-font); }
+.guide-pulse-table caption { text-align: left; padding: 16px 0 8px; font-weight: 700; color: var(--edition-ink); }
+.guide-pulse-table th, .guide-pulse-table td { padding: 10px 7px; border-bottom: 1px solid var(--edition-line); text-align: left; }
+@media (prefers-reduced-motion: no-preference) {
+  .guide-chapter[open] .guide-chapter-body { animation: guide-chapter-enter 260ms ease-out; }
+  .guide-chapter[open] .guide-drawing { animation: guide-ink-enter 450ms ease-out; }
+  .guide-handbook .guide-practice.is-correct .gp-reference { animation: guide-ink-enter 350ms ease-out; }
+  .guide-handbook [data-guide-value]:not([hidden]) { animation: guide-value-stamp 280ms ease-out; }
+}
+@keyframes guide-value-stamp { from { opacity: 0; transform: scale(1.12); } to { opacity: 1; transform: scale(1); } }
+@keyframes guide-chapter-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes guide-ink-enter { from { opacity: .15; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .guide-chapter summary i { transition: none; } }
 .guide-practice-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 0 4px 12px; text-align: left; }
 .guide-practice-head span { color: var(--edition-rust); font: 700 .62rem/1.3 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
 .guide-practice-head small { color: var(--edition-muted); font: .58rem/1.3 var(--ui-font); }

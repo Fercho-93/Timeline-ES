@@ -115,6 +115,26 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("acertar la práctica revela el valor", !el(w,'[data-guide-value]').hidden && /Exacto/.test(el(w,'[data-guide-feedback]').textContent));
   click(w,'[data-guide-reset]');
   ok("la práctica se puede repetir", el(w,'[data-guide-value]').hidden && !el(w,'[data-guide-place="0"]').disabled);
+  const saved = JSON.stringify({...w.localStorage});
+  click(w, '[data-guide-place="0"]');
+  ok("un ensayo fallido invita a volver a probar", /Prueba otro hueco/.test(el(w, '[data-guide-feedback]').textContent));
+  click(w, '[data-guide-place="1"]');
+  ok("el ensayo no modifica partidas ni progreso", JSON.stringify({...w.localStorage}) === saved);
+  ok("el ejemplo incluye tres ilustraciones reales", w.document.querySelectorAll('.guide-practice img').length === 3);
+  const chapters = [...w.document.querySelectorAll('[data-guide-chapter]')];
+  ok("seis capítulos cubren todas las reglas sin desplegarlas de golpe", chapters.length === 6 && chapters.every(chapter => !chapter.open));
+  chapters[0].open = true;
+  await respira();
+  chapters[1].open = true;
+  await respira();
+  ok("abrir otro capítulo recoge el anterior", !chapters[0].open && chapters[1].open);
+  ok("las salas explican el reloj configurable", /20, 30 o 45/.test(chapters[1].textContent));
+  ok("el duelo tiene su excepción de vidas", /Sin límite de vidas/.test(chapters[1].textContent));
+  ok("Pulso explica sus cuatro resultados", chapters[2].querySelectorAll('tbody tr').length === 4);
+  for (const [key, info] of Object.entries(w.CONTINUUM.MODES)) {
+    const markup = w.CONTINUUM.guideMarkup(key, 'solo');
+    ok(key + ": guía completa y eje correcto", markup.includes('data-guide-chapter="06"') && markup.includes(info.axis === 'time' ? 'de antes a después' : 'de menor a mayor'));
+  }
 }
 {
   const w = boot();
