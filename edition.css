@@ -1035,3 +1035,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app.atlas-board .slot { position: relative; }
 #app.atlas-board .board-progress { border-left: 3px solid var(--scene-color); }
 #app.atlas-board .board-progress progress { accent-color: var(--scene-color); }
+#app.atlas-board:has(.board-result-layer) > .shell { min-height: 0; }
+#app.atlas-board .game-head > div:first-child { flex: 1; }
+#app.atlas-board .game-head .solo-lives { flex: none; margin: 0 8px; white-space: nowrap; font-size: .9rem; }
+#app.atlas-board .board-progress { padding: 6px 10px; }
+.board-progress span:empty { display: none; }
+#app.atlas-board .atlas-hand-section { margin-top: 4px; }

@@ -88,6 +88,9 @@
     }
     container.classList.toggle('atlas-has-nav', !inGame);
     if (board.has(screen)) {
+      const lives = container.querySelector('.solo-lives');
+      const counters = container.querySelector('.game-head');
+      if (lives && counters) counters.insertBefore(lives, counters.querySelector('.deck-count'));
       const wrap = container.querySelector('.timeline-wrap');
       const zoom = container.querySelector('.timeline-zoom');
       if (wrap && zoom) wrap.after(zoom);
