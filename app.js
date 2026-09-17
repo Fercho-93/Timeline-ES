@@ -460,21 +460,69 @@
     window.scrollTo(0, 0);
   }
 
-  // La carátula no desaparece entre la colección y el mazo: en navegadores con
-  // View Transitions viaja hasta convertirse en la cabecera. En los demás, y con
-  // movimiento reducido, la navegación conserva exactamente el comportamiento normal.
+  // La carátula no se estira entre dos recortes incompatibles. Una copia viva conserva
+  // la proporción de la ilustración, cambia poco a poco el encuadre y se funde con la
+  // cabecera ya montada. Es un FLIP deliberadamente pequeño: no retiene la pantalla
+  // anterior ni condiciona la navegación si el navegador no puede animarlo.
   function openMode(modeKey, source) {
     const render = () => { setMode(modeKey); collectionOpen = true; collectionDetails = true; playMenu(); };
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const cover = source?.closest('.collection-entry')?.querySelector('.gallery-panel .panel-art img');
-    if (!document.startViewTransition || reduce || !cover) { render(); return; }
-    cover.style.viewTransitionName = 'continuum-deck-cover';
+    const frame = cover?.closest('.gallery-panel');
+    if (reduce || !cover || !frame || typeof frame.animate !== 'function') { render(); return; }
+    const start = frame.getBoundingClientRect();
+    if (!start.width || !start.height) { render(); return; }
+
+    const coverStyle = getComputedStyle(cover);
+    const frameStyle = getComputedStyle(frame);
+    const flight = document.createElement('span');
+    const image = document.createElement('img');
+    flight.className = 'deck-cover-flight';
+    flight.setAttribute('aria-hidden', 'true');
+    image.src = cover.currentSrc || cover.src;
+    image.alt = '';
+    image.style.objectPosition = coverStyle.objectPosition;
+    flight.append(image);
+    Object.assign(flight.style, {
+      left: `${start.left}px`, top: `${start.top}px`, width: `${start.width}px`, height: `${start.height}px`,
+      borderRadius: frameStyle.borderRadius
+    });
+    document.body.append(flight);
     document.documentElement.classList.add('deck-cover-transition');
-    const transition = document.startViewTransition(render);
-    transition.finished.finally(() => {
-      cover.style.viewTransitionName = '';
-      document.documentElement.classList.remove('deck-cover-transition');
-    }).catch(() => {});
+    render();
+
+    const target = app.querySelector('.atlas-landscape');
+    const targetImage = target?.querySelector('img');
+    const finish = () => {
+      target?.classList.remove('cover-arriving');
+      flight.remove();
+      document?.documentElement?.classList.remove('deck-cover-transition');
+    };
+    if (!target || !targetImage) { finish(); return; }
+    const end = target.getBoundingClientRect();
+    if (!end.width || !end.height) { finish(); return; }
+
+    target.classList.add('cover-arriving');
+    flight.classList.add('is-arriving');
+    const targetStyle = getComputedStyle(targetImage);
+    const travel = flight.animate([
+      { left: `${start.left}px`, top: `${start.top}px`, width: `${start.width}px`, height: `${start.height}px`,
+        borderRadius: frameStyle.borderRadius, boxShadow: '0 10px 24px #2e20152d' },
+      { offset: .18, left: `${start.left}px`, top: `${start.top - 5}px`, width: `${start.width}px`, height: `${start.height}px`,
+        borderRadius: frameStyle.borderRadius, boxShadow: '0 22px 42px #2e201548' },
+      { left: `${end.left}px`, top: `${end.top}px`, width: `${end.width}px`, height: `${end.height}px`,
+        borderRadius: getComputedStyle(target).borderRadius, boxShadow: '0 2px 8px #2e20150a' }
+    ], { duration: 760, easing: 'cubic-bezier(.22,.74,.18,1)', fill: 'forwards' });
+    image.animate([
+      { objectPosition: coverStyle.objectPosition, filter: coverStyle.filter, transform: 'scale(1.015)' },
+      { objectPosition: targetStyle.objectPosition, filter: targetStyle.filter, transform: 'scale(1.06)' }
+    ], { duration: 760, easing: 'cubic-bezier(.22,.74,.18,1)', fill: 'forwards' });
+    travel.finished.then(() => {
+      // La cabecera aparece debajo durante el último suspiro: así entran su pátina y
+      // su degradado sin un cambio brusco de color al retirar la copia.
+      target.classList.remove('cover-arriving');
+      return flight.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: 'ease-out', fill: 'forwards' }).finished;
+    }).catch(() => {}).finally(finish);
   }
 
   // Compartida con el diagnóstico de más abajo: es la misma búsqueda, una sola vez.

@@ -26,6 +26,22 @@ try {
  for(const [engine,type] of [['webkit',webkit],['chromium',chromium]]) {
   const browser=await type.launch();
   try {
+   const transitionPage=await browser.newPage({viewport:{width:414,height:714},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
+   await transitionPage.goto(url);
+   await transitionPage.locator('[data-block="historia"]').click();
+   const sourceCover=await transitionPage.locator('.gallery-panel.active').boundingBox();
+   await transitionPage.locator('[data-mode="history"]').click();
+   const flight=transitionPage.locator('.deck-cover-flight');
+   await flight.waitFor({state:'visible'});
+   await transitionPage.waitForTimeout(260);
+   const midway=await flight.boundingBox();
+   const imageFit=await flight.locator('img').evaluate(img=>getComputedStyle(img).objectFit);
+   assert.equal(imageFit,'cover','la ilustración conserva su proporción durante el viaje');
+   assert.ok(midway.width>=sourceCover.width-1,'la portada crece hacia la cabecera sin encogerse primero');
+   await transitionPage.screenshot({path:`test-results/zoom/${engine}-transicion-portada.png`});
+   await flight.waitFor({state:'detached',timeout:1800});
+   assert.equal(await transitionPage.locator('.atlas-landscape.cover-arriving').count(),0,'la cabecera recibe la imagen al terminar');
+   await transitionPage.close();
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
     const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
     await page.addInitScript(()=>{

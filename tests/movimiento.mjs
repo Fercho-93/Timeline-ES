@@ -113,6 +113,36 @@ console.log("\nVolver al menú sin saltos de lectura");
   w.close();
 }
 
+console.log("\nContinuidad de la portada hacia la cabecera");
+{
+  const w = boot();
+  click(w, '[data-block="historia"]');
+  const originalRect = w.Element.prototype.getBoundingClientRect;
+  w.Element.prototype.getBoundingClientRect = function() {
+    if (this.matches('.gallery-panel.active')) return {left: 18, top: 170, width: 378, height: 215, right: 396, bottom: 385};
+    if (this.matches('.atlas-landscape')) return {left: 0, top: 60, width: 414, height: 500, right: 414, bottom: 560};
+    return originalRect.call(this);
+  };
+  const animations = [];
+  w.Element.prototype.animate = function(keyframes, options) {
+    let resolve;
+    const animation = {target: this, keyframes, options, finished: new Promise(done => { resolve = done; }), finish: () => resolve()};
+    animations.push(animation);
+    return animation;
+  };
+  click(w, '[data-mode="history"]');
+  const flight = el(w, '.deck-cover-flight');
+  ok("la portada viaja como imagen real durante el cambio de marco", flight.querySelector('img').src.endsWith('hero-history-700.webp'));
+  ok("la cabecera espera oculta mientras llega la misma portada", el(w, '.atlas-landscape').classList.contains('cover-arriving'));
+  const travel = animations.find(animation => animation.target === flight);
+  ok("el recorrido interpola el marco completo sin escalar una captura", travel.keyframes[0].width === '378px' && travel.keyframes.at(-1).width === '414px' && travel.keyframes.at(-1).height === '500px');
+  travel.finish();
+  await Promise.resolve(); await Promise.resolve();
+  animations.find(animation => animation.target === flight && animation !== travel)?.finish();
+  await Promise.resolve(); await Promise.resolve();
+  w.close();
+}
+
 console.log("\nCambiar de categoría durante un ajuste de altura");
 {
   const w = boot();
@@ -593,4 +623,6 @@ const pantalla = w => el(w, "#app").dataset.screen;
 const css = read("styles.css");
 const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
 ok("el estilo reducido cubre navegación, cartas, diálogos y espera", [".selection-enter", ".placement-enter", ".dialog-exit", ".game-row.active", ".spinner", ".drag-ghost"].every(selector => reduced.includes(selector)));
+const edition = read("edition.css");
+ok("la copia de la portada conserva el dibujo al cambiar de proporción", edition.includes('.deck-cover-flight img') && edition.includes('object-fit: cover'));
 console.log(`\n${checks} comprobaciones de movimiento correctas`);
