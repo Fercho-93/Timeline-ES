@@ -162,19 +162,54 @@ descubre también en su mazo de origen.
 
 ## Duelo por enlace
 
-Un formato más dentro de «Jugar en solitario». Juegas 15 cartas al azar del mazo abierto y
+Un formato más dentro de «Jugar en solitario». Juegas unas cartas al azar del mazo abierto y
 mandas un enlace: quien lo abra recibe exactamente esas mismas cartas, en el mismo orden, y
 al terminar ve el cara a cara —el marcador y las dos tiradas carta a carta— con un botón
 para devolver el reto con semilla nueva.
+
+Tiene **dos modalidades**, que se eligen dentro del mismo formato porque comparten casi
+todo —las mismas cartas en los dos móviles, el enlace, el nombre, el reloj y lo que pasa al
+salirse de la aplicación— y solo se diferencian en qué se hace con cada carta:
+
+- **Ordenar las cartas.** 15 cartas que se colocan en la línea, 20 segundos cada una. Gana
+  quien más acierte.
+- **Escribir la cifra.** 10 cartas de las que se responde el número —los habitantes, los
+  años, los kilómetros—, 10 segundos cada una. Gana quien más puntos sume: puntúa lo cerca
+  que se quede uno (por porcentaje, o por años de diferencia en los mazos de fechas) y lo
+  rápido que responda. Los puntos que trae un enlace no se creen: se recalculan con las
+  mismas cartas y tienen que coincidir.
+
+### El reloj
+
+Las dos modalidades van a reloj por la misma razón: sin un plazo por carta, cualquiera
+puede ir a buscar la respuesta a otra parte, y quien la busca gana. El plazo no se puede
+parar.
+
+Eso obliga a medirlo **restando marcas de `Date.now()`, nunca descontando de un contador**.
+No es una preferencia de estilo: una pestaña escondida congela sus temporizadores, así que
+un contador ingenuo se pararía justo mientras alguien consulta la respuesta, premiando
+exactamente lo que se quiere evitar. Por la misma razón se guarda con la partida el instante
+en que empezó la carta: recargar la página o cerrar la aplicación no devuelven el plazo.
+
+Salir de la aplicación con una carta delante la cierra —en cifras deja la carta sin puntuar;
+en orden la da por fallada—, con un margen de gracia de segundo y medio para que un aviso
+que se cuela, una llamada entrante o un roce en el gesto de multitarea no cuesten una carta.
+No se llama tramposo a nadie: se dice lo que ha pasado, y en el duelo de cifras las cartas
+cerradas así salen aparte en el marcador que os mandáis. Lo que nada de esto tapa es un
+segundo dispositivo, que no hay manera de detectar desde aquí.
 
 Sin servidor, sin cuentas y sin que los dos móviles tengan que estar encendidos a la vez.
 Se apoya en lo mismo que el reto diario: dos móviles que barajan con la misma semilla
 reciben las mismas cartas. Allí la semilla es la fecha; aquí viaja dentro del enlace, junto
 con el mazo, el número de cartas, la marca de quien reta y su cuadrícula de aciertos, todo
-en base64url. Por eso un duelo funciona con la aplicación instalada y sin conexión.
+en base64url. La versión que abre la carga útil no numera el formato: numera las reglas. Un
+duelo jugado a reloj no es comparable con uno jugado sin él, así que los enlaces anteriores
+al reloj se siguen aceptando y se juegan como se jugaron —sin plazo, avisando de ello—, y una
+aplicación que no conozca la versión nueva pide actualizar en vez de comparar dos partidas
+con reglas distintas. Por eso un duelo funciona con la aplicación instalada y sin conexión.
 
-El duelo no gasta vidas: las dos partes juegan las quince de principio a fin. Si a una se le
-acabaran a la séptima, el marcador estaría comparando siete cartas contra quince.
+El duelo no gasta vidas: las dos partes juegan todas las cartas de principio a fin. Si a una
+se le acabaran a la séptima, el marcador estaría comparando siete cartas contra quince.
 
 El enlace lleva una **huella del mazo** —su número de cartas y un hash de sus
 identificadores en orden—. No es opcional: si los dos móviles llevan versiones distintas de

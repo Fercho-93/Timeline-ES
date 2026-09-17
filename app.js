@@ -39,14 +39,14 @@
         details.name = "solo-options";
         const summary = document.createElement("summary");
         const heading = panel.querySelector(".solo-panel-head");
-        const kind = panel.querySelector('[data-action="start-free"]') ? 'free' : panel.querySelector('[data-action="start-cifras"]') ? 'cifras' : panel.querySelector('[data-action="start-duel"]') ? 'duel' : 'daily';
+        const kind = panel.querySelector('[data-action="start-free"]') ? 'free' : panel.querySelector('[data-action="start-duel"]') ? 'duel' : 'daily';
         details.dataset.soloKind = kind;
-        const marks = {daily:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',free:'<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>',duel:'<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>',cifras:'<circle cx="12" cy="14" r="8"/><path d="M12 10v4l2.5 2.5M9 2h6"/>'};
+        const marks = {daily:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',free:'<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>',duel:'<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>'};
         const mark = document.createElement('span'); mark.className = 'solo-option-mark'; mark.setAttribute('aria-hidden','true');
         mark.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${marks[kind]}</svg>`;
         summary.append(mark);
         const copy = document.createElement('span'); copy.className = 'solo-option-copy'; copy.append(...heading.childNodes);
-        const caption = document.createElement('small'); caption.textContent = {daily:'Un reto distinto cada día',free:'A tu ritmo y a tu nivel',duel:'Las mismas cartas, otro rival',cifras:'Adivina la cifra a contrarreloj'}[kind]; copy.append(caption); summary.append(copy);
+        const caption = document.createElement('small'); caption.textContent = {daily:'Un reto distinto cada día',free:'A tu ritmo y a tu nivel',duel:'Las mismas cartas, otro rival'}[kind]; copy.append(caption); summary.append(copy);
         heading.remove();
         details.append(summary);
         const body = document.createElement("div");
@@ -106,7 +106,14 @@
         attemptedIndex: solo.pendingResult.attemptedIndex, correctIndex: solo.pendingResult.correctIndex
       };
       soloResult();
-    } else { result = null; soloView(); }
+    } else {
+      result = null;
+      // Igual que en el duelo de cifras: si la carta seguía abierta y se ha estado fuera
+      // más que el margen de gracia, se cierra en vez de estrenar plazo. Cerrar la
+      // aplicación no es una manera de pedir tiempo muerto.
+      if (enDueloConReloj() && solo.cartaEmpezadaEn && Date.now() - solo.cartaEmpezadaEn > CT.Duelo.GRACIA_MS) cierraCartaDuelo("salida");
+      else soloView();
+    }
   }
   // Y las capas se abren como diálogos: foco dentro, tabulador atrapado, Escape cierra.
   // `cerrable` distingue las capas que se pueden descartar —las reglas, el menú— de las
@@ -1548,7 +1555,6 @@
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
         </div>
         ${duelPanel()}
-      ${cifrasPanel()}
       </section>
     </div>`);
   }
@@ -1558,40 +1564,51 @@
   // dura lo que duren las vidas, así que no hay nada que mandar que reparta lo mismo en
   // el otro móvil. Con formato propio, en cambio, vale cualquier mazo y cuantas veces se
   // quiera, y cada duelo estrena semilla.
+  // El duelo es uno solo con dos maneras de jugarlo, no dos formatos distintos: lo que
+  // comparten —las mismas cartas en los dos móviles, el enlace, el nombre, el reloj y lo
+  // que pasa al salirse de la aplicación— pesa mucho más que en lo que se diferencian,
+  // que es si la carta se coloca en la línea o se responde con una cifra. Por eso el menú
+  // enseña una sola opción y la modalidad se elige dentro.
+  const DUEL_MODE_KEY = "hilo-duelo-modo-v1";
+
+  function duelMode() {
+    const guardado = CT.Storage.getItem(DUEL_MODE_KEY);
+    // Un mazo sin eje que sepa preguntar por una cifra solo admite la modalidad de orden.
+    if (guardado === "cifras" && reglaCifra()) return "cifras";
+    return "orden";
+  }
+
   function duelPanel() {
     // Un duelo aceptado y dejado a medias no se puede volver a empezar desde el enlace si
     // ya lo has cerrado, así que se ofrece continuarlo: con él se iría la marca del rival.
-    const aMedias = solo && solo.kind === "duel";
-    const contra = aMedias && solo.duelo?.rival ? solo.duelo.rival.nombre || "quien te retaba" : null;
+    const enOrden = solo && solo.kind === "duel";
+    const enCifras = cargaCifras();
+    const contra = partida => partida?.duelo?.rival || partida?.rival ? (partida.duelo?.rival || partida.rival).nombre || "quien te retaba" : null;
+    const regla = reglaCifra();
+    const modo = duelMode();
+    const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === modo ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
       <div class="solo-panel-head"><h3>Duelo por enlace</h3></div>
-      <p>${CT.Duelo.CARTAS} cartas al azar de este mazo. Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas. Sin cuentas y sin esperar a nadie.</p>
-      <div class="field">
+      <p>Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas. Sin cuentas y sin esperar a nadie.</p>
+      ${regla ? `<div class="field">
+        <label for="duel-kind">Modalidad</label>
+        <select id="duel-kind">
+          <option value="orden"${modo === "orden" ? " selected" : ""}>Ordenar las cartas</option>
+          <option value="cifras"${modo === "cifras" ? " selected" : ""}>Escribir la cifra</option>
+        </select>
+      </div>` : ""}
+      ${bloque("orden", `<p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
+        <p class="solo-intro-rule">${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</p>
+        ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
+        <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Crear un duelo"} <span>→</span></button>`)}
+      ${regla ? bloque("cifras", `<p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Gana quien más puntos sume: cuenta lo cerca que te quedes y lo rápido que respondas.</p>
+        <p class="solo-intro-rule">${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</p>
+        ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
+        <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
+      <div class="field" style="margin-top:12px">
         <label for="duel-name">Tu nombre, para que sepan quién reta</label>
         <input id="duel-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
       </div>
-      ${aMedias ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra ? `el duelo contra ${escapeHtml(contra)}` : "tu duelo"} <span>→</span></button>` : ""}
-      <button class="btn ${aMedias ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${aMedias ? "Empezar otro duelo" : "Crear un duelo"} <span>→</span></button>
-    </div>`;
-  }
-
-  // El otro duelo por enlace: mismas cartas para los dos, pero en vez de colocarlas se
-  // escribe la cifra. Solo se ofrece en los mazos cuyo eje sabe preguntar por una.
-  function cifrasPanel() {
-    const regla = reglaCifra();
-    if (!regla) return "";
-    const guardada = cargaCifras();
-    const contra = guardada?.rival ? guardada.rival.nombre || "quien te retaba" : null;
-    return `<div class="panel solo-panel">
-      <div class="solo-panel-head"><h3>Duelo de cifras</h3></div>
-      <p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Puntúa lo cerca que te quedes y lo rápido que respondas.</p>
-      <p class="solo-intro-rule">${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</p>
-      <div class="field">
-        <label for="cifras-name">Tu nombre, para que sepan quién reta</label>
-        <input id="cifras-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
-      </div>
-      ${guardada ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra ? `el duelo contra ${escapeHtml(contra)}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
-      <button class="btn ${guardada ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${guardada ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>
     </div>`;
   }
 
@@ -1607,11 +1624,8 @@
     try { CT.Storage.setItem(DUEL_NAME_KEY, CT.Duelo.limpiaNombre(nombre)); } catch { /* almacenamiento lleno */ }
   }
 
-  // Los dos duelos comparten nombre pero no campo: en el menú del solitario conviven los
-  // dos paneles, y dos elementos con el mismo identificador harían que guardar el nombre
-  // leyera siempre el del primero, estuviera o no desplegado.
-  function guardaNombreSiLoHay(id = "duel-name") {
-    const campo = document.getElementById(id);
+  function guardaNombreSiLoHay() {
+    const campo = document.getElementById("duel-name");
     if (campo) saveDuelName(campo.value);
   }
 
@@ -1627,7 +1641,10 @@
     let barajado;
     let duelo = null;
     if (kind === "duel") {
-      duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null };
+      // Un duelo que se estrena aquí se juega a reloj. Uno que llega por enlace se juega
+      // como lo jugó quien retó: los enlaces anteriores al reloj no lo llevan, y ponérselo
+      // a quien los acepta sería compararlo contra una marca hecha sin plazo.
+      duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null, reloj: true };
       barajado = CT.Duelo.reparto(selectedModeKey, duelo.seed, duelo.total);
     } else if (kind === "daily") {
       barajado = shuffleWith(ids, seededRandom(seedFrom(`${today()}:${selectedModeKey}`))).slice(0, DAILY_CARDS + 1);
@@ -1640,13 +1657,16 @@
       mode: selectedModeKey, day: today(), deck: barajado, timeline,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : null,
-      duelo, finished: false, newDiscoveries: 0
+      duelo, finished: false, newDiscoveries: 0,
+      cartaEmpezadaEn: duelo?.reloj ? Date.now() : null
     };
     pendingIndex = null;
     result = null;
     saveSolo();
     soloView();
   }
+
+  function enDueloConReloj() { return solo?.kind === "duel" && !!solo.duelo?.reloj && !solo.finished; }
 
   function soloView() {
     screen = "solo";
@@ -1677,6 +1697,7 @@
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
       ${progress}
       ${enDuelo() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
+      ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.max(0, CT.Duelo.MS - (Date.now() - solo.cartaEmpezadaEn)), CT.Duelo.MS) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} ${solo.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
@@ -1712,6 +1733,7 @@
         soloView();
       }
     });
+    if (cartaEnReloj()) arrancaReloj();
   }
 
   function soloPlace(index) {
@@ -1723,7 +1745,24 @@
     if (correct) {
       solo.timeline.splice(index, 0, solo.current);
       solo.hits += 1;
-    } else {
+    }
+    resuelveCartaSolo(card, correct, index, null);
+  }
+
+  // Quedarse sin tiempo, o salirse de la aplicación con una carta delante, la da por
+  // fallada. En un duelo a reloj no decidir es una decisión: dejarla pendiente para
+  // volver luego sería justamente el hueco por el que se cuela quien va a buscar la
+  // respuesta a otra parte, que es lo que el plazo viene a cerrar.
+  function cierraCartaDuelo(motivo) {
+    if (!enDueloConReloj() || !solo.cartaEmpezadaEn || solo.pendingResult) return;
+    resuelveCartaSolo(cardsById.get(solo.current), false, null, motivo);
+  }
+
+  // Lo que ocurre con una carta una vez resuelta, se haya colocado o se haya acabado el
+  // tiempo: cuenta como jugada, entra en la cuadrícula y abre el resultado.
+  function resuelveCartaSolo(card, correct, index, motivo) {
+    paraReloj();
+    if (!correct) {
       // El duelo no gasta vidas: ver `soloAcabada`.
       if (!enDuelo()) solo.lives -= 1;
       (solo.failed = solo.failed || []).push(solo.current);
@@ -1732,9 +1771,10 @@
     // Un acierto o un fallo por carta, en el orden en que se jugaron: es lo único que
     // hace falta para dibujar la cuadrícula de aciertos al compartir el reto diario.
     (solo.sequence = solo.sequence || []).push(correct);
+    solo.cartaEmpezadaEn = null;
     pendingIndex = null;
     result = {
-      correct, card, solo: true, attemptedIndex: index,
+      correct, card, solo: true, motivo, attemptedIndex: index,
       correctIndex: correct ? null : CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)
     };
     CT.Effects.feedback(correct);
@@ -1748,11 +1788,18 @@
 
   function soloResult() {
     soloView();
-    const { correct, card } = result;
+    const { correct, card, motivo } = result;
     const era = eraForCard(card);
     const acabada = soloAcabada();
     const hint = correct ? "" : `<p>${CT.placementHint(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), card)}</p>`;
-    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${correct ? "¡Bien colocado!" : "No encaja ahí"}</div><h2><span class="solo-lectores">${correct ? "Bien colocado:" : "No encaja ahí:"} </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${correct ? "La carta se queda colocada." : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    // Una carta que se acabó sin colocar no se ha colocado mal: se dice lo que pasó de
+    // verdad, y la explicación de debajo tampoco la llama fallo de colocación.
+    const titulo = correct ? "¡Bien colocado!" : motivo === "salida" ? "Carta cerrada" : motivo === "tiempo" ? "Se acabó el tiempo" : "No encaja ahí";
+    const remate = correct ? "La carta se queda colocada."
+      : motivo === "salida" ? "Has salido de la aplicación con la carta delante, así que esta no suma."
+      : motivo === "tiempo" ? "Se agotaron los segundos sin colocarla, así que esta no suma."
+      : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`;
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${titulo}</div><h2><span class="solo-lectores">${titulo}: </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${remate}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   function soloNext() {
@@ -1774,6 +1821,9 @@
     // para saber si el movimiento está por enseñar: eso lo dice esta lista, que vive solo
     // en esta pantalla y se vacía en cuanto se ha visto llegar las cartas.
     recienColocadas = solo.autoAdded.slice();
+    // La carta nueva estrena plazo. Se apunta el instante, no lo que queda: así el tiempo
+    // corre aunque el móvil apague la pantalla o la aplicación se vaya al fondo.
+    if (enDueloConReloj()) solo.cartaEmpezadaEn = Date.now();
     saveSolo();
     soloView();
   }
@@ -1964,22 +2014,41 @@
 
   function arrancaReloj() {
     paraReloj();
-    cifrasReloj = setInterval(cifrasTick, 100);
-    cifrasTick();
+    cifrasReloj = setInterval(tictac, 100);
+    tictac();
+  }
+
+  // Los dos duelos comparten el reloj. Lo único que cambia es qué cierra cada uno cuando
+  // se agota: el de cifras cierra la respuesta escrita; el de orden da la carta por
+  // fallada, porque ahí no hay nada a medio escribir que rescatar. Devuelve `null` en
+  // cuanto no hay ninguna carta abierta, que es la señal de parar el latido.
+  function cartaEnReloj() {
+    if (screen === "cifras" && cifras && cifras.empezadaEn !== null && !cifras.pendiente) {
+      return { empezadaEn: cifras.empezadaEn, ms: Cifras.MS, cierra: cierraCarta };
+    }
+    if (screen === "solo" && enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult) {
+      return { empezadaEn: solo.cartaEmpezadaEn, ms: CT.Duelo.MS, cierra: cierraCartaDuelo };
+    }
+    return null;
   }
 
   // El latido: no decide nada por su cuenta, solo mira la hora y pinta lo que queda. Si
   // el móvil ha tenido la pestaña congelada, al volver encuentra el tiempo ya gastado.
-  function cifrasTick() {
-    if (!cifras || screen !== "cifras" || cifras.empezadaEn === null) return paraReloj();
-    const barra = app.querySelector(".cifra-bar");
-    if (!barra) return paraReloj();
-    const restante = Cifras.MS - (Date.now() - cifras.empezadaEn);
+  function tictac() {
+    const abierta = cartaEnReloj();
+    const barra = app.querySelector(".reloj-bar");
+    if (!abierta || !barra) return paraReloj();
+    const restante = abierta.ms - (Date.now() - abierta.empezadaEn);
     barra.value = Math.max(0, restante);
-    barra.classList.toggle("cifra-apura", restante <= 3000);
-    const marca = app.querySelector(".cifra-left");
+    barra.classList.toggle("reloj-apura", restante <= 3000);
+    const marca = app.querySelector(".reloj-left");
     if (marca) marca.textContent = `${Math.max(0, Math.ceil(restante / 1000))} s`;
-    if (restante <= 0) cierraCarta("tiempo");
+    if (restante <= 0) abierta.cierra("tiempo");
+  }
+
+  // El reloj de una carta, igual en los dos duelos.
+  function relojMarkup(restante, total) {
+    return `<div class="reloj"><progress class="reloj-bar ${restante <= 3000 ? "reloj-apura" : ""}" max="${total}" value="${restante}" aria-label="Tiempo restante para esta carta"></progress><b class="reloj-left" role="timer" aria-live="off">${Math.ceil(restante / 1000)} s</b></div>`;
   }
 
   function abreCarta() {
@@ -2022,9 +2091,8 @@
   // llamar tramposo a nadie: la carta se cierra y se dice, que es lo que de verdad se ve
   // después en el marcador compartido.
   function salidaDeLaApp(fuera) {
-    if (fuera <= Cifras.GRACIA_MS) return;
-    if (screen !== "cifras" || !cifras || cifras.empezadaEn === null || cifras.pendiente) return;
-    cierraCarta("salida");
+    if (fuera <= CT.Duelo.GRACIA_MS) return;
+    cartaEnReloj()?.cierra("salida");
   }
 
   function vuelveAPrimerPlano() {
@@ -2086,7 +2154,7 @@
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Duelo de cifras</div><div class="turn-name" aria-hidden="true">${puntos} ${puntos === 1 ? "punto" : "puntos"}</div></div><div class="deck-count"><strong>${cifras.total - indice}</strong><span>por responder</span></div></div>
       ${marcaRival ? `<div class="solo-stats cifra-rival">${marcaRival}</div>` : ""}
       <section class="cifra-panel">
-        <div class="cifra-clock"><progress class="cifra-bar ${restante <= 3000 ? "cifra-apura" : ""}" max="${Cifras.MS}" value="${restante}" aria-label="Tiempo restante para responder"></progress><b class="cifra-left" role="timer" aria-live="off">${Math.ceil(restante / 1000)} s</b></div>
+        ${relojMarkup(restante, Cifras.MS)}
         <div class="cifra-card" id="cifra-pregunta">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta)}</span></div>
         <div class="field cifra-field">
           <label for="cifra-input">Tu cifra ${escapeHtml(regla.unidad ? `en ${regla.unidad}` : "")}</label>
@@ -2202,7 +2270,10 @@
   // mazo y qué marca hay que batir —pero ninguna carta: la gracia es no saber qué sale—.
   function duelIntro() {
     screen = "duelo-intro";
-    const { mode, total, rival, cifras: esCifras } = pendingDuel;
+    const { mode, total, rival, cifras: esCifras, reloj } = pendingDuel;
+    // Un enlace anterior al reloj se juega sin él: la marca de enfrente se hizo sin plazo
+    // y ponérselo solo a quien lo acepta no compararía las mismas dos partidas.
+    const conReloj = esCifras || reloj;
     const juego = CT.mode(mode);
     const quien = rival.nombre || "Alguien";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
@@ -2210,8 +2281,10 @@
         <div class="big-icon">${esCifras ? "⏱️" : "⚔️"}</div>
         <div class="eyebrow">${esCifras ? "Duelo de cifras" : "Duelo"}</div>
         <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${escapeHtml(quien)} te reta</h1>
-        <p class="lead" style="margin-inline:auto">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)}${esCifras ? `. En cada una escribes la cifra, y tienes ${Cifras.SEGUNDOS} segundos` : " y en el mismo orden"}.</p>
-        ${esCifras ? `<p class="solo-intro-rule">El reloj no se para: si sales de la aplicación, la carta se cierra.</p>` : ""}
+        <p class="lead" style="margin-inline:auto">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)}${esCifras ? `. En cada una escribes la cifra` : " y en el mismo orden"}.</p>
+        ${conReloj
+          ? `<p class="solo-intro-rule">${esCifras ? Cifras.SEGUNDOS : CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${esCifras ? "cierra" : "da por fallada"}.</p>`
+          : `<p class="solo-intro-rule">Este reto se creó antes de que los duelos llevaran reloj, así que se juega sin plazo, como lo jugó ${escapeHtml(quien)}.</p>`}
         <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${esCifras ? `${rival.puntos} puntos` : `${rival.hits} de ${total}`}</b><small>la marca que hay que batir</small></span></div>
         <div class="field" style="margin-top:16px">
           <label for="duel-name">Tu nombre, para devolver el reto</label>
@@ -2527,6 +2600,14 @@
 
   app.addEventListener("change", event => {
     if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value, { returnTo: encReturn }); return; }
+    // Cambiar de modalidad no repinta: repintar cerraría el desplegable que se acaba de
+    // abrir para llegar hasta aquí. Se enseña un bloque y se esconde el otro.
+    if (event.target.id === "duel-kind") {
+      const modo = event.target.value === "cifras" ? "cifras" : "orden";
+      CT.Storage.setItem(DUEL_MODE_KEY, modo);
+      app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== modo; });
+      return;
+    }
     if (event.target.id !== "solo-difficulty") return;
     const key = event.target.value;
     if (!CT.Ghost.LEVELS[key]) return;
@@ -2657,7 +2738,7 @@
     else if (action === "start-duel") { guardaNombreSiLoHay(); startSolo("duel"); }
     // El duelo de cifras se estrena igual, y «Devolver el reto» pasa por aquí desde el
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
-    else if (action === "start-cifras") { guardaNombreSiLoHay("cifras-name"); startCifras(); }
+    else if (action === "start-cifras") { guardaNombreSiLoHay(); startCifras(); }
     else if (action === "resume-cifras") resumeCifras();
     else if (action === "cifra-answer") cierraCarta("respuesta");
     else if (action === "cifras-next") cifrasNext();

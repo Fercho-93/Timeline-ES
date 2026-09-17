@@ -19,9 +19,31 @@ function boot({ url = "https://hilo.test/", almacen = {} } = {}) {
   const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
   const { window } = dom;
   window.Element.prototype.scrollIntoView = function () {};
+  const reloj = { ahora: Date.now() };
+  window.Date.now = () => reloj.ahora;
+  let oculto = false;
+  Object.defineProperty(window.document, "hidden", { configurable: true, get: () => oculto });
+  Object.defineProperty(window.document, "visibilityState", { configurable: true, get: () => (oculto ? "hidden" : "visible") });
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   guiones().forEach(archivo => window.eval(read(archivo)));
+  // Salirse de la aplicación y volver `ms` milisegundos después.
+  window.seVaYVuelve = ms => {
+    oculto = true;
+    window.document.dispatchEvent(new window.Event("visibilitychange"));
+    reloj.ahora += ms;
+    oculto = false;
+    window.document.dispatchEvent(new window.Event("visibilitychange"));
+  };
+  window.avanza = ms => { reloj.ahora += ms; };
   return window;
+}
+const duerme = ms => new Promise(listo => setTimeout(listo, ms));
+const partida = w => JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+// Entra en un duelo de orden recién creado.
+function abreDuelo(w) {
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-duel"]');
 }
 const click = (w, sel) => {
   const el = w.document.querySelector(sel);
@@ -155,6 +177,12 @@ console.log("\nUn enlace roto no rompe nada");
   }
   ok("un mazo desconocido se distingue de un enlace roto", D.descodificar(cruda(w, "1|inventado|abc|3|2|110|x|Ana")).motivo === "mazo");
   ok("una versión futura también", D.descodificar(cruda(w, "9|history|abc|3|2|110|x|Ana")).motivo === "version");
+}
+
+function plano(w, payload) {
+  const relleno = payload.replace(/-/g, "+").replace(/_/g, "/");
+  const binario = w.atob(relleno + "=".repeat((4 - (relleno.length % 4)) % 4));
+  return new w.TextDecoder().decode(Uint8Array.from(binario, c => c.charCodeAt(0)));
 }
 
 function cruda(w, texto) {
@@ -292,6 +320,88 @@ console.log("\nEl duelo no se cuela donde no debe");
   click(w, '[data-action="start"]');
   click(w, '[data-action="ready"]');
   ok("ni dentro de una partida", !existe(w, '[data-action="start-duel"]'));
+}
+
+
+console.log("\nEl duelo de orden también se juega a reloj");
+{
+  const w = boot();
+  abreDuelo(w);
+  ok("la carta lleva reloj", existe(w, ".reloj-bar"));
+  ok("y queda apuntado el instante en que empezó", Number.isFinite(partida(w).cartaEmpezadaEn));
+
+  // Un vistazo fuera por debajo del margen de gracia no cuesta la carta.
+  w.seVaYVuelve(w.CONTINUUM.Duelo.GRACIA_MS - 400);
+  ok("un vistazo corto no cierra la carta", !existe(w, ".overlay") && partida(w).played === 0);
+
+  // Irse el tiempo que se tarda en consultar algo, sí.
+  w.seVaYVuelve(5000);
+  ok("irse más allá de la gracia da la carta por fallada", existe(w, ".overlay"));
+  ok("se dice qué pasó, sin llamar tramposo a nadie", /Has salido de la aplicación/.test(texto(w)));
+  const tras = partida(w);
+  ok("la carta cuenta como jugada y no suma", tras.played === 1 && tras.hits === 0 && tras.sequence.join() === "false");
+  ok("un duelo no gasta vidas ni por salirse", tras.lives === 3);
+
+  // La siguiente carta estrena plazo entero: la penalización es de la carta, no de la partida.
+  click(w, '[data-action="solo-next"]');
+  ok("la siguiente carta arranca con su reloj", existe(w, ".reloj-bar") && Number.isFinite(partida(w).cartaEmpezadaEn));
+}
+
+console.log("\nSe acaban los veinte segundos");
+{
+  const w = boot();
+  abreDuelo(w);
+  w.avanza(w.CONTINUUM.Duelo.MS + 200);
+  await duerme(250);
+  ok("agotado el plazo, la carta se cierra sola", existe(w, ".overlay"));
+  ok("y se dice que fue el tiempo, no una mala colocación", /Se acabó el tiempo/.test(texto(w)));
+  ok("la carta no suma", partida(w).hits === 0 && partida(w).sequence.join() === "false");
+}
+
+console.log("\nCerrar la aplicación no devuelve el plazo");
+{
+  const w = boot();
+  abreDuelo(w);
+  const guardada = partida(w);
+  const vuelta = boot({ almacen: {
+    "hilo-selected-mode-v1": "history",
+    "hilo-solo-history-v1": JSON.stringify({ ...guardada, cartaEmpezadaEn: Date.now() - 60000 })
+  } });
+  abreMazo(vuelta, "historia", "history");
+  click(vuelta, '[data-action="solo"]');
+  click(vuelta, '[data-action="resume-solo"]');
+  ok("al continuar, la carta que seguía abierta se cierra", existe(vuelta, ".overlay"));
+  ok("y se cierra como salida", /Has salido de la aplicación/.test(texto(vuelta)));
+
+  const rapida = boot({ almacen: {
+    "hilo-selected-mode-v1": "history",
+    "hilo-solo-history-v1": JSON.stringify({ ...guardada, cartaEmpezadaEn: Date.now() - 500 })
+  } });
+  abreMazo(rapida, "historia", "history");
+  click(rapida, '[data-action="solo"]');
+  click(rapida, '[data-action="resume-solo"]');
+  ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && partida(rapida).played === 0);
+}
+
+console.log("\nLas reglas viajan en la versión del enlace");
+{
+  const w = boot();
+  const D = w.CONTINUUM.Duelo;
+  const payload = D.codificar({ mode: "history", seed: "abc", total: 3, hits: 2, sequence: [true, true, false], nombre: "Ana" });
+  ok("un duelo creado hoy va marcado como jugado a reloj", plano(w, payload).split("|")[0] === "3");
+  ok("y al leerlo se sabe que lo lleva", D.descodificar(payload).duelo.reloj === true);
+
+  // Los enlaces anteriores al reloj siguen valiendo y se juegan como se jugaron.
+  const viejo = cruda(w, "1|history|abc|3|2|110|" + D.huella("history") + "|Ana");
+  const leido = D.descodificar(viejo);
+  ok("un enlace anterior al reloj se sigue aceptando", leido.ok === true);
+  ok("y se marca como jugado sin plazo", leido.duelo.reloj === false);
+
+  const rival = boot({ url: `https://hilo.test/?duelo=${viejo}` });
+  ok("al abrirlo se avisa de que ese reto se juega sin reloj", /se juega sin plazo/.test(texto(rival)));
+  click(rival, '[data-action="accept-duel"]');
+  ok("y efectivamente se juega sin reloj", !existe(rival, ".reloj-bar"));
+  ok("aunque sigue siendo un duelo", partida(rival).kind === "duel" && partida(rival).duelo.reloj === false);
 }
 
 console.log(`\n${fail} fallos`);

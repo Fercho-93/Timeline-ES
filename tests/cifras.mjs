@@ -55,7 +55,7 @@ const duerme = ms => new Promise(listo => setTimeout(listo, ms));
 function abreDuelo(w, { block = "geografia", mode = "population", nombre = "Fernando" } = {}) {
   abreMazo(w, block, mode);
   click(w, '[data-action="solo"]');
-  w.document.getElementById("cifras-name").value = nombre;
+  w.document.getElementById("duel-name").value = nombre;
   click(w, '[data-action="start-cifras"]');
 }
 
@@ -230,14 +230,16 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   const w = boot();
   abreMazo(w, "geografia", "population");
   click(w, '[data-action="solo"]');
-  ok("el duelo de cifras es un formato más del solitario", /Duelo de cifras/.test(texto(w)));
-  ok("y avisa de la regla que lo sostiene", /si sales de la aplicación, la carta se cierra/i.test(texto(w)));
+  // El duelo es una sola opción del menú con las dos modalidades dentro.
+  ok("hay un único duelo en el menú del solitario", w.document.querySelectorAll('[data-duel-block]').length === 2 && /Duelo por enlace/.test(texto(w)));
+  ok("y se elige la modalidad dentro", !!w.document.querySelector('#duel-kind option[value="cifras"]'));
+  ok("avisa de la regla que lo sostiene", /si sales de la aplicación, la carta se cierra/i.test(texto(w)));
 
-  w.document.getElementById("cifras-name").value = "Fernando";
+  w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-cifras"]');
   ok("empieza la partida", existe(w, '[data-action="cifra-answer"]'));
   ok("el nombre se guarda para la próxima", w.localStorage.getItem("hilo-nombre-v1") === "Fernando");
-  ok("se ve el reloj", existe(w, ".cifra-bar"));
+  ok("se ve el reloj", existe(w, ".reloj-bar"));
   ok("y el campo donde escribir la cifra", existe(w, "#cifra-input"));
   ok("no se enseña el detalle de la carta, que muchas veces lleva la cifra dentro", !existe(w, ".reveal"));
 

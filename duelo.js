@@ -21,6 +21,18 @@
   const MAX_CARTAS = 40;
   const MAX_NOMBRE = 18;
 
+  // Los dos duelos se juegan a reloj, por la misma razón: sin un plazo por carta no hay
+  // nada que impida ir a buscar la respuesta a otra parte, y quien la busca gana. El de
+  // ordenar tiene más plazo que el de cifras porque colocar cuesta más que teclear: hay
+  // que leer la línea entera, elegir el hueco y confirmarlo.
+  const SEGUNDOS = 20;
+  const MS = SEGUNDOS * 1000;
+  // Salir de la aplicación cierra la carta abierta, pero no a la primera: por debajo de
+  // este margen caben un aviso que se cuela, una llamada entrante o un roce en el gesto
+  // de multitarea, y ninguna de esas tres cosas puede costar una carta. Por debajo de él
+  // tampoco da tiempo a consultar nada en ninguna parte.
+  const GRACIA_MS = 1500;
+
   // La huella del mazo —compartida con las salas, en modes.js—. No es opcional: si los
   // dos móviles llevan versiones distintas de la aplicación, el mazo puede haber
   // cambiado —ha pasado con animales, países y distancias— y entonces la misma semilla
@@ -60,10 +72,6 @@
   const CIFRAS_CARTAS = 10;
   const CIFRAS_SEGUNDOS = 10;
   const CIFRAS_MS = CIFRAS_SEGUNDOS * 1000;
-  // Salir de la aplicación cierra la carta, pero no a la primera: un aviso que se cuela,
-  // una llamada entrante o un roce en el gesto de multitarea no pueden costar una carta.
-  // Por debajo de esto no da tiempo a consultar nada en ninguna parte.
-  const CIFRAS_GRACIA_MS = 1500;
   const PUNTOS_TINO = 60;
   const PUNTOS_PRISA = 40;
   const PUNTOS_CARTA = PUNTOS_TINO + PUNTOS_PRISA;
@@ -173,10 +181,17 @@
   // Ocho campos separados por barras. Compacto a propósito: el enlace entero cabe de
   // sobra en un mensaje, que es por donde va a viajar.
   //
-  //   1 | mazo | semilla | cartas | aciertos | secuencia | huella | nombre
+  //   3 | mazo | semilla | cartas | aciertos | secuencia | huella | nombre
+  //
+  // La versión no numera el formato: numera las reglas. Un duelo de orden jugado a reloj
+  // no es comparable con uno jugado sin él, así que los enlaces del «1» —los que se
+  // crearon antes de que hubiera reloj— se siguen aceptando y se juegan como se jugaron,
+  // sin plazo; y una aplicación que no conozca el «3» dice que hay que actualizar en vez
+  // de comparar dos partidas con reglas distintas. Es la misma idea que la huella del
+  // mazo, aplicada a las reglas en vez de a las cartas.
   function codificar({ mode, seed, total, hits, sequence, nombre, deck }) {
     const campos = [
-      "1", mode, seed, total, hits,
+      "3", mode, seed, total, hits,
       sequence.map(acierto => (acierto ? "1" : "0")).join(""),
       huella(mode, deck), limpiaNombre(nombre)
     ];
@@ -213,24 +228,25 @@
     if (campos.length !== 8) return { ok: false, motivo: "roto" };
     const [version, mode, seed, textoTotal, textoMarca, cuerpo, huellaRival, nombre] = campos;
 
-    if (version !== "1" && version !== "2") return { ok: false, motivo: "version" };
+    if (!["1", "2", "3"].includes(version)) return { ok: false, motivo: "version" };
     if (!CT.has(mode)) return { ok: false, motivo: "mazo" };
     if (!/^[a-z0-9]{1,12}$/.test(seed)) return { ok: false, motivo: "roto" };
 
+    const esCifras = version === "2";
     const total = Number(textoTotal);
     if (!Number.isInteger(total) || total < 1 || total > MAX_CARTAS) return { ok: false, motivo: "roto" };
     // El duelo de orden necesita una carta más que las jugadas: la que abre la línea.
     // El de cifras no abre ninguna línea, así que le bastan las suyas.
-    if (total + (version === "1" ? 1 : 0) > CT.cards(mode).length) return { ok: false, motivo: "roto" };
+    if (total + (esCifras ? 0 : 1) > CT.cards(mode).length) return { ok: false, motivo: "roto" };
 
     if (huellaRival !== huella(mode)) return { ok: false, motivo: "mazo-distinto" };
 
-    return version === "1"
-      ? leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre })
-      : leeCifras({ mode, seed, total, textoMarca, cuerpo, nombre });
+    return esCifras
+      ? leeCifras({ mode, seed, total, textoMarca, cuerpo, nombre })
+      : leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre, reloj: version === "3" });
   }
 
-  function leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre }) {
+  function leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre, reloj }) {
     const hits = Number(textoMarca);
     if (!Number.isInteger(hits) || hits < 0 || hits > total) return { ok: false, motivo: "roto" };
     if (!/^[01]+$/.test(cuerpo) || cuerpo.length !== total) return { ok: false, motivo: "roto" };
@@ -238,7 +254,7 @@
     if (secuencia.filter(Boolean).length !== hits) return { ok: false, motivo: "roto" };
     return {
       ok: true,
-      duelo: { mode, seed, total, cifras: false, rival: { nombre: limpiaNombre(nombre), hits, sequence: secuencia } }
+      duelo: { mode, seed, total, cifras: false, reloj, rival: { nombre: limpiaNombre(nombre), hits, sequence: secuencia } }
     };
   }
 
@@ -288,7 +304,7 @@
   // lo recibe tiene que jugarlo sin saber qué le va a salir.
   function invitacion({ modeName, nombre, hits, total, payload }) {
     const quien = nombre ? `${nombre} te reta` : "Te retan";
-    return `${quien} en Continuum · ${modeName}\n📊 ${hits}/${total} — a ver si lo superas\n${enlace(payload)}`;
+    return `${quien} en Continuum · ${modeName}\n📊 ${hits}/${total}, a ${SEGUNDOS} segundos por carta — a ver si lo superas\n${enlace(payload)}`;
   }
 
   // El cara a cara, para compartir el resultado. Las dos cuadrículas, una debajo de otra,
@@ -327,10 +343,11 @@
   }
 
   CT.Duelo = {
-    CARTAS, MAX_CARTAS, MAX_NOMBRE, huella, crearSemilla, reparto, codificar, descodificar,
+    CARTAS, MAX_CARTAS, MAX_NOMBRE, SEGUNDOS, MS, GRACIA_MS,
+    huella, crearSemilla, reparto, codificar, descodificar,
     enlace, invitacion, marcador, limpiaNombre,
     Cifras: {
-      CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS: CIFRAS_GRACIA_MS,
+      CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
       regla: reglaCifra, reparto: repartoCifras, cartas: cartasCifras,
       banda, puntosCarta, puntosPartida, formato: formatoCifra, texto: textoCifra,
