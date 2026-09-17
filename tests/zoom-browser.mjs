@@ -34,6 +34,10 @@ try {
     await page.goto(url);
     await page.locator('[data-block="historia"]').click();
     await page.locator('[data-mode="history"]').click();
+    if(width===414) {
+      await page.locator('.atlas-landscape img').evaluate(img=>img.decode());
+      await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
+    }
     await page.locator('[data-action="solo"]').click();
     await page.locator('.solo-fold').filter({has:page.locator('[data-action="resume-solo"]')}).locator('summary').click();
     await page.locator('[data-action="resume-solo"]').click();
