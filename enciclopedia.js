@@ -129,6 +129,33 @@
     })).filter(block => block.decks.length);
   }
 
+  // `seen` conserva el orden en que se descubrió cada carta. Se recorre al revés y se
+  // resuelve contra su mazo original para abrir el álbum con las últimas láminas, no con
+  // una lista administrativa de filtros. Gran mezcla no duplica aquí sus cartas.
+  function recentDiscoveries(limit = 6) {
+    const ids = (CT.Progreso?.read?.().seen || []).slice().reverse();
+    if (!ids.length) return [];
+    const origin = new Map();
+    for (const block of Object.values(CT.BLOCKS)) for (const modeKey of block.games) {
+      if (modeKey === "mixed") continue;
+      for (const card of CT.cards(modeKey)) if (!origin.has(card.id)) origin.set(card.id, { modeKey, card });
+    }
+    return ids.map(id => origin.get(id)).filter(item => item && CT.cardArt(item.modeKey, item.card)).slice(0, limit);
+  }
+
+  function recentMarkup(limit = 6) {
+    const latest = recentDiscoveries(limit);
+    return `<section class="enc-recent" aria-labelledby="enc-recent-title"><div class="enc-album-heading"><div><span>Recién incorporadas</span><h2 id="enc-recent-title">Últimos descubrimientos</h2></div><small>${latest.length ? `${latest.length} láminas` : "Tu álbum empieza aquí"}</small></div>${latest.length
+      ? `<div class="enc-recent-strip">${latest.map(({modeKey, card}) => `<article class="enc-recent-card"><div class="enc-recent-art">${CT.animalArt(modeKey, card)}</div><div><small>${CT.escapeHtml(CT.mode(modeKey).name)}</small><b>${CT.escapeHtml(card.title)}</b><span>${CT.formatValue(modeKey, card)}</span></div></article>`).join("")}</div>`
+      : `<div class="enc-recent-empty"><span aria-hidden="true">✦</span><p>Juega una carta con ilustración para colocar tu primera lámina.</p></div>`}</section>`;
+  }
+
+  const COVER = { history:"hero-history", entertainment:"hero-entertainment", science:"hero-science", nature:"hero-nature", globe:"hero-geography", mixed:"hero-mixed" };
+  function deckCover(block, index) {
+    const file = COVER[block.art] || COVER.history;
+    return `<span class="enc-deck-cover" style="--cover-position:${18 + (index % 4) * 21}%" aria-hidden="true"><img src="assets/${file}-400.webp" alt="" width="400" height="560" loading="lazy" decoding="async"><i>${block.icon}</i></span>`;
+  }
+
   function catalogMarkup(query = "", { lock = "all" } = {}) {
     // Una sola lectura de las descubiertas para todo el catálogo, que son treinta mazos.
     const descubiertas = seen();
@@ -146,14 +173,14 @@
     const plegados = !searching && (query.trim() || lock !== "all")
       ? `<p class="hint">${encontradas} cartas: son muchas para abrirlas de golpe. Despliega el mazo que quieras ver.</p>`
       : "";
-    return plegados + groups.map(block => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
-      <h2 id="enc-topic-${block.key}"><span aria-hidden="true">${block.icon}</span> ${CT.escapeHtml(block.name)}</h2>
-      ${block.decks.map(deck => `<details class="enc-deck" data-enc-deck="${deck.key}"${searching ? ' open data-loaded="true"' : ''}>
-        <summary><span>${CT.escapeHtml(deck.name)}</span><small>${deck.cards.length} cartas${laminaResumen(deck.key, descubiertas)}</small></summary>
+    return plegados + groups.map((block, blockIndex) => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
+      <div class="enc-topic-divider"><span>Cuaderno ${String(blockIndex + 1).padStart(2, "0")}</span><h2 id="enc-topic-${block.key}"><i aria-hidden="true">${block.icon}</i> ${CT.escapeHtml(block.name)}</h2></div>
+      ${block.decks.map((deck, deckIndex) => `<details class="enc-deck" data-enc-deck="${deck.key}"${searching ? ' open data-loaded="true"' : ''}>
+        <summary>${deckCover(block, deckIndex)}<span class="enc-deck-copy"><b>${CT.escapeHtml(deck.name)}</b><small>${deck.cards.length} cartas${laminaResumen(deck.key, descubiertas)}</small></span><i class="enc-deck-chevron" aria-hidden="true">⌄</i></summary>
         <div class="enc-deck-cards">${searching ? resultsMarkup(deck.key, deck.cards, { descubiertas }) : ''}</div>
       </details>`).join('')}
     </section>`).join('');
   }
 
-  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup, catalogGroups, catalogMarkup, seenProgress };
+  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup, catalogGroups, catalogMarkup, seenProgress, recentDiscoveries, recentMarkup };
 })();

@@ -1187,7 +1187,7 @@
     if (screen !== 'enciclopedia') encBackground = app.innerHTML;
     screen = "enciclopedia";
     const all = encMode === "all";
-    const mode = all ? {name: "Todas las cartas"} : CT.mode(encMode);
+    const mode = all ? {name: "Álbum de láminas"} : CT.mode(encMode);
     const bands = all ? [] : CT.Enciclopedia.bands(encMode);
     const cards = all
       ? CT.Enciclopedia.catalogGroups(encQuery, { lock: encLock }).flatMap(group => group.decks.flatMap(deck => deck.cards))
@@ -1203,7 +1203,8 @@
         <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
         <h1 data-focus tabindex="-1">${escapeHtml(mode.name)}</h1>
         <p class="lead" id="enc-count">${encCountText(encMode, cards.length)}</p>
-        <div class="panel enc-toolbar">
+        <div class="panel enc-toolbar enc-toolbar-compact">
+          <div class="enc-primary-filters">
           <div class="field">
             <label for="enc-mode-select">Mazo</label>
             <select id="enc-mode-select">${encModeOptions(encMode)}</select>
@@ -1211,6 +1212,7 @@
           <div class="field">
             <label for="enc-search-input">Buscar</label>
             <input id="enc-search-input" type="search" autocomplete="off" placeholder="Título, explicación o fuente…" value="${escapeHtml(encQuery)}">
+          </div>
           </div>
           ${all ? '' : `<div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
             <button type="button" id="enc-band-all" class="band-chip${encBand === "all" ? " active" : ""}" data-action="enc-band" data-band="all" aria-pressed="${encBand === "all"}">Todas</button>
@@ -1223,6 +1225,7 @@
             </div>
           </div>` : ''}
         </div>
+        ${all && !encQuery && encLock === "all" ? CT.Enciclopedia.recentMarkup() : ""}
         ${all && encLock === "all" ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
         <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery, { lock: encLock }) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
         <button type="button" class="btn btn-secondary btn-block" data-action="enc-back">Cerrar enciclopedia</button>
@@ -2347,6 +2350,7 @@
   CT.localNavigate = action => {
     if (action === 'home-encyclopedia') openEnciclopedia('all');
     else if (action === 'perfil') perfilView();
+    else if (action === 'daily') { CT.closeDialog(); soloHome(); }
     else { homeDestination = 'home'; home(); window.scrollTo(0, 0); }
   };
   CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "comp-intro"].includes(screen) || !!CT.onlineActive;

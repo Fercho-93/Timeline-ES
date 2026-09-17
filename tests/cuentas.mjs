@@ -62,7 +62,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await w.testAccounts.startAccounts(()=>{});assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),p);dom.window.close();
 }
 {
- const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'dailyRanking/a':{alias:'Fer',avatar:'compass',hits:5}});
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'dailyRanking/b':{alias:'Luna',avatar:'star',hits:12},'dailyRanking/c':{alias:'Atlas',avatar:'globe',hits:9},'dailyRanking/d':{alias:'Marco',avatar:'book',hits:7},'dailyRanking/a':{alias:'Fer',avatar:'compass',hits:5}});
  await w.testAccounts.startAccounts(()=>{});
  w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
  const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();await new Promise(r=>setTimeout(r,0));};
@@ -70,10 +70,23 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.ok(w.document.querySelector('[role="dialog"] #account-alias'));
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('ranking');assert.match(w.document.querySelector('[role="dialog"]').textContent,/Fer/);
+ assert.equal(w.document.querySelectorAll('.ranking-medallion').length,3);
+ assert.equal(w.document.querySelectorAll('.ranking-medallion-1').length,1);
+ assert.ok(w.document.querySelector('.account-ranking .is-you .ranking-you'));
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('delete');assert.ok(w.document.querySelector('[role="dialog"] [data-account-action="delete-confirm"]'));
  w.document.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
  assert.equal(w.document.querySelector('[role="dialog"]'),null);
+ dom.window.close();
+}
+{
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile});let daily=0;
+ w.CONTINUUM.localNavigate=action=>{if(action==='daily')daily++;};
+ await w.testAccounts.startAccounts(()=>{});w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
+ w.document.querySelector('[data-account-action="ranking"]').click();await new Promise(r=>setTimeout(r,0));
+ assert.ok(w.document.querySelector('.ranking-empty [data-account-action="daily"]'));
+ w.document.querySelector('[data-account-action="daily"]').click();
+ assert.equal(daily,1);assert.equal(w.document.querySelector('[role="dialog"]'),null);
  dom.window.close();
 }
 assert.match(read('index.html'),/src="boot.js"/);assert.doesNotMatch(read('index.html'),/src="app.js"/);

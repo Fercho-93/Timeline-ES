@@ -1216,3 +1216,60 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   .timeline-ink-wave { animation: none; display: none; }
   .slot-correct.correction-target { animation: none; }
 }
+
+/* Enciclopedia como álbum: primero las láminas, después la herramienta de consulta. */
+#app .enc-modal { background: var(--edition-paper); }
+#app .enc-toolbar-compact { gap: 10px; padding: 12px; margin: 12px 0 18px; border-radius: 14px; }
+#app .enc-primary-filters { display: grid; grid-template-columns: minmax(180px,.8fr) minmax(220px,1.2fr); gap: 10px; }
+#app .enc-toolbar-compact .field { margin: 0; gap: 4px; }
+#app .enc-toolbar-compact label, #app .enc-toolbar-compact .enc-lock-label { font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; }
+#app .enc-toolbar-compact :is(select,input) { min-height: 42px; padding-block: 8px; }
+#app .enc-toolbar-compact .enc-bands { flex-wrap: nowrap; gap: 6px; overflow-x: auto; padding: 2px 1px 5px; scrollbar-width: none; }
+#app .enc-toolbar-compact .enc-bands::-webkit-scrollbar { display: none; }
+#app .enc-toolbar-compact .band-chip { min-height: 36px; padding: 6px 11px; flex: none; font-size: .68rem; }
+#app .enc-toolbar-compact .enc-lock-field { gap: 4px; }
+.enc-album-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.enc-album-heading span { display: block; margin-bottom: 3px; color: var(--edition-brass); font: 700 .58rem/1.3 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
+.enc-album-heading h2 { margin: 0; font-size: clamp(1.35rem,5vw,1.8rem); }
+.enc-album-heading > small { flex: none; color: var(--edition-muted); font: .68rem/1.4 var(--ui-font); }
+.enc-recent { margin: 4px 0 24px; padding: 16px 0 18px; border-block: 1px solid color-mix(in srgb,var(--edition-brass) 28%,transparent); }
+.enc-recent-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(142px,38%); gap: 10px; overflow-x: auto; padding: 4px 3px 15px; scroll-snap-type: x proximity; }
+.enc-recent-card { scroll-snap-align: start; overflow: hidden; border: 1px solid color-mix(in srgb,var(--edition-brass) 45%,var(--edition-line)); border-radius: 9px; background: var(--edition-surface); box-shadow: 0 5px 12px #3e2a1618; }
+.enc-recent-art { aspect-ratio: 4/3; overflow: hidden; background: var(--edition-paper); }
+.enc-recent-art .animal-card-art { width: 100%; height: 100%; object-fit: cover; object-position: center 34%; }
+.enc-recent-card > div:last-child { display: grid; gap: 3px; padding: 9px; }
+.enc-recent-card small { color: var(--edition-brass); font: 700 .52rem/1.25 var(--ui-font); letter-spacing: .06em; text-transform: uppercase; }
+.enc-recent-card b { font: 600 .78rem/1.2 var(--font-display); }
+.enc-recent-card span { color: var(--edition-muted); font: .65rem/1.2 var(--ui-font); }
+.enc-recent-empty { display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px dashed var(--edition-line); border-radius: 12px; color: var(--edition-muted); }
+.enc-recent-empty > span { color: var(--edition-brass); font-size: 1.8rem; }
+.enc-recent-empty p { margin: 0; font: .78rem/1.45 var(--ui-font); }
+#app .enc-topic { margin: 34px 0; }
+.enc-topic-divider { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 14px; margin-bottom: 12px; }
+.enc-topic-divider::after { content: ''; grid-column: 2; height: 1px; background: linear-gradient(90deg,var(--edition-brass),transparent); }
+.enc-topic-divider > span { grid-row: 1 / 3; color: var(--edition-brass); font: 700 .56rem/1.4 var(--ui-font); letter-spacing: .12em; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); }
+#app .enc-topic-divider h2 { grid-column: 2; margin: 0; font-size: 1.45rem; }
+.enc-topic-divider h2 i { font-style: normal; margin-right: 5px; }
+#app .enc-deck { overflow: hidden; border-color: color-mix(in srgb,var(--edition-brass) 32%,var(--edition-line)); box-shadow: 0 3px 10px #48321a0d; }
+#app .enc-deck summary { display: grid; grid-template-columns: 78px minmax(0,1fr) 26px; align-items: center; gap: 12px; min-height: 86px; padding: 0 13px 0 0; }
+.enc-deck-cover { position: relative; align-self: stretch; min-height: 86px; overflow: hidden; background: var(--edition-paper); }
+.enc-deck-cover img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--cover-position) center; filter: sepia(.18) saturate(.9); }
+.enc-deck-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,transparent 65%,var(--edition-surface)); }
+.enc-deck-cover i { position: absolute; z-index: 1; left: 8px; bottom: 7px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #f8eededb; color: var(--edition-ink); font-style: normal; }
+#app .enc-deck summary .enc-deck-copy { display: block; min-width: 0; }
+.enc-deck-copy b, .enc-deck-copy small { display: block; }
+.enc-deck-copy b { font: 600 .98rem/1.2 var(--font-display); }
+#app .enc-deck-copy small { margin: 5px 0 0; white-space: normal; font-size: .68rem; line-height: 1.35; }
+.enc-deck-chevron { color: var(--edition-brass); font-size: 1.25rem; font-style: normal; transition: transform 180ms ease; }
+.enc-deck[open] .enc-deck-chevron { transform: rotate(180deg); }
+#app .enc-deck-cards:not(:empty) { padding: 10px; background: color-mix(in srgb,var(--edition-brass) 5%,var(--edition-paper)); }
+#app .enc-grid .enc-card-illustrated { display: grid; grid-template-columns: minmax(118px,34%) minmax(0,1fr); align-items: start; overflow: hidden; }
+#app .enc-grid .enc-card-illustrated .card-visual { width: 100%; align-self: stretch; min-height: 190px; }
+#app .enc-grid .enc-card-illustrated .animal-card-art { object-fit: cover; }
+@media (max-width: 520px) {
+  #app .enc-primary-filters { grid-template-columns: 1fr; }
+  .enc-recent-strip { grid-auto-columns: minmax(136px,45%); }
+  #app .enc-grid .enc-card-illustrated { grid-template-columns: minmax(108px,36%) minmax(0,1fr); }
+  #app .enc-grid .enc-card-illustrated .card-content { padding: 10px; }
+  #app .enc-grid .enc-card-illustrated .card-content > p:not(.enc-source) { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+}
