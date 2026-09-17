@@ -157,18 +157,40 @@
   const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
   const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
 
-  // Las cartas que el tablero coloca solo —las automáticas de Normal en adelante— llegan
-  // desde el centro de la pantalla hasta su sitio en la línea, en vez de aparecer ya
-  // puestas. No es adorno: son cartas que nadie ha jugado y que cambian el tablero, así
-  // que se ve de dónde salen y dónde caen. Se anima el hueco final hacia atrás (la carta
-  // ya está en su posición definitiva y se la lleva al centro para traerla de vuelta),
-  // porque así el sitio que ocupa la línea es el de verdad en todo momento y ninguna
-  // carta se mueve al terminar. Con movimiento reducido no se anima nada.
-  // `seguir` lleva la vista hasta cada carta justo antes de que entre, no solo hasta la
-  // primera: con dos cartas automáticas, la segunda suele caer en otro punto de la línea
-  // y sin mover la vista se colocaría fuera de la pantalla. Se llama con la carta todavía
-  // invisible, así que primero se ve viajar la línea y después llegar la carta.
-  const TURNO = 640;
+  // Un mismo gesto físico para ambas llegadas: elevar, viajar y posar el papel.
+  // Las coordenadas pertenecen a la línea ya escalada: compensar su zoom evita
+  // que el recorrido cambie al elegir 80/100/120%.
+  function seatCard(card, {dx = 0, dy = 90, automatic = false, duration = 920} = {}) {
+    const angle = automatic ? 7 : -5;
+    const shadow = getComputedStyle(card).boxShadow;
+    const transform = (x, y, tilt, size) => `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg) scale(${size})`;
+    const animations = [card.animate([
+      {transform: transform(dx, dy, angle, .9), opacity: 0, boxShadow: '0 16px 28px #39240b30', offset: 0},
+      {transform: transform(dx * .86, dy * .83 - 14, angle * .75, 1.045), opacity: 1, boxShadow: '0 22px 32px #39240b38', offset: .22},
+      {transform: transform(dx * .14, dy * .12 - 8, -angle * .12, 1.025), opacity: 1, boxShadow: '0 10px 16px #39240b28', offset: .66},
+      {transform: transform(0, 2, 0, .992), opacity: 1, boxShadow: '0 2px 4px #39240b24', offset: .86},
+      {transform: 'none', opacity: 1, boxShadow: shadow, offset: 1}
+    ], {duration, easing: 'cubic-bezier(.25,.65,.3,1)'})];
+    const cards = [...card.parentElement.querySelectorAll('.timeline-card')];
+    const at = cards.indexOf(card);
+    [cards[at - 1], cards[at + 1]].forEach((neighbor, i) => {
+      if (neighbor?.animate) animations.push(neighbor.animate([
+        {transform: `translateX(${i === 0 ? 20 : -20}px)`, offset: 0},
+        {transform: `translateX(${i === 0 ? -4 : 4}px) rotate(${i === 0 ? -.6 : .6}deg)`, offset: .55},
+        {transform: 'none', offset: 1}
+      ], {duration, easing: 'cubic-bezier(.25,.65,.3,1)'}));
+    });
+    card.classList.add('card-fitting');
+    card.querySelector('.year')?.classList.add('date-ink');
+    const clean = () => {
+      card.classList.remove('card-fitting');
+      card.querySelector('.year')?.classList.remove('date-ink');
+    };
+    Promise.all(animations.map(animation => animation.finished)).then(clean, clean);
+    return () => { animations.forEach(animation => animation.cancel()); clean(); };
+  }
+  // Una llegada termina antes de que empiece la siguiente.
+  const TURNO = 1040;
   let cancelDeal = null;
   function dealIn(cards, { seguir = null, delay = 0 } = {}) {
     const lista = [...cards].filter(card => card?.isConnected);
@@ -194,29 +216,33 @@
     // Con movimiento reducido no hay recorrido, pero la vista sí va hasta la última: saber
     // dónde ha caído la carta no es decoración, es la mitad de la información.
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !lista.every(card => typeof card.animate === 'function')) { seguir?.(lista[lista.length - 1]); return; }
+    cancelDeal?.();
+    const timers = [], arrivals = [];
+    cancelDeal = () => {
+      timers.forEach(clearTimeout); arrivals.forEach(cancel => cancel());
+      lista.forEach(card => { card.style.visibility = ''; });
+      cancelDeal = null;
+    };
     lista.forEach((card, orden) => {
-      // Las que esperan su turno no se ven: si no, estarían puestas antes de llegar.
-      if (orden > 0) card.style.visibility = "hidden";
+      card.style.visibility = 'hidden';
       const entra = () => {
-        if (!card.isConnected) return;   // un repintado se llevó la mesa por delante
+        if (!card.isConnected) return;
         if (orden > 0) window.CONTINUUM.Effects?.transition?.('deal');
-        card.style.visibility = "";
         seguir?.(card);
-        if (!card.animate) return;
-        const caja = card.getBoundingClientRect();
-        if (!caja.width) return;
-        const dx = window.innerWidth / 2 - (caja.left + caja.width / 2);
-        const dy = window.innerHeight / 2 - (caja.top + caja.height / 2);
-        const efecto = card.animate([
-          { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 0, offset: 0 },
-          { transform: `translate3d(${dx}px, ${dy}px, 0) scale(1.16) rotate(-2.5deg)`, opacity: 1, offset: .18 },
-          { transform: `translate3d(${dx * .35}px, ${dy * .35}px, 0) scale(1.06) rotate(-1deg)`, opacity: 1, offset: .62 },
-          { transform: "none", opacity: 1, offset: 1 }
-        ], { duration: 760, easing: "cubic-bezier(.22,.61,.36,1)", fill: "backwards" });
-        efecto.finished.catch(() => {});
+        const wrap = card.closest('.timeline-wrap');
+        if (wrap) {
+          const box = card.getBoundingClientRect(), view = wrap.getBoundingClientRect();
+          wrap.scrollLeft += box.left - view.left - (view.width - box.width) / 2;
+        }
+        card.style.visibility = '';
+        const box = card.getBoundingClientRect();
+        if (!box.width) return;
+        const scale = parseFloat(card.closest('.timeline')?.style.getPropertyValue('--timeline-scale')) || 1;
+        const dx = Math.max(-120, Math.min(120, (window.innerWidth / 2 - (box.left + box.width / 2)) / scale + 60));
+        arrivals.push(seatCard(card, {dx, dy: -72 / scale, automatic: true}));
       };
       if (orden === 0) entra();
-      else setTimeout(entra, orden * TURNO);
+      else timers.push(setTimeout(entra, orden * TURNO));
     });
   }
 
@@ -493,19 +519,8 @@
         const hand = document.querySelector('.hand-card.selected')?.getBoundingClientRect();
         const dx = hand ? Math.max(-180, Math.min(180, (hand.left - box.left) / scale)) : 0;
         const dy = hand ? Math.max(60, Math.min(180, (hand.top - box.top) / scale)) : 90;
-        animations.push(card.animate([
-          {transform: `translate(${dx}px, ${dy}px) rotate(-5deg) scale(.86)`, opacity: 0},
-          {transform: 'translate(0, 0) rotate(0) scale(1)', opacity: 1}
-        ], {duration: Math.min(650, remaining), easing: 'cubic-bezier(.2,.7,.2,1)'}));
-        const cards = [...card.parentElement.querySelectorAll('.timeline-card')];
-        const at = cards.indexOf(card);
-        [cards[at - 1], cards[at + 1]].forEach((neighbor, i) => {
-          if (neighbor?.animate) animations.push(neighbor.animate([
-            {transform: `translateX(${i === 0 ? 24 : -24}px)`}, {transform: 'translateX(0)'}
-          ], {duration: Math.min(650, remaining), easing: 'cubic-bezier(.2,.7,.2,1)'}));
-        });
-        card.classList.add('card-fitting');
-        card.querySelector('.year')?.classList.add('date-ink');
+        const cancelArrival = seatCard(card, {dx, dy, duration: Math.min(920, remaining)});
+        animations.push({cancel: cancelArrival});
         const onKey = event => { if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ') event.preventDefault(); };
         document.addEventListener('keydown', onKey);
         const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); animations.forEach(animation => animation.cancel()); card.classList.remove('card-fitting'); card.querySelector('.year')?.classList.remove('date-ink'); }};

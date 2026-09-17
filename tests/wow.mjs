@@ -23,4 +23,18 @@ const modal=w.document.createElement('div');modal.innerHTML='<div class="reveal"
 w.CONTINUUM.UI.reveal(modal);const year=modal.querySelector('.year');assert.ok(year.classList.contains('date-ink'));
 const event=new w.Event('animationend');Object.defineProperty(event,'animationName',{value:'date-ink-stamp'});year.dispatchEvent(event);year.dispatchEvent(event);assert.equal(stamps,1,'un solo sello por revelado');
 reduced=true;year.classList.remove('date-ink');w.CONTINUUM.UI.reveal(modal);assert.equal(year.classList.contains('date-ink'),false);
+// Cancelar durante una llegada también debe retirar el movimiento y el turno siguiente.
+reduced=false;
+app.innerHTML='<div class="shell"><div class="timeline" style="--timeline-scale: .8"><article class="timeline-card"></article><article class="timeline-card"></article></div></div>';
+const arrivals=[...app.querySelectorAll('.timeline-card')];
+arrivals.forEach(card=>card.getBoundingClientRect=()=>({left:20,top:120,width:100,height:160}));
+let cancelled=0, entries=0;
+w.HTMLElement.prototype.animate=()=>({finished:new Promise(()=>{}),cancel(){cancelled++;}});
+w.CONTINUUM.dealIn(arrivals,{seguir(){entries++;}});
+assert.equal(entries,1);assert.equal(arrivals[1].style.visibility,'hidden');
+assert.ok(arrivals[0].classList.contains('card-fitting'));
+w.CONTINUUM.paint(app,'<section>Inicio</section>','home');
+assert.ok(cancelled>0,'salir cancela también el vuelo activo');
+assert.equal(arrivals[0].classList.contains('card-fitting'),false);
+await new Promise(r=>setTimeout(r,1100));assert.equal(entries,1,'no entra otra carta en una pantalla nueva');
 dom.window.close();console.log('WOW: espera IA, cancelación, abanico, logros, sello único y movimiento reducido OK.');
