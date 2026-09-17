@@ -22,16 +22,31 @@
   const MAX_NOMBRE = 18;
 
   // Los dos duelos se juegan a reloj, por la misma razón: sin un plazo por carta no hay
-  // nada que impida ir a buscar la respuesta a otra parte, y quien la busca gana. El de
-  // ordenar tiene más plazo que el de cifras porque colocar cuesta más que teclear: hay
-  // que leer la línea entera, elegir el hueco y confirmarlo.
-  const SEGUNDOS = 20;
+  // nada que impida ir a buscar la respuesta a otra parte, y quien la busca gana. El
+  // plazo es el mismo en las dos modalidades, que es lo que las hace una sola cosa con
+  // dos maneras de jugarla en vez de dos juegos.
+  const SEGUNDOS = 15;
   const MS = SEGUNDOS * 1000;
   // Salir de la aplicación cierra la carta abierta, pero no a la primera: por debajo de
   // este margen caben un aviso que se cuela, una llamada entrante o un roce en el gesto
   // de multitarea, y ninguna de esas tres cosas puede costar una carta. Por debajo de él
   // tampoco da tiempo a consultar nada en ninguna parte.
   const GRACIA_MS = 1500;
+
+  // Qué reglas lleva cada versión de la carga útil. La versión no numera el formato:
+  // numera las reglas con las que se jugó, porque dos partidas con plazos distintos no se
+  // pueden comparar y el marcador mentiría sin avisar. Por eso las versiones viejas no se
+  // rechazan: se leen con su propio plazo y se juegan como se jugaron. `ms: 0` es un
+  // duelo de antes de que hubiera reloj.
+  const REGLAS = {
+    "1": { cifras: false, ms: 0 },
+    "2": { cifras: true, ms: 10000 },
+    "3": { cifras: false, ms: 20000 },
+    "4": { cifras: false, ms: MS },
+    "5": { cifras: true, ms: MS }
+  };
+  const VERSION_ORDEN = "4";
+  const VERSION_CIFRAS = "5";
 
   // La huella del mazo —compartida con las salas, en modes.js—. No es opcional: si los
   // dos móviles llevan versiones distintas de la aplicación, el mazo puede haber
@@ -59,10 +74,10 @@
 
   // ——— El duelo de cifras ———
   //
-  // El otro duelo ordena cartas; este pide el número: diez cartas, diez segundos cada
-  // una, y gana quien sume más puntos.
+  // El otro duelo ordena cartas; este pide el número: diez cartas, el mismo plazo por
+  // carta que el de orden, y gana quien sume más puntos.
   //
-  // Los diez segundos no son un adorno. Son lo único que hace que no compense buscar la
+  // El plazo no es un adorno. Es lo único que hace que no compense buscar la
   // respuesta en otro sitio, y por eso el reloj se cuenta siempre restando marcas de
   // `Date.now()` y nunca con un contador que vaya bajando solo: una pestaña escondida
   // congela sus temporizadores, y un contador ingenuo se pararía justo mientras alguien
@@ -70,8 +85,8 @@
   // obliga a guardar el instante en que empezó la carta: si la partida se reanuda, el
   // tiempo transcurrido se mide contra el reloj de verdad, no contra lo que quedaba.
   const CIFRAS_CARTAS = 10;
-  const CIFRAS_SEGUNDOS = 10;
-  const CIFRAS_MS = CIFRAS_SEGUNDOS * 1000;
+  const CIFRAS_SEGUNDOS = SEGUNDOS;
+  const CIFRAS_MS = MS;
   const PUNTOS_TINO = 60;
   const PUNTOS_PRISA = 40;
   const PUNTOS_CARTA = PUNTOS_TINO + PUNTOS_PRISA;
@@ -127,17 +142,21 @@
   // Los puntos de una carta. Salir de la aplicación la deja a cero entera; agotar el
   // tiempo con algo escrito no: la respuesta cuenta, pero se queda sin la parte de la
   // prisa, que es justo lo que se pierde por tardar.
-  function puntosCarta(modeKey, card, jugada) {
+  //
+  // El plazo entra como argumento y no como constante porque la parte de la prisa se
+  // mide contra él: una partida jugada con otro plazo hay que volver a puntuarla con el
+  // suyo, o sus puntos no cuadrarían al recalcularlos.
+  function puntosCarta(modeKey, card, jugada, plazo = CIFRAS_MS) {
     if (!jugada || jugada.salida) return 0;
     const acierto = banda(modeKey, card, jugada.respuesta).puntos;
     if (!acierto) return 0;
-    const usado = Math.min(Math.max(Number(jugada.ms) || 0, 0), CIFRAS_MS);
-    return acierto + Math.round(PUNTOS_PRISA * ((CIFRAS_MS - usado) / CIFRAS_MS));
+    const usado = Math.min(Math.max(Number(jugada.ms) || 0, 0), plazo);
+    return acierto + Math.round(PUNTOS_PRISA * ((plazo - usado) / plazo));
   }
 
-  function puntosPartida(modeKey, seed, total, jugadas) {
+  function puntosPartida(modeKey, seed, total, jugadas, plazo = CIFRAS_MS) {
     const cartas = cartasCifras(modeKey, seed, total);
-    return jugadas.reduce((suma, jugada, i) => suma + puntosCarta(modeKey, cartas[i], jugada), 0);
+    return jugadas.reduce((suma, jugada, i) => suma + puntosCarta(modeKey, cartas[i], jugada, plazo), 0);
   }
 
   // La respuesta escrita, con la unidad del mazo. El eje formatea cartas, así que se le
@@ -181,17 +200,15 @@
   // Ocho campos separados por barras. Compacto a propósito: el enlace entero cabe de
   // sobra en un mensaje, que es por donde va a viajar.
   //
-  //   3 | mazo | semilla | cartas | aciertos | secuencia | huella | nombre
+  //   4 | mazo | semilla | cartas | aciertos | secuencia | huella | nombre
   //
-  // La versión no numera el formato: numera las reglas. Un duelo de orden jugado a reloj
-  // no es comparable con uno jugado sin él, así que los enlaces del «1» —los que se
-  // crearon antes de que hubiera reloj— se siguen aceptando y se juegan como se jugaron,
-  // sin plazo; y una aplicación que no conozca el «3» dice que hay que actualizar en vez
-  // de comparar dos partidas con reglas distintas. Es la misma idea que la huella del
-  // mazo, aplicada a las reglas en vez de a las cartas.
+  // El primer campo es la versión de las reglas —véase `REGLAS`—, no la del formato. Una
+  // aplicación que no la conozca pide actualizar en vez de comparar dos partidas que se
+  // jugaron con plazos distintos. Es la misma idea que la huella del mazo, aplicada a las
+  // reglas en vez de a las cartas.
   function codificar({ mode, seed, total, hits, sequence, nombre, deck }) {
     const campos = [
-      "3", mode, seed, total, hits,
+      VERSION_ORDEN, mode, seed, total, hits,
       sequence.map(acierto => (acierto ? "1" : "0")).join(""),
       huella(mode, deck), limpiaNombre(nombre)
     ];
@@ -209,7 +226,7 @@
       jugada.salida ? 1 : 0
     ].join(":")).join(",");
     const campos = [
-      "2", mode, seed, total, puntosPartida(mode, seed, total, jugadas),
+      VERSION_CIFRAS, mode, seed, total, puntosPartida(mode, seed, total, jugadas),
       datos, huella(mode, deck), limpiaNombre(nombre)
     ];
     return aBase64url(campos.join("|"));
@@ -228,25 +245,25 @@
     if (campos.length !== 8) return { ok: false, motivo: "roto" };
     const [version, mode, seed, textoTotal, textoMarca, cuerpo, huellaRival, nombre] = campos;
 
-    if (!["1", "2", "3"].includes(version)) return { ok: false, motivo: "version" };
+    const reglas = REGLAS[version];
+    if (!reglas) return { ok: false, motivo: "version" };
     if (!CT.has(mode)) return { ok: false, motivo: "mazo" };
     if (!/^[a-z0-9]{1,12}$/.test(seed)) return { ok: false, motivo: "roto" };
 
-    const esCifras = version === "2";
     const total = Number(textoTotal);
     if (!Number.isInteger(total) || total < 1 || total > MAX_CARTAS) return { ok: false, motivo: "roto" };
     // El duelo de orden necesita una carta más que las jugadas: la que abre la línea.
     // El de cifras no abre ninguna línea, así que le bastan las suyas.
-    if (total + (esCifras ? 0 : 1) > CT.cards(mode).length) return { ok: false, motivo: "roto" };
+    if (total + (reglas.cifras ? 0 : 1) > CT.cards(mode).length) return { ok: false, motivo: "roto" };
 
     if (huellaRival !== huella(mode)) return { ok: false, motivo: "mazo-distinto" };
 
-    return esCifras
-      ? leeCifras({ mode, seed, total, textoMarca, cuerpo, nombre })
-      : leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre, reloj: version === "3" });
+    return reglas.cifras
+      ? leeCifras({ mode, seed, total, textoMarca, cuerpo, nombre, ms: reglas.ms })
+      : leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre, ms: reglas.ms });
   }
 
-  function leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre, reloj }) {
+  function leeOrden({ mode, seed, total, textoMarca, cuerpo, nombre, ms }) {
     const hits = Number(textoMarca);
     if (!Number.isInteger(hits) || hits < 0 || hits > total) return { ok: false, motivo: "roto" };
     if (!/^[01]+$/.test(cuerpo) || cuerpo.length !== total) return { ok: false, motivo: "roto" };
@@ -254,11 +271,11 @@
     if (secuencia.filter(Boolean).length !== hits) return { ok: false, motivo: "roto" };
     return {
       ok: true,
-      duelo: { mode, seed, total, cifras: false, reloj, rival: { nombre: limpiaNombre(nombre), hits, sequence: secuencia } }
+      duelo: { mode, seed, total, cifras: false, ms, rival: { nombre: limpiaNombre(nombre), hits, sequence: secuencia } }
     };
   }
 
-  function leeCifras({ mode, seed, total, textoMarca, cuerpo, nombre }) {
+  function leeCifras({ mode, seed, total, textoMarca, cuerpo, nombre, ms: plazo }) {
     // Un duelo de cifras son siempre estas cartas y no más: la aplicación no crea otros
     // tamaños, y aceptar uno mayor desde un enlace sería jugar algo que luego ni siquiera
     // se podría reanudar.
@@ -278,7 +295,7 @@
       const respuesta = escrita === "" ? null : Number(escrita);
       if (respuesta !== null && (!Number.isFinite(respuesta) || Math.abs(respuesta) > MAX_CIFRA)) return { ok: false, motivo: "roto" };
       const ms = Number(textoMs);
-      if (!Number.isInteger(ms) || ms < 0 || ms > CIFRAS_MS) return { ok: false, motivo: "roto" };
+      if (!Number.isInteger(ms) || ms < 0 || ms > plazo) return { ok: false, motivo: "roto" };
       if (textoSalida !== "0" && textoSalida !== "1") return { ok: false, motivo: "roto" };
       jugadas.push({ respuesta, ms, salida: textoSalida === "1" });
     }
@@ -287,11 +304,11 @@
     // —las reparte la semilla y las garantiza la huella— y tienen que coincidir. Así una
     // marca inflada a mano no llega a comparar nada. Lo que sigue sin poder comprobarse
     // desde aquí son las respuestas en sí: el reloj vive en el otro móvil.
-    if (puntosPartida(mode, seed, total, jugadas) !== puntos) return { ok: false, motivo: "roto" };
+    if (puntosPartida(mode, seed, total, jugadas, plazo) !== puntos) return { ok: false, motivo: "roto" };
 
     return {
       ok: true,
-      duelo: { mode, seed, total, cifras: true, rival: { nombre: limpiaNombre(nombre), puntos, jugadas } }
+      duelo: { mode, seed, total, cifras: true, ms: plazo, rival: { nombre: limpiaNombre(nombre), puntos, jugadas } }
     };
   }
 
@@ -324,22 +341,22 @@
   // acertó: verde lo clavado o casi, amarillo lo razonable, blanco lo que no puntuó.
   // Las cartas cerradas por salir de la aplicación se cuentan aparte, que es la única
   // manera honrada de dejarlas a la vista sin llamar tramposo a nadie.
-  function rejillaCifras(modeKey, seed, total, jugadas) {
+  function rejillaCifras(modeKey, seed, total, jugadas, plazo = CIFRAS_MS) {
     const cartas = cartasCifras(modeKey, seed, total);
     return jugadas.map((jugada, i) => {
       if (jugada.salida) return "⬛";
-      const puntos = puntosCarta(modeKey, cartas[i], jugada);
+      const puntos = puntosCarta(modeKey, cartas[i], jugada, plazo);
       return puntos >= 70 ? "🟩" : puntos > 0 ? "🟨" : "⬜";
     }).join("");
   }
 
-  function marcadorCifras({ modeName, mode, seed, total, rival, mio }) {
+  function marcadorCifras({ modeName, mode, seed, total, rival, mio, ms = CIFRAS_MS }) {
     const veredicto = mio.puntos > rival.puntos ? "Gano yo" : mio.puntos < rival.puntos ? `Gana ${rival.nombre || "quien retaba"}` : "Empate";
     const salidas = [rival, mio].map(quien => quien.jugadas.filter(jugada => jugada.salida).length);
     const aviso = salidas[0] + salidas[1]
       ? `\n⬛ cartas cerradas por salir de la app: ${rival.nombre || "quien retaba"} ${salidas[0]}, yo ${salidas[1]}`
       : "";
-    return `Duelo de cifras en Continuum · ${modeName}\n${veredicto} — ${mio.puntos} a ${rival.puntos}\n${rival.nombre || "Quien retaba"} ${rejillaCifras(mode, seed, total, rival.jugadas)}\nYo ${rejillaCifras(mode, seed, total, mio.jugadas)}${aviso}`;
+    return `Duelo de cifras en Continuum · ${modeName}\n${veredicto} — ${mio.puntos} a ${rival.puntos}\n${rival.nombre || "Quien retaba"} ${rejillaCifras(mode, seed, total, rival.jugadas, ms)}\nYo ${rejillaCifras(mode, seed, total, mio.jugadas, ms)}${aviso}`;
   }
 
   CT.Duelo = {
