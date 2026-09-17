@@ -534,7 +534,9 @@
         const to = correctSlot.getBoundingClientRect();
         const lesson = document.createElement('div');
         lesson.className = 'placement-correction-card'; lesson.setAttribute('aria-hidden', 'true');
-        lesson.innerHTML = `<small>Su posición era</small><b>${overlay.querySelector('h2')?.textContent?.trim() || ''}</b><span>${overlay.querySelector('.year')?.textContent || ''}</span>`;
+        const heading = overlay.querySelector('h2')?.cloneNode(true);
+        heading?.querySelectorAll('.solo-lectores').forEach(node => node.remove());
+        lesson.innerHTML = `<small>Su posición era</small><b>${heading?.textContent?.trim() || ''}</b><span>${overlay.querySelector('.year')?.textContent || ''}</span>`;
         document.body.append(lesson);
         const w = 126, h = 78;
         const clampX = x => Math.max(6, Math.min(window.innerWidth - w - 6, x));
