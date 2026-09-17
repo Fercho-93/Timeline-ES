@@ -107,7 +107,7 @@
         if (confirm) { confirm.textContent = 'Confirmar posición'; dock.append(confirm); }
         if (cancel) { cancel.textContent = 'Cambiar posición'; dock.append(cancel); }
       } else {
-        dock.innerHTML = `<button class="btn btn-primary btn-block" disabled>Confirmar posición</button><span class="placement-instruction">${screen === 'solo' ? 'Toca un hueco de la línea para colocar tu carta' : 'Elige una carta y un hueco de la línea'}</span>`;
+        dock.innerHTML = `<span class="placement-instruction">${screen === 'solo' ? 'Toca un hueco de la línea para colocar tu carta' : 'Elige una carta y un hueco de la línea'}</span>`;
       }
       container.querySelector('.shell')?.append(dock);
     }
@@ -143,8 +143,27 @@
     surfaceNav.delete(modal);
     setTimeout(refreshDepth, 0);
   }
+  function compactResult(overlay) {
+    if (!overlay.hasAttribute('data-result-card')) return false;
+    const modal = overlay.querySelector('.modal');
+    if (!modal || modal.classList.contains('pulse-duel-modal')) return false;
+    if (modal.classList.contains('board-result')) return true;
+    overlay.classList.add('board-result-layer'); modal.classList.add('board-result');
+    const title = modal.querySelector('h2'), reveal = modal.querySelector('.reveal');
+    const summary = document.createElement('div'); summary.className = 'result-summary';
+    const label = document.createElement('b');
+    label.textContent = modal.classList.contains('success') ? '✓ Bien colocado' : '× No encaja ahí';
+    const date = document.createElement('span'); date.className = 'year'; date.textContent = reveal?.querySelector('.year')?.textContent || '';
+    summary.append(label, date); modal.prepend(summary);
+    const details = document.createElement('details'); details.className = 'result-history';
+    const toggle = document.createElement('summary'); toggle.textContent = 'Ver historia'; details.append(toggle);
+    if (reveal) details.append(reveal);
+    [...modal.children].filter(el => el.tagName === 'P').forEach(el => details.append(el));
+    if (title) title.after(details); else summary.after(details);
+    return true;
+  }
   function reveal(modal) {
-    const value = modal?.querySelector('.reveal');
+    const value = modal?.querySelector('.result-summary, .reveal');
     if (value && !reduced()) {
       value.classList.add('atlas-reveal');
       const year = value.querySelector('.year');
@@ -252,6 +271,6 @@
   }
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, confirmExit, reveal, openSurface, closeSurface, requestDepth,
+  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, reveal, openSurface, closeSurface, requestDepth,
     updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

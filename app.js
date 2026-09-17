@@ -1572,10 +1572,19 @@
     }
     const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + Math.ceil(solo.deck.length / (1 + CT.Ghost.level(solo.difficulty).extra));
     const etiqueta = soloLabel();
+    const streak = (solo.sequence || []).slice().reverse().findIndex(value => !value);
+    const run = streak < 0 ? (solo.sequence || []).length : streak;
+    const nextGoal = (Math.floor(solo.hits / 5) + 1) * 5;
+    const records = modeRecords();
+    const best = records.bestByDifficulty?.[solo.difficulty || 'easy'] || ((solo.difficulty || 'easy') === 'easy' ? records.best || 0 : 0);
+    const milestone = result?.correct && [3, 5, 10].includes(run);
+    const progress = `<div class="board-progress ${milestone ? 'board-milestone' : ''}" role="status"><div><b>${milestone ? `¡${run} aciertos seguidos!` : `Próximo hito: ${nextGoal} aciertos`}</b><span>${run ? `Racha: ${run} · ` : ''}${solo.kind === 'free' && best ? solo.hits > best ? '¡Nueva mejor marca!' : `Mejor marca: ${best} · A ${best - solo.hits + 1} de superarla` : 'Construye tu línea, carta a carta'}</span></div><progress max="5" value="${solo.hits % 5}" aria-label="Progreso hacia el próximo hito"></progress></div>`;
+
     paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${enDuelo() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
       ${solo.kind === "comp" ? `<div class="comp-topic">${escapeHtml(CT.mode(solo.mode).name)}</div>` : ""}
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
+      ${progress}
       ${enDuelo() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} ${solo.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>

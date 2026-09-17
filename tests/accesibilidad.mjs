@@ -118,7 +118,7 @@ console.log("\nLas reglas se adaptan al mazo");
   click(w, '.slot[data-index="0"]');
   click(w, '[data-action="confirm-place"]');
   const modal = el(w, ".overlay .modal");
-  ok("el revelado también es un diálogo", modal.getAttribute("aria-modal") === "true");
+  ok("el resultado integrado no bloquea el tablero", modal.getAttribute("role") === "dialog" && modal.getAttribute("aria-modal") === "false");
   ok("con el foco en su único botón", activo(w) === el(w, '[data-action="finish-turn"]'));
   ok("el resultado se lee junto al nombre de la carta", /Bien colocado:|No encaja ahí:/.test(el(w, ".overlay .modal h2").textContent));
   tecla(w, "Escape");

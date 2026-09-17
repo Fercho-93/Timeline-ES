@@ -45,7 +45,7 @@ try {
     });
     const base=await measure();
     for(const [index,scale] of [.8,1,1.2].entries()) {
-      await page.locator('[data-timeline-range]').fill(String(index));
+      await page.locator(`[data-zoom-level="${index}"]`).click();
       const now=await measure();
       assert.equal(now.label,`${Math.round(scale*100)}%`);
       for(const part of ['card','image'])for(const axis of ['width','height']) {
@@ -71,6 +71,11 @@ try {
       await page.screenshot({path:`test-results/zoom/${engine}-acierto-tablero.png`});
       await page.locator('.modal').waitFor({state:'visible',timeout:2500});
       assert.equal(await page.locator('[data-action="solo-next"]').evaluate(el=>document.activeElement===el),true);
+      assert.equal(await page.locator('.board-result').getAttribute('aria-modal'),'false');
+      assert.equal(await page.locator('.result-history').getAttribute('open'),null);
+      await page.locator('.result-history > summary').click();
+      assert.equal(await page.locator('.result-history .reveal').isVisible(),true);
+      await page.locator('.result-history > summary').click();
       await page.screenshot({path:`test-results/zoom/${engine}-acierto-resultado.png`});
       await page.locator('[data-action="solo-next"]').click();
       assert.equal(await page.locator('.shell').evaluate(el=>el.inert),true,'el tablero espera antes de repartir');

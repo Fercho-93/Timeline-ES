@@ -15,8 +15,8 @@
   const HOLD_SLOP = 10;       // cuánto se le perdona al dedo mientras espera, sin cancelar
   const EDGE = 56;            // margen en el que la línea temporal se desplaza sola
   const EDGE_STEP = 14;
-  const GHOST_WIDTH = 180;    // carta vertical legible, independiente del formato de la mano
-  const LIFT = 16;            // y por encima del dedo, que si no lo tapa él
+  const GHOST_WIDTH = 124;    // carta vertical legible, independiente del formato de la mano
+  const LIFT = 28;            // y por encima del dedo, que si no lo tapa él
   const MARGIN = 4;           // aire mínimo entre la copia y el borde de la pantalla
   const RUBBER = .55;         // cuánto cede el borde cuando el dedo empuja más allá
   const VELOCITY_DECAY = .55; // peso del movimiento anterior al estimar la velocidad
@@ -123,7 +123,8 @@
     ghost.setAttribute("aria-hidden", "true");
     ghost.setAttribute("tabindex", "-1");
     ghost.removeAttribute("disabled");
-    const scale = Math.min(1, (window.innerWidth - 2 * MARGIN) / GHOST_WIDTH, (window.innerHeight - 2 * MARGIN) / (GHOST_WIDTH * 1.5));
+    const sourceWidth = card.getBoundingClientRect().width || GHOST_WIDTH;
+    const scale = Math.min(1.12, Math.max(.78, sourceWidth * 1.08 / GHOST_WIDTH), (window.innerWidth - 2 * MARGIN) / GHOST_WIDTH, (window.innerHeight - 2 * MARGIN) / (GHOST_WIDTH * 1.5));
     ghost.classList.add('drag-card-preview');
     ghost.removeAttribute('id');
     ghost.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));

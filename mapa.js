@@ -20,10 +20,11 @@
   function timelineMap(_modeKey, cards) {
     if (!cards.length) return "";
     return `<div class="timeline-zoom" role="group" aria-label="Tamaño de las cartas en juego">
-      <button type="button" data-timeline-zoom="out" aria-label="Alejar para ver más cartas">−</button>
-      <input type="range" min="0" max="${levels.length - 1}" step="1" value="${level}" data-timeline-range aria-label="Zoom del tablero" aria-valuetext="${Math.round(levels[level]*100)} por ciento">
-      <button type="button" data-timeline-zoom="in" aria-label="Acercar las cartas">+</button>
-      <output aria-live="polite">${Math.round(levels[level] * 100)}%</output>
+      <button hidden type="button" data-timeline-zoom="out" aria-label="Alejar para ver más cartas">−</button>
+      <input hidden type="range" min="0" max="${levels.length - 1}" step="1" value="${level}" data-timeline-range aria-label="Zoom del tablero" aria-valuetext="${Math.round(levels[level]*100)} por ciento">
+      <button hidden type="button" data-timeline-zoom="in" aria-label="Acercar las cartas">+</button>
+      <output class="solo-lectores" aria-live="polite">${Math.round(levels[level] * 100)}%</output>
+      ${levels.map((scale, index) => `<button type="button" data-zoom-level="${index}" aria-pressed="${index === level}" aria-label="Zoom ${Math.round(scale * 100)} por ciento">${Math.round(scale * 100)}%</button>`).join('')}
     </div>`;
   }
 
@@ -58,6 +59,7 @@
     if (!controls) return;
     controls.querySelector("output").textContent = `${Math.round(levels[level] * 100)}%`;
     const range = controls.querySelector('[data-timeline-range]');
+    controls.querySelectorAll('[data-zoom-level]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.zoomLevel) === level)));
     range.value = level;
     range.setAttribute('aria-valuetext', `${Math.round(levels[level]*100)} por ciento`);
     controls.querySelector('[data-timeline-zoom="out"]').disabled = level === 0;
@@ -73,7 +75,7 @@
   }
 
   function changeZoom(event) {
-    const button = event.target.closest("[data-timeline-zoom], [data-timeline-range]");
+    const button = event.target.closest("[data-timeline-zoom], [data-timeline-range], [data-zoom-level]");
     if (!button || button.disabled) return;
     const container = button.closest("#app");
     const wrap = container?.querySelector(".timeline-wrap");
@@ -88,12 +90,12 @@
     const oldLeft = anchor?.getBoundingClientRect().left;
     const action = button.dataset.timelineZoom;
     const previousLevel = level;
-    level = button.hasAttribute('data-timeline-range') ? Number(button.value) : action === "reset" ? 1 : Math.max(0, Math.min(levels.length - 1, level + (action === "out" ? -1 : 1)));
+    level = button.hasAttribute('data-zoom-level') ? Number(button.dataset.zoomLevel) : button.hasAttribute('data-timeline-range') ? Number(button.value) : action === "reset" ? 1 : Math.max(0, Math.min(levels.length - 1, level + (action === "out" ? -1 : 1)));
     applyTimelineZoom(container);
     if (level !== previousLevel) CT.Effects?.transition?.('zoom');
     if (anchor) wrap.scrollLeft += anchor.getBoundingClientRect().left - oldLeft;
   }
-  document.addEventListener('click', event => { if (event.target.closest('[data-timeline-zoom]')) changeZoom(event); });
+  document.addEventListener('click', event => { if (event.target.closest('[data-timeline-zoom], [data-zoom-level]')) changeZoom(event); });
   document.addEventListener('input', event => { if (event.target.matches('[data-timeline-range]')) changeZoom(event); });
 
   CT.timelineMap = timelineMap;

@@ -524,6 +524,7 @@
         return;
       }
     }
+    const compact = window.CONTINUUM.UI?.compactResult?.(overlay);
     if (!pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
     const modal = overlay.querySelector(".modal") || overlay;
     window.CONTINUUM.UI?.reveal(modal);
@@ -531,7 +532,7 @@
     window.CONTINUUM.UI?.openSurface(modal);
     overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
-    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-modal", compact ? "false" : "true");
     modal.setAttribute("tabindex", "-1");
     const titulo = modal.querySelector("h1, h2, h3");
     if (titulo) {
@@ -539,6 +540,7 @@
       modal.setAttribute("aria-labelledby", titulo.id);
     }
 
+    if (compact) modal.scrollIntoView?.({block: "nearest", behavior: "auto"});
     const previo = openingFocus;
     // Una guía larga debe abrir por su título, no desplazarse hasta «Entendido».
     const lectura = titulo && modal.querySelector(".guide-content");
@@ -551,7 +553,7 @@
         if (cerrable) { event.preventDefault(); closeDialog(); }
         return;
       }
-      if (event.key !== "Tab") return;
+      if (compact || event.key !== "Tab") return;
       const lista = focusables(modal);
       if (!lista.length) { event.preventDefault(); return; }
       const primero = lista[0];
