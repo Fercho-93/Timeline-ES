@@ -42,6 +42,38 @@ try {
    await transitionPage.locator('[data-mode="history"]').click();
    assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
    await transitionPage.close();
+
+   // El muelle de confirmación y el pliegue de la carta elegida: dos cosas que JSDOM no
+   // ve. El botón llegó a quedarse fuera de la pantalla —`sticky` no funciona dentro de
+   // `#app`, que recorta un eje y por eso es contenedor de desplazamiento— y el pliegue
+   // se dibujaba como un arco dorado sobre el rótulo, por heredar la chapa del ✓.
+   const duelPage=await browser.newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
+   await duelPage.goto(url);
+   await duelPage.locator('[data-block="naturaleza"]').click();
+   await duelPage.locator('[data-mode="animals"]').click();
+   await duelPage.locator('[data-action="solo"]').click();
+   await duelPage.locator('.solo-fold[data-solo-kind="duel"] > summary').click();
+   await duelPage.locator('[data-action="start-duel"]').click();
+   await duelPage.evaluate(()=>{window.CONTINUUM.Duelo.CUENTA_PASO_MS=10;});
+   await duelPage.locator('[data-action="duel-play"]').click();
+   await duelPage.locator('[data-action="solo-place"]').first().click();
+   const dockBox=await duelPage.locator('.placement-dock').boundingBox();
+   assert.ok(dockBox.y+dockBox.height<=664+1,`el botón de confirmar cabe en la pantalla (acaba en ${Math.round(dockBox.y+dockBox.height)} de 664)`);
+   assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
+   const curl=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>{
+     const cs=getComputedStyle(el,'::before');
+     // `top` devuelve el valor usado, no `auto`, así que se mide dónde cae de verdad.
+     return {radius:cs.borderRadius,alto:el.clientHeight,arriba:parseFloat(cs.top),propio:parseFloat(cs.height)};
+   });
+   assert.equal(curl.radius,'0px','el pliegue de la esquina no es redondo: eso era la chapa del ✓ colándose');
+   assert.ok(curl.arriba+curl.propio>=curl.alto-6,`el pliegue va pegado al borde de abajo, no sobre el rótulo (cae en ${Math.round(curl.arriba)} de ${curl.alto})`);
+   // Con la carta a la vista, el muelle no la tapa.
+   await duelPage.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
+   const manoBox=await duelPage.locator('.hand-solo .hand-card').boundingBox();
+   const dockAbajo=await duelPage.locator('.placement-dock').boundingBox();
+   assert.ok(manoBox.y+manoBox.height<=dockAbajo.y+1,'la hoja reserva sitio: el muelle no tapa la carta');
+   await duelPage.screenshot({path:`test-results/zoom/${engine}-duelo-muelle.png`});
+   await duelPage.close();
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
     const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
     await page.addInitScript(()=>{

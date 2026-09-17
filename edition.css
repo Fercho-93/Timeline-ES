@@ -582,7 +582,25 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app.atlas-board .hand:not(.hand-solo) .carta-reverso { position: absolute; inset: 18px 8px auto; height: 34px; min-height: 0; margin: 0; opacity: .2; }
 #app.atlas-board .hand:not(.hand-solo) .reverso-emblema { width: 34px; height: 34px; }
 #app.atlas-board .hand .hand-card.selected { outline: 2px solid var(--atlas-selection); outline-offset: 1px; }
-#app.atlas-board .placement-dock { position: static; }
+/* El botón de confirmar va fijo al pie. `sticky` no sirve aquí: `#app` lleva
+   `overflow-x: clip`, y con un eje recortado el otro deja de ser `visible`, así que `#app`
+   pasa a ser contenedor de desplazamiento y la caja se pegaba al final del documento
+   —fuera de la pantalla, debajo de la barra del navegador— en vez de al borde visible.
+   Con `fixed` se pega a lo que de verdad se ve, y la hoja le reserva su altura para que
+   no tape la mano. El muelle que solo lleva la instrucción se queda en el flujo: es un
+   aviso, no un mando, y fijarlo solo taparía tablero. */
+#app.atlas-board .placement-dock:has(.btn) {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+  display: grid; justify-content: center; grid-template-columns: min(100% - 24px, 916px); gap: 3px;
+  padding: 8px 12px max(10px, env(safe-area-inset-bottom));
+  background: var(--edition-paper);
+  box-shadow: 0 -8px 20px #3d271c22;
+}
+#app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+#app.atlas-board .placement-dock:not(:has(.btn)) { position: static; }
+/* Con el texto muy ampliado el muelle ocuparía media pantalla: ahí vuelve al flujo. */
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .placement-dock:has(.btn) { position: static; grid-template-columns: 1fr; box-shadow: none; padding-inline: 0; }
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 #app.atlas-board[data-platform][data-screen] .timeline .card-visual { aspect-ratio: auto; }
 @media (max-width: 380px), (max-height: 740px) {
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: 76px; }
@@ -1174,9 +1192,13 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   transform: translateY(-6px) rotate(-.35deg);
   box-shadow: 0 2px 0 #b78f5f, 0 13px 22px #3d271c2d, inset 0 1px 0 #fff9e7;
 }
+/* Este `::before` ya lo usa la hoja base para la chapa del ✓, redonda y arriba a la
+   derecha. Reutilizarlo sin deshacer aquello dejaba un arco dorado encima del rótulo de
+   la carta: `top` mandaba sobre `bottom` y el `border-radius` lo redondeaba. */
 #app.atlas-board .hand .hand-card.selected::before {
-  content: ''; display: block; position: absolute; z-index: 4; left: 0; bottom: 0;
-  width: 29px; height: 29px; pointer-events: none;
+  content: ''; display: block; position: absolute; z-index: 4;
+  top: auto; right: auto; left: 0; bottom: 0;
+  width: 29px; height: 29px; border-radius: 0; pointer-events: none;
   background: linear-gradient(35deg, #9c744244 0 46%, #fff8e9 49% 70%, #c5a36c 73%);
   clip-path: polygon(0 0, 100% 100%, 0 100%);
   filter: drop-shadow(3px -3px 3px #5037192a);
