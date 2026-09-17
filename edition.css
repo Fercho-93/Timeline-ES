@@ -1089,14 +1089,14 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   background: color-mix(in srgb, var(--scene-wash) 10%, var(--edition-surface));
 }
 #app .play-menu-shell .walking-choice {
-  --choice-pigment: #5b9476;
+  --choice-pigment: #ad7352;
   --choice-tint: color-mix(in srgb, var(--choice-pigment) 18%, var(--edition-surface));
   background: linear-gradient(105deg, var(--choice-tint), var(--edition-surface) 66%, color-mix(in srgb, var(--choice-pigment) 25%, var(--edition-surface)));
   border-color: color-mix(in srgb, var(--choice-pigment) 48%, var(--edition-line));
   border-left: 4px solid var(--choice-pigment);
   box-shadow: 0 5px 14px color-mix(in srgb, var(--choice-pigment) 12%, transparent);
 }
-#app .play-menu-shell .walking-choice[data-action="solo"] { --choice-pigment: #598cab; }
+#app .play-menu-shell .walking-choice[data-action="solo"] { --choice-pigment: #b08b48; }
 #app .play-menu-shell .walking-copy { text-shadow: 0 1px 4px var(--choice-tint), 0 0 10px var(--choice-tint); }
 #app .play-menu-shell .walking-choice small { color: var(--edition-ink); }
 #app .play-menu-shell .walking-choice > i {
