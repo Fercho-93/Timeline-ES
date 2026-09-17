@@ -382,6 +382,7 @@
     const mode = currentMode();
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash">
       <div class="chapter-art" aria-hidden="true">${blockArt(CT.blockOf(game.mode).art, true)}</div>
+      ${CT.Tournament.journey(game.tournament)}
       <div class="chapter-number">Tema ${game.tournament.index + 1} de ${game.tournament.queue.length}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Competición · ronda ${game.tournament.index + 1}</span>${escapeHtml(mode.name)}</h2>
       <button class="btn btn-block comp-splash-start" data-action="competition-round-start">Empezar ronda</button>
@@ -771,7 +772,9 @@
     CT.Effects.feedback(correct);
     selectedCardId = null;
     // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
+    const nuevaLamina=!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(game.mode,card);
     anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", hidden: !!game.ghost?.pending.length }));
+    if(nuevaLamina)game.newDiscoveries=(game.newDiscoveries||0)+1;
     saveGame();
     renderResult();
   }
@@ -1099,7 +1102,8 @@
       ? "Ha sido la única persona en terminar la ronda sin cartas."
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
     const fallosUnicos = new Set(game.failed || []).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">🏆</div><div class="eyebrow">Fin de la partida</div><h1 data-focus tabindex="-1" style="font-size:clamp(2.5rem,12vw,4.5rem)">${title}</h1><p class="lead" style="margin-inline:auto">${lead}</p>${logrosMarkup(game.earnedAchievements || [])}<div class="actions" style="justify-content:center"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+    const earned=game.earnedAchievements||[];
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">Fin de la partida</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${finalMetrics(game.timeline.length,'láminas jugadas',`Ronda ${game.round||1}`,'mejor tramo',game.newDiscoveries||0,earned.length)}${logrosMarkup(earned)}<div class="actions final-actions"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
     if (game.tournament) {
       app.querySelector('.pass-screen').insertAdjacentHTML('afterbegin',CT.Tournament.board(game.tournament,game.players,game.winners));
       const button=app.querySelector('[data-action="setup"]');
@@ -1617,7 +1621,7 @@
       mode: selectedModeKey, day: today(), deck: barajado, timeline,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : null,
-      duelo, finished: false
+      duelo, finished: false, newDiscoveries: 0
     };
     pendingIndex = null;
     result = null;
@@ -1716,7 +1720,9 @@
     };
     CT.Effects.feedback(correct);
     solo.pendingResult = { correct, cardId: card.id, attemptedIndex: result.attemptedIndex, correctIndex: result.correctIndex };
+    const nuevaLamina=!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(solo.mode,card);
     anotaLogros(CT.Progreso.record({ mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() }));
+    if(nuevaLamina)solo.newDiscoveries=(solo.newDiscoveries||0)+1;
     saveSolo();
     soloResult();
   }
@@ -1758,6 +1764,8 @@
     screen = "solo-end";
     const total = solo.total || solo.played;
     const records = modeRecords();
+    const difficulty=solo.difficulty||'easy';
+    const previousBest=records.bestByDifficulty?.[difficulty]||((difficulty==='easy'?records.best:0)||0);
     // Se guarda con cada marca, no solo al crearlo, para que una instalación que ya
     // tenía partidas antes de este cambio acabe teniendo el suyo igual.
     // El identificador anónimo del móvil lo genera `progreso.js`, que es quien lo usa
@@ -1779,7 +1787,6 @@
       records.days = Object.fromEntries(dias.map(clave => [clave, records.days[clave]]));
       saveRecords(records);
     } else if (solo.kind === "free") {
-      const difficulty = solo.difficulty || "easy";
       records.bestByDifficulty = records.bestByDifficulty || { easy: records.best || 0 };
       records.bestByDifficulty[difficulty] = Math.max(records.bestByDifficulty[difficulty] || 0, solo.hits);
       if (difficulty === "easy") records.best = records.bestByDifficulty.easy;
@@ -1802,11 +1809,15 @@
     const duelo = enDueloEsta ? cierreDuelo(solo, total) : null;
     const earned = [...(solo.earnedAchievements || []), ...logros];
     const sessionLogros = [...new Map(earned.map(item => [item.id || item.name, item])).values()];
+    const finalHits=solo.hits;
+    const soloKind=solo.kind;
+    const newDiscoveries=solo.newDiscoveries||0;
+    const bestNow=solo.kind==='free'?Math.max(previousBest,solo.hits):Math.max(previousBest,records.best||0);
     solo.finished = true;
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">${duelo ? duelo.icono : superado ? "🏅" : "🎯"}</div><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${duelo ? duelo.titular : resumen}</h1>${duelo ? duelo.cuerpo : ""}${logrosMarkup(sessionLogros)}<div class="actions" style="justify-content:center">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,soloKind==='free'?(finalHits>previousBest?'nueva mejor marca':'mejor marca'):'mejor marca',newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -2150,6 +2161,10 @@
     else if (game) { game.earnedAchievements = [...(game.earnedAchievements || []), ...nuevos]; }
     showToast(nuevos.length === 1 ? `Logro: ${nuevos[0].name}` : `${nuevos.length} logros nuevos`);
     announce(nuevos.map(item => `Logro desbloqueado: ${item.name}.`).join(" "));
+  }
+
+  function finalMetrics(score,scoreLabel,best,bestLabel,newPlates,achievements) {
+    return `<div class="final-metrics"><div class="final-score"><strong>${escapeHtml(score)}</strong><span>${escapeHtml(scoreLabel)}</span></div><div class="final-stat"><small>${escapeHtml(bestLabel)}</small><b>${escapeHtml(best)}</b></div><div class="final-stat"><small>Láminas nuevas</small><b>${Number(newPlates)||0}</b></div><div class="final-stat"><small>Logros</small><b>${Number(achievements)||0}</b></div></div>`;
   }
 
   function logrosMarkup(nuevos) {

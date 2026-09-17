@@ -863,14 +863,9 @@
     return `Iba entre «${escapeHtml(before.title)}» y «${escapeHtml(after.title)}».`;
   }
 
-  // La demostración con la que abre la guía: una jugada entera, en bucle y con cartas de
-  // verdad del mazo que se va a jugar. Enseñar la mecánica cuesta menos que contarla —una
-  // carta sube a su hueco, se da la vuelta y descubre su valor— y de paso presenta el
-  // mazo. Las tres cartas se toman repartidas por el orden del mazo para que la del medio
-  // encaje de verdad entre las otras dos: la demostración no enseña una jugada falsa.
-  //
-  // Es decorativa para quien usa lector de pantalla (`aria-hidden`): lo que cuenta lo
-  // dicen los tres pasos de debajo, que sí se leen.
+  // La primera jugada se aprende haciéndola. Las tres cartas se toman de puntos separados
+  // del mazo y la central encaja de verdad entre las otras dos; no hay una respuesta
+  // amañada que contradiga luego las reglas del tablero.
   function guideDemo(modeKey) {
     const deck = cards(modeKey);
     if (deck.length < 3) return "";
@@ -878,19 +873,48 @@
     const en = fraccion => ordenadas[Math.floor(ordenadas.length * fraccion)];
     const [izquierda, medio, derecha] = [en(0.2), en(0.5), en(0.8)];
     const mini = card => `<b>${escapeHtml(shortValue(modeKey, card))}</b><small>${escapeHtml(card.title)}</small>`;
-    return `<div class="guide-demo" aria-hidden="true">
-      <div class="gd-line">
-        <div class="gd-card">${mini(izquierda)}</div>
-        <div class="gd-slot"><span>+</span></div>
-        <div class="gd-card">${mini(derecha)}</div>
+    return `<section class="guide-practice" data-guide-practice data-correct="1">
+      <div class="guide-practice-head"><span>Tu primera colocación</span><small>Prueba sin gastar ninguna carta</small></div>
+      <div class="gp-card" data-guide-card><i>${escapeHtml(hiddenLabel(modeKey))}</i><b data-guide-hidden>?</b><small>${escapeHtml(medio.title)}</small><em data-guide-value hidden>${escapeHtml(shortValue(modeKey, medio))}</em></div>
+      <p>¿Dónde encaja esta carta?</p>
+      <div class="gp-line">
+        <button type="button" data-guide-place="0" aria-label="Colocar antes de ${escapeHtml(izquierda.title)}">+</button>
+        <div class="gp-reference">${mini(izquierda)}</div>
+        <button type="button" data-guide-place="1" aria-label="Colocar entre las dos cartas">+</button>
+        <div class="gp-reference">${mini(derecha)}</div>
+        <button type="button" data-guide-place="2" aria-label="Colocar después de ${escapeHtml(derecha.title)}">+</button>
       </div>
-      <div class="gd-play"><div class="gd-flip">
-        <div class="gd-face gd-front"><i>${escapeHtml(hiddenLabel(modeKey))}</i><small>${escapeHtml(medio.title)}</small></div>
-        <div class="gd-face gd-back">${mini(medio)}</div>
-      </div></div>
-      <div class="gd-mark"><span>✓</span> ¡En su sitio!</div>
-    </div>`;
+      <div class="gp-feedback" data-guide-feedback role="status">Toca uno de los tres huecos.</div>
+      <button type="button" class="gp-reset" data-guide-reset hidden>Probar otra vez</button>
+    </section>`;
   }
+
+  if(typeof document!=='undefined')document.addEventListener('click', event => {
+    const place=event.target.closest('[data-guide-place]'), resetTarget=event.target.closest('[data-guide-reset]');
+    if(!place&&!resetTarget)return;
+    const practice=event.target.closest('[data-guide-practice]');
+    if(!practice)return;
+    const reset=practice.querySelector('[data-guide-reset]');
+    if(resetTarget){
+      practice.classList.remove('is-correct','is-wrong');
+      practice.querySelectorAll('[data-guide-place]').forEach(button=>{button.disabled=false;button.removeAttribute('aria-pressed');});
+      practice.querySelector('[data-guide-value]').hidden=true;
+      practice.querySelector('[data-guide-hidden]').hidden=false;
+      practice.querySelector('[data-guide-feedback]').textContent='Toca uno de los tres huecos.';
+      reset.hidden=true;return;
+    }
+    const correct=Number(place.dataset.guidePlace)===Number(practice.dataset.correct);
+    practice.classList.toggle('is-correct',correct);practice.classList.toggle('is-wrong',!correct);
+    practice.querySelectorAll('[data-guide-place]').forEach(button=>button.setAttribute('aria-pressed',String(button===place)));
+    const feedback=practice.querySelector('[data-guide-feedback]');
+    if(correct){
+      practice.querySelectorAll('[data-guide-place]').forEach(button=>button.disabled=true);
+      practice.querySelector('[data-guide-value]').hidden=false;
+      practice.querySelector('[data-guide-hidden]').hidden=true;
+      feedback.textContent='¡Exacto! La carta revela su valor y se queda entre las dos.';
+      reset.hidden=false;
+    } else feedback.textContent='No encaja ahí. Prueba otro hueco: aquí puedes ensayar sin perder nada.';
+  });
 
   function guideStep(numero, titulo, texto) {
     return `<li class="guide-step"><span class="gs-num" aria-hidden="true">${numero}</span><b>${titulo}</b><small>${texto}</small></li>`;

@@ -303,7 +303,7 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
   for (const theme of ASPECTOS.filter(t => !['auto', 'light'].includes(t))) {
     assert.ok(estilos.includes(`[data-theme="${theme}"]`), `el aspecto ${theme} tiene paleta en la hoja de estilo`);
   }
-  // Elegir en el desplegable aplica y guarda sin recargar.
+  // Elegir se ve primero en la muestra; la apariencia solo cambia al confirmarla.
   {
     const w = boot({ seen: true });
     try {
@@ -311,6 +311,9 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
       const select = w.document.querySelector('#ajuste-tema');
       select.value = 'night';
       select.dispatchEvent(new w.Event('change', { bubbles: true }));
+      assert.equal(w.document.documentElement.dataset.theme, undefined);
+      assert.equal(w.document.querySelector('[data-look-preview]').dataset.previewTheme, 'night');
+      w.document.querySelector('[data-settings-action="apply-look"]').click();
       assert.equal(w.document.documentElement.dataset.theme, 'night');
       assert.equal(colores(w).join('|'), '#000000|#000000');
       assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).theme, 'night');
