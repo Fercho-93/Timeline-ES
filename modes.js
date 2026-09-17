@@ -103,6 +103,12 @@
       hiddenLabel: "Fecha oculta",
       timelineTitle: "Línea temporal",
       question: "¿Antes o después?",
+      // El duelo de cifras no ordena: pide el número. Cada eje dice cómo se pregunta, en
+      // qué unidad se responde y con cuánta precisión. Las fechas se apartan de los demás
+      // en dos cosas: admiten negativos —los años antes de Cristo— y se puntúan por años
+      // de diferencia y no por porcentaje, porque errar un siglo es errar un siglo tanto
+      // en el año 200 como en el 1900.
+      cifra: { pregunta: "¿En qué año fue?", unidad: "año", decimales: 0, anos: true, negativos: true, pista: "Los años antes de Cristo, con un menos delante: −218" },
       bands: [
         { limit: 711, key: "antigua", name: "Hispania antigua", symbol: "Ⅻ" },
         { limit: 1492, key: "medieval", name: "Edad Media", symbol: "♜" },
@@ -121,6 +127,7 @@
       hiddenLabel: "Población oculta",
       timelineTitle: "De menos a más",
       question: "¿Menos o más gente?",
+      cifra: { pregunta: "¿Cuántos habitantes tiene?", unidad: "habitantes", decimales: 0, pista: "El número entero, sin puntos: 47000000" },
       bands: [
         { limit: 100000, key: "minusculo", name: "Minúsculo", symbol: "·" },
         { limit: 2000000, key: "muypequeno", name: "Muy pequeño", symbol: "▪" },
@@ -137,6 +144,7 @@
       hiddenLabel: "Hablantes ocultos",
       timelineTitle: "De menos a más hablado",
       question: "¿Menos o más hablantes?",
+      cifra: { pregunta: "¿Cuántos hablantes tiene?", unidad: "hablantes", decimales: 0, pista: "El número entero, sin puntos: 93000000" },
       // Los cortes están puestos sobre el rango real del mazo, que va del feroés (69.000)
       // al chino mandarín (929 millones). Con estos siete tramos caen 3, 5, 10, 7, 13, 5 y
       // 4 cartas, sin ninguna banda vacía.
@@ -158,6 +166,7 @@
       hiddenLabel: "Superficie oculta",
       timelineTitle: "De menor a mayor",
       question: "¿Más pequeño o más grande?",
+      cifra: { pregunta: "¿Cuántos kilómetros cuadrados tiene?", unidad: "km²", decimales: 0, pista: "En km², sin puntos: 505000" },
       bands: [
         { limit: 1000, key: "diminuto", name: "Diminuto", symbol: "·" },
         { limit: 50000, key: "pequeno", name: "Pequeño", symbol: "▪" },
@@ -174,6 +183,7 @@
       hiddenLabel: "Peso oculto",
       timelineTitle: "De más ligero a más pesado",
       question: "¿Más ligero o más pesado?",
+      cifra: { pregunta: "¿Cuánto pesa?", unidad: "kg", decimales: 3, pista: "En kilos. Para los muy pequeños valen decimales: 0,02" },
       bands: [
         { limit: 0.01, key: "microscopico", name: "Minúsculo", symbol: "·" },
         { limit: 1, key: "pequenisimo", name: "Muy pequeño", symbol: "▪" },
@@ -191,6 +201,7 @@
       hiddenLabel: "Vida oculta",
       timelineTitle: "De menos a más longevos",
       question: "¿Vive menos o más?",
+      cifra: { pregunta: "¿Cuántos años vive?", unidad: "años", decimales: 2, pista: "En años. Menos de uno, con decimales: 0,5" },
       bands: [
         { limit: 1, key: "fugaz", name: "Fugaz", symbol: "·" },
         { limit: 10, key: "breve", name: "Breve", symbol: "▪" },
@@ -207,6 +218,7 @@
       hiddenLabel: "Velocidad oculta",
       timelineTitle: "De más lento a más rápido",
       question: "¿Más lento o más rápido?",
+      cifra: { pregunta: "¿A qué velocidad llega?", unidad: "km/h", decimales: 3, pista: "En km/h. Los más lentos, con decimales: 0,3" },
       bands: [
         { limit: 1, key: "pausado", name: "Pausado", symbol: "·" },
         { limit: 20, key: "tranquilo", name: "Tranquilo", symbol: "▪" },
@@ -223,6 +235,7 @@
       hiddenLabel: "Distancia oculta",
       timelineTitle: "De más cerca a más lejos",
       question: "¿Más cerca o más lejos?",
+      cifra: { pregunta: "¿A cuántos kilómetros está?", unidad: "km", decimales: 0, pista: "En kilómetros, sin puntos: 1800" },
       bands: [
         { limit: 100, key: "cercana", name: "Cercana", symbol: "·" },
         { limit: 500, key: "regional", name: "Regional", symbol: "▪" },

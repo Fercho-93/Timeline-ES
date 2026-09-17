@@ -183,6 +183,9 @@
       {transform: transform(dx * .14, dy * .12 - 8, -angle * .12, 1.025), opacity: 1, boxShadow: '0 10px 16px #39240b28', offset: .66},
       {transform: transform(0, 2, 0, .992), opacity: 1, boxShadow: '0 2px 4px #39240b24', offset: .86},
       {transform: 'none', opacity: 1, boxShadow: shadow, offset: 1}
+      // `backwards` es lo que impide verla dos veces: quien reparte la hace visible justo
+      // antes de animarla, y sin rellenar hacia atrás queda un instante en el que la carta
+      // ya está pintada en su sitio y todavía no ha empezado a viajar hasta él.
     ], {duration, easing: 'cubic-bezier(.25,.65,.3,1)', fill: 'backwards'})];
     const cards = [...card.parentElement.querySelectorAll('.timeline-card')];
     const at = cards.indexOf(card);

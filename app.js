@@ -39,14 +39,14 @@
         details.name = "solo-options";
         const summary = document.createElement("summary");
         const heading = panel.querySelector(".solo-panel-head");
-        const kind = panel.querySelector('[data-action="start-free"]') ? 'free' : panel.querySelector('[data-action="start-duel"]') ? 'duel' : 'daily';
+        const kind = panel.querySelector('[data-action="start-free"]') ? 'free' : panel.querySelector('[data-action="start-cifras"]') ? 'cifras' : panel.querySelector('[data-action="start-duel"]') ? 'duel' : 'daily';
         details.dataset.soloKind = kind;
-        const marks = {daily:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',free:'<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>',duel:'<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>'};
+        const marks = {daily:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',free:'<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>',duel:'<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>',cifras:'<circle cx="12" cy="14" r="8"/><path d="M12 10v4l2.5 2.5M9 2h6"/>'};
         const mark = document.createElement('span'); mark.className = 'solo-option-mark'; mark.setAttribute('aria-hidden','true');
         mark.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${marks[kind]}</svg>`;
         summary.append(mark);
         const copy = document.createElement('span'); copy.className = 'solo-option-copy'; copy.append(...heading.childNodes);
-        const caption = document.createElement('small'); caption.textContent = {daily:'Un reto distinto cada día',free:'A tu ritmo y a tu nivel',duel:'Las mismas cartas, otro rival'}[kind]; copy.append(caption); summary.append(copy);
+        const caption = document.createElement('small'); caption.textContent = {daily:'Un reto distinto cada día',free:'A tu ritmo y a tu nivel',duel:'Las mismas cartas, otro rival',cifras:'Adivina la cifra a contrarreloj'}[kind]; copy.append(caption); summary.append(copy);
         heading.remove();
         details.append(summary);
         const body = document.createElement("div");
@@ -80,6 +80,9 @@
       'competition-menu': competitionMenu, 'perfil': perfilView};
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
     if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
+    // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
+    // carta no devuelve diez segundos nuevos, cierra esa carta.
+    routes.cifras = resumeCifras;
     if (!routes[view.screen]) return false;
     setMode(view.mode);
     if (CT.hasBlock(view.block)) selectedBlockKey = view.block;
@@ -1545,6 +1548,7 @@
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
         </div>
         ${duelPanel()}
+      ${cifrasPanel()}
       </section>
     </div>`);
   }
@@ -1571,6 +1575,26 @@
     </div>`;
   }
 
+  // El otro duelo por enlace: mismas cartas para los dos, pero en vez de colocarlas se
+  // escribe la cifra. Solo se ofrece en los mazos cuyo eje sabe preguntar por una.
+  function cifrasPanel() {
+    const regla = reglaCifra();
+    if (!regla) return "";
+    const guardada = cargaCifras();
+    const contra = guardada?.rival ? guardada.rival.nombre || "quien te retaba" : null;
+    return `<div class="panel solo-panel">
+      <div class="solo-panel-head"><h3>Duelo de cifras</h3></div>
+      <p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Puntúa lo cerca que te quedes y lo rápido que respondas.</p>
+      <p class="solo-intro-rule">${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</p>
+      <div class="field">
+        <label for="cifras-name">Tu nombre, para que sepan quién reta</label>
+        <input id="cifras-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
+      </div>
+      ${guardada ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra ? `el duelo contra ${escapeHtml(contra)}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
+      <button class="btn ${guardada ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${guardada ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>
+    </div>`;
+  }
+
   // El nombre se guarda entre duelos: es lo único que hay que escribir, y pedirlo cada
   // vez para acabar poniendo lo mismo sobra.
   const DUEL_NAME_KEY = "hilo-nombre-v1";
@@ -1583,8 +1607,11 @@
     try { CT.Storage.setItem(DUEL_NAME_KEY, CT.Duelo.limpiaNombre(nombre)); } catch { /* almacenamiento lleno */ }
   }
 
-  function guardaNombreSiLoHay() {
-    const campo = document.getElementById("duel-name");
+  // Los dos duelos comparten nombre pero no campo: en el menú del solitario conviven los
+  // dos paneles, y dos elementos con el mismo identificador harían que guardar el nombre
+  // leyera siempre el del primero, estuviera o no desplegado.
+  function guardaNombreSiLoHay(id = "duel-name") {
+    const campo = document.getElementById(id);
     if (campo) saveDuelName(campo.value);
   }
 
@@ -1860,20 +1887,332 @@
     </div>`;
   }
 
+  // ——— El duelo de cifras ———
+  //
+  // Diez cartas, diez segundos cada una, y en vez de colocar se escribe el número. Lo
+  // que puntúa y lo que viaja en el enlace está en duelo.js; aquí está lo que se ve y,
+  // sobre todo, el reloj, que es la regla de la que depende todo lo demás.
+  //
+  // El reloj se mide siempre restando marcas de `Date.now()`, nunca descontando de un
+  // contador. La diferencia no es de estilo: una pestaña escondida congela sus
+  // temporizadores, así que un contador se pararía justo mientras alguien va a buscar la
+  // respuesta a otra parte. Con la hora de verdad, irse cuesta el tiempo que se tarda.
+  const Cifras = CT.Duelo.Cifras;
+  let cifras = null;
+  let cifrasReloj = null;
+  // Desde cuándo está esto en segundo plano. Lo alimentan la visibilidad del documento y
+  // el cambio de estado de la aplicación nativa, que en móvil no siempre coinciden.
+  let ocultaDesde = 0;
+
+  function reglaCifra(modeKey = selectedModeKey) { return CT.axis(modeKey).cifra; }
+
+  function cifrasKey() { return `hilo-cifras-${selectedModeKey}-v1`; }
+
+  // La carta que se tiene delante. Mientras se enseña el resultado de una, la de delante
+  // sigue siendo esa y no la siguiente: revelar la siguiente por detrás de la capa sería
+  // regalar diez segundos de ventaja.
+  function indiceCifra() { return cifras.jugadas.length - (cifras.pendiente ? 1 : 0); }
+  function cartaCifra() { return cifras.cartas[indiceCifra()]; }
+
+  function guardaCifras() {
+    if (!cifras) { CT.Storage.removeItem(cifrasKey()); return; }
+    const { mode, seed, total, jugadas, empezadaEn, rival, finished } = cifras;
+    try { CT.Storage.setItem(cifrasKey(), JSON.stringify({ mode, seed, total, jugadas, empezadaEn, rival, finished })); }
+    catch { /* almacenamiento lleno */ }
+  }
+
+  // Al recuperar una partida no se guardan las cartas: se vuelven a repartir con la
+  // semilla. Si el mazo ha cambiado de versión entre medias, el reparto ya no cuadra y la
+  // partida se descarta en vez de comparar cosas distintas.
+  function cargaCifras() {
+    try {
+      const guardado = JSON.parse(CT.Storage.getItem(cifrasKey()) || "null");
+      if (!guardado || guardado.finished || guardado.mode !== selectedModeKey || !CT.has(guardado.mode)) return null;
+      if (!reglaCifra(guardado.mode)) return null;
+      const total = Number(guardado.total);
+      if (!Number.isInteger(total) || total < 1 || total > Cifras.CARTAS) return null;
+      if (!Array.isArray(guardado.jugadas) || guardado.jugadas.length > total) return null;
+      const cartas = Cifras.cartas(guardado.mode, guardado.seed, total);
+      if (cartas.length !== total || cartas.some(card => !card)) return null;
+      return { ...guardado, total, cartas, pendiente: null };
+    } catch { return null; }
+  }
+
+  // Lo que escribe una persona en español: puntos de millar, coma decimal, espacios y a
+  // veces un menos para los años antes de Cristo. «47.000.000» son cuarenta y siete
+  // millones; «1,5» es uno y medio; y «1.5», que nadie escribiría como millar porque
+  // detrás del punto no hay tres cifras, se entiende como decimal.
+  function leeCifra(texto) {
+    let limpio = String(texto || "").trim().replace(/[\s ]/g, "").replace(/[−–—]/g, "-");
+    if (!limpio) return null;
+    if (limpio.includes(",")) limpio = limpio.replace(/\./g, "").replace(",", ".");
+    else {
+      const trozos = limpio.split(".");
+      if (trozos.length > 1 && trozos.slice(1).every(parte => parte.length === 3)) limpio = trozos.join("");
+    }
+    if (!/^-?\d*\.?\d*$/.test(limpio) || !/\d/.test(limpio)) return null;
+    const valor = Number(limpio);
+    if (!Number.isFinite(valor) || Math.abs(valor) > Cifras.MAX_CIFRA) return null;
+    if (valor < 0 && !reglaCifra(cifras?.mode).negativos) return null;
+    return valor;
+  }
+
+  function paraReloj() {
+    if (cifrasReloj) clearInterval(cifrasReloj);
+    cifrasReloj = null;
+  }
+
+  function arrancaReloj() {
+    paraReloj();
+    cifrasReloj = setInterval(cifrasTick, 100);
+    cifrasTick();
+  }
+
+  // El latido: no decide nada por su cuenta, solo mira la hora y pinta lo que queda. Si
+  // el móvil ha tenido la pestaña congelada, al volver encuentra el tiempo ya gastado.
+  function cifrasTick() {
+    if (!cifras || screen !== "cifras" || cifras.empezadaEn === null) return paraReloj();
+    const barra = app.querySelector(".cifra-bar");
+    if (!barra) return paraReloj();
+    const restante = Cifras.MS - (Date.now() - cifras.empezadaEn);
+    barra.value = Math.max(0, restante);
+    barra.classList.toggle("cifra-apura", restante <= 3000);
+    const marca = app.querySelector(".cifra-left");
+    if (marca) marca.textContent = `${Math.max(0, Math.ceil(restante / 1000))} s`;
+    if (restante <= 0) cierraCarta("tiempo");
+  }
+
+  function abreCarta() {
+    cifras.pendiente = null;
+    cifras.empezadaEn = Date.now();
+    guardaCifras();
+    cifrasView();
+  }
+
+  // Cerrar una carta es lo único que resuelve una jugada, y las tres maneras de llegar
+  // aquí acaban en el mismo sitio: responder, agotar los diez segundos o salirse de la
+  // aplicación. Solo la tercera anula la respuesta; agotar el tiempo con algo escrito
+  // sigue puntuando, pero sin la parte que premia la prisa.
+  function cierraCarta(motivo) {
+    if (!cifras || cifras.empezadaEn === null || cifras.pendiente) return;
+    paraReloj();
+    const salida = motivo === "salida";
+    const campo = app.querySelector("#cifra-input");
+    const respuesta = salida ? null : leeCifra(campo ? campo.value : "");
+    const jugada = {
+      respuesta,
+      ms: Math.min(Math.max(Date.now() - cifras.empezadaEn, 0), Cifras.MS),
+      salida
+    };
+    const card = cartaCifra();
+    cifras.jugadas.push(jugada);
+    cifras.empezadaEn = null;
+    const puntos = Cifras.puntosCarta(cifras.mode, card, jugada);
+    cifras.pendiente = { jugada, motivo, puntos };
+    anotaLogros(CT.Progreso.record({ mode: cifras.mode, cardId: card.id, correct: puntos > 0, kind: "cifras" }));
+    CT.Effects.feedback(puntos > 0);
+    guardaCifras();
+    cifrasView();
+    cifrasRevelado();
+  }
+
+  // Irse de la aplicación cierra la carta abierta, pero no a la primera: por debajo del
+  // margen de gracia caben un aviso que se cuela, una llamada o un roce en el gesto de
+  // multitarea, y ninguna de esas tres cosas puede costar una carta. Lo que no se hace es
+  // llamar tramposo a nadie: la carta se cierra y se dice, que es lo que de verdad se ve
+  // después en el marcador compartido.
+  function salidaDeLaApp(fuera) {
+    if (fuera <= Cifras.GRACIA_MS) return;
+    if (screen !== "cifras" || !cifras || cifras.empezadaEn === null || cifras.pendiente) return;
+    cierraCarta("salida");
+  }
+
+  function vuelveAPrimerPlano() {
+    const fuera = ocultaDesde ? Date.now() - ocultaDesde : 0;
+    ocultaDesde = 0;
+    salidaDeLaApp(fuera);
+  }
+
+  function seVaAlFondo() { ocultaDesde = ocultaDesde || Date.now(); }
+
+  document.addEventListener("visibilitychange", () => (document.hidden ? seVaAlFondo() : vuelveAPrimerPlano()));
+  window.addEventListener("pagehide", seVaAlFondo);
+  window.addEventListener("pageshow", vuelveAPrimerPlano);
+  try {
+    const capacitor = window.Capacitor;
+    if (capacitor?.isNativePlatform?.()) {
+      const nativa = capacitor.registerPlugin?.("App") || capacitor.Plugins?.App;
+      Promise.resolve(nativa?.addListener?.("appStateChange", estado => (estado.isActive ? vuelveAPrimerPlano() : seVaAlFondo()))).catch(() => {});
+    }
+  } catch { /* La visibilidad del documento ya cubre el caso general. */ }
+
+  function startCifras(duel = null) {
+    const duelo = duel || { seed: CT.Duelo.crearSemilla(), total: Cifras.CARTAS, rival: null };
+    cifras = {
+      mode: selectedModeKey, seed: duelo.seed, total: duelo.total,
+      cartas: Cifras.cartas(selectedModeKey, duelo.seed, duelo.total),
+      jugadas: [], empezadaEn: null, rival: duelo.rival, finished: false, pendiente: null
+    };
+    abreCarta();
+  }
+
+  // Reanudar: si la carta seguía abierta, el tiempo que ha pasado por fuera cuenta igual,
+  // así que salirse y volver más tarde —o cerrar la aplicación del todo— cierra esa
+  // carta en vez de regalar un reloj nuevo.
+  function resumeCifras() {
+    cifras = cargaCifras();
+    if (!cifras) return soloHome();
+    if (cifras.jugadas.length >= cifras.total) return cifrasFinish();
+    if (cifras.empezadaEn === null) return abreCarta();
+    // La carta seguía abierta. Si se ha estado fuera más que el margen de gracia se
+    // cierra como salida, sin pasar antes por la pantalla: pintarla arrancaría el reloj,
+    // que al encontrar el tiempo gastado lo contaría como un simple agotarse el plazo y
+    // la carta dejaría de aparecer como lo que fue.
+    if (Date.now() - cifras.empezadaEn > Cifras.GRACIA_MS) return cierraCarta("salida");
+    cifrasView();
+  }
+
+  function cifrasView() {
+    screen = "cifras";
+    const regla = reglaCifra(cifras.mode);
+    const card = cartaCifra();
+    const indice = indiceCifra();
+    const cerrada = !!cifras.pendiente;
+    const puntos = Cifras.puntosPartida(cifras.mode, cifras.seed, cifras.total, cifras.jugadas);
+    const restante = cerrada ? 0 : Math.max(0, Cifras.MS - (Date.now() - cifras.empezadaEn));
+    const marcaRival = cifras.rival ? `<span><b>${cifras.rival.puntos}</b><small>${escapeHtml(cifras.rival.nombre || "quien te reta")}</small></span>` : "";
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="cifras-exit">Salir</button>')}
+      <h1 class="solo-lectores" data-focus tabindex="-1">Carta ${indice + 1} de ${cifras.total}. ${escapeHtml(regla.pregunta)} ${escapeHtml(card.title)}. Tienes ${Cifras.SEGUNDOS} segundos.</h1>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Duelo de cifras</div><div class="turn-name" aria-hidden="true">${puntos} ${puntos === 1 ? "punto" : "puntos"}</div></div><div class="deck-count"><strong>${cifras.total - indice}</strong><span>por responder</span></div></div>
+      ${marcaRival ? `<div class="solo-stats cifra-rival">${marcaRival}</div>` : ""}
+      <section class="cifra-panel">
+        <div class="cifra-clock"><progress class="cifra-bar ${restante <= 3000 ? "cifra-apura" : ""}" max="${Cifras.MS}" value="${restante}" aria-label="Tiempo restante para responder"></progress><b class="cifra-left" role="timer" aria-live="off">${Math.ceil(restante / 1000)} s</b></div>
+        <div class="cifra-card" id="cifra-pregunta">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta)}</span></div>
+        <div class="field cifra-field">
+          <label for="cifra-input">Tu cifra ${escapeHtml(regla.unidad ? `en ${regla.unidad}` : "")}</label>
+          <input id="cifra-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send" aria-describedby="cifra-pregunta" placeholder="${escapeHtml(regla.unidad || "")}" ${cerrada ? "disabled" : "data-autofocus"}>
+          <p class="hint">${escapeHtml(regla.pista || "")}</p>
+        </div>
+        <button class="btn btn-primary btn-block" data-action="cifra-answer" ${cerrada ? "disabled" : ""}>Responder <span>→</span></button>
+        <p class="hint cifra-aviso">El reloj no se para. Si sales de la aplicación, la carta se cierra.</p>
+      </section>
+    </div>`);
+    const campo = app.querySelector("#cifra-input");
+    if (campo && !cerrada) campo.addEventListener("keydown", evento => { if (evento.key === "Enter") { evento.preventDefault(); cierraCarta("respuesta"); } });
+    if (!cerrada) arrancaReloj();
+  }
+
+  // El resultado de una carta: lo que valía, lo que se respondió y lo que suma. Aquí ya
+  // se puede enseñar el detalle de la carta, que antes de responder muchas veces lleva la
+  // cifra dentro.
+  function cifrasRevelado() {
+    const { jugada, motivo, puntos } = cifras.pendiente;
+    const card = cartaCifra();
+    const banda = Cifras.banda(cifras.mode, card, jugada.respuesta);
+    const acabada = cifras.jugadas.length >= cifras.total;
+    const suya = cifras.rival ? cifras.rival.jugadas[indiceCifra()] : null;
+    const titulo = jugada.salida ? "Carta cerrada" : banda.nombre;
+    const explicacion = jugada.salida
+      ? "Has salido de la aplicación con la carta abierta, así que esta no puntúa."
+      : jugada.respuesta === null
+        ? motivo === "tiempo" ? "Se acabaron los diez segundos sin ninguna cifra escrita." : "No has escrito ninguna cifra."
+        : `Tu respuesta: <strong>${escapeHtml(Cifras.formato(cifras.mode, jugada.respuesta))}</strong>${motivo === "tiempo" ? " — llegó con el tiempo agotado, así que no suma la prisa." : ` — has tardado ${(jugada.ms / 1000).toFixed(1)} s.`}`;
+    overlay(`<div class="overlay" data-result-card="${puntos > 0 ? card.id : ""}"><div class="modal ${puntos > 0 ? "success" : "failure"}">
+      <div class="result-mark" aria-hidden="true">${puntos >= 70 ? "✓" : puntos > 0 ? "≈" : "×"}</div>
+      <div class="eyebrow" aria-hidden="true">${escapeHtml(titulo)}</div>
+      <h2><span class="solo-lectores">${escapeHtml(titulo)}: </span>${escapeHtml(card.title)}</h2>
+      <div class="reveal">${categoryBadge(card)}${CT.Art.button(cifras.mode, card)}<div class="year">${escapeHtml(CT.formatValue(cifras.mode, card))}</div><p>${escapeHtml(card.detail)}</p></div>
+      <p>${explicacion}</p>
+      <p class="cifra-puntos"><b>+${puntos}</b> ${puntos === 1 ? "punto" : "puntos"}</p>
+      ${suya ? `<p class="hint">${escapeHtml(cifras.rival.nombre || "Quien te reta")} respondió ${escapeHtml(suya.salida ? "nada: salió de la aplicación" : Cifras.formato(cifras.mode, suya.respuesta))} y sumó ${Cifras.puntosCarta(cifras.mode, card, suya)}.</p>` : ""}
+      <button class="btn btn-primary btn-block" data-dialog-focus data-action="cifras-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button>
+    </div></div>`);
+  }
+
+  function cifrasNext() {
+    if (!cifras?.pendiente) return;
+    CT.closeDialog?.();
+    if (cifras.jugadas.length >= cifras.total) return cifrasFinish();
+    abreCarta();
+  }
+
+  // Las dos caras del final, como en el otro duelo: quien lo crea manda el enlace y quien
+  // lo acepta ve el cara a cara.
+  function cifrasFinish() {
+    paraReloj();
+    screen = "cifras-end";
+    const { mode, seed, total, jugadas, rival } = cifras;
+    const modeName = CT.mode(mode).name;
+    const mios = { puntos: Cifras.puntosPartida(mode, seed, total, jugadas), jugadas };
+    const aciertos = jugadas.filter((jugada, i) => Cifras.puntosCarta(mode, cifras.cartas[i], jugada) > 0).length;
+    const salidas = jugadas.filter(jugada => jugada.salida).length;
+    const payload = Cifras.codificar({ mode, seed, total, jugadas, nombre: duelName() });
+    const gano = !!rival && mios.puntos > rival.puntos;
+    const logros = CT.Progreso.finishGame({ mode, kind: "duel", hits: aciertos, total, won: gano });
+    const sessionLogros = [...new Map(logros.map(item => [item.id || item.name, item])).values()];
+
+    let icono = "🎯", eyebrow = "Duelo de cifras listo", titular = `<strong>${mios.puntos}</strong> puntos en ${total} cartas.`, cuerpo = "", acciones = "";
+    if (!rival) {
+      lastDuelShare = Cifras.invitacion({ modeName, nombre: duelName(), puntos: mios.puntos, total, payload });
+      cuerpo = `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, con los mismos ${Cifras.SEGUNDOS} segundos para cada una.</p>`;
+      acciones = `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`;
+    } else {
+      const empate = mios.puntos === rival.puntos;
+      const quien = rival.nombre || "quien te retaba";
+      lastDuelShare = Cifras.marcador({ modeName, mode, seed, total, rival, mio: mios });
+      icono = empate ? "🤝" : gano ? "🏆" : "🎯";
+      eyebrow = empate ? "Empate" : gano ? "Has ganado el duelo" : "Duelo perdido";
+      titular = `${mios.puntos} <span style="opacity:.6">a</span> ${rival.puntos}`;
+      cuerpo = `<p class="lead" style="margin-inline:auto">${empate ? `Habéis sumado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
+        ${cifrasGridMarkup(quien, rival.jugadas, jugadas, mode, cifras.cartas)}`;
+      acciones = `<button class="btn btn-primary" data-action="start-cifras">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`;
+    }
+
+    cifras.finished = true;
+    guardaCifras();
+    cifras = null;
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
+      <div class="big-icon">${icono}</div><div class="eyebrow">${eyebrow}</div>
+      <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${titular}</h1>
+      ${cuerpo}
+      ${salidas ? `<p class="hint">${salidas === 1 ? "Una carta se cerró" : `${salidas} cartas se cerraron`} por salir de la aplicación.</p>` : ""}
+      ${logrosMarkup(sessionLogros)}
+      <div class="actions" style="justify-content:center">${acciones}<button class="btn btn-secondary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
+    </div></section></div>`);
+  }
+
+  // Verde lo clavado o casi, amarillo lo que se acercó, blanco lo que no puntuó y negro
+  // la carta que se cerró por salir de la aplicación.
+  function cifrasGridMarkup(quien, suyas, mias, mode, cartas) {
+    const puntosDe = (jugada, i) => Cifras.puntosCarta(mode, cartas[i], jugada);
+    const clase = (jugada, i) => {
+      if (jugada.salida) return "out";
+      const puntos = puntosDe(jugada, i);
+      return puntos >= 70 ? "ok" : puntos > 0 ? "mid" : "ko";
+    };
+    const fila = lista => lista.map((jugada, i) => `<i class="${clase(jugada, i)}" aria-hidden="true"></i>`).join("");
+    const cuenta = lista => `${lista.filter(puntosDe).length} de ${lista.length}`;
+    return `<div class="duel-grid">
+      <div><b>${escapeHtml(quien)}</b><div class="duel-row" role="img" aria-label="${escapeHtml(quien)}: puntúa en ${cuenta(suyas)}">${fila(suyas)}</div></div>
+      <div><b>Tú</b><div class="duel-row" role="img" aria-label="Tú: puntúas en ${cuenta(mias)}">${fila(mias)}</div></div>
+    </div>`;
+  }
+
   // La pantalla a la que se llega desde un enlace de duelo. Dice quién reta, con qué
   // mazo y qué marca hay que batir —pero ninguna carta: la gracia es no saber qué sale—.
   function duelIntro() {
     screen = "duelo-intro";
-    const { mode, total, rival } = pendingDuel;
+    const { mode, total, rival, cifras: esCifras } = pendingDuel;
     const juego = CT.mode(mode);
     const quien = rival.nombre || "Alguien";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="pass-screen"><div class="panel">
-        <div class="big-icon">⚔️</div>
-        <div class="eyebrow">Duelo</div>
+        <div class="big-icon">${esCifras ? "⏱️" : "⚔️"}</div>
+        <div class="eyebrow">${esCifras ? "Duelo de cifras" : "Duelo"}</div>
         <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${escapeHtml(quien)} te reta</h1>
-        <p class="lead" style="margin-inline:auto">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)} y en el mismo orden.</p>
-        <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${rival.hits} de ${total}</b><small>la marca que hay que batir</small></span></div>
+        <p class="lead" style="margin-inline:auto">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)}${esCifras ? `. En cada una escribes la cifra, y tienes ${Cifras.SEGUNDOS} segundos` : " y en el mismo orden"}.</p>
+        ${esCifras ? `<p class="solo-intro-rule">El reloj no se para: si sales de la aplicación, la carta se cierra.</p>` : ""}
+        <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${esCifras ? `${rival.puntos} puntos` : `${rival.hits} de ${total}`}</b><small>la marca que hay que batir</small></span></div>
         <div class="field" style="margin-top:16px">
           <label for="duel-name">Tu nombre, para devolver el reto</label>
           <input id="duel-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
@@ -1915,7 +2254,8 @@
     const duelo = pendingDuel;
     pendingDuel = null;
     if (duelo.mode !== selectedModeKey) setMode(duelo.mode);
-    startSolo("duel", duelo);
+    if (duelo.cifras) startCifras(duelo);
+    else startSolo("duel", duelo);
   }
 
   // Un resumen al estilo Wordle: cuenta el resultado sin revelar ninguna carta, así que
@@ -2098,7 +2438,7 @@
   // menú del solitario y leer las reglas de una partida entre varios no ayuda a nadie.
   function rules() {
     const returnTo = screen;
-    const enSolitario = ["solo-home", "solo", "solo-end", "duelo-intro"].includes(screen);
+    const enSolitario = ["solo-home", "solo", "solo-end", "cifras", "cifras-end", "duelo-intro"].includes(screen);
     const context = comp ? "competition" : solo || enSolitario ? "solo" : "local";
     const modeKey = screen === 'solo' ? solo.mode : CT.UI.isPlaying(screen) ? (game?.mode || selectedModeKey) : selectedModeKey;
     overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
@@ -2315,6 +2655,13 @@
     // cara no lo hay, y guardar lo que devuelve un elemento inexistente borraría el
     // nombre que ya tenías puesto.
     else if (action === "start-duel") { guardaNombreSiLoHay(); startSolo("duel"); }
+    // El duelo de cifras se estrena igual, y «Devolver el reto» pasa por aquí desde el
+    // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
+    else if (action === "start-cifras") { guardaNombreSiLoHay("cifras-name"); startCifras(); }
+    else if (action === "resume-cifras") resumeCifras();
+    else if (action === "cifra-answer") cierraCarta("respuesta");
+    else if (action === "cifras-next") cifrasNext();
+    else if (action === "cifras-exit") CT.UI.confirmExit("La carta que tengas abierta se cerrará: el reloj no se para.", () => { paraReloj(); if (cifras) { guardaCifras(); cifras = null; } soloHome(); });
     else if (action === "accept-duel") acceptDuel();
     else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
     else if (action === "resume-solo") resumeSolo();
@@ -2360,7 +2707,7 @@
     else if (action === 'daily') { CT.closeDialog(); soloHome(); }
     else { homeDestination = 'home'; home(); window.scrollTo(0, 0); }
   };
-  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "comp-intro"].includes(screen) || !!CT.onlineActive;
+  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();
   // El botón/gesto Atrás de Android: `window.Capacitor` solo existe dentro del contenedor
   // nativo (Capacitor lo inyecta al arrancar la WebView), así que esto no toca la versión
