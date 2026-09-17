@@ -181,6 +181,29 @@ salirse de la aplicación— y solo se diferencian en qué se hace con cada cart
 Las dos se eligen con un control de dos pastillas, no con un desplegable: así se ve que hay
 dos maneras y cuál está elegida, en vez de enseñar una y esconder la otra.
 
+### Las unidades
+
+Cada mazo ordena sus cartas por un número en una sola unidad —kilos, años, km/h—, pero las
+cartas se enseñan en la que toque: la hormiga en miligramos y la ballena en toneladas. Pedir
+las dos «en kilos» obligaría a escribir `0,0000001` para una de ellas, así que **la respuesta
+admite su unidad** y se convierte a la del mazo: «40 g», «2,5 t», «3 días», «30 m/s»,
+«47 millones». Sin unidad se entiende la del mazo, y una que no se reconoce descarta la
+respuesta entera en vez de colarse como si fuera la básica.
+
+Las unidades las declara cada eje en `modes.js`, y el campo de respuesta las lista debajo:
+sin eso no hay manera de saber en qué se responde. Lo que no se hace es elegir la unidad por
+carta —«¿cuánto pesa, en gramos?»—, porque eso regalaría el orden de magnitud, que es justo
+lo que había que adivinar.
+
+### Antes de empezar
+
+Un duelo va a reloj desde la primera carta, así que entrar directamente castigaba a quien
+todavía estaba leyendo de qué iba. Entre elegir la modalidad y jugar hay una pantalla que
+explica cómo funciona, con una demostración animada del mazo que se va a jugar —su pregunta,
+su eje, sus unidades, pero ninguna carta de verdad: eso sería destripar una de las diez— y un
+botón para empezar. Al pulsarlo, tres segundos de cuenta atrás. La partida no se crea hasta
+que termina, así que el reloj de la primera carta empieza cuando de verdad se ve la carta.
+
 ### El reloj
 
 Las dos modalidades van a reloj por la misma razón: sin un plazo por carta, cualquiera

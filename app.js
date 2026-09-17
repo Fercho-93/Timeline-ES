@@ -2003,18 +2003,32 @@
   // veces un menos para los años antes de Cristo. «47.000.000» son cuarenta y siete
   // millones; «1,5» es uno y medio; y «1.5», que nadie escribiría como millar porque
   // detrás del punto no hay tres cifras, se entiende como decimal.
-  function leeCifra(texto) {
-    let limpio = String(texto || "").trim().replace(/[\s ]/g, "").replace(/[−–—]/g, "-");
-    if (!limpio) return null;
+  // Lo que escribe una persona, que puede traer su unidad detrás: «40 g», «2,5 t»,
+  // «3 días», «47 millones». El número se lee a la española —puntos de millar, coma
+  // decimal— y la unidad se convierte a la del mazo, que es la que ordena las cartas.
+  // Una unidad que no se reconoce no se ignora: la respuesta entera se descarta, porque
+  // dar por buenos «40 lunas» como si fueran cuarenta kilos sería puntuar otra cosa.
+  function leeCifra(texto, modeKey = cifras?.mode || selectedModeKey) {
+    const crudo = String(texto || "").trim().replace(/[\u2212\u2013\u2014]/g, "-");
+    if (!crudo) return null;
+    // El número es lo que va delante; lo que quede detrás, si algo queda, es la unidad.
+    const partido = crudo.match(/^(-?[\d.,\s\u00a0]*\d)\s*(.*)$/);
+    if (!partido) return null;
+    const [, numero, unidad] = partido;
+
+    let limpio = numero.replace(/[\s\u00a0]/g, "");
     if (limpio.includes(",")) limpio = limpio.replace(/\./g, "").replace(",", ".");
     else {
       const trozos = limpio.split(".");
       if (trozos.length > 1 && trozos.slice(1).every(parte => parte.length === 3)) limpio = trozos.join("");
     }
     if (!/^-?\d*\.?\d*$/.test(limpio) || !/\d/.test(limpio)) return null;
-    const valor = Number(limpio);
+
+    const factor = Cifras.factorDe(modeKey, unidad);
+    if (factor === null) return null;
+    const valor = Number(limpio) * factor;
     if (!Number.isFinite(valor) || Math.abs(valor) > Cifras.MAX_CIFRA) return null;
-    if (valor < 0 && !reglaCifra(cifras?.mode).negativos) return null;
+    if (valor < 0 && !reglaCifra(modeKey).negativos) return null;
     return valor;
   }
 
@@ -2168,9 +2182,9 @@
         ${relojMarkup(restante, plazoCifras())}
         <div class="cifra-card" id="cifra-pregunta">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta)}</span></div>
         <div class="field cifra-field">
-          <label for="cifra-input">Tu cifra ${escapeHtml(regla.unidad ? `en ${regla.unidad}` : "")}</label>
-          <input id="cifra-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send" aria-describedby="cifra-pregunta" placeholder="${escapeHtml(regla.unidad || "")}" ${cerrada ? "disabled" : "data-autofocus"}>
-          <p class="hint">${escapeHtml(regla.pista || "")}</p>
+          <label for="cifra-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
+          <input id="cifra-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send" aria-describedby="cifra-pregunta cifra-unidades" placeholder="${escapeHtml(regla.unidad || "")}" ${cerrada ? "disabled" : "data-autofocus"}>
+          <p class="hint" id="cifra-unidades">${escapeHtml(regla.pista || "")}${unidadesMarkup(cifras.mode)}</p>
         </div>
         <button class="btn btn-primary btn-block" data-action="cifra-answer" ${cerrada ? "disabled" : ""}>Responder <span>→</span></button>
         <p class="hint cifra-aviso">El reloj no se para. Si sales de la aplicación, la carta se cierra.</p>
@@ -2179,6 +2193,15 @@
     const campo = app.querySelector("#cifra-input");
     if (campo && !cerrada) campo.addEventListener("keydown", evento => { if (evento.key === "Enter") { evento.preventDefault(); cierraCarta("respuesta"); } });
     if (!cerrada) arrancaReloj();
+  }
+
+  // Las unidades que admite el mazo, tal cual las declara su eje. No es decoración: en
+  // peso, longevidad y velocidad el valor interno está en una unidad y las cartas se
+  // enseñan en otra, así que sin esto no hay manera de saber en qué se responde.
+  function unidadesMarkup(modeKey) {
+    const lista = Cifras.unidades(modeKey);
+    if (lista.length < 2) return "";
+    return `<span class="cifra-unidades">Se aceptan: ${lista.map(u => escapeHtml(u.nombre)).join(" · ")}</span>`;
   }
 
   // El resultado de una carta: lo que valía, lo que se respondió y lo que suma. Aquí ya
@@ -2278,6 +2301,101 @@
     </div>`;
   }
 
+  // ——— Antes de empezar ———
+  //
+  // Un duelo va a reloj desde la primera carta, así que entrar directamente castigaba a
+  // quien todavía estaba leyendo de qué iba. Entre elegir la modalidad y jugar hay ahora
+  // una pantalla que enseña cómo funciona —con una demostración animada, que se entiende
+  // antes que un párrafo— y que no arranca nada hasta que se pulsa. Y al pulsar, tres
+  // segundos de cuenta atrás para levantar la vista y prepararse.
+  let duelPreparado = null;
+
+  function duelReady(modalidad, duel = null) {
+    duelPreparado = { modalidad, duel };
+    screen = "duelo-listo";
+    const cifrasEsta = modalidad === "cifras";
+    const regla = reglaCifra();
+    const rival = duel?.rival || null;
+    const plazo = Math.round((Number(duel?.ms) || CT.Duelo.MS) / 1000);
+    const reglas = cifrasEsta
+      ? [`${Cifras.CARTAS} cartas de ${escapeHtml(currentMode().name)}, una detrás de otra.`,
+         `En cada una escribes el número. ${escapeHtml(regla.pregunta || "")}`,
+         `Puntúa lo cerca que te quedes <b>y</b> lo rápido que respondas.`]
+      : [`${CT.Duelo.CARTAS} cartas de ${escapeHtml(currentMode().name)}, una detrás de otra.`,
+         `Colocas cada una en el hueco que le toque de la línea.`,
+         `Gana quien más acierte. No se gastan vidas: se juegan todas.`];
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+      <section class="pass-screen"><div class="panel duelo-listo">
+        <div class="eyebrow">Duelo por enlace</div>
+        <h1 data-focus tabindex="-1" class="duelo-listo-titulo">${cifrasEsta ? "Escribir la cifra" : "Ordenar las cartas"}</h1>
+        ${demoMarkup(cifrasEsta)}
+        <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
+        <p class="solo-intro-rule">${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.</p>
+        ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${cifrasEsta ? `${rival.puntos} puntos` : `${rival.hits} de ${duel.total}`}</b><small>la marca de ${escapeHtml(rival.nombre || "quien te reta")}</small></span></div>` : ""}
+        <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">JUGAR <span>→</span></button>
+      </div></section>
+    </div>`);
+  }
+
+  // La demostración: no explica con palabras lo que se entiende mirando. Es decorativa
+  // —las reglas van escritas justo debajo—, así que se esconde del lector de pantalla, y
+  // con movimiento reducido se queda quieta en su último fotograma, que ya se entiende.
+  function demoMarkup(cifrasEsta) {
+    // La demostración es del mazo que se va a jugar, no de uno cualquiera: enseñar
+    // «¿Cuántos habitantes?» antes de un duelo de pesos confundía más que ayudaba. Aun
+    // así no usa ninguna carta de verdad —eso sería destripar una de las diez—, sino la
+    // pregunta del eje y un ejemplo suyo.
+    const regla = reglaCifra();
+    const eje = currentAxis();
+    if (cifrasEsta) {
+      return `<div class="demo demo-cifras" aria-hidden="true">
+        <div class="demo-carta"><b>Una carta de ${escapeHtml(currentMode().name)}</b><small>${escapeHtml(regla.pregunta || "")}</small></div>
+        <div class="demo-reloj"><i></i></div>
+        <div class="demo-campo"><span>${escapeHtml(regla.ejemplo || "")}</span></div>
+        <div class="demo-premio">+82</div>
+      </div>`;
+    }
+    return `<div class="demo demo-orden" aria-hidden="true">
+      <small class="demo-eje">${escapeHtml(eje.timelineTitle)}</small>
+      <div class="demo-linea">
+        <span class="demo-hito">◂</span>
+        <span class="demo-hueco"></span>
+        <span class="demo-hito">▸</span>
+      </div>
+      <span class="demo-mano">${escapeHtml(eje.hiddenLabel)}</span>
+      <div class="demo-premio">✓</div>
+    </div>`;
+  }
+
+  // Tres, dos, uno. La partida no se crea hasta el final, así que el reloj de la primera
+  // carta empieza a contar cuando de verdad se ve la carta y no antes.
+  function cuentaAtras(arranca) {
+    const pasos = ["3", "2", "1", "¡Ya!"];
+    const quieto = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    overlay(`<div class="overlay overlay-cuenta"><div class="cuenta" role="status" aria-live="assertive"><b class="cuenta-numero">${pasos[0]}</b></div></div>`);
+    announce("Preparados. La partida empieza en tres segundos.");
+    let paso = 0;
+    const siguiente = () => {
+      paso += 1;
+      const marca = app.querySelector(".cuenta-numero");
+      if (!marca) return;
+      if (paso >= pasos.length) { CT.closeDialog?.(); arranca(); return; }
+      marca.textContent = pasos[paso];
+      // Reiniciar la animación en cada número: sin esto solo se animaría el primero.
+      if (!quieto) { marca.style.animation = "none"; void marca.offsetWidth; marca.style.animation = ""; }
+      CT.Effects?.transition?.("notice");
+      setTimeout(siguiente, Math.round(CT.Duelo.CUENTA_PASO_MS * (paso === pasos.length - 1 ? 0.65 : 1)));
+    };
+    setTimeout(siguiente, CT.Duelo.CUENTA_PASO_MS);
+  }
+
+  function duelPlay() {
+    if (!duelPreparado) return soloHome();
+    const { modalidad, duel } = duelPreparado;
+    duelPreparado = null;
+    cuentaAtras(() => (modalidad === "cifras" ? startCifras(duel) : startSolo("duel", duel)));
+  }
+
   // La pantalla a la que se llega desde un enlace de duelo. Dice quién reta, con qué
   // mazo y qué marca hay que batir —pero ninguna carta: la gracia es no saber qué sale—.
   function duelIntro() {
@@ -2339,8 +2457,7 @@
     const duelo = pendingDuel;
     pendingDuel = null;
     if (duelo.mode !== selectedModeKey) setMode(duelo.mode);
-    if (duelo.cifras) startCifras(duelo);
-    else startSolo("duel", duelo);
+    duelReady(duelo.cifras ? "cifras" : "orden", duelo);
   }
 
   // Un resumen al estilo Wordle: cuenta el resultado sin revelar ninguna carta, así que
@@ -2752,10 +2869,11 @@
     // El campo del nombre solo está donde se pide. Al devolver un reto desde el cara a
     // cara no lo hay, y guardar lo que devuelve un elemento inexistente borraría el
     // nombre que ya tenías puesto.
-    else if (action === "start-duel") { guardaNombreSiLoHay(); startSolo("duel"); }
+    else if (action === "start-duel") { guardaNombreSiLoHay(); duelReady("orden"); }
     // El duelo de cifras se estrena igual, y «Devolver el reto» pasa por aquí desde el
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
-    else if (action === "start-cifras") { guardaNombreSiLoHay(); startCifras(); }
+    else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
+    else if (action === "duel-play") duelPlay();
     else if (action === "resume-cifras") resumeCifras();
     else if (action === "cifra-answer") cierraCarta("respuesta");
     else if (action === "cifras-next") cifrasNext();
