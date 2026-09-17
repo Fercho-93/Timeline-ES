@@ -250,6 +250,11 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="solo-place"]');
   click(w, '[data-action="confirm-place"]');
   ok("en Normal el tablero coloca una carta por turno", /incorporado/.test(texto(w)) === false);
+  // La carta que acaba de colocar quien juega también se posa con el mismo gesto cuando
+  // el acierto se enseña en la línea, y el reparto de la partida libre es al azar: contar
+  // las dos juntas haría que esta prueba dependiera de si la primera jugada salió bien.
+  // A partir de aquí solo se mira lo que reparte el tablero por su cuenta.
+  animaciones.length = 0;
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
   const vistas = llegadas();
@@ -287,13 +292,19 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="start-free"]');
   click(w, '[data-action="solo-place"]');
   click(w, '[data-action="confirm-place"]');
+  // Igual que arriba: la llegada de la carta de quien juega, y el desplazamiento que la
+  // centra, quedan fuera de la cuenta.
+  animaciones.length = 0;
+  seguidas.length = 0;
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
   ok("la primera llega sola, no las dos a la vez", animaciones.length === 1);
   const segunda = w.document.querySelectorAll(".timeline-card")[1];
   ok("la que espera su turno no está puesta todavía", [...w.document.querySelectorAll(".timeline-card")].some(c => c.style.visibility === "hidden"));
   ok("y la vista ya se ha movido hasta la primera", seguidas.length >= 1);
-  await new Promise(resolve => w.setTimeout(resolve, 800));
+  // Una llegada termina antes de que empiece la siguiente, así que hay que esperar el
+  // turno entero: con menos, la segunda carta todavía no habría salido.
+  await new Promise(resolve => w.setTimeout(resolve, 1200));
   ok("la segunda llega después, con la vista detrás", animaciones.length === 2 && seguidas.length >= 2);
   ok("y ninguna se queda escondida al terminar", ![...w.document.querySelectorAll(".timeline-card")].some(c => c.style.visibility === "hidden"));
   w.close();
@@ -328,6 +339,9 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="start-free"]');
   click(w, '[data-action="solo-place"]');
   click(w, '[data-action="confirm-place"]');
+  // La carta de quien juega sí se posa, y aquí no se está mirando esa: lo que se
+  // comprueba es que el tablero no reparta ninguna por su cuenta.
+  animaciones.length = 0;
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
   ok("en Fácil no llega ninguna carta automática", !animaciones.some(el => el.classList?.contains("timeline-card")) && !/incorporado/.test(texto(w)));
