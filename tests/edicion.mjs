@@ -174,8 +174,9 @@ for (const reduce of [false, true]) {
     click(w, '[data-mode="history"]');
     click(w, '[data-action="solo"]');
     const folds = [...doc.querySelectorAll('.solo-fold')];
-    // Reto diario, partida libre, duelo por enlace y duelo de cifras.
-    assert.equal(folds.length, 4);
+    // Reto diario, partida libre y duelo por enlace. El duelo es uno solo: sus dos
+    // modalidades se eligen dentro, no son dos opciones del menú.
+    assert.equal(folds.length, 3);
     assert.ok(folds.every(fold => !fold.open && fold.querySelector('summary')));
     folds[0].open = true;
     folds[0].dispatchEvent(new w.Event('toggle'));
