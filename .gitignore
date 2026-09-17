@@ -5,3 +5,6 @@ dist/
 
 android/app/google-services.json
 ios/App/App/GoogleService-Info.plist
+
+# Capturas y medidas de la prueba de maquetación con navegador real.
+test-results/
