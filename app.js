@@ -81,7 +81,7 @@
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
     if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
     // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
-    // carta no devuelve diez segundos nuevos, cierra esa carta.
+    // carta no devuelve el plazo entero, cierra esa carta.
     routes.cifras = resumeCifras;
     if (!routes[view.screen]) return false;
     setMode(view.mode);
@@ -1590,12 +1590,15 @@
     return `<div class="panel solo-panel">
       <div class="solo-panel-head"><h3>Duelo por enlace</h3></div>
       <p>Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas. Sin cuentas y sin esperar a nadie.</p>
-      ${regla ? `<div class="field">
-        <label for="duel-kind">Modalidad</label>
-        <select id="duel-kind">
-          <option value="orden"${modo === "orden" ? " selected" : ""}>Ordenar las cartas</option>
-          <option value="cifras"${modo === "cifras" ? " selected" : ""}>Escribir la cifra</option>
-        </select>
+      ${regla ? `<div class="field duel-kind-field">
+        <span class="field-label" id="duel-kind-label">Elige la modalidad</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="duel-kind-label">
+          ${[["orden", "Ordenar las cartas", "Las colocas en la línea"], ["cifras", "Escribir la cifra", "Respondes con el número"]]
+            .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === modo ? " is-on" : ""}">
+              <input type="radio" name="duel-kind" value="${clave}"${clave === modo ? " checked" : ""}>
+              <span><b>${titulo}</b><small>${pie}</small></span>
+            </label>`).join("")}
+        </div>
       </div>` : ""}
       ${bloque("orden", `<p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
         <p class="solo-intro-rule">${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</p>
@@ -1644,7 +1647,7 @@
       // Un duelo que se estrena aquí se juega a reloj. Uno que llega por enlace se juega
       // como lo jugó quien retó: los enlaces anteriores al reloj no lo llevan, y ponérselo
       // a quien los acepta sería compararlo contra una marca hecha sin plazo.
-      duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null, reloj: true };
+      duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null, ms: CT.Duelo.MS };
       barajado = CT.Duelo.reparto(selectedModeKey, duelo.seed, duelo.total);
     } else if (kind === "daily") {
       barajado = shuffleWith(ids, seededRandom(seedFrom(`${today()}:${selectedModeKey}`))).slice(0, DAILY_CARDS + 1);
@@ -1658,7 +1661,7 @@
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : null,
       duelo, finished: false, newDiscoveries: 0,
-      cartaEmpezadaEn: duelo?.reloj ? Date.now() : null
+      cartaEmpezadaEn: duelo?.ms > 0 ? Date.now() : null
     };
     pendingIndex = null;
     result = null;
@@ -1666,7 +1669,10 @@
     soloView();
   }
 
-  function enDueloConReloj() { return solo?.kind === "duel" && !!solo.duelo?.reloj && !solo.finished; }
+  // El plazo de este duelo en concreto: el de hoy si se estrenó aquí, o el que traía el
+  // enlace si llegó de fuera. Cero es un duelo de antes de que hubiera reloj.
+  function plazoDuelo() { return solo?.kind === "duel" && !solo.finished ? Number(solo.duelo?.ms) || 0 : 0; }
+  function enDueloConReloj() { return plazoDuelo() > 0; }
 
   function soloView() {
     screen = "solo";
@@ -1697,7 +1703,7 @@
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
       ${progress}
       ${enDuelo() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
-      ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.max(0, CT.Duelo.MS - (Date.now() - solo.cartaEmpezadaEn)), CT.Duelo.MS) : ""}
+      ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn)), plazoDuelo()) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} ${solo.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
@@ -1939,7 +1945,7 @@
 
   // ——— El duelo de cifras ———
   //
-  // Diez cartas, diez segundos cada una, y en vez de colocar se escribe el número. Lo
+  // Diez cartas, el mismo plazo que el duelo de orden, y en vez de colocar se escribe el
   // que puntúa y lo que viaja en el enlace está en duelo.js; aquí está lo que se ve y,
   // sobre todo, el reloj, que es la regla de la que depende todo lo demás.
   //
@@ -1958,16 +1964,21 @@
 
   function cifrasKey() { return `hilo-cifras-${selectedModeKey}-v1`; }
 
+  // El plazo de esta partida de cifras: el de hoy si se estrenó aquí, o el que traía el
+  // enlace si llegó de fuera. Los puntos por rapidez se miden contra él, así que una
+  // partida jugada con otro plazo hay que seguir puntuándola con el suyo.
+  function plazoCifras() { return Number(cifras?.ms) || Cifras.MS; }
+
   // La carta que se tiene delante. Mientras se enseña el resultado de una, la de delante
   // sigue siendo esa y no la siguiente: revelar la siguiente por detrás de la capa sería
-  // regalar diez segundos de ventaja.
+  // regalar un plazo entero de ventaja.
   function indiceCifra() { return cifras.jugadas.length - (cifras.pendiente ? 1 : 0); }
   function cartaCifra() { return cifras.cartas[indiceCifra()]; }
 
   function guardaCifras() {
     if (!cifras) { CT.Storage.removeItem(cifrasKey()); return; }
-    const { mode, seed, total, jugadas, empezadaEn, rival, finished } = cifras;
-    try { CT.Storage.setItem(cifrasKey(), JSON.stringify({ mode, seed, total, jugadas, empezadaEn, rival, finished })); }
+    const { mode, seed, total, ms, jugadas, empezadaEn, rival, finished } = cifras;
+    try { CT.Storage.setItem(cifrasKey(), JSON.stringify({ mode, seed, total, ms, jugadas, empezadaEn, rival, finished })); }
     catch { /* almacenamiento lleno */ }
   }
 
@@ -2024,10 +2035,10 @@
   // cuanto no hay ninguna carta abierta, que es la señal de parar el latido.
   function cartaEnReloj() {
     if (screen === "cifras" && cifras && cifras.empezadaEn !== null && !cifras.pendiente) {
-      return { empezadaEn: cifras.empezadaEn, ms: Cifras.MS, cierra: cierraCarta };
+      return { empezadaEn: cifras.empezadaEn, ms: plazoCifras(), cierra: cierraCarta };
     }
     if (screen === "solo" && enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult) {
-      return { empezadaEn: solo.cartaEmpezadaEn, ms: CT.Duelo.MS, cierra: cierraCartaDuelo };
+      return { empezadaEn: solo.cartaEmpezadaEn, ms: plazoDuelo(), cierra: cierraCartaDuelo };
     }
     return null;
   }
@@ -2059,7 +2070,7 @@
   }
 
   // Cerrar una carta es lo único que resuelve una jugada, y las tres maneras de llegar
-  // aquí acaban en el mismo sitio: responder, agotar los diez segundos o salirse de la
+  // aquí acaban en el mismo sitio: responder, agotar el plazo o salirse de la
   // aplicación. Solo la tercera anula la respuesta; agotar el tiempo con algo escrito
   // sigue puntuando, pero sin la parte que premia la prisa.
   function cierraCarta(motivo) {
@@ -2070,13 +2081,13 @@
     const respuesta = salida ? null : leeCifra(campo ? campo.value : "");
     const jugada = {
       respuesta,
-      ms: Math.min(Math.max(Date.now() - cifras.empezadaEn, 0), Cifras.MS),
+      ms: Math.min(Math.max(Date.now() - cifras.empezadaEn, 0), plazoCifras()),
       salida
     };
     const card = cartaCifra();
     cifras.jugadas.push(jugada);
     cifras.empezadaEn = null;
-    const puntos = Cifras.puntosCarta(cifras.mode, card, jugada);
+    const puntos = Cifras.puntosCarta(cifras.mode, card, jugada, plazoCifras());
     cifras.pendiente = { jugada, motivo, puntos };
     anotaLogros(CT.Progreso.record({ mode: cifras.mode, cardId: card.id, correct: puntos > 0, kind: "cifras" }));
     CT.Effects.feedback(puntos > 0);
@@ -2115,9 +2126,9 @@
   } catch { /* La visibilidad del documento ya cubre el caso general. */ }
 
   function startCifras(duel = null) {
-    const duelo = duel || { seed: CT.Duelo.crearSemilla(), total: Cifras.CARTAS, rival: null };
+    const duelo = duel || { seed: CT.Duelo.crearSemilla(), total: Cifras.CARTAS, rival: null, ms: Cifras.MS };
     cifras = {
-      mode: selectedModeKey, seed: duelo.seed, total: duelo.total,
+      mode: selectedModeKey, seed: duelo.seed, total: duelo.total, ms: Number(duelo.ms) || Cifras.MS,
       cartas: Cifras.cartas(selectedModeKey, duelo.seed, duelo.total),
       jugadas: [], empezadaEn: null, rival: duelo.rival, finished: false, pendiente: null
     };
@@ -2146,15 +2157,15 @@
     const card = cartaCifra();
     const indice = indiceCifra();
     const cerrada = !!cifras.pendiente;
-    const puntos = Cifras.puntosPartida(cifras.mode, cifras.seed, cifras.total, cifras.jugadas);
-    const restante = cerrada ? 0 : Math.max(0, Cifras.MS - (Date.now() - cifras.empezadaEn));
+    const puntos = Cifras.puntosPartida(cifras.mode, cifras.seed, cifras.total, cifras.jugadas, plazoCifras());
+    const restante = cerrada ? 0 : Math.max(0, plazoCifras() - (Date.now() - cifras.empezadaEn));
     const marcaRival = cifras.rival ? `<span><b>${cifras.rival.puntos}</b><small>${escapeHtml(cifras.rival.nombre || "quien te reta")}</small></span>` : "";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="cifras-exit">Salir</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">Carta ${indice + 1} de ${cifras.total}. ${escapeHtml(regla.pregunta)} ${escapeHtml(card.title)}. Tienes ${Cifras.SEGUNDOS} segundos.</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Duelo de cifras</div><div class="turn-name" aria-hidden="true">${puntos} ${puntos === 1 ? "punto" : "puntos"}</div></div><div class="deck-count"><strong>${cifras.total - indice}</strong><span>por responder</span></div></div>
       ${marcaRival ? `<div class="solo-stats cifra-rival">${marcaRival}</div>` : ""}
       <section class="cifra-panel">
-        ${relojMarkup(restante, Cifras.MS)}
+        ${relojMarkup(restante, plazoCifras())}
         <div class="cifra-card" id="cifra-pregunta">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta)}</span></div>
         <div class="field cifra-field">
           <label for="cifra-input">Tu cifra ${escapeHtml(regla.unidad ? `en ${regla.unidad}` : "")}</label>
@@ -2183,7 +2194,7 @@
     const explicacion = jugada.salida
       ? "Has salido de la aplicación con la carta abierta, así que esta no puntúa."
       : jugada.respuesta === null
-        ? motivo === "tiempo" ? "Se acabaron los diez segundos sin ninguna cifra escrita." : "No has escrito ninguna cifra."
+        ? motivo === "tiempo" ? `Se acabaron los ${Cifras.SEGUNDOS} segundos sin ninguna cifra escrita.` : "No has escrito ninguna cifra."
         : `Tu respuesta: <strong>${escapeHtml(Cifras.formato(cifras.mode, jugada.respuesta))}</strong>${motivo === "tiempo" ? " — llegó con el tiempo agotado, así que no suma la prisa." : ` — has tardado ${(jugada.ms / 1000).toFixed(1)} s.`}`;
     overlay(`<div class="overlay" data-result-card="${puntos > 0 ? card.id : ""}"><div class="modal ${puntos > 0 ? "success" : "failure"}">
       <div class="result-mark" aria-hidden="true">${puntos >= 70 ? "✓" : puntos > 0 ? "≈" : "×"}</div>
@@ -2192,7 +2203,7 @@
       <div class="reveal">${categoryBadge(card)}${CT.Art.button(cifras.mode, card)}<div class="year">${escapeHtml(CT.formatValue(cifras.mode, card))}</div><p>${escapeHtml(card.detail)}</p></div>
       <p>${explicacion}</p>
       <p class="cifra-puntos"><b>+${puntos}</b> ${puntos === 1 ? "punto" : "puntos"}</p>
-      ${suya ? `<p class="hint">${escapeHtml(cifras.rival.nombre || "Quien te reta")} respondió ${escapeHtml(suya.salida ? "nada: salió de la aplicación" : Cifras.formato(cifras.mode, suya.respuesta))} y sumó ${Cifras.puntosCarta(cifras.mode, card, suya)}.</p>` : ""}
+      ${suya ? `<p class="hint">${escapeHtml(cifras.rival.nombre || "Quien te reta")} respondió ${escapeHtml(suya.salida ? "nada: salió de la aplicación" : Cifras.formato(cifras.mode, suya.respuesta))} y sumó ${Cifras.puntosCarta(cifras.mode, card, suya, plazoCifras())}.</p>` : ""}
       <button class="btn btn-primary btn-block" data-dialog-focus data-action="cifras-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button>
     </div></div>`);
   }
@@ -2211,8 +2222,9 @@
     screen = "cifras-end";
     const { mode, seed, total, jugadas, rival } = cifras;
     const modeName = CT.mode(mode).name;
-    const mios = { puntos: Cifras.puntosPartida(mode, seed, total, jugadas), jugadas };
-    const aciertos = jugadas.filter((jugada, i) => Cifras.puntosCarta(mode, cifras.cartas[i], jugada) > 0).length;
+    const plazo = plazoCifras();
+    const mios = { puntos: Cifras.puntosPartida(mode, seed, total, jugadas, plazo), jugadas };
+    const aciertos = jugadas.filter((jugada, i) => Cifras.puntosCarta(mode, cifras.cartas[i], jugada, plazo) > 0).length;
     const salidas = jugadas.filter(jugada => jugada.salida).length;
     const payload = Cifras.codificar({ mode, seed, total, jugadas, nombre: duelName() });
     const gano = !!rival && mios.puntos > rival.puntos;
@@ -2227,12 +2239,12 @@
     } else {
       const empate = mios.puntos === rival.puntos;
       const quien = rival.nombre || "quien te retaba";
-      lastDuelShare = Cifras.marcador({ modeName, mode, seed, total, rival, mio: mios });
+      lastDuelShare = Cifras.marcador({ modeName, mode, seed, total, rival, mio: mios, ms: plazo });
       icono = empate ? "🤝" : gano ? "🏆" : "🎯";
       eyebrow = empate ? "Empate" : gano ? "Has ganado el duelo" : "Duelo perdido";
       titular = `${mios.puntos} <span style="opacity:.6">a</span> ${rival.puntos}`;
       cuerpo = `<p class="lead" style="margin-inline:auto">${empate ? `Habéis sumado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
-        ${cifrasGridMarkup(quien, rival.jugadas, jugadas, mode, cifras.cartas)}`;
+        ${cifrasGridMarkup(quien, rival.jugadas, jugadas, mode, cifras.cartas, plazo)}`;
       acciones = `<button class="btn btn-primary" data-action="start-cifras">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`;
     }
 
@@ -2251,8 +2263,8 @@
 
   // Verde lo clavado o casi, amarillo lo que se acercó, blanco lo que no puntuó y negro
   // la carta que se cerró por salir de la aplicación.
-  function cifrasGridMarkup(quien, suyas, mias, mode, cartas) {
-    const puntosDe = (jugada, i) => Cifras.puntosCarta(mode, cartas[i], jugada);
+  function cifrasGridMarkup(quien, suyas, mias, mode, cartas, plazo) {
+    const puntosDe = (jugada, i) => Cifras.puntosCarta(mode, cartas[i], jugada, plazo);
     const clase = (jugada, i) => {
       if (jugada.salida) return "out";
       const puntos = puntosDe(jugada, i);
@@ -2270,10 +2282,10 @@
   // mazo y qué marca hay que batir —pero ninguna carta: la gracia es no saber qué sale—.
   function duelIntro() {
     screen = "duelo-intro";
-    const { mode, total, rival, cifras: esCifras, reloj } = pendingDuel;
+    const { mode, total, rival, cifras: esCifras } = pendingDuel;
     // Un enlace anterior al reloj se juega sin él: la marca de enfrente se hizo sin plazo
     // y ponérselo solo a quien lo acepta no compararía las mismas dos partidas.
-    const conReloj = esCifras || reloj;
+    const conReloj = pendingDuel.ms > 0;
     const juego = CT.mode(mode);
     const quien = rival.nombre || "Alguien";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
@@ -2283,7 +2295,7 @@
         <h1 data-focus tabindex="-1" style="font-size:clamp(2rem,9vw,3.4rem)">${escapeHtml(quien)} te reta</h1>
         <p class="lead" style="margin-inline:auto">${escapeHtml(juego.name)} · ${total} cartas, las mismas que ha jugado ${escapeHtml(quien)}${esCifras ? `. En cada una escribes la cifra` : " y en el mismo orden"}.</p>
         ${conReloj
-          ? `<p class="solo-intro-rule">${esCifras ? Cifras.SEGUNDOS : CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${esCifras ? "cierra" : "da por fallada"}.</p>`
+          ? `<p class="solo-intro-rule">${Math.round(pendingDuel.ms / 1000)} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${esCifras ? "cierra" : "da por fallada"}.</p>`
           : `<p class="solo-intro-rule">Este reto se creó antes de que los duelos llevaran reloj, así que se juega sin plazo, como lo jugó ${escapeHtml(quien)}.</p>`}
         <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${esCifras ? `${rival.puntos} puntos` : `${rival.hits} de ${total}`}</b><small>la marca que hay que batir</small></span></div>
         <div class="field" style="margin-top:16px">
@@ -2602,10 +2614,15 @@
     if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value, { returnTo: encReturn }); return; }
     // Cambiar de modalidad no repinta: repintar cerraría el desplegable que se acaba de
     // abrir para llegar hasta aquí. Se enseña un bloque y se esconde el otro.
-    if (event.target.id === "duel-kind") {
+    if (event.target.name === "duel-kind") {
       const modo = event.target.value === "cifras" ? "cifras" : "orden";
       CT.Storage.setItem(DUEL_MODE_KEY, modo);
       app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== modo; });
+      // La pastilla elegida se marca en el propio elemento: el `:has()` del CSS lo haría
+      // solo, pero no todos los navegadores en los que se juega esto lo soportan.
+      app.querySelectorAll(".segmented-option").forEach(opcion => {
+        opcion.classList.toggle("is-on", opcion.querySelector("input").value === modo);
+      });
       return;
     }
     if (event.target.id !== "solo-difficulty") return;

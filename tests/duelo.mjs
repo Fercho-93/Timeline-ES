@@ -388,20 +388,29 @@ console.log("\nLas reglas viajan en la versión del enlace");
   const w = boot();
   const D = w.CONTINUUM.Duelo;
   const payload = D.codificar({ mode: "history", seed: "abc", total: 3, hits: 2, sequence: [true, true, false], nombre: "Ana" });
-  ok("un duelo creado hoy va marcado como jugado a reloj", plano(w, payload).split("|")[0] === "3");
-  ok("y al leerlo se sabe que lo lleva", D.descodificar(payload).duelo.reloj === true);
+  ok("un duelo creado hoy lleva la versión de las reglas de hoy", plano(w, payload).split("|")[0] === "4");
+  ok("y al leerlo vuelve el plazo con el que se jugó", D.descodificar(payload).duelo.ms === D.MS);
 
   // Los enlaces anteriores al reloj siguen valiendo y se juegan como se jugaron.
   const viejo = cruda(w, "1|history|abc|3|2|110|" + D.huella("history") + "|Ana");
   const leido = D.descodificar(viejo);
   ok("un enlace anterior al reloj se sigue aceptando", leido.ok === true);
-  ok("y se marca como jugado sin plazo", leido.duelo.reloj === false);
+  ok("y se marca como jugado sin plazo", leido.duelo.ms === 0);
 
   const rival = boot({ url: `https://hilo.test/?duelo=${viejo}` });
   ok("al abrirlo se avisa de que ese reto se juega sin reloj", /se juega sin plazo/.test(texto(rival)));
   click(rival, '[data-action="accept-duel"]');
   ok("y efectivamente se juega sin reloj", !existe(rival, ".reloj-bar"));
-  ok("aunque sigue siendo un duelo", partida(rival).kind === "duel" && partida(rival).duelo.reloj === false);
+  ok("aunque sigue siendo un duelo", partida(rival).kind === "duel" && partida(rival).duelo.ms === 0);
+
+  // Un enlace de cuando el duelo de orden iba a veinte segundos se juega a veinte, no a
+  // los quince de hoy: la marca de enfrente se hizo con aquel plazo.
+  const deVeinte = cruda(w, "3|history|abc|3|2|110|" + D.huella("history") + "|Ana");
+  const leidoVeinte = D.descodificar(deVeinte);
+  ok("un enlace de otro plazo se acepta", leidoVeinte.ok === true);
+  ok("y conserva el plazo con el que se jugó", leidoVeinte.duelo.ms === 20000);
+  const conVeinte = boot({ url: `https://hilo.test/?duelo=${deVeinte}` });
+  ok("la invitación anuncia ese plazo y no el de hoy", /20 segundos por carta/.test(texto(conVeinte)));
 }
 
 console.log(`\n${fail} fallos`);

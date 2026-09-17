@@ -2,7 +2,7 @@ import {gameHtml} from './game-fixture.mjs';
 // El duelo de cifras: que puntúe por lo cerca que se queda uno y por lo rápido que
 // responde, que la carga útil dé la vuelta entera sin creerse los puntos que trae, y
 // —lo que sostiene el modo entero— que el reloj no se pueda parar. Irse de la
-// aplicación, recargar la página o cerrarla no devuelven diez segundos nuevos.
+// aplicación, recargar la página o cerrarla no devuelven el plazo entero.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
@@ -232,7 +232,23 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   click(w, '[data-action="solo"]');
   // El duelo es una sola opción del menú con las dos modalidades dentro.
   ok("hay un único duelo en el menú del solitario", w.document.querySelectorAll('[data-duel-block]').length === 2 && /Duelo por enlace/.test(texto(w)));
-  ok("y se elige la modalidad dentro", !!w.document.querySelector('#duel-kind option[value="cifras"]'));
+  // Las dos modalidades se ven a la vez, no escondidas dentro de un desplegable, y se
+  // ve cuál está elegida: es una elección que hay que hacer, no un ajuste con un valor
+  // puesto de antemano.
+  const opciones = [...w.document.querySelectorAll('.segmented-option')];
+  ok("las dos modalidades están a la vista", opciones.length === 2 && w.document.querySelectorAll('input[name="duel-kind"]').length === 2);
+  ok("se anuncia como un grupo de opciones", w.document.querySelector('.segmented')?.getAttribute('role') === 'radiogroup');
+  ok("y se marca cuál está elegida", opciones.filter(o => o.classList.contains('is-on')).length === 1 && opciones[0].classList.contains('is-on'));
+
+  // Elegir la otra cambia la marca y el bloque que se enseña.
+  const aCifras = w.document.querySelector('input[name="duel-kind"][value="cifras"]');
+  aCifras.checked = true;
+  aCifras.dispatchEvent(new w.Event("change", { bubbles: true }));
+  const tras = [...w.document.querySelectorAll('.segmented-option')];
+  ok("elegir la otra modalidad mueve la marca", tras[1].classList.contains('is-on') && !tras[0].classList.contains('is-on'));
+  ok("y enseña su bloque, escondiendo el anterior",
+    w.document.querySelector('[data-duel-block="cifras"]').hidden === false && w.document.querySelector('[data-duel-block="orden"]').hidden === true);
+  ok("la elección se recuerda", w.localStorage.getItem("hilo-duelo-modo-v1") === "cifras");
   ok("avisa de la regla que lo sostiene", /si sales de la aplicación, la carta se cierra/i.test(texto(w)));
 
   w.document.getElementById("duel-name").value = "Fernando";
@@ -318,7 +334,7 @@ console.log("\nEl reloj no se para: salir de la aplicación cierra la carta");
   ok("la siguiente carta arranca con su reloj entero", existe(w, '[data-action="cifra-answer"]') && Number.isFinite(estado(w, "population").empezadaEn));
 }
 
-console.log("\nNi recargar ni cerrar la aplicación devuelven diez segundos nuevos");
+console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
 {
   const w = boot();
   abreDuelo(w);
@@ -349,7 +365,7 @@ console.log("\nNi recargar ni cerrar la aplicación devuelven diez segundos nuev
   ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && estado(rapida, "population").jugadas.length === 0);
 }
 
-console.log("\nSe acaban los diez segundos");
+console.log("\nSe acaba el plazo");
 {
   const w = boot();
   abreDuelo(w);
@@ -357,7 +373,7 @@ console.log("\nSe acaban los diez segundos");
   w.avanza(w.CONTINUUM.Duelo.Cifras.MS + 200);
   await duerme(250);
   ok("agotado el plazo, la carta se cierra sola", existe(w, ".overlay"));
-  ok("se dice que se acabó el tiempo", /tiempo agotado|Se acabaron los diez segundos/.test(texto(w)));
+  ok("se dice que se acabó el tiempo", /tiempo agotado|Se acabaron los \\d+ segundos/.test(texto(w)));
   const guardado = estado(w, "population");
   ok("la cifra escrita cuenta igual: tardar no es marcharse", guardado.jugadas[0].salida === false && guardado.jugadas[0].respuesta === 1000000);
   ok("pero el tiempo se queda en el tope", guardado.jugadas[0].ms === w.CONTINUUM.Duelo.Cifras.MS);
@@ -397,6 +413,34 @@ function deBase64url(w, texto) {
   const relleno = texto.replace(/-/g, "+").replace(/_/g, "/");
   const binario = w.atob(relleno + "=".repeat((4 - (relleno.length % 4)) % 4));
   return new w.TextDecoder().decode(Uint8Array.from(binario, c => c.charCodeAt(0)));
+}
+
+
+console.log("\nUn enlace de cifras de otro plazo se puntúa con el suyo");
+{
+  // Cuando el duelo de cifras iba a diez segundos, la parte de la prisa se medía contra
+  // diez. Volver a puntuar esa partida con el plazo de hoy daría otros puntos y el enlace
+  // se rechazaría por no cuadrar, así que cada versión se lee con su propio plazo.
+  const w = boot();
+  const D = w.CONTINUUM.Duelo, C = D.Cifras;
+  const VIEJO_MS = 10000;
+  const cartas = C.cartas("population", "diezseg", 3);
+  const jugadas = cartas.map(card => ({ respuesta: w.CONTINUUM.sortValue("population", card), ms: 5000, salida: false }));
+  const puntosViejos = C.puntosPartida("population", "diezseg", 3, jugadas, VIEJO_MS);
+  const puntosHoy = C.puntosPartida("population", "diezseg", 3, jugadas, C.MS);
+  ok("el mismo tiempo puntúa distinto según el plazo", puntosViejos !== puntosHoy);
+
+  const datos = jugadas.map(j => `${j.respuesta}:${j.ms}:0`).join(",");
+  const antiguo = aBase64url(w, `2|population|diezseg|3|${puntosViejos}|${datos}|${D.huella("population")}|Ana`);
+  const leido = D.descodificar(antiguo);
+  ok("un enlace del plazo antiguo se sigue aceptando", leido.ok === true);
+  ok("y vuelve con su plazo, no con el de hoy", leido.duelo.ms === VIEJO_MS);
+  ok("sus puntos cuadran porque se recalculan con el suyo", leido.duelo.rival.puntos === puntosViejos);
+
+  // Y uno creado hoy lleva la versión de las reglas de hoy.
+  const deHoy = C.codificar({ mode: "population", seed: "diezseg", total: 3, jugadas, nombre: "Ana" });
+  ok("un duelo de cifras creado hoy va con las reglas de hoy", D.descodificar(deHoy).duelo.ms === C.MS);
+  ok("y las dos modalidades comparten plazo", C.MS === D.MS && C.SEGUNDOS === 15);
 }
 
 console.log(`\n${fail} fallos`);

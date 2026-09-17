@@ -171,19 +171,21 @@ Tiene **dos modalidades**, que se eligen dentro del mismo formato porque compart
 todo —las mismas cartas en los dos móviles, el enlace, el nombre, el reloj y lo que pasa al
 salirse de la aplicación— y solo se diferencian en qué se hace con cada carta:
 
-- **Ordenar las cartas.** 15 cartas que se colocan en la línea, 20 segundos cada una. Gana
-  quien más acierte.
+- **Ordenar las cartas.** 15 cartas que se colocan en la línea. Gana quien más acierte.
 - **Escribir la cifra.** 10 cartas de las que se responde el número —los habitantes, los
-  años, los kilómetros—, 10 segundos cada una. Gana quien más puntos sume: puntúa lo cerca
-  que se quede uno (por porcentaje, o por años de diferencia en los mazos de fechas) y lo
-  rápido que responda. Los puntos que trae un enlace no se creen: se recalculan con las
-  mismas cartas y tienen que coincidir.
+  años, los kilómetros—. Gana quien más puntos sume: puntúa lo cerca que se quede uno (por
+  porcentaje, o por años de diferencia en los mazos de fechas) y lo rápido que responda.
+  Los puntos que trae un enlace no se creen: se recalculan con las mismas cartas y tienen
+  que coincidir.
+
+Las dos se eligen con un control de dos pastillas, no con un desplegable: así se ve que hay
+dos maneras y cuál está elegida, en vez de enseñar una y esconder la otra.
 
 ### El reloj
 
 Las dos modalidades van a reloj por la misma razón: sin un plazo por carta, cualquiera
-puede ir a buscar la respuesta a otra parte, y quien la busca gana. El plazo no se puede
-parar.
+puede ir a buscar la respuesta a otra parte, y quien la busca gana. El plazo es **el mismo
+en las dos** —lo dice una sola constante, `SEGUNDOS` en `duelo.js`— y no se puede parar.
 
 Eso obliga a medirlo **restando marcas de `Date.now()`, nunca descontando de un contador**.
 No es una preferencia de estilo: una pestaña escondida congela sus temporizadores, así que
@@ -202,11 +204,17 @@ Sin servidor, sin cuentas y sin que los dos móviles tengan que estar encendidos
 Se apoya en lo mismo que el reto diario: dos móviles que barajan con la misma semilla
 reciben las mismas cartas. Allí la semilla es la fecha; aquí viaja dentro del enlace, junto
 con el mazo, el número de cartas, la marca de quien reta y su cuadrícula de aciertos, todo
-en base64url. La versión que abre la carga útil no numera el formato: numera las reglas. Un
-duelo jugado a reloj no es comparable con uno jugado sin él, así que los enlaces anteriores
-al reloj se siguen aceptando y se juegan como se jugaron —sin plazo, avisando de ello—, y una
-aplicación que no conozca la versión nueva pide actualizar en vez de comparar dos partidas
-con reglas distintas. Por eso un duelo funciona con la aplicación instalada y sin conexión.
+en base64url. La versión que abre la carga útil no numera el formato: **numera las reglas
+con las que se jugó**, y la tabla `REGLAS` de `duelo.js` dice cuáles son. Dos partidas con
+plazos distintos no se pueden comparar, así que un enlace viejo no se rechaza ni se
+reinterpreta: se lee con su propio plazo y se juega como se jugó, avisando de ello en la
+pantalla de invitación. En el duelo de cifras eso además es obligatorio para que cuadren los
+puntos, porque la parte de la prisa se mide contra el plazo. Una aplicación que no conozca
+una versión pide actualizar en vez de comparar dos partidas con reglas distintas.
+
+Cambiar el plazo, por tanto, es añadir una fila a `REGLAS` y estrenar versión, no editar un
+número: los enlaces que ya estén circulando siguen siendo válidos y siguen significando lo
+que significaban. Por eso un duelo funciona con la aplicación instalada y sin conexión.
 
 El duelo no gasta vidas: las dos partes juegan todas las cartas de principio a fin. Si a una
 se le acabaran a la séptima, el marcador estaría comparando siete cartas contra quince.
