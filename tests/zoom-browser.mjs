@@ -59,7 +59,20 @@ try {
     }
     if (width === 414) {
       await page.emulateMedia({reducedMotion:'no-preference'});
-      await page.locator('[data-action="solo-place"][data-index="1"]').click();
+      await page.locator('[data-zoom-level="1"]').click();
+      const hand=page.locator('.hand-card.selected');
+      await hand.scrollIntoViewIfNeeded();
+      const source=await hand.boundingBox();
+      const target=await page.locator('[data-action="solo-place"][data-index="1"]').boundingBox();
+      await page.mouse.move(source.x+source.width/2,source.y+source.height/2);
+      await page.mouse.down();
+      await page.mouse.move(target.x+target.width/2,target.y+target.height/2,{steps:8});
+      await page.locator('.drag-ghost').waitFor();
+      const ghost=await page.locator('.drag-ghost').boundingBox();
+      assert.ok(ghost.width<150,'el arrastre deja visible el destino');
+      assert.ok(await page.locator('.slot.drop-target').count()>0);
+      await page.screenshot({path:`test-results/zoom/${engine}-arrastre.png`});
+      await page.mouse.up();
       await page.locator('[data-action="confirm-place"]').click();
       const preview=page.locator('.overlay.result-preview');
       await preview.waitFor({state:'visible',timeout:800});

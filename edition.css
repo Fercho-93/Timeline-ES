@@ -1032,3 +1032,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 .result-history { margin: 8px 0 14px; }.result-history > summary { cursor: pointer; font: .8rem system-ui; color: #79613b; padding: 6px 0; }.result-history .reveal { margin-top: 12px; }.result-history p { font-size: .9rem; line-height: 1.45; }
 #app .board-result .btn-block { min-height: 44px; padding: 10px 16px; }
 @media (prefers-reduced-motion: reduce) { .board-milestone { animation: none; } #app.atlas-board .timeline-card { transition: none; } }
+#app.atlas-board .slot { position: relative; }
+#app.atlas-board .board-progress { border-left: 3px solid var(--scene-color); }
+#app.atlas-board .board-progress progress { accent-color: var(--scene-color); }
