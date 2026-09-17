@@ -112,7 +112,6 @@
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" aria-describedby="haptics-help" ${s.haptics === true && hapticsSupported ? "checked" : ""} ${hapticsSupported ? "" : "disabled"}></label>
         <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
         ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
-        <label class="opt-row"><span>Sonidos suaves de cartas y resultados</span><input type="checkbox" data-settings-action="sound" ${s.sound === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Música ambiente</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
         <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
         <p class="hint"><a href="assets/audio/CREDITS.md" target="_blank" rel="noopener noreferrer">Créditos de la música</a></p>
@@ -176,7 +175,7 @@
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
-  CT.effectPrefs = () => ({ sound: settings.sound === true, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true });
+  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true });
   function previewLook() {
     const preview=document.querySelector('[data-look-preview]'), apply=document.querySelector('[data-settings-action="apply-look"]');
     if(!preview||!apply)return;
@@ -190,7 +189,7 @@
       if (!['100','125','150','200'].includes(event.target.value)) return;
       draftLook.textSize = event.target.value; previewLook(); CT.Effects?.transition?.('select'); return;
     }
-    if (["sound", "haptics", "ambience", "depth"].includes(event.target.dataset.settingsAction)) {
+    if (["haptics", "ambience", "depth"].includes(event.target.dataset.settingsAction)) {
       const key = event.target.dataset.settingsAction;
       let enabled = event.target.checked;
       if (key === 'depth' && enabled) {

@@ -379,7 +379,8 @@
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
-    if (preparationTurn || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
+    const enteringDeck = paint.screen === 'home' && screen === 'play-menu';
+    if ((preparationTurn && !enteringDeck) || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
     if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
     else if (changed && screen !== "pass") firstLocalReveal = false;
     container.dataset.screen = screen;
