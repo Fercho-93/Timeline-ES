@@ -51,8 +51,6 @@ try {
       await page.locator('.enc-recent-card img, .enc-deck-cover img').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
       await page.screenshot({path:`test-results/zoom/${engine}-enciclopedia-album.png`,fullPage:true});
       await page.locator('[data-action="enc-back"]').first().click();
-      await page.locator('[data-block="historia"]').click();
-      await page.locator('[data-mode="history"]').click();
     }
     await page.locator('[data-action="solo"]').click();
     await page.locator('.solo-fold').filter({has:page.locator('[data-action="resume-solo"]')}).locator('summary').click();
