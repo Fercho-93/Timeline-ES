@@ -13,6 +13,18 @@ function boot(reduce = true) {
 const click = (w,s) => {const el=w.document.querySelector(s);assert.ok(el,s);el.click();};
 const screen = w => w.document.querySelector('#app').dataset.screen;
 {
+  const w = boot();
+  try {
+    const titulo = w.document.querySelector('.home-masthead:not(.splash-masthead) .home-wordmark');
+    assert.equal(titulo?.textContent.trim(), 'Continuum', 'el título principal sigue siendo texto legible');
+    const css = read('styles.css');
+    assert.match(css, /\.home-masthead:not\(\.splash-masthead\) \.home-wordmark\s*\{[^}]*max-width:\s*100%/s,
+      'el relieve se limita a Inicio y conserva el encaje en móvil');
+    assert.match(css, /\.home-masthead:not\(\.splash-masthead\) \.home-wordmark\s*\{[^}]*color:\s*var\(--ink\)[^}]*text-shadow:[^}]*var\(--paper\)[^}]*var\(--accent-dark\)/s,
+      'el título obtiene contraste y relieve desde la paleta de cada tema');
+  } finally {w.close();}
+}
+{
   const w=boot();
   try {
     click(w,'[data-block="naturaleza"]');click(w,'[data-mode="animals"]');
