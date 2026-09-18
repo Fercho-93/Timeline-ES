@@ -765,6 +765,21 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 
 /* Ritmo de lectura móvil: pequeñas láminas y espacios proporcionales. */
 .deck-preview { float: right; width: 64px; height: 78px; margin: 0 0 6px 12px; object-fit: cover; border-radius: 3px; filter: sepia(1); mix-blend-mode: multiply; -webkit-mask-image: linear-gradient(#000 72%,transparent); mask-image: linear-gradient(#000 72%,transparent); }
+/* Un mazo cerrado lleva el candado estampado en medio de su propia lámina, grande y sin
+   nada que lo disimule: es la señal, y tiene que verse antes que ninguna letra. La lámina
+   se apaga debajo —es justo lo que todavía no se puede mirar—, así que aquí se le quitan
+   a la estampa el papel sepia y la fusión con el fondo, que apagarían también el sello. */
+.deck-preview-cerrado {
+  position: relative; display: grid; place-items: center;
+  filter: none; mix-blend-mode: normal;
+  -webkit-mask-image: none; mask-image: none;
+  background: color-mix(in srgb, var(--edition-ink, #3d271c) 12%, transparent);
+}
+.deck-preview-cerrado img { filter: sepia(1) grayscale(.6); opacity: .3; }
+.deck-candado { position: absolute; font-size: 2rem; line-height: 1; filter: drop-shadow(0 1px 3px #0005); }
+/* En la puerta cerrada el candado es el titular, no una viñeta: `big-icon` solo tiene
+   tamaño dentro de los diálogos, así que aquí se le da el suyo. */
+#app[data-screen="mazo-cerrado"] .big-icon { font-size: 2.6rem; line-height: 1; margin-bottom: 8px; }
 #app .solo-intro { position: relative; isolation: isolate; padding: 16px 0 18px; }
 #app .solo-intro::before { content: ''; position: absolute; z-index: -1; inset: -8px -8px 0 35%; background: url('assets/mode-walk-solo.webp') right center / cover no-repeat; opacity: .3; mix-blend-mode: multiply; -webkit-mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); mask-image: radial-gradient(ellipse,#000 25%,transparent 72%); }
 #app .solo-intro .lead { margin: 10px 0; font: .95rem/1.4 var(--ui-font); }
