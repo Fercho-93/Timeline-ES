@@ -45,14 +45,18 @@
   // guardado: una compra simulada dura lo que dure la sesión y al recargar el mazo vuelve
   // a estar cerrado, que es justo lo que interesa para poder mirarlo tantas veces como
   // haga falta. Para quitar la simulación basta con dejar la lista vacía.
-  const SIMULACION = ["mixed"];
+  //
+  // Hay dos casos dentro a propósito, porque no se ven igual: «Gran mezcla temporal» es un
+  // mazo suelto —su bloque solo lo tiene a él—, mientras que Ciencia es una colección
+  // entera, con su carátula bloqueada y sus dos mazos diciendo que vienen juntos.
+  const SIMULACION = ["mixed", "astronomy", "medicine"];
 
   // Precios de mentira, solo para que la puerta cerrada enseñe una cifra en vez de un
   // hueco. No comprometen ningún precio real: eso se decide al registrar los productos en
   // las tiendas, y es entonces cuando la cifra deja de estar aquí y pasa a venir de
   // ellas, que son las que saben la moneda y los impuestos de cada país. En céntimos para
   // no arrastrar decimales.
-  const PRECIOS = { mezcla: 299, [PAQUETE_TODO]: 999 };
+  const PRECIOS = { mezcla: 399, ciencia: 599, [PAQUETE_TODO]: 1499 };
 
   function euros(centimos) {
     return typeof centimos === "number" ? `${(centimos / 100).toFixed(2).replace(".", ",")} €` : null;

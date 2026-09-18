@@ -27,9 +27,10 @@ const tick = () => new Promise(resolve => setTimeout(resolve, 5));
 try {
   console.log("\nEstabilización: guardados, competición y actualizaciones");
   let w = open();
-  // La competición recorre todos los mazos menos la Gran mezcla. Se deduce del catálogo
-  // para que dar de alta un mazo nuevo no obligue a repasar las cuentas de esta prueba.
-  const temas = Object.keys(w.CONTINUUM.MODES).filter(key => key !== "mixed").length;
+  // La competición recorre los mazos que son suyos menos la Gran mezcla. Se deduce del
+  // catálogo y de la cartera para que dar de alta un mazo nuevo —o cerrar uno— no obligue
+  // a repasar las cuentas de esta prueba.
+  const temas = Object.keys(w.CONTINUUM.MODES).filter(key => key !== "mixed" && w.CONTINUUM.Cartera.tiene(key)).length;
   click(w, "competition-menu"); click(w, "start-competition");
   const intro = saved(w);
   assert.equal(intro.queue.length, temas);

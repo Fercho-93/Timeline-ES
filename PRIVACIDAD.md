@@ -24,9 +24,9 @@ Desde Perfil puedes eliminar el invitado, su progreso y su entrada del ranking, 
 
 ## Contacto y responsable
 
-Continuum es un proyecto personal: el responsable del tratamiento es una persona física, su titular a título individual, y no una empresa. La dirección de contacto es **feedbackcontinuum@gmail.com**, y sirve tanto para dudas sobre el juego como para cualquier asunto de privacidad: acceso a los datos de un invitado, rectificación del alias o borrado. El borrado también se puede hacer solo, desde Perfil, sin escribir a nadie. Desde Ajustes, el botón de comentarios abre un correo ya dirigido a esa dirección con un diagnóstico de versión adjunto; revísalo antes de enviarlo. Durante la beta se contesta en la medida de lo posible, sin un plazo comprometido.
+Continuum es un proyecto personal: el responsable del tratamiento es **Fernando Sirvent Merino**, a título individual y no como empresa. La dirección de contacto es **feedbackcontinuum@gmail.com**, y sirve tanto para dudas sobre el juego como para cualquier asunto de privacidad: acceso a los datos de un invitado, rectificación del alias o borrado. El borrado también se puede hacer solo, desde Perfil, sin escribir a nadie. Desde Ajustes, el botón de comentarios abre un correo ya dirigido a esa dirección con un diagnóstico de versión adjunto; revísalo antes de enviarlo. Durante la beta se contesta en la medida de lo posible, sin un plazo comprometido.
 
-Antes de publicar en App Store o Google Play hay que completar aquí el nombre y los apellidos del responsable y la dirección postal que exijan la tienda y la normativa aplicable; un correo solo no basta para una ficha de tienda. Esta versión no está preparada para un lanzamiento comercial.
+Antes de publicar en App Store o Google Play queda por completar aquí la dirección postal que exijan la tienda y la normativa aplicable: el nombre y el correo solos no bastan para una ficha de tienda. Esta versión no está preparada para un lanzamiento comercial.
 
 Información de privacidad de Firebase
 
