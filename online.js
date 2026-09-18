@@ -44,6 +44,12 @@ const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false;
 const presenceListeners = new Map(), presenceRecords = new Map();
 let connectionMessage = "Conectando con la sala…";
+// El minijuego de quién empieza: cada persona adivina la fecha de una única carta que
+// reparte el anfitrión, y gana quien se acerque más. `starterRoom` recuerda de qué sala
+// son los oyentes activos, para no dejarlos abiertos al cambiar de sala.
+let starterRoom = "";
+const starterListeners = new Map(), starterRecords = new Map();
+let starterBusy = false;
 function stopPresence() {
   clearInterval(presenceTimer); presenceTimer = null; presenceRoom = "";
   for (const stop of presenceListeners.values()) stop();
@@ -80,6 +86,83 @@ function ensurePresence() {
     presenceListeners.set(uid, stop);
   }
   for (const [uid, stop] of presenceListeners) if (!roomState.playerOrder.includes(uid)) { stop(); presenceListeners.delete(uid); presenceRecords.delete(uid); }
+}
+
+function stopStarterListeners() {
+  starterRoom = "";
+  for (const stop of starterListeners.values()) stop();
+  starterListeners.clear(); starterRecords.clear();
+}
+
+// Igual que la presencia, un documento por persona en su propia subcolección: el
+// anfitrión escribe la carta en el suyo al repartir, y cada quien escribe su respuesta en
+// el suyo propio. Las reglas solo dejan a cada quien tocar su documento, así que no hace
+// falta una transacción para ir guardando las adivinanzas.
+function ensureStarterListeners() {
+  if (starterRoom !== roomCode) { stopStarterListeners(); starterRoom = roomCode; }
+  for (const uid of roomState.playerOrder) {
+    if (starterListeners.has(uid)) continue;
+    const stop = onSnapshot(doc(db, "rooms", roomCode, "starter", uid), snap => {
+      if (snap.exists()) starterRecords.set(uid, snap.data()); else starterRecords.delete(uid);
+      if (roomState?.status === "lobby") renderLobby();
+    }, () => {});
+    starterListeners.set(uid, stop);
+  }
+  for (const [uid, stop] of starterListeners) if (!roomState.playerOrder.includes(uid)) { stop(); starterListeners.delete(uid); starterRecords.delete(uid); }
+}
+
+// La carta que reparte el anfitrión: la de su propio documento, la única que cuenta.
+function starterCardId() { return starterRecords.get(roomState.hostUid)?.cardId ?? null; }
+
+// Quién ha respondido a la carta que está en juego ahora mismo: una respuesta de una
+// carta anterior, de antes de un «repetir sorteo», no cuenta.
+function starterAnswers() {
+  const cardId = starterCardId();
+  if (cardId == null) return null;
+  return roomState.playerOrder.map(uid => {
+    const record = starterRecords.get(uid);
+    return record && record.cardId === cardId && record.value !== null ? { uid, value: record.value } : null;
+  });
+}
+
+function starterEveryoneAnswered() {
+  const answers = starterAnswers();
+  return !!answers && answers.every(Boolean);
+}
+
+// Quién ha acertado más cerca, con el mismo criterio que usa el resto del juego: en años
+// y siglos el error se mide en unidades, y en el resto en proporción.
+function starterWinnerUid() {
+  const answers = starterAnswers();
+  if (!answers || !answers.every(Boolean)) return null;
+  const card = getCard(starterCardId());
+  const real = CT.sortValue(modeKey(), card);
+  const anos = !!CT.axis(modeKey()).cifra?.anos;
+  const error = value => anos || real === 0 ? Math.abs(value - real) : Math.abs(value - real) / Math.abs(real);
+  return answers.reduce((best, entry) => error(entry.value) < error(best.value) ? entry : best).uid;
+}
+
+async function drawStarterCard() {
+  if (starterBusy || roomState.hostUid !== user.uid) return;
+  starterBusy = true;
+  try {
+    const cardId = shuffle(modeCards(roomState.mode).map(card => card.id))[0];
+    await setDoc(doc(db, "rooms", roomCode, "starter", user.uid), { cardId, value: null, guessedAt: null });
+  } catch { showToast("No se pudo repartir la carta. Actualiza firestore.rules para el sorteo de quién empieza."); }
+  finally { starterBusy = false; }
+}
+
+async function submitStarterGuess() {
+  const cardId = starterCardId();
+  const campo = document.getElementById("starter-guess-input");
+  const value = CT.Duelo.Cifras.leer(modeKey(), campo ? campo.value : "");
+  if (value === null) return showToast("Escribe una cifra válida");
+  if (starterBusy) return;
+  starterBusy = true;
+  try {
+    await setDoc(doc(db, "rooms", roomCode, "starter", user.uid), { cardId, value, guessedAt: serverTimestamp() });
+  } catch { showToast("No se pudo enviar la respuesta."); }
+  finally { starterBusy = false; }
 }
 function canClaimHost() {
   if (!roomState || !user || roomState.hostUid === user.uid || !navigator.onLine || roomState.status === "ended") return false;
@@ -535,6 +618,7 @@ function connectToRoom(code) {
       return;
     }
     ensurePresence();
+    if (roomState.status === "lobby") ensureStarterListeners(); else stopStarterListeners();
     if (roomState.phase !== "turn") pendingIndex = null;
     anotaProgreso();
     if (roomState.status === "lobby") renderLobby();
@@ -616,6 +700,43 @@ function anotaProgreso() {
   }
 }
 
+// El panel del minijuego de quién empieza, para el anfitrión y para el resto por igual:
+// mientras no hay carta, solo el anfitrión puede repartirla; en cuanto la hay, cada
+// persona adivina la suya y ve cuándo le toca esperar o ya puede empezar.
+function starterPanelMarkup(isHost) {
+  const cardId = starterCardId();
+  if (cardId == null) {
+    return isHost
+      ? `<button type="button" class="btn btn-secondary btn-block" data-online-action="starter-draw">🂠 Sortear con una carta quién empieza</button>`
+      : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>Va a repartir una carta para decidir quién empieza.</p>`;
+  }
+  const card = getCard(cardId);
+  const regla = CT.axis(modeKey()).cifra || {};
+  const mine = starterRecords.get(user.uid);
+  const answered = mine && mine.cardId === cardId && mine.value !== null;
+  const everyone = starterEveryoneAnswered();
+  const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-online-action="starter-draw">🂠 Repetir el sorteo</button>` : "";
+  if (!everyone) {
+    if (answered) {
+      const faltan = roomState.playerOrder.filter(uid => { const r = starterRecords.get(uid); return !(r && r.cardId === cardId && r.value !== null); }).map(uid => roomState.players[uid].name);
+      return `<div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div><p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}`;
+    }
+    return `<div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
+      <div class="field cifra-field">
+        <label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
+        <input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send">
+        <p class="hint">${escapeHtml(regla.pista || "")}</p>
+      </div>
+      <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Adivinar <span>→</span></button>${repetir}`;
+  }
+  const winner = starterWinnerUid();
+  const answers = starterAnswers();
+  const lista = roomState.playerOrder.map((uid, i) => `<li${uid === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(roomState.players[uid].name)}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), answers[i].value))}</span></li>`).join("");
+  const resultado = `<div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}</span></div><ul class="starter-draw-list">${lista}</ul><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
+  if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
+  return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Barajar y empezar <span>→</span></button>`;
+}
+
 function renderLobby() {
   clearTurnTimer();
   const isHost = roomState.hostUid === user.uid;
@@ -628,7 +749,7 @@ function renderLobby() {
   paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button>${isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>'}`)}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${roomCode}</strong><div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div></div></section>
     <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${people.length}/9</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
-      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds"><option value="0">Sin límite</option><option value="20">20 segundos</option><option value="30" selected>30 segundos</option><option value="45">45 segundos</option></select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="online-starter">La persona más joven</label><select id="online-starter">${roomState.playerOrder.map(uid => `<option value="${uid}">${escapeHtml(roomState.players[uid].name)}</option>`).join("")}</select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir. Requiere reglas v39.</small></span><input type="checkbox" id="online-ghost"></label><button class="btn btn-primary btn-block" data-online-action="start" ${people.length < 2 ? "disabled" : ""}>${people.length < 2 ? "Esperando a alguien más…" : "Barajar y empezar →"}</button><button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`}</section>
+      <section class="panel lobby-settings">${isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds"><option value="0">Sin límite</option><option value="20">20 segundos</option><option value="30" selected>30 segundos</option><option value="45">45 segundos</option></select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir. Requiere reglas v39.</small></span><input type="checkbox" id="online-ghost"></label>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}<button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`}</section>
     </div>
   </div>`, "online-lobby");
   if (roomState.tournament) {
@@ -676,7 +797,10 @@ async function nextTournamentRound() {
 async function startRoom(withGhost = true) {
   if (busy || roomState.hostUid !== user.uid) return;
   const handSize = roomState.tournament?.handSize || Number(document.getElementById("online-hand-size").value);
-  const starterUid = document.getElementById("online-starter").value;
+  // Quien ganó el sorteo de la carta, o —si por lo que sea se empieza sin haberlo hecho—
+  // alguien al azar, igual que la partida de un solo móvil.
+  const starterCard = starterCardId();
+  const starterUid = starterWinnerUid() || roomState.playerOrder[Math.floor(Math.random() * roomState.playerOrder.length)];
   const pulse = !!document.getElementById("online-pulse")?.checked;
   const enableGhost = withGhost && !!document.getElementById("online-ghost")?.checked;
   busy = true;
@@ -694,7 +818,9 @@ async function startRoom(withGhost = true) {
       // aplicación se actualizaba sola: se comprueba también aquí, no solo al entrar.
       if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
       if (data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < CLIENT_VERSION)) throw new Error("UPDATE_CLIENTS");
-      const deck = shuffle(modeCards(data.mode || "history").map(card => card.id));
+      // La carta que se adivinó ya se ha visto de sobra: se aparta del mazo antes de
+      // repartir, así nadie vuelve a encontrársela en la partida.
+      const deck = shuffle(modeCards(data.mode || "history").map(card => card.id).filter(id => id !== starterCard));
       const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
       const powers = CT.Powers.create(deck, data.playerOrder.length, actualHand, enableGhost, pulse);
       const players = { ...data.players };
@@ -1415,7 +1541,7 @@ async function closeRoom() {
 // Desconecta la vista sin eliminar al participante ni recargar la aplicación.
 function detachOnline() {
   entryRequest++;
-  clearTurnTimer(); stopPresence();
+  clearTurnTimer(); stopPresence(); stopStarterListeners();
   CT.onlineActive = false;
   unsubscribeRoom?.(); unsubscribeRoom = null;
   roomState = null; roomRef = null; roomCode = '';
@@ -1508,6 +1634,8 @@ document.addEventListener("click", event => {
   else if (action === "qr") showQr();
   else if (action === "close-qr") CT.closeDialog();
   else if (action === "start") startRoom();
+  else if (action === "starter-draw") void drawStarterCard();
+  else if (action === "starter-guess-submit") void submitStarterGuess();
   else if (action === "competition-next") nextTournamentRound();
   else if (action === "competition-round-start") renderGame();
   else if (action === "select") {

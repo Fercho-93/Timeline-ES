@@ -39,13 +39,18 @@
       <div class="atlas-specimens" aria-label="Una muestra de las ilustraciones del mazo">${samples.map(card => `<figure>${CT.animalArt(modeKey, card)}<figcaption>${CT.escapeHtml(card.title)}</figcaption></figure>`).join('')}</div>
     </section>`;
   }
-  function confirmExit(message, proceed, title = '¿Salir de la partida?', label = 'Guardar y salir') {
+  // `discard` es opcional: cuando lo hay, añade un tercer botón para salir sin guardar
+  // nada, sin pasar por el guardado que hace `proceed`. Vive en el mismo diálogo que
+  // «Guardar y salir» para que salir de una partida ofrezca siempre las dos salidas
+  // juntas, en vez de esconder la de no guardar en otro menú.
+  function confirmExit(message, proceed, title = '¿Salir de la partida?', label = 'Guardar y salir', discard = null) {
     const app = document.getElementById('app');
     if (app.querySelector('[data-exit-dialog]')) return;
     const layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.exitDialog = '';
-    layer.innerHTML = `<div class="modal"><h2>${CT.escapeHtml(title)}</h2><p>${CT.escapeHtml(message)}</p><div class="actions"><button class="btn btn-primary" data-exit-stay>Seguir jugando</button><button class="btn btn-secondary" data-exit-confirm>${CT.escapeHtml(label)}</button></div></div>`;
+    layer.innerHTML = `<div class="modal"><h2>${CT.escapeHtml(title)}</h2><p>${CT.escapeHtml(message)}</p><div class="actions"><button class="btn btn-primary" data-exit-stay>Seguir jugando</button><button class="btn btn-secondary" data-exit-confirm>${CT.escapeHtml(label)}</button>${discard ? `<button class="btn btn-ghost" data-exit-discard>${CT.escapeHtml(discard.label)}</button>` : ''}</div></div>`;
     layer.querySelector('[data-exit-stay]').addEventListener('click', () => CT.closeDialog());
     layer.querySelector('[data-exit-confirm]').addEventListener('click', () => { CT.closeDialog(); proceed(); });
+    layer.querySelector('[data-exit-discard]')?.addEventListener('click', () => { CT.closeDialog(); discard.proceed(); });
     app.append(layer); CT.openDialog(layer, true);
   }
   let finalCards = [];

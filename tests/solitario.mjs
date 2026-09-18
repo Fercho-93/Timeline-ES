@@ -205,6 +205,22 @@ console.log("\nSalir sin guardar");
   ok("no cuenta para las estadísticas ni la racha", !marcas || !marcas.days || !Object.keys(marcas.days).length);
 }
 
+console.log("\nSalir sin guardar también desde la flecha de volver");
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-daily"]');
+  colocaHistoriaBien(w);
+  click(w, '[data-action="confirm-place"]');
+  click(w, '[data-action="solo-next"]');
+  click(w, '[data-action="ui-back"]');
+  ok("el diálogo de salir ofrece también salir sin guardar", existe(w, '[data-exit-discard]'));
+  click(w, '[data-exit-discard]');
+  ok("no queda partida guardada", !w.localStorage.getItem("hilo-solo-history-v1"));
+  ok("el reto de hoy se puede volver a empezar", existe(w, '[data-action="start-daily"]'));
+}
+
 console.log("\nBloque de geografía");
 {
   const w = boot();

@@ -892,6 +892,24 @@ service cloud.firestore {
           && request.resource.data.seenAt == request.time && request.resource.data.visible is bool;
         allow delete: if member() && request.auth.uid == playerId;
       }
+
+      // El minijuego de quién empieza: cada persona adivina la fecha de la misma carta y
+      // el anfitrión la reparte guardándola en su propio documento, que es el único que
+      // puede escribir. Vive en su propia subcolección, aparte del documento de la sala,
+      // para no tocar `validStart` ni el resto de las reglas de la partida: solo hace
+      // falta leerlo para saber a qué carta responder y quién ha acertado más cerca antes
+      // de arrancar la partida como siempre.
+      match /starter/{playerId} {
+        function member() { return registered() && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.playerOrder; }
+        function lobbyOpen() { return get(/databases/$(database)/documents/rooms/$(roomId)).data.status == 'lobby'; }
+        allow get, list: if member();
+        allow create, update: if member() && request.auth.uid == playerId && lobbyOpen()
+          && request.resource.data.keys().hasOnly(['cardId', 'value', 'guessedAt'])
+          && request.resource.data.cardId is int
+          && (request.resource.data.value == null || request.resource.data.value is number)
+          && (request.resource.data.guessedAt == null || request.resource.data.guessedAt == request.time);
+        allow delete: if member() && request.auth.uid == playerId;
+      }
       allow get: if registered() && (resource.data.status == 'lobby' || isParticipant());
       allow list: if false;
 
