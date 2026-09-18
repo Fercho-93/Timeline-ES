@@ -112,6 +112,7 @@
     if (previous) root.style.setProperty("scroll-behavior", previous, priority);
     else root.style.removeProperty("scroll-behavior");
   }
+  let cancelPageTurn = null;
   let cancelProfileRoll = null;
   function unrollProfile(container) {
     unrollSheet(container.firstElementChild);
@@ -168,6 +169,7 @@
   }
   const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
   const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
+  let firstLocalReveal = false;
 
   function inkWave(anchor, kind = 'success') {
     const timeline = anchor?.closest('.timeline');
@@ -275,6 +277,134 @@
     });
   }
 
+  // Construye un escenario doble: la vista que dejamos y la vista de destino existen
+  // a la vez, una al lado de la otra. Después de repintar, la cámara recorre ese mundo
+  // horizontal de forma continua; no hay una página que se apaga y otra que aparece.
+  function moveCamera(container, backwards) {
+    window.CONTINUUM.Effects?.page?.(backwards);
+    if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const layer = document.createElement("div");
+    layer.className = "camera-move";
+    layer.setAttribute("aria-hidden", "true");
+    layer.inert = true;
+    const world = document.createElement("div");
+    world.className = "camera-world";
+    world.innerHTML = '<i></i><i></i><i></i>';
+    const track = document.createElement("div");
+    track.className = "camera-move-frame";
+    track.dataset.direction = backwards ? "back" : "forward";
+    const decorations = document.createElement('style');
+    const rules = [];
+    let pageNode = 0;
+    const frozenStyle = computed => Array.from(computed, property =>
+      `${property}:${computed.getPropertyValue(property)};`).join('');
+    const snapshot = (sourceRoot, scrollTop) => {
+      const scene = document.createElement("div");
+      scene.className = "camera-move-view";
+      const copy = sourceRoot.cloneNode(true);
+      const sources = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
+      const copies = [copy, ...copy.querySelectorAll('*')];
+      const hasLayout = sourceRoot.getBoundingClientRect().width > 0;
+      sources.forEach((source, index) => {
+        const target = copies[index];
+        const computed = getComputedStyle(source);
+        target.style.cssText = frozenStyle(computed);
+        target.style.setProperty('animation', 'none', 'important');
+        target.style.setProperty('transition', 'none', 'important');
+        if (hasLayout) {
+          let id;
+          for (const pseudo of ['::before', '::after']) {
+            const style = getComputedStyle(source, pseudo);
+            if (!style.content || style.content === 'none' || style.content === 'normal') continue;
+            if (id === undefined) {
+              id = pageNode++;
+              target.dataset.pageNode = id;
+            }
+            rules.push(`.camera-move [data-page-node="${id}"]${pseudo}{${frozenStyle(style)}animation:none!important;transition:none!important;}`);
+          }
+        }
+        if (source instanceof HTMLImageElement) {
+          target.removeAttribute('srcset');
+          target.removeAttribute('sizes');
+          target.src = source.currentSrc || source.src;
+          target.loading = 'eager';
+        }
+      });
+      copy.removeAttribute("id");
+      copy.classList.add("camera-move-copy");
+      copy.style.transform = `translateY(${-scrollTop}px)`;
+      copy.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
+      copy.querySelectorAll(".overlay, .camera-move").forEach(node => node.remove());
+      scene.append(copy);
+      sources.forEach((source, index) => {
+        copies[index].scrollLeft = source.scrollLeft;
+        copies[index].scrollTop = source.scrollTop;
+      });
+      return scene;
+    };
+    const origin = snapshot(container, window.scrollY);
+    layer.append(decorations, world, track);
+    document.body.append(layer);
+    container.classList.add("camera-running");
+    let animation, worldAnimation, cleanupTimer;
+    const previousVisibility = container.style.visibility;
+    const cleanup = () => {
+      clearTimeout(cleanupTimer);
+      container.style.visibility = previousVisibility;
+      container.classList.remove("camera-running");
+      layer.remove();
+      if (cancelPageTurn === cancel) cancelPageTurn = null;
+    };
+    const cancel = () => { animation?.cancel(); worldAnimation?.cancel(); cleanup(); };
+    cancelPageTurn = cancel;
+    return () => {
+      // El destino puede traer revelados propios (láminas, figuras, cabeceras). La
+      // cámara ya es su transición de entrada: los llevamos a su fotograma final antes
+      // de fotografiarlo para que nada viaje invisible y aparezca de golpe al terminar.
+      for (const effect of container.getAnimations?.({ subtree: true }) || []) {
+        try { effect.finish(); } catch (_) { /* Una animación infinita no tiene final. */ }
+      }
+      const destination = snapshot(container, window.scrollY);
+      decorations.textContent = rules.join('\n');
+      if (backwards) track.append(destination, origin);
+      else track.append(origin, destination);
+      // La navegación común pertenece al mundo, no a una de sus habitaciones. Si está
+      // en ambos extremos queda quieta mientras el contenido se desplaza detrás.
+      const originNav = origin.querySelector('.home-nav');
+      const destinationNav = destination.querySelector('.home-nav');
+      if (originNav && destinationNav) {
+        originNav.remove();
+        destinationNav.remove();
+        destinationNav.classList.add('camera-fixed-nav');
+        layer.append(destinationNav);
+      }
+      container.style.visibility = "hidden";
+      // Una cámara física no se mueve a velocidad constante: arranca, coge inercia,
+      // se desenfoca en el tramo rápido y frena de más antes de asentarse. Ese perfil
+      // (aceleración-crucero-frenado, con un pequeño overshoot final) es lo que separa
+      // un slide plano de un movimiento de cámara creíble.
+      const duration = 980;
+      const start = backwards ? -100 : 0;
+      const end = backwards ? 0 : -100;
+      const dir = Math.sign(end - start);
+      const cruise = start + (end - start) * .46;
+      const overshoot = end + dir * 1.4;
+      animation = track.animate([
+        { transform: `translate3d(${start}vw,0,0) scale(1)`, filter: "blur(0px)", offset: 0, easing: "cubic-bezier(.5,0,.75,0)" },
+        { transform: `translate3d(${cruise}vw,-1.4vh,-150px) scale(.96)`, filter: "blur(6px)", offset: .42, easing: "cubic-bezier(.25,.46,.45,.94)" },
+        { transform: `translate3d(${overshoot}vw,-.3vh,-14px) scale(1.006)`, filter: "blur(1.5px)", offset: .84, easing: "cubic-bezier(.16,1,.3,1)" },
+        { transform: `translate3d(${end}vw,0,0) scale(1)`, filter: "blur(0px)", offset: 1 }
+      ], { duration, fill: "forwards" });
+      worldAnimation = world.animate([
+        { transform: `translate3d(${backwards ? -5 : 5}vw,0,-70px) scale(1.05)`, offset: 0 },
+        { transform: `translate3d(0vw,-1.6vh,-190px) scale(1.16)`, offset: .46 },
+        { transform: `translate3d(${backwards ? 4 : -4}vw,-1vh,-90px) scale(1.1)`, offset: 1 }
+      ], { duration, easing: "cubic-bezier(.25,.46,.45,.94)", fill: "forwards" });
+      animation.finished.then(cleanup, cleanup);
+      cleanupTimer = setTimeout(cleanup, duration + 180);
+    };
+  }
+
   // Pinta y decide dónde queda el foco:
   //
   // - Al cambiar de pantalla, en su titular. Así el lector lee dónde está, y quien usa
@@ -287,6 +417,7 @@
   // sorpresa desagradable.
   function paint(container, html, screen) {
     cancelDeal?.();
+    cancelPageTurn?.();
     cancelProfileRoll?.();
     const previousDepth = preparationDepth[paint.screen];
     const nextDepth = preparationDepth[screen];
@@ -296,8 +427,12 @@
       ? container.querySelector(`.enc-background[data-background-screen="${screen}"]`)
       : null;
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
+    const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
     const backwards = nextDepth !== undefined && nextDepth < previousDepth;
+    const launchCamera = preparationTurn || firstReveal ? moveCamera(container, backwards) : null;
+    if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
+    else if (changed && screen !== "pass") firstLocalReveal = false;
     container.dataset.screen = screen;
     olvidaDialogos(container);
     const activo = document.activeElement;
@@ -334,11 +469,11 @@
       window.CONTINUUM.Effects?.transition?.(kind);
     }
     // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
-    // muchas veces y no debe convertir cada toque en una animación.
-    // Hasta diseñar una transición de cámara que no duplique pantallas, toda la ruta de
-    // preparación cambia de vista una sola vez y sin animación global. Las respuestas
-    // de cartas y diálogos conservan sus movimientos propios.
-    if (!primero && cambioDePantalla && !closingEncyclopedia && !preparationTurn) {
+    // muchas veces y no debe convertir cada toque en una animación. Durante un giro de
+    // cámara esta clase igualmente se añade (por si la cámara no llega a lanzarse, por
+    // ejemplo con movimiento reducido), pero `.camera-running` anula su animación propia
+    // para que no compitan las dos a la vez.
+    if (!primero && cambioDePantalla && !closingEncyclopedia) {
       container.firstElementChild?.classList.add("screen-enter");
       if (vuelve || backwards) container.firstElementChild?.classList.add("screen-return");
     }
@@ -376,6 +511,9 @@
         wrap.scrollLeft += target.left - frame.left - (frame.width - target.width) / 2;
       }
     }
+    // La vista de destino se fotografía después de recuperar su posición vertical y
+    // horizontal. Así el viaje termina exactamente donde continuará el jugador.
+    launchCamera?.();
     if (primero) return;
     if (cambioDePantalla) {
       // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil

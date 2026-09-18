@@ -241,19 +241,60 @@ for (const reduce of [false, true]) {
 console.log('Edición: ambientes, navegación, menús plegables y confirmación de competición: OK');
 {
   const w = boot({ seen: true });
+  const turns = [];
   try {
+    w.Element.prototype.animate = function (frames) {
+      const entry = { frames, cancelled: false };
+      if (this.classList.contains('camera-move-frame')) turns.push(entry);
+      return { finished: new Promise(() => {}), cancel() { entry.cancelled = true; } };
+    };
     click(w, '[data-block="historia"]');
     click(w, '[data-mode="history"]');
-    assert.equal(w.document.querySelector('.camera-move'), null, 'el mazo no crea una segunda pantalla superpuesta');
-    assert.equal(w.document.querySelector('.screen-enter'), null, 'el menú del mazo no entra desplazándose lateralmente');
+    assert.ok(w.document.querySelector('.camera-move'), 'el mazo entra con un giro de cámara');
+    const style = w.document.createElement('style');
+    style.textContent = '#app .snapshot-probe { width: 28px; height: 28px; display: none; }';
+    w.document.head.append(style);
+    const probe = w.document.createElement('span');
+    probe.className = 'snapshot-probe';
+    w.document.getElementById('app').append(probe);
+    let settled = 0;
+    w.document.getElementById('app').getAnimations = () => [{ finish() { settled++; } }];
     click(w, '[data-action="solo"]');
     assert.equal(w.document.getElementById('app').dataset.screen, 'solo-home');
-    assert.equal(w.document.querySelector('.camera-move, .screen-enter'), null, 'solitario muestra directamente su única pantalla real');
-    const panels = [...w.document.querySelectorAll('.solo-panel')].map(panel => panel.textContent.trim());
-    assert.ok(panels[0].includes('Reto diario') && panels[1].includes('Partida libre'), 'las opciones de solitario llegan juntas y estables');
+    const frozen = w.document.querySelector('.camera-move-copy .snapshot-probe');
+    assert.equal(w.getComputedStyle(frozen).width, '28px', 'la cámara conserva tamaños que dependían de #app');
+    assert.equal(w.getComputedStyle(frozen).display, 'none', 'un icono oculto no reaparece al mover la cámara');
+    assert.equal(settled, 1, 'el destino llega a su fotograma final antes de fotografiarlo');
+    assert.equal(w.document.querySelectorAll('.camera-move-view').length, 2, 'origen y destino conviven en un mismo escenario');
+    // El plegado de solitario ocurre en el montaje, antes de que la cámara fotografíe el
+    // destino: la instantánea debe llegar ya plegada, nunca con los paneles abiertos que
+    // se cerrarían de golpe al terminar el viaje.
+    const soloDestination = w.document.querySelectorAll('.camera-move-view')[1];
+    assert.ok(soloDestination.querySelector('.solo-fold'), 'el destino de solitario llega ya plegado a la foto de la cámara');
+    assert.equal(soloDestination.querySelectorAll('.solo-panel:not(.solo-fold)').length, 0, 'ningún panel de solitario viaja abierto en la instantánea');
+    assert.ok(w.document.querySelector('.camera-fixed-nav'), 'la navegación común permanece quieta durante el viaje');
+    assert.equal(w.document.querySelectorAll('.camera-move-view .home-nav').length, 0, 'la barra común no se duplica dentro de los escenarios');
+    assert.ok(turns[1].frames.every(frame => !('opacity' in frame)), 'el viaje no funde ninguna de las dos vistas');
+    assert.match(turns[1].frames.at(-1).transform, /translate3d\(-100vw/);
+    assert.equal(w.document.querySelector('.camera-move-frame').dataset.direction, 'forward');
+    assert.equal(w.document.querySelector('.camera-move').getAttribute('aria-hidden'), 'true');
+    assert.equal(w.document.querySelector('.camera-move [id]'), null);
+    click(w, '#app [data-action="back-menu"]');
+    assert.equal(turns[1].cancelled, true);
+    assert.match(turns[2].frames.at(-1).transform, /translate3d\(0vw/);
+    assert.equal(w.document.querySelector('.camera-move-frame').dataset.direction, 'back');
+    assert.equal(w.document.querySelectorAll('.camera-move').length, 1);
+    w.matchMedia = () => ({ matches: true });
+    click(w, '#app [data-action="solo"]');
+    assert.equal(w.document.querySelector('.camera-move'), null);
+    assert.equal(turns.length, 3, 'movimiento reducido evita el giro');
+    // También sin cámara (movimiento reducido) el plegado llega ya hecho: no depende del
+    // viaje, depende del montaje.
+    const foldedPanels = [...w.document.querySelectorAll('.solo-panel')].map(panel => panel.textContent.trim());
+    assert.ok(foldedPanels[0].includes('Reto diario') && foldedPanels[1].includes('Partida libre'), 'las opciones de solitario llegan plegadas y estables sin cámara');
   } finally { w.close(); }
 }
-console.log('Preparación estable: una sola pantalla, sin desplazamientos ni vistas provisionales: OK');
+console.log('Movimiento de cámara: giro inverso, interrupciones y movimiento reducido: OK');
 for (const userAgent of ['Mozilla/5.0 (Linux; Android 14; Samsung)', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)']) {
   for (const textSize of ['100', '150', '200']) {
     const w = boot({ userAgent, seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: 'light', textSize }) } });
@@ -354,21 +395,21 @@ console.log('Atajo al inicio: marca dibujada, caja propia y especificidad que ga
     };
     const render = screen => w.CONTINUUM.paint(w.document.getElementById('app'), '<div class="shell"><h2 data-focus tabindex="-1">Pantalla</h2></div>', screen);
     for (const screen of ['play-menu', 'setup', 'pass', 'game']) render(screen);
-    assert.equal(turns.length, 0, 'el mazo y la preparación no crean capas de cámara');
+    assert.equal(turns.length, 4, 'el mazo y la preparación avanzan con el giro de cámara');
     for (const screen of ['game', 'pass', 'game']) render(screen);
-    assert.equal(turns.length, 0, 'las jugadas tampoco crean capas globales');
+    assert.equal(turns.length, 4, 'las jugadas y los siguientes turnos no mueven toda la cámara');
     render('home'); render('play-menu'); render('solo-home'); render('solo');
-    assert.equal(turns.length, 0, 'solitario entra directamente');
+    assert.equal(turns.length, 7, 'solitario incluye la entrada a partida');
     render('home'); render('comp-intro'); render('solo');
-    assert.equal(turns.length, 0, 'competición entra directamente');
+    assert.equal(turns.length, 9, 'competición incluye el cartel y el inicio');
     render('home'); render('play-menu'); render('online-loading'); render('online-entry'); render('online-lobby'); render('online-game');
-    assert.equal(turns.length, 0, 'la preparación online tampoco duplica pantallas');
+    assert.equal(turns.length, 14, 'la preparación online completa usa el efecto');
     render('home'); render('play-menu'); render('setup'); render('play-menu');
-    assert.equal(turns.length, 0);
-    assert.equal(w.document.querySelector('.camera-move, .screen-enter'), null);
+    assert.equal(turns.length, 17);
+    assert.match(turns.at(-1).at(-1).transform, /translate3d\(0vw/);
   } finally { w.close(); }
 }
-console.log('Preparación completa sin capas transitorias ni dobles entradas: OK');
+console.log('Cámara en toda la preparación, sin animar las jugadas posteriores: OK');
 {
   const w = boot({ seen: true });
   const effects = [];
