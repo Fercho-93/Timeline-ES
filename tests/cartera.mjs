@@ -1,10 +1,11 @@
 import {gameHtml} from './game-fixture.mjs';
 // La cartera: el único sitio que responde «¿tiene derecho este jugador a este mazo?».
 //
-// Hoy la respuesta es siempre que sí, así que la mitad de esta prueba comprueba justo
-// eso: que nada ha cambiado para quien juega. La otra mitad es la que vale de verdad —se
-// cierra un mazo a mano y se recorre el juego entero para ver que todos los rincones lo
-// respetan—. Sin ella, la cartera sería una función que nadie llama.
+// Mientras dure la simulación hay un mazo cerrado de verdad —«Gran mezcla temporal»—, así
+// que la primera parte de esta prueba fija esa situación: qué está cerrado, qué sigue
+// abierto y qué se le cuenta a quien se encuentra la puerta. La segunda cierra otros
+// mazos a mano y recorre el juego entero para ver que todos los rincones lo respetan.
+// Sin ella, la cartera sería una función que nadie llama.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
@@ -16,11 +17,12 @@ const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
-function boot({ url = "https://hilo.test/", almacen = {} } = {}) {
+function boot({ url = "https://hilo.test/", almacen = {}, sesion = {} } = {}) {
   const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
   const { window } = dom;
   window.Element.prototype.scrollIntoView = function () {};
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
+  Object.entries(sesion).forEach(([clave, valor]) => window.sessionStorage.setItem(clave, valor));
   guiones().forEach(archivo => window.eval(read(archivo)));
   return window;
 }
@@ -39,17 +41,32 @@ function cierra(w, ...cerrados) {
   w.CONTINUUM.Cartera.concede({ origen: "prueba", mazos: todos });
 }
 
-console.log("\nHoy no hay nada cerrado: la beta lo concede todo");
+console.log("\nLa simulación: un mazo suelto y una colección entera esperando un pago");
 {
   const w = boot();
   const C = w.CONTINUUM.Cartera;
-  ok("la concesión viene de la beta", C.origen() === "beta");
-  ok("y está todo abierto", C.todoAbierto() === true);
+  const cerrados = ["mixed", "astronomy", "medicine"];
+  ok("la concesión la firma la simulación, no la beta", C.origen() === "simulacion");
+  ok("y cierra exactamente lo que dice su lista",
+    C.SIMULACION.join() === cerrados.join() && C.cerrados().sort().join() === cerrados.slice().sort().join());
+  ok("no está todo abierto", C.todoAbierto() === false);
   const mazos = Object.keys(w.CONTINUUM.MODES);
-  ok(`los ${mazos.length} mazos son jugables`, mazos.every(key => C.tiene(key)));
-  ok("no hay ninguno cerrado", C.cerrados().length === 0 && C.abiertos().length === mazos.length);
-  ok("y por tanto ningún mazo tiene motivo que explicar", mazos.every(key => C.motivo(key) === null));
-  ok("los bloques están abiertos enteros", Object.keys(w.CONTINUUM.BLOCKS).every(key => C.tieneBloque(key)));
+  const abiertos = mazos.filter(k => !cerrados.includes(k));
+  ok(`los otros ${abiertos.length} mazos siguen siendo jugables`, abiertos.every(key => C.tiene(key)));
+  ok("los de la simulación no", cerrados.every(key => C.tiene(key) === false));
+  ok("sus dos bloques dejan de estar enteros y los demás no se enteran",
+    C.tieneBloque("mezcla") === false && C.tieneBloque("ciencia") === false
+    && ["historia", "cine", "naturaleza", "geografia"].every(k => C.tieneBloque(k)));
+
+  // El mazo suelto no puede decir «viene con» sin repetir su propio nombre; la colección sí.
+  const suelto = C.motivo("mixed");
+  ok("el mazo suelto se explica sin repetirse, y con su precio", suelto.texto === "Este mazo se desbloquea aparte por 3,99 €.");
+  ok("nombrando el paquete que haría falta", suelto.paquete === "mezcla" && suelto.precio === "3,99 €");
+  const enColeccion = C.motivo("astronomy");
+  ok("y el de una colección nombra la colección", enColeccion.texto === "Este mazo viene con Ciencia por 5,99 €.");
+  ok("los dos mazos de la colección piden lo mismo", C.motivo("medicine").paquete === "ciencia" && enColeccion.paquete === "ciencia");
+
+  ok("los abiertos no tienen nada que explicar", abiertos.every(key => C.motivo(key) === null));
   ok("un mazo que no existe nunca se tiene", C.tiene("inventado") === false);
 }
 
@@ -65,6 +82,121 @@ console.log("\nEl catálogo: lo que se vendería si algún día se vende");
     todo && bloques.every(b => w.CONTINUUM.block(b).games.every(m => todo.mazos.includes(m))));
   ok("cada mazo sabe a qué paquete pertenece", C.paquete("animals").clave === "naturaleza" && C.paquete("history").clave === "historia");
   ok("y el paquete se llama por su nombre, no por su clave", C.paquete("animals").nombre === "Naturaleza");
+  ok("un bloque de un solo mazo se sabe suelto, y una colección no",
+    C.paquete("mixed").solo === true && C.paquete("animals").solo === false);
+  ok("solo llevan precio los paquetes de la simulación",
+    paquetes.find(p => p.clave === "mezcla").precio === "3,99 €"
+    && paquetes.find(p => p.clave === "ciencia").precio === "5,99 €" && todo.precio === "14,99 €"
+    && paquetes.find(p => p.clave === "naturaleza").precio === null);
+}
+
+console.log("\nUna compra simulada abre la puerta, y no deja huella");
+{
+  const w = boot();
+  const C = w.CONTINUUM.Cartera;
+  ok("un paquete que no existe no compra nada", C.compraSimulada("regalo") === false && C.tiene("mixed") === false);
+  ok("el suyo sí", C.compraSimulada("mezcla") === true && C.tiene("mixed") === true);
+  ok("y abre solo ese: la colección sigue cerrada", C.tiene("astronomy") === false && C.todoAbierto() === false);
+  ok("comprar una colección abre todos sus mazos de una vez",
+    C.compraSimulada("ciencia") === true && C.tiene("astronomy") === true && C.tiene("medicine") === true);
+  ok("y ya no queda nada cerrado, sin haberse llevado por delante lo que había", C.todoAbierto() === true);
+  ok("la concesión dice de dónde vino", C.origen() === "compra-simulada");
+  ok("nada de esto se guarda: al volver a abrir, la puerta está cerrada otra vez",
+    boot().CONTINUUM.Cartera.tiene("mixed") === false);
+}
+
+console.log("\nLa puerta cerrada, tal y como se ve");
+{
+  const w = boot();
+  click(w, '[data-block="mezcla"]');
+  const fila = w.document.querySelector('[data-mode="mixed"]');
+  ok("el mazo se sigue viendo, con su candado y su precio",
+    fila && fila.classList.contains("game-row-cerrado") && /3,99 €/.test(fila.textContent));
+
+  click(w, '[data-mode="mixed"]');
+  ok("tocarlo lleva a la explicación, no a jugar", /Todavía no es tuyo/.test(texto(w)));
+  ok("que dice cuántas cartas hay dentro", new RegExp(`Son ${w.CONTINUUM.cards("mixed").length} cartas`).test(texto(w)));
+  ok("y ofrece desbloquear por su precio", /Desbloquear · 3,99 €/.test(texto(w)));
+
+  click(w, '[data-action="mazo-desbloquear"]');
+  ok("el botón abre una ventana de pago que se declara simulada", /no se cobra nada/i.test(texto(w)));
+  ok("y avisa de que al recargar vuelve a estar cerrado", /vuelve a estar cerrado/.test(texto(w)));
+  ok("sin haber concedido nada todavía", w.CONTINUUM.Cartera.tiene("mixed") === false);
+
+  click(w, '[data-action="compra-simular"]');
+  ok("simular que sale bien abre el mazo", w.CONTINUUM.Cartera.tiene("mixed") === true);
+  ok("y entra en él, sin dejar el diálogo por medio",
+    w.localStorage.getItem("hilo-selected-mode-v1") === "mixed" && !existe(w, ".overlay"));
+}
+
+console.log("\nUna colección entera cerrada se ve como colección, no como mazos sueltos");
+{
+  const w = boot();
+  const indice = [...w.document.querySelectorAll(".collection-entry")].find(e => e.querySelector('[data-block="ciencia"]'))?.querySelector(".collection-index");
+  ok("la carátula dice cuántos de sus mazos están cerrados", /2 mazos · 2 🔒/.test(indice?.textContent || ""));
+
+  click(w, '[data-block="ciencia"]');
+  const filas = [...w.document.querySelectorAll('[data-mode]')].filter(f => ["astronomy", "medicine"].includes(f.dataset.mode));
+  ok("sus dos mazos se ven, los dos cerrados", filas.length === 2 && filas.every(f => f.classList.contains("game-row-cerrado")));
+  ok("y los dos remiten a la misma colección, no cada uno a lo suyo",
+    filas.every(f => /viene con Ciencia por 5,99 €/.test(f.textContent)));
+
+  click(w, '[data-mode="astronomy"]');
+  click(w, '[data-action="mazo-desbloquear"]');
+  ok("la ventana de pago habla del paquete, no del mazo que se tocó",
+    /Ciencia/.test(texto(w)) && /2 mazos · 5,99 €/.test(texto(w)));
+  click(w, '[data-action="compra-simular"]');
+  ok("y una sola compra abre los dos", w.CONTINUUM.Cartera.tiene("astronomy") && w.CONTINUUM.Cartera.tiene("medicine"));
+  ok("entrando en el que se tocó", w.localStorage.getItem("hilo-selected-mode-v1") === "astronomy");
+}
+
+console.log("\n«Coleccionista» se mide sobre los mazos que cada uno tiene");
+{
+  const w = boot();
+  const P = w.CONTINUUM.Progreso;
+  const abiertos = w.CONTINUUM.Cartera.abiertos();
+  const logro = () => P.achievements().find(uno => uno.key === "coleccion");
+  ok(`la meta son los ${abiertos.length} mazos a mano, no los ${Object.keys(w.CONTINUUM.MODES).length} del catálogo`, logro().goal === abiertos.length);
+  ok("y se dice así", /Juega al menos una carta de tus \d+ mazos/.test(logro().desc));
+
+  for (const modeKey of abiertos) P.record({ mode: modeKey, cardId: w.CONTINUUM.cards(modeKey)[0].id, correct: true });
+  ok("jugar los suyos lo desbloquea, sin tener que comprar nada", logro().unlocked === true);
+
+  // Y jugar después un mazo comprado no descoloca el marcador ni vuelve a anunciarlo.
+  w.CONTINUUM.Cartera.compraSimulada("ciencia");
+  P.record({ mode: "astronomy", cardId: w.CONTINUUM.cards("astronomy")[0].id, correct: true });
+  const ahora = logro();
+  ok("y sigue conseguido cuando la meta sube", ahora.unlocked === true && ahora.goal === abiertos.length + 2);
+  ok("sin que el marcador se pase de su meta", ahora.have <= ahora.goal);
+}
+
+console.log("\nEl mazo que quedó elegido, si deja de ser suyo, no arrastra al juego entero");
+{
+  // Quien estaba jugando a «Gran mezcla» antes de que se cerrara tiene su clave guardada.
+  // Eso es el recuerdo de la última partida, no un derecho, y no puede saltarse la puerta.
+  const w = boot({ almacen: { "hilo-selected-mode-v1": "mixed" } });
+  click(w, '[data-block="mezcla"]');
+  ok("el mazo cerrado no aparece como el elegido",
+    w.document.querySelector('[data-mode="mixed"]')?.getAttribute("aria-pressed") === "false");
+  click(w, '[data-block="historia"]');
+  click(w, '[data-mode="history"]');
+  ok("y se puede seguir jugando a otro con normalidad", w.localStorage.getItem("hilo-selected-mode-v1") === "history");
+
+  // Lo mismo con la vista guardada de la pestaña: recargar no la devuelve a un mazo cerrado.
+  const vista = JSON.stringify({ screen: "play-menu", mode: "mixed", block: "mezcla" });
+  const v = boot({ sesion: { "continuum-tab-view-v1": vista } });
+  ok("una vista guardada de un mazo cerrado empieza en la portada", existe(v, ".gallery") && !/Todavía no es tuyo/.test(texto(v)));
+}
+
+console.log("\nLa enciclopedia no ofrece elegir un mazo que no es suyo");
+{
+  const w = boot();
+  click(w, '[data-action="home-encyclopedia"]');
+  const opciones = [...w.document.querySelectorAll("option")].map(o => o.value);
+  ok("el mazo cerrado no está en el desplegable", !opciones.includes("mixed"));
+  ok("los abiertos sí", opciones.includes("history") && opciones.includes("animals"));
+  ok("y no queda ningún grupo vacío",
+    [...w.document.querySelectorAll("optgroup")].every(g => g.querySelectorAll("option").length > 0));
 }
 
 console.log("\nCerrar un mazo se nota en todo el juego");
@@ -148,6 +280,13 @@ console.log("\nUn reto de un mazo que no es tuyo se explica, no se rompe");
   ok("el enlace se rechaza", leido.ok === false);
   ok("distinguiendo una puerta cerrada de un enlace roto", leido.motivo === "mazo-cerrado");
   ok("y diciendo de qué mazo se trata", leido.mode === "animals");
+
+  // Y así es como lo ve quien abre el enlace: un mazo que le falta, no un enlace roto.
+  const suyo = retador.CONTINUUM.Duelo.codificar({ mode: "mixed", seed: "cerrado2", total: 3, hits: 3, sequence: [true, true, true], nombre: "Ana" });
+  const invitado = boot({ url: `https://hilo.test/?duelo=${suyo}` });
+  ok("no se le dice que el enlace no vale, porque vale", /Te falta el mazo/.test(texto(invitado)) && !/Este enlace no vale/.test(texto(invitado)));
+  ok("se le nombra el mazo y lo que costaría", /Gran mezcla temporal/.test(texto(invitado)) && /3,99 €/.test(texto(invitado)));
+  ok("y se le ofrece la misma salida que en la puerta cerrada", existe(invitado, '[data-action="mazo-desbloquear"]'));
 }
 
 console.log("\nLa cartera decide qué se juega, nunca qué se ha jugado");
@@ -168,7 +307,8 @@ console.log("\nSolo se concede por la puerta prevista");
   const C = w.CONTINUUM.Cartera;
   let rompio = false;
   try { C.concede({ mazos: ["history"] }); } catch { rompio = true; }
-  ok("una concesión sin decir de dónde viene se rechaza", rompio === true && C.origen() === "beta");
+  ok("una concesión sin decir de dónde viene se rechaza y no cambia nada",
+    rompio === true && C.origen() === "simulacion" && C.tiene("history") === true);
   C.concede({ origen: "tienda", mazos: ["history", "inventado"] });
   ok("y una concesión con un mazo que no existe lo descarta en vez de guardarlo",
     C.tiene("history") === true && C.tiene("inventado") === false && C.abiertos().join() === "history");

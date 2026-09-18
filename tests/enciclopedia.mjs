@@ -228,8 +228,11 @@ console.log("\nCatálogo completo desde la barra inferior");
   ok("sin cartas jugadas invita a estrenar la primera lámina", !!doc.querySelector('.enc-recent-empty'));
   const groups = w.CONTINUUM.Enciclopedia.catalogGroups();
   const catalog = groups.flatMap(group => group.decks.flatMap(deck => deck.cards));
-  const allIds = new Set(Object.values(w.CONTINUUM.MODES).flatMap(mode => mode.cards).map(card => card.id));
-  ok("el catálogo contiene todas las cartas sin duplicar Gran mezcla", catalog.length === allIds.size && new Set(catalog.map(card => card.id)).size === allIds.size);
+  // Gran mezcla no aporta cartas propias y un mazo cerrado no enseña las suyas, así que
+  // lo que tiene que estar es exactamente lo de los demás mazos abiertos, sin repetir.
+  const propios = Object.values(w.CONTINUUM.MODES).filter(mode => mode.key !== "mixed" && w.CONTINUUM.Cartera.tiene(mode.key));
+  const allIds = new Set(propios.flatMap(mode => mode.cards).map(card => card.id));
+  ok("el catálogo contiene todas las cartas de los mazos que son suyos, sin duplicar Gran mezcla", catalog.length === allIds.size && new Set(catalog.map(card => card.id)).size === allIds.size);
   ok("las temáticas y los mazos tienen sus propios apartados", doc.querySelectorAll('.enc-topic').length === groups.length && doc.querySelectorAll('[data-enc-deck]').length === groups.flatMap(group => group.decks).length);
   ok("cada mazo se presenta con portada y separador de cuaderno", doc.querySelectorAll('.enc-deck-cover img').length === doc.querySelectorAll('[data-enc-deck]').length && doc.querySelectorAll('.enc-topic-divider').length === groups.length);
   ok("las cartas se cargan al desplegar, sin saturar el móvil al entrar", doc.querySelectorAll('[data-enc-card]').length === 0);
