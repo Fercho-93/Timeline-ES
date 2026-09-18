@@ -120,6 +120,15 @@ try {
       await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
       await page.locator('[data-action="rules"]').click();
+      const guideBack=page.locator('.rules .guide-tools > .atlas-dialog-back');
+      const guideBackAtTop=await guideBack.boundingBox();
+      await page.locator('.rules').evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.45);});
+      await page.waitForTimeout(50);
+      const guideBackHalfway=await guideBack.boundingBox();
+      const guideBackStyle=await guideBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
+      assert.ok(Math.abs(guideBackHalfway.y-guideBackAtTop.y)<=1,'la flecha circular de la guía permanece flotante');
+      assert.equal(guideBackStyle.radius,'50%','la guía comparte el botón circular de la enciclopedia');
+      assert.notEqual(guideBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de la guía conserva su fondo de papel');
       await page.locator('[data-guide-place="1"]').click();
       assert.ok(await page.locator('.guide-practice.is-correct').count(),'la guía permite completar la primera colocación');
       await page.screenshot({path:`test-results/zoom/${engine}-guia-interactiva.png`,fullPage:true});

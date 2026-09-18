@@ -1272,6 +1272,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   position: sticky;
   top: 8px;
   z-index: 24;
+}
+#app .enc-modal > .atlas-dialog-back,
+#app .rules .guide-tools > .atlas-dialog-back {
   width: 46px;
   height: 46px;
   padding: 0;
@@ -1283,6 +1286,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+#app .rules .guide-tools { top: 8px; z-index: 24; }
 #app .enc-toolbar-compact { gap: 10px; padding: 12px; margin: 12px 0 18px; border-radius: 14px; }
 #app .enc-primary-filters { display: grid; grid-template-columns: minmax(180px,.8fr) minmax(220px,1.2fr); gap: 10px; }
 #app .enc-toolbar-compact .field { margin: 0; gap: 4px; }
