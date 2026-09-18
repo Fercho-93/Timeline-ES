@@ -208,9 +208,10 @@ for (const difficulty of ['easy','normal','hard','expert']) {
   const w=boot({'continuum-difficulty-v1':'expert'});click(w,'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
   let rounds=0;
-  // La competición pasa por todos los mazos menos la Gran mezcla, así que el número de
-  // rondas se deduce del catálogo: añadir un mazo no debe obligar a tocar esta cuenta.
-  const temas=Object.keys(w.CONTINUUM.MODES).filter(key=>key!=='mixed').length;
+  // La competición pasa por los mazos que son suyos menos la Gran mezcla, así que el
+  // número de rondas se deduce del catálogo y de la cartera: ni añadir un mazo ni cerrar
+  // uno debe obligar a tocar esta cuenta.
+  const temas=Object.keys(w.CONTINUUM.MODES).filter(key=>key!=='mixed'&&w.CONTINUUM.Cartera.tiene(key)).length;
   // Las cinco cartas del usuario nunca se consumen como incorporaciones automáticas.
   while(rounds++<temas){
     for(let i=0;i<5;i++){

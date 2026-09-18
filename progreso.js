@@ -215,7 +215,23 @@
   // no lo esté. Se evalúan solo al registrar una jugada o al terminar una partida, nunca
   // al repintar, así que un logro no puede desbloquearse dos veces ni saltar sin motivo.
   // ---------------------------------------------------------------------------
-  const TOTAL_MAZOS = Object.keys(CT.MODES).length;
+  // «Coleccionista» se mide sobre los mazos que cada uno tiene a mano, no sobre el
+  // catálogo entero. Si algún día hay mazos de pago, medirlo sobre el catálogo dejaría el
+  // logro fuera del alcance de quien no compre: un candado dentro de otro candado. Así,
+  // en cambio, cada uno completa su colección, y quien añada mazos después vuelve a tener
+  // algo que recorrer. Una meta que cambia no descoloca nada: los logros se guardan el día
+  // que se consiguen y no se vuelven a mirar, así que lo ganado no se pierde aunque la
+  // meta suba luego.
+  const mazosAMano = () => CT.Cartera.abiertos().length;
+
+  // Y solo cuentan los mazos que siguen siendo suyos: contar uno que ya no está dejaría el
+  // marcador por encima de su propia meta.
+  const mazosJugados = profile => Object.keys(profile.byMode).filter(CT.Cartera.tiene).length;
+
+  // El resto de logros llevan una meta fija; esta función es la que deja que uno la tenga
+  // variable sin que los demás se enteren.
+  const metaDe = item => typeof item.goal === "function" ? item.goal() : item.goal;
+  const textoDe = item => typeof item.desc === "function" ? item.desc() : item.desc;
 
   function bestModeCards(profile) {
     return Math.max(0, ...Object.values(profile.byMode).map(entry => entry.cards));
@@ -234,7 +250,7 @@
     { key: "tirada", group: "Puntería", name: "Veinticinco seguidas", desc: "Coloca 25 cartas seguidas sin fallar ninguna.", have: p => p.totals.bestRun, goal: 25 },
     { key: "finura", group: "Puntería", name: "Nueve de cada diez", desc: "Llega al 90 % de aciertos en un mazo con 50 cartas jugadas.", have: fineDecks, goal: 1 },
 
-    { key: "coleccion", group: "Recorrido", name: "Coleccionista", desc: `Juega al menos una carta de los ${TOTAL_MAZOS} mazos.`, have: p => Object.keys(p.byMode).length, goal: TOTAL_MAZOS },
+    { key: "coleccion", group: "Recorrido", name: "Coleccionista", desc: () => `Juega al menos una carta de tus ${mazosAMano()} mazos.`, have: mazosJugados, goal: mazosAMano },
     { key: "competicion", group: "Recorrido", name: "Vuelta completa", desc: "Termina una competición entera, tema a tema.", have: p => p.marks.comps, goal: 1 },
     { key: "centenario", group: "Recorrido", name: "Cien en un mazo", desc: "Juega 100 cartas de un mismo mazo.", have: bestModeCards, goal: 100 },
     { key: "maraton", group: "Recorrido", name: "Quinientas cartas", desc: "Coloca 500 cartas en total.", have: p => p.totals.cards, goal: 500 },
@@ -254,9 +270,9 @@
     const nuevos = [];
     for (const item of ACHIEVEMENTS) {
       if (profile.achievements[item.key]) continue;
-      if (item.have(profile) < item.goal) continue;
+      if (item.have(profile) < metaDe(item)) continue;
       profile.achievements[item.key] = { unlockedAt: new Date().toISOString() };
-      nuevos.push({ key: item.key, name: item.name, desc: item.desc, group: item.group });
+      nuevos.push({ key: item.key, name: item.name, desc: textoDe(item), group: item.group });
     }
     return nuevos;
   }
@@ -480,10 +496,11 @@
 
   function achievements(profile = read()) {
     return ACHIEVEMENTS.map(item => {
-      const have = Math.min(item.have(profile), item.goal);
+      const goal = metaDe(item);
+      const have = Math.min(item.have(profile), goal);
       return {
-        key: item.key, group: item.group, name: item.name, desc: item.desc,
-        goal: item.goal, have,
+        key: item.key, group: item.group, name: item.name, desc: textoDe(item),
+        goal, have,
         unlocked: !!profile.achievements[item.key],
         unlockedAt: profile.achievements[item.key]?.unlockedAt || null
       };
