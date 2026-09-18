@@ -113,8 +113,14 @@
       if (slot) {
         slot.setAttribute('aria-label', 'Posición elegida');
         const confirm = slot.querySelector('.btn-primary'), cancel = slot.querySelector('.btn-ghost');
-        if (confirm) { confirm.textContent = 'Confirmar posición'; dock.append(confirm); }
-        if (cancel) { cancel.textContent = 'Cambiar posición'; dock.append(cancel); }
+        const status = document.createElement('div'); status.className = 'placement-dock-status';
+        status.innerHTML = '<span aria-hidden="true">✓</span><strong>Posición elegida</strong>';
+        const actions = document.createElement('div'); actions.className = 'placement-dock-actions';
+        if (confirm) { confirm.textContent = 'Confirmar'; actions.append(confirm); }
+        if (cancel) { cancel.textContent = 'Cambiar'; actions.append(cancel); }
+        dock.setAttribute('role', 'group');
+        dock.setAttribute('aria-label', 'Confirmar la posición elegida');
+        dock.append(status, actions);
       } else {
         dock.innerHTML = `<span class="placement-instruction">${screen === 'solo' ? 'Toca un hueco de la línea para colocar tu carta' : 'Elige una carta y un hueco de la línea'}</span>`;
       }

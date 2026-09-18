@@ -29,6 +29,8 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     const selected=w.document.querySelector('.hand-card.selected').dataset.id;
     assert.equal(w.document.querySelectorAll('[data-action="confirm-place"]').length,1);
     assert.ok(w.document.querySelector('.placement-dock [data-action="confirm-place"]'));
+    assert.equal(w.document.querySelector('.placement-dock-status strong').textContent,'Posición elegida');
+    assert.equal(w.document.querySelector('.placement-dock-actions [data-action="cancel-place"]').textContent,'Cambiar');
     assert.equal(w.document.querySelector('.slot-confirm button'),null);
     const zoom=w.document.querySelector('[data-timeline-range]');zoom.value='0';zoom.dispatchEvent(new w.Event('input',{bubbles:true}));
     assert.equal(w.document.querySelector('.timeline-zoom output').textContent,'80%');

@@ -529,9 +529,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app.atlas-board .hand-solo .reverso-emblema { width: 62px; height: 62px; }
 #app.atlas-board .atlas-hand-many { max-height: 260px; overflow-y: auto; padding: 7px 5px; }
 #app.atlas-board .atlas-hand-section > .hint { font: .72rem/1.3 var(--ui-font); margin: 5px 0; }
-#app.atlas-board .placement-dock { position: sticky; bottom: 0; z-index: 5; background: var(--edition-paper); padding: 7px 0 max(6px,env(safe-area-inset-bottom)); display: grid; gap: 3px; }
-#app.atlas-board .placement-dock .btn-primary { min-height: 46px; padding: 10px 14px; background: var(--atlas-selection); color: var(--edition-surface); }
-#app.atlas-board .placement-dock .btn-ghost { min-height: 30px; padding: 5px; font-size: .72rem; }
+#app.atlas-board .placement-dock { position: sticky; bottom: 0; z-index: 5; background: var(--edition-paper); padding: 7px 0 max(6px,env(safe-area-inset-bottom)); display: grid; gap: 7px; }
+#app.atlas-board .placement-dock-status { display: flex; align-items: center; gap: 6px; color: var(--edition-ink); font: 700 .68rem/1.1 var(--ui-font); letter-spacing: .025em; }
+#app.atlas-board .placement-dock-status span { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--atlas-selection); color: var(--edition-surface); font: 800 .76rem/1 var(--ui-font); box-shadow: inset 0 0 0 1px #fff8e744; }
+#app.atlas-board .placement-dock-actions { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; }
+#app.atlas-board .placement-dock .btn-primary { min-height: 44px; padding: 9px 14px; background: var(--atlas-selection); color: var(--edition-surface); }
+#app.atlas-board .placement-dock .btn-ghost { min-height: 44px; padding: 9px 12px; font-size: .72rem; }
 .placement-instruction { font: .66rem/1.3 var(--ui-font); color: var(--edition-muted); text-align: center; }
 #app.atlas-board .solo-lives { font-size: 1.1rem; margin: 0 0 5px; }
 #app.atlas-board .ghost-banner, #app.atlas-board .pulse-banner { margin: 4px 0; padding: 6px 9px; font-size: .78rem; }
@@ -582,24 +585,40 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app.atlas-board .hand:not(.hand-solo) .carta-reverso { position: absolute; inset: 18px 8px auto; height: 34px; min-height: 0; margin: 0; opacity: .2; }
 #app.atlas-board .hand:not(.hand-solo) .reverso-emblema { width: 34px; height: 34px; }
 #app.atlas-board .hand .hand-card.selected { outline: 2px solid var(--atlas-selection); outline-offset: 1px; }
-/* El botón de confirmar va fijo al pie. `sticky` no sirve aquí: `#app` lleva
+/* La confirmación queda como una tarjeta compacta en la esquina inferior derecha. `sticky`
+   no sirve aquí: `#app` lleva
    `overflow-x: clip`, y con un eje recortado el otro deja de ser `visible`, así que `#app`
    pasa a ser contenedor de desplazamiento y la caja se pegaba al final del documento
    —fuera de la pantalla, debajo de la barra del navegador— en vez de al borde visible.
-   Con `fixed` se pega a lo que de verdad se ve, y la hoja le reserva su altura para que
-   no tape la mano. El muelle que solo lleva la instrucción se queda en el flujo: es un
-   aviso, no un mando, y fijarlo solo taparía tablero. */
+   Con `fixed` se pega a lo que de verdad se ve. La tarjeta deja libre la mayor parte de
+   la carta y la hoja reserva su altura para que tampoco la cubra al llegar al final. El
+   muelle que solo lleva la instrucción se queda en el flujo: es un aviso, no un mando. */
 #app.atlas-board .placement-dock:has(.btn) {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
-  display: grid; justify-content: center; grid-template-columns: min(100% - 24px, 916px); gap: 3px;
-  padding: 8px 12px max(10px, env(safe-area-inset-bottom));
-  background: var(--edition-paper);
-  box-shadow: 0 -8px 20px #3d271c22;
+  position: fixed; left: auto; right: max(12px,env(safe-area-inset-right));
+  bottom: max(12px,env(safe-area-inset-bottom)); z-index: 6;
+  width: auto; max-width: calc(100vw - 24px);
+  display: grid; gap: 0;
+  padding: 8px;
+  border: 1px solid #a8895966;
+  border-radius: 17px;
+  background: color-mix(in srgb,var(--edition-paper) 94%,transparent);
+  box-shadow: 0 10px 28px #3d271c2e, 0 2px 8px #3d271c24, inset 0 1px 0 #fff8e7cc;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
-#app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+#app.atlas-board .placement-dock:has(.btn) .placement-dock-status {
+  position: absolute; right: 5px; bottom: calc(100% + 6px);
+  padding: 6px 9px 6px 6px;
+  border: 1px solid #a8895955; border-radius: 999px;
+  background: color-mix(in srgb,var(--edition-paper) 95%,transparent);
+  box-shadow: 0 4px 14px #3d271c20;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  white-space: nowrap; pointer-events: none;
+}
+#app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
 #app.atlas-board .placement-dock:not(:has(.btn)) { position: static; }
 /* Con el texto muy ampliado el muelle ocuparía media pantalla: ahí vuelve al flujo. */
-:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .placement-dock:has(.btn) { position: static; grid-template-columns: 1fr; box-shadow: none; padding-inline: 0; }
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .placement-dock:has(.btn) { position: static; width: auto; border: 0; border-radius: 0; box-shadow: none; padding-inline: 0; backdrop-filter: none; }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 #app.atlas-board[data-platform][data-screen] .timeline .card-visual { aspect-ratio: auto; }
 @media (max-width: 380px), (max-height: 740px) {

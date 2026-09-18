@@ -59,6 +59,8 @@ try {
    await duelPage.locator('[data-action="solo-place"]').first().click();
    const dockBox=await duelPage.locator('.placement-dock').boundingBox();
    assert.ok(dockBox.y+dockBox.height<=664+1,`el botón de confirmar cabe en la pantalla (acaba en ${Math.round(dockBox.y+dockBox.height)} de 664)`);
+   assert.ok(dockBox.x+dockBox.width>=390-13,'la confirmación queda alineada a la derecha');
+   assert.ok(dockBox.width<390*.6,'la confirmación deja visible la mayor parte del tablero');
    assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
    const curl=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>{
      const cs=getComputedStyle(el,'::before');
