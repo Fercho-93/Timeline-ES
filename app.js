@@ -580,16 +580,25 @@
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
         <div class="panel">
-          <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
-          <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
-          <section id="recent-players" class="recent-players" aria-label="Participantes recientes" hidden></section>
-          <div class="setup-grid">
-            <div class="field starter-field">${starterFieldMarkup()}</div>
-            <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
+          <div class="setup-block">
+            <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
+            <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
+            <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
+            <section id="recent-players" class="recent-players" aria-label="Participantes recientes" hidden></section>
           </div>
-          <div class="field"><label for="local-preset">Tipo de partida</label><select id="local-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div>
-          <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"></label>
-          <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"></label>
+          <div class="setup-block">
+            <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
+            <div class="setup-grid">
+              <div class="field starter-field">${starterFieldMarkup()}</div>
+              <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
+            </div>
+          </div>
+          <div class="setup-block">
+            <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Modo de juego</span></div>
+            <div class="field"><label for="local-preset">Tipo de partida</label><select id="local-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div>
+            <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"></label>
+            <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"></label>
+          </div>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
       </section>
@@ -602,11 +611,12 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-secondary btn-block" data-action="draw-starter">🂠 Adivinar la fecha</button>`;
+      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">🂠</span><span class="starter-draw-copy"><b>Adivinar la fecha</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
-    return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el sorteo</button>`;
+    return `<span class="field-label">Quién empieza</span><p class="starter-result"><span class="starter-result-crown" aria-hidden="true">${crownIcon()}</span><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el sorteo</button>`;
   }
+  const crownIcon = () => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4 3 5-6 5 6 4-3-2 10H5L3 8Z"/><path d="M5 21h14"/></svg>';
 
   function playerNames() {
     return [...document.querySelectorAll("#players input")].map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
@@ -678,9 +688,9 @@
     document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
     announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida.`);
     renderStarterDialog(`<h2>¿Quién empieza?</h2>
+      <div class="starter-winner-banner"><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><b>${escapeHtml(starterDraw.names[winner])}</b><span>Empieza la partida</span></div>
       <p>El valor real era <strong>${escapeHtml(CT.formatValue(selectedModeKey, card))}</strong>.</p>
       <ul class="starter-draw-list">${starterDraw.names.map((name, i) => `<li${i === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(name)}</span><span>${escapeHtml(Cifras.formato(selectedModeKey, starterDraw.guesses[i]))}</span></li>`).join("")}</ul>
-      <p>${escapeHtml(starterDraw.names[winner])} ha acertado más cerca y empieza.</p>
       <div class="actions"><button class="btn btn-primary btn-block" data-action="close-menu">Aceptar</button></div>`);
   }
 
