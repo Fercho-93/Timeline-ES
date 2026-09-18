@@ -29,46 +29,6 @@
   --shadow-soft: 0 5px 16px rgba(43, 35, 29, .07);
 }
 
-@media (prefers-color-scheme: dark) {
-  /* El sistema manda salvo que ya se haya elegido «claro» a mano. */
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --ink: #ece9e1;
-    --muted: #aaa8a0;
-    --line: #3c4140;
-    --paper: #171b1c;
-    --surface: #202526;
-    --accent: #e59777;
-    --accent-dark: #f0aa8d;
-    --accent-soft: #54362d;
-    --teal: #79bec7;
-    --green: #79bd94;
-    --ink-solid: #f1eee7;
-    --ink-solid-contrast: #172022;
-    --shadow: 0 12px 32px rgba(0, 0, 0, .35);
-    --shadow-soft: 0 4px 14px rgba(0, 0, 0, .25);
-  }
-}
-
-/* El interruptor manda incluso si contradice al sistema, en los dos sentidos. */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --ink: #ece9e1;
-  --muted: #aaa8a0;
-  --line: #3c4140;
-  --paper: #171b1c;
-  --surface: #202526;
-  --accent: #e59777;
-  --accent-dark: #f0aa8d;
-  --accent-soft: #54362d;
-  --teal: #79bec7;
-  --green: #79bd94;
-  --ink-solid: #f1eee7;
-  --ink-solid-contrast: #172022;
-  --shadow: 0 12px 32px rgba(0, 0, 0, .35);
-  --shadow-soft: 0 4px 14px rgba(0, 0, 0, .25);
-}
-
 * { box-sizing: border-box; }
 html {
   min-height: 100%;
@@ -1807,176 +1767,52 @@ body::before {
   .home-shell .comp-promo { max-width: 100%; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ink: #f1d7a4;
-    --muted: #c2a875;
-    --line: #74552f;
-    --paper: #21170d;
-    --surface: rgba(53,37,21,.92);
-    --accent: #d77a45;
-    --accent-dark: #efaa6c;
-    --accent-soft: #62401f;
-    --ink-solid: #bb5c2b;
-    --ink-solid-contrast: #fff0cf;
-    /* El pergamino de noche: cuero oscuro en vez de papel. La carta de la línea y la de
-       la mano no están aquí a propósito, porque son objetos de la mesa y no cambian. */
-    --vitela: rgba(52,36,20,.94);
-    --vitela-luz: rgba(255,226,170,.07);
-    --vitela-borde: rgba(180,132,70,.4);
-    --borde-suave: rgba(180,132,70,.4);
-    --boton-suave: rgba(68,48,27,.88);
-    --boton-icono: rgba(62,43,24,.85);
-    --boton-icono-luz: rgba(255,228,172,.07);
-    --campo: rgba(32,22,12,.88);
-    --ficha: rgba(60,42,24,.85);
-    --contador: rgba(62,43,24,.9);
-    --hueco: rgba(52,36,20,.72);
-    --modal-fondo: #31220f;
-    --fila: rgba(54,38,21,.9);
-    --fila-activa: rgba(84,58,30,.9);
-    --reja: rgba(130,95,48,.35);
-    --estante: rgba(44,31,17,.7);
-    --formato: linear-gradient(100deg, rgba(74,52,29,.9), rgba(52,36,20,.92));
-    --formato-luz: rgba(255,228,172,.08);
-    --formato-detalle: #c2a875;
-    --promo: rgba(64,45,25,.88);
-  }
-  :root:not([data-theme="light"]) body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
-  :root:not([data-theme="light"]) .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
-}
+/* Oscuro conserva el lenguaje del atlas y el pergamino, convertido en cuero entintado:
+   marfil cálido para lectura, latón para jerarquía y capas de nogal que distinguen la
+   mesa, los campos, los modales y la navegación sin depender de negro puro. */
 :root[data-theme="dark"] {
-  --ink: #f1d7a4;
-  --muted: #c2a875;
-  --line: #74552f;
-  --paper: #21170d;
-  --surface: rgba(53,37,21,.92);
-  --accent: #d77a45;
-  --accent-dark: #efaa6c;
-  --accent-soft: #62401f;
-  --ink-solid: #bb5c2b;
-  --ink-solid-contrast: #fff0cf;
-  /* El pergamino de noche: cuero oscuro en vez de papel. La carta de la línea y la de
-     la mano no están aquí a propósito, porque son objetos de la mesa y no cambian. */
-  --vitela: rgba(52,36,20,.94);
-  --vitela-luz: rgba(255,226,170,.07);
-  --vitela-borde: rgba(180,132,70,.4);
-  --borde-suave: rgba(180,132,70,.4);
-  --boton-suave: rgba(68,48,27,.88);
-  --boton-icono: rgba(62,43,24,.85);
-  --boton-icono-luz: rgba(255,228,172,.07);
-  --campo: rgba(32,22,12,.88);
-  --ficha: rgba(60,42,24,.85);
-  --contador: rgba(62,43,24,.9);
-  --hueco: rgba(52,36,20,.72);
-  --modal-fondo: #31220f;
-  --fila: rgba(54,38,21,.9);
-  --fila-activa: rgba(84,58,30,.9);
-  --reja: rgba(130,95,48,.35);
-  --estante: rgba(44,31,17,.7);
-  --formato: linear-gradient(100deg, rgba(74,52,29,.9), rgba(52,36,20,.92));
-  --formato-luz: rgba(255,228,172,.08);
-  --formato-detalle: #c2a875;
-  --promo: rgba(64,45,25,.88);
-}
-:root[data-theme="dark"] body { background: radial-gradient(circle at top, #3b2918, #1c130b 72%); }
-:root[data-theme="dark"] .home-nav { background: rgba(47,32,18,.96); border-color: #76562f; }
-
-/* Los demás aspectos. «Pergamino» es un tema claro y no aparece aquí: la mesa ya es de
-   papel en el tema claro, y lo único que cambia es la edición (edition.css). Los dos de
-   abajo sí tienen que redefinir cada superficie, porque las del `:root` son claras y una
-   tinta clara encima de una de ellas no se lee. La lista es la misma del tema oscuro:
-   `accesibilidad.mjs` comprueba que ninguna se quede sin su versión en cada aspecto. */
-
-/* Noche profunda: el mismo cuero del tema oscuro, pero sobre negro de verdad. En una
-   pantalla OLED el negro son píxeles apagados —ni luz ni batería—, así que es el aspecto
-   para jugar a oscuras; las líneas suben de tono para no perderse sobre el fondo. */
-:root[data-theme="night"] {
   color-scheme: dark;
-  --ink: #f6e3bc;
-  --muted: #c9b285;
-  --line: #7a5f39;
-  --paper: #000;
-  --surface: rgba(20,15,8,.95);
-  --accent: #e08a52;
-  --accent-dark: #f3b478;
-  --accent-soft: #55360f;
-  --teal: #79bec7;
-  --green: #79bd94;
-  --ink-solid: #c9662f;
-  --ink-solid-contrast: #fff0cf;
-  --shadow: 0 12px 32px rgba(0, 0, 0, .6);
-  --shadow-soft: 0 4px 14px rgba(0, 0, 0, .5);
-  --vitela: rgba(18,13,7,.96);
-  --vitela-luz: rgba(255,226,170,.06);
-  --vitela-borde: rgba(184,140,78,.46);
-  --borde-suave: rgba(184,140,78,.46);
-  --boton-suave: rgba(32,23,12,.92);
-  --boton-icono: rgba(28,20,11,.9);
-  --boton-icono-luz: rgba(255,228,172,.06);
-  --campo: rgba(10,7,4,.92);
-  --ficha: rgba(30,21,11,.9);
-  --contador: rgba(28,20,11,.92);
-  --hueco: rgba(18,13,7,.8);
-  --modal-fondo: #120d06;
-  --fila: rgba(24,17,9,.92);
-  --fila-activa: rgba(48,34,18,.92);
-  --reja: rgba(140,102,52,.38);
-  --estante: rgba(14,10,5,.8);
-  --formato: linear-gradient(100deg, rgba(40,28,15,.92), rgba(20,14,8,.94));
-  --formato-luz: rgba(255,228,172,.06);
-  --formato-detalle: #c9b285;
-  --promo: rgba(28,20,11,.9);
+  background: #100b07;
+  --ink: #f3e4c5;
+  --muted: #cbb68d;
+  --line: #80613a;
+  --paper: #18110b;
+  --surface: rgba(43,30,18,.96);
+  --accent: #dc8250;
+  --accent-dark: #f2b078;
+  --accent-soft: #5b351b;
+  --teal: #80c4c2;
+  --green: #8bc195;
+  --ink-solid: #c36032;
+  --ink-solid-contrast: #fff5df;
+  --shadow: 0 16px 38px rgba(0,0,0,.48);
+  --shadow-soft: 0 5px 16px rgba(0,0,0,.34);
+  /* Las cartas de la línea y de la mano son objetos físicos y conservan su papel. */
+  --vitela: rgba(46,31,18,.97);
+  --vitela-luz: rgba(255,226,170,.08);
+  --vitela-borde: rgba(194,148,84,.48);
+  --borde-suave: rgba(173,128,70,.5);
+  --boton-suave: rgba(61,42,24,.94);
+  --boton-icono: rgba(55,37,21,.94);
+  --boton-icono-luz: rgba(255,228,172,.08);
+  --campo: rgba(27,18,11,.96);
+  --ficha: rgba(55,37,22,.94);
+  --contador: rgba(58,39,22,.96);
+  --hueco: rgba(39,26,15,.88);
+  --modal-fondo: #25180e;
+  --fila: rgba(48,32,19,.96);
+  --fila-activa: rgba(82,55,29,.96);
+  --reja: rgba(151,109,57,.42);
+  --estante: rgba(35,23,14,.9);
+  --formato: linear-gradient(100deg, rgba(67,46,27,.96), rgba(42,28,17,.98));
+  --formato-luz: rgba(255,228,172,.09);
+  --formato-detalle: #cbb68d;
+  --promo: rgba(54,36,21,.96);
 }
+:root[data-theme="dark"] body { background: radial-gradient(circle at 50% -10%, #3b2817, #18110b 58%, #100b07 100%); }
+:root[data-theme="dark"] .home-nav { background: rgba(35,23,14,.98); border-color: #80613a; }
 
-/* Alto contraste: negro sobre blanco, bordes de 1 px bien visibles y ninguna veladura.
-   El color de bloque también se apaga —un botón principal pasa a ser casi negro con
-   texto blanco— porque aquí manda leer, no ambientar. */
-:root[data-theme="contrast"] {
-  color-scheme: light;
-  --ink: #0b0b0b;
-  --muted: #2e2e2e;
-  --line: #1a1a1a;
-  --paper: #fff;
-  --surface: #fff;
-  --accent: #8a2b00;
-  --accent-dark: #6b2100;
-  --accent-soft: #ffe4d8;
-  --teal: #14454e;
-  --green: #1f5136;
-  --accent-solid: #8a2b00;
-  --green-solid: #1f5136;
-  --ink-solid: #0b0b0b;
-  --ink-solid-contrast: #fff;
-  --shadow: none;
-  --shadow-soft: none;
-  --vitela: #fff;
-  --vitela-luz: #fff;
-  --vitela-borde: #1a1a1a;
-  --borde-suave: #1a1a1a;
-  --boton-suave: #fff;
-  --boton-icono: #fff;
-  --boton-icono-luz: #fff;
-  --campo: #fff;
-  --ficha: #fff;
-  --contador: #f1f1f1;
-  --hueco: #ededed;
-  --modal-fondo: #fff;
-  --fila: #fff;
-  --fila-activa: #e6e6e6;
-  --reja: #1a1a1a;
-  --estante: #f5f5f5;
-  --formato: linear-gradient(100deg, #fff, #fff);
-  --formato-luz: #fff;
-  --formato-detalle: #2e2e2e;
-  --promo: #fff;
-  /* La carta de la línea es papel en los demás aspectos y aquí también, pero su tinta sí
-     sube: es texto, y este aspecto existe justo para que el texto se lea. */
-  --carta-tinta: #0b0b0b;
-  --carta-dato: #8a2b00;
-}
-
-.system-notice { position:relative; z-index:10000; display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px; border:2px solid #8a5426; background:#fff4da; color:#302114; }
+.system-notice { position:relative; z-index:10000; display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px; border:2px solid var(--accent); background:var(--modal-fondo); color:var(--ink); }
 .system-notice span { flex:1 1 240px; }
 #system-notices { position:fixed; inset:auto 0 0; z-index:10000; max-height:42dvh; overflow:auto; padding-bottom:env(safe-area-inset-bottom); }
 

@@ -14,7 +14,7 @@ flotante mantiene a mano Inicio, Colección, Perfil y Ajustes.
 - Historia usa terracota; entretenimiento, ciruela; ciencia, petróleo;
   naturaleza, verde bosque; geografía, azul cartográfico; mezcla, bronce.
   La portada y el perfil vuelven al ambiente común de la colección.
-- Los modos claro, oscuro y automático siguen usando el ajuste existente.
+- Los temas Claro y Oscuro siguen usando el ajuste existente.
 
 ## Movimiento con una función
 

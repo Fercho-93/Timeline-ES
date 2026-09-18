@@ -173,10 +173,10 @@ try {
       assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','ajustes difumina el contenido que sale por arriba');
       assert.ok(await settingsVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de ajustes cubre también el relleno superior');
       await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=0;});
-      await page.locator('#ajuste-tema').selectOption('night');
+      await page.locator('#ajuste-tema').selectOption('dark');
       await page.locator('#ajuste-texto').selectOption('150');
-      assert.equal(await page.locator('[data-look-preview]').getAttribute('data-preview-theme'),'night');
-      assert.equal(await page.locator('html').getAttribute('data-theme'),null,'la muestra no aplica el tema antes de confirmar');
+      assert.equal(await page.locator('[data-look-preview]').getAttribute('data-preview-theme'),'dark');
+      assert.equal(await page.locator('html').getAttribute('data-theme'),'light','la muestra no aplica el tema antes de confirmar');
       await page.screenshot({path:`test-results/zoom/${engine}-ajustes-muestra.png`,fullPage:true});
       await page.locator('.settings-close').click();
       await page.locator('[data-action="perfil"]').click();

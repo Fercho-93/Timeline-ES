@@ -7,31 +7,40 @@
 
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
-  const DEFAULTS = { theme: "auto", textSize: "100" };
-  // Los aspectos, en un solo sitio: de aquí salen el desplegable, la validación de lo
-  // guardado y el color de la barra del navegador. `barra` es el color del papel de cada
-  // uno; «automático» no tiene porque ahí manda la preferencia del móvil. Quien añada un
-  // aspecto nuevo tiene que dar también sus variables en `styles.css` y `edition.css`.
+  const DEFAULTS = { theme: "light", textSize: "100" };
+  // Las dos apariencias, en un solo sitio: de aquí salen el desplegable, la validación
+  // de lo guardado y el color de la barra del navegador.
   const THEMES = {
-    auto: { label: "Automático, según el móvil" },
-    light: { label: "Claro", grupo: "Claros", barra: "#f3eee4" },
-    sepia: { label: "Pergamino", grupo: "Claros", barra: "#ecdfc4" },
-    contrast: { label: "Alto contraste", grupo: "Claros", barra: "#ffffff" },
-    dark: { label: "Oscuro", grupo: "Oscuros", barra: "#1c211f" },
-    night: { label: "Noche profunda", grupo: "Oscuros", barra: "#000000" }
+    light: { label: "Claro", barra: "#f3eee4" },
+    dark: { label: "Oscuro", barra: "#18110b" }
   };
   // Pendiente de rellenar antes de repartir la beta: el correo donde debe llegar el
   // informe de comentarios. Hasta entonces el botón avisa de que aún no hay dirección.
   const FEEDBACK_EMAIL = CT.Deployment.feedbackEmail;
 
+  function migratedTheme(theme) {
+    if (THEMES[theme]) return theme;
+    if (theme === "night") return "dark";
+    if (theme === "sepia" || theme === "contrast") return "light";
+    if (theme === "auto") {
+      try { return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }
+      catch { return "light"; }
+    }
+    return DEFAULTS.theme;
+  }
+
   function read() {
     try {
       const stored = JSON.parse(CT.Storage.getItem(KEY));
       const settings = { ...DEFAULTS, ...stored };
-      // Un aspecto que ya no exista —o cualquier cosa rara en el almacenamiento— vuelve a
-      // «automático»: si no, `data-theme` se quedaría con un valor sin estilos y la
-      // aplicación se vería a medio pintar sin que nada lo explicara.
-      if (!THEMES[settings.theme]) settings.theme = DEFAULTS.theme;
+      // La versión anterior ofrecía seis aspectos. Se reducen a los dos equivalentes
+      // sin tocar el resto de preferencias y se persiste la migración para hacerla una
+      // sola vez. Un valor desconocido vuelve al aspecto principal.
+      const previousTheme = settings.theme;
+      settings.theme = migratedTheme(previousTheme);
+      if (previousTheme !== settings.theme) {
+        try { CT.Storage.setItem(KEY, JSON.stringify(settings)); } catch { /* almacenamiento lleno */ }
+      }
       return settings;
     } catch { return { ...DEFAULTS }; }
   }
@@ -43,37 +52,24 @@
     try { CT.Storage.setItem(KEY, JSON.stringify(settings)); } catch { /* almacenamiento lleno */ }
   }
 
-  // El tema se aplica en el elemento raíz: «auto» no pone nada y deja mandar a
-  // `prefers-color-scheme`, tal como está montada la hoja de estilos.
+  // El tema se aplica de forma explícita en el elemento raíz para que la aplicación y
+  // la barra del navegador siempre compartan la misma apariencia.
   function applyTheme() {
     document.documentElement.dataset.platform = /Android/i.test(navigator.userAgent) ? 'android' : 'other';
     document.documentElement.style.fontSize = ({100:'var(--normal-text-size, 100%)',125:'125%',150:'150%',200:'200%'})[settings.textSize] || '100%';
     document.documentElement.dataset.textSize = settings.textSize;
-    if (settings.theme === "auto") document.documentElement.removeAttribute("data-theme");
-    else document.documentElement.setAttribute("data-theme", settings.theme);
-    // El color de la barra del navegador no lee variables CSS ni `data-theme`: en
-    // `index.html` hay dos etiquetas, una por preferencia del sistema, para que sea
-    // correcto antes incluso de que este script se ejecute. Con un aspecto elegido a
-    // mano se fuerzan las dos al papel de ese aspecto; en «auto» se les devuelve el suyo
-    // y vuelve a mandar el sistema.
-    const claro = THEMES.light.barra, oscuro = THEMES.dark.barra;
-    const elegido = THEMES[settings.theme]?.barra;
+    document.documentElement.setAttribute("data-theme", settings.theme);
+    const elegido = THEMES[settings.theme].barra;
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => {
-      if (elegido) meta.setAttribute("content", elegido);
-      else meta.setAttribute("content", (meta.getAttribute("media") || "").includes("dark") ? oscuro : claro);
+      meta.setAttribute("content", elegido);
     });
   }
 
   applyTheme();
 
-  // «Automático» va suelto arriba, y los demás repartidos en claros y oscuros: así el
-  // desplegable dice de un vistazo con qué luz se lleva cada uno, que es lo que se busca
-  // al abrirlo de noche o al sol.
   function themeOptions(elegido) {
     const opcion = key => `<option value="${key}"${key === elegido ? " selected" : ""}>${THEMES[key].label}</option>`;
-    const grupos = [...new Set(Object.values(THEMES).map(tema => tema.grupo).filter(Boolean))];
-    return Object.keys(THEMES).filter(key => !THEMES[key].grupo).map(opcion).join("") +
-      grupos.map(grupo => `<optgroup label="${grupo}">${Object.keys(THEMES).filter(key => THEMES[key].grupo === grupo).map(opcion).join("")}</optgroup>`).join("");
+    return Object.keys(THEMES).map(opcion).join("");
   }
 
   function panelHtml() {
