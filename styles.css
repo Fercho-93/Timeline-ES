@@ -70,7 +70,11 @@ button { touch-action: manipulation; color: inherit; }
   --camera-entry: min(23vw, 190px);
   --camera-tilt: -5deg;
   transform-origin: left center;
-  animation: camera-arrive 560ms cubic-bezier(.22,.61,.25,1) both;
+  /* Solo "backwards": el estado final del `to` no se queda pegado después de terminar
+     (ver el porqué junto a @keyframes camera-arrive). El propio elemento, sin la
+     animación ya activa, cae de vuelta a la base sin transform ni opacity propios, que
+     es visualmente idéntica al `to`, así que no hay parpadeo al soltarla. */
+  animation: camera-arrive 560ms cubic-bezier(.22,.61,.25,1) backwards;
 }
 .screen-return { --camera-entry: max(-23vw, -190px); --camera-tilt: 5deg; transform-origin: right center; }
 .screen-enter .topbar, .screen-enter > :not(.topbar) { animation: none; }
@@ -78,7 +82,7 @@ button { touch-action: manipulation; color: inherit; }
 @keyframes camera-arrive {
   from { opacity: .08; transform: perspective(1200px) translate3d(var(--camera-entry),0,-110px) rotateY(var(--camera-tilt)) scale(.94); }
   58% { opacity: 1; }
-  to { opacity: 1; transform: perspective(1200px) translate3d(0,0,0) rotateY(0) scale(1); }
+  to { opacity: 1; transform: none; }
 }
 .home-selection { display: flow-root; overflow: clip; }
 .section-enter > * { animation: section-in 240ms var(--ease-out) both; }

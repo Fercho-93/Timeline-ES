@@ -295,7 +295,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .camera-move-copy *, .camera-move-copy *::before, .camera-move-copy *::after { animation: none !important; transition: none !important; }
 @keyframes parchment-open {
   from { opacity: .2; clip-path: inset(0 0 95% 0 round 12px); transform: translateY(-8px); }
-  to { opacity: 1; clip-path: inset(0 0 0 0 round 12px); transform: translateY(0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0 round 12px); transform: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
   #app[data-screen="perfil"] .screen-enter > * { animation: none; }
