@@ -31,16 +31,17 @@ try {
    await transitionPage.locator('[data-block="historia"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
    const header=transitionPage.locator('.atlas-landscape');
-   const initialHeader=await header.boundingBox();
+   assert.equal(await transitionPage.locator('.camera-move').count(),1,'la vista anterior acompaña el giro de cámara');
    assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'sin portada voladora ni hoja superpuesta');
-   await transitionPage.waitForTimeout(300);
-   const finalHeader=await header.boundingBox();
-   assert.deepEqual(finalHeader,initialHeader,'el marco no cambia de posición ni tamaño durante la entrada');
+   await transitionPage.waitForTimeout(650);
+   assert.equal(await transitionPage.locator('.camera-move').count(),0,'la cámara se retira al terminar el giro');
    assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
    await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
    await transitionPage.locator('[data-action="collection-back"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
-   assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
+   assert.equal(await transitionPage.locator('.camera-move').count(),1,'reentrar vuelve a girar la cámara');
+   await transitionPage.waitForTimeout(650);
+   assert.equal(await transitionPage.locator('.camera-move, .deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
    await transitionPage.close();
 
    // La enciclopedia vive sobre una copia de la pantalla de origen. Al cerrarla se

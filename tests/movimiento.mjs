@@ -126,7 +126,7 @@ console.log("\nVolver al menú sin saltos de lectura");
   w.close();
 }
 
-console.log("\nEntrada editorial del mazo, sin portada voladora");
+console.log("\nEntrada del mazo con giro de cámara");
 for (const reduce of [false, true]) {
   const w = boot({reduce});
   w.scrollTo = () => {};
@@ -138,11 +138,14 @@ for (const reduce of [false, true]) {
   };
   click(w, '[data-mode="history"]');
   ok("la cabecera está disponible desde el primer momento", !!el(w, '.atlas-landscape img') && !el(w, '.atlas-landscape').classList.contains('cover-arriving'));
-  ok("no se crea un vuelo ni una hoja superpuesta", !w.document.querySelector('.deck-cover-flight, .book-turn') && animated.length === 0);
+  ok(reduce ? "movimiento reducido entra sin desplazar la cámara" : "la portada anterior sale como una cámara, sin vuelo de carta",
+    reduce
+      ? !w.document.querySelector('.camera-move, .deck-cover-flight, .book-turn') && animated.length === 0
+      : !!w.document.querySelector('.camera-move') && !w.document.querySelector('.deck-cover-flight, .book-turn') && animated.length === 1);
   ok("el foco llega al título sin esperar la transición", w.document.activeElement === el(w, 'h1'));
   click(w, '[data-action="collection-back"]');
   click(w, '[data-mode="history"]');
-  ok("se puede volver y entrar inmediatamente", el(w, '#app').dataset.screen === 'play-menu' && !w.document.querySelector('.deck-cover-flight'));
+  ok("se puede volver y entrar inmediatamente", el(w, '#app').dataset.screen === 'play-menu' && (reduce || !!w.document.querySelector('.camera-move')) && !w.document.querySelector('.deck-cover-flight'));
   await Promise.resolve();
   w.close();
 }
@@ -628,5 +631,5 @@ const css = read("styles.css");
 const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
 ok("el estilo reducido cubre navegación, cartas, diálogos y espera", [".selection-enter", ".placement-enter", ".dialog-exit", ".game-row.active", ".spinner", ".drag-ghost"].every(selector => reduced.includes(selector)));
 const edition = read("edition.css");
-ok("la nueva entrada es un fundido sin traslación ni escala", /@keyframes deck-menu-reveal \{ from \{ opacity: 0; \} to \{ opacity: 1; \} \}/.test(edition) && !edition.includes(".deck-cover-flight"));
+ok("la nueva entrada gira la cámara sin recuperar el vuelo de portada", css.includes("@keyframes camera-arrive") && edition.includes(".camera-move-frame") && !edition.includes(".deck-cover-flight"));
 console.log(`\n${checks} comprobaciones de movimiento correctas`);

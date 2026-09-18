@@ -277,22 +277,22 @@
     });
   }
 
-  // Conserva la página que sale: no es un panel nuevo que entra inclinado, sino
-  // la hoja anterior levantándose desde una esquina y descubriendo el destino debajo.
-  function turnPage(container, backwards) {
+  // Conserva la vista que sale y la desplaza como si una cámara girase hacia el
+  // siguiente escenario. El destino se pinta debajo y entra en sentido contrario.
+  function moveCamera(container, backwards) {
     window.CONTINUUM.Effects?.page?.(backwards);
     if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const layer = document.createElement("div");
-    layer.className = "book-turn";
+    layer.className = "camera-move";
     layer.setAttribute("aria-hidden", "true");
     layer.inert = true;
     const leaf = document.createElement("div");
-    leaf.className = "book-turn-leaf";
-    leaf.style.transformOrigin = backwards ? "right bottom" : "left top";
+    leaf.className = "camera-move-frame";
+    leaf.style.transformOrigin = backwards ? "left center" : "right center";
     const front = document.createElement("div");
-    front.className = "book-turn-front";
+    front.className = "camera-move-view";
     const copy = container.cloneNode(true);
-    // La hoja sale de #app: fijar el aspecto ANTES de repintar conserva también
+    // La copia sale de #app: fijar el aspecto ANTES de repintar conserva también
     // los tamaños de SVG, las imágenes y las reglas específicas de cada pantalla.
     const sources = [container, ...container.querySelectorAll('*')];
     const copies = [copy, ...copy.querySelectorAll('*')];
@@ -313,7 +313,7 @@
           const style = getComputedStyle(source, pseudo);
           if (!style.content || style.content === 'none' || style.content === 'normal') continue;
           target.dataset.pageNode = index;
-          rules.push(`.book-turn [data-page-node="${index}"]${pseudo}{${frozenStyle(style)}animation:none!important;transition:none!important;}`);
+          rules.push(`.camera-move [data-page-node="${index}"]${pseudo}{${frozenStyle(style)}animation:none!important;transition:none!important;}`);
         }
       }
       if (source instanceof HTMLImageElement) {
@@ -326,51 +326,27 @@
     decorations.textContent = rules.join('\n');
     layer.append(decorations);
     copy.removeAttribute("id");
-    copy.classList.add("book-turn-copy");
+    copy.classList.add("camera-move-copy");
     copy.style.transform = `translateY(${-window.scrollY}px)`;
     copy.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
     copy.querySelectorAll(".home-nav, .overlay").forEach(node => node.remove());
     front.append(copy);
-    const back = document.createElement("div");
-    back.className = "book-turn-back";
-    const sheet = document.createElement("div");
-    sheet.className = "book-turn-sheet";
-    sheet.append(front, back);
-    leaf.append(sheet);
+    leaf.append(front);
     layer.append(leaf);
     document.body.append(layer);
     sources.forEach((source, index) => {
       copies[index].scrollLeft = source.scrollLeft;
       copies[index].scrollTop = source.scrollTop;
     });
-    // El eje oblicuo levanta la esquina inferior derecha hacia la superior
-    // izquierda; al volver, el pivote y el signo invierten el recorrido.
-    const angle = backwards ? -1 : 1;
-    const timing = { duration: 1200, easing: "cubic-bezier(.32,.05,.18,1)", fill: "forwards" };
-    // La esquina se recoge y el papel se arquea antes de extenderse de nuevo.
-    // La deformación vive dentro del giro: no cambia ni el recorrido ni su duración.
-    const flex = sheet.animate([
-      { transform: "translateZ(0px) skew(0deg, 0deg)", offset: 0 },
-      { transform: `translateZ(45px) skew(${-angle * 5}deg, ${angle * 3}deg)`, offset: .42 },
-      { transform: `translateZ(22px) skew(${-angle * 2}deg, ${angle}deg)`, offset: .75 },
-      { transform: "translateZ(0px) skew(0deg, 0deg)", offset: 1 }
-    ], timing);
-    const curves = [front, back].map(face => face.animate([
-      { borderRadius: "0% 0% 0% 0%", offset: 0 },
-      { borderRadius: backwards ? "32% 4% 0% 4%" : "0% 4% 32% 4%", offset: .42 },
-      { borderRadius: backwards ? "16% 2% 0% 2%" : "0% 2% 16% 2%", offset: .75 },
-      { borderRadius: "0% 0% 0% 0%", offset: 1 }
-    ], timing));
-    [flex, ...curves].forEach(effect => effect.finished.catch(() => {}));
-    sheet.dataset.direction = backwards ? "back" : "forward";
+    const direction = backwards ? 1 : -1;
+    const timing = { duration: 560, easing: "cubic-bezier(.42,0,.18,1)", fill: "forwards" };
     const animation = leaf.animate([
-      { transform: "rotate3d(1, -1, 0, 0deg)", offset: 0 },
-      { transform: `rotate3d(1, -1, 0, ${angle * 32}deg)`, offset: .3 },
-      { transform: `rotate3d(1, -1, 0, ${angle * 105}deg)`, offset: .72 },
-      { transform: `rotate3d(1, -1, 0, ${angle * 178}deg)`, offset: 1 }
+      { opacity: 1, transform: "translate3d(0,0,0) rotateY(0deg) scale(1)", offset: 0 },
+      { opacity: .94, transform: `translate3d(${direction * 22}vw,0,-36px) rotateY(${direction * -3.5}deg) scale(.985)`, offset: .34 },
+      { opacity: .08, transform: `translate3d(${direction * 104}vw,0,-110px) rotateY(${direction * -8}deg) scale(.94)`, offset: 1 }
     ], timing);
     const cleanup = () => { layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
-    const cancel = () => { animation.cancel(); flex.cancel(); curves.forEach(curve => curve.cancel()); cleanup(); };
+    const cancel = () => { animation.cancel(); cleanup(); };
     cancelPageTurn = cancel;
     animation.finished.then(cleanup, cleanup);
   }
@@ -399,8 +375,8 @@
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
-    const enteringDeck = paint.screen === 'home' && screen === 'play-menu';
-    if ((preparationTurn && !enteringDeck) || firstReveal) turnPage(container, nextDepth !== undefined && nextDepth < previousDepth);
+    const backwards = nextDepth !== undefined && nextDepth < previousDepth;
+    if (preparationTurn || firstReveal) moveCamera(container, backwards);
     if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
     else if (changed && screen !== "pass") firstLocalReveal = false;
     container.dataset.screen = screen;
@@ -442,7 +418,7 @@
     // muchas veces y no debe convertir cada toque en una animación.
     if (!primero && cambioDePantalla && !closingEncyclopedia) {
       container.firstElementChild?.classList.add("screen-enter");
-      if (vuelve) container.firstElementChild?.classList.add("screen-return");
+      if (vuelve || backwards) container.firstElementChild?.classList.add("screen-return");
     }
     // Dentro de una partida no se anima el repintado entero: solo el elemento que acaba
     // de cambiar de estado. Así el movimiento explica la acción en lugar de decorar cada

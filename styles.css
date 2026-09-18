@@ -66,11 +66,19 @@ button, input, select { font: inherit; }
 button { touch-action: manipulation; color: inherit; }
 
 #app { min-height: 100dvh; overflow-x: clip; }
-.screen-enter .topbar { animation: chrome-in var(--motion-fast) ease-out both; }
-.screen-enter > :not(.topbar) { animation: content-in 280ms var(--ease-out) both; }
-.screen-return { --entry-x: -12px; }
-@keyframes chrome-in { from { opacity: .4; } }
-@keyframes content-in { from { opacity: 0; transform: translateX(var(--entry-x, 12px)); } }
+.screen-enter {
+  --camera-entry: min(23vw, 190px);
+  --camera-tilt: -5deg;
+  transform-origin: left center;
+  animation: camera-arrive 560ms cubic-bezier(.22,.61,.25,1) both;
+}
+.screen-return { --camera-entry: max(-23vw, -190px); --camera-tilt: 5deg; transform-origin: right center; }
+.screen-enter .topbar, .screen-enter > :not(.topbar) { animation: none; }
+@keyframes camera-arrive {
+  from { opacity: .08; transform: perspective(1200px) translate3d(var(--camera-entry),0,-110px) rotateY(var(--camera-tilt)) scale(.94); }
+  58% { opacity: 1; }
+  to { opacity: 1; transform: perspective(1200px) translate3d(0,0,0) rotateY(0) scale(1); }
+}
 .home-selection { display: flow-root; overflow: clip; }
 .section-enter > * { animation: section-in 240ms var(--ease-out) both; }
 @keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
@@ -1179,7 +1187,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   /* Los estados siguen siendo visibles por su texto y color, sin desplazamientos,
      zooms, rebotes ni giros; también se respeta la preferencia al recorrer el mapa. */
   .gallery-panel.active, .gallery-panel.active .panel-label, .gallery-panel.active .panel-art img,
-  .screen-enter .topbar, .screen-enter > :not(.topbar), .section-enter > *, .selection-enter, .placement-enter,
+  .screen-enter, .screen-enter .topbar, .screen-enter > :not(.topbar), .section-enter > *, .selection-enter, .placement-enter,
   .dialog-enter, .dialog-enter .modal, .dialog-enter .reveal, .dialog-enter .result-mark,
   .dialog-exit, .dialog-exit .modal, .drag-ghost, .game-row.active,
   .dialog-enter .guide-step, .dialog-enter .guide-card,
