@@ -52,13 +52,16 @@ try {
    await encyclopediaPage.locator('[data-action="home-encyclopedia"]').click();
    const encyclopediaModal=encyclopediaPage.locator('.enc-modal');
    const persistentBack=encyclopediaPage.locator('.enc-modal > .atlas-dialog-back');
+   const encyclopediaVeil=encyclopediaPage.locator('.enc-modal > .atlas-scroll-veil');
+   assert.equal(await encyclopediaVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la enciclopedia empieza sin veladura');
    const backAtTop=await persistentBack.boundingBox();
    await encyclopediaModal.evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.55);});
-   await encyclopediaPage.waitForTimeout(50);
+   await encyclopediaPage.waitForTimeout(220);
    const backHalfway=await persistentBack.boundingBox();
    assert.equal(await persistentBack.evaluate(button=>getComputedStyle(button).position),'sticky','la salida de la enciclopedia queda anclada');
    assert.ok(await persistentBack.isVisible(),'la salida sigue disponible a mitad del catálogo');
    assert.ok(Math.abs(backHalfway.y-backAtTop.y)<=1,'la salida no se desplaza con las cartas');
+   assert.equal(await encyclopediaVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','la enciclopedia difumina el contenido que sale por arriba');
    const backgroundImage=encyclopediaPage.locator('.enc-background img').first();
    await backgroundImage.waitFor();
    await backgroundImage.evaluate(async image=>{
@@ -121,14 +124,17 @@ try {
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
       await page.locator('[data-action="rules"]').click();
       const guideBack=page.locator('.rules .guide-tools > .atlas-dialog-back');
+      const guideVeil=page.locator('.rules > .atlas-scroll-veil');
+      assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la guía empieza sin veladura');
       const guideBackAtTop=await guideBack.boundingBox();
       await page.locator('.rules').evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.45);});
-      await page.waitForTimeout(50);
+      await page.waitForTimeout(220);
       const guideBackHalfway=await guideBack.boundingBox();
       const guideBackStyle=await guideBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
       assert.ok(Math.abs(guideBackHalfway.y-guideBackAtTop.y)<=1,'la flecha circular de la guía permanece flotante');
       assert.equal(guideBackStyle.radius,'50%','la guía comparte el botón circular de la enciclopedia');
       assert.notEqual(guideBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de la guía conserva su fondo de papel');
+      assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','la guía difumina el contenido que sale por arriba');
       await page.locator('[data-guide-place="1"]').click();
       assert.ok(await page.locator('.guide-practice.is-correct').count(),'la guía permite completar la primera colocación');
       await page.screenshot({path:`test-results/zoom/${engine}-guia-interactiva.png`,fullPage:true});
@@ -142,15 +148,18 @@ try {
       await page.locator('.guide-close').click();
       await page.locator('[data-settings-action="open"]').click();
       const settingsBack=page.locator('.settings-modal .settings-head > .atlas-dialog-back');
+      const settingsVeil=page.locator('.settings-modal > .atlas-scroll-veil');
+      assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','ajustes empieza sin veladura');
       const settingsBackAtTop=await settingsBack.boundingBox();
       await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.45);});
-      await page.waitForTimeout(50);
+      await page.waitForTimeout(220);
       const settingsBackHalfway=await settingsBack.boundingBox();
       const settingsBackStyle=await settingsBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
       assert.ok(Math.abs(settingsBackHalfway.y-settingsBackAtTop.y)<=1,'la flecha circular de ajustes permanece flotante');
       assert.ok(settingsBackAtTop.x < width/2,'la salida de ajustes queda a la izquierda');
       assert.equal(settingsBackStyle.radius,'50%','ajustes comparte el botón circular');
       assert.notEqual(settingsBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de ajustes conserva su fondo de papel');
+      assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','ajustes difumina el contenido que sale por arriba');
       await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=0;});
       await page.locator('#ajuste-tema').selectOption('night');
       await page.locator('#ajuste-texto').selectOption('150');
@@ -160,14 +169,17 @@ try {
       await page.locator('.settings-close').click();
       await page.locator('[data-action="perfil"]').click();
       const profileBack=page.locator('#app[data-screen="perfil"] .atlas-topbar > .atlas-back');
+      const profileVeil=page.locator('#app[data-screen="perfil"] .atlas-profile-veil');
+      assert.equal(await profileVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','el perfil empieza sin veladura');
       const profileBackAtTop=await profileBack.boundingBox();
       await page.evaluate(()=>scrollTo(0,Math.max(1,document.documentElement.scrollHeight*.45)));
-      await page.waitForTimeout(50);
+      await page.waitForTimeout(220);
       const profileBackHalfway=await profileBack.boundingBox();
       const profileBackStyle=await profileBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
       assert.ok(profileBackHalfway.y<=profileBackAtTop.y+1 && profileBackHalfway.y<=12,'la flecha circular del perfil permanece flotante');
       assert.equal(profileBackStyle.radius,'50%','perfil comparte el botón circular');
       assert.notEqual(profileBackStyle.background,'rgba(0, 0, 0, 0)','la flecha del perfil conserva su fondo de papel');
+      assert.equal(await profileVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','el perfil difumina el contenido que sale por arriba');
       await profileBack.click();
       await page.evaluate(()=>{
         for (const key of ['history','movies','animals','countries','languages']) {
