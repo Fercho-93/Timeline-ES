@@ -288,7 +288,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .camera-world i:nth-child(1) { width: 48vw; aspect-ratio: 1; left: -12vw; top: 8vh; }
 .camera-world i:nth-child(2) { width: 34vw; aspect-ratio: 1; left: 42vw; top: 22vh; }
 .camera-world i:nth-child(3) { width: 56vw; aspect-ratio: 1; right: -19vw; bottom: -18vh; }
-.camera-move-frame { position: absolute; inset: 0; display: flex; width: 200vw; transform-style: preserve-3d; will-change: transform; }
+.camera-move-frame { position: absolute; inset: 0; display: flex; width: 200vw; transform-style: preserve-3d; will-change: transform, filter; }
 .camera-move-view { position: relative; flex: 0 0 100vw; width: 100vw; height: 100dvh; overflow: hidden; background: var(--edition-paper); box-shadow: 0 0 72px #1c120b42; }
 .camera-move-view::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, #2b1b101e, transparent 13% 87%, #2b1b1028); }
 .camera-move .camera-fixed-nav { z-index: 2; pointer-events: none; }
