@@ -140,11 +140,13 @@ for (const reduce of [false, true]) {
     assert.equal(boton.textContent, 'Jugar');
     const sonido = w.document.getElementById('splash-ambience');
     assert.ok(sonido, 'la primera pantalla permite decidir la música');
-    assert.equal(sonido.getAttribute('role'), 'switch');
-    assert.equal(sonido.checked, true, 'el control refleja la configuración guardada');
-    assert.equal(w.document.querySelector(`label[for="${sonido.id}"] strong`).textContent, 'Música ambiente');
+    assert.equal(sonido.tagName, 'BUTTON', 'la elección es un botón sutil, no un bloque de opciones');
+    assert.equal(sonido.getAttribute('aria-pressed'), 'true', 'el control refleja la configuración guardada');
+    assert.equal(sonido.getAttribute('aria-label'), 'Desactivar música ambiente');
     sonido.click();
     assert.deepEqual(cambios, [false], 'la elección actualiza la misma configuración de audio');
+    assert.equal(sonido.getAttribute('aria-pressed'), 'false');
+    assert.equal(sonido.getAttribute('aria-label'), 'Activar música ambiente');
     advance(20000);
     assert.ok(active(), 'esperar a una persona no dispara el aviso de carga lenta');
     boton.click();

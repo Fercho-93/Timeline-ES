@@ -80,64 +80,38 @@ html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direc
   animation: splash-play-in 480ms 520ms ease-out both;
 }
 #app-splash .splash-sound {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  min-height: 58px;
-  padding: 10px 14px 10px 16px;
-  border: 1px solid var(--edition-brass, #876330);
+  position: fixed;
+  z-index: 2;
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
   border: 1px solid color-mix(in srgb, var(--edition-brass, #876330) 55%, transparent);
-  border-radius: 9px;
-  background: var(--edition-paper, #f3eee4);
-  background: color-mix(in srgb, var(--edition-paper, #f3eee4) 88%, transparent);
-  box-shadow: 0 8px 20px #3a2a1c1f;
-  cursor: pointer;
-}
-#app-splash .splash-sound-copy { display: grid; gap: 2px; }
-#app-splash .splash-sound strong {
-  color: var(--edition-ink, #302d27);
-  font: 700 .92rem/1.25 var(--ui-font, system-ui, sans-serif);
-}
-#app-splash .splash-sound small {
-  color: var(--edition-muted, #70695d);
-  font: .74rem/1.35 var(--ui-font, system-ui, sans-serif);
-}
-#app-splash .splash-sound input {
-  position: absolute;
-  width: 48px;
-  height: 28px;
-  margin: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-#app-splash .splash-switch {
-  flex: 0 0 auto;
-  width: 48px;
-  height: 28px;
-  border: 1px solid var(--edition-muted, #70695d);
-  border-radius: 999px;
-  background: #c9c4bb;
-  background: color-mix(in srgb, var(--edition-muted, #70695d) 22%, transparent);
-  transition: background-color 160ms ease, border-color 160ms ease;
-}
-#app-splash .splash-switch::before {
-  content: '';
-  display: block;
-  width: 20px;
-  height: 20px;
-  margin: 3px;
   border-radius: 50%;
-  background: var(--edition-paper, #f3eee4);
-  box-shadow: 0 1px 4px #0005;
-  transition: transform 160ms ease;
+  color: var(--edition-ink, #302d27);
+  background: color-mix(in srgb, var(--edition-paper, #f3eee4) 78%, transparent);
+  box-shadow: 0 5px 16px #3a2a1c1c;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease, transform 120ms ease;
 }
-#app-splash .splash-sound input:checked + .splash-switch {
+#app-splash .splash-sound svg { width: 23px; height: 23px; overflow: visible; }
+#app-splash .splash-sound path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#app-splash .splash-sound .sound-speaker { fill: currentColor; stroke: none; }
+#app-splash .splash-sound .sound-muted { display: none; }
+#app-splash .splash-sound[data-enabled="true"] {
   border-color: var(--atlas-selection, #9b452b);
-  background: var(--atlas-selection, #9b452b);
+  color: var(--atlas-selection, #9b452b);
+  background: color-mix(in srgb, var(--edition-paper, #f3eee4) 90%, transparent);
 }
-#app-splash .splash-sound input:checked + .splash-switch::before { transform: translateX(20px); }
-#app-splash .splash-sound input:focus-visible + .splash-switch { outline: 2px solid var(--edition-brass, #876330); outline-offset: 3px; }
+#app-splash .splash-sound[data-enabled="false"] .sound-waves { display: none; }
+#app-splash .splash-sound[data-enabled="false"] .sound-muted { display: block; }
+#app-splash .splash-sound:active { transform: scale(.94); }
+#app-splash .splash-sound:focus-visible { outline: 2px solid var(--edition-brass, #876330); outline-offset: 3px; }
 #app-splash .splash-play {
   width: 100%;
   min-height: 58px;

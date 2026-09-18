@@ -11,6 +11,7 @@
     el?.setAttribute('aria-hidden', 'true');
     el?.classList.remove('splash-ready', 'splash-exit', 'splash-gate', 'splash-entering');
     document.getElementById('splash-actions')?.remove();
+    document.getElementById('splash-ambience')?.remove();
     document.getElementById('splash-status')?.remove();
     startedAt = null;
   };
@@ -53,39 +54,39 @@
       actions.id = 'splash-actions';
       actions.className = 'splash-actions';
 
-      const sound = document.createElement('label');
+      const sound = document.createElement('button');
+      sound.type = 'button';
       sound.className = 'splash-sound';
-      sound.htmlFor = 'splash-ambience';
-      const copy = document.createElement('span');
-      copy.className = 'splash-sound-copy';
-      const title = document.createElement('strong');
-      title.textContent = 'Música ambiente';
-      const help = document.createElement('small');
-      help.id = 'splash-ambience-help';
-      help.textContent = 'Puedes cambiarla después en Ajustes.';
-      copy.append(title, help);
-      const toggle = document.createElement('input');
-      toggle.id = 'splash-ambience';
-      toggle.type = 'checkbox';
-      toggle.setAttribute('role', 'switch');
-      toggle.setAttribute('aria-describedby', help.id);
-      toggle.checked = window.CONTINUUM?.effectPrefs?.().ambience === true;
-      toggle.addEventListener('change', () => window.CONTINUUM?.setAmbience?.(toggle.checked));
-      const switchArt = document.createElement('span');
-      switchArt.className = 'splash-switch';
-      switchArt.setAttribute('aria-hidden', 'true');
-      sound.append(copy, toggle, switchArt);
+      sound.id = 'splash-ambience';
+      sound.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">
+        <path class="sound-speaker" d="M4 9v6h4l5 4V5L8 9H4Z"/>
+        <path class="sound-waves" d="M16 8.2a5 5 0 0 1 0 7.6M18.6 5.7a8.5 8.5 0 0 1 0 12.6"/>
+        <path class="sound-muted" d="m16.5 9 5 5m0-5-5 5"/>
+      </svg>`;
+      const reflectSound = enabled => {
+        sound.dataset.enabled = enabled ? 'true' : 'false';
+        sound.setAttribute('aria-pressed', String(enabled));
+        sound.setAttribute('aria-label', enabled ? 'Desactivar música ambiente' : 'Activar música ambiente');
+        sound.title = enabled ? 'Silenciar música' : 'Activar música';
+      };
+      reflectSound(window.CONTINUUM?.effectPrefs?.().ambience === true);
+      sound.addEventListener('click', () => {
+        const enabled = sound.dataset.enabled !== 'true';
+        window.CONTINUUM?.setAmbience?.(enabled);
+        reflectSound(enabled);
+      });
 
       button = document.createElement('button');
       button.id = 'splash-play';
       button.type = 'button';
       button.className = 'splash-play';
       button.textContent = 'Jugar';
-      actions.append(sound, button);
-      el.append(actions);
+      actions.append(button);
+      el.append(sound, actions);
     }
     button.addEventListener('click', () => {
       actions?.remove();
+      document.getElementById('splash-ambience')?.remove();
       el.classList.remove('splash-gate');
       resolve();
     }, { once: true });
