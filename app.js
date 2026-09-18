@@ -146,6 +146,10 @@
   let result = null;
   let pendingIndex = null;
   let pendingTournament = null;
+  // El minijuego de la carta para decidir quién empieza: null hasta que se saca, y se
+  // invalida en cuanto cambia el número de jugadores porque ya no habría una carta por
+  // persona.
+  let starterDraw = null;
   let competitionConfig = {rounds: CT.Tournament.modes().length, cards:5};
   const MULTI_COMP_KEY = 'continuum-multi-competition-v1';
   // Estado de la enciclopedia: qué mazo se consulta, la búsqueda y el filtro de banda en
@@ -602,14 +606,15 @@
 
   function setup() {
     screen = "setup";
+    starterDraw = null;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y marca a la más joven: tendrá el primer turno.</p>
+      <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza sacando una carta.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
           <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
           <section id="recent-players" class="recent-players" aria-label="Participantes recientes" hidden></section>
           <div class="setup-grid">
-            <div class="field"><label for="starter">La persona más joven</label><select id="starter"><option value="0">Jugador 1</option><option value="1">Jugador 2</option></select></div>
+            <div class="field starter-field">${starterFieldMarkup()}</div>
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
           </div>
           <div class="field"><label for="local-preset">Tipo de partida</label><select id="local-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div>
@@ -622,13 +627,50 @@
     renderRecentPlayers();
   }
 
+  // El campo que decide quién empieza: mientras no se ha sacado carta, un botón que
+  // lanza el minijuego; en cuanto hay un resultado, quién ganó y la opción de repetirlo.
+  function starterFieldMarkup() {
+    const names = playerNames();
+    if (!starterDraw || starterDraw.names.length !== names.length) {
+      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-secondary btn-block" data-action="draw-starter">🂠 Sacar una carta</button>`;
+    }
+    const ganador = escapeHtml(names[starterDraw.winner] || `Jugador ${starterDraw.winner + 1}`);
+    return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${ganador}</strong> saca la carta más antigua y empieza.</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el sorteo</button>`;
+  }
+
+  function playerNames() {
+    return [...document.querySelectorAll("#players input")].map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
+  }
+
+  // El sorteo en sí, sin nada de pantalla: cada persona saca una carta distinta del mazo
+  // elegido y gana quien la saque con la fecha más antigua, el mismo criterio de "el más
+  // pequeño" que antes se elegía a mano. Esas cartas se recuerdan para apartarlas del
+  // mazo antes de repartir, así nadie vuelve a encontrárselas en la partida.
+  function computeStarterDraw(names) {
+    const pool = shuffle(currentMode().cards.map(card => card.id));
+    const drawnIds = pool.slice(0, names.length);
+    const entries = drawnIds.map((id, i) => ({ player: i, id, value: CT.sortValue(selectedModeKey, cardsById.get(id) || currentMode().cards.find(c => c.id === id)) }));
+    const minValue = Math.min(...entries.map(e => e.value));
+    const winner = entries.find(e => e.value === minValue).player;
+    return { names, entries, winner, drawnIds };
+  }
+
+  // El minijuego tal cual lo ve quien juega: saca las cartas y enseña el resultado. Si se
+  // pasa directamente a "Barajar y empezar" sin pulsar este botón, `startGame` hace el
+  // mismo sorteo por su cuenta sin pantalla de por medio.
+  function drawStarterCards() {
+    starterDraw = computeStarterDraw(playerNames());
+    document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
+    const { names, entries, winner } = starterDraw;
+    announce(`${names[winner]} ha sacado la carta más antigua y empieza la partida.`);
+    overlay(`<div class="overlay"><div class="modal"><h2>¿Quién empieza?</h2><ul class="starter-draw-list">${entries.map(e => `<li${e.player === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(names[e.player])}</span><span>${escapeHtml(CT.shortValue(selectedModeKey, cardsById.get(e.id)))}</span></li>`).join("")}</ul><p>${escapeHtml(names[winner])} saca la carta más antigua y empieza.</p><div class="actions"><button class="btn btn-primary btn-block" data-action="close-menu">Aceptar</button></div></div></div>`, true);
+  }
+
   function syncStarterOptions() {
     const inputs = [...document.querySelectorAll("#players input")];
-    const select = document.getElementById("starter");
-    const selected = Math.min(Number(select.value), inputs.length - 1);
-    select.innerHTML = inputs.map((input, i) => `<option value="${i}">${escapeHtml(input.value.trim() || `Jugador ${i + 1}`)}</option>`).join("");
-    select.value = selected;
     inputs.forEach((input, i) => input.setAttribute("aria-label", `Nombre del jugador ${i + 1}`));
+    const field = document.querySelector(".starter-field");
+    if (field) field.innerHTML = starterFieldMarkup();
   }
 
   function renderRecentPlayers() {
@@ -658,17 +700,23 @@
     if (inputs.length < 2) return showToast("Se necesitan al menos 2 jugadores");
     const names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
     CT.RecentPlayers?.remember(names);
+    // Si nadie ha pulsado el botón del sorteo, se hace igualmente y sin pantalla: la
+    // partida siempre reparte a partir de un sorteo, se haya visto o no.
+    if (!starterDraw || starterDraw.names.length !== names.length) starterDraw = computeStarterDraw(names);
     const requestedHand = Number(document.getElementById("hand-size").value);
     const handSize = Math.min(requestedHand, Math.floor((currentMode().cards.length - 1) / names.length));
     if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
-    const starter = Number(document.getElementById("starter").value);
+    const starter = starterDraw.winner;
+    const drawnIds = starterDraw.drawnIds;
     const ghost = !!document.getElementById("ghost-toggle")?.checked;
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
     if (pendingTournament) {
       const t=CT.Tournament.create(pendingTournament.rounds,requestedHand);pendingTournament=null;
       startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse);return;
     }
-    const shuffled = shuffle(currentMode().cards.map(card => card.id));
+    // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
+    // del mazo para que nadie vuelva a encontrárselas en la partida.
+    const shuffled = shuffle(currentMode().cards.map(card => card.id).filter(id => !drawnIds.includes(id)));
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
@@ -1529,6 +1577,16 @@
     return date.toLocaleDateString("sv-SE");
   }
 
+  // El día anterior a una fecha dada (formato sv-SE, AAAA-MM-DD), para calcular la racha
+  // del reto diario contra el día en que se empezó a jugar y no contra el de hoy: un reto
+  // empezado antes de medianoche y acabado después sigue contando como el día en que
+  // empezó.
+  function previousDay(dateKey) {
+    const date = new Date(`${dateKey}T00:00:00`);
+    date.setDate(date.getDate() - 1);
+    return date.toLocaleDateString("sv-SE");
+  }
+
   function readRecords() {
     try { return JSON.parse(CT.Storage.getItem(RECORDS_KEY)) || {}; } catch { return {}; }
   }
@@ -1970,7 +2028,10 @@
     // para el perfil; aquí solo se copia dentro del récord del mazo para que un futuro
     // marcador entre amigos no tenga que cruzar dos claves de almacenamiento.
     records.playerId = records.playerId || CT.Progreso.playerId();
-    const dia = today();
+    // El reto diario convalida por el día en que se empezó a jugar, no por el día en que
+    // se termina: uno empezado a las 23:58 y acabado pasada la medianoche sigue siendo el
+    // reto de la fecha en que se empezó.
+    const dia = solo.day || today();
     const esReto = solo.kind === "daily" && !(records.days && records.days[dia]);
     if (esReto) {
       records.days = records.days || {};
@@ -1978,7 +2039,7 @@
       // marcador entre amigos del reto diario si algún día existe, guardado desde ya
       // para no depender de reconstruirlo a partir de partidas viejas que no lo llevan.
       records.days[dia] = { hits: solo.hits, total, sequence: solo.sequence || [], finishedAt: new Date().toISOString() };
-      records.streak = records.lastDay === yesterday() ? (records.streak || 0) + 1 : 1;
+      records.streak = records.lastDay === previousDay(dia) ? (records.streak || 0) + 1 : 1;
       records.lastDay = dia;
       // No hace falta guardar el histórico entero: basta con los últimos días.
       const dias = Object.keys(records.days).sort().slice(-60);
@@ -2805,11 +2866,28 @@
     backMenu();
   }
   function soloOptions() {
+    // La competición tiene su propio guardado y su propia forma de salir (abandonarla
+    // borra el progreso de todas las rondas, no solo del intento actual), así que el
+    // botón de salir sin guardar solo aparece fuera de ella.
+    const puedeSalirSinGuardar = solo && solo.kind !== "comp";
     overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid">
       <button class="btn btn-primary" data-action="close-menu">Seguir jugando</button>
       <button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}
       <button class="btn btn-secondary" data-action="solo-menu">Guardar y salir</button>
+      ${puedeSalirSinGuardar ? '<button class="btn btn-ghost" data-action="abandon-solo">Salir sin guardar</button>' : ''}
     </div></div></div>`, true);
+  }
+
+  // Salir sin guardar: se descarta el intento entero, no cuenta para las estadísticas ni
+  // para la racha del reto diario, y no deja nada a medias para continuar después.
+  function abandonSolo() {
+    solo = null;
+    saveSolo();
+    soloFailedForReview = [];
+    result = null;
+    pendingIndex = null;
+    selectedCardId = null;
+    soloHome();
   }
   function gameMenu() {
     overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`, true);
@@ -3000,6 +3078,9 @@
     } else if (action === "remove-player") {
       if (document.querySelectorAll("#players .player-row").length <= 2) return showToast("Se necesitan al menos 2 jugadores");
       target.closest(".player-row").remove(); syncStarterOptions(); renderRecentPlayers();
+    } else if (action === "draw-starter") {
+      if (document.querySelectorAll("#players input").length < 2) return showToast("Se necesitan al menos 2 jugadores");
+      drawStarterCards();
     } else if (action === "start") startGame();
     else if (action === "ready") { if (game.pulseGift && game.pulseGift.to === currentPlayer().id) { game.pulseGift = null; saveGame(); } if (game.pendingResult) { result = game.pendingResult; renderResult(); } else gameView(); }
     else if (action === "ghost-use") useGhost();
@@ -3043,6 +3124,7 @@
     else if (action === "game-menu") gameMenu();
     else if (action === "close-menu") CT.closeDialog();
     else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual. Esta acción no se puede deshacer.', () => { game = null; saveGame(); home(); }, '¿Abandonar partida?', 'Abandonar');
+    else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará en las estadísticas ni en la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "pulse-open") pulseTargetMenu();
     else if (action === "pulse-defend") { game.pulseTurn.stage = PULSE_DEFENSA; pendingIndex = null; saveGame(); gameView(); }
     else if (action === "pulse-target") { CT.closeDialog(); startPulse(Number(target.dataset.target)); }
