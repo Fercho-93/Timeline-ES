@@ -50,6 +50,15 @@ try {
    await encyclopediaPage.goto(url);
    await encyclopediaPage.evaluate(()=>scrollTo(0,Math.min(760,document.documentElement.scrollHeight-innerHeight)));
    await encyclopediaPage.locator('[data-action="home-encyclopedia"]').click();
+   const encyclopediaModal=encyclopediaPage.locator('.enc-modal');
+   const persistentBack=encyclopediaPage.locator('.enc-modal > .atlas-dialog-back');
+   const backAtTop=await persistentBack.boundingBox();
+   await encyclopediaModal.evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.55);});
+   await encyclopediaPage.waitForTimeout(50);
+   const backHalfway=await persistentBack.boundingBox();
+   assert.equal(await persistentBack.evaluate(button=>getComputedStyle(button).position),'sticky','la salida de la enciclopedia queda anclada');
+   assert.ok(await persistentBack.isVisible(),'la salida sigue disponible a mitad del catálogo');
+   assert.ok(Math.abs(backHalfway.y-backAtTop.y)<=1,'la salida no se desplaza con las cartas');
    const backgroundImage=encyclopediaPage.locator('.enc-background img').first();
    await backgroundImage.waitFor();
    await backgroundImage.evaluate(async image=>{
