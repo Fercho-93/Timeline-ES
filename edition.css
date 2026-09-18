@@ -1324,12 +1324,23 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   margin-bottom: -88px;
   pointer-events: none;
   opacity: 0;
-  background: linear-gradient(to bottom,var(--atlas-veil-paper,var(--modal-fondo)) 0 18%,transparent 100%);
+  background: linear-gradient(to bottom,var(--atlas-veil-paper,var(--edition-surface)) 0 18%,transparent 100%);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   -webkit-mask-image: linear-gradient(to bottom,#000 0 32%,transparent 100%);
   mask-image: linear-gradient(to bottom,#000 0 32%,transparent 100%);
   transition: opacity 180ms ease-out;
+}
+#app :is(.enc-modal,.rules,.settings-modal) > .atlas-scroll-veil {
+  top: -26px;
+  box-sizing: border-box;
+  width: calc(100% + 52px);
+  height: 114px;
+  margin-bottom: -114px;
+  margin-inline: -26px;
+  border-radius: 11px 11px 0 0;
+  --atlas-veil-paper: var(--edition-surface);
+  background: linear-gradient(to bottom,var(--atlas-veil-paper) 0 35%,transparent 100%);
 }
 #app .enc-modal > .atlas-scroll-veil { --atlas-veil-paper: var(--edition-paper); }
 #app[data-screen="perfil"] .atlas-profile-veil {
@@ -1342,6 +1353,15 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 .atlas-scroll-veil.is-visible { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .atlas-scroll-veil { transition: none; }
+}
+@media (max-width: 480px) {
+  #app .settings-modal > .atlas-scroll-veil {
+    top: -16px;
+    width: calc(100% + 32px);
+    height: 104px;
+    margin-bottom: -104px;
+    margin-inline: -16px;
+  }
 }
 #app .enc-toolbar-compact { gap: 10px; padding: 12px; margin: 12px 0 18px; border-radius: 14px; }
 #app .enc-primary-filters { display: grid; grid-template-columns: minmax(180px,.8fr) minmax(220px,1.2fr); gap: 10px; }

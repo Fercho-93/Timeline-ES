@@ -54,6 +54,7 @@ try {
    const persistentBack=encyclopediaPage.locator('.enc-modal > .atlas-dialog-back');
    const encyclopediaVeil=encyclopediaPage.locator('.enc-modal > .atlas-scroll-veil');
    assert.equal(await encyclopediaVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la enciclopedia empieza sin veladura');
+   assert.ok(await encyclopediaVeil.evaluate(veil=>Math.abs(veil.getBoundingClientRect().width-veil.parentElement.clientWidth)<=2),'la veladura de la enciclopedia llega a los bordes sin dibujar un rectángulo interior');
    const backAtTop=await persistentBack.boundingBox();
    await encyclopediaModal.evaluate(modal=>{
      modal.scrollTop=Math.max(1,modal.scrollHeight*.55);
@@ -65,6 +66,7 @@ try {
    assert.ok(await persistentBack.isVisible(),'la salida sigue disponible a mitad del catálogo');
    assert.ok(Math.abs(backHalfway.y-backAtTop.y)<=1,'la salida no se desplaza con las cartas');
    assert.equal(await encyclopediaVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','la enciclopedia difumina el contenido que sale por arriba');
+   assert.ok(await encyclopediaVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de la enciclopedia cubre también el relleno superior');
    const backgroundImage=encyclopediaPage.locator('.enc-background img').first();
    await backgroundImage.waitFor();
    await backgroundImage.evaluate(async image=>{
@@ -129,6 +131,7 @@ try {
       const guideBack=page.locator('.rules .guide-tools > .atlas-dialog-back');
       const guideVeil=page.locator('.rules > .atlas-scroll-veil');
       assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la guía empieza sin veladura');
+      assert.ok(await guideVeil.evaluate(veil=>Math.abs(veil.getBoundingClientRect().width-veil.parentElement.clientWidth)<=2),'la veladura de la guía llega a los bordes sin dibujar un rectángulo interior');
       const guideBackAtTop=await guideBack.boundingBox();
       await page.locator('.rules').evaluate(modal=>{
         modal.scrollTop=Math.max(1,modal.scrollHeight*.45);
@@ -141,6 +144,7 @@ try {
       assert.equal(guideBackStyle.radius,'50%','la guía comparte el botón circular de la enciclopedia');
       assert.notEqual(guideBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de la guía conserva su fondo de papel');
       assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','la guía difumina el contenido que sale por arriba');
+      assert.ok(await guideVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de la guía cubre también el relleno superior');
       await page.locator('[data-guide-place="1"]').click();
       assert.ok(await page.locator('.guide-practice.is-correct').count(),'la guía permite completar la primera colocación');
       await page.screenshot({path:`test-results/zoom/${engine}-guia-interactiva.png`,fullPage:true});
@@ -156,6 +160,7 @@ try {
       const settingsBack=page.locator('.settings-modal .settings-head > .atlas-dialog-back');
       const settingsVeil=page.locator('.settings-modal > .atlas-scroll-veil');
       assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','ajustes empieza sin veladura');
+      assert.ok(await settingsVeil.evaluate(veil=>Math.abs(veil.getBoundingClientRect().width-veil.parentElement.clientWidth)<=2),'la veladura de ajustes llega a los bordes sin dibujar un rectángulo interior');
       const settingsBackAtTop=await settingsBack.boundingBox();
       await page.locator('.settings-modal').evaluate(modal=>{
         modal.scrollTop=Math.max(1,modal.scrollHeight*.45);
@@ -169,6 +174,7 @@ try {
       assert.equal(settingsBackStyle.radius,'50%','ajustes comparte el botón circular');
       assert.notEqual(settingsBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de ajustes conserva su fondo de papel');
       assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','ajustes difumina el contenido que sale por arriba');
+      assert.ok(await settingsVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de ajustes cubre también el relleno superior');
       await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=0;});
       await page.locator('#ajuste-tema').selectOption('night');
       await page.locator('#ajuste-texto').selectOption('150');
