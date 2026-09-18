@@ -47,7 +47,7 @@
     const app = document.getElementById('app');
     if (app.querySelector('[data-exit-dialog]')) return;
     const layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.exitDialog = '';
-    layer.innerHTML = `<div class="modal"><h2>${CT.escapeHtml(title)}</h2><p>${CT.escapeHtml(message)}</p><div class="actions"><button class="btn btn-primary" data-exit-stay>Seguir jugando</button><button class="btn btn-secondary" data-exit-confirm>${CT.escapeHtml(label)}</button>${discard ? `<button class="btn btn-ghost" data-exit-discard>${CT.escapeHtml(discard.label)}</button>` : ''}</div></div>`;
+    layer.innerHTML = `<div class="modal"><h2>${CT.escapeHtml(title)}</h2><p>${CT.escapeHtml(message)}</p><div class="actions exit-actions"><button class="btn btn-primary btn-block" data-exit-stay>Seguir jugando</button><button class="btn btn-secondary btn-block" data-exit-confirm>${CT.escapeHtml(label)}</button>${discard ? `<button class="btn btn-ghost btn-block exit-discard" data-exit-discard>${CT.escapeHtml(discard.label)}</button>` : ''}</div></div>`;
     layer.querySelector('[data-exit-stay]').addEventListener('click', () => CT.closeDialog());
     layer.querySelector('[data-exit-confirm]').addEventListener('click', () => { CT.closeDialog(); proceed(); });
     layer.querySelector('[data-exit-discard]')?.addEventListener('click', () => { CT.closeDialog(); discard.proceed(); });

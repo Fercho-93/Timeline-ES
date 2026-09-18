@@ -248,17 +248,54 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .btn-ghost { color: var(--accent); background: transparent; }
 .btn-block { width: 100%; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+/* Apiladas de mayor a menor prioridad: seguir jugando (lo más probable), guardar y
+   salir, y, aparte, la salida sin guardar. Un margen y una línea propios la distinguen
+   del resto en vez de dejarla flotando como un tercer botón cualquiera. */
+.exit-actions { flex-direction: column; }
+.exit-discard { margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-weight: 600; }
 
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--shadow-soft); }
 .setup-section { max-width: 760px; margin: 28px auto 0; }
+/* Agrupa el formulario en tramos con su propio rótulo (Jugadores, Cómo empezar, Modo de
+   juego) en vez de una única lista plana: se lee de un vistazo qué pertenece a qué,
+   sin añadir líneas divisorias que compitan con las que ya separan cada extra. */
+.setup-block + .setup-block { margin-top: 26px; }
+.setup-block-head { margin-bottom: 12px; }
 .setup-grid { display: grid; gap: 16px; }
 .field { display: grid; gap: 7px; }
 .field label, .field .field-label { font-size: .85rem; font-weight: 700; color: var(--muted); }
 
-.starter-result { margin: 0; font-size: .9rem; }
+/* La invitación a jugar el minijuego tiene su propio peso: un botón con icono, texto y
+   una llamada a la acción, no un botón secundario cualquiera perdido entre selects. */
+.starter-draw-cta { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 16px; text-align: left; border: 1px dashed var(--accent); border-radius: 12px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--surface)), var(--surface)); color: var(--ink); }
+/* `.btn span` (más específico por combinar clase y etiqueta) pondría cada uno de estos
+   tres tramos en línea con un margen fijo; aquí se anula para que el icono, el texto y
+   la flecha sigan el `flex`/`gap` del propio botón, no el de un botón genérico. */
+.starter-draw-cta .starter-draw-icon, .starter-draw-cta .starter-draw-copy, .starter-draw-cta .starter-draw-arrow { margin-left: 0; }
+.starter-draw-icon { font-size: 1.5rem; line-height: 1; }
+.starter-draw-copy { display: flex; flex-direction: column; gap: 2px; }
+.starter-draw-copy b { font-size: .96rem; }
+.starter-draw-copy small { display: block; font-weight: 500; color: var(--muted); font-size: .76rem; line-height: 1.3; }
+.starter-draw-cta .starter-draw-arrow { margin-left: auto; flex: none; color: var(--accent); font-size: 1.15rem; }
+@media (hover: hover) and (pointer: fine) { .starter-draw-cta:hover { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, var(--surface)), var(--surface)); } }
+
+.starter-result { margin: 0; display: flex; align-items: center; gap: 8px; font-size: .9rem; }
+.starter-result-crown { flex: none; color: var(--accent); }
+/* El resultado del minijuego es el momento con más chispa de toda la preparación: quien
+   gana, empieza. Merece un cartel propio con corona y un brillo que lo recorra una vez,
+   no otra línea de texto igual que las demás. */
+.starter-winner-banner { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 2px 0 16px; padding: 18px 16px 16px; border-radius: 14px; border: 1px solid var(--line); background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%), var(--paper); position: relative; overflow: hidden; }
+.starter-winner-banner::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 40%, color-mix(in srgb, var(--accent) 40%, transparent) 50%, transparent 60%); background-size: 250% 100%; background-position: 120% 0; animation: starter-shine 1100ms ease-out 200ms both; }
+.starter-winner-crown { color: var(--accent); animation: starter-crown-pop 640ms cubic-bezier(.34,1.56,.64,1) both; }
+.starter-winner-banner b { font-family: var(--font-display); font-size: 1.25rem; margin-top: 2px; animation: starter-name-in 520ms ease-out 120ms both; }
+.starter-winner-banner span { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 700; }
+@keyframes starter-crown-pop { from { transform: scale(.3) rotate(-12deg); opacity: 0; } 65% { transform: scale(1.12) rotate(4deg); opacity: 1; } to { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes starter-name-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes starter-shine { from { background-position: 120% 0; } to { background-position: -20% 0; } }
 .starter-draw-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 6px; }
 .starter-draw-list li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 10px; background: var(--paper); font-size: .9rem; }
-.starter-draw-list li.starter-draw-winner { background: var(--accent-soft); font-weight: 700; }
+.starter-draw-list li.starter-draw-winner { background: var(--accent-soft); font-weight: 700; animation: starter-row-pop 420ms ease-out both; }
+@keyframes starter-row-pop { from { transform: scale(.94); } to { transform: scale(1); } }
 
 /* Elegir entre dos maneras de jugar lo mismo. Un `<select>` escondía que había una
    elección que hacer: se veía la opción puesta y no la otra. Con las dos a la vista y la
@@ -291,7 +328,8 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
   padding-right: 38px;
 }
 .player-row { display: grid; grid-template-columns: 1fr auto; gap: 9px; margin-bottom: 9px; }
-.remove { width: 48px; min-height: 44px; border: 0; border-radius: 10px; background: var(--paper); color: var(--accent); font-weight: 700; cursor: pointer; }
+.remove { width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.05rem; font-weight: 600; line-height: 1; cursor: pointer; transition: background var(--motion-fast) ease, color var(--motion-fast) ease, border-color var(--motion-fast) ease; }
+@media (hover: hover) and (pointer: fine) { .remove:hover { background: var(--paper); color: var(--accent); border-color: var(--accent); } }
 .recent-players { margin: 16px 0 18px; padding: 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
 .recent-players-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .recent-players-head strong { font-size: .82rem; }
@@ -1199,7 +1237,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .dialog-enter .guide-step, .dialog-enter .guide-card,
   .gd-play, .gd-flip, .gd-slot, .gd-mark,
   .spinner, .waiting-orbit, .waiting-inline i, .turn-timer-low,
-  .comp-splash { animation: none !important; }
+  .comp-splash, .starter-winner-banner::after, .starter-winner-crown, .starter-winner-banner b,
+  .starter-draw-list li.starter-draw-winner { animation: none !important; }
   /* Sin el bucle, la demostración se queda en un solo fotograma: la carta por jugar,
      con su valor tapado, ya sobre el hueco al que va. Se recorta a la altura de la línea
      porque la banda de abajo solo existía para verla subir. */
