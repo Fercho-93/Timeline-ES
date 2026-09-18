@@ -42,11 +42,15 @@ try {
    // cambiar de tamaño ni de contenido después — eso es lo que antes se veía como una
    // pantalla que se abre y se cierra sola.
    assert.equal(await transitionPage.locator('.camera-move, .deck-cover-flight').count(),0,'solitario no enseña una vista provisional');
+   // La vuelta de página (`screen-enter`, 560ms) sigue animando el encuadre un instante
+   // tras el click: se espera a que asiente antes de tomar la referencia, para comprobar
+   // solo lo que sí debe permanecer estable después: el plegado no depende de esa entrada.
+   await transitionPage.waitForTimeout(600);
    const soloBefore=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
    assert.ok(soloBefore.text.includes('Reto diario') && soloBefore.text.includes('Partida libre'),'los paneles de solitario llegan ya plegados');
    await transitionPage.waitForTimeout(400);
    const soloAfter=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
-   assert.deepEqual(soloAfter,soloBefore,'la pantalla de solitario no cambia de contenido ni de tamaño después de entrar');
+   assert.deepEqual(soloAfter,soloBefore,'la pantalla de solitario no cambia de contenido ni de tamaño una vez asentada la entrada');
    await transitionPage.locator('[data-action="back-menu"]').click();
    await transitionPage.locator('[data-action="collection-back"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
