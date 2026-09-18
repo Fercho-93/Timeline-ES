@@ -85,7 +85,7 @@ Para cada sesión registrar solo versión, dispositivo, modo y duración.
 - [x] Derechos/procedencia del arte documentados.
 - [ ] 17 cartas de Naturaleza revisadas o retiradas de la beta.
 - [ ] Política de privacidad final.
-- [ ] Responsable y correo de soporte.
+- [ ] Responsable y correo de soporte. Correo puesto (feedbackcontinuum@gmail.com) y responsable declarado como persona física; falta el nombre, los apellidos y la dirección postal.
 - [ ] Data Safety completado.
 - [ ] Clasificación de edad completada.
 - [ ] Capturas reales de la app.

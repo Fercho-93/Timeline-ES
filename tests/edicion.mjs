@@ -30,6 +30,10 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 {
   const w = boot();
   try {
+    // El ambiente de cada colección se prueba con todo el catálogo a mano: aquí se mira
+    // qué se ve al jugar, y un mazo cerrado no se juega. Que la puerta cerrada esté bien
+    // puesta es cosa de `cartera.mjs`.
+    w.CONTINUUM.Cartera.concede({ origen: 'prueba' });
     for (const block of Object.values(w.CONTINUUM.BLOCKS)) {
       click(w, `[data-block="${block.key}"]`);
       click(w, `[data-mode="${block.games[0]}"]`);

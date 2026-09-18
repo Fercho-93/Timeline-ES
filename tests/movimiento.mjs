@@ -65,7 +65,10 @@ console.log("\nGalería continua y navegación repetida");
       for (const mode of block.games) {
         click(w, `[data-mode="${mode}"]`);
         assert.equal(el(w, "h1").textContent, w.CONTINUUM.mode(mode).name);
-        click(w, '[data-action="collection-back"]');
+        // Un mazo que no es suyo enseña la puerta cerrada en vez del menú de formatos:
+        // lleva el mismo título y tiene su propia salida. Que esté bien contada se
+        // comprueba en `cartera.mjs`; aquí solo importa que se vuelva de ella igual.
+        click(w, w.CONTINUUM.Cartera.tiene(mode) ? '[data-action="collection-back"]' : '[data-action="back-menu"]');
         assert.equal(el(w, ".gallery-panel.active").dataset.block, block.key);
       }
     }

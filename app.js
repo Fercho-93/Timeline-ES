@@ -75,7 +75,10 @@
   function restoreView() {
     let view;
     try { view = JSON.parse(sessionStorage.getItem(VIEW_STORAGE_KEY)); } catch { return false; }
-    if (!view || !CT.has(view.mode)) return false;
+    // Una vista guardada de un mazo que ya no es suyo no se recupera: se empieza en la
+    // portada. Pintar la puerta cerrada aquí no valdría, porque la ruta guardada pintaría
+    // encima justo después.
+    if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
     const routes = {'home': home, 'play-menu': playMenu, 'solo-home': soloHome,
       'competition-menu': competitionMenu, 'perfil': perfilView};
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
@@ -124,6 +127,11 @@
   }
   let selectedModeKey = CT.Storage.getItem(MODE_STORAGE_KEY) || CT.DEFAULT_MODE;
   if (!CT.has(selectedModeKey)) selectedModeKey = CT.DEFAULT_MODE;
+  // Y si el que quedó elegido la última vez ya no es suyo, se vuelve al de siempre. Lo
+  // que hay guardado aquí es un recuerdo de la última partida, no un derecho: sin esta
+  // línea, cerrar un mazo dejaría al juego entero apuntando a él sin pasar por `setMode`,
+  // que es donde se pregunta a la cartera.
+  if (!CT.Cartera.tiene(selectedModeKey)) selectedModeKey = CT.DEFAULT_MODE;
   // El bloque en pantalla se deduce siempre del juego elegido, así que no se guarda aparte.
   let selectedBlockKey = CT.blockOf(selectedModeKey).key;
   let cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
@@ -1168,11 +1176,17 @@
 
   // El desplegable de mazos agrupado por bloque, igual que la portada los agrupa en la
   // galería: así la enciclopedia no inventa un segundo orden de los quince juegos.
+  // Un mazo que no es suyo no se ofrece: elegirlo acabaría en «Todas las cartas» sin
+  // decir por qué. Y un bloque que se queda sin mazos ofrecibles no pinta su grupo vacío.
   function encModeOptions(modeKey) {
-    return `<option value="all"${modeKey === "all" ? " selected" : ""}>Todas las cartas</option>` + Object.values(CT.BLOCKS).map(item => `<optgroup label="${escapeHtml(item.name)}">${item.games.map(key => {
-      const mode = CT.mode(key);
-      return `<option value="${key}"${key === modeKey ? " selected" : ""}>${escapeHtml(mode.name)} (${mode.cards.length})</option>`;
-    }).join("")}</optgroup>`).join("");
+    return `<option value="all"${modeKey === "all" ? " selected" : ""}>Todas las cartas</option>` + Object.values(CT.BLOCKS).map(item => {
+      const games = item.games.filter(key => CT.Cartera.tiene(key));
+      if (!games.length) return "";
+      return `<optgroup label="${escapeHtml(item.name)}">${games.map(key => {
+        const mode = CT.mode(key);
+        return `<option value="${key}"${key === modeKey ? " selected" : ""}>${escapeHtml(mode.name)} (${mode.cards.length})</option>`;
+      }).join("")}</optgroup>`;
+    }).join("");
   }
 
   function encCountText(modeKey, count) {
@@ -1575,9 +1589,9 @@
   // dura lo que duren las vidas, así que no hay nada que mandar que reparta lo mismo en
   // el otro móvil. Con formato propio, en cambio, vale cualquier mazo y cuantas veces se
   // quiera, y cada duelo estrena semilla.
-  // Un mazo al que todavía no se tiene derecho. Hoy no se llega nunca aquí: la beta lo
-  // tiene todo abierto. Existe para que el día que haya tienda la puerta cerrada tenga
-  // una explicación y una salida, en vez de un botón que no hace nada.
+  // Un mazo al que todavía no se tiene derecho: la puerta cerrada, con su explicación,
+  // su precio y su salida. Lo que nunca debe tener es un botón que no haga nada, así que
+  // el de desbloquear solo aparece cuando hay un precio que enseñar.
   function mazoCerrado(modeKey) {
     const razon = CT.Cartera.motivo(modeKey);
     if (!razon) return;
@@ -1588,10 +1602,34 @@
         <div class="big-icon">🔒</div>
         <div class="eyebrow">Todavía no es tuyo</div>
         <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.6rem)">${escapeHtml(juego.name)}</h1>
-        <p class="lead" style="margin-inline:auto">${escapeHtml(razon.texto)}</p>
-        <button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>
+        <p class="lead" style="margin-inline:auto">${escapeHtml(razon.texto)} Son ${juego.cards.length} cartas.</p>
+        ${razon.precio
+          ? `<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="mazo-desbloquear" data-paquete="${razon.paquete}" data-mode="${modeKey}">Desbloquear · ${escapeHtml(razon.precio)}</button>
+             <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ir al inicio</button>`
+          : `<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>`}
+        <p class="hint" style="margin-top:14px">Lo que ya hayas descubierto de este mazo sigue siendo tuyo y te espera dentro.</p>
       </div></section>
     </div>`);
+  }
+
+  // La ventana de pago, fingida. No imita la de ninguna tienda: cuenta lo que pasaría,
+  // que es lo que hace falta para decidir si la puerta cerrada está bien contada. El
+  // botón concede el paquete de verdad —pero solo en esta sesión, la cartera no lo
+  // guarda—, así que se puede entrar al mazo, mirarlo y recargar para volver a verlo
+  // cerrado.
+  function tiendaSimulada(clave, modeKey) {
+    const suyo = CT.Cartera.paquetes().find(uno => uno.clave === clave);
+    if (!suyo) return;
+    const cuantos = suyo.mazos.length === 1 ? "1 mazo" : `${suyo.mazos.length} mazos`;
+    overlay(`<div class="overlay"><div class="modal">
+      <div class="eyebrow">Simulación · no se cobra nada</div>
+      <h2>${escapeHtml(suyo.nombre)}</h2>
+      <p class="lead" style="margin-inline:auto">Aquí se abriría la ventana de pago del propio móvil, con la cuenta que ya tengas configurada. Continuum no llega a ver la tarjeta: solo recibe un sí o un no.</p>
+      <p class="hint">${cuantos} · ${escapeHtml(suyo.precio || "precio por decidir")} · pago único</p>
+      <button class="btn btn-primary btn-block" style="margin-top:10px" data-dialog-focus data-action="compra-simular" data-paquete="${suyo.clave}" data-mode="${modeKey || ""}">Simular que sale bien</button>
+      <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="close-menu">Cancelar</button>
+      <p class="hint" style="margin-top:12px">Al recargar el juego vuelve a estar cerrado: no hay ninguna compra guardada detrás.</p>
+    </div></div>`, true);
   }
 
   // El duelo es uno solo con dos maneras de jugarlo, no dos formatos distintos: lo que
@@ -2467,15 +2505,23 @@
     roto: "El enlace está incompleto o se ha estropeado por el camino. Pide que te lo manden otra vez, entero."
   };
 
-  function duelInvalido(motivo) {
+  // Un mazo cerrado no es un enlace estropeado: el reto está perfectamente, lo que falta
+  // es el mazo. Por eso lleva su propio título y, si hay precio, la misma salida que la
+  // puerta cerrada, que es lo que quien recibe el reto quiere en ese momento.
+  function duelInvalido(motivo, modeKey) {
     screen = "duelo-invalido";
+    const cerrado = motivo === "mazo-cerrado" && CT.has(modeKey);
+    const razon = cerrado ? CT.Cartera.motivo(modeKey) : null;
     paint(`<div class="shell">${header()}
       <section class="pass-screen"><div class="panel">
-        <div class="big-icon">🔗</div>
+        <div class="big-icon">${cerrado ? "🔒" : "🔗"}</div>
         <div class="eyebrow">Duelo</div>
-        <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.8rem)">Este enlace no vale</h1>
-        <p class="lead" style="margin-inline:auto">${DUELO_MOTIVOS[motivo] || DUELO_MOTIVOS.roto}</p>
-        <button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>
+        <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.8rem)">${cerrado ? "Te falta el mazo" : "Este enlace no vale"}</h1>
+        <p class="lead" style="margin-inline:auto">${cerrado ? `El reto es de ${escapeHtml(CT.mode(modeKey).name)}. ${escapeHtml(razon?.texto || "")}` : DUELO_MOTIVOS[motivo] || DUELO_MOTIVOS.roto}</p>
+        ${razon?.precio
+          ? `<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="mazo-desbloquear" data-paquete="${razon.paquete}" data-mode="${modeKey}">Desbloquear · ${escapeHtml(razon.precio)}</button>
+             <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ir al inicio</button>`
+          : `<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>`}
       </div></section>
     </div>`);
   }
@@ -2841,6 +2887,15 @@
     else if (action === "home-encyclopedia") openEnciclopedia("all");
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
     else if (action === "set-mode") openMode(target.dataset.mode);
+    else if (action === "mazo-desbloquear") tiendaSimulada(target.dataset.paquete, target.dataset.mode);
+    else if (action === "compra-simular") {
+      const modeKey = target.dataset.mode;
+      const comprado = CT.Cartera.compraSimulada(target.dataset.paquete);
+      CT.closeDialog();
+      if (!comprado) return showToast("No se ha podido simular la compra");
+      showToast("Compra simulada: ya es tuyo");
+      if (CT.has(modeKey)) openMode(modeKey); else home();
+    }
     else if (action === "set-block") {
       const sameOpenBlock = collectionOpen && target.dataset.block === selectedBlockKey;
       if (sameOpenBlock) {
@@ -3003,19 +3058,18 @@
     if (salidaOnline) { salidaOnline.click(); return; }
     backMenu();
   });
-  // Qué mazos tiene abiertos quien juega. Hoy lo concede la beta y los abre todos: no hay
-  // tienda, nadie ha pagado nada y nadie tiene nada cerrado. El día que la haya, aquí se
-  // le pregunta a Apple o a Google qué tiene comprado esta cuenta y se concede eso —y se
-  // concede en cada apertura, porque quien manda es la tienda y no lo que quedó guardado
-  // en el móvil—. Ese es el único cambio: el resto del juego ya pregunta a la cartera.
-  CT.Cartera.concede({ origen: "beta" });
+  // Qué mazos tiene abiertos quien juega lo decide `CT.Cartera.arranque()`, que ya se ha
+  // ejecutado al cargarse `cartera.js`: este archivo necesita saberlo antes de elegir el
+  // mazo de la última partida, mucho antes de llegar hasta aquí. El día que haya tienda,
+  // es en `arranque` donde se le pregunta a Apple o a Google qué tiene comprado esta
+  // cuenta. El resto del juego ya pregunta a la cartera.
 
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
   CT.Links.start(target => {
     if (CT.isSessionActive() && !confirm('¿Abrir la invitación? Tu partida local quedará guardada.')) return;
     if (target.room) launchOnline(target.room);
-    else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo); }
+    else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo, value.mode); }
   });
   const params = new URLSearchParams(location.hash.slice(1) || location.search);
   const invitedRoom = params.get("room") || "";
@@ -3024,6 +3078,6 @@
   else if (duelPayload) {
     const leido = CT.Duelo.descodificar(duelPayload);
     if (leido.ok) { pendingDuel = leido.duelo; duelIntro(); }
-    else duelInvalido(leido.motivo);
+    else duelInvalido(leido.motivo, leido.mode);
   } else if (!restoreView()) home();
 })();
