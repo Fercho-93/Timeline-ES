@@ -41,7 +41,9 @@ try {
    assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
    await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
    await transitionPage.locator('[data-action="collection-back"]').click();
-   await transitionPage.locator('[data-mode="history"]').click();
+   // Durante el viaje inverso hay una réplica inerte de la pantalla anterior. El
+   // usuario solo puede tocar #app; la prueba debe apuntar al mismo lugar interactivo.
+   await transitionPage.locator('#app [data-mode="history"]').click();
    assert.equal(await transitionPage.locator('.camera-move').count(),1,'reentrar vuelve a girar la cámara');
    await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
    assert.equal(await transitionPage.locator('.camera-move, .deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
