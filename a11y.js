@@ -379,26 +379,24 @@
         layer.append(destinationNav);
       }
       container.style.visibility = "hidden";
-      // Una cámara física no se mueve a velocidad constante: arranca, coge inercia y
-      // frena al llegar. Ese perfil de aceleración-frenado (con curvas propias en cada
-      // tramo) ya distingue un movimiento de cámara de un slide plano, sin necesidad de
-      // un rebote final ni de desenfocar el clon entero: lo primero se nota como un
-      // segundo salto porque el contenido de verdad retrocede un poco antes de
-      // asentarse, y lo segundo es demasiado caro de recalcular en un móvil real —
-      // ambos juntos es lo que se percibía como tirones que no acababan de resolverse.
-      const duration = 860;
+      // Deliberadamente lo más simple posible: un único `translate3d` en X, una sola
+      // curva de frenado estándar (sin cola larga ni rebote), sin profundidad ni escala.
+      // Las versiones anteriores (con Z, escala y curvas de dos tramos) se seguían
+      // sintiendo con tirones en un móvil real -tanto una curva con una cola de frenado
+      // muy suave como el coste de animar varias propiedades a la vez pueden leerse como
+      // "rebote"-, así que esto prioriza que sea barato de componer y llegue una sola
+      // vez, sin vuelta, por encima de parecer más cinematográfico.
+      const duration = 480;
       const start = backwards ? -100 : 0;
       const end = backwards ? 0 : -100;
-      const mid = start + (end - start) * .5;
       animation = track.animate([
-        { transform: `translate3d(${start}vw,0,0) scale(1)`, offset: 0, easing: "cubic-bezier(.45,0,.8,.2)" },
-        { transform: `translate3d(${mid}vw,-1vh,-90px) scale(.975)`, offset: .5, easing: "cubic-bezier(.16,1,.3,1)" },
-        { transform: `translate3d(${end}vw,0,0) scale(1)`, offset: 1 }
-      ], { duration, fill: "forwards" });
+        { transform: `translate3d(${start}vw,0,0)` },
+        { transform: `translate3d(${end}vw,0,0)` }
+      ], { duration, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" });
       worldAnimation = world.animate([
-        { transform: `translate3d(${backwards ? -4 : 4}vw,0,-70px) scale(1.06)`, offset: 0 },
-        { transform: `translate3d(${backwards ? 4 : -4}vw,-1vh,-70px) scale(1.1)`, offset: 1 }
-      ], { duration, easing: "cubic-bezier(.3,.05,.2,1)", fill: "forwards" });
+        { transform: `translate3d(${backwards ? -3 : 3}vw,0,0)` },
+        { transform: `translate3d(${backwards ? 3 : -3}vw,0,0)` }
+      ], { duration, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" });
       animation.finished.then(cleanup, cleanup);
       cleanupTimer = setTimeout(cleanup, duration + 180);
     };
