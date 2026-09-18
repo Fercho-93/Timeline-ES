@@ -96,7 +96,7 @@ console.log("\nVolver al menú sin saltos de lectura");
   // real entiende las dos, así que el simulacro también debe hacerlo.
   w.scrollTo = (...args) => {
     const options = args.length === 1 ? args[0] : { top: args[1], left: args[0], behavior: "instant" };
-    calls.push(options);
+    calls.push({...options, cssBehavior: w.document.documentElement.style.getPropertyValue('scroll-behavior')});
     w.scrollY = options.top;
   };
   w.scrollY = 520;
@@ -110,6 +110,13 @@ console.log("\nVolver al menú sin saltos de lectura");
   click(w, '[data-action="collection-back"]');
   ok("Volver recupera la posición y el foco de cuando se dejó Inicio", w.scrollY === 520 && w.document.activeElement.dataset.mode === 'history');
   ok("el regreso tiene sentido inverso sin un segundo desplazamiento animado", el(w, '.shell').classList.contains('screen-return') && calls.every(call => call.behavior === 'instant'));
+  calls.length = 0;
+  w.scrollY = 760;
+  click(w, '[data-action="home-encyclopedia"]');
+  click(w, '[data-action="enc-back"]');
+  ok("la enciclopedia conserva el fondo y vuelve directamente a la altura anterior",
+    w.scrollY === 760 && calls.length === 2 && calls.every(call => call.top === 760 && call.cssBehavior === 'auto'));
+  ok("la anulación instantánea no desactiva después el desplazamiento suave de la portada", !w.document.documentElement.style.getPropertyValue('scroll-behavior'));
   w.close();
 }
 
