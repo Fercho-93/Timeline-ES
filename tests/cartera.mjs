@@ -58,13 +58,19 @@ console.log("\nLa simulación: un mazo suelto y una colección entera esperando 
     C.tieneBloque("mezcla") === false && C.tieneBloque("ciencia") === false
     && ["historia", "cine", "naturaleza", "geografia"].every(k => C.tieneBloque(k)));
 
-  // El mazo suelto no puede decir «viene con» sin repetir su propio nombre; la colección sí.
+  // Un bloque de un solo mazo no tiene colección que vender: solo hay una manera de entrar.
   const suelto = C.motivo("mixed");
-  ok("el mazo suelto se explica sin repetirse, y con su precio", suelto.texto === "Este mazo se desbloquea aparte por 3,99 €.");
-  ok("nombrando el paquete que haría falta", suelto.paquete === "mezcla" && suelto.precio === "3,99 €");
+  ok("al mazo suelto solo se llega de una manera", suelto.opciones.length === 1 && suelto.opciones[0].tipo === "mazo");
+  ok("y se dice con su precio", suelto.texto === "Se desbloquea por 3,99 €" && suelto.precio === "3,99 €");
+
+  // Y a un mazo de una colección, de dos: él solo, o la colección entera más barata.
   const enColeccion = C.motivo("astronomy");
-  ok("y el de una colección nombra la colección", enColeccion.texto === "Este mazo viene con Ciencia por 5,99 €.");
-  ok("los dos mazos de la colección piden lo mismo", C.motivo("medicine").paquete === "ciencia" && enColeccion.paquete === "ciencia");
+  ok("a un mazo de una colección se llega de dos", enColeccion.opciones.map(v => v.tipo).join() === "mazo,coleccion");
+  ok("el mazo suelto va primero, que es el más barato", enColeccion.opciones[0].precio === "3,99 €");
+  ok("y la colección detrás, con los dos mazos dentro", enColeccion.opciones[1].precio === "5,99 €" && enColeccion.opciones[1].mazos.join() === "astronomy,medicine");
+  ok("las dos caben en una línea", enColeccion.texto === "3,99 € suelto · 5,99 € toda la colección Ciencia");
+  ok("los dos mazos de la colección ofrecen lo mismo", C.motivo("medicine").opciones[1].clave === "ciencia");
+  ok("y llevarse la colección sale más a cuenta que los mazos por separado", 599 < 2 * 399);
 
   ok("los abiertos no tienen nada que explicar", abiertos.every(key => C.motivo(key) === null));
   ok("un mazo que no existe nunca se tiene", C.tiene("inventado") === false);
@@ -75,19 +81,27 @@ console.log("\nEl catálogo: lo que se vendería si algún día se vende");
   const w = boot();
   const C = w.CONTINUUM.Cartera;
   const paquetes = C.paquetes();
-  const bloques = Object.keys(w.CONTINUUM.BLOCKS);
-  ok("hay un paquete por bloque más el que lo incluye todo", paquetes.length === bloques.length + 1);
+  const bloques = Object.values(w.CONTINUUM.BLOCKS);
+  const mazos = Object.keys(w.CONTINUUM.MODES);
+  const colecciones = bloques.filter(b => b.games.length > 1);
+  ok("se vende cada mazo suelto, cada colección de más de un mazo, y el catálogo entero",
+    paquetes.length === mazos.length + colecciones.length + 1);
+  ok("un bloque de un solo mazo no se vende dos veces", !paquetes.some(p => p.clave === "mezcla"));
+
   const todo = paquetes.find(p => p.clave === C.PAQUETE_TODO);
   ok("el paquete completo incluye todos los mazos de todos los bloques",
-    todo && bloques.every(b => w.CONTINUUM.block(b).games.every(m => todo.mazos.includes(m))));
-  ok("cada mazo sabe a qué paquete pertenece", C.paquete("animals").clave === "naturaleza" && C.paquete("history").clave === "historia");
-  ok("y el paquete se llama por su nombre, no por su clave", C.paquete("animals").nombre === "Naturaleza");
-  ok("un bloque de un solo mazo se sabe suelto, y una colección no",
-    C.paquete("mixed").solo === true && C.paquete("animals").solo === false);
-  ok("solo llevan precio los paquetes de la simulación",
-    paquetes.find(p => p.clave === "mezcla").precio === "3,99 €"
-    && paquetes.find(p => p.clave === "ciencia").precio === "5,99 €" && todo.precio === "14,99 €"
-    && paquetes.find(p => p.clave === "naturaleza").precio === null);
+    todo && bloques.every(b => b.games.every(m => todo.mazos.includes(m))));
+  ok("cada mazo sabe a qué colección pertenece", C.paquete("animals").clave === "naturaleza" && C.paquete("history").clave === "historia");
+  ok("y se llama por su nombre, no por su clave", C.paquete("animals").nombre === "Naturaleza");
+
+  // Los precios no se escriben uno a uno: salen de cuántos mazos lleva cada paquete, así
+  // que una colección nueva ya nace con el suyo.
+  ok("todos los mazos sueltos valen lo mismo", paquetes.filter(p => p.tipo === "mazo").every(p => p.precio === "3,99 €"));
+  ok("y cada colección sale de su tamaño, siempre más barata que sus mazos por separado",
+    paquetes.find(p => p.clave === "ciencia").precio === "5,99 €"
+    && paquetes.find(p => p.clave === "historia").precio === "7,99 €"
+    && paquetes.find(p => p.clave === "geografia").precio === "9,99 €");
+  ok("y el catálogo entero es el mejor trato de todos", todo.precio === "14,99 €");
 }
 
 console.log("\nUna compra simulada abre la puerta, y no deja huella");
@@ -95,7 +109,7 @@ console.log("\nUna compra simulada abre la puerta, y no deja huella");
   const w = boot();
   const C = w.CONTINUUM.Cartera;
   ok("un paquete que no existe no compra nada", C.compraSimulada("regalo") === false && C.tiene("mixed") === false);
-  ok("el suyo sí", C.compraSimulada("mezcla") === true && C.tiene("mixed") === true);
+  ok("el suyo sí", C.compraSimulada("mazo:mixed") === true && C.tiene("mixed") === true);
   ok("y abre solo ese: la colección sigue cerrada", C.tiene("astronomy") === false && C.todoAbierto() === false);
   ok("comprar una colección abre todos sus mazos de una vez",
     C.compraSimulada("ciencia") === true && C.tiene("astronomy") === true && C.tiene("medicine") === true);
@@ -110,13 +124,16 @@ console.log("\nLa puerta cerrada, tal y como se ve");
   const w = boot();
   click(w, '[data-block="mezcla"]');
   const fila = w.document.querySelector('[data-mode="mixed"]');
-  ok("el mazo se sigue viendo, con su candado y su precio",
-    fila && fila.classList.contains("game-row-cerrado") && /3,99 €/.test(fila.textContent));
+  ok("el mazo se sigue viendo, con su precio", fila && fila.classList.contains("game-row-cerrado") && /3,99 €/.test(fila.textContent));
+  ok("y con el candado estampado en medio de su lámina, no de adorno junto al nombre",
+    fila.querySelector(".deck-preview-cerrado .deck-candado")?.textContent === "🔒");
+  ok("un mazo abierto no lleva sello", !existe(w, '.game-row:not(.game-row-cerrado) .deck-candado'));
 
   click(w, '[data-mode="mixed"]');
   ok("tocarlo lleva a la explicación, no a jugar", /Todavía no es tuyo/.test(texto(w)));
-  ok("que dice cuántas cartas hay dentro", new RegExp(`Son ${w.CONTINUUM.cards("mixed").length} cartas`).test(texto(w)));
-  ok("y ofrece desbloquear por su precio", /Desbloquear · 3,99 €/.test(texto(w)));
+  ok("que dice cuántas cartas hay dentro", new RegExp(`${w.CONTINUUM.cards("mixed").length} cartas`).test(texto(w)));
+  ok("y ofrece una sola manera de conseguirlo, la suya",
+    w.document.querySelectorAll('[data-action="mazo-desbloquear"]').length === 1 && /Este mazo · 3,99 €/.test(texto(w)));
 
   click(w, '[data-action="mazo-desbloquear"]');
   ok("el botón abre una ventana de pago que se declara simulada", /no se cobra nada/i.test(texto(w)));
@@ -137,14 +154,36 @@ console.log("\nUna colección entera cerrada se ve como colección, no como mazo
 
   click(w, '[data-block="ciencia"]');
   const filas = [...w.document.querySelectorAll('[data-mode]')].filter(f => ["astronomy", "medicine"].includes(f.dataset.mode));
-  ok("sus dos mazos se ven, los dos cerrados", filas.length === 2 && filas.every(f => f.classList.contains("game-row-cerrado")));
-  ok("y los dos remiten a la misma colección, no cada uno a lo suyo",
-    filas.every(f => /viene con Ciencia por 5,99 €/.test(f.textContent)));
+  ok("sus dos mazos se ven, los dos cerrados y los dos sellados",
+    filas.length === 2 && filas.every(f => f.classList.contains("game-row-cerrado") && f.querySelector(".deck-candado")));
+  ok("y los dos ofrecen lo mismo: ellos solos o la colección entera",
+    filas.every(f => /3,99 € suelto · 5,99 € toda la colección Ciencia/.test(f.textContent)));
 
   click(w, '[data-mode="astronomy"]');
-  click(w, '[data-action="mazo-desbloquear"]');
-  ok("la ventana de pago habla del paquete, no del mazo que se tocó",
-    /Ciencia/.test(texto(w)) && /2 mazos · 5,99 €/.test(texto(w)));
+  const vias = [...w.document.querySelectorAll('[data-action="mazo-desbloquear"]')];
+  ok("la puerta cerrada da a elegir entre las dos", vias.length === 2);
+  const cartasDe = key => w.CONTINUUM.cards(key).length;
+  ok("el mazo suelto primero, con lo que abre",
+    /Este mazo · 3,99 €/.test(vias[0].textContent) && new RegExp(`Solo este mazo · ${cartasDe("astronomy")} cartas`).test(vias[0].textContent));
+  ok("y la colección detrás, con sus mazos y sus cartas",
+    /Ciencia · 5,99 €/.test(vias[1].textContent) && new RegExp(`2 mazos · ${cartasDe("astronomy") + cartasDe("medicine")} cartas`).test(vias[1].textContent));
+
+  // Comprar solo el mazo deja el otro cerrado, que es justo la diferencia entre las dos.
+  const soloMazo = boot();
+  click(soloMazo, '[data-block="ciencia"]'); click(soloMazo, '[data-mode="astronomy"]');
+  click(soloMazo, '[data-action="mazo-desbloquear"]'); click(soloMazo, '[data-action="compra-simular"]');
+  ok("llevarse el mazo suelto abre ese y solo ese",
+    soloMazo.CONTINUUM.Cartera.tiene("astronomy") === true && soloMazo.CONTINUUM.Cartera.tiene("medicine") === false);
+
+  // Y al que le queda uno solo ya no se le ofrece la colección: sería pagar más por menos.
+  click(soloMazo, '[data-action="home-top"]');
+  if (!existe(soloMazo, '[data-mode="medicine"]')) click(soloMazo, '[data-block="ciencia"]');
+  click(soloMazo, '[data-mode="medicine"]');
+  ok("al último mazo que falta ya no se le ofrece la colección",
+    soloMazo.document.querySelectorAll('[data-action="mazo-desbloquear"]').length === 1);
+
+  vias[1].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  ok("la ventana de pago habla del paquete elegido", /Ciencia/.test(texto(w)) && /2 mazos · 5,99 €/.test(texto(w)));
   click(w, '[data-action="compra-simular"]');
   ok("y una sola compra abre los dos", w.CONTINUUM.Cartera.tiene("astronomy") && w.CONTINUUM.Cartera.tiene("medicine"));
   ok("entrando en el que se tocó", w.localStorage.getItem("hilo-selected-mode-v1") === "astronomy");
@@ -207,8 +246,10 @@ console.log("\nCerrar un mazo se nota en todo el juego");
   ok("la cartera lo da por cerrado", C.tiene("animals") === false && C.tiene("history") === true);
   ok("su bloque deja de estar entero", C.tieneBloque("naturaleza") === false);
   ok("pero los demás mazos del bloque siguen abiertos", C.tiene("lifespan") === true && C.tiene("speed") === true);
+  // Y como es el único cerrado de los tres de Naturaleza, no se le ofrece la colección:
+  // costaría más que el mazo y pagaría por dos que ya son suyos.
   const razon = C.motivo("animals");
-  ok("y se puede explicar, nombrando lo que haría falta", !!razon && /Naturaleza/.test(razon.texto));
+  ok("y se puede explicar, con una sola manera de entrar", razon.opciones.length === 1 && razon.texto === "Se desbloquea por 3,99 €");
 
   // La portada avisa de cuántos hay cerrados en cada colección.
   click(w, '[data-block="naturaleza"]');
@@ -219,7 +260,7 @@ console.log("\nCerrar un mazo se nota en todo el juego");
   const fila = w.document.querySelector('[data-mode="animals"]');
   ok("el mazo cerrado se sigue viendo en la lista", !!fila);
   ok("marcado como cerrado", fila.classList.contains("game-row-cerrado"));
-  ok("y diciendo qué haría falta, en vez de cuántas cartas tiene", /Naturaleza/.test(fila.textContent));
+  ok("y diciendo lo que costaría, en vez de cuántas cartas tiene", /3,99 €/.test(fila.textContent) && !/cartas/.test(fila.textContent));
 
   click(w, '[data-mode="animals"]');
   ok("tocarlo no lleva a jugar, lleva a la explicación", /Todavía no es tuyo/.test(texto(w)));
@@ -293,10 +334,19 @@ console.log("\nLa cartera decide qué se juega, nunca qué se ha jugado");
 {
   // Cerrar un mazo no puede tocar el progreso: lo descubierto sigue descubierto, y si el
   // mazo vuelve a estar a mano, vuelve con todo lo que había.
+  //
+  // Con una carta jugada de verdad, no con el perfil recién estrenado: un perfil vacío no
+  // llega a guardarse, así que cada lectura devuelve uno nuevo con su fecha de creación
+  // puesta al milisegundo, y compararlos consigo mismos fallaba de vez en cuando por el
+  // reloj. Además, así se prueba lo que de verdad importa —que lo jugado sobrevive— en vez
+  // de comparar dos veces la nada.
   const w = boot();
+  const carta = w.CONTINUUM.cards("animals")[0].id;
+  w.CONTINUUM.Progreso.record({ mode: "animals", cardId: carta, correct: true });
   const antes = JSON.stringify(w.CONTINUUM.Progreso.read());
   cierra(w, "animals");
   ok("el progreso guardado no se toca al cerrar un mazo", JSON.stringify(w.CONTINUUM.Progreso.read()) === antes);
+  ok("y la carta descubierta sigue descubierta aunque el mazo ya no sea suyo", w.CONTINUUM.Progreso.seenCards().has(carta));
   w.CONTINUUM.Cartera.concede({ origen: "prueba" });
   ok("y al reabrirlo vuelve a estar todo", w.CONTINUUM.Cartera.tiene("animals") === true && JSON.stringify(w.CONTINUUM.Progreso.read()) === antes);
 }
