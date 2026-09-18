@@ -31,26 +31,21 @@ try {
    await transitionPage.locator('[data-block="historia"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
    const header=transitionPage.locator('.atlas-landscape');
-   assert.equal(await transitionPage.locator('.camera-move').count(),1,'la vista anterior acompaña el giro de cámara');
-   assert.equal(await transitionPage.locator('.camera-move-view').count(),2,'origen y destino forman un único escenario horizontal');
-   assert.deepEqual(await transitionPage.locator('.camera-move-view').evaluateAll(views=>views.map(view=>getComputedStyle(view).opacity)),['1','1'],'ninguna vista se funde durante el recorrido');
-   assert.equal(await transitionPage.locator('.camera-fixed-nav').count(),1,'la navegación común no desaparece mientras viaja la cámara');
-   assert.equal(await transitionPage.locator('.camera-move-view .home-nav').count(),0,'la navegación común no viaja duplicada con las escenas');
-   assert.equal(await transitionPage.locator('.camera-move-view').last().locator('.atlas-landscape img').evaluate(image=>getComputedStyle(image).opacity),'1','la imagen de destino viaja ya revelada');
-   assert.deepEqual(await transitionPage.locator('.camera-move-view').last().locator('.atlas-specimens figure').evaluateAll(figures=>figures.map(figure=>getComputedStyle(figure).opacity)),['1','1','1'],'las láminas de destino no aparecen de golpe al terminar');
-   assert.equal(await transitionPage.locator('#app').evaluate(app=>getComputedStyle(app).visibility),'hidden','la pantalla real espera detrás sin duplicar el destino');
-   assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'sin portada voladora ni hoja superpuesta');
-   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
-   assert.equal(await transitionPage.locator('.camera-move').count(),0,'la cámara se retira al terminar el giro');
+   assert.equal(await transitionPage.locator('.camera-move, .screen-enter, .deck-cover-flight, .book-turn').count(),0,'el mazo aparece una sola vez, sin desplazamiento ni pantalla superpuesta');
+   assert.equal(await transitionPage.locator('#app').evaluate(app=>getComputedStyle(app).visibility),'visible','la única pantalla real permanece visible');
+   await transitionPage.waitForTimeout(700);
    assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
    await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
+   await transitionPage.locator('[data-action="solo"]').click();
+   assert.equal(await transitionPage.locator('.camera-move, .screen-enter').count(),0,'solitario no enseña una vista provisional del reto diario');
+   const soloBefore=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
+   await transitionPage.waitForTimeout(400);
+   const soloAfter=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
+   assert.deepEqual(soloAfter,soloBefore,'la pantalla de solitario no se abre y se cierra después');
+   await transitionPage.locator('[data-action="back-menu"]').click();
    await transitionPage.locator('[data-action="collection-back"]').click();
-   // Durante el viaje inverso hay una réplica inerte de la pantalla anterior. El
-   // usuario solo puede tocar #app; la prueba debe apuntar al mismo lugar interactivo.
-   await transitionPage.locator('#app [data-mode="history"]').click();
-   assert.equal(await transitionPage.locator('.camera-move').count(),1,'reentrar vuelve a girar la cámara');
-   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
-   assert.equal(await transitionPage.locator('.camera-move, .deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
+   await transitionPage.locator('[data-mode="history"]').click();
+   assert.equal(await transitionPage.locator('.camera-move, .screen-enter, .deck-cover-flight, .book-turn').count(),0,'reentrar sigue sin dejar capas antiguas');
    await transitionPage.close();
 
    // La enciclopedia vive sobre una copia de la pantalla de origen. Al cerrarla se
