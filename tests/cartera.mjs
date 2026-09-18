@@ -294,6 +294,7 @@ console.log("\nLa cartera decide qué se juega, nunca qué se ha jugado");
   // Cerrar un mazo no puede tocar el progreso: lo descubierto sigue descubierto, y si el
   // mazo vuelve a estar a mano, vuelve con todo lo que había.
   const w = boot();
+  w.CONTINUUM.Progreso.record({ mode: "animals", cardId: w.CONTINUUM.cards("animals")[0].id, correct: true });
   const antes = JSON.stringify(w.CONTINUUM.Progreso.read());
   cierra(w, "animals");
   ok("el progreso guardado no se toca al cerrar un mazo", JSON.stringify(w.CONTINUUM.Progreso.read()) === antes);
