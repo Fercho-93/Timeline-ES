@@ -257,11 +257,16 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     const probe = w.document.createElement('span');
     probe.className = 'snapshot-probe';
     w.document.getElementById('app').append(probe);
+    let settled = 0;
+    w.document.getElementById('app').getAnimations = () => [{ finish() { settled++; } }];
     click(w, '[data-action="solo"]');
     const frozen = w.document.querySelector('.camera-move-copy .snapshot-probe');
     assert.equal(w.getComputedStyle(frozen).width, '28px', 'la cámara conserva tamaños que dependían de #app');
     assert.equal(w.getComputedStyle(frozen).display, 'none', 'un icono oculto no reaparece al mover la cámara');
+    assert.equal(settled, 1, 'el destino llega a su fotograma final antes de fotografiarlo');
     assert.equal(w.document.querySelectorAll('.camera-move-view').length, 2, 'origen y destino conviven en un mismo escenario');
+    assert.ok(w.document.querySelector('.camera-fixed-nav'), 'la navegación común permanece quieta durante el viaje');
+    assert.equal(w.document.querySelectorAll('.camera-move-view .home-nav').length, 0, 'la barra común no se duplica dentro de los escenarios');
     assert.ok(turns[1].frames.every(frame => !('opacity' in frame)), 'el viaje no funde ninguna de las dos vistas');
     assert.match(turns[1].frames.at(-1).transform, /translate3d\(-100vw/);
     assert.equal(w.document.querySelector('.camera-move-frame').dataset.direction, 'forward');

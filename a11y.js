@@ -334,7 +334,7 @@
       copy.classList.add("camera-move-copy");
       copy.style.transform = `translateY(${-scrollTop}px)`;
       copy.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
-      copy.querySelectorAll(".home-nav, .overlay, .camera-move").forEach(node => node.remove());
+      copy.querySelectorAll(".overlay, .camera-move").forEach(node => node.remove());
       scene.append(copy);
       sources.forEach((source, index) => {
         copies[index].scrollLeft = source.scrollLeft;
@@ -358,10 +358,26 @@
     const cancel = () => { animation?.cancel(); worldAnimation?.cancel(); cleanup(); };
     cancelPageTurn = cancel;
     return () => {
+      // El destino puede traer revelados propios (láminas, figuras, cabeceras). La
+      // cámara ya es su transición de entrada: los llevamos a su fotograma final antes
+      // de fotografiarlo para que nada viaje invisible y aparezca de golpe al terminar.
+      for (const effect of container.getAnimations?.({ subtree: true }) || []) {
+        try { effect.finish(); } catch (_) { /* Una animación infinita no tiene final. */ }
+      }
       const destination = snapshot(container, window.scrollY);
       decorations.textContent = rules.join('\n');
       if (backwards) track.append(destination, origin);
       else track.append(origin, destination);
+      // La navegación común pertenece al mundo, no a una de sus habitaciones. Si está
+      // en ambos extremos queda quieta mientras el contenido se desplaza detrás.
+      const originNav = origin.querySelector('.home-nav');
+      const destinationNav = destination.querySelector('.home-nav');
+      if (originNav && destinationNav) {
+        originNav.remove();
+        destinationNav.remove();
+        destinationNav.classList.add('camera-fixed-nav');
+        layer.append(destinationNav);
+      }
       container.style.visibility = "hidden";
       const timing = { duration: 920, easing: "cubic-bezier(.3,.02,.16,1)", fill: "forwards" };
       const start = backwards ? -100 : 0;

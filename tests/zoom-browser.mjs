@@ -34,6 +34,10 @@ try {
    assert.equal(await transitionPage.locator('.camera-move').count(),1,'la vista anterior acompaña el giro de cámara');
    assert.equal(await transitionPage.locator('.camera-move-view').count(),2,'origen y destino forman un único escenario horizontal');
    assert.deepEqual(await transitionPage.locator('.camera-move-view').evaluateAll(views=>views.map(view=>getComputedStyle(view).opacity)),['1','1'],'ninguna vista se funde durante el recorrido');
+   assert.equal(await transitionPage.locator('.camera-fixed-nav').count(),1,'la navegación común no desaparece mientras viaja la cámara');
+   assert.equal(await transitionPage.locator('.camera-move-view .home-nav').count(),0,'la navegación común no viaja duplicada con las escenas');
+   assert.equal(await transitionPage.locator('.camera-move-view').last().locator('.atlas-landscape img').evaluate(image=>getComputedStyle(image).opacity),'1','la imagen de destino viaja ya revelada');
+   assert.deepEqual(await transitionPage.locator('.camera-move-view').last().locator('.atlas-specimens figure').evaluateAll(figures=>figures.map(figure=>getComputedStyle(figure).opacity)),['1','1','1'],'las láminas de destino no aparecen de golpe al terminar');
    assert.equal(await transitionPage.locator('#app').evaluate(app=>getComputedStyle(app).visibility),'hidden','la pantalla real espera detrás sin duplicar el destino');
    assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'sin portada voladora ni hoja superpuesta');
    await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});

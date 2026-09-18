@@ -291,6 +291,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .camera-move-frame { position: absolute; inset: 0; display: flex; width: 200vw; transform-style: preserve-3d; will-change: transform; }
 .camera-move-view { position: relative; flex: 0 0 100vw; width: 100vw; height: 100dvh; overflow: hidden; background: var(--edition-paper); box-shadow: 0 0 72px #1c120b42; }
 .camera-move-view::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, #2b1b101e, transparent 13% 87%, #2b1b1028); }
+.camera-move .camera-fixed-nav { z-index: 2; pointer-events: none; }
 .camera-move-copy *, .camera-move-copy *::before, .camera-move-copy *::after { animation: none !important; transition: none !important; }
 @keyframes parchment-open {
   from { opacity: .2; clip-path: inset(0 0 95% 0 round 12px); transform: translateY(-8px); }
