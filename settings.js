@@ -172,6 +172,12 @@
   }
 
   CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true });
+  CT.setAmbience = enabled => {
+    settings.ambience = enabled === true;
+    save();
+    CT.UI?.updateEffects();
+    return settings.ambience;
+  };
   function previewLook() {
     const preview=document.querySelector('[data-look-preview]'), apply=document.querySelector('[data-settings-action="apply-look"]');
     if(!preview||!apply)return;
@@ -196,7 +202,9 @@
         const help = document.querySelector('[data-depth-help]');
         if (!enabled && help) help.textContent = 'Este dispositivo no ha permitido usar el movimiento. Las portadas siguen funcionando.';
       }
-      settings[key] = enabled; save(); CT.UI?.updateEffects(); CT.Effects?.transition?.('select');
+      if (key === 'ambience') CT.setAmbience(enabled);
+      else { settings[key] = enabled; save(); CT.UI?.updateEffects(); }
+      CT.Effects?.transition?.('select');
       if (key === 'haptics') {
         const test = document.querySelector('[data-settings-action="test-haptics"]');
         if (test) test.disabled = !enabled;

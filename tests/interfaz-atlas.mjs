@@ -90,9 +90,13 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
   const w=boot();
   try {
     assert.deepEqual(JSON.parse(JSON.stringify(w.CONTINUUM.effectPrefs())),{sound:false,haptics:false,ambience:false,depth:false});
+    assert.equal(w.CONTINUUM.setAmbience(true), true);
+    assert.equal(w.CONTINUUM.effectPrefs().ambience, true, 'la portada puede activar la misma preferencia que Ajustes');
+    assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).ambience, true, 'la elección de portada queda guardada');
     click(w,'[data-settings-action="open"]');
     assert.equal(w.document.querySelectorAll('.home-nav').length,1);
     assert.ok(w.document.querySelector('.settings-modal .home-nav'));
+    assert.equal(w.document.querySelector('[data-settings-action="ambience"]').checked, true, 'Ajustes refleja la elección de portada');
     w.DeviceOrientationEvent={requestPermission:async()=> 'denied'};
     const depth=w.document.querySelector('[data-settings-action="depth"]');depth.checked=true;depth.dispatchEvent(new w.Event('change',{bubbles:true}));
     await new Promise(resolve=>setTimeout(resolve,0));
