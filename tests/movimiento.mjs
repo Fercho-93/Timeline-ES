@@ -113,9 +113,12 @@ console.log("\nVolver al menú sin saltos de lectura");
   calls.length = 0;
   w.scrollY = 760;
   click(w, '[data-action="home-encyclopedia"]');
+  const cachedHomeImage = el(w, '.enc-background img');
   click(w, '[data-action="enc-back"]');
   ok("la enciclopedia conserva el fondo y vuelve directamente a la altura anterior",
     w.scrollY === 760 && calls.length === 2 && calls.every(call => call.top === 760 && call.cssBehavior === 'auto'));
+  ok("al cerrar reutiliza las imágenes ya cargadas en vez de dejarlas parpadear",
+    w.document.querySelector('.home-gallery-shell img') === cachedHomeImage && !w.document.querySelector('.enc-background'));
   ok("la anulación instantánea no desactiva después el desplazamiento suave de la portada", !w.document.documentElement.style.getPropertyValue('scroll-behavior'));
   w.close();
 }

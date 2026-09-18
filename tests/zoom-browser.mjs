@@ -43,6 +43,26 @@ try {
    assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
    await transitionPage.close();
 
+   // La enciclopedia vive sobre una copia de la pantalla de origen. Al cerrarla se
+   // reutiliza esa copia ya decodificada: si se repintara la portada, las carátulas
+   // dejarían durante un instante su panel oscuro antes de volver a aparecer.
+   const encyclopediaPage=await browser.newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
+   await encyclopediaPage.goto(url);
+   await encyclopediaPage.evaluate(()=>scrollTo(0,Math.min(760,document.documentElement.scrollHeight-innerHeight)));
+   await encyclopediaPage.locator('[data-action="home-encyclopedia"]').click();
+   const backgroundImage=encyclopediaPage.locator('.enc-background img').first();
+   await backgroundImage.waitFor();
+   await backgroundImage.evaluate(async image=>{
+     if(!image.complete) await new Promise(resolve=>image.addEventListener('load',resolve,{once:true}));
+     image.__continuumCloseProbe=true;
+   });
+   await encyclopediaPage.locator('[data-action="enc-back"]').first().click();
+   await encyclopediaPage.waitForTimeout(260);
+   const restoredImage=encyclopediaPage.locator('.home-gallery-shell img').first();
+   assert.equal(await restoredImage.evaluate(image=>image.__continuumCloseProbe===true),true,'cerrar la enciclopedia conserva el mismo nodo de imagen');
+   assert.equal(await restoredImage.evaluate(image=>image.complete&&image.naturalWidth>0),true,'la carátula sigue decodificada al reaparecer');
+   await encyclopediaPage.close();
+
    // El muelle de confirmación y el pliegue de la carta elegida: dos cosas que JSDOM no
    // ve. El botón llegó a quedarse fuera de la pantalla —`sticky` no funciona dentro de
    // `#app`, que recorta un eje y por eso es contenedor de desplazamiento— y el pliegue

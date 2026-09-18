@@ -393,6 +393,9 @@
     const nextDepth = preparationDepth[screen];
     const changed = paint.screen !== screen;
     const closingEncyclopedia = paint.screen === "enciclopedia" && changed;
+    const encyclopediaBackground = closingEncyclopedia
+      ? container.querySelector(`.enc-background[data-background-screen="${screen}"]`)
+      : null;
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
@@ -423,7 +426,11 @@
     paint.screen = screen;
 
     window.CONTINUUM.UI?.captureBoard?.(container);
-    container.innerHTML = html;
+    // La enciclopedia conserva debajo una copia ya cargada de la pantalla de origen.
+    // Si volvemos justo a esa pantalla, movemos sus nodos en vez de destruirlos y crear
+    // otros: las imágenes permanecen decodificadas y no aparece un fotograma oscuro.
+    if (encyclopediaBackground) container.replaceChildren(...encyclopediaBackground.childNodes);
+    else container.innerHTML = html;
     window.CONTINUUM.UI?.mount(container, screen);
     if (!primero && cambioDePantalla) {
       const kind = ['winner', 'online-winner', 'solo-end', 'comp-end'].includes(screen) ? 'end'
