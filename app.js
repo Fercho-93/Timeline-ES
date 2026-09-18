@@ -176,8 +176,12 @@
 
   function storageKey() { return `hilo-game-${selectedModeKey}-v1`; }
 
+  // Todo lo que lleva a jugar un mazo pasa por aquí, así que aquí se le pregunta a la
+  // cartera. Hoy nunca dice que no —no hay nada a la venta—, pero el día que lo diga,
+  // este es el sitio que impide entrar por la puerta de atrás.
   function setMode(modeKey) {
-    if (!CT.has(modeKey)) return;
+    if (!CT.has(modeKey)) return false;
+    if (!CT.Cartera.tiene(modeKey)) { mazoCerrado(modeKey); return false; }
     selectedModeKey = modeKey;
     selectedBlockKey = CT.blockOf(modeKey).key;
     CT.Storage.setItem(MODE_STORAGE_KEY, modeKey);
@@ -187,6 +191,7 @@
     pendingIndex = null;
     result = null;
     formatOpen = null;
+    return true;
   }
 
   function eraForCard(card) { return CT.eraForCard(selectedModeKey, card); }
@@ -267,7 +272,7 @@
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
         <span class="panel-depth-ground" aria-hidden="true"></span>
         <span class="collection-foil" aria-hidden="true"></span>
-        <span class="collection-index" aria-hidden="true">${total} ${total === 1 ? "mazo" : "mazos"}</span>
+        <span class="collection-index" aria-hidden="true">${total} ${total === 1 ? "mazo" : "mazos"}${CT.Cartera.cerrados(item.key).length ? ` · ${CT.Cartera.cerrados(item.key).length} 🔒` : ""}</span>
         <span class="collection-open" aria-hidden="true">${active ? "−" : "↗"}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
@@ -280,10 +285,13 @@
     const games = CT.blockGames(selectedBlockKey);
     return `<div class="games" role="group" aria-label="Elige el juego">${games.map((item, index) => {
       const active = item.key === selectedModeKey;
-      return `<button class="game-row${active ? " active" : ""}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}">
+      // Un mazo cerrado se sigue viendo, con su candado: esconderlo haría que nadie
+      // supiera que existe, y lo que se vende tiene que poder verse antes de comprarlo.
+      const abierto = CT.Cartera.tiene(item.key);
+      return `<button class="game-row${active ? " active" : ""}${abierto ? "" : " game-row-cerrado"}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}"${abierto ? "" : ` aria-describedby="mazo-cerrado-${item.key}"`}>
         ${CT.cardArt(item.key, item.cards[0]) ? `<span class="deck-preview" aria-hidden="true">${CT.animalArt(item.key, item.cards[0])}</span>` : ""}<span class="deck-chapter" aria-hidden="true">Capítulo ${["I", "II", "III", "IV", "V", "VI", "VII", "VIII"][index] || index + 1}<i>↗</i></span>
-        <span class="game-name">${item.name}</span>
-        <span class="game-meta">${item.cards.length} ${item.cardLabel} · ${item.blurb}</span>
+        <span class="game-name">${item.name}${abierto ? "" : ` <span class="game-candado" aria-hidden="true">🔒</span>`}</span>
+        <span class="game-meta"${abierto ? "" : ` id="mazo-cerrado-${item.key}"`}>${abierto ? `${item.cards.length} ${item.cardLabel} · ${item.blurb}` : escapeHtml(CT.Cartera.motivo(item.key).texto)}</span>
       </button>`;
     }).join("")}</div>`;
   }
@@ -473,7 +481,9 @@
   // Entrada editorial: la cabecera ya está en su lugar. No viaja ninguna portada,
   // no se mide su geometría ni se bloquea la navegación esperando una animación.
   function openMode(modeKey) {
-    setMode(modeKey);
+    // Si el mazo no es suyo, `setMode` ya ha pintado la explicación: pintar el menú
+    // encima la borraría y dejaría un botón que no hace nada.
+    if (!setMode(modeKey)) return;
     collectionOpen = true;
     collectionDetails = true;
     playMenu();
@@ -1251,7 +1261,8 @@
   }
 
   function openEnciclopedia(modeKey, { highlight = null, band = "all", returnTo = "home" } = {}) {
-    encMode = modeKey === "all" || CT.has(modeKey) ? modeKey : selectedModeKey;
+    // Abrir la enciclopedia de un mazo cerrado la abre entera, no ese mazo.
+    encMode = modeKey === "all" || (CT.has(modeKey) && CT.Cartera.tiene(modeKey)) ? modeKey : "all";
     encQuery = "";
     encBand = band;
     // Cada mazo entra por «todas»: llegar a uno nuevo con el filtro de otro puesto —y con
@@ -1564,6 +1575,25 @@
   // dura lo que duren las vidas, así que no hay nada que mandar que reparta lo mismo en
   // el otro móvil. Con formato propio, en cambio, vale cualquier mazo y cuantas veces se
   // quiera, y cada duelo estrena semilla.
+  // Un mazo al que todavía no se tiene derecho. Hoy no se llega nunca aquí: la beta lo
+  // tiene todo abierto. Existe para que el día que haya tienda la puerta cerrada tenga
+  // una explicación y una salida, en vez de un botón que no hace nada.
+  function mazoCerrado(modeKey) {
+    const razon = CT.Cartera.motivo(modeKey);
+    if (!razon) return;
+    screen = "mazo-cerrado";
+    const juego = CT.mode(modeKey);
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+      <section class="pass-screen"><div class="panel">
+        <div class="big-icon">🔒</div>
+        <div class="eyebrow">Todavía no es tuyo</div>
+        <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.6rem)">${escapeHtml(juego.name)}</h1>
+        <p class="lead" style="margin-inline:auto">${escapeHtml(razon.texto)}</p>
+        <button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>
+      </div></section>
+    </div>`);
+  }
+
   // El duelo es uno solo con dos maneras de jugarlo, no dos formatos distintos: lo que
   // comparten —las mismas cartas en los dos móviles, el enlace, el nombre, el reloj y lo
   // que pasa al salirse de la aplicación— pesa mucho más que en lo que se diferencian,
@@ -2433,6 +2463,7 @@
     "mazo-distinto": "Este duelo se creó con una versión distinta del mazo, así que las cartas no serían las mismas. Actualizad los dos la aplicación y volved a intentarlo.",
     version: "Este enlace es de una versión más nueva del juego. Actualiza la aplicación para poder jugarlo.",
     mazo: "El enlace menciona un mazo que este juego no tiene.",
+    "mazo-cerrado": "Este reto es de un mazo que todavía no es tuyo. Consíguelo y podrás aceptarlo.",
     roto: "El enlace está incompleto o se ha estropeado por el camino. Pide que te lo manden otra vez, entero."
   };
 
@@ -2496,6 +2527,10 @@
   // Un tema de
   // competición que sea «un poco de todo lo anterior» no aporta nada nuevo a la ronda, así
   // que se excluye de la rotación.
+  // La rotación sortea temas, así que solo puede sortear los que el jugador tiene. Se
+  // calcula al empezar cada competición y no una vez al cargar: entre una y otra puede
+  // haber cambiado lo que tiene abierto.
+  const compModes = () => Object.keys(CT.MODES).filter(key => key !== "mixed" && CT.Cartera.tiene(key));
   const COMP_MODES = Object.keys(CT.MODES).filter(key => key !== "mixed");
   const TOTAL_TEMAS = COMP_MODES.length;
   let comp = null;
@@ -2550,7 +2585,8 @@
     if (loadCompetition()) { resumeCompetition(); return; }
     solo = null;
     previousModeKey = selectedModeKey;
-    comp = { decks: CT.Saves.clone(Object.fromEntries(COMP_MODES.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(COMP_MODES).slice(0, Number(document.getElementById("competition-length")?.value) || COMP_MODES.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    const temas = compModes();
+    comp = { decks: CT.Saves.clone(Object.fromEntries(temas.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(temas).slice(0, Number(document.getElementById("competition-length")?.value) || temas.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
     comp.totalThemes = comp.queue.length;
     comp.cardsPerRound = competitionOptions().cards;
     compRoundIntro();
@@ -2967,6 +3003,13 @@
     if (salidaOnline) { salidaOnline.click(); return; }
     backMenu();
   });
+  // Qué mazos tiene abiertos quien juega. Hoy lo concede la beta y los abre todos: no hay
+  // tienda, nadie ha pagado nada y nadie tiene nada cerrado. El día que la haya, aquí se
+  // le pregunta a Apple o a Google qué tiene comprado esta cuenta y se concede eso —y se
+  // concede en cada apertura, porque quien manda es la tienda y no lo que quedó guardado
+  // en el móvil—. Ese es el único cambio: el resto del juego ya pregunta a la cartera.
+  CT.Cartera.concede({ origen: "beta" });
+
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
   CT.Links.start(target => {

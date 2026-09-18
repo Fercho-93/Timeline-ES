@@ -374,6 +374,12 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
    borde —una carta de la línea mide 130 px en un móvil estrecho—. El icono no encoge.
    Y va en su propia línea (`flex` con `width: fit-content`, no `inline-flex`) para que
    «Fecha oculta» no se le meta al lado en la carta de la mano. */
+/* Un mazo que todavía no es del jugador: se ve, se lee y se entiende por qué no se
+   puede abrir. Esconderlo sería peor: nadie compra lo que no sabe que existe. */
+.game-row-cerrado { opacity: .72; }
+.game-row-cerrado .game-name { color: var(--muted); }
+.game-candado { font-size: .8em; }
+
 .card-category { display: flex; width: fit-content; align-items: center; gap: 4px; max-width: 100%; margin-bottom: 6px; padding: 3px 8px; border-radius: 999px; background: var(--paper); color: var(--muted); font-size: .62rem; font-weight: 700; text-align: left; text-transform: uppercase; letter-spacing: .06em; line-height: 1.3; overflow-wrap: anywhere; }
 .card-category > span { flex: none; }
 .hand-card .card-category { position: relative; z-index: 1; }

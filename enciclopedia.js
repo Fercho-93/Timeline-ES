@@ -116,9 +116,13 @@
     const puestas = new Set();
     // Y una sola lectura de las descubiertas para los treinta y pico mazos de abajo.
     const vistas = lock === "all" ? null : (descubiertas || seen());
+    // Un mazo cerrado no enseña sus cartas: las cartas son justo lo que se vendería, y
+    // un álbum que las enseña todas gratis deja la compra sin sentido. Que exista ya se
+    // ve en la portada, con su candado. Esto no toca el progreso de nadie: lo que se
+    // descubrió sigue descubierto, solo deja de poder consultarse.
     return Object.values(CT.BLOCKS).map(block => ({
       ...block,
-      decks: block.games.filter(key => key !== 'mixed').map(key => ({
+      decks: block.games.filter(key => key !== 'mixed' && CT.Cartera.tiene(key)).map(key => ({
         key, name: CT.mode(key).name,
         cards: filterCards(key, { query, lock, descubiertas: vistas }).filter(card => {
           if (puestas.has(card.id)) return false;
@@ -137,7 +141,7 @@
     if (!ids.length) return [];
     const origin = new Map();
     for (const block of Object.values(CT.BLOCKS)) for (const modeKey of block.games) {
-      if (modeKey === "mixed") continue;
+      if (modeKey === "mixed" || !CT.Cartera.tiene(modeKey)) continue;
       for (const card of CT.cards(modeKey)) if (!origin.has(card.id)) origin.set(card.id, { modeKey, card });
     }
     return ids.map(id => origin.get(id)).filter(item => item && CT.cardArt(item.modeKey, item.card)).slice(0, limit);
