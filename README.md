@@ -160,6 +160,41 @@ descubiertas viajan en el perfil, así que se conservan al exportarlo e importar
 identificadores no se repiten entre mazos: descubrir una carta en «Gran mezcla» la
 descubre también en su mazo de origen.
 
+## La cartera
+
+`cartera.js` es el único sitio del juego que responde a **«¿tiene derecho este jugador a
+este mazo?»**. Hoy la respuesta es siempre que sí: no hay nada a la venta y la concesión de
+arranque —`CT.Cartera.concede({ origen: "beta" })`— abre el catálogo entero.
+
+El trabajo que hace no es cerrar mazos, es que **todo el juego pregunte**: la portada, la
+lista de mazos de cada colección, `setMode` —por donde pasa cualquier camino que lleve a
+jugar—, la rotación de temas de competición, la enciclopedia y los duelos que llegan por
+enlace. El día que haya tienda se cambia un sitio y el resto se entera solo.
+
+Dos reglas que conviene no romper:
+
+1. **Lo guardado en el móvil nunca manda sobre lo comprado.** Sirve para jugar sin
+   conexión y nada más. Quien lleva el registro de lo comprado es la tienda —Apple y
+   Google lo atan a la cuenta del cliente, no a la instalación— y se le pregunta al abrir.
+   Invertir esto significa que el día que alguien borre los datos del navegador le habremos
+   quitado un mazo a un cliente que pagó.
+2. **La cartera decide qué se puede jugar, nunca qué se ha jugado.** El progreso, los
+   logros y las cartas descubiertas son del jugador y no se tocan aunque un mazo deje de
+   estar a su alcance; si vuelve, vuelve con todo lo que había.
+
+Un mazo cerrado **se sigue viendo**, con su candado y con el nombre de lo que haría falta
+para abrirlo: esconderlo significaría que nadie sabe que existe. Lo que no enseña son sus
+cartas, ni en la enciclopedia ni en la partida, porque las cartas son justo lo que se
+vendería.
+
+`CT.Cartera.paquetes()` declara lo que se vendería —un paquete por colección más uno que lo
+incluye todo—, y `LIBRES` es la lista, hoy vacía, de lo que sería gratis siempre. Ninguna de
+las dos compromete precio ni decisión: son el esqueleto sobre el que colgar las fichas de
+las tiendas cuando se decida.
+
+`node tests/cartera.mjs` cierra un mazo a mano y recorre el juego entero comprobando que
+todos los rincones lo respetan. Sin esa mitad, la cartera sería una función que nadie llama.
+
 ## Duelo por enlace
 
 Un formato más dentro de «Jugar en solitario». Juegas unas cartas al azar del mazo abierto y
