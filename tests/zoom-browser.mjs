@@ -62,13 +62,14 @@ try {
    assert.ok(dockBox.x+dockBox.width>=390-13,'la confirmación queda alineada a la derecha');
    assert.ok(dockBox.width<390*.6,'la confirmación deja visible la mayor parte del tablero');
    assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
-   const curl=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>{
-     const cs=getComputedStyle(el,'::before');
-     // `top` devuelve el valor usado, no `auto`, así que se mide dónde cae de verdad.
-     return {radius:cs.borderRadius,alto:el.clientHeight,arriba:parseFloat(cs.top),propio:parseFloat(cs.height)};
-   });
-   assert.equal(curl.radius,'0px','el pliegue de la esquina no es redondo: eso era la chapa del ✓ colándose');
-   assert.ok(curl.arriba+curl.propio>=curl.alto-6,`el pliegue va pegado al borde de abajo, no sobre el rótulo (cae en ${Math.round(curl.arriba)} de ${curl.alto})`);
+   const selectedStyle=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>({
+     fold:getComputedStyle(el,'::before').display,
+     transform:getComputedStyle(el).transform,
+     width:el.getBoundingClientRect().width,
+     height:el.getBoundingClientRect().height
+   }));
+   assert.equal(selectedStyle.fold,'none','la carta inferior no conserva el pliegue dorado');
+   assert.ok(selectedStyle.width>=100&&selectedStyle.height>=136,'la carta inferior gana presencia sin dominar la pantalla');
    // Con la carta a la vista, el muelle no la tapa.
    await duelPage.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
    const manoBox=await duelPage.locator('.hand-solo .hand-card').boundingBox();

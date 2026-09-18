@@ -656,7 +656,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app.atlas-board { --atlas-card: clamp(142px, calc(100dvh - 610px), 218px); }
   #app.atlas-board:has(.hand-solo) {
     --atlas-card: clamp(142px, calc((100dvh - 366px) * .62), 306px);
-    --atlas-hand: clamp(124px, calc((100dvh - 366px) * .36), 212px);
+    --atlas-hand: clamp(136px, calc((100dvh - 366px) * .40), 228px);
   }
   #app.atlas-board .timeline-card { width: max(112px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: max(76px, calc(var(--atlas-card) * .66 - 18px)); }
@@ -1206,7 +1206,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
     linear-gradient(#8a673e78,#8a673e78) center calc(50% + 1px) / 100% 1px no-repeat;
 }
 
-/* Al elegirla, el papel se despega de la mesa y la esquina inferior se curva. */
+/* Al elegirla, el papel se separa de la mesa con una señal limpia. La carta única de
+   abajo no lleva el antiguo pliegue ni los filetes dorados: el sello rojo ya explica
+   por sí solo que es la carta activa. */
 #app.atlas-board .hand .hand-card.selected {
   transform: translateY(-6px) rotate(-.35deg);
   box-shadow: 0 2px 0 #b78f5f, 0 13px 22px #3d271c2d, inset 0 1px 0 #fff9e7;
@@ -1222,6 +1224,16 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   clip-path: polygon(0 0, 100% 100%, 0 100%);
   filter: drop-shadow(3px -3px 3px #5037192a);
 }
+#app.atlas-board .hand-solo .hand-card {
+  border-color: color-mix(in srgb,var(--atlas-selection) 72%,var(--edition-ink));
+  box-shadow: 0 7px 17px #3d271c26;
+}
+#app.atlas-board .hand-solo .hand-card.selected {
+  transform: translateY(-4px);
+  outline: 2px solid var(--atlas-selection); outline-offset: 2px;
+  box-shadow: 0 9px 19px #3d271c2b;
+}
+#app.atlas-board .hand-solo .hand-card.selected::before { display: none; }
 
 /* Al acercar una carta, el hueco enseña solo su volumen: no revela el resultado. */
 #app.atlas-board .slot.drop-target::before {
