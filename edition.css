@@ -21,56 +21,14 @@
 :root[data-scene="globe"] { --scene-color: #365b73; --scene-wash: #90afc2; }
 :root[data-scene="mixed"] { --scene-color: #6c5130; --scene-wash: #c2a466; }
 
-/* Una sola paleta de noche, con la misma prioridad que el ajuste existente. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --edition-paper: #1c211f; --edition-surface: #252b27;
-    --edition-ink: #eee7d8; --edition-muted: #b9b4a6;
-    --edition-line: #4c5045; --edition-brass: #ceb483;
-    --edition-shade: 0 18px 45px #0003;
-  }
-}
+/* Cuero, marfil y latón: la misma gramática del atlas con profundidad suficiente para
+   separar fondo, navegación y salidas flotantes sin convertir la noche en negro plano. */
 :root[data-theme="dark"] {
-  --edition-paper: #1c211f; --edition-surface: #252b27;
-  --edition-ink: #eee7d8; --edition-muted: #b9b4a6;
-  --edition-line: #4c5045; --edition-brass: #ceb483;
-  --edition-shade: 0 18px 45px #0003;
+  --edition-paper: #18110b; --edition-surface: #2a1d11;
+  --edition-ink: #f3e7cf; --edition-muted: #c8b995;
+  --edition-line: #6d5435; --edition-brass: #d4bb8b;
+  --edition-shade: 0 20px 48px #0008;
 }
-
-/* Pergamino: la edición se pasa al papel de la mesa. No hace falta nada en styles.css
-   —la mesa ya es de papel en el tema claro—, así que el aspecto entero cabe aquí. */
-:root[data-theme="sepia"] {
-  --edition-paper: #ecdfc4; --edition-surface: #f7efdc;
-  --edition-ink: #3a2d19; --edition-muted: #6f5a37;
-  --edition-line: #cbb489; --edition-brass: #7d5c28;
-  --edition-shade: 0 18px 45px #5a401820;
-}
-
-/* Noche profunda: negro de verdad, con la línea y el latón un punto más vivos para que
-   los bordes no se traguen el fondo. */
-:root[data-theme="night"] {
-  --edition-paper: #000; --edition-surface: #0f1211;
-  --edition-ink: #f4eee2; --edition-muted: #b6b1a3;
-  --edition-line: #3e433b; --edition-brass: #d9bd88;
-  --edition-shade: 0 18px 45px #000c;
-}
-/* Y sin el velo de color del bloque abierto, que sobre negro se ve como una mancha. */
-:root[data-theme="night"] body { background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 7%, transparent), transparent 45%), var(--edition-paper); }
-
-/* Alto contraste: blanco, tinta casi negra y bordes que se ven. El color del bloque se
-   apaga aquí y no en cada regla, así que también lo pierden el botón principal, el
-   cartel de competición y el velo de la portada. La segunda mitad del selector gana al
-   `[data-scene]` de arriba, que tiene la misma especificidad y va antes. */
-:root[data-theme="contrast"], :root[data-theme="contrast"][data-scene] {
-  --edition-paper: #fff; --edition-surface: #fff;
-  --edition-ink: #0b0b0b; --edition-muted: #2e2e2e;
-  --edition-line: #1a1a1a; --edition-brass: #5a3d00;
-  --edition-shade: none;
-  --scene-color: #1c1c1c; --scene-wash: #fff;
-}
-/* Las circunferencias del fondo se dibujan con la línea, y con una línea tan marcada
-   dejan de ser un adorno para convertirse en trazos cruzando el texto. */
-:root[data-theme="contrast"] body::before { display: none; }
 html { background: var(--edition-paper); }
 html body {
   background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 18%, transparent), transparent 55%), var(--edition-paper);
@@ -83,9 +41,6 @@ html body::before {
   background: radial-gradient(circle at 96% 10%, transparent 0 179px, var(--edition-line) 180px, transparent 181px 215px, var(--edition-line) 216px, transparent 217px 320px, var(--edition-line) 321px, transparent 322px);
 }
 :root[data-theme="dark"] body { background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 12%, transparent), transparent 55%), var(--edition-paper); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) body { background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 12%, transparent), transparent 55%), var(--edition-paper); }
-}
 .shell { position: relative; }
 .home-shell { max-width: 1160px; padding-inline: clamp(18px, 4vw, 48px); padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
 .topbar { color: var(--edition-ink); border-color: var(--edition-line); }
@@ -379,7 +334,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .enc-card-illustrated .card-visual .animal-card-art { display: block; width: 100%; height: 100%; object-fit: contain; filter: none; }
 /* El sello de la lámina por descubrir: un papel tramado, la tinta del aspecto en curso y
    el hueco del candado del color del papel. Se derivan de las variables de la edición, así
-   que los cinco aspectos —incluido alto contraste— traen el suyo sin declarar nada más. */
+   que Claro y Oscuro traen el suyo sin declarar nada más. */
 :root {
   --enc-sello: repeating-linear-gradient(135deg,
     color-mix(in srgb, var(--edition-brass) 14%, var(--edition-paper)) 0 9px,
@@ -439,8 +394,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 
 /* Atlas: navegación común, arte integrado y mesa compacta. */
 :root { --atlas-selection: #9b452b; }
-:root[data-theme="dark"], :root[data-theme="night"] { --atlas-selection: #f2aa83; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) { --atlas-selection: #f2aa83; } }
+:root[data-theme="dark"] { --atlas-selection: #f2aa83; }
 #app .atlas-topbar { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 8px; width: 100%; padding: 4px 0; margin: 0 0 12px; min-height: 48px; border: 0; }
 #app .atlas-topbar .brand { min-height: 0; text-align: center; font-size: .72rem; letter-spacing: .16em; }
 #app .atlas-topbar .icon-btn { display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 50%; background: transparent; }
@@ -719,8 +673,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app .walking-art { position: absolute; z-index: -1; inset: 0 18px 0 auto; width: 58%; height: 100%; object-fit: cover; object-position: right 65%; mix-blend-mode: multiply; opacity: .82; -webkit-mask-image: linear-gradient(90deg,transparent,#000 38%,#000 92%,transparent); mask-image: linear-gradient(90deg,transparent,#000 38%,#000 92%,transparent); }
 #app .walking-copy { max-width: 65%; text-shadow: 0 1px 3px var(--edition-surface),0 0 8px var(--edition-surface); }
 #app .walking-choice > i { align-self: center; z-index: 1; }
-:root:is([data-theme="dark"],[data-theme="night"]) #app .walking-art { mix-blend-mode: normal; opacity: .3; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) #app .walking-art { mix-blend-mode: normal; opacity: .3; } }
+:root[data-theme="dark"] #app .walking-art { mix-blend-mode: normal; opacity: .3; }
 @media (max-width: 699px) {
   /* `dvh` y no `svh`: la barra inferior se pliega al desplazarse y la barra de menús va
      fija al borde real de la ventana, así que midiendo con la altura mínima la columna
@@ -865,8 +818,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   #app .reveal .art-thumb { float: left; margin: 2px 14px 6px 0; }
   #app .reveal .year { margin-top: 0; }
 }
-:root:is([data-theme="dark"],[data-theme="night"]) #app .art-thumb img { mix-blend-mode: normal; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) #app .art-thumb img { mix-blend-mode: normal; } }
+:root[data-theme="dark"] #app .art-thumb img { mix-blend-mode: normal; }
 
 /* Reversos ilustrados: la portada común nunca anticipa la carta individual. */
 #app .hand-card { isolation: isolate; background: #f3eee4; color: #302d27; }
@@ -1134,12 +1086,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   background: color-mix(in srgb, var(--choice-pigment) 24%, var(--edition-surface));
 }
 #app .play-menu-shell .walking-art { filter: sepia(.35) saturate(1.15); opacity: .9; }
-:root[data-theme="contrast"] #app .play-menu-shell .walking-choice { --choice-pigment: var(--edition-ink); --choice-tint: var(--edition-surface); background: var(--edition-surface); }
-:root[data-theme="contrast"] #app .play-menu-shell .atlas-landscape::after { background: linear-gradient(var(--edition-paper), transparent 60%, var(--edition-paper)); }
-:root:is([data-theme="dark"], [data-theme="night"], [data-theme="contrast"]) #app .play-menu-shell .atlas-intro h1 { color: var(--edition-ink); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="sepia"]) #app .play-menu-shell .atlas-intro h1 { color: var(--edition-ink); }
-}
+:root[data-theme="dark"] #app .play-menu-shell .atlas-intro h1 { color: var(--edition-ink); }
 
 /* Botones como piezas de papel prensado: un canto fino, contacto con la mesa y una
    respuesta corta al dedo. Conservan la tinta propia de cada acción. */
@@ -1487,11 +1434,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 
 /* Ajustes muestra una mini página aislada: elegir no cambia toda la app hasta confirmar. */
 .settings-look-preview { --preview-paper:#f3eee4; --preview-surface:#fbf8f2; --preview-ink:#302d27; --preview-muted:#756d62; --preview-accent:#9e4a2a; margin: 10px 0 14px; padding: 12px; border-radius: 13px; background: #7c746b; box-shadow: inset 0 0 0 1px #ffffff24; }
-.settings-look-preview[data-preview-theme="sepia"] { --preview-paper:#ecdfc4;--preview-surface:#f7ebd1;--preview-ink:#382b20;--preview-muted:#756146;--preview-accent:#9a4d2c; }
-.settings-look-preview[data-preview-theme="contrast"] { --preview-paper:#fff;--preview-surface:#fff;--preview-ink:#000;--preview-muted:#252525;--preview-accent:#8b2600; }
-.settings-look-preview[data-preview-theme="dark"] { --preview-paper:#1c211f;--preview-surface:#272d2a;--preview-ink:#f2e9d8;--preview-muted:#c0b7a8;--preview-accent:#e29a6e; }
-.settings-look-preview[data-preview-theme="night"] { --preview-paper:#000;--preview-surface:#121412;--preview-ink:#fff;--preview-muted:#d0d0ca;--preview-accent:#efad79; }
-@media (prefers-color-scheme:dark) { .settings-look-preview[data-preview-theme="auto"] { --preview-paper:#1c211f;--preview-surface:#272d2a;--preview-ink:#f2e9d8;--preview-muted:#c0b7a8;--preview-accent:#e29a6e; } }
+.settings-look-preview[data-preview-theme="dark"] { --preview-paper:#18110b;--preview-surface:#2a1d11;--preview-ink:#f3e7cf;--preview-muted:#c8b995;--preview-accent:#e39a68; }
 .look-preview-page { min-height: 142px; padding: 15px; border: 1px solid color-mix(in srgb,var(--preview-muted) 42%,transparent); border-radius: 8px; background: var(--preview-paper); color: var(--preview-ink); box-shadow: 0 7px 15px #17110b38; overflow: hidden; }
 .look-preview-page > span { color: var(--preview-accent); font: 700 calc(.5rem * var(--preview-text))/1.2 var(--ui-font); letter-spacing: .15em; }
 .look-preview-page h3 { margin: 5px 0 2px; color: var(--preview-ink); font: 500 calc(1.05rem * var(--preview-text))/1.1 var(--font-display); }

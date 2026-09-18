@@ -322,19 +322,20 @@ también las dos etiquetas de color de la barra del navegador.
 
 | Aspecto | Para qué |
 | --- | --- |
-| **Automático** | Sigue la preferencia del móvil: claro de día y oscuro de noche, sin tocar nada. |
 | **Claro** | El papel de la edición: crema frío, tinta carbón y latón. |
-| **Pergamino** | La misma edición pasada al papel de la mesa: papel envejecido y tinta sepia. Más cálido y con menos luz azul que el claro, para leer de noche sin irse al oscuro. |
-| **Alto contraste** | Blanco, tinta casi negra y bordes de 1 px bien visibles. Apaga las veladuras, las circunferencias del fondo y hasta el color de cada bloque: aquí manda leer. |
-| **Oscuro** | Cuero oscuro y tinta dorada. |
-| **Noche profunda** | El mismo cuero, pero sobre negro de verdad. En una pantalla OLED el negro son píxeles apagados: ni luz en una habitación a oscuras, ni batería. |
+| **Oscuro** | Cuero entintado, marfil cálido y latón, con capas diferenciadas para la navegación, los modales y el tablero. |
 
-Los cinco aspectos (los seis, contando «automático») viven en variables CSS: las de la
-interfaz en `edition.css` (`--edition-*`) y las de la mesa en `styles.css`. Un aspecto que
+Los dos temas viven en variables CSS: las de la interfaz en `edition.css` (`--edition-*`)
+y las de la mesa en `styles.css`. Un tema que
 cambie el fondo tiene que traer **todas** las superficies, no solo el papel: si una se
 queda con su valor claro, el texto de encima —que sí cambia— deja de leerse. Eso lo
 vigila `tests/accesibilidad.mjs`, que además comprueba que los seis colores de cada
-aspecto llegan a 4,5:1 en los pares que llevan texto.
+tema llegan a 4,5:1 en los pares que llevan texto.
+
+Al actualizar desde una versión anterior, Pergamino y Alto contraste pasan a Claro;
+Noche profunda pasa a Oscuro; y Automático conserva el aspecto que indique el sistema
+en ese primer arranque. La migración guarda el resultado sin tocar el tamaño de texto ni
+los efectos opcionales.
 
 El mismo panel lleva un botón de comentarios que abre un correo con la versión instalada
 y la pantalla en la que se estaba, para no tener que describirlo de memoria. Si algo se

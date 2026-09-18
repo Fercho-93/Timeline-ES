@@ -5,14 +5,14 @@ import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
-function boot({ reduce = false, seen = false, saved = {}, userAgent = null } = {}) {
+function boot({ reduce = false, darkScheme = false, seen = false, saved = {}, userAgent = null } = {}) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {
     runScripts: 'outside-only', url: 'https://continuum.test/'
   }).window;
   w.scrollTo = () => {};
   if (userAgent) Object.defineProperty(w.navigator, 'userAgent', { value: userAgent });
   w.Element.prototype.scrollIntoView = () => {};
-  w.matchMedia = () => ({ matches: reduce });
+  w.matchMedia = query => ({ matches: query.includes('prefers-color-scheme') ? darkScheme : reduce });
   for (const [key, value] of Object.entries(saved)) w.localStorage.setItem(key, value);
   if (seen) w.localStorage.setItem('continuum-splash-seen-v2', '1');
   for (const m of html.matchAll(/<script src="([^"]+)"><\/script>/g)) w.eval(read(m[1]));
@@ -271,7 +271,7 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
 console.log('Paso de página: giro inverso, interrupciones y movimiento reducido: OK');
 for (const userAgent of ['Mozilla/5.0 (Linux; Android 14; Samsung)', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)']) {
   for (const textSize of ['100', '150', '200']) {
-    const w = boot({ userAgent, seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: 'auto', textSize }) } });
+    const w = boot({ userAgent, seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: 'light', textSize }) } });
     try {
       const root = w.document.documentElement;
       assert.equal(root.dataset.platform, userAgent.includes('Android') ? 'android' : 'other');
@@ -281,34 +281,29 @@ for (const userAgent of ['Mozilla/5.0 (Linux; Android 14; Samsung)', 'Mozilla/5.
   }
 }
 console.log('Vista Android compacta: detección independiente y ampliación del usuario conservada: OK');
-// Los aspectos. Lo que se elige tiene que llegar a tres sitios: al elemento raíz (de ahí
-// cuelgan todas las paletas), a las dos etiquetas de color de la barra del navegador —que
-// no leen variables CSS— y al almacenamiento. Y la hoja de estilo tiene que traer la
-// paleta de cada uno: un `data-theme` sin bloque detrás deja la aplicación a medio pintar.
+// Los dos temas. Lo que se elige tiene que llegar al elemento raíz, a las dos etiquetas
+// de color de la barra del navegador y al almacenamiento.
 {
-  const ASPECTOS = ['auto', 'light', 'sepia', 'contrast', 'dark', 'night'];
-  const CLARO = '#f3eee4', OSCURO = '#1c211f';
+  const ASPECTOS = ['light', 'dark'];
+  const COLORES = { light: '#f3eee4', dark: '#18110b' };
   const colores = w => [...w.document.querySelectorAll('meta[name="theme-color"]')].map(m => m.getAttribute('content'));
   for (const theme of ASPECTOS) {
     const w = boot({ seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme, textSize: '100' }) } });
     try {
       const root = w.document.documentElement;
-      assert.equal(root.dataset.theme, theme === 'auto' ? undefined : theme, `el aspecto ${theme} llega al elemento raíz`);
-      // En «automático» cada etiqueta conserva la suya y manda la preferencia del móvil;
-      // con un aspecto elegido, las dos dicen su papel para que no parpadee al abrir.
-      if (theme === 'auto') assert.deepEqual(colores(w), [CLARO, OSCURO]);
-      else assert.equal(new Set(colores(w)).size, 1, `${theme} fija las dos etiquetas`);
-      // El desplegable ofrece todos los aspectos y llega marcando el que está puesto.
+      assert.equal(root.dataset.theme, theme, `el aspecto ${theme} llega al elemento raíz`);
+      assert.deepEqual(colores(w), [COLORES[theme], COLORES[theme]], `${theme} fija las dos etiquetas`);
+      // El desplegable ofrece solo Claro y Oscuro y llega marcando el que está puesto.
       w.document.querySelector('[data-settings-action="open"]').click();
       const opciones = [...w.document.querySelectorAll('#ajuste-tema option')];
       assert.deepEqual(opciones.map(o => o.value), ASPECTOS);
       assert.equal(w.document.querySelector('#ajuste-tema option[selected]').value, theme);
       assert.ok(opciones.every(o => o.textContent.trim()), 'cada aspecto tiene su nombre');
-      assert.equal(w.document.querySelectorAll('#ajuste-tema optgroup').length, 2, 'claros y oscuros, separados');
+      assert.equal(w.document.querySelectorAll('#ajuste-tema optgroup').length, 0, 'dos opciones directas, sin grupos vacíos');
     } finally { w.close(); }
   }
   const estilos = read('edition.css') + read('styles.css');
-  for (const theme of ASPECTOS.filter(t => !['auto', 'light'].includes(t))) {
+  for (const theme of ASPECTOS.filter(t => t !== 'light')) {
     assert.ok(estilos.includes(`[data-theme="${theme}"]`), `el aspecto ${theme} tiene paleta en la hoja de estilo`);
   }
   // Elegir se ve primero en la muestra; la apariencia solo cambia al confirmarla.
@@ -317,31 +312,36 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
     try {
       w.document.querySelector('[data-settings-action="open"]').click();
       const select = w.document.querySelector('#ajuste-tema');
-      select.value = 'night';
+      select.value = 'dark';
       select.dispatchEvent(new w.Event('change', { bubbles: true }));
-      assert.equal(w.document.documentElement.dataset.theme, undefined);
-      assert.equal(w.document.querySelector('[data-look-preview]').dataset.previewTheme, 'night');
+      assert.equal(w.document.documentElement.dataset.theme, 'light');
+      assert.equal(w.document.querySelector('[data-look-preview]').dataset.previewTheme, 'dark');
       w.document.querySelector('[data-settings-action="apply-look"]').click();
-      assert.equal(w.document.documentElement.dataset.theme, 'night');
-      assert.equal(colores(w).join('|'), '#000000|#000000');
-      assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).theme, 'night');
+      assert.equal(w.document.documentElement.dataset.theme, 'dark');
+      assert.equal(colores(w).join('|'), '#18110b|#18110b');
+      assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).theme, 'dark');
       // Y un valor que no existe no llega a aplicarse: el aspecto anterior se queda.
       select.value = 'inventado';
       select.dispatchEvent(new w.Event('change', { bubbles: true }));
-      assert.equal(w.document.documentElement.dataset.theme, 'night');
+      assert.equal(w.document.documentElement.dataset.theme, 'dark');
     } finally { w.close(); }
   }
-  // Un aspecto retirado (o cualquier cosa rara guardada) vuelve a «automático» en vez de
-  // dejar un `data-theme` sin estilos detrás.
-  {
-    const w = boot({ seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: 'retirado', textSize: '100' }) } });
+  // Las seis preferencias anteriores migran una sola vez a su equivalente más cercano,
+  // sin perder el tamaño de texto ni el resto de ajustes.
+  for (const [legacy, expected, darkScheme = false] of [
+    ['auto', 'light'], ['auto', 'dark', true], ['sepia', 'light'],
+    ['contrast', 'light'], ['night', 'dark'], ['retirado', 'light']
+  ]) {
+    const w = boot({ darkScheme, seen: true, saved: { 'hilo-ajustes-v1': JSON.stringify({ theme: legacy, textSize: '150', ambience: true }) } });
     try {
-      assert.equal(w.document.documentElement.dataset.theme, undefined);
-      assert.deepEqual(colores(w), [CLARO, OSCURO]);
+      assert.equal(w.document.documentElement.dataset.theme, expected, `${legacy} migra a ${expected}`);
+      const migrated = JSON.parse(w.localStorage.getItem('hilo-ajustes-v1'));
+      assert.deepEqual(migrated, { theme: expected, textSize: '150', ambience: true });
+      assert.deepEqual(colores(w), [COLORES[expected], COLORES[expected]]);
     } finally { w.close(); }
   }
 }
-console.log('Aspectos: raíz, barra del navegador, desplegable, paleta en la hoja y valores retirados: OK');
+console.log('Temas: selección Claro/Oscuro, barra del navegador y migración de preferencias: OK');
 // El atajo al inicio es el único botón de la barra que es un dibujo y no una palabra, así
 // que necesita su propia caja. Se le escapó una vez: el tamaño estaba puesto en styles.css
 // y lo pisaba la barra agrupada del móvil, que aprieta todos sus botones y les quita el
