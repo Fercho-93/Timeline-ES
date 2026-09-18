@@ -10,7 +10,7 @@ const ASSETS = [
   "./assets/audio/CREDITS.md",
   "./assets/competition-engraving.webp",
   "./assets/mode-walk-solo.webp", "./assets/mode-walk-multi.webp",
-  "./deployment.js", "./accounts.css", "./firebase-client.js", "./account-storage.js", "./accounts.js", "./boot.js",
+  "./deployment.js", "./accounts.css", "./firebase-client.js", "./account-storage.js", "./recent-players.js", "./accounts.js", "./boot.js",
   "./privacidad.html",
   "./engine.js", "./final.js", "./tournament.js", "./links.js",
   "./", "./index.html", "./splash.css", "./splash.js", "./styles.css", "./edition.css", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
