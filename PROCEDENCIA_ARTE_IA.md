@@ -24,6 +24,7 @@ El sistema visual común se ha construido mediante instrucciones de continuidad 
 - Longevidad de animales: 26 imágenes nuevas y 12 reutilizadas, con lámina naturalista antigua, sepia, animal completo y formato WebP de 512 × 768.
 - Velocidad de animales: 31 imágenes nuevas y 7 reutilizadas, manteniendo el mismo lenguaje naturalista.
 - Logo e icono: se conserva evidencia conversacional de generación mediante el prompt «crea un icono y logo para el juego de timeline/continuum».
+- Portada de apertura: `assets/continuum-splash-v2.webp` se generó con ChatGPT/OpenAI el 18 de septiembre de 2026 a partir de un mockup aportado por el titular. El mockup se utilizó como referencia de composición, luz, paleta y materiales; el recurso final se pidió sin texto, logotipo ni controles para superponer en HTML la marca y los botones accesibles del juego.
 - Recursos recuperados: la ilustración de Austria fue generada el 8 de septiembre de 2026 con la herramienta de imágenes de OpenAI. El recurso de agujero negro se recuperó reutilizando otra ilustración existente del proyecto.
 
 ## Límites de la documentación

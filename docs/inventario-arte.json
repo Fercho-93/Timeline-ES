@@ -2087,6 +2087,20 @@
       }
     },
     {
+      "path": "assets/continuum-splash-v2.webp",
+      "sha256": "ad21f4e556a8e920f494e2eabbaf552a4f45bf7189eeb902f9dcbc6d6658f56f",
+      "rightsEvidence": {
+        "status": "ai-generated-with-recorded-prompt",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": "Fondo vertical 9:16 de pergamino luminoso con astrolabio, cartas antiguas flotantes y globo inferior; sin texto, logotipo, botones, iconos ni emblema central.",
+        "generatedAt": "2026-09-18",
+        "referenceImage": "Mockup de portada aportado por el titular el 2026-09-18.",
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/country-cards/2001.webp",
       "sha256": "7e2de4bf5ae1ee1fca9778af298afb24b59eba9cf43632144f3e945870832345",
       "rightsEvidence": {

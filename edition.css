@@ -377,7 +377,9 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 }
 
 /* La apertura dibuja una línea de cinco hitos antes de descubrir la colección. */
-html.splash-active #app-splash { color: var(--edition-ink); background: var(--edition-paper); }
+/* La portada trae su propia lámina en splash.css. Aquí solo se ajusta el papel que queda
+   detrás de ella; usar el atajo `background` borraría la imagen al cargarse esta hoja. */
+html.splash-active #app-splash { color: var(--edition-ink); background-color: var(--edition-paper); }
 .splash-hitos { position: relative; display: flex; justify-content: space-between; width: 180px; margin: 22px auto 0; }
 .splash-hitos::before { content: ""; position: absolute; height: 1px; top: 3px; inset-inline: 0; background: var(--edition-brass); transform-origin: left; }
 .splash-hitos i { z-index: 1; width: 7px; height: 7px; border: 1px solid var(--edition-brass); border-radius: 50%; background: var(--edition-paper); }

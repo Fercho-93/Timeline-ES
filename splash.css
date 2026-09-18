@@ -1,4 +1,4 @@
-/* La apertura comparte la tinta y el papel del tema elegido. */
+/* Portada de apertura: una escena completa, no una pantalla de carga genérica. */
 #app-splash { display: none; }
 html.splash-active #app-splash {
   display: block;
@@ -9,140 +9,182 @@ html.splash-active #app-splash {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  color: var(--edition-ink, #302d27);
-  background: var(--edition-paper, #f3eee4);
+  color: #29241e;
+  background: #e9dcc3 url("assets/continuum-splash-v2.webp") center / cover no-repeat;
   opacity: 1;
+  isolation: isolate;
   transition: opacity 1100ms cubic-bezier(.4, .08, .4, .94);
+}
+/* Un velo muy ligero reserva contraste para la marca sin borrar la textura. */
+html.splash-active #app-splash::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 52%, #fff8e9d1 0 19%, #fff8e965 38%, transparent 61%),
+    linear-gradient(180deg, #2b190914 0, transparent 18%, transparent 78%, #291a1330 100%);
 }
 /* La salida es larga a propósito: el telón se disuelve, no se retira. */
 html.splash-active #app-splash.splash-exit { opacity: 0; }
-/* El emblema se apaga antes que el papel: si aguantara hasta el final se cruzaría con
-   el rótulo de la portada del juego y se verían dos Continuum a la vez. */
 html.splash-active #app-splash.splash-exit .splash-masthead,
+html.splash-active #app-splash.splash-exit .splash-actions,
+html.splash-active #app-splash.splash-exit .splash-sound,
 html.splash-active #app-splash.splash-exit .splash-status { opacity: 0; }
-html.splash-active #app-splash.splash-exit .splash-masthead { transform: translate(-50%, -50%) scale(1.05); }
+html.splash-active #app-splash.splash-exit .splash-masthead { transform: translate(-50%, -50%) scale(1.035); }
 html.splash-active #app-splash .splash-masthead { transition: opacity 560ms ease-out, transform 1100ms cubic-bezier(.4, .08, .4, .94); }
+html.splash-active #app-splash .splash-actions,
+html.splash-active #app-splash .splash-sound,
 html.splash-active #app-splash .splash-status { transition: opacity 460ms ease-out; }
-/* Y la pantalla que aparece detrás se aclara a su ritmo, en el mismo compás en que la
-   música termina de entrar. */
+
 #app.app-arrive { animation: app-arrive 1400ms cubic-bezier(.4, .08, .4, .94) both; }
 @keyframes app-arrive { from { opacity: 0; } to { opacity: 1; } }
+
 html.splash-active #app-splash .splash-masthead {
   position: absolute;
-  top: 50%; left: 50%;
-  width: min(85vw, 520px);
+  top: 46%;
+  left: 50%;
+  width: min(92vw, 560px);
   max-width: none;
   margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 0;
+  padding: 0;
   opacity: 1;
+  text-align: center;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
+#app-splash .splash-crest {
+  grid-row: auto;
+  width: clamp(250px, 76vw, 440px);
+  margin: 0 auto -4px;
+  filter: drop-shadow(0 12px 14px #4e2a173d);
+}
+#app-splash .splash-crest::before { display: none; }
+#app-splash .splash-crest img { display: block; width: 100%; height: auto; }
 #app-splash .home-wordmark {
-  color: var(--edition-ink, #302d27);
-  text-shadow: none;
+  color: #27231f;
+  font: 500 clamp(2.65rem, 11.8vw, 5rem)/.9 var(--font-display, Georgia, "Times New Roman", serif);
+  letter-spacing: -.045em;
+  text-shadow: 0 1px 0 #fff9ecb8;
+  text-transform: uppercase;
 }
-#app-splash .home-tagline { color: var(--edition-muted, #70695d); }
-/* Solo se anima el emblema: el título y el lema se leen desde el primer instante. */
-#app-splash.splash-ready .splash-crest { animation: launch-reveal 700ms ease-out both; }
-html.splash-active #app-splash::before,
-html.splash-active #app-splash::after {
-  content: '';
-  position: absolute;
-  width: min(78vw, 650px);
-  aspect-ratio: 1;
-  border: 1px solid var(--edition-brass, #876330);
-  border-radius: 50%;
-  left: 50%; top: 46%;
-  opacity: .2;
-  transform: translate(-50%, -50%) rotateX(60deg) rotate(-25deg);
-  animation: launch-orbit 14s linear infinite;
-  pointer-events: none;
+#app-splash .home-tagline {
+  margin-top: 16px;
+  color: #5d5145;
+  font: 700 clamp(.58rem, 2.35vw, .78rem)/1.4 var(--ui-font, system-ui, sans-serif);
+  letter-spacing: .31em;
+  text-transform: uppercase;
 }
-html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direction: reverse; opacity: .1; }
+#app-splash .home-ornament { margin-top: 23px; }
+#app-splash .home-ornament span { background: #8c673f8f; }
+#app-splash .home-ornament i { border-color: #9b6f38; background: #f4e8ce80; }
+
+/* La marca llega como una pieza física que se posa sobre el astrolabio del fondo. */
+#app-splash.splash-ready .splash-crest { animation: launch-reveal 900ms cubic-bezier(.2,.7,.2,1) both; }
+#app-splash.splash-ready .home-wordmark,
+#app-splash.splash-ready .home-tagline,
+#app-splash.splash-ready .home-ornament { animation: launch-copy 650ms 180ms ease-out both; }
 @keyframes launch-reveal {
-  from { opacity: .65; transform: translateY(8px) scale(.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: .38; transform: translateY(14px) scale(.94); filter: blur(2px) drop-shadow(0 6px 8px #4e2a1722); }
+  to { opacity: 1; transform: none; filter: blur(0) drop-shadow(0 12px 14px #4e2a173d); }
 }
-@keyframes launch-orbit {
-  to { transform: translate(-50%, -50%) rotateX(60deg) rotate(335deg); }
+@keyframes launch-copy {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 }
-/* La entrada al juego: un botón ancho, del rojo de la tinta de las fechas, esperando el
-   toque de quien juega. Es la puerta —el juego no entra solo— y de paso es el gesto que
-   los navegadores exigen para dejar sonar la música. */
+
+/* El botón real queda separado del fondo para conservar foco, traducción y accesibilidad. */
 #app-splash .splash-actions {
   position: absolute;
   left: 50%;
-  bottom: max(13vh, 92px);
-  transform: translateX(-50%);
-  width: min(84vw, 420px);
+  bottom: max(16svh, calc(78px + env(safe-area-inset-bottom)));
+  width: min(78vw, 440px);
   display: grid;
   gap: 12px;
-  animation: splash-play-in 480ms 520ms ease-out both;
+  transform: translateX(-50%);
+  animation: splash-play-in 520ms 520ms ease-out both;
 }
+#app-splash .splash-play {
+  width: 100%;
+  min-height: 72px;
+  padding: 18px 28px;
+  border: 2px solid #6f301f;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #a04c32, #87351f 75%, #782b1b);
+  color: #fff5df;
+  font: 600 clamp(1.25rem, 5vw, 1.65rem)/1 var(--font-display, Georgia, "Times New Roman", serif);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 1px #3b160e;
+  box-shadow:
+    inset 0 0 0 3px #c69458,
+    inset 0 0 0 5px #5f2418,
+    0 13px 28px #44261757,
+    0 2px 0 #f3cc8d80;
+  cursor: pointer;
+  transition: filter 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+}
+#app-splash .splash-play:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 0 0 3px #c69458, inset 0 0 0 5px #5f2418, 0 7px 16px #4426174f;
+}
+#app-splash .splash-play:focus-visible { outline: 3px solid #f8e2af; outline-offset: 4px; }
+@media (hover: hover) and (pointer: fine) {
+  #app-splash .splash-play:hover { filter: brightness(1.08) saturate(1.05); }
+}
+
 #app-splash .splash-sound {
   position: fixed;
   z-index: 2;
-  top: max(18px, env(safe-area-inset-top));
-  right: max(18px, env(safe-area-inset-right));
+  top: max(24px, env(safe-area-inset-top));
+  right: max(22px, env(safe-area-inset-right));
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--edition-brass, #876330) 55%, transparent);
+  border: 1px solid #8f3c27;
   border-radius: 50%;
-  color: var(--edition-ink, #302d27);
-  background: color-mix(in srgb, var(--edition-paper, #f3eee4) 78%, transparent);
-  box-shadow: 0 5px 16px #3a2a1c1c;
+  color: #86351f;
+  background: #f7eddaeb;
+  box-shadow: 0 7px 20px #40220e2f, inset 0 0 0 1px #fff9e7;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   cursor: pointer;
-  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease, transform 120ms ease;
+  transition: color 160ms ease, background-color 160ms ease, transform 120ms ease;
 }
 #app-splash .splash-sound svg { width: 23px; height: 23px; overflow: visible; }
 #app-splash .splash-sound path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 #app-splash .splash-sound .sound-speaker { fill: currentColor; stroke: none; }
 #app-splash .splash-sound .sound-muted { display: none; }
-#app-splash .splash-sound[data-enabled="true"] {
-  border-color: var(--atlas-selection, #9b452b);
-  color: var(--atlas-selection, #9b452b);
-  background: color-mix(in srgb, var(--edition-paper, #f3eee4) 90%, transparent);
-}
+#app-splash .splash-sound[data-enabled="true"] { color: #6c2919; background: #fff7e8f5; }
 #app-splash .splash-sound[data-enabled="false"] .sound-waves { display: none; }
 #app-splash .splash-sound[data-enabled="false"] .sound-muted { display: block; }
 #app-splash .splash-sound:active { transform: scale(.94); }
-#app-splash .splash-sound:focus-visible { outline: 2px solid var(--edition-brass, #876330); outline-offset: 3px; }
-#app-splash .splash-play {
-  width: 100%;
-  min-height: 58px;
-  padding: 16px 28px;
-  border: 1px solid #7b3220;
-  border-radius: 9px;
-  background: var(--atlas-selection, #9b452b);
-  color: #fdf6e8;
-  font: 700 1.2rem/1 var(--font-display, Georgia, 'Times New Roman', serif);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  box-shadow: 0 12px 26px #3a2a1c47;
-  cursor: pointer;
-}
-#app-splash .splash-play:active { transform: translateY(1px); }
-#app-splash .splash-play:focus-visible { outline: 2px solid var(--edition-brass, #876330); outline-offset: 3px; }
+#app-splash .splash-sound:focus-visible { outline: 3px solid #8f3c27; outline-offset: 3px; }
+
 #app-splash .splash-status {
   position: absolute;
   left: 50%;
-  bottom: max(13vh, 92px);
-  transform: translateX(-50%);
-  width: min(84vw, 420px);
+  bottom: max(17svh, calc(90px + env(safe-area-inset-bottom)));
+  width: min(78vw, 440px);
   margin: 0;
-  color: var(--edition-muted, #70695d);
-  font: .82rem/1.4 system-ui, sans-serif;
-  letter-spacing: .06em;
+  color: #57483b;
+  font: 700 .78rem/1.4 var(--ui-font, system-ui, sans-serif);
+  letter-spacing: .12em;
   text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px #fff8e2;
   animation: splash-play-in 400ms ease-out both;
 }
-/* Mientras se monta la partida, los hitos de la línea laten uno detrás de otro: el
-   segundo telón no se lee, se cruza, y conviene que se note que algo avanza. */
+/* Los hitos solo aparecen al montar la aplicación, como indicador discreto. */
+#app-splash .splash-hitos { height: 7px; margin-top: 16px; opacity: 0; transition: opacity 180ms ease; }
+#app-splash.splash-entering .splash-hitos { opacity: .8; }
 @media (prefers-reduced-motion: no-preference) {
   #app-splash.splash-entering .splash-hitos i { animation: splash-hito-latido 1.4s ease-in-out infinite; }
   #app-splash.splash-entering .splash-hitos i:nth-child(2) { animation-delay: .14s; }
@@ -151,23 +193,38 @@ html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direc
   #app-splash.splash-entering .splash-hitos i:nth-child(5) { animation-delay: .56s; }
 }
 @keyframes splash-hito-latido {
-  0%, 60%, 100% { background: var(--edition-paper, #f3eee4); }
-  25% { background: var(--edition-brass, #876330); }
+  0%, 60%, 100% { background: #f3e7ce; }
+  25% { background: #8e3a24; }
 }
 @keyframes splash-play-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
-@media (max-height: 640px) {
-  html.splash-active #app-splash .splash-masthead { top: 39%; }
-  #app-splash .splash-actions { bottom: max(5vh, 24px); }
+
+/* En móviles bajos se compacta la marca, pero se conserva el globo de la parte inferior. */
+@media (max-height: 700px) {
+  html.splash-active #app-splash .splash-masthead { top: 43%; }
+  #app-splash .splash-crest { width: clamp(205px, 57svh, 360px); }
+  #app-splash .home-wordmark { font-size: clamp(2.25rem, 9.8vw, 3.6rem); }
+  #app-splash .home-tagline { margin-top: 10px; }
+  #app-splash .home-ornament { margin-top: 13px; }
+  #app-splash .splash-hitos { margin-top: 8px; }
+  #app-splash .splash-actions { bottom: max(7svh, calc(28px + env(safe-area-inset-bottom))); }
+  #app-splash .splash-play { min-height: 60px; }
+}
+@media (min-aspect-ratio: 4/3) and (max-height: 760px) {
+  html.splash-active #app-splash { background-position: center 48%; }
+  html.splash-active #app-splash .splash-masthead { top: 45%; width: min(50vw, 480px); }
+  #app-splash .splash-crest { width: min(36vw, 320px); }
+  #app-splash .home-wordmark { font-size: clamp(2.2rem, 5vw, 3.5rem); }
+  #app-splash .splash-actions { width: min(36vw, 390px); bottom: max(4svh, 22px); }
 }
 @media (prefers-reduced-motion: reduce) {
   html.splash-active #app-splash,
   html.splash-active #app-splash .splash-masthead,
+  html.splash-active #app-splash .splash-actions,
+  html.splash-active #app-splash .splash-sound,
   html.splash-active #app-splash .splash-status { transition: none; }
   #app.app-arrive { animation: none; }
-  html.splash-active #app-splash *,
-  html.splash-active #app-splash::before,
-  html.splash-active #app-splash::after { animation: none !important; }
+  html.splash-active #app-splash * { animation: none !important; }
 }
