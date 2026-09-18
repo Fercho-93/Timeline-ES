@@ -69,12 +69,77 @@ html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direc
 /* La entrada al juego: un botón ancho, del rojo de la tinta de las fechas, esperando el
    toque de quien juega. Es la puerta —el juego no entra solo— y de paso es el gesto que
    los navegadores exigen para dejar sonar la música. */
-#app-splash .splash-play {
+#app-splash .splash-actions {
   position: absolute;
   left: 50%;
   bottom: max(13vh, 92px);
   transform: translateX(-50%);
   width: min(84vw, 420px);
+  display: grid;
+  gap: 12px;
+  animation: splash-play-in 480ms 520ms ease-out both;
+}
+#app-splash .splash-sound {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 58px;
+  padding: 10px 14px 10px 16px;
+  border: 1px solid var(--edition-brass, #876330);
+  border: 1px solid color-mix(in srgb, var(--edition-brass, #876330) 55%, transparent);
+  border-radius: 9px;
+  background: var(--edition-paper, #f3eee4);
+  background: color-mix(in srgb, var(--edition-paper, #f3eee4) 88%, transparent);
+  box-shadow: 0 8px 20px #3a2a1c1f;
+  cursor: pointer;
+}
+#app-splash .splash-sound-copy { display: grid; gap: 2px; }
+#app-splash .splash-sound strong {
+  color: var(--edition-ink, #302d27);
+  font: 700 .92rem/1.25 var(--ui-font, system-ui, sans-serif);
+}
+#app-splash .splash-sound small {
+  color: var(--edition-muted, #70695d);
+  font: .74rem/1.35 var(--ui-font, system-ui, sans-serif);
+}
+#app-splash .splash-sound input {
+  position: absolute;
+  width: 48px;
+  height: 28px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+#app-splash .splash-switch {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 28px;
+  border: 1px solid var(--edition-muted, #70695d);
+  border-radius: 999px;
+  background: #c9c4bb;
+  background: color-mix(in srgb, var(--edition-muted, #70695d) 22%, transparent);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+#app-splash .splash-switch::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 3px;
+  border-radius: 50%;
+  background: var(--edition-paper, #f3eee4);
+  box-shadow: 0 1px 4px #0005;
+  transition: transform 160ms ease;
+}
+#app-splash .splash-sound input:checked + .splash-switch {
+  border-color: var(--atlas-selection, #9b452b);
+  background: var(--atlas-selection, #9b452b);
+}
+#app-splash .splash-sound input:checked + .splash-switch::before { transform: translateX(20px); }
+#app-splash .splash-sound input:focus-visible + .splash-switch { outline: 2px solid var(--edition-brass, #876330); outline-offset: 3px; }
+#app-splash .splash-play {
+  width: 100%;
   min-height: 58px;
   padding: 16px 28px;
   border: 1px solid #7b3220;
@@ -86,9 +151,8 @@ html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direc
   text-transform: uppercase;
   box-shadow: 0 12px 26px #3a2a1c47;
   cursor: pointer;
-  animation: splash-play-in 480ms 520ms ease-out both;
 }
-#app-splash .splash-play:active { transform: translateX(-50%) translateY(1px); }
+#app-splash .splash-play:active { transform: translateY(1px); }
 #app-splash .splash-play:focus-visible { outline: 2px solid var(--edition-brass, #876330); outline-offset: 3px; }
 #app-splash .splash-status {
   position: absolute;
@@ -119,6 +183,10 @@ html.splash-active #app-splash::after { width: min(95vw, 850px); animation-direc
 @keyframes splash-play-in {
   from { opacity: 0; transform: translateX(-50%) translateY(10px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@media (max-height: 640px) {
+  html.splash-active #app-splash .splash-masthead { top: 39%; }
+  #app-splash .splash-actions { bottom: max(5vh, 24px); }
 }
 @media (prefers-reduced-motion: reduce) {
   html.splash-active #app-splash,

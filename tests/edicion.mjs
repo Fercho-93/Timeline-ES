@@ -126,18 +126,31 @@ for (const reduce of [false, true]) {
   // botón tiene que estar antes de que se monte nada y esperar lo que haga falta.
   const {w, advance, active} = splashClock();
   try {
+    let ambiente = true;
+    const cambios = [];
+    w.CONTINUUM = {
+      effectPrefs: () => ({ambience: ambiente}),
+      setAmbience: enabled => { ambiente = enabled; cambios.push(enabled); }
+    };
     let abierto = false;
     w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
     await new Promise(resolve => setImmediate(resolve));
     const boton = w.document.getElementById('splash-play');
     assert.ok(boton, 'la portada ofrece el botón de jugar');
     assert.equal(boton.textContent, 'Jugar');
+    const sonido = w.document.getElementById('splash-ambience');
+    assert.ok(sonido, 'la primera pantalla permite decidir la música');
+    assert.equal(sonido.getAttribute('role'), 'switch');
+    assert.equal(sonido.checked, true, 'el control refleja la configuración guardada');
+    assert.equal(w.document.querySelector(`label[for="${sonido.id}"] strong`).textContent, 'Música ambiente');
+    sonido.click();
+    assert.deepEqual(cambios, [false], 'la elección actualiza la misma configuración de audio');
     advance(20000);
     assert.ok(active(), 'esperar a una persona no dispara el aviso de carga lenta');
     boton.click();
     await new Promise(resolve => setImmediate(resolve));
     assert.ok(abierto, 'pulsar abre el juego');
-    assert.ok(!w.document.getElementById('splash-play'), 'y el botón deja paso');
+    assert.ok(!w.document.getElementById('splash-actions'), 'y los controles dejan paso');
     w.CONTINUUM_SPLASH.entering();
     assert.equal(w.document.getElementById('splash-status').textContent, 'Entrando al juego…');
     w.CONTINUUM_SPLASH.finish();

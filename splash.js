@@ -10,7 +10,7 @@
     const el = splash();
     el?.setAttribute('aria-hidden', 'true');
     el?.classList.remove('splash-ready', 'splash-exit', 'splash-gate', 'splash-entering');
-    document.getElementById('splash-play')?.remove();
+    document.getElementById('splash-actions')?.remove();
     document.getElementById('splash-status')?.remove();
     startedAt = null;
   };
@@ -46,17 +46,46 @@
     // Aquí se espera a una persona, no a la red: el aviso de carga lenta sobra.
     clearTimeout(timeout);
     el.classList.add('splash-gate');
+    let actions = document.getElementById('splash-actions');
     let button = document.getElementById('splash-play');
     if (!button) {
+      actions = document.createElement('div');
+      actions.id = 'splash-actions';
+      actions.className = 'splash-actions';
+
+      const sound = document.createElement('label');
+      sound.className = 'splash-sound';
+      sound.htmlFor = 'splash-ambience';
+      const copy = document.createElement('span');
+      copy.className = 'splash-sound-copy';
+      const title = document.createElement('strong');
+      title.textContent = 'Música ambiente';
+      const help = document.createElement('small');
+      help.id = 'splash-ambience-help';
+      help.textContent = 'Puedes cambiarla después en Ajustes.';
+      copy.append(title, help);
+      const toggle = document.createElement('input');
+      toggle.id = 'splash-ambience';
+      toggle.type = 'checkbox';
+      toggle.setAttribute('role', 'switch');
+      toggle.setAttribute('aria-describedby', help.id);
+      toggle.checked = window.CONTINUUM?.effectPrefs?.().ambience === true;
+      toggle.addEventListener('change', () => window.CONTINUUM?.setAmbience?.(toggle.checked));
+      const switchArt = document.createElement('span');
+      switchArt.className = 'splash-switch';
+      switchArt.setAttribute('aria-hidden', 'true');
+      sound.append(copy, toggle, switchArt);
+
       button = document.createElement('button');
       button.id = 'splash-play';
       button.type = 'button';
       button.className = 'splash-play';
       button.textContent = 'Jugar';
-      el.append(button);
+      actions.append(sound, button);
+      el.append(actions);
     }
     button.addEventListener('click', () => {
-      button.remove();
+      actions?.remove();
       el.classList.remove('splash-gate');
       resolve();
     }, { once: true });
