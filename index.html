@@ -15,7 +15,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com; frame-src https://timeline-es.firebaseapp.com https://accounts.google.com https://appleid.apple.com; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
-    <link rel="preload" href="assets/continuum-splash-v2.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="assets/continuum-splash-clean-v3.webp" as="image" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="splash.css" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="edition.css" />
@@ -26,6 +26,17 @@
   </head>
   <body>
     <div id="app-splash" aria-hidden="true">
+      <div class="splash-sunlight" aria-hidden="true">
+        <i class="splash-sunbeam"></i>
+        <i class="splash-sparkles"></i>
+      </div>
+      <div class="splash-floating-cards" aria-hidden="true">
+        <figure class="splash-float-card splash-card-tl"><img src="assets/world-cards/5009-battle-marathon.webp" alt="" /></figure>
+        <figure class="splash-float-card splash-card-tr"><img src="assets/medicine-cards/9001-hippocratic-corpus.webp" alt="" /></figure>
+        <figure class="splash-float-card splash-card-ml"><img src="assets/astronomy-cards/first-earth-photo.webp" alt="" /></figure>
+        <figure class="splash-float-card splash-card-mr"><img src="assets/world-cards/5022-vesuvius-eruption.webp" alt="" /></figure>
+        <figure class="splash-float-card splash-card-br"><img src="assets/world-cards/5002-great-pyramid-giza.webp" alt="" /></figure>
+      </div>
       <section class="home-masthead splash-masthead">
         <div class="home-crest splash-crest">
           <img src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" decoding="sync" fetchpriority="high" />

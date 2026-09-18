@@ -2101,6 +2101,20 @@
       }
     },
     {
+      "path": "assets/continuum-splash-clean-v3.webp",
+      "sha256": "27472c85b31383863e872a960160b763b1c5f9f6d12fe0db84f51af548cc5691",
+      "rightsEvidence": {
+        "status": "ai-generated-with-recorded-prompt",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": "Eliminar solo las cinco cartas flotantes periféricas de la portada y reconstruir de forma natural el pergamino, las nubes, el polvo dorado y las líneas del astrolabio situadas detrás, conservando sin cambios la composición, la luz, los planetas y el globo.",
+        "generatedAt": "2026-09-19",
+        "referenceImage": "assets/continuum-splash-v2.webp",
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/country-cards/2001.webp",
       "sha256": "7e2de4bf5ae1ee1fca9778af298afb24b59eba9cf43632144f3e945870832345",
       "rightsEvidence": {

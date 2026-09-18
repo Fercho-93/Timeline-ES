@@ -5,6 +5,15 @@ import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
+{
+  const portada = new JSDOM(html).window.document;
+  const css = read('splash.css');
+  assert.equal(portada.querySelectorAll('.splash-float-card').length, 5, 'la portada compone cinco cartas que pueden moverse por separado');
+  assert.ok([...portada.querySelectorAll('.splash-float-card img')].every(img => img.getAttribute('src')?.startsWith('assets/')), 'las cartas flotantes reutilizan láminas propias del juego');
+  assert.match(css, /@keyframes splash-card-drift/, 'las cartas tienen un vaivén independiente');
+  assert.match(css, /@keyframes splash-sunbeam-shimmer/, 'el rayo de atardecer tintinea suavemente');
+  assert.match(css, /prefers-reduced-motion: reduce[\s\S]*#app-splash \*[\s\S]*animation: none !important/, 'la portada detiene su movimiento si el sistema lo pide');
+}
 function boot({ reduce = false, darkScheme = false, seen = false, saved = {}, userAgent = null } = {}) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {
     runScripts: 'outside-only', url: 'https://continuum.test/'

@@ -10,7 +10,7 @@ html.splash-active #app-splash {
   user-select: none;
   -webkit-user-select: none;
   color: #29241e;
-  background: #e9dcc3 url("assets/continuum-splash-v2.webp") center / cover no-repeat;
+  background: #e9dcc3 url("assets/continuum-splash-clean-v3.webp") center / cover no-repeat;
   opacity: 1;
   isolation: isolate;
   transition: opacity 1100ms cubic-bezier(.4, .08, .4, .94);
@@ -25,6 +25,103 @@ html.splash-active #app-splash::before {
   background:
     radial-gradient(ellipse at 50% 52%, #fff8e9d1 0 19%, #fff8e965 38%, transparent 61%),
     linear-gradient(180deg, #2b190914 0, transparent 18%, transparent 78%, #291a1330 100%);
+}
+
+/* Las cartas son capas reales: flotan por separado sin arrastrar el astrolabio ni el globo. */
+#app-splash .splash-floating-cards,
+#app-splash .splash-sunlight {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+#app-splash .splash-float-card {
+  --tilt: 0deg;
+  --spin: 1.2deg;
+  --drift-x: 5px;
+  --drift-y: -9px;
+  position: absolute;
+  width: clamp(112px, 31vw, 190px);
+  aspect-ratio: 2 / 3;
+  margin: 0;
+  padding: 5px;
+  border: 1px solid #7d5734;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #d4b784, #6e4327 11%, #b58a55 90%, #4f2f1d);
+  box-shadow: 0 18px 28px #43271159, inset 0 0 0 2px #e4c9998f;
+  opacity: .9;
+  transform: rotate(var(--tilt));
+  will-change: transform;
+}
+#app-splash .splash-float-card::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #f2d49a99;
+  border-radius: 6px;
+  box-shadow: inset 0 0 22px #2a170c55;
+}
+#app-splash .splash-float-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+  filter: sepia(.16) saturate(.78) contrast(.93) brightness(1.05);
+}
+#app-splash .splash-card-tl { top: 3%; left: -12%; --tilt: -17deg; --drift-x: 8px; --drift-y: 7px; animation-duration: 8.8s; }
+#app-splash .splash-card-tr { top: 7%; right: -11%; --tilt: 16deg; --spin: -1.1deg; --drift-x: -7px; animation-duration: 10.2s; animation-delay: -3.8s; }
+#app-splash .splash-card-ml { top: 48%; left: -23%; --tilt: 13deg; --spin: -1.4deg; --drift-x: 9px; --drift-y: -7px; animation-duration: 9.6s; animation-delay: -5.1s; }
+#app-splash .splash-card-mr { top: 42%; right: -23%; --tilt: 13deg; --drift-x: -8px; --drift-y: 8px; animation-duration: 8.2s; animation-delay: -1.7s; }
+#app-splash .splash-card-br { right: -16%; bottom: -7%; --tilt: -14deg; --spin: 1deg; --drift-x: -5px; --drift-y: -10px; animation-duration: 10.8s; animation-delay: -6.4s; }
+
+/* Un rayo de atardecer cruza la escena; los puntos de luz dan el tintineo sin parpadeos bruscos. */
+#app-splash .splash-sunbeam {
+  position: absolute;
+  top: -18%;
+  left: -25%;
+  width: min(78vw, 620px);
+  height: 124%;
+  background: linear-gradient(100deg, transparent 12%, #ffd99414 28%, #fff2bd61 48%, #ffcf741e 67%, transparent 84%);
+  filter: blur(10px);
+  mix-blend-mode: screen;
+  opacity: .6;
+  transform: rotate(-13deg);
+  transform-origin: 50% 0;
+  will-change: opacity, transform;
+}
+#app-splash .splash-sparkles {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 14% 13%, #fff9d8 0 1px, #ffcf738c 2px, transparent 5px),
+    radial-gradient(circle at 26% 28%, #fff7c9 0 1.5px, #ffc7677a 3px, transparent 7px),
+    radial-gradient(circle at 78% 18%, #fffbdc 0 1px, #ffd17b8a 3px, transparent 6px),
+    radial-gradient(circle at 85% 56%, #fff8cc 0 1.5px, #ffbd5575 3px, transparent 7px),
+    radial-gradient(circle at 18% 73%, #fffbe2 0 1px, #ffd37d80 3px, transparent 6px),
+    radial-gradient(circle at 67% 78%, #fff8ca 0 1px, #ffbd5870 3px, transparent 6px);
+  opacity: .42;
+  will-change: opacity, filter;
+}
+@media (prefers-reduced-motion: no-preference) {
+  #app-splash .splash-float-card { animation-name: splash-card-drift; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+  #app-splash .splash-sunbeam { animation: splash-sunbeam-shimmer 7.5s ease-in-out infinite; }
+  #app-splash .splash-sparkles { animation: splash-sparkle 3.8s ease-in-out infinite alternate; }
+}
+@keyframes splash-card-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--tilt)); }
+  50% { transform: translate3d(var(--drift-x), var(--drift-y), 0) rotate(calc(var(--tilt) + var(--spin))); }
+}
+@keyframes splash-sunbeam-shimmer {
+  0%, 100% { opacity: .38; transform: rotate(-13deg) translate3d(-1.5%, 0, 0) scaleX(.95); }
+  46% { opacity: .72; transform: rotate(-12deg) translate3d(2%, 0, 0) scaleX(1.06); }
+  58% { opacity: .55; }
+}
+@keyframes splash-sparkle {
+  0% { opacity: .25; filter: brightness(.9); }
+  55% { opacity: .7; filter: brightness(1.25); }
+  100% { opacity: .42; filter: brightness(1.05); }
 }
 /* La salida es larga a propósito: el telón se disuelve, no se retira. */
 html.splash-active #app-splash.splash-exit { opacity: 0; }
@@ -56,6 +153,7 @@ html.splash-active #app-splash .splash-masthead {
   opacity: 1;
   text-align: center;
   transform: translate(-50%, -50%);
+  z-index: 2;
   pointer-events: none;
 }
 #app-splash .splash-crest {
@@ -105,6 +203,7 @@ html.splash-active #app-splash .splash-masthead {
   bottom: max(16svh, calc(78px + env(safe-area-inset-bottom)));
   width: min(78vw, 440px);
   display: grid;
+  z-index: 2;
   gap: 12px;
   transform: translateX(-50%);
   animation: splash-play-in 520ms 520ms ease-out both;
