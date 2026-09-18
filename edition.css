@@ -1278,8 +1278,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   width: 46px;
   height: 46px;
   padding: 0;
+  /* Safari de algunas versiones descarta la declaración completa si no entiende
+     `color-mix()`. Estas dos bases conservan el botón circular en esos móviles. */
+  border: 1px solid var(--edition-line);
   border: 1px solid color-mix(in srgb,var(--edition-brass) 55%,var(--edition-line));
   border-radius: 50%;
+  background: var(--edition-surface);
   background: color-mix(in srgb,var(--edition-surface) 94%,transparent);
   color: var(--edition-ink);
   box-shadow: 0 5px 16px #3425162e;
