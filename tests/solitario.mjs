@@ -149,6 +149,62 @@ console.log("\nRacha de días");
   ok("jugar ayer y hoy encadena la racha", JSON.parse(w.localStorage.getItem("hilo-retos-v1")).history.streak === 5);
 }
 
+console.log("\nReto diario que cruza la medianoche");
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-daily"]');
+  const antes = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+  const diaInicio = antes.day;
+  // El reloj avanza un día a mitad de partida, como si se terminara pasada la
+  // medianoche: la partida ya había empezado con la fecha de antes.
+  const RealDate = w.Date;
+  class DateManana extends RealDate {
+    constructor(...args) {
+      if (args.length) super(...args);
+      else super(RealDate.now() + 24 * 60 * 60 * 1000);
+    }
+    static now() { return RealDate.now() + 24 * 60 * 60 * 1000; }
+  }
+  w.Date = DateManana;
+  const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
+  let vueltas = 0;
+  while (!/Reto completado|Se acabaron las vidas/.test(texto(w)) && vueltas++ < 60) {
+    const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+    const años = estado.timeline.map(id => cards.get(id).year);
+    let index = años.findIndex(y => y > cards.get(estado.current).year);
+    if (index < 0) index = años.length;
+    w.document.querySelectorAll('[data-action="solo-place"]')[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    click(w, '[data-action="confirm-place"]');
+    click(w, '[data-action="solo-next"]');
+  }
+  ok("el reto se completa aunque el reloj haya cambiado de día", /Reto completado/.test(texto(w)));
+  const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1")).history;
+  ok("convalida en el día en que se empezó, no en el que se terminó", Object.keys(marcas.days).includes(diaInicio));
+  ok("cuenta como un día de racha", marcas.streak === 1);
+}
+
+console.log("\nSalir sin guardar");
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  click(w, '[data-action="solo"]');
+  click(w, '[data-action="start-daily"]');
+  colocaHistoriaBien(w);
+  click(w, '[data-action="confirm-place"]');
+  click(w, '[data-action="solo-next"]');
+  ok("hay progreso a medio reto", JSON.parse(w.localStorage.getItem("hilo-solo-history-v1")).hits > 0);
+  click(w, '[data-action="solo-options"]');
+  ok("el menú ofrece salir sin guardar", existe(w, '[data-action="abandon-solo"]'));
+  click(w, '[data-action="abandon-solo"]');
+  click(w, '[data-exit-confirm]');
+  ok("no queda partida guardada", !w.localStorage.getItem("hilo-solo-history-v1"));
+  ok("el reto de hoy se puede volver a empezar", existe(w, '[data-action="start-daily"]'));
+  const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1") || "{}").history;
+  ok("no cuenta para las estadísticas ni la racha", !marcas || !marcas.days || !Object.keys(marcas.days).length);
+}
+
 console.log("\nBloque de geografía");
 {
   const w = boot();
