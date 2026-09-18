@@ -318,6 +318,15 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 }
 .player-row { display: grid; grid-template-columns: 1fr auto; gap: 9px; margin-bottom: 9px; }
 .remove { width: 48px; min-height: 44px; border: 0; border-radius: 10px; background: var(--paper); color: var(--accent); font-weight: 700; cursor: pointer; }
+.recent-players { margin: 16px 0 18px; padding: 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+.recent-players-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.recent-players-head strong { font-size: .82rem; }
+.recent-players-head button { border: 0; padding: 5px; color: var(--muted); background: transparent; font-size: .72rem; text-decoration: underline; cursor: pointer; }
+.recent-player-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.recent-player { display: inline-grid; grid-template-columns: auto 34px; min-height: 42px; overflow: hidden; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+.recent-player button { border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+.recent-player [data-action="add-recent-player"] { padding: 8px 7px 8px 14px; font-weight: 700; }
+.recent-player [data-action="remove-recent-player"] { padding: 0 10px 0 5px; color: var(--accent); font-weight: 800; }
 .section-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 22px 0 10px; font-weight: 700; }
 .section-label small { color: var(--muted); font-weight: 650; }
 

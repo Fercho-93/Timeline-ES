@@ -600,6 +600,7 @@
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
           <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
+          <section id="recent-players" class="recent-players" aria-label="Participantes recientes" hidden></section>
           <div class="setup-grid">
             <div class="field"><label for="starter">La persona más joven</label><select id="starter"><option value="0">Jugador 1</option><option value="1">Jugador 2</option></select></div>
             <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
@@ -611,6 +612,7 @@
         </div>
       </section>
     </div>`);
+    renderRecentPlayers();
   }
 
   function syncStarterOptions() {
@@ -622,11 +624,33 @@
     inputs.forEach((input, i) => input.setAttribute("aria-label", `Nombre del jugador ${i + 1}`));
   }
 
+  function renderRecentPlayers() {
+    const host = document.getElementById("recent-players");
+    if (!host || !CT.RecentPlayers) return;
+    const active = [...document.querySelectorAll("#players input")].map(input => input.value);
+    const names = CT.RecentPlayers.available(active);
+    host.hidden = !names.length;
+    host.innerHTML = names.length ? `<div class="recent-players-head"><strong>Jugadores recientes</strong><button type="button" data-action="clear-recent-players">Borrar lista</button></div><div class="recent-player-list">${names.map(name => {
+      const encoded = encodeURIComponent(name);
+      return `<span class="recent-player"><button type="button" data-action="add-recent-player" data-recent-name="${encoded}" aria-label="Añadir a ${escapeHtml(name)}">＋ ${escapeHtml(name)}</button><button type="button" data-action="remove-recent-player" data-recent-name="${encoded}" aria-label="Olvidar a ${escapeHtml(name)}">×</button></span>`;
+    }).join("")}</div>` : "";
+  }
+
+  function appendPlayer(name = "") {
+    const rows = document.querySelectorAll("#players .player-row");
+    if (rows.length >= 9) return showToast("El máximo es de 9 jugadores");
+    const value = name || `Jugador ${rows.length + 1}`;
+    document.getElementById("players").insertAdjacentHTML("beforeend", `<div class="player-row"><input aria-label="Nombre del jugador ${rows.length + 1}" value="${escapeHtml(value)}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div>`);
+    syncStarterOptions();
+    renderRecentPlayers();
+  }
+
   function startGame() {
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     const inputs = [...document.querySelectorAll("#players input")];
     if (inputs.length < 2) return showToast("Se necesitan al menos 2 jugadores");
     const names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
+    CT.RecentPlayers?.remember(names);
     const requestedHand = Number(document.getElementById("hand-size").value);
     const handSize = Math.min(requestedHand, Math.floor((currentMode().cards.length - 1) / names.length));
     if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
@@ -2847,7 +2871,7 @@
   }, true);
 
   app.addEventListener("input", event => {
-    if (event.target.closest("#players")) syncStarterOptions();
+    if (event.target.closest("#players")) { syncStarterOptions(); renderRecentPlayers(); }
     else if (event.target.id === "enc-search-input") {
       // Se actualiza solo el resultado, sin repintar la pantalla entera: repintarla
       // destruiría el campo justo mientras se escribe en él.
@@ -2934,13 +2958,21 @@
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
     else if (action === "continue") { cardsById = new Map(game.savedDeck.map(card => [card.id, card])); game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : pulseStage() === PULSE_PASE ? renderPulsePass() : renderPass(); }
     else if (action === "add-player") {
-      const count = document.querySelectorAll("#players .player-row").length;
-      if (count >= 9) return showToast("El máximo es de 9 jugadores");
-      document.getElementById("players").insertAdjacentHTML("beforeend", `<div class="player-row"><input aria-label="Nombre del jugador ${count + 1}" value="Jugador ${count + 1}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div>`);
-      syncStarterOptions();
+      appendPlayer();
+    } else if (action === "add-recent-player") {
+      const name = decodeURIComponent(target.dataset.recentName || "");
+      const active = [...document.querySelectorAll("#players input")].map(input => CT.RecentPlayers.identity(input.value));
+      if (active.includes(CT.RecentPlayers.identity(name))) return showToast("Ese jugador ya está añadido");
+      appendPlayer(name);
+    } else if (action === "remove-recent-player") {
+      CT.RecentPlayers.remove(decodeURIComponent(target.dataset.recentName || ""));
+      renderRecentPlayers();
+    } else if (action === "clear-recent-players") {
+      CT.RecentPlayers.clear();
+      renderRecentPlayers();
     } else if (action === "remove-player") {
       if (document.querySelectorAll("#players .player-row").length <= 2) return showToast("Se necesitan al menos 2 jugadores");
-      target.closest(".player-row").remove(); syncStarterOptions();
+      target.closest(".player-row").remove(); syncStarterOptions(); renderRecentPlayers();
     } else if (action === "start") startGame();
     else if (action === "ready") { if (game.pulseGift && game.pulseGift.to === currentPlayer().id) { game.pulseGift = null; saveGame(); } if (game.pendingResult) { result = game.pendingResult; renderResult(); } else gameView(); }
     else if (action === "ghost-use") useGhost();
