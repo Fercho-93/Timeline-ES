@@ -297,9 +297,16 @@
       // Un mazo cerrado se sigue viendo, con su candado: esconderlo haría que nadie
       // supiera que existe, y lo que se vende tiene que poder verse antes de comprarlo.
       const abierto = CT.Cartera.tiene(item.key);
+      // El candado va estampado en medio del mazo, sobre su propia lámina, no de adorno
+      // al lado del nombre: así se ve de un vistazo cuál está cerrado sin leer una línea.
+      // Cuando un mazo no tiene lámina, el sello se queda igual en su hueco.
+      const lamina = CT.cardArt(item.key, item.cards[0]) ? CT.animalArt(item.key, item.cards[0]) : "";
+      const preview = lamina || !abierto
+        ? `<span class="deck-preview${abierto ? "" : " deck-preview-cerrado"}" aria-hidden="true">${lamina}${abierto ? "" : '<span class="deck-candado">🔒</span>'}</span>`
+        : "";
       return `<button class="game-row${active ? " active" : ""}${abierto ? "" : " game-row-cerrado"}" data-action="set-mode" data-mode="${item.key}" aria-pressed="${active}"${abierto ? "" : ` aria-describedby="mazo-cerrado-${item.key}"`}>
-        ${CT.cardArt(item.key, item.cards[0]) ? `<span class="deck-preview" aria-hidden="true">${CT.animalArt(item.key, item.cards[0])}</span>` : ""}<span class="deck-chapter" aria-hidden="true">Capítulo ${["I", "II", "III", "IV", "V", "VI", "VII", "VIII"][index] || index + 1}<i>↗</i></span>
-        <span class="game-name">${item.name}${abierto ? "" : ` <span class="game-candado" aria-hidden="true">🔒</span>`}</span>
+        ${preview}<span class="deck-chapter" aria-hidden="true">Capítulo ${["I", "II", "III", "IV", "V", "VI", "VII", "VIII"][index] || index + 1}<i>↗</i></span>
+        <span class="game-name">${item.name}<span class="solo-lectores">${abierto ? "" : ", cerrado"}</span></span>
         <span class="game-meta"${abierto ? "" : ` id="mazo-cerrado-${item.key}"`}>${abierto ? `${item.cards.length} ${item.cardLabel} · ${item.blurb}` : escapeHtml(CT.Cartera.motivo(item.key).texto)}</span>
       </button>`;
     }).join("")}</div>`;
@@ -1617,24 +1624,44 @@
   // dura lo que duren las vidas, así que no hay nada que mandar que reparta lo mismo en
   // el otro móvil. Con formato propio, en cambio, vale cualquier mazo y cuantas veces se
   // quiera, y cada duelo estrena semilla.
-  // Un mazo al que todavía no se tiene derecho: la puerta cerrada, con su explicación,
-  // su precio y su salida. Lo que nunca debe tener es un botón que no haga nada, así que
-  // el de desbloquear solo aparece cuando hay un precio que enseñar.
+  // Las maneras de entrar a un mazo cerrado, una debajo de otra. El mazo suelto va
+  // primero porque es el más barato y el que responde a lo que se acaba de tocar; la
+  // colección, si la hay, va detrás como la alternativa que sale más a cuenta. Cada una
+  // dice qué abre y cuánto cuesta, sin letra pequeña.
+  function opcionesDeCompra(vias, modeKey) {
+    return vias.map((via, indice) => {
+      const pendientes = via.mazos.filter(key => !CT.Cartera.tiene(key));
+      const cartas = pendientes.reduce((total, key) => total + CT.mode(key).cards.length, 0);
+      const abre = via.tipo === "mazo"
+        ? `Solo este mazo · ${cartas} cartas`
+        : `${pendientes.length} mazos · ${cartas} cartas`;
+      return `<button class="btn ${indice ? "btn-secondary" : "btn-primary"} btn-block compra-via" style="margin-top:${indice ? 8 : 14}px" data-action="mazo-desbloquear" data-paquete="${via.clave}" data-mode="${modeKey}">
+        <b>${escapeHtml(via.tipo === "mazo" ? "Este mazo" : via.nombre)} · ${escapeHtml(via.precio)}</b>
+        <small>${escapeHtml(abre)}</small>
+      </button>`;
+    }).join("");
+  }
+
+  // Un mazo al que todavía no se tiene derecho: la puerta cerrada, con lo que hay dentro,
+  // las maneras de conseguirlo y su salida. Lo que nunca debe tener es un botón que no
+  // haga nada, así que si no hay ninguna manera de comprarlo solo queda la salida.
   function mazoCerrado(modeKey) {
     const razon = CT.Cartera.motivo(modeKey);
     if (!razon) return;
     screen = "mazo-cerrado";
     const juego = CT.mode(modeKey);
+    const vias = razon.opciones || [];
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="pass-screen"><div class="panel">
         <div class="big-icon">🔒</div>
         <div class="eyebrow">Todavía no es tuyo</div>
         <h1 data-focus tabindex="-1" style="font-size:clamp(1.8rem,7vw,2.6rem)">${escapeHtml(juego.name)}</h1>
-        <p class="lead" style="margin-inline:auto">${escapeHtml(razon.texto)} Son ${juego.cards.length} cartas.</p>
-        ${razon.precio
-          ? `<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="mazo-desbloquear" data-paquete="${razon.paquete}" data-mode="${modeKey}">Desbloquear · ${escapeHtml(razon.precio)}</button>
+        <p class="lead" style="margin-inline:auto">${vias.length > 1 ? "Dos maneras de conseguirlo." : escapeHtml(juego.blurb)}</p>
+        ${vias.length
+          ? `${opcionesDeCompra(vias, modeKey)}
              <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ir al inicio</button>`
-          : `<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>`}
+          : `<p class="lead" style="margin-inline:auto">${escapeHtml(razon.texto)}</p>
+             <button class="btn btn-primary btn-block" style="margin-top:14px" data-action="home">Ir al inicio</button>`}
         <p class="hint" style="margin-top:14px">Lo que ya hayas descubierto de este mazo sigue siendo tuyo y te espera dentro.</p>
       </div></section>
     </div>`);
