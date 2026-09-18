@@ -1325,6 +1325,39 @@ body::before {
   filter: sepia(.1) saturate(.78) contrast(.94);
 }
 .home-wordmark { font: 500 clamp(2.55rem, 9vw, 4.3rem)/.9 var(--font-display); letter-spacing: -.055em; text-transform: uppercase; }
+/* En Inicio el nombre funciona como el título grabado de un atlas: gana escala y una
+   sombra corta de impresión, sin convertir el telón de carga en un segundo rótulo. El
+   ancho y la escala tipográfica conservan el encaje en móviles estrechos. */
+.home-masthead:not(.splash-masthead) .home-wordmark {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: .04em .18em .12em;
+  color: var(--ink);
+  font-size: clamp(2.45rem, 11.5vw, 4.85rem);
+  font-weight: 600;
+  line-height: .88;
+  letter-spacing: .045em;
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--paper) 88%, transparent),
+    0 2px 0 color-mix(in srgb, var(--accent-dark) 30%, transparent),
+    0 7px 18px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.home-masthead:not(.splash-masthead) .home-wordmark::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: 10%;
+  bottom: 0;
+  left: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-dark) 28% 72%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--paper) 72%, transparent);
+  opacity: .72;
+}
 .home-tagline { margin-top: 10px; color: var(--accent); font-size: .72rem; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; }
 .home-ornament { display: grid; grid-template-columns: 58px 10px 58px; align-items: center; justify-content: center; gap: 7px; margin: 27px 0 0; }
 .home-ornament span { height: 1px; background: rgba(137,87,36,.58); }
@@ -1843,8 +1876,8 @@ body::before {
 @media (prefers-reduced-motion:reduce) { html.splash-active #app-splash { animation:none; display:none; } }
 
 /* Reflujo del texto ampliado: las acciones conservan su tamaño y siguen accesibles. */
-:root[data-text-size="200"] .home-wordmark { font-size: min(4.3rem, 13vw); }
-:root[data-text-size="150"] .home-wordmark { font-size: min(4.3rem, 13vw); }
+:root[data-text-size="200"] .home-wordmark { font-size: min(4.85rem, 13vw); }
+:root[data-text-size="150"] .home-wordmark { font-size: min(4.85rem, 13vw); }
 @media (max-width: 480px) {
   .settings-modal { padding: 16px; }
   .settings-modal .opt-row { gap: 8px; }
