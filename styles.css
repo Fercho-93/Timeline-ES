@@ -246,6 +246,11 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .field { display: grid; gap: 7px; }
 .field label, .field .field-label { font-size: .85rem; font-weight: 700; color: var(--muted); }
 
+.starter-result { margin: 0; font-size: .9rem; }
+.starter-draw-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 6px; }
+.starter-draw-list li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 10px; background: var(--paper); font-size: .9rem; }
+.starter-draw-list li.starter-draw-winner { background: var(--accent-soft); font-weight: 700; }
+
 /* Elegir entre dos maneras de jugar lo mismo. Un `<select>` escondía que había una
    elección que hacer: se veía la opción puesta y no la otra. Con las dos a la vista y la
    elegida marcada, se lee de un golpe que son dos y cuál está activa. Son radios de
