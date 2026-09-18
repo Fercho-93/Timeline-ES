@@ -1,7 +1,8 @@
 (function () {
   'use strict';
   const CT = window.CONTINUUM;
-  const modes = () => Object.keys(CT.MODES).filter(key => key !== 'mixed');
+  // Solo entran en la rotación los mazos a los que se tiene derecho: ver cartera.js.
+  const modes = () => Object.keys(CT.MODES).filter(key => key !== 'mixed' && CT.Cartera.tiene(key));
   function create(rounds, cards) {
     const queue = CT.shuffle(modes()).slice(0, Math.max(1, Math.min(modes().length, Number(rounds) || modes().length)));
     return {queue, index:0, history:[], handSize:Math.max(1, Math.min(6, Number(cards) || 5))};

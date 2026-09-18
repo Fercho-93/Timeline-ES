@@ -297,6 +297,10 @@
     const reglas = REGLAS[version];
     if (!reglas) return { ok: false, motivo: "version" };
     if (!CT.has(mode)) return { ok: false, motivo: "mazo" };
+    // Un reto puede llegar de alguien que tiene un mazo que quien lo abre todavía no.
+    // Se distingue de «este mazo no existe»: uno es un enlace roto y el otro una puerta
+    // cerrada, y no se explican igual.
+    if (!CT.Cartera.tiene(mode)) return { ok: false, motivo: "mazo-cerrado", mode };
     if (!/^[a-z0-9]{1,12}$/.test(seed)) return { ok: false, motivo: "roto" };
 
     const total = Number(textoTotal);
