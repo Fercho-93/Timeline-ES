@@ -44,6 +44,26 @@ try {
    assert.equal(await transitionPage.locator('.camera-move').count(),0,'la cámara se retira al terminar el giro');
    assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
    await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
+   await transitionPage.locator('[data-action="solo"]').click();
+   // El plegado de los paneles de solitario ocurre en el montaje, antes de que la cámara
+   // fotografíe el destino (a11y.js, `mount` → `foldSoloPanels` → `launchCamera`): la
+   // instantánea del viaje ya debe llegar plegada, y al terminar el viaje la pantalla
+   // real no debe cambiar de tamaño ni de contenido — eso es lo que antes se veía como
+   // una pantalla que se abre y se cierra sola.
+   assert.equal(await transitionPage.locator('.camera-move-view').last().locator('.solo-fold').count()>0,true,'el destino de solitario llega ya plegado a la instantánea de la cámara');
+   assert.equal(await transitionPage.locator('.camera-move-view').last().locator('.solo-panel:not(.solo-fold)').count(),0,'ningún panel de solitario viaja abierto en la instantánea');
+   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
+   const soloBefore=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
+   await transitionPage.waitForTimeout(400);
+   const soloAfter=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
+   assert.equal(soloAfter.text,soloBefore.text,'la pantalla de solitario no cambia de contenido después de que la cámara termine');
+   // Un margen de unos pocos píxeles absorbe el asentamiento normal de fuentes o barras
+   // de desplazamiento; lo que delataba el bug era un salto de decenas de píxeles al
+   // pasar de los paneles abiertos (fotografiados) a los ya plegados (el DOM real).
+   assert.ok(Math.abs(soloAfter.top-soloBefore.top)<8,`la posición no debería saltar tras el viaje (${soloBefore.top} → ${soloAfter.top})`);
+   assert.ok(Math.abs(soloAfter.height-soloBefore.height)<8,`la altura no debería saltar tras el viaje (${soloBefore.height} → ${soloAfter.height})`);
+   await transitionPage.locator('[data-action="back-menu"]').click();
+   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500}).catch(()=>{});
    await transitionPage.locator('[data-action="collection-back"]').click();
    // Durante el viaje inverso hay una réplica inerte de la pantalla anterior. El
    // usuario solo puede tocar #app; la prueba debe apuntar al mismo lugar interactivo.

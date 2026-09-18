@@ -260,11 +260,18 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     let settled = 0;
     w.document.getElementById('app').getAnimations = () => [{ finish() { settled++; } }];
     click(w, '[data-action="solo"]');
+    assert.equal(w.document.getElementById('app').dataset.screen, 'solo-home');
     const frozen = w.document.querySelector('.camera-move-copy .snapshot-probe');
     assert.equal(w.getComputedStyle(frozen).width, '28px', 'la cámara conserva tamaños que dependían de #app');
     assert.equal(w.getComputedStyle(frozen).display, 'none', 'un icono oculto no reaparece al mover la cámara');
     assert.equal(settled, 1, 'el destino llega a su fotograma final antes de fotografiarlo');
     assert.equal(w.document.querySelectorAll('.camera-move-view').length, 2, 'origen y destino conviven en un mismo escenario');
+    // El plegado de solitario ocurre en el montaje, antes de que la cámara fotografíe el
+    // destino: la instantánea debe llegar ya plegada, nunca con los paneles abiertos que
+    // se cerrarían de golpe al terminar el viaje.
+    const soloDestination = w.document.querySelectorAll('.camera-move-view')[1];
+    assert.ok(soloDestination.querySelector('.solo-fold'), 'el destino de solitario llega ya plegado a la foto de la cámara');
+    assert.equal(soloDestination.querySelectorAll('.solo-panel:not(.solo-fold)').length, 0, 'ningún panel de solitario viaja abierto en la instantánea');
     assert.ok(w.document.querySelector('.camera-fixed-nav'), 'la navegación común permanece quieta durante el viaje');
     assert.equal(w.document.querySelectorAll('.camera-move-view .home-nav').length, 0, 'la barra común no se duplica dentro de los escenarios');
     assert.ok(turns[1].frames.every(frame => !('opacity' in frame)), 'el viaje no funde ninguna de las dos vistas');
@@ -281,6 +288,10 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     click(w, '#app [data-action="solo"]');
     assert.equal(w.document.querySelector('.camera-move'), null);
     assert.equal(turns.length, 3, 'movimiento reducido evita el giro');
+    // También sin cámara (movimiento reducido) el plegado llega ya hecho: no depende del
+    // viaje, depende del montaje.
+    const foldedPanels = [...w.document.querySelectorAll('.solo-panel')].map(panel => panel.textContent.trim());
+    assert.ok(foldedPanels[0].includes('Reto diario') && foldedPanels[1].includes('Partida libre'), 'las opciones de solitario llegan plegadas y estables sin cámara');
   } finally { w.close(); }
 }
 console.log('Movimiento de cámara: giro inverso, interrupciones y movimiento reducido: OK');

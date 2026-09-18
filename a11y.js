@@ -167,9 +167,9 @@
     roll.finished.catch(() => {});
     return cancel;
   }
-  let firstLocalReveal = false;
   const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
   const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
+  let firstLocalReveal = false;
 
   function inkWave(anchor, kind = 'success') {
     const timeline = anchor?.closest('.timeline');
@@ -469,7 +469,10 @@
       window.CONTINUUM.Effects?.transition?.(kind);
     }
     // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
-    // muchas veces y no debe convertir cada toque en una animación.
+    // muchas veces y no debe convertir cada toque en una animación. Durante un giro de
+    // cámara esta clase igualmente se añade (por si la cámara no llega a lanzarse, por
+    // ejemplo con movimiento reducido), pero `.camera-running` anula su animación propia
+    // para que no compitan las dos a la vez.
     if (!primero && cambioDePantalla && !closingEncyclopedia) {
       container.firstElementChild?.classList.add("screen-enter");
       if (vuelve || backwards) container.firstElementChild?.classList.add("screen-return");

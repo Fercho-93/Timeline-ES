@@ -94,9 +94,48 @@
     veil?.classList.toggle('is-visible', window.scrollY > 8);
   }
   window.addEventListener('scroll', refreshProfileVeil, {passive: true});
+  // Convierte cada modo de solitario en un desplegable: cerrados de entrada, con un único
+  // abierto a la vez. Vive aquí, y no en quien pinta la pantalla, para que ya estén
+  // plegados antes de que cualquier transición fotografíe el destino.
+  function foldSoloPanels(container) {
+    container.querySelectorAll(".solo-panel:not(.solo-fold)").forEach(panel => {
+      const details = document.createElement("details");
+      details.className = "panel solo-panel solo-fold";
+      details.name = "solo-options";
+      const summary = document.createElement("summary");
+      const heading = panel.querySelector(".solo-panel-head");
+      const kind = panel.querySelector('[data-action="start-free"]') ? 'free' : panel.querySelector('[data-action="start-duel"]') ? 'duel' : 'daily';
+      details.dataset.soloKind = kind;
+      const marks = {daily:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',free:'<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>',duel:'<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>'};
+      const mark = document.createElement('span'); mark.className = 'solo-option-mark'; mark.setAttribute('aria-hidden','true');
+      mark.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${marks[kind]}</svg>`;
+      summary.append(mark);
+      const copy = document.createElement('span'); copy.className = 'solo-option-copy'; copy.append(...heading.childNodes);
+      const caption = document.createElement('small'); caption.textContent = {daily:'Un reto distinto cada día',free:'A tu ritmo y a tu nivel',duel:'Las mismas cartas, otro rival'}[kind]; copy.append(caption); summary.append(copy);
+      heading.remove();
+      details.append(summary);
+      const body = document.createElement("div");
+      body.className = "solo-fold-body";
+      body.append(...panel.childNodes);
+      details.append(body);
+      panel.replaceWith(details);
+      details.addEventListener("toggle", () => {
+        if (details.open) {
+          container.querySelectorAll(".solo-fold").forEach(other => { if (other !== details) other.open = false; });
+          (window.requestAnimationFrame || (fn => setTimeout(fn, 0)))(() => { if (details.isConnected && details.open) details.scrollIntoView?.({block: 'nearest', behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); });
+        }
+      });
+    });
+  }
   function mount(container, screen) {
     if (['solo-end', 'winner', 'online-winner', 'comp-end'].includes(screen)) atlasFinal(container);
     if (screen === 'home') finalCards = [];
+    // Se pliega aquí, antes de que la cámara fotografíe el destino (más abajo, en
+    // a11y.js), y no después de pintar: si el plegado llegara tarde, el viaje mostraría
+    // los paneles abiertos y, al terminar, la pantalla real —ya plegada— sustituiría de
+    // golpe a lo que se acababa de enseñar. Eso es lo que se veía como una pantalla que
+    // se abre y se cierra sola.
+    if (screen === 'solo-home') foldSoloPanels(container);
 
     surfaceNav.clear();
     const inGame = playing.has(screen);
