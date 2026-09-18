@@ -31,47 +31,25 @@ try {
    await transitionPage.locator('[data-block="historia"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
    const header=transitionPage.locator('.atlas-landscape');
-   assert.equal(await transitionPage.locator('.camera-move').count(),1,'la vista anterior acompaña el giro de cámara');
-   assert.equal(await transitionPage.locator('.camera-move-view').count(),2,'origen y destino forman un único escenario horizontal');
-   assert.deepEqual(await transitionPage.locator('.camera-move-view').evaluateAll(views=>views.map(view=>getComputedStyle(view).opacity)),['1','1'],'ninguna vista se funde durante el recorrido');
-   assert.equal(await transitionPage.locator('.camera-fixed-nav').count(),1,'la navegación común no desaparece mientras viaja la cámara');
-   assert.equal(await transitionPage.locator('.camera-move-view .home-nav').count(),0,'la navegación común no viaja duplicada con las escenas');
-   assert.equal(await transitionPage.locator('.camera-move-view').last().locator('.atlas-landscape img').evaluate(image=>getComputedStyle(image).opacity),'1','la imagen de destino viaja ya revelada');
-   assert.deepEqual(await transitionPage.locator('.camera-move-view').last().locator('.atlas-specimens figure').evaluateAll(figures=>figures.map(figure=>getComputedStyle(figure).opacity)),['1','1','1'],'las láminas de destino no aparecen de golpe al terminar');
-   assert.equal(await transitionPage.locator('#app').evaluate(app=>getComputedStyle(app).visibility),'hidden','la pantalla real espera detrás sin duplicar el destino');
-   assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'sin portada voladora ni hoja superpuesta');
-   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
-   assert.equal(await transitionPage.locator('.camera-move').count(),0,'la cámara se retira al terminar el giro');
+   assert.equal(await transitionPage.locator('.camera-move, .deck-cover-flight, .book-turn').count(),0,'el mazo entra con la vuelta de página, sin capas ni pantalla superpuesta');
+   assert.equal(await transitionPage.locator('#app').evaluate(app=>getComputedStyle(app).visibility),'visible','la única pantalla real permanece visible');
+   await transitionPage.waitForTimeout(700);
    assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
    await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
    await transitionPage.locator('[data-action="solo"]').click();
-   // El plegado de los paneles de solitario ocurre en el montaje, antes de que la cámara
-   // fotografíe el destino (a11y.js, `mount` → `foldSoloPanels` → `launchCamera`): la
-   // instantánea del viaje ya debe llegar plegada, y al terminar el viaje la pantalla
-   // real no debe cambiar de tamaño ni de contenido — eso es lo que antes se veía como
-   // una pantalla que se abre y se cierra sola.
-   assert.equal(await transitionPage.locator('.camera-move-view').last().locator('.solo-fold').count()>0,true,'el destino de solitario llega ya plegado a la instantánea de la cámara');
-   assert.equal(await transitionPage.locator('.camera-move-view').last().locator('.solo-panel:not(.solo-fold)').count(),0,'ningún panel de solitario viaja abierto en la instantánea');
-   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
+   // El plegado de los paneles de solitario ocurre en el montaje (a11y.js, `mount` →
+   // `foldSoloPanels`), no depende de ninguna transición: debe llegar ya plegado y no
+   // cambiar de tamaño ni de contenido después — eso es lo que antes se veía como una
+   // pantalla que se abre y se cierra sola.
+   assert.equal(await transitionPage.locator('.camera-move, .deck-cover-flight').count(),0,'solitario no enseña una vista provisional');
    const soloBefore=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
+   assert.ok(soloBefore.text.includes('Reto diario') && soloBefore.text.includes('Partida libre'),'los paneles de solitario llegan ya plegados');
    await transitionPage.waitForTimeout(400);
    const soloAfter=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
-   assert.equal(soloAfter.text,soloBefore.text,'la pantalla de solitario no cambia de contenido después de que la cámara termine');
-   // El texto ya prueba que no cambia el contenido; esto solo vigila que no vuelva el
-   // salto de geometría del bug original. Ese salto era de cientos de píxeles (los tres
-   // paneles viajaban abiertos y se plegaban de golpe al terminar); un margen amplio
-   // absorbe la métrica de fuente propia de cada motor sin dejar de detectarlo.
-   const SALTO_MAXIMO = 60;
-   assert.ok(Math.abs(soloAfter.top-soloBefore.top)<SALTO_MAXIMO,`la posición no debería saltar tras el viaje (${soloBefore.top} → ${soloAfter.top})`);
-   assert.ok(Math.abs(soloAfter.height-soloBefore.height)<SALTO_MAXIMO,`la altura no debería saltar tras el viaje (${soloBefore.height} → ${soloAfter.height})`);
+   assert.deepEqual(soloAfter,soloBefore,'la pantalla de solitario no cambia de contenido ni de tamaño después de entrar');
    await transitionPage.locator('[data-action="back-menu"]').click();
-   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500}).catch(()=>{});
    await transitionPage.locator('[data-action="collection-back"]').click();
-   // Durante el viaje inverso hay una réplica inerte de la pantalla anterior. El
-   // usuario solo puede tocar #app; la prueba debe apuntar al mismo lugar interactivo.
-   await transitionPage.locator('#app [data-mode="history"]').click();
-   assert.equal(await transitionPage.locator('.camera-move').count(),1,'reentrar vuelve a girar la cámara');
-   await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
+   await transitionPage.locator('[data-mode="history"]').click();
    assert.equal(await transitionPage.locator('.camera-move, .deck-cover-flight, .book-turn').count(),0,'reentrar no deja capas antiguas');
    await transitionPage.close();
 
