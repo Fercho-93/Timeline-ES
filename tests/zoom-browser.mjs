@@ -76,7 +76,7 @@ try {
    await duelPage.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
    const manoBox=await duelPage.locator('.hand-solo .hand-card').boundingBox();
    const dockAbajo=await duelPage.locator('.placement-dock').boundingBox();
-   assert.ok(manoBox.y+manoBox.height<=dockAbajo.y+1,'la hoja reserva sitio: el muelle no tapa la carta');
+   assert.ok(dockAbajo.y+dockAbajo.height<=manoBox.y+1,'la confirmación termina antes de la carta y no la tapa');
    await duelPage.screenshot({path:`test-results/zoom/${engine}-duelo-muelle.png`});
    await duelPage.close();
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
