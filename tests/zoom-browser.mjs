@@ -55,7 +55,10 @@ try {
    const encyclopediaVeil=encyclopediaPage.locator('.enc-modal > .atlas-scroll-veil');
    assert.equal(await encyclopediaVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la enciclopedia empieza sin veladura');
    const backAtTop=await persistentBack.boundingBox();
-   await encyclopediaModal.evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.55);});
+   await encyclopediaModal.evaluate(modal=>{
+     modal.scrollTop=Math.max(1,modal.scrollHeight*.55);
+     modal.dispatchEvent(new Event('scroll'));
+   });
    await encyclopediaPage.waitForTimeout(220);
    const backHalfway=await persistentBack.boundingBox();
    assert.equal(await persistentBack.evaluate(button=>getComputedStyle(button).position),'sticky','la salida de la enciclopedia queda anclada');
@@ -127,7 +130,10 @@ try {
       const guideVeil=page.locator('.rules > .atlas-scroll-veil');
       assert.equal(await guideVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la guía empieza sin veladura');
       const guideBackAtTop=await guideBack.boundingBox();
-      await page.locator('.rules').evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.45);});
+      await page.locator('.rules').evaluate(modal=>{
+        modal.scrollTop=Math.max(1,modal.scrollHeight*.45);
+        modal.dispatchEvent(new Event('scroll'));
+      });
       await page.waitForTimeout(220);
       const guideBackHalfway=await guideBack.boundingBox();
       const guideBackStyle=await guideBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
@@ -151,7 +157,10 @@ try {
       const settingsVeil=page.locator('.settings-modal > .atlas-scroll-veil');
       assert.equal(await settingsVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','ajustes empieza sin veladura');
       const settingsBackAtTop=await settingsBack.boundingBox();
-      await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.45);});
+      await page.locator('.settings-modal').evaluate(modal=>{
+        modal.scrollTop=Math.max(1,modal.scrollHeight*.45);
+        modal.dispatchEvent(new Event('scroll'));
+      });
       await page.waitForTimeout(220);
       const settingsBackHalfway=await settingsBack.boundingBox();
       const settingsBackStyle=await settingsBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
@@ -172,7 +181,10 @@ try {
       const profileVeil=page.locator('#app[data-screen="perfil"] .atlas-profile-veil');
       assert.equal(await profileVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','el perfil empieza sin veladura');
       const profileBackAtTop=await profileBack.boundingBox();
-      await page.evaluate(()=>scrollTo(0,Math.max(1,document.documentElement.scrollHeight*.45)));
+      await page.evaluate(()=>{
+        scrollTo(0,Math.max(1,document.documentElement.scrollHeight*.45));
+        dispatchEvent(new Event('scroll'));
+      });
       await page.waitForTimeout(220);
       const profileBackHalfway=await profileBack.boundingBox();
       const profileBackStyle=await profileBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
