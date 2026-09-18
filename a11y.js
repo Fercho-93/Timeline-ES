@@ -345,10 +345,15 @@
       { opacity: .94, transform: `translate3d(${direction * 22}vw,0,-36px) rotateY(${direction * -3.5}deg) scale(.985)`, offset: .34 },
       { opacity: .08, transform: `translate3d(${direction * 104}vw,0,-110px) rotateY(${direction * -8}deg) scale(.94)`, offset: 1 }
     ], timing);
-    const cleanup = () => { layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
+    let cleanupTimer;
+    const cleanup = () => { clearTimeout(cleanupTimer); layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
     const cancel = () => { animation.cancel(); cleanup(); };
     cancelPageTurn = cancel;
     animation.finished.then(cleanup, cleanup);
+    // WebKit puede dejar pendiente `finished` en animaciones 3D que cambian de escena.
+    // La capa es solo decorativa: pasado el recorrido se retira siempre para que nunca
+    // pueda tapar la pantalla nueva en Safari.
+    cleanupTimer = setTimeout(cleanup, timing.duration + 180);
   }
 
   // Pinta y decide dónde queda el foco:
