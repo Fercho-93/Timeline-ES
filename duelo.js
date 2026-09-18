@@ -120,6 +120,37 @@
 
   function reglaCifra(modeKey) { return CT.axis(modeKey).cifra || {}; }
 
+  // Lo que escribe una persona, que puede traer su unidad detrás: «40 g», «2,5 t»,
+  // «3 días», «47 millones». El número se lee a la española —puntos de millar, coma
+  // decimal— y la unidad se convierte a la del mazo, que es la que ordena las cartas.
+  // Una unidad que no se reconoce no se ignora: la respuesta entera se descarta, porque
+  // dar por buenos «40 lunas» como si fueran cuarenta kilos sería puntuar otra cosa.
+  // Compartida por el duelo de cifras, el reto diario y el sorteo de quién empieza —local
+  // y online—, que son los tres sitios donde alguien escribe una cifra a mano.
+  function leerCifra(modeKey, texto) {
+    const crudo = String(texto || "").trim().replace(/[−–—]/g, "-");
+    if (!crudo) return null;
+    // El número es lo que va delante; lo que quede detrás, si algo queda, es la unidad.
+    const partido = crudo.match(/^(-?[\d.,\s ]*\d)\s*(.*)$/);
+    if (!partido) return null;
+    const [, numero, unidad] = partido;
+
+    let limpio = numero.replace(/[\s ]/g, "");
+    if (limpio.includes(",")) limpio = limpio.replace(/\./g, "").replace(",", ".");
+    else {
+      const trozos = limpio.split(".");
+      if (trozos.length > 1 && trozos.slice(1).every(parte => parte.length === 3)) limpio = trozos.join("");
+    }
+    if (!/^-?\d*\.?\d*$/.test(limpio) || !/\d/.test(limpio)) return null;
+
+    const factor = factorDe(modeKey, unidad);
+    if (factor === null) return null;
+    const valor = Number(limpio) * factor;
+    if (!Number.isFinite(valor) || Math.abs(valor) > MAX_CIFRA) return null;
+    if (valor < 0 && !reglaCifra(modeKey).negativos) return null;
+    return valor;
+  }
+
   // Diez cartas del mazo, sin la que abre la línea: aquí no hay línea que abrir.
   function repartoCifras(modeKey, seed, total = CIFRAS_CARTAS) {
     return baraja(modeKey, seed).slice(0, total);
@@ -419,7 +450,7 @@
     Cifras: {
       CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
-      regla: reglaCifra, unidades, factorDe, reparto: repartoCifras, cartas: cartasCifras,
+      regla: reglaCifra, unidades, factorDe, leer: leerCifra, reparto: repartoCifras, cartas: cartasCifras,
       banda, puntosCarta, puntosPartida, formato: formatoCifra, texto: textoCifra,
       codificar: codificarCifras, invitacion: invitacionCifras, marcador: marcadorCifras, rejilla: rejillaCifras
     }

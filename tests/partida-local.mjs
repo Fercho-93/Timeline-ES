@@ -93,15 +93,21 @@ ok("todas anuncian que el dato está oculto", manoCartas.every(el => /oculta/i.t
 ok("las cartas de la mano no llevan distintivo de época", !/card-era|reveal-era|era-[a-z]/.test(handHtml));
 ok("la partida queda guardada en el dispositivo", !!w.localStorage.getItem("hilo-game-history-v1"));
 
-console.log("\nSorteo de quién empieza");
+console.log("\nSorteo de quién empieza: adivinar la fecha");
 w = boot();
 click(w, '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
-ok("al principio hay que sacar carta", !!w.document.querySelector('[data-action="draw-starter"]'));
+ok("al principio hay que adivinar una cifra", !!w.document.querySelector('[data-action="draw-starter"]'));
 click(w, '[data-action="draw-starter"]');
-ok("el sorteo enseña una carta por jugador", w.document.querySelectorAll(".starter-draw-list li").length === 2);
+ok("pide pasar el móvil al primer jugador", /Pasa el móvil a Jugador 1/.test(w.document.body.innerHTML));
+w.document.getElementById("starter-guess-input").value = "1900";
+click(w, '[data-action="starter-guess-submit"]');
+ok("después pide pasar el móvil al segundo jugador", /Pasa el móvil a Jugador 2/.test(w.document.body.innerHTML));
+w.document.getElementById("starter-guess-input").value = "1901";
+click(w, '[data-action="starter-guess-submit"]');
+ok("el resultado enseña la cifra de cada jugador", w.document.querySelectorAll(".starter-draw-list li").length === 2);
 ok("hay una persona ganadora marcada", !!w.document.querySelector(".starter-draw-winner"));
 click(w, '[data-action="close-menu"]');
 ok("el campo pasa a ofrecer repetir el sorteo", /Repetir el sorteo/.test(w.document.body.innerHTML));
@@ -109,7 +115,7 @@ click(w, '[data-action="start"]');
 const partidaSorteada = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
 ok("la partida arranca con quien ganó el sorteo", partidaSorteada.current === partidaSorteada.starter);
 const enJuego = new Set([...partidaSorteada.deck, ...partidaSorteada.discard, ...partidaSorteada.timeline, ...partidaSorteada.players.flatMap(p => p.hand)]);
-ok("las dos cartas sacadas para el sorteo no entran en la partida", enJuego.size === w.HISTORY_CARDS.length - 2);
+ok("la carta que se adivinó no entra en la partida", enJuego.size === w.HISTORY_CARDS.length - 1);
 
 console.log("\nEmpezar sin pasar por el sorteo también decide quién empieza");
 w = boot();
@@ -119,7 +125,20 @@ click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
 click(w, '[data-action="start"]');
 const partidaSinPasar = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
-ok("aun así se aparta una carta por jugador", [...partidaSinPasar.deck, ...partidaSinPasar.discard, ...partidaSinPasar.timeline, ...partidaSinPasar.players.flatMap(p => p.hand)].length === w.HISTORY_CARDS.length - 2);
+ok("aun así se aparta la carta del sorteo", [...partidaSinPasar.deck, ...partidaSinPasar.discard, ...partidaSinPasar.timeline, ...partidaSinPasar.players.flatMap(p => p.hand)].length === w.HISTORY_CARDS.length - 1);
+
+console.log("\nAbandonar partida también desde la flecha de volver");
+w = boot();
+click(w, '[data-block="historia"]');
+click(w, '[data-mode="history"]');
+click(w, '[data-format="multi"]');
+click(w, '[data-action="setup"]');
+click(w, '[data-action="start"]');
+click(w, '[data-action="ready"]');
+click(w, '[data-action="ui-back"]');
+ok("el diálogo de salir ofrece también abandonar la partida", !!w.document.querySelector('[data-exit-discard]'));
+click(w, '[data-exit-discard]');
+ok("no queda partida guardada", !w.localStorage.getItem("hilo-game-history-v1"));
 
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

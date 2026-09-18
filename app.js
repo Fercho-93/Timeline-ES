@@ -608,7 +608,7 @@
     screen = "setup";
     starterDraw = null;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza sacando una carta.</p>
+      <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
         <div class="panel">
           <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
           <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
@@ -627,43 +627,91 @@
     renderRecentPlayers();
   }
 
-  // El campo que decide quién empieza: mientras no se ha sacado carta, un botón que
-  // lanza el minijuego; en cuanto hay un resultado, quién ganó y la opción de repetirlo.
+  // El campo que decide quién empieza: mientras no se ha jugado el minijuego, un botón
+  // que lo lanza; en cuanto hay un resultado, quién ganó y la opción de repetirlo.
   function starterFieldMarkup() {
     const names = playerNames();
-    if (!starterDraw || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-secondary btn-block" data-action="draw-starter">🂠 Sacar una carta</button>`;
+    if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
+      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-secondary btn-block" data-action="draw-starter">🂠 Adivinar la fecha</button>`;
     }
-    const ganador = escapeHtml(names[starterDraw.winner] || `Jugador ${starterDraw.winner + 1}`);
-    return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${ganador}</strong> saca la carta más antigua y empieza.</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el sorteo</button>`;
+    const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
+    return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el sorteo</button>`;
   }
 
   function playerNames() {
     return [...document.querySelectorAll("#players input")].map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
   }
 
-  // El sorteo en sí, sin nada de pantalla: cada persona saca una carta distinta del mazo
-  // elegido y gana quien la saque con la fecha más antigua, el mismo criterio de "el más
-  // pequeño" que antes se elegía a mano. Esas cartas se recuerdan para apartarlas del
-  // mazo antes de repartir, así nadie vuelve a encontrárselas en la partida.
-  function computeStarterDraw(names) {
-    const pool = shuffle(currentMode().cards.map(card => card.id));
-    const drawnIds = pool.slice(0, names.length);
-    const entries = drawnIds.map((id, i) => ({ player: i, id, value: CT.sortValue(selectedModeKey, cardsById.get(id) || currentMode().cards.find(c => c.id === id)) }));
-    const minValue = Math.min(...entries.map(e => e.value));
-    const winner = entries.find(e => e.value === minValue).player;
-    return { names, entries, winner, drawnIds };
+  // Cuánto se aleja una respuesta del valor real de la carta, con el mismo criterio que
+  // usa el duelo de cifras: en años y siglos el error se mide en unidades, porque errar
+  // un siglo pesa igual en el año 200 que en el 1900; en el resto se mide en proporción,
+  // porque errar 100 habitantes no es lo mismo en un pueblo que en una capital.
+  function starterError(modeKey, card, guess) {
+    const real = CT.sortValue(modeKey, card);
+    const anos = !!reglaCifra(modeKey).anos;
+    return anos || real === 0 ? Math.abs(guess - real) : Math.abs(guess - real) / Math.abs(real);
   }
 
-  // El minijuego tal cual lo ve quien juega: saca las cartas y enseña el resultado. Si se
-  // pasa directamente a "Barajar y empezar" sin pulsar este botón, `startGame` hace el
-  // mismo sorteo por su cuenta sin pantalla de por medio.
-  function drawStarterCards() {
-    starterDraw = computeStarterDraw(playerNames());
+  // El minijuego para decidir quién empieza: se saca una única carta del mazo elegido y,
+  // pasando el móvil, cada persona escribe a qué cifra cree que corresponde. Gana quien
+  // más se acerque al valor real, y esa carta se aparta del mazo antes de repartir: ya se
+  // ha visto de sobra como para que vuelva a salir en la partida.
+  function beginStarterDraw() {
+    const names = playerNames();
+    if (names.length < 2) return showToast("Se necesitan al menos 2 jugadores");
+    const cardId = shuffle(currentMode().cards.map(card => card.id))[0];
+    starterDraw = { names, cardId, step: 0, guesses: [], winner: null, drawnIds: [cardId] };
+    renderStarterGuess();
+  }
+
+  function starterCard() { return cardsById.get(starterDraw.cardId) || currentMode().cards.find(c => c.id === starterDraw.cardId); }
+
+  // Un único diálogo para todo el minijuego: la primera llamada lo abre con su
+  // contenido ya dentro (para que el foco y el título del lector de pantalla se
+  // calculen bien desde el principio) y las siguientes solo reemplazan lo de dentro, así
+  // el paso de una persona a otra no va dejando diálogos apilados ni un Escape que
+  // retrocede a la pregunta de quien ya contestó.
+  function renderStarterDialog(modalHtml) {
+    const existing = app.querySelector('[data-starter-dialog] .modal');
+    if (existing) { existing.innerHTML = modalHtml; return; }
+    overlay(`<div class="overlay" data-starter-dialog><div class="modal">${modalHtml}</div></div>`, true);
+  }
+
+  function renderStarterGuess() {
+    const card = starterCard();
+    const regla = reglaCifra(selectedModeKey);
+    const jugador = escapeHtml(starterDraw.names[starterDraw.step]);
+    renderStarterDialog(`<h2>Pasa el móvil a ${jugador}</h2>
+      <div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
+      <div class="field cifra-field">
+        <label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
+        <input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send">
+        <p class="hint">${escapeHtml(regla.pista || "")}</p>
+      </div>
+      <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span>→</span></button></div>`);
+    const campo = app.querySelector("#starter-guess-input");
+    campo?.focus({ preventScroll: true });
+    campo?.addEventListener("keydown", evento => { if (evento.key === "Enter") { evento.preventDefault(); starterGuessSubmit(); } });
+  }
+
+  function starterGuessSubmit() {
+    const campo = app.querySelector("#starter-guess-input");
+    const valor = leeCifra(campo ? campo.value : "", selectedModeKey);
+    if (valor === null) return showToast("Escribe una cifra válida");
+    starterDraw.guesses.push(valor);
+    starterDraw.step += 1;
+    if (starterDraw.step < starterDraw.names.length) { renderStarterGuess(); return; }
+    const card = starterCard();
+    const errores = starterDraw.guesses.map(guess => starterError(selectedModeKey, card, guess));
+    const winner = errores.indexOf(Math.min(...errores));
+    starterDraw.winner = winner;
     document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
-    const { names, entries, winner } = starterDraw;
-    announce(`${names[winner]} ha sacado la carta más antigua y empieza la partida.`);
-    overlay(`<div class="overlay"><div class="modal"><h2>¿Quién empieza?</h2><ul class="starter-draw-list">${entries.map(e => `<li${e.player === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(names[e.player])}</span><span>${escapeHtml(CT.shortValue(selectedModeKey, cardsById.get(e.id)))}</span></li>`).join("")}</ul><p>${escapeHtml(names[winner])} saca la carta más antigua y empieza.</p><div class="actions"><button class="btn btn-primary btn-block" data-action="close-menu">Aceptar</button></div></div></div>`, true);
+    announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida.`);
+    renderStarterDialog(`<h2>¿Quién empieza?</h2>
+      <p>El valor real era <strong>${escapeHtml(CT.formatValue(selectedModeKey, card))}</strong>.</p>
+      <ul class="starter-draw-list">${starterDraw.names.map((name, i) => `<li${i === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(name)}</span><span>${escapeHtml(Cifras.formato(selectedModeKey, starterDraw.guesses[i]))}</span></li>`).join("")}</ul>
+      <p>${escapeHtml(starterDraw.names[winner])} ha acertado más cerca y empieza.</p>
+      <div class="actions"><button class="btn btn-primary btn-block" data-action="close-menu">Aceptar</button></div>`);
   }
 
   function syncStarterOptions() {
@@ -700,9 +748,13 @@
     if (inputs.length < 2) return showToast("Se necesitan al menos 2 jugadores");
     const names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
     CT.RecentPlayers?.remember(names);
-    // Si nadie ha pulsado el botón del sorteo, se hace igualmente y sin pantalla: la
-    // partida siempre reparte a partir de un sorteo, se haya visto o no.
-    if (!starterDraw || starterDraw.names.length !== names.length) starterDraw = computeStarterDraw(names);
+    // Si nadie ha jugado el minijuego, se decide igualmente y sin pantalla: la partida
+    // siempre arranca a partir de un sorteo, se haya visto o no. Sin adivinanzas de por
+    // medio no hay quien acertó más cerca, así que aquí el sorteo es solo quién empieza.
+    if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
+      const cardId = shuffle(currentMode().cards.map(card => card.id))[0];
+      starterDraw = { names, cardId, step: names.length, guesses: [], winner: Math.floor(Math.random() * names.length), drawnIds: [cardId] };
+    }
     const requestedHand = Number(document.getElementById("hand-size").value);
     const handSize = Math.min(requestedHand, Math.floor((currentMode().cards.length - 1) / names.length));
     if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
@@ -2192,29 +2244,7 @@
   // decimal— y la unidad se convierte a la del mazo, que es la que ordena las cartas.
   // Una unidad que no se reconoce no se ignora: la respuesta entera se descarta, porque
   // dar por buenos «40 lunas» como si fueran cuarenta kilos sería puntuar otra cosa.
-  function leeCifra(texto, modeKey = cifras?.mode || selectedModeKey) {
-    const crudo = String(texto || "").trim().replace(/[\u2212\u2013\u2014]/g, "-");
-    if (!crudo) return null;
-    // El número es lo que va delante; lo que quede detrás, si algo queda, es la unidad.
-    const partido = crudo.match(/^(-?[\d.,\s\u00a0]*\d)\s*(.*)$/);
-    if (!partido) return null;
-    const [, numero, unidad] = partido;
-
-    let limpio = numero.replace(/[\s\u00a0]/g, "");
-    if (limpio.includes(",")) limpio = limpio.replace(/\./g, "").replace(",", ".");
-    else {
-      const trozos = limpio.split(".");
-      if (trozos.length > 1 && trozos.slice(1).every(parte => parte.length === 3)) limpio = trozos.join("");
-    }
-    if (!/^-?\d*\.?\d*$/.test(limpio) || !/\d/.test(limpio)) return null;
-
-    const factor = Cifras.factorDe(modeKey, unidad);
-    if (factor === null) return null;
-    const valor = Number(limpio) * factor;
-    if (!Number.isFinite(valor) || Math.abs(valor) > Cifras.MAX_CIFRA) return null;
-    if (valor < 0 && !reglaCifra(modeKey).negativos) return null;
-    return valor;
-  }
+  function leeCifra(texto, modeKey = cifras?.mode || selectedModeKey) { return Cifras.leer(modeKey, texto); }
 
   function paraReloj() {
     if (cifrasReloj) clearInterval(cifrasReloj);
@@ -2857,8 +2887,16 @@
     else if (playReturn === 'duelo-intro') duelIntro();
     else playMenu();
   }
+  // La misma salida sin guardar que ya ofrece el menú de la partida (los tres puntos),
+  // pero también aquí, en la flecha de volver: es la salida que de verdad se usa más a
+  // menudo, así que no debería hacer falta abrir otro menú para encontrarla.
   function requestPlayExit() {
-    CT.UI.confirmExit('Tu partida quedará guardada para continuar después.', returnFromPlay);
+    const discard = screen === 'solo' && solo && solo.kind !== 'comp'
+      ? { label: 'Salir sin guardar', proceed: abandonSolo }
+      : game && !game.tournament
+        ? { label: 'Abandonar partida', proceed: () => { game = null; saveGame(); home(); } }
+        : null;
+    CT.UI.confirmExit('Tu partida quedará guardada para continuar después.', returnFromPlay, undefined, undefined, discard);
   }
   function uiBack() {
     if (app.dataset.screen?.startsWith('online-')) { CT.onlineNavigate?.('back'); return; }
@@ -3078,10 +3116,9 @@
     } else if (action === "remove-player") {
       if (document.querySelectorAll("#players .player-row").length <= 2) return showToast("Se necesitan al menos 2 jugadores");
       target.closest(".player-row").remove(); syncStarterOptions(); renderRecentPlayers();
-    } else if (action === "draw-starter") {
-      if (document.querySelectorAll("#players input").length < 2) return showToast("Se necesitan al menos 2 jugadores");
-      drawStarterCards();
-    } else if (action === "start") startGame();
+    } else if (action === "draw-starter") beginStarterDraw();
+    else if (action === "starter-guess-submit") starterGuessSubmit();
+    else if (action === "start") startGame();
     else if (action === "ready") { if (game.pulseGift && game.pulseGift.to === currentPlayer().id) { game.pulseGift = null; saveGame(); } if (game.pendingResult) { result = game.pendingResult; renderResult(); } else gameView(); }
     else if (action === "ghost-use") useGhost();
     else if (action === "select-card") {

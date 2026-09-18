@@ -39,9 +39,9 @@ for (let g = 0; g < muestras.length; g++) {
   fire(w, w.document.querySelector(`[data-block="${block}"]`));
   fire(w, w.document.querySelector(`[data-mode="${mode}"]`));
   const mazo = w[globalName];
-  // El sorteo de quién empieza saca una carta por persona y las aparta del mazo: con los
-  // dos jugadores por defecto de esta prueba, dos cartas menos entran en juego.
-  const total = mazo.length - 2;
+  // El sorteo de quién empieza saca una única carta para adivinar su fecha y la aparta
+  // del mazo: una carta menos entra en juego.
+  const total = mazo.length - 1;
   const cardsById = new Map(mazo.map(c => [c.id, c]));
   const orden = card => (["countries", "population", "languages", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
   fire(w, w.document.querySelector('[data-format="multi"]'));
