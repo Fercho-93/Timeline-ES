@@ -141,12 +141,34 @@ try {
       await page.screenshot({path:`test-results/zoom/${engine}-guia-poderes.png`,fullPage:true});
       await page.locator('.guide-close').click();
       await page.locator('[data-settings-action="open"]').click();
+      const settingsBack=page.locator('.settings-modal .settings-head > .atlas-dialog-back');
+      const settingsBackAtTop=await settingsBack.boundingBox();
+      await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=Math.max(1,modal.scrollHeight*.45);});
+      await page.waitForTimeout(50);
+      const settingsBackHalfway=await settingsBack.boundingBox();
+      const settingsBackStyle=await settingsBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
+      assert.ok(Math.abs(settingsBackHalfway.y-settingsBackAtTop.y)<=1,'la flecha circular de ajustes permanece flotante');
+      assert.ok(settingsBackAtTop.x < width/2,'la salida de ajustes queda a la izquierda');
+      assert.equal(settingsBackStyle.radius,'50%','ajustes comparte el botón circular');
+      assert.notEqual(settingsBackStyle.background,'rgba(0, 0, 0, 0)','la flecha de ajustes conserva su fondo de papel');
+      await page.locator('.settings-modal').evaluate(modal=>{modal.scrollTop=0;});
       await page.locator('#ajuste-tema').selectOption('night');
       await page.locator('#ajuste-texto').selectOption('150');
       assert.equal(await page.locator('[data-look-preview]').getAttribute('data-preview-theme'),'night');
       assert.equal(await page.locator('html').getAttribute('data-theme'),null,'la muestra no aplica el tema antes de confirmar');
       await page.screenshot({path:`test-results/zoom/${engine}-ajustes-muestra.png`,fullPage:true});
       await page.locator('.settings-close').click();
+      await page.locator('[data-action="perfil"]').click();
+      const profileBack=page.locator('#app[data-screen="perfil"] .atlas-topbar > .atlas-back');
+      const profileBackAtTop=await profileBack.boundingBox();
+      await page.evaluate(()=>scrollTo(0,Math.max(1,document.documentElement.scrollHeight*.45)));
+      await page.waitForTimeout(50);
+      const profileBackHalfway=await profileBack.boundingBox();
+      const profileBackStyle=await profileBack.evaluate(button=>({radius:getComputedStyle(button).borderRadius,background:getComputedStyle(button).backgroundColor}));
+      assert.ok(profileBackHalfway.y<=profileBackAtTop.y+1 && profileBackHalfway.y<=12,'la flecha circular del perfil permanece flotante');
+      assert.equal(profileBackStyle.radius,'50%','perfil comparte el botón circular');
+      assert.notEqual(profileBackStyle.background,'rgba(0, 0, 0, 0)','la flecha del perfil conserva su fondo de papel');
+      await profileBack.click();
       await page.evaluate(()=>{
         for (const key of ['history','movies','animals','countries','languages']) {
           const card=window.CONTINUUM.cards(key).find(item=>window.CONTINUUM.cardArt(key,item));

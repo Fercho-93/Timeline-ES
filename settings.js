@@ -85,9 +85,9 @@
     // de inmediato, como si ya se hubiera tocado. El foco inicial va aquí en su lugar.
     return `<div class="overlay" data-overlay="settings"><div class="modal settings-modal">
       <div class="settings-head">
-        <div class="eyebrow" tabindex="-1" data-dialog-focus>Ajustes</div>
         <button class="settings-close" data-settings-action="close" aria-label="Cerrar ajustes">×</button>
       </div>
+      <div class="eyebrow" tabindex="-1" data-dialog-focus>Ajustes</div>
 
       <section class="settings-section">
         <h2>Tema</h2>
