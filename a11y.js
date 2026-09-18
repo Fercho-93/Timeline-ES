@@ -98,6 +98,20 @@
   }
 
   let homePosition = null;
+  function restoreWindowPosition(top) {
+    const root = document.documentElement;
+    const previous = root.style.getPropertyValue("scroll-behavior");
+    const priority = root.style.getPropertyPriority("scroll-behavior");
+    // La portada usa desplazamiento suave para los enlaces internos. Safari puede
+    // heredarlo incluso cuando scrollTo recibe `behavior: "instant"`, y entonces deja
+    // ver primero el principio de Inicio antes de viajar hasta la posición guardada.
+    // La anulación en línea se aplica y se retira dentro del mismo pintado: el usuario
+    // llega directamente al punto anterior sin cambiar el resto de desplazamientos.
+    root.style.setProperty("scroll-behavior", "auto", "important");
+    window.scrollTo(0, top);
+    if (previous) root.style.setProperty("scroll-behavior", previous, priority);
+    else root.style.removeProperty("scroll-behavior");
+  }
   let cancelPageTurn = null;
   let cancelProfileRoll = null;
   function unrollProfile(container) {
@@ -379,6 +393,9 @@
     const nextDepth = preparationDepth[screen];
     const changed = paint.screen !== screen;
     const closingEncyclopedia = paint.screen === "enciclopedia" && changed;
+    const encyclopediaBackground = closingEncyclopedia
+      ? container.querySelector(`.enc-background[data-background-screen="${screen}"]`)
+      : null;
     const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
@@ -391,6 +408,7 @@
     const activo = document.activeElement;
     const dentro = activo && activo !== container && container.contains(activo);
     const clave = dentro ? selectorFor(activo) : null;
+    const previousWindowTop = window.scrollY;
     const primero = paint.screen === undefined;
     const cambioDePantalla = screen !== paint.screen;
     const vuelve = screen === "home" ||
@@ -408,7 +426,11 @@
     paint.screen = screen;
 
     window.CONTINUUM.UI?.captureBoard?.(container);
-    container.innerHTML = html;
+    // La enciclopedia conserva debajo una copia ya cargada de la pantalla de origen.
+    // Si volvemos justo a esa pantalla, movemos sus nodos en vez de destruirlos y crear
+    // otros: las imágenes permanecen decodificadas y no aparece un fotograma oscuro.
+    if (encyclopediaBackground) container.replaceChildren(...encyclopediaBackground.childNodes);
+    else container.innerHTML = html;
     window.CONTINUUM.UI?.mount(container, screen);
     if (!primero && cambioDePantalla) {
       const kind = ['winner', 'online-winner', 'solo-end', 'comp-end'].includes(screen) ? 'end'
@@ -461,10 +483,14 @@
       // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil
       // el titular de Inicio está debajo de la galería; enfocarlo saltaba la portada.
       const regreso = screen === "home" && homePosition;
+      const conservaFondo = screen === "enciclopedia";
       const destino = regreso?.focus && container.querySelector(regreso.focus);
       focus(destino || container.querySelector("[data-focus]"), { preventScroll: true });
-      const top = regreso ? regreso.top : 0;
-      if (window.scrollY !== top || window.scrollX !== 0) window.scrollTo({ top, left: 0, behavior: "instant" });
+      const top = regreso ? regreso.top : conservaFondo ? previousWindowTop : 0;
+      // Al reconstruir Inicio el navegador puede conservar todavía el valor antiguo y
+      // reajustarlo a cero al terminar el layout. Por eso, cuando hay un regreso guardado,
+      // reafirmamos siempre la posición aunque en este instante parezca coincidir.
+      if (regreso || conservaFondo || window.scrollY !== top || window.scrollX !== 0) restoreWindowPosition(top);
       if (screen === "perfil") unrollProfile(container);
       return;
     }

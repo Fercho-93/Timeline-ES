@@ -163,6 +163,7 @@
   // inicio, deshaciendo de un toque la navegación que trajo hasta aquí.
   let encReturn = "home";
   let encBackground = '';
+  let encBackgroundScreen = '';
   let reviewReturnView = null;
   // La portada empieza mostrando la colección, no un mazo abierto. Un toque descubre
   // una categoría y enseña directamente los mazos que contiene.
@@ -1214,7 +1215,10 @@
   // Solo se entra aquí desde la portada o desde un repaso: nunca desde dentro de una
   // partida, donde ver el mazo entero volvería trivial cualquier jugada pendiente.
   function enciclopediaView() {
-    if (screen !== 'enciclopedia') encBackground = app.innerHTML;
+    if (screen !== 'enciclopedia') {
+      encBackground = app.innerHTML;
+      encBackgroundScreen = screen;
+    }
     screen = "enciclopedia";
     const all = encMode === "all";
     const mode = all ? {name: "Álbum de láminas"} : CT.mode(encMode);
@@ -1227,7 +1231,7 @@
     // bloquear y las dos opciones saldrían vacías.
     const conLaminas = all || CT.Enciclopedia.seenProgress(encMode).total > 0;
     const chipLock = (key, etiqueta) => `<button type="button" class="band-chip${encLock === key ? " active" : ""}" data-action="enc-lock" data-lock="${key}" aria-pressed="${encLock === key}">${etiqueta}</button>`;
-    paint(`<div class="enc-background" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
+    paint(`<div class="enc-background" data-background-screen="${encBackgroundScreen}" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
       <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
       <section class="setup-section enc-section">
         <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
