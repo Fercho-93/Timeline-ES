@@ -58,9 +58,11 @@ try {
    await duelPage.locator('[data-action="duel-play"]').click();
    await duelPage.locator('[data-action="solo-place"]').first().click();
    const dockBox=await duelPage.locator('.placement-dock').boundingBox();
-   assert.ok(dockBox.y+dockBox.height<=664+1,`el botón de confirmar cabe en la pantalla (acaba en ${Math.round(dockBox.y+dockBox.height)} de 664)`);
-   assert.ok(dockBox.x+dockBox.width>=390-13,'la confirmación queda alineada a la derecha');
-   assert.ok(dockBox.width<390*.6,'la confirmación deja visible la mayor parte del tablero');
+   const timelineBox=await duelPage.locator('.timeline-wrap').boundingBox();
+   const handTitleBox=await duelPage.locator('.atlas-hand-section .hand-title').boundingBox();
+   assert.ok(dockBox.y>=timelineBox.y+timelineBox.height-1,'la confirmación queda debajo de la línea');
+   assert.ok(dockBox.y+dockBox.height<=handTitleBox.y+1,'la confirmación queda antes de Tu carta');
+   assert.equal(await duelPage.locator('.placement-dock').evaluate(el=>getComputedStyle(el).position),'static','la confirmación no flota sobre el contenido');
    assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
    const selectedStyle=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>({
      fold:getComputedStyle(el,'::before').display,
@@ -69,7 +71,7 @@ try {
      height:el.getBoundingClientRect().height
    }));
    assert.equal(selectedStyle.fold,'none','la carta inferior no conserva el pliegue dorado');
-   assert.ok(selectedStyle.width>=100&&selectedStyle.height>=136,'la carta inferior gana presencia sin dominar la pantalla');
+   assert.ok(selectedStyle.width>=115&&selectedStyle.height>=148,'la carta inferior gana presencia sin dominar la pantalla');
    // Con la carta a la vista, el muelle no la tapa.
    await duelPage.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
    const manoBox=await duelPage.locator('.hand-solo .hand-card').boundingBox();

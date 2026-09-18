@@ -585,41 +585,30 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
 #app.atlas-board .hand:not(.hand-solo) .carta-reverso { position: absolute; inset: 18px 8px auto; height: 34px; min-height: 0; margin: 0; opacity: .2; }
 #app.atlas-board .hand:not(.hand-solo) .reverso-emblema { width: 34px; height: 34px; }
 #app.atlas-board .hand .hand-card.selected { outline: 2px solid var(--atlas-selection); outline-offset: 1px; }
-/* La confirmación queda como una tarjeta compacta en la esquina inferior derecha. `sticky`
-   no sirve aquí: `#app` lleva
-   `overflow-x: clip`, y con un eje recortado el otro deja de ser `visible`, así que `#app`
-   pasa a ser contenedor de desplazamiento y la caja se pegaba al final del documento
-   —fuera de la pantalla, debajo de la barra del navegador— en vez de al borde visible.
-   Con `fixed` se pega a lo que de verdad se ve. La tarjeta deja libre la mayor parte de
-   la carta y la hoja reserva su altura para que tampoco la cubra al llegar al final. El
-   muelle que solo lleva la instrucción se queda en el flujo: es un aviso, no un mando. */
+/* La decisión forma parte del tablero: va entre la línea y «Tu carta». Así nunca cubre
+   la carta ni la pantalla, y sigue apareciendo junto al hueco que se acaba de elegir. */
 #app.atlas-board .placement-dock:has(.btn) {
-  position: fixed; left: auto; right: max(12px,env(safe-area-inset-right));
-  bottom: max(12px,env(safe-area-inset-bottom)); z-index: 6;
-  width: auto; max-width: calc(100vw - 24px);
-  display: grid; gap: 0;
-  padding: 8px;
-  border: 1px solid #a8895966;
-  border-radius: 17px;
-  background: color-mix(in srgb,var(--edition-paper) 94%,transparent);
-  box-shadow: 0 10px 28px #3d271c2e, 0 2px 8px #3d271c24, inset 0 1px 0 #fff8e7cc;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  position: static; z-index: auto;
+  width: auto; margin: 9px 6px 10px;
+  display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px;
+  padding: 8px 9px;
+  border: 1px solid color-mix(in srgb,var(--atlas-selection) 22%,var(--edition-line));
+  border-left: 3px solid var(--atlas-selection);
+  border-radius: 12px;
+  background: color-mix(in srgb,var(--edition-surface) 62%,transparent);
+  box-shadow: none;
 }
 #app.atlas-board .placement-dock:has(.btn) .placement-dock-status {
-  position: absolute; right: 5px; bottom: calc(100% + 6px);
-  padding: 6px 9px 6px 6px;
-  border: 1px solid #a8895955; border-radius: 999px;
-  background: color-mix(in srgb,var(--edition-paper) 95%,transparent);
-  box-shadow: 0 4px 14px #3d271c20;
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  white-space: nowrap; pointer-events: none;
+  position: static; min-width: 0; padding: 0;
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+  white-space: normal; pointer-events: none;
 }
-#app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+#app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: max(12px,env(safe-area-inset-bottom)); }
 #app.atlas-board .placement-dock:not(:has(.btn)) { position: static; }
-/* Con el texto muy ampliado el muelle ocuparía media pantalla: ahí vuelve al flujo. */
-:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .placement-dock:has(.btn) { position: static; width: auto; border: 0; border-radius: 0; box-shadow: none; padding-inline: 0; backdrop-filter: none; }
-:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+@media (max-width: 360px) {
+  #app.atlas-board .placement-dock:has(.btn) { grid-template-columns: 1fr; }
+}
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .placement-dock:has(.btn) { grid-template-columns: 1fr; }
 #app.atlas-board[data-platform][data-screen] .timeline .card-visual { aspect-ratio: auto; }
 @media (max-width: 380px), (max-height: 740px) {
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: 76px; }
@@ -651,12 +640,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   /* La mano repartida entre varias personas ocupa el doble de alto que la de una sola
      carta, así que a la mesa compartida le quedan unos cien píxeles menos. En solitario
      el hueco libre —lo que queda tras la barra, la cabecera, el zoom y el botón de
-     confirmar— se reparte entre la línea y la mano, 62 % y 36 %, dejando el resto de
-     aire entre las dos. */
+     confirmar— permite que la línea conserve su prioridad, mientras la mano crece un
+     poco más y la página puede desplazarse si una pantalla corta lo necesita. */
   #app.atlas-board { --atlas-card: clamp(142px, calc(100dvh - 610px), 218px); }
   #app.atlas-board:has(.hand-solo) {
     --atlas-card: clamp(142px, calc((100dvh - 366px) * .62), 306px);
-    --atlas-hand: clamp(136px, calc((100dvh - 366px) * .40), 228px);
+    --atlas-hand: clamp(148px, calc((100dvh - 366px) * .44), 244px);
   }
   #app.atlas-board .timeline-card { width: max(112px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: max(76px, calc(var(--atlas-card) * .66 - 18px)); }
@@ -823,7 +812,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
    proporción de una carta de baraja y crece con la pantalla, que es lo que cierra la
    franja de papel que quedaba hasta el botón de confirmar. */
 @media (min-width: 381px) and (max-width: 699px) {
-  #app.atlas-board .hand-solo { grid-template-columns: minmax(0, calc(var(--atlas-hand) * .75)); }
+  #app.atlas-board .hand-solo { grid-template-columns: minmax(0, calc(var(--atlas-hand) * .78)); }
   /* Los mismos atributos que la regla compacta de la mesa, o esa gana y la deja plana. */
   #app.atlas-board[data-platform][data-device][data-screen] .hand-solo .hand-card {
     aspect-ratio: 3 / 4; height: var(--atlas-hand); min-height: 0 !important;
@@ -1233,7 +1222,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background: var(--ed
   outline: 2px solid var(--atlas-selection); outline-offset: 2px;
   box-shadow: 0 9px 19px #3d271c2b;
 }
-#app.atlas-board .hand-solo .hand-card.selected::before { display: none; }
+#app.atlas-board .hand-solo .hand-card.selected::before {
+  content: none; display: none; background: none; filter: none; clip-path: none;
+}
 
 /* Al acercar una carta, el hueco enseña solo su volumen: no revela el resultado. */
 #app.atlas-board .slot.drop-target::before {
