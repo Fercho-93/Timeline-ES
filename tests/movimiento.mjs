@@ -141,7 +141,8 @@ for (const reduce of [false, true]) {
   ok(reduce ? "movimiento reducido entra sin desplazar la cámara" : "la portada anterior sale como una cámara, sin vuelo de carta",
     reduce
       ? !w.document.querySelector('.camera-move, .deck-cover-flight, .book-turn') && animated.length === 0
-      : !!w.document.querySelector('.camera-move') && !w.document.querySelector('.deck-cover-flight, .book-turn') && animated.length === 1);
+      : !!w.document.querySelector('.camera-move') && !!w.document.querySelectorAll('.camera-move-view').length &&
+        !w.document.querySelector('.deck-cover-flight, .book-turn') && animated.length === 2);
   ok("el foco llega al título sin esperar la transición", w.document.activeElement === el(w, 'h1'));
   click(w, '[data-action="collection-back"]');
   click(w, '[data-mode="history"]');

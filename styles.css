@@ -74,6 +74,7 @@ button { touch-action: manipulation; color: inherit; }
 }
 .screen-return { --camera-entry: max(-23vw, -190px); --camera-tilt: 5deg; transform-origin: right center; }
 .screen-enter .topbar, .screen-enter > :not(.topbar) { animation: none; }
+.camera-running > .screen-enter { animation: none !important; }
 @keyframes camera-arrive {
   from { opacity: .08; transform: perspective(1200px) translate3d(var(--camera-entry),0,-110px) rotateY(var(--camera-tilt)) scale(.94); }
   58% { opacity: 1; }

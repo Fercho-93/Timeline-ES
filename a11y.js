@@ -277,8 +277,9 @@
     });
   }
 
-  // Conserva la vista que sale y la desplaza como si una cámara girase hacia el
-  // siguiente escenario. El destino se pinta debajo y entra en sentido contrario.
+  // Construye un escenario doble: la vista que dejamos y la vista de destino existen
+  // a la vez, una al lado de la otra. Después de repintar, la cámara recorre ese mundo
+  // horizontal de forma continua; no hay una página que se apaga y otra que aparece.
   function moveCamera(container, backwards) {
     window.CONTINUUM.Effects?.page?.(backwards);
     if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
@@ -286,74 +287,98 @@
     layer.className = "camera-move";
     layer.setAttribute("aria-hidden", "true");
     layer.inert = true;
-    const leaf = document.createElement("div");
-    leaf.className = "camera-move-frame";
-    leaf.style.transformOrigin = backwards ? "left center" : "right center";
-    const front = document.createElement("div");
-    front.className = "camera-move-view";
-    const copy = container.cloneNode(true);
-    // La copia sale de #app: fijar el aspecto ANTES de repintar conserva también
-    // los tamaños de SVG, las imágenes y las reglas específicas de cada pantalla.
-    const sources = [container, ...container.querySelectorAll('*')];
-    const copies = [copy, ...copy.querySelectorAll('*')];
+    const world = document.createElement("div");
+    world.className = "camera-world";
+    world.innerHTML = '<i></i><i></i><i></i>';
+    const track = document.createElement("div");
+    track.className = "camera-move-frame";
+    track.dataset.direction = backwards ? "back" : "forward";
     const decorations = document.createElement('style');
     const rules = [];
-    const hasLayout = container.getBoundingClientRect().width > 0;
+    let pageNode = 0;
     const frozenStyle = computed => Array.from(computed, property =>
       `${property}:${computed.getPropertyValue(property)};`).join('');
-    sources.forEach((source, index) => {
-      const target = copies[index];
-      const computed = getComputedStyle(source);
-      target.style.cssText = frozenStyle(computed);
-      target.style.setProperty('animation', 'none', 'important');
-      target.style.setProperty('transition', 'none', 'important');
-      // Los degradados y veladuras también pueden depender de #app.
-      if (hasLayout) {
-        for (const pseudo of ['::before', '::after']) {
-          const style = getComputedStyle(source, pseudo);
-          if (!style.content || style.content === 'none' || style.content === 'normal') continue;
-          target.dataset.pageNode = index;
-          rules.push(`.camera-move [data-page-node="${index}"]${pseudo}{${frozenStyle(style)}animation:none!important;transition:none!important;}`);
+    const snapshot = (sourceRoot, scrollTop) => {
+      const scene = document.createElement("div");
+      scene.className = "camera-move-view";
+      const copy = sourceRoot.cloneNode(true);
+      const sources = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
+      const copies = [copy, ...copy.querySelectorAll('*')];
+      const hasLayout = sourceRoot.getBoundingClientRect().width > 0;
+      sources.forEach((source, index) => {
+        const target = copies[index];
+        const computed = getComputedStyle(source);
+        target.style.cssText = frozenStyle(computed);
+        target.style.setProperty('animation', 'none', 'important');
+        target.style.setProperty('transition', 'none', 'important');
+        if (hasLayout) {
+          let id;
+          for (const pseudo of ['::before', '::after']) {
+            const style = getComputedStyle(source, pseudo);
+            if (!style.content || style.content === 'none' || style.content === 'normal') continue;
+            if (id === undefined) {
+              id = pageNode++;
+              target.dataset.pageNode = id;
+            }
+            rules.push(`.camera-move [data-page-node="${id}"]${pseudo}{${frozenStyle(style)}animation:none!important;transition:none!important;}`);
+          }
         }
-      }
-      if (source instanceof HTMLImageElement) {
-        target.removeAttribute('srcset');
-        target.removeAttribute('sizes');
-        target.src = source.currentSrc || source.src;
-        target.loading = 'eager';
-      }
-    });
-    decorations.textContent = rules.join('\n');
-    layer.append(decorations);
-    copy.removeAttribute("id");
-    copy.classList.add("camera-move-copy");
-    copy.style.transform = `translateY(${-window.scrollY}px)`;
-    copy.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
-    copy.querySelectorAll(".home-nav, .overlay").forEach(node => node.remove());
-    front.append(copy);
-    leaf.append(front);
-    layer.append(leaf);
+        if (source instanceof HTMLImageElement) {
+          target.removeAttribute('srcset');
+          target.removeAttribute('sizes');
+          target.src = source.currentSrc || source.src;
+          target.loading = 'eager';
+        }
+      });
+      copy.removeAttribute("id");
+      copy.classList.add("camera-move-copy");
+      copy.style.transform = `translateY(${-scrollTop}px)`;
+      copy.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
+      copy.querySelectorAll(".home-nav, .overlay, .camera-move").forEach(node => node.remove());
+      scene.append(copy);
+      sources.forEach((source, index) => {
+        copies[index].scrollLeft = source.scrollLeft;
+        copies[index].scrollTop = source.scrollTop;
+      });
+      return scene;
+    };
+    const origin = snapshot(container, window.scrollY);
+    layer.append(decorations, world, track);
     document.body.append(layer);
-    sources.forEach((source, index) => {
-      copies[index].scrollLeft = source.scrollLeft;
-      copies[index].scrollTop = source.scrollTop;
-    });
-    const direction = backwards ? 1 : -1;
-    const timing = { duration: 560, easing: "cubic-bezier(.42,0,.18,1)", fill: "forwards" };
-    const animation = leaf.animate([
-      { opacity: 1, transform: "translate3d(0,0,0) rotateY(0deg) scale(1)", offset: 0 },
-      { opacity: .94, transform: `translate3d(${direction * 22}vw,0,-36px) rotateY(${direction * -3.5}deg) scale(.985)`, offset: .34 },
-      { opacity: .08, transform: `translate3d(${direction * 104}vw,0,-110px) rotateY(${direction * -8}deg) scale(.94)`, offset: 1 }
-    ], timing);
-    let cleanupTimer;
-    const cleanup = () => { clearTimeout(cleanupTimer); layer.remove(); if (cancelPageTurn === cancel) cancelPageTurn = null; };
-    const cancel = () => { animation.cancel(); cleanup(); };
+    container.classList.add("camera-running");
+    let animation, worldAnimation, cleanupTimer;
+    const previousVisibility = container.style.visibility;
+    const cleanup = () => {
+      clearTimeout(cleanupTimer);
+      container.style.visibility = previousVisibility;
+      container.classList.remove("camera-running");
+      layer.remove();
+      if (cancelPageTurn === cancel) cancelPageTurn = null;
+    };
+    const cancel = () => { animation?.cancel(); worldAnimation?.cancel(); cleanup(); };
     cancelPageTurn = cancel;
-    animation.finished.then(cleanup, cleanup);
-    // WebKit puede dejar pendiente `finished` en animaciones 3D que cambian de escena.
-    // La capa es solo decorativa: pasado el recorrido se retira siempre para que nunca
-    // pueda tapar la pantalla nueva en Safari.
-    cleanupTimer = setTimeout(cleanup, timing.duration + 180);
+    return () => {
+      const destination = snapshot(container, window.scrollY);
+      decorations.textContent = rules.join('\n');
+      if (backwards) track.append(destination, origin);
+      else track.append(origin, destination);
+      container.style.visibility = "hidden";
+      const timing = { duration: 920, easing: "cubic-bezier(.3,.02,.16,1)", fill: "forwards" };
+      const start = backwards ? -100 : 0;
+      const middle = backwards ? -48 : -52;
+      const end = backwards ? 0 : -100;
+      animation = track.animate([
+        { transform: `translate3d(${start}vw,0,0) scale(1)`, offset: 0 },
+        { transform: `translate3d(${middle}vw,-1.2vh,-48px) scale(.975)`, offset: .48 },
+        { transform: `translate3d(${end}vw,0,0) scale(1)`, offset: 1 }
+      ], timing);
+      worldAnimation = world.animate([
+        { transform: `translate3d(${backwards ? -3 : 3}vw,0,-90px) scale(1.08)` },
+        { transform: `translate3d(${backwards ? 3 : -3}vw,-1vh,-90px) scale(1.08)` }
+      ], timing);
+      animation.finished.then(cleanup, cleanup);
+      cleanupTimer = setTimeout(cleanup, timing.duration + 180);
+    };
   }
 
   // Pinta y decide dónde queda el foco:
@@ -381,7 +406,7 @@
     const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
     const backwards = nextDepth !== undefined && nextDepth < previousDepth;
-    if (preparationTurn || firstReveal) moveCamera(container, backwards);
+    const launchCamera = preparationTurn || firstReveal ? moveCamera(container, backwards) : null;
     if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
     else if (changed && screen !== "pass") firstLocalReveal = false;
     container.dataset.screen = screen;
@@ -459,6 +484,9 @@
         wrap.scrollLeft += target.left - frame.left - (frame.width - target.width) / 2;
       }
     }
+    // La vista de destino se fotografía después de recuperar su posición vertical y
+    // horizontal. Así el viaje termina exactamente donde continuará el jugador.
+    launchCamera?.();
     if (primero) return;
     if (cambioDePantalla) {
       // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil

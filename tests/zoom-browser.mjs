@@ -32,6 +32,9 @@ try {
    await transitionPage.locator('[data-mode="history"]').click();
    const header=transitionPage.locator('.atlas-landscape');
    assert.equal(await transitionPage.locator('.camera-move').count(),1,'la vista anterior acompaña el giro de cámara');
+   assert.equal(await transitionPage.locator('.camera-move-view').count(),2,'origen y destino forman un único escenario horizontal');
+   assert.deepEqual(await transitionPage.locator('.camera-move-view').evaluateAll(views=>views.map(view=>getComputedStyle(view).opacity)),['1','1'],'ninguna vista se funde durante el recorrido');
+   assert.equal(await transitionPage.locator('#app').evaluate(app=>getComputedStyle(app).visibility),'hidden','la pantalla real espera detrás sin duplicar el destino');
    assert.equal(await transitionPage.locator('.deck-cover-flight, .book-turn').count(),0,'sin portada voladora ni hoja superpuesta');
    await transitionPage.locator('.camera-move').waitFor({state:'detached',timeout:2500});
    assert.equal(await transitionPage.locator('.camera-move').count(),0,'la cámara se retira al terminar el giro');

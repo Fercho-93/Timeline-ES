@@ -261,14 +261,16 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     const frozen = w.document.querySelector('.camera-move-copy .snapshot-probe');
     assert.equal(w.getComputedStyle(frozen).width, '28px', 'la cámara conserva tamaños que dependían de #app');
     assert.equal(w.getComputedStyle(frozen).display, 'none', 'un icono oculto no reaparece al mover la cámara');
-    assert.match(turns[1].frames.at(-1).transform, /translate3d\(-104vw/);
-    assert.equal(w.document.querySelector('.camera-move-frame').style.transformOrigin, 'right center');
+    assert.equal(w.document.querySelectorAll('.camera-move-view').length, 2, 'origen y destino conviven en un mismo escenario');
+    assert.ok(turns[1].frames.every(frame => !('opacity' in frame)), 'el viaje no funde ninguna de las dos vistas');
+    assert.match(turns[1].frames.at(-1).transform, /translate3d\(-100vw/);
+    assert.equal(w.document.querySelector('.camera-move-frame').dataset.direction, 'forward');
     assert.equal(w.document.querySelector('.camera-move').getAttribute('aria-hidden'), 'true');
     assert.equal(w.document.querySelector('.camera-move [id]'), null);
     click(w, '#app [data-action="back-menu"]');
     assert.equal(turns[1].cancelled, true);
-    assert.match(turns[2].frames.at(-1).transform, /translate3d\(104vw/);
-    assert.equal(w.document.querySelector('.camera-move-frame').style.transformOrigin, 'left center');
+    assert.match(turns[2].frames.at(-1).transform, /translate3d\(0vw/);
+    assert.equal(w.document.querySelector('.camera-move-frame').dataset.direction, 'back');
     assert.equal(w.document.querySelectorAll('.camera-move').length, 1);
     w.matchMedia = () => ({ matches: true });
     click(w, '#app [data-action="solo"]');
@@ -388,7 +390,7 @@ console.log('Atajo al inicio: marca dibujada, caja propia y especificidad que ga
     assert.equal(turns.length, 14, 'la preparación online completa usa el efecto');
     render('home'); render('play-menu'); render('setup'); render('play-menu');
     assert.equal(turns.length, 17);
-    assert.match(turns.at(-1).at(-1).transform, /translate3d\(104vw/);
+    assert.match(turns.at(-1).at(-1).transform, /translate3d\(0vw/);
   } finally { w.close(); }
 }
 console.log('Cámara en toda la preparación, sin animar las jugadas posteriores: OK');
