@@ -11,7 +11,10 @@
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
   const turnDuelReady = import('./duelo-turnos.js').catch(() => null);
+  const pushReady = import('./push.js').catch(() => null);
   const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
+  pushReady.then(module => module?.start?.());
+  window.addEventListener('continuum:turn-duel-open', event => turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: event.detail?.duelId, back: home })));
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
   let playReturn = 'play-menu';
   let lastPaintedScreen = 'home';

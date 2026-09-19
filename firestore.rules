@@ -84,6 +84,15 @@ service cloud.firestore {
         && request.resource.data.alias is string
         && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24;
       allow delete: if owner(uid);
+      match /pushTokens/{tokenId} {
+        allow get, list: if owner(uid);
+        allow create, update: if owner(uid)
+          && request.resource.data.keys().hasOnly(['token','platform','updatedAt'])
+          && request.resource.data.token is string && request.resource.data.token.size() > 10
+          && request.resource.data.platform in ['android','ios']
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if owner(uid);
+      }
     }
     match /playerProgress/{uid} {
       function valid() {

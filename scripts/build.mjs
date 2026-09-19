@@ -20,7 +20,7 @@ const FILES = [
   "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js",
   "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js",
   "deployment.js", "accounts.css", "firebase-client.js", "account-storage.js", "recent-players.js", "accounts.js", "boot.js", "engine.js", "final.js", "tournament.js", "links.js", "storage.js", "saves.js", "updates.js", "session.js", "enciclopedia.js", "progreso.js", "cartera.js", "duelo.js", "local-transport.js", "local-room.js", "local-session.js", "local-share.js", "local-multiplayer.js", "ghost.js", "drag.js", "swipe.js",
-  "a11y.js", "mapa.js", "settings.js", "effects.js", "ambience.js", "immersion.js", "duelo-turnos.js", "app.js", "online.js", "actualizar.js"
+  "a11y.js", "mapa.js", "settings.js", "effects.js", "ambience.js", "immersion.js", "duelo-turnos.js", "push.js", "app.js", "online.js", "actualizar.js"
 ];
 
 const DIRS = ["assets"];
