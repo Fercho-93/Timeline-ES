@@ -175,7 +175,7 @@ try {
       assert.equal(await page.locator('.guide-pulse-table tbody tr').count(),4);
       assert.ok(await page.locator('.guide-handbook').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'la guía cabe en el móvil');
       await page.screenshot({path:`test-results/zoom/${engine}-guia-poderes.png`,fullPage:true});
-      await page.locator('.guide-close').click();
+      await guideBack.click();
       await page.locator('[data-settings-action="open"]').click();
       const settingsBack=page.locator('.settings-modal .settings-head > .atlas-dialog-back');
       const settingsVeil=page.locator('.settings-modal > .atlas-scroll-veil');
