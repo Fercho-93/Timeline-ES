@@ -34,8 +34,13 @@ service cloud.firestore {
             && request.resource.data.playersOrder.size() == 2
             && request.resource.data.playersOrder[0] == resource.data.playersOrder[0]
             && request.resource.data.playersOrder[1] == request.auth.uid
+            && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid])
+            && request.resource.data.scores.diff(resource.data.scores).affectedKeys().hasOnly([request.auth.uid])
+            && request.resource.data.scores[request.auth.uid] == 0
             && request.resource.data.status == 'playing'
             && request.resource.data.turnUid == request.resource.data.playersOrder[0]
+            && (request.resource.data.timeline == resource.data.timeline
+              || (resource.data.kind == 'orden' && resource.data.timeline.size() == 0 && request.resource.data.timeline.size() == 1))
             && request.resource.data.turnIndex == 0)
           ||
           (resource.data.status == 'playing' && resource.data.turnUid == request.auth.uid
@@ -43,10 +48,28 @@ service cloud.firestore {
             && request.resource.data.plays.size() == resource.data.plays.size() + 1
             && request.resource.data.plays[resource.data.turnIndex].uid == request.auth.uid
             && request.resource.data.plays[resource.data.turnIndex].cardId is int
-            && request.resource.data.plays[resource.data.turnIndex].index is int
-            && request.resource.data.timeline.size() == resource.data.timeline.size() + 1
-            && (request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid] || request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid] + 1)
-            && (request.resource.data.status == 'playing' || request.resource.data.status == 'finished'))
+            && request.resource.data.scores.diff(resource.data.scores).affectedKeys().hasOnly([request.auth.uid])
+            && (
+              (resource.data.kind == 'orden'
+                && request.resource.data.plays[resource.data.turnIndex].index is int
+                && ((request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid]
+                      && request.resource.data.timeline == resource.data.timeline)
+                  || (request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid] + 1
+                      && (request.resource.data.timeline.size() == resource.data.timeline.size() + 1
+                        || (resource.data.timeline.size() == 0 && request.resource.data.timeline.size() == 2)))))
+              ||
+              (resource.data.kind == 'cifras'
+                && request.resource.data.plays[resource.data.turnIndex].respuesta is number
+                && request.resource.data.plays[resource.data.turnIndex].points is int
+                && request.resource.data.timeline == resource.data.timeline
+                && request.resource.data.scores[request.auth.uid] >= resource.data.scores[request.auth.uid]
+                && request.resource.data.scores[request.auth.uid] <= resource.data.scores[request.auth.uid] + 100)
+            )
+            && ((request.resource.data.turnIndex == resource.data.total
+                  && request.resource.data.status == 'finished' && request.resource.data.turnUid == null)
+                || (request.resource.data.turnIndex < resource.data.total
+                  && request.resource.data.status == 'playing'
+                  && request.resource.data.turnUid == resource.data.playersOrder[request.resource.data.turnIndex % 2])))
         );
       allow delete: if false;
     }
