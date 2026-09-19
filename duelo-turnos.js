@@ -5,6 +5,8 @@ import { collection, doc, getDocs, limit, onSnapshot, query, runTransaction, ser
 
 const CT = window.CONTINUUM;
 const TURN_SECONDS = 15;
+const READY_SECONDS = 3;
+let prepareUntil = 0, preparingTurn = null;
 const TOTAL = CT.Duelo.CARTAS;
 let stop = null, current = null, onBack = null, timer = null, enteredAt = 0, shareLink = '', pendingIndex = null, expiring = false;
 
@@ -86,12 +88,13 @@ function render() {
   const sameTurn = app.querySelector('.turn-duel-shell')?.dataset.turn === String(current.turnIndex);
   const mine = current.turnUid === uid();
   const elapsed = enteredAt ? Math.max(0, TURN_SECONDS - Math.floor((Date.now() - enteredAt) / 1000)) : TURN_SECONDS;
-  const card = mine && !current.timeout ? localCard(current) : null;
+  const preparing = mine && current.status === 'playing' && Date.now() < prepareUntil;
+  const card = mine && !current.timeout && !preparing ? localCard(current) : null;
   const waiting = current.status === 'waiting';
   const kindLabel = current.kind === 'cifras' ? 'Escribir la cifra' : 'Ordenar las cartas';
   const rival = current.players?.[current.playersOrder?.find(x => x !== uid())]?.alias || '';
-  const finished = current.status === 'finished';
-  const active = mine && !waiting && !finished && !current.timeout;
+  const finished = ['finished', 'cancelled'].includes(current.status);
+  const active = mine && !waiting && !finished && !current.timeout && !preparing;
   const link = shareLink || `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${current.id}`;
   const html = `<div class="shell turn-duel-shell" data-duel-id="${safe(current.id)}" data-turn="${current.turnIndex}">
     <nav class="turn-duel-nav" aria-label="Duelo"><span>CONTINUUM <small>Duelo por turnos</small></span><button class="btn btn-ghost" data-turn-action="back">Volver</button></nav>
@@ -99,7 +102,8 @@ function render() {
       <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${finished ? 'Duelo terminado' : waiting ? 'Invita a tu rival' : statusText(current)}</h1><p>${waiting ? 'Comparte el enlace para empezar vuestra partida.' : finished ? 'Así queda vuestra partida.' : `Carta ${Math.min(current.turnIndex + 1, current.total)} de ${current.total}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div>${active ? clockMarkup(elapsed) : ''}</header>
       <div class="turn-duel-scores" aria-label="Marcador">${current.playersOrder.map(player => `<div class="turn-duel-player ${current.turnUid === player ? 'is-active' : ''}"><span>${safe(current.players?.[player]?.alias || 'Jugador')}${player === uid() ? ' · tú' : ''}</span><b>${current.scores?.[player] || 0}<small>${current.kind === 'cifras' ? 'puntos' : 'aciertos'}</small></b></div>`).join('')}</div>
       ${waiting ? `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>La partida empezará cuando se una tu rival.</small></div>` : ''}
-      ${!waiting && !finished && !active ? `<p class="turn-duel-status" role="status">${current.timeout ? 'Tiempo agotado. Pasando el turno…' : 'Tu rival está jugando. La mesa se actualizará automáticamente.'}</p>` : ''}
+      ${preparing ? `<div class="turn-duel-ready" role="status"><b id="turn-ready-seconds">${Math.ceil((prepareUntil - Date.now()) / 1000)}</b><h2>Prepárate</h2><p>La carta aparecerá al terminar la cuenta. Después tendrás 15 segundos.</p></div>` : ''}
+      ${!waiting && !finished && !active && !preparing ? `<p class="turn-duel-status" role="status">${current.timeout ? 'Tiempo agotado. Pasando el turno…' : 'Tu rival está jugando. La mesa se actualizará automáticamente.'}</p>` : ''}
       ${!waiting && current.kind === 'orden' ? orderBoard(current, active ? card : null) : ''}
       ${active && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
@@ -118,7 +122,13 @@ function render() {
   if (focused?.dataset.turnAction === 'select-slot') app.querySelector('[data-turn-action="confirm-place"]')?.focus({ preventScroll: true });
   window.scrollTo({ left: 0, top: oldTop, behavior: 'instant' });
   clearInterval(timer);
-  if (active) timer = setInterval(updateClock, 250);
+  if (preparing) timer = setInterval(() => {
+    const left = Math.max(0, Math.ceil((prepareUntil - Date.now()) / 1000));
+    const counter = document.getElementById('turn-ready-seconds');
+    if (counter) counter.textContent = left;
+    if (!left) { render(); updateClock(); }
+  }, 100);
+  else if (active) timer = setInterval(updateClock, 250);
 }
 async function expireTurn() {
   if (!current || current.turnUid !== uid() || current.status !== 'playing' || expiring) return;
@@ -137,6 +147,7 @@ async function expireTurn() {
   finally { expiring = false; }
 }
 async function place(index) {
+  if (Date.now() < prepareUntil) return;
   if (!current || current.turnUid !== uid() || current.timeout) return notify('El tiempo de seguridad de este turno ha terminado.');
   const card = localCard(current);
   if (!Number.isInteger(index) || index < 0) return;
@@ -148,6 +159,7 @@ async function place(index) {
   }).catch(() => notify('El turno ha cambiado o ya se ha jugado. Actualiza la pantalla.'));
 }
 async function submitCifra() {
+  if (Date.now() < prepareUntil) return;
   if (!current || current.kind !== 'cifras' || current.turnUid !== uid() || current.timeout) return notify('El tiempo de seguridad de este turno ha terminado.');
   const value = CT.Duelo.Cifras.leer(current.mode, document.getElementById('turn-cifra-input')?.value || '');
   if (value === null) return notify('Escribe una cifra válida.');
@@ -175,9 +187,41 @@ async function create(mode, kind, back) {
 async function join(gameId, back) {
   onBack = back; const ref = doc(db, 'turnDuels', gameId); await runTransaction(db, async tx => { const snap = await tx.get(ref); const game = snap.data(); if (!game) throw Error('no encontrado'); if (game.playersOrder.includes(uid())) return; if (game.playersOrder.length >= 2) throw Error('lleno'); game.playersOrder.push(uid()); game.players[uid()] = { alias: alias() }; game.scores[uid()] = 0; if (game.kind === 'orden' && !game.timeline?.length) game.timeline = [deckCards(game)[0].id]; game.status = 'playing'; game.turnUid = game.playersOrder[0]; game.updatedAt = serverTimestamp(); tx.update(ref, game); }); subscribe(gameId);
 }
-function subscribe(gameId) { stop?.(); stop = onSnapshot(doc(db, 'turnDuels', gameId), snap => { const next = snap.data(); if (!next) return; const previousTurn = current?.turnIndex; const wasPlayingAway = current?.status === 'playing' && current.turnUid !== uid(); const becamePlayable = current?.status === 'waiting' && next.status === 'playing' && next.turnUid === uid(); current = { ...next, id: gameId, shareLink }; if (previousTurn !== current.turnIndex) pendingIndex = null; if ((wasPlayingAway && current.turnUid === uid()) || becamePlayable) { enteredAt = Date.now(); sessionStorage.setItem(`continuum-turn-entry-${gameId}-${current.turnIndex}`, String(enteredAt)); if (wasPlayingAway) notify('Tu oponente ha colocado una carta. Te toca.'); } render(); }, () => notify('No se pudo sincronizar el duelo.')); const key = `continuum-turn-entry-${gameId}-${current?.turnIndex || 0}`; enteredAt = Number(sessionStorage.getItem(key)) || Date.now(); sessionStorage.setItem(key, String(enteredAt)); document.addEventListener('visibilitychange', leaveGuard); render(); }
+function prepareTurn() {
+  if (current?.status !== 'playing' || current.turnUid !== uid()) return;
+  const key = `continuum-turn-entry-${current.id}-${current.turnIndex}`;
+  if (preparingTurn === key) return;
+  preparingTurn = key;
+  // Persist the deadline: reopening an already revealed card never grants extra time.
+  const saved = Number(localStorage.getItem(key) || sessionStorage.getItem(key));
+  enteredAt = saved || Date.now() + READY_SECONDS * 1000;
+  localStorage.setItem(key, String(enteredAt));
+  prepareUntil = Math.max(Date.now(), enteredAt);
+}
+function subscribe(gameId) {
+  stop?.();
+  stop = onSnapshot(doc(db, 'turnDuels', gameId), snap => {
+    const next = snap.data(); if (!next) return;
+    const previousTurn = current?.turnIndex;
+    const wasPlayingAway = current?.status === 'playing' && current.turnUid !== uid();
+    current = { ...next, id: gameId, shareLink };
+    if (previousTurn !== current.turnIndex) pendingIndex = null;
+    prepareTurn();
+    if (wasPlayingAway && current.turnUid === uid()) notify('Tu oponente ha colocado una carta. Te toca.');
+    render();
+  }, () => notify('No se pudo sincronizar el duelo.'));
+  document.addEventListener('visibilitychange', leaveGuard);
+}
+async function cancel(gameId) {
+  await runTransaction(db, async tx => {
+    const ref = doc(db, 'turnDuels', gameId), game = (await tx.get(ref)).data();
+    if (!game || !game.playersOrder.includes(uid())) throw Error('No perteneces a este duelo.');
+    if (!['waiting', 'playing'].includes(game.status)) return;
+    tx.update(ref, { status: 'cancelled', turnUid: null, closedBy: uid(), updatedAt: serverTimestamp(), resultText: `${alias()} ha cerrado el duelo.` });
+  });
+}
 async function list() { if (!uid()) return []; const q = query(collection(db, 'turnDuels'), where('playersOrder', 'array-contains', uid()), limit(20)); const snaps = await getDocs(q); return snaps.docs.map(s => ({ ...s.data(), id: s.id })); }
-function open({ mode = 'history', kind = 'orden', gameId = '', back } = {}) { onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back).catch(() => notify('No se pudo crear el duelo.')); }
+function open({ mode = 'history', kind = 'orden', gameId = '', back } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; pendingIndex = null; onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back).catch(() => notify('No se pudo crear el duelo.')); }
 function close() { stop?.(); stop = null; clearInterval(timer); document.removeEventListener('visibilitychange', leaveGuard); current = null; onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') place(pendingIndex); if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
-CT.TurnDuel = { open, close, list, TURN_SECONDS };
+CT.TurnDuel = { open, close, list, cancel, TURN_SECONDS, READY_SECONDS };

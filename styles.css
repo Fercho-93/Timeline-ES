@@ -2178,6 +2178,14 @@ body::before {
 .turn-duel-list .btn { display: flex; justify-content: space-between; gap: 1rem; text-align: left; }
 .turn-duel-list .btn span { color: var(--edition-brass, #9b6b2f); font-size: .85em; }
 .turn-duel-screen { width: 100%; min-width: 0; max-width: 64rem; margin-inline: auto; text-align: left; }
+.turn-duel-profile-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; }
+.turn-duel-list .turn-duel-profile-row > .btn:first-child { display: grid; gap: 5px; text-align: left; }
+.turn-duel-profile-row small { color: var(--muted); font-size: .72rem; font-weight: 400; }
+.turn-duel-profile summary { padding: 14px 0; cursor: pointer; }
+.turn-duel-ready { padding: 20px; margin: 12px 0; text-align: center; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.turn-duel-ready > b { display: grid; place-items: center; width: 52px; height: 52px; margin: auto; border: 2px solid var(--accent); border-radius: 50%; font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.turn-duel-ready h2 { margin: 10px 0 6px; }
+.turn-duel-ready p { font-size: .8rem; color: var(--muted); }
 .turn-duel-countdown { display: grid; gap: .15rem; margin: 1.5rem auto; padding: 1rem; border: 1px solid var(--edition-brass, #9b6b2f); border-radius: 12px; }
 .turn-duel-countdown b { font-size: 2.4rem; }
 .turn-duel-countdown span, .turn-duel-card small, .turn-duel-wait small { display: block; opacity: .75; }

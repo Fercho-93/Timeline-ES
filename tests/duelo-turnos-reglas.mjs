@@ -1,5 +1,5 @@
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { doc, getDoc, runTransaction, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, runTransaction, serverTimestamp, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import fs from 'node:fs';
 
 const env = await initializeTestEnvironment({
@@ -79,7 +79,13 @@ try {
       status: 'playing', updatedAt: serverTimestamp(), resultText: null
     });
   }));
-  console.log('Duelo por turnos: el enlace permite entrar una vez y la partida vuelve a ser privada.');
+  const cancellation = { status: 'cancelled', turnUid: null, closedBy: 'outsider', updatedAt: serverTimestamp(), resultText: 'Duelo cerrado.' };
+  await assertFails(updateDoc(doc(outsider, 'turnDuels', duelId), cancellation));
+  await assertFails(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, closedBy: 'guest', scores: { guest: 100 } }));
+  await assertSucceeds(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, closedBy: 'guest' }));
+  await assertFails(updateDoc(doc(creator, 'turnDuels', duelId), { status: 'playing', turnUid: 'creator' }));
+  await assertSucceeds(getDoc(doc(creator, 'turnDuels', duelId)));
+  console.log('Duelo por turnos: entrada, jugadas y cierre privado sin alterar puntuaciones ni reabrir partidas.');
 } finally {
   await env.cleanup();
 }
