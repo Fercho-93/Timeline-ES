@@ -215,6 +215,18 @@
       const action = modal.matches('.rules') ? '[data-action="rules"]' : '[data-settings-action="open"]';
       navigation.querySelector(action)?.setAttribute('aria-current','page');
       modal.append(navigation);
+    } else if (navigation && modal.contains(navigation) && !surfaceNav.has(modal)) {
+      // `mount` puede haber colocado la barra dentro del modal antes de llegar aquí.
+      // Guardamos igualmente el shell que queda debajo para devolverla al comenzar
+      // el cierre, sincronizada con la salida del resto de la superficie.
+      const background = modal.closest('.overlay')?.previousElementSibling;
+      const parent = background?.querySelector('.shell') || document.querySelector('#app > .shell');
+      if (parent) surfaceNav.set(modal, {
+        navigation,
+        parent,
+        next: null,
+        active: navigation.querySelector('[aria-current]')
+      });
     }
     const close = modal.querySelector('.guide-close, .settings-close, [data-action="enc-back"]');
     scrollVeil(modal);
