@@ -83,10 +83,10 @@
       <div class="settings-head">
         <button class="settings-close" data-settings-action="close" aria-label="Cerrar ajustes">×</button>
       </div>
-      <div class="eyebrow" tabindex="-1" data-dialog-focus>Ajustes</div>
+      <header class="atlas-page-heading"><div class="eyebrow">A tu manera</div><h1 tabindex="-1" data-dialog-focus>Ajustes</h1><p>Encuentra tu forma de leer, escuchar y jugar.</p></header><div class="settings-layout">
 
-      <section class="settings-section">
-        <h2>Tema</h2>
+      <section class="settings-section settings-appearance">
+        <div class="settings-section-heading"><span aria-hidden="true">01</span><div><h2>Apariencia y lectura</h2><p>Prueba los cambios antes de aplicarlos.</p></div></div>
         <div class="settings-look-preview" data-look-preview data-preview-theme="${s.theme}" style="--preview-text:${Number(s.textSize)/100}">
           <div class="look-preview-page"><span>CONTINUUM</span><h3>Una página del atlas</h3><p>Así se verán el papel, la tinta y el tamaño de lectura.</p><div><i></i><b>1640</b></div></div>
         </div>
@@ -103,8 +103,8 @@
         <button class="btn btn-secondary btn-block settings-apply-look" data-settings-action="apply-look" disabled>Aplicar apariencia</button>
       </section>
 
-      <section class="settings-section">
-        <h2>Efectos opcionales</h2>
+      <section class="settings-section settings-effects">
+        <div class="settings-section-heading"><span aria-hidden="true">02</span><div><h2>Sonido y movimiento</h2><p>Pequeños detalles para acompañar la partida.</p></div></div>
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" aria-describedby="haptics-help" ${s.haptics === true && hapticsSupported ? "checked" : ""} ${hapticsSupported ? "" : "disabled"}></label>
         <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
         ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
@@ -115,14 +115,12 @@
         <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
       </section>
 
-      <section class="settings-section">
-        <h2>Versión y conexión</h2>
+      </div><details class="settings-section settings-support"><summary><span><b>Versión y conexión</b><small>Uso sin conexión e información de la aplicación</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         <p class="hint">Versión instalada: ${CT.escapeHtml(CT.APP_VERSION || "desconocida")}</p>
         <p class="hint">Las cartas y reglas funcionan sin conexión. Si una ilustración no se ve, es que no se cargó antes con internet.</p>
-      </section>
+      </div></details>
 
-      <section class="settings-section">
-        <h2>Comentarios</h2>
+      <details class="settings-section settings-support"><summary><span><b>Ayuda y comentarios</b><small>Cuéntanos cómo mejorar tu experiencia</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html#arte" target="_blank" rel="noopener noreferrer">Privacidad, datos y procedencia del arte</a></p>
         <div class="field">
           <label for="feedback-note">Comentario para la beta</label>
@@ -131,7 +129,7 @@
         <button class="btn btn-secondary btn-block" data-settings-action="download-feedback">Guardar comentario con diagnóstico</button>
         <p class="hint">¿Algo no va bien o se te ocurre algo? Manda un correo con la versión instalada y la pantalla en la que estás, para no tener que describirlo de memoria.</p>
         <button class="btn btn-secondary btn-block" data-settings-action="feedback">Enviar comentario</button>
-      </section>
+      </div></details>
 
       <button class="btn btn-primary btn-block settings-done" data-settings-action="close">Hecho</button>
     </div></div>`;

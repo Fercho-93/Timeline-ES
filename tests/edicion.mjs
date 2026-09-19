@@ -450,3 +450,28 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
   } finally { w.close(); }
 }
 console.log('Navegación inferior: pestañas a ancho completo, pergamino común y sin virutas: OK');
+
+// Cambiar de pestaña nunca apila las superficies completas; pulsar la activa tampoco.
+{
+  const w = boot({reduce:true});
+  try {
+    for (let round = 0; round < 2; round++) {
+      for (const [selector, surface, label] of [
+        ['[data-settings-action="open"]', '.settings-modal:not(.enc-modal)', 'Ajustes'],
+        ['[data-action="rules"]', '.rules', 'Guía'],
+        ['[data-action="home-encyclopedia"]', '.enc-modal', 'Enciclopedia']
+      ]) {
+        click(w, '.home-nav ' + selector);
+        assert.equal(w.document.querySelectorAll('#app > .overlay').length, 1);
+        assert.ok(w.document.querySelector(surface));
+        assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), label);
+        click(w, '.home-nav ' + selector);
+        assert.equal(w.document.querySelectorAll('#app > .overlay').length, 1);
+      }
+      click(w, '.home-nav [data-action="perfil"]');
+      assert.equal(w.document.querySelectorAll('#app > .overlay').length, 0);
+      assert.ok(w.document.querySelector('.perfil-section'));
+    }
+  } finally { w.close(); }
+}
+console.log('Pestañas: navegación sin capas acumuladas y destino activo estable: OK');

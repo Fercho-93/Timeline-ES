@@ -1133,12 +1133,12 @@
       guideCard('▤','Enciclopedia','','Explora mazos, busca cartas y filtra. Descubres las ilustraciones al jugar sus cartas, también si fallas. Los descubrimientos recientes aparecen arriba.')+
       guideCard('☆','Perfil, ranking y logros','','Consulta aciertos, marcas y logros. Solo los aciertos de retos diarios completados suman al ranking, una vez por día y mazo. Al terminar puedes repasar los fallos.')+
       guideCard('☼','A tu gusto','','En Ajustes prueba tema y tamaño del texto antes de aplicarlos. Música ambiente y vibración son independientes; la vibración depende del dispositivo.')+'</div><p>Tu perfil invitado pertenece a esta instalación: cambiar de móvil o borrar sus datos puede hacerte perder el progreso.</p>';
-    return '<div class="guide-handbook"><div class="eyebrow">Guía · '+escapeHtml(selectedMode.name)+'</div><h2>Una carta. Su lugar.</h2>'+
+    return '<div class="guide-handbook"><header class="atlas-page-heading"><div class="eyebrow">Una carta. Su lugar.</div><h1>Guía</h1><p>Lo esencial para empezar. Los detalles, cuando los necesites.</p></header><section class="guide-start"><h2>Aprende en tres pasos</h2>'+
       '<p class="guide-context">'+here+' · Ejemplo del mazo elegido</p><p class="guide-lead">Ordena las cartas '+order+'. La partida empieza con una carta de referencia. Tu carta tiene el valor oculto: elige su lugar y confirma para descubrirlo.</p>'+
       '<ol class="guide-steps">'+guideStep(1,'Elige','Toca una carta de tu mano.')+guideStep(2,'Sitúa','Toca un hueco o arrastra la carta. Puedes cambiar de idea.')+guideStep(3,'Confirma','Pulsa «Confirmar posición» para resolver.')+'</ol>'+
       guideDemo(modeKey)+'<p class="guide-note">El ensayo se resuelve al tocar el hueco; en la partida debes confirmar. No gasta vidas ni modifica tu progreso.</p>'+
       '<p class="guide-note">¿Dos cartas con el mismo valor? Valen los dos órdenes.'+(selectedMode.axis==='time'?' Las fechas a. C. van antes que las d. C.; 500 a. C. va antes que 100 a. C.':' Compara la cifra y su unidad, no el tamaño del dibujo.')+(pending?' Las cartas «en revisión» se juegan con el valor mostrado.':'')+'</p>'+
-      '<p class="guide-index-hint">Abre un capítulo para ver sus dibujos y reglas.</p>'+
+      '</section><div class="atlas-section-heading"><h2>El juego, capítulo a capítulo</h2><p class="guide-index-hint">Abre el tema que quieras consultar.</p></div>'+
       guideChapter('01','Aciertos, fallos y victoria','Qué cambia después de confirmar','result',result)+
       guideChapter('02','Elige cómo jugar','Solo, con amigos o por enlace','modes',formats)+
       guideChapter('03','Fantasma y Pulso','Poderes opcionales y sus consecuencias','powers',powers)+

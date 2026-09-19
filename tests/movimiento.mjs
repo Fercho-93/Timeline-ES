@@ -238,7 +238,7 @@ console.log("\nCierres animados, interrupciones y movimiento reducido");
     click(w, '[data-action="rules"]');
     const overlay = el(w, ".overlay");
     assert.ok(overlay.classList.contains("dialog-enter"), 'la Guía abierta desde la navegación inferior despliega el pergamino');
-    assert.equal(w.document.activeElement, el(w, ".modal h2"));
+    assert.equal(w.document.activeElement, el(w, ".modal h1, .modal h2"));
     w.document.activeElement.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true }));
     assert.equal(w.document.activeElement, el(w, '[data-action="close-rules"]'));
     click(w, '[data-action="close-rules"]');

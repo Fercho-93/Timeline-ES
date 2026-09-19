@@ -125,6 +125,14 @@
       prepareReturn();
     }
     const button = event.target.closest?.('#app .home-nav button');
+    if (button?.hasAttribute('aria-current')) {
+      event.preventDefault(); event.stopImmediatePropagation(); return;
+    }
+    // Las pestañas son destinos hermanos: sustituir la superficie anterior evita
+    // acumular diálogos, focos atrapados y barras de desplazamiento detrás.
+    if (button) {
+      while (pila.at(-1)?.overlay.querySelector('.enc-modal, .rules, .settings-modal')) closeDialog(true);
+    }
     if (button) primaryNavigationMotion = {
       dialog: button.matches('[data-action="home-encyclopedia"], [data-action="rules"], [data-settings-action]')
     };
@@ -599,7 +607,7 @@
   }
 
   // Cierra el diálogo de arriba y devuelve el foco a quien lo abrió.
-  function closeDialog() {
+  function closeDialog(immediate = false) {
     const dialogo = pila.pop();
     if (!dialogo) return;
     // La enciclopedia vuelve a su pantalla desde onClose; ese pintado da la
@@ -633,7 +641,7 @@
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     // jsdom y navegadores antiguos no exponen getAnimations: en ellos se mantiene el
     // cierre inmediato. En navegadores actuales se deja respirar la salida 160 ms.
-    if (reduce || typeof dialogo.overlay.getAnimations !== "function") { termina(); return; }
+    if (immediate || reduce || typeof dialogo.overlay.getAnimations !== "function") { termina(); return; }
     dialogo.overlay.classList.remove("dialog-enter");
     dialogo.overlay.classList.add("dialog-exit");
     dialogo.overlay.inert = true;
