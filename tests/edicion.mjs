@@ -435,9 +435,12 @@ console.log('Cámara en toda la preparación, sin animar las jugadas posteriores
     assert.ok(!w.document.querySelector('#app > .shell')?.classList.contains('screen-enter'));
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
+    const encyclopediaRollsBefore = effects.filter(effect => effect.frames[0].clipPath).length;
     click(w, '.home-nav [data-action="home-encyclopedia"]');
     assert.ok(w.document.querySelector('.settings-modal.enc-modal[role="dialog"]'), 'Enciclopedia se abre desde su pestaña');
     assert.ok(w.document.querySelector('.dialog-enter'), 'Enciclopedia usa el mismo despliegue de pergamino');
+    assert.ok(w.document.querySelector('.enc-modal.parchment-unrolling'), 'Enciclopedia marca el pergamino antes de la entrada CSS');
+    assert.equal(effects.filter(effect => effect.frames[0].clipPath).length, encyclopediaRollsBefore + 1, 'Enciclopedia solo inicia un despliegue');
     assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Enciclopedia');
     assert.ok(w.document.querySelector('.enc-background[inert]'), 'el fondo no recibe pulsaciones');
     w.document.dispatchEvent(new w.KeyboardEvent('keydown', {key:'Escape',bubbles:true}));

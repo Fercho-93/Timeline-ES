@@ -299,8 +299,8 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 }
 @media (prefers-reduced-motion: no-preference) {
   #app[data-screen="perfil"] .screen-enter > * { animation: none; }
-  .dialog-enter .settings-modal { animation: parchment-open 480ms ease-out both; }
-  .dialog-enter .enc-modal { animation-duration: 720ms; }
+  .dialog-enter .settings-modal:not(.parchment-unrolling) { animation: parchment-open 480ms ease-out both; }
+  .dialog-enter .enc-modal:not(.parchment-unrolling) { animation-duration: 720ms; }
 }
 /* La sección Perfil es mucho más larga que un diálogo. El despliegue recorre
    una pantalla visible, no un porcentaje de miles de píxeles de contenido. */
@@ -706,7 +706,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @keyframes atlas-surface-open { from { opacity: .2; } to { opacity: 1; } }
 #app .modal:has(.atlas-nav) { transform: none; }
 @media (prefers-reduced-motion: no-preference) {
-  #app .dialog-enter .modal:has(.atlas-nav) { animation: parchment-open 620ms ease-out both; }
+  #app .dialog-enter .modal:has(.atlas-nav):not(.parchment-unrolling) { animation: parchment-open 620ms ease-out both; }
 }
 #app .modal .atlas-nav { position: fixed; inset: auto 0 0; }
 

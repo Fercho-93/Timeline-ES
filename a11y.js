@@ -115,8 +115,8 @@
   let cancelPageTurn = null;
   let cancelProfileRoll = null;
   // La navegación inferior ya explica por sí sola el cambio de sección. Al usar uno de
-  // sus cinco destinos no añadimos además un giro de página, un rebote ni un pergamino:
-  // el contenido cambia en seco y el nuevo botón activo aporta toda la continuidad.
+  // sus cinco destinos no añadimos además un giro de página ni un rebote; las secciones
+  // secundarias conservan únicamente su despliegue de pergamino, sin sonido duplicado.
   let primaryNavigationMotion = null;
   document.addEventListener('click', event => {
     const button = event.target.closest?.('#app .home-nav button');
@@ -683,6 +683,10 @@
     window.CONTINUUM.UI?.reveal(modal);
     const openingFocus = document.activeElement;
     window.CONTINUUM.UI?.openSurface(modal);
+    // Marcar y arrancar el desenrollado antes de activar `dialog-enter` evita que el
+    // navegador llegue a pintar primero la animación CSS y después la animación JS.
+    const cancelRoll = modal.querySelector('.home-nav') && modal.matches('.rules, .settings-modal')
+      ? unrollSheet(modal, false, quietPrimaryNavigation) : null;
     overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", compact ? "false" : "true");
@@ -716,8 +720,6 @@
       else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
     }
     document.addEventListener("keydown", onKey);
-    const cancelRoll = modal.querySelector('.home-nav') && modal.matches('.rules, .settings-modal')
-      ? unrollSheet(modal, false, quietPrimaryNavigation) : null;
     pila.push({ overlay, previo, onKey, cerrable, cancelRoll, onClose });
   }
 
