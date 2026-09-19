@@ -1629,13 +1629,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app[data-screen="home"] .home-gallery-shell .gallery-panel.active {
   height: clamp(190px, 50vw, 300px);
   min-height: 190px;
-  border: 1px solid #3f3933;
+  border: 0;
   border-radius: 15px;
-  box-shadow:
-    0 0 0 2px #85877e,
-    0 0 0 4px #403a35,
-    inset 0 0 0 2px #e5e1d5a6,
-    0 10px 17px #2e251f45;
+  box-shadow: 0 10px 22px #2e251f40, 0 2px 5px #2e251f38;
 }
 #app[data-screen="home"] .gallery-panel .panel-art {
   -webkit-mask-image: none;
@@ -1647,17 +1643,17 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   filter: saturate(.9) contrast(1.08) brightness(.96);
 }
 #app[data-screen="home"] .gallery-panel::before {
-  inset: 5px;
-  border: 1px solid #e8e3d1a6;
-  border-radius: 10px;
-  box-shadow: inset 0 0 0 1px #302b284f, inset 0 0 18px #100d0b59;
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 -20px 28px #100d0b3d;
 }
 #app[data-screen="home"] .gallery-panel::after {
   background: linear-gradient(180deg, #1c130e1f 0, transparent 37%, #140d0961 68%, #130c09e8 100%);
 }
 #app[data-screen="home"] .gallery-panel .collection-foil {
   inset: 8px;
-  border-color: #ded9c67a;
+  border: 0;
   border-radius: 8px;
   background: linear-gradient(118deg, #fff8e817, transparent 31% 72%, #b98c5912);
 }
@@ -1742,9 +1738,9 @@ html #app .home-nav.atlas-nav {
   max-width: none;
   min-height: calc(67px + env(safe-area-inset-bottom));
   padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
-  border: 1px solid #3f514b;
-  border-bottom: 0;
-  border-radius: 18px 18px 0 0;
+  border: 0;
+  border-top: 1px solid #40534c;
+  border-radius: 46% 46% 0 0 / 18px 18px 0 0;
   color: #3e291a;
   background:
     radial-gradient(ellipse at 50% -35%, #f6f8efb8, transparent 54%),
@@ -1760,11 +1756,12 @@ html #app .home-nav.atlas-nav {
 html #app .home-nav.atlas-nav::before {
   content: "";
   position: absolute;
-  inset: 4px 4px 0;
+  inset: 3px 5% auto;
   z-index: -1;
-  border: 1px solid #65776f;
-  border-bottom: 0;
-  border-radius: 13px 13px 0 0;
+  height: 20px;
+  border-top: 2px solid #edf1e9a8;
+  border-radius: 50%;
+  box-shadow: 0 -1px #344a415c;
   pointer-events: none;
 }
 #app .home-nav.atlas-nav button {
@@ -1777,13 +1774,7 @@ html #app .home-nav.atlas-nav::before {
   box-shadow: none;
 }
 #app .home-nav.atlas-nav button + button::before {
-  content: "";
-  position: absolute;
-  top: 7px;
-  bottom: 6px;
-  left: 0;
-  width: 1px;
-  background: linear-gradient(transparent, #42574e70, transparent);
+  content: none;
 }
 #app .home-nav.atlas-nav button span {
   display: grid;
@@ -1791,8 +1782,8 @@ html #app .home-nav.atlas-nav::before {
   width: 30px;
   height: 29px;
   border-radius: 50%;
-  background: linear-gradient(180deg, #eef1eb8f, #788c8352);
-  box-shadow: inset 0 1px 1px #fff9, inset 0 -2px 3px #33483f38, 0 1px 2px #263a3230;
+  background: transparent;
+  filter: drop-shadow(0 1px 0 #f4f7f0) drop-shadow(0 -1px 0 #30463d66);
 }
 #app .home-nav.atlas-nav svg { width: 21px; height: 21px; stroke-width: 1.75; }
 #app .home-nav.atlas-nav small {
@@ -1843,5 +1834,5 @@ html #app .home-nav.atlas-nav::before {
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  #app[data-screen="home"] .gallery-panel:hover { box-shadow: 0 0 0 2px #9b9e94, 0 0 0 4px #403a35, 0 14px 22px #2e251f52; }
+  #app[data-screen="home"] .gallery-panel:hover { box-shadow: 0 14px 27px #2e251f52, 0 3px 7px #2e251f38; }
 }
