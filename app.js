@@ -1550,8 +1550,23 @@
     turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
       const box = document.getElementById("turn-duels-profile");
       if (!box || screen !== "perfil") return;
-      const activas = partidas.filter(p => p.status !== "finished");
-      box.innerHTML = `<h2>Duelo por turnos</h2>${activas.length ? `<div class="turn-duel-list">${activas.map(p => { const rival = p.playersOrder?.find(id => id !== CT.Accounts?.user?.uid); const mine = p.turnUid === CT.Accounts?.user?.uid; const state = p.status === "waiting" ? "Esperando rival" : mine ? "Tu turno" : "Turno del oponente"; return `<button class="btn btn-secondary btn-block" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || "Esperando rival")}</b><span>${state}</span></button>`; }).join("")}</div>` : `<p>Aquí aparecerán tus partidas por turnos.</p>`}`;
+      const myId = CT.Accounts?.user?.uid;
+      const groups = [
+        ['Tu turno', p => p.status === 'playing' && p.turnUid === myId],
+        ['Esperando al rival', p => p.status === 'playing' && p.turnUid !== myId],
+        ['Invitaciones pendientes', p => p.status === 'waiting'],
+        ['Terminados y cerrados', p => ['finished', 'cancelled'].includes(p.status)]
+      ];
+      const rows = games => games.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).map(p => {
+        const rival = p.playersOrder?.find(id => id !== myId);
+        const closed = ['finished', 'cancelled'].includes(p.status);
+        const detail = `${p.kind === 'cifras' ? 'Escribir cifras' : 'Ordenar cartas'} · ${CT.mode(p.mode).name}`;
+        return `<div class="turn-duel-profile-row"><button class="btn btn-secondary" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || 'Invitación sin aceptar')}</b><small>${escapeHtml(detail)}</small><span>${p.status === 'cancelled' ? 'Cerrado' : p.status === 'finished' ? 'Terminado' : `${p.turnIndex} de ${p.total} cartas`}</span></button>${closed ? '' : `<button class="btn btn-ghost" data-action="close-turn-duel" data-turn-id="${escapeHtml(p.id)}" aria-label="Cerrar duelo con ${escapeHtml(p.players?.[rival]?.alias || 'rival pendiente')}">Cerrar</button>`}</div>`;
+      }).join('');
+      box.innerHTML = `<h2>Mis duelos</h2>${partidas.length ? groups.map(([title, filter], index) => {
+        const games = partidas.filter(filter); if (!games.length) return '';
+        return index === 3 ? `<details><summary>${title} (${games.length})</summary><div class="turn-duel-list">${rows(games)}</div></details>` : `<h3>${title} (${games.length})</h3><div class="turn-duel-list">${rows(games)}</div>`;
+      }).join('') : '<p>Aquí aparecerán tus partidas por turnos.</p>'}`;
     }).catch(() => {});
   }
 
@@ -3178,6 +3193,11 @@
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "start-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: duelKind(), back: playMenu })); }
     else if (action === "open-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back: perfilView })); }
+    else if (action === "close-turn-duel") {
+      if (!window.confirm('¿Cerrar este duelo para ambos jugadores? Se conservará en el historial y no se podrá continuar.')) return;
+      target.disabled = true;
+      turnDuelReady.then(() => CT.TurnDuel.cancel(target.dataset.turnId)).then(() => { showToast('Duelo cerrado'); perfilView(); }).catch(() => { target.disabled = false; showToast('No se pudo cerrar el duelo. Comprueba la conexión y las reglas de Firebase.'); });
+    }
     else if (action === "duel-play") duelPlay();
     else if (action === "resume-cifras") resumeCifras();
     else if (action === "cifra-answer") cierraCarta("respuesta");

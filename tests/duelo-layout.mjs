@@ -71,6 +71,18 @@ try {
     await fits('invitation');
     await page.locator('summary').click();
     await fits('invitation link');
+    await page.addScriptTag({ content: `window.beginPreparation=()=>{preparingTurn=null;prepareTurn();render();clearInterval(timer);return enteredAt;};window.endPreparation=()=>{prepareUntil=Date.now()-1;render();clearInterval(timer);};` });
+    await page.evaluate(() => showDuel());
+    const deadline = await page.evaluate(() => beginPreparation());
+    assert.equal(await page.locator('#turn-ready-seconds').textContent(), '3');
+    assert.equal(await page.locator('.hand-card').count(), 0, 'pending card is absent during preparation');
+    assert.equal(await page.locator('[data-turn-action="select-slot"]').count(), 0);
+    assert.equal(await page.evaluate(() => beginPreparation()), deadline, 'reentry does not reset the deadline');
+    await page.evaluate(() => endPreparation());
+    assert.equal(await page.locator('.hand-card').count(), 1);
+    await page.evaluate(() => showDuel({status:'cancelled',turnUid:null,resultText:'Duelo cerrado.'}));
+    assert.equal(await page.locator('.hand-card').count(), 0);
+    assert.equal(await page.locator('[data-turn-action="select-slot"]').count(), 0);
     assert.deepEqual(errors, []);
     console.log(`OK ${width}px: invitation, long board, confirmation, opponent turn, answer and circular timer`);
     await page.close();

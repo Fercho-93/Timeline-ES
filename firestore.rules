@@ -27,6 +27,14 @@ service cloud.firestore {
       allow create: if validCreate();
       allow get: if member() || (registered() && resource.data.status == 'waiting' && resource.data.playersOrder.size() == 1);
       allow list: if member();
+      allow update: if member() && resource.data.status in ['waiting', 'playing']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'turnUid', 'closedBy', 'updatedAt', 'resultText'])
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.turnUid == null
+        && request.resource.data.closedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.resultText is string
+        && request.resource.data.resultText.size() <= 160;
       allow update: if (member() || (registered() && resource.data.status == 'waiting' && !(request.auth.uid in resource.data.playersOrder)))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
         && (
