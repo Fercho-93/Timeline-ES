@@ -10,6 +10,7 @@
   // Las modalidades, sus ejes y los ayudantes que comparte con el modo de varios
   // móviles están en modes.js, para declararlos una sola vez.
   const CT = window.CONTINUUM;
+  const turnDuelReady = import('./duelo-turnos.js').catch(() => null);
   const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
   let playReturn = 'play-menu';
@@ -1531,6 +1532,7 @@
         <div class="eyebrow"><span class="eyebrow-line"></span> Tu progreso</div>
         <h1 data-focus tabindex="-1">Perfil</h1>
         ${CT.Accounts?.card() || ""}
+        <section class="panel turn-duel-profile" id="turn-duels-profile"><h2>Duelo por turnos</h2><p>Cargando tus partidas activas…</p></section>
         ${estrenado
           ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
           : `<p class="lead">Aquí se irá guardando lo que juegues: aciertos, mazos, puntos débiles y logros. Todavía no hay nada que contar.</p>`}
@@ -1542,6 +1544,12 @@
       </section>
       ${homeNav()}
     </div>`);
+    CT.TurnDuel?.list?.().then(partidas => {
+      const box = document.getElementById("turn-duels-profile");
+      if (!box || screen !== "perfil") return;
+      const activas = partidas.filter(p => p.status !== "finished");
+      box.innerHTML = `<h2>Duelo por turnos</h2>${activas.length ? `<div class="turn-duel-list">${activas.map(p => { const rival = p.playersOrder?.find(id => id !== CT.Accounts?.user?.uid); const mine = p.turnUid === CT.Accounts?.user?.uid; return `<button class="btn btn-secondary btn-block" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || "Partida pendiente")}</b><span>${mine ? "Tu turno" : "Turno del oponente"}</span></button>`; }).join("")}</div>` : `<p>Aquí aparecerán tus partidas por turnos.</p>`}`;
+    }).catch(() => {});
   }
 
   async function perfilExport() {
@@ -1791,14 +1799,16 @@
   // que pasa al salirse de la aplicación— pesa mucho más que en lo que se diferencian,
   // que es si la carta se coloca en la línea o se responde con una cifra. Por eso el menú
   // enseña una sola opción y la modalidad se elige dentro.
-  const DUEL_MODE_KEY = "hilo-duelo-modo-v1";
+  const DUEL_KIND_KEY = "hilo-duelo-prueba-v1";
+  const DUEL_PACE_KEY = "hilo-duelo-ritmo-v1";
 
-  function duelMode() {
-    const guardado = CT.Storage.getItem(DUEL_MODE_KEY);
-    // Un mazo sin eje que sepa preguntar por una cifra solo admite la modalidad de orden.
-    if (guardado === "cifras" && reglaCifra()) return "cifras";
-    return "orden";
+  function duelKind() {
+    const guardado = CT.Storage.getItem(DUEL_KIND_KEY) || CT.Storage.getItem("hilo-duelo-modo-v1");
+    return guardado === "cifras" && reglaCifra() ? "cifras" : "orden";
   }
+  function duelPace() { return CT.Storage.getItem(DUEL_PACE_KEY) === "turnos" ? "turnos" : "seguidos"; }
+  // Compatibilidad con llamadas antiguas: el modo ya solo representa la prueba.
+  function duelMode() { return duelKind(); }
 
   function duelPanel() {
     // Un duelo aceptado y dejado a medias no se puede volver a empezar desde el enlace si
@@ -1807,29 +1817,46 @@
     const enCifras = cargaCifras();
     const contra = partida => partida?.duelo?.rival || partida?.rival ? (partida.duelo?.rival || partida.rival).nombre || "quien te retaba" : null;
     const regla = reglaCifra();
-    const modo = duelMode();
-    const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === modo ? "" : " hidden"}>${cuerpo}</div>`;
+    const prueba = duelKind();
+    const ritmo = duelPace();
+    const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === `${ritmo}-${prueba}` ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
       <div class="solo-panel-head"><h3>Duelo por enlace</h3></div>
-      <p>Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas. Sin cuentas y sin esperar a nadie.</p>
-      ${regla ? `<div class="field duel-kind-field">
-        <span class="field-label" id="duel-kind-label">Elige la modalidad</span>
-        <div class="segmented" role="radiogroup" aria-labelledby="duel-kind-label">
-          ${[["orden", "Ordenar las cartas", "Las colocas en la línea"], ["cifras", "Escribir la cifra", "Respondes con el número"]]
-            .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === modo ? " is-on" : ""}">
-              <input type="radio" name="duel-kind" value="${clave}"${clave === modo ? " checked" : ""}>
+      <p>Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas.</p>
+      <div class="field duel-kind-field">
+        <span class="field-label" id="duel-pace-label">Ritmo del duelo</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="duel-pace-label">
+          ${[["seguidos", "Duelo de seguidos", "Juegas y esperas al rival"], ["turnos", "Duelo por turnos", "Cada uno desde su móvil"]]
+            .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === ritmo ? " is-on" : ""}">
+              <input type="radio" name="duel-pace" value="${clave}"${clave === ritmo ? " checked" : ""}>
               <span><b>${titulo}</b><small>${pie}</small></span>
             </label>`).join("")}
         </div>
-      </div>` : ""}
-      ${bloque("orden", `<p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
+      </div>
+      <div class="field duel-kind-field">
+        <span class="field-label" id="duel-kind-label">Prueba</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="duel-kind-label">
+          ${[["orden", "Ordenar las cartas", "Colocarlas en la línea"], ...(regla ? [["cifras", "Escribir la cifra", "Responder con el número"]] : [])]
+            .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === prueba ? " is-on" : ""}">
+              <input type="radio" name="duel-kind" value="${clave}"${clave === prueba ? " checked" : ""}>
+              <span><b>${titulo}</b><small>${pie}</small></span>
+            </label>`).join("")}
+        </div>
+      </div>
+      ${bloque("seguidos-orden", `<p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
         <p class="solo-intro-rule">${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</p>
         ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
         <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Crear un duelo"} <span>→</span></button>`)}
-      ${regla ? bloque("cifras", `<p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Gana quien más puntos sume: cuenta lo cerca que te quedes y lo rápido que respondas.</p>
+      ${regla ? bloque("seguidos-cifras", `<p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Gana quien más puntos sume: cuenta lo cerca que te quedes y lo rápido que respondas.</p>
         <p class="solo-intro-rule">${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</p>
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
+      ${bloque("turnos-orden", `<p>Colocad una carta cada vez, desde vuestro propio móvil. Recibirás un aviso cuando el rival juegue.</p>
+        <p class="solo-intro-rule">15 segundos de seguridad al entrar en cada turno · Si sales de la pantalla, el turno queda protegido.</p>
+        <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
+      ${regla ? bloque("turnos-cifras", `<p>Responded una cifra cada vez, desde vuestro propio móvil. El rival recibe un aviso al terminar tu turno.</p>
+        <p class="solo-intro-rule">15 segundos de seguridad al entrar en cada turno · La respuesta queda cerrada si sales de la pantalla.</p>
+        <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
       <div class="field" style="margin-top:12px">
         <label for="duel-name">Tu nombre, para que sepan quién reta</label>
         <input id="duel-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
@@ -2980,14 +3007,17 @@
     if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value, { returnTo: encReturn }); return; }
     // Cambiar de modalidad no repinta: repintar cerraría el desplegable que se acaba de
     // abrir para llegar hasta aquí. Se enseña un bloque y se esconde el otro.
-    if (event.target.name === "duel-kind") {
-      const modo = event.target.value === "cifras" ? "cifras" : "orden";
-      CT.Storage.setItem(DUEL_MODE_KEY, modo);
-      app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== modo; });
+    if (event.target.name === "duel-kind" || event.target.name === "duel-pace") {
+      const value = event.target.value;
+      if (event.target.name === "duel-kind") CT.Storage.setItem(DUEL_KIND_KEY, value);
+      else CT.Storage.setItem(DUEL_PACE_KEY, value);
+      const selectedKind = event.target.name === "duel-kind" ? value : duelKind();
+      const selectedPace = event.target.name === "duel-pace" ? value : duelPace();
+      app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== `${selectedPace}-${selectedKind}`; });
       // La pastilla elegida se marca en el propio elemento: el `:has()` del CSS lo haría
       // solo, pero no todos los navegadores en los que se juega esto lo soportan.
       app.querySelectorAll(".segmented-option").forEach(opcion => {
-        opcion.classList.toggle("is-on", opcion.querySelector("input").value === modo);
+        opcion.classList.toggle("is-on", opcion.querySelector("input").checked);
       });
       return;
     }
@@ -3142,6 +3172,8 @@
     // El duelo de cifras se estrena igual, y «Devolver el reto» pasa por aquí desde el
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
+    else if (action === "start-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: duelKind(), back: playMenu })); }
+    else if (action === "open-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back: perfilView })); }
     else if (action === "duel-play") duelPlay();
     else if (action === "resume-cifras") resumeCifras();
     else if (action === "cifra-answer") cierraCarta("respuesta");
@@ -3248,12 +3280,15 @@
   CT.Links.start(target => {
     if (CT.isSessionActive() && !confirm('¿Abrir la invitación? Tu partida local quedará guardada.')) return;
     if (target.room) launchOnline(target.room);
+    else if (target.turnDuel) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.turnDuel, mode: selectedModeKey, back: home }));
     else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo, value.mode); }
   });
   const params = new URLSearchParams(location.hash.slice(1) || location.search);
   const invitedRoom = params.get("room") || "";
   const duelPayload = params.get("duelo") || "";
+  const turnDuelId = params.get("turnoduelo") || "";
   if (invitedRoom) launchOnline(invitedRoom);
+  else if (turnDuelId) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: turnDuelId, mode: selectedModeKey, back: home }));
   else if (duelPayload) {
     const leido = CT.Duelo.descodificar(duelPayload);
     if (leido.ok) { pendingDuel = leido.duelo; duelIntro(); }

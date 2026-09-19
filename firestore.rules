@@ -10,6 +10,43 @@ service cloud.firestore {
     function registered() {
       return request.auth != null;
     }
+
+    // Duelo por turnos: solo los dos participantes pueden leerlo; cada avance
+    // incrementa exactamente un turno y únicamente lo firma quien lo tiene.
+    match /turnDuels/{duelId} {
+      function member() { return registered() && request.auth.uid in resource.data.playersOrder; }
+      function validCreate() {
+        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt'])
+          && request.resource.data.playersOrder == [request.auth.uid]
+          && request.resource.data.turnUid == request.auth.uid
+          && request.resource.data.status == 'waiting'
+          && request.resource.data.total is int && request.resource.data.total > 0 && request.resource.data.total <= 30
+          && request.resource.data.mode is string && request.resource.data.kind in ['orden','cifras'] && request.resource.data.seed is string;
+      }
+      allow create: if validCreate();
+      allow get, list: if member();
+      allow update: if (member() || (registered() && resource.data.status == 'waiting' && !(request.auth.uid in resource.data.playersOrder)))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
+        && (
+          (resource.data.status == 'waiting' && request.auth.uid != resource.data.playersOrder[0]
+            && request.resource.data.playersOrder.size() == 2
+            && request.resource.data.playersOrder[0] == resource.data.playersOrder[0]
+            && request.resource.data.playersOrder[1] == request.auth.uid
+            && request.resource.data.status == 'playing'
+            && request.resource.data.turnIndex == 0)
+          ||
+          (resource.data.status == 'playing' && resource.data.turnUid == request.auth.uid
+            && request.resource.data.turnIndex == resource.data.turnIndex + 1
+            && request.resource.data.plays.size() == resource.data.plays.size() + 1
+            && request.resource.data.plays[resource.data.turnIndex].uid == request.auth.uid
+            && request.resource.data.plays[resource.data.turnIndex].cardId is int
+            && request.resource.data.plays[resource.data.turnIndex].index is int
+            && request.resource.data.timeline.size() == resource.data.timeline.size() + 1
+            && (request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid] || request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid] + 1)
+            && (request.resource.data.status == 'playing' || request.resource.data.status == 'finished'))
+        );
+      allow delete: if false;
+    }
     function owner(uid) { return registered() && request.auth.uid == uid; }
     function validName(uid) {
       let d=request.resource.data;
