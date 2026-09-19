@@ -294,24 +294,20 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .camera-move .camera-fixed-nav { z-index: 2; pointer-events: none; }
 .camera-move-copy *, .camera-move-copy *::before, .camera-move-copy *::after { animation: none !important; transition: none !important; }
 @keyframes parchment-open {
-  from { opacity: .2; clip-path: inset(0 0 95% 0 round 12px); transform: translateY(-8px); }
-  to { opacity: 1; clip-path: inset(0 0 0 0 round 12px); transform: none; }
+  from { opacity: .35; clip-path: inset(0 0 98% 0); }
+  to { opacity: 1; clip-path: inset(0); }
 }
 @media (prefers-reduced-motion: no-preference) {
   #app[data-screen="perfil"] .screen-enter > * { animation: none; }
   .dialog-enter .settings-modal { animation: parchment-open 480ms ease-out both; }
-  .dialog-enter .enc-modal { animation-duration: 1400ms; }
+  .dialog-enter .enc-modal { animation-duration: 720ms; }
 }
 /* La sección Perfil es mucho más larga que un diálogo. El despliegue recorre
    una pantalla visible, no un porcentaje de miles de píxeles de contenido. */
 .profile-roll-edge { position: fixed; height: 28px; z-index: 95; pointer-events: none; border-radius: 50% / 18%; background: linear-gradient(to bottom, var(--edition-line), var(--edition-paper) 18%, var(--edition-surface) 43%, var(--edition-paper) 65%, var(--edition-brass) 96%, var(--edition-line)); box-shadow: 0 5px 10px #302d2726; }
 .collection-decks, .collection-decks .game-row { animation: none !important; }
-.parchment-dust { position: absolute; top: 22px; border-radius: 50%; background: var(--edition-brass); opacity: 0; pointer-events: none; animation: parchment-dust-fall 1100ms ease-out 2; }
-@keyframes parchment-dust-fall { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 22% { opacity: .75; } 100% { opacity: 0; transform: translate(var(--dust-drift), 76px) scale(.25); } }
-.profile-roll-edge.has-dust::after { content: ""; position: absolute; inset: 14px -8px -48px; pointer-events: none; background: radial-gradient(ellipse at 25% 0%, #b7965960, transparent 55%), radial-gradient(ellipse at 75% 10%, #b7965950, transparent 60%); filter: blur(4px); animation: parchment-dust-cloud 1100ms ease-out 2; }
-@keyframes parchment-dust-cloud { from { opacity: 0; transform: translateY(-5px); } 30% { opacity: .65; } to { opacity: 0; transform: translateY(35px); } }
-.dialog-enter .rules.parchment-unrolling, .rules.parchment-unrolling * { animation: none !important; }
-@media (prefers-reduced-motion: reduce) { .parchment-dust { display: none; animation: none; } }
+.dialog-enter :is(.rules,.settings-modal).parchment-unrolling,
+:is(.rules,.settings-modal).parchment-unrolling * { animation: none !important; }
 .perfil-section > h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.12; margin: 10px 0 18px; }
 .perfil-section > .lead { font-size: 1rem; line-height: 1.65; margin-bottom: 26px; max-width: 62ch; }
 .perfil-section > .section-label { margin: 36px 0 18px; font-family: var(--font-display); font-size: 1.5rem; line-height: 1.3; letter-spacing: 0; text-transform: none; color: var(--edition-ink); gap: 12px; flex-wrap: wrap; }
@@ -708,9 +704,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
    diálogo en el bloque de referencia de su barra fija. La entrada de superficies
    con navegación usa solo opacidad, conservando el anclaje a la ventana. */
 @keyframes atlas-surface-open { from { opacity: .2; } to { opacity: 1; } }
-#app .modal:has(.atlas-nav) { transform: none; clip-path: none; }
+#app .modal:has(.atlas-nav) { transform: none; }
 @media (prefers-reduced-motion: no-preference) {
-  #app .dialog-enter .modal:has(.atlas-nav) { animation-name: atlas-surface-open; }
+  #app .dialog-enter .modal:has(.atlas-nav) { animation: parchment-open 620ms ease-out both; }
 }
 #app .modal .atlas-nav { position: fixed; inset: auto 0 0; }
 
@@ -1839,6 +1835,26 @@ html #app .home-nav.atlas-nav::before {
 
 /* Enciclopedia, Guía y Ajustes son también destinos de esta navegación. Conservan la
    barra visible y marcan su botón igual que Inicio y Perfil. */
+#app > .overlay:has(> :is(.enc-modal, .settings-modal, .rules)) {
+  place-items: stretch;
+  padding: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+#app > .overlay > :is(.enc-modal, .settings-modal, .rules) {
+  width: 100%;
+  max-width: none;
+  max-height: 100dvh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: max(18px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) calc(82px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  border: 0;
+  border-radius: 0;
+  background: var(--edition-paper);
+  box-shadow: none;
+}
+#app[data-screen="perfil"] > .shell { width: 100%; max-width: none; }
 #app :is(.enc-modal, .settings-modal, .rules) .home-nav.atlas-nav { display: grid; }
 #app :is(.enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
 #app .home-nav.atlas-nav button[aria-current] small {

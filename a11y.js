@@ -126,11 +126,11 @@
     };
   }, true);
   const primaryNavigationActive = () => !!primaryNavigationMotion;
-  function unrollProfile(container) {
-    unrollSheet(container.firstElementChild);
+  function unrollProfile(container, silent = false) {
+    unrollSheet(container.firstElementChild, false, silent);
   }
-  function unrollSheet(sheet, collection = false) {
-    if (sheet) window.CONTINUUM.Effects?.transition?.('unroll');
+  function unrollSheet(sheet, collection = false, silent = false) {
+    if (sheet && !silent) window.CONTINUUM.Effects?.transition?.('unroll');
     if (!sheet?.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     cancelProfileRoll?.();
     sheet.classList.add('parchment-unrolling');
@@ -147,17 +147,6 @@
     // La colección comienza en su portada y termina sobre la navegación fija.
     // Si se desplaza la página durante la apertura, retiramos el efecto.
     if (collection) sheet.style.minHeight = `${height}px`;
-    // Granos ligeros, sin bucle permanente ni superficie interactiva.
-    if (!collection) edge.classList.add('has-dust');
-    for (let index = 0; index < (collection ? 0 : 40); index++) {
-      const grain = document.createElement('i');
-      grain.className = 'parchment-dust';
-      grain.style.left = `${3 + (index * 37 % 94)}%`;
-      grain.style.setProperty('--dust-drift', `${(index % 7 - 3) * 12}px`);
-      grain.style.animationDelay = `${index % 6 * 110}ms`;
-      grain.style.width = grain.style.height = `${index % 4 + 3}px`;
-      edge.append(grain);
-    }
     document.body.append(edge);
     const timing = { duration: collection ? 3100 : 2300, easing: "cubic-bezier(.22,.55,.25,1)" };
     const reveal = sheet.animate([
@@ -538,7 +527,7 @@
       // reajustarlo a cero al terminar el layout. Por eso, cuando hay un regreso guardado,
       // reafirmamos siempre la posición aunque en este instante parezca coincidir.
       if (regreso || conservaFondo || window.scrollY !== top || window.scrollX !== 0) restoreWindowPosition(top);
-      if (screen === "perfil" && !quietPrimaryNavigation) unrollProfile(container);
+      if (screen === "perfil") unrollProfile(container, quietPrimaryNavigation);
       return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que
@@ -694,7 +683,7 @@
     window.CONTINUUM.UI?.reveal(modal);
     const openingFocus = document.activeElement;
     window.CONTINUUM.UI?.openSurface(modal);
-    if (!quietPrimaryNavigation) overlay.classList.add("dialog-enter");
+    overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", compact ? "false" : "true");
     modal.setAttribute("tabindex", "-1");
@@ -727,7 +716,8 @@
       else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
     }
     document.addEventListener("keydown", onKey);
-    const cancelRoll = modal.classList.contains('rules') ? unrollSheet(modal) : null;
+    const cancelRoll = modal.querySelector('.home-nav') && modal.matches('.rules, .settings-modal')
+      ? unrollSheet(modal, false, quietPrimaryNavigation) : null;
     pila.push({ overlay, previo, onKey, cerrable, cancelRoll, onClose });
   }
 

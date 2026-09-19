@@ -429,14 +429,15 @@ console.log('Cámara en toda la preparación, sin animar las jugadas posteriores
       return { finished: new Promise(() => {}), cancel() { effect.cancelled = true; } };
     };
     click(w, '.home-nav [data-action="perfil"]');
-    assert.equal(w.document.querySelector('.profile-roll-edge'), null, 'la barra cambia de pestaña sin rebote ni desenrollado');
+    assert.ok(w.document.querySelector('.profile-roll-edge'), 'Perfil se desenrolla desde la barra');
+    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 0, 'el pergamino no suelta virutas doradas');
     assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Perfil');
     assert.ok(!w.document.querySelector('#app > .shell')?.classList.contains('screen-enter'));
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     click(w, '.home-nav [data-action="home-encyclopedia"]');
     assert.ok(w.document.querySelector('.settings-modal.enc-modal[role="dialog"]'), 'Enciclopedia se abre desde su pestaña');
-    assert.equal(w.document.querySelector('.dialog-enter'), null, 'la pestaña no rebota al abrirse');
+    assert.ok(w.document.querySelector('.dialog-enter'), 'Enciclopedia usa el mismo despliegue de pergamino');
     assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Enciclopedia');
     assert.ok(w.document.querySelector('.enc-background[inert]'), 'el fondo no recibe pulsaciones');
     w.document.dispatchEvent(new w.KeyboardEvent('keydown', {key:'Escape',bubbles:true}));
@@ -456,7 +457,7 @@ console.log('Cámara en toda la preparación, sin animar las jugadas posteriores
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     click(w, '[data-action="rules"]');
     assert.ok(w.document.querySelector('.rules.parchment-unrolling'));
-    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 40, 'guía con polvo');
+    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 0, 'guía sin virutas doradas');
     click(w, '.guide-close');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null, 'cerrar guía limpia el efecto');
     w.matchMedia = () => ({ matches: true });
@@ -464,4 +465,4 @@ console.log('Cámara en toda la preparación, sin animar las jugadas posteriores
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
   } finally { w.close(); }
 }
-console.log('Navegación inferior: Perfil y Enciclopedia cambian sin rebote: OK');
+console.log('Navegación inferior: pestañas a ancho completo, pergamino común y sin virutas: OK');
