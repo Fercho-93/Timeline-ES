@@ -2,5 +2,10 @@
   "appId": "com.continuum.game",
   "appName": "Continuum",
   "webDir": "dist",
-  "backgroundColor": "#f6f1e8"
+  "backgroundColor": "#f6f1e8",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "banner", "list"]
+    }
+  }
 }
