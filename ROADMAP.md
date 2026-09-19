@@ -102,7 +102,7 @@ Decisión de arquitectura: capa de transporte intercambiable detrás de la lógi
 existente en `online.js` (turnos, Fantasma, Pulso, huella del mazo), con dos transportes
 según el grupo de dispositivos.
 
-### Fase 1 — Hotspot Wi-Fi + WebRTC + QR (cubre cualquier grupo con al menos un Android)
+### Fase 1 — Hotspot Wi-Fi + WebRTC + compartir del sistema (cubre cualquier grupo con al menos un Android)
 
 - [x] Lógica de sala independiente de Firestore (`local-room.js`): un reductor puro
       (`createRoom` / `joinRoom` / `startRoom` / `placeCard` / `finishTurn` / `skipTurn` /
@@ -128,8 +128,15 @@ según el grupo de dispositivos.
       aplica el reductor por su cuenta: manda la acción y refleja lo que vuelve. Con
       pruebas (`tests/sesion-local.mjs`) que cubren el protocolo sin necesitar WebRTC de
       verdad, más el aviso claro (`WEBRTC_UNAVAILABLE`) donde sí hace falta.
-- [ ] Señalización 100% offline de verdad: interfaz que enseñe y escanee ese formato como QR
-      (generalizando el QR que ya dibuja `online.js` para las salas actuales).
+- [x] Señalización 100% offline de verdad — cambio de plan: el QR que dibuja `online.js`
+      está fijado a una versión pequeña (~106 bytes) para el enlace corto de sala; una señal
+      WebRTC pesa varios cientos de bytes (huellas de seguridad y candidatos de red) y no
+      cabe ahí. Escribir un generador de QR de mayor capacidad —y, aparte, un lector por
+      cámara, que tampoco existe hoy— era demasiado para este paso. En su lugar,
+      `local-share.js` manda la señal por el propio "compartir" del móvil (`navigator.share`:
+      Bluetooth, AirDrop, Nearby Share, todo local sin internet), con el portapapeles como
+      red de seguridad si el sistema no ofrece compartir. Con pruebas
+      (`tests/compartir-local.mjs`).
 - [ ] Interfaz nueva "Sin conexión" (`local-multiplayer.js`, cargado bajo demanda como hace
       `app.js` con `online.js`): instrucciones para activar el punto de acceso Wi-Fi de un
       móvil (recomendando un Android como anfitrión si hay alguno en el grupo) y unirse el
