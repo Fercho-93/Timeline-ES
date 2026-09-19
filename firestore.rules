@@ -18,7 +18,7 @@ service cloud.firestore {
       function validCreate() {
         return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt'])
           && request.resource.data.playersOrder == [request.auth.uid]
-          && request.resource.data.turnUid == request.auth.uid
+          && request.resource.data.turnUid == null
           && request.resource.data.status == 'waiting'
           && request.resource.data.total is int && request.resource.data.total > 0 && request.resource.data.total <= 30
           && request.resource.data.mode is string && request.resource.data.kind in ['orden','cifras'] && request.resource.data.seed is string;
@@ -33,6 +33,7 @@ service cloud.firestore {
             && request.resource.data.playersOrder[0] == resource.data.playersOrder[0]
             && request.resource.data.playersOrder[1] == request.auth.uid
             && request.resource.data.status == 'playing'
+            && request.resource.data.turnUid == request.resource.data.playersOrder[0]
             && request.resource.data.turnIndex == 0)
           ||
           (resource.data.status == 'playing' && resource.data.turnUid == request.auth.uid

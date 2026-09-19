@@ -2186,3 +2186,10 @@ body::before {
 .turn-duel-wait { display: grid; gap: .35rem; margin: 2rem 0; padding: 1.5rem; }
 .turn-duel-wait span { font-size: 2rem; }
 .turn-duel-progress { display: block; margin: 1rem 0; opacity: .7; }
+.turn-duel-share { display: grid; gap: .65rem; margin: 1.4rem 0; padding: 1.2rem; border: 1px solid var(--edition-brass, #9b6b2f); border-radius: 14px; text-align: left; }
+.turn-duel-share-icon { font-size: 2rem; }
+.turn-duel-share code { display: block; overflow-wrap: anywhere; padding: .65rem; background: rgba(0,0,0,.05); font-size: .75rem; }
+.turn-duel-real-card { text-align: left; padding: 0; overflow: hidden; }
+.turn-duel-real-card .card-visual { min-height: 120px; }
+.turn-duel-real-card .card-content { padding: 1rem; }
+.turn-duel-real-card .card-content h3 { margin: .25rem 0; }
