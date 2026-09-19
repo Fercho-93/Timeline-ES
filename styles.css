@@ -2177,7 +2177,7 @@ body::before {
 .turn-duel-list { display: grid; gap: .65rem; }
 .turn-duel-list .btn { display: flex; justify-content: space-between; gap: 1rem; text-align: left; }
 .turn-duel-list .btn span { color: var(--edition-brass, #9b6b2f); font-size: .85em; }
-.turn-duel-screen { max-width: 64rem; margin-inline: auto; text-align: center; }
+.turn-duel-screen { width: 100%; min-width: 0; max-width: 64rem; margin-inline: auto; text-align: left; }
 .turn-duel-countdown { display: grid; gap: .15rem; margin: 1.5rem auto; padding: 1rem; border: 1px solid var(--edition-brass, #9b6b2f); border-radius: 12px; }
 .turn-duel-countdown b { font-size: 2.4rem; }
 .turn-duel-countdown span, .turn-duel-card small, .turn-duel-wait small { display: block; opacity: .75; }
@@ -2193,3 +2193,58 @@ body::before {
 .turn-duel-real-card .card-visual { min-height: 120px; }
 .turn-duel-real-card .card-content { padding: 1rem; }
 .turn-duel-real-card .card-content h3 { margin: .25rem 0; }
+
+/* The board owns its horizontal scroll; no intrinsic card width reaches the page. */
+.turn-duel-shell { min-width: 0; overflow-anchor: none; }
+.turn-duel-screen > * { min-width: 0; max-width: 100%; }
+.turn-duel-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+.turn-duel-nav > span { min-width: 0; font: 700 .9rem var(--font-display); letter-spacing: .1em; }
+.turn-duel-nav small { display: block; font: 400 .7rem/1.5 system-ui; letter-spacing: 0; color: var(--muted); }
+.turn-duel-nav .btn { flex: none; min-height: 44px; padding: 8px 14px; }
+.turn-duel-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; margin-bottom: 14px; }
+.turn-duel-heading h1 { font-size: clamp(1.4rem, 5vw, 2rem); line-height: 1.12; margin: 5px 0; overflow-wrap: anywhere; }
+.turn-duel-heading p { margin: 6px 0 0; font-size: .78rem; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+.turn-duel-heading .eyebrow { font-size: .65rem; }
+.turn-duel-clock { position: relative; width: 52px; height: 52px; color: var(--accent); flex: none; }
+.turn-duel-clock svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.turn-duel-clock circle { fill: none; stroke-width: 2.5; }
+.turn-clock-track { stroke: var(--line); }
+.turn-clock-progress { stroke: currentColor; stroke-linecap: round; transition: stroke-dashoffset .25s linear; }
+.turn-duel-clock > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 2px; }
+.turn-duel-clock b { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.turn-duel-clock small { font-size: .65rem; }
+.turn-duel-clock.is-urgent { color: var(--accent-dark); }
+.turn-duel-scores { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.turn-duel-player { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.turn-duel-player.is-active { border-color: var(--accent); box-shadow: inset 0 -2px var(--accent); }
+.turn-duel-player > span { font-size: .76rem; overflow-wrap: anywhere; min-width: 0; }
+.turn-duel-player > b { text-align: right; font-size: 1.1rem; flex: none; font-variant-numeric: tabular-nums; }
+.turn-duel-player small { display: block; color: var(--muted); font-size: .6rem; font-weight: 400; }
+.turn-duel-board { width: 100%; min-width: 0; }
+.turn-duel-board .timeline-wrap { width: 100%; max-width: 100%; min-width: 0; margin: 4px 0 0; padding: 8px 2px 12px; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+.turn-duel-board .timeline { gap: 6px; }
+.turn-duel-board .timeline > * { flex-shrink: 0; }
+.turn-duel-board .timeline-card { width: 146px; min-height: 210px; }
+.turn-duel-board .animal-timeline-card .card-visual { height: 124px; }
+.turn-duel-board .timeline :is(.slot, .slot-confirm) { min-height: 210px; }
+.turn-duel-board .slot-confirm { width: 132px; margin-inline: 0; }
+.turn-duel-board .hand-title, .turn-duel-hand .hand-title { margin-block: 10px 4px; }
+.turn-duel-board .hand-title h3 { font-size: .95rem; }
+.turn-duel-board .timeline-zoom { margin: 0; justify-content: flex-end; }
+.turn-duel-board .hint { margin: 4px 0 12px; font-size: .7rem; }
+.turn-duel-hand { border-top: 1px solid var(--line); padding-top: 4px; }
+.turn-duel-hand .hand { margin-block: 8px; }
+.turn-duel-status { padding: 10px 14px; border-left: 2px solid var(--accent); background: var(--surface); border-radius: 0 8px 8px 0; font-size: .8rem; line-height: 1.5; }
+.turn-duel-answer { display: grid; gap: 12px; max-width: 32rem; margin: 20px auto; }
+.turn-duel-answer label { font-size: .8rem; }
+.turn-duel-answer input { width: 100%; min-width: 0; min-height: 48px; font-size: 16px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--surface); }
+.turn-duel-share { max-width: 30rem; margin: 24px auto; }
+.turn-duel-share h2, .turn-duel-share p { margin: 0; }
+.turn-duel-share p { color: var(--muted); font-size: .85rem; line-height: 1.6; }
+.turn-duel-share details { min-width: 0; font-size: .75rem; }
+.turn-duel-share summary { cursor: pointer; padding-block: 12px; min-height: 44px; }
+@media (max-width: 620px) {
+  .turn-duel-shell { padding-inline: max(12px, env(safe-area-inset-left)); }
+  .turn-duel-hand .hand-card { max-width: 190px; }
+}
+@media (prefers-reduced-motion: reduce) { .turn-clock-progress { transition: none; } }

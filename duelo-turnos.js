@@ -36,40 +36,89 @@ function statusText(game) { return game.turnUid === uid() ? 'Es tu turno' : `Tur
 function timelineCardMarkup(game, card) {
   const era = CT.eraForCard(game.mode, card), art = CT.animalArt(game.mode, card);
   const visual = art || `<span>${era.symbol}</span><small>${safe(era.name)}</small>`;
-  return `<article class="timeline-card card-flippable" data-id="${card.id}"><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(game.mode, card)}<div class="year">${safe(CT.formatValue(game.mode, card))}</div><h3>${safe(card.title)}</h3><p>${safe(card.detail)}</p></div></article>`;
+  return `<article class="timeline-card ${art ? 'animal-timeline-card' : ''}" data-id="${card.id}"><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(game.mode, card)}<div class="year">${safe(CT.formatValue(game.mode, card))}</div><h3>${safe(card.title)}</h3></div></article>`;
 }
 function orderBoard(game, card) {
   const line = timelineCards(game), slots = [];
   for (let index = 0; index <= line.length; index++) {
-    slots.push(pendingIndex === index
+    if (card) slots.push(pendingIndex === index
       ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${safe(card.title)}</strong><button class="btn btn-primary btn-block" data-turn-action="confirm-place">Sí, aquí</button><button class="btn btn-ghost btn-block" data-turn-action="cancel-place">Cancelar</button></div>`
       : `<button class="slot" data-turn-action="select-slot" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${line.length + 1}"><span>+</span></button>`);
     if (index < line.length) slots.push(timelineCardMarkup(game, line[index]));
   }
-  return `<section><div class="hand-title"><h3>${safe(CT.timelineTitle(game.mode))}</h3><small>${line.length} ${line.length === 1 ? 'carta' : 'cartas'}</small></div>${CT.timelineMap?.(game.mode, line) || ''}<div class="timeline-wrap"><div class="timeline">${slots.join('')}</div></div></section><section><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(game.mode, card)}<span class="hidden-date">${safe(CT.hiddenLabel(game.mode))}</span>${CT.cardBack(game.mode)}<strong>${safe(card.title)}</strong></div></div><p class="hint">${pendingIndex === null ? 'Toca el hueco donde quieres colocar la carta.' : 'Confirma el hueco elegido o toca otro.'}</p></section>`;
+  return `<section class="turn-duel-board"><div class="hand-title"><h3>${safe(CT.timelineTitle(game.mode))}</h3><small>${line.length} ${line.length === 1 ? 'carta' : 'cartas'}</small></div>${CT.timelineMap?.(game.mode, line) || ''}<div class="timeline-wrap" tabindex="0" role="region" aria-label="Mesa de cartas, desplaza para ver más"><div class="timeline">${slots.join('')}</div></div><p class="hint">Desliza la línea para ver todas las cartas.</p></section>${card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3><small>${safe(CT.hiddenLabel(game.mode))}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(game.mode, card)}<span class="hidden-date">${safe(CT.hiddenLabel(game.mode))}</span>${CT.cardBack(game.mode)}<strong>${safe(card.title)}</strong></div></div><p class="hint">${pendingIndex === null ? 'Toca el hueco donde quieres colocar la carta.' : 'Confirma el hueco elegido o toca otro.'}</p></section>` : ''}`;
 }
-function cifraBoard(game, card) { return `<div class="cifra-card">${CT.categoryBadge(game.mode, card)}<strong>${safe(card.title)}</strong><span>${safe(CT.Duelo.Cifras.regla(game.mode)?.pregunta || 'Escribe la cifra')}</span></div><input id="turn-cifra-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Tu cifra"><button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button>`; }
-async function share() { if (!shareLink) return; if (navigator.share) { try { await navigator.share({ title: 'Duelo por turnos en Continuum', text: 'Únete a mi duelo por turnos en Continuum', url: shareLink }); return; } catch {} } await navigator.clipboard?.writeText(shareLink).catch(() => {}); notify('Enlace copiado. Ya puedes enviárselo a tu rival.'); }
+function cifraBoard(game, card) { return `<section class="turn-duel-answer"><div class="cifra-card">${CT.categoryBadge(game.mode, card)}<strong>${safe(card.title)}</strong><span>${safe(CT.Duelo.Cifras.regla(game.mode)?.pregunta || 'Escribe la cifra')}</span></div><label for="turn-cifra-input">Tu respuesta</label><input id="turn-cifra-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Escribe la cifra"><button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button></section>`; }
+function clockMarkup(seconds) {
+  return `<div class="turn-duel-clock" role="timer" aria-label="${seconds} segundos restantes"><svg viewBox="0 0 48 48" aria-hidden="true"><circle class="turn-clock-track" cx="24" cy="24" r="20"/><circle class="turn-clock-progress" cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${100 * seconds / TURN_SECONDS}"/></svg><span><b id="turn-duel-seconds">${seconds}</b><small>s</small></span></div>`;
+}
+function updateClock() {
+  const seconds = Math.max(0, Math.ceil((TURN_SECONDS * 1000 - (Date.now() - enteredAt)) / 1000));
+  const clock = document.querySelector('.turn-duel-clock');
+  if (clock) {
+    clock.querySelector('b').textContent = seconds;
+    clock.setAttribute('aria-label', `${seconds} segundos restantes`);
+    clock.classList.toggle('is-urgent', seconds <= 5);
+    clock.querySelector('.turn-clock-progress').setAttribute('stroke-dashoffset', String(100 * seconds / TURN_SECONDS));
+  }
+  if (seconds <= 0) { clearInterval(timer); expireTurn(); }
+}
+async function share() {
+  if (!current) return;
+  const link = shareLink || `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${current.id}`;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Duelo por turnos en Continuum', text: 'Únete a mi duelo por turnos en Continuum', url: link }); return; }
+    catch (error) { if (error.name === 'AbortError') return; }
+  }
+  try { await navigator.clipboard.writeText(link); notify('Enlace copiado. Ya puedes enviárselo a tu rival.'); }
+  catch { document.querySelector('.turn-duel-share details')?.setAttribute('open', ''); notify('Copia el enlace que aparece en la invitación.'); }
+}
 function render() {
   if (!current) return;
+  const app = document.getElementById('app');
+  const sameGame = app.querySelector('.turn-duel-shell')?.dataset.duelId === current.id;
+  const oldWrap = app.querySelector('.timeline-wrap');
+  const oldLeft = sameGame ? oldWrap?.scrollLeft || 0 : 0;
+  const oldTop = sameGame ? window.scrollY : 0;
+  const focused = document.activeElement;
+  const oldInput = app.querySelector('#turn-cifra-input');
+  const inputValue = oldInput?.value;
+  const sameTurn = app.querySelector('.turn-duel-shell')?.dataset.turn === String(current.turnIndex);
   const mine = current.turnUid === uid();
   const elapsed = enteredAt ? Math.max(0, TURN_SECONDS - Math.floor((Date.now() - enteredAt) / 1000)) : TURN_SECONDS;
   const card = mine && !current.timeout ? localCard(current) : null;
   const waiting = current.status === 'waiting';
   const kindLabel = current.kind === 'cifras' ? 'Escribir la cifra' : 'Ordenar las cartas';
   const rival = current.players?.[current.playersOrder?.find(x => x !== uid())]?.alias || '';
-  const html = `<div class="shell"><section class="pass-screen"><div class="panel turn-duel-screen">
-    <div class="eyebrow">Duelo por turnos · ${safe(kindLabel)}${rival ? ` · ${safe(rival)}` : ''}</div>
-    <h1 data-focus tabindex="-1">${current.status === 'finished' ? 'Duelo terminado' : waiting ? 'Comparte tu duelo' : statusText(current)}</h1>
-    <p class="lead">${current.status === 'finished' ? 'La partida ya ha terminado.' : waiting ? 'Elige a quién quieres retar y envíale este enlace. La partida empezará cuando se una.' : mine ? `Te toca en «${safe(kindLabel)}». El otro jugador no verá tu pantalla.` : 'Te avisaremos cuando el otro jugador coloque su carta.'}</p>
-    ${waiting ? `<div class="turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><b>Invita a tu rival</b><code>${safe(shareLink)}</code><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><small>El enlace lleva las mismas cartas y la modalidad «${safe(kindLabel)}».</small></div>` : ''}
-    ${current.status !== 'finished' && !waiting && mine ? `<div class="turn-duel-countdown" role="timer"><b id="turn-duel-seconds">${elapsed}s</b><span>de seguridad para jugar este turno</span></div>${current.timeout ? '<p class="lead">Tiempo agotado. Pasando el turno…</p>' : card ? (current.kind === 'cifras' ? cifraBoard(current, card) : orderBoard(current, card)) : '<p class="lead">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>'}` : ''}
-    ${current.status !== 'finished' && !mine ? `<div class="turn-duel-wait" role="status"><span aria-hidden="true">⌛</span><b>Esperando al oponente</b><small>Esta pantalla se actualizará automáticamente.</small></div>` : ''}
-    ${current.status === 'finished' ? `<p class="lead">${safe(current.resultText || 'Gracias por jugar.')}</p>` : `<small class="turn-duel-progress">Turno ${Math.min(current.turnIndex + 1, current.total)} de ${current.total} · Tu puntuación: ${current.scores?.[uid()] || 0}</small>`}
-    <button class="btn btn-ghost btn-block" data-turn-action="back">Volver al menú</button>
-  </div></section></div>`;
-  document.getElementById('app').innerHTML = html;
-  clearInterval(timer); if (mine && current.status === 'playing' && !current.timeout) timer = setInterval(() => { const left = Math.max(0, TURN_SECONDS - Math.floor((Date.now() - enteredAt) / 1000)), counter = document.getElementById('turn-duel-seconds'); if (counter) counter.textContent = `${left}s`; if (left <= 0) { clearInterval(timer); expireTurn(); } }, 250);
+  const finished = current.status === 'finished';
+  const active = mine && !waiting && !finished && !current.timeout;
+  const link = shareLink || `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${current.id}`;
+  const html = `<div class="shell turn-duel-shell" data-duel-id="${safe(current.id)}" data-turn="${current.turnIndex}">
+    <nav class="turn-duel-nav" aria-label="Duelo"><span>CONTINUUM <small>Duelo por turnos</small></span><button class="btn btn-ghost" data-turn-action="back">Volver</button></nav>
+    <section class="turn-duel-screen">
+      <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${finished ? 'Duelo terminado' : waiting ? 'Invita a tu rival' : statusText(current)}</h1><p>${waiting ? 'Comparte el enlace para empezar vuestra partida.' : finished ? 'Así queda vuestra partida.' : `Carta ${Math.min(current.turnIndex + 1, current.total)} de ${current.total}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div>${active ? clockMarkup(elapsed) : ''}</header>
+      <div class="turn-duel-scores" aria-label="Marcador">${current.playersOrder.map(player => `<div class="turn-duel-player ${current.turnUid === player ? 'is-active' : ''}"><span>${safe(current.players?.[player]?.alias || 'Jugador')}${player === uid() ? ' · tú' : ''}</span><b>${current.scores?.[player] || 0}<small>${current.kind === 'cifras' ? 'puntos' : 'aciertos'}</small></b></div>`).join('')}</div>
+      ${waiting ? `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>La partida empezará cuando se una tu rival.</small></div>` : ''}
+      ${!waiting && !finished && !active ? `<p class="turn-duel-status" role="status">${current.timeout ? 'Tiempo agotado. Pasando el turno…' : 'Tu rival está jugando. La mesa se actualizará automáticamente.'}</p>` : ''}
+      ${!waiting && current.kind === 'orden' ? orderBoard(current, active ? card : null) : ''}
+      ${active && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
+      ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
+      ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
+    </section></div>`;
+  app.dataset.screen = 'turn-duel';
+  app.innerHTML = html;
+  CT.applyTimelineZoom?.(app);
+  const wrap = app.querySelector('.timeline-wrap');
+  if (wrap) wrap.scrollLeft = oldLeft;
+  const input = app.querySelector('#turn-cifra-input');
+  if (sameTurn && input && inputValue !== undefined) {
+    input.value = inputValue;
+    if (focused === oldInput) input.focus({ preventScroll: true });
+  }
+  if (focused?.dataset.turnAction === 'select-slot') app.querySelector('[data-turn-action="confirm-place"]')?.focus({ preventScroll: true });
+  window.scrollTo({ left: 0, top: oldTop, behavior: 'instant' });
+  clearInterval(timer);
+  if (active) timer = setInterval(updateClock, 250);
 }
 async function expireTurn() {
   if (!current || current.turnUid !== uid() || current.status !== 'playing' || expiring) return;
