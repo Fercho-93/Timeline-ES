@@ -1,6 +1,6 @@
 (() => {
   const root = document.documentElement;
-  const MIN_VISIBLE = 3500, ENTER_VISIBLE = 1200, FADE_OUT = 1100, MAX_WAIT = 20000;
+  const MIN_VISIBLE = 3500, ENTER_VISIBLE = 1200, FADE_OUT = 420, MAX_WAIT = 20000;
   root.classList.add('splash-active');
   let startedAt = null, ready = false, minVisible = MIN_VISIBLE, timeout, finishTimer, hideTimer;
   const splash = () => document.getElementById('app-splash');

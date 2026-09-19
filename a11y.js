@@ -84,12 +84,10 @@
     const to = container.getBoundingClientRect().height;
     if (Math.abs(to - from) >= 1) window.CONTINUUM.Effects?.transition?.(to > from ? 'expand' : 'close');
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !container.animate) return;
-    container.classList.remove("section-enter");
-    void container.offsetWidth;
-    container.classList.add("section-enter");
+    container.classList.add("motion-managed");
     if (Math.abs(to - from) < 1) return;
     const animation = container.animate([{ height: `${from}px` }, { height: `${to}px` }], {
-      duration: 280, easing: "cubic-bezier(.22, .61, .36, 1)"
+      duration: 420, easing: "cubic-bezier(.22,.61,.36,1)"
     });
     resizing.set(container, animation);
     animation.finished.then(() => {
@@ -112,64 +110,53 @@
     if (previous) root.style.setProperty("scroll-behavior", previous, priority);
     else root.style.removeProperty("scroll-behavior");
   }
-  let cancelPageTurn = null;
-  let cancelProfileRoll = null;
-  function unrollProfile(container) {
-    unrollSheet(container.firstElementChild);
-  }
-  function unrollSheet(sheet, collection = false) {
-    if (sheet) window.CONTINUUM.Effects?.transition?.('unroll');
-    if (!sheet?.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    cancelProfileRoll?.();
-    sheet.classList.add('parchment-unrolling');
-    const bounds = sheet.getBoundingClientRect();
-    const navigation = document.querySelector('#app .home-nav')?.getBoundingClientRect();
-    const bottom = navigation?.height > 0 ? Math.min(window.innerHeight, navigation.top) : window.innerHeight;
-    const height = Math.max(1, collection ? bottom - bounds.top : Math.min(sheet.offsetHeight || Infinity, window.innerHeight - bounds.top));
-    const edge = document.createElement("div");
-    edge.className = "profile-roll-edge";
-    edge.setAttribute("aria-hidden", "true");
-    edge.style.left = `${bounds.left}px`;
-    edge.style.width = `${bounds.width}px`;
-    edge.style.top = `${bounds.top}px`;
-    // La colección comienza en su portada y termina sobre la navegación fija.
-    // Si se desplaza la página durante la apertura, retiramos el efecto.
-    if (collection) sheet.style.minHeight = `${height}px`;
-    // Granos ligeros, sin bucle permanente ni superficie interactiva.
-    if (!collection) edge.classList.add('has-dust');
-    for (let index = 0; index < (collection ? 0 : 40); index++) {
-      const grain = document.createElement('i');
-      grain.className = 'parchment-dust';
-      grain.style.left = `${3 + (index * 37 % 94)}%`;
-      grain.style.setProperty('--dust-drift', `${(index % 7 - 3) * 12}px`);
-      grain.style.animationDelay = `${index % 6 * 110}ms`;
-      grain.style.width = grain.style.height = `${index % 4 + 3}px`;
-      edge.append(grain);
-    }
-    document.body.append(edge);
-    const timing = { duration: collection ? 3100 : 2300, easing: "cubic-bezier(.22,.55,.25,1)" };
-    const reveal = sheet.animate([
-      { clipPath: 'polygon(0 0, 100% 0, 100% 0px, 0 0px)' },
-      { clipPath: `polygon(0 0, 100% 0, 100% ${height}px, 0 ${height}px)` }
-    ], timing);
-    const lip = collection ? 28 : 14;
-    const roll = edge.animate([
-      { transform: `translateY(${-lip}px)`, opacity: 0, offset: 0 },
-      { transform: `translateY(${height * .08 - lip}px)`, opacity: 1, offset: .08 },
-      { transform: `translateY(${height * .92 - lip}px)`, opacity: 1, offset: .92 },
-      { transform: `translateY(${height - lip}px)`, opacity: 0, offset: 1 }
-    ], timing);
-    const cleanup = () => { edge.remove(); sheet.classList.remove('parchment-unrolling'); window.removeEventListener('wheel', cancel); window.removeEventListener('touchmove', cancel); if (cancelProfileRoll === cancel) cancelProfileRoll = null; };
-    const cancel = () => { reveal.cancel(); roll.cancel(); cleanup(); };
-    if (collection) { window.addEventListener('wheel', cancel, { passive: true }); window.addEventListener('touchmove', cancel, { passive: true }); }
-    cancelProfileRoll = cancel;
-    reveal.finished.then(cleanup, cleanup);
-    roll.finished.catch(() => {});
+  const MOTION = { duration: 420, easing: 'cubic-bezier(.22,.61,.36,1)' };
+  const surfaceMotions = new Map();
+  let primaryNavigationMotion = null;
+  document.addEventListener('click', event => {
+    const button = event.target.closest?.('#app .home-nav button');
+    if (button) primaryNavigationMotion = {
+      dialog: button.matches('[data-action="home-encyclopedia"], [data-action="rules"], [data-settings-action]')
+    };
+  }, true);
+  const primaryNavigationActive = () => !!primaryNavigationMotion;
+  const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
+
+  // Una sola entrada por superficie. La marca permanece al terminar para que CSS
+  // no reactive una segunda entrada cuando se retira el estado transitorio.
+  function unrollSheet(sheet, collection = false, silent = false) {
+    if (!sheet) return;
+    if (!silent) window.CONTINUUM.Effects?.transition?.('unroll');
+    surfaceMotions.get(sheet)?.();
+    sheet.classList.add('motion-managed');
+    if (!sheet.animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    sheet.classList.add('motion-entering');
+    const children = [...sheet.children].filter(child =>
+      !child.matches('.home-nav, .atlas-scroll-veil, style, script, .solo-lectores'));
+    // Los botones de navegación permanecen estables y se conserva su anclaje fijo.
+    const targets = children.length ? children : [sheet];
+    const animations = targets.map(target => target.animate([
+      { opacity: 0 }, { opacity: 1 }
+    ], { ...MOTION, fill: 'backwards' }));
+    let done = false;
+    const cleanup = () => {
+      if (done) return;
+      done = true;
+      if (surfaceMotions.get(sheet) === cancel) {
+        surfaceMotions.delete(sheet);
+        sheet.classList.remove('motion-entering');
+      }
+    };
+    const cancel = () => { animations.forEach(animation => animation.cancel()); cleanup(); };
+    surfaceMotions.set(sheet, cancel);
+    Promise.all(animations.map(animation => animation.finished)).then(cleanup, cleanup);
     return cancel;
   }
-  const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
-  const gameScreens = new Set(["pass", "game", "solo", "online-game", "pulse-pass"]);
-  let firstLocalReveal = false;
+  function cancelSurfaceMotions(container) {
+    for (const [sheet, cancel] of surfaceMotions) {
+      if (!sheet.isConnected || container.contains(sheet)) cancel();
+    }
+  }
 
   function inkWave(anchor, kind = 'success') {
     const timeline = anchor?.closest('.timeline');
@@ -193,9 +180,6 @@
     const transform = (x, y, tilt, size) => `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg) scale(${size})`;
     const animations = [card.animate([
       {transform: transform(dx, dy, angle, .9), opacity: 0, boxShadow: '0 16px 28px #39240b30', offset: 0},
-      {transform: transform(dx * .86, dy * .83 - 14, angle * .75, 1.045), opacity: 1, boxShadow: '0 22px 32px #39240b38', offset: .22},
-      {transform: transform(dx * .14, dy * .12 - 8, -angle * .12, 1.025), opacity: 1, boxShadow: '0 10px 16px #39240b28', offset: .66},
-      {transform: transform(0, 2, 0, .992), opacity: 1, boxShadow: '0 2px 4px #39240b24', offset: .86},
       {transform: 'none', opacity: 1, boxShadow: shadow, offset: 1}
       // `backwards` es lo que impide verla dos veces: quien reparte la hace visible justo
       // antes de animarla, y sin rellenar hacia atrás queda un instante en el que la carta
@@ -206,7 +190,6 @@
     [cards[at - 1], cards[at + 1]].forEach((neighbor, i) => {
       if (neighbor?.animate) animations.push(neighbor.animate([
         {transform: `translateX(${i === 0 ? 20 : -20}px)`, offset: 0},
-        {transform: `translateX(${i === 0 ? -4 : 4}px) rotate(${i === 0 ? -.6 : .6}deg)`, offset: .55},
         {transform: 'none', offset: 1}
       ], {duration, easing: 'cubic-bezier(.25,.65,.3,1)'}));
     });
@@ -277,131 +260,6 @@
     });
   }
 
-  // Construye un escenario doble: la vista que dejamos y la vista de destino existen
-  // a la vez, una al lado de la otra. Después de repintar, la cámara recorre ese mundo
-  // horizontal de forma continua; no hay una página que se apaga y otra que aparece.
-  function moveCamera(container, backwards) {
-    window.CONTINUUM.Effects?.page?.(backwards);
-    if (!container.animate || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const layer = document.createElement("div");
-    layer.className = "camera-move";
-    layer.setAttribute("aria-hidden", "true");
-    layer.inert = true;
-    const world = document.createElement("div");
-    world.className = "camera-world";
-    world.innerHTML = '<i></i><i></i><i></i>';
-    const track = document.createElement("div");
-    track.className = "camera-move-frame";
-    track.dataset.direction = backwards ? "back" : "forward";
-    const decorations = document.createElement('style');
-    const rules = [];
-    let pageNode = 0;
-    const frozenStyle = computed => Array.from(computed, property =>
-      `${property}:${computed.getPropertyValue(property)};`).join('');
-    const snapshot = (sourceRoot, scrollTop) => {
-      const scene = document.createElement("div");
-      scene.className = "camera-move-view";
-      const copy = sourceRoot.cloneNode(true);
-      const sources = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
-      const copies = [copy, ...copy.querySelectorAll('*')];
-      const hasLayout = sourceRoot.getBoundingClientRect().width > 0;
-      sources.forEach((source, index) => {
-        const target = copies[index];
-        const computed = getComputedStyle(source);
-        target.style.cssText = frozenStyle(computed);
-        target.style.setProperty('animation', 'none', 'important');
-        target.style.setProperty('transition', 'none', 'important');
-        if (hasLayout) {
-          let id;
-          for (const pseudo of ['::before', '::after']) {
-            const style = getComputedStyle(source, pseudo);
-            if (!style.content || style.content === 'none' || style.content === 'normal') continue;
-            if (id === undefined) {
-              id = pageNode++;
-              target.dataset.pageNode = id;
-            }
-            rules.push(`.camera-move [data-page-node="${id}"]${pseudo}{${frozenStyle(style)}animation:none!important;transition:none!important;}`);
-          }
-        }
-        if (source instanceof HTMLImageElement) {
-          target.removeAttribute('srcset');
-          target.removeAttribute('sizes');
-          target.src = source.currentSrc || source.src;
-          target.loading = 'eager';
-        }
-      });
-      copy.removeAttribute("id");
-      copy.classList.add("camera-move-copy");
-      copy.style.transform = `translateY(${-scrollTop}px)`;
-      copy.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
-      copy.querySelectorAll(".overlay, .camera-move").forEach(node => node.remove());
-      scene.append(copy);
-      sources.forEach((source, index) => {
-        copies[index].scrollLeft = source.scrollLeft;
-        copies[index].scrollTop = source.scrollTop;
-      });
-      return scene;
-    };
-    const origin = snapshot(container, window.scrollY);
-    layer.append(decorations, world, track);
-    document.body.append(layer);
-    container.classList.add("camera-running");
-    let animation, worldAnimation, cleanupTimer;
-    const previousVisibility = container.style.visibility;
-    const cleanup = () => {
-      clearTimeout(cleanupTimer);
-      container.style.visibility = previousVisibility;
-      container.classList.remove("camera-running");
-      layer.remove();
-      if (cancelPageTurn === cancel) cancelPageTurn = null;
-    };
-    const cancel = () => { animation?.cancel(); worldAnimation?.cancel(); cleanup(); };
-    cancelPageTurn = cancel;
-    return () => {
-      // El destino puede traer revelados propios (láminas, figuras, cabeceras). La
-      // cámara ya es su transición de entrada: los llevamos a su fotograma final antes
-      // de fotografiarlo para que nada viaje invisible y aparezca de golpe al terminar.
-      for (const effect of container.getAnimations?.({ subtree: true }) || []) {
-        try { effect.finish(); } catch (_) { /* Una animación infinita no tiene final. */ }
-      }
-      const destination = snapshot(container, window.scrollY);
-      decorations.textContent = rules.join('\n');
-      if (backwards) track.append(destination, origin);
-      else track.append(origin, destination);
-      // La navegación común pertenece al mundo, no a una de sus habitaciones. Si está
-      // en ambos extremos queda quieta mientras el contenido se desplaza detrás.
-      const originNav = origin.querySelector('.home-nav');
-      const destinationNav = destination.querySelector('.home-nav');
-      if (originNav && destinationNav) {
-        originNav.remove();
-        destinationNav.remove();
-        destinationNav.classList.add('camera-fixed-nav');
-        layer.append(destinationNav);
-      }
-      container.style.visibility = "hidden";
-      // Deliberadamente lo más simple posible: un único `translate3d` en X, una sola
-      // curva de frenado estándar (sin cola larga ni rebote), sin profundidad ni escala.
-      // Las versiones anteriores (con Z, escala y curvas de dos tramos) se seguían
-      // sintiendo con tirones en un móvil real -tanto una curva con una cola de frenado
-      // muy suave como el coste de animar varias propiedades a la vez pueden leerse como
-      // "rebote"-, así que esto prioriza que sea barato de componer y llegue una sola
-      // vez, sin vuelta, por encima de parecer más cinematográfico.
-      const duration = 480;
-      const start = backwards ? -100 : 0;
-      const end = backwards ? 0 : -100;
-      animation = track.animate([
-        { transform: `translate3d(${start}vw,0,0)` },
-        { transform: `translate3d(${end}vw,0,0)` }
-      ], { duration, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" });
-      worldAnimation = world.animate([
-        { transform: `translate3d(${backwards ? -3 : 3}vw,0,0)` },
-        { transform: `translate3d(${backwards ? 3 : -3}vw,0,0)` }
-      ], { duration, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" });
-      animation.finished.then(cleanup, cleanup);
-      cleanupTimer = setTimeout(cleanup, duration + 180);
-    };
-  }
-
   // Pinta y decide dónde queda el foco:
   //
   // - Al cambiar de pantalla, en su titular. Así el lector lee dónde está, y quien usa
@@ -414,22 +272,17 @@
   // sorpresa desagradable.
   function paint(container, html, screen) {
     cancelDeal?.();
-    cancelPageTurn?.();
-    cancelProfileRoll?.();
+    cancelSurfaceMotions(container);
     const previousDepth = preparationDepth[paint.screen];
     const nextDepth = preparationDepth[screen];
     const changed = paint.screen !== screen;
+    const quietPrimaryNavigation = primaryNavigationActive();
     const closingEncyclopedia = paint.screen === "enciclopedia" && changed;
     const encyclopediaBackground = closingEncyclopedia
       ? container.querySelector(`.enc-background[data-background-screen="${screen}"]`)
       : null;
-    const preparationTurn = changed && previousDepth !== undefined && (nextDepth !== undefined || gameScreens.has(screen));
-    const firstReveal = firstLocalReveal && paint.screen === "pass" && screen === "game";
     if (changed) resultPreview = null;
     const backwards = nextDepth !== undefined && nextDepth < previousDepth;
-    const launchCamera = preparationTurn || firstReveal ? moveCamera(container, backwards) : null;
-    if (screen === "pass" && paint.screen === "setup") firstLocalReveal = true;
-    else if (changed && screen !== "pass") firstLocalReveal = false;
     container.dataset.screen = screen;
     olvidaDialogos(container);
     const activo = document.activeElement;
@@ -458,19 +311,22 @@
     // otros: las imágenes permanecen decodificadas y no aparece un fotograma oscuro.
     if (encyclopediaBackground) container.replaceChildren(...encyclopediaBackground.childNodes);
     else container.innerHTML = html;
+    // Una instantánea de Enciclopedia puede contener una clase de entrada activa:
+    // es estado transitorio del nodo original, no del fondo restaurado.
+    container.querySelectorAll('.motion-entering').forEach(node => node.classList.remove('motion-entering'));
+    // Los menús también se repintan al abrir una opción: su cabecera no debe volver
+    // a animarse en cada repintado de la misma pantalla.
+    container.querySelectorAll(':scope > .shell').forEach(node => node.classList.add('motion-managed'));
     window.CONTINUUM.UI?.mount(container, screen);
-    if (!primero && cambioDePantalla) {
+    if (!primero && cambioDePantalla && !quietPrimaryNavigation) {
       const kind = ['winner', 'online-winner', 'solo-end', 'comp-end'].includes(screen) ? 'end'
         : ['pass', 'pulse-pass', 'comp-intro', 'tournament-intro', 'online-competition-intro'].includes(screen) ? 'turn'
         : vuelve || (nextDepth !== undefined && nextDepth < previousDepth) ? 'back' : 'page';
       window.CONTINUUM.Effects?.transition?.(kind);
     }
-    // La entrada visual se limita a cambios de pantalla: una jugada repinta la mesa
-    // muchas veces y no debe convertir cada toque en una animación. Durante un giro de
-    // cámara esta clase igualmente se añade (por si la cámara no llega a lanzarse, por
-    // ejemplo con movimiento reducido), pero `.camera-running` anula su animación propia
-    // para que no compitan las dos a la vez.
-    if (!primero && cambioDePantalla && !closingEncyclopedia) {
+    // Solo los cambios de pantalla entran de nuevo; repintar una jugada conserva
+    // la mesa estable. El controlador común toma posesión tras restaurar el foco.
+    if (!primero && cambioDePantalla && screen !== "enciclopedia") {
       container.firstElementChild?.classList.add("screen-enter");
       if (vuelve || backwards) container.firstElementChild?.classList.add("screen-return");
     }
@@ -508,9 +364,7 @@
         wrap.scrollLeft += target.left - frame.left - (frame.width - target.width) / 2;
       }
     }
-    // La vista de destino se fotografía después de recuperar su posición vertical y
-    // horizontal. Así el viaje termina exactamente donde continuará el jugador.
-    launchCamera?.();
+    if (quietPrimaryNavigation && !primaryNavigationMotion?.dialog) primaryNavigationMotion = null;
     if (primero) return;
     if (cambioDePantalla) {
       // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil
@@ -524,7 +378,7 @@
       // reajustarlo a cero al terminar el layout. Por eso, cuando hay un regreso guardado,
       // reafirmamos siempre la posición aunque en este instante parezca coincidir.
       if (regreso || conservaFondo || window.scrollY !== top || window.scrollX !== 0) restoreWindowPosition(top);
-      if (screen === "perfil") unrollProfile(container);
+      if (screen !== "enciclopedia") unrollSheet(container.firstElementChild, false, true);
       return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que
@@ -568,7 +422,7 @@
   }
 
   function openDialog(overlay, cerrable, onClose) {
-    if (!overlay) return;
+    if (!overlay || pila.some(dialog => dialog.overlay === overlay)) return;
     // Enseñar primero la carta colocada. La capa transparente bloquea otra jugada
     // mientras el foco espera aquí; el diálogo y su revelado arrancan al terminar.
     const id = overlay.dataset.resultCard;
@@ -673,11 +527,16 @@
       }
     }
     const compact = window.CONTINUUM.UI?.compactResult?.(overlay);
-    if (!pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
+    const quietPrimaryNavigation = primaryNavigationActive();
+    if (quietPrimaryNavigation) primaryNavigationMotion = null;
+    if (!quietPrimaryNavigation && !pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
     const modal = overlay.querySelector(".modal") || overlay;
     window.CONTINUUM.UI?.reveal(modal);
     const openingFocus = document.activeElement;
     window.CONTINUUM.UI?.openSurface(modal);
+    // Marcar y arrancar el desenrollado antes de activar `dialog-enter` evita que el
+    // navegador llegue a pintar primero la animación CSS y después la animación JS.
+    const cancelRoll = unrollSheet(modal, false, true);
     overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", compact ? "false" : "true");
@@ -711,7 +570,6 @@
       else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
     }
     document.addEventListener("keydown", onKey);
-    const cancelRoll = modal.classList.contains('rules') ? unrollSheet(modal) : null;
     pila.push({ overlay, previo, onKey, cerrable, cancelRoll, onClose });
   }
 

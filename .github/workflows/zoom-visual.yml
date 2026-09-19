@@ -12,6 +12,7 @@ on:
       - 'effects.js'
       - '*.css'
       - 'tests/zoom-browser.mjs'
+      - 'tests/transitions-browser.mjs'
       - '.github/workflows/zoom-visual.yml'
   pull_request:
     paths: ['mapa.js', '*.css', 'tests/zoom-browser.mjs', '.github/workflows/zoom-visual.yml']
@@ -31,9 +32,12 @@ jobs:
           ln -s "$RUNNER_TEMP/zoom-browser/node_modules" node_modules
       - run: npx playwright install --with-deps webkit chromium
       - run: node tests/zoom-browser.mjs
+      - run: node tests/transitions-browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: zoom-mobile-measurements
-          path: test-results/zoom/
+          path: |
+            test-results/zoom/
+            test-results/transitions/
           retention-days: 7

@@ -3043,7 +3043,7 @@
     else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
     else if (action === "home") home();
     else if (action === "back-menu") backMenu();
-    else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "instant" }); }
     else if (action === "home-encyclopedia") openEnciclopedia("all");
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
     else if (action === "set-mode") openMode(target.dataset.mode);

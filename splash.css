@@ -13,7 +13,7 @@ html.splash-active #app-splash {
   background: #e9dcc3 url("assets/continuum-splash-clean-v3.webp") center / cover no-repeat;
   opacity: 1;
   isolation: isolate;
-  transition: opacity 1100ms cubic-bezier(.4, .08, .4, .94);
+  transition: opacity 420ms cubic-bezier(.22,.61,.36,1);
 }
 /* Un velo muy ligero reserva contraste para la marca sin borrar la textura. */
 html.splash-active #app-splash::before {
@@ -129,13 +129,12 @@ html.splash-active #app-splash.splash-exit .splash-masthead,
 html.splash-active #app-splash.splash-exit .splash-actions,
 html.splash-active #app-splash.splash-exit .splash-sound,
 html.splash-active #app-splash.splash-exit .splash-status { opacity: 0; }
-html.splash-active #app-splash.splash-exit .splash-masthead { transform: translate(-50%, -50%) scale(1.035); }
-html.splash-active #app-splash .splash-masthead { transition: opacity 560ms ease-out, transform 1100ms cubic-bezier(.4, .08, .4, .94); }
+html.splash-active #app-splash .splash-masthead { transition: opacity 420ms cubic-bezier(.22,.61,.36,1); }
 html.splash-active #app-splash .splash-actions,
 html.splash-active #app-splash .splash-sound,
 html.splash-active #app-splash .splash-status { transition: opacity 460ms ease-out; }
 
-#app.app-arrive { animation: app-arrive 1400ms cubic-bezier(.4, .08, .4, .94) both; }
+#app.app-arrive { animation: app-arrive 420ms cubic-bezier(.22,.61,.36,1) backwards; }
 @keyframes app-arrive { from { opacity: 0; } to { opacity: 1; } }
 
 html.splash-active #app-splash .splash-masthead {
