@@ -51,8 +51,8 @@ window.LANGUAGE_CARDS = [
   { id: 14026, value: 43900000, title: "Hausa", detail: "Lengua del norte de Nigeria y del sur de Níger, y la lengua del comercio en buena parte del Sahel." },
   { id: 14027, value: 43600000, title: "Indonesio", detail: "Una variedad estandarizada del malayo, adoptada como lengua nacional por un país con centenares de lenguas propias." },
   { id: 14028, value: 40000000, title: "Polaco", detail: "La lengua eslava occidental con más hablantes, y casi todos en un solo país." },
-  { id: 14029, value: 37100000, title: "Malayálam", detail: "La lengua del estado indio de Kerala. Escrito en alfabeto latino, su nombre se lee igual del derecho y del revés." },
-  { id: 14030, value: 34500000, title: "Oriya", detail: "La lengua de Odisha, en la costa oriental de la India." },
+  { id: 14029, value: 37100000, title: "Malayálam", detail: "La lengua del estado indio de Kerala. Su nombre, escrito en alfabeto latino, se lee igual del derecho y del revés; la lengua usa su propia escritura." },
+  { id: 14030, value: 34500000, title: "Odia", detail: "La lengua de Odisha, en la costa oriental de la India; también se conoce por el nombre antiguo de oriya." },
   { id: 14031, value: 33900000, title: "Maithili", detail: "Se habla a los dos lados de la frontera, en el norte de la India y en el sur de Nepal." },
   { id: 14032, value: 33000000, title: "Birmano", detail: "Oficial de Birmania. Se escribe con un alfabeto de letras redondeadas heredado de las escrituras del sur de la India." },
   { id: 14033, value: 32600000, title: "Panyabí", detail: "El panyabí oriental, el de la India, que se escribe en alfabeto gurmují. Las variedades del oeste de Pakistán van aparte, en la carta del lahnda." },
@@ -65,9 +65,12 @@ window.LANGUAGE_CARDS = [
   { id: 14040, value: 5500000, title: "Danés", detail: "Un danés lee el noruego y el sueco con relativa soltura; entenderlos hablados, y que le entiendan, ya cuesta bastante más." },
   { id: 14041, value: 5400000, title: "Finés", detail: "No es una lengua indoeuropea: pertenece a la familia urálica, como el estonio y, de mucho más lejos, el húngaro." },
   { id: 14042, value: 5200000, title: "Eslovaco", detail: "Tan cercano al checo que quien habla uno entiende al otro sin haberlo estudiado nunca." },
+  { id: 14048, value: 4100000, title: "Catalán", detail: "Lengua románica del Mediterráneo occidental, cooficial en Cataluña y las islas Baleares; en la Comunidad Valenciana recibe el nombre de valenciano." },
   { id: 14043, value: 3000000, title: "Lituano", detail: "Conserva más rasgos del indoeuropeo antiguo que ninguna otra lengua viva de Europa, lo que la hace muy valiosa para los lingüistas." },
   { id: 14044, value: 2400000, title: "Gallego", detail: "Cooficial en Galicia. Comparte origen con el portugués: los dos vienen del galaicoportugués medieval." },
   { id: 14045, value: 570000, title: "Maltés", detail: "La única lengua semítica oficial de la Unión Europea, y la única que se escribe habitualmente en alfabeto latino." },
+  { id: 14049, value: 480000, title: "Euskera", detail: "Lengua no indoeuropea, sin parentesco demostrado con ninguna otra lengua viva; se habla a ambos lados de los Pirineos occidentales." },
   { id: 14046, value: 390000, title: "Islandés", detail: "Ha cambiado tan poco en mil años que un islandés de hoy puede leer las sagas medievales sin traducción." },
-  { id: 14047, value: 69000, title: "Feroés", detail: "La lengua de las islas Feroe, en mitad del Atlántico norte. Es la carta con menos hablantes del mazo." }
+  { id: 14047, value: 69000, title: "Feroés", detail: "La lengua de las islas Feroe, en mitad del Atlántico norte." },
+  { id: 14050, value: 25000, title: "Aragonés", detail: "Lengua románica pirenaica de Aragón, conservada sobre todo en los valles del norte de la comunidad." }
 ];

@@ -8067,6 +8067,48 @@
       }
     },
     {
+      "path": "assets/language-cards/14048.webp",
+      "sha256": "94cc362796c609a7c2ef111bc81074deef3eb180753ff9b23fd2edb86b2140e8",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "docs/procedencia-idiomas.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-09-19",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/language-cards/14049.webp",
+      "sha256": "04602c6c91c668b53ebb74892c89a133286cec6716419f6aaacb7c3eee103bad",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "docs/procedencia-idiomas.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-09-19",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/language-cards/14050.webp",
+      "sha256": "41e3113898a821f49ab157e6d4d547ca9a0b7658a3969ce63e0a605873c2091e",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "docs/procedencia-idiomas.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-09-19",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/medicine-cards/4015-las-primeras-gafas-fecha-aproximada.webp",
       "sha256": "34f65fdc82197f2f4c82e59f761eb786742bf6e60a80898268334fbf02811148",
       "rightsEvidence": null

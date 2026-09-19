@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v246";
+const CACHE = "continuum-v248";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -165,7 +165,57 @@ const ASSETS = [
   "./assets/population-cards/3074.webp",
   "./assets/population-cards/3075.webp",
   "./assets/population-cards/3076.webp",
-  "./assets/population-cards/3077.webp"
+  "./assets/population-cards/3077.webp",
+  "./assets/language-cards/14001.webp",
+  "./assets/language-cards/14002.webp",
+  "./assets/language-cards/14003.webp",
+  "./assets/language-cards/14004.webp",
+  "./assets/language-cards/14005.webp",
+  "./assets/language-cards/14006.webp",
+  "./assets/language-cards/14007.webp",
+  "./assets/language-cards/14008.webp",
+  "./assets/language-cards/14009.webp",
+  "./assets/language-cards/14010.webp",
+  "./assets/language-cards/14011.webp",
+  "./assets/language-cards/14012.webp",
+  "./assets/language-cards/14013.webp",
+  "./assets/language-cards/14014.webp",
+  "./assets/language-cards/14015.webp",
+  "./assets/language-cards/14016.webp",
+  "./assets/language-cards/14017.webp",
+  "./assets/language-cards/14018.webp",
+  "./assets/language-cards/14019.webp",
+  "./assets/language-cards/14020.webp",
+  "./assets/language-cards/14021.webp",
+  "./assets/language-cards/14022.webp",
+  "./assets/language-cards/14023.webp",
+  "./assets/language-cards/14024.webp",
+  "./assets/language-cards/14025.webp",
+  "./assets/language-cards/14026.webp",
+  "./assets/language-cards/14027.webp",
+  "./assets/language-cards/14028.webp",
+  "./assets/language-cards/14029.webp",
+  "./assets/language-cards/14030.webp",
+  "./assets/language-cards/14031.webp",
+  "./assets/language-cards/14032.webp",
+  "./assets/language-cards/14033.webp",
+  "./assets/language-cards/14034.webp",
+  "./assets/language-cards/14035.webp",
+  "./assets/language-cards/14036.webp",
+  "./assets/language-cards/14037.webp",
+  "./assets/language-cards/14038.webp",
+  "./assets/language-cards/14039.webp",
+  "./assets/language-cards/14040.webp",
+  "./assets/language-cards/14041.webp",
+  "./assets/language-cards/14042.webp",
+  "./assets/language-cards/14043.webp",
+  "./assets/language-cards/14044.webp",
+  "./assets/language-cards/14045.webp",
+  "./assets/language-cards/14046.webp",
+  "./assets/language-cards/14047.webp",
+  "./assets/language-cards/14048.webp",
+  "./assets/language-cards/14049.webp",
+  "./assets/language-cards/14050.webp"
 ];
 
 // Las seis canciones —27 MB— tampoco entran en la instalación. La música es un ajuste

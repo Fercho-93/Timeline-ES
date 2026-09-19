@@ -91,6 +91,11 @@ console.log("\nService worker");
     .map(file => `./assets/population-cards/${file}`);
   const populationNoPrecargadas = populationAssets.filter(file => !cachedAssets.has(file));
   ok(`las ${populationAssets.length} ilustraciones de población sí se precargan al instalar${populationNoPrecargadas.length ? ` (faltan ${populationNoPrecargadas.join(", ")})` : ""}`, !populationNoPrecargadas.length);
+  const languageAssets = fs.readdirSync(path.join(REPO, "assets", "language-cards"))
+    .filter(file => file.endsWith(".webp"))
+    .map(file => `./assets/language-cards/${file}`);
+  const languageNoPrecargadas = languageAssets.filter(file => !cachedAssets.has(file));
+  ok(`las ${languageAssets.length} ilustraciones de idiomas sí se precargan al instalar${languageNoPrecargadas.length ? ` (faltan ${languageNoPrecargadas.join(", ")})` : ""}`, !languageNoPrecargadas.length);
   // Lo mismo con las seis canciones —27 MB de un ajuste que viene apagado—: instalar no
   // las baja, pero quedan guardadas para poder sonar sin conexión.
   const musica = Array.from({ length: 6 }, (unused, i) => `./assets/audio/v${i + 1}.mp3`);

@@ -1,6 +1,6 @@
 # Procedencia de las láminas de Idiomas
 
-Las 47 láminas del mazo **Voces del mundo** se generaron el 14 de septiembre de 2026
+Las 50 láminas del mazo **Voces del mundo** se generaron el 14 y el 19 de septiembre de 2026
 con la herramienta integrada de generación de imágenes de OpenAI para este repositorio.
 No se emplearon imágenes de referencia externas.
 
@@ -46,7 +46,7 @@ pseudoescritura y caricaturas.
 | 14027 | Indonesio | Viajeros hablando en un puerto insular |
 | 14028 | Polaco | Encuentro invernal en una plaza de Cracovia |
 | 14029 | Malayálam | Familia conversando en una barca de Kerala |
-| 14030 | Oriya | Artesanos conversando en Odisha |
+| 14030 | Odia | Artesanos conversando en Odisha |
 | 14031 | Maithili | Cantores reunidos en un patio fronterizo |
 | 14032 | Birmano | Conversación en una casa de té de Rangún |
 | 14033 | Panyabí | Familia hablando durante la cosecha |
@@ -64,6 +64,9 @@ pseudoescritura y caricaturas.
 | 14045 | Maltés | Conversación familiar en un puerto de piedra caliza |
 | 14046 | Islandés | Anciano narrando una saga junto al hogar |
 | 14047 | Feroés | Comunidad pesquera conversando ante los acantilados |
+| 14048 | Catalán | Familia y vecinos conversando en una plaza de piedra mediterránea |
+| 14049 | Euskera | Familia y narrador conversando en un caserío de las montañas vascas |
+| 14050 | Aragonés | Anciano contando historias en un pueblo pirenaico de Aragón |
 
 La primera versión de la lámina 14022 se descartó durante la revisión porque contenía
 marcas que podían interpretarse como pseudoescritura. El archivo incorporado es una

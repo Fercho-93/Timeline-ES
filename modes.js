@@ -151,8 +151,8 @@
       cifra: { pregunta: "¿Cuántos hablantes tiene?", unidad: "hablantes", decimales: 0,
         unidades: [["hablantes", 1], ["mil", 1e3], ["millones", 1e6], ["millón", 1e6], ["M", 1e6]], ejemplo: "93 millones",
         pista: "Vale «93 millones» o el número entero: 93000000" },
-      // Los cortes están puestos sobre el rango real del mazo, que va del feroés (69.000)
-      // al chino mandarín (929 millones). Con estos siete tramos caen 3, 5, 10, 7, 13, 5 y
+      // Los cortes están puestos sobre el rango real del mazo, que va del aragonés (25.000)
+      // al chino mandarín (929 millones). Con estos siete tramos caen 5, 6, 10, 7, 13, 5 y
       // 4 cartas, sin ninguna banda vacía.
       bands: [
         { limit: 1000000, key: "minoritario", name: "Minoritario", symbol: "·" },

@@ -1,9 +1,9 @@
 {
   "assetsBytes": 208666624,
-  "precacheBytes": 26214400,
+  "precacheBytes": 31457280,
   "musicBytes": 27262976,
   "singleImageBytes": 819200,
   "cardWidth": 512,
   "cardHeight": 768,
-  "policy": "Arte de cartas 512×768; WebP por defecto y JPEG heredado cuando ya cumple. No añadir originales duplicados al paquete. Las seis pistas MP3 originales suman 26 MiB al límite de recursos, con límite propio de música, y no entran en la precarga de la instalación: se guardan en segundo plano al activar la versión. Presupuesto sin compresión de tienda, no tamaño final de IPA/AAB."
+  "policy": "Arte de cartas 512×768; WebP por defecto y JPEG heredado cuando ya cumple. No añadir originales duplicados al paquete. Las seis pistas MP3 originales suman 26 MiB al límite de recursos, con límite propio de música, y no entran en la precarga de la instalación: se guardan en segundo plano al activar la versión. La precarga incluye las láminas de población e idiomas para que esos mazos funcionen completos sin conexión. Presupuesto sin compresión de tienda, no tamaño final de IPA/AAB."
 }
