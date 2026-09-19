@@ -53,4 +53,52 @@ window.MUSIC_CARDS = [
   { id: 6049, year: 2017, title: "Despacito se convierte en fenómeno mundial", detail: "Luis Fonsi y Daddy Yankee llevan una canción en español al número uno de decenas de países y a cifras récord en internet." },
   { id: 6050, year: 2020, title: "Un álbum íntegramente en español lidera Billboard", detail: "El último tour del mundo de Bad Bunny es el primer álbum completamente en español que alcanza el número uno del Billboard 200." },
   { id: 6051, year: 2023, title: "The Eras Tour", detail: "Taylor Swift inicia una gira que recorre todas sus etapas discográficas y se convierte en un fenómeno cultural y económico global." }
+  ,{ id: 6052, year: 1954, title: "That’s All Right", detail: "Elvis Presley publica su primera grabación para Sun Records; la mezcla de blues, country y energía vocal se convierte en una pieza fundacional del rock and roll." }
+  ,{ id: 6053, year: 1963, title: "I Want to Hold Your Hand", detail: "The Beatles publican el sencillo que abre su conquista del mercado estadounidense y anuncia la Beatlemanía a escala mundial." }
+  ,{ id: 6054, year: 1967, title: "Respect", detail: "Aretha Franklin transforma la canción de Otis Redding en un himno de afirmación femenina y de la cultura afroamericana." }
+  ,{ id: 6055, year: 1970, title: "Your Song", detail: "Elton John y Bernie Taupin firman una balada que se convierte en una de las canciones más reconocibles del repertorio del pianista británico." }
+  ,{ id: 6056, year: 1970, title: "(They Long to Be) Close to You", detail: "The Carpenters llevan esta composición de Burt Bacharach y Hal David a lo más alto de las listas y definen su sonido pop melódico." }
+  ,{ id: 6057, year: 1971, title: "Imagine", detail: "John Lennon publica una canción de tono pacifista cuya melodía y mensaje se convierten en un símbolo internacional." }
+  ,{ id: 6058, year: 1971, title: "Jealous Guy", detail: "John Lennon publica esta confesión íntima, originalmente escrita durante las sesiones de The Beatles para el proyecto The White Album." }
+  ,{ id: 6059, year: 1972, title: "Libre", detail: "Nino Bravo graba una de sus canciones más emblemáticas, convertida después en un clásico de la canción melódica en español." }
+  ,{ id: 6060, year: 1976, title: "Dancing Queen", detail: "ABBA publica el sencillo que resume su pop bailable y alcanza un éxito internacional duradero." }
+  ,{ id: 6061, year: 1977, title: "Heroes", detail: "David Bowie publica una canción épica sobre una pareja separada por el Muro de Berlín, grabada en los Hansa Studios de la ciudad." }
+  ,{ id: 6062, year: 1978, title: "Me olvidé de vivir", detail: "Julio Iglesias populariza esta canción de tono confesional y consolida su proyección internacional en el mercado hispano." }
+  ,{ id: 6063, year: 1979, title: "Highway to Hell", detail: "AC/DC publica uno de sus grandes himnos de hard rock y el último álbum de estudio de la banda con Bon Scott como vocalista." }
+  ,{ id: 6064, year: 1979, title: "Another Brick in the Wall (Part 2)", detail: "Pink Floyd convierte este fragmento de The Wall en un éxito mundial con un coro infantil y una crítica a la educación autoritaria." }
+  ,{ id: 6065, year: 1981, title: "Como una ola", detail: "Rocío Jurado interpreta una de las canciones más populares de su repertorio, convertida en referencia de la canción española." }
+  ,{ id: 6066, year: 1982, title: "Billie Jean", detail: "Michael Jackson publica el sencillo cuyo bajo, producción y coreografía asociada se convierten en hitos del pop de los años ochenta." }
+  ,{ id: 6067, year: 1983, title: "Every Breath You Take", detail: "The Police publican una canción de apariencia romántica y letra inquietante que se convierte en su mayor éxito internacional." }
+  ,{ id: 6068, year: 1983, title: "Let’s Dance", detail: "David Bowie entra en una nueva etapa pop con una producción de Nile Rodgers y una canción que alcanza un enorme éxito comercial." }
+  ,{ id: 6069, year: 1984, title: "Dancing in the Dark", detail: "Bruce Springsteen publica el sencillo que abre Born in the U.S.A. y amplía su presencia en la radio y en MTV." }
+  ,{ id: 6070, year: 1984, title: "Hallelujah", detail: "Leonard Cohen publica esta composición de estructura bíblica y tono íntimo, que con el tiempo se convertirá en un estándar reinterpretado por numerosos artistas." }
+  ,{ id: 6071, year: 1984, title: "What’s Love Got to Do with It", detail: "Tina Turner regresa a lo más alto de las listas con una canción que relanza su carrera en solitario." }
+  ,{ id: 6072, year: 1985, title: "Take on Me", detail: "A-ha combina sintetizadores, una melodía expansiva y un videoclip de animación rotoscópica para lograr un éxito global." }
+  ,{ id: 6073, year: 1986, title: "A quién le importa", detail: "Alaska y Dinarama publican un himno de libertad individual que se convierte en una canción esencial de la cultura pop española." }
+  ,{ id: 6074, year: 1990, title: "Rayando el sol", detail: "Maná publica una de sus canciones más conocidas y fija el sonido de la banda mexicana en el pop rock latino." }
+  ,{ id: 6075, year: 1990, title: "Enjoy the Silence", detail: "Depeche Mode transforma una balada inicialmente sencilla en un clásico de la música electrónica y el pop alternativo." }
+  ,{ id: 6076, year: 1991, title: "Losing My Religion", detail: "R.E.M. combina mandolina, melodía folk y una letra ambigua en el sencillo que los convierte en estrellas internacionales." }
+  ,{ id: 6077, year: 1991, title: "Enter Sandman", detail: "Metallica abre el Black Album con un riff inmediato y una producción que lleva el heavy metal a un público masivo." }
+  ,{ id: 6078, year: 1991, title: "20 de abril", detail: "Celtas Cortos publican una carta musical de tono nostálgico que se convierte en una de las canciones más recordadas del pop rock español." }
+  ,{ id: 6079, year: 1991, title: "Smells Like Teen Spirit", detail: "Nirvana publica el sencillo que lleva el grunge de Seattle al centro de la cultura popular y del rock de los noventa." }
+  ,{ id: 6080, year: 1992, title: "I Will Always Love You", detail: "Whitney Houston interpreta la canción de Dolly Parton para la película The Bodyguard y la convierte en un éxito mundial." }
+  ,{ id: 6081, year: 1994, title: "Basket Case", detail: "Green Day lleva el punk melódico a las radios internacionales con una canción sobre la ansiedad y la vida cotidiana." }
+  ,{ id: 6082, year: 1998, title: "…Baby One More Time", detail: "Britney Spears debuta con un sencillo pop que se convierte en uno de los grandes éxitos juveniles de finales de los noventa." }
+  ,{ id: 6083, year: 1999, title: "La raja de tu falda", detail: "Estopa irrumpe con una mezcla de rumba, rock y lenguaje cotidiano que se convierte en uno de los grandes éxitos españoles de la década." }
+  ,{ id: 6084, year: 2000, title: "Yellow", detail: "Coldplay publica una canción de guitarras envolventes que presenta a la banda ante el gran público internacional." }
+  ,{ id: 6085, year: 2000, title: "In the End", detail: "Linkin Park combina rock, rap y electrónica en una canción que define el nu metal de comienzos del siglo XXI." }
+  ,{ id: 6086, year: 2002, title: "Sin ti no soy nada", detail: "Amaral publica una canción de pop rock melódico que se convierte en una de las piezas más reconocibles del dúo zaragozano." }
+  ,{ id: 6087, year: 2002, title: "Lose Yourself", detail: "Eminem publica para la película 8 Mile una canción de rap sobre la presión y la oportunidad que gana el Óscar a mejor canción original." }
+  ,{ id: 6088, year: 2003, title: "Crazy in Love", detail: "Beyoncé inicia su carrera solista con una producción de pop y R&B impulsada por un sample de soul y la colaboración de Jay-Z." }
+  ,{ id: 6089, year: 2008, title: "I Kissed a Girl", detail: "Katy Perry alcanza el número uno con un sencillo provocador que la sitúa en el centro del pop internacional." }
+  ,{ id: 6090, year: 2010, title: "Baby", detail: "Justin Bieber consolida su salto al estrellato adolescente con una canción pop producida junto a Ludacris." }
+  ,{ id: 6091, year: 2010, title: "Firework", detail: "Katy Perry publica un himno pop de afirmación personal que alcanza un éxito mundial sostenido." }
+  ,{ id: 6092, year: 2011, title: "The A Team", detail: "Ed Sheeran presenta una canción acústica de narración social que se convierte en su primer gran éxito internacional." }
+  ,{ id: 6093, year: 2012, title: "Payphone", detail: "Maroon 5 mezcla pop, soul y hip-hop en un sencillo de gran difusión internacional junto a Wiz Khalifa." }
+  ,{ id: 6094, year: 2012, title: "Let Her Go", detail: "Passenger convierte una canción acústica y melancólica en un éxito mundial impulsado por la radio y las plataformas digitales." }
+  ,{ id: 6095, year: 2013, title: "Riptide", detail: "Vance Joy combina ukelele, folk y una melodía luminosa en una canción que se transforma en éxito internacional." }
+  ,{ id: 6096, year: 2016, title: "Say You Won’t Let Go", detail: "James Arthur regresa a las listas con una balada de amor que se convierte en su mayor éxito comercial." }
+  ,{ id: 6097, year: 2017, title: "Havana", detail: "Camila Cabello mezcla pop, ritmos latinos y una referencia a su ciudad natal en el sencillo que impulsa su carrera solista." }
+  ,{ id: 6098, year: 2020, title: "Levitating", detail: "Dua Lipa lleva el pop disco de Future Nostalgia a las listas internacionales y convierte la canción en uno de sus mayores éxitos." }
+  ,{ id: 6099, year: 2022, title: "As It Was", detail: "Harry Styles publica una canción de synth pop melancólico que domina las listas internacionales y abre su tercer álbum en solitario." }
 ];
