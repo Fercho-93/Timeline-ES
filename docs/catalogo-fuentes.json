@@ -11149,7 +11149,7 @@
     {
       "file": "idiomas.js",
       "id": 14030,
-      "title": "Oriya",
+      "title": "Odia",
       "value": 34500000,
       "source": null,
       "reviewStatus": null,
@@ -11321,6 +11321,36 @@
       "id": 14047,
       "title": "Feroés",
       "value": 69000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14048,
+      "title": "Catalán",
+      "value": 4100000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14049,
+      "title": "Euskera",
+      "value": 480000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
+      "id": 14050,
+      "title": "Aragonés",
+      "value": 25000,
       "source": null,
       "reviewStatus": null,
       "comparison": null,

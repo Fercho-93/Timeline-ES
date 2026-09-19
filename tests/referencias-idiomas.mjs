@@ -7,7 +7,7 @@ const window = {};
 vm.runInNewContext(fs.readFileSync("idiomas.js", "utf8"), { window });
 
 const cards = window.LANGUAGE_CARDS;
-assert.equal(cards.length, 47, "El mazo de idiomas debe conservar sus 47 cartas");
+assert.equal(cards.length, 50, "El mazo de idiomas debe conservar sus 50 cartas");
 
 const dimensions = file => {
   const data = fs.readFileSync(file).subarray(0, 40);

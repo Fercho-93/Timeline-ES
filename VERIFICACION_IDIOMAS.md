@@ -10,15 +10,15 @@ El mazo mezcla dos procedencias, y eso hay que saberlo antes de usarlo:
    cita **Ethnologue 2022**, en millones y con un decimal. La tabla de las 50 lenguas con más
    hablantes nativos la aportó el autor del repositorio, y las cifras se copian sin retocar:
    `92,7` millones se guarda como `92700000`.
-2. **Las 8 lenguas por debajo de los seis millones** —danés, finés, eslovaco, lituano, gallego,
-   maltés, islandés y feroés— no están en esa lista, que se corta en los 24 millones. Son cifras
-   aproximadas aportadas aparte, redondeadas al millar, y **no comparten corte temporal con el
-   resto del mazo**.
+2. **Las 11 lenguas por debajo de los seis millones** —danés, finés, eslovaco, catalán, lituano,
+   gallego, maltés, euskera, islandés, feroés y aragonés— no están en esa lista, que se corta en
+   los 24 millones. Son cifras aproximadas aportadas aparte, redondeadas al millar, y **no
+   comparten un único corte temporal con el resto del mazo**.
 
-**Por qué se acepta la mezcla.** Sin esas ocho cartas el mazo empieza en los 24 millones y se
+**Por qué se acepta la mezcla.** Sin esas once cartas el mazo empieza en los 24 millones y se
 queda sin cola: son las que hacen de Ciudad del Vaticano de esta línea, igual que en el mazo de
 población. La alternativa era un mazo homogéneo pero mocho. Se asume la mezcla y se declara aquí
-en lugar de disimularla presentando las 47 cifras como si vinieran del mismo sitio.
+en lugar de disimularla presentando las 50 cifras como si vinieran del mismo sitio.
 
 **Lo que esta fuente no es.** Ninguna de las dos es una fuente oficial. La única tabla con método
 y fecha únicos para todas las lenguas es el conjunto de datos de Ethnologue, que se vende y cuyo
@@ -68,13 +68,13 @@ aparece en esta tabla porque ya se había caído antes por empatar con el corean
 
 ## Resultado
 
-- **47 cartas**, del chino mandarín (929,0 millones) al feroés (69.000 hablantes).
-- 47 identificadores, títulos y valores únicos, sin choque con los otros catorce mazos.
-- Siete bandas, todas con cartas: Minoritario (3), Pequeño (5), Medio (10), Grande (7), Muy grande
+- **50 cartas**, del chino mandarín (929,0 millones) al aragonés (25.000 hablantes).
+- 50 identificadores, títulos y valores únicos, sin choque con los otros catorce mazos.
+- Siete bandas, todas con cartas: Minoritario (5), Pequeño (6), Medio (10), Grande (7), Muy grande
   (13), Gigante (5) y Colosal (4).
 - Las cifras de millones se muestran con el decimal de la fuente —«82,2 millones»— en vez de
   redondear a la unidad como hacen superficie y población, porque aquí el decimal es lo único que
-  separa algunas cartas. Por debajo del millón la carta da la cifra exacta: «69.000 hablantes».
+  separa algunas cartas. Por debajo del millón la carta da la cifra exacta: «25.000 hablantes».
 
 ## Cómo se eligieron
 
@@ -95,8 +95,8 @@ Ninguna cifra se ha modificado para deshacer un empate.
 
 ### Consecuencia, dicha con claridad
 
-Sin la regla del 8 %, **27 de las 46 parejas contiguas están a menos de un 8 %** y tres a menos
-de medio punto:
+Sin la regla del 8 %, **27 de las 46 parejas contiguas están a menos de un 8 %**, calculado sobre
+la cifra menor de cada pareja, y tres a menos de medio punto:
 
 | Separación | Pareja |
 |---|---|
@@ -122,15 +122,20 @@ bajaron de 34 a 27, porque buena parte del apelotonamiento estaba entre esas och
 - **Sindhi (24,6):** la tabla lo nombra «sindi». Mismo caso.
 - **Chino yue (85,2):** la carta añade «cantonés» entre paréntesis, que es como lo conoce quien
   juega. Mismo criterio que en «Francia (ámbito ONU)» en el mazo de población.
-- **Gallego (2,4 millones):** cooficial en Galicia. Es la única lengua de España en el mazo; el
-  español entra por su propio peso mundial, no por esa vía.
-- **Feroés (69.000):** la carta más pequeña del mazo, y la que fija el extremo inferior de la
-  línea.
+- **Gallego (2,4 millones):** cooficial en Galicia. Comparte origen con el portugués: los dos
+  vienen del galaicoportugués medieval.
+- **Catalán (4,1 millones):** estimación de hablantes de primera lengua de Ethnologue 2021,
+  incorporada como carta de cola y no como una actualización de toda la serie.
+- **Euskera (480.000):** aproximación a partir de la encuesta sociolingüística de 2021, sumando
+  hablantes nativos y bilingües de origen en los territorios vascófonos.
+- **Aragonés (25.000):** estimación de hablantes cotidianos de Aragón 3L; es la carta más pequeña
+  del mazo y fija el extremo inferior de la línea.
+- **Feroés (69.000):** queda justo por encima del aragonés en el extremo inferior de la línea.
 
 ## Lo que este mazo no acredita
 
 Que una carta lleve una cifra no significa que esa cifra esté verificada contra la publicación
-original de Ethnologue: se ha copiado de una recopilación, y las ocho lenguas pequeñas ni siquiera
-proceden de ella. Si algún día se consigue el conjunto de datos original, hay que contrastar las
-47 cifras una por una —y unificar el corte temporal de la cola— y dejar constancia aquí, no darlo
-por hecho.
+original de Ethnologue: se ha copiado de una recopilación, y las once lenguas pequeñas no
+comparten una única procedencia ni un único corte temporal. Si algún día se consigue el conjunto
+de datos original, hay que contrastar las 50 cifras una por una —y unificar el corte temporal de
+la cola— y dejar constancia aquí, no darlo por hecho.
