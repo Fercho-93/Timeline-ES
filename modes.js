@@ -766,7 +766,21 @@
     6042: "ipod", 6043: "itunes-store", 6044: "youtube-music-video",
     6045: "in-rainbows", 6046: "spotify", 6047: "21-album",
     6048: "gangnam-style", 6049: "despacito", 6050: "last-tour-world",
-    6051: "eras-tour"
+    6051: "eras-tour",
+    6052: "thats-all-right", 6053: "i-want-to-hold-your-hand", 6054: "respect",
+    6055: "your-song", 6056: "close-to-you", 6057: "imagine", 6058: "jealous-guy",
+    6059: "libre", 6060: "dancing-queen", 6061: "heroes", 6062: "me-olvide-de-vivir",
+    6063: "highway-to-hell", 6064: "another-brick-in-the-wall", 6065: "como-una-ola",
+    6066: "billie-jean", 6067: "every-breath-you-take", 6068: "lets-dance",
+    6069: "dancing-in-the-dark", 6070: "hallelujah", 6071: "whats-love-got-to-do-with-it",
+    6072: "take-on-me", 6073: "a-quien-le-importa", 6074: "rayando-el-sol",
+    6075: "enjoy-the-silence", 6076: "losing-my-religion", 6077: "enter-sandman",
+    6078: "20-de-abril", 6079: "smells-like-teen-spirit", 6080: "i-will-always-love-you",
+    6081: "basket-case", 6082: "baby-one-more-time", 6083: "la-raja-de-tu-falda",
+    6084: "yellow", 6085: "in-the-end", 6086: "sin-ti-no-soy-nada", 6087: "lose-yourself",
+    6088: "crazy-in-love", 6089: "i-kissed-a-girl", 6090: "baby", 6091: "firework",
+    6092: "the-a-team", 6093: "payphone", 6094: "let-her-go", 6095: "riptide",
+    6096: "say-you-wont-let-go", 6097: "havana", 6098: "levitating", 6099: "as-it-was"
   };
 
   // Láminas del mazo de Historia mundial, enlazadas por el ID de cada acontecimiento.
