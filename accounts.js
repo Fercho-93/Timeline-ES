@@ -163,6 +163,13 @@ function schedule(key) {
   change++;setMeta(true);clearTimeout(timer);
   timer=setTimeout(() => flush().catch(e => { if (!failedConflict) syncNotice(message(e)); }),2000);
 }
+// `navigator.onLine` no es de fiar: en Chrome para Android dice "conectado" en cuanto
+// el Wi-Fi está encendido, aunque sea el propio punto de acceso sin salida a internet
+// —así que un móvil que crea el hotspot lo ve como "con conexión" y nunca entra por
+// aquí. Lo que sí es de fiar es el error que ha devuelto de verdad Firebase al
+// intentarlo: estos códigos son justo los que `message()` ya reconoce como "sin red".
+const NETWORK_ERROR_CODES = ['auth/network-request-failed', 'unavailable', 'deadline-exceeded', 'auth/timeout'];
+function isNetworkError(error) { return !navigator.onLine || NETWORK_ERROR_CODES.includes(error?.code); }
 // Sin internet no hay invitado ni progreso en la nube que abrir, pero el resto del
 // juego —incluido el modo sin conexión— no necesita ninguno de los dos: entra igual,
 // sin cuenta, tal como ya hace boot.js cuando accounts.js ni siquiera llega a
@@ -178,7 +185,7 @@ async function enter() {
   if (!u) {
     try { u=(await signInAnonymously(auth)).user; }
     catch(error) {
-      if (!navigator.onLine) { offlineFallback(); return; }
+      if (isNetworkError(error)) { offlineFallback(); return; }
       shell('<p>No hemos podido crear tu invitado. Conéctate a internet y vuelve a intentarlo.</p><button class="btn btn-primary" id="account-load">Reintentar</button>');
       feedback(message(error));button('account-load',enter);return;
     }
@@ -206,7 +213,7 @@ async function enter() {
     if (!active) { active=true;startGame(); }
   } catch (error) {
     if (failedConflict) return;
-    if (!navigator.onLine) { offlineFallback(); return; }
+    if (isNetworkError(error)) { offlineFallback(); return; }
     shell('<h2>No hemos podido abrir tu progreso</h2><p>Necesitas conexión para abrir tu invitado. Tus datos no se han sustituido.</p><button class="btn btn-primary" id="account-load">Reintentar</button>');
     feedback(message(error));button('account-load',enter);
   }

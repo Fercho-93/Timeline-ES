@@ -177,9 +177,13 @@ for (const reduce of [false, true]) {
   assert.match(arranque, /Ambience\?\.sync\(true\)/, 'y aprovecha ese toque para encender la música');
   // Sin internet no hay invitado que preparar (accounts.js no llega a importarse), pero
   // el resto del juego —incluido el modo sin conexión— no necesita ninguno: entra
-  // igualmente en vez de enseñar el aviso de "necesitas internet".
-  assert.match(arranque, /navigator\.onLine/, 'distingue estar sin conexión de un fallo real del servicio');
-  assert.ok(arranque.indexOf('if (!navigator.onLine)') < arranque.lastIndexOf('failed();'), 'sin conexión entra sin pasar por el aviso bloqueante');
+  // igualmente en vez de enseñar el aviso de "necesitas internet". accounts.js ya
+  // resuelve por su cuenta cualquier fallo de red dentro de `enter()`, así que si el
+  // error llega hasta aquí solo puede ser que el propio módulo no se haya descargado
+  // — no hace falta (ni conviene: navigator.onLine no es de fiar en Android) distinguir
+  // el motivo, se entra siempre.
+  assert.doesNotMatch(arranque, /if\s*\(\s*!?\s*navigator\.onLine/, 'no decide por una señal de conexión que Android puede dar mal');
+  assert.ok(arranque.indexOf('catch {') < arranque.indexOf('loadApp();', arranque.indexOf('catch {')), 'el fallo del módulo de cuentas entra igual, sin condición');
   assert.match(arranque, /function loadApp\(\)/, 'cargar el juego es lo mismo con o sin cuenta, no una copia');
 }
 {

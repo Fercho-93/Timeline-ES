@@ -26,14 +26,14 @@
       const { startAccounts } = await accounts;
       await startAccounts(loadApp);
     } catch {
-      starting = false;
-      // Sin internet no hay invitado que preparar, pero el resto del juego —incluido el
-      // modo sin conexión— no necesita ninguno: el resto de la aplicación ya sabe jugar
-      // sin `CT.Accounts` (revisa su perfil local en vez del de la nube). Solo se bloquea
-      // aquí cuando accounts.js falla teniendo internet: ahí sí puede merecer un reintento,
-      // en vez de esconder en silencio un fallo real del servicio de cuentas.
-      if (!navigator.onLine) { starting = true; loadApp(); return; }
-      failed();
+      // accounts.js ya resuelve por su cuenta cualquier fallo de red que ocurra dentro
+      // de `enter()` (entra sin cuenta en vez de relanzar el error): si el error llega
+      // hasta aquí es porque el propio módulo no se ha podido descargar, y eso solo
+      // pasa sin conexión. `navigator.onLine` no sirve para distinguirlo — en Chrome
+      // para Android dice "conectado" en cuanto el Wi-Fi está encendido, aunque sea el
+      // propio punto de acceso sin salida a internet. El resto del juego —incluido el
+      // modo sin conexión— no necesita ninguna cuenta: entra igual, directamente.
+      loadApp();
     }
   }
   function failed() {

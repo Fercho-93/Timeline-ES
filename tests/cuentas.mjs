@@ -30,19 +30,16 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  dom.window.close();
 }
 {
+ // Sin conexión de verdad, detectada por el error que devuelve Firebase, no por
+ // navigator.onLine (JSDOM lo deja en `true` por defecto — el mismo valor incorrecto
+ // que reporta Chrome en Android cuando el Wi-Fi está encendido para el propio punto
+ // de acceso, sin salida a internet: ese fue el caso real que se quedaba bloqueado).
+ // No hay invitado que crear, pero el resto del juego no necesita ninguno: entra igual
+ // en vez de quedarse en la pantalla de reintentar.
  const {w,dom,auth}=setup();w.signInAnonymously=async()=>{throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});};
  let started=0;await w.testAccounts.startAccounts(()=>started++);
- assert.equal(started,0);assert.equal(auth.currentUser,null);assert.ok(w.document.querySelector('#account-load'));dom.window.close();
-}
-{
- // Sin conexión de verdad (navigator.onLine === false, no solo un fallo puntual del
- // servicio) no hay invitado que crear, pero el resto del juego no necesita ninguno:
- // entra igual en vez de quedarse en la pantalla de reintentar.
- const {w,dom}=setup();
- Object.defineProperty(w.navigator,'onLine',{value:false,configurable:true});
- w.signInAnonymously=async()=>{throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});};
- let started=0;await w.testAccounts.startAccounts(()=>started++);
  assert.equal(started,1,'entra sin cuenta en vez de bloquear el arranque');
+ assert.equal(auth.currentUser,null);
  assert.equal(w.CONTINUUM.Accounts,undefined,'sin cuenta: el resto de la app juega sin CT.Accounts, como cuando accounts.js no llega a cargar');
  assert.equal(w.document.querySelector('#account-load'),null);
  dom.window.close();
@@ -51,9 +48,9 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  // El caso real reportado: un invitado que ya existía de antes (auth.currentUser ya
  // está, signInAnonymously no hace falta) pero sin conexión para reabrir su progreso —
  // se quedaba en "Necesitas conexión para abrir tu invitado" sin dejar jugar a nada,
- // ni siquiera al modo sin conexión.
+ // ni siquiera al modo sin conexión. Tampoco aquí se fuerza navigator.onLine: el error
+ // de Firebase basta.
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});
- Object.defineProperty(w.navigator,'onLine',{value:false,configurable:true});
  w.auth.currentUser.getIdToken=async()=>{throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});};
  let started=0;await w.testAccounts.startAccounts(()=>started++);
  assert.equal(started,1,'entra sin cuenta en vez de quedarse pidiendo conexión para el progreso');
@@ -61,6 +58,14 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(w.document.querySelector('#account-load'),null);
  assert.equal(data.get('playerProfiles/a').alias,profile.alias,'el perfil guardado no se toca');
  dom.window.close();
+}
+{
+ // Un fallo que de verdad no es de red (aquí, cualquier otro código de error) sigue
+ // bloqueando con su aviso de siempre: la detección no puede volverse tan floja que
+ // esconda un fallo real del servicio como si fuera falta de conexión.
+ const {w,dom,auth}=setup();w.signInAnonymously=async()=>{throw Object.assign(Error('bloqueado'),{code:'auth/operation-not-allowed'});};
+ let started=0;await w.testAccounts.startAccounts(()=>started++);
+ assert.equal(started,0);assert.equal(auth.currentUser,null);assert.ok(w.document.querySelector('#account-load'));dom.window.close();
 }
 {
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});let started=0;
