@@ -1644,7 +1644,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app[data-screen="home"] .gallery-panel .panel-art img {
   object-fit: cover;
   object-position: center 48%;
-  filter: saturate(1.13) contrast(1.04) brightness(1.03);
+  filter: saturate(.9) contrast(1.08) brightness(.96);
 }
 #app[data-screen="home"] .gallery-panel::before {
   inset: 5px;
@@ -1659,8 +1659,18 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   inset: 8px;
   border-color: #ffeac167;
   border-radius: 8px;
-  background: linear-gradient(118deg, #fff1c429, transparent 31% 72%, #e4b45a1f);
+  background: linear-gradient(118deg, #fff8e817, transparent 31% 72%, #b98c5912);
 }
+#app[data-screen="home"] .gallery-panel .panel-depth-light {
+  opacity: .38;
+  background: radial-gradient(ellipse at 22% 18%, color-mix(in srgb, var(--scene-glow) 38%, #eef0e8), transparent 68%);
+}
+#app[data-screen="home"] .panel-history { --scene-glow: #d8c9ad; --scene-shade: #33271f; }
+#app[data-screen="home"] .panel-entertainment { --scene-glow: #bd9278; --scene-shade: #2e2420; }
+#app[data-screen="home"] .panel-science { --scene-glow: #82aeb0; --scene-shade: #18363a; }
+#app[data-screen="home"] .panel-nature { --scene-glow: #9daa82; --scene-shade: #263629; }
+#app[data-screen="home"] .panel-globe { --scene-glow: #91adb5; --scene-shade: #28383e; }
+#app[data-screen="home"] .panel-mixed { --scene-glow: #a79bb2; --scene-shade: #372f39; }
 #app[data-screen="home"] .gallery-panel .collection-index {
   top: 17px;
   left: 18px;
