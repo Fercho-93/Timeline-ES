@@ -239,11 +239,11 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   abreMazo(w, "geografia", "population");
   click(w, '[data-action="solo"]');
   // El duelo es una sola opción del menú con las dos modalidades dentro.
-  ok("hay un único duelo en el menú del solitario", w.document.querySelectorAll('[data-duel-block]').length === 2 && /Duelo por enlace/.test(texto(w)));
+  ok("hay un único duelo con cuatro combinaciones", w.document.querySelectorAll('[data-duel-block]').length === 4 && /Duelo por enlace/.test(texto(w)));
   // Las dos modalidades se ven a la vez, no escondidas dentro de un desplegable, y se
   // ve cuál está elegida: es una elección que hay que hacer, no un ajuste con un valor
   // puesto de antemano.
-  const opciones = [...w.document.querySelectorAll('.segmented-option')];
+  const opciones = [...w.document.querySelectorAll('[aria-labelledby="duel-kind-label"] .segmented-option')];
   ok("las dos modalidades están a la vista", opciones.length === 2 && w.document.querySelectorAll('input[name="duel-kind"]').length === 2);
   ok("se anuncia como un grupo de opciones", w.document.querySelector('.segmented')?.getAttribute('role') === 'radiogroup');
   ok("y se marca cuál está elegida", opciones.filter(o => o.classList.contains('is-on')).length === 1 && opciones[0].classList.contains('is-on'));
@@ -252,11 +252,22 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   const aCifras = w.document.querySelector('input[name="duel-kind"][value="cifras"]');
   aCifras.checked = true;
   aCifras.dispatchEvent(new w.Event("change", { bubbles: true }));
-  const tras = [...w.document.querySelectorAll('.segmented-option')];
+  const tras = [...w.document.querySelectorAll('[aria-labelledby="duel-kind-label"] .segmented-option')];
   ok("elegir la otra modalidad mueve la marca", tras[1].classList.contains('is-on') && !tras[0].classList.contains('is-on'));
   ok("y enseña su bloque, escondiendo el anterior",
-    w.document.querySelector('[data-duel-block="cifras"]').hidden === false && w.document.querySelector('[data-duel-block="orden"]').hidden === true);
-  ok("la elección se recuerda", w.localStorage.getItem("hilo-duelo-modo-v1") === "cifras");
+    w.document.querySelector('[data-duel-block="seguidos-cifras"]').hidden === false && w.document.querySelector('[data-duel-block="seguidos-orden"]').hidden === true);
+  for (const pace of ['turnos', 'seguidos']) {
+    for (const kind of ['orden', 'cifras']) {
+      for (const [name, value] of [['duel-pace', pace], ['duel-kind', kind]]) {
+        const input = w.document.querySelector(`input[name="${name}"][value="${value}"]`);
+        input.checked = true;
+        input.dispatchEvent(new w.Event('change', { bubbles: true }));
+      }
+      const visible = [...w.document.querySelectorAll('[data-duel-block]')].filter(el => !el.hidden);
+      ok(`ejes independientes: ${pace} + ${kind}`, visible.length === 1 && visible[0].dataset.duelBlock === `${pace}-${kind}`);
+    }
+  }
+  ok("ambos ejes se recuerdan", w.localStorage.getItem("hilo-duelo-prueba-v1") === "cifras" && w.localStorage.getItem("hilo-duelo-ritmo-v1") === "seguidos");
   ok("avisa de la regla que lo sostiene", /si sales de la aplicación, la carta se cierra/i.test(texto(w)));
 
   w.document.getElementById("duel-name").value = "Fernando";
