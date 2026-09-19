@@ -23,6 +23,9 @@ function play(cardId, neighbourId, slot, expected) {
     runScripts: "outside-only", url: "https://hilo.test/"
   });
   const w = dom.window;
+  // JSDOM no implementa el desplazamiento; el juego sí lo usa al cambiar de pantalla.
+  // El navegador real conserva su comportamiento normal.
+  w.scrollTo = () => {};
   w.localStorage.setItem("hilo-selected-mode-v1", "speed");
   w.localStorage.setItem("hilo-game-speed-v1", JSON.stringify({
     mode: "speed", players: [{ id: 1, name: "Ana", hand: [cardId] }, { id: 2, name: "Bea", hand: [13017] }],
@@ -53,8 +56,9 @@ function play(cardId, neighbourId, slot, expected) {
 console.log("\nReferencias animales: empates y proximidad");
 play(13007, 13014, 0, true);
 play(13007, 13014, 1, true);
-play(13021, 13020, 0, false);
-play(13021, 13020, 1, true);
+// El reno (30 km/h) va antes que el avestruz (70 km/h) en el eje ascendente.
+play(13021, 13020, 0, true);
+play(13021, 13020, 1, false);
 
 // La tabla vive en modes.js —compartida con online.js—, no en app.js.
 const modesSource = read("modes.js");

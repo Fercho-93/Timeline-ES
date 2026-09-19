@@ -524,6 +524,13 @@
     10034: "humpback-whale", 10035: "sperm-whale", 10038: "blue-whale", 10039: "octopus",
     10040: "flamingo", 10041: "penguin", 10042: "kangaroo", 10043: "nile-crocodile",
     10044: "polar-bear", 10045: "dromedary-camel",
+    10046: "toco-toucan", 10047: "ring-tailed-lemur", 10048: "west-indian-manatee",
+    10049: "pygmy-slow-loris", 10050: "red-deer", 10051: "komodo-dragon",
+    10052: "bennet-wallaby", 10053: "emu", 10054: "black-tailed-prairie-dog",
+    10055: "giant-anteater", 10056: "striped-skunk", 10057: "african-wild-ass",
+    10058: "meerkat", 10059: "vietnamese-pot-bellied-pig", 10060: "bactrian-camel",
+    10061: "giant-grouper", 10062: "blue-yellow-macaw", 10063: "eurasian-eagle-owl",
+    10064: "griffon-vulture", 10065: "bornean-orangutan",
     12001: "dolania-mayfly", 12002: "domestic-horse", 12003: "common-mosquito",
     12004: "fruit-fly", 12005: "bee", 12006: "monarch-butterfly", 12007: "house-mouse",
     12008: "brown-rat", 12009: "domestic-hamster", 12010: "domestic-gerbil",
@@ -546,6 +553,11 @@
     12057: "bornean-orangutan", 12058: "eurasian-eagle-owl", 12059: "great-white-pelican",
     12060: "polar-bear", 12061: "north-american-porcupine", 12062: "raccoon",
     12063: "red-panda", 12064: "reindeer", 12065: "spotted-hyena", 12066: "takin",
+    12067: "gorilla", 12068: "jaguar", 12069: "leopard", 12070: "great-white-shark",
+    12071: "domestic-cow", 12072: "domestic-goat", 12073: "domestic-sheep", 12074: "domestic-pig",
+    12075: "domestic-chicken", 12076: "domestic-duck", 12077: "veiled-chameleon", 12078: "marine-iguana",
+    12079: "emperor-scorpion", 12080: "atlantic-bluefin-tuna", 12081: "atlantic-salmon",
+    12082: "harbor-seal", 12083: "walrus", 12084: "african-buffalo", 12085: "olive-baboon",
     13001: "tiger-beetle", 13002: "ghost-crab", 13003: "sunflower-sea-star",
     13004: "galapagos-giant-tortoise", 13005: "three-toed-sloth", 13006: "dwarf-seahorse",
     13007: "koala", 13008: "black-mamba", 13009: "gentoo-penguin", 13010: "florida-manatee",
@@ -557,7 +569,10 @@
     13029: "common-swift", 13030: "peregrine-falcon", 13031: "saharan-silver-ant",
     13032: "common-limpet", 13033: "california-sea-lion", 13034: "grevys-zebra",
     13035: "moroccan-flic-flac-spider", 13036: "european-mole",
-    13037: "american-cockroach", 13038: "bee"
+    13037: "american-cockroach", 13038: "bee", 13039: "alpine-swift", 13040: "pacific-sailfish",
+    13041: "brown-pelican", 13042: "amur-tiger", 13043: "carolina-squirrel", 13044: "red-kangaroo",
+    13045: "bald-eagle", 13046: "thomsons-gazelle", 13047: "white-rhinoceros", 13048: "coyote",
+    13049: "recreational-runner", 13050: "bottlenose-dolphin"
   };
 
   // Láminas del mazo de Astronomía y espacio, enlazadas por el ID de cada carta.
