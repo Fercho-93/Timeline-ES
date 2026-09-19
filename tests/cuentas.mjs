@@ -35,6 +35,34 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(started,0);assert.equal(auth.currentUser,null);assert.ok(w.document.querySelector('#account-load'));dom.window.close();
 }
 {
+ // Sin conexión de verdad (navigator.onLine === false, no solo un fallo puntual del
+ // servicio) no hay invitado que crear, pero el resto del juego no necesita ninguno:
+ // entra igual en vez de quedarse en la pantalla de reintentar.
+ const {w,dom}=setup();
+ Object.defineProperty(w.navigator,'onLine',{value:false,configurable:true});
+ w.signInAnonymously=async()=>{throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});};
+ let started=0;await w.testAccounts.startAccounts(()=>started++);
+ assert.equal(started,1,'entra sin cuenta en vez de bloquear el arranque');
+ assert.equal(w.CONTINUUM.Accounts,undefined,'sin cuenta: el resto de la app juega sin CT.Accounts, como cuando accounts.js no llega a cargar');
+ assert.equal(w.document.querySelector('#account-load'),null);
+ dom.window.close();
+}
+{
+ // El caso real reportado: un invitado que ya existía de antes (auth.currentUser ya
+ // está, signInAnonymously no hace falta) pero sin conexión para reabrir su progreso —
+ // se quedaba en "Necesitas conexión para abrir tu invitado" sin dejar jugar a nada,
+ // ni siquiera al modo sin conexión.
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});
+ Object.defineProperty(w.navigator,'onLine',{value:false,configurable:true});
+ w.auth.currentUser.getIdToken=async()=>{throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});};
+ let started=0;await w.testAccounts.startAccounts(()=>started++);
+ assert.equal(started,1,'entra sin cuenta en vez de quedarse pidiendo conexión para el progreso');
+ assert.equal(w.CONTINUUM.Accounts,undefined);
+ assert.equal(w.document.querySelector('#account-load'),null);
+ assert.equal(data.get('playerProfiles/a').alias,profile.alias,'el perfil guardado no se toca');
+ dom.window.close();
+}
+{
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});let started=0;
  w.localStorage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:999}}));
  await w.testAccounts.startAccounts(()=>started++);assert.equal(started,1);assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),'{}');

@@ -163,11 +163,22 @@ function schedule(key) {
   change++;setMeta(true);clearTimeout(timer);
   timer=setTimeout(() => flush().catch(e => { if (!failedConflict) syncNotice(message(e)); }),2000);
 }
+// Sin internet no hay invitado ni progreso en la nube que abrir, pero el resto del
+// juego —incluido el modo sin conexión— no necesita ninguno de los dos: entra igual,
+// sin cuenta, tal como ya hace boot.js cuando accounts.js ni siquiera llega a
+// importarse. `delete CT.Accounts` deshace el marcador que puso `startAccounts`, para
+// que el resto de la aplicación tome exactamente ese mismo camino ya probado en vez de
+// quedarse esperando una cuenta que nunca llega a estar lista.
+function offlineFallback() {
+  delete CT.Accounts;
+  if (!active) { active=true;startGame(); }
+}
 async function enter() {
   let u=auth.currentUser;
   if (!u) {
     try { u=(await signInAnonymously(auth)).user; }
     catch(error) {
+      if (!navigator.onLine) { offlineFallback(); return; }
       shell('<p>No hemos podido crear tu invitado. Conéctate a internet y vuelve a intentarlo.</p><button class="btn btn-primary" id="account-load">Reintentar</button>');
       feedback(message(error));button('account-load',enter);return;
     }
@@ -195,6 +206,7 @@ async function enter() {
     if (!active) { active=true;startGame(); }
   } catch (error) {
     if (failedConflict) return;
+    if (!navigator.onLine) { offlineFallback(); return; }
     shell('<h2>No hemos podido abrir tu progreso</h2><p>Necesitas conexión para abrir tu invitado. Tus datos no se han sustituido.</p><button class="btn btn-primary" id="account-load">Reintentar</button>');
     feedback(message(error));button('account-load',enter);
   }
