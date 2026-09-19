@@ -1861,8 +1861,9 @@
         <p class="solo-intro-rule">15 segundos de seguridad al entrar en cada turno · La respuesta queda cerrada si sales de la pantalla.</p>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
       <div class="field" style="margin-top:12px">
-        <label for="duel-name">Tu nombre, para que sepan quién reta</label>
-        <input id="duel-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
+        <label for="duel-name">Tu nombre de perfil</label>
+        <input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}">
+        <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
       </div>
     </div>`;
   }
@@ -1872,7 +1873,7 @@
   const DUEL_NAME_KEY = "hilo-nombre-v1";
 
   function duelName() {
-    try { return CT.Duelo.limpiaNombre(CT.Storage.getItem(DUEL_NAME_KEY) || ""); } catch { return ""; }
+    try { return CT.Duelo.limpiaNombre(CT.Accounts?.profile?.alias || CT.Storage.getItem(DUEL_NAME_KEY) || "Explorador"); } catch { return "Explorador"; }
   }
 
   function saveDuelName(nombre) {
@@ -2650,8 +2651,8 @@
           : `<p class="solo-intro-rule">Este reto se creó antes de que los duelos llevaran reloj, así que se juega sin plazo, como lo jugó ${escapeHtml(quien)}.</p>`}
         <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${esCifras ? `${rival.puntos} puntos` : `${rival.hits} de ${total}`}</b><small>la marca que hay que batir</small></span></div>
         <div class="field" style="margin-top:16px">
-          <label for="duel-name">Tu nombre, para devolver el reto</label>
-          <input id="duel-name" type="text" maxlength="${CT.Duelo.MAX_NOMBRE}" autocomplete="nickname" placeholder="Tu nombre" value="${escapeHtml(duelName())}">
+          <label for="duel-name">Tu nombre de perfil</label>
+          <input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}">
         </div>
         <button class="btn btn-primary btn-block" style="margin-top:12px" data-action="accept-duel">Aceptar el reto <span>→</span></button>
         <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="home">Ahora no</button>
