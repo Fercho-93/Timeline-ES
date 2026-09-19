@@ -606,6 +606,10 @@
     // respuesta de navegación sin añadir primero otro sonido de cierre.
     if (!dialogo.onClose) window.CONTINUUM.Effects?.transition?.('close');
     const modal = dialogo.overlay.querySelector('.modal');
+    // La navegación pertenece al fondo que queda debajo. Devuélvela al empezar
+    // la salida para que no desaparezca durante el fundido del diálogo y reaparezca
+    // un instante después que el resto de la pantalla.
+    window.CONTINUUM.UI?.closeSurface(modal);
     if (modal?.classList.contains('motion-entering')) {
       // Conservar el fotograma visible antes de cancelar la entrada: cancelarla
       // directamente devolvería todos sus hijos a opacidad 1 antes del fundido de salida.
@@ -620,7 +624,6 @@
     const anteriorEnPila = pila[pila.length - 1];
     const termina = () => {
       if (!dialogo.overlay.isConnected) return;
-      window.CONTINUUM.UI?.closeSurface(dialogo.overlay.querySelector(".modal"));
       dialogo.overlay.remove();
       dialogo.onClose?.();
       // Un diálogo nuevo puede haberse abierto durante la salida: el cierre anterior no

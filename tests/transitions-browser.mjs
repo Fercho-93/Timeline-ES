@@ -51,6 +51,7 @@ try {
         await page.locator('.home-nav ' + open).click();
         if (!quick) await settle();
         await page.locator(close).first().click();
+        await page.waitForFunction(() => document.querySelector('#app > .shell > .home-nav') && (!document.querySelector('.overlay') || document.querySelector('.dialog-exit')));
         await page.waitForFunction(() => !document.querySelector('.dialog-exit, .enc-modal, .rules, .settings-modal') && document.querySelector('#app').dataset.screen !== 'perfil');
         assert.equal(await page.locator('#app > .shell.motion-entering').count(), 0, `${open} (rápido=${quick}): volver no inicia un segundo fundido`);
         const alphas = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
