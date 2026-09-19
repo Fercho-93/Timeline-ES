@@ -106,12 +106,16 @@ según el grupo de dispositivos.
 
 - [ ] Extraer la lógica de sala de `online.js` detrás de una interfaz común
       (`createRoom` / `joinRoom` / `onUpdate` / `sendAction`), independiente de Firestore.
-- [ ] Implementar el transporte `LocalPeer` sobre `RTCDataChannel`, topología en estrella
-      con el anfitrión como fuente de verdad (mismo modelo que las salas actuales).
-- [ ] Configurar WebRTC sin depender de un servidor STUN/TURN alcanzable (solo candidatos
-      locales; sin internet el STUN de Google falla en silencio y no debe bloquear la conexión).
-- [ ] Señalización 100% offline: generalizar el mecanismo de `duelo.js` (codificar datos en
-      un QR/enlace) para intercambiar oferta/respuesta WebRTC por cámara, sin servidor.
+- [x] Implementar el transporte sobre `RTCDataChannel` (`local-transport.js`), topología en
+      estrella con el anfitrión como fuente de verdad (mismo modelo que las salas actuales).
+      Cubre la conexión en sí (anfitrión/invitado, mensajes) y sus pruebas (`tests/transporte-local.mjs`);
+      falta enchufarlo a la lógica de sala del punto anterior.
+- [x] Configurar WebRTC sin depender de un servidor STUN/TURN alcanzable (`iceServers: []`
+      en `local-transport.js`; solo candidatos locales, sin trickle ICE).
+- [x] Formato de señal (oferta/respuesta) codificado para cámara/QR — `encodeSignal` /
+      `decodeSignal` en `local-transport.js`, con pruebas.
+- [ ] Señalización 100% offline de verdad: interfaz que enseñe y escanee ese formato como QR
+      (generalizando el QR que ya dibuja `online.js` para las salas actuales).
 - [ ] Interfaz nueva "Sin conexión": instrucciones para activar el punto de acceso Wi-Fi de
       un móvil (recomendando un Android como anfitrión si hay alguno en el grupo) y unirse
       el resto por Wi-Fi normal.
