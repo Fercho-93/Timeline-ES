@@ -85,5 +85,42 @@ window.MOVIE_CARDS = [
   { id: 1084, year: 2021, title: "El buen patrón", detail: "Fernando León de Aranoa dirige a Javier Bardem y bate el récord de nominaciones a los Goya." },
   { id: 1085, year: 2022, title: "As bestas", detail: "Rodrigo Sorogoyen dirige un thriller rural con diálogos en francés, castellano y gallego que triunfa en los Goya." },
   { id: 1086, year: 2023, title: "Barbie", detail: "Greta Gerwig tiñe el verano de rosa y lidera la taquilla mundial del año." },
-  { id: 1087, year: 2024, title: "Del revés 2 (Inside Out 2)", detail: "La secuela incorpora a Ansiedad a las emociones de Riley y se convierte en uno de los grandes éxitos de taquilla de 2024." }
+  { id: 1087, year: 2024, title: "Del revés 2 (Inside Out 2)", detail: "La secuela incorpora a Ansiedad a las emociones de Riley y se convierte en uno de los grandes éxitos de taquilla de 2024." },
+  { id: 1088, year: 2024, title: "Dune: parte dos", detail: "Denis Villeneuve lleva a Paul Atreides y Chani a la guerra abierta por Arrakis." },
+  { id: 1089, year: 2026, title: "La odisea", detail: "Christopher Nolan adapta el poema épico de Homero para una superproducción rodada en distintos escenarios del mundo." },
+  { id: 1090, year: 2023, title: "La sociedad de la nieve", detail: "J. A. Bayona reconstruye la supervivencia de los pasajeros del vuelo 571 en los Andes." },
+  { id: 1091, year: 2022, title: "Argentina, 1985", detail: "Santiago Mitre dramatiza el histórico juicio a las juntas militares argentinas." },
+  { id: 1092, year: 2023, title: "Oppenheimer", detail: "Christopher Nolan retrata al físico que dirigió el Proyecto Manhattan y sus consecuencias políticas y morales." },
+  { id: 1093, year: 2023, title: "Perfect Days", detail: "Wim Wenders encuentra poesía en la rutina de un limpiador de baños públicos de Tokio." },
+  { id: 1094, year: 2025, title: "Los domingos", detail: "Alauda Ruiz de Azúa explora los vínculos familiares y las decisiones que cambian una vida." },
+  { id: 1095, year: 2022, title: "Sin novedad en el frente", detail: "Edward Berger adapta la novela de Erich Maria Remarque desde la experiencia de un joven soldado alemán." },
+  { id: 1096, year: 1994, title: "Forrest Gump", detail: "Robert Zemeckis sigue a Forrest a través de varias décadas de historia estadounidense." },
+  { id: 1097, year: 2011, title: "Intocable", detail: "Olivier Nakache y Éric Toledano convierten la amistad entre Philippe y Driss en una comedia conmovedora." },
+  { id: 1098, year: 1987, title: "La chaqueta metálica", detail: "Stanley Kubrick divide su mirada sobre Vietnam entre el adiestramiento militar y el frente de batalla." },
+  { id: 1099, year: 1957, title: "Senderos de gloria", detail: "Kubrick denuncia la arbitrariedad del mando militar durante la Primera Guerra Mundial." },
+  { id: 1100, year: 2011, title: "Midnight in Paris", detail: "Woody Allen lleva a un escritor a viajar cada noche por el París de los años veinte." },
+  { id: 1101, year: 2008, title: "Vicky Cristina Barcelona", detail: "Woody Allen reúne a tres visitantes y un pintor en un verano de deseo y contradicciones." },
+  { id: 1102, year: 2005, title: "Match Point", detail: "Woody Allen convierte la ambición social y el azar en un thriller londinense." },
+  { id: 1103, year: 1989, title: "Indiana Jones y la última cruzada", detail: "Indiana Jones se une a su padre para buscar el Santo Grial antes que los nazis." },
+  { id: 1105, year: 1992, title: "Reservoir Dogs", detail: "Quentin Tarantino reúne a una banda de atracadores cuyo golpe se desmorona desde dentro." },
+  { id: 1106, year: 2012, title: "Django desencadenado", detail: "Tarantino mezcla western, venganza y esclavitud en la búsqueda de Broomhilda." },
+  { id: 1107, year: 2009, title: "Malditos bastardos", detail: "Tarantino reescribe la historia de la Segunda Guerra Mundial a través de un grupo de soldados judíos." },
+  { id: 1108, year: 2015, title: "Los odiosos ocho", detail: "Ocho desconocidos quedan atrapados por una tormenta de nieve en una cabaña de Wyoming." },
+  { id: 1109, year: 1997, title: "La vida es bella", detail: "Roberto Benigni protege la imaginación de su hijo en un campo de concentración nazi." },
+  { id: 1110, year: 2005, title: "El tigre y la nieve", detail: "Roberto Benigni viaja a Bagdad para cuidar a la mujer que ama durante la guerra." },
+  { id: 1111, year: 2002, title: "El pianista", detail: "Roman Polanski cuenta la supervivencia del pianista Władysław Szpilman durante la ocupación nazi de Varsovia." },
+  { id: 1112, year: 2008, title: "Gran Torino", detail: "Clint Eastwood interpreta a un veterano que forja una relación inesperada con sus vecinos." },
+  { id: 1113, year: 2006, title: "La vida de los otros", detail: "Florian Henckel von Donnersmarck observa la vigilancia de un dramaturgo en la Alemania Oriental." },
+  { id: 1114, year: 2001, title: "El viaje de Chihiro", detail: "Hayao Miyazaki introduce a Chihiro en un mundo de espíritus para salvar a sus padres." },
+  { id: 1115, year: 1997, title: "La princesa Mononoke", detail: "Miyazaki enfrenta la expansión industrial con los espíritus y guardianes del bosque." },
+  { id: 1116, year: 2004, title: "El castillo ambulante", detail: "Sophie encuentra refugio junto al mago Howl en un castillo que camina por un paisaje en guerra." },
+  { id: 1117, year: 1988, title: "Mi vecino Totoro", detail: "Dos hermanas descubren criaturas del bosque mientras esperan la recuperación de su madre." },
+  { id: 1118, year: 2019, title: "Klaus", detail: "Sergio Pablos imagina el origen de Santa Claus en una remota isla del norte." },
+  { id: 1119, year: 2014, title: "Interstellar", detail: "Christopher Nolan envía a un grupo de exploradores a buscar un nuevo hogar para la humanidad." },
+  { id: 1120, year: 2000, title: "Memento", detail: "Christopher Nolan cuenta una búsqueda de venganza fragmentada por la pérdida de memoria reciente." },
+  { id: 1121, year: 2014, title: "Whiplash", detail: "Damien Chazelle enfrenta a un joven batería con un profesor dispuesto a llevarlo al límite." }
 ];
+
+// El mazo puede contener estrenos del mismo año; se conserva el orden cronológico
+// para que las cartas lleguen al motor ya preparadas para la línea temporal.
+window.MOVIE_CARDS.sort((a, b) => a.year - b.year || a.id - b.id);

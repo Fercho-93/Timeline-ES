@@ -600,7 +600,18 @@
     1073: "1073-inception", 1074: "1074-harry-potter", 1075: "1075-avengers", 1076: "1076-frozen",
     1077: "1077-basque-comedy", 1078: "1078-inside-out", 1079: "1079-la-la-land", 1080: "1080-coco",
     1081: "1081-champions", 1082: "1082-parasites", 1083: "1083-soul", 1084: "1084-good-boss",
-    1085: "1085-as-bestas", 1086: "1086-barbie", 1087: "1087-inside-out-2"
+    1085: "1085-as-bestas", 1086: "1086-barbie", 1087: "1087-inside-out-2",
+    1088: "1088-dune-part-two", 1089: "1089-the-odyssey", 1090: "1090-society-of-the-snow",
+    1091: "1091-argentina-1985", 1092: "1092-oppenheimer", 1093: "1093-perfect-days",
+    1094: "1094-los-domingos", 1095: "1095-all-quiet-western-front", 1096: "1096-forrest-gump",
+    1097: "1097-intouchables", 1098: "1098-full-metal-jacket", 1099: "1099-paths-of-glory",
+    1100: "1100-midnight-in-paris", 1101: "1101-vicky-cristina-barcelona", 1102: "1102-match-point",
+    1103: "1103-last-crusade", 1105: "1105-reservoir-dogs", 1106: "1106-django-unchained",
+    1107: "1107-inglourious-basterds", 1108: "1108-hateful-eight", 1109: "1109-life-is-beautiful",
+    1110: "1110-tiger-and-snow", 1111: "1111-pianist", 1112: "1112-gran-torino",
+    1113: "1113-lives-of-others", 1114: "1114-spirited-away", 1115: "1115-princess-mononoke",
+    1116: "1116-howls-moving-castle", 1117: "1117-my-neighbor-totoro", 1118: "1118-klaus",
+    1119: "1119-interstellar", 1120: "1120-memento", 1121: "1121-whiplash"
   };
   // Láminas disponibles del mazo de Historia de España, enlazadas por ID.
   const HISTORY_ART_BY_ID = {

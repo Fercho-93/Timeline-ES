@@ -118,7 +118,7 @@ console.log("\nCambiar de mazo desde el desplegable");
   elegir(w, '#enc-mode-select', 'history');
   elegir(w, "#enc-mode-select", "movies");
   ok("el título cambia al mazo elegido", /Estrenos de cine/.test(texto(w)));
-  ok("se listan las 87 películas", w.document.querySelectorAll("#enc-results .timeline-card").length === 87);
+  ok("se listan las 120 películas", w.document.querySelectorAll("#enc-results .timeline-card").length === 120);
 }
 
 console.log("\nBuscar sin perder el campo ni el foco");

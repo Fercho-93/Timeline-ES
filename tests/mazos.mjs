@@ -23,7 +23,7 @@ function comunes(nombre, mazo, valor) {
 }
 
 comunes("Estrenos de cine", MOVIE_CARDS, c => c.year);
-ok("cada año aparece una sola vez", new Set(MOVIE_CARDS.map(c => c.year)).size === MOVIE_CARDS.length);
+ok("los estrenos están ordenados cronológicamente", MOVIE_CARDS.every((card, i) => i === 0 || card.year >= MOVIE_CARDS[i - 1].year));
 
 function fechadasDensas(nombre, mazo) {
   comunes(nombre, mazo, c => c.year);
