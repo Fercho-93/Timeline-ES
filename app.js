@@ -1544,11 +1544,11 @@
       </section>
       ${homeNav()}
     </div>`);
-    CT.TurnDuel?.list?.().then(partidas => {
+    turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
       const box = document.getElementById("turn-duels-profile");
       if (!box || screen !== "perfil") return;
       const activas = partidas.filter(p => p.status !== "finished");
-      box.innerHTML = `<h2>Duelo por turnos</h2>${activas.length ? `<div class="turn-duel-list">${activas.map(p => { const rival = p.playersOrder?.find(id => id !== CT.Accounts?.user?.uid); const mine = p.turnUid === CT.Accounts?.user?.uid; return `<button class="btn btn-secondary btn-block" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || "Partida pendiente")}</b><span>${mine ? "Tu turno" : "Turno del oponente"}</span></button>`; }).join("")}</div>` : `<p>Aquí aparecerán tus partidas por turnos.</p>`}`;
+      box.innerHTML = `<h2>Duelo por turnos</h2>${activas.length ? `<div class="turn-duel-list">${activas.map(p => { const rival = p.playersOrder?.find(id => id !== CT.Accounts?.user?.uid); const mine = p.turnUid === CT.Accounts?.user?.uid; const state = p.status === "waiting" ? "Esperando rival" : mine ? "Tu turno" : "Turno del oponente"; return `<button class="btn btn-secondary btn-block" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || "Esperando rival")}</b><span>${state}</span></button>`; }).join("")}</div>` : `<p>Aquí aparecerán tus partidas por turnos.</p>`}`;
     }).catch(() => {});
   }
 
