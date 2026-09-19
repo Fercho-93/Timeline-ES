@@ -99,15 +99,16 @@
     return new RTCPeerConnection(ICE_CONFIG);
   }
 
-  // Un invitado: una única RTCPeerConnection hacia el anfitrión.
-  function createGuestPeer(offerEncoded, onMessage) {
+  // Un invitado: una única RTCPeerConnection hacia el anfitrión. `onOpen` avisa cuando el
+  // canal ya admite mensajes, para no tener que sondear `isReady()` desde fuera.
+  function createGuestPeer(offerEncoded, onMessage, onOpen) {
     const { role, description: offerDescription } = decodeSignal(offerEncoded);
     if (role !== "offer") throw new Error("EXPECTED_OFFER");
     const peerConnection = createPeerConnection();
     let channel = null, ready = false;
     peerConnection.addEventListener("datachannel", event => {
       channel = event.channel;
-      channel.addEventListener("open", () => { ready = true; });
+      channel.addEventListener("open", () => { ready = true; onOpen?.(); });
       channel.addEventListener("message", messageEvent => {
         const message = decodeMessage(messageEvent.data);
         if (message) onMessage(message);
@@ -131,11 +132,11 @@
 
   // El anfitrión: una RTCPeerConnection por invitado, todas independientes entre sí — la
   // estrella. `onMessage` recibe el id de quién manda, para que la sala sepa distinguirlos.
-  function createHostPeer(onMessage) {
+  function createHostPeer(onMessage, onOpen) {
     const peerConnection = createPeerConnection();
     const channel = peerConnection.createDataChannel("sala", { ordered: true });
     let ready = false;
-    channel.addEventListener("open", () => { ready = true; });
+    channel.addEventListener("open", () => { ready = true; onOpen?.(); });
     channel.addEventListener("message", event => {
       const message = decodeMessage(event.data);
       if (message) onMessage(message);
@@ -162,12 +163,12 @@
 
   // Agrupa las conexiones de todos los invitados detrás de una sola sesión, para que la
   // lógica de sala no tenga que llevar la cuenta de cada `RTCPeerConnection` por su cuenta.
-  function createHostSession(onMessage) {
+  function createHostSession(onMessage, onPeerOpen) {
     const peers = new Map();
     let nextId = 1;
     function addPeer() {
       const peerId = String(nextId++);
-      const peer = createHostPeer(message => onMessage(peerId, message));
+      const peer = createHostPeer(message => onMessage(peerId, message), () => onPeerOpen?.(peerId));
       peers.set(peerId, peer);
       return { peerId, offerSignal: peer.offerSignal, acceptAnswer: peer.acceptAnswer };
     }

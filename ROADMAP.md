@@ -121,8 +121,13 @@ según el grupo de dispositivos.
       en `local-transport.js`; solo candidatos locales, sin trickle ICE).
 - [x] Formato de señal (oferta/respuesta) codificado para cámara/QR — `encodeSignal` /
       `decodeSignal` en `local-transport.js`, con pruebas.
-- [ ] Enchufar `local-room.js` a `local-transport.js`: el anfitrión aplica cada acción que
-      llega de un invitado con `LocalRoom.reduce` y reparte el estado nuevo por el canal.
+- [x] Enchufar `local-room.js` a `local-transport.js` (`local-session.js`): el anfitrión
+      traduce cada mensaje del canal en una acción del reductor (`actionFromMessage`), la
+      aplica y reparte la sala entera a todos ("state"), o contesta solo a quien se
+      equivocó ("error") — sus propias jugadas pasan por el mismo camino. Un invitado nunca
+      aplica el reductor por su cuenta: manda la acción y refleja lo que vuelve. Con
+      pruebas (`tests/sesion-local.mjs`) que cubren el protocolo sin necesitar WebRTC de
+      verdad, más el aviso claro (`WEBRTC_UNAVAILABLE`) donde sí hace falta.
 - [ ] Señalización 100% offline de verdad: interfaz que enseñe y escanee ese formato como QR
       (generalizando el QR que ya dibuja `online.js` para las salas actuales).
 - [ ] Interfaz nueva "Sin conexión" (`local-multiplayer.js`, cargado bajo demanda como hace
