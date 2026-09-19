@@ -1744,6 +1744,8 @@ html #app .home-nav.atlas-nav {
   color: #3e3028;
   background: transparent;
   box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   transform: none;
   overflow: visible;
   isolation: isolate;
