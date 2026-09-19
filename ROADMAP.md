@@ -92,7 +92,44 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - [ ] Decidir monetización después de la beta.
 - [ ] Si se venden mazos: implementar compras oficiales, restauración, reembolsos y validación en servidor.
 
-## 8. Límites de este roadmap
+## 8. Multijugador sin conexión (red local, sin internet)
+
+Objetivo: que varias personas jueguen la misma partida en tiempo real sin ningún tipo de
+conexión a internet ni cobertura (modo avión, zonas sin señal), usando solo una red Wi-Fi
+local creada por uno de los móviles.
+
+Decisión de arquitectura: capa de transporte intercambiable detrás de la lógica de sala ya
+existente en `online.js` (turnos, Fantasma, Pulso, huella del mazo), con dos transportes
+según el grupo de dispositivos.
+
+### Fase 1 — Hotspot Wi-Fi + WebRTC + QR (cubre cualquier grupo con al menos un Android)
+
+- [ ] Extraer la lógica de sala de `online.js` detrás de una interfaz común
+      (`createRoom` / `joinRoom` / `onUpdate` / `sendAction`), independiente de Firestore.
+- [ ] Implementar el transporte `LocalPeer` sobre `RTCDataChannel`, topología en estrella
+      con el anfitrión como fuente de verdad (mismo modelo que las salas actuales).
+- [ ] Configurar WebRTC sin depender de un servidor STUN/TURN alcanzable (solo candidatos
+      locales; sin internet el STUN de Google falla en silencio y no debe bloquear la conexión).
+- [ ] Señalización 100% offline: generalizar el mecanismo de `duelo.js` (codificar datos en
+      un QR/enlace) para intercambiar oferta/respuesta WebRTC por cámara, sin servidor.
+- [ ] Interfaz nueva "Sin conexión": instrucciones para activar el punto de acceso Wi-Fi de
+      un móvil (recomendando un Android como anfitrión si hay alguno en el grupo) y unirse
+      el resto por Wi-Fi normal.
+- [ ] Probar en dispositivos reales, en modo avión, con grupos mixtos Android/iPhone.
+
+### Fase 2 — Descubrimiento nativo sin hotspot manual (grupos homogéneos)
+
+- [ ] Plugin de Capacitor para Android usando Nearby Connections (Bluetooth/Wi-Fi Direct
+      automático, sin hotspot manual) para grupos 100% Android.
+- [ ] Plugin de Capacitor para iOS usando MultipeerConnectivity (la tecnología de AirDrop)
+      para grupos 100% iPhone, cubriendo el caso en que ningún iPhone pueda activar su
+      Hotspot personal sin cobertura.
+- [ ] Nota de alcance: estos dos frameworks no interoperan entre sí (un iPhone con
+      MultipeerConnectivity no ve a un Android con Nearby Connections), así que en grupos
+      mixtos sigue haciendo falta la Fase 1. Solo disponible en la app instalada, no en la
+      versión web de GitHub Pages.
+
+## 9. Límites de este roadmap
 
 No se consideran completados por existir código o documentación:
 
