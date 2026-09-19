@@ -701,7 +701,14 @@
     11040: "11040-rio-sao-paulo", 11041: "11041-buenos-aires-montevideo", 11042: "11042-el-cairo-jerusalen",
     11043: "11043-nairobi-kampala", 11044: "11044-delhi-bombay", 11045: "11045-pekin-shanghai",
     11046: "11046-tokio-seul", 11047: "11047-sidney-melbourne", 11048: "11048-auckland-wellington",
-    11049: "11049-ciudad-de-mexico-guadalajara", 11050: "11050-toronto-montreal"
+    11049: "11049-ciudad-de-mexico-guadalajara", 11050: "11050-toronto-montreal",
+    11051: "11051-el-cairo-tokio", 11052: "11052-lima-moscu", 11053: "11053-roma-atenas",
+    11054: "11054-teheran-kabul", 11055: "11055-viena-baku", 11056: "11056-doha-copenhague",
+    11057: "11057-tallin-los-angeles", 11058: "11058-gibraltar-paris", 11059: "11059-dublin-reikiavik",
+    11060: "11060-berlin-roma", 11061: "11061-hamburgo-oslo", 11062: "11062-seul-quito",
+    11063: "11063-la-habana-caracas", 11064: "11064-lisboa-varsovia", 11065: "11065-praga-san-petersburgo",
+    11066: "11066-estocolmo-ankara", 11067: "11067-montevideo-santiago", 11068: "11068-sofia-sarajevo",
+    11069: "11069-brasilia-pekin", 11070: "11070-bogota-medellin"
   };
 
   // El contexto de una carta en «Gran mezcla»: de qué tema viene, con el icono de su
