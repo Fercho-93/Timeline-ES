@@ -3382,6 +3382,486 @@
       "reviewedAt": null
     },
     {
+      "file": "music.js",
+      "id": 6052,
+      "title": "That’s All Right",
+      "value": 1954,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6053,
+      "title": "I Want to Hold Your Hand",
+      "value": 1963,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6054,
+      "title": "Respect",
+      "value": 1967,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6055,
+      "title": "Your Song",
+      "value": 1970,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6056,
+      "title": "(They Long to Be) Close to You",
+      "value": 1970,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6057,
+      "title": "Imagine",
+      "value": 1971,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6058,
+      "title": "Jealous Guy",
+      "value": 1971,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6059,
+      "title": "Libre",
+      "value": 1972,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6060,
+      "title": "Dancing Queen",
+      "value": 1976,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6061,
+      "title": "Heroes",
+      "value": 1977,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6062,
+      "title": "Me olvidé de vivir",
+      "value": 1978,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6063,
+      "title": "Highway to Hell",
+      "value": 1979,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6064,
+      "title": "Another Brick in the Wall (Part 2)",
+      "value": 1979,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6065,
+      "title": "Como una ola",
+      "value": 1981,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6066,
+      "title": "Billie Jean",
+      "value": 1982,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6067,
+      "title": "Every Breath You Take",
+      "value": 1983,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6068,
+      "title": "Let’s Dance",
+      "value": 1983,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6069,
+      "title": "Dancing in the Dark",
+      "value": 1984,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6070,
+      "title": "Hallelujah",
+      "value": 1984,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6071,
+      "title": "What’s Love Got to Do with It",
+      "value": 1984,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6072,
+      "title": "Take on Me",
+      "value": 1985,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6073,
+      "title": "A quién le importa",
+      "value": 1986,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6074,
+      "title": "Rayando el sol",
+      "value": 1990,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6075,
+      "title": "Enjoy the Silence",
+      "value": 1990,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6076,
+      "title": "Losing My Religion",
+      "value": 1991,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6077,
+      "title": "Enter Sandman",
+      "value": 1991,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6078,
+      "title": "20 de abril",
+      "value": 1991,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6079,
+      "title": "Smells Like Teen Spirit",
+      "value": 1991,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6080,
+      "title": "I Will Always Love You",
+      "value": 1992,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6081,
+      "title": "Basket Case",
+      "value": 1994,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6082,
+      "title": "…Baby One More Time",
+      "value": 1998,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6083,
+      "title": "La raja de tu falda",
+      "value": 1999,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6084,
+      "title": "Yellow",
+      "value": 2000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6085,
+      "title": "In the End",
+      "value": 2000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6086,
+      "title": "Sin ti no soy nada",
+      "value": 2002,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6087,
+      "title": "Lose Yourself",
+      "value": 2002,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6088,
+      "title": "Crazy in Love",
+      "value": 2003,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6089,
+      "title": "I Kissed a Girl",
+      "value": 2008,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6090,
+      "title": "Baby",
+      "value": 2010,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6091,
+      "title": "Firework",
+      "value": 2010,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6092,
+      "title": "The A Team",
+      "value": 2011,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6093,
+      "title": "Payphone",
+      "value": 2012,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6094,
+      "title": "Let Her Go",
+      "value": 2012,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6095,
+      "title": "Riptide",
+      "value": 2013,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6096,
+      "title": "Say You Won’t Let Go",
+      "value": 2016,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6097,
+      "title": "Havana",
+      "value": 2017,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6098,
+      "title": "Levitating",
+      "value": 2020,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "music.js",
+      "id": 6099,
+      "title": "As It Was",
+      "value": 2022,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
       "file": "videogames.js",
       "id": 7001,
       "title": "OXO",
@@ -7159,7 +7639,7 @@
     {
       "file": "mundo.js",
       "id": 5006,
-      "title": "La destrucción del Primer Templo de Jerusalén",
+      "title": "La destrucción del Primer Templo de Jerusalén (fecha discutida)",
       "value": -586,
       "source": null,
       "reviewStatus": null,
@@ -7339,7 +7819,7 @@
     {
       "file": "mundo.js",
       "id": 5024,
-      "title": "El edicto de Milán",
+      "title": "El llamado Edicto de Milán",
       "value": 313,
       "source": null,
       "reviewStatus": null,
@@ -7369,7 +7849,7 @@
     {
       "file": "mundo.js",
       "id": 5027,
-      "title": "La división definitiva del Imperio romano",
+      "title": "La división del Imperio romano",
       "value": 395,
       "source": null,
       "reviewStatus": null,
@@ -7449,7 +7929,7 @@
     {
       "file": "mundo.js",
       "id": 5035,
-      "title": "El Cisma de Oriente",
+      "title": "El Cisma de Oriente (fecha convencional)",
       "value": 1054,
       "source": null,
       "reviewStatus": null,
@@ -7569,7 +8049,7 @@
     {
       "file": "mundo.js",
       "id": 5047,
-      "title": "Colón llega a América",
+      "title": "La expedición de Colón llega al Caribe",
       "value": 1492,
       "source": null,
       "reviewStatus": null,
@@ -8259,7 +8739,7 @@
     {
       "file": "mundo.js",
       "id": 5116,
-      "title": "La OMS declara pandemia",
+      "title": "La OMS declara la pandemia de COVID-19",
       "value": 2020,
       "source": null,
       "reviewStatus": null,
@@ -8269,7 +8749,7 @@
     {
       "file": "mundo.js",
       "id": 5117,
-      "title": "La invasión rusa de Ucrania",
+      "title": "La invasión rusa a gran escala de Ucrania",
       "value": 2022,
       "source": null,
       "reviewStatus": null,
@@ -11278,6 +11758,16 @@
     },
     {
       "file": "idiomas.js",
+      "id": 14048,
+      "title": "Catalán",
+      "value": 4100000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
       "id": 14043,
       "title": "Lituano",
       "value": 3000000,
@@ -11308,6 +11798,16 @@
     },
     {
       "file": "idiomas.js",
+      "id": 14049,
+      "title": "Euskera",
+      "value": 480000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "idiomas.js",
       "id": 14046,
       "title": "Islandés",
       "value": 390000,
@@ -11321,26 +11821,6 @@
       "id": 14047,
       "title": "Feroés",
       "value": 69000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14048,
-      "title": "Catalán",
-      "value": 4100000,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "idiomas.js",
-      "id": 14049,
-      "title": "Euskera",
-      "value": 480000,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -11478,6 +11958,16 @@
     },
     {
       "file": "distances.js",
+      "id": 11070,
+      "title": "Bogotá — Medellín",
+      "value": 239,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
       "id": 11012,
       "title": "Madrid — Zaragoza",
       "value": 273,
@@ -11521,6 +12011,16 @@
       "id": 11015,
       "title": "Madrid — Sevilla",
       "value": 390,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11068,
+      "title": "Sofía — Sarajevo",
+      "value": 418,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -11618,6 +12118,16 @@
     },
     {
       "file": "distances.js",
+      "id": 11061,
+      "title": "Hamburgo — Oslo",
+      "value": 709,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
       "id": 11047,
       "title": "Sídney — Melbourne",
       "value": 713,
@@ -11631,6 +12141,16 @@
       "id": 11017,
       "title": "París — Barcelona",
       "value": 831,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11053,
+      "title": "Roma — Atenas",
+      "value": 1051,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -11688,9 +12208,69 @@
     },
     {
       "file": "distances.js",
+      "id": 11060,
+      "title": "Berlín — Roma",
+      "value": 1183,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
       "id": 11020,
       "title": "Madrid — Londres",
       "value": 1263,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11067,
+      "title": "Montevideo — Santiago de Chile",
+      "value": 1343,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11065,
+      "title": "Praga — San Petersburgo",
+      "value": 1486,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11059,
+      "title": "Dublín — Reikiavik",
+      "value": 1495,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11058,
+      "title": "Gibraltar — París",
+      "value": 1547,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11054,
+      "title": "Teherán — Kabul",
+      "value": 1623,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -11708,9 +12288,49 @@
     },
     {
       "file": "distances.js",
+      "id": 11063,
+      "title": "La Habana — Caracas",
+      "value": 2160,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
       "id": 11022,
       "title": "Madrid — Atenas",
       "value": 2370,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11066,
+      "title": "Estocolmo — Ankara",
+      "value": 2393,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11064,
+      "title": "Lisboa — Varsovia",
+      "value": 2759,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11055,
+      "title": "Viena — Bakú",
+      "value": 2777,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -11731,6 +12351,16 @@
       "id": 11024,
       "title": "Madrid — El Cairo",
       "value": 3351,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11056,
+      "title": "Doha — Copenhague",
+      "value": 4612,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -11788,9 +12418,29 @@
     },
     {
       "file": "distances.js",
+      "id": 11057,
+      "title": "Tallin — Los Ángeles",
+      "value": 9076,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
       "id": 11032,
       "title": "Madrid — Los Ángeles",
       "value": 9363,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11051,
+      "title": "El Cairo — Tokio",
+      "value": 9562,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -11818,6 +12468,16 @@
     },
     {
       "file": "distances.js",
+      "id": 11052,
+      "title": "Lima — Moscú",
+      "value": 12644,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
       "id": 11035,
       "title": "Madrid — Honolulu",
       "value": 12649,
@@ -11831,6 +12491,26 @@
       "id": 11036,
       "title": "Madrid — Perth",
       "value": 14615,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11062,
+      "title": "Seúl — Quito",
+      "value": 15107,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "distances.js",
+      "id": 11069,
+      "title": "Brasilia — Pekín",
+      "value": 16932,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
