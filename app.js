@@ -416,6 +416,7 @@
 
 
   function backMenu() {
+    CT.prepareReturn?.();
     if (screen !== 'enciclopedia' && navigationTrail.length) {
       const previous = navigationTrail.pop();
       if (previous.screen !== screen) {

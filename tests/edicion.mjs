@@ -414,7 +414,9 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
     assert.equal(w.document.querySelectorAll('.motion-entering').length, 1, 'solo Enciclopedia se revela, no su fondo');
     assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Enciclopedia');
     assert.ok(w.document.querySelector('.enc-background[inert]'), 'el fondo no recibe pulsaciones');
+    const beforeClose = effects.length;
     w.document.dispatchEvent(new w.KeyboardEvent('keydown', {key:'Escape',bubbles:true}));
+    assert.equal(effects.length, beforeClose, 'volver de Enciclopedia no vuelve a ocultar y revelar el fondo');
     assert.equal(w.document.querySelector('[data-overlay="encyclopedia"]'), null);
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
     const originalBounds = w.Element.prototype.getBoundingClientRect;
