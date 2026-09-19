@@ -126,7 +126,7 @@ console.log("\nVolver al menú sin saltos de lectura");
   w.close();
 }
 
-console.log("\nEntrada del mazo con giro de cámara");
+console.log("\nEntrada común del mazo");
 for (const reduce of [false, true]) {
   const w = boot({reduce});
   w.scrollTo = () => {};
@@ -138,15 +138,15 @@ for (const reduce of [false, true]) {
   };
   click(w, '[data-mode="history"]');
   ok("la cabecera está disponible desde el primer momento", !!el(w, '.atlas-landscape img') && !el(w, '.atlas-landscape').classList.contains('cover-arriving'));
-  ok(reduce ? "movimiento reducido entra sin desplazar la cámara" : "la portada anterior sale como una cámara, sin vuelo de carta",
+  ok(reduce ? "movimiento reducido entra sin desplazar la cámara" : "la entrada revela el contenido sin duplicar la pantalla",
     reduce
       ? !w.document.querySelector('.camera-move, .deck-cover-flight, .book-turn') && animated.length === 0
-      : !!w.document.querySelector('.camera-move') && !!w.document.querySelectorAll('.camera-move-view').length &&
-        !w.document.querySelector('.deck-cover-flight, .book-turn') && animated.length === 2);
+      : !!w.document.querySelector('.shell.motion-entering') &&
+        !w.document.querySelector('.camera-move, .deck-cover-flight, .book-turn') && animated.length > 0);
   ok("el foco llega al título sin esperar la transición", w.document.activeElement === el(w, 'h1'));
   click(w, '[data-action="collection-back"]');
   click(w, '[data-mode="history"]');
-  ok("se puede volver y entrar inmediatamente", el(w, '#app').dataset.screen === 'play-menu' && (reduce || !!w.document.querySelector('.camera-move')) && !w.document.querySelector('.deck-cover-flight'));
+  ok("se puede volver y entrar inmediatamente", el(w, '#app').dataset.screen === 'play-menu' && (reduce || !!w.document.querySelector('.shell.motion-entering')) && !w.document.querySelector('.deck-cover-flight'));
   await Promise.resolve();
   w.close();
 }
@@ -632,5 +632,5 @@ const css = read("styles.css");
 const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
 ok("el estilo reducido cubre navegación, cartas, diálogos y espera", [".selection-enter", ".placement-enter", ".dialog-exit", ".game-row.active", ".spinner", ".drag-ghost"].every(selector => reduced.includes(selector)));
 const edition = read("edition.css");
-ok("la nueva entrada gira la cámara sin recuperar el vuelo de portada", css.includes("@keyframes camera-arrive") && edition.includes(".camera-move-frame") && !edition.includes(".deck-cover-flight"));
+ok("la entrada gestionada impide que CSS vuelva a arrancar al finalizar", edition.includes("#app .motion-managed") && edition.includes("continuum-ink-enter"));
 console.log(`\n${checks} comprobaciones de movimiento correctas`);

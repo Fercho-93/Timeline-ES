@@ -21,7 +21,7 @@
   --ink-solid-contrast: #fff;
   --font-display: Iowan Old Style, Palatino Linotype, Book Antiqua, Palatino, Georgia, serif;
   --ease-out: cubic-bezier(.22, .61, .36, 1);
-  --ease-spring: cubic-bezier(.2, .78, .28, 1.04);
+  --ease-spring: var(--ease-out);
   --motion-fast: 160ms;
   --motion-base: 260ms;
   --motion-slow: 460ms;
@@ -66,24 +66,8 @@ button, input, select { font: inherit; }
 button { touch-action: manipulation; color: inherit; }
 
 #app { min-height: 100dvh; overflow-x: clip; }
-.screen-enter {
-  --camera-entry: min(23vw, 190px);
-  --camera-tilt: -5deg;
-  transform-origin: left center;
-  /* Solo "backwards": el estado final del `to` no se queda pegado después de terminar
-     (ver el porqué junto a @keyframes camera-arrive). El propio elemento, sin la
-     animación ya activa, cae de vuelta a la base sin transform ni opacity propios, que
-     es visualmente idéntica al `to`, así que no hay parpadeo al soltarla. */
-  animation: camera-arrive 560ms cubic-bezier(.22,.61,.25,1) backwards;
-}
-.screen-return { --camera-entry: max(-23vw, -190px); --camera-tilt: 5deg; transform-origin: right center; }
-.screen-enter .topbar, .screen-enter > :not(.topbar) { animation: none; }
-.camera-running > .screen-enter { animation: none !important; }
-@keyframes camera-arrive {
-  from { opacity: .08; transform: perspective(1200px) translate3d(var(--camera-entry),0,-110px) rotateY(var(--camera-tilt)) scale(.94); }
-  58% { opacity: 1; }
-  to { opacity: 1; transform: none; }
-}
+/* Las entradas de pantalla tienen un único propietario en a11y.js. */
+.screen-enter { animation: none; }
 .home-selection { display: flow-root; overflow: clip; }
 .section-enter > * { animation: section-in 240ms var(--ease-out) both; }
 @keyframes section-in { from { opacity: .25; transform: translateY(6px); } }
