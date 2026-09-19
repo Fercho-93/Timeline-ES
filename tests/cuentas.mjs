@@ -47,16 +47,29 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 {
  // El caso real reportado: un invitado que ya existía de antes (auth.currentUser ya
  // está, signInAnonymously no hace falta) pero sin conexión para reabrir su progreso —
- // se quedaba en "Necesitas conexión para abrir tu invitado" sin dejar jugar a nada,
- // ni siquiera al modo sin conexión. Tampoco aquí se fuerza navigator.onLine: el error
- // de Firebase basta.
+ // se quedaba en "Necesitas conexión para abrir tu invitado" sin dejar jugar a nada, ni
+ // siquiera al modo sin conexión. El error de Firebase en un Android real resultó no
+ // llevar ninguno de los códigos "de red" que se habían anticipado (ver más abajo el
+ // motivo de fondo: sin código reconocido en absoluto, sin `navigator.onLine`, nada) —
+ // así que aquí se simula justo eso: un error sin ningún código, para comprobar que
+ // sigue entrando de todos modos.
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});
- w.auth.currentUser.getIdToken=async()=>{throw Object.assign(Error('offline'),{code:'auth/network-request-failed'});};
+ w.auth.currentUser.getIdToken=async()=>{throw Error('fallo sin código reconocible');};
  let started=0;await w.testAccounts.startAccounts(()=>started++);
  assert.equal(started,1,'entra sin cuenta en vez de quedarse pidiendo conexión para el progreso');
  assert.equal(w.CONTINUUM.Accounts,undefined);
  assert.equal(w.document.querySelector('#account-load'),null);
  assert.equal(data.get('playerProfiles/a').alias,profile.alias,'el perfil guardado no se toca');
+ dom.window.close();
+}
+{
+ // Un perfil de otra temporada sí es un problema real de cuenta, no de red: debe
+ // seguir bloqueando con su propio aviso en vez de entrar sin cuenta en silencio.
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,season:'otra-temporada'}});
+ let started=0;await w.testAccounts.startAccounts(()=>started++);
+ assert.equal(started,0,'no entra: una temporada distinta no es falta de conexión');
+ assert.notEqual(w.CONTINUUM.Accounts,undefined);
+ assert.ok(w.document.querySelector('#account-load'));
  dom.window.close();
 }
 {

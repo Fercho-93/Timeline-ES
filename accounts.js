@@ -163,13 +163,16 @@ function schedule(key) {
   change++;setMeta(true);clearTimeout(timer);
   timer=setTimeout(() => flush().catch(e => { if (!failedConflict) syncNotice(message(e)); }),2000);
 }
-// `navigator.onLine` no es de fiar: en Chrome para Android dice "conectado" en cuanto
-// el Wi-Fi está encendido, aunque sea el propio punto de acceso sin salida a internet
-// —así que un móvil que crea el hotspot lo ve como "con conexión" y nunca entra por
-// aquí. Lo que sí es de fiar es el error que ha devuelto de verdad Firebase al
-// intentarlo: estos códigos son justo los que `message()` ya reconoce como "sin red".
-const NETWORK_ERROR_CODES = ['auth/network-request-failed', 'unavailable', 'deadline-exceeded', 'auth/timeout'];
-function isNetworkError(error) { return !navigator.onLine || NETWORK_ERROR_CODES.includes(error?.code); }
+// Adivinar todos los códigos con los que Firebase puede anunciar "sin red" no
+// funciona: en un Wi-Fi conectado pero sin salida a internet (justo el caso de un
+// punto de acceso sin internet) puede fallar de formas que ninguna lista cubre entera
+// —tampoco `navigator.onLine`, que en Chrome para Android dice "conectado" en cuanto
+// el Wi-Fi está encendido, aunque sea el propio punto de acceso—. Mejor al revés: una
+// lista corta y estable de los problemas de cuenta que sí son reales (y deben seguir
+// avisando) y tratar cualquier otra cosa como falta de conexión, que es con mucho el
+// motivo más probable de que esto falle.
+const ACCOUNT_ERROR_CODES = ['auth/operation-not-allowed', 'auth/too-many-requests', 'permission-denied', 'auth/requires-recent-login', 'account/wrong-season'];
+function isNetworkError(error) { return !ACCOUNT_ERROR_CODES.includes(error?.code); }
 // Sin internet no hay invitado ni progreso en la nube que abrir, pero el resto del
 // juego —incluido el modo sin conexión— no necesita ninguno de los dos: entra igual,
 // sin cuenta, tal como ya hace boot.js cuando accounts.js ni siquiera llega a
@@ -200,7 +203,7 @@ async function enter() {
     await u.getIdToken(true);
     const r=refs(u.uid);
     profile=await ensureProfile(u.uid);
-    if (profile.season !== season) throw Error('Este perfil pertenece a otra temporada. Contacta con soporte.');
+    if (profile.season !== season) throw Object.assign(Error('Este perfil pertenece a otra temporada. Contacta con soporte.'),{code:'account/wrong-season'});
     const snap=await getDocFromServer(r.progress), remote=snap.exists()?snap.data():null;
     const meta=metadata();revision=meta.revision || 0;
     if (meta.dirty) {
