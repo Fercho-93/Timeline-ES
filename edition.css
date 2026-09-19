@@ -1730,29 +1730,43 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   text-shadow: 0 2px 4px #0f0907;
 }
 
-/* La barra comparte el relieve de la maqueta, pero en cuero claro/pergamino. */
+/* La navegación no vive dentro de una caja: una base baja y arqueada une los cinco
+   botones, dejando que la silueta superior acompañe sus curvas. */
 html #app .home-nav.atlas-nav {
   left: 0;
   bottom: 0;
   width: 100%;
   max-width: none;
-  min-height: calc(76px + env(safe-area-inset-bottom));
-  padding: 5px 10px calc(5px + env(safe-area-inset-bottom));
+  min-height: calc(68px + env(safe-area-inset-bottom));
+  padding: 4px 12px calc(4px + env(safe-area-inset-bottom));
   border: 0;
   border-radius: 0;
   color: #3e3028;
-  background: linear-gradient(180deg, #f4ead9f2, #efe2cdf7);
-  box-shadow: 0 -7px 18px #44372a17;
+  background: transparent;
+  box-shadow: none;
   transform: none;
   overflow: visible;
+  isolation: isolate;
+}
+html #app .home-nav.atlas-nav::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 7px 5px 0;
+  border: 1px solid #c9b9a3a8;
+  border-bottom: 0;
+  border-radius: 48% 48% 0 0 / 22px 22px 0 0;
+  background: linear-gradient(180deg, #f8efe1f7, #ecddc8fa);
+  box-shadow: inset 0 1px 0 #fffaf0, 0 -5px 14px #4c39231a;
+  pointer-events: none;
 }
 html #app .home-nav.atlas-nav::before {
   content: "";
   position: absolute;
-  z-index: 0;
-  top: 27px;
-  right: 8%;
-  left: 8%;
+  z-index: 1;
+  top: 23px;
+  right: 9%;
+  left: 9%;
   height: 1px;
   border: 0;
   border-radius: 0;
@@ -1762,8 +1776,8 @@ html #app .home-nav.atlas-nav::before {
 }
 #app .home-nav.atlas-nav button {
   position: relative;
-  z-index: 1;
-  min-height: 66px;
+  z-index: 2;
+  min-height: 59px;
   padding: 1px 2px 0;
   border-radius: 0;
   color: #49372d;
@@ -1776,24 +1790,24 @@ html #app .home-nav.atlas-nav::before {
 #app .home-nav.atlas-nav button span {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border: 1px solid #9b8b78;
-  border-radius: 13px;
+  border-radius: 12px;
   color: #514035;
   background: linear-gradient(145deg, #fffdf6, #e5ded1);
-  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b7aa98, 0 4px 7px #46372a40, 0 0 0 3px #f5ead8b8;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b7aa98, 0 3px 6px #46372a38, 0 0 0 2px #f5ead8b8;
   filter: none;
 }
-#app .home-nav.atlas-nav button:nth-child(2) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a8b5a6, 0 4px 7px #41544242, 0 0 0 3px #e9eee5c4; }
-#app .home-nav.atlas-nav button:nth-child(3) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b7a56f, 0 4px 7px #69572c3d, 0 0 0 3px #f1ead6c4; }
-#app .home-nav.atlas-nav button:nth-child(4) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b69b98, 0 4px 7px #6445403d, 0 0 0 3px #f1e6e2c4; }
-#app .home-nav.atlas-nav button:nth-child(5) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #9ca5b4, 0 4px 7px #38465d3d, 0 0 0 3px #e7eaf0c4; }
-#app .home-nav.atlas-nav svg { width: 23px; height: 23px; stroke-width: 1.65; }
+#app .home-nav.atlas-nav button:nth-child(2) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a8b5a6, 0 3px 6px #41544238, 0 0 0 2px #e9eee5c4; }
+#app .home-nav.atlas-nav button:nth-child(3) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b7a56f, 0 3px 6px #69572c35, 0 0 0 2px #f1ead6c4; }
+#app .home-nav.atlas-nav button:nth-child(4) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #b69b98, 0 3px 6px #64454035, 0 0 0 2px #f1e6e2c4; }
+#app .home-nav.atlas-nav button:nth-child(5) span { box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #9ca5b4, 0 3px 6px #38465d35, 0 0 0 2px #e7eaf0c4; }
+#app .home-nav.atlas-nav svg { width: 20px; height: 20px; stroke-width: 1.7; }
 #app .home-nav.atlas-nav small {
   color: inherit;
-  margin-top: 5px;
-  font: 600 clamp(.55rem, 2vw, .68rem)/1.05 var(--font-display);
+  margin-top: 4px;
+  font: 600 clamp(.53rem, 1.9vw, .64rem)/1.05 var(--font-display);
 }
 #app .home-nav.atlas-nav button[aria-current] {
   color: #fff1cf;
@@ -1803,8 +1817,13 @@ html #app .home-nav.atlas-nav::before {
   border-color: #9b4f3a;
   color: #fff8eb;
   background: linear-gradient(145deg, #c9795c, #984b37 62%, #733326);
-  box-shadow: inset 1px 1px 0 #ffd8c8b8, inset -2px -2px 3px #59241da6, 0 5px 9px #74352261, 0 0 0 4px #f0c7b39c, 0 0 16px #c86d4d4f;
+  box-shadow: inset 1px 1px 0 #ffd8c8b8, inset -2px -2px 3px #59241da6, 0 4px 7px #74352257, 0 0 0 3px #f0c7b39c, 0 0 12px #c86d4d45;
 }
+
+/* Enciclopedia, Guía y Ajustes son también destinos de esta navegación. Conservan la
+   barra visible y marcan su botón igual que Inicio y Perfil. */
+#app :is(.enc-modal, .settings-modal, .rules) .home-nav.atlas-nav { display: grid; }
+#app :is(.enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
 #app .home-nav.atlas-nav button[aria-current] small {
   color: #8a3f2f;
   text-decoration: underline;

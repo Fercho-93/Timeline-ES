@@ -428,18 +428,16 @@ console.log('Cámara en toda la preparación, sin animar las jugadas posteriores
       effects.push(effect);
       return { finished: new Promise(() => {}), cancel() { effect.cancelled = true; } };
     };
-    click(w, '[data-action="perfil"]');
-    assert.ok(w.document.querySelector('.profile-roll-edge'));
-    const reveal = effects.find(effect => effect.frames[0].clipPath);
-    assert.ok(reveal.target.classList.contains('shell'), 'se desenrolla la hoja completa');
-    assert.equal(reveal.timing.duration, 2300);
-    assert.equal(w.document.querySelectorAll('.parchment-dust').length, 40);
-    assert.match(reveal.frames[1].clipPath, new RegExp(w.innerHeight + 'px'));
+    click(w, '.home-nav [data-action="perfil"]');
+    assert.equal(w.document.querySelector('.profile-roll-edge'), null, 'la barra cambia de pestaña sin rebote ni desenrollado');
+    assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Perfil');
+    assert.ok(!w.document.querySelector('#app > .shell')?.classList.contains('screen-enter'));
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
-    assert.ok(reveal.cancelled);
-    click(w, '[data-action="home-encyclopedia"]');
-    assert.ok(w.document.querySelector('.dialog-enter .settings-modal.enc-modal[role="dialog"]'), 'Enciclopedia se despliega como Ajustes');
+    click(w, '.home-nav [data-action="home-encyclopedia"]');
+    assert.ok(w.document.querySelector('.settings-modal.enc-modal[role="dialog"]'), 'Enciclopedia se abre desde su pestaña');
+    assert.equal(w.document.querySelector('.dialog-enter'), null, 'la pestaña no rebota al abrirse');
+    assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Enciclopedia');
     assert.ok(w.document.querySelector('.enc-background[inert]'), 'el fondo no recibe pulsaciones');
     w.document.dispatchEvent(new w.KeyboardEvent('keydown', {key:'Escape',bubbles:true}));
     assert.equal(w.document.querySelector('[data-overlay="encyclopedia"]'), null);
@@ -466,4 +464,4 @@ console.log('Cámara en toda la preparación, sin animar las jugadas posteriores
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
   } finally { w.close(); }
 }
-console.log('Perfil: desenrollado completo, borde móvil y cancelación segura: OK');
+console.log('Navegación inferior: Perfil y Enciclopedia cambian sin rebote: OK');

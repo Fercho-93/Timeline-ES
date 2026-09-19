@@ -114,6 +114,18 @@
   }
   let cancelPageTurn = null;
   let cancelProfileRoll = null;
+  // La navegación inferior ya explica por sí sola el cambio de sección. Al usar uno de
+  // sus cinco destinos no añadimos además un giro de página, un rebote ni un pergamino:
+  // el contenido cambia en seco y el nuevo botón activo aporta toda la continuidad.
+  let primaryNavigationMotion = null;
+  document.addEventListener('click', event => {
+    const button = event.target.closest?.('#app .home-nav button');
+    if (!button) return;
+    primaryNavigationMotion = {
+      dialog: button.matches('[data-action="home-encyclopedia"], [data-action="rules"], [data-settings-action]')
+    };
+  }, true);
+  const primaryNavigationActive = () => !!primaryNavigationMotion;
   function unrollProfile(container) {
     unrollSheet(container.firstElementChild);
   }
@@ -419,6 +431,7 @@
     const previousDepth = preparationDepth[paint.screen];
     const nextDepth = preparationDepth[screen];
     const changed = paint.screen !== screen;
+    const quietPrimaryNavigation = primaryNavigationActive();
     const closingEncyclopedia = paint.screen === "enciclopedia" && changed;
     const encyclopediaBackground = closingEncyclopedia
       ? container.querySelector(`.enc-background[data-background-screen="${screen}"]`)
@@ -459,7 +472,7 @@
     if (encyclopediaBackground) container.replaceChildren(...encyclopediaBackground.childNodes);
     else container.innerHTML = html;
     window.CONTINUUM.UI?.mount(container, screen);
-    if (!primero && cambioDePantalla) {
+    if (!primero && cambioDePantalla && !quietPrimaryNavigation) {
       const kind = ['winner', 'online-winner', 'solo-end', 'comp-end'].includes(screen) ? 'end'
         : ['pass', 'pulse-pass', 'comp-intro', 'tournament-intro', 'online-competition-intro'].includes(screen) ? 'turn'
         : vuelve || (nextDepth !== undefined && nextDepth < previousDepth) ? 'back' : 'page';
@@ -470,7 +483,7 @@
     // cámara esta clase igualmente se añade (por si la cámara no llega a lanzarse, por
     // ejemplo con movimiento reducido), pero `.camera-running` anula su animación propia
     // para que no compitan las dos a la vez.
-    if (!primero && cambioDePantalla && !closingEncyclopedia) {
+    if (!primero && cambioDePantalla && !closingEncyclopedia && !quietPrimaryNavigation) {
       container.firstElementChild?.classList.add("screen-enter");
       if (vuelve || backwards) container.firstElementChild?.classList.add("screen-return");
     }
@@ -511,6 +524,7 @@
     // La vista de destino se fotografía después de recuperar su posición vertical y
     // horizontal. Así el viaje termina exactamente donde continuará el jugador.
     launchCamera?.();
+    if (quietPrimaryNavigation && !primaryNavigationMotion?.dialog) primaryNavigationMotion = null;
     if (primero) return;
     if (cambioDePantalla) {
       // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil
@@ -524,7 +538,7 @@
       // reajustarlo a cero al terminar el layout. Por eso, cuando hay un regreso guardado,
       // reafirmamos siempre la posición aunque en este instante parezca coincidir.
       if (regreso || conservaFondo || window.scrollY !== top || window.scrollX !== 0) restoreWindowPosition(top);
-      if (screen === "perfil") unrollProfile(container);
+      if (screen === "perfil" && !quietPrimaryNavigation) unrollProfile(container);
       return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que
@@ -673,12 +687,14 @@
       }
     }
     const compact = window.CONTINUUM.UI?.compactResult?.(overlay);
-    if (!pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
+    const quietPrimaryNavigation = primaryNavigationActive();
+    if (quietPrimaryNavigation) primaryNavigationMotion = null;
+    if (!quietPrimaryNavigation && !pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
     const modal = overlay.querySelector(".modal") || overlay;
     window.CONTINUUM.UI?.reveal(modal);
     const openingFocus = document.activeElement;
     window.CONTINUUM.UI?.openSurface(modal);
-    overlay.classList.add("dialog-enter");
+    if (!quietPrimaryNavigation) overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", compact ? "false" : "true");
     modal.setAttribute("tabindex", "-1");
