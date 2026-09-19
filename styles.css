@@ -879,6 +879,9 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .online-form h3 { margin: 5px 0 8px; font: 800 1.55rem var(--font-display); letter-spacing: -.02em; }
 .online-form p { color: var(--muted); line-height: 1.45; }
 .form-number { display: block; color: var(--accent); font: italic 1rem var(--font-display); }
+/* El código de conexión del modo sin conexión, para copiarlo a mano cuando la hoja de
+   compartir del sistema no ofrece ningún destino común entre Android e iPhone. */
+.signal-box { width: 100%; box-sizing: border-box; margin: 12px 0; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 10px; background: var(--paper); color: var(--muted); font: .72rem/1.4 ui-monospace, monospace; resize: none; word-break: break-all; }
 .room-code-input { text-transform: uppercase; letter-spacing: .16em; font-weight: 700; }
 .online-note { margin-top: 16px; text-align: center; color: var(--muted); font-size: .8rem; }
 .spinner { width: 48px; height: 48px; margin: 0 auto 18px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }

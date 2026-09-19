@@ -43,6 +43,17 @@
 
   function paint(html, pantalla) { CT.paint(appEl, html, pantalla); }
 
+  // Cuando Android e iPhone no comparten ningún destino en la hoja de compartir del
+  // sistema, queda copiar el texto a mano. Si el portapapeles tampoco está disponible, el
+  // propio cuadro de texto de la pantalla es de solo lectura y se selecciona al tocarlo,
+  // así que la persona puede copiarlo con el gesto normal del móvil de todos modos.
+  function copyToClipboard(text, successMessage) {
+    if (!text) return;
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(() => showToast("Selecciona el texto y cópialo a mano"));
+    } else showToast("Selecciona el texto y cópialo a mano");
+  }
+
   function header(backAction, actionsHtml = "") {
     return `<header class="topbar"><button class="icon-btn" data-local-action="${backAction}" aria-label="Volver">${BACK_ICON}</button><div class="brand">Continuum</div><div class="topbar-actions">${actionsHtml}</div></header>`;
   }
@@ -172,7 +183,7 @@
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2></section>
       <form class="panel online-form" data-local-form="join-offer">
         <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name"></div>
-        <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" required placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí…"></textarea></div>
+        <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" required placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí… Si la hoja de compartir no lo entrega, pídele que lo copie y pégalo aquí a mano."></textarea></div>
         <button class="btn btn-primary btn-block" type="submit">Unirse</button>
       </form>
       <p class="online-note">¿No tienes el código? Pídele al anfitrión que lo comparta desde el vestíbulo.</p>
@@ -207,6 +218,9 @@
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Comparte tu respuesta</h2><p class="lead">Mándasela de vuelta al anfitrión por el mismo camino — Bluetooth, AirDrop o Cerca.</p></section>
       <div class="panel">
         <button type="button" class="btn btn-primary btn-block" data-local-action="share-answer">${SHARE_ICON} Compartir mi respuesta</button>
+        <p class="hint">¿Android e iPhone no se ven en la hoja de compartir? Copia el texto y pásaselo como puedas — un mensaje, o enseñándole la pantalla.</p>
+        <textarea class="signal-box" readonly rows="4" aria-label="Tu respuesta, para copiar a mano si hace falta" onclick="this.select()">${escapeHtml(pendingAnswerText)}</textarea>
+        <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-answer">Copiar</button>
       </div>
       <div class="status status-waiting"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Conectando con la sala…</span></div>
     </div>`, "local-unirse-compartir");
@@ -242,6 +256,9 @@
       <div class="panel">
         <p>Comparte el código de conexión por Bluetooth, AirDrop o Cerca — no pasa por internet.</p>
         <button type="button" class="btn btn-primary btn-block" data-local-action="share-invite">${SHARE_ICON} Compartir código</button>
+        <p class="hint">¿Android e iPhone no se ven en la hoja de compartir? Copia el texto y pásaselo como puedas — un mensaje, o enseñándole la pantalla para que lo copie.</p>
+        <textarea class="signal-box" readonly rows="4" aria-label="Código de conexión, para copiar a mano si hace falta" onclick="this.select()">${escapeHtml(pendingInvite?.inviteText || "")}</textarea>
+        <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-invite">Copiar</button>
       </div>
       <form class="panel" data-local-form="accept-answer">
         <div class="field"><label for="local-answer">Pega aquí la respuesta que te manden</label><textarea id="local-answer" name="answer" rows="3" placeholder="Cuando te la manden, pégala en este campo…"></textarea></div>
@@ -461,6 +478,8 @@
         .then(result => { if (result === "copied") showToast("Respuesta copiada"); })
         .catch(error => showToast(errorMessage(error.message)));
     }
+    else if (action === "copy-invite") copyToClipboard(pendingInvite?.inviteText, "Código copiado");
+    else if (action === "copy-answer") copyToClipboard(pendingAnswerText, "Respuesta copiada");
     else if (action === "start") doStart();
     else if (action === "close-room") doCloseRoom();
     else if (action === "kick") { const name = roomState?.players[target.dataset.uid]?.name || "esta persona"; if (confirm(`¿Expulsar a ${name} de la sala?`)) doRemovePlayer(target.dataset.uid); }
