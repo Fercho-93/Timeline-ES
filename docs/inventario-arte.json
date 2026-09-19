@@ -3246,703 +3246,1103 @@
     },
     {
       "path": "assets/distance-cards/11001-paris-versailles.webp",
-      "sha256": "0deb9544ec532191e7664194a0ccdd913f8201442e9e82a3e17926decec82710",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "a5f0f8f72eef888e037ef3dd67bc11386e6d7c03af4c60df5eb55f8b90774a7b",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11001-paris-versailles.webp",
+        "sha256": "0deb9544ec532191e7664194a0ccdd913f8201442e9e82a3e17926decec82710",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11002-berlin-potsdam.webp",
-      "sha256": "ec2cb2ce3e97b146e51d6a1e9d5361502e9b9f354787c7f88f247d0c4b9c9a4d",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "e7781b9293679b6d26af62c373a62d004e2854e9146256642d65d24a3fa52c9d",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11002-berlin-potsdam.webp",
+        "sha256": "ec2cb2ce3e97b146e51d6a1e9d5361502e9b9f354787c7f88f247d0c4b9c9a4d",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11003-madrid-alcala-de-henares.webp",
-      "sha256": "7330df87ebab4fc2b9339f223885337f2bc54fa235d791e93d65a956cb575a60",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "38d97f14e52cdbf54d0202d3c64344772e9f68e680e88bb1048d66a212c2785b",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11003-madrid-alcala-de-henares.webp",
+        "sha256": "7330df87ebab4fc2b9339f223885337f2bc54fa235d791e93d65a956cb575a60",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11004-amsterdam-utrecht.webp",
-      "sha256": "205d6fd4377aaadce447aafce1b0d0aada3685bd3fa698346fa79ff295e98f8c",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "6da89f266d9bc06a578a5cf8e183b284f066a450742bebdf36ba0cc7cd3ae1d2",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11004-amsterdam-utrecht.webp",
+        "sha256": "205d6fd4377aaadce447aafce1b0d0aada3685bd3fa698346fa79ff295e98f8c",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11005-madrid-toledo.webp",
-      "sha256": "fe40c7f9ed4f735683367ce496dd90cfed9e8643e3d8d22835127c9c66158148",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "7447e71b2b0e16c4f25ad45d30c91825ac1426b72a0fa358f86aa72fd6a1e948",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11005-madrid-toledo.webp",
+        "sha256": "fe40c7f9ed4f735683367ce496dd90cfed9e8643e3d8d22835127c9c66158148",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11006-londres-brighton.webp",
-      "sha256": "4003aef209b288a4457613f524a4bc57cac560fef21ffb44f4cf9e630a801bd6",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "56a23ce2ada410fd79830e0f46162f3ca099ab2817f2a7aa7db12f0ddc701f49",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11006-londres-brighton.webp",
+        "sha256": "4003aef209b288a4457613f524a4bc57cac560fef21ffb44f4cf9e630a801bd6",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11007-barcelona-girona.webp",
-      "sha256": "6b39caec894e2741987b6507f658694aefefea4a59ef1072ef0b943fca1e583c",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "4bcf69c9a055bff278af7d358e4446dcbd4bac6c3f27ccf2c620979bc49caaa7",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11007-barcelona-girona.webp",
+        "sha256": "6b39caec894e2741987b6507f658694aefefea4a59ef1072ef0b943fca1e583c",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11008-paris-ruan.webp",
-      "sha256": "15e38b1ae69125e2b62ba6853e3f6ea9fb4bc8eb011d99e822bde61091fb505b",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "c7c14f30b7ad0b6866f84614f44f536b7ec4abd9de46bea11b56b35c6bb7108f",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11008-paris-ruan.webp",
+        "sha256": "15e38b1ae69125e2b62ba6853e3f6ea9fb4bc8eb011d99e822bde61091fb505b",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11009-paris-reims.webp",
-      "sha256": "59884b975bef5b7ac72ad0e646d836f21d7dc5981b7edf75f0f095a85b1585f5",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "4e275fbcbbde8ff42b1b674f39942e1d8cbc2b56f143b16392b19d70ccb2f260",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11009-paris-reims.webp",
+        "sha256": "59884b975bef5b7ac72ad0e646d836f21d7dc5981b7edf75f0f095a85b1585f5",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11010-roma-napoles.webp",
-      "sha256": "e8b5b3d7808142db317557d5cf4c11462140d10a389a1cd984bb7352ccdfac0a",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "b4d02c0b5f26d094cd3fba346b9b4803f2848051cfa8a4147a7688a547cf584c",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11010-roma-napoles.webp",
+        "sha256": "e8b5b3d7808142db317557d5cf4c11462140d10a389a1cd984bb7352ccdfac0a",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11011-paris-lille.webp",
-      "sha256": "59b1750055763a0c7532609be01c4c8beed24f1abe2ee67b1e471c019be86511",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "5beb9e6b30d72502d777ed894b342713e74c699b208c04bf0b0eeb77ac477006",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11011-paris-lille.webp",
+        "sha256": "59b1750055763a0c7532609be01c4c8beed24f1abe2ee67b1e471c019be86511",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11012-madrid-zaragoza.webp",
-      "sha256": "68980876a5da3b28010ded28a70d7c6d265e1045f80e3fbe32bd2183beebe45a",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "015cc41225537be6f6a6a7bcce021f27542b75c3f68fb1234a69ecfbbd894ebd",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11012-madrid-zaragoza.webp",
+        "sha256": "68980876a5da3b28010ded28a70d7c6d265e1045f80e3fbe32bd2183beebe45a",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11013-madrid-valencia.webp",
-      "sha256": "bb6757d7338596a198745acd65b774b44260ce80a3199e1d605f64513804c48c",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "96f16804bd7c851b7c39ed94a0a8ea0daa272e374d43b7e08bda5508edd3a9de",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11013-madrid-valencia.webp",
+        "sha256": "bb6757d7338596a198745acd65b774b44260ce80a3199e1d605f64513804c48c",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11014-paris-londres.webp",
-      "sha256": "d1ef214cbb29ce5371205eeddcf4beb736d792583918cde0b6f9690e6566d419",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "ca263189791b10d51b34d37bacebd3657e96b32a52037b0c7894bab9aea739c0",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11014-paris-londres.webp",
+        "sha256": "d1ef214cbb29ce5371205eeddcf4beb736d792583918cde0b6f9690e6566d419",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11015-madrid-sevilla.webp",
-      "sha256": "a88fca8c73affb490745baf156bb01661f667c6b430fb843f42cdfb427b7209b",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "ab09de2f93f13da6d4afc58edd57414016750e280fccc75098a6173409abee7a",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11015-madrid-sevilla.webp",
+        "sha256": "a88fca8c73affb490745baf156bb01661f667c6b430fb843f42cdfb427b7209b",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11016-roma-milan.webp",
-      "sha256": "8cc0747a98f9fc346c0ea5332db2d199ccd1f7b552e42c443eeadbd277ea2036",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "9ded2d9cbe75e37d4b905272c32427da2092d3371c288d454523d6ee37821394",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11016-roma-milan.webp",
+        "sha256": "8cc0747a98f9fc346c0ea5332db2d199ccd1f7b552e42c443eeadbd277ea2036",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11017-paris-barcelona.webp",
-      "sha256": "aedd68c600172c8053a105deb9f0118c59fe13587d84a5bbf7a8edca5970bc18",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "06e15c94c07dd37e3936f1529a780c1b8e5bd966004c7cf056cff2b1d82b9820",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11017-paris-barcelona.webp",
+        "sha256": "aedd68c600172c8053a105deb9f0118c59fe13587d84a5bbf7a8edca5970bc18",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11018-madrid-paris.webp",
-      "sha256": "c0960b9b216b623ac4394dd3d009fe900f0fc9d0279fc36b4101aec0eeed5174",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "2ffbc065cac6932effb20c77a5dfa6b6cb9922b621609e6ac49df606700822f7",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11018-madrid-paris.webp",
+        "sha256": "c0960b9b216b623ac4394dd3d009fe900f0fc9d0279fc36b4101aec0eeed5174",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11019-nueva-york-chicago.webp",
-      "sha256": "f7d0b27e4e3c85fc7ad9c9a7823a8723ec6cf62c153d6440d5bd885c2ea0e0a8",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "37ba65ed5c9b6a390622aff4a5b84d470ff2b5fd422b9f2d7c8ffc5889255c16",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11019-nueva-york-chicago.webp",
+        "sha256": "f7d0b27e4e3c85fc7ad9c9a7823a8723ec6cf62c153d6440d5bd885c2ea0e0a8",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11020-madrid-londres.webp",
-      "sha256": "76c4aecbed83d3d213d1c591b243b9c7fc5bfbf5846e0aa4089fdcea08e194e3",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "57e987891dcc182fa7fece7a5ae856d3eba02f105b4d189d6801381c748e7cf8",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11020-madrid-londres.webp",
+        "sha256": "76c4aecbed83d3d213d1c591b243b9c7fc5bfbf5846e0aa4089fdcea08e194e3",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11021-madrid-berlin.webp",
-      "sha256": "b5d36502b5adc2e31be3afc0a5f8e01592136cbcd72a697a1d88d918dcd3643c",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "56bd3efde9b006212b213c5af548114e6c9ce6fb28abd67ea6d3fc82017eb07e",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11021-madrid-berlin.webp",
+        "sha256": "b5d36502b5adc2e31be3afc0a5f8e01592136cbcd72a697a1d88d918dcd3643c",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11022-madrid-atenas.webp",
-      "sha256": "42b5fbd2b6d26116d107f3d7289a19f48426fee50697268fbffd8e3c99238bd3",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "01e564d992dd1ba460cb2eaebe86afccc461cb4ecc224e4554eab386ca1c380a",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11022-madrid-atenas.webp",
+        "sha256": "42b5fbd2b6d26116d107f3d7289a19f48426fee50697268fbffd8e3c99238bd3",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11023-madrid-reikiavik.webp",
-      "sha256": "1a1fd2135802d0b10158da5acfe2e734dde41c912beefbf4490ab2d67a0ae0d7",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "32bf0fc7931d31a21c1d7f8eec901b87789d31d27d27d730c098b5734e30980c",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11023-madrid-reikiavik.webp",
+        "sha256": "1a1fd2135802d0b10158da5acfe2e734dde41c912beefbf4490ab2d67a0ae0d7",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11024-madrid-el-cairo.webp",
-      "sha256": "f7519d98213d1dff1ec6a9f18242f36cc57f088886976a9bd4ac1b84c35f2421",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "d77113016d36ecc6aeaf17504707ccff402766e93bc5db328bec35b81fc90791",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11024-madrid-el-cairo.webp",
+        "sha256": "f7519d98213d1dff1ec6a9f18242f36cc57f088886976a9bd4ac1b84c35f2421",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11025-madrid-teheran.webp",
-      "sha256": "0f15be222a31e89eb95f3eaad84dcc659229f897b480e2c0cc7d91974908b39d",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "91eda0603a7dac74d952c0cd89dc5e643e37160576f910d39dc505fa7285d715",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11025-madrid-teheran.webp",
+        "sha256": "0f15be222a31e89eb95f3eaad84dcc659229f897b480e2c0cc7d91974908b39d",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11026-singapur-tokio.webp",
-      "sha256": "52d6d4dbecb97b8a0979d33ae82be2f44f2e8ba6f118de47377cd8c7b1411220",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "d541e468f8393eb1e1537d06662d3a592b0c14002aa953e62e7786fe572a5e14",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11026-singapur-tokio.webp",
+        "sha256": "52d6d4dbecb97b8a0979d33ae82be2f44f2e8ba6f118de47377cd8c7b1411220",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11027-paris-nueva-york.webp",
-      "sha256": "d3a466980ab07d437079d4abf598d58b29616e188607873bb8eeed6251f76b17",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "8c39e8d8e679de4c9c87c531dbd52dd28d2cb58f8482b467ce1bebd6d9e50789",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11027-paris-nueva-york.webp",
+        "sha256": "d3a466980ab07d437079d4abf598d58b29616e188607873bb8eeed6251f76b17",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11028-roma-zurich.webp",
-      "sha256": "d471ead13dd5dbb157188710cf452a0a0ea4f9064b08ca9293833ae384fe14f5",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "08a8733817acff32731800ac5fa356d00c68853b73e215c99e3e01efb461071a",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11028-roma-zurich.webp",
+        "sha256": "d471ead13dd5dbb157188710cf452a0a0ea4f9064b08ca9293833ae384fe14f5",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11029-londres-bombay.webp",
-      "sha256": "486ca975245f656eeb64b5f187f97304165089dccda944bf00db3af2d92dad84",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "31779c02533ec7c437b1233c70e43fcac233f74c9d375985b60c25d71117157e",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11029-londres-bombay.webp",
+        "sha256": "486ca975245f656eeb64b5f187f97304165089dccda944bf00db3af2d92dad84",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11030-estambul-nueva-york.webp",
-      "sha256": "99f61168f3adf06cfbafaa1901010b45753b13831649d053aa599b8dfd832850",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "47e1d674f488a5c697192bd26226cafa4bb7c9c5c777a17da52be092850271ac",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11030-estambul-nueva-york.webp",
+        "sha256": "99f61168f3adf06cfbafaa1901010b45753b13831649d053aa599b8dfd832850",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11031-londres-edimburgo.webp",
-      "sha256": "ca4928fd1f679865bc4d302142361155d1960035b308fa6ff55091fb8dd0768e",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "1cf496e9e2fc12d4e0179da0a81e3e4bcddf8eb45c054cfc895803ec9453d5a3",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11031-londres-edimburgo.webp",
+        "sha256": "ca4928fd1f679865bc4d302142361155d1960035b308fa6ff55091fb8dd0768e",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11032-madrid-los-angeles.webp",
-      "sha256": "203cd126aea74025df12e0f4b703244b27e25616d16e0133124a3ee1c180513b",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "61021fc970b86b0be072c3c7e88ac27dd2e15836f62172231cb322c3653df6ef",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11032-madrid-los-angeles.webp",
+        "sha256": "203cd126aea74025df12e0f4b703244b27e25616d16e0133124a3ee1c180513b",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11033-madrid-santiago.webp",
-      "sha256": "b640359bea6872455aa97b75925eb1bbb99b327901e4c97de6acefd6b11da619",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "f42dfed45ef85ad46f1e115f3b8cb612183999edca2204e80f02e96104277437",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11033-madrid-santiago.webp",
+        "sha256": "b640359bea6872455aa97b75925eb1bbb99b327901e4c97de6acefd6b11da619",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11034-johannesburgo-pekin.webp",
-      "sha256": "281590f9989980a6f4065169918ef651c7b5a64e465cf14a56dcca094fa289e4",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "6b7e4f028f216205709a185e31686e51ace599aadf1cc0e59d1263de796ad370",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11034-johannesburgo-pekin.webp",
+        "sha256": "281590f9989980a6f4065169918ef651c7b5a64e465cf14a56dcca094fa289e4",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11035-madrid-honolulu.webp",
-      "sha256": "84092920a81586af962fa39053314bfeff803a0dd41a4357b59f87965f9ae7ed",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "1cf1a66f054232cb3685c78df90ebf3e83d8a25704475a18ad992642e4f1e5a6",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11035-madrid-honolulu.webp",
+        "sha256": "84092920a81586af962fa39053314bfeff803a0dd41a4357b59f87965f9ae7ed",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11036-madrid-perth.webp",
-      "sha256": "7b6822332259ec5564119c6e457829ecb18bd822fab3e6d979f118560f7d78cb",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "aa6fe13ade5b8081f8da183d4507a8e982c443530bd90cb697ee77589a42fa34",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11036-madrid-perth.webp",
+        "sha256": "7b6822332259ec5564119c6e457829ecb18bd822fab3e6d979f118560f7d78cb",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11037-madrid-sidney.webp",
-      "sha256": "babfd44b218127d7bde0970861753013f2c850eb7e849533f6d22de655503018",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "062319db5709dc0b2a74387a5fb38ae184872d7e6c5065ccf2e6f7294211c427",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11037-madrid-sidney.webp",
+        "sha256": "babfd44b218127d7bde0970861753013f2c850eb7e849533f6d22de655503018",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11038-madrid-auckland.webp",
-      "sha256": "07eb1fbb47fce50939a6d42f082356653d51609aca2a1dd65325dab9fb3bfb40",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "e7ff489775649505c8f7ad057436e3476da5bc7faf777e5d4ed21f05599029b9",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11038-madrid-auckland.webp",
+        "sha256": "07eb1fbb47fce50939a6d42f082356653d51609aca2a1dd65325dab9fb3bfb40",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11039-san-francisco-los-angeles.webp",
-      "sha256": "7aa3458558029b77eae562575c877b914d7b306c170a376763ac6e5960cbdcf3",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "59c3598657e2f5a6887bded2f14af924b73679036791ba6ab61a9378789f4b36",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11039-san-francisco-los-angeles.webp",
+        "sha256": "7aa3458558029b77eae562575c877b914d7b306c170a376763ac6e5960cbdcf3",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11040-rio-sao-paulo.webp",
-      "sha256": "40888cf27e956c8e53cf0aebd4d6099c7f1d62f09b62756cad3e5207cc32dc91",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "147dc8a4bef716a7ee0c31278f2e38c4b25059589a39df4fde5c76a9f95dd38b",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11040-rio-sao-paulo.webp",
+        "sha256": "40888cf27e956c8e53cf0aebd4d6099c7f1d62f09b62756cad3e5207cc32dc91",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11041-buenos-aires-montevideo.webp",
-      "sha256": "d11ee700ffbe9c101113bfeec2eebdc91cf63dc55c4e401576b88ccb870f05e7",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "7e4eabaae8165f8256af6c261a07a036d22368ffc1156543673e470eeb3204db",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11041-buenos-aires-montevideo.webp",
+        "sha256": "d11ee700ffbe9c101113bfeec2eebdc91cf63dc55c4e401576b88ccb870f05e7",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11042-el-cairo-jerusalen.webp",
-      "sha256": "d32bc7a1cdf734b492b60ed8e9c55f510d621795cbb762a1af97eb24368f5538",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "d48a7dac3fa996d10949911b1da3c79319aa4ed45157aacc2ff6af762f97f878",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11042-el-cairo-jerusalen.webp",
+        "sha256": "d32bc7a1cdf734b492b60ed8e9c55f510d621795cbb762a1af97eb24368f5538",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11043-nairobi-kampala.webp",
-      "sha256": "12431723a864307e1d70847a259dece1e86f65df15785c11173f1c30e2653610",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "2164c16cf9223c122ec539eaa8650b90e2af24a8071c1905e5dba664f56915e4",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11043-nairobi-kampala.webp",
+        "sha256": "12431723a864307e1d70847a259dece1e86f65df15785c11173f1c30e2653610",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11044-delhi-bombay.webp",
-      "sha256": "eb54ebfeb8b82539176aea513654cf150e01aa6cdd50dc8c654edd68012f70c4",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "d77e5e90c423f830d2c4e179c66a3e5714b4fb6f935c2e3b2cfb25dacbcae3db",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11044-delhi-bombay.webp",
+        "sha256": "eb54ebfeb8b82539176aea513654cf150e01aa6cdd50dc8c654edd68012f70c4",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11045-pekin-shanghai.webp",
-      "sha256": "5f8057696cc1aaf481e2ecda6bdd7c0f14a66c208d245c123d5a2b27ffcc4607",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "61478382f9790d8d80b8163f374508e9606742a3f30adc4ecc428c6d19a6764b",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11045-pekin-shanghai.webp",
+        "sha256": "5f8057696cc1aaf481e2ecda6bdd7c0f14a66c208d245c123d5a2b27ffcc4607",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11046-tokio-seul.webp",
-      "sha256": "e3f6c3f5cba56f7694089e41b447ce27794d546a2dc3edc6e093290e13721b43",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "80b43c31df14b62b3dd289879745dc6063f7324346eca84920f967b215a61f0d",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11046-tokio-seul.webp",
+        "sha256": "e3f6c3f5cba56f7694089e41b447ce27794d546a2dc3edc6e093290e13721b43",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11047-sidney-melbourne.webp",
-      "sha256": "e44bacb90058f3cf6943d0689efaad50f332ada8f2694a55a7970b6631b30c8a",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "3cf7cfb792e39a9a07773f4a3b2de41626d7275d3a1cb87f81c01e8c7d8f2793",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11047-sidney-melbourne.webp",
+        "sha256": "e44bacb90058f3cf6943d0689efaad50f332ada8f2694a55a7970b6631b30c8a",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11048-auckland-wellington.webp",
-      "sha256": "c9c5535a763d6e4255f41826afeb66c59154ac3c274abed86066447ac1ba3e01",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "fb280b3714bdcfaa50ef7e5ea0207fa92c374d943fbd0b091b439c8b5ca9205f",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11048-auckland-wellington.webp",
+        "sha256": "c9c5535a763d6e4255f41826afeb66c59154ac3c274abed86066447ac1ba3e01",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11049-ciudad-de-mexico-guadalajara.webp",
-      "sha256": "3c62bd45a90ea41f11dabe655d1d3301b13954f64be9b362470288077850fef0",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "6d183579c4ee7cbacf8f4f78f3c5999989a6d07c53825aff52c20746d382d25d",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11049-ciudad-de-mexico-guadalajara.webp",
+        "sha256": "3c62bd45a90ea41f11dabe655d1d3301b13954f64be9b362470288077850fef0",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/distance-cards/11050-toronto-montreal.webp",
-      "sha256": "2cb15dd1559ff37d4fdca39ba52ee8e0c3e43d5e3c47855b80b751abf175473b",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "b89c804adbea9e3d38bc5eefac37165d826d915e58cdeacf5d577d25c596302c",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/distance-cards/11050-toronto-montreal.webp",
+        "sha256": "2cb15dd1559ff37d4fdca39ba52ee8e0c3e43d5e3c47855b80b751abf175473b",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/distance-cards/11051-el-cairo-tokio.webp",
+      "sha256": "2cfc544fe4b6c9b7a89731306cddca9f98b63692ad8d779635d8dd26517b1f58",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11052-lima-moscu.webp",
+      "sha256": "6bf20c80944cc3f148aedf6b3610f10de12449820df7d625301a211c34e35f1b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11053-roma-atenas.webp",
+      "sha256": "ee1a7bb9084775ffb3a3ecec9d02f56729563f9d69c5aa733dc091885be08010",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11054-teheran-kabul.webp",
+      "sha256": "282217ca482b6251e1146251ad0f5e30761b42c9b7f272b4a4768dbe69a302b9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11055-viena-baku.webp",
+      "sha256": "525f9afe72d6f649cbdcf3f617a43c876427cc5efb3aefa15ad739afff1162ae",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11056-doha-copenhague.webp",
+      "sha256": "982bb47deea47ae087724f8f7c725ec74b357d8f9450680dd2eef858c70ae01d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11057-tallin-los-angeles.webp",
+      "sha256": "3aed36e9ca903fc4a840788e6a3e80b29fa0c3353a5a9fa219e1a41f9b9cea5f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11058-gibraltar-paris.webp",
+      "sha256": "5b8e4193c41ca2c7044a9d83bf4a3a881ebf18a8b2d9f517f906ee2d2167e206",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11059-dublin-reikiavik.webp",
+      "sha256": "b825192b4ec13137b65da78168c398b47b965d031c2f9a32239116e3f208f33c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11060-berlin-roma.webp",
+      "sha256": "fe9a26c6134ac0500e36d9342ffe2dacbe33acb92150b5c5bae5d1691e7e9e48",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11061-hamburgo-oslo.webp",
+      "sha256": "0ab8a2b0f39e80146004822d495506bc133621d8ae8408744feb55a49ae6eb74",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11062-seul-quito.webp",
+      "sha256": "e3fa501f1c68c3f9fae2c2f3e48a6d50c05eca53aa71637f94ec23291350adbc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11063-la-habana-caracas.webp",
+      "sha256": "54e4a11cbb9959997d82a6474c487350151eafbc8b03b056006a6ea60ea410bd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11064-lisboa-varsovia.webp",
+      "sha256": "4a14769e540d5d6672ed8d62de4ba3dea146c6b7ce980816a652c6092b88aa43",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11065-praga-san-petersburgo.webp",
+      "sha256": "17485c70aaf7bd523f5ce8fa36e2bdcf1f42d6b1c537b595eace49332387c36a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11066-estocolmo-ankara.webp",
+      "sha256": "fb291bd5c31c098f0a86f8895506c39c2f191ed747cf248592d19ee7b3b99d19",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11067-montevideo-santiago.webp",
+      "sha256": "57c937d0c1117a8a806bfabe3f2452514256d47659f4cd9c6cd3fc14a84fbca7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11068-sofia-sarajevo.webp",
+      "sha256": "f69a7d0bcfd3c8459155cbc4d467ca8567409af5bf2feeec4de91a54ef1b6563",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11069-brasilia-pekin.webp",
+      "sha256": "588018c64500dbb9ac477d6b3907f8ea1853cb122429a968c2f40fa15897a33c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/distance-cards/11070-bogota-medellin.webp",
+      "sha256": "bfe7eccb9d2b461bcb0c6739fc35083c1af128c4b529a2b0e8f7630e6b5066a7",
+      "rightsEvidence": null
     },
     {
       "path": "assets/hero-cinema-400.webp",
@@ -9746,31 +10146,43 @@
     },
     {
       "path": "assets/movie-cards/1067-mar-adentro.webp",
-      "sha256": "6ef8de848b34367eece28898159114745c6ba0b8d4b2b763c2d6a6e3db91fe7d",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "3edd77a072ca7de00f6d6a9c9c4e7741884b3ee889213174d8cd084a7a9fb947",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1067-mar-adentro.webp",
+        "sha256": "6ef8de848b34367eece28898159114745c6ba0b8d4b2b763c2d6a6e3db91fe7d",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1068-batman-begins.webp",
-      "sha256": "99239486b997f638ecb8a9a200fa41934c3d65343c869c7125379470a607ac1c",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "b85792f82eb4a04bbe9f6d73baf3a917393336658bf69abd7806c721f84fe34c",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1068-batman-begins.webp",
+        "sha256": "99239486b997f638ecb8a9a200fa41934c3d65343c869c7125379470a607ac1c",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1069-pan-labyrinth.webp",
@@ -9788,17 +10200,23 @@
     },
     {
       "path": "assets/movie-cards/1070-orphanage.webp",
-      "sha256": "2231a34f5fa296bb710508f9b75303f44a404ca48f6fd99a2b9e3582053bcd00",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "579aa9e09c1f61e2f13d3e26ac09ff515ea0a320878e74b49a59749fdfdba656",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1070-orphanage.webp",
+        "sha256": "2231a34f5fa296bb710508f9b75303f44a404ca48f6fd99a2b9e3582053bcd00",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1071-dark-knight.webp",
@@ -9858,73 +10276,103 @@
     },
     {
       "path": "assets/movie-cards/1075-avengers.webp",
-      "sha256": "cc99c2a7688ebeb11e4796d62d0f7aed668dd812130e19b92cde84c6cd11fe8f",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "618f0c5f30a0a97d86f9bc706c95a3eccf88281ccd8ac320d48463a84240a7fa",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1075-avengers.webp",
+        "sha256": "cc99c2a7688ebeb11e4796d62d0f7aed668dd812130e19b92cde84c6cd11fe8f",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1076-frozen.webp",
-      "sha256": "79c8806a98b08fcfdc67ab7bab5fab43f2ca1c0096259f0d3f9990c27d020ef5",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "8fdbd686c83e5d74ffb8bbb44f204c6f9ec4912222fe487f3cde182417bb686b",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1076-frozen.webp",
+        "sha256": "79c8806a98b08fcfdc67ab7bab5fab43f2ca1c0096259f0d3f9990c27d020ef5",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1077-basque-comedy.webp",
-      "sha256": "8c01d6bbe61c27b1d4aeef5ab7c1129b10e7531d620a6fe9b2179e6f9e63f67c",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "8b5a567ff55ef1bf035e1332227bbf81cb0c6752817af9fa56377cebaf39df87",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1077-basque-comedy.webp",
+        "sha256": "8c01d6bbe61c27b1d4aeef5ab7c1129b10e7531d620a6fe9b2179e6f9e63f67c",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1078-inside-out.webp",
-      "sha256": "3a1eada91d8bfc7489a079936137afdc62675c01449def5100c8f357de08a8ce",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "e71478ed63cd968fdf9f4a0f90653859a7c5f04a8a0098df6536aa58278a3d75",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1078-inside-out.webp",
+        "sha256": "3a1eada91d8bfc7489a079936137afdc62675c01449def5100c8f357de08a8ce",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1079-la-la-land.webp",
-      "sha256": "677bc6dfe49cca9891c43c83ca26a46d0b2db5cdc9cc6f34cbc137c90ff36e51",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "f1a97ac70b8d57fee0278acaf5f369dc5670ac852083a82dcf8be4402de064c3",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1079-la-la-land.webp",
+        "sha256": "677bc6dfe49cca9891c43c83ca26a46d0b2db5cdc9cc6f34cbc137c90ff36e51",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1080-coco.webp",
@@ -9942,73 +10390,103 @@
     },
     {
       "path": "assets/movie-cards/1081-champions.webp",
-      "sha256": "b0fe1bf8e30a93133dbcf49ab07d43aebc3b43beb53ed69dbd45ad4abce98804",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "b4ec15cce39f077ca237201563e004842adc16031e4fc16960ebed8d7def1c24",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1081-champions.webp",
+        "sha256": "b0fe1bf8e30a93133dbcf49ab07d43aebc3b43beb53ed69dbd45ad4abce98804",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1082-parasites.webp",
-      "sha256": "41bd2ee0f80aee3ceeabc26418310f19f93b13e3ac7edbc7c5790f5fe510a123",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "7ae92b1b8f093227e71b57d7d635af5132e141a05c40e8640649cdd336f1e8f1",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1082-parasites.webp",
+        "sha256": "41bd2ee0f80aee3ceeabc26418310f19f93b13e3ac7edbc7c5790f5fe510a123",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1083-soul.webp",
-      "sha256": "617404b95a19573c34b810e1032146d3d7adb097b8415f428c24417b3006e08a",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "a664c2668770bd5fa4fec4fac5848a076fdb564cd615fd512c56e958f1b45bbd",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1083-soul.webp",
+        "sha256": "617404b95a19573c34b810e1032146d3d7adb097b8415f428c24417b3006e08a",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1084-good-boss.webp",
-      "sha256": "4c31961bee65d0634c586363be909e55baeb094a69b3e40078032613a6a02b69",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "4829303d753d216fddb6d6e178f3fb36904735adde9d7893aeac290858beb04f",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1084-good-boss.webp",
+        "sha256": "4c31961bee65d0634c586363be909e55baeb094a69b3e40078032613a6a02b69",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1085-as-bestas.webp",
-      "sha256": "eb2e2ed2938e5a2cd9977ac57602c80b90f3c07148c7008440e2a0799f9f576b",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "da53c4ae8a4e93021ddde13f7400fccbbe411d2e2f7978cfceebde0d9425916e",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1085-as-bestas.webp",
+        "sha256": "eb2e2ed2938e5a2cd9977ac57602c80b90f3c07148c7008440e2a0799f9f576b",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1086-barbie.webp",
@@ -10026,17 +10504,23 @@
     },
     {
       "path": "assets/movie-cards/1087-inside-out-2.webp",
-      "sha256": "ac2d6d3f32aadf60a8174878f8e1779503de7c2876661243475356af9ccf89e2",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "5c42347a6d9e710cf6c164693a2d4bd2c091d033f612f2ee705ca7ae8e476a60",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1087-inside-out-2.webp",
+        "sha256": "ac2d6d3f32aadf60a8174878f8e1779503de7c2876661243475356af9ccf89e2",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1088-dune-part-two.webp",
@@ -10070,8 +10554,14 @@
     },
     {
       "path": "assets/movie-cards/1094-los-domingos.webp",
-      "sha256": "ecaf0da8b451e667ea810e9ca81cc2aed82bc9b05bbfb44f6561523202791e5c",
-      "rightsEvidence": null
+      "sha256": "0ba77ad2911cd3f16d2fa376d0cfcbf887f0aa951784d1bc3a583b148d786f0c",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1094-los-domingos.webp",
+        "sha256": "ecaf0da8b451e667ea810e9ca81cc2aed82bc9b05bbfb44f6561523202791e5c",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1095-all-quiet-western-front.webp",
@@ -10080,13 +10570,25 @@
     },
     {
       "path": "assets/movie-cards/1096-forrest-gump.webp",
-      "sha256": "fbbf0689b8ce096dce4170306bff8beefd37ecec979f6c418a2fa3c7e7ccf5bf",
-      "rightsEvidence": null
+      "sha256": "96bfb8dd5c297cc0ba0870a3b1e4bbb7301fa0c883b83caadfdbfb3d5f713535",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1096-forrest-gump.webp",
+        "sha256": "fbbf0689b8ce096dce4170306bff8beefd37ecec979f6c418a2fa3c7e7ccf5bf",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1097-intouchables.webp",
-      "sha256": "0a7fc207b983fd53e2175db829b96d62d2dfbf2bb7a50ac24f8bbc163f9ca176",
-      "rightsEvidence": null
+      "sha256": "481ae7b27fb44fc18d9b47112bcb1c68be9eec58d5b2887ee1a29a0a0ede73ad",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1097-intouchables.webp",
+        "sha256": "0a7fc207b983fd53e2175db829b96d62d2dfbf2bb7a50ac24f8bbc163f9ca176",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1098-full-metal-jacket.webp",
@@ -10100,18 +10602,36 @@
     },
     {
       "path": "assets/movie-cards/1100-midnight-in-paris.webp",
-      "sha256": "466fb7c0aa7598473ace94bb8043664f7e6b42cc4deba2958a91e1cbacd10602",
-      "rightsEvidence": null
+      "sha256": "a7fd9636cd6bda16b65c8386a8b0ba7af4dd1f0c589dc13179a094e9927dd551",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1100-midnight-in-paris.webp",
+        "sha256": "466fb7c0aa7598473ace94bb8043664f7e6b42cc4deba2958a91e1cbacd10602",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1101-vicky-cristina-barcelona.webp",
-      "sha256": "5f81f54ac9db0159469a9dc701a20834c7e596a9641769f492c378f2740caa63",
-      "rightsEvidence": null
+      "sha256": "7266602d31acbaff6b94fa067649875168223de2de05a66d93dc191a56c60fb0",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1101-vicky-cristina-barcelona.webp",
+        "sha256": "5f81f54ac9db0159469a9dc701a20834c7e596a9641769f492c378f2740caa63",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1102-match-point.webp",
-      "sha256": "368a6a5cf1d7f1dc0e63542903494bc9b4f01616fde96a22610b7a3bc847f40e",
-      "rightsEvidence": null
+      "sha256": "3c67b12518fe0095c8ba814fd9e7b09055a3d591b1aa269dfccbfd901b166d70",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1102-match-point.webp",
+        "sha256": "368a6a5cf1d7f1dc0e63542903494bc9b4f01616fde96a22610b7a3bc847f40e",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1103-last-crusade.webp",
@@ -10120,33 +10640,69 @@
     },
     {
       "path": "assets/movie-cards/1105-reservoir-dogs.webp",
-      "sha256": "b2c26dc17ccb7e021d28b250374327530daef03be58b5f76e6c0c4db1d8d5740",
-      "rightsEvidence": null
+      "sha256": "20543fcdd0b7438b865f104cbfeb8a6ba03e454764f26ccdfb8b5591904638aa",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1105-reservoir-dogs.webp",
+        "sha256": "b2c26dc17ccb7e021d28b250374327530daef03be58b5f76e6c0c4db1d8d5740",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1106-django-unchained.webp",
-      "sha256": "91f937951e53636434d9ae93624b11fa29ded104b8889d2b67ae6b92b7e2dcfc",
-      "rightsEvidence": null
+      "sha256": "cceca26298a1842c7b57b1567bea147f94605d8108e8659bcfb9d162fc9bb5d4",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1106-django-unchained.webp",
+        "sha256": "91f937951e53636434d9ae93624b11fa29ded104b8889d2b67ae6b92b7e2dcfc",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1107-inglourious-basterds.webp",
-      "sha256": "aaf049d7112a3ab95a00161100f37c34c8e432983d610790dbb00f666cb2e835",
-      "rightsEvidence": null
+      "sha256": "9d7d05a1230ad7e43097c3f09916f4cf63e06a8eb59d15ceffb42423ec2a0a7e",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1107-inglourious-basterds.webp",
+        "sha256": "aaf049d7112a3ab95a00161100f37c34c8e432983d610790dbb00f666cb2e835",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1108-hateful-eight.webp",
-      "sha256": "644cb242d823859545347ca1ebc1bcc1d0bcdcaf193df849c1d54ac8d880d152",
-      "rightsEvidence": null
+      "sha256": "285bf2f8687f1b118df4fbef3734ac8911cc4d75e45eeffc598e08a3cd78b1dd",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1108-hateful-eight.webp",
+        "sha256": "644cb242d823859545347ca1ebc1bcc1d0bcdcaf193df849c1d54ac8d880d152",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1109-life-is-beautiful.webp",
-      "sha256": "91db4ec1573bf5e6a35bd54d71384eac6694fa027978dbc50b33ef98ddee037d",
-      "rightsEvidence": null
+      "sha256": "af7c62685490cba856076331aafdb4ab22a58b7440dc44ec61cd034219b02174",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1109-life-is-beautiful.webp",
+        "sha256": "91db4ec1573bf5e6a35bd54d71384eac6694fa027978dbc50b33ef98ddee037d",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1110-tiger-and-snow.webp",
-      "sha256": "e3c799a81f1e585ddd58d95841df471b3682d55868db24ac8a672f4b351e33ea",
-      "rightsEvidence": null
+      "sha256": "c00472a4cffba43b376ee33bf9ae05a5d7e63814a73e60fd9e240452bc0a1fb8",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1110-tiger-and-snow.webp",
+        "sha256": "e3c799a81f1e585ddd58d95841df471b3682d55868db24ac8a672f4b351e33ea",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1111-pianist.webp",
@@ -10155,8 +10711,14 @@
     },
     {
       "path": "assets/movie-cards/1112-gran-torino.webp",
-      "sha256": "cc5200e75c40ceb506ddb57aa29a6d3a5ee1077f88157a291a1f0ca3deb227c5",
-      "rightsEvidence": null
+      "sha256": "c2553b032b18765d48762e324f54e4fe967478bf1e5eda1152164a9f1aa18cb1",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1112-gran-torino.webp",
+        "sha256": "cc5200e75c40ceb506ddb57aa29a6d3a5ee1077f88157a291a1f0ca3deb227c5",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1113-lives-of-others.webp",
@@ -10170,8 +10732,14 @@
     },
     {
       "path": "assets/movie-cards/1115-princess-mononoke.webp",
-      "sha256": "d4b05370bddd831cb43a999ee66bd634c147a59f9a99364deb5b37b4bd61d37f",
-      "rightsEvidence": null
+      "sha256": "f3878e213f634edac44a5b118a7bd2bf128b9e755f7a48e4a646c296dca78020",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1115-princess-mononoke.webp",
+        "sha256": "d4b05370bddd831cb43a999ee66bd634c147a59f9a99364deb5b37b4bd61d37f",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1116-howls-moving-castle.webp",
@@ -10180,56 +10748,134 @@
     },
     {
       "path": "assets/movie-cards/1117-my-neighbor-totoro.webp",
-      "sha256": "50fb3f52b0650e9cd0817c36ae763579715db376a774926b6c198dbde70ef2bf",
-      "rightsEvidence": null
+      "sha256": "fcae484f94e0e7cb3bd082d9304847a45c135afebdbfabd305e36520b5f2b36a",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1117-my-neighbor-totoro.webp",
+        "sha256": "50fb3f52b0650e9cd0817c36ae763579715db376a774926b6c198dbde70ef2bf",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1118-klaus.webp",
-      "sha256": "68f6ab44d9c6d3f0856deb6016e7d982fada6fc2f4bef7929309bed15fe18876",
-      "rightsEvidence": null
+      "sha256": "d033dceecb0c95e1d6032f500d913264d987eabff646a632443a6cede7e73247",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1118-klaus.webp",
+        "sha256": "68f6ab44d9c6d3f0856deb6016e7d982fada6fc2f4bef7929309bed15fe18876",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1119-interstellar.webp",
-      "sha256": "4740a6bd919bd4b7302b70b825fdf01828279e800d222664f7702bd051c0ba84",
-      "rightsEvidence": null
+      "sha256": "1ce660342d2d6fea1bdce856836317c602b3cd783ba39259c5a565e5b08ebc66",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1119-interstellar.webp",
+        "sha256": "4740a6bd919bd4b7302b70b825fdf01828279e800d222664f7702bd051c0ba84",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1120-memento.webp",
-      "sha256": "c4e43b36df41daa9e145e25799050128ac3be7dd70003c4bb35fbafb50848645",
-      "rightsEvidence": null
+      "sha256": "0c05fc5c556b8089eabebbcfad3a9302111804251cbfac6d6127e015fa9f3218",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1120-memento.webp",
+        "sha256": "c4e43b36df41daa9e145e25799050128ac3be7dd70003c4bb35fbafb50848645",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/movie-cards/1121-whiplash.webp",
-      "sha256": "39f35af48b6d9df97f27f5e4f8685f74ce7f5610fc722d9e12960c77fa47ea40",
+      "sha256": "ec326e1074924145202191159ec99c96e152193e21494019a7fe788366da20ba",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/movie-cards/1121-whiplash.webp",
+        "sha256": "39f35af48b6d9df97f27f5e4f8685f74ce7f5610fc722d9e12960c77fa47ea40",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/20-de-abril.webp",
+      "sha256": "b18a784d03033c5926ba7ed4fefefcd0a9a98be985458a9c70b0c4bf26a68f1a",
       "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/21-album.webp",
-      "sha256": "c9a3ae8f4c823bda61fe21f4ff9cb4a11fe9ba493ac22496a7f752c67a34309f",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "a976979a4cbecdcda88f101723a3a54915f65aaa06a2872c46f1d509b8fd80d6",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/21-album.webp",
+        "sha256": "c9a3ae8f4c823bda61fe21f4ff9cb4a11fe9ba493ac22496a7f752c67a34309f",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/a-quien-le-importa.webp",
+      "sha256": "d4a9256625b4c641bd10433039909dcfbc9126d89889d5204b0b32f73120c0ef",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/a-quien-le-importa.webp",
+        "sha256": "50f30a88de3b0fd98f76ba904f8c871b314d553bed4be9d7b4a2e155021bd1bc",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/another-brick-in-the-wall.webp",
+      "sha256": "eabd0de3049a301d27ee1ad22eb8edb700bbe5b8cb00d2bef2c10a400c484f91",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/as-it-was.webp",
+      "sha256": "47ebfa76f4286bb941dee53725b2837b4347eb8c557e88bf66a571775b76ce77",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/automatic-people.webp",
-      "sha256": "9b7ac0a1e32732ab8ffeab8d6c3f2ac3df2f20accba01bf37235dbb8426d050a",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "089dc4213314de5788dc90d99d7be9d4028f571b53697da279bf3837728985ab",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/automatic-people.webp",
+        "sha256": "9b7ac0a1e32732ab8ffeab8d6c3f2ac3df2f20accba01bf37235dbb8426d050a",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/baby-one-more-time.webp",
+      "sha256": "00db02b5fed9c4b86f0eabeecb313c098924453d3e243655264b31cf138b09da",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/baby.webp",
+      "sha256": "c9e8c91037c03006743c01b4a78423883eb225461e431fef3afc95010f0cc716",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/bach-brandenburg.webp",
@@ -10244,6 +10890,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/basket-case.webp",
+      "sha256": "e45d626fdbe476c676cfe3f322b857c96c79c6b278ae5497dfed8ea1d0d3f61a",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/beethoven-heroica.webp",
@@ -10288,18 +10939,29 @@
       }
     },
     {
+      "path": "assets/music-cards/billie-jean.webp",
+      "sha256": "33971862e03a58631e04cae4c59bdec7e3cf98aa0051a1ca0705e79a9b7dc644",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/bohemian-rhapsody.webp",
-      "sha256": "c61f4e78ffb733ccf415141e79c33f08539565b8afce2feac492cea9e4fe184b",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "d5fa2b0872241e5c188e42b6ce86d0874032e52103d550ff11cfd1a96bf0f2b6",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/bohemian-rhapsody.webp",
+        "sha256": "c61f4e78ffb733ccf415141e79c33f08539565b8afce2feac492cea9e4fe184b",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/music-cards/caruso-milan-recording.webp",
@@ -10316,6 +10978,11 @@
       }
     },
     {
+      "path": "assets/music-cards/close-to-you.webp",
+      "sha256": "3387dca5bf9713027e0dde1701254dd1b7c32aa0dc84a4795e80499e540bf364",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/commercial-radio.webp",
       "sha256": "0965ed5fe5302986749f493055d8d07aafefa40b2d62869533084bb8bae51f77",
       "rightsEvidence": {
@@ -10330,6 +10997,16 @@
       }
     },
     {
+      "path": "assets/music-cards/como-una-ola.webp",
+      "sha256": "8d326be449462f980aa4f1e260b2fa1ab343e5eb1aca3f17a37b4e36ee157922",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/crazy-in-love.webp",
+      "sha256": "27dfcb409e81083f55f90025b23c5086974677bf4ce991673ca0f35065ca1fc0",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/crystal-palace-recording.webp",
       "sha256": "42913168f01abf50d042affd7f77a5517961e4b46f867e9aa8c81df9e5ff1752",
       "rightsEvidence": {
@@ -10342,6 +11019,22 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/dancing-in-the-dark.webp",
+      "sha256": "e5102223b4dc10b3d997c4afd0b92e6e622296153a0e37240c329eebd9205dae",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/dancing-in-the-dark.webp",
+        "sha256": "6f0dcdb433255e647e9fa4260edeaeed07a157c9c12ef67736ea7c41182b2c49",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/dancing-queen.webp",
+      "sha256": "3f089930447ec2f20e0d9f0adcacac7951b6d63f7efc2a9d3bbce3fa00369fce",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/dark-side-moon.webp",
@@ -10442,6 +11135,16 @@
       }
     },
     {
+      "path": "assets/music-cards/enjoy-the-silence.webp",
+      "sha256": "a661788b873acb6bf55c04470474ba7e3810d346e8db49bffe792fd1dfd04fb2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/enter-sandman.webp",
+      "sha256": "db177660f00338373f3a752db9fd06db38a3f1e0b9a199393aa1a72d478f91f0",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/eras-tour.webp",
       "sha256": "d51d229fa4e95d5429320475f303c64d4609c76b84b8a7b6aa8f886e0d9a2cc1",
       "rightsEvidence": {
@@ -10454,6 +11157,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/every-breath-you-take.webp",
+      "sha256": "815de101cdd989bee6941ec9d2646f17444d1fcbdced68de636d6916e724952f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/firework.webp",
+      "sha256": "5f24c5da2a106e5444083558de1dd834ad2f72e45f951f065d807abce3f4d498",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/gangnam-style.webp",
@@ -10498,6 +11211,46 @@
       }
     },
     {
+      "path": "assets/music-cards/hallelujah.webp",
+      "sha256": "aef2ce99d7682b20d8cc1ff84ad437e84cb0bc700d73157b3c8cd50f08dbdfe1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/havana.webp",
+      "sha256": "583fd364fb8c89b939daef51fbd71e689f18c374651b3d2a04cbe8601be4905e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/heroes.webp",
+      "sha256": "d071a299ce4826b21328489b8cade68882aa0982aeca1a799044863de16aa4c6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/highway-to-hell.webp",
+      "sha256": "e514db96c70236b864824d5d8c22307bb538dff05e4302d322f3e8226f9d3c19",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/i-kissed-a-girl.webp",
+      "sha256": "7d2db7f19808a217f325843604b51a48c46d0b98df8a279e9f4774cd58cc8c2b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/i-want-to-hold-your-hand.webp",
+      "sha256": "ae1ef0ee2715b05e3156e4b2415a67ab44be9b3e07629cac6686c19b843d3102",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/i-will-always-love-you.webp",
+      "sha256": "179f37c9b3d69b3f5f5c658933f387a849c6a5753e8d0a8e7cb675adb3eb97a8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/imagine.webp",
+      "sha256": "854630f4afd146d8b7ff9bc738dbeb5e71072a3b32693b26c4f1a898c1844f6d",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/in-rainbows.webp",
       "sha256": "c38987b7d30db889e6f9e0859ccb20fafb011232907934cbffd93ca09a3b8893",
       "rightsEvidence": {
@@ -10510,6 +11263,17 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/in-the-end.webp",
+      "sha256": "44db9ac64859242e506f0f2e7d80b676cd7327b8a851e51688e714633947421d",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/in-the-end.webp",
+        "sha256": "dda9f62f806f8290ab7886962bfd12198f584c0093f31296ae26a70ad3ad69e7",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/music-cards/ipod.webp",
@@ -10540,6 +11304,11 @@
       }
     },
     {
+      "path": "assets/music-cards/jealous-guy.webp",
+      "sha256": "1cdfc47ae265704a5a1ec3830d331368b39caf9a40e0669a77e886c54f5ed9b5",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/joshua-tree.webp",
       "sha256": "e672da0111bb0cbea8e9ed0a9bf2cb9e49c91c0874edc858cac23d1dc8eabdaa",
       "rightsEvidence": {
@@ -10568,6 +11337,11 @@
       }
     },
     {
+      "path": "assets/music-cards/la-raja-de-tu-falda.webp",
+      "sha256": "11399c72abc29b7beefb1bc0706d915854209ed8235c53bdef0bf081864dba79",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/last-tour-world.webp",
       "sha256": "86ddd565554a019ef9ff1fd8f5a74b8bf41c93ce1343980e941755bb91dbc132",
       "rightsEvidence": {
@@ -10582,18 +11356,50 @@
       }
     },
     {
+      "path": "assets/music-cards/let-her-go.webp",
+      "sha256": "1ea855a81fe9d99362dde4b63e31cedf3ac724a034e7d9ded46ce8dc569bdc7b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/lets-dance.webp",
+      "sha256": "cd197eb9edea7a17c208899df7c9cef507f98ba6b34278a54aca16c0466eb140",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/levitating.webp",
+      "sha256": "ea860daebb828ce290cf66b6d7dca7c6ab502f5b8b92dbaecbe6799ada5b660d",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/levitating.webp",
+        "sha256": "1209b7ce5a1af21d17fc1bb9c45edfc78f17c6c61639b19d0cad6c0f02f5bd61",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/libre.webp",
+      "sha256": "d8cff1c2fcb2a17e41a228d9550ea915e4d149de7eff348c38e4d8d4abc954b8",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/like-a-prayer.webp",
-      "sha256": "aa4ea9ed448b03226d7ab960a7a30f43c59f44c707c5d7a16b503027e36688cd",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "sha256": "80797e3ccbe2d294e2cc7513bdc4d200448197134a9b0b38f14ced17e3d3516c",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/like-a-prayer.webp",
+        "sha256": "aa4ea9ed448b03226d7ab960a7a30f43c59f44c707c5d7a16b503027e36688cd",
+        "rightsEvidence": {
+          "status": "user-confirmed-ai-generated",
+          "generator": "ChatGPT / OpenAI",
+          "declaredBy": "Fercho-93",
+          "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+          "exactPrompt": null,
+          "generatedAt": null,
+          "referenceImage": null,
+          "commercialTermsRef": "terms-to-preserve"
+        }
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/music-cards/like-a-rolling-stone.webp",
@@ -10624,6 +11430,16 @@
       }
     },
     {
+      "path": "assets/music-cards/lose-yourself.webp",
+      "sha256": "5aa4edc3e32607abba7462ca3891c5eccb1bd389465d730317a5c1409f99f142",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/losing-my-religion.webp",
+      "sha256": "089dc4213314de5788dc90d99d7be9d4028f571b53697da279bf3837728985ab",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/love-me-do.webp",
       "sha256": "c392a19b2b03f2a91c66c07ae9d137b8643f65e11882a06a0b96c643b77364fe",
       "rightsEvidence": {
@@ -10650,6 +11466,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/me-olvide-de-vivir.webp",
+      "sha256": "a6d8afcb8f554cedf9357dab0068aa931b4353fe07f619dafa919d48e9984e12",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/monteverdi-orfeo.webp",
@@ -10736,6 +11557,11 @@
       }
     },
     {
+      "path": "assets/music-cards/payphone.webp",
+      "sha256": "78b0ce17749abc1ba90dc86146099731799c2b2591321cb939a5daf9d4a84b9c",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/purple-rain.webp",
       "sha256": "f08b03877b8c6a1b956cbfe742136d1810bbba0fa5de71698aa18ef2e5d6be12",
       "rightsEvidence": {
@@ -10764,6 +11590,16 @@
       }
     },
     {
+      "path": "assets/music-cards/rayando-el-sol.webp",
+      "sha256": "926d3bf362836aa90eabe39d49121944e9f49cd327cb81c0af47891b43ab91e0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/respect.webp",
+      "sha256": "3587faa74d2044e5ea857380d656a8ee37a2933355c9ea71a61ab3d4bb1a7a2a",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/rickenbacker-frying-pan.webp",
       "sha256": "3eed5ba70782b8057f2d101c883afea8406cf7f11482e79b4299c1a0f953b384",
       "rightsEvidence": {
@@ -10776,6 +11612,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/riptide.webp",
+      "sha256": "722f960d0bd0527de1214e9c24c614163a2daf5a814a0409d2c477f0fedaafc7",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/rite-of-spring.webp",
@@ -10820,6 +11661,11 @@
       }
     },
     {
+      "path": "assets/music-cards/say-you-wont-let-go.webp",
+      "sha256": "57ba6e461a5303519edd2fa133f5552316d5410114595436a3a8dbc8eff18c6e",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/sgt-peppers.webp",
       "sha256": "736a4ba3dc6a026f761df011f637b5e5e11778b2455484082cc1e5ab620bf968",
       "rightsEvidence": {
@@ -10834,6 +11680,22 @@
       }
     },
     {
+      "path": "assets/music-cards/sin-ti-no-soy-nada.webp",
+      "sha256": "150bddf5f00842193a54b117bc84456a2b6b104ba87548da84bf5d27b1265022",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/sin-ti-no-soy-nada.webp",
+        "sha256": "85b22737a058cc0d6369246b7a1dcdcb98df730211dbac24f2f74d4c744ba765",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/smells-like-teen-spirit.webp",
+      "sha256": "64ddc91dc011a93a5bd9ad04e8bca6c22abb463718d6ec21760aa622f8968a21",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/spotify.webp",
       "sha256": "d7cce04dffc2904a2aa4fa44fd5554d80779a0170f423dda6c9bccab1760c3bf",
       "rightsEvidence": {
@@ -10846,6 +11708,27 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/take-on-me.webp",
+      "sha256": "55bc740c68412ba501638075b1c4a422def1237ed5854291156fb7102cc087d3",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/music-cards/take-on-me.webp",
+        "sha256": "fa3d1371331dde3f0cc2c6c06ef1c465ba5d857485b17a8f877ee1ed8c1febd9",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
+    },
+    {
+      "path": "assets/music-cards/thats-all-right.webp",
+      "sha256": "190576e64c29b5ebce04a15e558d15e089d808e847fbfcdf9438dbdca99f7bff",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/the-a-team.webp",
+      "sha256": "05e1aab61a82b88bc75c4dd4e2e3b4cdf1b977cc535cdaffbae2576718349a90",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/thriller.webp",
@@ -10890,6 +11773,11 @@
       }
     },
     {
+      "path": "assets/music-cards/whats-love-got-to-do-with-it.webp",
+      "sha256": "4d713deca9f7cff43326a9012e2346fb0d006d49b834afe9d2fe3ad44e71db5a",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/music-cards/woodstock.webp",
       "sha256": "049db532e47abd2abd3ea2460583896cc863b83dc3087d752fd887e694f07977",
       "rightsEvidence": {
@@ -10902,6 +11790,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/music-cards/yellow.webp",
+      "sha256": "418b4fae9f0720252275ee4522af983884e810377b9811e17eb01751f875dc44",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/music-cards/your-song.webp",
+      "sha256": "923da2137a9bd60f2062c5917ec262916b629109aacfdff49037996fd7e35d69",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/youtube-music-video.webp",
@@ -12061,8 +12959,14 @@
     },
     {
       "path": "assets/videogame-cards/gta-san-andreas.webp",
-      "sha256": "651d15fbce5007aff2b41b369f4f9809d94274903fcf63db5003d93a79738492",
-      "rightsEvidence": null
+      "sha256": "2e8f3ee41352126011c902abd2dea23fbbaabfb8f4a3e5ec0901903979f1e589",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/videogame-cards/gta-san-andreas.webp",
+        "sha256": "651d15fbce5007aff2b41b369f4f9809d94274903fcf63db5003d93a79738492",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/videogame-cards/gta-v.webp",
@@ -12175,8 +13079,14 @@
     },
     {
       "path": "assets/videogame-cards/medievil-2.webp",
-      "sha256": "0162584f1a07e3b9e9e4fa191e6fe6d0acc3a62fdd817df138b22c437eb9236c",
-      "rightsEvidence": null
+      "sha256": "932e443a9923fecb5496e6b40e283ebcb1f31968f5fcaf73fee3f61ebf892c1a",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/videogame-cards/medievil-2.webp",
+        "sha256": "0162584f1a07e3b9e9e4fa191e6fe6d0acc3a62fdd817df138b22c437eb9236c",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/videogame-cards/mega-drive.webp",
@@ -12408,8 +13318,14 @@
     },
     {
       "path": "assets/videogame-cards/rust.webp",
-      "sha256": "7b4567789ef71893f8ad5a1a4645da392c1215cfbb98a29cfaa2593773bfba29",
-      "rightsEvidence": null
+      "sha256": "5f5659a0da257d9fa09ce2612d314f094cd340da5b8df04f7b6a5895d32f7144",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/videogame-cards/rust.webp",
+        "sha256": "7b4567789ef71893f8ad5a1a4645da392c1215cfbb98a29cfaa2593773bfba29",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/videogame-cards/secret-of-monkey-island.webp",
@@ -12535,8 +13451,14 @@
     },
     {
       "path": "assets/videogame-cards/tekken-3.webp",
-      "sha256": "7eb3338bd7402bb14a5420ae467e03526f338467b4b8f57554173fd9dc368ab6",
-      "rightsEvidence": null
+      "sha256": "e02daf0de39112d0620e3438957ecc8f08421d7fc11865438566f97b9f6f1e82",
+      "rightsEvidence": null,
+      "previousEvidence": {
+        "path": "assets/videogame-cards/tekken-3.webp",
+        "sha256": "7eb3338bd7402bb14a5420ae467e03526f338467b4b8f57554173fd9dc368ab6",
+        "rightsEvidence": null
+      },
+      "reviewRequired": true
     },
     {
       "path": "assets/videogame-cards/tennis-for-two.webp",
