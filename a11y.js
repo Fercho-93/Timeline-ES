@@ -113,7 +113,17 @@
   const MOTION = { duration: 420, easing: 'cubic-bezier(.22,.61,.36,1)' };
   const surfaceMotions = new Map();
   let primaryNavigationMotion = null;
+  let returningNavigation = false;
+  let returnTimer;
+  function prepareReturn() {
+    returningNavigation = true;
+    clearTimeout(returnTimer);
+    returnTimer = setTimeout(() => { returningNavigation = false; }, 0);
+  }
   document.addEventListener('click', event => {
+    if (event.target.closest?.('[data-action="ui-back"], [data-action="back-menu"], [data-action="collection-back"], [data-action="home"], [data-action="home-top"], [data-online-action="back"]')) {
+      prepareReturn();
+    }
     const button = event.target.closest?.('#app .home-nav button');
     if (button) primaryNavigationMotion = {
       dialog: button.matches('[data-action="home-encyclopedia"], [data-action="rules"], [data-settings-action]')
@@ -271,6 +281,8 @@
   // El primer pintado no toca el foco: nadie lo tenía y moverlo al entrar sería una
   // sorpresa desagradable.
   function paint(container, html, screen) {
+    const returning = returningNavigation;
+    returningNavigation = false;
     cancelDeal?.();
     cancelSurfaceMotions(container);
     const previousDepth = preparationDepth[paint.screen];
@@ -378,7 +390,11 @@
       // reajustarlo a cero al terminar el layout. Por eso, cuando hay un regreso guardado,
       // reafirmamos siempre la posición aunque en este instante parezca coincidir.
       if (regreso || conservaFondo || window.scrollY !== top || window.scrollX !== 0) restoreWindowPosition(top);
-      if (screen !== "enciclopedia") unrollSheet(container.firstElementChild, false, true);
+      // El fondo ya se ha visto durante el cierre: volver a hacerlo transparente
+      // produce un destello. Las acciones de regreso llegan directamente a su estado final.
+      if (screen !== "enciclopedia" && !closingEncyclopedia && !backwards && !returning) {
+        unrollSheet(container.firstElementChild, false, true);
+      }
       return;
     }
     // Quien no tenía el foco dentro tampoco lo recibe ahora: mover el foco a alguien que
@@ -589,6 +605,16 @@
     // La enciclopedia vuelve a su pantalla desde onClose; ese pintado da la
     // respuesta de navegación sin añadir primero otro sonido de cierre.
     if (!dialogo.onClose) window.CONTINUUM.Effects?.transition?.('close');
+    const modal = dialogo.overlay.querySelector('.modal');
+    if (modal?.classList.contains('motion-entering')) {
+      // Conservar el fotograma visible antes de cancelar la entrada: cancelarla
+      // directamente devolvería todos sus hijos a opacidad 1 antes del fundido de salida.
+      for (const child of modal.children) {
+        if (child.getAnimations?.().some(animation => animation.playState === 'running')) {
+          child.style.opacity = getComputedStyle(child).opacity;
+        }
+      }
+    }
     dialogo.cancelRoll?.();
     document.removeEventListener("keydown", dialogo.onKey);
     const anteriorEnPila = pila[pila.length - 1];
@@ -661,4 +687,5 @@
   window.CONTINUUM.openDialog = openDialog;
   window.CONTINUUM.closeDialog = closeDialog;
   window.CONTINUUM.backPressed = backPressed;
+  window.CONTINUUM.prepareReturn = prepareReturn;
 })();

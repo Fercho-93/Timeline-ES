@@ -39,6 +39,24 @@ try {
       assert.deepEqual(active, [], 'no reaparece una segunda animación');
       assert.equal(await page.locator('.camera-move, .profile-roll-edge').count(), 0);
     };
+    // Todas las salidas superiores, incluido el cierre mientras aún entra el panel.
+    for (const [open, close] of [
+      ['[data-action="home-encyclopedia"]', '.enc-modal > [data-action="enc-back"]'],
+      ['[data-action="rules"]', '.rules .atlas-dialog-back'],
+      ['[data-settings-action="open"]', '.settings-modal .atlas-dialog-back'],
+      ['[data-action="perfil"]', '.atlas-topbar .atlas-back']
+    ]) {
+      for (const quick of [false, true]) {
+        const backgroundOpacity = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
+        await page.locator('.home-nav ' + open).click();
+        if (!quick) await settle();
+        await page.locator(close).first().click();
+        await page.waitForFunction(() => !document.querySelector('.dialog-exit, .enc-modal, .rules, .settings-modal') && document.querySelector('#app').dataset.screen !== 'perfil');
+        assert.equal(await page.locator('#app > .shell.motion-entering').count(), 0, `${open} (rápido=${quick}): volver no inicia un segundo fundido`);
+        const alphas = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
+        assert.deepEqual(alphas, backgroundOpacity, 'el fondo conserva su opacidad al regresar');
+      }
+    }
     for (let round = 0; round < 2; round++) {
       for (const selector of ['[data-action="home-encyclopedia"]', '[data-action="rules"]', '[data-action="perfil"]', '[data-settings-action="open"]', '[data-action="home-top"]']) {
         await page.locator('.home-nav ' + selector).click();
