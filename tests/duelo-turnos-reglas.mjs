@@ -1,5 +1,5 @@
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { doc, getDoc, runTransaction, serverTimestamp, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, getDocs, query, collection, where, runTransaction, serverTimestamp, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import fs from 'node:fs';
 
 const env = await initializeTestEnvironment({
@@ -85,7 +85,24 @@ try {
   await assertSucceeds(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, closedBy: 'guest' }));
   await assertFails(updateDoc(doc(creator, 'turnDuels', duelId), { status: 'playing', turnUid: 'creator' }));
   await assertSucceeds(getDoc(doc(creator, 'turnDuels', duelId)));
-  console.log('Duelo por turnos: entrada, jugadas y cierre privado sin alterar puntuaciones ni reabrir partidas.');
+  const directId = `direct-${duelId}-creator`;
+  const direct = { id: directId, sourceDuel: duelId, invitedUid: 'guest', invitedAlias: 'Bea', mode: 'history', kind: 'orden', seed: 'fresh', total: 15, turnIndex: 0, turnUid: null, playersOrder: ['creator'], players: { creator: { alias: 'Ana' } }, status: 'waiting', plays: [], timeline: [1], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  await assertSucceeds(runTransaction(creator, async tx => { const ref = doc(creator, 'turnDuels', directId); await tx.get(ref); tx.set(ref, direct); }));
+  await assertSucceeds(getDoc(doc(guest, 'turnDuels', directId)));
+  await assertFails(getDoc(doc(outsider, 'turnDuels', directId)));
+  await assertSucceeds(getDocs(query(collection(guest, 'turnDuels'), where('invitedUid', '==', 'guest'))));
+  await assertSucceeds(getDocs(query(collection(creator, 'turnDuels'), where('playersOrder', 'array-contains', 'creator'))));
+  await assertFails(setDoc(doc(creator, 'turnDuels', 'bad-invitation'), { ...direct, id: 'bad-invitation', invitedUid: 'outsider' }));
+  await assertFails(updateDoc(doc(creator, 'turnDuels', directId), { remindedTurn: 'waiting:0' }));
+  const accept = { playersOrder: ['creator', 'guest'], players: { creator: { alias: 'Ana' }, guest: { alias: 'Bea' } }, scores: { creator: 0, guest: 0 }, status: 'playing', turnUid: 'creator', updatedAt: serverTimestamp() };
+  await assertFails(updateDoc(doc(outsider, 'turnDuels', directId), accept));
+  await assertSucceeds(updateDoc(doc(guest, 'turnDuels', directId), accept));
+  const declineId = `direct-${cifrasId}-creator`;
+  await assertSucceeds(setDoc(doc(creator, 'turnDuels', declineId), { ...direct, id: declineId, sourceDuel: cifrasId, kind: 'cifras', timeline: [] }));
+  await assertSucceeds(updateDoc(doc(guest, 'turnDuels', declineId), { ...cancellation, closedBy: 'guest' }));
+  await env.withSecurityRulesDisabled(async ctx => updateDoc(doc(ctx.firestore(), 'turnDuels', directId), { updatedAt: Timestamp.fromMillis(Date.now() - 8 * 86400000) }));
+  await assertFails(updateDoc(doc(creator, 'turnDuels', directId), { turnIndex: 1, turnUid: 'guest', plays: [{ uid: 'creator', cardId: 2, index: 0, correct: false }], updatedAt: serverTimestamp() }));
+  console.log('OK: link and direct invitations, private access, acceptance, decline, listing, closure and inactivity enforcement.');
 } finally {
   await env.cleanup();
 }

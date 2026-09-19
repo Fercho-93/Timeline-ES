@@ -1,0 +1,16 @@
+const assert = require('node:assert/strict');
+const { DAY, lifecycle, movementMessage } = require('../functions/duel-policy');
+const start = 1700000000000;
+const game = { status: 'playing', turnUid: 'a', turnIndex: 2, updatedAt: { seconds: start / 1000 } };
+assert.equal(lifecycle(game, start + 2 * DAY - 1), null);
+assert.deepEqual(lifecycle(game, start + 2 * DAY), { type: 'remind', recipient: 'a', turnKey: 'playing:2' });
+assert.equal(lifecycle({ ...game, remindedTurn: 'playing:2' }, start + 3 * DAY), null);
+assert.equal(lifecycle({ ...game, remindedTurn: 'playing:2', turnIndex: 4 }, start + 3 * DAY).type, 'remind');
+assert.equal(lifecycle(game, start + 7 * DAY).type, 'expire');
+assert.equal(lifecycle({ ...game, status: 'finished' }, start + 9 * DAY), null);
+assert.equal(lifecycle({ ...game, status: 'waiting', turnUid: null }, start + 3 * DAY), null);
+assert.equal(lifecycle({ ...game, status: 'waiting', invitedUid: 'b' }, start + 3 * DAY).recipient, 'b');
+assert.equal(movementMessage(game, { ...game, remindedTurn: 'playing:2' }), null);
+assert.equal(movementMessage(game, { ...game, status: 'expired', turnUid: null }), null);
+assert.equal(movementMessage(game, { ...game, turnUid: 'b' }).recipient, 'b');
+console.log('OK: 48h reminders, one per turn, 7-day expiry, invitation and movement messages.');

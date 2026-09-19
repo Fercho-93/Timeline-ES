@@ -2256,3 +2256,14 @@ body::before {
   .turn-duel-hand .hand-card { max-width: 190px; }
 }
 @media (prefers-reduced-motion: reduce) { .turn-clock-progress { transition: none; } }
+/* Asynchronous duels: compact, wrapping summaries and rival controls. */
+.turn-duel-last{padding:12px 16px;border:1px solid var(--line,#d5c5a7);border-radius:16px;background:rgba(255,255,255,.28);overflow-wrap:anywhere}
+.turn-duel-last p{margin:5px 0;font-size:.9rem}
+.turn-duel-last small{opacity:.75}
+.turn-duel-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.turn-duel-actions .btn{min-width:0;white-space:normal}
+.turn-duel-rivals{display:grid;gap:8px}
+.turn-duel-rival{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line,#d5c5a7);min-width:0}
+.turn-duel-rival>span{flex:1;min-width:0;overflow-wrap:anywhere}
+.turn-duel-rival small{display:block;font-size:.75rem;opacity:.7}
+.turn-duel-rival>.btn{flex-shrink:0;padding:8px 10px}

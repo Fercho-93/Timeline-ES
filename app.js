@@ -1554,20 +1554,22 @@
       const groups = [
         ['Tu turno', p => p.status === 'playing' && p.turnUid === myId],
         ['Esperando al rival', p => p.status === 'playing' && p.turnUid !== myId],
-        ['Invitaciones pendientes', p => p.status === 'waiting'],
-        ['Terminados y cerrados', p => ['finished', 'cancelled'].includes(p.status)]
+        ['Te han retado', p => p.status === 'waiting' && p.invitedUid === myId],
+        ['Invitaciones enviadas', p => p.status === 'waiting' && p.invitedUid !== myId],
+        ['Historial', p => ['finished', 'cancelled', 'expired'].includes(p.status)]
       ];
       const rows = games => games.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).map(p => {
         const rival = p.playersOrder?.find(id => id !== myId);
-        const closed = ['finished', 'cancelled'].includes(p.status);
+        const closed = ['finished', 'cancelled', 'expired'].includes(p.status);
         const detail = `${p.kind === 'cifras' ? 'Escribir cifras' : 'Ordenar cartas'} · ${CT.mode(p.mode).name}`;
-        return `<div class="turn-duel-profile-row"><button class="btn btn-secondary" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || 'Invitación sin aceptar')}</b><small>${escapeHtml(detail)}</small><span>${p.status === 'cancelled' ? 'Cerrado' : p.status === 'finished' ? 'Terminado' : `${p.turnIndex} de ${p.total} cartas`}</span></button>${closed ? '' : `<button class="btn btn-ghost" data-action="close-turn-duel" data-turn-id="${escapeHtml(p.id)}" aria-label="Cerrar duelo con ${escapeHtml(p.players?.[rival]?.alias || 'rival pendiente')}">Cerrar</button>`}</div>`;
+        return `<div class="turn-duel-profile-row"><button class="btn btn-secondary" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || p.invitedAlias || 'Invitación sin aceptar')}</b><small>${escapeHtml(detail)}</small><span>${p.status === 'expired' ? 'Caducado' : p.status === 'cancelled' ? 'Cerrado' : p.status === 'finished' ? 'Terminado' : `${p.turnIndex} de ${p.total} cartas`}</span></button>${closed ? p.playersOrder.length === 2 && p.playersOrder.includes(myId) ? `<button class="btn btn-ghost" data-action="rematch-turn-duel" data-turn-id="${escapeHtml(p.id)}">Revancha</button>` : '' : `<button class="btn btn-ghost" data-action="close-turn-duel" data-turn-id="${escapeHtml(p.id)}" aria-label="Cerrar duelo con ${escapeHtml(p.players?.[rival]?.alias || 'rival pendiente')}">${p.invitedUid === myId && p.status === 'waiting' ? 'Rechazar' : 'Cerrar'}</button>`}</div>`;
       }).join('');
-      box.innerHTML = `<h2>Mis duelos</h2>${partidas.length ? groups.map(([title, filter], index) => {
+      const rivals = CT.TurnDuel.rivals(partidas);
+      box.innerHTML = `<h2>Mis duelos</h2><button class="btn btn-secondary btn-block" data-action="next-turn-duel">Jugar siguiente turno pendiente</button>${partidas.length ? groups.map(([title, filter], index) => {
         const games = partidas.filter(filter); if (!games.length) return '';
-        return index === 3 ? `<details><summary>${title} (${games.length})</summary><div class="turn-duel-list">${rows(games)}</div></details>` : `<h3>${title} (${games.length})</h3><div class="turn-duel-list">${rows(games)}</div>`;
-      }).join('') : '<p>Aquí aparecerán tus partidas por turnos.</p>'}`;
-    }).catch(() => {});
+        return index === 4 ? `<details><summary>${title} (${games.length})</summary><div class="turn-duel-list">${rows(games)}</div></details>` : `<h3>${title} (${games.length})</h3><div class="turn-duel-list">${rows(games)}</div>`;
+      }).join('') : '<p>Aquí aparecerán tus partidas por turnos.</p>'}${rivals.length ? `<h3>Rivales recientes y favoritos</h3><p class="hint">Retar repite el mazo y la modalidad de vuestra última partida. Tus favoritos se guardan en este dispositivo.</p><div class="turn-duel-rivals">${rivals.map(r => `<div class="turn-duel-rival"><button class="btn btn-ghost" data-action="favorite-duel-rival" data-rival-id="${escapeHtml(r.uid)}" aria-pressed="${r.favorite}" aria-label="${r.favorite ? 'Quitar de' : 'Añadir a'} favoritos a ${escapeHtml(r.alias)}">${r.favorite ? '★' : '☆'}</button><span><b>${escapeHtml(r.alias)}</b><small>${escapeHtml(CT.mode(r.mode).name)} · ${r.kind === 'cifras' ? 'Cifras' : 'Ordenar'}</small></span><button class="btn btn-secondary" data-action="rematch-turn-duel" data-turn-id="${escapeHtml(r.source)}">Retar</button></div>`).join('')}</div>` : ''}`;
+    }).catch(() => { const box = document.getElementById('turn-duels-profile'); if (box) box.innerHTML = '<h2>Mis duelos</h2><p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a abrir el perfil.</p>'; });
   }
 
   async function perfilExport() {
@@ -3193,6 +3195,9 @@
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "start-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: duelKind(), back: playMenu })); }
     else if (action === "open-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back: perfilView })); }
+    else if (action === 'next-turn-duel') { turnDuelReady.then(() => CT.TurnDuel.next(perfilView)).catch(() => showToast('No se pudieron consultar tus duelos.')); }
+    else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); perfilView(); }
+    else if (action === 'rematch-turn-duel') { target.disabled = true; turnDuelReady.then(() => CT.TurnDuel.challenge(target.dataset.turnId, perfilView)).catch(() => showToast('No se pudo enviar la invitación.')).finally(() => { target.disabled = false; }); }
     else if (action === "close-turn-duel") {
       if (!window.confirm('¿Cerrar este duelo para ambos jugadores? Se conservará en el historial y no se podrá continuar.')) return;
       target.disabled = true;

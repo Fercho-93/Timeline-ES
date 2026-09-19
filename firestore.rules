@@ -16,18 +16,32 @@ service cloud.firestore {
     // entrar; al comenzar vuelve a ser privado para los dos participantes.
     match /turnDuels/{duelId} {
       function member() { return registered() && request.auth.uid in resource.data.playersOrder; }
+      function invited() { return registered() && resource.data.get('invitedUid', '') == request.auth.uid; }
+      function validInvitation() {
+        let d = request.resource.data;
+        let source = get(/databases/$(database)/documents/turnDuels/$(d.sourceDuel)).data;
+        return d.invitedUid is string && d.invitedUid != request.auth.uid
+          && source.playersOrder.size() == 2
+          && request.auth.uid in source.playersOrder && d.invitedUid in source.playersOrder
+          && d.mode == source.mode && d.kind == source.kind
+          && duelId == 'direct-' + d.sourceDuel + '-' + request.auth.uid;
+      }
       function validCreate() {
-        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt'])
+        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel'])
+          && (!('invitedUid' in request.resource.data) || validInvitation())
           && request.resource.data.playersOrder == [request.auth.uid]
           && request.resource.data.turnUid == null
           && request.resource.data.status == 'waiting'
+          && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
+          && request.resource.data.turnIndex == 0 && request.resource.data.plays == []
           && request.resource.data.total is int && request.resource.data.total > 0 && request.resource.data.total <= 30
           && request.resource.data.mode is string && request.resource.data.kind in ['orden','cifras'] && request.resource.data.seed is string;
       }
       allow create: if validCreate();
-      allow get: if member() || (registered() && resource.data.status == 'waiting' && resource.data.playersOrder.size() == 1);
-      allow list: if member();
-      allow update: if member() && resource.data.status in ['waiting', 'playing']
+      allow get: if registered() && !exists(/databases/$(database)/documents/turnDuels/$(duelId));
+      allow get: if member() || invited() || (registered() && !('invitedUid' in resource.data) && resource.data.status == 'waiting' && resource.data.playersOrder.size() == 1);
+      allow list: if member() || invited();
+      allow update: if (member() || (invited() && resource.data.status == 'waiting')) && resource.data.status in ['waiting', 'playing']
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'turnUid', 'closedBy', 'updatedAt', 'resultText'])
         && request.resource.data.status == 'cancelled'
         && request.resource.data.turnUid == null
@@ -39,6 +53,8 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
         && (
           (resource.data.status == 'waiting' && request.auth.uid != resource.data.playersOrder[0]
+            && (!('invitedUid' in resource.data) || invited())
+            && request.time < resource.data.updatedAt + duration.value(7, 'd')
             && request.resource.data.playersOrder.size() == 2
             && request.resource.data.playersOrder[0] == resource.data.playersOrder[0]
             && request.resource.data.playersOrder[1] == request.auth.uid
@@ -52,6 +68,7 @@ service cloud.firestore {
             && request.resource.data.turnIndex == 0)
           ||
           (resource.data.status == 'playing' && resource.data.turnUid == request.auth.uid
+            && request.time < resource.data.updatedAt + duration.value(7, 'd')
             && request.resource.data.turnIndex == resource.data.turnIndex + 1
             && request.resource.data.plays.size() == resource.data.plays.size() + 1
             && request.resource.data.plays[resource.data.turnIndex].uid == request.auth.uid
