@@ -559,6 +559,12 @@
   window.addEventListener("error", event => {
     // Un ruido conocido de algunos navegadores, inofensivo y ajeno a la aplicación.
     if (/ResizeObserver loop/.test(event.message || "")) return;
+    // Safari (y otros navegadores) informan así, a propósito y sin más detalle, de
+    // cualquier error que ocurra fuera del origen de la propia página —por ejemplo, al
+    // tocar su icono nativo de compartir—: es una medida de seguridad del navegador, no
+    // un aviso de que algo se haya roto aquí. `event.error` viene vacío también por eso:
+    // un fallo real de la aplicación siempre trae su propio objeto de error.
+    if (event.message === "Script error." && !event.error) return;
     showCrash(`${event.message || "Error sin mensaje"}\n${event.error?.stack || ""}`.trim());
   });
   window.addEventListener("unhandledrejection", event => {

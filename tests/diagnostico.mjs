@@ -62,6 +62,25 @@ console.log("\nUn ruido conocido del navegador no cuenta como fallo");
   ok("no se enseña ninguna pantalla de fallo", !w.document.querySelector("#crash-detalle"));
 }
 
+console.log("\n«Script error.» sin más detalle tampoco cuenta como fallo");
+{
+  // Los navegadores lo sueltan así, a propósito y sin `error` ni pila, cuando el fallo
+  // ocurre fuera del origen de la página —por ejemplo, al tocar el icono nativo de
+  // compartir de Safari—: no hay nada de la aplicación que depurar ahí.
+  const w = boot();
+  w.dispatchEvent(new w.ErrorEvent("error", { message: "Script error." }));
+  await espera();
+  ok("no se enseña ninguna pantalla de fallo", !w.document.querySelector("#crash-detalle"));
+}
+{
+  // Pero si alguna vez sí trae su propio error, es un fallo real y sí debe avisar,
+  // aunque el mensaje sea ese mismo texto genérico.
+  const w = boot();
+  w.dispatchEvent(new w.ErrorEvent("error", { message: "Script error.", error: new w.Error("Script error.") }));
+  await espera();
+  ok("con un error de verdad detrás, sí se enseña la pantalla de fallo", !!w.document.querySelector("#crash-detalle"));
+}
+
 console.log("\nComentarios en Ajustes");
 {
   const w = boot();
