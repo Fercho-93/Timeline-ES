@@ -39,6 +39,11 @@ exports.notifyTurnDuel = onDocumentUpdated('turnDuels/{duelId}', async event => 
 exports.notifyDuelInvitation = onDocumentCreated('turnDuels/{duelId}', async event => {
   const game = event.data?.data();
   if (game?.invitedUid && game.status === 'waiting' && await claimEvent(event.id)) {
+    const [a, b] = await Promise.all([
+      db.doc(`duelPreferences/${game.invitedUid}/blocked/${game.playersOrder[0]}`).get(),
+      db.doc(`duelPreferences/${game.playersOrder[0]}/blocked/${game.invitedUid}`).get()
+    ]);
+    if (a.exists || b.exists) return;
     const alias = game.players?.[game.playersOrder[0]]?.alias || 'Un rival';
     await send(game.invitedUid, event.params.duelId, 'Nuevo reto en Continuum', `${alias} te invita a un duelo. Acéptalo desde tu perfil.`);
   }
@@ -52,6 +57,11 @@ async function maintainDuel(ref, now) {
     if (action.type === 'expire') {
       tx.update(ref, { status: 'expired', turnUid: null, expiredAt: FieldValue.serverTimestamp(), resultText: 'Duelo caducado tras siete días sin actividad.' });
       return null;
+    }
+    if (game.status === 'waiting' && game.invitedUid) {
+      const a = await tx.get(db.doc(`duelPreferences/${game.invitedUid}/blocked/${game.playersOrder[0]}`));
+      const b = await tx.get(db.doc(`duelPreferences/${game.playersOrder[0]}/blocked/${game.invitedUid}`));
+      if (a.exists || b.exists) return null;
     }
     const budget = db.collection('duelReminderBudgets').doc(action.recipient);
     const last = await tx.get(budget);

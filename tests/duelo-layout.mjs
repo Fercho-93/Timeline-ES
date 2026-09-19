@@ -34,7 +34,7 @@ try {
       window.CONTINUUM = {
         escapeHtml: text => String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'),
         cards: () => cards, categoryBadge: () => '', animalArt: () => '', cardBack: () => '<span class="carta-reverso">✦</span>',
-        eraForCard: () => ({ key: 'modern', symbol: '✦', name: 'Historia' }), formatValue: (_, c) => String(c.year),
+        eraForCard: () => ({ key: 'modern', symbol: '✦', name: 'Historia' }), formatValue: (_, c) => String(c.year), sortValue: (_, c) => c.year, mode: () => ({name:'Historia'}), placementHint: () => 'Debía ir después de la carta anterior.',
         hiddenLabel: () => 'Fecha oculta', timelineTitle: () => 'Línea temporal', Accounts: { user: { uid: 'me' } },
         Duelo: { CARTAS: 15, reparto: () => cards.map(c => c.id), Cifras: { reparto: () => cards.map(c => c.id), regla: () => ({ pregunta: '¿En qué año fue?' }) } }
       };
@@ -71,8 +71,13 @@ try {
     await fits('invitation');
     await page.locator('summary').click();
     await fits('invitation link');
-    await page.addScriptTag({ content: `window.beginPreparation=()=>{preparingTurn=null;prepareTurn();render();clearInterval(timer);return enteredAt;};window.endPreparation=()=>{prepareUntil=Date.now()-1;render();clearInterval(timer);};` });
+    await page.addScriptTag({ content: `window.previewTurn=()=>{preparingTurn=null;prepareTurn();render();clearInterval(timer);};window.beginPreparation=()=>{preparingTurn=null;prepareTurn(true);render();clearInterval(timer);return enteredAt;};window.endPreparation=()=>{prepareUntil=Date.now()-1;render();clearInterval(timer);};` });
     await page.evaluate(() => showDuel());
+    await page.evaluate(() => previewTurn());
+    assert.equal(await page.locator('[data-turn-action="ready"]').count(), 1);
+    assert.equal(await page.locator('.hand-card').count(), 0, 'no card before I am ready');
+    assert.equal(await page.locator('.turn-duel-clock').count(), 0);
+    await fits('ready screen');
     const deadline = await page.evaluate(() => beginPreparation());
     assert.equal(await page.locator('#turn-ready-seconds').textContent(), '3');
     assert.equal(await page.locator('.hand-card').count(), 0, 'pending card is absent during preparation');
@@ -89,13 +94,21 @@ try {
     await fits('direct invitation');
     await page.evaluate(() => showDuel({status:'expired',turnUid:null,plays:[{uid:'them',cardId:2,correct:true}]}));
     assert.equal(await page.locator('.turn-duel-last').count(), 1);
+    assert.equal(await page.locator('.reveal .year').textContent(), '1001');
     assert.equal(await page.locator('[data-turn-action="rematch"]').count(), 1);
     assert.equal(await page.locator('[data-turn-action="next"]').count(), 1);
     assert.equal(await page.locator('.hand-card').count(), 0);
     await fits('last move and rematch');
+    if (process.env.DUEL_SCREENSHOT && width === 390) { await page.locator('.turn-duel-solution').evaluate(el => el.open = true); await page.screenshot({path:process.env.DUEL_SCREENSHOT.replace('.png','-solution.png'),fullPage:true}); }
     const favorites = await page.evaluate(() => { const t=CONTINUUM.TurnDuel; t.favorite('them'); return t.rivals([{id:'past',mode:'history',kind:'orden',playersOrder:['me','them'],players:{them:{alias:'Rival'}}}]); });
     assert.equal(favorites[0].favorite, true);
     assert.equal(favorites[0].source, 'past');
+    await page.evaluate(() => { document.getElementById('app').innerHTML = `<div class="shell">${CONTINUUM.TurnDuel.profileMarkup([{id:'old',status:'resigned',winnerUid:'me',kind:'orden',mode:'history',playersOrder:['me','them'],players:{me:{alias:'Yo'},them:{alias:'Rival con un nombre bastante largo'}},scores:{me:2,them:3}}])}</div>`; });
+    await page.locator('details').evaluateAll(elements => elements.forEach(el => el.open = true));
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'profile fits');
+    if (process.env.DUEL_SCREENSHOT && width === 390) await page.screenshot({path:process.env.DUEL_SCREENSHOT.replace('.png','-profile.png'),fullPage:true});
+    assert.equal(await page.locator('[data-action="archive-turn-duel"]').count(), 1);
+    assert.equal(await page.locator('[data-action="block-duel-rival"]').count(), 1);
     assert.deepEqual(errors, []);
     console.log(`OK ${width}px: invitation, long board, confirmation, opponent turn, answer and circular timer`);
     await page.close();

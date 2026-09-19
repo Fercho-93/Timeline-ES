@@ -2267,3 +2267,16 @@ body::before {
 .turn-duel-rival>span{flex:1;min-width:0;overflow-wrap:anywhere}
 .turn-duel-rival small{display:block;font-size:.75rem;opacity:.7}
 .turn-duel-rival>.btn{flex-shrink:0;padding:8px 10px}
+.turn-duel-intro{max-width:34rem;margin:18px auto;text-align:center;display:grid;gap:12px}
+.turn-duel-intro small{color:var(--muted);line-height:1.5}
+.turn-duel-solution{margin:12px 0;min-width:0;overflow-wrap:anywhere}
+.turn-duel-solution summary{cursor:pointer;min-height:44px;padding:12px;font-size:.85rem}
+.turn-duel-result{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:18px;text-align:center;max-width:36rem;margin:auto}
+.turn-duel-result .result-mark{font-size:1.5rem;margin:0}
+.turn-duel-result h2{font-size:1.2rem}
+.turn-duel-result .reveal .year{font-size:clamp(1.35rem,5vw,2rem);overflow-wrap:anywhere}
+.turn-duel-row-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;max-width:13rem}
+.turn-duel-row-actions .btn{white-space:normal;font-size:.75rem;padding:8px}
+.turn-duel-profile-row{min-width:0}
+.turn-duel-profile-row>button{display:grid;gap:5px;text-align:left;min-width:0;overflow-wrap:anywhere}
+@media(max-width:420px){.turn-duel-profile-row{grid-template-columns:minmax(0,1fr)}.turn-duel-rival{flex-wrap:wrap}.turn-duel-row-actions{max-width:none;width:100%}}

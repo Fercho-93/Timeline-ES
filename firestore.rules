@@ -10,6 +10,28 @@ service cloud.firestore {
     function registered() {
       return request.auth != null;
     }
+    function blocked(a, b) {
+      return exists(/databases/$(database)/documents/duelPreferences/$(a)/blocked/$(b))
+        || exists(/databases/$(database)/documents/duelPreferences/$(b)/blocked/$(a));
+    }
+    match /duelPreferences/{player}/blocked/{rival} {
+      allow read: if registered() && request.auth.uid == player;
+      allow create, update: if registered() && request.auth.uid == player && player != rival
+        && request.resource.data.keys().hasOnly(['alias','updatedAt'])
+        && request.resource.data.alias is string && request.resource.data.alias.size() <= 24
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if registered() && request.auth.uid == player;
+    }
+    match /duelPreferences/{player}/archived/{gameId} {
+      function archivable() {
+        let game = get(/databases/$(database)/documents/turnDuels/$(gameId)).data;
+        return (player in game.playersOrder || game.get('invitedUid', '') == player)
+          && (game.status in ['finished','cancelled','expired','resigned'] || request.time >= game.updatedAt + duration.value(7,'d'));
+      }
+      allow read, delete: if registered() && request.auth.uid == player;
+      allow create, update: if registered() && request.auth.uid == player && archivable()
+        && request.resource.data.keys().hasOnly(['updatedAt']) && request.resource.data.updatedAt == request.time;
+    }
 
     // Duelo por turnos: los participantes pueden leerlo. Mientras espera rival,
     // quien posee el identificador aleatorio del enlace puede leerlo una vez para
@@ -21,13 +43,16 @@ service cloud.firestore {
         let d = request.resource.data;
         let source = get(/databases/$(database)/documents/turnDuels/$(d.sourceDuel)).data;
         return d.invitedUid is string && d.invitedUid != request.auth.uid
+          && !blocked(request.auth.uid, d.invitedUid)
           && source.playersOrder.size() == 2
           && request.auth.uid in source.playersOrder && d.invitedUid in source.playersOrder
           && d.mode == source.mode && d.kind == source.kind
-          && duelId == 'direct-' + d.sourceDuel + '-' + request.auth.uid;
+          && (duelId == 'direct-' + d.sourceDuel + '-' + request.auth.uid
+            || (d.invitationRound is int && d.invitationRound >= 0 && d.invitationRound < 1000 && source.seed.size() <= 64
+              && duelId == 'invite-' + source.seed + '-' + request.auth.uid + '-' + string(d.invitationRound)));
       }
       function validCreate() {
-        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel'])
+        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound'])
           && (!('invitedUid' in request.resource.data) || validInvitation())
           && request.resource.data.playersOrder == [request.auth.uid]
           && request.resource.data.turnUid == null
@@ -41,7 +66,7 @@ service cloud.firestore {
       allow get: if registered() && !exists(/databases/$(database)/documents/turnDuels/$(duelId));
       allow get: if member() || invited() || (registered() && !('invitedUid' in resource.data) && resource.data.status == 'waiting' && resource.data.playersOrder.size() == 1);
       allow list: if member() || invited();
-      allow update: if (member() || (invited() && resource.data.status == 'waiting')) && resource.data.status in ['waiting', 'playing']
+      allow update: if (member() || invited()) && resource.data.status == 'waiting'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'turnUid', 'closedBy', 'updatedAt', 'resultText'])
         && request.resource.data.status == 'cancelled'
         && request.resource.data.turnUid == null
@@ -49,10 +74,18 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time
         && request.resource.data.resultText is string
         && request.resource.data.resultText.size() <= 160;
+      allow update: if member() && resource.data.status == 'playing'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','turnUid','closedBy','winnerUid','updatedAt','resultText'])
+        && request.resource.data.status == 'resigned' && request.resource.data.turnUid == null
+        && request.resource.data.closedBy == request.auth.uid
+        && request.resource.data.winnerUid in resource.data.playersOrder && request.resource.data.winnerUid != request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.resultText is string && request.resource.data.resultText.size() <= 160;
       allow update: if (member() || (registered() && resource.data.status == 'waiting' && !(request.auth.uid in resource.data.playersOrder)))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
         && (
           (resource.data.status == 'waiting' && request.auth.uid != resource.data.playersOrder[0]
+            && !blocked(request.auth.uid, resource.data.playersOrder[0])
             && (!('invitedUid' in resource.data) || invited())
             && request.time < resource.data.updatedAt + duration.value(7, 'd')
             && request.resource.data.playersOrder.size() == 2
@@ -68,6 +101,9 @@ service cloud.firestore {
             && request.resource.data.turnIndex == 0)
           ||
           (resource.data.status == 'playing' && resource.data.turnUid == request.auth.uid
+            && request.resource.data.playersOrder == resource.data.playersOrder
+            && request.resource.data.players == resource.data.players
+            && request.resource.data.plays.removeAll([request.resource.data.plays[resource.data.turnIndex]]) == resource.data.plays
             && request.time < resource.data.updatedAt + duration.value(7, 'd')
             && request.resource.data.turnIndex == resource.data.turnIndex + 1
             && request.resource.data.plays.size() == resource.data.plays.size() + 1

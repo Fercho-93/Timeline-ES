@@ -1550,25 +1550,7 @@
     turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
       const box = document.getElementById("turn-duels-profile");
       if (!box || screen !== "perfil") return;
-      const myId = CT.Accounts?.user?.uid;
-      const groups = [
-        ['Tu turno', p => p.status === 'playing' && p.turnUid === myId],
-        ['Esperando al rival', p => p.status === 'playing' && p.turnUid !== myId],
-        ['Te han retado', p => p.status === 'waiting' && p.invitedUid === myId],
-        ['Invitaciones enviadas', p => p.status === 'waiting' && p.invitedUid !== myId],
-        ['Historial', p => ['finished', 'cancelled', 'expired'].includes(p.status)]
-      ];
-      const rows = games => games.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).map(p => {
-        const rival = p.playersOrder?.find(id => id !== myId);
-        const closed = ['finished', 'cancelled', 'expired'].includes(p.status);
-        const detail = `${p.kind === 'cifras' ? 'Escribir cifras' : 'Ordenar cartas'} · ${CT.mode(p.mode).name}`;
-        return `<div class="turn-duel-profile-row"><button class="btn btn-secondary" data-action="open-turn-duel" data-turn-id="${escapeHtml(p.id)}"><b>${escapeHtml(p.players?.[rival]?.alias || p.invitedAlias || 'Invitación sin aceptar')}</b><small>${escapeHtml(detail)}</small><span>${p.status === 'expired' ? 'Caducado' : p.status === 'cancelled' ? 'Cerrado' : p.status === 'finished' ? 'Terminado' : `${p.turnIndex} de ${p.total} cartas`}</span></button>${closed ? p.playersOrder.length === 2 && p.playersOrder.includes(myId) ? `<button class="btn btn-ghost" data-action="rematch-turn-duel" data-turn-id="${escapeHtml(p.id)}">Revancha</button>` : '' : `<button class="btn btn-ghost" data-action="close-turn-duel" data-turn-id="${escapeHtml(p.id)}" aria-label="Cerrar duelo con ${escapeHtml(p.players?.[rival]?.alias || 'rival pendiente')}">${p.invitedUid === myId && p.status === 'waiting' ? 'Rechazar' : 'Cerrar'}</button>`}</div>`;
-      }).join('');
-      const rivals = CT.TurnDuel.rivals(partidas);
-      box.innerHTML = `<h2>Mis duelos</h2><button class="btn btn-secondary btn-block" data-action="next-turn-duel">Jugar siguiente turno pendiente</button>${partidas.length ? groups.map(([title, filter], index) => {
-        const games = partidas.filter(filter); if (!games.length) return '';
-        return index === 4 ? `<details><summary>${title} (${games.length})</summary><div class="turn-duel-list">${rows(games)}</div></details>` : `<h3>${title} (${games.length})</h3><div class="turn-duel-list">${rows(games)}</div>`;
-      }).join('') : '<p>Aquí aparecerán tus partidas por turnos.</p>'}${rivals.length ? `<h3>Rivales recientes y favoritos</h3><p class="hint">Retar repite el mazo y la modalidad de vuestra última partida. Tus favoritos se guardan en este dispositivo.</p><div class="turn-duel-rivals">${rivals.map(r => `<div class="turn-duel-rival"><button class="btn btn-ghost" data-action="favorite-duel-rival" data-rival-id="${escapeHtml(r.uid)}" aria-pressed="${r.favorite}" aria-label="${r.favorite ? 'Quitar de' : 'Añadir a'} favoritos a ${escapeHtml(r.alias)}">${r.favorite ? '★' : '☆'}</button><span><b>${escapeHtml(r.alias)}</b><small>${escapeHtml(CT.mode(r.mode).name)} · ${r.kind === 'cifras' ? 'Cifras' : 'Ordenar'}</small></span><button class="btn btn-secondary" data-action="rematch-turn-duel" data-turn-id="${escapeHtml(r.source)}">Retar</button></div>`).join('')}</div>` : ''}`;
+      box.innerHTML = CT.TurnDuel.profileMarkup(partidas);
     }).catch(() => { const box = document.getElementById('turn-duels-profile'); if (box) box.innerHTML = '<h2>Mis duelos</h2><p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a abrir el perfil.</p>'; });
   }
 
@@ -3199,9 +3181,20 @@
     else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); perfilView(); }
     else if (action === 'rematch-turn-duel') { target.disabled = true; turnDuelReady.then(() => CT.TurnDuel.challenge(target.dataset.turnId, perfilView)).catch(() => showToast('No se pudo enviar la invitación.')).finally(() => { target.disabled = false; }); }
     else if (action === "close-turn-duel") {
-      if (!window.confirm('¿Cerrar este duelo para ambos jugadores? Se conservará en el historial y no se podrá continuar.')) return;
+      if (!window.confirm(target.dataset.playing === 'true' ? '¿Rendirte? Tu rival ganará esta partida. Se conservará en el historial.' : '¿Cancelar esta invitación? No contará como derrota.')) return;
       target.disabled = true;
-      turnDuelReady.then(() => CT.TurnDuel.cancel(target.dataset.turnId)).then(() => { showToast('Duelo cerrado'); perfilView(); }).catch(() => { target.disabled = false; showToast('No se pudo cerrar el duelo. Comprueba la conexión y las reglas de Firebase.'); });
+      turnDuelReady.then(() => CT.TurnDuel.cancel(target.dataset.turnId, target.dataset.playing === 'true' ? 'playing' : 'waiting')).then(() => { showToast('Partida actualizada'); perfilView(); }).catch(() => { target.disabled = false; showToast('No se pudo actualizar el duelo. Puede haber cambiado: vuelve a abrir el perfil.'); });
+    }
+    else if (action === 'archive-turn-duel') {
+      target.disabled = true;
+      CT.TurnDuel.archive(target.dataset.turnId, target.dataset.restore === 'true').then(perfilView).catch(() => { target.disabled = false; showToast('No se pudo cambiar el archivo.'); });
+    }
+    else if (action === 'reshare-turn-duel') { CT.TurnDuel.reshare(target.dataset.turnId).catch(() => showToast('No se pudo compartir el enlace.')); }
+    else if (action === 'block-duel-rival' || action === 'unblock-duel-rival') {
+      const unblock = action === 'unblock-duel-rival';
+      if (!unblock && !window.confirm('¿Bloquear los retos de este rival? No cancela las partidas en curso. Puedes deshacerlo desde tu perfil.')) return;
+      target.disabled = true;
+      CT.TurnDuel.block(target.dataset.rivalId, target.dataset.rivalName, unblock).then(perfilView).catch(() => { target.disabled = false; showToast('No se pudo cambiar el bloqueo.'); });
     }
     else if (action === "duel-play") duelPlay();
     else if (action === "resume-cifras") resumeCifras();
