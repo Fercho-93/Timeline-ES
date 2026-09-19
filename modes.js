@@ -276,28 +276,9 @@
     { limit: Infinity, key: "global", name: "Mundo global", symbol: "◍" }
   ];
 
-  // IDs de INVENTION_CARDS que duplican, con el mismo año y casi el mismo título,
-  // una carta ya presente en ASTRONOMY_CARDS o MEDICINE_CARDS. Solo se usan para
-  // depurar el mazo de "Gran mezcla temporal" (ver más abajo); el mazo de
-  // Inventos en solitario no se toca.
-  const MIXED_DUPLICATE_INVENTION_IDS = new Set([
-    4022, // Harvey descubre la circulación de la sangre (medicine: "Harvey explica...")
-    4027, // Los «Principia» de Newton (astronomy: "Newton publica los Principia")
-    4036, // La vacuna de la viruela (medicine: "Primera vacuna contra la viruela")
-    4039, // El estetoscopio (medicine: "Invención del estetoscopio")
-    4046, // La anestesia con éter (medicine: "Demostración pública de anestesia con éter")
-    4062, // La relatividad especial (astronomy: "Relatividad especial")
-    4067, // La relatividad general (astronomy: "Relatividad general")
-    4068, // La insulina (medicine: "Aislamiento de la insulina")
-    4079, // La vacuna de la polio (medicine: "Vacuna de Salk contra la polio")
-    4080, // El Sputnik (astronomy: "Sputnik 1")
-    4088, // El primer bebé por fecundación in vitro (medicine: "Nace el primer bebé...")
-    4094, // El telescopio espacial Hubble (astronomy: "Lanzamiento del telescopio Hubble")
-    4095, // La oveja Dolly (medicine: "Nace la oveja Dolly")
-    4101, // La primera imagen de un agujero negro (astronomy: mismo título)
-    4102, // Las vacunas de ARN mensajero (medicine: "...contra la COVID-19")
-    4103  // Las primeras imágenes del James Webb (astronomy: "...científicas del James Webb")
-  ]);
+  // El mazo de Inventos ya no duplica hitos de los mazos de Astronomía o Medicina.
+  // Se conserva la constante para mantener estable la interfaz de CONTINUUM.
+  const MIXED_DUPLICATE_INVENTION_IDS = new Set();
 
   // Una modalidad hereda las bandas de su eje salvo que declare las suyas, como el cine:
   // comparte el eje del tiempo con la historia, pero no las mismas épocas.
@@ -321,11 +302,8 @@
         ["movies", window.MOVIE_CARDS], ["music", window.MUSIC_CARDS], ["videogames", window.VIDEOGAME_CARDS],
         ["astronomy", window.ASTRONOMY_CARDS], ["medicine", window.MEDICINE_CARDS]
       ]
-        // Inventos comparte una quincena de hitos con Astronomía y Medicina (misma
-        // fecha, mismo hecho, título casi calcado: relatividad, Sputnik, Hubble,
-        // vacunas...). En su propio mazo no molesta, pero mezclado con esos dos
-        // dejaría al jugador dos cartas casi idénticas en la misma partida. Se
-        // descarta aquí la versión de Inventos y se conserva la más específica.
+        // Inventos conserva los hitos tecnológicos propios; los descubrimientos
+        // médicos y astronómicos duplicados viven en sus mazos específicos.
         .flatMap(([sourceMode, deck]) => deck
           .filter(card => sourceMode !== "inventions" || !MIXED_DUPLICATE_INVENTION_IDS.has(card.id))
           .map(card => ({ ...card, sourceMode }))),
@@ -379,7 +357,7 @@
     },
     inventions: {
       key: "inventions", name: "Inventos y descubrimientos", tag: "Inventos",
-      cardLabel: "inventos", blurb: "De la escritura a la edición genética.", cards: window.INVENTION_CARDS,
+      cardLabel: "hitos", blurb: "Hitos históricos de ciencia, tecnología y conocimiento: de la escritura a la edición genética.", cards: window.INVENTION_CARDS,
       axis: "time",
       bands: [
         { limit: 500, key: "antigua", name: "Mundo antiguo", symbol: "☉" },
@@ -625,55 +603,47 @@
     4001: "4001-la-escritura-cuneiforme-fecha-aproximada", 4002: "4002-la-rueda-de-alfarero-fecha-aproximada",
     4003: "4003-el-papiro-egipcio-fecha-aproximada", 4004: "4004-el-codigo-de-hammurabi",
     4005: "4005-las-primeras-monedas-acunadas-fecha-aproximada", 4006: "4006-eratostenes-mide-la-tierra",
-    4007: "4007-muere-arquimedes-estudioso-de-la-palanca", 4008: "4008-julio-cesar-decreta-la-reforma-del-calendario",
+    4008: "4008-julio-cesar-decreta-la-reforma-del-calendario",
     4009: "4009-el-papel-en-china", 4010: "4010-el-almagesto-de-ptolomeo",
     4011: "4011-el-astrolabio-en-el-mundo-islamico-siglo-viii-fecha-aproximada",
     4012: "4012-el-tratado-de-algebra-de-al-juarismi-fecha-aproximada", 4013: "4013-la-primera-formula-escrita-de-la-polvora",
     4014: "4014-el-reloj-astronomico-de-su-song", 4015: "4015-las-primeras-gafas-fecha-aproximada",
-    4016: "4016-la-imprenta-de-tipos-moviles-de-gutenberg", 4017: "4017-copernico-pone-el-sol-en-el-centro",
+    4016: "4016-la-imprenta-de-tipos-moviles-de-gutenberg",
     4018: "4018-el-calendario-gregoriano", 4019: "4019-gilbert-explica-el-iman",
-    4020: "4020-lippershey-solicita-una-patente-para-el-telescopio", 4021: "4021-galileo-publica-lo-que-ve-en-el-cielo",
-    4022: "4022-harvey-descubre-la-circulacion-de-la-sangre", 4023: "4023-la-calculadora-de-pascal",
-    4024: "4024-el-reloj-de-pendulo", 4025: "4025-hooke-ve-la-celula",
-    4026: "4026-romer-mide-la-velocidad-de-la-luz", 4027: "4027-los-principia-de-newton",
+    4020: "4020-lippershey-solicita-una-patente-para-el-telescopio",
+    4023: "4023-la-calculadora-de-pascal", 4024: "4024-el-reloj-de-pendulo",
+    4026: "4026-romer-mide-la-velocidad-de-la-luz",
     4028: "4028-la-primera-maquina-de-vapor-comercial", 4029: "4029-la-maquina-atmosferica-de-newcomen",
     4030: "4030-el-termometro-de-mercurio", 4031: "4031-linneo-publica-la-primera-edicion-de-systema-naturae",
     4032: "4032-el-pararrayos-de-franklin", 4033: "4033-watt-patenta-el-condensador-separado",
     4034: "4034-el-descubrimiento-del-oxigeno", 4035: "4035-el-globo-de-los-hermanos-montgolfier",
-    4036: "4036-la-vacuna-de-la-viruela", 4037: "4037-la-pila-de-volta", 4038: "4038-la-primera-locomotora-de-vapor",
-    4039: "4039-el-estetoscopio", 4040: "4040-el-primer-motor-electrico",
+    4037: "4037-la-pila-de-volta", 4038: "4038-la-primera-locomotora-de-vapor",
+    4040: "4040-el-primer-motor-electrico",
     4041: "4041-la-primera-fotografia-conservada-fecha-aproximada", 4042: "4042-la-induccion-electromagnetica",
     4043: "4043-morse-desarrolla-su-telegrafo-electrico", 4044: "4044-el-daguerrotipo",
-    4045: "4045-la-vulcanizacion-del-caucho", 4046: "4046-la-anestesia-con-eter",
+    4045: "4045-la-vulcanizacion-del-caucho",
     4047: "4047-otis-vende-sus-primeros-ascensores-de-seguridad", 4048: "4048-el-convertidor-bessemer",
     4049: "4049-el-origen-de-las-especies", 4050: "4050-la-primera-fotografia-en-color",
     4051: "4051-mendel-presenta-sus-experimentos-sobre-la-herencia", 4052: "4052-la-dinamita",
     4053: "4053-la-tabla-periodica", 4054: "4054-la-patente-del-telefono",
     4055: "4055-la-lampara-incandescente-duradera", 4056: "4056-la-patente-del-automovil",
-    4057: "4057-el-neumatico-hinchable", 4058: "4058-los-rayos-x",
+    4057: "4057-el-neumatico-hinchable",
     4059: "4059-se-descubren-el-polonio-y-el-radio", 4060: "4060-la-primera-senal-de-radio-transatlantica",
-    4061: "4061-el-primer-vuelo-de-los-hermanos-wright", 4062: "4062-la-relatividad-especial",
+    4061: "4061-el-primer-vuelo-de-los-hermanos-wright",
     4063: "4063-la-baquelita-el-primer-plastico-sintetico", 4064: "4064-el-proceso-haber-para-el-amoniaco",
     4065: "4065-rutherford-propone-el-modelo-nuclear-del-atomo", 4066: "4066-la-cadena-de-montaje-de-ford",
-    4067: "4067-la-relatividad-general", 4068: "4068-la-insulina",
-    4069: "4069-la-primera-demostracion-de-la-television", 4070: "4070-la-penicilina",
+    4069: "4069-la-primera-demostracion-de-la-television",
     4071: "4071-la-patente-del-motor-a-reaccion", 4072: "4072-el-radar",
     4073: "4073-la-fision-nuclear", 4074: "4074-las-medias-de-nailon-salen-a-la-venta-en-todo-estados-unidos",
     4075: "4075-la-primera-reaccion-nuclear-en-cadena", 4076: "4076-el-eniac",
-    4077: "4077-el-transistor", 4078: "4078-la-estructura-del-adn",
-    4079: "4079-la-vacuna-de-la-polio", 4080: "4080-el-sputnik",
+    4077: "4077-el-transistor",
     4081: "4081-el-circuito-integrado", 4082: "4082-el-laser",
-    4083: "4083-el-primer-humano-en-el-espacio", 4084: "4084-el-primer-trasplante-de-corazon",
-    4085: "4085-la-llegada-a-la-luna", 4086: "4086-el-primer-microprocesador",
-    4087: "4087-la-primera-llamada-desde-un-movil", 4088: "4088-el-primer-bebe-por-fecundacion-in-vitro",
+    4086: "4086-el-primer-microprocesador",
+    4087: "4087-la-primera-llamada-desde-un-movil",
     4089: "4089-el-walkman", 4090: "4090-el-ibm-pc",
     4091: "4091-el-protocolo-tcp-ip", 4092: "4092-la-huella-genetica",
-    4093: "4093-la-propuesta-de-la-world-wide-web", 4094: "4094-el-telescopio-espacial-hubble",
-    4095: "4095-la-oveja-dolly", 4096: "4096-deep-blue-gana-a-kasparov",
-    4097: "4097-el-primer-borrador-del-genoma-humano", 4098: "4098-el-iphone",
-    4099: "4099-crispr-como-herramienta-de-edicion-genetica", 4100: "4100-la-deteccion-de-ondas-gravitacionales",
-    4101: "4101-la-primera-imagen-de-un-agujero-negro", 4102: "4102-las-vacunas-de-arn-mensajero",
-    4103: "4103-las-primeras-imagenes-del-james-webb"
+    4093: "4093-la-propuesta-de-la-world-wide-web", 4096: "4096-deep-blue-gana-a-kasparov",
+    4097: "4097-el-primer-borrador-del-genoma-humano", 4098: "4098-el-iphone"
   };
   // Láminas del mazo de videojuegos, enlazadas por el ID de cada carta.
   const VIDEOGAME_ART_BY_ID = {
