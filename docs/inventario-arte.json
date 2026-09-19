@@ -1,19 +1,16 @@
 {
-  "note": "Procedencia visual declarada por el titular del proyecto: los recursos visuales de Continuum incluidos en este inventario fueron generados con ChatGPT/OpenAI. Esta declaración documenta la procedencia comunicada por el titular; no sustituye la conservación de los términos aplicables al plan utilizado ni una revisión legal específica. Las huellas SHA-256 identifican los archivos auditados.",
-  "provenance": {
-    "generator": "ChatGPT / OpenAI",
-    "declaredBy": "Fercho-93, titular del proyecto",
-    "declaredAt": "2026-09-10",
-    "scope": "Todos los recursos visuales del inventario: ilustraciones de cartas, portadas, icono, splash y demás imágenes incorporadas al juego.",
-    "commonStyle": "Ilustración vertical sin texto ni marcos añadidos, con lenguaje de grabado/ lámina sobre pergamino, paleta sepia y tonos cálidos; el tratamiento concreto puede variar según el mazo.",
-    "evidenceLevel": "declaración del titular apoyada por el historial de conversaciones del proyecto",
-    "exactPrompts": "No conservados de forma completa para cada archivo.",
-    "generationDates": "No conservadas de forma completa para cada archivo.",
-    "referenceImages": "No se ha confirmado una imagen de referencia para cada archivo.",
-    "commercialTerms": "Conservar y revisar los términos vigentes de ChatGPT/OpenAI aplicables al uso de las imágenes en la fecha de generación; esta entrada no constituye por sí sola una certificación jurídica.",
-    "reviewStatus": "procedencia documentada; metadatos individuales pendientes cuando puedan recuperarse"
-  },
+  "note": "Completar derechos y procedencia con evidencia del titular. No se presupone que una imagen pública pueda reutilizarse.",
   "assets": [
+    {
+      "path": "assets/animal-cards/african-clawless-otter.webp",
+      "sha256": "c48b7e6066ad6a06dd5039e597dcd54f17863188cacde2009c3d7e3e88881abf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/african-penguin.webp",
+      "sha256": "fe4e52c584c5ad67c81076be94c8b60a7383e16ee13ae883dfd2f3955e92b8f7",
+      "rightsEvidence": null
+    },
     {
       "path": "assets/animal-cards/alaska-moose.webp",
       "sha256": "892af42fcda5c2a4e52a17cc61a75b61fb1d0f28050cc22ba4df9cef25c7d5d5",
@@ -85,6 +82,16 @@
       }
     },
     {
+      "path": "assets/animal-cards/andean-bear.webp",
+      "sha256": "43b48b09a1a483b71865dd1c0e4c900de56578a82a08d97465bdb129d684fc54",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/antelope.webp",
+      "sha256": "9b4f92d89e7a1f41115c016a7cd4523bf984db1ec55f36a3a0d33a2e8f1d6fee",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/animal-cards/australian-dragonfly.webp",
       "sha256": "1d471690f7cdbc940fcb18a952c78dbee121db2df643926dd957cf8a38d6846a",
       "rightsEvidence": {
@@ -97,6 +104,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/axolotl.webp",
+      "sha256": "d119bd026f3dfe95e3c9c492719231437744aa114f565f150960f970343dc9c5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/bald-eagle.webp",
+      "sha256": "08edc0a53803b8e0ac0402c2239a3449347c7be082bd4f0ce3afd8f9bfd570b8",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/bee.webp",
@@ -183,6 +200,16 @@
       }
     },
     {
+      "path": "assets/animal-cards/bonobo.webp",
+      "sha256": "22c952ac2f13912c013b07204a8060e5866f6d40390f73cbc1d9cfc14a16692e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/bornean-orangutan.webp",
+      "sha256": "1935aba9062c3748b87961d1209fb234f66980864bfeb0937b7f3da316df8de4",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/animal-cards/bowhead-whale.webp",
       "sha256": "8b108924ec191fa40a6d3dc05cd4a9b24dc9f779af8ad092a665eb01799a14a1",
       "rightsEvidence": {
@@ -251,6 +278,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/caracal.webp",
+      "sha256": "600f1f63148837b8cd55f60de9d52767d9e8e1399b62d3ab6711cabfdfc132db",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/cat.webp",
@@ -363,6 +395,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/coquerels-sifaka.webp",
+      "sha256": "5c9dd0d61497c1005ea4bc1ff57ffe0072f204e8520a85a45e8949c955defe2c",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/dolania-mayfly.webp",
@@ -489,6 +526,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/eurasian-eagle-owl.webp",
+      "sha256": "c87b1fc34e571cc66b6a1368005f604fc10e3979e867291809519e5b7b6d05c4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/eurasian-lynx.webp",
+      "sha256": "be48da1f2baebb2a08ead8ab4a2eef76842d7e4f8ba28dcbd3e14ae7a971e29a",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/european-beaver.webp",
@@ -673,6 +720,11 @@
       }
     },
     {
+      "path": "assets/animal-cards/giant-armadillo.webp",
+      "sha256": "5bc961f3433f4df91f5eb3f44579c53cd88348fa33dcd0c4424c6abf24246626",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/animal-cards/giant-barrel-sponge.webp",
       "sha256": "feefedce35a2b0f3d94e11105aee6a16b3af2a2b8064a10b9cbffbf4b8488bd6",
       "rightsEvidence": {
@@ -769,6 +821,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/great-white-pelican.webp",
+      "sha256": "16aa88e8f5466b231156c53ee495908cb48fb83f2c516309430286a00173f2e5",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/green-tree-frog.webp",
@@ -995,6 +1052,11 @@
       }
     },
     {
+      "path": "assets/animal-cards/leopard-shark.webp",
+      "sha256": "c34f5d22272b962d0c434a5b09533c2a994bc919f8035d0f0f34830e885bf799",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/animal-cards/lion.webp",
       "sha256": "24025d08d27f04a084cc4bcaae62dcdb2aee4deffee463a00da8a62cb4f6257a",
       "rightsEvidence": {
@@ -1077,6 +1139,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/north-american-porcupine.webp",
+      "sha256": "997220b3ca739933b5f61cce3609a5ca2a2ba93bd1f9592470a467aa8dae64a3",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/ocean-quahog.webp",
@@ -1175,6 +1242,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/raccoon.webp",
+      "sha256": "92240c40be3e8da039664bcf46b3c5965b8ca41095cba9832af53df73852c830",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/animal-cards/red-panda.webp",
+      "sha256": "c36adfed57ca9ca06d023cf0aa2b0add140803837bc6acf7edf95bc32b1dcbcb",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/red-sea-urchin.webp",
@@ -1317,6 +1394,11 @@
       }
     },
     {
+      "path": "assets/animal-cards/spotted-hyena.webp",
+      "sha256": "f637764f921a5822a88f70bed971a9f658ed0237f71ce18454ba1e3297d7dd9a",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/animal-cards/sunflower-sea-star.webp",
       "sha256": "f181a6a41976be90e5568d9c73402f4a2be923166149c81154c2c966ff572251",
       "rightsEvidence": {
@@ -1329,6 +1411,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/animal-cards/takin.webp",
+      "sha256": "25a83f5e7765b831dc443e37b4d6b305a5353db6fa06051e0688c9a81ff32cbd",
+      "rightsEvidence": null
     },
     {
       "path": "assets/animal-cards/three-toed-sloth.webp",
@@ -1385,6 +1472,36 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/astronomy-cards/4006-eratostenes-mide-la-tierra.webp",
+      "sha256": "5e91c60edac811450a1b53a451a8df721b606433362cfc5ae37197896cec7c7a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/4010-el-almagesto-de-ptolomeo.webp",
+      "sha256": "59b5d9514f04b433e4f857cda559e0559d565182fe242e097bb6c19f1805bdd5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/4011-el-astrolabio-en-el-mundo-islamico-siglo-viii-fecha-aproximada.webp",
+      "sha256": "710e002a4ab05ea17d76f06c82feb0f4935ec05de036a9311b67bece2f3b51b9",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/4014-el-reloj-astronomico-de-su-song.webp",
+      "sha256": "1e969796954717ccff15fac216d105f7c63f107c9c8d7b9cfc105b404e62718e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/4020-lippershey-solicita-una-patente-para-el-telescopio.webp",
+      "sha256": "5a6bdb37d6dbaa66e7a0bbff780f673468c586a10104b7af7f1528b2ee57c894",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/astronomy-cards/4026-romer-mide-la-velocidad-de-la-luz.webp",
+      "sha256": "cff4db508b88ea4932bad1ea1750a0adb2fac734f2ab08733af99f2244168798",
+      "rightsEvidence": null
     },
     {
       "path": "assets/astronomy-cards/8024_yuri-gagarin.webp",
@@ -2073,6 +2190,11 @@
       }
     },
     {
+      "path": "assets/competition-engraving.webp",
+      "sha256": "c9812eda2cd1ca2ef46c93136550dbeceffa40def8b513ffe4186fe160414d60",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/continuum-emblem-800.webp",
       "sha256": "38bbb95dd3231eec7e52f4a64f9f239868cda70c77d1d1b2753a033fa99039a3",
       "rightsEvidence": {
@@ -2087,20 +2209,6 @@
       }
     },
     {
-      "path": "assets/continuum-splash-v2.webp",
-      "sha256": "ad21f4e556a8e920f494e2eabbaf552a4f45bf7189eeb902f9dcbc6d6658f56f",
-      "rightsEvidence": {
-        "status": "ai-generated-with-recorded-prompt",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": "Fondo vertical 9:16 de pergamino luminoso con astrolabio, cartas antiguas flotantes y globo inferior; sin texto, logotipo, botones, iconos ni emblema central.",
-        "generatedAt": "2026-09-18",
-        "referenceImage": "Mockup de portada aportado por el titular el 2026-09-18.",
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/continuum-splash-clean-v3.webp",
       "sha256": "27472c85b31383863e872a960160b763b1c5f9f6d12fe0db84f51af548cc5691",
       "rightsEvidence": {
@@ -2111,6 +2219,20 @@
         "exactPrompt": "Eliminar solo las cinco cartas flotantes periféricas de la portada y reconstruir de forma natural el pergamino, las nubes, el polvo dorado y las líneas del astrolabio situadas detrás, conservando sin cambios la composición, la luz, los planetas y el globo.",
         "generatedAt": "2026-09-19",
         "referenceImage": "assets/continuum-splash-v2.webp",
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/continuum-splash-v2.webp",
+      "sha256": "ad21f4e556a8e920f494e2eabbaf552a4f45bf7189eeb902f9dcbc6d6658f56f",
+      "rightsEvidence": {
+        "status": "ai-generated-with-recorded-prompt",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": "Fondo vertical 9:16 de pergamino luminoso con astrolabio, cartas antiguas flotantes y globo inferior; sin texto, logotipo, botones, iconos ni emblema central.",
+        "generatedAt": "2026-09-18",
+        "referenceImage": "Mockup de portada aportado por el titular el 2026-09-18.",
         "commercialTermsRef": "terms-to-preserve"
       }
     },
@@ -6455,34 +6577,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4006-eratostenes-mide-la-tierra.webp",
-      "sha256": "5e91c60edac811450a1b53a451a8df721b606433362cfc5ae37197896cec7c7a",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4007-muere-arquimedes-estudioso-de-la-palanca.webp",
-      "sha256": "2a574366f30a5ed8f771b405103ab941c90826d9358c035af74ddec8813f3f91",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4008-julio-cesar-decreta-la-reforma-del-calendario.webp",
       "sha256": "1437a83400dc485a95e4a41af563e68d25fc7cff0eeb7c93e1908c8c8a7c9c9b",
       "rightsEvidence": {
@@ -6499,34 +6593,6 @@
     {
       "path": "assets/invention-cards/4009-el-papel-en-china.webp",
       "sha256": "e31ced6b9fe5596401126fc8fae191022b11390f8d969bd8a870ce5045057003",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4010-el-almagesto-de-ptolomeo.webp",
-      "sha256": "59b5d9514f04b433e4f857cda559e0559d565182fe242e097bb6c19f1805bdd5",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4011-el-astrolabio-en-el-mundo-islamico-siglo-viii-fecha-aproximada.webp",
-      "sha256": "710e002a4ab05ea17d76f06c82feb0f4935ec05de036a9311b67bece2f3b51b9",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6567,50 +6633,8 @@
       }
     },
     {
-      "path": "assets/invention-cards/4014-el-reloj-astronomico-de-su-song.webp",
-      "sha256": "1e969796954717ccff15fac216d105f7c63f107c9c8d7b9cfc105b404e62718e",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4015-las-primeras-gafas-fecha-aproximada.webp",
-      "sha256": "34f65fdc82197f2f4c82e59f761eb786742bf6e60a80898268334fbf02811148",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4016-la-imprenta-de-tipos-moviles-de-gutenberg.webp",
       "sha256": "ca11c21936c2168b113127241ea5e9d268c81045ba69404b88b435b19421dd58",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4017-copernico-pone-el-sol-en-el-centro.webp",
-      "sha256": "b4ddb771d969a1833ee357fb35c8fd176f81812fffe99b1689f17b871a3424ae",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6651,48 +6675,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4020-lippershey-solicita-una-patente-para-el-telescopio.webp",
-      "sha256": "5a6bdb37d6dbaa66e7a0bbff780f673468c586a10104b7af7f1528b2ee57c894",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4021-galileo-publica-lo-que-ve-en-el-cielo.webp",
-      "sha256": "61f0282e6749a52e8fa89d75db0deb2d4183d25bf779bd4ed80c752bb3ee4d55",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4022-harvey-descubre-la-circulacion-de-la-sangre.webp",
-      "sha256": "b1a1fdc1f3a44f123f493f3f23b94ee87042422149a41c2569ec6bfa2e3c38a7",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4023-la-calculadora-de-pascal.webp",
       "sha256": "8e6396445320111297af880e204511af2e98ac92053221e784b6cc7e66b40ef4",
       "rightsEvidence": {
@@ -6721,48 +6703,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4025-hooke-ve-la-celula.webp",
-      "sha256": "29f684c419454837bc1e12e5b1ca8e8cb8d090c45fb91a60d4c7a66bb702d9aa",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4026-romer-mide-la-velocidad-de-la-luz.webp",
-      "sha256": "cff4db508b88ea4932bad1ea1750a0adb2fac734f2ab08733af99f2244168798",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4027-los-principia-de-newton.webp",
-      "sha256": "ffa09cf6b0046be6e78fe070bf976b83307d1d5ec1007e274d6a8727b4c1e674",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4028-la-primera-maquina-de-vapor-comercial.webp",
       "sha256": "eb2f5e84efce1e9a89db5987f1d84c14fe33e1f35adaf2b3d4023972af72132e",
       "rightsEvidence": {
@@ -6779,20 +6719,6 @@
     {
       "path": "assets/invention-cards/4029-la-maquina-atmosferica-de-newcomen.webp",
       "sha256": "7cdd91d2eb2d1f862940ba8c7c999de0444b1fed8d122cfbba0ce9b00e736ad1",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4030-el-termometro-de-mercurio.webp",
-      "sha256": "fc9957fbf12c6e81bc19b60c3317107de415f987f8f80f5e9f1288aef9094946",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6847,36 +6773,8 @@
       }
     },
     {
-      "path": "assets/invention-cards/4034-el-descubrimiento-del-oxigeno.webp",
-      "sha256": "446d1452e6448b67af59940862202525d2313150d8938164e0867326b04f5fd8",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4035-el-globo-de-los-hermanos-montgolfier.webp",
       "sha256": "13687d947150307296e225678690a4956b2e2e66905a1bc9db9f37036a6be13d",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4036-la-vacuna-de-la-viruela.webp",
-      "sha256": "432495abb21d16ffcb37aa3f6ce83cef56462d4feb7ba5cc118df5e034dccae3",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -6905,20 +6803,6 @@
     {
       "path": "assets/invention-cards/4038-la-primera-locomotora-de-vapor.webp",
       "sha256": "8bae4ba300af9d49d1ada4d38b5bc36ce94051bbbe2e5e6a1215003e65480636",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4039-el-estetoscopio.webp",
-      "sha256": "e9a5a76d571f8db69279d919339b9015cd0b8ef52cdc6a5a579bd86a2201f33e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7015,20 +6899,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4046-la-anestesia-con-eter.webp",
-      "sha256": "aeb7e69fc40f70e993ae0154527b01ecb5a7fbf0998013271b814a0e5749b4a7",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4047-otis-vende-sus-primeros-ascensores-de-seguridad.webp",
       "sha256": "75d58ce58e98e0de43e1b34fd8ac85391572d90613adf4d9ace74958698bf278",
       "rightsEvidence": {
@@ -7073,20 +6943,6 @@
     {
       "path": "assets/invention-cards/4050-la-primera-fotografia-en-color.webp",
       "sha256": "1f952dd09e0fa080b8342777af08c1a4e4ad9dc9f23239b85ae3906a81f0bc56",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4051-mendel-presenta-sus-experimentos-sobre-la-herencia.webp",
-      "sha256": "7f3eb9c61f507b10227df7107bf274681f417165f7971ec666c69ac72414d9e7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7183,20 +7039,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4058-los-rayos-x.webp",
-      "sha256": "51a420dbb89d7c1366f29ae08a551823f578926be1285dbc47c91238c53b4e22",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4059-se-descubren-el-polonio-y-el-radio.webp",
       "sha256": "349adcbdf94dbe67556363caca9a8c50218f27c1ba5c3f6f9147ea8d048411d5",
       "rightsEvidence": {
@@ -7227,20 +7069,6 @@
     {
       "path": "assets/invention-cards/4061-el-primer-vuelo-de-los-hermanos-wright.webp",
       "sha256": "c95d632f8437f67b4b299a0262386755db8aaf0a7c744ebb0fa847209be625e3",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4062-la-relatividad-especial.webp",
-      "sha256": "32f40f23faac766f73cd9056b687bc92de5253e7e0256ac95d8acf368cfd8dd7",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7309,50 +7137,8 @@
       }
     },
     {
-      "path": "assets/invention-cards/4067-la-relatividad-general.webp",
-      "sha256": "8661e5a2e9d4d49607bc5d798b617e19f312403b5f5227e1be54e978c36ebdb7",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4068-la-insulina.webp",
-      "sha256": "84053e5f3a9646506570bf40821fd85cabaf95186e25132b8bee1496a02b0491",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4069-la-primera-demostracion-de-la-television.webp",
       "sha256": "dd2904bbc22eae8838bffad9ec81850cc11a8f47edd012e31940483dfb0a2dba",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4070-la-penicilina.webp",
-      "sha256": "020eff88c611ecb58d9d0eb1099f8ded5395fc8dea10b68cb309d7232c7a18da",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7463,48 +7249,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4078-la-estructura-del-adn.webp",
-      "sha256": "d811737286c5c857269b414bba56b8c5a66a03b7228d306962ea1517eb61d037",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4079-la-vacuna-de-la-polio.webp",
-      "sha256": "3ce976c7f1a9b1656bd07f6ea6243e23a75483fa928971773f984d50721c1826",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4080-el-sputnik.webp",
-      "sha256": "5b29f2217d9dc8d9c8cdbda73be38606cafb08b608d7e0259166f91c94d227f5",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4081-el-circuito-integrado.webp",
       "sha256": "b0dd2b1005a5196ed95207ec0d9e13309dd647f0316f0556518f060eea684183",
       "rightsEvidence": {
@@ -7533,48 +7277,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4083-el-primer-humano-en-el-espacio.webp",
-      "sha256": "7112355d76a70fb6a5c82d347767fcc1b49d616f3170be584d9419079468f2a5",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4084-el-primer-trasplante-de-corazon.webp",
-      "sha256": "e375401ba501288d4186a83e0f27b565e475585c707a0061b86fa5cf1a45df33",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4085-la-llegada-a-la-luna.webp",
-      "sha256": "58ddadfcba84b5728762d2b6ea72dfe2d8ca0c6d0048df0c59b38b5247dad749",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4086-el-primer-microprocesador.webp",
       "sha256": "1c2803a59341df05cc8affd462613f864a9c75feb914ca352bb193b2b1c2f17d",
       "rightsEvidence": {
@@ -7591,20 +7293,6 @@
     {
       "path": "assets/invention-cards/4087-la-primera-llamada-desde-un-movil.webp",
       "sha256": "412dca66076835dbd68659fa14319812f2bc2f450d691351495f8997d7db366d",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4088-el-primer-bebe-por-fecundacion-in-vitro.webp",
-      "sha256": "9a6e1c892bcf0c22983ca5f856332380610e9583e977e0d195ca2321118e2482",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7659,50 +7347,8 @@
       }
     },
     {
-      "path": "assets/invention-cards/4092-la-huella-genetica.webp",
-      "sha256": "0d4870de82783b536a616ad8750ef16da405a7b713045df3ad70d63666b3b772",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4093-la-propuesta-de-la-world-wide-web.webp",
       "sha256": "5cd88a27d1e54374396596656dd087104fe9a62a79064304afb378726dc76b10",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4094-el-telescopio-espacial-hubble.webp",
-      "sha256": "aa4afc0aa231ce14a7e3d0936aba4ea10034226f5ad622178f2108fc552ec947",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4095-la-oveja-dolly.webp",
-      "sha256": "5bbeca82b0f835f57f275556f7deff833f6e8746b1a3a820f49999a293da4d4e",
       "rightsEvidence": {
         "status": "user-confirmed-ai-generated",
         "generator": "ChatGPT / OpenAI",
@@ -7729,20 +7375,6 @@
       }
     },
     {
-      "path": "assets/invention-cards/4097-el-primer-borrador-del-genoma-humano.webp",
-      "sha256": "1231a368165649f20274f0b12096df327045e1a4a74f2dd96bf1b3d8bca21f21",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/invention-cards/4098-el-iphone.webp",
       "sha256": "f4ea24e98cc57c7b4d815d6550fc4ecf7a3116c06684260daabd423fccedb333",
       "rightsEvidence": {
@@ -7757,74 +7389,24 @@
       }
     },
     {
-      "path": "assets/invention-cards/4099-crispr-como-herramienta-de-edicion-genetica.webp",
-      "sha256": "66725cb754f68d1f057b248617049895f8d11cebf6396c6f1c8f8533b87b486e",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "path": "assets/invention-cards/4104-nace-coca-cola.webp",
+      "sha256": "7bb0dbdac427b3fea95b24efd6fe216b10f24196fe7057440ef177c43b042a7d",
+      "rightsEvidence": null
     },
     {
-      "path": "assets/invention-cards/4100-la-deteccion-de-ondas-gravitacionales.webp",
-      "sha256": "372761aa112fd0f9ebc45816ffa2c31ac53e512c002b309fbf4d99ccea3432e7",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "path": "assets/invention-cards/4105-el-primer-cajero-automatico.webp",
+      "sha256": "b0e1d6a399fa8ef2e7d3929f4e6654a98ba7bf33c70000524e62a951a221f6fc",
+      "rightsEvidence": null
     },
     {
-      "path": "assets/invention-cards/4101-la-primera-imagen-de-un-agujero-negro.webp",
-      "sha256": "166cfdf04c85e0d40e2fad9813ea36c1e1e3817d4d74fd5ff251076223512fce",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": "2026-09-14",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "path": "assets/invention-cards/4106-el-primer-correo-electronico.webp",
+      "sha256": "4f35e61fe96d0c6ec147f9ace0ee1f8286873c886184cdca960f9f7e576c3c30",
+      "rightsEvidence": null
     },
     {
-      "path": "assets/invention-cards/4102-las-vacunas-de-arn-mensajero.webp",
-      "sha256": "cad6b9f3a51e7ee7548d5d94cdd87d9100c5afcaa733800df501a40302750bd6",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
-      "path": "assets/invention-cards/4103-las-primeras-imagenes-del-james-webb.webp",
-      "sha256": "f8add9c7230dde8d240fc6e137f78a16a4ada1ec5973e8d917090cf6c290dbf4",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": null,
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
+      "path": "assets/invention-cards/4107-la-primera-tarjeta-de-credito.webp",
+      "sha256": "65233f2f0b491140c1151d48eecd767f28a5fcfdc2b2ae4886393c8e0b236c7c",
+      "rightsEvidence": null
     },
     {
       "path": "assets/language-cards/14001.webp",
@@ -8483,6 +8065,36 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/medicine-cards/4015-las-primeras-gafas-fecha-aproximada.webp",
+      "sha256": "34f65fdc82197f2f4c82e59f761eb786742bf6e60a80898268334fbf02811148",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/4030-el-termometro-de-mercurio.webp",
+      "sha256": "fc9957fbf12c6e81bc19b60c3317107de415f987f8f80f5e9f1288aef9094946",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/4034-el-descubrimiento-del-oxigeno.webp",
+      "sha256": "446d1452e6448b67af59940862202525d2313150d8938164e0867326b04f5fd8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/4051-mendel-presenta-sus-experimentos-sobre-la-herencia.webp",
+      "sha256": "7f3eb9c61f507b10227df7107bf274681f417165f7971ec666c69ac72414d9e7",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/4092-la-huella-genetica.webp",
+      "sha256": "0d4870de82783b536a616ad8750ef16da405a7b713045df3ad70d63666b3b772",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/medicine-cards/4097-el-primer-borrador-del-genoma-humano.webp",
+      "sha256": "1231a368165649f20274f0b12096df327045e1a4a74f2dd96bf1b3d8bca21f21",
+      "rightsEvidence": null
     },
     {
       "path": "assets/medicine-cards/9001-hippocratic-corpus.webp",
@@ -9155,6 +8767,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/mode-walk-multi.webp",
+      "sha256": "1d67f5b2fc2a1f52924cd6984b7a4e66483973852fd03e95e354c745e1d4eb22",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/mode-walk-solo.webp",
+      "sha256": "e66c2c0b50ae067b9b07880fbb7fda62b014f525b1236aef32c76c4b7e60ee78",
+      "rightsEvidence": null
     },
     {
       "path": "assets/movie-cards/1001-moon.webp",
@@ -10373,6 +9995,171 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/movie-cards/1088-dune-part-two.webp",
+      "sha256": "2476ebb8ed4305b226b3b884eb6ead78b54299070cb71ab5c9e9a54fc5f84e58",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1089-the-odyssey.webp",
+      "sha256": "13c84e077f10735e33d65cdc8f03cd42c182c21d833acc9fd4fb14722f6fd50c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1090-society-of-the-snow.webp",
+      "sha256": "0d8022624a4923a64e9a322055536ffd34d7d648432533c944229c2892fa486b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1091-argentina-1985.webp",
+      "sha256": "cad91a2f60532b58454f0878b67211c08c29f453abe09283128bae0bff216220",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1092-oppenheimer.webp",
+      "sha256": "410c093eeb757409d9711475534ec1865057514177843b0dfdaf7773692c8298",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1093-perfect-days.webp",
+      "sha256": "77008e32ddf7b4bde3a9dbb605aa61681781554418e25c8429531622bb630be2",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1094-los-domingos.webp",
+      "sha256": "ecaf0da8b451e667ea810e9ca81cc2aed82bc9b05bbfb44f6561523202791e5c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1095-all-quiet-western-front.webp",
+      "sha256": "7467421c8a25a2b892cebcb4e8d49d2c47505733d75dae29e7577a0a59b83e39",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1096-forrest-gump.webp",
+      "sha256": "fbbf0689b8ce096dce4170306bff8beefd37ecec979f6c418a2fa3c7e7ccf5bf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1097-intouchables.webp",
+      "sha256": "0a7fc207b983fd53e2175db829b96d62d2dfbf2bb7a50ac24f8bbc163f9ca176",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1098-full-metal-jacket.webp",
+      "sha256": "946f01e8c3782778d9d7115883cd4912cdd8df7d2fe83d611aabc84d858c1e61",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1099-paths-of-glory.webp",
+      "sha256": "a856a74895f52b3be2a834201556a7b071dc70972476f194e40f9ff71e40484b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1100-midnight-in-paris.webp",
+      "sha256": "466fb7c0aa7598473ace94bb8043664f7e6b42cc4deba2958a91e1cbacd10602",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1101-vicky-cristina-barcelona.webp",
+      "sha256": "5f81f54ac9db0159469a9dc701a20834c7e596a9641769f492c378f2740caa63",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1102-match-point.webp",
+      "sha256": "368a6a5cf1d7f1dc0e63542903494bc9b4f01616fde96a22610b7a3bc847f40e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1103-last-crusade.webp",
+      "sha256": "83bb31582673f195afa5626307c2d63cdceea2eeffacb20acd207a8116c5c69a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1105-reservoir-dogs.webp",
+      "sha256": "b2c26dc17ccb7e021d28b250374327530daef03be58b5f76e6c0c4db1d8d5740",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1106-django-unchained.webp",
+      "sha256": "91f937951e53636434d9ae93624b11fa29ded104b8889d2b67ae6b92b7e2dcfc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1107-inglourious-basterds.webp",
+      "sha256": "aaf049d7112a3ab95a00161100f37c34c8e432983d610790dbb00f666cb2e835",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1108-hateful-eight.webp",
+      "sha256": "644cb242d823859545347ca1ebc1bcc1d0bcdcaf193df849c1d54ac8d880d152",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1109-life-is-beautiful.webp",
+      "sha256": "91db4ec1573bf5e6a35bd54d71384eac6694fa027978dbc50b33ef98ddee037d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1110-tiger-and-snow.webp",
+      "sha256": "e3c799a81f1e585ddd58d95841df471b3682d55868db24ac8a672f4b351e33ea",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1111-pianist.webp",
+      "sha256": "dd81de20db25134e6346d9b43bf48c6a684ce77de7f142cdcf5e3ae3919c573b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1112-gran-torino.webp",
+      "sha256": "cc5200e75c40ceb506ddb57aa29a6d3a5ee1077f88157a291a1f0ca3deb227c5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1113-lives-of-others.webp",
+      "sha256": "2d5b2a39ae231bb8f47c419174738b52dfd61aa83d440702cc1a1a671df765bb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1114-spirited-away.webp",
+      "sha256": "d3727ca2b22374e60fac2cd2f40a68a39a5ca2c6e6cafa11c34f884663b47bdd",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1115-princess-mononoke.webp",
+      "sha256": "d4b05370bddd831cb43a999ee66bd634c147a59f9a99364deb5b37b4bd61d37f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1116-howls-moving-castle.webp",
+      "sha256": "851740ce79f34a767de0923a51779168b7373a2e81e8860e299eeb7508d42d3b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1117-my-neighbor-totoro.webp",
+      "sha256": "50fb3f52b0650e9cd0817c36ae763579715db376a774926b6c198dbde70ef2bf",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1118-klaus.webp",
+      "sha256": "68f6ab44d9c6d3f0856deb6016e7d982fada6fc2f4bef7929309bed15fe18876",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1119-interstellar.webp",
+      "sha256": "4740a6bd919bd4b7302b70b825fdf01828279e800d222664f7702bd051c0ba84",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1120-memento.webp",
+      "sha256": "c4e43b36df41daa9e145e25799050128ac3be7dd70003c4bb35fbafb50848645",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/movie-cards/1121-whiplash.webp",
+      "sha256": "39f35af48b6d9df97f27f5e4f8685f74ce7f5610fc722d9e12960c77fa47ea40",
+      "rightsEvidence": null
     },
     {
       "path": "assets/music-cards/21-album.webp",
@@ -11775,6 +11562,146 @@
       }
     },
     {
+      "path": "assets/population-cards/3050.webp",
+      "sha256": "065049bb0d3c5e700c28b9aeba3f7439f4444730cd320d90be98335090e49338",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3051.webp",
+      "sha256": "7f6e65b3d2268a31422252b05b2069a60a96921fe7b5a6d637dd505a2da0164e",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3052.webp",
+      "sha256": "1fa4f259f8dff4e5ad3ff364d90bb941dc8f5a167d509f35c146194593d6edb1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3053.webp",
+      "sha256": "2e7fde09af49c750cee5d20eecd79c0d81d0e461a944746c48ab7b360ab1a706",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3054.webp",
+      "sha256": "b8a1bf2cd1d5ba713dc613858330fa0dadf1df9445ad7871669ebd9e16f28e25",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3055.webp",
+      "sha256": "7e9fba6cc2421266e477c20a88c75e7f7cd0f547fafb8f8665c223427ea9f72d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3056.webp",
+      "sha256": "98903805c27c7c3e87daca0911919ce45a6b2b2bae4cd43f502fb6b34bf83083",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3057.webp",
+      "sha256": "af73c22b8d6b0a0fc0d4c3f54685af2aad4aa79cbe86665ee20c36fad0f3489c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3058.webp",
+      "sha256": "ddd916a79cace252d297d4685dcac5e45681ef0ddf3398fcbf2a1cf1ac119d22",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3059.webp",
+      "sha256": "8d4d1033aebd1c080fcdf35eebe07731fc88c3728d149cce4dac75b5e1a78c9b",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3060.webp",
+      "sha256": "b2f8df8139db8603238f3f4387990d33fb73da96f4c78498570f9d7dc9e6dab8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3061.webp",
+      "sha256": "851bc4ca4676ce8d251a5a81acc1482c48ed1f016dd50766f99172b1acfe7e02",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3062.webp",
+      "sha256": "aa630dd0a436ee938dad6852eba5c790ae203bdd785e707f0779a6fa5744985d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3063.webp",
+      "sha256": "fdd86c571496d44ccca1dc7dfd73fa1e6868fb8a769da33dbc9e8b1d5a0e6277",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3064.webp",
+      "sha256": "c2adb4f1883fd5678f2056c36da3e4840da1d52df235c25042dbd97f182040b1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3065.webp",
+      "sha256": "03f0ca5c44119bd980968206375cb53ec8658ff0aba218d8e34bdbbcc8a6a236",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3066.webp",
+      "sha256": "8fb3c5ad1499f9bddd619595c2bbd24e0cd85aa62dce484671eeccff3cdaf652",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3067.webp",
+      "sha256": "b669fcd1a0d2fee5d8ba41bb0a6645f31f3a3fa3374f01f983fd4bd88785a66a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3068.webp",
+      "sha256": "41e25332bc2ad48df797430a434d9f5e4478e5e5adddb650d4845c55f204602a",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3069.webp",
+      "sha256": "01113b6112fa50bebe4118dbdd6d264b74645d0fe720a5c11ba7fbb66027819d",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3070.webp",
+      "sha256": "2ba7bc45e8de8dbaee1ad59846807fb6f8951bb17f04b11255c4cfa3c44b6621",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3071.webp",
+      "sha256": "b1e787869f6fd030a7d20564869a024eb3e8bf9389ed6c9f5c8b9846f9b0e2d6",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3072.webp",
+      "sha256": "9a88a4ccf52f06a814549866ebba0825a9e8ed0bd903718bd495ea08208b6b42",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3073.webp",
+      "sha256": "d96c7f3eccdf368227f4854909f435096213ec9c22efafe84697b17a26369661",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3074.webp",
+      "sha256": "dea3528b53058cc86e862c3062e4f6e96c6d1b39e3f5da775aa1a0aa422836c0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3075.webp",
+      "sha256": "c4c826b1870f827d01af7811ce026394af0546808512763386e0fe882d8e0f0c",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3076.webp",
+      "sha256": "99918a0afde446e622c9c61b15c1e611caecf60b40620ca575dc44c0cd33e159",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/population-cards/3077.webp",
+      "sha256": "7a9e3d515ae61789de14cca0aac150ba47ee28b241c131d1bea58cd2866392d4",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/animal-crossing-new-horizons.webp",
       "sha256": "2859b9858bee423c5cb1924c805e072290cbaad1ce5ad7ba97fedfad9e0cb2cf",
       "rightsEvidence": {
@@ -11831,6 +11758,16 @@
       }
     },
     {
+      "path": "assets/videogame-cards/bloodborne.webp",
+      "sha256": "6fe5f78414dd9fd4471ee114f57d1595b3ac1fe28c24c42bcff8fe620a001458",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/call-of-duty.webp",
+      "sha256": "32644ef9a3c74d0bbadd6b82301f2914c20968bcc7bd915406a807ae70971812",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/candy-crush-saga.webp",
       "sha256": "1f3e6d550d69c03fbfd3b251d80f9958e3a181d47705f74349e38e21bddc7373",
       "rightsEvidence": {
@@ -11859,6 +11796,11 @@
       }
     },
     {
+      "path": "assets/videogame-cards/civilization-iv.webp",
+      "sha256": "7f8c48d4b829e9bf1a9d7e1dcd6096a46c977cace29ad822b85ec4ce9e5ecd31",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/commodore-64.webp",
       "sha256": "1b7836718a1921e3620c66658cbbf779c987aa4de33d101742ee3b3b04e5c1f6",
       "rightsEvidence": {
@@ -11885,6 +11827,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/crash-team-racing.webp",
+      "sha256": "98df8070fb7b518bf1ac6ca81e6a2919662556096dd052af08bd27de4c248666",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/disco-elysium.webp",
@@ -11943,6 +11890,11 @@
       }
     },
     {
+      "path": "assets/videogame-cards/driver.webp",
+      "sha256": "eb791b9dfcec05a73232f11b7c69d3acc501b26901f63537140e39a5876d1e05",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/elden-ring.webp",
       "sha256": "5f724997e54eb95b827ed2ee22579b3136f7a62e4bf3d05d955a1d2bc3e555d5",
       "rightsEvidence": {
@@ -11971,6 +11923,16 @@
       }
     },
     {
+      "path": "assets/videogame-cards/fifa.webp",
+      "sha256": "82a832bac20be61383293158781b7d75e222140823597a6cf3d2503f0bb04c7f",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/final-fantasy-ix.webp",
+      "sha256": "8ccd7fe3c95680e6b47bf6fbbf0996c1be33e2c3a57d11c39813b0dcf1d3e84e",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/final-fantasy-vii.webp",
       "sha256": "ea8add6af605d7ea4727c84b24e3533f57cb1fb2a39741e5c2cd6e70615bced6",
       "rightsEvidence": {
@@ -11983,6 +11945,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/final-fantasy-viii.webp",
+      "sha256": "995f14ce44efa60299ec47993fa20d913f7ec47ad8acbf5534fa60139436fd28",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/final-fantasy.webp",
@@ -12013,6 +11980,11 @@
       }
     },
     {
+      "path": "assets/videogame-cards/god-of-war-iii.webp",
+      "sha256": "734c80c8ca2c2bd6f01fc9bf3e7baa5de37e7027e325aed794a7a17667693e6b",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/god-of-war.webp",
       "sha256": "bcea11a3f8369e0e318d5a07c5e090b70cb51a815c5c302a6ecb110d0bed71cc",
       "rightsEvidence": {
@@ -12027,6 +11999,11 @@
       }
     },
     {
+      "path": "assets/videogame-cards/gran-turismo-2.webp",
+      "sha256": "2cd74c9a3115bc6c1d08a47f606fc6b1d1994bf9113328b27ac4e7618982bf58",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/gta-iv.webp",
       "sha256": "b19a3308ee1b133f78febcec16882ddca0da01947cc5732e9d0fa459a44c51b9",
       "rightsEvidence": {
@@ -12039,6 +12016,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/gta-san-andreas.webp",
+      "sha256": "651d15fbce5007aff2b41b369f4f9809d94274903fcf63db5003d93a79738492",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/gta-v.webp",
@@ -12067,6 +12049,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/guitar-hero.webp",
+      "sha256": "3f98f96bf31941664b04216a595d7f124643038e2d80a1a07f76c215d1d8f8ce",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/half-life-2.webp",
+      "sha256": "41191eee42a5be1c4585a8c817213d921a6af0955c5ffacbd86905e12840ddf7",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/half-life.webp",
@@ -12111,6 +12103,16 @@
       }
     },
     {
+      "path": "assets/videogame-cards/hollow-knight.webp",
+      "sha256": "69adc6784f83409799af06a07f4c23683a8a2a474f93bee63b020074976bb9ae",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/kingdom-hearts.webp",
+      "sha256": "b6148d9f8ce69fee213e88c57ddf40ae9ca6fd813f225d494eb305ecccdf5096",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/legend-of-zelda.webp",
       "sha256": "de412a8a25edd67056c2f3c6d4bcb22eafeccc5d164ee790c27a2ab73b5d2064",
       "rightsEvidence": {
@@ -12125,6 +12127,16 @@
       }
     },
     {
+      "path": "assets/videogame-cards/medal-of-honor.webp",
+      "sha256": "465168433419f442764d30ad5f19580129b8eba734b99a8f8ba4a47496c2f7e0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/medievil-2.webp",
+      "sha256": "0162584f1a07e3b9e9e4fa191e6fe6d0acc3a62fdd817df138b22c437eb9236c",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/mega-drive.webp",
       "sha256": "62be42c7f97b8be35b8c627b2d27fdbc9c2013dd9555963369b0e1b77abe70a1",
       "rightsEvidence": {
@@ -12137,6 +12149,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/metal-gear-solid-v-the-phantom-pain.webp",
+      "sha256": "20cf524640433097884e9a304ce128cd6a32201e28c66b4653c08456d86ad965",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/metal-gear-solid.webp",
+      "sha256": "16bf9f6a581693e72247019383e0c09f2ba8a8c47e9b2d94fbd3e8286b6ee7eb",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/minecraft.webp",
@@ -12167,6 +12189,11 @@
       }
     },
     {
+      "path": "assets/videogame-cards/need-for-speed-underground.webp",
+      "sha256": "65082b5c902e112612b0691e8fda64658393f8992de795bf402d620d3fee2a99",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/nintendo-switch.webp",
       "sha256": "0998c2310c930b36d0f3c21ee2b444132fc438f1bd25291a3f06040b0da5260f",
       "rightsEvidence": {
@@ -12195,6 +12222,11 @@
       }
     },
     {
+      "path": "assets/videogame-cards/oddworld-abes-oddysee.webp",
+      "sha256": "fa0cf7dde89db3911615ee1448460faa9e318c346a082cff3c362ab50a0972f3",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/oxo.webp",
       "sha256": "50c6fbc6c76647bcdb101c1c38c0a7a450b8adca0da588b4c52fb4b10a547ff9",
       "rightsEvidence": {
@@ -12221,6 +12253,26 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/playstation-2.webp",
+      "sha256": "ebf3c4aa0e536dc88c659a1bdde70935371130df352d2b8f19d80953724cfdb3",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/playstation-3.webp",
+      "sha256": "8b48bca3770c5775e556e483068f4ab8d3e15b8c0c7cca37b9ba54f6f41f7475",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/playstation-4.webp",
+      "sha256": "c02e9c1b87ba22dcecc9d1cac449ab0038f7939015a7919fde00e38e0b376f10",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/playstation-5.webp",
+      "sha256": "550eb84a6d6d1bc433c2affa31f680b781c9424f1818a0b5bff5de1011f9d45b",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/playstation.webp",
@@ -12279,6 +12331,21 @@
       }
     },
     {
+      "path": "assets/videogame-cards/prince-of-persia-the-sands-of-time.webp",
+      "sha256": "d47fe58446ee65b94735066e2107702f1229b3e5fa1a1333d93e5edd068677b8",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/pro-evolution-soccer-3.webp",
+      "sha256": "ef8d90200bc89d69bd4170ebf9e0c5814a914542eefbab61d622dedef99de0fa",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/red-dead-redemption-ii.webp",
+      "sha256": "85d2c4068b4f44c6bee6b689cd694cbf9b60621071e8a7dd867fc86ec4f29ead",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/red-dead-redemption.webp",
       "sha256": "88bf9589bfaa168d21aba1ce05a03e09a11d390853f2c2049511eff68a8a5efa",
       "rightsEvidence": {
@@ -12291,6 +12358,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/resident-evil-2.webp",
+      "sha256": "d17954cfc581909c20053f48b4857cbaec507c0ff9c04f41e529ee928a5748dc",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/rust.webp",
+      "sha256": "7b4567789ef71893f8ad5a1a4645da392c1215cfbb98a29cfaa2593773bfba29",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/secret-of-monkey-island.webp",
@@ -12319,6 +12396,11 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/silent-hill-2.webp",
+      "sha256": "547cdcae59dd9132ad9ac127a8044e20e2ba28ab99e8ab4339b931e9c5b7a7a6",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/skyrim.webp",
@@ -12405,6 +12487,16 @@
       }
     },
     {
+      "path": "assets/videogame-cards/syphon-filter.webp",
+      "sha256": "97415dcb199c96ebfa0848a6332a6703968e3e305ee4beba6ab072a960cf7fbb",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/tekken-3.webp",
+      "sha256": "7eb3338bd7402bb14a5420ae467e03526f338467b4b8f57554173fd9dc368ab6",
+      "rightsEvidence": null
+    },
+    {
       "path": "assets/videogame-cards/tennis-for-two.webp",
       "sha256": "ed9388be9c245474301fda5c5f67992d02c39982a7805d016e8f41555220a792",
       "rightsEvidence": {
@@ -12431,6 +12523,16 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/the-last-of-us-part-ii.webp",
+      "sha256": "7da99c26de1a9875ec70dd72c8d6607b5e093e981c26e0c16f48c8de4e9cead5",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/the-last-of-us.webp",
+      "sha256": "d7c4041b90f2c6efe9d51951f7c61e72af918c1ae892f28cc16f247359a9d0fe",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/the-sims.webp",
@@ -12473,6 +12575,26 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/videogame-cards/xbox-360.webp",
+      "sha256": "c6e100d5840ac4df9b8a7e5d3c277b8b3cef9a2446a696ac816ecf2c213a23b0",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/xbox-one.webp",
+      "sha256": "e89c402097fc93b90d7c67b802264e5a24d788c8cf36945b3b43f94f907801c1",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/xbox-series-x-s.webp",
+      "sha256": "8276b66c45b3f75c7a6e1619c588f0775412fa205861536421fe8c8d9e3929d4",
+      "rightsEvidence": null
+    },
+    {
+      "path": "assets/videogame-cards/xbox.webp",
+      "sha256": "eda8ea6d921067bb328b0baaf6cf652b43faf180a083bf275e2d0d94a923de4c",
+      "rightsEvidence": null
     },
     {
       "path": "assets/videogame-cards/zelda-tears-of-the-kingdom.webp",

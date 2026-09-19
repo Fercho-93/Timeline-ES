@@ -49,7 +49,9 @@ function fechadas(nombre, mazo, { unicos = true } = {}) {
 }
 
 fechadas("Historia de España", HISTORY_CARDS, { unicos: false });
-fechadas("Inventos y descubrimientos", INVENTION_CARDS);
+// Hay empates históricos legítimos: Coca-Cola y el automóvil (1886), y el
+// correo electrónico y el microprocesador (1971). El motor admite ambos órdenes.
+fechadas("Inventos y descubrimientos", INVENTION_CARDS, { unicos: false });
 fechadas("Historia mundial", WORLD_CARDS);
 
 // El margen mínimo del 8 % entre cartas contiguas ya no se exige aquí: las cifras de

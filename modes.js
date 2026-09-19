@@ -357,7 +357,7 @@
     },
     inventions: {
       key: "inventions", name: "Inventos y descubrimientos", tag: "Inventos",
-      cardLabel: "hitos", blurb: "Hitos históricos de ciencia, tecnología y conocimiento: de la escritura a la edición genética.", cards: window.INVENTION_CARDS,
+      cardLabel: "hitos", blurb: "Hitos históricos de ciencia, tecnología y conocimiento: de la escritura al teléfono inteligente.", cards: window.INVENTION_CARDS,
       axis: "time",
       bands: [
         { limit: 500, key: "antigua", name: "Mundo antiguo", symbol: "☉" },
@@ -540,6 +540,9 @@
 
   // Láminas del mazo de Astronomía y espacio, enlazadas por el ID de cada carta.
   const ASTRONOMY_ART_BY_ID = {
+    4006: "4006-eratostenes-mide-la-tierra", 4010: "4010-el-almagesto-de-ptolomeo",
+    4011: "4011-el-astrolabio-en-el-mundo-islamico-siglo-viii-fecha-aproximada", 4014: "4014-el-reloj-astronomico-de-su-song",
+    4020: "4020-lippershey-solicita-una-patente-para-el-telescopio", 4026: "4026-romer-mide-la-velocidad-de-la-luz",
     8001: "copernicus-heliocentric", 8002: "tycho-supernova", 8003: "galileo-telescope", 8004: "jupiter-moons",
     8005: "kepler-third-law", 8006: "titan-discovery", 8007: "greenwich-observatory", 8008: "newton-principia",
     8009: "halley-comet", 8010: "uranus-discovery", 8011: "ceres-discovery", 8012: "stellar-parallax",
@@ -643,7 +646,9 @@
     4089: "4089-el-walkman", 4090: "4090-el-ibm-pc",
     4091: "4091-el-protocolo-tcp-ip", 4092: "4092-la-huella-genetica",
     4093: "4093-la-propuesta-de-la-world-wide-web", 4096: "4096-deep-blue-gana-a-kasparov",
-    4097: "4097-el-primer-borrador-del-genoma-humano", 4098: "4098-el-iphone"
+    4097: "4097-el-primer-borrador-del-genoma-humano", 4098: "4098-el-iphone",
+    4104: "4104-nace-coca-cola", 4105: "4105-el-primer-cajero-automatico",
+    4106: "4106-el-primer-correo-electronico", 4107: "4107-la-primera-tarjeta-de-credito"
   };
   // Láminas del mazo de videojuegos, enlazadas por el ID de cada carta.
   const VIDEOGAME_ART_BY_ID = {
@@ -721,6 +726,9 @@
 
   // Láminas del mazo de Historia de la medicina, enlazadas por el ID de cada hito.
   const MEDICINE_ART_BY_ID = {
+    4015: "4015-las-primeras-gafas-fecha-aproximada", 4030: "4030-el-termometro-de-mercurio",
+    4034: "4034-el-descubrimiento-del-oxigeno", 4051: "4051-mendel-presenta-sus-experimentos-sobre-la-herencia",
+    4092: "4092-la-huella-genetica", 4097: "4097-el-primer-borrador-del-genoma-humano",
     9001: "9001-hippocratic-corpus", 9002: "9002-avicenna-canon", 9003: "9003-ibn-al-nafis-pulmonary-circulation",
     9004: "9004-vesalius-fabrica", 9005: "9005-harvey-circulation", 9006: "9006-hooke-micrographia",
     9007: "9007-leeuwenhoek-microorganisms", 9008: "9008-variolization", 9009: "9009-lind-scurvy",

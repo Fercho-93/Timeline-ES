@@ -84,9 +84,9 @@ impone como año indiscutible. El dato de Monorhaphis conserva la incertidumbre 
   de Moncloa decía «acuerdan», no «firman»: se precisa el texto sin atribuirle otro error.
   [UNAM: aprobación y publicación de la recopilación](https://revistas.juridicas.unam.mx/index.php/historia-derecho/article/download/20619/20959/46938),
   [Archivo de la Transición: Pactos de la Moncloa](https://archivodelatransicion.es/archivo-organizaciones/los-pactos-de-la-moncloa-2).
-- **4007, 4008, 4020:** la fecha de Arquímedes es su muerte; el calendario distingue decreto
-  de 46 a. C. y entrada en vigor en 45 a. C.; Lippershey solicita la patente, no se afirma
-  que se le concediera.
+- **4008 y 4020:** el calendario distingue decreto de 46 a. C. y entrada en vigor en 45 a. C.;
+  Lippershey solicita el primer privilegio conocido, sin afirmar que se le concediera una
+  patente exclusiva.
 - **4030 y 4031:** termómetro y publicación de escala no son el mismo hito; la primera edición
   de Systema Naturae de 1735 no se confunde con los puntos de partida binomiales de 1753/1758.
   [Linnean Society](https://www.linnean.org/the-society/building-and-collections).
@@ -97,12 +97,10 @@ impone como año indiscutible. El dato de Monorhaphis conserva la incertidumbre 
   [Smithsonian: patentes](https://npg.si.edu/exhibition/spirit-invention-patent-office),
   [Historia de Otis](https://www.otis.com/en/kw/our-company/history),
   [Estudio histórico de Mendel](https://pmc.ncbi.nlm.nih.gov/articles/PMC5586364/).
-- **4059, 4065 y 4094:** descubrimiento de radio/polonio frente al posterior aislamiento
-  metálico; interpretación nuclear de Rutherford en 1911 a partir de Geiger y Marsden en
-  1909; espejo primario de Hubble, no lente.
+- **4059 y 4065:** descubrimiento de radio/polonio frente al posterior aislamiento metálico;
+  interpretación nuclear de Rutherford en 1911 a partir de Geiger y Marsden en 1909.
   [Conferencia Nobel de Curie](https://www.nobelprize.org/prizes/chemistry/1911/marie-curie/lecture/),
-  [AIP: Rutherford](https://history.aip.org/exhibits/rutherford/sections/alpha-particles-atom.html),
-  [NASA: defecto del espejo](https://science.nasa.gov/mission/hubble/observatory/design/optics/hubbles-mirror-flaw/).
+  [AIP: Rutherford](https://history.aip.org/exhibits/rutherford/sections/alpha-particles-atom.html).
 - **5047, 5068, 5070, 5071, 5074, 5075 y 5077:** tres naves, no tres carabelas; aprobación
   británica de 1833 y aplicación en 1834; se elimina el recuento indefinido de cincuenta
   países en 1848; llegada de Perry en 1853 frente al tratado de 1854; muerte de Lincoln

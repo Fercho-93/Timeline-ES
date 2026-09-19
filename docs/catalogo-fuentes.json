@@ -1883,6 +1883,16 @@
     },
     {
       "file": "movies.js",
+      "id": 1099,
+      "title": "Senderos de gloria",
+      "value": 1957,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1022,
       "title": "Vértigo (De entre los muertos)",
       "value": 1958,
@@ -2173,6 +2183,16 @@
     },
     {
       "file": "movies.js",
+      "id": 1098,
+      "title": "La chaqueta metálica",
+      "value": 1987,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1051,
       "title": "Mujeres al borde de un ataque de nervios",
       "value": 1988,
@@ -2183,8 +2203,28 @@
     },
     {
       "file": "movies.js",
+      "id": 1117,
+      "title": "Mi vecino Totoro",
+      "value": 1988,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1052,
       "title": "La sirenita",
+      "value": 1989,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1103,
+      "title": "Indiana Jones y la última cruzada",
       "value": 1989,
       "source": null,
       "reviewStatus": null,
@@ -2223,6 +2263,16 @@
     },
     {
       "file": "movies.js",
+      "id": 1105,
+      "title": "Reservoir Dogs",
+      "value": 1992,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1056,
       "title": "Parque Jurásico",
       "value": 1993,
@@ -2235,6 +2285,16 @@
       "file": "movies.js",
       "id": 1057,
       "title": "El rey león",
+      "value": 1994,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1096,
+      "title": "Forrest Gump",
       "value": 1994,
       "source": null,
       "reviewStatus": null,
@@ -2273,6 +2333,26 @@
     },
     {
       "file": "movies.js",
+      "id": 1109,
+      "title": "La vida es bella",
+      "value": 1997,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1115,
+      "title": "La princesa Mononoke",
+      "value": 1997,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1061,
       "title": "Salvar al soldado Ryan",
       "value": 1998,
@@ -2303,6 +2383,16 @@
     },
     {
       "file": "movies.js",
+      "id": 1120,
+      "title": "Memento",
+      "value": 2000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1064,
       "title": "El señor de los anillos: La comunidad del anillo",
       "value": 2001,
@@ -2313,8 +2403,28 @@
     },
     {
       "file": "movies.js",
+      "id": 1114,
+      "title": "El viaje de Chihiro",
+      "value": 2001,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1065,
       "title": "Spider-Man",
+      "value": 2002,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1111,
+      "title": "El pianista",
       "value": 2002,
       "source": null,
       "reviewStatus": null,
@@ -2343,6 +2453,16 @@
     },
     {
       "file": "movies.js",
+      "id": 1116,
+      "title": "El castillo ambulante",
+      "value": 2004,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1068,
       "title": "Batman Begins",
       "value": 2005,
@@ -2353,8 +2473,38 @@
     },
     {
       "file": "movies.js",
+      "id": 1102,
+      "title": "Match Point",
+      "value": 2005,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1110,
+      "title": "El tigre y la nieve",
+      "value": 2005,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1069,
       "title": "El laberinto del fauno",
+      "value": 2006,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1113,
+      "title": "La vida de los otros",
       "value": 2006,
       "source": null,
       "reviewStatus": null,
@@ -2383,8 +2533,38 @@
     },
     {
       "file": "movies.js",
+      "id": 1101,
+      "title": "Vicky Cristina Barcelona",
+      "value": 2008,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1112,
+      "title": "Gran Torino",
+      "value": 2008,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1072,
       "title": "Avatar",
+      "value": 2009,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1107,
+      "title": "Malditos bastardos",
       "value": 2009,
       "source": null,
       "reviewStatus": null,
@@ -2413,8 +2593,38 @@
     },
     {
       "file": "movies.js",
+      "id": 1097,
+      "title": "Intocable",
+      "value": 2011,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1100,
+      "title": "Midnight in Paris",
+      "value": 2011,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1075,
       "title": "Los Vengadores",
+      "value": 2012,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1106,
+      "title": "Django desencadenado",
       "value": 2012,
       "source": null,
       "reviewStatus": null,
@@ -2443,8 +2653,38 @@
     },
     {
       "file": "movies.js",
+      "id": 1119,
+      "title": "Interstellar",
+      "value": 2014,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1121,
+      "title": "Whiplash",
+      "value": 2014,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1078,
       "title": "Del revés (Inside Out)",
+      "value": 2015,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1108,
+      "title": "Los odiosos ocho",
       "value": 2015,
       "source": null,
       "reviewStatus": null,
@@ -2493,6 +2733,16 @@
     },
     {
       "file": "movies.js",
+      "id": 1118,
+      "title": "Klaus",
+      "value": 2019,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1083,
       "title": "Soul",
       "value": 2020,
@@ -2523,8 +2773,58 @@
     },
     {
       "file": "movies.js",
+      "id": 1091,
+      "title": "Argentina, 1985",
+      "value": 2022,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1095,
+      "title": "Sin novedad en el frente",
+      "value": 2022,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
       "id": 1086,
       "title": "Barbie",
+      "value": 2023,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1090,
+      "title": "La sociedad de la nieve",
+      "value": 2023,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1092,
+      "title": "Oppenheimer",
+      "value": 2023,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1093,
+      "title": "Perfect Days",
       "value": 2023,
       "source": null,
       "reviewStatus": null,
@@ -2536,6 +2836,36 @@
       "id": 1087,
       "title": "Del revés 2 (Inside Out 2)",
       "value": 2024,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1088,
+      "title": "Dune: parte dos",
+      "value": 2024,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1094,
+      "title": "Los domingos",
+      "value": 2025,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "movies.js",
+      "id": 1089,
+      "title": "La odisea",
+      "value": 2026,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -3562,34 +3892,424 @@
       "reviewedAt": null
     },
     {
-      "file": "animals.js",
-      "id": 10001,
-      "title": "Abeja melífera (en revisión)",
-      "value": 0.0001,
+      "file": "videogames.js",
+      "id": 7052,
+      "title": "The Last of Us",
+      "value": 2013,
       "source": null,
-      "reviewStatus": "pending",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7053,
+      "title": "The Last of Us Part II",
+      "value": 2020,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7054,
+      "title": "Red Dead Redemption II",
+      "value": 2018,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7055,
+      "title": "Hollow Knight",
+      "value": 2017,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7056,
+      "title": "Metal Gear Solid V: The Phantom Pain",
+      "value": 2015,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7057,
+      "title": "God of War III",
+      "value": 2010,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7058,
+      "title": "Bloodborne",
+      "value": 2015,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7059,
+      "title": "Resident Evil 2",
+      "value": 1998,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7060,
+      "title": "Half-Life 2",
+      "value": 2004,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7061,
+      "title": "Tekken 3",
+      "value": 1997,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7062,
+      "title": "Grand Theft Auto: San Andreas",
+      "value": 2004,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7063,
+      "title": "Civilization IV",
+      "value": 2005,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7064,
+      "title": "Rust",
+      "value": 2013,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7065,
+      "title": "Metal Gear Solid",
+      "value": 1998,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7066,
+      "title": "Gran Turismo 2",
+      "value": 1999,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7067,
+      "title": "Final Fantasy IX",
+      "value": 2000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7068,
+      "title": "Syphon Filter",
+      "value": 1999,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7069,
+      "title": "Final Fantasy VIII",
+      "value": 1999,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7070,
+      "title": "Medal of Honor",
+      "value": 1999,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7071,
+      "title": "Oddworld: Abe's Oddysee",
+      "value": 1997,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7072,
+      "title": "Driver",
+      "value": 1999,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7073,
+      "title": "MediEvil 2",
+      "value": 2000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7074,
+      "title": "Crash Team Racing",
+      "value": 1999,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7075,
+      "title": "FIFA",
+      "value": 1993,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7076,
+      "title": "Silent Hill 2",
+      "value": 2001,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7077,
+      "title": "Pro Evolution Soccer 3",
+      "value": 2003,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7078,
+      "title": "Prince of Persia: The Sands of Time",
+      "value": 2003,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7079,
+      "title": "Guitar Hero",
+      "value": 2005,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7080,
+      "title": "Need for Speed Underground",
+      "value": 2003,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7081,
+      "title": "Kingdom Hearts",
+      "value": 2002,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7082,
+      "title": "Call of Duty",
+      "value": 2003,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7083,
+      "title": "PlayStation 2",
+      "value": 2000,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7084,
+      "title": "PlayStation 3",
+      "value": 2006,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7085,
+      "title": "PlayStation 4",
+      "value": 2013,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7086,
+      "title": "PlayStation 5",
+      "value": 2020,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7087,
+      "title": "Xbox",
+      "value": 2001,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7088,
+      "title": "Xbox 360",
+      "value": 2005,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7089,
+      "title": "Xbox One",
+      "value": 2013,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "videogames.js",
+      "id": 7090,
+      "title": "Xbox Series X|S",
+      "value": 2020,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "animals.js",
+      "id": 10001,
+      "title": "Abeja melífera",
+      "value": 0.00012,
+      "source": "https://www.nature.com/articles/s41598-022-21347-5",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
       "id": 10002,
-      "title": "Mariposa monarca (en revisión)",
+      "title": "Mariposa monarca",
       "value": 0.0005,
-      "source": null,
-      "reviewStatus": "pending",
+      "source": "https://www.monarchwatch.org/read/",
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
       "id": 10003,
-      "title": "Mantis religiosa (en revisión)",
-      "value": 0.002,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Mantis religiosa (hembra adulta)",
+      "value": 0.00225,
+      "source": "https://youforanimal.com/tamano-mantis-religiosa/",
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
@@ -3619,12 +4339,12 @@
     {
       "file": "animals.js",
       "id": 10007,
-      "title": "Paloma bravía (en revisión)",
+      "title": "Paloma bravía",
       "value": 0.35,
-      "source": null,
-      "reviewStatus": "pending",
+      "source": "https://animaldiversity.org/accounts/Columba_livia/",
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
@@ -3829,22 +4549,22 @@
     {
       "file": "animals.js",
       "id": 10044,
-      "title": "Oso polar (adulto)",
-      "value": 350,
+      "title": "Oso polar (macho adulto)",
+      "value": 550,
       "source": "https://animaldiversity.org/accounts/Ursus_maritimus/",
-      "reviewStatus": null,
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
       "id": 10023,
-      "title": "Caballo doméstico (en revisión)",
+      "title": "Caballo doméstico",
       "value": 500,
-      "source": null,
-      "reviewStatus": "pending",
+      "source": "https://agriculture.vic.gov.au/livestock-and-animals/horses/basic-horse-care",
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
@@ -3879,12 +4599,12 @@
     {
       "file": "animals.js",
       "id": 10026,
-      "title": "Jirafa (límite de las hembras)",
-      "value": 1200,
+      "title": "Jirafa (hembra adulta)",
+      "value": 1180,
       "source": "https://animaldiversity.org/accounts/Giraffa_camelopardalis/",
-      "reviewStatus": null,
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
@@ -3899,12 +4619,12 @@
     {
       "file": "animals.js",
       "id": 10028,
-      "title": "Rinoceronte blanco",
-      "value": 2300,
-      "source": "https://animals.sandiegozoo.org/animals/white-rhinoceros",
-      "reviewStatus": null,
+      "title": "Rinoceronte blanco (adulto típico)",
+      "value": 1900,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12884244/",
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
@@ -3929,22 +4649,22 @@
     {
       "file": "animals.js",
       "id": 10031,
-      "title": "Tiburón ballena (en revisión)",
+      "title": "Tiburón ballena",
       "value": 9000,
-      "source": null,
-      "reviewStatus": "pending",
+      "source": "https://images.nationalgeographic.org/image/upload/v1698248081/EducationHub/explorer_mag/trailblazer/2020-03/0320_TR.pdf",
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
       "id": 10032,
       "title": "Orca (macho adulto medio)",
       "value": 7200,
-      "source": "https://seaworld.org/animals/all-about/killer-whale/characteristics/",
-      "reviewStatus": null,
+      "source": "https://animaldiversity.org/accounts/Orcinus_orca/",
+      "reviewStatus": "reviewed",
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "animals.js",
@@ -3977,6 +4697,396 @@
       "reviewedAt": null
     },
     {
+      "file": "animals.js",
+      "id": 10046,
+      "title": "Tucán toco",
+      "value": 0.000676,
+      "source": "https://animaldiversity.org/accounts/Ramphastos_toco/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10047,
+      "title": "Lémur de cola anillada",
+      "value": 2.2,
+      "source": "https://animaldiversity.org/accounts/Lemur_catta/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10048,
+      "title": "Manatí antillano (adulto)",
+      "value": 450,
+      "source": "https://www.nps.gov/places/000/west-indian-manatee.htm",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10049,
+      "title": "Loris pigmeo (adulto silvestre)",
+      "value": 0.42,
+      "source": "https://primate.wisc.edu/primate-info-net/pin-factsheets/pin-factsheet-slow-loris/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10050,
+      "title": "Ciervo europeo (Cervus elaphus)",
+      "value": 100,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6637702/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10051,
+      "title": "Dragón de Komodo",
+      "value": 70,
+      "source": "https://nationalzoo.si.edu/animals/komodo-dragon",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10052,
+      "title": "Wallaby de Bennet",
+      "value": 12,
+      "source": "https://www.publish.csiro.au/WR/pdf/WR24016",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10053,
+      "title": "Emú",
+      "value": 57.5,
+      "source": "https://nationalzoo.si.edu/animals/emu",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10054,
+      "title": "Perrito de las praderas",
+      "value": 1.5,
+      "source": "https://www.depts.ttu.edu/nsrl/mammals-of-texas-online-edition/Accounts_Rodentia/Cynomys_ludovicianus.php",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10055,
+      "title": "Oso melero (oso hormiguero gigante)",
+      "value": 33,
+      "source": "https://onlinelibrary.wiley.com/doi/10.1002/zoo.21865",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10056,
+      "title": "Mofeta rayada",
+      "value": 3.25,
+      "source": "https://cwf-fcf.org/en/explore/resources/encyclopedias/fauna/mammals/striped-skunk.html",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10057,
+      "title": "Burro africano (hembra adulta)",
+      "value": 320,
+      "source": "https://animaldiversity.org/accounts/Equus_asinus/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10058,
+      "title": "Suricato",
+      "value": 0.8,
+      "source": "https://www.nationalzoo.com.au/meerkat",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10059,
+      "title": "Cerdo vietnamita",
+      "value": 38.5,
+      "source": "https://vcahospitals.com/cordova/know-your-pet/general-facts-about-mini-pigs",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10060,
+      "title": "Camello bactriano doméstico",
+      "value": 475,
+      "source": "https://www.zoo-frankfurt.de/en/tiere-von-a-z-detailansicht/animal/tiere-von-a-z-detailansicht/trampeltier",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10061,
+      "title": "Mero gigante",
+      "value": 20,
+      "source": "https://www.aciar.gov.au/sites/default/files/2021-07/final-report-FIS-2012-101.pdf",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10062,
+      "title": "Guacamayo azulamarillo (Ara ararauna)",
+      "value": 1.35,
+      "source": "https://animaldiversity.org/accounts/Ara_ararauna/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10063,
+      "title": "Búho real",
+      "value": 2.8,
+      "source": "https://animaldiversity.org/accounts/Bubo_bubo/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10064,
+      "title": "Buitre leonado",
+      "value": 9,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8345826/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10065,
+      "title": "Orangután de Borneo (adulto)",
+      "value": 67,
+      "source": "https://nationalzoo.si.edu/animals/orangutan",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10066,
+      "title": "Gorila",
+      "value": 135,
+      "source": "https://animaldiversity.org/accounts/Gorilla_beringei/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10067,
+      "title": "Jaguar",
+      "value": 100,
+      "source": "https://animaldiversity.org/accounts/Panthera_onca/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10068,
+      "title": "Leopardo",
+      "value": 41,
+      "source": "https://animaldiversity.org/accounts/Panthera_pardus/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10069,
+      "title": "Gran tiburón blanco",
+      "value": 428,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3600591/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10070,
+      "title": "Vaca doméstica",
+      "value": 389,
+      "source": "https://www.fao.org/fileadmin/templates/ess/documents/methodology/tcf.pdf",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10071,
+      "title": "Cabra",
+      "value": 45,
+      "source": "https://animaldiversity.org/accounts/Capra_hircus/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10072,
+      "title": "Oveja",
+      "value": 89,
+      "source": "https://content.ces.ncsu.edu/sheep-facts",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10073,
+      "title": "Cerdo doméstico común",
+      "value": 136,
+      "source": "https://www.fao.org/fileadmin/templates/ess/documents/methodology/tcf.pdf",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10074,
+      "title": "Gallina",
+      "value": 3,
+      "source": "https://rarc.wisc.edu/tools_and_guides/species_general_data.html",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10075,
+      "title": "Pato",
+      "value": 4,
+      "source": "https://www.vet.cornell.edu/animal-health-diagnostic-center/programs/duck-research-laboratory/domestic-ducks",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10076,
+      "title": "Camaleón",
+      "value": 0.035,
+      "source": "https://animaldiversity.org/accounts/Chamaeleo_chamaeleon/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10077,
+      "title": "Iguana marina",
+      "value": 5,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4778492/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10078,
+      "title": "Escorpión",
+      "value": 0.005,
+      "source": "https://animaldiversity.org/accounts/Hadrurus_arizonensis/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10079,
+      "title": "Atún rojo",
+      "value": 250,
+      "source": "https://animaldiversity.org/accounts/Thunnus_thynnus/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10080,
+      "title": "Salmón",
+      "value": 5,
+      "source": "https://animaldiversity.org/accounts/Salmo_salar/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10081,
+      "title": "Foca común",
+      "value": 115,
+      "source": "https://animaldiversity.org/accounts/Phoca_vitulina/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10082,
+      "title": "Morsa",
+      "value": 1000,
+      "source": "https://animaldiversity.org/accounts/Odobenus_rosmarus/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10083,
+      "title": "Búfalo africano",
+      "value": 753,
+      "source": "https://www.fao.org/4/w7540e/w7540e0g.htm",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "animals.js",
+      "id": 10084,
+      "title": "Babuino",
+      "value": 21,
+      "source": "https://animaldiversity.org/accounts/Papio/",
+      "reviewStatus": "reviewed",
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
       "file": "lifespan.js",
       "id": 12001,
       "title": "Efímera Dolania americana (hembra adulta)",
@@ -3991,7 +5101,7 @@
       "id": 12002,
       "title": "Caballo Old Billy (edad al morir)",
       "value": 62,
-      "source": "https://www.guinnessworldrecords.com/news/2021/10/worlds-oldest-animals-cats-dogs-deep-sea-creatures-and-more-678003",
+      "source": "https://www.guinnessworldrecords.com/world-records/70449-oldest-horse-ever",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -3999,20 +5109,20 @@
     {
       "file": "lifespan.js",
       "id": 12003,
-      "title": "Mosquito común (fase adulta) (en revisión)",
-      "value": 0.04,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Mosquito común (fase adulta)",
+      "value": 0.05753424657534247,
+      "source": "https://www.cdc.gov/mosquitoes/about/index.html",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
     {
       "file": "lifespan.js",
       "id": 12004,
-      "title": "Mosca de la fruta (fase adulta) (en revisión)",
-      "value": 0.065,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Mosca de la fruta (Drosophila melanogaster, adulta)",
+      "value": 0.2191780821917808,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5507281/",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
@@ -4021,22 +5131,17 @@
       "id": 12005,
       "title": "Abeja obrera (referencia de seis semanas)",
       "value": 0.11498973305954825,
-      "source": "https://doi.org/10.1016/j.exger.2007.06.002",
-      "reviewStatus": "reviewed",
-      "comparison": {
-        "species": "Apis mellifera",
-        "condition": "Obreras adultas; referencia dentro del rango de 4–8 semanas",
-        "unit": "years",
-        "statistic": "range-midpoint"
-      },
-      "reviewedAt": "2026-09-08"
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2398712/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
     },
     {
       "file": "lifespan.js",
       "id": 12006,
       "title": "Monarca migratoria (límite habitual)",
       "value": 0.6666666666666666,
-      "source": "https://www.fws.gov/press-release/2020-12/endangered-species-act-listing-monarch-butterfly-warranted-precluded",
+      "source": "https://www.fws.gov/story/phenomenal-monarch-migration",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4094,10 +5199,10 @@
     {
       "file": "lifespan.js",
       "id": 12012,
-      "title": "Conejo europeo (en libertad) (en revisión)",
-      "value": 2.5,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Conejo europeo (en libertad)",
+      "value": 1,
+      "source": "https://animaldiversity.org/accounts/Oryctolagus_cuniculus/",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
@@ -4114,40 +5219,40 @@
     {
       "file": "lifespan.js",
       "id": 12014,
-      "title": "Ardilla roja (en revisión)",
-      "value": 6.5,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Ardilla roja (media)",
+      "value": 6,
+      "source": "https://www.wildlifetrusts.org/wildlife-explorer/mammals/red-squirrel",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
     {
       "file": "lifespan.js",
       "id": 12015,
-      "title": "Zorro rojo (ejemplar longevo) (en revisión)",
-      "value": 10,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Zorro rojo (media en libertad)",
+      "value": 3,
+      "source": "https://animaldiversity.org/accounts/Vulpes_vulpes/",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
     {
       "file": "lifespan.js",
       "id": 12016,
-      "title": "Perro doméstico (en revisión)",
-      "value": 13,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Perro doméstico (mediana de edad al morir)",
+      "value": 11.57,
+      "source": "https://www.frontiersin.org/journals/veterinary-science/articles/10.3389/fvets.2023.1082102/pdf",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
     {
       "file": "lifespan.js",
       "id": 12017,
-      "title": "Gato doméstico (de interior) (en revisión)",
-      "value": 17,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Gato doméstico de interior (referencia media)",
+      "value": 15,
+      "source": "https://www.petmd.com/cat/care/defining-senior-age-cats",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
@@ -4164,7 +5269,7 @@
     {
       "file": "lifespan.js",
       "id": 12019,
-      "title": "Dragón de Komodo (referencia en libertad)",
+      "title": "Dragón de Komodo (en libertad)",
       "value": 30,
       "source": "https://nationalzoo.si.edu/animals/komodo-dragon",
       "reviewStatus": null,
@@ -4174,10 +5279,10 @@
     {
       "file": "lifespan.js",
       "id": 12020,
-      "title": "Águila harpía (en revisión)",
-      "value": 36,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Águila harpía (referencia media)",
+      "value": 30,
+      "source": "https://animals.sandiegozoo.org/animals/harpy-eagle",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
@@ -4204,27 +5309,27 @@
     {
       "file": "lifespan.js",
       "id": 12023,
-      "title": "Elefante africano (en revisión)",
-      "value": 72,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Elefante africano (media en libertad)",
+      "value": 65,
+      "source": "https://animaldiversity.org/accounts/Loxodonta_africana/",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
     {
       "file": "lifespan.js",
       "id": 12024,
-      "title": "Ballena azul (límite del rango típico) (en revisión)",
-      "value": 90,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Ballena azul (media estimada)",
+      "value": 85,
+      "source": "https://www.fisheries.noaa.gov/species/blue-whale",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
     {
       "file": "lifespan.js",
       "id": 12025,
-      "title": "Tortuga gigante de Galápagos (más de un siglo)",
+      "title": "Tortuga gigante de Galápagos (límite inferior)",
       "value": 100,
       "source": "https://www.galapagos.org/conservation/giant-tortoise-restoration/",
       "reviewStatus": null,
@@ -4294,7 +5399,7 @@
     {
       "file": "lifespan.js",
       "id": 12032,
-      "title": "Erizo rojo del Pacífico (más de un siglo)",
+      "title": "Erizo rojo del Pacífico (límite inferior)",
       "value": 100,
       "source": "https://spo.nmfs.noaa.gov/content/red-sea-urchins-strongylocentrotus-franciscanus-can-live-over-100-years-confirmation-bomb",
       "reviewStatus": null,
@@ -4304,9 +5409,9 @@
     {
       "file": "lifespan.js",
       "id": 12033,
-      "title": "Tortuga Jonathan (edad en 2026)",
+      "title": "Tortuga Jonathan (edad estimada en 2026)",
       "value": 194,
-      "source": "https://www.guinnessworldrecords.com/news/icons/jonathan-the-tortoise-the-oldest-terrestrial-animal",
+      "source": "https://www.guinnessworldrecords.com/news/2026/6/shellabration-time-why-long-lived-jonathan-the-tortoise-has-been-named-a-gwr-icon",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4326,7 +5431,7 @@
       "id": 12035,
       "title": "Cacatúa Cookie (edad al morir)",
       "value": 83,
-      "source": "https://www.guinnessworldrecords.com/news/2021/10/worlds-oldest-animals-cats-dogs-deep-sea-creatures-and-more-678003",
+      "source": "https://www.guinnessworldrecords.com/world-records/oldest-parrot-ever",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4362,6 +5467,286 @@
       "reviewedAt": null
     },
     {
+      "file": "lifespan.js",
+      "id": 12039,
+      "title": "Antílope (referencia de bóvidos silvestres)",
+      "value": 12.5,
+      "source": "https://animaldiversity.org/accounts/Bovidae/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12040,
+      "title": "Armadillo gigante",
+      "value": 13.5,
+      "source": "https://animaldiversity.org/accounts/Priodontes_maximus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12041,
+      "title": "Oso andino",
+      "value": 20,
+      "source": "https://animaldiversity.org/accounts/Tremarctos_ornatus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12042,
+      "title": "Pingüino africano",
+      "value": 12.5,
+      "source": "https://animaldiversity.org/accounts/Spheniscus_demersus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12043,
+      "title": "Ajolote (en laboratorio)",
+      "value": 5.5,
+      "source": "https://animaldiversity.org/accounts/Ambystoma_mexicanum/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12044,
+      "title": "Águila calva",
+      "value": 17.5,
+      "source": "https://animaldiversity.org/accounts/Haliaeetus_leucocephalus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12045,
+      "title": "Bonobo",
+      "value": 20,
+      "source": "https://animaldiversity.org/accounts/Pan_paniscus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12046,
+      "title": "Dromedario",
+      "value": 40,
+      "source": "https://animaldiversity.org/accounts/Camelus_dromedarius/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12047,
+      "title": "Caracal",
+      "value": 12,
+      "source": "https://animaldiversity.org/accounts/Caracal_caracal/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12048,
+      "title": "Carpincho",
+      "value": 6,
+      "source": "https://animaldiversity.org/accounts/Hydrochoerus_hydrochaeris/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12049,
+      "title": "Sifaca de Coquerel",
+      "value": 27,
+      "source": "https://animaldiversity.org/accounts/Propithecus_coquereli/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12050,
+      "title": "Emú",
+      "value": 7,
+      "source": "https://animaldiversity.org/accounts/Dromaius_novaehollandiae/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12051,
+      "title": "Flamenco común",
+      "value": 25,
+      "source": "https://animaldiversity.org/accounts/Phoenicopterus_roseus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12052,
+      "title": "Panda gigante",
+      "value": 12.5,
+      "source": "https://animaldiversity.org/accounts/Ailuropoda_melanoleuca/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12053,
+      "title": "Koala",
+      "value": 13,
+      "source": "https://animaldiversity.org/accounts/Phascolarctos_cinereus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12054,
+      "title": "Tiburón leopardo",
+      "value": 21,
+      "source": "https://animaldiversity.org/accounts/Triakis_semifasciata/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12055,
+      "title": "Lince euroasiático",
+      "value": 5,
+      "source": "https://animaldiversity.org/accounts/Lynx_lynx/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12056,
+      "title": "Nutria africana sin garras",
+      "value": 11,
+      "source": "https://animaldiversity.org/accounts/Aonyx_capensis/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12057,
+      "title": "Orangután de Borneo",
+      "value": 35,
+      "source": "https://animaldiversity.org/accounts/Pongo_pygmaeus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12058,
+      "title": "Búho real",
+      "value": 20,
+      "source": "https://animaldiversity.org/accounts/Bubo_bubo/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12059,
+      "title": "Pelícano blanco común",
+      "value": 15.5,
+      "source": "https://animaldiversity.org/accounts/Pelecanus_onocrotalus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12060,
+      "title": "Oso polar",
+      "value": 25,
+      "source": "https://animaldiversity.org/accounts/Ursus_maritimus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12061,
+      "title": "Puercoespín norteamericano",
+      "value": 6,
+      "source": "https://animaldiversity.org/accounts/Erethizon_dorsatum/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12062,
+      "title": "Mapache",
+      "value": 5,
+      "source": "https://animaldiversity.org/accounts/Procyon_lotor/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12063,
+      "title": "Panda rojo",
+      "value": 9,
+      "source": "https://animaldiversity.org/accounts/Ailurus_fulgens/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12064,
+      "title": "Reno o caribú",
+      "value": 4.5,
+      "source": "https://animaldiversity.org/accounts/Rangifer_tarandus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12065,
+      "title": "Hiena manchada",
+      "value": 20,
+      "source": "https://animaldiversity.org/accounts/Crocuta_crocuta/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12066,
+      "title": "Takin",
+      "value": 13.5,
+      "source": "https://animals.sandiegozoo.org/animals/takin",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
       "file": "speed.js",
       "id": 13001,
       "title": "Escarabajo tigre (carrera en tierra)",
@@ -4375,7 +5760,7 @@
       "file": "speed.js",
       "id": 13002,
       "title": "Cangrejo fantasma (carrera en tierra)",
-      "value": 14.4,
+      "value": 14,
       "source": "https://www.guinnessworldrecords.com/world-records/112626-fastest-moving-crustacean-on-land",
       "reviewStatus": null,
       "comparison": null,
@@ -4435,7 +5820,7 @@
       "file": "speed.js",
       "id": 13008,
       "title": "Mamba negra (esprint en terreno llano)",
-      "value": 19,
+      "value": 18,
       "source": "https://www.guinnessworldrecords.com/world-records/70269-fastest-land-snake",
       "reviewStatus": null,
       "comparison": null,
@@ -4455,7 +5840,7 @@
       "file": "speed.js",
       "id": 13010,
       "title": "Manatí de Florida (aceleración nadando)",
-      "value": 24.1,
+      "value": 24,
       "source": "https://myfwc.com/education/wildlife/manatee/facts-and-information/",
       "reviewStatus": null,
       "comparison": null,
@@ -4505,7 +5890,7 @@
       "file": "speed.js",
       "id": 13015,
       "title": "Hipopótamo común (carga en tierra)",
-      "value": 22.5,
+      "value": 23,
       "source": "https://animals.sandiegozoo.org/animals/hippo",
       "reviewStatus": null,
       "comparison": null,
@@ -4515,7 +5900,7 @@
       "file": "speed.js",
       "id": 13016,
       "title": "Elefante (máximo fiable registrado)",
-      "value": 24.5,
+      "value": 25,
       "source": "https://journals.biologists.com/jeb/article/209/19/3812/16362/The-locomotor-kinematics-of-Asian-and-African",
       "reviewStatus": null,
       "comparison": null,
@@ -4525,7 +5910,7 @@
       "file": "speed.js",
       "id": 13017,
       "title": "Jirafa (galopando)",
-      "value": 56.3,
+      "value": 56,
       "source": "https://animals.sandiegozoo.org/animals/giraffe",
       "reviewStatus": null,
       "comparison": null,
@@ -4545,7 +5930,7 @@
       "file": "speed.js",
       "id": 13019,
       "title": "Iguana espinosa (esprint en tierra)",
-      "value": 34.9,
+      "value": 35,
       "source": "https://www.guinnessworldrecords.com/world-records/498679-fastest-reptile-on-land",
       "reviewStatus": null,
       "comparison": null,
@@ -4564,9 +5949,9 @@
     {
       "file": "speed.js",
       "id": 13021,
-      "title": "Reno (carrera)",
-      "value": 80,
-      "source": "https://animals.sandiegozoo.org/animals/reindeer-caribou",
+      "title": "Reno (trote migratorio)",
+      "value": 30,
+      "source": "https://aalborgzoo.dk/en/our-animals-2/reindeer/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4605,7 +5990,7 @@
       "file": "speed.js",
       "id": 13025,
       "title": "Cangrejo nadador de Henslow (nadando)",
-      "value": 4.68,
+      "value": 5,
       "source": "https://www.guinnessworldrecords.com/world-records/112624-fastest-swimming-crustacean",
       "reviewStatus": null,
       "comparison": null,
@@ -4645,7 +6030,7 @@
       "file": "speed.js",
       "id": 13029,
       "title": "Vencejo común (vuelo horizontal medido)",
-      "value": 111.6,
+      "value": 112,
       "source": "https://www.guinnessworldrecords.com/world-records/fastest-bird-level-flight",
       "reviewStatus": null,
       "comparison": null,
@@ -4655,7 +6040,7 @@
       "file": "speed.js",
       "id": 13030,
       "title": "Halcón peregrino (picado medido)",
-      "value": 184,
+      "value": 162,
       "source": "https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0086506",
       "reviewStatus": null,
       "comparison": null,
@@ -4665,7 +6050,7 @@
       "file": "speed.js",
       "id": 13031,
       "title": "Hormiga plateada del Sáhara (carrera)",
-      "value": 3.08,
+      "value": 3,
       "source": "https://journals.biologists.com/jeb/article/222/20/jeb198705/224418/High-speed-locomotion-in-the-Saharan-silver-ant",
       "reviewStatus": null,
       "comparison": null,
@@ -4684,9 +6069,9 @@
     {
       "file": "speed.js",
       "id": 13033,
-      "title": "León marino de California (nadando)",
-      "value": 40,
-      "source": "https://www.guinnessworldrecords.com/world-records/70461-fastest-marine-mammal",
+      "title": "León marino de California (velocidad media estimada)",
+      "value": 9,
+      "source": "https://repository.library.noaa.gov/view/noaa/20261/noaa_20261_DS1.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4694,9 +6079,9 @@
     {
       "file": "speed.js",
       "id": 13034,
-      "title": "Cebra (huida)",
+      "title": "Cebra común (carrera)",
       "value": 64,
-      "source": "https://animals.sandiegozoo.org/animals/zebra",
+      "source": "https://sydneyzoo.com/animals/plains-zebra",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4705,7 +6090,7 @@
       "file": "speed.js",
       "id": 13035,
       "title": "Araña flic-flac de Marruecos (huida)",
-      "value": 6.12,
+      "value": 6,
       "source": "https://www.guinnessworldrecords.com/world-records/82841-fastest-spider",
       "reviewStatus": null,
       "comparison": null,
@@ -4714,10 +6099,10 @@
     {
       "file": "speed.js",
       "id": 13036,
-      "title": "Topo europeo (en revisión)",
-      "value": 3.5,
-      "source": null,
-      "reviewStatus": "pending",
+      "title": "Topo europeo (desplazamiento en galerías)",
+      "value": 4,
+      "source": "https://viagallica.com/a/taupe_europe.htm",
+      "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
     },
@@ -4725,7 +6110,7 @@
       "file": "speed.js",
       "id": 13037,
       "title": "Cucaracha americana (carrera medida)",
-      "value": 5.4,
+      "value": 5,
       "source": "https://journals.biologists.com/jeb/article/156/1/215/6299/Mechanics-of-A-Rapid-Running-Insect-Two-Four-and",
       "reviewStatus": null,
       "comparison": null,
@@ -4737,6 +6122,316 @@
       "title": "Abeja melífera (vuelo de crucero sin carga)",
       "value": 27,
       "source": "https://journals.biologists.com/jeb/article/209/5/978/16690/Visual-regulation-of-ground-speed-and-headwind",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13039,
+      "title": "Vencejo real (vuelo)",
+      "value": 110,
+      "source": "https://animaldiversity.org/accounts/Tachymarptis_melba/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13040,
+      "title": "Pez vela del Pacífico (ráfaga de natación)",
+      "value": 25,
+      "source": "https://researchportal.plymouth.ac.uk/files/38901447/icv017.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13041,
+      "title": "Pelícano pardo (vuelo rasante)",
+      "value": 42,
+      "source": "https://animaldiversity.org/accounts/Pelecanus_occidentalis/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13042,
+      "title": "Tigre del Amur (esprint de caza)",
+      "value": 60,
+      "source": "https://bakuzoo.az/en/animals/mammals/276",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13043,
+      "title": "Ardilla de las Carolinas (carrera en tierra)",
+      "value": 24,
+      "source": "https://www.extension.purdue.edu/extmedia/fnr/fnr-413-w.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13044,
+      "title": "Canguro rojo (salto de crucero)",
+      "value": 32,
+      "source": "https://animals.sandiegozoo.org/animals/kangaroo-and-wallaby",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13045,
+      "title": "Águila calva (vuelo migratorio)",
+      "value": 50,
+      "source": "https://eagles.org/what-we-do/educate/learn-about-eagles/bald-eagle-behavior/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13046,
+      "title": "Gacela de Thomson (carrera)",
+      "value": 70,
+      "source": "https://animaldiversity.org/accounts/Eudorcas_thomsonii/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13047,
+      "title": "Rinoceronte blanco (trote sostenido)",
+      "value": 24,
+      "source": "https://www.torontozoo.com/animals/White%20rhinoceros",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13048,
+      "title": "Coyote (carrera)",
+      "value": 65,
+      "source": "https://animaldiversity.org/accounts/Canis_latrans/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13049,
+      "title": "Humano adulto (carrera recreativa)",
+      "value": 10,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10588426/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13050,
+      "title": "Delfín mular (natación media diurna)",
+      "value": 5,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3794307/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13051,
+      "title": "Gorila (carrera breve)",
+      "value": 32,
+      "source": "https://biologyfiles.ucr.edu/people/faculty/Garland/Garl1983_JZL.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13052,
+      "title": "Jaguar (sprint corto)",
+      "value": 80,
+      "source": "https://www.artis.nl/en/artis-zoo/what-to-explore-in-artis-zoo/jaguar",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13053,
+      "title": "Leopardo (sprint corto)",
+      "value": 58,
+      "source": "https://animals.sandiegozoo.org/animals/leopard",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13054,
+      "title": "Gran tiburón blanco (natación rápida)",
+      "value": 50,
+      "source": "https://www.nationalgeographic.com/animals/fish/facts/great-white-shark?beta=true",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13055,
+      "title": "Vaca doméstica (carrera habitual)",
+      "value": 27,
+      "source": "https://www.countryfile.com/animals/farm-animals/how-fast-does-a-cow-run",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13056,
+      "title": "Cabra doméstica (galope en pista horizontal)",
+      "value": 22,
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3667127/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13057,
+      "title": "Oveja doméstica (escape ante depredador)",
+      "value": 5,
+      "source": "https://digital.library.adelaide.edu.au/server/api/core/bitstreams/0cccbc9a-4d3d-4f69-ad8d-df8a6440bcb2/content",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13058,
+      "title": "Cerdo doméstico (carrera)",
+      "value": 18,
+      "source": "https://www.rspca.org.uk/adviceandwelfare/farm/pigs",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13059,
+      "title": "Gallina doméstica (carrera en cinta)",
+      "value": 4,
+      "source": "https://pubmed.ncbi.nlm.nih.gov/7288355/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13060,
+      "title": "Pato corredor indio (sprint terrestre)",
+      "value": 13,
+      "source": "https://www.oregonzoo.org/animals/indian-runner-duck",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13061,
+      "title": "Camaleón velado (locomoción)",
+      "value": 1,
+      "source": "https://webcentral.uc.edu/eProf/media/attachment/eprofmediafile_69.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13062,
+      "title": "Iguana marina (ráfaga terrestre)",
+      "value": 9,
+      "source": "https://www.journals.uchicago.edu/doi/10.1086/physzool.52.4.30155945",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13063,
+      "title": "Escorpión (sprint)",
+      "value": 1,
+      "source": "https://file.iflora.cn/fastdfs/group4/M00/00/F7/wKhnsV3GuFmAQLI_AYa4cWdOCz4363.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13064,
+      "title": "Atún rojo (natación máxima estimada)",
+      "value": 54,
+      "source": "https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1095-8649.1989.tb03399.x",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13065,
+      "title": "Salmón atlántico (ráfaga acuática)",
+      "value": 15,
+      "source": "https://onlinelibrary.wiley.com/doi/pdf/10.1002/%28SICI%291099-1646%28199801/02%2914%3A1%3C41%3A%3AAID-RRR475%3E3.0.CO%3B2-8",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13066,
+      "title": "Foca común (natación máxima)",
+      "value": 19,
+      "source": "https://seaworld.org/animals/all-about/harbor-seal/adaptations/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13067,
+      "title": "Morsa (escape acuático)",
+      "value": 30,
+      "source": "https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry/cosewic-assessments-status-reports/atlantic-walrus/chapter-9.html",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13068,
+      "title": "Búfalo africano (carrera breve)",
+      "value": 57,
+      "source": "https://biologyfiles.ucr.edu/people/faculty/Garland/Garl1983_JZL.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "speed.js",
+      "id": 13069,
+      "title": "Babuino (desplazamiento medio)",
+      "value": 2,
+      "source": "https://www.princeton.edu/~baboon/publications/Altmann%201987.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -4793,28 +6488,8 @@
     },
     {
       "file": "inventos.js",
-      "id": 4006,
-      "title": "Eratóstenes mide la Tierra",
-      "value": -240,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4007,
-      "title": "Muere Arquímedes, estudioso de la palanca",
-      "value": -212,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4008,
-      "title": "Julio César decreta la reforma del calendario",
+      "title": "Julio César decreta la reforma del calendario (46 a. C.)",
       "value": -46,
       "source": null,
       "reviewStatus": null,
@@ -4833,26 +6508,6 @@
     },
     {
       "file": "inventos.js",
-      "id": 4010,
-      "title": "El Almagesto de Ptolomeo",
-      "value": 150,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4011,
-      "title": "El astrolabio en el mundo islámico (siglo VIII, fecha aproximada)",
-      "value": 750,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4012,
       "title": "El tratado de álgebra de Al-Juarismi (fecha aproximada)",
       "value": 830,
@@ -4864,28 +6519,8 @@
     {
       "file": "inventos.js",
       "id": 4013,
-      "title": "La primera fórmula escrita de la pólvora",
+      "title": "Una de las primeras fórmulas escritas de la pólvora",
       "value": 1044,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4014,
-      "title": "El reloj astronómico de Su Song",
-      "value": 1088,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4015,
-      "title": "Las primeras gafas (fecha aproximada)",
-      "value": 1286,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -4896,16 +6531,6 @@
       "id": 4016,
       "title": "La imprenta de tipos móviles de Gutenberg",
       "value": 1450,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4017,
-      "title": "Copérnico pone el Sol en el centro",
-      "value": 1543,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -4933,36 +6558,6 @@
     },
     {
       "file": "inventos.js",
-      "id": 4020,
-      "title": "Lippershey solicita una patente para el telescopio",
-      "value": 1608,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4021,
-      "title": "Galileo publica lo que ve en el cielo",
-      "value": 1610,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4022,
-      "title": "Harvey descubre la circulación de la sangre",
-      "value": 1628,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4023,
       "title": "La calculadora de Pascal",
       "value": 1642,
@@ -4983,36 +6578,6 @@
     },
     {
       "file": "inventos.js",
-      "id": 4025,
-      "title": "Hooke ve la célula",
-      "value": 1665,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4026,
-      "title": "Rømer mide la velocidad de la luz",
-      "value": 1676,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4027,
-      "title": "Los «Principia» de Newton",
-      "value": 1687,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4028,
       "title": "La primera máquina de vapor comercial",
       "value": 1698,
@@ -5026,16 +6591,6 @@
       "id": 4029,
       "title": "La máquina atmosférica de Newcomen",
       "value": 1712,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4030,
-      "title": "El termómetro de mercurio",
-      "value": 1714,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5073,29 +6628,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4034,
-      "title": "El descubrimiento del oxígeno",
-      "value": 1774,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4035,
-      "title": "El globo de los hermanos Montgolfier",
+      "title": "El primer vuelo tripulado en globo de aire caliente",
       "value": 1783,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4036,
-      "title": "La vacuna de la viruela",
-      "value": 1796,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5116,16 +6651,6 @@
       "id": 4038,
       "title": "La primera locomotora de vapor",
       "value": 1804,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4039,
-      "title": "El estetoscopio",
-      "value": 1816,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5193,16 +6718,6 @@
     },
     {
       "file": "inventos.js",
-      "id": 4046,
-      "title": "La anestesia con éter",
-      "value": 1846,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4047,
       "title": "Otis vende sus primeros ascensores de seguridad",
       "value": 1853,
@@ -5236,16 +6751,6 @@
       "id": 4050,
       "title": "La primera fotografía en color",
       "value": 1861,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4051,
-      "title": "Mendel presenta sus experimentos sobre la herencia",
-      "value": 1865,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5303,9 +6808,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4057,
-      "title": "El neumático hinchable",
-      "value": 1888,
+      "id": 4104,
+      "title": "Nace Coca-Cola",
+      "value": 1886,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5313,9 +6818,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4058,
-      "title": "Los rayos X",
-      "value": 1895,
+      "id": 4057,
+      "title": "Dunlop desarrolla un neumático hinchable práctico",
+      "value": 1888,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5334,7 +6839,7 @@
     {
       "file": "inventos.js",
       "id": 4060,
-      "title": "La primera señal de radio transatlántica",
+      "title": "Marconi afirma recibir una señal de radio transatlántica",
       "value": 1901,
       "source": null,
       "reviewStatus": null,
@@ -5346,16 +6851,6 @@
       "id": 4061,
       "title": "El primer vuelo de los hermanos Wright",
       "value": 1903,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4062,
-      "title": "La relatividad especial",
-      "value": 1905,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5403,39 +6898,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4067,
-      "title": "La relatividad general",
-      "value": 1915,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4068,
-      "title": "La insulina",
-      "value": 1921,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4069,
       "title": "La primera demostración de la televisión",
       "value": 1926,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4070,
-      "title": "La penicilina",
-      "value": 1928,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5513,29 +6978,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4078,
-      "title": "La estructura del ADN",
-      "value": 1953,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4079,
-      "title": "La vacuna de la polio",
-      "value": 1955,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4080,
-      "title": "El Sputnik",
-      "value": 1957,
+      "id": 4107,
+      "title": "La primera tarjeta de crédito",
+      "value": 1950,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5563,29 +7008,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4083,
-      "title": "El primer humano en el espacio",
-      "value": 1961,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4084,
-      "title": "El primer trasplante de corazón",
+      "id": 4105,
+      "title": "El primer cajero automático",
       "value": 1967,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4085,
-      "title": "La llegada a la Luna",
-      "value": 1969,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5603,9 +7028,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4087,
-      "title": "La primera llamada desde un móvil",
-      "value": 1973,
+      "id": 4106,
+      "title": "El primer correo electrónico",
+      "value": 1971,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5613,9 +7038,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4088,
-      "title": "El primer bebé por fecundación in vitro",
-      "value": 1978,
+      "id": 4087,
+      "title": "La primera llamada desde un móvil",
+      "value": 1973,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5653,39 +7078,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4092,
-      "title": "La huella genética",
-      "value": 1984,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4093,
       "title": "La propuesta de la World Wide Web",
       "value": 1989,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4094,
-      "title": "El telescopio espacial Hubble",
-      "value": 1990,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4095,
-      "title": "La oveja Dolly",
-      "value": 1996,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -5703,69 +7098,9 @@
     },
     {
       "file": "inventos.js",
-      "id": 4097,
-      "title": "El primer borrador del genoma humano",
-      "value": 2001,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
       "id": 4098,
       "title": "El iPhone",
       "value": 2007,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4099,
-      "title": "CRISPR como herramienta de edición genética",
-      "value": 2012,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4100,
-      "title": "La detección de ondas gravitacionales",
-      "value": 2015,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4101,
-      "title": "La primera imagen de un agujero negro",
-      "value": 2019,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4102,
-      "title": "Las vacunas de ARN mensajero",
-      "value": 2020,
-      "source": null,
-      "reviewStatus": null,
-      "comparison": null,
-      "reviewedAt": null
-    },
-    {
-      "file": "inventos.js",
-      "id": 4103,
-      "title": "Las primeras imágenes del James Webb",
-      "value": 2022,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -6943,6 +8278,46 @@
     },
     {
       "file": "astronomy.js",
+      "id": 4006,
+      "title": "Eratóstenes mide la Tierra",
+      "value": -240,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "astronomy.js",
+      "id": 4010,
+      "title": "El Almagesto de Ptolomeo",
+      "value": 150,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "astronomy.js",
+      "id": 4011,
+      "title": "El astrolabio en el mundo islámico (siglo VIII, fecha aproximada)",
+      "value": 750,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "astronomy.js",
+      "id": 4014,
+      "title": "El reloj astronómico de Su Song",
+      "value": 1088,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "astronomy.js",
       "id": 8001,
       "title": "Copérnico publica su modelo heliocéntrico",
       "value": 1543,
@@ -6956,6 +8331,16 @@
       "id": 8002,
       "title": "Tycho Brahe observa una nueva estrella",
       "value": 1572,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "astronomy.js",
+      "id": 4020,
+      "title": "Lippershey solicita el primer privilegio conocido para un telescopio",
+      "value": 1608,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -7006,6 +8391,16 @@
       "id": 8007,
       "title": "Fundación del Observatorio de Greenwich",
       "value": 1675,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "astronomy.js",
+      "id": 4026,
+      "title": "Rømer demuestra que la luz tiene velocidad finita",
+      "value": 1676,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -7463,6 +8858,16 @@
     },
     {
       "file": "medicine.js",
+      "id": 4015,
+      "title": "Las primeras gafas (fecha aproximada)",
+      "value": 1286,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "medicine.js",
       "id": 9004,
       "title": "Vesalio publica De humani corporis fabrica",
       "value": 1543,
@@ -7503,6 +8908,16 @@
     },
     {
       "file": "medicine.js",
+      "id": 4030,
+      "title": "El termómetro de mercurio",
+      "value": 1714,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "medicine.js",
       "id": 9008,
       "title": "La variolización llega a Inglaterra",
       "value": 1721,
@@ -7516,6 +8931,16 @@
       "id": 9009,
       "title": "James Lind prueba tratamientos contra el escorbuto",
       "value": 1747,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "medicine.js",
+      "id": 4034,
+      "title": "Priestley aísla el gas que llamaremos oxígeno",
+      "value": 1774,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -7576,6 +9001,16 @@
       "id": 9015,
       "title": "John Snow rastrea el cólera",
       "value": 1854,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "medicine.js",
+      "id": 4051,
+      "title": "Mendel presenta sus experimentos sobre la herencia",
+      "value": 1865,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -7803,6 +9238,16 @@
     },
     {
       "file": "medicine.js",
+      "id": 4092,
+      "title": "La huella genética",
+      "value": 1984,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "medicine.js",
       "id": 9038,
       "title": "Comienza el Proyecto Genoma Humano",
       "value": 1990,
@@ -7826,6 +9271,16 @@
       "id": 9040,
       "title": "Herceptin inaugura una terapia dirigida",
       "value": 1998,
+      "source": null,
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "medicine.js",
+      "id": 4097,
+      "title": "El primer borrador del genoma humano",
+      "value": 2001,
       "source": null,
       "reviewStatus": null,
       "comparison": null,
@@ -8636,490 +10091,770 @@
       "id": 3001,
       "title": "India",
       "value": 1476625576,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3002,
       "title": "Estados Unidos",
       "value": 349035494,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3003,
       "title": "Indonesia",
       "value": 287886782,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3004,
       "title": "Nigeria",
       "value": 242431832,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3005,
       "title": "Brasil",
       "value": 213562666,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3006,
       "title": "Bangladesh",
       "value": 177818044,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3007,
       "title": "México",
       "value": 132997658,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3008,
       "title": "Japón",
       "value": 122427731,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3009,
       "title": "Vietnam",
       "value": 102177431,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3010,
       "title": "Irán",
       "value": 93168497,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3011,
       "title": "Alemania",
       "value": 83644258,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3012,
       "title": "Tanzania",
       "value": 72563780,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3013,
       "title": "Francia (ámbito ONU)",
       "value": 66746401,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3014,
       "title": "Italia",
       "value": 58926166,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3015,
       "title": "Colombia",
       "value": 53936226,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3016,
       "title": "España",
       "value": 47850793,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3017,
       "title": "Yemen",
       "value": 42961653,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3018,
       "title": "Marruecos",
       "value": 38762441,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3019,
       "title": "Perú",
       "value": 34922148,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3020,
       "title": "Venezuela",
       "value": 28633711,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3021,
       "title": "Siria",
       "value": 26472497,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3022,
       "title": "Sri Lanka",
       "value": 23348315,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3023,
       "title": "Chile",
       "value": 19945850,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3024,
       "title": "Ecuador",
       "value": 18444506,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3025,
       "title": "Ruanda",
       "value": 14889693,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3026,
       "title": "Bolivia",
       "value": 12749291,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3027,
       "title": "República Dominicana",
       "value": 11609500,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3028,
       "title": "Portugal",
       "value": 10395362,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3029,
       "title": "Suiza",
       "value": 9007798,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3030,
       "title": "Paraguay",
       "value": 7095279,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3031,
       "title": "El Salvador",
       "value": 6391253,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3032,
       "title": "Noruega",
       "value": 5652989,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3033,
       "title": "Costa Rica",
       "value": 5174789,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3034,
       "title": "Panamá",
       "value": 4625718,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3035,
       "title": "Croacia",
       "value": 3822345,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3036,
       "title": "Uruguay",
       "value": 3382537,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3037,
       "title": "Bosnia y Herzegovina",
       "value": 3114242,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3038,
       "title": "Lituania",
       "value": 2797338,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3039,
       "title": "Eslovenia",
       "value": 2114573,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3040,
       "title": "Letonia",
       "value": 1835935,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3041,
       "title": "Estonia",
       "value": 1331062,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3042,
       "title": "Luxemburgo",
       "value": 687448,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3043,
       "title": "Montenegro",
       "value": 626233,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3044,
       "title": "Malta",
       "value": 549011,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3045,
       "title": "Islandia",
       "value": 402329,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3046,
       "title": "Andorra",
       "value": 83753,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3047,
       "title": "Mónaco",
       "value": 38087,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3048,
       "title": "San Marino",
       "value": 33605,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "population.js",
       "id": 3049,
       "title": "Ciudad del Vaticano",
       "value": 506,
-      "source": null,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
       "reviewStatus": null,
       "comparison": null,
-      "reviewedAt": null
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3050,
+      "title": "Nueva Zelanda",
+      "value": 5287479,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3051,
+      "title": "Corea del Sur",
+      "value": 51600388,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3052,
+      "title": "Mongolia",
+      "value": 3556798,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3053,
+      "title": "Afganistán",
+      "value": 45047069,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3054,
+      "title": "Kazajistán",
+      "value": 21083626,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3055,
+      "title": "Kirguistán",
+      "value": 7400465,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3056,
+      "title": "Pakistán",
+      "value": 259299791,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3057,
+      "title": "Tayikistán",
+      "value": 10978599,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3058,
+      "title": "Turkmenistán",
+      "value": 7736632,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3059,
+      "title": "Uzbekistán",
+      "value": 37724223,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3060,
+      "title": "Chad",
+      "value": 21560380,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3061,
+      "title": "Sudán",
+      "value": 53282719,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3062,
+      "title": "Uganda",
+      "value": 52761469,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3063,
+      "title": "Kenia",
+      "value": 58636412,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3064,
+      "title": "Angola",
+      "value": 40215179,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3065,
+      "title": "Zimbabue",
+      "value": 17273580,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3066,
+      "title": "Namibia",
+      "value": 3153246,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3067,
+      "title": "Laos",
+      "value": 7974017,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3068,
+      "title": "Myanmar (Birmania)",
+      "value": 55184819,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3069,
+      "title": "Eslovaquia",
+      "value": 5451342,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3070,
+      "title": "Líbano",
+      "value": 5897467,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3071,
+      "title": "Suecia",
+      "value": 10701047,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3072,
+      "title": "Irlanda",
+      "value": 5356950,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3073,
+      "title": "Túnez",
+      "value": 12415138,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3074,
+      "title": "Moldavia",
+      "value": 2961253,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3075,
+      "title": "Camerún",
+      "value": 30640817,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3076,
+      "title": "Togo",
+      "value": 9930918,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
+    },
+    {
+      "file": "population.js",
+      "id": 3077,
+      "title": "Liberia",
+      "value": 5853949,
+      "source": "https://www.worldometers.info/world-population/population-by-country/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": "2026-09-19"
     },
     {
       "file": "idiomas.js",

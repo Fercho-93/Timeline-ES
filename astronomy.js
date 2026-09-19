@@ -2,13 +2,19 @@
 // por la publicación o descubrimiento; las modernas, por el lanzamiento, llegada o
 // anuncio que se describe. Cada hito tiene un único año dentro del mazo.
 window.ASTRONOMY_CARDS = [
+  { id: 4006, year: -240, title: "Eratóstenes mide la Tierra", detail: "Con dos sombras y una distancia calcula la circunferencia del planeta con un error de pocos puntos." },
+  { id: 4010, year: 150, title: "El Almagesto de Ptolomeo", detail: "El modelo del cielo con la Tierra en el centro que se enseñará durante catorce siglos." },
+  { id: 4011, year: 750, title: "El astrolabio en el mundo islámico (siglo VIII, fecha aproximada)", detail: "El astrolabio, de origen antiguo, se desarrolla en el mundo islámico desde el siglo VIII. Se usa 750 como referencia aproximada del siglo, no como fecha de una invención puntual.", label: "c. 750" },
+  { id: 4014, year: 1088, title: "El reloj astronómico de Su Song", detail: "Una torre de agua y engranajes que mueve una esfera celeste: el escape mecánico antes que en Europa." },
   { id: 8001, year: 1543, title: "Copérnico publica su modelo heliocéntrico", detail: "De revolutionibus sitúa a la Tierra entre los planetas que giran alrededor del Sol." },
   { id: 8002, year: 1572, title: "Tycho Brahe observa una nueva estrella", detail: "La supernova visible en Casiopea contradice la idea de un cielo perfecto e inmutable." },
+  { id: 4020, year: 1608, title: "Lippershey solicita el primer privilegio conocido para un telescopio", detail: "El óptico Hans Lippershey solicita en los Países Bajos el primer privilegio conocido para un catalejo; la solicitud no llegó a convertirse en una patente exclusiva." },
   { id: 8003, year: 1609, title: "Galileo apunta un telescopio al cielo", detail: "Observa relieve en la Luna y una multitud de estrellas invisibles a simple vista." },
   { id: 8004, year: 1610, title: "Descubrimiento de las lunas de Júpiter", detail: "Galileo publica que cuatro cuerpos orbitan Júpiter: no todo gira alrededor de la Tierra." },
   { id: 8005, year: 1619, title: "Kepler publica su tercera ley", detail: "La publica en «Harmonices Mundi» en 1619, tras formularla en 1618. Relaciona el periodo orbital de un planeta con el semieje mayor de su órbita." },
   { id: 8006, year: 1655, title: "Huygens descubre Titán", detail: "Christiaan Huygens identifica la mayor luna de Saturno con un telescopio construido por él y su hermano." },
   { id: 8007, year: 1675, title: "Fundación del Observatorio de Greenwich", detail: "Carlos II crea el observatorio para mejorar la astronomía y la navegación marítima." },
+  { id: 4026, year: 1676, title: "Rømer demuestra que la luz tiene velocidad finita", detail: "Los eclipses de las lunas de Júpiter se retrasan: Rømer infiere que la luz tarda en llegar y realiza una primera estimación de su velocidad." },
   { id: 8008, year: 1687, title: "Newton publica los Principia", detail: "Las leyes del movimiento y la gravitación explican con una misma física la caída de una manzana y las órbitas." },
   { id: 8009, year: 1705, title: "Halley predice el regreso de su cometa", detail: "Edmond Halley calcula que varios cometas observados eran el mismo y anuncia que volverá en 1758." },
   { id: 8010, year: 1781, title: "Descubrimiento de Urano", detail: "William Herschel observa el primer planeta descubierto con telescopio y amplía el tamaño conocido del sistema solar." },
