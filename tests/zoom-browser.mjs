@@ -157,7 +157,7 @@ try {
     await page.locator('[data-block="historia"]').click();
     await page.locator('[data-mode="history"]').click();
     if(width===414) {
-      await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
+      await page.locator('.atlas-landscape img, .atlas-specimens img, .walking-art').evaluateAll(imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return img.decode();})));
       await page.screenshot({path:`test-results/zoom/${engine}-menu-color.png`,fullPage:true});
       await page.locator('[data-action="rules"]').click();
       const guideBack=page.locator('.rules .guide-tools > .atlas-dialog-back');
@@ -239,7 +239,7 @@ try {
       assert.ok(await page.locator('.enc-deck-cover img').count()>5,'los mazos tienen portada');
       const toolbar=await page.locator('.enc-toolbar-compact').boundingBox();
       assert.ok(toolbar.height<260,'los filtros dejan protagonismo al álbum');
-      await page.locator('.enc-recent-card img, .enc-deck-cover img').evaluateAll(imgs=>Promise.all(imgs.map(img=>img.decode())));
+      await page.locator('.enc-recent-card img, .enc-deck-cover img').evaluateAll(imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return img.decode();})));
       await page.screenshot({path:`test-results/zoom/${engine}-enciclopedia-album.png`,fullPage:true});
       await page.locator('[data-action="enc-back"]').first().click();
       const historyMode=page.locator('[data-mode="history"]');
