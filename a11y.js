@@ -125,7 +125,7 @@
       prepareReturn();
     }
     const button = event.target.closest?.('#app .home-nav button');
-    if (button?.hasAttribute('aria-current')) {
+    if (button?.hasAttribute('aria-current') && button.matches('[data-action="rules"], [data-action="home-encyclopedia"], [data-settings-action="open"]')) {
       event.preventDefault(); event.stopImmediatePropagation(); return;
     }
     // Las pestañas son destinos hermanos: sustituir la superficie anterior evita
