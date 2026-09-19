@@ -11,8 +11,9 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Duelo por turnos: solo los dos participantes pueden leerlo; cada avance
-    // incrementa exactamente un turno y únicamente lo firma quien lo tiene.
+    // Duelo por turnos: los participantes pueden leerlo. Mientras espera rival,
+    // quien posee el identificador aleatorio del enlace puede leerlo una vez para
+    // entrar; al comenzar vuelve a ser privado para los dos participantes.
     match /turnDuels/{duelId} {
       function member() { return registered() && request.auth.uid in resource.data.playersOrder; }
       function validCreate() {
@@ -24,7 +25,8 @@ service cloud.firestore {
           && request.resource.data.mode is string && request.resource.data.kind in ['orden','cifras'] && request.resource.data.seed is string;
       }
       allow create: if validCreate();
-      allow get, list: if member();
+      allow get: if member() || (registered() && resource.data.status == 'waiting' && resource.data.playersOrder.size() == 1);
+      allow list: if member();
       allow update: if (member() || (registered() && resource.data.status == 'waiting' && !(request.auth.uid in resource.data.playersOrder)))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
         && (
