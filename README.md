@@ -87,7 +87,7 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
 
 - **Superficie de países:** 72 países ordenados de menor a mayor, de la Ciudad del Vaticano a Rusia.
   Aquí la línea no es temporal: se ordena por tamaño.
-- **Población de países:** 49 países ordenados de menos a más gente, del Vaticano a la India,
+- **Población de países:** 77 países ordenados de menos a más gente, del Vaticano a la India,
   con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer).
 - **Idiomas por hablantes nativos:** 47 lenguas del chino mandarín (929 millones) al feroés
   (69.000), ordenadas por hablantes de lengua materna. No es la lista de «idiomas más hablados

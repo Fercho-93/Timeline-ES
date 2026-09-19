@@ -86,6 +86,11 @@ console.log("\nService worker");
   const cachedAssets = new Set(sw.precargas.map(request => request.url));
   const animalesPrecargados = animalAssets.filter(file => cachedAssets.has(file));
   ok(`las ${animalAssets.length} ilustraciones de animales NO se precargan al instalar${animalesPrecargados.length ? ` (se coló ${animalesPrecargados.join(", ")})` : ""}`, !animalesPrecargados.length);
+  const populationAssets = fs.readdirSync(path.join(REPO, "assets", "population-cards"))
+    .filter(file => file.endsWith(".webp"))
+    .map(file => `./assets/population-cards/${file}`);
+  const populationNoPrecargadas = populationAssets.filter(file => !cachedAssets.has(file));
+  ok(`las ${populationAssets.length} ilustraciones de población sí se precargan al instalar${populationNoPrecargadas.length ? ` (faltan ${populationNoPrecargadas.join(", ")})` : ""}`, !populationNoPrecargadas.length);
   // Lo mismo con las seis canciones —27 MB de un ajuste que viene apagado—: instalar no
   // las baja, pero quedan guardadas para poder sonar sin conexión.
   const musica = Array.from({ length: 6 }, (unused, i) => `./assets/audio/v${i + 1}.mp3`);

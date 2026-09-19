@@ -21,7 +21,7 @@ window.POPULATION_CARDS = [
   { id: 3014, value: 58926166, title: "Italia", detail: "La baja fecundidad y el envejecimiento marcan su demografía; la migración también influye en el total de habitantes." },
   { id: 3015, value: 53936226, title: "Colombia", detail: "El segundo país hispanohablante más poblado." },
   { id: 3016, value: 47850793, title: "España", detail: "Ha crecido en más de seis millones desde el año 2000, casi todo por migración." },
-  { id: 3017, value: 42961653, title: "Yemen", detail: "Ha doblado su población desde 1995 pese a la guerra." },
+  { id: 3017, value: 42961653, title: "Yemen", detail: "Ha más que duplicado su población desde 1995 pese a la guerra." },
   { id: 3018, value: 38762441, title: "Marruecos", detail: "Casi tanta gente como España en una superficie parecida." },
   { id: 3019, value: 34922148, title: "Perú", detail: "Un tercio vive en Lima y su área metropolitana." },
   { id: 3020, value: 28633711, title: "Venezuela", detail: "Ha perdido millones de habitantes desde 2015 por la emigración." },
@@ -44,7 +44,7 @@ window.POPULATION_CARDS = [
   { id: 3037, value: 3114242, title: "Bosnia y Herzegovina", detail: "Un millón menos que antes de la guerra de los noventa." },
   { id: 3038, value: 2797338, title: "Lituania", detail: "La mayor de las tres repúblicas bálticas." },
   { id: 3039, value: 2114573, title: "Eslovenia", detail: "Cabe cuatro veces en Castilla y León y tiene casi la misma gente." },
-  { id: 3040, value: 1835935, title: "Letonia", detail: "Ha perdido una cuarta parte de su población desde 1991." },
+  { id: 3040, value: 1835935, title: "Letonia", detail: "Ha perdido casi un tercio de su población desde 1991." },
   { id: 3041, value: 1331062, title: "Estonia", detail: "La menos poblada de las bálticas, y la más digitalizada de Europa." },
   { id: 3042, value: 687448, title: "Luxemburgo", detail: "Casi la mitad de sus residentes son extranjeros." },
   { id: 3043, value: 626233, title: "Montenegro", detail: "Menos gente que la ciudad de Valencia." },
@@ -53,5 +53,42 @@ window.POPULATION_CARDS = [
   { id: 3046, value: 83753, title: "Andorra", detail: "Este pequeño Estado pirenaico supera la población de la ciudad española de Cuenca." },
   { id: 3047, value: 38087, title: "Mónaco", detail: "El país más densamente poblado del mundo: 38.000 personas en dos km²." },
   { id: 3048, value: 33605, title: "San Marino", detail: "La república más antigua del mundo que sigue en pie." },
-  { id: 3049, value: 506, title: "Ciudad del Vaticano", detail: "El país menos poblado del mundo: cabría entero en un instituto grande." }
+  { id: 3049, value: 506, title: "Ciudad del Vaticano", detail: "El país menos poblado del mundo: cabría entero en un instituto grande." },
+  { id: 3050, value: 5287479, title: "Nueva Zelanda", detail: "Más de tres cuartas partes de su población viven en la Isla Norte." },
+  { id: 3051, value: 51600388, title: "Corea del Sur", detail: "La mayoría de sus habitantes se concentra en el área metropolitana de Seúl." },
+  { id: 3052, value: 3556798, title: "Mongolia", detail: "El país menos densamente poblado del mundo entre los estados soberanos." },
+  { id: 3053, value: 45047069, title: "Afganistán", detail: "Tiene una de las poblaciones más jóvenes del mundo." },
+  { id: 3054, value: 21083626, title: "Kazajistán", detail: "Es el país más grande del mundo sin salida al mar." },
+  { id: 3055, value: 7400465, title: "Kirguistán", detail: "Más del noventa por ciento de su territorio es montañoso." },
+  { id: 3056, value: 259299791, title: "Pakistán", detail: "El quinto país más poblado del mundo, con una población muy joven." },
+  { id: 3057, value: 10978599, title: "Tayikistán", detail: "Más de nueve décimas partes de su territorio son montañas." },
+  { id: 3058, value: 7736632, title: "Turkmenistán", detail: "El desierto de Karakum ocupa buena parte del país." },
+  { id: 3059, value: 37724223, title: "Uzbekistán", detail: "El país más poblado de Asia Central." },
+  { id: 3060, value: 21560380, title: "Chad", detail: "El lago Chad da nombre a un país que se extiende del Sahel al Sahara." },
+  { id: 3061, value: 53282719, title: "Sudán", detail: "El Nilo y sus afluentes atraviesan el corazón de su población." },
+  { id: 3062, value: 52761469, title: "Uganda", detail: "Una de las poblaciones más jóvenes del mundo, a orillas del lago Victoria." },
+  { id: 3063, value: 58636412, title: "Kenia", detail: "La población se concentra en las tierras altas y el corredor de Nairobi." },
+  { id: 3064, value: 40215179, title: "Angola", detail: "El país lusófono más poblado de África." },
+  { id: 3065, value: 17273580, title: "Zimbabue", detail: "El río Zambeze forma su frontera natural con Zambia en las cataratas Victoria." },
+  { id: 3066, value: 3153246, title: "Namibia", detail: "Uno de los países menos densamente poblados de África." },
+  { id: 3067, value: 7974017, title: "Laos", detail: "El único país sin litoral del Sudeste Asiático continental." },
+  { id: 3068, value: 55184819, title: "Myanmar (Birmania)", detail: "El río Irrawaddy vertebra una de las grandes llanuras arroceras de Asia." },
+  { id: 3069, value: 5451342, title: "Eslovaquia", detail: "Los Cárpatos atraviesan el centro y el norte del país." },
+  { id: 3070, value: 5897467, title: "Líbano", detail: "La mayor parte de su población vive entre la costa y la cordillera del Líbano." },
+  { id: 3071, value: 10701047, title: "Suecia", detail: "La población se concentra en el sur, mientras el norte está cubierto de bosques y lagos." },
+  { id: 3072, value: 5356950, title: "Irlanda", detail: "Casi la mitad de la población vive en el área metropolitana de Dublín y sus alrededores." },
+  { id: 3073, value: 12415138, title: "Túnez", detail: "La mayor parte de la población se concentra en el litoral mediterráneo." },
+  { id: 3074, value: 2961253, title: "Moldavia", detail: "Uno de los países menos poblados de Europa, entre Rumanía y Ucrania." },
+  { id: 3075, value: 30640817, title: "Camerún", detail: "Su territorio reúne selva ecuatorial, sabana y montañas volcánicas." },
+  { id: 3076, value: 9930918, title: "Togo", detail: "Una estrecha franja de África Occidental que llega desde el golfo de Guinea al Sahel." },
+  { id: 3077, value: 5853949, title: "Liberia", detail: "El país conserva una de las mayores extensiones de bosque tropical de África Occidental." }
 ];
+
+// La tabla es una serie congelada: proyección a 1 de julio de 2026 de la revisión 2024
+// de World Population Prospects. Se conserva la fuente y la fecha en cada carta para que
+// el inventario automático no deje estos datos sin trazabilidad.
+const POPULATION_SOURCE = "https://www.worldometers.info/world-population/population-by-country/";
+for (const card of window.POPULATION_CARDS) {
+  card.source = POPULATION_SOURCE;
+  card.reviewedAt = "2026-09-19";
+}

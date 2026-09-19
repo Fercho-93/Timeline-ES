@@ -11,18 +11,19 @@ Fecha de revisión inicial: 26 de agosto de 2026. Fecha y ámbito corregidos el 
   cifras del mazo se copian de ella sin redondear.
 
 **Serie congelada:** se juega con la proyección de esa fecha y revisión, no con una
-población en tiempo real. Las 49 cifras coinciden con la tabla contrastada en la auditoría.
+población en tiempo real. Las 77 cifras coinciden con la tabla contrastada en la auditoría.
 El margen del 8 % no garantiza que el orden sobreviva a futuras revisiones; al actualizar
 hay que contrastar de nuevo la serie completa sin mezclar censos nacionales de otras fechas.
 
 ## Resultado
 
-- 49 países, con la población en habitantes.
-- 49 identificadores, títulos y valores únicos, sin choque con los otros tres mazos.
+- 77 países, con la población en habitantes.
+- 77 identificadores, títulos y valores únicos, sin choque con los otros tres mazos.
 - Rango: de 506 habitantes (Ciudad del Vaticano) a 1.476.625.576 (India). La línea se ordena de
   menos a más, igual que la de superficies va de menor a mayor.
-- **Separación mínima entre cartas contiguas: 8,1%** (Chile y Ecuador). El resto está más
-  separado, y la mayoría por encima del 12%.
+- La ampliación incorpora países que antes faltaban y, por tanto, ya no mantiene la separación
+  mínima histórica del 8%. Los vecinos más próximos incluyen Kenia–Italia, Sudán–Colombia y
+  Nueva Zelanda–Costa Rica; el orden sigue siendo estrictamente creciente.
 
 ## Cómo se eligieron
 
@@ -32,7 +33,7 @@ prioridad se fijó pensando en quién juega —España primero, luego los grande
 el mundo hispanohablante—, porque en cada colisión sobrevive uno solo y conviene que sea el
 más esperado.
 
-De 194 estados soberanos, 49 cartas. El resto cae por tres motivos: colisión con una carta ya
+De 194 estados soberanos, 77 cartas. El resto cae por tres motivos: colisión con una carta ya
 elegida, ser un territorio no soberano (Taiwán, Hong Kong, Puerto Rico, Palestina, Sáhara
 Occidental y las dependencias europeas), o no ser situable por el público general, con el mismo
 criterio que en superficies.
