@@ -1,6 +1,13 @@
 (function () {
   const app = document.getElementById('app');
   let starting = false;
+  function loadApp() {
+    const script = document.createElement('script');
+    script.src = 'app.js';
+    script.onload = () => window.CONTINUUM_SPLASH?.finish();
+    script.onerror = () => { starting = false; failed(); };
+    document.body.append(script);
+  }
   async function start() {
     if (starting) return;
     starting = true;
@@ -17,14 +24,17 @@
       window.CONTINUUM?.Ambience?.sync(true);
       window.CONTINUUM_SPLASH?.entering();
       const { startAccounts } = await accounts;
-      await startAccounts(() => {
-        const script = document.createElement('script');
-        script.src = 'app.js';
-        script.onload = () => window.CONTINUUM_SPLASH?.finish();
-        script.onerror = () => { starting = false; failed(); };
-        document.body.append(script);
-      });
-    } catch { starting = false; failed(); }
+      await startAccounts(loadApp);
+    } catch {
+      starting = false;
+      // Sin internet no hay invitado que preparar, pero el resto del juego —incluido el
+      // modo sin conexión— no necesita ninguno: el resto de la aplicación ya sabe jugar
+      // sin `CT.Accounts` (revisa su perfil local en vez del de la nube). Solo se bloquea
+      // aquí cuando accounts.js falla teniendo internet: ahí sí puede merecer un reintento,
+      // en vez de esconder en silencio un fallo real del servicio de cuentas.
+      if (!navigator.onLine) { starting = true; loadApp(); return; }
+      failed();
+    }
   }
   function failed() {
     window.CONTINUUM_SPLASH?.finish();

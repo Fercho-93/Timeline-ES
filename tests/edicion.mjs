@@ -175,6 +175,12 @@ for (const reduce of [false, true]) {
   assert.match(arranque, /CONTINUUM_SPLASH\?\.gate\(\)/, 'el arranque espera al botón');
   assert.ok(arranque.indexOf('gate()') < arranque.indexOf('startAccounts('), 'y lo espera antes de montar la cuenta');
   assert.match(arranque, /Ambience\?\.sync\(true\)/, 'y aprovecha ese toque para encender la música');
+  // Sin internet no hay invitado que preparar (accounts.js no llega a importarse), pero
+  // el resto del juego —incluido el modo sin conexión— no necesita ninguno: entra
+  // igualmente en vez de enseñar el aviso de "necesitas internet".
+  assert.match(arranque, /navigator\.onLine/, 'distingue estar sin conexión de un fallo real del servicio');
+  assert.ok(arranque.indexOf('if (!navigator.onLine)') < arranque.lastIndexOf('failed();'), 'sin conexión entra sin pasar por el aviso bloqueante');
+  assert.match(arranque, /function loadApp\(\)/, 'cargar el juego es lo mismo con o sin cuenta, no una copia');
 }
 {
   const {w, advance, active} = splashClock();
