@@ -1732,18 +1732,18 @@ html #app .home-nav.atlas-nav {
   max-width: none;
   min-height: calc(76px + env(safe-area-inset-bottom));
   padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
-  border: 2px solid #62411f;
+  border: 2px solid #53604e;
   border-bottom: 0;
   border-radius: 22px 22px 0 0;
   color: #3e291a;
   background:
-    linear-gradient(90deg, #fff4d82e 1px, transparent 1px) 0 0 / 28px 100%,
-    linear-gradient(180deg, #efdcb7, #d8ba83 57%, #c7a368);
+    linear-gradient(90deg, #fff9e72b 1px, transparent 1px) 0 0 / 28px 100%,
+    linear-gradient(180deg, #e7eadc, #bdc7b3 57%, #94a28d);
   box-shadow:
-    0 0 0 2px #d9b873,
-    inset 0 0 0 2px #fff1cd8f,
-    inset 0 -9px 17px #855a2830,
-    0 8px 23px #35200f42;
+    0 -2px 0 #c5a66f,
+    inset 0 0 0 2px #fffbe09c,
+    inset 0 -9px 17px #42533e2b,
+    0 -7px 22px #2f382a30;
   transform: none;
   overflow: visible;
 }
@@ -1752,7 +1752,7 @@ html #app .home-nav.atlas-nav::before {
   position: absolute;
   inset: 5px 5px 0;
   z-index: -1;
-  border: 1px solid #8c6739;
+  border: 1px solid #72816d;
   border-bottom: 0;
   border-radius: 15px 15px 0 0;
   pointer-events: none;
@@ -1762,7 +1762,7 @@ html #app .home-nav.atlas-nav::before {
   min-height: 60px;
   padding: 5px 2px 3px;
   border-radius: 13px;
-  color: #4f3825;
+  color: #344236;
   background: transparent;
 }
 #app .home-nav.atlas-nav button + button::before {
@@ -1772,7 +1772,7 @@ html #app .home-nav.atlas-nav::before {
   bottom: 9px;
   left: 0;
   width: 1px;
-  background: linear-gradient(transparent, #76502563, transparent);
+  background: linear-gradient(transparent, #58685163, transparent);
 }
 #app .home-nav.atlas-nav button span {
   display: grid;
@@ -1796,7 +1796,7 @@ html #app .home-nav.atlas-nav::before {
   box-shadow: 0 0 0 2px #f2d497, 0 0 0 4px #765126, inset 0 1px 4px #fff7;
 }
 #app .home-nav.atlas-nav button[aria-current] small {
-  color: #4b291c;
+  color: #443127;
   text-decoration: underline;
   text-decoration-color: #8d442f;
   text-underline-offset: 5px;
@@ -1804,14 +1804,28 @@ html #app .home-nav.atlas-nav::before {
 
 @media (max-width: 520px) {
   #app[data-screen="home"] .home-gallery-shell { padding-inline: 22px; }
-  #app[data-screen="home"] .home-masthead { margin-bottom: 27px; }
-  #app[data-screen="home"] .home-crest { width: 122px; }
-  #app[data-screen="home"] .home-wordmark { font-size: clamp(2.5rem, 12vw, 3.25rem); }
-  #app[data-screen="home"] .home-tagline { font-size: .58rem; letter-spacing: .22em; }
+  #app[data-screen="home"] .home-masthead { margin: 0 auto 17px; padding-top: 0; }
+  #app[data-screen="home"] .home-crest { width: 94px; margin-bottom: -7px; }
+  #app[data-screen="home"] .home-wordmark { font-size: clamp(2.25rem, 10.8vw, 2.85rem); }
+  #app[data-screen="home"] .home-tagline { margin-top: 2px; font-size: .53rem; letter-spacing: .2em; }
+  #app[data-screen="home"] .home-ornament { margin-top: 9px; }
+  #app[data-screen="home"] .home-ornament span { width: 62px; }
+  #app[data-screen="home"] .collection-heading { margin-bottom: 12px; padding-bottom: 9px; }
   #app[data-screen="home"] .collection-heading h2 { font-size: 1.78rem; }
   #app[data-screen="home"] .collection-heading .eyebrow { font-size: .56rem; letter-spacing: .16em; }
+  #app[data-screen="home"] .gallery { gap: 13px; }
   #app[data-screen="home"] .home-gallery-shell .gallery-panel,
-  #app[data-screen="home"] .home-gallery-shell .gallery-panel.active { height: clamp(190px, 53vw, 224px); }
+  #app[data-screen="home"] .home-gallery-shell .gallery-panel.active {
+    height: clamp(154px, 41vw, 170px);
+    min-height: 154px;
+  }
+  #app[data-screen="home"] .gallery-panel .collection-index { top: 12px; left: 14px; min-height: 27px; padding: 3px 11px; }
+  #app[data-screen="home"] .gallery-panel .collection-open { right: 15px; width: 34px; height: 34px; }
+  #app[data-screen="home"] .gallery-panel .panel-label,
+  #app[data-screen="home"] .gallery-panel:not(.active) .panel-label,
+  #app[data-screen="home"] .gallery-panel.active .panel-label { right: 60px; bottom: 13px; left: 16px; }
+  #app[data-screen="home"] .gallery-panel .panel-label strong { font-size: clamp(1.45rem, 6vw, 1.75rem); }
+  #app[data-screen="home"] .gallery-panel .panel-label small { font-size: .7rem; }
   html #app .home-nav.atlas-nav { width: 100%; bottom: 0; }
 }
 
