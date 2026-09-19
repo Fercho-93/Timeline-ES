@@ -27,9 +27,17 @@ try {
  for(const [engine,type] of [['webkit',webkit],['chromium',chromium]]) {
   if (process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE !== engine) continue;
   const browser=await type.launch(engine === 'chromium' && process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {});
+  const newPage = async options => {
+    const page = await browser.newPage(options);
+    await page.addInitScript(() => localStorage.setItem('continuum-splash-seen-v2', '1'));
+    page.setDefaultTimeout(15000);
+    page.setDefaultNavigationTimeout(30000);
+    return page;
+  };
   try {
-   const transitionPage=await browser.newPage({viewport:{width:414,height:714},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
+   const transitionPage=await newPage({viewport:{width:414,height:714},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
    await transitionPage.goto(url);
+   await transitionPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
    await transitionPage.locator('[data-block="historia"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
    const header=transitionPage.locator('.atlas-landscape');
@@ -68,8 +76,9 @@ try {
    // La enciclopedia vive sobre una copia de la pantalla de origen. Al cerrarla se
    // reutiliza esa copia ya decodificada: si se repintara la portada, las carátulas
    // dejarían durante un instante su panel oscuro antes de volver a aparecer.
-   const encyclopediaPage=await browser.newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
+   const encyclopediaPage=await newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
    await encyclopediaPage.goto(url);
+   await encyclopediaPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
    await encyclopediaPage.evaluate(()=>scrollTo(0,Math.min(760,document.documentElement.scrollHeight-innerHeight)));
    await encyclopediaPage.locator('[data-action="home-encyclopedia"]').click();
    const encyclopediaModal=encyclopediaPage.locator('.enc-modal');
@@ -105,8 +114,9 @@ try {
    // ve. El botón llegó a quedarse fuera de la pantalla —`sticky` no funciona dentro de
    // `#app`, que recorta un eje y por eso es contenedor de desplazamiento— y el pliegue
    // se dibujaba como un arco dorado sobre el rótulo, por heredar la chapa del ✓.
-   const duelPage=await browser.newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
+   const duelPage=await newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
    await duelPage.goto(url);
+   await duelPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
    await duelPage.locator('[data-block="naturaleza"]').click();
    await duelPage.locator('[data-mode="animals"]').click();
    await duelPage.locator('[data-action="solo"]').click();
@@ -138,11 +148,12 @@ try {
    await duelPage.screenshot({path:`test-results/zoom/${engine}-duelo-muelle.png`});
    await duelPage.close();
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
-    const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
+    const page=await newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
     await page.addInitScript(()=>{
       localStorage.setItem('hilo-solo-history-v1',JSON.stringify({kind:'free',difficulty:'normal',mode:'history',day:new Date().toLocaleDateString('sv-SE'),deck:[1,2,3],timeline:[74],current:67,lives:3,hits:0,played:0,total:null,finished:false}));
     });
     await page.goto(url);
+    await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
     await page.locator('[data-block="historia"]').click();
     await page.locator('[data-mode="history"]').click();
     if(width===414) {

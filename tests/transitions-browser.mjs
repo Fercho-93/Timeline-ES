@@ -27,6 +27,7 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.addInitScript(() => localStorage.setItem('continuum-splash-seen-v2', '1'));
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
+    await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
     await page.evaluate(() => document.fonts.ready);
     const settle = async () => {
       await page.waitForFunction(() => !document.querySelector('.motion-entering'));
