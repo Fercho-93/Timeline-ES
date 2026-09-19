@@ -44,6 +44,13 @@ ok("un texto que no es base64 válido se rechaza", intentaDescodificar("no es un
 ok("un JSON válido pero de otra cosa se rechaza", intentaDescodificar(Buffer.from(JSON.stringify({ hola: "mundo" })).toString("base64url")) !== null);
 ok("una versión distinta de la actual se rechaza con su propio motivo", intentaDescodificar(Buffer.from(JSON.stringify({ v: 99, role: "offer", sdp: "x", type: "offer" })).toString("base64url")) === "VERSION_MISMATCH");
 
+console.log("\nTexto genérico (para la invitación completa: señal + datos de sala)");
+const textoOriginal = "{\"roomCode\":\"HZ7Q2K\",\"modeKey\":\"history\"}";
+const textoCodificado = LT.encodeText(textoOriginal);
+ok("el texto codificado es apto para una URL/QR", /^[A-Za-z0-9_-]+$/.test(textoCodificado));
+ok("el texto codificado descodifica igual", LT.decodeText(textoCodificado) === textoOriginal);
+ok("un texto con acentos también va y vuelve igual", LT.decodeText(LT.encodeText("año 1969, ñ")) === "año 1969, ñ");
+
 console.log("\nMensajes del canal de datos");
 const mensaje = LT.encodeMessage("place-card", { index: 3, cardId: "5009" });
 ok("el mensaje codificado es JSON", (() => { try { JSON.parse(mensaje); return true; } catch { return false; } })());

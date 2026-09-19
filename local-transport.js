@@ -188,6 +188,12 @@
   CT.LocalTransport = {
     ICE_CONFIG, MAX_SIGNAL_LENGTH,
     encodeSignal, decodeSignal, encodeMessage, decodeMessage,
+    // Codificación de texto genérica, sin las validaciones propias de la señal WebRTC:
+    // la usa `local-multiplayer.js` para meter en una sola invitación la señal y los
+    // datos de la sala (código, modalidad, huella del mazo) que el invitado todavía no
+    // conoce antes de unirse.
+    encodeText: text => toBase64Url(String(text)),
+    decodeText: encoded => fromBase64Url(String(encoded).trim()),
     createGuestPeer, createHostPeer, createHostSession
   };
 })();

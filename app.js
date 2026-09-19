@@ -292,6 +292,7 @@
     const common = 'viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
     if (kind === "local") return `<svg ${common}><rect x="7" y="2.75" width="10" height="18.5" rx="2.2"></rect><path d="M10.5 18h3"></path></svg>`;
     if (kind === "online") return `<svg ${common}><rect x="3" y="6" width="10" height="15" rx="2"></rect><rect x="11" y="2.75" width="10" height="15" rx="2"></rect><path d="M14 14.75h4"></path></svg>`;
+    if (kind === "offline") return `<svg ${common}><rect x="3" y="6" width="8" height="13" rx="1.8"></rect><rect x="13" y="5" width="8" height="13" rx="1.8"></rect><path d="M11 12h2"></path></svg>`;
     if (kind === "deck") return `<svg ${common}><path d="M12 6.6C10.4 5.3 8.5 4.7 6 4.7v12.9c2.5 0 4.4.6 6 1.9 1.6-1.3 3.5-1.9 6-1.9V4.7c-2.5 0-4.4.6-6 1.9Z"></path><path d="M12 6.6v12.9"></path></svg>`;
     return `<svg ${common}><circle cx="12" cy="8" r="3.25"></circle><path d="M5.5 21c.8-4.05 3.05-6 6.5-6s5.7 1.95 6.5 6"></path></svg>`;
   }
@@ -314,6 +315,7 @@
   function playChoices(resume) {
     const multi = `<button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
+      <button class="play-choice" data-action="local-multiplayer"><span class="choice-icon">${playIcon("offline")}</span><span><b>Sin conexión</b><small>Varios móviles, sin internet — una red Wi-Fi local basta.</small></span><i aria-hidden="true">→</i></button>
       ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}`;
     const solo = `<button class="play-choice walking-choice" data-action="solo"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
@@ -2942,6 +2944,13 @@
     </div>`;
   }
 
+  // A diferencia de `online.js`, no hace falta un `import()` dinámico: no descarga nada
+  // de fuera (ni Firebase ni ninguna CDN), así que se carga siempre con el resto de la
+  // aplicación, igual que `duelo.js`. `launchLocalMultiplayer` solo entrega el control.
+  function launchLocalMultiplayer() {
+    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: playMenu });
+  }
+
   async function launchOnline(roomCode = "", competition = null) {
     screen = "online-loading";
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
@@ -3077,6 +3086,7 @@
     else if (action === "competition-resume") resumeMultiCompetition();
     else if (action === "competition-round-start") { game.tournamentIntro = false; saveGame(); renderPass(); }
     else if (action === "online") launchOnline();
+    else if (action === "local-multiplayer") launchLocalMultiplayer();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
     else if (action === "continue") { cardsById = new Map(game.savedDeck.map(card => [card.id, card])); game.winners ? renderWinner(game.players.filter(p => game.winners.includes(p.id))) : pulseStage() === PULSE_PASE ? renderPulsePass() : renderPass(); }

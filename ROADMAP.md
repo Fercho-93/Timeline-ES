@@ -137,11 +137,21 @@ según el grupo de dispositivos.
       Bluetooth, AirDrop, Nearby Share, todo local sin internet), con el portapapeles como
       red de seguridad si el sistema no ofrece compartir. Con pruebas
       (`tests/compartir-local.mjs`).
-- [ ] Interfaz nueva "Sin conexión" (`local-multiplayer.js`, cargado bajo demanda como hace
-      `app.js` con `online.js`): instrucciones para activar el punto de acceso Wi-Fi de un
-      móvil (recomendando un Android como anfitrión si hay alguno en el grupo) y unirse el
-      resto por Wi-Fi normal.
-- [ ] Probar en dispositivos reales, en modo avión, con grupos mixtos Android/iPhone.
+- [x] Interfaz nueva "Sin conexión" (`local-multiplayer.js`) — incrustada en el juego de
+      verdad, no en un archivo aparte: tercera opción en el menú real de "¿Cómo quieres
+      jugar?" (junto a "Un solo móvil" y "Varios móviles"), reutilizando exactamente las
+      clases de `styles.css`/`edition.css` que ya pinta `online.js` (`.panel`,
+      `.online-form`, `.room-code-card`, `.lobby-table`, `.table-seat`, `.timeline-card`,
+      `.hand-card`…). Sin `import()` dinámico: no descarga nada de fuera, así que se carga
+      siempre con el resto de la aplicación, como `duelo.js`. Cubre crear sala, invitar,
+      unirse, vestíbulo y una partida jugable de principio a fin (dentro del alcance de
+      `local-room.js`: sin Fantasma, Pulso, torneo ni desempate de final secreta; sin
+      sorteo de quién empieza — empieza siempre quien organiza la sala). Con aviso del
+      punto de acceso Wi-Fi en la entrada, y pruebas de humo sobre el DOM real de
+      `index.html` (`tests/multijugador-local.mjs`).
+- [ ] Probar en dispositivos reales, en modo avión, con grupos mixtos Android/iPhone —
+      la conexión WebRTC en sí no se puede probar en Node (no hay `RTCPeerConnection`);
+      todo lo de alrededor sí está probado.
 
 ### Fase 2 — Descubrimiento nativo sin hotspot manual (grupos homogéneos)
 
