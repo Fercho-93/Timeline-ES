@@ -104,21 +104,31 @@ según el grupo de dispositivos.
 
 ### Fase 1 — Hotspot Wi-Fi + WebRTC + QR (cubre cualquier grupo con al menos un Android)
 
-- [ ] Extraer la lógica de sala de `online.js` detrás de una interfaz común
-      (`createRoom` / `joinRoom` / `onUpdate` / `sendAction`), independiente de Firestore.
+- [x] Lógica de sala independiente de Firestore (`local-room.js`): un reductor puro
+      (`createRoom` / `joinRoom` / `startRoom` / `placeCard` / `finishTurn` / `skipTurn` /
+      `removePlayer`, con `reduce({type, ...})` como entrada única), con pruebas
+      (`tests/sala-local.mjs`). Decisión de diseño: en vez de tocar el `online.js` que ya
+      funciona en producción —1675 líneas con la UI, las reglas y Firestore mezclados—, se
+      escribió aparte, con las mismas reglas, para no arriesgar el modo con internet que ya
+      usan los testers. `online.js` no se ha tocado.
+      **Alcance de esta primera versión: falta Fantasma, Pulso, torneo y el desempate de
+      final secreta** (varias personas sin cartas a la vez) — `finishTurn` avisa con
+      `TIE_NOT_SUPPORTED_YET` en ese caso en vez de fingir un resultado.
 - [x] Implementar el transporte sobre `RTCDataChannel` (`local-transport.js`), topología en
       estrella con el anfitrión como fuente de verdad (mismo modelo que las salas actuales).
-      Cubre la conexión en sí (anfitrión/invitado, mensajes) y sus pruebas (`tests/transporte-local.mjs`);
-      falta enchufarlo a la lógica de sala del punto anterior.
+      Cubre la conexión en sí (anfitrión/invitado, mensajes) y sus pruebas (`tests/transporte-local.mjs`).
 - [x] Configurar WebRTC sin depender de un servidor STUN/TURN alcanzable (`iceServers: []`
       en `local-transport.js`; solo candidatos locales, sin trickle ICE).
 - [x] Formato de señal (oferta/respuesta) codificado para cámara/QR — `encodeSignal` /
       `decodeSignal` en `local-transport.js`, con pruebas.
+- [ ] Enchufar `local-room.js` a `local-transport.js`: el anfitrión aplica cada acción que
+      llega de un invitado con `LocalRoom.reduce` y reparte el estado nuevo por el canal.
 - [ ] Señalización 100% offline de verdad: interfaz que enseñe y escanee ese formato como QR
       (generalizando el QR que ya dibuja `online.js` para las salas actuales).
-- [ ] Interfaz nueva "Sin conexión": instrucciones para activar el punto de acceso Wi-Fi de
-      un móvil (recomendando un Android como anfitrión si hay alguno en el grupo) y unirse
-      el resto por Wi-Fi normal.
+- [ ] Interfaz nueva "Sin conexión" (`local-multiplayer.js`, cargado bajo demanda como hace
+      `app.js` con `online.js`): instrucciones para activar el punto de acceso Wi-Fi de un
+      móvil (recomendando un Android como anfitrión si hay alguno en el grupo) y unirse el
+      resto por Wi-Fi normal.
 - [ ] Probar en dispositivos reales, en modo avión, con grupos mixtos Android/iPhone.
 
 ### Fase 2 — Descubrimiento nativo sin hotspot manual (grupos homogéneos)
