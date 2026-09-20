@@ -38,7 +38,13 @@ try {
     await page.locator('[data-action="home"]').last().click();
     await page.locator('[data-action="quick-challenges"]').click();
     await page.screenshot({path: `test-results/quick-challenges/setup-${width}.png`, fullPage: true});
-    await page.locator('#quick-length').selectOption('1');
+    await page.locator('#quick-name-0').fill('Ana');
+    await page.locator('[name="quick-count"][value="4"]').check();
+    assert.equal(await page.locator('[data-quick-name]').count(), 4);
+    assert.equal(await page.locator('#quick-name-0').inputValue(), 'Ana');
+    await page.locator('[name="quick-count"][value="2"]').check();
+    assert.equal(await page.locator('[data-quick-name]').count(), 2);
+    await page.locator('[name="quick-length"][value="1"]').check();
     await page.locator('#quick-choice').selectOption('poker');
     await page.locator('[data-quick="start"]').click();
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
