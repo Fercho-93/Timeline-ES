@@ -102,6 +102,8 @@ const riversSpain = CT.QuickCatalog.challenges.find(c => c.id === 'rivers-spain'
 assert.ok(riversSpain.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const foodsKcal = CT.QuickCatalog.challenges.find(c => c.id === 'foods-kcal');
 assert.ok(foodsKcal.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+const albumsSales = CT.QuickCatalog.challenges.find(c => c.id === 'albums-sales');
+assert.ok(albumsSales.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
 assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
