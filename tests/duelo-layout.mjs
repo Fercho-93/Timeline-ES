@@ -40,7 +40,7 @@ try {
       };
     });
     await page.addScriptTag({ url: '/mapa.js' });
-    await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();clearInterval(timer);}; window.redrawDuel=()=>{render();clearInterval(timer);};window.tickDuel=()=>{enteredAt=Date.now()-10000;updateClock();};` });
+    await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{cachedGames=options.nextGames||[];current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();clearInterval(timer);}; window.redrawDuel=()=>{render();clearInterval(timer);};window.tickDuel=()=>{enteredAt=Date.now()-10000;updateClock();};` });
     const fits = async label => {
       const sizes = await page.evaluate(() => ({ viewport: innerWidth, page: document.documentElement.scrollWidth, shell: document.querySelector('.turn-duel-shell').getBoundingClientRect().right }));
       assert.ok(sizes.page <= sizes.viewport + 1, `${width}px ${label}: page overflow ${JSON.stringify(sizes)}`);
@@ -92,7 +92,7 @@ try {
     assert.equal(await page.locator('[data-turn-action="accept"]').count(), 1);
     assert.equal(await page.locator('.hand-card').count(), 0);
     await fits('direct invitation');
-    await page.evaluate(() => showDuel({status:'expired',turnUid:null,plays:[{uid:'them',cardId:2,correct:true}]}));
+    await page.evaluate(() => showDuel({status:'expired',turnUid:null,plays:[{uid:'them',cardId:2,correct:true}],nextGames:[{id:'other',status:'playing',turnUid:'me'}]}));
     assert.equal(await page.locator('.turn-duel-last').count(), 1);
     assert.equal(await page.locator('.reveal .year').textContent(), '1001');
     assert.equal(await page.locator('[data-turn-action="rematch"]').count(), 1);
