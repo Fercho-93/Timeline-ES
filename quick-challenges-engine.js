@@ -11,7 +11,7 @@
     const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
-      if (!c || ids.has(c.id) || !Array.isArray(round.order) || round.order.length !== c.cards.length ||
+      if (!c || !Array.isArray(round.order) || round.order.length !== c.cards.length ||
           new Set(round.order).size !== c.cards.length || round.order.some(id => !c.cards.some(card => card.id === id))) throw Error('INVALID_DECK');
       ids.add(c.id);
     }

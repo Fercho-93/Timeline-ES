@@ -15,4 +15,7 @@
 .quick-shell .setup-section .field{margin-bottom:14px}
 .quick-shell .setup-section textarea{width:100%;max-width:100%;font-size:16px;padding:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px}
 .quick-shell .solo-panel>.btn{margin:8px 0}
+.quick-ready-card{text-align:center}
+.quick-ready-card .quick-countdown{display:grid;place-items:center;width:72px;height:72px;margin:18px auto;border:1px solid var(--accent);border-radius:50%;color:var(--accent);font:600 2.3rem/1 var(--font-display)}
+.quick-ready-card .btn{margin-top:12px}
 .quick-shell .play-choice>span:first-child:not(.walking-copy){min-width:0}

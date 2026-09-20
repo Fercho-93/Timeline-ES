@@ -19,7 +19,7 @@
     paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(playing ? 'data-quick="exit"' : page==='menu' ? 'data-action="home"' : 'data-quick="formats"', state ? 'data-quick="menu"' : '', playing)}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
-  let format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4;
+  let format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null, readyTimer = null;
   const DAILY = 'continuum-quick-daily-v1', BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1';
   const day = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
   function readJSON(key, fallback=null) {try{return JSON.parse(CT.Storage.getItem(key)) || fallback;}catch{return fallback;}}
@@ -51,8 +51,8 @@
     const freeIcon='<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>';
     const duelIcon='<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>';
     const dailyBody=`<p>Las mismas cartas para todo el mundo, un intento al día.</p>${button('daily',done?'Ver o continuar el reto de hoy':'Jugar el reto de hoy','btn btn-primary btn-block')}${score?`<p class="solo-done">Hoy ya lo has jugado: <strong>${score}</strong>.</p>`:''}`;
-    const freeBody=`<p>Elige un reto o juega tres temáticas variadas.</p><p class="hint">Mejor marca en tres retos: ${Number(readJSON(BEST,0)) || 0} puntos.</p>${button('free','Empezar <span>→</span>','btn btn-primary btn-block')}`;
-    const duelBody=`<p>De seguidos: juega y comparte las mismas cartas con otra persona. Por turnos: crea una sala para dos y volved cuando os toque.</p>${button('duel','Duelo de seguidos','btn btn-primary btn-block')}${button('turn-duel','Duelo por turnos','btn btn-secondary btn-block')}<div class="field"><label for="quick-duel-link">Enlace recibido</label><input id="quick-duel-link" type="url" placeholder="Pega aquí el enlace"></div>${button('accept-duel','Abrir duelo','btn btn-ghost btn-block')}`;
+    const freeBody=`<p>Elige la duración y juega mazos sorpresa.</p><p class="hint">Mejor marca: ${Number(readJSON(BEST,0)) || 0} puntos.</p>${button('free','Elegir duración <span>→</span>','btn btn-primary btn-block')}`;
+    const duelBody=`<p>Reta a otra persona por enlace. Se juega siempre por turnos, con el mismo mazo oculto para ambos.</p>${button('turn-duel','Crear o unirse al duelo','btn btn-primary btn-block')}`;
     shell(`<section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
       <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">Acertar suma. Plantarte asegura tus puntos. Fallar termina el reto y pierde los puntos provisionales.</p></div>
     ${soloFold('daily','Reto diario','Un reto distinto cada día',dailyIcon,dailyBody)}
@@ -61,15 +61,28 @@
   }
   function rounds(count=3, selectedId=null, seed=null) {
     const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed));
-    const list=selectedId?[E.challenge(selectedId)]:CT.shuffleWith(CT.QuickCatalog.challenges,random).slice(0,count);
+    if (selectedId) return [E.challenge(selectedId)].map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
+    const catalog=CT.shuffleWith(CT.QuickCatalog.challenges,random);
+    const list=Array.from({length:count},(_,i)=>catalog[i % catalog.length]);
     return list.map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
   }
-  function begin(config) {record={version:CT.QuickCatalog.version,config,commands:[]};state=E.create(config);selected=null;slot=null;save();render();}
+  function begin(config) {clearInterval(readyTimer);readyTimer=null;pendingConfig=null;record={version:CT.QuickCatalog.version,config,commands:[]};state=E.create(config);selected=null;slot=null;save();render();}
+  function prepare(config) {
+    pendingConfig=config; page='prepare'; state=null; record=null;
+    const c=E.challenge(config.rounds[0].id);
+    shell(`<section class="setup-section quick-ready"><div class="eyebrow"><span class="eyebrow-line"></span> Reto preparado</div><h2 data-focus tabindex="-1">${esc(c.title)}</h2><p class="lead">${config.rounds.length === 1 ? 'Un mazo sorpresa.' : `${config.rounds.length} mazos sorpresa, uno detrás de otro.`}</p><div class="panel quick-ready-card"><p>${esc(c.rule)}</p><div class="quick-countdown" aria-label="Cuenta atrás">3</div><p class="hint">Cuando estés preparado, empieza el reto. Los siguientes mazos seguirán ocultos hasta que lleguen.</p>${button('ready','Estoy preparado <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
+    let count=3; const clock=app().querySelector('.quick-countdown');
+    readyTimer=setInterval(()=>{count--; if (!clock?.isConnected || count <= 0) { clearInterval(readyTimer); readyTimer=null; if (clock?.isConnected) clock.textContent='¡'; return; } clock.textContent=String(count);},1000);
+  }
+  function freeSetup() {
+    stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
+    shell(`<section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> Partida libre</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los mazos se sortearán sin mostrarte cuáles son.</p><div class="panel"><div class="field"><label for="quick-free-length">Duración de la partida</label><select id="quick-free-length"><option value="1">1 mazo · partida rápida</option><option value="3" selected>3 mazos · partida estándar</option><option value="5">5 mazos · partida larga</option></select></div>${button('start-free','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
+  }
   function dailyGame() {
     const today=day(),saved=readJSON(DAILY);
     format='daily';
     if(saved?.config?.day===today){record=saved;state=E.restore(record);render();return;}
-    begin({names:['Tú'],rounds:rounds(1,null,`quick-${CT.QuickCatalog.version}-${today}`),kind:'daily',day:today});
+    prepare({names:['Tú'],rounds:rounds(1,null,`quick-${CT.QuickCatalog.version}-${today}`),kind:'daily',day:today});
   }
   function duelLink() {
     const url=new URL(location.href);url.hash='quick-duel='+CT.LocalTransport.encodeText(JSON.stringify(record));return url.href;
@@ -96,7 +109,7 @@
   function lobby(code) {
     state=null;const host=myId===room.host;
     shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Sala de Retos rápidos</h2><div class="panel"><p>${code?`Código: <strong>${esc(code)}</strong>`:'Sala en la red Wi-Fi local'}</p><ul>${room.names.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><p>${room.capacity===2 ? "Dos participantes." : "De 2 a 4 participantes."} ${host?'Empieza cuando estéis todos.':'Quien creó la sala elige cuándo empezar.'}</p>
-    ${host ? `<div class="field"><label for="quick-net-length">Duración</label><select id="quick-net-length"><option value="3">Tres retos variados</option><option value="1">Un solo reto</option></select></div><div id="quick-net-choice-wrap" class="field" hidden><label for="quick-net-choice">Elige el reto</label><select id="quick-net-choice"><option value="">Al azar</option>${CT.QuickCatalog.challenges.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div>${button('start-room','Empezar partida','btn btn-primary btn-block')}`:''}
+    ${host ? button('start-room','Sortear y empezar','btn btn-primary btn-block') : ''}
     ${connection?.kind==='local'&&host ? button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}
     ${code?button('share-room','Compartir enlace de sala','btn btn-secondary btn-block'):''}
     ${button('formats','Volver a los formatos','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
@@ -126,13 +139,15 @@
     if(action==='formats'){formatMenu();return true;}
     if(action==='show-multi'){const target=app().querySelector('[data-quick="show-multi"]'),panel=app().querySelector('#quick-multi');panel.hidden=!panel.hidden;target.setAttribute('aria-expanded',String(!panel.hidden));target.parentElement.classList.toggle('open',!panel.hidden);return true;}
     if(action==='solo-menu'){soloMenu();return true;}
-    if(['local','free','duel'].includes(action)){format=action;setup();return true;}
+    if(action==='local'){format=action;setup();return true;}
+    if(action==='free'){freeSetup();return true;}
+    if(action==='duel'||action==='turn-duel'){networkSetup('internet',2);return true;}
     if(action==='daily'){dailyGame();return true;}
     if(action==='accept-duel'){acceptDuel(app().querySelector('#quick-duel-link').value);return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(['internet','offline','turn-duel'].includes(action)){networkSetup(action==='offline'?'local':'internet',action==='turn-duel'?2:4);return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
-    if(action==='start-room'){await networkAction({type:'start',rounds:rounds(Number(app().querySelector('#quick-net-length').value),app().querySelector('#quick-net-length').value==='1' ? app().querySelector('#quick-net-choice').value || null : null)});return true;}
+    if(action==='start-room'){await networkAction({type:'start',rounds:rounds(1)});return true;}
     if(action==='share-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;await CT.LocalShare.shareSignal(url.href);return true;}
     if(action==='share-signal'){await CT.LocalShare.shareSignal(app().querySelector('#quick-signal').value);return true;}
     if(action==='invite-peer'){
@@ -170,7 +185,7 @@
     if(room)return;
     CT.Storage.setItem(KEY, JSON.stringify(record));
     if(record.config.kind==='daily')CT.Storage.setItem(DAILY,JSON.stringify(record));
-    if(record.config.kind==='free' && state.phase==='round-end' && state.index===2)CT.Storage.setItem(BEST,JSON.stringify(Math.max(Number(readJSON(BEST,0))||0,state.players[0].score)));
+    if(record.config.kind==='free' && state.phase==='round-end' && state.index===record.config.rounds.length-1)CT.Storage.setItem(BEST,JSON.stringify(Math.max(Number(readJSON(BEST,0))||0,state.players[0].score)));
   }
   function dispatch(command) {
     if(room){if(myTurn())void networkAction(command);return;}
@@ -256,6 +271,11 @@
     }
     if (action === 'menu') {menu(); return;}
     if (action === 'close-menu') {CT.closeDialog(); return;}
+    if (action === 'ready') { if (pendingConfig) begin(pendingConfig); return; }
+    if (action === 'start-free') {
+      const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
+      prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count}); return;
+    }
     if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', formatMenu); return;}
     if (action === 'setup') {setup(); return;}
     if (action === 'start') {
@@ -264,7 +284,7 @@
         app().querySelector('#quick-error').textContent = 'Escribe nombres diferentes para cada participante.'; return;
       }
       const count = Number(app().querySelector('#quick-length').value);
-      const list = count === 1 ? [E.challenge(app().querySelector('#quick-choice').value)] : CT.shuffle(CT.QuickCatalog.challenges).slice(0, count);
+      const list = count === 1 ? [E.challenge(app().querySelector('#quick-choice').value)] : rounds(count).map(round => E.challenge(round.id));
       const config = {names, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id))})),kind:format};
       record = {version: CT.QuickCatalog.version, config, commands: []}; state = E.create(config);
       save(); selected = null; slot = null; render(); return;
