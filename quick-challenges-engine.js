@@ -5,9 +5,9 @@
   const challenge = id => catalog.challenges.find(c => c.id === id);
   const clone = value => JSON.parse(JSON.stringify(value));
   function create(config) {
-    if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 4 ||
+    if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 8 ||
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
-        !Array.isArray(config.rounds) || ![1, 3].includes(config.rounds.length)) throw Error('INVALID_CONFIG');
+        !Array.isArray(config.rounds) || ![1, 3, 5].includes(config.rounds.length)) throw Error('INVALID_CONFIG');
     const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
@@ -23,7 +23,9 @@
     const round = s.config.rounds[s.index];
     s.timeline = [round.order[0]];
     s.remaining = round.order.slice(1);
-    s.current = s.index % s.players.length;
+    // El inicio rota en cada reto: nadie tiene ventaja por ser quien crea la sala.
+    s.starter = s.index % s.players.length;
+    s.current = s.starter;
     s.phase = 'turn'; s.result = null;
     s.players.forEach(p => {p.points = 0; p.status = 'active'; p.roundScore = 0;});
   }

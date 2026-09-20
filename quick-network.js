@@ -1,8 +1,8 @@
 (function () {
   'use strict';
   const CT = window.CONTINUUM, R = CT.QuickRoom;
-  function localHost(name, change, fail) {
-    let room = R.create('host', name), closed = false;
+  function localHost(name, change, fail, capacity=4) {
+    let room = R.create('host', name, capacity), closed = false;
     const transport = CT.LocalTransport.createHostSession((peerId, message) => {
       try {
         if (message.type !== 'quick-action') return;

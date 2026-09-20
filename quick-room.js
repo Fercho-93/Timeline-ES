@@ -15,7 +15,7 @@
     return room;
   }
   function validate(room) {
-    if (!room || room.version !== 1 || !Array.isArray(room.members) || room.members.length < 1 || ![2,4].includes(room.capacity) || room.members.length > room.capacity || new Set(room.members).size !== room.members.length || room.members[0] !== room.host || !Array.isArray(room.names) || room.names.length !== room.members.length || room.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) || !Number.isInteger(room.revision) || room.revision < 0) throw Error('Sala no válida.');
+    if (!room || room.version !== 1 || !Array.isArray(room.members) || room.members.length < 1 || !Number.isInteger(room.capacity) || room.capacity < 2 || room.capacity > 8 || room.members.length > room.capacity || new Set(room.members).size !== room.members.length || room.members[0] !== room.host || !Array.isArray(room.names) || room.names.length !== room.members.length || room.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) || !Number.isInteger(room.revision) || room.revision < 0) throw Error('Sala no válida.');
     if (room.config) {
       if (JSON.stringify(room.config.names) !== JSON.stringify(room.names)) throw Error('Participantes no válidos.');
       const derived = metadata(copy(room));
@@ -35,7 +35,7 @@
       r.members.push(id); r.names.push(name);
     } else if (action.type === 'start') {
       if (id !== r.host || r.phase !== 'lobby' || r.members.length < 2) throw Error('Solo quien crea la sala puede empezar, con al menos dos personas.');
-      r.config = {names:r.names, rounds:action.rounds}; E.create(r.config); metadata(r);
+      r.config = {names:r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null}; E.create(r.config); metadata(r);
     } else {
       if (!r.config || r.phase === 'finished' || id !== r.actor) throw Error('Espera tu turno.');
       const s = E.step(state(r), action);
