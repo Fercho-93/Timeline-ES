@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  CT.APP_VERSION = "continuum-v258";
+  CT.APP_VERSION = "continuum-v259";
   CT.Updates = { start };
   function start() {
     if (!("serviceWorker" in navigator) || window.Capacitor?.isNativePlatform?.()) return;
@@ -50,7 +50,7 @@
     async function check() {
       try {
         if (!registration) {
-          registration = await navigator.serviceWorker.register("service-worker.js");
+          registration = await navigator.serviceWorker.register("service-worker-258.js");
           registration.addEventListener("updatefound", () => {
             registration.installing?.addEventListener("statechange", refresh);
           });

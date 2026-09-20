@@ -1330,14 +1330,14 @@
         const progreso = CT.Enciclopedia.seenProgress(deck.key);
         return { seen: suma.seen + progreso.seen, total: suma.total + progreso.total };
       }, { seen: 0, total: 0 });
-      const desbloqueadas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas desbloqueadas` : "";
-      return `${count} de ${decks.reduce((sum, deck) => sum + deck.cards.length, 0)} cartas · ${decks.length} mazos · ${groups.length} temáticas${desbloqueadas}`;
+      const descubiertas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas descubiertas` : "";
+      return `${count} de ${decks.reduce((sum, deck) => sum + deck.cards.length, 0)} cartas · ${decks.length} mazos · ${groups.length} temáticas${descubiertas}`;
     }
     const mode = CT.mode(modeKey);
     // Las láminas descubiertas van aquí y no en cada carta: es un recuento del mazo, y
     // además explica de una vez por qué algunas ilustraciones se ven veladas.
     const laminas = CT.Enciclopedia.seenProgress(modeKey);
-    const descubiertas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas desbloqueadas` : "";
+    const descubiertas = laminas.total ? ` · ${laminas.seen} de ${laminas.total} láminas descubiertas` : "";
     return `${count} de ${mode.cards.length} ${escapeHtml(mode.cardLabel)} · ${escapeHtml(CT.axis(modeKey).timelineTitle)}${descubiertas}`;
   }
 
