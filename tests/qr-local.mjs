@@ -73,5 +73,19 @@ ok(`una invitación real (${inviteText.length} caracteres) cabe en un único có
 console.log("\nLímites");
 ok("un texto absurdamente largo se rechaza en vez de fallar en silencio", (() => { try { QrEncode.matrix("Q".repeat(4000)); return false; } catch (e) { return e.message === "QR_TEXT_TOO_LONG"; } })());
 
+// Una invitación completa genera un QR bastante más denso (100+ cuadraditos) que el
+// código corto de sala de online.js: si el CSS lo encoge a un cuadrado pequeño, cada
+// cuadradito queda por debajo de lo que una cámara real puede resolver a la distancia
+// normal a la que se enseña una pantalla a otra — visto en una prueba real (cámara activa,
+// código centrado, pero sin ninguna reacción). El marco y el lienzo tienen que poder crecer
+// con el hueco disponible, no quedarse en un tamaño fijo pensado para un código más simple.
+console.log("\nTamaño en pantalla (styles.css)");
+const css = fs.readFileSync(path.join(REPO, "styles.css"), "utf8");
+const marco = css.match(/\.qr-frame\s*\{([^}]*)\}/)?.[1] || "";
+const lienzo = css.match(/\.qr-frame canvas\s*\{([^}]*)\}/)?.[1] || "";
+const anchoMarco = Number(marco.match(/width:\s*min\(100%,\s*(\d+)px\)/)?.[1]);
+ok(`el marco del QR mide al menos 320px (${anchoMarco || "no encontrado"})`, anchoMarco >= 320);
+ok("el lienzo del QR ocupa el marco entero, no un tamaño fijo pequeño", /width:\s*9[0-9]%/.test(lienzo) && !/width:\s*min\([^)]*,\s*2\d\dpx\)/.test(lienzo));
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);
