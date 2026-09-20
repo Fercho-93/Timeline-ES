@@ -34,6 +34,7 @@ ok("un solo móvil y varios móviles siguen ahí, sin quitar nada", !!w.document
 click(w, '[data-action="local-multiplayer"]');
 ok("lleva a la entrada del modo sin conexión", w.document.body.innerHTML.includes("Una mesa"));
 ok("avisa del punto de acceso Wi-Fi antes de nada", /punto de acceso Wi-Fi/.test(w.document.body.innerHTML));
+ok("pide activar la cámara aquí, no cuando ya haga falta escanear", !!w.document.querySelector('[data-local-action="warm-camera"]'));
 
 console.log("\nCrear una sala");
 w.document.getElementById("local-name-host").value = "Fer";
