@@ -64,13 +64,13 @@ assert.throws(() => E.restore({version: -1, config, commands: []}));
 assert.throws(() => E.restore({version: 1, config, commands: [{type: 'place', cardId: 'missing', index: 0}]}));
 assert.throws(() => E.create({names: ['A', 'B'], rounds: [{id:'social', order: ['social-1']}]}));
 for (const c of CT.QuickCatalog.challenges) {
-  assert.ok(c.cards.length >= 2 && c.cards.length <= 20);
+  assert.ok(c.cards.length >= 2 && c.cards.length <= 25);
   assert.equal(new Set(c.cards.map(card => card.id)).size, c.cards.length);
   assert.ok(c.cards.every(card => Number.isFinite(card.value) && card.title && card.label && card.detail && card.source.startsWith('https://')));
 }
 const requestedDecks = ['sports-players','drinks','festivities','social','wwii','civil-war','kings','consoles','oscars','companies-founded','timezones-june','cities-east-west','cities-north-south','body','series-seasons','buildings','rivers-spain','foods-kcal','albums-sales','stadiums','capitals-altitude','eurovision-wins','storage','airports','metros','companies-revenue','spanish-tv','minimum-wages'];
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.some(c => c.id === id)));
-assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= 20));
+assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= 25));
 const social = CT.QuickCatalog.challenges.find(c => c.id === 'social');
 assert.equal(social.cards.length, 15);
 assert.ok(social.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));

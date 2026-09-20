@@ -34,7 +34,16 @@
         ['Fútbol',11,'11 jugadores','assets/quick-cards/sports-players-9.webp'],
         ['Cricket',11,'11 jugadores','assets/quick-cards/sports-players-10.webp'],
         ['Hockey hierba',11,'11 jugadores','assets/quick-cards/sports-players-11.webp'],
-        ['Rugby union',15,'15 jugadores','assets/quick-cards/sports-players-12.webp']
+        ['Rugby union',15,'15 jugadores','assets/quick-cards/sports-players-12.webp'],
+        ['Pádel',2,'2 jugadores','assets/quick-cards/sports-players-13.webp'],
+        ['Polo',4,'4 jugadores','assets/quick-cards/sports-players-14.webp'],
+        ['Netball',7,'7 jugadores','assets/quick-cards/sports-players-15.webp'],
+        ['Kin-ball',4,'4 jugadores','assets/quick-cards/sports-players-16.webp'],
+        ['Curling',4,'4 jugadores','assets/quick-cards/sports-players-17.webp'],
+        ['Hurling',15,'15 jugadores','assets/quick-cards/sports-players-18.webp'],
+        ['Vóley playa',2,'2 jugadores','assets/quick-cards/sports-players-19.webp'],
+        ['Natación artística',8,'8 nadadoras','assets/quick-cards/sports-players-20.webp'],
+        ['Fútbol americano',11,'11 jugadores','assets/quick-cards/sports-players-21.webp']
       ]
     ),
     d(
