@@ -73,7 +73,7 @@ assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
 const click = selector => {const el = w.document.querySelector(selector); assert.ok(el, selector); el.click();};
 click('[data-action="quick-challenges"]');
-assert.match(w.document.querySelector('#app').textContent, /Un solo móvil/);
+assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
 click('[data-quick="start"]');
 let saved = JSON.parse(w.localStorage.getItem(key));
 assert.equal(saved.config.rounds.length, 3);
