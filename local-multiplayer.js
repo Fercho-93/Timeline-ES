@@ -18,6 +18,8 @@
   const BACK_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg>';
   const SHARE_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>';
   const WIFI_ICON = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/></svg>';
+  const CAMERA_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="14" r="3.5"/></svg>';
+  const QR_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01"/></svg>';
 
   let onBackToMenu = null;
   let modeKey = "history";
@@ -32,6 +34,15 @@
   let busy = false;
   let cardsByIdCache = new Map();
 
+  // Mostrar un código como QR (animado si no cabe en uno solo) o leerlo con la cámara: la
+  // alternativa a "compartir"/pegar a mano cuando no hay ningún canal común entre los dos
+  // móviles. `qrCycleTimer` y `cameraHandle` son recursos en vivo (un temporizador, la
+  // cámara abierta) que hay que cerrar en cuanto se deja esa pantalla — el `paint` de más
+  // abajo lo hace solo con que la pantalla destino no sea la suya.
+  let qrShowText = "", qrShowTitle = "", qrShowOnBack = null;
+  let qrScanTitle = "", qrScanHint = "", qrScanOnResult = null, qrScanOnBack = null;
+  let qrCycleTimer = null, cameraHandle = null;
+
   function showToast(message) {
     const toastEl = document.getElementById("toast");
     if (!toastEl) return;
@@ -41,7 +52,14 @@
     showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 2500);
   }
 
-  function paint(html, pantalla) { CT.paint(appEl, html, pantalla); }
+  function stopQrCycle() { if (qrCycleTimer) { clearInterval(qrCycleTimer); qrCycleTimer = null; } }
+  function stopCamera() { cameraHandle?.stop(); cameraHandle = null; }
+
+  function paint(html, pantalla) {
+    if (pantalla !== "local-qr-show") stopQrCycle();
+    if (pantalla !== "local-qr-scan") stopCamera();
+    CT.paint(appEl, html, pantalla);
+  }
 
   // Cuando Android e iPhone no comparten ningún destino en la hoja de compartir del
   // sistema, queda copiar el texto a mano. Si el portapapeles tampoco está disponible, el
@@ -141,6 +159,7 @@
   // ---------------------------------------------------------------------------
   // Entrada
   function open(options = {}) {
+    stopCamera(); stopQrCycle();
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     role = null; hostSession = null; guestSession = null; roomState = null;
@@ -183,10 +202,11 @@
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2></section>
       <form class="panel online-form" data-local-form="join-offer">
         <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name"></div>
-        <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" required placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí… Si la hoja de compartir no lo entrega, pídele que lo copie y pégalo aquí a mano."></textarea></div>
+        <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí… Si la hoja de compartir no lo entrega, pídele que te enseñe su código QR y escanéalo abajo."></textarea></div>
         <button class="btn btn-primary btn-block" type="submit">Unirse</button>
+        <button type="button" class="btn btn-secondary btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código QR del anfitrión</button>
       </form>
-      <p class="online-note">¿No tienes el código? Pídele al anfitrión que lo comparta desde el vestíbulo.</p>
+      <p class="online-note">¿No tenéis ningún canal en común (por ejemplo, un Android y un iPhone)? Pídele que te enseñe su código QR y escanéalo con el botón de arriba.</p>
     </div>`, "local-unirse");
   }
 
@@ -221,6 +241,8 @@
         <p class="hint">¿Android e iPhone no se ven en la hoja de compartir? Copia el texto y pásaselo como puedas — un mensaje, o enseñándole la pantalla.</p>
         <textarea class="signal-box" readonly rows="4" aria-label="Tu respuesta, para copiar a mano si hace falta" onclick="this.select()">${escapeHtml(pendingAnswerText)}</textarea>
         <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-answer">Copiar</button>
+        <button type="button" class="btn btn-secondary btn-block" data-local-action="show-answer-qr">${QR_ICON} Mostrar como código QR</button>
+        <p class="hint">¿Sin ningún canal en común con quien organiza la sala? Que te escanee con la cámara desde su pantalla de invitar.</p>
       </div>
       <div class="status status-waiting"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Conectando con la sala…</span></div>
     </div>`, "local-unirse-compartir");
@@ -259,10 +281,13 @@
         <p class="hint">¿Android e iPhone no se ven en la hoja de compartir? Copia el texto y pásaselo como puedas — un mensaje, o enseñándole la pantalla para que lo copie.</p>
         <textarea class="signal-box" readonly rows="4" aria-label="Código de conexión, para copiar a mano si hace falta" onclick="this.select()">${escapeHtml(pendingInvite?.inviteText || "")}</textarea>
         <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-invite">Copiar</button>
+        <button type="button" class="btn btn-secondary btn-block" data-local-action="show-invite-qr">${QR_ICON} Mostrar como código QR</button>
+        <p class="hint">¿Sin ningún canal en común (por ejemplo, un Android y un iPhone)? Que la otra persona lo escanee con su cámara.</p>
       </div>
       <form class="panel" data-local-form="accept-answer">
         <div class="field"><label for="local-answer">Pega aquí la respuesta que te manden</label><textarea id="local-answer" name="answer" rows="3" placeholder="Cuando te la manden, pégala en este campo…"></textarea></div>
         <button class="btn btn-secondary btn-block" type="submit">Conectar</button>
+        <button type="button" class="btn btn-secondary btn-block" data-local-action="scan-answer">${CAMERA_ICON} Escanear su respuesta con la cámara</button>
       </form>
       <div class="status ${conectado ? "status-ok" : "status-waiting"}">${conectado
         ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Conectando…</span>'
@@ -281,6 +306,78 @@
       console.error(error);
       showToast(errorMessage(error.message));
     } finally { busy = false; }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Código como QR / lectura por cámara — para cuando "compartir" no tiene ningún destino
+  // en común entre los dos móviles (el caso típico: un Android y un iPhone en modo avión,
+  // sin Bluetooth emparejado ni AirDrop compatible entre ambos).
+  function openQrShow(text, { title, onBack }) {
+    qrShowText = text; qrShowTitle = title; qrShowOnBack = onBack;
+    renderQrShow();
+  }
+
+  function renderQrShow() {
+    screen = "local-qr-show";
+    paint(`<div class="shell online-shell">${header("qr-show-back")}
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Código QR</div><h2 data-focus tabindex="-1">${escapeHtml(qrShowTitle)}</h2><p class="lead">Enseña esta pantalla a la otra persona para que la escanee con la cámara de su móvil.</p></section>
+      <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-qr-canvas" aria-label="Código QR"></canvas></div><p class="hint" id="local-qr-progress" aria-live="polite"></p></div>
+      <button type="button" class="btn btn-ghost btn-block" data-local-action="qr-show-back">Ya lo ha escaneado</button>
+    </div>`, "local-qr-show");
+    startQrCycle();
+  }
+
+  function startQrCycle() {
+    stopQrCycle();
+    const canvas = document.getElementById("local-qr-canvas");
+    const progressEl = document.getElementById("local-qr-progress");
+    if (!canvas) return;
+    let frames;
+    try { frames = CT.QrFrames.split(qrShowText); }
+    catch (error) { console.error(error); showToast("El código es demasiado largo para mostrarlo como QR"); return; }
+    let index = 0;
+    const drawFrame = () => {
+      CT.QrEncode.draw(canvas, frames[index]);
+      if (progressEl) progressEl.textContent = frames.length > 1
+        ? `Parte ${index + 1} de ${frames.length} — espera a que pasen todas antes de cerrar`
+        : "Código listo para escanear";
+      index = (index + 1) % frames.length;
+    };
+    drawFrame();
+    if (frames.length > 1) qrCycleTimer = setInterval(drawFrame, 650);
+  }
+
+  function openQrScan({ title, hint, onResult, onBack }) {
+    qrScanTitle = title; qrScanHint = hint; qrScanOnResult = onResult; qrScanOnBack = onBack;
+    renderQrScan();
+  }
+
+  function renderQrScan() {
+    screen = "local-qr-scan";
+    paint(`<div class="shell online-shell">${header("qr-scan-back")}
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Cámara</div><h2 data-focus tabindex="-1">${escapeHtml(qrScanTitle)}</h2><p class="lead">${escapeHtml(qrScanHint)}</p></section>
+      <div class="panel qr-panel"><div class="qr-frame"><video id="local-qr-video" aria-label="Cámara"></video></div><p class="hint" id="local-qr-scan-status" aria-live="polite">Encuadra el código QR con la cámara.</p></div>
+    </div>`, "local-qr-scan");
+    startCameraScan();
+  }
+
+  async function startCameraScan() {
+    stopCamera();
+    const statusEl = document.getElementById("local-qr-scan-status");
+    if (!CT.QrScanner.isSupported()) { if (statusEl) statusEl.textContent = "Este navegador no permite usar la cámara aquí."; return; }
+    const videoEl = document.getElementById("local-qr-video");
+    const reader = CT.QrFrames.createReader();
+    try {
+      cameraHandle = await CT.QrScanner.start(videoEl, text => {
+        const progress = reader.ingest(text);
+        if (!progress) return;
+        if (statusEl) statusEl.textContent = progress.total > 1 ? `Leyendo… parte ${progress.received} de ${progress.total}` : "Leyendo…";
+        if (progress.done) { const onResult = qrScanOnResult; stopCamera(); onResult?.(progress.text); }
+      }, () => { if (statusEl) statusEl.textContent = "No se ha podido leer el código. Sigue encuadrándolo."; });
+    } catch (error) {
+      console.error(error);
+      if (statusEl) statusEl.textContent = "No se pudo acceder a la cámara. Revisa los permisos y vuelve a intentarlo.";
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -480,6 +577,27 @@
     }
     else if (action === "copy-invite") copyToClipboard(pendingInvite?.inviteText, "Código copiado");
     else if (action === "copy-answer") copyToClipboard(pendingAnswerText, "Respuesta copiada");
+    else if (action === "show-invite-qr") {
+      if (!pendingInvite) return;
+      openQrShow(pendingInvite.inviteText, { title: "Código de conexión", onBack: () => renderInvitar(false) });
+    }
+    else if (action === "show-answer-qr") openQrShow(pendingAnswerText, { title: "Tu respuesta", onBack: () => renderUnirseCompartir() });
+    else if (action === "scan-answer") openQrScan({
+      title: "Escanear respuesta", hint: "Apunta la cámara al código que te enseñe la otra persona.",
+      onResult: text => { renderInvitar(false); void acceptPendingAnswer(text); },
+      onBack: () => renderInvitar(false)
+    });
+    else if (action === "scan-offer") {
+      const name = String(document.getElementById("local-guest-name")?.value || "").trim().slice(0, 18);
+      if (!name) return showToast("Escribe tu nombre antes de escanear");
+      openQrScan({
+        title: "Escanear invitación", hint: "Apunta la cámara al código que te enseñe quien organiza la sala.",
+        onResult: text => { renderUnirseForm(); void doJoinWithOffer(name, text); },
+        onBack: () => renderUnirseForm()
+      });
+    }
+    else if (action === "qr-show-back") { const onBack = qrShowOnBack; qrShowOnBack = null; (onBack || renderEntrada)(); }
+    else if (action === "qr-scan-back") { const onBack = qrScanOnBack; qrScanOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "start") doStart();
     else if (action === "close-room") doCloseRoom();
     else if (action === "kick") { const name = roomState?.players[target.dataset.uid]?.name || "esta persona"; if (confirm(`¿Expulsar a ${name} de la sala?`)) doRemovePlayer(target.dataset.uid); }
