@@ -19,7 +19,6 @@
   const SHARE_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>';
   const WIFI_ICON = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/></svg>';
   const CAMERA_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="14" r="3.5"/></svg>';
-  const QR_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01"/></svg>';
 
   let onBackToMenu = null;
   let modeKey = "history";
@@ -34,14 +33,13 @@
   let busy = false;
   let cardsByIdCache = new Map();
 
-  // Mostrar un código como QR (animado si no cabe en uno solo) o leerlo con la cámara: la
-  // alternativa a "compartir"/pegar a mano cuando no hay ningún canal común entre los dos
-  // móviles. `qrCycleTimer` y `cameraHandle` son recursos en vivo (un temporizador, la
-  // cámara abierta) que hay que cerrar en cuanto se deja esa pantalla — el `paint` de más
-  // abajo lo hace solo con que la pantalla destino no sea la suya.
-  let qrShowText = "", qrShowTitle = "", qrShowOnBack = null;
+  // Leer un código con la cámara es la única pantalla de QR que necesita navegación
+  // propia (mostrar uno se pinta directamente donde haga falta, ver más abajo).
+  // `cameraHandle` es la cámara abierta en vivo: hay que cerrarla en cuanto se deja esa
+  // pantalla — el `paint` de más abajo lo hace solo con que la pantalla destino no sea la
+  // suya.
   let qrScanTitle = "", qrScanHint = "", qrScanOnResult = null, qrScanOnBack = null;
-  let qrCycleTimer = null, cameraHandle = null;
+  let cameraHandle = null;
 
   function showToast(message) {
     const toastEl = document.getElementById("toast");
@@ -52,11 +50,9 @@
     showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 2500);
   }
 
-  function stopQrCycle() { if (qrCycleTimer) { clearInterval(qrCycleTimer); qrCycleTimer = null; } }
   function stopCamera() { cameraHandle?.stop(); cameraHandle = null; }
 
   function paint(html, pantalla) {
-    if (pantalla !== "local-qr-show") stopQrCycle();
     if (pantalla !== "local-qr-scan") stopCamera();
     CT.paint(appEl, html, pantalla);
   }
@@ -119,12 +115,17 @@
   // invitado todavía no conoce (código, modalidad, huella del mazo). La respuesta del
   // invitado no necesita nada de esto — el anfitrión ya sabe en qué sala está — así que
   // esa viaja tal cual, sin envolver.
-  function encodeInvite(data) { return "CTM1:" + CT.LocalTransport.encodeText(JSON.stringify(data)); }
+  //
+  // Sin el paso extra por base64 que llevaba antes: todos los campos ya son texto seguro
+  // (letras, dígitos, puntos) generado por la propia aplicación, nunca escrito a mano por
+  // quien juega, así que el JSON en crudo no necesita esa envoltura — algo menos que
+  // meter en el código QR de la invitación (`qr-encode.js`).
+  function encodeInvite(data) { return "CTM1:" + JSON.stringify(data); }
   function decodeInvite(text) {
     const trimmed = String(text || "").trim();
     if (!trimmed.startsWith("CTM1:")) throw new Error("INVALID_INVITE");
     let data;
-    try { data = JSON.parse(CT.LocalTransport.decodeText(trimmed.slice(5))); }
+    try { data = JSON.parse(trimmed.slice(5)); }
     catch { throw new Error("INVALID_INVITE"); }
     if (!data || typeof data.signal !== "string" || typeof data.roomCode !== "string") throw new Error("INVALID_INVITE");
     return data;
@@ -145,9 +146,13 @@
   function hiddenLabel() { return CT.hiddenLabel(modeKey); }
   function timelineTitle() { return CT.timelineTitle(modeKey); }
 
+  // También hay que reaccionar desde "invitar" (anfitrión) y "comparte tu respuesta"
+  // (invitado): son las pantallas donde cada cual espera a que la conexión cuaje. Sin
+  // esto, aunque la sala ya estuviera lista, ninguno de los dos se enteraba y se quedaban
+  // mirando "Conectando…" para siempre — había que salir y volver a mano al vestíbulo.
   function onRoomChange(room) {
     roomState = room;
-    if (screen === "local-lobby" || screen === "local-game") renderCurrent();
+    if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir"].includes(screen)) renderCurrent();
   }
 
   function renderCurrent() {
@@ -159,7 +164,7 @@
   // ---------------------------------------------------------------------------
   // Entrada
   function open(options = {}) {
-    stopCamera(); stopQrCycle();
+    stopCamera();
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     role = null; hostSession = null; guestSession = null; roomState = null;
@@ -196,17 +201,20 @@
     renderLobby();
   }
 
+  // Escanear con la cámara es el camino normal — un único código, una única lectura — y
+  // pegarlo a mano queda como recurso para cuando la cámara no se pueda usar.
   function renderUnirseForm() {
     screen = "local-unirse";
     paint(`<div class="shell online-shell">${header("go-entrada")}
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2></section>
       <form class="panel online-form" data-local-form="join-offer">
         <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name"></div>
-        <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí… Si la hoja de compartir no lo entrega, pídele que te enseñe su código QR y escanéalo abajo."></textarea></div>
-        <button class="btn btn-primary btn-block" type="submit">Unirse</button>
-        <button type="button" class="btn btn-secondary btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código QR del anfitrión</button>
+        <button type="button" class="btn btn-primary btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código del anfitrión</button>
+        <details class="qr-fallback"><summary>¿No puedes usar la cámara?</summary>
+          <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí."></textarea></div>
+          <button class="btn btn-secondary btn-block" type="submit">Unirse con ese código</button>
+        </details>
       </form>
-      <p class="online-note">¿No tenéis ningún canal en común (por ejemplo, un Android y un iPhone)? Pídele que te enseñe su código QR y escanéalo con el botón de arriba.</p>
     </div>`, "local-unirse");
   }
 
@@ -232,20 +240,23 @@
     } finally { busy = false; }
   }
 
+  // Un único código QR, generado y enseñado directamente — sin un botón "mostrar como QR"
+  // aparte, es lo primero que se ve. Compartir por Bluetooth/AirDrop o copiar a mano queda
+  // como recurso, para cuando la cámara de quien organiza la sala no se pueda usar.
   function renderUnirseCompartir() {
     screen = "local-unirse-compartir";
     paint(`<div class="shell online-shell">${header("leave")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Comparte tu respuesta</h2><p class="lead">Mándasela de vuelta al anfitrión por el mismo camino — Bluetooth, AirDrop o Cerca.</p></section>
-      <div class="panel">
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Enséñale esto a quien organiza la sala</h2><p class="lead">Se incorporará sola en cuanto lo escanee con su cámara — no hace falta hacer nada más.</p></section>
+      <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-answer-qr" aria-label="Tu respuesta, en código QR"></canvas></div></div>
+      <details class="panel qr-fallback"><summary>¿No puede usar la cámara?</summary>
         <button type="button" class="btn btn-primary btn-block" data-local-action="share-answer">${SHARE_ICON} Compartir mi respuesta</button>
-        <p class="hint">¿Android e iPhone no se ven en la hoja de compartir? Copia el texto y pásaselo como puedas — un mensaje, o enseñándole la pantalla.</p>
         <textarea class="signal-box" readonly rows="4" aria-label="Tu respuesta, para copiar a mano si hace falta" onclick="this.select()">${escapeHtml(pendingAnswerText)}</textarea>
         <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-answer">Copiar</button>
-        <button type="button" class="btn btn-secondary btn-block" data-local-action="show-answer-qr">${QR_ICON} Mostrar como código QR</button>
-        <p class="hint">¿Sin ningún canal en común con quien organiza la sala? Que te escanee con la cámara desde su pantalla de invitar.</p>
-      </div>
+      </details>
       <div class="status status-waiting"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Conectando con la sala…</span></div>
     </div>`, "local-unirse-compartir");
+    try { CT.QrEncode.draw(document.getElementById("local-answer-qr"), pendingAnswerText); }
+    catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano."); }
   }
 
   // ---------------------------------------------------------------------------
@@ -260,7 +271,7 @@
       const invite = await hostSession.invitePeer();
       const inviteText = encodeInvite({
         v: 1, roomCode: roomState.roomCode, modeKey, deckFingerprint: roomState.deckFingerprint,
-        hostName: myName, signal: invite.offerSignal
+        signal: invite.offerSignal
       });
       pendingInvite = { ...invite, inviteText };
       renderInvitar(false);
@@ -271,29 +282,32 @@
     } finally { busy = false; }
   }
 
+  // Igual que en la pantalla del invitado: el código QR es lo primero que se ve, no algo
+  // detrás de un botón. Una vez la otra persona lo escanea y manda su respuesta —por el
+  // mismo camino, con su propia cámara— toca escanearla aquí para cerrar la conexión.
   function renderInvitar(conectado) {
     screen = "local-invitar";
     paint(`<div class="shell online-shell">${header("local-lobby")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Anfitrión</div><h2 data-focus tabindex="-1">Invitar a alguien</h2></section>
-      <div class="panel">
-        <p>Comparte el código de conexión por Bluetooth, AirDrop o Cerca — no pasa por internet.</p>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Anfitrión</div><h2 data-focus tabindex="-1">Invitar a alguien</h2><p class="lead">Que la otra persona escanee esto con su cámara para unirse a la sala.</p></section>
+      <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-invite-qr" aria-label="Código de invitación, en código QR"></canvas></div></div>
+      <details class="panel qr-fallback"><summary>¿No puede usar la cámara?</summary>
         <button type="button" class="btn btn-primary btn-block" data-local-action="share-invite">${SHARE_ICON} Compartir código</button>
-        <p class="hint">¿Android e iPhone no se ven en la hoja de compartir? Copia el texto y pásaselo como puedas — un mensaje, o enseñándole la pantalla para que lo copie.</p>
         <textarea class="signal-box" readonly rows="4" aria-label="Código de conexión, para copiar a mano si hace falta" onclick="this.select()">${escapeHtml(pendingInvite?.inviteText || "")}</textarea>
         <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-invite">Copiar</button>
-        <button type="button" class="btn btn-secondary btn-block" data-local-action="show-invite-qr">${QR_ICON} Mostrar como código QR</button>
-        <p class="hint">¿Sin ningún canal en común (por ejemplo, un Android y un iPhone)? Que la otra persona lo escanee con su cámara.</p>
-      </div>
-      <form class="panel" data-local-form="accept-answer">
-        <div class="field"><label for="local-answer">Pega aquí la respuesta que te manden</label><textarea id="local-answer" name="answer" rows="3" placeholder="Cuando te la manden, pégala en este campo…"></textarea></div>
-        <button class="btn btn-secondary btn-block" type="submit">Conectar</button>
-        <button type="button" class="btn btn-secondary btn-block" data-local-action="scan-answer">${CAMERA_ICON} Escanear su respuesta con la cámara</button>
-      </form>
-      <div class="status ${conectado ? "status-ok" : "status-waiting"}">${conectado
-        ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Conectando…</span>'
-        : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Esperando su respuesta…</span>'}</div>
-      <button type="button" class="btn btn-ghost btn-block" data-local-action="local-lobby">Ya se unió — ir al vestíbulo</button>
+      </details>
+      ${conectado
+        ? `<div class="status status-ok"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Conectando…</span></div>`
+        : `<button type="button" class="btn btn-primary btn-block" data-local-action="scan-answer">${CAMERA_ICON} Ya me ha enseñado su código — escanearlo</button>
+      <details class="panel qr-fallback"><summary>¿Te lo ha mandado a mano?</summary>
+        <form data-local-form="accept-answer">
+          <div class="field"><label for="local-answer">Pega aquí la respuesta que te manden</label><textarea id="local-answer" name="answer" rows="3" placeholder="Cuando te la manden, pégala en este campo…"></textarea></div>
+          <button class="btn btn-secondary btn-block" type="submit">Conectar</button>
+        </form>
+      </details>`}
+      <button type="button" class="btn btn-ghost btn-block" data-local-action="local-lobby">Ir al vestíbulo</button>
     </div>`, "local-invitar");
+    try { CT.QrEncode.draw(document.getElementById("local-invite-qr"), pendingInvite?.inviteText || ""); }
+    catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano."); }
   }
 
   async function acceptPendingAnswer(text) {
@@ -309,44 +323,11 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Código como QR / lectura por cámara — para cuando "compartir" no tiene ningún destino
-  // en común entre los dos móviles (el caso típico: un Android y un iPhone en modo avión,
-  // sin Bluetooth emparejado ni AirDrop compatible entre ambos).
-  function openQrShow(text, { title, onBack }) {
-    qrShowText = text; qrShowTitle = title; qrShowOnBack = onBack;
-    renderQrShow();
-  }
-
-  function renderQrShow() {
-    screen = "local-qr-show";
-    paint(`<div class="shell online-shell">${header("qr-show-back")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Código QR</div><h2 data-focus tabindex="-1">${escapeHtml(qrShowTitle)}</h2><p class="lead">Enseña esta pantalla a la otra persona para que la escanee con la cámara de su móvil.</p></section>
-      <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-qr-canvas" aria-label="Código QR"></canvas></div><p class="hint" id="local-qr-progress" aria-live="polite"></p></div>
-      <button type="button" class="btn btn-ghost btn-block" data-local-action="qr-show-back">Ya lo ha escaneado</button>
-    </div>`, "local-qr-show");
-    startQrCycle();
-  }
-
-  function startQrCycle() {
-    stopQrCycle();
-    const canvas = document.getElementById("local-qr-canvas");
-    const progressEl = document.getElementById("local-qr-progress");
-    if (!canvas) return;
-    let frames;
-    try { frames = CT.QrFrames.split(qrShowText); }
-    catch (error) { console.error(error); showToast("El código es demasiado largo para mostrarlo como QR"); return; }
-    let index = 0;
-    const drawFrame = () => {
-      CT.QrEncode.draw(canvas, frames[index]);
-      if (progressEl) progressEl.textContent = frames.length > 1
-        ? `Parte ${index + 1} de ${frames.length} — espera a que pasen todas antes de cerrar`
-        : "Código listo para escanear";
-      index = (index + 1) % frames.length;
-    };
-    drawFrame();
-    if (frames.length > 1) qrCycleTimer = setInterval(drawFrame, 650);
-  }
-
+  // Lectura por cámara — la única pantalla dedicada que hace falta: mostrar el código ya
+  // no la necesita (se dibuja directamente en la propia pantalla de invitar/compartir, ver
+  // más arriba). Con la librería completa de QR (`qr-encode.js`) una invitación entera
+  // cabe en un único código, así que aquí solo hay que leer uno y devolver su texto tal
+  // cual — nada que reunir ni trocear.
   function openQrScan({ title, hint, onResult, onBack }) {
     qrScanTitle = title; qrScanHint = hint; qrScanOnResult = onResult; qrScanOnBack = onBack;
     renderQrScan();
@@ -366,13 +347,11 @@
     const statusEl = document.getElementById("local-qr-scan-status");
     if (!CT.QrScanner.isSupported()) { if (statusEl) statusEl.textContent = "Este navegador no permite usar la cámara aquí."; return; }
     const videoEl = document.getElementById("local-qr-video");
-    const reader = CT.QrFrames.createReader();
     try {
       cameraHandle = await CT.QrScanner.start(videoEl, text => {
-        const progress = reader.ingest(text);
-        if (!progress) return;
-        if (statusEl) statusEl.textContent = progress.total > 1 ? `Leyendo… parte ${progress.received} de ${progress.total}` : "Leyendo…";
-        if (progress.done) { const onResult = qrScanOnResult; stopCamera(); onResult?.(progress.text); }
+        const onResult = qrScanOnResult;
+        stopCamera();
+        onResult?.(text);
       }, () => { if (statusEl) statusEl.textContent = "No se ha podido leer el código. Sigue encuadrándolo."; });
     } catch (error) {
       console.error(error);
@@ -577,11 +556,6 @@
     }
     else if (action === "copy-invite") copyToClipboard(pendingInvite?.inviteText, "Código copiado");
     else if (action === "copy-answer") copyToClipboard(pendingAnswerText, "Respuesta copiada");
-    else if (action === "show-invite-qr") {
-      if (!pendingInvite) return;
-      openQrShow(pendingInvite.inviteText, { title: "Código de conexión", onBack: () => renderInvitar(false) });
-    }
-    else if (action === "show-answer-qr") openQrShow(pendingAnswerText, { title: "Tu respuesta", onBack: () => renderUnirseCompartir() });
     else if (action === "scan-answer") openQrScan({
       title: "Escanear respuesta", hint: "Apunta la cámara al código que te enseñe la otra persona.",
       onResult: text => { renderInvitar(false); void acceptPendingAnswer(text); },
@@ -596,7 +570,6 @@
         onBack: () => renderUnirseForm()
       });
     }
-    else if (action === "qr-show-back") { const onBack = qrShowOnBack; qrShowOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "qr-scan-back") { const onBack = qrScanOnBack; qrScanOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "start") doStart();
     else if (action === "close-room") doCloseRoom();

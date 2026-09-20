@@ -1,8 +1,10 @@
-// El QR de una sola pieza (`qr-encode.js`, el mismo generador que ya usa `online.js` para
-// el enlace corto de sala) y el troceo en varias piezas para lo que no cabe en una
-// (`qr-frames.js`, para las señales WebRTC del modo "Sin conexión"). Sin cámara ni
-// `RTCPeerConnection` — eso no se puede probar en Node — pero todo lo que no depende de
-// hardware sí.
+// El código QR de la invitación (`qr-encode.js`, sobre la librería vendorizada
+// `qrcode-generator.js`) es la pieza más delicada del modo "Sin conexión": si genera un
+// código que parece válido pero no decodifica bien, la sala nunca llegaría a conectar y
+// nadie lo sabría hasta probarlo con dos móviles de verdad. Por eso esta prueba no se
+// queda en "genera una matriz" — la renderiza a píxeles reales y la decodifica con el
+// mismo `jsQR` que usa la cámara (`qr-scanner.js`), para varios tamaños de texto,
+// incluido uno del tamaño real de una invitación completa.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
@@ -16,81 +18,60 @@ const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " 
 function boot() {
   const dom = new JSDOM("<!doctype html><html><body></body></html>", { runScripts: "outside-only", url: "https://hilo.test/" });
   dom.window.CONTINUUM = {};
-  // Determinista en vez de al azar de verdad: así la letra de sesión de cada `split()` es
-  // predecible y las pruebas sobre sesiones distintas no dependen de que dos números al
-  // azar no coincidan (1 entre 36 de posibilidad de que sí, si se dejara el `crypto` real).
-  let contador = 0;
-  Object.defineProperty(dom.window, "crypto", { value: { getRandomValues: arr => { arr[0] = (contador++) % 256; return arr; } } });
+  dom.window.eval(read("qrcode-generator.js"));
   dom.window.eval(read("qr-encode.js"));
-  dom.window.eval(read("qr-frames.js"));
+  dom.window.eval(read("jsqr.js"));
   return dom.window;
 }
 
 const w = boot();
-const { QrEncode, QrFrames } = w.CONTINUUM;
+const { QrEncode } = w.CONTINUUM;
+const jsQR = w.jsQR;
 
-console.log("\nQrEncode: un solo código");
-ok("un texto corto genera una matriz cuadrada", (() => { const m = QrEncode.matrix("ABC"); return m.length === 37 && m.every(row => row.length === 37); })());
+console.log("\nGeneración de la matriz");
+ok("un texto corto genera una matriz cuadrada", (() => { const m = QrEncode.matrix("ABC"); return m.length > 0 && m.every(row => row.length === m.length); })());
 ok("dos textos distintos no generan la misma matriz", JSON.stringify(QrEncode.matrix("ABC")) !== JSON.stringify(QrEncode.matrix("XYZ")));
 ok("el mismo texto siempre genera la misma matriz", JSON.stringify(QrEncode.matrix("ABC")) === JSON.stringify(QrEncode.matrix("ABC")));
-ok("hasta 106 bytes cabe en un único código", (() => { QrEncode.matrix("Q".repeat(106)); return true; })());
-ok("107 bytes se rechaza en vez de truncar en silencio", (() => { try { QrEncode.matrix("Q".repeat(107)); return false; } catch (e) { return e.message === "QR_TEXT_TOO_LONG"; } })());
+ok("un texto más largo usa una matriz más grande, no la misma de siempre", QrEncode.matrix("Q".repeat(2000)).length > QrEncode.matrix("ABC").length);
 
-console.log("\nQrFrames: partir y reunir");
-const corto = "hola-invitado";
-const framesCortos = QrFrames.split(corto);
-ok("un texto que ya cabe en un código da una sola pieza", framesCortos.length === 1);
-ok("cada pieza empieza por Q y cabe en el límite del QR de una pieza", framesCortos.every(f => f.startsWith("Q") && [...new TextEncoder().encode(f)].length <= QrEncode.MAX_BYTES));
-
-const largo = Array.from({ length: 350 }, (unused, i) => (i % 36).toString(36)).join("").toUpperCase();
-const framesLargos = QrFrames.split(largo);
-ok("un texto largo se reparte en varias piezas", framesLargos.length > 1);
-ok("cada pieza sigue cabiendo en un solo QR", framesLargos.every(f => [...new TextEncoder().encode(f)].length <= QrEncode.MAX_BYTES));
-
-function leerTodas(frames, orden = frames.map((unused, i) => i)) {
-  const reader = QrFrames.createReader();
-  let ultimo = null;
-  for (const i of orden) ultimo = reader.ingest(frames[i]);
-  return ultimo;
+// Renderiza la matriz a un buffer RGBA en memoria, con el mismo esquema de colores que
+// draw() en qr-encode.js, y la decodifica con jsQR — sin esto, un bug en el orden de los
+// bits o en la máscara de la librería podría producir un código que "se ve" como un QR
+// pero que ninguna cámara real llegaría a leer.
+function decodifica(text) {
+  const modules = QrEncode.matrix(text);
+  const quietZone = 4;
+  const scale = Math.max(2, Math.min(8, Math.round(600 / modules.length)));
+  const size = (modules.length + quietZone * 2) * scale;
+  const data = new Uint8ClampedArray(size * size * 4);
+  for (let i = 0; i < data.length; i += 4) { data[i] = 0xff; data[i + 1] = 0xfa; data[i + 2] = 0xf0; data[i + 3] = 255; }
+  modules.forEach((row, y) => row.forEach((dark, x) => {
+    if (!dark) return;
+    for (let dy = 0; dy < scale; dy++) for (let dx = 0; dx < scale; dx++) {
+      const px = (x + quietZone) * scale + dx, py = (y + quietZone) * scale + dy;
+      const idx = (py * size + px) * 4;
+      data[idx] = 0x21; data[idx + 1] = 0x1b; data[idx + 2] = 0x16; data[idx + 3] = 255;
+    }
+  }));
+  const result = jsQR(data, size, size, { inversionAttempts: "dontInvert" });
+  return result?.data ?? null;
 }
 
-const resultado = leerTodas(framesLargos);
-ok("tras leer todas las piezas, el texto vuelve intacto", resultado.done && resultado.text === largo);
+console.log("\nDecodificado real con jsQR (no solo generar, también leer)");
+ok("un código corto (como el de sala de online.js) decodifica igual", decodifica("HOLA1234") === "HOLA1234");
+ok("un texto de tamaño medio decodifica igual", decodifica("X".repeat(300)) === "X".repeat(300));
 
-const desordenado = leerTodas(framesLargos, [...framesLargos.keys()].reverse());
-ok("da igual el orden en que lleguen las piezas", desordenado.done && desordenado.text === largo);
+// El tamaño real de una invitación completa (código de sala + huella del mazo + la señal
+// WebRTC entera) — esto es justo lo que antes obligaba a trocear en varios códigos QR
+// seguidos (`qr-frames.js`, ya retirado) y ahora cabe en uno solo.
+const sdp = "v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:abcd\r\na=ice-pwd:abcdefghijklmnopqrstuvwx\r\na=fingerprint:sha-256 AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=candidate:1 1 udp 2130706431 192.168.1.5 54321 typ host generation 0\r\na=end-of-candidates\r\n";
+const toBase64Url = text => Buffer.from(text, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const signal = toBase64Url(JSON.stringify({ v: 1, role: "offer", sdp, type: "offer" }));
+const inviteText = "CTM1:" + JSON.stringify({ v: 1, roomCode: "ABC123XY", modeKey: "history", deckFingerprint: "v3.502.1a2b3c4", signal });
+ok(`una invitación real (${inviteText.length} caracteres) cabe en un único código y decodifica igual`, decodifica(inviteText) === inviteText);
 
-{
-  const reader = QrFrames.createReader();
-  const primera = reader.ingest(framesLargos[0]);
-  ok("con una sola pieza todavía no está completo", primera.done === false && primera.received === 1);
-  const repetida = reader.ingest(framesLargos[0]);
-  ok("leer la misma pieza dos veces no adelanta el progreso", repetida.received === 1);
-}
-
-ok("un texto que no sigue el formato se ignora en vez de romper la lectura", QrFrames.createReader().ingest("esto no es un código nuestro") === null);
-
-{
-  // Un total de piezas más pequeño ya por sí solo reinicia la lectura.
-  const otraTanda = QrFrames.split(largo.slice(0, 50));
-  const reader = QrFrames.createReader();
-  reader.ingest(framesLargos[0]);
-  const trasCambiar = reader.ingest(otraTanda[0]);
-  ok("una tanda nueva con menos piezas no arrastra restos de la anterior", trasCambiar.total === otraTanda.length && trasCambiar.received === 1);
-}
-{
-  // Dos invitaciones seguidas con el mismo número de piezas tampoco deben mezclarse: la
-  // letra de sesión al azar de cada `split()` basta para que la segunda tanda reinicie la
-  // lectura aunque el total coincida por casualidad.
-  const mismaLongitud = largo.split("").reverse().join("");
-  const otraMismoTotal = QrFrames.split(mismaLongitud);
-  ok("la comparación de abajo tiene sentido: mismo total de piezas", otraMismoTotal.length === framesLargos.length);
-  const reader = QrFrames.createReader();
-  reader.ingest(framesLargos[0]);
-  reader.ingest(framesLargos[1]);
-  const trasCambiar = reader.ingest(otraMismoTotal[0]);
-  ok("una sesión distinta con el mismo total no arrastra piezas de la anterior", trasCambiar.received === 1);
-}
+console.log("\nLímites");
+ok("un texto absurdamente largo se rechaza en vez de fallar en silencio", (() => { try { QrEncode.matrix("Q".repeat(4000)); return false; } catch (e) { return e.message === "QR_TEXT_TOO_LONG"; } })());
 
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);
