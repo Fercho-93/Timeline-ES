@@ -71,6 +71,8 @@ for (const c of CT.QuickCatalog.challenges) {
 const requestedDecks = ['sports-players','drinks','festivities','social','wwii','civil-war','kings','consoles','oscars','companies-founded','timezones-june','cities-east-west','cities-north-south','body','series-seasons','buildings','rivers-spain','foods-kcal','albums-sales','stadiums','capitals-altitude','eurovision-wins','storage','airports','metros','companies-revenue','spanish-tv','minimum-wages'];
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.some(c => c.id === id)));
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= 20));
+const social = CT.QuickCatalog.challenges.find(c => c.id === 'social');
+assert.ok(social.cards.slice(0, 5).every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
 assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
