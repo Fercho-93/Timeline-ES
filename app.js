@@ -1377,7 +1377,7 @@
           ${conLaminas ? `<div class="field enc-lock-field">
             <span class="enc-lock-label" id="enc-lock-label">Láminas</span>
             <div class="enc-bands enc-locks" role="group" aria-labelledby="enc-lock-label">
-              ${chipLock("all", "Todas")}${chipLock("seen", "Desbloqueadas")}${chipLock("locked", "Bloqueadas")}
+              ${chipLock("all", "Todas")}${chipLock("seen", "Descubiertas")}${chipLock("locked", "Por descubrir")}
             </div>
           </div>` : ''}
         </div>
@@ -1445,7 +1445,7 @@
         ${statBox(resumen.games, resumen.games === 1 ? "partida" : "partidas")}
         ${statBox(resumen.cards, "cartas colocadas")}
         ${statBox(`${resumen.accuracy}%`, "de aciertos")}
-        ${statBox(resumen.bestRun, "mejor tirada seguida")}
+        ${statBox(resumen.bestRun, "racha máxima de aciertos")}
         ${statBox(resumen.bestStreak, "días seguidos de reto")}
         ${statBox(`${resumen.unlocked}/${resumen.total}`, "logros")}
       </div>
@@ -1475,16 +1475,26 @@
       <span><b>${escapeHtml(carta.title)}</b><small>${escapeHtml(carta.modeName)}</small></span>
       <i aria-hidden="true">→</i>
     </button>`).join("");
-    return `<div class="section-label">Puntos débiles</div>
+    return `<div class="section-label">Para practicar</div>
       <div class="panel weak-panel">
-        ${bandas.length ? `<h3>Dónde más se falla</h3><div class="weak-list" role="group" aria-label="Tramos con menos aciertos">${filasBandas}</div>` : ""}
-        ${cartas.length ? `<h3>Cartas que se atragantan</h3><div class="weak-list" role="group" aria-label="Cartas falladas más veces">${filasCartas}</div>` : ""}
+        ${bandas.length ? `<h3>Tramos para practicar</h3><div class="weak-list" role="group" aria-label="Tramos con menos aciertos">${filasBandas}</div>` : ""}
+        ${cartas.length ? `<h3>Cartas para repasar</h3><div class="weak-list" role="group" aria-label="Cartas falladas más veces">${filasCartas}</div>` : ""}
       </div>`;
+  }
+
+  function perfilColeccion() {
+    const keys = Object.keys(CT.MODES || {}).filter(key => key !== "mixed" && (!CT.Cartera || CT.Cartera.tiene(key)));
+    const total = keys.reduce((sum, key) => sum + (CT.Enciclopedia?.seenProgress(key)?.total || 0), 0);
+    const seen = keys.reduce((sum, key) => sum + (CT.Enciclopedia?.seenProgress(key)?.seen || 0), 0);
+    const decks = keys.length;
+    return `<div class="panel perfil-collection"><div><b>${seen}/${total}</b><span>láminas descubiertas</span></div><small>${decks} ${decks === 1 ? "mazo disponible" : "mazos disponibles"} · juega una carta para completar tu álbum</small></div>`;
   }
 
   function perfilLogros(logros) {
     const grupos = LOGRO_GRUPOS.filter(grupo => logros.some(logro => logro.group === grupo));
+    const siguiente = logros.find(logro => !logro.unlocked);
     return `<div class="section-label">Logros <small>${logros.filter(l => l.unlocked).length} de ${logros.length}</small></div>
+      ${siguiente ? `<p class="profile-next-goal"><b>Siguiente objetivo:</b> ${escapeHtml(siguiente.name)} · ${escapeHtml(siguiente.desc)}</p>` : '<p class="profile-next-goal">Has conseguido todos los logros disponibles.</p>'}
       ${grupos.map(grupo => `<details class="perfil-achievement-group"><summary><span><b>${escapeHtml(grupo)}</b><small>${logros.filter(l => l.group === grupo && l.unlocked).length} de ${logros.filter(l => l.group === grupo).length} conseguidos</small></span><i aria-hidden="true">+</i></summary>
         <div class="logro-grid" role="group" aria-label="Logros de ${escapeHtml(grupo)}">
           ${logros.filter(logro => logro.group === grupo).map(logroCard).join("")}
@@ -1535,6 +1545,7 @@
           ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
           : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
         ${perfilResumen(resumen)}
+        ${perfilColeccion()}
         <div class="perfil-layout"><div class="perfil-main"><section class="panel turn-duel-profile" id="turn-duels-profile"><h2>Mis duelos</h2><p role="status">Cargando tus partidas…</p></section>
         ${perfilPorJuego(filas)}
         ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
