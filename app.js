@@ -54,7 +54,7 @@
     // encima justo después.
     if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
     const routes = {'home': home, 'play-menu': playMenu, 'solo-home': soloHome,
-      'competition-menu': competitionMenu, 'perfil': perfilView};
+      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'perfil': perfilView};
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
     if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
     // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
@@ -449,12 +449,17 @@
     const buttons = resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '';
     return buttons ? `<section class="quick-actions" aria-label="Jugar ahora">${buttons}</section>` : '';
   }
+  function quickChallenges() {
+    screen = "quick-challenges";
+    CT.Quick.open((html, playing) => {screen = playing ? "quick-game" : "quick-challenges"; paint(html);});
+  }
+
   function home() {
     pendingTournament = null;
     screen = "home";
     paint(`<div class="shell home-shell home-gallery-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
       ${homeMasthead()}${quickActions()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
-      <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section></div></section>
+      <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section>${CT.Quick.promo()}</div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
@@ -3091,7 +3096,8 @@
     if (app.dataset.screen?.startsWith('online-') && ['home-top', 'home-encyclopedia', 'perfil', 'rules'].includes(action)) {
       CT.onlineNavigate?.(action); return;
     }
-    if (action === 'ui-back') uiBack();
+    if (action === 'quick-challenges') quickChallenges();
+    else if (action === 'ui-back') uiBack();
     else if (action === 'solo-options') soloOptions();
     else if (action === "retry-online") launchOnline();
     else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));

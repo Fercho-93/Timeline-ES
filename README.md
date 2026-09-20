@@ -1,5 +1,46 @@
 # Continuum
 
+## Retos rápidos y ¿Cuántos hay…?
+
+La portada ofrece **Retos rápidos**, una partida por puntos para 2–4 jugadores o
+equipos en **un solo móvil**. Se puede elegir un reto o jugar tres retos distintos
+al azar. Esta primera versión no crea salas entre varios móviles ni usa el
+marcador de Competición: mantiene su propia partida guardada.
+
+Cada conjunto tiene como máximo diez cartas, incluida una referencia inicial que
+no puntúa. En cada turno se elige una carta común y se confirma su hueco en la
+línea. Acertar suma un punto provisional y pasa el turno; fallar pierde los puntos
+de ese reto y retira al participante hasta el siguiente. Plantarse asegura los
+puntos y también retira al participante. Los puntos de retos anteriores nunca se
+pierden. Una carta fallada se coloca correctamente como referencia.
+
+Al agotarse las cartas se aseguran los puntos pendientes; también termina el reto
+si nadie sigue activo. La última persona activa puede continuar o plantarse. El
+primer turno rota entre retos. Gana la mayor puntuación acumulada y los empates
+finales se comparten. La rotación reduce la ventaja inicial, pero no garantiza el
+mismo número de intentos: depende de los fallos, retiradas y cartas disponibles.
+
+El catálogo inicial contiene redes sociales (6 cartas), películas por Óscar (10),
+graduación de bebidas concretas (6) y categorías de manos del póker (9). Cada carta
+incluye dato, explicación y fuente, accesible al revelar y al repasar el orden
+completo. En póker, la escalera real forma parte de la categoría escalera de color.
+La colocación admite empates reales y retos de orden ascendente o descendente.
+
+**¿Cuántos hay…?** queda reservado como gran mazo de cantidades, con el contenido
+pendiente de selección. Se anuncia como «En preparación» y no se incorpora como
+mazo vacío a partidas, enciclopedia, compras o rotación de Competición.
+
+`quick-challenges-data.js` contiene el catálogo independiente y la reserva del
+mazo futuro. `quick-challenges-engine.js` reutiliza la comparación de `engine.js`;
+`quick-challenges.js` presenta los turnos y guarda una configuración y un historial
+de acciones en el almacenamiento de la cuenta. La recuperación reproduce acciones
+válidas en vez de aceptar puntuaciones guardadas. Si cambia el significado de los
+datos o las reglas, debe incrementarse `QuickCatalog.version`.
+
+Validación: `node tests/quick-challenges.mjs`. La prueba visual
+`node tests/quick-challenges-browser.mjs` necesita Playwright/Chromium y acepta
+`PLAYWRIGHT_MODULE` y `CHROME_PATH`, igual que las otras pruebas de navegador.
+
 ## Competición por rondas
 
 Desde la portada se abre Modo competición. En la siguiente hoja se elige Jugar solo o Multijugador; este último se despliega para escoger un móvil o varios móviles. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por ronda. Cada ronda usa un mazo aleatorio diferente; Gran mezcla se excluye porque combina otros mazos.
