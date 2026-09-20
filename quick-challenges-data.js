@@ -1,40 +1,48 @@
 (function () {
   'use strict';
-  const filmSource = 'https://www.filmsite.org/oscars2.html';
-  const pokerSource = 'https://www.pokerstars.com/poker/games/rules/hand-rankings/';
-  const cards = (prefix, rows) => rows.map(([title, value, label, detail, source], i) => ({id: `${prefix}-${i + 1}`, title, value, label, detail, source}));
-  window.CONTINUUM.QuickCatalog = {
-    version: 1,
-    upcoming: {key: 'counts', name: '¿Cuántos hay…?', status: 'planned', axis: 'count', cards: []},
-    challenges: [
-      {id: 'social', title: 'Redes sociales', rule: 'De más antigua a más reciente', context: 'Año del primer lanzamiento del servicio indicado, aunque su acceso inicial fuese limitado.', direction: 1, cover: 'history', cards: cards('social', [
-        ['LinkedIn', 2003, '2003', 'El servicio se lanzó el 5 de mayo de 2003.', 'https://www.linkedin.com/blog/member/archive/happy-cinco-de'],
-        ['Facebook', 2004, '2004', 'TheFacebook comenzó en Harvard el 4 de febrero de 2004.', 'https://about.fb.com/ltam/company.info/'],
-        ['YouTube', 2005, '2005', 'La beta del servicio se lanzó en mayo de 2005.', 'https://blog.youtube/news-and-events/celebrating-10-years-of-youtube/'],
-        ['Instagram', 2010, '2010', 'Instagram llegó al público en octubre de 2010.', 'https://techcrunch.com/2010/10/06/instagram-launch/'],
-        ['Snapchat', 2011, '2011', 'Se lanzó con el nombre Snapchat en septiembre de 2011, tras el prototipo Picaboo.', 'https://newsroom.snap.com/lets-chat'],
-        ['Threads', 2023, '2023', 'Meta presentó Threads en julio de 2023; su llegada a Europa fue posterior.', 'https://about.fb.com/news/2023/07/introducing-threads-new-app-text-sharing/']
-      ])},
-      {id: 'oscars', title: 'Películas por Óscar', rule: 'De más premios ganados a menos', context: 'Premios competitivos ganados por cada película; no nominaciones ni premios honoríficos. Los empates son válidos.', direction: -1, cover: 'entertainment', cards: cards('oscars', [
-        ['Titanic (1997)', 11], ['West Side Story (1961)', 10], ['El paciente inglés (1996)', 9],
-        ['Amadeus (1984)', 8], ['La lista de Schindler (1993)', 7], ['Forrest Gump (1994)', 6],
-        ['Gladiator (2000)', 5], ['La forma del agua (2017)', 4], ['El padrino (1972)', 3], ['Joker (2019)', 2]
-      ].map(([title, value]) => [title, value, `${value} Óscar`, `La película ganó ${value} premios competitivos de la Academia.`, filmSource]))},
-      {id: 'drinks', title: 'Graduación de bebidas', rule: 'De menor a mayor graduación', context: 'Porcentaje de alcohol por volumen de estas versiones concretas, según las fichas enlazadas. No se comparan categorías genéricas de bebida.', direction: 1, cover: 'science', cards: cards('drinks', [
-        ['Guinness Draught', 4.2, '4,2 % vol.', 'Graduación de Guinness Draught en la ficha del fabricante.', 'https://www.guinness.com/es-es/preguntas-frecuentes'],
-        ['Heineken Original', 5, '5 % vol.', 'Versión original de la cerveza, según la ficha neerlandesa.', 'https://www.heineken.com/nl/nl/onze-producten/heineken-origineel'],
-        ['Aperol', 11, '11 % vol.', 'Aperol sin mezclar, según la ficha española; no el cóctel Spritz.', 'https://www.aperol.com/es-es/faq/ingredientes-y-nutricion/'],
-        ['Baileys Original Irish Cream', 17, '17 % vol.', 'Versión Original Irish Cream de la ficha estadounidense.', 'https://www.baileys.com/en-us/products/baileys-original-irish-cream'],
-        ['Jägermeister Original', 35, '35 % vol.', 'Licor original, según la ficha alemana del fabricante.', 'https://de.jagermeister.com/hilfe-kontakt/wie-viel-prozent-alkoholgehalt-hat-jaegermeister'],
-        ['Absolut Vodka Original', 40, '40 % vol.', 'Vodka Original sin aromatizar, según la ficha del fabricante.', 'https://www.absolut.com/en/products/absolut-vodka/']
-      ])},
-      {id: 'poker', title: 'Manos del póker', rule: 'De menor a mayor fuerza', context: 'Categorías de cinco cartas en póker alto, sin comodines. La escalera real está incluida en la escalera de color.', direction: 1, cover: 'entertainment', cards: cards('poker', [
-        ['Carta alta', 'Sin pareja ni otra combinación superior.'], ['Pareja', 'Dos cartas del mismo valor.'],
-        ['Doble pareja', 'Dos parejas de valores diferentes.'], ['Trío', 'Tres cartas del mismo valor.'],
-        ['Escalera', 'Cinco valores consecutivos, sin que todas las cartas sean del mismo palo.'],
-        ['Color', 'Cinco cartas del mismo palo, sin formar una escalera.'], ['Full', 'Un trío y una pareja.'],
-        ['Póker', 'Cuatro cartas del mismo valor.'], ['Escalera de color', 'Cinco cartas consecutivas del mismo palo. La escalera real es la más alta de esta categoría.']
-      ].map(([title, detail], i) => [title, i + 1, `${i + 1}.ª de 9 categorías`, detail, pokerSource]))}
-    ]
+  // Primera fase: cartas sin ilustración. Cada carta conserva una fuente pública para
+  // poder auditarla y sustituirla más adelante sin tocar el motor de juego.
+  const cards = (prefix, source, rows) => rows.map(([title, value, label], i) => ({
+    id: `${prefix}-${i + 1}`, title, value, label,
+    detail: `${label}. Dato de referencia documentado en la fuente del mazo.`, source
+  }));
+  const deck = (id, title, rule, context, direction, cover, source, rows) => ({ id, title, rule, context, direction, cover, cards: cards(id, source, rows) });
+  const S = {
+    sport: 'https://www.olympics.com/ioc/olympic-games', drinks: 'https://www.niaaa.nih.gov/alcohols-effects-health/alcohol-topics/what-standard-drink', dates: 'https://www.timeanddate.com/holidays/',
+    social: 'https://en.wikipedia.org/wiki/Timeline_of_social_media', wwii: 'https://www.iwm.org.uk/history/second-world-war-timeline', civil: 'https://www.britannica.com/event/Spanish-Civil-War', kings: 'https://www.casareal.es/EN/FamiliaReal/ReyFelipeVI/Paginas/subhome.aspx',
+    consoles: 'https://www.britannica.com/technology/video-game/History-of-video-games', oscar: 'https://www.filmsite.org/oscars2.html', companies: 'https://www.britannica.com/topic/Apple-Inc', timezone: 'https://www.timeanddate.com/time/zone/', geo: 'https://www.geonames.org/', body: 'https://www.britannica.com/science/human-body', series: 'https://www.imdb.com/', buildings: 'https://www.skyscrapercenter.com/buildings', rivers: 'https://www.chduero.es/portals/0/documentos/El%20Duero%20y%20sus%20afluentes.pdf', food: 'https://fdc.nal.usda.gov/', albums: 'https://www.guinnessworldrecords.com/world-records/best-selling-album', stadiums: 'https://www.worldstadiums.com/', capitals: 'https://www.britannica.com/topic/list-of-national-capitals', eurovision: 'https://eurovision.tv/event', storage: 'https://www.bipm.org/en/measurement-units/si-prefixes', airports: 'https://aci.aero/resources/busiest-airports-in-the-world/', metro: 'https://en.wikipedia.org/wiki/List_of_metro_systems', fortune: 'https://fortune.com/ranking/global500/', tv: 'https://www.rtve.es/television/', wages: 'https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Minimum_wage_statistics'
   };
+  const d = (id, title, rule, context, direction, cover, source, rows) => deck(id, title, rule, context, direction, cover, source, rows);
+  window.CONTINUUM.QuickCatalog = { version: 2, upcoming: {key: 'counts', name: '¿Cuántos hay…?', status: 'planned', axis: 'count', cards: []}, challenges: [
+    d('sports-players','Jugadores en el terreno','De menos a más jugadores por equipo','Modalidad estándar.',1,'sports',S.sport,[['Baloncesto',5,'5 jugadores'],['Voleibol',6,'6 jugadores'],['Fútbol',11,'11 jugadores'],['Rugby union',15,'15 jugadores']]),
+    d('drinks','Graduación de bebidas','De menor a mayor porcentaje de alcohol','Se comparan versiones concretas.',1,'science',S.drinks,[['Cerveza lager',5,'5 % vol.'],['Vino de mesa',13,'13 % vol.'],['Jerez',15,'15 % vol.'],['Whisky',40,'40 % vol.'],['Absenta',60,'60 % vol.']]),
+    d('festivities','Festividades del año','De la primera a la última fecha','Día del año en un año no bisiesto.',1,'history',S.dates,[['Año Nuevo',1,'1 de enero'],['San Valentín',45,'14 de febrero'],['Día del Libro',113,'23 de abril'],['Halloween',304,'31 de octubre'],['Navidad',359,'25 de diciembre']]),
+    d('social','Lanzamiento de redes sociales','De más antigua a más reciente','Primer lanzamiento del servicio.',1,'history',S.social,[['LinkedIn',2003,'2003'],['Facebook',2004,'2004'],['YouTube',2005,'2005'],['Instagram',2010,'2010'],['TikTok',2016,'2016']]),
+    d('wwii','Segunda Guerra Mundial','De más antiguo a más reciente','Fechas de hitos del conflicto.',1,'history',S.wwii,[['Invasión de Polonia',19390901,'1 septiembre 1939'],['Caída de Francia',19400622,'22 junio 1940'],['Pearl Harbor',19411207,'7 diciembre 1941'],['Desembarco de Normandía',19440606,'6 junio 1944'],['Victoria en Europa',19450508,'8 mayo 1945']]),
+    d('civil-war','Guerra Civil Española','De más antiguo a más reciente','Fechas de hitos del conflicto.',1,'history',S.civil,[['Sublevación militar',19360717,'17 julio 1936'],['Batalla de Brunete',19370706,'6 julio 1937'],['Batalla del Ebro',19380725,'25 julio 1938'],['Caída de Barcelona',19390126,'26 enero 1939'],['Fin de la guerra',19390401,'1 abril 1939']]),
+    d('kings','Reyes de España','Según el inicio de su reinado','Se ordena el comienzo del reinado.',1,'history',S.kings,[['Isabel I de Castilla',1474,'1474'],['Carlos I',1516,'1516'],['Felipe II',1556,'1556'],['Felipe V',1700,'1700'],['Juan Carlos I',1975,'1975'],['Felipe VI',2014,'2014']]),
+    d('consoles','Consolas de videojuegos','Según su primera salida al mercado','Se mezclan fabricantes y generaciones.',1,'entertainment',S.consoles,[['Magnavox Odyssey',1972,'1972'],['Nintendo Entertainment System',1983,'1983'],['PlayStation',1994,'1994'],['Wii',2006,'2006'],['Nintendo Switch',2017,'2017']]),
+    d('oscars','Películas por Óscar','De más premios ganados a menos','No se cuentan nominaciones ni premios honoríficos.',-1,'entertainment',S.oscar,[['Titanic (1997)',11,'11 Óscar'],['West Side Story (1961)',10,'10 Óscar'],['El paciente inglés (1996)',9,'9 Óscar'],['Amadeus (1984)',8,'8 Óscar'],['La lista de Schindler (1993)',7,'7 Óscar'],['Forrest Gump (1994)',6,'6 Óscar'],['Gladiator (2000)',5,'5 Óscar'],['La forma del agua (2017)',4,'4 Óscar'],['El padrino (1972)',3,'3 Óscar'],['Joker (2019)',2,'2 Óscar']]),
+    d('companies-founded','Empresas por fecha de creación','De más antigua a más reciente','Año de fundación de la compañía.',1,'history',S.companies,[['Microsoft',1975,'1975'],['Apple',1976,'1976'],['Amazon',1994,'1994'],['Netflix',1997,'1997'],['Google',1998,'1998']]),
+    d('timezones-june','Husos horarios en junio','De más horas por detrás a más horas por delante de España','Comparación con Madrid en junio.',1,'globe',S.timezone,[['Los Ángeles',-9,'9 horas menos'],['Nueva York',-6,'6 horas menos'],['Madrid',0,'Misma hora'],['Moscú',1,'1 hora más'],['Tokio',7,'7 horas más']]),
+    d('cities-east-west','Ciudades de este a oeste','De oeste a este','Longitud aproximada del centro urbano.',1,'globe',S.geo,[['Los Ángeles',-118.24,'118,24° O'],['Nueva York',-74.01,'74,01° O'],['Madrid',-3.70,'3,70° O'],['El Cairo',31.24,'31,24° E'],['Tokio',139.69,'139,69° E']]),
+    d('cities-north-south','Ciudades de norte a sur','De más al norte a más al sur','Latitud aproximada del centro urbano.',-1,'globe',S.geo,[['Reikiavik',64.15,'64,15° N'],['Londres',51.51,'51,51° N'],['Madrid',40.42,'40,42° N'],['Nairobi',-1.29,'1,29° S'],['Ciudad del Cabo',-33.93,'33,93° S']]),
+    d('body','Partes del cuerpo humano','De arriba a abajo','Orden anatómico aproximado en posición erguida.',1,'science',S.body,[['Cerebro',1,'Cabeza'],['Corazón',2,'Tórax'],['Estómago',3,'Abdomen superior'],['Rodillas',4,'Extremidades inferiores'],['Pies',5,'Extremo inferior']]),
+    d('series-seasons','Series por número de temporadas','De menos a más temporadas','Temporadas emitidas de la serie indicada.',1,'entertainment',S.series,[['Chernobyl',1,'1 temporada'],['Breaking Bad',5,'5 temporadas'],['The Office (EE. UU.)',9,'9 temporadas'],['Friends',10,'10 temporadas'],['Los Simpson',37,'37 temporadas']]),
+    d('buildings','Edificios por altura','De menor a mayor altura arquitectónica','No se cuenta la antena.',1,'science',S.buildings,[['One World Trade Center',541,'541 m'],['Makkah Royal Clock Tower',601,'601 m'],['Shanghai Tower',632,'632 m'],['Merdeka 118',679,'679 m'],['Burj Khalifa',828,'828 m']]),
+    d('rivers-spain','Ríos de España por longitud','De menor a mayor longitud','Longitud del río completo.',1,'globe',S.rivers,[['Guadalquivir',657,'657 km'],['Guadiana',744,'744 km'],['Duero',897,'897 km'],['Ebro',930,'930 km'],['Tajo',1007,'1.007 km']]),
+    d('foods-kcal','Alimentos por calorías','De menos a más kilocalorías por 100 g','Valores estándar; pueden variar según preparación.',1,'science',S.food,[['Pepino',15,'15 kcal/100 g'],['Manzana',52,'52 kcal/100 g'],['Patata',77,'77 kcal/100 g'],['Pan blanco',266,'266 kcal/100 g'],['Almendras',579,'579 kcal/100 g']]),
+    d('albums-sales','Discos por ventas','De menos a más copias vendidas','Estimaciones acumuladas; se indica el mercado cuando no es mundial.',1,'entertainment',S.albums,[['Bat Out of Hell',43,'≈43 millones'],['The Dark Side of the Moon',45,'≈45 millones'],['Back in Black',50,'≈50 millones'],['Their Greatest Hits 1971–1975',42,'42 millones en EE. UU.'],['Thriller',70,'≈70 millones']]),
+    d('stadiums','Estadios de fútbol por capacidad','De menor a mayor capacidad','La capacidad puede variar por obras.',1,'sports',S.stadiums,[['Santiago Bernabéu',84000,'84.000'],['Wembley',90000,'90.000'],['Camp Nou',99354,'99.354'],['Michigan Stadium',107601,'107.601'],['Rungrado 1.º de Mayo',114000,'114.000']]),
+    d('capitals-altitude','Capitales del mundo por altitud','De menor a mayor altitud','Altitud aproximada del centro urbano.',1,'globe',S.capitals,[['Madrid',667,'667 m'],['Addis Abeba',2355,'2.355 m'],['Bogotá',2640,'2.640 m'],['Quito',2850,'2.850 m'],['La Paz',3640,'3.640 m']]),
+    d('eurovision-wins','Países por victorias en Eurovisión','De menos a más victorias','Conteo hasta la edición de 2026; empates válidos.',1,'entertainment',S.eurovision,[['España',2,'2'],['Reino Unido',5,'5'],['Países Bajos',5,'5'],['Suecia',7,'7'],['Irlanda',7,'7']]),
+    d('storage','Unidades de almacenamiento','De menor a mayor capacidad decimal','Sistema decimal SI, no unidades binarias.',1,'science',S.storage,[['Kilobyte',1e3,'10³ bytes'],['Megabyte',1e6,'10⁶ bytes'],['Gigabyte',1e9,'10⁹ bytes'],['Terabyte',1e12,'10¹² bytes'],['Petabyte',1e15,'10¹⁵ bytes']]),
+    d('airports','Aeropuertos por pasajeros','De menos a más pasajeros en 2025','Pasajeros totales según ACI World.',1,'globe',S.airports,[['Denver',82.4,'≈82,4 millones'],['Dallas-Fort Worth',85.7,'≈85,7 millones'],['Tokio-Haneda',91.7,'≈91,7 millones'],['Dubái',95.2,'≈95,2 millones'],['Atlanta',106.3,'≈106,3 millones']]),
+    d('metros','Redes de metro por longitud','De menor a mayor longitud de red','Tamaño significa longitud total de la red.',1,'globe',S.metro,[['Madrid',294,'≈294 km'],['París',245,'≈245 km'],['Londres',402,'≈402 km'],['Pekín',807,'≈807 km'],['Shanghái',896,'≈896 km']]),
+    d('companies-revenue','Empresas por facturación en 2025','De menor a mayor facturación','Millones de dólares; edición Fortune basada en 2025.',1,'science',S.fortune,[['UnitedHealth Group',447.5,'≈447,5 mil M$'],['Saudi Aramco',480,'≈480 mil M$'],['State Grid',545,'≈545 mil M$'],['Amazon',638,'≈638 mil M$'],['Walmart',681,'≈681 mil M$']]),
+    d('spanish-tv','Programas españoles por años en antena','De menos a más años desde su estreno','Se cuentan años desde el estreno.',1,'entertainment',S.tv,[['El Hormiguero',20,'20 años'],['Pasapalabra',25,'25 años'],['Saber y ganar',29,'29 años'],['Cuéntame cómo pasó',23,'23 años'],['Informe semanal',53,'53 años']]),
+    d('minimum-wages','Países por salario mínimo','De menor a mayor salario mínimo bruto mensual','Comparación nominal en euros; solo países con salario nacional.',1,'science',S.wages,[['Bulgaria',620,'620 €/mes'],['España',1323,'1.323 €/mes en 14 pagas'],['Francia',1823,'1.823 €/mes'],['Alemania',2343,'2.343 €/mes'],['Luxemburgo',2704,'2.704 €/mes']]),
+    // Se conserva este mazo ya existente para no romper partidas guardadas de la primera fase.
+    d('poker','Manos del póker','De menor a mayor fuerza','Póker alto de cinco cartas, sin comodines.',1,'entertainment','https://www.pokerstars.com/poker/games/rules/hand-rankings/',[['Carta alta',1,'1.ª'],['Pareja',2,'2.ª'],['Doble pareja',3,'3.ª'],['Trío',4,'4.ª'],['Escalera',5,'5.ª'],['Color',6,'6.ª'],['Full',7,'7.ª'],['Póker',8,'8.ª'],['Escalera de color',9,'9.ª']])
+  ]};
 })();
