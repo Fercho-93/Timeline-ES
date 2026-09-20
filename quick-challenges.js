@@ -40,14 +40,23 @@
     return `<svg ${common}><rect x="3" y="6" width="8" height="13" rx="1.8"></rect><rect x="13" y="5" width="8" height="13" rx="1.8"></rect><path d="M11 12h2"></path></svg>`;
   }
   function choice(action,title,subtitle,kind) {return `<button class="play-choice" data-quick="${action}"><span class="choice-icon">${choiceIcon(kind)}</span><span><b>${title}</b><small>${subtitle}</small></span><i aria-hidden="true">→</i></button>`;}
+  function soloFold(kind, title, caption, icon, copy) {
+    return `<details class="panel solo-panel solo-fold" name="quick-solo-options" data-solo-kind="${kind}"><summary><span class="solo-option-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${icon}</svg></span><span class="solo-option-copy"><b>${title}</b>${kind === 'daily' ? `<time datetime="${today()}">${today().split('-').reverse().join('/')}</time>` : ''}<small>${caption}</small></span></summary><div class="solo-fold-body">${copy}</div></details>`;
+  }
   function soloMenu() {
     page='solo-menu';state=null;record=null;const daily=readJSON(DAILY),today=day();const done=daily?.config?.day===today;let score='';
     if(done){try{const s=E.restore(daily);score=`${s.players[0].score} puntos asegurados`;}catch{}}
+    const dailyIcon='<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>';
+    const freeIcon='<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>';
+    const duelIcon='<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>';
+    const dailyBody=`<p>Las mismas cartas para todo el mundo, un intento al día.</p>${button('daily',done?'Ver o continuar el reto de hoy':'Jugar el reto de hoy','btn btn-primary btn-block')}${score?`<p class="solo-done">Hoy ya lo has jugado: <strong>${score}</strong>.</p>`:''}`;
+    const freeBody=`<p>Elige un reto o juega tres temáticas variadas.</p><p class="hint">Mejor marca en tres retos: ${Number(readJSON(BEST,0)) || 0} puntos.</p>${button('free','Empezar <span>→</span>','btn btn-primary btn-block')}`;
+    const duelBody=`<p>De seguidos: juega y comparte las mismas cartas con otra persona. Por turnos: crea una sala para dos y volved cuando os toque.</p>${button('duel','Duelo de seguidos','btn btn-primary btn-block')}${button('turn-duel','Duelo por turnos','btn btn-secondary btn-block')}<div class="field"><label for="quick-duel-link">Enlace recibido</label><input id="quick-duel-link" type="url" placeholder="Pega aquí el enlace"></div>${button('accept-duel','Abrir duelo','btn btn-ghost btn-block')}`;
     shell(`<section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
       <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">Acertar suma. Plantarte asegura tus puntos. Fallar termina el reto y pierde los puntos provisionales.</p></div>
-    <div class="panel solo-panel"><div class="solo-panel-head"><h3>Reto diario</h3><time datetime="${today}">${today.split("-").reverse().join("/")}</time></div><p>Las mismas cartas para todo el mundo, un intento al día.</p>${button('daily',done?'Ver o continuar el reto de hoy':'Jugar el reto de hoy','btn btn-primary btn-block')}${score?`<p class="solo-done">Hoy ya lo has jugado: <strong>${score}</strong>.</p>`:''}</div>
-    <div class="panel solo-panel"><div class="solo-panel-head"><h3>Partida libre</h3></div><p>Elige un reto o juega tres temáticas variadas.</p><p class="hint">Mejor marca en tres retos: ${Number(readJSON(BEST,0)) || 0} puntos.</p>${button('free','Empezar <span>→</span>','btn btn-primary btn-block')}</div>
-    <div class="panel solo-panel"><div class="solo-panel-head"><h3>Duelo por enlace</h3></div><p>De seguidos: juega y comparte las mismas cartas con otra persona. Por turnos: crea una sala para dos y volved cuando os toque.</p>${button('duel','Duelo de seguidos','btn btn-primary btn-block')}${button('turn-duel','Duelo por turnos','btn btn-secondary btn-block')}<div class="field"><label for="quick-duel-link">Enlace recibido</label><input id="quick-duel-link" type="url" placeholder="Pega aquí el enlace"></div>${button('accept-duel','Abrir duelo','btn btn-ghost btn-block')}</div><p id="quick-error" role="alert"></p></section>`);
+    ${soloFold('daily','Reto diario','Un reto distinto cada día',dailyIcon,dailyBody)}
+    ${soloFold('free','Partida libre','A tu ritmo y a tu nivel',freeIcon,freeBody)}
+    ${soloFold('duel','Duelo por enlace','Las mismas cartas, otro rival',duelIcon,duelBody)}<p id="quick-error" role="alert"></p></section>`);
   }
   function rounds(count=3, selectedId=null, seed=null) {
     const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed));
