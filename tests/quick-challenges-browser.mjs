@@ -32,10 +32,7 @@ try {
     assert.ok(sizes.length >= 2);
     for (const size of sizes.slice(-2)) assert.deepEqual(size, sizes[0], 'Los nuevos bloques tienen el tamaño de las colecciones');
     await page.screenshot({path: `test-results/quick-challenges/home-${width}.png`, fullPage:true});
-    await page.locator('[data-action="quick-counts"]').click();
-    assert.ok(await page.getByText('De menos a más', {exact:true}).isVisible());
-    assert.equal(await page.locator('[data-quick="start"]').count(), 0);
-    await page.locator('[data-action="home"]').last().click();
+    assert.equal(await page.locator('[data-action="quick-counts"]').count(), 0);
     await page.locator('[data-action="quick-challenges"]').click();
     await page.locator('[data-quick="show-multi"]').click();
     await page.locator('[data-quick="local"]').click();

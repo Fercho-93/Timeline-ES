@@ -13,7 +13,7 @@
     consoles: 'https://www.britannica.com/technology/video-game/History-of-video-games', oscar: 'https://www.filmsite.org/oscars2.html', companies: 'https://www.britannica.com/topic/Apple-Inc', timezone: 'https://www.timeanddate.com/time/zone/', geo: 'https://www.geonames.org/', body: 'https://www.britannica.com/science/human-body', series: 'https://www.imdb.com/', buildings: 'https://www.skyscrapercenter.com/buildings', rivers: 'https://www.chduero.es/portals/0/documentos/El%20Duero%20y%20sus%20afluentes.pdf', food: 'https://fdc.nal.usda.gov/', albums: 'https://www.guinnessworldrecords.com/world-records/best-selling-album', stadiums: 'https://www.worldstadiums.com/', capitals: 'https://www.britannica.com/topic/list-of-national-capitals', eurovision: 'https://eurovision.tv/event', storage: 'https://www.bipm.org/en/measurement-units/si-prefixes', airports: 'https://aci.aero/resources/busiest-airports-in-the-world/', metro: 'https://en.wikipedia.org/wiki/List_of_metro_systems', fortune: 'https://fortune.com/ranking/global500/', tv: 'https://www.rtve.es/television/', wages: 'https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Minimum_wage_statistics'
   };
   const d = (id, title, rule, context, direction, cover, source, rows) => deck(id, title, rule, context, direction, cover, source, rows);
-  window.CONTINUUM.QuickCatalog = { version: 2, upcoming: {key: 'counts', name: '¿Cuántos hay…?', status: 'planned', axis: 'count', cards: []}, challenges: [
+  window.CONTINUUM.QuickCatalog = { version: 2, challenges: [
     d(
       'sports-players',
       'Jugadores en el terreno',

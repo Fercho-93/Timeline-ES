@@ -128,8 +128,8 @@ const drinks = CT.QuickCatalog.challenges.find(c => c.id === 'drinks');
 assert.ok(drinks.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const festivities = CT.QuickCatalog.challenges.find(c => c.id === 'festivities');
 assert.ok(festivities.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
-assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
-assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
+assert.equal(CT.QuickCatalog.upcoming, undefined, 'La colección pendiente ya no se publica');
+assert.equal(CT.has('counts'), false, 'La colección eliminada no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
 const click = selector => {const el = w.document.querySelector(selector); assert.ok(el, selector); el.click();};
 click('[data-action="quick-challenges"]'); click('[data-quick="show-multi"]'); click('[data-quick="local"]');
@@ -160,7 +160,7 @@ for (let r = 0; r < 3; r++) {
 assert.equal(w.document.querySelector('[data-quick="next"]'), null);
 assert.match(w.document.querySelector('#app').textContent, /Gana|Victoria compartida/);
 click('[data-action="home"]');
-assert.match(w.document.querySelector('#app').textContent, /¿Cuántos hay…\?/);
+assert.equal(w.document.querySelector('[data-action="quick-counts"]'), null, 'La colección eliminada no aparece en inicio');
 assert.ok(w.document.querySelector('[data-action="competition-menu"]'));
 w.close();
 w = boot('{invalid'); click('[data-action="quick-challenges"]');

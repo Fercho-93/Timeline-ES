@@ -317,7 +317,6 @@
   CT.Quick = {
     leave:stopNetwork,
     open(renderPage) {paint = renderPage; state = null; record = null; selected = null; slot = null;formatMenu();const params=new URLSearchParams(location.hash.slice(1));try{if(params.has('quick-duel'))acceptDuel();else if(params.has('quick-room')){networkSetup('internet');app().querySelector('#quick-net-code').value=params.get('quick-room');}}catch(e){errorNotice(e);}},
-    blocks() {return block('Retos rápidos', 'Ordena. Arriesga. Asegura.', 'quick', 'quick-challenges', `${CT.QuickCatalog.challenges.length} retos`) + block('¿Cuántos hay…?', 'Un gran mazo de cantidades por descubrir.', 'science', 'quick-counts', 'En preparación');},
-    counts(renderPage) {stopNetwork();page='counts';paint = renderPage; state = null; record = null; shell(`${masthead('¿Cuántos hay…?', 'Conceptos muy distintos, una misma pregunta: ¿qué cantidad es mayor?', 'science')}<section class="panel quick-panel"><div class="eyebrow">Gran mazo · En preparación</div><h2>De menos a más</h2><p>Este bloque tendrá su propio gran mazo de cantidades. La selección de cartas llegará más adelante.</p><button class="btn btn-secondary" data-action="home">Volver a las colecciones</button></section>`);}
+    blocks() {return block('Retos rápidos', 'Ordena. Arriesga. Asegura.', 'quick', 'quick-challenges', `${CT.QuickCatalog.challenges.length} retos`);}
   };
 })();

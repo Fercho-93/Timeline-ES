@@ -54,7 +54,7 @@
     // encima justo después.
     if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
     const routes = {'home': home, 'play-menu': playMenu, 'solo-home': soloHome,
-      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-lobby': quickChallenges, 'quick-counts': quickCounts, 'perfil': perfilView};
+      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-lobby': quickChallenges, 'perfil': perfilView};
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
     if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
     // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
@@ -452,11 +452,6 @@
   function quickChallenges() {
     screen = "quick-challenges";
     CT.Quick.open((html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);});
-  }
-
-  function quickCounts() {
-    screen = 'quick-counts';
-    CT.Quick.counts(html => {screen = 'quick-counts'; paint(html);});
   }
 
   function home() {
@@ -3128,7 +3123,6 @@
       CT.onlineNavigate?.(action); return;
     }
     if (action === 'quick-challenges') quickChallenges();
-    else if (action === 'quick-counts') quickCounts();
     else if (action === 'ui-back') uiBack();
     else if (action === 'solo-options') soloOptions();
     else if (action === "retry-online") launchOnline();
