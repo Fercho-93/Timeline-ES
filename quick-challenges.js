@@ -244,10 +244,20 @@
     if (slot !== null) app().querySelector('[data-quick="confirm"]')?.focus({preventScroll:true});
     CT.announce(slot === null ? 'Carta elegida. Elige un hueco.' : `Hueco ${slot + 1} elegido. Confirma la colocación.`);
   }
+  function abandonQuick() {
+    const kind=record?.config?.kind || state?.config?.kind;
+    const hadRoom=!!room;
+    stopNetwork();
+    CT.Storage.removeItem(KEY);
+    if (kind === 'daily') CT.Storage.removeItem(DAILY);
+    if (hadRoom) CT.Storage.removeItem(NET);
+    pendingConfig=null; state=null; record=null; selected=null; slot=null;
+    formatMenu();
+  }
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);
     const layer = document.createElement('div'); layer.className = 'overlay';
-    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}</div></div>`;
+    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}${button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
     app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
@@ -277,6 +287,7 @@
       prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count}); return;
     }
     if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', formatMenu); return;}
+    if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
     if (action === 'setup') {setup(); return;}
     if (action === 'start') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value.trim());
