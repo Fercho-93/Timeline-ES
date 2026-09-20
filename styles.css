@@ -1490,6 +1490,9 @@ body::before {
   height: auto;
   margin: 0;
 }
+.gallery-divider { display: flex; align-items: center; gap: 10px; margin: 7px 2px 2px; color: var(--accent-dark); font-family: var(--font-display); font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 700; opacity: .82; }
+.gallery-divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(130,81,35,.45), transparent); }
+.gallery-divider-label { white-space: nowrap; }
 .collection-entry { min-width: 0; scroll-margin-top: 14px; }
 .collection-entry.active { grid-column: 1 / -1; }
 .home-shell .gallery-panel {

@@ -264,7 +264,7 @@
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
       </button>${mazos}</div>`;
-    }).join("")}${CT.Quick.blocks()}</div>`;
+    }).join("")}<div class="gallery-divider" role="separator" aria-label="Minijuegos y retos"><span class="gallery-divider-line" aria-hidden="true"></span><span class="gallery-divider-label" aria-hidden="true">Minijuegos y retos</span><span class="gallery-divider-line" aria-hidden="true"></span></div>${CT.Quick.blocks()}</div>`;
   }
 
   // Los juegos del bloque en pantalla.
