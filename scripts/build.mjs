@@ -15,7 +15,7 @@ const dist = path.join(root, "dist");
 // de imágenes que se piden bajo demanda.
 const FILES = [
   "index.html", "actualizar.html", "privacidad.html", "manifest.webmanifest", "icon.svg",
-  "splash.css", "splash.js", "styles.css", "edition.css", "service-worker.js",
+  "splash.css", "splash.js", "styles.css", "edition.css", "service-worker.js", "service-worker-258.js",
   "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",
   "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js",
   "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js",
