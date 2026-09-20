@@ -54,7 +54,7 @@
     // encima justo después.
     if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
     const routes = {'home': home, 'play-menu': playMenu, 'solo-home': soloHome,
-      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'perfil': perfilView};
+      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-counts': quickCounts, 'perfil': perfilView};
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
     if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
     // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
@@ -264,7 +264,7 @@
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
       </button>${mazos}</div>`;
-    }).join("")}</div>`;
+    }).join("")}${CT.Quick.blocks()}</div>`;
   }
 
   // Los juegos del bloque en pantalla.
@@ -454,12 +454,17 @@
     CT.Quick.open((html, playing) => {screen = playing ? "quick-game" : "quick-challenges"; paint(html);});
   }
 
+  function quickCounts() {
+    screen = 'quick-counts';
+    CT.Quick.counts(html => {screen = 'quick-counts'; paint(html);});
+  }
+
   function home() {
     pendingTournament = null;
     screen = "home";
     paint(`<div class="shell home-shell home-gallery-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
       ${homeMasthead()}${quickActions()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
-      <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section>${CT.Quick.promo()}</div></section>
+      <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section></div></section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
@@ -2929,6 +2934,7 @@
     CT.UI.confirmExit('Tu partida quedará guardada para continuar después.', returnFromPlay, undefined, undefined, discard);
   }
   function uiBack() {
+    if (screen === "quick-game") { app.querySelector('[data-quick="exit"]')?.click(); return; }
     if (app.dataset.screen?.startsWith('online-')) { CT.onlineNavigate?.('back'); return; }
     if (CT.UI.isPlaying(screen)) { requestPlayExit(); return; }
     backMenu();
@@ -3090,6 +3096,7 @@
       CT.onlineNavigate?.(action); return;
     }
     if (action === 'quick-challenges') quickChallenges();
+    else if (action === 'quick-counts') quickCounts();
     else if (action === 'ui-back') uiBack();
     else if (action === 'solo-options') soloOptions();
     else if (action === "retry-online") launchOnline();
@@ -3260,7 +3267,7 @@
     else if (action === 'daily') { CT.closeDialog(); soloHome(); }
     else { homeDestination = 'home'; home(); window.scrollTo(0, 0); }
   };
-  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro"].includes(screen) || !!CT.onlineActive;
+  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro", "quick-game"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();
   // El botón/gesto Atrás de Android: `window.Capacitor` solo existe dentro del contenedor
   // nativo (Capacitor lo inyecta al arrancar la WebView), así que esto no toca la versión

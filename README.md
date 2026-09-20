@@ -722,3 +722,5 @@ pertenencia a la sala; el relevo conserva cartas y turno. No es presencia instan
 
 Publicar las reglas v39 junto con el cliente. Las subcolecciones de presencia deben
 incluirse en la limpieza de salas; borrar el documento padre no las elimina.
+
+Retos rápidos utiliza las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del tablero compartido. Mantiene sus turnos de 2–4 participantes en un móvil y el guardado automático. Tiene una portada propia; «¿Cuántos hay…?» aparece en otro bloque del mismo tamaño, pendiente de contenido.

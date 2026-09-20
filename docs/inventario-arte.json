@@ -15211,6 +15211,26 @@
         "referenceImage": null,
         "commercialTermsRef": "terms-to-preserve"
       }
+    },
+    {
+      "path": "assets/hero-quick-400.webp",
+      "sha256": "fdaf213261331a2f5a18d2e5939ecfb3fe802670dec5db2d6c43ab4801c909a0",
+      "rightsEvidence": {
+        "status": "ai-generated",
+        "generator": "OpenAI integrated image generation",
+        "evidence": "docs/retos-portada.md",
+        "generatedAt": "2026-09-20"
+      }
+    },
+    {
+      "path": "assets/hero-quick-700.webp",
+      "sha256": "d8ba888e16b312f98b9d968b86ff4db437a370f7a939ec070761955937bfadec",
+      "rightsEvidence": {
+        "status": "ai-generated",
+        "generator": "OpenAI integrated image generation",
+        "evidence": "docs/retos-portada.md",
+        "generatedAt": "2026-09-20"
+      }
     }
   ]
 }

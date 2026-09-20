@@ -1909,8 +1909,8 @@ body::before {
 .room-connection { padding:10px; border:1px solid currentColor; border-radius:12px; margin-block:10px; font-family:system-ui,sans-serif; }
 
 /* Tablero compacto; las explicaciones siguen disponibles a tamaño de lectura. */
-#app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"]) .topbar { padding-block:8px; margin-bottom:10px; }
-#app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"]) .turn-name { font-size:clamp(1.25rem,5vw,1.8rem); }
+#app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"], [data-screen="quick-game"]) .topbar { padding-block:8px; margin-bottom:10px; }
+#app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"], [data-screen="quick-game"]) .turn-name { font-size:clamp(1.25rem,5vw,1.8rem); }
 .rules p, .rules li, .reveal p, .hint, .art-modal { font-family:system-ui,sans-serif; line-height:1.5; }
 .art-modal img { display:block; width:100%; max-height:65dvh; object-fit:contain; margin-block:12px; }
 .modal { overflow-wrap:anywhere; }
@@ -1918,7 +1918,7 @@ body::before {
 .modal input[type="file"], .modal textarea { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
 .modal textarea { color:var(--ink); background:var(--campo); border:1px solid var(--line); padding:10px; border-radius:8px; font:inherit; }
 @media (max-width:600px) {
-  #app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"]) .shell { padding-inline:12px; }
+  #app:is([data-screen="game"], [data-screen="solo"], [data-screen="online-game"], [data-screen="quick-game"]) .shell { padding-inline:12px; }
   .timeline .animal-timeline-card { width:146px; min-height:210px; }
   .timeline .animal-timeline-card .card-visual { height:128px; }
   .hand-card { min-width:136px; min-height:170px; }

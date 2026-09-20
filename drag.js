@@ -221,8 +221,8 @@
     if (event.isPrimary === false) return;   // un segundo dedo no arrastra nada
     const card = event.target.closest(this.cardSelector);
     if (!card || card.disabled) return;
-    const cardId = Number(card.dataset.id);
-    if (!Number.isFinite(cardId)) return;
+    const cardId = this.parseCardId ? this.parseCardId(card.dataset.id) : Number(card.dataset.id);
+    if (typeof cardId === 'number' ? !Number.isFinite(cardId) : typeof cardId !== 'string' || !cardId) return;
 
     const raton = event.pointerType === "mouse";
     session = {

@@ -4,7 +4,7 @@ import {JSDOM} from 'jsdom';
 
 // JSDOM no pinta píxeles. Las medidas intrínsecas se simulan para comprobar
 // escala, espacio de scroll, redimensionado, límites y conservación del DOM.
-for (const screen of ['game','solo','online-game']) {
+for (const screen of ['game','solo','online-game','quick-game']) {
   const dom=new JSDOM('<main id="app"></main>',{runScripts:'outside-only'});
   const w=dom.window, app=w.document.getElementById('app');
   app.dataset.screen=screen;w.CONTINUUM={};
