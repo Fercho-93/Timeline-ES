@@ -180,7 +180,13 @@
         ['Batalla de Teruel',19371222,'22 diciembre 1937','assets/quick-cards/civil-war-5.webp'],
         ['Batalla del Ebro',19380725,'25 julio 1938','assets/quick-cards/civil-war-6.webp'],
         ['Caída de Barcelona',19390126,'26 enero 1939','assets/quick-cards/civil-war-7.webp'],
-        ['Fin de la guerra',19390401,'1 abril 1939','assets/quick-cards/civil-war-8.webp']
+        ['Fin de la guerra',19390401,'1 abril 1939','assets/quick-cards/civil-war-8.webp'],
+        ['Liberación del Alcázar de Toledo',19360927,'27 septiembre 1936','assets/quick-cards/civil-war-9.webp'],
+        ['Batalla de Madrid y traslado del Gobierno',19361106,'6 noviembre 1936','assets/quick-cards/civil-war-10.webp'],
+        ['Batalla del Jarama',19370206,'6 febrero 1937','assets/quick-cards/civil-war-11.webp'],
+        ['Hechos de Mayo en Barcelona',19370503,'3 mayo 1937','assets/quick-cards/civil-war-12.webp'],
+        ['Asesinato de José Calvo Sotelo',19360713,'13 julio 1936','assets/quick-cards/civil-war-13.webp'],
+        ['Traslado de las reservas de oro del Banco de España a Moscú',19361022,'22 octubre 1936','assets/quick-cards/civil-war-14.webp']
       ]
     ),
     d(
