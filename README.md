@@ -723,4 +723,6 @@ pertenencia a la sala; el relevo conserva cartas y turno. No es presencia instan
 Publicar las reglas v39 junto con el cliente. Las subcolecciones de presencia deben
 incluirse en la limpieza de salas; borrar el documento padre no las elimina.
 
-Retos rápidos utiliza las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del tablero compartido. Mantiene sus turnos de 2–4 participantes en un móvil y el guardado automático. Tiene una portada propia; «¿Cuántos hay…?» aparece en otro bloque del mismo tamaño, pendiente de contenido.
+Retos rápidos utiliza las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del tablero compartido. Ofrece partida libre, reto diario y duelo por enlace en solitario; partidas de 2–4 participantes en un móvil, por internet o por Wi-Fi local; y duelos por turnos en salas para dos. Conserva el guardado local y recupera la última sala por internet. Tiene una portada propia; «¿Cuántos hay…?» aparece en otro bloque del mismo tamaño, pendiente de contenido.
+
+Las salas de Retos usan `quickRooms`, con turnos transaccionales e historial de comandos que cada cliente reconstruye. Publicar las reglas junto con el cliente. Los resultados son de juego casual, sin clasificación competitiva del servidor. En Wi-Fi local, quien crea la sala debe mantenerla abierta; las invitaciones se intercambian mediante Compartir/copiar. El diario se fija por fecha local y conserva un intento por perfil. El duelo de seguidos incluye las cartas y el resultado en el enlace.

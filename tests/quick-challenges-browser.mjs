@@ -37,6 +37,8 @@ try {
     assert.equal(await page.locator('[data-quick="start"]').count(), 0);
     await page.locator('[data-action="home"]').last().click();
     await page.locator('[data-action="quick-challenges"]').click();
+    await page.locator('[data-quick="show-multi"]').click();
+    await page.locator('[data-quick="local"]').click();
     await page.screenshot({path: `test-results/quick-challenges/setup-${width}.png`, fullPage: true});
     await page.locator('#quick-name-0').fill('Ana');
     await page.locator('[data-quick="add-player"]').click();

@@ -112,6 +112,9 @@ try {
  const mismatched=fixture();mismatched.status='lobby';mismatched.phase='lobby';delete mismatched.ghost;mismatched.timeline=[];mismatched.deck=[];mismatched.deckFingerprint='huella-de-otra-version';Object.values(mismatched.players).forEach(p=>p.hand=[]);await seed(mismatched);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/DECK_MISMATCH/);assert.equal((await snapshot()).status,'lobby');
  // Arranque real, nueve personas y mazo pequeño: reparto igual y una carta reservada.
+ // Fijar el catálogo de esta prueba: el mazo de producción sigue creciendo.
+ const fullAnimals=clients.map(cl=>cl.w.CONTINUUM.MODES.animals.cards);
+ clients.forEach(cl=>{cl.w.CONTINUUM.MODES.animals.cards=cl.w.CONTINUUM.MODES.animals.cards.slice(0,41);});
  const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:42} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
@@ -126,6 +129,7 @@ try {
  const pulsePrevious=clone(lobby);pulsePrevious.players[B].clientVersion=37;await seed(pulsePrevious);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-pulse').checked=true;
  await clients[0].api.startRoom();assert.match(String(clients[0].errors.pop()),/UPDATE_CLIENTS/);assert.equal((await snapshot()).status,'lobby');
+ clients.forEach((cl,i)=>{cl.w.CONTINUUM.MODES.animals.cards=fullAnimals[i];});
  const three=fixture();three.phase='reveal';three.current=2;three.turnsInRound=2;Object.values(three.players).forEach(p=>p.hand=[]);three.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};three.ghost.cards=[15,16,17];three.ghost.owners=['','',''];
  await seed(three);await clients[2].call('finishTurn');assert.deepEqual((await snapshot()).final.players,[A,B,C]);assert.deepEqual((await snapshot()).ghost.owners,['','','']);
  const modernThree=clone(three);modernThree.ghost.distribution=2;

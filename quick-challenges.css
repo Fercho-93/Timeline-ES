@@ -11,3 +11,8 @@
 .quick-shell .setup-section [data-quick="resume"]{margin-top:10px}
 .quick-shell #quick-error:empty{display:none}
 .quick-shell #quick-choice-wrap[hidden]{display:none}
+.quick-shell [hidden]{display:none!important}
+.quick-shell .setup-section .field{margin-bottom:14px}
+.quick-shell .setup-section textarea{width:100%;max-width:100%;font-size:16px;padding:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px}
+.quick-shell .solo-panel>.btn{margin:8px 0}
+.quick-shell .play-choice>span:first-child:not(.walking-copy){min-width:0}

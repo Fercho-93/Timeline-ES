@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
+import {doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
+const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
+const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
+const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
+const rounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
+const host=env.authenticatedContext('host').firestore(),guest=env.authenticatedContext('guest').firestore(),out=env.authenticatedContext('outsider').firestore();
+const ref=db=>doc(db,'quickRooms','ABCDEFGH23');
+const write=(db,r)=>setDoc(ref(db),{...JSON.parse(JSON.stringify(r)),catalog:1,updatedAt:serverTimestamp()});
+try {
+  let r=R.create('host','Ana');
+  await assertSucceeds(write(host,r));
+  await assertFails(write(out,r));
+  await assertSucceeds(getDoc(ref(guest)));
+  r=R.reduce(r,'guest',{type:'join',name:'Bea'});await assertSucceeds(write(guest,r));
+  let started=R.reduce(r,'host',{type:'start',rounds});
+  await assertFails(write(guest,started));await assertSucceeds(write(host,started));r=started;
+  await assertFails(getDoc(ref(out)));
+  await assertFails(write(out,R.reduce(r,'host',{type:'bank'})));
+  await assertFails(write(guest,R.reduce(r,'host',{type:'bank'})));
+  let next=R.reduce(r,'host',{type:'place',cardId:'poker-2',index:1});await assertSucceeds(write(host,next));r=next;
+  next=R.reduce(r,'host',{type:'ack'});await assertSucceeds(write(host,next));r=next;
+  assert.equal(r.actor,'guest');
+  await assertFails(write(host,R.reduce(r,'guest',{type:'bank'})));
+  next=R.reduce(r,'guest',{type:'bank'});await assertSucceeds(write(guest,next));r=next;
+  await assertFails(write(host,{...r,revision:r.revision+1,commands:[]}));
+  await assertFails(write(host,{...r,revision:r.revision+1,names:['Impostor','Bea']}));
+  next=R.reduce(r,'host',{type:'bank'});await assertSucceeds(write(host,next));
+  assert.equal(next.phase,'finished');
+  await assertFails(write(host,{...next,revision:next.revision+1,commands:[...next.commands,{type:'next'}],phase:'turn'}));
+  // The production adapter uses the real SDK against the emulator, including listeners,
+  // concurrent join transactions, late reconnect and stale-turn rejection.
+  const source=fs.readFileSync('quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace('export async function connect','async function connect');
+  w.CONTINUUM.QuickNetwork={fingerprint:()=>1};
+  w.CONTINUUM.QuickRoom={...R,create:(...args)=>JSON.parse(JSON.stringify(R.create(...args))),reduce:(...args)=>JSON.parse(JSON.stringify(R.reduce(...args)))};
+  const adapter=(uid,db)=>new Function('auth','db','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connect;')({currentUser:{uid},authStateReady:async()=>{}},db,doc,runTransaction,onSnapshot,serverTimestamp,w);
+  const rooms={};let failures=[];
+  const h=await adapter('host',host)({name:'Ana',create:true,onChange:r=>rooms.h=r,onError:e=>failures.push(e)});
+  const g=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.g=r,onError:e=>failures.push(e)});
+  const wait=async predicate=>{for(let n=0;n<100&&!predicate();n++)await new Promise(r=>setTimeout(r,30));assert.ok(predicate());};
+  await wait(()=>rooms.h?.members.length===2&&rooms.g?.members.length===2);
+  await h.act({type:'start',rounds});await wait(()=>rooms.g?.phase==='turn');
+  await assert.rejects(g.act({type:'bank'}));
+  await h.act({type:'bank'});await wait(()=>rooms.g?.actor==='guest');
+  g.close();
+  const rejoined=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.rejoined=r,onError:e=>failures.push(e)});
+  await wait(()=>rooms.rejoined?.actor==='guest');await rejoined.act({type:'bank'});await wait(()=>rooms.h?.phase==='finished');
+  assert.deepEqual(failures,[]);h.close();rejoined.close();
+  console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
+} finally {await env.cleanup();}

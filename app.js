@@ -54,7 +54,7 @@
     // encima justo después.
     if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
     const routes = {'home': home, 'play-menu': playMenu, 'solo-home': soloHome,
-      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-counts': quickCounts, 'perfil': perfilView};
+      'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-lobby': quickChallenges, 'quick-counts': quickCounts, 'perfil': perfilView};
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
     if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
     // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
@@ -451,7 +451,7 @@
   }
   function quickChallenges() {
     screen = "quick-challenges";
-    CT.Quick.open((html, playing) => {screen = playing ? "quick-game" : "quick-challenges"; paint(html);});
+    CT.Quick.open((html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);});
   }
 
   function quickCounts() {
@@ -460,6 +460,7 @@
   }
 
   function home() {
+    CT.Quick.leave();
     pendingTournament = null;
     screen = "home";
     paint(`<div class="shell home-shell home-gallery-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
@@ -2934,7 +2935,7 @@
     CT.UI.confirmExit('Tu partida quedará guardada para continuar después.', returnFromPlay, undefined, undefined, discard);
   }
   function uiBack() {
-    if (screen === "quick-game") { app.querySelector('[data-quick="exit"]')?.click(); return; }
+    if (["quick-game","quick-lobby"].includes(screen)) { app.querySelector('[data-quick="exit"]')?.click(); return; }
     if (app.dataset.screen?.startsWith('online-')) { CT.onlineNavigate?.('back'); return; }
     if (CT.UI.isPlaying(screen)) { requestPlayExit(); return; }
     backMenu();
@@ -3267,7 +3268,7 @@
     else if (action === 'daily') { CT.closeDialog(); soloHome(); }
     else { homeDestination = 'home'; home(); window.scrollTo(0, 0); }
   };
-  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro", "quick-game"].includes(screen) || !!CT.onlineActive;
+  CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro", "quick-game", "quick-lobby"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();
   // El botón/gesto Atrás de Android: `window.Capacitor` solo existe dentro del contenedor
   // nativo (Capacitor lo inyecta al arrancar la WebView), así que esto no toca la versión
@@ -3329,7 +3330,8 @@
   const invitedRoom = params.get("room") || "";
   const duelPayload = params.get("duelo") || "";
   const turnDuelId = params.get("turnoduelo") || "";
-  if (invitedRoom) launchOnline(invitedRoom);
+  if (params.has("quick-room") || params.has("quick-duel")) quickChallenges();
+  else if (invitedRoom) launchOnline(invitedRoom);
   else if (turnDuelId) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: turnDuelId, mode: selectedModeKey, back: home }));
   else if (duelPayload) {
     const leido = CT.Duelo.descodificar(duelPayload);

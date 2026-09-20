@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v262";
+const CACHE = "continuum-v263";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -8,7 +8,7 @@ const CACHE = "continuum-v262";
 // de ahí, con esa carta ya vista, funciona sin conexión igual que el resto.
 const ASSETS = [
   "./assets/hero-quick-400.webp", "./assets/hero-quick-700.webp",
-  "./quick-challenges.css", "./quick-challenges-data.js", "./quick-challenges-engine.js", "./quick-challenges.js",
+  "./quick-room.js", "./quick-network.js", "./quick-online.js", "./quick-challenges.css", "./quick-challenges-data.js", "./quick-challenges-engine.js", "./quick-challenges.js",
   "./assets/audio/CREDITS.md",
   "./assets/competition-engraving.webp",
   "./assets/mode-walk-solo.webp", "./assets/mode-walk-multi.webp",

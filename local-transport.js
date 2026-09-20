@@ -109,6 +109,7 @@
     peerConnection.addEventListener("datachannel", event => {
       channel = event.channel;
       channel.addEventListener("open", () => { ready = true; onOpen?.(); });
+      channel.addEventListener("close", () => { ready = false; });
       channel.addEventListener("message", messageEvent => {
         const message = decodeMessage(messageEvent.data);
         if (message) onMessage(message);
@@ -170,7 +171,7 @@
       const peerId = String(nextId++);
       const peer = createHostPeer(message => onMessage(peerId, message), () => onPeerOpen?.(peerId));
       peers.set(peerId, peer);
-      return { peerId, offerSignal: peer.offerSignal, acceptAnswer: peer.acceptAnswer };
+      return { peerId, offerSignal: peer.offerSignal, acceptAnswer: peer.acceptAnswer, peerConnection: peer.peerConnection };
     }
     function removePeer(peerId) {
       const peer = peers.get(peerId);
