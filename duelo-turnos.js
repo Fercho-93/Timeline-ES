@@ -60,7 +60,7 @@ function solution(game) {
   const line = timelineCards(game).filter(c => c.id !== card.id);
   const explanation = cifras
     ? `<p>${play.timeout ? 'Sin respuesta a tiempo.' : `Respuesta: <strong>${safe(CT.Duelo.Cifras.formato(game.mode, play.respuesta))}</strong>. Diferencia respecto al valor correcto: ${safe(Math.abs(play.respuesta - CT.sortValue(game.mode, card)).toLocaleString('es-ES', { maximumFractionDigits: 3 }))}${CT.Duelo.Cifras.regla(game.mode)?.anos ? ' años' : ' (en la unidad del mazo)'}.`}</p><p class="cifra-puntos"><b>+${Number(play.points) || 0}</b> puntos</p>`
-    : `<p>${CT.placementHint?.(game.mode, line, card) || ''}</p>`;
+    : !correct && !play.timeout ? `<p>${CT.placementHint?.(game.mode, line, card) || ''}</p>` : '';
   return `<details class="turn-duel-solution" ${play.uid === uid() ? 'open' : ''}><summary>Ver solución · ${safe(card.title)}</summary><div class="turn-duel-result ${correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${correct ? '✓' : '×'}</div><div class="eyebrow">${safe(title)}</div><h2>${safe(card.title)}</h2><div class="reveal">${CT.categoryBadge(game.mode, card)}${CT.Art?.button?.(game.mode, card) || ''}<div class="year">${safe(CT.formatValue(game.mode, card))}</div><p>${safe(card.detail)}</p></div>${explanation}</div></details>`;
 }
 function timelineCardMarkup(game, card) {
@@ -150,7 +150,7 @@ function render() {
       ${active && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
       ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
-      ${!active && !preparing && (finished && current.playersOrder.length === 2 || nextTargets.length) ? `<div class="turn-duel-actions">${finished && current.playersOrder.length === 2 ? '<button class="btn btn-primary" data-turn-action="rematch">Revancha</button>' : ''}${nextTargets.length ? `<button class="btn btn-secondary" data-turn-action="next" aria-label="Abrir otro duelo pendiente">Ir al siguiente duelo pendiente <small>(${nextTargets.length})</small></button>` : ''}</div>` : ''}
+      ${!active && !preparing && (finished || nextTargets.length) ? `<div class="turn-duel-actions">${finished && current.playersOrder.length === 2 ? '<button class="btn btn-primary" data-turn-action="rematch">Revancha</button>' : ''}${nextTargets.length ? `<button class="btn btn-secondary" data-turn-action="next" aria-label="Abrir otro duelo pendiente">Ir al siguiente duelo pendiente <small>(${nextTargets.length})</small></button>` : ''}${finished && !nextTargets.length ? '<button class="btn btn-secondary" data-turn-action="back">Volver a mis duelos</button>' : ''}</div>` : ''}
       ${!finished ? '<p class="hint">Un recordatorio tras 48 horas. Caduca a los 7 días sin actividad.</p>' : ''}
     </section></div>`;
   app.dataset.screen = 'turn-duel';

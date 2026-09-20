@@ -82,6 +82,8 @@ try {
   assert.equal(games.get('other').turnIndex, 0, 'navigation never retargets a pending move');
   t.show(clone(games.get('one')));
   assert.equal(w.document.querySelector('.reveal .year').textContent, '200');
+  assert.doesNotMatch(w.document.querySelector('.turn-duel-solution').textContent, /Debía ir después/);
+  t.show({ ...clone(games.get('one')), plays: [{ uid: 'them', cardId: 2, index: 0, correct: false }], timeline: [1], status: 'playing', turnUid: 'me' });
   assert.match(w.document.querySelector('.turn-duel-solution').textContent, /Debía ir después/);
   games.set('late', game('late'));
   t.show(clone(games.get('late'))); t.ready(); now += 19000;
