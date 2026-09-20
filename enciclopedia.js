@@ -77,12 +77,15 @@
     const visual = velada
       ? `<span class="enc-sello">${CANDADO}<span class="solo-lectores">Lámina por descubrir (bloqueada). Juega esta carta para verla.</span></span>`
       : tieneLamina ? CT.animalArt(modeKey, card) : `<span>${era.symbol}</span><small>${era.name}</small>`;
+    const visualFinal = !velada && tieneLamina && !interactive
+      ? `<button type="button" class="enc-image-zoom" data-action="enc-image" data-mode="${modeKey}" data-id="${card.id}" aria-label="Ver la ilustración de ${CT.escapeHtml(card.title)} en grande">${visual}<span class="enc-image-zoom-label">Ampliar ilustración</span></button>`
+      : visual;
     const art = tieneLamina;
     const fuente = card.source
       ? `<p class="enc-source"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Fuente <span aria-hidden="true">↗</span><span class="solo-lectores"> (se abre en una pestaña nueva)</span></a></p>`
       : "";
     const action = interactive ? ` data-action="enc-card" data-mode="${modeKey}" data-id="${card.id}" tabindex="0" role="button" aria-label="Abrir carta ${CT.escapeHtml(card.title)}"` : "";
-    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${velada ? " enc-card-velada" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"${action}><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
+    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${velada ? " enc-card-velada" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"${action}><div class="card-visual era-${era.key}">${visualFinal}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
   }
 
   function resultsMarkup(modeKey, cards, { highlight = null, descubiertas = null } = {}) {

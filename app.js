@@ -1428,6 +1428,19 @@
     </div></div>`, true);
   }
 
+  function openEnciclopediaImage(modeKey, id) {
+    if (!CT.has(modeKey)) return;
+    const card = CT.cards(modeKey).find(item => item.id === Number(id));
+    if (!card || !CT.cardArt(modeKey, card) || !(CT.Progreso?.seenCards?.() || new Set()).has(card.id)) return;
+    overlay(`<div class="overlay enc-image-overlay" data-overlay="encyclopedia-image"><div class="modal enc-image-modal" role="dialog" aria-modal="true" aria-labelledby="enc-image-title">
+      <button type="button" class="enc-card-close" data-action="enc-card-close" data-dialog-focus aria-label="Cerrar ilustración">×</button>
+      <div class="eyebrow">${escapeHtml(CT.mode(modeKey).name)}</div>
+      <h2 id="enc-image-title">${escapeHtml(card.title)}</h2>
+      <div class="enc-image-full">${CT.animalArt(modeKey, card)}</div>
+      <button type="button" class="btn btn-secondary btn-block" data-action="enc-card-close">Volver a la carta</button>
+    </div></div>`, true);
+  }
+
   function openEnciclopedia(modeKey, { highlight = null, band = "all", returnTo = "home" } = {}) {
     // Abrir la enciclopedia de un mazo cerrado la abre entera, no ese mazo.
     encMode = modeKey === "all" || (CT.has(modeKey) && CT.Cartera.tiene(modeKey)) ? modeKey : "all";
@@ -3269,6 +3282,7 @@
     else if (action === "enciclopedia") openEnciclopedia(selectedModeKey, { returnTo: "play-menu" });
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
     else if (action === "enc-card") openEnciclopediaCard(target.dataset.mode, target.dataset.id);
+    else if (action === "enc-image") openEnciclopediaImage(target.dataset.mode, target.dataset.id);
     else if (action === "enc-card-close") CT.closeDialog();
     else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }

@@ -1307,6 +1307,15 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .enc-card-large .enc-card .card-visual { min-height: 310px; }
 .enc-card-large .enc-card .card-content { padding: 18px; }
 .enc-card-large .enc-card .card-content h3 { font-size: 1.25rem; }
+.enc-image-zoom { position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 0; color: inherit; background: transparent; cursor: zoom-in; }
+.enc-image-zoom .animal-card-art { display: block; }
+.enc-image-zoom-label { position: absolute; right: 10px; bottom: 10px; padding: 7px 10px; border: 1px solid #fff8; border-radius: 999px; color: #fff; background: #21170db8; font: 700 .63rem/1 var(--ui-font); letter-spacing: .04em; opacity: .9; }
+.enc-image-zoom:focus-visible { outline: 2px solid var(--edition-rust); outline-offset: -4px; }
+.enc-image-overlay { z-index: 65; }
+.enc-image-modal { position: relative; width: min(100%, 760px); max-height: min(94dvh, 980px); overflow: auto; padding: 26px clamp(16px, 4vw, 34px) 24px; background: var(--edition-paper); }
+.enc-image-modal h2 { max-width: calc(100% - 50px); margin: 4px 0 16px; font: 600 clamp(1.5rem, 5vw, 2.2rem)/1.05 var(--font-display); }
+.enc-image-full { display: grid; place-items: center; min-height: 260px; margin: 0 auto 20px; padding: 10px; border: 1px solid var(--edition-line); background: var(--edition-surface); }
+.enc-image-full .animal-card-art { display: block; width: min(100%, 620px); max-height: min(68dvh, 720px); object-fit: contain; }
 @media (max-width: 560px) {
   #app .enc-toolbar-compact { grid-template-columns: 1fr; gap: 8px; }
   .enc-card-large .enc-card { grid-template-columns: 1fr; }
