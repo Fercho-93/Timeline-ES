@@ -364,11 +364,11 @@
     app.querySelector('.setup-section h2').textContent = 'Competición multijugador';
     app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
-  function startTournamentRound(t, players, starter, ghost, pulse) {
+  function startTournamentRound(t, players, starter, ghost, pulse, excludedCardId = null) {
     selectedModeKey = t.queue[t.index];
     selectedBlockKey = CT.blockOf(selectedModeKey).key;
     cardsById = new Map(CT.cards(selectedModeKey).map(c=>[c.id,c]));
-    const deck = shuffle(CT.cards(selectedModeKey).map(c=>c.id));
+    const deck = shuffle(CT.cards(selectedModeKey).map(c=>c.id).filter(id => id !== excludedCardId));
     const handSize = Math.min(t.handSize, Math.floor((deck.length-1)/players.length));
     const powers = CT.Powers.create(deck,players.length,handSize,ghost,pulse);
     const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
@@ -768,7 +768,7 @@
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
     if (pendingTournament) {
       const t=CT.Tournament.create(pendingTournament.rounds,requestedHand);pendingTournament=null;
-      startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse);return;
+      startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse,starterDraw.cardId);return;
     }
     // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
     // del mazo para que nadie vuelva a encontrárselas en la partida.
