@@ -110,6 +110,8 @@ const capitalsAltitude = CT.QuickCatalog.challenges.find(c => c.id === 'capitals
 assert.ok(capitalsAltitude.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const eurovisionWins = CT.QuickCatalog.challenges.find(c => c.id === 'eurovision-wins');
 assert.ok(eurovisionWins.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+const storage = CT.QuickCatalog.challenges.find(c => c.id === 'storage');
+assert.ok(storage.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
 assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
