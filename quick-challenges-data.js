@@ -99,7 +99,14 @@
         ['Independencia de EE. UU.',185,'4 de julio','assets/quick-cards/festivities-10.webp'],
         ['Halloween',304,'31 de octubre','assets/quick-cards/festivities-11.webp'],
         ['Constitución Española',341,'6 de diciembre','assets/quick-cards/festivities-12.webp'],
-        ['Navidad',359,'25 de diciembre','assets/quick-cards/festivities-13.webp']
+        ['Navidad',359,'25 de diciembre','assets/quick-cards/festivities-13.webp'],
+        ['San Isidro',135,'15 de mayo','assets/quick-cards/festivities-14.webp'],
+        ['Asunción de la Virgen',227,'15 de agosto','assets/quick-cards/festivities-15.webp'],
+        ['Fiesta Nacional de España',285,'12 de octubre','assets/quick-cards/festivities-16.webp'],
+        ['Inmaculada Concepción',342,'8 de diciembre','assets/quick-cards/festivities-17.webp'],
+        ['Fiesta de la Comunidad de Madrid',122,'2 de mayo','assets/quick-cards/festivities-18.webp'],
+        ['Nuestra Señora de la Almudena',313,'9 de noviembre','assets/quick-cards/festivities-19.webp'],
+        ['Fiesta Nacional de Francia',195,'14 de julio','assets/quick-cards/festivities-20.webp']
       ]
     ),
     d(
