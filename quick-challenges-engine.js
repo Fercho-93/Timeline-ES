@@ -5,7 +5,7 @@
   const challenge = id => catalog.challenges.find(c => c.id === id);
   const clone = value => JSON.parse(JSON.stringify(value));
   function create(config) {
-    if (!config || !Array.isArray(config.names) || config.names.length < 2 || config.names.length > 4 ||
+    if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 4 ||
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
         !Array.isArray(config.rounds) || ![1, 3].includes(config.rounds.length)) throw Error('INVALID_CONFIG');
     const ids = new Set();

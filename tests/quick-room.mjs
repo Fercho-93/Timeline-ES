@@ -1,0 +1,27 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const window={CONTINUUM:{}};for(const p of ['engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window});
+const {QuickRoom:R,QuickEngine:E}=window.CONTINUUM;
+const rounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
+let r=R.create('a','Ana',2),before=JSON.stringify(r);
+r=R.reduce(r,'b',{type:'join',name:'Bea'});assert.equal(JSON.parse(before).members.length,1);
+assert.throws(()=>R.reduce(r,'c',{type:'join',name:'Carla'}));
+assert.throws(()=>R.reduce(r,'b',{type:'start',rounds}));
+r=R.reduce(r,'a',{type:'start',rounds});
+assert.throws(()=>R.reduce(r,'b',{type:'bank'}));
+assert.throws(()=>R.reduce(r,'a',{type:'bank'},r.revision-1));
+assert.throws(()=>R.validate({...r,actor:'b'}));
+r=R.reduce(r,'a',{type:'place',cardId:'poker-2',index:1});assert.equal(R.state(r).players[0].points,1);
+assert.throws(()=>R.reduce(r,'a',{type:'place',cardId:'poker-3',index:2}));
+r=R.reduce(r,'a',{type:'ack'});assert.equal(r.actor,'b');
+r=R.reduce(r,'b',{type:'bank'});r=R.reduce(r,'a',{type:'bank'});assert.equal(r.phase,'finished');
+assert.equal(R.state(r).players[0].score,1);assert.throws(()=>R.reduce(r,'a',{type:'next'}));
+let solo=E.create({names:['Tú'],rounds});
+while(solo.phase!=='round-end'){
+  if(solo.phase==='result')solo=E.step(solo,{type:'ack'});
+  else solo=E.step(solo,{type:'place',cardId:solo.remaining[0],index:solo.timeline.length});
+}
+assert.equal(solo.players[0].score,8);
+solo=E.create({names:['Tú'],rounds});solo=E.step(solo,{type:'place',cardId:'poker-2',index:1});solo=E.step(solo,{type:'ack'});solo=E.step(solo,{type:'place',cardId:'poker-3',index:0});solo=E.step(solo,{type:'ack'});assert.equal(solo.phase,'round-end');assert.equal(solo.players[0].score,0);
+console.log('Sala de Retos: capacidad, identidad, turnos, revisiones, inmutabilidad y solitario completo: OK');

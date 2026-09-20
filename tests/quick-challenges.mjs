@@ -59,7 +59,7 @@ for (const index of [0, 1]) {
   assert.equal(E.step(s, {type: 'place', cardId: 'oscars-2', index}).result.correct, true);
 }
 oscars.cards[1].value = before;
-assert.throws(() => E.create({names: ['A'], rounds: [round('social')]}));
+assert.equal(E.create({names: ['A'], rounds: [round('social')]}).players.length, 1);
 assert.throws(() => E.restore({version: -1, config, commands: []}));
 assert.throws(() => E.restore({version: 1, config, commands: [{type: 'place', cardId: 'missing', index: 0}]}));
 assert.throws(() => E.create({names: ['A', 'B'], rounds: [{id:'social', order: ['social-1']}]}));
@@ -72,7 +72,7 @@ assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
 assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
 const click = selector => {const el = w.document.querySelector(selector); assert.ok(el, selector); el.click();};
-click('[data-action="quick-challenges"]');
+click('[data-action="quick-challenges"]'); click('[data-quick="show-multi"]'); click('[data-quick="local"]');
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
 click('[data-quick="start"]');
 let saved = JSON.parse(w.localStorage.getItem(key));

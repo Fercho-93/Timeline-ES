@@ -10,6 +10,63 @@ service cloud.firestore {
     function registered() {
       return request.auth != null;
     }
+    // Retos rápidos: historial inmutable de comandos. Cada participante escribe
+    // únicamente durante su turno; todos reconstruyen el marcador con el mismo motor.
+    match /quickRooms/{code} {
+      function valid(d) {
+        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','updatedAt'])
+          && d.version == 1 && d.capacity in [2,4] && d.host is string && d.catalog is int
+          && d.members is list && d.members.size() >= 1 && d.members.size() <= d.capacity
+          && d.members.toSet().size() == d.members.size() && d.members[0] == d.host
+          && d.names is list && d.names.size() == d.members.size()
+          && d.names[0] is string && d.names[0].size() > 0 && d.names[0].size() <= 24
+          && (d.names.size() < 2 || (d.names[1] is string && d.names[1].size() > 0 && d.names[1].size() <= 24))
+          && (d.names.size() < 3 || (d.names[2] is string && d.names[2].size() > 0 && d.names[2].size() <= 24))
+          && (d.names.size() < 4 || (d.names[3] is string && d.names[3].size() > 0 && d.names[3].size() <= 24))
+          && d.commands is list && d.commands.size() <= 100
+          && d.revision is int && d.revision >= 0 && d.revision <= 110
+          && d.actor in d.members && d.phase in ['lobby','turn','result','round-end','finished']
+          && d.updatedAt == request.time;
+      }
+      function joining(a,b) {
+        return a.phase == 'lobby' && !(request.auth.uid in a.members)
+          && b.diff(a).affectedKeys().hasOnly(['members','names','revision','updatedAt'])
+          && b.members == a.members.concat([request.auth.uid])
+          && b.names.size() == a.names.size()+1
+          && b.names == a.names.concat([b.names[b.names.size()-1]]);
+      }
+      function starting(a,b) {
+        return request.auth.uid == a.host && a.phase == 'lobby' && a.members.size() >= 2
+          && b.diff(a).affectedKeys().hasOnly(['config','phase','revision','updatedAt'])
+          && b.config is map && b.config.keys().hasOnly(['names','rounds'])
+          && b.config.names == a.names && b.config.rounds is list && b.config.rounds.size() in [1,3]
+          && b.phase == 'turn';
+      }
+      function playing(a,b) {
+        let last=b.commands[b.commands.size()-1];
+        return request.auth.uid == a.actor && a.phase in ['turn','result','round-end']
+          && b.diff(a).affectedKeys().hasOnly(['commands','phase','actor','revision','updatedAt'])
+          && b.commands.size() == a.commands.size()+1 && b.commands == a.commands.concat([last])
+          && ((a.phase=='turn' && last.type=='place' && last.keys().hasOnly(['type','cardId','index'])
+              && last.cardId is string && last.cardId.size() <= 32 && last.index is int && last.index>=0 && last.index<=10
+              && b.phase=='result' && b.actor==a.actor)
+            || (a.phase=='turn' && last=={'type':'bank'} && b.phase in ['turn','round-end','finished'])
+            || (a.phase=='result' && last=={'type':'ack'} && b.phase in ['turn','round-end','finished'])
+            || (a.phase=='round-end' && request.auth.uid==a.host && last=={'type':'next'} && b.phase=='turn'))
+          && (!(b.phase in ['round-end','finished']) || b.actor==a.host);
+      }
+      allow get: if registered() && (!exists(/databases/$(database)/documents/quickRooms/$(code)) || resource.data.phase=='lobby' || request.auth.uid in resource.data.members);
+      allow list: if false;
+      allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && valid(request.resource.data)
+        && request.resource.data.host==request.auth.uid && request.resource.data.members==[request.auth.uid]
+        && request.resource.data.config==null && request.resource.data.commands==[]
+        && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
+      allow update: if registered() && valid(request.resource.data)
+        && request.resource.data.revision==resource.data.revision+1
+        && (joining(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
+      allow delete: if registered() && request.auth.uid==resource.data.host;
+    }
+
     function blocked(a, b) {
       return exists(/databases/$(database)/documents/duelPreferences/$(a)/blocked/$(b))
         || exists(/databases/$(database)/documents/duelPreferences/$(b)/blocked/$(a));
