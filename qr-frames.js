@@ -63,7 +63,11 @@
       if (!Number.isInteger(frameTotal) || !Number.isInteger(frameIndex) || frameTotal < 1 || frameIndex < 0 || frameIndex >= frameTotal) return null;
       if (session !== frameSession || total !== frameTotal) { session = frameSession; total = frameTotal; chunks.clear(); }
       chunks.set(frameIndex, text.slice(6));
-      if (chunks.size < total) return { done: false, received: chunks.size, total };
+      if (chunks.size < total) {
+        const missing = [];
+        for (let i = 0; i < total; i++) if (!chunks.has(i)) missing.push(i + 1);
+        return { done: false, received: chunks.size, total, missing };
+      }
       const ordered = [];
       for (let i = 0; i < total; i++) ordered.push(chunks.get(i));
       return { done: true, received: total, total, text: ordered.join("") };

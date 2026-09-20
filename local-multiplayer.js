@@ -40,8 +40,9 @@
   // cámara abierta) que hay que cerrar en cuanto se deja esa pantalla — el `paint` de más
   // abajo lo hace solo con que la pantalla destino no sea la suya.
   let qrShowText = "", qrShowTitle = "", qrShowOnBack = null;
+  let qrShowFrames = [], qrShowIndex = 0;
   let qrScanTitle = "", qrScanHint = "", qrScanOnResult = null, qrScanOnBack = null;
-  let qrCycleTimer = null, cameraHandle = null;
+  let cameraHandle = null;
 
   function showToast(message) {
     const toastEl = document.getElementById("toast");
@@ -52,11 +53,9 @@
     showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 2500);
   }
 
-  function stopQrCycle() { if (qrCycleTimer) { clearInterval(qrCycleTimer); qrCycleTimer = null; } }
   function stopCamera() { cameraHandle?.stop(); cameraHandle = null; }
 
   function paint(html, pantalla) {
-    if (pantalla !== "local-qr-show") stopQrCycle();
     if (pantalla !== "local-qr-scan") stopCamera();
     CT.paint(appEl, html, pantalla);
   }
@@ -119,12 +118,18 @@
   // invitado todavía no conoce (código, modalidad, huella del mazo). La respuesta del
   // invitado no necesita nada de esto — el anfitrión ya sabe en qué sala está — así que
   // esa viaja tal cual, sin envolver.
-  function encodeInvite(data) { return "CTM1:" + CT.LocalTransport.encodeText(JSON.stringify(data)); }
+  //
+  // Sin el paso extra por base64 que llevaba antes: todos los campos ya son texto seguro
+  // (letras, dígitos, puntos) generado por la propia aplicación, nunca escrito a mano por
+  // quien juega, así que el JSON en crudo no necesita esa envoltura — y se ahorra justo el
+  // 33% que añade base64, la diferencia entre que una invitación quepa en 10 códigos QR
+  // seguidos o en 13 (menos partes que enseñar y leer con la cámara, ver `qr-frames.js`).
+  function encodeInvite(data) { return "CTM1:" + JSON.stringify(data); }
   function decodeInvite(text) {
     const trimmed = String(text || "").trim();
     if (!trimmed.startsWith("CTM1:")) throw new Error("INVALID_INVITE");
     let data;
-    try { data = JSON.parse(CT.LocalTransport.decodeText(trimmed.slice(5))); }
+    try { data = JSON.parse(trimmed.slice(5)); }
     catch { throw new Error("INVALID_INVITE"); }
     if (!data || typeof data.signal !== "string" || typeof data.roomCode !== "string") throw new Error("INVALID_INVITE");
     return data;
@@ -159,7 +164,7 @@
   // ---------------------------------------------------------------------------
   // Entrada
   function open(options = {}) {
-    stopCamera(); stopQrCycle();
+    stopCamera();
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     role = null; hostSession = null; guestSession = null; roomState = null;
@@ -260,7 +265,7 @@
       const invite = await hostSession.invitePeer();
       const inviteText = encodeInvite({
         v: 1, roomCode: roomState.roomCode, modeKey, deckFingerprint: roomState.deckFingerprint,
-        hostName: myName, signal: invite.offerSignal
+        signal: invite.offerSignal
       });
       pendingInvite = { ...invite, inviteText };
       renderInvitar(false);
@@ -314,37 +319,33 @@
   // sin Bluetooth emparejado ni AirDrop compatible entre ambos).
   function openQrShow(text, { title, onBack }) {
     qrShowText = text; qrShowTitle = title; qrShowOnBack = onBack;
+    try { qrShowFrames = CT.QrFrames.split(text); }
+    catch (error) { console.error(error); showToast("El código es demasiado largo para mostrarlo como QR"); return; }
+    qrShowIndex = 0;
     renderQrShow();
   }
 
+  // Nada de ciclo automático: con varias partes, quien escanea necesita tiempo para
+  // enfocar y leer cada una, y un temporizador ciego —moviéndose solo cada pocos
+  // milisegundos— no da ese tiempo y encima resulta imposible de seguir a simple vista.
+  // Mejor que la propia persona pase a la siguiente parte cuando vea que la cámara ya ha
+  // leído la actual (o, con una sola parte, no hace falta ni tocar nada).
   function renderQrShow() {
     screen = "local-qr-show";
+    const varias = qrShowFrames.length > 1;
     paint(`<div class="shell online-shell">${header("qr-show-back")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Código QR</div><h2 data-focus tabindex="-1">${escapeHtml(qrShowTitle)}</h2><p class="lead">Enseña esta pantalla a la otra persona para que la escanee con la cámara de su móvil.</p></section>
-      <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-qr-canvas" aria-label="Código QR"></canvas></div><p class="hint" id="local-qr-progress" aria-live="polite"></p></div>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Código QR</div><h2 data-focus tabindex="-1">${escapeHtml(qrShowTitle)}</h2><p class="lead">Enseña esta pantalla a la otra persona para que la escanee con la cámara de su móvil.${varias ? " Al ser un código largo, se enseña en varias partes: pasa a la siguiente en cuanto la otra persona te diga que ya ha leído esta." : ""}</p></section>
+      <div class="panel qr-panel"><div class="qr-frame"><canvas id="local-qr-canvas" aria-label="Código QR"></canvas></div>${varias ? `<p class="hint">Parte ${qrShowIndex + 1} de ${qrShowFrames.length}</p><div class="qr-nav"><button type="button" class="btn btn-secondary" data-local-action="qr-prev" ${qrShowIndex === 0 ? "disabled" : ""}>← Anterior</button><button type="button" class="btn btn-primary" data-local-action="qr-next" ${qrShowIndex === qrShowFrames.length - 1 ? "disabled" : ""}>Siguiente →</button></div>` : '<p class="hint">Código listo para escanear</p>'}</div>
       <button type="button" class="btn btn-ghost btn-block" data-local-action="qr-show-back">Ya lo ha escaneado</button>
     </div>`, "local-qr-show");
-    startQrCycle();
+    CT.QrEncode.draw(document.getElementById("local-qr-canvas"), qrShowFrames[qrShowIndex]);
   }
 
-  function startQrCycle() {
-    stopQrCycle();
-    const canvas = document.getElementById("local-qr-canvas");
-    const progressEl = document.getElementById("local-qr-progress");
-    if (!canvas) return;
-    let frames;
-    try { frames = CT.QrFrames.split(qrShowText); }
-    catch (error) { console.error(error); showToast("El código es demasiado largo para mostrarlo como QR"); return; }
-    let index = 0;
-    const drawFrame = () => {
-      CT.QrEncode.draw(canvas, frames[index]);
-      if (progressEl) progressEl.textContent = frames.length > 1
-        ? `Parte ${index + 1} de ${frames.length} — espera a que pasen todas antes de cerrar`
-        : "Código listo para escanear";
-      index = (index + 1) % frames.length;
-    };
-    drawFrame();
-    if (frames.length > 1) qrCycleTimer = setInterval(drawFrame, 650);
+  function doQrShowStep(delta) {
+    const next = qrShowIndex + delta;
+    if (next < 0 || next >= qrShowFrames.length) return;
+    qrShowIndex = next;
+    renderQrShow();
   }
 
   function openQrScan({ title, hint, onResult, onBack }) {
@@ -371,7 +372,9 @@
       cameraHandle = await CT.QrScanner.start(videoEl, text => {
         const progress = reader.ingest(text);
         if (!progress) return;
-        if (statusEl) statusEl.textContent = progress.total > 1 ? `Leyendo… parte ${progress.received} de ${progress.total}` : "Leyendo…";
+        if (statusEl) statusEl.textContent = progress.total > 1
+          ? `Leídas ${progress.received} de ${progress.total} — falta${progress.missing?.length === 1 ? "" : "n"}: ${progress.missing?.join(", ")}`
+          : "Leyendo…";
         if (progress.done) { const onResult = qrScanOnResult; stopCamera(); onResult?.(progress.text); }
       }, () => { if (statusEl) statusEl.textContent = "No se ha podido leer el código. Sigue encuadrándolo."; });
     } catch (error) {
@@ -596,6 +599,8 @@
         onBack: () => renderUnirseForm()
       });
     }
+    else if (action === "qr-prev") doQrShowStep(-1);
+    else if (action === "qr-next") doQrShowStep(1);
     else if (action === "qr-show-back") { const onBack = qrShowOnBack; qrShowOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "qr-scan-back") { const onBack = qrScanOnBack; qrScanOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "start") doStart();
