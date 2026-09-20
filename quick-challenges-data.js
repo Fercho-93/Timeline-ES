@@ -154,7 +154,14 @@
         ['Desembarco de Normandía',19440606,'6 junio 1944','assets/quick-cards/wwii-8.webp'],
         ['Batalla de las Ardenas',19441216,'16 diciembre 1944','assets/quick-cards/wwii-9.webp'],
         ['Victoria en Europa',19450508,'8 mayo 1945','assets/quick-cards/wwii-10.webp'],
-        ['Bomba atómica sobre Hiroshima',19450806,'6 agosto 1945','assets/quick-cards/wwii-11.webp']
+        ['Bomba atómica sobre Hiroshima',19450806,'6 agosto 1945','assets/quick-cards/wwii-11.webp'],
+        ['Operación Barbarroja',19410622,'22 junio 1941','assets/quick-cards/wwii-12.webp'],
+        ['Batalla de Midway',19420604,'4 junio 1942','assets/quick-cards/wwii-13.webp'],
+        ['Rendición de Italia',19430908,'8 septiembre 1943','assets/quick-cards/wwii-14.webp'],
+        ['Liberación de París',19440825,'25 agosto 1944','assets/quick-cards/wwii-15.webp'],
+        ['Conferencia de Yalta',19450204,'4 febrero 1945','assets/quick-cards/wwii-16.webp'],
+        ['Pacto Mólotov-Ribbentrop',19390823,'23 agosto 1939','assets/quick-cards/wwii-17.webp'],
+        ['Conferencia de Wannsee',19420120,'20 enero 1942','assets/quick-cards/wwii-18.webp']
       ]
     ),
     d(
