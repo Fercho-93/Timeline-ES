@@ -357,7 +357,7 @@ console.log('Vista Android compacta: detección independiente y ampliación del 
     try {
       assert.equal(w.document.documentElement.dataset.theme, expected, `${legacy} migra a ${expected}`);
       const migrated = JSON.parse(w.localStorage.getItem('hilo-ajustes-v1'));
-      assert.deepEqual(migrated, { theme: expected, textSize: '150', ambience: true });
+      assert.deepEqual(migrated, { theme: expected, textSize: '150', ambience: true, haptics: false, depth: false, ambienceVolume: 50 });
       assert.deepEqual(colores(w), [COLORES[expected], COLORES[expected]]);
     } finally { w.close(); }
   }

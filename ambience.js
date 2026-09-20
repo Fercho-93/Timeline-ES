@@ -4,11 +4,13 @@
   const CT = window.CONTINUUM;
   const TRACKS = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'].map(name => `assets/audio/${name}.mp3`);
   const OVERLAP = 4, VOLUME = .12, FADE_IN = 2.2, FADE_OUT = .3;
+  let userVolume = 1;
   let queue = [], last = null, audio, master, loading = false, ready = null;
   let pageActive = true, nativeActive = true, startRequested = false, pauseTimer;
   let transport = Promise.resolve(), targetVolume = 0;
   const voices = new Set();
   const enabled = () => CT.effectPrefs?.().ambience === true && pageActive && nativeActive && !document.hidden;
+  const outputVolume = () => VOLUME * Math.max(0, Math.min(1, Number(CT.effectPrefs?.().ambienceVolume ?? userVolume) || 0));
 
   function refill() {
     queue = [...TRACKS];
@@ -54,7 +56,7 @@
         const resuming = audio.state !== 'running';
         if (resuming) await audio.resume();
         if (!enabled()) { await audio.suspend(); return; }
-        if (resuming || targetVolume !== VOLUME) fadeMaster(VOLUME, FADE_IN);
+        if (resuming || targetVolume !== outputVolume()) fadeMaster(outputVolume(), FADE_IN);
         void prepareNext();
       } else {
         await audio.suspend();
@@ -169,7 +171,7 @@
       // Aunque el navegador aún no deje sonar nada, la primera pista se va bajando.
       void preload();
       // Navegar no reinicia la pista ni aplica otra entrada de volumen.
-      if (audio.state !== 'running' || targetVolume !== VOLUME) reconcile();
+      if (audio.state !== 'running' || targetVolume !== outputVolume()) reconcile();
       else void prepareNext();
     }
   }
@@ -190,7 +192,7 @@
       })).catch(() => {});
     }
   } catch { /* La visibilidad del documento sigue cubriendo la pausa. */ }
-  CT.Ambience = {sync};
+  CT.Ambience = {sync, setVolume(value) { userVolume = Math.max(0, Math.min(1, Number(value) || 0)); if (audio && enabled()) fadeMaster(outputVolume(), .2); }};
   // Los ajustes ya están cargados y el splash sigue visible. No esperar al
   // inicio de sesión ni a la primera pantalla del juego para pedir la música.
   sync(true);
