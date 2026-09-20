@@ -21,22 +21,22 @@
   function setup() {
     state = null; record = null; selected = null; slot = null;
     const saved = load();
-    shell(`${masthead('Retos rápidos', 'Elige una carta, colócala y decide cuándo asegurar tus puntos.', 'quick')}
-      <section class="panel quick-panel quick-setup" aria-labelledby="quick-setup-title">
-      <header class="quick-setup-heading"><div><div class="eyebrow">Un solo móvil</div><h2 id="quick-setup-title">Preparad la mesa</h2></div><span class="quick-table-mark" aria-hidden="true">◇</span></header>
-      <fieldset class="quick-fieldset"><legend>¿Cuántos jugáis?</legend><div class="quick-count-options"><label class="quick-count-option"><input type="radio" name="quick-count" value="2" checked><span><b>2</b><small>jugadores</small></span></label><label class="quick-count-option"><input type="radio" name="quick-count" value="3" ><span><b>3</b><small>jugadores</small></span></label><label class="quick-count-option"><input type="radio" name="quick-count" value="4" ><span><b>4</b><small>jugadores</small></span></label></div><p class="quick-help">También podéis jugar por equipos.</p></fieldset>
-      <div id="quick-names" class="quick-names">${nameFields(2)}</div>
-      <fieldset class="quick-fieldset quick-duration"><legend>Elegid la partida</legend><div class="quick-length-options"><label class="quick-length-option"><input type="radio" name="quick-length" value="1"><span><b>Un reto</b><small>Elegís la temática</small></span></label><label class="quick-length-option"><input type="radio" name="quick-length" value="3" checked><span><b>Tres retos</b><small>Sorpresa en cada ronda</small></span></label></div></fieldset>
-      <div id="quick-choice-wrap" hidden><label for="quick-choice">¿A qué jugamos?</label><select id="quick-choice">${CT.QuickCatalog.challenges.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div>
-      <p class="quick-help quick-turn-note">El primer turno rota en cada reto.</p>
-      <div class="quick-start-actions">${button('start', 'Barajar y empezar <span aria-hidden="true">→</span>', 'btn btn-primary btn-block')}
-      ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}</div>
-      <p id="quick-error" role="alert">${esc(error)}</p></section>
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">De 2 a 4 jugadores o equipos en un solo móvil.</p><div class="panel">
+      <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
+      <div id="quick-names">${nameFields(2)}</div>
+      ${button('add-player', '＋ Añadir participante', 'btn btn-ghost')}</div>
+      <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
+      <div class="setup-grid"><div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="3">Tres retos variados</option><option value="1">Un solo reto</option></select></div>
+      <div id="quick-choice-wrap" class="field" hidden><label for="quick-choice">Elige el reto</label><select id="quick-choice">${CT.QuickCatalog.challenges.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div></div>
+      <p class="hint">El primer turno rota en cada reto.</p></div>
+      ${button('start', 'Barajar y empezar <span>→</span>', 'btn btn-primary btn-block')}
+      ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}
+      <p id="quick-error" role="alert">${esc(error)}</p></div></section>
       <details class="panel quick-panel"><summary>Cómo se juega</summary><ol><li>Una carta revelada inicia la línea, sin dar puntos.</li><li>Elige una de las cartas comunes y toca un hueco. Confirma para revelar el dato.</li><li>Acertar suma un punto provisional y pasa el turno.</li><li>En tu siguiente turno puedes plantarte: aseguras tus puntos y sales de este reto.</li><li>Fallar pierde tus puntos de este reto y te retira. Los de retos anteriores se conservan.</li><li>Al agotarse las cartas, los puntos pendientes se aseguran. El reto también termina si nadie sigue activo.</li></ol><p>La carta fallada queda corregida en la línea. Si queda una sola persona, puede seguir arriesgando. Los empates de valor admiten cualquier orden equivalente. Gana quien suma más puntos; un empate final se comparte.</p></details>
       <section class="quick-catalog" aria-label="Retos disponibles">${CT.QuickCatalog.challenges.map(c => `<article class="panel quick-panel"><h2>${esc(c.title)}</h2><p>${esc(c.rule)}</p><small>${c.cards.length} cartas · una de referencia</small></article>`).join('')}</section>`);
   }
   function nameFields(count, names = []) {
-    return Array.from({length: count}, (_, i) => `<div class="quick-player"><span class="quick-player-token" aria-hidden="true">${i + 1}</span><div><label for="quick-name-${i}">Jugador o equipo ${i + 1}</label><input id="quick-name-${i}" data-quick-name maxlength="24" value="${esc(names[i] || `Jugador ${i + 1}`)}" autocomplete="off" spellcheck="false"></div></div>`).join('');
+    return Array.from({length: count}, (_, i) => `<div class="player-row"><input id="quick-name-${i}" data-quick-name aria-label="Nombre del jugador o equipo ${i + 1}" maxlength="24" value="${esc(names[i] ?? `Jugador ${i + 1}`)}" autocomplete="off"><button class="remove" data-quick="remove-player" data-index="${i}" aria-label="Quitar jugador ${i + 1}" ${count <= 2 ? 'disabled' : ''}>×</button></div>`).join('');
   }
   function save() { CT.Storage.setItem(KEY, JSON.stringify(record)); }
   function dispatch(command) {
@@ -99,16 +99,20 @@
   }
   document.addEventListener('change', event => {
     if (!app().querySelector('.quick-shell')) return;
-    if (event.target.name === 'quick-count') {
-      const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
-      app().querySelector('#quick-names').innerHTML = nameFields(Number(event.target.value), names);
-    }
-    if (event.target.name === 'quick-length') app().querySelector('#quick-choice-wrap').hidden = event.target.value !== '1';
+    if (event.target.id === 'quick-length') app().querySelector('#quick-choice-wrap').hidden = event.target.value !== '1';
   });
   document.addEventListener('click', event => {
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
+    if (action === 'add-player' || action === 'remove-player') {
+      const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
+      if (action === 'add-player' && names.length < 4) names.push(`Jugador ${names.length + 1}`);
+      else if (action === 'remove-player' && names.length > 2) names.splice(Number(target.dataset.index), 1);
+      app().querySelector('#quick-names').innerHTML = nameFields(names.length, names);
+      app().querySelector('[data-quick="add-player"]').disabled = names.length >= 4;
+      app().querySelector(`#quick-name-${names.length - 1}`)?.focus(); return;
+    }
     if (action === 'menu') {menu(); return;}
     if (action === 'close-menu') {CT.closeDialog(); return;}
     if (action === 'exit') {CT.UI.confirmExit('La partida se conserva para que puedas continuar después.', setup); return;}
@@ -118,7 +122,7 @@
       if (names.some(n => !n) || new Set(names.map(n => n.toLocaleLowerCase('es'))).size !== names.length) {
         app().querySelector('#quick-error').textContent = 'Escribe nombres diferentes para cada participante.'; return;
       }
-      const count = Number(app().querySelector('[name="quick-length"]:checked').value);
+      const count = Number(app().querySelector('#quick-length').value);
       const list = count === 1 ? [E.challenge(app().querySelector('#quick-choice').value)] : CT.shuffle(CT.QuickCatalog.challenges).slice(0, count);
       const config = {names, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id))}))};
       record = {version: CT.QuickCatalog.version, config, commands: []}; state = E.create(config);
