@@ -76,6 +76,27 @@
     return `<div class="wifi-note">${WIFI_ICON}<p><strong>Antes de empezar:</strong> uno de los móviles activa su punto de acceso Wi-Fi (mejor si es Android) y el resto se une a esa red — no hace falta que tenga internet.</p></div>`;
   }
 
+  // El permiso de la cámara hay que pedirlo aquí, al entrar, no cuando ya haga falta
+  // escanear: para entonces puede que no quede conexión y, si el navegador lo denegó,
+  // no hay manera cómoda de ir a activarlo a mano en mitad de la partida. Pedirlo ahora,
+  // con la pantalla explicando por qué, dispara el aviso del sistema mientras todavía se
+  // puede arreglar sin prisas.
+  function cameraNote() {
+    return `<div class="wifi-note">${CAMERA_ICON}<p><strong>Hace falta la cámara</strong> para leer los códigos QR entre los móviles cuando no compartáis ningún otro canal. Actívala ahora — si esperas a necesitarla, puede que ya no tengas cómo arreglarlo.</p><button type="button" class="btn btn-secondary" data-local-action="warm-camera">Activar la cámara</button></div>`;
+  }
+
+  async function warmUpCamera() {
+    if (!CT.QrScanner.isSupported()) { showToast("Este navegador no permite usar la cámara aquí."); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+      stream.getTracks().forEach(track => track.stop());
+      showToast("Cámara activada. Ya puedes escanear códigos QR sin conexión.");
+    } catch (error) {
+      console.error(error);
+      showToast("No se pudo activar la cámara. Revisa los permisos del navegador o del sistema.");
+    }
+  }
+
   function createRoomCode() {
     const values = new Uint32Array(8);
     crypto.getRandomValues(values);
@@ -178,6 +199,7 @@
     paint(`<div class="shell online-shell">${header("back")}
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(CT.mode(modeKey).name)}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas — sin internet</h2><p class="lead">Cada persona juega desde su móvil, conectadas por Wi-Fi local, sin ninguna conexión a internet.</p></section>
       ${wifiNote()}
+      ${cameraNote()}
       <div class="online-entry-grid">
         <div class="panel online-form"><span class="form-number">01</span><h3>Unirse a una sala</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme a la partida <span>→</span></button></div>
         <form class="panel online-form" data-local-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
@@ -540,6 +562,7 @@
     if (action === "back") { if (onBackToMenu) onBackToMenu(); }
     else if (action === "leave") leaveToEntrada();
     else if (action === "go-unirse") renderUnirseForm();
+    else if (action === "warm-camera") void warmUpCamera();
     else if (action === "go-entrada") renderEntrada();
     else if (action === "local-lobby") { if (roomState) renderLobby(); else renderEntrada(); }
     else if (action === "invite") void openInvite();

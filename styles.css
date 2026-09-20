@@ -899,8 +899,13 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .qr-top { min-width: 45px; padding-inline: 12px; }
 .qr-modal .eyebrow { justify-content: center; }
 .qr-modal h2 { margin-top: 8px; }
-.qr-frame { width: min(100%, 270px); aspect-ratio: 1; margin: 17px auto 12px; display: grid; place-items: center; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: inset 0 0 0 7px #fff, var(--shadow-soft); }
-.qr-frame canvas { width: min(92%, 240px); height: auto; display: block; image-rendering: pixelated; }
+.qr-frame { width: min(100%, 340px); aspect-ratio: 1; margin: 17px auto 12px; display: grid; place-items: center; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: inset 0 0 0 7px #fff, var(--shadow-soft); }
+/* Una invitación completa da un QR bastante más denso (100+ cuadraditos) que el código
+   corto de sala de online.js: encogerlo a un cuadrado pequeño deja cada cuadradito por
+   debajo de lo que una cámara de móvil puede resolver a la distancia normal a la que se
+   enseña una pantalla a otra. Que ocupe todo el hueco disponible del marco, no un tamaño
+   fijo pensado para un código mucho más simple. */
+.qr-frame canvas { width: 96%; height: auto; display: block; image-rendering: pixelated; }
 .qr-panel { text-align: center; }
 .qr-panel .qr-frame video { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block; }
 .qr-panel #local-qr-progress, .qr-panel #local-qr-scan-status { margin: 0; }
