@@ -165,7 +165,7 @@
     const descubiertas = seen();
     const groups = catalogGroups(query, { lock, descubiertas });
     if (!groups.length) {
-      return `<p class="enc-empty">${lock === "locked" ? "No queda ninguna lámina por desbloquear." : lock === "seen" ? "Todavía no has desbloqueado ninguna lámina." : "Ninguna carta coincide con la búsqueda."}</p>`;
+      return `<p class="enc-empty">${lock === "locked" ? "No queda ninguna lámina por descubrir." : lock === "seen" ? "Todavía no has descubierto ninguna lámina." : "Ninguna carta coincide con la búsqueda."}</p>`;
     }
     // Con una búsqueda o un filtro puesto, los mazos se abren solos: si no, lo único que
     // se vería es una lista de nombres. Pero solo mientras quepan: «bloqueadas» sobre el
