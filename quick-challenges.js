@@ -29,11 +29,17 @@
   function formatMenu() {
     stopNetwork();page='menu';state=null;record=null;const saved=load();
     shell(`${masthead('Retos rápidos','Ordena. Arriesga. Asegura.','quick')}<section class="home-play"><section class="play-choices" aria-labelledby="quick-formats-title"><div class="play-choices-head"><div><div class="eyebrow">Elegir formato</div><h2 id="quick-formats-title">¿Cómo quieres jugar?</h2></div></div>
-    <div class="play-choice-block"><button class="play-block-toggle walking-choice" data-quick="show-multi" aria-expanded="false"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Multijugador</b><small>Un solo móvil o varios.</small></span><i aria-hidden="true">⌄</i></button><div id="quick-multi" class="play-choice-grid" hidden>${choice('local','Un solo móvil','Pasad el teléfono en cada turno.')}${choice('internet','Varios móviles','Crear sala o unirse por internet.')}${choice('offline','Sin conexión','Varios móviles en la misma red Wi-Fi.')}</div></div>
+    <div class="play-choice-block"><button class="play-block-toggle walking-choice" data-quick="show-multi" aria-expanded="false"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Multijugador</b><small>Un solo móvil o varios.</small></span><i aria-hidden="true">⌄</i></button><div id="quick-multi" class="play-choice-grid" hidden>${choice('local','Un solo móvil','Pasad el teléfono en cada turno.','local')}${choice('internet','Varios móviles','Crear sala o unirse por internet.','internet')}${choice('offline','Sin conexión','Varios móviles en la misma red Wi-Fi.','offline')}</div></div>
     <div class="direct-solo"><button class="play-choice walking-choice" data-quick="solo-menu"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Reto diario, partida libre o duelo por enlace.</small></span><i aria-hidden="true">→</i></button></div>
     ${saved ? button('resume','Continuar partida guardada','continue-choice') : ''}${readJSON(NET) ? button('reconnect','Volver a mi sala por internet','continue-choice') : ''}<p id="quick-error" role="alert">${esc(error)}</p></section></section>`);
   }
-  function choice(action,title,subtitle) {return `<button class="play-choice" data-quick="${action}"><span><b>${title}</b><small>${subtitle}</small></span><i aria-hidden="true">→</i></button>`;}
+  function choiceIcon(kind) {
+    const common='viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
+    if(kind==='local')return `<svg ${common}><rect x="7" y="2.75" width="10" height="18.5" rx="2.2"></rect><path d="M10.5 18h3"></path></svg>`;
+    if(kind==='internet')return `<svg ${common}><rect x="3" y="6" width="10" height="15" rx="2"></rect><rect x="11" y="2.75" width="10" height="15" rx="2"></rect><path d="M14 14.75h4"></path></svg>`;
+    return `<svg ${common}><rect x="3" y="6" width="8" height="13" rx="1.8"></rect><rect x="13" y="5" width="8" height="13" rx="1.8"></rect><path d="M11 12h2"></path></svg>`;
+  }
+  function choice(action,title,subtitle,kind) {return `<button class="play-choice" data-quick="${action}"><span class="choice-icon">${choiceIcon(kind)}</span><span><b>${title}</b><small>${subtitle}</small></span><i aria-hidden="true">→</i></button>`;}
   function soloMenu() {
     page='solo-menu';state=null;record=null;const daily=readJSON(DAILY),today=day();const done=daily?.config?.day===today;let score='';
     if(done){try{const s=E.restore(daily);score=`${s.players[0].score} puntos asegurados`;}catch{}}
