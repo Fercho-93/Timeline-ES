@@ -78,6 +78,8 @@ const wwii = CT.QuickCatalog.challenges.find(c => c.id === 'wwii');
 assert.ok(wwii.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const civilWar = CT.QuickCatalog.challenges.find(c => c.id === 'civil-war');
 assert.ok(civilWar.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+const kings = CT.QuickCatalog.challenges.find(c => c.id === 'kings');
+assert.ok(kings.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
 assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
