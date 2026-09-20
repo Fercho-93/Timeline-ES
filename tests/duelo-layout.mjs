@@ -28,7 +28,7 @@ try {
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     // Disable all application scripts: no network game or authentication is created.
     await page.route('**/*', route => route.request().url().startsWith(`http://127.0.0.1:${server.address().port}/`) ? route.continue() : route.abort());
-    await page.setContent(`<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/styles.css"><main id="app"></main><div id="toast"></div>`);
+    await page.setContent(`<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/edition.css"><link rel="stylesheet" href="/accounts.css"><main id="app"></main><div id="toast"></div>`);
     await page.evaluate(() => {
       const cards = Array.from({ length: 20 }, (_, i) => ({ id: i + 1, title: `Acontecimiento histórico número ${i + 1}`, year: 1000 + i, detail: 'Explicación de la carta.' }));
       window.CONTINUUM = {

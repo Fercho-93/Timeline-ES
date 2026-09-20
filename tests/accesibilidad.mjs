@@ -75,7 +75,7 @@ console.log("\nLas capas son diálogos de verdad");
   click(w, '[data-action="rules"]');
   const modal = el(w, ".overlay .modal");
   ok("se anuncia como diálogo", modal.getAttribute("role") === "dialog" && modal.getAttribute("aria-modal") === "true");
-  ok("y con nombre, tomado de su titular", modal.getAttribute("aria-labelledby") === el(w, ".overlay .modal h2").id);
+  ok("y con nombre, tomado de su titular", modal.getAttribute("aria-labelledby") === el(w, ".overlay .modal h1, .overlay .modal h2").id);
   ok("el foco entra dentro", modal.contains(activo(w)));
 
   const abrio = el(w, '[data-action="rules"]');

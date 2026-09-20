@@ -1358,9 +1358,7 @@
     paint(`<div class="enc-background" data-background-screen="${encBackgroundScreen}" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
       <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
       <section class="setup-section enc-section">
-        <div class="eyebrow"><span class="eyebrow-line"></span> Enciclopedia</div>
-        <h1 data-focus tabindex="-1">${escapeHtml(mode.name)}</h1>
-        <p class="lead" id="enc-count">${encCountText(encMode, cards.length)}</p>
+        <header class="atlas-page-heading"><div class="eyebrow">El atlas de Continuum</div><h1 data-focus tabindex="-1">Enciclopedia</h1><p>Explora las cartas. Completa tu colección, una partida a la vez.</p></header><div class="enc-selection-heading"><h2>${escapeHtml(mode.name)}</h2><p id="enc-count" role="status">${encCountText(encMode, cards.length)}</p></div>
         <div class="panel enc-toolbar enc-toolbar-compact">
           <div class="enc-primary-filters">
           <div class="field">
@@ -1384,7 +1382,7 @@
           </div>` : ''}
         </div>
         ${all && !encQuery && encLock === "all" ? CT.Enciclopedia.recentMarkup() : ""}
-        ${all && encLock === "all" ? '<p class="hint">Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
+        ${all && encLock === "all" ? '<p class="hint" data-enc-browse-hint>Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
         <div id="enc-results">${all ? CT.Enciclopedia.catalogMarkup(encQuery, { lock: encLock }) : CT.Enciclopedia.resultsMarkup(encMode, cards, { highlight: encHighlight })}</div>
         <button type="button" class="btn btn-secondary btn-block" data-action="enc-back">Cerrar enciclopedia</button>
       </section>
@@ -1487,10 +1485,10 @@
   function perfilLogros(logros) {
     const grupos = LOGRO_GRUPOS.filter(grupo => logros.some(logro => logro.group === grupo));
     return `<div class="section-label">Logros <small>${logros.filter(l => l.unlocked).length} de ${logros.length}</small></div>
-      ${grupos.map(grupo => `<h3 class="logro-grupo">${escapeHtml(grupo)}</h3>
+      ${grupos.map(grupo => `<details class="perfil-achievement-group"><summary><span><b>${escapeHtml(grupo)}</b><small>${logros.filter(l => l.group === grupo && l.unlocked).length} de ${logros.filter(l => l.group === grupo).length} conseguidos</small></span><i aria-hidden="true">+</i></summary>
         <div class="logro-grid" role="group" aria-label="Logros de ${escapeHtml(grupo)}">
           ${logros.filter(logro => logro.group === grupo).map(logroCard).join("")}
-        </div>`).join("")}`;
+        </div></details>`).join("")}`;
   }
 
   function logroCard(logro) {
@@ -1532,26 +1530,23 @@
     const estrenado = resumen.cards > 0 || resumen.games > 0;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
-        <div class="eyebrow"><span class="eyebrow-line"></span> Tu progreso</div>
-        <h1 data-focus tabindex="-1">Perfil</h1>
-        ${CT.Accounts?.card() || ""}
-        <section class="panel turn-duel-profile" id="turn-duels-profile"><h2>Duelo por turnos</h2><p>Cargando tus partidas activas…</p></section>
+        <header class="atlas-page-heading"><div class="eyebrow">Tu historia en Continuum</div><h1 data-focus tabindex="-1">Perfil</h1><p>Cada partida deja una huella. Este es tu recorrido.</p></header>
         ${estrenado
           ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
-          : `<p class="lead">Aquí se irá guardando lo que juegues: aciertos, mazos, puntos débiles y logros. Todavía no hay nada que contar.</p>`}
+          : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
         ${perfilResumen(resumen)}
+        <div class="perfil-layout"><div class="perfil-main"><section class="panel turn-duel-profile" id="turn-duels-profile"><h2>Mis duelos</h2><p role="status">Cargando tus partidas…</p></section>
         ${perfilPorJuego(filas)}
         ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
-        ${perfilLogros(CT.Progreso.achievements())}
-        ${CT.Accounts ? "" : perfilCopia()}
+        ${perfilLogros(CT.Progreso.achievements())}</div><aside class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</aside></div>
       </section>
       ${homeNav()}
     </div>`);
+    const box = document.getElementById("turn-duels-profile");
     turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
-      const box = document.getElementById("turn-duels-profile");
-      if (!box || screen !== "perfil") return;
+      if (!box?.isConnected || screen !== "perfil") return;
       box.innerHTML = CT.TurnDuel.profileMarkup(partidas);
-    }).catch(() => { const box = document.getElementById('turn-duels-profile'); if (box) box.innerHTML = '<h2>Mis duelos</h2><p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a abrir el perfil.</p>'; });
+    }).catch(() => { if (box?.isConnected && screen === 'perfil') box.innerHTML = '<h2>Mis duelos</h2><p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a abrir el perfil.</p>'; });
   }
 
   async function perfilExport() {
@@ -3048,6 +3043,7 @@
       // Se actualiza solo el resultado, sin repintar la pantalla entera: repintarla
       // destruiría el campo justo mientras se escribe en él.
       encQuery = event.target.value;
+      app.querySelectorAll('.enc-recent, [data-enc-browse-hint]').forEach(element => { element.hidden = !!encQuery.trim(); });
       const all = encMode === "all";
       const cards = all
         ? CT.Enciclopedia.catalogGroups(encQuery, { lock: encLock }).flatMap(group => group.decks.flatMap(deck => deck.cards))

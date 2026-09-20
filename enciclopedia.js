@@ -180,7 +180,7 @@
     return plegados + groups.map((block, blockIndex) => `<section class="enc-topic" aria-labelledby="enc-topic-${block.key}">
       <div class="enc-topic-divider"><span>Cuaderno ${String(blockIndex + 1).padStart(2, "0")}</span><h2 id="enc-topic-${block.key}"><i aria-hidden="true">${block.icon}</i> ${CT.escapeHtml(block.name)}</h2></div>
       ${block.decks.map((deck, deckIndex) => `<details class="enc-deck" data-enc-deck="${deck.key}"${searching ? ' open data-loaded="true"' : ''}>
-        <summary>${deckCover(block, deckIndex)}<span class="enc-deck-copy"><b>${CT.escapeHtml(deck.name)}</b><small>${deck.cards.length} cartas${laminaResumen(deck.key, descubiertas)}</small></span><i class="enc-deck-chevron" aria-hidden="true">⌄</i></summary>
+        <summary>${deckCover(block, deckIndex)}<span class="enc-deck-copy"><b>${CT.escapeHtml(deck.name)}</b><small>${deck.cards.length} ${deck.cards.length === 1 ? "carta" : "cartas"}${laminaResumen(deck.key, descubiertas)}</small></span><i class="enc-deck-chevron" aria-hidden="true">⌄</i></summary>
         <div class="enc-deck-cards">${searching ? resultsMarkup(deck.key, deck.cards, { descubiertas }) : ''}</div>
       </details>`).join('')}
     </section>`).join('');
