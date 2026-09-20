@@ -207,7 +207,19 @@
         ['Alfonso XII',1874,'1874','assets/quick-cards/kings-7.webp'],
         ['Alfonso XIII',1886,'1886','assets/quick-cards/kings-8.webp'],
         ['Juan Carlos I',1975,'1975','assets/quick-cards/kings-9.webp'],
-        ['Felipe VI',2014,'2014','assets/quick-cards/kings-10.webp']
+        ['Felipe VI',2014,'2014','assets/quick-cards/kings-10.webp'],
+        ['Fernando II de Aragón',1479,'1479','assets/quick-cards/kings-11.webp'],
+        ['Juana I de Castilla',1504,'1504','assets/quick-cards/kings-12.webp'],
+        ['Felipe I de Castilla',1506,'1506','assets/quick-cards/kings-13.webp'],
+        ['Felipe III',1598,'1598','assets/quick-cards/kings-14.webp'],
+        ['Felipe IV',1621,'1621','assets/quick-cards/kings-15.webp'],
+        ['Carlos II',1665,'1665','assets/quick-cards/kings-16.webp'],
+        ['Luis I',1724,'1724','assets/quick-cards/kings-17.webp'],
+        ['Fernando VI',1746,'1746','assets/quick-cards/kings-18.webp'],
+        ['Carlos III',1759,'1759','assets/quick-cards/kings-19.webp'],
+        ['Carlos IV',1788,'1788','assets/quick-cards/kings-20.webp'],
+        ['José I Bonaparte',1808,'1808','assets/quick-cards/kings-21.webp'],
+        ['Fernando VII',1814,'1814','assets/quick-cards/kings-22.webp']
       ]
     ),
     d(
