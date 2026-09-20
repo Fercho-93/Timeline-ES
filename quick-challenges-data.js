@@ -65,7 +65,17 @@
         ['Ginebra',40,'40 % vol.','assets/quick-cards/drinks-8.webp'],
         ['Ron',40,'40 % vol.','assets/quick-cards/drinks-9.webp'],
         ['Coñac',40,'40 % vol.','assets/quick-cards/drinks-10.webp'],
-        ['Absenta',60,'60 % vol.','assets/quick-cards/drinks-11.webp']
+        ['Absenta',60,'60 % vol.','assets/quick-cards/drinks-11.webp'],
+        ['Vermut',15,'15 % vol.','assets/quick-cards/drinks-12.webp'],
+        ['Limoncello',30,'30 % vol.','assets/quick-cards/drinks-13.webp'],
+        ['Baileys',17,'17 % vol.','assets/quick-cards/drinks-14.webp'],
+        ['Mezcal',40,'40 % vol.','assets/quick-cards/drinks-15.webp'],
+        ['Pisco',40,'40 % vol.','assets/quick-cards/drinks-16.webp'],
+        ['Orujo',40,'40 % vol.','assets/quick-cards/drinks-17.webp'],
+        ['Hidromiel',12,'12 % vol.','assets/quick-cards/drinks-18.webp'],
+        ['Pacharán',25,'25 % vol.','assets/quick-cards/drinks-19.webp'],
+        ['Licor 43',31,'31 % vol.','assets/quick-cards/drinks-20.webp'],
+        ['Anís Chinchón',35,'35 % vol.','assets/quick-cards/drinks-21.webp']
       ]
     ),
     d(
