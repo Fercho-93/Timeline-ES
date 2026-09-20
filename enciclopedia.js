@@ -75,7 +75,7 @@
     // sello acababa pareciendo un aviso de error. Lo que dice el candado sin decirlo va
     // igualmente para quien no lo ve, en el texto que solo leen los lectores de pantalla.
     const visual = velada
-      ? `<span class="enc-sello">${CANDADO}<span class="solo-lectores">Lámina bloqueada. Descúbrela jugando esta carta.</span></span>`
+      ? `<span class="enc-sello">${CANDADO}<span class="solo-lectores">Lámina por descubrir (bloqueada). Juega esta carta para verla.</span></span>`
       : tieneLamina ? CT.animalArt(modeKey, card) : `<span>${era.symbol}</span><small>${era.name}</small>`;
     const art = tieneLamina;
     const fuente = card.source

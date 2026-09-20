@@ -1,5 +1,5 @@
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { doc, getDoc, getDocs, query, collection, where, runTransaction, serverTimestamp, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { doc, deleteDoc, getDoc, getDocs, query, collection, where, runTransaction, serverTimestamp, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import fs from 'node:fs';
 
 const env = await initializeTestEnvironment({
@@ -82,7 +82,14 @@ try {
   const cancellation = { status: 'cancelled', turnUid: null, closedBy: 'outsider', updatedAt: serverTimestamp(), resultText: 'Duelo cerrado.' };
   await assertFails(updateDoc(doc(outsider, 'turnDuels', duelId), cancellation));
   await assertFails(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, closedBy: 'guest', scores: { guest: 100 } }));
-  await assertSucceeds(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, closedBy: 'guest' }));
+  await assertFails(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, closedBy: 'guest' }));
+  await assertFails(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, status: 'resigned', closedBy: 'guest', winnerUid: 'guest' }));
+  await assertSucceeds(updateDoc(doc(guest, 'turnDuels', duelId), { ...cancellation, status: 'resigned', closedBy: 'guest', winnerUid: 'creator' }));
+  await assertSucceeds(setDoc(doc(guest, 'duelPreferences', 'guest', 'archived', duelId), { updatedAt: serverTimestamp() }));
+  await assertFails(getDoc(doc(creator, 'duelPreferences', 'guest', 'archived', duelId)));
+  await assertFails(setDoc(doc(creator, 'duelPreferences', 'guest', 'archived', duelId), { updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(guest, 'duelPreferences', 'guest', 'archived', cifrasId), { updatedAt: serverTimestamp() }));
+  await assertSucceeds(deleteDoc(doc(guest, 'duelPreferences', 'guest', 'archived', duelId)));
   await assertFails(updateDoc(doc(creator, 'turnDuels', duelId), { status: 'playing', turnUid: 'creator' }));
   await assertSucceeds(getDoc(doc(creator, 'turnDuels', duelId)));
   const directId = `direct-${duelId}-creator`;
@@ -97,8 +104,21 @@ try {
   const accept = { playersOrder: ['creator', 'guest'], players: { creator: { alias: 'Ana' }, guest: { alias: 'Bea' } }, scores: { creator: 0, guest: 0 }, status: 'playing', turnUid: 'creator', updatedAt: serverTimestamp() };
   await assertFails(updateDoc(doc(outsider, 'turnDuels', directId), accept));
   await assertSucceeds(updateDoc(doc(guest, 'turnDuels', directId), accept));
+  const boundedId = 'invite-abc123-creator-0';
+  await assertSucceeds(setDoc(doc(creator, 'turnDuels', boundedId), { ...direct, id: boundedId, invitationRound: 0 }));
+  await assertSucceeds(updateDoc(doc(guest, 'turnDuels', boundedId), { ...cancellation, closedBy: 'guest' }));
+  await assertSucceeds(setDoc(doc(creator, 'turnDuels', 'invite-abc123-creator-1'), { ...direct, id: 'invite-abc123-creator-1', invitationRound: 1 }));
+  await assertFails(setDoc(doc(creator, 'turnDuels', 'invite-abc123-creator-2'), { ...direct, id: 'invite-abc123-creator-2', invitationRound: 0 }));
   const declineId = `direct-${cifrasId}-creator`;
+  const blocked = doc(guest, 'duelPreferences', 'guest', 'blocked', 'creator');
+  await assertSucceeds(setDoc(blocked, { alias: 'Ana', updatedAt: serverTimestamp() }));
+  await assertFails(getDoc(doc(creator, 'duelPreferences', 'guest', 'blocked', 'creator')));
+  await assertFails(setDoc(doc(creator, 'turnDuels', declineId), { ...direct, id: declineId, sourceDuel: cifrasId, kind: 'cifras', timeline: [] }));
+  await assertSucceeds(deleteDoc(blocked));
   await assertSucceeds(setDoc(doc(creator, 'turnDuels', declineId), { ...direct, id: declineId, sourceDuel: cifrasId, kind: 'cifras', timeline: [] }));
+  await assertSucceeds(setDoc(blocked, { alias: 'Ana', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(guest, 'turnDuels', declineId), accept));
+  await assertFails(setDoc(doc(outsider, 'duelPreferences', 'guest', 'blocked', 'creator'), { alias: 'Ana', updatedAt: serverTimestamp() }));
   await assertSucceeds(updateDoc(doc(guest, 'turnDuels', declineId), { ...cancellation, closedBy: 'guest' }));
   await env.withSecurityRulesDisabled(async ctx => updateDoc(doc(ctx.firestore(), 'turnDuels', directId), { updatedAt: Timestamp.fromMillis(Date.now() - 8 * 86400000) }));
   await assertFails(updateDoc(doc(creator, 'turnDuels', directId), { turnIndex: 1, turnUid: 'guest', plays: [{ uid: 'creator', cardId: 2, index: 0, correct: false }], updatedAt: serverTimestamp() }));

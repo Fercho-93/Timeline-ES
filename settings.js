@@ -7,7 +7,7 @@
 
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
-  const DEFAULTS = { theme: "light", textSize: "100" };
+  const DEFAULTS = { theme: "light", textSize: "100", haptics: false, ambience: false, depth: false, ambienceVolume: 50 };
   // Las dos apariencias, en un solo sitio: de aquí salen el desplegable, la validación
   // de lo guardado y el color de la barra del navegador.
   const THEMES = {
@@ -109,6 +109,11 @@
         <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
         ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
         <label class="opt-row"><span>Música ambiente</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
+        <div class="field settings-volume">
+          <label for="ajuste-volumen">Volumen de la música <output id="ajuste-volumen-valor">${Number(s.ambienceVolume) || 0}%</output></label>
+          <input id="ajuste-volumen" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.ambienceVolume) || 0))}" data-settings-action="ambience-volume" aria-describedby="volume-help">
+          <p class="hint" id="volume-help">Puedes dejar la música activa y bajar su volumen hasta 0 %.</p>
+        </div>
         <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
         <p class="hint"><a href="assets/audio/CREDITS.md" target="_blank" rel="noopener noreferrer">Créditos de la música</a></p>
         <p class="hint" data-depth-help>La profundidad solo actúa en las portadas y respeta «reducir movimiento».</p>
@@ -117,7 +122,7 @@
 
       </div><details class="settings-section settings-support"><summary><span><b>Versión y conexión</b><small>Uso sin conexión e información de la aplicación</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         <p class="hint">Versión instalada: ${CT.escapeHtml(CT.APP_VERSION || "desconocida")}</p>
-        <p class="hint">Las cartas y reglas funcionan sin conexión. Si una ilustración no se ve, es que no se cargó antes con internet.</p>
+        <p class="hint">Las partidas locales y las cartas ya descargadas funcionan sin conexión. Las salas, duelos por turnos, ranking y comentarios necesitan conexión. Si una ilustración no aparece, recarga cuando tengas internet.</p>
       </div></details>
 
       <details class="settings-section settings-support"><summary><span><b>Ayuda y comentarios</b><small>Cuéntanos cómo mejorar tu experiencia</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
@@ -130,6 +135,9 @@
         <p class="hint">¿Algo no va bien o se te ocurre algo? Manda un correo con la versión instalada y la pantalla en la que estás, para no tener que describirlo de memoria.</p>
         <button class="btn btn-secondary btn-block" data-settings-action="feedback">Enviar comentario</button>
       </div></details>
+
+      <button class="btn btn-ghost btn-block settings-reset" data-settings-action="reset-preferences">Restablecer preferencias</button>
+      <p class="hint settings-reset-help">Restablece solo apariencia y efectos; conserva tu progreso, cartas y partidas guardadas.</p>
 
       <button class="btn btn-primary btn-block settings-done" data-settings-action="close">Hecho</button>
     </div></div>`;
@@ -156,8 +164,22 @@
   async function sendFeedback() {
     if (!FEEDBACK_EMAIL) { showToast("Todavía no hay una dirección de contacto configurada."); return; }
     const detalle = await CT.appDiagnostics?.() ?? "";
-    const cuerpo = encodeURIComponent(`Cuéntame qué ha pasado:\n\n\n---\n${detalle}`);
+    const nota = document.getElementById('feedback-note')?.value.trim() || 'Cuéntame qué ha pasado:';
+    const cuerpo = encodeURIComponent(`${nota}\n\n---\n${detalle}`);
     location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("Continuum: comentario")}&body=${cuerpo}`;
+  }
+
+  function resetPreferences() {
+    if (!window.confirm('¿Restablecer apariencia y efectos? Tu progreso no cambiará.')) return;
+    settings = { ...DEFAULTS };
+    draftLook = { theme: settings.theme, textSize: settings.textSize };
+    save();
+    applyTheme();
+    CT.setAmbience?.(false);
+    CT.Ambience?.setVolume?.(settings.ambienceVolume / 100);
+    CT.UI?.updateEffects();
+    CT.closeDialog();
+    showToast('Preferencias restablecidas');
   }
 
   // Cada motor pinta a su manera, así que abrir y cerrar el panel pasa por lo que ya
@@ -169,7 +191,7 @@
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
-  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true });
+  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true, ambienceVolume: settings.ambienceVolume / 100 });
   CT.setAmbience = enabled => {
     settings.ambience = enabled === true;
     save();
@@ -185,6 +207,15 @@
     apply.textContent=apply.disabled?'Apariencia aplicada':'Aplicar apariencia';
   }
   document.addEventListener("change", async event => {
+    if (event.target.dataset.settingsAction === 'ambience-volume') {
+      const volume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
+      settings.ambienceVolume = volume;
+      const output = document.getElementById('ajuste-volumen-valor');
+      if (output) output.value = `${volume}%`;
+      save();
+      CT.Ambience?.setVolume?.(volume / 100);
+      return;
+    }
     if (event.target.dataset.settingsAction === 'text-size') {
       if (!['100','125','150','200'].includes(event.target.value)) return;
       draftLook.textSize = event.target.value; previewLook(); CT.Effects?.transition?.('select'); return;
@@ -226,6 +257,7 @@
       settings.theme=draftLook.theme;settings.textSize=draftLook.textSize;save();applyTheme();CT.Effects?.transition?.('select');previewLook();
     }
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
+    else if (target.dataset.settingsAction === "reset-preferences") resetPreferences();
     else if (target.dataset.settingsAction === "test-haptics") void testHaptics();
     else if (target.dataset.settingsAction === "download-feedback") {
       void (async () => {
