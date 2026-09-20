@@ -63,7 +63,7 @@
   // Lo único que se gana jugando es la lámina: hasta que la carta pasa por tu mano, en su
   // sitio hay un sello cerrado. La enciclopedia sigue sirviendo para consultar —que es
   // para lo que está—, pero las ilustraciones se descubren, que es lo que invita a volver.
-  function cardMarkup(modeKey, card, { highlight = false, descubiertas = null } = {}) {
+  function cardMarkup(modeKey, card, { highlight = false, descubiertas = null, interactive = true } = {}) {
     const era = CT.eraForCard(modeKey, card);
     // `cardArt` solo dice si hay lámina; el `<img>` se monta únicamente si se va a ver.
     // Una carta bloqueada no descarga su ilustración ni la difumina: un mazo entero por
@@ -81,7 +81,8 @@
     const fuente = card.source
       ? `<p class="enc-source"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Fuente <span aria-hidden="true">↗</span><span class="solo-lectores"> (se abre en una pestaña nueva)</span></a></p>`
       : "";
-    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${velada ? " enc-card-velada" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
+    const action = interactive ? ` data-action="enc-card" data-mode="${modeKey}" data-id="${card.id}" tabindex="0" role="button" aria-label="Abrir carta ${CT.escapeHtml(card.title)}"` : "";
+    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${velada ? " enc-card-velada" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"${action}><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
   }
 
   function resultsMarkup(modeKey, cards, { highlight = null, descubiertas = null } = {}) {
@@ -150,7 +151,7 @@
   function recentMarkup(limit = 6) {
     const latest = recentDiscoveries(limit);
     return `<section class="enc-recent" aria-labelledby="enc-recent-title"><div class="enc-album-heading"><div><span>Recién incorporadas</span><h2 id="enc-recent-title">Últimos descubrimientos</h2></div><small>${latest.length ? `${latest.length} láminas` : "Tu álbum empieza aquí"}</small></div>${latest.length
-      ? `<div class="enc-recent-strip">${latest.map(({modeKey, card}) => `<article class="enc-recent-card"><div class="enc-recent-art">${CT.animalArt(modeKey, card)}</div><div><small>${CT.escapeHtml(CT.mode(modeKey).name)}</small><b>${CT.escapeHtml(card.title)}</b><span>${CT.formatValue(modeKey, card)}</span></div></article>`).join("")}</div>`
+      ? `<div class="enc-recent-strip">${latest.map(({modeKey, card}) => `<article class="enc-recent-card" data-action="enc-card" data-mode="${modeKey}" data-id="${card.id}" tabindex="0" role="button" aria-label="Abrir carta ${CT.escapeHtml(card.title)}"><div class="enc-recent-art">${CT.animalArt(modeKey, card)}</div><div><small>${CT.escapeHtml(CT.mode(modeKey).name)}</small><b>${CT.escapeHtml(card.title)}</b><span>${CT.formatValue(modeKey, card)}</span></div></article>`).join("")}</div>`
       : `<div class="enc-recent-empty"><span aria-hidden="true">✦</span><p>Juega una carta con ilustración para colocar tu primera lámina.</p></div>`}</section>`;
   }
 

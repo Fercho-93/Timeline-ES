@@ -1411,6 +1411,20 @@
     app.querySelector('[data-action="home-encyclopedia"]')?.focus({preventScroll:true});
   }
 
+  function openEnciclopediaCard(modeKey, id) {
+    if (!CT.has(modeKey)) return;
+    const card = CT.cards(modeKey).find(item => item.id === Number(id));
+    if (!card) return;
+    const descubiertas = CT.Progreso?.seenCards?.() || new Set();
+    overlay(`<div class="overlay enc-card-overlay" data-overlay="encyclopedia-card"><div class="modal enc-card-modal" role="dialog" aria-modal="true" aria-labelledby="enc-card-title">
+      <button type="button" class="enc-card-close" data-action="enc-card-close" data-dialog-focus aria-label="Cerrar carta">×</button>
+      <div class="eyebrow">${escapeHtml(CT.mode(modeKey).name)}</div>
+      <h2 id="enc-card-title">${escapeHtml(card.title)}</h2>
+      <div class="enc-card-large">${CT.Enciclopedia.cardMarkup(modeKey, card, { descubiertas, interactive: false })}</div>
+      <button type="button" class="btn btn-secondary btn-block" data-action="enc-card-close">Volver a la enciclopedia</button>
+    </div></div>`, true);
+  }
+
   function openEnciclopedia(modeKey, { highlight = null, band = "all", returnTo = "home" } = {}) {
     // Abrir la enciclopedia de un mazo cerrado la abre entera, no ese mazo.
     encMode = modeKey === "all" || (CT.has(modeKey) && CT.Cartera.tiene(modeKey)) ? modeKey : "all";
@@ -3092,6 +3106,7 @@
   app.addEventListener("click", event => {
     const target = event.target.closest("[data-action]");
     if (!target) return;
+    if (target.dataset.action === "enc-card" && event.target.closest("a")) return;
     const action = target.dataset.action;
     if (app.dataset.screen?.startsWith('online-') && ['home-top', 'home-encyclopedia', 'perfil', 'rules'].includes(action)) {
       CT.onlineNavigate?.(action); return;
@@ -3250,6 +3265,8 @@
     else if (action === "abandon-comp") requestPlayExit();
     else if (action === "enciclopedia") openEnciclopedia(selectedModeKey, { returnTo: "play-menu" });
     else if (action === "enc-view") openEnciclopedia(target.dataset.mode, { highlight: Number(target.dataset.id), returnTo: ["review", "timeline-review"].includes(screen) ? "review" : "perfil" });
+    else if (action === "enc-card") openEnciclopediaCard(target.dataset.mode, target.dataset.id);
+    else if (action === "enc-card-close") CT.closeDialog();
     else if (action === "enc-band-view") openEnciclopedia(target.dataset.mode, { band: target.dataset.band, returnTo: "perfil" });
     else if (action === "enc-band") { encBand = target.dataset.band; enciclopediaView(); }
     else if (action === "enc-lock") { encLock = ["all", "seen", "locked"].includes(target.dataset.lock) ? target.dataset.lock : "all"; enciclopediaView(); }
@@ -3260,6 +3277,12 @@
     else if (action === "perfil-import" && !CT.Accounts) perfilImport();
     else if (action === "perfil-reset" && !CT.Accounts) perfilResetMenu();
     else if (action === "perfil-reset-confirm" && !CT.Accounts) { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
+  });
+
+  app.addEventListener("keydown", event => {
+    if ((event.key !== "Enter" && event.key !== " ") || event.target.dataset.action !== "enc-card") return;
+    event.preventDefault();
+    event.target.click();
   });
 
   CT.localNavigate = action => {
