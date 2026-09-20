@@ -77,9 +77,10 @@
     const visual = velada
       ? `<span class="enc-sello">${CANDADO}<span class="solo-lectores">Lámina por descubrir (bloqueada). Juega esta carta para verla.</span></span>`
       : tieneLamina ? CT.animalArt(modeKey, card) : `<span>${era.symbol}</span><small>${era.name}</small>`;
-    const visualFinal = !velada && tieneLamina && !interactive
-      ? `<button type="button" class="enc-image-zoom" data-action="enc-image" data-mode="${modeKey}" data-id="${card.id}" aria-label="Ver la ilustración de ${CT.escapeHtml(card.title)} en grande">${visual}<span class="enc-image-zoom-label">Ampliar ilustración</span></button>`
-      : visual;
+    // La carta de la enciclopedia ya se abre en un formato grande. No anidamos
+    // una segunda acción de zoom dentro de ella: así la ilustración aparece una
+    // sola vez y la explicación queda inmediatamente debajo/al lado.
+    const visualFinal = visual;
     const art = tieneLamina;
     const fuente = card.source
       ? `<p class="enc-source"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Fuente <span aria-hidden="true">↗</span><span class="solo-lectores"> (se abre en una pestaña nueva)</span></a></p>`
