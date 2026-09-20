@@ -1365,32 +1365,35 @@
     // ilustraciones. Donde no aparece es en un mazo sin ninguna: no habría nada que
     // bloquear y las dos opciones saldrían vacías.
     const conLaminas = all || CT.Enciclopedia.seenProgress(encMode).total > 0;
-    const chipLock = (key, etiqueta) => `<button type="button" class="band-chip${encLock === key ? " active" : ""}" data-action="enc-lock" data-lock="${key}" aria-pressed="${encLock === key}">${etiqueta}</button>`;
+    const chipLock = (key, etiqueta) => `<button type="button" class="enc-lock-chip${encLock === key ? " active" : ""}" data-action="enc-lock" data-lock="${key}" aria-pressed="${encLock === key}">${etiqueta}</button>`;
     paint(`<div class="enc-background" data-background-screen="${encBackgroundScreen}" inert aria-hidden="true">${encBackground}</div><div class="overlay" data-overlay="encyclopedia"><div class="modal settings-modal enc-modal">
       <button class="btn btn-secondary" data-action="enc-back" data-dialog-focus>Cerrar enciclopedia</button>
       <section class="setup-section enc-section">
         <header class="atlas-page-heading"><div class="eyebrow">El atlas de Continuum</div><h1 data-focus tabindex="-1">Enciclopedia</h1><p>Explora las cartas. Completa tu colección, una partida a la vez.</p></header><div class="enc-selection-heading"><h2>${escapeHtml(mode.name)}</h2><p id="enc-count" role="status">${encCountText(encMode, cards.length)}</p></div>
         <div class="panel enc-toolbar enc-toolbar-compact">
-          <div class="enc-primary-filters">
-          <div class="field">
-            <label for="enc-mode-select">Mazo</label>
+          <div class="field enc-topic-select">
+            <label for="enc-mode-select">Explorar temática</label>
             <select id="enc-mode-select">${encModeOptions(encMode)}</select>
           </div>
-          <div class="field">
-            <label for="enc-search-input">Buscar</label>
-            <input id="enc-search-input" type="search" autocomplete="off" placeholder="Título, explicación o fuente…" value="${escapeHtml(encQuery)}">
-          </div>
-          </div>
-          ${all ? '' : `<div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
-            <button type="button" id="enc-band-all" class="band-chip${encBand === "all" ? " active" : ""}" data-action="enc-band" data-band="all" aria-pressed="${encBand === "all"}">Todas</button>
-            ${bands.map(band => `<button type="button" id="enc-band-${band.key}" class="band-chip${encBand === band.key ? " active" : ""}" data-action="enc-band" data-band="${band.key}" aria-pressed="${encBand === band.key}"><span aria-hidden="true">${band.symbol}</span> ${escapeHtml(band.name)}</button>`).join("")}
-          </div>`}
           ${conLaminas ? `<div class="field enc-lock-field">
-            <span class="enc-lock-label" id="enc-lock-label">Láminas</span>
+            <span class="enc-lock-label" id="enc-lock-label">Estado de las láminas</span>
             <div class="enc-bands enc-locks" role="group" aria-labelledby="enc-lock-label">
               ${chipLock("all", "Todas")}${chipLock("seen", "Descubiertas")}${chipLock("locked", "Por descubrir")}
             </div>
           </div>` : ''}
+          <details class="enc-advanced-filters">
+            <summary>Buscar o acotar por periodo</summary>
+            <div class="enc-advanced-body">
+              <div class="field">
+                <label for="enc-search-input">Buscar</label>
+                <input id="enc-search-input" type="search" autocomplete="off" placeholder="Título, explicación o fuente…" value="${escapeHtml(encQuery)}">
+              </div>
+              ${all ? '' : `<div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
+                <button type="button" id="enc-band-all" class="band-chip${encBand === "all" ? " active" : ""}" data-action="enc-band" data-band="all" aria-pressed="${encBand === "all"}">Todas</button>
+                ${bands.map(band => `<button type="button" id="enc-band-${band.key}" class="band-chip${encBand === band.key ? " active" : ""}" data-action="enc-band" data-band="${band.key}" aria-pressed="${encBand === band.key}"><span aria-hidden="true">${band.symbol}</span> ${escapeHtml(band.name)}</button>`).join("")}
+              </div>`}
+            </div>
+          </details>
         </div>
         ${all && !encQuery && encLock === "all" ? CT.Enciclopedia.recentMarkup() : ""}
         ${all && encLock === "all" ? '<p class="hint" data-enc-browse-hint>Explora una temática y despliega un mazo, o busca entre todas las cartas.</p>' : ''}
