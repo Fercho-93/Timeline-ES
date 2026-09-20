@@ -14,6 +14,7 @@ const dist = path.join(root, "dist");
 // y scripts que no pasan por el service worker (actualizar.*) y las carpetas
 // de imágenes que se piden bajo demanda.
 const FILES = [
+  "quick-challenges.css", "quick-challenges-data.js", "quick-challenges-engine.js", "quick-challenges.js",
   "index.html", "actualizar.html", "privacidad.html", "manifest.webmanifest", "icon.svg",
   "splash.css", "splash.js", "styles.css", "edition.css", "service-worker.js", "service-worker-258.js",
   "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",
