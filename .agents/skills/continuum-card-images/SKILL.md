@@ -137,7 +137,7 @@ Cruza:
 1. cartas declaradas en el archivo `.js` del mazo;
 2. mapeos de ilustración de `modes.js`;
 3. archivos realmente presentes en `assets/...-cards/`;
-4. precarga/cache en `service-worker.js` cuando aplique;
+4. precarga/cache en `service-worker-258.js` cuando aplique;
 5. tests existentes.
 
 No asumas que una carta está pendiente solo porque no aparece en una lista parcial.
@@ -214,7 +214,7 @@ Al añadir una ilustración nueva:
 
 1. guardar el WebP en la carpeta correcta;
 2. actualizar el mapping de `modes.js` si ese mazo lo necesita;
-3. actualizar `service-worker.js` si la estrategia de precarga actual exige enumerarla;
+3. actualizar `service-worker-258.js` si la estrategia de precarga actual exige enumerarla;
 4. ampliar tests para garantizar que la carta tiene archivo y mapping;
 5. comprobar que la UI usa la misma clase `animal-card-art`/mecanismo de lámina y no se
    introducen wrappers o estilos especiales por carta;

@@ -10,13 +10,16 @@ import { fileURLToPath } from "node:url";
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const dist = path.join(root, "dist");
 
-// Misma lista que ASSETS en service-worker.js (sin el "./"), más las páginas
+// Misma lista que ASSETS en service-worker-258.js (sin el "./"), más las páginas
 // y scripts que no pasan por el service worker (actualizar.*) y las carpetas
-// de imágenes que se piden bajo demanda.
+// de imágenes que se piden bajo demanda. El nombre "-258" es un accidente
+// histórico que se ha quedado así a propósito: es la URL exacta que
+// `updates.js` registra, y cambiarla dejaría sin caché a quien ya lo tenga
+// instalado, como si abriera la aplicación por primera vez sin conexión.
 const FILES = [
   "quick-room.js", "quick-network.js", "quick-online.js", "quick-challenges.css", "quick-challenges-data.js", "quick-challenges-engine.js", "quick-challenges.js",
   "index.html", "actualizar.html", "privacidad.html", "manifest.webmanifest", "icon.svg",
-  "splash.css", "splash.js", "styles.css", "edition.css", "service-worker.js", "service-worker-258.js",
+  "splash.css", "splash.js", "styles.css", "edition.css", "service-worker-258.js",
   "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",
   "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js",
   "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js",
@@ -42,7 +45,7 @@ async function build() {
 
   // Aviso si el service worker referencia algo que el build no ha copiado, para
   // detectar antes de publicar que dist/ y la lista de caché se han desincronizado.
-  const sw = await readFile(path.join(root, "service-worker.js"), "utf8");
+  const sw = await readFile(path.join(root, "service-worker-258.js"), "utf8");
   const assetMatch = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
   if (assetMatch) {
     const referenced = [...assetMatch[1].matchAll(/"\.\/([^"]+)"/g)].map(m => m[1]);

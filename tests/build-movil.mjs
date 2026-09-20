@@ -22,7 +22,7 @@ const scripts = [...indexHtml.matchAll(/<script src="([^"]+)"><\/script>/g)].map
 const faltanScripts = scripts.filter(archivo => !fs.existsSync(path.join(DIST, archivo)));
 ok(`dist/ contiene todos los scripts de index.html${faltanScripts.length ? ` (falta ${faltanScripts.join(", ")})` : ""}`, !faltanScripts.length);
 
-for (const archivo of ["index.html", "actualizar.html", "manifest.webmanifest", "icon.svg", "service-worker.js"]) {
+for (const archivo of ["index.html", "actualizar.html", "manifest.webmanifest", "icon.svg", "service-worker-258.js"]) {
   ok(`dist/${archivo} existe`, fs.existsSync(path.join(DIST, archivo)));
 }
 ok("dist/assets existe y no está vacío", fs.existsSync(path.join(DIST, "assets")) && fs.readdirSync(path.join(DIST, "assets")).length > 0);

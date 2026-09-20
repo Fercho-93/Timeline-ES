@@ -548,7 +548,7 @@ núcleo, sin reescribir el juego ni duplicarlo por plataforma:
 - `npm run build` genera `dist/`, una copia literal de los archivos que el juego necesita
   para funcionar (el juego se sirve como scripts clásicos, no como módulos, así que el
   build no empaqueta ni transforma nada: solo copia y comprueba que no falte nada de lo
-  que pide `service-worker.js`).
+  que pide `service-worker-258.js`).
 - `capacitor.config.json` apunta `webDir` a `dist/`. El `appId` (`com.continuum.game`) ya
   está aprobado y es el que hay que mantener estable de aquí en adelante: las tiendas lo
   usan para reconocer la aplicación de forma permanente, así que cambiarlo después de

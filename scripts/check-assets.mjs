@@ -18,7 +18,7 @@ for(const file of files.filter(f=>f.includes('-cards') && /\.(webp|jpg|png)$/i.t
   assert.equal(meta.width,budget.cardWidth,`Anchura de ${file}`);
   assert.equal(meta.height,budget.cardHeight,`Altura de ${file}`);
 }
-const source=fs.readFileSync(path.join(root,'service-worker.js'),'utf8').split('];')[0];
+const source=fs.readFileSync(path.join(root,'service-worker-258.js'),'utf8').split('];')[0];
 const precache=[...new Set([...source.matchAll(/"\.\/([^"]*)"/g)].map(m=>m[1]||'index.html'))];
 const initial=precache.reduce((n,file)=>n+fs.statSync(path.join(root,file)).size,0);
 assert.ok(initial<=budget.precacheBytes,`Precarga: ${initial} bytes; presupuesto ${budget.precacheBytes}`);
