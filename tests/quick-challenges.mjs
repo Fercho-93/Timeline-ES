@@ -118,6 +118,8 @@ const metros = CT.QuickCatalog.challenges.find(c => c.id === 'metros');
 assert.ok(metros.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const companiesRevenue = CT.QuickCatalog.challenges.find(c => c.id === 'companies-revenue');
 assert.ok(companiesRevenue.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+const spanishTv = CT.QuickCatalog.challenges.find(c => c.id === 'spanish-tv');
+assert.ok(spanishTv.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
 assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
