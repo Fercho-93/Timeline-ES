@@ -99,7 +99,14 @@
         ['Independencia de EE. UU.',185,'4 de julio','assets/quick-cards/festivities-10.webp'],
         ['Halloween',304,'31 de octubre','assets/quick-cards/festivities-11.webp'],
         ['Constitución Española',341,'6 de diciembre','assets/quick-cards/festivities-12.webp'],
-        ['Navidad',359,'25 de diciembre','assets/quick-cards/festivities-13.webp']
+        ['Navidad',359,'25 de diciembre','assets/quick-cards/festivities-13.webp'],
+        ['San Isidro',135,'15 de mayo','assets/quick-cards/festivities-14.webp'],
+        ['Asunción de la Virgen',227,'15 de agosto','assets/quick-cards/festivities-15.webp'],
+        ['Fiesta Nacional de España',285,'12 de octubre','assets/quick-cards/festivities-16.webp'],
+        ['Inmaculada Concepción',342,'8 de diciembre','assets/quick-cards/festivities-17.webp'],
+        ['Fiesta de la Comunidad de Madrid',122,'2 de mayo','assets/quick-cards/festivities-18.webp'],
+        ['Nuestra Señora de la Almudena',313,'9 de noviembre','assets/quick-cards/festivities-19.webp'],
+        ['Fiesta Nacional de Francia',195,'14 de julio','assets/quick-cards/festivities-20.webp']
       ]
     ),
     d(
@@ -147,7 +154,14 @@
         ['Desembarco de Normandía',19440606,'6 junio 1944','assets/quick-cards/wwii-8.webp'],
         ['Batalla de las Ardenas',19441216,'16 diciembre 1944','assets/quick-cards/wwii-9.webp'],
         ['Victoria en Europa',19450508,'8 mayo 1945','assets/quick-cards/wwii-10.webp'],
-        ['Bomba atómica sobre Hiroshima',19450806,'6 agosto 1945','assets/quick-cards/wwii-11.webp']
+        ['Bomba atómica sobre Hiroshima',19450806,'6 agosto 1945','assets/quick-cards/wwii-11.webp'],
+        ['Operación Barbarroja',19410622,'22 junio 1941','assets/quick-cards/wwii-12.webp'],
+        ['Batalla de Midway',19420604,'4 junio 1942','assets/quick-cards/wwii-13.webp'],
+        ['Rendición de Italia',19430908,'8 septiembre 1943','assets/quick-cards/wwii-14.webp'],
+        ['Liberación de París',19440825,'25 agosto 1944','assets/quick-cards/wwii-15.webp'],
+        ['Conferencia de Yalta',19450204,'4 febrero 1945','assets/quick-cards/wwii-16.webp'],
+        ['Pacto Mólotov-Ribbentrop',19390823,'23 agosto 1939','assets/quick-cards/wwii-17.webp'],
+        ['Conferencia de Wannsee',19420120,'20 enero 1942','assets/quick-cards/wwii-18.webp']
       ]
     ),
     d(
