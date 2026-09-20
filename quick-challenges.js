@@ -41,7 +41,8 @@
   }
   function choice(action,title,subtitle,kind) {return `<button class="play-choice" data-quick="${action}"><span class="choice-icon">${choiceIcon(kind)}</span><span><b>${title}</b><small>${subtitle}</small></span><i aria-hidden="true">→</i></button>`;}
   function soloFold(kind, title, caption, icon, copy) {
-    return `<details class="panel solo-panel solo-fold" name="quick-solo-options" data-solo-kind="${kind}"><summary><span class="solo-option-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${icon}</svg></span><span class="solo-option-copy"><b>${title}</b>${kind === 'daily' ? `<time datetime="${today()}">${today().split('-').reverse().join('/')}</time>` : ''}<small>${caption}</small></span></summary><div class="solo-fold-body">${copy}</div></details>`;
+    const date = day();
+    return `<details class="panel solo-panel solo-fold" name="quick-solo-options" data-solo-kind="${kind}"><summary><span class="solo-option-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${icon}</svg></span><span class="solo-option-copy"><b>${title}</b>${kind === 'daily' ? `<time datetime="${date}">${date.split('-').reverse().join('/')}</time>` : ''}<small>${caption}</small></span></summary><div class="solo-fold-body">${copy}</div></details>`;
   }
   function soloMenu() {
     page='solo-menu';state=null;record=null;const daily=readJSON(DAILY),today=day();const done=daily?.config?.day===today;let score='';
