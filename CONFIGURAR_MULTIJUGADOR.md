@@ -95,14 +95,14 @@ Sube todos los archivos de esta versión. En especial deben estar:
 - `app.js`
 - `online.js`
 - `styles.css`
-- `service-worker.js`
+- `service-worker-258.js`
 - `cards.js`
 - `movies.js`
 - la carpeta `assets`
 
 El archivo `firestore.rules` no es ejecutado por GitHub Pages; se incluye como copia de seguridad de las reglas publicadas en Firebase.
 
-Al cambiar cualquier archivo conviene subir el número de `CACHE` en `service-worker.js`
+Al cambiar cualquier archivo conviene subir el número de `CACHE` en `service-worker-258.js`
 (`hilo-modos-v10`, `v11`…): eso hace que el navegador reinstale el service worker y
 descarte de golpe la versión anterior. Si se olvida, la actualización llega igualmente,
 pero un arranque más tarde. La portada muestra abajo la versión que tiene guardada ese

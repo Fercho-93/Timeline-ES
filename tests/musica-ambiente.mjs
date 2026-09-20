@@ -244,7 +244,7 @@ for (const autoplay of ['pending', 'reject']) {
   } finally {h.w.close();}
 }
 
-const sw = read('service-worker.js');
+const sw = read('service-worker-258.js');
 for (let i=1;i<=6;i++) {
   assert.ok(fs.statSync(new URL(`../assets/audio/v${i}.mp3`, import.meta.url)).size > 100000);
   assert.ok(sw.includes(`"./assets/audio/v${i}.mp3"`), 'todas las canciones se conservan sin conexión');

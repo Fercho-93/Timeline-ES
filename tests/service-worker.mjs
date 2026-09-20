@@ -50,7 +50,7 @@ function arrancar() {
     setTimeout, Promise, URL
   };
   vm.createContext(contexto);
-  vm.runInContext(fs.readFileSync(path.join(REPO, "service-worker.js"), "utf8"), contexto);
+  vm.runInContext(fs.readFileSync(path.join(REPO, "service-worker-258.js"), "utf8"), contexto);
 
   const pedir = async (url, mode = "same-origin", method = "GET") => {
     let devuelta;
@@ -173,7 +173,7 @@ console.log("\nService worker");
 {
   // Un archivo nuevo en `index.html` que no esté en la lista de precarga no se guarda al
   // instalar: la aplicación se abriría rota al quedarse sin conexión.
-  const fuente = fs.readFileSync(path.join(REPO, "service-worker.js"), "utf8");
+  const fuente = fs.readFileSync(path.join(REPO, "service-worker-258.js"), "utf8");
   const precargados = [...fuente.matchAll(/"(\.\/[^"]+)"/g)].map(m => m[1]);
   const guiones = [...fs.readFileSync(path.join(REPO, "index.html"), "utf8")
     .matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => `./${m[1]}`);
