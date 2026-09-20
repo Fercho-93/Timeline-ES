@@ -90,6 +90,8 @@ const timezonesJune = CT.QuickCatalog.challenges.find(c => c.id === 'timezones-j
 assert.ok(timezonesJune.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const citiesEastWest = CT.QuickCatalog.challenges.find(c => c.id === 'cities-east-west');
 assert.ok(citiesEastWest.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+const citiesNorthSouth = CT.QuickCatalog.challenges.find(c => c.id === 'cities-north-south');
+assert.ok(citiesNorthSouth.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming.cards.length, 0);
 assert.equal(CT.has('counts'), false, 'El mazo pendiente no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
