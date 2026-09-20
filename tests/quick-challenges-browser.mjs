@@ -28,6 +28,14 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+    const sizes = await page.locator('.gallery-panel').evaluateAll(els => els.map(el => ({w:el.getBoundingClientRect().width,h:el.getBoundingClientRect().height})));
+    assert.ok(sizes.length >= 2);
+    for (const size of sizes.slice(-2)) assert.deepEqual(size, sizes[0], 'Los nuevos bloques tienen el tamaño de las colecciones');
+    await page.screenshot({path: `test-results/quick-challenges/home-${width}.png`, fullPage:true});
+    await page.locator('[data-action="quick-counts"]').click();
+    assert.ok(await page.getByText('De menos a más', {exact:true}).isVisible());
+    assert.equal(await page.locator('[data-quick="start"]').count(), 0);
+    await page.locator('[data-action="home"]').last().click();
     await page.locator('[data-action="quick-challenges"]').click();
     await page.screenshot({path: `test-results/quick-challenges/setup-${width}.png`, fullPage: true});
     await page.locator('#quick-length').selectOption('1');
@@ -36,9 +44,24 @@ try {
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
     assert.equal(await overflow(), false, `Sin desbordamiento a ${width}px`);
     await page.screenshot({path: `test-results/quick-challenges/turn-${width}.png`, fullPage: true});
+    await page.locator('.card-flippable').first().click();
+    assert.ok(await page.locator('.card-flippable.is-flipped').count());
+    await page.locator('[data-zoom-level="2"]').click();
+    assert.equal(await page.locator('.timeline').evaluate(el => el.style.transform), 'scale(1.2)');
+    await page.locator('[data-zoom-level="1"]').click();
+    await page.locator('[data-quick="menu"]').click();
+    await page.locator('[data-settings-action="open"]').click();
+    await page.locator('[data-settings-action="close"]').first().click();
+    await page.locator('[data-quick="close-menu"]').click();
+    if(width === 1280) {
+      await page.locator('.hand-card').first().dragTo(page.locator('.slot').first());
+      await page.locator('[data-quick="confirm"]').waitFor();
+      await page.locator('[data-quick="cancel"]').click();
+    }
     await page.locator('[data-quick="select"]').first().click();
     await page.locator('[data-quick="slot"]').first().click();
     await page.locator('[data-quick="confirm"]').click();
+    await page.keyboard.press('Escape');
     assert.ok(await page.locator('[data-quick="ack"]').isVisible());
     await page.screenshot({path: `test-results/quick-challenges/result-${width}.png`, fullPage: true});
     await page.reload();

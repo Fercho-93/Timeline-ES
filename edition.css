@@ -280,7 +280,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 @media (max-width: 600px) {
   #app .hand-solo { grid-template-columns: minmax(0, 230px); }
   #app[data-screen="online-game"] .hand .hand-card { height: 145px; min-height: 145px; }
-  #app[data-device="ios"]:is([data-screen="online-game"], [data-screen="game"]) .hand .hand-card { height: auto; min-height: 215px; }
+  #app[data-device="ios"]:is([data-screen="online-game"], [data-screen="game"], [data-screen="quick-game"]) .hand .hand-card { height: auto; min-height: 215px; }
 }
 .perfil-section > h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.12; margin: 10px 0 18px; }
 .perfil-section > .lead { font-size: 1rem; line-height: 1.65; margin-bottom: 26px; max-width: 62ch; }

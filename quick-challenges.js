@@ -15,14 +15,13 @@
     } catch {error = 'No se ha podido recuperar la partida anterior. Puedes empezar una nueva.'; return null;}
   }
   function shell(content) {
-    paint(`<div class="shell quick-shell">${CT.UI.header('data-action="home"', state ? 'data-quick="menu"' : '', !!state)}<div class="quick-content">${content}</div></div>`, !!state);
+    paint(`<div class="shell quick-shell">${CT.UI.header(state ? 'data-quick="exit"' : 'data-action="home"', state ? 'data-quick="menu"' : '', !!state)}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, !!state);
   }
   const button = (action, text, cls = 'btn btn-primary') => `<button class="${cls}" data-quick="${action}">${text}</button>`;
   function setup() {
     state = null; record = null; selected = null; slot = null;
     const saved = load();
-    shell(`<div class="eyebrow">Una carta. Una decisión.</div><h1 data-focus tabindex="-1">Retos rápidos</h1>
-      <p class="quick-lead">Elige una carta, colócala y decide cuándo asegurar tus puntos.</p>
+    shell(`${masthead('Retos rápidos', 'Elige una carta, colócala y decide cuándo asegurar tus puntos.', 'quick')}
       <div class="panel quick-panel"><h2>Un solo móvil</h2><p>De 2 a 4 jugadores o equipos. Con más personas, formad equipos y alternad quién coloca.</p>
       <label for="quick-count">Participantes</label><select id="quick-count"><option>2</option><option>3</option><option>4</option></select>
       <div id="quick-names">${nameFields(2)}</div>
@@ -41,18 +40,19 @@
   function save() { CT.Storage.setItem(KEY, JSON.stringify(record)); }
   function dispatch(command) {
     state = E.step(state, command);
+    if (command.type === 'place') CT.Effects?.feedback(state.result.correct);
     record.commands.push(command); save(); selected = null; slot = null; render();
   }
   function scores() {
-    return `<ul class="quick-scores" aria-label="Marcador">${state.players.map((p, i) => `<li class="${state.phase === 'turn' && i === state.current ? 'current' : ''}"><strong>${esc(p.name)}</strong><span>${p.score} asegurados${p.points ? ` · ${p.points} en juego` : ''}</span><small>${p.status === 'failed' ? 'Fuera de este reto' : p.status === 'banked' ? 'Puntos asegurados' : 'Sigue jugando'}</small></li>`).join('')}</ul>`;
+    return `<div class="scoreboard" aria-label="Marcador">${state.players.map((p, i) => `<span class="score ${i === state.current ? 'active' : ''}" aria-label="${esc(p.name)}: ${p.score} asegurados, ${p.points} en juego. ${p.status === 'failed' ? 'Fuera de este reto' : p.status === 'banked' ? 'Se ha plantado' : 'Sigue jugando'}"><i>${esc(CT.initials(p.name))}</i><b>${esc(p.name)}</b><em>${p.score}${p.points ? ` +${p.points}` : ''}${p.status !== 'active' ? ' ·' : ''}</em></span>`).join('')}</div>`;
   }
   function cardMarkup(c, item) {
-    return `<article class="timeline-card quick-card"><div class="card-visual"><span aria-hidden="true">◇</span><small>${esc(c.title)}</small></div><div class="card-content"><div class="year">${esc(item.label)}</div><h3>${esc(item.title)}</h3></div></article>`;
+    return `<article class="timeline-card card-flippable animal-timeline-card" data-id="${item.id}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(item.title)}. Toca para ver la explicación."><div class="card-category">${esc(c.title)}</div><div class="card-visual"><img class="animal-card-art" src="assets/hero-quick-400.webp" alt="" width="400" height="600"></div><div class="card-content"><h3>${esc(item.title)}</h3><p>${esc(item.detail)}</p><div class="year">${esc(item.label)}</div></div></article>`;
   }
   function render() {
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
-    const heading = `<div class="eyebrow">Reto ${state.index + 1} de ${state.config.rounds.length}</div><h1 data-focus tabindex="-1">${esc(c.title)}</h1><p class="quick-rule">${esc(c.rule)}</p><p>${esc(c.context)}</p>${scores()}`;
+    const heading = `<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="game-head"><div><div class="turn-label">Reto ${state.index + 1} de ${state.config.rounds.length} · ${esc(c.title)}</div><div class="turn-name">${esc(p.name)}</div></div><div class="deck-count"><strong>${state.remaining.length}</strong><span>cartas</span></div></div>${scores()}<p class="quick-rule">${esc(c.rule)}</p>`;
     if (state.phase === 'round-end') {
       const final = state.index + 1 === state.config.rounds.length;
       const best = Math.max(...state.players.map(player => player.score));
@@ -67,17 +67,34 @@
     }
     if (state.phase === 'result') {
       const r = state.result, item = get(r.cardId);
-      shell(`${heading}<section class="panel quick-panel quick-result ${r.correct ? 'success' : 'failure'}" role="status"><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}</h3><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p><a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Consultar fuente</a>
+      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id => cardMarkup(c, get(id))).join('')}</div></div><div class="overlay" data-quick-result><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}</h3><div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div><a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Consultar fuente</a>
         <p>${r.correct ? `${esc(p.name)} tiene ${p.points} ${p.points === 1 ? 'punto provisional' : 'puntos provisionales'}.` : `${esc(p.name)} pierde ${r.lost} puntos de este reto y queda fuera hasta el siguiente. La carta ya está en su lugar correcto.`}</p>
-        ${button('ack', 'Continuar', 'btn btn-primary btn-block')}</section><div class="quick-line" aria-label="Orden actual">${state.timeline.map(id => cardMarkup(c, get(id))).join('')}</div>`);
+        ${button('ack', 'Continuar', 'btn btn-primary btn-block')}</section></div>`);
+      CT.openDialog(app().querySelector('[data-quick-result]'), false);
       return;
     }
-    const gap = i => `<button class="quick-slot${slot === i ? ' selected' : ''}" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-pressed="${slot === i}" aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}">+</button>`;
-    shell(`${heading}<section class="quick-turn panel quick-panel"><h2>Turno de ${esc(p.name)}</h2><p>${p.points} puntos en juego · ${state.remaining.length} cartas disponibles</p>${button('bank', p.points ? `Plantarse y asegurar ${p.points} puntos` : 'Pasar este reto', 'btn btn-secondary')}</section>
-      <p class="hint">${selected ? 'Elige un hueco de la línea y confirma la colocación.' : 'Elige una carta común para colocarla en la línea.'}</p>
-      <div class="quick-line" aria-label="Línea de cartas: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div>
-      ${slot !== null ? `<section class="panel quick-panel quick-confirm"><h2>¿Colocar «${esc(get(selected).title)}» aquí?</h2>${button('confirm', 'Confirmar colocación')}${button('cancel', 'Cancelar', 'btn btn-ghost')}</section>` : ''}
-      <h2>Cartas comunes</h2><div class="hand quick-hand">${state.remaining.map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"><span class="hidden-date">Valor oculto</span><span class="carta-reverso" aria-hidden="true"><img class="reverso-coleccion" src="assets/hero-${c.cover}-400.webp" alt="" width="400" height="560"></span><strong>${esc(get(id).title)}</strong></button>`).join('')}</div>`);
+    const gap = i => slot === i && selected ? `<div class="slot-confirm quick-confirm" data-index="${i}"><small>Colocar aquí</small><strong>${esc(get(selected).title)}</strong>${button('confirm', 'Sí, aquí', 'btn btn-primary btn-block')}${button('cancel', 'Cancelar', 'btn btn-ghost btn-block')}</div>` : `<button class="slot" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}"><span>+</span></button>`;
+    shell(`${heading}<section><div class="hand-title"><h3>Línea de cartas</h3><small>${state.timeline.length} colocadas</small></div>${CT.timelineMap(null, state.timeline)}
+      <div class="timeline-wrap"><div class="timeline" aria-label="Línea de cartas: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>
+      <section><div class="hand-title"><h3>Cartas comunes</h3><small>${state.remaining.length} por colocar</small></div><div class="hand">${state.remaining.map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"><span class="hidden-date">Valor oculto</span><span class="carta-reverso" aria-hidden="true"><img class="reverso-coleccion" src="assets/hero-quick-400.webp" alt="" width="400" height="600"></span><strong>${esc(get(id).title)}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
+      <p class="hint">${selected ? 'Toca un hueco y confirma, o arrastra la carta hasta su lugar.' : 'Toca una carta o mantenla pulsada para arrastrarla hasta un hueco.'}</p></section>
+      <div class="quick-bank"><p>${p.points} puntos en juego · ${p.score} asegurados</p>${button('bank', p.points ? `Plantarse y asegurar ${p.points} puntos` : 'Pasar este reto', 'btn btn-secondary btn-block')}</div>`);
+    CT.enableDrag({cardSelector: '.quick-shell .hand-card', slotSelector: '.quick-shell .slot', parseCardId: id => id, onDrop(id, index) {
+      if (!app().querySelector('.quick-shell') || state?.phase !== 'turn' || !state.remaining.includes(id)) return;
+      selected = id; slot = index; render(); focusPlacement();
+    }});
+  }
+  function focusPlacement() {
+    const node = app().querySelector('.quick-confirm') || app().querySelector('.timeline-wrap');
+    node?.scrollIntoView?.({block: 'nearest', behavior: 'auto'});
+    if (slot !== null) app().querySelector('[data-quick="confirm"]')?.focus({preventScroll:true});
+    CT.announce(slot === null ? 'Carta elegida. Elige un hueco.' : `Hueco ${slot + 1} elegido. Confirma la colocación.`);
+  }
+  function menu() {
+    const c = E.challenge(state.config.rounds[state.index].id);
+    const layer = document.createElement('div'); layer.className = 'overlay';
+    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('setup', 'Guardar y salir', 'btn btn-secondary btn-block')}</div></div>`;
+    app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
     if (!app().querySelector('.quick-shell')) return;
@@ -91,7 +108,9 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    if (action === 'menu') {CT.UI.confirmExit('La partida se conserva para que puedas continuar después.', setup); return;}
+    if (action === 'menu') {menu(); return;}
+    if (action === 'close-menu') {CT.closeDialog(); return;}
+    if (action === 'exit') {CT.UI.confirmExit('La partida se conserva para que puedas continuar después.', setup); return;}
     if (action === 'setup') {setup(); return;}
     if (action === 'start') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value.trim());
@@ -106,14 +125,21 @@
     }
     if (action === 'resume') {record = load(); if (!record) {setup(); return;} state = E.restore(record); selected = null; slot = null; render(); return;}
     if (!state) return;
-    if (action === 'select' && state.phase === 'turn' && state.remaining.includes(target.dataset.id)) {selected = target.dataset.id; slot = null; render();}
-    else if (action === 'slot' && selected && state.phase === 'turn') {slot = Number(target.dataset.index); render(); app().querySelector('.quick-confirm')?.scrollIntoView?.({block: 'nearest'});}
+    if (action === 'select' && state.phase === 'turn' && state.remaining.includes(target.dataset.id)) {selected = target.dataset.id; slot = null; CT.Effects?.tap(); render(); focusPlacement();}
+    else if (action === 'slot' && selected && state.phase === 'turn') {slot = Number(target.dataset.index); CT.Effects?.tap(); render(); focusPlacement();}
     else if (action === 'cancel') {slot = null; render();}
-    else if (action === 'confirm' && selected && slot !== null) dispatch({type: 'place', cardId: selected, index: slot});
+    else if (action === 'confirm' && selected && slot !== null) {CT.Effects?.stamp(); dispatch({type: 'place', cardId: selected, index: slot});}
     else if (['bank', 'ack', 'next'].includes(action)) dispatch({type: action});
   });
+  function masthead(title, subtitle, art) {
+    return `<section class="mode-masthead atlas-intro" data-depth-scene><div class="atlas-landscape"><img src="assets/hero-${art}-700.webp" alt="" decoding="async"></div><div class="atlas-intro-copy"><div class="eyebrow">Continuum</div><h1 data-focus tabindex="-1">${esc(title)}</h1><p>${esc(subtitle)}</p></div></section>`;
+  }
+  function block(title, subtitle, art, action, count) {
+    return `<div class="collection-entry"><button class="gallery-panel panel-${art}" data-action="${action}" aria-label="${esc(title)}. ${esc(subtitle)}"><span class="panel-backdrop" aria-hidden="true"><img src="assets/hero-${art}-400.webp" alt="" width="400" height="600"></span><span class="panel-depth-light" aria-hidden="true"></span><span class="panel-art" aria-hidden="true"><img src="assets/hero-${art}-400.webp" alt="" width="400" height="600"></span><span class="panel-depth-ground" aria-hidden="true"></span><span class="collection-foil" aria-hidden="true"></span><span class="collection-index" aria-hidden="true">${count}</span><span class="collection-open" aria-hidden="true">↗</span><span class="panel-spine" aria-hidden="true"><i>◇</i><b>${esc(title)}</b></span><span class="panel-label" aria-hidden="true"><i></i><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></span></button></div>`;
+  }
   CT.Quick = {
     open(renderPage) {paint = renderPage; state = null; record = null; selected = null; slot = null; setup();},
-    promo() {return `<section class="home-competition"><div class="collection-heading"><div class="eyebrow">Pequeños desafíos, grandes decisiones</div><h2>Retos rápidos</h2></div><button class="comp-promo quick-promo" data-action="quick-challenges"><span><b>Ordena. Arriesga. Asegura.</b><small>Hasta diez cartas por reto · turnos en un solo móvil</small></span><span aria-hidden="true">→</span></button><article class="panel quick-upcoming"><span class="eyebrow">Gran mazo · En preparación</span><h2>¿Cuántos hay…?</h2><p>Conceptos muy distintos, una misma pregunta: ¿qué cantidad es mayor?</p><small>La selección de cartas llegará más adelante.</small></article></section>`;}
+    blocks() {return block('Retos rápidos', 'Ordena. Arriesga. Asegura.', 'quick', 'quick-challenges', `${CT.QuickCatalog.challenges.length} retos`) + block('¿Cuántos hay…?', 'Un gran mazo de cantidades por descubrir.', 'science', 'quick-counts', 'En preparación');},
+    counts(renderPage) {paint = renderPage; state = null; record = null; shell(`${masthead('¿Cuántos hay…?', 'Conceptos muy distintos, una misma pregunta: ¿qué cantidad es mayor?', 'science')}<section class="panel quick-panel"><div class="eyebrow">Gran mazo · En preparación</div><h2>De menos a más</h2><p>Este bloque tendrá su propio gran mazo de cantidades. La selección de cartas llegará más adelante.</p><button class="btn btn-secondary" data-action="home">Volver a las colecciones</button></section>`);}
   };
 })();
