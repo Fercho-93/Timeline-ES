@@ -716,12 +716,13 @@ function starterPanelMarkup(isHost) {
   const answered = mine && mine.cardId === cardId && mine.value !== null;
   const everyone = starterEveryoneAnswered();
   const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-online-action="starter-draw">🂠 Repetir el sorteo</button>` : "";
+  const cardMarkup = (detalle) => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
   if (!everyone) {
     if (answered) {
       const faltan = roomState.playerOrder.filter(uid => { const r = starterRecords.get(uid); return !(r && r.cardId === cardId && r.value !== null); }).map(uid => roomState.players[uid].name);
-      return `<div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div><p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}`;
+      return `${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}`;
     }
-    return `<div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
+    return `${cardMarkup(escapeHtml(regla.pregunta || ""))}
       <div class="field cifra-field">
         <label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
         <input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send">
@@ -732,7 +733,7 @@ function starterPanelMarkup(isHost) {
   const winner = starterWinnerUid();
   const answers = starterAnswers();
   const lista = roomState.playerOrder.map((uid, i) => `<li${uid === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(roomState.players[uid].name)}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), answers[i].value))}</span></li>`).join("");
-  const resultado = `<div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}</span></div><ul class="starter-draw-list">${lista}</ul><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
+  const resultado = `${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<ul class="starter-draw-list">${lista}</ul><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
   if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Barajar y empezar <span>→</span></button>`;
 }

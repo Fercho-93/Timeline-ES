@@ -686,7 +686,7 @@
     const regla = reglaCifra(selectedModeKey);
     const jugador = escapeHtml(starterDraw.names[starterDraw.step]);
     renderStarterDialog(`<h2>Pasa el móvil a ${jugador}</h2>
-      <div class="cifra-card">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
+      <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
       <div class="field cifra-field">
         <label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
         <input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send">
@@ -713,7 +713,7 @@
     announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida.`);
     renderStarterDialog(`<h2>¿Quién empieza?</h2>
       <div class="starter-winner-banner"><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><b>${escapeHtml(starterDraw.names[winner])}</b><span>Empieza la partida</span></div>
-      <p>El valor real era <strong>${escapeHtml(CT.formatValue(selectedModeKey, card))}</strong>.</p>
+      <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>El valor real era ${escapeHtml(CT.formatValue(selectedModeKey, card))}</span></div>
       <ul class="starter-draw-list">${starterDraw.names.map((name, i) => `<li${i === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(name)}</span><span>${escapeHtml(Cifras.formato(selectedModeKey, starterDraw.guesses[i]))}</span></li>`).join("")}</ul>
       <div class="actions"><button class="btn btn-primary btn-block" data-action="close-menu">Aceptar</button></div>`);
   }
