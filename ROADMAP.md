@@ -152,29 +152,34 @@ según el grupo de dispositivos.
 - [x] Código QR con lectura por cámara, para cuando "compartir" no tiene ningún destino en
       común entre los dos móviles — el caso real detectado por un tester: un Android y un
       iPhone en modo avión, sin Bluetooth emparejado ni AirDrop compatible entre sí, donde
-      `local-share.js` (`navigator.share`) no tiene a quién entregar el texto. Solución:
-      - `qr-encode.js`: el mismo generador de QR de `online.js` (versión 5, hasta 106
-        bytes), sacado aparte para no tocar ese archivo, reutilizable desde el modo "Sin
-        conexión".
-      - `qr-frames.js`: como una señal WebRTC completa no cabe en un único QR de 106 bytes,
-        el texto se trocea en varios códigos que se enseñan seguidos en la misma pantalla
-        (como un QR animado); cada trozo lleva una cabecera corta (letra de sesión al azar +
-        total + índice, en base 36) para que la cámara los reúna en el orden que sea y sin
-        mezclar dos códigos distintos. Puro, sin DOM ni cámara — con pruebas
-        (`tests/qr-local.mjs`).
+      `local-share.js` (`navigator.share`) no tiene a quién entregar el texto. Dos rondas,
+      las dos a partir de pruebas reales:
+      - Primera ronda: generador de QR hecho a mano (versión 5, 106 bytes), heredado del de
+        `online.js`. Una invitación completa no cabía ahí, así que se troceaba en 12-13
+        códigos seguidos — probado en un Android/iPhone reales, imposible de leer a ese
+        ritmo.
+      - Segunda ronda, tras esa prueba: sustituido por `qrcode-generator` (vendorizado sin
+        modificar, licencia MIT — ver `LICENSE-QRCODE-GENERATOR.txt`), que soporta las 40
+        versiones del estándar QR. Una invitación completa (código de sala + huella del
+        mazo + señal WebRTC) cabe siempre en un único código — nada que trocear ni
+        reunir. `qr-encode.js` expone la misma interfaz de antes (`matrix`/`draw`) sobre
+        esta librería; con pruebas que no solo generan el código sino que lo decodifican de
+        verdad con `jsQR` sobre píxeles reales, para varios tamaños incluido uno del tamaño
+        real de una invitación (`tests/qr-local.mjs`).
       - `qr-scanner.js`: lee la cámara con `getUserMedia` y decodifica con `jsQR`
         (`jsqr.js`, vendorizado sin modificar, licencia Apache-2.0 — ver
         `LICENSE-JSQR.txt`). Es la única pieza de esta funcionalidad que no se puede probar
-        en Node (no hay cámara ni `RTCPeerConnection` en el entorno de pruebas). `jsqr.js`
-        pesa unos 250 KB sin comprimir: no se carga con el resto de la aplicación —solo la
-        primera vez que se abre la pantalla de escanear—, pero sí está en la lista de
-        precarga del service worker, así que esa carga bajo demanda sigue funcionando sin
-        conexión.
-      - `local-multiplayer.js`: "Mostrar como código QR" en la invitación del anfitrión y en
-        la respuesta del invitado; "Escanear con la cámara" como alternativa a pegar el
-        código a mano, en ambos sentidos. El paso a estas pantallas cierra la cámara o el
-        temporizador del QR en cuanto se sale de ellas, para no dejar la cámara abierta de
-        fondo.
+        en Node (no hay cámara ni `RTCPeerConnection` en el entorno de pruebas). Pesa unos
+        250 KB sin comprimir: no se carga con el resto de la aplicación —solo la primera
+        vez que se abre la pantalla de escanear—, pero sí está en la lista de precarga del
+        service worker, así que esa carga bajo demanda sigue funcionando sin conexión.
+      - `local-multiplayer.js`: el código QR se dibuja directamente en la propia pantalla
+        de invitar (anfitrión) o de compartir respuesta (invitado) — no detrás de un botón
+        aparte. Compartir por Bluetooth/AirDrop o pegar a mano queda como alternativa
+        plegada, para cuando la cámara no se pueda usar. De paso, se corrigió un fallo
+        real: ni el anfitrión ni quien se unía pasaban solos al vestíbulo al conectar
+        —tenían que salir y volver a mano—, porque `onRoomChange` no reaccionaba desde las
+        pantallas de invitar/compartir, solo desde el vestíbulo o la partida.
 - [ ] Probar en dispositivos reales, en modo avión, con grupos mixtos Android/iPhone —
       la conexión WebRTC en sí no se puede probar en Node (no hay `RTCPeerConnection`), y la
       lectura de QR por cámara tampoco (no hay cámara); todo lo de alrededor sí está

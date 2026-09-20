@@ -31,10 +31,9 @@
     return typeof navigator !== "undefined" && !!navigator.mediaDevices?.getUserMedia;
   }
 
-  // `onFrame` se llama con el texto de cada QR que la cámara consigue leer, una y otra vez
-  // mientras el vídeo siga encuadrando alguno — puede ser el mismo texto repetido (el código
-  // no ha cambiado todavía) o partes distintas de un código animado (`qr-frames.js`); decidir
-  // cuándo ya se tiene lo necesario es cosa de quien llama, no de este archivo.
+  // `onFrame` se llama con el texto del QR en cuanto la cámara consigue leerlo, y puede
+  // repetirse mientras el código siga a la vista — quien llama decide qué hacer con eso
+  // (aquí, aceptar la primera lectura y parar) y cuándo dejar de escuchar (`stop()`).
   async function start(videoEl, onFrame, onError) {
     if (!isSupported()) throw new Error("CAMERA_UNAVAILABLE");
     await ensureLibrary();
