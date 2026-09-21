@@ -35,6 +35,20 @@ La retención objetivo es de siete días para salas y presencia, con configuraci
 
 Al publicar, comparar el SHA-256 del archivo de reglas aprobado con el contenido activo recuperado de Firebase Rules API o de la consola, y guardar evidencia de proyecto, fecha y versión. No declarar equivalencia solo porque un despliegue local devolvió éxito. Ejecutar las pruebas contra un proyecto de ensayo y comprobar una sala desde dos dispositivos antes de abrir nuevas altas.
 
+## Respuesta ante actividad anómala (B.4.3)
+
+Procedimiento simple, para no improvisar en caliente. «Anómalo» aquí significa: un salto brusco en el panel de uso de Firestore (Firebase Console → Firestore Database → Uso), una alerta de presupuesto de Google Cloud Billing (B.4.1, aún por configurar), o un aviso de coste/tráfico que no cuadra con el número real de jugadores.
+
+1. **Confirmar que es de verdad anómalo, no un pico legítimo.** Cruzar la fecha con cualquier motivo esperado (publicación nueva, mención en redes, prueba propia). Un pico que coincide con una campaña no es abuso.
+2. **Mirar qué colección concentra el gasto**, en el panel de uso por colección de Firestore: si son lecturas de `socialRanking`/`dailyRanking`, sospechar del ranking (B.3 ya documenta que su cuota de lectura no se puede exigir desde las reglas); si son escrituras en `rooms`/`roomCreation`/`roomJoin`, sospechar de creación o entrada masiva de salas.
+3. **Cortar altas nuevas temporalmente** si el origen parece ser cuentas nuevas en bucle: Firebase Console → Authentication → Sign-in method → desactivar el proveedor anónimo. Esto no expulsa a quien ya está jugando (su sesión sigue siendo válida), solo impide que se creen identidades nuevas. Revertir en cuanto se identifique y corte el origen.
+4. **Si App Check ya está activo (B.2)**, revisar en Firebase Console → App Check qué proporción de peticiones llega sin token válido: un salto ahí apunta a tráfico fuera de la app real (un script, no un cliente modificado con App Check correcto, porque ese sí lo pasaría).
+5. **Si el origen es una cuota concreta que se está saltando de forma sistemática** (por ejemplo, muchas altas de `roomCreation` con menos de 30 segundos de diferencia real que sin embargo no deberían pasar), comprobar primero que las reglas desplegadas coinciden con las del repositorio (hash SHA-256, B.1.2) antes de sospechar de un fallo en la regla misma.
+6. **Documentar el incidente** en el registro de incidencias (C.3.2, ver `INCIDENCIAS.md`) con fecha, qué se observó, qué se hizo y cuándo se revirtió. Sirve para no repetir el mismo diagnóstico la próxima vez.
+7. **Reabrir altas** solo cuando el origen esté identificado y cortado (no solo cuando el gasto haya bajado: puede bajar solo porque el atacante se ha cansado, no porque el hueco esté cerrado).
+
+Esto no sustituye a B.2 (App Check) ni a B.3 (cuotas): es lo que se hace cuando, aun con esas dos cosas activas, algo se sale de lo esperado.
+
 ## Arquitectura para una futura competición pública
 
 Crear una versión de protocolo independiente con estas fronteras:
