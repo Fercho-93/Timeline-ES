@@ -6,7 +6,7 @@ import vm from 'node:vm';
 // Ninguna prueba crea salas de producción.
 const source = fs.readFileSync(new URL('../online.js', import.meta.url), 'utf8');
 const links = fs.readFileSync(new URL('../links.js', import.meta.url), 'utf8');
-const helpers = source.slice(source.indexOf('function invitationUrl('), source.indexOf('function gfMultiply('));
+const helpers = source.slice(source.indexOf('function invitationUrl('), source.indexOf('function rememberRoom('));
 const operations = source.slice(source.indexOf('async function createRoom('), source.indexOf('function connectToRoom('));
 const code = 'ABCD2345';
 

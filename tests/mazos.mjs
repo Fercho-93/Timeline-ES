@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.window = {};
-for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "animals.js", "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js"]) {
+for (const archivo of ["cards.js", "movies.js", "music.js", "videogames.js", "animals.js", "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js", "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "mode-art.js", "modes.js"]) {
   new Function(fs.readFileSync(path.join(REPO, archivo), "utf8")).call(globalThis);
 }
 const { HISTORY_CARDS, MOVIE_CARDS, MUSIC_CARDS, VIDEOGAME_CARDS, ANIMAL_WEIGHT_CARDS, ANIMAL_LIFESPAN_CARDS, ANIMAL_SPEED_CARDS, INVENTION_CARDS, WORLD_CARDS, ASTRONOMY_CARDS, MEDICINE_CARDS, COUNTRY_CARDS, POPULATION_CARDS, LANGUAGE_CARDS, CITY_DISTANCE_CARDS } = globalThis.window;

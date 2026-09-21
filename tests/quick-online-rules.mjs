@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
 import {doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
-const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
+const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','mode-art.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
 const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
 const rounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
 const host=env.authenticatedContext('host').firestore(),guest=env.authenticatedContext('guest').firestore(),out=env.authenticatedContext('outsider').firestore();
