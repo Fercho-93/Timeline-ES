@@ -17,7 +17,7 @@ const ASSETS = [
   "./engine.js", "./final.js", "./tournament.js", "./links.js",
   "./", "./index.html", "./splash.css", "./splash.js", "./styles.css", "./edition.css", "./service-worker-258.js", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
-  "./medicine.js", "./countries.js", "./population.js", "./idiomas.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./enciclopedia.js", "./progreso.js", "./cartera.js", "./duelo.js", "./duelo-turnos.js", "./push.js", "./local-transport.js", "./local-room.js", "./local-session.js", "./local-share.js", "./qrcode-generator.js", "./qr-encode.js", "./qr-scanner.js", "./local-multiplayer.js", "./jsqr.js",
+  "./medicine.js", "./countries.js", "./population.js", "./idiomas.js", "./distances.js", "./mode-art.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./enciclopedia.js", "./progreso.js", "./cartera.js", "./duelo.js", "./duelo-turnos.js", "./push.js", "./local-transport.js", "./local-room.js", "./local-session.js", "./local-share.js", "./qrcode-generator.js", "./qr-encode.js", "./qr-scanner.js", "./local-multiplayer.js", "./jsqr.js",
   "./ghost.js", "./drag.js", "./swipe.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./ambience.js", "./immersion.js", "./app.js", "./online.js",
   "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/continuum-splash-clean-v3.webp",
   "./assets/world-cards/5009-battle-marathon.webp", "./assets/medicine-cards/9001-hippocratic-corpus.webp", "./assets/astronomy-cards/first-earth-photo.webp",

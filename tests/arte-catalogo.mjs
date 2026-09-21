@@ -11,7 +11,7 @@ const scripts = [...html.matchAll(/<script\b[^>]*\bsrc="([^"?]+)(?:\?[^"]*)?"[^>
 const window = {};
 // Descubre los catálogos desde la página real, para detectar también nuevos mazos.
 const catalogs = scripts.filter(file => !file.includes('/') && /window\.\w+_CARDS\s*=/.test(read(file)));
-for (const file of [...catalogs, 'modes.js', 'enciclopedia.js']) vm.runInNewContext(read(file), { window });
+for (const file of [...catalogs, 'mode-art.js', 'modes.js', 'enciclopedia.js']) vm.runInNewContext(read(file), { window });
 const ct = window.CONTINUUM;
 assert(scripts.includes('modes.js'));
 for (const file of catalogs) assert(scripts.indexOf(file) < scripts.indexOf('modes.js'), `${file} se carga después de modes.js`);
@@ -22,7 +22,7 @@ const used = new Set(), uniqueCards = new Map();
 const groups = Object.values(ct.BLOCKS).flatMap(block => Array.from(block.games));
 assert.equal(new Set(groups).size, groups.length, 'Mazo repetido entre colecciones');
 assert.deepEqual([...groups].sort(), Object.keys(ct.MODES).sort(), 'Mazos fuera de las colecciones');
-const source = read('modes.js');
+const source = read('modes.js') + read('mode-art.js');
 for (const [key, mode] of Object.entries(ct.MODES)) {
   assert(ct.usesAnimalArt(key), `${key} no activa las ilustraciones`);
   assert(mode.cards.length > 0, `${key} está vacío`);
