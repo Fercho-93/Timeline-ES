@@ -49,6 +49,10 @@ Procedimiento simple, para no improvisar en caliente. «Anómalo» aquí signifi
 
 Esto no sustituye a B.2 (App Check) ni a B.3 (cuotas): es lo que se hace cuando, aun con esas dos cosas activas, algo se sale de lo esperado.
 
+## Repetir las pruebas antes de cada versión (C.3.3)
+
+Antes de publicar una versión nueva (subir a las tiendas, desplegar `firestore.rules` o `functions/`), ejecutar `npm test` completo — o, como mínimo, `npm run test:seguridad` (reglas de Firestore contra el emulador) y `npm run test:infra` (que el build móvil no se rompe y todos los ficheros de `index.html` llegan a `dist/`). Un cambio que pasaba las pruebas la semana pasada puede dejar de hacerlo si otra persona tocó `firestore.rules` mientras tanto; no basta con confiar en la última ejecución en CI si hubo commits después. Ver `package.json` para el resto de grupos (`test:contenido`, `test:juego`, `test:accesibilidad`, `test:multijugador`, C.2.4).
+
 ## Arquitectura para una futura competición pública
 
 Crear una versión de protocolo independiente con estas fronteras:
