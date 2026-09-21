@@ -232,7 +232,9 @@ service cloud.firestore {
         && (!('aliasKey' in resource.data) || resource.data.aliasKey == request.resource.data.aliasKey
           || !existsAfter(/databases/$(database)/documents/playerNames/$(resource.data.aliasKey)))
         && request.resource.data.alias is string
-        && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24;
+        && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24
+        // Cuota B.3: la misma transacción tiene que renovar nameChange/{uid}.
+        && getAfter(/databases/$(database)/documents/nameChange/$(uid)).data.lastChangedAt == request.time;
       allow delete: if owner(uid);
       match /pushTokens/{tokenId} {
         allow get, list: if owner(uid);
@@ -301,6 +303,17 @@ service cloud.firestore {
       allow get: if registered();
       allow write, list: if false;
     }
+    // Cuotas por UID (B.3): todas viven en esta zona del fichero, cada una en su propia
+    // colección `{acción}/{uid}` con la misma forma — un campo `last…At` que debe valer
+    // `request.time` y no puede repetirse antes de que pase `duration.value(30,'s')` desde
+    // el valor anterior. La acción que la dispara exige en la misma escritura (batch o
+    // transacción) que ese documento se actualice, vía `getAfter(...)`; así un cliente no
+    // puede saltarse el contador escribiendo solo la mitad. Añadir una cuota nueva es
+    // copiar uno de estos `match` y esa exigencia cruzada en la acción correspondiente.
+    // Cuotas activas: crear sala (`roomCreation`), unirse a sala (`roomJoin`), cambiar de
+    // nombre (`nameChange`). Consultar el ranking no tiene cuota: es una lectura, y las
+    // reglas no pueden obligar a un cliente a acompañarla de una escritura — solo un
+    // backend con estado (el `server/` experimental, no desplegado) podría exigirlo.
     match /roomCreation/{owner} {
       allow get: if registered() && request.auth.uid == owner;
       allow create, update: if registered() && request.auth.uid == owner
@@ -311,6 +324,24 @@ service cloud.firestore {
         && !exists(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode))
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.hostUid == owner
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.createdAt == request.time;
+      allow list, delete: if false;
+    }
+    match /roomJoin/{owner} {
+      allow get: if registered() && request.auth.uid == owner;
+      allow create, update: if registered() && request.auth.uid == owner
+        && request.resource.data.keys().hasOnly(['lastJoinedAt','roomCode'])
+        && request.resource.data.lastJoinedAt == request.time
+        && request.resource.data.roomCode is string
+        && (!exists(/databases/$(database)/documents/roomJoin/$(owner)) || request.time >= resource.data.lastJoinedAt + duration.value(30,'s'))
+        && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.playerOrder.hasAny([owner]);
+      allow list, delete: if false;
+    }
+    match /nameChange/{owner} {
+      allow get: if registered() && request.auth.uid == owner;
+      allow create, update: if registered() && request.auth.uid == owner
+        && request.resource.data.keys().hasOnly(['lastChangedAt'])
+        && request.resource.data.lastChangedAt == request.time
+        && (!exists(/databases/$(database)/documents/nameChange/$(owner)) || request.time >= resource.data.lastChangedAt + duration.value(30,'s'));
       allow list, delete: if false;
     }
     match /rooms/{roomId} {
@@ -641,6 +672,9 @@ service cloud.firestore {
           && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid])
           && validName(request.resource.data.players[request.auth.uid].name)
           && request.resource.data.players[request.auth.uid].hand.size() == 0
+          // Cuota B.3: la misma transacción tiene que renovar roomJoin/{uid}.
+          && getAfter(/databases/$(database)/documents/roomJoin/$(request.auth.uid)).data.roomCode == roomId
+          && getAfter(/databases/$(database)/documents/roomJoin/$(request.auth.uid)).data.lastJoinedAt == request.time
           && bumped();
       }
 

@@ -29,7 +29,7 @@ function setup(href, native, { blockedHistory = false, serverError = null } = {}
     writeBatch: () => ({ set() {}, async commit() { if (serverError) throw serverError; events.push('saved'); } }),
     runTransaction: async (_db, work) => {
       if (serverError) throw serverError;
-      await work({ get: async () => ({ exists: () => true, data: () => room }), update() {} });
+      await work({ get: async () => ({ exists: () => true, data: () => room }), update() {}, set() {} });
       events.push('saved');
     },
     rememberRoom: () => events.push('remembered'),

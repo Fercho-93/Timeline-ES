@@ -18,7 +18,16 @@ El catálogo y los valores correctos siguen estando en el cliente, como el resto
 
 App Check no sustituye las reglas, no oculta cartas y no evita por sí solo todo abuso. La autenticación anónima puede regenerarse; cualquier cuota por UID debe acompañarse de observación y atestación. Revisar altas de identidades, creación de salas, lecturas, escrituras, errores y consumo. Configurar avisos y un procedimiento de cierre de altas; un presupuesto no es un corte automático.
 
-Las altas de sala llevan una cuota atómica de una sala cada 30 segundos por UID. Crear una sala sin actualizar su registro `roomCreation` en la misma operación es rechazado. Estos registros necesitan limpieza por `lastCreatedAt` con el mismo desplazamiento de siete días. Esta cuota no limita las lecturas ni impide crear otra identidad: no se presenta como un límite global de costes.
+## Cuotas por UID (B.3)
+
+Todas las cuotas activas viven en `firestore.rules`, agrupadas junto a `roomCreation` bajo el comentario «Cuotas por UID (B.3)»: cada una es una colección `{acción}/{uid}` con un campo `last…At` que debe valer `request.time` y no puede renovarse antes de que pasen 30 segundos desde el valor anterior. La acción que dispara la cuota exige, en la misma escritura (batch o transacción), que ese documento se actualice — así un cliente no puede escribir solo la mitad. Añadir una cuota nueva ante un abuso distinto es copiar uno de esos `match` y esa misma exigencia cruzada en la acción correspondiente; no hay que buscar la comprobación repetida en otros ficheros porque no la hay.
+
+- **Crear sala** (`roomCreation`): una sala nueva cada 30 segundos por UID. Crear una sala sin actualizar su registro en la misma operación es rechazado.
+- **Unirse a sala** (`roomJoin`): una entrada cada 30 segundos por UID, sobre `rooms/{roomId}`. No cubre todavía `quickRooms` (Retos rápidos), que queda pendiente si se detecta abuso ahí.
+- **Cambiar de nombre** (`nameChange`): un cambio de alias cada 30 segundos por UID, sobre `playerProfiles/{uid}`.
+- **Consultar el ranking**: sin cuota. Es una lectura (`get`/`list` en `socialRanking`/`dailyRanking`), y las reglas de Firestore no pueden obligar a que una lectura vaya acompañada de una escritura de control — un cliente modificado simplemente no la escribiría. Sin un backend con estado (el `server/` experimental, no desplegado) no hay forma de exigirlo de verdad; `socialRanking`/`dailyRanking` ya limitan cada consulta a 50 documentos (`request.query.limit <= 50`), pero eso no es una cuota de repetición.
+
+Los registros de `roomCreation`, `roomJoin` y `nameChange` necesitan limpieza por su campo `last…At` con el mismo desplazamiento de siete días. Ninguna de estas cuotas limita las lecturas ni impide crear otra identidad: no se presentan como un límite global de costes.
 
 La retención objetivo es de siete días para salas y presencia, con configuración separada de TTL y desplazamiento explícito. Ver `CONFIGURAR_MULTIJUGADOR.md`. Verificar en ensayo y después contrastar las políticas reales; no se han inspeccionado ni cambiado reglas o políticas de producción en esta tarea.
 

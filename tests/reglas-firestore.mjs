@@ -27,6 +27,13 @@ async function createRoomForTest(code, data) {
   batch.set(doc(db,'rooms',code),data);
   return batch.commit();
 }
+async function joinRoomForTest(uid, code, updates) {
+  await env.withSecurityRulesDisabled(c=>deleteDoc(doc(c.firestore(),'roomJoin',uid)));
+  const db=ctx(uid), batch=writeBatch(db);
+  batch.set(doc(db,'roomJoin',uid),{roomCode:code,lastJoinedAt:serverTimestamp()});
+  batch.update(doc(db,'rooms',code),updates);
+  return batch.commit();
+}
 async function check(label, expected, promise) {
   try {
     await (expected === "allow" ? assertSucceeds(promise) : assertFails(promise));
@@ -56,11 +63,12 @@ await check("crear sala con hostUid ajeno", "deny", setDoc(doc(ctx(P2), "rooms",
 await check("crear sala repartiéndose cartas", "deny", setDoc(doc(ctx(P2), "rooms", "YYYY2345"), { ...base(), roomCode: "YYYY2345", hostUid: P2, playerOrder: [P2], players: { [P2]: { name: "Bea", hand: [1, 2, 3], joinedAt: 1 } } }));
 
 await seed(base());
-await check("un invitado entra en el vestíbulo", "allow", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
+await check("un invitado entra en el vestíbulo", "allow", joinRoomForTest(P2, ROOM, { players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
 await seed(base());
-await check("entrar con nombre de 30 caracteres", "deny", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "B".repeat(30), hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
-await check("entrar borrando al anfitrión", "deny", updateDoc(ref(ctx(P2)), { players: { [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [P2], version: 2, updatedAt: serverTimestamp() }));
-await check("entrar cambiando la modalidad", "deny", updateDoc(ref(ctx(P2)), { mode: "movies", players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
+await check("entrar sin renovar la cuota de sala", "deny", updateDoc(ref(ctx(P2)), { players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
+await check("entrar con nombre de 30 caracteres", "deny", joinRoomForTest(P2, ROOM, { players: { ...base().players, [P2]: { name: "B".repeat(30), hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
+await check("entrar borrando al anfitrión", "deny", joinRoomForTest(P2, ROOM, { players: { [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [P2], version: 2, updatedAt: serverTimestamp() }));
+await check("entrar cambiando la modalidad", "deny", joinRoomForTest(P2, ROOM, { mode: "movies", players: { ...base().players, [P2]: { name: "Bea", hand: [], joinedAt: 2 } }, playerOrder: [HOST, P2], version: 2, updatedAt: serverTimestamp() }));
 
 await check("crear una sala de la modalidad de países", "allow", createRoomForTest("PAIS2345", { ...base(), roomCode: "PAIS2345", mode: "countries" }));
 // La lista de juegos ya no vive en las reglas, para no republicarlas con cada juego

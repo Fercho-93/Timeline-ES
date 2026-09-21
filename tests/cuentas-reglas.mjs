@@ -1,5 +1,5 @@
 import {initializeTestEnvironment,assertFails,assertSucceeds} from '@firebase/rules-unit-testing';
-import {doc,setDoc,getDoc,getDocs,collection,query,orderBy,limit,deleteDoc,writeBatch,serverTimestamp} from 'firebase/firestore';
+import {doc,setDoc,updateDoc,getDoc,getDocs,collection,query,orderBy,limit,deleteDoc,writeBatch,serverTimestamp} from 'firebase/firestore';
 import fs from 'node:fs';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
 const verified={firebase:{sign_in_provider:'anonymous'}};
@@ -32,7 +32,8 @@ try {
  await assertSucceeds(getDocs(query(collection(anonymous,'dailyRanking'),limit(50))));
  await assertFails(getDocs(query(collection(unauthenticated,'dailyRanking'),limit(50))));
  await assertFails(deleteDoc(doc(other,'dailyRanking','account-a')));
- batch=writeBatch(db);batch.update(doc(db,'playerProfiles','account-a'),{alias:'Fulanito',aliasKey:'fulanito'});batch.set(doc(db,'playerNames','fulanito'),{uid:'account-a'});batch.delete(doc(db,'playerNames','fer'));batch.update(doc(db,'dailyRanking','account-a'),{alias:'Fulanito',updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
+ batch=writeBatch(db);batch.update(doc(db,'playerProfiles','account-a'),{alias:'Fulanito',aliasKey:'fulanito'});batch.set(doc(db,'playerNames','fulanito'),{uid:'account-a'});batch.delete(doc(db,'playerNames','fer'));batch.update(doc(db,'dailyRanking','account-a'),{alias:'Fulanito',updatedAt:serverTimestamp()});batch.set(doc(db,'nameChange','account-a'),{lastChangedAt:serverTimestamp()});await assertSucceeds(batch.commit());
+ await assertFails(updateDoc(doc(db,'playerProfiles','account-a'),{alias:'SinCuota',aliasKey:'sincuota'})); // sin renovar nameChange
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'x'}));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,season:'other'}));
  await assertFails(deleteDoc(doc(db,'playerNames','fulanito')));

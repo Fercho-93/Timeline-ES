@@ -54,6 +54,7 @@ function randomAlias() {
   return `Player ${1000 + number[0] % 9000}`;
 }
 const nameRef = key => doc(db,'playerNames',key);
+const nameChangeRef = uid => doc(db,'nameChange',uid);
 const nameKey = alias => alias.toLowerCase();
 function validateAlias(alias) {
   if (alias.length < 2 || alias.length > 24 || !/^[a-z0-9áéíóúüñ_-](?:[a-z0-9áéíóúüñ _-]*[a-z0-9áéíóúüñ_-])$/i.test(alias)) throw Error('Usa de 2 a 24 caracteres: letras, números, espacios, guion o guion bajo.');
@@ -73,6 +74,10 @@ async function ensureProfile(uid) {
         const rank=await tx.get(refs(uid).ranking);
         const value=old ? {...old,alias,aliasKey} : {alias,aliasKey,avatar:'compass',season,createdAt:serverTimestamp(),privacyVersion:1};
         tx.set(nameRef(aliasKey),{uid});tx.set(ref,value);
+        // Perfil ya existente sin aliasKey (recuperación de un estado antiguo roto): para
+        // las reglas esto es una actualización, no una creación, así que también pide
+        // renovar la cuota de B.3 igual que rename().
+        if(old)tx.set(nameChangeRef(uid),{lastChangedAt:serverTimestamp()});
         if(rank.exists())tx.set(refs(uid).ranking,{...rank.data(),alias,updatedAt:serverTimestamp()});
         return value;
       });
@@ -102,6 +107,7 @@ async function rename() {
     const previous=p.data().aliasKey;
     tx.set(nameRef(aliasKey),{uid:identity.uid});
     tx.set(r.profile,{...p.data(),alias,aliasKey});
+    tx.set(nameChangeRef(identity.uid),{lastChangedAt:serverTimestamp()});
     if(previous && previous!==aliasKey) tx.delete(nameRef(previous));
     if (rank.exists()) tx.set(r.ranking,{...rank.data(),alias,updatedAt:serverTimestamp()});
   });
