@@ -2223,7 +2223,7 @@
       icono: empate ? "🤝" : gano ? "🏆" : "🎯",
       eyebrow: empate ? "Empate" : gano ? "Has ganado el duelo" : "Duelo perdido",
       titular: `${mio.hits} <span style="opacity:.6">a</span> ${rival.hits}`,
-      cuerpo: `<p class="lead" style="margin-inline:auto">${empate ? `Habéis acertado lo mismo que ${quien}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
+      cuerpo: `<p class="lead" style="margin-inline:auto">${empate ? `Habéis acertado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
         ${duelGridMarkup(quien, rival.sequence, mio.sequence)}`,
       acciones: `<button class="btn btn-primary" data-action="start-duel">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`
     };
@@ -2566,7 +2566,7 @@
 
   function soloLabel() {
     if (solo.kind === "daily") return "Reto diario";
-    if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${solo.duelo.rival.nombre || "quien te reta"}` : "Duelo · tu tirada";
+    if (solo.kind === "duel") return solo.duelo?.rival ? `Duelo · contra ${escapeHtml(solo.duelo.rival.nombre || "quien te reta")}` : "Duelo · tu tirada";
     // El tema no va aquí: lo lleva su propio rótulo encima del marcador, que es lo que
     // recuerda a qué se está jugando cuando el cartel del principio ya se ha ido.
     if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${(comp.totalThemes || TOTAL_TEMAS) - comp.queue.length} de ${comp.totalThemes || TOTAL_TEMAS}`;

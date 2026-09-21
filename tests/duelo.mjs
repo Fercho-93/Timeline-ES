@@ -429,5 +429,32 @@ console.log("\nLas reglas viajan en la versión del enlace");
   ok("la invitación anuncia ese plazo y no el de hoy", /20 segundos por carta/.test(texto(conVeinte)));
 }
 
+console.log("\nEl nombre de quien reta no se cuela como HTML (XSS)");
+{
+  // limpiaNombre() solo quita barras y saltos de línea: el nombre puede llevar < > " sin
+  // que el enlace se rompa. Si algún sitio lo pinta sin escapar, esta etiqueta se convierte
+  // en un <img> de verdad en vez de quedarse como texto.
+  const D = boot().CONTINUUM.Duelo;
+  // Exactamente MAX_NOMBRE (18) caracteres: limpiaNombre() trunca, no filtra < > ", así
+  // que cabe entera y llega intacta.
+  const maligno = "<img src=x data-a>";
+  const sequence = [true, true, true, true, true, true, true, true, true, true, true, true, false, false, false];
+  const payload = D.codificar({ mode: "history", seed: "xss1", total: 15, hits: 12, sequence, nombre: maligno });
+
+  const rival = boot({ url: `https://hilo.test/?duelo=${payload}` });
+  ok("la invitación no crea la etiqueta del rival como HTML real", !existe(rival, "img[data-a]"));
+  ok("se ve como texto escapado", texto(rival).includes(maligno));
+
+  rival.document.getElementById("duel-name").value = "Marta";
+  click(rival, '[data-action="accept-duel"]');
+  await jugar(rival);
+  ok("tampoco en la pantalla de partida, nada más entrar", !existe(rival, "img[data-a]"));
+
+  // Empate deliberado (12 de 15 en los dos lados): es la rama que en su día se dejó sin escapar.
+  juegaDuelo(rival, "history", { falla: n => n >= 12 });
+  ok("ni en el resultado final, tampoco en empate", !existe(rival, "img[data-a]"));
+  ok("el resultado sigue mostrando el nombre, pero como texto", texto(rival).includes(maligno));
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);
