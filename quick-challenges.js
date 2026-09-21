@@ -20,9 +20,35 @@
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
   let format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null, readyTimer = null;
-  const DAILY = 'continuum-quick-daily-v1', BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1';
+  const DAILY = 'continuum-quick-daily-v1', BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1', HISTORY = 'continuum-quick-history-v1';
   const day = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
   function readJSON(key, fallback=null) {try{return JSON.parse(CT.Storage.getItem(key)) || fallback;}catch{return fallback;}}
+  function historyId() {return globalThis.crypto?.randomUUID?.() || `quick-${Date.now()}-${Math.random().toString(36).slice(2)}`;}
+  function quickHistory() {return readJSON(HISTORY, []);}
+  function saveHistory() {
+    if (!record || state?.phase !== 'round-end' || !record.config || record.historySaved) return;
+    const final = state.index + 1 === record.config.rounds.length;
+    if (!final) return;
+    const key = record.config.historyId || `${record.config.kind}-${record.config.rounds.map(r=>r.id).join(',')}-${record.config.names?.join('|')}`;
+    const history = quickHistory();
+    if (!history.some(item => item.id === key)) {
+      history.unshift({id:key,date:day(),kind:record.config.kind || 'network',rounds:record.config.rounds.length,score:Math.max(...state.players.map(p=>p.score)),players:state.players.map(p=>p.name)});
+      CT.Storage.setItem(HISTORY, JSON.stringify(history.slice(0, 50)));
+    }
+    record.historySaved = true;
+  }
+  function statsPanel() {
+    const history = quickHistory(), games = history.length, points = history.reduce((n,item)=>n + (Number(item.score)||0),0), best = history.reduce((n,item)=>Math.max(n,Number(item.score)||0),0);
+    const rows = history.slice(0, 12).map(item => `<li><strong>${esc(item.score)} puntos</strong><span>${esc(item.date)} · ${esc(item.kind === 'daily' ? 'Reto diario' : item.kind === 'duel' ? 'Duelo por turnos' : `${item.rounds} ${item.rounds === 1 ? 'reto' : 'retos'}`)}</span></li>`).join('');
+    const layer = document.createElement('div'); layer.className='overlay';
+    layer.innerHTML = `<div class="modal quick-stats-modal"><h2>Historial y estadísticas</h2><div class="quick-stats-grid"><span><b>${games}</b><small>partidas terminadas</small></span><span><b>${points}</b><small>puntos acumulados</small></span><span><b>${best}</b><small>mejor resultado</small></span></div><h3>Últimas partidas</h3>${rows ? `<ol class="quick-history">${rows}</ol>` : '<p class="hint">Todavía no hay partidas terminadas. Tu historial aparecerá aquí.</p>'}<button class="btn btn-primary btn-block" data-quick="close-menu">Cerrar</button></div>`;
+    app().append(layer); CT.openDialog(layer,true);
+  }
+  function guide() {
+    const layer=document.createElement('div'); layer.className='overlay';
+    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Arriesga o asegura</h3><p>Cada acierto suma un punto provisional. Puedes plantarte para asegurarlo. Si fallas, pierdes los puntos provisionales de ese reto.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
+    app().append(layer); CT.openDialog(layer,true);
+  }
   function myTurn() {return !room || room.actor === myId;}
   function stopNetwork() {networkEpoch++;connection?.close();connection=null;room=null;myId=null;busy=false;invite=null;}
   function errorNotice(e) {busy=false;let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=e.message || String(e);CT.announce(e.message || String(e));}
@@ -57,7 +83,7 @@
       <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">Acertar suma. Plantarte asegura tus puntos. Fallar termina el reto y pierde los puntos provisionales.</p></div>
     ${soloFold('daily','Reto diario','Un reto distinto cada día',dailyIcon,dailyBody)}
     ${soloFold('free','Partida libre','A tu ritmo y a tu nivel',freeIcon,freeBody)}
-    ${soloFold('duel','Duelo por enlace','Las mismas cartas, otro rival',duelIcon,duelBody)}<p id="quick-error" role="alert"></p></section>`);
+    ${soloFold('duel','Duelo por enlace','Las mismas cartas, otro rival',duelIcon,duelBody)}<div class="quick-secondary-actions"><button class="btn btn-secondary btn-block" data-quick="guide">Guía de Retos rápidos</button><button class="btn btn-ghost btn-block" data-quick="stats">Historial y estadísticas</button></div><p id="quick-error" role="alert"></p></section>`);
   }
   function rounds(count=3, selectedId=null, seed=null) {
     const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed));
@@ -66,7 +92,7 @@
     const list=Array.from({length:count},(_,i)=>catalog[i % catalog.length]);
     return list.map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
   }
-  function begin(config) {clearInterval(readyTimer);readyTimer=null;pendingConfig=null;record={version:CT.QuickCatalog.version,config,commands:[]};state=E.create(config);selected=null;slot=null;save();render();}
+  function begin(config) {clearInterval(readyTimer);readyTimer=null;pendingConfig=null;config.historyId ||= historyId();record={version:CT.QuickCatalog.version,config,commands:[]};state=E.create(config);selected=null;slot=null;save();render();}
   function prepare(config) {
     pendingConfig=config; page='prepare'; state=null; record=null;
     const c=E.challenge(config.rounds[0].id);
@@ -98,7 +124,7 @@
   function networkSetup(kind,capacity=4) {
     roomCapacity=capacity;
     stopNetwork();state=null;record=null;page='network';netKind=kind;
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo por turnos':kind==='internet'?'Varios móviles':'Sin conexión'}</h2><p class="lead">${kind==='internet'?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p><div class="panel"><div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${esc(CT.Accounts?.profile?.alias || '')}"></div>${button('create-room','Crear sala','btn btn-primary btn-block')}<div class="field"><label for="quick-net-code">${kind==='internet'?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>${button('join-room','Unirme a la sala','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo por turnos':kind==='internet'?'Varios móviles':'Sin conexión'}</h2><p class="lead">${kind==='internet'?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p><div class="panel"><div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${esc(CT.Accounts?.profile?.alias || '')}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>${button('create-room','Crear sala','btn btn-primary btn-block')}<div class="field"><label for="quick-net-code">${kind==='internet'?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>${button('join-room','Unirme a la sala','btn btn-secondary btn-block')}<p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></div></section>`);
   }
   function roomChanged(next,id,code) {
     room=CT.QuickRoom.validate(next);myId=id;busy=false;page='network-lobby';
@@ -108,7 +134,7 @@
   }
   function lobby(code) {
     state=null;const host=myId===room.host;
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Sala de Retos rápidos</h2><div class="panel"><p>${code?`Código: <strong>${esc(code)}</strong>`:'Sala en la red Wi-Fi local'}</p><ul>${room.names.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><p>${room.capacity===2 ? "Dos participantes." : "De 2 a 4 participantes."} ${host?'Empieza cuando estéis todos.':'Quien creó la sala elige cuándo empezar.'}</p>
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Sala de Retos rápidos</h2><div class="panel"><p>${code?`Código: <strong>${esc(code)}</strong>`:'Sala en la red Wi-Fi local'}</p><ul>${room.names.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><p>${room.capacity===2 ? "Dos participantes." : `De 2 a ${room.capacity} participantes.`} ${host?'Empieza cuando estéis todos.':'Quien creó la sala elige cuándo empezar.'}</p><p class="hint">El primer turno rotará en cada reto. La sala se puede recuperar después desde Retos rápidos.</p>
     ${host ? button('start-room','Sortear y empezar','btn btn-primary btn-block') : ''}
     ${connection?.kind==='local'&&host ? button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}
     ${code?button('share-room','Compartir enlace de sala','btn btn-secondary btn-block'):''}
@@ -117,13 +143,14 @@
   }
   async function connectRoom(create) {
     const name=app().querySelector('#quick-net-name').value.trim();if(!name)throw Error('Escribe tu nombre.');
+    if (create) roomCapacity = Number(app().querySelector('#quick-net-players')?.value) || roomCapacity;
     let code=app().querySelector('#quick-net-code').value.trim();
     const epoch=networkEpoch, change=(...args)=>{if(epoch===networkEpoch)roomChanged(...args);}, fail=e=>{if(epoch===networkEpoch)errorNotice(e);};
     if(netKind==='internet') {
       if(code.includes('#'))code=new URLSearchParams(new URL(code).hash.slice(1)).get('quick-room') || '';
       const opened=await CT.QuickNetwork.internet({create,code,name,capacity:roomCapacity,onChange:change,onError:fail});
       if(epoch!==networkEpoch){opened.close();return;}connection=opened;
-    } else if(create) connection=CT.QuickNetwork.localHost(name,change,fail);
+    } else if(create) connection=CT.QuickNetwork.localHost(name,change,fail,roomCapacity);
     else {
       connection=CT.QuickNetwork.localGuest(code,name,change,fail);
       const answer=await connection.answer();if(epoch!==networkEpoch)return;
@@ -147,7 +174,7 @@
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(['internet','offline','turn-duel'].includes(action)){networkSetup(action==='offline'?'local':'internet',action==='turn-duel'?2:4);return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
-    if(action==='start-room'){await networkAction({type:'start',rounds:rounds(1)});return true;}
+    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||3;await networkAction({type:'start',rounds:rounds(count),kind:roomCapacity===2?'duel':'network',historyId:historyId()});return true;}
     if(action==='share-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;await CT.LocalShare.shareSignal(url.href);return true;}
     if(action==='share-signal'){await CT.LocalShare.shareSignal(app().querySelector('#quick-signal').value);return true;}
     if(action==='invite-peer'){
@@ -164,13 +191,12 @@
     stopNetwork();page="setup";const solo=format!=="local";
     state = null; record = null; selected = null; slot = null;
     const saved = load();
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo y asegura tus puntos antes de fallar." : "De 2 a 4 jugadores o equipos en un solo móvil."}</p><div class="panel">
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo y asegura tus puntos antes de fallar." : "De 2 a 8 jugadores o equipos en un solo móvil."}</p><div class="panel">
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
       <div id="quick-names">${nameFields(solo ? 1 : 2, solo ? ["Tú"] : [])}</div>
       ${solo ? '' : button('add-player', '＋ Añadir participante', 'btn btn-ghost')}</div>
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
-      <div class="setup-grid"><div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="3">Tres retos variados</option><option value="1">Un solo reto</option></select></div>
-      <div id="quick-choice-wrap" class="field" hidden><label for="quick-choice">Elige el reto</label><select id="quick-choice">${CT.QuickCatalog.challenges.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div></div>
+      <div class="setup-grid"><div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div></div>
       <p class="hint">${solo ? "Puedes plantarte para asegurar los puntos del reto." : "El primer turno rota en cada reto."}</p></div>
       ${button('start', 'Barajar y empezar <span>→</span>', 'btn btn-primary btn-block')}
       ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}
@@ -201,6 +227,7 @@
   }
   function render() {
     page="game";
+    saveHistory();
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
     const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="game-head"><div><div class="turn-label">Reto ${state.index + 1} de ${state.config.rounds.length} · ${esc(c.title)}</div><div class="turn-name">${esc(p.name)}</div></div><div class="deck-count"><strong>${state.remaining.length}</strong><span>cartas</span></div></div>${scores()}<p class="quick-rule">${esc(c.rule)}</p>`;
@@ -212,6 +239,7 @@
         ${final ? `<p>${winners.join(' y ')} · ${best} puntos.</p>` : '<p>Los puntos de este reto ya están asegurados.</p>'}
         <ul>${state.players.map(player => `<li>${esc(player.name)}: ${player.roundScore} puntos en este reto.</li>`).join('')}</ul>
         ${final ? button('formats', 'Elegir otra partida') : button('next', 'Siguiente reto')}
+        ${final && record.config.kind==='duel' ? button('rematch', 'Crear una revancha', 'btn btn-secondary btn-block') : ''}
         ${final && record.config.kind==='duel' ? button('share-duel','Compartir duelo','btn btn-secondary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div>` : ''}
         ${final && Number.isFinite(record.config.rivalScore) ? `<p>Tu rival: ${record.config.rivalScore} puntos. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Tu rival ha asegurado más puntos.'}</p>` : ''}
         <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button></section>
@@ -257,13 +285,12 @@
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);
     const layer = document.createElement('div'); layer.className = 'overlay';
-    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}${button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
+    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}${button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
     app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
     if (!app().querySelector('.quick-shell')) return;
-    if (event.target.id === 'quick-net-length') app().querySelector('#quick-net-choice-wrap').hidden=event.target.value!=='1';
-    if (event.target.id === 'quick-length') app().querySelector('#quick-choice-wrap').hidden = event.target.value !== '1';
+    if (event.target.id === 'quick-net-length') app().querySelector('#quick-net-choice-wrap')?.setAttribute('hidden','');
   });
   document.addEventListener('click', event => {
     const target = event.target.closest('[data-quick]');
@@ -273,14 +300,17 @@
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
-      if (action === 'add-player' && names.length < 4) names.push(`Jugador ${names.length + 1}`);
+      if (action === 'add-player' && names.length < 8) names.push(`Jugador ${names.length + 1}`);
       else if (action === 'remove-player' && names.length > 2) names.splice(Number(target.dataset.index), 1);
       app().querySelector('#quick-names').innerHTML = nameFields(names.length, names);
-      app().querySelector('[data-quick="add-player"]').disabled = names.length >= 4;
+      app().querySelector('[data-quick="add-player"]').disabled = names.length >= 8;
       app().querySelector(`#quick-name-${names.length - 1}`)?.focus(); return;
     }
     if (action === 'menu') {menu(); return;}
     if (action === 'close-menu') {CT.closeDialog(); return;}
+    if (action === 'guide') {guide(); return;}
+    if (action === 'stats') {statsPanel(); return;}
+    if (action === 'rematch') {networkSetup('internet',2); return;}
     if (action === 'ready') { if (pendingConfig) begin(pendingConfig); return; }
     if (action === 'start-free') {
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
@@ -295,8 +325,8 @@
         app().querySelector('#quick-error').textContent = 'Escribe nombres diferentes para cada participante.'; return;
       }
       const count = Number(app().querySelector('#quick-length').value);
-      const list = count === 1 ? [E.challenge(app().querySelector('#quick-choice').value)] : rounds(count).map(round => E.challenge(round.id));
-      const config = {names, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id))})),kind:format};
+      const list = rounds(count).map(round => E.challenge(round.id));
+      const config = {names, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id))})),kind:format,historyId:historyId()};
       record = {version: CT.QuickCatalog.version, config, commands: []}; state = E.create(config);
       save(); selected = null; slot = null; render(); return;
     }

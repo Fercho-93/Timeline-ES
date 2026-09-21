@@ -17,6 +17,9 @@ assert.throws(()=>R.reduce(r,'a',{type:'place',cardId:'poker-3',index:2}));
 r=R.reduce(r,'a',{type:'ack'});assert.equal(r.actor,'b');
 r=R.reduce(r,'b',{type:'bank'});r=R.reduce(r,'a',{type:'bank'});assert.equal(r.phase,'finished');
 assert.equal(R.state(r).players[0].score,1);assert.throws(()=>R.reduce(r,'a',{type:'next'}));
+const longRounds=Array.from({length:5},()=>({id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}));
+const expanded=R.create('host','Host',8);assert.equal(expanded.capacity,8);
+let rotating=E.create({names:['A','B'],rounds:longRounds});assert.equal(rotating.current,0);rotating=E.step(rotating,{type:'bank'});rotating=E.step(rotating,{type:'bank'});rotating=E.step(rotating,{type:'next'});assert.equal(rotating.current,1);
 let solo=E.create({names:['Tú'],rounds});
 while(solo.phase!=='round-end'){
   if(solo.phase==='result')solo=E.step(solo,{type:'ack'});

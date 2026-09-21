@@ -15,7 +15,7 @@ service cloud.firestore {
     match /quickRooms/{code} {
       function valid(d) {
         return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','updatedAt'])
-          && d.version == 1 && d.capacity in [2,4] && d.host is string && d.catalog is int
+          && d.version == 1 && d.capacity is int && d.capacity >= 2 && d.capacity <= 8 && d.host is string && d.catalog is int
           && d.members is list && d.members.size() >= 1 && d.members.size() <= d.capacity
           && d.members.toSet().size() == d.members.size() && d.members[0] == d.host
           && d.names is list && d.names.size() == d.members.size()
@@ -23,6 +23,10 @@ service cloud.firestore {
           && (d.names.size() < 2 || (d.names[1] is string && d.names[1].size() > 0 && d.names[1].size() <= 24))
           && (d.names.size() < 3 || (d.names[2] is string && d.names[2].size() > 0 && d.names[2].size() <= 24))
           && (d.names.size() < 4 || (d.names[3] is string && d.names[3].size() > 0 && d.names[3].size() <= 24))
+          && (d.names.size() < 5 || (d.names[4] is string && d.names[4].size() > 0 && d.names[4].size() <= 24))
+          && (d.names.size() < 6 || (d.names[5] is string && d.names[5].size() > 0 && d.names[5].size() <= 24))
+          && (d.names.size() < 7 || (d.names[6] is string && d.names[6].size() > 0 && d.names[6].size() <= 24))
+          && (d.names.size() < 8 || (d.names[7] is string && d.names[7].size() > 0 && d.names[7].size() <= 24))
           && d.commands is list && d.commands.size() <= 100
           && d.revision is int && d.revision >= 0 && d.revision <= 110
           && d.actor in d.members && d.phase in ['lobby','turn','result','round-end','finished']
@@ -38,8 +42,10 @@ service cloud.firestore {
       function starting(a,b) {
         return request.auth.uid == a.host && a.phase == 'lobby' && a.members.size() >= 2
           && b.diff(a).affectedKeys().hasOnly(['config','phase','revision','updatedAt'])
-          && b.config is map && b.config.keys().hasOnly(['names','rounds'])
-          && b.config.names == a.names && b.config.rounds is list && b.config.rounds.size() in [1,3]
+          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId'])
+          && b.config.names == a.names && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
+          && (!('kind' in b.config.keys()) || b.config.kind in ['duel','network'])
+          && (!('historyId' in b.config.keys()) || b.config.historyId == null || (b.config.historyId is string && b.config.historyId.size() <= 64))
           && b.phase == 'turn';
       }
       function playing(a,b) {
