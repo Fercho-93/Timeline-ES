@@ -10,6 +10,8 @@ Las nuevas partidas usan una final numérica. Cada respuesta se guarda de forma 
 
 Antes de distribuir el cliente v41, publicar `firestore.rules` en el proyecto `timeline-es` (Firebase Console → Firestore Database → Reglas, o `firebase deploy --only firestore:rules --project timeline-es`). La lectura de capacidad `/capabilities/secretFinal` confirma que las reglas están actualizadas; no requiere crear ese documento. Sin ellas, el cliente muestra un aviso antes de iniciar una partida, evitando fallar a mitad de la final. Todos los participantes necesitan el cliente actualizado.
 
+Al desplegar `functions/` (C.4.1), publicar también `firestore.indexes.json` — `firebase deploy --only firestore` (sin `:rules`) sube las dos cosas a la vez. `maintainTurnDuels` combina `where('status','in',…)` con `orderBy` por documento, y eso exige el índice compuesto declarado ahí; sin desplegarlo, la función programada falla en silencio cada hora (el error solo se ve en los registros de Cloud Functions).
+
 El catálogo y los valores correctos siguen estando en el cliente, como el resto del juego. Las reglas validan las respuestas privadas y la clasificación contra el valor de la carta registrado en la sala; no son un servidor autoritativo del catálogo. No se promete resistencia a clientes modificados que falseen dicho valor.
 
 ## Antes de ampliar el acceso

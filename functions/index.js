@@ -75,6 +75,10 @@ exports.maintainTurnDuels = onSchedule({ schedule: 'every 60 minutes', timeZone:
   let cursor;
   const now = Date.now();
   do {
+    // C.4.1: where('in') + orderBy en otro campo (aquí el propio id) exige un índice
+    // compuesto; declarado en firestore.indexes.json, desplegado con
+    // `firebase deploy --only firestore` (no con `--only firestore:rules`, que solo
+    // sube las reglas).
     let query = db.collection('turnDuels').where('status', 'in', ['waiting', 'playing']).orderBy(FieldPath.documentId()).limit(200);
     if (cursor) query = query.startAfter(cursor);
     const page = await query.get();
