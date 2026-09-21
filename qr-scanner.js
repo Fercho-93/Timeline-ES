@@ -37,7 +37,16 @@
   async function start(videoEl, onFrame, onError) {
     if (!isSupported()) throw new Error("CAMERA_UNAVAILABLE");
     await ensureLibrary();
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+    // Sin pedir resolución, el navegador puede elegir una muy baja por su cuenta (varía
+    // según el móvil y el navegador) — de sobra para una videollamada, no para resolver
+    // los cuadraditos finos de un código QR denso como el de una invitación completa. Se
+    // pide la más alta que el propio móvil ofrezca, y enfoque continuo donde exista: sin
+    // esto un lado de la conversación puede leer perfectamente al otro y el otro no leer
+    // nada, según qué resolución eligiera cada navegador por defecto.
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 }, advanced: [{ focusMode: "continuous" }] },
+      audio: false
+    });
     videoEl.srcObject = stream;
     videoEl.setAttribute("playsinline", "true");
     videoEl.muted = true;
