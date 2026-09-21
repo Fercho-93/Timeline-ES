@@ -10,6 +10,14 @@ service cloud.firestore {
     function registered() {
       return request.auth != null;
     }
+    // B.7.2: el código de sala solo lo genera createRoomCode() en online.js — ocho
+    // mayúsculas o cifras (el alfabeto real evita I/O/0/1 por legibilidad, pero eso es
+    // cosa del cliente; aquí basta con acotar longitud y forma). Un cliente modificado
+    // no puede colarse con una cadena de otro tamaño; las tres rutas que reciben un
+    // roomCode de fuera (crear, unirse, la propia sala) lo exigen.
+    function validRoomCode(code) {
+      return code is string && code.matches('^[A-Z0-9]{8}$');
+    }
     // Retos rápidos: historial inmutable de comandos. Cada participante escribe
     // únicamente durante su turno; todos reconstruyen el marcador con el mismo motor.
     match /quickRooms/{code} {
@@ -81,7 +89,7 @@ service cloud.firestore {
       allow read: if registered() && request.auth.uid == player;
       allow create, update: if registered() && request.auth.uid == player && player != rival
         && request.resource.data.keys().hasOnly(['alias','updatedAt'])
-        && request.resource.data.alias is string && request.resource.data.alias.size() <= 24
+        && request.resource.data.alias is string && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24
         && request.resource.data.updatedAt == request.time;
       allow delete: if registered() && request.auth.uid == player;
     }
@@ -114,10 +122,20 @@ service cloud.firestore {
             || (d.invitationRound is int && d.invitationRound >= 0 && d.invitationRound < 1000 && source.seed.size() <= 64
               && duelId == 'invite-' + source.seed + '-' + request.auth.uid + '-' + string(d.invitationRound)));
       }
+      // B.7.2: un alias de duelo por turnos no llega de un perfil validado (validName())
+      // como el resto de la app — viaja suelto en el documento — así que aquí se acota
+      // igual que la sala compartida: cadena, de 1 a 24 caracteres.
+      function validAlias(value) {
+        return value is string && value.size() >= 1 && value.size() <= 24;
+      }
       function validCreate() {
         return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound'])
           && (!('invitedUid' in request.resource.data) || validInvitation())
           && request.resource.data.playersOrder == [request.auth.uid]
+          && request.resource.data.players.keys().hasOnly([request.auth.uid])
+          && request.resource.data.players[request.auth.uid].keys().hasOnly(['alias'])
+          && validAlias(request.resource.data.players[request.auth.uid].alias)
+          && (!('invitedAlias' in request.resource.data) || validAlias(request.resource.data.invitedAlias))
           && request.resource.data.turnUid == null
           && request.resource.data.status == 'waiting'
           && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
@@ -155,6 +173,8 @@ service cloud.firestore {
             && request.resource.data.playersOrder[0] == resource.data.playersOrder[0]
             && request.resource.data.playersOrder[1] == request.auth.uid
             && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid])
+            && request.resource.data.players[request.auth.uid].keys().hasOnly(['alias'])
+            && validAlias(request.resource.data.players[request.auth.uid].alias)
             && request.resource.data.scores.diff(resource.data.scores).affectedKeys().hasOnly([request.auth.uid])
             && request.resource.data.scores[request.auth.uid] == 0
             && request.resource.data.status == 'playing'
@@ -319,7 +339,7 @@ service cloud.firestore {
       allow create, update: if registered() && request.auth.uid == owner
         && request.resource.data.keys().hasOnly(['lastCreatedAt','roomCode'])
         && request.resource.data.lastCreatedAt == request.time
-        && request.resource.data.roomCode is string
+        && validRoomCode(request.resource.data.roomCode)
         && (!exists(/databases/$(database)/documents/roomCreation/$(owner)) || request.time >= resource.data.lastCreatedAt + duration.value(30,'s'))
         && !exists(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode))
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.hostUid == owner
@@ -331,7 +351,7 @@ service cloud.firestore {
       allow create, update: if registered() && request.auth.uid == owner
         && request.resource.data.keys().hasOnly(['lastJoinedAt','roomCode'])
         && request.resource.data.lastJoinedAt == request.time
-        && request.resource.data.roomCode is string
+        && validRoomCode(request.resource.data.roomCode)
         && (!exists(/databases/$(database)/documents/roomJoin/$(owner)) || request.time >= resource.data.lastJoinedAt + duration.value(30,'s'))
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.playerOrder.hasAny([owner]);
       allow list, delete: if false;

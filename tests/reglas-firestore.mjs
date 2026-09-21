@@ -59,6 +59,10 @@ const playing = (over = {}) => ({
 console.log("\nCrear y entrar");
 await env.clearFirestore();
 await check("el anfitrión crea la sala", "allow", createRoomForTest(ROOM,base()));
+// B.7.2: roomCode solo lo genera createRoomCode() (ocho mayúsculas o cifras); un cliente
+// modificado no puede colarse con otra longitud o minúsculas.
+await check("un código de sala corto se rechaza", "deny", createRoomForTest("CORTO", { ...base(), roomCode: "CORTO" }));
+await check("un código de sala en minúsculas se rechaza", "deny", createRoomForTest("abcd2345", { ...base(), roomCode: "abcd2345" }));
 await check("crear sala con hostUid ajeno", "deny", setDoc(doc(ctx(P2), "rooms", "ZZZZ2345"), { ...base(), roomCode: "ZZZZ2345" }));
 await check("crear sala repartiéndose cartas", "deny", setDoc(doc(ctx(P2), "rooms", "YYYY2345"), { ...base(), roomCode: "YYYY2345", hostUid: P2, playerOrder: [P2], players: { [P2]: { name: "Bea", hand: [1, 2, 3], joinedAt: 1 } } }));
 

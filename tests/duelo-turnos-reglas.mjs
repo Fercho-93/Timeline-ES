@@ -21,6 +21,21 @@ try {
     timeline: [], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
   }));
 
+  // B.7.2: el alias viaja suelto en el documento (no pasa por validName()), así que las
+  // reglas tienen que acotarlo igual que el resto de campos que escribe un jugador.
+  await assertFails(setDoc(doc(creator, 'turnDuels', 'duel-alias-largo'), {
+    id: 'duel-alias-largo', mode: 'history', kind: 'orden', seed: 'abc123', total: 15,
+    turnIndex: 0, turnUid: null, playersOrder: ['creator'],
+    players: { creator: { alias: 'N'.repeat(25) } }, status: 'waiting', plays: [],
+    timeline: [], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  }));
+  await assertFails(setDoc(doc(creator, 'turnDuels', 'duel-alias-numero'), {
+    id: 'duel-alias-numero', mode: 'history', kind: 'orden', seed: 'abc123', total: 15,
+    turnIndex: 0, turnUid: null, playersOrder: ['creator'],
+    players: { creator: { alias: 123 } }, status: 'waiting', plays: [],
+    timeline: [], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  }));
+
   await assertSucceeds(getDoc(doc(guest, 'turnDuels', duelId)));
   await assertFails(getDoc(doc(publicDb, 'turnDuels', duelId)));
 
