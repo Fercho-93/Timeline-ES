@@ -41,7 +41,14 @@ function timelineCards(game) {
   const ids = game.timeline?.length ? game.timeline : game.kind === 'orden' ? [deckCards(game)[0]?.id] : [];
   return ids.map(item => byId.get(String(item))).filter(Boolean);
 }
-function correctPlacement(game, card, index) { const line = timelineCards(game); const value = CT.sortValue(game.mode, card); const left = line[index - 1], right = line[index]; return (!left || CT.sortValue(game.mode, left) <= value) && (!right || value <= CT.sortValue(game.mode, right)); }
+// Misma comprobación que el motor común (engine.js: Engine.fits), reutilizada aquí en
+// vez de duplicada: si el día de mañana esto se juega en servidor, es el mismo sitio
+// el que hay que mover.
+function correctPlacement(game, card, index) {
+  const byId = new Map(CT.cards(game.mode).map(c => [String(c.id), c]));
+  const value = id => CT.sortValue(game.mode, byId.get(String(id)));
+  return CT.Engine.fits(timelineCards(game).map(c => c.id), card.id, index, value);
+}
 function statusText(game) { return game.turnUid === uid() ? 'Es tu turno' : `Turno de ${game.players?.[game.turnUid]?.alias || 'tu oponente'}`; }
 function lastMove(game) {
   const play = game.plays?.at(-1);

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 const source = fs.readFileSync('duelo-turnos.js', 'utf8').replace(/^import .*;\r?\n/gm, '');
+const engineSource = fs.readFileSync('engine.js', 'utf8');
 const dom = new JSDOM('<main id="app"></main><div id="toast"></div>', { url: 'https://continuum.test/', runScripts: 'outside-only' });
 const w = dom.window;
 w.scrollTo = () => {};
@@ -32,6 +33,7 @@ w.__deps = {
     return result;
   }
 };
+w.eval(engineSource);
 w.eval(`const {auth,db,doc,Timestamp,serverTimestamp,runTransaction}=window.__deps;\n${source}\nwindow.testDuel={
   show: game=>{current=game;preparingTurn=null;prepareTurn();render();}, ready:()=>{prepareTurn(true);render();}, refresh:()=>render(),
   place, queueMove, retryPending, outbox, pendingMove, cancel,
