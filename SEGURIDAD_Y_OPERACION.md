@@ -20,6 +20,17 @@ El catálogo y los valores correctos siguen estando en el cliente, como el resto
 
 App Check no sustituye las reglas, no oculta cartas y no evita por sí solo todo abuso. La autenticación anónima puede regenerarse; cualquier cuota por UID debe acompañarse de observación y atestación. Revisar altas de identidades, creación de salas, lecturas, escrituras, errores y consumo. Configurar avisos y un procedimiento de cierre de altas; un presupuesto no es un corte automático.
 
+## Secretos de servidor: dónde viven y cuándo rotarlos (B.6.3 / B.7.5)
+
+Hoy no hay ningún secreto de servidor guardado en un fichero versionado: `functions/` usa las credenciales automáticas del propio entorno de Cloud Functions (no hace falta ninguna clave, `initializeApp()` sin argumentos ya se autentica como el proyecto); `server/` (el experimental de `server/README.md`, no desplegado) lee todo lo sensible de variables de entorno (`CONTINUUM_SERVER_CATALOGS`, `CONTINUUM_ALLOWED_ORIGINS`) en vez de tenerlo escrito en el código; y los ficheros con claves de las apps nativas (`google-services.json`, `GoogleService-Info.plist`) están en `.gitignore`, así que no llegan a GitHub. La única clave presente en el código del cliente es la `apiKey` pública de Firebase (ver B.7.4/B.6.1): esa es pública por diseño, no es un secreto.
+
+Política de rotación, para cuando exista un secreto real que rotar (por ejemplo, la clave de RevenueCat de B.6.2 el día que se implemente, o un token del servidor experimental si se despliega):
+
+- **Rotación por sospecha, inmediata**: si un secreto pudo haberse expuesto (aparece en un commit por error, en un log, en una captura compartida), se rota ese mismo día y se revoca el anterior, sin esperar a la siguiente ventana programada.
+- **Rotación programada, cada 6 meses**: para secretos de larga vida que no dependen de una plataforma externa (tokens propios del servidor experimental, por ejemplo).
+- **La plataforma que emite el secreto manda si dice otra cosa**: si Google Cloud, Apple o RevenueCat fuerzan su propio ciclo de rotación o expiración, se sigue el suyo en vez de este calendario.
+- Ningún secreto nuevo se añade directamente al código: variable de entorno (como ya hace `server/`) o gestor de secretos del proveedor (Google Secret Manager), nunca un valor literal en un fichero que se sube a git.
+
 ## Cuotas por UID (B.3)
 
 Todas las cuotas activas viven en `firestore.rules`, agrupadas junto a `roomCreation` bajo el comentario «Cuotas por UID (B.3)»: cada una es una colección `{acción}/{uid}` con un campo `last…At` que debe valer `request.time` y no puede renovarse antes de que pasen 30 segundos desde el valor anterior. La acción que dispara la cuota exige, en la misma escritura (batch o transacción), que ese documento se actualice — así un cliente no puede escribir solo la mitad. Añadir una cuota nueva ante un abuso distinto es copiar uno de esos `match` y esa misma exigencia cruzada en la acción correspondiente; no hay que buscar la comprobación repetida en otros ficheros porque no la hay.
