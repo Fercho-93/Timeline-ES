@@ -1718,6 +1718,17 @@
 
   const CALENDARIO_DIAS = 28;
 
+  // Un icono discreto para encabezar cada panel de «Jugar en solitario». Mismo trazo que
+  // el resto de iconos de la aplicación, así que no introduce un estilo nuevo.
+  function panelIcon(paths) {
+    return `<span class="solo-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths}</svg></span>`;
+  }
+  const SOLO_PANEL_ICONS = {
+    daily: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',
+    free: '<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>',
+    duel: '<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>'
+  };
+
   // Las últimas cuatro semanas del reto diario, un cuadrito por día. La racha ya se ve
   // como número; esto enseña su forma: dónde hay huecos y qué tan bien fue cada intento.
   function calendarHtml(records) {
@@ -1753,8 +1764,8 @@
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
         <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">${SOLO_LIVES} vidas · Cada fallo cuesta una. En duelo, juega las ${CT.Duelo.CARTAS} cartas sin límite de vidas.</p></div>
-        <div class="panel solo-panel">
-          <div class="solo-panel-head"><h3>Reto diario</h3><time datetime="${today()}">${today().split("-").reverse().join("/")}</time></div>
+        <div class="panel solo-panel solo-panel-featured">
+          <div class="solo-panel-head">${panelIcon(SOLO_PANEL_ICONS.daily)}<h3>Reto diario</h3><time datetime="${today()}">${today().split("-").reverse().join("/")}</time></div>
           ${doneToday
             ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
             : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
@@ -1762,7 +1773,7 @@
           ${calendarHtml(records)}
         </div>
         <div class="panel solo-panel">
-          <div class="solo-panel-head"><h3>Partida libre</h3></div>
+          <div class="solo-panel-head">${panelIcon(SOLO_PANEL_ICONS.free)}<h3>Partida libre</h3></div>
           <p>El mazo entero, hasta perder las tres vidas o agotarlo.</p>
           ${CT.Ghost.difficultySelect("solo-difficulty", selectedDifficulty)}
           <p class="hint" data-level-record>Mejor marca en ${CT.Ghost.level(selectedDifficulty).name}: ${records.bestByDifficulty?.[selectedDifficulty] || (selectedDifficulty === "easy" ? records.best || 0 : 0)}</p>
@@ -1869,7 +1880,7 @@
     const ritmo = duelPace();
     const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === `${ritmo}-${prueba}` ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
-      <div class="solo-panel-head"><h3>Duelo por enlace</h3></div>
+      <div class="solo-panel-head">${panelIcon(SOLO_PANEL_ICONS.duel)}<h3>Duelo por enlace</h3></div>
       <p>Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas.</p>
       <div class="field duel-kind-field">
         <span class="field-label" id="duel-pace-label">Ritmo del duelo</span>
@@ -2589,27 +2600,28 @@
   // segundos de cuenta atrás para levantar la vista y prepararse.
   let duelPreparado = null;
 
-  function duelReady(modalidad, duel = null) {
-    duelPreparado = { modalidad, duel };
+  function duelReady(modalidad, duel = null, pace = "seguidos") {
+    duelPreparado = { modalidad, duel, pace };
     screen = "duelo-listo";
     const cifrasEsta = modalidad === "cifras";
+    const enTurnos = pace === "turnos";
     const regla = reglaCifra();
     const rival = duel?.rival || null;
     const plazo = Math.round((Number(duel?.ms) || CT.Duelo.MS) / 1000);
     const reglas = cifrasEsta
       ? [`${Cifras.CARTAS} cartas de ${escapeHtml(currentMode().name)}, una detrás de otra.`,
          `En cada una escribes el número. ${escapeHtml(regla.pregunta || "")}`,
-         `Puntúa lo cerca que te quedes <b>y</b> lo rápido que respondas.`]
+         enTurnos ? `Cada uno responde desde su propio móvil: recibirás un aviso cuando el rival juegue.` : `Puntúa lo cerca que te quedes <b>y</b> lo rápido que respondas.`]
       : [`${CT.Duelo.CARTAS} cartas de ${escapeHtml(currentMode().name)}, una detrás de otra.`,
          `Colocas cada una en el hueco que le toque de la línea.`,
-         `Gana quien más acierte. No se gastan vidas: se juegan todas.`];
+         enTurnos ? `Cada uno juega desde su propio móvil: recibirás un aviso cuando el rival juegue.` : `Gana quien más acierte. No se gastan vidas: se juegan todas.`];
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="pass-screen"><div class="panel duelo-listo">
         <div class="eyebrow">Duelo por enlace</div>
         <h1 data-focus tabindex="-1" class="duelo-listo-titulo">${cifrasEsta ? "Escribir la cifra" : "Ordenar las cartas"}</h1>
         ${demoMarkup(cifrasEsta)}
         <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
-        <p class="solo-intro-rule">${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.</p>
+        <p class="solo-intro-rule">${enTurnos ? "15 segundos de seguridad al entrar en cada turno · Si sales de la pantalla, el turno queda protegido." : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.`}</p>
         ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${cifrasEsta ? `${rival.puntos} puntos` : `${rival.hits} de ${duel.total}`}</b><small>la marca de ${escapeHtml(rival.nombre || "quien te reta")}</small></span></div>` : ""}
         <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">JUGAR <span>→</span></button>
       </div></section>
@@ -2670,8 +2682,12 @@
 
   function duelPlay() {
     if (!duelPreparado) return soloHome();
-    const { modalidad, duel } = duelPreparado;
+    const { modalidad, duel, pace } = duelPreparado;
     duelPreparado = null;
+    if (pace === "turnos") {
+      turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: modalidad, back: playMenu }));
+      return;
+    }
     cuentaAtras(() => (modalidad === "cifras" ? startCifras(duel) : startSolo("duel", duel)));
   }
 
@@ -3225,7 +3241,7 @@
     // El duelo de cifras se estrena igual, y «Devolver el reto» pasa por aquí desde el
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
-    else if (action === "start-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: duelKind(), back: playMenu })); }
+    else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
     else if (action === "open-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back: perfilView })); }
     else if (action === 'next-turn-duel') { turnDuelReady.then(() => CT.TurnDuel.next(perfilView)).catch(() => showToast('No se pudieron consultar tus duelos.')); }
     else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); perfilView(); }
