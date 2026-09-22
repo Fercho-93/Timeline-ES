@@ -324,6 +324,8 @@
     const hadFinalForm = !!container.querySelector('.final-form');
     actualizaAnclas(container);
     paint.screen = screen;
+    // Entrar o salir de una partida decide si la música de menú puede sonar.
+    if (changed) window.CONTINUUM.Ambience?.sync();
 
     window.CONTINUUM.UI?.captureBoard?.(container);
     // La enciclopedia conserva debajo una copia ya cargada de la pantalla de origen.

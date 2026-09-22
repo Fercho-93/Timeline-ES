@@ -196,6 +196,7 @@
     settings.ambience = enabled === true;
     save();
     CT.UI?.updateEffects();
+    document.dispatchEvent(new CustomEvent('continuum:settings-changed'));
     return settings.ambience;
   };
   function previewLook() {

@@ -9,7 +9,9 @@
   let pageActive = true, nativeActive = true, startRequested = false, pauseTimer;
   let transport = Promise.resolve(), targetVolume = 0;
   const voices = new Set();
-  const enabled = () => CT.effectPrefs?.().ambience === true && pageActive && nativeActive && !document.hidden;
+  // La música es cosa de menús: en cuanto empieza una partida, silencio.
+  const inGame = () => CT.UI?.isPlaying(document.getElementById('app')?.dataset.screen) === true;
+  const enabled = () => CT.effectPrefs?.().ambience === true && pageActive && nativeActive && !document.hidden && !inGame();
   const outputVolume = () => VOLUME * Math.max(0, Math.min(1, Number(CT.effectPrefs?.().ambienceVolume ?? userVolume) || 0));
 
   function refill() {
@@ -196,4 +198,27 @@
   // Los ajustes ya están cargados y el splash sigue visible. No esperar al
   // inicio de sesión ni a la primera pantalla del juego para pedir la música.
   sync(true);
+
+  // Interruptor discreto, siempre presente en una esquina: distinto del del
+  // telón inicial (ese desaparece con el splash) y del de ajustes, pero
+  // gobierna la misma preferencia.
+  function mountToggle() {
+    const toggle = document.getElementById('ambience-toggle');
+    if (!toggle) return;
+    const reflect = () => {
+      const on = CT.effectPrefs?.().ambience === true;
+      toggle.dataset.enabled = on ? 'true' : 'false';
+      toggle.setAttribute('aria-pressed', String(on));
+      toggle.setAttribute('aria-label', on ? 'Silenciar música ambiente' : 'Activar música ambiente');
+      toggle.title = on ? 'Silenciar música' : 'Activar música';
+    };
+    toggle.addEventListener('click', () => {
+      CT.setAmbience?.(CT.effectPrefs?.().ambience !== true);
+      reflect();
+    });
+    document.addEventListener('continuum:settings-changed', reflect);
+    reflect();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountToggle);
+  else mountToggle();
 })();

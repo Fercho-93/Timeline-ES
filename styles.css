@@ -2309,3 +2309,35 @@ body::before {
 .turn-duel-profile-row{min-width:0}
 .turn-duel-profile-row>button{display:grid;gap:5px;text-align:left;min-width:0;overflow-wrap:anywhere}
 @media(max-width:420px){.turn-duel-profile-row{grid-template-columns:minmax(0,1fr)}.turn-duel-rival{flex-wrap:wrap}.turn-duel-row-actions{max-width:none;width:100%}}
+
+/* Interruptor de música: discreto en cualquier pantalla, menú o partida.
+   Vive fuera de #app para no desaparecer en los repintados. */
+.ambience-toggle {
+  position: fixed;
+  z-index: 40;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--muted);
+  background: var(--surface);
+  opacity: .38;
+  cursor: pointer;
+  transition: opacity 160ms ease, color 160ms ease, transform 120ms ease;
+}
+.ambience-toggle svg { width: 16px; height: 16px; overflow: visible; }
+.ambience-toggle path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ambience-toggle .sound-speaker { fill: currentColor; stroke: none; }
+.ambience-toggle .sound-muted { display: none; }
+.ambience-toggle[data-enabled="false"] .sound-waves { display: none; }
+.ambience-toggle[data-enabled="false"] .sound-muted { display: block; }
+.ambience-toggle:focus-visible, .ambience-toggle:active { opacity: 1; }
+.ambience-toggle:active { transform: scale(.92); }
+@media (hover: hover) { .ambience-toggle:hover { opacity: 1; } }
+.ambience-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+html.splash-active .ambience-toggle { display: none; }

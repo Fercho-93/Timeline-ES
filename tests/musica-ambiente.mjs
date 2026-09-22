@@ -244,6 +244,23 @@ for (const autoplay of ['pending', 'reject']) {
   } finally {h.w.close();}
 }
 
+{
+  const h = boot({initiallyEnabled:true});
+  try {
+    await settle();
+    const ctx = h.contexts[0];
+    assert.equal(ctx.state, 'running', 'suena en el menú');
+    h.w.document.getElementById('app').dataset.screen = 'game';
+    h.w.CONTINUUM.UI = {isPlaying: screen => screen === 'game'};
+    h.w.CONTINUUM.Ambience.sync();
+    await ctx.advance(.3); h.timers(); await settle();
+    assert.equal(ctx.state, 'suspended', 'una partida en curso silencia la música');
+    h.w.document.getElementById('app').dataset.screen = 'home';
+    h.w.CONTINUUM.Ambience.sync();
+    await settle();
+    assert.equal(ctx.state, 'running', 'volver al menú la recupera');
+  } finally {h.w.close();}
+}
 const sw = read('service-worker-258.js');
 for (let i=1;i<=6;i++) {
   assert.ok(fs.statSync(new URL(`../assets/audio/v${i}.mp3`, import.meta.url)).size > 100000);
