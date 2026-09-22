@@ -690,6 +690,9 @@
       <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span>→</span></button></div>`);
     const campo = app.querySelector("#starter-guess-input");
     campo?.focus({ preventScroll: true });
+    // En iOS el teclado tarda un pelín en abrirse y el viewport en recalcularse: sin este
+    // empujón el campo puede quedar tapado hasta que el usuario desplace a mano.
+    campo?.addEventListener("focus", () => campo.scrollIntoView({ block: "center", behavior: "smooth" }));
     campo?.addEventListener("keydown", evento => { if (evento.key === "Enter") { evento.preventDefault(); starterGuessSubmit(); } });
   }
 
