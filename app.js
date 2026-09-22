@@ -690,6 +690,9 @@
       <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span>→</span></button></div>`);
     const campo = app.querySelector("#starter-guess-input");
     campo?.focus({ preventScroll: true });
+    // En iOS el teclado tarda un pelín en abrirse y el viewport en recalcularse: sin este
+    // empujón el campo puede quedar tapado hasta que el usuario desplace a mano.
+    campo?.addEventListener("focus", () => campo.scrollIntoView({ block: "center", behavior: "smooth" }));
     campo?.addEventListener("keydown", evento => { if (evento.key === "Enter") { evento.preventDefault(); starterGuessSubmit(); } });
   }
 
@@ -1577,15 +1580,16 @@
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
         <header class="atlas-page-heading"><div class="eyebrow">Tu historia en Continuum</div><h1 data-focus tabindex="-1">Perfil</h1><p>Cada partida deja una huella. Este es tu recorrido.</p></header>
+        <div class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</div>
         ${estrenado
           ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
           : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
         ${perfilResumen(resumen)}
         ${perfilColeccion()}
-        <div class="perfil-layout"><div class="perfil-main"><section class="panel turn-duel-profile" id="turn-duels-profile"><h2>Mis duelos</h2><p role="status">Cargando tus partidas…</p></section>
+        <div class="perfil-main"><section class="panel turn-duel-profile" id="turn-duels-profile"><h2>Mis duelos</h2><p role="status">Cargando tus partidas…</p></section>
         ${perfilPorJuego(filas)}
         ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
-        ${perfilLogros(CT.Progreso.achievements())}</div><aside class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</aside></div>
+        ${perfilLogros(CT.Progreso.achievements())}</div>
       </section>
       ${homeNav()}
     </div>`);

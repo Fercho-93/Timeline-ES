@@ -586,6 +586,10 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .pulse-duel-modal .pulse-outcome { margin-top: 14px; line-height: 1.5; }
 
 .overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(35,27,19,.73); backdrop-filter: blur(8px); }
+/* El diálogo del sorteo lleva un teclado numérico debajo: anclarlo arriba (en vez de
+   centrarlo) evita que se recoloque de golpe al abrirse el teclado y deje la mitad de
+   la carta cortada, y que haga falta desplazar para encontrar el campo. */
+.overlay[data-starter-dialog] { align-items: flex-start; padding-top: max(18px, env(safe-area-inset-top)); }
 .modal { width: min(100%, 460px); max-height: calc(100dvh - 36px); overflow-y: auto; overscroll-behavior-y: contain; border-radius: 12px; padding: 26px; background: var(--surface); box-shadow: 0 20px 50px rgba(0,0,0,.22); text-align: center; border: 1px solid var(--line); }
 .dialog-enter { animation: veil-in 180ms ease-out both; }
 .dialog-enter .modal { animation: dialog-in 260ms var(--ease-out) both; }
@@ -1135,7 +1139,9 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .cifra-card strong { display: block; margin: 8px 0 6px; font-size: clamp(1.25rem, 5vw, 1.7rem); line-height: 1.25; }
 .cifra-card span { display: block; color: var(--muted); font-size: .9rem; }
 .starter-card-art { margin: -20px -18px 14px; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--surface); }
-.starter-card-art .animal-card-art { display: block; width: 100%; height: min(48vw, 260px); object-fit: contain; }
+/* Más baja que una lámina normal: en el paso de adivinar hay que dejar sitio de sobra
+   para el campo y el teclado numérico debajo, así que la ilustración cede altura. */
+.starter-card-art .animal-card-art { display: block; width: 100%; height: min(30vw, 160px); object-fit: contain; }
 .cifra-field input { font-size: 1.3rem; font-variant-numeric: tabular-nums; text-align: center; }
 .cifra-unidad { font-weight: 400; text-transform: none; }
 .cifra-unidades { display: block; margin-top: 4px; font-size: .72rem; color: var(--muted); }

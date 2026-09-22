@@ -1993,8 +1993,8 @@ html #app .home-nav.atlas-nav::before {
 #app .perfil-collection span { display: block; margin-top: 3px; font: .8rem/1.4 var(--ui-font); }
 #app .perfil-collection small { color: var(--edition-muted); font: .78rem/1.5 var(--ui-font); text-align: right; }
 #app .profile-next-goal { margin: 12px 0; padding: 12px 15px; border-left: 3px solid var(--edition-brass); color: var(--edition-muted); font: .85rem/1.6 var(--ui-font); background: color-mix(in srgb, var(--edition-brass) 7%, transparent); }
-#app .perfil-layout { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(0,1fr); gap: 28px; align-items: start; margin-top: 28px; }
-#app :is(.perfil-main, .perfil-account) { min-width: 0; }
+#app .perfil-account { margin: 24px 0 4px; }
+#app .perfil-main { margin-top: 28px; min-width: 0; }
 #app .perfil-main > .section-label { margin: 30px 0 14px; font: 500 1.35rem/1.4 var(--font-display); text-transform: none; letter-spacing: 0; flex-wrap: wrap; }
 #app .perfil-main > .section-label small { font: .8rem/1.5 var(--ui-font); color: var(--edition-muted); }
 #app .turn-duel-profile { margin-top: 0; border-radius: 14px; padding: 22px; box-shadow: none; }
@@ -2036,10 +2036,9 @@ html #app .home-nav.atlas-nav::before {
 #app :is(.settings-section, .enc-toolbar) :is(select, input[type="search"], textarea) { border-radius: 8px; min-height: 46px; font: .9rem/1.5 var(--ui-font); }
 #app :is(.perfil-achievement-group, .settings-support) > summary:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 3px; border-radius: 10px; }
 @media (max-width: 740px) {
-  #app .settings-layout, #app .perfil-layout { grid-template-columns: 1fr; gap: 20px; }
+  #app .settings-layout { grid-template-columns: 1fr; gap: 20px; }
   #app .atlas-page-heading { padding-block: 16px 22px; margin-bottom: 22px; }
   #app .settings-layout .settings-section { padding: 20px; }
-  #app .perfil-account { margin-top: 8px; }
 }
 @media (max-width: 420px) {
   #app > .overlay > :is(.enc-modal,.settings-modal,.rules) { padding-inline: 16px; }
