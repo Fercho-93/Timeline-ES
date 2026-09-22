@@ -2324,7 +2324,7 @@ body::before {
   position: fixed;
   z-index: 40;
   right: max(10px, env(safe-area-inset-right));
-  bottom: max(10px, env(safe-area-inset-bottom));
+  top: max(10px, env(safe-area-inset-top));
   display: grid;
   place-items: center;
   width: 34px;
@@ -2349,3 +2349,5 @@ body::before {
 @media (hover: hover) { .ambience-toggle:hover { opacity: 1; } }
 .ambience-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 html.splash-active .ambience-toggle { display: none; }
+/* En partida esa esquina ya tiene el botón de opciones (⋮): el interruptor se corre a su lado. */
+#app:has(.atlas-game-topbar) ~ .ambience-toggle { right: calc(max(10px, env(safe-area-inset-right)) + 52px); }
