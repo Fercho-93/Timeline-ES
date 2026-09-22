@@ -933,16 +933,9 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .solo-intro { margin-bottom: 24px; }
 .solo-title { margin: 7px 0 10px; }
 .solo-intro .lead { max-width: 43ch; margin-bottom: 0; }
-.solo-panel-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.solo-panel-head h3 { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 1.08rem; letter-spacing: -.015em; }
+.solo-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.solo-panel-head h3 { margin: 0; font-size: 1.08rem; letter-spacing: -.015em; }
 .solo-panel-head time { flex: 0 0 auto; color: var(--muted); font-size: .78rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.solo-panel-icon { flex: 0 0 auto; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--paper); border: 1px solid var(--line); color: var(--accent); }
-.solo-panel-icon svg { width: 18px; height: 18px; }
-/* El reto diario es la puerta de entrada principal: un lavado sutil de acento y un
-   icono relleno lo distinguen sin que deje de sentirse parte de la misma familia de
-   paneles que el resto de la pantalla. */
-.solo-panel-featured { border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); background: linear-gradient(175deg, color-mix(in srgb, var(--accent) 7%, var(--surface)), var(--surface) 60%); }
-.solo-panel-featured .solo-panel-icon { background: var(--accent); border-color: var(--accent); color: var(--ink-solid-contrast); }
 .solo-panel p { color: var(--muted); font-size: .82rem; margin: 0 0 14px; }
 .solo-done strong { color: var(--ink); }
 .solo-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }

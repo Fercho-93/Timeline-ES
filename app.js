@@ -1718,17 +1718,6 @@
 
   const CALENDARIO_DIAS = 28;
 
-  // Un icono discreto para encabezar cada panel de «Jugar en solitario». Mismo trazo que
-  // el resto de iconos de la aplicación, así que no introduce un estilo nuevo.
-  function panelIcon(paths) {
-    return `<span class="solo-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths}</svg></span>`;
-  }
-  const SOLO_PANEL_ICONS = {
-    daily: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',
-    free: '<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>',
-    duel: '<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>'
-  };
-
   // Las últimas cuatro semanas del reto diario, un cuadrito por día. La racha ya se ve
   // como número; esto enseña su forma: dónde hay huecos y qué tan bien fue cada intento.
   function calendarHtml(records) {
@@ -1764,8 +1753,8 @@
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
         <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">${SOLO_LIVES} vidas · Cada fallo cuesta una. En duelo, juega las ${CT.Duelo.CARTAS} cartas sin límite de vidas.</p></div>
-        <div class="panel solo-panel solo-panel-featured">
-          <div class="solo-panel-head">${panelIcon(SOLO_PANEL_ICONS.daily)}<h3>Reto diario</h3><time datetime="${today()}">${today().split("-").reverse().join("/")}</time></div>
+        <div class="panel solo-panel">
+          <div class="solo-panel-head"><h3>Reto diario</h3><time datetime="${today()}">${today().split("-").reverse().join("/")}</time></div>
           ${doneToday
             ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
             : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
@@ -1773,7 +1762,7 @@
           ${calendarHtml(records)}
         </div>
         <div class="panel solo-panel">
-          <div class="solo-panel-head">${panelIcon(SOLO_PANEL_ICONS.free)}<h3>Partida libre</h3></div>
+          <div class="solo-panel-head"><h3>Partida libre</h3></div>
           <p>El mazo entero, hasta perder las tres vidas o agotarlo.</p>
           ${CT.Ghost.difficultySelect("solo-difficulty", selectedDifficulty)}
           <p class="hint" data-level-record>Mejor marca en ${CT.Ghost.level(selectedDifficulty).name}: ${records.bestByDifficulty?.[selectedDifficulty] || (selectedDifficulty === "easy" ? records.best || 0 : 0)}</p>
@@ -1880,7 +1869,7 @@
     const ritmo = duelPace();
     const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === `${ritmo}-${prueba}` ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
-      <div class="solo-panel-head">${panelIcon(SOLO_PANEL_ICONS.duel)}<h3>Duelo por enlace</h3></div>
+      <div class="solo-panel-head"><h3>Duelo por enlace</h3></div>
       <p>Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas.</p>
       <div class="field duel-kind-field">
         <span class="field-label" id="duel-pace-label">Ritmo del duelo</span>

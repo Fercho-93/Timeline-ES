@@ -712,6 +712,11 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .solo-option-copy time { display: block; margin-top: 3px; }
 #app .solo-fold[open] { border-color: var(--edition-brass); box-shadow: 0 5px 18px #352a1710; }
 #app .solo-fold[open] summary { border-bottom: 1px solid var(--edition-line); }
+/* El reto diario es la puerta de entrada principal de «Jugar en solitario»: un lavado
+   sutil del mismo latón del tema y una marca rellena lo distinguen de Partida libre y
+   Duelo por enlace sin salirse de la familia de paneles plegables. */
+#app .solo-fold[data-solo-kind="daily"] { border-color: color-mix(in srgb, var(--edition-brass) 35%, var(--edition-line)); background: linear-gradient(175deg, color-mix(in srgb, var(--edition-brass) 8%, var(--edition-surface)), var(--edition-surface) 60%); }
+#app .solo-fold[data-solo-kind="daily"] .solo-option-mark { color: var(--edition-paper); background: var(--edition-brass); border-color: var(--edition-brass); }
 #app .solo-fold-body { padding-top: 12px; }
 #app .solo-fold-body .btn + .btn { margin-top: 8px; }
 #app .solo-fold-body > p { font: .84rem/1.45 var(--ui-font); margin: 8px 0 14px; }
