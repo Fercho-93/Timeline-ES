@@ -1718,23 +1718,50 @@
 
   const CALENDARIO_DIAS = 28;
 
+  // Iconos de trazo para los paneles de «Jugar en solitario», con el mismo grosor que las
+  // marcas que pone immersion.js en la cabecera de cada desplegable.
+  const GLYPHS = {
+    racha: '<path d="M12 3c1 3.5 5 5.6 5 10a5 5 0 0 1-10 0c0-2.2 1.2-3.7 2.4-4.8.3 1.6 1.1 2.6 2.1 2.8C11 8.6 11.3 5.6 12 3Z"/>',
+    marca: '<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z"/>',
+    seguidos: '<path d="M7 3h10M7 21h10M8 3v2a4 4 0 0 0 1.6 3.2L12 10l2.4-1.8A4 4 0 0 0 16 5V3M8 21v-2a4 4 0 0 1 1.6-3.2L12 14l2.4 1.8A4 4 0 0 1 16 19v2"/>',
+    turnos: '<path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/>',
+    orden: '<rect x="2.5" y="7" width="5.5" height="10" rx="1.2"/><rect x="9.25" y="7" width="5.5" height="10" rx="1.2"/><rect x="16" y="7" width="5.5" height="10" rx="1.2"/>',
+    cifras: '<path d="M9.5 4 7.5 20M16.5 4l-2 16M4.5 9h15M3.5 15h15"/>',
+    reloj: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'
+  };
+  function glyph(paths) {
+    return `<svg class="solo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
+  }
+
   // Las últimas cuatro semanas del reto diario, un cuadrito por día. La racha ya se ve
   // como número; esto enseña su forma: dónde hay huecos y qué tan bien fue cada intento.
+  // Las columnas no empiezan en lunes: la última casilla es siempre hoy. Por eso la
+  // cabecera de días se calcula desde la primera fecha y no es fija.
   function calendarHtml(records) {
     const days = records.days || {};
     const celdas = [];
+    const iniciales = ["D", "L", "M", "X", "J", "V", "S"];
+    let cabecera = "";
+    let jugados = 0;
     for (let i = CALENDARIO_DIAS - 1; i >= 0; i--) {
       const fecha = new Date();
       fecha.setDate(fecha.getDate() - i);
+      if (celdas.length < 7) cabecera += `<span>${iniciales[fecha.getDay()]}</span>`;
       const clave = fecha.toLocaleDateString("sv-SE");
       const entrada = days[clave];
+      if (entrada) jugados += 1;
       const ratio = entrada ? entrada.hits / entrada.total : null;
       const nivel = ratio === null ? "vacio" : ratio >= 0.8 ? "alto" : ratio >= 0.5 ? "medio" : "bajo";
       const fechaLegible = fecha.toLocaleDateString("es-ES", { day: "numeric", month: "long" });
       const etiqueta = entrada ? `${fechaLegible}: ${entrada.hits} de ${entrada.total}` : `${fechaLegible}: sin jugar`;
-      celdas.push(`<span class="cal-day cal-${nivel}" title="${escapeHtml(etiqueta)}" aria-label="${escapeHtml(etiqueta)}"></span>`);
+      celdas.push(`<span class="cal-day cal-${nivel}${i === 0 ? " cal-hoy" : ""}" style="--i:${celdas.length}" title="${escapeHtml(etiqueta)}" aria-label="${escapeHtml(etiqueta)}"></span>`);
     }
-    return `<div class="cal-grid" role="img" aria-label="Calendario de los últimos ${CALENDARIO_DIAS} días del reto diario">${celdas.join("")}</div>`;
+    return `<div class="cal-card">
+      <div class="cal-head"><span class="cal-title">Últimas 4 semanas</span><span class="cal-count">${jugados} de ${CALENDARIO_DIAS} días</span></div>
+      <div class="cal-weekdays" aria-hidden="true">${cabecera}</div>
+      <div class="cal-grid" role="img" aria-label="Calendario de los últimos ${CALENDARIO_DIAS} días del reto diario">${celdas.join("")}</div>
+      <div class="cal-legend" aria-hidden="true"><span>Menos</span><i class="cal-swatch cal-vacio"></i><i class="cal-swatch cal-bajo"></i><i class="cal-swatch cal-medio"></i><i class="cal-swatch cal-alto"></i><span>Más aciertos</span></div>
+    </div>`;
   }
 
   let selectedDifficulty = CT.Storage.getItem("continuum-difficulty-v1") || "easy";
@@ -1758,7 +1785,10 @@
           ${doneToday
             ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
             : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
-          <div class="solo-stats"><span><b>${records.streak || 0}</b><small>días seguidos</small></span><span><b>${records.best || 0}</b><small>mejor marca · Fácil</small></span></div>
+          <div class="solo-stats daily-stats">
+            <span>${glyph(GLYPHS.racha)}<b>${records.streak || 0}</b><small>${records.streak === 1 ? "día seguido" : "días seguidos"}</small></span>
+            <span>${glyph(GLYPHS.marca)}<b>${records.best || 0}</b><small>mejor marca · Fácil</small></span>
+          </div>
           ${calendarHtml(records)}
         </div>
         <div class="panel solo-panel">
@@ -1877,6 +1907,7 @@
           ${[["seguidos", "Duelo de seguidos", "Juegas y esperas al rival"], ["turnos", "Duelo por turnos", "Cada uno desde su móvil"]]
             .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === ritmo ? " is-on" : ""}">
               <input type="radio" name="duel-pace" value="${clave}"${clave === ritmo ? " checked" : ""}>
+              <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>
               <span><b>${titulo}</b><small>${pie}</small></span>
             </label>`).join("")}
         </div>
@@ -1887,27 +1918,28 @@
           ${[["orden", "Ordenar las cartas", "Colocarlas en la línea"], ...(regla ? [["cifras", "Escribir la cifra", "Responder con el número"]] : [])]
             .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === prueba ? " is-on" : ""}">
               <input type="radio" name="duel-kind" value="${clave}"${clave === prueba ? " checked" : ""}>
+              <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>
               <span><b>${titulo}</b><small>${pie}</small></span>
             </label>`).join("")}
         </div>
       </div>
-      ${bloque("seguidos-orden", `<p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
-        <p class="solo-intro-rule">${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</p>
+      ${bloque("seguidos-orden", `<div class="duel-brief"><p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
         ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
         <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Crear un duelo"} <span>→</span></button>`)}
-      ${regla ? bloque("seguidos-cifras", `<p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Gana quien más puntos sume: cuenta lo cerca que te quedes y lo rápido que respondas.</p>
-        <p class="solo-intro-rule">${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</p>
+      ${regla ? bloque("seguidos-cifras", `<div class="duel-brief"><p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Gana quien más puntos sume: cuenta lo cerca que te quedes y lo rápido que respondas.</p>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</span></p></div>
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
-      ${bloque("turnos-orden", `<p>Colocad una carta cada vez, desde vuestro propio móvil. Recibirás un aviso cuando el rival juegue.</p>
-        <p class="solo-intro-rule">15 segundos de seguridad al entrar en cada turno · Si sales de la pantalla, el turno queda protegido.</p>
+      ${bloque("turnos-orden", `<div class="duel-brief"><p>Colocad una carta cada vez, desde vuestro propio móvil. Recibirás un aviso cuando el rival juegue.</p>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos de seguridad al entrar en cada turno · Si sales de la pantalla, el turno queda protegido.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
-      ${regla ? bloque("turnos-cifras", `<p>Responded una cifra cada vez, desde vuestro propio móvil. El rival recibe un aviso al terminar tu turno.</p>
-        <p class="solo-intro-rule">15 segundos de seguridad al entrar en cada turno · La respuesta queda cerrada si sales de la pantalla.</p>
+      ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Responded una cifra cada vez, desde vuestro propio móvil. El rival recibe un aviso al terminar tu turno.</p>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos de seguridad al entrar en cada turno · La respuesta queda cerrada si sales de la pantalla.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
-      <div class="field" style="margin-top:12px">
+      <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
-        <input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}">
+        <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${escapeHtml(initials(duelName()))}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
         <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
       </div>
     </div>`;

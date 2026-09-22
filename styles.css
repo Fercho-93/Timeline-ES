@@ -947,12 +947,6 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .cal-day.cal-bajo { background: color-mix(in srgb, var(--accent) 30%, var(--paper)); border-color: transparent; }
 .cal-day.cal-medio { background: color-mix(in srgb, var(--accent) 65%, var(--paper)); border-color: transparent; }
 .cal-day.cal-alto { background: var(--accent); border-color: transparent; }
-/* El «Duelo por enlace» comparte el mismo panel que Reto diario y Partida libre, pero
-   tiene dos grupos de opciones seguidos: sin un respiro entre ellos se leían como un
-   único bloque. La etiqueta de cada grupo toma el mismo tratamiento tipográfico que el
-   «eyebrow» del resto de la aplicación, para no introducir un estilo aparte. */
-.duel-kind-field { margin: 0 0 20px; }
-.duel-kind-field .field-label { display: block; margin-bottom: 8px; color: var(--accent); font-size: .73rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
 /* La pantalla de repaso reutiliza la carta de la línea temporal, pero en vertical y a
    todo el ancho: aquí no hay que desplazarse a los lados, hay que leer. */
 .review-grid { display: flex; flex-direction: column; gap: 12px; margin: 16px 0 22px; }

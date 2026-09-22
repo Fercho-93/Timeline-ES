@@ -712,17 +712,78 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .solo-option-copy time { display: block; margin-top: 3px; }
 #app .solo-fold[open] { border-color: var(--edition-brass); box-shadow: 0 5px 18px #352a1710; }
 #app .solo-fold[open] summary { border-bottom: 1px solid var(--edition-line); }
-/* El reto diario es la puerta de entrada principal de «Jugar en solitario»: un lavado
-   sutil del mismo latón del tema y una marca rellena lo distinguen de Partida libre y
-   Duelo por enlace sin salirse de la familia de paneles plegables. */
-#app .solo-fold[data-solo-kind="daily"] { border-color: color-mix(in srgb, var(--edition-brass) 35%, var(--edition-line)); background: linear-gradient(175deg, color-mix(in srgb, var(--edition-brass) 8%, var(--edition-surface)), var(--edition-surface) 60%); }
-#app .solo-fold[data-solo-kind="daily"] .solo-option-mark { color: var(--edition-paper); background: var(--edition-brass); border-color: var(--edition-brass); }
 #app .solo-fold-body { padding-top: 12px; }
 #app .solo-fold-body .btn + .btn { margin-top: 8px; }
 #app .solo-fold-body > p { font: .84rem/1.45 var(--ui-font); margin: 8px 0 14px; }
 #app .solo-fold-body .hint { font-size: .76rem; margin: 10px 0; }
 #app .solo-fold-body .field { margin-bottom: 12px; }
 #app .solo-fold-body .field-hint { text-align: left; }
+/* ——— Jugar en solitario: reto diario y duelo por enlace ———
+   Todo se apoya en el latón del tema y en superficies con filete fino, como las fichas
+   de la enciclopedia: nada de placas macizas, que eran lo que hacía pesada la pantalla. */
+#app .solo-fold[data-solo-kind="daily"] { border-color: color-mix(in srgb, var(--edition-brass) 40%, var(--edition-line)); background: radial-gradient(120% 60% at 0% 0%, color-mix(in srgb, var(--edition-brass) 12%, transparent), transparent 62%), var(--edition-surface); }
+#app .solo-fold[data-solo-kind="daily"] .solo-option-mark { color: var(--edition-surface); border-color: transparent; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--edition-brass) 62%, #fff), var(--edition-brass) 72%); box-shadow: 0 0 0 4px color-mix(in srgb, var(--edition-brass) 13%, transparent), 0 6px 14px -4px color-mix(in srgb, var(--edition-brass) 55%, transparent); }
+#app .solo-fold-body .solo-done { padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--edition-brass) 35%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--edition-brass) 8%, transparent); color: var(--edition-ink); }
+
+#app .solo-fold-body .daily-stats { gap: 0; margin: 18px 0 0; border: 1px solid var(--edition-line); border-radius: 14px; background: color-mix(in srgb, var(--edition-surface) 72%, transparent); overflow: hidden; }
+#app .solo-fold-body .daily-stats > span { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 10px; row-gap: 6px; padding: 14px 15px 13px; border: 0; border-radius: 0; background: none; text-align: left; }
+#app .solo-fold-body .daily-stats > span + span { border-left: 1px solid var(--edition-line); }
+#app .daily-stats .solo-glyph { width: 30px; height: 30px; padding: 6px; border-radius: 50%; color: var(--edition-brass); background: color-mix(in srgb, var(--edition-brass) 12%, transparent); }
+#app .daily-stats b { color: var(--edition-ink); font: 600 1.75rem/1 var(--font-display); font-variant-numeric: lining-nums tabular-nums; }
+#app .daily-stats small { grid-column: 1 / -1; margin: 0; color: var(--edition-muted); font: 600 .58rem/1.3 var(--ui-font); letter-spacing: .07em; text-transform: uppercase; }
+
+#app .cal-card { margin-top: 12px; padding: 14px 14px 12px; border: 1px solid var(--edition-line); border-radius: 14px; background: color-mix(in srgb, var(--edition-surface) 72%, transparent); }
+#app .cal-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+#app .cal-title { color: var(--edition-brass); font: 700 .6rem/1 var(--ui-font); letter-spacing: .15em; text-transform: uppercase; }
+#app .cal-count { color: var(--edition-muted); font: .7rem/1 var(--ui-font); font-variant-numeric: tabular-nums; }
+#app .cal-weekdays, #app .cal-card .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+#app .cal-weekdays span { color: var(--edition-muted); font: 600 .56rem/1 var(--ui-font); letter-spacing: .06em; text-align: center; opacity: .75; }
+#app .cal-card .cal-grid { margin-top: 7px; }
+#app .cal-card .cal-day, #app .cal-swatch { border: 0; border-radius: 7px; background: color-mix(in srgb, var(--edition-line) 42%, transparent); }
+#app .cal-card :is(.cal-day, .cal-swatch).cal-bajo { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+#app .cal-card :is(.cal-day, .cal-swatch).cal-medio { background: color-mix(in srgb, var(--accent) 55%, transparent); }
+#app .cal-card :is(.cal-day, .cal-swatch).cal-alto { background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 82%, #fff), var(--accent) 70%); box-shadow: inset 0 1px 0 rgb(255 255 255 / .22); }
+#app .cal-card .cal-day.cal-hoy { box-shadow: 0 0 0 2px var(--edition-surface), 0 0 0 3.5px var(--edition-brass); }
+#app .cal-legend { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 12px; color: var(--edition-muted); font: .6rem/1 var(--ui-font); }
+#app .cal-legend span:first-child { margin-right: 4px; }
+#app .cal-legend span:last-child { margin-left: 4px; }
+#app .cal-swatch { display: block; width: 11px; height: 11px; border-radius: 3px; }
+
+#app .solo-fold-body .duel-kind-field { margin: 20px 0 0; gap: 9px; }
+#app .solo-fold-body :is(.duel-kind-field .field-label, .duel-identity-field > label) { margin: 0; color: var(--edition-brass); font: 700 .6rem/1 var(--ui-font); letter-spacing: .15em; text-transform: uppercase; }
+#app .solo-fold-body .segmented { gap: 10px; padding: 0; border: 0; border-radius: 0; background: none; }
+#app .solo-fold-body .segmented-option { display: grid; justify-items: start; align-content: start; gap: 10px; min-height: 0; padding: 13px 12px 12px; border: 1px solid var(--edition-line); border-radius: 14px; color: var(--edition-ink); background: var(--edition-surface); text-align: left; box-shadow: none; transition: border-color var(--motion-base) ease, background var(--motion-base) ease, box-shadow var(--motion-base) ease; }
+#app .solo-fold-body .segmented-option b { color: var(--edition-ink); font: 600 .95rem/1.2 var(--font-display); }
+#app .solo-fold-body .segmented-option small { margin-top: 4px; color: var(--edition-muted); font: .7rem/1.3 var(--ui-font); opacity: 1; }
+#app .solo-fold-body .segmented-option::after { content: ''; position: absolute; top: 12px; right: 12px; width: 15px; height: 15px; border: 1.5px solid var(--edition-line); border-radius: 50%; pointer-events: none; transition: border-color var(--motion-base) ease, background var(--motion-base) ease; }
+#app .duel-option-mark { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--edition-line); border-radius: 50%; color: var(--edition-brass); background: color-mix(in srgb, var(--edition-brass) 6%, transparent); font-style: normal; transition: color var(--motion-base) ease, background var(--motion-base) ease, border-color var(--motion-base) ease; }
+#app .duel-option-mark .solo-glyph { width: 18px; height: 18px; }
+#app .solo-fold-body .segmented-option.is-on { border-color: var(--edition-brass); background: linear-gradient(160deg, color-mix(in srgb, var(--edition-brass) 14%, var(--edition-surface)), var(--edition-surface) 70%); box-shadow: 0 0 0 1px var(--edition-brass), 0 10px 20px -12px color-mix(in srgb, var(--edition-brass) 80%, transparent); }
+#app .solo-fold-body .segmented-option.is-on .duel-option-mark { color: var(--edition-surface); border-color: var(--edition-brass); background: var(--edition-brass); }
+#app .solo-fold-body .segmented-option.is-on::after { border-color: var(--edition-brass); background: radial-gradient(circle, var(--edition-brass) 0 3.5px, transparent 4px); }
+@media (hover: hover) and (pointer: fine) { #app .solo-fold-body .segmented-option:not(.is-on):hover { border-color: color-mix(in srgb, var(--edition-brass) 55%, var(--edition-line)); background: var(--edition-surface); color: var(--edition-ink); } }
+#app .solo-fold-body .segmented-option:has(input:focus-visible) { outline: 2px solid var(--edition-brass); outline-offset: 3px; }
+
+#app .solo-fold-body [data-duel-block] { margin-top: 16px; }
+#app .duel-brief { padding: 14px 15px; border-radius: 12px; background: color-mix(in srgb, var(--edition-brass) 8%, transparent); }
+#app .duel-brief > p { margin: 0; color: var(--edition-ink); font: .84rem/1.5 var(--ui-font); }
+#app .duel-brief > .duel-rule { display: flex; align-items: flex-start; gap: 9px; max-width: none; margin-top: 11px; padding-top: 11px; border-top: 1px solid color-mix(in srgb, var(--edition-brass) 22%, transparent); color: var(--edition-muted); font: .74rem/1.45 var(--ui-font); }
+#app .duel-rule .solo-glyph { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 1px; color: var(--edition-brass); }
+
+#app .solo-fold-body .duel-identity-field { gap: 9px; margin: 22px 0 0; padding-top: 20px; border-top: 1px solid var(--edition-line); }
+#app .duel-identity { display: flex; align-items: center; gap: 12px; padding: 6px 16px 6px 6px; border: 1px solid var(--edition-line); border-radius: 999px; background: var(--edition-surface); }
+#app .duel-avatar { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border-radius: 50%; color: var(--edition-surface); background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--edition-brass) 62%, #fff), var(--edition-brass) 72%); font: 600 .9rem/1 var(--font-display); letter-spacing: .03em; }
+#app .duel-identity input[readonly] { flex: 1; min-width: 0; min-height: 0; padding: 0; border: 0; border-radius: 0; color: var(--edition-ink); background: transparent; font: 600 1.02rem/1.2 var(--font-display); box-shadow: none; }
+#app .duel-identity-field .field-help { color: var(--edition-muted); font: .72rem/1.45 var(--ui-font); }
+
+@media (prefers-reduced-motion: no-preference) {
+  #app .solo-fold[data-solo-kind="daily"] .solo-option-mark svg { animation: daily-sun 60s linear infinite; }
+  #app .solo-fold[open] .cal-card .cal-day { animation: cal-in 380ms var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 14ms + 140ms); }
+  #app .solo-fold[open] .cal-card .cal-day.cal-hoy { animation: cal-in 380ms var(--ease-out) backwards calc(var(--i, 0) * 14ms + 140ms), cal-today 2.4s ease-in-out 1.2s 3; }
+}
+@keyframes daily-sun { to { transform: rotate(1turn); } }
+@keyframes cal-in { from { opacity: 0; transform: scale(.55); } }
+@keyframes cal-today { 50% { box-shadow: 0 0 0 2px var(--edition-surface), 0 0 0 6px color-mix(in srgb, var(--edition-brass) 35%, transparent); } }
 #app.atlas-board .deck-count { width: auto; min-width: 72px; height: 46px; padding: 4px 10px; border-radius: 12px; }
 #app.atlas-board .deck-count span { font-size: .52rem; white-space: nowrap; letter-spacing: .03em; }
 #app.atlas-board .placement-dock .btn-primary:disabled { background: color-mix(in srgb,var(--atlas-selection) 12%,var(--edition-paper)); color: var(--edition-muted); border: 1px solid var(--edition-line); box-shadow: none; }
