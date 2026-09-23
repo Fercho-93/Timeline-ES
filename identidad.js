@@ -1,7 +1,6 @@
-// Quién juega en este móvil: su nombre y su avatar. Se piden una vez, al entrar por
-// primera vez, y se cambian después desde el Atlas. El nombre es el mismo que usa la
-// cuenta (y con él el ranking y los duelos); el avatar identifica a cada cual en las
-// partidas de varios.
+// Quién juega en este móvil: su nombre. Se pide una vez, al entrar por primera vez, y
+// se cambia después desde el Atlas. Es el mismo que usa la cuenta (y con él el ranking y
+// los duelos), y de él sale el avatar (avatares.js), así que no hay nada más que guardar.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
@@ -29,23 +28,22 @@
   function leer() {
     try {
       const guardada = JSON.parse(CT.Storage.getItem(CLAVE));
-      if (guardada && !problema(guardada.nombre) && CT.Avatares.valido(guardada.avatar)) return guardada;
+      if (guardada && !problema(guardada.nombre)) return { nombre: guardada.nombre };
     } catch { /* se vuelve a pedir */ }
     return null;
   }
 
-  function guarda({ nombre, avatar }) {
-    const actual = leer();
-    const identidad = { nombre: limpia(nombre ?? actual?.nombre), avatar: avatar ?? actual?.avatar };
-    if (problema(identidad.nombre) || !CT.Avatares.valido(identidad.avatar)) throw Error("Identidad no válida");
+  function guarda({ nombre }) {
+    const identidad = { nombre: limpia(nombre) };
+    if (problema(identidad.nombre)) throw Error("Identidad no válida");
     CT.Storage.setItem(CLAVE, JSON.stringify(identidad));
     CT.Storage.setItem(NOMBRE_ANTIGUO, identidad.nombre);
     return identidad;
   }
 
   // Quien ya había elegido nombre antes de que existiera esta pantalla —en su cuenta o
-  // en un duelo— no tiene que volver a escribirlo: se le reconoce y solo se le asigna
-  // avatar. Devuelve si ya hay identidad.
+  // en un duelo— no tiene que volver a escribirlo: se le reconoce. Devuelve si ya hay
+  // identidad.
   function reconoce() {
     if (leer()) return true;
     // Sin almacenamiento (navegación privada estricta, datos bloqueados) no hay dónde
@@ -54,7 +52,7 @@
     const candidatos = [CT.Accounts?.profile?.alias, CT.Storage.getItem(NOMBRE_ANTIGUO)];
     const nombre = candidatos.map(limpia).find(n => n && !problema(n));
     if (!nombre) return false;
-    try { guarda({ nombre, avatar: CT.Avatares.aleatorio() }); return true; } catch { return false; }
+    try { guarda({ nombre }); return true; } catch { return false; }
   }
 
   function disponible() {
@@ -65,7 +63,6 @@
   CT.Identidad = {
     MAX, leer, guarda, reconoce, problema, limpia,
     hecha: () => !!leer(),
-    nombre: () => leer()?.nombre || "",
-    avatar: () => leer()?.avatar || "brujula"
+    nombre: () => leer()?.nombre || ""
   };
 })();

@@ -375,7 +375,7 @@
     const deck = shuffle(CT.cards(selectedModeKey).map(c=>c.id).filter(id => id !== excludedCardId));
     const handSize = Math.min(t.handSize, Math.floor((deck.length-1)/players.length));
     const powers = CT.Powers.create(deck,players.length,handSize,ghost,pulse);
-    const roster = players.map(p=>({id:p.id,name:p.name,avatar:p.avatar,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
+    const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
     const timeline=[deck.shift()];
     roster.forEach(p=>p.hand.forEach(id=>CT.Powers.claim(powers,id,p.id,deck)));
     game={mode:selectedModeKey,tournament:t,competitionGhost:ghost,pulse,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,tournamentIntro:true,pulseTurn:null,pulseGift:null};
@@ -463,45 +463,25 @@
 
   // ── Bienvenida ─────────────────────────────────────────────────────────────────────
   //
-  // La primera vez que se entra, el juego pregunta el nombre y asigna un avatar al azar
-  // entre los nueve (se puede elegir otro ahí mismo o después, en el Atlas). Quien ya
-  // tenía nombre de antes se reconoce y no pasa por aquí (`CT.Identidad.reconoce`).
-  let bienvenidaAvatar = null;
-  function bienvenida(paso = "nombre", error = "") {
+  // La primera vez que se entra, el juego pregunta el nombre. El avatar sale de él y se
+  // ve mientras se escribe. Quien ya tenía nombre de antes se reconoce y no pasa por aquí
+  // (`CT.Identidad.reconoce`).
+  let bienvenidaNombre = "";
+  function bienvenida(error = "") {
     screen = "bienvenida";
     const nombre = bienvenidaNombre || CT.Identidad.nombre();
-    if (paso === "nombre") {
-      paint(`<div class="shell bienvenida-shell"><section class="bienvenida">
-        <img class="bienvenida-emblema" src="assets/continuum-emblem-800.webp" alt="" width="800" height="533">
-        <h1 data-focus tabindex="-1">Bienvenido a Continuum</h1>
-        <p class="lead">¿Cómo te llamas?</p>
-        <form class="bienvenida-form" data-bienvenida="nombre" novalidate>
-          <label class="solo-lectores" for="bienvenida-nombre">Tu nombre</label>
-          <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu nombre" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error">
-          <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
-          <button class="btn btn-primary btn-block" type="submit">Continuar <span aria-hidden="true">→</span></button>
-        </form>
-        <p class="hint">Es el nombre de tu perfil. Podrás cambiarlo en el Atlas.</p>
-      </section></div>`);
-      return;
-    }
-    bienvenidaAvatar ||= CT.Avatares.aleatorio();
-    const elegido = CT.Avatares.de(bienvenidaAvatar);
     paint(`<div class="shell bienvenida-shell"><section class="bienvenida">
-      <div class="bienvenida-avatar">${CT.Avatares.markup(elegido.key, { size: 112, etiqueta: `Tu avatar: ${elegido.nombre}` })}</div>
-      <h1 data-focus tabindex="-1">${escapeHtml(nombre)}</h1>
-      <p class="lead">Te ha tocado ${escapeHtml(elegido.nombre)}.</p>
-      ${avatarPicker(elegido.key, "bienvenida-avatar")}
-      <button class="btn btn-primary btn-block" data-action="bienvenida-fin">Empezar a jugar <span aria-hidden="true">→</span></button>
-      <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
+      <div class="bienvenida-avatar" data-avatar-vivo>${CT.Avatares.markup(nombre, { size: 112 })}</div>
+      <h1 data-focus tabindex="-1">Bienvenido a Continuum</h1>
+      <p class="lead">¿Cómo te llamas?</p>
+      <form class="bienvenida-form" data-bienvenida="nombre" novalidate>
+        <label class="solo-lectores" for="bienvenida-nombre">Tu nombre</label>
+        <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu nombre" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error bienvenida-pista" data-avatar-de>
+        <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
+        <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="hint" id="bienvenida-pista">Tu avatar sale de tu nombre. Podrás cambiar el nombre en el Atlas.</p>
     </section></div>`);
-  }
-  let bienvenidaNombre = "";
-
-  // La cuadrícula de los nueve avatares, para la bienvenida y el Atlas.
-  function avatarPicker(actual, accion) {
-    return `<div class="avatar-picker" role="radiogroup" aria-label="Elige tu avatar">${CT.Avatares.LISTA.map(avatar =>
-      `<button type="button" role="radio" aria-checked="${avatar.key === actual}" class="avatar-option${avatar.key === actual ? " is-on" : ""}" data-action="${accion}" data-avatar="${avatar.key}" aria-label="${escapeHtml(avatar.nombre)}">${CT.Avatares.markup(avatar.key, { size: 52 })}</button>`).join("")}</div>`;
   }
 
   // El nombre se guarda también en la cuenta, si la hay: es el del ranking y los duelos.
@@ -514,22 +494,17 @@
 
   async function bienvenidaNombreEnviado(boton) {
     const nombre = CT.Identidad.limpia(document.getElementById("bienvenida-nombre")?.value);
+    bienvenidaNombre = nombre;
     if (boton) boton.disabled = true;
     try {
       await guardaNombre(nombre);
-      bienvenidaNombre = nombre;
-      bienvenida("avatar");
+      CT.Identidad.guarda({ nombre });
     } catch (error) {
-      bienvenidaNombre = nombre;
-      bienvenida("nombre", error.message || "No se ha podido guardar el nombre.");
+      bienvenida(error.message || "No se ha podido guardar el nombre.");
       document.getElementById("bienvenida-nombre")?.focus();
+      return;
     }
-  }
-
-  function bienvenidaFin() {
-    try { CT.Identidad.guarda({ nombre: bienvenidaNombre, avatar: bienvenidaAvatar }); }
-    catch { bienvenida("nombre", "Escribe tu nombre para continuar."); return; }
-    bienvenidaAvatar = null;
+    bienvenidaNombre = "";
     home();
   }
 
@@ -942,24 +917,9 @@
     renderRecentPlayers();
   }
 
-  // Los avatares de una partida en un solo móvil: quien lleva tu nombre, el tuyo; el resto
-  // recibe uno distinto al azar, sin repetir, para distinguir a cada cual en la mesa.
-  function avataresPara(names) {
-    const propio = CT.Identidad.nombre().toLocaleLowerCase("es");
-    let propioUsado = false;
-    const asignados = names.map(name => {
-      if (!propioUsado && propio && name.trim().toLocaleLowerCase("es") === propio) { propioUsado = true; return CT.Identidad.avatar(); }
-      return null;
-    });
-    asignados.forEach((avatar, i) => { if (!avatar) asignados[i] = CT.Avatares.aleatorio(asignados.filter(Boolean)); });
-    return asignados;
-  }
-
-  // Las partidas guardadas antes de que hubiera avatares no los llevan: se les da uno
-  // fijo por puesto, que no cambia al repintar.
+  // El avatar de cada jugador sale de su nombre, como el tuyo.
   function jugadorAvatar(jugador, size) {
-    const clave = CT.Avatares.valido(jugador.avatar) ? jugador.avatar : CT.Avatares.LISTA[(Number(jugador.id) - 1 + 9) % 9].key;
-    return CT.Avatares.markup(clave, { size });
+    return CT.Avatares.markup(jugador.name, { size });
   }
 
   function startGame() {
@@ -984,8 +944,7 @@
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
     if (pendingTournament) {
       const t=CT.Tournament.create(pendingTournament.rounds,requestedHand);pendingTournament=null;
-      const avatares=avataresPara(names);
-      startTournamentRound(t,names.map((name,i)=>({id:i+1,name,avatar:avatares[i]})),starter,ghost,pulse,starterDraw.cardId);return;
+      startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse,starterDraw.cardId);return;
     }
     // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
     // del mazo para que nadie vuelva a encontrárselas en la partida.
@@ -994,8 +953,7 @@
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
     const powers = CT.Powers.create(shuffled, names.length, handSize, ghost, pulse);
-    const avatares = avataresPara(names);
-    const players = names.map((name, i) => ({ id: i + 1, name, avatar: avatares[i], hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
+    const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
     const timeline = [shuffled.shift()];
     players.forEach(p => p.hand.forEach(id => CT.Powers.claim(powers, id, p.id, shuffled)));
     game = { mode: selectedModeKey, pulse, ...powers, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
@@ -1747,22 +1705,24 @@
       <button class="btn btn-primary" data-action="home-encyclopedia">Explorar todas las cartas <span aria-hidden="true">→</span></button></section>`;
   }
 
-  // Quién eres en el juego: tu avatar y tu nombre, con lo necesario para cambiarlos.
+  // Quién eres en el juego: tu nombre y el avatar que sale de él.
   function atlasIdentidad() {
-    const avatar = CT.Avatares.de(CT.Identidad.avatar());
+    const nombre = CT.Identidad.nombre();
     return `<section class="panel atlas-identidad">
-      <button class="atlas-identidad-avatar" data-action="identidad-avatar" aria-label="Cambiar avatar (ahora ${escapeHtml(avatar.nombre)})">${CT.Avatares.markup(avatar.key, { size: 72 })}</button>
-      <div><h2>${escapeHtml(CT.Identidad.nombre() || "Sin nombre")}</h2>
-        <div class="atlas-identidad-acciones"><button class="btn btn-secondary" data-action="identidad-nombre">Cambiar nombre</button><button class="btn btn-ghost" data-action="identidad-avatar">Cambiar avatar</button></div></div>
+      <span class="atlas-identidad-avatar">${CT.Avatares.markup(nombre, { size: 72, etiqueta: "Tu avatar" })}</span>
+      <div><h2>${escapeHtml(nombre || "Sin nombre")}</h2>
+        <div class="atlas-identidad-acciones"><button class="btn btn-secondary" data-action="identidad-nombre">Cambiar nombre</button></div>
+        <p class="hint">Tu avatar sale de tu nombre: cambia si lo cambias.</p></div>
     </section>`;
   }
 
   function editaNombre(error = "", valor = CT.Identidad.nombre()) {
     CT.closeDialog?.();
     overlay(`<div class="overlay"><div class="modal identidad-modal"><h2>Tu nombre</h2>
+      <div class="identidad-avatar-vivo" data-avatar-vivo>${CT.Avatares.markup(valor, { size: 88 })}</div>
       <form data-identidad="nombre" novalidate>
         <label for="identidad-nombre">Nombre de tu perfil</label>
-        <input id="identidad-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" value="${escapeHtml(valor)}" aria-describedby="identidad-error">
+        <input id="identidad-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" value="${escapeHtml(valor)}" aria-describedby="identidad-error" data-avatar-de>
         <p id="identidad-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
         <div class="actions" style="display:grid"><button class="btn btn-primary" type="submit">Guardar</button><button class="btn btn-secondary" type="button" data-action="close-menu">Cancelar</button></div>
       </form></div></div>`, true);
@@ -1780,13 +1740,6 @@
     } catch (error) {
       editaNombre(error.message || "No se ha podido guardar el nombre.", nombre);
     }
-  }
-
-  function editaAvatar() {
-    overlay(`<div class="overlay"><div class="modal identidad-modal"><h2>Tu avatar</h2>
-      <p class="hint">Te identifica en las partidas de varios.</p>
-      ${avatarPicker(CT.Identidad.avatar(), "identidad-avatar-elige")}
-      <button class="btn btn-secondary btn-block" data-action="close-menu">Cerrar</button></div></div>`, true);
   }
 
   function atlasRetoDiario() {
@@ -3545,6 +3498,11 @@
   }, true);
 
   app.addEventListener("input", event => {
+    // El avatar se redibuja con cada letra: así se ve qué personaje sale de cada nombre.
+    if (event.target.matches?.("[data-avatar-de]")) {
+      const vivo = event.target.closest(".bienvenida, .identidad-modal")?.querySelector("[data-avatar-vivo]");
+      if (vivo) vivo.innerHTML = CT.Avatares.markup(event.target.value, { size: vivo.classList.contains("bienvenida-avatar") ? 112 : 88 });
+    }
     if (event.target.closest("#players")) { syncStarterOptions(); renderRecentPlayers(); }
     else if (event.target.id === "enc-search-input") {
       // Se actualiza solo el resultado, sin repintar la pantalla entera: repintarla
@@ -3734,11 +3692,7 @@
     else if (action === "resume-solo") resumeSolo();
     else if (action === "daily-start") startDaily();
     else if (action === "daily-play") playDaily();
-    else if (action === "bienvenida-avatar") { bienvenidaAvatar = target.dataset.avatar; bienvenida("avatar"); app.querySelector(`[data-avatar="${bienvenidaAvatar}"]`)?.focus(); }
-    else if (action === "bienvenida-fin") bienvenidaFin();
     else if (action === "identidad-nombre") editaNombre();
-    else if (action === "identidad-avatar") editaAvatar();
-    else if (action === "identidad-avatar-elige") { CT.Identidad.guarda({ avatar: target.dataset.avatar }); CT.closeDialog(); perfilView(); showToast(`Avatar: ${CT.Avatares.de(target.dataset.avatar).nombre}`); }
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();

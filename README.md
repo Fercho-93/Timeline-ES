@@ -26,21 +26,21 @@ La barra inferior se queda en Inicio, Guía y Ajustes: a Jugar y al Atlas se ent
 
 ## Tu nombre y tu avatar
 
-La primera vez que se entra, una bienvenida pide el nombre y asigna uno de los nueve
-avatares al azar (Brújula, Búho, Globo, Telescopio, Pluma, Reloj de arena, Ancla, Laurel
-y Cometa); ahí mismo se puede elegir otro. Quien ya tenía nombre de antes —en su cuenta o
-en un duelo— se reconoce y no pasa por la bienvenida. Nombre y avatar se ven y se cambian
-arriba del Atlas.
+La primera vez que se entra, una bienvenida pide el nombre. El avatar sale de él: el
+mismo nombre dibuja siempre el mismo personaje, y se ve cambiar mientras se escribe. Quien
+ya tenía nombre de antes —en su cuenta o en un duelo— se reconoce y no pasa por la
+bienvenida. Nombre y avatar se ven arriba del Atlas; al cambiar el nombre cambia el avatar.
 
-`identidad.js` guarda los dos en `continuum-identidad-v1` y copia el nombre en
-`hilo-nombre-v1`, el que ya usaban duelos y salas. Si hay cuenta, el nombre se guarda
-también en ella (es el del ranking) y un nombre ocupado por otra cuenta se rechaza con
-aviso. Los avatares son dibujos propios en `avatares.js`, sin descargas.
+`identidad.js` guarda el nombre en `continuum-identidad-v1` y lo copia en
+`hilo-nombre-v1`, el que ya usaban duelos y salas. Si hay cuenta, se guarda también en
+ella (es el del ranking) y un nombre ocupado por otra cuenta se rechaza con aviso.
 
-En la partida en un solo móvil, el primer jugador sale con tu nombre y juega con tu
-avatar; el resto recibe uno distinto al azar. Se ven en la pantalla de pasar el móvil, en
-el marcador y en el Pulso. Las salas de varios móviles todavía no transmiten el avatar:
-necesita un campo nuevo en las reglas de Firestore.
+Los avatares los dibuja [blobatar](https://github.com/Alain00/blobatar) (MIT, sin
+dependencias), copiado en `blobatar.js` para funcionar sin conexión; `avatares.js` es la
+única puerta. Como salen del nombre, no hay que guardarlos ni mandarlos: cada móvil pinta
+el de todos con el nombre que ya viaja en la partida. Se ven en la partida en un móvil (al
+pasar el móvil, en el marcador y en el Pulso), en las salas por internet y por Wi-Fi
+(asientos, marcador y lista del anfitrión) y en el marcador de Retos rápidos.
 
 ## Retos rápidos y ¿Cuántos hay…?
 
