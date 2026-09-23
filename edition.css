@@ -2375,3 +2375,142 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 #app .home-doors-shell .home-door::after { z-index: 1; }
 #app .home-doors-shell .home-door-copy { position: relative; z-index: 2; }
+
+
+/* Evolución de la portada: más profundidad y un reto diario que se siente especial,
+   conservando el papel, el grabado y la navegación que ya conoce el jugador. */
+#app[data-screen="home"] .home-doors-shell .home-masthead {
+  position: relative;
+  isolation: isolate;
+}
+#app[data-screen="home"] .home-doors-shell .home-masthead::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -2% 7% 27%;
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 42%, color-mix(in srgb, var(--edition-brass) 17%, transparent), transparent 68%),
+    radial-gradient(ellipse at 50% 90%, color-mix(in srgb, var(--edition-paper) 62%, transparent), transparent 72%);
+}
+#app[data-screen="home"] .home-doors-shell .home-crest img {
+  filter: sepia(.12) saturate(.9) contrast(1.02) drop-shadow(0 5px 9px color-mix(in srgb, var(--edition-brass) 24%, transparent));
+}
+#app[data-screen="home"] .home-doors-shell .home-tagline {
+  display: inline-flex;
+  align-items: center;
+  gap: .65em;
+  margin-top: 7px;
+  padding: 5px 12px;
+  border-block: 1px solid color-mix(in srgb, var(--edition-brass) 38%, transparent);
+  color: var(--edition-muted);
+  font-size: .62rem;
+  letter-spacing: .23em;
+}
+#app[data-screen="home"] .home-doors-shell .home-ornament { opacity: .86; }
+
+#app .home-doors-shell .home-door {
+  border-color: color-mix(in srgb, var(--edition-brass) 32%, var(--edition-line));
+  border-radius: 12px;
+  box-shadow: 0 7px 20px #352a1719, inset 0 1px 0 #ffffff70;
+}
+#app .home-doors-shell .home-door::after {
+  background:
+    radial-gradient(ellipse at 88% 50%, color-mix(in srgb, var(--edition-brass) 19%, transparent), transparent 34%),
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--edition-surface) 98%, transparent) 0%,
+      color-mix(in srgb, var(--edition-surface) 91%, transparent) 40%,
+      color-mix(in srgb, var(--edition-surface) 54%, transparent) 67%,
+      color-mix(in srgb, var(--edition-surface) 10%, transparent) 100%);
+}
+#app .home-doors-shell .home-door-art img {
+  transition: transform 700ms cubic-bezier(.2,.7,.25,1), filter 350ms ease;
+}
+@media (hover: hover) {
+  #app .home-doors-shell button.home-door:hover .home-door-art img {
+    transform: scale(1.045);
+    filter: sepia(.48) saturate(.9) contrast(1.02);
+  }
+}
+#app .home-doors-shell .home-door-copy { z-index: 3; }
+#app .home-doors-shell .home-door-copy b { text-shadow: 0 1px 0 color-mix(in srgb, var(--edition-surface) 70%, transparent); }
+#app .home-doors-shell .home-door-copy small { color: color-mix(in srgb, var(--edition-ink) 70%, var(--edition-muted)); }
+#app .home-doors-shell .home-door-cta {
+  min-height: 30px;
+  align-items: center;
+  margin-top: 3px;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--edition-brass) 52%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--edition-surface) 76%, transparent);
+  box-shadow: 0 2px 8px #352a1710;
+}
+#app .home-doors-shell .home-door-daily {
+  border-color: color-mix(in srgb, var(--edition-brass) 84%, var(--edition-line));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--edition-brass) 19%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--edition-brass) 32%, transparent);
+}
+#app .home-doors-shell .home-door-daily::after {
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at 88% 50%, color-mix(in srgb, var(--edition-brass) 26%, transparent), transparent 30%),
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--edition-surface) 99%, transparent) 0%,
+      color-mix(in srgb, var(--edition-surface) 93%, transparent) 43%,
+      color-mix(in srgb, var(--edition-surface) 58%, transparent) 69%,
+      color-mix(in srgb, var(--edition-surface) 8%, transparent) 100%);
+}
+#app .home-doors-shell .home-door-daily::before {
+  content: "✦\A HOY\A ✦";
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: clamp(18px, 7%, 58px);
+  display: grid;
+  place-content: center;
+  width: clamp(66px, 10vw, 86px);
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--edition-brass) 88%, white);
+  border-radius: 50%;
+  outline: 1px solid color-mix(in srgb, var(--edition-brass) 70%, transparent);
+  outline-offset: 4px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--edition-surface) 92%, transparent) 0 56%, transparent 58%),
+    radial-gradient(circle, color-mix(in srgb, var(--edition-brass) 32%, transparent), color-mix(in srgb, var(--edition-brass) 7%, transparent) 68%);
+  box-shadow: 0 5px 18px #352a1726, inset 0 0 0 4px color-mix(in srgb, var(--edition-brass) 14%, transparent);
+  color: var(--edition-brass);
+  font: 700 .62rem/1.25 var(--ui-font);
+  letter-spacing: .14em;
+  text-align: center;
+  white-space: pre;
+  transform: translateY(-50%) rotate(7deg);
+}
+#app .home-doors-shell .home-door-daily .home-door-copy { width: 68%; }
+#app .home-doors-shell .home-door-daily .home-door-copy b {
+  font-size: clamp(1.35rem, 4.2vw, 1.58rem);
+}
+#app .home-doors-shell .home-door-daily .home-door-copy b::before {
+  content: "EL DESAFÍO DE HOY";
+  display: block;
+  margin-bottom: 5px;
+  color: var(--edition-brass);
+  font: 700 .56rem/1.2 var(--ui-font);
+  letter-spacing: .17em;
+  text-shadow: none;
+}
+#app .home-doors-shell .home-daily-streak {
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--edition-brass) 34%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--edition-surface) 75%, transparent);
+}
+#app .home-doors-shell .home-daily-share { position: relative; z-index: 3; }
+@media (max-width: 480px) {
+  #app .home-doors-shell .home-door-daily .home-door-copy { width: 70%; padding-inline: 15px; }
+  #app .home-doors-shell .home-door-daily::before { right: 18px; width: 64px; font-size: .54rem; }
+  #app[data-screen="home"] .home-doors-shell .home-tagline { font-size: .56rem; letter-spacing: .18em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .home-doors-shell .home-door-art img { transition: none; }
+}
