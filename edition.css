@@ -3021,7 +3021,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   }
 }
 
-/* v346 · Partida completa en el primer vistazo: menos rótulos y más ilustración. */
+/* v348 · Partida completa en el primer vistazo: mano más pequeña y línea protagonista. */
 @media (max-width: 699px) {
   #app.atlas-board .board-focus-card {
     margin-top: 0;
@@ -3030,7 +3030,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     margin: 0 0 2px;
   }
   #app.atlas-board .board-focus-card .hand-solo {
-    grid-template-columns: minmax(0, min(42vw, 164px));
+    grid-template-columns: minmax(0, min(33.6vw, 131px));
     padding-block: 0;
   }
   #app.atlas-board[data-platform][data-device][data-screen] .board-focus-card .hand-solo .hand-card {
@@ -3064,14 +3064,14 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     padding-block: 1px 3px;
   }
   #app.atlas-board .board-timeline-section .timeline-card {
-    width: 118px;
-    min-height: 164px;
+    width: 132px;
+    min-height: 184px;
   }
   #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
   #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
     width: auto;
-    height: 100px;
-    max-height: 100px;
+    height: 114px;
+    max-height: 114px;
     aspect-ratio: auto;
   }
   #app.atlas-board .board-timeline-section .animal-timeline-card .animal-card-art {
@@ -3080,21 +3080,21 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
   }
   #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) {
-    min-height: 164px;
+    min-height: 184px;
   }
 }
 
 @media (max-width: 380px), (max-height: 740px) {
   #app.atlas-board .board-focus-card .hand-solo {
-    grid-template-columns: minmax(0, min(38vw, 146px));
+    grid-template-columns: minmax(0, min(30.4vw, 117px));
   }
   #app.atlas-board .board-timeline-section .timeline-card,
   #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) {
-    min-height: 150px;
+    min-height: 168px;
   }
   #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
   #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
-    height: 90px;
-    max-height: 90px;
+    height: 102px;
+    max-height: 102px;
   }
 }
