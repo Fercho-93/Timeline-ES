@@ -218,6 +218,44 @@
     });
     document.addEventListener('continuum:settings-changed', reflect);
     reflect();
+    // El interruptor flota en la esquina de arriba a la derecha, y esa esquina la usan
+    // también algunas pantallas: el «Volver» del duelo por turnos y de las salas, los
+    // tres puntos de la partida… En vez de apartarlo pantalla por pantalla, después de
+    // cada repintado mira si pisa algún control y, si lo hace, se corre a su izquierda.
+    const app = document.getElementById('app');
+    const pisa = (a, b) => a.left < b.right + 6 && a.right > b.left - 6 && a.top < b.bottom + 6 && a.bottom > b.top - 6;
+    const aparta = () => {
+      toggle.style.right = '';
+      for (let intento = 0; intento < 4; intento++) {
+        const propio = toggle.getBoundingClientRect();
+        if (!propio.width) return;
+        const debajo = [...app.querySelectorAll('button, a[href], [role="button"], select, input, summary')].map(el => el.getBoundingClientRect())
+          .filter(r => r.width && r.height && pisa(propio, r));
+        if (!debajo.length) return;
+        toggle.style.right = `${Math.max(0, window.innerWidth - Math.min(...debajo.map(r => r.left)) + 8)}px`;
+      }
+    };
+    // Las pantallas entran con un desplazamiento breve: mientras dura, los botones no
+    // están aún en su sitio. Por eso se mira al repintar y otra vez cuando la entrada
+    // termina (o, si no hay evento, al poco).
+    let pendiente = 0, tardio = 0;
+    const siguienteCuadro = window.requestAnimationFrame?.bind(window) || (fn => setTimeout(fn, 16));
+    const cancelaCuadro = window.cancelAnimationFrame?.bind(window) || clearTimeout;
+    const programa = () => {
+      cancelaCuadro(pendiente); clearTimeout(tardio);
+      pendiente = siguienteCuadro(aparta);
+      tardio = setTimeout(aparta, 600);
+    };
+    if (app && 'MutationObserver' in window) {
+      new MutationObserver(programa).observe(app, { childList: true, subtree: true });
+      // Mientras dura el telón de entrada el interruptor está oculto y no se puede medir:
+      // al retirarse el telón (cambia la clase de <html>) se vuelve a mirar.
+      new MutationObserver(programa).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    app?.addEventListener('animationend', programa, true);
+    app?.addEventListener('transitionend', event => { if (event.propertyName === 'transform') programa(); }, true);
+    window.addEventListener('resize', programa);
+    programa();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountToggle);
   else mountToggle();

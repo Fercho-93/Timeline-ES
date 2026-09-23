@@ -2906,3 +2906,5 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 @media (prefers-reduced-motion: reduce) {
   #app .daily-mystery-cards { animation: none; }
 }
+#app .turn-duel-avatar:has(svg.avatar) { border: 0; background: transparent; overflow: visible; }
+#app .turn-duel-avatar svg.avatar { width: 100%; height: 100%; }
