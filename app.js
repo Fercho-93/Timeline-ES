@@ -559,17 +559,38 @@
 
   // La hoja de calendario del día: el reto es de hoy y cambia mañana, y eso es lo que
   // dice el dibujo, sin desvelar de qué mazo va. Trazos con los colores de la edición.
-  function dailyCalendar(dia) {
-    const fecha = new Date(`${dia}T12:00:00`);
-    const mes = fecha.toLocaleDateString("es-ES", { month: "short" }).replace(".", "").toUpperCase();
-    const semana = fecha.toLocaleDateString("es-ES", { weekday: "long" });
-    return `<svg viewBox="0 0 92 92" role="presentation">
-      <rect class="cal-sheet" x="14" y="16" width="64" height="66" rx="6"/>
-      <path class="cal-band" d="M14 22a6 6 0 0 1 6-6h52a6 6 0 0 1 6 6v10H14Z"/>
-      <path class="cal-ring" d="M30 10v12M62 10v12"/>
-      <text class="cal-month" x="46" y="28.5" text-anchor="middle">${mes}</text>
-      <text class="cal-day" x="46" y="64" text-anchor="middle">${fecha.getDate()}</text>
-      <text class="cal-week" x="46" y="75" text-anchor="middle">${semana}</text>
+  // Una alegoría neutral de Continuum: cartas sin tema, órbitas y una línea temporal.
+  // Prepara la sorpresa sin adelantar el mazo que saldrá en la ruleta.
+  function dailyMysteryArt() {
+    return `<svg class="daily-mystery-art" viewBox="0 0 260 180" role="presentation">
+      <g class="daily-mystery-orbits">
+        <ellipse cx="130" cy="88" rx="105" ry="68"/>
+        <ellipse cx="130" cy="88" rx="82" ry="51"/>
+        <path d="M130 13v11M130 152v11M24 88h13M223 88h13"/>
+      </g>
+      <g class="daily-mystery-cards">
+        <g transform="rotate(-11 91 91)">
+          <rect class="daily-mystery-card" x="48" y="37" width="86" height="112" rx="7"/>
+          <path class="daily-mystery-card-line" d="M60 52h62M60 134h62"/>
+          <circle class="daily-mystery-card-seal" cx="91" cy="91" r="17"/>
+        </g>
+        <g transform="rotate(11 169 91)">
+          <rect class="daily-mystery-card" x="126" y="37" width="86" height="112" rx="7"/>
+          <path class="daily-mystery-card-line" d="M138 52h62M138 134h62"/>
+          <circle class="daily-mystery-card-seal" cx="169" cy="91" r="17"/>
+        </g>
+        <rect class="daily-mystery-card daily-mystery-card-main" x="87" y="27" width="86" height="122" rx="8"/>
+        <path class="daily-mystery-card-line" d="M100 43h60M100 133h60"/>
+        <path class="daily-mystery-diamond" d="m130 47 7 7-7 7-7-7Z"/>
+      </g>
+      <path class="daily-mystery-thread-shadow" d="M65 94c19-29 42-29 65 0s46 29 65 0c-19-29-42-29-65 0s-46 29-65 0Z"/>
+      <path class="daily-mystery-thread" d="M65 94c19-29 42-29 65 0s46 29 65 0c-19-29-42-29-65 0s-46 29-65 0Z"/>
+      <g class="daily-mystery-timeline">
+        <path d="M42 159h176"/>
+        <circle cx="62" cy="159" r="4"/><circle cx="96" cy="159" r="3"/>
+        <circle cx="130" cy="159" r="5"/><circle cx="164" cy="159" r="3"/>
+        <circle cx="198" cy="159" r="4"/>
+      </g>
     </svg>`;
   }
 
@@ -2002,17 +2023,22 @@
     const dia = today(), modeKey = dailyModeKey(dia), mode = CT.mode(modeKey);
     const fecha = new Date(`${dia}T12:00:00`).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
-      <div class="chapter-art daily-splash-art" aria-hidden="true">${dailyCalendar(dia)}</div>
+      <div class="chapter-art daily-splash-art" aria-hidden="true">${dailyMysteryArt()}</div>
       <div class="chapter-number">Reto diario · ${escapeHtml(fecha)}</div>
-      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel" aria-hidden="true">·&nbsp;·&nbsp;·</span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
+      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel-stage" aria-hidden="true"><span class="daily-reel-kicker">Seleccionando mazo</span><span class="daily-reel-window"><span class="daily-reel">·&nbsp;·&nbsp;·</span></span></span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
       <p class="daily-splash-rule" hidden>${DAILY_CARDS} cartas, las mismas para todo el mundo. Un intento.</p>
       <button class="btn btn-block comp-splash-start" data-action="daily-play" hidden>Jugar <span aria-hidden="true">→</span></button>
     </div></section></div>`);
     const reel = app.querySelector(".daily-reel");
     const revela = () => {
       if (screen !== "daily-intro" || !reel.isConnected) return;
+      reel.classList.remove("is-ticking");
       reel.textContent = mode.name;
       reel.classList.add("is-revealed");
+      const splash = app.querySelector(".daily-splash");
+      splash?.classList.add("is-revealed");
+      const kicker = app.querySelector(".daily-reel-kicker");
+      if (kicker) kicker.textContent = "Mazo de hoy";
       const arte = app.querySelector(".daily-splash-art");
       arte.innerHTML = blockArt(CT.blockOf(modeKey).art, true);
       arte.classList.add("is-revealed");
@@ -2032,7 +2058,10 @@
       const espera = 60 + paso * paso * 2.2;
       transcurrido += espera;
       if (transcurrido > 2800 || !otros.length) { revela(); return; }
+      reel.classList.remove("is-ticking");
+      void reel.offsetWidth;
       reel.textContent = otros[paso % otros.length];
+      reel.classList.add("is-ticking");
       paso += 1;
       dailyReelTimer = setTimeout(gira, espera);
     };
