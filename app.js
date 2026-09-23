@@ -487,19 +487,21 @@
     </button>`;
   }
 
-  // El reto del día enseña su mazo desde la portada: saber de qué va hoy es parte de lo
-  // que hace volver. Hecho, deja de ser un botón y se queda con el resultado y la racha.
+  // El mazo del día es sorpresa: la portada no lo nombra ni enseña su ilustración, y se
+  // descubre al empezar. Una vez jugado ya no hay nada que esconder y se dice cuál fue.
   function dailyDoor() {
-    const dia = today(), modeKey = dailyModeKey(dia), mode = CT.mode(modeKey);
+    const dia = today();
     const records = dailyRecords(), hecho = records.days?.[dia], racha = dailyStreak(records);
     const pendiente = !hecho && loadDaily();
-    const art = BLOCK_ART[CT.blockOf(modeKey)?.art] || BLOCK_ART.mixed;
     const fecha = `<time datetime="${dia}">${dia.split("-").reverse().join("/")}</time>`;
     const rachaTexto = `${glyph(GLYPHS.racha)}<span>${racha ? `${racha} ${racha === 1 ? "día seguido" : "días seguidos"}` : "Empieza hoy tu racha"}</span>`;
-    const copy = `<span class="home-door-kicker">Reto diario · ${fecha}</span><b>${escapeHtml(mode.name)}</b>
-      <small>${hecho ? `Hoy: <strong>${hecho.hits} de ${hecho.total}</strong>. Mañana, otro mazo.` : `Las mismas ${DAILY_CARDS} cartas para todo el mundo. Un intento al día.`}</small>
+    const detalle = hecho
+      ? `Hoy, en ${escapeHtml(CT.mode(dailyModeKey(dia)).name)}: <strong>${hecho.hits} de ${hecho.total}</strong>. Mañana, otro mazo sorpresa.`
+      : `Un mazo sorpresa y las mismas ${DAILY_CARDS} cartas para todo el mundo. Un intento al día.`;
+    const copy = `<span class="home-door-kicker">${fecha}</span><b>Reto diario</b>
+      <small>${detalle}</small>
       <span class="home-daily-streak">${rachaTexto}</span>`;
-    const arte = `<span class="home-door-art" aria-hidden="true"><img src="assets/${art.archivo}-700.webp" alt="" width="700" height="${art.alto[700]}" decoding="async" fetchpriority="high"></span>`;
+    const arte = `<span class="home-door-art" aria-hidden="true"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" fetchpriority="high"></span>`;
     if (hecho) return `<article class="home-door home-door-daily is-done">${arte}<span class="home-door-copy">${copy}
       <button class="btn btn-secondary home-daily-share" data-action="share-daily-home">Compartir resultado</button></span></article>`;
     return `<button class="home-door home-door-daily" data-action="daily-start">${arte}<span class="home-door-copy">${copy}

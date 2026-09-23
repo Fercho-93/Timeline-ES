@@ -5,8 +5,9 @@
 La portada tiene tres puertas y nada más:
 
 - **Reto diario.** Uno para todo el mundo: cada día se sortea un mazo con la fecha como
-  semilla y de él salen las mismas 15 cartas en todos los móviles. La portada enseña el
-  mazo de hoy, la racha y, una vez jugado, el resultado para compartirlo.
+  semilla y de él salen las mismas 15 cartas en todos los móviles. El mazo es sorpresa:
+  la portada no lo nombra y se descubre al empezar. Enseña la racha y, una vez jugado,
+  el mazo que era y el resultado para compartirlo.
 - **Jugar.** Primero se elige *qué*: **Grandes colecciones** (los mazos completos, por
   colección), **Retos rápidos** (temas cortos y concretos, como las redes sociales por
   fecha de aparición) o **Competición** (un tema distinto en cada ronda). Después, *cómo*:
