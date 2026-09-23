@@ -2007,15 +2007,20 @@
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
       <div class="chapter-art daily-splash-art" aria-hidden="true">${dailyCalendar(dia)}</div>
       <div class="chapter-number">Reto diario · ${escapeHtml(fecha)}</div>
-      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel" aria-hidden="true">·&nbsp;·&nbsp;·</span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
+      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel-stage" aria-hidden="true"><span class="daily-reel-kicker">Seleccionando mazo</span><span class="daily-reel-window"><span class="daily-reel">·&nbsp;·&nbsp;·</span></span></span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
       <p class="daily-splash-rule" hidden>${DAILY_CARDS} cartas, las mismas para todo el mundo. Un intento.</p>
       <button class="btn btn-block comp-splash-start" data-action="daily-play" hidden>Jugar <span aria-hidden="true">→</span></button>
     </div></section></div>`);
     const reel = app.querySelector(".daily-reel");
     const revela = () => {
       if (screen !== "daily-intro" || !reel.isConnected) return;
+      reel.classList.remove("is-ticking");
       reel.textContent = mode.name;
       reel.classList.add("is-revealed");
+      const splash = app.querySelector(".daily-splash");
+      splash?.classList.add("is-revealed");
+      const kicker = app.querySelector(".daily-reel-kicker");
+      if (kicker) kicker.textContent = "Mazo de hoy";
       const arte = app.querySelector(".daily-splash-art");
       arte.innerHTML = blockArt(CT.blockOf(modeKey).art, true);
       arte.classList.add("is-revealed");
@@ -2035,7 +2040,10 @@
       const espera = 60 + paso * paso * 2.2;
       transcurrido += espera;
       if (transcurrido > 2800 || !otros.length) { revela(); return; }
+      reel.classList.remove("is-ticking");
+      void reel.offsetWidth;
       reel.textContent = otros[paso % otros.length];
+      reel.classList.add("is-ticking");
       paso += 1;
       dailyReelTimer = setTimeout(gira, espera);
     };
