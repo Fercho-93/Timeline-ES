@@ -121,8 +121,8 @@ console.log("\nLos avatares en la partida de un móvil");
   ok("la pantalla de pasar el móvil enseña el avatar de quien juega", w.document.querySelector(".player-medallion-avatar").innerHTML === pintado(w, A.markup(actual.name, { size: 76 })));
   click(w, '[data-action="ready"]');
   const marcador = [...w.document.querySelectorAll(".scoreboard .score-avatar")].map(el => el.innerHTML);
-  ok("el marcador enseña el avatar de cada jugador", marcador.length === partida.players.length && marcador.every((html, i) => html === pintado(w, A.markup(partida.players[i].name, { size: 28 }))));
-  ok("tú apareces con el mismo avatar que en tu Atlas", marcador[0] === pintado(w, A.markup("Lucía", { size: 28 })));
+  ok("el marcador enseña el avatar de cada jugador", marcador.length === partida.players.length && marcador.every((html, i) => html === pintado(w, A.markup(partida.players[i].name, { size: 40 }))));
+  ok("tú apareces con el mismo avatar que en tu Atlas", marcador[0] === pintado(w, A.markup("Lucía", { size: 40 })));
 }
 
 console.log(`\n${fail} fallos`);
