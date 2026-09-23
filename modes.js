@@ -97,6 +97,7 @@
   // temporal: la de países ordena por tamaño con el mismo motor.
   const AXES = {
     time: {
+      orderLabel: "Tiempo",
       sortValue: card => card.year,
       format: card => card.label || (card.year < 0 ? `${Math.abs(card.year)} a. C.` : String(card.year)),
       shortValue: card => card.year < 0 ? `${Math.abs(card.year)} a.C.` : String(card.year),
@@ -122,6 +123,7 @@
       ]
     },
     population: {
+      orderLabel: "Población",
       sortValue: card => card.value,
       // Con la cifra en millones el «hab.» sobra y no cabe; abajo sí aclara.
       format: card => card.value >= 1e6 ? compact(card.value) : `${compact(card.value)} hab.`,
@@ -142,6 +144,7 @@
       ]
     },
     speakers: {
+      orderLabel: "Hablantes",
       sortValue: card => card.value,
       format: card => compactSpeakers(card.value),
       shortValue: card => shortMillions(card.value),
@@ -165,6 +168,7 @@
       ]
     },
     area: {
+      orderLabel: "Superficie",
       sortValue: card => card.value,
       // «de km²» solo cuando la cifra va en millones: «17,1 millones de km²».
       format: card => card.value >= 1e6 ? `${compact(card.value)} de km²` : `${compact(card.value)} km²`,
@@ -185,6 +189,7 @@
       ]
     },
     mass: {
+      orderLabel: "Peso",
       sortValue: card => card.value,
       format: card => compactMass(card.value),
       shortValue: card => compactMass(card.value),
@@ -205,6 +210,7 @@
       ]
     },
     lifespan: {
+      orderLabel: "Longevidad",
       sortValue: card => card.value,
       format: card => compactLifespan(card.value),
       shortValue: card => compactLifespan(card.value),
@@ -224,6 +230,7 @@
       ]
     },
     speed: {
+      orderLabel: "Velocidad",
       sortValue: card => card.value,
       format: card => compactSpeed(card.value),
       shortValue: card => compactSpeed(card.value),
@@ -243,6 +250,7 @@
       ]
     },
     distance: {
+      orderLabel: "Distancia",
       sortValue: card => card.value,
       format: card => compactDistance(card.value),
       shortValue: card => compactDistance(card.value),

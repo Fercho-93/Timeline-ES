@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v343";
+const CACHE = "continuum-v348";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -245,11 +245,27 @@ async function storeMusic() {
 self.addEventListener("install", event => {
   // Una caché de aplicación nueva no basta si la caché HTTP aún considera frescos los
   // archivos antiguos. Cada instalación debe obtener realmente la versión publicada.
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS.map(url => new Request(url, { cache: "reload" })))));
+  event.waitUntil(caches.open(CACHE)
+    .then(cache => cache.addAll(ASSETS.map(url => new Request(url, { cache: "reload" }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE && /^(continuum-|hilo-modos-)/.test(key)).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const obsolete = keys.filter(key => key !== CACHE && /^(continuum-|hilo-modos-)/.test(key));
+    await Promise.all(obsolete.map(key => caches.delete(key)));
+    await self.clients.claim();
+    // Una actualización ya preparada debe sustituir la página que aún ejecuta los
+    // archivos de la caché anterior. La partida está persistida antes de cada repintado,
+    // así que recargar conserva el punto exacto y evita dejar Safari en una versión mixta.
+    if (obsolete.length) {
+      const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      await Promise.all(clients
+        .filter(client => client.url.startsWith(self.registration.scope))
+        .map(client => client.navigate(client.url).catch(() => null)));
+    }
+  })());
   // Fuera de `waitUntil` a propósito: mientras el trabajador está activándose, las
   // peticiones de la página esperan, y esto son 27 MB. La música se va guardando por su
   // cuenta; si el navegador detiene el trabajador antes de acabar, la ruta `fetch` la
@@ -257,7 +273,7 @@ self.addEventListener("activate", event => {
   void storeMusic();
 });
 
-// Activar solo por petición explícita y sin otras pestañas que puedan estar jugando.
+// Mantener la petición explícita por compatibilidad con clientes de versiones anteriores.
 self.addEventListener("message", event => {
   if (event.data?.type !== "ACTIVATE_UPDATE") return;
   event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(clients => {

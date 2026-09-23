@@ -2925,3 +2925,193 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 #app .turn-duel-avatar:has(svg.avatar) { border: 0; background: transparent; overflow: visible; }
 #app .turn-duel-avatar svg.avatar { width: 100%; height: 100%; }
+
+/* v344 · La carta por jugar ocupa el centro y la línea queda como destino inferior. */
+#app.atlas-board .board-question { width: min(100%, 430px); margin: 3px auto 5px; text-align: center; }
+#app.atlas-board .board-question h2 { margin: 0 0 3px; color: var(--edition-ink); font: 700 clamp(1.2rem, 5.3vw, 1.65rem)/1.05 var(--font-display); letter-spacing: -.025em; }
+#app.atlas-board .board-axis { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border: 1px solid color-mix(in srgb, var(--edition-brass) 42%, transparent); border-radius: 999px; color: var(--edition-muted); background: color-mix(in srgb, var(--edition-surface) 58%, transparent); font: 650 .62rem/1 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; }
+#app.atlas-board .board-axis strong { color: var(--atlas-selection); }
+#app.atlas-board .board-question p { margin: 4px 0 0; color: var(--edition-muted); font: .7rem/1.25 var(--ui-font); }
+
+#app.atlas-board .board-focus-card { margin-top: 0; }
+#app.atlas-board .board-focus-card > .hand-title { justify-content: center; margin-bottom: 3px; }
+#app.atlas-board .board-focus-card > .hand-title h3 { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+#app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(54vw, 220px)); justify-content: center; padding: 2px; }
+#app.atlas-board[data-platform][data-device][data-screen] .board-focus-card .hand-solo .hand-card { width: 100%; height: auto !important; min-height: 0 !important; aspect-ratio: 2 / 3; padding: 11px; border-radius: 10px; }
+#app.atlas-board .board-focus-card .hand-solo .carta-reverso { min-height: 0; height: auto; flex: 1 1 auto; }
+#app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong,
+#app.atlas-board[data-platform][data-screen] .atlas-hand-section .hand-card > strong { display: block; max-height: none; overflow: visible; white-space: normal; overflow-wrap: break-word; hyphens: auto; text-overflow: clip; }
+#app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong { margin-top: 8px; font-size: clamp(.84rem, 3.6vw, 1rem); line-height: 1.15; }
+
+/* En manos de varias cartas, la elegida adquiere la misma jerarquía sin ocultar las demás. */
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected { grid-column: 1 / -1; justify-self: center; width: min(62vw, 240px); min-height: 220px !important; aspect-ratio: 3 / 4 !important; }
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected .carta-reverso { min-height: 112px; }
+
+/* El selector de escala tiene una fila propia, centrada antes del título de la línea. */
+#app.atlas-board .board-timeline-section > .timeline-zoom { margin: 4px auto 5px; padding: 2px; justify-content: center; }
+#app.atlas-board .board-timeline-section > .timeline-zoom [data-zoom-level] { width: auto; min-width: 52px; height: 36px; min-height: 36px; font-size: .72rem; }
+#app.atlas-board .board-timeline-section > .timeline-toolbar { display: flex; flex-direction: row; align-items: baseline; justify-content: space-between; width: 100%; margin: 0 0 3px; }
+
+/* La incisión de la línea es tenue; los huecos pasan a ser nodos circulares. */
+#app.atlas-board .board-timeline-section { padding-top: 4px; }
+#app.atlas-board .board-timeline-section .timeline { position: relative; align-items: stretch; padding: 2px 0 5px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--atlas-selection) 27%, transparent) 8%, color-mix(in srgb, var(--atlas-selection) 27%, transparent) 92%, transparent) center / 100% 1px no-repeat; }
+#app.atlas-board .board-timeline-section .slot { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+#app.atlas-board .board-timeline-section .slot > span { width: 46px; height: 46px; min-height: 46px; border-radius: 50%; border: 1px dashed color-mix(in srgb, var(--atlas-selection) 52%, var(--edition-line)); color: color-mix(in srgb, var(--atlas-selection) 72%, var(--edition-muted)); background: color-mix(in srgb, var(--edition-surface) 68%, transparent); }
+#app.atlas-board .board-timeline-section .timeline-card { box-shadow: 0 2px 0 #b89b6e, 0 6px 12px #4a341a1b; }
+
+/* Marcador multijugador: avatar actual, nombre, avance y cartas restantes. */
+#app.atlas-board .scoreboard-panel { margin: 0 0 5px; padding: 7px 8px 8px; border: 1px solid color-mix(in srgb, var(--edition-brass) 26%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--edition-surface) 43%, transparent); box-shadow: inset 0 1px 0 #fff8; }
+#app.atlas-board .scoreboard-title { margin: 0 0 4px 3px; color: var(--edition-muted); font: 700 .56rem/1 var(--ui-font); letter-spacing: .2em; text-transform: uppercase; }
+#app.atlas-board .scoreboard-panel .scoreboard { display: grid; gap: 4px; max-height: 108px; margin: 0; padding: 0; overflow-x: hidden; overflow-y: auto; scroll-snap-type: y proximity; }
+#app.atlas-board .scoreboard-panel .score { width: 100%; min-width: 0; display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; gap: 8px; align-items: center; padding: 4px 7px; border-radius: 10px; color: var(--edition-ink); background: color-mix(in srgb, var(--edition-surface) 64%, transparent); border: 1px solid color-mix(in srgb, var(--edition-line) 72%, transparent); box-shadow: none; }
+#app.atlas-board .scoreboard-panel .score.active { color: var(--edition-ink); background: color-mix(in srgb, var(--atlas-selection) 6%, var(--edition-surface)); border-color: color-mix(in srgb, var(--atlas-selection) 44%, var(--edition-line)); box-shadow: inset 3px 0 0 var(--atlas-selection); }
+#app.atlas-board .scoreboard-panel .score > .score-avatar { width: 40px; height: 40px; overflow: visible; border-radius: 50%; background: transparent; }
+#app.atlas-board .scoreboard-panel .score > .score-avatar .avatar { width: 40px !important; height: 40px !important; }
+#app.atlas-board .score-copy { min-width: 0; display: grid; gap: 4px; }
+#app.atlas-board .score-copy > b { max-width: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
+#app.atlas-board .score-progress { display: block; width: 100%; height: 5px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--edition-line) 72%, transparent); }
+#app.atlas-board .score-progress > i { display: block; width: var(--player-progress); height: 100%; border-radius: inherit; background: color-mix(in srgb, var(--atlas-selection) 74%, var(--edition-brass)); }
+#app.atlas-board .scoreboard-panel .score > em { width: auto; height: auto; display: grid; gap: 0; place-items: center; border-radius: 0; color: var(--edition-ink); background: transparent; }
+#app.atlas-board .scoreboard-panel .score > em strong { font: 700 1.15rem/1 var(--font-display); }
+#app.atlas-board .scoreboard-panel .score > em small { color: var(--edition-muted); font: .48rem/1 var(--ui-font); text-transform: uppercase; }
+
+#app.atlas-board .placement-dock { gap: 4px; padding-top: 5px; }
+#app.atlas-board .placement-dock > .placement-instruction { margin: 0; font-size: .64rem; }
+#app.atlas-board .placement-dock > .btn-primary { min-height: 42px; border-radius: 12px; }
+
+@media (max-width: 699px) {
+  #app.atlas-board .game-head { margin-bottom: 3px; padding-block: 2px 4px; }
+  #app.atlas-board .board-question { margin-block: 1px 4px; }
+  #app.atlas-board .atlas-hand-section { margin-top: 0; }
+  #app.atlas-board .atlas-hand-section > .hint { margin: 2px 0; }
+  #app.atlas-board .board-timeline-section .timeline-wrap { flex: 0 1 auto; margin-bottom: 0; }
+  #app.atlas-board .board-timeline-section .timeline-card { width: 112px; min-height: 148px; }
+  #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual { height: 86px; }
+  #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) { min-height: 148px; }
+}
+
+@media (max-height: 760px) and (max-width: 699px) {
+  #app.atlas-board .board-question p { display: none; }
+  #app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(48vw, 190px)); }
+  #app.atlas-board .scoreboard-panel .scoreboard { max-height: 82px; }
+  #app.atlas-board .scoreboard-panel .score { grid-template-columns: 34px minmax(0,1fr) 38px; padding-block: 2px; }
+  #app.atlas-board .scoreboard-panel .score > .score-avatar,
+  #app.atlas-board .scoreboard-panel .score > .score-avatar .avatar { width: 32px !important; height: 32px !important; }
+  #app.atlas-board .board-timeline-section .timeline-card { min-height: 132px; }
+  #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) { min-height: 132px; }
+}
+
+/* v345 · Los tres accesos de Inicio caben completos en una sola pantalla móvil. */
+@media (max-width: 699px) {
+  #app[data-screen="home"] .home-doors-shell .home-doors {
+    gap: 8px;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily.is-done {
+    height: 100px;
+    min-height: 100px;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily .home-door-copy,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily.is-done .home-door-copy {
+    width: 82%;
+    height: 100px;
+    min-height: 100px;
+    padding: 9px 15px;
+    gap: 3px;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy b,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily .home-door-copy b {
+    font-size: 1.12rem;
+    line-height: 1.04;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy small {
+    font-size: .7rem;
+    line-height: 1.22;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-cta {
+    min-height: 18px;
+    margin-top: 0;
+    font-size: .7rem;
+    line-height: 1.1;
+  }
+}
+
+/* v348 · Partida completa en el primer vistazo: mano más pequeña y línea protagonista. */
+@media (max-width: 699px) {
+  #app.atlas-board .board-focus-card {
+    margin-top: 0;
+  }
+  #app.atlas-board .board-focus-card > .hand-title {
+    margin: 0 0 2px;
+  }
+  #app.atlas-board .board-focus-card .hand-solo {
+    grid-template-columns: minmax(0, min(33.6vw, 131px));
+    padding-block: 0;
+  }
+  #app.atlas-board[data-platform][data-device][data-screen] .board-focus-card .hand-solo .hand-card {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 3 / 4;
+    padding: 8px;
+  }
+  #app.atlas-board .board-focus-card .hand-solo .carta-reverso {
+    margin-block: 4px;
+  }
+  #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong {
+    margin-top: 4px;
+    font-size: clamp(.72rem, 3vw, .86rem);
+    line-height: 1.12;
+  }
+  #app.atlas-board .board-focus-card > .hint {
+    max-width: 32rem;
+    margin: 2px auto 3px;
+    font-size: .62rem;
+    line-height: 1.2;
+  }
+  #app.atlas-board .board-timeline-section {
+    padding-top: 2px;
+  }
+  #app.atlas-board .board-timeline-section > .timeline-toolbar {
+    margin-bottom: 1px;
+  }
+  #app.atlas-board .board-timeline-section .timeline-wrap {
+    padding-block: 1px 3px;
+  }
+  #app.atlas-board .board-timeline-section .timeline-card {
+    width: 132px;
+    min-height: 184px;
+  }
+  #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
+  #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
+    width: auto;
+    height: 114px;
+    max-height: 114px;
+    aspect-ratio: auto;
+  }
+  #app.atlas-board .board-timeline-section .animal-timeline-card .animal-card-art {
+    object-position: center 44%;
+    -webkit-mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+  }
+  #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) {
+    min-height: 184px;
+  }
+}
+
+@media (max-width: 380px), (max-height: 740px) {
+  #app.atlas-board .board-focus-card .hand-solo {
+    grid-template-columns: minmax(0, min(30.4vw, 117px));
+  }
+  #app.atlas-board .board-timeline-section .timeline-card,
+  #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) {
+    min-height: 168px;
+  }
+  #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
+  #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
+    height: 102px;
+    max-height: 102px;
+  }
+}
