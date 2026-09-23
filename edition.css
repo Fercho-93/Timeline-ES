@@ -2130,18 +2130,19 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 /* La portada: tres puertas —el reto del día, jugar y el atlas— con la misma lámina en
    sepia que la competición. El aviso de duelos solo aparece cuando hay algo pendiente. */
-#app .home-doors { display: grid; gap: 16px; max-width: 720px; margin: 0 auto; }
-#app .home-door { display: flex; position: relative; isolation: isolate; align-items: center; width: 100%; min-height: 190px; padding: 0; overflow: hidden; text-align: left; color: var(--edition-ink); border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-paper); box-shadow: 0 8px 24px #352a1710; cursor: pointer; }
+#app .home-doors { display: grid; gap: 12px; max-width: 720px; margin: 0 auto; }
+#app .home-door { display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 14px; width: 100%; padding: 12px 14px; text-align: left; color: var(--edition-ink); border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-surface); box-shadow: 0 4px 14px #352a170d; cursor: pointer; }
 #app article.home-door { cursor: default; }
-#app .home-door-art { position: absolute; inset: 0; z-index: -1; -webkit-mask-image: radial-gradient(ellipse at 78% 50%,#000 22%,transparent 74%); mask-image: radial-gradient(ellipse at 78% 50%,#000 22%,transparent 74%); }
-#app .home-door-art img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: sepia(1); mix-blend-mode: multiply; opacity: .85; }
-#app .home-door-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 68%; padding: 22px 20px; text-shadow: 0 1px 6px var(--edition-paper); }
+#app .home-door-art { width: 76px; height: 76px; overflow: hidden; border-radius: 6px; border: 1px solid var(--edition-line); }
+#app .home-door-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: sepia(.55) saturate(.8); }
+#app .home-door-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
 #app .home-door-kicker { font: .6rem/1.5 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; color: var(--edition-brass); }
-#app .home-door-copy b { font-family: var(--font-display); font-size: clamp(1.5rem,5vw,2rem); font-weight: 400; line-height: 1.07; }
-#app .home-door-copy small { font: .8rem/1.5 var(--ui-font); color: var(--edition-ink); }
-#app .home-door-cta { display: inline-flex; margin-top: 8px; padding: 7px 0; border-bottom: 1px solid var(--edition-brass); color: var(--edition-brass); font: 600 .77rem/1.3 var(--ui-font); }
-#app .home-door-daily { min-height: 220px; border-color: color-mix(in srgb, var(--edition-brass) 55%, var(--edition-line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edition-brass) 30%, transparent), 0 10px 28px #352a1718; }
-#app .home-door-daily .home-door-copy b { font-size: clamp(1.7rem,6vw,2.4rem); }
+#app .home-door-copy b { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; line-height: 1.1; }
+#app .home-door-copy small { font: .78rem/1.45 var(--ui-font); color: var(--edition-muted); }
+#app .home-door-cta { display: inline-flex; margin-top: 4px; color: var(--edition-brass); font: 600 .75rem/1.3 var(--ui-font); }
+#app .home-door-daily { grid-template-columns: 92px 1fr; border-color: color-mix(in srgb, var(--edition-brass) 55%, var(--edition-line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edition-brass) 30%, transparent), 0 6px 18px #352a1714; }
+#app .home-door-daily .home-door-art { width: 92px; height: 92px; }
+#app .home-door-daily .home-door-copy b { font-size: 1.45rem; }
 #app .home-daily-streak { display: inline-flex; align-items: center; gap: 6px; font: 600 .75rem/1.3 var(--ui-font); color: var(--accent); }
 #app .home-daily-streak .solo-glyph { width: 18px; height: 18px; }
 #app .home-daily-share { margin-top: 10px; min-height: 44px; }
@@ -2170,10 +2171,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .atlas-daily .cal-card { margin-top: 14px; }
 
 @media (max-width: 520px) {
-  #app .home-door { min-height: 170px; }
-  #app .home-door-copy { width: 78%; padding: 18px 16px; }
-  #app .home-door-daily { min-height: 200px; }
   #app .atlas-collection .btn, #app .atlas-duels .btn { width: 100%; }
 }
-:root[data-theme="dark"] #app .home-door-art img { mix-blend-mode: normal; opacity: .35; }
+:root[data-theme="dark"] #app .home-door-art img { filter: sepia(.35) saturate(.8) brightness(.9); }
 :root[data-theme="dark"] #app .home-duels-banner { box-shadow: 0 8px 22px #0006; }
