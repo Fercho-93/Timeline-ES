@@ -8,9 +8,9 @@ import { fileURLToPath } from "node:url";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
-// entra antes en el Atlas desde la barra inferior.
-function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) d.querySelector('.home-nav [data-action="perfil"]')?.click(); return w; }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+// entra antes en el Atlas desde la portada.
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) { if (!d.querySelector('.home-door[data-action="perfil"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('.home-door[data-action="perfil"]')?.click(); } return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -106,7 +106,7 @@ console.log("\nSe entra desde el menú del mazo elegido");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  ok("la barra del menú ofrece el Atlas, que abre la enciclopedia", existe(w, '.home-nav [data-action="perfil"]'));
+  ok("la barra del menú vuelve al inicio, donde está el Atlas", existe(w, '.home-nav [data-action="home-top"]'));
   click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   elegir(w, '#enc-mode-select', 'history');
   ok("se puede elegir Historia de España desde la barra", /Historia de España/.test(texto(w)));
@@ -169,7 +169,7 @@ console.log("\nSin entrada desde dentro de una partida");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  ok("la barra sí ofrece el Atlas, antes de empezar a jugar", existe(w, '.home-nav [data-action="perfil"]'));
+  ok("la barra sí está, antes de empezar a jugar", existe(w, '.home-nav [data-action="home-top"]'));
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   click(w, '[data-action="start"]');
   ok("no hay enciclopedia en la pantalla de pasar el móvil", !existe(w, '[data-action="home-encyclopedia"]'));
@@ -229,7 +229,7 @@ console.log("\nCatálogo completo desde el Atlas");
   click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   const doc = w.document;
   ok("la barra abre una pantalla distinta a Inicio", doc.getElementById('app').dataset.screen === 'enciclopedia');
-  ok("el Atlas queda marcado en la barra", doc.querySelector('.home-nav [aria-current="page"]').dataset.action === 'perfil');
+  ok("ninguna pestaña de la barra queda marcada", !doc.querySelector('.home-nav [aria-current="page"]'));
   ok("se abre con todas las cartas", doc.getElementById('enc-mode-select').value === 'all');
   ok("el álbum abre con los últimos descubrimientos arriba", !!doc.querySelector('.enc-recent') && /Últimos descubrimientos/.test(doc.querySelector('.enc-recent').textContent));
   ok("sin cartas jugadas invita a estrenar la primera lámina", !!doc.querySelector('.enc-recent-empty'));
@@ -261,8 +261,8 @@ console.log("\nCatálogo completo desde el Atlas");
   ok("se puede consultar un mazo con sus filtros propios", doc.querySelectorAll('[data-enc-card]').length === w.CONTINUUM.cards('animals').length && existe(w, '.enc-bands'));
   elegir(w, '#enc-mode-select', 'all');
   ok("se puede volver al catálogo completo", existe(w, '.enc-topic'));
-  click(w, '[data-action="perfil"]');
-  ok("el perfil conserva la barra", existe(w, '.home-nav'));
+  click(w, '[data-action="enc-back"]');
+  ok("cerrar vuelve al Atlas, que conserva la barra", existe(w, '.perfil-section') && existe(w, '.home-nav'));
   click(w, '[data-action="home-top"]');
   ok("Inicio vuelve a la portada y queda marcado", doc.getElementById('app').dataset.screen === 'home' && doc.querySelector('.home-nav [aria-current="page"]').dataset.action === 'home-top');
   w.close();

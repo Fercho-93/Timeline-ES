@@ -20,7 +20,7 @@ Encima de las tres puertas, y solo cuando hay algo pendiente, un aviso de **duel
 turnos**: si es uno, lleva directo a él; si son varios, a la lista con el estado de cada
 uno (tu turno, esperando al rival, retos recibidos, invitaciones enviadas, historial).
 
-La barra inferior sigue el mismo orden: Inicio, Jugar, Atlas, Guía y Ajustes.
+La barra inferior se queda en Inicio, Guía y Ajustes: a Jugar y al Atlas se entra desde la portada.
 
 ## Retos rápidos y ¿Cuántos hay…?
 

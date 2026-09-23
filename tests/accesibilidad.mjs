@@ -15,7 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -185,7 +185,7 @@ console.log("\nEl perfil");
 {
   const w = boot();
   const nav = [...w.document.querySelectorAll(".home-nav button")];
-  ok("los cinco destinos de la portada tienen nombre", nav.length === 5 && nav.every(b => b.getAttribute("aria-label")));
+  ok("los tres destinos de la barra tienen nombre", nav.length === 3 && nav.every(b => b.getAttribute("aria-label")));
 
   click(w, '[data-action="perfil"]');
   ok("el foco va al titular de la pantalla", activo(w) === el(w, "h1[data-focus]"));

@@ -9,7 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -358,7 +358,7 @@ console.log("\nNo se cuela en ninguna pantalla de partida");
   const w = boot();
   abreMazo(w, "historia", "history");
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
-  ok("la preparación conserva el perfil en el menú inferior", existe(w, '.home-nav [data-action="perfil"]'));
+  ok("la preparación conserva el menú inferior", existe(w, '.home-nav [data-action="home-top"]'));
   click(w, '[data-action="start"]');
   click(w, '[data-action="ready"]');
   ok("ni dentro de la partida local", !existe(w, '[data-action="perfil"]'));

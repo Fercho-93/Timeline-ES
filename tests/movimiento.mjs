@@ -7,9 +7,9 @@ import { JSDOM } from "jsdom";
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
-// entra antes en el Atlas desde la barra inferior.
-function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) d.querySelector('.home-nav [data-action="perfil"]')?.click(); return w; }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+// entra antes en el Atlas desde la portada.
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) { if (!d.querySelector('.home-door[data-action="perfil"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('.home-door[data-action="perfil"]')?.click(); } return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
 
 
 const root = new URL("../", import.meta.url);

@@ -6,9 +6,9 @@ import { JSDOM } from 'jsdom';
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
-// entra antes en el Atlas desde la barra inferior.
-function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) d.querySelector('.home-nav [data-action="perfil"]')?.click(); return w; }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+// entra antes en el Atlas desde la portada.
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) { if (!d.querySelector('.home-door[data-action="perfil"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('.home-door[data-action="perfil"]')?.click(); } return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
 
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
@@ -210,10 +210,10 @@ for (const reduce of [false, true]) {
   const w = boot({ seen: true });
   try {
     const doc = w.document;
-    click(w, '[data-action="perfil"]');
     click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
     assert.equal(doc.getElementById('app').dataset.screen, 'enciclopedia');
-    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'perfil');
+    // La barra solo tiene Inicio, Guía y Ajustes: el Atlas se abre desde la portada.
+    assert.equal(doc.querySelector('.home-nav [aria-current="page"]'), null);
     click(w, '[data-action="home-top"]');
     click(irAJugar(w), '[data-block="historia"]');
     click(w, '[data-mode="history"]');
@@ -234,7 +234,7 @@ for (const reduce of [false, true]) {
     click(w, '[data-action="back-menu"]');
     assert.equal(doc.getElementById('app').dataset.screen, 'play-menu');
     click(w, '[data-action="collection-back"]');
-    assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'jugar');
+    assert.equal(doc.getElementById('app').dataset.screen, 'jugar');
     click(w, '[data-action="home-top"]');
     assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-top');
   } finally { w.close(); }
@@ -414,10 +414,10 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
       effects.push(effect);
       return { finished: new Promise(() => {}), cancel() { effect.cancelled = true; } };
     };
-    click(w, '.home-nav [data-action="perfil"]');
+    click(w, '.home-door[data-action="perfil"]');
     assert.ok(w.document.querySelector('.shell.motion-entering'), 'el Atlas usa la entrada común');
     assert.equal(w.document.querySelectorAll('.parchment-dust').length, 0, 'el pergamino no suelta virutas doradas');
-    assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Atlas');
+    assert.equal(w.document.querySelector('.home-nav [aria-current]'), null);
     assert.ok(w.document.querySelector('#app > .shell.motion-managed'));
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
@@ -428,7 +428,7 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
     assert.ok(w.document.querySelector('.enc-modal.motion-managed'), 'Enciclopedia mantiene desactivada la entrada CSS');
     assert.ok(effects.length > encyclopediaRollsBefore);
     assert.equal(w.document.querySelectorAll('.motion-entering').length, 1, 'solo Enciclopedia se revela, no su fondo');
-    assert.equal(w.document.querySelector('.home-nav [aria-current]')?.getAttribute('aria-label'), 'Atlas');
+    assert.equal(w.document.querySelector('.home-nav [aria-current]'), null);
     assert.ok(w.document.querySelector('.enc-background[inert]'), 'el fondo no recibe pulsaciones');
     const beforeClose = effects.length;
     w.document.dispatchEvent(new w.KeyboardEvent('keydown', {key:'Escape',bubbles:true}));
@@ -451,7 +451,8 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
     click(w, '.guide-close');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null, 'cerrar guía limpia el efecto');
     w.matchMedia = () => ({ matches: true });
-    click(w, '[data-action="perfil"]');
+    click(w, '.home-nav [data-action="home-top"]');
+    click(w, '.home-door[data-action="perfil"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
   } finally { w.close(); }
 }
@@ -473,8 +474,9 @@ console.log('Navegación inferior: pestañas a ancho completo, pergamino común 
         click(w, '.home-nav ' + selector);
         assert.equal(w.document.querySelectorAll('#app > .overlay').length, 1);
       }
-      click(w, '.home-nav [data-action="perfil"]');
+      click(w, '.home-nav [data-action="home-top"]');
       assert.equal(w.document.querySelectorAll('#app > .overlay').length, 0);
+      click(w, '.home-door[data-action="perfil"]');
       assert.ok(w.document.querySelector('.perfil-section'));
     }
   } finally { w.close(); }

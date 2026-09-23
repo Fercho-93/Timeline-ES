@@ -90,7 +90,7 @@ console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibr
     click('#app [data-action="ui-back"]'); has('open');
     click('#app [data-exit-confirm]'); has('back');
     click('#app [data-action="back-menu"]');
-    click('#app [data-action="perfil"]'); assert.deepEqual(cues,[],'cambiar de pestaña no añade rebote ni efecto sonoro');
+    click('#app .home-nav [data-action="home-top"]'); assert.deepEqual(cues,[],'cambiar de pestaña no añade rebote ni efecto sonoro');
     // Un repintado idéntico puede llegar del servidor: no significa otra transición.
     cues.length=0;
     const app=w.document.getElementById('app');

@@ -79,7 +79,7 @@ try {
    const encyclopediaPage=await newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
    await encyclopediaPage.goto(url);
    await encyclopediaPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
-   await encyclopediaPage.locator('.home-nav [data-action="perfil"]').click();
+   await encyclopediaPage.locator('.home-door[data-action="perfil"]').click();
    await encyclopediaPage.evaluate(()=>scrollTo(0,Math.min(760,document.documentElement.scrollHeight-innerHeight)));
    await encyclopediaPage.locator('[data-action="home-encyclopedia"]').click();
    const encyclopediaModal=encyclopediaPage.locator('.enc-modal');
@@ -235,7 +235,7 @@ try {
           if(card) window.CONTINUUM.Progreso.record({mode:key,cardId:card.id,correct:true});
         }
       });
-      await page.locator('.home-nav [data-action="perfil"]').click();
+      await page.locator('.home-door[data-action="perfil"]').click();
       await page.locator('[data-action="home-encyclopedia"]').click();
       assert.equal(await page.locator('.enc-recent-card').count(),5,'los descubrimientos abren el álbum');
       assert.ok(await page.locator('.enc-deck-cover img').count()>5,'los mazos tienen portada');

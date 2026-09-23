@@ -371,7 +371,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .atlas-topbar .brand { min-height: 0; text-align: center; font-size: .72rem; letter-spacing: .16em; }
 #app .atlas-topbar .icon-btn { display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 50%; background: transparent; }
 #app.atlas-has-nav > .shell { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-#app .atlas-nav { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); width: 100%; max-width: none; left: 0; transform: none; background: var(--edition-surface); min-height: 64px; z-index: 30; }
+#app .atlas-nav { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: 100%; max-width: none; left: 0; transform: none; background: var(--edition-surface); min-height: 64px; z-index: 30; }
 #app .atlas-nav button { min-height: 50px; min-width: 0; }
 #app .atlas-nav small { font: .67rem/1.3 var(--ui-font); }
 #app .atlas-nav svg { display: block; width: 22px; height: 22px; }
@@ -2136,24 +2136,23 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .home-door-art { width: 76px; height: 76px; overflow: hidden; border-radius: 6px; border: 1px solid var(--edition-line); }
 #app .home-door-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: sepia(.55) saturate(.8); }
 #app .home-door-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
-#app .home-door-kicker { font: .6rem/1.5 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; color: var(--edition-brass); }
 #app .home-door-copy b { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; line-height: 1.1; }
 #app .home-door-copy small { font: .78rem/1.45 var(--ui-font); color: var(--edition-muted); }
 #app .home-door-cta { display: inline-flex; margin-top: 4px; color: var(--edition-brass); font: 600 .75rem/1.3 var(--ui-font); }
 #app .home-door-daily { grid-template-columns: 92px 1fr; border-color: color-mix(in srgb, var(--edition-brass) 55%, var(--edition-line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edition-brass) 30%, transparent), 0 6px 18px #352a1714; }
 #app .home-door-daily .home-door-art { width: 92px; height: 92px; }
 #app .home-door-daily .home-door-copy b { font-size: 1.45rem; }
-#app .home-daily-streak { display: inline-flex; align-items: center; gap: 6px; font: 600 .75rem/1.3 var(--ui-font); color: var(--accent); }
+#app .home-daily-streak { display: inline-flex; align-items: center; gap: 6px; font: 600 .75rem/1.3 var(--ui-font); color: var(--edition-brass); }
 #app .home-daily-streak .solo-glyph { width: 18px; height: 18px; }
 #app .home-daily-share { margin-top: 10px; min-height: 44px; }
 #app .home-door:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 #app .home-duels { max-width: 720px; margin: 0 auto; }
 #app .home-duels:not(:empty) { margin-bottom: 16px; }
-#app .home-duels-banner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 16px; text-align: left; color: #fff; border: 0; border-radius: 8px; background: var(--accent-solid); box-shadow: 0 8px 22px #843b2833; cursor: pointer; }
+#app .home-duels-banner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; width: 100%; min-height: 60px; padding: 10px 16px; text-align: left; color: var(--edition-ink); border: 1px solid color-mix(in srgb, var(--edition-brass) 55%, var(--edition-line)); border-radius: 8px; background: var(--edition-surface); box-shadow: 0 4px 14px #352a170d; cursor: pointer; }
 #app .home-duels-banner b { display: block; font: 700 .95rem/1.3 var(--ui-font); }
-#app .home-duels-banner small { display: block; margin-top: 2px; font: .78rem/1.4 var(--ui-font); opacity: .92; }
-#app .home-duels-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #ffffff26; font-size: 1.1rem; }
-#app .home-duels-banner i { font-style: normal; font-size: 1.2rem; }
+#app .home-duels-banner small { display: block; margin-top: 2px; font: .78rem/1.4 var(--ui-font); color: var(--edition-muted); }
+#app .home-duels-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--edition-line); color: var(--edition-brass); font-size: 1rem; }
+#app .home-duels-banner i { font-style: normal; font-size: 1.1rem; color: var(--edition-brass); }
 #app .home-duels-banner:focus-visible { outline: 3px solid var(--edition-ink); outline-offset: 3px; }
 
 /* Jugar: las tres familias de contenido una debajo de otra. */
@@ -2174,4 +2173,4 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   #app .atlas-collection .btn, #app .atlas-duels .btn { width: 100%; }
 }
 :root[data-theme="dark"] #app .home-door-art img { filter: sepia(.35) saturate(.8) brightness(.9); }
-:root[data-theme="dark"] #app .home-duels-banner { box-shadow: 0 8px 22px #0006; }
+:root[data-theme="dark"] #app .home-duels-banner { box-shadow: 0 6px 18px #0005; }

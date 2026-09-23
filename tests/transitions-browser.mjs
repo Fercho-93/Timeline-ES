@@ -42,8 +42,7 @@ try {
     // Todas las salidas superiores, incluido el cierre mientras aún entra el panel.
     for (const [open, close] of [
       ['[data-action="rules"]', '.rules .atlas-dialog-back'],
-      ['[data-settings-action="open"]', '.settings-modal .atlas-dialog-back'],
-      ['[data-action="perfil"]', '.atlas-topbar .atlas-back']
+      ['[data-settings-action="open"]', '.settings-modal .atlas-dialog-back']
     ]) {
       for (const quick of [false, true]) {
         const backgroundOpacity = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
@@ -58,12 +57,12 @@ try {
       }
     }
     for (let round = 0; round < 2; round++) {
-      for (const selector of ['[data-action="jugar"]', '[data-action="rules"]', '[data-action="perfil"]', '[data-settings-action="open"]', '[data-action="home-top"]']) {
+      for (const selector of ['[data-action="rules"]', '[data-settings-action="open"]', '[data-action="home-top"]']) {
         await page.locator('.home-nav ' + selector).click();
         await settle();
       }
     }
-    await page.locator('.home-nav [data-action="jugar"]').click();
+    await page.locator('.home-door[data-action="jugar"]').click();
     await settle();
     await page.locator('[data-block="historia"]').click();
     await settle();
@@ -77,7 +76,8 @@ try {
     await page.locator('[data-action="solo"]').click();
     await settle();
     // Navegación durante una entrada: la limpieza antigua no toca la nueva.
-    await page.locator('.home-nav [data-action="perfil"]').click();
+    await page.locator('.home-nav [data-action="home-top"]').click();
+    await page.locator('.home-door[data-action="perfil"]').click();
     await page.locator('[data-action="home-encyclopedia"]').click();
     await page.locator('.home-nav [data-settings-action="open"]').click();
     await settle();

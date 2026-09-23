@@ -470,8 +470,8 @@
       <div id="home-duels" class="home-duels"></div>
       <section class="home-doors" aria-label="Qué quieres hacer">
         ${dailyDoor()}
-        ${homeDoor("jugar", "Jugar", "Elige qué y cómo", "Colecciones, retos rápidos y competición.", "hero-mixed", 992)}
-        ${homeDoor("perfil", "Atlas", "Tu colección", "Tus cartas, tu progreso y tus logros.", "hero-geography", 859)}
+        ${homeDoor("jugar", "Jugar", "Colecciones, retos rápidos y competición.", "hero-mixed", 992)}
+        ${homeDoor("perfil", "Atlas", "Tus cartas, tu progreso y tus logros.", "hero-geography", 859)}
       </section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
@@ -480,10 +480,10 @@
     refreshDuelBanner();
   }
 
-  function homeDoor(action, title, kicker, text, art, alto) {
+  function homeDoor(action, title, text, art, alto) {
     return `<button class="home-door" data-action="${action}">
       <span class="home-door-art" aria-hidden="true"><img src="assets/${art}-700.webp" alt="" width="700" height="${alto}" decoding="async"></span>
-      <span class="home-door-copy"><span class="home-door-kicker">${kicker}</span><b>${title}</b><small>${text}</small><span class="home-door-cta" aria-hidden="true">Entrar →</span></span>
+      <span class="home-door-copy"><b>${title}</b><small>${text}</small><span class="home-door-cta" aria-hidden="true">Entrar →</span></span>
     </button>`;
   }
 
@@ -493,12 +493,11 @@
     const dia = today();
     const records = dailyRecords(), hecho = records.days?.[dia], racha = dailyStreak(records);
     const pendiente = !hecho && loadDaily();
-    const fecha = `<time datetime="${dia}">${dia.split("-").reverse().join("/")}</time>`;
     const rachaTexto = `${glyph(GLYPHS.racha)}<span>${racha ? `${racha} ${racha === 1 ? "día seguido" : "días seguidos"}` : "Empieza hoy tu racha"}</span>`;
     const detalle = hecho
       ? `${escapeHtml(CT.mode(dailyModeKey(dia)).name)}: <strong>${hecho.hits} de ${hecho.total}</strong>`
       : "Un mazo sorpresa cada día.";
-    const copy = `<span class="home-door-kicker">${fecha}</span><b>Reto diario</b>
+    const copy = `<b>Reto diario</b>
       <small>${detalle}</small>
       <span class="home-daily-streak">${rachaTexto}</span>`;
     const arte = `<span class="home-door-art" aria-hidden="true"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" fetchpriority="high"></span>`;
@@ -1508,7 +1507,6 @@
       </section>
     </div></div>`);
     app.querySelectorAll('.home-nav [aria-current]').forEach(button => button.removeAttribute('aria-current'));
-    app.querySelector('.home-nav [data-action="perfil"]')?.setAttribute('aria-current', 'page');
     CT.openDialog(app.querySelector('[data-overlay="encyclopedia"]'), true, closeEnciclopedia);
   }
 
