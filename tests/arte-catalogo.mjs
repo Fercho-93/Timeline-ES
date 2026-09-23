@@ -11,7 +11,7 @@ const scripts = [...html.matchAll(/<script\b[^>]*\bsrc="([^"?]+)(?:\?[^"]*)?"[^>
 const window = {};
 // Descubre los catálogos desde la página real, para detectar también nuevos mazos.
 const catalogs = scripts.filter(file => !file.includes('/') && /window\.\w+_CARDS\s*=/.test(read(file)));
-for (const file of [...catalogs, 'modes.js', 'enciclopedia.js']) vm.runInNewContext(read(file), { window });
+for (const file of [...catalogs, 'modes.js', 'enciclopedia.js', 'quick-challenges-data.js']) vm.runInNewContext(read(file), { window });
 const ct = window.CONTINUUM;
 assert(scripts.includes('modes.js'));
 for (const file of catalogs) assert(scripts.indexOf(file) < scripts.indexOf('modes.js'), `${file} se carga después de modes.js`);
@@ -54,5 +54,17 @@ for (const map of source.matchAll(/const \w+_ART_BY_ID = \{([\s\S]*?)\};/g)) {
   assert.equal(ids.length, new Set(ids).size, 'ID repetido en una tabla de imágenes');
   for (const id of ids) assert(uniqueCards.has(id), `Asociación de arte a carta inexistente: ${id}`);
 }
+// Retos rápidos ilustra sus cartas aparte, en su propio catálogo y no en ct.MODES: sin
+// esto, cada imagen de assets/quick-cards/ se veía huérfana aunque estuviera en uso.
+let quickImages = 0;
+for (const challenge of ct.QuickCatalog.challenges) {
+  for (const card of challenge.cards) {
+    if (!card.image) continue;
+    assert(exactPaths.has(card.image), `Archivo ausente o mayúsculas incorrectas: ${card.image}`);
+    used.add(card.image);
+    quickImages += 1;
+  }
+}
+console.log(`Retos rápidos: ${quickImages} cartas ilustradas`);
 assert.deepEqual(artFiles.filter(file => !used.has(file)), [], 'Ilustraciones sin carta');
 console.log(`${uniqueCards.size} cartas únicas; ${artFiles.length} imágenes; ninguna asociación ausente ni imagen huérfana.`);
