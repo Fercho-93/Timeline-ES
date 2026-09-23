@@ -2983,3 +2983,40 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   #app.atlas-board .board-timeline-section .timeline-card { min-height: 132px; }
   #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) { min-height: 132px; }
 }
+
+/* v345 · Los tres accesos de Inicio caben completos en una sola pantalla móvil. */
+@media (max-width: 699px) {
+  #app[data-screen="home"] .home-doors-shell .home-doors {
+    gap: 8px;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily.is-done {
+    height: 100px;
+    min-height: 100px;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily .home-door-copy,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily.is-done .home-door-copy {
+    width: 82%;
+    height: 100px;
+    min-height: 100px;
+    padding: 9px 15px;
+    gap: 3px;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy b,
+  #app[data-screen="home"] .home-doors-shell .home-door-daily .home-door-copy b {
+    font-size: 1.12rem;
+    line-height: 1.04;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy small {
+    font-size: .7rem;
+    line-height: 1.22;
+  }
+  #app[data-screen="home"] .home-doors-shell .home-door-cta {
+    min-height: 18px;
+    margin-top: 0;
+    font-size: .7rem;
+    line-height: 1.1;
+  }
+}
