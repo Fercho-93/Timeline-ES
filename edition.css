@@ -2461,7 +2461,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
       color-mix(in srgb, var(--edition-surface) 8%, transparent) 100%);
 }
 #app .home-doors-shell .home-door-daily::before {
-  content: "✦\\A HOY\\A ✦";
+  content: "✦\A HOY\A ✦";
   position: absolute;
   z-index: 2;
   top: 50%;
