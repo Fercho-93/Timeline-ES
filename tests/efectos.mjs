@@ -40,7 +40,7 @@ for (const savedSound of [false, true]) {
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
   try {
     assert.equal(w.CONTINUUM.effectPrefs().sound,false,'las preferencias antiguas no reactivan efectos');
-    for(const selector of ['[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
+    for(const selector of ['[data-action="jugar"]','[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
       w.document.querySelector('#app '+selector).click();
     }
     w.document.querySelector('[data-settings-action="open"]').click();
@@ -69,6 +69,7 @@ console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibr
   const click=selector=>{const node=w.document.querySelector(selector);assert.ok(node,selector);cues.length=0;node.click();};
   const has=kind=>assert.ok(cues.includes(kind),`${kind}: ${cues.join(',')}`);
   try {
+    click('#app [data-action="jugar"]');
     click('#app [data-block="historia"]'); has('unroll');
     click('#app [data-block="historia"]'); has('close');
     click('#app [data-block="historia"]');
@@ -76,7 +77,6 @@ console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibr
     click('#app [data-format="multi"]'); has('expand');
     click('#app [data-format="multi"]'); has('close');
     click('#app [data-action="solo"]'); has('page');
-    click('#app .solo-fold summary');
     click('#app [data-action="start-free"]'); has('page');
     click('#app .slot'); has('place');
     click('#app [data-action="cancel-place"]'); has('return');

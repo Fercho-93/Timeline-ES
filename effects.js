@@ -5,7 +5,7 @@
   // No añade observadores, esperas ni estado persistido a la partida.
   CT.Scene = {
     apply(mode, screen) {
-      const neutral = ["home", "perfil", "comp-end", "online-entry", "online-loading"].includes(screen);
+      const neutral = ["home", "jugar", "duelos", "perfil", "comp-end", "online-entry", "online-loading"].includes(screen);
       document.documentElement.dataset.scene = !neutral && CT.has(mode) ? CT.blockOf(mode).art : "archive";
     }
   };

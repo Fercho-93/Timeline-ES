@@ -10,6 +10,7 @@ for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[
 const click=action=>{const button=w.document.querySelector('[data-action="'+action+'"]');assert.ok(button,action);button.click();};
 try {
  const defaultBlock=w.CONTINUUM.blockOf(w.CONTINUUM.DEFAULT_MODE).key;
+ click('jugar');
  w.document.querySelector(`[data-action="set-block"][data-block="${defaultBlock}"]`).click();
  w.document.querySelector(`[data-action="set-mode"][data-mode="${w.CONTINUUM.DEFAULT_MODE}"]`).click();
  assert.ok(w.document.querySelector('[data-action="solo"]'));

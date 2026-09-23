@@ -8,6 +8,10 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -26,7 +30,7 @@ const submit = (w, sel) => { const el = w.document.querySelector(sel); if (!el) 
 
 console.log("\nEntrar en el modo desde el menú de verdad");
 let w = boot();
-click(w, '[data-block="historia"]');
+click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 ok("el menú real ofrece la tercera opción, sin tocar nada aparte", !!w.document.querySelector('[data-action="local-multiplayer"]'));
@@ -51,7 +55,7 @@ ok("no revienta: vuelve al vestíbulo con un aviso, no con una pantalla en blanc
 
 console.log("\nUnirse a una sala con un código inválido");
 w = boot();
-click(w, '[data-block="historia"]');
+click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="local-multiplayer"]');

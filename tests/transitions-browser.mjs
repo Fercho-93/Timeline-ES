@@ -41,7 +41,6 @@ try {
     };
     // Todas las salidas superiores, incluido el cierre mientras aún entra el panel.
     for (const [open, close] of [
-      ['[data-action="home-encyclopedia"]', '.enc-modal > [data-action="enc-back"]'],
       ['[data-action="rules"]', '.rules .atlas-dialog-back'],
       ['[data-settings-action="open"]', '.settings-modal .atlas-dialog-back'],
       ['[data-action="perfil"]', '.atlas-topbar .atlas-back']
@@ -59,11 +58,13 @@ try {
       }
     }
     for (let round = 0; round < 2; round++) {
-      for (const selector of ['[data-action="home-encyclopedia"]', '[data-action="rules"]', '[data-action="perfil"]', '[data-settings-action="open"]', '[data-action="home-top"]']) {
+      for (const selector of ['[data-action="jugar"]', '[data-action="rules"]', '[data-action="perfil"]', '[data-settings-action="open"]', '[data-action="home-top"]']) {
         await page.locator('.home-nav ' + selector).click();
         await settle();
       }
     }
+    await page.locator('.home-nav [data-action="jugar"]').click();
+    await settle();
     await page.locator('[data-block="historia"]').click();
     await settle();
     await page.locator('[data-mode="history"]').click();
@@ -75,11 +76,9 @@ try {
     await page.locator('[data-action="back-menu"]').click();
     await page.locator('[data-action="solo"]').click();
     await settle();
-    await page.locator('.solo-fold summary').first().click();
-    await settle();
     // Navegación durante una entrada: la limpieza antigua no toca la nueva.
     await page.locator('.home-nav [data-action="perfil"]').click();
-    await page.locator('.home-nav [data-action="home-encyclopedia"]').click();
+    await page.locator('[data-action="home-encyclopedia"]').click();
     await page.locator('.home-nav [data-settings-action="open"]').click();
     await settle();
     assert.equal(await page.locator('.home-nav').filter({visible:true}).count(), 1);

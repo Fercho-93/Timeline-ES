@@ -2,6 +2,10 @@ import {gameHtml} from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 const read = f => fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
 const html = gameHtml(read('index.html'));
 function boot(reduce = true) {
@@ -27,7 +31,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
 {
   const w=boot();
   try {
-    click(w,'[data-block="naturaleza"]');click(w,'[data-mode="animals"]');
+    click(irAJugar(w),'[data-block="naturaleza"]');click(w,'[data-mode="animals"]');
     assert.equal(w.document.querySelectorAll('.atlas-specimens figure').length,3);
     assert.equal(w.document.querySelectorAll('.home-nav button').length,5);
     assert.ok(w.document.querySelector('.home-nav [data-action="rules"]'));
@@ -141,6 +145,8 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
       Object.defineProperties(event, {beta:{value:beta}, gamma:{value:gamma}});
       w.dispatchEvent(event);
     };
+    // Las portadas de las colecciones viven en «Jugar».
+    w.document.querySelector('[data-action="jugar"]').click();
     inclina(0, 0);            // la primera lectura fija el origen
     inclina(9, 9);            // media inclinación en los dos ejes
     await new Promise(resolve => setTimeout(resolve, 40));   // el frame que escribe

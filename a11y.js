@@ -95,7 +95,12 @@
     }).catch(() => {});
   }
 
-  let homePosition = null;
+  // La posición y el foco de las pantallas con galería (Inicio y Jugar), para volver a
+  // ellas donde se dejaron.
+  const galleryScreens = ["home", "jugar"];
+  const galleryPositions = {};
+  // La altura de la pantalla sobre la que se abrió la enciclopedia, para volver a ella.
+  let encyclopediaOrigin = null;
   function restoreWindowPosition(top) {
     const root = document.documentElement;
     const previous = root.style.getPropertyValue("scroll-behavior");
@@ -138,7 +143,7 @@
     };
   }, true);
   const primaryNavigationActive = () => !!primaryNavigationMotion;
-  const preparationDepth = { home: 0, "play-menu": 1, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
+  const preparationDepth = { home: 0, jugar: 0.5, duelos: 0.5, "play-menu": 1, "duel-home": 2, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
 
   // Una sola entrada por superficie. La marca permanece al terminar para que CSS
   // no reactive una segunda entrada cuando se retira el estado transitorio.
@@ -311,12 +316,13 @@
     const previousWindowTop = window.scrollY;
     const primero = paint.screen === undefined;
     const cambioDePantalla = screen !== paint.screen;
-    const vuelve = screen === "home" ||
+    const vuelve = galleryScreens.includes(screen) ||
       (screen === "solo-home" && ["solo", "solo-end", "review"].includes(paint.screen)) ||
       (screen === "online-entry" && !["home", "online-loading"].includes(paint.screen));
-    if (cambioDePantalla && paint.screen === "home") {
-      homePosition = { top: window.scrollY, focus: clave };
+    if (cambioDePantalla && galleryScreens.includes(paint.screen)) {
+      galleryPositions[paint.screen] = { top: window.scrollY, focus: clave };
     }
+    if (cambioDePantalla && screen === "enciclopedia") encyclopediaOrigin = { screen: paint.screen, top: window.scrollY };
     const cartaElegida = container.querySelector(".hand-card.selected")?.dataset.id || null;
     const confirmacionAnterior = container.querySelector(".slot-confirm")?.dataset.index ?? null;
     const oldFinal = container.querySelector('.final-results')?.textContent;
@@ -391,7 +397,8 @@
     if (cambioDePantalla) {
       // El foco anuncia la pantalla, pero no decide dónde empieza la vista. En móvil
       // el titular de Inicio está debajo de la galería; enfocarlo saltaba la portada.
-      const regreso = screen === "home" && homePosition;
+      const desdeEnciclopedia = closingEncyclopedia && encyclopediaOrigin?.screen === screen ? { top: encyclopediaOrigin.top, focus: null } : null;
+      const regreso = desdeEnciclopedia || (galleryScreens.includes(screen) && galleryPositions[screen]);
       const conservaFondo = screen === "enciclopedia";
       const destino = regreso?.focus && container.querySelector(regreso.focus);
       focus(destino || container.querySelector("[data-focus]"), { preventScroll: true });

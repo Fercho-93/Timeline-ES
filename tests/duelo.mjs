@@ -6,6 +6,10 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -49,7 +53,7 @@ const partida = w => JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
 // Entra en un duelo de orden recién creado.
 async function abreDuelo(w) {
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-action="duel-home"]');
   click(w, '[data-action="start-duel"]');
   await jugar(w);
 }
@@ -60,7 +64,7 @@ const click = (w, sel) => {
 };
 const existe = (w, sel) => !!w.document.querySelector(sel);
 const texto = w => w.document.body.textContent;
-const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
+const abreMazo = (w, block, mode) => { click(irAJugar(w), `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
 
 // Juega el duelo que hay en curso hasta el final, acertando o fallando a voluntad.
 // Devuelve la secuencia real, para contrastarla con lo que viaja en el enlace.
@@ -206,7 +210,7 @@ console.log("\nCrear un duelo y jugarlo");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-action="duel-home"]');
   ok("el duelo es un formato más del solitario", /Duelo por enlace/.test(texto(w)));
   w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-duel"]');
@@ -383,7 +387,7 @@ console.log("\nCerrar la aplicación no devuelve el plazo");
     "hilo-solo-history-v1": JSON.stringify({ ...guardada, cartaEmpezadaEn: Date.now() - 60000 })
   } });
   abreMazo(vuelta, "historia", "history");
-  click(vuelta, '[data-action="solo"]');
+  click(vuelta, '[data-action="duel-home"]');
   click(vuelta, '[data-action="resume-solo"]');
   ok("al continuar, la carta que seguía abierta se cierra", existe(vuelta, ".overlay"));
   ok("y se cierra como salida", /Has salido de la aplicación/.test(texto(vuelta)));
@@ -393,7 +397,7 @@ console.log("\nCerrar la aplicación no devuelve el plazo");
     "hilo-solo-history-v1": JSON.stringify({ ...guardada, cartaEmpezadaEn: Date.now() - 500 })
   } });
   abreMazo(rapida, "historia", "history");
-  click(rapida, '[data-action="solo"]');
+  click(rapida, '[data-action="duel-home"]');
   click(rapida, '[data-action="resume-solo"]');
   ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && partida(rapida).played === 0);
 }

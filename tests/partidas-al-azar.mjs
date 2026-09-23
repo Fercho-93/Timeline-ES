@@ -5,6 +5,10 @@ import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -36,7 +40,7 @@ for (let g = 0; g < muestras.length; g++) {
   try {
   const [mode, block, globalName] = muestras[g];
   // Hay que abrir antes el bloque: la portada solo lista los juegos del bloque en pantalla.
-  fire(w, w.document.querySelector(`[data-block="${block}"]`));
+  fire(w, irAJugar(w).document.querySelector(`[data-block="${block}"]`));
   fire(w, w.document.querySelector(`[data-mode="${mode}"]`));
   const mazo = w[globalName];
   // El sorteo de quién empieza saca una única carta para adivinar su fecha y la aparta

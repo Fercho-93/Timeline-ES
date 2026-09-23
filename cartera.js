@@ -46,10 +46,10 @@
   // a estar cerrado, que es justo lo que interesa para poder mirarlo tantas veces como
   // haga falta. Para quitar la simulación basta con dejar la lista vacía.
   //
-  // Hay dos casos dentro a propósito, porque no se ven igual: «Gran mezcla temporal» es un
-  // mazo suelto —su bloque solo lo tiene a él—, mientras que Ciencia es una colección
-  // entera, con su carátula bloqueada y sus dos mazos diciendo que vienen juntos.
-  const SIMULACION = ["mixed", "astronomy", "medicine"];
+  // Vacía durante la beta: todo el catálogo está abierto mientras se prueba. Para volver a
+  // ver la puerta cerrada basta con poner aquí algún mazo, por ejemplo
+  // ["mixed", "astronomy", "medicine"]: un mazo suelto y una colección entera.
+  const SIMULACION = [];
 
   // ── Lo que se puede comprar ────────────────────────────────────────────────────────
   //
@@ -220,13 +220,22 @@
     return true;
   }
 
+  // Los mazos de los que sale el reto diario. Tiene que ser el mismo bote para todo el
+  // mundo —si dependiera de lo que ha comprado cada cuenta, dos personas no jugarían el
+  // mismo reto—, así que no mira la concesión sino los mazos gratis para siempre. Mientras
+  // esa lista esté sin decidir, la beta los trata todos como gratis.
+  function diarios() {
+    const libres = LIBRES.filter(CT.has);
+    return libres.length ? libres : Object.keys(CT.MODES);
+  }
+
   function origen() { return concesion.origen; }
   function todoAbierto() { return cerrados().length === 0; }
 
   CT.Cartera = {
     PAQUETE_TODO, LIBRES, SIMULACION,
     tiene, tieneBloque, cerrados, abiertos, motivo, opciones, paquete, paquetes,
-    concede, arranque, compraSimulada, origen, todoAbierto
+    concede, arranque, compraSimulada, origen, todoAbierto, diarios
   };
 
   // La cartera se deja lista al cargarse, no al arrancar la interfaz: `app.js` decide qué

@@ -132,7 +132,7 @@ assert.equal(CT.QuickCatalog.upcoming, undefined, 'La colección pendiente ya no
 assert.equal(CT.has('counts'), false, 'La colección eliminada no entra en partidas ni en competición');
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
 const click = selector => {const el = w.document.querySelector(selector); assert.ok(el, selector); el.click();};
-click('[data-action="quick-challenges"]'); click('[data-quick="show-multi"]'); click('[data-quick="local"]');
+click('[data-action="jugar"]'); click('[data-action="quick-challenges"]'); click('[data-quick="show-multi"]'); click('[data-quick="local"]');
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
 click('[data-quick="start"]');
 let saved = JSON.parse(w.localStorage.getItem(key));
@@ -151,7 +151,7 @@ for (let r = 0; r < 3; r++) {
   const snapshot = w.localStorage.getItem(key);
   assert.equal(E.restore(JSON.parse(snapshot)).phase, 'result');
   w.close(); w = boot(snapshot); CT = w.CONTINUUM; E = CT.QuickEngine;
-  click('[data-action="quick-challenges"]'); click('[data-quick="resume"]');
+  click('[data-action="jugar"]'); click('[data-action="quick-challenges"]'); click('[data-quick="resume"]');
   assert.match(w.document.querySelector('#app').textContent, /¡Bien colocado!/);
   click('[data-quick="ack"]'); click('[data-quick="bank"]'); click('[data-quick="bank"]');
   assert.equal(E.restore(JSON.parse(w.localStorage.getItem(key))).phase, 'round-end');
@@ -161,9 +161,9 @@ assert.equal(w.document.querySelector('[data-quick="next"]'), null);
 assert.match(w.document.querySelector('#app').textContent, /Gana|Victoria compartida/);
 click('[data-action="home"]');
 assert.equal(w.document.querySelector('[data-action="quick-counts"]'), null, 'La colección eliminada no aparece en inicio');
-assert.ok(w.document.querySelector('[data-action="competition-menu"]'));
+assert.ok(w.document.querySelector('[data-action="jugar"]'));
 w.close();
-w = boot('{invalid'); click('[data-action="quick-challenges"]');
+w = boot('{invalid'); click('[data-action="jugar"]'); click('[data-action="quick-challenges"]');
 assert.match(w.document.querySelector('#app').textContent, /No se ha podido recuperar/);
 assert.equal(w.document.querySelector('[data-quick="resume"]'), null);
 w.close();

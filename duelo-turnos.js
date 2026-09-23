@@ -431,7 +431,13 @@ function open({ mode = 'history', kind = 'orden', gameId = '', back } = {}) { st
 function close() { stop?.(); stop = null; clearInterval(timer); document.removeEventListener('visibilitychange', leaveGuard); current = null; onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') place(pendingIndex); if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
 CT.TurnDuel = { open, close, list, cancel, TURN_SECONDS, READY_SECONDS };
-Object.assign(CT.TurnDuel, { rivals, favorite, challenge, next, archive, block, headToHead, profileMarkup, reshare });
+// Los duelos que esperan algo de quien juega: los suyos en los que le toca y los retos
+// que le han mandado. Es lo que la portada avisa; lo demás se ve en la lista completa.
+function pending(games = cachedGames) {
+  return games.filter(g => !archivedIds.has(g.id) && ((g.status === 'playing' && g.turnUid === uid()) || (g.status === 'waiting' && g.invitedUid === uid() && !blockedPlayers.has(g.playersOrder[0]))))
+    .sort((a, b) => (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0));
+}
+Object.assign(CT.TurnDuel, { rivals, favorite, challenge, next, archive, block, headToHead, profileMarkup, reshare, pending });
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-turn-action]');
   const actions = { ready: () => { prepareTurn(true); render(); }, retry: retryPending, rematch: () => challenge(current.id), next: () => next(), accept: () => join(current.id, onBack, true), decline: () => cancel(current.id, 'waiting') };

@@ -16,7 +16,7 @@ function boot(saved={}) {
 const snapshot=w=>({session:{...w.sessionStorage},local:{...w.localStorage}});
 let w=boot();
 const click=selector=>{const el=w.document.querySelector(selector);assert.ok(el,selector);el.click();};
-click('[data-block="historia"]');click('[data-mode="history"]');click('[data-format="multi"]');
+click('[data-action="jugar"]');click('[data-block="historia"]');click('[data-mode="history"]');click('[data-format="multi"]');
 let saved=snapshot(w);w.close();w=boot(saved);
 assert.equal(w.document.querySelector('#app').dataset.screen,'play-menu');
 assert.equal(w.document.querySelector('[data-format="multi"]').getAttribute('aria-expanded'),'true');

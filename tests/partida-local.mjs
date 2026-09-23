@@ -5,6 +5,10 @@ import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -25,12 +29,12 @@ const click = (w, sel) => { const el = w.document.querySelector(sel); if (!el) t
 
 console.log("\nArranque");
 let w = boot();
-ok("los seis bloques están en la galería", w.document.querySelectorAll("[data-block]").length === 6);
-click(w, '[data-block="historia"]');
+ok("los seis bloques están en la galería", irAJugar(w).document.querySelectorAll("[data-block]").length === 6);
+click(irAJugar(w), '[data-block="historia"]');
 ok("el bloque de historia se despliega con el mazo de historia", /167 hechos/.test(w.document.body.innerHTML));
 // Elegir bloque selecciona su primer juego; el clic en el juego es explícito de todos
 // modos, que es como funcionará cuando un bloque tenga varios.
-click(w, '[data-block="cine"]');
+click(irAJugar(w), '[data-block="cine"]');
 ok("Entretenimiento reúne cine, música y videojuegos", w.document.querySelectorAll(".game-row").length === 3);
 ok("el bloque de cine muestra las 87 películas", /87 películas/.test(w.document.body.innerHTML));
 click(w, '[data-mode="movies"]');
@@ -38,7 +42,7 @@ ok("elegir un juego lleva al menú de formatos de Estrenos de cine", w.document.
 
 console.log("\nUna partida entera");
 w = boot();
-click(w, '[data-block="historia"]');
+click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
@@ -80,7 +84,7 @@ ok(`cada turno revela la fecha de su carta (${revealed} de ${turns})`, revealed 
 
 console.log("\nFechas ocultas y persistencia");
 w = boot();
-click(w, '[data-block="historia"]');
+click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
@@ -95,7 +99,7 @@ ok("la partida queda guardada en el dispositivo", !!w.localStorage.getItem("hilo
 
 console.log("\nSorteo de quién empieza: adivinar la fecha");
 w = boot();
-click(w, '[data-block="historia"]');
+click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
@@ -121,7 +125,7 @@ ok("la carta que se adivinó no entra en la partida", enJuego.size === w.HISTORY
 
 console.log("\nEmpezar sin pasar por el sorteo también decide quién empieza");
 w = boot();
-click(w, '[data-block="historia"]');
+click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
@@ -131,7 +135,7 @@ ok("aun así se aparta la carta del sorteo", [...partidaSinPasar.deck, ...partid
 
 console.log("\nAbandonar partida también desde la flecha de volver");
 w = boot();
-click(w, '[data-block="historia"]');
+click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');

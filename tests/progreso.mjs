@@ -7,6 +7,10 @@ import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -39,7 +43,7 @@ const click = (w, sel) => {
 const existe = (w, sel) => !!w.document.querySelector(sel);
 const texto = w => w.document.body.textContent;
 const perfil = w => JSON.parse(w.localStorage.getItem("hilo-perfil-v1"));
-const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
+const abreMazo = (w, block, mode) => { click(irAJugar(w), `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
 
 // Juega una partida en solitario entera acertando o fallando a voluntad. Devuelve
 // cuántas cartas se colocaron bien, para poder contrastarlas con lo que anotó el perfil.
@@ -209,7 +213,7 @@ console.log("\nAlmacenamiento roto, lleno o de otra versión");
   const w = boot({ "hilo-perfil-v1": "{ esto no es json" });
   ok("un perfil corrupto se lee como uno vacío", w.CONTINUUM.Progreso.read().totals.cards === 0);
   click(w, '[data-action="perfil"]');
-  ok("y la pantalla del perfil se pinta igual", /Perfil/.test(texto(w)) && existe(w, ".logro-grid"));
+  ok("y la pantalla del Atlas se pinta igual", /Atlas/.test(texto(w)) && existe(w, ".logro-grid"));
 }
 {
   // Un perfil escrito por una versión anterior, sin los contadores que se añadieron
@@ -223,21 +227,23 @@ console.log("\nAlmacenamiento roto, lleno o de otra versión");
 }
 {
   // Una instalación anterior al perfil: tiene récords y racha, pero ninguna clave nueva.
+  // La racha era la del antiguo reto diario por mazo, que ya no existe: se borra y el
+  // reto para todos empieza de cero. La mejor marca de la partida libre se queda.
   const previo = { history: { best: 9, streak: 4, lastDay: "2026-01-01", days: { "2026-01-01": { hits: 9, total: 15 } } } };
   const w = boot({ "hilo-retos-v1": JSON.stringify(previo) });
   ok("no hay perfil todavía", w.localStorage.getItem("hilo-perfil-v1") === null);
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
-  ok("el solitario sigue enseñando la racha de antes", /4/.test(texto(w)));
+  ok("el solitario sigue enseñando la mejor marca de antes", /Mejor marca en Fácil: 9/.test(texto(w)));
   const guardado = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
-  ok("los récords de antes no se tocan", guardado.history.best === 9 && guardado.history.streak === 4);
+  ok("la marca se conserva y la racha por mazo se borra", guardado.history.best === 9 && guardado.history.streak === undefined);
 }
 
 console.log("\nLa pantalla del perfil");
 {
   const w = boot();
   click(w, '[data-action="perfil"]');
-  ok("se llega desde la portada", w.document.querySelector("h1")?.textContent === "Perfil");
+  ok("se llega desde la portada", w.document.querySelector("h1")?.textContent === "Atlas");
   ok("un perfil sin estrenar lo dice sin números falsos", /Todavía no hay nada que contar/.test(texto(w)));
   ok("todos los logros se pintan aunque estén bloqueados", w.document.querySelectorAll(".logro").length === w.CONTINUUM.Progreso.ACHIEVEMENTS.length);
   ok("ninguno aparece como conseguido", w.document.querySelectorAll(".logro.unlocked").length === 0);
@@ -325,7 +331,7 @@ console.log("\nCopia de seguridad");
 {
   // Con un récord y una racha ya guardados, para poder comprobar que borrar el perfil
   // no se lleva por delante el reto diario, que vive en otra clave.
-  const retos = { history: { best: 11, streak: 5, lastDay: "2026-02-02", days: { "2026-02-02": { hits: 11, total: 15 } } } };
+  const retos = { history: { best: 11 }, retoDiario: { best: 11, streak: 5, lastDay: "2026-02-02", days: { "2026-02-02": { hits: 11, total: 15 } } } };
   const w = boot({ "hilo-retos-v1": JSON.stringify(retos) });
   abreMazo(w, "historia", "history");
   click(w, '[data-action="solo"]');
@@ -342,9 +348,9 @@ console.log("\nCopia de seguridad");
   click(w, '[data-action="perfil-reset-confirm"]');
   ok("confirmar sí lo borra", w.CONTINUUM.Progreso.read().totals.cards === 0);
   const tras = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
-  ok("el récord del reto diario sobrevive al borrado", tras?.history?.best === 11);
-  ok("y su racha también", tras.history.streak === 5 && tras.history.lastDay === "2026-02-02");
-  ok("la pantalla se queda en el perfil, ya vacío", w.document.querySelector("h1")?.textContent === "Perfil");
+  ok("el récord del reto diario sobrevive al borrado", tras?.retoDiario?.best === 11 && tras.history.best === 11);
+  ok("y su racha también", tras.retoDiario.streak === 5 && tras.retoDiario.lastDay === "2026-02-02");
+  ok("la pantalla se queda en el Atlas, ya vacío", w.document.querySelector("h1")?.textContent === "Atlas");
 }
 
 console.log("\nNo se cuela en ninguna pantalla de partida");

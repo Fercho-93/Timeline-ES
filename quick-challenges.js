@@ -16,11 +16,11 @@
   }
   function shell(content) {
     const playing=!!state || !!connection || page==='network-lobby';
-    paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(playing ? 'data-quick="exit"' : page==='menu' ? 'data-action="home"' : 'data-quick="formats"', state ? 'data-quick="menu"' : '', playing)}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
+    paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(playing ? 'data-quick="exit"' : page==='menu' ? 'data-action="jugar"' : 'data-quick="formats"', state ? 'data-quick="menu"' : '', playing)}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
   let format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null, readyTimer = null;
-  const DAILY = 'continuum-quick-daily-v1', BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1', HISTORY = 'continuum-quick-history-v1';
+  const BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1', HISTORY = 'continuum-quick-history-v1';
   const day = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
   function readJSON(key, fallback=null) {try{return JSON.parse(CT.Storage.getItem(key)) || fallback;}catch{return fallback;}}
   function historyId() {return globalThis.crypto?.randomUUID?.() || `quick-${Date.now()}-${Math.random().toString(36).slice(2)}`;}
@@ -56,7 +56,9 @@
     stopNetwork();page='menu';state=null;record=null;const saved=load();
     shell(`${masthead('Retos rápidos','Ordena. Arriesga. Asegura.','quick')}<section class="home-play"><section class="play-choices" aria-labelledby="quick-formats-title"><div class="play-choices-head"><div><div class="eyebrow">Elegir formato</div><h2 id="quick-formats-title">¿Cómo quieres jugar?</h2></div></div>
     <div class="play-choice-block"><button class="play-block-toggle walking-choice" data-quick="show-multi" aria-expanded="false"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Multijugador</b><small>Un solo móvil o varios.</small></span><i aria-hidden="true">⌄</i></button><div id="quick-multi" class="play-choice-grid" hidden>${choice('local','Un solo móvil','Pasad el teléfono en cada turno.','local')}${choice('internet','Varios móviles','Crear sala o unirse por internet.','internet')}${choice('offline','Sin conexión','Varios móviles en la misma red Wi-Fi.','offline')}</div></div>
-    <div class="direct-solo"><button class="play-choice walking-choice" data-quick="solo-menu"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Reto diario, partida libre o duelo por enlace.</small></span><i aria-hidden="true">→</i></button></div>
+    <div class="direct-solo"><button class="play-choice walking-choice" data-quick="free"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Elige la duración y supera tu marca.</small></span><i aria-hidden="true">→</i></button></div>
+    <div class="direct-solo"><button class="play-choice walking-choice duel-choice" data-quick="turn-duel"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Retar a un amigo</b><small>Un duelo por turnos, cada uno en su móvil.</small></span><i aria-hidden="true">→</i></button></div>
+    <div class="quick-secondary-actions"><button class="btn btn-secondary btn-block" data-quick="guide">Guía de Retos rápidos</button><button class="btn btn-ghost btn-block" data-quick="stats">Historial y estadísticas</button></div>
     ${saved ? button('resume','Continuar partida guardada','continue-choice') : ''}${readJSON(NET) ? button('reconnect','Volver a mi sala por internet','continue-choice') : ''}<p id="quick-error" role="alert">${esc(error)}</p></section></section>`);
   }
   function choiceIcon(kind) {
@@ -66,25 +68,6 @@
     return `<svg ${common}><rect x="3" y="6" width="8" height="13" rx="1.8"></rect><rect x="13" y="5" width="8" height="13" rx="1.8"></rect><path d="M11 12h2"></path></svg>`;
   }
   function choice(action,title,subtitle,kind) {return `<button class="play-choice" data-quick="${action}"><span class="choice-icon">${choiceIcon(kind)}</span><span><b>${title}</b><small>${subtitle}</small></span><i aria-hidden="true">→</i></button>`;}
-  function soloFold(kind, title, caption, icon, copy) {
-    const date = day();
-    return `<details class="panel solo-panel solo-fold" name="quick-solo-options" data-solo-kind="${kind}"><summary><span class="solo-option-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${icon}</svg></span><span class="solo-option-copy"><b>${title}</b>${kind === 'daily' ? `<time datetime="${date}">${date.split('-').reverse().join('/')}</time>` : ''}<small>${caption}</small></span></summary><div class="solo-fold-body">${copy}</div></details>`;
-  }
-  function soloMenu() {
-    page='solo-menu';state=null;record=null;const daily=readJSON(DAILY),today=day();const done=daily?.config?.day===today;let score='';
-    if(done){try{const s=E.restore(daily);score=`${s.players[0].score} puntos asegurados`;}catch{}}
-    const dailyIcon='<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>';
-    const freeIcon='<rect x="7" y="4" width="13" height="17" rx="2"/><path d="M4 17V3h12M11 9h5m-5 4h5"/>';
-    const duelIcon='<path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m0 12a4 4 0 0 0 6 0l5-5a4 4 0 0 0-6-6l-1 1"/>';
-    const dailyBody=`<p>Las mismas cartas para todo el mundo, un intento al día.</p>${button('daily',done?'Ver o continuar el reto de hoy':'Jugar el reto de hoy','btn btn-primary btn-block')}${score?`<p class="solo-done">Hoy ya lo has jugado: <strong>${score}</strong>.</p>`:''}`;
-    const freeBody=`<p>Elige la duración y juega mazos sorpresa.</p><p class="hint">Mejor marca: ${Number(readJSON(BEST,0)) || 0} puntos.</p>${button('free','Elegir duración <span>→</span>','btn btn-primary btn-block')}`;
-    const duelBody=`<p>Reta a otra persona por enlace. Se juega siempre por turnos, con el mismo mazo oculto para ambos.</p>${button('turn-duel','Crear o unirse al duelo','btn btn-primary btn-block')}`;
-    shell(`<section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
-      <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">Acertar suma. Plantarte asegura tus puntos. Fallar termina el reto y pierde los puntos provisionales.</p></div>
-    ${soloFold('daily','Reto diario','Un reto distinto cada día',dailyIcon,dailyBody)}
-    ${soloFold('free','Partida libre','A tu ritmo y a tu nivel',freeIcon,freeBody)}
-    ${soloFold('duel','Duelo por enlace','Las mismas cartas, otro rival',duelIcon,duelBody)}<div class="quick-secondary-actions"><button class="btn btn-secondary btn-block" data-quick="guide">Guía de Retos rápidos</button><button class="btn btn-ghost btn-block" data-quick="stats">Historial y estadísticas</button></div><p id="quick-error" role="alert"></p></section>`);
-  }
   function rounds(count=3, selectedId=null, seed=null) {
     const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed));
     if (selectedId) return [E.challenge(selectedId)].map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
@@ -103,12 +86,6 @@
   function freeSetup() {
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
     shell(`<section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> Partida libre</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los mazos se sortearán sin mostrarte cuáles son.</p><div class="panel"><div class="field"><label for="quick-free-length">Duración de la partida</label><select id="quick-free-length"><option value="1">1 mazo · partida rápida</option><option value="3" selected>3 mazos · partida estándar</option><option value="5">5 mazos · partida larga</option></select></div>${button('start-free','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
-  }
-  function dailyGame() {
-    const today=day(),saved=readJSON(DAILY);
-    format='daily';
-    if(saved?.config?.day===today){record=saved;state=E.restore(record);render();return;}
-    prepare({names:['Tú'],rounds:rounds(1,null,`quick-${CT.QuickCatalog.version}-${today}`),kind:'daily',day:today});
   }
   function duelLink() {
     const url=new URL(location.href);url.hash='quick-duel='+CT.LocalTransport.encodeText(JSON.stringify(record));return url.href;
@@ -165,11 +142,9 @@
   async function formatAction(action) {
     if(action==='formats'){formatMenu();return true;}
     if(action==='show-multi'){const target=app().querySelector('[data-quick="show-multi"]'),panel=app().querySelector('#quick-multi');panel.hidden=!panel.hidden;target.setAttribute('aria-expanded',String(!panel.hidden));target.parentElement.classList.toggle('open',!panel.hidden);return true;}
-    if(action==='solo-menu'){soloMenu();return true;}
     if(action==='local'){format=action;setup();return true;}
     if(action==='free'){freeSetup();return true;}
     if(action==='duel'||action==='turn-duel'){networkSetup('internet',2);return true;}
-    if(action==='daily'){dailyGame();return true;}
     if(action==='accept-duel'){acceptDuel(app().querySelector('#quick-duel-link').value);return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(['internet','offline','turn-duel'].includes(action)){networkSetup(action==='offline'?'local':'internet',action==='turn-duel'?2:4);return true;}
@@ -210,7 +185,6 @@
   function save() {
     if(room)return;
     CT.Storage.setItem(KEY, JSON.stringify(record));
-    if(record.config.kind==='daily')CT.Storage.setItem(DAILY,JSON.stringify(record));
     if(record.config.kind==='free' && state.phase==='round-end' && state.index===record.config.rounds.length-1)CT.Storage.setItem(BEST,JSON.stringify(Math.max(Number(readJSON(BEST,0))||0,state.players[0].score)));
   }
   function dispatch(command) {
@@ -273,11 +247,9 @@
     CT.announce(slot === null ? 'Carta elegida. Elige un hueco.' : `Hueco ${slot + 1} elegido. Confirma la colocación.`);
   }
   function abandonQuick() {
-    const kind=record?.config?.kind || state?.config?.kind;
     const hadRoom=!!room;
     stopNetwork();
     CT.Storage.removeItem(KEY);
-    if (kind === 'daily') CT.Storage.removeItem(DAILY);
     if (hadRoom) CT.Storage.removeItem(NET);
     pendingConfig=null; state=null; record=null; selected=null; slot=null;
     formatMenu();
@@ -296,7 +268,7 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    const formatActions=['formats','show-multi','solo-menu','local','free','duel','daily','accept-duel','share-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','share-signal','invite-peer','accept-answer','reconnect'];
+    const formatActions=['formats','show-multi','local','free','duel','accept-duel','share-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','share-signal','invite-peer','accept-answer','reconnect'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);

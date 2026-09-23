@@ -28,6 +28,7 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+    await page.locator('[data-action="jugar"]').click();
     const sizes = await page.locator('.gallery-panel').evaluateAll(els => els.map(el => ({w:el.getBoundingClientRect().width,h:el.getBoundingClientRect().height})));
     assert.ok(sizes.length >= 2);
     for (const size of sizes.slice(-2)) assert.deepEqual(size, sizes[0], 'Los nuevos bloques tienen el tamaño de las colecciones');

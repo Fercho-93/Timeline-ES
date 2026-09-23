@@ -17,7 +17,7 @@ const click=sel=>{const el=w.document.querySelector(sel);assert.ok(el,sel);el.cl
 const state=()=>JSON.parse(w.localStorage.getItem(key));
 assert.equal(w.document.querySelector('[data-action="start-competition"]'),null);
 assert.equal(w.document.getElementById('competition-length'),null);
-click('[data-action="competition-menu"]');
+click('[data-action="jugar"]');click('[data-action="competition-menu"]');
 assert.ok(w.document.querySelector('[data-action="start-competition"]'));
 w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='1';
 click('[data-format="competition-multi"]');
@@ -45,7 +45,7 @@ for(let round=0;round<3;round++) {
  assert.equal(w.document.querySelectorAll('.chapter-stop.current').length,1);
  assert.ok(w.document.querySelector('.final-metrics'),'el cierre resume el resultado antes de las acciones');
  assert.equal(state().tournament.index,round);
- const saved=w.localStorage.getItem(key);w.close();w=boot(saved);click('[data-action="competition-menu"]');click('[data-action="competition-resume"]');
+ const saved=w.localStorage.getItem(key);w.close();w=boot(saved);click('[data-action="jugar"]');click('[data-action="competition-menu"]');click('[data-action="competition-resume"]');
  assert.ok(w.document.querySelector('.tournament-board'));
  if(round<2){const prior=state().mode;click('[data-action="competition-next"]');assert.notEqual(state().mode,prior);assert.ok(state().players.every(p=>p.hand.length===1));click('[data-action="competition-round-start"]');}
 }
@@ -54,7 +54,7 @@ assert.match(w.document.querySelector('.tournament-board').textContent,/3 puntos
 assert.equal(w.document.querySelectorAll('.chapter-stop.complete').length,2);
 w.close();
 // Solitario conserva el mismo ciclo y respeta el número de cartas elegido.
-w=boot();click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';
+w=boot();click('[data-action="jugar"]');click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';
 click('[data-action="start-competition"]');click('[data-action="comp-next-round"]');
 let solo=JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
 assert.equal(solo.cardsPerRound,2);assert.equal(solo.solo.total,2);

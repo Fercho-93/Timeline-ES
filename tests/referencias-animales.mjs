@@ -5,6 +5,10 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const scripts = [...gameHtml(read("index.html")).matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
@@ -30,7 +34,7 @@ function play(cardId, neighbourId, slot, expected) {
     starter: 0, turnsInRound: 0, round: 1, winner: null
   }));
   scripts.forEach(file => w.eval(read(file)));
-  click(w, '[data-block="naturaleza"]');
+  click(irAJugar(w), '[data-block="naturaleza"]');
   click(w, '[data-mode="speed"]');
   click(w, '[data-format="multi"]');
   click(w, '[data-action="continue"]');

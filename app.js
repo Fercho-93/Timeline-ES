@@ -23,7 +23,7 @@
   const paint = html => {
     if (CT.Accounts && !CT.Accounts.ready) return;
     if (CT.UI.isPlaying(screen) && !CT.UI.isPlaying(lastPaintedScreen)) {
-      playReturn = ['setup', 'solo-home', 'competition-menu', 'duelo-intro'].includes(lastPaintedScreen) ? lastPaintedScreen : 'play-menu';
+      playReturn = ['setup', 'solo-home', 'duel-home', 'competition-menu', 'duelo-intro'].includes(lastPaintedScreen) ? lastPaintedScreen : 'play-menu';
     }
     if (screen !== lastPaintedScreen && !navigatingBack) {
       if (screen === 'home') navigationTrail.length = 0;
@@ -53,10 +53,11 @@
     // portada. Pintar la puerta cerrada aquí no valdría, porque la ruta guardada pintaría
     // encima justo después.
     if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
-    const routes = {'home': home, 'play-menu': playMenu, 'solo-home': soloHome,
+    const routes = {'home': home, 'jugar': jugarView, 'duelos': duelsView, 'play-menu': playMenu, 'solo-home': soloHome, 'duel-home': duelHome,
       'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-lobby': quickChallenges, 'perfil': perfilView};
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
-    if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
+    if (view.screen === 'solo' && view.soloKind === 'daily') routes.solo = () => resumeSolo('daily');
+    else if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
     // Y el duelo de cifras se recupera con su reloj puesto en hora: recargar durante una
     // carta no devuelve el plazo entero, cierra esa carta.
     routes.cifras = resumeCifras;
@@ -72,11 +73,12 @@
     routes[view.screen]();
     return true;
   }
-  function resumeSolo() {
-    solo = loadSolo();
+  function resumeSolo(kind = "mode") {
+    solo = kind === "daily" ? loadDaily() : loadSolo();
+    if (kind === "daily" && solo) soloSlot = "daily";
     if (solo) cardsById = new Map(solo.savedDeck.map(card => [card.id, card]));
     pendingIndex = null;
-    if (!solo) soloHome();
+    if (!solo) kind === "daily" ? home() : soloHome();
     else if (solo.pendingResult) {
       result = {
         correct: solo.pendingResult.correct, card: cardsById.get(solo.pendingResult.cardId), solo: true,
@@ -264,7 +266,7 @@
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
       </button>${mazos}</div>`;
-    }).join("")}<div class="gallery-divider" role="separator" aria-label="Minijuegos y retos"><span class="gallery-divider-line" aria-hidden="true"></span><span class="gallery-divider-label" aria-hidden="true">Minijuegos y retos</span><span class="gallery-divider-line" aria-hidden="true"></span></div>${CT.Quick.blocks()}</div>`;
+    }).join("")}</div>`;
   }
 
   // Los juegos del bloque en pantalla.
@@ -321,10 +323,12 @@
       <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="local-multiplayer"><span class="choice-icon">${playIcon("offline")}</span><span><b>Sin conexión</b><small>Varios móviles, sin internet — una red Wi-Fi local basta.</small></span><i aria-hidden="true">→</i></button>
       ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}`;
-    const solo = `<button class="play-choice walking-choice" data-action="solo"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Reto diario o partida libre.</small></span><i aria-hidden="true">→</i></button>`;
+    const solo = `<button class="play-choice walking-choice" data-action="solo"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Partida libre hasta perder las vidas.</small></span><i aria-hidden="true">→</i></button>`;
+    const duelo = `<button class="play-choice walking-choice duel-choice" data-action="duel-home"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Retar a un amigo</b><small>Las mismas cartas para los dos, por enlace.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
       ${formatBlock("multi", "Multijugador", "Un solo móvil o varios.", multi)}
       <div class="direct-solo">${solo}</div>
+      <div class="direct-solo">${duelo}</div>
     </section>`;
   }
 
@@ -339,7 +343,7 @@
     screen = 'competition-menu';
     const multi = `<button class="play-choice primary" data-action="competition-local"><span class="choice-icon">${playIcon('local')}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="competition-online"><span class="choice-icon">${playIcon('online')}</span><span><b>Varios móviles</b><small>La misma sala durante todas las rondas.</small></span><i aria-hidden="true">→</i></button>`;
-    paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="mode-masthead comp-atlas-intro"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async"><div><div class="eyebrow">Mazos aleatorios</div><h1 data-focus tabindex="-1">Modo competición</h1><p>Termina una ronda y descubre otro mazo, sin repetir temáticas.</p></div></section>
       <section class="home-play"><div class="panel setup-grid">
         <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
@@ -429,15 +433,16 @@
         selectedBlockKey = previous.block; formatOpen = previous.format;
         pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
         collectionDetails = previous.collectionDetails; homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
-        const render = {'home':home, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'perfil':perfilView, 'duelo-intro':duelIntro}[previous.screen];
+        const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'perfil':perfilView, 'duelo-intro':duelIntro}[previous.screen];
         if (render) render(); else { screen = previous.screen; paint(previous.html); }
         return;
       }
     }
     if (screen === 'setup' && pendingTournament) { pendingTournament=null;competitionMenu();return; }
-    if (["setup", "solo-home", "online-loading", "online-error"].includes(screen)) playMenu();
-    else if (screen === "duelo-intro") soloHome();
-    else if (screen === "play-menu") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
+    if (["setup", "solo-home", "duel-home", "online-loading", "online-error"].includes(screen)) playMenu();
+    else if (screen === "duelo-intro") duelHome();
+    else if (screen === "play-menu") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
+    else if (["competition-menu", "quick-challenges"].includes(screen)) jugarView();
     else if (screen === "enciclopedia") app.querySelector('[data-action="enc-back"]')?.click();
     else if (screen === "perfil" && profileReturn === "play-menu") playMenu();
     else if (screen === "perfil" && profileReturn === "solo-home") soloHome();
@@ -454,17 +459,118 @@
     CT.Quick.open((html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);});
   }
 
+  // La portada tiene tres puertas y nada más: el reto del día, jugar y el atlas. Encima,
+  // solo cuando hay algo pendiente, el aviso de los duelos en los que te toca.
   function home() {
     CT.Quick.leave();
     pendingTournament = null;
     screen = "home";
-    paint(`<div class="shell home-shell home-gallery-shell">${header('<button class="icon-btn" data-action="rules">Guía</button>')}
-      ${homeMasthead()}${quickActions()}<section class="hero"><div class="hero-copy"><section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Explora los mazos</div><h2>Colección</h2></div>${gallery()}</section>
-      <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un reto sin fin</div><h2>Modo competición</h2></div>${competitionPromo()}</section></div></section>
+    paint(`<div class="shell home-shell home-doors-shell">${header()}
+      ${homeMasthead()}${quickActions()}
+      <div id="home-duels" class="home-duels"></div>
+      <section class="home-doors" aria-label="Qué quieres hacer">
+        ${dailyDoor()}
+        ${homeDoor("jugar", "Jugar", "Elige qué y cómo", "Grandes colecciones, retos rápidos y competición. Solo, con más gente o retando a un amigo.", "hero-mixed", 992)}
+        ${homeDoor("perfil", "Atlas", "Tu colección", "Las cartas que has descubierto, tu progreso y tus logros.", "hero-geography", 859)}
+      </section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
     </div>`);
     showCacheVersion();
+    refreshDuelBanner();
+  }
+
+  function homeDoor(action, title, kicker, text, art, alto) {
+    return `<button class="home-door" data-action="${action}">
+      <span class="home-door-art" aria-hidden="true"><img src="assets/${art}-700.webp" alt="" width="700" height="${alto}" decoding="async"></span>
+      <span class="home-door-copy"><span class="home-door-kicker">${kicker}</span><b>${title}</b><small>${text}</small><span class="home-door-cta" aria-hidden="true">Entrar →</span></span>
+    </button>`;
+  }
+
+  // El reto del día enseña su mazo desde la portada: saber de qué va hoy es parte de lo
+  // que hace volver. Hecho, deja de ser un botón y se queda con el resultado y la racha.
+  function dailyDoor() {
+    const dia = today(), modeKey = dailyModeKey(dia), mode = CT.mode(modeKey);
+    const records = dailyRecords(), hecho = records.days?.[dia], racha = dailyStreak(records);
+    const pendiente = !hecho && loadDaily();
+    const art = BLOCK_ART[CT.blockOf(modeKey)?.art] || BLOCK_ART.mixed;
+    const fecha = `<time datetime="${dia}">${dia.split("-").reverse().join("/")}</time>`;
+    const rachaTexto = `${glyph(GLYPHS.racha)}<span>${racha ? `${racha} ${racha === 1 ? "día seguido" : "días seguidos"}` : "Empieza hoy tu racha"}</span>`;
+    const copy = `<span class="home-door-kicker">Reto diario · ${fecha}</span><b>${escapeHtml(mode.name)}</b>
+      <small>${hecho ? `Hoy: <strong>${hecho.hits} de ${hecho.total}</strong>. Mañana, otro mazo.` : `Las mismas ${DAILY_CARDS} cartas para todo el mundo. Un intento al día.`}</small>
+      <span class="home-daily-streak">${rachaTexto}</span>`;
+    const arte = `<span class="home-door-art" aria-hidden="true"><img src="assets/${art.archivo}-700.webp" alt="" width="700" height="${art.alto[700]}" decoding="async" fetchpriority="high"></span>`;
+    if (hecho) return `<article class="home-door home-door-daily is-done">${arte}<span class="home-door-copy">${copy}
+      <button class="btn btn-secondary home-daily-share" data-action="share-daily-home">Compartir resultado</button></span></article>`;
+    return `<button class="home-door home-door-daily" data-action="daily-start">${arte}<span class="home-door-copy">${copy}
+      <span class="home-door-cta" aria-hidden="true">${pendiente ? "Continuar el reto" : "Jugar el reto de hoy"} →</span></span></button>`;
+  }
+
+  function shareDailyFromHome() {
+    const dia = today(), records = dailyRecords(), hecho = records.days?.[dia];
+    if (!hecho) return;
+    compartir(shareText(CT.mode(dailyModeKey(dia)).name, dia, hecho.hits, hecho.total, hecho.sequence || [], records.streak), "Resultado copiado");
+  }
+
+  // El aviso solo existe cuando hay algo que hacer. Con un duelo, lleva directo a él;
+  // con varios, a la lista, donde cada uno dice en qué punto está.
+  let pendingDuels = [];
+  function refreshDuelBanner() {
+    const box = document.getElementById("home-duels");
+    if (!box) return;
+    turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
+      if (!box.isConnected || screen !== "home") return;
+      pendingDuels = CT.TurnDuel.pending?.(partidas) || [];
+      if (!pendingDuels.length) return;
+      const n = pendingDuels.length;
+      const turnos = pendingDuels.filter(g => g.status === "playing").length, retos = n - turnos;
+      const detalle = [turnos ? `${turnos} ${turnos === 1 ? "te espera" : "te esperan"}` : "", retos ? `${retos} ${retos === 1 ? "reto nuevo" : "retos nuevos"}` : ""].filter(Boolean).join(" · ");
+      box.innerHTML = `<button class="home-duels-banner" data-action="duels-open"><span class="home-duels-mark" aria-hidden="true">⚔</span><span><b>${n === 1 ? "Tienes un duelo pendiente" : `Tienes ${n} duelos pendientes`}</b><small>${detalle}</small></span><i aria-hidden="true">→</i></button>`;
+    }).catch(() => { /* sin conexión no hay aviso: la portada sigue igual */ });
+  }
+
+  function openPendingDuels() {
+    if (pendingDuels.length === 1) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: pendingDuels[0].id, back: home }));
+    else duelsView();
+  }
+
+  // Todos tus duelos por turnos, agrupados por lo que esperan: tu turno, el del rival,
+  // retos recibidos, invitaciones enviadas e historial.
+  function duelsView() {
+    screen = "duelos";
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+      <section class="setup-section perfil-section">
+        <header class="atlas-page-heading"><div class="eyebrow">Retos entre amigos</div><h1 data-focus tabindex="-1">Tus duelos</h1><p>En qué punto está cada uno y a quién le toca.</p></header>
+        <section class="panel turn-duel-profile" id="turn-duels-list"><p role="status">Cargando tus duelos…</p></section>
+      </section>
+      ${homeNav()}
+    </div>`);
+    const box = document.getElementById("turn-duels-list");
+    turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
+      if (!box?.isConnected || screen !== "duelos") return;
+      box.innerHTML = CT.TurnDuel.profileMarkup(partidas).replace(/^<h2>Mis duelos<\/h2>/, "");
+    }).catch(() => { if (box?.isConnected && screen === "duelos") box.innerHTML = '<p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a intentarlo.</p>'; });
+  }
+
+  // Después de tocar un duelo (rendirse, archivar, bloquear…) se repinta la pantalla
+  // desde la que se tocó.
+  function duelsRefresh() { screen === "duelos" ? duelsView() : perfilView(); }
+
+  // Jugar: primero qué, luego cómo. Tres bloques, cada uno con su propio «¿Cómo quieres
+  // jugar?» detrás.
+  function jugarView() {
+    CT.Quick.leave();
+    pendingTournament = null;
+    screen = "jugar";
+    paint(`<div class="shell home-shell home-gallery-shell jugar-shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+      <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige qué jugar</div><h1 data-focus tabindex="-1">Jugar</h1><p>Después eliges cómo: solo, con más gente o retando a un amigo.</p></header>
+      <section class="hero"><div class="hero-copy">
+        <section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Mazos completos</div><h2>Grandes colecciones</h2></div>${gallery()}</section>
+        <section class="home-quick"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Temas cortos y concretos</div><h2>Retos rápidos</h2></div><div class="gallery">${CT.Quick.blocks()}</div></section>
+        <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un tema distinto en cada ronda</div><h2>Competición</h2></div>${competitionPromo()}</section>
+      </div></section>
+      ${homeNav()}
+    </div>`);
   }
 
   // Se llega aquí con un mazo ya elegido, así que es el sitio natural para ojearlo
@@ -1400,7 +1506,7 @@
       </section>
     </div></div>`);
     app.querySelectorAll('.home-nav [aria-current]').forEach(button => button.removeAttribute('aria-current'));
-    app.querySelector('.home-nav [data-action="home-encyclopedia"]')?.setAttribute('aria-current', 'page');
+    app.querySelector('.home-nav [data-action="perfil"]')?.setAttribute('aria-current', 'page');
     CT.openDialog(app.querySelector('[data-overlay="encyclopedia"]'), true, closeEnciclopedia);
   }
 
@@ -1521,12 +1627,29 @@
       </div>`;
   }
 
+  // El Atlas junta lo que antes eran el perfil y la enciclopedia: arriba la colección,
+  // con la puerta a todas las cartas, y debajo el recorrido de quien juega.
+  function atlasColeccion() {
+    return `<section class="panel atlas-collection"><div><h2>Tu colección</h2>${perfilColeccion()}</div>
+      <button class="btn btn-primary" data-action="home-encyclopedia">Explorar todas las cartas <span aria-hidden="true">→</span></button></section>`;
+  }
+
+  function atlasRetoDiario() {
+    const records = dailyRecords(), racha = dailyStreak(records);
+    return `<section class="panel atlas-daily"><h2>Reto diario</h2>
+      <div class="solo-stats daily-stats">
+        <span>${glyph(GLYPHS.racha)}<b>${racha}</b><small>${racha === 1 ? "día seguido" : "días seguidos"}</small></span>
+        <span>${glyph(GLYPHS.marca)}<b>${records.best || 0}</b><small>mejor resultado</small></span>
+      </div>
+      ${calendarHtml(records)}</section>`;
+  }
+
   function perfilColeccion() {
     const keys = Object.keys(CT.MODES || {}).filter(key => key !== "mixed" && (!CT.Cartera || CT.Cartera.tiene(key)));
     const total = keys.reduce((sum, key) => sum + (CT.Enciclopedia?.seenProgress(key)?.total || 0), 0);
     const seen = keys.reduce((sum, key) => sum + (CT.Enciclopedia?.seenProgress(key)?.seen || 0), 0);
     const decks = keys.length;
-    return `<div class="panel perfil-collection"><div><b>${seen}/${total}</b><span>láminas descubiertas</span></div><small>${decks} ${decks === 1 ? "mazo disponible" : "mazos disponibles"} · juega una carta para completar tu álbum</small></div>`;
+    return `<div class="perfil-collection"><div><b>${seen}/${total}</b><span>láminas descubiertas</span></div><small>${decks} ${decks === 1 ? "mazo disponible" : "mazos disponibles"} · juega una carta para completar tu álbum</small></div>`;
   }
 
   function perfilLogros(logros) {
@@ -1579,25 +1702,22 @@
     const estrenado = resumen.cards > 0 || resumen.games > 0;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Tu historia en Continuum</div><h1 data-focus tabindex="-1">Perfil</h1><p>Cada partida deja una huella. Este es tu recorrido.</p></header>
+        <header class="atlas-page-heading"><div class="eyebrow">Tu colección y tu recorrido</div><h1 data-focus tabindex="-1">Atlas</h1><p>Las cartas que has descubierto y la huella que deja cada partida.</p></header>
+        ${atlasColeccion()}
+        ${atlasRetoDiario()}
+        <section class="panel atlas-duels"><div><h2>Tus duelos</h2><p>Retos por turnos con tus amigos: en qué punto está cada uno.</p></div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section>
         <div class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</div>
         ${estrenado
           ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
           : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
         ${perfilResumen(resumen)}
-        ${perfilColeccion()}
-        <div class="perfil-main"><section class="panel turn-duel-profile" id="turn-duels-profile"><h2>Mis duelos</h2><p role="status">Cargando tus partidas…</p></section>
+        <div class="perfil-main">
         ${perfilPorJuego(filas)}
         ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
         ${perfilLogros(CT.Progreso.achievements())}</div>
       </section>
       ${homeNav()}
     </div>`);
-    const box = document.getElementById("turn-duels-profile");
-    turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
-      if (!box?.isConnected || screen !== "perfil") return;
-      box.innerHTML = CT.TurnDuel.profileMarkup(partidas);
-    }).catch(() => { if (box?.isConnected && screen === 'perfil') box.innerHTML = '<h2>Mis duelos</h2><p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a abrir el perfil.</p>'; });
   }
 
   async function perfilExport() {
@@ -1664,7 +1784,10 @@
     return !enDuelo() && solo.lives === 0;
   }
 
-  function soloKey() { return `hilo-solo-${selectedModeKey}-v1`; }
+  // El reto diario tiene su propio hueco de guardado: comparte mazo con la partida libre
+  // y el duelo de ese día, y empezarlo no puede pisar una partida libre a medias.
+  let soloSlot = "mode";
+  function soloKey() { return soloSlot === "daily" ? DAILY_SAVE_KEY : `hilo-solo-${selectedModeKey}-v1`; }
 
   function today() { return new Date().toLocaleDateString("sv-SE"); }
 
@@ -1688,6 +1811,84 @@
     try { return JSON.parse(CT.Storage.getItem(RECORDS_KEY)) || {}; } catch { return {}; }
   }
 
+  // ── El reto diario ────────────────────────────────────────────────────────────────
+  //
+  // Uno para todo el mundo: cada día sale un mazo, el mismo en todos los móviles, y de
+  // él las mismas cartas. El mazo se sortea con la fecha como semilla entre los mazos
+  // gratuitos (`CT.Cartera.diarios`), nunca entre los que ha comprado cada cuenta, que
+  // harían que dos personas no jugaran el mismo reto. La racha es una sola, la del reto,
+  // y no una por mazo.
+  // Sus marcas viven dentro de `hilo-retos-v1`, junto a las de cada mazo, porque esa es
+  // la clave que la cuenta sincroniza con la nube: así la racha sigue al jugador de un
+  // móvil a otro. `retoDiario` no es el nombre de ningún mazo.
+  const DAILY_RECORDS_FIELD = "retoDiario";
+  const DAILY_SAVE_KEY = "continuum-reto-diario-partida-v2";
+
+  function dailyPick(day) {
+    const pool = CT.Cartera.diarios().filter(CT.has);
+    return pool[Math.floor(seededRandom(seedFrom(`reto-diario:${day}`))() * pool.length)];
+  }
+  // Un sorteo al azar repetiría mazo dos días seguidos de vez en cuando; se evita
+  // saltando al siguiente del bote. Solo mira el día anterior sin corregir, así que no
+  // hay cadena de cálculos hacia atrás.
+  function dailyModeKey(day = today()) {
+    const pool = CT.Cartera.diarios().filter(CT.has);
+    const pick = dailyPick(day);
+    if (pool.length < 2 || pick !== dailyPick(previousDay(day))) return pick;
+    return pool[(pool.indexOf(pick) + 1) % pool.length];
+  }
+
+  function dailyRecords() {
+    const stored = readRecords()[DAILY_RECORDS_FIELD];
+    if (stored) return stored;
+    olvidaRetosPorMazo();
+    return { best: 0, streak: 0, lastDay: "", days: {} };
+  }
+
+  function saveDailyRecords(entry) {
+    const records = readRecords();
+    records[DAILY_RECORDS_FIELD] = entry;
+    try { CT.Storage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* almacenamiento lleno */ }
+  }
+
+  // Las rachas del antiguo reto diario por mazo se borran la primera vez que se consulta
+  // el nuevo: el reto es ahora uno para todos y su racha empieza de cero. Las mejores
+  // marcas de la partida libre se quedan donde estaban. Se hace al consultar y no al
+  // cargar para que ya esté puesto el almacenamiento de la cuenta que juega.
+  function olvidaRetosPorMazo() {
+    try {
+      const records = readRecords();
+      for (const entry of Object.values(records)) { if (entry && typeof entry === "object") { delete entry.days; delete entry.streak; delete entry.lastDay; } }
+      records[DAILY_RECORDS_FIELD] = { best: 0, streak: 0, lastDay: "", days: {} };
+      CT.Storage.setItem(RECORDS_KEY, JSON.stringify(records));
+      CT.Storage.removeItem("continuum-quick-daily-v1");
+    } catch { /* sin almacenamiento no hay nada que borrar */ }
+  }
+
+  // La racha de hoy solo sigue viva si ayer también se jugó (o si hoy ya está jugado).
+  function dailyStreak(records = dailyRecords()) {
+    return records.lastDay === today() || records.lastDay === yesterday() ? records.streak || 0 : 0;
+  }
+
+  function loadDaily() {
+    try {
+      const stored = JSON.parse(CT.Storage.getItem(DAILY_SAVE_KEY));
+      if (!stored || stored.kind !== "daily" || stored.day !== today() || stored.finished || !CT.has(stored.mode)) return null;
+      return CT.Saves.read(DAILY_SAVE_KEY, stored.mode);
+    } catch { return null; }
+  }
+
+  function startDaily() {
+    const pendiente = loadDaily();
+    if (pendiente) { setMode(pendiente.mode); resumeSolo("daily"); return; }
+    if (dailyRecords().days?.[today()]) { home(); return; }
+    // `setMode` pinta la puerta cerrada si el mazo no es suyo; el bote del reto son los
+    // gratuitos, así que no debería pasar, pero si pasa se queda en esa explicación.
+    if (!setMode(dailyModeKey())) return;
+    soloSlot = "daily";
+    startSolo("daily");
+  }
+
   function modeRecords() {
     const records = readRecords();
     return records[selectedModeKey] || { best: 0, streak: 0, lastDay: "", days: {} };
@@ -1707,11 +1908,12 @@
   }
 
   function loadSolo() {
+    soloSlot = "mode";
     try {
       const stored = CT.Saves.read(soloKey(), selectedModeKey);
       if (!stored || !stored.timeline || stored.finished) return null;
-      // El reto diario caduca: si es de otro día ya no vale continuarlo.
-      if (stored.kind === "daily" && stored.day !== today()) return null;
+      // Los guardados del antiguo reto diario por mazo ya no se continúan.
+      if (stored.kind === "daily") return null;
       return stored;
     } catch { return null; }
   }
@@ -1774,23 +1976,11 @@
     solo = loadSolo();
     pendingIndex = null;
     const records = modeRecords();
-    const doneToday = records.days && records.days[today()];
     const mode = currentMode();
     const pendiente = solo && solo.kind === "free";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
-        <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">${SOLO_LIVES} vidas · Cada fallo cuesta una. En duelo, juega las ${CT.Duelo.CARTAS} cartas sin límite de vidas.</p></div>
-        <div class="panel solo-panel">
-          <div class="solo-panel-head"><h3>Reto diario</h3><time datetime="${today()}">${today().split("-").reverse().join("/")}</time></div>
-          ${doneToday
-            ? `<p class="solo-done">Hoy ya lo has jugado: <strong>${doneToday.hits} de ${doneToday.total}</strong>. Vuelve mañana.</p>`
-            : `<p>Las mismas ${DAILY_CARDS} cartas para todo el mundo, un intento al día.</p><button class="btn btn-primary btn-block" data-action="start-daily">Jugar el reto de hoy <span>→</span></button>`}
-          <div class="solo-stats daily-stats">
-            <span>${glyph(GLYPHS.racha)}<b>${records.streak || 0}</b><small>${records.streak === 1 ? "día seguido" : "días seguidos"}</small></span>
-            <span>${glyph(GLYPHS.marca)}<b>${records.best || 0}</b><small>mejor marca · Fácil</small></span>
-          </div>
-          ${calendarHtml(records)}
-        </div>
+        <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">${SOLO_LIVES} vidas · Cada fallo cuesta una.</p></div>
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Partida libre</h3></div>
           <p>El mazo entero, hasta perder las tres vidas o agotarlo.</p>
@@ -1799,7 +1989,21 @@
           ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
         </div>
+      </section>
+    </div>`);
+  }
+
+  // Retar a un amigo: el duelo por enlace, que antes vivía dentro del solitario, tiene
+  // ahora su propia pantalla como tercera manera de jugar un mazo.
+  function duelHome() {
+    screen = "duel-home";
+    solo = loadSolo();
+    pendingIndex = null;
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
+      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Retar a un amigo</h2>
+        <p class="lead">Las mismas cartas para los dos. Gana quien más acierte.</p><p class="solo-intro-rule">En duelo se juegan las ${CT.Duelo.CARTAS} cartas sin límite de vidas.</p></div>
         ${duelPanel()}
+        <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus duelos en curso</button>
       </section>
     </div>`);
   }
@@ -2168,7 +2372,7 @@
     if (solo.kind === "comp") return compRoundFinish();
     screen = "solo-end";
     const total = solo.total || solo.played;
-    const records = modeRecords();
+    const records = solo.kind === "daily" ? dailyRecords() : modeRecords();
     const difficulty=solo.difficulty||'easy';
     const previousBest=records.bestByDifficulty?.[difficulty]||((difficulty==='easy'?records.best:0)||0);
     // Se guarda con cada marca, no solo al crearlo, para que una instalación que ya
@@ -2193,7 +2397,8 @@
       // No hace falta guardar el histórico entero: basta con los últimos días.
       const dias = Object.keys(records.days).sort().slice(-60);
       records.days = Object.fromEntries(dias.map(clave => [clave, records.days[clave]]));
-      saveRecords(records);
+      records.best = Math.max(records.best || 0, solo.hits);
+      saveDailyRecords(records);
     } else if (solo.kind === "free") {
       records.bestByDifficulty = records.bestByDifficulty || { easy: records.best || 0 };
       records.bestByDifficulty[difficulty] = Math.max(records.bestByDifficulty[difficulty] || 0, solo.hits);
@@ -2225,7 +2430,7 @@
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,soloKind==='free'?(finalHits>previousBest?'nueva mejor marca':'mejor marca'):'mejor marca',newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,soloKind==='free'?(finalHits>previousBest?'nueva mejor marca':'mejor marca'):'mejor marca',newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}${soloKind === "daily" ? '<button class="btn btn-primary" data-action="home">Ir al inicio</button>' : `<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="${duelo ? "duel-home" : "solo"}">${duelo ? "Volver a los duelos" : "Volver a solitario"}</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`}</div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -2465,7 +2670,7 @@
   // carta en vez de regalar un reloj nuevo.
   function resumeCifras() {
     cifras = cargaCifras();
-    if (!cifras) return soloHome();
+    if (!cifras) return duelHome();
     if (cifras.jugadas.length >= cifras.total) return cifrasFinish();
     if (cifras.empezadaEn === null) return abreCarta();
     // La carta seguía abierta. Si se ha estado fuera más que el margen de gracia se
@@ -2591,7 +2796,7 @@
       ${cuerpo}
       ${salidas ? `<p class="hint">${salidas === 1 ? "Una carta se cerró" : `${salidas} cartas se cerraron`} por salir de la aplicación.</p>` : ""}
       ${logrosMarkup(sessionLogros)}
-      <div class="actions" style="justify-content:center">${acciones}<button class="btn btn-secondary" data-action="solo">Volver a solitario</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
+      <div class="actions" style="justify-content:center">${acciones}<button class="btn btn-secondary" data-action="duel-home">Volver a los duelos</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button></div>
     </div></section></div>`);
   }
 
@@ -2702,7 +2907,7 @@
   }
 
   function duelPlay() {
-    if (!duelPreparado) return soloHome();
+    if (!duelPreparado) return duelHome();
     const { modalidad, duel, pace } = duelPreparado;
     duelPreparado = null;
     if (pace === "turnos") {
@@ -2970,7 +3175,7 @@
   // menú del solitario y leer las reglas de una partida entre varios no ayuda a nadie.
   function rules() {
     const returnTo = screen;
-    const enSolitario = ["solo-home", "solo", "solo-end", "cifras", "cifras-end", "duelo-intro"].includes(screen);
+    const enSolitario = ["solo-home", "duel-home", "solo", "solo-end", "cifras", "cifras-end", "duelo-intro"].includes(screen);
     const context = comp ? "competition" : solo || enSolitario ? "solo" : "local";
     const modeKey = screen === 'solo' ? solo.mode : CT.UI.isPlaying(screen) ? (game?.mode || selectedModeKey) : selectedModeKey;
     overlay(`<div class="overlay" data-overlay="rules"><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-action="close-rules" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, context, { pulse: !!game?.pulse, ghost: game ? !!game.ghost : true })}</div><button class="btn btn-primary btn-block" data-action="close-rules" data-return="${returnTo}">Entendido</button></div></div>`, true);
@@ -2984,7 +3189,9 @@
     else if (game) saveGame();
     result = null; selectedCardId = null; pendingIndex = null;
     if (screen !== 'solo' && game?.tournament) { competitionMenu(); return; }
+    if (soloSlot === 'daily' && screen === 'solo') { solo = null; soloSlot = 'mode'; home(); return; }
     if (playReturn === 'setup') setup();
+    else if (playReturn === 'duel-home' || solo?.kind === 'duel') duelHome();
     else if (playReturn === 'solo-home' || screen === 'solo') soloHome();
     else if (playReturn === 'duelo-intro') duelIntro();
     else playMenu();
@@ -3022,13 +3229,14 @@
   // Salir sin guardar: se descarta el intento entero, no cuenta para las estadísticas ni
   // para la racha del reto diario, y no deja nada a medias para continuar después.
   function abandonSolo() {
+    const eraDuelo = solo?.kind === "duel";
     solo = null;
     saveSolo();
     soloFailedForReview = [];
     result = null;
     pendingIndex = null;
     selectedCardId = null;
-    soloHome();
+    if (soloSlot === "daily") { soloSlot = "mode"; home(); } else if (eraDuelo) duelHome(); else soloHome();
   }
   function gameMenu() {
     overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid"><button class="btn btn-primary" data-action="close-menu">Seguir jugando</button><button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}<button class="btn btn-secondary" data-action="ui-back">Guardar y salir</button><button class="btn btn-ghost" data-action="abandon">Abandonar partida</button></div></div></div>`, true);
@@ -3160,7 +3368,7 @@
     if (!target) return;
     if (target.dataset.action === "enc-card" && event.target.closest("a")) return;
     const action = target.dataset.action;
-    if (app.dataset.screen?.startsWith('online-') && ['home-top', 'home-encyclopedia', 'perfil', 'rules'].includes(action)) {
+    if (app.dataset.screen?.startsWith('online-') && ['home-top', 'jugar', 'home-encyclopedia', 'perfil', 'rules'].includes(action)) {
       CT.onlineNavigate?.(action); return;
     }
     if (action === 'quick-challenges') quickChallenges();
@@ -3171,8 +3379,13 @@
     else if (action === "home") home();
     else if (action === "back-menu") backMenu();
     else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "instant" }); }
-    else if (action === "home-encyclopedia") openEnciclopedia("all");
-    else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; home(); }
+    // La enciclopedia se abre desde el Atlas, y al cerrarla se vuelve a él.
+    else if (action === "home-encyclopedia") openEnciclopedia("all", { returnTo: screen === "perfil" ? "perfil" : "home" });
+    else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
+    else if (action === "jugar") { collectionOpen = false; collectionDetails = false; jugarView(); window.scrollTo(0, 0); }
+    else if (action === "duels-open") openPendingDuels();
+    else if (action === "duels-list") duelsView();
+    else if (action === "share-daily-home") shareDailyFromHome();
     else if (action === "set-mode") openMode(target.dataset.mode);
     else if (action === "mazo-desbloquear") tiendaSimulada(target.dataset.paquete, target.dataset.mode);
     else if (action === "compra-simular") {
@@ -3189,14 +3402,14 @@
         CT.Effects.transition('close');
         collectionOpen = false;
         collectionDetails = false;
-        home();
+        jugarView();
         return;
       }
       setBlock(target.dataset.block);
       homeDestination = "collection";
       collectionOpen = true;
       collectionDetails = true;
-      home();
+      jugarView();
       // Fijar primero la portada arriba evita que el desplazamiento y el
       // desenrollado compitan. El pergamino descubre portada y mazos juntos.
       const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -3251,7 +3464,7 @@
     else if (action === "final-ready") renderFinalPass(true);
     else if (action === "final-next") nextLocalFinal();
     else if (action === "solo") soloHome();
-    else if (action === "start-daily") startSolo("daily");
+    else if (action === "duel-home") duelHome();
     else if (action === "start-free") startSolo("free");
     // Vale tanto para estrenar un duelo como para devolver uno recién jugado: en los dos
     // casos es una semilla nueva, así que nadie repite cartas que ya conoce.
@@ -3263,34 +3476,35 @@
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
-    else if (action === "open-turn-duel") { turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back: perfilView })); }
-    else if (action === 'next-turn-duel') { turnDuelReady.then(() => CT.TurnDuel.next(perfilView)).catch(() => showToast('No se pudieron consultar tus duelos.')); }
-    else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); perfilView(); }
-    else if (action === 'rematch-turn-duel') { target.disabled = true; turnDuelReady.then(() => CT.TurnDuel.challenge(target.dataset.turnId, perfilView)).catch(() => showToast('No se pudo enviar la invitación.')).finally(() => { target.disabled = false; }); }
+    else if (action === "open-turn-duel") { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back })); }
+    else if (action === 'next-turn-duel') { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.next(back)).catch(() => showToast('No se pudieron consultar tus duelos.')); }
+    else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); duelsRefresh(); }
+    else if (action === 'rematch-turn-duel') { target.disabled = true; const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.challenge(target.dataset.turnId, back)).catch(() => showToast('No se pudo enviar la invitación.')).finally(() => { target.disabled = false; }); }
     else if (action === "close-turn-duel") {
       if (!window.confirm(target.dataset.playing === 'true' ? '¿Rendirte? Tu rival ganará esta partida. Se conservará en el historial.' : '¿Cancelar esta invitación? No contará como derrota.')) return;
       target.disabled = true;
-      turnDuelReady.then(() => CT.TurnDuel.cancel(target.dataset.turnId, target.dataset.playing === 'true' ? 'playing' : 'waiting')).then(() => { showToast('Partida actualizada'); perfilView(); }).catch(() => { target.disabled = false; showToast('No se pudo actualizar el duelo. Puede haber cambiado: vuelve a abrir el perfil.'); });
+      turnDuelReady.then(() => CT.TurnDuel.cancel(target.dataset.turnId, target.dataset.playing === 'true' ? 'playing' : 'waiting')).then(() => { showToast('Partida actualizada'); duelsRefresh(); }).catch(() => { target.disabled = false; showToast('No se pudo actualizar el duelo. Puede haber cambiado: vuelve a abrir la lista.'); });
     }
     else if (action === 'archive-turn-duel') {
       target.disabled = true;
-      CT.TurnDuel.archive(target.dataset.turnId, target.dataset.restore === 'true').then(perfilView).catch(() => { target.disabled = false; showToast('No se pudo cambiar el archivo.'); });
+      CT.TurnDuel.archive(target.dataset.turnId, target.dataset.restore === 'true').then(duelsRefresh).catch(() => { target.disabled = false; showToast('No se pudo cambiar el archivo.'); });
     }
     else if (action === 'reshare-turn-duel') { CT.TurnDuel.reshare(target.dataset.turnId).catch(() => showToast('No se pudo compartir el enlace.')); }
     else if (action === 'block-duel-rival' || action === 'unblock-duel-rival') {
       const unblock = action === 'unblock-duel-rival';
       if (!unblock && !window.confirm('¿Bloquear los retos de este rival? No cancela las partidas en curso. Puedes deshacerlo desde tu perfil.')) return;
       target.disabled = true;
-      CT.TurnDuel.block(target.dataset.rivalId, target.dataset.rivalName, unblock).then(perfilView).catch(() => { target.disabled = false; showToast('No se pudo cambiar el bloqueo.'); });
+      CT.TurnDuel.block(target.dataset.rivalId, target.dataset.rivalName, unblock).then(duelsRefresh).catch(() => { target.disabled = false; showToast('No se pudo cambiar el bloqueo.'); });
     }
     else if (action === "duel-play") duelPlay();
     else if (action === "resume-cifras") resumeCifras();
     else if (action === "cifra-answer") cierraCarta("respuesta");
     else if (action === "cifras-next") cifrasNext();
-    else if (action === "cifras-exit") CT.UI.confirmExit("La carta que tengas abierta se cerrará: el reloj no se para.", () => { paraReloj(); if (cifras) { guardaCifras(); cifras = null; } soloHome(); });
+    else if (action === "cifras-exit") CT.UI.confirmExit("La carta que tengas abierta se cerrará: el reloj no se para.", () => { paraReloj(); if (cifras) { guardaCifras(); cifras = null; } duelHome(); });
     else if (action === "accept-duel") acceptDuel();
     else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
     else if (action === "resume-solo") resumeSolo();
+    else if (action === "daily-start") startDaily();
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();
@@ -3340,7 +3554,8 @@
   CT.localNavigate = action => {
     if (action === 'home-encyclopedia') openEnciclopedia('all');
     else if (action === 'perfil') perfilView();
-    else if (action === 'daily') { CT.closeDialog(); soloHome(); }
+    else if (action === 'daily') { CT.closeDialog(); startDaily(); }
+    else if (action === 'jugar') jugarView();
     else { homeDestination = 'home'; home(); window.scrollTo(0, 0); }
   };
   CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro", "quick-game", "quick-lobby"].includes(screen) || !!CT.onlineActive;

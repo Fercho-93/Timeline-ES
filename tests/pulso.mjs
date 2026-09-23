@@ -8,6 +8,10 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -86,7 +90,7 @@ function entrar(w) {
 // Lo mismo, pero sin recoger el móvil: un duelo a medias no vuelve a la pantalla de paso
 // de un turno normal, así que ahí no hay ningún «Empezar mi turno» que tocar.
 function entrar2(w) {
-  click(w, '[data-block="historia"]');
+  click(irAJugar(w), '[data-block="historia"]');
   click(w, '[data-mode="history"]');
   click(w, '[data-format="multi"]');
   click(w, '[data-action="continue"]');

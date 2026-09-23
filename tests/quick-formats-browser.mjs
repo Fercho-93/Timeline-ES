@@ -29,24 +29,17 @@ try {
     await page.addInitScript(()=>{window.pcs=[];const P=window.RTCPeerConnection;window.RTCPeerConnection=class extends P{constructor(...a){super(...a);window.pcs.push(this);}};});
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     await page.evaluate(()=>window.CONTINUUM_SPLASH?.finish());
-    await page.locator('[data-action="quick-challenges"]').click();return page;
+    await page.locator('[data-action="jugar"]').click();await page.locator('[data-action="quick-challenges"]').click();return page;
   };
   const p=await open();
   await p.screenshot({path:'test-results/quick-challenges/formats.png',fullPage:true});
-  await p.locator('[data-quick="solo-menu"]').click();
-  await p.screenshot({path:'test-results/quick-challenges/solo.png',fullPage:true});
-  await p.locator('[data-quick="daily"]').click();
-  const today=await p.evaluate(()=>JSON.parse(localStorage.getItem('continuum-quick-daily-v1')));
-  assert.equal(today.config.names.length,1);
-  await p.locator('[data-quick="bank"]').click();
-  assert.ok(await p.getByText('Tu resultado',{exact:true}).isVisible());
-  await p.locator('[data-quick="formats"]').click();await p.locator('[data-quick="solo-menu"]').click();await p.locator('[data-quick="daily"]').click();
-  assert.ok(await p.getByText('Tu resultado',{exact:true}).isVisible(),'El diario no permite reiniciar el intento terminado');
-  await p.locator('[data-quick="formats"]').click();await p.locator('[data-quick="solo-menu"]').click();await p.locator('[data-quick="free"]').click();
+  // El reto diario es ahora uno para todo el juego y está en la portada: «Jugar solo»
+  // lleva directo a la partida libre.
+  await p.locator('[data-quick="free"]').click();
   assert.equal(await p.locator('[data-quick-name]').count(),1);assert.equal(await p.locator('[data-quick="add-player"]').count(),0);
   await p.locator('[data-quick="start"]').click();
   for(let i=0;i<3;i++){await p.locator('[data-quick="bank"]').click();if(i<2)await p.locator('[data-quick="next"]').click();}
-  await p.locator('[data-quick="formats"]').click();await p.locator('[data-quick="solo-menu"]').click();await p.locator('[data-quick="duel"]').click();
+  await p.locator('[data-quick="formats"]').click();await p.locator('[data-quick="duel"]').click();
   await p.locator('#quick-length').selectOption('1');await p.locator('[data-quick="start"]').click();await p.locator('[data-quick="bank"]').click();
   const link=await p.locator('#quick-result-link').inputValue();
   const rival=await browser.newPage();rival.on('pageerror',e=>errors.push(e.message));await rival.goto(link);await rival.evaluate(()=>window.CONTINUUM_SPLASH?.finish());
@@ -72,5 +65,5 @@ try {
   await host.locator('[data-quick="formats"]').waitFor();await guest.locator('[data-quick="formats"]').waitFor();
   await host.close();await guest.close();
   assert.deepEqual(errors,[]);
-  console.log('Formatos: diario sin reinicio, libre, duelo por enlace y partida WebRTC real en dos móviles: OK');
+  console.log('Formatos: libre, duelo por enlace y partida WebRTC real en dos móviles: OK');
 } finally {await browser?.close();await new Promise(resolve=>server.close(resolve));}

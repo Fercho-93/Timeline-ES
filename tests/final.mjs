@@ -31,7 +31,7 @@ for (const mode of Object.keys(w.CONTINUUM.MODES)) {
   assert.equal(next.players.length,2);
 }
 function click(sel) { const el=w.document.querySelector(sel); assert.ok(el,sel); el.click(); }
-click('[data-block="historia"]');click('[data-mode="history"]');click('[data-format="multi"]');click('[data-action="setup"]');
+click('[data-action="jugar"]');click('[data-block="historia"]');click('[data-mode="history"]');click('[data-format="multi"]');click('[data-action="setup"]');
 w.document.querySelector('#hand-size').value='1';click('[data-action="start"]');
 for(let i=0;i<2;i++) {
   click('[data-action="ready"]');

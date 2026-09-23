@@ -2,6 +2,10 @@ import {gameHtml} from './game-fixture.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
 const html = gameHtml(read("index.html"));
 function boot(entries = {}, setup = () => {}) {
@@ -31,12 +35,12 @@ try {
   // catálogo y de la cartera para que dar de alta un mazo nuevo —o cerrar uno— no obligue
   // a repasar las cuentas de esta prueba.
   const temas = Object.keys(w.CONTINUUM.MODES).filter(key => key !== "mixed" && w.CONTINUUM.Cartera.tiene(key)).length;
-  click(w, "competition-menu"); click(w, "start-competition");
+  click(irAJugar(w), "competition-menu"); click(w, "start-competition");
   const intro = saved(w);
   assert.equal(intro.queue.length, temas);
   assert.equal(intro.saveVersion, 2);
   const originalMode = intro.previousModeKey;
-  w = open(entries(w)); click(w, "competition-menu"); click(w, "resume-competition");
+  w = open(entries(w)); click(irAJugar(w), "competition-menu"); click(w, "resume-competition");
   assert.deepEqual(saved(w).queue, intro.queue);
   click(w, "comp-next-round");
   let state = saved(w);
@@ -45,7 +49,7 @@ try {
   assert.equal(state.difficulty, intro.difficulty);
   const beforePlay = json(state.solo);
   // Cerrar en medio de la ronda mantiene exactamente el reparto.
-  w = open(entries(w)); click(w, "competition-menu"); click(w, "resume-competition");
+  w = open(entries(w)); click(irAJugar(w), "competition-menu"); click(w, "resume-competition");
   assert.deepEqual(saved(w).solo, beforePlay);
   click(w, "comp-confirm-resume");
   const ct = w.CONTINUUM;
@@ -54,14 +58,14 @@ try {
   w.document.querySelector(`[data-action="solo-place"][data-index="${at}"]`).click();
   click(w, "confirm-place");
   state = saved(w); assert.equal(state.solo.hits, 1); assert.ok(state.solo.pendingResult);
-  w = open(entries(w)); click(w, "competition-menu"); click(w, "resume-competition");
+  w = open(entries(w)); click(irAJugar(w), "competition-menu"); click(w, "resume-competition");
   click(w, "comp-confirm-resume");
   assert.ok(w.document.querySelector('[data-action="solo-next"]'));
   assert.equal(saved(w).solo.hits, 1);
   click(w, "solo-next"); assert.equal(saved(w).solo.played, 1);
   click(w, "ui-back"); w.document.querySelector("[data-exit-confirm]").click(); click(w, "home-top");
   assert.equal(saved(w).previousModeKey, originalMode);
-  click(w, "competition-menu");
+  click(irAJugar(w), "competition-menu");
   assert.ok(w.document.querySelector('[data-action="resume-competition"]'));
   // Jugar el resto: cada resultado y cada cambio de tema sobrevive a recargar.
   click(w, "resume-competition");
@@ -69,7 +73,7 @@ try {
   let steps = 0;
   while (!saved(w).finished && steps++ < temas * 8) {
     state = saved(w);
-    if (!state.solo) { w = open(entries(w)); click(w, "competition-menu"); click(w, "resume-competition"); click(w, "comp-next-round"); continue; }
+    if (!state.solo) { w = open(entries(w)); click(irAJugar(w), "competition-menu"); click(w, "resume-competition"); click(w, "comp-next-round"); continue; }
     const s = state.solo, c = new Map(s.savedDeck.map(c => [c.id, c]));
     const index = w.CONTINUUM.correctIndex(s.mode, s.timeline.map(id => c.get(id)), c.get(s.current));
     w.document.querySelector(`[data-action="solo-place"][data-index="${index}"]`).click();
@@ -110,7 +114,7 @@ try {
       return native.call(this, key, value);
     };
   });
-  w.full = true; click(w, "competition-menu"); click(w, "start-competition");
+  w.full = true; click(irAJugar(w), "competition-menu"); click(w, "start-competition");
   assert.ok(w.CONTINUUM.Storage.hasPending());
   assert.ok(w.document.querySelector("#storage-notice"));
   assert.ok(JSON.parse(w.CONTINUUM.Storage.getItem(key)).queue.length);
@@ -133,7 +137,7 @@ try {
   } }));
   await tick();
   const updateButton = w.document.querySelector("#update-notice button"); assert.ok(updateButton);
-  click(w, "competition-menu"); click(w, "start-competition"); await tick(); assert.equal(updateButton.disabled, true);
+  click(irAJugar(w), "competition-menu"); click(w, "start-competition"); await tick(); assert.equal(updateButton.disabled, true);
   updateButton.click(); assert.equal(messages.length, 0);
   handlers.controllerchange(); assert.equal(w.document.getElementById("app").hasAttribute("inert"), false);
   click(w, "ui-back"); w.document.querySelector("[data-exit-confirm]").click(); click(w, "home-top"); await tick(); assert.equal(updateButton.disabled, false);
@@ -149,9 +153,9 @@ try {
     async register() { throw Error("Sin conexión"); }, addEventListener() {}
   } }));
   await tick(); assert.match(w.document.getElementById("update-notice").textContent, /seguir jugando/);
-  assert.ok(w.document.querySelector('[data-action="competition-menu"]'));
+  assert.ok(w.document.querySelector('[data-action="jugar"]'));
   w = open({}, win => { win.Storage.prototype.getItem = () => { throw new win.DOMException("Bloqueado", "SecurityError"); }; });
   assert.ok(w.document.querySelector("#storage-notice"));
-  assert.ok(w.document.querySelector('[data-action="competition-menu"]'));
+  assert.ok(w.document.querySelector('[data-action="jugar"]'));
   console.log("  ok actualización diferida, bloqueo durante partidas y errores offline no fatales");
 } finally { for (const w of windows) w.close(); }

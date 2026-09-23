@@ -5,6 +5,13 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+// La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
+// entra antes en el Atlas desde la barra inferior.
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) d.querySelector('.home-nav [data-action="perfil"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -41,7 +48,7 @@ const existe = (w, sel) => !!w.document.querySelector(sel);
 const texto = w => w.document.body.textContent;
 // La Enciclopedia se abre desde el menú de un mazo concreto (`playMenu`), al que se
 // llega desplegando antes su bloque en la portada.
-const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
+const abreMazo = (w, block, mode) => { click(irAJugar(w), `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
 
 console.log("\nFiltrado puro (CT.Enciclopedia)");
 {
@@ -99,8 +106,8 @@ console.log("\nSe entra desde el menú del mazo elegido");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  ok("la barra del menú ofrece la enciclopedia", existe(w, '[data-action="home-encyclopedia"]'));
-  click(w, '[data-action="home-encyclopedia"]');
+  ok("la barra del menú ofrece el Atlas, que abre la enciclopedia", existe(w, '.home-nav [data-action="perfil"]'));
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   elegir(w, '#enc-mode-select', 'history');
   ok("se puede elegir Historia de España desde la barra", /Historia de España/.test(texto(w)));
   ok("aparece el selector de mazo", existe(w, "#enc-mode-select"));
@@ -114,7 +121,7 @@ console.log("\nCambiar de mazo desde el desplegable");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="home-encyclopedia"]');
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   elegir(w, '#enc-mode-select', 'history');
   elegir(w, "#enc-mode-select", "movies");
   ok("el título cambia al mazo elegido", /Estrenos de cine/.test(texto(w)));
@@ -125,7 +132,7 @@ console.log("\nBuscar sin perder el campo ni el foco");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="home-encyclopedia"]');
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   elegir(w, '#enc-mode-select', 'history');
   const antes = w.document.getElementById("enc-search-input");
   antes.focus();
@@ -145,7 +152,7 @@ console.log("\nFiltrar por banda desde la pantalla");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="home-encyclopedia"]');
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   elegir(w, '#enc-mode-select', 'history');
   const total = w.document.querySelectorAll("#enc-results .timeline-card").length;
   const chip = w.document.querySelector(".band-chip:not(#enc-band-all)");
@@ -162,7 +169,7 @@ console.log("\nSin entrada desde dentro de una partida");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  ok("la barra sí la ofrece, antes de empezar a jugar", existe(w, '[data-action="home-encyclopedia"]'));
+  ok("la barra sí ofrece el Atlas, antes de empezar a jugar", existe(w, '.home-nav [data-action="perfil"]'));
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   click(w, '[data-action="start"]');
   ok("no hay enciclopedia en la pantalla de pasar el móvil", !existe(w, '[data-action="home-encyclopedia"]'));
@@ -216,13 +223,13 @@ console.log("\nEl repaso enlaza con la enciclopedia");
   ok("Volver recupera el repaso, no abre Perfil", w.document.getElementById("app").dataset.screen === "review");
 }
 
-console.log("\nCatálogo completo desde la barra inferior");
+console.log("\nCatálogo completo desde el Atlas");
 {
   const w = boot();
-  click(w, '[data-action="home-encyclopedia"]');
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   const doc = w.document;
   ok("la barra abre una pantalla distinta a Inicio", doc.getElementById('app').dataset.screen === 'enciclopedia');
-  ok("Enciclopedia queda marcada en la barra", doc.querySelector('.home-nav [aria-current="page"]').dataset.action === 'home-encyclopedia');
+  ok("el Atlas queda marcado en la barra", doc.querySelector('.home-nav [aria-current="page"]').dataset.action === 'perfil');
   ok("se abre con todas las cartas", doc.getElementById('enc-mode-select').value === 'all');
   ok("el álbum abre con los últimos descubrimientos arriba", !!doc.querySelector('.enc-recent') && /Últimos descubrimientos/.test(doc.querySelector('.enc-recent').textContent));
   ok("sin cartas jugadas invita a estrenar la primera lámina", !!doc.querySelector('.enc-recent-empty'));
@@ -343,7 +350,7 @@ console.log("\nFiltro de láminas en la pantalla");
   const cartas = () => doc.querySelectorAll("[data-enc-card]").length;
 
   CT.Progreso.record({ mode: "animals", cardId: CT.cards("animals")[0].id, correct: true });
-  click(w, '[data-action="home-encyclopedia"]');
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   elegir(w, '#enc-mode-select', 'animals');
   ok("el mazo llega con las tres opciones y «todas» puesta", chips().length === 3 && activo() === "all");
   ok("y con el mazo entero a la vista", cartas() === CT.cards("animals").length);

@@ -2,6 +2,10 @@ import {gameHtml} from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 const root = new URL('../', import.meta.url);
 const read = name => fs.readFileSync(new URL(name, root), 'utf8');
 const html = gameHtml(read('index.html'));
@@ -22,7 +26,7 @@ const openFormat = (w, format) => { const el = w.document.querySelector(`[data-f
 // llega desplegando antes su bloque en la portada. «Competición» no: baraja varios mazos
 // al azar, así que su botón está en la portada y no depende de ningún mazo elegido. Este
 // archivo solo juega con Historia de España.
-const abreMazo = w => { w.document.querySelector('[data-block="historia"]').click(); w.document.querySelector('[data-mode="history"]').click(); };
+const abreMazo = w => { irAJugar(w).document.querySelector('[data-block="historia"]').click(); w.document.querySelector('[data-mode="history"]').click(); };
 const key = 'hilo-game-history-v1', soloKey = 'hilo-solo-history-v1';
 const state = (w, k = key) => JSON.parse(w.localStorage.getItem(k));
 const all = s => [...s.timeline, ...s.deck, ...s.discard, ...s.players.flatMap(p => p.hand)];
@@ -205,7 +209,7 @@ for (const difficulty of ['easy','normal','hard','expert']) {
 {
   // El modo competición ya no vive en el menú de un mazo concreto: baraja varios mazos
   // al azar, así que su botón está en la portada y no hace falta `abreMazo` para llegar.
-  const w=boot({'continuum-difficulty-v1':'expert'});click(w,'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
+  const w=boot({'continuum-difficulty-v1':'expert'});click(irAJugar(w),'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
   let rounds=0;
   // La competición pasa por los mazos que son suyos menos la Gran mezcla, así que el

@@ -10,6 +10,13 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+// La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
+// entra antes en el Atlas desde la barra inferior.
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) d.querySelector('.home-nav [data-action="perfil"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -17,13 +24,21 @@ const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
-function boot({ url = "https://hilo.test/", almacen = {}, sesion = {} } = {}) {
+// La beta sale con todo abierto (`SIMULACION` vacía). Estas pruebas encienden la
+// maqueta de la puerta cerrada con un mazo suelto y una colección entera, que es justo lo
+// que hay que escribir en `cartera.js` para volver a verla en el juego.
+const SIMULADOS = ["mixed", "astronomy", "medicine"];
+const conSimulacion = (archivo, codigo) => archivo === "cartera.js"
+  ? codigo.replace("const SIMULACION = [];", `const SIMULACION = ${JSON.stringify(SIMULADOS)};`)
+  : codigo;
+
+function boot({ url = "https://hilo.test/", almacen = {}, sesion = {}, simulacion = true } = {}) {
   const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url });
   const { window } = dom;
   window.Element.prototype.scrollIntoView = function () {};
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   Object.entries(sesion).forEach(([clave, valor]) => window.sessionStorage.setItem(clave, valor));
-  guiones().forEach(archivo => window.eval(read(archivo)));
+  guiones().forEach(archivo => window.eval(simulacion ? conSimulacion(archivo, read(archivo)) : read(archivo)));
   return window;
 }
 const click = (w, sel) => {
@@ -39,6 +54,15 @@ const texto = w => w.document.body.textContent;
 function cierra(w, ...cerrados) {
   const todos = Object.keys(w.CONTINUUM.MODES).filter(key => !cerrados.includes(key));
   w.CONTINUUM.Cartera.concede({ origen: "prueba", mazos: todos });
+}
+
+console.log("\nLa beta: todo el catálogo abierto");
+{
+  const w = boot({ simulacion: false });
+  const C = w.CONTINUUM.Cartera;
+  ok("la concesión la firma la beta", C.origen() === "beta");
+  ok("no hay nada cerrado", C.SIMULACION.length === 0 && C.todoAbierto() === true);
+  ok("el reto diario sortea entre todos los mazos mientras no haya gratuitos decididos", C.diarios().length === Object.keys(w.CONTINUUM.MODES).length);
 }
 
 console.log("\nLa simulación: un mazo suelto y una colección entera esperando un pago");
@@ -122,7 +146,7 @@ console.log("\nUna compra simulada abre la puerta, y no deja huella");
 console.log("\nLa puerta cerrada, tal y como se ve");
 {
   const w = boot();
-  click(w, '[data-block="mezcla"]');
+  click(irAJugar(w), '[data-block="mezcla"]');
   const fila = w.document.querySelector('[data-mode="mixed"]');
   ok("el mazo se sigue viendo, con su precio", fila && fila.classList.contains("game-row-cerrado") && /3,99 €/.test(fila.textContent));
   ok("y con el candado estampado en medio de su lámina, no de adorno junto al nombre",
@@ -149,10 +173,10 @@ console.log("\nLa puerta cerrada, tal y como se ve");
 console.log("\nUna colección entera cerrada se ve como colección, no como mazos sueltos");
 {
   const w = boot();
-  const indice = [...w.document.querySelectorAll(".collection-entry")].find(e => e.querySelector('[data-block="ciencia"]'))?.querySelector(".collection-index");
+  const indice = [...irAJugar(w).document.querySelectorAll(".collection-entry")].find(e => e.querySelector('[data-block="ciencia"]'))?.querySelector(".collection-index");
   ok("la carátula dice cuántos de sus mazos están cerrados", /2 mazos · 2 🔒/.test(indice?.textContent || ""));
 
-  click(w, '[data-block="ciencia"]');
+  click(irAJugar(w), '[data-block="ciencia"]');
   const filas = [...w.document.querySelectorAll('[data-mode]')].filter(f => ["astronomy", "medicine"].includes(f.dataset.mode));
   ok("sus dos mazos se ven, los dos cerrados y los dos sellados",
     filas.length === 2 && filas.every(f => f.classList.contains("game-row-cerrado") && f.querySelector(".deck-candado")));
@@ -170,14 +194,14 @@ console.log("\nUna colección entera cerrada se ve como colección, no como mazo
 
   // Comprar solo el mazo deja el otro cerrado, que es justo la diferencia entre las dos.
   const soloMazo = boot();
-  click(soloMazo, '[data-block="ciencia"]'); click(soloMazo, '[data-mode="astronomy"]');
+  click(irAJugar(soloMazo), '[data-block="ciencia"]'); click(soloMazo, '[data-mode="astronomy"]');
   click(soloMazo, '[data-action="mazo-desbloquear"]'); click(soloMazo, '[data-action="compra-simular"]');
   ok("llevarse el mazo suelto abre ese y solo ese",
     soloMazo.CONTINUUM.Cartera.tiene("astronomy") === true && soloMazo.CONTINUUM.Cartera.tiene("medicine") === false);
 
   // Y al que le queda uno solo ya no se le ofrece la colección: sería pagar más por menos.
   click(soloMazo, '[data-action="home-top"]');
-  if (!existe(soloMazo, '[data-mode="medicine"]')) click(soloMazo, '[data-block="ciencia"]');
+  if (!existe(soloMazo, '[data-mode="medicine"]')) click(irAJugar(soloMazo), '[data-block="ciencia"]');
   click(soloMazo, '[data-mode="medicine"]');
   ok("al último mazo que falta ya no se le ofrece la colección",
     soloMazo.document.querySelectorAll('[data-action="mazo-desbloquear"]').length === 1);
@@ -214,23 +238,23 @@ console.log("\nEl mazo que quedó elegido, si deja de ser suyo, no arrastra al j
   // Quien estaba jugando a «Gran mezcla» antes de que se cerrara tiene su clave guardada.
   // Eso es el recuerdo de la última partida, no un derecho, y no puede saltarse la puerta.
   const w = boot({ almacen: { "hilo-selected-mode-v1": "mixed" } });
-  click(w, '[data-block="mezcla"]');
+  click(irAJugar(w), '[data-block="mezcla"]');
   ok("el mazo cerrado no aparece como el elegido",
     w.document.querySelector('[data-mode="mixed"]')?.getAttribute("aria-pressed") === "false");
-  click(w, '[data-block="historia"]');
+  click(irAJugar(w), '[data-block="historia"]');
   click(w, '[data-mode="history"]');
   ok("y se puede seguir jugando a otro con normalidad", w.localStorage.getItem("hilo-selected-mode-v1") === "history");
 
   // Lo mismo con la vista guardada de la pestaña: recargar no la devuelve a un mazo cerrado.
   const vista = JSON.stringify({ screen: "play-menu", mode: "mixed", block: "mezcla" });
   const v = boot({ sesion: { "continuum-tab-view-v1": vista } });
-  ok("una vista guardada de un mazo cerrado empieza en la portada", existe(v, ".gallery") && !/Todavía no es tuyo/.test(texto(v)));
+  ok("una vista guardada de un mazo cerrado empieza en la portada", existe(v, ".home-doors") && !/Todavía no es tuyo/.test(texto(v)));
 }
 
 console.log("\nLa enciclopedia no ofrece elegir un mazo que no es suyo");
 {
   const w = boot();
-  click(w, '[data-action="home-encyclopedia"]');
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   const opciones = [...w.document.querySelectorAll("option")].map(o => o.value);
   ok("el mazo cerrado no está en el desplegable", !opciones.includes("mixed"));
   ok("los abiertos sí", opciones.includes("history") && opciones.includes("animals"));
@@ -252,7 +276,7 @@ console.log("\nCerrar un mazo se nota en todo el juego");
   ok("y se puede explicar, con una sola manera de entrar", razon.opciones.length === 1 && razon.texto === "Se desbloquea por 3,99 €");
 
   // La portada avisa de cuántos hay cerrados en cada colección.
-  click(w, '[data-block="naturaleza"]');
+  click(irAJugar(w), '[data-block="naturaleza"]');
   const indice = [...w.document.querySelectorAll(".collection-entry")].find(e => e.querySelector('[data-block="naturaleza"]'))?.querySelector(".collection-index");
   ok("la colección enseña el candado con su cuenta", /1 🔒/.test(indice?.textContent || ""));
 
@@ -272,7 +296,7 @@ console.log("\nUn mazo abierto sigue funcionando igual que siempre");
 {
   const w = boot();
   cierra(w, "animals");
-  click(w, '[data-block="historia"]');
+  click(irAJugar(w), '[data-block="historia"]');
   click(w, '[data-mode="history"]');
   ok("se entra sin fricción", w.localStorage.getItem("hilo-selected-mode-v1") === "history");
   ok("y no aparece ninguna explicación de puerta cerrada", !/Todavía no es tuyo/.test(texto(w)));

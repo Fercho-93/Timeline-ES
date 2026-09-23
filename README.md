@@ -1,10 +1,31 @@
 # Continuum
 
+## Cómo está organizado el juego
+
+La portada tiene tres puertas y nada más:
+
+- **Reto diario.** Uno para todo el mundo: cada día se sortea un mazo con la fecha como
+  semilla y de él salen las mismas 15 cartas en todos los móviles. La portada enseña el
+  mazo de hoy, la racha y, una vez jugado, el resultado para compartirlo.
+- **Jugar.** Primero se elige *qué*: **Grandes colecciones** (los mazos completos, por
+  colección), **Retos rápidos** (temas cortos y concretos, como las redes sociales por
+  fecha de aparición) o **Competición** (un tema distinto en cada ronda). Después, *cómo*:
+  solo, multijugador (uno o varios móviles) o **retando a un amigo**.
+- **Atlas.** Lo que antes eran el perfil y la enciclopedia: la colección de cartas con la
+  puerta a todas ellas, la racha del reto diario con su calendario, los duelos, las
+  estadísticas y los logros.
+
+Encima de las tres puertas, y solo cuando hay algo pendiente, un aviso de **duelos por
+turnos**: si es uno, lleva directo a él; si son varios, a la lista con el estado de cada
+uno (tu turno, esperando al rival, retos recibidos, invitaciones enviadas, historial).
+
+La barra inferior sigue el mismo orden: Inicio, Jugar, Atlas, Guía y Ajustes.
+
 ## Retos rápidos y ¿Cuántos hay…?
 
-La portada ofrece **Retos rápidos**, una partida por puntos para 2–4 jugadores o
-equipos en **un solo móvil**. Se puede elegir un reto o jugar tres retos distintos
-al azar. Esta primera versión no crea salas entre varios móviles ni usa el
+**Retos rápidos** funciona igual que las grandes colecciones, con temas cortos: se juega
+solo (partida libre por duración), en multijugador de 2–4 participantes en un móvil, por
+internet o por Wi-Fi local, o retando a un amigo en un duelo por turnos. No usa el
 marcador de Competición: mantiene su propia partida guardada.
 
 Cada conjunto tiene como máximo diez cartas, incluida una referencia inicial que
@@ -229,7 +250,10 @@ cartas, ni en la enciclopedia ni en la partida, porque las cartas son justo lo q
 vendería.
 
 `CT.Cartera.paquetes()` declara lo que se vendería —un paquete por colección más uno que lo
-incluye todo—, y `LIBRES` es la lista, hoy vacía, de lo que sería gratis siempre. Ninguna de
+incluye todo—, y `LIBRES` es la lista, hoy vacía, de lo que sería gratis siempre. El reto
+diario solo sortea entre esos gratuitos (`CT.Cartera.diarios()`), nunca entre lo que ha
+comprado cada cuenta, para que todo el mundo juegue el mismo; mientras `LIBRES` esté vacía,
+la beta los cuenta todos. `SIMULACION` está vacía durante la beta: todo el catálogo abierto. Ninguna de
 las dos compromete precio ni decisión: son el esqueleto sobre el que colgar las fichas de
 las tiendas cuando se decida.
 
@@ -238,7 +262,7 @@ todos los rincones lo respetan. Sin esa mitad, la cartera sería una función qu
 
 ## Duelo por enlace
 
-Un formato más dentro de «Jugar en solitario». Juegas unas cartas al azar del mazo abierto y
+«Retar a un amigo», la tercera manera de jugar un mazo junto a «Jugar solo» y «Multijugador». Juegas unas cartas al azar del mazo abierto y
 mandas un enlace: quien lo abra recibe exactamente esas mismas cartas, en el mismo orden, y
 al terminar ve el cara a cara —el marcador y las dos tiradas carta a carta— con un botón
 para devolver el reto con semilla nueva.
@@ -329,9 +353,10 @@ Es un duelo entre amigos, no una competición arbitrada: el enlace es legible y 
 quien reta la afirma su propio móvil. Se dice así en la Guía, con la misma franqueza con que
 `firestore.rules` reconoce que el servidor no puede validar una colocación.
 
-## Perfil, estadísticas y logros
+## Atlas: perfil, estadísticas y logros
 
-«Perfil», en la barra de la portada, reúne lo que hasta ahora no se veía: partidas jugadas,
+«Atlas», en la barra de la portada, reúne la colección —con la entrada a la enciclopedia—,
+el reto diario y los duelos, y lo que hasta ahora no se veía: partidas jugadas,
 cartas colocadas, porcentaje de aciertos, mejor tirada seguida y racha de retos diarios. Por
 debajo, una fila por mazo jugado y dos listas de puntos débiles —los tramos donde más se
 falla y las cartas que más se atragantan—, cada una enlazando a la enciclopedia del mazo
@@ -344,8 +369,10 @@ desbloquea dos veces. Los que caen a mitad de partida se avisan y ya está; los 
 pantalla de fin se enseñan ahí, con su nombre y su condición.
 
 El perfil se guarda en `hilo-perfil-v1`, aparte del reto diario y los récords de
-`hilo-retos-v1`, que no se tocan: una instalación anterior conserva su racha y sus marcas y
-estrena el perfil a cero. Como todo vive en un solo móvil, la pantalla permite copiar el
+`hilo-retos-v1`. El reto diario guarda su racha dentro de `hilo-retos-v1`, en el campo
+`retoDiario` (no es ningún mazo), porque esa es la clave que la cuenta sincroniza. Las
+rachas del antiguo reto diario por mazo se borraron al llegar el reto para todos; las
+mejores marcas de la partida libre se conservan. Como todo vive en un solo móvil, la pantalla permite copiar el
 perfil en JSON y recuperarlo en otro, y borrarlo entero previa confirmación.
 
 Dos cosas se cuentan con cuidado. En una partida a un solo móvil gana alguien de la mesa,
@@ -387,7 +414,10 @@ y un botón para copiarlo.
 
 Tres formatos, los tres sin conexión y con la marca guardada en el propio móvil:
 
-- **Reto diario:** las mismas 15 cartas para todo el mundo ese día y un solo intento. Las cartas se
+- **Reto diario:** se entra desde la portada, no desde un mazo. Cada día sale un mazo —sorteado
+  con la fecha entre los gratuitos, sin repetir el del día anterior— y de él las mismas 15 cartas
+  para todo el mundo, con un solo intento. Tiene su propio guardado, así que empezarlo no pisa una
+  partida libre a medias del mismo mazo. Las cartas se
   barajan con la fecha como semilla, así que no hace falta ningún servidor para que dos móviles
   reciban exactamente el mismo reto. Completar el reto un día detrás de otro encadena una racha,
   que además se ve como un calendario de las últimas cuatro semanas, no solo como un número. Al
@@ -723,6 +753,6 @@ pertenencia a la sala; el relevo conserva cartas y turno. No es presencia instan
 Publicar las reglas v39 junto con el cliente. Las subcolecciones de presencia deben
 incluirse en la limpieza de salas; borrar el documento padre no las elimina.
 
-Retos rápidos utiliza las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del tablero compartido. Ofrece partida libre, reto diario y duelo por enlace en solitario; partidas de 2–4 participantes en un móvil, por internet o por Wi-Fi local; y duelos por turnos en salas para dos. Conserva el guardado local y recupera la última sala por internet. Tiene una portada propia; «¿Cuántos hay…?» aparece en otro bloque del mismo tamaño, pendiente de contenido.
+Retos rápidos utiliza las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del tablero compartido. Ofrece partida libre en solitario; partidas de 2–4 participantes en un móvil, por internet o por Wi-Fi local; y, como «Retar a un amigo», duelos por turnos en salas para dos. El reto diario es el de la portada, común a todo el juego. Conserva el guardado local y recupera la última sala por internet. Tiene una portada propia; «¿Cuántos hay…?» aparece en otro bloque del mismo tamaño, pendiente de contenido.
 
 Las salas de Retos usan `quickRooms`, con turnos transaccionales e historial de comandos que cada cliente reconstruye. Publicar las reglas junto con el cliente. Los resultados son de juego casual, sin clasificación competitiva del servidor. En Wi-Fi local, quien crea la sala debe mantenerla abierta; las invitaciones se intercambian mediante Compartir/copiar. El diario se fija por fecha local y conserva un intento por perfil. El duelo de seguidos incluye las cartas y el resultado en el enlace.

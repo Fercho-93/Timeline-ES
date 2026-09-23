@@ -4,6 +4,10 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -36,7 +40,7 @@ const colocaHistoriaBien = w => {
 
 // El solitario, como cualquier otro formato, se elige ahora desde el menú de un mazo
 // concreto (`playMenu`), al que se llega desplegando su bloque en la portada.
-const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
+const abreMazo = (w, block, mode) => { click(irAJugar(w), `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
 
 console.log("\nConfirmar antes de colocar");
 {
@@ -81,82 +85,90 @@ console.log("\nPartida libre");
   ok("se guarda la mejor marca", marcas && marcas.history && marcas.history.best > 0);
 }
 
+// El reto diario es uno para todo el mundo y se entra desde la portada: cada día sale
+// un mazo, sorteado con la fecha, y de él las mismas cartas en todos los móviles.
+const DIARIO = "continuum-reto-diario-partida-v2";
+const estadoDiario = w => JSON.parse(w.localStorage.getItem(DIARIO));
+const retoDiario = w => JSON.parse(w.localStorage.getItem("hilo-retos-v1") || "{}").retoDiario;
+const colocaDiarioBien = w => {
+  const estado = estadoDiario(w);
+  const cards = new Map(w.CONTINUUM.cards(estado.mode).map(card => [card.id, card]));
+  const at = w.CONTINUUM.correctIndex(estado.mode, estado.timeline.map(id => cards.get(id)), cards.get(estado.current));
+  click(w, `[data-action="solo-place"][data-index="${at}"]`);
+};
+const juegaDiarioEntero = w => {
+  let vueltas = 0;
+  while (!/Reto completado|Se acabaron las vidas/.test(texto(w)) && vueltas++ < 60) {
+    colocaDiarioBien(w);
+    click(w, '[data-action="confirm-place"]');
+    click(w, '[data-action="solo-next"]');
+  }
+};
+
 console.log("\nReto diario");
 {
   const uno = boot();
   abreMazo(uno, "historia", "history");
   click(uno, '[data-action="solo"]');
   click(uno, '[data-action="start-free"]');
+  const libreAntes = uno.localStorage.getItem("hilo-solo-history-v1");
+  click(uno, '[data-action="ui-back"]');
+  click(uno, '[data-exit-confirm]');
+  click(uno, '[data-action="home-top"]');
+  ok("la portada ofrece el reto del día", existe(uno, '[data-action="daily-start"]'));
+  click(uno, '[data-action="daily-start"]');
+  ok("empezar el reto no pisa la partida libre a medias", uno.localStorage.getItem("hilo-solo-history-v1") === libreAntes);
   const otro = boot();
-  abreMazo(otro, "historia", "history");
-  click(otro, '[data-action="solo"]');
-  click(otro, '[data-action="start-daily"]');
-  const tercero = boot();
-  abreMazo(tercero, "historia", "history");
-  click(tercero, '[data-action="solo"]');
-  click(tercero, '[data-action="start-daily"]');
-  const a = JSON.parse(otro.localStorage.getItem("hilo-solo-history-v1"));
-  const b = JSON.parse(tercero.localStorage.getItem("hilo-solo-history-v1"));
-  ok("dos móviles reciben hoy las mismas cartas", JSON.stringify([a.current, ...a.deck, ...a.timeline]) === JSON.stringify([b.current, ...b.deck, ...b.timeline]));
+  click(otro, '[data-action="daily-start"]');
+  const a = estadoDiario(uno), b = estadoDiario(otro);
+  ok("dos móviles juegan hoy el mismo mazo", a.mode === b.mode);
+  ok("y reciben las mismas cartas", JSON.stringify([a.current, ...a.deck, ...a.timeline]) === JSON.stringify([b.current, ...b.deck, ...b.timeline]));
+  ok("el mazo sale del bote de gratuitos", uno.CONTINUUM.Cartera.diarios().includes(a.mode));
+  ok("la portada anuncia ese mazo", (() => { const w = boot(); return w.document.querySelector(".home-door-daily b").textContent === w.CONTINUUM.mode(a.mode).name; })());
   ok("el reto reparte 15 cartas por colocar", a.total === 15 && a.deck.length + 1 === 15);
-  const libre = JSON.parse(uno.localStorage.getItem("hilo-solo-history-v1"));
-  ok("la partida libre usa el mazo entero", libre.deck.length + 2 === uno.HISTORY_CARDS.length);
 
   // Terminar el reto de hoy y comprobar que no se puede repetir.
-  const w = tercero;
-  const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
-  let vueltas = 0;
-  while (!/Reto completado|Se acabaron las vidas/.test(texto(w)) && vueltas++ < 60) {
-    const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
-    const años = estado.timeline.map(id => cards.get(id).year);
-    let index = años.findIndex(y => y > cards.get(estado.current).year);
-    if (index < 0) index = años.length;
-    w.document.querySelectorAll('[data-action="solo-place"]')[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
-    click(w, '[data-action="confirm-place"]');
-    click(w, '[data-action="solo-next"]');
-  }
+  const w = otro;
+  juegaDiarioEntero(w);
   ok("jugando bien se completa el reto entero", /Reto completado/.test(texto(w)));
-  const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1")).history;
+  const marcas = retoDiario(w);
   ok("cuenta un día de racha", marcas.streak === 1);
   ok("guarda el resultado del día", Object.values(marcas.days)[0].hits === 15);
-  // «Volver a solitario» en la pantalla de resultado es el mismo data-action que el
-  // bloque de formatos, pero no vive dentro de él: no hace falta desplegar nada.
-  click(w, '[data-action="solo"]');
-  ok("el reto no se puede repetir el mismo día", /ya lo has jugado/i.test(texto(w)) && !existe(w, '[data-action="start-daily"]'));
+  click(w, '[data-action="home"]');
+  ok("el reto no se puede repetir el mismo día", /15 de 15/.test(w.document.querySelector(".home-door-daily").textContent) && !existe(w, '[data-action="daily-start"]'));
+  ok("y la portada ofrece compartir el resultado", existe(w, '[data-action="share-daily-home"]'));
 }
 
 console.log("\nRacha de días");
 {
   const ayer = new Date();
   ayer.setDate(ayer.getDate() - 1);
-  const marcas = { history: { best: 3, streak: 4, lastDay: ayer.toLocaleDateString("sv-SE"), days: {} } };
+  const marcas = { retoDiario: { best: 3, streak: 4, lastDay: ayer.toLocaleDateString("sv-SE"), days: {} } };
   const w = boot({ "hilo-retos-v1": JSON.stringify(marcas) });
-  abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
-  ok("la portada de solitario muestra la racha", /4/.test(w.document.querySelector(".solo-stats").textContent));
-  click(w, '[data-action="start-daily"]');
-  const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
-  let vueltas = 0;
-  while (!/Reto completado|Se acabaron las vidas/.test(texto(w)) && vueltas++ < 60) {
-    const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
-    const años = estado.timeline.map(id => cards.get(id).year);
-    let index = años.findIndex(y => y > cards.get(estado.current).year);
-    if (index < 0) index = años.length;
-    w.document.querySelectorAll('[data-action="solo-place"]')[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
-    click(w, '[data-action="confirm-place"]');
-    click(w, '[data-action="solo-next"]');
-  }
-  ok("jugar ayer y hoy encadena la racha", JSON.parse(w.localStorage.getItem("hilo-retos-v1")).history.streak === 5);
+  ok("la portada muestra la racha", /4 días seguidos/.test(w.document.querySelector(".home-door-daily").textContent));
+  click(w, '[data-action="daily-start"]');
+  juegaDiarioEntero(w);
+  ok("jugar ayer y hoy encadena la racha", retoDiario(w).streak === 5);
+}
+
+console.log("\nLas rachas del antiguo reto por mazo empiezan de cero");
+{
+  const ayer = new Date();
+  ayer.setDate(ayer.getDate() - 1);
+  const dia = ayer.toLocaleDateString("sv-SE");
+  const marcas = { history: { best: 7, streak: 9, lastDay: dia, days: { [dia]: { hits: 10, total: 15 } } } };
+  const w = boot({ "hilo-retos-v1": JSON.stringify(marcas) });
+  const tras = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
+  ok("la racha y los días del mazo se borran", tras.history.streak === undefined && tras.history.days === undefined);
+  ok("la mejor marca de la partida libre se conserva", tras.history.best === 7);
+  ok("el reto nuevo empieza sin racha", tras.retoDiario.streak === 0 && /Empieza hoy tu racha/.test(w.document.querySelector(".home-door-daily").textContent));
 }
 
 console.log("\nReto diario que cruza la medianoche");
 {
   const w = boot();
-  abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
-  click(w, '[data-action="start-daily"]');
-  const antes = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
-  const diaInicio = antes.day;
+  click(w, '[data-action="daily-start"]');
+  const diaInicio = estadoDiario(w).day;
   // El reloj avanza un día a mitad de partida, como si se terminara pasada la
   // medianoche: la partida ya había empezado con la fecha de antes.
   const RealDate = w.Date;
@@ -168,19 +180,9 @@ console.log("\nReto diario que cruza la medianoche");
     static now() { return RealDate.now() + 24 * 60 * 60 * 1000; }
   }
   w.Date = DateManana;
-  const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
-  let vueltas = 0;
-  while (!/Reto completado|Se acabaron las vidas/.test(texto(w)) && vueltas++ < 60) {
-    const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
-    const años = estado.timeline.map(id => cards.get(id).year);
-    let index = años.findIndex(y => y > cards.get(estado.current).year);
-    if (index < 0) index = años.length;
-    w.document.querySelectorAll('[data-action="solo-place"]')[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
-    click(w, '[data-action="confirm-place"]');
-    click(w, '[data-action="solo-next"]');
-  }
+  juegaDiarioEntero(w);
   ok("el reto se completa aunque el reloj haya cambiado de día", /Reto completado/.test(texto(w)));
-  const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1")).history;
+  const marcas = retoDiario(w);
   ok("convalida en el día en que se empezó, no en el que se terminó", Object.keys(marcas.days).includes(diaInicio));
   ok("cuenta como un día de racha", marcas.streak === 1);
 }
@@ -188,43 +190,46 @@ console.log("\nReto diario que cruza la medianoche");
 console.log("\nSalir sin guardar");
 {
   const w = boot();
-  abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
-  click(w, '[data-action="start-daily"]');
-  colocaHistoriaBien(w);
+  click(w, '[data-action="daily-start"]');
+  colocaDiarioBien(w);
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
-  ok("hay progreso a medio reto", JSON.parse(w.localStorage.getItem("hilo-solo-history-v1")).hits > 0);
+  ok("hay progreso a medio reto", estadoDiario(w).hits > 0);
   click(w, '[data-action="solo-options"]');
   ok("el menú ofrece salir sin guardar", existe(w, '[data-action="abandon-solo"]'));
   click(w, '[data-action="abandon-solo"]');
   click(w, '[data-exit-confirm]');
-  ok("no queda partida guardada", !w.localStorage.getItem("hilo-solo-history-v1"));
-  ok("el reto de hoy se puede volver a empezar", existe(w, '[data-action="start-daily"]'));
-  const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1") || "{}").history;
+  ok("no queda partida guardada", !w.localStorage.getItem(DIARIO));
+  ok("el reto de hoy se puede volver a empezar", existe(w, '[data-action="daily-start"]'));
+  const marcas = retoDiario(w);
   ok("no cuenta para las estadísticas ni la racha", !marcas || !marcas.days || !Object.keys(marcas.days).length);
 }
 
-console.log("\nSalir sin guardar también desde la flecha de volver");
+console.log("\nSalir guardando y continuar el reto");
 {
   const w = boot();
-  abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
-  click(w, '[data-action="start-daily"]');
-  colocaHistoriaBien(w);
+  click(w, '[data-action="daily-start"]');
+  colocaDiarioBien(w);
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
   click(w, '[data-action="ui-back"]');
   ok("el diálogo de salir ofrece también salir sin guardar", existe(w, '[data-exit-discard]'));
+  click(w, '[data-exit-confirm]');
+  ok("guardar y salir vuelve a la portada", w.document.getElementById("app").dataset.screen === "home");
+  ok("la portada ofrece continuar el reto", /Continuar el reto/.test(w.document.querySelector(".home-door-daily").textContent));
+  const antes = estadoDiario(w).hits;
+  click(w, '[data-action="daily-start"]');
+  ok("continuar recupera los aciertos", estadoDiario(w).hits === antes && antes > 0);
+  click(w, '[data-action="ui-back"]');
   click(w, '[data-exit-discard]');
-  ok("no queda partida guardada", !w.localStorage.getItem("hilo-solo-history-v1"));
-  ok("el reto de hoy se puede volver a empezar", existe(w, '[data-action="start-daily"]'));
+  ok("salir sin guardar desde la flecha no deja partida", !w.localStorage.getItem(DIARIO));
+  ok("el reto de hoy se puede volver a empezar", existe(w, '[data-action="daily-start"]'));
 }
 
 console.log("\nBloque de geografía");
 {
   const w = boot();
-  click(w, '[data-block="geografia"]');
+  click(irAJugar(w), '[data-block="geografia"]');
   ok("elegir el bloque selecciona su primer juego", /72 países/.test(texto(w)));
   ok("el bloque lista sus cuatro juegos", w.document.querySelectorAll(".game-row").length === 4);
   ok("los cuatro juegos del bloque aparecen por su nombre",

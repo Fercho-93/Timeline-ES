@@ -7,6 +7,10 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -47,7 +51,7 @@ const click = (w, sel) => {
 };
 const existe = (w, sel) => !!w.document.querySelector(sel);
 const texto = w => w.document.body.textContent;
-const abreMazo = (w, block, mode) => { click(w, `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
+const abreMazo = (w, block, mode) => { click(irAJugar(w), `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
 const estado = (w, mode) => JSON.parse(w.localStorage.getItem(`hilo-cifras-${mode}-v1`) || "null");
 const duerme = ms => new Promise(listo => setTimeout(listo, ms));
 // Entre elegir el duelo y jugarlo hay una pantalla que explica la modalidad y una cuenta
@@ -61,7 +65,7 @@ async function jugar(w) {
 // Entra en el duelo de cifras de un mazo, con el nombre puesto.
 async function abreDuelo(w, { block = "geografia", mode = "population", nombre = "Fernando" } = {}) {
   abreMazo(w, block, mode);
-  click(w, '[data-action="solo"]');
+  click(w, '[data-action="duel-home"]');
   w.document.getElementById("duel-name").value = nombre;
   click(w, '[data-action="start-cifras"]');
   await jugar(w);
@@ -237,7 +241,7 @@ console.log("\nCrear un duelo de cifras y jugarlo");
 {
   const w = boot();
   abreMazo(w, "geografia", "population");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-action="duel-home"]');
   // El duelo es una sola opción del menú con las dos modalidades dentro.
   ok("hay un único duelo con cuatro combinaciones", w.document.querySelectorAll('[data-duel-block]').length === 4 && /Duelo por enlace/.test(texto(w)));
   // Las dos modalidades se ven a la vez, no escondidas dentro de un desplegable, y se
@@ -371,7 +375,7 @@ console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
     "hilo-cifras-population-v1": JSON.stringify({ ...guardado, empezadaEn: Date.now() - 60000 })
   } });
   abreMazo(vuelta, "geografia", "population");
-  click(vuelta, '[data-action="solo"]');
+  click(vuelta, '[data-action="duel-home"]');
   ok("se ofrece continuar el duelo empezado", existe(vuelta, '[data-action="resume-cifras"]'));
   click(vuelta, '[data-action="resume-cifras"]');
   ok("al continuar, la carta que estaba abierta se cierra", existe(vuelta, ".overlay"));
@@ -383,7 +387,7 @@ console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
     "hilo-cifras-population-v1": JSON.stringify({ ...guardado, empezadaEn: Date.now() - 500 })
   } });
   abreMazo(rapida, "geografia", "population");
-  click(rapida, '[data-action="solo"]');
+  click(rapida, '[data-action="duel-home"]');
   click(rapida, '[data-action="resume-cifras"]');
   ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && estado(rapida, "population").jugadas.length === 0);
 }
@@ -519,7 +523,7 @@ console.log("\nAntes de jugar se explica, y hay una cuenta atrás");
 {
   const w = boot();
   abreMazo(w, "geografia", "population");
-  click(w, '[data-action="solo"]');
+  click(w, '[data-action="duel-home"]');
   click(w, '[data-action="start-cifras"]');
   ok("no se entra directamente a la partida", !existe(w, '[data-action="cifra-answer"]'));
   ok("se explica cómo funciona la modalidad", existe(w, ".demo-cifras") && /Puntúa lo cerca/.test(texto(w)));

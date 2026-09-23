@@ -2127,3 +2127,53 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 #app .enc-toolbar-compact .band-chip { min-height: 44px; font-size: .75rem; }
 #app .enc-toolbar-compact .enc-locks { flex-wrap: wrap; }
+
+/* La portada: tres puertas —el reto del día, jugar y el atlas— con la misma lámina en
+   sepia que la competición. El aviso de duelos solo aparece cuando hay algo pendiente. */
+#app .home-doors { display: grid; gap: 16px; max-width: 720px; margin: 0 auto; }
+#app .home-door { display: flex; position: relative; isolation: isolate; align-items: center; width: 100%; min-height: 190px; padding: 0; overflow: hidden; text-align: left; color: var(--edition-ink); border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-paper); box-shadow: 0 8px 24px #352a1710; cursor: pointer; }
+#app article.home-door { cursor: default; }
+#app .home-door-art { position: absolute; inset: 0; z-index: -1; -webkit-mask-image: radial-gradient(ellipse at 78% 50%,#000 22%,transparent 74%); mask-image: radial-gradient(ellipse at 78% 50%,#000 22%,transparent 74%); }
+#app .home-door-art img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: sepia(1); mix-blend-mode: multiply; opacity: .85; }
+#app .home-door-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 68%; padding: 22px 20px; text-shadow: 0 1px 6px var(--edition-paper); }
+#app .home-door-kicker { font: .6rem/1.5 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; color: var(--edition-brass); }
+#app .home-door-copy b { font-family: var(--font-display); font-size: clamp(1.5rem,5vw,2rem); font-weight: 400; line-height: 1.07; }
+#app .home-door-copy small { font: .8rem/1.5 var(--ui-font); color: var(--edition-ink); }
+#app .home-door-cta { display: inline-flex; margin-top: 8px; padding: 7px 0; border-bottom: 1px solid var(--edition-brass); color: var(--edition-brass); font: 600 .77rem/1.3 var(--ui-font); }
+#app .home-door-daily { min-height: 220px; border-color: color-mix(in srgb, var(--edition-brass) 55%, var(--edition-line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edition-brass) 30%, transparent), 0 10px 28px #352a1718; }
+#app .home-door-daily .home-door-copy b { font-size: clamp(1.7rem,6vw,2.4rem); }
+#app .home-daily-streak { display: inline-flex; align-items: center; gap: 6px; font: 600 .75rem/1.3 var(--ui-font); color: var(--accent); }
+#app .home-daily-streak .solo-glyph { width: 18px; height: 18px; }
+#app .home-daily-share { margin-top: 10px; min-height: 44px; }
+#app .home-door:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+#app .home-duels { max-width: 720px; margin: 0 auto; }
+#app .home-duels:not(:empty) { margin-bottom: 16px; }
+#app .home-duels-banner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 16px; text-align: left; color: #fff; border: 0; border-radius: 8px; background: var(--accent-solid); box-shadow: 0 8px 22px #843b2833; cursor: pointer; }
+#app .home-duels-banner b { display: block; font: 700 .95rem/1.3 var(--ui-font); }
+#app .home-duels-banner small { display: block; margin-top: 2px; font: .78rem/1.4 var(--ui-font); opacity: .92; }
+#app .home-duels-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #ffffff26; font-size: 1.1rem; }
+#app .home-duels-banner i { font-style: normal; font-size: 1.2rem; }
+#app .home-duels-banner:focus-visible { outline: 3px solid var(--edition-ink); outline-offset: 3px; }
+
+/* Jugar: las tres familias de contenido una debajo de otra. */
+#app .jugar-heading { max-width: 720px; margin: 8px auto 22px; text-align: center; }
+#app .jugar-heading .eyebrow { justify-content: center; }
+#app .home-quick { margin-top: 26px; }
+#app .duel-choice .walking-art { filter: hue-rotate(160deg) saturate(.8); }
+
+/* Atlas: la colección arriba, con su puerta a la enciclopedia; debajo, el recorrido. */
+#app .atlas-collection, #app .atlas-duels { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+#app .atlas-collection h2, #app .atlas-duels h2, #app .atlas-daily h2 { margin: 0 0 6px; font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; }
+#app .atlas-collection > div, #app .atlas-duels > div { flex: 1 1 240px; }
+#app .atlas-duels p { margin: 0; color: var(--edition-muted); font: .84rem/1.5 var(--ui-font); }
+#app .atlas-daily { margin-bottom: 16px; }
+#app .atlas-daily .cal-card { margin-top: 14px; }
+
+@media (max-width: 520px) {
+  #app .home-door { min-height: 170px; }
+  #app .home-door-copy { width: 78%; padding: 18px 16px; }
+  #app .home-door-daily { min-height: 200px; }
+  #app .atlas-collection .btn, #app .atlas-duels .btn { width: 100%; }
+}
+:root[data-theme="dark"] #app .home-door-art img { mix-blend-mode: normal; opacity: .35; }
+:root[data-theme="dark"] #app .home-duels-banner { box-shadow: 0 8px 22px #0006; }

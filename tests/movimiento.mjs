@@ -4,6 +4,13 @@ import {gameHtml} from './game-fixture.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
+// La colección y la competición viven ahora en «Jugar», no en la portada: desde la
+// portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
+// La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
+// entra antes en el Atlas desde la barra inferior.
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) d.querySelector('.home-nav [data-action="perfil"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) d.querySelector('[data-action="jugar"]')?.click(); return w; }
+
 
 const root = new URL("../", import.meta.url);
 const read = file => fs.readFileSync(new URL(file, root), "utf8");
@@ -38,7 +45,7 @@ function click(w, selector) { const element = el(w, selector); element.focus(); 
 function abreMazo(w, block, mode) {
   // Si ya se volvió a la colección elegida, sus mazos siguen visibles. Pulsar otra vez
   // esa misma carátula la plegaría, así que solo la abrimos cuando el mazo no está aún.
-  if (!w.document.querySelector(`[data-mode="${mode}"]`)) click(w, `[data-block="${block}"]`);
+  if (!w.document.querySelector(`[data-mode="${mode}"]`)) click(irAJugar(w), `[data-block="${block}"]`);
   click(w, `[data-mode="${mode}"]`);
 }
 function game(w) { abreMazo(w, "historia", "history"); click(w, '[data-format="multi"]'); ["setup", "start", "ready"].forEach(action => click(w, `[data-action="${action}"]`)); }
@@ -59,7 +66,7 @@ console.log("\nGalería continua y navegación repetida");
   const blocks = Object.values(w.CONTINUUM.BLOCKS);
   for (let round = 0; round < 3; round++) {
     for (const block of blocks) {
-      click(w, `[data-block="${block.key}"]`);
+      click(irAJugar(w), `[data-block="${block.key}"]`);
       assert.equal(el(w, ".gallery-panel.active").dataset.block, block.key);
       assert.equal(w.document.activeElement.dataset.block, block.key);
       for (const mode of block.games) {
@@ -74,7 +81,7 @@ console.log("\nGalería continua y navegación repetida");
     }
   }
   ok("tres vueltas por todos los bloques y mazos llevan el estado activo y el foco al elemento correcto", true);
-  click(w, '[data-block="ciencia"]');
+  click(irAJugar(w), '[data-block="ciencia"]');
   ok("la imagen de Ciencia pide el tamaño grande al desplegarse", el(w, ".panel-science img").getAttribute("src").endsWith("700.webp"));
   for (let round = 0; round < 6; round++) {
     abreMazo(w, "historia", "history");
@@ -102,26 +109,29 @@ console.log("\nVolver al menú sin saltos de lectura");
     calls.push({...options, cssBehavior: w.document.documentElement.style.getPropertyValue('scroll-behavior')});
     w.scrollY = options.top;
   };
+  irAJugar(w);
   w.scrollY = 520;
   click(w, '[data-block="historia"]');
-  // Elegir un mazo es lo que de verdad sale de Inicio; el resto del recorrido
+  // Elegir un mazo es lo que de verdad sale de Jugar; el resto del recorrido
   // (menú de formatos, configuración) no vuelve a tocar esa posición guardada.
   click(w, '[data-mode="history"]');
   ok("elegir un mazo comienza arriba incluso si Inicio estaba desplazado", w.scrollY === 0);
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   click(w, '[data-action="back-menu"]');
   click(w, '[data-action="collection-back"]');
-  ok("Volver recupera la posición y el foco de cuando se dejó Inicio", w.scrollY === 520 && w.document.activeElement.dataset.mode === 'history');
+  ok("Volver recupera la posición y el foco de cuando se dejó Jugar", w.scrollY === 520 && w.document.activeElement.dataset.mode === 'history');
   ok("el regreso tiene sentido inverso sin un segundo desplazamiento animado", el(w, '.shell').classList.contains('screen-return') && calls.every(call => call.behavior === 'instant'));
+  // La enciclopedia se abre ahora desde el Atlas, y al cerrarla se vuelve a él.
+  irAlAtlas(w);
   calls.length = 0;
   w.scrollY = 760;
   click(w, '[data-action="home-encyclopedia"]');
-  const cachedHomeImage = el(w, '.enc-background img');
+  const cachedAtlas = el(w, '.enc-background .perfil-section');
   click(w, '[data-action="enc-back"]');
   ok("la enciclopedia conserva el fondo y vuelve directamente a la altura anterior",
     w.scrollY === 760 && calls.length === 2 && calls.every(call => call.top === 760 && call.cssBehavior === 'auto'));
-  ok("al cerrar reutiliza las imágenes ya cargadas en vez de dejarlas parpadear",
-    w.document.querySelector('.home-gallery-shell img') === cachedHomeImage && !w.document.querySelector('.enc-background'));
+  ok("al cerrar reutiliza el Atlas que había detrás en vez de dejarlo parpadear",
+    w.document.querySelector('.perfil-section') === cachedAtlas && !w.document.querySelector('.enc-background'));
   ok("la anulación instantánea no desactiva después el desplazamiento suave de la portada", !w.document.documentElement.style.getPropertyValue('scroll-behavior'));
   w.close();
 }
@@ -130,7 +140,7 @@ console.log("\nEntrada común del mazo");
 for (const reduce of [false, true]) {
   const w = boot({reduce});
   w.scrollTo = () => {};
-  click(w, '[data-block="historia"]');
+  click(irAJugar(w), '[data-block="historia"]');
   const animated = [];
   w.Element.prototype.animate = function() {
     animated.push(this.className);
@@ -156,7 +166,7 @@ console.log("\nCambiar de categoría durante un ajuste de altura");
   const w = boot();
   const animations = [];
   let height = 200;
-  const container = el(w, '.deck-collection');
+  const container = el(irAJugar(w), '.deck-collection');
   container.getBoundingClientRect = () => ({ height });
   container.animate = () => {
     let resolve, reject;
@@ -569,13 +579,17 @@ const pantalla = w => el(w, "#app").dataset.screen;
   abreMazo(w, "historia", "history");
   assert.equal(pantalla(w), "play-menu");
   swipe(w);
-  ok("deslizar en el menú del mazo vuelve a la colección, como «Volver»", pantalla(w) === "home" && !!w.document.querySelector('[data-mode="history"]'));
+  ok("deslizar en el menú del mazo vuelve a la colección, como «Volver»", pantalla(w) === "jugar" && !!w.document.querySelector('[data-mode="history"]'));
+  await sleep(5);
+  swipe(w);
+  ok("y deslizar en Jugar vuelve al inicio", pantalla(w) === "home");
+  await sleep(5);
   swipe(w);
   ok("en el inicio no hay nada detrás: el gesto no hace nada", pantalla(w) === "home");
   // Igual que tras un arrastre: el gesto se come el clic que el navegador puede disparar
   // al soltar, así que el siguiente toque de verdad llega en el turno siguiente.
   await sleep(5);
-  click(w, '[data-mode="history"]');
+  abreMazo(w, "historia", "history");
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   assert.equal(pantalla(w), "setup");
   swipe(w, { cancelado: true });
@@ -608,11 +622,11 @@ const pantalla = w => el(w, "#app").dataset.screen;
   swipe(w, { target: el(w, ".modal") });
   ok("con la guía abierta, el gesto la cierra como Escape", !w.document.querySelector(".overlay") && pantalla(w) === "home");
   await sleep(5);
-  click(w, '[data-action="home-encyclopedia"]');
+  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
   swipe(w, { target: el(w, "#enc-search-input") });
   ok("buscando en la enciclopedia, deslizar no la cierra", !!w.document.querySelector('[data-overlay="encyclopedia"]'));
   swipe(w, { target: el(w, ".enc-modal") });
-  ok("y desde el resto de la enciclopedia el gesto la cierra", !w.document.querySelector('[data-overlay="encyclopedia"]') && pantalla(w) === "home");
+  ok("y desde el resto de la enciclopedia el gesto la cierra y vuelve al Atlas", !w.document.querySelector('[data-overlay="encyclopedia"]') && pantalla(w) === "perfil");
   w.close();
 }
 {
