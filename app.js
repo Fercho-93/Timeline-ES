@@ -579,8 +579,8 @@
     compartir(shareText(CT.mode(dailyModeKey(dia)).name, dia, hecho.hits, hecho.total, hecho.sequence || [], records.streak), "Resultado copiado");
   }
 
-  // El aviso solo existe cuando hay algo que hacer. Con un duelo, lleva directo a él;
-  // con varios, a la lista, donde cada uno dice en qué punto está.
+  // El aviso solo existe cuando hay algo que hacer, y lleva siempre a la lista de duelos:
+  // ahí cada uno dice contra quién es, a quién le toca y cómo va, y se entra tocándolo.
   let pendingDuels = [];
   function refreshDuelBanner() {
     const box = document.getElementById("home-duels");
@@ -596,10 +596,7 @@
     }).catch(() => { /* sin conexión no hay aviso: la portada sigue igual */ });
   }
 
-  function openPendingDuels() {
-    if (pendingDuels.length === 1) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: pendingDuels[0].id, back: home }));
-    else duelsView();
-  }
+  function openPendingDuels() { duelsView(); }
 
   // Todos tus duelos por turnos, agrupados por lo que esperan: tu turno, el del rival,
   // retos recibidos, invitaciones enviadas e historial.

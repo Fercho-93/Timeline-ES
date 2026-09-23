@@ -436,5 +436,26 @@ console.log("\nLas reglas viajan en la versión del enlace");
   ok("la invitación anuncia ese plazo y no el de hoy", /20 segundos por carta/.test(texto(conVeinte)));
 }
 
+console.log("\nEl estado de cada duelo por turnos, para la lista");
+{
+  const w = boot();
+  const estado = w.CONTINUUM.Duelo.estadoTurnos;
+  const base = { mode: "history", kind: "orden", total: 15, playersOrder: ["yo", "ella"], players: { yo: { alias: "Fer" }, ella: { alias: "Marta" } }, scores: { yo: 4, ella: 3 } };
+  const mio = estado({ ...base, status: "playing", turnUid: "yo", turnIndex: 7 }, "yo");
+  ok("si me toca, lo dice y va arriba", mio.grupo === "tu-turno" && mio.estado === "Te toca" && mio.pendiente);
+  ok("con la carta por la que vamos", mio.detalle === "Carta 8 de 15");
+  ok("y el marcador desde mi lado", mio.marcador === "Tú 4 · Marta 3 aciertos");
+  const suyo = estado({ ...base, status: "playing", turnUid: "ella", turnIndex: 8 }, "yo");
+  ok("si le toca al rival, dice a quién", suyo.grupo === "su-turno" && suyo.estado === "Turno de Marta" && !suyo.pendiente);
+  const retado = estado({ ...base, status: "waiting", playersOrder: ["ella"], invitedUid: "yo", invitedAlias: "Fer", scores: { ella: 0 } }, "yo");
+  ok("un reto recibido pide aceptarlo", retado.grupo === "retado" && retado.estado === "Marta te ha retado" && retado.pendiente);
+  const enviada = estado({ ...base, status: "waiting", playersOrder: ["yo"], invitedUid: "ella", invitedAlias: "Marta", scores: { yo: 0 } }, "yo");
+  ok("una invitación mía espera a que acepten", enviada.grupo === "enviada" && enviada.estado === "Esperando a que Marta acepte");
+  const fin = estado({ ...base, status: "finished", turnUid: null, turnIndex: 15, scores: { yo: 9, ella: 7 } }, "yo");
+  ok("un duelo terminado dice el resultado", fin.grupo === "historial" && fin.estado === "Ganaste" && fin.marcador === "Tú 9 · Marta 7 aciertos");
+  const cifras = estado({ ...base, kind: "cifras", status: "playing", turnUid: "yo", turnIndex: 0, scores: { yo: 120, ella: 80 } }, "yo");
+  ok("en cifras se cuentan puntos", cifras.marcador === "Tú 120 · Marta 80 puntos");
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

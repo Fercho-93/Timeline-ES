@@ -443,10 +443,39 @@
     return `Duelo de cifras en Continuum · ${modeName}\n${veredicto} — ${mio.puntos} a ${rival.puntos}\n${rival.nombre || "Quien retaba"} ${rejillaCifras(mode, seed, total, rival.jugadas, ms)}\nYo ${rejillaCifras(mode, seed, total, mio.jugadas, ms)}${aviso}`;
   }
 
+  // En qué punto está un duelo por turnos, contado desde quien mira (`yo`, su uid): a
+  // quién le toca, por qué carta van y cómo va el marcador. Es lo que enseña la lista de
+  // duelos; vive aquí, fuera del módulo de Firebase, para poder probarlo sin red.
+  function estadoTurnos(partida, yo) {
+    const rivalUid = (partida.playersOrder || []).find(uid => uid !== yo) || partida.invitedUid;
+    const rival = partida.players?.[rivalUid]?.alias || partida.invitedAlias || "Rival pendiente";
+    const total = Number(partida.total) || 0;
+    const carta = Math.min(total, (Number(partida.turnIndex) || 0) + 1);
+    const mios = partida.scores?.[yo] || 0, suyos = partida.scores?.[rivalUid] || 0;
+    const unidad = partida.kind === "cifras" ? "puntos" : "aciertos";
+    const marcadorTexto = `Tú ${mios} · ${rival} ${suyos} ${unidad}`;
+    const invitado = partida.status === "waiting" && partida.invitedUid === yo;
+    if (partida.status === "playing") {
+      const mio = partida.turnUid === yo;
+      return { grupo: mio ? "tu-turno" : "su-turno", rival, estado: mio ? "Te toca" : `Turno de ${rival}`,
+        detalle: `Carta ${carta} de ${total}`, marcador: marcadorTexto, pendiente: mio };
+    }
+    if (partida.status === "waiting") {
+      return invitado
+        ? { grupo: "retado", rival, estado: `${rival} te ha retado`, detalle: "Acéptalo para empezar", marcador: "", pendiente: true }
+        : { grupo: "enviada", rival, estado: `Esperando a que ${rival} acepte`, detalle: "Invitación enviada", marcador: "", pendiente: false };
+    }
+    const estado = partida.status === "resigned" ? (partida.winnerUid === yo ? "Ganaste: tu rival se rindió" : "Te rendiste")
+      : partida.status === "expired" ? "Caducado por inactividad"
+      : partida.status === "cancelled" ? "Invitación cancelada"
+      : mios > suyos ? "Ganaste" : mios < suyos ? "Perdiste" : "Empate";
+    return { grupo: "historial", rival, estado, detalle: "Terminado", marcador: ["finished", "resigned"].includes(partida.status) ? marcadorTexto : "", pendiente: false };
+  }
+
   CT.Duelo = {
     CARTAS, MAX_CARTAS, MAX_NOMBRE, SEGUNDOS, MS, GRACIA_MS, CUENTA_PASO_MS,
     huella, crearSemilla, reparto, codificar, descodificar,
-    enlace, invitacion, marcador, limpiaNombre,
+    enlace, invitacion, marcador, limpiaNombre, estadoTurnos,
     Cifras: {
       CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
