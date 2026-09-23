@@ -2809,3 +2809,82 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     animation: none;
   }
 }
+
+
+/* Ilustración neutral de la ruleta: cartas, continuidad y línea temporal. */
+#app .daily-splash-art .daily-mystery-art {
+  position: relative;
+  z-index: 2;
+  width: min(88%, 270px);
+  height: 180px;
+  overflow: visible;
+  filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--edition-ink) 12%, transparent));
+}
+#app .daily-mystery-orbits {
+  fill: none;
+  stroke: color-mix(in srgb, var(--edition-brass) 30%, transparent);
+  stroke-width: 1;
+}
+#app .daily-mystery-orbits ellipse:last-of-type { stroke-dasharray: 3 7; }
+#app .daily-mystery-cards {
+  transform-origin: 130px 92px;
+  animation: daily-mystery-breathe 4.2s ease-in-out infinite;
+}
+#app .daily-mystery-card {
+  fill: color-mix(in srgb, var(--edition-surface) 90%, var(--edition-paper));
+  stroke: color-mix(in srgb, var(--edition-brass) 64%, var(--edition-line));
+  stroke-width: 1.5;
+}
+#app .daily-mystery-card-main {
+  fill: color-mix(in srgb, var(--edition-surface) 96%, #fff);
+  stroke-width: 2;
+}
+#app .daily-mystery-card-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--edition-brass) 42%, transparent);
+  stroke-width: 1;
+}
+#app .daily-mystery-card-seal {
+  fill: none;
+  stroke: color-mix(in srgb, var(--edition-brass) 32%, transparent);
+  stroke-width: 1;
+}
+#app .daily-mystery-diamond {
+  fill: color-mix(in srgb, var(--edition-brass) 20%, var(--edition-surface));
+  stroke: var(--edition-brass);
+  stroke-width: 1.2;
+}
+#app .daily-mystery-thread-shadow {
+  fill: none;
+  stroke: color-mix(in srgb, var(--edition-surface) 86%, transparent);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#app .daily-mystery-thread {
+  fill: none;
+  stroke: var(--edition-brass);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#app .daily-mystery-timeline {
+  fill: var(--edition-surface);
+  stroke: color-mix(in srgb, var(--edition-brass) 72%, var(--edition-line));
+  stroke-width: 1.5;
+}
+#app .daily-mystery-timeline circle:nth-of-type(3) {
+  fill: var(--edition-brass);
+  stroke: color-mix(in srgb, var(--edition-surface) 80%, transparent);
+  stroke-width: 2;
+}
+@keyframes daily-mystery-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.012); }
+}
+@media (max-width: 520px) {
+  #app .daily-splash-art .daily-mystery-art { width: min(92%, 242px); height: 166px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .daily-mystery-cards { animation: none; }
+}
