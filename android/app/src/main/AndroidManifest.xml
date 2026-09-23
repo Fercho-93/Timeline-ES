@@ -38,4 +38,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Escanear el QR de invitación a una sala (qr-scanner.js, getUserMedia vía WebView). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Recordatorios de turno y de invitación a duelos (push.js, functions/index.js). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>
