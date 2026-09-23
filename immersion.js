@@ -168,9 +168,7 @@
       const timelineHeading = wrap?.parentElement.querySelector('.hand-title');
       if (timelineHeading && zoom) {
         timelineHeading.classList.add('timeline-toolbar');
-        const caption = document.createElement('div'); caption.className = 'timeline-caption';
-        caption.append(...timelineHeading.childNodes);
-        timelineHeading.append(caption, zoom);
+        timelineHeading.parentElement.insertBefore(zoom, timelineHeading);
       }
       const hand = container.querySelector('.hand');
       if (hand) {
@@ -188,13 +186,13 @@
         const status = document.createElement('div'); status.className = 'placement-dock-status';
         status.innerHTML = '<span aria-hidden="true">✓</span><strong>Posición elegida</strong>';
         const actions = document.createElement('div'); actions.className = 'placement-dock-actions';
-        if (confirm) { confirm.textContent = 'Confirmar'; actions.append(confirm); }
+        if (confirm) { confirm.textContent = 'Colocar carta →'; actions.append(confirm); }
         if (cancel) { cancel.textContent = 'Cambiar'; actions.append(cancel); }
         dock.setAttribute('role', 'group');
         dock.setAttribute('aria-label', 'Confirmar la posición elegida');
         dock.append(status, actions);
       } else {
-        dock.innerHTML = `<span class="placement-instruction">${screen === 'solo' ? 'Toca un hueco de la línea para colocar tu carta' : 'Elige una carta y un hueco de la línea'}</span>`;
+        dock.innerHTML = `<span class="placement-instruction">${screen === 'solo' ? 'Toca un hueco de la línea para colocar tu carta' : 'Elige una carta y un hueco de la línea'}</span><button class="btn btn-primary btn-block" type="button" disabled>Colocar carta →</button>`;
       }
       const shell = container.querySelector('.shell');
       const timelineSection = container.querySelector('.timeline-wrap')?.closest('section');
