@@ -493,13 +493,14 @@
     const dia = today();
     const records = dailyRecords(), hecho = records.days?.[dia], racha = dailyStreak(records);
     const pendiente = !hecho && loadDaily();
-    const rachaTexto = `${glyph(GLYPHS.racha)}<span>${racha ? `${racha} ${racha === 1 ? "día seguido" : "días seguidos"}` : "Empieza hoy tu racha"}</span>`;
+    // Sin racha no se dice nada: la línea solo aparece cuando hay días que contar.
+    const rachaTexto = racha ? `<span class="home-daily-streak">${glyph(GLYPHS.racha)}<span>${racha} ${racha === 1 ? "día seguido" : "días seguidos"}</span></span>` : "";
     const detalle = hecho
       ? `${escapeHtml(CT.mode(dailyModeKey(dia)).name)}: <strong>${hecho.hits} de ${hecho.total}</strong>`
       : "Un mazo sorpresa cada día.";
     const copy = `<b>Reto diario</b>
       <small>${detalle}</small>
-      <span class="home-daily-streak">${rachaTexto}</span>`;
+      ${rachaTexto}`;
     const arte = `<span class="home-door-art" aria-hidden="true"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" fetchpriority="high"></span>`;
     if (hecho) return `<article class="home-door home-door-daily is-done">${arte}<span class="home-door-copy">${copy}
       <button class="btn btn-secondary home-daily-share" data-action="share-daily-home">Compartir resultado</button></span></article>`;

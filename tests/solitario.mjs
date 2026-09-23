@@ -162,7 +162,7 @@ console.log("\nLas rachas del antiguo reto por mazo empiezan de cero");
   const tras = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
   ok("la racha y los días del mazo se borran", tras.history.streak === undefined && tras.history.days === undefined);
   ok("la mejor marca de la partida libre se conserva", tras.history.best === 7);
-  ok("el reto nuevo empieza sin racha", tras.retoDiario.streak === 0 && /Empieza hoy tu racha/.test(w.document.querySelector(".home-door-daily").textContent));
+  ok("el reto nuevo empieza sin racha", tras.retoDiario.streak === 0 && !w.document.querySelector(".home-door-daily .home-daily-streak"));
 }
 
 console.log("\nReto diario que cruza la medianoche");
