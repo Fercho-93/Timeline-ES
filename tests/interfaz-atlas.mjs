@@ -4,7 +4,10 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
+// La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
+// marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
+function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
 
 const read = f => fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
 const html = gameHtml(read('index.html'));
@@ -146,7 +149,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
       w.dispatchEvent(event);
     };
     // Las portadas de las colecciones viven en «Jugar».
-    w.document.querySelector('[data-action="jugar"]').click();
+    const jugar = w.document.querySelector('[data-action="jugar"]'); jugar.dataset.homeTransition = "done"; jugar.click();
     inclina(0, 0);            // la primera lectura fija el origen
     inclina(9, 9);            // media inclinación en los dos ejes
     await new Promise(resolve => setTimeout(resolve, 40));   // el frame que escribe

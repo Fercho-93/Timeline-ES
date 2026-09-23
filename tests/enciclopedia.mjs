@@ -9,8 +9,11 @@ import { fileURLToPath } from "node:url";
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
 // entra antes en el Atlas desde la portada.
-function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) { if (!d.querySelector('.home-door[data-action="perfil"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('.home-door[data-action="perfil"]')?.click(); } return w; }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) { if (!d.querySelector('.home-door[data-action="perfil"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "perfil"); } return w; }
+// La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
+// marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
+function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");

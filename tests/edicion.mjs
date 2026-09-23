@@ -7,8 +7,11 @@ import { JSDOM } from 'jsdom';
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
 // entra antes en el Atlas desde la portada.
-function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) { if (!d.querySelector('.home-door[data-action="perfil"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('.home-door[data-action="perfil"]')?.click(); } return w; }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); d.querySelector('[data-action="jugar"]')?.click(); } return w; }
+function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action="home-encyclopedia"]')) { if (!d.querySelector('.home-door[data-action="perfil"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "perfil"); } return w; }
+// La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
+// marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
+function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
 
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
@@ -414,7 +417,7 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
       effects.push(effect);
       return { finished: new Promise(() => {}), cancel() { effect.cancelled = true; } };
     };
-    click(w, '.home-door[data-action="perfil"]');
+    pulsaPuerta(w.document, "perfil");
     assert.ok(w.document.querySelector('.shell.motion-entering'), 'el Atlas usa la entrada común');
     assert.equal(w.document.querySelectorAll('.parchment-dust').length, 0, 'el pergamino no suelta virutas doradas');
     assert.equal(w.document.querySelector('.home-nav [aria-current]'), null);
@@ -452,7 +455,7 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
     assert.equal(w.document.querySelector('.profile-roll-edge'), null, 'cerrar guía limpia el efecto');
     w.matchMedia = () => ({ matches: true });
     click(w, '.home-nav [data-action="home-top"]');
-    click(w, '.home-door[data-action="perfil"]');
+    pulsaPuerta(w.document, "perfil");
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);
   } finally { w.close(); }
 }
@@ -476,7 +479,7 @@ console.log('Navegación inferior: pestañas a ancho completo, pergamino común 
       }
       click(w, '.home-nav [data-action="home-top"]');
       assert.equal(w.document.querySelectorAll('#app > .overlay').length, 0);
-      click(w, '.home-door[data-action="perfil"]');
+      pulsaPuerta(w.document, "perfil");
       assert.ok(w.document.querySelector('.perfil-section'));
     }
   } finally { w.close(); }

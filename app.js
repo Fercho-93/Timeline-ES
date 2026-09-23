@@ -575,7 +575,7 @@
     const copy = `<b>Reto diario</b>
       <small>${detalle}</small>
       ${rachaTexto}`;
-    const arte = `<span class="home-door-art home-daily-art" aria-hidden="true">${dailyCalendar(dia)}</span>`;
+    const arte = `<span class="home-door-art home-daily-art" aria-hidden="true"><img src="assets/hero-history-700.webp" alt="" width="700" height="467" decoding="async"></span>`;
     if (hecho) return `<article class="home-door home-door-daily is-done">${arte}<span class="home-door-copy">${copy}
       <button class="btn btn-secondary home-daily-share" data-action="share-daily-home">Compartir resultado</button></span></article>`;
     return `<button class="home-door home-door-daily" data-action="daily-start">${arte}<span class="home-door-copy">${copy}
@@ -3578,6 +3578,24 @@
     if (!target) return;
     if (target.dataset.action === "enc-card" && event.target.closest("a")) return;
     const action = target.dataset.action;
+    // La tarjeta gira antes de navegar. Con movimiento reducido (o sin forma de
+    // saberlo) no hay giro que esperar: se navega en el acto, sin aplazar el clic.
+    const sinMovimiento = !window.matchMedia || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!sinMovimiento && screen === "home" && target.matches(".home-door") &&
+        ["daily-start", "jugar", "perfil"].includes(action) &&
+        target.dataset.homeTransition !== "done") {
+      event.preventDefault();
+      target.classList.add("home-door-leaving");
+      const delay = 240;
+      window.setTimeout(() => {
+        app.classList.add("home-transition-enter");
+        target.dataset.homeTransition = "done";
+        target.click();
+        delete target.dataset.homeTransition;
+        window.setTimeout(() => app.classList.remove("home-transition-enter"), 520);
+      }, delay);
+      return;
+    }
     if (app.dataset.screen?.startsWith('online-') && ['home-top', 'jugar', 'home-encyclopedia', 'perfil', 'rules'].includes(action)) {
       CT.onlineNavigate?.(action); return;
     }
