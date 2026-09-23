@@ -96,6 +96,12 @@ const colocaDiarioBien = w => {
   const at = w.CONTINUUM.correctIndex(estado.mode, estado.timeline.map(id => cards.get(id)), cards.get(estado.current));
   click(w, `[data-action="solo-place"][data-index="${at}"]`);
 };
+// Tocar el reto abre su presentación (el mazo del día se desvela ahí) y «Jugar» lo
+// empieza. Un reto ya empezado se retoma directamente, sin presentación.
+const empiezaDiario = w => {
+  click(w, '[data-action="daily-start"]');
+  if (existe(w, '[data-action="daily-play"]')) click(w, '[data-action="daily-play"]');
+};
 const juegaDiarioEntero = w => {
   let vueltas = 0;
   while (!/Reto completado|Se acabaron las vidas/.test(texto(w)) && vueltas++ < 60) {
@@ -116,10 +122,10 @@ console.log("\nReto diario");
   click(uno, '[data-exit-confirm]');
   click(uno, '[data-action="home-top"]');
   ok("la portada ofrece el reto del día", existe(uno, '[data-action="daily-start"]'));
-  click(uno, '[data-action="daily-start"]');
+  empiezaDiario(uno);
   ok("empezar el reto no pisa la partida libre a medias", uno.localStorage.getItem("hilo-solo-history-v1") === libreAntes);
   const otro = boot();
-  click(otro, '[data-action="daily-start"]');
+  empiezaDiario(otro);
   const a = estadoDiario(uno), b = estadoDiario(otro);
   ok("dos móviles juegan hoy el mismo mazo", a.mode === b.mode);
   ok("y reciben las mismas cartas", JSON.stringify([a.current, ...a.deck, ...a.timeline]) === JSON.stringify([b.current, ...b.deck, ...b.timeline]));
@@ -140,6 +146,20 @@ console.log("\nReto diario");
   ok("y la portada ofrece compartir el resultado", existe(w, '[data-action="share-daily-home"]'));
 }
 
+console.log("\nPresentación del reto");
+{
+  const w = boot();
+  click(w, '[data-action="daily-start"]');
+  ok("tocar el reto abre su presentación, no la partida", w.document.getElementById("app").dataset.screen === "daily-intro" && !estadoDiario(w));
+  ok("la presentación ofrece el botón para jugar", existe(w, '[data-action="daily-play"]'));
+  click(w, '[data-action="daily-play"]');
+  ok("«Jugar» empieza el reto", w.document.getElementById("app").dataset.screen === "solo" && estadoDiario(w)?.kind === "daily");
+  click(w, '[data-action="ui-back"]');
+  click(w, '[data-exit-confirm]');
+  click(w, '[data-action="daily-start"]');
+  ok("un reto empezado se retoma sin volver a presentarlo", w.document.getElementById("app").dataset.screen === "solo");
+}
+
 console.log("\nRacha de días");
 {
   const ayer = new Date();
@@ -147,7 +167,7 @@ console.log("\nRacha de días");
   const marcas = { retoDiario: { best: 3, streak: 4, lastDay: ayer.toLocaleDateString("sv-SE"), days: {} } };
   const w = boot({ "hilo-retos-v1": JSON.stringify(marcas) });
   ok("la portada muestra la racha", /4 días seguidos/.test(w.document.querySelector(".home-door-daily").textContent));
-  click(w, '[data-action="daily-start"]');
+  empiezaDiario(w);
   juegaDiarioEntero(w);
   ok("jugar ayer y hoy encadena la racha", retoDiario(w).streak === 5);
 }
@@ -168,7 +188,7 @@ console.log("\nLas rachas del antiguo reto por mazo empiezan de cero");
 console.log("\nReto diario que cruza la medianoche");
 {
   const w = boot();
-  click(w, '[data-action="daily-start"]');
+  empiezaDiario(w);
   const diaInicio = estadoDiario(w).day;
   // El reloj avanza un día a mitad de partida, como si se terminara pasada la
   // medianoche: la partida ya había empezado con la fecha de antes.
@@ -191,7 +211,7 @@ console.log("\nReto diario que cruza la medianoche");
 console.log("\nSalir sin guardar");
 {
   const w = boot();
-  click(w, '[data-action="daily-start"]');
+  empiezaDiario(w);
   colocaDiarioBien(w);
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
@@ -209,7 +229,7 @@ console.log("\nSalir sin guardar");
 console.log("\nSalir guardando y continuar el reto");
 {
   const w = boot();
-  click(w, '[data-action="daily-start"]');
+  empiezaDiario(w);
   colocaDiarioBien(w);
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
@@ -219,7 +239,7 @@ console.log("\nSalir guardando y continuar el reto");
   ok("guardar y salir vuelve a la portada", w.document.getElementById("app").dataset.screen === "home");
   ok("la portada ofrece continuar el reto", /Continuar el reto/.test(w.document.querySelector(".home-door-daily").textContent));
   const antes = estadoDiario(w).hits;
-  click(w, '[data-action="daily-start"]');
+  empiezaDiario(w);
   ok("continuar recupera los aciertos", estadoDiario(w).hits === antes && antes > 0);
   click(w, '[data-action="ui-back"]');
   click(w, '[data-exit-discard]');

@@ -2174,3 +2174,62 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 :root[data-theme="dark"] #app .home-door-art img { filter: sepia(.35) saturate(.8) brightness(.9); }
 :root[data-theme="dark"] #app .home-duels-banner { box-shadow: 0 6px 18px #0005; }
+
+/* Portada sin desplazamiento: la barra superior está vacía en Inicio (no hay nada a lo
+   que volver), así que se retira y el logo sube; sus medidas siguen la altura de la
+   pantalla para que las tres puertas quepan a la vista junto a la barra inferior. */
+#app .home-doors-shell .atlas-topbar { display: none; }
+#app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(env(safe-area-inset-top) + 10px) auto clamp(12px, 2.4svh, 22px); padding: 0; }
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(78px, 13svh, 128px); margin-bottom: -6px; }
+#app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2.2rem, 6.2svh, 3.4rem); }
+#app[data-screen="home"] .home-doors-shell .home-ornament { margin-top: clamp(6px, 1.4svh, 12px); }
+#app .home-doors-shell .home-door { padding-block: clamp(8px, 1.4svh, 12px); }
+@media (max-height: 700px) {
+  #app[data-screen="home"] .home-doors-shell .home-ornament { display: none; }
+  #app .home-doors-shell .home-door-art { width: 64px; height: 64px; }
+  #app .home-doors-shell .home-door { grid-template-columns: 64px 1fr; }
+  #app .home-doors-shell .home-door-daily .home-door-art { width: 76px; height: 76px; }
+  #app .home-doors-shell .home-door-daily { grid-template-columns: 76px 1fr; }
+}
+#app .home-daily-art { display: grid; place-items: center; background: color-mix(in srgb, var(--edition-brass) 10%, var(--edition-paper)); }
+#app .home-daily-art svg { width: 100%; height: 100%; }
+#app .home-daily-art .cal-sheet { fill: var(--edition-surface); stroke: var(--edition-brass); stroke-width: 1.4; }
+#app .home-daily-art .cal-band { fill: var(--edition-brass); }
+#app .home-daily-art .cal-ring { stroke: var(--edition-ink); stroke-width: 3; stroke-linecap: round; fill: none; opacity: .75; }
+#app .home-daily-art .cal-month { fill: var(--edition-surface); font: 700 9px/1 var(--ui-font); letter-spacing: .12em; }
+#app .home-daily-art .cal-day { fill: var(--edition-ink); font: 400 32px/1 var(--font-display); }
+#app .home-daily-art .cal-week { fill: var(--edition-muted); font: 7px/1 var(--ui-font); letter-spacing: .04em; }
+
+/* Presentación del reto diario: el calendario del día hasta que se desvela el mazo. */
+#app .daily-splash-art { display: grid; place-items: center; background: color-mix(in srgb, var(--edition-brass) 12%, var(--edition-paper)); }
+#app .daily-splash-art svg { width: 150px; height: 150px; }
+#app .daily-splash-art::after { background: linear-gradient(transparent 70%, var(--edition-surface)); }
+#app .daily-splash-art.is-revealed { animation: daily-art-in 520ms var(--ease-out) both; }
+#app .daily-splash-art .cal-sheet { fill: var(--edition-surface); stroke: var(--edition-brass); stroke-width: 1.4; }
+#app .daily-splash-art .cal-band { fill: var(--edition-brass); }
+#app .daily-splash-art .cal-ring { stroke: var(--edition-ink); stroke-width: 3; stroke-linecap: round; fill: none; opacity: .75; }
+#app .daily-splash-art .cal-month { fill: var(--edition-surface); font: 700 9px/1 var(--ui-font); letter-spacing: .12em; }
+#app .daily-splash-art .cal-day { fill: var(--edition-ink); font: 400 32px/1 var(--font-display); }
+#app .daily-splash-art .cal-week { fill: var(--edition-muted); font: 7px/1 var(--ui-font); letter-spacing: .04em; }
+#app .daily-reel { display: block; min-height: 1.1em; color: var(--edition-muted); transition: color .3s; }
+#app .daily-reel.is-revealed { color: var(--edition-ink); animation: daily-reel-land 420ms var(--ease-out) both; }
+#app .daily-splash-rule { margin: -12px 0 22px; color: var(--edition-muted); font: .85rem/1.5 var(--ui-font); }
+#app .daily-splash .comp-splash-start { background: var(--edition-ink); color: var(--edition-surface); }
+@keyframes daily-art-in { from { opacity: 0; } }
+@keyframes daily-reel-land { from { opacity: .3; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { #app .daily-splash-art.is-revealed, #app .daily-reel.is-revealed { animation: none; } }
+#app .daily-splash-art.is-revealed { display: block; }
+#app .daily-splash-art.is-revealed img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Jugar: las grandes colecciones agrupadas en una cuadrícula de dos, como un índice.
+   La que se abre ocupa el ancho entero para enseñar sus mazos debajo. */
+#app .jugar-shell #deck-collection .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+#app .jugar-shell #deck-collection .gallery-panel { height: 112px; min-height: 112px; }
+#app .jugar-shell #deck-collection .gallery-panel.active { height: 190px; }
+#app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label { left: 12px; right: 12px; bottom: 10px; column-gap: 8px; }
+#app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label strong { font-size: 1.02rem; letter-spacing: -.01em; }
+#app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label small { display: none; }
+#app .jugar-shell #deck-collection .gallery-panel:not(.active) .collection-index { top: 10px; left: 12px; font-size: .6rem; }
+#app .jugar-shell #deck-collection .gallery-panel:not(.active) .collection-open { top: 10px; right: 12px; width: 20px; height: 20px; }
+#app .jugar-shell .home-quick .gallery-panel { height: 112px; min-height: 112px; }
+#app .jugar-shell .home-competition .comp-promo { min-height: 180px; }

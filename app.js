@@ -501,11 +501,27 @@
     const copy = `<b>Reto diario</b>
       <small>${detalle}</small>
       ${rachaTexto}`;
-    const arte = `<span class="home-door-art" aria-hidden="true"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" fetchpriority="high"></span>`;
+    const arte = `<span class="home-door-art home-daily-art" aria-hidden="true">${dailyCalendar(dia)}</span>`;
     if (hecho) return `<article class="home-door home-door-daily is-done">${arte}<span class="home-door-copy">${copy}
       <button class="btn btn-secondary home-daily-share" data-action="share-daily-home">Compartir resultado</button></span></article>`;
     return `<button class="home-door home-door-daily" data-action="daily-start">${arte}<span class="home-door-copy">${copy}
       <span class="home-door-cta" aria-hidden="true">${pendiente ? "Continuar el reto" : "Jugar el reto de hoy"} →</span></span></button>`;
+  }
+
+  // La hoja de calendario del día: el reto es de hoy y cambia mañana, y eso es lo que
+  // dice el dibujo, sin desvelar de qué mazo va. Trazos con los colores de la edición.
+  function dailyCalendar(dia) {
+    const fecha = new Date(`${dia}T12:00:00`);
+    const mes = fecha.toLocaleDateString("es-ES", { month: "short" }).replace(".", "").toUpperCase();
+    const semana = fecha.toLocaleDateString("es-ES", { weekday: "long" });
+    return `<svg viewBox="0 0 92 92" role="presentation">
+      <rect class="cal-sheet" x="14" y="16" width="64" height="66" rx="6"/>
+      <path class="cal-band" d="M14 22a6 6 0 0 1 6-6h52a6 6 0 0 1 6 6v10H14Z"/>
+      <path class="cal-ring" d="M30 10v12M62 10v12"/>
+      <text class="cal-month" x="46" y="28.5" text-anchor="middle">${mes}</text>
+      <text class="cal-day" x="46" y="64" text-anchor="middle">${fecha.getDate()}</text>
+      <text class="cal-week" x="46" y="75" text-anchor="middle">${semana}</text>
+    </svg>`;
   }
 
   function shareDailyFromHome() {
@@ -1883,6 +1899,60 @@
     const pendiente = loadDaily();
     if (pendiente) { setMode(pendiente.mode); resumeSolo("daily"); return; }
     if (dailyRecords().days?.[today()]) { home(); return; }
+    dailyIntro();
+  }
+
+  // La presentación del reto: el mazo del día es sorpresa hasta aquí. Los nombres de los
+  // mazos pasan cada vez más despacio hasta pararse en el de hoy (unos tres segundos), y
+  // entonces aparece su colección y el botón para jugar. Con movimiento reducido se
+  // desvela sin ruleta.
+  let dailyReelTimer = null;
+  function dailyIntro() {
+    clearTimeout(dailyReelTimer);
+    screen = "daily-intro";
+    const dia = today(), modeKey = dailyModeKey(dia), mode = CT.mode(modeKey);
+    const fecha = new Date(`${dia}T12:00:00`).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
+      <div class="chapter-art daily-splash-art" aria-hidden="true">${dailyCalendar(dia)}</div>
+      <div class="chapter-number">Reto diario · ${escapeHtml(fecha)}</div>
+      <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel" aria-hidden="true">·&nbsp;·&nbsp;·</span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
+      <p class="daily-splash-rule" hidden>${DAILY_CARDS} cartas, las mismas para todo el mundo. Un intento.</p>
+      <button class="btn btn-block comp-splash-start" data-action="daily-play" hidden>Jugar <span aria-hidden="true">→</span></button>
+    </div></section></div>`);
+    const reel = app.querySelector(".daily-reel");
+    const revela = () => {
+      if (screen !== "daily-intro" || !reel.isConnected) return;
+      reel.textContent = mode.name;
+      reel.classList.add("is-revealed");
+      const arte = app.querySelector(".daily-splash-art");
+      arte.innerHTML = blockArt(CT.blockOf(modeKey).art, true);
+      arte.classList.add("is-revealed");
+      CT.Scene.apply(modeKey, "daily-reveal");
+      app.querySelector(".daily-splash-rule").hidden = false;
+      const jugar = app.querySelector('[data-action="daily-play"]');
+      jugar.hidden = false;
+      app.querySelector("#daily-reveal").textContent = `Hoy toca ${mode.name}.`;
+      jugar.focus({ preventScroll: true });
+    };
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { revela(); return; }
+    // Los otros nombres, barajados, para que la ruleta no pase siempre en el mismo orden.
+    const otros = shuffle(CT.Cartera.diarios().filter(key => CT.has(key) && key !== modeKey).map(key => CT.mode(key).name));
+    let paso = 0, transcurrido = 0;
+    const gira = () => {
+      if (screen !== "daily-intro" || !reel.isConnected) return;
+      const espera = 60 + paso * paso * 2.2;
+      transcurrido += espera;
+      if (transcurrido > 2800 || !otros.length) { revela(); return; }
+      reel.textContent = otros[paso % otros.length];
+      paso += 1;
+      dailyReelTimer = setTimeout(gira, espera);
+    };
+    gira();
+  }
+
+  function playDaily() {
+    clearTimeout(dailyReelTimer);
+    if (loadDaily() || dailyRecords().days?.[today()]) { startDaily(); return; }
     // `setMode` pinta la puerta cerrada si el mazo no es suyo; el bote del reto son los
     // gratuitos, así que no debería pasar, pero si pasa se queda en esa explicación.
     if (!setMode(dailyModeKey())) return;
@@ -3506,6 +3576,7 @@
     else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
     else if (action === "resume-solo") resumeSolo();
     else if (action === "daily-start") startDaily();
+    else if (action === "daily-play") playDaily();
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();
