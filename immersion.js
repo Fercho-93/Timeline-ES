@@ -16,10 +16,13 @@
   };
   const icon = name => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
   function header(back = '', menu = '', inGame = false) {
+    // La tercera columna es una fila propia, no una sola celda: así aloja el interruptor
+    // de sonido y, cuando lo hay, el botón de menú, sin que ninguno de los dos tenga que
+    // adivinar el sitio del otro.
     return `<header class="topbar atlas-topbar${inGame ? ' atlas-game-topbar' : ''}">
       ${back ? `<button class="icon-btn atlas-back" ${back} aria-label="Volver a la pantalla anterior">${icon('back')}</button>` : '<span></span>'}
       ${inGame ? '<span></span>' : '<div class="brand">Continuum</div>'}
-      ${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : '<span></span>'}
+      <div class="atlas-topbar-actions"><i data-sound-slot></i>${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
     </header>`;
   }
   function nav(screen) {

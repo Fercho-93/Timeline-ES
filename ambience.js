@@ -199,9 +199,12 @@
   // inicio de sesión ni a la primera pantalla del juego para pedir la música.
   sync(true);
 
-  // Interruptor discreto, siempre presente en una esquina: distinto del del
-  // telón inicial (ese desaparece con el splash) y del de ajustes, pero
-  // gobierna la misma preferencia.
+  // Interruptor discreto: un único botón, creado una vez, que cada pantalla aloja en
+  // su propia cabecera. No flota por encima de nada ni se recalcula su posición: cada
+  // plantilla reserva su hueco con `[data-sound-slot]`, y aquí solo se traslada el mismo
+  // nodo —con sus escuchas ya puestas— al hueco que acaba de aparecer. Al ser el propio
+  // reparto de la cabecera (grid o flex) quien lo coloca, nunca puede solaparse con un
+  // botón vecino: eso lo garantiza el navegador, no una medición nuestra.
   function mountToggle() {
     const toggle = document.getElementById('ambience-toggle');
     if (!toggle) return;
@@ -218,44 +221,17 @@
     });
     document.addEventListener('continuum:settings-changed', reflect);
     reflect();
-    // El interruptor flota en la esquina de arriba a la derecha, y esa esquina la usan
-    // también algunas pantallas: el «Volver» del duelo por turnos y de las salas, los
-    // tres puntos de la partida… En vez de apartarlo pantalla por pantalla, después de
-    // cada repintado mira si pisa algún control y, si lo hace, se corre a su izquierda.
+    // Cada pantalla se pinta reemplazando el contenido de #app entero, así que la
+    // plantilla trae siempre un hueco nuevo, vacío. Un observador sobre #app basta para
+    // enterarse de cada repintado venga de donde venga (el flujo común de `CT.paint` o
+    // las pantallas que escriben su HTML por su cuenta, como el duelo por turnos).
     const app = document.getElementById('app');
-    const pisa = (a, b) => a.left < b.right + 6 && a.right > b.left - 6 && a.top < b.bottom + 6 && a.bottom > b.top - 6;
-    const aparta = () => {
-      toggle.style.right = '';
-      for (let intento = 0; intento < 4; intento++) {
-        const propio = toggle.getBoundingClientRect();
-        if (!propio.width) return;
-        const debajo = [...app.querySelectorAll('button, a[href], [role="button"], select, input, summary')].map(el => el.getBoundingClientRect())
-          .filter(r => r.width && r.height && pisa(propio, r));
-        if (!debajo.length) return;
-        toggle.style.right = `${Math.max(0, window.innerWidth - Math.min(...debajo.map(r => r.left)) + 8)}px`;
-      }
+    const coloca = () => {
+      const hueco = app?.querySelector('[data-sound-slot]');
+      if (hueco) hueco.replaceWith(toggle);
     };
-    // Las pantallas entran con un desplazamiento breve: mientras dura, los botones no
-    // están aún en su sitio. Por eso se mira al repintar y otra vez cuando la entrada
-    // termina (o, si no hay evento, al poco).
-    let pendiente = 0, tardio = 0;
-    const siguienteCuadro = window.requestAnimationFrame?.bind(window) || (fn => setTimeout(fn, 16));
-    const cancelaCuadro = window.cancelAnimationFrame?.bind(window) || clearTimeout;
-    const programa = () => {
-      cancelaCuadro(pendiente); clearTimeout(tardio);
-      pendiente = siguienteCuadro(aparta);
-      tardio = setTimeout(aparta, 600);
-    };
-    if (app && 'MutationObserver' in window) {
-      new MutationObserver(programa).observe(app, { childList: true, subtree: true });
-      // Mientras dura el telón de entrada el interruptor está oculto y no se puede medir:
-      // al retirarse el telón (cambia la clase de <html>) se vuelve a mirar.
-      new MutationObserver(programa).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    }
-    app?.addEventListener('animationend', programa, true);
-    app?.addEventListener('transitionend', event => { if (event.propertyName === 'transform') programa(); }, true);
-    window.addEventListener('resize', programa);
-    programa();
+    if (app && 'MutationObserver' in window) new MutationObserver(coloca).observe(app, { childList: true, subtree: true });
+    coloca();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountToggle);
   else mountToggle();

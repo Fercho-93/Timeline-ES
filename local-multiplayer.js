@@ -69,7 +69,7 @@
   }
 
   function header(backAction, actionsHtml = "") {
-    return `<header class="topbar"><button class="icon-btn" data-local-action="${backAction}" aria-label="Volver">${BACK_ICON}</button><div class="brand">Continuum</div><div class="topbar-actions">${actionsHtml}</div></header>`;
+    return `<header class="topbar"><button class="icon-btn" data-local-action="${backAction}" aria-label="Volver">${BACK_ICON}</button><div class="brand">Continuum</div><div class="topbar-actions"><i data-sound-slot></i>${actionsHtml}</div></header>`;
   }
 
   function wifiNote() {

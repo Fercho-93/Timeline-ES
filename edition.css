@@ -367,9 +367,14 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* Atlas: navegación común, arte integrado y mesa compacta. */
 :root { --atlas-selection: #9b452b; }
 :root[data-theme="dark"] { --atlas-selection: #f2aa83; }
-#app .atlas-topbar { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 8px; width: 100%; padding: 4px 0; margin: 0 0 12px; min-height: 48px; border: 0; }
+#app .atlas-topbar { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; align-items: center; gap: 8px; width: 100%; padding: 4px 0; margin: 0 0 12px; min-height: 48px; border: 0; }
 #app .atlas-topbar .brand { min-height: 0; text-align: center; font-size: .72rem; letter-spacing: .16em; }
 #app .atlas-topbar .icon-btn { display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 50%; background: transparent; }
+/* Tercera columna: fila propia con el sonido y, si la pantalla lo pide, el menú de la
+   partida (⋮). Crece con su contenido —una o dos monedas de 44 px— en vez de forzar un
+   ancho fijo que solo cabría una. */
+#app .atlas-topbar-actions { grid-column: 3; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+#app .atlas-topbar-actions .ambience-toggle { width: 36px; height: 36px; }
 #app.atlas-has-nav > .shell { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
 #app .atlas-nav { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: 100%; max-width: none; left: 0; transform: none; background: var(--edition-surface); min-height: 64px; z-index: 30; }
 #app .atlas-nav button { min-height: 50px; min-width: 0; }
@@ -616,7 +621,11 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app .play-menu-shell .play-choice { min-height: 60px; padding: 8px 12px; }
   #app .play-menu-shell :is(.play-block-toggle,.play-choice) b { font-size: 1.05rem; }
   #app .play-menu-shell :is(.play-block-toggle,.play-choice) small { font-size: .78rem; line-height: 1.3; }
-  #app .home-gallery-shell .atlas-topbar { display: none; }
+  /* El resto de la cabecera se retira para dejar sitio a la colección, pero el
+     interruptor de sonido se queda: es la única manera de llegar a él en esta
+     pantalla sin pasar por Ajustes. */
+  #app .home-gallery-shell .atlas-topbar { min-height: 0; margin-bottom: 4px; padding: 4px 0 0; border: 0; }
+  #app .home-gallery-shell .atlas-topbar > :not(.atlas-topbar-actions) { display: none; }
   #app .home-gallery-shell .quick-actions { margin: 6px auto; }
   #app .home-gallery-shell .home-masthead { margin: 8px auto 14px; }
   #app .home-gallery-shell .home-crest { width: clamp(80px, 15svh, 100px); }
@@ -2175,10 +2184,18 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 :root[data-theme="dark"] #app .home-door-art img { filter: sepia(.35) saturate(.8) brightness(.9); }
 :root[data-theme="dark"] #app .home-duels-banner { box-shadow: 0 6px 18px #0005; }
 
-/* Portada sin desplazamiento: la barra superior está vacía en Inicio (no hay nada a lo
-   que volver), así que se retira y el logo sube; sus medidas siguen la altura de la
-   pantalla para que las tres puertas quepan a la vista junto a la barra inferior. */
-#app .home-doors-shell .atlas-topbar { display: none; }
+/* Portada sin desplazamiento: la barra superior no tiene ni «volver» ni marca en
+   Inicio, así que se retira y el logo sube; sus medidas siguen la altura de la pantalla
+   para que las tres puertas quepan a la vista junto a la barra inferior. El interruptor
+   de sonido se queda, pero sale del flujo del documento (posición absoluta, sin alto
+   propio): aquí no hay ningún otro botón con el que pueda solaparse, así que flotar en
+   esta esquina no cuesta el hueco que exige la portada sin desplazamiento. */
+#app .home-doors-shell .atlas-topbar {
+  position: absolute; inset: max(6px, env(safe-area-inset-top)) 0 auto 0;
+  margin: 0; padding: 0; border: 0; min-height: 0; z-index: 5; pointer-events: none;
+}
+#app .home-doors-shell .atlas-topbar > :not(.atlas-topbar-actions) { display: none; }
+#app .home-doors-shell .atlas-topbar-actions { pointer-events: auto; padding-right: max(4px, env(safe-area-inset-right)); }
 #app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(env(safe-area-inset-top) + 10px) auto clamp(12px, 2.4svh, 22px); padding: 0; }
 #app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(78px, 13svh, 128px); margin-bottom: -6px; }
 #app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2.2rem, 6.2svh, 3.4rem); }

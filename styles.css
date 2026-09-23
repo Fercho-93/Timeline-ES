@@ -2233,6 +2233,7 @@ body::before {
 .turn-duel-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
 .turn-duel-nav > span { min-width: 0; font: 700 .9rem var(--font-display); letter-spacing: .1em; }
 .turn-duel-nav small { display: block; font: 400 .7rem/1.5 system-ui; letter-spacing: 0; color: var(--muted); }
+.turn-duel-nav-actions { display: flex; align-items: center; gap: 10px; flex: none; }
 .turn-duel-nav .btn { flex: none; min-height: 44px; padding: 8px 14px; }
 .turn-duel-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; margin-bottom: 14px; }
 .turn-duel-heading h1 { font-size: clamp(1.4rem, 5vw, 2rem); line-height: 1.12; margin: 5px 0; overflow-wrap: anywhere; }
@@ -2318,15 +2319,14 @@ body::before {
 .turn-duel-profile-row>button{display:grid;gap:5px;text-align:left;min-width:0;overflow-wrap:anywhere}
 @media(max-width:420px){.turn-duel-profile-row{grid-template-columns:minmax(0,1fr)}.turn-duel-rival{flex-wrap:wrap}.turn-duel-row-actions{max-width:none;width:100%}}
 
-/* Interruptor de música: discreto en cualquier pantalla, menú o partida.
-   Vive fuera de #app para no desaparecer en los repintados. */
+/* Interruptor de música: un solo nodo (vive fuera de #app para conservar sus escuchas
+   entre repintados) que cada cabecera aloja en su propio hueco [data-sound-slot]. No
+   flota ni se posiciona a mano: es un elemento más del reparto flex/grid de esa
+   cabecera, así que nunca puede quedar encima de otro botón. */
 .ambience-toggle {
-  position: fixed;
-  z-index: 40;
-  right: max(10px, env(safe-area-inset-right));
-  top: max(10px, env(safe-area-inset-top));
   display: grid;
   place-items: center;
+  flex: none;
   width: 34px;
   height: 34px;
   padding: 0;
@@ -2348,6 +2348,9 @@ body::before {
 .ambience-toggle:active { transform: scale(.92); }
 @media (hover: hover) { .ambience-toggle:hover { opacity: 1; } }
 .ambience-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* Mientras dura el telón, el interruptor todavía no tiene hueco donde vivir (#app sigue
+   vacío): se queda oculto en vez de aparecer suelto al final de la página. */
 html.splash-active .ambience-toggle { display: none; }
-/* En partida esa esquina ya tiene el botón de opciones (⋮): el interruptor se corre a su lado. */
-#app:has(.atlas-game-topbar) ~ .ambience-toggle { right: calc(max(10px, env(safe-area-inset-right)) + 52px); }
+/* La cabecera común de cada pantalla (#app .atlas-topbar-actions), la de las salas de
+   varios móviles (#app .topbar-actions) y la del duelo por turnos
+   (#app .turn-duel-nav-actions) son las que reparten este hueco; ver edition.css. */
