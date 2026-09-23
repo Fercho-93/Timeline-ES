@@ -89,7 +89,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
 {
   const w=boot();
   try {
-    assert.deepEqual(JSON.parse(JSON.stringify(w.CONTINUUM.effectPrefs())),{sound:false,haptics:false,ambience:false,depth:false});
+    assert.deepEqual(JSON.parse(JSON.stringify(w.CONTINUUM.effectPrefs())),{sound:false,haptics:false,ambience:false,depth:false,ambienceVolume:0.5});
     assert.equal(w.CONTINUUM.setAmbience(true), true);
     assert.equal(w.CONTINUUM.effectPrefs().ambience, true, 'la portada puede activar la misma preferencia que Ajustes');
     assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).ambience, true, 'la elección de portada queda guardada');
