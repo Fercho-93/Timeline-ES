@@ -1623,7 +1623,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app[data-screen="home"] .home-gallery-shell::before {
   content: "";
   position: absolute;
-  z-index: -1;
+  z-index: 1;
   inset: 0;
   pointer-events: none;
   opacity: .48;
@@ -2257,7 +2257,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .home-door-art,
 #app .home-door-daily .home-door-art {
   position: absolute;
-  z-index: -2;
+  z-index: 0;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -2334,3 +2334,16 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   width: 100%;
   height: 100%;
 }
+
+/* Capas explícitas para que las imágenes de portada queden visibles en Safari móvil. */
+#app .home-doors-shell .home-door-art,
+#app .home-doors-shell .home-door-daily .home-door-art {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+#app .home-doors-shell .home-door::after { z-index: 1; }
+#app .home-doors-shell .home-door-copy { position: relative; z-index: 2; }
