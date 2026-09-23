@@ -191,16 +191,12 @@
         dock.setAttribute('role', 'group');
         dock.setAttribute('aria-label', 'Confirmar la posición elegida');
         dock.append(status, actions);
-      } else {
-        dock.innerHTML = `<span class="placement-instruction">${screen === 'solo' ? 'Toca un hueco de la línea para colocar tu carta' : 'Elige una carta y un hueco de la línea'}</span><button class="btn btn-primary btn-block" type="button" disabled>Colocar carta →</button>`;
       }
-      const shell = container.querySelector('.shell');
       const timelineSection = container.querySelector('.timeline-wrap')?.closest('section');
       // Cuando hay una decisión pendiente, sus mandos pertenecen a la línea y quedan
       // justo después de ella. En el flujo no cubren la carta ni dependen del alto de la
-      // barra del navegador. La instrucción sin botones sigue cerrando la página.
+      // barra del navegador. Antes de elegir hueco no se añade un panel redundante.
       if (slot && timelineSection) timelineSection.insertAdjacentElement('afterend', dock);
-      else shell?.append(dock);
     }
     refreshDepth();
   }
