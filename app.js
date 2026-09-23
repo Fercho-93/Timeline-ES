@@ -470,8 +470,8 @@
       <div id="home-duels" class="home-duels"></div>
       <section class="home-doors" aria-label="Qué quieres hacer">
         ${dailyDoor()}
-        ${homeDoor("jugar", "Jugar", "Elige qué y cómo", "Grandes colecciones, retos rápidos y competición. Solo, con más gente o retando a un amigo.", "hero-mixed", 992)}
-        ${homeDoor("perfil", "Atlas", "Tu colección", "Las cartas que has descubierto, tu progreso y tus logros.", "hero-geography", 859)}
+        ${homeDoor("jugar", "Jugar", "Elige qué y cómo", "Colecciones, retos rápidos y competición.", "hero-mixed", 992)}
+        ${homeDoor("perfil", "Atlas", "Tu colección", "Tus cartas, tu progreso y tus logros.", "hero-geography", 859)}
       </section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>
@@ -496,8 +496,8 @@
     const fecha = `<time datetime="${dia}">${dia.split("-").reverse().join("/")}</time>`;
     const rachaTexto = `${glyph(GLYPHS.racha)}<span>${racha ? `${racha} ${racha === 1 ? "día seguido" : "días seguidos"}` : "Empieza hoy tu racha"}</span>`;
     const detalle = hecho
-      ? `Hoy, en ${escapeHtml(CT.mode(dailyModeKey(dia)).name)}: <strong>${hecho.hits} de ${hecho.total}</strong>. Mañana, otro mazo sorpresa.`
-      : `Un mazo sorpresa y las mismas ${DAILY_CARDS} cartas para todo el mundo. Un intento al día.`;
+      ? `${escapeHtml(CT.mode(dailyModeKey(dia)).name)}: <strong>${hecho.hits} de ${hecho.total}</strong>`
+      : "Un mazo sorpresa cada día.";
     const copy = `<span class="home-door-kicker">${fecha}</span><b>Reto diario</b>
       <small>${detalle}</small>
       <span class="home-daily-streak">${rachaTexto}</span>`;
