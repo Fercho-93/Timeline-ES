@@ -34,4 +34,15 @@ No se han recuperado los prompts completos, la fecha individual de generación, 
 
 Antes de una publicación comercial se deben conservar, junto con la documentación del proyecto, los términos aplicables al plan y servicio utilizados en cada generación. Esta documentación no afirma que OpenAI sea el titular de las imágenes ni sustituye una revisión jurídica; deja registrada la procedencia declarada y evita presentar los recursos como imágenes descargadas de terceros.
 
+### Términos comerciales de OpenAI (A.5.2)
+
+Según los términos de uso públicos de OpenAI vigentes: entre el usuario y OpenAI, el usuario es dueño del resultado («output») que genera — OpenAI cede su derecho, título e interés sobre ese resultado —, y puede usarlo para cualquier fin, incluido el comercial, sujeto a las políticas de uso de OpenAI. Esto aplica igual estés en el plan gratuito, Plus o de pago por API; lo que cambia entre planes es solo si OpenAI puede usar tus conversaciones para entrenar sus modelos (en Business/Team/API no lo hace; en gratuito/Plus sí, salvo que se desactive), lo cual no afecta a tu derecho a usar comercialmente lo que generaste.
+
+Dos matices legales a tener en cuenta, no exclusivos de OpenAI sino de cómo funciona el derecho de autor con IA en general:
+
+- **El resultado puede no ser único**: la propia cesión de derechos de OpenAI no impide que otra persona reciba una imagen parecida a partir de un prompt similar — no es una garantía de exclusividad.
+- **Una obra generada íntegramente por IA, sin aportación creativa humana significativa, puede no ser protegible por derechos de autor** tanto en EE. UU. como en la práctica habitual de la UE/España (que también exige autoría humana para la protección). En la práctica: puedes usar las imágenes comercialmente sin problema (es lo que autorizan los términos de OpenAI), pero la capacidad de impedir que un tercero copie una ilustración muy similar generada por IA es legalmente menos sólida que con una ilustración encargada a una persona.
+
+Esto no es asesoramiento jurídico — antes de un lanzamiento comercial real conviene una revisión legal de los términos vigentes en ese momento (OpenAI los actualiza) y de si conviene añadir aportación creativa humana adicional (edición, composición, selección) a las piezas más visibles (icono, logo, portada) para reforzar su protección.
+
 Los textos, datos, fuentes y marcas representadas en las cartas tienen una revisión independiente. Que una ilustración haya sido generada con IA no convierte automáticamente en libres de derechos los nombres, logotipos o elementos identificables de terceros que pudiera representar.
