@@ -87,8 +87,12 @@ function accountDialog(html) {
 function editNameScreen() {
   accountDialog(`<div class="overlay"><section class="modal"><h2>Cambiar nombre</h2><p>Este nombre será público en el ranking. No uses datos personales.</p><label>Nombre<input id="account-alias" minlength="2" maxlength="24" autocomplete="nickname" value="${esc(profile.alias)}"></label><p id="account-delete-message" role="status"></p><button class="btn btn-primary" data-account-action="rename">Guardar nombre</button><button class="btn btn-secondary" data-account-action="close">Cancelar</button></section></div>`,true);
 }
-async function rename() {
-  const alias = document.getElementById('account-alias').value.trim();
+// Sin argumento lee el diálogo de la tarjeta; con él, lo llama la identidad del juego
+// (bienvenida y Atlas) con el nombre ya elegido.
+async function rename(aliasArg) {
+  const desdeDialogo = typeof aliasArg !== 'string';
+  const alias = (desdeDialogo ? document.getElementById('account-alias').value : aliasArg).trim();
+  if (alias === profile?.alias) return;
   validateAlias(alias);
   const aliasKey=nameKey(alias);
   if (alias.length < 2 || alias.length > 24 || /[<>\x00-\x1f]/.test(alias)) throw Error('Elige un nombre de 2 a 24 caracteres sin símbolos < o >.');
@@ -109,7 +113,7 @@ async function rename() {
   CT.Storage.setItem('hilo-nombre-v1',alias);
   const card=document.querySelector('.account-card');
   if(card) card.outerHTML=accountCard();
-  CT.closeDialog();
+  if (desdeDialogo) CT.closeDialog();
 }
 function metadata() { try { return JSON.parse(CT.Storage.getItem(META)) || {}; } catch { return {}; } }
 function setMeta(dirty) { CT.Storage.setItem(META,JSON.stringify({revision,dirty})); }
@@ -224,10 +228,10 @@ async function enter() {
 function accountCard() {
   const stats=payload(), dirty=metadata().dirty;
   return `<div class="account-card">
-    <div class="account-hero"><span class="account-kicker">TU HISTORIA EN CONTINUUM</span><div class="account-identity"><span class="account-avatar" aria-hidden="true">${avatars[profile?.avatar] || '🧭'}</span><div><span class="account-kicker">EXPLORADOR</span><strong>${esc(profile?.alias || '')}</strong><span class="account-save-state" role="status">${dirty ? '◌ Cambios pendientes' : '✓ Progreso guardado'}</span></div></div>
+    <div class="account-hero"><span class="account-kicker">TU CUENTA</span><span class="account-save-state" role="status">${dirty ? '◌ Cambios pendientes' : '✓ Progreso guardado'}</span>
     <div class="account-metrics"><div><b>${stats.hits}</b><span>Aciertos diarios</span></div><div><b>${stats.games}</b><span>Retos completados</span></div></div></div>
     <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking de retos diarios</b><span>Descubre tu lugar entre exploradores</span></span><span aria-hidden="true">↗</span></button>
-    <div class="account-actions"><button class="btn btn-secondary" data-account-action="edit-name"><span aria-hidden="true">✎</span> Cambiar nombre</button><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>
+    <div class="account-actions"><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>
     <details class="account-details"><summary>Tu invitado y tus datos</summary><p>Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.</p><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a><button class="btn btn-ghost account-delete" data-account-action="delete">Eliminar invitado y progreso</button></details>
   </div>`;
 }
@@ -263,7 +267,7 @@ async function removeAccount() {
 }
 export async function startAccounts(callback) {
   startGame=callback;
-  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush};
+  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,renombra:alias=>rename(alias)};
   await auth.authStateReady();
   await setPersistence(auth,browserLocalPersistence);
   onAuthStateChanged(auth,u=>{

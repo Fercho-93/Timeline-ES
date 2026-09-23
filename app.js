@@ -375,7 +375,7 @@
     const deck = shuffle(CT.cards(selectedModeKey).map(c=>c.id).filter(id => id !== excludedCardId));
     const handSize = Math.min(t.handSize, Math.floor((deck.length-1)/players.length));
     const powers = CT.Powers.create(deck,players.length,handSize,ghost,pulse);
-    const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
+    const roster = players.map(p=>({id:p.id,name:p.name,avatar:p.avatar,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
     const timeline=[deck.shift()];
     roster.forEach(p=>p.hand.forEach(id=>CT.Powers.claim(powers,id,p.id,deck)));
     game={mode:selectedModeKey,tournament:t,competitionGhost:ghost,pulse,...powers,players:roster,deck,discard:[],timeline,current:starter,starter,turnsInRound:0,round:1,winner:null,winners:null,tournamentIntro:true,pulseTurn:null,pulseGift:null};
@@ -424,6 +424,8 @@
 
 
   function backMenu() {
+    // La bienvenida no tiene nada detrás: hasta tener nombre no se entra en el juego.
+    if (screen === "bienvenida") return;
     CT.prepareReturn?.();
     if (screen !== 'enciclopedia' && navigationTrail.length) {
       const previous = navigationTrail.pop();
@@ -457,6 +459,78 @@
   function quickChallenges() {
     screen = "quick-challenges";
     CT.Quick.open((html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);});
+  }
+
+  // ── Bienvenida ─────────────────────────────────────────────────────────────────────
+  //
+  // La primera vez que se entra, el juego pregunta el nombre y asigna un avatar al azar
+  // entre los nueve (se puede elegir otro ahí mismo o después, en el Atlas). Quien ya
+  // tenía nombre de antes se reconoce y no pasa por aquí (`CT.Identidad.reconoce`).
+  let bienvenidaAvatar = null;
+  function bienvenida(paso = "nombre", error = "") {
+    screen = "bienvenida";
+    const nombre = bienvenidaNombre || CT.Identidad.nombre();
+    if (paso === "nombre") {
+      paint(`<div class="shell bienvenida-shell"><section class="bienvenida">
+        <img class="bienvenida-emblema" src="assets/continuum-emblem-800.webp" alt="" width="800" height="533">
+        <h1 data-focus tabindex="-1">Bienvenido a Continuum</h1>
+        <p class="lead">¿Cómo te llamas?</p>
+        <form class="bienvenida-form" data-bienvenida="nombre" novalidate>
+          <label class="solo-lectores" for="bienvenida-nombre">Tu nombre</label>
+          <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu nombre" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error">
+          <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
+          <button class="btn btn-primary btn-block" type="submit">Continuar <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="hint">Es el nombre de tu perfil. Podrás cambiarlo en el Atlas.</p>
+      </section></div>`);
+      return;
+    }
+    bienvenidaAvatar ||= CT.Avatares.aleatorio();
+    const elegido = CT.Avatares.de(bienvenidaAvatar);
+    paint(`<div class="shell bienvenida-shell"><section class="bienvenida">
+      <div class="bienvenida-avatar">${CT.Avatares.markup(elegido.key, { size: 112, etiqueta: `Tu avatar: ${elegido.nombre}` })}</div>
+      <h1 data-focus tabindex="-1">${escapeHtml(nombre)}</h1>
+      <p class="lead">Te ha tocado ${escapeHtml(elegido.nombre)}.</p>
+      ${avatarPicker(elegido.key, "bienvenida-avatar")}
+      <button class="btn btn-primary btn-block" data-action="bienvenida-fin">Empezar a jugar <span aria-hidden="true">→</span></button>
+      <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
+    </section></div>`);
+  }
+  let bienvenidaNombre = "";
+
+  // La cuadrícula de los nueve avatares, para la bienvenida y el Atlas.
+  function avatarPicker(actual, accion) {
+    return `<div class="avatar-picker" role="radiogroup" aria-label="Elige tu avatar">${CT.Avatares.LISTA.map(avatar =>
+      `<button type="button" role="radio" aria-checked="${avatar.key === actual}" class="avatar-option${avatar.key === actual ? " is-on" : ""}" data-action="${accion}" data-avatar="${avatar.key}" aria-label="${escapeHtml(avatar.nombre)}">${CT.Avatares.markup(avatar.key, { size: 52 })}</button>`).join("")}</div>`;
+  }
+
+  // El nombre se guarda también en la cuenta, si la hay: es el del ranking y los duelos.
+  // Si otra cuenta ya lo usa, se dice y se deja elegir otro.
+  async function guardaNombre(nombre) {
+    const problema = CT.Identidad.problema(nombre);
+    if (problema) throw Error(problema);
+    if (CT.Accounts?.ready && CT.Accounts.renombra) await CT.Accounts.renombra(CT.Identidad.limpia(nombre));
+  }
+
+  async function bienvenidaNombreEnviado(boton) {
+    const nombre = CT.Identidad.limpia(document.getElementById("bienvenida-nombre")?.value);
+    if (boton) boton.disabled = true;
+    try {
+      await guardaNombre(nombre);
+      bienvenidaNombre = nombre;
+      bienvenida("avatar");
+    } catch (error) {
+      bienvenidaNombre = nombre;
+      bienvenida("nombre", error.message || "No se ha podido guardar el nombre.");
+      document.getElementById("bienvenida-nombre")?.focus();
+    }
+  }
+
+  function bienvenidaFin() {
+    try { CT.Identidad.guarda({ nombre: bienvenidaNombre, avatar: bienvenidaAvatar }); }
+    catch { bienvenida("nombre", "Escribe tu nombre para continuar."); return; }
+    bienvenidaAvatar = null;
+    home();
   }
 
   // La portada tiene tres puertas y nada más: el reto del día, jugar y el atlas. Encima,
@@ -725,7 +799,7 @@
         <div class="panel">
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
-            <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="Jugador 1" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
+            <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="${escapeHtml(CT.Identidad.nombre() || "Jugador 1")}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
             <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
             <section id="recent-players" class="recent-players" aria-label="Participantes recientes" hidden></section>
           </div>
@@ -868,6 +942,26 @@
     renderRecentPlayers();
   }
 
+  // Los avatares de una partida en un solo móvil: quien lleva tu nombre, el tuyo; el resto
+  // recibe uno distinto al azar, sin repetir, para distinguir a cada cual en la mesa.
+  function avataresPara(names) {
+    const propio = CT.Identidad.nombre().toLocaleLowerCase("es");
+    let propioUsado = false;
+    const asignados = names.map(name => {
+      if (!propioUsado && propio && name.trim().toLocaleLowerCase("es") === propio) { propioUsado = true; return CT.Identidad.avatar(); }
+      return null;
+    });
+    asignados.forEach((avatar, i) => { if (!avatar) asignados[i] = CT.Avatares.aleatorio(asignados.filter(Boolean)); });
+    return asignados;
+  }
+
+  // Las partidas guardadas antes de que hubiera avatares no los llevan: se les da uno
+  // fijo por puesto, que no cambia al repintar.
+  function jugadorAvatar(jugador, size) {
+    const clave = CT.Avatares.valido(jugador.avatar) ? jugador.avatar : CT.Avatares.LISTA[(Number(jugador.id) - 1 + 9) % 9].key;
+    return CT.Avatares.markup(clave, { size });
+  }
+
   function startGame() {
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     const inputs = [...document.querySelectorAll("#players input")];
@@ -890,7 +984,8 @@
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
     if (pendingTournament) {
       const t=CT.Tournament.create(pendingTournament.rounds,requestedHand);pendingTournament=null;
-      startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse,starterDraw.cardId);return;
+      const avatares=avataresPara(names);
+      startTournamentRound(t,names.map((name,i)=>({id:i+1,name,avatar:avatares[i]})),starter,ghost,pulse,starterDraw.cardId);return;
     }
     // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
     // del mazo para que nadie vuelva a encontrárselas en la partida.
@@ -899,7 +994,8 @@
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
     const powers = CT.Powers.create(shuffled, names.length, handSize, ghost, pulse);
-    const players = names.map((name, i) => ({ id: i + 1, name, hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
+    const avatares = avataresPara(names);
+    const players = names.map((name, i) => ({ id: i + 1, name, avatar: avatares[i], hand: shuffled.splice(0, handSize), pulseUsed: false, shieldRound: 0 }));
     const timeline = [shuffled.shift()];
     players.forEach(p => p.hand.forEach(id => CT.Powers.claim(powers, id, p.id, shuffled)));
     game = { mode: selectedModeKey, pulse, ...powers, players, deck: shuffled, discard: [], timeline, current: starter, starter, turnsInRound: 0, round: 1, winner: null, winners: null, pulseTurn: null, pulseGift: null };
@@ -921,7 +1017,7 @@
       ? `<p class="pulse-gift">⚡ <b>${escapeHtml(game.pulseGift.from)}</b> te ha pasado <b>${escapeHtml(cardsById.get(game.pulseGift.cardId).title)}</b> con su Pulso.</p>`
       : "";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
-      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion">${escapeHtml(initials(player.name))}</div><div class="eyebrow">${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
+      <section class="pass-screen"><div class="panel pass-card"><div class="player-medallion player-medallion-avatar">${jugadorAvatar(player, 76)}</div><div class="eyebrow">${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}</div><h2 data-focus tabindex="-1">El turno es de<br>${escapeHtml(player.name)}</h2><p>Pásale el móvil. Las fechas siguen ocultas hasta colocar una carta.</p>${regalo}<button class="btn btn-primary btn-block" data-action="ready">Empezar mi turno <span>→</span></button></div></section>
     </div>`);
   }
 
@@ -967,7 +1063,7 @@
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
-      <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i>${escapeHtml(initials(p.name))}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
+      <div class="scoreboard">${game.players.map((p, i) => `<span class="score ${i === game.current ? "active" : ""}"${i === game.current ? ' aria-current="true"' : ""}><i class="score-avatar">${jugadorAvatar(p, 28)}</i><b>${escapeHtml(p.name)}</b><em>${p.hand.length}</em></span>`).join("")}</div>
       ${pulseCard ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer().name)}</b> reta a <b>${escapeHtml(pulseTarget.name)}</b>${defending ? " · te toca defender" : ""}</div>` : ""}
       ${CT.Ghost.banner(game.ghost, game.players)}
       <section><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: !!game.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
@@ -1223,7 +1319,7 @@
     const target = game.players.find(item => item.id === game.pulseTurn.targetId);
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <section class="pass-screen"><div class="panel pass-card">
-        <div class="player-medallion">${escapeHtml(initials(target.name))}</div>
+        <div class="player-medallion player-medallion-avatar">${jugadorAvatar(target, 76)}</div>
         <div class="eyebrow">⚡ Pulso · Te retan</div>
         <h2 data-focus tabindex="-1">Pásale el móvil a<br>${escapeHtml(target.name)}</h2>
         <p>Coloca la misma carta donde creas que va. No verás dónde la ha puesto ${escapeHtml(currentPlayer().name)} hasta que los dos hayáis jugado.</p>
@@ -1651,6 +1747,48 @@
       <button class="btn btn-primary" data-action="home-encyclopedia">Explorar todas las cartas <span aria-hidden="true">→</span></button></section>`;
   }
 
+  // Quién eres en el juego: tu avatar y tu nombre, con lo necesario para cambiarlos.
+  function atlasIdentidad() {
+    const avatar = CT.Avatares.de(CT.Identidad.avatar());
+    return `<section class="panel atlas-identidad">
+      <button class="atlas-identidad-avatar" data-action="identidad-avatar" aria-label="Cambiar avatar (ahora ${escapeHtml(avatar.nombre)})">${CT.Avatares.markup(avatar.key, { size: 72 })}</button>
+      <div><h2>${escapeHtml(CT.Identidad.nombre() || "Sin nombre")}</h2>
+        <div class="atlas-identidad-acciones"><button class="btn btn-secondary" data-action="identidad-nombre">Cambiar nombre</button><button class="btn btn-ghost" data-action="identidad-avatar">Cambiar avatar</button></div></div>
+    </section>`;
+  }
+
+  function editaNombre(error = "", valor = CT.Identidad.nombre()) {
+    CT.closeDialog?.();
+    overlay(`<div class="overlay"><div class="modal identidad-modal"><h2>Tu nombre</h2>
+      <form data-identidad="nombre" novalidate>
+        <label for="identidad-nombre">Nombre de tu perfil</label>
+        <input id="identidad-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" value="${escapeHtml(valor)}" aria-describedby="identidad-error">
+        <p id="identidad-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
+        <div class="actions" style="display:grid"><button class="btn btn-primary" type="submit">Guardar</button><button class="btn btn-secondary" type="button" data-action="close-menu">Cancelar</button></div>
+      </form></div></div>`, true);
+  }
+
+  async function nombreEditado(boton) {
+    const nombre = CT.Identidad.limpia(document.getElementById("identidad-nombre")?.value);
+    if (boton) boton.disabled = true;
+    try {
+      await guardaNombre(nombre);
+      CT.Identidad.guarda({ nombre });
+      CT.closeDialog();
+      perfilView();
+      showToast("Nombre guardado");
+    } catch (error) {
+      editaNombre(error.message || "No se ha podido guardar el nombre.", nombre);
+    }
+  }
+
+  function editaAvatar() {
+    overlay(`<div class="overlay"><div class="modal identidad-modal"><h2>Tu avatar</h2>
+      <p class="hint">Te identifica en las partidas de varios.</p>
+      ${avatarPicker(CT.Identidad.avatar(), "identidad-avatar-elige")}
+      <button class="btn btn-secondary btn-block" data-action="close-menu">Cerrar</button></div></div>`, true);
+  }
+
   function atlasRetoDiario() {
     const records = dailyRecords(), racha = dailyStreak(records);
     return `<section class="panel atlas-daily"><h2>Reto diario</h2>
@@ -1720,6 +1858,7 @@
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
         <header class="atlas-page-heading"><div class="eyebrow">Tu colección y tu recorrido</div><h1 data-focus tabindex="-1">Atlas</h1><p>Las cartas que has descubierto y la huella que deja cada partida.</p></header>
+        ${atlasIdentidad()}
         ${atlasColeccion()}
         ${atlasRetoDiario()}
         <section class="panel atlas-duels"><div><h2>Tus duelos</h2><p>Retos por turnos con tus amigos: en qué punto está cada uno.</p></div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section>
@@ -2225,7 +2364,7 @@
   const DUEL_NAME_KEY = "hilo-nombre-v1";
 
   function duelName() {
-    try { return CT.Duelo.limpiaNombre(CT.Accounts?.profile?.alias || CT.Storage.getItem(DUEL_NAME_KEY) || "Explorador"); } catch { return "Explorador"; }
+    try { return CT.Duelo.limpiaNombre(CT.Identidad.nombre() || CT.Accounts?.profile?.alias || CT.Storage.getItem(DUEL_NAME_KEY) || "Explorador"); } catch { return "Explorador"; }
   }
 
   function saveDuelName(nombre) {
@@ -3577,6 +3716,11 @@
     else if (action === "resume-solo") resumeSolo();
     else if (action === "daily-start") startDaily();
     else if (action === "daily-play") playDaily();
+    else if (action === "bienvenida-avatar") { bienvenidaAvatar = target.dataset.avatar; bienvenida("avatar"); app.querySelector(`[data-avatar="${bienvenidaAvatar}"]`)?.focus(); }
+    else if (action === "bienvenida-fin") bienvenidaFin();
+    else if (action === "identidad-nombre") editaNombre();
+    else if (action === "identidad-avatar") editaAvatar();
+    else if (action === "identidad-avatar-elige") { CT.Identidad.guarda({ avatar: target.dataset.avatar }); CT.closeDialog(); perfilView(); showToast(`Avatar: ${CT.Avatares.de(target.dataset.avatar).nombre}`); }
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();
@@ -3615,6 +3759,16 @@
     else if (action === "perfil-import" && !CT.Accounts) perfilImport();
     else if (action === "perfil-reset" && !CT.Accounts) perfilResetMenu();
     else if (action === "perfil-reset-confirm" && !CT.Accounts) { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
+  });
+
+  // Los dos formularios de nombre (bienvenida y Atlas) se envían con Intro igual que con
+  // el botón.
+  app.addEventListener("submit", event => {
+    const form = event.target.closest("[data-bienvenida], [data-identidad]");
+    if (!form) return;
+    event.preventDefault();
+    const boton = form.querySelector('[type="submit"]');
+    if (form.dataset.bienvenida) bienvenidaNombreEnviado(boton); else nombreEditado(boton);
   });
 
   app.addEventListener("keydown", event => {
@@ -3699,5 +3853,6 @@
     const leido = CT.Duelo.descodificar(duelPayload);
     if (leido.ok) { pendingDuel = leido.duelo; duelIntro(); }
     else duelInvalido(leido.motivo, leido.mode);
-  } else if (!restoreView()) home();
+  } else if (!CT.Identidad.reconoce()) bienvenida();
+  else if (!restoreView()) home();
 })();

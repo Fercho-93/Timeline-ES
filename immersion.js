@@ -152,12 +152,13 @@
     }
     // El fondo de la enciclopedia es una instantánea inerte; su barra no es la real.
     container.querySelectorAll('.enc-background .home-nav').forEach(el => el.remove());
-    if (inGame) container.querySelectorAll('.home-nav').forEach(el => el.remove());
+    // La bienvenida tampoco lleva barra: hasta tener nombre no hay a dónde ir.
+    if (inGame || container.querySelector('.bienvenida-shell')) container.querySelectorAll('.home-nav').forEach(el => el.remove());
     else if (!container.querySelector('.home-nav')) {
       const destination = container.querySelector('.enc-modal') || container.querySelector('.shell') || container;
       destination.insertAdjacentHTML('beforeend', nav(screen));
     }
-    container.classList.toggle('atlas-has-nav', !inGame);
+    container.classList.toggle('atlas-has-nav', !inGame && !container.querySelector('.bienvenida-shell'));
     if (board.has(screen)) {
       const lives = container.querySelector('.solo-lives');
       const counters = container.querySelector('.game-head');

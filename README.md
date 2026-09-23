@@ -24,6 +24,24 @@ uno (tu turno, esperando al rival, retos recibidos, invitaciones enviadas, histo
 
 La barra inferior se queda en Inicio, Guía y Ajustes: a Jugar y al Atlas se entra desde la portada.
 
+## Tu nombre y tu avatar
+
+La primera vez que se entra, una bienvenida pide el nombre y asigna uno de los nueve
+avatares al azar (Brújula, Búho, Globo, Telescopio, Pluma, Reloj de arena, Ancla, Laurel
+y Cometa); ahí mismo se puede elegir otro. Quien ya tenía nombre de antes —en su cuenta o
+en un duelo— se reconoce y no pasa por la bienvenida. Nombre y avatar se ven y se cambian
+arriba del Atlas.
+
+`identidad.js` guarda los dos en `continuum-identidad-v1` y copia el nombre en
+`hilo-nombre-v1`, el que ya usaban duelos y salas. Si hay cuenta, el nombre se guarda
+también en ella (es el del ranking) y un nombre ocupado por otra cuenta se rechaza con
+aviso. Los avatares son dibujos propios en `avatares.js`, sin descargas.
+
+En la partida en un solo móvil, el primer jugador sale con tu nombre y juega con tu
+avatar; el resto recibe uno distinto al azar. Se ven en la pantalla de pasar el móvil, en
+el marcador y en el Pulso. Las salas de varios móviles todavía no transmiten el avatar:
+necesita un campo nuevo en las reglas de Firestore.
+
 ## Retos rápidos y ¿Cuántos hay…?
 
 **Retos rápidos** funciona igual que las grandes colecciones, con temas cortos: se juega

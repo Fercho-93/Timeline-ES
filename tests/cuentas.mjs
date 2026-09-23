@@ -95,6 +95,12 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(data.get('playerNames/fulanito').uid,'a');
  assert.equal(data.has('playerNames/fer'),false);
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');w.CONTINUUM.closeDialog();
+ // La identidad del juego (bienvenida y Atlas) cambia el nombre de la cuenta por la
+ // misma transacción, sin pasar por el diálogo.
+ await w.CONTINUUM.Accounts.renombra('Mengano');
+ assert.equal(data.get('playerProfiles/a').alias,'Mengano');assert.equal(data.get('playerNames/mengano').uid,'a');
+ await assert.rejects(w.CONTINUUM.Accounts.renombra('Ocupado'),/ya está en uso/);
+ assert.equal(data.get('playerProfiles/a').alias,'Mengano');
  assert.equal(w.localStorage.getItem('hilo-perfil-v1'),JSON.stringify({totals:{hits:999}}));
  w.CONTINUUM.AccountStorage.use('b');assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),null);w.CONTINUUM.AccountStorage.use('a');
  // A simultaneous device update must never be overwritten.
@@ -112,7 +118,10 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await w.testAccounts.startAccounts(()=>{});
  w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
  const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();await new Promise(r=>setTimeout(r,0));};
- await click('edit-name');
+ // El nombre se cambia desde el Atlas (identidad del juego); la tarjeta de la cuenta ya
+ // no lleva ese botón, pero el diálogo de la cuenta sigue funcionando.
+ assert.equal(w.document.querySelector('[data-account-action="edit-name"]'),null);
+ w.testAccounts.editNameScreen();await new Promise(r=>setTimeout(r,0));
  assert.ok(w.document.querySelector('[role="dialog"] #account-alias'));
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('ranking');assert.match(w.document.querySelector('[role="dialog"]').textContent,/Fer/);

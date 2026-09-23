@@ -105,7 +105,7 @@ click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
 ok("al principio hay que adivinar una cifra", !!w.document.querySelector('[data-action="draw-starter"]'));
 click(w, '[data-action="draw-starter"]');
-ok("pide pasar el móvil al primer jugador", /Pasa el móvil a Jugador 1/.test(w.document.body.innerHTML));
+ok("pide pasar el móvil al primer jugador, que lleva tu nombre", /Pasa el móvil a Prueba/.test(w.document.body.innerHTML));
 ok("el sorteo enseña la ilustración de la carta", !!w.document.querySelector('.starter-card-art img.animal-card-art'));
 w.document.getElementById("starter-guess-input").value = "1900";
 click(w, '[data-action="starter-guess-submit"]');
