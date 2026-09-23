@@ -2575,3 +2575,237 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 @media (prefers-reduced-motion: reduce) {
   #app .home-doors-shell .home-door-art img { transition: none; }
 }
+
+
+/* Ruleta del reto diario: una ventana mecánica sobria que desacelera y revela el mazo. */
+#app[data-screen="daily-intro"] {
+  background:
+    radial-gradient(ellipse at 50% 22%, color-mix(in srgb, var(--scene-wash) 18%, transparent), transparent 43%),
+    radial-gradient(circle at 94% 10%, transparent 0 150px, color-mix(in srgb, var(--edition-brass) 12%, transparent) 151px 152px, transparent 153px),
+    var(--edition-paper);
+}
+#app .pass-screen .daily-splash {
+  width: min(100%, 560px);
+  padding: 222px 34px 32px;
+  border: 1px solid color-mix(in srgb, var(--edition-brass) 48%, var(--edition-line));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--edition-surface) 97%, transparent);
+  box-shadow:
+    0 24px 60px color-mix(in srgb, var(--edition-ink) 14%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--edition-surface) 48%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 70%, transparent);
+}
+#app .daily-splash .daily-splash-art {
+  height: 210px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 47%, color-mix(in srgb, var(--edition-brass) 14%, transparent), transparent 38%),
+    linear-gradient(155deg, color-mix(in srgb, var(--edition-paper) 88%, #ead4a7), var(--edition-paper));
+}
+#app .daily-splash-art::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 176px;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--edition-brass) 38%, transparent);
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 0deg,
+      color-mix(in srgb, var(--edition-brass) 38%, transparent) 0 1deg,
+      transparent 1deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 68%, #000 69% 71%, transparent 72%);
+  mask-image: radial-gradient(circle, transparent 0 68%, #000 69% 71%, transparent 72%);
+  opacity: .72;
+  transform: translate(-50%, -50%);
+  animation: daily-dial-turn 11s linear infinite;
+}
+#app .daily-splash-art svg {
+  position: relative;
+  z-index: 2;
+  width: 136px;
+  height: 136px;
+  filter: drop-shadow(0 8px 14px color-mix(in srgb, var(--edition-ink) 13%, transparent));
+}
+#app .daily-splash-art::after {
+  z-index: 3;
+  background: linear-gradient(transparent 54%, color-mix(in srgb, var(--edition-surface) 96%, transparent) 96%);
+}
+#app .daily-splash .chapter-number {
+  margin-bottom: 16px;
+  font-size: .7rem;
+  letter-spacing: .2em;
+}
+#app .daily-splash h2 {
+  margin: 0;
+  font-size: inherit;
+  line-height: 1;
+}
+#app .daily-splash .comp-splash-lead {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--edition-muted);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+}
+#app .daily-reel-stage {
+  display: block;
+  width: min(100%, 470px);
+  margin: 0 auto 22px;
+}
+#app .daily-reel-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--edition-brass);
+  font: 700 .58rem/1.2 var(--ui-font);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  transition: color 260ms ease;
+}
+#app .daily-reel-window {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 86px;
+  padding: 11px 38px;
+  overflow: hidden;
+  border-block: 1px solid color-mix(in srgb, var(--edition-brass) 48%, var(--edition-line));
+  background:
+    linear-gradient(90deg,
+      transparent,
+      color-mix(in srgb, var(--edition-brass) 7%, transparent) 18% 82%,
+      transparent),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--edition-paper) 45%, transparent),
+      color-mix(in srgb, var(--edition-surface) 88%, transparent) 50%,
+      color-mix(in srgb, var(--edition-paper) 45%, transparent));
+  box-shadow:
+    inset 0 12px 18px -18px color-mix(in srgb, var(--edition-ink) 38%, transparent),
+    inset 0 -12px 18px -18px color-mix(in srgb, var(--edition-ink) 38%, transparent);
+}
+#app .daily-reel-window::before,
+#app .daily-reel-window::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-block: 5px solid transparent;
+  transform: translateY(-50%);
+}
+#app .daily-reel-window::before {
+  left: 12px;
+  border-left: 0;
+  border-right: 8px solid var(--edition-brass);
+}
+#app .daily-reel-window::after {
+  right: 12px;
+  border-right: 0;
+  border-left: 8px solid var(--edition-brass);
+}
+#app .daily-reel {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 2.15em;
+  color: color-mix(in srgb, var(--edition-ink) 72%, var(--edition-muted));
+  font: 400 clamp(1.5rem, 5.3vw, 2.55rem)/1.06 var(--font-display);
+  letter-spacing: -.02em;
+  text-wrap: balance;
+  transition: color 260ms ease;
+}
+#app .daily-reel.is-ticking {
+  animation: daily-reel-tick 190ms cubic-bezier(.2,.7,.25,1) both;
+}
+#app .daily-reel.is-revealed {
+  color: var(--edition-ink);
+  animation: daily-reel-land 620ms cubic-bezier(.16,.84,.24,1) both;
+}
+#app .daily-splash.is-revealed .daily-reel-kicker { color: var(--scene-color); }
+#app .daily-splash.is-revealed .daily-reel-window {
+  border-color: color-mix(in srgb, var(--scene-color) 62%, var(--edition-line));
+  background:
+    radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--scene-wash) 15%, transparent), transparent 68%),
+    color-mix(in srgb, var(--edition-surface) 90%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--scene-color) 12%, transparent),
+    inset 0 12px 18px -20px var(--edition-ink),
+    inset 0 -12px 18px -20px var(--edition-ink);
+}
+#app .daily-splash.is-revealed .daily-reel-window::before { border-right-color: var(--scene-color); }
+#app .daily-splash.is-revealed .daily-reel-window::after { border-left-color: var(--scene-color); }
+#app .daily-splash-art.is-revealed {
+  display: block;
+  animation: daily-art-reveal 760ms cubic-bezier(.16,.84,.24,1) both;
+}
+#app .daily-splash-art.is-revealed::before { opacity: 0; animation: none; }
+#app .daily-splash-art.is-revealed img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 50% 54%;
+}
+#app .daily-splash-rule {
+  margin: -5px 0 20px;
+  color: var(--edition-muted);
+  font-size: .8rem;
+  animation: daily-control-in 420ms 120ms var(--ease-out) both;
+}
+#app .daily-splash .comp-splash-start {
+  min-height: 56px;
+  border-radius: 8px;
+  background: linear-gradient(120deg,
+    color-mix(in srgb, var(--scene-color) 88%, var(--edition-ink)),
+    var(--scene-color));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--scene-color) 24%, transparent);
+  animation: daily-control-in 480ms 170ms var(--ease-out) both;
+}
+@keyframes daily-dial-turn {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes daily-reel-tick {
+  from { opacity: .08; filter: blur(5px); transform: translateY(-32%) scale(.97); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+}
+@keyframes daily-reel-land {
+  0% { opacity: .25; filter: blur(4px); transform: translateY(-16px) scale(.98); }
+  62% { opacity: 1; filter: blur(0); transform: translateY(3px) scale(1.018); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes daily-art-reveal {
+  from { opacity: .25; clip-path: inset(0 0 76% 0); transform: scale(1.035); }
+  to { opacity: 1; clip-path: inset(0); transform: scale(1); }
+}
+@keyframes daily-control-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+@media (max-width: 520px) {
+  #app .pass-screen .daily-splash {
+    padding: 200px 18px 22px;
+    border-radius: 13px;
+  }
+  #app .daily-splash .daily-splash-art { height: 188px; }
+  #app .daily-reel-stage { margin-bottom: 18px; }
+  #app .daily-reel-window { min-height: 78px; padding-inline: 27px; }
+  #app .daily-reel { font-size: clamp(1.38rem, 7vw, 2rem); }
+  #app .daily-splash .chapter-number { font-size: .61rem; letter-spacing: .14em; }
+  #app .daily-splash-rule { font-size: .75rem; }
+}
+:root[data-theme="dark"] #app .pass-screen .daily-splash {
+  background: color-mix(in srgb, var(--edition-surface) 97%, #000);
+  box-shadow: 0 24px 60px #0008, 0 0 0 6px #0002;
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .daily-splash-art::before,
+  #app .daily-reel.is-ticking,
+  #app .daily-reel.is-revealed,
+  #app .daily-splash-art.is-revealed,
+  #app .daily-splash-rule,
+  #app .daily-splash .comp-splash-start {
+    animation: none;
+  }
+}
