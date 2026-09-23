@@ -16,7 +16,8 @@
     // Sin el generador (un archivo que no llegó a cargar) se queda la inicial: nunca
     // un hueco vacío en el marcador.
     if (!dibuja) return `<span class="avatar avatar-inicial ${clase}" ${accesible} style="width:${size}px;height:${size}px">${CT.escapeHtml(CT.initials(semilla))}</span>`;
-    return dibuja(semilla, { size, background: "circle" })
+    // Sin fondo: el personaje solo, sobre lo que haya debajo.
+    return dibuja(semilla, { size })
       .replace("<svg ", `<svg class="avatar ${clase}" ${accesible} focusable="false" `);
   }
 

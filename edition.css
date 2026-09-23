@@ -2245,21 +2245,20 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .bienvenida-error { min-height: 1.2em; margin: 0; color: #9a3b2a; font: .85rem/1.4 var(--ui-font); }
 #app .bienvenida-error:empty { min-height: 0; }
 #app .bienvenida .hint { margin: 0; color: var(--edition-muted); font: .8rem/1.4 var(--ui-font); }
-#app .bienvenida-avatar { padding: 8px; border-radius: 50%; box-shadow: 0 0 0 1px var(--edition-line), 0 10px 26px #352a171f; animation: comp-splash-pop 380ms var(--ease-out) both; }
+#app .bienvenida-avatar { animation: comp-splash-pop 380ms var(--ease-out) both; }
 #app .atlas-identidad { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
 #app .atlas-identidad h2 { margin: 0 0 8px; font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; overflow-wrap: anywhere; }
 #app .atlas-identidad-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
 #app .atlas-identidad-acciones .btn { min-height: 40px; padding: 8px 12px; font-size: .85rem; }
 #app .identidad-modal form { display: grid; gap: 10px; }
-#app .player-medallion-avatar { padding: 0; background: transparent; border: 0; overflow: hidden; }
+#app .player-medallion-avatar { padding: 0; background: transparent; border: 0; box-shadow: none; overflow: visible; }
 #app .player-medallion-avatar svg { width: 100%; height: 100%; }
 #app .score i.score-avatar { background: transparent; overflow: hidden; }
 #app .score i.score-avatar svg { width: 100%; height: 100%; }
 #app .atlas-identidad-avatar { flex: none; display: grid; }
 #app .atlas-identidad .hint { margin: 8px 0 0; color: var(--edition-muted); font: .78rem/1.4 var(--ui-font); }
 #app .identidad-avatar-vivo { display: grid; place-items: center; margin: 4px 0 10px; }
-#app .bienvenida-avatar { background: var(--edition-surface); }
-#app .table-seat > span.seat-avatar, #app .manage-player > span.seat-avatar { padding: 0; overflow: hidden; background: var(--edition-surface); color: inherit; }
+#app .table-seat > span.seat-avatar, #app .manage-player > span.seat-avatar { padding: 0; overflow: visible; border: 0; background: transparent; box-shadow: none; color: inherit; }
 #app .seat-avatar svg { width: 100%; height: 100%; }
 #app .avatar-inicial { display: inline-grid; place-items: center; border-radius: 50%; background: var(--edition-line); color: var(--edition-ink); font: 700 .7rem var(--ui-font); }
 
