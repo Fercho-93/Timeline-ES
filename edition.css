@@ -3020,3 +3020,81 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     line-height: 1.1;
   }
 }
+
+/* v346 · Partida completa en el primer vistazo: menos rótulos y más ilustración. */
+@media (max-width: 699px) {
+  #app.atlas-board .board-focus-card {
+    margin-top: 0;
+  }
+  #app.atlas-board .board-focus-card > .hand-title {
+    margin: 0 0 2px;
+  }
+  #app.atlas-board .board-focus-card .hand-solo {
+    grid-template-columns: minmax(0, min(42vw, 164px));
+    padding-block: 0;
+  }
+  #app.atlas-board[data-platform][data-device][data-screen] .board-focus-card .hand-solo .hand-card {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 3 / 4;
+    padding: 8px;
+  }
+  #app.atlas-board .board-focus-card .hand-solo .carta-reverso {
+    margin-block: 4px;
+  }
+  #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong {
+    margin-top: 4px;
+    font-size: clamp(.72rem, 3vw, .86rem);
+    line-height: 1.12;
+  }
+  #app.atlas-board .board-focus-card > .hint {
+    max-width: 32rem;
+    margin: 2px auto 3px;
+    font-size: .62rem;
+    line-height: 1.2;
+  }
+  #app.atlas-board .board-timeline-section {
+    padding-top: 2px;
+  }
+  #app.atlas-board .board-timeline-section > .timeline-toolbar {
+    margin-bottom: 1px;
+  }
+  #app.atlas-board .board-timeline-section .timeline-wrap {
+    padding-block: 1px 3px;
+  }
+  #app.atlas-board .board-timeline-section .timeline-card {
+    width: 118px;
+    min-height: 164px;
+  }
+  #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
+  #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
+    width: auto;
+    height: 100px;
+    max-height: 100px;
+    aspect-ratio: auto;
+  }
+  #app.atlas-board .board-timeline-section .animal-timeline-card .animal-card-art {
+    object-position: center 44%;
+    -webkit-mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+  }
+  #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) {
+    min-height: 164px;
+  }
+}
+
+@media (max-width: 380px), (max-height: 740px) {
+  #app.atlas-board .board-focus-card .hand-solo {
+    grid-template-columns: minmax(0, min(38vw, 146px));
+  }
+  #app.atlas-board .board-timeline-section .timeline-card,
+  #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) {
+    min-height: 150px;
+  }
+  #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
+  #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
+    height: 90px;
+    max-height: 90px;
+  }
+}
