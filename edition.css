@@ -3315,3 +3315,50 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-cta { color: #30251b; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-wordmark { color: #f5d4b2; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner { background: #49371f; border-color: #c58d47; }
+
+/* Ilustraciones impresas sobre el papel: sin marco fotográfico ni corte recto. */
+#app .timeline-card:has(.animal-card-art) { isolation: isolate; }
+#app .timeline-card .card-visual:has(> .animal-card-art),
+#app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual:has(> .animal-card-art),
+#app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual:has(> .animal-card-art) {
+  position: relative; background: transparent; border: 0; border-radius: 0; box-shadow: none;
+  padding: 0; margin-inline: 0; width: 100%; filter: none;
+}
+#app .timeline-card .animal-card-art,
+#app.atlas-board .board-timeline-section .timeline .animal-card-art {
+  position: absolute; inset: 0 auto 0 50%; width: auto; height: 100%; max-width: 100%;
+  transform: translateX(-50%);
+  object-fit: contain; mix-blend-mode: multiply; border: 0; border-radius: 0;
+  box-shadow: none; filter: sepia(.18) saturate(.95) contrast(1.03);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(180deg, transparent, #000 9%, #000 76%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(180deg, transparent, #000 9%, #000 76%, transparent);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+}
+
+/* Reverso común a todos los mazos: trama geométrica y relieve, sin figuras temáticas. */
+#app .hand-card, .drag-card-preview {
+  --cardback-fill: radial-gradient(ellipse at 50% 38%, #fff9eedd, #fff9ee00 60%), repeating-linear-gradient(45deg, #486d6610 0 1px, transparent 1px 12px), repeating-linear-gradient(-45deg, #486d6610 0 1px, transparent 1px 12px), linear-gradient(145deg, #f9f2e2, #e6e6d5);
+}
+#app.atlas-board[data-screen] .hand .hand-card .carta-reverso,
+#app .hand-card .carta-reverso,
+.drag-card-preview .carta-reverso {
+  position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; margin: 0;
+  background: var(--cardback-fill); opacity: 1; pointer-events: none;
+}
+#app .hand-card .carta-reverso::before,
+.drag-card-preview .carta-reverso::before {
+  content: ""; position: absolute; inset: 6px; border: 3px double #7b92816b;
+  border-radius: 6px; box-shadow: inset 0 0 0 1px #fff9, 0 0 0 1px #fff5;
+}
+#app .hand-card .carta-reverso::after,
+.drag-card-preview .carta-reverso::after {
+  content: ""; position: absolute; inset: auto; left: 50%; top: 42%;
+  width: 29%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(45deg);
+  border: 3px double #718f7859; border-radius: 6px; background: #fff8e933;
+  box-shadow: 3px 3px 0 #fff8, -2px -2px 0 #72877916, inset 0 0 0 6px #faf5e759;
+}
+#app .hand-card > .hidden-date, .drag-card-preview > .hidden-date { color: #47675f; }
+#app .hand-card > strong, .drag-card-preview > strong {
+  color: #253f39; background: #f9f3e7ed; padding: 7px 5px 4px;
+  border-top: 1px solid #9aab9370; border-radius: 4px; text-shadow: none;
+}

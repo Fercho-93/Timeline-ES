@@ -949,7 +949,7 @@
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
-  // El reverso queda deliberadamente vacío para no dar pistas sobre la carta.
+  // CSS dibuja el mismo reverso geométrico en todos los mazos, sin ilustraciones ni pistas.
   function cardBack(modeKey) {
     return `<span class="carta-reverso" aria-hidden="true"></span>`;
   }

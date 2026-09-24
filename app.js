@@ -1146,7 +1146,7 @@
   }
 
   function confirmSlot(card) {
-    return `<div class="slot-confirm provisional-placement" data-index="${pendingIndex}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${escapeHtml(card.title)}</strong><span aria-hidden="true">Fecha oculta</span></div>
+    return `<div class="slot-confirm provisional-placement" data-index="${pendingIndex}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${escapeHtml(card.title)}</strong><span aria-hidden="true">${escapeHtml(currentAxis().hiddenLabel)}</span></div>
       <button class="btn btn-primary btn-block" data-action="confirm-place" data-autofocus>Sí, aquí</button>
       <button class="btn btn-ghost btn-block" data-action="cancel-place">Cancelar</button></div>`;
   }
