@@ -14,6 +14,30 @@
   --scene-wash: #bda27a;
   --ui-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
+
+/* La portada recupera el color de las láminas y da un matiz propio a cada acceso. */
+:root:not([data-theme="dark"]) #app[data-screen="home"] .home-door-art img {
+  filter: sepia(.34) saturate(1.08) contrast(1.05) brightness(1.01);
+}
+:root:not([data-theme="dark"]) #app[data-screen="home"] .home-door::after {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--edition-surface) 93%, transparent) 0%,
+    color-mix(in srgb, var(--edition-surface) 84%, transparent) 38%,
+    color-mix(in srgb, var(--edition-surface) 34%, transparent) 67%,
+    transparent 100%);
+}
+:root:not([data-theme="dark"]) #app[data-screen="home"] .home-door:nth-child(1) {
+  box-shadow: inset 4px 0 #a64f32, 0 5px 16px #352a1718;
+}
+:root:not([data-theme="dark"]) #app[data-screen="home"] .home-door:nth-child(2) {
+  box-shadow: inset 4px 0 #a77a35, 0 5px 16px #352a1718;
+}
+:root:not([data-theme="dark"]) #app[data-screen="home"] .home-door:nth-child(3) {
+  box-shadow: inset 4px 0 #607e66, 0 5px 16px #352a1718;
+}
+:root:not([data-theme="dark"]) #app[data-screen="home"] .home-door-cta {
+  color: #9b472a;
+}
 :root[data-scene="history"] { --scene-color: #834931; --scene-wash: #c29269; }
 :root[data-scene="entertainment"] { --scene-color: #654256; --scene-wash: #b895a2; }
 :root[data-scene="science"] { --scene-color: #285963; --scene-wash: #85afb2; }
