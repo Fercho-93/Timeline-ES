@@ -3226,34 +3226,34 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   }
 }
 
-/* Portada con pigmentos visibles, conservando las láminas originales. */
+/* Portada como una serie de láminas encuadernadas: papel, tinta y latón. */
 :root:not([data-theme="dark"]) #app[data-screen="home"] {
-  background: radial-gradient(ellipse at 5% 8%, #f6c39c66, transparent 45%), radial-gradient(ellipse at 100% 65%, #83bfb33b, transparent 45%), #f8efdf;
+  background: radial-gradient(ellipse at 12% 8%, #fff8e7, transparent 42%), radial-gradient(ellipse at 95% 72%, #c9ad7652, transparent 47%), #f3ede1;
 }
-#app[data-screen="home"] .home-door { --door-paper: #f7d6be; --door-ink: #793924; --door-edge: #c66a40; }
-#app[data-screen="home"] .home-door[data-action="jugar"] { --door-paper: #c3e0d7; --door-ink: #205653; --door-edge: #3b9586; }
-#app[data-screen="home"] .home-door[data-action="perfil"] { --door-paper: #cedeef; --door-ink: #2f5179; --door-edge: #568cb9; }
+#app[data-screen="home"] .home-door { --door-paper: #f5eddb; --door-ink: #3e3329; --door-edge: #a98b59; }
+#app[data-screen="home"] .home-door[data-action="jugar"] { --door-paper: #f1eadc; --door-ink: #3e382d; --door-edge: #8e8060; }
+#app[data-screen="home"] .home-door[data-action="perfil"] { --door-paper: #eee8da; --door-ink: #3e372e; --door-edge: #97856b; }
 #app[data-screen="home"] .home-doors-shell .home-door {
-  background: var(--door-paper); border: 1px solid color-mix(in srgb, var(--door-edge) 65%, #fff);
-  border-radius: 16px; box-shadow: 0 5px 0 color-mix(in srgb, var(--door-edge) 35%, #ded1b7), 0 12px 24px #4933201a;
+  background: var(--door-paper); border: 1px solid color-mix(in srgb, var(--door-edge) 67%, #fff8e8);
+  border-radius: 12px; box-shadow: 0 3px 0 color-mix(in srgb, var(--door-edge) 25%, #ddd0b6), 0 10px 21px #4939201d, inset 0 1px 0 #fff9ec;
 }
 #app[data-screen="home"] .home-doors-shell .home-door::before {
-  content: ""; position: absolute; z-index: 3; inset: 0 auto 0 0; width: 5px; background: var(--door-edge); pointer-events: none;
+  content: ""; position: absolute; z-index: 3; inset: 5px; border: 1px solid #fff9e7a8; border-radius: 7px; box-shadow: inset 0 0 0 1px #6d563016; pointer-events: none;
 }
 #app[data-screen="home"] .home-doors-shell .home-door::after {
-  background: linear-gradient(90deg, var(--door-paper) 0%, color-mix(in srgb, var(--door-paper) 96%, transparent) 32%, color-mix(in srgb, var(--door-paper) 55%, transparent) 63%, transparent 100%);
+  background: linear-gradient(90deg, var(--door-paper) 0%, color-mix(in srgb, var(--door-paper) 97%, transparent) 29%, color-mix(in srgb, var(--door-paper) 79%, transparent) 51%, color-mix(in srgb, var(--door-paper) 12%, transparent) 100%);
 }
-#app[data-screen="home"] .home-doors-shell .home-door-art img { filter: saturate(1.35) contrast(1.1); opacity: 1; }
+#app[data-screen="home"] .home-doors-shell .home-door-art img { filter: sepia(.32) saturate(.91) contrast(1.13); opacity: 1; }
 #app[data-screen="home"] .home-doors-shell .home-door-copy { min-height: 140px; width: 83%; padding: 17px 20px; gap: 6px; }
 #app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-size: clamp(1.45rem, 5vw, 1.9rem); }
-#app[data-screen="home"] .home-doors-shell .home-door-copy small { max-width: 29ch; color: #30372f; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy small { max-width: 29ch; color: #514b40; }
 #app[data-screen="home"] .home-doors-shell .home-door-cta {
-  margin-top: 4px; padding: 5px 11px; border-radius: 20px; background: var(--door-ink); color: #fffdf6; font-weight: 650; box-shadow: 0 2px 5px #31231418;
+  margin-top: 5px; padding: 0 0 2px; border-radius: 0; border-bottom: 1px solid var(--door-edge); background: transparent; color: #745a35; font-weight: 700; box-shadow: none;
 }
 #app[data-screen="home"] .home-doors-shell .home-crest,
-#app[data-screen="home"] .home-doors-shell .home-crest img { filter: saturate(1.2) drop-shadow(0 5px 8px #76492224); }
-#app[data-screen="home"] .home-doors-shell .home-wordmark { color: #74382a; }
-#app[data-screen="home"] .home-duels-banner { background: #fbebc8; border-color: #c58d47; }
+#app[data-screen="home"] .home-doors-shell .home-crest img { filter: sepia(.12) saturate(.9) drop-shadow(0 5px 8px #6d563024); }
+#app[data-screen="home"] .home-doors-shell .home-wordmark { color: #3e3028; }
+#app[data-screen="home"] .home-duels-banner { background: #f8eed7; border-color: #ac9163; }
 
 /* Jugar: tres entradas y un único panel abierto; las alturas se animan en el DOM. */
 #app .jugar-shell { max-width: 820px; }
@@ -3261,11 +3261,11 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .jugar-shell .jugar-heading h1 { font-size: clamp(2rem, 7vw, 3rem); line-height: 1.08; margin: 10px 0; }
 #app .jugar-shell .jugar-heading p { font-size: .93rem; line-height: 1.5; }
 #app .play-catalog { display: grid; gap: 16px; }
-#app .catalog-section { --catalog-color: #246f69; --catalog-tint: #d9ebe2; overflow: hidden; border: 1px solid color-mix(in srgb, var(--catalog-color) 34%, var(--edition-line)); border-radius: 18px; background: var(--edition-surface); box-shadow: 0 5px 16px #3b291412; }
-#app .catalog-quick { --catalog-color: #a2542e; --catalog-tint: #fae0c2; }
-#app .catalog-competition { --catalog-color: #5c528f; --catalog-tint: #e6def2; }
+#app .catalog-section { --catalog-color: #6f5939; --catalog-tint: #f1e8d5; overflow: hidden; border: 1px solid color-mix(in srgb, var(--catalog-color) 34%, var(--edition-line)); border-radius: 14px; background: var(--edition-surface); box-shadow: 0 4px 13px #3b291414; }
+#app .catalog-quick { --catalog-color: #6b6446; --catalog-tint: #ede9d9; }
+#app .catalog-competition { --catalog-color: #695947; --catalog-tint: #ebe5d8; }
 #app .catalog-section > h2 { margin: 0; padding: 0; }
-#app .catalog-toggle { display: grid; grid-template-columns: 42px minmax(0, 1fr) 30px; align-items: center; gap: 13px; width: 100%; padding: 22px 18px; border: 0; border-radius: 0; color: var(--catalog-color); background: linear-gradient(115deg, var(--catalog-tint), color-mix(in srgb, var(--catalog-tint) 50%, var(--edition-surface))); text-align: left; cursor: pointer; }
+#app .catalog-toggle { display: grid; grid-template-columns: 42px minmax(0, 1fr) 30px; align-items: center; gap: 13px; width: 100%; padding: 22px 18px; border: 0; border-radius: 0; color: var(--catalog-color); background: linear-gradient(115deg, var(--catalog-tint), color-mix(in srgb, var(--catalog-tint) 32%, var(--edition-surface))); text-align: left; cursor: pointer; }
 #app .catalog-number { display: grid; place-items: center; width: 42px; height: 50px; border-radius: 10px 10px 18px 10px; background: var(--catalog-color); color: #fffdf6; font: 500 1.05rem var(--font-display); box-shadow: 0 3px 0 #00000015; }
 #app .catalog-copy { display: grid; gap: 7px; min-width: 0; }
 #app .catalog-copy strong { font: 500 clamp(1.3rem, 4.5vw, 1.65rem)/1.08 var(--font-display); }
@@ -3304,15 +3304,15 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 @media (prefers-reduced-motion: reduce) {
   #app .catalog-drawer, #app .collection-drawer, #app .catalog-chevron, #app .jugar-shell #deck-collection .gallery-panel { transition: none; }
 }
-:root[data-theme="dark"] #app .catalog-section { --catalog-tint: #263d36; --catalog-color: #9ccdb8; }
-:root[data-theme="dark"] #app .catalog-quick { --catalog-tint: #503522; --catalog-color: #efb584; }
-:root[data-theme="dark"] #app .catalog-competition { --catalog-tint: #38304a; --catalog-color: #c7b7e6; }
+:root[data-theme="dark"] #app .catalog-section { --catalog-tint: #352d21; --catalog-color: #dfc497; }
+:root[data-theme="dark"] #app .catalog-quick { --catalog-tint: #302e23; --catalog-color: #d5c89e; }
+:root[data-theme="dark"] #app .catalog-competition { --catalog-tint: #332c25; --catalog-color: #d6bd9e; }
 :root[data-theme="dark"] #app .catalog-number { color: #201b17; }
-:root[data-theme="dark"] #app[data-screen="home"] .home-door { --door-paper: #583a2c; --door-ink: #ffe0bc; }
-:root[data-theme="dark"] #app[data-screen="home"] .home-door[data-action="jugar"] { --door-paper: #254b46; --door-ink: #d2f4df; }
-:root[data-theme="dark"] #app[data-screen="home"] .home-door[data-action="perfil"] { --door-paper: #30485f; --door-ink: #d7e9ff; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-door { --door-paper: #332a20; --door-ink: #f1e1bf; --door-edge: #997d50; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-door[data-action="jugar"] { --door-paper: #302d24; --door-ink: #ece2c7; --door-edge: #888363; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-door[data-action="perfil"] { --door-paper: #312b23; --door-ink: #e8dcc6; --door-edge: #90816a; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-copy small { color: #f4ecd9; }
-:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-cta { color: #30251b; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-cta { color: #e6c58e; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-wordmark { color: #f5d4b2; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner { background: #49371f; border-color: #c58d47; }
 
