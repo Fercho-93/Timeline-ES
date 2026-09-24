@@ -30,7 +30,7 @@
       else if (previousView && !CT.UI.isPlaying(lastPaintedScreen) && !CT.UI.isPlaying(screen) && screen !== 'enciclopedia' && lastPaintedScreen !== 'enciclopedia') navigationTrail.push(previousView);
     }
     navigatingBack = false;
-    previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, format: formatOpen, tournament: pendingTournament, collectionOpen, collectionDetails, collectionIndexExpanded, homeDestination, profileReturn};
+    previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, format: formatOpen, tournament: pendingTournament, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection, homeDestination, profileReturn};
     lastPaintedScreen = screen;
     rememberView();
     const sceneMode = screen === "enciclopedia" && encMode !== "all" ? encMode : selectedModeKey;
@@ -40,9 +40,12 @@
   // Solo una ruta y preferencias de navegación, nunca HTML ni estado de una jugada.
   // sessionStorage mantiene independiente cada pestaña y sobrevive a una recarga.
   function rememberView() {
+    if (screen === "jugar" && previousView?.screen === "jugar") {
+      Object.assign(previousView, {mode: selectedModeKey, block: selectedBlockKey, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection});
+    }
     try {
       sessionStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({screen, mode: selectedModeKey,
-        block: selectedBlockKey, format: formatOpen, collectionOpen, collectionDetails, collectionIndexExpanded,
+        block: selectedBlockKey, format: formatOpen, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection,
         homeDestination, profileReturn, soloKind: solo?.kind}));
     } catch { /* El bloqueo del almacenamiento no impide jugar. */ }
   }
@@ -68,6 +71,7 @@
     collectionOpen = view.collectionOpen === true;
     collectionDetails = view.collectionDetails === true;
     collectionIndexExpanded = view.collectionIndexExpanded === true;
+    jugarSection = ["collections", "quick", "competition"].includes(view.jugarSection) ? view.jugarSection : null;
     homeDestination = view.homeDestination === 'collection' ? 'collection' : 'home';
     profileReturn = ['play-menu','solo-home'].includes(view.profileReturn) ? view.profileReturn : 'home';
     if (view.screen === 'perfil') screen = 'perfil';
@@ -150,8 +154,7 @@
   // una categoría y enseña directamente los mazos que contiene.
   let collectionOpen = false;
   let collectionIndexExpanded = false;
-  let collectionGalleryClosing = false;
-  let collectionCloseTimer = null;
+  let jugarSection = null;
   let homeDestination = "home";
   let profileReturn = "home";
   let collectionDetails = false;
@@ -264,7 +267,7 @@
       const mazos = active && collectionDetails
         ? `<div class="collection-decks"><h2 data-focus tabindex="-1">${item.name}</h2><p class="lead">Elige un mazo para continuar.</p>${gameList()}</div>`
         : "";
-      return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
+      return `<div class="collection-entry${active ? " active" : ""}"><button class="gallery-panel panel-${item.art}${active ? " active" : ""}" data-action="set-block" data-block="${item.key}" aria-pressed="${active}" aria-expanded="${active}" aria-controls="collection-drawer-${item.key}" aria-label="${item.name}, ${total} ${total === 1 ? "juego" : "juegos"}. ${instruction}">
         <span class="panel-backdrop" aria-hidden="true">${blockArt(item.art, active)}</span>
         <span class="panel-depth-light" aria-hidden="true"></span>
         <span class="panel-art" aria-hidden="true">${blockArt(item.art, active)}</span>
@@ -274,7 +277,7 @@
         <span class="collection-open" aria-hidden="true">${active ? "−" : "↗"}</span>
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
-      </button>${mazos}</div>`;
+      </button><div id="collection-drawer-${item.key}" class="collection-drawer"${active ? "" : " inert"}><div class="collection-drawer-inner">${mazos}</div></div></div>`;
     }).join("")}</div>`;
   }
 
@@ -443,7 +446,7 @@
         if (previous.mode !== selectedModeKey) setMode(previous.mode);
         selectedBlockKey = previous.block; formatOpen = previous.format;
         pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
-        collectionDetails = previous.collectionDetails; collectionIndexExpanded = previous.collectionIndexExpanded;
+        collectionDetails = previous.collectionDetails; collectionIndexExpanded = previous.collectionIndexExpanded; jugarSection = previous.jugarSection || null;
         homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
         const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'perfil':perfilView, 'duelo-intro':duelIntro}[previous.screen];
         if (render) render(); else { screen = previous.screen; paint(previous.html); }
@@ -657,15 +660,49 @@
     CT.Quick.leave();
     pendingTournament = null;
     screen = "jugar";
+    if (collectionIndexExpanded) jugarSection = "collections";
     paint(`<div class="shell home-shell home-gallery-shell jugar-shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
-      <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige qué jugar</div><h1 data-focus tabindex="-1">Jugar</h1><p>Después eliges cómo: solo, con más gente o retando a un amigo.</p></header>
-      <section class="hero"><div class="hero-copy">
-        <section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Mazos completos</div><h2><button class="collection-index-toggle" data-action="toggle-collection-index" aria-expanded="${collectionIndexExpanded}" aria-controls="collection-gallery" data-focus>Grandes colecciones<span class="collection-index-chevron" aria-hidden="true">⌄</span></button></h2></div>${collectionIndexExpanded || collectionGalleryClosing ? `<div id="collection-gallery" class="collection-gallery-reveal${collectionGalleryClosing ? " is-closing" : ""}"${collectionGalleryClosing ? " aria-hidden=\"true\" inert" : ""}>${gallery()}</div>` : ""}</section>
-        <section class="home-quick"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Temas cortos y concretos</div><h2>Retos rápidos</h2></div><div class="gallery">${CT.Quick.blocks()}</div></section>
-        <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un tema distinto en cada ronda</div><h2>Competición</h2></div>${competitionPromo()}</section>
-      </div></section>
+      <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige tu próxima partida</div><h1 data-focus tabindex="-1">¿Qué te apetece jugar?</h1><p>Explora un tema, prueba un reto o lánzate a competir.</p></header>
+      <div class="play-catalog">
+        ${catalogSection("collections", "01", "Grandes colecciones", "Historia, ciencia, naturaleza y mucho más.", "Explorar los mazos")}
+        ${catalogSection("quick", "02", "Retos rápidos", "Temas concretos para una partida diferente.", "Descubrir los retos")}
+        ${catalogSection("competition", "03", "Competición", "Pon a prueba lo que sabes, ronda a ronda.", "Ver cómo competir")}
+      </div>
       ${homeNav()}
     </div>`);
+  }
+
+  function catalogContent(key) {
+    if (key === "collections") return `<p class="catalog-hint">Elige una colección para desplegar sus mazos.</p><section id="deck-collection">${gallery()}</section>`;
+    if (key === "quick") return `<div class="home-quick"><div class="gallery">${CT.Quick.blocks()}</div></div>`;
+    return `<div class="home-competition">${competitionPromo()}</div>`;
+  }
+
+  function catalogSection(key, number, title, description, cta) {
+    const open = jugarSection === key;
+    return `<section class="catalog-section catalog-${key}${open ? " is-open" : ""}" data-catalog="${key}">
+      <h2><button class="catalog-toggle" data-action="toggle-play-catalog" data-section="${key}" aria-expanded="${open}" aria-controls="catalog-${key}">
+        <span class="catalog-number" aria-hidden="true">${number}</span><span class="catalog-copy"><strong>${title}</strong><small>${description}</small><span class="catalog-cta">${cta}</span></span><span class="catalog-chevron" aria-hidden="true">+</span>
+      </button></h2>
+      <div id="catalog-${key}" class="catalog-drawer"${open ? "" : " inert"}><div class="catalog-drawer-inner">${open ? catalogContent(key) : ""}</div></div>
+    </section>`;
+  }
+
+  function toggleCatalog(key) {
+    jugarSection = jugarSection === key ? null : key;
+    collectionIndexExpanded = jugarSection === "collections";
+    app.querySelectorAll("[data-catalog]").forEach(section => {
+      const open = section.dataset.catalog === jugarSection;
+      const drawer = section.querySelector(".catalog-drawer");
+      const inner = drawer.firstElementChild;
+      if (open && !inner.innerHTML) inner.innerHTML = catalogContent(key);
+      // Medir la fila cerrada permite animar su altura incluso al cargarla por primera vez.
+      void drawer.offsetHeight;
+      section.classList.toggle("is-open", open);
+      section.querySelector(".catalog-toggle").setAttribute("aria-expanded", String(open));
+      drawer.inert = !open;
+    });
+    rememberView();
   }
 
   // Se llega aquí con un mazo ya elegido, así que es el sitio natural para ojearlo
@@ -3593,21 +3630,9 @@
     else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "instant" }); }
     // La enciclopedia se abre desde el Atlas, y al cerrarla se vuelve a él.
     else if (action === "home-encyclopedia") openEnciclopedia("all", { returnTo: screen === "perfil" ? "perfil" : "home" });
-    else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
-    else if (action === "jugar") { clearTimeout(collectionCloseTimer); collectionGalleryClosing = false; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = false; jugarView(); window.scrollTo(0, 0); }
-    else if (action === "toggle-collection-index") {
-      clearTimeout(collectionCloseTimer);
-      const expand = !(collectionIndexExpanded || collectionGalleryClosing);
-      collectionIndexExpanded = expand;
-      collectionGalleryClosing = !expand;
-      if (!expand) { collectionOpen = false; collectionDetails = false; }
-      CT.Effects.transition(expand ? "expand" : "close");
-      jugarView();
-      if (!expand) collectionCloseTimer = setTimeout(() => {
-        collectionGalleryClosing = false;
-        if (screen === "jugar") jugarView();
-      }, 360);
-    }
+    else if (action === "collection-back") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
+    else if (action === "jugar") { jugarSection = null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = false; jugarView(); window.scrollTo(0, 0); }
+    else if (action === "toggle-play-catalog") toggleCatalog(target.dataset.section);
     else if (action === "duels-open") openPendingDuels();
     else if (action === "duels-list") duelsView();
     else if (action === "share-daily-home") shareDailyFromHome();
@@ -3622,25 +3647,27 @@
       if (CT.has(modeKey)) openMode(modeKey); else home();
     }
     else if (action === "set-block") {
-      collectionIndexExpanded = true;
-      const sameOpenBlock = collectionOpen && target.dataset.block === selectedBlockKey;
-      if (sameOpenBlock) {
-        CT.Effects.transition('close');
-        collectionOpen = false;
-        collectionDetails = false;
-        jugarView();
-        return;
-      }
+      const open = !(collectionOpen && target.dataset.block === selectedBlockKey);
       setBlock(target.dataset.block);
+      collectionIndexExpanded = true;
+      jugarSection = "collections";
       homeDestination = "collection";
-      collectionOpen = true;
-      collectionDetails = true;
-      jugarView();
-      // Fijar primero la portada arriba evita que el desplazamiento y el
-      // desenrollado compitan. El pergamino descubre portada y mazos juntos.
-      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-      app.querySelector('.collection-entry.active')?.scrollIntoView?.({ block: 'start', behavior: reduce ? 'auto' : 'instant' });
-      CT.unrollCollection(app.querySelector('.collection-decks'));
+      collectionOpen = open;
+      collectionDetails = open;
+      app.querySelectorAll("#deck-collection .collection-entry").forEach(entry => {
+        const button = entry.querySelector(".gallery-panel");
+        const active = open && button.dataset.block === selectedBlockKey;
+        const drawer = entry.querySelector(".collection-drawer");
+        if (active) drawer.firstElementChild.innerHTML = `<div class="collection-decks"><p class="lead">Elige tu mazo</p>${gameList()}</div>`;
+        void drawer.offsetHeight;
+        entry.classList.toggle("active", active);
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+        button.setAttribute("aria-expanded", String(active));
+        button.setAttribute("aria-label", `${CT.block(button.dataset.block).name}. ${active ? "Mazos visibles debajo." : "Toca para ver sus mazos."}`);
+        drawer.inert = !active;
+      });
+      rememberView();
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }
     else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; CT.Effects.transition(formatOpen ? 'expand' : 'close'); if(screen==='competition-menu') {competitionOptions();competitionMenu();} else playMenu(); }
