@@ -30,7 +30,7 @@
       else if (previousView && !CT.UI.isPlaying(lastPaintedScreen) && !CT.UI.isPlaying(screen) && screen !== 'enciclopedia' && lastPaintedScreen !== 'enciclopedia') navigationTrail.push(previousView);
     }
     navigatingBack = false;
-    previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, format: formatOpen, tournament: pendingTournament, collectionOpen, collectionDetails, homeDestination, profileReturn};
+    previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, format: formatOpen, tournament: pendingTournament, collectionOpen, collectionDetails, collectionIndexExpanded, homeDestination, profileReturn};
     lastPaintedScreen = screen;
     rememberView();
     const sceneMode = screen === "enciclopedia" && encMode !== "all" ? encMode : selectedModeKey;
@@ -42,7 +42,7 @@
   function rememberView() {
     try {
       sessionStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({screen, mode: selectedModeKey,
-        block: selectedBlockKey, format: formatOpen, collectionOpen, collectionDetails,
+        block: selectedBlockKey, format: formatOpen, collectionOpen, collectionDetails, collectionIndexExpanded,
         homeDestination, profileReturn, soloKind: solo?.kind}));
     } catch { /* El bloqueo del almacenamiento no impide jugar. */ }
   }
@@ -67,6 +67,7 @@
     formatOpen = ['multi', 'competition-multi'].includes(view.format) ? view.format : null;
     collectionOpen = view.collectionOpen === true;
     collectionDetails = view.collectionDetails === true;
+    collectionIndexExpanded = view.collectionIndexExpanded === true;
     homeDestination = view.homeDestination === 'collection' ? 'collection' : 'home';
     profileReturn = ['play-menu','solo-home'].includes(view.profileReturn) ? view.profileReturn : 'home';
     if (view.screen === 'perfil') screen = 'perfil';
@@ -148,6 +149,9 @@
   // La portada empieza mostrando la colección, no un mazo abierto. Un toque descubre
   // una categoría y enseña directamente los mazos que contiene.
   let collectionOpen = false;
+  let collectionIndexExpanded = false;
+  let collectionGalleryClosing = false;
+  let collectionCloseTimer = null;
   let homeDestination = "home";
   let profileReturn = "home";
   let collectionDetails = false;
@@ -329,7 +333,7 @@
       <button class="play-choice" data-action="local-multiplayer"><span class="choice-icon">${playIcon("offline")}</span><span><b>Sin conexión</b><small>Varios móviles, sin internet — una red Wi-Fi local basta.</small></span><i aria-hidden="true">→</i></button>
       ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}`;
     const solo = `<button class="play-choice walking-choice" data-action="solo"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Partida libre hasta perder las vidas.</small></span><i aria-hidden="true">→</i></button>`;
-    const duelo = `<button class="play-choice walking-choice duel-choice" data-action="duel-home"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Retar a un amigo</b><small>Las mismas cartas para los dos, por enlace.</small></span><i aria-hidden="true">→</i></button>`;
+    const duelo = `<button class="play-choice walking-choice duel-choice" data-action="duel-home"><img class="walking-art" src="assets/mode-walk-duel.webp" alt="" width="1536" height="1024"><span class="walking-copy"><b>Retar a un amigo</b><small>Las mismas cartas para los dos, por enlace.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
       ${formatBlock("multi", "Multijugador", "Un solo móvil o varios.", multi)}
       <div class="direct-solo">${solo}</div>
@@ -439,7 +443,8 @@
         if (previous.mode !== selectedModeKey) setMode(previous.mode);
         selectedBlockKey = previous.block; formatOpen = previous.format;
         pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
-        collectionDetails = previous.collectionDetails; homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
+        collectionDetails = previous.collectionDetails; collectionIndexExpanded = previous.collectionIndexExpanded;
+        homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
         const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'perfil':perfilView, 'duelo-intro':duelIntro}[previous.screen];
         if (render) render(); else { screen = previous.screen; paint(previous.html); }
         return;
@@ -655,7 +660,7 @@
     paint(`<div class="shell home-shell home-gallery-shell jugar-shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
       <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige qué jugar</div><h1 data-focus tabindex="-1">Jugar</h1><p>Después eliges cómo: solo, con más gente o retando a un amigo.</p></header>
       <section class="hero"><div class="hero-copy">
-        <section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Mazos completos</div><h2>Grandes colecciones</h2></div>${gallery()}</section>
+        <section class="deck-collection" id="deck-collection"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Mazos completos</div><h2><button class="collection-index-toggle" data-action="toggle-collection-index" aria-expanded="${collectionIndexExpanded}" aria-controls="collection-gallery" data-focus>Grandes colecciones<span class="collection-index-chevron" aria-hidden="true">⌄</span></button></h2></div>${collectionIndexExpanded || collectionGalleryClosing ? `<div id="collection-gallery" class="collection-gallery-reveal${collectionGalleryClosing ? " is-closing" : ""}"${collectionGalleryClosing ? " aria-hidden=\"true\" inert" : ""}>${gallery()}</div>` : ""}</section>
         <section class="home-quick"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Temas cortos y concretos</div><h2>Retos rápidos</h2></div><div class="gallery">${CT.Quick.blocks()}</div></section>
         <section class="home-competition"><div class="collection-heading"><div class="eyebrow"><span class="eyebrow-line"></span> Un tema distinto en cada ronda</div><h2>Competición</h2></div>${competitionPromo()}</section>
       </div></section>
@@ -1009,7 +1014,7 @@
     const player = actingPlayer();
     const defending = pulseStage() === PULSE_DEFENSA;
     const timelineCards = game.timeline.map(id => cardsById.get(id));
-    const handCards = player.hand.map(id => cardsById.get(id));
+    const handCards = player.hand.map(id => cardsById.get(id)).filter(card => !(pendingIndex !== null && selectedCardId === card.id));
     const selectedCard = selectedCardId ? cardsById.get(selectedCardId) : null;
     // Durante un Pulso la mano no se toca: la única carta jugable es la que sacó el mazo,
     // así que hace de carta elegida para los huecos, el arrastre y la confirmación.
@@ -1039,8 +1044,8 @@
         ? `Colócala tú también. Si aciertas, no te llevas ninguna carta de ${escapeHtml(currentPlayer().name)}`
         : `Colócala. Si aciertas y ${escapeHtml(pulseTarget.name)} falla, le pasas una carta tuya`;
     const manoHtml = pulseCard
-      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div><p class="hint">${pistaPulso()}</p></section>`
-      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${player.hand.length} por colocar</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
+      ? `<section><div class="hand-title"><h3>Carta del duelo</h3><small>${defending ? `te reta ${escapeHtml(currentPlayer().name)}` : `contra ${escapeHtml(pulseTarget.name)}`}</small></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${pulseCard.id}">${categoryBadge(pulseCard)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(pulseCard.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pistaPulso()}</p></section>`
+      : `<section><div class="hand-title"><h3>Tus cartas</h3><small>${handCards.length} en mano</small></div><div class="hand">${handCards.map(card => `<button class="hand-card ${selectedCardId === card.id ? "selected" : ""}" data-action="select-card" data-id="${card.id}" aria-pressed="${selectedCardId === card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`).join("")}</div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco"}</p>${!game.pulsePower && pulseAvailable(player) ? `<button class="btn btn-secondary btn-block pulse-btn" data-action="pulse-open">⚡ Usar mi Pulso <small>una vez por partida</small></button>` : ""}</section>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="game-menu">Partida</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${defending ? `Defiendes el Pulso de ${escapeHtml(currentPlayer().name)}, ${escapeHtml(player.name)}` : `Turno de ${escapeHtml(player.name)}, ronda ${game.round}`}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${defending ? "⚡ Defensa del Pulso" : `${game.tournament ? `Competición · ronda ${game.tournament.index + 1} de ${game.tournament.queue.length}` : `Ronda ${game.round} · Turno ${game.turnsInRound + 1} de ${game.players.length}`}`}</div><div class="turn-name" aria-hidden="true">${escapeHtml(player.name)}</div></div><div class="deck-count"><strong>${game.deck.length}</strong><span>mazo</span></div></div>
@@ -1104,7 +1109,7 @@
   }
 
   function confirmSlot(card) {
-    return `<div class="slot-confirm" data-index="${pendingIndex}"><small>Colocar aquí</small><strong>${escapeHtml(card.title)}</strong>
+    return `<div class="slot-confirm provisional-placement" data-index="${pendingIndex}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${escapeHtml(card.title)}</strong><span aria-hidden="true">Fecha oculta</span></div>
       <button class="btn btn-primary btn-block" data-action="confirm-place" data-autofocus>Sí, aquí</button>
       <button class="btn btn-ghost btn-block" data-action="cancel-place">Cancelar</button></div>`;
   }
@@ -2423,7 +2428,7 @@
       ${enDuelo() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
       ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn)), plazoDuelo()) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>Los valores se revelan al resolver cada carta.</small></div></div>` : ""}
-      <section class="board-focus-card"><div class="hand-title"><h3>Tu carta</h3></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong></div></div><p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
+      <section class="board-focus-card"><div class="hand-title"><h3>Tu carta</h3></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
       <section class="board-timeline-section"><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3><small>${solo.timeline.length} ${solo.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
     </div>`);
@@ -3589,7 +3594,20 @@
     // La enciclopedia se abre desde el Atlas, y al cerrarla se vuelve a él.
     else if (action === "home-encyclopedia") openEnciclopedia("all", { returnTo: screen === "perfil" ? "perfil" : "home" });
     else if (action === "collection-back") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
-    else if (action === "jugar") { collectionOpen = false; collectionDetails = false; jugarView(); window.scrollTo(0, 0); }
+    else if (action === "jugar") { clearTimeout(collectionCloseTimer); collectionGalleryClosing = false; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = false; jugarView(); window.scrollTo(0, 0); }
+    else if (action === "toggle-collection-index") {
+      clearTimeout(collectionCloseTimer);
+      const expand = !(collectionIndexExpanded || collectionGalleryClosing);
+      collectionIndexExpanded = expand;
+      collectionGalleryClosing = !expand;
+      if (!expand) { collectionOpen = false; collectionDetails = false; }
+      CT.Effects.transition(expand ? "expand" : "close");
+      jugarView();
+      if (!expand) collectionCloseTimer = setTimeout(() => {
+        collectionGalleryClosing = false;
+        if (screen === "jugar") jugarView();
+      }, 360);
+    }
     else if (action === "duels-open") openPendingDuels();
     else if (action === "duels-list") duelsView();
     else if (action === "share-daily-home") shareDailyFromHome();
@@ -3604,6 +3622,7 @@
       if (CT.has(modeKey)) openMode(modeKey); else home();
     }
     else if (action === "set-block") {
+      collectionIndexExpanded = true;
       const sameOpenBlock = collectionOpen && target.dataset.block === selectedBlockKey;
       if (sameOpenBlock) {
         CT.Effects.transition('close');

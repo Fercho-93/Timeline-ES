@@ -441,6 +441,13 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .slot-confirm { width: 108px; padding: 9px; background: var(--edition-surface); border-color: var(--atlas-selection); }
 #app.atlas-board .slot-confirm strong { font-size: .85rem; }
 #app.atlas-board .slot-confirm small { color: var(--atlas-selection); }
+#app.atlas-board .slot-confirm.provisional-placement { border-style: dashed; background: color-mix(in srgb, var(--edition-surface) 78%, #b7aa92); }
+#app.atlas-board .slot-confirm-card { display: flex; flex: 1 1 auto; min-height: 52px; flex-direction: column; justify-content: center; gap: 4px; padding: 6px; border: 1px dashed color-mix(in srgb, var(--atlas-selection) 55%, transparent); border-radius: 5px; opacity: .62; filter: saturate(.45); }
+#app.atlas-board .slot-confirm-card small { font: 700 .48rem/1.15 var(--ui-font); letter-spacing: .06em; text-transform: uppercase; }
+#app.atlas-board .slot-confirm-card strong { overflow-wrap: anywhere; font-size: .74rem; }
+#app.atlas-board .slot-confirm-card span { font: .55rem var(--ui-font); color: var(--edition-muted); }
+#app.atlas-board .slot-confirm .btn { padding: 7px 4px; font-size: .7rem; }
+#app.atlas-board .provisional-hand-note { padding: 10px; border: 1px dashed var(--edition-brass); border-radius: 7px; background: #f3eee4; color: var(--edition-muted); }
 #app .timeline-zoom { display: flex; justify-content: center; gap: 10px; margin: 0 0 6px; }
 #app .timeline-zoom button { display: grid; place-items: center; width: 44px; min-width: 44px; height: 44px; padding: 0; border-radius: 50%; border-color: var(--edition-brass); background: transparent; color: var(--edition-ink); font-size: 1.25rem; }
 .timeline-zoom input[type="range"] { width: 130px; min-height: 44px; margin: 0; accent-color: var(--edition-brass); cursor: pointer; }
@@ -874,24 +881,23 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 }
 :root[data-theme="dark"] #app .art-thumb img { mix-blend-mode: normal; }
 
-/* Reversos ilustrados: la portada común nunca anticipa la carta individual. */
+/* Reverso neutro: sin ilustración ni pistas visuales sobre la respuesta. */
 #app .hand-card { isolation: isolate; background: #f3eee4; color: #302d27; }
 #app.atlas-board[data-screen] .hand .hand-card .carta-reverso {
   position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0;
-  padding: 0; margin: 0; opacity: 1; z-index: -1; overflow: hidden;
+  padding: 0; margin: 0; opacity: 1; z-index: -1; overflow: hidden; background: #f3eee4;
 }
-#app .carta-reverso .reverso-coleccion { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; filter: sepia(1) saturate(.5); }
-#app .carta-reverso::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,#f3eee4e8 0%,#f3eee433 30%,#f3eee426 44%,#f3eee4e8 76%,#f3eee4 100%); }
+#app .carta-reverso::after { content: none; }
 #app .hand-card > .hidden-date { color: #66451f; position: relative; }
-#app .hand-card > strong { color: #302d27; position: relative; text-shadow: 0 1px 3px #f3eee4; }
+#app .hand-card > strong { color: #302d27; position: relative; text-shadow: none; }
 
 /* La carta levantada conserva proporción 2:3 aunque la mano sea horizontal. */
 .drag-card-preview { display: flex; flex-direction: column; align-items: stretch; isolation: isolate; padding: 12px; border: 2px solid var(--atlas-selection); border-radius: 10px; background: #f3eee4; color: #302d27; }
 .drag-card-preview .carta-reverso { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; z-index: -1; overflow: hidden; }
-.drag-card-preview .reverso-coleccion { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; filter: sepia(1) saturate(.5); }
-.drag-card-preview .carta-reverso::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,#f3eee4e8 0%,#f3eee433 30%,#f3eee426 44%,#f3eee4e8 76%,#f3eee4 100%); }
+.drag-card-preview .carta-reverso { background: #f3eee4; }
+.drag-card-preview .carta-reverso::after { content: none; }
 .drag-card-preview > .hidden-date { position: relative; color: #66451f; font-size: .65rem; }
-.drag-card-preview > strong { position: relative; margin-top: auto; margin-bottom: 0; font-size: 1rem; line-height: 1.2; color: #302d27; text-shadow: 0 1px 3px #f3eee4; }
+.drag-card-preview > strong { position: relative; margin-top: auto; margin-bottom: 0; font-size: 1rem; line-height: 1.2; color: #302d27; text-shadow: none; }
 #app.atlas-board .slot.drop-target { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); border-radius: 12px; }
 
 /* Competición: una lámina de atlas al final de las colecciones. */
@@ -1139,7 +1145,17 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   border-radius: 50%; color: var(--edition-ink);
   background: color-mix(in srgb, var(--choice-pigment) 24%, var(--edition-surface));
 }
-#app .play-menu-shell .walking-art { filter: sepia(.35) saturate(1.15); opacity: .9; }
+#app .play-menu-shell .walking-choice {
+  box-shadow: inset 0 1px 0 #fff9, inset 0 -2px 0 color-mix(in srgb, var(--choice-pigment, var(--edition-brass)) 24%, transparent), 0 5px 12px #49331d24, 0 12px 22px #49331d10;
+  transition: transform 220ms var(--ease-out), box-shadow 220ms ease;
+}
+#app .play-menu-shell .walking-art { filter: sepia(.35) saturate(1.15) contrast(1.16) drop-shadow(0 3px 4px #49331d4a); opacity: .96; }
+#app .play-menu-shell .duel-choice { --choice-pigment: #a77b42; }
+#app .play-menu-shell .duel-choice::before { content: ""; position: absolute; z-index: -1; inset: 0 4% 0 34%; pointer-events: none; background: radial-gradient(ellipse at 67% 52%, #d2a75a55, transparent 68%); }
+#app .play-menu-shell .duel-choice .walking-art {
+  z-index: -2; right: -2%; width: 66%; opacity: .94; object-position: right 31%;
+  filter: sepia(.18) saturate(1.08) contrast(1.12) drop-shadow(0 4px 5px #49331d5c);
+}
 :root[data-theme="dark"] #app .play-menu-shell .atlas-intro h1 { color: var(--edition-ink); }
 
 /* Botones como piezas de papel prensado: un canto fino, contacto con la mesa y una
@@ -2168,7 +2184,12 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .jugar-heading { max-width: 720px; margin: 8px auto 22px; text-align: center; }
 #app .jugar-heading .eyebrow { justify-content: center; }
 #app .home-quick { margin-top: 26px; }
-#app .duel-choice .walking-art { filter: hue-rotate(160deg) saturate(.8); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  #app .play-menu-shell .walking-choice:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 #fff9, inset 0 -2px 0 color-mix(in srgb, var(--choice-pigment, var(--edition-brass)) 30%, transparent), 0 9px 18px #49331d2b, 0 16px 26px #49331d14; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .play-menu-shell .walking-choice { transition: none; }
+}
 
 /* Atlas: la colección arriba, con su puerta a la enciclopedia; debajo, el recorrido. */
 #app .atlas-collection, #app .atlas-duels { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
@@ -2243,13 +2264,37 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .jugar-shell #deck-collection .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 #app .jugar-shell #deck-collection .gallery-panel { height: 112px; min-height: 112px; }
 #app .jugar-shell #deck-collection .gallery-panel.active { height: 190px; }
+#app .jugar-shell #deck-collection .gallery-panel { transition: height 380ms var(--ease-out), transform var(--motion-fast) ease, box-shadow var(--motion-base) ease; }
 #app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label { left: 12px; right: 12px; bottom: 10px; column-gap: 8px; }
 #app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label strong { font-size: 1.02rem; letter-spacing: -.01em; }
 #app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label small { display: none; }
 #app .jugar-shell #deck-collection .gallery-panel:not(.active) .collection-index { top: 10px; left: 12px; font-size: .6rem; }
 #app .jugar-shell #deck-collection .gallery-panel:not(.active) .collection-open { top: 10px; right: 12px; width: 20px; height: 20px; }
+#app .jugar-shell #deck-collection .collection-heading { align-items: center; }
+#app .jugar-shell #deck-collection .collection-heading h2 { margin: 0; }
+#app .jugar-shell .collection-index-toggle { display: inline-flex; align-items: center; gap: 12px; padding: 4px 0; border: 0; color: inherit; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+#app .jugar-shell .collection-index-toggle:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 5px; border-radius: 3px; }
+#app .jugar-shell .collection-index-chevron { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--edition-brass); border-radius: 50%; color: var(--edition-brass); font: 1rem/1 var(--ui-font); transition: transform 280ms var(--ease-out), background-color 280ms ease, color 280ms ease; }
+#app .jugar-shell .collection-index-toggle[aria-expanded="true"] .collection-index-chevron { transform: rotate(180deg); color: var(--edition-surface); background: var(--edition-brass); }
+#app .jugar-shell .collection-gallery-reveal { transform-origin: top center; animation: collection-index-in 440ms var(--ease-out) both; }
+#app .jugar-shell .collection-gallery-reveal.is-closing { pointer-events: none; animation: collection-index-out 340ms ease-in both; }
+#app .jugar-shell .collection-gallery-reveal.is-closing .collection-entry { animation: none; }
+#app .jugar-shell .collection-gallery-reveal .collection-entry { animation: collection-tile-in 440ms var(--ease-out) both; }
+#app .jugar-shell .collection-gallery-reveal .collection-entry:nth-child(2) { animation-delay: 45ms; }
+#app .jugar-shell .collection-gallery-reveal .collection-entry:nth-child(3) { animation-delay: 90ms; }
+#app .jugar-shell .collection-gallery-reveal .collection-entry:nth-child(4) { animation-delay: 135ms; }
+#app .jugar-shell .collection-gallery-reveal .collection-entry:nth-child(5) { animation-delay: 180ms; }
+#app .jugar-shell .collection-gallery-reveal .collection-entry:nth-child(6) { animation-delay: 225ms; }
+@keyframes collection-index-in { from { opacity: 0; clip-path: inset(0 0 100%); } to { opacity: 1; clip-path: inset(0); } }
+@keyframes collection-index-out { from { opacity: 1; clip-path: inset(0); } to { opacity: 0; clip-path: inset(0 0 100%); } }
+@keyframes collection-tile-in { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 #app .jugar-shell .home-quick .gallery-panel { height: 112px; min-height: 112px; }
 #app .jugar-shell .home-competition .comp-promo { min-height: 180px; }
+@media (prefers-reduced-motion: reduce) {
+  #app .jugar-shell .collection-index-chevron { transition: none; }
+  #app .jugar-shell #deck-collection .gallery-panel { transition: none; }
+  #app .jugar-shell .collection-gallery-reveal, #app .jugar-shell .collection-gallery-reveal .collection-entry { animation: none; }
+}
 
 /* Identidad: bienvenida, selector de avatares, Atlas y avatares en la mesa. */
 #app .bienvenida-shell { max-width: 460px; min-height: 100svh; display: grid; align-content: center; padding-block: calc(env(safe-area-inset-top) + 24px) calc(env(safe-area-inset-bottom) + 24px); }

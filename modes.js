@@ -949,12 +949,9 @@
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
-  // Todas las cartas de una colección comparten portada: el reverso no revela
-  // la ilustración individual ni el valor de la carta pendiente.
+  // El reverso queda deliberadamente vacío para no dar pistas sobre la carta.
   function cardBack(modeKey) {
-    const art = blockOf(modeKey).art;
-    const cover = art === 'globe' ? 'geography' : art;
-    return `<span class="carta-reverso" aria-hidden="true"><img class="reverso-coleccion" src="assets/hero-${cover}-400.webp" alt="" width="400" height="560" decoding="async"></span>`;
+    return `<span class="carta-reverso" aria-hidden="true"></span>`;
   }
 
   // La huella detecta versiones distintas del contenido; no es una validación del
