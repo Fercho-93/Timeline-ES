@@ -39,7 +39,7 @@
     const data = message?.data || {};
     const { modeKey, valueOf, shuffle, now } = context;
     switch (message?.type) {
-      case "join": return { type: "join", playerId: data.playerId, name: data.name, deckFingerprint: data.deckFingerprint, now: now() };
+      case "join": return { type: "join", playerId: data.playerId, name: data.name, avatarId: data.avatarId, deckFingerprint: data.deckFingerprint, now: now() };
       case "start": return { type: "start", requesterId: data.playerId, handSize: data.handSize, turnSeconds: data.turnSeconds, starterId: data.starterId, deck: buildDeck(modeKey, shuffle), now: now() };
       case "place-card": return { type: "place-card", playerId: data.playerId, cardId: data.cardId, index: data.index, valueOf, shuffle, now: now() };
       case "finish-turn": return { type: "finish-turn", requesterId: data.playerId, now: now() };
@@ -50,10 +50,10 @@
   }
 
   // --- Anfitrión: aplica, guarda y reparte. ---
-  function createHostSession({ roomCode, hostName, modeKey, deckFingerprint = null, now = () => Date.now(), onChange }) {
+  function createHostSession({ roomCode, hostName, avatarId = null, modeKey, deckFingerprint = null, now = () => Date.now(), onChange }) {
     const valueOf = valueOfForMode(modeKey);
     const context = { modeKey, valueOf, shuffle: CT.shuffle, now };
-    let room = CT.LocalRoom.createRoom({ roomCode, hostId: HOST_ID, hostName, modeKey, deckFingerprint, now: now() });
+    let room = CT.LocalRoom.createRoom({ roomCode, hostId: HOST_ID, hostName, avatarId, modeKey, deckFingerprint, now: now() });
     onChange(room);
 
     const transport = CT.LocalTransport.createHostSession((peerId, message) => {
@@ -86,7 +86,7 @@
 
   // --- Invitado: manda acciones, refleja lo que el anfitrión reparte. Nunca aplica el
   // reductor por su cuenta — jugaría con datos que podrían no coincidir con los del resto. ---
-  function createGuestSession({ offerSignal, playerId, name, deckFingerprint = null, onChange, onError }) {
+  function createGuestSession({ offerSignal, playerId, name, avatarId = null, deckFingerprint = null, onChange, onError }) {
     let room = null;
     const peer = CT.LocalTransport.createGuestPeer(
       offerSignal,
@@ -94,7 +94,7 @@
         if (message.type === "state") { room = message.data; onChange(room); }
         else if (message.type === "error") onError?.(message.data?.message);
       },
-      () => peer.send("join", { playerId, name, deckFingerprint })
+      () => peer.send("join", { playerId, name, avatarId, deckFingerprint })
     );
 
     return {

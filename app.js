@@ -483,7 +483,7 @@
     screen = "bienvenida";
     const nombre = bienvenidaNombre || CT.Identidad.nombre();
     paint(`<div class="shell bienvenida-shell"><section class="bienvenida">
-      <div class="bienvenida-avatar" data-avatar-vivo>${CT.Avatares.markup(nombre, { size: 112, seed: CT.Avatares.ownSeed() })}</div>
+      <button class="bienvenida-avatar avatar-picker-trigger" type="button" data-action="identidad-avatar" data-avatar-vivo aria-label="Elegir avatar">${CT.Avatares.markup(nombre, { size: 112, seed: CT.Avatares.ownSeed() })}<span class="avatar-picker-cue">Elegir avatar <span aria-hidden="true">✦</span></span></button>
       <h1 data-focus tabindex="-1">Bienvenido a Continuum</h1>
       <p class="lead">¿Cómo te llamas?</p>
       <form class="bienvenida-form" data-bienvenida="nombre" novalidate>
@@ -492,7 +492,7 @@
         <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
         <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
       </form>
-      <p class="hint" id="bienvenida-pista">Tu avatar te acompañará aunque cambies de nombre.</p>
+      <p class="hint" id="bienvenida-pista">Toca el avatar para elegirlo. Podrás cambiarlo después.</p>
     </section></div>`);
   }
 
@@ -1787,9 +1787,9 @@
   function atlasIdentidad() {
     const nombre = CT.Identidad.nombre();
     return `<section class="panel atlas-identidad">
-      <span class="atlas-identidad-avatar">${CT.Avatares.markup(nombre, { size: 72, etiqueta: "Tu avatar", seed: CT.Avatares.ownSeed() })}</span>
+      <button class="atlas-identidad-avatar avatar-picker-trigger" type="button" data-action="identidad-avatar" aria-label="Cambiar avatar">${CT.Avatares.markup(nombre, { size: 72, etiqueta: "Tu avatar", seed: CT.Avatares.ownSeed() })}</button>
       <div><h2>${escapeHtml(nombre || "Sin nombre")}</h2>
-        <div class="atlas-identidad-acciones"><button class="btn btn-secondary" data-action="identidad-nombre">Cambiar nombre</button></div>
+        <div class="atlas-identidad-acciones"><button class="btn btn-secondary" data-action="identidad-nombre">Cambiar nombre</button><button class="btn btn-secondary" data-action="identidad-avatar">Cambiar avatar</button></div>
         <p class="hint">Tu avatar permanece contigo aunque cambies de nombre.</p></div>
     </section>`;
   }
@@ -1804,6 +1804,30 @@
         <p id="identidad-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
         <div class="actions" style="display:grid"><button class="btn btn-primary" type="submit">Guardar</button><button class="btn btn-secondary" type="button" data-action="close-menu">Cancelar</button></div>
       </form></div></div>`, true);
+  }
+
+  function eligeAvatar() {
+    const selected = CT.Avatares.ownId();
+    const groups = [
+      ["Personajes históricos", CT.Avatares.ids.slice(0, 6).concat(CT.Avatares.ids.slice(12, 21))],
+      ["Animales", CT.Avatares.ids.slice(6, 12).concat(CT.Avatares.ids.slice(24, 30))],
+      ["Videojuegos", CT.Avatares.ids.slice(21, 24).concat(CT.Avatares.ids.slice(30))]
+    ];
+    overlay(`<div class="overlay"><section class="modal avatar-picker" aria-labelledby="avatar-picker-title">
+      <header class="avatar-picker-header"><div><span class="eyebrow">TU PERSONAJE</span><h2 id="avatar-picker-title">Elige tu avatar</h2></div><button class="avatar-picker-close" type="button" data-action="close-menu" aria-label="Cerrar">×</button></header>
+      <p class="avatar-picker-intro">Te acompañará en tu viaje por Continuum.</p>
+      <div class="avatar-picker-list">${groups.map(([label, ids]) => `<section class="avatar-picker-group"><h3>${label}</h3><div class="avatar-picker-grid">${ids.map(id => `<button type="button" class="avatar-picker-option${id === selected ? ' is-selected' : ''}" data-action="avatar-select" data-avatar-id="${id}" aria-label="${escapeHtml(CT.Avatares.title(id))}${id === selected ? ', seleccionado' : ''}" aria-pressed="${id === selected}">${CT.Avatares.markup('', { size: 68, id })}<span>${escapeHtml(CT.Avatares.title(id))}</span></button>`).join('')}</div></section>`).join('')}</div>
+    </section></div>`, true);
+  }
+
+  function seleccionaAvatar(id) {
+    if (!CT.Avatares.choose(id)) return;
+    CT.closeDialog(true);
+    if (screen === "perfil") perfilView();
+    else {
+      const trigger = app.querySelector(".bienvenida-avatar");
+      if (trigger) trigger.innerHTML = `${CT.Avatares.markup(CT.Identidad.nombre(), { size: 112, seed: CT.Avatares.ownSeed() })}<span class="avatar-picker-cue">Elegir avatar <span aria-hidden="true">✦</span></span>`;
+    }
   }
 
   async function nombreEditado(boton) {
@@ -3768,6 +3792,8 @@
     else if (action === "daily-start") startDaily();
     else if (action === "daily-play") playDaily();
     else if (action === "identidad-nombre") editaNombre();
+    else if (action === "identidad-avatar") eligeAvatar();
+    else if (action === "avatar-select") seleccionaAvatar(target.dataset.avatarId);
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();
