@@ -15273,6 +15273,402 @@
         "evidence": "docs/retos-portada.md",
         "generatedAt": "2026-09-20"
       }
+    },
+  {
+    "path": "assets/avatars/alfonso-x.webp",
+    "sha256": "28317f4099ad7be9e1414904f1baf22448a700b17afead6b00ac2337a7fbe3a6",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
     }
+  },
+  {
+    "path": "assets/avatars/aretha-franklin.webp",
+    "sha256": "bd1ac62f8bd8442a8590500d55ed13120126ad20082615407bcb617e4f066c92",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/automata.webp",
+    "sha256": "58c901146029eca39e775c00bcf0ed7a5586790d0c8449a2c461dbd787a78312",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/aventurera.webp",
+    "sha256": "97cbe8509747ce9ae04d7c29154704861f346e5b35d7365ce637ad4bff0456c0",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/ballena-azul.webp",
+    "sha256": "dcc46e9f659309a5059dab8d8129c1e69d85236ca0838957954ece7f0f98e588",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/beethoven.webp",
+    "sha256": "673b44f31b84c68b52ea3d8540405cec4cf7ac2aad41397666d89dcbabe2c024",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/buho-real.webp",
+    "sha256": "adc7b20abb5e718fd73d4d169eb375a7bf2de7d2b4db4cf9b862a1fc99002247",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/caballera.webp",
+    "sha256": "444bc872a4c946d6f50a280316dfc5ddb2af472404b3b75e7d5e229a6c319643",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/carlos-iii.webp",
+    "sha256": "8f18facccd141a8560c21c8ac2e88c6298baa310fa052d991200e57bea8202ac",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/cervantes.webp",
+    "sha256": "34580e18dc16a562ac63359519c8dc176267fd73bb9396a61c3b7d1cb5fb2f39",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/chaplin.webp",
+    "sha256": "1daad97a38ede69ef2e2490b5cc839d792d849abaec45dff127baadefcad2829",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/cleopatra.webp",
+    "sha256": "9c618db7c55fee0b8230b25440cfd3937f059e0a4159887264b9f915568994d4",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/creador-puzles.webp",
+    "sha256": "09eba68e046f7f95d9f11a7ed75270880634a1eeffd7d79d1d6f42975f6c7b73",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/david-bowie.webp",
+    "sha256": "4d88eda692698d5ce78f2dbca8d3cb35e0cfec3d431049e3e7ea8d5ac3826406",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/el-cid.webp",
+    "sha256": "088f5adf9bfcf8a5e137006c89500df1bc7af9a54a0a0a0fd19198fec9911c7f",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/elefante.webp",
+    "sha256": "3147553cd0b6e661d2ea6a333f857cef8d49f54dceb182a8b3006a978ed54031",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/explorador.webp",
+    "sha256": "9f0c924ce78a44854ae4f281199e83f1071632739c002335bc72430696455b0d",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/felipe-ii.webp",
+    "sha256": "6957a3549e89f90ae55ec0bc67a40d45de4c7ef1829c2e3af98c92f4998f190c",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/flamenco.webp",
+    "sha256": "c0677b134093e53072778e00a8990ec749c6b143e5f2ef52b1e6732301787ec3",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/hechicera.webp",
+    "sha256": "df86f4b3c64da93e26cf2e6e70b2c539ba3452ebafa1c18f6db22b2719bdb3af",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/ingrid-bergman.webp",
+    "sha256": "665aa7d4fbd286c7be27158acacd0127f01c03dd5848ee22aa508ef706efede1",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/isabel-catolica.webp",
+    "sha256": "3fef3142caed82a2b892aacdeab5dd567ee8a0faeb6ea1247636c0e7972b161c",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/jirafa.webp",
+    "sha256": "dbd269fc62cb082143ff3ef08eea5e696a86dcabdd019efd0bc0702022bc06eb",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/juana-i.webp",
+    "sha256": "5ca49f0a20ddf8fa15f7114512220d34168704c5a4554c871d0225cee6b0e960",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/leon.webp",
+    "sha256": "6787fb97c1cfb05b7150d81470600a2d5da18d43059e18f517b6b5cf1932e4f1",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/lince.webp",
+    "sha256": "d6b2e92e5adfe564a29c522304a237aa706942544bbe06b8d52c040290541227",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/marie-curie.webp",
+    "sha256": "21a59010a3a84ccdb9972619b16b1df0e1d2ad6be3299f67dd2dacae886a24ce",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/melies.webp",
+    "sha256": "095aad4757ed28c71d08f946e9d9eaf07b32ea47d37f17cbc64b140566445173",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/ninja.webp",
+    "sha256": "2ee4d7b27c0773bf88e698c0fa148f368ecd273874dfdf1f80a90dbe34973461",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/panda.webp",
+    "sha256": "01a726e7d8a311162675353b392d075059293ed190c435f57412ad8028a5869b",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/piloto-arcade.webp",
+    "sha256": "fea317b4384773810df16e189d22be376681e063d26405113c0f3ffc98d3659c",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/piloto-espacial.webp",
+    "sha256": "6854331e580a6e82046c0e89a6c7b90c7fa7e920290e0070aedf4b592ca7874c",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/pinguino.webp",
+    "sha256": "0da402ecd4d0efcdfd462113d94fa370373dacf028626a904ec0a8a6a83e753d",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/pulpo.webp",
+    "sha256": "473e388d165b95de1a53cac7b2474f689e15b612fab05e5e1cd9012f69facbaa",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/tigre.webp",
+    "sha256": "0fbc966642769a2e220305df2775291f33f1b1e9d7bf9d7fe394b39781cb2a7e",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  },
+  {
+    "path": "assets/avatars/zorro.webp",
+    "sha256": "499b7fecebc28ec251392b987dc97d0279ac989a7575bc0fb7af1121ccf6be65",
+    "rightsEvidence": {
+      "status": "generated-for-continuum",
+      "generator": "ChatGPT / OpenAI",
+      "generatedAt": "2026-09-25",
+      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    }
+  }
   ]
 }

@@ -1,25 +1,56 @@
-// El avatar de cada cual sale de su nombre: el mismo nombre dibuja siempre el mismo
-// personaje, en cualquier móvil (blobatar.js, MIT). Por eso no hay que elegirlo ni
-// guardarlo, y en una sala de varios móviles cada uno puede pintar el de los demás con
-// el nombre que ya viaja en la partida, sin mandar nada más.
+// Ilustraciones propias de Continuum. El UID de cada invitado decide su avatar de
+// forma estable; los nombres se pueden cambiar sin cambiar de personaje.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  const generador = () => window.CONTINUUM_BLOBATAR?.blobatar;
+  const IDS = Object.freeze([
+    "alfonso-x", "felipe-ii", "carlos-iii", "cleopatra", "marie-curie", "isabel-catolica",
+    "ballena-azul", "elefante", "leon", "panda", "jirafa", "buho-real",
+    "el-cid", "cervantes", "juana-i", "melies", "chaplin", "ingrid-bergman",
+    "beethoven", "aretha-franklin", "david-bowie", "piloto-arcade", "aventurera", "creador-puzles",
+    "tigre", "lince", "pulpo", "flamenco", "pinguino", "zorro",
+    "caballera", "ninja", "automata", "hechicera", "explorador", "piloto-espacial"
+  ]);
+  const KEY = "continuum-avatar-seed-v1";
+  let sessionSeed;
 
-  // `etiqueta` lo nombra para lectores de pantalla; sin ella el dibujo es decorativo,
-  // porque el nombre ya está escrito al lado.
-  function markup(nombre, { size = 40, etiqueta = "", clase = "" } = {}) {
-    const semilla = String(nombre ?? "").trim() || "?";
-    const accesible = etiqueta ? `role="img" aria-label="${CT.escapeHtml(etiqueta)}"` : 'aria-hidden="true"';
-    const dibuja = generador();
-    // Sin el generador (un archivo que no llegó a cargar) se queda la inicial: nunca
-    // un hueco vacío en el marcador.
-    if (!dibuja) return `<span class="avatar avatar-inicial ${clase}" ${accesible} style="width:${size}px;height:${size}px">${CT.escapeHtml(CT.initials(semilla))}</span>`;
-    // Sin fondo: el personaje solo, sobre lo que haya debajo.
-    return dibuja(semilla, { size })
-      .replace("<svg ", `<svg class="avatar ${clase}" ${accesible} focusable="false" `);
+  function ownSeed() {
+    const uid = CT.Accounts?.user?.uid;
+    if (uid) return "uid:" + uid;
+    if (!sessionSeed) {
+      try { sessionSeed = CT.Storage.getItem(KEY); } catch { /* sesión privada */ }
+      if (!sessionSeed) {
+        const bytes = new Uint32Array(2);
+        window.crypto?.getRandomValues(bytes);
+        sessionSeed = "local:" + bytes[0].toString(36) + ":" + bytes[1].toString(36);
+        try { CT.Storage.setItem(KEY, sessionSeed); } catch { /* solo esta sesión */ }
+      }
+    }
+    return sessionSeed;
   }
 
-  CT.Avatares = { markup };
+  function idFor(seed) {
+    // FNV-1a: la misma identidad elige la misma ilustración en cualquier móvil.
+    let hash = 2166136261;
+    for (const char of String(seed)) {
+      hash ^= char.codePointAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    return IDS[(hash >>> 0) % IDS.length];
+  }
+
+  function markup(nombre, { size = 40, etiqueta = "", clase = "", seed } = {}) {
+    const name = String(nombre ?? "").trim();
+    const mine = name && [CT.Identidad?.nombre?.(), CT.Accounts?.profile?.alias]
+      .some(value => value && value.toLocaleLowerCase("es") === name.toLocaleLowerCase("es"));
+    const key = seed ?? (mine || !name ? ownSeed() : "name:" + name.toLocaleLowerCase("es"));
+    const id = idFor(key);
+    const side = Math.max(24, Math.min(144, Number(size) || 40));
+    const accessible = etiqueta ? 'role="img" aria-label="' + CT.escapeHtml(etiqueta) + '"' : 'aria-hidden="true"';
+    return '<span class="avatar avatar-art ' + CT.escapeHtml(clase) + '" ' + accessible
+      + ' style="--avatar-size:' + side + 'px"><img src="assets/avatars/' + id
+      + '.webp" width="' + side + '" height="' + side + '" alt="" decoding="async"></span>';
+  }
+
+  CT.Avatares = { markup, idFor, ids: IDS, ownSeed };
 })();

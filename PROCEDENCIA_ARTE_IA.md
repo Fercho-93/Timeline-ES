@@ -8,6 +8,13 @@ Esta declaración se basa en la confirmación expresa del titular y en el histor
 
 ## Lenguaje visual
 
+Los 36 retratos de `assets/avatars/` se generaron con ChatGPT/OpenAI el 25 de
+septiembre de 2026 y se recortaron de las láminas aprobadas por el titular.
+Las variantes de animales tomaron como referencia las ilustraciones de cartas
+ya presentes en Continuum. Las seis últimas variantes de videojuegos son
+personajes originales, sin marcas ni diseños de una franquicia concreta. Cada
+archivo WebP individual figura con su huella en `docs/inventario-arte.json`.
+
 El sistema visual común se ha construido mediante instrucciones de continuidad entre cartas:
 
 - Formato vertical de carta.
