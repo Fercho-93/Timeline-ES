@@ -12,7 +12,7 @@ assert.equal(normalizePublicCapacity(2), 2);
 assert.equal(normalizePublicCapacity('4'), 4);
 assert.throws(() => normalizePublicCapacity(1), /INVALID_PUBLIC_CAPACITY/);
 assert.throws(() => normalizePublicCapacity(5), /INVALID_PUBLIC_CAPACITY/);
-assert.equal(publicQueueKey({ mode: 'history', capacity: 4 }), 'history:4');
+assert.equal(publicQueueKey({ mode: 'history', capacity: 4, clientVersion: 42, deckFingerprint: '167.test1' }), 'history:4:v42:167.test1');
 
 const room = {
   matchmaking: 'public', status: 'lobby', mode: 'history', capacity: 4,
