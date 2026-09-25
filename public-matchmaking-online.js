@@ -145,7 +145,9 @@ function inject() {
     if(key===CT.DEFAULT_MODE || (CT.Cartera?.tiene && !CT.Cartera.tiene(key)))continue;
     const option=document.createElement('option');option.value=key;option.textContent=m.name;select.append(option);
   }
-  const currentKey=Object.entries(CT.MODES||{}).find(([,m])=>current?.includes(m.name))?.[0];\n  if(currentKey && [...select.options].some(o=>o.value===currentKey)) select.value=currentKey;\n  grid.prepend(panel);
+  const currentKey=Object.entries(CT.MODES||{}).find(([,m])=>current?.includes(m.name))?.[0];
+  if(currentKey && [...select.options].some(o=>o.value===currentKey)) select.value=currentKey;
+  grid.prepend(panel);
 }
 function refresh() {
   inject();
