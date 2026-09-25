@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-client.js';
-import { doc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { doc, onSnapshot, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity } from './public-matchmaking.js';
 
 const CT = window.CONTINUUM;
@@ -55,9 +55,9 @@ async function findOrCreate(mode, capacityInput) {
         }
       }
     }
-    // La cola no sirve: solo se reemplaza si no existe o ya estaba llena. Una cola waiting
-    // que apunte a una sala caducada se deja fallar de forma segura y se reintenta después.
-    if(qSnap.exists() && qSnap.data().status!=='full') throw Error('QUEUE_STALE');
+    // Si el puntero quedó obsoleto (sala borrada/cerrada/llena), la transacción crea
+    // una mesa nueva y reemplaza la cola. Las reglas solo permiten ese reemplazo si el
+    // puntero anterior ya no puede aceptar jugadores.
     for(let attempt=0;attempt<4;attempt++){
       const code=makePublicRoomCode();
       const roomRef=doc(db,'rooms',code);
@@ -72,6 +72,27 @@ async function findOrCreate(mode, capacityInput) {
   });
 }
 
+function watchPublicRoom(code) {
+  const reference=doc(db,'rooms',code);
+  let started=false;
+  const stop=onSnapshot(reference,snap=>{
+    if(!snap.exists()){stop();return;}
+    const room=snap.data();
+    if(room.matchmaking!=='public'){stop();return;}
+    const full=room.status==='lobby' && room.playerOrder?.length===room.capacity;
+    const panel=document.querySelector('[data-public-waiting]');
+    if(panel) panel.textContent=full?'Mesa completa. Preparando partida…':`Esperando jugadores · ${room.playerOrder?.length||0}/${room.capacity}`;
+    if(full && room.hostUid===auth.currentUser?.uid && !started){
+      started=true;
+      // online.js conserva la autoridad de reparto. El anfitrión técnico pulsa el mismo
+      // arranque que una sala privada, pero las reglas impiden hacerlo antes del cupo.
+      setTimeout(()=>document.querySelector('[data-online-action="start"]')?.click(),350);
+    }
+    if(room.status!=='lobby') stop();
+  },()=>{});
+  return stop;
+}
+
 async function startQuickMatch(capacity) {
   if(busy)return;
   busy=true;
@@ -83,6 +104,14 @@ async function startQuickMatch(capacity) {
     CT.Storage.setItem('continuum-last-room',code);
     const online=await import('./online.js');
     await online.openOnlineMode({roomCode:code,modeKey:mode});
+    watchPublicRoom(code);
+    setTimeout(()=>{
+      const shell=document.querySelector('.online-shell');
+      if(shell && !shell.querySelector('[data-public-waiting]')){
+        const note=document.createElement('p');note.className='online-note';note.dataset.publicWaiting='';
+        note.textContent='Esperando jugadores…';shell.querySelector('.lobby-head')?.after(note);
+      }
+    },250);
   }catch(error){
     console.error(error);
     const msg=error.message==='QUEUE_STALE'?'La mesa anterior está cerrándose. Inténtalo de nuevo en unos segundos.'
