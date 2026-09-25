@@ -681,13 +681,16 @@
     return `<div class="home-competition">${competitionPromo()}</div>`;
   }
 
-  // Lámina de cada entrada: grabados que ya usa el juego (los de la portada de apertura,
-  // la portada de los retos y el trofeo de la competición), fundidos en el papel.
+  // Lámina de cada entrada: grabados que ya usa el juego, puestos como fondo desde la
+  // hoja de estilos. Así, si la hoja no está al día, simplemente no se ven: nunca salen
+  // como imágenes sueltas a tamaño real.
+  // La posición va también en línea: aunque falte la hoja, la capa queda fuera de la
+  // rejilla de la tarjeta y no descoloca el texto.
+  const catalogArt = (kind, inner = "") => `<span class="catalog-art catalog-art-${kind}" aria-hidden="true" style="position:absolute;top:0;right:0;bottom:0;pointer-events:none">${inner}</span>`;
   const CATALOG_ART = {
-    collections: `<span class="catalog-art catalog-art-fan" aria-hidden="true">${["world-cards/5002-great-pyramid-giza", "astronomy-cards/first-earth-photo", "medicine-cards/9001-hippocratic-corpus"]
-      .map(src => `<img src="assets/${src}.webp" alt="" width="512" height="768" decoding="async">`).join("")}</span>`,
-    quick: `<span class="catalog-art catalog-art-quick" aria-hidden="true"><img src="assets/hero-quick-400.webp" alt="" width="400" height="600" decoding="async"></span>`,
-    competition: `<span class="catalog-art catalog-art-competition" aria-hidden="true"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async"></span>`
+    collections: catalogArt("fan", "<i></i><i></i><i></i>"),
+    quick: catalogArt("quick"),
+    competition: catalogArt("competition")
   };
   function catalogSection(key, number, title, description, cta) {
     const open = jugarSection === key;

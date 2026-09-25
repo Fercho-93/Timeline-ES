@@ -28,7 +28,9 @@ function arrancar() {
   const cache = {
     match: async request => guardado.get(request.url || request),
     put: async (request, response) => { guardado.set(request.url, response); },
-    addAll: async requests => { requests.forEach(request => { precargas.push(request); guardado.set(request.url, respuesta(`${request.url} precargado`)); }); }
+    // La precarga pide cada archivo con `?v=<versión>`; la ruta `fetch` lo busca ignorando
+    // la consulta, así que aquí se guarda por su ruta de siempre.
+    addAll: async requests => { requests.forEach(request => { precargas.push(request); const url = request.url.split("?")[0]; guardado.set(url, respuesta(`${url} precargado`)); }); }
   };
   const contexto = {
     self: {
@@ -67,6 +69,7 @@ console.log("\nService worker");
   sw.listeners.install({ waitUntil: tarea => { instalada = tarea; } });
   await instalada;
   ok("instalar una versión nueva evita reutilizar archivos viejos de la caché HTTP", sw.precargas.length > 0 && sw.precargas.every(request => request.cache === "reload"));
+  ok("cada archivo se pide con la versión en la URL, para no mezclar archivos viejos de la CDN", sw.precargas.every(request => /[?&]v=continuum-v\d+/.test(request.url)));
   ok("instalar no activa automáticamente una actualización", sw.activaciones() === 0);
   let tarea;
   const mensajes = [];
@@ -83,7 +86,7 @@ console.log("\nService worker");
   const animalAssets = fs.readdirSync(path.join(REPO, "assets", "animal-cards"))
     .filter(file => file.endsWith(".webp"))
     .map(file => `./assets/animal-cards/${file}`);
-  const cachedAssets = new Set(sw.precargas.map(request => request.url));
+  const cachedAssets = new Set(sw.precargas.map(request => request.url.split("?")[0]));
   const animalesPrecargados = animalAssets.filter(file => cachedAssets.has(file));
   ok(`las ${animalAssets.length} ilustraciones de animales NO se precargan al instalar${animalesPrecargados.length ? ` (se coló ${animalesPrecargados.join(", ")})` : ""}`, !animalesPrecargados.length);
   const populationAssets = fs.readdirSync(path.join(REPO, "assets", "population-cards"))

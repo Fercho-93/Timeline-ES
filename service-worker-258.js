@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v362";
+const CACHE = "continuum-v363";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -247,7 +247,11 @@ self.addEventListener("install", event => {
   // Una caché de aplicación nueva no basta si la caché HTTP aún considera frescos los
   // archivos antiguos. Cada instalación debe obtener realmente la versión publicada.
   event.waitUntil(caches.open(CACHE)
-    .then(cache => cache.addAll(ASSETS.map(url => new Request(url, { cache: "reload" }))))
+    // La versión va en la URL: la CDN de GitHub Pages puede tardar en soltar un archivo
+    // viejo, y sin ella una versión nueva podía guardar código nuevo con estilos viejos.
+    // La ruta `fetch` busca ignorando la consulta, así que cada archivo se sigue sirviendo
+    // por su ruta de siempre.
+    .then(cache => cache.addAll(ASSETS.map(url => new Request(`${url}${url.includes("?") ? "&" : "?"}v=${CACHE}`, { cache: "reload" }))))
     .then(() => self.skipWaiting()));
 });
 
@@ -300,7 +304,7 @@ self.addEventListener("fetch", event => {
       }
       return response;
     } catch {
-      return event.request.mode === "navigate" ? (await cache.match("./index.html")) || Response.error() : Response.error();
+      return event.request.mode === "navigate" ? (await cache.match("./index.html", { ignoreSearch: true })) || Response.error() : Response.error();
     }
   })());
 });
