@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-client.js';
-import { doc, onSnapshot, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { doc, getDoc, onSnapshot, runTransaction, serverTimestamp, writeBatch } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity } from './public-matchmaking.js';
 
 const CT = window.CONTINUUM;
@@ -40,40 +40,37 @@ async function findOrCreate(mode, capacityInput) {
   const fingerprint=CT.deckFingerprint(mode);
   const queueKey=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
   const queueRef=doc(db,'publicQueues',queueKey);
-  return runTransaction(db,async tx=>{
-    const qSnap=await tx.get(queueRef);
-    if(qSnap.exists() && qSnap.data().status==='waiting'){
-      const q=qSnap.data();
-      const roomRef=doc(db,'rooms',q.roomCode);
+  const qSnap=await getDoc(queueRef);
+  if(qSnap.exists() && qSnap.data().status==='waiting'){
+    const existing=await runTransaction(db,async tx=>{
+      const freshQueue=await tx.get(queueRef);
+      if(!freshQueue.exists() || freshQueue.data().status!=='waiting') return null;
+      const q=freshQueue.data(), roomRef=doc(db,'rooms',q.roomCode);
       const roomSnap=await tx.get(roomRef);
-      if(roomSnap.exists()){
-        const room=roomSnap.data();
-        if(room.playerOrder?.includes(user.uid)) return room.roomCode;
-        if(isJoinablePublicRoom(room,{mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint})){
-          const order=[...room.playerOrder,user.uid];
-          tx.update(roomRef,{
-            players:{...room.players,[user.uid]:{name:alias(),avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
-            playerOrder:order,version:room.version+1,updatedAt:serverTimestamp()
-          });
-          if(order.length===capacity) tx.update(queueRef,{status:'full',updatedAt:serverTimestamp()});
-          return room.roomCode;
-        }
-      }
-    }
-    // Si el puntero quedó obsoleto (sala borrada/cerrada/llena), la transacción crea
-    // una mesa nueva y reemplaza la cola. Las reglas solo permiten ese reemplazo si el
-    // puntero anterior ya no puede aceptar jugadores.
-    for(let attempt=0;attempt<4;attempt++){
-      const code=makePublicRoomCode();
-      const roomRef=doc(db,'rooms',code);
-      if((await tx.get(roomRef)).exists()) continue;
-      const room=roomData(code,mode,capacity,user.uid);
-      tx.set(roomRef,room);
-      tx.set(queueRef,{queueKey,roomCode:code,mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint,status:'waiting',updatedAt:serverTimestamp()});
-      return code;
-    }
-    throw Error('ROOM_CODE_COLLISION');
-  });
+      if(!roomSnap.exists()) return null;
+      const room=roomSnap.data();
+      if(room.playerOrder?.includes(user.uid)) return room.roomCode;
+      if(!isJoinablePublicRoom(room,{mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint})) return null;
+      const order=[...room.playerOrder,user.uid];
+      tx.update(roomRef,{
+        players:{...room.players,[user.uid]:{name:alias(),avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
+        playerOrder:order,version:room.version+1,updatedAt:serverTimestamp()
+      });
+      if(order.length===capacity) tx.update(queueRef,{status:'full',updatedAt:serverTimestamp()});
+      return room.roomCode;
+    });
+    if(existing) return existing;
+  }
+  // La creación usa un batch, no una transacción con lecturas después de escrituras.
+  // Firestore rechaza ese patrón en producción aunque el emulador de reglas valide los datos.
+  const code=makePublicRoomCode();
+  const roomRef=doc(db,'rooms',code);
+  const room=roomData(code,mode,capacity,user.uid);
+  const batch=writeBatch(db);
+  batch.set(roomRef,room);
+  batch.set(queueRef,{queueKey,roomCode:code,mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint,status:'waiting',updatedAt:serverTimestamp()});
+  await batch.commit();
+  return code;
 }
 
 function watchPublicRoom(code) {
