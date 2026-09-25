@@ -326,7 +326,10 @@ service cloud.firestore {
       allow update: if validQueue(request.resource.data)
         && ((request.resource.data.roomCode == resource.data.roomCode
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']))
-          || (resource.data.status == 'full'
+          || ((resource.data.status == 'full'
+                || !exists(/databases/$(database)/documents/rooms/$(resource.data.roomCode))
+                || get(/databases/$(database)/documents/rooms/$(resource.data.roomCode)).data.status != 'lobby'
+                || get(/databases/$(database)/documents/rooms/$(resource.data.roomCode)).data.playerOrder.size() >= resource.data.capacity)
               && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.hostUid == request.auth.uid));
       allow delete: if false;
     }
@@ -683,6 +686,7 @@ service cloud.firestore {
         let next = request.resource.data;
         return isHost()
           && prior.status == 'lobby'
+          && (prior.get('matchmaking','private') != 'public' || prior.playerOrder.size() == prior.capacity)
           && prior.playerOrder.size() >= 2
           && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'turnSeconds', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
