@@ -4,7 +4,7 @@
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 4;
-const PUBLIC_ROOM_PREFIX = 'PUB';
+const PUBLIC_ROOM_PREFIX = 'P';
 
 export function normalizePublicCapacity(value) {
   const capacity = Number(value);
