@@ -313,7 +313,7 @@ service cloud.firestore {
           && d.clientVersion is int && d.clientVersion >= 1
           && d.deckFingerprint is string && d.deckFingerprint.size() >= 1 && d.deckFingerprint.size() <= 24
           && d.status in ['waiting','full'] && d.updatedAt == request.time
-          && room.matchmaking == 'public' && room.roomCode == d.roomCode && room.mode == d.mode
+          && room.matchmaking == 'public' && room.queueKey == d.queueKey && room.roomCode == d.roomCode && room.mode == d.mode
           && room.capacity == d.capacity && room.clientVersion == d.clientVersion
           && room.deckFingerprint == d.deckFingerprint
           && room.playerOrder.size() <= d.capacity
@@ -1153,7 +1153,8 @@ service cloud.firestore {
             && request.resource.data.capacity is int && request.resource.data.capacity >= 2 && request.resource.data.capacity <= 4
             && request.resource.data.clientVersion is int && request.resource.data.clientVersion >= 1
             && request.resource.data.players[request.auth.uid].clientVersion == request.resource.data.clientVersion
-            && getAfter(/databases/$(database)/documents/publicQueues/$(request.resource.data.mode + ':' + string(request.resource.data.capacity))).data.roomCode == roomId))
+            && request.resource.data.queueKey is string && request.resource.data.queueKey.size() >= 5 && request.resource.data.queueKey.size() <= 100
+            && getAfter(/databases/$(database)/documents/publicQueues/$(request.resource.data.queueKey)).data.roomCode == roomId))
         && (!('tournament' in request.resource.data) || (tournamentShape(request.resource.data.tournament)
           && request.resource.data.tournament.index == 0 && request.resource.data.tournament.history == []
           && request.resource.data.mode == request.resource.data.tournament.queue[0]))
