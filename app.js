@@ -681,11 +681,19 @@
     return `<div class="home-competition">${competitionPromo()}</div>`;
   }
 
+  // Lámina de cada entrada: grabados que ya usa el juego (los de la portada de apertura,
+  // la portada de los retos y el trofeo de la competición), fundidos en el papel.
+  const CATALOG_ART = {
+    collections: `<span class="catalog-art catalog-art-fan" aria-hidden="true">${["world-cards/5002-great-pyramid-giza", "astronomy-cards/first-earth-photo", "medicine-cards/9001-hippocratic-corpus"]
+      .map(src => `<img src="assets/${src}.webp" alt="" width="512" height="768" decoding="async">`).join("")}</span>`,
+    quick: `<span class="catalog-art catalog-art-quick" aria-hidden="true"><img src="assets/hero-quick-400.webp" alt="" width="400" height="600" decoding="async"></span>`,
+    competition: `<span class="catalog-art catalog-art-competition" aria-hidden="true"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async"></span>`
+  };
   function catalogSection(key, number, title, description, cta) {
     const open = jugarSection === key;
     return `<section class="catalog-section catalog-${key}${open ? " is-open" : ""}" data-catalog="${key}">
       <h2><button class="catalog-toggle" data-action="toggle-play-catalog" data-section="${key}" aria-expanded="${open}" aria-controls="catalog-${key}">
-        <span class="catalog-number" aria-hidden="true">${number}</span><span class="catalog-copy"><strong>${title}</strong><small>${description}</small><span class="catalog-cta">${cta}</span></span><span class="catalog-chevron" aria-hidden="true">+</span>
+        ${CATALOG_ART[key] || ""}<span class="catalog-number" aria-hidden="true">${number}</span><span class="catalog-copy"><strong>${title}</strong><small>${description}</small><span class="catalog-cta">${cta}</span></span><span class="catalog-chevron" aria-hidden="true">+</span>
       </button></h2>
       <div id="catalog-${key}" class="catalog-drawer"${open ? "" : " inert"}><div class="catalog-drawer-inner">${open ? catalogContent(key) : ""}</div></div>
     </section>`;

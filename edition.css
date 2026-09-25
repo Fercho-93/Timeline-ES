@@ -3560,3 +3560,48 @@ html body:has(#app[data-screen="home"])::before {
     url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat,
     repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, 90vw) min(520px, 60vh) no-repeat;
 }
+
+/* Jugar: cada entrada lleva a la derecha un grabado del juego, como las láminas de un
+   jugador o de duelo, fundido en el papel con un velo terracota. El texto no se mueve. */
+#app .catalog-toggle { position: relative; overflow: hidden; isolation: isolate; }
+#app .catalog-toggle > :not(.catalog-art) { position: relative; z-index: 1; }
+#app .catalog-toggle .catalog-copy { padding-right: 18%; }
+#app .catalog-art {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 auto;
+  width: 56%;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 48%);
+  mask-image: linear-gradient(90deg, transparent, #000 48%);
+}
+#app .catalog-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 20%, #b8653d24);
+  mix-blend-mode: multiply;
+}
+#app .catalog-art img { display: block; filter: sepia(.45) saturate(.8) contrast(.96); }
+#app .catalog-art-competition img,
+#app .catalog-art-quick img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
+#app .catalog-art-competition img { object-position: 85% 45%; opacity: .9; }
+#app .catalog-art-quick img { object-position: 50% 42%; opacity: .62; filter: sepia(.6) saturate(.75) brightness(1.35) contrast(.9); }
+#app .catalog-art-fan { display: flex; align-items: center; justify-content: flex-end; padding-right: 58px; }
+#app .catalog-art-fan img {
+  width: 52px; height: 76px; margin-left: -18px; object-fit: cover;
+  border: 2px solid #f6ecd8; border-radius: 4px; box-shadow: 0 3px 8px #4a2c1633, 0 0 0 1px #b8935a66;
+  transform: rotate(var(--tilt)) translateY(var(--lift));
+}
+#app .catalog-art-fan img:nth-child(1) { --tilt: -12deg; --lift: 6px; }
+#app .catalog-art-fan img:nth-child(2) { --tilt: -1deg; --lift: -4px; z-index: 1; }
+#app .catalog-art-fan img:nth-child(3) { --tilt: 11deg; --lift: 6px; }
+:root[data-theme="dark"] #app .catalog-art img { mix-blend-mode: normal; opacity: .45; }
+@media (max-width: 359px) { #app .catalog-art { width: 48%; } #app .catalog-art-fan { padding-right: 48px; } }
+#app .catalog-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 55%); mask-image: linear-gradient(90deg, transparent, #000 55%); }
+#app .catalog-art-fan { width: 38%; padding-right: 50px; -webkit-mask-image: none; mask-image: none; }
+#app .catalog-art-fan img { width: 40px; height: 58px; margin-left: -14px; }
+#app .catalog-toggle .catalog-copy { padding-right: 22%; }
+#app .catalog-art-quick img { opacity: .5; filter: sepia(.75) saturate(.8) hue-rotate(-8deg) brightness(1.4) contrast(.85); }
+#app .catalog-chevron { background: color-mix(in srgb, var(--edition-surface) 82%, transparent); box-shadow: 0 1px 4px #4a2c161f; }
+#app .catalog-collections .catalog-toggle .catalog-copy { padding-right: 30%; }
