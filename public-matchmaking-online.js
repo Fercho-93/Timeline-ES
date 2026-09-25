@@ -5,6 +5,7 @@ import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePubl
 const CT = window.CONTINUUM;
 const CLIENT_VERSION = 42;
 let busy = false;
+let watchedCode = '';
 
 const alias = () => (CT.Accounts?.profile?.alias || 'Explorador').slice(0, 18);
 const avatarId = () => CT.Avatares?.ownId?.() || null;
@@ -72,12 +73,14 @@ async function findOrCreate(mode, capacityInput) {
 }
 
 function watchPublicRoom(code) {
+  if(!code || watchedCode===code) return;
+  watchedCode=code;
   const reference=doc(db,'rooms',code);
   let started=false;
   const stop=onSnapshot(reference,snap=>{
-    if(!snap.exists()){stop();return;}
+    if(!snap.exists()){watchedCode='';stop();return;}
     const room=snap.data();
-    if(room.matchmaking!=='public'){stop();return;}
+    if(room.matchmaking!=='public'){watchedCode='';stop();return;}
     const full=room.status==='lobby' && room.playerOrder?.length===room.capacity;
     const panel=document.querySelector('[data-public-waiting]');
     if(panel) panel.textContent=full?'Mesa completa. Preparando partida…':`Esperando jugadores · ${room.playerOrder?.length||0}/${room.capacity}`;
@@ -87,7 +90,7 @@ function watchPublicRoom(code) {
       // arranque que una sala privada, pero las reglas impiden hacerlo antes del cupo.
       setTimeout(()=>document.querySelector('[data-online-action="start"]')?.click(),350);
     }
-    if(room.status!=='lobby') stop();
+    if(room.status!=='lobby'){watchedCode='';stop();}
   },()=>{});
   return stop;
 }
@@ -144,8 +147,15 @@ function inject() {
   }
   const currentKey=Object.entries(CT.MODES||{}).find(([,m])=>current?.includes(m.name))?.[0];\n  if(currentKey && [...select.options].some(o=>o.value===currentKey)) select.value=currentKey;\n  grid.prepend(panel);
 }
-new MutationObserver(inject).observe(document.getElementById('app'),{childList:true,subtree:true});
+function refresh() {
+  inject();
+  if(document.getElementById('app')?.dataset?.screen==='online-lobby'){
+    const code=CT.Storage.getItem('continuum-last-room');
+    if(code) watchPublicRoom(code);
+  }
+}
+new MutationObserver(refresh).observe(document.getElementById('app'),{childList:true,subtree:true});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(b)void startQuickMatch(Number(document.getElementById('public-match-capacity')?.value||4));});
-inject();
+refresh();
 
 export { findOrCreate };
