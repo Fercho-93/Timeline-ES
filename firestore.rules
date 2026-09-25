@@ -1157,8 +1157,9 @@ service cloud.firestore {
         && (!('tournament' in request.resource.data) || (tournamentShape(request.resource.data.tournament)
           && request.resource.data.tournament.index == 0 && request.resource.data.tournament.history == []
           && request.resource.data.mode == request.resource.data.tournament.queue[0]))
-        && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.roomCode == roomId
-        && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.lastCreatedAt == request.time
+        && (request.resource.data.get('matchmaking','private') == 'public'
+          || (getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.roomCode == roomId
+            && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.lastCreatedAt == request.time))
         && !('ghost' in request.resource.data)
         && !('pulsePower' in request.resource.data)
         && request.resource.data.hostUid == request.auth.uid
