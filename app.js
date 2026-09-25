@@ -497,11 +497,19 @@
   }
 
   // El nombre se guarda también en la cuenta, si la hay: es el del ranking y los duelos.
-  // Si otra cuenta ya lo usa, se dice y se deja elegir otro.
+  // Durante las pruebas no se exige que sea único: si otra cuenta ya lo usa, el nombre se
+  // guarda igual en este móvil y la cuenta conserva el suyo. Para el lanzamiento, poner
+  // `NOMBRES_UNICOS` a `true` y se volverá a pedir otro nombre.
+  const NOMBRES_UNICOS = false;
   async function guardaNombre(nombre) {
     const problema = CT.Identidad.problema(nombre);
     if (problema) throw Error(problema);
-    if (CT.Accounts?.ready && CT.Accounts.renombra) await CT.Accounts.renombra(CT.Identidad.limpia(nombre));
+    if (!CT.Accounts?.ready || !CT.Accounts.renombra) return;
+    try {
+      await CT.Accounts.renombra(CT.Identidad.limpia(nombre));
+    } catch (error) {
+      if (NOMBRES_UNICOS || !/ya está en uso/.test(error?.message || "")) throw error;
+    }
   }
 
   async function bienvenidaNombreEnviado(boton) {
