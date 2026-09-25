@@ -63,7 +63,6 @@ async function findOrCreate(mode, capacityInput) {
       const roomRef=doc(db,'rooms',code);
       if((await tx.get(roomRef)).exists()) continue;
       const room=roomData(code,mode,capacity,user.uid);
-      tx.set(doc(db,'roomCreation',user.uid),{lastCreatedAt:serverTimestamp(),roomCode:code});
       tx.set(roomRef,room);
       tx.set(queueRef,{queueKey,roomCode:code,mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint,status:'waiting',updatedAt:serverTimestamp()});
       return code;
