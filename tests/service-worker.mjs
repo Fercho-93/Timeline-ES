@@ -118,6 +118,21 @@ console.log("\nService worker");
   ok("activar solo va a la red a por la música", sw.peticiones.every(url => musica.includes(url)));
 }
 {
+  // Al activarse, la versión nueva no recarga en seco a quien puede estar escribiendo:
+  // avisa a la página y solo la recarga ella si no contesta (una versión anterior).
+  const sw = arrancar();
+  const avisos = [], recargas = [];
+  const pagina = id => ({ id, url: "https://hilo.test/", postMessage: m => avisos.push([id, m.type]), navigate: async () => { recargas.push(id); } });
+  sw.contexto.self.clients.matchAll = async () => [pagina("nueva"), pagina("antigua")];
+  let activada;
+  sw.listeners.activate({ waitUntil: tarea => { activada = tarea; } });
+  await activada;
+  ok("activar avisa a cada página en vez de recargarla", avisos.length === 2 && avisos.every(([, tipo]) => tipo === "VERSION_READY") && !recargas.length);
+  sw.listeners.message({ data: { type: "VERSION_ACK" }, source: { id: "nueva" } });
+  await new Promise(resolve => setTimeout(resolve, 4300));
+  ok("la página que contesta recarga ella misma; la que no, se recarga como antes", recargas.length === 1 && recargas[0] === "antigua");
+}
+{
   const sw = arrancar();
   sw.guardado.set("./online.js", respuesta("online.js viejo"));
   const primera = await sw.pedir("./online.js");

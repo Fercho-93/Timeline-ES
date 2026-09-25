@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  CT.APP_VERSION = "continuum-v373";
+  CT.APP_VERSION = "continuum-v374";
   CT.Updates = { start };
   function start() {
     if (!("serviceWorker" in navigator) || window.Capacitor?.isNativePlatform?.()) return;
@@ -39,7 +39,23 @@
       registration.waiting.postMessage({ type: "ACTIVATE_UPDATE" });
       timer = setTimeout(() => { unlock(); refresh(); label.textContent = "La actualización sigue pendiente. Puedes reintentarlo."; }, 15000);
     });
+    // El trabajador nuevo avisa en vez de recargar en seco: se contesta enseguida y se
+    // recarga cuando nadie esté escribiendo ni en la bienvenida, para no borrar lo que se
+    // está tecleando ni cerrar el teclado a mitad de palabra.
+    let pendingReload = null;
+    function reloadWhenCalm() {
+      if (pendingReload) return;
+      const busy = () => !!document.activeElement?.matches?.("input, textarea, select, [contenteditable='true']") ||
+        !!document.querySelector("#app .bienvenida-shell");
+      const attempt = () => { if (busy()) return false; clearInterval(pendingReload); location.reload(); return true; };
+      if (!attempt()) pendingReload = setInterval(attempt, 1000);
+    }
     navigator.serviceWorker.addEventListener("message", event => {
+      if (event.data?.type === "VERSION_READY") {
+        event.source?.postMessage?.({ type: "VERSION_ACK" });
+        reloadWhenCalm();
+        return;
+      }
       if (event.data?.type !== "UPDATE_BLOCKED") return;
       unlock(); refresh(); label.textContent = "Cierra las otras pestañas de Continuum antes de actualizar.";
     });

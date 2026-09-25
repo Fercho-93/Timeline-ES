@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v373";
+const CACHE = "continuum-v374";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -265,11 +265,20 @@ self.addEventListener("activate", event => {
     // Una actualización ya preparada debe sustituir la página que aún ejecuta los
     // archivos de la caché anterior. La partida está persistida antes de cada repintado,
     // así que recargar conserva el punto exacto y evita dejar Safari en una versión mixta.
+    // Pero recargar en seco podía pillar a alguien escribiendo (el nombre en la
+    // bienvenida): se le avisa a la página, que recarga cuando no se está escribiendo.
+    // La página que no conteste —una versión anterior— se recarga como siempre.
     if (obsolete.length) {
-      const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-      await Promise.all(clients
-        .filter(client => client.url.startsWith(self.registration.scope))
-        .map(client => client.navigate(client.url).catch(() => null)));
+      const clients = (await self.clients.matchAll({ type: "window", includeUncontrolled: true }))
+        .filter(client => client.url.startsWith(self.registration.scope));
+      const direct = [];
+      for (const client of clients) {
+        if (typeof client.postMessage === "function" && client.id) {
+          client.postMessage({ type: "VERSION_READY", version: CACHE });
+          setTimeout(() => { if (!acknowledged.has(client.id)) client.navigate(client.url).catch(() => null); }, ACK_WAIT);
+        } else direct.push(client);
+      }
+      await Promise.all(direct.map(client => client.navigate(client.url).catch(() => null)));
     }
   })());
   // Fuera de `waitUntil` a propósito: mientras el trabajador está activándose, las
@@ -279,8 +288,13 @@ self.addEventListener("activate", event => {
   void storeMusic();
 });
 
+// Páginas que ya han recibido el aviso y recargarán ellas mismas en un momento tranquilo.
+const acknowledged = new Set();
+const ACK_WAIT = 4000;
+
 // Mantener la petición explícita por compatibilidad con clientes de versiones anteriores.
 self.addEventListener("message", event => {
+  if (event.data?.type === "VERSION_ACK") { if (event.source?.id) acknowledged.add(event.source.id); return; }
   if (event.data?.type !== "ACTIVATE_UPDATE") return;
   event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(clients => {
     const own = clients.filter(client => client.url.startsWith(self.registration.scope));
