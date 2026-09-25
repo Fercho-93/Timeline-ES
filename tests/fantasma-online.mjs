@@ -140,7 +140,7 @@ try {
  assert.equal(s.players[A].hand.length,3);assert.equal(s.ghost.owners[1],'');assert.ok(s.deck.includes(s.ghost.cards[1]));
  for(const [i,cl] of clients.entries()){
   await cl.call('renderGame');assert.equal(cl.w.document.querySelectorAll('.hand-card').length,s.players[[A,B,C][i]].hand.length);
-  assert.deepEqual([...cl.w.document.querySelectorAll('.scoreboard em')].map(el=>Number(el.textContent)),[3,3,3],'los contadores públicos no incluyen poderes');
+  assert.deepEqual([...cl.w.document.querySelectorAll('.scoreboard em strong')].map(el=>Number(el.textContent)),[3,3,3],'los contadores públicos no incluyen poderes');
  }
  await clients[0].call('finishTurn');
  await clients[0].call('renderGame');assert.ok(clients[0].w.document.querySelector('.ghost-power'));
