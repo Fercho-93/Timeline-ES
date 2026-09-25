@@ -140,7 +140,7 @@ function inject() {
   const current=entry.querySelector('.online-intro .eyebrow')?.textContent?.trim();
   const select=panel.querySelector('#public-match-mode');
   for(const [key,m] of Object.entries(CT.MODES||{})){
-    if(key===CT.DEFAULT_MODE)continue;
+    if(key===CT.DEFAULT_MODE || (CT.Cartera?.tiene && !CT.Cartera.tiene(key)))continue;
     const option=document.createElement('option');option.value=key;option.textContent=m.name;select.append(option);
   }
   grid.prepend(panel);
