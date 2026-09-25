@@ -521,7 +521,7 @@
     home();
   }
 
-  // La portada tiene tres puertas y nada más: el reto del día, jugar y el atlas. Encima,
+  // La portada tiene tres puertas y nada más: jugar, el reto del día y el atlas. Encima,
   // solo cuando hay algo pendiente, el aviso de los duelos en los que te toca.
   function home() {
     CT.Quick.leave();
@@ -531,8 +531,8 @@
       ${homeMasthead()}${quickActions()}
       <div id="home-duels" class="home-duels"></div>
       <section class="home-doors" aria-label="Qué quieres hacer">
-        ${dailyDoor()}
         ${homeDoor("jugar", "Jugar", "Colecciones, retos rápidos y competición.", "home-door-jugar", 344, 378)}
+        ${dailyDoor()}
         ${homeDoor("perfil", "Atlas", "Tus cartas, tu progreso y tus logros.", "hero-geography", 859)}
       </section>
       ${homeNav()}

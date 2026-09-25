@@ -3498,3 +3498,47 @@ html body:not(:has(#app[data-screen="home"]))::before { content: none; }
     repeating-linear-gradient(94deg, transparent 0 29px, #fff8e414 29px 30px),
     color-mix(in srgb, var(--edition-paper) 48%, transparent);
 }
+
+/* Portada compacta: caben al menos dos láminas enteras en un móvil con la barra del
+   navegador visible. */
+#app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(env(safe-area-inset-top) + clamp(4px, 1.6svh, 18px)) auto clamp(10px, 1.8svh, 18px); }
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(70px, 17vw, 110px); margin-bottom: -2px; }
+#app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2rem, 9.4vw, 3.2rem); }
+#app[data-screen="home"] .home-doors-shell .home-doors { gap: 10px; }
+#app[data-screen="home"] .home-doors-shell .home-door,
+#app[data-screen="home"] .home-doors-shell .home-door-daily,
+#app[data-screen="home"] .home-doors-shell .home-door-copy,
+#app[data-screen="home"] .home-doors-shell .home-door-daily .home-door-copy { min-height: 112px; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy { padding: 12px 18px; gap: 3px; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy b { font-size: clamp(1.35rem, 5.6vw, 1.7rem); }
+#app[data-screen="home"] .home-doors-shell .home-door-copy small { font-size: .92rem; line-height: 1.3; }
+#app[data-screen="home"] .home-doors-shell .home-door-cta { margin-top: 4px; padding-bottom: 2px; font-size: .98rem; }
+#app[data-screen="home"] .home-doors-shell .home-door-daily.is-done,
+#app[data-screen="home"] .home-doors-shell .home-door-daily.is-done .home-door-copy { min-height: 124px; }
+#app[data-screen="home"] .home-duels:not(:empty) { margin-bottom: 10px; }
+#app[data-screen="home"] .home-duels-banner { min-height: 58px; padding: 8px 16px; }
+#app[data-screen="home"] .home-duels-mark { width: 38px; height: 38px; font-size: 1.05rem; }
+#app[data-screen="home"] .home-duels-banner b { font-size: 1.02rem; }
+#app[data-screen="home"] .home-duels-banner small { font-size: .88rem; }
+
+/* El lema va sobre una cinta terracota para que las letras oscuras se lean sobre la
+   ilustración. */
+#app[data-screen="home"] .home-doors-shell .home-tagline {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px 4px calc(10px + .3em);
+  border-radius: 3px;
+  color: #1c120b;
+  font-weight: 700;
+  background: linear-gradient(90deg, #c9784ecc, #d0835a 14% 86%, #c9784ecc);
+  box-shadow: inset 0 1px 0 #f1b08a80, inset 0 -1px 0 #8f462580, 0 2px 6px #6b33182e;
+}
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-tagline { color: #1c120b; }
+
+/* Rayos de luz también desde la esquina derecha, como los que entran por la izquierda. */
+html body:has(#app[data-screen="home"])::before {
+  background:
+    url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
+    url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat,
+    repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, 90vw) min(520px, 60vh) no-repeat;
+}
