@@ -19,7 +19,6 @@ console.log('\nMatchmaking público');
 await env.clearFirestore();
 {
   const db=ctx(H),b=writeBatch(db);
-  b.set(doc(db,'roomCreation',H),{lastCreatedAt:serverTimestamp(),roomCode:CODE});
   b.set(doc(db,'rooms',CODE),room());
   b.set(doc(db,'publicQueues',KEY),queue());
   await check('crea sala pública y su cola de forma atómica',true,b.commit());
@@ -29,7 +28,6 @@ await check('un usuario autenticado puede localizar la cola',true,getDoc(doc(ctx
 await env.clearFirestore();
 await check('no permite crear una sala pública sin su cola',false,(async()=>{
   const db=ctx(H),b=writeBatch(db);
-  b.set(doc(db,'roomCreation',H),{lastCreatedAt:serverTimestamp(),roomCode:CODE});
   b.set(doc(db,'rooms',CODE),room());
   return b.commit();
 })());
