@@ -15287,6 +15287,17 @@
         "evidence": "docs/retos-portada.md",
         "generatedAt": "2026-09-20"
       }
+    },
+    {
+      "path": "assets/paper-map.svg",
+      "sha256": "a717929626bfbe3f0d982ff61a51e2c1bfad3be70220f8348783c2333c8bb741",
+      "rightsEvidence": {
+        "status": "original-vector",
+        "generator": "Dibujo vectorial del proyecto (SVG escrito a mano)",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "generatedAt": "2026-09-25"
+      }
     }
   ]
 }

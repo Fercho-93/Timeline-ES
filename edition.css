@@ -3367,39 +3367,66 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
    columna y un olivo a la izquierda, un astrolabio con la ciudad a la derecha y una
    franja de cartas marinas sobre la barra. Las piezas son recortes con transparencia:
    dejan libre el centro, donde la marca, las láminas y el texto siguen siendo HTML. */
-:root:not([data-theme="dark"]) #app[data-screen="home"] {
-  background:
-    radial-gradient(ellipse at 50% 18%, #fbf4e4 0 18%, transparent 52%),
-    radial-gradient(ellipse at 96% 78%, #d8bf9147, transparent 46%),
-    linear-gradient(180deg, #f1e6d0, #eadcc0);
-}
-#app[data-screen="home"]::before {
+html:root { background: radial-gradient(ellipse at 50% 18%, #fbf4e4 0 18%, transparent 52%), radial-gradient(ellipse at 96% 78%, #d8bf9147, transparent 46%), linear-gradient(180deg, #f1e6d0, #eadcc0) fixed; }
+html:root[data-theme="dark"] { background: radial-gradient(ellipse at 50% 12%, #3a2b1c, transparent 55%), linear-gradient(180deg, #1d150e, #130e09) fixed; }
+html body, html:root[data-theme="dark"] body { background: transparent; }
+/* Toda la pantalla, en cualquier vista del juego, es la misma lámina: una carta náutica
+   vectorial cubre el papel y las piezas ilustradas quedan fijas en los bordes mientras
+   el contenido se desplaza por encima. Van detrás de todo (z-index -1) para no competir
+   con modales ni avisos. */
+html body::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
   opacity: 1;
+  box-shadow: none;
   background:
     url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
     url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat;
 }
-#app[data-screen="home"]::after {
+/* La carta náutica va aparte, en `html`, para poder atenuar las esquinas sin tocarla. */
+html::before {
+  content: "";
   position: fixed;
-  z-index: 0;
-  inset: auto 0 calc(52px + env(safe-area-inset-bottom));
-  height: 58px;
-  opacity: .92;
-  width: min(100%, 440px);
-  margin-inline: auto;
-  background: url("assets/home-deco-maps.webp") center bottom / cover no-repeat;
-  -webkit-mask-image: none;
-  mask-image: none;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: url("assets/paper-map.svg") center / cover no-repeat;
 }
+:root[data-theme="dark"]::before { opacity: .35; }
+/* Fuera de la portada los títulos van a la izquierda: la columna y el astrolabio se
+   quedan más pequeños y tenues para no pasar por detrás de las letras. */
+html body:not(:has(#app[data-screen="home"]))::before {
+  opacity: .5;
+  background-size: min(120px, 28vw) auto, min(120px, 28vw) auto;
+}
+:root[data-theme="dark"] body:not(:has(#app[data-screen="home"]))::before { opacity: .12; }
+html body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: auto 0 env(safe-area-inset-bottom);
+  width: min(100%, 440px);
+  height: 58px;
+  margin-inline: auto;
+  pointer-events: none;
+  opacity: .92;
+  background: url("assets/home-deco-maps.webp") center bottom / cover no-repeat;
+}
+html body:has(.home-nav)::after { bottom: calc(52px + env(safe-area-inset-bottom)); }
 @media (min-width: 460px) {
-  #app[data-screen="home"]::after {
+  html body::after {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
   }
 }
-:root:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen="home"]::after { display: none; }
-:root[data-theme="dark"] #app[data-screen="home"]::before,
-:root[data-theme="dark"] #app[data-screen="home"]::after { opacity: .2; }
+:root:is([data-text-size="150"], [data-text-size="200"]) body::after { display: none; }
+:root[data-theme="dark"] body::before, :root[data-theme="dark"] body::after { opacity: .18; }
+/* La portada ya no pinta su propio papel: deja ver la lámina común. */
+:root #app[data-screen="home"], :root:not([data-theme="dark"]) #app[data-screen="home"], :root[data-theme="dark"] #app[data-screen="home"] { background: transparent; }
+#app[data-screen="home"]::before, #app[data-screen="home"]::after { content: none; }
 
 #app[data-screen="home"] .home-doors-shell .home-masthead { margin-top: calc(env(safe-area-inset-top) + clamp(16px, 4svh, 44px)); }
 #app[data-screen="home"] .home-doors-shell .home-masthead::before { display: none; }
@@ -3473,3 +3500,12 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   #app[data-screen="home"] .home-duels-banner b { font-size: 1.02rem; }
 }
 #app[data-screen="home"] .home-doors-shell { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
+:root #app[data-screen="daily-intro"] { background: radial-gradient(ellipse at 50% 22%, color-mix(in srgb, var(--scene-wash) 18%, transparent), transparent 43%); }
+/* La mesa de juego conserva su fibra y su luz, pero ahora sobre la carta náutica común. */
+#app.atlas-board {
+  background:
+    radial-gradient(ellipse at 48% 28%, #fff4cf70 0 16%, transparent 58%),
+    repeating-linear-gradient(4deg, transparent 0 7px, #74502c08 7px 8px),
+    repeating-linear-gradient(94deg, transparent 0 29px, #fff8e414 29px 30px),
+    color-mix(in srgb, var(--edition-paper) 48%, transparent);
+}
