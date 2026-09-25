@@ -3567,7 +3567,6 @@ html body:has(#app[data-screen="home"])::before {
 #app .catalog-toggle { position: relative; overflow: hidden; isolation: isolate; }
 #app .catalog-toggle > :not(.catalog-art) { position: relative; z-index: 1; }
 #app .catalog-toggle .catalog-copy { padding-right: 22%; }
-#app .catalog-collections .catalog-toggle .catalog-copy { padding-right: 30%; }
 #app .catalog-art {
   position: absolute;
   z-index: 0;
@@ -3586,27 +3585,12 @@ html body:has(#app[data-screen="home"])::before {
   background-image: url("assets/hero-quick-400.webp"); background-position: 50% 42%; opacity: .5;
   filter: sepia(.75) saturate(.8) hue-rotate(-8deg) brightness(1.4) contrast(.85);
 }
-/* Colecciones: tres cartas de mazos distintos, en abanico, como grabadas en la tarjeta. */
-#app .catalog-art-fan {
-  width: 40%;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 38%);
-  mask-image: linear-gradient(90deg, transparent, #000 38%);
-  opacity: .9;
+/* Colecciones: la portada de la mezcla de todos los mazos (templo, reloj, cine, brújula),
+   con el mismo lavado que la de los retos. */
+#app .catalog-art-collections {
+  background-image: url("assets/hero-mixed-400.webp"); background-position: 50% 30%; opacity: .5;
+  filter: sepia(.75) saturate(.8) hue-rotate(-8deg) brightness(1.4) contrast(.85);
 }
-#app .catalog-art-fan i {
-  position: absolute;
-  top: 50%;
-  right: calc(52px + var(--x));
-  width: 40px;
-  height: 58px;
-  border-radius: 3px;
-  background: center / cover no-repeat;
-  box-shadow: 0 0 0 1px #9c7a4a80, 0 3px 6px #4a2c1624;
-  transform: translateY(-50%) translateY(var(--lift)) rotate(var(--tilt));
-}
-#app .catalog-art-fan i:nth-child(1) { --x: 44px; --tilt: -12deg; --lift: 5px; background-image: url("assets/world-cards/5002-great-pyramid-giza.webp"); }
-#app .catalog-art-fan i:nth-child(3) { --x: 0px; --tilt: 11deg; --lift: 5px; background-image: url("assets/medicine-cards/9001-hippocratic-corpus.webp"); }
-#app .catalog-art-fan i:nth-child(2) { --x: 22px; --tilt: -1deg; --lift: -4px; z-index: 1; background-image: url("assets/astronomy-cards/first-earth-photo.webp"); }
 #app .catalog-chevron { background: color-mix(in srgb, var(--edition-surface) 82%, transparent); box-shadow: 0 1px 4px #4a2c161f; }
 :root[data-theme="dark"] #app .catalog-art { mix-blend-mode: normal; opacity: .4; }
 @media (max-width: 359px) { #app .catalog-art { width: 48%; } }

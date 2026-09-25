@@ -688,7 +688,7 @@
   // rejilla de la tarjeta y no descoloca el texto.
   const catalogArt = (kind, inner = "") => `<span class="catalog-art catalog-art-${kind}" aria-hidden="true" style="position:absolute;top:0;right:0;bottom:0;pointer-events:none">${inner}</span>`;
   const CATALOG_ART = {
-    collections: catalogArt("fan", "<i></i><i></i><i></i>"),
+    collections: catalogArt("collections"),
     quick: catalogArt("quick"),
     competition: catalogArt("competition")
   };
