@@ -71,7 +71,7 @@
     collectionOpen = view.collectionOpen === true;
     collectionDetails = view.collectionDetails === true;
     collectionIndexExpanded = view.collectionIndexExpanded === true;
-    jugarSection = ["collections", "quick", "competition"].includes(view.jugarSection) ? view.jugarSection : null;
+    jugarSection = view.jugarSection === "collections" ? "collections" : null;
     homeDestination = view.homeDestination === 'collection' ? 'collection' : 'home';
     profileReturn = ['play-menu','solo-home'].includes(view.profileReturn) ? view.profileReturn : 'home';
     if (view.screen === 'perfil') screen = 'perfil';
@@ -667,8 +667,8 @@
       <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige tu próxima partida</div><h1 data-focus tabindex="-1">¿Qué te apetece jugar?</h1><p>Explora un tema, prueba un reto o lánzate a competir.</p></header>
       <div class="play-catalog">
         ${catalogSection("collections", "01", "Grandes colecciones", "Historia, ciencia, naturaleza y mucho más.", "Explorar los mazos")}
-        ${catalogSection("quick", "02", "Retos rápidos", "Temas concretos para una partida diferente.", "Descubrir los retos")}
-        ${catalogSection("competition", "03", "Competición", "Pon a prueba lo que sabes, ronda a ronda.", "Ver cómo competir")}
+        ${catalogSection("quick", "02", "Retos rápidos", "Temas concretos para una partida diferente.", "Jugar un reto")}
+        ${catalogSection("competition", "03", "Competición", "Pon a prueba lo que sabes, ronda a ronda.", "Elegir cómo competir")}
       </div>
       ${homeNav()}
     </div>`);
@@ -691,7 +691,16 @@
     quick: catalogArt("quick"),
     competition: catalogArt("competition")
   };
+  // Retos rápidos y Competición tienen una sola puerta: desplegarlas solo repetía la
+  // misma tarjeta, así que la entrada lleva directamente a su pantalla.
+  const CATALOG_DIRECT = { quick: "quick-challenges", competition: "competition-menu" };
   function catalogSection(key, number, title, description, cta) {
+    const direct = CATALOG_DIRECT[key];
+    if (direct) return `<section class="catalog-section catalog-${key} catalog-direct" data-catalog="${key}">
+      <h2><button class="catalog-toggle" data-action="${direct}">
+        ${CATALOG_ART[key] || ""}<span class="catalog-number" aria-hidden="true">${number}</span><span class="catalog-copy"><strong>${title}</strong><small>${description}</small><span class="catalog-cta">${cta} <span aria-hidden="true">→</span></span></span><span class="catalog-chevron" aria-hidden="true">→</span>
+      </button></h2>
+    </section>`;
     const open = jugarSection === key;
     return `<section class="catalog-section catalog-${key}${open ? " is-open" : ""}" data-catalog="${key}">
       <h2><button class="catalog-toggle" data-action="toggle-play-catalog" data-section="${key}" aria-expanded="${open}" aria-controls="catalog-${key}">
@@ -707,6 +716,7 @@
     app.querySelectorAll("[data-catalog]").forEach(section => {
       const open = section.dataset.catalog === jugarSection;
       const drawer = section.querySelector(".catalog-drawer");
+      if (!drawer) return; // Las entradas directas no se despliegan.
       const inner = drawer.firstElementChild;
       if (open && !inner.innerHTML) inner.innerHTML = catalogContent(key);
       // Medir la fila cerrada permite animar su altura incluso al cargarla por primera vez.

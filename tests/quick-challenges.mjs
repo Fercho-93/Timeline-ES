@@ -134,9 +134,8 @@ assert.equal(CT.has('counts'), false, 'La colección eliminada no entra en parti
 const click = selector => {const el = w.document.querySelector(selector); assert.ok(el, selector); el.click();};
 const openQuick = () => {
   click('[data-action="jugar"]');
-  assert.equal(w.document.querySelector('[data-action="quick-challenges"]'), null, 'Los retos se descubren al abrir su bloque');
-  click('[data-action="toggle-play-catalog"][data-section="quick"]');
-  click('[data-action="quick-challenges"]');
+  assert.equal(w.document.querySelector('[data-action="toggle-play-catalog"][data-section="quick"]'), null, 'Retos rápidos tiene una sola puerta: no se despliega');
+  click('.catalog-quick [data-action="quick-challenges"]');
 };
 openQuick(); click('[data-quick="show-multi"]'); click('[data-quick="local"]');
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);

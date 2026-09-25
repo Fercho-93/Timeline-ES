@@ -3726,3 +3726,5 @@ html:not(:has(#app[data-screen="home"]))::before {
 }
 :root[data-theme="dark"] #app .catalog-drawer-inner > .catalog-hint { color: #e3cfb4; }
 :root[data-theme="dark"] #app .jugar-shell #deck-collection .collection-decks { background: #2a1f16cc; }
+#app .catalog-direct .catalog-chevron { font-size: 1.1rem; }
+@media (hover: hover) { #app .catalog-direct .catalog-toggle:hover .catalog-chevron { transform: translateX(3px); } }
