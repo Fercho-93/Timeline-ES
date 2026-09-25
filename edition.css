@@ -3594,3 +3594,24 @@ html body:has(#app[data-screen="home"])::before {
 #app .catalog-chevron { background: color-mix(in srgb, var(--edition-surface) 82%, transparent); box-shadow: 0 1px 4px #4a2c161f; }
 :root[data-theme="dark"] #app .catalog-art { mix-blend-mode: normal; opacity: .4; }
 @media (max-width: 359px) { #app .catalog-art { width: 48%; } }
+
+/* Jugar con un punto más de color: cada entrada toma un matiz suave a juego con su
+   número (terracota, oliva y latón), la lámina recupera algo de tono y el velo del
+   fondo se calienta. Sin saturar: los dibujos siguen siendo los mismos. */
+#app .catalog-collections { --catalog-tint: #f5dfcb; --catalog-wash: #c0643a; }
+#app .catalog-quick { --catalog-tint: #ebe6cc; --catalog-wash: #7f7a3c; }
+#app .catalog-competition { --catalog-tint: #f3e2c0; --catalog-wash: #b0833a; }
+#app .catalog-section { border-color: color-mix(in srgb, var(--catalog-wash) 38%, var(--edition-line)); box-shadow: 0 4px 14px color-mix(in srgb, var(--catalog-wash) 16%, transparent); }
+#app .catalog-toggle { background: linear-gradient(110deg, color-mix(in srgb, var(--catalog-tint) 70%, #fbf6ec), var(--catalog-tint) 60%); }
+#app .catalog-art::after { background: linear-gradient(90deg, transparent 15%, color-mix(in srgb, var(--catalog-wash) 22%, transparent)); }
+#app :is(.catalog-art-collections, .catalog-art-quick) { opacity: .56; filter: sepia(.7) saturate(1.05) hue-rotate(-10deg) brightness(1.3) contrast(.88); }
+#app .catalog-art-competition { filter: sepia(.6) saturate(1.1) hue-rotate(-8deg); }
+#app .catalog-copy strong { color: color-mix(in srgb, var(--catalog-color) 70%, var(--catalog-wash)); }
+#app .catalog-cta { color: color-mix(in srgb, var(--catalog-color) 55%, var(--catalog-wash)); }
+html:not(:has(#app[data-screen="home"]))::before {
+  background: linear-gradient(#f3e3c8b3, #f2e1c494 60%, #f0dcbc4d), #e9dcc3 url("assets/continuum-splash-clean-v3.webp") center bottom / cover no-repeat;
+}
+:root[data-theme="dark"] #app .catalog-section { --catalog-tint: #352a1f; }
+:root[data-theme="dark"] #app .catalog-quick { --catalog-tint: #2f2d21; }
+:root[data-theme="dark"] #app .catalog-competition { --catalog-tint: #362c1c; }
+:root[data-theme="dark"] #app .catalog-copy strong, :root[data-theme="dark"] #app .catalog-cta { color: var(--catalog-color); }
