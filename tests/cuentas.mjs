@@ -8,6 +8,7 @@ function setup(user=null,seed={}){
  w.CONTINUUM={escapeHtml:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),Scene:{apply(){}},Storage:{getItem:k=>w.localStorage.getItem(k),setItem:(k,v)=>{w.localStorage.setItem(k,v);return true;},removeItem:k=>w.localStorage.removeItem(k),notice(){}},isSessionActive:()=>false};
  w.eval(read('a11y.js'));
  w.eval(read('account-storage.js'));
+ w.eval(read('avatares.js'));
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
  Object.assign(w,{collection:(_,name)=>name,query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async()=>({docs:[...data].filter(([k])=>k.startsWith('dailyRanking/')).map(([k,v])=>({id:k.split('/')[1],data:()=>v}))}),browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,col,id)=>`${col}/${id}`,getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
@@ -126,6 +127,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('ranking');assert.match(w.document.querySelector('[role="dialog"]').textContent,/Fer/);
  assert.equal(w.document.querySelectorAll('.ranking-medallion').length,3);
+ assert.equal(w.document.querySelectorAll('.ranking-medallion .avatar-art img').length,3);
  assert.equal(w.document.querySelectorAll('.ranking-medallion-1').length,1);
  assert.ok(w.document.querySelector('.account-ranking .is-you .ranking-you'));
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);

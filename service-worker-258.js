@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v365";
+const CACHE = "continuum-v367";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -11,13 +11,14 @@ const ASSETS = [
   "./quick-room.js", "./quick-network.js", "./quick-online.js", "./quick-challenges.css", "./quick-challenges-data.js", "./quick-challenges-engine.js", "./quick-challenges.js",
   "./assets/audio/CREDITS.md",
   "./assets/competition-engraving.webp",
+  "./assets/avatars/alfonso-x.webp", "./assets/avatars/aretha-franklin.webp", "./assets/avatars/automata.webp", "./assets/avatars/aventurera.webp", "./assets/avatars/ballena-azul.webp", "./assets/avatars/beethoven.webp", "./assets/avatars/buho-real.webp", "./assets/avatars/caballera.webp", "./assets/avatars/carlos-iii.webp", "./assets/avatars/cervantes.webp", "./assets/avatars/chaplin.webp", "./assets/avatars/cleopatra.webp", "./assets/avatars/creador-puzles.webp", "./assets/avatars/david-bowie.webp", "./assets/avatars/el-cid.webp", "./assets/avatars/elefante.webp", "./assets/avatars/explorador.webp", "./assets/avatars/felipe-ii.webp", "./assets/avatars/flamenco.webp", "./assets/avatars/hechicera.webp", "./assets/avatars/ingrid-bergman.webp", "./assets/avatars/isabel-catolica.webp", "./assets/avatars/jirafa.webp", "./assets/avatars/juana-i.webp", "./assets/avatars/leon.webp", "./assets/avatars/lince.webp", "./assets/avatars/marie-curie.webp", "./assets/avatars/melies.webp", "./assets/avatars/ninja.webp", "./assets/avatars/panda.webp", "./assets/avatars/piloto-arcade.webp", "./assets/avatars/piloto-espacial.webp", "./assets/avatars/pinguino.webp", "./assets/avatars/pulpo.webp", "./assets/avatars/tigre.webp", "./assets/avatars/zorro.webp",
   "./assets/mode-walk-solo.webp", "./assets/mode-walk-multi.webp", "./assets/mode-walk-duel.webp",
   "./deployment.js", "./accounts.css", "./firebase-client.js", "./account-storage.js", "./recent-players.js", "./accounts.js", "./boot.js",
   "./privacidad.html",
   "./engine.js", "./final.js", "./tournament.js", "./links.js",
   "./", "./index.html", "./splash.css", "./splash.js", "./styles.css", "./edition.css", "./service-worker-258.js", "./cards.js", "./movies.js", "./music.js", "./videogames.js",
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
-  "./medicine.js", "./countries.js", "./population.js", "./idiomas.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./blobatar.js", "./avatares.js", "./identidad.js", "./enciclopedia.js", "./progreso.js", "./cartera.js", "./duelo.js", "./duelo-turnos.js", "./push.js", "./local-transport.js", "./local-room.js", "./local-session.js", "./local-share.js", "./qrcode-generator.js", "./qr-encode.js", "./qr-scanner.js", "./local-multiplayer.js", "./jsqr.js",
+  "./medicine.js", "./countries.js", "./population.js", "./idiomas.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./avatares.js", "./identidad.js", "./enciclopedia.js", "./progreso.js", "./cartera.js", "./duelo.js", "./duelo-turnos.js", "./push.js", "./local-transport.js", "./local-room.js", "./local-session.js", "./local-share.js", "./qrcode-generator.js", "./qr-encode.js", "./qr-scanner.js", "./local-multiplayer.js", "./jsqr.js",
   "./ghost.js", "./drag.js", "./swipe.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./ambience.js", "./immersion.js", "./app.js", "./online.js",
   "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/continuum-splash-clean-v3.webp",
   "./assets/home-door-jugar.webp",

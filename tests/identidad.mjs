@@ -1,6 +1,5 @@
 import { gameHtml } from "./game-fixture.mjs";
-// Identidad: la bienvenida pide el nombre, del que sale el avatar; el Atlas deja
-// cambiarlo y las partidas usan el avatar para distinguir a cada cual.
+// La identidad del invitado fija el avatar; el nombre se puede cambiar sin perderlo.
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
@@ -35,19 +34,21 @@ const escribeNombre = (w, nombre) => {
   w.document.querySelector("[data-bienvenida]").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
 };
 const espera = () => new Promise(resolve => setTimeout(resolve, 0));
-// El SVG tal y como queda en la página: el navegador lo normaliza al insertarlo, así
-// que se compara pasado por el mismo molde.
+// El navegador normaliza el HTML al insertarlo; comparar tras pasar por el mismo molde.
 const pintado = (w, html) => { const molde = w.document.createElement("div"); molde.innerHTML = html; return molde.innerHTML; };
 
-console.log("\nEl avatar sale del nombre");
+console.log("\nEl avatar queda ligado a la identidad");
 {
   const w = boot();
   const A = w.CONTINUUM.Avatares;
-  const svg = n => A.markup(n, { size: 40 });
-  ok("el mismo nombre dibuja siempre el mismo avatar", svg("Lucía") === svg("Lucía") && svg("Lucía") === svg("  lucía "));
-  ok("nombres distintos, avatares distintos", new Set(["Ana", "Pablo", "Marta", "Diego", "Sofía"].map(svg)).size === 5);
-  ok("es un dibujo SVG sin descargas", /^<svg class="avatar/.test(svg("Ana")) && !/<image|href=/.test(svg("Ana")));
-  ok("decorativo salvo que se le dé nombre", /aria-hidden="true"/.test(svg("Ana")) && /aria-label="Tu avatar"/.test(A.markup("Ana", { etiqueta: "Tu avatar" })));
+  const own = A.ownSeed();
+  ok("hay 36 ilustraciones y todas están en el build", A.ids.length === 36 && A.ids.every(id => fs.existsSync(path.join(REPO, "assets/avatars", id + ".webp"))));
+  ok("la elección se mantiene con el mismo identificador aunque cambie el nombre",
+    A.markup("Lucía", { seed: "uid:persona-1" }) === A.markup("Lucía", { seed: "uid:persona-1" })
+    && A.idFor("uid:persona-1") === A.idFor("uid:persona-1"));
+  ok("es una ilustración local sin SVG remoto", /src="assets\/avatars\/[\w-]+\.webp"/.test(A.markup("Ana")) && !/<svg/.test(A.markup("Ana")));
+  ok("decorativo salvo que se le dé nombre", /aria-hidden="true"/.test(A.markup("Ana")) && /aria-label="Tu avatar"/.test(A.markup("Ana", { etiqueta: "Tu avatar" })));
+  ok("la semilla local permanece al volver a abrir", boot({ "continuum-avatar-seed-v1": own }).CONTINUUM.Avatares.ownSeed() === own);
 }
 
 console.log("\nLa primera vez: el nombre");
@@ -57,8 +58,17 @@ console.log("\nLa primera vez: el nombre");
   ok("la bienvenida no lleva barra inferior", !existe(w, ".home-nav"));
   const input = w.document.getElementById("bienvenida-nombre");
   input.value = "Fernando";
+  click(w, ".bienvenida-avatar");
+  ok("el retrato abre la colección completa", w.document.querySelectorAll(".avatar-picker-option").length === 36);
+  const elegido = w.CONTINUUM.Avatares.ids.find(id => id !== w.CONTINUUM.Avatares.ownId());
+  click(w, `[data-action="avatar-select"][data-avatar-id="${elegido}"]`);
+  ok("se guarda la elección sin borrar el nombre escrito", w.CONTINUUM.Avatares.ownId() === elegido && input.value === "Fernando");
+  ok("la bienvenida enseña el retrato elegido", w.document.querySelector(".bienvenida-avatar img").getAttribute("src").endsWith(`/${elegido}.webp`));
+  ok("persiste al volver a abrir el juego", boot({ ...w.localStorage }).CONTINUUM.Avatares.ownId() === elegido);
+  const before = w.document.querySelector("[data-avatar-vivo]").innerHTML;
+  input.value = "Fernando";
   input.dispatchEvent(new w.Event("input", { bubbles: true }));
-  ok("el avatar se ve mientras se escribe", w.document.querySelector("[data-avatar-vivo]").innerHTML === pintado(w, w.CONTINUUM.Avatares.markup("Fernando", { size: 112 })));
+  ok("el avatar ya asignado no cambia al escribir", w.document.querySelector("[data-avatar-vivo]").innerHTML === before);
   escribeNombre(w, "a");
   await espera();
   ok("un nombre demasiado corto se explica", /al menos 2/.test(w.document.getElementById("bienvenida-error").textContent));
@@ -91,8 +101,8 @@ console.log("\nEl Atlas: nombre y avatar");
   click(w, '.home-door[data-action="perfil"]');
   const A = w.CONTINUUM.Avatares;
   ok("el Atlas enseña el nombre", w.document.querySelector(".atlas-identidad h2").textContent === "Lucía");
-  ok("y el avatar de ese nombre", w.document.querySelector(".atlas-identidad-avatar").innerHTML === pintado(w, A.markup("Lucía", { size: 72, etiqueta: "Tu avatar" })));
-  ok("no hay selector de avatar: sale del nombre", !existe(w, '[data-action="identidad-avatar"]'));
+  ok("y el avatar del invitado", w.document.querySelector(".atlas-identidad-avatar").innerHTML === pintado(w, A.markup("Lucía", { size: 72, etiqueta: "Tu avatar", seed: A.ownSeed() })));
+  ok("el Atlas permite cambiar de avatar", existe(w, '[data-action="identidad-avatar"]'));
   click(w, '.atlas-identidad-acciones [data-action="identidad-nombre"]');
   w.document.getElementById("identidad-nombre").value = "x";
   w.document.querySelector("[data-identidad]").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
@@ -101,13 +111,14 @@ console.log("\nEl Atlas: nombre y avatar");
   w.document.getElementById("identidad-nombre").value = "Lucía G";
   w.document.querySelector("[data-identidad]").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
   await espera();
-  ok("cambiar el nombre lo guarda y cambia el avatar", identidad(w).nombre === "Lucía G" && w.document.querySelector(".atlas-identidad-avatar").innerHTML === pintado(w, A.markup("Lucía G", { size: 72, etiqueta: "Tu avatar" })));
+  ok("cambiar el nombre lo guarda y conserva el avatar", identidad(w).nombre === "Lucía G" && w.document.querySelector(".atlas-identidad-avatar").innerHTML === pintado(w, A.markup("Lucía G", { size: 72, etiqueta: "Tu avatar", seed: A.ownSeed() })));
 }
 
 console.log("\nLos avatares en la partida de un móvil");
 {
   const w = boot({ "continuum-identidad-v1": JSON.stringify({ nombre: "Lucía" }) });
   click(w, '[data-action="jugar"]');
+  click(w, '[data-action="toggle-play-catalog"][data-section="collections"]');
   click(w, '[data-block="historia"]');
   click(w, '[data-mode="history"]');
   click(w, '[data-format="multi"]');

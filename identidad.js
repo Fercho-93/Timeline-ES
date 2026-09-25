@@ -1,6 +1,6 @@
 // Quién juega en este móvil: su nombre. Se pide una vez, al entrar por primera vez, y
 // se cambia después desde el Atlas. Es el mismo que usa la cuenta (y con él el ranking y
-// los duelos), y de él sale el avatar (avatares.js), así que no hay nada más que guardar.
+// los duelos). El avatar queda ligado al invitado, no a este nombre.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;

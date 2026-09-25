@@ -35,6 +35,9 @@ ok("empieza en el vestíbulo, con solo el anfitrión", sala.status === "lobby" &
 sala = Room.reduce(sala, { type: "join", playerId: "ana", name: "Ana", deckFingerprint: "v1", now: 1001 });
 sala = Room.reduce(sala, { type: "join", playerId: "leo", name: "Leo", deckFingerprint: "v1", now: 1002 });
 ok("los tres están en la sala, por orden de entrada", sala.playerOrder.join(",") === "host,ana,leo");
+const salaConAvatar = Room.createRoom({ roomCode: "ART123", hostId: "host", hostName: "Fer", avatarId: "panda", modeKey: "history", now: 1000 });
+const invitadaConAvatar = Room.reduce(salaConAvatar, { type: "join", playerId: "ana", name: "Ana", avatarId: "cleopatra", now: 1001 });
+ok("los retratos elegidos viajan en el estado de la sala", invitadaConAvatar.players.host.avatarId === "panda" && invitadaConAvatar.players.ana.avatarId === "cleopatra");
 ok("unirse dos veces no rompe nada, simplemente no hace nada", intenta(() => Room.reduce(sala, { type: "join", playerId: "ana", name: "Ana", now: 1003 })) === null);
 ok("un mazo de otra versión se rechaza al entrar", intenta(() => Room.reduce(sala, { type: "join", playerId: "raro", name: "?", deckFingerprint: "v2", now: 1003 })) === "DECK_MISMATCH");
 

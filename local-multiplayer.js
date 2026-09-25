@@ -223,7 +223,7 @@
     const roomCode = createRoomCode();
     try {
       hostSession = CT.LocalSession.createHostSession({
-        roomCode, hostName: name, modeKey,
+        roomCode, hostName: name, avatarId: CT.Avatares.ownId(), modeKey,
         deckFingerprint: CT.deckFingerprint(modeKey),
         onChange: onRoomChange
       });
@@ -259,7 +259,7 @@
       myPlayerId = randomPlayerId();
       modeKey = CT.has(invite.modeKey) ? invite.modeKey : modeKey;
       guestSession = CT.LocalSession.createGuestSession({
-        offerSignal: invite.signal, playerId: myPlayerId, name, deckFingerprint: invite.deckFingerprint,
+        offerSignal: invite.signal, playerId: myPlayerId, name, avatarId: CT.Avatares.ownId(), deckFingerprint: invite.deckFingerprint,
         onChange: onRoomChange,
         onError: code => showToast(errorMessage(code))
       });
@@ -406,7 +406,7 @@
       const player = roomState.players[uid];
       const pos = SEAT_POSITIONS[index] || SEAT_POSITIONS[SEAT_POSITIONS.length - 1];
       const puedeExpulsar = isHost && uid !== roomState.hostId;
-      return `<div class="table-seat" style="left:${pos.left};top:${pos.top};"><span class="seat-avatar">${CT.Avatares.markup(player.name, { size: 44 })}</span><strong>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</strong><small>${uid === roomState.hostId ? "Anfitrión" : `Plaza ${index + 1}`}</small><i class="ready-seal">Listo</i>${puedeExpulsar ? `<button class="kick-btn" data-local-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>` : ""}</div>`;
+      return `<div class="table-seat" style="left:${pos.left};top:${pos.top};"><span class="seat-avatar">${CT.Avatares.markup(player.name, { size: 44, seed: 'room:' + uid, id: player.avatarId })}</span><strong>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</strong><small>${uid === roomState.hostId ? "Anfitrión" : `Plaza ${index + 1}`}</small><i class="ready-seal">Listo</i>${puedeExpulsar ? `<button class="kick-btn" data-local-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>` : ""}</div>`;
     }).join("");
     const settings = isHost
       ? `<div class="section-label">Ajustes</div><div class="field"><label for="local-hand-size">Cartas iniciales</label><select id="local-hand-size"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="local-turn-seconds">Tiempo por turno</label><select id="local-turn-seconds"><option value="0">Sin límite</option><option value="20" selected>20 segundos</option><option value="30">30 segundos</option></select></div>${roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : '<button class="btn btn-primary btn-block" data-local-action="start">Barajar y empezar</button>'}<button class="btn btn-ghost btn-block" data-local-action="close-room">Cerrar sala</button>`
@@ -488,7 +488,7 @@
     paint(`<div class="shell">${header("local-lobby", '<button class="icon-btn" data-local-action="local-lobby" aria-label="Abrir menú de la sala">Sala</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
-      <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40 })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
+      <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
       ${boardQuestion()}
       ${roomState.phase === "reveal" ? revealPanel(currentUid) : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`}
       <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(modeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>

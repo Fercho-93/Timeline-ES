@@ -3615,3 +3615,78 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root[data-theme="dark"] #app .catalog-quick { --catalog-tint: #2f2d21; }
 :root[data-theme="dark"] #app .catalog-competition { --catalog-tint: #362c1c; }
 :root[data-theme="dark"] #app .catalog-copy strong, :root[data-theme="dark"] #app .catalog-cta { color: var(--catalog-color); }
+
+/* Retratos ilustrados: el círculo, la moldura y la sombra pertenecen al juego.
+   El recorte evita que se vea una miniatura cuadrada sobre el papel de la pantalla. */
+#app .avatar-art,
+.avatar-art {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--edition-brass, #a6814d) 54%, #f7edda);
+  border-radius: 50%;
+  background: #ead8b9;
+  box-shadow: 0 2px 6px #34261332, inset 0 0 0 2px #fff6e980;
+  vertical-align: middle;
+  isolation: isolate;
+}
+#app .avatar-art img,
+.avatar-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  transform: scale(1.06);
+}
+#app .bienvenida-avatar .avatar-art,
+#app .identidad-avatar-vivo .avatar-art,
+#app .atlas-identidad-avatar .avatar-art,
+#app .player-medallion-avatar .avatar-art {
+  box-shadow: 0 5px 15px #34261335, 0 0 0 3px #fbf1df8c, inset 0 0 0 2px #fff9ea;
+}
+#app .score i.score-avatar,
+#app .table-seat > span.seat-avatar,
+#app .manage-player > span.seat-avatar,
+#app .turn-duel-avatar,
+#app .turn-duel-entry-avatar {
+  display: inline-grid;
+  place-items: center;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#app.atlas-board .scoreboard-panel .score > .score-avatar .avatar-art {
+  width: 100% !important;
+  height: 100% !important;
+}
+#app .duel-identity .duel-avatar { border: 0; background: transparent; box-shadow: none; }
+
+/* Selector de retratos: la bienvenida conserva su composición y la colección
+   se presenta como una página del Atlas, accesible también desde el perfil. */
+#app .avatar-picker-trigger { display: inline-grid; justify-items: center; gap: 8px; padding: 0; border: 0; background: transparent; color: var(--edition-ink); cursor: pointer; font: inherit; }
+#app .avatar-picker-trigger:focus-visible { outline: 3px solid var(--edition-brass); outline-offset: 5px; border-radius: 50%; }
+#app .bienvenida-avatar { justify-self: center; }
+#app .avatar-picker-cue { color: var(--edition-muted); font: 600 .76rem/1.2 var(--ui-font); letter-spacing: .04em; }
+#app .avatar-picker-cue span { color: var(--edition-brass); }
+#app .avatar-picker { width: min(94vw, 480px); max-height: min(82svh, 720px); padding: 20px 18px 12px; display: flex; flex-direction: column; overflow: hidden; background: #f8f0df; color: var(--edition-ink); }
+#app .avatar-picker-header { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+#app .avatar-picker-header h2 { margin: 4px 0 0; font: 400 1.75rem/1.1 var(--font-display); }
+#app .avatar-picker-close { width: 38px; height: 38px; flex: none; border: 1px solid var(--edition-line); border-radius: 50%; background: #fff9ed; color: var(--edition-ink); font-size: 1.6rem; cursor: pointer; }
+#app .avatar-picker-intro { margin: 10px 0 16px; color: var(--edition-muted); font: .86rem/1.4 var(--ui-font); }
+#app .avatar-picker-list { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 3px 14px; }
+#app .avatar-picker-group + .avatar-picker-group { margin-top: 18px; }
+#app .avatar-picker-group h3 { margin: 0 0 10px; padding-bottom: 7px; border-bottom: 1px solid var(--edition-line); color: var(--edition-muted); font: 600 .76rem var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
+#app .avatar-picker-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 4px; }
+#app .avatar-picker-option { display: grid; justify-items: center; align-content: start; gap: 5px; padding: 8px 2px 7px; border: 1px solid transparent; border-radius: 14px; background: transparent; color: var(--edition-ink); cursor: pointer; min-width: 0; }
+#app .avatar-picker-option .avatar-art { max-width: 100%; }
+#app .avatar-picker-option > span:last-child { max-width: 100%; font: .67rem/1.15 var(--ui-font); text-align: center; overflow-wrap: anywhere; }
+#app .avatar-picker-option.is-selected { border-color: var(--edition-brass); background: #e8d9bb80; box-shadow: inset 0 0 0 1px #fff8e6; }
+#app .avatar-picker-option:hover { background: #e8d9bb80; }
+#app .avatar-picker-option:focus-visible, #app .avatar-picker-close:focus-visible { outline: 3px solid var(--edition-brass); outline-offset: 2px; }
+@media (max-width: 360px) { #app .avatar-picker-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

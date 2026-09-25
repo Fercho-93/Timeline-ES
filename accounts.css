@@ -72,3 +72,8 @@
 @media (hover:hover) { .account-ranking-link:hover { transform:translateY(-2px); box-shadow:0 6px 15px #172d2414; } }
 @media (prefers-reduced-motion:reduce) { .account-ranking-link { transition:none; } }
 @media (max-width:360px) { .account-hero { padding:20px 16px; } .account-avatar { width:54px; height:54px; } .account-ranking-link { margin:12px; padding:14px 10px; gap:8px; } .ranking-body { padding-inline:12px; } .ranking-podium{gap:5px}.ranking-medallion{padding-inline:4px}.ranking-avatar{width:40px;height:40px} }
+
+/* El mismo medallón acompaña al invitado en el ranking. */
+.ranking-avatar { padding: 0; overflow: visible; background: transparent; }
+.ranking-avatar .avatar-art { width: 100%; height: 100%; }
+.account-ranking td .avatar-art { margin-right: 6px; }

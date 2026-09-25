@@ -476,24 +476,23 @@
 
   // ── Bienvenida ─────────────────────────────────────────────────────────────────────
   //
-  // La primera vez que se entra, el juego pregunta el nombre. El avatar sale de él y se
-  // ve mientras se escribe. Quien ya tenía nombre de antes se reconoce y no pasa por aquí
+  // La primera vez que se entra, el juego pregunta el nombre. El avatar ya está asignado al invitado y no cambia al escribir. Quien ya tenía nombre de antes se reconoce y no pasa por aquí
   // (`CT.Identidad.reconoce`).
   let bienvenidaNombre = "";
   function bienvenida(error = "") {
     screen = "bienvenida";
     const nombre = bienvenidaNombre || CT.Identidad.nombre();
     paint(`<div class="shell bienvenida-shell"><section class="bienvenida">
-      <div class="bienvenida-avatar" data-avatar-vivo>${CT.Avatares.markup(nombre, { size: 112 })}</div>
+      <button class="bienvenida-avatar avatar-picker-trigger" type="button" data-action="identidad-avatar" data-avatar-vivo aria-label="Elegir avatar">${CT.Avatares.markup(nombre, { size: 112, seed: CT.Avatares.ownSeed() })}<span class="avatar-picker-cue">Elegir avatar <span aria-hidden="true">✦</span></span></button>
       <h1 data-focus tabindex="-1">Bienvenido a Continuum</h1>
       <p class="lead">¿Cómo te llamas?</p>
       <form class="bienvenida-form" data-bienvenida="nombre" novalidate>
         <label class="solo-lectores" for="bienvenida-nombre">Tu nombre</label>
-        <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu nombre" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error bienvenida-pista" data-avatar-de>
+        <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu nombre" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error bienvenida-pista">
         <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
         <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
       </form>
-      <p class="hint" id="bienvenida-pista">Tu avatar sale de tu nombre. Podrás cambiar el nombre en el Atlas.</p>
+      <p class="hint" id="bienvenida-pista">Toca el avatar para elegirlo. Podrás cambiarlo después.</p>
     </section></div>`);
   }
 
@@ -996,7 +995,7 @@
     renderRecentPlayers();
   }
 
-  // El avatar de cada jugador sale de su nombre, como el tuyo.
+  // El avatar propio sigue al invitado; los jugadores de este móvil se reconocen por su nombre.
   function jugadorAvatar(jugador, size) {
     return CT.Avatares.markup(jugador.name, { size });
   }
@@ -1784,27 +1783,51 @@
       <button class="btn btn-primary" data-action="home-encyclopedia">Explorar todas las cartas <span aria-hidden="true">→</span></button></section>`;
   }
 
-  // Quién eres en el juego: tu nombre y el avatar que sale de él.
+  // Quién eres en el juego: el nombre se puede cambiar sin perder tu avatar.
   function atlasIdentidad() {
     const nombre = CT.Identidad.nombre();
     return `<section class="panel atlas-identidad">
-      <span class="atlas-identidad-avatar">${CT.Avatares.markup(nombre, { size: 72, etiqueta: "Tu avatar" })}</span>
+      <button class="atlas-identidad-avatar avatar-picker-trigger" type="button" data-action="identidad-avatar" aria-label="Cambiar avatar">${CT.Avatares.markup(nombre, { size: 72, etiqueta: "Tu avatar", seed: CT.Avatares.ownSeed() })}</button>
       <div><h2>${escapeHtml(nombre || "Sin nombre")}</h2>
-        <div class="atlas-identidad-acciones"><button class="btn btn-secondary" data-action="identidad-nombre">Cambiar nombre</button></div>
-        <p class="hint">Tu avatar sale de tu nombre: cambia si lo cambias.</p></div>
+        <div class="atlas-identidad-acciones"><button class="btn btn-secondary" data-action="identidad-nombre">Cambiar nombre</button><button class="btn btn-secondary" data-action="identidad-avatar">Cambiar avatar</button></div>
+        <p class="hint">Tu avatar permanece contigo aunque cambies de nombre.</p></div>
     </section>`;
   }
 
   function editaNombre(error = "", valor = CT.Identidad.nombre()) {
     CT.closeDialog?.();
     overlay(`<div class="overlay"><div class="modal identidad-modal"><h2>Tu nombre</h2>
-      <div class="identidad-avatar-vivo" data-avatar-vivo>${CT.Avatares.markup(valor, { size: 88 })}</div>
+      <div class="identidad-avatar-vivo" data-avatar-vivo>${CT.Avatares.markup(valor, { size: 88, seed: CT.Avatares.ownSeed() })}</div>
       <form data-identidad="nombre" novalidate>
         <label for="identidad-nombre">Nombre de tu perfil</label>
-        <input id="identidad-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" value="${escapeHtml(valor)}" aria-describedby="identidad-error" data-avatar-de>
+        <input id="identidad-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" value="${escapeHtml(valor)}" aria-describedby="identidad-error">
         <p id="identidad-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
         <div class="actions" style="display:grid"><button class="btn btn-primary" type="submit">Guardar</button><button class="btn btn-secondary" type="button" data-action="close-menu">Cancelar</button></div>
       </form></div></div>`, true);
+  }
+
+  function eligeAvatar() {
+    const selected = CT.Avatares.ownId();
+    const groups = [
+      ["Personajes históricos", CT.Avatares.ids.slice(0, 6).concat(CT.Avatares.ids.slice(12, 21))],
+      ["Animales", CT.Avatares.ids.slice(6, 12).concat(CT.Avatares.ids.slice(24, 30))],
+      ["Videojuegos", CT.Avatares.ids.slice(21, 24).concat(CT.Avatares.ids.slice(30))]
+    ];
+    overlay(`<div class="overlay"><section class="modal avatar-picker" aria-labelledby="avatar-picker-title">
+      <header class="avatar-picker-header"><div><span class="eyebrow">TU PERSONAJE</span><h2 id="avatar-picker-title">Elige tu avatar</h2></div><button class="avatar-picker-close" type="button" data-action="close-menu" aria-label="Cerrar">×</button></header>
+      <p class="avatar-picker-intro">Te acompañará en tu viaje por Continuum.</p>
+      <div class="avatar-picker-list">${groups.map(([label, ids]) => `<section class="avatar-picker-group"><h3>${label}</h3><div class="avatar-picker-grid">${ids.map(id => `<button type="button" class="avatar-picker-option${id === selected ? ' is-selected' : ''}" data-action="avatar-select" data-avatar-id="${id}" aria-label="${escapeHtml(CT.Avatares.title(id))}${id === selected ? ', seleccionado' : ''}" aria-pressed="${id === selected}">${CT.Avatares.markup('', { size: 68, id })}<span>${escapeHtml(CT.Avatares.title(id))}</span></button>`).join('')}</div></section>`).join('')}</div>
+    </section></div>`, true);
+  }
+
+  function seleccionaAvatar(id) {
+    if (!CT.Avatares.choose(id)) return;
+    CT.closeDialog(true);
+    if (screen === "perfil") perfilView();
+    else {
+      const trigger = app.querySelector(".bienvenida-avatar");
+      if (trigger) trigger.innerHTML = `${CT.Avatares.markup(CT.Identidad.nombre(), { size: 112, seed: CT.Avatares.ownSeed() })}<span class="avatar-picker-cue">Elegir avatar <span aria-hidden="true">✦</span></span>`;
+    }
   }
 
   async function nombreEditado(boton) {
@@ -2393,7 +2416,7 @@
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
-        <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${escapeHtml(initials(duelName()))}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
+        <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
         <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
       </div>
     </div>`;
@@ -3575,12 +3598,7 @@
   }, true);
 
   app.addEventListener("input", event => {
-    // El avatar se redibuja con cada letra: así se ve qué personaje sale de cada nombre.
-    if (event.target.matches?.("[data-avatar-de]")) {
-      const vivo = event.target.closest(".bienvenida, .identidad-modal")?.querySelector("[data-avatar-vivo]");
-      if (vivo) vivo.innerHTML = CT.Avatares.markup(event.target.value, { size: vivo.classList.contains("bienvenida-avatar") ? 112 : 88 });
-    }
-    if (event.target.closest("#players")) { syncStarterOptions(); renderRecentPlayers(); }
+      if (event.target.closest("#players")) { syncStarterOptions(); renderRecentPlayers(); }
     else if (event.target.id === "enc-search-input") {
       // Se actualiza solo el resultado, sin repintar la pantalla entera: repintarla
       // destruiría el campo justo mientras se escribe en él.
@@ -3774,6 +3792,8 @@
     else if (action === "daily-start") startDaily();
     else if (action === "daily-play") playDaily();
     else if (action === "identidad-nombre") editaNombre();
+    else if (action === "identidad-avatar") eligeAvatar();
+    else if (action === "avatar-select") seleccionaAvatar(target.dataset.avatarId);
     else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();

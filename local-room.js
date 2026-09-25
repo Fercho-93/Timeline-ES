@@ -22,14 +22,14 @@
   const MIN_PLAYERS = 2;
   const MAX_PLAYERS = 9;
 
-  function createRoom({ roomCode, hostId, hostName, modeKey, deckFingerprint = null, now }) {
+  function createRoom({ roomCode, hostId, hostName, avatarId = null, modeKey, deckFingerprint = null, now }) {
     if (!roomCode || !hostId || !hostName || !modeKey) throw new Error("INVALID_ROOM");
     return {
       roomCode, mode: modeKey, deckFingerprint,
       hostId, status: "lobby", phase: "lobby", version: 1,
       handSize: 4, turnSeconds: 30,
       playerOrder: [hostId],
-      players: { [hostId]: { name: hostName, hand: [], joinedAt: now } },
+      players: { [hostId]: { name: hostName, ...(avatarId ? { avatarId } : {}), hand: [], joinedAt: now } },
       deck: [], discard: [], timeline: [], current: 0, starter: hostId,
       turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
       createdAt: now, updatedAt: now
@@ -40,14 +40,14 @@
   // lleva una versión distinta de la app, el mazo puede haber cambiado (ha pasado con
   // animales, países y distancias) y un mismo identificador de carta dejaría de significar
   // lo mismo en cada pantalla.
-  function joinRoom(state, { playerId, name, deckFingerprint = null, now }) {
+  function joinRoom(state, { playerId, name, avatarId = null, deckFingerprint = null, now }) {
     if (state.deckFingerprint && deckFingerprint && state.deckFingerprint !== deckFingerprint) throw new Error("DECK_MISMATCH");
     if (state.playerOrder.includes(playerId)) return state;
     if (state.status !== "lobby") throw new Error("ALREADY_STARTED");
     if (state.playerOrder.length >= MAX_PLAYERS) throw new Error("ROOM_FULL");
     return {
       ...state,
-      players: { ...state.players, [playerId]: { name, hand: [], joinedAt: now } },
+      players: { ...state.players, [playerId]: { name, ...(avatarId ? { avatarId } : {}), hand: [], joinedAt: now } },
       playerOrder: [...state.playerOrder, playerId],
       version: state.version + 1, updatedAt: now
     };

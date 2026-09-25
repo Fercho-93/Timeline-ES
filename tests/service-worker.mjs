@@ -1,6 +1,6 @@
 // El service worker decide qué versión de la aplicación ve el móvil, así que conviene
-// comprobarlo: sirve una copia estable por versión y espera una petición explícita
-// para activar la siguiente, sin interrumpir otra pestaña. Se ejecuta el archivo real
+// comprobarlo: sirve una copia estable por versión, activa la nueva al instalar
+// y conserva la petición explícita de clientes antiguos. Se ejecuta el archivo real
 // con un entorno de service worker falso.
 import fs from "node:fs";
 import path from "node:path";
@@ -70,23 +70,27 @@ console.log("\nService worker");
   await instalada;
   ok("instalar una versión nueva evita reutilizar archivos viejos de la caché HTTP", sw.precargas.length > 0 && sw.precargas.every(request => request.cache === "reload"));
   ok("cada archivo se pide con la versión en la URL, para no mezclar archivos viejos de la CDN", sw.precargas.every(request => /[?&]v=continuum-v\d+/.test(request.url)));
-  ok("instalar no activa automáticamente una actualización", sw.activaciones() === 0);
+  ok("instalar activa la versión nueva", sw.activaciones() === 1);
   let tarea;
   const mensajes = [];
   sw.contexto.self.clients.matchAll = async () => [{url:"https://hilo.test/", navigate: async () => {}},{url:"https://hilo.test/?room=X", navigate: async () => {}}];
   sw.listeners.message({data:{type:"ACTIVATE_UPDATE"},source:{postMessage:m=>mensajes.push(m)},waitUntil:p=>{tarea=p;}});
   await tarea;
-  ok("otra pestaña impide activar el nuevo trabajador", sw.activaciones() === 0 && mensajes[0].type === "UPDATE_BLOCKED");
+  ok("la petición antigua avisa si hay otra pestaña", sw.activaciones() === 1 && mensajes[0].type === "UPDATE_BLOCKED");
   sw.contexto.self.clients.matchAll = async () => [{url:"https://hilo.test/", navigate: async () => {}}];
   sw.listeners.message({data:{type:"ACTIVATE_UPDATE"},waitUntil:p=>{tarea=p;}});
   await tarea;
-  ok("se activa al pedirlo desde la única pestaña", sw.activaciones() === 1);
+  ok("la petición antigua también puede activar desde una pestaña", sw.activaciones() === 2);
   // Casi cien archivos y 5,5 MB: quien nunca abre Naturaleza no debería pagar esa
   // descarga solo por instalar la aplicación. Se cachean por demanda, no al instalar.
   const animalAssets = fs.readdirSync(path.join(REPO, "assets", "animal-cards"))
     .filter(file => file.endsWith(".webp"))
     .map(file => `./assets/animal-cards/${file}`);
   const cachedAssets = new Set(sw.precargas.map(request => request.url.split("?")[0]));
+  const avatars = fs.readdirSync(path.join(REPO, "assets", "avatars"))
+    .filter(file => file.endsWith(".webp")).map(file => `./assets/avatars/${file}`);
+  ok("los 36 medallones se precargan para jugar sin conexión", avatars.length === 36 && avatars.every(file => cachedAssets.has(file)));
+
   const animalesPrecargados = animalAssets.filter(file => cachedAssets.has(file));
   ok(`las ${animalAssets.length} ilustraciones de animales NO se precargan al instalar${animalesPrecargados.length ? ` (se coló ${animalesPrecargados.join(", ")})` : ""}`, !animalesPrecargados.length);
   const populationAssets = fs.readdirSync(path.join(REPO, "assets", "population-cards"))
