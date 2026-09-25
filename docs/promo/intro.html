@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=540, initial-scale=1" />
+<title>Continuum · intro</title>
+<!-- Animación corta de la portada, pensada para grabarse en vídeo con
+     scripts/render-intro.mjs. Todo se mueve con animaciones CSS para que el
+     grabador pueda detenerlas y situarlas en cualquier instante exacto. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=block" />
+<style>
+  :root {
+    --display: "Iowan Old Style", "Libre Caslon Text", Palatino, Georgia, serif;
+    --ui: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --ease-out: cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { background: #120b06; }
+  body { display: grid; place-items: center; min-height: 100vh; }
+
+  .stage {
+    position: relative;
+    width: 540px;
+    height: 960px;
+    overflow: hidden;
+    isolation: isolate;
+    color: #29241e;
+    background: #e9dcc3;
+  }
+
+  /* Fondo: la escena respira hacia dentro durante toda la pieza. */
+  .bg {
+    position: absolute;
+    inset: 0;
+    background: url("../../assets/continuum-splash-clean-v3.webp") center / cover no-repeat;
+    animation: bg-settle 8.5s cubic-bezier(.25,.6,.25,1) both;
+  }
+  .veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 52%, #fff8e9d1 0 19%, #fff8e965 38%, transparent 61%),
+      linear-gradient(180deg, #2b190914 0, transparent 18%, transparent 78%, #291a1330 100%);
+  }
+  @keyframes bg-settle {
+    from { transform: scale(1.16) translateY(2%); filter: brightness(.55) sepia(.4); }
+    30% { filter: brightness(1) sepia(0); }
+    to { transform: scale(1); filter: none; }
+  }
+
+  /* Telón de apertura: de la penumbra del archivo a la luz. */
+  .curtain {
+    position: absolute;
+    z-index: 20;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, #3a220f 0, #120b06 70%);
+    animation: fade-out 1.3s .1s ease-in both;
+  }
+  @keyframes fade-out { to { opacity: 0; } }
+
+  /* Rayo de sol que cruza desde arriba a la izquierda. */
+  .sunbeam {
+    position: absolute;
+    z-index: 1;
+    top: -18%;
+    left: -25%;
+    width: 420px;
+    height: 124%;
+    background: linear-gradient(100deg, transparent 12%, #ffd99414 28%, #fff2bd61 48%, #ffcf741e 67%, transparent 84%);
+    filter: blur(10px);
+    mix-blend-mode: screen;
+    transform-origin: 50% 0;
+    animation: beam-in 2.4s .5s ease-out both, beam-shimmer 5s 2.9s ease-in-out infinite;
+  }
+  @keyframes beam-in {
+    from { opacity: 0; transform: rotate(-30deg) scaleX(.6); }
+    to { opacity: .62; transform: rotate(-13deg); }
+  }
+  @keyframes beam-shimmer {
+    0%, 100% { opacity: .62; transform: rotate(-13deg); }
+    50% { opacity: .9; transform: rotate(-11deg) translateX(3%) scaleX(1.08); }
+  }
+  .sparkles {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    background:
+      radial-gradient(circle at 14% 13%, #fff9d8 0 1px, #ffcf738c 2px, transparent 5px),
+      radial-gradient(circle at 26% 28%, #fff7c9 0 1.5px, #ffc7677a 3px, transparent 7px),
+      radial-gradient(circle at 78% 18%, #fffbdc 0 1px, #ffd17b8a 3px, transparent 6px),
+      radial-gradient(circle at 85% 56%, #fff8cc 0 1.5px, #ffbd5575 3px, transparent 7px),
+      radial-gradient(circle at 18% 73%, #fffbe2 0 1px, #ffd37d80 3px, transparent 6px),
+      radial-gradient(circle at 67% 78%, #fff8ca 0 1px, #ffbd5870 3px, transparent 6px),
+      radial-gradient(circle at 44% 9%, #fffbe2 0 1px, #ffd37d80 3px, transparent 6px),
+      radial-gradient(circle at 58% 62%, #fff8cc 0 1px, #ffbd5575 2px, transparent 5px);
+    animation: sparkle 1.9s 1s ease-in-out infinite alternate backwards;
+  }
+  @keyframes sparkle {
+    from { opacity: 0; filter: brightness(.9); }
+    to { opacity: .8; filter: brightness(1.3); }
+  }
+
+  /* Cartas: entran desde fuera de cuadro como si alguien las repartiera, y luego flotan. */
+  .card {
+    --tilt: 0deg; --from-x: 0px; --from-y: 0px; --from-r: 0deg; --drift-x: 5px; --drift-y: -9px;
+    position: absolute;
+    z-index: 2;
+    width: 167px;
+    aspect-ratio: 2 / 3;
+    padding: 5px;
+    border: 1px solid #7d5734;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #d4b784, #6e4327 11%, #b58a55 90%, #4f2f1d);
+    box-shadow: 0 18px 28px #43271159, inset 0 0 0 2px #e4c9998f;
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px solid #f2d49a99;
+    border-radius: 6px;
+    box-shadow: inset 0 0 22px #2a170c55;
+  }
+  .card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+    filter: sepia(.16) saturate(.78) contrast(.93) brightness(1.05);
+  }
+  .card { animation: deal .95s var(--delay) cubic-bezier(.16,.84,.3,1.08) both, drift var(--period) calc(var(--delay) + .95s) ease-in-out infinite; }
+  @keyframes deal {
+    from { opacity: 0; transform: translate(var(--from-x), var(--from-y)) rotate(var(--from-r)) scale(.85); }
+    35% { opacity: .95; }
+    to { opacity: .92; transform: rotate(var(--tilt)); }
+  }
+  @keyframes drift {
+    0%, 100% { transform: rotate(var(--tilt)); }
+    50% { transform: translate(var(--drift-x), var(--drift-y)) rotate(calc(var(--tilt) + 1.2deg)); }
+  }
+  .c-tl { top: 3%; left: -12%; --tilt: -17deg; --from-x: -260px; --from-y: -120px; --from-r: -50deg; --delay: .75s; --period: 5.8s; --drift-y: 7px; }
+  .c-tr { top: 7%; right: -11%; --tilt: 16deg; --from-x: 260px; --from-y: -140px; --from-r: 45deg; --delay: .95s; --period: 6.4s; --drift-x: -7px; }
+  .c-ml { top: 48%; left: -23%; --tilt: 13deg; --from-x: -280px; --from-y: 40px; --from-r: -25deg; --delay: 1.15s; --period: 6.1s; --drift-y: -7px; }
+  .c-mr { top: 42%; right: -23%; --tilt: 13deg; --from-x: 280px; --from-y: -30px; --from-r: 50deg; --delay: 1.3s; --period: 5.5s; --drift-x: -8px; --drift-y: 8px; }
+  .c-br { right: -16%; bottom: -7%; --tilt: -14deg; --from-x: 220px; --from-y: 260px; --from-r: 30deg; --delay: 1.45s; --period: 6.8s; --drift-x: -5px; }
+
+  /* Marca: emblema, nombre, lema y ornamento, en el mismo sitio que en la portada. */
+  .masthead {
+    position: absolute;
+    z-index: 3;
+    top: 46%;
+    left: 50%;
+    width: 497px;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    transform: translate(-50%, -50%);
+  }
+  .crest { position: relative; width: 410px; margin-bottom: -4px; }
+  .crest img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 12px 14px #4e2a173d);
+    animation: crest-in 1.25s 1.75s var(--ease-out) both;
+  }
+  @keyframes crest-in {
+    from { opacity: 0; transform: translateY(26px) scale(.72); filter: blur(8px) drop-shadow(0 4px 6px #4e2a1700); }
+    60% { opacity: 1; filter: blur(0) drop-shadow(0 12px 14px #4e2a173d); }
+    to { opacity: 1; transform: none; filter: drop-shadow(0 12px 14px #4e2a173d); }
+  }
+  /* Halo de luz que se abre detrás del emblema cuando se posa. */
+  .halo {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 52%;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff6d8 0, #ffe7a8a8 22%, #ffd78a33 45%, transparent 68%);
+    transform: translate(-50%, -50%);
+    animation: halo 2.2s 2.1s ease-out both;
+  }
+  @keyframes halo {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+    35% { opacity: 1; }
+    to { opacity: .35; transform: translate(-50%, -50%) scale(1.15); }
+  }
+  /* Destello dorado que recorre el metal del emblema, recortado a su silueta. */
+  .glint {
+    position: absolute;
+    inset: 0;
+    -webkit-mask: url("../../assets/continuum-emblem-800.webp") center / 100% 100% no-repeat;
+    mask: url("../../assets/continuum-emblem-800.webp") center / 100% 100% no-repeat;
+    background: linear-gradient(105deg, transparent 36%, #fff3c800 38%, #fff3c8b3 50%, #fff3c800 62%, transparent 64%) no-repeat;
+    background-size: 250% 100%;
+    mix-blend-mode: screen;
+    animation: glint 1.2s 3.05s ease-in-out both;
+  }
+  @keyframes glint {
+    from { background-position: 120% 0; opacity: 1; }
+    to { background-position: -20% 0; opacity: 1; }
+  }
+
+  .wordmark {
+    display: flex;
+    color: #27231f;
+    font: 500 64px/.9 var(--display);
+    letter-spacing: -.045em;
+    text-shadow: 0 1px 0 #fff9ecb8;
+    text-transform: uppercase;
+  }
+  .wordmark span { display: inline-block; animation: letter-in .7s calc(2.85s + var(--i) * 70ms) var(--ease-out) both; }
+  @keyframes letter-in {
+    from { opacity: 0; transform: translateY(22px) scale(1.08); filter: blur(6px); }
+    to { opacity: 1; transform: none; filter: blur(0); }
+  }
+  .tagline {
+    display: flex;
+    gap: .9em;
+    margin-top: 16px;
+    color: #5d5145;
+    font: 700 12.7px/1.4 var(--ui);
+    letter-spacing: .31em;
+    text-transform: uppercase;
+  }
+  .tagline span { animation: word-in .55s calc(3.85s + var(--i) * 260ms) ease-out both; }
+  @keyframes word-in {
+    from { opacity: 0; transform: translateY(8px); letter-spacing: .6em; }
+    to { opacity: 1; transform: none; }
+  }
+  .ornament {
+    display: grid;
+    grid-template-columns: 58px 10px 58px;
+    align-items: center;
+    gap: 7px;
+    margin-top: 23px;
+  }
+  .ornament span { height: 1px; background: #8c673f8f; animation: line-in .6s 4.7s ease-out both; }
+  .ornament span:first-child { transform-origin: 100% 50%; }
+  .ornament span:last-child { transform-origin: 0 50%; }
+  .ornament i { width: 8px; height: 8px; border: 1px solid #9b6f38; background: #f4e8ce80; transform: rotate(45deg); animation: diamond-in .6s 4.55s var(--ease-out) both; }
+  @keyframes line-in { from { transform: scaleX(0); } }
+  @keyframes diamond-in { from { opacity: 0; transform: rotate(-135deg) scale(0); } }
+
+  /* Botón «Jugar», igual que el de la portada, con un brillo final que invita a pulsar. */
+  .play {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    bottom: 153px;
+    width: 421px;
+    min-height: 72px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 2px solid #6f301f;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #a04c32, #87351f 75%, #782b1b);
+    color: #fff5df;
+    font: 600 25px/1 var(--display);
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 1px #3b160e;
+    box-shadow: inset 0 0 0 3px #c69458, inset 0 0 0 5px #5f2418, 0 13px 28px #44261757, 0 2px 0 #f3cc8d80;
+    animation: play-in .7s 5.2s var(--ease-out) both, play-pulse 1.6s 6.4s ease-in-out infinite;
+  }
+  .play::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, #ffe9c055 50%, transparent 65%) no-repeat;
+    background-size: 250% 100%;
+    animation: glint .9s 6.1s ease-in-out both;
+  }
+  @keyframes play-in {
+    from { opacity: 0; transform: translate(-50%, 24px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @keyframes play-pulse {
+    0%, 100% { transform: translate(-50%, 0) scale(1); }
+    50% { transform: translate(-50%, 0) scale(1.03); }
+  }
+</style>
+</head>
+<body>
+  <main class="stage" aria-label="Continuum">
+    <div class="bg"></div>
+    <div class="veil"></div>
+    <i class="sunbeam"></i>
+    <i class="sparkles"></i>
+    <figure class="card c-tl"><img src="../../assets/world-cards/5009-battle-marathon.webp" alt="" /></figure>
+    <figure class="card c-tr"><img src="../../assets/medicine-cards/9001-hippocratic-corpus.webp" alt="" /></figure>
+    <figure class="card c-ml"><img src="../../assets/astronomy-cards/first-earth-photo.webp" alt="" /></figure>
+    <figure class="card c-mr"><img src="../../assets/world-cards/5022-vesuvius-eruption.webp" alt="" /></figure>
+    <figure class="card c-br"><img src="../../assets/world-cards/5002-great-pyramid-giza.webp" alt="" /></figure>
+    <section class="masthead">
+      <div class="crest">
+        <div class="halo"></div>
+        <img src="../../assets/continuum-emblem-800.webp" alt="" width="800" height="533" />
+        <div class="glint"></div>
+      </div>
+      <div class="wordmark" aria-label="Continuum"></div>
+      <div class="tagline"><span style="--i:0">Ordena.</span><span style="--i:1">Compara.</span><span style="--i:2">Descubre.</span></div>
+      <div class="ornament" aria-hidden="true"><span></span><i></i><span></span></div>
+    </section>
+    <div class="play">Jugar</div>
+    <div class="curtain"></div>
+  </main>
+  <script>
+    // Cada letra del nombre entra por separado.
+    const mark = document.querySelector('.wordmark');
+    [...'Continuum'].forEach((letter, i) => {
+      const span = document.createElement('span');
+      span.textContent = letter;
+      span.style.setProperty('--i', i);
+      span.setAttribute('aria-hidden', 'true');
+      mark.append(span);
+    });
+    // `?t=4.2` congela la pieza en ese segundo; sin parámetro se reproduce en bucle.
+    const params = new URLSearchParams(location.search);
+    const DURATION = 8500;
+    window.seek = ms => document.getAnimations().forEach(a => { a.pause(); a.currentTime = ms; });
+    if (params.has('t')) {
+      addEventListener('load', () => seek(Number(params.get('t')) * 1000));
+    } else if (!params.has('render')) {
+      setInterval(() => document.getAnimations().forEach(a => { a.currentTime = 0; a.play(); }), DURATION + 1200);
+    }
+  </script>
+</body>
+</html>
