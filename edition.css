@@ -3521,19 +3521,37 @@ html body:not(:has(#app[data-screen="home"]))::before { content: none; }
 #app[data-screen="home"] .home-duels-banner b { font-size: 1.02rem; }
 #app[data-screen="home"] .home-duels-banner small { font-size: .88rem; }
 
-/* El lema va sobre una cinta terracota para que las letras oscuras se lean sobre la
-   ilustración. */
+/* El lema va sin fondo: un halo de papel, invisible como tal, aparta de las letras las
+   líneas y planetas de la ilustración para que se lean con buen contraste. */
 #app[data-screen="home"] .home-doors-shell .home-tagline {
   display: inline-block;
-  margin-top: 8px;
-  padding: 4px 10px 4px calc(10px + .3em);
-  border-radius: 3px;
-  color: #1c120b;
+  margin-top: 9px;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  color: #24170e;
+  font-size: clamp(.66rem, 2.3vw, .82rem);
+  letter-spacing: .24em;
   font-weight: 700;
-  background: linear-gradient(90deg, #c9784ecc, #d0835a 14% 86%, #c9784ecc);
-  box-shadow: inset 0 1px 0 #f1b08a80, inset 0 -1px 0 #8f462580, 0 2px 6px #6b33182e;
+  text-shadow: 0 0 4px #fbf4e4, 0 0 10px #fbf4e4, 0 0 18px #f6ecd6;
 }
-:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-tagline { color: #1c120b; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-tagline { color: #f1dfbf; text-shadow: 0 0 6px #140d08, 0 0 14px #140d08; }
+
+/* Marca un punto más presente: halo cálido de luz alrededor del emblema y del nombre,
+   sin engrosar las letras. */
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(78px, 19vw, 120px); }
+#app[data-screen="home"] .home-doors-shell .home-crest img { filter: sepia(.08) saturate(.95) drop-shadow(0 0 10px #fff4d6) drop-shadow(0 5px 9px #5a341a40); }
+#app[data-screen="home"] .home-doors-shell .home-wordmark {
+  color: #24150c;
+  text-shadow: 0 1px 0 #fffaf0, 0 0 12px #fbf2dc, 0 0 26px #f7e8c8, 0 6px 14px #4a2c1633;
+}
+#app[data-screen="home"] .home-doors-shell .home-wordmark::after { opacity: 1; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-wordmark { text-shadow: 0 0 14px #140d08, 0 4px 12px #000a; }
+
+/* Barniz: la ilustración pierde un punto de saturación y gana un tono terracota; las
+   columnas y el olivo, algo más. */
+html::before { filter: saturate(.9) sepia(.08); }
+html body::before { filter: saturate(.76) sepia(.2) hue-rotate(-6deg); }
 
 /* Rayos de luz también desde la esquina derecha, como los que entran por la izquierda. */
 html body:has(#app[data-screen="home"])::before {
