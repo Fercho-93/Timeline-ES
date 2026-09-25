@@ -1153,8 +1153,10 @@ service cloud.firestore {
             && request.resource.data.capacity is int && request.resource.data.capacity >= 2 && request.resource.data.capacity <= 4
             && request.resource.data.clientVersion is int && request.resource.data.clientVersion >= 1
             && request.resource.data.players[request.auth.uid].clientVersion == request.resource.data.clientVersion
-            && request.resource.data.queueKey is string && request.resource.data.queueKey.size() >= 5 && request.resource.data.queueKey.size() <= 100
-            && getAfter(/databases/$(database)/documents/publicQueues/$(request.resource.data.queueKey)).data.roomCode == roomId))
+            // La regla de la cola valida la sala con getAfter en el mismo batch.
+            // Leer aquí la cola a su vez forma un ciclo entre ambas reglas y
+            // Firebase rechaza incluso la creación válida de los dos documentos.
+            && request.resource.data.queueKey is string && request.resource.data.queueKey.size() >= 5 && request.resource.data.queueKey.size() <= 100))
         && (!('tournament' in request.resource.data) || (tournamentShape(request.resource.data.tournament)
           && request.resource.data.tournament.index == 0 && request.resource.data.tournament.history == []
           && request.resource.data.mode == request.resource.data.tournament.queue[0]))

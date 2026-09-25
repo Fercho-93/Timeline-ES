@@ -26,11 +26,16 @@ await env.clearFirestore();
 await check('un usuario autenticado puede localizar la cola',true,getDoc(doc(ctx(P2),'publicQueues',KEY)));
 
 await env.clearFirestore();
-await check('no permite crear una sala pública sin su cola',false,(async()=>{
+// La sala se puede preparar sin cola, pero una cola sin sala válida queda prohibida.
+// Evita la lectura circular de getAfter entre ambas reglas de creación.
+await check('permite preparar la sala sin cola',true,(async()=>{
   const db=ctx(H),b=writeBatch(db);
   b.set(doc(db,'rooms',CODE),room());
   return b.commit();
 })());
+
+await env.clearFirestore();
+await check('no permite publicar una cola sin su sala',false,setDoc(doc(ctx(H),'publicQueues',KEY),queue()));
 
 await env.clearFirestore();
 await env.withSecurityRulesDisabled(async c=>{
