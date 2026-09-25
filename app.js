@@ -332,7 +332,8 @@
 
   function playChoices(resume) {
     const multi = `<button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
-      <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Cada persona juega desde su pantalla.</small></span><i aria-hidden="true">→</i></button>
+      <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Crea una sala privada o entra con un código.</small></span><i aria-hidden="true">→</i></button>
+      <button class="play-choice" data-action="public-match"><span class="choice-icon">${playIcon("online")}</span><span><b>Partida rápida</b><small>Encuentra una mesa pública y juega online con otros jugadores.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="local-multiplayer"><span class="choice-icon">${playIcon("offline")}</span><span><b>Sin conexión</b><small>Varios móviles, sin internet — una red Wi-Fi local basta.</small></span><i aria-hidden="true">→</i></button>
       ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}`;
     const solo = `<button class="play-choice walking-choice" data-action="solo"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Partida libre hasta perder las vidas.</small></span><i aria-hidden="true">→</i></button>`;
@@ -3561,6 +3562,22 @@
     CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: playMenu });
   }
 
+  async function launchPublicMatch() {
+    screen = "online-loading";
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Buscando partida</h2><p>Buscando una mesa pública compatible…</p></div></section></div>`);
+    try {
+      const matchmaking = await import("./public-matchmaking-online.js");
+      const code = await matchmaking.findOrCreate(selectedModeKey, 4);
+      const online = await import("./online.js");
+      await online.openOnlineMode({ roomCode: code, modeKey: selectedModeKey, onBack: playMenu });
+      matchmaking.watchPublicRoom?.(code);
+    } catch (error) {
+      console.error(error);
+      screen = "online-error";
+      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo encontrar partida</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión y vuelve a intentarlo.</p><button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button><button class="btn btn-ghost btn-block" data-action="back-menu">Volver</button></div></section></div>`);
+    }
+  }
+
   async function launchOnline(roomCode = "", competition = null) {
     screen = "online-loading";
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
@@ -3729,6 +3746,7 @@
     else if (action === "competition-resume") resumeMultiCompetition();
     else if (action === "competition-round-start") { game.tournamentIntro = false; saveGame(); renderPass(); }
     else if (action === "online") launchOnline();
+    else if (action === "public-match") launchPublicMatch();
     else if (action === "local-multiplayer") launchLocalMultiplayer();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
