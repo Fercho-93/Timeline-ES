@@ -159,25 +159,47 @@
     transform: translate(-50%, -50%);
   }
   .crest { position: relative; width: 410px; margin-bottom: -4px; }
-  /* El emblema es una moneda: entra girando sobre su eje vertical y, al final,
-     da otra vuelta completa. La opacidad va en el envoltorio porque sobre la
-     propia moneda aplanaría el 3D. */
+  /* El emblema es una moneda que llega en un torbellino: aparece pequeño y
+     girando muy deprisa sobre su eje vertical, crece mientras frena y se queda
+     quieto. La opacidad va en el envoltorio porque sobre la propia moneda
+     aplanaría el 3D. */
   .crest-in {
     perspective: 1100px;
-    animation: crest-in 1.1s 1.75s var(--ease-out) both;
+    animation: crest-in 2.3s 1s cubic-bezier(.16,.7,.24,1) both;
   }
   @keyframes crest-in {
-    from { opacity: 0; transform: translateY(26px) scale(.72); }
-    45% { opacity: 1; }
-    to { opacity: 1; transform: none; }
+    from { opacity: 0; transform: translateY(40px) scale(.15) rotate(-35deg); filter: blur(3px); }
+    18% { opacity: 1; }
+    55% { filter: blur(0); }
+    to { opacity: 1; transform: none; filter: none; }
   }
   .coin {
     position: relative;
     transform-style: preserve-3d;
-    animation: coin-spin 2.1s 1.75s cubic-bezier(.12,.62,.22,1) both, coin-turn 1.5s 6.6s cubic-bezier(.55,0,.25,1) both;
+    animation: coin-spin 2.4s 1s cubic-bezier(.1,.55,.2,1) both;
   }
-  @keyframes coin-spin { from { transform: rotateY(-720deg); } to { transform: rotateY(0deg); } }
-  @keyframes coin-turn { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+  @keyframes coin-spin { from { transform: rotateY(-2160deg); } to { transform: rotateY(0deg); } }
+  /* Remolino de polvo dorado alrededor del emblema mientras gira. */
+  .swirl {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: 470px;
+    height: 470px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, #ffe4a000 0deg, #ffe7a8cc 8deg, #ffe4a000 22deg, #fff6d800 40deg, #f6cf7c99 47deg, #ffe4a000 60deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 28%, #000 42%, #0008 58%, transparent 70%);
+    mask: radial-gradient(circle, transparent 0 28%, #000 42%, #0008 58%, transparent 70%);
+    filter: blur(2px);
+    animation: swirl 2.5s 1s cubic-bezier(.2,.6,.3,1) both;
+  }
+  @keyframes swirl {
+    from { opacity: 0; transform: translate(-50%, -50%) rotate(0deg) scale(.3); }
+    20% { opacity: .9; }
+    65% { opacity: .6; }
+    to { opacity: 0; transform: translate(-50%, -50%) rotate(-900deg) scale(1.2); }
+  }
   .coin img { display: block; width: 100%; height: auto; }
   .face { position: relative; backface-visibility: hidden; transform: translateZ(3px); }
   .face img { filter: drop-shadow(0 12px 14px #4e2a173d); }
@@ -197,7 +219,7 @@
     border-radius: 50%;
     background: radial-gradient(circle, #fff6d8 0, #ffe7a8a8 22%, #ffd78a33 45%, transparent 68%);
     transform: translate(-50%, -50%);
-    animation: halo 2.2s 2.1s ease-out both;
+    animation: halo 2.2s 2.9s ease-out both;
   }
   @keyframes halo {
     from { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
@@ -213,7 +235,7 @@
     background: linear-gradient(105deg, transparent 36%, #fff3c800 38%, #fff3c8b3 50%, #fff3c800 62%, transparent 64%) no-repeat;
     background-size: 250% 100%;
     mix-blend-mode: screen;
-    animation: glint 1.2s 3.8s ease-in-out both;
+    animation: glint 1.2s 3.5s ease-in-out both;
   }
   @keyframes glint {
     from { background-position: 120% 0; opacity: 1; }
@@ -315,6 +337,7 @@
     <section class="masthead">
       <div class="crest">
         <div class="halo"></div>
+        <div class="swirl"></div>
         <div class="crest-in">
           <div class="coin">
             <div class="face front">
