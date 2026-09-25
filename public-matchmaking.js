@@ -14,7 +14,12 @@ export function normalizePublicCapacity(value) {
   return capacity;
 }
 
-export function publicQueueKey({ mode, capacity, clientVersion, deckFingerprint }) {\n  if (!mode || typeof mode !== 'string') throw new Error('INVALID_PUBLIC_MODE');\n  if (!Number.isInteger(Number(clientVersion)) || Number(clientVersion) < 1) throw new Error('INVALID_PUBLIC_VERSION');\n  if (!deckFingerprint || typeof deckFingerprint !== 'string') throw new Error('INVALID_PUBLIC_DECK');\n  return mode + ':' + normalizePublicCapacity(capacity) + ':v' + Number(clientVersion) + ':' + deckFingerprint;\n}
+export function publicQueueKey({ mode, capacity, clientVersion, deckFingerprint }) {
+  if (!mode || typeof mode !== 'string') throw new Error('INVALID_PUBLIC_MODE');
+  if (!Number.isInteger(Number(clientVersion)) || Number(clientVersion) < 1) throw new Error('INVALID_PUBLIC_VERSION');
+  if (!deckFingerprint || typeof deckFingerprint !== 'string') throw new Error('INVALID_PUBLIC_DECK');
+  return mode + ':' + normalizePublicCapacity(capacity) + ':v' + Number(clientVersion) + ':' + deckFingerprint;
+}
 
 export function isJoinablePublicRoom(room, { mode, capacity, clientVersion, deckFingerprint } = {}) {
   if (!room || room.matchmaking !== 'public' || room.status !== 'lobby') return false;
