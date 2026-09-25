@@ -33,9 +33,9 @@ async function findOrCreate(mode, capacityInput) {
   const capacity=normalizePublicCapacity(capacityInput);
   const user=auth.currentUser;
   if(!user) throw Error('AUTH_NOT_READY');
-  const queueKey=publicQueueKey({mode,capacity});
-  const queueRef=doc(db,'publicQueues',queueKey);
   const fingerprint=CT.deckFingerprint(mode);
+  const queueKey=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
+  const queueRef=doc(db,'publicQueues',queueKey);
   return runTransaction(db,async tx=>{
     const qSnap=await tx.get(queueRef);
     if(qSnap.exists() && qSnap.data().status==='waiting'){
