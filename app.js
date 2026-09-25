@@ -3572,9 +3572,14 @@
       await online.openOnlineMode({ roomCode: code, modeKey: selectedModeKey, onBack: playMenu });
       matchmaking.watchPublicRoom?.(code);
     } catch (error) {
-      console.error(error);
-      screen = "online-error";
-      paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo encontrar partida</h2><p class="lead" style="margin-inline:auto">Comprueba la conexión y vuelve a intentarlo.</p><button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button><button class="btn btn-ghost btn-block" data-action="back-menu">Volver</button></div></section></div>`);
+      console.error("PUBLIC_MATCH_ERROR", error?.code || "", error?.message || error);
+      screen = "public-match-error";
+      const detail = error?.code === "permission-denied"
+        ? "Firebase ha rechazado la creación de la mesa pública."
+        : error?.message === "AUTH_NOT_READY"
+          ? "Tu perfil todavía no está preparado."
+          : "No se pudo crear ni encontrar una mesa pública.";
+      paint(`<div class="shell">${header('<button class="icon-btn" data-action="public-match-back">Volver</button>')}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p><button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button><button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
     }
   }
 
@@ -3747,6 +3752,7 @@
     else if (action === "competition-round-start") { game.tournamentIntro = false; saveGame(); renderPass(); }
     else if (action === "online") launchOnline();
     else if (action === "public-match") launchPublicMatch();
+    else if (action === "public-match-back") playMenu();
     else if (action === "local-multiplayer") launchLocalMultiplayer();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
