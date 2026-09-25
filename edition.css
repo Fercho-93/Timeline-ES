@@ -3362,3 +3362,114 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   color: #253f39; background: #f9f3e7ed; padding: 7px 5px 4px;
   border-top: 1px solid #9aab9370; border-radius: 4px; text-shadow: none;
 }
+
+/* Portada ilustrada: la lámina de referencia del juego. El papel se enmarca con una
+   columna y un olivo a la izquierda, un astrolabio con la ciudad a la derecha y una
+   franja de cartas marinas sobre la barra. Las piezas son recortes con transparencia:
+   dejan libre el centro, donde la marca, las láminas y el texto siguen siendo HTML. */
+:root:not([data-theme="dark"]) #app[data-screen="home"] {
+  background:
+    radial-gradient(ellipse at 50% 18%, #fbf4e4 0 18%, transparent 52%),
+    radial-gradient(ellipse at 96% 78%, #d8bf9147, transparent 46%),
+    linear-gradient(180deg, #f1e6d0, #eadcc0);
+}
+#app[data-screen="home"]::before {
+  opacity: 1;
+  background:
+    url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
+    url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat;
+}
+#app[data-screen="home"]::after {
+  position: fixed;
+  z-index: 0;
+  inset: auto 0 calc(52px + env(safe-area-inset-bottom));
+  height: 58px;
+  opacity: .92;
+  width: min(100%, 440px);
+  margin-inline: auto;
+  background: url("assets/home-deco-maps.webp") center bottom / cover no-repeat;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+@media (min-width: 460px) {
+  #app[data-screen="home"]::after {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
+  }
+}
+:root:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen="home"]::after { display: none; }
+:root[data-theme="dark"] #app[data-screen="home"]::before,
+:root[data-theme="dark"] #app[data-screen="home"]::after { opacity: .2; }
+
+#app[data-screen="home"] .home-doors-shell .home-masthead { margin-top: calc(env(safe-area-inset-top) + clamp(16px, 4svh, 44px)); }
+#app[data-screen="home"] .home-doors-shell .home-masthead::before { display: none; }
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(96px, 24vw, 132px); margin-bottom: 2px; }
+#app[data-screen="home"] .home-doors-shell .home-wordmark {
+  color: #2a1a10;
+  font-size: clamp(2.2rem, 10.6vw, 3.6rem);
+  font-weight: 600;
+  letter-spacing: .005em;
+  text-shadow: 0 1px 0 #fff8e8, 0 4px 10px #4a2c1624;
+}
+#app[data-screen="home"] .home-doors-shell .home-wordmark::after { opacity: .9; }
+#app[data-screen="home"] .home-doors-shell .home-tagline { margin-top: 9px; color: #3d2c20; font-weight: 500; letter-spacing: .3em; }
+#app[data-screen="home"] .home-doors-shell .home-ornament { display: none; }
+
+/* Láminas: papel marfil con filete dorado; la ilustración ocupa la parte derecha y se
+   funde en el papel, y todo el texto va en la misma serif que el título. */
+#app[data-screen="home"] .home-doors-shell .home-door {
+  --door-paper: #f8f0df; --door-ink: #2a1c12; --door-edge: #c4a46c;
+  min-height: 150px;
+  border: 1.5px solid #d2b683;
+  border-radius: 14px;
+  box-shadow: 0 2px 0 #e2cfa6, 0 12px 26px #4a321a26, inset 0 1px 0 #fffaf0;
+}
+#app[data-screen="home"] .home-doors-shell .home-door::before { inset: 6px; border-color: #fffaf0cc; border-radius: 9px; box-shadow: inset 0 0 0 1px #b8955a33; }
+#app[data-screen="home"] .home-doors-shell .home-door-art {
+  left: auto !important;
+  right: 0;
+  width: 64% !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 38%);
+  mask-image: linear-gradient(90deg, transparent, #000 38%);
+}
+#app[data-screen="home"] .home-doors-shell .home-door-art img { filter: sepia(.18) saturate(.95) contrast(1.05); }
+#app[data-screen="home"] .home-doors-shell .home-door::after {
+  background: linear-gradient(90deg, var(--door-paper) 0 30%, color-mix(in srgb, var(--door-paper) 72%, transparent) 46%, transparent 72%);
+}
+#app[data-screen="home"] .home-doors-shell .home-door[data-action="jugar"] .home-door-art img { object-position: 70% 50%; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy { min-height: 150px; width: 70%; padding: 18px 22px; gap: 7px; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, 6.6vw, 2.05rem); letter-spacing: -.01em; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy small { max-width: 26ch; color: #4a3d31; font: 1rem/1.35 var(--font-display); }
+#app[data-screen="home"] .home-doors-shell .home-door-cta {
+  margin-top: 8px; padding-bottom: 4px; border-bottom: 1.5px solid #9c7641; color: #6e4a1f;
+  font: 700 1.05rem/1.3 var(--font-display);
+}
+#app[data-screen="home"] .home-doors-shell .home-daily-streak { font-family: var(--font-display); }
+
+/* Aviso de duelos: tarjeta de papel con sello circular, como las láminas. */
+#app[data-screen="home"] .home-duels-banner {
+  min-height: 70px; padding: 12px 18px; gap: 16px;
+  border: 1.5px solid #d2b683; border-radius: 14px;
+  background: linear-gradient(180deg, #fbf5e8, #f4ead5);
+  box-shadow: 0 2px 0 #e2cfa6, 0 10px 22px #4a321a1f, inset 0 0 0 4px #fffaf0, inset 0 0 0 5px #c4a46c40;
+}
+#app[data-screen="home"] .home-duels-banner b { color: #2a1c12; font: 700 1.12rem/1.25 var(--font-display); }
+#app[data-screen="home"] .home-duels-banner small { color: #5f5142; font: .95rem/1.35 var(--font-display); }
+#app[data-screen="home"] .home-duels-mark { width: 44px; height: 44px; border: 1px solid #c9ad7a; background: radial-gradient(circle, #fffaf0, #efe2c6); color: #3d3024; font-size: 1.25rem; box-shadow: inset 0 0 0 3px #fffaf0; }
+#app[data-screen="home"] .home-duels-banner i { color: #6e4a1f; font-size: 1.4rem; }
+
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door { --door-paper: #332a20; --door-ink: #f1e1bf; border-color: #8c6f45; box-shadow: 0 12px 26px #0006; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-copy small { color: #e9dcc3; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-cta { color: #e6c58e; border-color: #c8a26a; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-wordmark { color: #f5dfc0; text-shadow: 0 4px 12px #0008; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-tagline { color: #d9c29b; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner { background: #3a2d1f; border-color: #8c6f45; box-shadow: 0 10px 22px #0006; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner b { color: #f1e1bf; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-duels-banner small { color: #d9c9aa; }
+:root[data-theme="dark"] #app[data-screen="home"] .home-duels-mark { background: #2a2118; color: #e6c58e; box-shadow: none; }
+@media (max-width: 380px) {
+  #app[data-screen="home"] .home-doors-shell .home-door-copy { width: 76%; padding-inline: 16px; }
+  #app[data-screen="home"] .home-doors-shell .home-door-copy small { font-size: .92rem; }
+  #app[data-screen="home"] .home-duels-banner b { font-size: 1.02rem; }
+}
+#app[data-screen="home"] .home-doors-shell { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }

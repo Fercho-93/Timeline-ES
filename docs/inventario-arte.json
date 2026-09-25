@@ -9211,6 +9211,62 @@
       }
     },
     {
+      "path": "assets/home-deco-left.webp",
+      "sha256": "fd5f0c2371aa6627ce8011b3d1e59ed42564db734f225822fac474fea65e8333",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-09-25",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/home-deco-maps.webp",
+      "sha256": "4ee39360f21e633af6b3ab5967e3c9f74916812cc2bf2723c4f8d6e716164188",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-09-25",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/home-deco-right.webp",
+      "sha256": "1f9612c22b7ab0d5def45145b9b138100e06c27bf32bde165f0533877aa24141",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-09-25",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/home-door-jugar.webp",
+      "sha256": "4d93db2376070ac48385b97a629748b31ff74405fc809b3248132f23d1735ca6",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-09-25",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/mode-walk-multi.webp",
       "sha256": "1d67f5b2fc2a1f52924cd6984b7a4e66483973852fd03e95e354c745e1d4eb22",
       "rightsEvidence": null

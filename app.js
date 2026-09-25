@@ -532,7 +532,7 @@
       <div id="home-duels" class="home-duels"></div>
       <section class="home-doors" aria-label="Qué quieres hacer">
         ${dailyDoor()}
-        ${homeDoor("jugar", "Jugar", "Colecciones, retos rápidos y competición.", "hero-mixed", 992)}
+        ${homeDoor("jugar", "Jugar", "Colecciones, retos rápidos y competición.", "home-door-jugar", 344, 378)}
         ${homeDoor("perfil", "Atlas", "Tus cartas, tu progreso y tus logros.", "hero-geography", 859)}
       </section>
       ${homeNav()}
@@ -542,9 +542,12 @@
     refreshDuelBanner();
   }
 
-  function homeDoor(action, title, text, art, alto) {
+  // `ancho` solo lo lleva una ilustración propia de la portada; las demás son las
+  // portadas de 700 px de las familias.
+  function homeDoor(action, title, text, art, alto, ancho = 0) {
+    const src = ancho ? `assets/${art}.webp` : `assets/${art}-700.webp`;
     return `<button class="home-door" data-action="${action}">
-      <span class="home-door-art" aria-hidden="true"><img src="assets/${art}-700.webp" alt="" width="700" height="${alto}" decoding="async"></span>
+      <span class="home-door-art" aria-hidden="true"><img src="${src}" alt="" width="${ancho || 700}" height="${alto}" decoding="async"></span>
       <span class="home-door-copy"><b>${title}</b><small>${text}</small><span class="home-door-cta" aria-hidden="true">Entrar →</span></span>
     </button>`;
   }
