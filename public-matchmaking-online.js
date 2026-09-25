@@ -20,7 +20,7 @@ function roomData(code, mode, capacity, uid) {
   const name=alias();
   return {
     roomCode:code, mode, deckFingerprint:CT.deckFingerprint(mode), hostUid:uid,
-    matchmaking:'public', capacity, clientVersion:CLIENT_VERSION,
+    matchmaking:'public', capacity, clientVersion:CLIENT_VERSION, queueKey:publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(mode)}),
     status:'lobby', phase:'lobby', version:1, handSize:4, turnSeconds:30,
     playerOrder:[uid],
     players:{[uid]:{name,avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
