@@ -31,8 +31,12 @@ function roomData(code, mode, capacity, uid) {
 
 async function findOrCreate(mode, capacityInput) {
   const capacity=normalizePublicCapacity(capacityInput);
-  const user=auth.currentUser;
-  if(!user) throw Error('AUTH_NOT_READY');
+  let user=auth.currentUser;
+  if(!user || !CT.Accounts?.ready) {
+    await auth.authStateReady?.();
+    user=auth.currentUser;
+  }
+  if(!user || !CT.Accounts?.ready) throw Error('AUTH_NOT_READY');
   const fingerprint=CT.deckFingerprint(mode);
   const queueKey=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
   const queueRef=doc(db,'publicQueues',queueKey);
