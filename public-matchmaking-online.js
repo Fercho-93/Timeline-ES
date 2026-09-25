@@ -160,4 +160,4 @@ new MutationObserver(refresh).observe(document.getElementById('app'),{childList:
 document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(b)void startQuickMatch(Number(document.getElementById('public-match-capacity')?.value||4));});
 refresh();
 
-export { findOrCreate };
+export { findOrCreate, watchPublicRoom };
