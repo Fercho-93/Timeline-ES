@@ -52,7 +52,7 @@ try {
   check("título del actualizador", read("actualizar.html").includes(`<title>Actualizar ${brand}</title>`));
   check("título de la documentación", read("README.md").startsWith(`# ${brand}\n`));
   check("título de las auditorías", read("VERIFICACION_CORRECCIONES.md").startsWith(`# Correcciones de las auditorías de ${brand}\n`));
-  for (const script of w.document.querySelectorAll("script[src]")) w.eval(read(script.getAttribute("src")));
+  for (const script of w.document.querySelectorAll("script[src]:not([type=\"module\"])")) w.eval(read(script.getAttribute("src")));
   checkScreen("Inicio");
   openSelectedCollection();
   click("set-mode");
