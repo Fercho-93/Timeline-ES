@@ -28,8 +28,8 @@ assert.equal(shouldStartPublicRoom(room), false);
 assert.equal(shouldStartPublicRoom({ ...room, playerOrder: ['a','b','c','d'] }), true);
 
 const code = makePublicRoomCode(() => 0);
-assert.equal(code, 'PUBAAAAAAA');
-assert.equal(code.length, 10);
+assert.equal(code, 'PAAAAAAA');
+assert.equal(code.length, 8);
 const player = publicPlayer({ uid: 'u1', name: 'Fernando-123456789012345', avatarId: 'fox', clientVersion: 42, joinedAt: 1 });
 assert.equal(player.uid, 'u1');
 assert.equal(player.name.length, 18);
