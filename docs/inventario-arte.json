@@ -9225,20 +9225,6 @@
       }
     },
     {
-      "path": "assets/home-deco-maps.webp",
-      "sha256": "4ee39360f21e633af6b3ab5967e3c9f74916812cc2bf2723c4f8d6e716164188",
-      "rightsEvidence": {
-        "status": "user-confirmed-ai-generated",
-        "generator": "ChatGPT / OpenAI",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "exactPrompt": null,
-        "generatedAt": "2026-09-25",
-        "referenceImage": null,
-        "commercialTermsRef": "terms-to-preserve"
-      }
-    },
-    {
       "path": "assets/home-deco-right.webp",
       "sha256": "1f9612c22b7ab0d5def45145b9b138100e06c27bf32bde165f0533877aa24141",
       "rightsEvidence": {
@@ -15286,17 +15272,6 @@
         "generator": "OpenAI integrated image generation",
         "evidence": "docs/retos-portada.md",
         "generatedAt": "2026-09-20"
-      }
-    },
-    {
-      "path": "assets/paper-map.svg",
-      "sha256": "0976e396e0eb46ba3260c8f60028dfe6c55d89a8a1ceff9a7d5fbc0570fbb0d6",
-      "rightsEvidence": {
-        "status": "original-vector",
-        "generator": "Dibujo vectorial del proyecto (SVG escrito a mano)",
-        "declaredBy": "Fercho-93",
-        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-        "generatedAt": "2026-09-25"
       }
     }
   ]
