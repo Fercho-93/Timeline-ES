@@ -143,7 +143,7 @@ function inject() {
     if(key===CT.DEFAULT_MODE || (CT.Cartera?.tiene && !CT.Cartera.tiene(key)))continue;
     const option=document.createElement('option');option.value=key;option.textContent=m.name;select.append(option);
   }
-  grid.prepend(panel);
+  const currentKey=Object.entries(CT.MODES||{}).find(([,m])=>current?.includes(m.name))?.[0];\n  if(currentKey && [...select.options].some(o=>o.value===currentKey)) select.value=currentKey;\n  grid.prepend(panel);
 }
 new MutationObserver(inject).observe(document.getElementById('app'),{childList:true,subtree:true});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(b)void startQuickMatch(Number(document.getElementById('public-match-capacity')?.value||4));});
