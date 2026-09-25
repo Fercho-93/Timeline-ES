@@ -3367,8 +3367,10 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
    columna y un olivo a la izquierda, un astrolabio con la ciudad a la derecha y una
    franja de cartas marinas sobre la barra. Las piezas son recortes con transparencia:
    dejan libre el centro, donde la marca, las láminas y el texto siguen siendo HTML. */
-html:root { background: radial-gradient(ellipse at 50% 18%, #fbf4e4 0 18%, transparent 52%), radial-gradient(ellipse at 96% 78%, #d8bf9147, transparent 46%), linear-gradient(180deg, #f1e6d0, #eadcc0) fixed; }
-html:root[data-theme="dark"] { background: radial-gradient(ellipse at 50% 12%, #3a2b1c, transparent 55%), linear-gradient(180deg, #1d150e, #130e09) fixed; }
+/* Color liso de fondo: Safari en iPhone no respeta `fixed` en el lienzo y, al cambiar
+   de tamaño la barra del navegador, lo que quede sin cubrir debe seguir siendo papel. */
+html:root { background: #ecdfc4; }
+html:root[data-theme="dark"] { background: #171009; }
 html body, html:root[data-theme="dark"] body { background: transparent; }
 /* Toda la pantalla, en cualquier vista del juego, es la misma lámina: una carta náutica
    vectorial cubre el papel y las piezas ilustradas quedan fijas en los bordes mientras
@@ -3378,7 +3380,9 @@ html body::before {
   content: "";
   position: fixed;
   z-index: -1;
-  inset: 0;
+  inset: 0 0 auto;
+  height: 100vh;
+  height: 100lvh;
   pointer-events: none;
   opacity: 1;
   box-shadow: none;
@@ -3391,11 +3395,20 @@ html::before {
   content: "";
   position: fixed;
   z-index: -1;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Viewport grande: cubre también la franja que deja libre la barra de Safari al plegarse. */
+  height: 100vh;
+  height: 100lvh;
   pointer-events: none;
-  background: url("assets/paper-map.svg") center / cover no-repeat;
+  background:
+    url("assets/paper-map.svg") center / cover no-repeat,
+    radial-gradient(ellipse at 50% 16%, #fbf4e4 0 16%, transparent 55%),
+    radial-gradient(ellipse at 96% 70%, #d8bf9140, transparent 46%),
+    linear-gradient(180deg, #f1e6d0, #e6d6b6);
 }
-:root[data-theme="dark"]::before { opacity: .35; }
+:root[data-theme="dark"]::before { background: url("assets/paper-map.svg") center / cover no-repeat, radial-gradient(ellipse at 50% 12%, #3a2b1c, transparent 55%), linear-gradient(180deg, #1d150e, #130e09); }
 /* Fuera de la portada los títulos van a la izquierda: la columna y el astrolabio se
    quedan más pequeños y tenues para no pasar por detrás de las letras. */
 html body:not(:has(#app[data-screen="home"]))::before {
@@ -3414,12 +3427,16 @@ html body::after {
   pointer-events: none;
   opacity: .92;
   background: url("assets/home-deco-maps.webp") center bottom / cover no-repeat;
+  -webkit-mask-image: linear-gradient(transparent, #000 55%);
+  mask-image: linear-gradient(transparent, #000 55%);
 }
 html body:has(.home-nav)::after { bottom: calc(52px + env(safe-area-inset-bottom)); }
 @media (min-width: 460px) {
   html body::after {
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
+    -webkit-mask-image: linear-gradient(transparent, #000 55%), linear-gradient(90deg, transparent, #000 18% 82%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(transparent, #000 55%), linear-gradient(90deg, transparent, #000 18% 82%, transparent);
+    mask-composite: intersect;
   }
 }
 :root:is([data-text-size="150"], [data-text-size="200"]) body::after { display: none; }
