@@ -316,8 +316,18 @@
   function block(title, subtitle, art, action, count) {
     return `<div class="collection-entry"><button class="gallery-panel panel-${art}" data-action="${action}" aria-label="${esc(title)}. ${esc(subtitle)}"><span class="panel-backdrop" aria-hidden="true"><img src="assets/hero-${art}-400.webp" alt="" width="400" height="600"></span><span class="panel-depth-light" aria-hidden="true"></span><span class="panel-art" aria-hidden="true"><img src="assets/hero-${art}-400.webp" alt="" width="400" height="600"></span><span class="panel-depth-ground" aria-hidden="true"></span><span class="collection-foil" aria-hidden="true"></span><span class="collection-index" aria-hidden="true">${count}</span><span class="collection-open" aria-hidden="true">↗</span><span class="panel-spine" aria-hidden="true"><i>◇</i><b>${esc(title)}</b></span><span class="panel-label" aria-hidden="true"><i></i><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></span></button></div>`;
   }
+  function dailyQuick(dayValue) {
+    const seed=CT.seedFrom('quick-daily-'+dayValue), random=CT.seededRandom(seed);
+    const challenge=CT.QuickCatalog.challenges[Math.floor(random()*CT.QuickCatalog.challenges.length)];
+    return {names:['Tú'],rounds:[{id:challenge.id,order:CT.shuffleWith(challenge.cards.map(x=>x.id),random)}],kind:'daily',day:dayValue};
+  }
+
   CT.Quick = {
     leave:stopNetwork,
+    startDaily(dayValue, renderPage) {
+      paint=renderPage; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
+      prepare(dailyQuick(dayValue));
+    },
     open(renderPage) {paint = renderPage; state = null; record = null; selected = null; slot = null;formatMenu();const params=new URLSearchParams(location.hash.slice(1));try{if(params.has('quick-duel'))acceptDuel();else if(params.has('quick-room')){networkSetup('internet');app().querySelector('#quick-net-code').value=params.get('quick-room');}}catch(e){errorNotice(e);}},
     blocks() {return block('Retos rápidos', 'Ordena. Arriesga. Asegura.', 'quick', 'quick-challenges', `${CT.QuickCatalog.challenges.length} retos`);}
   };
