@@ -77,7 +77,7 @@
       `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select><small>Si eliges “Cualquiera”, buscamos primero una mesa de 4 y después de 3 o 2.</small></div>`,
       modeDoor('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', '▦', 'Grandes colecciones', 'Elige tres temas candidatos y la mesa sortea uno para todos.', false, 'data-online-kind="collections"'),
-      modeDoor('quick-challenges', '◫', 'Retos rápidos', 'Temas breves y concretos; entra en su zona de juego online.', false, 'data-online-kind="quick"')
+      modeDoor('quick-public', '◫', 'Retos rápidos', 'Temas breves y concretos con jugadores aleatorios.', false, 'data-online-kind="quick"')
     ].join(''));
   }
 
@@ -131,6 +131,11 @@
     const target = event.target.closest('[data-action]');
     if (!target) return;
     const action = target.dataset.action;
+    if(action==='quick-public'){
+      event.preventDefault();event.stopImmediatePropagation();
+      const cap=Number(document.getElementById('mode-public-capacity')?.value||sessionStorage.getItem('continuum-public-capacity')||0);
+      window.CONTINUUM.Quick.openPublic((html,playing)=>{app.dataset.screen=playing?'quick-game':'quick-lobby';app.innerHTML=html;},cap).catch(()=>{});return;
+    }
     if (!['online-hub','online-collections','solo-hub','friends-hub'].includes(action)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
