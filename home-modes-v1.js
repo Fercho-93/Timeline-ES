@@ -117,7 +117,31 @@
     else openFriendsHub();
   }, true);
 
-  const observer = new MutationObserver(restructureHome);
+  function rankingSummary() {
+    const keys=['continuum-daily-records-v1','continuum-quick-history-v1'];
+    let classic=0, quick=0;
+    try {
+      const raw=JSON.parse(localStorage.getItem(keys[0])||'{}');
+      classic=Object.values(raw.days||{}).reduce((sum,d)=>sum+(Number(d.hits)||0),0);
+    } catch {}
+    try {
+      const raw=JSON.parse(localStorage.getItem(keys[1])||'[]');
+      quick=(Array.isArray(raw)?raw:[]).reduce((sum,d)=>sum+(Number(d.score)||0),0);
+    } catch {}
+    return {classic,quick,total:classic+quick};
+  }
+
+  function addRankingSummary() {
+    if(app.dataset.screen!=='home' || app.querySelector('.mode-ranking-summary')) return;
+    const doors=app.querySelector('.home-doors'); if(!doors)return;
+    const r=rankingSummary(), box=document.createElement('section');
+    box.className='mode-ranking-summary';
+    box.innerHTML=`<div><small>RANKING GLOBAL · PUNTOS LOCALES</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
+    doors.append(box);
+  }
+
+  const observer = new MutationObserver(()=>{restructureHome();addRankingSummary();});
   observer.observe(app, { childList: true, subtree: true });
   restructureHome();
+  addRankingSummary();
 })();
