@@ -28,6 +28,9 @@
     dailyWrap.setAttribute('aria-label', 'Reto del día');
     dailyWrap.append(daily);
 
+    const legacyPlay = doors.querySelector('.home-door[data-action="jugar"]');
+    if (legacyPlay) legacyPlay.classList.add('mode-legacy-entry');
+
     const choices = document.createElement('section');
     choices.className = 'mode-entry-grid';
     choices.setAttribute('aria-label', 'Cómo quieres jugar');
@@ -45,6 +48,7 @@
     secondary.append(atlas);
 
     doors.replaceChildren(dailyWrap, choices, secondary);
+    if (legacyPlay) doors.append(legacyPlay);
     doors.dataset.modesV1 = 'true';
   }
 
