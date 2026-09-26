@@ -127,8 +127,11 @@ async function startQuickMatch(capacity) {
   try{
     const intent=sessionStorage.getItem('continuum-public-kind')||'collections';
     const candidates=Object.keys(CT.MODES||{}).filter(key=>key!=='mixed' && (!CT.Cartera?.tiene || CT.Cartera.tiene(key)));
-    const randomMode=candidates[Math.floor(Math.random()*Math.max(1,candidates.length))] || CT.DEFAULT_MODE;
-    const mode=intent==='surprise' ? randomMode : (document.getElementById('public-match-mode')?.value || CT.DEFAULT_MODE);
+    let preferred=[];
+    try { preferred=JSON.parse(sessionStorage.getItem('continuum-public-topics')||'[]').filter(key=>candidates.includes(key)); } catch {}
+    const pool=preferred.length?preferred:candidates;
+    const randomMode=pool[Math.floor(Math.random()*Math.max(1,pool.length))] || CT.DEFAULT_MODE;
+    const mode=(intent==='surprise' || intent==='collections-vote') ? randomMode : (document.getElementById('public-match-mode')?.value || CT.DEFAULT_MODE);
     const found=await findFlexible(mode,capacity);
     const code=found.code;
     CT.Storage.setItem('continuum-last-room',code);
