@@ -36,3 +36,9 @@ assert.equal(player.name.length, 18);
 assert.equal(player.joinedAt, 1);
 
 console.log('public matchmaking core: ok');
+
+// La capa pública se mantiene deliberadamente entre 2 y 4 para no fragmentar colas.
+assert.equal(normalizePublicCapacity(2),2);
+assert.equal(normalizePublicCapacity(4),4);
+assert.throws(()=>normalizePublicCapacity(1));
+assert.throws(()=>normalizePublicCapacity(5));
