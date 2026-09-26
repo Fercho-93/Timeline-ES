@@ -103,7 +103,9 @@
     const home = event.target.closest('[data-mode-home]');
     if (home) {
       event.preventDefault();
-      location.reload();
+      const nativeHome=document.querySelector('.home-nav [data-action="home-top"]');
+      if(nativeHome){ nativeHome.click(); return; }
+      history.back();
       return;
     }
     const target = event.target.closest('[data-action]');
