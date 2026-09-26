@@ -6,8 +6,8 @@
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
-  function modeDoor(action, icon, title, text, featured = false) {
-    return `<button class="mode-entry${featured ? ' mode-entry-featured' : ''}" data-action="${action}">
+  function modeDoor(action, icon, title, text, featured = false, attrs = '') {
+    return `<button class="mode-entry${featured ? ' mode-entry-featured' : ''}" data-action="${action}" ${attrs}>
       <span class="mode-entry-icon" aria-hidden="true">${icon}</span>
       <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(text)}</small></span>
       <span class="mode-entry-arrow" aria-hidden="true">→</span>
@@ -66,9 +66,9 @@
 
   function openOnlineHub() {
     hub('Jugar online', 'Mesas públicas', [
-      existing('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.'),
-      existing('public-match', '▦', 'Grandes colecciones', 'Partidas completas con temas amplios. La selección temática se ampliará con votación.'),
-      existing('quick-challenges', '◫', 'Reto rápido', 'Temas breves y concretos. El matchmaking específico se activará en la siguiente fase.')
+      modeDoor('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.', false, 'data-online-kind="surprise"'),
+      modeDoor('public-match', '▦', 'Grandes colecciones', 'Partidas completas con temas amplios.', false, 'data-online-kind="collections"'),
+      modeDoor('quick-challenges', '◫', 'Retos rápidos', 'Temas breves y concretos; entra en su zona de juego online.', false, 'data-online-kind="quick"')
     ].join(''));
   }
 
@@ -90,6 +90,10 @@
   }
 
   app.addEventListener('click', event => {
+    const publicEntry = event.target.closest('[data-action="public-match"][data-online-kind]');
+    if (publicEntry) {
+      sessionStorage.setItem('continuum-public-kind', publicEntry.dataset.onlineKind || 'surprise');
+    }
     const home = event.target.closest('[data-mode-home]');
     if (home) {
       event.preventDefault();
