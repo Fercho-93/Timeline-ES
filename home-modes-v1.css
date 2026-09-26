@@ -21,3 +21,5 @@
   #app .mode-entry { transition:transform .16s ease, box-shadow .16s ease; }
   #app .mode-entry:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(54,38,25,.11); }
 }
+
+#app .mode-legacy-entry { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important; }
