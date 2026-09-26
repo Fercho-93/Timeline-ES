@@ -113,6 +113,8 @@ async function findFlexible(mode, capacityInput) {
 
 async function startQuickMatch(capacity) {
   if(busy)return;
+  const storedCapacity=Number(sessionStorage.getItem('continuum-public-capacity'));
+  if(capacity===4 && sessionStorage.getItem('continuum-public-capacity')!==null) capacity=storedCapacity;
   busy=true;
   const button=document.querySelector('[data-public-match]');
   if(button){button.disabled=true;button.textContent='Buscando mesa…';}
@@ -180,4 +182,4 @@ new MutationObserver(refresh).observe(document.getElementById('app'),{childList:
 document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(!b)return;const raw=Number(document.getElementById('public-match-capacity')?.value||0);sessionStorage.setItem('continuum-public-capacity',String(raw));void startQuickMatch(raw);});
 refresh();
 
-export { findOrCreate, watchPublicRoom };
+export { findOrCreate, findFlexible, watchPublicRoom };
