@@ -1,0 +1,25 @@
+/* Fase 1 · nueva jerarquía de entrada. Aislada para poder validarla antes de tocar los flujos. */
+#app .mode-daily-zone { display:grid; gap:10px; }
+#app .mode-daily-zone::before { content:"HOY EN CONTINUUM"; font-size:.72rem; font-weight:800; letter-spacing:.14em; opacity:.62; padding-left:4px; }
+#app .mode-entry-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+#app .mode-entry { appearance:none; width:100%; min-height:108px; border:1px solid rgba(91,65,42,.18); border-radius:18px; padding:16px; background:rgba(255,252,246,.82); color:inherit; text-align:left; display:grid; grid-template-columns:38px 1fr auto; gap:11px; align-items:center; box-shadow:0 8px 24px rgba(54,38,25,.07); cursor:pointer; }
+#app .mode-entry:active { transform:translateY(1px); }
+#app .mode-entry-featured { grid-column:1/-1; min-height:124px; border-color:rgba(137,76,42,.32); background:linear-gradient(135deg,rgba(255,249,238,.98),rgba(239,224,202,.9)); }
+#app .mode-entry-icon { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:rgba(91,65,42,.09); font-size:1.15rem; }
+#app .mode-entry-copy { min-width:0; display:grid; gap:4px; }
+#app .mode-entry-copy b { font-family:Georgia,serif; font-size:1.04rem; }
+#app .mode-entry-copy small { line-height:1.32; opacity:.7; }
+#app .mode-entry-arrow { font-size:1.2rem; opacity:.6; }
+#app .mode-secondary { margin-top:2px; }
+#app .mode-atlas-entry { opacity:.9; }
+@media (max-width:560px) {
+  #app .mode-entry-grid { grid-template-columns:1fr; }
+  #app .mode-entry-featured { grid-column:auto; }
+  #app .mode-entry { min-height:92px; padding:14px; }
+}
+@media (prefers-reduced-motion:no-preference) {
+  #app .mode-entry { transition:transform .16s ease, box-shadow .16s ease; }
+  #app .mode-entry:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(54,38,25,.11); }
+}
+
+#app .mode-legacy-entry { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important; }
