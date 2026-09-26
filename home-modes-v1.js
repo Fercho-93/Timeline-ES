@@ -145,16 +145,17 @@
     else openFriendsHub();
   }, true);
 
+  function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
   function rankingSummary() {
     let classic=0, quick=0;
     try {
       const records=JSON.parse(localStorage.getItem('hilo-retos-v1')||'{}');
       const raw=records.retoDiario||{};
-      classic=Object.values(raw.days||{}).reduce((sum,d)=>sum+(Number(d.hits)||0),0);
+      classic=Object.entries(raw.days||{}).filter(([date])=>date.startsWith(seasonKey())).reduce((sum,[,d])=>sum+(Number(d.hits)||0),0);
     } catch {}
     try {
       const raw=JSON.parse(localStorage.getItem('continuum-quick-history-v1')||'[]');
-      quick=(Array.isArray(raw)?raw:[]).reduce((sum,d)=>sum+(Number(d.score)||0),0);
+      quick=(Array.isArray(raw)?raw:[]).filter(d=>String(d.date||'').startsWith(seasonKey())).reduce((sum,d)=>sum+(Number(d.score)||0),0);
     } catch {}
     return {classic,quick,total:classic+quick};
   }
@@ -164,7 +165,7 @@
     const doors=app.querySelector('.home-doors'); if(!doors)return;
     const r=rankingSummary(), box=document.createElement('section');
     box.className='mode-ranking-summary';
-    box.innerHTML=`<div><small>RANKING GLOBAL · PUNTOS LOCALES</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
+    box.innerHTML=`<div><small>TEMPORADA ${seasonKey()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
     doors.append(box);
   }
 
