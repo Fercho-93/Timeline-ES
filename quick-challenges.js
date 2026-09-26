@@ -322,8 +322,17 @@
     return {names:['Tú'],rounds:[{id:challenge.id,order:CT.shuffleWith(challenge.cards.map(x=>x.id),random)}],kind:'daily',day:dayValue};
   }
 
+  async function openPublic(renderPage, capacity=0) {
+    paint=renderPage; stopNetwork(); page='network-lobby'; state=null; record=null; selected=null; slot=null; format='public'; netKind='internet';
+    const name=CT.Accounts?.profile?.alias || CT.Identidad?.nombre?.() || 'Explorador';
+    const change=(...args)=>roomChanged(...args), fail=e=>errorNotice(e);
+    shell('<section class="setup-section"><h2>Buscando mesa…</h2><div class="panel"><p>Retos rápidos · jugadores aleatorios</p><p class="hint">Entrarás en la primera mesa compatible.</p></div></section>');
+    connection=await (await import('./quick-online.js')).connectPublic({name,capacity,onChange:change,onError:fail});
+  }
+
   CT.Quick = {
     leave:stopNetwork,
+    openPublic,
     startDaily(dayValue, renderPage) {
       paint=renderPage; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       prepare(dailyQuick(dayValue));
