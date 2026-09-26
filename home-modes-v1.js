@@ -76,9 +76,17 @@
     hub('Jugar online', 'Mesas públicas', [
       `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select><small>Si eliges “Cualquiera”, buscamos primero una mesa de 4 y después de 3 o 2.</small></div>`,
       modeDoor('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.', false, 'data-online-kind="surprise"'),
-      modeDoor('public-match', '▦', 'Grandes colecciones', 'Partidas completas con temas amplios.', false, 'data-online-kind="collections"'),
+      modeDoor('online-collections', '▦', 'Grandes colecciones', 'Elige tres temas candidatos y la mesa sortea uno para todos.', false, 'data-online-kind="collections"'),
       modeDoor('quick-challenges', '◫', 'Retos rápidos', 'Temas breves y concretos; entra en su zona de juego online.', false, 'data-online-kind="quick"')
     ].join(''));
+  }
+
+  function openOnlineCollections() {
+    const modes=Object.entries(window.CONTINUUM?.MODES||{}).filter(([key])=>key!=='mixed').slice(0,12);
+    hub('Grandes colecciones', 'Mesa pública · temas', `
+      <div class="mode-topic-picker"><p>Marca hasta 3 temas. Si no eliges ninguno, Continuum escogerá candidatos al azar.</p>
+      <div class="mode-topic-grid">${modes.map(([key,m])=>`<label><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
+      <button class="mode-entry mode-entry-featured" data-action="public-match" data-online-kind="collections-vote"><span class="mode-entry-icon">⚡</span><span class="mode-entry-copy"><b>Buscar mesa</b><small>Un único tema será común para toda la mesa.</small></span><span class="mode-entry-arrow">→</span></button></div>`);
   }
 
   function openSoloHub() {
@@ -102,6 +110,8 @@
     const publicEntry = event.target.closest('[data-action="public-match"][data-online-kind]');
     if (publicEntry) {
       sessionStorage.setItem('continuum-public-kind', publicEntry.dataset.onlineKind || 'surprise');
+      const topics=[...document.querySelectorAll('[data-public-topic]:checked')].slice(0,3).map(x=>x.value);
+      if(topics.length) sessionStorage.setItem('continuum-public-topics',JSON.stringify(topics)); else sessionStorage.removeItem('continuum-public-topics');
       const cap=document.getElementById('mode-public-capacity')?.value ?? '0';
       sessionStorage.setItem('continuum-public-capacity',cap);
     }
@@ -116,10 +126,11 @@
     const target = event.target.closest('[data-action]');
     if (!target) return;
     const action = target.dataset.action;
-    if (!['online-hub','solo-hub','friends-hub'].includes(action)) return;
+    if (!['online-hub','online-collections','solo-hub','friends-hub'].includes(action)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
     if (action === 'online-hub') openOnlineHub();
+    else if (action === 'online-collections') openOnlineCollections();
     else if (action === 'solo-hub') openSoloHub();
     else openFriendsHub();
   }, true);
