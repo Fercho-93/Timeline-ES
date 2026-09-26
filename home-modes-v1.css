@@ -34,3 +34,8 @@
 #app .mode-hub-head { display:flex; gap:12px; align-items:flex-start; margin:18px 0 20px; }
 #app .mode-hub-head h1 { margin:.2rem 0 0; }
 #app .mode-hub-list { display:grid; gap:10px; }
+
+#app .mode-online-config { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:8px 12px; padding:14px 16px; border-radius:16px; background:rgba(91,65,42,.06); }
+#app .mode-online-config label { font-weight:800; }
+#app .mode-online-config select { width:100%; }
+#app .mode-online-config small { grid-column:1/-1; opacity:.66; line-height:1.35; }
