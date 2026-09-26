@@ -96,13 +96,21 @@ function watchPublicRoom(code) {
   return stop;
 }
 
+function preferredCapacity() {
+  const value=Number(sessionStorage.getItem('continuum-public-capacity')||0);
+  return [2,3,4].includes(value)?value:4;
+}
+
 async function startQuickMatch(capacity) {
   if(busy)return;
   busy=true;
   const button=document.querySelector('[data-public-match]');
   if(button){button.disabled=true;button.textContent='Buscando mesa…';}
   try{
-    const mode=document.getElementById('public-match-mode')?.value || 'history';
+    const intent=sessionStorage.getItem('continuum-public-kind')||'collections';
+    const candidates=Object.keys(CT.MODES||{}).filter(key=>key!=='mixed' && (!CT.Cartera?.tiene || CT.Cartera.tiene(key)));
+    const randomMode=candidates[Math.floor(Math.random()*Math.max(1,candidates.length))] || CT.DEFAULT_MODE;
+    const mode=intent==='surprise' ? randomMode : (document.getElementById('public-match-mode')?.value || CT.DEFAULT_MODE);
     const code=await findOrCreate(mode,capacity);
     CT.Storage.setItem('continuum-last-room',code);
     const online=await import('./online.js');
@@ -136,7 +144,7 @@ function inject() {
     <div class="field"><label for="public-match-mode">Colección</label><select id="public-match-mode">
       <option value="${CT.DEFAULT_MODE}">${CT.escapeHtml(CT.mode(CT.DEFAULT_MODE).name)}</option>
     </select></div>
-    <div class="field"><label for="public-match-capacity">Jugadores</label><select id="public-match-capacity"><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4" selected>4 jugadores</option></select></div>
+    <div class="field"><label for="public-match-capacity">Jugadores</label><select id="public-match-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select></div>
     <button class="btn btn-primary btn-block" type="button" data-public-match>Buscar partida</button>
     <small class="hint">La partida empieza cuando se complete la mesa.</small>`;
   // La modalidad abierta se añade como primera opción si no es la predeterminada.
@@ -158,7 +166,7 @@ function refresh() {
   }
 }
 new MutationObserver(refresh).observe(document.getElementById('app'),{childList:true,subtree:true});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(b)void startQuickMatch(Number(document.getElementById('public-match-capacity')?.value||4));});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(!b)return;const raw=Number(document.getElementById('public-match-capacity')?.value||0);const capacity=raw||preferredCapacity();sessionStorage.setItem('continuum-public-capacity',String(capacity));void startQuickMatch(capacity);});
 refresh();
 
 export { findOrCreate, watchPublicRoom };
