@@ -91,18 +91,18 @@
 
   function openSoloHub() {
     hub('Jugar solo', 'A tu ritmo', [
-      existing('jugar', '▦', 'Grandes colecciones', 'Mazos amplios de historia, ciencia, naturaleza, geografía y más.'),
-      existing('quick-challenges', '◫', 'Retos rápidos', 'Temas muy concretos para partidas cortas.'),
-      existing('jugar', '∞', 'Gran mezcla', 'Explora la colección transversal de cartas.')
+      modeDoor('jugar', '▦', 'Grandes colecciones', 'Mazos amplios de historia, ciencia, naturaleza, geografía y más.', false, 'data-solo-route="collections"'),
+      modeDoor('quick-challenges', '◫', 'Retos rápidos', 'Temas muy concretos para partidas cortas.', false, 'data-solo-route="quick"'),
+      modeDoor('jugar', '∞', 'Gran mezcla', 'Explora la colección transversal de cartas.', false, 'data-solo-route="mixed"')
     ].join(''));
   }
 
   function openFriendsHub() {
     hub('Jugar con amigos', 'Juntos', [
-      existing('jugar', '◉', 'Un solo móvil', 'Pasad el teléfono en cada turno.'),
-      existing('jugar', '⌁', 'Sala privada', 'Cada persona con su móvil mediante código o enlace.'),
+      modeDoor('jugar', '◉', 'Un solo móvil', 'Pasad el teléfono en cada turno.', false, 'data-friend-route="local"'),
+      modeDoor('jugar', '⌁', 'Sala privada', 'Cada persona con su móvil mediante código o enlace.', false, 'data-friend-route="online"'),
       existing('jugar', '⌂', 'Wi‑Fi local', 'Varios móviles cerca, sin depender de internet.'),
-      existing('jugar', '⚔', 'Duelo por turnos', 'Reta a una persona y jugad cuando podáis.')
+      modeDoor('jugar', '⚔', 'Duelo por turnos', 'Reta a una persona y jugad cuando podáis.', false, 'data-friend-route="duel"')
     ].join(''));
   }
 
@@ -127,6 +127,12 @@
       if(nativeHome){ nativeHome.click(); return; }
       history.back();
       return;
+    }
+    const routed=event.target.closest('[data-solo-route],[data-friend-route]');
+    if(routed){
+      const route=routed.dataset.soloRoute||routed.dataset.friendRoute;
+      sessionStorage.setItem('continuum-entry-route',route);
+      if(route==='mixed') try{localStorage.setItem('hilo-selected-mode-v1','mixed');}catch{}
     }
     const target = event.target.closest('[data-action]');
     if (!target) return;
