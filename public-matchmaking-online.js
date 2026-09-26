@@ -103,12 +103,18 @@ function capacityOrder(value) {
 }
 
 async function findFlexible(mode, capacityInput) {
-  let lastError=null;
-  for(const capacity of capacityOrder(capacityInput)){
-    try { return {code:await findOrCreate(mode,capacity),capacity}; }
-    catch(error){ lastError=error; }
+  const capacities=capacityOrder(capacityInput);
+  // “Cualquiera” comparte una única cola lógica por modalidad: intentamos las mesas
+  // grandes primero, pero si no hay ninguna compatible creamos una de 4. No creamos
+  // tres salas vacías a la vez, que fragmentaría justo la población que queremos juntar.
+  if(capacities.length===1) return {code:await findOrCreate(mode,capacities[0]),capacity:capacities[0]};
+  for(const capacity of capacities){
+    const fingerprint=CT.deckFingerprint(mode);
+    const key=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
+    const snap=await getDoc(doc(db,'publicQueues',key));
+    if(snap.exists() && snap.data().status==='waiting') return {code:await findOrCreate(mode,capacity),capacity};
   }
-  throw lastError || Error('NO_PUBLIC_TABLE');
+  return {code:await findOrCreate(mode,4),capacity:4};
 }
 
 async function startQuickMatch(capacity) {
