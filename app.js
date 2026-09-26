@@ -2108,7 +2108,17 @@
     } catch { return null; }
   }
 
+  function dailyFamily(day = today()) {
+    const n = Number(day.replaceAll('-', ''));
+    return n % 2 === 0 ? 'collections' : 'quick';
+  }
+
   function startDaily() {
+    if (dailyFamily() === 'quick') {
+      screen = 'quick-challenges';
+      CT.Quick.startDaily(today(), (html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); });
+      return;
+    }
     const pendiente = loadDaily();
     if (pendiente) { setMode(pendiente.mode); resumeSolo("daily"); return; }
     if (dailyRecords().days?.[today()]) { home(); return; }
@@ -2173,6 +2183,7 @@
 
   function playDaily() {
     clearTimeout(dailyReelTimer);
+    if (dailyFamily() === 'quick') { startDaily(); return; }
     if (loadDaily() || dailyRecords().days?.[today()]) { startDaily(); return; }
     // `setMode` pinta la puerta cerrada si el mazo no es suyo; el bote del reto son los
     // gratuitos, así que no debería pasar, pero si pasa se queda en esa explicación.
