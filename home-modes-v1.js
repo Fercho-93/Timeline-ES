@@ -1,6 +1,7 @@
 (function () {
   'use strict';
 
+  const start = () => {
   const app = document.getElementById('app');
   if (!app) return;
 
@@ -146,4 +147,6 @@
   observer.observe(app, { childList: true, subtree: true });
   restructureHome();
   addRankingSummary();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true}); else start();
 })();
