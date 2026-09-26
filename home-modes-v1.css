@@ -23,3 +23,14 @@
 }
 
 #app .mode-legacy-entry { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important; }
+
+#app .mode-daily-family { margin:-2px 4px 2px; font-size:.78rem; opacity:.72; }
+#app .mode-ranking-summary { padding:14px 16px; border:1px solid rgba(91,65,42,.14); border-radius:16px; background:rgba(255,252,246,.62); }
+#app .mode-ranking-summary > div { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+#app .mode-ranking-summary small { font-weight:800; letter-spacing:.08em; opacity:.6; }
+#app .mode-ranking-summary b { font:700 1.45rem Georgia,serif; }
+#app .mode-ranking-summary p { margin:5px 0 0; font-size:.78rem; opacity:.72; }
+#app .mode-hub-shell { max-width:720px; margin:0 auto; }
+#app .mode-hub-head { display:flex; gap:12px; align-items:flex-start; margin:18px 0 20px; }
+#app .mode-hub-head h1 { margin:.2rem 0 0; }
+#app .mode-hub-list { display:grid; gap:10px; }
