@@ -74,6 +74,7 @@
 
   function openOnlineHub() {
     hub('Jugar online', 'Mesas públicas', [
+      `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select><small>Si eliges “Cualquiera”, buscamos primero una mesa de 4 y después de 3 o 2.</small></div>`,
       modeDoor('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.', false, 'data-online-kind="surprise"'),
       modeDoor('public-match', '▦', 'Grandes colecciones', 'Partidas completas con temas amplios.', false, 'data-online-kind="collections"'),
       modeDoor('quick-challenges', '◫', 'Retos rápidos', 'Temas breves y concretos; entra en su zona de juego online.', false, 'data-online-kind="quick"')
@@ -101,6 +102,8 @@
     const publicEntry = event.target.closest('[data-action="public-match"][data-online-kind]');
     if (publicEntry) {
       sessionStorage.setItem('continuum-public-kind', publicEntry.dataset.onlineKind || 'surprise');
+      const cap=document.getElementById('mode-public-capacity')?.value ?? '0';
+      sessionStorage.setItem('continuum-public-capacity',cap);
     }
     const home = event.target.closest('[data-mode-home]');
     if (home) {
