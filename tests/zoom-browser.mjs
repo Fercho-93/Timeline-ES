@@ -23,6 +23,10 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url=`http://127.0.0.1:${server.address().port}/`;
 await fs.mkdir('test-results/zoom',{recursive:true});
 const records=[];
+async function openCollections(page){
+  await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
+  await page.locator('[data-action="toggle-play-catalog"][data-section="collections"]').click();
+}
 try {
  for(const [engine,type] of [['webkit',webkit],['chromium',chromium]]) {
   if (process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE !== engine) continue;
@@ -38,6 +42,7 @@ try {
    const transitionPage=await newPage({viewport:{width:414,height:714},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
    await transitionPage.goto(url);
    await transitionPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+   await openCollections(transitionPage);
    await transitionPage.locator('[data-block="historia"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
    const header=transitionPage.locator('.atlas-landscape');
@@ -118,6 +123,7 @@ try {
    const duelPage=await newPage({viewport:{width:390,height:664},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
    await duelPage.goto(url);
    await duelPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+   await openCollections(duelPage);
    await duelPage.locator('[data-block="naturaleza"]').click();
    await duelPage.locator('[data-mode="animals"]').click();
    await duelPage.locator('[data-action="solo"]').click();
@@ -155,6 +161,7 @@ try {
     });
     await page.goto(url);
     await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+    await openCollections(page);
     await page.locator('[data-block="historia"]').click();
     await page.locator('[data-mode="history"]').click();
     if(width===414) {

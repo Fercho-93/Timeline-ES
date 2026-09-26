@@ -62,7 +62,9 @@ try {
         await settle();
       }
     }
-    await page.locator('.home-door[data-action="jugar"]').click();
+    await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
+    await settle();
+    await page.locator('[data-action="toggle-play-catalog"][data-section="collections"]').click();
     await settle();
     await page.locator('[data-block="historia"]').click();
     await settle();
