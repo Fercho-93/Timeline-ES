@@ -124,8 +124,8 @@
   function rankingSummary() {
     let classic=0, quick=0;
     try {
-      const records=JSON.parse(localStorage.getItem('hilo-records-v1')||'{}');
-      const raw=records.__daily__||records.daily||{};
+      const records=JSON.parse(localStorage.getItem('hilo-retos-v1')||'{}');
+      const raw=records.retoDiario||{};
       classic=Object.values(raw.days||{}).reduce((sum,d)=>sum+(Number(d.hits)||0),0);
     } catch {}
     try {
