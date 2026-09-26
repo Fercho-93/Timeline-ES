@@ -14,6 +14,11 @@
     </button>`;
   }
 
+  function dailyFamily() {
+    const n=Number(new Date().toISOString().slice(0,10).replaceAll('-',''));
+    return n%2===0?'Grandes colecciones':'Retos rápidos';
+  }
+
   function restructureHome() {
     if (app.dataset.screen !== 'home') return;
     const doors = app.querySelector('.home-doors');
@@ -27,6 +32,7 @@
     dailyWrap.className = 'mode-daily-zone';
     dailyWrap.setAttribute('aria-label', 'Reto del día');
     dailyWrap.append(daily);
+    const family=document.createElement('p');family.className='mode-daily-family';family.innerHTML=`Hoy · <strong>${dailyFamily()}</strong> · un único reto para el ranking global`;dailyWrap.append(family);
 
     const legacyPlay = doors.querySelector('.home-door[data-action="jugar"]');
     if (legacyPlay) legacyPlay.classList.add('mode-legacy-entry');
