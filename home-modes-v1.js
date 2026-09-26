@@ -16,7 +16,8 @@
   }
 
   function dailyFamily() {
-    const n=Number(new Date().toISOString().slice(0,10).replaceAll('-',''));
+    const d=new Date(), stamp=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const n=Number(stamp);
     return n%2===0?'Grandes colecciones':'Retos rápidos';
   }
 
@@ -121,14 +122,14 @@
   }, true);
 
   function rankingSummary() {
-    const keys=['continuum-daily-records-v1','continuum-quick-history-v1'];
     let classic=0, quick=0;
     try {
-      const raw=JSON.parse(localStorage.getItem(keys[0])||'{}');
+      const records=JSON.parse(localStorage.getItem('hilo-records-v1')||'{}');
+      const raw=records.__daily__||records.daily||{};
       classic=Object.values(raw.days||{}).reduce((sum,d)=>sum+(Number(d.hits)||0),0);
     } catch {}
     try {
-      const raw=JSON.parse(localStorage.getItem(keys[1])||'[]');
+      const raw=JSON.parse(localStorage.getItem('continuum-quick-history-v1')||'[]');
       quick=(Array.isArray(raw)?raw:[]).reduce((sum,d)=>sum+(Number(d.score)||0),0);
     } catch {}
     return {classic,quick,total:classic+quick};
