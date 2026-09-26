@@ -107,6 +107,11 @@
   }
 
   app.addEventListener('click', event => {
+    const topicInput=event.target.closest('[data-public-topic]');
+    if(topicInput){
+      const checked=[...document.querySelectorAll('[data-public-topic]:checked')];
+      if(checked.length>3){topicInput.checked=false;return;}
+    }
     const publicEntry = event.target.closest('[data-action="public-match"][data-online-kind]');
     if (publicEntry) {
       sessionStorage.setItem('continuum-public-kind', publicEntry.dataset.onlineKind || 'surprise');
