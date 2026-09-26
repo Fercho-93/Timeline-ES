@@ -32,9 +32,9 @@
     choices.className = 'mode-entry-grid';
     choices.setAttribute('aria-label', 'Cómo quieres jugar');
     choices.innerHTML = [
-      modeDoor('public-match', '🌐', 'Jugar online', 'Encuentra jugadores y entra en una mesa pública.', true),
-      modeDoor('jugar', '●', 'Jugar solo', 'Grandes colecciones, rondas rápidas y Gran mezcla.'),
-      modeDoor('jugar', '◆', 'Jugar con amigos', 'Mismo móvil, sala privada, Wi‑Fi local o duelo.'),
+      modeDoor('online-hub', '🌐', 'Jugar online', 'Encuentra jugadores y entra en una mesa pública.', true),
+      modeDoor('solo-hub', '●', 'Jugar solo', 'Grandes colecciones, retos rápidos y Gran mezcla.'),
+      modeDoor('friends-hub', '◆', 'Jugar con amigos', 'Mismo móvil, sala privada, Wi‑Fi local o duelo.'),
       modeDoor('competition-menu', '♜', 'Competición', 'Varias rondas, distintas temáticas y marcador acumulado.')
     ].join('');
 
@@ -47,6 +47,61 @@
     doors.replaceChildren(dailyWrap, choices, secondary);
     doors.dataset.modesV1 = 'true';
   }
+
+  function hub(title, eyebrow, body) {
+    app.dataset.screen = 'mode-hub';
+    app.innerHTML = `<div class="shell home-shell mode-hub-shell">
+      <header class="mode-hub-head"><button class="icon-btn" data-mode-home>Volver</button><div><div class="eyebrow">${escapeHtml(eyebrow)}</div><h1>${escapeHtml(title)}</h1></div></header>
+      <section class="mode-hub-list">${body}</section>
+    </div>`;
+  }
+
+  function existing(action, icon, title, text) {
+    return modeDoor(action, icon, title, text);
+  }
+
+  function openOnlineHub() {
+    hub('Jugar online', 'Mesas públicas', [
+      existing('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.'),
+      existing('public-match', '▦', 'Grandes colecciones', 'Partidas completas con temas amplios. La selección temática se ampliará con votación.'),
+      existing('quick-challenges', '◫', 'Reto rápido', 'Temas breves y concretos. El matchmaking específico se activará en la siguiente fase.')
+    ].join(''));
+  }
+
+  function openSoloHub() {
+    hub('Jugar solo', 'A tu ritmo', [
+      existing('jugar', '▦', 'Grandes colecciones', 'Mazos amplios de historia, ciencia, naturaleza, geografía y más.'),
+      existing('quick-challenges', '◫', 'Retos rápidos', 'Temas muy concretos para partidas cortas.'),
+      existing('jugar', '∞', 'Gran mezcla', 'Explora la colección transversal de cartas.')
+    ].join(''));
+  }
+
+  function openFriendsHub() {
+    hub('Jugar con amigos', 'Juntos', [
+      existing('jugar', '◉', 'Un solo móvil', 'Pasad el teléfono en cada turno.'),
+      existing('jugar', '⌁', 'Sala privada', 'Cada persona con su móvil mediante código o enlace.'),
+      existing('jugar', '⌂', 'Wi‑Fi local', 'Varios móviles cerca, sin depender de internet.'),
+      existing('jugar', '⚔', 'Duelo por turnos', 'Reta a una persona y jugad cuando podáis.')
+    ].join(''));
+  }
+
+  app.addEventListener('click', event => {
+    const home = event.target.closest('[data-mode-home]');
+    if (home) {
+      event.preventDefault();
+      location.reload();
+      return;
+    }
+    const target = event.target.closest('[data-action]');
+    if (!target) return;
+    const action = target.dataset.action;
+    if (!['online-hub','solo-hub','friends-hub'].includes(action)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (action === 'online-hub') openOnlineHub();
+    else if (action === 'solo-hub') openSoloHub();
+    else openFriendsHub();
+  }, true);
 
   const observer = new MutationObserver(restructureHome);
   observer.observe(app, { childList: true, subtree: true });
