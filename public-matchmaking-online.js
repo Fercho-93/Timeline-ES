@@ -96,9 +96,19 @@ function watchPublicRoom(code) {
   return stop;
 }
 
-function preferredCapacity() {
-  const value=Number(sessionStorage.getItem('continuum-public-capacity')||0);
-  return [2,3,4].includes(value)?value:4;
+function capacityOrder(value) {
+  const n=Number(value);
+  if([2,3,4].includes(n)) return [n];
+  return [4,3,2];
+}
+
+async function findFlexible(mode, capacityInput) {
+  let lastError=null;
+  for(const capacity of capacityOrder(capacityInput)){
+    try { return {code:await findOrCreate(mode,capacity),capacity}; }
+    catch(error){ lastError=error; }
+  }
+  throw lastError || Error('NO_PUBLIC_TABLE');
 }
 
 async function startQuickMatch(capacity) {
@@ -111,7 +121,8 @@ async function startQuickMatch(capacity) {
     const candidates=Object.keys(CT.MODES||{}).filter(key=>key!=='mixed' && (!CT.Cartera?.tiene || CT.Cartera.tiene(key)));
     const randomMode=candidates[Math.floor(Math.random()*Math.max(1,candidates.length))] || CT.DEFAULT_MODE;
     const mode=intent==='surprise' ? randomMode : (document.getElementById('public-match-mode')?.value || CT.DEFAULT_MODE);
-    const code=await findOrCreate(mode,capacity);
+    const found=await findFlexible(mode,capacity);
+    const code=found.code;
     CT.Storage.setItem('continuum-last-room',code);
     const online=await import('./online.js');
     await online.openOnlineMode({roomCode:code,modeKey:mode});
@@ -166,7 +177,7 @@ function refresh() {
   }
 }
 new MutationObserver(refresh).observe(document.getElementById('app'),{childList:true,subtree:true});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(!b)return;const raw=Number(document.getElementById('public-match-capacity')?.value||0);const capacity=raw||preferredCapacity();sessionStorage.setItem('continuum-public-capacity',String(capacity));void startQuickMatch(capacity);});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(!b)return;const raw=Number(document.getElementById('public-match-capacity')?.value||0);sessionStorage.setItem('continuum-public-capacity',String(raw));void startQuickMatch(raw);});
 refresh();
 
 export { findOrCreate, watchPublicRoom };
