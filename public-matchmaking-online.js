@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-client.js';
-import { doc, getDoc, onSnapshot, runTransaction, serverTimestamp, writeBatch } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { doc, getDoc, onSnapshot, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity } from './public-matchmaking.js';
 
 const CT = window.CONTINUUM;
@@ -40,37 +40,27 @@ async function findOrCreate(mode, capacityInput) {
   const fingerprint=CT.deckFingerprint(mode);
   const queueKey=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
   const queueRef=doc(db,'publicQueues',queueKey);
-  const qSnap=await getDoc(queueRef);
-  if(qSnap.exists() && qSnap.data().status==='waiting'){
-    const existing=await runTransaction(db,async tx=>{
-      const freshQueue=await tx.get(queueRef);
-      if(!freshQueue.exists() || freshQueue.data().status!=='waiting') return null;
-      const q=freshQueue.data(), roomRef=doc(db,'rooms',q.roomCode);
-      const roomSnap=await tx.get(roomRef);
-      if(!roomSnap.exists()) return null;
-      const room=roomSnap.data();
-      if(room.playerOrder?.includes(user.uid)) return room.roomCode;
-      if(!isJoinablePublicRoom(room,{mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint})) return null;
-      const order=[...room.playerOrder,user.uid];
-      tx.update(roomRef,{
-        players:{...room.players,[user.uid]:{name:alias(),avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
-        playerOrder:order,version:room.version+1,updatedAt:serverTimestamp()
+  return runTransaction(db,async tx=>{
+    const freshQueue=await tx.get(queueRef);
+    const oldRef=freshQueue.exists()?doc(db,'rooms',freshQueue.data().roomCode):null;
+    const roomSnap=oldRef?await tx.get(oldRef):null;
+    const oldRoom=roomSnap?.exists()?roomSnap.data():null;
+    if(oldRoom?.playerOrder?.includes(user.uid)) return oldRoom.roomCode;
+    if(freshQueue.exists() && freshQueue.data().status==='waiting'
+        && isJoinablePublicRoom(oldRoom,{mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint})){
+      const order=[...oldRoom.playerOrder,user.uid];
+      tx.update(oldRef,{
+        players:{...oldRoom.players,[user.uid]:{name:alias(),avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
+        playerOrder:order,version:oldRoom.version+1,updatedAt:serverTimestamp()
       });
       if(order.length===capacity) tx.update(queueRef,{status:'full',updatedAt:serverTimestamp()});
-      return room.roomCode;
-    });
-    if(existing) return existing;
-  }
-  // La creación usa un batch, no una transacción con lecturas después de escrituras.
-  // Firestore rechaza ese patrón en producción aunque el emulador de reglas valide los datos.
-  const code=makePublicRoomCode();
-  const roomRef=doc(db,'rooms',code);
-  const room=roomData(code,mode,capacity,user.uid);
-  const batch=writeBatch(db);
-  batch.set(roomRef,room);
-  batch.set(queueRef,{queueKey,roomCode:code,mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint,status:'waiting',updatedAt:serverTimestamp()});
-  await batch.commit();
-  return code;
+      return oldRoom.roomCode;
+    }
+    const code=makePublicRoomCode(),roomRef=doc(db,'rooms',code);
+    tx.set(roomRef,roomData(code,mode,capacity,user.uid));
+    tx.set(queueRef,{queueKey,roomCode:code,mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint,status:'waiting',updatedAt:serverTimestamp()});
+    return code;
+  });
 }
 
 function watchPublicRoom(code) {
@@ -115,6 +105,20 @@ async function findFlexible(mode, capacityInput) {
     if(snap.exists() && snap.data().status==='waiting') return {code:await findOrCreate(mode,capacity),capacity};
   }
   return {code:await findOrCreate(mode,4),capacity:4};
+}
+
+async function findAcrossModes(modes, capacityInput) {
+  const pool=[...new Set(modes.filter(mode=>CT.MODES?.[mode] && mode!=='mixed'))];
+  if(!pool.length) throw Error('NO_PUBLIC_MODES');
+  const capacities=capacityOrder(capacityInput);
+  for(const capacity of capacities){
+    for(const mode of pool){
+      const key=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(mode)});
+      const snap=await getDoc(doc(db,'publicQueues',key));
+      if(snap.exists() && snap.data().status==='waiting') return {mode,...await findFlexible(mode,capacity)};
+    }
+  }
+  return {mode:pool[0],...await findFlexible(pool[0],capacities[0])};
 }
 
 async function startQuickMatch(capacity) {
@@ -191,4 +195,4 @@ new MutationObserver(refresh).observe(document.getElementById('app'),{childList:
 document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(!b)return;const raw=Number(document.getElementById('public-match-capacity')?.value||0);sessionStorage.setItem('continuum-public-capacity',String(raw));void startQuickMatch(raw);});
 refresh();
 
-export { findOrCreate, findFlexible, watchPublicRoom };
+export { findOrCreate, findFlexible, findAcrossModes, watchPublicRoom };

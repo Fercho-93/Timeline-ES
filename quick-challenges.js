@@ -35,7 +35,23 @@
       history.unshift({id:key,date:day(),kind:record.config.kind || 'network',rounds:record.config.rounds.length,score:Math.max(...state.players.map(p=>p.score)),players:state.players.map(p=>p.name)});
       CT.Storage.setItem(HISTORY, JSON.stringify(history.slice(0, 50)));
     }
+    if(record.config.kind==='daily' && record.config.day===day()){
+      const key='hilo-retos-v1', all=readJSON(key,{}) || {};
+      const daily=all.retoDiario || {best:0,streak:0,lastDay:'',days:{}};
+      daily.days ||= {};
+      if(!daily.days[day()]){
+        const hits=state.players[0].score;
+        const total=E.challenge(record.config.rounds[0].id).cards.length-1;
+        const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+        const previous=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+        daily.streak=daily.lastDay===previous?(daily.streak||0)+1:1;
+        daily.lastDay=day();daily.best=Math.max(daily.best||0,hits);
+        daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id};
+        all.retoDiario=daily;CT.Storage.setItem(key,JSON.stringify(all));
+      }
+    }
     record.historySaved = true;
+    if(!room) CT.Storage.setItem(KEY, JSON.stringify(record));
   }
   function statsPanel() {
     const history = quickHistory(), games = history.length, points = history.reduce((n,item)=>n + (Number(item.score)||0),0), best = history.reduce((n,item)=>Math.max(n,Number(item.score)||0),0);
@@ -110,9 +126,9 @@
     else lobby(code || connection?.code);
   }
   function lobby(code) {
-    state=null;const host=myId===room.host;
+    state=null;const host=myId===room.host, isPublic=room.matchmaking==='public';
     shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Sala de Retos rápidos</h2><div class="panel"><p>${code?`Código: <strong>${esc(code)}</strong>`:'Sala en la red Wi-Fi local'}</p><ul>${room.names.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><p>${room.capacity===2 ? "Dos participantes." : `De 2 a ${room.capacity} participantes.`} ${host?'Empieza cuando estéis todos.':'Quien creó la sala elige cuándo empezar.'}</p><p class="hint">El primer turno rotará en cada reto. La sala se puede recuperar después desde Retos rápidos.</p>
-    ${host ? button('start-room','Sortear y empezar','btn btn-primary btn-block') : ''}
+    ${host && !isPublic ? button('start-room','Sortear y empezar','btn btn-primary btn-block') : ''}
     ${connection?.kind==='local'&&host ? button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}
     ${code?button('share-room','Compartir enlace de sala','btn btn-secondary btn-block'):''}
     ${button('formats','Volver a los formatos','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
@@ -333,8 +349,13 @@
   CT.Quick = {
     leave:stopNetwork,
     openPublic,
+    openSolo(renderPage){paint=renderPage;format='free';freeSetup();},
     startDaily(dayValue, renderPage) {
       paint=renderPage; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
+      const saved=load();
+      if(saved?.config?.kind==='daily' && saved.config.day===dayValue && !saved.historySaved){
+        record=saved;state=E.restore(record);render();return;
+      }
       prepare(dailyQuick(dayValue));
     },
     open(renderPage) {paint = renderPage; state = null; record = null; selected = null; slot = null;formatMenu();const params=new URLSearchParams(location.hash.slice(1));try{if(params.has('quick-duel'))acceptDuel();else if(params.has('quick-room')){networkSetup('internet');app().querySelector('#quick-net-code').value=params.get('quick-room');}}catch(e){errorNotice(e);}},

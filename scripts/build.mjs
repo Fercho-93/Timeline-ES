@@ -19,7 +19,7 @@ const dist = path.join(root, "dist");
 const FILES = [
   "quick-room.js", "quick-network.js", "quick-online.js", "quick-challenges.css", "quick-challenges-data.js", "quick-challenges-engine.js", "quick-challenges.js",
   "index.html", "actualizar.html", "privacidad.html", "manifest.webmanifest", "icon.svg",
-  "splash.css", "splash.js", "styles.css", "edition.css", "service-worker-258.js",
+  "splash.css", "splash.js", "styles.css", "edition.css", "home-modes-v1.css", "home-modes-v1.js", "service-worker-258.js",
   "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",
   "lifespan.js", "speed.js", "inventos.js", "mundo.js", "astronomy.js",
   "medicine.js", "countries.js", "population.js", "idiomas.js", "distances.js", "modes.js",

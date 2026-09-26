@@ -172,4 +172,17 @@ w = boot('{invalid'); openQuick();
 assert.match(w.document.querySelector('#app').textContent, /No se ha podido recuperar/);
 assert.equal(w.document.querySelector('[data-quick="resume"]'), null);
 w.close();
+// El reto diario rápido guarda un solo resultado normalizable y la racha en
+// el mismo registro que el reto diario de grandes colecciones.
+w=boot();CT=w.CONTINUUM;
+const dailyDate=new Date().toLocaleDateString('sv-SE');
+CT.Quick.startDaily(dailyDate,(markup,playing)=>{const app=w.document.getElementById('app');app.innerHTML=markup;app.dataset.screen=playing?'quick-game':'quick-challenges';});
+click('[data-quick="ready"]');
+click('[data-quick="bank"]');
+const daily=JSON.parse(w.localStorage.getItem('hilo-retos-v1')).retoDiario;
+assert.equal(daily.days[dailyDate].family,'quick');
+assert.equal(daily.days[dailyDate].hits,0);
+assert.ok(daily.days[dailyDate].total>0);
+assert.equal(daily.streak,1);
+w.close();
 console.log('Retos rápidos: reglas, empates, orden descendente, turnos, recuperación y tres rondas completas: OK');

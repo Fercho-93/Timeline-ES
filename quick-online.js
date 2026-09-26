@@ -1,5 +1,5 @@
 import {auth, db} from './firebase-client.js';
-import {doc, getDoc, runTransaction, onSnapshot, serverTimestamp, writeBatch} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import {doc, getDoc, runTransaction, onSnapshot, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
@@ -10,24 +10,37 @@ async function publicConnect({name,capacity=4,onChange,onError}) {
   let chosen=null;
   for(const cap of capacities){
     const key=publicKey(cap), qref=doc(db,'quickPublicQueues',key), qs=await getDoc(qref);
-    if(qs.exists()&&qs.data().status==='waiting'){chosen={cap,key,code:qs.data().code};break;}
+    if(qs.exists()&&qs.data().status==='waiting'){chosen={cap,key};break;}
   }
-  if(!chosen){const cap=capacities[0],key=publicKey(cap),code=Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%31]).join('');chosen={cap,key,code};}
-  const ref=doc(db,'quickRooms',chosen.code), qref=doc(db,'quickPublicQueues',chosen.key);
-  await runTransaction(db,async tx=>{
-    const snap=await tx.get(ref);
-    if(!snap.exists()){
-      const room={...R.create(uid,name,chosen.cap),catalog:CT.QuickNetwork.fingerprint(),matchmaking:'public',updatedAt:serverTimestamp()};
-      tx.set(ref,room);tx.set(qref,{code:chosen.code,status:'waiting',capacity:chosen.cap,updatedAt:serverTimestamp()});return;
+  if(!chosen){const cap=capacities[0];chosen={cap,key:publicKey(cap)};}
+  const qref=doc(db,'quickPublicQueues',chosen.key);
+  const code=await runTransaction(db,async tx=>{
+    const queue=await tx.get(qref);
+    const current=queue.exists()&&queue.data().status==='waiting'
+      ? doc(db,'quickRooms',queue.data().code) : null;
+    const snap=current?await tx.get(current):null;
+    const room=snap?.exists()?snap.data():null;
+    if(room && room.catalog===CT.QuickNetwork.fingerprint() && room.matchmaking==='public'
+        && room.capacity===chosen.cap && room.phase==='lobby' && room.members.length<chosen.cap){
+      if(!room.members.includes(uid)){
+        const next=R.reduce(room,uid,{type:'join',name});
+        tx.update(current,{...next,updatedAt:serverTimestamp()});
+        if(next.members.length===chosen.cap)tx.update(qref,{status:'full',updatedAt:serverTimestamp()});
+      }
+      return queue.data().code;
     }
-    const room=snap.data(); if(room.catalog!==CT.QuickNetwork.fingerprint())throw Error('Actualizad Continuum.');
-    if(!room.members.includes(uid)){const next=R.reduce(room,uid,{type:'join',name});tx.update(ref,{...next,updatedAt:serverTimestamp()});if(next.members.length>=chosen.cap)tx.update(qref,{status:'full',updatedAt:serverTimestamp()});}
+    const fresh=Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%31]).join('');
+    const ref=doc(db,'quickRooms',fresh);
+    tx.set(ref,{...R.create(uid,name,chosen.cap),catalog:CT.QuickNetwork.fingerprint(),matchmaking:'public',updatedAt:serverTimestamp()});
+    tx.set(qref,{code:fresh,status:'waiting',capacity:chosen.cap,updatedAt:serverTimestamp()});
+    return fresh;
   });
+  const ref=doc(db,'quickRooms',code);
   let latest=null,started=false;
-  const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,chosen.code);
-    if(latest.host===uid&&latest.members.length===chosen.cap&&!latest.config&&!started){started=true;const count=3;const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,count);void api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+chosen.code});}
+  const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);
+    if(latest.host===uid&&latest.members.length===chosen.cap&&!latest.config&&!started){started=true;const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,3);void api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code}).catch(onError);}
   }catch(e){onError(e);}},onError);
-  const api={kind:'internet',public:true,code:chosen.code,get host(){return latest?.host===uid;},close:stop,async act(action){if(!latest)throw Error('Espera a que se cargue la mesa.');const revision=latest.revision;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La mesa ya no existe.');const next=R.reduce(snap.data(),uid,action,revision);tx.update(ref,{...next,updatedAt:serverTimestamp()});});}};
+  const api={kind:'internet',public:true,code,get host(){return latest?.host===uid;},close:stop,async act(action){if(!latest)throw Error('Espera a que se cargue la mesa.');const revision=latest.revision;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La mesa ya no existe.');const next=R.reduce(snap.data(),uid,action,revision);tx.update(ref,{...next,updatedAt:serverTimestamp()});});}};
   return api;
 }
 

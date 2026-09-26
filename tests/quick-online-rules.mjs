@@ -33,7 +33,7 @@ try {
   await assertFails(write(host,{...next,revision:next.revision+1,commands:[...next.commands,{type:'next'}],phase:'turn'}));
   // The production adapter uses the real SDK against the emulator, including listeners,
   // concurrent join transactions, late reconnect and stale-turn rejection.
-  const source=fs.readFileSync('quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace('export async function connect','async function connect');
+  const source=fs.readFileSync('quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
   w.CONTINUUM.QuickNetwork={fingerprint:()=>1};
   w.CONTINUUM.QuickRoom={...R,create:(...args)=>JSON.parse(JSON.stringify(R.create(...args))),reduce:(...args)=>JSON.parse(JSON.stringify(R.reduce(...args)))};
   const adapter=(uid,db)=>new Function('auth','db','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connect;')({currentUser:{uid},authStateReady:async()=>{}},db,doc,runTransaction,onSnapshot,serverTimestamp,w);
@@ -49,5 +49,19 @@ try {
   const rejoined=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.rejoined=r,onError:e=>failures.push(e)});
   await wait(()=>rooms.rejoined?.actor==='guest');await rejoined.act({type:'bank'});await wait(()=>rooms.h?.phase==='finished');
   assert.deepEqual(failures,[]);h.close();rejoined.close();
+  // La primera persona crea sala y cola en una transacción; la segunda ocupa la
+  // última plaza y cierra la cola antes de que una tercera pueda unirse.
+  const publicAdapter=(uid,db)=>new Function('auth','db','doc','getDoc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connectPublic;')(
+    {currentUser:{uid},authStateReady:async()=>{}},db,doc,getDoc,runTransaction,onSnapshot,serverTimestamp,w);
+  const publicRooms={};
+  const first=await publicAdapter('host',host)({name:'Ana',capacity:2,onChange:r=>publicRooms.host=r,onError:e=>failures.push(e)});
+  const second=await publicAdapter('guest',guest)({name:'Bea',capacity:2,onChange:r=>publicRooms.guest=r,onError:e=>failures.push(e)});
+  assert.equal(first.code,second.code);
+  await wait(()=>publicRooms.host?.members.length===2 && publicRooms.guest?.members.length===2);
+  const queue=await getDoc(doc(host,'quickPublicQueues','quick:2:v1:1'));
+  assert.equal(queue.data().status,'full');
+  await wait(()=>publicRooms.guest?.phase==='turn');
+  assert.deepEqual(failures,[]);
+  first.close();second.close();
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
 } finally {await env.cleanup();}

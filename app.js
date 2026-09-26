@@ -331,6 +331,19 @@
   }
 
   function playChoices(resume) {
+    const entry=sessionStorage.getItem('continuum-entry-route');
+    if(entry && ['collections','mixed','local','online','wifi','duel'].includes(entry)){
+      const options={
+        collections:['solo','Jugar solo','Una partida en esta colección.'],
+        mixed:['solo','Jugar solo','Una partida de Gran mezcla.'],
+        local:['setup','Un solo móvil','Pasad el teléfono en cada turno.'],
+        online:['online','Sala privada','Crea una sala o entra con un código.'],
+        wifi:['local-multiplayer','Wi‑Fi local','Conecta los móviles en la misma red.'],
+        duel:['duel-home','Duelo por turnos','Reta a un amigo por enlace.']
+      };
+      const [action,title,description]=options[entry];
+      return `<section class="play-choices"><h2>¿Cómo quieres jugar?</h2><button class="play-choice primary" data-action="${action}"><span><b>${title}</b><small>${description}</small></span><i aria-hidden="true">→</i></button>${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ''}</section>`;
+    }
     const multi = `<button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Crea una sala privada o entra con un código.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="public-match"><span class="choice-icon">${playIcon("online")}</span><span><b>Partida rápida</b><small>Encuentra una mesa pública y juega online con otros jugadores.</small></span><i aria-hidden="true">→</i></button>
@@ -472,7 +485,9 @@
   }
   function quickChallenges() {
     screen = "quick-challenges";
-    CT.Quick.open((html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);});
+    const render=(html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);};
+    if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
+    else CT.Quick.open(render);
   }
 
   // ── Bienvenida ─────────────────────────────────────────────────────────────────────
@@ -532,6 +547,7 @@
   // La portada tiene tres puertas y nada más: jugar, el reto del día y el atlas. Encima,
   // solo cuando hay algo pendiente, el aviso de los duelos en los que te toca.
   function home() {
+    sessionStorage.removeItem('continuum-entry-route');
     CT.Quick.leave();
     pendingTournament = null;
     screen = "home";
@@ -569,7 +585,7 @@
     // Sin racha no se dice nada: la línea solo aparece cuando hay días que contar.
     const rachaTexto = racha ? `<span class="home-daily-streak">${glyph(GLYPHS.racha)}<span>${racha} ${racha === 1 ? "día seguido" : "días seguidos"}</span></span>` : "";
     const detalle = hecho
-      ? `${escapeHtml(CT.mode(dailyModeKey(dia)).name)}: <strong>${hecho.hits} de ${hecho.total}</strong>`
+      ? `${hecho.family === 'quick' ? 'Reto rápido' : escapeHtml(CT.mode(dailyModeKey(dia)).name)}: <strong>${hecho.hits} de ${hecho.total}</strong>`
       : "Un mazo sorpresa cada día.";
     const copy = `<b>Reto diario</b>
       <small>${detalle}</small>
@@ -621,7 +637,7 @@
   function shareDailyFromHome() {
     const dia = today(), records = dailyRecords(), hecho = records.days?.[dia];
     if (!hecho) return;
-    compartir(shareText(CT.mode(dailyModeKey(dia)).name, dia, hecho.hits, hecho.total, hecho.sequence || [], records.streak), "Resultado copiado");
+    compartir(shareText(hecho.family === 'quick' ? 'Reto rápido' : CT.mode(dailyModeKey(dia)).name, dia, hecho.hits, hecho.total, hecho.sequence || [], records.streak), "Resultado copiado");
   }
 
   // El aviso solo existe cuando hay algo que hacer, y lleva siempre a la lista de duelos:
@@ -676,8 +692,8 @@
       <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige tu próxima partida</div><h1 data-focus tabindex="-1">¿Qué te apetece jugar?</h1><p>Explora un tema, prueba un reto o lánzate a competir.</p></header>
       <div class="play-catalog">
         ${catalogSection("collections", "01", "Grandes colecciones", "Historia, ciencia, naturaleza y mucho más.", "Explorar los mazos")}
-        ${catalogSection("quick", "02", "Retos rápidos", "Temas concretos para una partida diferente.", "Jugar un reto")}
-        ${catalogSection("competition", "03", "Competición", "Pon a prueba lo que sabes, ronda a ronda.", "Elegir cómo competir")}
+        ${sessionStorage.getItem('continuum-entry-route') ? '' : catalogSection("quick", "02", "Retos rápidos", "Temas concretos para una partida diferente.", "Jugar un reto")}
+        ${sessionStorage.getItem('continuum-entry-route') ? '' : catalogSection("competition", "03", "Competición", "Pon a prueba lo que sabes, ronda a ronda.", "Elegir cómo competir")}
       </div>
       ${homeNav()}
     </div>`);
@@ -2114,6 +2130,7 @@
   }
 
   function startDaily() {
+    if (dailyRecords().days?.[today()]) { home(); return; }
     if (dailyFamily() === 'quick') {
       screen = 'quick-challenges';
       CT.Quick.startDaily(today(), (html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); });
@@ -3578,9 +3595,17 @@
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Buscando partida</h2><p>Buscando una mesa pública compatible…</p></div></section></div>`);
     try {
       const matchmaking = await import("./public-matchmaking-online.js");
-      const code = await matchmaking.findOrCreate(selectedModeKey, 4);
+      const intent=sessionStorage.getItem('continuum-public-kind');
+      const capacity=Number(sessionStorage.getItem('continuum-public-capacity') ?? 4);
+      let preferred=[];
+      try{preferred=JSON.parse(sessionStorage.getItem('continuum-public-topics')||'[]');}catch{}
+      const available=Object.keys(CT.MODES).filter(mode=>mode!=='mixed' && (!CT.Cartera?.tiene || CT.Cartera.tiene(mode)));
+      const pool=intent==='collections-vote' && preferred.length ? preferred.filter(mode=>available.includes(mode))
+        : intent ? available : [selectedModeKey];
+      const found=await matchmaking.findAcrossModes(pool.length?pool:[selectedModeKey],capacity);
+      const {code,mode}=found;
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode: code, modeKey: selectedModeKey, onBack: playMenu });
+      await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: playMenu });
       matchmaking.watchPublicRoom?.(code);
     } catch (error) {
       console.error("PUBLIC_MATCH_ERROR", error?.code || "", error?.message || error);
@@ -3708,13 +3733,13 @@
     else if (action === 'solo-options') soloOptions();
     else if (action === "retry-online") launchOnline();
     else if (action === "resume-room") launchOnline(CT.Storage.getItem("continuum-last-room"));
-    else if (action === "home") home();
+    else if (action === "home") { sessionStorage.removeItem('continuum-entry-route'); home(); }
     else if (action === "back-menu") backMenu();
     else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "instant" }); }
     // La enciclopedia se abre desde el Atlas, y al cerrarla se vuelve a él.
     else if (action === "home-encyclopedia") openEnciclopedia("all", { returnTo: screen === "perfil" ? "perfil" : "home" });
     else if (action === "collection-back") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
-    else if (action === "jugar") { jugarSection = null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = false; jugarView(); window.scrollTo(0, 0); }
+    else if (action === "jugar") { jugarSection = sessionStorage.getItem('continuum-entry-route') ? 'collections' : null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = !!jugarSection; jugarView(); window.scrollTo(0, 0); }
     else if (action === "toggle-play-catalog") toggleCatalog(target.dataset.section);
     else if (action === "duels-open") openPendingDuels();
     else if (action === "duels-list") duelsView();
@@ -3908,7 +3933,7 @@
     else if (action === 'perfil') perfilView();
     else if (action === 'daily') { CT.closeDialog(); startDaily(); }
     else if (action === 'jugar') jugarView();
-    else { homeDestination = 'home'; home(); window.scrollTo(0, 0); }
+    else { sessionStorage.removeItem('continuum-entry-route'); homeDestination = 'home'; home(); window.scrollTo(0, 0); }
   };
   CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro", "quick-game", "quick-lobby"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();

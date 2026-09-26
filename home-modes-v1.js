@@ -34,7 +34,7 @@
     dailyWrap.className = 'mode-daily-zone';
     dailyWrap.setAttribute('aria-label', 'Reto del día');
     dailyWrap.append(daily);
-    const family=document.createElement('p');family.className='mode-daily-family';family.innerHTML=`Hoy · <strong>${dailyFamily()}</strong> · un único reto para el ranking global`;dailyWrap.append(family);
+    const family=document.createElement('p');family.className='mode-daily-family';family.innerHTML=`Hoy · <strong>${dailyFamily()}</strong> · un único reto del día`;dailyWrap.append(family);
 
     const legacyPlay = doors.querySelector('.home-door[data-action="jugar"]');
     if (legacyPlay) legacyPlay.classList.add('mode-legacy-entry');
@@ -76,7 +76,7 @@
     hub('Jugar online', 'Mesas públicas', [
       `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select><small>Si eliges “Cualquiera”, buscamos primero una mesa de 4 y después de 3 o 2.</small></div>`,
       modeDoor('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.', false, 'data-online-kind="surprise"'),
-      modeDoor('online-collections', '▦', 'Grandes colecciones', 'Elige tres temas candidatos y la mesa sortea uno para todos.', false, 'data-online-kind="collections"'),
+      modeDoor('online-collections', '▦', 'Grandes colecciones', 'Elige hasta tres temas entre los que buscar mesa.', false, 'data-online-kind="collections"'),
       modeDoor('quick-public', '◫', 'Retos rápidos', 'Temas breves y concretos con jugadores aleatorios.', false, 'data-online-kind="quick"')
     ].join(''));
   }
@@ -84,9 +84,9 @@
   function openOnlineCollections() {
     const modes=Object.entries(window.CONTINUUM?.MODES||{}).filter(([key])=>key!=='mixed').slice(0,12);
     hub('Grandes colecciones', 'Mesa pública · temas', `
-      <div class="mode-topic-picker"><p>Marca hasta 3 temas. Si no eliges ninguno, Continuum escogerá candidatos al azar.</p>
+      <div class="mode-topic-picker"><p>Marca hasta 3 temas. Buscaremos mesa en esos temas; si no eliges ninguno, buscaremos en todas las colecciones.</p>
       <div class="mode-topic-grid">${modes.map(([key,m])=>`<label><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
-      <button class="mode-entry mode-entry-featured" data-action="public-match" data-online-kind="collections-vote"><span class="mode-entry-icon">⚡</span><span class="mode-entry-copy"><b>Buscar mesa</b><small>Un único tema será común para toda la mesa.</small></span><span class="mode-entry-arrow">→</span></button></div>`);
+      <button class="mode-entry mode-entry-featured" data-action="public-match" data-online-kind="collections-vote"><span class="mode-entry-icon">⚡</span><span class="mode-entry-copy"><b>Buscar mesa</b><small>La mesa compartirá un único tema.</small></span><span class="mode-entry-arrow">→</span></button></div>`);
   }
 
   function openSoloHub() {
@@ -101,7 +101,7 @@
     hub('Jugar con amigos', 'Juntos', [
       modeDoor('jugar', '◉', 'Un solo móvil', 'Pasad el teléfono en cada turno.', false, 'data-friend-route="local"'),
       modeDoor('jugar', '⌁', 'Sala privada', 'Cada persona con su móvil mediante código o enlace.', false, 'data-friend-route="online"'),
-      existing('jugar', '⌂', 'Wi‑Fi local', 'Varios móviles cerca, sin depender de internet.'),
+      modeDoor('jugar', '⌂', 'Wi‑Fi local', 'Varios móviles cerca, sin depender de internet.', false, 'data-friend-route="wifi"'),
       modeDoor('jugar', '⚔', 'Duelo por turnos', 'Reta a una persona y jugad cuando podáis.', false, 'data-friend-route="duel"')
     ].join(''));
   }
@@ -117,15 +117,13 @@
       sessionStorage.setItem('continuum-public-kind', publicEntry.dataset.onlineKind || 'surprise');
       const topics=[...document.querySelectorAll('[data-public-topic]:checked')].slice(0,3).map(x=>x.value);
       if(topics.length) sessionStorage.setItem('continuum-public-topics',JSON.stringify(topics)); else sessionStorage.removeItem('continuum-public-topics');
-      const cap=document.getElementById('mode-public-capacity')?.value ?? '0';
+      const cap=document.getElementById('mode-public-capacity')?.value ?? sessionStorage.getItem('continuum-public-capacity') ?? '0';
       sessionStorage.setItem('continuum-public-capacity',cap);
     }
     const home = event.target.closest('[data-mode-home]');
     if (home) {
       event.preventDefault();
-      const nativeHome=document.querySelector('.home-nav [data-action="home-top"]');
-      if(nativeHome){ nativeHome.click(); return; }
-      history.back();
+      window.CONTINUUM?.localNavigate?.('home');
       return;
     }
     const routed=event.target.closest('[data-solo-route],[data-friend-route]');
@@ -137,10 +135,12 @@
     const target = event.target.closest('[data-action]');
     if (!target) return;
     const action = target.dataset.action;
+    if(action==='online-collections') sessionStorage.setItem('continuum-public-capacity',document.getElementById('mode-public-capacity')?.value ?? '0');
     if(action==='quick-public'){
       event.preventDefault();event.stopImmediatePropagation();
       const cap=Number(document.getElementById('mode-public-capacity')?.value||sessionStorage.getItem('continuum-public-capacity')||0);
-      window.CONTINUUM.Quick.openPublic((html,playing)=>{app.dataset.screen=playing?'quick-game':'quick-lobby';app.innerHTML=html;},cap).catch(()=>{});return;
+      window.CONTINUUM.Quick.openPublic((html,playing)=>{app.dataset.screen=playing?'quick-game':'quick-lobby';app.innerHTML=html;},cap)
+        .catch(error=>{console.error('QUICK_PUBLIC_MATCH_ERROR',error);openOnlineHub();const note=document.createElement('p');note.setAttribute('role','alert');note.textContent=error?.message || 'No se pudo encontrar una mesa. Inténtalo de nuevo.';app.querySelector('.mode-hub-list')?.prepend(note);});return;
     }
     if (!['online-hub','online-collections','solo-hub','friends-hub'].includes(action)) return;
     event.preventDefault();
@@ -157,11 +157,11 @@
     try {
       const records=JSON.parse(localStorage.getItem('hilo-retos-v1')||'{}');
       const raw=records.retoDiario||{};
-      classic=Object.entries(raw.days||{}).filter(([date])=>date.startsWith(seasonKey())).reduce((sum,[,d])=>sum+(Number(d.hits)||0),0);
-    } catch {}
-    try {
-      const raw=JSON.parse(localStorage.getItem('continuum-quick-history-v1')||'[]');
-      quick=(Array.isArray(raw)?raw:[]).filter(d=>String(d.date||'').startsWith(seasonKey())).reduce((sum,d)=>sum+(Number(d.score)||0),0);
+      for(const [date,result] of Object.entries(raw.days||{})){
+        if(!date.startsWith(seasonKey()) || !(Number(result.total)>0))continue;
+        const points=Math.round(100*Math.max(0,Math.min(1,Number(result.hits)/Number(result.total))));
+        if(result.family==='quick')quick+=points;else classic+=points;
+      }
     } catch {}
     return {classic,quick,total:classic+quick};
   }
@@ -171,7 +171,7 @@
     const doors=app.querySelector('.home-doors'); if(!doors)return;
     const r=rankingSummary(), box=document.createElement('section');
     box.className='mode-ranking-summary';
-    box.innerHTML=`<div><small>TEMPORADA ${seasonKey()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
+    box.innerHTML=`<div><small>TUS RETOS · ${seasonKey()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
     doors.append(box);
   }
 

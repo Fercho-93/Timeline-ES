@@ -54,6 +54,8 @@ try {
   check("título de las auditorías", read("VERIFICACION_CORRECCIONES.md").startsWith(`# Correcciones de las auditorías de ${brand}\n`));
   for (const script of w.document.querySelectorAll("script[src]:not([type=\"module\"])")) w.eval(read(script.getAttribute("src")));
   checkScreen("Inicio");
+  click("jugar");
+  click("toggle-play-catalog");
   openSelectedCollection();
   click("set-mode");
   checkScreen("Menú de formatos");
