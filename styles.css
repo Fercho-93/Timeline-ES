@@ -1098,14 +1098,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
 .demo-premio { position: absolute; right: 14px; bottom: 12px; padding: 4px 10px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 700; font-size: .88rem; animation: demo-suma 3.6s var(--ease-out) infinite; }
 @keyframes demo-suma { 0%, 62% { opacity: 0; transform: translateY(8px) scale(.85); } 74%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 
-/* Tres, dos, uno: ocupa la pantalla entera para que no haya nada más que mirar. */
-.overlay-cuenta { background: rgba(35,27,19,.86); }
-.cuenta { display: grid; place-items: center; }
-.cuenta-numero { display: block; color: #fffaf4; font-size: clamp(5rem, 28vw, 11rem); line-height: 1; font-variant-numeric: tabular-nums; animation: cuenta-late 640ms var(--ease-out); }
-@keyframes cuenta-late { from { opacity: 0; transform: scale(.55); } 60% { opacity: 1; transform: scale(1.06); } to { opacity: 1; transform: none; } }
-
 @media (prefers-reduced-motion: reduce) {
-  .demo-mano, .demo-reloj i, .demo-campo span, .demo-premio, .cuenta-numero { animation: none; }
+  .demo-mano, .demo-reloj i, .demo-campo span, .demo-premio { animation: none; }
   .demo-mano { transform: translate(0, -38px); }
   .demo-reloj i { width: 42%; }
 }

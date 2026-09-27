@@ -3132,8 +3132,7 @@
   // Un duelo va a reloj desde la primera carta, así que entrar directamente castigaba a
   // quien todavía estaba leyendo de qué iba. Entre elegir la modalidad y jugar hay ahora
   // una pantalla que enseña cómo funciona —con una demostración animada, que se entiende
-  // antes que un párrafo— y que no arranca nada hasta que se pulsa. Y al pulsar, tres
-  // segundos de cuenta atrás para levantar la vista y prepararse.
+  // antes que un párrafo— y que no arranca nada hasta que se pulsa.
   let duelPreparado = null;
 
   function duelReady(modalidad, duel = null, pace = "seguidos") {
@@ -3194,28 +3193,6 @@
     </div>`;
   }
 
-  // Tres, dos, uno. La partida no se crea hasta el final, así que el reloj de la primera
-  // carta empieza a contar cuando de verdad se ve la carta y no antes.
-  function cuentaAtras(arranca) {
-    const pasos = ["3", "2", "1", "¡Ya!"];
-    const quieto = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    overlay(`<div class="overlay overlay-cuenta"><div class="cuenta" role="status" aria-live="assertive"><b class="cuenta-numero">${pasos[0]}</b></div></div>`);
-    announce("Preparados. La partida empieza en tres segundos.");
-    let paso = 0;
-    const siguiente = () => {
-      paso += 1;
-      const marca = app.querySelector(".cuenta-numero");
-      if (!marca) return;
-      if (paso >= pasos.length) { CT.closeDialog?.(); arranca(); return; }
-      marca.textContent = pasos[paso];
-      // Reiniciar la animación en cada número: sin esto solo se animaría el primero.
-      if (!quieto) { marca.style.animation = "none"; void marca.offsetWidth; marca.style.animation = ""; }
-      CT.Effects?.transition?.("notice");
-      setTimeout(siguiente, Math.round(CT.Duelo.CUENTA_PASO_MS * (paso === pasos.length - 1 ? 0.65 : 1)));
-    };
-    setTimeout(siguiente, CT.Duelo.CUENTA_PASO_MS);
-  }
-
   function duelPlay() {
     if (!duelPreparado) return duelHome();
     const { modalidad, duel, pace } = duelPreparado;
@@ -3224,7 +3201,9 @@
       turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: modalidad, back: playMenu }));
       return;
     }
-    cuentaAtras(() => (modalidad === "cifras" ? startCifras(duel) : startSolo("duel", duel)));
+    // La partida se crea al pulsar, así que el reloj de la primera carta empieza a
+    // contar cuando de verdad se ve la carta y no antes.
+    if (modalidad === "cifras") startCifras(duel); else startSolo("duel", duel);
   }
 
   // La pantalla a la que se llega desde un enlace de duelo. Dice quién reta, con qué

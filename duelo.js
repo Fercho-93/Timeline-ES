@@ -32,10 +32,6 @@
   // de multitarea, y ninguna de esas tres cosas puede costar una carta. Por debajo de él
   // tampoco da tiempo a consultar nada en ninguna parte.
   const GRACIA_MS = 1500;
-  // Lo que dura cada número de la cuenta atrás de antes de empezar. Vive aquí, con el
-  // resto de las reglas del duelo, para poder acortarlo en las pruebas y no gastar tres
-  // segundos de reloj real en cada partida que se juega.
-  const CUENTA_PASO_MS = 700;
 
   // Qué reglas lleva cada versión de la carga útil. La versión no numera el formato:
   // numera las reglas con las que se jugó, porque dos partidas con plazos distintos no se
@@ -473,7 +469,7 @@
   }
 
   CT.Duelo = {
-    CARTAS, MAX_CARTAS, MAX_NOMBRE, SEGUNDOS, MS, GRACIA_MS, CUENTA_PASO_MS,
+    CARTAS, MAX_CARTAS, MAX_NOMBRE, SEGUNDOS, MS, GRACIA_MS,
     huella, crearSemilla, reparto, codificar, descodificar,
     enlace, invitacion, marcador, limpiaNombre, estadoTurnos,
     Cifras: {
