@@ -124,5 +124,36 @@ await expectBack('play-menu');
 await expectBack('jugar');
 await expectBack('home');
 
+// Deslizar hacia la derecha hace lo mismo que la flecha, también en las pantallas que
+// pintan otros módulos.
+function pointer(type, x) {
+  const event = new w.MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: 320, button: 0 });
+  Object.defineProperties(event, { pointerId: { value: 1 }, pointerType: { value: 'touch' } });
+  app().dispatchEvent(event);
+}
+async function swipe() {
+  pointer('pointerdown', 30);
+  for (let paso = 1; paso <= 3; paso++) pointer('pointermove', 30 + (140 * paso) / 3);
+  pointer('pointerup', 170);
+  await tick(); await tick();
+}
+await click('.home-door[data-action="jugar"]');
+await click('[data-action="quick-challenges"]');
+assert.equal(screen(), 'quick-challenges');
+await click('[data-quick="free"]');
+assert.ok(app().querySelector('[data-quick="start-free"]'));
+await swipe();
+assert.ok(app().querySelector('[data-quick="free"]'), 'deslizar en un formato de Retos rápidos vuelve a sus formatos');
+await swipe();
+assert.equal(screen(), 'jugar', 'y desde los formatos, al catálogo');
+await click('[data-action="toggle-play-catalog"][data-section="collections"]');
+await openFirstDeck();
+await click('.play-choice-block [data-action="toggle-format-block"]');
+await click('.play-choice[data-action="local-multiplayer"]');
+const wifi = screen();
+assert.ok(wifi.startsWith('local-'), `Wi-Fi local abierto (${wifi})`);
+await swipe();
+assert.equal(screen(), 'play-menu', 'deslizar en Wi-Fi local vuelve al menú del mazo');
+
 console.log('✓ La flecha de volver lleva siempre a la pantalla anterior');
 w.close();

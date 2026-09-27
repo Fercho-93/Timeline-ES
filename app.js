@@ -3937,6 +3937,8 @@
   // de «Volver», igual que las de este archivo.
   CT.showScreen = (name, html) => { screen = name; paint(html); };
   CT.navigateBack = backMenu;
+  // La flecha de volver de la pantalla visible, la pinte este archivo o un módulo propio.
+  const screenBackArrow = () => app.querySelector('.topbar .atlas-back, .topbar [data-local-action][aria-label="Volver"], .turn-duel-back');
   CT.openQuickPublic = capacity => {
     screen = 'quick-lobby';
     return CT.Quick.openPublic((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, capacity);
@@ -3953,7 +3955,7 @@
     nativeApp?.addListener?.("backButton", () => {
       if (CT.backPressed()) return;
       if (app.dataset.screen?.startsWith('online-') || CT.UI.isPlaying(screen)) { uiBack(); return; }
-      if (screen !== "home") { backMenu(); return; }
+      if ((app.dataset.screen || screen) !== "home") { const flecha = screenBackArrow(); if (flecha) flecha.click(); else backMenu(); return; }
       nativeApp.exitApp();
     });
   }
@@ -3981,8 +3983,17 @@
     // La pantalla la manda el DOM y no la variable local: durante una sala es online.js
     // quien pinta, y `screen` se quedó en la última pantalla que pintó este archivo.
     if ((app.dataset.screen || screen) === "home") return;
+    // swipe.js se traga el clic que sigue al gesto; pulsar una salida en el mismo
+    // instante también se lo tragaría, así que se pulsa justo después.
+    const pulsa = boton => setTimeout(() => boton.isConnected && boton.click(), 0);
     const salidaOnline = app.querySelector('[data-online-action="back"]');
-    if (salidaOnline) { salidaOnline.click(); return; }
+    if (salidaOnline) { pulsa(salidaOnline); return; }
+    // Las pantallas que pintan otros módulos (Wi-Fi local, Retos rápidos, duelo por
+    // turnos) saben a dónde lleva su flecha; el gesto hace lo mismo que ella. Salir de una
+    // sala Wi-Fi cierra la conexión sin preguntar, así que eso no se hace con un gesto.
+    const flecha = screenBackArrow();
+    if (flecha?.dataset.localAction === "leave") return;
+    if (flecha) { pulsa(flecha); return; }
     backMenu();
   });
   // Qué mazos tiene abiertos quien juega lo decide `CT.Cartera.arranque()`, que ya se ha
