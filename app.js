@@ -344,19 +344,6 @@
   }
 
   function playChoices(resume) {
-    const entry=sessionStorage.getItem('continuum-entry-route');
-    if(entry && ['collections','mixed','local','online','wifi','duel'].includes(entry)){
-      const options={
-        collections:['solo','Jugar solo','Una partida en esta colección.'],
-        mixed:['solo','Jugar solo','Una partida de Gran mezcla.'],
-        local:['setup','Un solo móvil','Pasad el teléfono en cada turno.'],
-        online:['online','Sala privada','Crea una sala o entra con un código.'],
-        wifi:['local-multiplayer','Wi‑Fi local','Conecta los móviles en la misma red.'],
-        duel:['duel-home','Duelo por turnos','Reta a un amigo por enlace.']
-      };
-      const [action,title,description]=options[entry];
-      return `<section class="play-choices"><h2>¿Cómo quieres jugar?</h2><button class="play-choice primary" data-action="${action}"><span><b>${title}</b><small>${description}</small></span><i aria-hidden="true">→</i></button>${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ''}</section>`;
-    }
     const multi = `<button class="play-choice primary" data-action="setup"><span class="choice-icon">${playIcon("local")}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="online"><span class="choice-icon">${playIcon("online")}</span><span><b>Varios móviles</b><small>Crea una sala privada o entra con un código.</small></span><i aria-hidden="true">→</i></button>
       <button class="play-choice" data-action="public-match"><span class="choice-icon">${playIcon("online")}</span><span><b>Partida rápida</b><small>Encuentra una mesa pública y juega online con otros jugadores.</small></span><i aria-hidden="true">→</i></button>
@@ -486,7 +473,12 @@
     // Sin rastro (por ejemplo, tras recargar) se vuelve al menú que contiene esta pantalla.
     if (screen !== 'enciclopedia') navigatingBack = true;
     if (screen === 'setup' && pendingTournament) { pendingTournament=null;competitionMenu();return; }
-    if (["setup", "solo-home", "duel-home", "online-loading", "online-error"].includes(screen)) playMenu();
+    if (["setup", "solo-home", "duel-home", "online-loading", "online-error"].includes(screen)) {
+      const entry = sessionStorage.getItem('continuum-entry-route');
+      if (entry === 'mixed') CT.ModeHubs.open('hub-solo');
+      else if (entry) jugarView();
+      else playMenu();
+    }
     else if (screen === "duelo-intro") duelHome();
     else if (screen === "play-menu") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
     else if (["competition-menu", "quick-challenges"].includes(screen)) jugarView();
@@ -793,6 +785,14 @@
     if (!setMode(modeKey)) return;
     collectionOpen = true;
     collectionDetails = true;
+    // Inicio ya determinó el formato. Tras elegir mazo se pasa a los ajustes
+    // o a la sala sin volver a preguntar cómo jugar.
+    const entry = sessionStorage.getItem('continuum-entry-route');
+    if (entry === 'collections' || entry === 'mixed') { soloHome(); return; }
+    if (entry === 'local') { setup(); return; }
+    if (entry === 'online') { launchOnline(); return; }
+    if (entry === 'wifi') { launchLocalMultiplayer(); return; }
+    if (entry === 'duel') { duelHome(); return; }
     playMenu();
   }
 
@@ -902,6 +902,7 @@
     starterDraw = null;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
+        ${game && !game.winners && !pendingTournament && sessionStorage.getItem('continuum-entry-route') === 'local' ? '<button class="btn btn-secondary btn-block" data-action="continue">Continuar partida guardada <span>→</span></button>' : ''}
         <div class="panel">
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
@@ -3501,6 +3502,7 @@
     else if (playReturn === 'duel-home' || solo?.kind === 'duel') duelHome();
     else if (playReturn === 'solo-home' || screen === 'solo') soloHome();
     else if (playReturn === 'duelo-intro') duelIntro();
+    else if (sessionStorage.getItem('continuum-entry-route')) jugarView();
     else playMenu();
   }
   // La misma salida sin guardar que ya ofrece el menú de la partida (los tres puntos),
@@ -3585,7 +3587,7 @@
   // de fuera (ni Firebase ni ninguna CDN), así que se carga siempre con el resto de la
   // aplicación, igual que `duelo.js`. `launchLocalMultiplayer` solo entrega el control.
   function launchLocalMultiplayer() {
-    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: playMenu });
+    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: sessionStorage.getItem('continuum-entry-route') === 'wifi' ? jugarView : playMenu });
   }
 
   async function launchPublicMatch() {
@@ -3737,7 +3739,12 @@
     // La enciclopedia se abre desde el Atlas, y al cerrarla se vuelve a él.
     else if (action === "home-encyclopedia") openEnciclopedia("all", { returnTo: screen === "perfil" ? "perfil" : "home" });
     else if (action === "collection-back") backMenu();
-    else if (action === "jugar") { jugarSection = sessionStorage.getItem('continuum-entry-route') ? 'collections' : null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = !!jugarSection; jugarView(); window.scrollTo(0, 0); }
+    else if (action === "jugar") {
+      const entry = sessionStorage.getItem('continuum-entry-route');
+      if (entry === 'mixed') { if (setMode('mixed')) soloHome(); }
+      else { jugarSection = entry ? 'collections' : null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = !!jugarSection; jugarView(); }
+      window.scrollTo(0, 0);
+    }
     else if (action === "toggle-play-catalog") toggleCatalog(target.dataset.section);
     else if (action === "duels-open") openPendingDuels();
     else if (action === "duels-list") duelsView();
