@@ -4008,6 +4008,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) > .card-category {
   position: relative; align-self: flex-start; margin: 6px 6px 60px;
   max-width: calc(100% - 12px); background: #f8efdd; color: #51402e;
+  white-space: normal; overflow-wrap: anywhere; flex-shrink: 0;
 }
 :root[data-theme="dark"] #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) > .card-content {
   background: linear-gradient(to bottom, transparent 0, #2d2119 18px, #2d2119 100%);
