@@ -686,16 +686,59 @@
     setTimeout(() => carta.classList.toggle("is-flipped", giraHaciaAtras), 200);
     setTimeout(() => carta.classList.remove("flip-anim"), 400);
   }
+  function openTimelineDetail(carta) {
+    const source = carta.querySelector('.card-visual .animal-card-art');
+    if (!source) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay timeline-detail-overlay';
+    overlay.dataset.overlay = 'timeline-detail';
+    const modal = document.createElement('div');
+    modal.className = 'modal timeline-detail-modal';
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'enc-card-close';
+    close.dataset.cardDetailClose = '';
+    close.setAttribute('data-dialog-focus', '');
+    close.setAttribute('aria-label', 'Cerrar carta ampliada');
+    close.textContent = '×';
+    const image = document.createElement('div');
+    image.className = 'timeline-detail-image';
+    const plate = source.cloneNode(true);
+    plate.removeAttribute('loading');
+    plate.alt = carta.querySelector('.card-content h3')?.textContent?.trim() || 'Ilustración de la carta';
+    image.append(plate);
+    const title = document.createElement('h2');
+    title.textContent = carta.querySelector('.card-content h3')?.textContent?.trim() || '';
+    const value = document.createElement('strong');
+    value.className = 'timeline-detail-value';
+    value.textContent = carta.querySelector('.card-content .year')?.textContent?.trim() || '';
+    const description = document.createElement('p');
+    description.textContent = carta.querySelector('.card-content p')?.textContent?.trim() || '';
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'btn btn-secondary btn-block timeline-detail-close';
+    back.dataset.cardDetailClose = '';
+    back.textContent = 'Volver a la línea';
+    modal.append(close, image, title, value);
+    if (description.textContent) modal.append(description);
+    modal.append(back);
+    overlay.append(modal);
+    document.getElementById('app').append(overlay);
+    openDialog(overlay, true);
+  }
   document.addEventListener("click", event => {
+    if (event.target.closest('[data-card-detail-close]')) { closeDialog(); return; }
     const carta = event.target.closest(".card-flippable");
-    if (carta) toggleFlip(carta);
+    if (carta?.classList.contains('animal-timeline-card')) openTimelineDetail(carta);
+    else if (carta) toggleFlip(carta);
   });
   document.addEventListener("keydown", event => {
     if (event.key !== "Enter" && event.key !== " ") return;
     const carta = event.target.closest?.(".card-flippable");
     if (!carta) return;
     event.preventDefault();
-    toggleFlip(carta);
+    if (carta.classList.contains('animal-timeline-card')) openTimelineDetail(carta);
+    else toggleFlip(carta);
   });
 
   window.CONTINUUM = window.CONTINUUM || {};

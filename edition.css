@@ -3982,40 +3982,81 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: auto; min-height: 300px; }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(66vw, 250px); min-height: 290px !important; }
 
-/* La ilustración llena la carta; la leyenda ocupa solo su altura natural al pie. */
+/* Lámina completa a proporción 2:3 y placa de datos fuera del dibujo. */
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(> .card-visual > .animal-card-art) {
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 0; isolation: isolate; background: #f8efdd;
+  display: flex; flex-direction: column;
+  padding: 0; background: #f8efdd;
 }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
-  position: absolute; inset: 0; z-index: 0;
-  width: 100%; height: 100%; min-height: 0; max-height: none;
-  margin: 0; padding: 0; border-radius: inherit;
+  position: relative; inset: auto; z-index: auto; flex: 0 0 auto;
+  box-sizing: border-box; width: 100%; height: auto; min-height: 0; max-height: none;
+  aspect-ratio: 2 / 3; margin: 0; padding: 0; border-radius: 0;
 }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card .card-visual > .animal-card-art {
   inset: 0; width: 100%; height: 100%; max-width: none;
-  object-fit: cover; object-position: center 35%; transform: none;
+  object-fit: contain; object-position: center; transform: none;
   -webkit-mask-image: none; mask-image: none; mix-blend-mode: normal;
   filter: sepia(.12) saturate(.95);
 }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-content {
-  position: relative; z-index: 1; flex: 0 0 auto; margin-top: auto; padding: 17px 8px 7px;
-  background: linear-gradient(to bottom, transparent 0, #f8efdded 16px, #f8efddf5 100%);
+  position: relative; z-index: 1; flex: 0 0 auto; min-height: 68px;
+  margin: 0; padding: 7px 8px 8px; background: #f8efdd;
   color: #302116; text-shadow: none;
 }
+#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content h3 {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  max-height: 2.4em; overflow: hidden; margin: 0 0 5px;
+  font-size: .76rem; line-height: 1.2;
+}
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content :is(h3, p) { color: #302116; }
-#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .year { color: #824023; border-top-color: #6b4b3040; }
-#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) > .card-category {
-  position: relative; align-self: flex-start; margin: 6px 6px 48px;
-  max-width: calc(100% - 12px); background: #21160edb; color: #fff7e8;
-  white-space: normal; overflow-wrap: anywhere; flex-shrink: 0;
+#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .year {
+  margin-top: auto; padding-top: 5px; color: #824023;
+  border-top: 1px solid #6b4b3040; font-size: clamp(.86rem, 2vw, 1.08rem);
+}
+#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .card-category {
+  margin-bottom: 4px; padding: 2px 4px; background: #e9dac0; color: #60422e;
+  font-size: .5rem; line-height: 1.1;
 }
 :root[data-theme="dark"] #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) > .card-content {
-  background: linear-gradient(to bottom, transparent 0, #f8efdded 16px, #f8efddf5 100%);
+  background: #f8efdd;
   color: #302116;
 }
 :root[data-theme="dark"] #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content :is(h3, p) { color: #302116; }
 :root[data-theme="dark"] #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .year { color: #824023; }
+
+/* El duelo por turnos comparte la misma ficha aunque viva fuera del tablero atlas. */
+#app .turn-duel-board .timeline .animal-timeline-card { display: flex; flex-direction: column; padding: 0; background: #f8efdd; }
+#app .turn-duel-board .timeline .animal-timeline-card > .card-visual {
+  position: relative; inset: auto; box-sizing: border-box; width: 100%; height: auto;
+  aspect-ratio: 2 / 3; margin: 0; padding: 0; border-radius: 0;
+}
+#app .turn-duel-board .timeline .animal-timeline-card .animal-card-art {
+  inset: 0; width: 100%; height: 100%; max-width: none; transform: none;
+  object-fit: contain; object-position: center; mask-image: none; -webkit-mask-image: none;
+  mix-blend-mode: normal; filter: sepia(.12) saturate(.95);
+}
+#app .turn-duel-board .timeline .animal-timeline-card > .card-content {
+  flex: 0 0 auto; min-height: 68px; margin: 0; padding: 7px 8px 8px;
+  background: #f8efdd; color: #302116;
+}
+#app .turn-duel-board .timeline .animal-timeline-card .card-content h3 {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  max-height: 2.4em; overflow: hidden; margin: 0 0 5px; font-size: .76rem; line-height: 1.2;
+}
+#app .turn-duel-board .timeline .animal-timeline-card .card-content .year {
+  margin-top: auto; padding-top: 5px; color: #824023;
+  border-top: 1px solid #6b4b3040; font-size: .95rem;
+}
+
+/* La vista ampliada deja el título y la explicación debajo de la lámina, sin recortarla. */
+.timeline-detail-overlay { z-index: 80; }
+.timeline-detail-modal { width: min(100%, 500px); max-height: min(94dvh, 900px); padding: 14px; overflow-y: auto; background: #f8efdd; color: #302116; text-align: left; }
+.timeline-detail-modal .timeline-detail-image { display: grid; place-items: center; margin: 0 0 12px; background: #ede0c9; border-radius: 7px; overflow: hidden; }
+.timeline-detail-modal .timeline-detail-image img { display: block; width: auto; max-width: 100%; height: auto; max-height: min(57dvh, 570px); object-fit: contain; filter: sepia(.12) saturate(.95); }
+.timeline-detail-modal h2 { margin: 0 44px 7px 0; font: 700 clamp(1.25rem, 5vw, 1.75rem)/1.12 var(--font-display); }
+.timeline-detail-modal .timeline-detail-value { display: block; margin-bottom: 8px; color: #824023; font: 700 1.35rem/1.1 var(--font-display); }
+.timeline-detail-modal p { margin: 0 0 8px; color: #5a412e; }
+.timeline-detail-modal .timeline-detail-close { margin-top: 12px; }
 
 /* Tamaño compacto sin reducir los controles táctiles ni el texto accesible. */
 #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong {

@@ -66,7 +66,7 @@ function solution(game) {
 function timelineCardMarkup(game, card) {
   const era = CT.eraForCard(game.mode, card), art = CT.animalArt(game.mode, card);
   const visual = art || `<span>${era.symbol}</span><small>${safe(era.name)}</small>`;
-  return `<article class="timeline-card ${art ? 'animal-timeline-card' : ''}" data-id="${card.id}"><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(game.mode, card)}<div class="year">${safe(CT.formatValue(game.mode, card))}</div><h3>${safe(card.title)}</h3></div></article>`;
+  return `<article class="timeline-card ${art ? 'animal-timeline-card card-flippable' : ''}" data-id="${card.id}" ${art ? `role="button" tabindex="0" aria-label="${safe(card.title)}. Toca para ver la lámina y los datos."` : ''}><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(game.mode, card)}<h3>${safe(card.title)}</h3>${art ? `<p>${safe(card.detail || '')}</p>` : ''}<div class="year">${safe(CT.formatValue(game.mode, card))}</div></div></article>`;
 }
 function orderBoard(game, card) {
   const line = timelineCards(game), slots = [];

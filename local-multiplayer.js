@@ -482,9 +482,9 @@
         const era = eraForCard(card);
         const animal = usesAnimalArt();
         const body = animal
-          ? `${categoryBadge(card)}<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content"><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p><div class="year">${formatValue(card)}</div></div>`
+          ? `<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content">${categoryBadge(card)}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p><div class="year">${formatValue(card)}</div></div>`
           : `<div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div>`;
-        slots.push(`<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver la explicación.">${body}</article>`);
+        slots.push(`<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver ${animal ? "la lámina y los datos" : "la explicación"}.">${body}</article>`);
       }
     }
     paint(`<div class="shell">${header("local-lobby", '<button class="icon-btn" data-local-action="local-lobby" aria-label="Abrir menú de la sala">Sala</button>')}
