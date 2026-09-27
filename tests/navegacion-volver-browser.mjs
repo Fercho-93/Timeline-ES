@@ -54,25 +54,23 @@ async function flows(vp) {
     // Jugar solo
     await click('[data-action="solo-hub"]'); await at('hub-solo'); await back('home');
     await click('[data-action="solo-hub"]'); await click('[data-solo-route="collections"]'); await at('jugar');
-    await click('[data-action="set-block"]'); await click('.collection-entry.active [data-action="set-mode"]'); await at('play-menu');
-    await click('.play-choice[data-action="solo"]'); await at('solo-home');
+    await click('[data-action="set-block"]'); await click('.collection-entry.active [data-action="set-mode"]'); await at('solo-home');
     await click('[data-action="start-free"]'); await at('solo'); await back('solo-home');
-    await back('play-menu'); await back('jugar'); await back('hub-solo');
-    await click('[data-solo-route="mixed"]'); await at('jugar'); await back('hub-solo');
+    await back('jugar'); await back('hub-solo');
+    await click('[data-solo-route="mixed"]'); await at('solo-home'); await back('hub-solo');
     await click('[data-solo-route="quick"]'); await at('quick-challenges');
     await click('[data-quick="start-free"]'); await at('quick-challenges'); await click('[data-quick="ready"]'); await at('quick-game'); await back('quick-challenges'); await click('[data-quick="start-free"]'); await back('quick-challenges');
     await back('hub-solo'); await back('home');
     // Jugar con amigos
-    for (const [route, action, target] of [['local', 'setup', 'setup'], ['duel', 'duel-home', 'duel-home'], ['wifi', 'local-multiplayer', null], ['online', 'online', null]]) {
+    for (const [route, target] of [['local', 'setup'], ['duel', 'duel-home'], ['wifi', 'local-entrada'], ['online', null]]) {
       await click('[data-action="friends-hub"]'); await at('hub-friends');
       await click(`[data-friend-route="${route}"]`); await at('jugar');
-      await click('[data-action="set-block"]'); await click('.collection-entry.active [data-action="set-mode"]'); await at('play-menu');
-      await click(`.play-choice[data-action="${action}"]`);
+      await click('[data-action="set-block"]'); await click('.collection-entry.active [data-action="set-mode"]');
       if (target) await at(target);
       if (route === 'online') { await pg.waitForFunction(() => document.getElementById('app').dataset.screen !== 'online-loading', null, {timeout: 15000}).catch(() => {}); console.log('online →', await screen()); }
       if (route === 'local') { await click('[data-action="start"]'); await at('pass'); await back('setup'); }
       if (route === 'duel') { await click('[data-action="start-duel"]'); await at('duelo-listo'); await back('duel-home'); await click('[data-action="duels-list"]'); await at('duelos'); await back('duel-home'); }
-      await back('play-menu'); await back('jugar'); await back('hub-friends'); await back('home');
+      await back('jugar'); await back('hub-friends'); await back('home');
     }
     // Jugar online
     await click('[data-action="online-hub"]'); await at('hub-online');
@@ -86,7 +84,7 @@ async function flows(vp) {
     // Atlas
     await click('.home-door[data-action="perfil"]'); await at('perfil'); await back('home');
     // Jugar clásico (puerta antigua)
-    await pg.evaluate(() => document.querySelector('.home-door[data-action="jugar"]').click()); await pg.waitForTimeout(600); await at('jugar');
+    await pg.evaluate(() => window.CONTINUUM.localNavigate('jugar')); await pg.waitForTimeout(600); await at('jugar');
     await click('[data-action="quick-challenges"]'); await at('quick-challenges');
     await click('[data-quick="free"]'); await back('quick-challenges');
     await click('[data-quick="show-multi"]'); await click('[data-quick="local"]'); await back('quick-challenges');
