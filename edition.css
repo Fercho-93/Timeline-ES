@@ -4085,3 +4085,108 @@ html:not(:has(#app[data-screen="home"]))::before {
   font-size: .42rem; letter-spacing: .03em;
 }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: 1rem; }
+
+/* Atlas personal: carta de navegación, estaciones y cuadernos del recorrido. */
+#app[data-screen="perfil"] .perfil-section { max-width: 900px; margin-inline: auto; }
+#app[data-screen="perfil"] .atlas-page-heading { margin-bottom: 8px; text-align: center; }
+#app[data-screen="perfil"] .atlas-page-heading h1 { font-size: clamp(2.8rem, 11vw, 4.8rem); letter-spacing: -.035em; }
+#app[data-screen="perfil"] .atlas-page-heading p { max-width: 42ch; margin-inline: auto; }
+#app[data-screen="perfil"] .atlas-identidad {
+  max-width: 490px; margin: 10px auto -22px; padding: 12px 18px; position: relative; z-index: 2;
+  border: 1px solid color-mix(in srgb, var(--edition-brass) 42%, var(--edition-line));
+  border-radius: 16px; background: var(--edition-surface);
+  box-shadow: 0 7px 20px #553d2121, inset 0 1px #fff8;
+}
+#app[data-screen="perfil"] .atlas-identidad .hint { display: none; }
+#app[data-screen="perfil"] .atlas-identidad h2 { font-size: 1.28rem; }
+#app[data-screen="perfil"] .atlas-identidad-acciones .btn { min-height: 35px; padding: 6px 10px; font-size: .75rem; }
+
+#app[data-screen="perfil"] .atlas-chart {
+  position: relative; isolation: isolate; display: block; width: 100%; height: 510px;
+  overflow: hidden; margin: 0 0 28px; border: 1px solid #a6865580; border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 72% 55%, #83947b34, transparent 32%),
+    radial-gradient(ellipse at 18% 72%, #b58c5a3b, transparent 34%),
+    repeating-radial-gradient(ellipse at 60% 48%, transparent 0 18px, #936f4421 19px 20px, transparent 21px 38px),
+    repeating-linear-gradient(102deg, transparent 0 16px, #6a4c2610 17px, transparent 18px 34px),
+    #e9dbc0;
+  box-shadow: 0 16px 36px #45301d25, inset 0 0 0 7px #f8eddaaa, inset 0 0 0 8px #a78d6259;
+  color: #392a1d;
+}
+#app[data-screen="perfil"] .atlas-chart::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: -1;
+  background: radial-gradient(ellipse at center, transparent 36%, #8c6a4030 100%);
+}
+#app[data-screen="perfil"] .atlas-chart-heading { position: absolute; left: 28px; top: 40px; z-index: 2; display: grid; gap: 4px; }
+#app[data-screen="perfil"] .atlas-chart-heading span { font: 700 .73rem/1.2 var(--ui-font); letter-spacing: .2em; color: #704a29; }
+#app[data-screen="perfil"] .atlas-chart-heading small { font: italic 1.1rem/1.3 var(--font-display); color: #664b36; }
+#app[data-screen="perfil"] .atlas-chart-route { position: absolute; inset: 50px 20px 20px; width: calc(100% - 40px); height: calc(100% - 70px); fill: none; overflow: visible; }
+#app[data-screen="perfil"] .atlas-chart-route path { stroke: #9a674a; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 3 9; opacity: .64; }
+#app[data-screen="perfil"] .atlas-chart-compass { position: absolute; right: 36px; top: 30px; display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid #9b7953; border-radius: 50%; font: 2rem/1 var(--font-display); color: #875039; opacity: .8; }
+#app[data-screen="perfil"] .atlas-chart-compass small { position: absolute; top: -14px; font: 700 .58rem var(--ui-font); }
+#app[data-screen="perfil"] .atlas-chart-stop {
+  position: absolute; z-index: 1; display: grid; align-content: center; width: clamp(134px, 21%, 190px); min-height: 85px;
+  padding: 12px 14px 12px 19px; border: 1px solid #9b795488; border-left: 4px solid #9c5036;
+  border-radius: 5px 16px 16px 5px; background: #f8efddf2;
+  box-shadow: 0 5px 0 #8b673d33, 0 12px 22px #442c162e, inset 0 1px #fff;
+  color: #34281f; text-decoration: none; transform: rotate(var(--atlas-tilt, 0deg));
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+#app[data-screen="perfil"] .atlas-chart-stop::before { content: ''; position: absolute; left: -14px; top: 50%; width: 15px; height: 15px; border: 3px solid #f6e9d2; border-radius: 50%; background: #995039; box-shadow: 0 0 0 2px #99503955; transform: translateY(-50%); }
+#app[data-screen="perfil"] .atlas-chart-stop i { font: 700 .61rem/1.2 var(--ui-font); letter-spacing: .16em; color: #a15338; }
+#app[data-screen="perfil"] .atlas-chart-stop b { margin-top: 3px; font: 600 clamp(1rem, 2.4vw, 1.27rem)/1.1 var(--font-display); }
+#app[data-screen="perfil"] .atlas-chart-stop small { margin-top: 4px; font: .69rem/1.3 var(--ui-font); color: #69533e; }
+#app[data-screen="perfil"] .atlas-chart-stop:focus-visible { outline: 3px solid #753d28; outline-offset: 4px; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  #app[data-screen="perfil"] .atlas-chart-stop:hover { transform: rotate(0deg) translateY(-5px); box-shadow: 0 8px 0 #8b673d33, 0 19px 26px #442c163a; }
+}
+#app[data-screen="perfil"] .atlas-stop-collection { left: 7%; top: 25%; --atlas-tilt: -2deg; }
+#app[data-screen="perfil"] .atlas-stop-daily { left: 38%; top: 33%; --atlas-tilt: 2deg; }
+#app[data-screen="perfil"] .atlas-stop-duels { right: 6%; top: 26%; --atlas-tilt: -2deg; }
+#app[data-screen="perfil"] .atlas-stop-journey { left: 19%; top: 69%; --atlas-tilt: 2deg; }
+#app[data-screen="perfil"] .atlas-stop-achievements { right: 15%; top: 68%; --atlas-tilt: -2deg; }
+#app[data-screen="perfil"] .atlas-chart-seal { position: absolute; right: 24px; bottom: 18px; display: grid; place-content: center; width: 64px; height: 64px; border: 3px double #965444; border-radius: 50%; text-align: center; color: #965444; font: 2rem/.75 var(--font-display); opacity: .68; transform: rotate(-13deg); }
+#app[data-screen="perfil"] .atlas-chart-seal small { padding-top: 8px; font: 600 .33rem var(--ui-font); letter-spacing: .1em; }
+
+#app[data-screen="perfil"] .atlas-territories { position: relative; display: grid; gap: 18px; padding-left: 30px; }
+#app[data-screen="perfil"] .atlas-territories::before { content: ''; position: absolute; left: 13px; top: 20px; bottom: 70px; width: 2px; background: repeating-linear-gradient(to bottom, #a76e50 0 5px, transparent 5px 13px); opacity: .6; }
+#app[data-screen="perfil"] .atlas-territory { position: relative; min-width: 0; scroll-margin-top: 18px; padding: 19px clamp(15px, 4vw, 28px) 24px; border: 1px solid color-mix(in srgb, var(--edition-brass) 26%, var(--edition-line)); border-radius: 16px; background: radial-gradient(ellipse at 94% 8%, color-mix(in srgb, var(--edition-brass) 10%, transparent), transparent 40%), var(--edition-surface); box-shadow: 0 8px 20px #50371d12, inset 0 1px #fff5; }
+#app[data-screen="perfil"] .atlas-territory::before { content: ''; position: absolute; left: -27px; top: 30px; width: 18px; height: 18px; border: 4px solid var(--edition-paper); border-radius: 50%; background: var(--atlas-selection); box-shadow: 0 0 0 1px var(--edition-brass); }
+#app[data-screen="perfil"] .atlas-territory-caption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 3px 16px; padding-bottom: 11px; margin-bottom: 14px; border-bottom: 1px solid var(--edition-line); }
+#app[data-screen="perfil"] .atlas-territory-caption span { color: var(--edition-brass); font: 700 .66rem/1.3 var(--ui-font); letter-spacing: .15em; }
+#app[data-screen="perfil"] .atlas-territory-caption h2 { margin: 0; color: var(--edition-ink); font: 500 1.55rem/1.2 var(--font-display); }
+#app[data-screen="perfil"] .atlas-territory > .panel { padding: 0; margin: 0; border: 0; background: transparent; box-shadow: none; }
+#app[data-screen="perfil"] .atlas-territory > .perfil-main { margin: 0; }
+#app[data-screen="perfil"] .atlas-territory .perfil-main > .section-label:first-child { margin-top: 0; }
+#app[data-screen="perfil"] .atlas-territory .perfil-account { margin: 0; }
+#app[data-screen="perfil"] .atlas-territory .atlas-collection { margin-top: 0; }
+#app[data-screen="perfil"] .atlas-territory .atlas-daily { margin-bottom: 0; }
+#app[data-screen="perfil"] .atlas-territory .perfil-stats { border: 1px solid var(--edition-line); border-radius: 12px; overflow: hidden; background: color-mix(in srgb, var(--edition-paper) 65%, transparent); }
+#app[data-screen="perfil"] .atlas-territory .perfil-stats > span { padding: 18px 8px; }
+#app[data-screen="perfil"] .atlas-territory .lead { margin: 0 0 12px; }
+
+@media (max-width: 600px) {
+  #app[data-screen="perfil"] .atlas-chart { height: 525px; border-radius: 18px; }
+  #app[data-screen="perfil"] .atlas-chart-heading { left: 22px; top: 42px; }
+  #app[data-screen="perfil"] .atlas-chart-heading small { font-size: .95rem; }
+  #app[data-screen="perfil"] .atlas-chart-compass { right: 22px; top: 28px; width: 38px; height: 38px; font-size: 1.5rem; }
+  #app[data-screen="perfil"] .atlas-chart-route { inset: 75px 0 25px; width: 100%; height: calc(100% - 100px); opacity: .5; }
+  #app[data-screen="perfil"] .atlas-chart-stop { width: min(43%, 175px); min-height: 75px; padding: 9px 7px 9px 12px; }
+  #app[data-screen="perfil"] .atlas-chart-stop b { font-size: 1rem; }
+  #app[data-screen="perfil"] .atlas-chart-stop small { font-size: .63rem; }
+  #app[data-screen="perfil"] .atlas-stop-collection { left: 7%; top: 24%; }
+  #app[data-screen="perfil"] .atlas-stop-daily { left: auto; right: 6%; top: 35%; }
+  #app[data-screen="perfil"] .atlas-stop-duels { left: 8%; right: auto; top: 47%; }
+  #app[data-screen="perfil"] .atlas-stop-journey { left: auto; right: 7%; top: 59%; }
+  #app[data-screen="perfil"] .atlas-stop-achievements { left: 9%; right: auto; top: 72%; }
+  #app[data-screen="perfil"] .atlas-chart-seal { right: 19px; bottom: 18px; width: 52px; height: 52px; font-size: 1.5rem; }
+  #app[data-screen="perfil"] .atlas-identidad { margin-bottom: -16px; padding: 10px 12px; }
+  #app[data-screen="perfil"] .atlas-identidad-avatar svg { width: 58px; height: 58px; }
+  #app[data-screen="perfil"] .atlas-territory-caption { display: block; }
+  #app[data-screen="perfil"] .atlas-territory-caption h2 { margin-top: 3px; }
+}
+@media (max-width: 350px) {
+  #app[data-screen="perfil"] .atlas-chart-stop { width: 45%; }
+  #app[data-screen="perfil"] .atlas-chart-stop b { font-size: .9rem; }
+  #app[data-screen="perfil"] .atlas-chart-heading small { font-size: .84rem; }
+}

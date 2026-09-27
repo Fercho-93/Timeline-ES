@@ -1962,23 +1962,40 @@
     screen = "perfil";
     const resumen = CT.Progreso.summary();
     const filas = CT.Progreso.modeRows();
+    const logros = CT.Progreso.achievements();
+    const descubiertas = Object.keys(CT.MODES || {})
+      .filter(key => key !== "mixed" && (!CT.Cartera || CT.Cartera.tiene(key)))
+      .reduce((sum, key) => sum + (CT.Enciclopedia?.seenProgress(key)?.seen || 0), 0);
     const estrenado = resumen.cards > 0 || resumen.games > 0;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Tu colección y tu recorrido</div><h1 data-focus tabindex="-1">Atlas</h1><p>Las cartas que has descubierto y la huella que deja cada partida.</p></header>
+        <header class="atlas-page-heading"><div class="eyebrow">Cartografía personal · Continuum</div><h1 data-focus tabindex="-1">Tu Atlas</h1><p>Un mapa de lo que has descubierto y de los caminos que aún puedes recorrer.</p></header>
         ${atlasIdentidad()}
-        ${atlasColeccion()}
-        ${atlasRetoDiario()}
-        <section class="panel atlas-duels"><div><h2>Tus duelos</h2><p>Retos por turnos con tus amigos: en qué punto está cada uno.</p></div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section>
-        <div class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</div>
-        ${estrenado
-          ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
-          : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
-        ${perfilResumen(resumen)}
-        <div class="perfil-main">
-        ${perfilPorJuego(filas)}
-        ${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}
-        ${perfilLogros(CT.Progreso.achievements())}</div>
+        <nav class="atlas-chart" aria-label="Mapa de tu Atlas">
+          <div class="atlas-chart-heading"><span>MAPA DE TU VIAJE</span><small>Elige un destino para explorar</small></div>
+          <svg class="atlas-chart-route" viewBox="0 0 640 440" preserveAspectRatio="none" aria-hidden="true"><path d="M96 120 C192 92 200 210 306 168 S435 66 528 135 S452 252 356 292 S183 266 116 357 S365 413 518 366" /></svg>
+          <span class="atlas-chart-compass" aria-hidden="true">✦<small>N</small></span>
+          <a class="atlas-chart-stop atlas-stop-collection" href="#atlas-collection"><i aria-hidden="true">01</i><b>Las láminas</b><small>${descubiertas} descubiertas</small></a>
+          <a class="atlas-chart-stop atlas-stop-daily" href="#atlas-daily"><i aria-hidden="true">02</i><b>El reto diario</b><small>Tu constancia</small></a>
+          <a class="atlas-chart-stop atlas-stop-duels" href="#atlas-duels"><i aria-hidden="true">03</i><b>Tus duelos</b><small>Con amigos</small></a>
+          <a class="atlas-chart-stop atlas-stop-journey" href="#atlas-journey"><i aria-hidden="true">04</i><b>Tu recorrido</b><small>${resumen.games} ${resumen.games === 1 ? "partida" : "partidas"}</small></a>
+          <a class="atlas-chart-stop atlas-stop-achievements" href="#atlas-achievements"><i aria-hidden="true">05</i><b>Los logros</b><small>${resumen.unlocked} de ${resumen.total}</small></a>
+          <span class="atlas-chart-seal" aria-hidden="true">C<br><small>CONTINUUM</small></span>
+        </nav>
+        <div class="atlas-territories">
+          <div class="atlas-territory" id="atlas-collection"><div class="atlas-territory-caption"><span>01 / ARCHIVO DE LÁMINAS</span><h2>Las láminas</h2></div>${atlasColeccion()}</div>
+          <div class="atlas-territory" id="atlas-daily"><div class="atlas-territory-caption"><span>02 / CADA DÍA UN PASO</span><h2>El reto diario</h2></div>${atlasRetoDiario()}</div>
+          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / CAMINOS COMPARTIDOS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h2>Tus duelos</h2><p>Retos por turnos con tus amigos: en qué punto está cada uno.</p></div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
+          <div class="atlas-territory" id="atlas-journey"><div class="atlas-territory-caption"><span>04 / HUELLAS EN EL MAPA</span><h2>Tu recorrido</h2></div>
+            ${estrenado
+              ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
+              : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
+            ${perfilResumen(resumen)}
+            <div class="perfil-main">${perfilPorJuego(filas)}${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}</div>
+          </div>
+          <div class="atlas-territory" id="atlas-achievements"><div class="atlas-territory-caption"><span>05 / RUMBO A NUEVAS METAS</span><h2>Logros</h2></div><div class="perfil-main">${perfilLogros(logros)}</div></div>
+          <div class="atlas-territory atlas-territory-account"><div class="atlas-territory-caption"><span>06 / CUADERNO DE VIAJE</span><h2>Tu cuenta y tus datos</h2></div><div class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</div></div>
+        </div>
       </section>
       ${homeNav()}
     </div>`);

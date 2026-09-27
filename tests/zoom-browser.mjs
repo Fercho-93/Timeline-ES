@@ -103,6 +103,22 @@ try {
    assert.equal(await illustratedPage.locator('.timeline-detail-overlay').count(),0,'volver conserva la partida');
    await illustratedPage.close();
 
+   const atlasPage=await newPage({viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
+   await atlasPage.goto(url);
+   await atlasPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+   await atlasPage.locator('.home-door[data-action="perfil"]').evaluate(el=>{el.dataset.homeTransition='done';});
+   await atlasPage.locator('.home-door[data-action="perfil"]').click();
+   const map=atlasPage.locator('.atlas-chart');
+   await map.screenshot({path:`test-results/zoom/${engine}-atlas-mapa.png`});
+   assert.equal(await map.locator('.atlas-chart-stop').count(),5,'el mapa muestra los cinco destinos');
+   assert.equal(await atlasPage.locator('.atlas-territory').count(),6,'el Atlas conserva todas las zonas y la cuenta');
+   assert.equal(await atlasPage.locator('.perfil-stats > span').count(),6,'se mantienen las seis estadísticas');
+   const mapWidth=await map.evaluate(el=>({scroll:el.scrollWidth,visible:el.clientWidth}));
+   assert.ok(mapWidth.scroll<=mapWidth.visible+1,'el mapa cabe en la pantalla móvil');
+   await map.locator('a[href="#atlas-achievements"]').click();
+   assert.ok(await atlasPage.locator('#atlas-achievements .perfil-achievement-group').count()>0,'el destino de logros lleva al contenido');
+   await atlasPage.close();
+
    const transitionPage=await newPage({viewport:{width:414,height:714},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
    await transitionPage.goto(url);
    await transitionPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
