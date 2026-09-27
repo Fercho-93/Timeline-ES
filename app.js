@@ -2512,7 +2512,7 @@
   const DUEL_NAME_KEY = "hilo-nombre-v1";
 
   function duelName() {
-    try { return CT.Duelo.limpiaNombre(CT.Identidad.nombre() || CT.Accounts?.profile?.alias || CT.Storage.getItem(DUEL_NAME_KEY) || "Explorador"); } catch { return "Explorador"; }
+    try { return CT.Duelo.limpiaNombre(CT.Identidad.propio() || CT.Storage.getItem(DUEL_NAME_KEY) || "Explorador"); } catch { return "Explorador"; }
   }
 
   function saveDuelName(nombre) {

@@ -20,7 +20,7 @@ let stop = null, current = null, onBack = null, timer = null, enteredAt = 0, sha
 
 const safe = value => CT.escapeHtml(String(value ?? ''));
 const uid = () => auth.currentUser?.uid || CT.Accounts?.user?.uid;
-const alias = () => CT.Accounts?.profile?.alias || 'Explorador';
+const alias = () => CT.Identidad?.propio?.() || 'Explorador';
 const id = () => crypto.randomUUID().replaceAll('-', '');
 function notify(text) {
   const toast = document.getElementById('toast');

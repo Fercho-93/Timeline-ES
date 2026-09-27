@@ -63,6 +63,10 @@
   CT.Identidad = {
     MAX, leer, guarda, reconoce, problema, limpia,
     hecha: () => !!leer(),
-    nombre: () => leer()?.nombre || ""
+    nombre: () => leer()?.nombre || "",
+    // El nombre que se propone en cualquier campo «Tu nombre» del juego (salas, mesas,
+    // duelos, retos): siempre el del perfil de este móvil; el alias de la cuenta solo si
+    // todavía no hay perfil.
+    propio: () => leer()?.nombre || limpia(CT.Accounts?.profile?.alias || "") || ""
   };
 })();

@@ -535,8 +535,9 @@ export async function openOnlineMode(options = {}) {
 
 function renderEntry(invited = "") {
   const known = invited ? rememberedRoom(invited) : null;
-  // El nombre de este móvil ya está elegido desde la bienvenida: se propone, no se pide.
-  const ownName = escapeHtml(known?.name || CT.Identidad?.nombre?.() || "");
+  // El nombre del perfil manda: el que se usó antes en esta misma sala solo se propone si
+  // este móvil todavía no tiene perfil.
+  const ownName = escapeHtml(CT.Identidad?.propio?.() || known?.name || "");
   paint(`<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="back">Salir</button>')}
     <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid${invited ? " online-entry-invited" : ""}">

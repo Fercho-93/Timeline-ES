@@ -66,7 +66,7 @@
     CT.paint(appEl, html, pantalla);
   }
 
-  function ownName() { return escapeHtml(CT.Identidad?.nombre?.() || ""); }
+  function ownName() { return escapeHtml(CT.Identidad?.propio?.() || ""); }
 
   // Cuando Android e iPhone no comparten ningún destino en la hoja de compartir del
   // sistema, queda copiar el texto a mano. Si el portapapeles tampoco está disponible, el
@@ -281,7 +281,7 @@
     paint(`<div class="shell online-shell">${header("go-entrada")}
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2></section>
       <form class="panel online-form" data-local-form="join-offer">
-        <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name" value="${escapeHtml(savedSeat()?.name || "") || ownName()}"></div>
+        <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name" value="${ownName() || escapeHtml(savedSeat()?.name || "")}"></div>
         ${savedSeat() ? `<p class="hint">Si escaneas una invitación de la sala ${escapeHtml(savedSeat().roomCode)}, volverás a tu plaza con tus cartas.</p>` : ""}
         <button type="button" class="btn btn-primary btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código del anfitrión</button>
         <details class="qr-fallback"><summary>¿No puedes usar la cámara?</summary>
