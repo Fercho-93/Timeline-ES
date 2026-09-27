@@ -12,7 +12,9 @@
 #app .mode-play-card:focus-visible { outline: 3px solid #9c4f2c; outline-offset: 3px; }
 #app .mode-choices-reveal { display: grid; grid-template-rows: 0fr; margin-top: 0; opacity: 0; visibility: hidden; transition: grid-template-rows .38s ease, margin-top .38s ease, opacity .28s ease, visibility .38s; }
 #app .mode-choices-reveal.is-open { grid-template-rows: 1fr; margin-top: 12px; opacity: 1; visibility: visible; }
-#app .mode-entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-height: 0; overflow: hidden; }
+/* Sangrado con una línea guía: las opciones son hijas de la lámina «Jugar» de
+   arriba, no un bloque al mismo nivel. */
+#app .mode-entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-height: 0; overflow: hidden; margin-left: 22px; padding-left: 18px; border-left: 2px solid #d2b683; }
 #app .mode-entry {
   --mode-paper: #f8f0df;
   appearance: none; position: relative; isolation: isolate; display: flex; align-items: center;
@@ -89,6 +91,7 @@
   #app .mode-entry-featured .mode-entry-art { width: 73%; }
 }
 @media (max-width: 420px) {
+  #app .mode-entry-grid { margin-left: 14px; padding-left: 12px; }
   #app .mode-entry, #app .mode-entry-featured { min-height: 132px; }
   #app .mode-entry-copy { width: 78%; padding: 13px 17px; gap: 4px; }
   #app .mode-entry-copy b { font-size: 1.48rem; }
@@ -99,6 +102,7 @@
 }
 :root[data-theme="dark"] #app .mode-entry,
 :root[data-theme="dark"] #app .mode-hub-head { --mode-paper: #332a20; background: #332a20; border-color: #8c6f45; box-shadow: 0 12px 26px #0006; }
+:root[data-theme="dark"] #app .mode-entry-grid { border-left-color: #8c6f45; }
 :root[data-theme="dark"] #app .mode-entry::after { background: linear-gradient(90deg, #332a20 0 26%, #332a20e8 44%, #332a207a 70%, transparent 100%); }
 :root[data-theme="dark"] #app .mode-entry-copy b,
 :root[data-theme="dark"] #app .mode-hub-title h1 { color: #f1e1bf; }
