@@ -22,7 +22,7 @@
     paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing)}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
-  let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null, readyTimer = null;
+  let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null;
   const BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1', HISTORY = 'continuum-quick-history-v1';
   const day = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
   function readJSON(key, fallback=null) {try{return JSON.parse(CT.Storage.getItem(key)) || fallback;}catch{return fallback;}}
@@ -94,13 +94,11 @@
     const list=Array.from({length:count},(_,i)=>catalog[i % catalog.length]);
     return list.map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
   }
-  function begin(config) {clearInterval(readyTimer);readyTimer=null;pendingConfig=null;config.historyId ||= historyId();record={version:CT.QuickCatalog.version,config,commands:[]};state=E.create(config);selected=null;slot=null;save();render();}
+  function begin(config) {pendingConfig=null;config.historyId ||= historyId();record={version:CT.QuickCatalog.version,config,commands:[]};state=E.create(config);selected=null;slot=null;save();render();}
   function prepare(config) {
     pendingConfig=config; page='prepare'; state=null; record=null;
     const c=E.challenge(config.rounds[0].id);
-    shell(`<section class="setup-section quick-ready"><div class="eyebrow"><span class="eyebrow-line"></span> Reto preparado</div><h2 data-focus tabindex="-1">${esc(c.title)}</h2><p class="lead">${config.rounds.length === 1 ? 'Un mazo sorpresa.' : `${config.rounds.length} mazos sorpresa, uno detrás de otro.`}</p><div class="panel quick-ready-card"><p>${esc(c.rule)}</p><div class="quick-countdown" aria-label="Cuenta atrás">3</div><p class="hint">Cuando estés preparado, empieza el reto. Los siguientes mazos seguirán ocultos hasta que lleguen.</p>${button('ready','Estoy preparado <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
-    let count=3; const clock=app().querySelector('.quick-countdown');
-    readyTimer=setInterval(()=>{count--; if (!clock?.isConnected || count <= 0) { clearInterval(readyTimer); readyTimer=null; if (clock?.isConnected) clock.textContent='¡'; return; } clock.textContent=String(count);},1000);
+    shell(`<section class="setup-section quick-ready"><div class="eyebrow"><span class="eyebrow-line"></span> Reto preparado</div><h2 data-focus tabindex="-1">${esc(c.title)}</h2><p class="lead">${config.rounds.length === 1 ? 'Un mazo sorpresa.' : `${config.rounds.length} mazos sorpresa, uno detrás de otro.`}</p><div class="panel quick-ready-card"><div class="quick-ready-seal" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="29"/><circle cx="32" cy="32" r="23"/><path d="M32 9l3.2 19.8L55 32l-19.8 3.2L32 55l-3.2-19.8L9 32l19.8-3.2z"/><circle cx="32" cy="32" r="3.2"/></svg></div><span class="quick-ready-kicker">La regla del mazo</span><p class="quick-ready-rule">${esc(c.rule)}</p><div class="quick-ready-divider" aria-hidden="true"><i></i><b>◆</b><i></i></div><p class="hint">Cuando estés preparado, empieza el reto. Los siguientes mazos seguirán ocultos hasta que lleguen.</p>${button('ready','Estoy preparado <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
   }
   function freeSetup() {
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
@@ -278,7 +276,7 @@
   function toEntry() {
     if (entry === 'menu') formatMenu();
     else if (entry === 'free-setup') freeSetup();
-    else {clearInterval(readyTimer);readyTimer=null;stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;CT.navigateBack?.();}
+    else {stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;CT.navigateBack?.();}
   }
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);

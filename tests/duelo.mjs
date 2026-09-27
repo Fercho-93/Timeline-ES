@@ -45,10 +45,9 @@ function boot({ url = "https://hilo.test/", almacen = {} } = {}) {
   return window;
 }
 const duerme = ms => new Promise(listo => setTimeout(listo, ms));
-// Entre elegir el duelo y jugarlo hay una pantalla que explica la modalidad y una cuenta
-// atrás. Las pruebas la acortan a unos milisegundos: lo que importa aquí es la partida.
+// Entre elegir el duelo y jugarlo hay una pantalla que explica la modalidad; la partida
+// empieza al pulsar JUGAR, sin cuenta atrás.
 async function jugar(w) {
-  w.CONTINUUM.Duelo.CUENTA_PASO_MS = 4;
   click(w, '[data-action="duel-play"]');
   await duerme(80);
 }

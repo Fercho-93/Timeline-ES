@@ -129,7 +129,6 @@ try {
    await duelPage.locator('[data-action="solo"]').click();
    await duelPage.locator('.solo-fold[data-solo-kind="duel"] > summary').click();
    await duelPage.locator('[data-action="start-duel"]').click();
-   await duelPage.evaluate(()=>{window.CONTINUUM.Duelo.CUENTA_PASO_MS=10;});
    await duelPage.locator('[data-action="duel-play"]').click();
    await duelPage.locator('[data-action="solo-place"]').first().click();
    const dockBox=await duelPage.locator('.placement-dock').boundingBox();

@@ -57,10 +57,9 @@ const texto = w => w.document.body.textContent;
 const abreMazo = (w, block, mode) => { click(irAJugar(w), `[data-block="${block}"]`); click(w, `[data-mode="${mode}"]`); };
 const estado = (w, mode) => JSON.parse(w.localStorage.getItem(`hilo-cifras-${mode}-v1`) || "null");
 const duerme = ms => new Promise(listo => setTimeout(listo, ms));
-// Entre elegir el duelo y jugarlo hay una pantalla que explica la modalidad y una cuenta
-// atrás. Las pruebas la acortan a unos milisegundos: lo que importa aquí es la partida.
+// Entre elegir el duelo y jugarlo hay una pantalla que explica la modalidad; la partida
+// empieza al pulsar JUGAR, sin cuenta atrás.
 async function jugar(w) {
-  w.CONTINUUM.Duelo.CUENTA_PASO_MS = 4;
   click(w, '[data-action="duel-play"]');
   await duerme(80);
 }
@@ -522,7 +521,7 @@ console.log("\nEl campo de respuesta dice en qué se puede responder");
   ok("y cuenta como clavada", /Clavado/.test(texto(w)));
 }
 
-console.log("\nAntes de jugar se explica, y hay una cuenta atrás");
+console.log("\nAntes de jugar se explica, y se empieza al pulsar, sin cuenta atrás");
 {
   const w = boot();
   abreMazo(w, "geografia", "population");
@@ -533,16 +532,9 @@ console.log("\nAntes de jugar se explica, y hay una cuenta atrás");
   ok("se dicen el plazo y lo que pasa al salirse", /15 segundos por carta/.test(texto(w)) && /la carta se cierra/.test(texto(w)));
   ok("y hay un botón para empezar", existe(w, '[data-action="duel-play"]'));
 
-  w.CONTINUUM.Duelo.CUENTA_PASO_MS = 30;
   click(w, '[data-action="duel-play"]');
-  ok("al pulsar aparece la cuenta atrás", existe(w, ".cuenta-numero") && w.document.querySelector(".cuenta-numero").textContent === "3");
-  ok("y la partida todavía no ha empezado", !existe(w, '[data-action="cifra-answer"]') && !estado(w, "population"));
-  await duerme(45);
-  ok("la cuenta baja", w.document.querySelector(".cuenta-numero")?.textContent === "2");
-  await duerme(120);
-  ok("al acabar empieza la partida", existe(w, '[data-action="cifra-answer"]'));
+  ok("al pulsar empieza la partida, sin cuenta atrás", existe(w, '[data-action="cifra-answer"]') && !existe(w, ".cuenta-numero"));
   ok("y el reloj de la primera carta arranca ahí, no antes", Number.isFinite(estado(w, "population").empezadaEn));
-  ok("la cuenta atrás ya no está", !existe(w, ".cuenta-numero"));
 }
 
 console.log(`\n${fail} fallos`);
