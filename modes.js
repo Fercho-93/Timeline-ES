@@ -949,9 +949,9 @@
     return `<img class="animal-card-art" src="assets/${folder}/${plate}.${extension}" alt="" width="512" height="768" decoding="async" loading="lazy">`;
   }
 
-  // CSS dibuja el mismo reverso geométrico en todos los mazos, sin ilustraciones ni pistas.
+  // El emblema común identifica una carta por jugar sin revelar su lámina ni su valor.
   function cardBack(modeKey) {
-    return `<span class="carta-reverso" aria-hidden="true"></span>`;
+    return `<span class="carta-reverso" aria-hidden="true"><img class="reverso-emblema" src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" decoding="async"></span>`;
   }
 
   // La huella detecta versiones distintas del contenido; no es una validación del

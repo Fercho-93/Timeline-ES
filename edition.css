@@ -3858,3 +3858,82 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root[data-theme="dark"] #app .solo-home .solo-panel .duel-brief { background: #2a2018; box-shadow: none; }
 :root[data-theme="dark"] #app .solo-home .solo-panel .duel-brief > p { color: #eadbc2; }
 :root[data-theme="dark"] #app .solo-home .solo-panel .duel-brief > .duel-rule { color: #cdb99a; }
+
+/* El reverso común lleva el emblema real de Continuum. La mano se lee por encima
+   de la línea: una carta activa grande, las demás en un abanico limpio y compacto. */
+#app .hand-card, .drag-card-preview {
+  --cardback-fill: radial-gradient(ellipse at 50% 38%, #fff8e9, #f5ead4 58%, #e7d3b1 100%);
+  border-color: #bd9670;
+  box-shadow: inset 0 0 0 1px #fff8e7, 0 5px 13px #51351d26;
+}
+#app .hand-card .carta-reverso::before,
+.drag-card-preview .carta-reverso::before {
+  inset: 6px; border: 1px solid #bd8a657e; border-radius: 6px;
+  box-shadow: inset 0 0 0 3px #f8ecd9, inset 0 0 0 4px #bd8a6545;
+}
+#app .hand-card .carta-reverso::after,
+.drag-card-preview .carta-reverso::after { content: none; }
+#app.atlas-board .hand .hand-card .carta-reverso > .reverso-emblema,
+#app .hand-card .carta-reverso > .reverso-emblema,
+.drag-card-preview .carta-reverso > .reverso-emblema {
+  position: absolute; left: 50%; top: 42%;
+  width: 76%; max-width: 180px; height: auto; max-height: 50%;
+  object-fit: contain; transform: translate(-50%, -50%);
+  opacity: .94; filter: drop-shadow(0 4px 5px #6340214d);
+}
+#app .hand-card > .hidden-date, .drag-card-preview > .hidden-date { color: #775234; }
+#app .hand-card > strong, .drag-card-preview > strong {
+  color: #30271e; background: #fbf4e9e8; border-top-color: #b994686b;
+}
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px; max-width: 460px; margin-inline: auto;
+}
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo):has(> :nth-child(2):last-child),
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo):has(> :nth-child(3):last-child) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card { min-height: 118px; }
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card:not(.selected) .reverso-emblema {
+  width: 68%; max-width: 92px; max-height: 35%; opacity: .7;
+}
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected {
+  order: -1; grid-column: 1 / -1; justify-self: center;
+  width: min(52vw, 210px); min-height: 210px !important; aspect-ratio: 3 / 4 !important;
+  z-index: 2; border: 2px solid #a75438; outline: 1px solid #a75438;
+  outline-offset: 2px; transform: translateY(-5px);
+  box-shadow: 0 2px 0 #6d3927, 0 14px 28px #663b2d66, 0 0 0 7px #c78b5c2e;
+}
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected {
+  aspect-ratio: 3 / 4;
+}
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected .reverso-emblema {
+  width: 78%; max-width: 162px; max-height: 48%; opacity: 1;
+}
+#app.atlas-board .atlas-hand-section .hand-solo .hand-card.selected {
+  border-color: #a75438; outline: 2px solid #a75438; outline-offset: 2px;
+  box-shadow: 0 2px 0 #6d3927, 0 13px 25px #663b2d50, 0 0 0 6px #c78b5c21;
+}
+#app.atlas-board .atlas-hand-many { max-height: 340px; padding: 10px 9px 13px; }
+@media (max-width: 420px) {
+  #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card { min-height: 105px; }
+  #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected { width: min(49vw, 185px); min-height: 188px !important; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  #app.atlas-board .atlas-hand-section .hand-card.selected .reverso-emblema { animation: continuum-mark-reveal .42s ease-out both; }
+}
+@keyframes continuum-mark-reveal {
+  from { opacity: .45; filter: drop-shadow(0 0 1px #dcb78e); }
+  to { opacity: 1; filter: drop-shadow(0 4px 5px #6340214d); }
+}
+:root[data-theme="dark"] #app .hand-card,
+:root[data-theme="dark"] .drag-card-preview {
+  --cardback-fill: radial-gradient(ellipse at 50% 35%, #49352a, #2c211c 78%);
+  border-color: #9b6948;
+}
+:root[data-theme="dark"] #app .hand-card > .hidden-date { color: #edd3a9; }
+:root[data-theme="dark"] #app .hand-card > strong { color: #f4e8d3; background: #342820e8; border-top-color: #aa77545c; }
+/* Con texto ampliado se ve la mano completa, en una sola columna. */
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) {
+  grid-template-columns: 1fr;
+}

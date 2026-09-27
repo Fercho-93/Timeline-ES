@@ -2,8 +2,8 @@
 (function () {
   'use strict';
   const CT = window.CONTINUUM;
-  const playing = new Set(['game', 'solo', 'cifras', 'online-game', 'pass', 'pulse-pass', 'final-local', 'online-final', 'comp-intro', 'tournament-intro', 'online-competition-intro', 'quick-game', 'quick-lobby']);
-  const board = new Set(['game', 'solo', 'online-game', 'quick-game']);
+  const playing = new Set(['game', 'solo', 'cifras', 'online-game', 'local-game', 'pass', 'pulse-pass', 'final-local', 'online-final', 'comp-intro', 'tournament-intro', 'online-competition-intro', 'quick-game', 'quick-lobby']);
+  const board = new Set(['game', 'solo', 'online-game', 'local-game', 'quick-game']);
   const reduced = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const icons = {
     back: '<path d="m14 5-7 7 7 7M7 12h14"/>',
