@@ -82,5 +82,15 @@ try {
   await assertFails(env.withSecurityRulesDisabled(async()=>{}).then(()=>setDoc(doc(out,'quickPublicQueues','quick:2:v1:1'),{code:'YYYYYYYYY2',status:'waiting',capacity:2,updatedAt:serverTimestamp()})));
   assert.deepEqual(failures,[]);
   nueva.close();
+  // Dejar una mesa pública antes de empezar: se libera la plaza y, si se va quien la
+  // llevaba, la lleva quien queda primero.
+  await env.clearFirestore();
+  let mesa=R.create('host','Ana',4);mesa.matchmaking='public';
+  mesa=R.reduce(mesa,'guest',{type:'join',name:'Bea'});
+  await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'quickRooms','ABCDEFGH23'),{...JSON.parse(JSON.stringify(mesa)),catalog:1,updatedAt:new Date()}));
+  const sinAna=R.reduce(mesa,'host',{type:'leave'});
+  assert.equal(sinAna.host,'guest');
+  await assertFails(write(guest,{...sinAna,host:'host'}));
+  await assertSucceeds(write(host,sinAna));
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
 } finally {await env.cleanup();}

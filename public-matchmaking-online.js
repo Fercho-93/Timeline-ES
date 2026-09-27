@@ -51,9 +51,20 @@ async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
   const fingerprint=CT.deckFingerprint(mode);
   const queueKey=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
   const queueRef=doc(db,'publicQueues',queueKey);
+  // La cola puede apuntar a una mesa que ya está jugando: esa no se puede leer (ahí están
+  // las manos) y leerla dentro de la transacción haría fallar toda la búsqueda. Se mira
+  // antes, fuera, y si no se puede leer se abre una mesa nueva en su lugar.
+  const pre=await getDoc(queueRef);
+  const preCode=pre.exists()?pre.data().roomCode:null;
+  let preHidden=false;
+  if(preCode){
+    try{await getDoc(doc(db,'rooms',preCode));}
+    catch(error){if(error?.code==='permission-denied')preHidden=true;else throw error;}
+  }
   return runTransaction(db,async tx=>{
     const freshQueue=await tx.get(queueRef);
-    const oldRef=freshQueue.exists()?doc(db,'rooms',freshQueue.data().roomCode):null;
+    const queuedCode=freshQueue.exists()?freshQueue.data().roomCode:null;
+    const oldRef=queuedCode&&!(preHidden&&queuedCode===preCode)?doc(db,'rooms',queuedCode):null;
     const roomSnap=oldRef?await tx.get(oldRef):null;
     const oldRoom=roomSnap?.exists()?roomSnap.data():null;
     if(oldRoom?.playerOrder?.includes(user.uid)) return oldRoom.roomCode;
@@ -74,6 +85,8 @@ async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
   }).catch(error=>{
     // Con las reglas anteriores no se puede sustituir una mesa abandonada: se entra en
     // ella como antes, y el relevo automático del anfitrión la pondrá en marcha.
+    // También cubre que la mesa de la cola empezase justo entre la comprobación y la
+    // transacción: al repetir, ya no se puede leer y se abre otra.
     if(!allowStale && error?.code==='permission-denied') return findOrCreate(mode,capacityInput,{allowStale:true});
     throw error;
   });

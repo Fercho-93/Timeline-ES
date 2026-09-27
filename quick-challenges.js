@@ -69,7 +69,8 @@
     app().append(layer); CT.openDialog(layer,true);
   }
   function myTurn() {return !room || room.actor === myId;}
-  function stopNetwork() {networkEpoch++;connection?.close();connection=null;room=null;myId=null;busy=false;invite=null;}
+  let publicClock=null;
+  function stopNetwork() {clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;myId=null;busy=false;invite=null;}
   function errorNotice(e) {busy=false;let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=e.message || String(e);CT.announce(e.message || String(e));}
   function formatMenu() {
     stopNetwork();page='menu';state=null;record=null;const saved=load();
@@ -126,7 +127,31 @@
     if(room.config){record=CT.QuickRoom.record(room);state=E.restore(record);selected=null;slot=null;render();}
     else lobby(code || connection?.code);
   }
+  // Mesa pública de Retos rápidos: la misma sala de espera que en Grandes colecciones.
+  // Empieza sola al completarse o, con al menos dos personas, cuando pasan 30 s sin que
+  // entre nadie más; se puede dejar de buscar sin dejar la plaza ocupada.
+  function publicLobby() {
+    clearInterval(publicClock);publicClock=null;
+    const count=room.members.length, cap=room.capacity, left=()=>connection?.secondsLeft?.() ?? 30;
+    const clock=s=>`0:${String(Math.max(0,s)).padStart(2,'0')}`;
+    const status=()=>count<2
+      ? `<div class="public-status-title">Buscando jugadores…</div><p>En cuanto entre alguien más, empieza una cuenta atrás de 30 s.</p>`
+      : left()===0 || count>=cap ? `<div class="public-status-title">Empezando la partida…</div><p>Preparando los retos.</p>`
+      : `<div class="public-status-title">La partida empieza en <b id="quick-public-clock" class="public-clock">${clock(left())}</b></div><p>Puede entrar alguien más (${count} de ${cap}). Si entra, la cuenta vuelve a 30 s.</p>`;
+    const seats=Array.from({length:cap},(_,i)=>{
+      const name=room.names[i], mine=room.members[i]===myId;
+      return name ? `<li class="public-seat${mine?' is-you':''}"><span class="public-seat-avatar">${playerAvatar({name},i)}</span><span class="public-seat-copy"><b>${esc(name)}${mine?' <span class="public-you">tú</span>':''}</b><small>En la mesa</small></span></li>`
+        : `<li class="public-seat is-empty"><span class="public-seat-avatar" aria-hidden="true">+</span><span class="public-seat-copy"><b>Plaza libre</b><small>Esperando a alguien…</small></span></li>`;
+    }).join('');
+    shell(`<section class="setup-section public-lobby"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${cap} jugadores</div><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="hint">Tres retos con las mismas cartas para toda la mesa. Arriesga para sumar puntos o plántate para asegurarlos.</p>
+      <div class="panel public-status" role="status" aria-live="polite">${status()}</div>
+      <div class="panel public-roster"><div class="section-label">Jugadores <small>${count}/${cap}</small></div><ul class="public-seats">${seats}</ul></div>
+      ${button('leave-public','Dejar de buscar','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></section>`);
+    publicClock=setInterval(()=>{const el=document.getElementById('quick-public-clock');if(!el||page!=='network-lobby'){if(!el)clearInterval(publicClock);return;}const s=left();el.textContent=clock(s);el.classList.toggle('is-low',s<=5);},500);
+  }
   function lobby(code) {
+    if(room.matchmaking==='public'){state=null;publicLobby();return;}
+    clearInterval(publicClock);publicClock=null;
     state=null;const host=myId===room.host, isPublic=room.matchmaking==='public';
     shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Sala de Retos rápidos</h2><div class="panel"><p>${code?`Código: <strong>${esc(code)}</strong>`:'Sala en la red Wi-Fi local'}</p><ul>${room.names.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><p>${room.capacity===2 ? "Dos participantes." : `De 2 a ${room.capacity} participantes.`} ${host?'Empieza cuando estéis todos.':'Quien creó la sala elige cuándo empezar.'}</p><p class="hint">El primer turno rotará en cada reto. La sala se puede recuperar después desde Retos rápidos.</p>
     ${host && !isPublic ? button('start-room','Sortear y empezar','btn btn-primary btn-block') : ''}
@@ -158,6 +183,7 @@
   }
   async function formatAction(action) {
     if(action==='formats'){toEntry();return true;}
+    if(action==='leave-public'){const leaving=connection;connection=null;clearInterval(publicClock);await leaving?.leave?.();toEntry();return true;}
     if(action==='show-multi'){const target=app().querySelector('[data-quick="show-multi"]'),panel=app().querySelector('#quick-multi');panel.hidden=!panel.hidden;target.setAttribute('aria-expanded',String(!panel.hidden));target.parentElement.classList.toggle('open',!panel.hidden);return true;}
     if(action==='local'){format=action;setup();return true;}
     if(action==='free'){freeSetup();return true;}
@@ -299,7 +325,7 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    const formatActions=['formats','show-multi','local','free','duel','accept-duel','share-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','share-signal','invite-peer','accept-answer','reconnect'];
+    const formatActions=['formats','leave-public','show-multi','local','free','duel','accept-duel','share-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','share-signal','invite-peer','accept-answer','reconnect'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);

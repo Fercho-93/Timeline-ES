@@ -185,3 +185,31 @@ Chat, ranking/ELO, filtros de nivel, mesas visibles, espectadores, invitaciones 
   mientras espera; una cola sin renovar en dos minutos se da por abandonada y la búsqueda
   abre otra mesa. Quien ya estaba esperando en una mesa abandonada recibe un aviso para
   volver a buscar.
+
+## Sala de espera (revisión con prueba de extremo a extremo)
+
+Referencia: las salas públicas de juegos como Among Us o Risk. Nadie organiza, el juego
+lleva la mesa y nadie se queda esperando para siempre.
+
+- **Cuándo empieza.** Al completarse la mesa (y responder todos al minijuego) o, con al
+  menos dos personas, cuando pasan 30 s sin que entre nadie más. Cada entrada reinicia la
+  cuenta atrás, medida con la hora del servidor (`updatedAt` de la sala). Las reglas no
+  dejan empezar antes de 25 s desde la última entrada. Antes, una mesa de 4 con dos
+  personas no empezaba nunca.
+- **Minijuego mientras se espera.** La carta sale en cuanto hay dos personas; quien entra
+  después responde a la misma; quien no responde a tiempo juega al final.
+- **Salir.** «Dejar de buscar» o la flecha de volver liberan la plaza al momento. Si se va
+  quien lleva la mesa, la pasa a quien queda primero (`validPublicHostLeave`); si no
+  quedaba nadie, la mesa se cierra.
+- **Buscar después de que otra mesa haya empezado.** La cola puede seguir apuntando a una
+  mesa ya en juego, que no se puede leer. Antes, leerla dentro de la transacción hacía
+  fallar toda la búsqueda («Firebase ha rechazado la creación de la mesa pública»); ahora
+  se comprueba antes y se abre una mesa nueva.
+- **Pantalla.** Arriba, la colección y el estado con la cuenta atrás; debajo, los
+  jugadores con su estado (tú, en la mesa, pensando su cifra, ha respondido, sin señal) y
+  el minijuego. Sin «Anfitrión» ni la caja técnica de conexión. Al terminar, «Buscar otra
+  partida».
+- **Retos rápidos.** Las mismas reglas de arranque y de salida (acción `leave` en
+  `quick-room.js` y regla `leaving`).
+- **Prueba.** `npm run test:online-e2e` recorre todo lo anterior con varias personas a la
+  vez, en Chromium y contra los emuladores de Auth y Firestore con las reglas reales.

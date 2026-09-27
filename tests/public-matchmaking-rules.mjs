@@ -87,6 +87,24 @@ await env.withSecurityRulesDisabled(async c=>{
 }
 await check('quien espera en la mesa renueva su cola',true,updateDoc(doc(ctx(H),'publicQueues',KEY),{status:'waiting',updatedAt:serverTimestamp()}));
 
+// Mesa pública de 4 con dos personas: se puede empezar si lleva 25 s sin que entre nadie.
+const empezar = extra => ({status:'playing',phase:'turn',handSize:1,players:{[H]:{...player('Ana'),hand:[1]},[P2]:{...player('Bea'),hand:[2]}},deck:[4],discard:[],timeline:[3],current:0,starter:H,turnsInRound:0,round:1,winner:null,winners:null,reveal:null,version:3,updatedAt:serverTimestamp(),...extra});
+for (const [label, hace, esperado] of [['recién entrada la segunda persona no se puede empezar todavía', 5000, false], ['con dos personas y 30 s sin que entre nadie, sí', 40000, true]]) {
+  await env.clearFirestore();
+  await env.withSecurityRulesDisabled(async c=>{
+    const t=new Date(Date.now()-hace);
+    await setDoc(doc(c.firestore(),'rooms',CODE),{...room(),capacity:4,playerOrder:[H,P2],players:{[H]:player('Ana'),[P2]:player('Bea')},version:2,createdAt:t,updatedAt:t});
+  });
+  await check(label, esperado, updateDoc(doc(ctx(H),'rooms',CODE), empezar()));
+}
+// Quien lleva una mesa pública que aún espera puede irse: la pasa a quien queda primero.
+await env.clearFirestore();
+await env.withSecurityRulesDisabled(async c=>{
+  await setDoc(doc(c.firestore(),'rooms',CODE),{...room(),capacity:4,playerOrder:[H,P2,P3],players:{[H]:player('Ana'),[P2]:player('Bea'),[P3]:player('Cid')},version:2,createdAt:new Date(),updatedAt:new Date()});
+});
+await check('TRAMPA: al irse, pasarle la mesa a quien no toca',false,updateDoc(doc(ctx(H),'rooms',CODE),{players:{[P2]:player('Bea'),[P3]:player('Cid')},playerOrder:[P2,P3],hostUid:P3,version:3,updatedAt:serverTimestamp()}));
+await check('quien lleva la mesa se va y la lleva quien queda primero',true,updateDoc(doc(ctx(H),'rooms',CODE),{players:{[P2]:player('Bea'),[P3]:player('Cid')},playerOrder:[P2,P3],hostUid:P2,version:3,updatedAt:serverTimestamp()}));
+
 await env.cleanup();
 console.log(fail ? '\n'+fail+' fallos' : '\n0 fallos');
 process.exit(fail?1:0);

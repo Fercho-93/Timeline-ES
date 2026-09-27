@@ -2349,3 +2349,30 @@ html.splash-active .ambience-toggle { display: none; }
 /* La cabecera común de cada pantalla (#app .atlas-topbar-actions), la de las salas de
    varios móviles (#app .topbar-actions) y la del duelo por turnos
    (#app .turn-duel-nav-actions) son las que reparten este hueco; ver edition.css. */
+
+/* Mesa pública: estado arriba, jugadores y minijuego debajo (ver renderPublicLobby). */
+.public-lobby { display: grid; gap: 14px; }
+.public-lobby-head h2 { margin: 6px 0 2px; font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.05; }
+.public-lobby-head .hint { margin: 0; }
+.public-status { text-align: center; padding: 18px 16px; }
+.public-status-title { font-family: var(--font-display, inherit); font-size: 1.25rem; font-weight: 700; }
+.public-status p { margin: 6px 0 0; color: var(--muted); font-size: .92rem; }
+.public-clock { display: inline-block; min-width: 3.2ch; font-variant-numeric: tabular-nums; color: var(--accent); }
+.public-clock.is-low { animation: turn-timer-pulse 1s ease-in-out infinite; }
+.public-dots::after { content: "…"; display: inline-block; width: 1.2em; text-align: left; animation: public-dots 1.4s steps(4, end) infinite; overflow: hidden; vertical-align: bottom; }
+@keyframes public-dots { from { width: 0; } to { width: 1.2em; } }
+.public-seats { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.public-seat { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.public-seat.is-you { border-color: var(--accent); }
+.public-seat.is-empty { border-style: dashed; background: transparent; color: var(--muted); }
+.public-seat-avatar { flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; font-size: 1.2rem; }
+.public-seat.is-empty .public-seat-avatar { border: 1px dashed var(--line); }
+.public-seat-copy { display: grid; min-width: 0; }
+.public-seat-copy b { overflow-wrap: anywhere; line-height: 1.2; }
+.public-seat-copy small { color: var(--muted); font-size: .78rem; }
+.public-seat.is-done small { color: #2f7d4f; }
+.public-seat.is-silent small { color: #b3402f; }
+.public-you { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-left: 4px; }
+.public-answered { margin: 10px 0 0; text-align: center; }
+.public-leave { margin-top: 2px; }
+@media (prefers-reduced-motion: reduce) { .public-dots::after, .public-clock.is-low { animation: none; } }

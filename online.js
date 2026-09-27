@@ -42,10 +42,8 @@ const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su a
 const CLIENT_VERSION = 42; // Competición con cambio de mazo entre rondas.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
 let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = null, relayKick = null, queueTimer = null;
-// Mesa pública: el minijuego de quién empieza se juega solo en cuanto la mesa se llena.
-// Cada persona tiene este tiempo para responder; quien no responde juega al final.
-const PUBLIC_STARTER_SECONDS = 30;
-let publicStarterSeen = { key: "", at: 0 }, publicStarterTimer = null, publicClock = null, publicDrawFor = "", publicStartFor = "";
+// Temporizadores y marcas de la sala de espera pública (ver `renderPublicLobby`).
+let publicStarterTimer = null, publicClock = null, publicDrawFor = "", publicStartFor = "";
 const presenceListeners = new Map(), presenceRecords = new Map();
 let connectionMessage = "Conectando con la sala…";
 // El minijuego de quién empieza: cada persona adivina la fecha de una única carta que
@@ -184,7 +182,10 @@ function renderPresence() {
   if (!roomState || !user) return;
   // La presencia sigue activa para reconexión y relevo del anfitrión, pero durante la
   // partida no se muestra: la pantalla debe quedar centrada en el juego.
-  if (roomState.status === "playing") {
+  // En una mesa pública el estado de cada persona ya se ve en la lista de jugadores: la
+  // caja de conexión solo aparece si hay un problema de verdad.
+  const publicOk = roomState.matchmaking === "public" && navigator.onLine && !/Sin confirmación|requiere/.test(connectionMessage);
+  if (roomState.status === "playing" || publicOk) {
     appEl.querySelector("#room-connection")?.remove();
     return;
   }
@@ -829,6 +830,7 @@ function seatSilent(uid) {
 
 function renderLobby() {
   clearTurnTimer();
+  if (roomState.matchmaking === "public") return renderPublicLobby();
   // Cada respuesta ajena repinta la sala de espera: lo que se estaba escribiendo en el
   // minijuego no se pierde por eso.
   const draft = document.getElementById("starter-guess-input")?.value || "";
@@ -858,67 +860,134 @@ function renderLobby() {
   }
 }
 
-// Mesa pública completa: el mismo minijuego que en una sala privada, pero sin nadie que
-// tenga que pulsar nada. El anfitrión técnico reparte la carta solo, cada persona tiene
-// `PUBLIC_STARTER_SECONDS` para responder y la partida arranca en cuanto han
-// respondido todos o se agota el tiempo (quien no respondió juega al final).
-function publicStarterSecondsLeft() {
-  const cardId = starterCardId();
-  if (cardId == null) return null;
-  const key = `${roomCode}:${cardId}`;
-  if (publicStarterSeen.key !== key) publicStarterSeen = { key, at: Date.now() };
-  return Math.max(0, PUBLIC_STARTER_SECONDS - Math.floor((Date.now() - publicStarterSeen.at) / 1000));
+// ---------------------------------------------------------------------------
+// Mesa pública. Como en las salas públicas de otros juegos en línea: nadie organiza, el
+// juego lleva la mesa solo y nadie se queda esperando para siempre.
+// - Con una sola persona, se busca.
+// - Desde que hay dos, corre una cuenta atrás de `PUBLIC_WAIT_SECONDS`, que vuelve a
+//   empezar cada vez que entra alguien más. Al llegar a cero —o al completarse la mesa y
+//   haber respondido todos— empieza la partida.
+// - Mientras tanto se juega el minijuego de quién empieza: la carta sale en cuanto hay
+//   dos personas y quien entra después responde a la misma. Quien no responde a tiempo
+//   juega al final.
+// La cuenta atrás se mide con la hora del servidor (la última entrada en la mesa,
+// `updatedAt`), igual en todos los móviles; las reglas no dejan empezar antes de 25 s.
+const PUBLIC_WAIT_SECONDS = 30;
+let publicJoinedAt = { room: "", at: 0 };
+function publicNow() { return CT.Session.now() ?? Date.now(); }
+function publicSecondsLeft() {
+  const last = roomState?.updatedAt?.toMillis?.();
+  if (!Number.isFinite(last)) return PUBLIC_WAIT_SECONDS;
+  return Math.max(0, Math.ceil((last + PUBLIC_WAIT_SECONDS * 1000 - publicNow()) / 1000));
 }
+function publicElapsed() {
+  if (publicJoinedAt.room !== roomCode) publicJoinedAt = { room: roomCode, at: Date.now() };
+  const seconds = Math.floor((Date.now() - publicJoinedAt.at) / 1000);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+const clockText = seconds => `0:${String(Math.max(0, seconds)).padStart(2, "0")}`;
+function answeredStarter(uid) {
+  const cardId = starterCardId(), record = starterRecords.get(uid);
+  return cardId != null && record?.cardId === cardId && record.value !== null && record.value !== undefined;
+}
+
+function publicStatusMarkup() {
+  const count = roomState.playerOrder.length, capacity = roomState.capacity;
+  const full = count >= capacity;
+  if (count < 2) {
+    return `<div class="public-status-title">Buscando jugadores<span class="public-dots" aria-hidden="true"></span></div>
+      <p>Llevas <b id="public-elapsed">${publicElapsed()}</b> en la mesa. En cuanto entre alguien más, empieza una cuenta atrás de ${PUBLIC_WAIT_SECONDS} s.</p>`;
+  }
+  const left = publicSecondsLeft();
+  if ((full && starterEveryoneAnswered()) || left === 0) {
+    return `<div class="public-status-title">Empezando la partida…</div><p>Repartiendo las cartas.</p>`;
+  }
+  return `<div class="public-status-title">La partida empieza en <b id="public-clock" class="public-clock">${clockText(left)}</b></div>
+    <p>${full ? "Mesa completa: empieza antes si respondéis todos al minijuego." : `Puede entrar alguien más (${count} de ${capacity}). Si entra, la cuenta vuelve a ${PUBLIC_WAIT_SECONDS} s.`}</p>`;
+}
+
+function publicRosterMarkup() {
+  const capacity = roomState.capacity;
+  const cardDrawn = starterCardId() != null;
+  return Array.from({ length: capacity }, (_, index) => {
+    const uid = roomState.playerOrder[index], player = uid ? roomState.players[uid] : null;
+    if (!player) return `<li class="public-seat is-empty"><span class="public-seat-avatar" aria-hidden="true">+</span><span class="public-seat-copy"><b>Plaza libre</b><small>Esperando a alguien…</small></span></li>`;
+    const mine = uid === user.uid;
+    const state = !mine && seatSilent(uid) ? ["Sin señal", "is-silent"]
+      : cardDrawn ? (answeredStarter(uid) ? ["Ha respondido ✓", "is-done"] : ["Pensando su cifra…", "is-thinking"])
+      : ["En la mesa", "is-ready"];
+    return `<li class="public-seat ${state[1]}${mine ? " is-you" : ""}"><span class="public-seat-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'uid:' + uid, id: mine ? CT.Avatares.ownId() : player.avatarId })}</span><span class="public-seat-copy"><b>${escapeHtml(player.name)}${mine ? ' <span class="public-you">tú</span>' : ""}</b><small>${state[0]}</small></span></li>`;
+  }).join("");
+}
+
 function publicStarterMarkup() {
   const cardId = starterCardId();
-  if (cardId == null) return `<div class="waiting-orbit"><span></span></div><h3>Mesa completa</h3><p>Sorteando una carta para decidir el orden de juego…</p>`;
+  if (cardId == null) return "";
   const card = getCard(cardId);
   const regla = CT.axis(modeKey()).cifra || {};
-  const mine = starterRecords.get(user.uid);
-  const answered = mine && mine.cardId === cardId && mine.value !== null;
   const cardMarkup = detalle => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
-  const reloj = `<p class="hint" role="timer">Quedan <b id="public-starter-clock">${publicStarterSecondsLeft()}</b> s para responder. Quien no responda jugará al final.</p>`;
+  const head = `<div class="section-label">¿Quién empieza?</div><p class="hint">Escribe la cifra de esta carta. Empieza quien más se acerque y el resto juega por orden de cercanía.</p>`;
   if (starterEveryoneAnswered()) {
     const ranking = starterRanking();
-    return `${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<p class="hint">Orden de juego:</p><ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol><p>La partida empieza ahora…</p>`;
+    return `${head}${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol>`;
   }
-  if (answered) {
-    const faltan = roomState.playerOrder.filter(uid => { const r = starterRecords.get(uid); return !(r && r.cardId === cardId && r.value !== null); }).map(uid => roomState.players[uid].name);
-    return `<h3>¿Quién empieza?</h3>${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${reloj}`;
+  if (answeredStarter(user.uid)) {
+    return `${head}${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="public-answered">Tu respuesta: <b>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(user.uid).value))}</b>. Las cifras se enseñan cuando empieza la partida.</p>`;
   }
-  return `<h3>¿Quién empieza?</h3><p>Escribe la cifra de esta carta: empieza quien más se acerque y el resto juega por orden de cercanía.</p>${cardMarkup(escapeHtml(regla.pregunta || ""))}
+  return `${head}${cardMarkup(escapeHtml(regla.pregunta || ""))}
     <div class="field cifra-field"><label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label><input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"><p class="hint">${escapeHtml(regla.pista || "")}</p></div>
-    <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Adivinar <span>→</span></button>${reloj}`;
+    <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Responder <span>→</span></button>`;
 }
+
+function renderPublicLobby() {
+  const isHost = roomState.hostUid === user.uid;
+  const draft = document.getElementById("starter-guess-input")?.value || "";
+  const mode = CT.mode(modeKey());
+  const count = roomState.playerOrder.length;
+  const starter = publicStarterMarkup();
+  paint(`<div class="shell online-shell public-lobby">${header('<button class="icon-btn" data-online-action="guide">Guía</button>')}
+    <section class="public-lobby-head"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${roomState.capacity} jugadores</div><h2 data-focus tabindex="-1">${escapeHtml(mode.name)}</h2><p class="hint">Partida con conexión: cada uno juega desde su móvil, con ${roomState.turnSeconds || 30} s por turno.</p></section>
+    <section class="panel public-status" role="status" aria-live="polite">${publicStatusMarkup()}</section>
+    <section class="panel public-roster"><div class="section-label">Jugadores <small>${count}/${roomState.capacity}</small></div><ul class="public-seats">${publicRosterMarkup()}</ul></section>
+    ${starter ? `<section class="panel public-starter">${starter}</section>` : ""}
+    <input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="30">
+    <button class="btn btn-ghost btn-block public-leave" data-online-action="leave-public">Dejar de buscar</button>
+  </div>`, "online-lobby");
+  if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
+  managePublicStarter();
+}
+
+// El reloj de la sala de espera pública y, en el móvil que lleva la mesa, las decisiones
+// que nadie tiene que tomar a mano: repartir la carta del minijuego y empezar.
 function managePublicStarter() {
   clearInterval(publicClock); publicClock = null;
   clearTimeout(publicStarterTimer); publicStarterTimer = null;
-  if (!roomState || roomState.status !== "lobby" || roomState.playerOrder.length !== roomState.capacity) return;
-  const cardId = starterCardId();
-  const isHost = roomState.hostUid === user.uid;
-  if (cardId == null) {
-    // Reparte quien lleva la mesa, una sola vez por mesa (si falla, lo reintenta la
-    // siguiente instantánea).
-    if (isHost && publicDrawFor !== roomCode) { publicDrawFor = roomCode; void drawStarterCard().then(ok => { if (!ok) publicDrawFor = ""; }); }
-    return;
-  }
-  const left = publicStarterSecondsLeft();
-  if (!starterEveryoneAnswered()) {
-    publicClock = setInterval(() => {
-      const clock = document.getElementById("public-starter-clock");
-      if (clock) clock.textContent = publicStarterSecondsLeft();
-    }, 1000);
-  }
-  if (!isHost) return;
-  const startNow = () => {
-    const key = `${roomCode}:${starterCardId()}`;
-    if (publicStartFor === key || roomState?.status !== "lobby" || roomState.hostUid !== user.uid) return;
+  if (!roomState || roomState.matchmaking !== "public" || roomState.status !== "lobby") return;
+  const tick = () => {
+    if (!roomState || roomState.status !== "lobby") { clearInterval(publicClock); publicClock = null; return; }
+    const count = roomState.playerOrder.length;
+    const elapsed = document.getElementById("public-elapsed");
+    if (elapsed) elapsed.textContent = publicElapsed();
+    const left = publicSecondsLeft();
+    const clock = document.getElementById("public-clock");
+    if (clock) { clock.textContent = clockText(left); clock.classList.toggle("is-low", left <= 5); }
+    if (roomState.hostUid !== user.uid || count < 2) return;
+    if (starterCardId() == null) {
+      if (publicDrawFor !== roomCode) { publicDrawFor = roomCode; void drawStarterCard().then(ok => { if (!ok) publicDrawFor = ""; }); }
+      return;
+    }
+    const ready = (count >= roomState.capacity && starterEveryoneAnswered()) || left === 0;
+    const key = `${roomCode}:${roomState.version}`;
+    if (!ready || publicStartFor === key) return;
     publicStartFor = key;
-    void startRoom().finally(() => { if (roomState?.status === "lobby") publicStartFor = ""; });
+    // Con todas las respuestas se deja un momento para ver el orden.
+    publicStarterTimer = setTimeout(() => {
+      if (roomState?.status !== "lobby" || roomState.hostUid !== user.uid) return;
+      void startRoom().finally(() => { if (roomState?.status === "lobby") setTimeout(() => { publicStartFor = ""; }, 2000); });
+    }, left === 0 ? 0 : 2500);
   };
-  // Con todas las respuestas se deja un momento para ver el orden; si no, se espera al
-  // final del plazo.
-  publicStarterTimer = setTimeout(startNow, starterEveryoneAnswered() ? 2500 : left * 1000 + 250);
+  tick();
+  publicClock = setInterval(tick, 500);
 }
 
 function tournamentBoard(winners = []) {
@@ -1566,7 +1635,7 @@ function renderWinner() {
     ? "Ha sido la única persona en terminar la ronda sin cartas."
     : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
   const logroMarkup=sessionAchievements.length?`<div class="logros-nuevos" role="status"><div class="eyebrow">${sessionAchievements.length===1?'Logro nuevo':`${sessionAchievements.length} logros nuevos`}</div>${sessionAchievements.map(item=>`<div class="logro-chip"><b>${escapeHtml(item.name)}</b><small>${escapeHtml(item.desc)}</small></div>`).join('')}</div>`:'';
-  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button><button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}</div></div></section></div>`, "online-winner");
+  paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel winner-online final-composition"><div class="eyebrow">Fin de la partida · Sala ${roomCode}</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${onlineFinalMetrics(roomState.timeline.length,sessionNewDiscoveries,sessionAchievements.length)}${logroMarkup}<div class="actions final-actions"><button class="btn btn-ghost" data-online-action="review-timeline">Ver las ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${roomState.matchmaking === "public" ? '<button class="btn btn-primary" data-online-action="public-again">Buscar otra partida</button><button class="btn btn-secondary" data-online-action="back">Ir al inicio</button>' : `<button class="btn btn-primary" data-online-action="back">Ir al inicio</button>${roomState.hostUid === user.uid ? '<button class="btn btn-secondary" data-online-action="close-room">Cerrar sala</button>' : ""}`}</div></div></section></div>`, "online-winner");
   if(roomState.tournament) {
     const section=appEl.querySelector('.pass-screen');
     section.insertAdjacentHTML('afterbegin',tournamentBoard(uids));
@@ -1618,6 +1687,31 @@ function roomMenu() {
     </div>
   </div></div>`);
   abreCapa(appEl.querySelector("[data-room-overlay]"), true);
+}
+
+// Dejar una mesa pública que todavía espera jugadores: se libera la plaza al momento y, si
+// se iba quien la llevaba, la lleva quien queda primero. Si no quedaba nadie, se cierra.
+async function leavePublicLobby() {
+  if (busy || !roomRef || roomState?.matchmaking !== "public") return;
+  const code = roomCode, queueKey = roomState.queueKey;
+  busy = true;
+  try {
+    if (roomState.playerOrder.length <= 1 && roomState.hostUid === user.uid) await deleteDoc(roomRef);
+    else {
+      await runTransaction(db, async transaction => {
+        const data = (await transaction.get(roomRef)).data();
+        if (!data || data.status !== "lobby" || !data.playerOrder.includes(user.uid)) return;
+        const players = { ...data.players };
+        delete players[user.uid];
+        const playerOrder = data.playerOrder.filter(uid => uid !== user.uid);
+        // Si se va quien lleva la mesa, la pasa a quien queda primero.
+        transaction.update(roomRef, { players, playerOrder, ...(data.hostUid === user.uid ? { hostUid: playerOrder[0] } : {}), version: data.version + 1, updatedAt: serverTimestamp() });
+      });
+      void reopenPublicQueue(code, queueKey);
+    }
+  } catch (error) { console.error(error); }
+  finally { busy = false; }
+  leaveOnline();
 }
 
 // El anfitrión desatasca la partida cuando alguien se queda sin batería o sin cobertura.
@@ -1745,6 +1839,8 @@ function leaveOnline(message = '') {
 }
 function navigateOnline(action) {
   if (action === 'rules') { showGuide(); return; }
+  // Salir de la sala de espera de una mesa pública es dejar de buscar: se libera la plaza.
+  if (roomState?.matchmaking === 'public' && roomState.status === 'lobby' && ['back', 'home-top'].includes(action)) { void leavePublicLobby(); return; }
   const go = () => {
     const code = roomCode;
     const wasInRoom = !!roomRef;
@@ -1859,7 +1955,10 @@ document.addEventListener("click", event => {
   else if (action === "kick") {
     const name = roomState?.players[target.dataset.uid]?.name || "esta persona";
     if (confirm(`¿Expulsar a ${name} de la sala?`)) { CT.closeDialog(); removePlayer(target.dataset.uid); }
-  } else if (action === "leave-room") {
+  } else if (action === "leave-public") void leavePublicLobby();
+  else if (action === "public-again") { detachOnline(); CT.launchPublicMatch?.(); }
+  else if (action === "leave-room") {
+    if (roomState?.matchmaking === "public" && roomState.status === "lobby") { void leavePublicLobby(); return; }
     const question = roomState?.status === "playing" ? "¿Salir de la sala? Tus cartas volverán al mazo." : roomState?.matchmaking === "public" ? "¿Dejar de buscar partida? Tu plaza quedará libre para otra persona." : "¿Salir de la sala?";
     if (confirm(question)) removePlayer(user.uid);
   }

@@ -24,7 +24,7 @@
     const image = art || modeArt[action] || 'home-door-jugar.webp';
     return `<button class="mode-entry${featured ? ' mode-entry-featured' : ''}" data-action="${action}" ${attrs}>
       <span class="mode-entry-art" aria-hidden="true"><img src="assets/${image}" alt="" loading="lazy" decoding="async"></span>
-      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(description)}</small><span class="mode-entry-cta" aria-hidden="true">Explorar <span>→</span></span></span>
+      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(description)}</small><span class="mode-entry-cta" aria-hidden="true">${action === 'public-match' || action === 'quick-public' ? 'Buscar mesa' : action === 'online-collections' ? 'Elegir temas' : 'Explorar'} <span>→</span></span></span>
     </button>`;
   }
 
@@ -104,8 +104,8 @@
 
   function openOnlineHub() {
     hub('hub-online', 'Jugar online', 'Mesas públicas', [
-      `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select><small>Si eliges “Cualquiera”, buscamos primero una mesa de 4 y después de 3 o 2.</small></div>`,
-      modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Entra en la primera mesa disponible.', false, 'data-online-kind="surprise"'),
+      `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquier mesa · más rápido</option><option value="2">Hasta 2 jugadores</option><option value="3">Hasta 3 jugadores</option><option value="4">Hasta 4 jugadores</option></select><small>La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</small></div>`,
+      modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Cualquier colección: entra en la primera mesa que espere jugadores.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
       modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Partidas breves con jugadores aleatorios.', false, 'data-online-kind="quick"')
     ].join(''), modeArt['online-hub']);

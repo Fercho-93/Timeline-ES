@@ -33,6 +33,13 @@
       const name = typeof action.name === 'string' ? action.name.trim() : '';
       if (!name || name.length > 24 || r.names.some(n=>n.toLocaleLowerCase('es') === name.toLocaleLowerCase('es'))) throw Error('Escribe un nombre diferente.');
       r.members.push(id); r.names.push(name);
+    } else if (action.type === 'leave') {
+      // Dejar una mesa pública antes de empezar: se libera la plaza y, si se iba quien la
+      // llevaba, la lleva quien queda primero.
+      const at = r.members.indexOf(id);
+      if (r.matchmaking !== 'public' || r.phase !== 'lobby' || at < 0 || r.members.length < 2) throw Error('No se puede salir ahora.');
+      r.members.splice(at, 1); r.names.splice(at, 1);
+      r.host = r.members[0]; r.actor = r.host;
     } else if (action.type === 'start') {
       if (id !== r.host || r.phase !== 'lobby' || r.members.length < 2) throw Error('Solo quien crea la sala puede empezar, con al menos dos personas.');
       r.config = {names:r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null}; E.create(r.config); metadata(r);

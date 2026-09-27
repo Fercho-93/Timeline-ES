@@ -3609,6 +3609,7 @@
     CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: sessionStorage.getItem('continuum-entry-route') === 'wifi' ? jugarView : playMenu });
   }
 
+  CT.launchPublicMatch = () => launchPublicMatch();
   async function launchPublicMatch() {
     screen = "online-loading";
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Buscando partida</h2><p>Buscando una mesa pública compatible…</p></div></section></div>`);
@@ -3624,7 +3625,8 @@
       const found=await matchmaking.findAcrossModes(pool.length?pool:[selectedModeKey],capacity);
       const {code,mode}=found;
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: backMenu });
+      // Al salir de una mesa pública se vuelve a «Jugar online», no al menú de un mazo.
+      await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: () => CT.ModeHubs ? CT.ModeHubs.open("hub-online") : home() });
       matchmaking.watchPublicRoom?.(code);
     } catch (error) {
       console.error("PUBLIC_MATCH_ERROR", error?.code || "", error?.message || error);

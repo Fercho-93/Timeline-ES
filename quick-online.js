@@ -6,7 +6,7 @@ function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT
 // Solo quien abre una mesa pública puede empezarla, así que la mesa vive mientras esa
 // persona siga esperando: su móvil renueva la cola cada 45 s. Una cola sin renovar en dos
 // minutos es una mesa abandonada: la búsqueda no entra y abre otra en su lugar.
-const STALE_QUEUE_MS=120000;
+const STALE_QUEUE_MS=120000, PUBLIC_WAIT_MS=30000;
 const queueFresh=q=>{const at=q?.updatedAt?.toMillis?.();return Number.isFinite(at)&&Date.now()-at<STALE_QUEUE_MS;};
 async function publicConnect(options) {
   const {name,capacity=4,onChange,onError,allowStale=false}=options;
@@ -20,9 +20,15 @@ async function publicConnect(options) {
   }
   if(!chosen){const cap=capacities[0];chosen={cap,key:publicKey(cap)};}
   const qref=doc(db,'quickPublicQueues',chosen.key);
+  // Una mesa que ya ha empezado no la puede leer quien no está en ella, y leerla dentro de
+  // la transacción haría fallar la búsqueda: se comprueba antes y, si es así, se abre otra.
+  const pre=await getDoc(qref);
+  const preCode=pre.exists()?pre.data().code:null;
+  let preHidden=false;
+  if(preCode){try{await getDoc(doc(db,'quickRooms',preCode));}catch(error){if(error?.code==='permission-denied')preHidden=true;else throw error;}}
   const code=await runTransaction(db,async tx=>{
     const queue=await tx.get(qref);
-    const current=queue.exists()&&queue.data().status==='waiting'&&(allowStale||queueFresh(queue.data()))
+    const current=queue.exists()&&queue.data().status==='waiting'&&(allowStale||queueFresh(queue.data()))&&!(preHidden&&queue.data().code===preCode)
       ? doc(db,'quickRooms',queue.data().code) : null;
     const snap=current?await tx.get(current):null;
     const room=snap?.exists()?snap.data():null;
@@ -48,9 +54,20 @@ async function publicConnect(options) {
   if(code===null)return publicConnect({...options,allowStale:true});
   const ref=doc(db,'quickRooms',code);
   let latest=null,started=false;
-  const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);
-    if(latest.host===uid&&latest.members.length===chosen.cap&&!latest.config&&!started){started=true;const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,3);void api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code}).catch(onError);}
+  // La mesa empieza al completarse o, con al menos dos personas, cuando lleva
+  // PUBLIC_WAIT_MS sin que entre nadie (la hora es la de la última entrada, del
+  // servidor). La arranca quien la lleva; si las reglas aún no lo permiten, se reintenta.
+  const secondsLeft=()=>{const last=latest?.updatedAt?.toMillis?.();return Number.isFinite(last)?Math.max(0,Math.ceil((last+PUBLIC_WAIT_MS-Date.now())/1000)):PUBLIC_WAIT_MS/1000;};
+  const tryStart=()=>{
+    if(!latest||latest.config||latest.phase!=='lobby'||latest.host!==uid||latest.members.length<2||started)return;
+    if(latest.members.length<latest.capacity&&secondsLeft()>0)return;
+    started=true;
+    const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,3);
+    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code}).catch(()=>{setTimeout(()=>{started=false;},2000);});
+  };
+  const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);tryStart();
   }catch(e){onError(e);}},onError);
+  const startTimer=setInterval(tryStart,1000);
   let warned=false;
   const keepAlive=async()=>{
     if(!latest||latest.phase!=='lobby'||latest.members.length>=chosen.cap)return;
@@ -64,8 +81,18 @@ async function publicConnect(options) {
     catch{}
   };
   const keepTimer=setInterval(keepAlive,45000);
-  const close=()=>{clearInterval(keepTimer);stop();};
-  const api={kind:'internet',public:true,code,get host(){return latest?.host===uid;},close,async act(action){if(!latest)throw Error('Espera a que se cargue la mesa.');const revision=latest.revision;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La mesa ya no existe.');const next=R.reduce(snap.data(),uid,action,revision);tx.update(ref,{...next,updatedAt:serverTimestamp()});});}};
+  const close=()=>{clearInterval(keepTimer);clearInterval(startTimer);stop();};
+  // Dejar de buscar: se libera la plaza (o se cierra la mesa si no quedaba nadie más).
+  async function leave(){
+    close();
+    try{await runTransaction(db,async tx=>{
+      const snap=await tx.get(ref);if(!snap.exists())return;
+      const data=snap.data();if(data.phase!=='lobby'||!data.members.includes(uid))return;
+      if(data.members.length<=1){if(data.host===uid)tx.delete(ref);return;}
+      tx.update(ref,{...R.reduce(data,uid,{type:'leave'}),updatedAt:serverTimestamp()});
+    });}catch(error){console.warn('QUICK_PUBLIC_LEAVE',error?.code||error);}
+  }
+  const api={kind:'internet',public:true,code,secondsLeft,leave,get host(){return latest?.host===uid;},close,async act(action){if(!latest)throw Error('Espera a que se cargue la mesa.');const revision=latest.revision;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La mesa ya no existe.');const next=R.reduce(snap.data(),uid,action,revision);tx.update(ref,{...next,updatedAt:serverTimestamp()});});}};
   return api;
 }
 

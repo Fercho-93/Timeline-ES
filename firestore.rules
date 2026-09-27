@@ -41,9 +41,22 @@ service cloud.firestore {
           && b.names.size() == a.names.size()+1
           && b.names == a.names.concat([b.names[b.names.size()-1]]);
       }
+      // Dejar una mesa pública antes de empezar. Si se va quien la llevaba, la lleva quien
+      // queda primero (la única vez que cambia `host`).
+      function leaving(a,b) {
+        return a.get('matchmaking','private') == 'public' && a.phase == 'lobby' && b.phase == 'lobby'
+          && request.auth.uid in a.members && !(request.auth.uid in b.members)
+          && b.diff(a).affectedKeys().hasOnly(['members','names','host','actor','revision','updatedAt'])
+          && b.members.size() == a.members.size() - 1 && b.members.size() >= 1
+          && b.members.toSet() == a.members.toSet().difference([request.auth.uid].toSet())
+          && b.names.size() == b.members.size() && b.host == b.members[0] && b.actor == b.host;
+      }
       function starting(a,b) {
         return request.auth.uid == a.host && a.phase == 'lobby' && a.members.size() >= 2
-          && (a.get('matchmaking','private') != 'public' || a.members.size() == a.capacity)
+          // Mesa pública: empieza al completarse o, con al menos dos personas, cuando lleva
+          // un rato sin que entre nadie (la pantalla cuenta 30 s; aquí se exigen 25).
+          && (a.get('matchmaking','private') != 'public' || a.members.size() == a.capacity
+              || a.updatedAt < request.time - duration.value(25, 's'))
           && b.diff(a).affectedKeys().hasOnly(['config','phase','revision','updatedAt'])
           && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId'])
           && b.config.names == a.names && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
@@ -72,7 +85,7 @@ service cloud.firestore {
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
-        && (joining(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
+        && (joining(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host;
     }
 
@@ -731,7 +744,10 @@ service cloud.firestore {
         let next = request.resource.data;
         return isHost()
           && prior.status == 'lobby'
-          && (prior.get('matchmaking','private') != 'public' || prior.playerOrder.size() == prior.capacity)
+          // Mesa pública: empieza al completarse o, con al menos dos personas, cuando lleva
+          // un rato sin que entre nadie (la pantalla cuenta 30 s; aquí se exigen 25).
+          && (prior.get('matchmaking','private') != 'public' || prior.playerOrder.size() == prior.capacity
+              || prior.updatedAt < request.time - duration.value(25, 's'))
           && prior.playerOrder.size() >= 2
           && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'turnSeconds', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
@@ -1160,6 +1176,20 @@ service cloud.firestore {
         let host = exists(path) ? get(path).data : {'seenAt': resource.data.updatedAt, 'visible': true};
         return host.seenAt is timestamp && request.time > host.seenAt + duration.value(host.visible ? 90 : 15, 's');
       }
+      // Mesa pública que aún espera jugadores: quien la lleva puede irse sin dejar la
+      // plaza ocupada, y pasa a llevarla quien queda primero.
+      function validPublicHostLeave() {
+        let prior = resource.data;
+        let next = request.resource.data;
+        return prior.get('matchmaking', 'private') == 'public' && prior.status == 'lobby'
+          && prior.hostUid == request.auth.uid && prior.playerOrder.size() >= 2
+          && changed().hasOnly(['players', 'playerOrder', 'hostUid', 'version', 'updatedAt'])
+          && next.playerOrder == prior.playerOrder.removeAll([request.auth.uid])
+          && next.players.diff(prior.players).affectedKeys().hasOnly([request.auth.uid])
+          && !(request.auth.uid in next.players)
+          && next.hostUid == next.playerOrder[0]
+          && bumped();
+      }
       function validHostClaim() {
         return isParticipant() && resource.data.status != 'ended'
           && request.resource.data.hostUid == request.auth.uid && changed().hasOnly(['hostUid', 'version', 'updatedAt'])
@@ -1266,6 +1296,7 @@ service cloud.firestore {
                       : (resource.data.phase == 'reveal' ? validAdvance() : validSkip()))))))));
 
       allow update: if registered() && request.resource.data.hostUid != resource.data.hostUid && validHostClaim();
+      allow update: if registered() && request.resource.data.hostUid != resource.data.hostUid && validPublicHostLeave();
 
       allow update: if registered() && isParticipant() && identityKept()
         && (before().phase == 'final' ? (before().status == 'playing' && (validFinalSubmit() || validFinalResolve())) : validFinalStart());
