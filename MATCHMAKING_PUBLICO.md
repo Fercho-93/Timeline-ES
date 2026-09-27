@@ -180,3 +180,8 @@ Chat, ranking/ELO, filtros de nivel, mesas visibles, espectadores, invitaciones 
   mesa abandonada como antes y el relevo automático la pone en marcha.
 - **Sala de espera.** En una mesa pública no se muestra quién es el anfitrión técnico: cada
   plaza dice solo su número y, si esa persona no da señal, «sin señal».
+- **Retos rápidos.** Sus mesas públicas usan la cola `quickPublicQueues` y solo las puede
+  empezar quien las abrió (no hay relevo). Por eso esa persona renueva la cola cada 45 s
+  mientras espera; una cola sin renovar en dos minutos se da por abandonada y la búsqueda
+  abre otra mesa. Quien ya estaba esperando en una mesa abandonada recibe un aviso para
+  volver a buscar.

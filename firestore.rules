@@ -98,9 +98,16 @@ service cloud.firestore {
               && request.resource.data.capacity == resource.data.capacity
               && request.resource.data.status == 'full'
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']))
+          // Quien abrió la mesa renueva la cola cada 45 s mientras espera jugadores.
+          || (resource.data.status == 'waiting' && request.resource.data.status == 'waiting'
+              && request.resource.data.code == resource.data.code
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['updatedAt'])
+              && getAfter(/databases/$(database)/documents/quickRooms/$(resource.data.code)).data.host == request.auth.uid)
           || (request.resource.data.status == 'waiting'
               && request.resource.data.capacity == resource.data.capacity
               && (resource.data.status == 'full'
+                // Sin renovar en dos minutos, la mesa está abandonada: se abre otra.
+                || resource.data.updatedAt < request.time - duration.value(120, 's')
                 || !exists(/databases/$(database)/documents/quickRooms/$(resource.data.code))
                 || get(/databases/$(database)/documents/quickRooms/$(resource.data.code)).data.phase != 'lobby'
                 || get(/databases/$(database)/documents/quickRooms/$(resource.data.code)).data.members.size() >= resource.data.capacity)

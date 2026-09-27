@@ -63,5 +63,24 @@ try {
   await wait(()=>publicRooms.guest?.phase==='turn');
   assert.deepEqual(failures,[]);
   first.close();second.close();
+  // Mesa abandonada: quien la abrió se fue y su cola lleva más de dos minutos sin
+  // renovarse. La búsqueda no entra en ella: abre otra mesa y la cola apunta a la nueva.
+  await env.clearFirestore();
+  const viejo=new Date(Date.now()-5*60000);
+  await env.withSecurityRulesDisabled(async c=>{
+    const d=c.firestore();
+    await setDoc(doc(d,'quickRooms','ZZZZZZZZZ2'),{...JSON.parse(JSON.stringify(R.create('fantasma','Nadie',2))),catalog:1,matchmaking:'public',updatedAt:viejo});
+    await setDoc(doc(d,'quickPublicQueues','quick:2:v1:1'),{code:'ZZZZZZZZZ2',status:'waiting',capacity:2,updatedAt:viejo});
+  });
+  const nueva=await publicAdapter('guest',guest)({name:'Bea',capacity:2,onChange:()=>{},onError:e=>failures.push(e)});
+  assert.notEqual(nueva.code,'ZZZZZZZZZ2','no entra en la mesa abandonada');
+  assert.equal((await getDoc(doc(guest,'quickPublicQueues','quick:2:v1:1'))).data().code,nueva.code);
+  // Solo quien abrió la mesa la mantiene viva en la búsqueda.
+  await assertSucceeds(updateDoc(doc(guest,'quickPublicQueues','quick:2:v1:1'),{updatedAt:serverTimestamp()}));
+  await assertFails(updateDoc(doc(out,'quickPublicQueues','quick:2:v1:1'),{updatedAt:serverTimestamp()}));
+  // Una mesa viva no se puede sustituir.
+  await assertFails(env.withSecurityRulesDisabled(async()=>{}).then(()=>setDoc(doc(out,'quickPublicQueues','quick:2:v1:1'),{code:'YYYYYYYYY2',status:'waiting',capacity:2,updatedAt:serverTimestamp()})));
+  assert.deepEqual(failures,[]);
+  nueva.close();
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
 } finally {await env.cleanup();}
