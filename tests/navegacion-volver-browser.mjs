@@ -31,7 +31,9 @@ async function session(viewport, date, fn) {
   const screen = () => pg.evaluate(() => document.getElementById('app').dataset.screen);
   const settle = () => pg.waitForTimeout(250);
   const tag = `[${viewport.width}px${date ? ' ' + date.slice(0, 10) : ''}]`;
-  const click = async sel => { const el = pg.locator(sel + ':visible').first(); await el.scrollIntoViewIfNeeded({timeout: 5000}); await el.click({timeout: 5000}); await settle(); };
+  // En Inicio las modalidades están plegadas bajo la lámina «Jugar».
+  const openModes = async () => { const toggle = pg.locator('[data-action="toggle-modes"][aria-expanded="false"]'); if (await toggle.count()) { await toggle.first().click(); await pg.waitForTimeout(400); } };
+  const click = async sel => { if (/-hub|mode-entry/.test(sel)) await openModes(); const el = pg.locator(sel + ':visible').first(); await el.scrollIntoViewIfNeeded({timeout: 5000}); await el.click({timeout: 5000}); await settle(); };
   const arrowVisible = () => pg.evaluate(sel => { const el = [...document.querySelectorAll(sel)].find(e => e.checkVisibility({checkOpacity: true, checkVisibilityCSS: true})); if (!el) return false; const r = el.getBoundingClientRect(); return r.width > 20 && r.height > 20; }, ARROW);
   const at = async expected => { const s = await screen(); if (s !== expected) problems.push(`${tag} esperaba ${expected}, está en ${s}`); return s === expected; };
   const back = async expected => {
