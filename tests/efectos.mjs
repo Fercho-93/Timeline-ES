@@ -40,7 +40,7 @@ for (const savedSound of [false, true]) {
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
   try {
     assert.equal(w.CONTINUUM.effectPrefs().sound,false,'las preferencias antiguas no reactivan efectos');
-    for(const selector of ['[data-action="jugar"]','[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
+    for(const selector of ['[data-action="jugar"]','[data-action="toggle-play-catalog"][data-section="collections"]','[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
       w.document.querySelector('#app '+selector).click();
     }
     w.document.querySelector('[data-settings-action="open"]').click();
@@ -70,6 +70,7 @@ console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibr
   const has=kind=>assert.ok(cues.includes(kind),`${kind}: ${cues.join(',')}`);
   try {
     click('#app [data-action="jugar"]');
+    click('#app [data-action="toggle-play-catalog"][data-section="collections"]');
     click('#app [data-block="historia"]'); has('unroll');
     click('#app [data-block="historia"]'); has('close');
     click('#app [data-block="historia"]');

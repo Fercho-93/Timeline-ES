@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
+function irAJugar(w) { const d = w.document; if (d.getElementById("app")?.dataset.screen !== "jugar") { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } if (!d.querySelector("[data-block]")) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -38,8 +38,10 @@ ok("el bloque de historia se despliega con el mazo de historia", /167 hechos/.te
 // Elegir bloque selecciona su primer juego; el clic en el juego es explícito de todos
 // modos, que es como funcionará cuando un bloque tenga varios.
 click(irAJugar(w), '[data-block="cine"]');
-ok("Entretenimiento reúne cine, música y videojuegos", w.document.querySelectorAll(".game-row").length === 3);
-ok("el bloque de cine muestra las 87 películas", /87 películas/.test(w.document.body.innerHTML));
+// La colección que se pliega conserva su lista (inerte) para animar el cierre: se
+// cuentan solo los mazos de la desplegada.
+ok("Entretenimiento reúne cine, música y videojuegos", w.document.querySelectorAll(".collection-entry.active .game-row").length === 3);
+ok("el bloque de cine muestra todas sus películas", new RegExp(`${w.CONTINUUM.cards("movies").length} películas`).test(w.document.body.innerHTML));
 click(w, '[data-mode="movies"]');
 ok("elegir un juego lleva al menú de formatos de Estrenos de cine", w.document.querySelector("h1")?.textContent === "Estrenos de cine");
 

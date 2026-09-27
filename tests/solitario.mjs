@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
+function irAJugar(w) { const d = w.document; if (d.getElementById("app")?.dataset.screen !== "jugar") { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } if (!d.querySelector("[data-block]")) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -18,9 +18,23 @@ const guiones = () => [...gameHtml(read("index.html")).matchAll(/<script src="([
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
+// El reto diario alterna: los días pares sale un mazo de las colecciones y los impares
+// un reto rápido. Esta prueba recorre el de colecciones, así que el reloj —el de aquí y
+// el de cada ventana— se adelanta hasta el primer día par. Sin esto, la prueba fallaba
+// un día sí y otro no.
+const DIA = 24 * 60 * 60 * 1000;
+const esPar = t => Number(new Date(t).toLocaleDateString("sv-SE").replaceAll("-", "")) % 2 === 0;
+const DESFASE = [0, 1, 2].map(n => n * DIA).find(d => esPar(Date.now() + d));
+const adelanta = RealDate => DESFASE ? class extends RealDate {
+  constructor(...args) { if (args.length) super(...args); else super(RealDate.now() + DESFASE); }
+  static now() { return RealDate.now() + DESFASE; }
+} : RealDate;
+globalThis.Date = adelanta(Date);
+
 function boot(almacen = {}) {
   const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
+  window.Date = adelanta(window.Date);
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   // Los scripts se toman de index.html, que es la única lista de verdad: así un mazo
   // nuevo no obliga a tocar cada prueba (y no se olvida, que ya pasó).
@@ -255,11 +269,11 @@ console.log("\nBloque de geografía");
   const w = boot();
   click(irAJugar(w), '[data-block="geografia"]');
   ok("elegir el bloque selecciona su primer juego", /72 países/.test(texto(w)));
-  ok("el bloque lista sus cuatro juegos", w.document.querySelectorAll(".game-row").length === 4);
+  ok("el bloque lista sus cuatro juegos", w.document.querySelectorAll(".collection-entry.active .game-row").length === 4);
   ok("los cuatro juegos del bloque aparecen por su nombre",
      /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w))
      && /Idiomas por hablantes nativos/.test(texto(w)) && /Distancias entre ciudades/.test(texto(w)));
-  ok("la galería ofrece los seis bloques más Retos rápidos", w.document.querySelectorAll(".gallery-panel").length === 7);
+  ok("la galería de colecciones ofrece los seis bloques", w.document.querySelectorAll(".gallery-panel").length === 6);
   const portada = w.document.querySelector(".gallery-panel.active").outerHTML;
   // Las tres carátulas están siempre, pero solo la desplegada pide el tamaño grande.
   ok("la carátula desplegada es la de geografía, no otra",

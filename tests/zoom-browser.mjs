@@ -53,8 +53,10 @@ try {
    assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
    await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
    await transitionPage.locator('[data-action="solo"]').click();
-   assert.ok(await transitionPage.locator('.solo-fold').count()>0,'solitario llega plegado');
-   assert.equal(await transitionPage.locator('.solo-panel:not(.solo-fold)').count(),0,'ningún panel llega abierto');
+   // Solitario tiene ahora un único panel (el reto diario vive en la portada): con uno
+   // solo no hay acordeón, llega abierto y sin pliegue.
+   assert.equal(await transitionPage.locator('.solo-panel').count(),1,'solitario ofrece solo la partida libre');
+   assert.equal(await transitionPage.locator('.solo-fold').count(),0,'un único panel no se pliega');
    await transitionPage.waitForFunction(()=>!document.querySelector('.motion-entering'));
    const soloBefore=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
    await transitionPage.waitForTimeout(400);
@@ -111,7 +113,8 @@ try {
    });
    await encyclopediaPage.locator('[data-action="enc-back"]').first().click();
    await encyclopediaPage.waitForTimeout(260);
-   const restoredImage=encyclopediaPage.locator('.home-gallery-shell img').first();
+   // La enciclopedia se abre desde el Atlas: al cerrarla vuelve ahí, con su misma imagen.
+   const restoredImage=encyclopediaPage.locator('#app[data-screen="perfil"] > .shell img').first();
    assert.equal(await restoredImage.evaluate(image=>image.__continuumCloseProbe===true),true,'cerrar la enciclopedia conserva el mismo nodo de imagen');
    assert.equal(await restoredImage.evaluate(image=>image.complete&&image.naturalWidth>0),true,'la carátula sigue decodificada al reaparecer');
    await encyclopediaPage.close();
@@ -126,31 +129,27 @@ try {
    await openCollections(duelPage);
    await duelPage.locator('[data-block="naturaleza"]').click();
    await duelPage.locator('[data-mode="animals"]').click();
-   await duelPage.locator('[data-action="solo"]').click();
-   await duelPage.locator('.solo-fold[data-solo-kind="duel"] > summary').click();
+   // Los duelos tienen su propia pantalla en el menú del mazo, ya no un pliegue de Solitario.
+   await duelPage.locator('[data-action="duel-home"]').click();
    await duelPage.locator('[data-action="start-duel"]').click();
    await duelPage.locator('[data-action="duel-play"]').click();
-   await duelPage.locator('[data-action="solo-place"]').first().click();
-   const dockBox=await duelPage.locator('.placement-dock').boundingBox();
-   const timelineBox=await duelPage.locator('.timeline-wrap').boundingBox();
-   const handTitleBox=await duelPage.locator('.atlas-hand-section .hand-title').boundingBox();
-   assert.ok(dockBox.y>=timelineBox.y+timelineBox.height-1,'la confirmación queda debajo de la línea');
-   assert.ok(dockBox.y+dockBox.height<=handTitleBox.y+1,'la confirmación queda antes de Tu carta');
-   assert.equal(await duelPage.locator('.placement-dock').evaluate(el=>getComputedStyle(el).position),'static','la confirmación no flota sobre el contenido');
-   assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
+   // La carta de «Tu carta», antes de elegir hueco: sin el pliegue dorado y con presencia.
    const selectedStyle=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>({
      fold:getComputedStyle(el,'::before').display,
-     transform:getComputedStyle(el).transform,
      width:el.getBoundingClientRect().width,
      height:el.getBoundingClientRect().height
    }));
    assert.equal(selectedStyle.fold,'none','la carta inferior no conserva el pliegue dorado');
    assert.ok(selectedStyle.width>=115&&selectedStyle.height>=148,'la carta inferior gana presencia sin dominar la pantalla');
-   // Con la carta a la vista, el muelle no la tapa.
-   await duelPage.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
-   const manoBox=await duelPage.locator('.hand-solo .hand-card').boundingBox();
-   const dockAbajo=await duelPage.locator('.placement-dock').boundingBox();
-   assert.ok(dockAbajo.y+dockAbajo.height<=manoBox.y+1,'la confirmación termina antes de la carta y no la tapa');
+   // Al elegir hueco la carta pasa a la línea como vista previa y el muelle queda debajo.
+   await duelPage.locator('[data-action="solo-place"]').first().click();
+   const dockBox=await duelPage.locator('.placement-dock').boundingBox();
+   const timelineBox=await duelPage.locator('.timeline-wrap').boundingBox();
+   assert.ok(dockBox.y>=timelineBox.y+timelineBox.height-1,'la confirmación queda debajo de la línea');
+   assert.equal(await duelPage.locator('.placement-dock').evaluate(el=>getComputedStyle(el).position),'static','la confirmación no flota sobre el contenido');
+   assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
+   assert.ok(await duelPage.locator('.slot-confirm').isVisible(),'la carta se ve en la línea como vista previa');
+   assert.equal(await duelPage.locator('.hand-solo .hand-card').count(),0,'y no se queda repetida en «Tu carta»');
    await duelPage.screenshot({path:`test-results/zoom/${engine}-duelo-muelle.png`});
    await duelPage.close();
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
@@ -255,7 +254,6 @@ try {
       await historyMode.click();
     }
     await page.locator('[data-action="solo"]').click();
-    await page.locator('.solo-fold').filter({has:page.locator('[data-action="resume-solo"]')}).locator('summary').click();
     await page.locator('[data-action="resume-solo"]').click();
     await page.locator('.timeline-card img').evaluate(img=>img.decode());
     const measure=()=>page.evaluate(()=>{

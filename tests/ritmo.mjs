@@ -11,6 +11,7 @@ const click=action=>{const button=w.document.querySelector('[data-action="'+acti
 try {
  const defaultBlock=w.CONTINUUM.blockOf(w.CONTINUUM.DEFAULT_MODE).key;
  click('jugar');
+ w.document.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]').click();
  w.document.querySelector(`[data-action="set-block"][data-block="${defaultBlock}"]`).click();
  w.document.querySelector(`[data-action="set-mode"][data-mode="${w.CONTINUUM.DEFAULT_MODE}"]`).click();
  assert.ok(w.document.querySelector('[data-action="solo"]'));

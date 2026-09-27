@@ -10,7 +10,7 @@ import path from "node:path";
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
+function irAJugar(w) { const d = w.document; if (d.getElementById("app")?.dataset.screen !== "jugar") { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } if (!d.querySelector("[data-block]")) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
@@ -49,7 +49,7 @@ function play(cardId, neighbourId, slot, expected) {
   check(`${cardId} junto a ${neighbourId}, hueco ${slot}`, !!w.document.querySelector(".modal.success") === expected);
   const CT = w.CONTINUUM;
   const byId = id => w.ANIMAL_SPEED_CARDS.find(card => card.id === id);
-  check("70 y 70,35 km/h se muestran diferentes", CT.formatValue("speed", byId(13020)) !== CT.formatValue("speed", byId(13021)));
+  check("70 y 70,35 km/h se muestran diferentes", CT.formatValue("speed", { value: 70 }) !== CT.formatValue("speed", { value: 70.35 }));
   check("un empate real conserva la misma cifra", CT.formatValue("speed", byId(13007)) === CT.formatValue("speed", byId(13014)));
   check("12,8 kg no se redondean a un entero", CT.formatValue("animals", w.ANIMAL_WEIGHT_CARDS.find(card => card.id === 10013)) === "12,8 kg");
   for (const mode of ["animals", "lifespan", "speed"]) {
@@ -60,8 +60,9 @@ function play(cardId, neighbourId, slot, expected) {
 console.log("\nReferencias animales: empates y proximidad");
 play(13007, 13014, 0, true);
 play(13007, 13014, 1, true);
-play(13021, 13020, 0, false);
-play(13021, 13020, 1, true);
+// La pareja más ajustada del mazo: cebra (64 km/h) y coyote (65 km/h).
+play(13048, 13034, 0, false);
+play(13048, 13034, 1, true);
 
 // La tabla vive en modes.js —compartida con online.js—, no en app.js.
 const modesSource = read("modes.js");

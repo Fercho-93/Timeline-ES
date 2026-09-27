@@ -750,6 +750,9 @@
       section.querySelector(".catalog-toggle").setAttribute("aria-expanded", String(open));
       drawer.inert = !open;
     });
+    // Las portadas entran sin repintar la pantalla: el efecto de profundidad tiene que
+    // enterarse de que ahora hay galería (o de que ya no la hay).
+    CT.UI.refreshDepth?.();
     rememberView();
   }
 
@@ -876,7 +879,11 @@
     if (!CT.hasBlock(blockKey)) return;
     selectedBlockKey = blockKey;
     const games = CT.block(blockKey).games;
-    if (!games.includes(selectedModeKey)) setMode(games[0]);
+    // Desplegar una colección no es elegir mazo: si el primero está cerrado, `setMode`
+    // pintaría su explicación de compra encima de la lista. Se preselecciona el primero
+    // abierto, y si no hay ninguno se deja la lista a la vista, con sus candados.
+    const abierto = games.find(key => CT.Cartera.tiene(key));
+    if (!games.includes(selectedModeKey) && abierto) setMode(abierto);
   }
 
   function setup() {
@@ -1106,7 +1113,11 @@
     const pulseCard = game.pulseTurn ? cardsById.get(game.pulseTurn.cardId) : null;
     const pulseTarget = game.pulseTurn ? game.players.find(item => item.id === game.pulseTurn.targetId) : null;
     const activeCard = pulseCard || selectedCard;
-    const nuevaSeleccion = activeCard && app.querySelector(".hand-card.selected")?.dataset.id !== String(activeCard.id);
+    // Con un hueco pendiente la carta sale de la mano y queda en la vista previa del
+    // hueco: se busca en los dos sitios para que cambiar de hueco o cancelar no cuente
+    // como una selección nueva y no vuelva a desplazar la pantalla.
+    const cartaMostrada = app.querySelector(".hand-card.selected")?.dataset.id ?? app.querySelector(".slot-confirm")?.dataset.cardId;
+    const nuevaSeleccion = activeCard && cartaMostrada !== String(activeCard.id);
     // Tras un fallo, `result` sigue apuntando a la carta que se acaba de fallar (todavía
     // no se ha pulsado «Terminar turno»): se aprovecha para señalar en la propia línea el
     // hueco donde iba de verdad, justo debajo del aviso que ya lo cuenta con palabras.
@@ -1194,7 +1205,7 @@
   }
 
   function confirmSlot(card) {
-    return `<div class="slot-confirm provisional-placement" data-index="${pendingIndex}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${escapeHtml(card.title)}</strong><span aria-hidden="true">${escapeHtml(currentAxis().hiddenLabel)}</span></div>
+    return `<div class="slot-confirm provisional-placement" data-index="${pendingIndex}" data-card-id="${card.id}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${escapeHtml(card.title)}</strong><span aria-hidden="true">${escapeHtml(currentAxis().hiddenLabel)}</span></div>
       <button class="btn btn-primary btn-block" data-action="confirm-place" data-autofocus>Sí, aquí</button>
       <button class="btn btn-ghost btn-block" data-action="cancel-place">Cancelar</button></div>`;
   }
@@ -3746,6 +3757,12 @@
         const active = open && button.dataset.block === selectedBlockKey;
         const drawer = entry.querySelector(".collection-drawer");
         if (active) drawer.firstElementChild.innerHTML = `<div class="collection-decks"><p class="lead">Elige tu mazo</p>${gameList()}</div>`;
+        // La carátula desplegada pide su tamaño grande; al plegarse conserva el que ya
+        // tiene, que está bajado y no hace falta volver a pedir el pequeño.
+        if (active && !button.querySelector('.panel-art img[width="700"]')) {
+          const arte = blockArt(CT.block(button.dataset.block).art, true);
+          button.querySelectorAll(".panel-backdrop, .panel-art").forEach(capa => { capa.innerHTML = arte; });
+        }
         void drawer.offsetHeight;
         entry.classList.toggle("active", active);
         button.classList.toggle("active", active);
@@ -3754,6 +3771,9 @@
         button.setAttribute("aria-label", `${CT.block(button.dataset.block).name}. ${active ? "Mazos visibles debajo." : "Toca para ver sus mazos."}`);
         drawer.inert = !active;
       });
+      // La colección que se abre se despliega con su aviso; la que se pliega solo avisa.
+      if (open) CT.unrollCollection?.(app.querySelector("#deck-collection .collection-entry.active"));
+      else CT.Effects.transition("close");
       rememberView();
     }
     else if (action === "home-new") { game = null; saveGame(); home(); }

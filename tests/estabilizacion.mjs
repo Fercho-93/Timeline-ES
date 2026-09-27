@@ -7,7 +7,7 @@ import { JSDOM } from "jsdom";
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
+function irAJugar(w) { const d = w.document; if (d.getElementById("app")?.dataset.screen !== "jugar") { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } if (!d.querySelector("[data-block]")) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
 
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
 const html = gameHtml(read("index.html"));

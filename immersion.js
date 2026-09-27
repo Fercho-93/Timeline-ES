@@ -374,6 +374,6 @@
   }
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, reveal, openSurface, closeSurface, requestDepth,
+  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, reveal, openSurface, closeSurface, requestDepth, refreshDepth,
     updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

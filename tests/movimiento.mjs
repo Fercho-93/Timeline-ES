@@ -12,7 +12,7 @@ function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
+function irAJugar(w) { const d = w.document; if (d.getElementById("app")?.dataset.screen !== "jugar") { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } if (!d.querySelector("[data-block]")) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
 
 
 const root = new URL("../", import.meta.url);
@@ -169,7 +169,7 @@ console.log("\nCambiar de categoría durante un ajuste de altura");
   const w = boot();
   const animations = [];
   let height = 200;
-  const container = el(irAJugar(w), '.deck-collection');
+  const container = el(irAJugar(w), '#deck-collection');
   container.getBoundingClientRect = () => ({ height });
   container.animate = () => {
     let resolve, reject;

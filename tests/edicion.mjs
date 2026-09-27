@@ -11,7 +11,7 @@ function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
+function irAJugar(w) { const d = w.document; if (d.getElementById("app")?.dataset.screen !== "jugar") { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } if (!d.querySelector("[data-block]")) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
 
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
@@ -63,10 +63,10 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       assert.ok(w.document.querySelector('.hand-card'), 'el ambiente no sustituye la partida');
       // Ninguna lámina en la mano: situaría la carta en su época sin saber nada del hecho
       // que cuenta, y eso vale para los treinta y pico mazos por igual. En su sitio va el
-      // reverso de la colección, el mismo para todas sus cartas.
+      // reverso geométrico que CSS dibuja igual en todos los mazos (`cardBack`, en modes.js).
       assert.equal(w.document.querySelector('.hand .animal-card-art'), null, `${block.key}: la mano no enseña láminas`);
-      assert.ok(w.document.querySelector('.hand img').getAttribute('src').startsWith('assets/hero-'), `${block.key}: solo se usa la portada común`);
-      assert.ok(w.document.querySelector('.hand .carta-reverso .reverso-coleccion'), `${block.key}: la mano enseña el reverso del mazo`);
+      assert.equal(w.document.querySelector('.hand img'), null, `${block.key}: la mano no lleva ninguna imagen`);
+      assert.ok(w.document.querySelector('.hand .carta-reverso'), `${block.key}: la mano enseña el reverso común`);
       click(w, '[data-action="ui-back"]');
       click(w, '[data-exit-confirm]');
       click(w, '[data-action="back-menu"]');
@@ -85,13 +85,13 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 {
   const w = boot();
   try {
-    // Cada colección tiene su portada, que es lo que hace que el reverso diga de qué se
-    // está jugando sin decir nada de la carta que tapa.
+    // El reverso es el mismo dibujo geométrico en todos los mazos: no da pistas de la
+    // carta que tapa ni de su colección, y no descarga ninguna imagen.
     const reversos = Object.values(w.CONTINUUM.BLOCKS).map(block => w.CONTINUUM.cardBack(block.games[0]));
-    assert.equal(new Set(reversos).size, reversos.length, 'cada colección trae su propia portada');
+    assert.equal(new Set(reversos).size, 1, 'todas las colecciones comparten el mismo reverso');
     for (const reverso of reversos) {
       assert.match(reverso, /class="carta-reverso" aria-hidden="true"/, 'el reverso no se lee en voz alta');
-      assert.match(reverso, /src="assets\/hero-[a-z]+-400\.webp"/, 'el reverso usa la portada común de la colección');
+      assert.doesNotMatch(reverso, /<img/, 'el reverso no lleva ilustración');
     }
     // Y la lámina no desaparece del juego: la enseñan la carta ya colocada —donde su
     // valor está a la vista y no hay nada que adivinar— y la enciclopedia.

@@ -7,7 +7,7 @@ import {JSDOM} from 'jsdom';
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } return w; }
+function irAJugar(w) { const d = w.document; if (d.getElementById("app")?.dataset.screen !== "jugar") { if (!d.querySelector('[data-action="jugar"]')) d.querySelector('.home-nav [data-action="home-top"]')?.click(); pulsaPuerta(d, "jugar"); } if (!d.querySelector("[data-block]")) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
 
 const read = f => fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
 const html = gameHtml(read('index.html'));
@@ -44,19 +44,23 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     assert.equal(w.document.querySelectorAll('.hand-card').length,4);
     assert.equal(w.document.querySelector('.home-nav'),null);
     assert.equal(w.document.querySelectorAll('.topbar button').length,2);
-    click(w,'.hand-card');click(w,'.slot');
+    click(w,'.hand-card');
     const selected=w.document.querySelector('.hand-card.selected').dataset.id;
+    click(w,'.slot');
+    // Con el hueco elegido, la carta pasa a la línea como vista previa y sale de la mano.
+    assert.equal(w.document.querySelector('.slot-confirm').dataset.cardId,selected);
+    assert.equal(w.document.querySelector('.hand-card.selected'),null);
     assert.equal(w.document.querySelectorAll('[data-action="confirm-place"]').length,1);
     assert.ok(w.document.querySelector('.placement-dock [data-action="confirm-place"]'));
     assert.equal(w.document.querySelector('.placement-dock-status strong').textContent,'Posición elegida');
     assert.equal(w.document.querySelector('.placement-dock-actions [data-action="cancel-place"]').textContent,'Cambiar');
     const timelineSection=w.document.querySelector('.timeline-wrap').closest('section');
     assert.equal(timelineSection.nextElementSibling.className,'placement-dock');
-    assert.ok(timelineSection.nextElementSibling.nextElementSibling.classList.contains('atlas-hand-section'));
+    assert.ok(timelineSection.previousElementSibling.classList.contains('atlas-hand-section'));
     assert.equal(w.document.querySelector('.slot-confirm button'),null);
     const zoom=w.document.querySelector('[data-timeline-range]');zoom.value='0';zoom.dispatchEvent(new w.Event('input',{bubbles:true}));
     assert.equal(w.document.querySelector('.timeline-zoom output').textContent,'80%');
-    assert.equal(w.document.querySelector('.hand-card.selected').dataset.id,selected);
+    assert.equal(w.document.querySelector('.slot-confirm').dataset.cardId,selected,'el zoom conserva la carta en vista previa');
     const saved=w.localStorage.getItem('hilo-game-animals-v1');
     click(w,'[data-action="ui-back"]');assert.ok(w.document.querySelector('[data-exit-dialog]'));
     click(w,'[data-exit-stay]');assert.equal(screen(w),'game');assert.equal(w.localStorage.getItem('hilo-game-animals-v1'),saved);
@@ -150,6 +154,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     };
     // Las portadas de las colecciones viven en «Jugar».
     const jugar = w.document.querySelector('[data-action="jugar"]'); jugar.dataset.homeTransition = "done"; jugar.click();
+    click(w, '[data-action="toggle-play-catalog"][data-section="collections"]');
     inclina(0, 0);            // la primera lectura fija el origen
     inclina(9, 9);            // media inclinación en los dos ejes
     await new Promise(resolve => setTimeout(resolve, 40));   // el frame que escribe
