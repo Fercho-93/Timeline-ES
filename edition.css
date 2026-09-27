@@ -3940,18 +3940,18 @@ html:not(:has(#app[data-screen="home"]))::before {
 
 /* Mano en abanico: una única fila de cartas superpuestas alrededor de la elegida. */
 #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan {
-  --fan-step: min(21vw, 78px);
+  --fan-step: min(14.7vw, 54.6px);
   display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr;
   justify-items: center; align-items: center;
-  width: 100%; max-width: 460px; height: clamp(218px, 64vw, 245px);
-  min-height: 0; max-height: none; margin: 0 auto; padding: 12px 0 22px;
+  width: 100%; max-width: 460px; height: clamp(160px, 45vw, 176px);
+  min-height: 0; max-height: none; margin: 0 auto; padding: 8px 0 18px;
   overflow: clip; isolation: isolate; touch-action: pan-y;
 }
 #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card {
   grid-area: 1 / 1; order: 0; position: relative;
-  width: min(38vw, 150px); min-height: 0 !important; height: auto !important;
-  aspect-ratio: 3 / 4 !important; margin: 0; padding: 10px;
-  transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 16px)) rotate(calc(var(--fan-offset) * 6deg)) scale(calc(1 - var(--fan-depth) * .14));
+  width: min(26.6vw, 105px); min-height: 0 !important; height: auto !important;
+  aspect-ratio: 3 / 4 !important; margin: 0; padding: 6px;
+  transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 6deg)) scale(calc(1 - var(--fan-depth) * .14));
   transform-origin: center 85%; touch-action: pan-y;
   border: 1px solid #b99570; outline: 0;
   box-shadow: 0 7px 12px #51351d33;
@@ -3982,7 +3982,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: auto; min-height: 300px; }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(66vw, 250px); min-height: 290px !important; }
 
-/* La lámina ocupa la carta entera; el pie de papel garantiza contraste al leer. */
+/* La ilustración llega a los bordes; una veladura oscura protege la lectura. */
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(> .card-visual > .animal-card-art) {
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: 0; isolation: isolate; background: #f8efdd;
@@ -3999,20 +3999,29 @@ html:not(:has(#app[data-screen="home"]))::before {
   filter: sepia(.12) saturate(.95);
 }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-content {
-  position: relative; margin-top: auto; padding: 22px 9px 9px;
-  background: linear-gradient(to bottom, transparent 0, #f8efdd 18px, #f8efdd 100%);
-  color: #30271e; text-shadow: none;
+  position: relative; margin-top: auto; padding: 16px 8px 7px;
+  background: linear-gradient(to bottom, transparent 0, #21160edb 14px, #21160ef0 100%);
+  color: #fff7e8; text-shadow: 0 1px 2px #0009;
 }
-#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content :is(h3, p) { color: #30271e; }
-#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .year { color: #823e27; }
+#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content :is(h3, p) { color: #fff7e8; }
+#app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .year { color: #ffdaa2; border-top-color: #fff7e840; }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) > .card-category {
-  position: relative; align-self: flex-start; margin: 6px 6px 60px;
-  max-width: calc(100% - 12px); background: #f8efdd; color: #51402e;
+  position: relative; align-self: flex-start; margin: 6px 6px 48px;
+  max-width: calc(100% - 12px); background: #21160edb; color: #fff7e8;
   white-space: normal; overflow-wrap: anywhere; flex-shrink: 0;
 }
 :root[data-theme="dark"] #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) > .card-content {
-  background: linear-gradient(to bottom, transparent 0, #2d2119 18px, #2d2119 100%);
+  background: linear-gradient(to bottom, transparent 0, #21160edb 14px, #21160ef0 100%);
   color: #f6ead7;
 }
 :root[data-theme="dark"] #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content :is(h3, p) { color: #f6ead7; }
 :root[data-theme="dark"] #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .year { color: #edbe91; }
+
+/* Tamaño compacto sin reducir los controles táctiles ni el texto accesible. */
+#app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong {
+  font-size: .72rem; line-height: 1.12; padding: 4px 3px;
+}
+#app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > .hidden-date {
+  font-size: .42rem; letter-spacing: .03em;
+}
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: 1rem; }
