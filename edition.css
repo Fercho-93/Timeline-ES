@@ -3937,3 +3937,47 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) {
   grid-template-columns: 1fr;
 }
+
+/* Mano en abanico: una única fila de cartas superpuestas alrededor de la elegida. */
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan {
+  --fan-step: min(21vw, 78px);
+  display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr;
+  justify-items: center; align-items: center;
+  width: 100%; max-width: 460px; height: clamp(248px, 74vw, 285px);
+  min-height: 0; max-height: none; margin: 0 auto; padding: 12px 0 22px;
+  overflow: clip; isolation: isolate; touch-action: pan-y;
+}
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card {
+  grid-area: 1 / 1; order: 0; position: relative;
+  width: min(44vw, 175px); min-height: 0 !important; height: auto !important;
+  aspect-ratio: 3 / 4 !important; margin: 0; padding: 10px;
+  transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 16px)) rotate(calc(var(--fan-offset) * 6deg)) scale(calc(1 - var(--fan-depth) * .14));
+  transform-origin: center 85%; touch-action: pan-y;
+  border: 1px solid #b99570; outline: 0;
+  box-shadow: 0 7px 12px #51351d33;
+  opacity: .8; animation: none;
+}
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card.fan-center {
+  opacity: 1; border: 2px solid #a75438; outline: 1px solid #a7543880; outline-offset: 2px;
+  box-shadow: 0 3px 0 #734632, 0 12px 22px #663b2d59;
+}
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card.fan-away {
+  visibility: hidden; pointer-events: none;
+}
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card .reverso-emblema {
+  width: 76%; max-width: 162px; height: auto; max-height: 48%; opacity: .94;
+}
+#app.atlas-board .hand-fan-controls {
+  display: flex; align-items: center; justify-content: center; gap: 22px;
+  margin: -6px auto 4px; color: var(--edition-muted);
+}
+#app.atlas-board .hand-fan-controls button {
+  width: 44px; height: 44px; min-height: 44px; padding: 0;
+  border: 1px solid #b9957066; border-radius: 50%; background: #f9f0dfaa;
+  color: #825039; font: 1.6rem/1 var(--ui-font); box-shadow: 0 2px 4px #51351d14;
+}
+#app.atlas-board .hand-fan-controls span { min-width: 52px; text-align: center; font: .75rem var(--ui-font); font-variant-numeric: tabular-nums; }
+#app.atlas-board .hand-fan-controls button:disabled { opacity: .35; }
+:root[data-theme="dark"] #app.atlas-board .hand-fan-controls button { background: #392a20; color: #edd3a9; }
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: auto; min-height: 300px; }
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(66vw, 250px); min-height: 290px !important; }

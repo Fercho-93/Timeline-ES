@@ -66,6 +66,12 @@ function checkBoard(document, count) {
     checkBoard(document, 4);
     click(document, '.hand-card:not(.selected)');
     assert.equal(document.querySelectorAll('.hand-card.selected').length, 1, 'solo una carta jugable resalta');
+    assert.ok(document.querySelector('.hand-fan .fan-center.selected'), 'la elegida queda en el centro');
+    const before = document.querySelector('.hand-card.selected').dataset.id;
+    click(document, '[data-fan-step="1"]');
+    assert.notEqual(document.querySelector('.hand-card.selected').dataset.id, before, 'la flecha elige la siguiente carta');
+    click(document, '[data-fan-step="-1"]');
+    assert.equal(document.querySelector('.hand-card.selected').dataset.id, before, 'el carrusel conserva el orden');
   } finally { window.close(); }
 }
 {
@@ -96,6 +102,16 @@ function checkBoard(document, count) {
     assert.ok(document.querySelectorAll('.hand-card').length > 1, 'el reto mantiene todas las cartas comunes');
     click(document, '[data-quick="select"]');
     assert.equal(document.querySelectorAll('.hand-card.selected').length, 1);
+    assert.ok(document.querySelectorAll('.hand-fan .hand-card:not(.fan-away)').length <= 5, 'la mano larga ocupa un abanico compacto');
+    const before = document.querySelector('.hand-card.selected').dataset.id;
+    const hand = document.querySelector('.hand-fan');
+    for (const [type, x] of [['pointerdown', 220], ['pointermove', 150], ['pointerup', 120]]) {
+      const event = new window.MouseEvent(type, {bubbles: true, cancelable: true, clientX: x, clientY: 100});
+      Object.defineProperties(event, {pointerType: {value: 'touch'}, pointerId: {value: 1}});
+      hand.dispatchEvent(event);
+    }
+    assert.notEqual(document.querySelector('.hand-card.selected').dataset.id, before, 'deslizar cambia la carta sin salir de la partida');
+    assert.ok(document.querySelector('.hand-fan .fan-center.selected'));
   } finally { window.close(); }
 }
 console.log('Mano y reverso: solitario, local, online y retos rápidos correctos.');

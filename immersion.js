@@ -132,6 +132,88 @@
       });
     });
   }
+  let previousFan = null;
+  function mountHandFan(hand) {
+    const cards = [...hand.querySelectorAll('.hand-card')];
+    if (hand.classList.contains('hand-solo') || cards.length < 2) return;
+    hand.classList.add('hand-fan');
+    hand.setAttribute('role', 'group');
+    hand.setAttribute('aria-label', 'Cartas en mano. Desliza a los lados para elegir.');
+    const chosen = cards.findIndex(card => card.classList.contains('selected'));
+    const center = Math.max(0, chosen);
+    const enabled = cards.some(card => !card.disabled);
+    const key = cards.map(card => card.dataset.id).join('|');
+    const distance = (index, active) => {
+      let delta = index - active;
+      if (delta > cards.length / 2) delta -= cards.length;
+      if (delta < -cards.length / 2) delta += cards.length;
+      return delta;
+    };
+    const step = Math.min(78, window.innerWidth * .21);
+    const pose = offset => `translateX(${offset * step}px) translateY(${Math.abs(offset) * 16}px) rotate(${offset * 6}deg) scale(${Math.max(.65, 1 - Math.abs(offset) * .14)})`;
+    cards.forEach((card, index) => {
+      const offset = distance(index, center);
+      card.style.setProperty('--fan-offset', offset);
+      card.style.setProperty('--fan-depth', Math.abs(offset));
+      card.style.zIndex = String(10 - Math.abs(offset));
+      card.classList.toggle('fan-center', index === center);
+      card.classList.toggle('fan-away', Math.abs(offset) > 2);
+      card.tabIndex = index === center && enabled ? 0 : -1;
+      card.setAttribute('aria-label', `${card.querySelector('strong')?.textContent || 'Carta'}. ${index + 1} de ${cards.length}`);
+      if (!reduced() && previousFan?.key === key && previousFan.center !== center && Math.abs(offset) <= 2) {
+        card.animate?.([{transform: pose(distance(index, previousFan.center))}, {transform: pose(offset)}], {duration: 260, easing: 'cubic-bezier(.2,.7,.2,1)'});
+      }
+    });
+    previousFan = {key, center};
+    const controls = document.createElement('div');
+    controls.className = 'hand-fan-controls';
+    controls.innerHTML = `<button type="button" aria-label="Carta anterior" data-fan-step="-1">‹</button><span>${center + 1} / ${cards.length}</span><button type="button" aria-label="Carta siguiente" data-fan-step="1">›</button>`;
+    hand.insertAdjacentElement('afterend', controls);
+    const select = direction => {
+      if (!enabled || !hand.isConnected) return;
+      cards[(center + direction + cards.length) % cards.length].click();
+    };
+    controls.querySelectorAll('button').forEach(button => {
+      button.disabled = !enabled;
+      button.addEventListener('click', () => select(Number(button.dataset.fanStep)));
+    });
+    hand.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      select(event.key === 'ArrowLeft' ? -1 : 1);
+      document.querySelector('.hand-fan .fan-center')?.focus({preventScroll: true});
+    });
+    let gesture = null;
+    hand.addEventListener('pointerdown', event => {
+      if (!enabled || event.pointerType === 'mouse' || event.isPrimary === false) return;
+      gesture = {id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false};
+    });
+    hand.addEventListener('pointermove', event => {
+      if (!gesture || event.pointerId !== gesture.id) return;
+      if (document.body.classList.contains('dragging-card')) { gesture = null; return; }
+      const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
+      if (!gesture.horizontal && Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { gesture = null; return; }
+      if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        gesture.horizontal = true;
+        event.preventDefault();
+        hand.setPointerCapture?.(event.pointerId);
+      }
+    }, {passive: false});
+    hand.addEventListener('pointerup', event => {
+      const move = gesture; gesture = null;
+      if (!move || event.pointerId !== move.id || !move.horizontal || document.body.classList.contains('dragging-card')) return;
+      const dx = event.clientX - move.x;
+      if (Math.abs(dx) < 35) return;
+      event.preventDefault();
+      // Evita que el clic sintético del dedo seleccione otra carta tras repintar.
+      const swallow = click => { if (click.isTrusted) { click.preventDefault(); click.stopImmediatePropagation(); } };
+      document.addEventListener('click', swallow, true);
+      setTimeout(() => document.removeEventListener('click', swallow, true), 350);
+      select(dx < 0 ? 1 : -1);
+    });
+    hand.addEventListener('pointercancel', () => { gesture = null; });
+  }
+
   function mount(container, screen) {
     if (['solo-end', 'winner', 'online-winner', 'comp-end'].includes(screen)) atlasFinal(container);
     if (screen === 'home') finalCards = [];
@@ -178,6 +260,7 @@
         hand.closest('section')?.classList.add('atlas-hand-section');
         // Se desplaza la mano cuando hay más de cuatro; nunca se eliminan cartas.
         hand.classList.toggle('atlas-hand-many', hand.children.length > 4);
+        mountHandFan(hand);
         const hint = hand.parentElement.querySelector('.hint');
         if (hint) hint.hidden = true;
       }

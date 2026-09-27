@@ -36,7 +36,7 @@
 
   function blocked(target) {
     if (!(target instanceof Element)) return false;
-    if (target.closest(CONTROLS)) return true;
+    if (target.closest(CONTROLS) || target.closest('.hand-fan, .hand-fan-controls')) return true;
     for (let node = target; node; node = node.parentElement) {
       if (scroller(node)) return true;
     }
