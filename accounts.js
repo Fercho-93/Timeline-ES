@@ -243,7 +243,7 @@ async function ranking() {
   const mine=entries.findIndex(v=>v.id===identity.uid);
   const ownSnap=mine<0?await getDocFromServer(refs(identity.uid).ranking):null;
   const own=mine>=0?entries[mine]:ownSnap?.exists()?{id:identity.uid,...ownSnap.data()}:null;
-  const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id });
+  const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, ...(v.id === CT.Accounts?.user?.uid ? { id: CT.Avatares.ownId() } : {}) });
   const player=(v,i)=>`<tr class="${v.id===identity.uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${v.id===identity.uid?'<small class="ranking-you">Tú</small>':''}</td><td><b>${Number(v.hits)||0}</b></td></tr>`;
   const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===identity.uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${v.id===identity.uid?'<small class="ranking-you">Tú</small>':''}<strong>${Number(v.hits)||0}</strong><span>aciertos</span></article>`).join('');
   accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETOS DIARIOS</span><span class="ranking-emblem" aria-hidden="true">✦</span><h2>La cima te espera</h2><p>Un nuevo día. Un nuevo reto. Tu siguiente puesto.</p><span class="ranking-caption">Ranking de retos diarios · Top 50</span></header>

@@ -109,19 +109,19 @@ await expectBack('home');
 
 // Tras salir de una partida se vuelve a su preparación, y desde ahí hacia atrás sin
 // quedarse dando vueltas entre dos pantallas.
-await click('.home-door[data-action="jugar"]');
+await click('[data-action="solo-hub"]');
+await click('[data-solo-route="collections"]');
 assert.equal(screen(), 'jugar');
-await click('[data-action="toggle-play-catalog"][data-section="collections"]');
 await openFirstDeck();
-await click('.play-choice-block [data-action="toggle-format-block"]');
-await click('.play-choice[data-action="setup"]');
-await click('[data-action="start"]');
-assert.equal(screen(), 'pass');
+await click('.play-choice[data-action="solo"]');
+await click('[data-action="start-free"]');
+assert.equal(screen(), 'solo');
 await back();
 await click('[data-exit-confirm]');
-assert.equal(screen(), 'setup');
+assert.equal(screen(), 'solo-home');
 await expectBack('play-menu');
 await expectBack('jugar');
+await expectBack('hub-solo');
 await expectBack('home');
 
 // Deslizar hacia la derecha hace lo mismo que la flecha, también en las pantallas que
@@ -137,18 +137,20 @@ async function swipe() {
   pointer('pointerup', 170);
   await tick(); await tick();
 }
-await click('.home-door[data-action="jugar"]');
-await click('[data-action="quick-challenges"]');
+await click('[data-action="solo-hub"]');
+await click('[data-solo-route="quick"]');
 assert.equal(screen(), 'quick-challenges');
-await click('[data-quick="free"]');
-assert.ok(app().querySelector('[data-quick="start-free"]'));
+await click('[data-quick="start-free"]');
+assert.ok(app().querySelector('[data-quick="ready"]'));
 await swipe();
-assert.ok(app().querySelector('[data-quick="free"]'), 'deslizar en un formato de Retos rápidos vuelve a sus formatos');
+assert.ok(app().querySelector('[data-quick="start-free"]'), 'deslizar en el reto preparado vuelve a elegir la duración');
 await swipe();
-assert.equal(screen(), 'jugar', 'y desde los formatos, al catálogo');
-await click('[data-action="toggle-play-catalog"][data-section="collections"]');
+assert.equal(screen(), 'hub-solo', 'y desde ahí, a Jugar solo');
+await swipe();
+assert.equal(screen(), 'home');
+await click('[data-action="friends-hub"]');
+await click('[data-friend-route="wifi"]');
 await openFirstDeck();
-await click('.play-choice-block [data-action="toggle-format-block"]');
 await click('.play-choice[data-action="local-multiplayer"]');
 const wifi = screen();
 assert.ok(wifi.startsWith('local-'), `Wi-Fi local abierto (${wifi})`);
