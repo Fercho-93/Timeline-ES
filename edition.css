@@ -4004,8 +4004,8 @@ html:not(:has(#app[data-screen="home"]))::before {
   color: #302116; text-shadow: none;
 }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content h3 {
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-  max-height: 2.4em; overflow: hidden; margin: 0 0 5px;
+  display: block; max-height: none; overflow: visible; overflow-wrap: break-word;
+  margin: 0 0 5px;
   font-size: .76rem; line-height: 1.2;
 }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content :is(h3, p) { color: #302116; }
@@ -4040,8 +4040,8 @@ html:not(:has(#app[data-screen="home"]))::before {
   background: #f8efdd; color: #302116;
 }
 #app .turn-duel-board .timeline .animal-timeline-card .card-content h3 {
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-  max-height: 2.4em; overflow: hidden; margin: 0 0 5px; font-size: .76rem; line-height: 1.2;
+  display: block; max-height: none; overflow: visible; overflow-wrap: break-word;
+  margin: 0 0 5px; font-size: .76rem; line-height: 1.2;
 }
 #app .turn-duel-board .timeline .animal-timeline-card .card-content .year {
   margin-top: auto; padding-top: 5px; color: #824023;

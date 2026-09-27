@@ -72,6 +72,20 @@ try {
    assert.equal(illustrated.titleColor,'rgb(48, 33, 22)','el título tiene tinta oscura');
    const fullTitle=await illustratedCard.locator('h3').textContent();
    const fullValue=await illustratedCard.locator('.year').textContent();
+   // Un título largo debe verse entero en la carta compacta, sin ocultar la fecha.
+   await illustratedCard.locator('h3').evaluate(el=>{el.textContent='Comienzan las guerras cántabras y astures';});
+   const longTitle=await illustratedCard.evaluate(card=>{
+     const title=card.querySelector('h3'),value=card.querySelector('.year');
+     return {titleHeight:title.getBoundingClientRect().height,titleScroll:title.scrollHeight,
+       titleClamp:getComputedStyle(title).webkitLineClamp,
+       valueBottom:value.getBoundingClientRect().bottom,cardBottom:card.getBoundingClientRect().bottom};
+   });
+   assert.ok(longTitle.titleHeight>30,'el título largo ocupa varias líneas');
+   assert.ok(longTitle.titleScroll<=longTitle.titleHeight+1,'se ven todas las líneas del título');
+   assert.equal(longTitle.titleClamp,'none','el título no tiene límite de líneas');
+   assert.ok(longTitle.valueBottom<=longTitle.cardBottom+1,'el valor sigue visible bajo el título');
+   await illustratedPage.screenshot({path:`test-results/zoom/${engine}-carta-titulo-largo.png`});
+   await illustratedCard.locator('h3').evaluate((el,title)=>{el.textContent=title;},fullTitle);
    await illustratedCard.click();
    const detail=illustratedPage.locator('.timeline-detail-modal');
    assert.equal(await detail.locator('h2').textContent(),fullTitle,'la vista ampliada muestra el título completo');
