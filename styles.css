@@ -2231,7 +2231,8 @@ body::before {
 .turn-duel-shell { min-width: 0; overflow-anchor: none; }
 .turn-duel-screen > * { min-width: 0; max-width: 100%; }
 .turn-duel-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
-.turn-duel-nav > span { min-width: 0; font: 700 .9rem var(--font-display); letter-spacing: .1em; }
+.turn-duel-nav > span { flex: 1; min-width: 0; font: 700 .9rem var(--font-display); letter-spacing: .1em; }
+.turn-duel-nav .turn-duel-back { flex: none; }
 .turn-duel-nav small { display: block; font: 400 .7rem/1.5 system-ui; letter-spacing: 0; color: var(--muted); }
 .turn-duel-nav-actions { display: flex; align-items: center; gap: 10px; flex: none; }
 .turn-duel-nav .btn { flex: none; min-height: 44px; padding: 8px 14px; }

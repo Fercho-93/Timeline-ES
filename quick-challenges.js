@@ -16,10 +16,13 @@
   }
   function shell(content) {
     const playing=!!state || !!connection || page==='network-lobby';
-    paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(playing ? 'data-quick="exit"' : page==='menu' ? 'data-action="jugar"' : 'data-quick="formats"', state ? 'data-quick="menu"' : '', playing)}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
+    // Desde la pantalla por la que se entró, la flecha sale de Retos rápidos a la pantalla
+    // anterior del juego; desde cualquier otra, vuelve a esa pantalla de entrada.
+    const back=playing ? 'data-quick="exit"' : page===entry || page==='menu' ? 'data-action="ui-back"' : 'data-quick="formats"';
+    paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing)}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
-  let format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null, readyTimer = null;
+  let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null, readyTimer = null;
   const BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1', HISTORY = 'continuum-quick-history-v1';
   const day = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
   function readJSON(key, fallback=null) {try{return JSON.parse(CT.Storage.getItem(key)) || fallback;}catch{return fallback;}}
@@ -156,7 +159,7 @@
     finally{busy=false;}
   }
   async function formatAction(action) {
-    if(action==='formats'){formatMenu();return true;}
+    if(action==='formats'){toEntry();return true;}
     if(action==='show-multi'){const target=app().querySelector('[data-quick="show-multi"]'),panel=app().querySelector('#quick-multi');panel.hidden=!panel.hidden;target.setAttribute('aria-expanded',String(!panel.hidden));target.parentElement.classList.toggle('open',!panel.hidden);return true;}
     if(action==='local'){format=action;setup();return true;}
     if(action==='free'){freeSetup();return true;}
@@ -268,7 +271,14 @@
     CT.Storage.removeItem(KEY);
     if (hadRoom) CT.Storage.removeItem(NET);
     pendingConfig=null; state=null; record=null; selected=null; slot=null;
-    formatMenu();
+    toEntry();
+  }
+  // Vuelve a la pantalla por la que se entró en Retos rápidos. El reto del día y la mesa
+  // pública no tienen una propia: se sale a la pantalla anterior del juego.
+  function toEntry() {
+    if (entry === 'menu') formatMenu();
+    else if (entry === 'free-setup') freeSetup();
+    else {clearInterval(readyTimer);readyTimer=null;stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;CT.navigateBack?.();}
   }
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);
@@ -304,7 +314,7 @@
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
       prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count}); return;
     }
-    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', formatMenu); return;}
+    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry); return;}
     if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
     if (action === 'setup') {setup(); return;}
     if (action === 'start') {
@@ -339,7 +349,7 @@
   }
 
   async function openPublic(renderPage, capacity=0) {
-    paint=renderPage; stopNetwork(); page='network-lobby'; state=null; record=null; selected=null; slot=null; format='public'; netKind='internet';
+    paint=renderPage; entry='public'; stopNetwork(); page='network-lobby'; state=null; record=null; selected=null; slot=null; format='public'; netKind='internet';
     const name=CT.Accounts?.profile?.alias || CT.Identidad?.nombre?.() || 'Explorador';
     const change=(...args)=>roomChanged(...args), fail=e=>errorNotice(e);
     shell('<section class="setup-section"><h2>Buscando mesa…</h2><div class="panel"><p>Retos rápidos · jugadores aleatorios</p><p class="hint">Entrarás en la primera mesa compatible.</p></div></section>');
@@ -349,16 +359,16 @@
   CT.Quick = {
     leave:stopNetwork,
     openPublic,
-    openSolo(renderPage){paint=renderPage;format='free';freeSetup();},
+    openSolo(renderPage){paint=renderPage;entry='free-setup';format='free';freeSetup();},
     startDaily(dayValue, renderPage) {
-      paint=renderPage; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
+      paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       const saved=load();
       if(saved?.config?.kind==='daily' && saved.config.day===dayValue && !saved.historySaved){
         record=saved;state=E.restore(record);render();return;
       }
       prepare(dailyQuick(dayValue));
     },
-    open(renderPage) {paint = renderPage; state = null; record = null; selected = null; slot = null;formatMenu();const params=new URLSearchParams(location.hash.slice(1));try{if(params.has('quick-duel'))acceptDuel();else if(params.has('quick-room')){networkSetup('internet');app().querySelector('#quick-net-code').value=params.get('quick-room');}}catch(e){errorNotice(e);}},
+    open(renderPage) {paint = renderPage; entry = 'menu'; state = null; record = null; selected = null; slot = null;formatMenu();const params=new URLSearchParams(location.hash.slice(1));try{if(params.has('quick-duel'))acceptDuel();else if(params.has('quick-room')){networkSetup('internet');app().querySelector('#quick-net-code').value=params.get('quick-room');}}catch(e){errorNotice(e);}},
     blocks() {return block('Retos rápidos', 'Ordena. Arriesga. Asegura.', 'quick', 'quick-challenges', `${CT.QuickCatalog.challenges.length} retos`);}
   };
 })();

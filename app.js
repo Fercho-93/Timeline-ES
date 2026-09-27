@@ -20,14 +20,26 @@
   let lastPaintedScreen = 'home';
   let previousView = null, navigatingBack = false;
   const navigationTrail = [];
+  // Pantallas de paso: una espera o un aviso de error no son un sitio al que volver.
+  const TRANSIENT_SCREENS = ['online-loading', 'online-error', 'public-match-error'];
+  // Y los resultados solo se recuerdan para volver desde su propio repaso.
+  const RESULT_SCREENS = ['solo-end', 'cifras-end', 'comp-end', 'winner'];
+  // Retos rápidos lleva su propia navegación interna: para el rastro es una sola pantalla.
+  const screenGroup = name => name?.startsWith('quick-') ? 'quick' : name;
+  function remembersView(from, to) {
+    if (!from || CT.UI.isPlaying(from.screen) || TRANSIENT_SCREENS.includes(from.screen)) return false;
+    if (from.screen === 'enciclopedia' || to === 'enciclopedia') return false;
+    if (RESULT_SCREENS.includes(from.screen)) return ['review', 'timeline-review'].includes(to);
+    return true;
+  }
   const paint = html => {
     if (CT.Accounts && !CT.Accounts.ready) return;
     if (CT.UI.isPlaying(screen) && !CT.UI.isPlaying(lastPaintedScreen)) {
       playReturn = ['setup', 'solo-home', 'duel-home', 'competition-menu', 'duelo-intro'].includes(lastPaintedScreen) ? lastPaintedScreen : 'play-menu';
     }
-    if (screen !== lastPaintedScreen && !navigatingBack) {
+    if (screenGroup(screen) !== screenGroup(lastPaintedScreen) && !navigatingBack) {
       if (screen === 'home') navigationTrail.length = 0;
-      else if (previousView && !CT.UI.isPlaying(lastPaintedScreen) && !CT.UI.isPlaying(screen) && screen !== 'enciclopedia' && lastPaintedScreen !== 'enciclopedia') navigationTrail.push(previousView);
+      else if (remembersView(previousView, screen)) navigationTrail.push(previousView);
     }
     navigatingBack = false;
     previousView = {screen, mode: selectedModeKey, block: selectedBlockKey, html, format: formatOpen, tournament: pendingTournament, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection, homeDestination, profileReturn};
@@ -58,6 +70,7 @@
     if (!view || !CT.has(view.mode) || !CT.Cartera.tiene(view.mode)) return false;
     const routes = {'home': home, 'jugar': jugarView, 'duelos': duelsView, 'play-menu': playMenu, 'solo-home': soloHome, 'duel-home': duelHome,
       'competition-menu': competitionMenu, 'quick-challenges': quickChallenges, 'quick-game': quickChallenges, 'quick-lobby': quickChallenges, 'perfil': perfilView};
+    if (view.screen?.startsWith('hub-') && CT.ModeHubs) routes[view.screen] = () => CT.ModeHubs.open(view.screen);
     // Los turnos se recuperan desde sus guardados validados, nunca desde la ruta.
     if (view.screen === 'solo' && view.soloKind === 'daily') routes.solo = () => resumeSolo('daily');
     else if (view.screen === 'solo' && view.soloKind !== 'comp') routes.solo = resumeSolo;
@@ -453,24 +466,29 @@
     // La bienvenida no tiene nada detrás: hasta tener nombre no se entra en el juego.
     if (screen === "bienvenida") return;
     CT.prepareReturn?.();
+    // Tras una partida, la pantalla desde la que se empezó queda arriba del rastro y es
+    // también la que se ve: volver a ella no sería volver a ningún sitio.
+    while (navigationTrail.length && screenGroup(navigationTrail.at(-1).screen) === screenGroup(screen)) navigationTrail.pop();
     if (screen !== 'enciclopedia' && navigationTrail.length) {
       const previous = navigationTrail.pop();
-      if (previous.screen !== screen) {
-        navigatingBack = true;
-        if (previous.mode !== selectedModeKey) setMode(previous.mode);
-        selectedBlockKey = previous.block; formatOpen = previous.format;
-        pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
-        collectionDetails = previous.collectionDetails; collectionIndexExpanded = previous.collectionIndexExpanded; jugarSection = previous.jugarSection || null;
-        homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
-        const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'perfil':perfilView, 'duelo-intro':duelIntro}[previous.screen];
-        if (render) render(); else { screen = previous.screen; paint(previous.html); }
-        return;
-      }
+      navigatingBack = true;
+      if (previous.mode !== selectedModeKey) setMode(previous.mode);
+      selectedBlockKey = previous.block; formatOpen = previous.format;
+      pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
+      collectionDetails = previous.collectionDetails; collectionIndexExpanded = previous.collectionIndexExpanded; jugarSection = previous.jugarSection || null;
+      homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
+      const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'perfil':perfilView, 'duelo-intro':duelIntro, 'quick-challenges':quickChallenges}[previous.screen];
+      if (render) render();
+      else if (previous.screen.startsWith('hub-') && CT.ModeHubs) CT.ModeHubs.open(previous.screen);
+      else { screen = previous.screen; paint(previous.html); }
+      return;
     }
+    // Sin rastro (por ejemplo, tras recargar) se vuelve al menú que contiene esta pantalla.
+    if (screen !== 'enciclopedia') navigatingBack = true;
     if (screen === 'setup' && pendingTournament) { pendingTournament=null;competitionMenu();return; }
     if (["setup", "solo-home", "duel-home", "online-loading", "online-error"].includes(screen)) playMenu();
     else if (screen === "duelo-intro") duelHome();
-    else if (screen === "play-menu") { collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
+    else if (screen === "play-menu") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
     else if (["competition-menu", "quick-challenges"].includes(screen)) jugarView();
     else if (screen === "enciclopedia") app.querySelector('[data-action="enc-back"]')?.click();
     else if (screen === "perfil" && profileReturn === "play-menu") playMenu();
@@ -688,7 +706,7 @@
     pendingTournament = null;
     screen = "jugar";
     if (collectionIndexExpanded) jugarSection = "collections";
-    paint(`<div class="shell home-shell home-gallery-shell jugar-shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}
+    paint(`<div class="shell home-shell home-gallery-shell jugar-shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige tu próxima partida</div><h1 data-focus tabindex="-1">¿Qué te apetece jugar?</h1><p>Explora un tema, prueba un reto o lánzate a competir.</p></header>
       <div class="play-catalog">
         ${catalogSection("collections", "01", "Grandes colecciones", "Historia, ciencia, naturaleza y mucho más.", "Explorar los mazos")}
@@ -2152,7 +2170,7 @@
     screen = "daily-intro";
     const dia = today(), modeKey = dailyModeKey(dia), mode = CT.mode(modeKey);
     const fecha = new Date(`${dia}T12:00:00`).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
-    paint(`<div class="shell">${header('<button class="icon-btn" data-action="home">Volver</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}<section class="pass-screen"><div class="panel pass-card comp-splash daily-splash">
       <div class="chapter-art daily-splash-art" aria-hidden="true">${dailyMysteryArt()}</div>
       <div class="chapter-number">Reto diario · ${escapeHtml(fecha)}</div>
       <h2 data-focus tabindex="-1"><span class="comp-splash-lead">Hoy toca</span><span class="daily-reel-stage" aria-hidden="true"><span class="daily-reel-kicker">Seleccionando mazo</span><span class="daily-reel-window"><span class="daily-reel">·&nbsp;·&nbsp;·</span></span></span><span class="solo-lectores" id="daily-reveal" aria-live="polite"></span></h2>
@@ -3221,7 +3239,7 @@
     const { modalidad, duel, pace } = duelPreparado;
     duelPreparado = null;
     if (pace === "turnos") {
-      turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: modalidad, back: playMenu }));
+      turnDuelReady.then(() => CT.TurnDuel?.open({ mode: selectedModeKey, kind: modalidad, back: backMenu }));
       return;
     }
     cuentaAtras(() => (modalidad === "cifras" ? startCifras(duel) : startSolo("duel", duel)));
@@ -3519,7 +3537,8 @@
   }
   function uiBack() {
     if (["quick-game","quick-lobby"].includes(screen)) { app.querySelector('[data-quick="exit"]')?.click(); return; }
-    if (app.dataset.screen?.startsWith('online-')) { CT.onlineNavigate?.('back'); return; }
+    // La espera y el error de conexión los pinta este archivo: online.js puede no haber cargado.
+    if (app.dataset.screen?.startsWith('online-') && !TRANSIENT_SCREENS.includes(app.dataset.screen)) { CT.onlineNavigate?.('back'); return; }
     if (CT.UI.isPlaying(screen)) { requestPlayExit(); return; }
     backMenu();
   }
@@ -3605,7 +3624,7 @@
       const found=await matchmaking.findAcrossModes(pool.length?pool:[selectedModeKey],capacity);
       const {code,mode}=found;
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: playMenu });
+      await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: backMenu });
       matchmaking.watchPublicRoom?.(code);
     } catch (error) {
       console.error("PUBLIC_MATCH_ERROR", error?.code || "", error?.message || error);
@@ -3624,7 +3643,7 @@
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
     try {
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, competition, onBack: competition ? competitionMenu : playMenu });
+      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, competition, onBack: backMenu });
     } catch (error) {
       console.error(error);
       screen = "online-error";
@@ -3738,7 +3757,7 @@
     else if (action === "home-top") { homeDestination = "home"; home(); window.scrollTo({ top: 0, behavior: "instant" }); }
     // La enciclopedia se abre desde el Atlas, y al cerrarla se vuelve a él.
     else if (action === "home-encyclopedia") openEnciclopedia("all", { returnTo: screen === "perfil" ? "perfil" : "home" });
-    else if (action === "collection-back") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
+    else if (action === "collection-back") backMenu();
     else if (action === "jugar") { jugarSection = sessionStorage.getItem('continuum-entry-route') ? 'collections' : null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = !!jugarSection; jugarView(); window.scrollTo(0, 0); }
     else if (action === "toggle-play-catalog") toggleCatalog(target.dataset.section);
     else if (action === "duels-open") openPendingDuels();
@@ -3788,7 +3807,7 @@
     else if (action === "competition-round-start") { game.tournamentIntro = false; saveGame(); renderPass(); }
     else if (action === "online") launchOnline();
     else if (action === "public-match") launchPublicMatch();
-    else if (action === "public-match-back") playMenu();
+    else if (action === "public-match-back") backMenu();
     else if (action === "local-multiplayer") launchLocalMultiplayer();
     // Una partida guardada a mitad de un duelo vuelve a su pantalla de paso, no a la de
     // un turno normal: si volviera a esa, quien reta colocaría su carta por segunda vez.
@@ -3934,6 +3953,14 @@
     else if (action === 'daily') { CT.closeDialog(); startDaily(); }
     else if (action === 'jugar') jugarView();
     else { sessionStorage.removeItem('continuum-entry-route'); homeDestination = 'home'; home(); window.scrollTo(0, 0); }
+  };
+  // Las pantallas de elección de home-modes-v1.js pintan por aquí para entrar en el rastro
+  // de «Volver», igual que las de este archivo.
+  CT.showScreen = (name, html) => { screen = name; paint(html); };
+  CT.navigateBack = backMenu;
+  CT.openQuickPublic = capacity => {
+    screen = 'quick-lobby';
+    return CT.Quick.openPublic((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, capacity);
   };
   CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro", "quick-game", "quick-lobby"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();

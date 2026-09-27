@@ -60,12 +60,16 @@
     doors.dataset.modesV1 = 'true';
   }
 
-  function hub(title, eyebrow, body) {
-    app.dataset.screen = 'mode-hub';
-    app.innerHTML = `<div class="shell home-shell mode-hub-shell">
-      <header class="mode-hub-head"><button class="icon-btn" data-mode-home>Volver</button><div><div class="eyebrow">${escapeHtml(eyebrow)}</div><h1>${escapeHtml(title)}</h1></div></header>
+  // Cada elección es una pantalla más del juego: pinta por app.js para que la flecha de
+  // volver la recuerde y regrese a la pantalla anterior, no siempre al inicio.
+  function hub(screen, title, eyebrow, body) {
+    const html = `<div class="shell home-shell mode-hub-shell">
+      ${window.CONTINUUM?.UI?.header?.('data-action="ui-back"') || ''}
+      <header class="mode-hub-head"><div><div class="eyebrow">${escapeHtml(eyebrow)}</div><h1 data-focus tabindex="-1">${escapeHtml(title)}</h1></div></header>
       <section class="mode-hub-list">${body}</section>
     </div>`;
+    if (window.CONTINUUM?.showScreen) window.CONTINUUM.showScreen(screen, html);
+    else { app.dataset.screen = screen; app.innerHTML = html; }
   }
 
   function existing(action, icon, title, text) {
@@ -73,7 +77,7 @@
   }
 
   function openOnlineHub() {
-    hub('Jugar online', 'Mesas públicas', [
+    hub('hub-online', 'Jugar online', 'Mesas públicas', [
       `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select><small>Si eliges “Cualquiera”, buscamos primero una mesa de 4 y después de 3 o 2.</small></div>`,
       modeDoor('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', '▦', 'Grandes colecciones', 'Elige hasta tres temas entre los que buscar mesa.', false, 'data-online-kind="collections"'),
@@ -83,14 +87,14 @@
 
   function openOnlineCollections() {
     const modes=Object.entries(window.CONTINUUM?.MODES||{}).filter(([key])=>key!=='mixed').slice(0,12);
-    hub('Grandes colecciones', 'Mesa pública · temas', `
+    hub('hub-online-collections', 'Grandes colecciones', 'Mesa pública · temas', `
       <div class="mode-topic-picker"><p>Marca hasta 3 temas. Buscaremos mesa en esos temas; si no eliges ninguno, buscaremos en todas las colecciones.</p>
       <div class="mode-topic-grid">${modes.map(([key,m])=>`<label><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
       <button class="mode-entry mode-entry-featured" data-action="public-match" data-online-kind="collections-vote"><span class="mode-entry-icon">⚡</span><span class="mode-entry-copy"><b>Buscar mesa</b><small>La mesa compartirá un único tema.</small></span><span class="mode-entry-arrow">→</span></button></div>`);
   }
 
   function openSoloHub() {
-    hub('Jugar solo', 'A tu ritmo', [
+    hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       modeDoor('jugar', '▦', 'Grandes colecciones', 'Mazos amplios de historia, ciencia, naturaleza, geografía y más.', false, 'data-solo-route="collections"'),
       modeDoor('quick-challenges', '◫', 'Retos rápidos', 'Temas muy concretos para partidas cortas.', false, 'data-solo-route="quick"'),
       modeDoor('jugar', '∞', 'Gran mezcla', 'Explora la colección transversal de cartas.', false, 'data-solo-route="mixed"')
@@ -98,7 +102,7 @@
   }
 
   function openFriendsHub() {
-    hub('Jugar con amigos', 'Juntos', [
+    hub('hub-friends', 'Jugar con amigos', 'Juntos', [
       modeDoor('jugar', '◉', 'Un solo móvil', 'Pasad el teléfono en cada turno.', false, 'data-friend-route="local"'),
       modeDoor('jugar', '⌁', 'Sala privada', 'Cada persona con su móvil mediante código o enlace.', false, 'data-friend-route="online"'),
       modeDoor('jugar', '⌂', 'Wi‑Fi local', 'Varios móviles cerca, sin depender de internet.', false, 'data-friend-route="wifi"'),
@@ -120,12 +124,6 @@
       const cap=document.getElementById('mode-public-capacity')?.value ?? sessionStorage.getItem('continuum-public-capacity') ?? '0';
       sessionStorage.setItem('continuum-public-capacity',cap);
     }
-    const home = event.target.closest('[data-mode-home]');
-    if (home) {
-      event.preventDefault();
-      window.CONTINUUM?.localNavigate?.('home');
-      return;
-    }
     const routed=event.target.closest('[data-solo-route],[data-friend-route]');
     if(routed){
       const route=routed.dataset.soloRoute||routed.dataset.friendRoute;
@@ -139,7 +137,7 @@
     if(action==='quick-public'){
       event.preventDefault();event.stopImmediatePropagation();
       const cap=Number(document.getElementById('mode-public-capacity')?.value||sessionStorage.getItem('continuum-public-capacity')||0);
-      window.CONTINUUM.Quick.openPublic((html,playing)=>{app.dataset.screen=playing?'quick-game':'quick-lobby';app.innerHTML=html;},cap)
+      window.CONTINUUM.openQuickPublic(cap)
         .catch(error=>{console.error('QUICK_PUBLIC_MATCH_ERROR',error);openOnlineHub();const note=document.createElement('p');note.setAttribute('role','alert');note.textContent=error?.message || 'No se pudo encontrar una mesa. Inténtalo de nuevo.';app.querySelector('.mode-hub-list')?.prepend(note);});return;
     }
     if (!['online-hub','online-collections','solo-hub','friends-hub'].includes(action)) return;
@@ -150,6 +148,9 @@
     else if (action === 'solo-hub') openSoloHub();
     else openFriendsHub();
   }, true);
+
+  const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends': openFriendsHub};
+  if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); } };
 
   function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
   function rankingSummary() {
