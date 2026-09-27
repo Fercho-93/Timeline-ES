@@ -5,7 +5,14 @@
 #app .mode-daily-zone::before { content: "EL RETO DE HOY"; }
 #app .mode-entry-grid::before { content: "ELIGE TU CAMINO"; grid-column: 1 / -1; }
 #app .mode-daily-family { margin: -2px 4px 2px; color: #665442; font: .8rem/1.4 var(--ui-font); }
-#app .mode-entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+#app .mode-play-zone { min-width: 0; }
+#app .mode-play-card { width: 100%; }
+#app .mode-play-card .mode-play-chevron { display: inline-block; margin-left: 8px; font: 700 1.35rem/0.7 var(--font-display); vertical-align: middle; transition: transform .32s ease; }
+#app .mode-play-card[aria-expanded="true"] .mode-play-chevron { transform: rotate(180deg); }
+#app .mode-play-card:focus-visible { outline: 3px solid #9c4f2c; outline-offset: 3px; }
+#app .mode-choices-reveal { display: grid; grid-template-rows: 0fr; margin-top: 0; opacity: 0; visibility: hidden; transition: grid-template-rows .38s ease, margin-top .38s ease, opacity .28s ease, visibility .38s; }
+#app .mode-choices-reveal.is-open { grid-template-rows: 1fr; margin-top: 12px; opacity: 1; visibility: visible; }
+#app .mode-entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-height: 0; overflow: hidden; }
 #app .mode-entry {
   --mode-paper: #f8f0df;
   appearance: none; position: relative; isolation: isolate; display: flex; align-items: center;
@@ -40,7 +47,9 @@
   #app .mode-entry:hover .mode-entry-art img { transform: scale(1.045); }
 }
 #app .mode-secondary { margin-top: 4px; }
-#app .mode-legacy-entry { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important; }
+@media (prefers-reduced-motion: reduce) {
+  #app .mode-choices-reveal, #app .mode-play-card .mode-play-chevron { transition: none; }
+}
 #app .mode-ranking-summary {
   display: grid; gap: 3px; padding: 12px 17px; border-top: 1px solid #b8955a80;
   color: #493424; font-family: var(--font-display);

@@ -4,6 +4,7 @@
   const start = () => {
   const app = document.getElementById('app');
   if (!app) return;
+  let playExpanded = false;
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
@@ -48,11 +49,19 @@
     dailyWrap.append(daily);
     const family=document.createElement('p');family.className='mode-daily-family';family.innerHTML=`Hoy · <strong>${dailyFamily()}</strong> · un único reto del día`;dailyWrap.append(family);
 
-    const legacyPlay = doors.querySelector('.home-door[data-action="jugar"]');
-    if (legacyPlay) legacyPlay.classList.add('mode-legacy-entry');
+    const play = doors.querySelector('.home-door[data-action="jugar"]');
+    if (!play) return;
+    play.classList.add('mode-play-card');
+    play.dataset.action = 'toggle-modes';
+    play.setAttribute('aria-controls', 'home-mode-choices');
+    play.setAttribute('aria-expanded', String(playExpanded));
+    play.querySelector('.home-door-copy b').textContent = 'Jugar';
+    play.querySelector('.home-door-copy small').textContent = 'Elige cómo quieres vivir la partida.';
+    play.querySelector('.home-door-cta').innerHTML = '<span class="mode-play-cta-label">Elegir modalidad</span> <span class="mode-play-chevron" aria-hidden="true">⌄</span>';
 
     const choices = document.createElement('section');
     choices.className = 'mode-entry-grid';
+    choices.id = 'home-mode-choices';
     choices.setAttribute('aria-label', 'Cómo quieres jugar');
     choices.innerHTML = [
       modeDoor('online-hub', modeArt['online-hub'], 'Jugar online', 'Encuentra jugadores en una mesa pública.', true),
@@ -60,6 +69,16 @@
       modeDoor('friends-hub', modeArt['friends-hub'], 'Jugar con amigos', 'En el mismo móvil o cada uno en el suyo.'),
       modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Rondas y temas con marcador acumulado.')
     ].join('');
+    choices.setAttribute('aria-hidden', String(!playExpanded));
+    choices.inert = !playExpanded;
+
+    const reveal = document.createElement('div');
+    reveal.className = `mode-choices-reveal${playExpanded ? ' is-open' : ''}`;
+    reveal.append(choices);
+    const playWrap = document.createElement('section');
+    playWrap.className = 'mode-play-zone';
+    playWrap.setAttribute('aria-label', 'Jugar');
+    playWrap.append(play, reveal);
 
     const secondary = document.createElement('section');
     secondary.className = 'mode-secondary';
@@ -67,8 +86,7 @@
     atlas.classList.add('mode-atlas-entry');
     secondary.append(atlas);
 
-    doors.replaceChildren(dailyWrap, choices, secondary);
-    if (legacyPlay) doors.append(legacyPlay);
+    doors.replaceChildren(playWrap, dailyWrap, secondary);
     doors.dataset.modesV1 = 'true';
   }
 
@@ -119,6 +137,18 @@
   }
 
   app.addEventListener('click', event => {
+    const playToggle = event.target.closest('[data-action="toggle-modes"]');
+    if (playToggle && app.dataset.screen === 'home') {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      playExpanded = !playExpanded;
+      playToggle.setAttribute('aria-expanded', String(playExpanded));
+      const choices = app.querySelector('#home-mode-choices');
+      choices.parentElement.classList.toggle('is-open', playExpanded);
+      choices.setAttribute('aria-hidden', String(!playExpanded));
+      choices.inert = !playExpanded;
+      return;
+    }
     const topicInput=event.target.closest('[data-public-topic]');
     if(topicInput){
       const checked=[...document.querySelectorAll('[data-public-topic]:checked')];
