@@ -7,11 +7,23 @@
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
-  function modeDoor(action, icon, title, text, featured = false, attrs = '') {
+  const modeArt = {
+    'online-hub': 'mode-walk-duel.webp',
+    'solo-hub': 'mode-walk-solo.webp',
+    'friends-hub': 'mode-walk-multi.webp',
+    'competition-menu': 'competition-engraving.webp',
+    'public-match': 'mode-walk-duel.webp',
+    'online-collections': 'hero-mixed-700.webp',
+    'quick-public': 'hero-quick-700.webp',
+    'jugar': 'hero-mixed-700.webp',
+    'quick-challenges': 'hero-quick-700.webp'
+  };
+
+  function modeDoor(action, art, title, description, featured = false, attrs = '') {
+    const image = art || modeArt[action] || 'home-door-jugar.webp';
     return `<button class="mode-entry${featured ? ' mode-entry-featured' : ''}" data-action="${action}" ${attrs}>
-      <span class="mode-entry-icon" aria-hidden="true">${icon}</span>
-      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(text)}</small></span>
-      <span class="mode-entry-arrow" aria-hidden="true">→</span>
+      <span class="mode-entry-art" aria-hidden="true"><img src="assets/${image}" alt="" loading="lazy" decoding="async"></span>
+      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(description)}</small><span class="mode-entry-cta" aria-hidden="true">Explorar <span>→</span></span></span>
     </button>`;
   }
 
@@ -43,10 +55,10 @@
     choices.className = 'mode-entry-grid';
     choices.setAttribute('aria-label', 'Cómo quieres jugar');
     choices.innerHTML = [
-      modeDoor('online-hub', '🌐', 'Jugar online', 'Encuentra jugadores y entra en una mesa pública.', true),
-      modeDoor('solo-hub', '●', 'Jugar solo', 'Grandes colecciones, retos rápidos y Gran mezcla.'),
-      modeDoor('friends-hub', '◆', 'Jugar con amigos', 'Mismo móvil, sala privada, Wi‑Fi local o duelo.'),
-      modeDoor('competition-menu', '♜', 'Competición', 'Varias rondas, distintas temáticas y marcador acumulado.')
+      modeDoor('online-hub', modeArt['online-hub'], 'Jugar online', 'Encuentra jugadores en una mesa pública.', true),
+      modeDoor('solo-hub', modeArt['solo-hub'], 'Jugar solo', 'Colecciones, retos rápidos y Gran mezcla.'),
+      modeDoor('friends-hub', modeArt['friends-hub'], 'Jugar con amigos', 'En el mismo móvil o cada uno en el suyo.'),
+      modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Rondas y temas con marcador acumulado.')
     ].join('');
 
     const secondary = document.createElement('section');
@@ -62,27 +74,23 @@
 
   // Cada elección es una pantalla más del juego: pinta por app.js para que la flecha de
   // volver la recuerde y regrese a la pantalla anterior, no siempre al inicio.
-  function hub(screen, title, eyebrow, body) {
+  function hub(screen, title, eyebrow, body, art) {
     const html = `<div class="shell home-shell mode-hub-shell">
       ${window.CONTINUUM?.UI?.header?.('data-action="ui-back"') || ''}
-      <header class="mode-hub-head"><div><div class="eyebrow">${escapeHtml(eyebrow)}</div><h1 data-focus tabindex="-1">${escapeHtml(title)}</h1></div></header>
+      <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">${escapeHtml(eyebrow)}</div><h1 data-focus tabindex="-1">${escapeHtml(title)}</h1></div><img src="assets/${art}" alt="" aria-hidden="true" decoding="async"></header>
       <section class="mode-hub-list">${body}</section>
     </div>`;
     if (window.CONTINUUM?.showScreen) window.CONTINUUM.showScreen(screen, html);
     else { app.dataset.screen = screen; app.innerHTML = html; }
   }
 
-  function existing(action, icon, title, text) {
-    return modeDoor(action, icon, title, text);
-  }
-
   function openOnlineHub() {
     hub('hub-online', 'Jugar online', 'Mesas públicas', [
       `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select><small>Si eliges “Cualquiera”, buscamos primero una mesa de 4 y después de 3 o 2.</small></div>`,
-      modeDoor('public-match', '⚡', 'Sorpréndeme', 'Entra en la primera mesa compatible disponible.', false, 'data-online-kind="surprise"'),
-      modeDoor('online-collections', '▦', 'Grandes colecciones', 'Elige hasta tres temas entre los que buscar mesa.', false, 'data-online-kind="collections"'),
-      modeDoor('quick-public', '◫', 'Retos rápidos', 'Temas breves y concretos con jugadores aleatorios.', false, 'data-online-kind="quick"')
-    ].join(''));
+      modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Entra en la primera mesa disponible.', false, 'data-online-kind="surprise"'),
+      modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
+      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Partidas breves con jugadores aleatorios.', false, 'data-online-kind="quick"')
+    ].join(''), modeArt['online-hub']);
   }
 
   function openOnlineCollections() {
@@ -90,24 +98,24 @@
     hub('hub-online-collections', 'Grandes colecciones', 'Mesa pública · temas', `
       <div class="mode-topic-picker"><p>Marca hasta 3 temas. Buscaremos mesa en esos temas; si no eliges ninguno, buscaremos en todas las colecciones.</p>
       <div class="mode-topic-grid">${modes.map(([key,m])=>`<label><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
-      <button class="mode-entry mode-entry-featured" data-action="public-match" data-online-kind="collections-vote"><span class="mode-entry-icon">⚡</span><span class="mode-entry-copy"><b>Buscar mesa</b><small>La mesa compartirá un único tema.</small></span><span class="mode-entry-arrow">→</span></button></div>`);
+      ${modeDoor('public-match', modeArt['online-hub'], 'Buscar mesa', 'La mesa compartirá un único tema.', true, 'data-online-kind="collections-vote"')}</div>`, modeArt['online-collections']);
   }
 
   function openSoloHub() {
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
-      modeDoor('jugar', '▦', 'Grandes colecciones', 'Mazos amplios de historia, ciencia, naturaleza, geografía y más.', false, 'data-solo-route="collections"'),
-      modeDoor('quick-challenges', '◫', 'Retos rápidos', 'Temas muy concretos para partidas cortas.', false, 'data-solo-route="quick"'),
-      modeDoor('jugar', '∞', 'Gran mezcla', 'Explora la colección transversal de cartas.', false, 'data-solo-route="mixed"')
-    ].join(''));
+      modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, 'data-solo-route="collections"'),
+      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, 'data-solo-route="quick"'),
+      modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, 'data-solo-route="mixed"')
+    ].join(''), modeArt['solo-hub']);
   }
 
   function openFriendsHub() {
     hub('hub-friends', 'Jugar con amigos', 'Juntos', [
-      modeDoor('jugar', '◉', 'Un solo móvil', 'Pasad el teléfono en cada turno.', false, 'data-friend-route="local"'),
-      modeDoor('jugar', '⌁', 'Sala privada', 'Cada persona con su móvil mediante código o enlace.', false, 'data-friend-route="online"'),
-      modeDoor('jugar', '⌂', 'Wi‑Fi local', 'Varios móviles cerca, sin depender de internet.', false, 'data-friend-route="wifi"'),
-      modeDoor('jugar', '⚔', 'Duelo por turnos', 'Reta a una persona y jugad cuando podáis.', false, 'data-friend-route="duel"')
-    ].join(''));
+      modeDoor('jugar', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.', false, 'data-friend-route="local"'),
+      modeDoor('jugar', 'mode-walk-multi.webp', 'Sala privada', 'Cada persona con su móvil, por código o enlace.', false, 'data-friend-route="online"'),
+      modeDoor('jugar', 'mode-walk-multi.webp', 'Wi‑Fi local', 'Varios móviles cerca, sin internet.', false, 'data-friend-route="wifi"'),
+      modeDoor('jugar', 'mode-walk-duel.webp', 'Duelo por turnos', 'Jugad cuando podáis, por enlace.', false, 'data-friend-route="duel"')
+    ].join(''), modeArt['friends-hub']);
   }
 
   app.addEventListener('click', event => {
