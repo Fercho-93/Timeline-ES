@@ -56,4 +56,26 @@
     return `<section class="panel final-results"><h2>Valor real: ${value(mode, final.target)}</h2><table><thead><tr><th>Finalista</th><th>Respuesta</th><th>Diferencia</th></tr></thead><tbody>${ranked.rows.map(row => `<tr${ranked.winners.includes(row.uid) ? ' class="final-best"' : ''}><th>${CT.escapeHtml(name(row.uid))}</th><td>${value(mode, row.answer)}</td><td>${value(mode, row.distance)}</td></tr>`).join('')}</tbody></table><p>${ranked.winners.length === 1 ? `${CT.escapeHtml(name(ranked.winners[0]))} gana la final.` : `Empate: ${ranked.winners.map(uid => CT.escapeHtml(name(uid))).join(', ')} pasan a otra carta.`}</p></section>`;
   }
   CT.Final = {factor, parse, create, rank, value, question, form, results};
+
+  // El minijuego de quién empieza, igual en todas las modalidades con turnos: cada
+  // persona escribe la cifra de la misma carta, empieza quien más se acerque y el resto
+  // juega por orden de cercanía. En años y siglos el error se mide en unidades (errar un
+  // siglo pesa igual en el año 200 que en el 1900); en el resto, en proporción (errar 100
+  // habitantes no es lo mismo en un pueblo que en una capital).
+  function starterError(mode, card, guess) {
+    const real = CT.sortValue(mode, card);
+    const anos = !!CT.axis(mode).cifra?.anos;
+    return anos || real === 0 ? Math.abs(guess - real) : Math.abs(guess - real) / Math.abs(real);
+  }
+  // `entries` va en el orden de la mesa: [{id, value}] con `value` null si esa persona no
+  // respondió (por ejemplo, en una mesa pública en la que se agotó el tiempo). Devuelve
+  // los identificadores de más cerca a más lejos; a igual distancia se respeta el orden
+  // de la mesa, y quien no respondió va al final.
+  function starterOrder(mode, cardId, entries) {
+    const card = CT.cards(mode).find(item => item.id === cardId);
+    const rows = entries.map((entry, seat) => ({ id: entry.id, seat,
+      error: card && Number.isFinite(entry.value) ? starterError(mode, card, entry.value) : Infinity }));
+    return rows.sort((a, b) => a.error - b.error || a.seat - b.seat).map(row => row.id);
+  }
+  CT.Starter = { error: starterError, order: starterOrder };
 })();

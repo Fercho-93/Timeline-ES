@@ -41,7 +41,11 @@ let turnTimerHandle = null;
 const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
 const CLIENT_VERSION = 42; // Competición con cambio de mazo entre rondas.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
-let presenceRoom = "", presenceTimer = null, presenceBusy = false;
+let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = null, relayKick = null;
+// Mesa pública: el minijuego de quién empieza se juega solo en cuanto la mesa se llena.
+// Cada persona tiene este tiempo para responder; quien no responde juega al final.
+const PUBLIC_STARTER_SECONDS = 30;
+let publicStarterSeen = { key: "", at: 0 }, publicStarterTimer = null, publicClock = null, publicDrawFor = "", publicStartFor = "";
 const presenceListeners = new Map(), presenceRecords = new Map();
 let connectionMessage = "Conectando con la sala…";
 // El minijuego de quién empieza: cada persona adivina la fecha de una única carta que
@@ -52,6 +56,8 @@ const starterListeners = new Map(), starterRecords = new Map();
 let starterBusy = false;
 function stopPresence() {
   clearInterval(presenceTimer); presenceTimer = null; presenceRoom = "";
+  clearInterval(relayTimer); relayTimer = null; relayKick = null;
+  clearTimeout(publicStarterTimer); publicStarterTimer = null; clearInterval(publicClock); publicClock = null;
   for (const stop of presenceListeners.values()) stop();
   presenceListeners.clear(); presenceRecords.clear();
 }
@@ -75,6 +81,7 @@ function ensurePresence() {
     stopPresence(); presenceRoom = roomCode;
     void heartbeat();
     presenceTimer = setInterval(() => { if (document.visibilityState === "visible") void heartbeat(); }, 45000);
+    relayTimer = setInterval(maybeAutoRelay, 5000);
   }
   for (const uid of roomState.playerOrder) {
     if (presenceListeners.has(uid)) continue;
@@ -130,17 +137,16 @@ function starterEveryoneAnswered() {
   return !!answers && answers.every(Boolean);
 }
 
-// Quién ha acertado más cerca, con el mismo criterio que usa el resto del juego: en años
-// y siglos el error se mide en unidades, y en el resto en proporción.
-function starterWinnerUid() {
+// El orden de juego que sale del minijuego, con el mismo criterio que el resto de
+// modalidades (`CT.Starter`): de quien más se acerca a quien menos. Solo cuando todos han
+// respondido, salvo en una mesa pública cuyo tiempo de respuesta se ha agotado: ahí
+// quien no respondió juega al final.
+function starterRanking(allowMissing = false) {
   const answers = starterAnswers();
-  if (!answers || !answers.every(Boolean)) return null;
-  const card = getCard(starterCardId());
-  const real = CT.sortValue(modeKey(), card);
-  const anos = !!CT.axis(modeKey()).cifra?.anos;
-  const error = value => anos || real === 0 ? Math.abs(value - real) : Math.abs(value - real) / Math.abs(real);
-  return answers.reduce((best, entry) => error(entry.value) < error(best.value) ? entry : best).uid;
+  if (!answers || (!allowMissing && !answers.every(Boolean))) return null;
+  return CT.Starter.order(modeKey(), starterCardId(), roomState.playerOrder.map((uid, i) => ({ id: uid, value: answers[i]?.value ?? null })));
 }
+function starterWinnerUid() { return starterRanking()?.[0] || null; }
 
 async function drawStarterCard() {
   if (starterBusy || roomState.hostUid !== user.uid) return;
@@ -148,7 +154,8 @@ async function drawStarterCard() {
   try {
     const cardId = shuffle(modeCards(roomState.mode).map(card => card.id))[0];
     await setDoc(doc(db, "rooms", roomCode, "starter", user.uid), { cardId, value: null, guessedAt: null });
-  } catch { showToast("No se pudo repartir la carta. Actualiza firestore.rules para el sorteo de quién empieza."); }
+    return true;
+  } catch { showToast("No se pudo repartir la carta. Actualiza firestore.rules para el sorteo de quién empieza."); return false; }
   finally { starterBusy = false; }
 }
 
@@ -189,17 +196,53 @@ function renderPresence() {
     + roomState.playerOrder.map(uid => '<li>' + escapeHtml(roomState.players[uid].name) + ': ' + escapeHtml(CT.Session.presence(presenceRecords.get(uid))) + '</li>').join("") + '</ul></details>'
     + (canClaimHost() ? '<button class="btn btn-secondary" data-online-action="claim-host">Tomar relevo del anfitrión</button>' : '');
 }
-async function claimHost() {
+async function claimHost(auto = false) {
   if (busy || !canClaimHost()) return;
   busy = true;
+  const previousHost = roomState.hostUid;
   try {
     await runTransaction(db, async tx => {
       const current = (await tx.get(roomRef)).data();
       if (!current.playerOrder.includes(user.uid) || current.status === "ended") throw Error("Sala no disponible");
+      if (current.hostUid !== previousHost) throw Error("Ya hubo relevo");
       tx.update(roomRef, { hostUid: user.uid, version: current.version + 1, updatedAt: serverTimestamp() });
     });
-  } catch { showToast("El anfitrión ha vuelto o alguien ya tomó el relevo. La sala sigue guardada."); }
+    // En una mesa pública que todavía espera jugadores, quien se fue deja de ocupar su
+    // plaza: se le saca de la mesa y la mesa vuelve a aparecer en la búsqueda.
+    if (roomState?.matchmaking === "public") relayKick = previousHost;
+    if (auto) showToast("Quien abrió la mesa se ha ido: ahora la llevas tú.");
+  } catch { if (!auto) showToast("El anfitrión ha vuelto o alguien ya tomó el relevo. La sala sigue guardada."); }
   finally { busy = false; }
+}
+
+// Mesas públicas: nadie conoce a nadie, así que no se espera a que alguien pulse «Tomar
+// relevo». Si el anfitrión deja de dar señales, lo toma solo la primera persona de la mesa
+// que sigue conectada (las reglas solo lo permiten con el anfitrión ausente, y la
+// transacción impide que lo tomen dos a la vez).
+function maybeAutoRelay() {
+  if (!roomState || !user || roomState.matchmaking !== "public" || busy || !canClaimHost()) return;
+  const now = CT.Session.now();
+  const alive = uid => {
+    if (uid === user.uid) return true;
+    const record = presenceRecords.get(uid);
+    return !!record && record.visible !== false && now !== null && now - record.seenAt < 90000;
+  };
+  const candidate = roomState.playerOrder.find(uid => uid !== roomState.hostUid && alive(uid));
+  if (candidate === user.uid) void claimHost(true);
+}
+
+// La cola pública vuelve a ofrecer esta mesa cuando se queda una plaza libre en la sala
+// de espera (alguien se fue o se le sacó por ausencia).
+async function reopenPublicQueue(code = roomCode, queueKey = roomState?.queueKey) {
+  if (!queueKey) return;
+  try {
+    await runTransaction(db, async tx => {
+      const reference = doc(db, "publicQueues", queueKey);
+      const queue = await tx.get(reference);
+      if (!queue.exists() || queue.data().roomCode !== code || queue.data().status === "waiting") return;
+      tx.update(reference, { status: "waiting", updatedAt: serverTimestamp() });
+    });
+  } catch (error) { console.warn("PUBLIC_QUEUE_REOPEN", error?.code || error); }
 }
 
 // La modalidad la manda la sala; solo antes de entrar en una vale la elegida en la portada.
@@ -634,6 +677,10 @@ function connectToRoom(code) {
     if (roomState.status === "lobby") ensureStarterListeners(); else stopStarterListeners();
     if (roomState.phase !== "turn") pendingIndex = null;
     anotaProgreso();
+    if (relayKick && roomState.hostUid === user.uid && roomState.status === "lobby" && roomState.matchmaking === "public") {
+      const target = relayKick; relayKick = null;
+      if (roomState.playerOrder.includes(target)) void removePlayer(target);
+    }
     if (roomState.status === "lobby") renderLobby();
     else if (roomState.status === "ended") renderWinner();
     else if (roomState.phase === "final") { clearTurnTimer(); void renderOnlineFinal(); }
@@ -717,6 +764,11 @@ function anotaProgreso() {
 // mientras no hay carta, solo el anfitrión puede repartirla; en cuanto la hay, cada
 // persona adivina la suya y ve cuándo le toca esperar o ya puede empezar.
 function starterPanelMarkup(isHost) {
+  if ((roomState.tournament?.index || 0) > 0) {
+    const next = roomState.players[roomState.playerOrder[roomState.tournament.index % roomState.playerOrder.length]];
+    const aviso = `<p>Empieza <b>${escapeHtml(next?.name || "")}</b>: el orden de la primera ronda se mantiene y el turno de empezar rota en cada ronda.</p>`;
+    return isHost ? `${aviso}<button class="btn btn-primary btn-block" data-online-action="start">Barajar y empezar <span>→</span></button>` : `${aviso}<p class="hint">Esperando al anfitrión para empezar.</p>`;
+  }
   const cardId = starterCardId();
   if (cardId == null) {
     return isHost
@@ -743,16 +795,20 @@ function starterPanelMarkup(isHost) {
       </div>
       <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Adivinar <span>→</span></button>${repetir}`;
   }
-  const winner = starterWinnerUid();
-  const answers = starterAnswers();
-  const lista = roomState.playerOrder.map((uid, i) => `<li${uid === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(roomState.players[uid].name)}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), answers[i].value))}</span></li>`).join("");
-  const resultado = `${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<ul class="starter-draw-list">${lista}</ul><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
+  const ranking = starterRanking();
+  const winner = ranking[0];
+  const valueOf = uid => starterRecords.get(uid)?.value;
+  const lista = ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), valueOf(uid)))}</span></li>`).join("");
+  const resultado = `${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
   if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Barajar y empezar <span>→</span></button>`;
 }
 
 function renderLobby() {
   clearTurnTimer();
+  // Cada respuesta ajena repinta la sala de espera: lo que se estaba escribiendo en el
+  // minijuego no se pierde por eso.
+  const draft = document.getElementById("starter-guess-input")?.value || "";
   const isHost = roomState.hostUid === user.uid;
   const isPublic = roomState.matchmaking === 'public';
   const capacity = isPublic ? roomState.capacity : 9;
@@ -766,15 +822,80 @@ function renderLobby() {
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>${isPublic ? 'Partida rápida' : 'Código de sala'}</small><strong>${isPublic ? people.length + '/' + capacity : roomCode}</strong>${isPublic ? '' : '<div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div>'}</div></section>
     <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${people.length}/${capacity}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
       <section class="panel lobby-settings">${isPublic
-        ? `<div class="section-label">Partida rápida</div><input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="30"><div class="waiting-orbit"><span></span></div><h3>${people.length === capacity ? 'Mesa completa' : 'Buscando jugadores'}</h3><p>${people.length === capacity ? 'La partida va a comenzar automáticamente.' : `Esperando a ${capacity - people.length} ${capacity - people.length === 1 ? 'jugador' : 'jugadores'} más…`}</p>${isHost && people.length === capacity ? '<button class="btn btn-primary btn-block" data-online-action="start">Comenzar partida</button>' : ''}`
+        ? `<div class="section-label">Partida rápida</div><input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="30">${people.length === capacity ? publicStarterMarkup() : `<div class="waiting-orbit"><span></span></div><h3>Buscando jugadores</h3><p>Esperando a ${capacity - people.length} ${capacity - people.length === 1 ? 'jugador' : 'jugadores'} más…</p><p class="hint">Cuando la mesa esté completa, un minijuego decidirá el orden de juego.</p><button class="btn btn-ghost btn-block" data-online-action="${isHost ? "leave" : "leave-room"}">Dejar de buscar</button>`}`
         : (isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds"><option value="0">Sin límite</option><option value="20">20 segundos</option><option value="30" selected>30 segundos</option><option value="45">45 segundos</option></select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir. Requiere reglas v39.</small></span><input type="checkbox" id="online-ghost"></label>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}<button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`)}</section>
     </div>
   </div>`, "online-lobby");
+  if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
+  if (isPublic) managePublicStarter();
   if (roomState.tournament) {
     appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', tournamentBoard());
     const hand = document.getElementById('online-hand-size');
     if (hand) {hand.value=String(roomState.tournament.handSize);hand.disabled=true;}
   }
+}
+
+// Mesa pública completa: el mismo minijuego que en una sala privada, pero sin nadie que
+// tenga que pulsar nada. El anfitrión técnico reparte la carta solo, cada persona tiene
+// `PUBLIC_STARTER_SECONDS` para responder y la partida arranca en cuanto han
+// respondido todos o se agota el tiempo (quien no respondió juega al final).
+function publicStarterSecondsLeft() {
+  const cardId = starterCardId();
+  if (cardId == null) return null;
+  const key = `${roomCode}:${cardId}`;
+  if (publicStarterSeen.key !== key) publicStarterSeen = { key, at: Date.now() };
+  return Math.max(0, PUBLIC_STARTER_SECONDS - Math.floor((Date.now() - publicStarterSeen.at) / 1000));
+}
+function publicStarterMarkup() {
+  const cardId = starterCardId();
+  if (cardId == null) return `<div class="waiting-orbit"><span></span></div><h3>Mesa completa</h3><p>Sorteando una carta para decidir el orden de juego…</p>`;
+  const card = getCard(cardId);
+  const regla = CT.axis(modeKey()).cifra || {};
+  const mine = starterRecords.get(user.uid);
+  const answered = mine && mine.cardId === cardId && mine.value !== null;
+  const cardMarkup = detalle => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
+  const reloj = `<p class="hint" role="timer">Quedan <b id="public-starter-clock">${publicStarterSecondsLeft()}</b> s para responder. Quien no responda jugará al final.</p>`;
+  if (starterEveryoneAnswered()) {
+    const ranking = starterRanking();
+    return `${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<p class="hint">Orden de juego:</p><ol class="starter-draw-list">${ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(uid)?.value))}</span></li>`).join("")}</ol><p>La partida empieza ahora…</p>`;
+  }
+  if (answered) {
+    const faltan = roomState.playerOrder.filter(uid => { const r = starterRecords.get(uid); return !(r && r.cardId === cardId && r.value !== null); }).map(uid => roomState.players[uid].name);
+    return `<h3>¿Quién empieza?</h3>${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${reloj}`;
+  }
+  return `<h3>¿Quién empieza?</h3><p>Escribe la cifra de esta carta: empieza quien más se acerque y el resto juega por orden de cercanía.</p>${cardMarkup(escapeHtml(regla.pregunta || ""))}
+    <div class="field cifra-field"><label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label><input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"><p class="hint">${escapeHtml(regla.pista || "")}</p></div>
+    <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Adivinar <span>→</span></button>${reloj}`;
+}
+function managePublicStarter() {
+  clearInterval(publicClock); publicClock = null;
+  clearTimeout(publicStarterTimer); publicStarterTimer = null;
+  if (!roomState || roomState.status !== "lobby" || roomState.playerOrder.length !== roomState.capacity) return;
+  const cardId = starterCardId();
+  const isHost = roomState.hostUid === user.uid;
+  if (cardId == null) {
+    // Reparte quien lleva la mesa, una sola vez por mesa (si falla, lo reintenta la
+    // siguiente instantánea).
+    if (isHost && publicDrawFor !== roomCode) { publicDrawFor = roomCode; void drawStarterCard().then(ok => { if (!ok) publicDrawFor = ""; }); }
+    return;
+  }
+  const left = publicStarterSecondsLeft();
+  if (!starterEveryoneAnswered()) {
+    publicClock = setInterval(() => {
+      const clock = document.getElementById("public-starter-clock");
+      if (clock) clock.textContent = publicStarterSecondsLeft();
+    }, 1000);
+  }
+  if (!isHost) return;
+  const startNow = () => {
+    const key = `${roomCode}:${starterCardId()}`;
+    if (publicStartFor === key || roomState?.status !== "lobby" || roomState.hostUid !== user.uid) return;
+    publicStartFor = key;
+    void startRoom().finally(() => { if (roomState?.status === "lobby") publicStartFor = ""; });
+  };
+  // Con todas las respuestas se deja un momento para ver el orden; si no, se espera al
+  // final del plazo.
+  publicStarterTimer = setTimeout(startNow, starterEveryoneAnswered() ? 2500 : left * 1000 + 250);
 }
 
 function tournamentBoard(winners = []) {
@@ -812,13 +933,22 @@ async function nextTournamentRound() {
   finally {busy=false;}
 }
 
-async function startRoom(withGhost = true) {
+// `keepOrder` es el camino de las reglas anteriores a poder reordenar la mesa al empezar:
+// si el servicio de salas todavía no se ha actualizado, se empieza igual, con quien ganó
+// el minijuego pero en el orden de entrada.
+async function startRoom(withGhost = true, keepOrder = false) {
   if (busy || roomState.hostUid !== user.uid) return;
-  const handSize = roomState.tournament?.handSize || Number(document.getElementById("online-hand-size").value);
-  // Quien ganó el sorteo de la carta, o —si por lo que sea se empieza sin haberlo hecho—
-  // alguien al azar, igual que la partida de un solo móvil.
-  const starterCard = starterCardId();
-  const starterUid = starterWinnerUid() || roomState.playerOrder[Math.floor(Math.random() * roomState.playerOrder.length)];
+  const handSize = roomState.tournament?.handSize || Number(document.getElementById("online-hand-size")?.value || 4);
+  const isPublic = roomState.matchmaking === "public";
+  // En una competición, el minijuego se juega en la primera ronda y ordena la mesa; en
+  // las siguientes, el turno de empezar rota por ese mismo orden, igual que en la
+  // competición de un solo móvil.
+  const laterRound = (roomState.tournament?.index || 0) > 0;
+  const starterCard = laterRound ? null : starterCardId();
+  const ranking = laterRound ? null : starterRanking(isPublic);
+  const rotated = laterRound ? roomState.playerOrder[roomState.tournament.index % roomState.playerOrder.length] : null;
+  // Sin minijuego (se empezó sin jugarlo), alguien al azar, igual que en un solo móvil.
+  const starterUid = rotated || ranking?.[0] || roomState.playerOrder[Math.floor(Math.random() * roomState.playerOrder.length)];
   const pulse = !!document.getElementById("online-pulse")?.checked;
   const enableGhost = withGhost && !!document.getElementById("online-ghost")?.checked;
   busy = true;
@@ -845,15 +975,27 @@ async function startRoom(withGhost = true) {
       data.playerOrder.forEach(uid => { players[uid] = { ...players[uid], hand: deck.splice(0, actualHand), pulseUsed: false, shieldRound: 0 }; });
       const timeline = [deck.shift()];
       data.playerOrder.forEach(uid => players[uid].hand.forEach(id => CT.Powers.claim(powers, id, uid, deck)));
+      // La mesa se sienta por orden de cercanía, si el minijuego sigue siendo de estas
+      // mismas personas (alguien pudo entrar o salir mientras tanto).
+      const sameTable = ranking && ranking.length === data.playerOrder.length && data.playerOrder.every(uid => ranking.includes(uid));
+      const reorder = !keepOrder && sameTable && ranking.some((uid, i) => uid !== data.playerOrder[i]);
+      const order = reorder ? ranking : data.playerOrder;
+      const startUid = order.includes(starterUid) ? starterUid : order[0];
       transaction.update(roomRef, {
+        ...(reorder ? { playerOrder: order } : {}),
         handSize: actualHand, turnSeconds: Number(document.getElementById("online-turn-seconds")?.value ?? 30), pulse, ...(powers.ghost ? { ghost: powers.ghost } : {}), ...(powers.pulsePower ? { pulsePower: powers.pulsePower } : {}), players, deck, timeline, discard: [], status: "playing", phase: "turn",
-        current: data.playerOrder.indexOf(starterUid), starter: starterUid,
+        current: order.indexOf(startUid), starter: startUid,
         turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null, pulseTurn: null,
         turnStartedAt: serverTimestamp(),
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
   } catch (error) {
+    if (!keepOrder && error.code === "permission-denied" && starterRanking(isPublic)) {
+      // Reglas sin actualizar: no admiten reordenar la mesa. Se reintenta sin hacerlo.
+      busy = false;
+      return await startRoom(withGhost, true);
+    }
     console.error(error);
     if (error.message === 'FINAL_RULES_REQUIRED') { showToast('El servicio de salas necesita actualizarse para la final secreta. Contacta con el organizador de la beta.'); return; }
     showToast(error.message === "DECK_MISMATCH" ? "Alguien de la sala lleva una versión distinta del juego. Actualizad todos los móviles y cread una sala nueva." : error.message === "UPDATE_CLIENTS" ? `Para usar esta sala, actualizad todos los móviles a v${CLIENT_VERSION} y cread una sala nueva.` : (enableGhost || pulse) && error.code === "permission-denied" ? "Actualiza firestore.rules a v39 para usar Fantasma o Pulso." : "No se pudo iniciar la partida");
@@ -1490,6 +1632,8 @@ async function removePlayer(targetUid) {
   if (busy) return;
   if (targetUid !== user.uid && roomState?.hostUid !== user.uid) return;
   busy = true;
+  const publicLobby = roomState?.matchmaking === "public" && roomState.status === "lobby";
+  const code = roomCode, queueKey = roomState?.queueKey;
   try {
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(roomRef);
@@ -1528,6 +1672,7 @@ async function removePlayer(targetUid) {
       }
       transaction.update(roomRef, update);
     });
+    if (publicLobby) void reopenPublicQueue(code, queueKey);
   } catch (error) {
     console.error(error);
     showToast(error.message === "HOST" ? "El anfitrión no puede salir: cierra la sala" : "No se pudo actualizar la sala");
@@ -1560,6 +1705,9 @@ async function closeRoom() {
 // Desconecta la vista sin eliminar al participante ni recargar la aplicación.
 function detachOnline() {
   entryRequest++;
+  // Quien deja la pantalla de la sala avisa de que ya no la está mirando: así, si era el
+  // anfitrión de una mesa pública, el relevo llega en segundos y no al minuto y medio.
+  if (roomRef && user && roomCode) setDoc(doc(db, "rooms", roomCode, "presence", user.uid), { seenAt: serverTimestamp(), visible: false }).catch(() => {});
   clearTurnTimer(); stopPresence(); stopStarterListeners();
   CT.onlineActive = false;
   unsubscribeRoom?.(); unsubscribeRoom = null;

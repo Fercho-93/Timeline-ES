@@ -69,7 +69,6 @@ function watchPublicRoom(code) {
   if(!code || watchedCode===code) return;
   watchedCode=code;
   const reference=doc(db,'rooms',code);
-  let started=false;
   const stop=onSnapshot(reference,snap=>{
     if(!snap.exists()){watchedCode='';stop();return;}
     const room=snap.data();
@@ -77,12 +76,8 @@ function watchPublicRoom(code) {
     const full=room.status==='lobby' && room.playerOrder?.length===room.capacity;
     const panel=document.querySelector('[data-public-waiting]');
     if(panel) panel.textContent=full?'Mesa completa. Preparando partida…':`Esperando jugadores · ${room.playerOrder?.length||0}/${room.capacity}`;
-    if(full && room.hostUid===auth.currentUser?.uid && !started){
-      started=true;
-      // online.js conserva la autoridad de reparto. El anfitrión técnico pulsa el mismo
-      // arranque que una sala privada, pero las reglas impiden hacerlo antes del cupo.
-      setTimeout(()=>document.querySelector('[data-online-action="start"]')?.click(),350);
-    }
+    // El arranque ya no se dispara desde aquí: online.js juega primero el minijuego de
+    // quién empieza con la mesa completa y reparte al terminarlo (o al agotarse el plazo).
     if(room.status!=='lobby'){watchedCode='';stop();}
   },()=>{});
   return stop;

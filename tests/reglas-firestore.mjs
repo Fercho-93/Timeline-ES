@@ -77,6 +77,15 @@ await check("el anfitrión reparte y empieza", "allow", updateDoc(ref(ctx(HOST))
 await seed(lobby3);
 await check("un invitado intenta empezar", "deny", updateDoc(ref(ctx(P2)), startPayload));
 await check("empezar con 20 cartas en mano", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, handSize: 20 }));
+// El minijuego de quién empieza sienta a la mesa por orden de cercanía.
+await seed(lobby3);
+await check("empezar con la mesa ordenada por el minijuego", "allow", updateDoc(ref(ctx(HOST)), { ...startPayload, playerOrder: [P2, P3, HOST], current: 0 }));
+await seed(lobby3);
+await check("TRAMPA: reordenar la mesa colando a alguien de fuera", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, playerOrder: [P2, OUT, HOST], current: 0 }));
+await seed(lobby3);
+await check("TRAMPA: reordenar la mesa dejando fuera a alguien", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, playerOrder: [P2, HOST], current: 0 }));
+await seed(lobby3);
+await check("TRAMPA: reordenar la mesa repitiendo a alguien", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, playerOrder: [P2, P2, HOST], current: 0 }));
 
 console.log("\nJugar una carta");
 await seed(playing());

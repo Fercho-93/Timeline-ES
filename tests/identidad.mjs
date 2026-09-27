@@ -126,6 +126,10 @@ console.log("\nLos avatares en la partida de un móvil");
   ok("el primer jugador lleva tu nombre", w.document.querySelector("#players input").value === "Lucía");
   click(w, '[data-action="add-player"]');
   click(w, '[data-action="start"]');
+  // Antes de repartir se juega el minijuego de quién empieza (todas con la misma
+  // cifra: a igual distancia se respeta el orden de la mesa).
+  while (w.document.getElementById('starter-guess-input')) { w.document.getElementById('starter-guess-input').value = '1900'; click(w, '[data-action="starter-guess-submit"]'); }
+  click(w, '[data-action="starter-start"]');
   const partida = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
   const A = w.CONTINUUM.Avatares;
   const actual = partida.players[partida.current];

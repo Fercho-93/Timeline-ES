@@ -62,6 +62,10 @@ function checkBoard(document, count) {
     click(document, '[data-action="setup"]');
     document.querySelector('#hand-size').value = '4';
     click(document, '[data-action="start"]');
+    // Antes de repartir se juega el minijuego de quién empieza (todas con la misma
+    // cifra: a igual distancia se respeta el orden de la mesa).
+    while (document.getElementById('starter-guess-input')) { document.getElementById('starter-guess-input').value = '1900'; click(document, '[data-action="starter-guess-submit"]'); }
+    click(document, '[data-action="starter-start"]');
     click(document, '[data-action="ready"]');
     checkBoard(document, 4);
     click(document, '.hand-card:not(.selected)');

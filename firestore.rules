@@ -725,7 +725,11 @@ service cloud.firestore {
           && prior.playerOrder.size() >= 2
           && changed().hasOnly(['ghost', 'pulsePower', 'handSize', 'turnSeconds', 'pulse', 'players', 'deck', 'discard', 'timeline', 'status', 'phase',
                                 'current', 'starter', 'turnsInRound', 'round', 'winner', 'winners', 'reveal',
-                                'pulseTurn', 'turnStartedAt', 'version', 'updatedAt'])
+                                'pulseTurn', 'turnStartedAt', 'version', 'updatedAt', 'playerOrder'])
+          // El minijuego de quién empieza sienta a la mesa por orden de cercanía: al
+          // empezar se puede reordenar, pero solo con las mismas personas.
+          && next.playerOrder.size() == prior.playerOrder.size()
+          && next.playerOrder.toSet() == prior.playerOrder.toSet()
           && next.status == 'playing'
           && next.phase == 'turn'
           && next.handSize >= 1 && next.handSize <= 6

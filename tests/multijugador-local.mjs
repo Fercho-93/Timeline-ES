@@ -119,7 +119,19 @@ function fakeNetwork() {
       isReady: () => peer.open && !closed
     };
   }
-  return { install(win) { win.CONTINUUM.LocalTransport = { ...win.CONTINUUM.LocalTransport, createHostSession: host, createGuestPeer: guest }; } };
+  // Un corte de verdad (Wi-Fi que se va, móvil que se bloquea): los dos extremos se
+  // enteran a la vez y nadie ha pedido salir.
+  function drop() {
+    for (const peer of [...offers.values()].reverse()) {
+      if (!peer.open || !peer.guest || peer.dropped) continue;
+      peer.dropped = true; peer.open = false;
+      later(() => peer.guest.onClose?.());
+      peer.lost();
+      return true;
+    }
+    return false;
+  }
+  return { drop, install(win) { win.CONTINUUM.LocalTransport = { ...win.CONTINUUM.LocalTransport, createHostSession: host, createGuestPeer: guest }; } };
 }
 
 const tick = (ms = 5) => new Promise(resolve => setTimeout(resolve, ms));
@@ -135,59 +147,114 @@ const anfitrion = boot(), invitada = boot();
 for (const win of [anfitrion, invitada]) { red.install(win); win.confirm = () => true; }
 const erroresAnfitrion = [];
 anfitrion.addEventListener("error", event => erroresAnfitrion.push(event.message));
+const elige = (win, id, value) => { const el = win.document.getElementById(id); if (typeof value === "boolean") el.checked = value; else el.value = value; el.dispatchEvent(new win.Event("change", { bubbles: true })); };
+const valorDe = (win, titulo) => { const CTw = win.CONTINUUM; const carta = CTw.cards("history").find(item => item.title === titulo); return { carta, valor: CTw.sortValue("history", carta) }; };
+
+// Conecta una invitada nueva (o que vuelve) al anfitrión, por el camino de pegar códigos.
+async function conecta(host, guest, nombre = "Ana") {
+  click(host, '[data-local-action="invite"]');
+  await until(() => !!host.document.querySelector(".signal-box"));
+  const invitacion = host.document.querySelector(".signal-box").textContent;
+  if (pantalla(guest) !== "local-unirse") click(guest, '[data-local-action="go-unirse"]');
+  guest.document.getElementById("local-guest-name").value = nombre;
+  guest.document.getElementById("local-guest-offer").value = invitacion;
+  submit(guest, '[data-local-form="join-offer"]');
+  await until(() => !!guest.document.querySelector(".signal-box"));
+  const respuesta = guest.document.querySelector(".signal-box").textContent;
+  host.document.getElementById("local-answer").value = respuesta;
+  submit(host, '[data-local-form="accept-answer"]');
+  return { invitacion, respuesta };
+}
+
+// El minijuego de quién empieza, con las dos respuestas escritas en cada móvil. Quien
+// escribe la cifra exacta empieza.
+async function minijuego(host, guest, exacto = host) {
+  click(host, '[data-local-action="starter-draw"]');
+  await until(() => !!guest.document.getElementById("starter-guess-input") && !!host.document.getElementById("starter-guess-input"));
+  const { valor } = valorDe(host, host.document.querySelector(".starter-card strong").textContent);
+  for (const win of [host, guest]) {
+    win.document.getElementById("starter-guess-input").value = String(win === exacto ? valor : valor + 5000);
+    click(win, '[data-local-action="starter-guess"]');
+    await tick();
+  }
+  await until(() => !!host.document.querySelector('[data-local-action="start"]'));
+}
+
 await entrarWifi(anfitrion);
 anfitrion.document.getElementById("local-name-host").value = "Fer";
 submit(anfitrion, '[data-local-form="create"]');
-click(anfitrion, '[data-local-action="invite"]');
-await tick();
-const invitacion = anfitrion.document.querySelector(".signal-box")?.value || anfitrion.document.querySelector(".signal-box")?.textContent;
-ok("el anfitrión tiene una invitación que compartir", /^CTM1:/.test(invitacion || ""));
-
 await entrarWifi(invitada);
-click(invitada, '[data-local-action="go-unirse"]');
-invitada.document.getElementById("local-guest-name").value = "Ana";
-invitada.document.getElementById("local-guest-offer").value = invitacion;
-submit(invitada, '[data-local-form="join-offer"]');
-await tick();
-const respuesta = invitada.document.querySelector(".signal-box")?.value || invitada.document.querySelector(".signal-box")?.textContent;
+const { invitacion, respuesta } = await conecta(anfitrion, invitada);
+ok("el anfitrión tiene una invitación que compartir", /^CTM1:/.test(invitacion || ""));
 ok("la invitada genera su respuesta", respuesta === "FAKE-ANSWER-1");
-
-anfitrion.document.getElementById("local-answer").value = respuesta;
-submit(anfitrion, '[data-local-form="accept-answer"]');
 await until(() => pantalla(anfitrion) === "local-lobby" && pantalla(invitada) === "local-lobby");
 ok("el anfitrión ve a las dos personas en la mesa", /Ana/.test(html(anfitrion)) && pantalla(anfitrion) === "local-lobby");
 ok("la invitada pasa sola al vestíbulo", pantalla(invitada) === "local-lobby" && /Fer/.test(html(invitada)));
 
-anfitrion.document.getElementById("local-hand-size").value = "2";
-anfitrion.document.getElementById("local-turn-seconds").value = "0";
+console.log("\nMinijuego de quién empieza, igual que en la sala online");
+ok("sin minijuego no se puede barajar todavía", !anfitrion.document.querySelector('[data-local-action="start"]') && !!anfitrion.document.querySelector('[data-local-action="starter-draw"]'));
+elige(anfitrion, "wifi-hand-size", "2");
+elige(anfitrion, "wifi-turn-seconds", "0");
+await minijuego(anfitrion, invitada, invitada);
+await until(() => invitada.document.querySelectorAll(".starter-draw-list li").length === 2);
+ok("los dos móviles ven el orden de juego", invitada.document.querySelectorAll(".starter-draw-list li").length === 2 && /1\.º Ana/.test(invitada.document.querySelector(".starter-draw-list").textContent));
+ok("los ajustes elegidos no se pierden al repintar la sala", anfitrion.document.getElementById("wifi-hand-size").value === "2");
 click(anfitrion, '[data-local-action="start"]');
 await until(() => pantalla(invitada) === "local-game");
 ok("la partida arranca en los dos móviles", pantalla(anfitrion) === "local-game" && pantalla(invitada) === "local-game");
+ok("empieza quien más se acercó en el minijuego", /Tu turno/.test(invitada.document.querySelector(".turn-name").textContent));
 ok("el anfitrión ve su propia mano (antes la pantalla se rompía)", anfitrion.document.querySelectorAll(".hand-card").length === 2 && !erroresAnfitrion.length);
 ok("sin límite de tiempo no se enseña reloj", !anfitrion.document.getElementById("turn-timer"));
 
-let jugadas = 0;
-for (let i = 0; i < 400 && pantalla(anfitrion) === "local-game"; i++) {
-  const turno = [anfitrion, invitada].find(win => win.document.querySelector(".hand-card:not([disabled])"));
-  const sigue = [anfitrion, invitada].find(win => win.document.querySelector('[data-local-action="finish-turn"]'));
-  if (sigue && !turno) { click(sigue, '[data-local-action="finish-turn"]'); await tick(); continue; }
-  if (!turno) { await tick(); continue; }
-  // Se juega bien, para que la partida termine en pocas vueltas: el hueco correcto se
-  // calcula con las mismas funciones del juego.
-  const CTg = turno.CONTINUUM;
-  const carta = turno.document.querySelector(".hand-card:not([disabled])");
-  const porId = id => CTg.cards("history").find(card => card.id === Number(id));
-  const linea = [...turno.document.querySelectorAll(".timeline .timeline-card")].map(el => porId(el.dataset.id));
-  const hueco = CTg.correctIndex("history", linea, porId(carta.dataset.id));
-  click(turno, `.hand-card[data-id="${carta.dataset.id}"]`);
-  click(turno, `.slot[data-local-action="place"][data-index="${hueco}"]`);
-  click(turno, '[data-local-action="confirm-place"]');
-  jugadas++;
-  await until(() => [anfitrion, invitada].every(win => win.document.querySelector('[data-local-action="finish-turn"], .local-final, [data-local-action="rematch"], [data-local-action="leave"]') || pantalla(win) === "local-final"), 1000);
+// Se juega bien, para que la partida termine en pocas vueltas: el hueco correcto se
+// calcula con las mismas funciones del juego.
+async function juegaBien(ventanas, limite = 400) {
+  let jugadas = 0;
+  for (let i = 0; i < limite && ventanas.some(win => pantalla(win) === "local-game"); i++) {
+    const turno = ventanas.find(win => win.document.querySelector(".hand-card:not([disabled])"));
+    const sigue = ventanas.find(win => win.document.querySelector('[data-local-action="finish-turn"]'));
+    if (sigue && !turno) {
+      click(sigue, '[data-local-action="finish-turn"]');
+      await tick();
+      await until(() => !ventanas.some(win => win.document.querySelector('[data-local-action="finish-turn"]')), 3000);
+      continue;
+    }
+    if (!turno) { await tick(); continue; }
+    const CTg = turno.CONTINUUM;
+    const carta = turno.document.querySelector(".hand-card:not([disabled])");
+    const porId = id => CTg.cards("history").find(card => card.id === Number(id));
+    const linea = [...turno.document.querySelectorAll(".timeline .timeline-card")].map(el => porId(el.dataset.id));
+    const hueco = CTg.correctIndex("history", linea, porId(carta.dataset.id));
+    click(turno, `.hand-card[data-id="${carta.dataset.id}"]`);
+    click(turno, `.slot[data-local-action="place"][data-index="${hueco}"]`);
+    click(turno, '[data-local-action="confirm-place"]');
+    jugadas++;
+    // La jugada viaja al anfitrión y el resultado vuelve a los dos: se espera a que el
+    // móvil que ha jugado deje de tener el turno antes de mirar otra vez.
+    await tick();
+    await until(() => !turno.document.querySelector(".hand-card:not([disabled])") || ventanas.every(win => pantalla(win) !== "local-game"), 3000);
+  }
+  return jugadas;
 }
+const jugadas = await juegaBien([anfitrion, invitada]);
+await until(() => [anfitrion, invitada].every(win => ["local-final", "local-final-secreta"].includes(pantalla(win))));
+
+console.log("\nLas dos terminan la misma ronda sin cartas: final secreta");
+ok(`los dos móviles pasan a la final (${jugadas} jugadas)`, pantalla(anfitrion) === "local-final-secreta" && pantalla(invitada) === "local-final-secreta");
+ok("cada finalista tiene su propio formulario, sin ver la cifra ajena", !!anfitrion.document.querySelector("[data-local-final]") && !!invitada.document.querySelector("[data-local-final]"));
+const { valor: objetivo } = valorDe(anfitrion, anfitrion.document.querySelector(".final-card h2").textContent);
+for (const [win, cifra] of [[anfitrion, objetivo], [invitada, objetivo + 300]]) {
+  const form = win.document.querySelector("[data-local-final]");
+  form.elements.guess.value = String(Math.abs(cifra));
+  if (form.elements.era) form.elements.era.value = cifra < 0 ? "bc" : "ad";
+  submit(win, "[data-local-final]");
+  await tick();
+}
+await until(() => !!invitada.document.querySelector('[data-local-action="final-next"]'));
+ok("al responder las dos se enseñan las cifras a la vez", !!invitada.document.querySelector(".final-results") && !!anfitrion.document.querySelector(".final-results"));
+click(invitada, '[data-local-action="final-next"]');
 await until(() => pantalla(anfitrion) === "local-final" && pantalla(invitada) === "local-final");
-ok(`la partida termina en los dos móviles (${jugadas} jugadas)`, pantalla(anfitrion) === "local-final" && pantalla(invitada) === "local-final");
-ok("se anuncia quién gana", /gana|ganan/.test(html(anfitrion)));
+ok("gana quien más se acerca en la final", /Fer.*gana/.test(anfitrion.document.querySelector("h2").textContent) && /cifra más cercana/.test(html(anfitrion)));
 ok("el anfitrión puede pedir la revancha", !!anfitrion.document.querySelector('[data-local-action="rematch"]'));
 ok("la invitada puede salir de la pantalla final (antes el botón no hacía nada)", !!invitada.document.querySelector('[data-local-action="leave"]'));
 
@@ -195,19 +262,36 @@ console.log("\nRevancha con la misma mesa");
 click(anfitrion, '[data-local-action="rematch"]');
 await until(() => pantalla(invitada) === "local-lobby");
 ok("los dos vuelven al vestíbulo, con las mismas personas", pantalla(anfitrion) === "local-lobby" && pantalla(invitada) === "local-lobby" && /Ana/.test(html(anfitrion)));
+ok("y hay que volver a jugar el minijuego", !anfitrion.document.querySelector('[data-local-action="start"]'));
 
-console.log("\nReloj del turno y menú de la sala");
-anfitrion.document.getElementById("local-turn-seconds").value = "20";
+console.log("\nReloj del turno, poderes y menú de la sala");
+elige(anfitrion, "wifi-turn-seconds", "20");
+elige(anfitrion, "wifi-hand-size", "4");
+elige(anfitrion, "wifi-preset", "advanced");
+ok("la partida avanzada activa Pulso y Fantasma", anfitrion.document.getElementById("wifi-pulse").checked && anfitrion.document.getElementById("wifi-ghost").checked);
+await minijuego(anfitrion, invitada, anfitrion);
 click(anfitrion, '[data-local-action="start"]');
 await until(() => pantalla(invitada) === "local-game");
 ok("con límite de tiempo se enseña la cuenta atrás", !!anfitrion.document.getElementById("turn-timer") && !!invitada.document.getElementById("turn-timer"));
 click(anfitrion, '[data-local-action="room-menu"]');
 ok("volver abre el menú de la sala en vez del vestíbulo", !!anfitrion.document.querySelector("[data-local-room-overlay]") && pantalla(anfitrion) === "local-game");
-const turnoDeAna = /Turno de Ana/.test(anfitrion.document.querySelector(".turn-name").textContent);
-ok("el anfitrión puede saltar el turno ajeno desde el menú", !!anfitrion.document.querySelector('[data-local-action="skip"]') === turnoDeAna);
+ok("desde el menú se puede volver a invitar a alguien", !!anfitrion.document.querySelector('[data-local-room-overlay] [data-local-action="invite"]'));
 click(anfitrion, '[data-local-action="close-room-menu"]');
 
-console.log("\nSi el móvil de la invitada se desconecta");
+console.log("\nSi la conexión de la invitada se corta, conserva su plaza");
+const manoAntes = invitada.document.querySelectorAll(".hand-card").length;
+red.drop();
+await until(() => pantalla(invitada) === "local-desconectado" && /desconectado/.test(html(anfitrion)));
+ok("la invitada ve que ha perdido la conexión y cómo volver", pantalla(invitada) === "local-desconectado" && !!invitada.document.querySelector('[data-local-action="go-unirse"]'));
+ok("el anfitrión la sigue viendo en la mesa, marcada como desconectada", /Ana · desconectado/.test(html(anfitrion)));
+ok("la partida sigue: si era su turno, pasa al anfitrión", /Tu turno/.test(anfitrion.document.querySelector(".turn-name").textContent));
+click(anfitrion, '[data-local-action="room-menu"]');
+await conecta(anfitrion, invitada);
+await until(() => pantalla(invitada) === "local-game");
+ok("vuelve a su plaza con sus cartas", pantalla(invitada) === "local-game" && invitada.document.querySelectorAll(".hand-card").length === manoAntes);
+ok("el anfitrión ya no la ve desconectada", !/Ana · desconectado/.test(html(anfitrion)) && /ha vuelto/.test(anfitrion.document.getElementById("toast")?.textContent || ""));
+
+console.log("\nSi la invitada sale de la partida");
 click(invitada, '[data-local-action="room-menu"]');
 click(invitada, '[data-local-action="leave"]');
 await until(() => pantalla(anfitrion) === "local-final");
@@ -219,12 +303,8 @@ const red2 = fakeNetwork();
 const h2 = boot(), g2 = boot();
 for (const win of [h2, g2]) { red2.install(win); win.confirm = () => true; }
 await entrarWifi(h2); submit(h2, '[data-local-form="create"]');
-click(h2, '[data-local-action="invite"]'); await tick();
-await entrarWifi(g2); click(g2, '[data-local-action="go-unirse"]');
-g2.document.getElementById("local-guest-offer").value = h2.document.querySelector(".signal-box").textContent;
-submit(g2, '[data-local-form="join-offer"]'); await tick();
-h2.document.getElementById("local-answer").value = g2.document.querySelector(".signal-box").textContent;
-submit(h2, '[data-local-form="accept-answer"]');
+await entrarWifi(g2);
+await conecta(h2, g2);
 await until(() => pantalla(g2) === "local-lobby");
 click(h2, '[data-local-action="leave"]');
 await until(() => pantalla(g2) === "local-entrada");

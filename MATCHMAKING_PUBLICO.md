@@ -157,3 +157,19 @@ No se publicará el botón de Partida rápida hasta que estas reglas tengan prue
 ## Fuera de Fase 1
 
 Chat, ranking/ELO, filtros de nivel, mesas visibles, espectadores, invitaciones a una mesa pública, bots, temporadas y matchmaking por habilidad.
+## Orden de juego y relevo del anfitrión
+
+- **Quién empieza.** Al completarse la mesa se juega el mismo minijuego que en las salas
+  privadas: el anfitrión técnico reparte una carta automáticamente y cada persona tiene 30
+  segundos para escribir su cifra. La partida arranca sola en cuanto han respondido todos
+  (o se agota el plazo). La mesa se sienta por orden de cercanía; quien no respondió juega
+  al final.
+- **Relevo automático.** Si el anfitrión técnico deja de dar señales (15 s si dejó la
+  pantalla de la sala o la app pasó a segundo plano, 90 s si simplemente dejó de
+  responder), la primera persona conectada de la mesa toma el relevo sin pulsar nada. En
+  la sala de espera, además, se saca de la mesa a quien se fue y la cola vuelve a ofrecer
+  la mesa (`status: waiting`).
+- **Reglas.** Reordenar la mesa al empezar necesita la versión actual de
+  `firestore.rules` (`validStart` admite una permutación de `playerOrder`). Con las
+  reglas antiguas publicadas, el cliente reintenta sin reordenar: empieza quien ganó el
+  minijuego, en el orden de entrada.

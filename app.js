@@ -942,22 +942,13 @@
       return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">🂠</span><span class="starter-draw-copy"><b>Adivinar la fecha</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
-    return `<span class="field-label">Quién empieza</span><p class="starter-result"><span class="starter-result-crown" aria-hidden="true">${crownIcon()}</span><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el sorteo</button>`;
+    const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");
+    return `<span class="field-label">Quién empieza</span><p class="starter-result"><span class="starter-result-crown" aria-hidden="true">${crownIcon()}</span><strong>${ganador}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${orden}</p><button type="button" class="btn btn-ghost" data-action="draw-starter">🂠 Repetir el sorteo</button>`;
   }
   const crownIcon = () => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4 3 5-6 5 6 4-3-2 10H5L3 8Z"/><path d="M5 21h14"/></svg>';
 
   function playerNames() {
     return [...document.querySelectorAll("#players input")].map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
-  }
-
-  // Cuánto se aleja una respuesta del valor real de la carta, con el mismo criterio que
-  // usa el duelo de cifras: en años y siglos el error se mide en unidades, porque errar
-  // un siglo pesa igual en el año 200 que en el 1900; en el resto se mide en proporción,
-  // porque errar 100 habitantes no es lo mismo en un pueblo que en una capital.
-  function starterError(modeKey, card, guess) {
-    const real = CT.sortValue(modeKey, card);
-    const anos = !!reglaCifra(modeKey).anos;
-    return anos || real === 0 ? Math.abs(guess - real) : Math.abs(guess - real) / Math.abs(real);
   }
 
   // El minijuego para decidir quién empieza: se saca una única carta del mazo elegido y,
@@ -1013,16 +1004,24 @@
     starterDraw.step += 1;
     if (starterDraw.step < starterDraw.names.length) { renderStarterGuess(); return; }
     const card = starterCard();
-    const errores = starterDraw.guesses.map(guess => starterError(selectedModeKey, card, guess));
-    const winner = errores.indexOf(Math.min(...errores));
+    // El mismo criterio que en todas las modalidades con turnos (`CT.Starter`): empieza
+    // quien más se acerca y el resto juega por orden de cercanía.
+    const order = CT.Starter.order(selectedModeKey, starterDraw.cardId, starterDraw.guesses.map((value, id) => ({ id, value })));
+    const winner = order[0];
     starterDraw.winner = winner;
+    starterDraw.order = order;
     document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
-    announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida.`);
+    announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida. Orden de juego: ${order.map(i => starterDraw.names[i]).join(", ")}.`);
     renderStarterDialog(`<h2>¿Quién empieza?</h2>
       <div class="starter-winner-banner"><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><b>${escapeHtml(starterDraw.names[winner])}</b><span>Empieza la partida</span></div>
       <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>El valor real era ${escapeHtml(CT.formatValue(selectedModeKey, card))}</span></div>
-      <ul class="starter-draw-list">${starterDraw.names.map((name, i) => `<li${i === winner ? ' class="starter-draw-winner"' : ''}><span>${escapeHtml(name)}</span><span>${escapeHtml(Cifras.formato(selectedModeKey, starterDraw.guesses[i]))}</span></li>`).join("")}</ul>
-      <div class="actions"><button class="btn btn-primary btn-block" data-action="close-menu">Aceptar</button></div>`);
+      ${starterOrderList(order.map(i => ({ name: starterDraw.names[i], value: Cifras.formato(selectedModeKey, starterDraw.guesses[i]) })))}
+      <div class="actions" style="display:grid"><button class="btn btn-primary btn-block" data-action="starter-start">Barajar y empezar <span aria-hidden="true">→</span></button><button class="btn btn-ghost btn-block" data-action="close-menu">Volver a la preparación</button></div>`);
+  }
+
+  // El resultado del minijuego, ya en orden de juego: la primera fila empieza.
+  function starterOrderList(rows) {
+    return `<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${rows.map((row, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(row.name)}</span><span>${escapeHtml(row.value)}</span></li>`).join("")}</ol>`;
   }
 
   function syncStarterOptions() {
@@ -1062,19 +1061,18 @@
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     const inputs = [...document.querySelectorAll("#players input")];
     if (inputs.length < 2) return showToast("Se necesitan al menos 2 jugadores");
-    const names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
+    let names = inputs.map((input, i) => input.value.trim() || `Jugador ${i + 1}`);
     CT.RecentPlayers?.remember(names);
-    // Si nadie ha jugado el minijuego, se decide igualmente y sin pantalla: la partida
-    // siempre arranca a partir de un sorteo, se haya visto o no. Sin adivinanzas de por
-    // medio no hay quien acertó más cerca, así que aquí el sorteo es solo quién empieza.
-    if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      const cardId = shuffle(currentMode().cards.map(card => card.id))[0];
-      starterDraw = { names, cardId, step: names.length, guesses: [], winner: Math.floor(Math.random() * names.length), drawnIds: [cardId] };
-    }
+    // Como en la sala online y en la de Wi-Fi, no se empieza sin el minijuego de quién
+    // empieza: si todavía no se ha jugado (o la mesa ha cambiado desde entonces), se abre
+    // ahora, y su resultado ya ofrece barajar.
+    if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) { beginStarterDraw(); return; }
     const requestedHand = Number(document.getElementById("hand-size").value);
     const handSize = Math.min(requestedHand, Math.floor((currentMode().cards.length - 1) / names.length));
     if (handSize < requestedHand) showToast(`Mazo pequeño: ${handSize} cartas por persona para reservar el tablero.`);
-    const starter = starterDraw.winner;
+    // La mesa se sienta por orden de cercanía en el minijuego y empieza la primera.
+    let starter = starterDraw.winner;
+    if (starterDraw.order?.length === names.length) { names = starterDraw.order.map(i => names[i]); starter = 0; }
     const drawnIds = starterDraw.drawnIds;
     const ghost = !!document.getElementById("ghost-toggle")?.checked;
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
@@ -3807,12 +3805,13 @@
     else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; CT.Effects.transition(formatOpen ? 'expand' : 'close'); if(screen==='competition-menu') {competitionOptions();competitionMenu();} else playMenu(); }
     else if (action === "competition-menu") { formatOpen=null;competitionMenu(); }
     else if (action === "setup") { pendingTournament=null;setup(); }
-    // Revancha: la misma mesa y los mismos ajustes, con un nuevo sorteo de quién empieza.
+    // Revancha: la misma mesa y los mismos ajustes. Se vuelve a jugar el minijuego de
+    // quién empieza, como en cualquier partida nueva, y se baraja al terminarlo.
     else if (action === "rematch-local") {
       pendingTournament = null;
       if (game?.players?.length) lastLocalSetup = { ...(lastLocalSetup || {}), names: game.players.map(p => p.name) };
       if (game?.mode && game.mode !== selectedModeKey && !setMode(game.mode)) return;
-      setup(); startGame();
+      setup(); beginStarterDraw();
     }
     else if (action === "competition-local") prepareMultiCompetition();
     else if (action === "competition-online") launchOnline('',competitionOptions());
@@ -3912,6 +3911,7 @@
     else if (action === "close-rules") CT.closeDialog();
     else if (action === "game-menu") gameMenu();
     else if (action === "close-menu") CT.closeDialog();
+    else if (action === "starter-start") { CT.closeDialog(); startGame(); }
     else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual. Esta acción no se puede deshacer.', () => { game = null; saveGame(); home(); }, '¿Abandonar partida?', 'Abandonar');
     else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará en las estadísticas ni en la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "pulse-open") pulseTargetMenu();

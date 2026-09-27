@@ -124,6 +124,10 @@ await openFirstDeck();
 await click('.play-choice-block [data-action="toggle-format-block"]');
 await click('.play-choice[data-action="setup"]');
 await click('[data-action="start"]');
+// Antes de repartir se juega el minijuego de quién empieza (todas con la misma
+// cifra: a igual distancia se respeta el orden de la mesa).
+while (w.document.getElementById('starter-guess-input')) { w.document.getElementById('starter-guess-input').value = '1900'; await click('[data-action="starter-guess-submit"]'); }
+await click('[data-action="starter-start"]');
 assert.equal(screen(), 'pass');
 await back();
 await click('[data-exit-confirm]');

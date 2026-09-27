@@ -111,8 +111,8 @@ según el grupo de dispositivos.
       funciona en producción —1675 líneas con la UI, las reglas y Firestore mezclados—, se
       escribió aparte, con las mismas reglas, para no arriesgar el modo con internet que ya
       usan los testers. `online.js` no se ha tocado.
-      **Alcance: falta Fantasma, Pulso, torneo y la final secreta** — si varias personas
-      se quedan sin cartas a la vez, comparten la victoria (ver «Pulido» más abajo).
+      **Alcance: las mismas reglas que la sala online** (minijuego de quién empieza, final
+      secreta, Fantasma y Pulso); solo falta la competición por rondas.
 - [x] Implementar el transporte sobre `RTCDataChannel` (`local-transport.js`), topología en
       estrella con el anfitrión como fuente de verdad (mismo modelo que las salas actuales).
       Cubre la conexión en sí (anfitrión/invitado, mensajes) y sus pruebas (`tests/transporte-local.mjs`).
@@ -183,12 +183,20 @@ según el grupo de dispositivos.
       - **Fallo que impedía jugar**: el anfitrión no tenía identificador propio en la
         interfaz y su pantalla se rompía al empezar la partida («Cannot read properties of
         undefined (reading 'hand')»). Ahora juega como cualquier otra plaza.
-      - Varias personas sin cartas en la misma ronda comparten la victoria, en vez de
-        dejar la partida atascada con `TIE_NOT_SUPPORTED_YET`. Saltar un turno también
-        cierra la ronda y declara ganador si toca.
+      - Varias personas sin cartas en la misma ronda juegan la final secreta
+        (`CT.Final`), como en un solo móvil y en la sala online, en vez de dejar la
+        partida atascada con `TIE_NOT_SUPPORTED_YET`. Saltar un turno también cierra la
+        ronda.
+      - Minijuego de quién empieza, igual que en las demás modalidades: la mesa se sienta
+        por orden de cercanía (`CT.Starter`, compartido por todas).
+      - Pulso y Fantasma, con las mismas reglas (`CT.Powers`, `CT.Ghost`,
+        `CT.Engine.pulse`); quien defiende un Pulso lo coloca en su propio móvil.
+      - Plaza reservada: si el canal de alguien se cae a mitad de partida, conserva su
+        plaza y sus cartas (sus turnos se saltan) y vuelve a sentarse escaneando una
+        invitación nueva. Sin internet no hay forma de reconectar sin volver a escanear;
+        en la app instalada con la señal por LAN basta con escanear la invitación.
       - El «Tiempo por turno» ya funciona: cuenta atrás en todos los móviles y, al
         agotarse, el anfitrión pasa el turno.
-      - Quién empieza se sortea entre la mesa (antes empezaba siempre el anfitrión).
       - Revancha con la misma mesa (`rematch` en el reductor): todos vuelven al vestíbulo.
       - Salidas y desconexiones: un invitado que sale avisa al anfitrión (sus cartas
         vuelven al descarte); si su canal se cae, el anfitrión lo saca de la mesa en vez
@@ -199,6 +207,9 @@ según el grupo de dispositivos.
         salir) en vez de llevar al vestíbulo.
       - Cada canal queda atado a la persona que se unió por él: sus mensajes siempre
         hablan en su nombre, aunque manden otro identificador.
+        Límite conocido: quien conozca el identificador de alguien desconectado podría
+        ocupar su plaza (el identificador viaja en el estado de la sala); entre personas
+        de la misma mesa se ha considerado aceptable.
       - `tests/multijugador-local.mjs` juega ahora una partida entera entre dos ventanas
         con un transporte simulado (todo lo demás es el código real).
 - [ ] Probar en dispositivos reales, en modo avión, con grupos mixtos Android/iPhone —

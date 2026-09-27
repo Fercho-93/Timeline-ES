@@ -27,6 +27,10 @@ assert.ok(w.document.querySelector('[data-action="competition-online"]'));
 click('[data-action="competition-local"]');click('[data-action="back-menu"]');
 assert.equal(w.document.getElementById('competition-cards').value,'1');
 click('[data-action="competition-local"]');click('[data-action="start"]');
+// Antes de repartir se juega el minijuego de quién empieza (todas con la misma
+// cifra: a igual distancia se respeta el orden de la mesa).
+while (w.document.getElementById('starter-guess-input')) { w.document.getElementById('starter-guess-input').value = '1900'; click('[data-action="starter-guess-submit"]'); }
+click('[data-action="starter-start"]');
 click('[data-action="competition-round-start"]');
 assert.equal(state().tournament.queue.length,3);assert.equal(new Set(state().tournament.queue).size,3);
 assert.ok(state().players.every(p=>p.hand.length===1));
