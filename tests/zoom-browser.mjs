@@ -39,6 +39,34 @@ try {
     return page;
   };
   try {
+   // La lámina colocada debe ocupar la carta y el pie de lectura no puede taparla.
+   const illustratedPage=await newPage({viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
+   await illustratedPage.goto(url);
+   await illustratedPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
+   await openCollections(illustratedPage);
+   await illustratedPage.locator('[data-block="historia"]').click();
+   await illustratedPage.locator('[data-mode="history"]').click();
+   await illustratedPage.locator('[data-action="solo"]').click();
+   await illustratedPage.locator('[data-action="start-free"]').click();
+   const illustratedCard=illustratedPage.locator('.timeline .timeline-card:has(.animal-card-art)').first();
+   await illustratedCard.locator('img').evaluate(img=>img.decode());
+   const illustrated=await illustratedCard.evaluate(card=>{
+     const image=card.querySelector('.card-visual'),caption=card.querySelector('.card-content');
+     const bounds=element=>element.getBoundingClientRect();
+     return {cardHeight:bounds(card).height,imageHeight:bounds(image).height,captionHeight:bounds(caption).height,
+       imageWidth:bounds(image).width,cardWidth:bounds(card).width,
+       captionFlex:getComputedStyle(caption).flexGrow,
+       captionBackground:getComputedStyle(caption).backgroundImage,
+       titleColor:getComputedStyle(caption.querySelector('h3')).color};
+   });
+   await illustratedPage.screenshot({path:`test-results/zoom/${engine}-carta-ilustrada.png`});
+   assert.ok(illustrated.imageHeight>=illustrated.cardHeight-2 && illustrated.imageWidth>=illustrated.cardWidth-2,'la lámina llena la carta');
+   assert.ok(illustrated.captionHeight<illustrated.cardHeight*.6,'la leyenda no tapa la mayor parte de la ilustración');
+   assert.equal(illustrated.captionFlex,'0','el pie no crece sobre la lámina');
+   assert.ok(illustrated.captionBackground.includes('248, 239, 221'),'el pie es papel claro');
+   assert.equal(illustrated.titleColor,'rgb(48, 33, 22)','el título tiene tinta oscura');
+   await illustratedPage.close();
+
    const transitionPage=await newPage({viewport:{width:414,height:714},isMobile:true,deviceScaleFactor:2,reducedMotion:'no-preference'});
    await transitionPage.goto(url);
    await transitionPage.evaluate(() => window.CONTINUUM_SPLASH?.finish());
