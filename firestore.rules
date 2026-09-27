@@ -362,6 +362,9 @@ service cloud.firestore {
         && ((request.resource.data.roomCode == resource.data.roomCode
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']))
           || ((resource.data.status == 'full'
+                // Mesa abandonada: quien espera en ella renueva la cola cada 45 s; si nadie
+                // lo ha hecho en dos minutos, otra persona puede abrir una mesa nueva.
+                || resource.data.updatedAt < request.time - duration.value(120, 's')
                 || !exists(/databases/$(database)/documents/rooms/$(resource.data.roomCode))
                 || get(/databases/$(database)/documents/rooms/$(resource.data.roomCode)).data.status != 'lobby'
                 || get(/databases/$(database)/documents/rooms/$(resource.data.roomCode)).data.playerOrder.size() >= resource.data.capacity)

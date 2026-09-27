@@ -60,6 +60,33 @@ await env.withSecurityRulesDisabled(async c=>{
 });
 await check('no se puede secuestrar una cola waiting apuntándola a otra sala',false,updateDoc(doc(ctx(P2),'publicQueues',KEY),{roomCode:'PBBBBBBB',updatedAt:serverTimestamp()}));
 
+await env.clearFirestore();
+// Mesa abandonada: su cola no se ha renovado en más de dos minutos.
+await env.withSecurityRulesDisabled(async c=>{
+  const db=c.firestore(), old=new Date(Date.now()-5*60000);
+  await setDoc(doc(db,'rooms',CODE),{...room(),createdAt:old,updatedAt:old});
+  await setDoc(doc(db,'publicQueues',KEY),{...queue(),updatedAt:old});
+});
+{
+  const db=ctx(P2),b=writeBatch(db);
+  b.set(doc(db,'rooms','PBBBBBBB'),{...room(P2),roomCode:'PBBBBBBB'});
+  b.set(doc(db,'publicQueues',KEY),queue('PBBBBBBB'));
+  await check('una mesa abandonada (cola sin renovar en dos minutos) se sustituye por una nueva',true,b.commit());
+}
+await env.clearFirestore();
+await env.withSecurityRulesDisabled(async c=>{
+  const db=c.firestore();
+  await setDoc(doc(db,'rooms',CODE),{...room(),createdAt:new Date(),updatedAt:new Date()});
+  await setDoc(doc(db,'publicQueues',KEY),{...queue(),updatedAt:new Date()});
+});
+{
+  const db=ctx(P2),b=writeBatch(db);
+  b.set(doc(db,'rooms','PBBBBBBB'),{...room(P2),roomCode:'PBBBBBBB'});
+  b.set(doc(db,'publicQueues',KEY),queue('PBBBBBBB'));
+  await check('una mesa que sigue viva no se puede sustituir',false,b.commit());
+}
+await check('quien espera en la mesa renueva su cola',true,updateDoc(doc(ctx(H),'publicQueues',KEY),{status:'waiting',updatedAt:serverTimestamp()}));
+
 await env.cleanup();
 console.log(fail ? '\n'+fail+' fallos' : '\n0 fallos');
 process.exit(fail?1:0);

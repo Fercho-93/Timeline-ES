@@ -41,7 +41,7 @@ let turnTimerHandle = null;
 const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
 const CLIENT_VERSION = 42; // Competición con cambio de mazo entre rondas.
 const turnSeconds = () => roomState?.turnSeconds ?? TURN_SECONDS;
-let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = null, relayKick = null;
+let presenceRoom = "", presenceTimer = null, presenceBusy = false, relayTimer = null, relayKick = null, queueTimer = null;
 // Mesa pública: el minijuego de quién empieza se juega solo en cuanto la mesa se llena.
 // Cada persona tiene este tiempo para responder; quien no responde juega al final.
 const PUBLIC_STARTER_SECONDS = 30;
@@ -57,6 +57,7 @@ let starterBusy = false;
 function stopPresence() {
   clearInterval(presenceTimer); presenceTimer = null; presenceRoom = "";
   clearInterval(relayTimer); relayTimer = null; relayKick = null;
+  clearInterval(queueTimer); queueTimer = null;
   clearTimeout(publicStarterTimer); publicStarterTimer = null; clearInterval(publicClock); publicClock = null;
   for (const stop of presenceListeners.values()) stop();
   presenceListeners.clear(); presenceRecords.clear();
@@ -82,13 +83,15 @@ function ensurePresence() {
     void heartbeat();
     presenceTimer = setInterval(() => { if (document.visibilityState === "visible") void heartbeat(); }, 45000);
     relayTimer = setInterval(maybeAutoRelay, 5000);
+    queueTimer = setInterval(keepPublicQueueAlive, 45000);
+    void keepPublicQueueAlive();
   }
   for (const uid of roomState.playerOrder) {
     if (presenceListeners.has(uid)) continue;
     const stop = onSnapshot(doc(db, "rooms", roomCode, "presence", uid), snap => {
       const p = snap.data();
       if (p?.seenAt?.toMillis) presenceRecords.set(uid, { seenAt: p.seenAt.toMillis(), visible: p.visible });
-      renderPresence();
+      if (roomState?.matchmaking === "public" && roomState.status === "lobby") renderLobby(); else renderPresence();
     }, () => { connectionMessage = "La presencia requiere las reglas actualizadas de la sala."; renderPresence(); });
     presenceListeners.set(uid, stop);
   }
@@ -215,6 +218,15 @@ async function claimHost(auto = false) {
   finally { busy = false; }
 }
 
+// Mientras alguien espera en una mesa pública con plazas libres, su móvil renueva la cola:
+// así la búsqueda sabe que la mesa sigue viva. Una cola sin renovar en dos minutos se da
+// por abandonada y la siguiente búsqueda abre una mesa nueva (ver
+// `public-matchmaking-online.js` y la regla de `publicQueues`).
+function keepPublicQueueAlive() {
+  if (!roomState || roomState.matchmaking !== "public" || roomState.status !== "lobby" || roomState.playerOrder.length >= roomState.capacity) return;
+  return reopenPublicQueue(roomCode, roomState.queueKey, true);
+}
+
 // Mesas públicas: nadie conoce a nadie, así que no se espera a que alguien pulse «Tomar
 // relevo». Si el anfitrión deja de dar señales, lo toma solo la primera persona de la mesa
 // que sigue conectada (las reglas solo lo permiten con el anfitrión ausente, y la
@@ -233,13 +245,13 @@ function maybeAutoRelay() {
 
 // La cola pública vuelve a ofrecer esta mesa cuando se queda una plaza libre en la sala
 // de espera (alguien se fue o se le sacó por ausencia).
-async function reopenPublicQueue(code = roomCode, queueKey = roomState?.queueKey) {
+async function reopenPublicQueue(code = roomCode, queueKey = roomState?.queueKey, touch = false) {
   if (!queueKey) return;
   try {
     await runTransaction(db, async tx => {
       const reference = doc(db, "publicQueues", queueKey);
       const queue = await tx.get(reference);
-      if (!queue.exists() || queue.data().roomCode !== code || queue.data().status === "waiting") return;
+      if (!queue.exists() || queue.data().roomCode !== code || (!touch && queue.data().status === "waiting")) return;
       tx.update(reference, { status: "waiting", updatedAt: serverTimestamp() });
     });
   } catch (error) { console.warn("PUBLIC_QUEUE_REOPEN", error?.code || error); }
@@ -805,6 +817,16 @@ function starterPanelMarkup(isHost) {
   return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Barajar y empezar <span>→</span></button>`;
 }
 
+// En una mesa pública no hay anfitrión que importe a quien juega (lo lleva el propio
+// juego); lo útil es saber quién sigue conectado.
+function seatSilent(uid) {
+  const now = CT.Session.now(), record = presenceRecords.get(uid);
+  if (now === null) return false;
+  // Recién sentado, su primera señal puede tardar un momento en llegar.
+  if (!record) return now - (roomState.players[uid]?.joinedAt || 0) > 30000;
+  return record.visible === false || now - record.seenAt > 90000;
+}
+
 function renderLobby() {
   clearTurnTimer();
   // Cada respuesta ajena repinta la sala de espera: lo que se estaba escribiendo en el
@@ -817,7 +839,7 @@ function renderLobby() {
   const seats = Array.from({length:capacity},(_,index)=>{
     const uid=roomState.playerOrder[index], player=uid ? roomState.players[uid] : null;
     if(!player) return `<div class="table-seat empty" data-seat="${index+1}" aria-label="Plaza ${index+1} libre"><span>+</span><small>Libre</small></div>`;
-    return `<div class="table-seat occupied${uid===user.uid?' is-you':''}" data-seat="${index+1}"><span class="seat-avatar">${CT.Avatares.markup(player.name,{size:44,seed:'uid:'+uid,id:uid===user.uid?CT.Avatares.ownId():player.avatarId})}</span><strong>${escapeHtml(player.name)}${uid===user.uid?' · tú':''}</strong><small>${uid===roomState.hostUid?'Anfitrión':`Plaza ${index+1}`}</small><i class="ready-seal">Listo</i>${isHost&&!isPublic&&uid!==roomState.hostUid?`<button class="kick-btn" data-online-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>`:''}</div>`;
+    return `<div class="table-seat occupied${uid===user.uid?' is-you':''}" data-seat="${index+1}"><span class="seat-avatar">${CT.Avatares.markup(player.name,{size:44,seed:'uid:'+uid,id:uid===user.uid?CT.Avatares.ownId():player.avatarId})}</span><strong>${escapeHtml(player.name)}${uid===user.uid?' · tú':''}</strong><small>${isPublic ? `Plaza ${index+1}${uid!==user.uid && seatSilent(uid) ? ' · sin señal' : ''}` : uid===roomState.hostUid?'Anfitrión':`Plaza ${index+1}`}</small><i class="ready-seal">Listo</i>${isHost&&!isPublic&&uid!==roomState.hostUid?`<button class="kick-btn" data-online-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>`:''}</div>`;
   }).join('');
   paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button>${isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>'}`)}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>${isPublic ? 'Partida rápida' : 'Código de sala'}</small><strong>${isPublic ? people.length + '/' + capacity : roomCode}</strong>${isPublic ? '' : '<div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div>'}</div></section>

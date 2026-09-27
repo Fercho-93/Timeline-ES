@@ -173,3 +173,10 @@ Chat, ranking/ELO, filtros de nivel, mesas visibles, espectadores, invitaciones 
   `firestore.rules` (`validStart` admite una permutación de `playerOrder`). Con las
   reglas antiguas publicadas, el cliente reintenta sin reordenar: empieza quien ganó el
   minijuego, en el orden de entrada.
+- **Mesas abandonadas.** Mientras alguien espera en una mesa con plazas libres, su móvil
+  renueva la cola cada 45 s. Una cola sin renovar en dos minutos se da por abandonada: la
+  búsqueda no entra en ella y abre una mesa nueva en su lugar (la regla de
+  `publicQueues` lo permite). Con las reglas anteriores publicadas, el cliente entra en la
+  mesa abandonada como antes y el relevo automático la pone en marcha.
+- **Sala de espera.** En una mesa pública no se muestra quién es el anfitrión técnico: cada
+  plaza dice solo su número y, si esa persona no da señal, «sin señal».

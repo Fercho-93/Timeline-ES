@@ -31,7 +31,7 @@ function client(uid) {
   const src = read('online.js').replace(/^import .+;\n/gm, '').replace('export async function', 'async function');
   w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,setDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}
   window.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},
-    starterRecords, presenceRecords, startRoom, claimHost, removePlayer, starterRanking, relayKick:()=>relayKick};})();`);
+    starterRecords, presenceRecords, startRoom, claimHost, removePlayer, starterRanking, keepPublicQueueAlive, relayKick:()=>relayKick};})();`);
   return { w, api: w.onlineTest, errors, async load() { this.api.set(await roomData()); } };
 }
 
@@ -89,6 +89,12 @@ try {
   await new Promise(resolve => setTimeout(resolve, 300));
   const queue = await readDoc('publicQueues', KEY);
   ok('la mesa vuelve a aparecer en la búsqueda', queue.status === 'waiting');
+  const antes = queue.updatedAt.toMillis();
+  await new Promise(resolve => setTimeout(resolve, 20));
+  await bea.load();
+  await bea.api.keepPublicQueueAlive();
+  const renovada = await readDoc('publicQueues', KEY);
+  ok('quien sigue esperando mantiene viva la mesa en la búsqueda', renovada.updatedAt.toMillis() > antes && renovada.status === 'waiting');
   ok('sin errores en pantalla', bea.errors.length === 0);
 } finally {
   await env.cleanup();

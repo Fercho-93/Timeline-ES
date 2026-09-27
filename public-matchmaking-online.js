@@ -31,7 +31,16 @@ function roomData(code, mode, capacity, uid) {
   };
 }
 
-async function findOrCreate(mode, capacityInput) {
+// Una mesa que espera jugadores renueva su cola cada 45 s mientras alguien sigue en ella
+// (online.js). Si la cola lleva más de dos minutos sin renovarse, la mesa está abandonada
+// y no se entra: se abre una nueva en su lugar.
+const STALE_QUEUE_MS = 120000;
+const queueFresh = queue => {
+  const at = queue?.updatedAt?.toMillis?.();
+  return Number.isFinite(at) && Date.now() - at < STALE_QUEUE_MS;
+};
+
+async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
   const capacity=normalizePublicCapacity(capacityInput);
   let user=auth.currentUser;
   if(!user || !CT.Accounts?.ready) {
@@ -48,7 +57,7 @@ async function findOrCreate(mode, capacityInput) {
     const roomSnap=oldRef?await tx.get(oldRef):null;
     const oldRoom=roomSnap?.exists()?roomSnap.data():null;
     if(oldRoom?.playerOrder?.includes(user.uid)) return oldRoom.roomCode;
-    if(freshQueue.exists() && freshQueue.data().status==='waiting'
+    if(freshQueue.exists() && freshQueue.data().status==='waiting' && (allowStale || queueFresh(freshQueue.data()))
         && isJoinablePublicRoom(oldRoom,{mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint})){
       const order=[...oldRoom.playerOrder,user.uid];
       tx.update(oldRef,{
@@ -62,6 +71,11 @@ async function findOrCreate(mode, capacityInput) {
     tx.set(roomRef,roomData(code,mode,capacity,user.uid));
     tx.set(queueRef,{queueKey,roomCode:code,mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint,status:'waiting',updatedAt:serverTimestamp()});
     return code;
+  }).catch(error=>{
+    // Con las reglas anteriores no se puede sustituir una mesa abandonada: se entra en
+    // ella como antes, y el relevo automático del anfitrión la pondrá en marcha.
+    if(!allowStale && error?.code==='permission-denied') return findOrCreate(mode,capacityInput,{allowStale:true});
+    throw error;
   });
 }
 
@@ -99,7 +113,7 @@ async function findFlexible(mode, capacityInput) {
     const fingerprint=CT.deckFingerprint(mode);
     const key=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
     const snap=await getDoc(doc(db,'publicQueues',key));
-    if(snap.exists() && snap.data().status==='waiting') return {code:await findOrCreate(mode,capacity),capacity};
+    if(snap.exists() && snap.data().status==='waiting' && queueFresh(snap.data())) return {code:await findOrCreate(mode,capacity),capacity};
   }
   return {code:await findOrCreate(mode,4),capacity:4};
 }
@@ -112,7 +126,7 @@ async function findAcrossModes(modes, capacityInput) {
     for(const mode of pool){
       const key=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(mode)});
       const snap=await getDoc(doc(db,'publicQueues',key));
-      if(snap.exists() && snap.data().status==='waiting') return {mode,...await findFlexible(mode,capacity)};
+      if(snap.exists() && snap.data().status==='waiting' && queueFresh(snap.data())) return {mode,...await findFlexible(mode,capacity)};
     }
   }
   return {mode:pool[0],...await findFlexible(pool[0],capacities[0])};
