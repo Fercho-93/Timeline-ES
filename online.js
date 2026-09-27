@@ -492,11 +492,13 @@ export async function openOnlineMode(options = {}) {
 
 function renderEntry(invited = "") {
   const known = invited ? rememberedRoom(invited) : null;
+  // El nombre de este móvil ya está elegido desde la bienvenida: se propone, no se pide.
+  const ownName = escapeHtml(known?.name || CT.Identidad?.nombre?.() || "");
   paint(`<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="back">Salir</button>')}
     <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid${invited ? " online-entry-invited" : ""}">
-      <form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${escapeHtml(known?.name || "")}"></div><button class="btn btn-primary btn-block" type="submit">Unirme a la partida <span>→</span></button></form>
-      ${invited ? "" : '<form class="panel online-form" data-online-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>'}
+      <form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${ownName}"></div><button class="btn btn-primary btn-block" type="submit">Unirme a la partida <span>→</span></button></form>
+      ${invited ? "" : '<form class="panel online-form" data-online-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName}"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>'}
     </div>
     <p class="online-note">Necesita conexión a internet durante la partida compartida.</p>
   </div>`, "online-entry");
@@ -1687,6 +1689,7 @@ document.addEventListener("click", event => {
     const name = roomState?.players[target.dataset.uid]?.name || "esta persona";
     if (confirm(`¿Expulsar a ${name} de la sala?`)) { CT.closeDialog(); removePlayer(target.dataset.uid); }
   } else if (action === "leave-room") {
-    if (confirm("¿Salir de la sala? Tus cartas volverán al mazo.")) removePlayer(user.uid);
+    const question = roomState?.status === "playing" ? "¿Salir de la sala? Tus cartas volverán al mazo." : roomState?.matchmaking === "public" ? "¿Dejar de buscar partida? Tu plaza quedará libre para otra persona." : "¿Salir de la sala?";
+    if (confirm(question)) removePlayer(user.uid);
   }
 });

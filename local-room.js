@@ -9,11 +9,11 @@
 // espera el estado que vuelve. Es el mismo papel que tiene Firestore hoy en `online.js`,
 // solo que aquí el servidor es el propio móvil anfitrión.
 //
-// Alcance de esta primera versión: la partida básica (repartir, colocar, pasar turno,
-// expulsar/salir, ganador único). Fantasma, Pulso, torneo y el desempate de final secreta
-// —que si tres jugadores se quedan sin cartas en la misma ronda reparte una final aparte—
-// todavía no están aquí; `finishTurn` avisa con un error reconocible (`TIE_NOT_SUPPORTED_YET`)
-// en vez de fingir que lo resuelve.
+// Alcance: la partida básica (repartir, colocar, pasar turno, expulsar/salir, límite de
+// tiempo por turno y revancha con la misma mesa). Fantasma, Pulso, torneo y la final
+// secreta todavía no están aquí: si varias personas se quedan sin cartas en la misma
+// ronda, comparten la victoria — la misma salida que ya da el juego online cuando el
+// mazo no alcanza para desempatar —, en vez de dejar la partida atascada.
 (function () {
   "use strict";
   window.CONTINUUM = window.CONTINUUM || {};
@@ -70,7 +70,7 @@
       players, deck, timeline, discard: [], status: "playing", phase: "turn",
       current: state.playerOrder.indexOf(starterId), starter: starterId,
       turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
-      version: state.version + 1, updatedAt: now
+      turnStartedAt: now, version: state.version + 1, updatedAt: now
     };
   }
 
@@ -90,28 +90,47 @@
     };
   }
 
-  function finishTurn(state, { requesterId, now }) {
-    const currentId = state.playerOrder[state.current];
-    if (state.phase !== "reveal" || (requesterId !== currentId && requesterId !== state.hostId)) throw new Error("NOT_ALLOWED");
+  // Pasar al siguiente turno, venga de terminar una jugada o de saltarla (por tiempo o
+  // porque el anfitrión la desatasca): en los dos casos, al cerrar la ronda se mira si
+  // alguien se ha quedado sin cartas. Si son varias personas a la vez, comparten la
+  // victoria.
+  function advance(state, now) {
     let turnsInRound = state.turnsInRound + 1, round = state.round;
     if (turnsInRound >= state.playerOrder.length) {
       const { empty } = CT.Engine.roundOutcome(state.playerOrder, state.players, state.deck.length + state.discard.length);
-      if (empty.length === 1) {
-        return { ...state, status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: state.version + 1, updatedAt: now };
+      if (empty.length) {
+        return { ...state, status: "ended", phase: "finished", winner: empty.length === 1 ? empty[0] : null, winners: empty, reveal: null, version: state.version + 1, updatedAt: now };
       }
-      if (empty.length > 1) throw new Error("TIE_NOT_SUPPORTED_YET");
       turnsInRound = 0; round += 1;
     }
-    return { ...state, current: (state.current + 1) % state.playerOrder.length, turnsInRound, round, phase: "turn", reveal: null, version: state.version + 1, updatedAt: now };
+    return { ...state, current: (state.current + 1) % state.playerOrder.length, turnsInRound, round, phase: "turn", reveal: null, turnStartedAt: now, version: state.version + 1, updatedAt: now };
   }
 
-  function skipTurn(state, { requesterId, now }) {
+  function finishTurn(state, { requesterId, now }) {
+    const currentId = state.playerOrder[state.current];
+    if (state.phase !== "reveal" || (requesterId !== currentId && requesterId !== state.hostId)) throw new Error("NOT_ALLOWED");
+    return advance(state, now);
+  }
+
+  // Solo el anfitrión: cuando se agota el tiempo del turno o alguien se ha quedado sin
+  // batería. `expectedVersion` evita saltar un turno que ya ha cambiado por su cuenta.
+  function skipTurn(state, { requesterId, expectedVersion = null, now }) {
     if (state.hostId !== requesterId || state.status !== "playing") throw new Error("NOT_ALLOWED");
-    const roundEnds = state.turnsInRound + 1 >= state.playerOrder.length;
+    if (expectedVersion !== null && (state.version !== expectedVersion || state.phase !== "turn")) return state;
+    return advance(state, now);
+  }
+
+  // Revancha: la misma mesa vuelve al vestíbulo, con las mismas personas, lista para
+  // barajar otra vez. Solo el anfitrión, y solo con la partida terminada.
+  function rematch(state, { requesterId, now }) {
+    if (state.hostId !== requesterId || state.status !== "ended") throw new Error("NOT_ALLOWED");
+    const players = {};
+    state.playerOrder.forEach(id => { players[id] = { ...state.players[id], hand: [] }; });
     return {
-      ...state, current: (state.current + 1) % state.playerOrder.length,
-      turnsInRound: roundEnds ? 0 : state.turnsInRound + 1, round: roundEnds ? state.round + 1 : state.round,
-      phase: "turn", reveal: null, version: state.version + 1, updatedAt: now
+      ...state, status: "lobby", phase: "lobby", players,
+      deck: [], discard: [], timeline: [], current: 0, turnsInRound: 0, round: 1,
+      winner: null, winners: null, reveal: null, turnStartedAt: null,
+      version: state.version + 1, updatedAt: now
     };
   }
 
@@ -129,27 +148,29 @@
     const base = { ...state, players, playerOrder, discard: [...state.discard, ...hand], version: state.version + 1, updatedAt: now };
     if (state.status !== "playing") return base;
     if (playerOrder.length < 2) {
-      return { ...base, status: "ended", phase: "finished", winner: playerOrder[0] ?? null, current: 0, turnsInRound: 0, reveal: null };
+      return { ...base, status: "ended", phase: "finished", winner: playerOrder[0] ?? null, winners: playerOrder.slice(0, 1), current: 0, turnsInRound: 0, reveal: null };
     }
     const before = index < state.current;
     const current = ((before ? state.current - 1 : state.current) + playerOrder.length) % playerOrder.length;
     const turnsInRound = Math.min(before ? Math.max(0, state.turnsInRound - 1) : state.turnsInRound, playerOrder.length - 1);
+    const wasCurrent = targetId === state.playerOrder[state.current];
     return {
       ...base, current, turnsInRound,
-      phase: targetId === state.playerOrder[state.current] ? "turn" : state.phase,
-      reveal: targetId === state.playerOrder[state.current] ? null : state.reveal
+      phase: wasCurrent ? "turn" : state.phase,
+      reveal: wasCurrent ? null : state.reveal,
+      ...(wasCurrent ? { turnStartedAt: now } : {})
     };
   }
 
   // Un único punto de entrada para lo que llega por `local-transport.js`: el anfitrión
   // recibe `{type, data}` de un invitado (o se manda uno a sí mismo) y no necesita saber
   // qué función concreta aplicar.
-  const ACTIONS = { join: joinRoom, start: startRoom, "place-card": placeCard, "finish-turn": finishTurn, "skip-turn": skipTurn, "remove-player": removePlayer };
+  const ACTIONS = { join: joinRoom, start: startRoom, "place-card": placeCard, "finish-turn": finishTurn, "skip-turn": skipTurn, "remove-player": removePlayer, rematch };
   function reduce(state, action) {
     const handler = ACTIONS[action?.type];
     if (!handler) throw new Error("UNKNOWN_ACTION");
     return handler(state, action);
   }
 
-  CT.LocalRoom = { MIN_PLAYERS, MAX_PLAYERS, createRoom, joinRoom, startRoom, placeCard, finishTurn, skipTurn, removePlayer, reduce };
+  CT.LocalRoom = { MIN_PLAYERS, MAX_PLAYERS, createRoom, joinRoom, startRoom, placeCard, finishTurn, skipTurn, rematch, removePlayer, reduce };
 })();

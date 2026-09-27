@@ -111,9 +111,8 @@ según el grupo de dispositivos.
       funciona en producción —1675 líneas con la UI, las reglas y Firestore mezclados—, se
       escribió aparte, con las mismas reglas, para no arriesgar el modo con internet que ya
       usan los testers. `online.js` no se ha tocado.
-      **Alcance de esta primera versión: falta Fantasma, Pulso, torneo y el desempate de
-      final secreta** (varias personas sin cartas a la vez) — `finishTurn` avisa con
-      `TIE_NOT_SUPPORTED_YET` en ese caso en vez de fingir un resultado.
+      **Alcance: falta Fantasma, Pulso, torneo y la final secreta** — si varias personas
+      se quedan sin cartas a la vez, comparten la victoria (ver «Pulido» más abajo).
 - [x] Implementar el transporte sobre `RTCDataChannel` (`local-transport.js`), topología en
       estrella con el anfitrión como fuente de verdad (mismo modelo que las salas actuales).
       Cubre la conexión en sí (anfitrión/invitado, mensajes) y sus pruebas (`tests/transporte-local.mjs`).
@@ -180,6 +179,28 @@ según el grupo de dispositivos.
         real: ni el anfitrión ni quien se unía pasaban solos al vestíbulo al conectar
         —tenían que salir y volver a mano—, porque `onRoomChange` no reaccionaba desde las
         pantallas de invitar/compartir, solo desde el vestíbulo o la partida.
+- [x] Pulido de la partida (tras repasar el modo entero):
+      - **Fallo que impedía jugar**: el anfitrión no tenía identificador propio en la
+        interfaz y su pantalla se rompía al empezar la partida («Cannot read properties of
+        undefined (reading 'hand')»). Ahora juega como cualquier otra plaza.
+      - Varias personas sin cartas en la misma ronda comparten la victoria, en vez de
+        dejar la partida atascada con `TIE_NOT_SUPPORTED_YET`. Saltar un turno también
+        cierra la ronda y declara ganador si toca.
+      - El «Tiempo por turno» ya funciona: cuenta atrás en todos los móviles y, al
+        agotarse, el anfitrión pasa el turno.
+      - Quién empieza se sortea entre la mesa (antes empezaba siempre el anfitrión).
+      - Revancha con la misma mesa (`rematch` en el reductor): todos vuelven al vestíbulo.
+      - Salidas y desconexiones: un invitado que sale avisa al anfitrión (sus cartas
+        vuelven al descarte); si su canal se cae, el anfitrión lo saca de la mesa en vez
+        de esperar su turno para siempre; si el anfitrión cierra la sala o se desconecta,
+        el invitado vuelve a la entrada con un aviso. Un invitado ya no podía salir de la
+        pantalla final (el botón no hacía nada); ahora sí.
+      - Durante la partida, volver abre un menú de sala (guía, saltar turno, expulsar,
+        salir) en vez de llevar al vestíbulo.
+      - Cada canal queda atado a la persona que se unió por él: sus mensajes siempre
+        hablan en su nombre, aunque manden otro identificador.
+      - `tests/multijugador-local.mjs` juega ahora una partida entera entre dos ventanas
+        con un transporte simulado (todo lo demás es el código real).
 - [ ] Probar en dispositivos reales, en modo avión, con grupos mixtos Android/iPhone —
       la conexión WebRTC en sí no se puede probar en Node (no hay `RTCPeerConnection`), y la
       lectura de QR por cámara tampoco (no hay cámara); todo lo de alrededor sí está

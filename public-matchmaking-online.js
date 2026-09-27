@@ -7,7 +7,9 @@ const CLIENT_VERSION = 42;
 let busy = false;
 let watchedCode = '';
 
-const alias = () => (CT.Accounts?.profile?.alias || 'Explorador').slice(0, 18);
+// El nombre que se ve en la mesa es el de este móvil (el de la bienvenida); el alias de
+// la cuenta queda como respaldo.
+const alias = () => (CT.Identidad?.nombre?.() || CT.Accounts?.profile?.alias || 'Explorador').slice(0, 18);
 const avatarId = () => CT.Avatares?.ownId?.() || null;
 const notify = text => {
   const toast=document.getElementById('toast');

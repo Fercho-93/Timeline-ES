@@ -100,16 +100,18 @@
   }
 
   // Un invitado: una única RTCPeerConnection hacia el anfitrión. `onOpen` avisa cuando el
-  // canal ya admite mensajes, para no tener que sondear `isReady()` desde fuera.
-  function createGuestPeer(offerEncoded, onMessage, onOpen) {
+  // canal ya admite mensajes, para no tener que sondear `isReady()` desde fuera, y
+  // `onClose` cuando se cae después de haber estado abierto (el anfitrión cerró la sala,
+  // se apagó su Wi-Fi…): sin eso, la pantalla se quedaba esperando para siempre.
+  function createGuestPeer(offerEncoded, onMessage, onOpen, onClose) {
     const { role, description: offerDescription } = decodeSignal(offerEncoded);
     if (role !== "offer") throw new Error("EXPECTED_OFFER");
     const peerConnection = createPeerConnection();
-    let channel = null, ready = false;
+    let channel = null, ready = false, closing = false;
     peerConnection.addEventListener("datachannel", event => {
       channel = event.channel;
       channel.addEventListener("open", () => { ready = true; onOpen?.(); });
-      channel.addEventListener("close", () => { ready = false; });
+      channel.addEventListener("close", () => { const wasReady = ready; ready = false; if (wasReady && !closing) onClose?.(); });
       channel.addEventListener("message", messageEvent => {
         const message = decodeMessage(messageEvent.data);
         if (message) onMessage(message);
@@ -127,17 +129,18 @@
       channel.send(encodeMessage(type, data));
       return true;
     }
-    function close() { try { channel?.close(); } catch {} try { peerConnection.close(); } catch {} }
+    function close() { closing = true; try { channel?.close(); } catch {} try { peerConnection.close(); } catch {} }
     return { peerConnection, answerSignal, send, close, isReady: () => ready };
   }
 
   // El anfitrión: una RTCPeerConnection por invitado, todas independientes entre sí — la
   // estrella. `onMessage` recibe el id de quién manda, para que la sala sepa distinguirlos.
-  function createHostPeer(onMessage, onOpen) {
+  function createHostPeer(onMessage, onOpen, onClose) {
     const peerConnection = createPeerConnection();
     const channel = peerConnection.createDataChannel("sala", { ordered: true });
-    let ready = false;
+    let ready = false, closing = false;
     channel.addEventListener("open", () => { ready = true; onOpen?.(); });
+    channel.addEventListener("close", () => { const wasReady = ready; ready = false; if (wasReady && !closing) onClose?.(); });
     channel.addEventListener("message", event => {
       const message = decodeMessage(event.data);
       if (message) onMessage(message);
@@ -158,18 +161,20 @@
       channel.send(encodeMessage(type, data));
       return true;
     }
-    function close() { try { channel.close(); } catch {} try { peerConnection.close(); } catch {} }
+    function close() { closing = true; try { channel.close(); } catch {} try { peerConnection.close(); } catch {} }
     return { peerConnection, offerSignal, acceptAnswer, send, close, isReady: () => ready };
   }
 
   // Agrupa las conexiones de todos los invitados detrás de una sola sesión, para que la
   // lógica de sala no tenga que llevar la cuenta de cada `RTCPeerConnection` por su cuenta.
-  function createHostSession(onMessage, onPeerOpen) {
+  // `onPeerClose` avisa de un invitado cuyo canal se ha caído solo (no de los que cierra el
+  // propio anfitrión), para que la sala no se quede esperando su turno para siempre.
+  function createHostSession(onMessage, onPeerOpen, onPeerClose) {
     const peers = new Map();
     let nextId = 1;
     function addPeer() {
       const peerId = String(nextId++);
-      const peer = createHostPeer(message => onMessage(peerId, message), () => onPeerOpen?.(peerId));
+      const peer = createHostPeer(message => onMessage(peerId, message), () => onPeerOpen?.(peerId), () => { peers.delete(peerId); onPeerClose?.(peerId); });
       peers.set(peerId, peer);
       return { peerId, offerSignal: peer.offerSignal, acceptAnswer: peer.acceptAnswer, peerConnection: peer.peerConnection };
     }

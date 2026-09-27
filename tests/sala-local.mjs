@@ -89,13 +89,38 @@ const terminada = Room.finishTurn(casiGanada, { requesterId: "a", now: 3000 });
 ok("gana quien se queda sin cartas si nadie más se queda igual en la misma ronda", terminada.status === "ended" && terminada.winner === "a");
 ok("la sala queda marcada como terminada, no solo el ganador anotado", terminada.phase === "finished");
 
-console.log("\nVarias personas sin cartas a la vez: fuera de alcance por ahora");
+console.log("\nVarias personas sin cartas a la vez: comparten la victoria");
 const empatan = {
   hostId: "a", playerOrder: ["a", "b"],
   players: { a: { name: "A", hand: [] }, b: { name: "B", hand: [] } },
   deck: [], discard: [], status: "playing", phase: "reveal", current: 0, turnsInRound: 1, round: 1, version: 9
 };
-ok("se avisa con un error reconocible en vez de fingir un resultado", intenta(() => Room.finishTurn(empatan, { requesterId: "a", now: 3100 })) === "TIE_NOT_SUPPORTED_YET");
+const empate = Room.finishTurn(empatan, { requesterId: "a", now: 3100 });
+ok("la partida termina en vez de quedarse atascada", empate.status === "ended" && empate.phase === "finished");
+ok("las dos personas figuran como ganadoras", empate.winners.join(",") === "a,b" && empate.winner === null);
+
+console.log("\nSaltar turno (tiempo agotado o móvil sin batería)");
+const enTurno = {
+  hostId: "a", playerOrder: ["a", "b", "c"],
+  players: { a: { name: "A", hand: ["x"] }, b: { name: "B", hand: ["y"] }, c: { name: "C", hand: ["z"] } },
+  deck: ["w"], discard: [], status: "playing", phase: "turn", current: 1, turnsInRound: 1, round: 2, version: 20, turnStartedAt: 100
+};
+ok("solo el anfitrión puede saltar un turno", intenta(() => Room.skipTurn(enTurno, { requesterId: "b", now: 200 })) === "NOT_ALLOWED");
+const saltado = Room.skipTurn(enTurno, { requesterId: "a", expectedVersion: 20, now: 200 });
+ok("pasa al siguiente y reinicia el reloj del turno", saltado.current === 2 && saltado.turnsInRound === 2 && saltado.turnStartedAt === 200);
+ok("un salto con una versión ya superada no hace nada", Room.skipTurn(saltado, { requesterId: "a", expectedVersion: 20, now: 300 }) === saltado);
+const sinCartasAlSaltar = { ...enTurno, current: 2, turnsInRound: 2, players: { ...enTurno.players, a: { name: "A", hand: [] } } };
+const cierraRonda = Room.skipTurn(sinCartasAlSaltar, { requesterId: "a", now: 400 });
+ok("saltar el último turno de la ronda también declara ganador", cierraRonda.status === "ended" && cierraRonda.winner === "a");
+
+console.log("\nRevancha con la misma mesa");
+ok("no se puede pedir revancha a mitad de partida", intenta(() => Room.rematch(enTurno, { requesterId: "a", now: 500 })) === "NOT_ALLOWED");
+ok("solo el anfitrión la pide", intenta(() => Room.rematch(cierraRonda, { requesterId: "b", now: 500 })) === "NOT_ALLOWED");
+const revancha = Room.reduce(cierraRonda, { type: "rematch", requesterId: "a", now: 500 });
+ok("vuelve al vestíbulo con las mismas personas", revancha.status === "lobby" && revancha.playerOrder.join(",") === "a,b,c");
+ok("sin manos, mesa ni ganador de la partida anterior", Object.values(revancha.players).every(p => p.hand.length === 0) && revancha.timeline.length === 0 && revancha.winner === null && revancha.winners === null);
+const otraVez = Room.startRoom(revancha, { requesterId: "a", handSize: 2, turnSeconds: 0, starterId: "b", deck: mazo(20), now: 600 });
+ok("y se puede barajar otra vez desde ahí", otraVez.status === "playing" && otraVez.playerOrder[otraVez.current] === "b");
 
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

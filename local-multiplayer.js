@@ -6,9 +6,10 @@
 // `online.js` para la sala compartida (`.panel`, `.online-form`, `.room-code-card`,
 // `.lobby-table`, `.timeline-card`, `.hand-card`…) — es la misma mesa, sin Firestore.
 //
-// Alcance de esta primera versión, heredado de `local-room.js`: sin Fantasma, sin Pulso,
-// sin torneo y sin el desempate de final secreta. Sin sorteo de quién empieza: empieza
-// siempre quien organiza la sala. Se puede jugar una partida completa de principio a fin.
+// Alcance, heredado de `local-room.js`: sin Fantasma, sin Pulso, sin torneo y sin la final
+// secreta (si varias personas terminan a la vez, comparten la victoria). Quién empieza se
+// sortea al azar entre la mesa. Hay límite de tiempo por turno, revancha con la misma
+// mesa y, si el móvil de alguien se desconecta, la partida sigue sin esa persona.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
@@ -34,6 +35,10 @@
   let selectedCardId = null, pendingIndex = null;
   let busy = false;
   let cardsByIdCache = new Map();
+  // Reloj del turno. El anfitrión manda con su propio reloj (`turnStartedAt`); cada
+  // invitado cuenta desde que recibe el turno, para no depender de que los relojes de los
+  // móviles coincidan — en la misma Wi-Fi el mensaje tarda milésimas.
+  let turnTimerHandle = null, turnSeenKey = "", turnSeenAt = 0;
 
   // Leer un código con la cámara es la única pantalla de QR que necesita navegación
   // propia (mostrar uno se pinta directamente donde haga falta, ver más abajo).
@@ -56,8 +61,11 @@
 
   function paint(html, pantalla) {
     if (pantalla !== "local-qr-scan") stopCamera();
+    if (pantalla !== "local-game") clearTurnTimer();
     CT.paint(appEl, html, pantalla);
   }
+
+  function ownName() { return escapeHtml(CT.Identidad?.nombre?.() || ""); }
 
   // Cuando Android e iPhone no comparten ningún destino en la hoja de compartir del
   // sistema, queda copiar el texto a mano. Si el portapapeles tampoco está disponible, el
@@ -183,8 +191,22 @@
   // esto, aunque la sala ya estuviera lista, ninguno de los dos se enteraba y se quedaban
   // mirando "Conectando…" para siempre — había que salir y volver a mano al vestíbulo.
   function onRoomChange(room) {
+    // Un invitado que ya no figura en la mesa (lo han expulsado o se ha marchado) no puede
+    // pintar una partida de la que no forma parte: vuelve a la entrada con un aviso.
+    if (role === "guest" && room && !room.playerOrder.includes(myPlayerId)) {
+      leaveToEntrada("Ya no estás en esta sala");
+      return;
+    }
     roomState = room;
-    if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir"].includes(screen)) renderCurrent();
+    if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir", "local-final"].includes(screen)) renderCurrent();
+  }
+
+  // El canal con el anfitrión se ha caído: cerró la sala, se quedó sin batería o salió de
+  // la Wi-Fi. Sin servidor no hay forma de reengancharse a la misma partida, así que se
+  // dice claramente en vez de dejar la pantalla congelada.
+  function onGuestDisconnect() {
+    if (role !== "guest" || !guestSession) return;
+    leaveToEntrada(roomState?.status === "ended" ? "La sala se ha cerrado" : "Se ha perdido la conexión con la sala");
   }
 
   function renderCurrent() {
@@ -199,7 +221,7 @@
     stopCamera();
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
-    role = null; hostSession = null; guestSession = null; roomState = null;
+    role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
     renderEntrada();
@@ -213,7 +235,7 @@
       ${cameraNote()}
       <div class="online-entry-grid">
         <div class="panel online-form"><span class="form-number">01</span><h3>Unirse a una sala</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme a la partida <span>→</span></button></div>
-        <form class="panel online-form" data-local-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
+        <form class="panel online-form" data-local-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName()}"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
       </div>
       <p class="online-note">No necesita conexión a internet en ningún momento.</p>
     </div>`, "local-entrada");
@@ -222,12 +244,14 @@
   function doCreateRoom(name) {
     role = "host";
     myName = name;
+    myPlayerId = CT.LocalSession.HOST_ID;
     const roomCode = createRoomCode();
     try {
       hostSession = CT.LocalSession.createHostSession({
         roomCode, hostName: name, avatarId: CT.Avatares.ownId(), modeKey,
         deckFingerprint: CT.deckFingerprint(modeKey),
-        onChange: onRoomChange
+        onChange: onRoomChange,
+        onPeerLost: lostName => showToast(`${lostName || "Alguien"} se ha desconectado y sale de la mesa`)
       });
     } catch (error) { console.error(error); showToast("No se pudo crear la sala"); return; }
     roomState = hostSession.currentRoom();
@@ -241,7 +265,7 @@
     paint(`<div class="shell online-shell">${header("go-entrada")}
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2></section>
       <form class="panel online-form" data-local-form="join-offer">
-        <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name"></div>
+        <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name" value="${ownName()}"></div>
         <button type="button" class="btn btn-primary btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código del anfitrión</button>
         <details class="qr-fallback"><summary>¿No puedes usar la cámara?</summary>
           <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí."></textarea></div>
@@ -263,7 +287,8 @@
       guestSession = CT.LocalSession.createGuestSession({
         offerSignal: invite.signal, playerId: myPlayerId, name, avatarId: CT.Avatares.ownId(), deckFingerprint: invite.deckFingerprint,
         onChange: onRoomChange,
-        onError: code => showToast(errorMessage(code))
+        onError: code => showToast(errorMessage(code)),
+        onDisconnect: onGuestDisconnect
       });
       pendingAnswerText = await guestSession.answerSignal();
       renderUnirseCompartir();
@@ -425,10 +450,15 @@
   function doStart() {
     if (role !== "host" || busy) return;
     const handSize = Number(document.getElementById("local-hand-size")?.value || 4);
-    const turnSeconds = Number(document.getElementById("local-turn-seconds")?.value || 20);
+    const turnSeconds = Number(document.getElementById("local-turn-seconds")?.value ?? 20);
+    // Quién empieza se sortea: que no le toque siempre a quien organiza.
+    const order = roomState.playerOrder;
+    const values = new Uint32Array(1);
+    crypto.getRandomValues(values);
+    const starterId = order[values[0] % order.length];
     busy = true;
     try {
-      hostSession.act("start", { handSize, turnSeconds, starterId: roomState.hostId });
+      hostSession.act("start", { handSize, turnSeconds, starterId });
     } catch (error) { console.error(error); showToast(errorMessage(error.message)); }
     finally { busy = false; }
   }
@@ -447,15 +477,108 @@
   function doCloseRoom() {
     if (role !== "host") return;
     if (!confirm("¿Cerrar la sala para todos los participantes?")) return;
-    hostSession.close();
     leaveToEntrada();
   }
 
-  function leaveToEntrada() {
+  // Salir de la sala: quien organiza la cierra para todos (se pide confirmación si ya hay
+  // alguien más); un invitado avisa antes al anfitrión, para que sus cartas vuelvan al
+  // descarte y la partida no se quede esperando su turno.
+  function requestLeave() {
+    if (role === "host") {
+      if (roomState && roomState.playerOrder.length > 1 && roomState.status !== "ended" && !confirm("Si sales, la sala se cierra para todos. ¿Cerrarla?")) return;
+      leaveToEntrada();
+    } else if (role === "guest" && roomState && roomState.status === "playing") {
+      if (!confirm("¿Salir de la partida? Tus cartas volverán al mazo.")) return;
+      leaveToEntrada();
+    } else leaveToEntrada();
+  }
+
+  function leaveToEntrada(message = "") {
+    CT.closeDialog?.();
+    const guest = guestSession;
     hostSession?.close?.();
-    guestSession?.close?.();
-    hostSession = null; guestSession = null; roomState = null; role = null;
+    guestSession = null;
+    if (guest) { if (roomState?.playerOrder?.includes(myPlayerId)) guest.leave?.(); else guest.close?.(); }
+    hostSession = null; roomState = null; role = null; myPlayerId = "";
+    selectedCardId = null; pendingIndex = null;
     renderEntrada();
+    if (message) showToast(message);
+  }
+
+  function doRematch() {
+    if (role !== "host" || busy) return;
+    try { hostSession.act("rematch", {}); }
+    catch (error) { console.error(error); showToast(errorMessage(error.message)); }
+  }
+
+  function doSkipTurn(expectedVersion = null) {
+    if (role !== "host" || !roomState || roomState.status !== "playing") return;
+    try { hostSession.act("skip-turn", expectedVersion === null ? {} : { expectedVersion }); }
+    catch (error) { console.error(error); showToast(errorMessage(error.message)); }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Reloj del turno
+  function clearTurnTimer() { if (turnTimerHandle) { clearInterval(turnTimerHandle); turnTimerHandle = null; } }
+
+  function turnRemaining() {
+    const seconds = Number(roomState?.turnSeconds) || 0;
+    if (!seconds || roomState.status !== "playing" || roomState.phase !== "turn") return null;
+    if (role === "host" && Number.isFinite(roomState.turnStartedAt)) {
+      return Math.max(0, Math.ceil(seconds - (Date.now() - roomState.turnStartedAt) / 1000));
+    }
+    const key = `${roomState.round}:${roomState.turnsInRound}:${roomState.current}:${roomState.version}`;
+    if (key !== turnSeenKey) { turnSeenKey = key; turnSeenAt = performance.now(); }
+    return Math.max(0, Math.ceil(seconds - (performance.now() - turnSeenAt) / 1000));
+  }
+
+  function manageTurnTimer() {
+    clearTurnTimer();
+    if (turnRemaining() === null) return;
+    const version = roomState.version;
+    const tick = () => {
+      const remaining = turnRemaining();
+      const value = document.getElementById("turn-timer-value");
+      if (value && remaining !== null) value.textContent = remaining;
+      document.getElementById("turn-timer")?.classList.toggle("turn-timer-low", remaining !== null && remaining <= 5);
+      if (remaining === 0 && role === "host" && roomState?.version === version) {
+        clearTurnTimer();
+        const name = roomState.players[roomState.playerOrder[roomState.current]]?.name;
+        doSkipTurn(version);
+        showToast(`Se acabó el tiempo${name ? ` de ${name}` : ""}`);
+      }
+    };
+    tick();
+    turnTimerHandle = setInterval(tick, 250);
+  }
+
+  function showGuide() {
+    appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-local-guide><div class="modal rules"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-local-action="close-guide" aria-label="Cerrar guía">×</button></div><div class="guide-content">${CT.guideMarkup(modeKey, "online", { pulse: false, ghost: false })}</div><button class="btn btn-primary btn-block" data-local-action="close-guide">Entendido</button></div></div>`);
+    CT.openDialog(appEl.querySelector("[data-local-guide]"), true);
+  }
+
+  // Durante la partida, la flecha de volver y el botón «Sala» abren este menú en vez de
+  // llevar al vestíbulo, que ya no sirve de nada con la partida en marcha.
+  function roomMenu() {
+    if (!roomState) return;
+    const isHost = role === "host";
+    const playing = roomState.status === "playing";
+    const currentUid = playing ? roomState.playerOrder[roomState.current] : null;
+    const currentName = currentUid ? roomState.players[currentUid]?.name : "";
+    const others = roomState.playerOrder.filter(uid => uid !== roomState.hostId);
+    appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-local-room-overlay><div class="modal">
+      <div class="eyebrow">Sala ${escapeHtml(roomState.roomCode)}</div><h2>Opciones de la partida</h2><p class="hint">La partida continúa mientras consultas este menú.</p>
+      <div class="actions" style="display:grid">
+        <button class="btn btn-secondary" data-local-action="guide">Guía</button>
+        ${isHost && playing && currentUid !== roomState.hostId && roomState.phase === "turn" ? `<button class="btn btn-ghost" data-local-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
+      </div>
+      ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'room:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}</strong><button class="kick-btn" data-local-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
+      <div class="actions" style="display:grid">
+        ${isHost ? '<button class="btn btn-ghost" data-local-action="close-room">Terminar partida y cerrar sala</button>' : '<button class="btn btn-ghost" data-local-action="leave">Salir de la partida</button>'}
+        <button class="btn btn-primary" data-local-action="close-room-menu">Volver a la partida</button>
+      </div>
+    </div></div>`);
+    CT.openDialog(appEl.querySelector("[data-local-room-overlay]"), true);
   }
 
   // ---------------------------------------------------------------------------
@@ -487,27 +610,40 @@
         slots.push(`<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver ${animal ? "la lámina y los datos" : "la explicación"}.">${body}</article>`);
       }
     }
-    paint(`<div class="shell">${header("local-lobby", '<button class="icon-btn" data-local-action="local-lobby" aria-label="Abrir menú de la sala">Sala</button>')}
+    const secondsLeft = turnRemaining();
+    paint(`<div class="shell">${header("room-menu", '<button class="icon-btn" data-local-action="room-menu" aria-label="Abrir menú de la sala">Sala</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div><div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
       ${boardQuestion()}
       ${roomState.phase === "reveal" ? revealPanel(currentUid) : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`}
       <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(modeKey, timelineCards)}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
     </div>`, "local-game");
+    manageTurnTimer();
   }
 
   function revealPanel(currentUid) {
     const reveal = roomState.reveal;
     const card = getCard(reveal.cardId);
     const canContinue = myPlayerId === currentUid || role === "host";
-    return `<section class="panel reveal-panel"><div class="eyebrow">${reveal.correct ? "Acierto" : "Fallo"}</div><h3>${escapeHtml(card.title)}</h3><p>${formatValue(card)}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-local-action="finish-turn">Continuar</button>' : '<p class="hint">Esperando para seguir…</p>'}</section>`;
+    const quien = reveal.playerId === myPlayerId ? "Tú" : escapeHtml(reveal.playerName || roomState.players[reveal.playerId]?.name || "");
+    const verbo = reveal.playerId === myPlayerId ? (reveal.correct ? "has acertado" : "has fallado") : (reveal.correct ? "ha acertado" : "ha fallado");
+    return `<section class="panel reveal-panel"><div class="eyebrow">${reveal.correct ? "Acierto" : "Fallo"}</div><p class="hint">${quien} ${verbo}${reveal.correct ? "" : ": la carta vuelve al mazo y se roba otra"}.</p><h3>${escapeHtml(card.title)}</h3><p>${formatValue(card)}</p>${canContinue ? '<button class="btn btn-primary btn-block" data-local-action="finish-turn">Continuar</button>' : `<p class="hint">Esperando a que ${escapeHtml(roomState.players[currentUid]?.name || "")} continúe…</p>`}</section>`;
   }
 
+  // Fin de partida: revancha con la misma mesa (la pide quien organiza) o salir.
   function renderFinal() {
     screen = "local-final";
-    const winnerName = roomState.winner ? roomState.players[roomState.winner]?.name : null;
-    paint(`<div class="shell">${header("local-lobby")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Partida terminada</div><h2 data-focus tabindex="-1">${winnerName ? `${escapeHtml(winnerName)} gana` : "Partida terminada"}</h2><p>${winnerName ? "Se ha quedado sin cartas antes que nadie." : ""}</p><button class="btn btn-primary btn-block" data-local-action="close-room">Salir de la sala</button></div></section></div>`, "local-final");
+    const uids = (roomState.winners || (roomState.winner ? [roomState.winner] : [])).filter(uid => roomState.players[uid]);
+    const names = uids.map(uid => escapeHtml(roomState.players[uid].name) + (uid === myPlayerId ? " (tú)" : ""));
+    const title = !names.length ? "Partida terminada" : names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
+    const lead = names.length > 1 ? "Terminaron la misma ronda sin cartas: comparten la victoria." : names.length ? (roomState.playerOrder.length === 1 ? "Es la última persona que queda en la mesa." : "Se ha quedado sin cartas antes que nadie.") : "";
+    const isHost = role === "host";
+    const puedeRevancha = isHost && roomState.playerOrder.length >= CT.LocalRoom.MIN_PLAYERS;
+    const acciones = isHost
+      ? `${puedeRevancha ? '<button class="btn btn-primary btn-block" data-local-action="rematch">Revancha con la misma mesa <span>→</span></button>' : ""}<button class="btn ${puedeRevancha ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="close-room">Cerrar la sala</button>`
+      : `<p class="hint">Si quien organiza pide revancha, volveréis todos a la sala de espera.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>`;
+    paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Partida terminada · ${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"} en la mesa</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p>${acciones}</div></section></div>`, "local-final");
   }
 
   function doSelect(id) {
@@ -572,7 +708,13 @@
     if (!target) return;
     const action = target.dataset.localAction;
     if (action === "back") { if (onBackToMenu) onBackToMenu(); }
-    else if (action === "leave") leaveToEntrada();
+    else if (action === "leave") requestLeave();
+    else if (action === "room-menu") roomMenu();
+    else if (action === "close-room-menu") CT.closeDialog();
+    else if (action === "guide") { CT.closeDialog(); showGuide(); }
+    else if (action === "close-guide") CT.closeDialog();
+    else if (action === "skip") { CT.closeDialog(); doSkipTurn(); }
+    else if (action === "rematch") doRematch();
     else if (action === "go-unirse") renderUnirseForm();
     else if (action === "warm-camera") void warmUpCamera();
     else if (action === "go-entrada") renderEntrada();
@@ -608,7 +750,7 @@
     else if (action === "qr-scan-back") { const onBack = qrScanOnBack; qrScanOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "start") doStart();
     else if (action === "close-room") doCloseRoom();
-    else if (action === "kick") { const name = roomState?.players[target.dataset.uid]?.name || "esta persona"; if (confirm(`¿Expulsar a ${name} de la sala?`)) doRemovePlayer(target.dataset.uid); }
+    else if (action === "kick") { const name = roomState?.players[target.dataset.uid]?.name || "esta persona"; if (confirm(`¿Expulsar a ${name} de la sala?`)) { CT.closeDialog?.(); doRemovePlayer(target.dataset.uid); } }
     else if (action === "select") doSelect(target.dataset.id);
     else if (action === "place") doPlace(Number(target.dataset.index));
     else if (action === "confirm-place") doConfirmPlace();

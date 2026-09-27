@@ -897,6 +897,10 @@
     if (!games.includes(selectedModeKey)) setMode(games[0]);
   }
 
+  // Lo último que se preparó en «Un solo móvil»: quién jugaba, cuántas cartas y qué
+  // poderes. «Otra partida» y la revancha lo recuperan, para no volver a escribir los
+  // nombres de toda la mesa después de cada partida.
+  let lastLocalSetup = null;
   function setup() {
     screen = "setup";
     starterDraw = null;
@@ -906,7 +910,7 @@
         <div class="panel">
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
-            <div id="players"><div class="player-row"><input aria-label="Nombre del jugador 1" value="${escapeHtml(CT.Identidad.nombre() || "Jugador 1")}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div><div class="player-row"><input aria-label="Nombre del jugador 2" value="Jugador 2" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div></div>
+            <div id="players">${(lastLocalSetup?.names || [CT.Identidad.nombre() || "Jugador 1", "Jugador 2"]).map((name, i) => `<div class="player-row"><input aria-label="Nombre del jugador ${i + 1}" value="${escapeHtml(name)}" maxlength="18"><button class="remove" data-action="remove-player" aria-label="Quitar jugador">×</button></div>`).join("")}</div>
             <button class="btn btn-ghost" data-action="add-player">＋ Añadir participante</button>
             <section id="recent-players" class="recent-players" aria-label="Participantes recientes" hidden></section>
           </div>
@@ -914,14 +918,14 @@
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
             <div class="setup-grid">
               <div class="field starter-field">${starterFieldMarkup()}</div>
-              <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
+              <div class="field"><label for="hand-size">Cartas iniciales por persona</label><select id="hand-size">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === (lastLocalSetup?.handSize || 4) ? " selected" : ""}>${n}</option>`).join("")}</select></div>
             </div>
           </div>
           <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Modo de juego</span></div>
-            <div class="field"><label for="local-preset">Tipo de partida</label><select id="local-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div>
-            <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"></label>
-            <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"></label>
+            <div class="field"><label for="local-preset">Tipo de partida</label><select id="local-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced"${lastLocalSetup?.ghost && lastLocalSetup?.pulse ? " selected" : ""}>Avanzada · Pulso y Fantasma</option></select></div>
+            <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"${lastLocalSetup?.ghost ? " checked" : ""}></label>
+            <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"${lastLocalSetup?.pulse ? " checked" : ""}></label>
           </div>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
@@ -1074,6 +1078,7 @@
     const drawnIds = starterDraw.drawnIds;
     const ghost = !!document.getElementById("ghost-toggle")?.checked;
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
+    lastLocalSetup = { names, handSize: requestedHand, ghost, pulse };
     if (pendingTournament) {
       const t=CT.Tournament.create(pendingTournament.rounds,requestedHand);pendingTournament=null;
       startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse,starterDraw.cardId);return;
@@ -1566,7 +1571,7 @@
       : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
     const fallosUnicos = new Set(game.failed || []).size;
     const earned=game.earnedAchievements||[];
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">Fin de la partida</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${finalMetrics(game.timeline.length,'láminas jugadas',`Ronda ${game.round||1}`,'mejor tramo',game.newDiscoveries||0,earned.length)}${logrosMarkup(earned)}<div class="actions final-actions"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">Fin de la partida</div><h1 class="final-title" data-focus tabindex="-1">${title}</h1><p class="final-lead">${lead}</p>${finalMetrics(game.timeline.length,'láminas jugadas',`Ronda ${game.round||1}`,'mejor tramo',game.newDiscoveries||0,earned.length)}${logrosMarkup(earned)}<div class="actions final-actions"><button class="btn btn-ghost" data-action="review-timeline">Ver las ${game.timeline.length} ${game.timeline.length === 1 ? "carta" : "cartas"} jugadas</button>${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-game">Ver lo que se falló (${fallosUnicos})</button>` : ""}${game.tournament ? "" : '<button class="btn btn-primary" data-action="rematch-local">Revancha · mismos jugadores</button>'}<button class="btn ${game.tournament ? "btn-primary" : "btn-secondary"}" data-action="setup">${game.tournament ? "Otra partida" : "Cambiar jugadores o ajustes"}</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button></div></div></section></div>`);
     if (game.tournament) {
       app.querySelector('.pass-screen').insertAdjacentHTML('afterbegin',CT.Tournament.board(game.tournament,game.players,game.winners));
       const button=app.querySelector('[data-action="setup"]');
@@ -3802,6 +3807,13 @@
     else if (action === "toggle-format-block") { formatOpen = formatOpen === target.dataset.format ? null : target.dataset.format; CT.Effects.transition(formatOpen ? 'expand' : 'close'); if(screen==='competition-menu') {competitionOptions();competitionMenu();} else playMenu(); }
     else if (action === "competition-menu") { formatOpen=null;competitionMenu(); }
     else if (action === "setup") { pendingTournament=null;setup(); }
+    // Revancha: la misma mesa y los mismos ajustes, con un nuevo sorteo de quién empieza.
+    else if (action === "rematch-local") {
+      pendingTournament = null;
+      if (game?.players?.length) lastLocalSetup = { ...(lastLocalSetup || {}), names: game.players.map(p => p.name) };
+      if (game?.mode && game.mode !== selectedModeKey && !setMode(game.mode)) return;
+      setup(); startGame();
+    }
     else if (action === "competition-local") prepareMultiCompetition();
     else if (action === "competition-online") launchOnline('',competitionOptions());
     else if (action === "competition-next") nextTournamentRound();
