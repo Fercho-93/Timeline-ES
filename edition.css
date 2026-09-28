@@ -4442,3 +4442,15 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .hint,
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-screen > .hint:last-child { display: none; }
 }
+
+/* El hueco de la línea pertenece a la lámina. En móviles con alto suficiente,
+   la carta crece sin aumentar la mano ni alterar los controles del tablero. */
+@media (min-width: 375px) and (max-width: 699px) and (min-height: 620px) {
+  #app.atlas-board[data-board-fit] {
+    --optimal-timeline-width: clamp(110px, min(35vw, calc((100dvh - 420px) * .6667)), 146px);
+  }
+  #app.atlas-board[data-platform][data-screen][data-board-fit] .board-timeline-section .timeline .timeline-card,
+  #app.atlas-board[data-platform][data-screen][data-board-fit] .quick-shell .board-timeline-section .timeline .timeline-card {
+    width: var(--optimal-timeline-width);
+  }
+}
