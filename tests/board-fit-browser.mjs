@@ -70,13 +70,14 @@ try {
           await page.waitForTimeout(180);
           const data=await page.evaluate(()=>{
             const app=document.getElementById('app'),shell=app.querySelector(':scope > .shell');
-            const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height),width:Math.round(r.width)}};
+            const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),left:Math.round(r.left),right:Math.round(r.right),height:Math.round(r.height),width:Math.round(r.width)}};
             const hand=app.querySelector('.hand'),timeline=app.querySelector('.timeline-wrap');
             const handCard=hand?.querySelector('.hand-card'),label=handCard?.querySelector('strong'),emblem=handCard?.querySelector('.reverso-emblema');
+            const focusTitle=app.querySelector('.board-focus-card > .hand-title h3');
             const placed=timeline?.querySelector('.timeline-card'),heading=timeline?.closest('section')?.querySelector('.timeline-toolbar');
             return {screen:app.dataset.screen,fit:app.dataset.boardFit||'',viewport:Math.round(visualViewport?.height||innerHeight),
               shellHeight:Math.round(shell?.scrollHeight||0),documentHeight:document.documentElement.scrollHeight,
-              hand:box(hand),handCard:box(handCard),timeline:box(timeline),placed:box(placed),headingGap:heading&&placed?box(placed).top-box(heading).bottom:null,zoom:app.querySelector('.timeline-zoom output')?.textContent?.trim(),
+              hand:box(hand),handCard:box(handCard),focusTitle:box(focusTitle),timeline:box(timeline),placed:box(placed),headingGap:heading&&placed?box(placed).top-box(heading).bottom:null,zoom:app.querySelector('.timeline-zoom output')?.textContent?.trim(),
               cards:hand?.querySelectorAll('.hand-card').length||0,fan:!!hand?.classList.contains('hand-fan'),
               order:hand&&timeline?box(hand).top<box(timeline).top:null,
               labelFits:label?label.scrollHeight<=label.clientHeight+1:null,
@@ -93,7 +94,9 @@ try {
             !data.order || (data.cards>1&&!data.fan) || data.labelFits===false || data.emblemVisible===false ||
             (data.cards===1&&data.handCard?.height<data.handCard?.width*1.25) ||
             (data.placed&&data.placed.height<data.placed.width*1.2) || data.headingGap>45 ||
-            (width===390&&format==='solo'&&data.placed?.width<120) || (data.placed&&data.placed.bottom>data.viewport+2))
+            (width===390&&format==='solo'&&data.placed?.width<120) ||
+            (width===390&&format==='solo'&&data.focusTitle?.right>data.handCard?.left+2) ||
+            (data.placed&&data.placed.bottom>data.viewport+2))
             errors.push('La mesa no cumple las medidas o el orden de juego');
           if(width===320||width===390)await page.screenshot({path:path.join(destination,`board-${engine}-${format}-${width}x${height}.png`)});
         }catch(error){records.push({engine,width,height,format,error:String(error),errors});}

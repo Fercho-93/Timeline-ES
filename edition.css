@@ -4450,3 +4450,11 @@ html:not(:has(#app[data-screen="home"]))::before {
     width: var(--optimal-timeline-width);
   }
 }
+
+/* En solitario, «Tu carta» queda alineado a la izquierda de la carta. */
+@media (max-width: 699px) {
+  #app.atlas-board[data-screen="solo"] .board-focus-card > .hand-title {
+    justify-content: flex-start;
+    padding-left: max(12px, calc(50% - 135px));
+  }
+}
