@@ -560,7 +560,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @media (max-width: 699px) {
   #app.atlas-board > .shell { display: flex; flex-direction: column; min-height: 100dvh; }
   #app.atlas-board > .shell > section:has(.timeline-wrap) { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
-  #app.atlas-board > .shell > section:has(.timeline-wrap) .timeline-wrap { flex: 1 1 auto; display: flex; align-items: center; }
+  #app.atlas-board > .shell > section:has(.timeline-wrap) .timeline-wrap { flex: 0 0 auto; display: flex; align-items: flex-start; }
 }
 /* Y ese hueco no se queda en blanco: las cartas ya colocadas crecen con él, así el
    grabado y la fecha se leen sin tocar el zoom.
@@ -4233,7 +4233,7 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo { grid-template-columns: minmax(0, var(--fit-focus-width)); }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .hand-card { min-height: 0 !important; }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .hand-card > strong {
-    font-size: .65rem; line-height: 1.06; padding: 2px; margin-top: 2px;
+    font-size: .65rem; line-height: 1.06; padding: 2px; margin-top: auto;
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .carta-reverso { min-height: 22px; margin: 0; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .reverso-emblema { width: 29px; height: 29px; }
@@ -4275,19 +4275,20 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit="tight"] .hand-fan-controls { margin-bottom: 0; }
   #app.atlas-board[data-board-fit="tight"] .hand-fan-controls button { width: 32px; height: 32px; min-height: 32px; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card { width: 96px; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card { width: 80px; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline-card:not(:has(.animal-card-art)) .card-visual { height: 82px; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(.animal-card-art) h3 {
     font-size: .67rem; line-height: 1.1;
   }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .year { font-size: .76rem; line-height: 1.1; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card > .card-category { display: none; }
-  #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card { width: 80px; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .quick-shell .board-timeline-section .timeline .timeline-card { width: 80px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .card-content { min-height: 50px; }
-  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .hand.hand-fan {
-    height: 96px; padding-bottom: 6px;
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan {
+    height: 90px; padding-bottom: 4px;
   }
-  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .hand.hand-fan .hand-card {
-    width: min(20vw, 69px);
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card {
+    width: min(18vw, 64px);
   }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .hand-fan-controls { margin-top: -5px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .scoreboard-panel .score > .score-avatar,
@@ -4311,13 +4312,13 @@ html:not(:has(#app[data-screen="home"]))::before {
 
 @media (max-width: 699px) and (max-height: 600px) {
   #app.atlas-board[data-board-fit="tight"] .quick-shell .atlas-topbar { height: 34px; min-height: 34px; }
-  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .hand.hand-fan {
-    height: 79px; padding-bottom: 3px;
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan {
+    height: 76px; padding-bottom: 3px;
   }
-  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .hand.hand-fan .hand-card {
-    width: min(18vw, 59px);
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card {
+    width: min(16vw, 55px);
   }
-  #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card { width: 72px; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .quick-shell .board-timeline-section .timeline .timeline-card { width: 72px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .card-content { padding: 3px 4px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card h3 { font-size: .62rem; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .hand-fan-controls button { width: 28px; height: 28px; min-height: 28px; }
