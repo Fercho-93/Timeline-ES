@@ -15,60 +15,6 @@
   --ui-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* En el duelo por turnos, la carta activa precede a la línea y ambas caben en la mesa corta. */
-@media (max-width: 699px) and (max-height: 740px) {
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) > .turn-duel-shell {
-    display: flex; flex-direction: column; min-height: 100dvh;
-    padding: max(2px,env(safe-area-inset-top)) 10px max(2px,env(safe-area-inset-bottom));
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-nav {
-    min-height: 40px; margin-bottom: 3px; padding: 0;
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-nav .icon-btn { width: 40px; height: 40px; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-screen { display: flex; flex: 1; flex-direction: column; min-height: 0; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading { margin-bottom: 3px; gap: 5px; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading h1 { margin: 2px 0; font-size: 1.06rem; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading p { margin: 2px 0; font-size: .64rem; line-height: 1.15; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-clock { width: 40px; height: 40px; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-scores { gap: 4px; margin-bottom: 4px; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-player {
-    grid-template-columns: 27px minmax(0,1fr) auto; gap: 3px; min-height: 45px;
-    padding: 4px; border-radius: 10px;
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-avatar,
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-avatar .avatar { width: 27px; height: 27px; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-score b { font-size: .9rem; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-score small { font-size: .5rem; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-last { max-height: 36px; overflow-y: auto; padding: 3px 7px; font-size: .65rem; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-last p { margin: 1px 0; font-size: .65rem; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand { padding: 0; border: 0; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-title { margin: 1px 0; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand { grid-template-columns: 90px; justify-content: center; margin: 0; padding: 0; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card {
-    width: 90px; min-height: 0; height: auto; aspect-ratio: 3 / 4; padding: 5px;
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card > strong { padding: 3px; font-size: .63rem; line-height: 1.07; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hint { margin: 2px 0; font-size: .62rem; line-height: 1.12; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board { display: flex; flex: 1; flex-direction: column; min-height: 0; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .hand-title { margin: 1px 0; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline-wrap {
-    display: flex; flex: 1; align-items: center; min-height: 0; margin: 0; padding: 2px;
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline { align-items: stretch; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card {
-    display: grid; grid-template-columns: 62px minmax(0,1fr); width: 156px; min-height: 0;
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card > .card-visual { grid-column: 1; grid-row: 1; width: 62px; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card > .card-content {
-    grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-height: 0; padding: 4px;
-  }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card h3 { font-size: .65rem; line-height: 1.1; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card .year { font-size: .72rem; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline :is(.slot,.slot-confirm) { min-height: 110px; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .hint,
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-screen > .hint:last-child { display: none; }
-}
-
 :root[data-scene="history"] { --scene-color: #834931; --scene-wash: #c29269; }
 :root[data-scene="entertainment"] { --scene-color: #654256; --scene-wash: #b895a2; }
 :root[data-scene="science"] { --scene-color: #285963; --scene-wash: #85afb2; }
@@ -4361,4 +4307,59 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit="tight"] .quick-bank .btn {
     flex: 0 0 59%; width: 59%; min-height: 36px; padding: 4px; font-size: .67rem; line-height: 1.1;
   }
+}
+
+/* En el duelo por turnos, la carta activa precede a la línea y ambas caben en la mesa corta. */
+@media (max-width: 699px) and (max-height: 740px) {
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) > .turn-duel-shell {
+    display: flex; flex-direction: column; min-height: 100dvh;
+    padding: max(2px,env(safe-area-inset-top)) 10px max(2px,env(safe-area-inset-bottom));
+  }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-nav {
+    min-height: 40px; margin-bottom: 3px; padding: 0;
+  }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-nav .icon-btn { width: 40px; height: 40px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-screen { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading { margin-bottom: 3px; gap: 5px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading h1 { margin: 2px 0; font-size: 1.06rem; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading p { margin: 2px 0; font-size: .64rem; line-height: 1.15; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-clock { width: 40px; height: 40px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-scores { gap: 4px; margin-bottom: 4px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-player {
+    grid-template-columns: 27px minmax(0,1fr) auto; gap: 3px; min-height: 45px;
+    padding: 4px; border-radius: 10px;
+  }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-avatar,
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-avatar .avatar { width: 27px; height: 27px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-score b { font-size: .9rem; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-score small { font-size: .5rem; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-last { max-height: 36px; overflow-y: auto; padding: 3px 7px; font-size: .65rem; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-last p { margin: 1px 0; font-size: .65rem; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand { padding: 0; border: 0; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-title { margin: 1px 0; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand { grid-template-columns: 90px; justify-content: center; margin: 0; padding: 0; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card {
+    width: 90px; min-height: 0; height: auto; aspect-ratio: 3 / 4; padding: 5px;
+  }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card > strong { padding: 3px; font-size: .63rem; line-height: 1.07; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card.selected::after { display: none; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hint { margin: 2px 0; font-size: .62rem; line-height: 1.12; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .hand-title { margin: 1px 0; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline-wrap {
+    display: flex; flex: 1; align-items: center; min-height: 0; margin: 0; padding: 2px;
+  }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline { align-items: stretch; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card {
+    display: grid; grid-template-columns: 62px minmax(0,1fr); width: 156px; min-height: 0;
+  }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card > .card-visual { grid-column: 1; grid-row: 1; width: 62px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card > .card-content {
+    grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-height: 0; padding: 4px;
+  }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card h3 { font-size: .65rem; line-height: 1.1; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline .animal-timeline-card .year { font-size: .72rem; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .timeline :is(.slot,.slot-confirm) { min-height: 110px; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board .hint,
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-screen > .hint:last-child { display: none; }
 }

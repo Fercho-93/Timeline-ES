@@ -61,4 +61,4 @@ try {
   }
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 if(findings.length){console.error(findings.join('\n'));process.exitCode=1;}
-else console.log('Todas las entradas llegan a su mesa o sala.');
+else console.log('Las entradas locales llegan a su mesa; las de red alcanzan la sala o la frontera de conexión del fixture.');
