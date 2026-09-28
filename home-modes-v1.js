@@ -114,7 +114,7 @@
 
   function openSoloHub() {
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
-      modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, 'data-solo-route="collections"'),
+      `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, 'data-solo-route="collections" aria-expanded="false" aria-controls="mode-inline-drawer"')}<div id="mode-inline-drawer" class="mode-inline-drawer" hidden></div></div>`,
       modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, 'data-solo-route="quick"'),
       modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, 'data-solo-route="mixed"')
     ].join(''), modeArt['solo-hub']);
@@ -140,6 +140,18 @@
       choices.parentElement.classList.toggle('is-open', playExpanded);
       choices.setAttribute('aria-hidden', String(!playExpanded));
       choices.inert = !playExpanded;
+      return;
+    }
+    const inlineCollections = event.target.closest('[data-solo-route="collections"]');
+    if (inlineCollections && app.dataset.screen === 'hub-solo') {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      sessionStorage.setItem('continuum-entry-route', 'collections');
+      const drawer = document.getElementById('mode-inline-drawer');
+      const open = drawer.hidden;
+      drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery() : '';
+      drawer.hidden = !open;
+      inlineCollections.setAttribute('aria-expanded', String(open));
       return;
     }
     const topicInput=event.target.closest('[data-public-topic]');

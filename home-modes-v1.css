@@ -117,3 +117,6 @@
 :root[data-theme="dark"] #app .mode-online-config,
 :root[data-theme="dark"] #app .mode-topic-grid label { color: #f1e1bf; background: #332a20; border-color: #8c6f45; }
 :root[data-theme="dark"] #app .mode-hub-head .icon-btn { background: #332a20cc; }
+
+.mode-inline-drawer { display: grid; gap: 12px; margin-top: 14px; }
+.mode-inline-drawer[hidden] { display: none; }

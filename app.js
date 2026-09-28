@@ -3972,6 +3972,11 @@
   // Las pantallas de elección de home-modes-v1.js pintan por aquí para entrar en el rastro
   // de «Volver», igual que las de este archivo.
   CT.showScreen = (name, html) => { screen = name; paint(html); };
+  // La galería de colecciones también se despliega dentro de «Jugar solo», sin cambiar de pantalla.
+  CT.collectionsGallery = () => {
+    collectionOpen = false; collectionDetails = false; collectionIndexExpanded = true; jugarSection = "collections";
+    return `<p class="catalog-hint">Elige una colección para desplegar sus mazos.</p><section id="deck-collection">${gallery()}</section>`;
+  };
   CT.navigateBack = backMenu;
   // La flecha de volver de la pantalla visible, la pinte este archivo o un módulo propio.
   const screenBackArrow = () => app.querySelector('.topbar .atlas-back, .topbar [data-local-action][aria-label="Volver"], .turn-duel-back');
