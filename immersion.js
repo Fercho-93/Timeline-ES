@@ -213,6 +213,29 @@
     });
     hand.addEventListener('pointercancel', () => { gesture = null; });
   }
+  // Ajusta la mesa según el espacio visible real. Safari puede cambiar la altura al
+  // plegar sus barras; las clases se recalculan sin tocar el zoom elegido ni el estado.
+  let boardFitFrame = 0;
+  function fitBoard(container) {
+    if (!board.has(container.dataset.screen) || window.innerWidth > 699) {
+      delete container.dataset.boardFit;
+      return;
+    }
+    cancelAnimationFrame(boardFitFrame);
+    boardFitFrame = requestAnimationFrame(() => {
+      if (!container.classList.contains('atlas-board')) return;
+      const shell = container.querySelector(':scope > .shell');
+      if (!shell) return;
+      const available = window.visualViewport?.height || window.innerHeight;
+      const top = shell.getBoundingClientRect().top + window.scrollY;
+      const fits = () => top + shell.scrollHeight <= available + 2;
+      container.dataset.boardFit = 'normal';
+      if (!fits()) container.dataset.boardFit = 'compact';
+      if (!fits()) container.dataset.boardFit = 'tight';
+    });
+  }
+  window.addEventListener('resize', () => fitBoard(document.getElementById('app')), {passive: true});
+  window.visualViewport?.addEventListener('resize', () => fitBoard(document.getElementById('app')), {passive: true});
 
   function mount(container, screen) {
     if (['solo-end', 'winner', 'online-winner', 'comp-end'].includes(screen)) atlasFinal(container);
@@ -285,6 +308,7 @@
       if (slot && timelineSection) timelineSection.insertAdjacentElement('afterend', dock);
     }
     refreshDepth();
+    fitBoard(container);
   }
   const surfaceNav = new Map();
   function openSurface(modal) {

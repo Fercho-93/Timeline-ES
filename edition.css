@@ -4190,3 +4190,59 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app[data-screen="perfil"] .atlas-chart-stop b { font-size: .9rem; }
   #app[data-screen="perfil"] .atlas-chart-heading small { font-size: .84rem; }
 }
+
+/* La mesa se adapta al alto útil al 100 %, sin ocultar cartas ni recortar sus datos. */
+@media (max-width: 699px) {
+  #app.atlas-board[data-board-fit="compact"] {
+    --fit-hand-height: 132px; --fit-hand-width: min(24vw, 88px);
+    --fit-focus-width: min(27vw, 105px); --fit-timeline-width: 101px;
+    --fit-score-height: 62px; --fit-section-pad: 6px;
+  }
+  #app.atlas-board[data-board-fit="tight"] {
+    --fit-hand-height: 110px; --fit-hand-width: min(21vw, 74px);
+    --fit-focus-width: min(24vw, 88px); --fit-timeline-width: 87px;
+    --fit-score-height: 52px; --fit-section-pad: 4px;
+  }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell {
+    padding-top: max(2px, env(safe-area-inset-top)); padding-bottom: max(3px, env(safe-area-inset-bottom));
+  }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .atlas-topbar {
+    min-height: 40px; height: 40px; margin-bottom: 0; padding-block: 0;
+  }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .atlas-topbar .icon-btn { width: 40px; height: 40px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .game-head { margin-bottom: 2px; padding-block: 1px 3px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .game-head .turn-name { font-size: 1rem; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .atlas-hand-section,
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card { padding-block: 2px; margin-block: 0; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .atlas-hand-section > .hand-title,
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card > .hand-title { margin: 0 0 2px; }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit]:not([data-board-fit="normal"]) .atlas-hand-section .hand.hand-fan {
+    height: var(--fit-hand-height); padding: 3px 0 10px;
+  }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit]:not([data-board-fit="normal"]) .atlas-hand-section .hand.hand-fan .hand-card {
+    width: var(--fit-hand-width); min-height: 0 !important; padding: 4px;
+  }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .hand-fan-controls { margin: -3px auto 0; gap: 20px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .hand-fan-controls button { width: 38px; height: 38px; min-height: 38px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo { grid-template-columns: minmax(0, var(--fit-focus-width)); }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .hand-card { min-height: 0 !important; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel { padding: 3px 5px; margin-bottom: 2px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel .scoreboard { max-height: var(--fit-score-height); }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-title { margin-bottom: 2px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section { padding: var(--fit-section-pad); margin-top: 1px; flex: 1 1 auto; min-height: 0; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-wrap { flex: 1 1 auto; min-height: 0; padding-block: 3px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section > .timeline-zoom { margin: 0 auto 3px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section > .timeline-zoom [data-zoom-level] { min-height: 32px; height: 32px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline .timeline-card { width: var(--fit-timeline-width); min-height: 0; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline :is(.slot, .slot-confirm) { min-height: 0; align-self: stretch; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
+    box-sizing: border-box; width: 100%; height: auto; max-height: none; margin: 0; aspect-ratio: 2 / 3;
+  }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-card:not(:has(.animal-card-art)) .card-visual { height: calc(var(--fit-timeline-width) * .95); }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-card .card-content { padding: 5px 6px 6px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-card h3 { font-size: .7rem; line-height: 1.13; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-card .year { font-size: .87rem; padding-top: 3px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .quick-rule { margin: 2px 0 4px; font-size: .76rem; line-height: 1.2; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .quick-bank { margin: 4px 0 2px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .quick-bank p { margin: 0 0 3px; font-size: .74rem; }
+}
