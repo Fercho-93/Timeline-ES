@@ -79,7 +79,7 @@ try {
     await settle();
     // Navegación durante una entrada: la limpieza antigua no toca la nueva.
     await page.locator('.home-nav [data-action="home-top"]').click();
-    await page.locator('.home-door[data-action="perfil"]').click();
+    await page.locator('.home-nav [data-action="perfil"]').click();
     await page.locator('[data-action="home-encyclopedia"]').click();
     await page.locator('.home-nav [data-settings-action="open"]').click();
     await settle();

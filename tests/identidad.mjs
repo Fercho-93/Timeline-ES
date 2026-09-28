@@ -98,7 +98,7 @@ console.log("\nQuien ya tenía nombre se reconoce");
 console.log("\nEl Atlas: nombre y avatar");
 {
   const w = boot({ "continuum-identidad-v1": JSON.stringify({ nombre: "Lucía" }) });
-  click(w, '.home-door[data-action="perfil"]');
+  click(w, '.home-nav [data-action="perfil"]');
   const A = w.CONTINUUM.Avatares;
   ok("el Atlas enseña el nombre", w.document.querySelector(".atlas-identidad h2").textContent === "Lucía");
   ok("y el avatar del invitado", w.document.querySelector(".atlas-identidad-avatar").innerHTML === pintado(w, A.markup("Lucía", { size: 72, etiqueta: "Tu avatar", seed: A.ownSeed() })));

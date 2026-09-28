@@ -40,8 +40,7 @@
     if (!doors || doors.dataset.modesV1 === 'true') return;
 
     const daily = doors.querySelector('.home-door-daily');
-    const atlas = doors.querySelector('.home-door[data-action="perfil"]');
-    if (!daily || !atlas) return;
+    if (!daily) return;
 
     const dailyWrap = document.createElement('section');
     dailyWrap.className = 'mode-daily-zone';
@@ -80,13 +79,7 @@
     playWrap.setAttribute('aria-label', 'Jugar');
     playWrap.append(play, reveal);
 
-    const secondary = document.createElement('section');
-    secondary.className = 'mode-secondary';
-    secondary.setAttribute('aria-label', 'Tu colección');
-    atlas.classList.add('mode-atlas-entry');
-    secondary.append(atlas);
-
-    doors.replaceChildren(playWrap, dailyWrap, secondary);
+    doors.replaceChildren(playWrap, dailyWrap);
     doors.dataset.modesV1 = 'true';
   }
 

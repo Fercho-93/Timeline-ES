@@ -110,7 +110,7 @@ await click('[data-action="competition-local"]');
 assert.equal(screen(), 'setup');
 await expectBack('competition-menu');
 await expectBack('home');
-await click('.home-door[data-action="perfil"]');
+await click('.home-nav [data-action="perfil"]');
 assert.equal(screen(), 'perfil');
 await expectBack('home');
 

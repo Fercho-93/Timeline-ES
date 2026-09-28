@@ -554,7 +554,7 @@
     home();
   }
 
-  // La portada tiene tres puertas y nada más: jugar, el reto del día y el atlas. Encima,
+  // La portada tiene dos puertas y nada más: jugar y el reto del día (el atlas vive en la barra). Encima,
   // solo cuando hay algo pendiente, el aviso de los duelos en los que te toca.
   function home() {
     sessionStorage.removeItem('continuum-entry-route');
@@ -567,7 +567,6 @@
       <section class="home-doors" aria-label="Qué quieres hacer">
         ${homeDoor("jugar", "Jugar", "Colecciones, retos rápidos y competición.", "home-door-jugar", 344, 378)}
         ${dailyDoor()}
-        ${homeDoor("perfil", "Atlas", "Tus cartas, tu progreso y tus logros.", "hero-geography", 859)}
       </section>
       ${homeNav()}
       <p class="app-version" id="app-version"></p>

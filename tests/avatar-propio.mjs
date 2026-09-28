@@ -21,7 +21,7 @@ const elegido = CT.Avatares.ids.find(id => id !== porNombre && id !== CT.Avatare
 assert.ok(CT.Avatares.choose(elegido));
 const src = sel => w.document.querySelector(sel)?.getAttribute('src') || '';
 
-await click('.home-door[data-action="perfil"]');
+await click('.home-nav [data-action="perfil"]');
 assert.ok(src('.atlas-identidad-avatar img').includes(elegido), 'el Atlas muestra el avatar elegido');
 
 await click('[data-action="home-top"]');

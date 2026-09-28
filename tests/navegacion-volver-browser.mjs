@@ -84,7 +84,7 @@ async function flows(vp) {
     await click('[data-format="competition-multi"]'); await click('[data-action="competition-local"]'); await at('setup'); await back('competition-menu');
     await back('home');
     // Atlas
-    await click('.home-door[data-action="perfil"]'); await at('perfil'); await back('home');
+    await click('.home-nav [data-action="perfil"]'); await at('perfil'); await back('home');
     // Jugar clásico (puerta antigua)
     await pg.evaluate(() => window.CONTINUUM.localNavigate('jugar')); await pg.waitForTimeout(600); await at('jugar');
     await click('[data-action="quick-challenges"]'); await at('quick-challenges');

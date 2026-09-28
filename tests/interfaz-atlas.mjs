@@ -36,7 +36,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
   try {
     click(irAJugar(w),'[data-block="naturaleza"]');click(w,'[data-mode="animals"]');
     assert.equal(w.document.querySelectorAll('.atlas-specimens figure').length,3);
-    assert.equal(w.document.querySelectorAll('.home-nav button').length,3);
+    assert.equal(w.document.querySelectorAll('.home-nav button').length,4);
     assert.ok(w.document.querySelector('.home-nav [data-action="rules"]'));
     assert.equal(w.document.querySelector('.topbar [data-action="rules"]'),null);
     click(w,'[data-format="multi"]');click(w,'[data-action="setup"]');
@@ -89,7 +89,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     click(w,'[data-online-action="back"]');click(w,'[data-exit-confirm]');
     assert.equal(screen(w),'online-entry');assert.equal(w.detachCount,1);
     assert.equal(w.document.querySelector('#online-code').value,'ABCD2345');
-    assert.equal(w.document.querySelectorAll('.home-nav button').length,3);
+    assert.equal(w.document.querySelectorAll('.home-nav button').length,4);
     click(w,'.home-nav [data-action="home-top"]');assert.equal(screen(w),'home');
   } finally {w.close();}
 }
