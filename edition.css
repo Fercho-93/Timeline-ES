@@ -4669,3 +4669,12 @@ html #app .home-nav.atlas-nav {
 }
 html #app .home-nav.atlas-nav::before,
 html #app .home-nav.atlas-nav::after { content: none; }
+/* Retos rápidos: el zoom de la línea va en la fila del título, sin robar una fila entera. */
+#app.atlas-board .quick-shell .board-timeline-section { position: relative; }
+#app.atlas-board .quick-shell .board-timeline-section > .timeline-zoom { position: absolute; z-index: 2; top: 4px; right: 8px; margin: 0; padding: 0; }
+#app.atlas-board .quick-shell .board-timeline-section > .timeline-zoom [data-zoom-level] { min-height: 28px; height: 28px; padding-block: 0; }
+#app.atlas-board .quick-shell .board-timeline-section > .timeline-toolbar { margin-top: 6px; }
+#app.atlas-board .quick-shell .timeline-ends { margin-top: 8px; }
+#app.atlas-board[data-platform][data-device][data-screen] .quick-shell .hand.hand-fan .hand-card > strong { font-size: .68rem; overflow-wrap: normal; word-break: normal; hyphens: auto; }
+#app.atlas-board .quick-shell .game-head { margin-top: 2px; padding-bottom: 4px; }
+#app.atlas-board[data-board-fit="tight"] .quick-shell .quick-meta { margin: 2px 0 0; }
