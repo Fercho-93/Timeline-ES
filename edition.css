@@ -4545,3 +4545,88 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .quick-shell .game-head { align-items: end; margin-top: 6px; padding-bottom: 6px; }
 #app.atlas-board .quick-shell .game-head .turn-label { margin: 0; }
 #app.atlas-board .quick-shell .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 2px; color: #8a3f2f; font: 700 .68rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+
+
+/* Navegación como cuatro fichas de atlas: pergamino mate, inclinación leve y una
+   elevación contenida para indicar el destino actual sin añadir otra caja brillante. */
+html #app .home-nav.atlas-nav {
+  left: 50%;
+  bottom: 0;
+  width: min(calc(100% - 24px), 460px);
+  max-width: 460px;
+  min-height: calc(88px + env(safe-area-inset-bottom));
+  padding: 5px 5px calc(7px + env(safe-area-inset-bottom));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transform: translateX(-50%);
+  overflow: visible;
+}
+html #app .home-nav.atlas-nav::before,
+html #app .home-nav.atlas-nav::after { content: none; }
+html #app .home-nav.atlas-nav button {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  min-height: 70px;
+  padding: 5px 2px 4px;
+  border: 1px solid #b9a98e;
+  border-radius: 9px 9px 7px 7px;
+  color: #5b4936;
+  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
+  transform: rotate(var(--atlas-card-tilt, 0deg));
+  transform-origin: 50% 100%;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+html #app .home-nav.atlas-nav button:nth-child(1) { --atlas-card-tilt: -2deg; }
+html #app .home-nav.atlas-nav button:nth-child(2) { --atlas-card-tilt: -.7deg; }
+html #app .home-nav.atlas-nav button:nth-child(3) { --atlas-card-tilt: .7deg; }
+html #app .home-nav.atlas-nav button:nth-child(4) { --atlas-card-tilt: 2deg; }
+html #app .home-nav.atlas-nav button span {
+  width: 31px;
+  height: 31px;
+  border: 1px solid #c8b89d;
+  border-radius: 5px;
+  color: #66513a;
+  background: rgba(244,237,222,.78);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(55,42,27,.08);
+}
+html #app .home-nav.atlas-nav button:nth-child(n) span { box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(55,42,27,.08); }
+html #app .home-nav.atlas-nav button svg { width: 19px; height: 19px; stroke-width: 1.65; }
+html #app .home-nav.atlas-nav button small {
+  margin-top: 1px;
+  color: inherit;
+  font: 600 clamp(.57rem, 2vw, .67rem)/1.05 var(--font-display);
+}
+html #app .home-nav.atlas-nav button[aria-current="page"] {
+  z-index: 3;
+  min-height: 76px;
+  border-color: #aa7157;
+  color: #704a37;
+  background: linear-gradient(155deg, #f8efdf, #eadbc4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 5px 9px rgba(61,43,29,.17);
+  transform: translateY(-5px) rotate(0deg);
+}
+html #app .home-nav.atlas-nav button[aria-current="page"] span {
+  border-color: #bd9278;
+  color: #8d4e38;
+  background: #ead8c3;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(61,43,29,.1);
+}
+html #app .home-nav.atlas-nav button[aria-current="page"] small {
+  color: #854b37;
+  text-decoration: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html #app .home-nav.atlas-nav button { transition: none; }
+}
