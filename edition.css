@@ -4690,3 +4690,21 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
   min-height: 72px;
   transform: translateY(-13px) rotate(0deg);
 }
+
+/* Mazos de una colección como un camino: una línea con un punto por mazo, y cada mazo en una
+   tarjeta cuya ilustración forma parte del propio fondo (se difumina hacia el texto). */
+#app #deck-collection .collection-decks { padding: 4px 0 12px; background: transparent; border: 0; box-shadow: none; }
+#app #deck-collection .collection-decks .lead { margin: 2px 0 10px; text-align: center; font: 600 .7rem/1.3 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; color: #8a3f2f; }
+#app #deck-collection .collection-decks .games { position: relative; display: grid; gap: 14px; padding: 4px 0 4px 34px; }
+#app #deck-collection .collection-decks .games::before { content: ""; position: absolute; left: 13px; top: 18px; bottom: 18px; width: 3px; border-radius: 2px; background: repeating-linear-gradient(180deg, #b08a52 0 7px, transparent 7px 13px); opacity: .8; }
+#app #deck-collection .collection-decks .game-row { position: relative; display: block; overflow: visible; margin: 0; min-height: 92px; padding: 15px 44% 15px 16px; border: 1px solid #c9b48f; border-left: 1px solid #c9b48f; border-radius: 14px; background: linear-gradient(120deg, #fbf3e2, #f3e6cc); box-shadow: 0 3px 10px #5a3f1f22; text-align: left; }
+#app #deck-collection .collection-decks .game-row::before { content: ""; position: absolute; inset: 50% auto auto -27px; width: 15px; height: 15px; margin-top: -8px; border-radius: 50%; background: #f7ecd6; border: 3px solid #b08a52; box-shadow: 0 0 0 3px #f7ecd6; }
+#app #deck-collection .collection-decks .game-row::after { content: none; }
+#app #deck-collection .collection-decks .game-row .deck-preview { position: absolute; inset: 0 0 0 auto; z-index: 0; float: none; width: 46%; height: auto; margin: 0; border-radius: 0 14px 14px 0; overflow: hidden; filter: sepia(.25) saturate(.9); mix-blend-mode: normal; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 70%); mask-image: linear-gradient(90deg, transparent 0, #000 70%); pointer-events: none; }
+#app #deck-collection .collection-decks .game-row .deck-preview img,
+#app #deck-collection .collection-decks .game-row .deck-preview svg { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+#app #deck-collection .collection-decks .game-row > :not(.deck-preview) { position: relative; z-index: 1; grid-column: auto; }
+#app #deck-collection .collection-decks .game-row .deck-chapter { margin: 0 0 4px; justify-content: flex-start; font-size: .58rem; letter-spacing: .16em; color: #8a3f2f; }
+#app #deck-collection .collection-decks .game-row .deck-chapter i { display: none; }
+#app #deck-collection .collection-decks .game-row .game-name { padding: 0; border: 0; font-size: 1.12rem; line-height: 1.15; }
+#app #deck-collection .collection-decks .game-row .game-meta { margin-top: 5px; font: .72rem/1.35 var(--ui-font); }
