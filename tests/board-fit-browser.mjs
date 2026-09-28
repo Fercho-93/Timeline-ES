@@ -79,7 +79,10 @@ try {
               cards:hand?.querySelectorAll('.hand-card').length||0,fan:!!hand?.classList.contains('hand-fan'),
               order:hand&&timeline?box(hand).top<box(timeline).top:null,
               labelFits:label?label.scrollHeight<=label.clientHeight+1:null,
-              emblemVisible:emblem&&hand?.classList.contains('hand-solo')?box(emblem).bottom<=box(label).top+2:null,
+              emblemVisible:emblem&&hand?.classList.contains('hand-solo')?handCard.classList.contains('is-wide-label')||(() => {
+                const a=emblem.getBoundingClientRect(),b=label.getBoundingClientRect();
+                return a.bottom<=b.top+2 || a.right<=b.left+2;
+              })():null,
               horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2};
           });
           records.push({engine,width,height,format,...data,errors});

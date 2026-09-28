@@ -4284,6 +4284,7 @@ html:not(:has(#app[data-screen="home"]))::before {
     grid-column: 1 / -1; grid-row: 1; margin: 3px 4px; padding: 2px 4px;
     font-size: .52rem; line-height: 1.08;
   }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card > .card-category { display: none; }
   #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
     grid-column: 1; grid-row: 2; width: 62px; align-self: start; margin: 0;
   }
@@ -4294,6 +4295,7 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(.animal-card-art) h3 {
     font-size: .65rem; line-height: 1.08;
   }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .year { font-size: .68rem; line-height: 1.1; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline :is(.slot, .slot-confirm) { min-height: 120px; }
   #app.atlas-board[data-board-fit="tight"] .quick-rule { margin: 0 0 2px; line-height: 1.1; }
   #app.atlas-board[data-board-fit="tight"] .quick-bank {
