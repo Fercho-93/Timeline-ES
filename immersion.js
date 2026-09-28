@@ -232,6 +232,19 @@
       container.dataset.boardFit = 'normal';
       if (!fits()) container.dataset.boardFit = 'compact';
       if (!fits()) container.dataset.boardFit = 'tight';
+      // Un título largo puede añadir líneas incluso en la mesa compacta. La lámina
+      // sigue entera, pero reduce su altura al espacio que realmente le queda.
+      container.classList.remove('board-image-condensed');
+      container.style.removeProperty('--board-image-height');
+      if (!fits() && container.dataset.boardFit === 'tight') {
+        const visual = shell.querySelector('.board-timeline-section .timeline-card .card-visual:has(.animal-card-art)');
+        if (visual) {
+          const excess = Math.ceil(top + shell.scrollHeight - available);
+          const height = Math.max(64, Math.floor(visual.getBoundingClientRect().height - excess - 10));
+          container.style.setProperty('--board-image-height', `${height}px`);
+          container.classList.add('board-image-condensed');
+        }
+      }
       if (!fits() && container.dataset.boardFit === 'normal') container.dataset.boardFit = 'compact';
       if (!fits() && container.dataset.boardFit === 'compact') container.dataset.boardFit = 'tight';
     });

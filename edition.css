@@ -4266,6 +4266,9 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-platform][data-screen][data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
     box-sizing: border-box; width: 100%; height: auto; max-height: none; margin: 0; aspect-ratio: 2 / 3;
   }
+  #app.atlas-board.board-image-condensed[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
+    height: var(--board-image-height); aspect-ratio: auto;
+  }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-card:not(:has(.animal-card-art)) .card-visual { height: calc(var(--fit-timeline-width) * .95); }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-card .card-content { padding: 5px 6px 6px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-card h3 { font-size: .7rem; line-height: 1.13; }

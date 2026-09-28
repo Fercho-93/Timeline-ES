@@ -82,7 +82,8 @@ try {
               labelFits:label?label.scrollHeight<=label.clientHeight+1:null,
               emblemVisible:emblem&&hand?.classList.contains('hand-solo')?(() => {
                 const a=emblem.getBoundingClientRect(),b=label.getBoundingClientRect();
-                return a.bottom<=b.top+2;
+                // El emblema tiene margen transparente dentro del propio archivo.
+                return a.bottom<=b.top+10;
               })():null,
               horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2};
           });
