@@ -63,7 +63,8 @@ try {
    });
    await illustratedPage.screenshot({path:`test-results/zoom/${engine}-carta-ilustrada.png`});
    assert.ok(Math.abs(illustrated.imageHeight-illustrated.imageWidth*1.5)<3,'la lámina conserva su proporción completa');
-   assert.ok(illustrated.imageHeight<=165,'la lámina móvil conserva el tamaño compacto aunque el título necesite más líneas');
+   assert.ok(illustrated.imageHeight>165,'la lámina aprovecha el espacio disponible para mostrar el dibujo');
+   assert.ok(illustrated.cardHeight>illustrated.imageHeight,'la placa de datos permanece dentro de la carta');
    assert.ok(illustrated.captionTop>=illustrated.imageBottom-1,'el texto comienza debajo de la lámina');
    assert.equal(illustrated.imageFit,'contain','la imagen no recorta los bordes');
    assert.ok(illustrated.captionHeight<illustrated.cardHeight*.4,'la placa deja protagonismo al dibujo');
