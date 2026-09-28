@@ -758,7 +758,7 @@
       ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
       ${boardQuestion()}
       ${handSection}
-      <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3><small>${roomState.timeline.length} ${roomState.timeline.length === 1 ? "carta" : "cartas"}</small></div>${CT.timelineMap(modeKey, timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
+      <section class="board-timeline-section"><div class="hand-title"><h3>${timelineTitle()}</h3></div>${CT.timelineEnds(modeKey)}${CT.timelineMap(modeKey, timelineCards, { hidden: !!roomState.ghost?.pending.length })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
       ${!pulsing && roomState.phase !== "reveal" ? CT.Ghost.power(roomState.ghost, myPlayerId, roomState.timeline.length, me.hand.length, 'data-local-action="ghost-use"', powersEnabled) : ""}
       ${!pulsing && roomState.phase !== "reveal" ? pulseButton(me, powersEnabled) : ""}
       ${roomState.phase === "reveal" ? revealOverlay(currentUid) : ""}

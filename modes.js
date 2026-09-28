@@ -103,6 +103,7 @@
       shortValue: card => card.year < 0 ? `${Math.abs(card.year)} a.C.` : String(card.year),
       hiddenLabel: "Fecha oculta",
       timelineTitle: "Línea temporal",
+      ends: ["Más antiguo", "Más reciente"],
       question: "¿Antes o después?",
       // El duelo de cifras no ordena: pide el número. Cada eje dice cómo se pregunta, en
       // qué unidad se responde y con cuánta precisión. Las fechas se apartan de los demás
@@ -130,6 +131,7 @@
       shortValue: card => shortMillions(card.value),
       hiddenLabel: "Población oculta",
       timelineTitle: "De menos a más",
+      ends: ["Menos habitantes", "Más habitantes"],
       question: "¿Menos o más gente?",
       cifra: { pregunta: "¿Cuántos habitantes tiene?", unidad: "habitantes", decimales: 0,
         unidades: [["habitantes", 1], ["mil", 1e3], ["millones", 1e6], ["millón", 1e6], ["M", 1e6]], ejemplo: "47 millones",
@@ -150,6 +152,7 @@
       shortValue: card => shortMillions(card.value),
       hiddenLabel: "Hablantes ocultos",
       timelineTitle: "De menos a más hablado",
+      ends: ["Menos hablantes", "Más hablantes"],
       question: "¿Menos o más hablantes?",
       cifra: { pregunta: "¿Cuántos hablantes tiene?", unidad: "hablantes", decimales: 0,
         unidades: [["hablantes", 1], ["mil", 1e3], ["millones", 1e6], ["millón", 1e6], ["M", 1e6]], ejemplo: "93 millones",
@@ -175,6 +178,7 @@
       shortValue: card => shortMillions(card.value),
       hiddenLabel: "Superficie oculta",
       timelineTitle: "De menor a mayor",
+      ends: ["Más pequeño", "Más grande"],
       question: "¿Más pequeño o más grande?",
       cifra: { pregunta: "¿Cuántos kilómetros cuadrados tiene?", unidad: "km²", decimales: 0,
         unidades: [["km²", 1], ["millones de km²", 1e6], ["ha", 0.01], ["m²", 1e-6]], ejemplo: "505.000 km²",
@@ -195,6 +199,7 @@
       shortValue: card => compactMass(card.value),
       hiddenLabel: "Peso oculto",
       timelineTitle: "De más ligero a más pesado",
+      ends: ["Más ligero", "Más pesado"],
       question: "¿Más ligero o más pesado?",
       cifra: { pregunta: "¿Cuánto pesa?", unidad: "kg", decimales: 6,
         unidades: [["kg", 1], ["g", 1e-3], ["mg", 1e-6], ["t", 1e3], ["toneladas", 1e3]], ejemplo: "2,5 t",
@@ -216,6 +221,7 @@
       shortValue: card => compactLifespan(card.value),
       hiddenLabel: "Vida oculta",
       timelineTitle: "De menos a más longevos",
+      ends: ["Vida más corta", "Vida más larga"],
       question: "¿Vive menos o más?",
       cifra: { pregunta: "¿Cuántos años vive?", unidad: "años", decimales: 6,
         unidades: [["años", 1], ["meses", 1 / 12], ["semanas", 7 / 365], ["días", 1 / 365], ["horas", 1 / 8760], ["minutos", 1 / 525600]], ejemplo: "18 meses",
@@ -236,6 +242,7 @@
       shortValue: card => compactSpeed(card.value),
       hiddenLabel: "Velocidad oculta",
       timelineTitle: "De más lento a más rápido",
+      ends: ["Más lento", "Más rápido"],
       question: "¿Más lento o más rápido?",
       cifra: { pregunta: "¿A qué velocidad llega?", unidad: "km/h", decimales: 6,
         unidades: [["km/h", 1], ["m/s", 3.6], ["m/h", 1e-3], ["cm/s", 0.036], ["mm/s", 0.0036]], ejemplo: "30 m/s",
@@ -256,6 +263,7 @@
       shortValue: card => compactDistance(card.value),
       hiddenLabel: "Distancia oculta",
       timelineTitle: "De más cerca a más lejos",
+      ends: ["Más cerca", "Más lejos"],
       question: "¿Más cerca o más lejos?",
       cifra: { pregunta: "¿A cuántos kilómetros está?", unidad: "km", decimales: 3,
         unidades: [["km", 1], ["m", 1e-3]], ejemplo: "1.800 km",
@@ -986,6 +994,12 @@
 
   function timelineTitle(modeKey) { return axis(modeKey).timelineTitle; }
 
+  // Qué significa cada extremo de la línea, según la naturaleza del mazo.
+  function timelineEnds(modeKey) {
+    const [left, right] = axis(modeKey).ends || ["Antes", "Después"];
+    return `<div class="timeline-ends" aria-hidden="true"><span>← ${left}</span><span>${right} →</span></div>`;
+  }
+
   function question(modeKey) { return axis(modeKey).question; }
 
   function eraForCard(modeKey, card) {
@@ -1211,7 +1225,7 @@
     pulseRules: PULSE_RULES,
     usesAnimalArt, cardArt, animalArt, cardBack, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
-    formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, question, eraForCard,
+    formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, timelineEnds, question, eraForCard,
     correctIndex, placementHint, guideMarkup,
     escapeHtml, initials, shuffle, seedFrom, seededRandom, shuffleWith
   };

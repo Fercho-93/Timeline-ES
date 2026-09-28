@@ -4780,3 +4780,23 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
 #app #deck-collection .collection-decks .game-row .game-name { color: #fbf1dc; max-width: 70%; }
 #app #deck-collection .collection-decks .game-row .game-meta { color: #eadcc0; max-width: 72%; }
 #app #deck-collection .collection-decks .game-row.game-row-cerrado .game-meta { color: #d9cdb6; }
+
+/* Mesa de juego: la lupa del zoom bajo el contador de pendientes, a la derecha del todo;
+   «Tu carta» pegada a la izquierda; y los extremos de la línea según el mazo. */
+#app.atlas-board .game-head-side { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; margin-left: auto; }
+#app.atlas-board .game-head-side > .timeline-zoom { position: relative; display: block; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
+#app.atlas-board .timeline-zoom .zoom-toggle { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 4px 10px; border: 1px solid var(--edition-line, #cdb994); border-radius: 999px; background: #fbf4e4; color: #5a4330; font: 600 .74rem/1 var(--ui-font); cursor: pointer; box-shadow: 0 1px 3px #5a3f1f22; }
+#app.atlas-board .timeline-zoom .zoom-toggle[aria-expanded="true"] { background: #8a3f2f; border-color: #8a3f2f; color: #fff6e8; }
+#app.atlas-board .timeline-zoom .zoom-toggle output { font: inherit; }
+#app.atlas-board .timeline-zoom .zoom-menu { position: absolute; z-index: 40; top: calc(100% + 6px); right: 0; display: grid; gap: 2px; min-width: 84px; padding: 4px; border: 1px solid #cdb994; border-radius: 12px; background: #fbf4e4; box-shadow: 0 8px 20px #3a26134d; }
+#app.atlas-board .timeline-zoom .zoom-menu[hidden] { display: none; }
+#app.atlas-board .timeline-zoom .zoom-menu [data-zoom-level] { min-height: 34px; height: auto; padding: 6px 12px; border: 0; border-radius: 8px; background: transparent; color: #4a3626; font: 600 .82rem/1 var(--ui-font); text-align: right; }
+#app.atlas-board .timeline-zoom .zoom-menu [data-zoom-level][aria-pressed="true"] { background: #8a3f2f; color: #fff6e8; }
+#app.atlas-board .board-focus-card > .hand-title { justify-content: flex-start; }
+#app.atlas-board .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 4px 2px 2px; color: #8a3f2f; font: 700 .66rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+#app.atlas-board[data-platform][data-screen] .timeline-zoom button.zoom-toggle { width: auto !important; height: 30px !important; min-width: 0 !important; min-height: 30px !important; padding: 0 11px !important; border-radius: 999px !important; aspect-ratio: auto !important; font-size: .74rem !important; }
+#app.atlas-board[data-platform][data-screen] .timeline-zoom button.zoom-toggle svg { display: block; flex: none; width: 15px; height: 15px; }
+#app.atlas-board[data-platform][data-screen] .timeline-zoom .zoom-menu button[data-zoom-level] { width: 100% !important; height: auto !important; min-height: 34px !important; aspect-ratio: auto !important; border-radius: 8px !important; }
+#app.atlas-board .board-focus-card > .hand-title,
+#app.atlas-board .board-focus-card > .hand-title h3 { justify-content: flex-start; text-align: left; margin-left: 0; margin-right: auto; }
+#app.atlas-board[data-platform][data-screen] .board-focus-card > .hand-title { padding-left: 4px; padding-right: 0; }

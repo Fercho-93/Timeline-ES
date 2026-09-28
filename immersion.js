@@ -314,14 +314,24 @@
     if (board.has(screen)) {
       const lives = container.querySelector('.solo-lives');
       const counters = container.querySelector('.game-head');
-      if (lives && counters) counters.insertBefore(lives, counters.querySelector('.deck-count'));
+      if (lives && counters) counters.insertBefore(lives, counters.querySelector(':scope > .game-head-side') || counters.querySelector(':scope > .deck-count'));
       const wrap = container.querySelector('.timeline-wrap');
       const zoom = container.querySelector('.timeline-zoom');
       const timelineHeading = wrap?.parentElement.querySelector('.hand-title');
-      if (timelineHeading && zoom) {
-        timelineHeading.classList.add('timeline-toolbar');
-        timelineHeading.parentElement.insertBefore(zoom, timelineHeading);
+      if (timelineHeading) timelineHeading.classList.add('timeline-toolbar');
+      // La lupa del zoom va arriba a la derecha, bajo el contador de cartas pendientes.
+      const deckCount = container.querySelector('.game-head .deck-count');
+      if (zoom && deckCount) {
+        let side = deckCount.parentElement;
+        if (!side.classList.contains('game-head-side')) {
+          side = document.createElement('div');
+          side.className = 'game-head-side';
+          deckCount.before(side);
+          side.append(deckCount);
+        }
+        side.append(zoom);
       }
+      else if (timelineHeading && zoom) timelineHeading.parentElement.insertBefore(zoom, timelineHeading);
       const hand = container.querySelector('.hand');
       if (hand) {
         hand.closest('section')?.classList.add('atlas-hand-section');

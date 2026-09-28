@@ -23,8 +23,8 @@
       <button hidden type="button" data-timeline-zoom="out" aria-label="Alejar para ver más cartas">−</button>
       <input hidden type="range" min="0" max="${levels.length - 1}" step="1" value="${level}" data-timeline-range aria-label="Zoom del tablero" aria-valuetext="${Math.round(levels[level]*100)} por ciento">
       <button hidden type="button" data-timeline-zoom="in" aria-label="Acercar las cartas">+</button>
-      <output class="solo-lectores" aria-live="polite">${Math.round(levels[level] * 100)}%</output>
-      ${levels.map((scale, index) => `<button type="button" data-zoom-level="${index}" aria-pressed="${index === level}" aria-label="Zoom ${Math.round(scale * 100)} por ciento">${Math.round(scale * 100)}%</button>`).join('')}
+      <button type="button" class="zoom-toggle" data-zoom-toggle aria-expanded="false" aria-haspopup="true" aria-label="Zoom de las cartas"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></svg><output aria-live="polite">${Math.round(levels[level] * 100)}%</output></button>
+      <div class="zoom-menu" hidden>${levels.map((scale, index) => `<button type="button" data-zoom-level="${index}" aria-pressed="${index === level}" aria-label="Zoom ${Math.round(scale * 100)} por ciento">${Math.round(scale * 100)}%</button>`).join('')}</div>
     </div>`;
   }
 
@@ -95,7 +95,21 @@
     if (level !== previousLevel) CT.Effects?.transition?.('zoom');
     if (anchor) wrap.scrollLeft += anchor.getBoundingClientRect().left - oldLeft;
   }
-  document.addEventListener('click', event => { if (event.target.closest('[data-timeline-zoom], [data-zoom-level]')) changeZoom(event); });
+  // La lupa abre y cierra el desplegable; elegir un nivel o tocar fuera lo cierra.
+  function setZoomMenu(controls, open) {
+    const toggle = controls?.querySelector('[data-zoom-toggle]'), menu = controls?.querySelector('.zoom-menu');
+    if (!toggle || !menu) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+  }
+  document.addEventListener('click', event => {
+    const toggle = event.target.closest('[data-zoom-toggle]');
+    document.querySelectorAll('.timeline-zoom').forEach(controls => {
+      if (!toggle || !controls.contains(toggle)) setZoomMenu(controls, false);
+    });
+    if (toggle) { const controls = toggle.closest('.timeline-zoom'); setZoomMenu(controls, toggle.getAttribute('aria-expanded') !== 'true'); return; }
+    if (event.target.closest('[data-timeline-zoom], [data-zoom-level]')) changeZoom(event);
+  });
   document.addEventListener('input', event => { if (event.target.matches('[data-timeline-range]')) changeZoom(event); });
 
   CT.timelineMap = timelineMap;
