@@ -20,6 +20,15 @@ async function search(p, kind = 'surprise', capacity = '0') {
   await p.page.waitForTimeout(800);
 }
 const seats = p => p.page.locator('.public-seat:not(.is-empty)').count();
+async function boardLayout(p) {
+  return p.page.evaluate(() => {
+    const app=document.getElementById('app'),hand=app.querySelector('.hand'),timeline=app.querySelector('.timeline-wrap');
+    return {screen:app.dataset.screen,fit:app.dataset.boardFit,zoom:app.querySelector('.timeline-zoom output')?.textContent?.trim(),
+      height:document.documentElement.scrollHeight,viewport:visualViewport?.height||innerHeight,
+      width:document.documentElement.scrollWidth,fan:hand?.classList.contains('hand-fan'),
+      order:hand&&timeline&&hand.getBoundingClientRect().top<timeline.getBoundingClientRect().top};
+  });
+}
 async function answer(p, value) {
   await p.page.locator('#starter-guess-input').waitFor({ timeout: 15000 });
   await p.page.fill('#starter-guess-input', String(value));
@@ -69,6 +78,10 @@ try {
   ok(`orden por cercanía y quien no respondió al final (${order.join(', ')})`, order.join(',') === 'Bruno,Ana,Carla');
   ok('empieza quien más se acercó', /Tu turno/.test(await b.page.locator('.turn-name').textContent()));
   await b.shot('e2e-03-partida');
+  const onlineBoard=await boardLayout(b);
+  ok(`la mesa online cabe al 100 % sin scroll (${onlineBoard.height}/${onlineBoard.viewport})`,
+    onlineBoard.screen==='online-game'&&onlineBoard.height<=onlineBoard.viewport+2&&onlineBoard.width<=390+2&&onlineBoard.zoom==='100%');
+  ok('la mano online conserva el abanico encima de la línea',onlineBoard.fan&&onlineBoard.order);
   for (const p of [a, b, c]) await p.ctx.close();
 
   console.log('\nQuien lleva la mesa se va: el relevo es automático');
@@ -139,6 +152,11 @@ try {
   await q2.page.waitForFunction(() => !document.querySelector('.public-lobby'), null, { timeout: 60000 }).catch(() => {});
   ok('y la partida de Retos rápidos empieza sola', !(await q2.page.locator('.public-lobby').count()) && /reto 1 de 3/i.test(flat(await q2.text())));
   await q2.shot('e2e-06-retos-partida');
+  if(await q2.screen()==='quick-game') {
+    const quickBoard=await boardLayout(q2);
+    ok(`la mesa del reto online cabe al 100 % (${quickBoard.height}/${quickBoard.viewport})`,
+      quickBoard.height<=quickBoard.viewport+2&&quickBoard.width<=390+2&&quickBoard.zoom==='100%'&&quickBoard.fan&&quickBoard.order);
+  }
 
   for (const p of [q1, q2, q3]) {
     const errors = p.log.filter(l => /pageerror|PERMISSION|permission-denied/i.test(l));
