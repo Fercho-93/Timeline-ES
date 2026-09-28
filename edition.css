@@ -4241,7 +4241,9 @@ html:not(:has(#app[data-screen="home"]))::before {
   }
   #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label > .hidden-date { grid-column: 1 / -1; margin: 0; }
   #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label .carta-reverso { grid-column: 1; grid-row: 2; min-height: 45px; margin: 0; }
-  #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label .reverso-emblema { width: 40px; height: 40px; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit] .board-focus-card .hand-card.is-wide-label .carta-reverso > .reverso-emblema {
+    left: 17%; top: 60%; width: 36px; height: auto; max-height: 42px;
+  }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .board-focus-card .hand-card.is-wide-label > strong {
     grid-column: 2; grid-row: 2; width: 100%; min-width: 0; margin: 0; padding: 3px;
     font-size: clamp(.62rem, 2.7vw, .76rem); line-height: 1.08; text-align: left;
@@ -4293,4 +4295,14 @@ html:not(:has(#app[data-screen="home"]))::before {
     font-size: .65rem; line-height: 1.08;
   }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline :is(.slot, .slot-confirm) { min-height: 120px; }
+  #app.atlas-board[data-board-fit="tight"] .quick-rule { margin: 0 0 2px; line-height: 1.1; }
+  #app.atlas-board[data-board-fit="tight"] .quick-bank {
+    display: flex; align-items: center; gap: 5px; min-height: 36px; margin: 0; padding: 0;
+  }
+  #app.atlas-board[data-board-fit="tight"] .quick-bank p {
+    flex: 1; min-width: 0; margin: 0; text-align: left; font-size: .64rem; line-height: 1.12;
+  }
+  #app.atlas-board[data-board-fit="tight"] .quick-bank .btn {
+    flex: 0 0 59%; width: 59%; min-height: 36px; padding: 4px; font-size: .67rem; line-height: 1.1;
+  }
 }

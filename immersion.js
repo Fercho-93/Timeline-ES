@@ -242,6 +242,8 @@
         if (emblem && label && emblem.getBoundingClientRect().bottom > label.getBoundingClientRect().top + 2)
           handCard.classList.add('is-wide-label');
       }
+      if (!fits() && container.dataset.boardFit === 'normal') container.dataset.boardFit = 'compact';
+      if (!fits() && container.dataset.boardFit === 'compact') container.dataset.boardFit = 'tight';
     });
   }
   window.addEventListener('resize', () => fitBoard(document.getElementById('app')), {passive: true});
