@@ -254,7 +254,7 @@
     saveHistory();
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
-    const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="game-head"><div><div class="turn-label">Reto ${state.index + 1} de ${state.config.rounds.length} · ${esc(c.title)}</div><div class="turn-name">${esc(p.name)}</div></div><div class="deck-count"><strong>${state.remaining.length}</strong><span>cartas</span></div></div>${scores()}<p class="quick-rule">${esc(c.rule)}</p>`;
+    const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="game-head"><div><div class="turn-label">Reto ${state.index + 1} de ${state.config.rounds.length} · ${esc(c.title)}</div>${state.players.length === 1 ? '' : `<div class="turn-name">${esc(p.name)}</div>`}</div><div class="deck-count"><strong>${state.remaining.length}</strong><span>cartas</span></div></div><div class="quick-meta"><p class="quick-rule">${esc(c.rule)}</p>${scores()}</div>`;
     if (state.phase === 'round-end') {
       const final = state.index + 1 === state.config.rounds.length;
       const best = Math.max(...state.players.map(player => player.score));

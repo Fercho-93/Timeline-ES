@@ -4521,3 +4521,22 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-screen="game"][data-board-fit="tight"] .scoreboard-panel .score > em strong { font-size: .85rem; }
   #app.atlas-board[data-screen="game"][data-board-fit="tight"] .scoreboard-panel:has(.score:nth-child(3)) .scoreboard-title { display: none; }
 }
+
+/* Retos rápidos: mesa que cabe entera sin desplazarse. Título del mazo en rojizo y más grande,
+   regla y marcador en una sola fila (el jugador a la derecha), mano grande y sin recortar,
+   y láminas de la línea enteras con su etiqueta debajo, como en las colecciones. */
+#app.atlas-board .quick-shell .game-head { align-items: start; }
+#app.atlas-board .quick-shell .game-head .turn-label { color: #8a3f2f; font: 700 .8rem/1.2 var(--font-display); letter-spacing: .03em; text-transform: uppercase; }
+#app.atlas-board[data-board-fit="tight"] .quick-shell .game-head .turn-label { font-size: .78rem; line-height: 1.15; }
+#app.atlas-board .quick-shell .quick-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px; margin: 4px 0 2px; }
+#app.atlas-board .quick-shell .quick-meta .quick-rule { flex: 1 1 0; min-width: 9ch; margin: 0; }
+#app.atlas-board .quick-shell .quick-meta .scoreboard { margin: 0 0 0 auto; justify-content: flex-end; }
+#app.atlas-board .quick-shell .quick-meta .scoreboard:only-child { flex: 1 1 100%; }
+#app.atlas-board[data-platform][data-device][data-screen] .quick-shell .atlas-hand-section .hand.hand-fan,
+#app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .quick-shell .atlas-hand-section .hand.hand-fan { height: clamp(100px, 15.5dvh, 140px); padding: 2px 0 12px; overflow: visible; }
+#app.atlas-board[data-platform][data-device][data-screen] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card,
+#app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card { width: min(24vw, 88px, calc((15.5dvh - 16px) * .75)); --fan-step: min(15vw, 56px); }
+#app.atlas-board[data-platform][data-device][data-screen] .quick-shell .hand.hand-fan .hand-card > strong { font-size: .74rem; }
+#app.atlas-board .quick-shell .timeline .timeline-card > .card-category { display: none; }
+#app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content h3 { font: 400 .82rem/1.15 var(--font-display); }
+#app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content .year { font: 700 .92rem/1.15 var(--font-display); color: #8a3f2f; }
