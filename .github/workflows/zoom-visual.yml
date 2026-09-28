@@ -32,6 +32,7 @@ jobs:
           ln -s "$RUNNER_TEMP/zoom-browser/node_modules" node_modules
       - run: npx playwright install --with-deps webkit chromium
       - run: node tests/board-fit-browser.mjs
+      - run: node tests/entry-board-browser.mjs
       - run: node tests/zoom-browser.mjs
       - run: node tests/transitions-browser.mjs
       - uses: actions/upload-artifact@v4
