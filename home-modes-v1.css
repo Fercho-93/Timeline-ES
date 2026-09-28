@@ -120,3 +120,12 @@
 
 .mode-inline-drawer { display: grid; gap: 12px; margin-top: 14px; }
 .mode-inline-drawer[hidden] { display: none; }
+
+/* Colecciones desplegadas dentro de «Jugar solo»: tarjetas más compactas. */
+#app .mode-inline-drawer .gallery { gap: 10px; }
+#app .mode-inline-drawer .gallery-panel,
+#app .mode-inline-drawer .gallery-panel.active { height: 116px; min-height: 116px; }
+#app .mode-inline-drawer .gallery-panel .panel-label strong { font-size: 1.25rem; }
+#app .mode-inline-drawer .gallery-panel .panel-label small { font-size: .68rem; }
+#app .mode-inline-drawer .gallery-panel .collection-index { top: 9px; left: 12px; min-height: 22px; padding: 2px 9px; font-size: .55rem; }
+#app .mode-inline-drawer .gallery-panel .collection-open { width: 28px; height: 28px; right: 12px; }
