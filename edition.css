@@ -4678,3 +4678,15 @@ html #app .home-nav.atlas-nav::after { content: none; }
 #app.atlas-board[data-platform][data-device][data-screen] .quick-shell .hand.hand-fan .hand-card > strong { font-size: .68rem; overflow-wrap: normal; word-break: normal; hyphens: auto; }
 #app.atlas-board .quick-shell .game-head { margin-top: 2px; padding-bottom: 4px; }
 #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-meta { margin: 2px 0 0; }
+
+
+/* Ficha activa elevada sobre la base: base más baja y pestaña activa levantada por encima de su borde superior. */
+html #app .home-nav.atlas-nav {
+  min-height: calc(78px + env(safe-area-inset-bottom));
+  padding: 3px 12px calc(5px + env(safe-area-inset-bottom));
+}
+html #app .home-nav.atlas-nav button { min-height: 66px; }
+html #app .home-nav.atlas-nav button[aria-current="page"] {
+  min-height: 72px;
+  transform: translateY(-13px) rotate(0deg);
+}
