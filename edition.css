@@ -4342,6 +4342,7 @@ html:not(:has(#app[data-screen="home"]))::before {
     width: 90px; min-height: 0; height: auto; aspect-ratio: 3 / 4; padding: 5px;
   }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card > strong { padding: 3px; font-size: .63rem; line-height: 1.07; }
+  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card.selected::before,
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hand-card.selected::after { display: none; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-hand .hint { margin: 2px 0; font-size: .62rem; line-height: 1.12; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-board { display: flex; flex: 1; flex-direction: column; min-height: 0; }

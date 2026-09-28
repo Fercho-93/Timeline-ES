@@ -36,9 +36,10 @@ try{
     await page.waitForTimeout(100);
     const result=await page.evaluate(()=>({screen:document.documentElement.scrollHeight,available:visualViewport?.height||innerHeight,
       order:document.querySelector('.turn-duel-hand').getBoundingClientRect().top<document.querySelector('.turn-duel-board').getBoundingClientRect().top,
-      horizontal:document.documentElement.scrollWidth>innerWidth+2}));
+      horizontal:document.documentElement.scrollWidth>innerWidth+2,
+      marker:getComputedStyle(document.querySelector('.turn-duel-hand .hand-card'),'::before').display}));
     console.log(name,width,result);
-    if(result.screen>result.available+2||!result.order||result.horizontal)errors.push(`${name} ${width}: ${JSON.stringify(result)}`);
+    if(result.screen>result.available+2||!result.order||result.horizontal||result.marker!=='none')errors.push(`${name} ${width}: ${JSON.stringify(result)}`);
     await page.screenshot({path:path.join(root,`test-results/zoom/turn-duel-${name}-${width}.png`)});
     await page.close();
    }
