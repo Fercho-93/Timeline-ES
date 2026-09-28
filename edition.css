@@ -4754,3 +4754,21 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
 #app #deck-collection .collection-decks .game-row .deck-preview > :is(img, svg) { position: absolute; inset: 0; height: 100%; }
 #app #deck-collection .collection-decks .lead + .games > .game-row:first-child::after { right: auto; bottom: auto; width: auto; height: auto; left: -50px; top: -28px; background: #8a3f2f; border-radius: 4px; }
 #app #deck-collection .collection-decks .games { overflow: visible; }
+
+/* Camino fino y elegante (sustituye a la senda gruesa): un hilo dorado punteado que
+   serpentea, pequeños hitos de latón con el número del mazo y una estrella discreta al final.
+   Cada mazo es una lámina a sangre con su ilustración de fondo y el texto sobre un velo. */
+#app #deck-collection .collection-decks .games { padding: 8px 0 30px 40px; gap: 12px; }
+#app #deck-collection .collection-decks .games::before { left: 4px; top: 6px; bottom: 22px; width: 24px; filter: none; background: url("assets/camino-senda.svg") center top / 24px 120px repeat-y; }
+#app #deck-collection .collection-decks .games::after { content: "✦"; left: 7px; bottom: 2px; width: 18px; height: 18px; font-size: .7rem; color: #a8824a; background: #f8efdd; border: 1px solid #c9a86a; box-shadow: none; animation: none; }
+#app #deck-collection .collection-decks .game-row::before { inset: 50% auto auto -38px; width: 22px; height: 22px; margin-top: -11px; color: #7a5a2c; font: 600 .66rem/1 var(--font-display); text-shadow: none; background: #fbf4e4; border: 1px solid #b08a52; box-shadow: 0 0 0 3px #f5ead3, 0 1px 3px #5a3f1f33; animation: none; }
+#app #deck-collection .collection-decks .game-row-cerrado::before { content: "🔒"; font-size: .55rem; background: #eee7da; border-color: #a39a8a; box-shadow: 0 0 0 3px #f5ead3; }
+#app #deck-collection .collection-decks .lead + .games > .game-row:first-child::after { content: none; }
+#app #deck-collection .collection-decks .game-row { min-height: 96px; padding: 14px 16px; border: 1px solid #6b5230; border-radius: 12px; background: #2b2118; box-shadow: 0 4px 12px #2a1c0f44; overflow: visible; }
+#app #deck-collection .collection-decks .game-row .deck-preview { inset: 0; width: auto; height: 100% !important; border-radius: 11px; filter: sepia(.35) saturate(.85) brightness(.9); -webkit-mask-image: none; mask-image: none; }
+#app #deck-collection .collection-decks .game-row .deck-preview::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #1d150ee6 0%, #1d150eb3 45%, #1d150e33 100%); }
+#app #deck-collection .collection-decks .game-row .deck-preview > :is(img, svg) { object-position: center 35%; }
+#app #deck-collection .collection-decks .game-row .deck-chapter { color: #e2c48c; }
+#app #deck-collection .collection-decks .game-row .game-name { color: #fbf1dc; max-width: 70%; }
+#app #deck-collection .collection-decks .game-row .game-meta { color: #eadcc0; max-width: 72%; }
+#app #deck-collection .collection-decks .game-row.game-row-cerrado .game-meta { color: #d9cdb6; }
