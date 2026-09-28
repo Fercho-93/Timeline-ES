@@ -4234,6 +4234,18 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .board-focus-card .hand-solo .hand-card > strong { font-size: .58rem; }
   #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .carta-reverso { min-height: 18px; }
   #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .reverso-emblema { width: 23px; height: 23px; }
+  #app.atlas-board[data-board-fit] .board-focus-card .hand-solo:has(.is-wide-label) { grid-template-columns: minmax(0, min(51vw, 164px)); }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .board-focus-card .hand-solo .hand-card.is-wide-label {
+    display: grid; grid-template-columns: 43px minmax(0,1fr); grid-template-rows: auto 1fr;
+    align-items: center; column-gap: 3px; width: 100%; aspect-ratio: 8 / 5; padding: 5px;
+  }
+  #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label > .hidden-date { grid-column: 1 / -1; margin: 0; }
+  #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label .carta-reverso { grid-column: 1; grid-row: 2; min-height: 45px; margin: 0; }
+  #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label .reverso-emblema { width: 40px; height: 40px; }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .board-focus-card .hand-card.is-wide-label > strong {
+    grid-column: 2; grid-row: 2; width: 100%; min-width: 0; margin: 0; padding: 3px;
+    font-size: clamp(.62rem, 2.7vw, .76rem); line-height: 1.08; text-align: left;
+  }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel { padding: 3px 5px; margin-bottom: 2px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel .scoreboard { max-height: var(--fit-score-height); }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-title { margin-bottom: 2px; }
@@ -4253,4 +4265,32 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .quick-rule { margin: 2px 0 4px; font-size: .76rem; line-height: 1.2; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .quick-bank { margin: 4px 0 2px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .quick-bank p { margin: 0 0 3px; font-size: .74rem; }
+  #app.atlas-board[data-board-fit] .quick-content { padding-bottom: 0; }
+  #app.atlas-board[data-board-fit="tight"] .scoreboard-title { display: none; }
+  #app.atlas-board[data-board-fit="tight"] .hand-fan-controls { margin-bottom: 0; }
+  #app.atlas-board[data-board-fit="tight"] .hand-fan-controls button { width: 32px; height: 32px; min-height: 32px; }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card { width: 94px; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
+    width: 70px; margin-inline: auto;
+  }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline-card:not(:has(.animal-card-art)) .card-visual { height: 68px; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) {
+    display: grid; grid-template-columns: 62px minmax(0,1fr); grid-template-rows: auto 1fr;
+    width: min(48vw,156px); min-height: 0; align-self: center;
+  }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card > .card-category {
+    grid-column: 1 / -1; grid-row: 1; margin: 3px 4px; padding: 2px 4px;
+    font-size: .52rem; line-height: 1.08;
+  }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
+    grid-column: 1; grid-row: 2; width: 62px; align-self: start; margin: 0;
+  }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-content {
+    grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-height: 0;
+    padding: 4px; overflow-wrap: anywhere;
+  }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(.animal-card-art) h3 {
+    font-size: .65rem; line-height: 1.08;
+  }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline :is(.slot, .slot-confirm) { min-height: 120px; }
 }
