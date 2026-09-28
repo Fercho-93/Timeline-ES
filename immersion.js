@@ -232,16 +232,6 @@
       container.dataset.boardFit = 'normal';
       if (!fits()) container.dataset.boardFit = 'compact';
       if (!fits()) container.dataset.boardFit = 'tight';
-      // En nombres largos el pie invade el emblema de la carta pequeña.
-      // La misma carta se abre en horizontal, con imagen y título lado a lado.
-      const handCard = shell.querySelector('.board-focus-card .hand-card');
-      if (handCard) {
-        handCard.classList.remove('is-wide-label');
-        const emblem = handCard.querySelector('.reverso-emblema');
-        const label = handCard.querySelector('strong');
-        if (emblem && label && emblem.getBoundingClientRect().bottom > label.getBoundingClientRect().top + 2)
-          handCard.classList.add('is-wide-label');
-      }
       if (!fits() && container.dataset.boardFit === 'normal') container.dataset.boardFit = 'compact';
       if (!fits() && container.dataset.boardFit === 'compact') container.dataset.boardFit = 'tight';
     });

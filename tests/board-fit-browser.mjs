@@ -27,7 +27,7 @@ try {
   for(const [engine,type] of [['webkit',webkit],['chromium',chromium]]) {
     if(process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE!==engine)continue;
     browser=await type.launch();
-    for(const {width,height} of [{width:320,height:568},{width:375,height:667},{width:390,height:844},{width:430,height:932},{width:600,height:800}]) {
+    for(const {width,height} of [{width:320,height:568},{width:375,height:667},{width:390,height:640},{width:390,height:844},{width:430,height:932},{width:600,height:800}]) {
       for(const format of ['solo','local','competition','quick']) {
         const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
         page.setDefaultTimeout(12000);
@@ -70,27 +70,30 @@ try {
           await page.waitForTimeout(180);
           const data=await page.evaluate(()=>{
             const app=document.getElementById('app'),shell=app.querySelector(':scope > .shell');
-            const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height)}};
+            const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height),width:Math.round(r.width)}};
             const hand=app.querySelector('.hand'),timeline=app.querySelector('.timeline-wrap');
             const handCard=hand?.querySelector('.hand-card'),label=handCard?.querySelector('strong'),emblem=handCard?.querySelector('.reverso-emblema');
+            const placed=timeline?.querySelector('.timeline-card'),heading=timeline?.closest('section')?.querySelector('.timeline-toolbar');
             return {screen:app.dataset.screen,fit:app.dataset.boardFit||'',viewport:Math.round(visualViewport?.height||innerHeight),
               shellHeight:Math.round(shell?.scrollHeight||0),documentHeight:document.documentElement.scrollHeight,
-              hand:box(hand),timeline:box(timeline),zoom:app.querySelector('.timeline-zoom output')?.textContent?.trim(),
+              hand:box(hand),handCard:box(handCard),timeline:box(timeline),placed:box(placed),headingGap:heading&&placed?box(placed).top-box(heading).bottom:null,zoom:app.querySelector('.timeline-zoom output')?.textContent?.trim(),
               cards:hand?.querySelectorAll('.hand-card').length||0,fan:!!hand?.classList.contains('hand-fan'),
               order:hand&&timeline?box(hand).top<box(timeline).top:null,
               labelFits:label?label.scrollHeight<=label.clientHeight+1:null,
-              emblemVisible:emblem&&hand?.classList.contains('hand-solo')?handCard.classList.contains('is-wide-label')||(() => {
+              emblemVisible:emblem&&hand?.classList.contains('hand-solo')?(() => {
                 const a=emblem.getBoundingClientRect(),b=label.getBoundingClientRect();
-                return a.bottom<=b.top+2 || a.right<=b.left+2;
+                return a.bottom<=b.top+2;
               })():null,
               horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2};
           });
           records.push({engine,width,height,format,...data,errors});
           if(data.screen!==(format==='quick'?'quick-game':format==='local'?'game':'solo') ||
             data.documentHeight>data.viewport+2 || data.horizontalOverflow || data.zoom!=='100%' ||
-            !data.order || (data.cards>1&&!data.fan) || data.labelFits===false || data.emblemVisible===false)
+            !data.order || (data.cards>1&&!data.fan) || data.labelFits===false || data.emblemVisible===false ||
+            (data.cards===1&&data.handCard?.height<data.handCard?.width*1.25) ||
+            (data.placed&&data.placed.height<data.placed.width*1.2) || data.headingGap>45)
             errors.push('La mesa no cumple las medidas o el orden de juego');
-          if(width===320||width===390)await page.screenshot({path:path.join(destination,`board-${engine}-${format}-${width}.png`)});
+          if(width===320||width===390)await page.screenshot({path:path.join(destination,`board-${engine}-${format}-${width}x${height}.png`)});
         }catch(error){records.push({engine,width,height,format,error:String(error),errors});}
         finally{await fs.writeFile(path.join(destination,'board-fit.json'),JSON.stringify(records,null,2));await page.close();}
       }

@@ -4193,6 +4193,12 @@ html:not(:has(#app[data-screen="home"]))::before {
 
 /* La mesa se adapta al alto útil al 100 %, sin ocultar cartas ni recortar sus datos. */
 @media (max-width: 699px) {
+  #app.atlas-board .board-timeline-section .timeline-wrap {
+    flex: 0 0 auto; align-items: flex-start; padding-top: 7px;
+  }
+  #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card .carta-reverso > .reverso-emblema {
+    top: 35%; max-height: 34%;
+  }
   #app.atlas-board[data-board-fit="compact"] {
     --fit-hand-height: 132px; --fit-hand-width: min(24vw, 88px);
     --fit-focus-width: min(27vw, 105px); --fit-timeline-width: 101px;
@@ -4234,25 +4240,19 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .board-focus-card .hand-solo .hand-card > strong { font-size: .58rem; }
   #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .carta-reverso { min-height: 18px; }
   #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .reverso-emblema { width: 23px; height: 23px; }
-  #app.atlas-board[data-board-fit] .board-focus-card .hand-solo:has(.is-wide-label) { grid-template-columns: minmax(0, min(51vw, 164px)); }
-  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .board-focus-card .hand-solo .hand-card.is-wide-label {
-    display: grid; grid-template-columns: 43px minmax(0,1fr); grid-template-rows: auto 1fr;
-    align-items: center; column-gap: 3px; width: 100%; aspect-ratio: 8 / 5; padding: 5px;
-  }
-  #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label > .hidden-date { grid-column: 1 / -1; margin: 0; }
-  #app.atlas-board[data-board-fit] .board-focus-card .hand-card.is-wide-label .carta-reverso { grid-column: 1; grid-row: 2; min-height: 45px; margin: 0; }
-  #app.atlas-board[data-platform][data-screen][data-board-fit] .board-focus-card .hand-card.is-wide-label .carta-reverso > .reverso-emblema {
-    left: 17%; top: 60%; width: 36px; height: auto; max-height: 42px;
-  }
-  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .board-focus-card .hand-card.is-wide-label > strong {
-    grid-column: 2; grid-row: 2; width: 100%; min-width: 0; margin: 0; padding: 3px;
-    font-size: clamp(.62rem, 2.7vw, .76rem); line-height: 1.08; text-align: left;
+  /* El pie puede crecer en vertical sin convertir el reverso en una ficha. */
+  #app.atlas-board[data-board-fit] .board-focus-card .hand-solo .hand-card { aspect-ratio: 3 / 4; }
+  #app.atlas-board[data-board-fit] .board-focus-card .hand-solo .hidden-date { margin-bottom: 0; }
+  #app.atlas-board[data-platform][data-screen][data-board-fit] .board-focus-card .hand-solo .hand-card .carta-reverso > .reverso-emblema {
+    top: 36%; max-height: 33%; transform: translate(-50%, -50%);
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel { padding: 3px 5px; margin-bottom: 2px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel .scoreboard { max-height: var(--fit-score-height); }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-title { margin-bottom: 2px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section { padding: var(--fit-section-pad); margin-top: 1px; flex: 1 1 auto; min-height: 0; }
-  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-wrap { flex: 1 1 auto; min-height: 0; padding-block: 3px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline-wrap {
+    flex: 0 0 auto; align-items: flex-start; min-height: 0; padding-block: 6px 3px;
+  }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section > .timeline-zoom { margin: 0 auto 3px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section > .timeline-zoom [data-zoom-level] { min-height: 32px; height: 32px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-timeline-section .timeline .timeline-card { width: var(--fit-timeline-width); min-height: 0; }
@@ -4271,31 +4271,12 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit="tight"] .scoreboard-title { display: none; }
   #app.atlas-board[data-board-fit="tight"] .hand-fan-controls { margin-bottom: 0; }
   #app.atlas-board[data-board-fit="tight"] .hand-fan-controls button { width: 32px; height: 32px; min-height: 32px; }
-  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card { width: 94px; }
-  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
-    width: 70px; margin-inline: auto;
-  }
-  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline-card:not(:has(.animal-card-art)) .card-visual { height: 68px; }
-  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) {
-    display: grid; grid-template-columns: 62px minmax(0,1fr); grid-template-rows: auto 1fr;
-    width: min(48vw,156px); min-height: 0; align-self: center;
-  }
-  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card > .card-category {
-    grid-column: 1 / -1; grid-row: 1; margin: 3px 4px; padding: 2px 4px;
-    font-size: .52rem; line-height: 1.08;
-  }
-  #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card > .card-category { display: none; }
-  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-visual {
-    grid-column: 1; grid-row: 2; width: 62px; align-self: start; margin: 0;
-  }
-  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(> .card-visual > .animal-card-art) > .card-content {
-    grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-height: 0;
-    padding: 4px; overflow-wrap: anywhere;
-  }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card { width: 96px; }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline-card:not(:has(.animal-card-art)) .card-visual { height: 82px; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card:has(.animal-card-art) h3 {
-    font-size: .65rem; line-height: 1.08;
+    font-size: .67rem; line-height: 1.1;
   }
-  #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .year { font-size: .68rem; line-height: 1.1; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .year { font-size: .76rem; line-height: 1.1; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline :is(.slot, .slot-confirm) { min-height: 120px; }
   #app.atlas-board[data-board-fit="tight"] .quick-rule { margin: 0 0 2px; line-height: 1.1; }
   #app.atlas-board[data-board-fit="tight"] .quick-bank {
