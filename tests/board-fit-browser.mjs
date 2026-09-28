@@ -75,9 +75,11 @@ try {
             const handCard=hand?.querySelector('.hand-card'),label=handCard?.querySelector('strong'),emblem=handCard?.querySelector('.reverso-emblema');
             const focusTitle=app.querySelector('.board-focus-card > .hand-title h3');
             const placed=timeline?.querySelector('.timeline-card'),heading=timeline?.closest('section')?.querySelector('.timeline-toolbar');
+            const roster=app.querySelector('.scoreboard-panel .scoreboard');
             return {screen:app.dataset.screen,fit:app.dataset.boardFit||'',viewport:Math.round(visualViewport?.height||innerHeight),
               shellHeight:Math.round(shell?.scrollHeight||0),documentHeight:document.documentElement.scrollHeight,
               hand:box(hand),handCard:box(handCard),focusTitle:box(focusTitle),timeline:box(timeline),placed:box(placed),headingGap:heading&&placed?box(placed).top-box(heading).bottom:null,zoom:app.querySelector('.timeline-zoom output')?.textContent?.trim(),
+              roster:box(roster),players:[...roster?.querySelectorAll('.score')||[]].map(box),rosterOverflowsY:roster?roster.scrollHeight>roster.clientHeight+2:false,
               cards:hand?.querySelectorAll('.hand-card').length||0,fan:!!hand?.classList.contains('hand-fan'),
               order:hand&&timeline?box(hand).top<box(timeline).top:null,
               labelFits:label?label.scrollHeight<=label.clientHeight+1:null,
@@ -96,6 +98,7 @@ try {
             (data.placed&&data.placed.height<data.placed.width*1.2) || data.headingGap>45 ||
             (width===390&&format==='solo'&&data.placed?.width<120) ||
             (width===390&&format==='solo'&&data.focusTitle?.right>data.handCard?.left+2) ||
+            (format==='local'&&(data.players.length!==2||data.rosterOverflowsY||data.players.some(p=>p.left<data.roster.left-2||p.right>data.roster.right+2||p.top<data.roster.top-2||p.bottom>data.roster.bottom+2))) ||
             (data.placed&&data.placed.bottom>data.viewport+2))
             errors.push('La mesa no cumple las medidas o el orden de juego');
           if(width===320||width===390)await page.screenshot({path:path.join(destination,`board-${engine}-${format}-${width}x${height}.png`)});

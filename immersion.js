@@ -352,6 +352,13 @@
     }
     refreshDepth();
     fitBoard(container);
+    if (screen === 'game' && window.innerWidth <= 699) requestAnimationFrame(() => {
+      const roster = container.querySelector('.scoreboard-panel .scoreboard');
+      const active = roster?.querySelector('.score.active');
+      if (!roster?.isConnected || !active || roster.scrollWidth <= roster.clientWidth) return;
+      // Mantén a quien juega junto al participante anterior al pasar el móvil.
+      roster.scrollLeft = Math.max(0, active.offsetLeft - roster.children[1].offsetLeft);
+    });
   }
   const surfaceNav = new Map();
   function openSurface(modal) {

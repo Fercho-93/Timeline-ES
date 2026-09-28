@@ -4458,3 +4458,48 @@ html:not(:has(#app[data-screen="home"]))::before {
     padding-left: max(12px, calc(50% - 135px));
   }
 }
+
+/* El marcador local compacto conserva su altura y enseña dos jugadores completos. */
+@media (max-width: 699px) {
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+  }
+  #app.atlas-board[data-screen="game"][data-board-fit="compact"] .scoreboard-panel { height: 82px; }
+  #app.atlas-board[data-screen="game"][data-board-fit="tight"] .scoreboard-panel { height: 60px; }
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel .scoreboard {
+    display: grid;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(50% - 2.5px);
+    align-items: center;
+    gap: 5px;
+    min-height: 42px;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  #app.atlas-board[data-screen="game"] .scoreboard-panel .scoreboard::-webkit-scrollbar { display: none; }
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel .score {
+    grid-template-columns: 28px minmax(0, 1fr) 26px;
+    gap: 4px;
+    min-height: 40px;
+    padding: 3px 4px;
+    scroll-snap-align: start;
+  }
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel .score > .score-avatar,
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel .score > .score-avatar .avatar { width: 28px !important; height: 28px !important; }
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel .score-copy { gap: 3px; }
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel .score-copy > b { font-size: .67rem; }
+  #app.atlas-board[data-screen="game"]:is([data-board-fit="compact"], [data-board-fit="tight"]) .scoreboard-panel .score > em strong { font-size: 1rem; }
+  #app.atlas-board[data-screen="game"][data-board-fit="tight"] .scoreboard-panel:has(.score:nth-child(3)) .scoreboard-title {
+    display: block;
+    margin: 0 0 1px;
+    font-size: .5rem;
+  }
+}
