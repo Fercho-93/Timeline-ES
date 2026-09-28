@@ -33,6 +33,7 @@ jobs:
       - run: npx playwright install --with-deps webkit chromium
       - run: node tests/board-fit-browser.mjs
       - run: node tests/entry-board-browser.mjs
+      - run: node tests/turn-duel-layout-browser.mjs
       - run: node tests/zoom-browser.mjs
       - run: node tests/transitions-browser.mjs
       - uses: actions/upload-artifact@v4
