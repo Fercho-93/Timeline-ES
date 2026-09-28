@@ -4226,6 +4226,14 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .hand-fan-controls button { width: 38px; height: 38px; min-height: 38px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo { grid-template-columns: minmax(0, var(--fit-focus-width)); }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .hand-card { min-height: 0 !important; }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .hand-card > strong {
+    font-size: .65rem; line-height: 1.06; padding: 2px; margin-top: 2px;
+  }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .carta-reverso { min-height: 22px; margin: 0; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .reverso-emblema { width: 29px; height: 29px; }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .board-focus-card .hand-solo .hand-card > strong { font-size: .58rem; }
+  #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .carta-reverso { min-height: 18px; }
+  #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .reverso-emblema { width: 23px; height: 23px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel { padding: 3px 5px; margin-bottom: 2px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel .scoreboard { max-height: var(--fit-score-height); }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-title { margin-bottom: 2px; }

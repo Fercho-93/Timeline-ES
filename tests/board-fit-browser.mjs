@@ -40,7 +40,7 @@ try {
             await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
             await page.locator('[data-action="quick-challenges"]').click();
             await page.locator('[data-quick="free"]').click();
-            await page.locator('[data-quick="start"]').click();
+            await page.locator('[data-quick="start-free"]').click();
             await page.locator('[data-quick="ready"]').click();
           } else if(format==='competition') {
             await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
@@ -56,6 +56,7 @@ try {
               await page.locator('[data-action="solo"]').click();
               await page.locator('[data-action="start-free"]').click();
             } else {
+              await page.locator('[data-action="toggle-format-block"][data-format="multi"]').click();
               await page.locator('[data-action="setup"]').click();
               await page.locator('[data-action="start"]').click();
               for(const guess of ['1000','2000']) {
@@ -71,14 +72,21 @@ try {
             const app=document.getElementById('app'),shell=app.querySelector(':scope > .shell');
             const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height)}};
             const hand=app.querySelector('.hand'),timeline=app.querySelector('.timeline-wrap');
+            const handCard=hand?.querySelector('.hand-card'),label=handCard?.querySelector('strong'),emblem=handCard?.querySelector('.reverso-emblema');
             return {screen:app.dataset.screen,fit:app.dataset.boardFit||'',viewport:Math.round(visualViewport?.height||innerHeight),
               shellHeight:Math.round(shell?.scrollHeight||0),documentHeight:document.documentElement.scrollHeight,
               hand:box(hand),timeline:box(timeline),zoom:app.querySelector('.timeline-zoom output')?.textContent?.trim(),
               cards:hand?.querySelectorAll('.hand-card').length||0,fan:!!hand?.classList.contains('hand-fan'),
               order:hand&&timeline?box(hand).top<box(timeline).top:null,
+              labelFits:label?label.scrollHeight<=label.clientHeight+1:null,
+              emblemVisible:emblem&&hand?.classList.contains('hand-solo')?box(emblem).bottom<=box(label).top+2:null,
               horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2};
           });
           records.push({engine,width,height,format,...data,errors});
+          if(data.screen!==(format==='quick'?'quick-game':format==='local'?'game':'solo') ||
+            data.documentHeight>data.viewport+2 || data.horizontalOverflow || data.zoom!=='100%' ||
+            !data.order || (data.cards>1&&!data.fan) || data.labelFits===false || data.emblemVisible===false)
+            errors.push('La mesa no cumple las medidas o el orden de juego');
           if(width===320||width===390)await page.screenshot({path:path.join(destination,`board-${engine}-${format}-${width}.png`)});
         }catch(error){records.push({engine,width,height,format,error:String(error),errors});}
         finally{await fs.writeFile(path.join(destination,'board-fit.json'),JSON.stringify(records,null,2));await page.close();}
