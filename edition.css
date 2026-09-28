@@ -4646,3 +4646,26 @@ html #app .home-nav.atlas-nav button[aria-current="page"] small {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+/* Base opaca a ras del borde: las fichas siguen siendo el foco, pero el contenido
+   de la página queda cubierto entre ellas y bajo la zona de navegación. */
+html #app .home-nav.atlas-nav {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: none;
+  min-height: calc(88px + env(safe-area-inset-bottom));
+  padding: 5px 12px calc(7px + env(safe-area-inset-bottom));
+  border: 0;
+  border-top: 1px solid #c9b99e;
+  border-radius: 13px 13px 0 0;
+  background: #eee5d5;
+  box-shadow: 0 -4px 13px rgba(54,41,26,.12);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transform: none;
+  overflow: visible;
+}
+html #app .home-nav.atlas-nav::before,
+html #app .home-nav.atlas-nav::after { content: none; }
