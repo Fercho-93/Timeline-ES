@@ -4680,9 +4680,10 @@ html #app .home-nav.atlas-nav::after { content: none; }
 #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-meta { margin: 2px 0 0; }
 
 
-/* Base aún más compacta; la ficha activa mantiene su salida por el borde superior. */
+/* La zona segura se reserva solo en el relleno inferior; no se duplica en la altura
+   de la base, que en iPhone la empujaba demasiado hacia arriba. */
 html #app .home-nav.atlas-nav {
-  min-height: calc(70px + env(safe-area-inset-bottom));
+  min-height: 70px;
   padding: 0 12px calc(1px + env(safe-area-inset-bottom));
 }
 html #app .home-nav.atlas-nav button { min-height: 63px; }
