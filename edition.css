@@ -4250,7 +4250,7 @@ html:not(:has(#app[data-screen="home"]))::before {
     top: 30%; width: 48px; height: 48px; max-height: 28%; transform: translate(-50%, -50%);
   }
   #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-focus-card .hand-solo .hand-card .carta-reverso > .reverso-emblema {
-    width: 36px; height: 36px;
+    top: 20%; width: 30px; height: 30px; max-height: 20%;
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel { padding: 3px 5px; margin-bottom: 2px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel .scoreboard { max-height: var(--fit-score-height); }
