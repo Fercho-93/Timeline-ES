@@ -4680,11 +4680,19 @@ html #app .home-nav.atlas-nav::after { content: none; }
 #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-meta { margin: 2px 0 0; }
 
 
-/* La zona segura se reserva solo en el relleno inferior; no se duplica en la altura
-   de la base, que en iPhone la empujaba demasiado hacia arriba. */
+/* El panel termina en el borde inferior de las fichas normales. El vidrio deja
+   pasar apenas el papel y difumina el contenido para conservar una base serena. */
 html #app .home-nav.atlas-nav {
+  bottom: env(safe-area-inset-bottom);
   min-height: 70px;
-  padding: 0 12px calc(1px + env(safe-area-inset-bottom));
+  padding: 0 12px;
+  border: 1px solid #c9b99e;
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  background: color-mix(in srgb, #eee5d5 91%, transparent);
+  box-shadow: 0 -4px 14px rgba(54,41,26,.10);
+  -webkit-backdrop-filter: blur(8px) saturate(1.08);
+  backdrop-filter: blur(8px) saturate(1.08);
 }
 html #app .home-nav.atlas-nav button { min-height: 63px; }
 html #app .home-nav.atlas-nav button[aria-current="page"] {
