@@ -4680,14 +4680,14 @@ html #app .home-nav.atlas-nav::after { content: none; }
 #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-meta { margin: 2px 0 0; }
 
 
-/* Ficha activa elevada sobre la base: base más baja y pestaña activa levantada por encima de su borde superior. */
+/* Base aún más compacta; la ficha activa mantiene su salida por el borde superior. */
 html #app .home-nav.atlas-nav {
-  min-height: calc(74px + env(safe-area-inset-bottom));
-  padding: 1px 12px calc(2px + env(safe-area-inset-bottom));
+  min-height: calc(70px + env(safe-area-inset-bottom));
+  padding: 0 12px calc(1px + env(safe-area-inset-bottom));
 }
-html #app .home-nav.atlas-nav button { min-height: 66px; }
+html #app .home-nav.atlas-nav button { min-height: 63px; }
 html #app .home-nav.atlas-nav button[aria-current="page"] {
-  min-height: 72px;
+  min-height: 69px;
   transform: translateY(-13px) rotate(0deg);
 }
 
