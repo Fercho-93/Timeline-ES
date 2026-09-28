@@ -4540,3 +4540,8 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .quick-shell .timeline .timeline-card > .card-category { display: none; }
 #app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content h3 { font: 400 .82rem/1.15 var(--font-display); }
 #app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content .year { font: 700 .92rem/1.15 var(--font-display); color: #8a3f2f; }
+
+/* Retos rápidos: título del mazo pegado a la línea divisoria y extremos de la línea de cartas. */
+#app.atlas-board .quick-shell .game-head { align-items: end; margin-top: 6px; padding-bottom: 6px; }
+#app.atlas-board .quick-shell .game-head .turn-label { margin: 0; }
+#app.atlas-board .quick-shell .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 2px; color: #8a3f2f; font: 700 .68rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }

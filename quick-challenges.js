@@ -246,6 +246,30 @@
     if (mine) return CT.Avatares.markup(p.name, {size:28, seed:CT.Avatares.ownSeed(), id:CT.Avatares.ownId()});
     return CT.Avatares.markup(p.name, room?.members?.[i] ? {size:28, seed:'room:'+room.members[i]} : {size:28});
   }
+  // Qué significa cada extremo de la línea, según la naturaleza de cada mazo.
+  const ENDS = {
+    'sports-players': ['Menos jugadores', 'Más jugadores'], drinks: ['Menos alcohol', 'Más alcohol'],
+    festivities: ['Primera fecha', 'Última fecha'], social: ['Más antigua', 'Más reciente'],
+    wwii: ['Más antiguo', 'Más reciente'], 'civil-war': ['Más antiguo', 'Más reciente'],
+    kings: ['Reinado más antiguo', 'Reinado más reciente'], consoles: ['Más antigua', 'Más reciente'],
+    oscars: ['Más premios', 'Menos premios'], 'companies-founded': ['Más antigua', 'Más reciente'],
+    'timezones-june': ['Más por detrás', 'Más por delante'], 'cities-east-west': ['Oeste', 'Este'],
+    'cities-north-south': ['Norte', 'Sur'], body: ['Arriba', 'Abajo'],
+    'series-seasons': ['Menos temporadas', 'Más temporadas'], buildings: ['Más bajo', 'Más alto'],
+    'rivers-spain': ['Más corto', 'Más largo'], 'foods-kcal': ['Menos kcal', 'Más kcal'],
+    'albums-sales': ['Menos ventas', 'Más ventas'], stadiums: ['Menor aforo', 'Mayor aforo'],
+    'capitals-altitude': ['Menor altitud', 'Mayor altitud'], 'eurovision-wins': ['Menos victorias', 'Más victorias'],
+    storage: ['Menor capacidad', 'Mayor capacidad'], airports: ['Menos pasajeros', 'Más pasajeros'],
+    metros: ['Red más corta', 'Red más larga'], 'companies-revenue': ['Menos facturación', 'Más facturación'],
+    'spanish-tv': ['Menos años', 'Más años'], 'minimum-wages': ['Menor salario', 'Mayor salario'],
+    poker: ['Más débil', 'Más fuerte']
+  };
+  function timelineEnds(c) {
+    const m = /^De (.+?) a (.+)$/.exec(c.rule || '');
+    const [left, right] = ENDS[c.id] || (m ? [m[1], m[2]] : ['Primero', 'Último']);
+    const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+    return `<div class="timeline-ends" aria-hidden="true"><span>← ${esc(cap(left))}</span><span>${esc(cap(right))} →</span></div>`;
+  }
   function cardMarkup(c, item) {
     return `<article class="timeline-card card-flippable animal-timeline-card" data-id="${item.id}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(item.title)}. Toca para ver la explicación."><div class="card-category">${esc(c.title)}</div><div class="card-visual"><img class="animal-card-art" src="${esc(item.image || 'assets/hero-quick-400.webp')}" alt="" width="400" height="600"></div><div class="card-content"><h3>${esc(item.title)}</h3><p>${esc(item.detail)}</p><div class="year">${esc(item.label)}</div></div></article>`;
   }
@@ -254,7 +278,7 @@
     saveHistory();
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
-    const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="game-head"><div><div class="turn-label">Reto ${state.index + 1} de ${state.config.rounds.length} · ${esc(c.title)}</div>${state.players.length === 1 ? '' : `<div class="turn-name">${esc(p.name)}</div>`}</div><div class="deck-count"><strong>${state.remaining.length}</strong><span>cartas</span></div></div><div class="quick-meta"><p class="quick-rule">${esc(c.rule)}</p>${scores()}</div>`;
+    const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="game-head"><div><div class="turn-label">${state.config.rounds.length === 1 ? '' : `Reto ${state.index + 1} de ${state.config.rounds.length} · `}${esc(c.title)}</div>${state.players.length === 1 ? '' : `<div class="turn-name">${esc(p.name)}</div>`}</div><div class="deck-count"><strong>${state.remaining.length}</strong><span>cartas</span></div></div><div class="quick-meta"><p class="quick-rule">${esc(c.rule)}</p>${scores()}</div>`;
     if (state.phase === 'round-end') {
       const final = state.index + 1 === state.config.rounds.length;
       const best = Math.max(...state.players.map(player => player.score));
@@ -282,7 +306,7 @@
     const gap = i => slot === i && selected ? `<div class="slot-confirm quick-confirm" data-index="${i}"><small>Colocar aquí</small><strong>${esc(get(selected).title)}</strong>${button('confirm', 'Sí, aquí', 'btn btn-primary btn-block')}${button('cancel', 'Cancelar', 'btn btn-ghost btn-block')}</div>` : `<button class="slot" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}"><span>+</span></button>`;
     shell(`${heading}<section><div class="hand-title"><h3>Cartas comunes</h3><small>${state.remaining.length} por colocar</small></div><div class="hand">${state.remaining.map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
       <p class="hint">${selected ? 'Toca un hueco y confirma, o arrastra la carta hasta su lugar.' : 'Toca una carta o mantenla pulsada para arrastrarla hasta un hueco.'}</p></section>
-      <section class="board-timeline-section"><div class="hand-title"><h3>Línea de cartas</h3><small>${state.timeline.length} colocadas</small></div>${CT.timelineMap(null, state.timeline)}
+      <section class="board-timeline-section"><div class="hand-title"><h3>Línea de cartas</h3><small>${state.timeline.length} colocadas</small></div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
       <div class="timeline-wrap"><div class="timeline" aria-label="Línea de cartas: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>
       <div class="quick-bank"><p>${p.points} puntos en juego · ${p.score} asegurados</p>${button('bank', p.points ? `Plantarse y asegurar ${p.points} puntos` : 'Pasar este reto', 'btn btn-secondary btn-block')}</div>`);
     CT.enableDrag({cardSelector: '.quick-shell .hand-card', slotSelector: '.quick-shell .slot', parseCardId: id => id, onDrop(id, index) {
