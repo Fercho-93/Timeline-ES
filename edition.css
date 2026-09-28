@@ -4708,3 +4708,48 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
 #app #deck-collection .collection-decks .game-row .deck-chapter i { display: none; }
 #app #deck-collection .collection-decks .game-row .game-name { padding: 0; border: 0; font-size: 1.12rem; line-height: 1.15; }
 #app #deck-collection .collection-decks .game-row .game-meta { margin-top: 5px; font: .72rem/1.35 var(--ui-font); }
+
+/* El camino de los mazos, como el mapa de niveles de un videojuego: una senda de tierra
+   que serpentea, un medallón numerado por mazo, bandera de salida y estrella de meta. */
+#app #deck-collection .collection-decks .games { counter-reset: nivel; padding: 34px 0 44px 52px; gap: 16px; }
+#app #deck-collection .collection-decks .games::before {
+  left: 3px; top: 14px; bottom: 16px; width: 44px; border-radius: 0; opacity: 1;
+  background: url("assets/camino-senda.svg") center top / 44px 120px repeat-y;
+}
+#app #deck-collection .collection-decks .games::after {
+  content: "★"; position: absolute; left: 6px; bottom: 0; width: 38px; height: 38px;
+  display: grid; place-items: center; border-radius: 50%; color: #fff4d6; font-size: 1.15rem;
+  background: radial-gradient(circle at 35% 30%, #f3d48a, #b8862f 60%, #7c5418);
+  border: 2px solid #fff3d2; box-shadow: 0 0 0 2px #8a6326, 0 4px 10px #5a3a1466, 0 0 14px #e6b85a88;
+}
+#app #deck-collection .collection-decks .game-row { counter-increment: nivel; }
+#app #deck-collection .collection-decks .game-row::before {
+  content: counter(nivel); inset: 50% auto auto -47px; width: 34px; height: 34px; margin-top: -17px;
+  display: grid; place-items: center; color: #fff6e0; font: 800 .95rem/1 var(--font-display);
+  text-shadow: 0 1px 0 #5a2a1c;
+  background: radial-gradient(circle at 35% 28%, #d98a68, #9b4430 58%, #6c2a1d);
+  border: 2px solid #fff1d6; box-shadow: 0 0 0 2px #7a3526, 0 5px 0 #4f1e14, 0 7px 10px #3a1a0f55;
+}
+#app #deck-collection .collection-decks .game-row-cerrado::before {
+  content: "🔒"; font-size: .8rem; background: radial-gradient(circle at 35% 28%, #cfc3ad, #8d8170 60%, #5f564a);
+  box-shadow: 0 0 0 2px #5f564a, 0 5px 0 #3e382f, 0 7px 10px #2a262055;
+}
+#app #deck-collection .collection-decks .lead { position: relative; }
+#app #deck-collection .collection-decks .lead + .games > .game-row:first-child::after {
+  content: "⚑ SALIDA"; position: absolute; left: -58px; top: -30px; z-index: 2; padding: 2px 6px;
+  border-radius: 4px; background: #8a3f2f; color: #fff4e0; font: 700 .52rem/1.4 var(--ui-font); letter-spacing: .1em;
+  box-shadow: 0 2px 4px #0003; white-space: nowrap;
+}
+@media (prefers-reduced-motion: no-preference) {
+  #app #deck-collection .collection-decks .game-row::before { animation: nivel-pop 520ms cubic-bezier(.2,1.4,.4,1) both; }
+  #app #deck-collection .collection-decks .game-row:nth-child(2)::before { animation-delay: 120ms; }
+  #app #deck-collection .collection-decks .game-row:nth-child(3)::before { animation-delay: 240ms; }
+  #app #deck-collection .collection-decks .game-row:nth-child(4)::before { animation-delay: 360ms; }
+  #app #deck-collection .collection-decks .games::after { animation: meta-brillo 2.4s ease-in-out infinite; }
+}
+@keyframes nivel-pop { from { transform: scale(.3); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes meta-brillo { 50% { box-shadow: 0 0 0 2px #8a6326, 0 4px 10px #5a3a1466, 0 0 22px #f0c86acc; } }
+#app #deck-collection .collection-decks .game-row .deck-preview { top: 0; bottom: 0; height: 100% !important; max-height: 100%; }
+#app #deck-collection .collection-decks .game-row .deck-preview > :is(img, svg) { position: absolute; inset: 0; height: 100%; }
+#app #deck-collection .collection-decks .lead + .games > .game-row:first-child::after { right: auto; bottom: auto; width: auto; height: auto; left: -50px; top: -28px; background: #8a3f2f; border-radius: 4px; }
+#app #deck-collection .collection-decks .games { overflow: visible; }
