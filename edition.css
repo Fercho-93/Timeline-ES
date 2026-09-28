@@ -4197,7 +4197,7 @@ html:not(:has(#app[data-screen="home"]))::before {
     flex: 0 0 auto; align-items: flex-start; padding-top: 7px;
   }
   #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card .carta-reverso > .reverso-emblema {
-    top: 35%; max-height: 34%;
+    top: 30%; max-height: 28%;
   }
   #app.atlas-board[data-board-fit="compact"] {
     --fit-hand-height: 132px; --fit-hand-width: min(24vw, 88px);
@@ -4236,10 +4236,10 @@ html:not(:has(#app[data-screen="home"]))::before {
     font-size: .65rem; line-height: 1.06; padding: 2px; margin-top: auto;
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .carta-reverso { min-height: 22px; margin: 0; }
-  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .reverso-emblema { width: 29px; height: 29px; }
+  #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .board-focus-card .hand-solo .reverso-emblema { width: 48px; height: 48px; }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .board-focus-card .hand-solo .hand-card > strong { font-size: .58rem; }
   #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .carta-reverso { min-height: 18px; }
-  #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .reverso-emblema { width: 23px; height: 23px; }
+  #app.atlas-board[data-board-fit="tight"] .board-focus-card .hand-solo .reverso-emblema { width: 36px; height: 36px; }
   /* El pie puede crecer en vertical sin convertir el reverso en una ficha. */
   #app.atlas-board[data-board-fit] .board-focus-card .hand-solo .hand-card { aspect-ratio: 3 / 4; }
   #app.atlas-board[data-board-fit] .board-focus-card .hand-solo .hidden-date { margin-bottom: 0; }
@@ -4247,7 +4247,10 @@ html:not(:has(#app[data-screen="home"]))::before {
     margin-top: auto; margin-bottom: 0; position: relative; z-index: 1;
   }
   #app.atlas-board[data-platform][data-screen][data-board-fit] .board-focus-card .hand-solo .hand-card .carta-reverso > .reverso-emblema {
-    top: 36%; max-height: 33%; transform: translate(-50%, -50%);
+    top: 30%; width: 48px; height: 48px; max-height: 28%; transform: translate(-50%, -50%);
+  }
+  #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-focus-card .hand-solo .hand-card .carta-reverso > .reverso-emblema {
+    width: 36px; height: 36px;
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel { padding: 3px 5px; margin-bottom: 2px; }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .scoreboard-panel .scoreboard { max-height: var(--fit-score-height); }
@@ -4273,6 +4276,7 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit] .quick-content { padding-bottom: 0; }
   #app.atlas-board[data-board-fit="tight"] .scoreboard-title { display: none; }
   #app.atlas-board[data-board-fit="tight"] .hand-fan-controls { margin-bottom: 0; }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .atlas-hand-section .hand.hand-fan { height: 102px; }
   #app.atlas-board[data-board-fit="tight"] .hand-fan-controls button { width: 32px; height: 32px; min-height: 32px; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline .timeline-card { width: 96px; }
   #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .board-timeline-section .timeline .timeline-card { width: 80px; }
@@ -4297,6 +4301,8 @@ html:not(:has(#app[data-screen="home"]))::before {
   }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .scoreboard-panel .score { padding: 1px 4px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-rule { font-size: .7rem; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .atlas-topbar { height: 36px; min-height: 36px; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-bank { margin-bottom: 0; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline :is(.slot, .slot-confirm) { min-height: 120px; }
   #app.atlas-board[data-board-fit="tight"] .quick-rule { margin: 0 0 2px; line-height: 1.1; }
   #app.atlas-board[data-board-fit="tight"] .quick-bank {
@@ -4322,6 +4328,37 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .card-content { padding: 3px 4px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card h3 { font-size: .62rem; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .hand-fan-controls button { width: 28px; height: 28px; min-height: 28px; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .game-head .turn-label { font-size: .58rem; line-height: 1; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .game-head .turn-name { font-size: .86rem; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .board-timeline-section > .timeline-zoom [data-zoom-level] { min-height: 27px; height: 27px; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-bank { min-height: 32px; }
+  #app.atlas-board[data-board-fit="tight"] .quick-shell .quick-bank .btn { min-height: 32px; }
+}
+
+@media (max-width: 350px) and (max-height: 600px) {
+  #app.atlas-board[data-board-fit="tight"] .atlas-topbar { height: 34px; min-height: 34px; }
+  #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .scoreboard {
+    display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); max-height: none; overflow: visible;
+  }
+  #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score {
+    grid-template-columns: 24px minmax(0,1fr) 20px; gap: 3px; padding: 2px;
+  }
+  #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > .score-avatar,
+  #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > .score-avatar .avatar { width: 24px !important; height: 24px !important; }
+  #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > em strong { font-size: .87rem; }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .atlas-hand-section .hand.hand-fan {
+    height: 92px; padding-bottom: 5px;
+  }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .atlas-hand-section .hand.hand-fan .hand-card {
+    width: min(21vw,67px);
+  }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan { height: 76px; }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card { width: min(16vw,55px); }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section > .timeline-zoom [data-zoom-level] { min-height: 28px; height: 28px; }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline-card .card-content { padding: 3px 4px; }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline-card h3 { font-size: .61rem; line-height: 1.08; }
+  #app.atlas-board[data-board-fit="tight"] .board-timeline-section .timeline-card .year { font-size: .72rem; }
 }
 
 /* En el duelo por turnos, la carta activa precede a la línea y ambas caben en la mesa corta. */
