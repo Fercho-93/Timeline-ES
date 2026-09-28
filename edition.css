@@ -4682,8 +4682,8 @@ html #app .home-nav.atlas-nav::after { content: none; }
 
 /* Ficha activa elevada sobre la base: base más baja y pestaña activa levantada por encima de su borde superior. */
 html #app .home-nav.atlas-nav {
-  min-height: calc(78px + env(safe-area-inset-bottom));
-  padding: 3px 12px calc(5px + env(safe-area-inset-bottom));
+  min-height: calc(74px + env(safe-area-inset-bottom));
+  padding: 1px 12px calc(2px + env(safe-area-inset-bottom));
 }
 html #app .home-nav.atlas-nav button { min-height: 66px; }
 html #app .home-nav.atlas-nav button[aria-current="page"] {
