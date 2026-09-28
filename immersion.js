@@ -229,6 +229,8 @@
       const available = window.visualViewport?.height || window.innerHeight;
       const top = shell.getBoundingClientRect().top + window.scrollY;
       const fits = () => top + shell.scrollHeight <= available + 2;
+      container.classList.remove('board-card-expanded');
+      container.style.removeProperty('--optimal-timeline-width');
       container.dataset.boardFit = 'normal';
       if (!fits()) container.dataset.boardFit = 'compact';
       if (!fits()) container.dataset.boardFit = 'tight';
@@ -247,6 +249,32 @@
       }
       if (!fits() && container.dataset.boardFit === 'normal') container.dataset.boardFit = 'compact';
       if (!fits() && container.dataset.boardFit === 'compact') container.dataset.boardFit = 'tight';
+      // Aprovecha el papel libre dentro de la línea. La carta crece de forma
+      // progresiva y se detiene antes de desplazar cualquier mando fuera de vista.
+      if (fits() && window.innerWidth >= 375) {
+        const section = shell.querySelector('.board-timeline-section');
+        const card = section?.querySelector('.timeline .timeline-card');
+        if (card) {
+          const gap = Math.min(section.getBoundingClientRect().bottom, available) - card.getBoundingClientRect().bottom;
+          const base = card.getBoundingClientRect().width;
+          const growth = Math.min(38, Math.max(0, Math.floor((gap - 25) / 1.5)));
+          if (growth >= 5) {
+            container.classList.add('board-card-expanded');
+            let expanded = false;
+            for (let amount = growth; amount >= 0; amount -= 2) {
+              container.style.setProperty('--optimal-timeline-width', `${base + amount}px`);
+              if (fits() && card.getBoundingClientRect().bottom <= available - 8) {
+                expanded = true;
+                break;
+              }
+            }
+            if (!expanded) {
+              container.classList.remove('board-card-expanded');
+              container.style.removeProperty('--optimal-timeline-width');
+            }
+          }
+        }
+      }
     });
   }
   window.addEventListener('resize', () => fitBoard(document.getElementById('app')), {passive: true});

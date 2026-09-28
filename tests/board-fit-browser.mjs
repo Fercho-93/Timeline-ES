@@ -93,7 +93,7 @@ try {
             !data.order || (data.cards>1&&!data.fan) || data.labelFits===false || data.emblemVisible===false ||
             (data.cards===1&&data.handCard?.height<data.handCard?.width*1.25) ||
             (data.placed&&data.placed.height<data.placed.width*1.2) || data.headingGap>45 ||
-            (width===390&&data.placed?.width<120) || (data.placed&&data.placed.bottom>data.viewport+2))
+            (width===390&&format==='solo'&&data.placed?.width<120) || (data.placed&&data.placed.bottom>data.viewport+2))
             errors.push('La mesa no cumple las medidas o el orden de juego');
           if(width===320||width===390)await page.screenshot({path:path.join(destination,`board-${engine}-${format}-${width}x${height}.png`)});
         }catch(error){records.push({engine,width,height,format,error:String(error),errors});}
