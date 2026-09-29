@@ -18,7 +18,8 @@ assert.match(source, /paint\(`<div class="shell">\$\{header\(\x27<button class="
 assert.match(source, /Terminar partida y cerrar sala/, "el anfitrión debe poder terminar y cerrar la sala durante la partida");
 assert.match(source, /Salir de la partida/, "un jugador debe poder salir de la partida");
 assert.match(source, /roomState\.status === "playing"[\s\S]*?room-connection/, "la presencia debe ocultarse durante la partida");
-assert.match(source, /invited \? "" : '<form class="panel online-form" data-online-form="create"/, "una invitación no debe mostrar el formulario de creación");
+assert.match(source, /invited \? "" : [\x27`]<form class="panel online-form" data-online-form="create"/, "una invitación no debe mostrar el formulario de creación");
+assert.doesNotMatch(source, /\x27<form[^\x27]*\$\{ownName\}/, "el nombre propio del formulario de crear sala debe interpolarse (plantilla, no comillas simples)");
 
 assert.doesNotMatch(appSource, /Volver a mi sala/, "la portada no debe mostrar el acceso rápido a la sala");
 assert.match(appSource, /Continuar partida/, "la portada debe conservar la continuación de partidas locales");
