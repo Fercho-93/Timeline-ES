@@ -4532,11 +4532,6 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .quick-shell .quick-meta .quick-rule { flex: 1 1 0; min-width: 9ch; margin: 0; }
 #app.atlas-board .quick-shell .quick-meta .scoreboard { margin: 0 0 0 auto; justify-content: flex-end; }
 #app.atlas-board .quick-shell .quick-meta .scoreboard:only-child { flex: 1 1 100%; }
-#app.atlas-board[data-platform][data-device][data-screen] .quick-shell .atlas-hand-section .hand.hand-fan,
-#app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .quick-shell .atlas-hand-section .hand.hand-fan { height: clamp(100px, 15.5dvh, 140px); padding: 2px 0 12px; overflow: visible; }
-#app.atlas-board[data-platform][data-device][data-screen] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card,
-#app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card { width: min(24vw, 88px, calc((15.5dvh - 16px) * .75)); --fan-step: min(15vw, 56px); }
-#app.atlas-board[data-platform][data-device][data-screen] .quick-shell .hand.hand-fan .hand-card > strong { font-size: .74rem; }
 #app.atlas-board .quick-shell .timeline .timeline-card > .card-category { display: none; }
 #app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content h3 { font: 400 .82rem/1.15 var(--font-display); }
 #app.atlas-board .quick-shell .timeline .timeline-card:has(.animal-card-art) .card-content .year { font: 700 .92rem/1.15 var(--font-display); color: #8a3f2f; }
@@ -4820,7 +4815,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
    Misma estética que «Jugar solo»: la mano en abanico sin recortar, los jugadores
    como píldoras a la derecha y la lámina de la línea siempre entera. */
 #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: clamp(100px, 15.5dvh, 140px) !important; padding: 2px 0 12px !important; overflow: visible !important; }
-#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(24vw, 88px, calc((15.5dvh - 16px) * .68)) !important; aspect-ratio: 2 / 3 !important; --fan-step: min(6vw, 22px); transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 4deg)) scale(calc(1 - var(--fan-depth) * .14)); }
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(24vw, 88px, calc((15.5dvh - 16px) * .68)) !important; aspect-ratio: 2 / 3 !important; --fan-step: min(8.2vw, 38px); transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 4deg)) scale(calc(1 - var(--fan-depth) * .14)); }
 #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: .66rem; overflow-wrap: normal; word-break: normal; hyphens: auto; }
 #app.atlas-board .scoreboard-panel { display: flex !important; justify-content: flex-end; height: auto !important; margin: 0 0 4px !important; padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
 #app.atlas-board .scoreboard-panel .scoreboard-title { display: none !important; }
