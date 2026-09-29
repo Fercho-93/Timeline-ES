@@ -3574,7 +3574,12 @@
       const available=Object.keys(CT.MODES).filter(mode=>mode!=='mixed' && (!CT.Cartera?.tiene || CT.Cartera.tiene(mode)));
       const pool=intent==='collections-vote' && preferred.length ? preferred.filter(mode=>available.includes(mode))
         : intent ? available : [selectedModeKey];
-      const found=await matchmaking.findAcrossModes(pool.length?pool:[selectedModeKey],capacity);
+      // Sin límite, una conexión colgada dejaba el spinner para siempre.
+      let timer;
+      const found=await Promise.race([
+        matchmaking.findAcrossModes(pool.length?pool:[selectedModeKey],capacity),
+        new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('MATCH_TIMEOUT')),30000);})
+      ]).finally(()=>clearTimeout(timer));
       const {code,mode}=found;
       const online = await import("./online.js");
       // Al salir de una mesa pública se vuelve a «Jugar online», no al menú de un mazo.
@@ -3587,6 +3592,8 @@
         ? "Firebase ha rechazado la creación de la mesa pública."
         : error?.message === "AUTH_NOT_READY"
           ? "Tu perfil todavía no está preparado."
+        : error?.message === "MATCH_TIMEOUT"
+          ? "La conexión con el servidor tarda demasiado. Comprueba tu internet e inténtalo de nuevo."
           : "No se pudo crear ni encontrar una mesa pública.";
       paint(`<div class="shell">${header('<button class="icon-btn" data-action="public-match-back">Volver</button>')}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p><button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button><button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
     }
