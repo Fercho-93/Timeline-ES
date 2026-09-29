@@ -119,7 +119,7 @@
   const inlineOpen = {};
   function inlineCollections(route) {
     const open = !!inlineOpen[app.dataset.pendingHub || ''];
-    return `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`)}<div id="mode-inline-drawer" class="mode-inline-drawer"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true) : ''}</div></div>`;
+    return `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`)}<div id="mode-inline-drawer" class="mode-inline-drawer" data-route="${route}"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true) : ''}</div></div>`;
   }
 
   // Cada forma de jugar con amigos tiene su pantalla con las mismas tres puertas que «Jugar solo»:
@@ -220,6 +220,10 @@
       const cap=document.getElementById('mode-public-capacity')?.value ?? sessionStorage.getItem('continuum-public-capacity') ?? '0';
       sessionStorage.setItem('continuum-public-capacity',cap);
     }
+    // Elegir un mazo del cajón de colecciones fija de nuevo la ruta del cajón: si antes se entró en
+    // otra puerta (por ejemplo Retos rápidos) y se volvió, la ruta guardada ya no es esta.
+    const drawerDeck = event.target.closest('#mode-inline-drawer [data-action="set-mode"]');
+    if (drawerDeck) { const drawerRoute = drawerDeck.closest('#mode-inline-drawer').dataset.route; const stale = sessionStorage.getItem('continuum-entry-route'); if (drawerRoute && stale && /(^|-)quick$/.test(stale)) sessionStorage.setItem('continuum-entry-route', drawerRoute); }
     const routed=event.target.closest('[data-solo-route],[data-friend-route]');
     if(routed){
       const route=routed.dataset.soloRoute||routed.dataset.friendRoute;

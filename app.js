@@ -738,6 +738,9 @@
     if (entry === 'online') { launchOnline(); return; }
     if (entry === 'wifi') { launchLocalMultiplayer(); return; }
     if (entry === 'duel') { duelHome(); return; }
+    // Una ruta que no elige mazo (Retos rápidos y similares) se quedó guardada al volver: el
+    // formato ya se decidió antes, así que no se vuelve a preguntar «cómo quieres jugar».
+    if (entry) { soloHome(); return; }
     playMenu();
   }
 
