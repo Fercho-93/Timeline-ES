@@ -150,8 +150,8 @@
       if (delta < -cards.length / 2) delta += cards.length;
       return delta;
     };
-    const step = Math.min(54.6, window.innerWidth * .147);
-    const pose = offset => `translateX(${offset * step}px) translateY(${Math.abs(offset) * 11.2}px) rotate(${offset * 6}deg) scale(${Math.max(.65, 1 - Math.abs(offset) * .14)})`;
+    const step = Math.min(22, window.innerWidth * .06);
+    const pose = offset => `translateX(${offset * step}px) translateY(${Math.abs(offset) * 11.2}px) rotate(${offset * 4}deg) scale(${Math.max(.65, 1 - Math.abs(offset) * .14)})`;
     cards.forEach((card, index) => {
       const offset = distance(index, center);
       card.style.setProperty('--fan-offset', offset);
