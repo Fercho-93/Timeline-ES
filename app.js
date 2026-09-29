@@ -351,7 +351,7 @@
       <button class="play-choice" data-action="local-multiplayer"><span class="choice-icon">${playIcon("offline")}</span><span><b>Sin conexión</b><small>Varios móviles, sin internet — una red Wi-Fi local basta.</small></span><i aria-hidden="true">→</i></button>
       ${resume ? '<button class="continue-choice" data-action="continue">Continuar la partida guardada <span>→</span></button>' : ""}`;
     const solo = `<button class="play-choice walking-choice" data-action="solo"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Partida libre hasta perder las vidas.</small></span><i aria-hidden="true">→</i></button>`;
-    const duelo = `<button class="play-choice walking-choice duel-choice" data-action="duel-home"><img class="walking-art" src="assets/mode-walk-duel.webp" alt="" width="1536" height="1024"><span class="walking-copy"><b>Retar a un amigo</b><small>Las mismas cartas para los dos, por enlace.</small></span><i aria-hidden="true">→</i></button>`;
+    const duelo = `<button class="play-choice walking-choice duel-choice" data-action="duel-home"><img class="walking-art" src="assets/mode-walk-duel.webp" alt="" width="1536" height="1024"><span class="walking-copy"><b>Duelo con un amigo</b><small>Las mismas cartas para los dos, por enlace.</small></span><i aria-hidden="true">→</i></button>`;
     return `<section class="play-choices" aria-labelledby="play-choices-title"><div class="play-choices-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Elegir formato</div><h2 id="play-choices-title">¿Cómo quieres jugar?</h2></div></div>
       ${formatBlock("multi", "Multijugador", "Un solo móvil o varios.", multi)}
       <div class="direct-solo">${solo}</div>
@@ -2307,14 +2307,14 @@
     </div>`);
   }
 
-  // Retar a un amigo: el duelo por enlace, que antes vivía dentro del solitario, tiene
+  // Duelo con un amigo: el duelo por enlace, que antes vivía dentro del solitario, tiene
   // ahora su propia pantalla como tercera manera de jugar un mazo.
   function duelHome() {
     screen = "duel-home";
     solo = loadSolo();
     pendingIndex = null;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Retar a un amigo</h2>
+      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Duelo con un amigo</h2>
         <p class="lead">Las mismas cartas para los dos. Gana quien más acierte.</p><p class="solo-intro-rule">En duelo se juegan las ${CT.Duelo.CARTAS} cartas sin límite de vidas.</p></div>
         ${duelPanel()}
         <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus duelos en curso</button>
@@ -2422,7 +2422,7 @@
       <div class="field duel-kind-field">
         <span class="field-label" id="duel-pace-label">Ritmo del duelo</span>
         <div class="segmented" role="radiogroup" aria-labelledby="duel-pace-label">
-          ${[["seguidos", "Duelo de seguidos", "Juegas y esperas al rival"], ["turnos", "Duelo por turnos", "Cada uno desde su móvil"]]
+          ${[["seguidos", "Partida completa", "Juegas y esperas al rival"], ["turnos", "Por turnos", "Cada uno desde su móvil"]]
             .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === ritmo ? " is-on" : ""}">
               <input type="radio" name="duel-pace" value="${clave}"${clave === ritmo ? " checked" : ""}>
               <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>

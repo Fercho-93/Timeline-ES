@@ -1133,8 +1133,8 @@
     const formats = '<div class="guide-cards">'+
       guideCard('☼','Reto diario','15 cartas · 3 vidas','Las mismas cartas del mazo para todos, un intento al día. En Fácil; termina al completar las cartas o agotar las vidas.')+
       guideCard('∞','Partida libre','3 vidas','Elige dificultad y juega hasta completar el mazo o agotar las vidas. Puedes continuar más tarde la partida guardada.')+
-      guideCard('↗','Duelo por enlace','Sin límite de vidas','Comparte un enlace: la otra persona juega las mismas 15 cartas, sin coincidir a la vez. Compara los aciertos al terminar.')+
-      guideCard('⇄','Duelo por turnos','Cada uno desde su móvil','La partida se guarda entre turnos. Juega cuando sea tu turno, deja la partida y vuelve desde «Continuar»; el perfil muestra quién tiene la jugada.')+
+      guideCard('↗','Duelo con un amigo · Partida completa','Sin límite de vidas','Comparte un enlace: la otra persona juega las mismas 15 cartas, sin coincidir a la vez. Compara los aciertos al terminar.')+
+      guideCard('⇄','Duelo con un amigo · Por turnos','Cada uno desde su móvil','La partida se guarda entre turnos. Juega cuando sea tu turno, deja la partida y vuelve desde «Continuar»; el perfil muestra quién tiene la jugada.')+
       guideCard('≈','Duelo de cifras','Escribe el valor','En cada carta escribe el número en la unidad que se indica. Se valora la cercanía y el acierto; revisa la unidad antes de confirmar.')+
       guideCard('♟','Un solo móvil','2–9 personas','Elegid cartas iniciales y jugad el minijuego de quién empieza. Pasad el teléfono a la persona indicada; mantened en secreto las manos ajenas.')+
       guideCard('⌁','Varios móviles','Sala con conexión','El anfitrión crea la sala y comparte código, enlace o QR. Los demás entran y se preparan. El anfitrión elige cartas y reloj: sin límite, 20, 30 o 45 segundos. Si se agota el tiempo, el turno pasa. En las mesas públicas el minijuego de quién empieza se juega solo al completarse la mesa, con 30 segundos para responder.')+

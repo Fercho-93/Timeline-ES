@@ -128,7 +128,7 @@
     local: ['hub-friends-local', 'Un solo móvil', 'Pasad el teléfono', 'mode-walk-duel.webp'],
     online: ['hub-friends-online', 'Sala privada', 'Cada uno en su móvil', 'mode-walk-multi.webp'],
     wifi: ['hub-friends-wifi', 'Wi‑Fi local', 'Sin internet, cerca', 'mode-walk-multi.webp'],
-    duel: ['hub-friends-duel', 'Duelo por turnos', 'Jugad cuando podáis', 'mode-walk-duel.webp']
+    duel: ['hub-friends-duel', 'Duelo con un amigo', 'Jugad cuando podáis', 'mode-walk-duel.webp']
   };
   function openFriendHub(route) {
     const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
@@ -157,7 +157,7 @@
       modeDoor('local-hub', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.'),
       modeDoor('friend-hub', 'mode-walk-multi.webp', 'Sala privada', 'Cada persona con su móvil, por código o enlace.', false, 'data-friend-hub="online"'),
       modeDoor('friend-hub', 'mode-walk-multi.webp', 'Wi‑Fi local', 'Varios móviles cerca, sin internet.', false, 'data-friend-hub="wifi"'),
-      modeDoor('friend-hub', 'mode-walk-duel.webp', 'Duelo por turnos', 'Jugad cuando podáis, por enlace.', false, 'data-friend-hub="duel"')
+      modeDoor('friend-hub', 'mode-walk-duel.webp', 'Duelo con un amigo', 'Partida completa o por turnos, por enlace.', false, 'data-friend-hub="duel"')
     ].join(''), modeArt['friends-hub']);
   }
 
