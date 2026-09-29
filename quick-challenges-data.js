@@ -448,18 +448,17 @@
       [
         ['Lechuga',15,'15 kcal/100 g','assets/quick-cards/foods-kcal-1.webp'],
         ['Pepino',15,'15 kcal/100 g','assets/quick-cards/foods-kcal-2.webp'],
-        ['Tomate',18,'18 kcal/100 g','assets/quick-cards/foods-kcal-3.webp'],
-        ['Zanahoria',41,'41 kcal/100 g','assets/quick-cards/foods-kcal-4.webp'],
-        ['Manzana',52,'52 kcal/100 g','assets/quick-cards/foods-kcal-5.webp'],
+        ['Zanahoria',41,'41 kcal/100 g','assets/quick-cards/foods-kcal-3.webp'],
+        ['Manzana',52,'52 kcal/100 g','assets/quick-cards/foods-kcal-4.webp'],
+        ['Patata',77,'77 kcal/100 g','assets/quick-cards/foods-kcal-5.webp'],
         ['Plátano',89,'89 kcal/100 g','assets/quick-cards/foods-kcal-6.webp'],
-        ['Patata',77,'77 kcal/100 g','assets/quick-cards/foods-kcal-7.webp'],
-        ['Arroz blanco cocido',130,'130 kcal/100 g','assets/quick-cards/foods-kcal-8.webp'],
-        ['Pollo asado',190,'190 kcal/100 g','assets/quick-cards/foods-kcal-9.webp'],
-        ['Salmón',208,'208 kcal/100 g','assets/quick-cards/foods-kcal-10.webp'],
-        ['Pan blanco',266,'266 kcal/100 g','assets/quick-cards/foods-kcal-11.webp'],
-        ['Queso cheddar',403,'403 kcal/100 g','assets/quick-cards/foods-kcal-12.webp'],
-        ['Almendras',579,'579 kcal/100 g','assets/quick-cards/foods-kcal-13.webp'],
-        ['Mantequilla',717,'717 kcal/100 g','assets/quick-cards/foods-kcal-14.webp']
+        ['Arroz blanco cocido',130,'130 kcal/100 g','assets/quick-cards/foods-kcal-7.webp'],
+        ['Pollo asado',190,'190 kcal/100 g','assets/quick-cards/foods-kcal-8.webp'],
+        ['Salmón',208,'208 kcal/100 g','assets/quick-cards/foods-kcal-9.webp'],
+        ['Pan blanco',266,'266 kcal/100 g','assets/quick-cards/foods-kcal-10.webp'],
+        ['Queso cheddar',403,'403 kcal/100 g','assets/quick-cards/foods-kcal-11.webp'],
+        ['Almendras',579,'579 kcal/100 g','assets/quick-cards/foods-kcal-12.webp'],
+        ['Mantequilla',717,'717 kcal/100 g','assets/quick-cards/foods-kcal-13.webp']
       ]
     ),
     d(
