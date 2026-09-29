@@ -13,6 +13,7 @@ function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
 function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); if (!d.querySelector('[data-block]')) d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
+function irACompeticion(w) { irAInicio(w); w.CONTINUUM.ModeHubs.open('hub-solo'); return w; }
 
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
@@ -74,7 +75,7 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       click(w, '[data-action="collection-back"]');
       assert.equal(w.document.documentElement.dataset.scene, 'archive');
     }
-    click(irAInicio(w), '[data-action="competition-menu"]'); click(w, '[data-action="start-competition"]');
+    click(irACompeticion(w), '[data-action="competition-menu"]'); click(w, '[data-action="start-competition"]');
     const saved = JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
     const expected = w.CONTINUUM.blockOf(saved.queue[0]).art;
     assert.equal(w.document.documentElement.dataset.scene, expected, 'el cartel usa el tema siguiente');
@@ -247,14 +248,14 @@ for (const reduce of [false, true]) {
   let w = boot({ seen: true });
   let saved;
   try {
-    click(irAInicio(w), '[data-action="competition-menu"]'); click(w, '[data-action="start-competition"]');
+    click(irACompeticion(w), '[data-action="competition-menu"]'); click(w, '[data-action="start-competition"]');
     assert.equal(w.document.querySelector('.hand-card'), null);
     click(w, '[data-action="comp-next-round"]');
     saved = w.localStorage.getItem(key);
   } finally { w.close(); }
   w = boot({ seen: true, saved: { [key]: saved } });
   try {
-    click(irAInicio(w), '[data-action="competition-menu"]'); click(w, '[data-action="resume-competition"]');
+    click(irACompeticion(w), '[data-action="competition-menu"]'); click(w, '[data-action="resume-competition"]');
     assert.ok(w.document.querySelector('.comp-splash'));
     assert.equal(w.document.querySelector('.hand-card'), null);
     const before = JSON.parse(saved);

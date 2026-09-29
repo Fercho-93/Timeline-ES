@@ -59,7 +59,9 @@ async function flows(vp) {
     await click('[data-action="set-block"]'); await click('.collection-entry.active [data-action="set-mode"]'); await at('solo-home');
     await click('[data-action="start-free"]'); await at('solo'); await back('solo-home');
     await back('jugar'); await back('hub-solo');
-    await click('[data-solo-route="mixed"]'); await at('solo-home'); await back('hub-solo');
+    await click('[data-solo-route="collections"]');
+    await click('#mode-inline-drawer [data-action="set-block"][data-block="mezcla"]');
+    await click('#mode-inline-drawer [data-action="set-mode"][data-mode="mixed"]'); await at('solo-home'); await back('hub-solo');
     await click('[data-solo-route="quick"]'); await at('quick-challenges');
     await click('[data-quick="start-free"]'); await at('quick-challenges'); await click('[data-quick="ready"]'); await at('quick-game'); await back('quick-challenges'); await click('[data-quick="start-free"]'); await back('quick-challenges');
     await back('hub-solo'); await back('home');
@@ -79,10 +81,14 @@ async function flows(vp) {
     await click('[data-action="online-collections"]'); await at('hub-online-collections'); await back('hub-online');
     await back('home');
     // Competición
+    await click('[data-action="solo-hub"]');
     await click('.mode-entry[data-action="competition-menu"]'); await at('competition-menu');
     await click('[data-action="start-competition"]'); await back('competition-menu');
+    await back('hub-solo'); await back('home');
+    await click('[data-action="friends-hub"]'); await click('[data-action="local-hub"]');
+    await click('.mode-entry[data-action="competition-menu"]'); await at('competition-menu');
     await click('[data-action="competition-local"]'); await at('setup'); await back('competition-menu');
-    await back('home');
+    await back('hub-friends-local'); await back('hub-friends'); await back('home');
     // Atlas
     await click('.home-nav [data-action="perfil"]'); await at('perfil'); await back('home');
     // Jugar clásico (puerta antigua)

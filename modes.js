@@ -306,7 +306,7 @@
     // el mazo con la periodización más general de los cuatro.
     mixed: {
       key: "mixed", name: "Gran mezcla temporal",
-      cardLabel: "hitos", blurb: "Todos los mazos de línea temporal, juntos.",
+      cardLabel: "hitos", blurb: "Historia, cine, música y ciencia en una misma línea. ¿Qué ocurrió antes?",
       // Cada carta se etiqueta con la modalidad de la que viene (`sourceMode`): al
       // mezclar ocho mazos distintos, el título y el año solos no bastan para ubicarse
       // —«Se estrena tal película» y «Cae tal ciudad» pueden caer en el mismo siglo—, así
@@ -328,12 +328,12 @@
     },
     history: {
       key: "history", name: "Historia de España", tag: "España",
-      cardLabel: "hechos", blurb: "De Hispania a la democracia.", cards: window.HISTORY_CARDS,
+      cardLabel: "hechos", blurb: "Ordena los acontecimientos de España, de la Antigüedad a la actualidad.", cards: window.HISTORY_CARDS,
       axis: "time"
     },
     movies: {
       key: "movies", name: "Estrenos de cine", tag: "Cine",
-      cardLabel: "películas", blurb: "De Méliès a nuestros días.", cards: window.MOVIE_CARDS,
+      cardLabel: "películas", blurb: "Ordena las películas por su año de estreno.", cards: window.MOVIE_CARDS,
       axis: "time",
       bands: [
         { limit: 1930, key: "pioneros", name: "Cine pionero", symbol: "▥" },
@@ -346,7 +346,7 @@
     },
     music: {
       key: "music", name: "Hitos de la música", tag: "Música",
-      cardLabel: "hitos", blurb: "De Monteverdi al streaming.", cards: window.MUSIC_CARDS,
+      cardLabel: "hitos", blurb: "Ordena los grandes momentos de la historia de la música.", cards: window.MUSIC_CARDS,
       axis: "time",
       bands: [
         { limit: 1750, key: "barroco", name: "Barroco", symbol: "♫" },
@@ -360,7 +360,7 @@
     },
     videogames: {
       key: "videogames", name: "Historia de los videojuegos", tag: "Videojuegos",
-      cardLabel: "juegos", blurb: "Del laboratorio a los mundos abiertos.", cards: window.VIDEOGAME_CARDS,
+      cardLabel: "juegos", blurb: "Recorre la historia del videojuego ordenando sus hitos.", cards: window.VIDEOGAME_CARDS,
       axis: "time",
       bands: [
         { limit: 1972, key: "laboratorio", name: "Pioneros", symbol: "⌨" },
@@ -373,7 +373,7 @@
     },
     inventions: {
       key: "inventions", name: "Inventos y descubrimientos", tag: "Inventos",
-      cardLabel: "hitos", blurb: "Hitos históricos de ciencia, tecnología y conocimiento: de la escritura al teléfono inteligente.", cards: window.INVENTION_CARDS,
+      cardLabel: "hitos", blurb: "¿Qué llegó antes? Ordena inventos y descubrimientos que cambiaron el mundo.", cards: window.INVENTION_CARDS,
       axis: "time",
       bands: [
         { limit: 500, key: "antigua", name: "Mundo antiguo", symbol: "☉" },
@@ -387,13 +387,13 @@
     },
     world: {
       key: "world", name: "Historia mundial", tag: "Mundo",
-      cardLabel: "hechos", blurb: "De los faraones a hoy.", cards: window.WORLD_CARDS,
+      cardLabel: "hechos", blurb: "Sitúa los grandes acontecimientos del mundo en su momento.", cards: window.WORLD_CARDS,
       axis: "time",
       bands: WORLD_BANDS
     },
     astronomy: {
       key: "astronomy", name: "Astronomía y espacio", tag: "Astronomía",
-      cardLabel: "hitos", blurb: "De Copérnico al otro lado de la Luna.", cards: window.ASTRONOMY_CARDS,
+      cardLabel: "hitos", blurb: "Ordena los descubrimientos y misiones que ampliaron nuestro universo.", cards: window.ASTRONOMY_CARDS,
       axis: "time",
       bands: [
         { limit: 1700, key: "revolucion", name: "Revolución astronómica", symbol: "☉" },
@@ -407,7 +407,7 @@
     },
     medicine: {
       key: "medicine", name: "Historia de la medicina", tag: "Medicina",
-      cardLabel: "hitos", blurb: "De Hipócrates a la edición genética.", cards: window.MEDICINE_CARDS,
+      cardLabel: "hitos", blurb: "Ordena los avances que transformaron la medicina.", cards: window.MEDICINE_CARDS,
       axis: "time",
       bands: [
         { limit: 1500, key: "medicinaantigua", name: "Medicina antigua", symbol: "⚕" },
@@ -421,37 +421,37 @@
     },
     animals: {
       key: "animals", name: "Peso de animales",
-      cardLabel: "animales", blurb: "Masas de referencia; consulta el sexo y el rango.", cards: window.ANIMAL_WEIGHT_CARDS,
+      cardLabel: "animales", blurb: "Del más ligero al más pesado: encuentra el lugar de cada animal.", cards: window.ANIMAL_WEIGHT_CARDS,
       axis: "mass"
     },
     lifespan: {
       key: "lifespan", name: "Longevidad de animales",
-      cardLabel: "animales", blurb: "Edades de referencia, con contexto sobre su medición.", cards: window.ANIMAL_LIFESPAN_CARDS,
+      cardLabel: "animales", blurb: "¿Quién vive más? Ordena los animales por su longevidad.", cards: window.ANIMAL_LIFESPAN_CARDS,
       axis: "lifespan"
     },
     speed: {
       key: "speed", name: "Velocidad de animales",
-      cardLabel: "animales", blurb: "Movimiento y tipo de medición indicados en cada referencia.", cards: window.ANIMAL_SPEED_CARDS,
+      cardLabel: "animales", blurb: "Del más lento al más rápido: compara sus velocidades.", cards: window.ANIMAL_SPEED_CARDS,
       axis: "speed"
     },
     countries: {
       key: "countries", name: "Superficie de países",
-      cardLabel: "países", blurb: "Del Vaticano a Rusia.", cards: window.COUNTRY_CARDS,
+      cardLabel: "países", blurb: "Ordena los países de menor a mayor superficie.", cards: window.COUNTRY_CARDS,
       axis: "area"
     },
     population: {
       key: "population", name: "Población de países",
-      cardLabel: "países", blurb: "Proyección ONU a 1 de julio de 2026.", cards: window.POPULATION_CARDS,
+      cardLabel: "países", blurb: "Ordena los países de menos a más habitantes. Proyección ONU de 2026.", cards: window.POPULATION_CARDS,
       axis: "population"
     },
     languages: {
       key: "languages", name: "Idiomas por hablantes nativos",
-      cardLabel: "idiomas", blurb: "Hablantes de lengua materna, no totales.", cards: window.LANGUAGE_CARDS,
+      cardLabel: "idiomas", blurb: "Compara cuántas personas tienen cada idioma como lengua materna.", cards: window.LANGUAGE_CARDS,
       axis: "speakers"
     },
     distances: {
       key: "distances", name: "Distancias entre ciudades",
-      cardLabel: "pares", blurb: "En línea recta, de París a Auckland.", cards: window.CITY_DISTANCE_CARDS,
+      cardLabel: "pares", blurb: "Ordena distancias en línea recta, de la más corta a la más larga.", cards: window.CITY_DISTANCE_CARDS,
       axis: "distance"
     }
   };
@@ -471,7 +471,7 @@
     ciencia: { key: "ciencia", name: "Ciencia", icon: "🔬", art: "science", tagline: "Ordena los descubrimientos.", games: ["astronomy", "medicine"] },
     naturaleza: { key: "naturaleza", name: "Naturaleza", icon: "🦋", art: "nature", tagline: "Ordena la vida.", games: ["animals", "lifespan", "speed"] },
     geografia: { key: "geografia", name: "Geografía", icon: "🌍", art: "globe", tagline: "Ordena el mundo.", games: ["countries", "population", "languages", "distances"] },
-    mezcla: { key: "mezcla", name: "Gran mezcla temporal", icon: "⏳", art: "mixed", tagline: "Solo mazos de línea temporal.", games: ["mixed"] }
+    mezcla: { key: "mezcla", name: "Gran mezcla temporal", icon: "⏳", art: "mixed", tagline: "Ocho mazos cronológicos en una misma línea.", games: ["mixed"] }
   };
 
   const DEFAULT_MODE = "history";
@@ -1153,8 +1153,8 @@
       '<p>Las cartas automáticas hacen crecer la línea después de tu jugada; no suman aciertos tuyos. El reto diario y el duelo por enlace se juegan en Fácil.</p>';
     const powers = '<p>Opcionales en multijugador: se activan antes de empezar; en una sala decide el anfitrión. Se consiguen al azar al recibir cartas: no todos tendrán uno. Cada poder recibido tiene un uso y no ocupa la mano.</p><div class="guide-cards">'+
       guideCard('◌','Fantasma',shared?(ghost?'en juego':'opcional'):'Multijugador','Necesitas el poder, alguna carta en la mano y cinco cartas en la línea. Oculta los valores durante una vuelta completa. No se superpone a otro Fantasma; después hay una vuelta con valores visibles.')+
-      guideCard('ϟ','Pulso',shared?(pulse?'en juego':'opcional'):'Multijugador','Necesitas el poder y dos cartas en la mano. Elige rival y la carta que podrías pasarle. Los dos colocáis la misma carta del mazo a ciegas, sin ver la elección del otro.')+'</div>'+
-      '<table class="guide-pulse-table"><caption>Resultado del Pulso</caption><thead><tr><th scope="col">Quién acierta</th><th scope="col">Qué ocurre</th></tr></thead><tbody><tr><td>Los dos</td><td>Ninguna mano cambia.</td></tr><tr><td>Solo quien reta</td><td>Pasa su carta elegida al defensor.</td></tr><tr><td>Solo quien defiende</td><td>Quien reta roba una carta.</td></tr><tr><td>Ninguno</td><td>Se descarta la carta del reto; quien reta roba una.</td></tr></tbody></table><p>Si se agota el mazo se reutiliza el descarte; si ambos están vacíos se omite el robo. Quien recibe una carta por Pulso queda protegido de recibir otra por Pulso durante esa ronda. En Difícil y Experto el ocultamiento es parte de la dificultad: no necesitas recibir un poder.</p>';
+      guideCard('ϟ','Pulso',shared?(pulse?'en juego':'opcional'):'Multijugador','Necesitas el poder y dos cartas en la mano. Elige un rival; se aparta al azar una carta de tu mano que podrías pasarle. Los dos colocáis la misma carta del mazo a ciegas, sin ver la elección del otro.')+'</div>'+
+      '<table class="guide-pulse-table"><caption>Resultado del Pulso</caption><thead><tr><th scope="col">Quién acierta</th><th scope="col">Qué ocurre</th></tr></thead><tbody><tr><td>Los dos</td><td>Ninguna mano cambia.</td></tr><tr><td>Solo quien reta</td><td>Pasa al defensor la carta apartada al azar.</td></tr><tr><td>Solo quien defiende</td><td>Quien reta roba una carta.</td></tr><tr><td>Ninguno</td><td>Se descarta la carta del reto; quien reta roba una.</td></tr></tbody></table><p>Si se agota el mazo se reutiliza el descarte; si ambos están vacíos se omite el robo. Quien recibe una carta por Pulso queda protegido de recibir otra por Pulso durante esa ronda. En Difícil y Experto el ocultamiento es parte de la dificultad: no necesitas recibir un poder.</p>';
     const chapters = '<p>Elige uno o varios jugadores, rondas y cartas. Cada capítulo propone un mazo aleatorio distinto que se presenta antes de empezar.</p><div class="guide-cards">'+
       guideCard('1','En solitario','','Cinco cartas por ronda por defecto, o las que elijas. Recuperas tres vidas en cada tema y acumulas los aciertos del recorrido.')+
       guideCard('2','En multijugador','','Puntos por ronda: sin cartas, +1; con una, 0; con tres, −2. Se resta el número de cartas restantes menos uno. Al final gana la puntuación mayor; puede haber empate en el total.')+'</div><p>«Siguiente ronda» abre el nuevo tema. La competición no puntúa en el ranking diario.</p>';

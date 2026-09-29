@@ -370,6 +370,7 @@
   // ilustración, los ajustes de la competición y una puerta por forma de jugar.
   function competitionMenu() {
     screen = 'competition-menu';
+    const audience = sessionStorage.getItem('continuum-competition-audience') || 'all';
     const door = (action, art, title, text) => `<button class="mode-entry" data-action="${action}"><span class="mode-entry-art" aria-hidden="true"><img src="assets/${art}" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>${title}</b><small>${text}</small><span class="mode-entry-cta" aria-hidden="true">Empezar <span>→</span></span></span></button>`;
     paint(`<div class="shell home-shell mode-hub-shell competition-hub">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">Grandes colecciones al azar</div><h1 data-focus tabindex="-1">Competición</h1></div><img src="assets/competition-engraving.webp" alt="" aria-hidden="true" decoding="async"></header>
@@ -378,13 +379,13 @@
         <button class="btn btn-secondary btn-block" data-action="friends-hub">Retos rápidos con amigos <span aria-hidden="true">→</span></button>
         <div class="panel setup-grid competition-settings">
           <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
-          <div class="field"><label for="competition-cards">Cartas por ronda</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
+          <div class="field"><label for="competition-cards">${audience === 'solo' ? 'Cartas por ronda' : audience === 'friends' ? 'Cartas iniciales por jugador' : 'Cartas por ronda o iniciales por jugador'}</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
         </div>
-        ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
-        ${CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}
-        ${door('start-competition', 'mode-walk-solo.webp', 'Jugar solo', 'Suma tus aciertos ronda a ronda, sin repetir temática.')}
-        ${door('competition-local', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.')}
-        ${door('competition-online', 'mode-walk-multi.webp', 'Varios móviles', 'La misma sala durante todas las rondas.')}
+        ${audience !== 'friends' && loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
+        ${audience !== 'solo' && CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}
+        ${audience !== 'friends' ? door('start-competition', 'mode-walk-solo.webp', 'Jugar solo', 'Suma tus aciertos ronda a ronda, sin repetir temática.') : ''}
+        ${audience !== 'solo' ? door('competition-local', 'menu-local.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.') : ''}
+        ${audience !== 'solo' ? door('competition-online', 'menu-private.webp', 'Sala privada online', 'La misma sala durante todas las rondas.') : ''}
       </section></div>`);
   }
 
@@ -397,7 +398,7 @@
     setup();
     document.getElementById('hand-size').value = String(pendingTournament.cards);
     app.querySelector('.setup-section h2').textContent = 'Competición multijugador';
-    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios de las grandes colecciones. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
+    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios de las grandes colecciones. Las ${pendingTournament.cards} cartas son el reparto inicial por jugador, no un límite de robos. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
   function startTournamentRound(t, players, starter, ghost, pulse, excludedCardId = null) {
     selectedModeKey = t.queue[t.index];
@@ -486,7 +487,8 @@
     }
     else if (screen === "duelo-intro") duelHome();
     else if (screen === "play-menu") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
-    else if (["competition-menu", "quick-challenges"].includes(screen)) jugarView();
+    else if (screen === "competition-menu") CT.ModeHubs.open(sessionStorage.getItem('continuum-competition-audience') === 'friends' ? 'hub-friends' : 'hub-solo');
+    else if (screen === "quick-challenges") jugarView();
     else if (screen === "enciclopedia") app.querySelector('[data-action="enc-back"]')?.click();
     else if (screen === "perfil" && profileReturn === "play-menu") playMenu();
     else if (screen === "perfil" && profileReturn === "solo-home") soloHome();
@@ -567,6 +569,7 @@
   // solo cuando hay algo pendiente, el aviso de los duelos en los que te toca.
   function home() {
     sessionStorage.removeItem('continuum-entry-route');
+    sessionStorage.removeItem('continuum-competition-audience');
     CT.Quick.leave();
     pendingTournament = null;
     screen = "home";
@@ -608,7 +611,7 @@
     const copy = `<b>Reto diario</b>
       <small>${detalle}</small>
       ${rachaTexto}`;
-    const arte = `<span class="home-door-art home-daily-art" aria-hidden="true"><img src="assets/hero-history-700.webp" alt="" width="700" height="467" decoding="async"></span>`;
+    const arte = `<span class="home-door-art home-daily-art" aria-hidden="true"><img src="assets/menu-daily.webp" alt="" width="1536" height="1024" decoding="async"></span>`;
     if (hecho) return `<article class="home-door home-door-daily is-done">${arte}<span class="home-door-copy">${copy}
       <button class="btn btn-secondary home-daily-share" data-action="share-daily-home">Compartir resultado</button></span></article>`;
     return `<button class="home-door home-door-daily" data-action="daily-start">${arte}<span class="home-door-copy">${copy}
