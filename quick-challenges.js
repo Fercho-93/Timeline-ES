@@ -84,7 +84,7 @@
   function prepare(config) {
     pendingConfig=config; page='prepare'; state=null; record=null;
     const c=E.challenge(config.rounds[0].id);
-    shell(`<section class="setup-section quick-ready"><div class="eyebrow"><span class="eyebrow-line"></span> Reto preparado</div><h2 data-focus tabindex="-1">${esc(c.title)}</h2>${config.rounds.length === 1 ? '' : `<p class="lead">${config.rounds.length} mazos sorpresa, uno detrás de otro.</p>`}<div class="panel quick-ready-card"><div class="quick-ready-seal" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="29"/><circle cx="32" cy="32" r="23"/><path d="M32 9l3.2 19.8L55 32l-19.8 3.2L32 55l-3.2-19.8L9 32l19.8-3.2z"/><circle cx="32" cy="32" r="3.2"/></svg></div><span class="quick-ready-kicker">La regla del mazo</span><p class="quick-ready-rule">${esc(c.rule)}</p><div class="quick-ready-divider" aria-hidden="true"><i></i><b>◆</b><i></i></div><p class="hint">Cuando estés preparado, empieza el reto. Los siguientes mazos seguirán ocultos hasta que lleguen.</p>${button('ready','Estoy preparado <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
+    shell(`<section class="setup-section quick-ready"><div class="eyebrow"><span class="eyebrow-line"></span> Reto preparado</div><h2 data-focus tabindex="-1">${esc(c.title)}</h2>${config.rounds.length === 1 ? '' : `<p class="lead">${config.rounds.length} mazos sorpresa, uno detrás de otro.</p>`}<div class="panel quick-ready-card"><div class="quick-ready-seal" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="29"/><circle cx="32" cy="32" r="23"/><path d="M32 9l3.2 19.8L55 32l-19.8 3.2L32 55l-3.2-19.8L9 32l19.8-3.2z"/><circle cx="32" cy="32" r="3.2"/></svg></div><span class="quick-ready-kicker">La regla del mazo</span><p class="quick-ready-rule">${esc(c.rule)}</p>${c.asOf ? `<p class="quick-ready-asof">Datos a ${esc(c.asOf)}</p>` : ''}<div class="quick-ready-divider" aria-hidden="true"><i></i><b>◆</b><i></i></div><p class="hint">Cuando estés preparado, empieza el reto. Los siguientes mazos seguirán ocultos hasta que lleguen.</p>${button('ready','Estoy preparado <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
     deckSplash(config);
   }
   // Antes de la explicación, una portada breve con el mazo que toca. Es una capa sobre la
@@ -358,7 +358,7 @@
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);
     const layer = document.createElement('div'); layer.className = 'overlay';
-    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}${button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
+    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}${button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
     app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
@@ -439,7 +439,7 @@
     openLocal(renderPage){paint=renderPage;entry='setup';format='local';setup();},
     openNetwork(renderPage,kind,capacity){paint=renderPage;entry='network';networkSetup(kind,capacity);},
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
-    dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,cards:c.cards.length};},
+    dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,asOf:c.asOf,cards:c.cards.length};},
     startDaily(dayValue, renderPage) {
       paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       const saved=load();

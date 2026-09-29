@@ -138,7 +138,7 @@
       // Quien se une no elige mazo: la invitación ya lo lleva.
       route === 'wifi' ? modeDoor('wifi-join', 'mode-walk-multi.webp', 'Unirme a una sala', 'Escanea el código de quien la ha creado, sea cual sea el mazo.', true) : '',
       inlineCollections(route),
-      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, `data-friend-quick="${route}"`),
+      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Mazos sorpresa; elige cuántos quieres jugar.', false, `data-friend-quick="${route}"`),
       modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, `data-friend-mixed="${route}"`)
     ].join(''), art);
   }
@@ -148,7 +148,7 @@
     app.dataset.pendingHub = 'hub-solo';
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       inlineCollections('collections'),
-      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, 'data-solo-route="quick"'),
+      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Mazos sorpresa; elige cuántos quieres jugar.', false, 'data-solo-route="quick"'),
       modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, 'data-solo-route="mixed"')
     ].join(''), modeArt['solo-hub']);
   }

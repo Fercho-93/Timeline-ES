@@ -2,11 +2,19 @@
   'use strict';
   // Primera fase: cartas sin ilustración. Cada carta conserva una fuente pública para
   // poder auditarla y sustituirla más adelante sin tocar el motor de juego.
-  const cards = (prefix, source, rows) => rows.map(([title, value, label, image], i) => ({
+  // Fecha de referencia de las cifras que cambian con el tiempo (temporadas, ventas, capacidades,
+  // salarios…). Se enseña igual en todos los mazos: «Datos a 2026». Al actualizar un mazo, se cambia aquí.
+  const AS_OF = {
+    'series-seasons': '2026', 'albums-sales': '2026', 'stadiums': '2026', 'minimum-wages': '2026', 'metros': '2026',
+    'eurovision-wins': '2026', 'spanish-tv': '2026', 'airports': '2025', 'companies-revenue': '2025'
+  };
+  const host = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };
+  // El detalle que se ve al descubrir una carta: qué es, qué se mide, a qué fecha y de dónde sale.
+  const cards = (prefix, source, rows, context, asOf) => rows.map(([title, value, label, image], i) => ({
     id: `${prefix}-${i + 1}`, title, value, label, image: image || null,
-    detail: `${label}. Dato de referencia documentado en la fuente del mazo.`, source
+    detail: `${title}: ${label}. ${context}${asOf ? ` Datos a ${asOf}.` : ''}${host(source) ? ` Fuente: ${host(source)}.` : ''}`, source
   }));
-  const deck = (id, title, rule, context, direction, cover, source, rows) => ({ id, title, rule, context, direction, cover, cards: cards(id, source, rows) });
+  const deck = (id, title, rule, context, direction, cover, source, rows) => ({ id, title, rule, context, direction, cover, asOf: AS_OF[id] || null, cards: cards(id, source, rows, context, AS_OF[id] || null) });
   const S = {
     sport: 'https://www.olympics.com/ioc/olympic-games', drinks: 'https://www.niaaa.nih.gov/alcohols-effects-health/alcohol-topics/what-standard-drink', dates: 'https://www.timeanddate.com/holidays/',
     social: 'https://en.wikipedia.org/wiki/Timeline_of_social_media', wwii: 'https://www.iwm.org.uk/history/second-world-war-timeline', civil: 'https://www.britannica.com/event/Spanish-Civil-War', kings: 'https://www.casareal.es/EN/FamiliaReal/ReyFelipeVI/Paginas/subhome.aspx',
@@ -16,9 +24,9 @@
   window.CONTINUUM.QuickCatalog = { version: 2, challenges: [
     d(
       'sports-players',
-      'Jugadores en el terreno',
+      'Deportes por jugadores por equipo',
       'De menos a más jugadores por equipo',
-      'Modalidad estándar.',
+      'Jugadores de cada equipo en juego a la vez, en la modalidad estándar del deporte.',
       1,
       'sports',
       S.sport,
@@ -247,9 +255,9 @@
     ),
     d(
       'oscars',
-      'Películas por Óscar',
+      'Películas por número de Óscar',
       'De más premios ganados a menos',
-      'No se cuentan nominaciones ni premios honoríficos.',
+      'Se compara el número de premios Óscar ganados; no cuentan nominaciones ni premios honoríficos.',
       -1,
       'entertainment',
       S.oscar,
@@ -293,7 +301,7 @@
       'timezones-june',
       'Husos horarios en junio',
       'De más horas por detrás a más horas por delante de España',
-      'Comparación con Madrid en junio.',
+      'Diferencia horaria respecto a Madrid en junio.',
       1,
       'globe',
       S.timezone,
@@ -528,7 +536,7 @@
       'eurovision-wins',
       'Países por victorias en Eurovisión',
       'De menos a más victorias',
-      'Conteo hasta la edición de 2026; empates válidos.',
+      'Victorias acumuladas de cada país; los empates cuentan.',
       1,
       'entertainment',
       S.eurovision,
@@ -609,7 +617,7 @@
       'companies-revenue',
       'Empresas por facturación en 2025',
       'De menor a mayor facturación',
-      'Millones de dólares; edición Fortune basada en 2025.',
+      'Millones de dólares, según el ranking Fortune.',
       1,
       'science',
       S.fortune,
@@ -626,22 +634,22 @@
     ),
     d(
       'spanish-tv',
-      'Programas españoles por años en antena',
-      'De menos a más años desde su estreno',
-      'Se cuentan años desde el estreno.',
+      'Programas españoles por fecha de estreno',
+      'De estreno más reciente a más antiguo',
+      'Ordenados por su fecha de estreno; la cifra son los años transcurridos desde entonces.',
       1,
       'entertainment',
       S.tv,
       [
-        ['First Dates',9,'9 años','assets/quick-cards/spanish-tv-1.webp'],
-        ['Sálvame',14,'14 años','assets/quick-cards/spanish-tv-2.webp'],
-        ['La ruleta de la suerte',19,'19 años','assets/quick-cards/spanish-tv-3.webp'],
-        ['El Hormiguero',20,'20 años','assets/quick-cards/spanish-tv-4.webp'],
-        ['Pasapalabra',25,'25 años','assets/quick-cards/spanish-tv-5.webp'],
-        ['Gran Hermano',25,'25 años','assets/quick-cards/spanish-tv-6.webp'],
-        ['Cuéntame cómo pasó',23,'23 años','assets/quick-cards/spanish-tv-7.webp'],
-        ['Saber y ganar',29,'29 años','assets/quick-cards/spanish-tv-8.webp'],
-        ['Informe semanal',53,'53 años','assets/quick-cards/spanish-tv-9.webp']
+        ['First Dates',9,'hace 9 años','assets/quick-cards/spanish-tv-1.webp'],
+        ['Sálvame',14,'hace 14 años','assets/quick-cards/spanish-tv-2.webp'],
+        ['La ruleta de la suerte',19,'hace 19 años','assets/quick-cards/spanish-tv-3.webp'],
+        ['El Hormiguero',20,'hace 20 años','assets/quick-cards/spanish-tv-4.webp'],
+        ['Pasapalabra',25,'hace 25 años','assets/quick-cards/spanish-tv-5.webp'],
+        ['Gran Hermano',25,'hace 25 años','assets/quick-cards/spanish-tv-6.webp'],
+        ['Cuéntame cómo pasó',23,'hace 23 años','assets/quick-cards/spanish-tv-7.webp'],
+        ['Saber y ganar',29,'hace 29 años','assets/quick-cards/spanish-tv-8.webp'],
+        ['Informe semanal',53,'hace 53 años','assets/quick-cards/spanish-tv-9.webp']
       ]
     ),
     d(

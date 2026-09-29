@@ -2135,7 +2135,7 @@
     const day = today(), done = !!dailyRecords().days?.[day];
     if (dailyFamily(day) === 'quick') {
       const c = CT.Quick.dailyChallenge(day);
-      return { family: 'Retos rápidos', title: c.title, done, rules: `${c.rule}. Ordena ${c.cards - 1} cartas comunes, una tras otra: cada acierto suma un punto provisional, que puedes asegurar plantándote; un fallo pierde los del reto. Un solo intento.` };
+      return { family: 'Retos rápidos', title: c.title, done, rules: `${c.rule}${c.asOf ? ` (datos a ${c.asOf})` : ''}. Ordena ${c.cards - 1} cartas comunes, una tras otra: cada acierto suma un punto provisional, que puedes asegurar plantándote; un fallo pierde los del reto. Un solo intento.` };
     }
     const mode = CT.mode(dailyModeKey(day));
     return { family: 'Grandes colecciones', title: mode.name, done, rules: `${DAILY_CARDS} cartas, ordenadas ${mode.axis === 'time' ? 'de antes a después' : 'de menor a mayor'}, en dificultad Fácil y con 3 vidas. Un solo intento.` };
