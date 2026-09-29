@@ -145,78 +145,13 @@ async function findAcrossModes(modes, capacityInput) {
   return {mode:pool[0],...await findFlexible(pool[0],capacities[0])};
 }
 
-async function startQuickMatch(capacity) {
-  if(busy)return;
-  const storedCapacity=Number(sessionStorage.getItem('continuum-public-capacity'));
-  if(capacity===4 && sessionStorage.getItem('continuum-public-capacity')!==null) capacity=storedCapacity;
-  busy=true;
-  const button=document.querySelector('[data-public-match]');
-  if(button){button.disabled=true;button.textContent='Buscando mesa…';}
-  try{
-    const intent=sessionStorage.getItem('continuum-public-kind')||'collections';
-    const candidates=Object.keys(CT.MODES||{}).filter(key=>key!=='mixed' && (!CT.Cartera?.tiene || CT.Cartera.tiene(key)));
-    let preferred=[];
-    try { preferred=JSON.parse(sessionStorage.getItem('continuum-public-topics')||'[]').filter(key=>candidates.includes(key)); } catch {}
-    const pool=preferred.length?preferred:candidates;
-    const randomMode=pool[Math.floor(Math.random()*Math.max(1,pool.length))] || CT.DEFAULT_MODE;
-    const mode=(intent==='surprise' || intent==='collections-vote') ? randomMode : (document.getElementById('public-match-mode')?.value || CT.DEFAULT_MODE);
-    const found=await findFlexible(mode,capacity);
-    const code=found.code;
-    CT.Storage.setItem('continuum-last-room',code);
-    const online=await import('./online.js');
-    await online.openOnlineMode({roomCode:code,modeKey:mode});
-    watchPublicRoom(code);
-    setTimeout(()=>{
-      const shell=document.querySelector('.online-shell');
-      if(shell && !shell.querySelector('[data-public-waiting]')){
-        const note=document.createElement('p');note.className='online-note';note.dataset.publicWaiting='';
-        note.textContent='Esperando jugadores…';shell.querySelector('.lobby-head')?.after(note);
-      }
-    },250);
-  }catch(error){
-    console.error(error);
-    const msg=error.message==='QUEUE_STALE'?'La mesa anterior está cerrándose. Inténtalo de nuevo en unos segundos.'
-      : error.message==='AUTH_NOT_READY'?'Espera a que termine de cargar tu perfil.'
-      :'No se pudo encontrar una mesa. Vuelve a intentarlo.';
-    notify(msg);
-  }finally{busy=false;if(button){button.disabled=false;button.textContent='Buscar partida';}}
-}
-
-function inject() {
-  const entry=document.querySelector('[data-screen="online-entry"], .online-shell');
-  if(!entry || !document.querySelector('[data-online-form="create"]') || document.querySelector('[data-public-match-panel]'))return;
-  const grid=entry.querySelector('.online-entry-grid');
-  if(!grid)return;
-  const panel=document.createElement('section');
-  panel.className='panel online-form';
-  panel.dataset.publicMatchPanel='';
-  panel.innerHTML=`<span class="form-number">⚡</span><h3>Partida rápida</h3><p>Encuentra automáticamente una mesa pública y juega con otras personas.</p>
-    <div class="field"><label for="public-match-mode">Colección</label><select id="public-match-mode">
-      <option value="${CT.DEFAULT_MODE}">${CT.escapeHtml(CT.mode(CT.DEFAULT_MODE).name)}</option>
-    </select></div>
-    <div class="field"><label for="public-match-capacity">Jugadores</label><select id="public-match-capacity"><option value="0">Cualquiera · más rápido</option><option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option></select></div>
-    <button class="btn btn-primary btn-block" type="button" data-public-match>Buscar partida</button>
-    <small class="hint">La partida empieza cuando se complete la mesa.</small>`;
-  // La modalidad abierta se añade como primera opción si no es la predeterminada.
-  const current=entry.querySelector('.online-intro .eyebrow')?.textContent?.trim();
-  const select=panel.querySelector('#public-match-mode');
-  for(const [key,m] of Object.entries(CT.MODES||{})){
-    if(key===CT.DEFAULT_MODE || (CT.Cartera?.tiene && !CT.Cartera.tiene(key)))continue;
-    const option=document.createElement('option');option.value=key;option.textContent=m.name;select.append(option);
-  }
-  const currentKey=Object.entries(CT.MODES||{}).find(([,m])=>current?.includes(m.name))?.[0];
-  if(currentKey && [...select.options].some(o=>o.value===currentKey)) select.value=currentKey;
-  grid.prepend(panel);
-}
 function refresh() {
-  inject();
   if(document.getElementById('app')?.dataset?.screen==='online-lobby'){
     const code=CT.Storage.getItem('continuum-last-room');
     if(code) watchPublicRoom(code);
   }
 }
 new MutationObserver(refresh).observe(document.getElementById('app'),{childList:true,subtree:true});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-public-match]');if(!b)return;const raw=Number(document.getElementById('public-match-capacity')?.value||0);sessionStorage.setItem('continuum-public-capacity',String(raw));void startQuickMatch(raw);});
 refresh();
 
 export { findOrCreate, findFlexible, findAcrossModes, watchPublicRoom };
