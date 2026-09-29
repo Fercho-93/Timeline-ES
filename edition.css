@@ -4833,7 +4833,6 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 #app.atlas-board .scoreboard-panel .score > em small { display: none !important; }
 
 /* Retos rápidos: «Pasar reto» es un botón pequeño y discreto arriba a la izquierda, sobre el título. */
-#app.atlas-board .quick-shell .game-head > div:first-child { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
 #app.atlas-board .quick-shell .quick-pass { min-height: 24px; padding: 0 10px; border: 1px solid #c9a55a99; border-radius: 999px; background: #efe0bd80; color: #7a5a2c; font: 600 .64rem/1 var(--ui-font); letter-spacing: .03em; cursor: pointer; box-shadow: none; }
 #app.atlas-board .quick-shell .quick-pass:active { background: #e4cf9e; }
 #app.atlas-board .quick-shell .quick-pass:focus-visible { outline: 2px solid #8a3f2f; outline-offset: 2px; }
@@ -4851,3 +4850,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 /* Aire entre el abanico de la mano y el bloque de la línea de cartas: la base de las cartas
    giradas ya no toca el borde superior del bloque. */
 #app.atlas-board .atlas-hand-section + .board-timeline-section, #app.atlas-board .atlas-hand-section ~ .board-timeline-section { margin-top: 22px !important; }
+
+/* «Pasar reto» junto al título de la línea de cartas, a la derecha, en el hueco que quedó libre. */
+#app.atlas-board .quick-shell .board-timeline-section > .hand-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#app.atlas-board .quick-shell .board-timeline-section > .hand-title .quick-pass { flex: none; margin-right: 2px; }
