@@ -62,6 +62,30 @@ ok("basura sin JSON se descarta en vez de reventar", LT.decodeMessage("esto no e
 const intentaMensajeSinTipo = () => { try { LT.encodeMessage("", {}); return null; } catch (e) { return e.message; } };
 ok("codificar sin tipo se rechaza al escribir, no al leer", intentaMensajeSinTipo() === "INVALID_MESSAGE_TYPE");
 
+console.log("\nSeñal compacta (la que evita QR densos)");
+const FP = Array.from({ length: 32 }, (_, i) => ((i * 7 + 3) & 255).toString(16).toUpperCase().padStart(2, "0")).join(":");
+const sdpReal = ["v=0", "o=- 4611731400430051336 2 IN IP4 127.0.0.1", "s=-", "t=0 0", "a=group:BUNDLE 0", "a=extmap-allow-mixed", "a=msid-semantic: WMS",
+  "m=application 9 UDP/DTLS/SCTP webrtc-datachannel", "c=IN IP4 0.0.0.0", "a=candidate:1 1 udp 2113937151 3f2a9c1e-1111-4222-8333-444455556666.local 51000 typ host generation 0",
+  "a=candidate:2 1 udp 2113937151 192.168.43.1 51001 typ host generation 0", "a=candidate:3 1 udp 2113939711 fe80::1 51002 typ host generation 0", "a=candidate:4 1 tcp 1518283007 192.168.43.1 9 typ host tcptype active",
+  "a=ice-ufrag:AbCd", "a=ice-pwd:0123456789abcdefghijk+/", "a=ice-options:trickle", `a=fingerprint:sha-256 ${FP}`, "a=setup:actpass", "a=mid:0", "a=sctp-port:5000", "a=max-message-size:262144", ""].join("\r\n");
+const compacta = LT.encodeSignal("offer", { sdp: sdpReal, type: "offer" });
+ok("una SDP real se resume en el formato compacto", compacta.startsWith("S2|"));
+ok("la señal compacta pesa una fracción de la completa", compacta.length < sdpReal.length / 3);
+const vuelta = LT.decodeSignal(compacta);
+ok("el papel y el tipo se conservan", vuelta.role === "offer" && vuelta.description.type === "offer");
+const sdpVuelta = vuelta.description.sdp;
+ok("se conservan usuario, clave y huella ICE/DTLS", sdpVuelta.includes("a=ice-ufrag:AbCd") && sdpVuelta.includes("a=ice-pwd:0123456789abcdefghijk+/") && sdpVuelta.includes(`a=fingerprint:sha-256 ${FP}`));
+ok("se conserva quién inicia el DTLS", sdpVuelta.includes("a=setup:actpass"));
+ok("se conservan los candidatos IPv4 y los nombres .local", sdpVuelta.includes("192.168.43.1 51001 typ host") && sdpVuelta.includes("3f2a9c1e-1111-4222-8333-444455556666.local 51000"));
+ok("se descartan IPv6 y TCP, que solo engordan el código", !sdpVuelta.includes("fe80") && !sdpVuelta.includes(" tcp "));
+ok("la SDP reconstruida es de un solo canal de datos", (sdpVuelta.match(/^m=/gm) || []).length === 1 && sdpVuelta.includes("webrtc-datachannel"));
+const resumen = LT.describeSignal(compacta);
+ok("el diagnóstico cuenta candidatos y nombres .local", resumen.compact && resumen.candidates === 2 && resumen.mdns === 1 && resumen.length === compacta.length);
+const conVideo = sdpReal + "m=video 9 UDP/TLS/RTP/SAVPF 96\r\n";
+ok("una SDP con más secciones cae al formato completo", !LT.encodeSignal("offer", { sdp: conVideo, type: "offer" }).startsWith("S2|"));
+const malas = ["S2|o|x", "S2|z|u|p|" + compacta.split("|")[3] + "|x|1.2.3.4:5", "S2|o|u|p|AAAA|x|1.2.3.4:5", "S2|o|u|p|" + compacta.split("|")[3] + "|x|1.2.3.4:99999"];
+ok("una señal compacta corrupta se rechaza con un motivo claro", malas.every(m => { try { LT.decodeSignal(m); return false; } catch (e) { return e.message === "INVALID_SIGNAL"; } }));
+
 console.log("\nSin WebRTC disponible (como en esta suite de Node)");
 const intentaAbrir = (fn) => { try { fn(); return null; } catch (e) { return e.message; } };
 ok("abrir de anfitrión falla con un motivo claro, no revienta el módulo", intentaAbrir(() => LT.createHostPeer(() => {})) === "WEBRTC_UNAVAILABLE");

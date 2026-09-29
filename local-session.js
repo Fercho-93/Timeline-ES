@@ -147,10 +147,10 @@
         if (endpoint) {
           pendingPeers.set(String(peer.peerId), peer);
           const automaticOffer = CT.LocalLanSignal.encodeInvite({ host: endpoint.host, port: endpoint.port, token: lanSecret, peerId: peer.peerId, roomCode, modeKey, deckFingerprint, signal: rawOffer });
-          return { peerId: peer.peerId, offerSignal: automaticOffer, acceptAnswer: peer.acceptAnswer, automaticLan: true };
+          return { peerId: peer.peerId, offerSignal: automaticOffer, acceptAnswer: peer.acceptAnswer, automaticLan: true, peerConnection: peer.peerConnection };
         }
       } catch (error) { console.warn("LAN signaling unavailable; using manual fallback", error); }
-      return { peerId: peer.peerId, offerSignal: rawOffer, acceptAnswer: peer.acceptAnswer, automaticLan: false };
+      return { peerId: peer.peerId, offerSignal: rawOffer, acceptAnswer: peer.acceptAnswer, automaticLan: false, peerConnection: peer.peerConnection };
     }
     function close() {
       try { transport.closeAll(); }
@@ -174,7 +174,7 @@
     // Todas las jugadas del invitado pasan por aquí: el anfitrión las resuelve y reparte.
     const send = (type, data = {}) => peer.send(type, { ...data, playerId });
     return {
-      answerSignal, send,
+      answerSignal, send, peerConnection: peer.peerConnection,
       placeCard: (cardId, index) => send("place-card", { cardId, index }),
       finishTurn: () => send("finish-turn"),
       skipTurn: () => send("skip-turn"),

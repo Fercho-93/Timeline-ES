@@ -48,14 +48,101 @@
   // fallar el `JSON.parse` o, peor, conectar mal.
   const SIGNAL_VERSION = 1;
 
+  // Una señal WebRTC completa pesa varios cientos de bytes (más en Safari, que añade IPv6 y
+  // varias interfaces) y el QR resultante llega a versiones de 150+ módulos que la cámara de
+  // otro móvil casi no lee. Entre datachannels solo hace falta un puñado de datos: usuario y
+  // clave ICE, huella DTLS, quién inicia y los candidatos IPv4. Se envían solo esos y el otro
+  // lado reconstruye una SDP mínima equivalente. Si la SDP trae algo que no se sabe resumir
+  // (varias secciones, otra huella…) se cae al formato completo de siempre.
+  const COMPACT_PREFIX = "S2|";
+  const MAX_COMPACT_CANDIDATES = 6;
+  const SETUP_CODE = { active: "a", passive: "p", actpass: "x" };
+  const SETUP_NAME = { a: "active", p: "passive", x: "actpass" };
+
+  // `toBase64Url` codifica texto UTF-8; para bytes crudos hace falta la variante binaria.
+  function bytesToBase64Url(bytes) {
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    const raw = hasBtoa() ? btoa(binary) : Buffer.from(binary, "binary").toString("base64");
+    return raw.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function base64UrlToBytes(value) {
+    const padded = value.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - value.length % 4) % 4);
+    const binary = hasBtoa() ? atob(padded) : Buffer.from(padded, "base64").toString("binary");
+    return Uint8Array.from(binary, ch => ch.charCodeAt(0));
+  }
+
+  function compactSignal(role, description) {
+    const sdp = description.sdp;
+    if ((sdp.match(/^m=/gm) || []).length !== 1 || !/^m=application /m.test(sdp)) return null;
+    const grab = re => (sdp.match(re) || [])[1];
+    const ufrag = grab(/^a=ice-ufrag:(\S+)/m), pwd = grab(/^a=ice-pwd:(\S+)/m);
+    const fingerprint = grab(/^a=fingerprint:sha-256 ([0-9A-Fa-f:]+)/m);
+    const setup = SETUP_CODE[grab(/^a=setup:(\S+)/m)];
+    if (!ufrag || !pwd || !fingerprint || !setup) return null;
+    const seen = new Set(), candidates = [];
+    for (const match of sdp.matchAll(/^a=candidate:\S+ 1 udp \d+ (\S+) (\d+) typ host\b/gm)) {
+      // IPv6 fuera: dentro de un Wi-Fi de móvil no aporta y engorda el código.
+      if (match[1].includes(":")) continue;
+      const entry = `${match[1]}:${match[2]}`;
+      if (!seen.has(entry)) { seen.add(entry); candidates.push(entry); }
+    }
+    if (!candidates.length) return null;
+    const bytes = fingerprint.split(":").map(pair => parseInt(pair, 16));
+    if (bytes.length !== 32 || bytes.some(Number.isNaN)) return null;
+    return COMPACT_PREFIX + [role === "offer" ? "o" : "a", ufrag, pwd, bytesToBase64Url(bytes), setup, candidates.slice(0, MAX_COMPACT_CANDIDATES).join(",")].join("|");
+  }
+
+  function expandSignal(text) {
+    const parts = text.split("|");
+    if (parts.length !== 7) throw new Error("INVALID_SIGNAL");
+    const [, roleCode, ufrag, pwd, fp, setupCode, candidateList] = parts;
+    const role = roleCode === "o" ? "offer" : roleCode === "a" ? "answer" : null;
+    const setup = SETUP_NAME[setupCode];
+    if (!role || !setup || !ufrag || !pwd || !candidateList) throw new Error("INVALID_SIGNAL");
+    let fingerprint;
+    try { fingerprint = [...base64UrlToBytes(fp)].map(b => b.toString(16).toUpperCase().padStart(2, "0")).join(":"); }
+    catch { throw new Error("INVALID_SIGNAL"); }
+    if (fingerprint.split(":").length !== 32) throw new Error("INVALID_SIGNAL");
+    const lines = [
+      "v=0", "o=- 4611731400430051336 2 IN IP4 127.0.0.1", "s=-", "t=0 0", "a=group:BUNDLE 0", "a=msid-semantic: WMS",
+      "m=application 9 UDP/DTLS/SCTP webrtc-datachannel", "c=IN IP4 0.0.0.0",
+      `a=ice-ufrag:${ufrag}`, `a=ice-pwd:${pwd}`,
+      `a=fingerprint:sha-256 ${fingerprint}`, `a=setup:${setup}`, "a=mid:0", "a=sctp-port:5000", "a=max-message-size:262144"
+    ];
+    candidateList.split(",").forEach((entry, index) => {
+      const cut = entry.lastIndexOf(":");
+      const address = entry.slice(0, cut), port = Number(entry.slice(cut + 1));
+      if (!address || !Number.isInteger(port) || port < 1 || port > 65535) throw new Error("INVALID_SIGNAL");
+      lines.push(`a=candidate:${index + 1} 1 udp ${2113937151 - index} ${address} ${port} typ host generation 0`);
+    });
+    lines.push("a=end-of-candidates");
+    return { role, description: { type: role, sdp: lines.join("\r\n") + "\r\n" } };
+  }
+
   function encodeSignal(role, description) {
     if (role !== "offer" && role !== "answer") throw new Error("INVALID_ROLE");
     if (!description || typeof description.sdp !== "string" || typeof description.type !== "string") throw new Error("INVALID_DESCRIPTION");
+    const compact = compactSignal(role, description);
+    if (compact) return compact;
     return toBase64Url(JSON.stringify({ v: SIGNAL_VERSION, role, sdp: description.sdp, type: description.type }));
+  }
+
+  // Resumen para la pantalla de diagnóstico: cuánto pesa la señal y con qué candidatos viaja.
+  function describeSignal(encoded) {
+    const text = String(encoded || "");
+    const compact = text.startsWith(COMPACT_PREFIX);
+    let candidates = 0, mdns = 0;
+    try {
+      const sdp = compact ? expandSignal(text).description.sdp : decodeSignal(text).description.sdp;
+      for (const match of sdp.matchAll(/^a=candidate:\S+ \d+ \S+ \d+ (\S+) \d+ typ /gm)) { candidates++; if (match[1].endsWith(".local")) mdns++; }
+    } catch { /* Sin desglose si no se puede leer. */ }
+    return { length: text.length, compact, candidates, mdns };
   }
 
   function decodeSignal(encoded) {
     if (typeof encoded !== "string" || !encoded.trim()) throw new Error("EMPTY_SIGNAL");
+    if (encoded.trim().startsWith(COMPACT_PREFIX)) return expandSignal(encoded.trim());
     let payload;
     try { payload = JSON.parse(fromBase64Url(encoded.trim())); }
     catch { throw new Error("INVALID_SIGNAL"); }
@@ -82,14 +169,19 @@
   // Sin trickle ICE: se espera a que termine de reunir candidatos antes de leer la
   // descripción local, para que la oferta (o la respuesta) quepa entera en un solo QR, en
   // vez de tener que enseñar uno nuevo por cada candidato que vaya llegando.
+  const GATHER_TIMEOUT_MS = 3000;
   function waitIceGatheringComplete(peerConnection) {
     if (peerConnection.iceGatheringState === "complete") return Promise.resolve();
+    // Con un tope: hay redes en las que el navegador tarda en dar por terminada la búsqueda
+    // aunque los candidatos locales ya estén, y sin él el QR no llegaba a mostrarse.
     return new Promise(resolve => {
-      function check() {
-        if (peerConnection.iceGatheringState !== "complete") return;
+      const timer = setTimeout(done, GATHER_TIMEOUT_MS);
+      function done() {
+        clearTimeout(timer);
         peerConnection.removeEventListener("icegatheringstatechange", check);
         resolve();
       }
+      function check() { if (peerConnection.iceGatheringState === "complete") done(); }
       peerConnection.addEventListener("icegatheringstatechange", check);
     });
   }
@@ -193,7 +285,7 @@
 
   CT.LocalTransport = {
     ICE_CONFIG, MAX_SIGNAL_LENGTH,
-    encodeSignal, decodeSignal, encodeMessage, decodeMessage,
+    encodeSignal, decodeSignal, describeSignal, encodeMessage, decodeMessage,
     // Codificación de texto genérica, sin las validaciones propias de la señal WebRTC:
     // la usa `local-multiplayer.js` para meter en una sola invitación la señal y los
     // datos de la sala (código, modalidad, huella del mazo) que el invitado todavía no

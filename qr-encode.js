@@ -44,8 +44,10 @@
     const quietZone = 4;
     // Un código con muchos cuadraditos (una invitación larga) necesita más píxeles para
     // seguir siendo legible por una cámara; con pocos, no hace falta un lienzo enorme.
-    const targetSize = Math.min(420, Math.max(260, modules.length * 6));
-    const scale = Math.max(1, Math.floor(targetSize / (modules.length + quietZone * 2)));
+    // Al menos 5 píxeles por cuadradito: con 2 (lo que salía en un código de versión alta)
+    // la cámara de otro móvil no distingue los módulos en una pantalla retina.
+    const targetSize = Math.min(900, Math.max(420, modules.length * 8));
+    const scale = Math.max(5, Math.floor(targetSize / (modules.length + quietZone * 2)));
     const size = (modules.length + quietZone * 2) * scale;
     canvas.width = size;
     canvas.height = size;
@@ -58,5 +60,8 @@
     }));
   }
 
-  CT.QrEncode = { draw, matrix };
+  // Versión del estándar QR (1-40) que necesita un texto; para el diagnóstico.
+  function version(text) { return (matrix(text).length - 17) / 4; }
+
+  CT.QrEncode = { draw, matrix, version };
 })();

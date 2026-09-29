@@ -317,6 +317,31 @@
     } finally { busy = false; }
   }
 
+  // Diagnóstico de la conexión mientras se espera: si el canal no abre, la pantalla lo dice en
+  // vez de quedarse en «Conectando…» para siempre, y enseña el estado ICE, el tamaño del QR y
+  // los candidatos, que es justo lo que hace falta para saber por qué no conecta.
+  let connectionWatch = null;
+  function watchConnection(peerConnection, { signalText, qrText, warnAfter }) {
+    clearInterval(connectionWatch); connectionWatch = null;
+    if (!peerConnection) return;
+    const started = Date.now();
+    const info = CT.LocalTransport.describeSignal(signalText);
+    let qrVersion = "?";
+    try { qrVersion = CT.QrEncode.version(qrText); } catch { /* Sin dato. */ }
+    const line = () => `ICE ${peerConnection.iceConnectionState} · conexión ${peerConnection.connectionState} · QR v${qrVersion} · señal ${info.length} car.${info.compact ? " (compacta)" : ""} · ${info.candidates} candidatos${info.mdns ? `, ${info.mdns} con nombre .local` : ""}`;
+    connectionWatch = setInterval(() => {
+      const statusEl = document.getElementById("local-conn-status"), diagEl = document.getElementById("local-conn-diag");
+      if (!statusEl) { clearInterval(connectionWatch); connectionWatch = null; return; }
+      const state = peerConnection.iceConnectionState, seconds = (Date.now() - started) / 1000;
+      if (diagEl) diagEl.textContent = line();
+      if (state === "connected" || state === "completed") { clearInterval(connectionWatch); connectionWatch = null; return; }
+      if (state === "failed" || state === "disconnected" || seconds >= warnAfter) {
+        statusEl.textContent = "No consigue conectar. Comprobad que los dos móviles están en el mismo Wi-Fi, con los datos móviles apagados, y que el punto de acceso no aísla los dispositivos. Si sigue igual, empezad la invitación de nuevo.";
+        if (diagEl) diagEl.hidden = false;
+      }
+    }, 1000);
+  }
+
   // Un único código QR, generado y enseñado directamente — sin un botón "mostrar como QR"
   // aparte, es lo primero que se ve. Compartir por Bluetooth/AirDrop o copiar a mano queda
   // como recurso, para cuando la cámara de quien organiza la sala no se pueda usar.
@@ -330,10 +355,13 @@
         <textarea class="signal-box" readonly rows="4" aria-label="Tu respuesta, para copiar a mano si hace falta" onclick="this.select()">${escapeHtml(pendingAnswerText)}</textarea>
         <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-answer">Copiar</button>
       </details>
-      <div class="status status-waiting"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Conectando con la sala…</span></div>
+      <div class="status status-waiting"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="local-conn-status">Conectando con la sala…</span></div>
+      <small class="hint" id="local-conn-diag" hidden></small>
     </div>`, "local-unirse-compartir");
     try { CT.QrEncode.draw(document.getElementById("local-answer-qr"), pendingAnswerText); }
     catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano."); }
+    // El invitado no sabe cuándo escanea el otro su respuesta: solo avisa pasado un minuto.
+    watchConnection(guestSession?.peerConnection, { signalText: pendingAnswerText, qrText: pendingAnswerText, warnAfter: 60 });
   }
 
   // ---------------------------------------------------------------------------
@@ -373,7 +401,7 @@
         <button type="button" class="btn btn-secondary btn-block" data-local-action="copy-invite">Copiar</button>
       </details>
       ${conectado
-        ? `<div class="status status-ok"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Conectando…</span></div>`
+        ? `<div class="status status-ok"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span id="local-conn-status">Conectando…</span></div><small class="hint" id="local-conn-diag" hidden></small>`
         : `<button type="button" class="btn btn-primary btn-block" data-local-action="scan-answer">${CAMERA_ICON} Ya me ha enseñado su código — escanearlo</button>
       <details class="panel qr-fallback"><summary>¿Te lo ha mandado a mano?</summary>
         <form data-local-form="accept-answer">
@@ -385,6 +413,7 @@
     </div>`, "local-invitar");
     try { CT.QrEncode.draw(document.getElementById("local-invite-qr"), pendingInvite?.inviteText || ""); }
     catch (error) { console.error(error); showToast("No se pudo generar el código QR; usa la opción de compartir a mano."); }
+    if (conectado) watchConnection(pendingInvite?.peerConnection, { signalText: pendingInvite?.offerSignal, qrText: pendingInvite?.inviteText || "", warnAfter: 15 });
   }
 
   async function acceptPendingAnswer(text) {
