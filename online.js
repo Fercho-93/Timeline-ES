@@ -561,7 +561,7 @@ function renderEntry(invited = "") {
   </div>`, "online-entry");
   if (competitionOptions && !invited) {
     appEl.querySelector('.online-intro .eyebrow').textContent='Competición multijugador';
-    appEl.querySelector('.online-intro .lead').textContent=`${competitionOptions.rounds} rondas con mazos aleatorios, ${competitionOptions.cards} cartas por persona. Un punto por ronda ganada.`;
+    appEl.querySelector('.online-intro .lead').textContent=`${competitionOptions.rounds} rondas con mazos aleatorios de las grandes colecciones, ${competitionOptions.cards} cartas por persona. Un punto por ronda ganada.`;
   }
 }
 

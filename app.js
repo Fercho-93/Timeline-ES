@@ -372,7 +372,7 @@
     screen = 'competition-menu';
     const door = (action, art, title, text) => `<button class="mode-entry" data-action="${action}"><span class="mode-entry-art" aria-hidden="true"><img src="assets/${art}" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>${title}</b><small>${text}</small><span class="mode-entry-cta" aria-hidden="true">Empezar <span>→</span></span></span></button>`;
     paint(`<div class="shell home-shell mode-hub-shell competition-hub">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">Mazos aleatorios</div><h1 data-focus tabindex="-1">Competición</h1></div><img src="assets/competition-engraving.webp" alt="" aria-hidden="true" decoding="async"></header>
+      <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">Grandes colecciones al azar</div><h1 data-focus tabindex="-1">Competición</h1></div><img src="assets/competition-engraving.webp" alt="" aria-hidden="true" decoding="async"></header>
       <section class="mode-hub-list">
         <div class="panel setup-grid competition-settings">
           <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
@@ -383,6 +383,8 @@
         ${door('start-competition', 'mode-walk-solo.webp', 'Jugar solo', 'Suma tus aciertos ronda a ronda, sin repetir temática.')}
         ${door('competition-local', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.')}
         ${door('competition-online', 'mode-walk-multi.webp', 'Varios móviles', 'La misma sala durante todas las rondas.')}
+        <p class="competition-note">La competición reparte mazos de las grandes colecciones. ¿Prefieres los mazos de Retos rápidos?</p>
+        <button class="btn btn-secondary btn-block" data-action="friends-hub">Retos rápidos con amigos <span aria-hidden="true">→</span></button>
       </section></div>`);
   }
 
@@ -395,7 +397,7 @@
     setup();
     document.getElementById('hand-size').value = String(pendingTournament.cards);
     app.querySelector('.setup-section h2').textContent = 'Competición multijugador';
-    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
+    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios de las grandes colecciones. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
   function startTournamentRound(t, players, starter, ghost, pulse, excludedCardId = null) {
     selectedModeKey = t.queue[t.index];

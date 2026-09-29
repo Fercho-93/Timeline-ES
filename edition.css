@@ -5066,3 +5066,12 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 5px rgba(54,41,26,.12);
   color: #8a3f2f; font: 600 1.05rem/1.2 var(--font-display); letter-spacing: .02em; text-wrap: balance;
 }
+
+/* Aviso de la pantalla de competición: de dónde salen los mazos y dónde están los de Retos rápidos. */
+#app .competition-note { margin: 6px 4px 0; color: var(--edition-muted, #7a6a58); font: .82rem/1.45 var(--ui-font); text-align: center; text-wrap: balance; }
+:root:not([data-theme="dark"]) #app .competition-hub .btn-secondary {
+  border: 1px solid #b9a98e;
+  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
+  color: #5b4936;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
+}
