@@ -1060,7 +1060,7 @@ async function startRoom(withGhost = true, keepOrder = false) {
       if (data.playerOrder.some(uid => (data.players[uid].clientVersion || 0) < CLIENT_VERSION)) throw new Error("UPDATE_CLIENTS");
       // La carta que se adivinó ya se ha visto de sobra: se aparta del mazo antes de
       // repartir, así nadie vuelve a encontrársela en la partida.
-      const deck = shuffle(modeCards(data.mode || "history").map(card => card.id).filter(id => id !== starterCard));
+      const deck = shuffle(CT.uniqueValueIds(data.mode || "history", modeCards(data.mode || "history").map(card => card.id).filter(id => id !== starterCard)));
       const actualHand = Math.min(handSize, Math.floor((deck.length - 1) / data.playerOrder.length));
       const powers = CT.Powers.create(deck, data.playerOrder.length, actualHand, enableGhost, pulse);
       const players = { ...data.players };

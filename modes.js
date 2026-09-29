@@ -1177,6 +1177,23 @@
     return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase();
   }
 
+  // Un mazo sin valores repetidos: de cada grupo de cartas con el mismo valor (dos hechos del
+  // mismo año, dos animales con el mismo peso) se deja UNA, elegida al azar. Colocar una
+  // carta antes o después de otra igual es correcto, pero en una partida es más limpio no
+  // repartir dos que no se pueden distinguir. `random` permite que el reto diario y el
+  // duelo —que barajan con semilla— excluyan siempre las mismas en todos los móviles.
+  function uniqueValueIds(modeKey, ids, random = Math.random) {
+    const groups = new Map(), byId = new Map(cards(modeKey).map(card => [card.id, card]));
+    for (const id of ids) {
+      const card = byId.get(id);
+      const value = card ? sortValue(modeKey, card) : id;
+      (groups.get(value) || groups.set(value, []).get(value)).push(id);
+    }
+    const kept = new Set();
+    for (const group of groups.values()) kept.add(group.length === 1 ? group[0] : group[Math.floor(random() * group.length)]);
+    return ids.filter(id => kept.has(id));
+  }
+
   function shuffle(items) {
     const copy = [...items];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -1225,7 +1242,7 @@
     pulseRules: PULSE_RULES,
     usesAnimalArt, cardArt, animalArt, cardBack, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
-    formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, timelineEnds, question, eraForCard,
+    formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, timelineEnds, uniqueValueIds, question, eraForCard,
     correctIndex, placementHint, guideMarkup,
     escapeHtml, initials, shuffle, seedFrom, seededRandom, shuffleWith
   };

@@ -21,7 +21,7 @@
   }
 
   function valueOfForMode(modeKey) { const byId = new Map(CT.cards(modeKey).map(card => [card.id, card])); return id => CT.sortValue(modeKey, byId.get(id)); }
-  function buildDeck(modeKey, shuffle = CT.shuffle, exclude = []) { return shuffle(CT.cards(modeKey).map(card => card.id).filter(id => !exclude.includes(id))); }
+  function buildDeck(modeKey, shuffle = CT.shuffle, exclude = []) { return shuffle((CT.uniqueValueIds || ((_, ids) => ids))(modeKey, CT.cards(modeKey).map(card => card.id).filter(id => !exclude.includes(id)))); }
 
   // Lo que el reductor necesita y no puede inventar él solo: valores de las cartas,
   // barajar, azar, la hora y la carta de la final. Viaja con todas las acciones.

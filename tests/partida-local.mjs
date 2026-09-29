@@ -128,7 +128,9 @@ click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 const partidaSorteada = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
 ok("la partida arranca con quien ganó el sorteo", partidaSorteada.current === partidaSorteada.starter);
 const enJuego = new Set([...partidaSorteada.deck, ...partidaSorteada.discard, ...partidaSorteada.timeline, ...partidaSorteada.players.flatMap(p => p.hand)]);
-ok("la carta que se adivinó no entra en la partida", enJuego.size === w.HISTORY_CARDS.length - 1);
+const valoresHistoria = new Set(w.HISTORY_CARDS.map(c => w.CONTINUUM.sortValue("history", c))).size;
+ok("la carta que se adivinó no entra en la partida", !enJuego.has(partidaSorteada.starterCardId ?? -1) && enJuego.size <= valoresHistoria && enJuego.size >= valoresHistoria - 1);
+ok("no se reparten dos cartas con el mismo valor", new Set([...enJuego].map(id => w.CONTINUUM.sortValue("history", w.HISTORY_CARDS.find(c => c.id === id)))).size === enJuego.size);
 
 console.log("\nEmpezar sin pasar por el sorteo también decide quién empieza");
 w = boot();
@@ -138,7 +140,9 @@ click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
 click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 const partidaSinPasar = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
-ok("aun así se aparta la carta del sorteo", [...partidaSinPasar.deck, ...partidaSinPasar.discard, ...partidaSinPasar.timeline, ...partidaSinPasar.players.flatMap(p => p.hand)].length === w.HISTORY_CARDS.length - 1);
+const repartidasSinPasar = [...partidaSinPasar.deck, ...partidaSinPasar.discard, ...partidaSinPasar.timeline, ...partidaSinPasar.players.flatMap(p => p.hand)];
+const distintos = new Set(w.HISTORY_CARDS.map(c => w.CONTINUUM.sortValue("history", c))).size;
+ok("aun así se aparta la carta del sorteo", repartidasSinPasar.length <= distintos && repartidasSinPasar.length >= distintos - 1 && new Set(repartidasSinPasar).size === repartidasSinPasar.length);
 
 console.log("\nAbandonar partida también desde la flecha de volver");
 w = boot();

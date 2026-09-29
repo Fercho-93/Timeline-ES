@@ -61,7 +61,9 @@
   }
 
   function baraja(modeKey, seed) {
-    const ids = CT.cards(modeKey).map(card => card.id);
+    // Se aparta una carta de cada grupo con el mismo valor, al azar pero con la semilla del
+    // duelo: los dos móviles excluyen exactamente las mismas.
+    const ids = CT.uniqueValueIds(modeKey, CT.cards(modeKey).map(card => card.id), CT.seededRandom(CT.seedFrom(`${seed}:${modeKey}:iguales`)));
     return CT.shuffleWith(ids, CT.seededRandom(CT.seedFrom(`${seed}:${modeKey}`)));
   }
 

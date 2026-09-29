@@ -401,7 +401,7 @@
     selectedModeKey = t.queue[t.index];
     selectedBlockKey = CT.blockOf(selectedModeKey).key;
     cardsById = new Map(CT.cards(selectedModeKey).map(c=>[c.id,c]));
-    const deck = shuffle(CT.cards(selectedModeKey).map(c=>c.id).filter(id => id !== excludedCardId));
+    const deck = shuffle(CT.uniqueValueIds(selectedModeKey, CT.cards(selectedModeKey).map(c=>c.id).filter(id => id !== excludedCardId)));
     const handSize = Math.min(t.handSize, Math.floor((deck.length-1)/players.length));
     const powers = CT.Powers.create(deck,players.length,handSize,ghost,pulse);
     const roster = players.map(p=>({id:p.id,name:p.name,hand:deck.splice(0,handSize),pulseUsed:false,shieldRound:0}));
@@ -1031,7 +1031,7 @@
     }
     // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
     // del mazo para que nadie vuelva a encontrárselas en la partida.
-    const shuffled = shuffle(currentMode().cards.map(card => card.id).filter(id => !drawnIds.includes(id)));
+    const shuffled = shuffle(CT.uniqueValueIds(selectedModeKey, currentMode().cards.map(card => card.id).filter(id => !drawnIds.includes(id))));
     // `pulseUsed` y `shieldRound` solo los mira el Pulso; una partida guardada de antes
     // no los lleva, y sin ellos `undefined` se comporta como «no usado» y «sin escudo»,
     // que es justo lo que hace falta para que siga abriéndose sin migrarla.
@@ -2493,9 +2493,10 @@
       duelo = duel || { seed: CT.Duelo.crearSemilla(), total: CT.Duelo.CARTAS, rival: null, ms: CT.Duelo.MS };
       barajado = CT.Duelo.reparto(selectedModeKey, duelo.seed, duelo.total);
     } else if (kind === "daily") {
-      barajado = shuffleWith(ids, seededRandom(seedFrom(`${today()}:${selectedModeKey}`))).slice(0, DAILY_CARDS + 1);
+      const azar = seededRandom(seedFrom(`${today()}:${selectedModeKey}`));
+      barajado = shuffleWith(CT.uniqueValueIds(selectedModeKey, ids, azar), azar).slice(0, DAILY_CARDS + 1);
     } else {
-      barajado = shuffle(ids);
+      barajado = shuffle(CT.uniqueValueIds(selectedModeKey, ids));
     }
     const timeline = [barajado.shift()];
     solo = {
@@ -3392,7 +3393,7 @@
     cardsById = new Map(comp.decks[modeKey].map(card => [card.id, card]));
     const extra = CT.Ghost.level(comp.difficulty).extra;
     const count = comp.cardsPerRound || ROUND_CARDS;
-    const barajado = shuffle(comp.decks[modeKey].map(card => card.id)).slice(0, count + 1 + extra * (count - 1));
+    const barajado = shuffle(CT.uniqueValueIds(modeKey, comp.decks[modeKey].map(card => card.id))).slice(0, count + 1 + extra * (count - 1));
     const timeline = [barajado.shift()];
     solo = {
       savedDeck: comp.decks[modeKey], kind: "comp", difficulty: comp.difficulty, ghostTurns: comp.difficulty === "hard" ? CT.Ghost.soloSchedule(count) : [], mode: modeKey, timeline, deck: barajado,
