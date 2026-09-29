@@ -390,7 +390,7 @@
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
       prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count}); return;
     }
-    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry); return;}
+    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, state ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
     if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
     if (action === 'setup') {setup(); return;}
     if (action === 'start') {
