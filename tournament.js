@@ -19,11 +19,13 @@
     if (t.index + 1 >= t.queue.length) throw Error('La competición ha terminado.');
     return {...t, index:t.index+1, history:[...t.history,{mode:t.queue[t.index],winners:[...winners],hands:handsOf(players)}]};
   }
+  // Los capítulos que aún no han llegado no dicen su mazo: cada ronda se descubre en su cartel de
+  // presentación, no antes.
   function journey(t) {
     return `<nav class="chapter-journey" aria-label="Recorrido de la competición"><ol>${t.queue.map((modeKey,index)=>{
       const state=index<t.index?' complete':index===t.index?' current':'';
       const label=index<t.index?'Completado':index===t.index?'Capítulo actual':'Pendiente';
-      return `<li class="chapter-stop${state}"${index===t.index?' aria-current="step"':''}><span>${index<t.index?'✓':index+1}</span><small>Cap. ${String(index+1).padStart(2,'0')}</small><b>${CT.escapeHtml(CT.mode(modeKey).name)}</b><i>${label}</i></li>`;
+      return `<li class="chapter-stop${state}"${index===t.index?' aria-current="step"':''}><span>${index<t.index?'✓':index+1}</span><small>Cap. ${String(index+1).padStart(2,'0')}</small><b>${index>t.index?'Por descubrir':CT.escapeHtml(CT.mode(modeKey).name)}</b><i>${label}</i></li>`;
     }).join('')}</ol></nav>`;
   }
   function board(t, players, winners = []) {

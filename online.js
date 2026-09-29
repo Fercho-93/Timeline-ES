@@ -863,7 +863,10 @@ function renderLobby() {
   if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
   if (isPublic) managePublicStarter();
   if (roomState.tournament) {
-    appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', tournamentBoard());
+    // En la sala de espera no se enseña qué mazos vienen: cada ronda se descubre en su cartel. Solo
+    // el resumen de la competición, sin nombres.
+    const t = roomState.tournament;
+    appEl.querySelector('.lobby-head').insertAdjacentHTML('afterend', `<section class="panel tournament-board tournament-summary"><div class="tournament-score-head"><div><span>Competición</span><h2>${t.queue.length} ${t.queue.length === 1 ? 'ronda' : 'rondas'} con mazos sorpresa</h2></div><p>${t.handSize} cartas por persona. Ganar la ronda suma un punto; las cartas restantes restan su número menos uno.</p></div></section>`);
     const hand = document.getElementById('online-hand-size');
     if (hand) {hand.value=String(roomState.tournament.handSize);hand.disabled=true;}
   }

@@ -61,5 +61,12 @@ w=boot();w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();cl
 click('[data-action="start-competition"]');click('[data-action="comp-next-round"]');
 let solo=JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
 assert.equal(solo.cardsPerRound,2);assert.equal(solo.solo.total,2);
+{ // El recorrido no revela los mazos que aún no han llegado.
+  const CTw = w.CONTINUUM, modos = CTw.Tournament.modes().slice(0, 3);
+  const html = CTw.Tournament.journey({ queue: modos, index: 0, history: [], handSize: 4 });
+  assert.ok(html.includes(CTw.mode(modos[0]).name), 'el capítulo actual sí dice su mazo');
+  for (const pendiente of modos.slice(1)) assert.ok(!html.includes(CTw.mode(pendiente).name), 'un capítulo pendiente no debe decir su mazo');
+  assert.ok(html.includes('Por descubrir'));
+}
 w.close();
 console.log('Competición: tres formatos, mazos sin repetir, cartas configurables, tres rondas locales, desempate, marcador y recuperación: OK');
