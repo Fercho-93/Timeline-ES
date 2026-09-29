@@ -4,6 +4,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 import {gameHtml} from './game-fixture.mjs';
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
@@ -42,7 +45,7 @@ function checkBoard(document, count) {
     const CT = window.CONTINUUM;
     for (const mode of Object.keys(CT.MODES)) assert.match(CT.cardBack(mode), /continuum-emblem-800\.webp/);
     CT.localNavigate('jugar');
-    click(document, '[data-action="toggle-play-catalog"][data-section="collections"]');
+    click(document, '[data-inline-route]'); window.sessionStorage.removeItem('continuum-entry-route');
     click(document, '[data-block="historia"]');
     click(document, '[data-mode="history"]');
     click(document, '[data-action="solo"]');
@@ -55,7 +58,7 @@ function checkBoard(document, count) {
   const window = boot(), document = window.document;
   try {
     window.CONTINUUM.localNavigate('jugar');
-    click(document, '[data-action="toggle-play-catalog"][data-section="collections"]');
+    click(document, '[data-inline-route]'); window.sessionStorage.removeItem('continuum-entry-route');
     click(document, '[data-block="historia"]');
     click(document, '[data-mode="history"]');
     click(document, '[data-format="multi"]');

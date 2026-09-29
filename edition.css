@@ -4942,3 +4942,5 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 :root[data-theme="dark"] #app.atlas-board .hand-card > .hidden-date { color: #e2c48c !important; }
 :root[data-theme="dark"] #app.atlas-board .scoreboard-panel .score:not(.active) { background: #3a2a1d; border-color: #7a5d38; color: #f0e2c6; }
 :root[data-theme="dark"] #app.atlas-board .scoreboard-panel .score:not(.active) > em { background: #f0e2c6; color: #5a2a1c; }
+/* Modo oscuro: «Fecha oculta» queda sobre el filo claro del marco; se le da un fondo propio. */
+:root[data-theme="dark"] #app.atlas-board .hand-card > .hidden-date { position: relative; z-index: 3; width: fit-content; padding: 1px 5px; border-radius: 4px; background: #2b2118; }

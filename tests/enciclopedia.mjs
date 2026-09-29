@@ -5,6 +5,9 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
@@ -13,7 +16,8 @@ function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('jugar'); } if (!d.querySelector('[data-block]')) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -174,7 +178,7 @@ console.log("\nSin entrada desde dentro de una partida");
   abreMazo(w, "historia", "history");
   ok("la barra sí está, antes de empezar a jugar", existe(w, '.home-nav [data-action="home-top"]'));
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
-  click(w, '[data-action="start"]');
+  click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   ok("no hay enciclopedia en la pantalla de pasar el móvil", !existe(w, '[data-action="home-encyclopedia"]'));
   click(w, '[data-action="ready"]');
   ok("no hay enciclopedia en la partida local", !existe(w, '[data-action="home-encyclopedia"]'));

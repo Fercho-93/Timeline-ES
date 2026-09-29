@@ -133,9 +133,12 @@ assert.equal(CT.has('counts'), false, 'La colección eliminada no entra en parti
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
 const click = selector => {const el = w.document.querySelector(selector); assert.ok(el, selector); el.click();};
 const openQuick = () => {
-  click('[data-action="jugar"]');
-  assert.equal(w.document.querySelector('[data-action="toggle-play-catalog"][data-section="quick"]'), null, 'Retos rápidos tiene una sola puerta: no se despliega');
-  click('.catalog-quick [data-action="quick-challenges"]');
+  // Menú de formatos de Retos rápidos (sin ruta de entrada).
+  w.sessionStorage.removeItem('continuum-entry-route');
+  w.CONTINUUM.ModeHubs.open('hub-solo');
+  const door = w.document.querySelector('[data-action="quick-challenges"]');
+  door.removeAttribute('data-solo-route');
+  door.click();
 };
 openQuick(); click('[data-quick="show-multi"]'); click('[data-quick="local"]');
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);

@@ -186,6 +186,8 @@
       drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery() : '';
       drawer.hidden = !open;
       inlineCollections.setAttribute('aria-expanded', String(open));
+      // El efecto de profundidad al inclinar el móvil también vale para las portadas desplegadas.
+      window.CONTINUUM.UI?.updateEffects?.();
       return;
     }
     const topicInput=event.target.closest('[data-public-topic]');
@@ -229,7 +231,7 @@
   }, true);
 
   const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends-wifi': () => openFriendHub('wifi'), 'hub-friends-duel': () => openFriendHub('duel'), 'hub-friends': openFriendsHub};
-  if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); } };
+  if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
 
   function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
   function rankingSummary() {
@@ -255,10 +257,12 @@
     doors.append(box);
   }
 
-  const observer = new MutationObserver(()=>{restructureHome();addRankingSummary();});
+  // Si la ventana ya se ha cerrado (pruebas), no queda documento sobre el que trabajar.
+  const observer = new MutationObserver(()=>{if(typeof document==='undefined'||!document||!app.ownerDocument?.defaultView)return;restructureHome();addRankingSummary();});
   observer.observe(app, { childList: true, subtree: true });
   restructureHome();
   addRankingSummary();
   };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true}); else start();
+  // El script va al final de <body>: #app ya existe y se puede montar sin esperar al evento.
+  if (document.readyState !== 'loading' || document.getElementById('app')) start(); else document.addEventListener('DOMContentLoaded', start, {once:true});
 })();

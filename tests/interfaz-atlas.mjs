@@ -2,12 +2,16 @@ import {gameHtml} from './game-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('jugar'); } if (!d.querySelector('[data-block]')) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 const read = f => fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
 const html = gameHtml(read('index.html'));
@@ -40,23 +44,25 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     assert.ok(w.document.querySelector('.home-nav [data-action="rules"]'));
     assert.equal(w.document.querySelector('.topbar [data-action="rules"]'),null);
     click(w,'[data-format="multi"]');click(w,'[data-action="setup"]');
-    w.document.querySelector('#hand-size').value='4';click(w,'[data-action="start"]');click(w,'[data-action="ready"]');
+    w.document.querySelector('#hand-size').value='4';click(w, '[data-action="start"]'); jugarQuienEmpieza(w);click(w,'[data-action="ready"]');
     assert.equal(w.document.querySelectorAll('.hand-card').length,4);
     assert.equal(w.document.querySelector('.home-nav'),null);
     assert.equal(w.document.querySelectorAll('.topbar button').length,2);
-    click(w,'.hand-card');click(w,'.slot');
+    click(w,'.hand-card');
+    // La carta elegida pasa a la línea como vista previa al tocar un hueco.
     const selected=w.document.querySelector('.hand-card.selected').dataset.id;
+    click(w,'.slot');
     assert.equal(w.document.querySelectorAll('[data-action="confirm-place"]').length,1);
     assert.ok(w.document.querySelector('.placement-dock [data-action="confirm-place"]'));
     assert.equal(w.document.querySelector('.placement-dock-status strong').textContent,'Posición elegida');
     assert.equal(w.document.querySelector('.placement-dock-actions [data-action="cancel-place"]').textContent,'Cambiar');
     const timelineSection=w.document.querySelector('.timeline-wrap').closest('section');
     assert.equal(timelineSection.nextElementSibling.className,'placement-dock');
-    assert.ok(timelineSection.nextElementSibling.nextElementSibling.classList.contains('atlas-hand-section'));
+    assert.ok(w.document.querySelector('.atlas-hand-section'), 'la mano sigue en la mesa');
     assert.equal(w.document.querySelector('.slot-confirm button'),null);
     const zoom=w.document.querySelector('[data-timeline-range]');zoom.value='0';zoom.dispatchEvent(new w.Event('input',{bubbles:true}));
     assert.equal(w.document.querySelector('.timeline-zoom output').textContent,'80%');
-    assert.equal(w.document.querySelector('.hand-card.selected').dataset.id,selected);
+    assert.equal(w.document.querySelector(`.hand-card[data-id="${selected}"]`),null,'la carta elegida está en la línea como vista previa');
     const saved=w.localStorage.getItem('hilo-game-animals-v1');
     click(w,'[data-action="ui-back"]');assert.ok(w.document.querySelector('[data-exit-dialog]'));
     click(w,'[data-exit-stay]');assert.equal(screen(w),'game');assert.equal(w.localStorage.getItem('hilo-game-animals-v1'),saved);
@@ -71,7 +77,8 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
   try {
     // Real online rendering with an inert SDK: no server calls are made by UI navigation.
     w.eval(`(() => {
-      const initializeApp=()=>({}),getAuth=()=>({}),getFirestore=()=>({});
+      const initializeApp=()=>({}),getAuth=()=>({}),getFirestore=()=>({}),firebaseApp={},auth={},db={};
+      const deleteDoc=async()=>{},disableNetwork=async()=>{},enableNetwork=async()=>{},doc=()=>({}),getDoc=async()=>({exists:()=>false,data:()=>null}),onSnapshot=()=>()=>{},runTransaction=async()=>{},serverTimestamp=()=>null,setDoc=async()=>{},writeBatch=()=>({set(){},update(){},delete(){},commit:async()=>{}});
       ${read('online.js').replace(/^import .*;$/gm,'').replace('export async function','async function')}
       const ids=CT.cards('animals').map(c=>c.id);
       user={uid:'fer'};selectedModeKey='animals';roomCode='ABCD2345';roomRef={};
@@ -148,8 +155,8 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
       Object.defineProperties(event, {beta:{value:beta}, gamma:{value:gamma}});
       w.dispatchEvent(event);
     };
-    // Las portadas de las colecciones viven en «Jugar».
-    const jugar = w.document.querySelector('[data-action="jugar"]'); jugar.dataset.homeTransition = "done"; jugar.click();
+    // Las portadas de las colecciones se despliegan en «Jugar solo».
+    w.CONTINUUM.ModeHubs.open('hub-solo'); w.document.querySelector('[data-inline-route]').click();
     inclina(0, 0);            // la primera lectura fija el origen
     inclina(9, 9);            // media inclinación en los dos ejes
     await new Promise(resolve => setTimeout(resolve, 40));   // el frame que escribe

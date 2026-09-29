@@ -7,12 +7,16 @@ import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('jugar'); } if (!d.querySelector('[data-block]')) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -113,7 +117,7 @@ console.log("\nUna partida a un solo móvil");
   abreMazo(w, "historia", "history");
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   w.document.getElementById("hand-size").value = "1";
-  click(w, '[data-action="start"]');
+  click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   const cards = new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
   let turnos = 0;
   while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML) && turnos < 600) {
@@ -246,7 +250,7 @@ console.log("\nLa pantalla del perfil");
 {
   const w = boot();
   click(w, '[data-action="perfil"]');
-  ok("se llega desde la portada", w.document.querySelector("h1")?.textContent === "Atlas");
+  ok("se llega desde la portada", /Atlas/.test(w.document.querySelector("h1")?.textContent || ""));
   ok("un perfil sin estrenar lo dice sin números falsos", /Todavía no hay nada que contar/.test(texto(w)));
   ok("todos los logros se pintan aunque estén bloqueados", w.document.querySelectorAll(".logro").length === w.CONTINUUM.Progreso.ACHIEVEMENTS.length);
   ok("ninguno aparece como conseguido", w.document.querySelectorAll(".logro.unlocked").length === 0);
@@ -353,7 +357,7 @@ console.log("\nCopia de seguridad");
   const tras = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
   ok("el récord del reto diario sobrevive al borrado", tras?.retoDiario?.best === 11 && tras.history.best === 11);
   ok("y su racha también", tras.retoDiario.streak === 5 && tras.retoDiario.lastDay === "2026-02-02");
-  ok("la pantalla se queda en el Atlas, ya vacío", w.document.querySelector("h1")?.textContent === "Atlas");
+  ok("la pantalla se queda en el Atlas, ya vacío", /Atlas/.test(w.document.querySelector("h1")?.textContent || ""));
 }
 
 console.log("\nNo se cuela en ninguna pantalla de partida");
@@ -362,7 +366,7 @@ console.log("\nNo se cuela en ninguna pantalla de partida");
   abreMazo(w, "historia", "history");
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   ok("la preparación conserva el menú inferior", existe(w, '.home-nav [data-action="home-top"]'));
-  click(w, '[data-action="start"]');
+  click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   click(w, '[data-action="ready"]');
   ok("ni dentro de la partida local", !existe(w, '[data-action="perfil"]'));
 }

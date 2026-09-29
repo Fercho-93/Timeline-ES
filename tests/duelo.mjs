@@ -6,12 +6,16 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('jugar'); } if (!d.querySelector('[data-block]')) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -338,7 +342,7 @@ console.log("\nEl duelo no se cuela donde no debe");
   ok("no hay duelo en el menú de formatos", !existe(w, '[data-action="start-duel"]'));
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   ok("ni en la preparación de una partida local", !existe(w, '[data-action="start-duel"]'));
-  click(w, '[data-action="start"]');
+  click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   click(w, '[data-action="ready"]');
   ok("ni dentro de una partida", !existe(w, '[data-action="start-duel"]'));
 }

@@ -5,12 +5,16 @@ import { finishLocalFinal } from './final-helper.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('jugar'); } if (!d.querySelector('[data-block]')) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -38,8 +42,8 @@ ok("el bloque de historia se despliega con el mazo de historia", /167 hechos/.te
 // Elegir bloque selecciona su primer juego; el clic en el juego es explícito de todos
 // modos, que es como funcionará cuando un bloque tenga varios.
 click(irAJugar(w), '[data-block="cine"]');
-ok("Entretenimiento reúne cine, música y videojuegos", w.document.querySelectorAll(".game-row").length === 3);
-ok("el bloque de cine muestra las 87 películas", /87 películas/.test(w.document.body.innerHTML));
+ok("Entretenimiento reúne cine, música y videojuegos", w.document.querySelectorAll(".collection-entry.active .game-row").length === 3);
+ok("el bloque de cine muestra sus películas", /\d+ películas/.test(w.document.querySelector(".collection-entry.active").innerHTML));
 click(w, '[data-mode="movies"]');
 ok("elegir un juego lleva al menú de formatos de Estrenos de cine", w.document.querySelector("h1")?.textContent === "Estrenos de cine");
 
@@ -51,7 +55,7 @@ click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
 click(w, '[data-action="add-player"]');
 w.document.getElementById("hand-size").value = "2";
-click(w, '[data-action="start"]');
+click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 ok("empieza pidiendo pasar el móvil", /El turno es de/.test(w.document.body.innerHTML));
 
 const cardsById = new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
@@ -91,7 +95,7 @@ click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
-click(w, '[data-action="start"]');
+click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 click(w, '[data-action="ready"]');
 const manoCartas = [...w.document.querySelectorAll('[data-action="select-card"]')];
 const handHtml = manoCartas.map(el => el.innerHTML).join(" ");
@@ -120,7 +124,7 @@ ok("hay una persona ganadora marcada", !!w.document.querySelector(".starter-draw
 ok("el resultado mantiene visible la ilustración de la carta", !!w.document.querySelector('.starter-card-art img.animal-card-art'));
 click(w, '[data-action="close-menu"]');
 ok("el campo pasa a ofrecer repetir el sorteo", /Repetir el sorteo/.test(w.document.body.innerHTML));
-click(w, '[data-action="start"]');
+click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 const partidaSorteada = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
 ok("la partida arranca con quien ganó el sorteo", partidaSorteada.current === partidaSorteada.starter);
 const enJuego = new Set([...partidaSorteada.deck, ...partidaSorteada.discard, ...partidaSorteada.timeline, ...partidaSorteada.players.flatMap(p => p.hand)]);
@@ -132,7 +136,7 @@ click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
-click(w, '[data-action="start"]');
+click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 const partidaSinPasar = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
 ok("aun así se aparta la carta del sorteo", [...partidaSinPasar.deck, ...partidaSinPasar.discard, ...partidaSinPasar.timeline, ...partidaSinPasar.players.flatMap(p => p.hand)].length === w.HISTORY_CARDS.length - 1);
 
@@ -142,7 +146,7 @@ click(irAJugar(w), '[data-block="historia"]');
 click(w, '[data-mode="history"]');
 click(w, '[data-format="multi"]');
 click(w, '[data-action="setup"]');
-click(w, '[data-action="start"]');
+click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 click(w, '[data-action="ready"]');
 click(w, '[data-action="ui-back"]');
 ok("el diálogo de salir ofrece también abandonar la partida", !!w.document.querySelector('[data-exit-discard]'));

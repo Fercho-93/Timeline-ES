@@ -136,8 +136,9 @@ await expectBack('home');
 // quedarse dando vueltas entre dos pantallas.
 w.CONTINUUM.localNavigate('jugar');
 await tick();
-assert.equal(screen(), 'jugar');
-await click('[data-action="toggle-play-catalog"][data-section="collections"]');
+assert.equal(screen(), 'hub-solo', 'la antigua pantalla «Jugar» ya no existe: se abre Jugar solo');
+await click('[data-inline-route]');
+w.sessionStorage.removeItem('continuum-entry-route');
 await openFirstDeck();
 await click('.play-choice-block [data-action="toggle-format-block"]');
 await click('.play-choice[data-action="setup"]');
@@ -151,7 +152,7 @@ await back();
 await click('[data-exit-confirm]');
 assert.equal(screen(), 'setup');
 await expectBack('play-menu');
-await expectBack('jugar');
+await expectBack('hub-solo');
 await expectBack('home');
 
 // Deslizar hacia la derecha hace lo mismo que la flecha, también en las pantallas que
@@ -171,13 +172,11 @@ w.CONTINUUM.localNavigate('jugar');
 await tick();
 await click('[data-action="quick-challenges"]');
 assert.equal(screen(), 'quick-challenges');
-await click('[data-quick="free"]');
 assert.ok(app().querySelector('[data-quick="start-free"]'));
 await swipe();
-assert.ok(app().querySelector('[data-quick="free"]'), 'deslizar en un formato de Retos rápidos vuelve a sus formatos');
-await swipe();
-assert.equal(screen(), 'jugar', 'y desde los formatos, al catálogo');
-await click('[data-action="toggle-play-catalog"][data-section="collections"]');
+assert.equal(screen(), 'hub-solo', 'deslizar en Retos rápidos vuelve a Jugar solo');
+await click('[data-inline-route]');
+w.sessionStorage.removeItem('continuum-entry-route');
 await openFirstDeck();
 await click('.play-choice-block [data-action="toggle-format-block"]');
 await click('.play-choice[data-action="local-multiplayer"]');

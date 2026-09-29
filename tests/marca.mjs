@@ -36,7 +36,9 @@ const openFormat = format => {
 // tocamos su carátula cuando aún no se ven los mazos; volver a tocar una colección ya
 // abierta ahora la pliega de forma intencionada.
 const openSelectedCollection = () => {
-  if (!w.document.querySelector('[data-action="set-mode"]')) click("set-block");
+  if (w.document.querySelector('[data-action="set-mode"]')) return;
+  if (!w.document.querySelector('[data-action="set-block"]')) { w.document.querySelector('[data-inline-route]').click(); w.sessionStorage.removeItem('continuum-entry-route'); }
+  click("set-block");
 };
 const checkScreen = label => {
   check(`${label}: marca o cabecera de partida despejada`, w.CONTINUUM.UI.isPlaying(w.document.getElementById('app').dataset.screen) ? !!w.document.querySelector('.atlas-back') && !!w.document.querySelector('.atlas-menu') : w.document.querySelector('.brand')?.textContent.trim() === brand);
@@ -54,8 +56,8 @@ try {
   check("título de las auditorías", read("VERIFICACION_CORRECCIONES.md").startsWith(`# Correcciones de las auditorías de ${brand}\n`));
   for (const script of w.document.querySelectorAll("script[src]:not([type=\"module\"])")) w.eval(read(script.getAttribute("src")));
   checkScreen("Inicio");
-  click("jugar");
-  click("toggle-play-catalog");
+  w.CONTINUUM.localNavigate('jugar');
+  w.document.querySelector('[data-inline-route]').click(); w.sessionStorage.removeItem('continuum-entry-route');
   openSelectedCollection();
   click("set-mode");
   checkScreen("Menú de formatos");

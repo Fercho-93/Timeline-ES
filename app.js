@@ -696,76 +696,15 @@
   // desde la que se tocó.
   function duelsRefresh() { screen === "duelos" ? duelsView() : perfilView(); }
 
-  // Jugar: primero qué, luego cómo. Tres bloques, cada uno con su propio «¿Cómo quieres
-  // jugar?» detrás.
+  // La antigua pantalla «¿Qué te apetece jugar?» ya no existe: cualquier camino que llevaba a
+  // ella abre ahora la pantalla de la modalidad de la que se viene (Jugar solo, Un solo móvil…).
+  const HUB_FOR_ROUTE = { local: 'hub-friends-local', wifi: 'hub-friends-wifi', online: 'hub-friends-online', duel: 'hub-friends-duel' };
   function jugarView() {
     CT.Quick.leave();
     pendingTournament = null;
-    screen = "jugar";
-    if (collectionIndexExpanded) jugarSection = "collections";
-    paint(`<div class="shell home-shell home-gallery-shell jugar-shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <header class="atlas-page-heading jugar-heading"><div class="eyebrow">Elige tu próxima partida</div><h1 data-focus tabindex="-1">¿Qué te apetece jugar?</h1><p>Explora un tema, prueba un reto o lánzate a competir.</p></header>
-      <div class="play-catalog">
-        ${catalogSection("collections", "01", "Grandes colecciones", "Historia, ciencia, naturaleza y mucho más.", "Explorar los mazos")}
-        ${sessionStorage.getItem('continuum-entry-route') ? '' : catalogSection("quick", "02", "Retos rápidos", "Temas concretos para una partida diferente.", "Jugar un reto")}
-        ${sessionStorage.getItem('continuum-entry-route') ? '' : catalogSection("competition", "03", "Competición", "Pon a prueba lo que sabes, ronda a ronda.", "Elegir cómo competir")}
-      </div>
-      ${homeNav()}
-    </div>`);
-  }
-
-  function catalogContent(key) {
-    if (key === "collections") return `<p class="catalog-hint">Elige una colección para desplegar sus mazos.</p><section id="deck-collection">${gallery()}</section>`;
-    if (key === "quick") return `<div class="home-quick"><div class="gallery">${CT.Quick.blocks()}</div></div>`;
-    return `<div class="home-competition">${competitionPromo()}</div>`;
-  }
-
-  // Lámina de cada entrada: grabados que ya usa el juego, puestos como fondo desde la
-  // hoja de estilos. Así, si la hoja no está al día, simplemente no se ven: nunca salen
-  // como imágenes sueltas a tamaño real.
-  // La posición va también en línea: aunque falte la hoja, la capa queda fuera de la
-  // rejilla de la tarjeta y no descoloca el texto.
-  const catalogArt = (kind, inner = "") => `<span class="catalog-art catalog-art-${kind}" aria-hidden="true" style="position:absolute;top:0;right:0;bottom:0;pointer-events:none">${inner}</span>`;
-  const CATALOG_ART = {
-    collections: catalogArt("collections"),
-    quick: catalogArt("quick"),
-    competition: catalogArt("competition")
-  };
-  // Retos rápidos y Competición tienen una sola puerta: desplegarlas solo repetía la
-  // misma tarjeta, así que la entrada lleva directamente a su pantalla.
-  const CATALOG_DIRECT = { quick: "quick-challenges", competition: "competition-menu" };
-  function catalogSection(key, number, title, description, cta) {
-    const direct = CATALOG_DIRECT[key];
-    if (direct) return `<section class="catalog-section catalog-${key} catalog-direct" data-catalog="${key}">
-      <h2><button class="catalog-toggle" data-action="${direct}">
-        ${CATALOG_ART[key] || ""}<span class="catalog-number" aria-hidden="true">${number}</span><span class="catalog-copy"><strong>${title}</strong><small>${description}</small><span class="catalog-cta">${cta} <span aria-hidden="true">→</span></span></span><span class="catalog-chevron" aria-hidden="true">→</span>
-      </button></h2>
-    </section>`;
-    const open = jugarSection === key;
-    return `<section class="catalog-section catalog-${key}${open ? " is-open" : ""}" data-catalog="${key}">
-      <h2><button class="catalog-toggle" data-action="toggle-play-catalog" data-section="${key}" aria-expanded="${open}" aria-controls="catalog-${key}">
-        ${CATALOG_ART[key] || ""}<span class="catalog-number" aria-hidden="true">${number}</span><span class="catalog-copy"><strong>${title}</strong><small>${description}</small><span class="catalog-cta">${cta}</span></span><span class="catalog-chevron" aria-hidden="true">+</span>
-      </button></h2>
-      <div id="catalog-${key}" class="catalog-drawer"${open ? "" : " inert"}><div class="catalog-drawer-inner">${open ? catalogContent(key) : ""}</div></div>
-    </section>`;
-  }
-
-  function toggleCatalog(key) {
-    jugarSection = jugarSection === key ? null : key;
-    collectionIndexExpanded = jugarSection === "collections";
-    app.querySelectorAll("[data-catalog]").forEach(section => {
-      const open = section.dataset.catalog === jugarSection;
-      const drawer = section.querySelector(".catalog-drawer");
-      if (!drawer) return; // Las entradas directas no se despliegan.
-      const inner = drawer.firstElementChild;
-      if (open && !inner.innerHTML) inner.innerHTML = catalogContent(key);
-      // Medir la fila cerrada permite animar su altura incluso al cargarla por primera vez.
-      void drawer.offsetHeight;
-      section.classList.toggle("is-open", open);
-      section.querySelector(".catalog-toggle").setAttribute("aria-expanded", String(open));
-      drawer.inert = !open;
-    });
-    rememberView();
+    const entry = sessionStorage.getItem('continuum-entry-route') || '';
+    const hub = HUB_FOR_ROUTE[entry.replace(/-quick$/, '')] || 'hub-solo';
+    if (CT.ModeHubs) CT.ModeHubs.open(hub); else home();
   }
 
   // Se llega aquí con un mazo ya elegido, así que es el sitio natural para ojearlo
@@ -3771,7 +3710,6 @@
       else { jugarSection = entry ? 'collections' : null; collectionOpen = false; collectionDetails = false; collectionIndexExpanded = !!jugarSection; jugarView(); }
       window.scrollTo(0, 0);
     }
-    else if (action === "toggle-play-catalog") toggleCatalog(target.dataset.section);
     else if (action === "duels-open") openPendingDuels();
     else if (action === "duels-list") duelsView();
     else if (action === "share-daily-home") shareDailyFromHome();

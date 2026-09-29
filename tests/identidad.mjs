@@ -4,6 +4,9 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => fs.readFileSync(path.join(REPO, f), "utf8");
@@ -117,8 +120,8 @@ console.log("\nEl Atlas: nombre y avatar");
 console.log("\nLos avatares en la partida de un móvil");
 {
   const w = boot({ "continuum-identidad-v1": JSON.stringify({ nombre: "Lucía" }) });
-  click(w, '[data-action="jugar"]');
-  click(w, '[data-action="toggle-play-catalog"][data-section="collections"]');
+  w.CONTINUUM.localNavigate('jugar');
+  click(w, '[data-inline-route]'); w.sessionStorage.removeItem('continuum-entry-route');
   click(w, '[data-block="historia"]');
   click(w, '[data-mode="history"]');
   click(w, '[data-format="multi"]');

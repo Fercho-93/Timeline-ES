@@ -7,7 +7,8 @@ import { JSDOM } from 'jsdom';
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block], [data-action="competition-menu"]')) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('jugar'); } if (!d.querySelector('[data-block]')) d.querySelector('[data-action="toggle-play-catalog"][data-section="collections"]')?.click(); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 const root = new URL('../', import.meta.url);
 const read = name => fs.readFileSync(new URL(name, root), 'utf8');
@@ -212,7 +213,7 @@ for (const difficulty of ['easy','normal','hard','expert']) {
 {
   // El modo competición ya no vive en el menú de un mazo concreto: baraja varios mazos
   // al azar, así que su botón está en la portada y no hace falta `abreMazo` para llegar.
-  const w=boot({'continuum-difficulty-v1':'expert'});click(irAJugar(w),'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
+  const w=boot({'continuum-difficulty-v1':'expert'});click(irAInicio(w),'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
   let rounds=0;
   // La competición pasa por los mazos que son suyos menos la Gran mezcla, así que el
