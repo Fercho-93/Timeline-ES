@@ -4,6 +4,9 @@ import {gameHtml} from './game-fixture.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
+// Antes de repartir se juega el minijuego de quién empieza: todos dicen la misma cifra.
+function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); for (let i = 0; i < 12 && d.getElementById('starter-guess-input'); i++) { d.getElementById('starter-guess-input').value = '1900'; tap(d.querySelector('[data-action="starter-guess-submit"]')); } tap(d.querySelector('[data-action="starter-start"]')); return w; }
+
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La enciclopedia se abre ahora desde el Atlas: si el botón no está a la vista, se
@@ -12,7 +15,7 @@ function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); if (!d.querySelector('[data-block]')) d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
@@ -52,7 +55,7 @@ function abreMazo(w, block, mode) {
   if (!w.document.querySelector(`[data-mode="${mode}"]`)) click(irAJugar(w), `[data-block="${block}"]`);
   click(w, `[data-mode="${mode}"]`);
 }
-function game(w) { abreMazo(w, "historia", "history"); click(w, '[data-format="multi"]'); ["setup", "start", "ready"].forEach(action => click(w, `[data-action="${action}"]`)); }
+function game(w) { abreMazo(w, "historia", "history"); click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]'); click(w, '[data-action="start"]'); jugarQuienEmpieza(w); click(w, '[data-action="ready"]'); }
 function animationEnd(w, target, name) {
   const event = new w.Event("animationend", { bubbles: true });
   Object.defineProperty(event, "animationName", { value: name });
@@ -80,6 +83,8 @@ console.log("\nGalería continua y navegación repetida");
         // lleva el mismo título y tiene su propia salida. Que esté bien contada se
         // comprueba en `cartera.mjs`; aquí solo importa que se vuelva de ella igual.
         click(w, w.CONTINUUM.Cartera.tiene(mode) ? '[data-action="collection-back"]' : '[data-action="back-menu"]');
+        // Se vuelve a la pantalla de la modalidad; la colección se despliega de nuevo al tocarla.
+        if (!w.document.querySelector(".gallery-panel.active")) { irAJugar(w); click(w, `[data-block="${block.key}"]`); }
         assert.equal(el(w, ".gallery-panel.active").dataset.block, block.key);
       }
     }
@@ -170,7 +175,7 @@ console.log("\nCambiar de categoría durante un ajuste de altura");
   const w = boot();
   const animations = [];
   let height = 200;
-  const container = el(irAJugar(w), '.deck-collection');
+  const container = el(irAJugar(w), '#deck-collection');
   container.getBoundingClientRect = () => ({ height });
   container.animate = () => {
     let resolve, reject;
@@ -576,19 +581,23 @@ function swipe(w, { target = el(w, "#app"), from = 30, to = 170, y = 320, dy = 0
   pointer(w, "pointerdown", target, from, y, pointerType);
   for (let paso = 1; paso <= steps; paso++) pointer(w, "pointermove", target, from + ((to - from) * paso) / steps, y + (dy * paso) / steps, pointerType);
   pointer(w, cancelado ? "pointercancel" : "pointerup", target, to, y + dy, pointerType);
+  // La salida se pulsa justo después del gesto (en el turno siguiente).
+  return sleep(5);
 }
 const pantalla = w => el(w, "#app").dataset.screen;
 {
   const w = boot();
   abreMazo(w, "historia", "history");
   assert.equal(pantalla(w), "play-menu");
-  swipe(w);
-  ok("deslizar en el menú del mazo vuelve a la colección, como «Volver»", pantalla(w) === "jugar" && !!w.document.querySelector('[data-mode="history"]'));
+  await swipe(w);
   await sleep(5);
-  swipe(w);
-  ok("y deslizar en Jugar vuelve al inicio", pantalla(w) === "home");
+  ok("deslizar en el menú del mazo vuelve a la colección, como «Volver»", pantalla(w) === "hub-solo" && !!w.document.querySelector('[data-mode="history"]'));
   await sleep(5);
-  swipe(w);
+  await swipe(w);
+  await sleep(5);
+  ok("y deslizar en Jugar solo vuelve al inicio", pantalla(w) === "home");
+  await sleep(5);
+  await swipe(w);
   ok("en el inicio no hay nada detrás: el gesto no hace nada", pantalla(w) === "home");
   // Igual que tras un arrastre: el gesto se come el clic que el navegador puede disparar
   // al soltar, así que el siguiente toque de verdad llega en el turno siguiente.
@@ -596,40 +605,40 @@ const pantalla = w => el(w, "#app").dataset.screen;
   abreMazo(w, "historia", "history");
   click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
   assert.equal(pantalla(w), "setup");
-  swipe(w, { cancelado: true });
+  await swipe(w, { cancelado: true });
   ok("un gesto que el navegador cancela a mitad, ya cumplido, vuelve igual", pantalla(w) === "play-menu");
   await sleep(5);
   click(w, '[data-action="setup"]');
-  swipe(w, { from: 200, to: 40 });
+  await swipe(w, { from: 200, to: 40 });
   ok("de derecha a izquierda no vuelve: ese no es el gesto", pantalla(w) === "setup");
-  swipe(w, { dy: 130 });
+  await swipe(w, { dy: 130 });
   ok("un desplazamiento en diagonal tampoco vuelve", pantalla(w) === "setup");
-  swipe(w, { to: 70 });
+  await swipe(w, { to: 70 });
   ok("un roce corto no vuelve", pantalla(w) === "setup");
-  swipe(w, { pointerType: "mouse" });
+  await swipe(w, { pointerType: "mouse" });
   ok("con el ratón se navega con los botones, no arrastrando", pantalla(w) === "setup");
-  swipe(w, { target: el(w, "#players input") });
+  await swipe(w, { target: el(w, "#players input") });
   ok("deslizar sobre un campo de texto lo respeta", pantalla(w) === "setup");
   const tira = w.document.createElement("div");
   tira.style.overflowX = "auto";
   Object.defineProperties(tira, { scrollWidth: { value: 900 }, clientWidth: { value: 360 } });
   el(w, ".shell").append(tira);
-  swipe(w, { target: tira });
+  await swipe(w, { target: tira });
   ok("una tira que se desplaza a los lados se queda el gesto", pantalla(w) === "setup");
-  swipe(w);
+  await swipe(w);
   ok("y fuera de ella el gesto sigue volviendo", pantalla(w) === "play-menu");
   w.close();
 }
 {
   const w = boot();
   click(w, '[data-action="rules"]');
-  swipe(w, { target: el(w, ".modal") });
+  await swipe(w, { target: el(w, ".modal") });
   ok("con la guía abierta, el gesto la cierra como Escape", !w.document.querySelector(".overlay") && pantalla(w) === "home");
   await sleep(5);
   click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
-  swipe(w, { target: el(w, "#enc-search-input") });
+  await swipe(w, { target: el(w, "#enc-search-input") });
   ok("buscando en la enciclopedia, deslizar no la cierra", !!w.document.querySelector('[data-overlay="encyclopedia"]'));
-  swipe(w, { target: el(w, ".enc-modal") });
+  await swipe(w, { target: el(w, ".enc-modal") });
   ok("y desde el resto de la enciclopedia el gesto la cierra y vuelve al Atlas", !w.document.querySelector('[data-overlay="encyclopedia"]') && pantalla(w) === "perfil");
   w.close();
 }
@@ -637,11 +646,11 @@ const pantalla = w => el(w, "#app").dataset.screen;
   const w = boot();
   game(w);
   assert.equal(pantalla(w), "game");
-  swipe(w);
+  await swipe(w);
   ok("en mitad de una partida el gesto no navega ni abre nada", pantalla(w) === "game" && !w.document.querySelector(".overlay"));
   await sleep(5);
   click(w, '[data-action="game-menu"]');
-  swipe(w, { target: el(w, ".modal") });
+  await swipe(w, { target: el(w, ".modal") });
   ok("pero cierra el menú de la partida, que sí es descartable", !w.document.querySelector(".overlay") && pantalla(w) === "game");
   w.close();
 }

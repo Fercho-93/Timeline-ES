@@ -10,7 +10,7 @@ for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[
 const click=action=>{const button=w.document.querySelector('[data-action="'+action+'"]');assert.ok(button,action);button.click();};
 try {
  const defaultBlock=w.CONTINUUM.blockOf(w.CONTINUUM.DEFAULT_MODE).key;
- click('jugar');
+ w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');
  w.document.querySelector(`[data-action="set-block"][data-block="${defaultBlock}"]`).click();
  w.document.querySelector(`[data-action="set-mode"][data-mode="${w.CONTINUUM.DEFAULT_MODE}"]`).click();
  assert.ok(w.document.querySelector('[data-action="solo"]'));
@@ -21,7 +21,7 @@ try {
  const preset=w.document.getElementById('local-preset');preset.value='advanced';preset.dispatchEvent(new w.Event('change',{bubbles:true}));
  assert.equal(w.document.getElementById('ghost-toggle').checked,true);
  assert.equal(w.document.getElementById('pulse-toggle').checked,true);
- click('back-menu');click('collection-back');click('competition-menu');w.document.getElementById('competition-length').value='3';click('start-competition');
+ w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();click('competition-menu');w.document.getElementById('competition-length').value='3';click('start-competition');
  let state=JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
  assert.equal(state.totalThemes,3);assert.equal(state.queue.length,3);
  click('comp-next-round');assert.match(w.document.body.textContent,/tema 1 de 3/);

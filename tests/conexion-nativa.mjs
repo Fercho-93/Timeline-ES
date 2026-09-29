@@ -13,7 +13,7 @@ const code = 'ABCD2345';
 function setup(href, native, { blockedHistory = false, serverError = null } = {}) {
   const events = [], messages = [], warnings = [];
   const location = new URL(href);
-  const CT = { Links: null, deckFingerprint: () => 'deck-v1' };
+  const CT = { Links: null, deckFingerprint: () => 'deck-v1', Avatares: { ownId: () => null, ownSeed: () => 'guest' } };
   const room = { status: 'lobby', mode: 'history', deckFingerprint: 'deck-v1', playerOrder: ['host'], players: {}, version: 1 };
   const context = vm.createContext({
     window: { CONTINUUM: CT, Capacitor: { isNativePlatform: () => native } },

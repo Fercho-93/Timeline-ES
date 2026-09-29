@@ -175,7 +175,7 @@ assert.equal(screen(), 'quick-challenges');
 assert.ok(app().querySelector('[data-quick="start-free"]'));
 await swipe();
 assert.equal(screen(), 'hub-solo', 'deslizar en Retos rápidos vuelve a Jugar solo');
-await click('[data-inline-route]');
+if (!app().querySelector('[data-action="set-block"]')) await click('[data-inline-route]');
 w.sessionStorage.removeItem('continuum-entry-route');
 await openFirstDeck();
 await click('.play-choice-block [data-action="toggle-format-block"]');

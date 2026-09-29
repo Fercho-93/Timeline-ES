@@ -97,7 +97,7 @@
 
   // La posición y el foco de las pantallas con galería (Inicio y Jugar), para volver a
   // ellas donde se dejaron.
-  const galleryScreens = ["home", "jugar"];
+  const galleryScreens = ["home", "jugar", "hub-solo", "hub-friends-local", "hub-friends-online", "hub-friends-wifi", "hub-friends-duel"];
   const galleryPositions = {};
   // La altura de la pantalla sobre la que se abrió la enciclopedia, para volver a ella.
   let encyclopediaOrigin = null;

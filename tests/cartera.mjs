@@ -18,7 +18,7 @@ function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); if (!d.querySelector('[data-block]')) d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
@@ -151,7 +151,7 @@ console.log("\nLa puerta cerrada, tal y como se ve");
 {
   const w = boot();
   click(irAJugar(w), '[data-block="mezcla"]');
-  const fila = w.document.querySelector('[data-mode="mixed"]');
+  const fila = w.document.querySelector('.game-row[data-mode="mixed"]');
   ok("el mazo se sigue viendo, con su precio", fila && fila.classList.contains("game-row-cerrado") && /3,99 €/.test(fila.textContent));
   ok("y con el candado estampado en medio de su lámina, no de adorno junto al nombre",
     fila.querySelector(".deck-preview-cerrado .deck-candado")?.textContent === "🔒");

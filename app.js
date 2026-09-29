@@ -52,7 +52,7 @@
   // Solo una ruta y preferencias de navegación, nunca HTML ni estado de una jugada.
   // sessionStorage mantiene independiente cada pestaña y sobrevive a una recarga.
   function rememberView() {
-    if (screen === "jugar" && previousView?.screen === "jugar") {
+    if ((screen === "jugar" || screen.startsWith("hub-")) && previousView?.screen === screen) {
       Object.assign(previousView, {mode: selectedModeKey, block: selectedBlockKey, collectionOpen, collectionDetails, collectionIndexExpanded, jugarSection});
     }
     try {
@@ -167,6 +167,7 @@
   // una categoría y enseña directamente los mazos que contiene.
   let collectionOpen = false;
   let collectionIndexExpanded = false;
+  let lastApproachedCard = null;
   let jugarSection = null;
   let homeDestination = "home";
   let profileReturn = "home";
@@ -838,7 +839,10 @@
     if (!CT.hasBlock(blockKey)) return;
     selectedBlockKey = blockKey;
     const games = CT.block(blockKey).games;
-    if (!games.includes(selectedModeKey)) setMode(games[0]);
+    // Desplegar una colección no abre la pantalla de compra: se preselecciona su primer
+    // mazo propio y, si todos están cerrados, solo se muestran (con su candado y precio).
+    const propio = games.find(key => CT.Cartera.tiene(key));
+    if (!games.includes(selectedModeKey) && propio) setMode(propio);
   }
 
   // Lo último que se preparó en «Un solo móvil»: quién jugaba, cuántas cartas y qué
@@ -1072,7 +1076,10 @@
     const pulseCard = game.pulseTurn ? cardsById.get(game.pulseTurn.cardId) : null;
     const pulseTarget = game.pulseTurn ? game.players.find(item => item.id === game.pulseTurn.targetId) : null;
     const activeCard = pulseCard || selectedCard;
-    const nuevaSeleccion = activeCard && app.querySelector(".hand-card.selected")?.dataset.id !== String(activeCard.id);
+    // Se acerca la línea solo al elegir otra carta: cambiar de hueco o cancelar la vista
+    // previa (la carta vuelve a la mano) no es una selección nueva.
+    const nuevaSeleccion = activeCard && lastApproachedCard !== activeCard.id;
+    lastApproachedCard = activeCard ? activeCard.id : null;
     // Tras un fallo, `result` sigue apuntando a la carta que se acaba de fallar (todavía
     // no se ha pulsado «Terminar turno»): se aprovecha para señalar en la propia línea el
     // hueco donde iba de verdad, justo debajo del aviso que ya lo cuenta con palabras.
@@ -3731,18 +3738,23 @@
       homeDestination = "collection";
       collectionOpen = open;
       collectionDetails = open;
+      // Cerrar una colección suena a plegar; abrirla se despliega (y suena) más abajo.
+      if (!open) CT.Effects?.transition?.('close');
       app.querySelectorAll("#deck-collection .collection-entry").forEach(entry => {
         const button = entry.querySelector(".gallery-panel");
         const active = open && button.dataset.block === selectedBlockKey;
         const drawer = entry.querySelector(".collection-drawer");
         if (active) drawer.firstElementChild.innerHTML = `<div class="collection-decks"><p class="lead">Elige tu mazo</p>${gameList()}</div>`;
         void drawer.offsetHeight;
+        // La carátula desplegada se ve grande: se pide su versión de 700 px.
+        if (active) button.querySelectorAll('img[src$="-400.webp"]').forEach(img => { img.src = img.getAttribute('src').replace(/-400\.webp$/, '-700.webp'); img.width = 700; img.removeAttribute('height'); });
         entry.classList.toggle("active", active);
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
         button.setAttribute("aria-expanded", String(active));
         button.setAttribute("aria-label", `${CT.block(button.dataset.block).name}. ${active ? "Mazos visibles debajo." : "Toca para ver sus mazos."}`);
         drawer.inert = !active;
+        if (active) CT.unrollCollection?.(entry);
       });
       rememberView();
     }
@@ -3919,8 +3931,10 @@
   // La galería de colecciones también se despliega dentro de «Jugar solo», sin cambiar de pantalla.
   // Abre un mazo respetando la ruta de entrada (por ejemplo, Gran mezcla en un solo móvil).
   CT.openMode = openMode;
-  CT.collectionsGallery = () => {
-    collectionOpen = false; collectionDetails = false; collectionIndexExpanded = true; jugarSection = "collections";
+  // `keep`: al volver a la pantalla se conserva la colección que estaba desplegada.
+  CT.collectionsGallery = (keep = false) => {
+    if (!keep) { collectionOpen = false; collectionDetails = false; }
+    collectionIndexExpanded = true; jugarSection = "collections";
     return `<p class="catalog-hint">Elige una colección para desplegar sus mazos.</p><section id="deck-collection">${gallery()}</section>`;
   };
   CT.navigateBack = backMenu;

@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); if (!d.querySelector('[data-block]')) d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
@@ -59,6 +59,9 @@ for (let g = 0; g < muestras.length; g++) {
   const mano = 1;
   w.document.getElementById("hand-size").value = String(mano);
   fire(w, w.document.querySelector('[data-action="start"]'));
+  // Minijuego de quién empieza: todos dicen la misma cifra.
+  for (let i = 0; i < 12 && w.document.getElementById('starter-guess-input'); i++) { w.document.getElementById('starter-guess-input').value = '1900'; fire(w, w.document.querySelector('[data-action="starter-guess-submit"]')); }
+  fire(w, w.document.querySelector('[data-action="starter-start"]'));
   const key = `hilo-game-${mode}-v1`;
   let turns = 0;
   while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML)) {

@@ -7,7 +7,7 @@ import { JSDOM } from "jsdom";
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); if (!d.querySelector('[data-block]')) d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
@@ -157,7 +157,7 @@ try {
     async register() { throw Error("Sin conexión"); }, addEventListener() {}
   } }));
   await tick(); assert.match(w.document.getElementById("update-notice").textContent, /seguir jugando/);
-  assert.ok(w.document.querySelector('[data-action="jugar"]'));
+  assert.ok(w.document.querySelector('[data-action="jugar"], [data-action="toggle-modes"]'));
   w = open({}, win => { win.Storage.prototype.getItem = () => { throw new win.DOMException("Bloqueado", "SecurityError"); }; });
   assert.ok(w.document.querySelector("#storage-notice"));
   assert.ok(w.document.querySelector('[data-action="jugar"]'));

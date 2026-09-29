@@ -86,6 +86,7 @@
   // Cada elección es una pantalla más del juego: pinta por app.js para que la flecha de
   // volver la recuerde y regrese a la pantalla anterior, no siempre al inicio.
   function hub(screen, title, eyebrow, body, art) {
+    delete app.dataset.pendingHub;
     const html = `<div class="shell home-shell mode-hub-shell">
       ${window.CONTINUUM?.UI?.header?.('data-action="ui-back"') || ''}
       <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">${escapeHtml(eyebrow)}</div><h1 data-focus tabindex="-1">${escapeHtml(title)}</h1></div><img src="assets/${art}" alt="" aria-hidden="true" decoding="async"></header>
@@ -114,8 +115,11 @@
 
   // «Grandes colecciones» se despliega dentro de la propia pantalla; `route` decide qué pasa al
   // elegir un mazo (jugar solo o preparar una partida en un solo móvil).
+  // Pantallas con las colecciones desplegadas al salir de ellas: al volver, siguen así.
+  const inlineOpen = {};
   function inlineCollections(route) {
-    return `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="false" aria-controls="mode-inline-drawer"`)}<div id="mode-inline-drawer" class="mode-inline-drawer" hidden></div></div>`;
+    const open = !!inlineOpen[app.dataset.pendingHub || ''];
+    return `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`)}<div id="mode-inline-drawer" class="mode-inline-drawer"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true) : ''}</div></div>`;
   }
 
   // Cada forma de jugar con amigos tiene su pantalla con las mismas tres puertas que «Jugar solo»:
@@ -128,6 +132,7 @@
   };
   function openFriendHub(route) {
     const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
+    app.dataset.pendingHub = screen;
     hub(screen, title, eyebrow, [
       inlineCollections(route),
       modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, `data-friend-quick="${route}"`),
@@ -137,6 +142,7 @@
   const openLocalHub = () => openFriendHub('local');
 
   function openSoloHub() {
+    app.dataset.pendingHub = 'hub-solo';
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       inlineCollections('collections'),
       modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, 'data-solo-route="quick"'),
@@ -185,6 +191,7 @@
       const open = drawer.hidden;
       drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery() : '';
       drawer.hidden = !open;
+      inlineOpen[app.dataset.screen] = open;
       inlineCollections.setAttribute('aria-expanded', String(open));
       // El efecto de profundidad al inclinar el móvil también vale para las portadas desplegadas.
       window.CONTINUUM.UI?.updateEffects?.();
@@ -222,6 +229,7 @@
     if (!['online-hub','online-collections','solo-hub','friends-hub','local-hub','friend-hub'].includes(action)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
+    ['hub-solo', 'hub-friends-local', 'hub-friends-online', 'hub-friends-wifi', 'hub-friends-duel'].forEach(key => { inlineOpen[key] = false; });
     if (action === 'online-hub') openOnlineHub();
     else if (action === 'online-collections') openOnlineCollections();
     else if (action === 'solo-hub') openSoloHub();

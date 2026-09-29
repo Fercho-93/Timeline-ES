@@ -4,12 +4,19 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// El reto diario alterna cada día entre Grandes colecciones (días pares) y Retos rápidos
+// (impares). Esta prueba recorre el de colecciones: en un día impar se adelanta el reloj
+// un día, en la prueba y en la ventana, para que el resultado no dependa de la fecha.
+const DESFASE = Number(new Date().toLocaleDateString("sv-SE").replaceAll("-", "")) % 2 ? 86400000 : 0;
+const relojDesfasado = Base => class extends Base { constructor(...a) { super(...(a.length ? a : [Base.now() + DESFASE])); } static now() { return Base.now() + DESFASE; } };
+if (DESFASE) globalThis.Date = relojDesfasado(globalThis.Date);
+
 // La colección y la competición viven ahora en «Jugar», no en la portada: desde la
 // portada, se entra primero ahí. Devuelve la misma ventana para poder encadenarlo.
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); if (!d.querySelector('[data-block]')) d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 
@@ -22,6 +29,7 @@ const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " 
 function boot(almacen = {}) {
   const dom = new JSDOM(gameHtml(read("index.html")).replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   const { window } = dom;
+  if (DESFASE) window.Date = relojDesfasado(window.Date);
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
   // Los scripts se toman de index.html, que es la única lista de verdad: así un mazo
   // nuevo no obliga a tocar cada prueba (y no se olvida, que ya pasó).
@@ -260,7 +268,7 @@ console.log("\nBloque de geografía");
   ok("los cuatro juegos del bloque aparecen por su nombre",
      /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w))
      && /Idiomas por hablantes nativos/.test(texto(w)) && /Distancias entre ciudades/.test(texto(w)));
-  ok("la galería ofrece los seis bloques más Retos rápidos", w.document.querySelectorAll(".gallery-panel").length === 7);
+  ok("la galería ofrece los seis bloques", w.document.querySelectorAll(".gallery-panel").length === 6);
   const portada = w.document.querySelector(".gallery-panel.active").outerHTML;
   // Las tres carátulas están siempre, pero solo la desplegada pide el tamaño grande.
   ok("la carátula desplegada es la de geografía, no otra",
@@ -270,6 +278,7 @@ console.log("\nBloque de geografía");
   click(w, '[data-mode="population"]');
   ok("cambiar de juego dentro del bloque cambia el mazo", w.document.querySelector("h1")?.textContent === "Población de países");
   click(w, '[data-action="collection-back"]');
+  if (!existe(w, '[data-mode="countries"]')) { click(irAJugar(w), '[data-block="geografia"]'); }
   click(w, '[data-mode="countries"]');
   click(w, '[data-action="solo"]');
   click(w, '[data-action="start-free"]');

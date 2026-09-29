@@ -11,7 +11,7 @@ function irAlAtlas(w) { const d = w.document; if (!d.querySelector('[data-action
 // La tarjeta de la portada gira antes de navegar; `homeTransition = "done"` es la
 // marca con la que la propia portada se salta ese giro, y aquí se usa para no esperarlo.
 function pulsaPuerta(d, accion) { const b = d.querySelector(`[data-action="${accion}"]`); if (!b) return; b.dataset.homeTransition = "done"; b.click(); }
-function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
+function irAJugar(w) { const d = w.document; if (!d.querySelector('[data-block]')) { w.CONTINUUM.ModeHubs.open('hub-solo'); if (!d.querySelector('[data-block]')) d.querySelector('[data-inline-route]')?.click(); } w.sessionStorage.removeItem('continuum-entry-route'); return w; }
 function irAInicio(w) { w.sessionStorage.removeItem('continuum-entry-route'); w.CONTINUUM.localNavigate('home'); w.CONTINUUM.ModeHubs.refreshHome(); return w; }
 
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
@@ -66,8 +66,8 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       // que cuenta, y eso vale para los treinta y pico mazos por igual. En su sitio va el
       // reverso de la colección, el mismo para todas sus cartas.
       assert.equal(w.document.querySelector('.hand .animal-card-art'), null, `${block.key}: la mano no enseña láminas`);
-      assert.ok(w.document.querySelector('.hand img').getAttribute('src').startsWith('assets/hero-'), `${block.key}: solo se usa la portada común`);
-      assert.ok(w.document.querySelector('.hand .carta-reverso .reverso-coleccion'), `${block.key}: la mano enseña el reverso del mazo`);
+      assert.ok(/continuum-emblem|hero-/.test(w.document.querySelector('.hand img').getAttribute('src')), `${block.key}: solo se usa el reverso común`);
+      assert.ok(w.document.querySelector('.hand .carta-reverso :is(.reverso-emblema, .reverso-coleccion)'), `${block.key}: la mano enseña el reverso común`);
       click(w, '[data-action="ui-back"]');
       click(w, '[data-exit-confirm]');
       click(w, '[data-action="back-menu"]');
@@ -86,13 +86,12 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 {
   const w = boot();
   try {
-    // Cada colección tiene su portada, que es lo que hace que el reverso diga de qué se
-    // está jugando sin decir nada de la carta que tapa.
+    // Todas las cartas tapadas comparten el mismo reverso con el emblema de Continuum.
     const reversos = Object.values(w.CONTINUUM.BLOCKS).map(block => w.CONTINUUM.cardBack(block.games[0]));
-    assert.equal(new Set(reversos).size, reversos.length, 'cada colección trae su propia portada');
+    assert.equal(new Set(reversos).size, 1, 'todas las colecciones comparten el reverso');
     for (const reverso of reversos) {
       assert.match(reverso, /class="carta-reverso" aria-hidden="true"/, 'el reverso no se lee en voz alta');
-      assert.match(reverso, /src="assets\/hero-[a-z]+-400\.webp"/, 'el reverso usa la portada común de la colección');
+      assert.match(reverso, /src="assets\/continuum-emblem-800\.webp"/, 'el reverso usa el emblema común');
     }
     // Y la lámina no desaparece del juego: la enseñan la carta ya colocada —donde su
     // valor está a la vista y no hay nada que adivinar— y la enciclopedia.
@@ -238,7 +237,7 @@ for (const reduce of [false, true]) {
     click(w, '[data-action="back-menu"]');
     assert.equal(doc.getElementById('app').dataset.screen, 'play-menu');
     click(w, '[data-action="collection-back"]');
-    assert.equal(doc.getElementById('app').dataset.screen, 'jugar');
+    assert.equal(doc.getElementById('app').dataset.screen, 'hub-solo');
     click(w, '[data-action="home-top"]');
     assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-top');
   } finally { w.close(); }
@@ -421,7 +420,7 @@ console.log('Todas las familias de pantallas comparten entrada sin repetirla al 
     pulsaPuerta(w.document, "perfil");
     assert.ok(w.document.querySelector('.shell.motion-entering'), 'el Atlas usa la entrada común');
     assert.equal(w.document.querySelectorAll('.parchment-dust').length, 0, 'el pergamino no suelta virutas doradas');
-    assert.equal(w.document.querySelector('.home-nav [aria-current]'), null);
+    assert.equal(w.document.querySelector('.home-nav [aria-current]')?.dataset.action, 'perfil', 'el Atlas es una pestaña de la barra');
     assert.ok(w.document.querySelector('#app > .shell.motion-managed'));
     click(w, '[data-action="back-menu"]');
     assert.equal(w.document.querySelector('.profile-roll-edge'), null);

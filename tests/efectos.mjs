@@ -40,7 +40,8 @@ for (const savedSound of [false, true]) {
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
   try {
     assert.equal(w.CONTINUUM.effectPrefs().sound,false,'las preferencias antiguas no reactivan efectos');
-    for(const selector of ['[data-action="jugar"]','[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
+    w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');
+    for(const selector of ['[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
       w.document.querySelector('#app '+selector).click();
     }
     w.document.querySelector('[data-settings-action="open"]').click();
@@ -69,7 +70,7 @@ console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibr
   const click=selector=>{const node=w.document.querySelector(selector);assert.ok(node,selector);cues.length=0;node.click();};
   const has=kind=>assert.ok(cues.includes(kind),`${kind}: ${cues.join(',')}`);
   try {
-    click('#app [data-action="jugar"]');
+    w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');
     click('#app [data-block="historia"]'); has('unroll');
     click('#app [data-block="historia"]'); has('close');
     click('#app [data-block="historia"]');
@@ -82,7 +83,8 @@ console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibr
     click('#app [data-action="cancel-place"]'); has('return');
     click('#app .hand-card'); assert.deepEqual(cues,[],'una carta que ya estaba elegida no repite el toque');
     click('#app [data-timeline-zoom="out"]'); has('zoom');
-    click('#app .card-flippable'); has('flip');
+    // Tocar una carta de la línea abre su ficha (antes se giraba).
+    click('#app .card-flippable'); assert.ok(cues.includes('flip') || cues.includes('open'), cues.join(',')); w.CONTINUUM.closeDialog?.();
     click('#app .atlas-menu'); has('open');
     cues.length=0;
     w.document.querySelector('.modal').dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));

@@ -3291,7 +3291,8 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .jugar-shell #deck-collection .gallery-panel .collection-index { top: 12px; left: 17px; font-size: .61rem; }
 #app .jugar-shell #deck-collection .gallery-panel .collection-open { top: 50%; right: 15px; width: 26px; height: 26px; transform: translateY(-50%) rotate(45deg); }
 #app .jugar-shell #deck-collection .gallery-panel::after { background: linear-gradient(90deg, #152b29d4, #14261a54 65%, #19221515); }
-#app .jugar-shell #deck-collection .panel-art, #app .jugar-shell #deck-collection .gallery-panel:hover .panel-art { filter: saturate(1.3) contrast(1.05); }
+#app .jugar-shell #deck-collection .panel-art { filter: saturate(1.3) contrast(1.05); }
+@media (hover: hover) { #app .jugar-shell #deck-collection .gallery-panel:hover .panel-art { filter: saturate(1.3) contrast(1.05); } }
 #app .jugar-shell #deck-collection .collection-decks { display: block; margin: 0; padding: 14px 12px; border: 0; border-radius: 0; box-shadow: none; background: var(--edition-surface); animation: none; }
 #app .jugar-shell #deck-collection .collection-decks h2 { display: none; }
 #app .jugar-shell #deck-collection .collection-decks .lead { margin: 0 0 10px; font-size: .78rem; }
@@ -3682,7 +3683,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app .avatar-picker-option .avatar-art { max-width: 100%; }
 #app .avatar-picker-option > span:last-child { max-width: 100%; font: .67rem/1.15 var(--ui-font); text-align: center; overflow-wrap: anywhere; }
 #app .avatar-picker-option.is-selected { border-color: var(--edition-brass); background: #e8d9bb80; box-shadow: inset 0 0 0 1px #fff8e6; }
-#app .avatar-picker-option:hover { background: #e8d9bb80; }
+@media (hover: hover) { #app .avatar-picker-option:hover { background: #e8d9bb80; } }
 #app .avatar-picker-option:focus-visible, #app .avatar-picker-close:focus-visible { outline: 3px solid var(--edition-brass); outline-offset: 2px; }
 @media (max-width: 360px) { #app .avatar-picker-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
