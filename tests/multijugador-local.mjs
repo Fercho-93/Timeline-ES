@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 async function entrarWifi(w) {
   const pausa = () => new Promise(resolve => setTimeout(resolve, 0));
   await pausa();
-  for (const sel of ['[data-action="friends-hub"]', '[data-friend-route="wifi"]', '[data-block="historia"]', '[data-mode="history"]']) { click(w, sel); await pausa(); }
+  for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="wifi"]', '[data-inline-route="wifi"]', '#mode-inline-drawer [data-block="historia"]', '#mode-inline-drawer [data-mode="history"]']) { click(w, sel); await pausa(); }
   return w.document;
 }
 

@@ -66,8 +66,8 @@ async function flows(vp) {
     // Jugar con amigos
     for (const [route, target] of [['local', 'setup'], ['duel', 'duel-home'], ['wifi', 'local-entrada'], ['online', null]]) {
       await click('[data-action="friends-hub"]'); await at('hub-friends');
-      await click(`[data-friend-route="${route}"]`); await at('jugar');
-      await click('[data-action="set-block"]'); await click('.collection-entry.active [data-action="set-mode"]');
+      await click(route === 'local' ? '[data-action="local-hub"]' : `[data-friend-hub="${route}"]`); await at(`hub-friends-${route}`);
+      await click(`[data-inline-route="${route}"]`); await click('#mode-inline-drawer [data-action="set-block"]'); await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
       if (target) await at(target);
       if (route === 'online') { await pg.waitForFunction(() => document.getElementById('app').dataset.screen !== 'online-loading', null, {timeout: 15000}).catch(() => {}); console.log('online →', await screen()); }
       if (route === 'local') { await click('[data-action="start"]'); await at('pass'); await back('setup'); }

@@ -26,9 +26,10 @@ async function click(selector) {
 }
 
 await click('[data-action="friends-hub"]');
-await click('[data-friend-route="local"]');
-await click('[data-action="set-block"]');
-await click('.collection-entry.active [data-action="set-mode"]');
+await click('[data-action="local-hub"]');
+await click('[data-inline-route="local"]');
+await click('#mode-inline-drawer [data-action="set-block"]');
+await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
 assert.equal(screen(), 'setup');
 
 await click('[data-action="add-player"]');
