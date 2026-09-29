@@ -2,8 +2,8 @@
 // coincide con su posición en el mazo (`foods-kcal-3.webp` es la tercera carta). Así se
 // desplazaron las láminas al quitar una carta o reordenar la lista sin renombrar los ficheros:
 // el arroz enseñaba un pollo. Un script no puede ver el dibujo, pero sí detectar el desajuste
-// entre el número del fichero y el puesto de la carta. Las ciudades comparten dibujos entre
-// mazos a propósito (una misma ciudad sale en varios) y quedan fuera de la comparación.
+// entre el número del fichero y el puesto de la carta. Las ciudades también tienen
+// una ilustración propia en cada mazo; imagenes-unicas.mjs comprueba su contenido.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 globalThis.window = { CONTINUUM: {} };
@@ -17,9 +17,16 @@ for (const reto of retos) {
     if (usadas.has(carta.image)) problemas.push(`${carta.image} lo usan «${usadas.get(carta.image)}» y «${reto.id}: ${carta.title}»`);
     usadas.set(carta.image, `${reto.id}: ${carta.title}`);
     const [, propio, numero] = /([a-z-]+?)-(\d+)\.webp$/.exec(carta.image) || [];
-    if (!/^(cities-|timezones-|capitals-)/.test(propio || '') && propio === reto.id && Number(numero) !== reto.cards.indexOf(carta) + 1) problemas.push(`${reto.id}: «${carta.title}» es la carta ${reto.cards.indexOf(carta) + 1} pero usa ${carta.image}`);
-    if (propio !== reto.id && !/^(cities-|timezones-|capitals-)/.test(propio)) problemas.push(`${reto.id}: «${carta.title}» usa una lámina de otro mazo (${carta.image})`);
+    if (propio === reto.id && Number(numero) !== reto.cards.indexOf(carta) + 1) problemas.push(`${reto.id}: «${carta.title}» es la carta ${reto.cards.indexOf(carta) + 1} pero usa ${carta.image}`);
+    if (propio !== reto.id) problemas.push(`${reto.id}: «${carta.title}» usa una lámina de otro mazo (${carta.image})`);
   }
 }
 assert.deepEqual(problemas, [], problemas.join('\n'));
+const alimentos = retos.find(reto => reto.id === 'foods-kcal');
+const tomate = alimentos.cards.find(carta => carta.title === 'Tomate');
+assert.ok(tomate, 'El tomate sigue en el catálogo de alimentos');
+assert.equal(tomate.id, 'foods-kcal-14', 'Restaurar el tomate no desplaza IDs publicados');
+assert.equal(tomate.value, 18);
+assert.equal(tomate.image, 'assets/quick-cards/foods-kcal-14.webp');
+assert.equal(alimentos.cards.find(carta => carta.title === 'Zanahoria').id, 'foods-kcal-3');
 console.log(`${usadas.size} láminas de Retos rápidos, cada una en una sola carta`);

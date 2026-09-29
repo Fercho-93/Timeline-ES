@@ -11478,8 +11478,15 @@
     },
     {
       "path": "assets/music-cards/losing-my-religion.webp",
-      "sha256": "089dc4213314de5788dc90d99d7be9d4028f571b53697da279bf3837728985ab",
-      "rightsEvidence": null
+      "sha256": "b70e0c0d05fe378674e8e2d4207b88529adf6a9bbd4096c43a8edf3449b652f6",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. R.E.M. single Losing My Religion: an eight-string mandolin with FOUR pairs of strings rests diagonally against an empty wooden chair in a modest early-1990s rehearsal room, microphone stand softly behind, expressive oblique afternoon light, introspective musical still life. Clearly show small teardrop mandolin body and paired strings, not a guitar. No album covers, portraits, or religious emblems.",
+        "referenceImage": null
+      }
     },
     {
       "path": "assets/music-cards/love-me-do.webp",
@@ -15274,401 +15281,545 @@
         "generatedAt": "2026-09-20"
       }
     },
-  {
-    "path": "assets/avatars/alfonso-x.webp",
-    "sha256": "28317f4099ad7be9e1414904f1baf22448a700b17afead6b00ac2337a7fbe3a6",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+    {
+      "path": "assets/avatars/alfonso-x.webp",
+      "sha256": "28317f4099ad7be9e1414904f1baf22448a700b17afead6b00ac2337a7fbe3a6",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/aretha-franklin.webp",
+      "sha256": "bd1ac62f8bd8442a8590500d55ed13120126ad20082615407bcb617e4f066c92",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/automata.webp",
+      "sha256": "58c901146029eca39e775c00bcf0ed7a5586790d0c8449a2c461dbd787a78312",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/aventurera.webp",
+      "sha256": "97cbe8509747ce9ae04d7c29154704861f346e5b35d7365ce637ad4bff0456c0",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/ballena-azul.webp",
+      "sha256": "dcc46e9f659309a5059dab8d8129c1e69d85236ca0838957954ece7f0f98e588",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/beethoven.webp",
+      "sha256": "673b44f31b84c68b52ea3d8540405cec4cf7ac2aad41397666d89dcbabe2c024",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/buho-real.webp",
+      "sha256": "adc7b20abb5e718fd73d4d169eb375a7bf2de7d2b4db4cf9b862a1fc99002247",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/caballera.webp",
+      "sha256": "444bc872a4c946d6f50a280316dfc5ddb2af472404b3b75e7d5e229a6c319643",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/carlos-iii.webp",
+      "sha256": "8f18facccd141a8560c21c8ac2e88c6298baa310fa052d991200e57bea8202ac",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/cervantes.webp",
+      "sha256": "34580e18dc16a562ac63359519c8dc176267fd73bb9396a61c3b7d1cb5fb2f39",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/chaplin.webp",
+      "sha256": "1daad97a38ede69ef2e2490b5cc839d792d849abaec45dff127baadefcad2829",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/cleopatra.webp",
+      "sha256": "9c618db7c55fee0b8230b25440cfd3937f059e0a4159887264b9f915568994d4",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/creador-puzles.webp",
+      "sha256": "09eba68e046f7f95d9f11a7ed75270880634a1eeffd7d79d1d6f42975f6c7b73",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/david-bowie.webp",
+      "sha256": "4d88eda692698d5ce78f2dbca8d3cb35e0cfec3d431049e3e7ea8d5ac3826406",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/el-cid.webp",
+      "sha256": "088f5adf9bfcf8a5e137006c89500df1bc7af9a54a0a0a0fd19198fec9911c7f",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/elefante.webp",
+      "sha256": "3147553cd0b6e661d2ea6a333f857cef8d49f54dceb182a8b3006a978ed54031",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/explorador.webp",
+      "sha256": "9f0c924ce78a44854ae4f281199e83f1071632739c002335bc72430696455b0d",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/felipe-ii.webp",
+      "sha256": "6957a3549e89f90ae55ec0bc67a40d45de4c7ef1829c2e3af98c92f4998f190c",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/flamenco.webp",
+      "sha256": "c0677b134093e53072778e00a8990ec749c6b143e5f2ef52b1e6732301787ec3",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/hechicera.webp",
+      "sha256": "df86f4b3c64da93e26cf2e6e70b2c539ba3452ebafa1c18f6db22b2719bdb3af",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/ingrid-bergman.webp",
+      "sha256": "665aa7d4fbd286c7be27158acacd0127f01c03dd5848ee22aa508ef706efede1",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/isabel-catolica.webp",
+      "sha256": "3fef3142caed82a2b892aacdeab5dd567ee8a0faeb6ea1247636c0e7972b161c",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/jirafa.webp",
+      "sha256": "dbd269fc62cb082143ff3ef08eea5e696a86dcabdd019efd0bc0702022bc06eb",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/juana-i.webp",
+      "sha256": "5ca49f0a20ddf8fa15f7114512220d34168704c5a4554c871d0225cee6b0e960",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/leon.webp",
+      "sha256": "6787fb97c1cfb05b7150d81470600a2d5da18d43059e18f517b6b5cf1932e4f1",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/lince.webp",
+      "sha256": "d6b2e92e5adfe564a29c522304a237aa706942544bbe06b8d52c040290541227",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/marie-curie.webp",
+      "sha256": "21a59010a3a84ccdb9972619b16b1df0e1d2ad6be3299f67dd2dacae886a24ce",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/melies.webp",
+      "sha256": "095aad4757ed28c71d08f946e9d9eaf07b32ea47d37f17cbc64b140566445173",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/ninja.webp",
+      "sha256": "2ee4d7b27c0773bf88e698c0fa148f368ecd273874dfdf1f80a90dbe34973461",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/panda.webp",
+      "sha256": "01a726e7d8a311162675353b392d075059293ed190c435f57412ad8028a5869b",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/piloto-arcade.webp",
+      "sha256": "fea317b4384773810df16e189d22be376681e063d26405113c0f3ffc98d3659c",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/piloto-espacial.webp",
+      "sha256": "6854331e580a6e82046c0e89a6c7b90c7fa7e920290e0070aedf4b592ca7874c",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/pinguino.webp",
+      "sha256": "0da402ecd4d0efcdfd462113d94fa370373dacf028626a904ec0a8a6a83e753d",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/pulpo.webp",
+      "sha256": "473e388d165b95de1a53cac7b2474f689e15b612fab05e5e1cd9012f69facbaa",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/tigre.webp",
+      "sha256": "0fbc966642769a2e220305df2775291f33f1b1e9d7bf9d7fe394b39781cb2a7e",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/avatars/zorro.webp",
+      "sha256": "499b7fecebc28ec251392b987dc97d0279ac989a7575bc0fb7af1121ccf6be65",
+      "rightsEvidence": {
+        "status": "generated-for-continuum",
+        "generator": "ChatGPT / OpenAI",
+        "generatedAt": "2026-09-25",
+        "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
+        "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
+      }
+    },
+    {
+      "path": "assets/quick-cards/foods-kcal-14.webp",
+      "sha256": "f261d257dbc46768fceea4a0e65af721ca4f7b84dcf807c04482624668ae555d",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Tomato, botanical culinary illustration: two ripe whole tomatoes with unmistakable star-shaped calyx and a cut half showing seed chambers, on a rustic wooden kitchen table, a modest vine with serrated tomato leaves in the soft background. Large focal fruit, muted warm russet flesh subordinate to sepia ink.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/cities-east-west-5.webp",
+      "sha256": "c5df317643743e73e051dcfa92e052ab8123a66158fb4cd00834c0c42a8b87d4",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Madrid, Spain for the longitude deck: the Puerta de Alcalá's unmistakable five arched openings with stone sculptural details dominating a three-quarter street-level view, mature trees and restrained Madrid buildings behind. Clear geographic city landmark, no map or arbitrary globe.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/cities-north-south-5.webp",
+      "sha256": "c0c2337553b1537b7bf28d46cb0712f9df0dea7cb12c3920608583bf67a73d33",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Madrid, Spain for the latitude deck: Palacio de Cristal in Retiro Park beside its reflecting pond, slender iron-and-glass architecture, leafy trees, delicate water reflections, coherent elevated view from the pond bank. A distinct Madrid landscape, not Puerta de Alcalá or Gran Via.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/cities-north-south-6.webp",
+      "sha256": "d9dbf09571bc990fb0731447d9e5c946886ba1dd1f82c957b67745632ce67b58",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Cairo, Egypt for the latitude deck: a coherent view of the Nile embankment, felucca with triangular sail in the foreground, Cairo Tower recognizable as a slender lattice tower on Gezira island in the middle distance, dense Cairo skyline in warm dusty haze. NO European or Madrid buildings, no pyramids unrealistically in the city center.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/timezones-june-1.webp",
+      "sha256": "069731e65e8c93d9d207549ca1e5b67513a6b82aad21af35a7451e22d50c9ba8",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Honolulu Hawaii for the June time-zone deck: unmistakable broad low Diamond Head volcanic crater seen across Waikiki beach in peaceful late-evening twilight, sparse palms in foreground, gentle Pacific waves, a few modest waterfront buildings. Diamond Head is a broad crater ridge, never jagged alpine peaks. No navigation instruments.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/timezones-june-2.webp",
+      "sha256": "3281cf2b204abc0c7cead6567190e9c142ea97f062f9578bd6a1792be3558b3d",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Los Angeles for the June time-zone deck: Griffith Observatory with its three recognizable domes viewed from the hillside in late afternoon, vast Los Angeles city plain softly behind, a few dry hillside shrubs in foreground, monumental observatory the clear focus. No coastline or signs.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/timezones-june-3.webp",
+      "sha256": "95bde9727fd0bdb4bc9eeff9b885753cc245f58347c4bcfbf36325e6b5e2fa6d",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. New York City for the June time-zone deck: Manhattan skyline dominated by the recognizable setback silhouette and spire of the Empire State Building, viewed from a nearby rooftop in warm morning light, water towers and restrained brick architecture foreground. No text or Times Square billboards.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/timezones-june-5.webp",
+      "sha256": "2c9621e4821f2a86de956aacfec7b22ab22d1bd1843454e4c036fb6fa1153cd2",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. London for the June time-zone deck: Tower Bridge with its two recognizable neo-Gothic towers spanning the Thames, seen obliquely from the riverbank in soft late morning sunlight, gentle river water and one modest boat. No Big Ben, no clock numerals, no signs.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/timezones-june-6.webp",
+      "sha256": "9e00daeb5e930c2b3ffdfd3adc0ce959686ac8baa22f49540587dcb15229b317",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Madrid for the June time-zone deck: the Cibeles fountain with the seated goddess and TWO lions, viewed diagonally across the plaza toward the recognizable Palacio de Cibeles in luminous summer noon light, architectural depth, empty foreground breathing room. No Puerta de Alcalá or Gran Via scene, no signs.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/timezones-june-11.webp",
+      "sha256": "d8cbb964547826565a1aa08a2109ffef63859b279a385e2e133faafb46b1bdde",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Tokyo Japan for the June time-zone deck: Tokyo Tower recognizable red-brown lattice silhouette rising over quiet Shiba Park at late summer dusk, foreground Japanese pines and a small traditional temple roof, modern Tokyo buildings softly behind. Sepia rendering of steel tower, no neon, no Sydney Opera House, no text.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/timezones-june-12.webp",
+      "sha256": "214393fccb43a19bf696bead454cecea38625c8847f1cab2b233a6c0ea5f09cf",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Sydney Australia for the June time-zone deck: Sydney Harbour Bridge as dominant subject from beneath one waterfront approach at evening twilight, recognizable broad steel arch spanning harbor, quiet ferry on the water and sandstone embankment foreground. No Opera House in foreground, distinct bridge-centered composition.",
+        "referenceImage": null
+      }
+    },
+    {
+      "path": "assets/quick-cards/cities-east-west-8.webp",
+      "sha256": "13a605ff9ce0dbe3f17cd5180cdf920abb0aca5ccc09efd28d35da35e76ede7c",
+      "rightsEvidence": {
+        "status": "session-ai-generated",
+        "generator": "OpenAI built-in image_gen",
+        "generatedAt": "2026-09-29",
+        "evidenceRef": "docs/ilustraciones-unicas-2026-09-29.json",
+        "exactPrompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions and historically/scientifically plausible details, quiet breathing room, one coherent full-bleed scene. Artwork only, no text, no letters, no numerals, no labels, no border, no frame, no card layout, no collage, no split panels, no modern saturated colors, no glossy 3D render, no cartoon, no photorealistic camera look. No signs or watermarks. Keep important elements inside central 88% of canvas. Tokyo Japan for the longitude deck: Senso-ji temple's recognizable five-story pagoda and neighboring traditional temple roof viewed through a peaceful garden in daylight, meticulously etched Japanese timber architecture, subtle distant Tokyo city rooftops. No lantern writing, no signs, no Sydney landmarks.",
+        "referenceImage": null
+      }
     }
-  },
-  {
-    "path": "assets/avatars/aretha-franklin.webp",
-    "sha256": "bd1ac62f8bd8442a8590500d55ed13120126ad20082615407bcb617e4f066c92",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/automata.webp",
-    "sha256": "58c901146029eca39e775c00bcf0ed7a5586790d0c8449a2c461dbd787a78312",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/aventurera.webp",
-    "sha256": "97cbe8509747ce9ae04d7c29154704861f346e5b35d7365ce637ad4bff0456c0",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/ballena-azul.webp",
-    "sha256": "dcc46e9f659309a5059dab8d8129c1e69d85236ca0838957954ece7f0f98e588",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/beethoven.webp",
-    "sha256": "673b44f31b84c68b52ea3d8540405cec4cf7ac2aad41397666d89dcbabe2c024",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/buho-real.webp",
-    "sha256": "adc7b20abb5e718fd73d4d169eb375a7bf2de7d2b4db4cf9b862a1fc99002247",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/caballera.webp",
-    "sha256": "444bc872a4c946d6f50a280316dfc5ddb2af472404b3b75e7d5e229a6c319643",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/carlos-iii.webp",
-    "sha256": "8f18facccd141a8560c21c8ac2e88c6298baa310fa052d991200e57bea8202ac",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/cervantes.webp",
-    "sha256": "34580e18dc16a562ac63359519c8dc176267fd73bb9396a61c3b7d1cb5fb2f39",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/chaplin.webp",
-    "sha256": "1daad97a38ede69ef2e2490b5cc839d792d849abaec45dff127baadefcad2829",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/cleopatra.webp",
-    "sha256": "9c618db7c55fee0b8230b25440cfd3937f059e0a4159887264b9f915568994d4",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/creador-puzles.webp",
-    "sha256": "09eba68e046f7f95d9f11a7ed75270880634a1eeffd7d79d1d6f42975f6c7b73",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/david-bowie.webp",
-    "sha256": "4d88eda692698d5ce78f2dbca8d3cb35e0cfec3d431049e3e7ea8d5ac3826406",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/el-cid.webp",
-    "sha256": "088f5adf9bfcf8a5e137006c89500df1bc7af9a54a0a0a0fd19198fec9911c7f",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/elefante.webp",
-    "sha256": "3147553cd0b6e661d2ea6a333f857cef8d49f54dceb182a8b3006a978ed54031",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/explorador.webp",
-    "sha256": "9f0c924ce78a44854ae4f281199e83f1071632739c002335bc72430696455b0d",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/felipe-ii.webp",
-    "sha256": "6957a3549e89f90ae55ec0bc67a40d45de4c7ef1829c2e3af98c92f4998f190c",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/flamenco.webp",
-    "sha256": "c0677b134093e53072778e00a8990ec749c6b143e5f2ef52b1e6732301787ec3",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/hechicera.webp",
-    "sha256": "df86f4b3c64da93e26cf2e6e70b2c539ba3452ebafa1c18f6db22b2719bdb3af",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/ingrid-bergman.webp",
-    "sha256": "665aa7d4fbd286c7be27158acacd0127f01c03dd5848ee22aa508ef706efede1",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/isabel-catolica.webp",
-    "sha256": "3fef3142caed82a2b892aacdeab5dd567ee8a0faeb6ea1247636c0e7972b161c",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/jirafa.webp",
-    "sha256": "dbd269fc62cb082143ff3ef08eea5e696a86dcabdd019efd0bc0702022bc06eb",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/juana-i.webp",
-    "sha256": "5ca49f0a20ddf8fa15f7114512220d34168704c5a4554c871d0225cee6b0e960",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/leon.webp",
-    "sha256": "6787fb97c1cfb05b7150d81470600a2d5da18d43059e18f517b6b5cf1932e4f1",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/lince.webp",
-    "sha256": "d6b2e92e5adfe564a29c522304a237aa706942544bbe06b8d52c040290541227",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/marie-curie.webp",
-    "sha256": "21a59010a3a84ccdb9972619b16b1df0e1d2ad6be3299f67dd2dacae886a24ce",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/melies.webp",
-    "sha256": "095aad4757ed28c71d08f946e9d9eaf07b32ea47d37f17cbc64b140566445173",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/ninja.webp",
-    "sha256": "2ee4d7b27c0773bf88e698c0fa148f368ecd273874dfdf1f80a90dbe34973461",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/panda.webp",
-    "sha256": "01a726e7d8a311162675353b392d075059293ed190c435f57412ad8028a5869b",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/piloto-arcade.webp",
-    "sha256": "fea317b4384773810df16e189d22be376681e063d26405113c0f3ffc98d3659c",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/piloto-espacial.webp",
-    "sha256": "6854331e580a6e82046c0e89a6c7b90c7fa7e920290e0070aedf4b592ca7874c",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/pinguino.webp",
-    "sha256": "0da402ecd4d0efcdfd462113d94fa370373dacf028626a904ec0a8a6a83e753d",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/pulpo.webp",
-    "sha256": "473e388d165b95de1a53cac7b2474f689e15b612fab05e5e1cd9012f69facbaa",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/tigre.webp",
-    "sha256": "0fbc966642769a2e220305df2775291f33f1b1e9d7bf9d7fe394b39781cb2a7e",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  },
-  {
-    "path": "assets/avatars/zorro.webp",
-    "sha256": "499b7fecebc28ec251392b987dc97d0279ac989a7575bc0fb7af1121ccf6be65",
-    "rightsEvidence": {
-      "status": "generated-for-continuum",
-      "generator": "ChatGPT / OpenAI",
-      "generatedAt": "2026-09-25",
-      "evidenceRef": "PROCEDENCIA_ARTE_IA.md",
-      "source": "Ilustración aprobada en la conversación del proyecto; el recorte WebP procede de las láminas generadas."
-    }
-  }
   ]
 }

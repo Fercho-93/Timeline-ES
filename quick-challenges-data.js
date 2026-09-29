@@ -458,7 +458,9 @@
         ['Pan blanco',266,'266 kcal/100 g','assets/quick-cards/foods-kcal-10.webp'],
         ['Queso cheddar',403,'403 kcal/100 g','assets/quick-cards/foods-kcal-11.webp'],
         ['Almendras',579,'579 kcal/100 g','assets/quick-cards/foods-kcal-12.webp'],
-        ['Mantequilla',717,'717 kcal/100 g','assets/quick-cards/foods-kcal-13.webp']
+        ['Mantequilla',717,'717 kcal/100 g','assets/quick-cards/foods-kcal-13.webp'],
+        // Añadida al final para conservar los IDs de cartas y partidas ya guardadas.
+        ['Tomate',18,'18 kcal/100 g','assets/quick-cards/foods-kcal-14.webp']
       ]
     ),
     d(
