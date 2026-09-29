@@ -4814,9 +4814,9 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 /* ===== Mesa de juego unificada (todas las modalidades) =====
    Misma estética que «Jugar solo»: la mano en abanico sin recortar, los jugadores
    como píldoras a la derecha y la lámina de la línea siempre entera. */
-#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: clamp(100px, 15.5dvh, 140px) !important; padding: 2px 0 12px !important; overflow: visible !important; }
-#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(24vw, 88px, calc((15.5dvh - 16px) * .68)) !important; aspect-ratio: 2 / 3 !important; --fan-step: min(8.2vw, 38px); transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 4deg)) scale(calc(1 - var(--fan-depth) * .14)); }
-#app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: .66rem; overflow-wrap: normal; word-break: normal; hyphens: auto; }
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: clamp(112px, 22dvh, 176px) !important; padding: 2px 0 12px !important; overflow: visible !important; }
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(30vw, 112px, calc((22dvh - 16px) * .68)) !important; aspect-ratio: 2 / 3 !important; --fan-step: calc(min(30vw, 112px, (22dvh - 16px) * .68) * .55); transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 4deg)) scale(calc(1 - var(--fan-depth) * .14)); }
+#app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: .7rem; line-height: 1.12; overflow-wrap: normal; word-break: normal; hyphens: auto; }
 #app.atlas-board .scoreboard-panel { display: flex !important; justify-content: flex-end; height: auto !important; margin: 0 0 4px !important; padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
 #app.atlas-board .scoreboard-panel .scoreboard-title { display: none !important; }
 #app.atlas-board .scoreboard-panel .scoreboard { display: flex !important; flex-direction: row; justify-content: flex-start; gap: 6px !important; width: auto; max-width: 100%; max-height: none !important; height: auto !important; min-height: 0 !important; margin: 0 0 0 auto !important; padding: 0 !important; overflow-x: auto !important; overflow-y: hidden !important; scrollbar-width: none; }
@@ -4840,6 +4840,10 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 
 /* Las flechas de la mano van a los lados del abanico (ya no ocupan una fila debajo): más sitio
    para la carta de la línea. El contador queda solo para lectores de pantalla. */
-#app.atlas-board .atlas-hand-section > .hand-fan-controls { position: relative; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; height: 0; margin: 0 !important; padding: 0 2px; gap: 0; pointer-events: none; transform: translateY(calc(-0.5 * clamp(100px, 15.5dvh, 140px) - 18px)); }
+#app.atlas-board .atlas-hand-section > .hand-fan-controls { position: relative; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; height: 0; margin: 0 !important; padding: 0 2px; gap: 0; pointer-events: none; transform: translateY(calc(-0.5 * clamp(112px, 22dvh, 176px) - 18px)); }
 #app.atlas-board .atlas-hand-section > .hand-fan-controls button { width: 38px !important; height: 38px !important; min-height: 38px !important; pointer-events: auto; font-size: 1.4rem; background: #fbf4e4cc; }
 #app.atlas-board .atlas-hand-section > .hand-fan-controls span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* El contador de cartas y la lupa van en la misma fila (ahorran una fila entera): ese alto
+   se da a la mano para que los títulos se lean completos. */
+#app.atlas-board .game-head-side { flex-direction: row !important; align-items: center !important; gap: 10px !important; }
