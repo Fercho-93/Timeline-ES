@@ -104,7 +104,10 @@
   }
   function freeSetup() {
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
-    shell(`<section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> Partida libre</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los mazos se sortearán sin mostrarte cuáles son.</p><div class="panel"><div class="field"><label for="quick-free-length">Duración de la partida</label><select id="quick-free-length"><option value="1">1 mazo · partida rápida</option><option value="3" selected>3 mazos · partida estándar</option><option value="5">5 mazos · partida larga</option></select></div>${button('start-free','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
+    const total=CT.QuickCatalog.challenges.length;
+    const options=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga'],[10,'Maratón'],[15,'Gran maratón'],[20,'Resistencia']].filter(([n])=>n<total);
+    const chip=(n,label,extra='')=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}${extra}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"><b>${n}</b><span>${n===1?'mazo':'mazos'}</span><small>${label}</small></button>`;
+    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Partida libre</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los mazos se sortearán sin mostrarte cuáles son.</p><div class="quick-length" role="radiogroup" aria-label="Duración de la partida">${options.map(([n,label])=>chip(n,label)).join('')}${chip(total,'Todos los mazos del catálogo',' quick-length-all')}</div><input type="hidden" id="quick-free-length" value="3">${button('start-free','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></section>`);
   }
   function duelLink() {
     const url=new URL(location.href);url.hash='quick-duel='+CT.LocalTransport.encodeText(JSON.stringify(record));return url.href;
@@ -215,7 +218,7 @@
       <div id="quick-names">${nameFields(solo ? 1 : 2, solo ? ["Tú"] : [CT.Identidad?.propio?.() || "Jugador 1"])}</div>
       ${solo ? '' : button('add-player', '＋ Añadir participante', 'btn btn-ghost')}</div>
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
-      <div class="setup-grid"><div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div></div>
+      <div class="setup-grid"><div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option><option value="10">10 retos · maratón</option><option value="15">15 retos · gran maratón</option><option value="20">20 retos · resistencia</option><option value="${CT.QuickCatalog.challenges.length}">Todos los mazos · ${CT.QuickCatalog.challenges.length} retos</option></select></div></div>
       <p class="hint">${solo ? "Puedes plantarte para asegurar los puntos del reto." : "El primer turno rota en cada reto."}</p></div>
       ${button('start', 'Barajar y empezar <span>→</span>', 'btn btn-primary btn-block')}
       ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}
@@ -366,6 +369,10 @@
     if (action === 'stats') {statsPanel(); return;}
     if (action === 'rematch') {networkSetup('internet',2); return;}
     if (action === 'ready') { if (pendingConfig) begin(pendingConfig); return; }
+    if (action === 'length') {
+      app().querySelectorAll('.quick-length-chip').forEach(chip => {const on = chip === target; chip.classList.toggle('is-selected', on); chip.setAttribute('aria-checked', String(on));});
+      const input = app().querySelector('#quick-free-length'); if (input) input.value = target.dataset.length; return;
+    }
     if (action === 'start-free') {
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
       prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count}); return;

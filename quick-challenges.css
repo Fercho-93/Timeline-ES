@@ -48,3 +48,18 @@
 .quick-ready .eyebrow-line{background:var(--accent)}
 .quick-ready h2{margin:6px auto 18px;max-width:20ch;color:var(--ink);text-wrap:balance}
 .quick-ready .lead{margin:-6px auto 18px;max-width:32ch}
+
+/* Partida libre: la duración se elige con fichas de pergamino (como las de la barra inferior),
+   sin el recuadro blanco con desplegable. */
+.quick-free-setup{--accent:#8a3f2f;--accent-dark:#7a3a2c}
+.quick-shell .quick-length{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:20px 0 22px}
+.quick-shell .quick-length-chip{display:grid;justify-items:center;align-content:center;gap:1px;min-height:92px;padding:10px 4px;border:1px solid #b9a98e;border-radius:10px;color:#5b4936;background:linear-gradient(155deg,rgba(250,246,235,.97),rgba(232,221,201,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 2px 4px rgba(54,41,26,.12);font:inherit;cursor:pointer;transition:transform 160ms ease,box-shadow 160ms ease,border-color 160ms ease}
+.quick-shell .quick-length-chip b{font:600 1.7rem/1 var(--font-display)}
+.quick-shell .quick-length-chip span{font:600 .72rem/1.2 var(--font-display);letter-spacing:.08em;text-transform:uppercase}
+.quick-shell .quick-length-chip small{margin-top:4px;color:var(--muted,#7a6a58);font:.68rem/1.2 var(--ui-font,inherit)}
+.quick-shell .quick-length-chip.is-selected{border-color:#aa7157;color:#704a37;background:linear-gradient(155deg,#f8efdf,#eadbc4);box-shadow:inset 0 0 0 1px #aa7157,0 5px 9px rgba(61,43,29,.17);transform:translateY(-2px)}
+.quick-shell .quick-length-chip:focus-visible{outline:2px solid #8a3f2f;outline-offset:2px}
+.quick-shell .quick-length-chip.quick-length-all{grid-column:1/-1;grid-auto-flow:column;justify-content:center;gap:8px;min-height:58px}
+.quick-shell .quick-length-chip.quick-length-all b{font-size:1.3rem}
+.quick-shell .quick-length-chip.quick-length-all small{margin:0 0 0 4px}
+@media(prefers-reduced-motion:reduce){.quick-shell .quick-length-chip{transition:none}}

@@ -7,7 +7,7 @@
   function create(config) {
     if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 8 ||
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
-        !Array.isArray(config.rounds) || ![1, 3, 5].includes(config.rounds.length)) throw Error('INVALID_CONFIG');
+        !Array.isArray(config.rounds) || config.rounds.length < 1 || config.rounds.length > catalog.challenges.length) throw Error('INVALID_CONFIG');
     const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
