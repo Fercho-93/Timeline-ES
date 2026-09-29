@@ -136,7 +136,18 @@
   function networkSetup(kind,capacity=4) {
     roomCapacity=capacity;
     stopNetwork();state=null;record=null;page='network';netKind=kind;
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo por turnos':kind==='internet'?'Varios móviles':'Sin conexión'}</h2><p class="lead">${kind==='internet'?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p><div class="panel"><div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${esc(CT.Identidad?.propio?.() || '')}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>${button('create-room','Crear sala','btn btn-primary btn-block')}<div class="field"><label for="quick-net-code">${kind==='internet'?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>${button('scan-code','Escanear QR de la sala','btn btn-secondary btn-block')}${button('join-room','Unirme a la sala','btn btn-secondary btn-block')}<p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></div></section>`);
+    const net=kind==='internet', ownName=esc(CT.Identidad?.propio?.() || '');
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo por turnos':net?'Varios móviles':'Sin conexión'}</h2><p class="lead">${net?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p>
+      <div class="online-entry-grid">
+        <section class="panel online-form"><span class="form-number">01</span><h3>${net?'Entrar en una sala':'Unirme a una sala'}</h3><p>${net?'Usa el código, el enlace o el QR de quien creó la sala.':'Pega la invitación o escanea su código QR.'}</p>
+          <div class="field"><label for="quick-net-code">${net?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>
+          <div class="field"><label for="quick-net-name-join">Tu nombre</label><input id="quick-net-name-join" maxlength="24" value="${ownName}"></div>
+          ${button('scan-code','Escanear código QR','btn btn-secondary btn-block')}${button('join-room','Unirme a la partida <span>→</span>','btn btn-primary btn-block')}</section>
+        <section class="panel online-form"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código, el enlace o el QR.</p>
+          <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${ownName}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>
+          ${button('create-room','Crear sala','btn btn-secondary btn-block')}</section>
+      </div>
+      <p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></section>`);
   }
   function roomChanged(next,id,code) {
     room=CT.QuickRoom.validate(next);myId=id;busy=false;page='network-lobby';
@@ -179,7 +190,7 @@
     const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=room.members.length<2;
   }
   async function connectRoom(create) {
-    const name=app().querySelector('#quick-net-name').value.trim();if(!name)throw Error('Escribe tu nombre.');
+    const nameInput=app().querySelector(create?'#quick-net-name':'#quick-net-name-join') || app().querySelector('#quick-net-name'), name=nameInput.value.trim();if(!name)throw Error('Escribe tu nombre.');
     if (create) roomCapacity = Number(app().querySelector('#quick-net-players')?.value) || roomCapacity;
     let code=app().querySelector('#quick-net-code').value.trim();
     const epoch=networkEpoch, change=(...args)=>{if(epoch===networkEpoch)roomChanged(...args);}, fail=e=>{if(epoch===networkEpoch)errorNotice(e);};
