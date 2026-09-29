@@ -186,6 +186,28 @@
     });
   }
 
+  // Chrome y Safari esconden la IP real del móvil tras un nombre `.local` (mDNS) salvo que la
+  // página tenga la cámara en uso. Entre un Android y un iPhone, resolver ese nombre por
+  // multicast suele fallar —sobre todo en el punto de acceso de un móvil—, y entonces los
+  // QR se leen bien pero el canal no llega a abrirse. Con la cámara abierta mientras se
+  // reúnen los candidatos, la señal lleva la IP de verdad. Si no hay cámara o permiso, se
+  // sigue igual que antes: es una ayuda, nunca un requisito.
+  const CAPTURE_WAIT_MS = 4000;
+  async function withCapture(work) {
+    let stream = null, late = false;
+    try {
+      if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+        const pending = navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        // Si el permiso tarda (aviso del sistema abierto), no se bloquea la invitación: la
+        // cámara que llegue tarde se cierra en cuanto aparezca.
+        pending.then(s => { if (late) s.getTracks().forEach(t => t.stop()); else stream = s; }, () => {});
+        await Promise.race([pending.catch(() => null), new Promise(resolve => setTimeout(resolve, CAPTURE_WAIT_MS))]);
+      }
+    } catch { /* Sin cámara: se sigue sin ella. */ }
+    try { return await work(); }
+    finally { late = true; stream?.getTracks().forEach(track => track.stop()); }
+  }
+
   function createPeerConnection() {
     if (typeof RTCPeerConnection === "undefined") throw new Error("WEBRTC_UNAVAILABLE");
     return new RTCPeerConnection(ICE_CONFIG);
@@ -212,9 +234,11 @@
     async function answerSignal() {
       await peerConnection.setRemoteDescription(offerDescription);
       const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
-      await waitIceGatheringComplete(peerConnection);
-      return encodeSignal("answer", peerConnection.localDescription);
+      return withCapture(async () => {
+        await peerConnection.setLocalDescription(answer);
+        await waitIceGatheringComplete(peerConnection);
+        return encodeSignal("answer", peerConnection.localDescription);
+      });
     }
     function send(type, data) {
       if (!ready || !channel) return false;
@@ -239,9 +263,11 @@
     });
     async function offerSignal() {
       const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-      await waitIceGatheringComplete(peerConnection);
-      return encodeSignal("offer", peerConnection.localDescription);
+      return withCapture(async () => {
+        await peerConnection.setLocalDescription(offer);
+        await waitIceGatheringComplete(peerConnection);
+        return encodeSignal("offer", peerConnection.localDescription);
+      });
     }
     async function acceptAnswer(encoded) {
       const { role, description } = decodeSignal(encoded);
