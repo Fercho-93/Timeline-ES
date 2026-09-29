@@ -352,9 +352,11 @@
       if (timelineHeading) timelineHeading.classList.add('timeline-toolbar');
       // La lupa del zoom va en la barra superior, junto al sonido y el menú: es un ajuste de
       // vista, no parte del tablero, y así no descuadra la cabecera de la línea.
-      const actions = container.querySelector('.atlas-topbar .atlas-topbar-actions');
-      if (zoom && actions) actions.prepend(zoom);
-      else if (zoom && timelineHeading) timelineHeading.append(zoom);
+      // El zoom y el sonido viven en el menú ⋯ de la partida: la barra de arriba queda solo
+      // con volver, el título y el menú. Sin menú (algunas salas), el zoom sigue en la línea.
+      const menuButton = container.querySelector(':is(.topbar, .atlas-topbar) :is(.atlas-topbar-actions, .topbar-actions) > button:not(#ambience-toggle)');
+      container.classList.toggle('atlas-menu-tools', !!menuButton);
+      if (zoom && !menuButton && timelineHeading) timelineHeading.append(zoom);
       const hand = container.querySelector('.hand');
       if (hand) {
         hand.closest('section')?.classList.add('atlas-hand-section');
@@ -394,6 +396,34 @@
       roster.scrollLeft = Math.max(0, active.offsetLeft - roster.children[1].offsetLeft);
     });
   }
+  // Al abrir el menú ⋯ de una partida se añade arriba un bloque «Vista» con el zoom y la
+  // música. Se engancha a cualquier menú de la barra superior, sea cual sea la modalidad.
+  document.addEventListener('click', event => {
+    const opener = event.target.closest?.('#app.atlas-menu-tools :is(.atlas-topbar-actions, .topbar-actions) > button:not(#ambience-toggle)');
+    if (!opener) return;
+    setTimeout(() => {
+      const modal = [...document.querySelectorAll('#app > .overlay .modal')].at(-1);
+      if (!modal || modal.querySelector('.menu-view-tools')) return;
+      const zoom = document.querySelector('#app .timeline-zoom');
+      const levels = zoom ? [...zoom.querySelectorAll('.zoom-menu [data-zoom-level]')] : [];
+      const on = () => CT.effectPrefs?.().ambience === true;
+      const block = document.createElement('div');
+      block.className = 'menu-view-tools';
+      block.innerHTML = `${levels.length ? `<div class="menu-view-row"><span>Zoom de las cartas</span><div class="menu-view-zoom" role="group" aria-label="Zoom de las cartas">${levels.map(b => `<button type="button" data-zoom-level="${b.dataset.zoomLevel}" aria-pressed="${b.getAttribute('aria-pressed')}">${b.textContent}</button>`).join('')}</div></div>` : ''}<div class="menu-view-row"><span>Música</span><button type="button" class="menu-view-sound" aria-pressed="${on()}">${on() ? 'Activada' : 'Desactivada'}</button></div>`;
+      block.addEventListener('click', e => {
+        const level = e.target.closest('[data-zoom-level]');
+        if (level) setTimeout(() => block.querySelectorAll('[data-zoom-level]').forEach(b => b.setAttribute('aria-pressed', String(b === level))), 0);
+        const sound = e.target.closest('.menu-view-sound');
+        if (sound) {
+          CT.setAmbience?.(!on());
+          sound.setAttribute('aria-pressed', String(on()));
+          sound.textContent = on() ? 'Activada' : 'Desactivada';
+        }
+      });
+      const title = modal.querySelector('h2');
+      if (title) title.after(block); else modal.prepend(block);
+    }, 0);
+  });
   const surfaceNav = new Map();
   function openSurface(modal) {
     if (playing.has(document.getElementById('app').dataset.screen)) return;

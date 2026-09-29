@@ -4876,3 +4876,17 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 #app .atlas-topbar-actions > .timeline-zoom { position: relative; display: block; margin: 0 !important; padding: 0; border: 0; background: none; box-shadow: none; }
 #app.atlas-board[data-platform][data-screen] .atlas-topbar-actions .timeline-zoom button.zoom-toggle { height: 36px !important; min-height: 36px !important; padding: 0 10px !important; gap: 4px; font-size: .72rem !important; }
 #app .atlas-topbar-actions .timeline-zoom .zoom-menu { top: calc(100% + 6px); right: 0; z-index: 60; }
+
+/* Barra superior despejada en partida: el zoom y la música pasan al menú ⋯. */
+#app.atlas-menu-tools .timeline-zoom { display: none !important; }
+#app.atlas-menu-tools :is(.atlas-topbar-actions, .topbar-actions) > #ambience-toggle { display: none !important; }
+.menu-view-tools { display: grid; gap: 10px; margin: 4px 0 14px; padding: 12px 14px; border: 1px solid #d8c6a4; border-radius: 12px; background: #fbf4e4; }
+.menu-view-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.menu-view-row > span { color: #5a4330; font: 600 .82rem/1.2 var(--ui-font); }
+.menu-view-zoom { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid #cdb994; border-radius: 999px; background: #fff9ee; }
+.menu-view-zoom button, .menu-view-sound { min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: #4a3626; font: 600 .78rem/1 var(--ui-font); cursor: pointer; }
+.menu-view-zoom button[aria-pressed="true"], .menu-view-sound[aria-pressed="true"] { background: #8a3f2f; color: #fff6e8; }
+.menu-view-sound { border: 1px solid #cdb994; background: #fff9ee; }
+.menu-view-row > span { text-align: left; }
+.menu-view-zoom { flex: none; }
+#app .modal .menu-view-zoom button, #app .modal .menu-view-sound { width: auto !important; min-width: 0; white-space: nowrap; padding: 0 11px; }
