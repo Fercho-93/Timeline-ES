@@ -4854,3 +4854,19 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 /* «Pasar reto» junto al título de la línea de cartas, a la derecha, en el hueco que quedó libre. */
 #app.atlas-board .quick-shell .board-timeline-section > .hand-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 #app.atlas-board .quick-shell .board-timeline-section > .hand-title .quick-pass { flex: none; margin-right: 2px; }
+
+/* ===== Cabecera limpia de la mesa =====
+   Barra superior: ← · título del mazo · sonido y menú. Debajo, una sola franja: cartas
+   pendientes a la izquierda; «Pasar reto» y jugadores a la derecha. La lupa del zoom vive en
+   la cabecera de la línea, que es lo que amplía. */
+#app .atlas-topbar .topbar-title { min-width: 0; text-align: center; color: #8a3f2f; font: 700 .78rem/1.2 var(--font-display); letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+#app.atlas-board .quick-shell .quick-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 2px 0 6px; padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--edition-line, #cdb994) 70%, transparent); }
+#app.atlas-board .quick-shell .quick-left { color: var(--edition-muted, #7a6a58); font: .74rem/1.2 var(--ui-font); letter-spacing: .02em; white-space: nowrap; }
+#app.atlas-board .quick-shell .quick-left b { color: #4a3626; font: 700 1rem/1 var(--font-display); margin-right: 2px; }
+#app.atlas-board .quick-shell .quick-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
+#app.atlas-board .quick-shell .quick-right .scoreboard { margin: 0; flex-wrap: nowrap; }
+#app.atlas-board .quick-shell .quick-pass { min-height: 28px; padding: 0 11px; }
+#app.atlas-board .board-timeline-section > .timeline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom { position: relative; flex: none; margin: 0 !important; padding: 0; border: 0; background: none; box-shadow: none; }
+#app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom .zoom-menu { top: calc(100% + 6px); right: 0; }
+#app.atlas-board .quick-shell .quick-right .scoreboard, #app.atlas-board .quick-shell .quick-right .score { box-shadow: none; } #app.atlas-board .quick-shell .quick-right .scoreboard { padding: 0; background: none; border: 0; }

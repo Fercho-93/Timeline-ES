@@ -14,12 +14,13 @@
       return saved;
     } catch {error = 'No se ha podido recuperar la partida anterior. Puedes empezar una nueva.'; return null;}
   }
+  let topTitle = '';
   function shell(content) {
     const playing=!!state || !!connection || page==='network-lobby';
     // Desde la pantalla por la que se entró, la flecha sale de Retos rápidos a la pantalla
     // anterior del juego; desde cualquier otra, vuelve a esa pantalla de entrada.
     const back=playing ? 'data-quick="exit"' : page===entry || page==='menu' ? 'data-action="ui-back"' : 'data-quick="formats"';
-    paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing)}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
+    paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '')}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
   let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null;
@@ -278,7 +279,9 @@
     saveHistory();
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
-    const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="game-head"><div><div class="turn-label">${state.config.rounds.length === 1 ? '' : `Reto ${state.index + 1} de ${state.config.rounds.length} · `}${esc(c.title)}</div>${state.players.length === 1 ? '' : `<div class="turn-name">${esc(p.name)}</div>`}</div><div class="deck-count"><strong>${state.remaining.length}</strong><span>cartas</span></div></div><div class="quick-meta"><p class="quick-rule">${esc(c.rule)}</p>${scores()}</div>`;
+    topTitle = `${state.config.rounds.length === 1 ? '' : `${state.index + 1}/${state.config.rounds.length} · `}${esc(c.title)}`;
+    const pass = `<button class="quick-pass" data-quick="bank" aria-label="${p.points ? `Plantarse y asegurar ${p.points} puntos` : 'Pasar este reto'}">${p.points ? `Asegurar ${p.points} pts` : 'Pasar reto'}</button>`;
+    const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)} · Turno de ${esc(p.name)}</h1><div class="quick-bar"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span><div class="quick-right">${state.phase === 'turn' && myTurn() ? pass : ''}${scores()}</div></div>`;
     if (state.phase === 'round-end') {
       const final = state.index + 1 === state.config.rounds.length;
       const best = Math.max(...state.players.map(player => player.score));
@@ -304,10 +307,9 @@
       return;
     }
     const gap = i => slot === i && selected ? `<div class="slot-confirm quick-confirm" data-index="${i}"><small>Colocar aquí</small><strong>${esc(get(selected).title)}</strong>${button('confirm', 'Sí, aquí', 'btn btn-primary btn-block')}${button('cancel', 'Cancelar', 'btn btn-ghost btn-block')}</div>` : `<button class="slot" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}"><span>+</span></button>`;
-    const pass = `<button class="quick-pass" data-quick="bank" aria-label="${p.points ? `Plantarse y asegurar ${p.points} puntos` : 'Pasar este reto'}">${p.points ? `Asegurar ${p.points} pts` : 'Pasar reto'}</button>`;
-    shell(`${heading}<section><div class="hand-title"><h3>Cartas comunes</h3></div><div class="hand">${state.remaining.map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
+    shell(`${heading}<section><h3 class="solo-lectores">Cartas comunes</h3><div class="hand">${state.remaining.map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
       <p class="hint">${selected ? 'Toca un hueco y confirma, o arrastra la carta hasta su lugar.' : 'Toca una carta o mantenla pulsada para arrastrarla hasta un hueco.'}</p></section>
-      <section class="board-timeline-section"><div class="hand-title"><h3>Línea de cartas</h3>${pass}</div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
+      <section class="board-timeline-section"><div class="hand-title"><h3>Línea de cartas</h3></div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
       <div class="timeline-wrap"><div class="timeline" aria-label="Línea de cartas: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>`);
     CT.enableDrag({cardSelector: '.quick-shell .hand-card', slotSelector: '.quick-shell .slot', parseCardId: id => id, onDrop(id, index) {
       if (!myTurn() || !app().querySelector('.quick-shell') || state?.phase !== 'turn' || !state.remaining.includes(id)) return;

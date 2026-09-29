@@ -16,13 +16,13 @@
     more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
   };
   const icon = name => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
-  function header(back = '', menu = '', inGame = false) {
+  function header(back = '', menu = '', inGame = false, title = '') {
     // La tercera columna es una fila propia, no una sola celda: así aloja el interruptor
     // de sonido y, cuando lo hay, el botón de menú, sin que ninguno de los dos tenga que
     // adivinar el sitio del otro.
     return `<header class="topbar atlas-topbar${inGame ? ' atlas-game-topbar' : ''}">
       ${back ? `<button class="icon-btn atlas-back" ${back} aria-label="Volver a la pantalla anterior">${icon('back')}</button>` : '<span></span>'}
-      ${inGame ? '<span></span>' : '<div class="brand">Continuum</div>'}
+      ${inGame ? (title ? `<div class="topbar-title">${title}</div>` : '<span></span>') : '<div class="brand">Continuum</div>'}
       <div class="atlas-topbar-actions"><i data-sound-slot></i>${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
     </header>`;
   }
@@ -350,19 +350,8 @@
       const zoom = container.querySelector('.timeline-zoom');
       const timelineHeading = wrap?.parentElement.querySelector('.hand-title');
       if (timelineHeading) timelineHeading.classList.add('timeline-toolbar');
-      // La lupa del zoom va arriba a la derecha, bajo el contador de cartas pendientes.
-      const deckCount = container.querySelector('.game-head .deck-count');
-      if (zoom && deckCount) {
-        let side = deckCount.parentElement;
-        if (!side.classList.contains('game-head-side')) {
-          side = document.createElement('div');
-          side.className = 'game-head-side';
-          deckCount.before(side);
-          side.append(deckCount);
-        }
-        side.append(zoom);
-      }
-      else if (timelineHeading && zoom) timelineHeading.parentElement.insertBefore(zoom, timelineHeading);
+      // La lupa del zoom va en la cabecera de la línea, a la derecha: es un mando del tablero.
+      if (zoom && timelineHeading) timelineHeading.append(zoom);
       const hand = container.querySelector('.hand');
       if (hand) {
         hand.closest('section')?.classList.add('atlas-hand-section');
