@@ -4847,3 +4847,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 /* El contador de cartas y la lupa van en la misma fila (ahorran una fila entera): ese alto
    se da a la mano para que los títulos se lean completos. */
 #app.atlas-board .game-head-side { flex-direction: row !important; align-items: center !important; gap: 10px !important; }
+
+/* Aire entre el abanico de la mano y el bloque de la línea de cartas: la base de las cartas
+   giradas ya no toca el borde superior del bloque. */
+#app.atlas-board .atlas-hand-section + .board-timeline-section, #app.atlas-board .atlas-hand-section ~ .board-timeline-section { margin-top: 14px; }
