@@ -342,6 +342,29 @@
       destination.insertAdjacentHTML('beforeend', nav(screen));
     }
     container.classList.toggle('atlas-has-nav', !inGame && !container.querySelector('.bienvenida-shell'));
+    // Cabecera limpia en todas las mesas (como Retos rápidos): el nombre de la partida sube a la
+    // barra superior y debajo queda una sola franja con los contadores.
+    if (board.has(screen) && !container.querySelector('.quick-shell')) {
+      const head = container.querySelector(':scope > .shell > .game-head');
+      const label = head?.querySelector('.turn-label');
+      const middle = container.querySelector('.atlas-topbar > span:nth-child(2)');
+      if (head && label && middle) {
+        const title = document.createElement('div');
+        title.className = 'topbar-title';
+        title.setAttribute('aria-hidden', 'true');
+        title.textContent = label.textContent;
+        middle.replaceWith(title);
+        label.classList.add('solo-lectores');
+        head.classList.add('game-head-slim');
+        // Con marcador de jugadores, el nombre de quien juega ya se ve en su píldora.
+        const roster = container.querySelector(':scope > .shell > .scoreboard-panel');
+        if (roster) {
+          head.querySelector('.turn-name')?.classList.add('solo-lectores');
+          head.append(roster);
+        }
+      }
+      container.querySelectorAll('.atlas-hand-section .hand-title small, :scope > .shell > section > .hand-title small').forEach(el => el.classList.add('solo-lectores'));
+    }
     if (board.has(screen)) {
       const lives = container.querySelector('.solo-lives');
       const counters = container.querySelector('.game-head');
