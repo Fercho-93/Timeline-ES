@@ -63,6 +63,7 @@
 
   function paint(html, pantalla) {
     if (pantalla !== "local-qr-scan") stopCamera();
+    if (pantalla !== "local-cercanas") stopNearbySearch();
     if (pantalla !== "local-game") clearTurnTimer();
     CT.paint(appEl, html, pantalla);
   }
@@ -204,7 +205,7 @@
     roomState = room;
     if (previous?.phase !== room.phase || previous?.status !== room.status) renderGame.revelando = false;
     if (role === "guest") rememberSeat();
-    if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir", "local-final", "local-final-secreta"].includes(screen)) renderCurrent();
+    if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir", "local-cercanas", "local-final", "local-final-secreta"].includes(screen)) renderCurrent();
   }
 
   // El canal con el anfitrión se ha caído: cerró la sala, se quedó sin batería o salió de
@@ -288,7 +289,8 @@
       <form class="panel online-form" data-local-form="join-offer">
         <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name" value="${ownName() || escapeHtml(savedSeat()?.name || "")}"></div>
         ${savedSeat() ? `<p class="hint">Si escaneas una invitación de la sala ${escapeHtml(savedSeat().roomCode)}, volverás a tu plaza con tus cartas.</p>` : ""}
-        <button type="button" class="btn btn-primary btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código del anfitrión</button>
+        ${nearbyAvailable() ? `<button type="button" class="btn btn-primary btn-block" data-local-action="nearby-search">${WIFI_ICON} Buscar salas cercanas</button><p class="hint">Entre iPhones: sin escanear nada ni compartir Wi-Fi. Con Bluetooth y Wi-Fi activados basta.</p>` : ""}
+        <button type="button" class="btn ${nearbyAvailable() ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="scan-offer">${CAMERA_ICON} Escanear el código del anfitrión</button>
         <details class="qr-fallback"><summary>¿No puedes usar la cámara?</summary>
           <div class="field"><label for="local-guest-offer">Pega el código que te ha compartido el anfitrión</label><textarea id="local-guest-offer" name="offer" rows="3" placeholder="Recíbelo por Bluetooth, AirDrop o Cerca y pégalo aquí."></textarea></div>
           <button class="btn btn-secondary btn-block" type="submit">Unirse con ese código</button>
@@ -319,6 +321,78 @@
     } catch (error) {
       console.error(error);
       showToast(errorMessage(error.message));
+    } finally { busy = false; }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Salas cercanas (iPhone ↔ iPhone, MultipeerConnectivity): sin QR. El anfitrión se anuncia
+  // solo al crear la sala y aquí se ve la lista; tocar una sala basta para entrar.
+  const nearbyAvailable = () => !!CT.LocalPeer?.available?.();
+  let nearbySearch = null, nearbyRooms = [], nearbyName = "";
+  function stopNearbySearch() { nearbySearch?.stop?.(); nearbySearch = null; }
+
+  function nearbyListMarkup() {
+    if (!nearbyRooms.length) return `<div class="status status-waiting"><div class="spinner" aria-hidden="true"></div><span>Buscando salas cercanas… Que quien organiza haya creado ya la sala, y que los dos tengáis Bluetooth y Wi-Fi activados (no hace falta estar conectados a ninguna red).</span></div>`;
+    return `<div class="nearby-list">${nearbyRooms.map(room => {
+      const known = CT.has(room.mode), sameDeck = !room.fp || !known || room.fp === CT.deckFingerprint(room.mode);
+      const usable = known && sameDeck;
+      return `<button type="button" class="btn btn-secondary btn-block" data-local-action="nearby-join" data-id="${escapeHtml(room.id)}"${usable ? "" : " disabled"}><b>${escapeHtml(room.host || "Sala")}</b> · ${escapeHtml(known ? CT.mode(room.mode).name : "Mazo desconocido")}${usable ? "" : ` — ${known ? "versión distinta del juego" : "actualiza la app"}`}</button>`;
+    }).join("")}</div>`;
+  }
+
+  async function renderNearby(name) {
+    nearbyName = name;
+    nearbyRooms = [];
+    screen = "local-cercanas";
+    paint(`<div class="shell online-shell">${header("go-unirse")}
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Salas cercanas</h2><p class="lead">Elige la sala de quien la ha creado. Se unirá sola, sin códigos.</p></section>
+      <div class="panel" id="local-nearby-list" aria-live="polite">${nearbyListMarkup()}</div>
+    </div>`, "local-cercanas");
+    try {
+      nearbySearch = await CT.LocalPeer.browse(rooms => {
+        nearbyRooms = rooms;
+        const list = document.getElementById("local-nearby-list");
+        if (list && screen === "local-cercanas") list.innerHTML = nearbyListMarkup();
+      });
+    } catch (error) {
+      console.error(error);
+      const list = document.getElementById("local-nearby-list");
+      if (list) list.innerHTML = `<p>No se pudo buscar salas cercanas. Comprueba que has permitido la red local en Ajustes → Continuum, y que Bluetooth y Wi-Fi están activados.</p>`;
+    }
+  }
+
+  async function doJoinNearby(id) {
+    if (busy) return;
+    const info = nearbyRooms.find(room => room.id === id);
+    if (!info) return;
+    busy = true;
+    try {
+      role = "guest";
+      myName = nearbyName;
+      const seat = savedSeat();
+      myPlayerId = seat && seat.roomCode === info.room ? seat.playerId : randomPlayerId();
+      modeKey = CT.has(info.mode) ? info.mode : modeKey;
+      guestSession = CT.LocalSession.createGuestSession({
+        nearbyHostId: id, playerId: myPlayerId, name: myName, avatarId: CT.Avatares.ownId(), deckFingerprint: CT.deckFingerprint(modeKey),
+        onChange: onRoomChange,
+        onError: code => showToast(errorMessage(code)),
+        onDisconnect: onGuestDisconnect,
+        onFail: () => {
+          if (role !== "guest" || roomState) return;
+          try { guestSession?.close(); } catch {}
+          guestSession = null; role = null;
+          showToast("No se pudo conectar con esa sala. Inténtalo de nuevo.");
+          if (screen === "local-cercanas") void renderNearby(nearbyName);
+        }
+      });
+      const list = document.getElementById("local-nearby-list");
+      if (list) list.innerHTML = `<div class="status status-waiting"><div class="spinner" aria-hidden="true"></div><span>Conectando con ${escapeHtml(info.host || "la sala")}…</span></div>`;
+      await guestSession.connect();
+    } catch (error) {
+      console.error(error);
+      guestSession = null; role = null;
+      showToast(errorMessage(error.message));
+      void renderNearby(nearbyName);
     } finally { busy = false; }
   }
 
@@ -540,7 +614,8 @@
         <button class="btn btn-ghost btn-block" data-local-action="close-room">Cerrar sala</button>`
       : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
     paint(`<div class="shell online-shell">${header("leave")}
-      <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">Invitar a alguien</button></div>` : ""}</div></section>
+      <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
+      ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una sala → Buscar salas cercanas». Para un Android, usa el QR.</p>` : ""}
       <div class="online-lobby-grid">
         <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${settings}</section>
@@ -1011,6 +1086,12 @@
       onResult: text => { renderInvitar(false); void acceptPendingAnswer(text); },
       onBack: () => renderInvitar(false)
     });
+    else if (action === "nearby-search") {
+      const name = String(document.getElementById("local-guest-name")?.value || "").trim().slice(0, 18);
+      if (!name) return showToast("Escribe tu nombre antes de buscar");
+      void renderNearby(name);
+    }
+    else if (action === "nearby-join") void doJoinNearby(target.dataset.id);
     else if (action === "scan-offer") {
       const name = String(document.getElementById("local-guest-name")?.value || "").trim().slice(0, 18);
       if (!name) return showToast("Escribe tu nombre antes de escanear");

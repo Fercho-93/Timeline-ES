@@ -222,6 +222,12 @@ según el grupo de dispositivos.
 
 - [ ] Plugin de Capacitor para Android usando Nearby Connections (Bluetooth/Wi-Fi Direct
       automático, sin hotspot manual) para grupos 100% Android.
+- [~] Escrito, **pendiente de compilar y probar en dos iPhones reales**: `LocalPeerPlugin.swift`
+      (MultipeerConnectivity) + `local-peer.js`. El anfitrión se anuncia solo y los iPhones
+      ven la lista de salas cercanas («Unirme a una sala → Buscar salas cercanas»), sin QR;
+      Android y la web siguen por WebRTC y conviven en la misma sala. Requiere permiso de red
+      local (`NSBonjourServices` en Info.plist). De paso se han añadido al proyecto de Xcode y
+      registrado (`MainViewController.swift`) los plugins propios, que no estaban incluidos.
 - [ ] Plugin de Capacitor para iOS usando MultipeerConnectivity (la tecnología de AirDrop)
       para grupos 100% iPhone, cubriendo el caso en que ningún iPhone pueda activar su
       Hotspot personal sin cobertura.

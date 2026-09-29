@@ -24,6 +24,11 @@
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Continuum usa la red Wi-Fi local para conectar los móviles de una partida sin enviar datos a internet.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_continuum-loc._tcp</string>
+		<string>_continuum-loc._udp</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

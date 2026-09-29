@@ -107,7 +107,20 @@
       onPeerLost?.(name, room.status === "playing");
     }
 
-    const transport = CT.LocalTransport.createHostSession(onGuestMessage, null, onGuestLost);
+    // En la app de iOS los iPhones se unen por MultipeerConnectivity (`local-peer.js`), sin
+    // QR; el resto —Android, la web, o quien prefiera el QR— sigue por WebRTC. Las dos
+    // vías conviven en la misma sala detrás de una sola interfaz.
+    const webrtc = CT.LocalTransport.createHostSession(onGuestMessage, null, onGuestLost);
+    const nearby = CT.LocalPeer?.available?.() ? CT.LocalPeer.createHostTransport(onGuestMessage, null, onGuestLost) : null;
+    const transport = nearby ? {
+      addPeer: webrtc.addPeer,
+      removePeer: id => (nearby.owns(id) ? nearby : webrtc).removePeer(id),
+      broadcast: (type, data) => { webrtc.broadcast(type, data); nearby.broadcast(type, data); },
+      sendTo: (id, type, data) => (nearby.owns(id) ? nearby : webrtc).sendTo(id, type, data),
+      isPeerReady: id => nearby.isPeerReady(id) || webrtc.isPeerReady(id),
+      closeAll: () => { webrtc.closeAll(); nearby.closeAll(); }
+    } : webrtc;
+    if (nearby) nearby.advertise({ room: roomCode, mode: modeKey, host: hostName, fp: deckFingerprint || "" }).catch(error => console.warn("LocalPeer advertise", error));
     let lan = null, lanSecret = null;
     const pendingPeers = new Map();
 
@@ -156,16 +169,17 @@
       try { transport.closeAll(); }
       finally { pendingPeers.clear(); peerPlayers.clear(); if (lan) void lan.stop(); lan = null; lanSecret = null; }
     }
-    return { HOST_ID, invitePeer, removePeer: transport.removePeer, peerOf, act, currentRoom: () => room, close };
+    return { HOST_ID, nearby: !!nearby, invitePeer, removePeer: transport.removePeer, peerOf, act, currentRoom: () => room, close };
   }
 
-  function createGuestSession({ offerSignal, playerId, name, avatarId = null, deckFingerprint = null, onChange, onError, onDisconnect }) {
+  function createGuestSession({ offerSignal, nearbyHostId = null, onFail, playerId, name, avatarId = null, deckFingerprint = null, onChange, onError, onDisconnect }) {
     let room = null, lanInvite = null, rawOffer = offerSignal;
-    if (typeof offerSignal === "string" && offerSignal.startsWith("CTL1:")) { lanInvite = CT.LocalLanSignal.decodeInvite(offerSignal); rawOffer = lanInvite.signal; }
-    const peer = CT.LocalTransport.createGuestPeer(rawOffer,
-      message => { if (message.type === "state") { room = message.data; onChange(room); } else if (message.type === "error") onError?.(message.data?.message); },
-      () => peer.send("join", { playerId, name, avatarId, deckFingerprint }),
-      () => onDisconnect?.());
+    if (!nearbyHostId && typeof offerSignal === "string" && offerSignal.startsWith("CTL1:")) { lanInvite = CT.LocalLanSignal.decodeInvite(offerSignal); rawOffer = lanInvite.signal; }
+    const onMessage = message => { if (message.type === "state") { room = message.data; onChange(room); } else if (message.type === "error") onError?.(message.data?.message); };
+    const onOpen = () => peer.send("join", { playerId, name, avatarId, deckFingerprint });
+    const peer = nearbyHostId
+      ? CT.LocalPeer.createGuestPeer(nearbyHostId, onMessage, onOpen, () => onDisconnect?.(), () => onFail?.())
+      : CT.LocalTransport.createGuestPeer(rawOffer, onMessage, onOpen, () => onDisconnect?.());
     async function answerSignal() {
       const answer = await peer.answerSignal();
       if (lanInvite) { await CT.LocalLanSignal.sendAnswer(lanInvite, answer, lanInvite.peerId); return ""; }
@@ -174,7 +188,7 @@
     // Todas las jugadas del invitado pasan por aquí: el anfitrión las resuelve y reparte.
     const send = (type, data = {}) => peer.send(type, { ...data, playerId });
     return {
-      answerSignal, send, peerConnection: peer.peerConnection,
+      answerSignal, send, peerConnection: peer.peerConnection, connect: () => peer.connect(),
       placeCard: (cardId, index) => send("place-card", { cardId, index }),
       finishTurn: () => send("finish-turn"),
       skipTurn: () => send("skip-turn"),
