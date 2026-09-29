@@ -81,7 +81,7 @@ await click('#mode-inline-drawer [data-action="set-block"]');
 await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
 assert.equal(screen(), 'setup');
 await expectBack('hub-friends-local');
-await click('[data-local-route="mixed"]');
+await click('[data-friend-mixed="local"]');
 assert.equal(screen(), 'setup', 'Gran mezcla en un solo móvil va a preparar la partida');
 await expectBack('hub-friends-local');
 await expectBack('hub-friends');
@@ -89,18 +89,26 @@ await expectBack('home');
 
 // Jugar con amigos → Duelo por turnos.
 await click('[data-action="friends-hub"]');
-await click('[data-friend-route="duel"]');
-await openFirstDeck('duel-home');
-await expectBack('jugar');
+await click('[data-friend-hub="duel"]');
+assert.equal(screen(), 'hub-friends-duel', 'Duelo por turnos tiene su propia pantalla, como Jugar solo');
+await click('[data-inline-route="duel"]');
+await click('#mode-inline-drawer [data-action="set-block"]');
+await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
+assert.equal(screen(), 'duel-home');
+await expectBack('hub-friends-duel');
 await expectBack('hub-friends');
 await expectBack('home');
 
 // Wi-Fi local → mazo → sala, sin volver a elegir Wi-Fi.
 await click('[data-action="friends-hub"]');
-await click('[data-friend-route="wifi"]');
-await openFirstDeck('local-entrada');
+await click('[data-friend-hub="wifi"]');
+assert.equal(screen(), 'hub-friends-wifi');
+await click('[data-inline-route="wifi"]');
+await click('#mode-inline-drawer [data-action="set-block"]');
+await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
+assert.equal(screen(), 'local-entrada');
 await back();
-assert.equal(screen(), 'jugar');
+assert.equal(screen(), 'hub-friends-wifi');
 await expectBack('hub-friends');
 await expectBack('home');
 

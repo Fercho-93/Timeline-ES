@@ -498,6 +498,9 @@
     const render=(html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);};
     if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
+    else if(sessionStorage.getItem('continuum-entry-route')==='wifi-quick') CT.Quick.openNetwork(render, 'local', 4);
+    else if(sessionStorage.getItem('continuum-entry-route')==='online-quick') CT.Quick.openNetwork(render, 'internet', 4);
+    else if(sessionStorage.getItem('continuum-entry-route')==='duel-quick') CT.Quick.openNetwork(render, 'internet', 2);
     else CT.Quick.open(render);
   }
 
@@ -3606,7 +3609,7 @@
   // de fuera (ni Firebase ni ninguna CDN), así que se carga siempre con el resto de la
   // aplicación, igual que `duelo.js`. `launchLocalMultiplayer` solo entrega el control.
   function launchLocalMultiplayer() {
-    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: sessionStorage.getItem('continuum-entry-route') === 'wifi' ? jugarView : playMenu });
+    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: sessionStorage.getItem('continuum-entry-route') === 'wifi' ? () => (CT.ModeHubs ? CT.ModeHubs.open('hub-friends-wifi') : jugarView()) : playMenu });
   }
 
   CT.launchPublicMatch = () => launchPublicMatch();

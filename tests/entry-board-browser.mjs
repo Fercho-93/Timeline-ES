@@ -21,12 +21,12 @@ const scenarios={
   collections:async({click,deck})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="collections"]');await deck();await click('[data-action="start-free"]');},
   mixed:async({click})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="mixed"]');await click('[data-action="start-free"]');},
   quick:async({click})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="quick"]');await click('[data-quick="start-free"]');await click('[data-quick="ready"]');},
-  local:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-route="local"]');await deck();await click('[data-action="start"]');for(const n of ['1000','2000']){await click('#starter-guess-input',true,n);await click('[data-action="starter-guess-submit"]');}await click('[data-action="starter-start"]');await click('[data-action="ready"]');},
-  duel:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-route="duel"]');await deck();await click('[data-action="start-duel"]');await click('[data-action="duel-play"]');},
+  local:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-action="local-hub"]');await click('[data-inline-route="local"]');await deck();await click('[data-action="start"]');for(const n of ['1000','2000']){await click('#starter-guess-input',true,n);await click('[data-action="starter-guess-submit"]');}await click('[data-action="starter-start"]');await click('[data-action="ready"]');},
+  duel:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-hub="duel"]');await click('[data-inline-route="duel"]');await deck();await click('[data-action="start-duel"]');await click('[data-action="duel-play"]');},
   competition:async({click})=>{await click('[data-action="competition-menu"]');await click('[data-action="start-competition"]');await click('[data-action="comp-next-round"]');},
   daily:async({click,page})=>{await click('[data-action="daily-start"]');const screen=await page.locator('#app').getAttribute('data-screen');if(screen==='quick-challenges')await click('[data-quick="ready"]');else{await click('[data-action="daily-play"]');}},
-  wifi:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-route="wifi"]');await deck();},
-  online:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-route="online"]');await deck();}
+  wifi:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-hub="wifi"]');await click('[data-inline-route="wifi"]');await deck();},
+  online:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-hub="online"]');await click('[data-inline-route="online"]');await deck();}
 };
 const expected={collections:'solo',mixed:'solo',quick:'quick-game',local:'game',duel:'solo',competition:'solo',daily:'quick-game',wifi:'local-entrada',online:'online-loading'};
 try {

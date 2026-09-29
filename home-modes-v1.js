@@ -118,14 +118,23 @@
     return `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="false" aria-controls="mode-inline-drawer"`)}<div id="mode-inline-drawer" class="mode-inline-drawer" hidden></div></div>`;
   }
 
-  // Un solo móvil: las mismas tres puertas que «Jugar solo», pasando el teléfono en cada turno.
-  function openLocalHub() {
-    hub('hub-friends-local', 'Un solo móvil', 'Pasad el teléfono', [
-      inlineCollections('local'),
-      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, 'data-local-route="quick"'),
-      modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, 'data-local-route="mixed"')
-    ].join(''), 'mode-walk-duel.webp');
+  // Cada forma de jugar con amigos tiene su pantalla con las mismas tres puertas que «Jugar solo»:
+  // Grandes colecciones (desplegables aquí mismo), Retos rápidos y Gran mezcla.
+  const FRIEND_HUBS = {
+    local: ['hub-friends-local', 'Un solo móvil', 'Pasad el teléfono', 'mode-walk-duel.webp'],
+    online: ['hub-friends-online', 'Sala privada', 'Cada uno en su móvil', 'mode-walk-multi.webp'],
+    wifi: ['hub-friends-wifi', 'Wi‑Fi local', 'Sin internet, cerca', 'mode-walk-multi.webp'],
+    duel: ['hub-friends-duel', 'Duelo por turnos', 'Jugad cuando podáis', 'mode-walk-duel.webp']
+  };
+  function openFriendHub(route) {
+    const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
+    hub(screen, title, eyebrow, [
+      inlineCollections(route),
+      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, `data-friend-quick="${route}"`),
+      modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, `data-friend-mixed="${route}"`)
+    ].join(''), art);
   }
+  const openLocalHub = () => openFriendHub('local');
 
   function openSoloHub() {
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
@@ -138,9 +147,9 @@
   function openFriendsHub() {
     hub('hub-friends', 'Jugar con amigos', 'Juntos', [
       modeDoor('local-hub', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.'),
-      modeDoor('jugar', 'mode-walk-multi.webp', 'Sala privada', 'Cada persona con su móvil, por código o enlace.', false, 'data-friend-route="online"'),
-      modeDoor('jugar', 'mode-walk-multi.webp', 'Wi‑Fi local', 'Varios móviles cerca, sin internet.', false, 'data-friend-route="wifi"'),
-      modeDoor('jugar', 'mode-walk-duel.webp', 'Duelo por turnos', 'Jugad cuando podáis, por enlace.', false, 'data-friend-route="duel"')
+      modeDoor('friend-hub', 'mode-walk-multi.webp', 'Sala privada', 'Cada persona con su móvil, por código o enlace.', false, 'data-friend-hub="online"'),
+      modeDoor('friend-hub', 'mode-walk-multi.webp', 'Wi‑Fi local', 'Varios móviles cerca, sin internet.', false, 'data-friend-hub="wifi"'),
+      modeDoor('friend-hub', 'mode-walk-duel.webp', 'Duelo por turnos', 'Jugad cuando podáis, por enlace.', false, 'data-friend-hub="duel"')
     ].join(''), modeArt['friends-hub']);
   }
 
@@ -157,17 +166,18 @@
       choices.inert = !playExpanded;
       return;
     }
-    const localRoute = event.target.closest('[data-local-route]');
-    if (localRoute?.dataset.localRoute === 'quick') sessionStorage.setItem('continuum-entry-route', 'local-quick');
-    else if (localRoute) {
+    const friendQuick = event.target.closest('[data-friend-quick]');
+    if (friendQuick) sessionStorage.setItem('continuum-entry-route', `${friendQuick.dataset.friendQuick}-quick`);
+    const friendMixed = event.target.closest('[data-friend-mixed]');
+    if (friendMixed) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      sessionStorage.setItem('continuum-entry-route', 'local');
+      sessionStorage.setItem('continuum-entry-route', friendMixed.dataset.friendMixed);
       window.CONTINUUM.openMode?.('mixed');
       return;
     }
     const inlineCollections = event.target.closest('[data-inline-route]');
-    if (inlineCollections && ['hub-solo', 'hub-friends-local'].includes(app.dataset.screen)) {
+    if (inlineCollections && /^hub-(solo|friends-)/.test(app.dataset.screen || '')) {
       event.preventDefault();
       event.stopImmediatePropagation();
       sessionStorage.setItem('continuum-entry-route', inlineCollections.dataset.inlineRoute);
@@ -207,17 +217,18 @@
       window.CONTINUUM.openQuickPublic(cap)
         .catch(error=>{console.error('QUICK_PUBLIC_MATCH_ERROR',error);openOnlineHub();const note=document.createElement('p');note.setAttribute('role','alert');note.textContent=error?.message || 'No se pudo encontrar una mesa. Inténtalo de nuevo.';app.querySelector('.mode-hub-list')?.prepend(note);});return;
     }
-    if (!['online-hub','online-collections','solo-hub','friends-hub','local-hub'].includes(action)) return;
+    if (!['online-hub','online-collections','solo-hub','friends-hub','local-hub','friend-hub'].includes(action)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
     if (action === 'online-hub') openOnlineHub();
     else if (action === 'online-collections') openOnlineCollections();
     else if (action === 'solo-hub') openSoloHub();
     else if (action === 'local-hub') openLocalHub();
+    else if (action === 'friend-hub') openFriendHub(target.dataset.friendHub);
     else openFriendsHub();
   }, true);
 
-  const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends': openFriendsHub};
+  const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends-wifi': () => openFriendHub('wifi'), 'hub-friends-duel': () => openFriendHub('duel'), 'hub-friends': openFriendsHub};
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); } };
 
   function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}

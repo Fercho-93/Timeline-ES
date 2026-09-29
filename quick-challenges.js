@@ -417,6 +417,7 @@
     openPublic,
     openSolo(renderPage){paint=renderPage;entry='free-setup';format='free';freeSetup();},
     openLocal(renderPage){paint=renderPage;entry='setup';format='local';setup();},
+    openNetwork(renderPage,kind,capacity){paint=renderPage;entry='network';networkSetup(kind,capacity);},
     startDaily(dayValue, renderPage) {
       paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       const saved=load();
