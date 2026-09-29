@@ -314,7 +314,7 @@
     ),
     d(
       'cities-east-west',
-      'Ciudades de este a oeste',
+      'Ciudades de oeste a este',
       'De oeste a este',
       'Longitud aproximada del centro urbano.',
       1,

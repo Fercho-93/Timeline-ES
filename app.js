@@ -2123,6 +2123,17 @@
     return n % 2 === 0 ? 'collections' : 'quick';
   }
 
+  // Qué reto toca hoy y con qué reglas, para la guía. Solo lee: no empieza ni guarda nada.
+  CT.dailyInfo = () => {
+    const day = today(), done = !!dailyRecords().days?.[day];
+    if (dailyFamily(day) === 'quick') {
+      const c = CT.Quick.dailyChallenge(day);
+      return { family: 'Retos rápidos', title: c.title, done, rules: `${c.rule}. Ordena ${c.cards - 1} cartas comunes, una tras otra: cada acierto suma un punto provisional, que puedes asegurar plantándote; un fallo pierde los del reto. Un solo intento.` };
+    }
+    const mode = CT.mode(dailyModeKey(day));
+    return { family: 'Grandes colecciones', title: mode.name, done, rules: `${DAILY_CARDS} cartas, ordenadas ${mode.axis === 'time' ? 'de antes a después' : 'de menor a mayor'}, en dificultad Fácil y con 3 vidas. Un solo intento.` };
+  };
+
   function startDaily() {
     if (dailyRecords().days?.[today()]) { home(); return; }
     if (dailyFamily() === 'quick') {

@@ -106,7 +106,8 @@
   }
 
   function openOnlineCollections() {
-    const modes=Object.entries(window.CONTINUUM?.MODES||{}).filter(([key])=>key!=='mixed').slice(0,12);
+    // El catálogo completo de colecciones (menos la mezcla), las mismas que entran en el sorteo de mesas.
+    const modes=Object.entries(window.CONTINUUM?.MODES||{}).filter(([key])=>key!=='mixed' && (!window.CONTINUUM?.Cartera?.tiene || window.CONTINUUM.Cartera.tiene(key)));
     hub('hub-online-collections', 'Grandes colecciones', 'Mesa pública · temas', `
       <div class="mode-topic-picker"><p>Marca hasta 3 temas. Buscaremos mesa en esos temas; si no eliges ninguno, buscaremos en todas las colecciones.</p>
       <div class="mode-topic-grid">${modes.map(([key,m])=>`<label><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>

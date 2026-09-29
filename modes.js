@@ -1130,8 +1130,14 @@
       guideCard('↺','Si fallas','','La corrección enseña dónde encajaba, pero la carta fallada no se añade a la línea. En multijugador la sustituyes por otra; si no queda ninguna para robar, conservas la fallada. En solitario pierdes una vida, excepto en el duelo por enlace.')+'</div>'+
       '<h4>Cómo se gana</h4><p>En multijugador se completa la ronda para que todos tengan su turno. Gana quien termine como única persona sin cartas. Los poderes que guardes no cuentan como cartas pendientes.</p>'+
       '<h4>La final de desempate</h4><p>Si varias personas quedan sin cartas, cada finalista escribe una cifra secreta para una carta neutral, en la unidad indicada. Se revelan juntas: gana la más cercana, por encima o por debajo. Si persiste el empate, solo quienes empataron repiten con otra carta. Sin poderes en la final.</p>';
+    // Las reglas del reto de hoy, calculadas al abrir la guía (si la aplicación aún no las ofrece, se omiten).
+    const hoy = window.CONTINUUM.dailyInfo?.();
+    const dailyToday = hoy ? guideCard('◆','Hoy: '+escapeHtml(hoy.family),escapeHtml(hoy.title),escapeHtml(hoy.rules)+(hoy.done?' Hoy ya lo has jugado.':'')) : '';
     const formats = '<div class="guide-cards">'+
-      guideCard('☼','Reto diario','15 cartas · 3 vidas','Las mismas cartas del mazo para todos, un intento al día. En Fácil; termina al completar las cartas o agotar las vidas.')+
+      guideCard('☼','Reto diario','Un único reto al día','Cada día hay un solo reto, con las mismas cartas para todo el mundo y un único intento. Los días pares toca uno de Grandes colecciones y los impares uno de Retos rápidos: el inicio te dice cuál.')+
+      guideCard('≡','Días de Grandes colecciones','15 cartas · 3 vidas','Un mazo de las grandes colecciones, en dificultad Fácil. Termina al completar las cartas o al perder las tres vidas.')+
+      guideCard('⇅','Días de Retos rápidos','Un mazo de Retos rápidos','Ordenas las cartas comunes del mazo. Cada acierto suma un punto provisional; puedes asegurarlos plantándote, y un fallo pierde los del reto. Sin vidas.')+
+      dailyToday+
       guideCard('∞','Partida libre','3 vidas','Elige dificultad y juega hasta completar el mazo o agotar las vidas. Puedes continuar más tarde la partida guardada.')+
       guideCard('↗','Duelo con un amigo · Partida completa','Sin límite de vidas','Comparte un enlace: la otra persona juega las mismas 15 cartas, sin coincidir a la vez. Compara los aciertos al terminar.')+
       guideCard('⇄','Duelo con un amigo · Por turnos','Cada uno desde su móvil','La partida se guarda entre turnos. Juega cuando sea tu turno, deja la partida y vuelve desde «Continuar»; el perfil muestra quién tiene la jugada.')+
@@ -1153,7 +1159,7 @@
       guideCard('⋯','Pausa y salida','','El menú de partida reúne guía y opciones de salida. En partidas guardadas usa «Continuar». Salir de una sala online no pausa a los demás; el anfitrión puede cerrarla.')+'</div>';
     const progress = '<div class="guide-cards">'+
       guideCard('▤','Enciclopedia','','Explora mazos, busca cartas y filtra. Descubres las ilustraciones al jugar sus cartas, también si fallas. Los descubrimientos recientes aparecen arriba.')+
-      guideCard('☆','Perfil, ranking y logros','','Consulta aciertos, marcas y logros. Solo los aciertos de retos diarios completados suman al ranking, una vez por día y mazo. Al terminar puedes repasar los fallos; tu colección se completa al jugar las cartas.')+
+      guideCard('☆','Perfil, ranking y logros','Un único reto al día','Solo el reto diario puntúa, y una sola vez al día. Al completarlo sumas hasta 100 puntos (100 × aciertos ÷ cartas) al marcador del mes, que ves en el inicio, separado entre Grandes colecciones y Retos rápidos; los aciertos del reto de Grandes colecciones cuentan además para el ranking online. Las partidas libres, los duelos y la competición no puntúan. Al terminar puedes repasar los fallos; tu colección se completa al jugar las cartas.')+
       guideCard('☼','A tu gusto','','En Ajustes prueba tema y tamaño del texto antes de aplicarlos. Música ambiente y vibración son independientes; la vibración depende del dispositivo.')+'</div><p>Tu perfil invitado pertenece a esta instalación: cambiar de móvil o borrar sus datos puede hacerte perder el progreso.</p>';
     return '<div class="guide-handbook"><header class="atlas-page-heading"><div class="eyebrow">Una carta. Su lugar.</div><h1>Guía</h1><p>Lo esencial para empezar. Los detalles, cuando los necesites.</p></header><section class="guide-start"><h2>Aprende en tres pasos</h2>'+
       '<p class="guide-context">'+here+' · Ejemplo: '+escapeHtml(selectedMode.name)+'</p><p class="guide-lead">Ordena las cartas '+order+'. La partida empieza con una carta de referencia. Tu carta tiene el valor oculto: elige su lugar y confirma para descubrirlo.</p>'+

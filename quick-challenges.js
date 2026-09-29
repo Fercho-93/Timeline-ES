@@ -438,6 +438,8 @@
     openSolo(renderPage){paint=renderPage;entry='free-setup';format='free';freeSetup();},
     openLocal(renderPage){paint=renderPage;entry='setup';format='local';setup();},
     openNetwork(renderPage,kind,capacity){paint=renderPage;entry='network';networkSetup(kind,capacity);},
+    // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
+    dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,cards:c.cards.length};},
     startDaily(dayValue, renderPage) {
       paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       const saved=load();
