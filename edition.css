@@ -4800,3 +4800,18 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
 #app.atlas-board .board-focus-card > .hand-title,
 #app.atlas-board .board-focus-card > .hand-title h3 { justify-content: flex-start; text-align: left; margin-left: 0; margin-right: auto; }
 #app.atlas-board[data-platform][data-screen] .board-focus-card > .hand-title { padding-left: 4px; padding-right: 0; }
+
+/* La navegación inferior va pegada al borde, sin flotar: fondo totalmente opaco, cubre también la
+   zona segura del iPhone (nada asoma por debajo) y la pestaña activa no sobresale de la barra. */
+html #app .home-nav.atlas-nav {
+  bottom: 0;
+  min-height: 0;
+  padding: 6px 12px calc(6px + env(safe-area-inset-bottom));
+  border-radius: 14px 14px 0 0;
+  background: #eee5d5;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 -3px 10px rgba(54,41,26,.12);
+}
+html #app .home-nav.atlas-nav button { min-height: 62px; }
+html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; transform: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 1px 3px rgba(61,43,29,.18); }
