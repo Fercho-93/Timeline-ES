@@ -4810,9 +4810,9 @@ html #app .home-nav.atlas-nav {
   box-shadow: 0 -3px 10px rgba(54,41,26,.12);
 }
 html #app .home-nav.atlas-nav button { min-height: 62px; }
-/* La pestaña activa sobresale de la barra: la mitad de su recuadro queda por encima del borde
-   superior y la otra mitad dentro (el relleno de 6px de la barra se suma al desplazamiento). */
-html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; transform: translateY(calc(-50% - 6px)); box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 3px 8px rgba(61,43,29,.22); }
+/* La pestaña activa sobresale de la barra: un cuarto de su recuadro queda por encima del borde
+   superior y el resto dentro (el relleno de 6px de la barra se suma al desplazamiento). */
+html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; transform: translateY(calc(-25% - 6px)); box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 3px 8px rgba(61,43,29,.22); }
 
 /* ===== Mesa de juego unificada (todas las modalidades) =====
    Misma estética que «Jugar solo»: la mano en abanico sin recortar, los jugadores
