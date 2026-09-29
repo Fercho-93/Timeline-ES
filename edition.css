@@ -4850,4 +4850,4 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 
 /* Aire entre el abanico de la mano y el bloque de la línea de cartas: la base de las cartas
    giradas ya no toca el borde superior del bloque. */
-#app.atlas-board .atlas-hand-section + .board-timeline-section, #app.atlas-board .atlas-hand-section ~ .board-timeline-section { margin-top: 14px; }
+#app.atlas-board .atlas-hand-section + .board-timeline-section, #app.atlas-board .atlas-hand-section ~ .board-timeline-section { margin-top: 22px !important; }
