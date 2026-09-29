@@ -104,7 +104,7 @@
     deckSplash(config);
   }
   // Antes de la explicación, una portada breve con el mazo que toca. Es una capa sobre la
-  // pantalla «Reto preparado» (que ya está pintada debajo): se retira sola o con un toque.
+  // pantalla «Reto preparado» (que ya está pintada debajo): solo se retira con un toque.
   function deckSplash(config) {
     const c=E.challenge(config.rounds[0].id), total=config.rounds.length;
     const art=c.cards.filter(card=>card.image), pick=[...new Set([art[0],art[Math.floor(art.length/2)],art.at(-1)].filter(Boolean))];
@@ -113,7 +113,7 @@
     layer.innerHTML=`<div class="quick-splash-inner"><div class="quick-splash-fan" aria-hidden="true">${pick.map(card=>`<img src="${esc(card.image)}" alt="" decoding="async">`).join('')}</div><div class="eyebrow">${esc(lead)}</div><h2>${esc(c.title)}</h2><span class="quick-splash-hint">Toca para continuar</span></div>`;
     const close=()=>{if(!layer.isConnected)return;layer.classList.add('is-leaving');setTimeout(()=>layer.remove(),260);};
     layer.addEventListener('click',close);layer.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();close();}});
-    app().append(layer);setTimeout(close,2400);
+    app().append(layer);
   }
   function freeSetup() {
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
