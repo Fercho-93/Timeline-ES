@@ -20,7 +20,6 @@ assert.equal(w.document.getElementById('competition-length'),null);
 click('[data-action="jugar"]');click('[data-action="competition-menu"]');
 assert.ok(w.document.querySelector('[data-action="start-competition"]'));
 w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='1';
-click('[data-format="competition-multi"]');
 assert.equal(w.document.getElementById('competition-length').value,'3');
 assert.equal(w.document.getElementById('competition-cards').value,'1');
 assert.ok(w.document.querySelector('[data-action="competition-online"]'));

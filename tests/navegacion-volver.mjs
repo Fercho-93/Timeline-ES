@@ -124,7 +124,6 @@ await expectBack('home');
 // Competición y Atlas vuelven al inicio.
 await click('.mode-entry[data-action="competition-menu"]');
 assert.equal(screen(), 'competition-menu');
-await click('[data-format="competition-multi"]');
 await click('[data-action="competition-local"]');
 assert.equal(screen(), 'setup');
 await expectBack('competition-menu');

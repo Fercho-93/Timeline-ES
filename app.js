@@ -365,21 +365,23 @@
     </button>`;
   }
 
+  // Competición con la misma estructura que «Jugar solo» y las pantallas de amigos: cabecera con
+  // ilustración, los ajustes de la competición y una puerta por forma de jugar.
   function competitionMenu() {
     screen = 'competition-menu';
-    const multi = `<button class="play-choice primary" data-action="competition-local"><span class="choice-icon">${playIcon('local')}</span><span><b>Un solo móvil</b><small>Pasad el teléfono en cada turno.</small></span><i aria-hidden="true">→</i></button>
-      <button class="play-choice" data-action="competition-online"><span class="choice-icon">${playIcon('online')}</span><span><b>Varios móviles</b><small>La misma sala durante todas las rondas.</small></span><i aria-hidden="true">→</i></button>`;
-    paint(`<div class="shell home-shell play-menu-shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <section class="mode-masthead comp-atlas-intro"><img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async"><div><div class="eyebrow">Mazos aleatorios</div><h1 data-focus tabindex="-1">Modo competición</h1><p>Termina una ronda y descubre otro mazo, sin repetir temáticas.</p></div></section>
-      <section class="home-play"><div class="panel setup-grid">
-        <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
-        <div class="field"><label for="competition-cards">Cartas por ronda y persona</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
-      </div><section class="play-choices"><div class="play-choices-head"><h2>¿Cómo quieres jugar?</h2></div>
-        ${formatBlock('competition-multi','Multijugador','Un solo móvil o varios.',multi)}
-        <div class="direct-solo"><button class="play-choice walking-choice" data-action="start-competition"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Suma tus aciertos a lo largo de las rondas.</small></span><i aria-hidden="true">→</i></button></div>
-      </section>
-      ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
-      ${CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}
+    const door = (action, art, title, text) => `<button class="mode-entry" data-action="${action}"><span class="mode-entry-art" aria-hidden="true"><img src="assets/${art}" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>${title}</b><small>${text}</small><span class="mode-entry-cta" aria-hidden="true">Empezar <span>→</span></span></span></button>`;
+    paint(`<div class="shell home-shell mode-hub-shell competition-hub">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+      <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">Mazos aleatorios</div><h1 data-focus tabindex="-1">Competición</h1></div><img src="assets/competition-engraving.webp" alt="" aria-hidden="true" decoding="async"></header>
+      <section class="mode-hub-list">
+        <div class="panel setup-grid competition-settings">
+          <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
+          <div class="field"><label for="competition-cards">Cartas por ronda</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
+        </div>
+        ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
+        ${CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}
+        ${door('start-competition', 'mode-walk-solo.webp', 'Jugar solo', 'Suma tus aciertos ronda a ronda, sin repetir temática.')}
+        ${door('competition-local', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.')}
+        ${door('competition-online', 'mode-walk-multi.webp', 'Varios móviles', 'La misma sala durante todas las rondas.')}
       </section></div>`);
   }
 

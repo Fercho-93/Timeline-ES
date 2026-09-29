@@ -81,7 +81,7 @@ async function flows(vp) {
     // Competición
     await click('.mode-entry[data-action="competition-menu"]'); await at('competition-menu');
     await click('[data-action="start-competition"]'); await back('competition-menu');
-    await click('[data-format="competition-multi"]'); await click('[data-action="competition-local"]'); await at('setup'); await back('competition-menu');
+    await click('[data-action="competition-local"]'); await at('setup'); await back('competition-menu');
     await back('home');
     // Atlas
     await click('.home-nav [data-action="perfil"]'); await at('perfil'); await back('home');

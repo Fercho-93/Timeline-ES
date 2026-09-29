@@ -4906,3 +4906,11 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 #app.atlas-board .timeline .timeline-card .card-category > span[aria-hidden="true"] { font-size: .75rem !important; line-height: 1 !important; }
 #app.atlas-board .hand-card > .card-category { font-size: 0 !important; color: transparent !important; }
 #app.atlas-board .hand-card > .card-category > span[aria-hidden="true"] { font-size: .7rem !important; }
+
+/* Competición con el formato de las pantallas de modalidad. */
+#app .competition-hub .competition-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; padding: 14px 16px; border-radius: 16px; }
+#app .competition-hub .competition-settings label { font-size: .8rem; }
+#app .competition-hub .mode-hub-list > .btn { margin: 0; }
+#app .competition-hub .competition-settings .field { display: grid; gap: 6px; margin: 0; }
+#app .competition-hub .competition-settings label { min-height: 0; margin: 0; }
+#app .competition-hub .competition-settings select { min-height: 44px; }
