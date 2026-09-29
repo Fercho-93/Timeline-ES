@@ -24,7 +24,7 @@
     const image = art || modeArt[action] || 'home-door-jugar.webp';
     return `<button class="mode-entry${featured ? ' mode-entry-featured' : ''}" data-action="${action}" ${attrs}>
       <span class="mode-entry-art" aria-hidden="true"><img src="assets/${image}" alt="" loading="lazy" decoding="async"></span>
-      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(description)}</small><span class="mode-entry-cta" aria-hidden="true">${action === 'public-match' || action === 'quick-public' ? 'Buscar mesa' : action === 'online-collections' ? 'Elegir temas' : 'Explorar'} <span>→</span></span></span>
+      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(description)}</small><span class="mode-entry-cta" aria-hidden="true">${action === 'public-match' || action === 'quick-public' ? 'Buscar mesa' : action === 'online-collections' ? 'Elegir temas' : action === 'wifi-join' ? 'Escanear' : 'Explorar'} <span>→</span></span></span>
     </button>`;
   }
 
@@ -134,6 +134,8 @@
     const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
     app.dataset.pendingHub = screen;
     hub(screen, title, eyebrow, [
+      // Quien se une no elige mazo: la invitación ya lo lleva.
+      route === 'wifi' ? modeDoor('wifi-join', 'mode-walk-multi.webp', 'Unirme a una sala', 'Escanea el código de quien la ha creado, sea cual sea el mazo.', true) : '',
       inlineCollections(route),
       modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, `data-friend-quick="${route}"`),
       modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, `data-friend-mixed="${route}"`)
@@ -170,6 +172,14 @@
       choices.parentElement.classList.toggle('is-open', playExpanded);
       choices.setAttribute('aria-hidden', String(!playExpanded));
       choices.inert = !playExpanded;
+      return;
+    }
+    const wifiJoin = event.target.closest('[data-action="wifi-join"]');
+    if (wifiJoin) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      sessionStorage.setItem('continuum-entry-route', 'wifi');
+      window.CONTINUUM.LocalMultiplayer.open({ join: true, onBack: () => openFriendHub('wifi') });
       return;
     }
     const friendQuick = event.target.closest('[data-friend-quick]');

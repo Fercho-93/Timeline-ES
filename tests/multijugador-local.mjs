@@ -55,6 +55,20 @@ click(w, '[data-local-action="invite"]');
 await new Promise(resolve => setTimeout(resolve, 0));
 ok("no revienta: vuelve al vestíbulo con un aviso, no con una pantalla en blanco", w.document.body.innerHTML.includes("Preparando la mesa") || w.document.body.innerHTML.includes("Sala de espera") || w.document.body.innerHTML.includes("Mesa de exploradores"));
 
+console.log("\nUnirse directo desde el menú de Wi-Fi local, sin elegir mazo");
+w = boot();
+{
+  const pausa = () => new Promise(resolve => setTimeout(resolve, 0));
+  await pausa();
+  for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="wifi"]']) { click(w, sel); await pausa(); }
+  ok("el menú de Wi-Fi local ofrece «Unirme a una sala»", !!w.document.querySelector('[data-action="wifi-join"]'));
+  click(w, '[data-action="wifi-join"]'); await pausa();
+  ok("abre directamente la pantalla de unirse", /Unirse a una sala/.test(w.document.body.innerHTML) && !!w.document.querySelector('[data-local-action="scan-offer"]'));
+  ok("explica que no hay que elegir mazo y pide la cámara aquí", /No hace falta elegir mazo/.test(w.document.body.innerHTML) && !!w.document.querySelector('[data-local-action="warm-camera"]'));
+  click(w, '[data-local-action="back"]'); await pausa();
+  ok("volver lleva otra vez al menú de Wi-Fi local", !!w.document.querySelector('[data-action="wifi-join"]'));
+}
+
 console.log("\nUnirse a una sala con un código inválido");
 w = boot();
 await entrarWifi(w);

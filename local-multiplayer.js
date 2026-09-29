@@ -24,6 +24,7 @@
 
   let onBackToMenu = null;
   let modeKey = "history";
+  let directJoin = false;
   let screen = "";
   let role = null; // 'host' | 'guest'
   let hostSession = null, guestSession = null;
@@ -237,7 +238,10 @@
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
-    renderEntrada();
+    // «Unirme a una sala» desde el menú de Wi-Fi local: no hay mazo elegido, el de la
+    // invitación manda. Se salta la entrada y se pasa directo a escanear.
+    directJoin = !!options.join;
+    if (directJoin) renderUnirseForm(); else renderEntrada();
   }
 
   function renderEntrada() {
@@ -278,8 +282,9 @@
   // pegarlo a mano queda como recurso para cuando la cámara no se pueda usar.
   function renderUnirseForm() {
     screen = "local-unirse";
-    paint(`<div class="shell online-shell">${header("go-entrada")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2></section>
+    paint(`<div class="shell online-shell">${header(directJoin ? "back" : "go-entrada")}
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Unirse a una sala</h2>${directJoin ? "<p class=\"lead\">No hace falta elegir mazo: la sala trae el suyo.</p>" : ""}</section>
+      ${directJoin ? wifiNote() + cameraNote() : ""}
       <form class="panel online-form" data-local-form="join-offer">
         <div class="field"><label for="local-guest-name">Tu nombre</label><input id="local-guest-name" name="name" maxlength="18" required placeholder="Ej. Ana" autocomplete="name" value="${ownName() || escapeHtml(savedSeat()?.name || "")}"></div>
         ${savedSeat() ? `<p class="hint">Si escaneas una invitación de la sala ${escapeHtml(savedSeat().roomCode)}, volverás a tu plaza con tus cartas.</p>` : ""}
