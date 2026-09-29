@@ -133,14 +133,13 @@ assert.equal(CT.has('counts'), false, 'La colección eliminada no entra en parti
 // Integración real con portada, selección, confirmación, guardado y fin de partida.
 const click = selector => {const el = w.document.querySelector(selector); assert.ok(el, selector); el.click();};
 const openQuick = () => {
-  // Menú de formatos de Retos rápidos (sin ruta de entrada).
+  // Retos rápidos en un solo móvil, por la puerta de «Jugar con amigos»: es donde ya se ve
+  // «Continuar partida guardada» y donde se avisa de un guardado dañado.
   w.sessionStorage.removeItem('continuum-entry-route');
-  w.CONTINUUM.ModeHubs.open('hub-solo');
-  const door = w.document.querySelector('[data-action="quick-challenges"]');
-  door.removeAttribute('data-solo-route');
-  door.click();
+  w.CONTINUUM.ModeHubs.open('hub-friends-local');
+  w.document.querySelector('[data-action="quick-challenges"]').click();
 };
-openQuick(); click('[data-quick="show-multi"]'); click('[data-quick="local"]');
+openQuick();
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
 click('[data-quick="start"]');
 let saved = JSON.parse(w.localStorage.getItem(key));

@@ -19,8 +19,8 @@
     const playing=!!state || !!connection || page==='network-lobby';
     // Desde la pantalla por la que se entró, la flecha sale de Retos rápidos a la pantalla
     // anterior del juego; desde cualquier otra, vuelve a esa pantalla de entrada.
-    const back=playing ? 'data-quick="exit"' : page===entry || page==='menu' ? 'data-action="ui-back"' : 'data-quick="formats"';
-    paint(`<div class="shell quick-shell${page==='menu'?' home-shell play-menu-shell':''}">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '')}${state || page==='menu' ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
+    const back=playing ? 'data-quick="exit"' : page===entry ? 'data-action="ui-back"' : 'data-quick="formats"';
+    paint(`<div class="shell quick-shell">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '')}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
   let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null;
@@ -59,7 +59,7 @@
   }
   function statsPanel() {
     const history = quickHistory(), games = history.length, points = history.reduce((n,item)=>n + (Number(item.score)||0),0), best = history.reduce((n,item)=>Math.max(n,Number(item.score)||0),0);
-    const rows = history.slice(0, 12).map(item => `<li><strong>${esc(item.score)} puntos</strong><span>${esc(item.date)} · ${esc(item.kind === 'daily' ? 'Reto diario' : item.kind === 'duel' ? 'Duelo por turnos' : `${item.rounds} ${item.rounds === 1 ? 'reto' : 'retos'}`)}</span></li>`).join('');
+    const rows = history.slice(0, 12).map(item => `<li><strong>${esc(item.score)} puntos</strong><span>${esc(item.date)} · ${esc(item.kind === 'daily' ? 'Reto diario' : item.kind === 'duel' ? 'Duelo de Retos rápidos' : `${item.rounds} ${item.rounds === 1 ? 'reto' : 'retos'}`)}</span></li>`).join('');
     const layer = document.createElement('div'); layer.className='overlay';
     layer.innerHTML = `<div class="modal quick-stats-modal"><h2>Historial y estadísticas</h2><div class="quick-stats-grid"><span><b>${games}</b><small>partidas terminadas</small></span><span><b>${points}</b><small>puntos acumulados</small></span><span><b>${best}</b><small>mejor resultado</small></span></div><h3>Últimas partidas</h3>${rows ? `<ol class="quick-history">${rows}</ol>` : '<p class="hint">Todavía no hay partidas terminadas. Tu historial aparecerá aquí.</p>'}<button class="btn btn-primary btn-block" data-quick="close-menu">Cerrar</button></div>`;
     app().append(layer); CT.openDialog(layer,true);
@@ -73,22 +73,6 @@
   let publicClock=null;
   function stopNetwork() {clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;myId=null;busy=false;invite=null;}
   function errorNotice(e) {busy=false;let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=e.message || String(e);CT.announce(e.message || String(e));}
-  function formatMenu() {
-    stopNetwork();page='menu';state=null;record=null;const saved=load();
-    shell(`${masthead('Retos rápidos','Ordena. Arriesga. Asegura.','quick')}<section class="home-play"><section class="play-choices" aria-labelledby="quick-formats-title"><div class="play-choices-head"><div><div class="eyebrow">Elegir formato</div><h2 id="quick-formats-title">¿Cómo quieres jugar?</h2></div></div>
-    <div class="play-choice-block"><button class="play-block-toggle walking-choice" data-quick="show-multi" aria-expanded="false"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Multijugador</b><small>Un solo móvil o varios.</small></span><i aria-hidden="true">⌄</i></button><div id="quick-multi" class="play-choice-grid" hidden>${choice('local','Un solo móvil','Pasad el teléfono en cada turno.','local')}${choice('internet','Varios móviles','Crear sala o unirse por internet.','internet')}${choice('offline','Sin conexión','Varios móviles en la misma red Wi-Fi.','offline')}</div></div>
-    <div class="direct-solo"><button class="play-choice walking-choice" data-quick="free"><img class="walking-art" src="assets/mode-walk-solo.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Jugar solo</b><small>Elige la duración y supera tu marca.</small></span><i aria-hidden="true">→</i></button></div>
-    <div class="direct-solo"><button class="play-choice walking-choice duel-choice" data-quick="turn-duel"><img class="walking-art" src="assets/mode-walk-multi.webp" alt="" width="720" height="480"><span class="walking-copy"><b>Retar a un amigo</b><small>Un duelo por turnos, cada uno en su móvil.</small></span><i aria-hidden="true">→</i></button></div>
-    <div class="quick-secondary-actions"><button class="btn btn-secondary btn-block" data-quick="guide">Guía de Retos rápidos</button><button class="btn btn-ghost btn-block" data-quick="stats">Historial y estadísticas</button></div>
-    ${saved ? button('resume','Continuar partida guardada','continue-choice') : ''}${readJSON(NET) ? button('reconnect','Volver a mi sala por internet','continue-choice') : ''}<p id="quick-error" role="alert">${esc(error)}</p></section></section>`);
-  }
-  function choiceIcon(kind) {
-    const common='viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
-    if(kind==='local')return `<svg ${common}><rect x="7" y="2.75" width="10" height="18.5" rx="2.2"></rect><path d="M10.5 18h3"></path></svg>`;
-    if(kind==='internet')return `<svg ${common}><rect x="3" y="6" width="10" height="15" rx="2"></rect><rect x="11" y="2.75" width="10" height="15" rx="2"></rect><path d="M14 14.75h4"></path></svg>`;
-    return `<svg ${common}><rect x="3" y="6" width="8" height="13" rx="1.8"></rect><rect x="13" y="5" width="8" height="13" rx="1.8"></rect><path d="M11 12h2"></path></svg>`;
-  }
-  function choice(action,title,subtitle,kind) {return `<button class="play-choice" data-quick="${action}"><span class="choice-icon">${choiceIcon(kind)}</span><span><b>${title}</b><small>${subtitle}</small></span><i aria-hidden="true">→</i></button>`;}
   function rounds(count=3, selectedId=null, seed=null) {
     const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed));
     if (selectedId) return [E.challenge(selectedId)].map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
@@ -120,7 +104,7 @@
     const total=CT.QuickCatalog.challenges.length;
     const options=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga'],[10,'Maratón'],[15,'Gran maratón'],[20,'Resistencia']].filter(([n])=>n<total);
     const chip=(n,label,extra='')=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}${extra}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"><b>${n}</b><span>${n===1?'mazo':'mazos'}</span><small>${label}</small></button>`;
-    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Partida libre</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los mazos se sortearán sin mostrarte cuáles son.</p><div class="quick-length" role="radiogroup" aria-label="Duración de la partida">${options.map(([n,label])=>chip(n,label)).join('')}${chip(total,'Todos los mazos del catálogo',' quick-length-all')}</div><input type="hidden" id="quick-free-length" value="3">${button('start-free','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}<p id="quick-error" role="alert"></p></section>`);
+    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Partida libre</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los mazos se sortearán sin mostrarte cuáles son.</p><div class="quick-length" role="radiogroup" aria-label="Duración de la partida">${options.map(([n,label])=>chip(n,label)).join('')}${chip(total,'Todos los mazos del catálogo',' quick-length-all')}</div><input type="hidden" id="quick-free-length" value="3">${button('start-free','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}${load() ? button('resume','Continuar partida guardada','btn btn-secondary btn-block') : ''}<div class="quick-secondary-actions">${button('guide','Guía de Retos rápidos','btn btn-secondary btn-block')}${button('stats','Historial y estadísticas','btn btn-ghost btn-block')}</div><p id="quick-error" role="alert">${esc(error)}</p></section>`);
   }
   function duelLink() {
     const url=new URL(location.href);url.hash='quick-duel='+CT.LocalTransport.encodeText(JSON.stringify(record));return url.href;
@@ -137,7 +121,7 @@
     roomCapacity=capacity;
     stopNetwork();state=null;record=null;page='network';netKind=kind;
     const net=kind==='internet', ownName=esc(CT.Identidad?.propio?.() || '');
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo por turnos':net?'Varios móviles':'Sin conexión'}</h2><p class="lead">${net?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p>
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo de Retos rápidos':net?'Varios móviles':'Sin conexión'}</h2><p class="lead">${net?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p>
       <div class="online-entry-grid">
         <section class="panel online-form"><span class="form-number">01</span><h3>${net?'Entrar en una sala':'Unirme a una sala'}</h3><p>${net?'Usa el código, el enlace o el QR de quien creó la sala.':'Pega la invitación o escanea su código QR.'}</p>
           <div class="field"><label for="quick-net-code">${net?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>
@@ -147,6 +131,7 @@
           <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${ownName}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>
           ${button('create-room','Crear sala','btn btn-secondary btn-block')}</section>
       </div>
+      ${net && readJSON(NET) ? button('reconnect','Volver a mi sala','btn btn-secondary btn-block') : ''}
       <p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></section>`);
   }
   function roomChanged(next,id,code) {
@@ -186,7 +171,7 @@
     ${connection?.kind==='local'&&host ? button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}
     ${code?button('share-room','Compartir enlace de sala','btn btn-secondary btn-block'):''}
     ${code?button('qr-room','Mostrar QR de la sala','btn btn-secondary btn-block'):''}
-    ${button('formats','Volver a los formatos','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
+    <p id="quick-error" role="alert"></p></div></section>`);
     const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=room.members.length<2;
   }
   async function connectRoom(create) {
@@ -222,13 +207,7 @@
   async function formatAction(action) {
     if(action==='formats'){toEntry();return true;}
     if(action==='leave-public'){const leaving=connection;connection=null;clearInterval(publicClock);await leaving?.leave?.();toEntry();return true;}
-    if(action==='show-multi'){const target=app().querySelector('[data-quick="show-multi"]'),panel=app().querySelector('#quick-multi');panel.hidden=!panel.hidden;target.setAttribute('aria-expanded',String(!panel.hidden));target.parentElement.classList.toggle('open',!panel.hidden);return true;}
-    if(action==='local'){format=action;setup();return true;}
-    if(action==='free'){freeSetup();return true;}
-    if(action==='duel'||action==='turn-duel'){networkSetup('internet',2);return true;}
-    if(action==='accept-duel'){acceptDuel(app().querySelector('#quick-duel-link').value);return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
-    if(['internet','offline','turn-duel'].includes(action)){networkSetup(action==='offline'?'local':'internet',action==='turn-duel'?2:4);return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
     if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||3;await networkAction({type:'start',rounds:rounds(count),kind:roomCapacity===2?'duel':'network',historyId:historyId()});return true;}
     if(action==='share-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;await CT.LocalShare.shareSignal(url.href);return true;}
@@ -242,7 +221,7 @@
       shell(`<section class="setup-section"><h2>Invita otro móvil</h2><div class="panel"><p>Comparte esta invitación. El otro móvil la pega en «Unirme a la sala» y te devuelve su respuesta.</p><div class="field"><textarea id="quick-signal" readonly rows="3">${esc(invite.signal)}</textarea></div>${button('share-signal','Compartir invitación','btn btn-primary btn-block')}${button('qr-signal','Mostrar QR de la invitación','btn btn-secondary btn-block')}<div class="field"><label for="quick-answer">Respuesta del otro móvil</label><textarea id="quick-answer" rows="3"></textarea></div>${button('scan-answer','Escanear QR de la respuesta','btn btn-secondary btn-block')}${button('accept-answer','Conectar','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);return true;
     }
     if(action==='accept-answer'){await invite.accept(app().querySelector('#quick-answer').value.trim());lobby();return true;}
-    if(action==='reconnect') {const saved=readJSON(NET);if(!saved)throw Error('No hay ninguna sala guardada.');networkSetup('internet');app().querySelector('#quick-net-name').value=saved.name;app().querySelector('#quick-net-code').value=saved.code;await connectRoom(false);return true;}
+    if(action==='reconnect') {const saved=readJSON(NET);if(!saved)throw Error('No hay ninguna sala guardada.');networkSetup('internet');app().querySelector('#quick-net-name').value=saved.name;app().querySelector('#quick-net-name-join').value=saved.name;app().querySelector('#quick-net-code').value=saved.code;await connectRoom(false);return true;}
     return false;
   }
 
@@ -373,8 +352,7 @@
   // Vuelve a la pantalla por la que se entró en Retos rápidos. El reto del día y la mesa
   // pública no tienen una propia: se sale a la pantalla anterior del juego.
   function toEntry() {
-    if (entry === 'menu') formatMenu();
-    else if (entry === 'free-setup') freeSetup();
+    if (entry === 'free-setup') freeSetup();
     else {stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;CT.navigateBack?.();}
   }
   function menu() {
@@ -391,7 +369,7 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    const formatActions=['formats','leave-public','show-multi','local','free','duel','accept-duel','share-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect'];
+    const formatActions=['formats','leave-public','share-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
@@ -437,9 +415,6 @@
     else if (action === 'confirm' && selected && slot !== null) {CT.Effects?.stamp(); dispatch({type: 'place', cardId: selected, index: slot});}
     else if (['bank', 'ack', 'next'].includes(action)) dispatch({type: action});
   });
-  function masthead(title, subtitle, art) {
-    return `<section class="mode-masthead atlas-intro" data-depth-scene><div class="atlas-landscape"><img src="assets/hero-${art}-700.webp" alt="" decoding="async"></div><div class="atlas-intro-copy"><div class="eyebrow">Continuum</div><h1 data-focus tabindex="-1">${esc(title)}</h1><p>${esc(subtitle)}</p></div></section>`;
-  }
   function block(title, subtitle, art, action, count) {
     return `<div class="collection-entry"><button class="gallery-panel panel-${art}" data-action="${action}" aria-label="${esc(title)}. ${esc(subtitle)}"><span class="panel-backdrop" aria-hidden="true"><img src="assets/hero-${art}-400.webp" alt="" width="400" height="600"></span><span class="panel-depth-light" aria-hidden="true"></span><span class="panel-art" aria-hidden="true"><img src="assets/hero-${art}-400.webp" alt="" width="400" height="600"></span><span class="panel-depth-ground" aria-hidden="true"></span><span class="collection-foil" aria-hidden="true"></span><span class="collection-index" aria-hidden="true">${count}</span><span class="collection-open" aria-hidden="true">↗</span><span class="panel-spine" aria-hidden="true"><i>◇</i><b>${esc(title)}</b></span><span class="panel-label" aria-hidden="true"><i></i><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></span></button></div>`;
   }
@@ -471,7 +446,20 @@
       }
       prepare(dailyQuick(dayValue));
     },
-    open(renderPage) {paint = renderPage; entry = 'menu'; state = null; record = null; selected = null; slot = null;formatMenu();const params=new URLSearchParams(location.hash.slice(1));try{if(params.has('quick-duel'))acceptDuel();else if(params.has('quick-room')){networkSetup('internet');app().querySelector('#quick-net-code').value=params.get('quick-room');}}catch(e){errorNotice(e);}},
+    // Sin ruta de entrada (al abrir un enlace de sala o de duelo, o si se pierde la ruta) ya no hay un menú de
+    // formatos propio: un duelo o una sala se abren directos y, sin enlace, se vuelve a las puertas de Jugar.
+    open(renderPage) {
+      paint = renderPage; entry = 'network'; state = null; record = null; selected = null; slot = null;
+      const params = new URLSearchParams(location.hash.slice(1));
+      try {
+        if (params.has('quick-duel')) acceptDuel();
+        else if (params.has('quick-room')) { networkSetup('internet'); app().querySelector('#quick-net-code').value = params.get('quick-room'); }
+        else CT.ModeHubs.open('hub-solo');
+      } catch (e) {
+        CT.ModeHubs.open('hub-solo');
+        CT.UI.askDialog({ title: 'No se pudo abrir el enlace', message: e.message || 'El enlace no es válido.', stay: 'Entendido' });
+      }
+    },
     blocks() {return block('Retos rápidos', 'Ordena. Arriesga. Asegura.', 'quick', 'quick-challenges', `${CT.QuickCatalog.challenges.length} retos`);}
   };
 })();
