@@ -1121,7 +1121,11 @@
     else if (action === "finish-turn") attempt("finish-turn");
     else if (action === "ghost-use") { selectedCardId = null; pendingIndex = null; attempt("use-ghost"); }
     else if (action === "pulse-open") openPulse();
-    else if (action === "pulse-target") { CT.closeDialog(); selectedCardId = null; pendingIndex = null; attempt("pulse-start", { targetId: target.dataset.target }); }
+    else if (action === "pulse-target") {
+      CT.closeDialog(); selectedCardId = null; pendingIndex = null;
+      const targetId = target.dataset.target, me = roomState.players[myPlayerId];
+      CT.UI.pulseGiftDialog({ cards: me.hand.map(id => ({ id, title: getCard(id).title })), targetName: roomState.players[targetId]?.name || "tu rival", onPick: giftId => attempt("pulse-start", { targetId, giftId }) });
+    }
     else if (action === "final-next") attempt("final-next");
   });
 

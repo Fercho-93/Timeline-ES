@@ -35,6 +35,8 @@ const click = (w, sel) => {
   if (!el) throw new Error(`no existe ${sel}`);
   el.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 };
+// El Pulso tiene dos pasos: elegir rival y elegir la carta de la mano que se pasaría (`indice` en la lista).
+const reta = (w, indice = 0) => { click(w, '[data-action="pulse-target"]'); click(w, `[data-pulse-gift="${indice}"]`); };
 const existe = (w, sel) => !!w.document.querySelector(sel);
 const CLAVE = "hilo-game-history-v1";
 const estado = w => JSON.parse(w.localStorage.getItem(CLAVE));
@@ -59,7 +61,7 @@ console.log("\nPulso como poder secreto");
   const owner = boot({ [CLAVE]: partida(base) }); entrar(owner);
   ok("solo el propietario ve la Carta Pulso", existe(owner, ".pulse-power"));
   ok("el poder no aumenta el contador de su mano", estado(owner).players[0].hand.length === 2);
-  click(owner, '[data-action="pulse-open"]'); click(owner, '[data-action="pulse-target"]');
+  click(owner, '[data-action="pulse-open"]'); reta(owner);
   ok("se consume al lanzarlo", estado(owner).pulsePower.used.includes("1"));
 
   const rival = boot({ [CLAVE]: partida({ ...base, pulsePower: { ...base.pulsePower, owners: ["2"] } }) }); entrar(rival);
@@ -111,7 +113,7 @@ function colocar(w, index) {
 const BIEN = 1, MAL = 0;
 function duelo(w, huecoReto, huecoDefensa) {
   click(w, '[data-action="pulse-open"]');
-  click(w, '[data-action="pulse-target"]');
+  reta(w);
   colocar(w, huecoReto);
   click(w, '[data-action="pulse-defend"]');
   colocar(w, huecoDefensa);
@@ -149,10 +151,13 @@ console.log("\nEl duelo: quien reta juega primero y no se resuelve nada hasta qu
   click(w, '[data-action="pulse-open"]');
   ok("se puede elegir a quién retar", existe(w, '[data-action="pulse-target"]'));
   click(w, '[data-action="pulse-target"]');
+  const ofrecidas = [...w.document.querySelectorAll('[data-pulse-gift]')].map(b => b.textContent.trim());
+  ok("después se elige, entre las cartas de la propia mano, cuál se pasaría", ofrecidas.length === 2);
+  click(w, '[data-pulse-gift="1"]');
   const enJuego = estado(w);
   ok("el Pulso queda marcado como gastado en cuanto se lanza", enJuego.players[0].pulseUsed === true);
   ok("la carta del reto sale del mazo, no de la mano", enJuego.pulseTurn.cardId === 20 && !enJuego.players[0].hand.includes(20));
-  ok("la carta que se pagaría queda apalabrada desde el principio", [1, 2].includes(enJuego.pulseTurn.giftId));
+  ok("la carta que se pagaría es la que eligió quien reta, no un sorteo", enJuego.pulseTurn.giftId === 2);
   ok("la mano propia no se puede jugar durante el duelo", !existe(w, '[data-action="select-card"]'));
 
   colocar(w, BIEN);
@@ -225,7 +230,7 @@ console.log("\nUn duelo a medias sobrevive a cerrar la aplicación");
   const w = boot({ [CLAVE]: partida({ manos: [[1, 2], [3, 4]], timeline: [15, 21], deck: [20, 24, 25] }) });
   entrar(w);
   click(w, '[data-action="pulse-open"]');
-  click(w, '[data-action="pulse-target"]');
+  reta(w);
   colocar(w, BIEN);
   const guardado = w.localStorage.getItem(CLAVE);
 
@@ -260,7 +265,7 @@ console.log("\nRetar a quien está a punto de ganar");
   click(w, '[data-action="pulse-open"]');
   const objetivos = [...w.document.querySelectorAll('[data-action="pulse-target"]')].map(b => b.dataset.target);
   ok("se puede retar a quien está a cero cartas", objetivos.includes("2"));
-  click(w, '[data-action="pulse-target"]');
+  reta(w);
   colocar(w, BIEN);
   click(w, '[data-action="pulse-defend"]');
   colocar(w, MAL);

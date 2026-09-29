@@ -152,10 +152,12 @@
     return !state.ghost?.fresh && hasPower && !me.pulseUsed && me.hand.length >= PULSE_MIN_HAND
       && state.deck.length + state.discard.length > 0 && pulseTargets(state, playerId).length > 0;
   }
-  function pulseStart(state, { playerId, targetId, shuffle = cards => [...cards], random = Math.random, now }) {
+  function pulseStart(state, { playerId, targetId, giftId, shuffle = cards => [...cards], random = Math.random, now }) {
     const currentId = state.playerOrder[state.current];
     if (state.status !== "playing" || state.phase !== "turn" || currentId !== playerId) throw new Error("NOT_TURN");
     if (!pulseAvailable(state, playerId) || !pulseTargets(state, playerId).includes(targetId)) throw new Error("NOT_ALLOWED");
+    // La carta que se pasaría la elige quien reta y debe ser suya; sin elegir (un móvil con una versión anterior), se sortea.
+    if (giftId != null && !state.players[playerId].hand.includes(giftId)) throw new Error("NOT_ALLOWED");
     let deck = [...state.deck], discard = [...state.discard];
     if (!deck.length) { deck = shuffle(discard); discard = []; }
     const cardId = deck.shift();
@@ -167,7 +169,7 @@
     return {
       ...state, ghost, pulsePower, deck, discard, phase: "pulse",
       players: { ...state.players, [playerId]: { ...me, pulseUsed: true } },
-      pulseTurn: { targetId, cardId, stage: "reto", giftId: me.hand[Math.floor(random() * me.hand.length)] },
+      pulseTurn: { targetId, cardId, stage: "reto", giftId: giftId ?? me.hand[Math.floor(random() * me.hand.length)] },
       version: state.version + 1, updatedAt: now
     };
   }

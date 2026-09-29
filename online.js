@@ -1364,7 +1364,17 @@ async function useGhost() {
   } finally { busy = false; }
 }
 
-async function startPulse(targetUid) {
+// Segundo paso del Pulso: quien reta elige de su mano la carta que pasaría al rival.
+function pulseChooseGift(targetUid) {
+  const me = roomState?.players[user.uid], target = roomState?.players[targetUid];
+  if (!me || !target) return;
+  CT.UI.pulseGiftDialog({
+    cards: me.hand.map(id => ({ id, title: getCard(id).title })), targetName: target.name,
+    onPick: giftId => startPulse(targetUid, giftId)
+  });
+}
+
+async function startPulse(targetUid, giftId) {
   if (busy) return;
   busy = true;
   try {
@@ -1377,6 +1387,7 @@ async function startPulse(targetUid) {
       const hasPower = data.pulsePower ? CT.Powers.ownsPulse(data.pulsePower, user.uid) : !!data.pulse;
       if (data.ghost?.fresh || !hasPower || me.pulseUsed || me.hand.length < PULSE_MIN_HAND) throw new Error("NO_PULSE");
       if (!data.playerOrder.includes(targetUid) || targetUid === user.uid) throw new Error("NO_TARGET");
+      if (!me.hand.includes(giftId)) throw new Error("NO_GIFT");
       if ((data.players[targetUid].shieldRound || 0) === data.round) throw new Error("SHIELDED");
       let deck = [...data.deck];
       let discard = [...data.discard];
@@ -1390,9 +1401,9 @@ async function startPulse(targetUid) {
       transaction.update(roomRef, {
         players: { ...data.players, [user.uid]: { ...me, pulseUsed: true } },
         ...(ghost ? { ghost } : {}), ...(pulsePower ? { pulsePower } : {}), deck, discard, phase: "pulse",
-        // La carta que se pagaría si ganas el duelo se sortea aquí, con la mano intacta y
-        // antes de que nadie coloque: así ni se elige a posteriori ni la elige quien cobra.
-        pulseTurn: { targetUid, cardId, stage: "reto", giftId: me.hand[Math.floor(Math.random() * me.hand.length)] },
+        // La carta que se pasaría si ganas el duelo la elige quien reta, con la mano intacta y
+        // antes de que nadie coloque: queda fijada en la sala y no se cambia después.
+        pulseTurn: { targetUid, cardId, stage: "reto", giftId },
         version: data.version + 1, updatedAt: serverTimestamp()
       });
     });
@@ -2007,7 +2018,7 @@ document.addEventListener("click", event => {
   else if (action === "ghost-use") useGhost();
   else if (action === "pulse-open") openPulse();
   else if (action === "close-pulse") CT.closeDialog();
-  else if (action === "pulse-target") { CT.closeDialog(); startPulse(target.dataset.target); }
+  else if (action === "pulse-target") { CT.closeDialog(); pulseChooseGift(target.dataset.target); }
   else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); announce(`Hueco ${pendingIndex + 1} de ${roomState.timeline.length + 1} elegido. Confirma o elige otro.`); renderGame(); }
   else if (action === "confirm-pulse") placePulse(pendingIndex);
   else if (action === "confirm-defense") defendPulse(pendingIndex);

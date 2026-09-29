@@ -1118,6 +1118,11 @@
     });
   }, true);
 
+  // Qué se adivina en el minijuego de «quién empieza»: el año en los mazos de fechas y, en el resto, lo que
+  // mide el mazo (peso, población…). Un mazo sin nombre propio queda en «el valor».
+  const STARTER_NOUN = { animals: "el peso", lifespan: "la longevidad", speed: "la velocidad", countries: "la superficie", population: "la población", languages: "el número de hablantes", distances: "la distancia" };
+  function starterNoun(modeKey) { return mode(modeKey).axis === "time" ? "el año" : STARTER_NOUN[modeKey] || "el valor"; }
+
   function guideMarkup(modeKey, context = "local", { pulse = false, ghost = true } = {}) {
     const selectedMode = mode(modeKey);
     const order = selectedMode.axis === "time" ? "de antes a después" : "de menor a mayor";
@@ -1248,7 +1253,7 @@
     pulseRules: PULSE_RULES,
     usesAnimalArt, cardArt, animalArt, cardBack, deckFingerprint, categoryFor, categoryBadge,
     hasBlock, block, blockOf, blockGames,
-    formatValue, shortValue, sortValue, hiddenLabel, timelineTitle, timelineEnds, uniqueValueIds, question, eraForCard,
+    formatValue, shortValue, sortValue, hiddenLabel, starterNoun, timelineTitle, timelineEnds, uniqueValueIds, question, eraForCard,
     correctIndex, placementHint, guideMarkup,
     escapeHtml, initials, shuffle, seedFrom, seededRandom, shuffleWith
   };

@@ -69,6 +69,17 @@
     layer.querySelectorAll('[data-ask-action]').forEach(button => button.addEventListener('click', () => { CT.closeDialog(); actions[Number(button.dataset.askAction)].proceed(); }));
     app.append(layer); CT.openDialog(layer, true);
   }
+  // Pulso, segundo paso: quien reta elige de su mano la carta que pasaría al rival si acierta él y falla
+  // el rival. Se elige antes de colocar y ya no se cambia. `cards` es [{ id, title }].
+  function pulseGiftDialog({ cards = [], targetName = 'tu rival', onPick } = {}) {
+    const app = document.getElementById('app');
+    if (!app || !cards.length) return;
+    const layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.pulseGiftDialog = '';
+    layer.innerHTML = `<div class="modal"><div class="eyebrow">Pulso</div><h2>¿Qué carta podrías pasar?</h2><p class="lead" style="margin-inline:auto">Si aciertas tú y falla ${CT.escapeHtml(targetName)}, se la pasas. La eliges ahora, antes de colocar, y no se cambia.</p><div class="actions" style="display:grid;margin-top:6px">${cards.map((card, i) => `<button class="btn btn-secondary btn-block" data-pulse-gift="${i}"><b>${CT.escapeHtml(card.title)}</b></button>`).join('')}</div><button class="btn btn-ghost btn-block" style="margin-top:10px" data-pulse-gift-cancel>Mejor no</button></div>`;
+    layer.querySelector('[data-pulse-gift-cancel]').addEventListener('click', () => CT.closeDialog());
+    layer.querySelectorAll('[data-pulse-gift]').forEach(button => button.addEventListener('click', () => { CT.closeDialog(); onPick?.(cards[Number(button.dataset.pulseGift)].id); }));
+    app.append(layer); CT.openDialog(layer, true);
+  }
   // El caso más común: aceptar o cancelar.
   function confirmDialog(message, proceed, { title = '¿Seguro?', confirmLabel = 'Aceptar', cancelLabel = 'Cancelar' } = {}) {
     askDialog({ title, message, stay: cancelLabel, actions: [{ label: confirmLabel, proceed }] });
@@ -635,6 +646,6 @@
   }
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, reveal, openSurface, closeSurface, requestDepth,
+  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface, requestDepth,
     updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

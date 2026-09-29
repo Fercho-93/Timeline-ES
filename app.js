@@ -892,7 +892,7 @@
   function starterFieldMarkup() {
     const names = playerNames();
     if (!starterDraw || starterDraw.winner === null || starterDraw.names.length !== names.length) {
-      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">🂠</span><span class="starter-draw-copy"><b>Adivinar la fecha</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+      return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-action="draw-starter"><span class="starter-draw-icon" aria-hidden="true">🂠</span><span class="starter-draw-copy"><b>Adivinar ${CT.starterNoun(selectedModeKey)}</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
     }
     const ganador = escapeHtml(names[starterDraw.winner] ?? `Jugador ${starterDraw.winner + 1}`);
     const orden = (starterDraw.order || [starterDraw.winner]).map(i => escapeHtml(names[i] ?? `Jugador ${i + 1}`)).join(" → ");
@@ -1282,9 +1282,19 @@
       && game.deck.length + game.discard.length > 0 && pulseTargets().length > 0;
   }
 
-  function startPulse(targetId) {
+  // Segundo paso del Pulso: quien reta elige de su mano la carta que pasaría al rival.
+  function pulseChooseGift(targetId) {
+    const player = currentPlayer(), target = game.players.find(item => item.id === targetId);
+    if (!pulseAvailable(player) || !target) return;
+    CT.UI.pulseGiftDialog({
+      cards: player.hand.map(id => ({ id, title: cardsById.get(id).title })), targetName: target.name,
+      onPick: giftId => startPulse(targetId, giftId)
+    });
+  }
+
+  function startPulse(targetId, giftId) {
     const player = currentPlayer();
-    if (!pulseAvailable(player) || !pulseTargets().some(target => target.id === targetId)) return;
+    if (!pulseAvailable(player) || !pulseTargets().some(target => target.id === targetId) || !player.hand.includes(giftId)) return;
     if (!game.deck.length) {
       game.deck = shuffle(game.discard);
       game.discard = [];
@@ -1294,12 +1304,9 @@
     CT.Powers.consumePulse(game.pulsePower, player.id);
     CT.Powers.claim(game, cardId, player.id, game.deck);
     player.pulseUsed = true;
-    // La carta que se pagaría si ganas el duelo se sortea aquí, con la mano todavía
-    // intacta y antes de que nadie coloque nada: así no puede elegirse a posteriori.
-    game.pulseTurn = {
-      targetId, cardId, stage: PULSE_RETO,
-      giftId: player.hand[Math.floor(Math.random() * player.hand.length)]
-    };
+    // La carta que se pasaría si ganas el duelo la eligió quien reta, con la mano todavía
+    // intacta y antes de que nadie coloque nada: queda fijada y no puede cambiarse después.
+    game.pulseTurn = { targetId, cardId, stage: PULSE_RETO, giftId };
     selectedCardId = null;
     pendingIndex = null;
     saveGame();
@@ -2461,10 +2468,10 @@
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
       ${bloque("turnos-orden", `<div class="duel-brief"><p>Colocad una carta cada vez, desde vuestro propio móvil. Recibirás un aviso cuando el rival juegue.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos de seguridad al entrar en cada turno · Si sales de la pantalla, el turno queda protegido.</span></p></div>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos para responder en cada turno · Si sales de la pantalla, el turno queda protegido.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
       ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Responded una cifra cada vez, desde vuestro propio móvil. El rival recibe un aviso al terminar tu turno.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos de seguridad al entrar en cada turno · La respuesta queda cerrada si sales de la pantalla.</span></p></div>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos para responder en cada turno · La respuesta queda cerrada si sales de la pantalla.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
@@ -3162,7 +3169,7 @@
         <h1 data-focus tabindex="-1" class="duelo-listo-titulo">${cifrasEsta ? "Escribir la cifra" : "Ordenar las cartas"}</h1>
         ${demoMarkup(cifrasEsta)}
         <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
-        <p class="solo-intro-rule">${enTurnos ? "15 segundos de seguridad al entrar en cada turno · Si sales de la pantalla, el turno queda protegido." : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.`}</p>
+        <p class="solo-intro-rule">${enTurnos ? "15 segundos para responder en cada turno · Si sales de la pantalla, el turno queda protegido." : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.`}</p>
         ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${cifrasEsta ? `${rival.puntos} puntos` : `${rival.hits} de ${duel.total}`}</b><small>la marca de ${escapeHtml(rival.nombre || "quien te reta")}</small></span></div>` : ""}
         <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">JUGAR <span>→</span></button>
       </div></section>
@@ -3915,7 +3922,7 @@
     else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará en las estadísticas ni en la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "pulse-open") pulseTargetMenu();
     else if (action === "pulse-defend") { game.pulseTurn.stage = PULSE_DEFENSA; pendingIndex = null; saveGame(); gameView(); }
-    else if (action === "pulse-target") { CT.closeDialog(); startPulse(Number(target.dataset.target)); }
+    else if (action === "pulse-target") { CT.closeDialog(); pulseChooseGift(Number(target.dataset.target)); }
     else if (action === "pulse-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, game.timeline.length); gameView(); }
     else if (action === "review-game") reviewScreen((game.failed || []).map(id => ({ id, mode: game.mode })), `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
     else if (action === "review-timeline") timelineReviewScreen(game.timeline, game.mode, `<button class="btn btn-primary" data-action="setup">Otra partida</button><button class="btn btn-secondary" data-action="home-new">Ir al inicio</button>`);
