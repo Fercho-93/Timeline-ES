@@ -4949,8 +4949,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 :root[data-theme="dark"] #app.atlas-board .hand-card > .hidden-date { position: relative; z-index: 3; width: fit-content; padding: 1px 5px; border-radius: 4px; background: #2b2118; }
 
 /* Mesas de juego (todas las modalidades): todo el contenido baja un poco desde el borde superior. */
-html #app.atlas-board > .shell { padding-top: calc(env(safe-area-inset-top) + 12px); }
-html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { padding-top: calc(env(safe-area-inset-top) + 8px); }
+html #app.atlas-board > .shell { padding-top: calc(env(safe-area-inset-top) + 30px); }
+html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { padding-top: calc(env(safe-area-inset-top) + 22px); }
 
 /* Popup de salir de la partida: pergamino con marco de latón, en la línea del resto del juego. */
 #app [data-exit-dialog] .modal {
