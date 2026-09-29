@@ -3479,15 +3479,33 @@
     else if (sessionStorage.getItem('continuum-entry-route')) jugarView();
     else playMenu();
   }
+  // Salir sin guardar de una competición: se borra la competición en curso (todas sus rondas)
+  // y se restaura la modalidad de antes de empezar. Las rondas ya terminadas siguen contando en
+  // el perfil, porque se anotaron al acabar cada una.
+  function discardCompetition() {
+    CT.Storage.removeItem(COMP_KEY);
+    if (comp && previousModeKey) { selectedModeKey = previousModeKey; cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card])); }
+    solo = null; comp = null; result = null; pendingIndex = null; selectedCardId = null;
+    competitionMenu();
+  }
+  function discardMultiCompetition() {
+    CT.Storage.removeItem(MULTI_COMP_KEY);
+    game = null; pendingTournament = null; result = null; pendingIndex = null; selectedCardId = null;
+    competitionMenu();
+  }
   // La misma salida sin guardar que ya ofrece el menú de la partida (los tres puntos),
   // pero también aquí, en la flecha de volver: es la salida que de verdad se usa más a
   // menudo, así que no debería hacer falta abrir otro menú para encontrarla.
   function requestPlayExit() {
     const discard = screen === 'solo' && solo && solo.kind !== 'comp'
       ? { label: 'Salir sin guardar', proceed: abandonSolo }
-      : game && !game.tournament
-        ? { label: 'Abandonar partida', proceed: () => { game = null; saveGame(); home(); } }
-        : null;
+      : (screen === 'solo' && solo?.kind === 'comp') || screen === 'comp-intro'
+        ? { label: 'Salir sin guardar', proceed: discardCompetition }
+        : game && game.tournament
+          ? { label: 'Salir sin guardar', proceed: discardMultiCompetition }
+          : game
+            ? { label: 'Abandonar partida', proceed: () => { game = null; saveGame(); home(); } }
+            : null;
     CT.UI.confirmExit('Tu partida quedará guardada para continuar después.', returnFromPlay, undefined, undefined, discard);
   }
   function uiBack() {
@@ -3498,10 +3516,9 @@
     backMenu();
   }
   function soloOptions() {
-    // La competición tiene su propio guardado y su propia forma de salir (abandonarla
-    // borra el progreso de todas las rondas, no solo del intento actual), así que el
-    // botón de salir sin guardar solo aparece fuera de ella.
-    const puedeSalirSinGuardar = solo && solo.kind !== "comp";
+    // En la competición, salir sin guardar borra el progreso de todas las rondas, no solo
+    // del intento actual (`abandon-solo` lo pregunta con su propio mensaje).
+    const puedeSalirSinGuardar = !!solo;
     overlay(`<div class="overlay"><div class="modal"><h2>Opciones de la partida</h2><div class="actions" style="display:grid">
       <button class="btn btn-primary" data-action="close-menu">Seguir jugando</button>
       <button class="btn btn-secondary" data-action="rules">Guía</button>${CT.settingsButton()}
@@ -3881,6 +3898,7 @@
     else if (action === "close-menu") CT.closeDialog();
     else if (action === "starter-start") { CT.closeDialog(); startGame(); }
     else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual. Esta acción no se puede deshacer.', () => { game = null; saveGame(); home(); }, '¿Abandonar partida?', 'Abandonar');
+    else if (action === "abandon-solo" && solo?.kind === "comp") CT.UI.confirmExit('Se borrará la competición en curso, con todas sus rondas, y no podrás continuarla después. Esta acción no se puede deshacer.', discardCompetition, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará en las estadísticas ni en la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "pulse-open") pulseTargetMenu();
     else if (action === "pulse-defend") { game.pulseTurn.stage = PULSE_DEFENSA; pendingIndex = null; saveGame(); gameView(); }
