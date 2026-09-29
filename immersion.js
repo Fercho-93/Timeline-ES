@@ -229,30 +229,61 @@
       if (!shell) return;
       const available = window.visualViewport?.height || window.innerHeight;
       const top = shell.getBoundingClientRect().top + window.scrollY;
-      const fits = () => top + shell.scrollHeight <= available + 2;
+      // El marco de la línea se redimensiona en un observador asíncrono: sin ajustarlo aquí, cada
+      // medida se hacía con el alto de la carta anterior y la mesa parecía no caber.
+      const syncFrame = () => {
+        const line = shell.querySelector('.board-timeline-section .timeline');
+        const frame = line?.parentElement;
+        if (!frame?.classList.contains('timeline-scale-frame')) return;
+        const scale = Number(line.style.getPropertyValue('--timeline-scale')) || 1;
+        frame.style.width = `${line.offsetWidth * scale}px`;
+        frame.style.height = `${line.offsetHeight * scale}px`;
+      };
+      const fits = () => { syncFrame(); return top + shell.scrollHeight <= available + 2; };
       container.classList.remove('board-card-expanded');
       container.style.removeProperty('--optimal-timeline-width');
       container.dataset.boardFit = 'normal';
       if (!fits()) container.dataset.boardFit = 'compact';
       if (!fits()) container.dataset.boardFit = 'tight';
-      // Un título largo puede añadir líneas incluso en la mesa compacta. La lámina
-      // sigue entera, pero reduce su altura al espacio que realmente le queda.
+      // Un título largo puede añadir líneas incluso en la mesa compacta. La lámina no se
+      // recorta ni se estrecha: se reduce la carta entera (siempre 2:3) hasta que la mesa
+      // cabe sin desplazarse.
       container.classList.remove('board-image-condensed');
       container.style.removeProperty('--board-image-height');
+      let shrunk = false;
       if (!fits() && container.dataset.boardFit === 'tight') {
-        const visual = shell.querySelector('.board-timeline-section .timeline-card .card-visual:has(.animal-card-art)');
-        if (visual) {
+        const card = shell.querySelector('.board-timeline-section .timeline .timeline-card');
+        if (card) {
+          const start = Math.floor(card.getBoundingClientRect().width);
+          container.classList.add('board-card-expanded');
+          // Un título largo hace más líneas al estrechar la carta: se busca el ancho más
+          // grande con el que la mesa cabe y, si ninguno cabe, el que menos sobra.
+          let best = { width: start, over: Infinity };
+          for (let width = start; width >= 60; width -= 2) {
+            container.style.setProperty('--optimal-timeline-width', `${width}px`);
+            syncFrame();
+            const over = top + shell.scrollHeight - available;
+            if (over < best.over) best = { width, over };
+            if (fits()) { best = { width, over: -1 }; break; }
+          }
+          container.style.setProperty('--optimal-timeline-width', `${best.width}px`);
+          shrunk = true;
+          // Solo en pantallas muy bajas, cuando ni la carta más pequeña cabe, la lámina cede
+          // altura: es el último recurso, para no obligar a desplazarse.
+          syncFrame();
           const excess = Math.ceil(top + shell.scrollHeight - available);
-          const height = Math.max(64, Math.floor(visual.getBoundingClientRect().height - excess - 10));
-          container.style.setProperty('--board-image-height', `${height}px`);
-          container.classList.add('board-image-condensed');
+          const visual = card.querySelector('.card-visual:has(.animal-card-art)');
+          if (excess > 2 && visual) {
+            container.style.setProperty('--board-image-height', `${Math.max(64, Math.floor(visual.getBoundingClientRect().height - excess - 4))}px`);
+            container.classList.add('board-image-condensed');
+          }
         }
       }
       if (!fits() && container.dataset.boardFit === 'normal') container.dataset.boardFit = 'compact';
       if (!fits() && container.dataset.boardFit === 'compact') container.dataset.boardFit = 'tight';
       // Aprovecha el papel libre dentro de la línea. La carta crece de forma
       // progresiva y se detiene antes de desplazar cualquier mando fuera de vista.
-      if (fits() && window.innerWidth >= 375) {
+      if (!shrunk && fits() && window.innerWidth >= 375) {
         const section = shell.querySelector('.board-timeline-section');
         const card = section?.querySelector('.timeline .timeline-card');
         if (card) {
