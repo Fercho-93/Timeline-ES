@@ -39,5 +39,49 @@
     return text;
   }
 
-  CT.LocalShare = { shareSignal, pasteSignal };
+  const escape = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // Enseña un texto (un enlace de sala, una invitación…) como código QR en una ventana. Sirve
+  // para cualquier modo multijugador: el otro móvil lo lee con su cámara o con «Escanear QR».
+  // Devuelve false si el texto no cabe en un QR (el llamador avisa con otra vía).
+  function showQr({ eyebrow = "Invitación", title = "Escanea para entrar", text, hint = "", code = "" } = {}) {
+    if (!text || !CT.QrEncode) return false;
+    const layer = document.createElement("div");
+    layer.className = "overlay qr-overlay"; layer.dataset.qrOverlay = "";
+    layer.innerHTML = `<div class="modal qr-modal"><div class="eyebrow">${escape(eyebrow)}</div><h2>${escape(title)}</h2><div class="qr-frame"><canvas aria-label="${escape(title)}, en código QR"></canvas></div>${code ? `<div class="qr-room-code">${escape(code)}</div>` : ""}${hint ? `<p>${escape(hint)}</p>` : ""}<div class="actions"><button class="btn btn-primary btn-block" data-qr-close>Cerrar</button></div></div>`;
+    try { CT.QrEncode.draw(layer.querySelector("canvas"), text); }
+    catch (error) { console.error(error); return false; }
+    layer.querySelector("[data-qr-close]").addEventListener("click", () => CT.closeDialog());
+    (document.getElementById("app") || document.body).append(layer);
+    CT.openDialog(layer, true);
+    return true;
+  }
+
+  // Abre la cámara en una ventana y entrega el primer texto leído a `onText`. Vale para leer
+  // invitaciones y respuestas entre móviles sin internet (el texto no cabe en un enlace).
+  async function scanQr({ title = "Escanear QR", hint = "Encuadra el código QR del otro móvil.", onText } = {}) {
+    if (!CT.QrScanner?.isSupported()) throw new Error("CAMERA_UNAVAILABLE");
+    const layer = document.createElement("div");
+    layer.className = "overlay qr-overlay"; layer.dataset.qrOverlay = "";
+    layer.innerHTML = `<div class="modal qr-modal"><div class="eyebrow">Cámara</div><h2>${escape(title)}</h2><div class="qr-panel"><div class="qr-frame"><video playsinline muted aria-label="Cámara"></video></div></div><p data-qr-status aria-live="polite">${escape(hint)}</p><div class="actions"><button class="btn btn-secondary btn-block" data-qr-close>Cancelar</button></div></div>`;
+    (document.getElementById("app") || document.body).append(layer);
+    let handle = null, closed = false;
+    const stop = () => { closed = true; handle?.stop(); };
+    layer.querySelector("[data-qr-close]").addEventListener("click", () => { stop(); CT.closeDialog(); });
+    CT.openDialog(layer, true, stop);
+    try {
+      const found = new Promise(resolve => {
+        CT.QrScanner.start(layer.querySelector("video"), text => resolve(text), () => {
+          const status = layer.querySelector("[data-qr-status]"); if (status) status.textContent = "No se ha podido leer el código. Sigue encuadrándolo.";
+        }).then(h => { handle = h; if (closed) h.stop(); }).catch(error => {
+          const status = layer.querySelector("[data-qr-status]"); if (status) status.textContent = "No se pudo acceder a la cámara. Revisa los permisos y vuelve a intentarlo."; console.error(error);
+        });
+      });
+      const text = await found;
+      stop(); CT.closeDialog();
+      onText?.(text);
+    } catch (error) { stop(); throw error; }
+  }
+
+  CT.LocalShare = { shareSignal, pasteSignal, showQr, scanQr };
 })();

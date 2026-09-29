@@ -2755,7 +2755,7 @@
         icono: "🎯", eyebrow: "Duelo listo",
         titular: `Has colocado bien <strong>${mio.hits}</strong> de ${total} cartas.`,
         cuerpo: `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, en el mismo orden, y al terminar verá vuestro cara a cara.</p>`,
-        acciones: `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`
+        acciones: `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button><button class="btn btn-secondary" data-action="qr-duel">Mostrar QR del reto</button>`
       };
     }
 
@@ -3077,7 +3077,7 @@
     if (!rival) {
       lastDuelShare = Cifras.invitacion({ modeName, nombre: duelName(), puntos: mios.puntos, total, payload });
       cuerpo = `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, con los mismos ${Cifras.SEGUNDOS} segundos para cada una.</p>`;
-      acciones = `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`;
+      acciones = `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button><button class="btn btn-secondary" data-action="qr-duel">Mostrar QR del reto</button>`;
     } else {
       const empate = mios.puntos === rival.puntos;
       const quien = rival.nombre || "quien te retaba";
@@ -3883,6 +3883,10 @@
     else if (action === "cifras-exit") CT.UI.confirmExit("La carta que tengas abierta se cerrará: el reloj no se para.", () => { paraReloj(); if (cifras) { guardaCifras(); cifras = null; } duelHome(); });
     else if (action === "accept-duel") acceptDuel();
     else if (action === "share-duel") compartir(lastDuelShare, "Enlace copiado");
+    else if (action === "qr-duel") {
+      const enlace = lastDuelShare?.match(/https?:\/\/\S+$/m)?.[0];
+      if (!enlace || !CT.LocalShare.showQr({ eyebrow: "Duelo por enlace", title: "Escanea para aceptar el reto", text: enlace, hint: "Abre la cámara del móvil de tu rival y apunta al código." })) showToast("El reto es demasiado largo para un QR. Usa «Mandar el reto».");
+    }
     else if (action === "resume-solo") resumeSolo();
     else if (action === "daily-start") startDaily();
     else if (action === "daily-play") playDaily();

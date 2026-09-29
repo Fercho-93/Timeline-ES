@@ -136,7 +136,7 @@
   function networkSetup(kind,capacity=4) {
     roomCapacity=capacity;
     stopNetwork();state=null;record=null;page='network';netKind=kind;
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo por turnos':kind==='internet'?'Varios móviles':'Sin conexión'}</h2><p class="lead">${kind==='internet'?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p><div class="panel"><div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${esc(CT.Identidad?.propio?.() || '')}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>${button('create-room','Crear sala','btn btn-primary btn-block')}<div class="field"><label for="quick-net-code">${kind==='internet'?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>${button('join-room','Unirme a la sala','btn btn-secondary btn-block')}<p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></div></section>`);
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">${capacity===2?'Duelo por turnos':kind==='internet'?'Varios móviles':'Sin conexión'}</h2><p class="lead">${kind==='internet'?'Cread una sala o uníos con su código. También podéis volver más tarde para seguir por turnos.':'Conectad todos los móviles a la misma red Wi-Fi. Quien crea la sala debe mantenerla abierta.'}</p><div class="panel"><div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${esc(CT.Identidad?.propio?.() || '')}"></div>${capacity===2?'':`<div class="field"><label for="quick-net-players">Participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===capacity?' selected':''}>${n} jugadores</option>`).join('')}</select></div>`}<div class="field"><label for="quick-net-length">Duración de la partida</label><select id="quick-net-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option></select></div>${button('create-room','Crear sala','btn btn-primary btn-block')}<div class="field"><label for="quick-net-code">${kind==='internet'?'Código o enlace de sala':'Invitación recibida'}</label><textarea id="quick-net-code" rows="2"></textarea></div>${button('scan-code','Escanear QR de la sala','btn btn-secondary btn-block')}${button('join-room','Unirme a la sala','btn btn-secondary btn-block')}<p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></div></section>`);
   }
   function roomChanged(next,id,code) {
     room=CT.QuickRoom.validate(next);myId=id;busy=false;page='network-lobby';
@@ -174,6 +174,7 @@
     ${host && !isPublic ? button('start-room','Sortear y empezar','btn btn-primary btn-block') : ''}
     ${connection?.kind==='local'&&host ? button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}
     ${code?button('share-room','Compartir enlace de sala','btn btn-secondary btn-block'):''}
+    ${code?button('qr-room','Mostrar QR de la sala','btn btn-secondary btn-block'):''}
     ${button('formats','Volver a los formatos','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></div></section>`);
     const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=room.members.length<2;
   }
@@ -190,13 +191,22 @@
     else {
       connection=CT.QuickNetwork.localGuest(code,name,change,fail);
       const answer=await connection.answer();if(epoch!==networkEpoch)return;
-      shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Devuelve esta respuesta</h2><div class="panel"><p>Compártela con quien creó la sala para completar la conexión.</p><div class="field"><textarea id="quick-signal" readonly rows="4">${esc(answer)}</textarea></div>${button('share-signal','Compartir respuesta','btn btn-primary btn-block')}<p>La sala aparecerá al conectar. Si no conecta, comprobad que estáis en la misma red Wi-Fi.</p><p id="quick-error" role="alert"></p></div></section>`);
+      shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Devuelve esta respuesta</h2><div class="panel"><p>Compártela con quien creó la sala para completar la conexión.</p><div class="field"><textarea id="quick-signal" readonly rows="4">${esc(answer)}</textarea></div>${button('share-signal','Compartir respuesta','btn btn-primary btn-block')}${button('qr-signal','Mostrar QR de la respuesta','btn btn-secondary btn-block')}<p>La sala aparecerá al conectar. Si no conecta, comprobad que estáis en la misma red Wi-Fi.</p><p id="quick-error" role="alert"></p></div></section>`);
     }
   }
   async function networkAction(action) {
     if(busy)return;busy=true;
     try{await connection.act(action);}catch(e){errorNotice(e);}
     finally{busy=false;}
+  }
+  // Muestra el QR; si el texto no cabe en un código, lo dice en vez de dejar la pantalla igual.
+  function showQrOrExplain(options) {
+    if(!CT.LocalShare.showQr(options))throw Error('Este contenido es demasiado largo para un código QR. Usa «Compartir».');
+  }
+  // Abre la cámara y, al leer un código, sigue con `next`. Sin cámara lo explica.
+  async function scanQrInto(title,hint,next) {
+    if(!CT.QrScanner?.isSupported())throw Error('Este navegador no permite usar la cámara aquí.');
+    await CT.LocalShare.scanQr({title,hint,onText:text=>{Promise.resolve(next(text)).catch(errorNotice);}});
   }
   async function formatAction(action) {
     if(action==='formats'){toEntry();return true;}
@@ -206,15 +216,20 @@
     if(action==='free'){freeSetup();return true;}
     if(action==='duel'||action==='turn-duel'){networkSetup('internet',2);return true;}
     if(action==='accept-duel'){acceptDuel(app().querySelector('#quick-duel-link').value);return true;}
+    if(action==='qr-duel'){showQrOrExplain({eyebrow:'Duelo de Retos rápidos',title:'Escanea para aceptar el duelo',text:duelLink(),hint:'Abre la cámara del móvil de tu rival y apunta al código.'});return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(['internet','offline','turn-duel'].includes(action)){networkSetup(action==='offline'?'local':'internet',action==='turn-duel'?2:4);return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
     if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||3;await networkAction({type:'start',rounds:rounds(count),kind:roomCapacity===2?'duel':'network',historyId:historyId()});return true;}
     if(action==='share-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;await CT.LocalShare.shareSignal(url.href);return true;}
+    if(action==='qr-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;showQrOrExplain({eyebrow:'Sala de Retos rápidos',title:'Escanea para entrar',text:url.href,code:connection.code,hint:'Abre la cámara del otro móvil y apunta al código.'});return true;}
+    if(action==='qr-signal'){showQrOrExplain({eyebrow:'Conexión sin internet',title:'Enséñalo al otro móvil',text:app().querySelector('#quick-signal').value,hint:'El otro móvil lo lee con «Escanear QR».'});return true;}
+    if(action==='scan-code'){await scanQrInto('Escanear QR de la sala','Encuadra el código QR de la sala o de la invitación.',text=>{app().querySelector('#quick-net-code').value=text;return formatAction('join-room');});return true;}
+    if(action==='scan-answer'){await scanQrInto('Escanear QR de la respuesta','Encuadra el código QR que enseña el otro móvil.',text=>{app().querySelector('#quick-answer').value=text;return formatAction('accept-answer');});return true;}
     if(action==='share-signal'){await CT.LocalShare.shareSignal(app().querySelector('#quick-signal').value);return true;}
     if(action==='invite-peer'){
       invite=await connection.invite();
-      shell(`<section class="setup-section"><h2>Invita otro móvil</h2><div class="panel"><p>Comparte esta invitación. El otro móvil la pega en «Unirme a la sala» y te devuelve su respuesta.</p><div class="field"><textarea id="quick-signal" readonly rows="3">${esc(invite.signal)}</textarea></div>${button('share-signal','Compartir invitación','btn btn-primary btn-block')}<div class="field"><label for="quick-answer">Respuesta del otro móvil</label><textarea id="quick-answer" rows="3"></textarea></div>${button('accept-answer','Conectar','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);return true;
+      shell(`<section class="setup-section"><h2>Invita otro móvil</h2><div class="panel"><p>Comparte esta invitación. El otro móvil la pega en «Unirme a la sala» y te devuelve su respuesta.</p><div class="field"><textarea id="quick-signal" readonly rows="3">${esc(invite.signal)}</textarea></div>${button('share-signal','Compartir invitación','btn btn-primary btn-block')}${button('qr-signal','Mostrar QR de la invitación','btn btn-secondary btn-block')}<div class="field"><label for="quick-answer">Respuesta del otro móvil</label><textarea id="quick-answer" rows="3"></textarea></div>${button('scan-answer','Escanear QR de la respuesta','btn btn-secondary btn-block')}${button('accept-answer','Conectar','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></div></section>`);return true;
     }
     if(action==='accept-answer'){await invite.accept(app().querySelector('#quick-answer').value.trim());lobby();return true;}
     if(action==='reconnect') {const saved=readJSON(NET);if(!saved)throw Error('No hay ninguna sala guardada.');networkSetup('internet');app().querySelector('#quick-net-name').value=saved.name;app().querySelector('#quick-net-code').value=saved.code;await connectRoom(false);return true;}
@@ -306,7 +321,7 @@
         <ul>${state.players.map(player => `<li>${esc(player.name)}: ${player.roundScore} puntos en este reto.</li>`).join('')}</ul>
         ${final ? button('formats', 'Elegir otra partida') : button('next', 'Siguiente reto')}
         ${final && record.config.kind==='duel' ? button('rematch', 'Crear una revancha', 'btn btn-secondary btn-block') : ''}
-        ${final && record.config.kind==='duel' ? button('share-duel','Compartir duelo','btn btn-secondary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div>` : ''}
+        ${final && record.config.kind==='duel' ? button('share-duel','Compartir duelo','btn btn-secondary btn-block')+button('qr-duel','Mostrar QR del duelo','btn btn-secondary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div>` : ''}
         ${final && Number.isFinite(record.config.rivalScore) ? `<p>Tu rival: ${record.config.rivalScore} puntos. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Tu rival ha asegurado más puntos.'}</p>` : ''}
         <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button></section>
         <details class="panel quick-panel"><summary>Ver el orden completo y las fuentes</summary><ol>${[...c.cards].sort((a, b) => (a.value - b.value) * c.direction).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} <a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Fuente</a></p></li>`).join('')}</ol></details>`);
@@ -366,7 +381,7 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    const formatActions=['formats','leave-public','show-multi','local','free','duel','accept-duel','share-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','share-signal','invite-peer','accept-answer','reconnect'];
+    const formatActions=['formats','leave-public','show-multi','local','free','duel','accept-duel','share-duel','qr-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
