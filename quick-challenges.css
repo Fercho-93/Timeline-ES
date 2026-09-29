@@ -63,3 +63,19 @@
 .quick-shell .quick-length-chip.quick-length-all b{font-size:1.3rem}
 .quick-shell .quick-length-chip.quick-length-all small{margin:0 0 0 4px}
 @media(prefers-reduced-motion:reduce){.quick-shell .quick-length-chip{transition:none}}
+
+/* Portada del mazo que toca: se ve un instante antes de «Reto preparado». */
+.quick-splash{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:24px;text-align:center;cursor:pointer;background:radial-gradient(ellipse at 50% 32%,#fbf3e2 0,#f0e3c8 55%,#e3d0ab 100%);color:#2b2118;transition:opacity 240ms ease}
+.quick-splash.is-leaving{opacity:0;pointer-events:none}
+.quick-splash-inner{display:grid;justify-items:center;gap:10px;max-width:min(88vw,420px)}
+.quick-splash .eyebrow{justify-content:center;color:#8a3f2f;font:600 .78rem/1.3 var(--font-display);letter-spacing:.22em;text-transform:uppercase}
+.quick-splash h2{margin:0;font:500 clamp(1.7rem,7vw,2.3rem)/1.15 var(--font-display);text-wrap:balance}
+.quick-splash-hint{margin-top:14px;color:#7a6a58;font:.75rem/1.3 var(--ui-font,inherit);letter-spacing:.12em;text-transform:uppercase}
+.quick-splash-fan{display:flex;justify-content:center;margin-bottom:18px;height:150px}
+.quick-splash-fan img{width:104px;height:150px;object-fit:cover;border:3px solid #fbf3e2;border-radius:10px;background:#eadbc4;box-shadow:0 8px 18px rgba(54,41,26,.28)}
+.quick-splash-fan img:nth-child(1){transform:rotate(-8deg) translateX(14px)}
+.quick-splash-fan img:nth-child(2){position:relative;z-index:1;transform:translateY(-8px)}
+.quick-splash-fan img:nth-child(3){transform:rotate(8deg) translateX(-14px)}
+.quick-splash-fan img:only-child{transform:none}
+@media(prefers-reduced-motion:no-preference){.quick-splash-inner{animation:quick-ready-in 520ms var(--ease-out,ease-out) both}}
+@media(prefers-reduced-motion:reduce){.quick-splash{transition:none}}
