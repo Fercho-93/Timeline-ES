@@ -239,7 +239,7 @@
         frame.style.width = `${line.offsetWidth * scale}px`;
         frame.style.height = `${line.offsetHeight * scale}px`;
       };
-      const fits = () => { syncFrame(); return top + shell.scrollHeight <= available + 2; };
+      const fits = () => { syncFrame(); return top + shell.scrollHeight <= available; };
       container.classList.remove('board-card-expanded');
       container.style.removeProperty('--optimal-timeline-width');
       container.dataset.boardFit = 'normal';
