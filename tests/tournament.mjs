@@ -22,7 +22,14 @@ assert.ok(w.document.querySelector('[data-action="competition-local"]'));
 w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='1';
 assert.equal(w.document.getElementById('competition-length').value,'3');
 assert.equal(w.document.getElementById('competition-cards').value,'1');
+// Cada puerta ofrece solo su forma de jugar: ya se eligió antes, no se vuelve a preguntar.
+assert.equal(w.document.querySelector('[data-action="competition-online"]'), null, 'desde «Un solo móvil» no se ofrece la sala online');
+assert.equal(w.document.querySelector('[data-action="start-competition"]'), null, 'ni la competición en solitario');
+w.CONTINUUM.ModeHubs.open('hub-friends-online');click('[data-action="competition-menu"]');
 assert.ok(w.document.querySelector('[data-action="competition-online"]'));
+assert.equal(w.document.querySelector('[data-action="competition-local"]'), null, 'desde «Sala privada online» no se ofrece un solo móvil');
+w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');
+w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='1';
 click('[data-action="competition-local"]');click('[data-action="back-menu"]');
 assert.equal(w.document.getElementById('competition-cards').value,'1');
 click('[data-action="competition-local"]');click('[data-action="start"]');

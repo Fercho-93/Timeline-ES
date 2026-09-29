@@ -136,7 +136,7 @@
       route === 'wifi' ? modeDoor('wifi-join', 'menu-wifi.webp', 'Unirme a una sala', 'Escanea el código de quien la ha creado, sea cual sea el mazo.', true) : '',
       inlineCollections(route),
       modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
-      route === 'local' || route === 'online' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas y rondas con marcador acumulado.', false, 'data-competition-audience="friends"', 'Configurar competición') : ''
+      route === 'local' || route === 'online' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas y rondas con marcador acumulado.', false, `data-competition-audience="${route}"`, 'Configurar competición') : ''
     ].join(''), art);
   }
   const openLocalHub = () => openFriendHub('local');
