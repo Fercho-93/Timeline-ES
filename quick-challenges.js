@@ -220,8 +220,7 @@
       ${button('start', 'Barajar y empezar <span>→</span>', 'btn btn-primary btn-block')}
       ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}
       <p id="quick-error" role="alert">${esc(error)}</p></div></section>
-      <details class="panel quick-panel"><summary>Cómo se juega</summary><ol><li>Una carta revelada inicia la línea, sin dar puntos.</li><li>Elige una de las cartas comunes y toca un hueco. Confirma para revelar el dato.</li><li>Acertar suma un punto provisional y pasa el turno.</li><li>En tu siguiente turno puedes plantarte: aseguras tus puntos y sales de este reto.</li><li>Fallar pierde tus puntos de este reto y te retira. Los de retos anteriores se conservan.</li><li>Al agotarse las cartas, los puntos pendientes se aseguran. El reto también termina si nadie sigue activo.</li></ol><p>La carta fallada queda corregida en la línea. Si queda una sola persona, puede seguir arriesgando. Los empates de valor admiten cualquier orden equivalente. Gana quien suma más puntos; un empate final se comparte.</p></details>
-      <section class="quick-catalog" aria-label="Retos disponibles">${CT.QuickCatalog.challenges.map(c => `<article class="panel quick-panel"><h2>${esc(c.title)}</h2><p>${esc(c.rule)}</p><small>${c.cards.length} cartas · una de referencia</small></article>`).join('')}</section>`);
+      <details class="panel quick-panel"><summary>Cómo se juega</summary><ol><li>Una carta revelada inicia la línea, sin dar puntos.</li><li>Elige una de las cartas comunes y toca un hueco. Confirma para revelar el dato.</li><li>Acertar suma un punto provisional y pasa el turno.</li><li>En tu siguiente turno puedes plantarte: aseguras tus puntos y sales de este reto.</li><li>Fallar pierde tus puntos de este reto y te retira. Los de retos anteriores se conservan.</li><li>Al agotarse las cartas, los puntos pendientes se aseguran. El reto también termina si nadie sigue activo.</li></ol><p>La carta fallada queda corregida en la línea. Si queda una sola persona, puede seguir arriesgando. Los empates de valor admiten cualquier orden equivalente. Gana quien suma más puntos; un empate final se comparte.</p></details>`);
   }
   function nameFields(count, names = []) {
     return Array.from({length: count}, (_, i) => `<div class="player-row"><input id="quick-name-${i}" data-quick-name aria-label="Nombre del jugador o equipo ${i + 1}" maxlength="24" value="${esc(names[i] ?? `Jugador ${i + 1}`)}" autocomplete="off"><button class="remove" data-quick="remove-player" data-index="${i}" aria-label="Quitar jugador ${i + 1}" ${count <= 2 ? 'disabled' : ''}>×</button></div>`).join('');
@@ -417,6 +416,7 @@
     leave:stopNetwork,
     openPublic,
     openSolo(renderPage){paint=renderPage;entry='free-setup';format='free';freeSetup();},
+    openLocal(renderPage){paint=renderPage;entry='setup';format='local';setup();},
     startDaily(dayValue, renderPage) {
       paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       const saved=load();

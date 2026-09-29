@@ -497,6 +497,7 @@
     screen = "quick-challenges";
     const render=(html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);};
     if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
+    else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
     else CT.Quick.open(render);
   }
 
@@ -3973,6 +3974,8 @@
   // de «Volver», igual que las de este archivo.
   CT.showScreen = (name, html) => { screen = name; paint(html); };
   // La galería de colecciones también se despliega dentro de «Jugar solo», sin cambiar de pantalla.
+  // Abre un mazo respetando la ruta de entrada (por ejemplo, Gran mezcla en un solo móvil).
+  CT.openMode = openMode;
   CT.collectionsGallery = () => {
     collectionOpen = false; collectionDetails = false; collectionIndexExpanded = true; jugarSection = "collections";
     return `<p class="catalog-hint">Elige una colección para desplegar sus mazos.</p><section id="deck-collection">${gallery()}</section>`;

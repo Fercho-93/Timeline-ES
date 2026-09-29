@@ -73,9 +73,17 @@ await expectBack('home');
 // Jugar con amigos → Un solo móvil → mazo → preparar partida.
 await click('[data-action="friends-hub"]');
 assert.equal(screen(), 'hub-friends');
-await click('[data-friend-route="local"]');
-await openFirstDeck('setup');
-await expectBack('jugar');
+await click('[data-action="local-hub"]');
+assert.equal(screen(), 'hub-friends-local', 'Un solo móvil tiene su propia pantalla, como Jugar solo');
+await click('[data-inline-route="local"]');
+assert.ok(app().querySelector('#mode-inline-drawer .gallery-panel'), 'Grandes colecciones se despliega en la propia pantalla');
+await click('#mode-inline-drawer [data-action="set-block"]');
+await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
+assert.equal(screen(), 'setup');
+await expectBack('hub-friends-local');
+await click('[data-local-route="mixed"]');
+assert.equal(screen(), 'setup', 'Gran mezcla en un solo móvil va a preparar la partida');
+await expectBack('hub-friends-local');
 await expectBack('hub-friends');
 await expectBack('home');
 

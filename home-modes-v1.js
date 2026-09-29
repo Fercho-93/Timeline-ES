@@ -112,9 +112,24 @@
       ${modeDoor('public-match', modeArt['online-hub'], 'Buscar mesa', 'La mesa compartirá un único tema.', true, 'data-online-kind="collections-vote"')}</div>`, modeArt['online-collections']);
   }
 
+  // «Grandes colecciones» se despliega dentro de la propia pantalla; `route` decide qué pasa al
+  // elegir un mazo (jugar solo o preparar una partida en un solo móvil).
+  function inlineCollections(route) {
+    return `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="false" aria-controls="mode-inline-drawer"`)}<div id="mode-inline-drawer" class="mode-inline-drawer" hidden></div></div>`;
+  }
+
+  // Un solo móvil: las mismas tres puertas que «Jugar solo», pasando el teléfono en cada turno.
+  function openLocalHub() {
+    hub('hub-friends-local', 'Un solo móvil', 'Pasad el teléfono', [
+      inlineCollections('local'),
+      modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, 'data-local-route="quick"'),
+      modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, 'data-local-route="mixed"')
+    ].join(''), 'mode-walk-duel.webp');
+  }
+
   function openSoloHub() {
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
-      `<div class="mode-inline-collections">${modeDoor('jugar', 'hero-history-700.webp', 'Grandes colecciones', 'Historia, ciencia, naturaleza y más.', false, 'data-solo-route="collections" aria-expanded="false" aria-controls="mode-inline-drawer"')}<div id="mode-inline-drawer" class="mode-inline-drawer" hidden></div></div>`,
+      inlineCollections('collections'),
       modeDoor('quick-challenges', 'hero-quick-700.webp', 'Retos rápidos', 'Temas concretos para partidas cortas.', false, 'data-solo-route="quick"'),
       modeDoor('jugar', 'hero-mixed-700.webp', 'Gran mezcla', 'Cartas de todas las colecciones.', false, 'data-solo-route="mixed"')
     ].join(''), modeArt['solo-hub']);
@@ -122,7 +137,7 @@
 
   function openFriendsHub() {
     hub('hub-friends', 'Jugar con amigos', 'Juntos', [
-      modeDoor('jugar', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.', false, 'data-friend-route="local"'),
+      modeDoor('local-hub', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.'),
       modeDoor('jugar', 'mode-walk-multi.webp', 'Sala privada', 'Cada persona con su móvil, por código o enlace.', false, 'data-friend-route="online"'),
       modeDoor('jugar', 'mode-walk-multi.webp', 'Wi‑Fi local', 'Varios móviles cerca, sin internet.', false, 'data-friend-route="wifi"'),
       modeDoor('jugar', 'mode-walk-duel.webp', 'Duelo por turnos', 'Jugad cuando podáis, por enlace.', false, 'data-friend-route="duel"')
@@ -142,11 +157,20 @@
       choices.inert = !playExpanded;
       return;
     }
-    const inlineCollections = event.target.closest('[data-solo-route="collections"]');
-    if (inlineCollections && app.dataset.screen === 'hub-solo') {
+    const localRoute = event.target.closest('[data-local-route]');
+    if (localRoute?.dataset.localRoute === 'quick') sessionStorage.setItem('continuum-entry-route', 'local-quick');
+    else if (localRoute) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      sessionStorage.setItem('continuum-entry-route', 'collections');
+      sessionStorage.setItem('continuum-entry-route', 'local');
+      window.CONTINUUM.openMode?.('mixed');
+      return;
+    }
+    const inlineCollections = event.target.closest('[data-inline-route]');
+    if (inlineCollections && ['hub-solo', 'hub-friends-local'].includes(app.dataset.screen)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      sessionStorage.setItem('continuum-entry-route', inlineCollections.dataset.inlineRoute);
       const drawer = document.getElementById('mode-inline-drawer');
       const open = drawer.hidden;
       drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery() : '';
@@ -183,16 +207,17 @@
       window.CONTINUUM.openQuickPublic(cap)
         .catch(error=>{console.error('QUICK_PUBLIC_MATCH_ERROR',error);openOnlineHub();const note=document.createElement('p');note.setAttribute('role','alert');note.textContent=error?.message || 'No se pudo encontrar una mesa. Inténtalo de nuevo.';app.querySelector('.mode-hub-list')?.prepend(note);});return;
     }
-    if (!['online-hub','online-collections','solo-hub','friends-hub'].includes(action)) return;
+    if (!['online-hub','online-collections','solo-hub','friends-hub','local-hub'].includes(action)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
     if (action === 'online-hub') openOnlineHub();
     else if (action === 'online-collections') openOnlineCollections();
     else if (action === 'solo-hub') openSoloHub();
+    else if (action === 'local-hub') openLocalHub();
     else openFriendsHub();
   }, true);
 
-  const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends': openFriendsHub};
+  const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends': openFriendsHub};
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); } };
 
   function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
