@@ -4870,3 +4870,9 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 #app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom { position: relative; flex: none; margin: 0 !important; padding: 0; border: 0; background: none; box-shadow: none; }
 #app.atlas-board .board-timeline-section > .timeline-toolbar > .timeline-zoom .zoom-menu { top: calc(100% + 6px); right: 0; }
 #app.atlas-board .quick-shell .quick-right .scoreboard, #app.atlas-board .quick-shell .quick-right .score { box-shadow: none; } #app.atlas-board .quick-shell .quick-right .scoreboard { padding: 0; background: none; border: 0; }
+
+/* Lupa del zoom en la barra superior: misma altura que los botones redondos de al lado. */
+#app .atlas-topbar-actions { display: flex; align-items: center; gap: 6px; }
+#app .atlas-topbar-actions > .timeline-zoom { position: relative; display: block; margin: 0 !important; padding: 0; border: 0; background: none; box-shadow: none; }
+#app.atlas-board[data-platform][data-screen] .atlas-topbar-actions .timeline-zoom button.zoom-toggle { height: 36px !important; min-height: 36px !important; padding: 0 10px !important; gap: 4px; font-size: .72rem !important; }
+#app .atlas-topbar-actions .timeline-zoom .zoom-menu { top: calc(100% + 6px); right: 0; z-index: 60; }

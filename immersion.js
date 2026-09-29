@@ -350,8 +350,11 @@
       const zoom = container.querySelector('.timeline-zoom');
       const timelineHeading = wrap?.parentElement.querySelector('.hand-title');
       if (timelineHeading) timelineHeading.classList.add('timeline-toolbar');
-      // La lupa del zoom va en la cabecera de la línea, a la derecha: es un mando del tablero.
-      if (zoom && timelineHeading) timelineHeading.append(zoom);
+      // La lupa del zoom va en la barra superior, junto al sonido y el menú: es un ajuste de
+      // vista, no parte del tablero, y así no descuadra la cabecera de la línea.
+      const actions = container.querySelector('.atlas-topbar .atlas-topbar-actions');
+      if (zoom && actions) actions.prepend(zoom);
+      else if (zoom && timelineHeading) timelineHeading.append(zoom);
       const hand = container.querySelector('.hand');
       if (hand) {
         hand.closest('section')?.classList.add('atlas-hand-section');
