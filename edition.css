@@ -4890,3 +4890,19 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 .menu-view-row > span { text-align: left; }
 .menu-view-zoom { flex: none; }
 #app .modal .menu-view-zoom button, #app .modal .menu-view-sound { width: auto !important; min-width: 0; white-space: nowrap; padding: 0 11px; }
+
+/* Gran mezcla: la carta de la mano se ve igual que en Grandes colecciones. La temática ya no es
+   una pastilla que tapa el «valor oculto» y el reverso: queda como un pequeño sello con su icono
+   en la esquina superior derecha (el nombre sigue disponible para lectores de pantalla). */
+#app.atlas-board .hand-card { position: relative; }
+#app.atlas-board .hand-card > .card-category { position: absolute; z-index: 3; top: 5px; right: 5px; left: auto; width: 20px; height: 20px; min-height: 0; margin: 0; padding: 0; justify-content: center; gap: 0; overflow: hidden; border-radius: 50%; font-size: 0; line-height: 0; color: transparent; background: #f3e6c8; border: 1px solid #c9b48f; box-shadow: 0 1px 2px #5a3f1f33; }
+#app.atlas-board .hand-card > .card-category > span[aria-hidden="true"] { font-size: .7rem; line-height: 1; color: initial; }
+/* La carta de la línea usa el mismo sello de temática en la esquina, así no crece en Gran mezcla. */
+#app.atlas-board .timeline .timeline-card { position: relative; }
+#app.atlas-board .timeline .timeline-card .card-category { position: absolute; z-index: 3; top: 6px; right: 6px; left: auto; width: 22px; height: 22px; min-height: 0; margin: 0 !important; padding: 0; justify-content: center; gap: 0; overflow: hidden; border-radius: 50%; font-size: 0; line-height: 0; color: transparent; background: #f3e6c8; border: 1px solid #c9b48f; box-shadow: 0 1px 2px #5a3f1f33; }
+#app.atlas-board .timeline .timeline-card .card-category > span[aria-hidden="true"] { font-size: .75rem; line-height: 1; color: initial; }
+#app.atlas-board .timeline .timeline-card:has(.animal-card-art) > .card-content { position: static !important; }
+#app.atlas-board .timeline .timeline-card .card-category { font-size: 0 !important; line-height: 0 !important; color: transparent !important; letter-spacing: 0 !important; text-transform: none !important; max-width: none; }
+#app.atlas-board .timeline .timeline-card .card-category > span[aria-hidden="true"] { font-size: .75rem !important; line-height: 1 !important; }
+#app.atlas-board .hand-card > .card-category { font-size: 0 !important; color: transparent !important; }
+#app.atlas-board .hand-card > .card-category > span[aria-hidden="true"] { font-size: .7rem !important; }
