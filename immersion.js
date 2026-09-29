@@ -56,6 +56,23 @@
     layer.querySelector('[data-exit-discard]')?.addEventListener('click', () => { CT.closeDialog(); discard.proceed(); });
     app.append(layer); CT.openDialog(layer, true);
   }
+  // Pregunta con el estilo del juego en lugar del `confirm()` del navegador (blanco, sin
+  // estilo y bloqueado en algunas vistas web). «Quedarse» es siempre la opción principal;
+  // cada acción cierra el diálogo antes de ejecutarse. `kind: 'ghost'` marca la salida más
+  // drástica, con el mismo aspecto que «Salir sin guardar».
+  function askDialog({ title = '¿Seguro?', message = '', stay = 'Cancelar', actions = [] } = {}) {
+    const app = document.getElementById('app');
+    if (!app || app.querySelector('[data-exit-dialog]')) return;
+    const layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.exitDialog = '';
+    layer.innerHTML = `<div class="modal" role="alertdialog" aria-modal="true"><h2>${CT.escapeHtml(title)}</h2>${message ? `<p>${CT.escapeHtml(message)}</p>` : ''}<div class="actions exit-actions"><button class="btn btn-primary btn-block" data-ask-stay>${CT.escapeHtml(stay)}</button>${actions.map((action, i) => `<button class="btn ${action.kind === 'ghost' ? 'btn-ghost exit-discard' : 'btn-secondary'} btn-block" data-ask-action="${i}">${CT.escapeHtml(action.label)}</button>`).join('')}</div></div>`;
+    layer.querySelector('[data-ask-stay]').addEventListener('click', () => CT.closeDialog());
+    layer.querySelectorAll('[data-ask-action]').forEach(button => button.addEventListener('click', () => { CT.closeDialog(); actions[Number(button.dataset.askAction)].proceed(); }));
+    app.append(layer); CT.openDialog(layer, true);
+  }
+  // El caso más común: aceptar o cancelar.
+  function confirmDialog(message, proceed, { title = '¿Seguro?', confirmLabel = 'Aceptar', cancelLabel = 'Cancelar' } = {}) {
+    askDialog({ title, message, stay: cancelLabel, actions: [{ label: confirmLabel, proceed }] });
+  }
   let finalCards = [];
   function captureBoard(container) {
     const cards = [...container.querySelectorAll('.timeline .timeline-card')];
@@ -618,6 +635,6 @@
   }
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, reveal, openSurface, closeSurface, requestDepth,
+  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, reveal, openSurface, closeSurface, requestDepth,
     updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

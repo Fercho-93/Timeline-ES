@@ -135,15 +135,28 @@ function downloadProgress() {
   const url = URL.createObjectURL(new Blob([JSON.stringify({season,uid:identity?.uid,...payload()},null,2)],{type:'application/json'}));
   const a=document.createElement('a');a.href=url;a.download='continuum-progreso.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+// Pregunta con el mismo aspecto que el resto de diálogos del juego. Esta pantalla sale antes de que
+// cargue el resto de la interfaz, así que no puede depender de `CT.UI`: pinta su propia capa.
+function askConfirm(message,title,confirmLabel,proceed) {
+  if (CT.UI?.confirmDialog) { CT.UI.confirmDialog(message,proceed,{title,confirmLabel,cancelLabel:'Cancelar'}); return; }
+  if (app.querySelector('[data-exit-dialog]')) return;
+  const layer=document.createElement('div');layer.className='overlay';layer.dataset.exitDialog='';
+  const esc=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  layer.innerHTML=`<div class="modal" role="alertdialog" aria-modal="true"><h2>${esc(title)}</h2><p>${esc(message)}</p><div class="actions exit-actions"><button class="btn btn-primary btn-block" data-ask-stay>Cancelar</button><button class="btn btn-secondary btn-block" data-ask-ok>${esc(confirmLabel)}</button></div></div>`;
+  layer.querySelector('[data-ask-stay]').addEventListener('click',()=>layer.remove());
+  layer.querySelector('[data-ask-ok]').addEventListener('click',()=>{layer.remove();proceed();});
+  app.append(layer);layer.querySelector('[data-ask-stay]').focus();
+}
 function conflictScreen() {
   failedConflict = true;
   // No se fusionan totales ni se pisa el otro dispositivo: el usuario elige expresamente.
   ready = false; app.inert = false;
   shell('<h2>Tu progreso cambió en otro dispositivo</h2><p>Hay dos versiones. Puedes descargar una copia de la de este móvil antes de cargar la guardada en tu cuenta. Para evitar duplicados, juega desde un dispositivo cada vez.</p><button class="btn btn-secondary" id="account-copy">Descargar copia de este móvil</button><button class="btn btn-primary" id="account-cloud">Usar el progreso de mi cuenta</button>');
   button('account-copy',downloadProgress);
-  button('account-cloud',async () => {
-    if (!confirm('¿Sustituir los cambios pendientes de este móvil por el progreso de tu cuenta?')) return;
-    const snap=await getDocFromServer(refs(identity.uid).progress);restoreRemote(snap.exists()?snap.data():null);location.reload();
+  button('account-cloud',() => {
+    askConfirm('Se sustituirán los cambios pendientes de este móvil por el progreso de tu cuenta.','¿Cargar el progreso de tu cuenta?','Cargar el de mi cuenta',async () => {
+      const snap=await getDocFromServer(refs(identity.uid).progress);restoreRemote(snap.exists()?snap.data():null);location.reload();
+    });
   });
 }
 async function flush() {

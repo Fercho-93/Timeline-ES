@@ -308,6 +308,7 @@ ok("el anfitrión ya no la ve desconectada", !/Ana · desconectado/.test(html(an
 console.log("\nSi la invitada sale de la partida");
 click(invitada, '[data-local-action="room-menu"]');
 click(invitada, '[data-local-action="leave"]');
+click(invitada, '[data-ask-action="0"]'); // la pregunta es un diálogo del juego, no el confirm() del navegador
 await until(() => pantalla(anfitrion) === "local-final");
 ok("la invitada vuelve a la entrada del modo", pantalla(invitada) === "local-entrada");
 ok("la partida del anfitrión termina en vez de esperar un turno que no llegará", pantalla(anfitrion) === "local-final" && /Fer/.test(html(anfitrion)));
@@ -321,6 +322,7 @@ await entrarWifi(g2);
 await conecta(h2, g2);
 await until(() => pantalla(g2) === "local-lobby");
 click(h2, '[data-local-action="leave"]');
+click(h2, '[data-ask-action="0"]');
 await until(() => pantalla(g2) === "local-entrada");
 ok("la invitada no se queda congelada: vuelve a la entrada con un aviso", pantalla(g2) === "local-entrada" && /conexión|cerrado/.test(g2.document.getElementById("toast")?.textContent || ""));
 

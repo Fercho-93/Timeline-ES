@@ -35,7 +35,7 @@ let sessionAchievements = [];
 let fallbackTimerVersion = null;
 let fallbackTimerStartedAt = 0;
 let turnTimerHandle = null;
-// Cada turno tiene 20 segundos para colocar la carta; si se agotan, pasa al siguiente
+// Cada turno tiene 30 segundos por defecto (ajustable en la sala) para colocar la carta; si se agotan, pasa al siguiente
 // jugador. `turnStartedAt` es la marca del servidor, así que la cuenta atrás se ve igual
 // en todos los móviles aunque sus relojes no coincidan.
 const TURN_SECONDS = 20; // Valor de las salas antiguas; las nuevas guardan su ajuste.
@@ -828,8 +828,17 @@ function seatSilent(uid) {
   return record.visible === false || now - record.seenAt > 90000;
 }
 
+// Los ajustes del anfitrión viven aquí y no en el formulario: la sala de espera se repinta con
+// cada persona que entra o sale y con cada respuesta del minijuego, y sin esto volverían a los
+// valores de serie. Se reinician al cambiar de sala.
+const LOBBY_DEFAULTS = { preset: "simple", turnSeconds: "30", handSize: "4", pulse: false, ghost: false };
+const lobbySettings = { room: "", ...LOBBY_DEFAULTS };
+const lobbyOption = (value, label, current) => `<option value="${value}"${String(current) === String(value) ? " selected" : ""}>${label}</option>`;
+function presetFor(pulse, ghost) { return pulse && ghost ? "advanced" : !pulse && !ghost ? "simple" : "custom"; }
+
 function renderLobby() {
   clearTurnTimer();
+  if (lobbySettings.room !== roomCode) Object.assign(lobbySettings, LOBBY_DEFAULTS, { room: roomCode });
   if (roomState.matchmaking === "public") return renderPublicLobby();
   // Cada respuesta ajena repinta la sala de espera: lo que se estaba escribiendo en el
   // minijuego no se pierde por eso.
@@ -843,12 +852,12 @@ function renderLobby() {
     if(!player) return `<div class="table-seat empty" data-seat="${index+1}" aria-label="Plaza ${index+1} libre"><span>+</span><small>Libre</small></div>`;
     return `<div class="table-seat occupied${uid===user.uid?' is-you':''}" data-seat="${index+1}"><span class="seat-avatar">${CT.Avatares.markup(player.name,{size:44,seed:'uid:'+uid,id:uid===user.uid?CT.Avatares.ownId():player.avatarId})}</span><strong>${escapeHtml(player.name)}${uid===user.uid?' · tú':''}</strong><small>${isPublic ? `Plaza ${index+1}${uid!==user.uid && seatSilent(uid) ? ' · sin señal' : ''}` : uid===roomState.hostUid?'Anfitrión':`Plaza ${index+1}`}</small><i class="ready-seal">Listo</i>${isHost&&!isPublic&&uid!==roomState.hostUid?`<button class="kick-btn" data-online-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>`:''}</div>`;
   }).join('');
-  paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button>${isHost ? '<button class="icon-btn" data-online-action="leave">Salir</button>' : '<button class="icon-btn" data-online-action="leave-room">Salir</button>'}`)}
+  paint(`<div class="shell online-shell">${header(`<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="lobby-exit">Salir</button>`)}
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>${isPublic ? 'Partida rápida' : 'Código de sala'}</small><strong>${isPublic ? people.length + '/' + capacity : roomCode}</strong>${isPublic ? '' : '<div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div>'}</div></section>
     <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${people.length}/${capacity}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
       <section class="panel lobby-settings">${isPublic
         ? `<div class="section-label">Partida rápida</div><input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="30">${people.length === capacity ? publicStarterMarkup() : `<div class="waiting-orbit"><span></span></div><h3>Buscando jugadores</h3><p>Esperando a ${capacity - people.length} ${capacity - people.length === 1 ? 'jugador' : 'jugadores'} más…</p><p class="hint">Cuando la mesa esté completa, un minijuego decidirá el orden de juego.</p><button class="btn btn-ghost btn-block" data-online-action="${isHost ? "leave" : "leave-room"}">Dejar de buscar</button>`}`
-        : (isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset"><option value="simple">Primera partida · sin poderes</option><option value="advanced">Avanzada · Pulso y Fantasma</option></select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds"><option value="0">Sin límite</option><option value="20">20 segundos</option><option value="30" selected>30 segundos</option><option value="45">45 segundos</option></select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir. Requiere reglas v39.</small></span><input type="checkbox" id="online-ghost"></label>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}<button class="btn btn-ghost btn-block" data-online-action="close-room">Cerrar sala</button>` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`)}</section>
+        : (isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset">${lobbyOption("simple", "Primera partida · sin poderes", lobbySettings.preset)}${lobbyOption("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}${lobbySettings.preset === "custom" ? lobbyOption("custom", "Personalizada", lobbySettings.preset) : ""}</select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds">${lobbyOption(0, "Sin límite", lobbySettings.turnSeconds)}${lobbyOption(20, "20 segundos", lobbySettings.turnSeconds)}${lobbyOption(30, "30 segundos", lobbySettings.turnSeconds)}${lobbyOption(45, "45 segundos", lobbySettings.turnSeconds)}</select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size">${[1, 2, 3, 4, 5, 6].map(n => lobbyOption(n, n, lobbySettings.handSize)).join("")}</select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"${lobbySettings.pulse ? " checked" : ""}></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="online-ghost"${lobbySettings.ghost ? " checked" : ""}></label>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`)}</section>
     </div>
   </div>`, "online-lobby");
   if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
@@ -1813,10 +1822,30 @@ function showQr() {
   abreCapa(document.querySelector("[data-qr-overlay]"), true);
 }
 
-async function closeRoom() {
+async function deleteRoom() {
   if (!roomRef || roomState?.hostUid !== user.uid) return;
-  if (!confirm("¿Cerrar la sala para todos los participantes?")) return;
   await deleteDoc(roomRef);
+}
+function closeRoom() {
+  if (!roomRef || roomState?.hostUid !== user.uid) return;
+  CT.UI.confirmDialog("Se cerrará la sala para todos los participantes.", () => { void deleteRoom(); }, { title: "¿Cerrar la sala?", confirmLabel: "Cerrar sala", cancelLabel: "Seguir en la sala" });
+}
+// Salir de la sala: quien no organiza deja su plaza (sus cartas vuelven al mazo si se estaba
+// jugando); en una mesa pública, además, es dejar de buscar.
+function requestLeaveRoom() {
+  if (roomState?.matchmaking === "public" && roomState.status === "lobby") { void leavePublicLobby(); return; }
+  const message = roomState?.status === "playing" ? "Tus cartas volverán al mazo." : roomState?.matchmaking === "public" ? "Tu plaza quedará libre para otra persona." : "Podrás volver a entrar con el código de la sala.";
+  const title = roomState?.matchmaking === "public" && roomState.status !== "playing" ? "¿Dejar de buscar partida?" : "¿Salir de la sala?";
+  CT.UI.confirmDialog(message, () => removePlayer(user.uid), { title, confirmLabel: roomState?.matchmaking === "public" && roomState.status !== "playing" ? "Dejar de buscar" : "Salir de la sala", cancelLabel: "Quedarme" });
+}
+// La sala de espera tiene una sola salida para todos. Quien organiza elige entre cerrarla para
+// todos o dejarla abierta (se puede volver a entrar con el código); el resto, dejar su plaza.
+function requestLobbyExit() {
+  if (roomState?.hostUid !== user.uid) { requestLeaveRoom(); return; }
+  CT.UI.askDialog({
+    title: "¿Salir de la sala?", message: "Puedes cerrarla para todos o dejarla abierta y volver a entrar con su código.", stay: "Quedarme en la sala",
+    actions: [{ label: "Salir sin cerrarla", proceed: () => navigateOnline("back") }, { label: "Cerrar sala para todos", kind: "ghost", proceed: () => { void deleteRoom(); } }]
+  });
 }
 
 // Desconecta la vista sin eliminar al participante ni recargar la aplicación.
@@ -1896,10 +1925,27 @@ document.addEventListener("submit", event => {
 });
 
 document.addEventListener("change", event => {
-  if (event.target.id !== "online-preset") return;
-  const advanced = event.target.value === "advanced";
-  document.getElementById("online-pulse").checked = advanced;
-  document.getElementById("online-ghost").checked = advanced;
+  const id = event.target.id;
+  if (!["online-preset", "online-turn-seconds", "online-hand-size", "online-pulse", "online-ghost"].includes(id)) return;
+  const pulseBox = document.getElementById("online-pulse"), ghostBox = document.getElementById("online-ghost");
+  if (id === "online-preset") {
+    if (event.target.value === "custom") return;
+    const advanced = event.target.value === "advanced";
+    lobbySettings.pulse = lobbySettings.ghost = advanced;
+    if (pulseBox) pulseBox.checked = advanced;
+    if (ghostBox) ghostBox.checked = advanced;
+  } else if (id === "online-turn-seconds") lobbySettings.turnSeconds = event.target.value;
+  else if (id === "online-hand-size") lobbySettings.handSize = event.target.value;
+  else {
+    if (id === "online-pulse") lobbySettings.pulse = event.target.checked; else lobbySettings.ghost = event.target.checked;
+  }
+  // El desplegable siempre dice lo que hacen las casillas: si solo hay un poder, es «Personalizada».
+  lobbySettings.preset = presetFor(lobbySettings.pulse, lobbySettings.ghost);
+  const preset = document.getElementById("online-preset");
+  if (preset) {
+    if (lobbySettings.preset === "custom" && !preset.querySelector('option[value="custom"]')) preset.insertAdjacentHTML("beforeend", '<option value="custom">Personalizada</option>');
+    preset.value = lobbySettings.preset;
+  }
 });
 document.addEventListener("input", event => {
   if (event.target.matches(".room-code-input")) event.target.value = cleanCode(event.target.value);
@@ -1953,13 +1999,10 @@ document.addEventListener("click", event => {
   else if (action === "close-room-menu") CT.closeDialog();
   else if (action === "skip") { CT.closeDialog(); skipTurn(); }
   else if (action === "kick") {
-    const name = roomState?.players[target.dataset.uid]?.name || "esta persona";
-    if (confirm(`¿Expulsar a ${name} de la sala?`)) { CT.closeDialog(); removePlayer(target.dataset.uid); }
+    const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona";
+    CT.UI.confirmDialog("Saldrá de la sala y sus cartas volverán al mazo.", () => { CT.closeDialog(); removePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" });
   } else if (action === "leave-public") void leavePublicLobby();
   else if (action === "public-again") { detachOnline(); CT.launchPublicMatch?.(); }
-  else if (action === "leave-room") {
-    if (roomState?.matchmaking === "public" && roomState.status === "lobby") { void leavePublicLobby(); return; }
-    const question = roomState?.status === "playing" ? "¿Salir de la sala? Tus cartas volverán al mazo." : roomState?.matchmaking === "public" ? "¿Dejar de buscar partida? Tu plaza quedará libre para otra persona." : "¿Salir de la sala?";
-    if (confirm(question)) removePlayer(user.uid);
-  }
+  else if (action === "leave-room") requestLeaveRoom();
+  else if (action === "lobby-exit") requestLobbyExit();
 });

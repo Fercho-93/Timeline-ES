@@ -4035,10 +4035,13 @@
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
   CT.Links.start(target => {
-    if (CT.isSessionActive() && !confirm('¿Abrir la invitación? Tu partida local quedará guardada.')) return;
-    if (target.room) launchOnline(target.room);
-    else if (target.turnDuel) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.turnDuel, mode: selectedModeKey, back: home }));
-    else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo, value.mode); }
+    const abrir = () => {
+      if (target.room) launchOnline(target.room);
+      else if (target.turnDuel) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.turnDuel, mode: selectedModeKey, back: home }));
+      else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo, value.mode); }
+    };
+    if (CT.isSessionActive()) CT.UI.confirmDialog('Tu partida local quedará guardada.', abrir, { title: '¿Abrir la invitación?', confirmLabel: 'Abrir la invitación', cancelLabel: 'Ahora no' });
+    else abrir();
   });
   const params = new URLSearchParams(location.hash.slice(1) || location.search);
   const invitedRoom = params.get("room") || "";

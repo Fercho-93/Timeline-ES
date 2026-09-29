@@ -554,7 +554,7 @@
 
   // Los ajustes del anfitrión se guardan aquí y no en el propio formulario: la sala de
   // espera se repinta con cada respuesta del minijuego y, si no, volverían a los de serie.
-  const lobbySettings = { preset: "simple", handSize: "4", turnSeconds: "20", pulse: false, ghost: false };
+  const lobbySettings = { preset: "simple", handSize: "4", turnSeconds: "30", pulse: false, ghost: false };
 
   // El minijuego de quién empieza, el mismo que en la sala online y en un solo móvil:
   // el anfitrión reparte una carta, cada persona escribe su cifra en su móvil, empieza
@@ -605,13 +605,12 @@
     const opcion = (value, label, current) => `<option value="${value}"${String(current) === String(value) ? " selected" : ""}>${label}</option>`;
     const settings = isHost
       ? `<div class="section-label">Ajustes</div>
-        <div class="field"><label for="wifi-preset">Tipo de partida</label><select id="wifi-preset">${opcion("simple", "Primera partida · sin poderes", lobbySettings.preset)}${opcion("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}</select></div>
+        <div class="field"><label for="wifi-preset">Tipo de partida</label><select id="wifi-preset">${opcion("simple", "Primera partida · sin poderes", lobbySettings.preset)}${opcion("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}${lobbySettings.preset === "custom" ? opcion("custom", "Personalizada", lobbySettings.preset) : ""}</select></div>
         <div class="field"><label for="wifi-turn-seconds">Tiempo por turno</label><select id="wifi-turn-seconds">${opcion(0, "Sin límite", lobbySettings.turnSeconds)}${opcion(20, "20 segundos", lobbySettings.turnSeconds)}${opcion(30, "30 segundos", lobbySettings.turnSeconds)}${opcion(45, "45 segundos", lobbySettings.turnSeconds)}</select></div>
         <div class="field"><label for="wifi-hand-size">Cartas iniciales</label><select id="wifi-hand-size">${[1, 2, 3, 4, 5, 6].map(n => opcion(n, n, lobbySettings.handSize)).join("")}</select></div>
         <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="wifi-pulse"${lobbySettings.pulse ? " checked" : ""}></label>
         <label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="wifi-ghost"${lobbySettings.ghost ? " checked" : ""}></label>
-        ${roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}
-        <button class="btn btn-ghost btn-block" data-local-action="close-room">Cerrar sala</button>`
+        ${roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}`
       : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
     paint(`<div class="shell online-shell">${header("leave")}
       <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
@@ -661,8 +660,7 @@
 
   function doCloseRoom() {
     if (role !== "host") return;
-    if (!confirm("¿Cerrar la sala para todos los participantes?")) return;
-    leaveToEntrada();
+    CT.UI.confirmDialog("Se cerrará la sala para todos los participantes.", () => leaveToEntrada(), { title: "¿Cerrar la sala?", confirmLabel: "Cerrar sala", cancelLabel: "Seguir en la sala" });
   }
 
   // Salir de la sala: quien organiza la cierra para todos (se pide confirmación si ya hay
@@ -670,11 +668,13 @@
   // descarte y la partida no se quede esperando su turno.
   function requestLeave() {
     if (role === "host") {
-      if (roomState && roomState.playerOrder.length > 1 && roomState.status !== "ended" && !confirm("Si sales, la sala se cierra para todos. ¿Cerrarla?")) return;
+      if (roomState && roomState.playerOrder.length > 1 && roomState.status !== "ended") {
+        CT.UI.confirmDialog("Si sales, la sala se cierra para todos los participantes.", () => leaveToEntrada(), { title: "¿Salir y cerrar la sala?", confirmLabel: "Cerrar sala", cancelLabel: "Quedarme en la sala" });
+        return;
+      }
       leaveToEntrada();
     } else if (role === "guest" && roomState && roomState.status === "playing") {
-      if (!confirm("¿Salir de la partida? Tus cartas volverán al mazo.")) return;
-      leaveToEntrada();
+      CT.UI.confirmDialog("Tus cartas volverán al mazo.", () => leaveToEntrada(), { title: "¿Salir de la partida?", confirmLabel: "Salir de la partida", cancelLabel: "Quedarme" });
     } else leaveToEntrada();
   }
 
@@ -1032,16 +1032,23 @@
   document.addEventListener("change", event => {
     const id = event.target.id;
     if (!["wifi-preset", "wifi-turn-seconds", "wifi-hand-size", "wifi-pulse", "wifi-ghost"].includes(id)) return;
+    const pulseBox = document.getElementById("wifi-pulse"), ghostBox = document.getElementById("wifi-ghost");
     if (id === "wifi-preset") {
-      lobbySettings.preset = event.target.value;
+      if (event.target.value === "custom") return;
       lobbySettings.pulse = lobbySettings.ghost = event.target.value === "advanced";
-      const pulse = document.getElementById("wifi-pulse"), ghost = document.getElementById("wifi-ghost");
-      if (pulse) pulse.checked = lobbySettings.pulse;
-      if (ghost) ghost.checked = lobbySettings.ghost;
+      if (pulseBox) pulseBox.checked = lobbySettings.pulse;
+      if (ghostBox) ghostBox.checked = lobbySettings.ghost;
     } else if (id === "wifi-turn-seconds") lobbySettings.turnSeconds = event.target.value;
     else if (id === "wifi-hand-size") lobbySettings.handSize = event.target.value;
     else if (id === "wifi-pulse") lobbySettings.pulse = event.target.checked;
     else if (id === "wifi-ghost") lobbySettings.ghost = event.target.checked;
+    // El desplegable siempre dice lo que hacen las casillas: con un solo poder es «Personalizada».
+    lobbySettings.preset = lobbySettings.pulse && lobbySettings.ghost ? "advanced" : !lobbySettings.pulse && !lobbySettings.ghost ? "simple" : "custom";
+    const preset = document.getElementById("wifi-preset");
+    if (preset) {
+      if (lobbySettings.preset === "custom" && !preset.querySelector('option[value="custom"]')) preset.insertAdjacentHTML("beforeend", '<option value="custom">Personalizada</option>');
+      preset.value = lobbySettings.preset;
+    }
   });
 
   document.addEventListener("keydown", event => {
@@ -1104,7 +1111,7 @@
     else if (action === "qr-scan-back") { const onBack = qrScanOnBack; qrScanOnBack = null; (onBack || renderEntrada)(); }
     else if (action === "start") doStart();
     else if (action === "close-room") doCloseRoom();
-    else if (action === "kick") { const name = roomState?.players[target.dataset.uid]?.name || "esta persona"; if (confirm(`¿Expulsar a ${name} de la sala?`)) { CT.closeDialog?.(); doRemovePlayer(target.dataset.uid); } }
+    else if (action === "kick") { const uid = target.dataset.uid, name = roomState?.players[uid]?.name || "esta persona"; CT.UI.confirmDialog("Saldrá de la sala y sus cartas volverán al mazo.", () => { CT.closeDialog?.(); doRemovePlayer(uid); }, { title: `¿Expulsar a ${name}?`, confirmLabel: "Expulsar", cancelLabel: "Cancelar" }); }
     else if (action === "select") doSelect(target.dataset.id);
     else if (action === "place" || action === "pulse-place") doPlace(Number(target.dataset.index));
     else if (action === "confirm-place") doConfirmPlace();
