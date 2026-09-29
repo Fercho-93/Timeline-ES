@@ -4968,3 +4968,46 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
 #app [data-exit-dialog] .exit-actions .btn-primary { background: #8a3f2f; border-color: #7a3a2c; color: #fff6e8; }
 #app [data-exit-dialog] .exit-actions .btn-secondary { background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96)); border: 1px solid #b9a98e; color: #5b4936; box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12); }
 #app [data-exit-dialog] .exit-actions .exit-discard { background: transparent; border-color: transparent; box-shadow: none; color: #8a3f2f; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ===== Recuadros de selección y configuración: pergamino en vez de blanco =====
+   Los paneles donde se eligen jugadores, opciones, salas y ajustes toman la estética de
+   «Jugar en solitario»: papel cálido con filete de latón y campos de papel claro. */
+:root:not([data-theme="dark"]) #app :is(.panel, .settings-layout .settings-section):not(.pass-card, .quick-ready-card, .final-composition, .solo-panel, .atlas-identidad, .comp-splash) {
+  border: 1px solid #d8bf9c;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 45% at 15% 0%, #fffaf2a6, transparent 60%),
+    linear-gradient(165deg, #faf1e4, #f1ddc7 65%, #ead0b2);
+  box-shadow: inset 0 1px 0 #ffffffb3, inset 0 -1px 0 #b8653d26, 0 10px 26px #7a3f1d1f, 0 2px 5px #7a3f1d12;
+  color: #2a1a10;
+}
+:root:not([data-theme="dark"]) #app :is(.panel, .settings-layout .settings-section):not(.pass-card, .quick-ready-card, .final-composition, .solo-panel, .atlas-identidad, .comp-splash) :is(h1, h2, h3) { color: #2a1a10; }
+:root:not([data-theme="dark"]) #app :is(.panel, .settings-layout .settings-section) :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+  border: 1px solid #cdb48d;
+  border-radius: 10px;
+  background: #fffaf1;
+  color: #2a1a10;
+  box-shadow: inset 0 1px 2px #7a3f1d14;
+}
+:root:not([data-theme="dark"]) #app :is(.panel, .settings-layout .settings-section) :is(input, select, textarea):focus-visible { outline: 2px solid #b8653d; outline-offset: 2px; }
+:root:not([data-theme="dark"]) #app :is(.panel, .settings-layout .settings-section) .btn-secondary {
+  border: 1px solid #b9a98e;
+  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
+  color: #5b4936;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
+}
+:root:not([data-theme="dark"]) #app :is(.panel, .settings-layout .settings-section) .btn-ghost { background: transparent; border-color: #cdb48d; color: #5b4936; }
+:root:not([data-theme="dark"]) #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) {
+  border: 1px solid #d8bf9c;
+  border-radius: 16px;
+  background: radial-gradient(120% 45% at 15% 0%, #fffaf2a6, transparent 60%), linear-gradient(165deg, #faf1e4, #f1ddc7 65%, #ead0b2);
+  box-shadow: inset 0 1px 0 #ffffffb3, 0 18px 40px rgba(43,28,16,.34);
+  color: #2a1a10;
+}
+:root:not([data-theme="dark"]) #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) :is(h2, h3) { color: #2a1a10; }
+:root:not([data-theme="dark"]) #app .overlay .modal:not(.board-result, .quick-result, .enc-modal, .settings-modal, .rules) .btn-secondary {
+  border: 1px solid #b9a98e;
+  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
+  color: #5b4936;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
+}
