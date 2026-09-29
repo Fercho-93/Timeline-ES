@@ -216,7 +216,6 @@
     if(action==='free'){freeSetup();return true;}
     if(action==='duel'||action==='turn-duel'){networkSetup('internet',2);return true;}
     if(action==='accept-duel'){acceptDuel(app().querySelector('#quick-duel-link').value);return true;}
-    if(action==='qr-duel'){showQrOrExplain({eyebrow:'Duelo de Retos rápidos',title:'Escanea para aceptar el duelo',text:duelLink(),hint:'Abre la cámara del móvil de tu rival y apunta al código.'});return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(['internet','offline','turn-duel'].includes(action)){networkSetup(action==='offline'?'local':'internet',action==='turn-duel'?2:4);return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
@@ -321,7 +320,7 @@
         <ul>${state.players.map(player => `<li>${esc(player.name)}: ${player.roundScore} puntos en este reto.</li>`).join('')}</ul>
         ${final ? button('formats', 'Elegir otra partida') : button('next', 'Siguiente reto')}
         ${final && record.config.kind==='duel' ? button('rematch', 'Crear una revancha', 'btn btn-secondary btn-block') : ''}
-        ${final && record.config.kind==='duel' ? button('share-duel','Compartir duelo','btn btn-secondary btn-block')+button('qr-duel','Mostrar QR del duelo','btn btn-secondary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div>` : ''}
+        ${final && record.config.kind==='duel' ? button('share-duel','Compartir duelo','btn btn-secondary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div>` : ''}
         ${final && Number.isFinite(record.config.rivalScore) ? `<p>Tu rival: ${record.config.rivalScore} puntos. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Tu rival ha asegurado más puntos.'}</p>` : ''}
         <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button></section>
         <details class="panel quick-panel"><summary>Ver el orden completo y las fuentes</summary><ol>${[...c.cards].sort((a, b) => (a.value - b.value) * c.direction).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} <a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Fuente</a></p></li>`).join('')}</ol></details>`);
@@ -381,7 +380,7 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    const formatActions=['formats','leave-public','show-multi','local','free','duel','accept-duel','share-duel','qr-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect'];
+    const formatActions=['formats','leave-public','show-multi','local','free','duel','accept-duel','share-duel','internet','offline','turn-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
