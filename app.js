@@ -374,6 +374,8 @@
     paint(`<div class="shell home-shell mode-hub-shell competition-hub">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">Grandes colecciones al azar</div><h1 data-focus tabindex="-1">Competición</h1></div><img src="assets/competition-engraving.webp" alt="" aria-hidden="true" decoding="async"></header>
       <section class="mode-hub-list">
+        <p class="competition-note">La competición reparte mazos de las grandes colecciones. ¿Prefieres los mazos de Retos rápidos?</p>
+        <button class="btn btn-secondary btn-block" data-action="friends-hub">Retos rápidos con amigos <span aria-hidden="true">→</span></button>
         <div class="panel setup-grid competition-settings">
           <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
           <div class="field"><label for="competition-cards">Cartas por ronda</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
@@ -383,8 +385,6 @@
         ${door('start-competition', 'mode-walk-solo.webp', 'Jugar solo', 'Suma tus aciertos ronda a ronda, sin repetir temática.')}
         ${door('competition-local', 'mode-walk-duel.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.')}
         ${door('competition-online', 'mode-walk-multi.webp', 'Varios móviles', 'La misma sala durante todas las rondas.')}
-        <p class="competition-note">La competición reparte mazos de las grandes colecciones. ¿Prefieres los mazos de Retos rápidos?</p>
-        <button class="btn btn-secondary btn-block" data-action="friends-hub">Retos rápidos con amigos <span aria-hidden="true">→</span></button>
       </section></div>`);
   }
 
