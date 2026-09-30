@@ -5163,3 +5163,5 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   box-shadow: inset 0 1px 0 #ffffff14, 0 18px 44px #0008, 0 0 0 5px #0002;
 }
 :root[data-theme="dark"] #app .pass-screen .pass-card:not(.comp-splash, .final-composition)::before { border-color: #d4bb8b40; }
+
+.table-seat.is-unused { visibility: hidden; }

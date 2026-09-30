@@ -242,17 +242,32 @@
       ${button('leave-public','Dejar de buscar','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></section>`);
     publicClock=setInterval(()=>{const el=document.getElementById('quick-public-clock');if(!el||page!=='network-lobby'){if(!el)clearInterval(publicClock);return;}const s=left();el.textContent=clock(s);el.classList.toggle('is-low',s<=5);},500);
   }
+  // Sala privada: la misma mesa de exploradores que en Grandes colecciones, con las plazas
+  // repartidas alrededor según cuántos caben.
+  const SEAT_SLOTS={2:[7,2],3:[0,3,6],4:[0,2,5,7],5:[0,2,3,6,7],6:[1,2,3,6,7,8],7:[0,1,2,3,6,7,8],8:[1,2,3,4,5,6,7,8]};
   function lobby(code) {
     if(room.matchmaking==='public'){state=null;publicLobby();return;}
     clearInterval(publicClock);publicClock=null;
-    state=null;const host=myId===room.host, isPublic=room.matchmaking==='public';
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Sala de Retos rápidos</h2><div class="panel"><p>${code?`Código: <strong>${esc(code)}</strong>`:'Sala en la red Wi-Fi local'}</p><ul>${room.names.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><p>${room.capacity===2 ? "Dos participantes." : `De 2 a ${room.capacity} participantes.`} ${host?'Empieza cuando estéis todos.':'Quien creó la sala elige cuándo empezar.'}</p><p class="hint">El primer turno rotará en cada reto. La sala se puede recuperar después desde Retos rápidos.</p>
-    ${host && !isPublic ? button('start-room','Sortear y empezar','btn btn-primary btn-block') : ''}
-    ${connection?.kind==='local'&&host ? button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}
-    ${code?button('share-room','Compartir enlace de sala','btn btn-secondary btn-block'):''}
-    ${code?button('qr-room','Mostrar QR de la sala','btn btn-secondary btn-block'):''}
-    <p id="quick-error" role="alert"></p></div></section>`);
-    const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=room.members.length<2;
+    state=null;const host=myId===room.host, cap=room.capacity, count=room.members.length;
+    const slots=SEAT_SLOTS[cap]||SEAT_SLOTS[8], table=Array(9).fill('<div class="table-seat is-unused" aria-hidden="true"></div>');
+    slots.forEach((slot,i)=>{
+      const name=room.names[i], mine=room.members[i]===myId;
+      table[slot]=name
+        ? `<div class="table-seat occupied${mine?' is-you':''}"><span class="seat-avatar">${CT.Avatares.markup(name,mine?{size:44,seed:CT.Avatares.ownSeed(),id:CT.Avatares.ownId()}:{size:44,seed:'room:'+room.members[i]})}</span><strong>${esc(name)}${mine?' · tú':''}</strong><small>${room.members[i]===room.host?'Anfitrión':`Plaza ${i+1}`}</small><i class="ready-seal">Listo</i></div>`
+        : `<div class="table-seat empty" aria-label="Plaza ${i+1} libre"><span>+</span><small>Libre</small></div>`;
+    });
+    const length=roomLength||3;
+    const side=host
+      ? `<div class="section-label">Partida</div><p>${length} ${length===1?'reto':'retos'} con las mismas cartas para toda la mesa. El primer turno rota en cada reto.</p>
+        ${count<2?'<div class="waiting-orbit"><span></span></div><p class="hint">Esperando a alguien más…</p>':''}
+        ${button('start-room','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}
+        ${connection?.kind==='local'?button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}`
+      : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`;
+    shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera · Retos rápidos</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div>
+      <div class="room-code-card"><small>${code?'Código de sala':'Red Wi-Fi local'}</small><strong>${code?esc(code):count+'/'+cap}</strong>${code?`<div class="room-invite-actions"><button data-quick="share-room">Compartir enlace</button><button data-quick="qr-room">Mostrar QR</button></div>`:''}</div></section>
+      <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${count}/${cap}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${count}</strong><small>${count===1?'explorador':'exploradores'}</small></div>${table.join('')}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
+        <section class="panel lobby-settings">${side}<p id="quick-error" role="alert"></p></section></div>`);
+    const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=count<2;
   }
   async function connectRoom(create) {
     const nameInput=app().querySelector(create?'#quick-net-name':'#quick-net-name-join') || app().querySelector('#quick-net-name'), name=nameInput.value.trim();if(!name)throw Error('Escribe tu nombre.');
@@ -647,7 +662,11 @@
       const params = new URLSearchParams(location.hash.slice(1));
       try {
         if (params.has('quick-duel')) acceptDuel();
-        else if (params.has('quick-room')) { networkSetup('internet'); app().querySelector('#quick-net-code').value = params.get('quick-room'); }
+        else if (params.has('quick-room')) {
+          networkSetup('internet'); app().querySelector('#quick-net-code').value = params.get('quick-room');
+          // Con el nombre ya conocido se entra directamente a la mesa, como en Grandes colecciones.
+          if (app().querySelector('#quick-net-name-join')?.value.trim()) formatAction('join-room').catch(errorNotice);
+        }
         else CT.ModeHubs.open('hub-solo');
       } catch (e) {
         CT.ModeHubs.open('hub-solo');
