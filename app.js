@@ -377,6 +377,13 @@
     const showLocal = ['all', 'friends', 'local'].includes(audience);
     const showOnline = ['all', 'friends', 'online'].includes(audience);
     const withFriends = audience !== 'solo' && audience !== 'all';
+    // Formas de jugar que se ofrecen. Si solo hay una (lo normal: ya se eligió en el menú de origen), no se repite
+    // como puerta con el mismo nombre: queda un botón directo para empezar.
+    const salidas = [
+      showSolo && ['start-competition', 'mode-walk-solo.webp', 'Jugar solo', 'Suma tus aciertos ronda a ronda, sin repetir temática.'],
+      showLocal && ['competition-local', 'menu-local.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.'],
+      showOnline && ['competition-online', 'menu-private.webp', 'Sala privada online', 'La misma sala durante todas las rondas.']
+    ].filter(Boolean);
     const door = (action, art, title, text) => `<button class="mode-entry" data-action="${action}"><span class="mode-entry-art" aria-hidden="true"><img src="assets/${art}" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>${title}</b><small>${text}</small><span class="mode-entry-cta" aria-hidden="true">Empezar <span>→</span></span></span></button>`;
     paint(`<div class="shell home-shell mode-hub-shell competition-hub">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">Grandes colecciones al azar</div><h1 data-focus tabindex="-1">Competición</h1></div><img src="assets/competition-engraving.webp" alt="" aria-hidden="true" decoding="async"></header>
@@ -387,9 +394,9 @@
         </div>
         ${showSolo && loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
         ${showLocal && CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}
-        ${showSolo ? door('start-competition', 'mode-walk-solo.webp', 'Jugar solo', 'Suma tus aciertos ronda a ronda, sin repetir temática.') : ''}
-        ${showLocal ? door('competition-local', 'menu-local.webp', 'Un solo móvil', 'Pasad el teléfono en cada turno.') : ''}
-        ${showOnline ? door('competition-online', 'menu-private.webp', 'Sala privada online', 'La misma sala durante todas las rondas.') : ''}
+        ${salidas.length === 1
+          ? `<p class="hint" style="text-align:center;margin:2px 0 0">${salidas[0][3]}</p><button class="btn btn-primary btn-block" data-action="${salidas[0][0]}">Empezar competición <span aria-hidden="true">→</span></button>`
+          : salidas.map(salida => door(...salida)).join('')}
       </section></div>`);
   }
 
