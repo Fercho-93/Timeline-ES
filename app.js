@@ -393,6 +393,7 @@
         <div class="panel setup-grid competition-settings">
           <div class="field"><label for="competition-length">Temas a jugar</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
           <div class="field"><label for="competition-cards">${audience === 'solo' ? 'Cartas por ronda' : withFriends ? 'Cartas iniciales por jugador' : 'Cartas por ronda o iniciales por jugador'}</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
+          ${showSolo ? CT.Ghost.difficultySelect("competition-difficulty", competitionDifficulty).replace('class="field difficulty-field"', 'class="field difficulty-field competition-difficulty"') : ""}
         </div>
         ${showSolo && loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
         ${showLocal && CT.Storage.getItem(MULTI_COMP_KEY) ? '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada</button>' : ''}
@@ -2355,6 +2356,10 @@
   }
 
   let selectedDifficulty = CT.Storage.getItem("continuum-difficulty-v1") || "easy";
+  // La competición en solitario tiene su propia dificultad, que se elige en su menú. Antes usaba la última
+  // de la partida libre sin decirlo, y quien una vez eligió Difícil se encontraba siempre la competición así.
+  let competitionDifficulty = CT.Storage.getItem("continuum-competition-difficulty-v1") || "easy";
+  if (!CT.Ghost.LEVELS[competitionDifficulty]) competitionDifficulty = "easy";
   // Las cartas que el tablero acaba de colocar y todavía no se han visto llegar.
   let recienColocadas = [];
   if (!CT.Ghost.LEVELS[selectedDifficulty]) selectedDifficulty = "easy";
@@ -3446,7 +3451,7 @@
     solo = null;
     previousModeKey = selectedModeKey;
     const temas = compModes();
-    comp = { decks: CT.Saves.clone(Object.fromEntries(temas.map(key => [key, CT.cards(key)]))), difficulty: selectedDifficulty, queue: shuffle(temas).slice(0, Number(document.getElementById("competition-length")?.value) || temas.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp = { decks: CT.Saves.clone(Object.fromEntries(temas.map(key => [key, CT.cards(key)]))), difficulty: CT.Ghost.LEVELS[document.getElementById("competition-difficulty")?.value] ? document.getElementById("competition-difficulty").value : competitionDifficulty, queue: shuffle(temas).slice(0, Number(document.getElementById("competition-length")?.value) || temas.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
     comp.totalThemes = comp.queue.length;
     comp.cardsPerRound = competitionOptions().cards;
     compRoundIntro();
@@ -3732,6 +3737,14 @@
       app.querySelectorAll(".segmented-option").forEach(opcion => {
         opcion.classList.toggle("is-on", opcion.querySelector("input").checked);
       });
+      return;
+    }
+    if (event.target.id === "competition-difficulty") {
+      const elegida = event.target.value;
+      if (!CT.Ghost.LEVELS[elegida]) return;
+      event.target.closest(".difficulty-field").querySelector("[data-difficulty-help]").textContent = CT.Ghost.level(elegida).description;
+      competitionDifficulty = elegida;
+      CT.Storage.setItem("continuum-competition-difficulty-v1", elegida);
       return;
     }
     if (event.target.id !== "solo-difficulty") return;

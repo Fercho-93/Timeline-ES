@@ -5118,3 +5118,6 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   object-fit: contain; object-position: center; transform: translate(-50%, -50%);
   opacity: 1; filter: drop-shadow(0 3px 3px #734f2938);
 }
+
+/* Dificultad de la competición: ocupa todo el ancho bajo los dos desplegables. */
+.competition-settings .competition-difficulty { grid-column: 1 / -1; }
