@@ -1853,6 +1853,9 @@ async function scanRoomQr() {
     await CT.LocalShare.scanQr({
       title: "Escanear el QR de la sala", hint: "Encuadra el código QR que enseña quien creó la sala.",
       onText: text => {
+        // El QR de una sala de Retos rápidos también se puede leer desde aquí: abre esa pantalla con el código puesto.
+        const quick = String(text).match(/quick-room=([^&#\s]+)/);
+        if (quick && CT.openQuickChallenges) { CT.closeDialog?.(); location.hash = "quick-room=" + quick[1]; CT.openQuickChallenges(); return; }
         const code = roomCodeFromText(text);
         if (code.length !== 8) { showToast("Ese código QR no es de una sala de Continuum."); return; }
         const codeInput = document.getElementById("online-code"), nameInput = document.getElementById("online-player-name");
