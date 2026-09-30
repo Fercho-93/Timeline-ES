@@ -305,7 +305,12 @@ service cloud.firestore {
     match /playerProgress/{uid} {
       function valid() {
         let d = request.resource.data;
-        return d.keys().hasOnly(['progress','records','hits','games','season','revision','updatedAt'])
+        return d.keys().hasOnly(['progress','records','hits','games','season','revision','updatedAt','day','dayHits','week','weekHits'])
+          // Aciertos del reto de hoy (0–10) y de esta semana (0–70), de donde salen las tablas del ranking.
+          && (!('day' in d) || (d.day is string && d.day.size() <= 10
+            && d.dayHits is int && d.dayHits >= 0 && d.dayHits <= 10
+            && d.week is string && d.week.size() <= 10
+            && d.weekHits is int && d.weekHits >= 0 && d.weekHits <= 70))
           && d.progress is string && d.progress.size() <= 350000
           && d.records is string && d.records.size() <= 350000
           && d.hits is int && d.hits >= 0 && d.hits <= 100000000
@@ -332,6 +337,33 @@ service cloud.firestore {
       allow get: if registered();
       allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
       allow create, update: if owner(uid) && valid();
+      allow delete: if owner(uid);
+    }
+    // Ranking del reto diario: una tabla por día y otra por semana (clave: la fecha del lunes). Cada fila
+    // es de su dueño y debe coincidir con el nombre y avatar del perfil y con los aciertos de su progreso.
+    function scoreRow(uid, maxHits) {
+      let d = request.resource.data;
+      let p = getAfter(/databases/$(database)/documents/playerProfiles/$(uid)).data;
+      return d.alias == p.alias && d.avatar == p.avatar
+        && d.hits is int && d.hits >= 0 && d.hits <= maxHits && d.updatedAt == request.time;
+    }
+    match /dailyScores/{day}/players/{uid} {
+      allow get: if registered();
+      allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
+      allow create, update: if owner(uid) && scoreRow(uid, 10)
+        && request.resource.data.keys().hasOnly(['alias','avatar','hits','finishedAt','updatedAt'])
+        && request.resource.data.finishedAt is string && request.resource.data.finishedAt.size() <= 40
+        && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.day == day
+        && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.dayHits == request.resource.data.hits;
+      allow delete: if owner(uid);
+    }
+    match /weeklyScores/{week}/players/{uid} {
+      allow get: if registered();
+      allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
+      allow create, update: if owner(uid) && scoreRow(uid, 70)
+        && request.resource.data.keys().hasOnly(['alias','avatar','hits','updatedAt'])
+        && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.week == week
+        && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.weekHits == request.resource.data.hits;
       allow delete: if owner(uid);
     }
     match /dailyRanking/{uid} {

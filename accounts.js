@@ -20,6 +20,27 @@ async function acquireTab(uid) {
   });
 }
 const refs = uid => ({profile:doc(db,'playerProfiles',uid), progress:doc(db,'playerProgress',uid), ranking:doc(db,'dailyRanking',uid)});
+// El ranking tiene dos tablas: la del reto de hoy y la de esta semana (de lunes a domingo). Cada día y cada
+// semana es una colección propia, así que el lunes todo el mundo empieza de cero sin borrar nada.
+const dayScore = (uid, key) => doc(db,'dailyScores',key,'players',uid);
+const weekScore = (uid, key) => doc(db,'weeklyScores',key,'players',uid);
+const DAILY_MAX = 10;
+const dateKey = date => date.toLocaleDateString('sv-SE');
+// Aciertos de hoy y de esta semana, leídos de los retos diarios guardados. Solo se suman aciertos:
+// un reto vale de 0 a 10 y la semana, como mucho, 70.
+function periods(records, now = new Date()) {
+  const today = dateKey(now), monday = new Date(now);
+  monday.setHours(12,0,0,0); monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+  const weekKey = dateKey(monday), days = records?.retoDiario?.days || {};
+  const hitsOf = entry => Math.max(0, Math.min(DAILY_MAX, Number.isSafeInteger(entry?.hits) ? entry.hits : 0));
+  const hoy = days[today], semana = Object.keys(days).filter(key => key >= weekKey && key <= today);
+  return {
+    today, weekKey,
+    day: hoy ? today : '', dayHits: hoy ? hitsOf(hoy) : 0, finishedAt: String(hoy?.finishedAt || '').slice(0, 40),
+    week: semana.length ? weekKey : '', weekHits: Math.min(DAILY_MAX * 7, semana.reduce((n, key) => n + hitsOf(days[key]), 0))
+  };
+}
+function readRecords() { try { return JSON.parse(CT.Storage.getItem(R) || '{}'); } catch { return {}; } }
 function message(error) {
   const texts = {
     'auth/operation-not-allowed':'El acceso de invitado aún no está activado. Contacta con soporte.',
@@ -88,6 +109,18 @@ function editNameScreen() {
 }
 // Sin argumento lee el diálogo de la tarjeta; con él, lo llama la identidad del juego
 // (bienvenida y Atlas) con el nombre ya elegido.
+// Las filas de hoy y de esta semana que ya tiene quien juega, para cambiarles el nombre o el avatar en la
+// misma transacción que el perfil. Solo las que corresponden al progreso guardado: las reglas comprueban
+// que la fila coincide con él.
+async function scoreRows(tx, uid) {
+  const s = await tx.get(refs(uid).progress), data = s.exists() ? s.data() : {};
+  const rows = [];
+  for (const ref of [data.day && dayScore(uid, data.day), data.week && weekScore(uid, data.week)].filter(Boolean)) {
+    const row = await tx.get(ref);
+    if (row.exists()) rows.push([ref, row.data()]);
+  }
+  return rows;
+}
 async function rename(aliasArg) {
   const desdeDialogo = typeof aliasArg !== 'string';
   const alias = (desdeDialogo ? document.getElementById('account-alias').value : aliasArg).trim();
@@ -100,6 +133,7 @@ async function rename(aliasArg) {
   const r=refs(identity.uid);
   await runTransaction(db,async tx => {
     const p=await tx.get(r.profile), rank=await tx.get(r.ranking), reservation=await tx.get(nameRef(aliasKey));
+    const tablas=await scoreRows(tx, identity.uid);
     if(reservation.exists() && reservation.data().uid!==identity.uid) throw Error('Este nombre de usuario ya está en uso. Elige otro.');
     if (!p.exists()) throw Error('No se ha encontrado tu perfil. Vuelve a abrir el juego.');
     const previous=p.data().aliasKey;
@@ -107,6 +141,7 @@ async function rename(aliasArg) {
     tx.set(r.profile,{...p.data(),alias,aliasKey});
     if(previous && previous!==aliasKey) tx.delete(nameRef(previous));
     if (rank.exists()) tx.set(r.ranking,{...rank.data(),alias,updatedAt:serverTimestamp()});
+    for (const [ref, row] of tablas) tx.set(ref,{...row,alias,updatedAt:serverTimestamp()});
   });
   profile={...profile,alias,aliasKey};
   CT.Storage.setItem('hilo-nombre-v1',alias);
@@ -123,10 +158,11 @@ async function syncAvatar() {
   const r = refs(identity.uid);
   try {
     await runTransaction(db, async tx => {
-      const p = await tx.get(r.profile), rank = await tx.get(r.ranking);
+      const p = await tx.get(r.profile), rank = await tx.get(r.ranking), tablas = await scoreRows(tx, identity.uid);
       if (!p.exists()) return;
       tx.set(r.profile, {...p.data(), avatar: wanted});
       if (rank.exists()) tx.set(r.ranking, {...rank.data(), avatar: wanted, updatedAt: serverTimestamp()});
+      for (const [ref, row] of tablas) tx.set(ref, {...row, avatar: wanted, updatedAt: serverTimestamp()});
     });
     profile = {...profile, avatar: wanted};
   } catch { /* sin conexión o reglas sin actualizar: se reintenta al entrar */ }
@@ -137,7 +173,8 @@ function payload() {
   const progress = CT.Storage.getItem(P) || '{}', records = CT.Storage.getItem(R) || '{}';
   const totals = JSON.parse(progress).totals || {};
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
-  return {progress,records,hits:count(totals.dailyHits),games:count(totals.dailyGames),season};
+  const {day,dayHits,week,weekHits} = periods(readRecords());
+  return {progress,records,hits:count(totals.dailyHits),games:count(totals.dailyGames),season,day,dayHits,week,weekHits};
 }
 // Lo jugado sin conexión antes de tener invitado vive en un espacio aparte («locked»). Si la cuenta
 // es nueva y no tiene progreso en la nube, ese progreso pasa a ser el suyo en vez de perderse.
@@ -198,7 +235,9 @@ async function flush() {
     const snap=await tx.get(r.progress), remote=snap.exists()?snap.data():null;
     if ((remote?.revision || 0) !== expected) { const e=Error('Conflicto de progreso');e.code='account/conflict';throw e; }
     tx.set(r.progress,{...data,revision:expected+1,updatedAt:serverTimestamp()});
-    if (data.games > 0) tx.set(r.ranking,{alias:profile.alias,avatar:profile.avatar,hits:data.hits,games:data.games,season,updatedAt:serverTimestamp()});
+    const who = {alias:profile.alias, avatar:profile.avatar};
+    if (data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,finishedAt:periods(readRecords()).finishedAt,updatedAt:serverTimestamp()});
+    if (data.week) tx.set(weekScore(uid,data.week),{...who,hits:data.weekHits,updatedAt:serverTimestamp()});
   }).then(() => {
     revision=expected+1;setMeta(change !== generation);
     if (!metadata().dirty) document.getElementById('storage-notice')?.remove();
@@ -275,27 +314,40 @@ function accountCard() {
   const stats=payload(), dirty=metadata().dirty;
   return `<div class="account-card">
     <div class="account-hero"><span class="account-kicker">TU CUENTA</span><span class="account-save-state" role="status">${dirty ? '◌ Cambios pendientes' : '✓ Progreso guardado'}</span>
-    <div class="account-metrics"><div><b>${stats.hits}</b><span>Aciertos diarios</span></div><div><b>${stats.games}</b><span>Retos completados</span></div></div></div>
-    <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking de retos diarios</b><span>Descubre tu lugar entre exploradores</span></span><span aria-hidden="true">↗</span></button>
+    <div class="account-metrics"><div><b>${stats.day ? `${stats.dayHits}/${DAILY_MAX}` : '–'}</b><span>Reto de hoy</span></div><div><b>${stats.weekHits}</b><span>Aciertos esta semana</span></div></div></div>
+    <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking de retos diarios</b><span>Hoy y esta semana</span></span><span aria-hidden="true">↗</span></button>
     <div class="account-actions"><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>
     <details class="account-details"><summary>Tu invitado y tus datos</summary><p>Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.</p><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a><button class="btn btn-ghost account-delete" data-account-action="delete">Eliminar invitado y progreso</button></details>
   </div>`;
 }
-async function ranking() {
+async function ranking(tab = 'day') {
   await flush();
   if (failedConflict) return;
-  const snap=await getDocsFromServer(query(collection(db,'dailyRanking'),orderBy('hits','desc'),limit(50)));
+  const semana = tab === 'week', uid = identity.uid, per = periods(readRecords());
+  const key = semana ? per.weekKey : per.today;
+  const snap=await getDocsFromServer(query(collection(db, semana ? 'weeklyScores' : 'dailyScores', key, 'players'),orderBy('hits','desc'),limit(50)));
+  const hits = v => Number(v.hits) || 0;
   const entries=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const position=i=>1+entries.filter(v=>(Number(v.hits)||0)>(Number(entries[i].hits)||0)).length;
-  const mine=entries.findIndex(v=>v.id===identity.uid);
-  const ownSnap=mine<0?await getDocFromServer(refs(identity.uid).ranking):null;
-  const own=mine>=0?entries[mine]:ownSnap?.exists()?{id:identity.uid,...ownSnap.data()}:null;
-  const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === CT.Accounts?.user?.uid ? CT.Avatares.ownId() : v.avatar });
-  const player=(v,i)=>`<tr class="${v.id===identity.uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${v.id===identity.uid?'<small class="ranking-you">Tú</small>':''}</td><td><b>${Number(v.hits)||0}</b></td></tr>`;
-  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===identity.uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${v.id===identity.uid?'<small class="ranking-you">Tú</small>':''}<strong>${Number(v.hits)||0}</strong><span>aciertos</span></article>`).join('');
-  accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETOS DIARIOS</span><span class="ranking-emblem" aria-hidden="true">✦</span><h2>La cima te espera</h2><p>Un nuevo día. Un nuevo reto. Tu siguiente puesto.</p><span class="ranking-caption">Ranking de retos diarios · Top 50</span></header>
-    <div class="ranking-body">${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros exploradores">${podium}</div><div class="ranking-personal${own?' has-result':''}">${mine>=0?`<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${Number(own.hits)||0}</b> aciertos</span>`:own?`<span>Tu posición <b>Fuera del top 50</b></span><span><b>${Number(own.hits)||0}</b> aciertos</span>`:'Completa un reto diario para sumar tus aciertos al ranking.'}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}`:`<div class="ranking-empty"><span aria-hidden="true">✧</span><h3>La primera huella puede ser tuya</h3><p>Todavía no hay resultados. Completa un reto diario y estrena el ranking.</p><button class="btn btn-primary ranking-daily" data-account-action="daily">Jugar un reto diario <span aria-hidden="true">→</span></button></div>`}
-    <details class="account-details ranking-rules"><summary>Cómo se suman los aciertos</summary><p>Aciertos acumulados en los retos diarios completados, de Grandes colecciones y de Retos rápidos. Es un único reto al día, así que cuenta una sola vez; las partidas libres, los duelos y la competición no puntúan. Los puntos del mes que ves en el inicio son otra cuenta (hasta 100 por reto). Resultados enviados por el juego, sin validación competitiva.</p><p>Primeros 50 jugadores. Las igualdades comparten puesto y no se consideran un desempate competitivo.</p></details></div>
+  // Hoy, a igualdad de aciertos va delante quien terminó antes; en la semana, los empates comparten puesto.
+  if (!semana) entries.sort((a,b) => hits(b) - hits(a) || String(a.finishedAt || '9').localeCompare(String(b.finishedAt || '9')));
+  const position = i => semana ? 1 + entries.filter(v => hits(v) > hits(entries[i])).length : i + 1;
+  const mine=entries.findIndex(v=>v.id===uid);
+  const ownSnap=mine<0?await getDocFromServer(semana ? weekScore(uid,key) : dayScore(uid,key)):null;
+  const own=mine>=0?entries[mine]:ownSnap?.exists()?{id:uid,...ownSnap.data()}:null;
+  const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
+  const you = v => v.id===uid?'<small class="ranking-you">Tú</small>':'';
+  const player=(v,i)=>`<tr class="${v.id===uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}</td><td><b>${hits(v)}</b></td></tr>`;
+  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}<strong>${hits(v)}</strong><span>aciertos</span></article>`).join('');
+  const lunes = new Date(`${per.weekKey}T12:00:00`).toLocaleDateString('es-ES',{day:'numeric',month:'long'});
+  const tabs = `<div class="ranking-tabs" role="group" aria-label="Periodo"><button type="button" class="btn ${semana?'btn-secondary':'btn-primary'}" data-account-action="ranking-day" aria-pressed="${!semana}">Hoy</button><button type="button" class="btn ${semana?'btn-primary':'btn-secondary'}" data-account-action="ranking-week" aria-pressed="${semana}">Esta semana</button></div>`;
+  const personal = mine>=0 ? `<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${hits(own)}</b> aciertos</span>`
+    : own ? `<span>Tu posición <b>Fuera del top 50</b></span><span><b>${hits(own)}</b> aciertos</span>`
+    : semana ? 'Juega el reto diario para entrar en la tabla de esta semana.' : 'Todavía no has jugado el reto de hoy.';
+  const vacio = `<div class="ranking-empty"><span aria-hidden="true">✧</span><h3>${semana ? 'La semana acaba de empezar' : 'Nadie ha jugado todavía el reto de hoy'}</h3><p>${semana ? 'Cada lunes todo el mundo empieza de cero.' : 'Juega el reto y estrena la tabla de hoy.'}</p><button class="btn btn-primary ranking-daily" data-account-action="daily">Jugar el reto de hoy <span aria-hidden="true">→</span></button></div>`;
+  if (document.querySelector('.ranking-modal')) CT.closeDialog();
+  accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETO DIARIO</span><span class="ranking-emblem" aria-hidden="true">✦</span><h2>${semana ? 'Esta semana' : 'Hoy'}</h2><p>${semana ? `Desde el lunes ${esc(lunes)}. El lunes que viene, todos a cero.` : 'Aciertos en el reto de hoy, de 0 a 10.'}</p>${tabs}</header>
+    <div class="ranking-body">${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros">${podium}</div><div class="ranking-personal${own?' has-result':''}">${personal}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}`:vacio}
+    <details class="account-details ranking-rules"><summary>Cómo funciona</summary><p>Cada día hay un reto de 10 cartas; cada carta bien colocada es un acierto. <b>Hoy</b> ordena por los aciertos del reto de hoy y, si hay empate, va delante quien terminó antes. <b>Esta semana</b> suma los aciertos de lunes a domingo; cada lunes todo el mundo vuelve a empezar, así que da igual cuándo empezaste a jugar.</p><p>Solo cuenta el reto diario. Primeros 50. Resultados enviados por el juego, sin validación competitiva.</p></details></div>
     <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`,true);
 }
 function deleteScreen() {
@@ -307,6 +359,7 @@ async function removeAccount() {
   clearTimeout(timer);stopStorage?.();if (saving) await saving;
   const r=refs(u.uid), batch=writeBatch(db);
   if(profile?.aliasKey) batch.delete(nameRef(profile.aliasKey));
+  const per=periods(readRecords());batch.delete(dayScore(u.uid,per.today));batch.delete(weekScore(u.uid,per.weekKey));
   batch.delete(r.ranking);batch.delete(doc(db,'socialRanking',u.uid));batch.delete(r.progress);batch.delete(r.profile);await batch.commit();
   active=false;
   try { await deleteUser(u); } catch(error) { active=true; throw error; }
@@ -331,7 +384,7 @@ export async function startAccounts(callback) {
     if(action==='close'){CT.closeDialog();return;}
     if(action==='daily'){CT.closeDialog();CT.localNavigate?.('daily');return;}
     if(busy)return;busy=true;target.disabled=true;
-    const fn={ranking,sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
+    const fn={ranking:()=>ranking('day'),'ranking-day':()=>ranking('day'),'ranking-week':()=>ranking('week'),sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
     Promise.resolve().then(fn).catch(error=>{
       const text=message(error), el=document.getElementById('account-delete-message');
       if(el)el.textContent=text;else if(!failedConflict)syncNotice(text);

@@ -37,6 +37,23 @@ try {
  batch=writeBatch(db);batch.update(doc(db,'playerProfiles','account-a'),{avatar:'tigre'});batch.update(doc(db,'dailyRanking','account-a'),{avatar:'tigre',updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'Fulanito',aliasKey:'fulanito',avatar:'inventado'}));
  await assertFails(setDoc(doc(db,'dailyRanking','account-a'),{...rank,alias:'Fulanito',avatar:'panda',updatedAt:serverTimestamp()})); // no coincide con el perfil
+ // Tablas del ranking: hoy y esta semana. La fila tiene que cuadrar con el progreso, el nombre y el avatar.
+ const day='2026-09-30', week='2026-09-28', who={alias:'Fulanito',avatar:'tigre'};
+ batch=writeBatch(db);batch.set(doc(db,'playerProgress','account-a'),{...progress,revision:2,day,dayHits:7,week,weekHits:19});
+ batch.set(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,finishedAt:'2026-09-30T08:00:00.000Z',updatedAt:serverTimestamp()});
+ batch.set(doc(db,'weeklyScores',week,'players','account-a'),{...who,hits:19,updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
+ await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:9,finishedAt:'',updatedAt:serverTimestamp()})); // no cuadra con el progreso
+ await assertFails(setDoc(doc(db,'dailyScores','2026-09-29','players','account-a'),{...who,hits:7,finishedAt:'',updatedAt:serverTimestamp()})); // otro día
+ await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,alias:'Otro',hits:7,finishedAt:'',updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(other,'dailyScores',day,'players','account-a'),{...who,hits:7,finishedAt:'',updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db,'playerProgress','account-a'),{...progress,revision:3,day,dayHits:11,week,weekHits:19})); // un reto vale como mucho 10
+ await assertFails(setDoc(doc(db,'playerProgress','account-a'),{...progress,revision:3,day,dayHits:7,week,weekHits:71}));
+ await assertSucceeds(getDocs(query(collection(other,'dailyScores',day,'players'),orderBy('hits','desc'),limit(50))));
+ await assertSucceeds(getDocs(query(collection(other,'weeklyScores',week,'players'),orderBy('hits','desc'),limit(50))));
+ await assertFails(getDocs(collection(other,'weeklyScores',week,'players')));
+ await assertFails(getDocs(query(collection(unauthenticated,'dailyScores',day,'players'),limit(50))));
+ await assertFails(deleteDoc(doc(other,'weeklyScores',week,'players','account-a')));
+ await assertSucceeds(deleteDoc(doc(db,'weeklyScores',week,'players','account-a')));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'x'}));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,season:'other'}));
  await assertFails(deleteDoc(doc(db,'playerNames','fulanito')));

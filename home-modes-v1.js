@@ -100,7 +100,7 @@
       `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquier mesa · más rápido</option><option value="2">Hasta 2 jugadores</option><option value="3">Hasta 3 jugadores</option><option value="4">Hasta 4 jugadores</option></select><small>La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</small></div>`,
       modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Un mazo sorpresa: entra en la primera mesa disponible.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
-      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Ordena, arriesga y planta tus puntos con otros jugadores.', false, 'data-online-kind="quick"')
+      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Ordena, arriesga y asegura tus aciertos con otros jugadores.', false, 'data-online-kind="quick"')
     ].join(''), modeArt['online-hub']);
   }
 
@@ -133,7 +133,7 @@
   let createRoomOpen = false;
   function createRoomGroup(route) {
     return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear una sala</b><small>Tú organizas la partida y compartes el código, el enlace o el QR.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir modalidad'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
-      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición')}</div></div>`;
+      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición')}</div></div>`;
   }
   function openFriendHub(route) {
     const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
@@ -144,7 +144,7 @@
       route === 'online' ? modeDoor('online-join', 'menu-private.webp', 'Unirme a una sala', 'Escanea el QR o escribe el código de una sala que ya está creada.', true) : '',
       route === 'online' ? createRoomGroup(route) : [
         inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos.'),
-        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa para todos: cada uno arriesga o asegura sus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
+        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa para todos: cada uno arriesga o asegura sus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
         route === 'local' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición') : ''
       ].join('')
     ].join(''), art);
@@ -155,7 +155,7 @@
     app.dataset.pendingHub = 'hub-solo';
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       inlineCollections('collections'),
-      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, 'data-solo-route="quick"', 'Preparar partida'),
+      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus aciertos.', false, 'data-solo-route="quick"', 'Preparar partida'),
       modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; suma tus aciertos ronda a ronda.', false, 'data-competition-audience="solo"', 'Configurar competición')
     ].join(''), modeArt['solo-hub']);
   }
@@ -302,18 +302,23 @@
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
 
   function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+  // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.
   function rankingSummary() {
-    let classic=0, quick=0;
+    const key = d => d.toLocaleDateString('sv-SE');
+    const now = new Date(), monday = new Date(now), yesterday = new Date(now);
+    monday.setHours(12,0,0,0); monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const today = key(now), week = key(monday);
+    let day = null, weekHits = 0, streak = 0;
     try {
       const records=JSON.parse((window.CONTINUUM?.Storage||localStorage).getItem('hilo-retos-v1')||'{}');
-      const raw=records.retoDiario||{};
-      for(const [date,result] of Object.entries(raw.days||{})){
-        if(!date.startsWith(seasonKey()) || !(Number(result.total)>0))continue;
-        const points=Math.round(100*Math.max(0,Math.min(1,Number(result.hits)/Number(result.total))));
-        if(result.family==='quick')quick+=points;else classic+=points;
-      }
+      const daily=records.retoDiario||{}, days=daily.days||{};
+      const hits = entry => Math.max(0, Math.min(10, Number(entry?.hits) || 0));
+      if (days[today]) day = hits(days[today]);
+      for (const [date, result] of Object.entries(days)) if (date >= week && date <= today) weekHits += hits(result);
+      if (daily.lastDay === today || daily.lastDay === key(yesterday)) streak = Number(daily.streak) || 0;
     } catch {}
-    return {classic,quick,total:classic+quick};
+    return {day, weekHits, streak};
   }
 
   function addRankingSummary() {
@@ -321,7 +326,8 @@
     const doors=app.querySelector('.home-doors'); if(!doors)return;
     const r=rankingSummary(), box=document.createElement('section');
     box.className='mode-ranking-summary';
-    box.innerHTML=`<div><small>TUS RETOS · ${new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'}).toUpperCase()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking de retos diarios <span aria-hidden="true">→</span></button>':''}`;
+    box.setAttribute('aria-label','Tus retos diarios');
+    box.innerHTML=`<div class="mode-ranking-stats"><span><b>${r.day===null?'–':`${r.day}/10`}</b><small>Hoy</small></span><span><b>${r.weekHits}</b><small>Esta semana</small></span><span><b>${r.streak}</b><small>${r.streak===1?'Día seguido':'Días seguidos'}</small></span></div>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking <span aria-hidden="true">→</span></button>':''}`;
     doors.append(box);
   }
 

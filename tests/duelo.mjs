@@ -457,7 +457,7 @@ console.log("\nEl estado de cada duelo por turnos, para la lista");
   const fin = estado({ ...base, status: "finished", turnUid: null, turnIndex: 15, scores: { yo: 9, ella: 7 } }, "yo");
   ok("un duelo terminado dice el resultado", fin.grupo === "historial" && fin.estado === "Ganaste" && fin.marcador === "Tú 9 · Marta 7 aciertos");
   const cifras = estado({ ...base, kind: "cifras", status: "playing", turnUid: "yo", turnIndex: 0, scores: { yo: 120, ella: 80 } }, "yo");
-  ok("en cifras se cuentan puntos", cifras.marcador === "Tú 120 · Marta 80 puntos");
+  ok("en cifras también se cuentan aciertos", cifras.marcador === "Tú 120 · Marta 80 aciertos");
 }
 
 console.log(`\n${fail} fallos`);

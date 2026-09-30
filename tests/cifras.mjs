@@ -291,7 +291,7 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   const escritas = juegaCifras(w, "population", card => w.CONTINUUM.sortValue("population", card), { tarda: () => 1000 });
   ok(`se juegan las ${C.CARTAS} cartas`, escritas.length === C.CARTAS);
   ok("la partida termina", /Duelo de cifras listo/.test(texto(w)));
-  ok("clavarlas todas en un segundo suma casi el máximo", /9\d\d puntos en 10 cartas/.test(texto(w)));
+  ok("clavarlas todas son 10 de 10 aciertos", /10 de 10 aciertos/.test(texto(w)));
   ok("y ofrece mandar el reto", existe(w, '[data-action="share-duel"]'));
   ok("todavía no hay marcador: no hay rival contra quien compararse", !existe(w, ".duel-grid"));
 
@@ -308,13 +308,14 @@ console.log("\nAceptar un duelo de cifras por enlace");
   const cartas = C.cartas("population", semilla, 10);
   // El retador se queda a un 20% en todas y tarda dos segundos: una marca batible.
   const suyas = cartas.map(card => ({ respuesta: retador.CONTINUUM.sortValue("population", card) * 1.2, ms: 2000, salida: false }));
-  const marca = C.puntosPartida("population", semilla, 10, suyas);
+  const marca = C.aciertos("population", semilla, 10, suyas);
+  ok("un 20 % de error cuenta como acierto", marca === 10);
   const payload = C.codificar({ mode: "population", seed: semilla, total: 10, jugadas: suyas, nombre: "Fernando" });
 
   const rival = boot({ url: `https://hilo.test/?duelo=${payload}` });
   ok("al abrir el enlace se ve quién reta", /Fernando te reta/.test(texto(rival)));
   ok("se dice que es de cifras", /Duelo de cifras/.test(texto(rival)));
-  ok("y la marca que hay que batir, en puntos", new RegExp(`${marca} puntos`).test(texto(rival)));
+  ok("y la marca que hay que batir, en aciertos", new RegExp(`${marca} de 10`).test(texto(rival)));
   ok("no se enseña ninguna carta todavía", !existe(rival, ".cifra-card"));
 
   rival.document.getElementById("duel-name").value = "Marta";
@@ -357,7 +358,7 @@ console.log("\nEl reloj no se para: salir de la aplicación cierra la carta");
   ok("se dice qué ha pasado, sin llamar tramposo a nadie", /Has salido de la aplicación/.test(texto(w)));
   const despues = estado(w, "population");
   ok("la jugada queda marcada como salida", despues.jugadas[0].salida === true);
-  ok("y no puntúa", despues.jugadas.length === 1 && /\+0 puntos/.test(texto(w)));
+  ok("y no cuenta como acierto", despues.jugadas.length === 1 && /Sin acierto/.test(texto(w)));
 
   // Y la siguiente carta empieza limpia: la penalización es de la carta, no de la partida.
   click(w, '[data-action="cifras-next"]');
@@ -536,6 +537,20 @@ console.log("\nAntes de jugar se explica, y se empieza al pulsar, sin cuenta atr
   click(w, '[data-action="duel-play"]');
   ok("al pulsar empieza la partida, sin cuenta atrás", existe(w, '[data-action="cifra-answer"]') && !existe(w, ".cuenta-numero"));
   ok("y el reloj de la primera carta arranca ahí, no antes", Number.isFinite(estado(w, "population").empezadaEn));
+}
+
+console.log("\nAciertos y desempate por rapidez");
+{
+  const w = boot(), C = w.CONTINUUM.Duelo.Cifras;
+  const cartas = C.cartas("population", "desempate", 10);
+  const real = card => w.CONTINUUM.sortValue("population", card);
+  ok("un 20 % de error es acierto", C.acierto("population", cartas[0], { respuesta: real(cartas[0]) * 1.2, ms: 1000 }));
+  ok("un 40 % de error ya no", !C.acierto("population", cartas[0], { respuesta: real(cartas[0]) * 1.4, ms: 1000 }));
+  ok("salir de la aplicación nunca es acierto", !C.acierto("population", cartas[0], { respuesta: real(cartas[0]), ms: 1000, salida: true }));
+  ok("gana quien tiene más aciertos, aunque tarde más", C.compara({ aciertos: 7, tiempo: 90000 }, { aciertos: 6, tiempo: 1000 }) === 1);
+  ok("con los mismos aciertos gana quien tardó menos", C.compara({ aciertos: 7, tiempo: 30000 }, { aciertos: 7, tiempo: 31000 }) === 1);
+  ok("mismos aciertos y mismo tiempo es empate", C.compara({ aciertos: 7, tiempo: 30000 }, { aciertos: 7, tiempo: 30000 }) === 0);
+  ok("una carta cerrada cuenta el plazo entero", C.tiempo([{ ms: 2000 }, { ms: 500, salida: true }], 15000) === 17000);
 }
 
 console.log(`\n${fail} fallos`);

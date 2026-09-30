@@ -77,3 +77,6 @@
 .ranking-avatar { padding: 0; overflow: visible; background: transparent; }
 .ranking-avatar .avatar-art { width: 100%; height: 100%; }
 .account-ranking td .avatar-art { margin-right: 6px; }
+
+.ranking-tabs { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+.ranking-tabs .btn { min-width: 120px; }

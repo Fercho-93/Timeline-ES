@@ -2043,7 +2043,7 @@
     </div></div>`, true);
   }
 
-  const DAILY_CARDS = 15;
+  const DAILY_CARDS = 10;
   const SOLO_LIVES = 3;
   const RECORDS_KEY = "hilo-retos-v1";
   let solo = null;
@@ -2174,7 +2174,7 @@
     const day = today(), done = !!dailyRecords().days?.[day];
     if (dailyFamily(day) === 'quick') {
       const c = CT.Quick.dailyChallenge(day);
-      return { family: 'Retos rápidos', title: c.title, done, rules: `${c.rule}${c.asOf ? ` (datos a ${c.asOf})` : ''}. Ordena ${c.cards - 1} cartas comunes, una tras otra: cada acierto suma un punto provisional, que puedes asegurar plantándote; un fallo pierde los del reto. Un solo intento.` };
+      return { family: 'Retos rápidos', title: c.title, done, rules: `${c.rule}${c.asOf ? ` (datos a ${c.asOf})` : ''}. Ordena ${c.cards - 1} cartas, una tras otra: cada acierto queda provisional hasta que te plantas; un fallo pierde los provisionales. Un solo intento.` };
     }
     const mode = CT.mode(dailyModeKey(day));
     return { family: 'Grandes colecciones', title: mode.name, done, rules: `${DAILY_CARDS} cartas, ordenadas ${mode.axis === 'time' ? 'de antes a después' : 'de menor a mayor'}, en dificultad Fácil y con 3 vidas. Un solo intento.` };
@@ -2502,7 +2502,7 @@
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
         ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
         <button class="btn ${enOrden ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-duel">${enOrden ? "Empezar otro duelo" : "Crear un duelo"} <span>→</span></button>`)}
-      ${regla ? bloque("seguidos-cifras", `<div class="duel-brief"><p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Gana quien más puntos sume: cuenta lo cerca que te quedes y lo rápido que respondas.</p>
+      ${regla ? bloque("seguidos-cifras", `<div class="duel-brief"><p>${Cifras.CARTAS} cartas de este mazo, y en cada una escribes el número. ${escapeHtml(regla.pregunta)} Si te acercas lo suficiente, es un acierto. Gana quien tenga más aciertos; si empatáis, quien haya respondido más rápido.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</span></p></div>
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
@@ -2980,10 +2980,10 @@
     const card = cartaCifra();
     cifras.jugadas.push(jugada);
     cifras.empezadaEn = null;
-    const puntos = Cifras.puntosCarta(cifras.mode, card, jugada, plazoCifras());
-    cifras.pendiente = { jugada, motivo, puntos };
-    anotaLogros(CT.Progreso.record({ mode: cifras.mode, cardId: card.id, correct: puntos > 0, kind: "cifras" }));
-    CT.Effects.feedback(puntos > 0);
+    const acierto = Cifras.acierto(cifras.mode, card, jugada);
+    cifras.pendiente = { jugada, motivo, acierto };
+    anotaLogros(CT.Progreso.record({ mode: cifras.mode, cardId: card.id, correct: acierto, kind: "cifras" }));
+    CT.Effects.feedback(acierto);
     guardaCifras();
     cifrasView();
     cifrasRevelado();
@@ -3034,6 +3034,8 @@
   function resumeCifras() {
     cifras = cargaCifras();
     if (!cifras) return duelHome();
+    // Un duelo guardado antes de contar aciertos trae la marca rival en puntos: se recuenta.
+    if (cifras.rival && !Number.isInteger(cifras.rival.aciertos)) Object.assign(cifras.rival, { aciertos: Cifras.aciertos(cifras.mode, cifras.seed, cifras.total, cifras.rival.jugadas), tiempo: Cifras.tiempo(cifras.rival.jugadas, plazoCifras()) });
     if (cifras.jugadas.length >= cifras.total) return cifrasFinish();
     if (cifras.empezadaEn === null) return abreCarta();
     // La carta seguía abierta. Si se ha estado fuera más que el margen de gracia se
@@ -3050,12 +3052,12 @@
     const card = cartaCifra();
     const indice = indiceCifra();
     const cerrada = !!cifras.pendiente;
-    const puntos = Cifras.puntosPartida(cifras.mode, cifras.seed, cifras.total, cifras.jugadas, plazoCifras());
+    const aciertos = Cifras.aciertos(cifras.mode, cifras.seed, cifras.total, cifras.jugadas);
     const restante = cerrada ? 0 : Math.max(0, plazoCifras() - (Date.now() - cifras.empezadaEn));
-    const marcaRival = cifras.rival ? `<span><b>${cifras.rival.puntos}</b><small>${escapeHtml(cifras.rival.nombre || "quien te reta")}</small></span>` : "";
+    const marcaRival = cifras.rival ? `<span><b>${cifras.rival.aciertos}</b><small>aciertos de ${escapeHtml(cifras.rival.nombre || "quien te reta")}</small></span>` : "";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="cifras-exit">Salir</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">Carta ${indice + 1} de ${cifras.total}. ${escapeHtml(regla.pregunta)} ${escapeHtml(card.title)}. Tienes ${Cifras.SEGUNDOS} segundos.</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Duelo de cifras</div><div class="turn-name" aria-hidden="true">${puntos} ${puntos === 1 ? "punto" : "puntos"}</div></div><div class="deck-count"><strong>${cifras.total - indice}</strong><span>por responder</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Duelo de cifras</div><div class="turn-name" aria-hidden="true">${aciertos} ${aciertos === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${cifras.total - indice}</strong><span>por responder</span></div></div>
       ${marcaRival ? `<div class="solo-stats cifra-rival">${marcaRival}</div>` : ""}
       <section class="cifra-panel">
         ${relojMarkup(restante, plazoCifras())}
@@ -3087,25 +3089,26 @@
   // se puede enseñar el detalle de la carta, que antes de responder muchas veces lleva la
   // cifra dentro.
   function cifrasRevelado() {
-    const { jugada, motivo, puntos } = cifras.pendiente;
+    const { jugada, motivo } = cifras.pendiente;
     const card = cartaCifra();
+    const acierto = Cifras.acierto(cifras.mode, card, jugada);
     const banda = Cifras.banda(cifras.mode, card, jugada.respuesta);
     const acabada = cifras.jugadas.length >= cifras.total;
     const suya = cifras.rival ? cifras.rival.jugadas[indiceCifra()] : null;
     const titulo = jugada.salida ? "Carta cerrada" : banda.nombre;
     const explicacion = jugada.salida
-      ? "Has salido de la aplicación con la carta abierta, así que esta no puntúa."
+      ? "Has salido de la aplicación con la carta abierta, así que esta no cuenta."
       : jugada.respuesta === null
         ? motivo === "tiempo" ? `Se acabaron los ${Cifras.SEGUNDOS} segundos sin ninguna cifra escrita.` : "No has escrito ninguna cifra."
-        : `Tu respuesta: <strong>${escapeHtml(Cifras.formato(cifras.mode, jugada.respuesta))}</strong>${motivo === "tiempo" ? " — llegó con el tiempo agotado, así que no suma la prisa." : ` — has tardado ${(jugada.ms / 1000).toFixed(1)} s.`}`;
-    overlay(`<div class="overlay" data-result-card="${puntos > 0 ? card.id : ""}"><div class="modal ${puntos > 0 ? "success" : "failure"}">
-      <div class="result-mark" aria-hidden="true">${puntos >= 70 ? "✓" : puntos > 0 ? "≈" : "×"}</div>
+        : `Tu respuesta: <strong>${escapeHtml(Cifras.formato(cifras.mode, jugada.respuesta))}</strong>${motivo === "tiempo" ? " — llegó con el tiempo agotado." : ` — has tardado ${(jugada.ms / 1000).toFixed(1)} s.`}`;
+    overlay(`<div class="overlay" data-result-card="${acierto ? card.id : ""}"><div class="modal ${acierto ? "success" : "failure"}">
+      <div class="result-mark" aria-hidden="true">${acierto ? "✓" : "×"}</div>
       <div class="eyebrow" aria-hidden="true">${escapeHtml(titulo)}</div>
       <h2><span class="solo-lectores">${escapeHtml(titulo)}: </span>${escapeHtml(card.title)}</h2>
       <div class="reveal">${categoryBadge(card)}${CT.Art.button(cifras.mode, card)}<div class="year">${escapeHtml(CT.formatValue(cifras.mode, card))}</div><p>${escapeHtml(card.detail)}</p></div>
       <p>${explicacion}</p>
-      <p class="cifra-puntos"><b>+${puntos}</b> ${puntos === 1 ? "punto" : "puntos"}</p>
-      ${suya ? `<p class="hint">${escapeHtml(cifras.rival.nombre || "Quien te reta")} respondió ${escapeHtml(suya.salida ? "nada: salió de la aplicación" : Cifras.formato(cifras.mode, suya.respuesta))} y sumó ${Cifras.puntosCarta(cifras.mode, card, suya, plazoCifras())}.</p>` : ""}
+      <p class="cifra-puntos"><b>${acierto ? "Acierto" : "Sin acierto"}</b></p>
+      ${suya ? `<p class="hint">${escapeHtml(cifras.rival.nombre || "Quien te reta")} respondió ${escapeHtml(suya.salida ? "nada: salió de la aplicación" : Cifras.formato(cifras.mode, suya.respuesta))} : ${Cifras.acierto(cifras.mode, card, suya) ? "acierto" : "sin acierto"}.</p>` : ""}
       <button class="btn btn-primary btn-block" data-dialog-focus data-action="cifras-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button>
     </div></div>`);
   }
@@ -3125,27 +3128,28 @@
     const { mode, seed, total, jugadas, rival } = cifras;
     const modeName = CT.mode(mode).name;
     const plazo = plazoCifras();
-    const mios = { puntos: Cifras.puntosPartida(mode, seed, total, jugadas, plazo), jugadas };
-    const aciertos = jugadas.filter((jugada, i) => Cifras.puntosCarta(mode, cifras.cartas[i], jugada, plazo) > 0).length;
+    const aciertos = Cifras.aciertos(mode, seed, total, jugadas);
+    const mios = { puntos: Cifras.puntosPartida(mode, seed, total, jugadas, plazo), aciertos, tiempo: Cifras.tiempo(jugadas, plazo), jugadas };
+    const resultado = rival ? Cifras.compara(mios, rival) : 0;
     const salidas = jugadas.filter(jugada => jugada.salida).length;
     const payload = Cifras.codificar({ mode, seed, total, jugadas, nombre: duelName() });
-    const gano = !!rival && mios.puntos > rival.puntos;
+    const gano = !!rival && resultado > 0;
     const logros = CT.Progreso.finishGame({ mode, kind: "duel", hits: aciertos, total, won: gano });
     const sessionLogros = [...new Map(logros.map(item => [item.id || item.name, item])).values()];
 
-    let icono = "🎯", eyebrow = "Duelo de cifras listo", titular = `<strong>${mios.puntos}</strong> puntos en ${total} cartas.`, cuerpo = "", acciones = "";
+    let icono = "🎯", eyebrow = "Duelo de cifras listo", titular = `<strong>${aciertos}</strong> de ${total} aciertos.`, cuerpo = "", acciones = "";
     if (!rival) {
-      lastDuelShare = Cifras.invitacion({ modeName, nombre: duelName(), puntos: mios.puntos, total, payload });
+      lastDuelShare = Cifras.invitacion({ modeName, nombre: duelName(), aciertos, total, payload });
       cuerpo = `<p class="lead" style="margin-inline:auto">Manda el enlace a quien quieras: recibirá estas mismas ${total} cartas, con los mismos ${Cifras.SEGUNDOS} segundos para cada una.</p>`;
       acciones = `<button class="btn btn-primary" data-action="share-duel">Mandar el reto <span>→</span></button>`;
     } else {
-      const empate = mios.puntos === rival.puntos;
+      const empate = resultado === 0, porTiempo = !empate && aciertos === rival.aciertos;
       const quien = rival.nombre || "quien te retaba";
       lastDuelShare = Cifras.marcador({ modeName, mode, seed, total, rival, mio: mios, ms: plazo });
       icono = empate ? "🤝" : gano ? "🏆" : "🎯";
       eyebrow = empate ? "Empate" : gano ? "Has ganado el duelo" : "Duelo perdido";
-      titular = `${mios.puntos} <span style="opacity:.6">a</span> ${rival.puntos}`;
-      cuerpo = `<p class="lead" style="margin-inline:auto">${empate ? `Habéis sumado lo mismo que ${escapeHtml(quien)}.` : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
+      titular = `${aciertos} <span style="opacity:.6">a</span> ${rival.aciertos}`;
+      cuerpo = `<p class="lead" style="margin-inline:auto">${empate ? `Mismos aciertos y mismo tiempo que ${escapeHtml(quien)}.` : porTiempo ? (gano ? `Mismos aciertos, pero has respondido más rápido que ${escapeHtml(quien)}.` : `Mismos aciertos, pero ${escapeHtml(quien)} respondió más rápido.`) : gano ? `Has superado a ${escapeHtml(quien)}.` : `${escapeHtml(quien)} te ha ganado esta vez.`}</p>
         ${cifrasGridMarkup(quien, rival.jugadas, jugadas, mode, cifras.cartas, plazo)}`;
       acciones = `<button class="btn btn-primary" data-action="start-cifras">Devolver el reto <span>→</span></button><button class="btn btn-secondary" data-action="share-duel">Compartir el resultado</button>`;
     }
@@ -3163,20 +3167,16 @@
     </div></section></div>`);
   }
 
-  // Verde lo clavado o casi, amarillo lo que se acercó, blanco lo que no puntuó y negro
+  // Verde los aciertos, blanco lo que no llegó a acierto y negro
   // la carta que se cerró por salir de la aplicación.
   function cifrasGridMarkup(quien, suyas, mias, mode, cartas, plazo) {
-    const puntosDe = (jugada, i) => Cifras.puntosCarta(mode, cartas[i], jugada, plazo);
-    const clase = (jugada, i) => {
-      if (jugada.salida) return "out";
-      const puntos = puntosDe(jugada, i);
-      return puntos >= 70 ? "ok" : puntos > 0 ? "mid" : "ko";
-    };
+    const puntosDe = (jugada, i) => Cifras.acierto(mode, cartas[i], jugada);
+    const clase = (jugada, i) => jugada.salida ? "out" : puntosDe(jugada, i) ? "ok" : "ko";
     const fila = lista => lista.map((jugada, i) => `<i class="${clase(jugada, i)}" aria-hidden="true"></i>`).join("");
     const cuenta = lista => `${lista.filter(puntosDe).length} de ${lista.length}`;
     return `<div class="duel-grid">
-      <div><b>${escapeHtml(quien)}</b><div class="duel-row" role="img" aria-label="${escapeHtml(quien)}: puntúa en ${cuenta(suyas)}">${fila(suyas)}</div></div>
-      <div><b>Tú</b><div class="duel-row" role="img" aria-label="Tú: puntúas en ${cuenta(mias)}">${fila(mias)}</div></div>
+      <div><b>${escapeHtml(quien)}</b><div class="duel-row" role="img" aria-label="${escapeHtml(quien)}: aciertos en ${cuenta(suyas)}">${fila(suyas)}</div></div>
+      <div><b>Tú</b><div class="duel-row" role="img" aria-label="Tú: aciertos en ${cuenta(mias)}">${fila(mias)}</div></div>
     </div>`;
   }
 
@@ -3210,7 +3210,7 @@
         ${demoMarkup(cifrasEsta)}
         <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
         <p class="solo-intro-rule">${enTurnos ? "15 segundos para responder en cada turno · Si sales de la pantalla, el turno queda protegido." : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.`}</p>
-        ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${cifrasEsta ? `${rival.puntos} puntos` : `${rival.hits} de ${duel.total}`}</b><small>la marca de ${escapeHtml(rival.nombre || "quien te reta")}</small></span></div>` : ""}
+        ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${cifrasEsta ? `${rival.aciertos} de ${duel.total}` : `${rival.hits} de ${duel.total}`}</b><small>la marca de ${escapeHtml(rival.nombre || "quien te reta")}</small></span></div>` : ""}
         <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">JUGAR <span>→</span></button>
       </div></section>
     </div>`);
@@ -3278,7 +3278,7 @@
         ${conReloj
           ? `<p class="solo-intro-rule">${Math.round(pendingDuel.ms / 1000)} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${esCifras ? "cierra" : "da por fallada"}.</p>`
           : `<p class="solo-intro-rule">Este reto se creó antes de que los duelos llevaran reloj, así que se juega sin plazo, como lo jugó ${escapeHtml(quien)}.</p>`}
-        <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${esCifras ? `${rival.puntos} puntos` : `${rival.hits} de ${total}`}</b><small>la marca que hay que batir</small></span></div>
+        <div class="solo-stats" style="grid-template-columns:1fr"><span><b>${esCifras ? `${rival.aciertos} de ${total}` : `${rival.hits} de ${total}`}</b><small>la marca que hay que batir</small></span></div>
         <div class="field" style="margin-top:16px">
           <label for="duel-name">Tu nombre de perfil</label>
           <input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}">

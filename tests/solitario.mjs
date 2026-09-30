@@ -143,7 +143,7 @@ console.log("\nReto diario");
   ok("y reciben las mismas cartas", JSON.stringify([a.current, ...a.deck, ...a.timeline]) === JSON.stringify([b.current, ...b.deck, ...b.timeline]));
   ok("el mazo sale del bote de gratuitos", uno.CONTINUUM.Cartera.diarios().includes(a.mode));
   ok("la portada no desvela el mazo de hoy", (() => { const w = boot(); const puerta = w.document.querySelector(".home-door-daily"); return puerta.querySelector("b").textContent === "Reto diario" && !puerta.textContent.includes(w.CONTINUUM.mode(a.mode).name); })());
-  ok("el reto reparte 15 cartas por colocar", a.total === 15 && a.deck.length + 1 === 15);
+  ok("el reto reparte 10 cartas por colocar", a.total === 10 && a.deck.length + 1 === 10);
 
   // Terminar el reto de hoy y comprobar que no se puede repetir.
   const w = otro;
@@ -151,9 +151,9 @@ console.log("\nReto diario");
   ok("jugando bien se completa el reto entero", /Reto completado/.test(texto(w)));
   const marcas = retoDiario(w);
   ok("cuenta un día de racha", marcas.streak === 1);
-  ok("guarda el resultado del día", Object.values(marcas.days)[0].hits === 15);
+  ok("guarda el resultado del día", Object.values(marcas.days)[0].hits === 10);
   click(w, '[data-action="home"]');
-  ok("el reto no se puede repetir el mismo día", /15 de 15/.test(w.document.querySelector(".home-door-daily").textContent) && !existe(w, '[data-action="daily-start"]'));
+  ok("el reto no se puede repetir el mismo día", /10 de 10/.test(w.document.querySelector(".home-door-daily").textContent) && !existe(w, '[data-action="daily-start"]'));
   ok("una vez jugado, la portada dice qué mazo era", w.document.querySelector(".home-door-daily").textContent.includes(w.CONTINUUM.mode(a.mode).name));
   ok("y la portada ofrece compartir el resultado", existe(w, '[data-action="share-daily-home"]'));
 }

@@ -45,12 +45,12 @@
       daily.days ||= {};
       if(!daily.days[day()]){
         const hits=state.players[0].score;
-        const total=E.challenge(record.config.rounds[0].id).cards.length-1;
+        const total=record.config.rounds[0].order.length-1;
         const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
         const previous=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
         daily.streak=daily.lastDay===previous?(daily.streak||0)+1:1;
         daily.lastDay=day();daily.best=Math.max(daily.best||0,hits);
-        daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id};
+        daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id,finishedAt:new Date().toISOString()};
         all.retoDiario=daily;CT.Storage.setItem(key,JSON.stringify(all));
         CT.Progreso?.finishQuickDaily?.({hits,total,streak:daily.streak});
       }
@@ -60,14 +60,14 @@
   }
   function statsPanel() {
     const history = quickHistory(), games = history.length, points = history.reduce((n,item)=>n + (Number(item.score)||0),0), best = history.reduce((n,item)=>Math.max(n,Number(item.score)||0),0);
-    const rows = history.slice(0, 12).map(item => `<li><strong>${esc(item.score)} puntos</strong><span>${esc(item.date)} · ${esc(item.kind === 'daily' ? 'Reto diario' : item.kind === 'duel' ? 'Duelo de Retos rápidos' : `${item.rounds} ${item.rounds === 1 ? 'reto' : 'retos'}`)}</span></li>`).join('');
+    const rows = history.slice(0, 12).map(item => `<li><strong>${esc(item.score)} aciertos</strong><span>${esc(item.date)} · ${esc(item.kind === 'daily' ? 'Reto diario' : item.kind === 'duel' ? 'Duelo de Retos rápidos' : `${item.rounds} ${item.rounds === 1 ? 'reto' : 'retos'}`)}</span></li>`).join('');
     const layer = document.createElement('div'); layer.className='overlay';
-    layer.innerHTML = `<div class="modal quick-stats-modal"><h2>Historial y estadísticas</h2><div class="quick-stats-grid"><span><b>${games}</b><small>partidas terminadas</small></span><span><b>${points}</b><small>puntos acumulados</small></span><span><b>${best}</b><small>mejor resultado</small></span></div><h3>Últimas partidas</h3>${rows ? `<ol class="quick-history">${rows}</ol>` : '<p class="hint">Todavía no hay partidas terminadas. Tu historial aparecerá aquí.</p>'}<button class="btn btn-primary btn-block" data-quick="close-menu">Cerrar</button></div>`;
+    layer.innerHTML = `<div class="modal quick-stats-modal"><h2>Historial y estadísticas</h2><div class="quick-stats-grid"><span><b>${games}</b><small>partidas terminadas</small></span><span><b>${points}</b><small>aciertos acumulados</small></span><span><b>${best}</b><small>mejor resultado</small></span></div><h3>Últimas partidas</h3>${rows ? `<ol class="quick-history">${rows}</ol>` : '<p class="hint">Todavía no hay partidas terminadas. Tu historial aparecerá aquí.</p>'}<button class="btn btn-primary btn-block" data-quick="close-menu">Cerrar</button></div>`;
     app().append(layer); CT.openDialog(layer,true);
   }
   function guide() {
     const layer=document.createElement('div'); layer.className='overlay';
-    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Arriesga o asegura</h3><p>Cada acierto suma un punto provisional. Puedes plantarte para asegurarlo. Si fallas, pierdes los puntos provisionales de ese reto.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
+    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Arriesga o asegura</h3><p>Cada acierto suma un acierto provisional. Puedes plantarte para asegurarlo. Si fallas, pierdes los aciertos provisionales de ese reto.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
     app().append(layer); CT.openDialog(layer,true);
   }
   function myTurn() {return !room || room.actor === myId;}
@@ -157,7 +157,7 @@
       return name ? `<li class="public-seat${mine?' is-you':''}"><span class="public-seat-avatar">${playerAvatar({name},i)}</span><span class="public-seat-copy"><b>${esc(name)}${mine?' <span class="public-you">tú</span>':''}</b><small>En la mesa</small></span></li>`
         : `<li class="public-seat is-empty"><span class="public-seat-avatar" aria-hidden="true">+</span><span class="public-seat-copy"><b>Plaza libre</b><small>Esperando a alguien…</small></span></li>`;
     }).join('');
-    shell(`<section class="setup-section public-lobby"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${cap} jugadores</div><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="hint">Tres retos con las mismas cartas para toda la mesa. Arriesga para sumar puntos o plántate para asegurarlos.</p>
+    shell(`<section class="setup-section public-lobby"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${cap} jugadores</div><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="hint">Tres retos con las mismas cartas para toda la mesa. Arriesga para sumar aciertos o plántate para asegurarlos.</p>
       <div class="panel public-status" role="status" aria-live="polite">${status()}</div>
       <div class="panel public-roster"><div class="section-label">Jugadores <small>${count}/${cap}</small></div><ul class="public-seats">${seats}</ul></div>
       ${button('leave-public','Dejar de buscar','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></section>`);
@@ -277,17 +277,17 @@
     stopNetwork();page="setup";const solo=format!=="local";
     state = null; record = null; selected = null; slot = null;
     const saved = load();
-    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo y asegura tus puntos antes de fallar." : "De 2 a 8 jugadores o equipos en un solo móvil."}</p><div class="panel">
+    shell(`<section class="setup-section"><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="lead">${solo ? "Juega a tu ritmo y asegura tus aciertos antes de fallar." : "De 2 a 8 jugadores o equipos en un solo móvil."}</p><div class="panel">
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Jugadores</span></div>
       <div id="quick-names">${nameFields(solo ? 1 : 2, solo ? ["Tú"] : [CT.Identidad?.propio?.() || "Jugador 1"])}</div>
       ${solo ? '' : button('add-player', '＋ Añadir participante', 'btn btn-ghost')}</div>
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
       <div class="setup-grid">${solo ? '' : `<div class="field starter-field quick-starter-field">${starterFieldMarkup(['Jugador 1','Jugador 2'])}</div>`}<div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option><option value="10">10 retos · maratón</option><option value="15">15 retos · gran maratón</option><option value="20">20 retos · resistencia</option><option value="${CT.QuickCatalog.challenges.length}">Todos los mazos · ${CT.QuickCatalog.challenges.length} retos</option></select></div></div>
-      <p class="hint">${solo ? "Puedes plantarte para asegurar los puntos del reto." : "Empieza quien gane el minijuego; el primer turno rota en cada reto."}</p></div>
+      <p class="hint">${solo ? "Puedes plantarte para asegurar los aciertos del reto." : "Empieza quien gane el minijuego; el primer turno rota en cada reto."}</p></div>
       ${button('start', 'Barajar y empezar <span>→</span>', 'btn btn-primary btn-block')}
       ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}
       <p id="quick-error" role="alert">${esc(error)}</p></div></section>
-      <details class="panel quick-panel"><summary>Cómo se juega</summary><ol><li>Una carta revelada inicia la línea, sin dar puntos.</li><li>Elige una de las cartas comunes y toca un hueco. Confirma para revelar el dato.</li><li>Acertar suma un punto provisional y pasa el turno.</li><li>En tu siguiente turno puedes plantarte: aseguras tus puntos y sales de este reto.</li><li>Fallar pierde tus puntos de este reto y te retira. Los de retos anteriores se conservan.</li><li>Al agotarse las cartas, los puntos pendientes se aseguran. El reto también termina si nadie sigue activo.</li></ol><p>La carta fallada queda corregida en la línea. Si queda una sola persona, puede seguir arriesgando. Los empates de valor admiten cualquier orden equivalente. Gana quien suma más puntos; un empate final se comparte.</p></details>`);
+      <details class="panel quick-panel"><summary>Cómo se juega</summary><ol><li>Una carta revelada inicia la línea, sin contar como acierto.</li><li>Elige una de las cartas comunes y toca un hueco. Confirma para revelar el dato.</li><li>Acertar suma un acierto provisional y pasa el turno.</li><li>En tu siguiente turno puedes plantarte: aseguras tus aciertos y sales de este reto.</li><li>Fallar pierde tus aciertos de este reto y te retira. Los de retos anteriores se conservan.</li><li>Al agotarse las cartas, los aciertos pendientes se aseguran. El reto también termina si nadie sigue activo.</li></ol><p>La carta fallada queda corregida en la línea. Si queda una sola persona, puede seguir arriesgando. Los empates de valor admiten cualquier orden equivalente. Gana quien asegura más aciertos; un empate final se comparte.</p></details>`);
     if (!solo) {refreshStarterField(); app().querySelector('#quick-names')?.addEventListener('input', () => {if (starter && starter.key !== quickNames().join('|')) {starter = null;} refreshStarterField();});}
   }
   function nameFields(count, names = []) {
@@ -347,19 +347,19 @@
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
     topTitle = `${state.config.rounds.length === 1 ? '' : `${state.index + 1}/${state.config.rounds.length} · `}${esc(c.title)}`;
-    const pass = `<button class="quick-pass" data-quick="bank" aria-label="${p.points ? `Plantarse y asegurar ${p.points} puntos` : 'Pasar este reto'}">${p.points ? `Asegurar ${p.points} pts` : 'Pasar reto'}</button>`;
+    const pass = `<button class="quick-pass" data-quick="bank" aria-label="${p.points ? `Plantarse y asegurar ${p.points} ${p.points === 1 ? 'acierto' : 'aciertos'}` : 'Pasar este reto'}">${p.points ? `Asegurar ${p.points} pts` : 'Pasar reto'}</button>`;
     const heading = `${room ? `<p class="hint">${myTurn() ? "Tu turno" : `Turno de ${esc(p.name)}`} · ${connection?.kind==='local' ? 'Red Wi-Fi local' : 'Sala por internet'}</p>` : ''}<h1 class="solo-lectores" data-focus tabindex="-1">${esc(c.title)}${!room && state.players.length === 1 ? '' : ` · Turno de ${esc(p.name)}`}</h1><div class="quick-bar"><span class="quick-left"><b>${state.remaining.length}</b> por colocar</span><div class="quick-right">${state.phase === 'turn' && myTurn() ? pass : ''}${scores()}</div></div>`;
     if (state.phase === 'round-end') {
       const final = state.index + 1 === state.config.rounds.length;
       const best = Math.max(...state.players.map(player => player.score));
       const winners = state.players.filter(player => player.score === best).map(player => esc(player.name));
       shell(`${heading}<section class="panel quick-panel"><h2>${final ? state.players.length===1 ? 'Tu resultado' : winners.length > 1 ? 'Victoria compartida' : `Gana ${winners[0]}` : 'Reto terminado'}</h2>
-        ${final ? `<p>${winners.join(' y ')} · ${best} puntos.</p>` : '<p>Los puntos de este reto ya están asegurados.</p>'}
-        <ul>${state.players.map(player => `<li>${esc(player.name)}: ${player.roundScore} puntos en este reto.</li>`).join('')}</ul>
+        ${final ? `<p>${winners.join(' y ')} · ${best} ${best === 1 ? 'acierto' : 'aciertos'}.</p>` : '<p>Los aciertos de este reto ya están asegurados.</p>'}
+        <ul>${state.players.map(player => `<li>${esc(player.name)}: ${player.roundScore} ${player.roundScore === 1 ? 'acierto' : 'aciertos'} en este reto.</li>`).join('')}</ul>
         ${final ? button('formats', 'Elegir otra partida') : button('next', 'Siguiente reto')}
         ${final && record.config.kind==='duel' ? button('rematch', 'Crear una revancha', 'btn btn-secondary btn-block') : ''}
         ${final && record.config.kind==='duel' ? button('share-duel','Compartir duelo','btn btn-secondary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div>` : ''}
-        ${final && Number.isFinite(record.config.rivalScore) ? `<p>Tu rival: ${record.config.rivalScore} puntos. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Tu rival ha asegurado más puntos.'}</p>` : ''}
+        ${final && Number.isFinite(record.config.rivalScore) ? `<p>Tu rival: ${record.config.rivalScore} aciertos. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Tu rival ha asegurado más aciertos.'}</p>` : ''}
         ${final && record.config.kind==='daily' && CT.Accounts?.ready ? '<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>' : ''}
         <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button>${button('abandon','Salir sin guardar','btn btn-ghost exit-discard')}</section>
         <details class="panel quick-panel"><summary>Ver el orden completo y las fuentes</summary><ol>${[...c.cards].sort((a, b) => (a.value - b.value) * c.direction).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} <a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Fuente</a></p></li>`).join('')}</ol></details>`);
@@ -369,7 +369,7 @@
       const r = state.result, item = get(r.cardId);
       if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id=>cardMarkup(c,get(id))).join('')}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);return;}
       shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id => cardMarkup(c, get(id))).join('')}</div></div><div class="overlay" data-quick-result><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}</h3><div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div><a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Consultar fuente</a>
-        <p>${r.correct ? `${esc(p.name)} tiene ${p.points} ${p.points === 1 ? 'punto provisional' : 'puntos provisionales'}.` : `${esc(p.name)} pierde ${r.lost} puntos de este reto y queda fuera hasta el siguiente. La carta ya está en su lugar correcto.`}</p>
+        <p>${r.correct ? `${esc(p.name)} tiene ${p.points} ${p.points === 1 ? 'acierto provisional' : 'aciertos provisionales'}.` : `${esc(p.name)} pierde ${r.lost} ${r.lost === 1 ? 'acierto' : 'aciertos'} de este reto y queda fuera hasta el siguiente. La carta ya está en su lugar correcto.`}</p>
         ${button('ack', 'Continuar', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
       CT.openDialog(app().querySelector('[data-quick-result]'), false);
       return;
@@ -407,7 +407,7 @@
   function menu() {
     const c = E.challenge(state.config.rounds[state.index].id);
     const layer = document.createElement('div'); layer.className = 'overlay';
-    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''}</p><p>Acertar suma un punto provisional. Plantarse lo asegura; fallar pierde los puntos de este reto y te retira. Los puntos anteriores se conservan.</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}${button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
+    layer.innerHTML = `<div class="modal"><h2>Retos rápidos</h2><p>${esc(c.rule)}. ${esc(c.context)}${c.asOf ? ` Datos a ${esc(c.asOf)}.` : ''}</p><p>Acertar suma un acierto provisional. Plantarse lo asegura; fallar pierde los aciertos de este reto y te retira. Los aciertos anteriores se conservan.</p><div class="actions exit-actions">${button('close-menu', 'Seguir jugando', 'btn btn-primary btn-block')}${button('guide', 'Guía', 'btn btn-secondary btn-block')}<button class="btn btn-secondary btn-block" data-settings-action="open">Ajustes</button>${button('formats', 'Guardar y salir', 'btn btn-secondary btn-block')}${button('abandon', 'Salir sin guardar', 'btn btn-ghost btn-block exit-discard')}</div></div>`;
     app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
@@ -478,10 +478,17 @@
     const cover = art === 'quick' ? 'menu-quick.webp' : `hero-${art}-400.webp`;
     return `<div class="collection-entry"><button class="gallery-panel panel-${art}" data-action="${action}" aria-label="${esc(title)}. ${esc(subtitle)}"><span class="panel-backdrop" aria-hidden="true"><img src="assets/${cover}" alt="" width="400" height="600"></span><span class="panel-depth-light" aria-hidden="true"></span><span class="panel-art" aria-hidden="true"><img src="assets/${cover}" alt="" width="400" height="600"></span><span class="panel-depth-ground" aria-hidden="true"></span><span class="collection-foil" aria-hidden="true"></span><span class="collection-index" aria-hidden="true">${count}</span><span class="collection-open" aria-hidden="true">↗</span><span class="panel-spine" aria-hidden="true"><i>◇</i><b>${esc(title)}</b></span><span class="panel-label" aria-hidden="true"><i></i><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></span></button></div>`;
   }
+  // El reto diario tiene siempre 10 cartas que ordenar, igual que el de Grandes colecciones: así los
+  // aciertos de un día valen lo mismo que los de otro, sin cuentas. Una carta más abre la línea, y solo
+  // entran los mazos que llegan a ese tamaño.
+  const DAILY_QUICK_CARDS = 10;
   function dailyQuick(dayValue) {
     const seed=CT.seedFrom('quick-daily-'+dayValue), random=CT.seededRandom(seed);
-    const challenge=CT.QuickCatalog.challenges[Math.floor(random()*CT.QuickCatalog.challenges.length)];
-    return {names:['Tú'],rounds:[{id:challenge.id,order:CT.shuffleWith(challenge.cards.map(x=>x.id),random)}],kind:'daily',day:dayValue};
+    const all=CT.QuickCatalog.challenges, pool=all.filter(c=>c.cards.length>DAILY_QUICK_CARDS);
+    const list=pool.length?pool:all;
+    const challenge=list[Math.floor(random()*list.length)];
+    const order=CT.shuffleWith(challenge.cards.map(x=>x.id),random).slice(0,DAILY_QUICK_CARDS+1);
+    return {names:['Tú'],rounds:[{id:challenge.id,order}],kind:'daily',day:dayValue};
   }
 
   async function openPublic(renderPage, capacity=0) {
@@ -499,7 +506,7 @@
     openLocal(renderPage){paint=renderPage;entry='setup';format='local';setup();},
     openNetwork(renderPage,kind,capacity){paint=renderPage;entry='network';networkSetup(kind,capacity);},
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
-    dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,asOf:c.asOf,cards:c.cards.length};},
+    dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,asOf:c.asOf,cards:dailyQuick(dayValue).rounds[0].order.length};},
     startDaily(dayValue, renderPage) {
       paint=renderPage; entry='prepare'; stopNetwork(); page='prepare'; state=null; record=null; selected=null; slot=null;
       const saved=load();

@@ -77,7 +77,7 @@
   // ——— El duelo de cifras ———
   //
   // El otro duelo ordena cartas; este pide el número: diez cartas, el mismo plazo por
-  // carta que el de orden, y gana quien sume más puntos.
+  // carta que el de orden, y gana quien tenga más aciertos (la rapidez desempata).
   //
   // El plazo no es un adorno. Es lo único que hace que no compense buscar la
   // respuesta en otro sitio, y por eso el reloj se cuenta siempre restando marcas de
@@ -185,6 +185,28 @@
     if (!acierto) return 0;
     const usado = Math.min(Math.max(Number(jugada.ms) || 0, 0), plazo);
     return acierto + Math.round(PUNTOS_PRISA * ((plazo - usado) / plazo));
+  }
+
+  // Lo que se enseña y lo que decide quién gana: cada carta es un acierto o no. Es acierto quedarse en
+  // «Cerca» o mejor (un 25 % en las cifras, 7 años en las fechas). La rapidez no suma: solo desempata,
+  // y gana quien haya tardado menos en total. Los puntos de arriba siguen viajando en el enlace, porque
+  // con ellos se comprueba que la marca no se ha tocado, pero ya no se enseñan.
+  const UMBRAL_ACIERTO = 38;
+  function acierto(modeKey, card, jugada) {
+    return !!jugada && !jugada.salida && banda(modeKey, card, jugada.respuesta).puntos >= UMBRAL_ACIERTO;
+  }
+  function aciertosPartida(modeKey, seed, total, jugadas) {
+    const cartas = cartasCifras(modeKey, seed, total);
+    return jugadas.filter((jugada, i) => acierto(modeKey, cartas[i], jugada)).length;
+  }
+  function tiempoPartida(jugadas, plazo = CIFRAS_MS) {
+    return jugadas.reduce((suma, jugada) => suma + (jugada.salida ? plazo : Math.min(Math.max(Number(jugada.ms) || 0, 0), plazo)), 0);
+  }
+  // 1 si gana `a`, -1 si gana `b`, 0 si empatan en aciertos y en tiempo.
+  function comparaCifras(a, b) {
+    if (a.aciertos !== b.aciertos) return a.aciertos > b.aciertos ? 1 : -1;
+    if (a.tiempo !== b.tiempo) return a.tiempo < b.tiempo ? 1 : -1;
+    return 0;
   }
 
   function puntosPartida(modeKey, seed, total, jugadas, plazo = CIFRAS_MS) {
@@ -390,7 +412,8 @@
 
     return {
       ok: true,
-      duelo: { mode, seed, total, cifras: true, ms: plazo, rival: { nombre: limpiaNombre(nombre), puntos, jugadas } }
+      duelo: { mode, seed, total, cifras: true, ms: plazo, rival: { nombre: limpiaNombre(nombre), puntos, jugadas,
+        aciertos: aciertosPartida(mode, seed, total, jugadas), tiempo: tiempoPartida(jugadas, plazo) } }
     };
   }
 
@@ -414,9 +437,9 @@
     return `Duelo en Continuum · ${modeName}\n${veredicto} — ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
   }
 
-  function invitacionCifras({ modeName, nombre, puntos, total, payload }) {
+  function invitacionCifras({ modeName, nombre, aciertos, total, payload }) {
     const quien = nombre ? `${nombre} te reta` : "Te retan";
-    return `${quien} en Continuum · Cifras · ${modeName}\n🎯 ${puntos} puntos en ${total} cartas, a ${CIFRAS_SEGUNDOS} segundos por carta\n${enlace(payload)}`;
+    return `${quien} en Continuum · Cifras · ${modeName}\n🎯 ${aciertos}/${total} aciertos, a ${CIFRAS_SEGUNDOS} segundos por carta\n${enlace(payload)}`;
   }
 
   // La cuadrícula de un duelo de cifras dice cuánto se acercó cada carta, no si se
@@ -427,18 +450,19 @@
     const cartas = cartasCifras(modeKey, seed, total);
     return jugadas.map((jugada, i) => {
       if (jugada.salida) return "⬛";
-      const puntos = puntosCarta(modeKey, cartas[i], jugada, plazo);
-      return puntos >= 70 ? "🟩" : puntos > 0 ? "🟨" : "⬜";
+      return acierto(modeKey, cartas[i], jugada) ? "🟩" : "⬜";
     }).join("");
   }
 
   function marcadorCifras({ modeName, mode, seed, total, rival, mio, ms = CIFRAS_MS }) {
-    const veredicto = mio.puntos > rival.puntos ? "Gano yo" : mio.puntos < rival.puntos ? `Gana ${rival.nombre || "quien retaba"}` : "Empate";
+    const resultado = comparaCifras(mio, rival);
+    const veredicto = resultado > 0 ? "Gano yo" : resultado < 0 ? `Gana ${rival.nombre || "quien retaba"}` : "Empate";
+    const porTiempo = resultado && mio.aciertos === rival.aciertos ? " (por rapidez)" : "";
     const salidas = [rival, mio].map(quien => quien.jugadas.filter(jugada => jugada.salida).length);
     const aviso = salidas[0] + salidas[1]
       ? `\n⬛ cartas cerradas por salir de la app: ${rival.nombre || "quien retaba"} ${salidas[0]}, yo ${salidas[1]}`
       : "";
-    return `Duelo de cifras en Continuum · ${modeName}\n${veredicto} — ${mio.puntos} a ${rival.puntos}\n${rival.nombre || "Quien retaba"} ${rejillaCifras(mode, seed, total, rival.jugadas, ms)}\nYo ${rejillaCifras(mode, seed, total, mio.jugadas, ms)}${aviso}`;
+    return `Duelo de cifras en Continuum · ${modeName}\n${veredicto}${porTiempo} — ${mio.aciertos} a ${rival.aciertos} aciertos\n${rival.nombre || "Quien retaba"} ${rejillaCifras(mode, seed, total, rival.jugadas, ms)}\nYo ${rejillaCifras(mode, seed, total, mio.jugadas, ms)}${aviso}`;
   }
 
   // En qué punto está un duelo por turnos, contado desde quien mira (`yo`, su uid): a
@@ -450,7 +474,7 @@
     const total = Number(partida.total) || 0;
     const carta = Math.min(total, (Number(partida.turnIndex) || 0) + 1);
     const mios = partida.scores?.[yo] || 0, suyos = partida.scores?.[rivalUid] || 0;
-    const unidad = partida.kind === "cifras" ? "puntos" : "aciertos";
+    const unidad = "aciertos";
     const marcadorTexto = `Tú ${mios} · ${rival} ${suyos} ${unidad}`;
     const invitado = partida.status === "waiting" && partida.invitedUid === yo;
     if (partida.status === "playing") {
@@ -478,7 +502,7 @@
       CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
       regla: reglaCifra, unidades, factorDe, leer: leerCifra, reparto: repartoCifras, cartas: cartasCifras,
-      banda, puntosCarta, puntosPartida, formato: formatoCifra, texto: textoCifra,
+      banda, puntosCarta, puntosPartida, acierto, aciertos: aciertosPartida, tiempo: tiempoPartida, compara: comparaCifras, formato: formatoCifra, texto: textoCifra,
       codificar: codificarCifras, invitacion: invitacionCifras, marcador: marcadorCifras, rejilla: rejillaCifras
     }
   };

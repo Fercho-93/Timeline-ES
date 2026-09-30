@@ -11,8 +11,9 @@
     const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
-      if (!c || !Array.isArray(round.order) || round.order.length !== c.cards.length ||
-          new Set(round.order).size !== c.cards.length || round.order.some(id => !c.cards.some(card => card.id === id))) throw Error('INVALID_DECK');
+      // El reto diario juega un recorte fijo del mazo (ver DAILY_QUICK_CARDS en quick-challenges.js); el resto, el mazo entero.
+      if (!c || !Array.isArray(round.order) || round.order.length < 2 || round.order.length > c.cards.length ||
+          new Set(round.order).size !== round.order.length || round.order.some(id => !c.cards.some(card => card.id === id))) throw Error('INVALID_DECK');
       ids.add(c.id);
     }
     const s = {config: clone(config), index: 0, players: config.names.map(name => ({name: name.trim(), score: 0, points: 0, status: 'active'}))};

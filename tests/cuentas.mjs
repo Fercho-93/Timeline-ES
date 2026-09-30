@@ -11,13 +11,14 @@ function setup(user=null,seed={}){
  w.eval(read('avatares.js'));
  const auth={currentUser:user,authStateReady:async()=>{}};w.auth=auth;w.db={};
  const snap=key=>({exists:()=>data.has(key),data:()=>data.get(key)});
- Object.assign(w,{collection:(_,name)=>name,query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async()=>({docs:[...data].filter(([k])=>k.startsWith('dailyRanking/')).map(([k,v])=>({id:k.split('/')[1],data:()=>v}))}),browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,col,id)=>`${col}/${id}`,getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
+ Object.assign(w,{collection:(_,...parts)=>parts.join('/'),query:(...args)=>args,orderBy:()=>null,limit:()=>null,getDocsFromServer:async q=>{const base=(typeof q[0]==='string'?q[0]:'dailyRanking');return {docs:[...data].filter(([k])=>k.startsWith(base+'/')&&k.split('/').length===base.split('/').length+1).map(([k,v])=>({id:k.split('/').pop(),data:()=>v}))};},browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>{auth.currentUser={uid:'guest',isAnonymous:true,getIdToken:async()=>''};return {user:auth.currentUser};},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,onAuthStateChanged:()=>{},runTransaction:async(_,fn)=>{
   const pending=[];const result=await fn({delete:key=>pending.push([key,null]),get:async key=>snap(key),set:(key,value)=>pending.push([key,value])});for(const [k,v]of pending)v===null?data.delete(k):data.set(k,v);return result;
  }});
  let source=read('accounts.js').replace(/^import .*;\n/gm,'').replace('export async function startAccounts','async function startAccounts');
  w.eval(source+'\nwindow.testAccounts={startAccounts,enter,flush,rename,editNameScreen};');
  return {w,dom,auth,data};
 }
+const hoy=new Date().toLocaleDateString('sv-SE'), lunes=(()=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-(d.getDay()+6)%7);return d.toLocaleDateString('sv-SE');})();
 const user=id=>({uid:id,emailVerified:false,email:null,isAnonymous:true,getIdToken:async()=>'',providerData:[]});
 const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 {
@@ -85,11 +86,16 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});let started=0;
  w.localStorage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:999}}));
  await w.testAccounts.startAccounts(()=>started++);assert.equal(started,1);assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),'{}');
+ w.CONTINUUM.Storage.setItem('hilo-retos-v1',JSON.stringify({retoDiario:{days:{[hoy]:{hits:7,total:10,finishedAt:'2026-01-01T10:00:00.000Z'},'2000-01-03':{hits:9,total:10}}}}));
  w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:9,games:4,rankedHits:500,rankedGames:200,dailyHits:5,dailyGames:2}}));await w.testAccounts.flush();
- assert.equal(data.get('playerProgress/a').revision,1);assert.equal(data.get('dailyRanking/a').hits,5);
+ assert.equal(data.get('playerProgress/a').revision,1);
+ // Las tablas de hoy y de esta semana llevan los aciertos del reto; un día de otra semana no suma.
+ assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(data.get(`dailyScores/${hoy}/players/a`).finishedAt,'2026-01-01T10:00:00.000Z');
+ assert.equal(data.get(`weeklyScores/${lunes}/players/a`).hits,7);
+ assert.equal(data.get('playerProgress/a').dayHits,7);assert.equal(data.get('playerProgress/a').weekHits,7);
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='Fulanito';await w.testAccounts.rename();
- assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get('dailyRanking/a').alias,'Fulanito');
- assert.equal(data.get('dailyRanking/a').hits,5);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
+ assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get(`dailyScores/${hoy}/players/a`).alias,'Fulanito');
+ assert.equal(data.get(`weeklyScores/${lunes}/players/a`).alias,'Fulanito');assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='<bad>';await assert.rejects(w.testAccounts.rename());
  data.set('playerNames/ocupado',{uid:'someone-else'});
  w.document.getElementById('account-alias').value='OCUPADO';await assert.rejects(w.testAccounts.rename(),/ya está en uso/);
@@ -115,7 +121,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await w.testAccounts.startAccounts(()=>{});assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),p);dom.window.close();
 }
 {
- const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'dailyRanking/b':{alias:'Luna',avatar:'star',hits:12},'dailyRanking/c':{alias:'Atlas',avatar:'globe',hits:9},'dailyRanking/d':{alias:'Marco',avatar:'book',hits:7},'dailyRanking/a':{alias:'Fer',avatar:'compass',hits:5}});
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,[`dailyScores/${hoy}/players/b`]:{alias:'Luna',avatar:'star',hits:9,finishedAt:'2026-01-01T09:00:00Z'},[`dailyScores/${hoy}/players/c`]:{alias:'Atlas',avatar:'globe',hits:9,finishedAt:'2026-01-01T08:00:00Z'},[`dailyScores/${hoy}/players/d`]:{alias:'Marco',avatar:'book',hits:7},[`dailyScores/${hoy}/players/a`]:{alias:'Fer',avatar:'compass',hits:5},[`weeklyScores/${lunes}/players/b`]:{alias:'Luna',avatar:'star',hits:40},[`weeklyScores/${lunes}/players/a`]:{alias:'Fer',avatar:'compass',hits:12}});
  await w.testAccounts.startAccounts(()=>{});
  w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
  const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();await new Promise(r=>setTimeout(r,0));};
@@ -126,10 +132,19 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.ok(w.document.querySelector('[role="dialog"] #account-alias'));
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('ranking');assert.match(w.document.querySelector('[role="dialog"]').textContent,/Fer/);
+ // Hoy: a igualdad de aciertos va delante quien terminó antes.
+ assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Atlas/);
+ assert.match(w.document.querySelector('.ranking-medallion-2').textContent,/Luna/);
+ assert.equal(w.document.querySelector('[data-account-action="ranking-day"]').getAttribute('aria-pressed'),'true');
  assert.equal(w.document.querySelectorAll('.ranking-medallion').length,3);
  assert.equal(w.document.querySelectorAll('.ranking-medallion .avatar-art img').length,3);
  assert.equal(w.document.querySelectorAll('.ranking-medallion-1').length,1);
  assert.ok(w.document.querySelector('.account-ranking .is-you .ranking-you'));
+ // Esta semana: la otra tabla, con su suma de lunes a domingo.
+ await click('ranking-week');await new Promise(r=>setTimeout(r,0));
+ assert.equal(w.document.querySelectorAll('.ranking-modal').length,1,'cambiar de pestaña no apila diálogos');
+ assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Luna.*40/s);
+ assert.match(w.document.querySelector('.ranking-hero h2').textContent,/Esta semana/);
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('delete');assert.ok(w.document.querySelector('[role="dialog"] [data-account-action="delete-confirm"]'));
  w.document.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
@@ -148,12 +163,12 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 }
 {
  // El avatar elegido se publica en el perfil y en la fila del ranking, y el ranking dibuja el de cada persona.
- const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'dailyRanking/a':{alias:'Fer',avatar:'compass',hits:3,games:1,season:'launch-1'},'dailyRanking/b':{alias:'Bea',avatar:'panda',hits:5,games:2,season:'launch-1'}});
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'playerProgress/a':{progress:'{}',records:JSON.stringify({retoDiario:{days:{[hoy]:{hits:3,total:10}}}}),revision:1,season:'launch-1',day:hoy,dayHits:3,week:lunes,weekHits:3},[`dailyScores/${hoy}/players/a`]:{alias:'Fer',avatar:'compass',hits:3},[`dailyScores/${hoy}/players/b`]:{alias:'Bea',avatar:'panda',hits:5}});
  await w.testAccounts.startAccounts(()=>{});
  assert.equal(data.get('playerProfiles/a').avatar,w.CONTINUUM.Avatares.ownId(),'al entrar se publica el avatar de la persona, también el que le tocó sin elegir');
  w.CONTINUUM.Avatares.choose('tigre');await w.CONTINUUM.Accounts.sincronizaAvatar();
  assert.equal(data.get('playerProfiles/a').avatar,'tigre','el elegido se publica');
- assert.equal(data.get('dailyRanking/a').avatar,'tigre','y en su fila del ranking');
+ assert.equal(data.get(`dailyScores/${hoy}/players/a`).avatar,'tigre','y en su fila del ranking');
  w.CONTINUUM.Avatares.choose('lince');await w.CONTINUUM.Accounts.sincronizaAvatar();
  assert.equal(data.get('playerProfiles/a').avatar,'lince','al cambiarlo se vuelve a publicar');
  w.document.body.insertAdjacentHTML('beforeend','<button data-account-action="ranking"></button>');
@@ -162,7 +177,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const html=w.document.querySelector('.ranking-modal')?.innerHTML||'';
  assert.match(html,/avatars\/panda\.webp/,'se ve el avatar que eligió la otra persona');
  assert.match(html,/avatars\/lince\.webp/,'y el propio');
- assert.match(html,/Grandes colecciones y de Retos rápidos/);
+ assert.match(html,/Esta semana/);
  dom.window.close();
 }
 {
@@ -172,7 +187,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  w.localStorage.setItem('continuum-account:launch-1:locked:hilo-retos-v1','{"retoDiario":{"days":{}}}');
  await w.testAccounts.startAccounts(()=>{});
  assert.equal(JSON.parse(data.get('playerProgress/n').progress).totals.dailyHits,4,'el progreso sin conexión es ahora el de la cuenta');
- assert.equal(data.get('dailyRanking/n').hits,4,'y cuenta para el ranking');
+ assert.equal(data.get('playerProgress/n').hits,4,'y cuenta para el ranking');
  assert.equal(w.localStorage.getItem('continuum-account:launch-1:locked:hilo-perfil-v1'),null);
  dom.window.close();
 }
