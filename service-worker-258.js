@@ -22,7 +22,7 @@ const ASSETS = [
   "./animals.js", "./lifespan.js", "./speed.js", "./inventos.js", "./mundo.js", "./astronomy.js",
   "./medicine.js", "./countries.js", "./population.js", "./idiomas.js", "./distances.js", "./modes.js", "./storage.js", "./saves.js", "./updates.js", "./session.js", "./avatares.js", "./identidad.js", "./enciclopedia.js", "./progreso.js", "./cartera.js", "./duelo.js", "./duelo-turnos.js", "./push.js", "./public-matchmaking.js", "./public-matchmaking-online.js", "./local-transport.js", "./local-peer.js", "./local-room.js", "./local-session.js", "./local-share.js", "./qrcode-generator.js", "./qr-encode.js", "./qr-scanner.js", "./local-multiplayer.js", "./jsqr.js",
   "./ghost.js", "./drag.js", "./swipe.js", "./a11y.js", "./mapa.js", "./settings.js", "./effects.js", "./ambience.js", "./immersion.js", "./app.js", "./online.js",
-  "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/continuum-splash-clean-v3.webp",
+  "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/continuum-emblem-center.webp", "./assets/continuum-splash-clean-v3.webp",
   "./assets/home-door-jugar.webp",
   "./assets/world-cards/5009-battle-marathon.webp", "./assets/medicine-cards/9001-hippocratic-corpus.webp", "./assets/astronomy-cards/first-earth-photo.webp",
   "./assets/world-cards/5022-vesuvius-eruption.webp", "./assets/world-cards/5002-great-pyramid-giza.webp",

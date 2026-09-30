@@ -1701,33 +1701,21 @@ body::before {
    título, y crece o mengua con ella: vale igual para la carta grande del solitario y
    para la mano apretada de una sala en un móvil estrecho, sin medidas por pantalla. */
 .carta-reverso {
-  position: relative;
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-block: 8px;
+  margin-block: 10px;
+  padding-block: 10px;
+  border-block: 1px solid rgba(211,169,96,.25);
   pointer-events: none;
   /* La tinta de la colección en curso, siempre tirando al oro de la carta: cada mazo
      tiene su reverso sin salirse de la paleta de la edición. */
   color: color-mix(in srgb, var(--scene-wash, #bda27a) 70%, #d3a960);
   opacity: .72;
 }
-.carta-reverso::before,
-.carta-reverso::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border: 1px solid rgba(211,169,96,.45);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-.carta-reverso::before { width: min(78%, 148px); aspect-ratio: 1; box-shadow: 0 0 0 5px rgba(211,169,96,.07), inset 0 0 0 1px rgba(211,169,96,.12); }
-.carta-reverso::after { width: min(67%, 126px); aspect-ratio: 1; border-style: dashed; opacity: .7; }
-.reverso-emblema { position: relative; z-index: 1; display: block; width: min(84%, 132px); height: auto; max-height: 100%; filter: drop-shadow(0 3px 4px rgba(17,8,2,.42)); }
+.reverso-emblema { display: block; width: min(92%, 155px); height: auto; max-height: 100%; filter: drop-shadow(0 3px 4px rgba(17,8,2,.42)); }
 .hand-card.selected {
   border-color: #ffe1a0;
   outline: 3px solid #a66123;

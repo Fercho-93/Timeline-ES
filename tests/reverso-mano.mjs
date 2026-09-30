@@ -10,7 +10,7 @@ function jugarQuienEmpieza(w) { const d = w.document; const tap = el => el?.disp
 
 const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const html = gameHtml(read('index.html'));
-const logo = 'assets/continuum-emblem-800.webp';
+const logo = 'assets/continuum-emblem-center.webp';
 const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(match => match[1]);
 function boot() {
   const window = new JSDOM(html.replace(/<script src="[^"]+"><\/script>/g, ''), {
@@ -43,7 +43,7 @@ function checkBoard(document, count) {
   const window = boot(), document = window.document;
   try {
     const CT = window.CONTINUUM;
-    for (const mode of Object.keys(CT.MODES)) assert.match(CT.cardBack(mode), /continuum-emblem-800\.webp/);
+    for (const mode of Object.keys(CT.MODES)) assert.match(CT.cardBack(mode), /continuum-emblem-center\.webp/);
     CT.localNavigate('jugar');
     click(document, '[data-inline-route]'); window.sessionStorage.removeItem('continuum-entry-route');
     click(document, '[data-block="historia"]');
