@@ -26,7 +26,7 @@ const scenarios={
   competition:async({click})=>{await click('[data-action="solo-hub"]');await click('[data-action="competition-menu"]');await click('[data-action="start-competition"]');await click('[data-action="comp-next-round"]');},
   daily:async({click,page})=>{await click('[data-action="daily-start"]');const screen=await page.locator('#app').getAttribute('data-screen');if(screen==='quick-challenges')await click('[data-quick="ready"]');else{await click('[data-action="daily-play"]');}},
   wifi:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-hub="wifi"]');await click('[data-inline-route="wifi"]');await deck();},
-  online:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-hub="online"]');await click('[data-inline-route="online"]');await deck();}
+  online:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-hub="online"]');await click('[data-action="create-room-toggle"]');await click('[data-inline-route="online"]');await deck();}
 };
 const expected={collections:'solo',mixed:'solo',quick:'quick-game',local:'game',duel:'solo',competition:'solo',daily:'quick-game',wifi:'local-entrada',online:'online-loading'};
 try {
