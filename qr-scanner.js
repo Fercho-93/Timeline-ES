@@ -54,19 +54,45 @@
 
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d", { willReadFrequently: true });
-    let stopped = false, frameHandle = null;
+    let stopped = false, frameHandle = null, busy = false, lastRun = 0, frameCount = 0;
+    // El lector nativo (Chrome/Android) es más tolerante que jsQR con pantallas de iPhone
+    // (muaré, brillo, reflejos); si no existe o falla, sigue jsQR como antes.
+    let detector = null;
+    try { if (typeof BarcodeDetector === "function") detector = new BarcodeDetector({ formats: ["qr_code"] }); } catch { detector = null; }
 
-    function tick() {
+    // jsQR a resolución completa es lento en Android y, sin tolerar colores invertidos, falla
+    // con algunas pantallas: se reduce a ~900 px y cada pocos fotogramas se prueba también
+    // la imagen invertida.
+    function decodeWithJsQr() {
+      const w = videoEl.videoWidth, h = videoEl.videoHeight;
+      const scale = Math.min(1, 900 / Math.max(w, h));
+      canvas.width = Math.max(1, Math.round(w * scale));
+      canvas.height = Math.max(1, Math.round(h * scale));
+      context.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const mode = frameCount % 3 === 2 ? "attemptBoth" : "dontInvert";
+      return jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: mode })?.data || "";
+    }
+
+    async function scan() {
+      busy = true;
+      try {
+        let text = "";
+        if (detector) {
+          try { text = (await detector.detect(videoEl))[0]?.rawValue || ""; } catch { detector = null; }
+        }
+        if (!text && !stopped) text = decodeWithJsQr();
+        if (text && !stopped) onFrame(text);
+      } catch (error) { onError?.(error); }
+      busy = false;
+    }
+
+    function tick(now) {
       if (stopped) return;
-      if (videoEl.readyState >= 2 && videoEl.videoWidth) {
-        canvas.width = videoEl.videoWidth;
-        canvas.height = videoEl.videoHeight;
-        context.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
-        try {
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          const result = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-          if (result?.data) onFrame(result.data);
-        } catch (error) { onError?.(error); }
+      if (!busy && now - lastRun > 120 && videoEl.readyState >= 2 && videoEl.videoWidth) {
+        lastRun = now;
+        frameCount += 1;
+        void scan();
       }
       frameHandle = requestAnimationFrame(tick);
     }
