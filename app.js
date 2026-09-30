@@ -2617,6 +2617,7 @@
     CT.enableDrag({
       cardSelector: ".hand-card", slotSelector: ".slot",
       onDrop: (id, index) => {
+        if (solo.pendingResult) return;
         pendingIndex = index;
         if (index !== null) anunciaHueco(index, solo.timeline.length);
         soloView();
@@ -3941,7 +3942,10 @@
     else if (action === "identidad-nombre") editaNombre();
     else if (action === "identidad-avatar") eligeAvatar();
     else if (action === "avatar-select") seleccionaAvatar(target.dataset.avatarId);
-    else if (action === "solo-place") { pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
+    // Con el resultado de la carta a la vista, los huecos siguen pintados pero ya no se
+    // eligen: la carta está resuelta y solo queda «Siguiente carta». Elegir uno aquí
+    // quitaba ese botón y dejaba la partida sin forma de avanzar.
+    else if (action === "solo-place") { if (solo?.pendingResult) return; pendingIndex = Number(target.dataset.index); anunciaHueco(pendingIndex, solo.timeline.length); soloView(); }
     else if (action === "solo-next") soloNext();
     else if (action === "solo-menu") requestPlayExit();
     else if (action === "rules") rules();
