@@ -959,7 +959,7 @@
 
   // El emblema común identifica una carta por jugar sin revelar su lámina ni su valor.
   function cardBack(modeKey) {
-    return `<span class="carta-reverso" aria-hidden="true"><img class="reverso-emblema" src="assets/continuum-emblem-center.webp" alt="" width="420" height="125" decoding="async"></span>`;
+    return `<span class="carta-reverso" aria-hidden="true"><img class="reverso-emblema" src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" decoding="async"></span>`;
   }
 
   // La huella detecta versiones distintas del contenido; no es una validación del

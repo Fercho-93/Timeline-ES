@@ -92,7 +92,7 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
     assert.equal(new Set(reversos).size, 1, 'todas las colecciones comparten el reverso');
     for (const reverso of reversos) {
       assert.match(reverso, /class="carta-reverso" aria-hidden="true"/, 'el reverso no se lee en voz alta');
-      assert.match(reverso, /src="assets\/continuum-emblem-center\.webp"/, 'el reverso usa el emblema central limpio');
+      assert.match(reverso, /src="assets\/continuum-emblem-800\.webp"/, 'el reverso usa el emblema completo sin recortar');
     }
     // Y la lámina no desaparece del juego: la enseñan la carta ya colocada —donde su
     // valor está a la vista y no hay nada que adivinar— y la enciclopedia.

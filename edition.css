@@ -5096,3 +5096,25 @@ html #app .mode-create-list[hidden]{display:none}
 /* Fantasma en solitario: la lámina se ve igual; solo el valor va tapado. */
 .ghost-card.ghost-art .card-visual { background: none; color: inherit; }
 .ghost-card.ghost-art { cursor: default; }
+
+/* Reverso acabado: marca completa, papel tramado y filetes con relieve.
+   Solo cambia la decoración interior, nunca las dimensiones de la mano. */
+#app .hand-card, .drag-card-preview {
+  --cardback-fill: radial-gradient(ellipse at 50% 40%, #fffaf0 0%, #fffaf000 65%), repeating-linear-gradient(45deg, #a77b3810 0 1px, transparent 1px 9px), repeating-linear-gradient(-45deg, #a77b3810 0 1px, transparent 1px 9px), linear-gradient(145deg, #f8edda, #e9d3ab);
+}
+#app .hand-card .carta-reverso { border: 0; }
+#app .hand-card .carta-reverso::before, .drag-card-preview .carta-reverso::before {
+  content: ""; position: absolute; inset: 6px; width: auto; height: auto;
+  aspect-ratio: auto; transform: none; border: 1px solid #ab804d;
+  border-radius: 7px; background: transparent;
+  box-shadow: inset 0 0 0 2px #fff5e1, inset 0 0 0 3px #bc93575c, inset 0 0 18px #96632914;
+}
+#app .hand-card .carta-reverso::after, .drag-card-preview .carta-reverso::after { content: none; }
+html #app .hand-card .carta-reverso > .reverso-emblema,
+html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .hand .hand-card .carta-reverso > .reverso-emblema,
+.drag-card-preview .carta-reverso > .reverso-emblema {
+  position: absolute; left: 50%; top: 40%; width: 88% !important;
+  height: 48% !important; max-width: none !important; max-height: none !important;
+  object-fit: contain; object-position: center; transform: translate(-50%, -50%);
+  opacity: 1; filter: drop-shadow(0 3px 3px #734f2938);
+}
