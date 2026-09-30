@@ -7,9 +7,10 @@ Este registro indica qué cartas se han contrastado de forma individual. Una pru
 | Mazo | Estado | Resultado |
 | --- | --- | --- |
 | `sports-players` · Deportes por jugadores por equipo | 21/21, cerrado el 30-09-2026 | Las cifras concuerdan con la modalidad indicada. Se precisaron lacrosse de campo masculino, curling de cuatro y natación artística por equipos; esta última admite deportistas varones. La regla ahora aclara béisbol y críquet. Cada carta enlaza una referencia específica de federación, liga u organismo deportivo. |
-| `drinks` · Graduación de bebidas | 2/21, en curso | La graduación no es una propiedad fija de la categoría. Las cartas 1 y 2 ahora nombran productos concretos, Heineken Original y La Sidruca Original, con porcentajes confirmados en sus fichas de fabricante. Próxima: carta 3, vino de mesa. |
+| `drinks` · Graduación de bebidas | 21/21, cerrado el 30-09-2026 | Las 21 cartas se contrastaron con fichas de fabricantes, distribuidores o etiquetas oficiales y enlazan la fuente específica. Las categorías genéricas se precisaron como productos concretos: la graduación cambia según marca, versión o mercado. En Beefeater, el propio fabricante advierte que el 40 % corresponde a la mayoría de países; en Don Julio Blanco la ficha corresponde a México. |
+| `festivities` · Festividades del año | 3/20, en curso | Año Nuevo, Reyes Magos/Epifanía y Día de la Constitución contrastados con el BOE. Se corrigió el ordinal del 6 de diciembre en año no bisiesto: día 340, no 341. Próxima carta en orden: 3, San Valentín. |
 
-Quedan pendientes 19 cartas de `drinks` y los otros 27 retos rápidos. En `drinks`, la referencia común del NIAAA explica la unidad de bebida estándar, pero no respalda la graduación exacta de cada producto: sustituirla carta por carta por ficha o etiqueta específica. Para el deporte de Kin-Ball, la fuente es una federación nacional: conviene sustituirla por el reglamento internacional cuando esté accesible. La fuente de polo es el reglamento de la asociación estadounidense; la cifra corresponde al polo exterior.
+Quedan pendientes 17 cartas de `festivities` y los otros 26 retos rápidos. En `drinks` se sustituyó la referencia común del NIAAA, que no respaldaba las graduaciones exactas, por fuentes específicas de cada producto. Para el deporte de Kin-Ball, la fuente es una federación nacional: conviene sustituirla por el reglamento internacional cuando esté accesible. La fuente de polo es el reglamento de la asociación estadounidense; la cifra corresponde al polo exterior.
 
 ## Grandes colecciones
 
