@@ -134,6 +134,7 @@
     hub(screen, title, eyebrow, [
       // Quien se une no elige mazo: la invitación ya lo lleva.
       route === 'wifi' ? modeDoor('wifi-join', 'menu-wifi.webp', 'Unirme a una sala', 'Escanea el código de quien la ha creado, sea cual sea el mazo.', true) : '',
+      route === 'online' ? modeDoor('online-join', 'menu-private.webp', 'Unirme a una sala', 'Escanea el QR o escribe el código de quien la ha creado, sea cual sea el mazo.', true) : '',
       inlineCollections(route),
       modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
       route === 'local' || route === 'online' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas y rondas con marcador acumulado.', false, `data-competition-audience="${route}"`, 'Configurar competición') : ''
@@ -178,6 +179,14 @@
       event.stopImmediatePropagation();
       sessionStorage.setItem('continuum-entry-route', 'wifi');
       window.CONTINUUM.LocalMultiplayer.open({ join: true, onBack: () => openFriendHub('wifi') });
+      return;
+    }
+    const onlineJoin = event.target.closest('[data-action="online-join"]');
+    if (onlineJoin) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      sessionStorage.setItem('continuum-entry-route', 'online');
+      import('./online.js').then(online => online.openOnlineMode({ joinOnly: true, onBack: () => openFriendHub('online') }));
       return;
     }
     const friendQuick = event.target.closest('[data-friend-quick]');

@@ -527,6 +527,7 @@ export async function openOnlineMode(options = {}) {
   returnToMenu = typeof options.onBack === "function" ? options.onBack : null;
   selectedModeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
   competitionOptions = options.competition || null;
+  joinOnly = !!options.joinOnly;
   sessionNewDiscoveries = 0;
   sessionAchievements = [];
   renderEntry(cleanCode(options.roomCode));
@@ -546,16 +547,17 @@ export async function openOnlineMode(options = {}) {
   }
 }
 
+let joinOnly = false;
 function renderEntry(invited = "") {
   const known = invited ? rememberedRoom(invited) : null;
   // El nombre del perfil manda: el que se usó antes en esta misma sala solo se propone si
   // este móvil todavía no tiene perfil.
   const ownName = escapeHtml(CT.Identidad?.propio?.() || known?.name || "");
   paint(`<div class="shell online-shell">${header('<button class="icon-btn" data-online-action="guide">Guía</button><button class="icon-btn" data-online-action="back">Salir</button>')}
-    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
+    <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${joinOnly ? "Sala privada" : CT.mode(selectedModeKey).name}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas</h2><p class="lead">Cada persona juega desde su móvil y todos ven la línea temporal avanzar en directo.</p></section>
     <div class="online-entry-grid${invited ? " online-entry-invited" : ""}">
       <form class="panel online-form" data-online-form="join"><span class="form-number">01</span><h3>${invited ? "Te han invitado a una sala" : "Entrar en una sala"}</h3><p>${invited ? "Introduce tu nombre para unirte a la partida compartida." : "Usa el código que aparece en el móvil anfitrión."}</p><div class="field"><label for="online-code">Código de sala</label><input id="online-code" name="code" class="room-code-input" maxlength="8" required placeholder="ABCD2345" value="${escapeHtml(invited)}" autocapitalize="characters" autocomplete="off"></div><div class="field"><label for="online-player-name">Tu nombre</label><input id="online-player-name" name="name" maxlength="18" required placeholder="Ej. Lucía" autocomplete="name" value="${ownName}"></div>${invited ? "" : '<button class="btn btn-secondary btn-block" type="button" data-online-action="scan-qr">Escanear código QR</button>'}<button class="btn btn-primary btn-block" type="submit">Unirme a la partida <span>→</span></button></form>
-      ${invited ? "" : `<form class="panel online-form" data-online-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código, el enlace o el QR.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName}"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>`}
+      ${invited || joinOnly ? "" : `<form class="panel online-form" data-online-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código, el enlace o el QR.</p><div class="field"><label for="online-host-name">Tu nombre</label><input id="online-host-name" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName}"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>`}
     </div>
     <p class="online-note">Necesita conexión a internet durante la partida compartida.</p>
   </div>`, "online-entry");
