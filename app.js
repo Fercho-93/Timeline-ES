@@ -1181,16 +1181,23 @@
     });
   }
 
-  function timelineCardMarkup(card, hidden = false) {
-    if (hidden) return CT.Ghost.hiddenCard(card);
+  // `hidden` es el Fantasma. En multijugador la carta oculta pierde hasta la lámina; en solitario (`keepArt`)
+  // la lámina se queda siempre a la vista y solo se tapa el valor, que es lo que el Fantasma esconde.
+  function timelineCardMarkup(card, hidden = false, keepArt = false) {
+    if (hidden && !keepArt) return CT.Ghost.hiddenCard(card);
+    const oculta = hidden && keepArt;
     const era = eraForCard(card);
     // El identificador no se ve ni se lee: es el ancla que usa `a11y.js` para no perder
     // el sitio en la línea cuando se repinta la pantalla.
     const animal = usesAnimalArt();
+    const textoOculto = "Valor y explicación ocultos durante esta jugada.";
+    const valor = oculta ? `<div class="year ghost-value" aria-label="Valor oculto">— —</div>` : `<div class="year">${formatValue(card)}</div>`;
     // La lámina se ve entera; la temática, el título y el valor van en su placa inferior.
     const body = animal
-      ? `<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content">${categoryBadge(card)}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p><div class="year">${formatValue(card)}</div></div>`
-      : `<div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}<div class="year">${formatValue(card)}</div><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.detail)}</p></div>`;
+      ? `<div class="card-visual era-${era.key}">${animalArt(card)}</div><div class="card-content">${categoryBadge(card)}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(oculta ? textoOculto : card.detail)}</p>${valor}</div>`
+      : `<div class="card-visual era-${era.key}"><span>${era.symbol}</span><small>${era.name}</small></div><div class="card-content">${categoryBadge(card)}${valor}<h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(oculta ? textoOculto : card.detail)}</p></div>`;
+    // Con el valor oculto la carta no se abre: la explicación desvelaría justo lo que se esconde.
+    if (oculta) return `<article class="timeline-card ghost-card ghost-art ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" aria-label="${escapeHtml(card.title)}. Valor oculto.">${body}</article>`;
     return `<article class="timeline-card card-flippable ${animal ? "animal-timeline-card" : ""}" data-id="${card.id}" role="button" tabindex="0" aria-label="${escapeHtml(card.title)}. Toca para ver ${animal ? "la lámina y los datos" : "la explicación"}.">${body}</article>`;
   }
 
@@ -2602,7 +2609,7 @@
       slots.push(pendingIndex === i
         ? confirmSlot(card)
         : slotMarkup(i, timelineCards.length, "solo-place", true, i === failIndex));
-      if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i], soloHidden()));
+      if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i], soloHidden(), true));
     }
     const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + Math.ceil(solo.deck.length / (1 + CT.Ghost.level(solo.difficulty).extra));
     const etiqueta = soloLabel();

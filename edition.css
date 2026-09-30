@@ -5092,3 +5092,7 @@ html #app .mode-create-list[hidden]{display:none}
   background-repeat: no-repeat !important;
   padding-right: 38px;
 }
+
+/* Fantasma en solitario: la lámina se ve igual; solo el valor va tapado. */
+.ghost-card.ghost-art .card-visual { background: none; color: inherit; }
+.ghost-card.ghost-art { cursor: default; }
