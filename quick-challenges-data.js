@@ -10,10 +10,13 @@
   };
   const host = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };
   // El detalle que se ve al descubrir una carta: qué es, qué se mide, a qué fecha y de dónde sale.
-  const cards = (prefix, source, rows, context, asOf) => rows.map(([title, value, label, image], i) => ({
-    id: `${prefix}-${i + 1}`, title, value, label, image: image || null,
-    detail: `${title}: ${label}. ${context}${asOf ? ` Datos a ${asOf}.` : ''}${host(source) ? ` Fuente: ${host(source)}.` : ''}`, source
-  }));
+  const cards = (prefix, source, rows, context, asOf) => rows.map(([title, value, label, image, cardSource], i) => {
+    const reference = cardSource || source;
+    return {
+      id: `${prefix}-${i + 1}`, title, value, label, image: image || null,
+      detail: `${title}: ${label}. ${context}${asOf ? ` Datos a ${asOf}.` : ''}${host(reference) ? ` Fuente: ${host(reference)}.` : ''}`, source: reference
+    };
+  });
   const deck = (id, title, rule, context, direction, cover, source, rows) => ({ id, title, rule, context, direction, cover, asOf: AS_OF[id] || null, cards: cards(id, source, rows, context, AS_OF[id] || null) });
   const S = {
     sport: 'https://www.olympics.com/ioc/olympic-games', drinks: 'https://www.niaaa.nih.gov/alcohols-effects-health/alcohol-topics/what-standard-drink', dates: 'https://www.timeanddate.com/holidays/',
@@ -26,32 +29,32 @@
       'sports-players',
       'Deportes por jugadores por equipo',
       'De menos a más jugadores por equipo',
-      'Jugadores de cada equipo en juego a la vez, en la modalidad estándar del deporte.',
+      'Integrantes en juego por equipo en la modalidad indicada; en béisbol y críquet se cuenta el equipo que defiende. En natación artística se cuenta la rutina por equipos.',
       1,
       'sports',
       S.sport,
       [
-        ['Baloncesto',5,'5 jugadores','assets/quick-cards/sports-players-1.webp'],
-        ['Fútbol sala',5,'5 jugadores','assets/quick-cards/sports-players-2.webp'],
-        ['Hockey hielo',6,'6 jugadores','assets/quick-cards/sports-players-3.webp'],
-        ['Voleibol',6,'6 jugadores','assets/quick-cards/sports-players-4.webp'],
-        ['Waterpolo',7,'7 jugadores','assets/quick-cards/sports-players-5.webp'],
-        ['Balonmano',7,'7 jugadores','assets/quick-cards/sports-players-6.webp'],
-        ['Béisbol',9,'9 jugadores','assets/quick-cards/sports-players-7.webp'],
-        ['Lacrosse',10,'10 jugadores','assets/quick-cards/sports-players-8.webp'],
-        ['Fútbol',11,'11 jugadores','assets/quick-cards/sports-players-9.webp'],
-        ['Cricket',11,'11 jugadores','assets/quick-cards/sports-players-10.webp'],
-        ['Hockey hierba',11,'11 jugadores','assets/quick-cards/sports-players-11.webp'],
-        ['Rugby union',15,'15 jugadores','assets/quick-cards/sports-players-12.webp'],
-        ['Pádel',2,'2 jugadores','assets/quick-cards/sports-players-13.webp'],
-        ['Polo',4,'4 jugadores','assets/quick-cards/sports-players-14.webp'],
-        ['Netball',7,'7 jugadores','assets/quick-cards/sports-players-15.webp'],
-        ['Kin-ball',4,'4 jugadores','assets/quick-cards/sports-players-16.webp'],
-        ['Curling',4,'4 jugadores','assets/quick-cards/sports-players-17.webp'],
-        ['Hurling',15,'15 jugadores','assets/quick-cards/sports-players-18.webp'],
-        ['Vóley playa',2,'2 jugadores','assets/quick-cards/sports-players-19.webp'],
-        ['Natación artística',8,'8 nadadoras','assets/quick-cards/sports-players-20.webp'],
-        ['Fútbol americano',11,'11 jugadores','assets/quick-cards/sports-players-21.webp']
+        ['Baloncesto',5,'5 jugadores','assets/quick-cards/sports-players-1.webp','https://about.fiba.basketball/en/our-sport/basketball'],
+        ['Fútbol sala',5,'5 jugadores','assets/quick-cards/sports-players-2.webp','https://inside.fifa.com/en/news/a-crash-course-in-futsal-rules'],
+        ['Hockey hielo',6,'6 jugadores','assets/quick-cards/sports-players-3.webp','https://www.iihf.com/en/static/55352/rules_regulations_guidelines'],
+        ['Voleibol',6,'6 jugadores','assets/quick-cards/sports-players-4.webp','https://www.fivb.com/volleyball/the-game/basic-rules/'],
+        ['Waterpolo',7,'7 jugadores','assets/quick-cards/sports-players-5.webp','https://www.worldaquatics.com/news/4186172/world-aquatics-updates-competition-regulations-2025'],
+        ['Balonmano',7,'7 jugadores','assets/quick-cards/sports-players-6.webp','https://www.ihf.info/sites/default/files/2025-02/09A%20-%20Rules%20of%20the%20Game_Indoor%20Handball_E.pdf'],
+        ['Béisbol',9,'9 jugadores','assets/quick-cards/sports-players-7.webp','https://www.mlb.com/glossary/positions'],
+        ['Lacrosse de campo masculino',10,'10 jugadores','assets/quick-cards/sports-players-8.webp','https://worldlacrosse.sport/discipline-mens-field/'],
+        ['Fútbol',11,'11 jugadores','assets/quick-cards/sports-players-9.webp','https://www.theifab.com/laws/latest/the-players/'],
+        ['Cricket',11,'11 jugadores','assets/quick-cards/sports-players-10.webp','https://www.icc-cricket.com/news/mens-test-match-clause-1-the-players'],
+        ['Hockey hierba',11,'11 jugadores','assets/quick-cards/sports-players-11.webp','https://www.fih.hockey/about-fih/official-documents/rules-of-hockey'],
+        ['Rugby union',15,'15 jugadores','assets/quick-cards/sports-players-12.webp','https://passport.world.rugby/laws-of-the-game/laws-by-number/3-team'],
+        ['Pádel',2,'2 jugadores','assets/quick-cards/sports-players-13.webp','https://www.padelfip.com/wp-content/uploads/2025/12/FIP_Rules-of-Padel.pdf'],
+        ['Polo',4,'4 jugadores','assets/quick-cards/sports-players-14.webp','https://www.uspolo.org/assets/docs/2019-Rulebook-for-website_190205_122821.pdf'],
+        ['Netball',7,'7 jugadores','assets/quick-cards/sports-players-15.webp','https://netball.sport/game/netball-explained/'],
+        ['Kin-ball',4,'4 jugadores','assets/quick-cards/sports-players-16.webp','https://www.kin-ball.in/'],
+        ['Curling de cuatro',4,'4 jugadores','assets/quick-cards/sports-players-17.webp','https://worldcurling.org/about/curling/'],
+        ['Hurling',15,'15 jugadores','assets/quick-cards/sports-players-18.webp','https://www.gaa.ie/api/pdfs/image/upload/s0nddwy8nims22rad74a.pdf'],
+        ['Vóley playa',2,'2 jugadores','assets/quick-cards/sports-players-19.webp','https://www.fivb.com/beach-volleyball/the-game/basic-rules/'],
+        ['Natación artística por equipos',8,'8 deportistas','assets/quick-cards/sports-players-20.webp','https://www.worldaquatics.com/news/4431689/artistic-swimming-path-to-la-28-confirmed-as-olympic-qualification-system-approved'],
+        ['Fútbol americano',11,'11 jugadores','assets/quick-cards/sports-players-21.webp','https://playfootball.nfl.com/tackle/youth-and-high-school-tackle-football-glossary/']
       ]
     ),
     d(
