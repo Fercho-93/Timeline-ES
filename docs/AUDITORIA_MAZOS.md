@@ -7,14 +7,15 @@ Este registro indica qué cartas se han contrastado de forma individual. Una pru
 | Mazo | Estado | Resultado |
 | --- | --- | --- |
 | `sports-players` · Deportes por jugadores por equipo | 21/21, cerrado el 30-09-2026 | Las cifras concuerdan con la modalidad indicada. Se precisaron lacrosse de campo masculino, curling de cuatro y natación artística por equipos; esta última admite deportistas varones. La regla ahora aclara béisbol y críquet. Cada carta enlaza una referencia específica de federación, liga u organismo deportivo. |
+| `drinks` · Graduación de bebidas | 2/21, en curso | La graduación no es una propiedad fija de la categoría. Las cartas 1 y 2 ahora nombran productos concretos, Heineken Original y La Sidruca Original, con porcentajes confirmados en sus fichas de fabricante. Próxima: carta 3, vino de mesa. |
 
-Quedan pendientes los otros 28 retos rápidos. Para el deporte de Kin-Ball, la fuente es una federación nacional: conviene sustituirla por el reglamento internacional cuando esté accesible. La fuente de polo es el reglamento de la asociación estadounidense; la cifra corresponde al polo exterior.
+Quedan pendientes 19 cartas de `drinks` y los otros 27 retos rápidos. En `drinks`, la referencia común del NIAAA explica la unidad de bebida estándar, pero no respalda la graduación exacta de cada producto: sustituirla carta por carta por ficha o etiqueta específica. Para el deporte de Kin-Ball, la fuente es una federación nacional: conviene sustituirla por el reglamento internacional cuando esté accesible. La fuente de polo es el reglamento de la asociación estadounidense; la cifra corresponde al polo exterior.
 
 ## Grandes colecciones
 
 | Mazo | Estado | Resultado |
 | --- | --- | --- |
-| `astronomy.js` · Astronomía y espacio | 4/55, en curso | Cartas 4006, 4010, 4011 y 4014 revisadas. Eratóstenes y el *Almagesto* llevan fecha aproximada; se retiró una precisión no justificada de la medición antigua. El astrolabio se sitúa de forma convencional en el siglo IX según el British Museum; Su Song se atribuye también a Han Gonglian. Las cuatro cartas enlazan su fuente. Próxima: 8001 (Copérnico). |
+| `astronomy.js` · Astronomía y espacio | 55/55, cerrado el 30-09-2026 | Contraste individual de fecha, hito, modalidad y explicación con fuentes institucionales de NASA, ESA, ESO, IAU, LIGO, CNSA y otras instituciones. Se explicitaron las fechas aproximadas antiguas; Rømer no calculó una velocidad en distancia/tiempo; la cefeida de Andrómeda se identificó en 1923, con anuncio de la conclusión en 1924; la señal de LIGO se captó en 2015, pero se anunció en 2016; Philae rebotó tras el primer contacto. Las 55 cartas enlazan su fuente específica. |
 
 Las otras grandes colecciones siguen pendientes en esta ronda de auditoría.
 

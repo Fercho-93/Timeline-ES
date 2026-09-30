@@ -66,8 +66,8 @@
       'science',
       S.drinks,
       [
-        ['Cerveza lager',5,'5 % vol.','assets/quick-cards/drinks-1.webp'],
-        ['Sidra',5.5,'5,5 % vol.','assets/quick-cards/drinks-2.webp'],
+        ['Heineken Original (cerveza lager)',5,'5 % vol.','assets/quick-cards/drinks-1.webp','https://www.heineken.com/es/es/nuestros-productos/heineken-original'],
+        ['La Sidruca Original (sidra)',5.5,'5,5 % vol.','assets/quick-cards/drinks-2.webp','https://sidrasomarroza.es/producto/la-sidruca-natural/'],
         ['Vino de mesa',13,'13 % vol.','assets/quick-cards/drinks-3.webp'],
         ['Sake',15,'15 % vol.','assets/quick-cards/drinks-4.webp'],
         ['Jerez',15,'15 % vol.','assets/quick-cards/drinks-5.webp'],
