@@ -114,6 +114,23 @@ async function rename(aliasArg) {
   if(card) card.outerHTML=accountCard();
   if (desdeDialogo) CT.closeDialog();
 }
+// El avatar que se ve en el ranking es el que cada persona eligió, no uno calculado. Se guarda en
+// el perfil (y en su fila del ranking, si la hay) cada vez que cambia. Si las reglas aún no
+// admiten el avatar nuevo, falla en silencio y se reintenta en la próxima apertura.
+async function syncAvatar() {
+  const wanted = CT.Avatares?.ownId?.();
+  if (!identity || !profile || !wanted || wanted === profile.avatar || !CT.Avatares.ids.includes(wanted)) return;
+  const r = refs(identity.uid);
+  try {
+    await runTransaction(db, async tx => {
+      const p = await tx.get(r.profile), rank = await tx.get(r.ranking);
+      if (!p.exists()) return;
+      tx.set(r.profile, {...p.data(), avatar: wanted});
+      if (rank.exists()) tx.set(r.ranking, {...rank.data(), avatar: wanted, updatedAt: serverTimestamp()});
+    });
+    profile = {...profile, avatar: wanted};
+  } catch { /* sin conexión o reglas sin actualizar: se reintenta al entrar */ }
+}
 function metadata() { try { return JSON.parse(CT.Storage.getItem(META)) || {}; } catch { return {}; } }
 function setMeta(dirty) { CT.Storage.setItem(META,JSON.stringify({revision,dirty})); }
 function payload() {
@@ -121,6 +138,20 @@ function payload() {
   const totals = JSON.parse(progress).totals || {};
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
   return {progress,records,hits:count(totals.dailyHits),games:count(totals.dailyGames),season};
+}
+// Lo jugado sin conexión antes de tener invitado vive en un espacio aparte («locked»). Si la cuenta
+// es nueva y no tiene progreso en la nube, ese progreso pasa a ser el suyo en vez de perderse.
+function adoptOffline() {
+  const raw = key => { try { return localStorage.getItem(`continuum-account:${season}:locked:${key}`); } catch { return null; } };
+  const progress = raw(P), records = raw(R);
+  if (!progress && !records) return false;
+  suppress = true;
+  if (progress) CT.Storage.setItem(P, progress);
+  if (records) CT.Storage.setItem(R, records);
+  suppress = false;
+  revision = 0; change++; setMeta(true);
+  try { localStorage.removeItem(`continuum-account:${season}:locked:${P}`); localStorage.removeItem(`continuum-account:${season}:locked:${R}`); } catch { /* ya está copiado */ }
+  return true;
 }
 function restoreRemote(data) {
   suppress = true;
@@ -225,9 +256,12 @@ async function enter() {
     if (meta.dirty) {
       if (revision !== (remote?.revision || 0)) { conflictScreen(); return; }
       await flush();
+    } else if (!remote && adoptOffline()) {
+      await flush();
     } else restoreRemote(remote);
     // Un UID compartido con Firebase y un alias guardado para los modos que piden nombre.
     CT.Storage.setItem('hilo-jugador-v1',u.uid);CT.Storage.setItem('hilo-nombre-v1',profile.alias);
+    await syncAvatar();
     ready=true;stopStorage?.();stopStorage=CT.AccountStorage.subscribe(schedule);
     if (!active) { active=true;startGame(); }
   } catch (error) {
@@ -256,12 +290,12 @@ async function ranking() {
   const mine=entries.findIndex(v=>v.id===identity.uid);
   const ownSnap=mine<0?await getDocFromServer(refs(identity.uid).ranking):null;
   const own=mine>=0?entries[mine]:ownSnap?.exists()?{id:identity.uid,...ownSnap.data()}:null;
-  const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, ...(v.id === CT.Accounts?.user?.uid ? { id: CT.Avatares.ownId() } : {}) });
+  const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === CT.Accounts?.user?.uid ? CT.Avatares.ownId() : v.avatar });
   const player=(v,i)=>`<tr class="${v.id===identity.uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${v.id===identity.uid?'<small class="ranking-you">Tú</small>':''}</td><td><b>${Number(v.hits)||0}</b></td></tr>`;
   const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===identity.uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${v.id===identity.uid?'<small class="ranking-you">Tú</small>':''}<strong>${Number(v.hits)||0}</strong><span>aciertos</span></article>`).join('');
   accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETOS DIARIOS</span><span class="ranking-emblem" aria-hidden="true">✦</span><h2>La cima te espera</h2><p>Un nuevo día. Un nuevo reto. Tu siguiente puesto.</p><span class="ranking-caption">Ranking de retos diarios · Top 50</span></header>
     <div class="ranking-body">${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros exploradores">${podium}</div><div class="ranking-personal${own?' has-result':''}">${mine>=0?`<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${Number(own.hits)||0}</b> aciertos</span>`:own?`<span>Tu posición <b>Fuera del top 50</b></span><span><b>${Number(own.hits)||0}</b> aciertos</span>`:'Completa un reto diario para sumar tus aciertos al ranking.'}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}`:`<div class="ranking-empty"><span aria-hidden="true">✧</span><h3>La primera huella puede ser tuya</h3><p>Todavía no hay resultados. Completa un reto diario y estrena el ranking.</p><button class="btn btn-primary ranking-daily" data-account-action="daily">Jugar un reto diario <span aria-hidden="true">→</span></button></div>`}
-    <details class="account-details ranking-rules"><summary>Cómo se suman los aciertos</summary><p>Aciertos acumulados en el reto diario completado. Es un único reto al día, así que cuenta una sola vez; las partidas libres y multijugador no puntúan. Resultados enviados por el juego, sin validación competitiva.</p><p>Primeros 50 jugadores. Las igualdades comparten puesto y no se consideran un desempate competitivo.</p></details></div>
+    <details class="account-details ranking-rules"><summary>Cómo se suman los aciertos</summary><p>Aciertos acumulados en los retos diarios completados, de Grandes colecciones y de Retos rápidos. Es un único reto al día, así que cuenta una sola vez; las partidas libres, los duelos y la competición no puntúan. Los puntos del mes que ves en el inicio son otra cuenta (hasta 100 por reto). Resultados enviados por el juego, sin validación competitiva.</p><p>Primeros 50 jugadores. Las igualdades comparten puesto y no se consideran un desempate competitivo.</p></details></div>
     <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`,true);
 }
 function deleteScreen() {
@@ -280,7 +314,7 @@ async function removeAccount() {
 }
 export async function startAccounts(callback) {
   startGame=callback;
-  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,renombra:alias=>rename(alias)};
+  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar};
   await auth.authStateReady();
   await setPersistence(auth,browserLocalPersistence);
   onAuthStateChanged(auth,u=>{

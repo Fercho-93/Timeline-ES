@@ -52,6 +52,7 @@
         daily.lastDay=day();daily.best=Math.max(daily.best||0,hits);
         daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id};
         all.retoDiario=daily;CT.Storage.setItem(key,JSON.stringify(all));
+        CT.Progreso?.finishQuickDaily?.({hits,total,streak:daily.streak});
       }
     }
     record.historySaved = true;
@@ -359,6 +360,7 @@
         ${final && record.config.kind==='duel' ? button('rematch', 'Crear una revancha', 'btn btn-secondary btn-block') : ''}
         ${final && record.config.kind==='duel' ? button('share-duel','Compartir duelo','btn btn-secondary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div>` : ''}
         ${final && Number.isFinite(record.config.rivalScore) ? `<p>Tu rival: ${record.config.rivalScore} puntos. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Tu rival ha asegurado más puntos.'}</p>` : ''}
+        ${final && record.config.kind==='daily' && CT.Accounts?.ready ? '<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>' : ''}
         <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button>${button('abandon','Salir sin guardar','btn btn-ghost exit-discard')}</section>
         <details class="panel quick-panel"><summary>Ver el orden completo y las fuentes</summary><ol>${[...c.cards].sort((a, b) => (a.value - b.value) * c.direction).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} <a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Fuente</a></p></li>`).join('')}</ol></details>`);
       return;

@@ -305,7 +305,7 @@
   function rankingSummary() {
     let classic=0, quick=0;
     try {
-      const records=JSON.parse(localStorage.getItem('hilo-retos-v1')||'{}');
+      const records=JSON.parse((window.CONTINUUM?.Storage||localStorage).getItem('hilo-retos-v1')||'{}');
       const raw=records.retoDiario||{};
       for(const [date,result] of Object.entries(raw.days||{})){
         if(!date.startsWith(seasonKey()) || !(Number(result.total)>0))continue;
@@ -321,7 +321,7 @@
     const doors=app.querySelector('.home-doors'); if(!doors)return;
     const r=rankingSummary(), box=document.createElement('section');
     box.className='mode-ranking-summary';
-    box.innerHTML=`<div><small>TUS RETOS · ${new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'}).toUpperCase()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
+    box.innerHTML=`<div><small>TUS RETOS · ${new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'}).toUpperCase()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking de retos diarios <span aria-hidden="true">→</span></button>':''}`;
     doors.append(box);
   }
 

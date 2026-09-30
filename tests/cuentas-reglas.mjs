@@ -33,6 +33,10 @@ try {
  await assertFails(getDocs(query(collection(unauthenticated,'dailyRanking'),limit(50))));
  await assertFails(deleteDoc(doc(other,'dailyRanking','account-a')));
  batch=writeBatch(db);batch.update(doc(db,'playerProfiles','account-a'),{alias:'Fulanito',aliasKey:'fulanito'});batch.set(doc(db,'playerNames','fulanito'),{uid:'account-a'});batch.delete(doc(db,'playerNames','fer'));batch.update(doc(db,'dailyRanking','account-a'),{alias:'Fulanito',updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
+ // El avatar elegido (uno de los 36 del selector) se publica en el perfil y en el ranking; uno inventado, no.
+ batch=writeBatch(db);batch.update(doc(db,'playerProfiles','account-a'),{avatar:'tigre'});batch.update(doc(db,'dailyRanking','account-a'),{avatar:'tigre',updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
+ await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'Fulanito',aliasKey:'fulanito',avatar:'inventado'}));
+ await assertFails(setDoc(doc(db,'dailyRanking','account-a'),{...rank,alias:'Fulanito',avatar:'panda',updatedAt:serverTimestamp()})); // no coincide con el perfil
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'x'}));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,season:'other'}));
  await assertFails(deleteDoc(doc(db,'playerNames','fulanito')));

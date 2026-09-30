@@ -146,6 +146,44 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(daily,1);assert.equal(w.document.querySelector('[role="dialog"]'),null);
  dom.window.close();
 }
+{
+ // El avatar elegido se publica en el perfil y en la fila del ranking, y el ranking dibuja el de cada persona.
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'dailyRanking/a':{alias:'Fer',avatar:'compass',hits:3,games:1,season:'launch-1'},'dailyRanking/b':{alias:'Bea',avatar:'panda',hits:5,games:2,season:'launch-1'}});
+ await w.testAccounts.startAccounts(()=>{});
+ assert.equal(data.get('playerProfiles/a').avatar,w.CONTINUUM.Avatares.ownId(),'al entrar se publica el avatar de la persona, también el que le tocó sin elegir');
+ w.CONTINUUM.Avatares.choose('tigre');await w.CONTINUUM.Accounts.sincronizaAvatar();
+ assert.equal(data.get('playerProfiles/a').avatar,'tigre','el elegido se publica');
+ assert.equal(data.get('dailyRanking/a').avatar,'tigre','y en su fila del ranking');
+ w.CONTINUUM.Avatares.choose('lince');await w.CONTINUUM.Accounts.sincronizaAvatar();
+ assert.equal(data.get('playerProfiles/a').avatar,'lince','al cambiarlo se vuelve a publicar');
+ w.document.body.insertAdjacentHTML('beforeend','<button data-account-action="ranking"></button>');
+ w.document.querySelector('[data-account-action="ranking"]').click();
+ await new Promise(r=>setTimeout(r,50));
+ const html=w.document.querySelector('.ranking-modal')?.innerHTML||'';
+ assert.match(html,/avatars\/panda\.webp/,'se ve el avatar que eligió la otra persona');
+ assert.match(html,/avatars\/lince\.webp/,'y el propio');
+ assert.match(html,/Grandes colecciones y de Retos rápidos/);
+ dom.window.close();
+}
+{
+ // Lo jugado sin conexión (espacio «locked») pasa a una cuenta nueva sin progreso en la nube.
+ const {w,dom,data}=setup(user('n'),{});
+ w.localStorage.setItem('continuum-account:launch-1:locked:hilo-perfil-v1','{"totals":{"dailyHits":4,"dailyGames":1}}');
+ w.localStorage.setItem('continuum-account:launch-1:locked:hilo-retos-v1','{"retoDiario":{"days":{}}}');
+ await w.testAccounts.startAccounts(()=>{});
+ assert.equal(JSON.parse(data.get('playerProgress/n').progress).totals.dailyHits,4,'el progreso sin conexión es ahora el de la cuenta');
+ assert.equal(data.get('dailyRanking/n').hits,4,'y cuenta para el ranking');
+ assert.equal(w.localStorage.getItem('continuum-account:launch-1:locked:hilo-perfil-v1'),null);
+ dom.window.close();
+}
+{
+ // Una cuenta que ya tiene progreso en la nube no lo pierde por lo que haya quedado sin conexión.
+ const {w,dom,data}=setup(user('m'),{'playerProfiles/m':{...profile,aliasKey:'fer'},'playerProgress/m':{progress:'{"totals":{"dailyHits":9,"dailyGames":2}}',records:'{}',hits:9,games:2,revision:1,season:'launch-1'}});
+ w.localStorage.setItem('continuum-account:launch-1:locked:hilo-perfil-v1','{"totals":{"dailyHits":1,"dailyGames":1}}');
+ await w.testAccounts.startAccounts(()=>{});
+ assert.equal(JSON.parse(data.get('playerProgress/m').progress).totals.dailyHits,9);
+ dom.window.close();
+}
 assert.match(read('index.html'),/src="boot.js"/);assert.doesNotMatch(read('index.html'),/src="app.js"/);
 assert.doesNotMatch(read('online.js'),/signInAnonymously/);
 console.log('Invitados: alta automática, reentrada, error de conexión, cambio de nombre, ranking, aislamiento y conflictos correctos.');

@@ -133,3 +133,5 @@
 
 /* La tarjeta «Jugar» no se mueve al tocarla (el :hover pegado del móvil y el giro de :active la hacían bailar mientras se despliega). */
 html #app button.mode-play-card:hover, html #app button.mode-play-card:active { transform: translateZ(0); box-shadow: inherit; }
+
+#app .mode-ranking-summary .mode-ranking-link { margin-top: 10px; width: 100%; }

@@ -253,6 +253,8 @@ service cloud.firestore {
       allow delete: if false;
     }
     function owner(uid) { return registered() && request.auth.uid == uid; }
+    // Los seis avatares del primer diseño y los 36 del selector actual (avatares.js). El elegido se publica con el perfil para que los demás lo vean en el ranking.
+    function validAvatar(a) { return a is string && a in ['compass', 'globe', 'star', 'book', 'rocket', 'owl', 'alfonso-x', 'felipe-ii', 'carlos-iii', 'cleopatra', 'marie-curie', 'isabel-catolica', 'ballena-azul', 'elefante', 'leon', 'panda', 'jirafa', 'buho-real', 'el-cid', 'cervantes', 'juana-i', 'melies', 'chaplin', 'ingrid-bergman', 'beethoven', 'aretha-franklin', 'david-bowie', 'piloto-arcade', 'aventurera', 'creador-puzles', 'tigre', 'lince', 'pulpo', 'flamenco', 'pinguino', 'zorro', 'caballera', 'ninja', 'automata', 'hechicera', 'explorador', 'piloto-espacial']; }
     function validName(uid) {
       let d=request.resource.data;
       return d.alias is string && d.alias.size() >= 2 && d.alias.size() <= 24
@@ -278,12 +280,13 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['alias','aliasKey','avatar','season','createdAt','privacyVersion'])
         && request.resource.data.alias is string
         && request.resource.data.alias.size() >= 2 && request.resource.data.alias.size() <= 24
-        && request.resource.data.avatar in ['compass','globe','star','book','rocket','owl']
+        && validAvatar(request.resource.data.avatar)
         && request.resource.data.season == 'launch-1'
         && request.resource.data.privacyVersion == 1
         && request.resource.data.createdAt == request.time;
       allow update: if owner(uid) && validName(uid)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['alias','aliasKey'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['alias','aliasKey','avatar'])
+        && validAvatar(request.resource.data.avatar)
         && (!('aliasKey' in resource.data) || resource.data.aliasKey == request.resource.data.aliasKey
           || !existsAfter(/databases/$(database)/documents/playerNames/$(resource.data.aliasKey)))
         && request.resource.data.alias is string

@@ -364,6 +364,23 @@
     return nuevos;
   }
 
+  // El reto diario de Retos rápidos no tiene mazo de Grandes colecciones detrás, así que no pasa por
+  // `finishGame`; suma lo mismo al ranking de retos diarios que el de Grandes colecciones.
+  function finishQuickDaily({ hits = 0, total = 0, streak = 0 }) {
+    const profile = read();
+    profile.playerId = profile.playerId || playerId();
+    profile.totals.games += 1;
+    profile.totals.rankedGames += 1;
+    const contados = Math.max(0, Math.min(hits, total));
+    profile.totals.dailyHits += contados;
+    profile.totals.dailyGames += 1;
+    if (total > 0 && contados === total) profile.marks.perfectDaily += 1;
+    profile.marks.bestStreak = Math.max(profile.marks.bestStreak, streak);
+    const nuevos = unlock(profile);
+    save(profile);
+    return nuevos;
+  }
+
   // La competición se cuenta aparte: cada ronda ya pasó por `finishGame` con su propio
   // mazo, y lo que premia el logro es haberlas jugado todas de seguido.
   function finishCompetition() {
@@ -548,7 +565,7 @@
 
   CT.Progreso = {
     KEY, ACHIEVEMENTS,
-    read, record, recordOnline, finishGame, finishOnline, finishCompetition, reset, playerId,
+    read, record, recordOnline, finishGame, finishQuickDaily, finishOnline, finishCompetition, reset, playerId,
     summary, modeRows, weakBands, weakCards, achievements, seenCards,
     exportJson, importJson
   };

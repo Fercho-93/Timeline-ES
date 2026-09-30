@@ -552,10 +552,10 @@
   }
 
   // El nombre se guarda también en la cuenta, si la hay: es el del ranking y los duelos.
-  // Durante las pruebas no se exige que sea único: si otra cuenta ya lo usa, el nombre se
-  // guarda igual en este móvil y la cuenta conserva el suyo. Para el lanzamiento, poner
-  // `NOMBRES_UNICOS` a `true` y se volverá a pedir otro nombre.
-  const NOMBRES_UNICOS = false;
+  // El nombre es público en el ranking y no puede repetirse: si otra cuenta ya lo usa, se vuelve
+  // a pedir otro. Con `NOMBRES_UNICOS` a `false` (solo para pruebas) el nombre se guardaría en
+  // este móvil y la cuenta conservaría el suyo, con lo que el ranking mostraría «Player ####».
+  const NOMBRES_UNICOS = true;
   async function guardaNombre(nombre) {
     const problema = CT.Identidad.problema(nombre);
     if (problema) throw Error(problema);
@@ -564,6 +564,18 @@
       await CT.Accounts.renombra(CT.Identidad.limpia(nombre));
     } catch (error) {
       if (NOMBRES_UNICOS || !/ya está en uso/.test(error?.message || "")) throw error;
+    }
+  }
+
+  // Quien puso su nombre sin conexión (o antes de que hubiera cuenta) lo tiene en el móvil pero no en el
+  // ranking, donde seguiría apareciendo como «Player ####». Al abrir con cuenta se publica; si el nombre
+  // lo tiene ya otra persona, se avisa en vez de dejarlo así sin decir nada.
+  async function sincronizaNombrePendiente() {
+    const nombre = CT.Identidad.nombre();
+    if (!nombre || !CT.Accounts?.ready || !CT.Accounts.profile || CT.Accounts.profile.alias === nombre) return;
+    try { await CT.Accounts.renombra(nombre); }
+    catch (error) {
+      if (/ya está en uso/.test(error?.message || "")) showToast(`«${nombre}» ya lo usa otra persona: en el ranking apareces como ${CT.Accounts.profile.alias}. Cámbialo en el Atlas.`);
     }
   }
 
@@ -1867,6 +1879,7 @@
 
   function seleccionaAvatar(id) {
     if (!CT.Avatares.choose(id)) return;
+    CT.Accounts?.sincronizaAvatar?.();
     CT.closeDialog(true);
     if (screen === "perfil") perfilView();
     else {
@@ -2780,7 +2793,7 @@
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,soloKind==='free'?(finalHits>previousBest?'nueva mejor marca':'mejor marca'):'mejor marca',newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}${soloKind === "daily" ? '<button class="btn btn-primary" data-action="home">Ir al inicio</button>' : `<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="${duelo ? "duel-home" : "solo"}">${duelo ? "Volver a los duelos" : "Volver a solitario"}</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`}</div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,soloKind==='free'?(finalHits>previousBest?'nueva mejor marca':'mejor marca'):'mejor marca',newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${compartir && CT.Accounts?.ready ? `<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}${soloKind === "daily" ? '<button class="btn btn-primary" data-action="home">Ir al inicio</button>' : `<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="${duelo ? "duel-home" : "solo"}">${duelo ? "Volver a los duelos" : "Volver a solitario"}</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`}</div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -4112,4 +4125,5 @@
     else duelInvalido(leido.motivo, leido.mode);
   } else if (!CT.Identidad.reconoce()) bienvenida();
   else if (!restoreView()) home();
+  sincronizaNombrePendiente();
 })();

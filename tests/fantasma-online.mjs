@@ -24,7 +24,7 @@ function client(uid){
  // no lo reconoce como marca de hora del servidor.
  w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.set(ref,limpio);},update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse,placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse:(objetivo,regalo)=>startPulse(objetivo,regalo??roomState.players[user.uid].hand[0]),placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];
@@ -118,7 +118,9 @@ try {
  const lobby=fixture();lobby.status='lobby';lobby.phase='lobby';delete lobby.ghost;lobby.timeline=[];lobby.deck=[];lobby.mode='animals';lobby.playerOrder=[A,B,C,'d','e','f','g','h','i'];lobby.players=Object.fromEntries(lobby.playerOrder.map(id=>[id,{name:id,hand:[],clientVersion:42} ]));await seed(lobby);
  await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-hand-size').value='6';await clients[0].call('startRoom');
  s=await snapshot();assert.equal(s.handSize,4);assert.equal(s.timeline.length,1);assert.ok(Object.values(s.players).every(p=>p.hand.length===4));
- assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,41);
+ // El reparto descarta los empates de cifra, así que no son siempre las 41 cartas cortadas: son las de valor único.
+ const repartibles=clients[0].w.CONTINUUM.uniqueValueIds('animals',clients[0].w.CONTINUUM.MODES.animals.cards.map(c=>c.id)).length;
+ assert.equal(new Set([...s.timeline,...s.deck,...Object.values(s.players).flatMap(p=>p.hand)]).size,repartibles);
  assert.equal(s.ghost.distribution,2);assert.equal(s.ghost.cards.length,3);
  // Pulso usa el mismo reparto, sin compartir posiciones con Fantasma.
  await seed(lobby);await clients[0].call('renderLobby');clients[0].w.document.getElementById('online-ghost').checked=true;clients[0].w.document.getElementById('online-pulse').checked=true;await clients[0].call('startRoom');
