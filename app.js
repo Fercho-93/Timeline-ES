@@ -1848,10 +1848,15 @@
 
   function eligeAvatar() {
     const selected = CT.Avatares.ownId();
+    // Los 36 avatares están ordenados en tres bloques de contenido:
+    // 0–5 personajes históricos, 6–11 animales, 12–23 personajes de historia/cine/música
+    // y arquetipos, 24–29 animales adicionales, 30–35 personajes de aventura/videojuego.
+    // No usar rangos cruzados: mezclar índices hacía que animales apareciesen como videojuegos
+    // y personajes como animales.
     const groups = [
-      ["Personajes históricos", CT.Avatares.ids.slice(0, 6).concat(CT.Avatares.ids.slice(12, 21))],
+      ["Personajes", CT.Avatares.ids.slice(0, 6).concat(CT.Avatares.ids.slice(12, 24))],
       ["Animales", CT.Avatares.ids.slice(6, 12).concat(CT.Avatares.ids.slice(24, 30))],
-      ["Videojuegos", CT.Avatares.ids.slice(21, 24).concat(CT.Avatares.ids.slice(30))]
+      ["Aventura y videojuegos", CT.Avatares.ids.slice(30)]
     ];
     overlay(`<div class="overlay"><section class="modal avatar-picker" aria-labelledby="avatar-picker-title">
       <header class="avatar-picker-header"><div><span class="eyebrow">TU PERSONAJE</span><h2 id="avatar-picker-title">Elige tu avatar</h2></div><button class="avatar-picker-close" type="button" data-action="close-menu" aria-label="Cerrar">×</button></header>
