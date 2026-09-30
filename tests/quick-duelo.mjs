@@ -70,4 +70,18 @@ assert.match(app.textContent, /Duelo de Retos rápidos/);
 assert.match(app.textContent, /mismos mazos/);
 assert.equal(app.querySelector('[data-quick="enter-room"], [data-quick="create-room"], #quick-net-code'), null, 'ya no pide sala ni código');
 assert.ok(app.querySelector('[data-quick="start-duel"]'));
+// El texto tras fallar una carta concuerda con quien juega: «Pierdes…» en solitario, «Ana pierde…» en mesa,
+// y con 0 aciertos provisionales no dice «pierde 0 aciertos».
+{
+  const src = read('quick-challenges.js'), f = src.slice(src.indexOf('  function resultNote'), src.indexOf('  function render() {'));
+  const nota = (room, players) => new Function('room', 'state', 'esc', f + ';return resultNote;')(room, {players}, x => x);
+  const solo = nota(null, [1]), mesa = nota(null, [1, 2]);
+  assert.equal(solo({correct: true}, {name: 'Tú', points: 1}), 'Tienes 1 acierto provisional.');
+  assert.match(solo({correct: false, lost: 2}, {name: 'Tú'}), /^Pierdes 2 aciertos de este reto y quedas fuera/);
+  assert.match(solo({correct: false, lost: 1}, {name: 'Tú'}), /^Pierdes 1 acierto de este reto/);
+  assert.match(solo({correct: false, lost: 0}, {name: 'Tú'}), /^No tenías aciertos provisionales que perder/);
+  assert.match(mesa({correct: false, lost: 3}, {name: 'Ana'}), /^Ana pierde 3 aciertos de este reto y queda fuera/);
+  assert.doesNotMatch(mesa({correct: false, lost: 0}, {name: 'Ana'}), /pierde 0|0 aciertos/);
+  assert.doesNotMatch(solo({correct: false, lost: 0}, {name: 'Tú'}), /Tú pierde/);
+}
 console.log('Duelo de Retos rápidos: mazos por semilla, enlace corto, resultado comprobado por el motor y entrada con 1, 3 o 5 mazos.');
