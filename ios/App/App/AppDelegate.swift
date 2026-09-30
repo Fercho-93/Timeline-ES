@@ -1,4 +1,5 @@
 import UIKit
+import AVFoundation
 import Capacitor
 
 @UIApplicationMain
@@ -7,7 +8,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // La música ambiente es audio web: por defecto iOS la calla con el interruptor de silencio del
+        // iPhone. Con la categoría «playback» suena igual que en cualquier juego, y `mixWithOthers` deja
+        // seguir lo que el usuario ya estuviera escuchando (Spotify, podcasts). El volumen y el ajuste
+        // «Música ambiente» de la app siguen mandando.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
         return true
     }
 
