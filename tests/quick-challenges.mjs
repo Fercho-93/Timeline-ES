@@ -142,6 +142,11 @@ const openQuick = () => {
 openQuick();
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
 click('[data-quick="start"]');
+// Un solo móvil: antes de repartir se juega el minijuego de quién empieza (con una carta de Grandes colecciones).
+assert.ok(w.document.querySelector('[data-quick-starter]'), 'se abre el minijuego de quién empieza');
+for (let i = 0; i < 2; i++) { w.document.getElementById('quick-starter-input').value = i ? '1500' : '1900'; click('[data-quick="starter-guess"]'); }
+assert.match(w.document.querySelector('[data-quick-starter]').textContent, /Empieza la partida/);
+click('[data-quick="starter-go"]');
 let saved = JSON.parse(w.localStorage.getItem(key));
 assert.equal(saved.config.rounds.length, 3);
 assert.equal(new Set(saved.config.rounds.map(r => r.id)).size, 3);

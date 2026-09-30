@@ -377,6 +377,8 @@
     const showLocal = ['all', 'friends', 'local'].includes(audience);
     const showOnline = ['all', 'friends', 'online'].includes(audience);
     const withFriends = audience !== 'solo' && audience !== 'all';
+    // «Un solo móvil» ya es su propia pantalla de ajustes: rondas y cartas se eligen ahí, en una sola ventana.
+    if (audience === 'local') { prepareMultiCompetition(); return; }
     // Formas de jugar que se ofrecen. Si solo hay una (lo normal: ya se eligió en el menú de origen), no se repite
     // como puerta con el mismo nombre: queda un botón directo para empezar.
     const salidas = [
@@ -408,8 +410,13 @@
     pendingTournament = competitionOptions();
     setup();
     document.getElementById('hand-size').value = String(pendingTournament.cards);
+    const lengthField = document.createElement('div');
+    lengthField.className = 'field';
+    lengthField.innerHTML = `<label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===pendingTournament.rounds?' selected':''}>${label}</option>`).join('')}</select>`;
+    document.getElementById('hand-size').closest('.field').before(lengthField);
+    if (CT.Storage.getItem(MULTI_COMP_KEY) && !app.querySelector('[data-action="competition-resume"]')) app.querySelector('.setup-section .panel').insertAdjacentHTML('beforebegin', '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada <span>→</span></button>');
     app.querySelector('.setup-section h2').textContent = 'Competición multijugador';
-    app.querySelector('.setup-section .lead').textContent = `${pendingTournament.rounds} rondas con mazos aleatorios de las grandes colecciones. Las ${pendingTournament.cards} cartas son el reparto inicial por jugador, no un límite de robos. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
+    app.querySelector('.setup-section .lead').textContent = `Rondas con mazos aleatorios de las grandes colecciones. Las cartas iniciales son el reparto inicial por jugador, no un límite de robos. Ganar la ronda suma un punto; las cartas que te queden en la mano restan su número menos uno.`;
   }
   function startTournamentRound(t, players, starter, ghost, pulse, excludedCardId = null) {
     selectedModeKey = t.queue[t.index];
@@ -489,7 +496,7 @@
     }
     // Sin rastro (por ejemplo, tras recargar) se vuelve al menú que contiene esta pantalla.
     if (screen !== 'enciclopedia') navigatingBack = true;
-    if (screen === 'setup' && pendingTournament) { pendingTournament=null;competitionMenu();return; }
+    if (screen === 'setup' && pendingTournament) { pendingTournament=null;if (sessionStorage.getItem('continuum-competition-audience') === 'local') CT.ModeHubs.open('hub-friends-local'); else competitionMenu();return; }
     if (["setup", "solo-home", "duel-home", "online-loading", "online-error"].includes(screen)) {
       const entry = sessionStorage.getItem('continuum-entry-route');
       if (entry === 'mixed') CT.ModeHubs.open('hub-solo');
@@ -1045,7 +1052,7 @@
     const pulse = !!document.getElementById("pulse-toggle")?.checked;
     lastLocalSetup = { names, handSize: requestedHand, ghost, pulse };
     if (pendingTournament) {
-      const t=CT.Tournament.create(pendingTournament.rounds,requestedHand);pendingTournament=null;
+      const t=CT.Tournament.create(Number(document.getElementById('competition-length')?.value)||pendingTournament.rounds,requestedHand);pendingTournament=null;
       startTournamentRound(t,names.map((name,i)=>({id:i+1,name})),starter,ghost,pulse,starterDraw.cardId);return;
     }
     // Las cartas que se sacaron para decidir quién empieza ya se han visto: se apartan
