@@ -41,6 +41,11 @@
     el?.classList.add('splash-ready');
     el?.setAttribute('aria-hidden', 'false');
     guard();
+    // En cuanto la moneda deja de girar, el emblema pasa a ser una imagen plana: algunos Android
+    // componían mal la escena 3D ya quieta y dejaban el logo desplazado a la derecha.
+    const settle = () => el?.classList.add('splash-coin-settled');
+    el?.querySelector('.splash-coin')?.addEventListener('animationend', settle, { once: true });
+    setTimeout(settle, 3600);
   };
   // El juego no entra solo: entra cuando alguien pulsa «Jugar». Ese toque es además lo
   // único que permite encender el audio —ningún navegador deja sonar nada antes—, así

@@ -222,6 +222,10 @@ html.splash-active #app-splash .splash-masthead {
 #app-splash .splash-coin-back { position: absolute; inset: 0; transform: rotateY(180deg) translateZ(3px); }
 #app-splash .splash-coin-back img { filter: sepia(.1) saturate(.78) contrast(.94) brightness(.9); }
 #app-splash .splash-coin-edge { position: absolute; inset: 0; display: none; transform: translateZ(var(--z)); }
+#app-splash.splash-coin-settled .splash-crest-in { perspective: none; }
+#app-splash.splash-coin-settled .splash-coin { animation: none !important; transform: none; transform-style: flat; }
+#app-splash.splash-coin-settled .splash-coin-face { transform: none; }
+#app-splash.splash-coin-settled :is(.splash-coin-edge, .splash-coin-back) { display: none !important; }
 #app-splash .splash-coin-edge img { filter: brightness(.5) sepia(.6) saturate(1.4); }
 #app-splash .splash-halo,
 #app-splash .splash-swirl,
