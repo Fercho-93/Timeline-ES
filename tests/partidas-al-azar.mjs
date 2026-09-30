@@ -47,12 +47,8 @@ for (let g = 0; g < muestras.length; g++) {
   fire(w, irAJugar(w).document.querySelector(`[data-block="${block}"]`));
   fire(w, w.document.querySelector(`[data-mode="${mode}"]`));
   const mazo = w[globalName];
-  // El sorteo de quién empieza saca una única carta para adivinar su fecha y la aparta
-  // del mazo: una carta menos entra en juego. Además, de cada grupo de cartas con el mismo
-  // valor se deja una: entran en juego tantas cartas como valores distintos (menos, como
-  // mucho, la adivinada, que pudo ser la única de su valor o no).
-  const valoresDistintos = new Set(mazo.map(c => w.CONTINUUM.sortValue(mode, c))).size;
-  const total = valoresDistintos - 1;
+  // El sorteo de quién empieza aparta una carta. Las demás cartas, incluidos los empates
+  // legítimos de año o magnitud, deben conservarse durante toda la partida.
   const cardsById = new Map(mazo.map(c => [c.id, c]));
   const orden = card => (["countries", "population", "languages", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
   fire(w, w.document.querySelector('[data-format="multi"]'));
@@ -66,6 +62,8 @@ for (let g = 0; g < muestras.length; g++) {
   for (let i = 0; i < 12 && w.document.getElementById('starter-guess-input'); i++) { w.document.getElementById('starter-guess-input').value = '1900'; fire(w, w.document.querySelector('[data-action="starter-guess-submit"]')); }
   fire(w, w.document.querySelector('[data-action="starter-start"]'));
   const key = `hilo-game-${mode}-v1`;
+  const initialState = JSON.parse(w.localStorage.getItem(key));
+  const total = initialState.deck.length + initialState.discard.length + initialState.timeline.length + initialState.players.reduce((n, p) => n + p.hand.length, 0);
   let turns = 0;
   while (!/gana(n)?<\/h1>/.test(w.document.body.innerHTML)) {
     if (JSON.parse(w.localStorage.getItem(key))?.final) { finishLocalFinal(w, key); continue; }

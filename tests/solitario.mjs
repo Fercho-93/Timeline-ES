@@ -263,6 +263,9 @@ console.log("\nBloque de geografía");
 {
   const w = boot();
   click(irAJugar(w), '[data-block="geografia"]');
+  // La carátula grande se instala tras precargar y decodificar la imagen, para
+  // evitar un destello al desplegar el bloque.
+  await new Promise(resolve => setTimeout(resolve, 0));
   ok("elegir el bloque selecciona su primer juego", /72 países/.test(texto(w)));
   ok("el bloque lista sus cuatro juegos", w.document.querySelectorAll(".game-row").length === 4);
   ok("los cuatro juegos del bloque aparecen por su nombre",

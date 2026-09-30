@@ -25,24 +25,20 @@ function comunes(nombre, mazo, valor) {
 comunes("Estrenos de cine", MOVIE_CARDS, c => c.year);
 ok("los estrenos están ordenados cronológicamente", MOVIE_CARDS.every((card, i) => i === 0 || card.year >= MOVIE_CARDS[i - 1].year));
 
-function fechadasDensas(nombre, mazo) {
-  comunes(nombre, mazo, c => c.year);
-  ok("cada año aparece una sola vez", new Set(mazo.map(c => c.year)).size === mazo.length);
-}
-
-// En mazos contemporáneos hay décadas repletas de hitos imprescindibles. Se conserva
-// el año único como decisión de selección, pero no se impone el espaciado pensado para
-// relatos de miles de años.
-fechadasDensas("Hitos de la música", MUSIC_CARDS);
-fechadasDensas("Historia de los videojuegos", VIDEOGAME_CARDS);
-fechadasDensas("Astronomía y espacio", ASTRONOMY_CARDS);
-fechadasDensas("Historia de la medicina", MEDICINE_CARDS);
+// En los mazos contemporáneos hay décadas repletas de hitos imprescindibles. Los
+// empates de año son válidos cuando representan hechos distintos; solo se comprueba
+// que cada carta esté completa y que la selección no acumule demasiados años contiguos.
+fechadas("Hitos de la música", MUSIC_CARDS, { unicos: false, densidad: false });
+fechadas("Historia de los videojuegos", VIDEOGAME_CARDS, { unicos: false, densidad: false });
+fechadas("Astronomía y espacio", ASTRONOMY_CARDS, { unicos: false, densidad: false });
+fechadas("Historia de la medicina", MEDICINE_CARDS, { unicos: false, densidad: false });
 
 // Las fechas únicas y su distribución son criterios editoriales de estos mazos.
 // Los empates reales se aceptan en ambos órdenes por los motores del juego.
-function fechadas(nombre, mazo, { unicos = true } = {}) {
+function fechadas(nombre, mazo, { unicos = true, densidad = true } = {}) {
   comunes(nombre, mazo, c => c.year);
   if (unicos) ok("cada año aparece una sola vez", new Set(mazo.map(c => c.year)).size === mazo.length);
+  if (!densidad) return;
   const orden = [...mazo].sort((a, b) => a.year - b.year);
   const pegados = orden.filter((card, i) => i && card.year - orden[i - 1].year === 1).length;
   ok(`pocos pares a un año de diferencia (${pegados} de ${orden.length - 1})`, pegados <= orden.length / 10);

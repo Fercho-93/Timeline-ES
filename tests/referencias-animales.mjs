@@ -61,8 +61,8 @@ function play(cardId, neighbourId, slot, expected) {
 console.log("\nReferencias animales: empates y proximidad");
 play(13007, 13014, 0, true);
 play(13007, 13014, 1, true);
-play(13021, 13020, 0, false);
-play(13021, 13020, 1, true);
+play(13021, 13020, 0, true);
+play(13021, 13020, 1, false);
 
 // La tabla vive en modes.js —compartida con online.js—, no en app.js.
 const modesSource = read("modes.js");

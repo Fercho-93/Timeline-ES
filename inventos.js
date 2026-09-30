@@ -14,7 +14,7 @@ window.INVENTION_CARDS = [
   { id: 4004, year: -1750, title: "El código de Hammurabi", detail: "Babilonia graba en piedra uno de los primeros conjuntos de leyes escritas que se conservan." },
   { id: 4005, year: -630, title: "Las primeras monedas acuñadas (fecha aproximada)", detail: "El reino de Lidia sella trozos de electro con un peso garantizado por el Estado." },
   { id: 4008, year: -46, title: "Julio César decreta la reforma del calendario (46 a. C.)", detail: "La reforma se decreta en 46 a. C.; el calendario juliano entra en vigor el 1 de enero de 45 a. C. La carta usa el año del decreto, no el de su aplicación." },
-  { id: 4009, year: 105, title: "El papel en China", detail: "Cai Lun presenta al emperador un papel barato hecho con corteza, cáñamo y trapos." },
+  { id: 4009, year: 105, title: "La mejora del papel en China (fecha tradicional)", detail: "La tradición atribuye a Cai Lun la presentación de un proceso barato con corteza, cáñamo y trapos; ya existían antecedentes de papel en China siglos antes." },
   { id: 4012, year: 830, title: "El tratado de álgebra de Al-Juarismi (fecha aproximada)", detail: "Al-Juarismi escribe su tratado de álgebra durante el reinado de al-Mamún (813–833). Se sitúa aproximadamente hacia 830, no en 850, fecha asociada a su muerte.", label: "c. 830" },
   { id: 4013, year: 1044, title: "Una de las primeras fórmulas escritas de la pólvora", detail: "Un manual militar chino, el Wujing Zongyao, conserva tres recetas de mezcla explosiva; son de las primeras fórmulas conocidas por escrito." },
   { id: 4016, year: 1450, title: "La imprenta de tipos móviles de Gutenberg", detail: "Tipos de metal reutilizables y una prensa de vino: el libro deja de copiarse a mano." },

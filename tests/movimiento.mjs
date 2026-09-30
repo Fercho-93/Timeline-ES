@@ -91,6 +91,8 @@ console.log("\nGalería continua y navegación repetida");
   }
   ok("tres vueltas por todos los bloques y mazos llevan el estado activo y el foco al elemento correcto", true);
   click(irAJugar(w), '[data-block="ciencia"]');
+  // El tamaño grande se instala después de la precarga asíncrona de la carátula.
+  await sleep(0);
   ok("la imagen de Ciencia pide el tamaño grande al desplegarse", el(w, ".panel-science img").getAttribute("src").endsWith("700.webp"));
   for (let round = 0; round < 6; round++) {
     abreMazo(w, "historia", "history");
