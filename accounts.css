@@ -80,3 +80,8 @@
 
 .ranking-tabs { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
 .ranking-tabs .btn { min-width: 120px; }
+.ranking-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+.ranking-nav span { font-family: var(--font-display); font-size: 1.35rem; min-width: 12ch; text-align: center; }
+.ranking-nav .btn { min-width: 44px; font-size: 1.4rem; }
+.ranking-time { display: block; opacity: .7; font-size: .7rem; }
+.ranking-more { display: block; margin: 12px auto 0; }

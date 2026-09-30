@@ -24,7 +24,8 @@ const refs = uid => ({profile:doc(db,'playerProfiles',uid), progress:doc(db,'pla
 // semana es una colección propia, así que el lunes todo el mundo empieza de cero sin borrar nada.
 const dayScore = (uid, key) => doc(db,'dailyScores',key,'players',uid);
 const weekScore = (uid, key) => doc(db,'weeklyScores',key,'players',uid);
-const DAILY_MAX = 10;
+const DAILY_MAX = 10, DAY_MS = 86400000;
+const shiftKey = (key, days) => { const d = new Date(`${key}T12:00:00`); d.setDate(d.getDate() + days); return dateKey(d); };
 const dateKey = date => date.toLocaleDateString('sv-SE');
 // Aciertos de hoy y de esta semana, leídos de los retos diarios guardados. Solo se suman aciertos:
 // un reto vale de 0 a 10 y la semana, como mucho, 70.
@@ -33,11 +34,14 @@ function periods(records, now = new Date()) {
   monday.setHours(12,0,0,0); monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
   const weekKey = dateKey(monday), days = records?.retoDiario?.days || {};
   const hitsOf = entry => Math.max(0, Math.min(DAILY_MAX, Number.isSafeInteger(entry?.hits) ? entry.hits : 0));
+  // Lo que se tardó en cada reto desempata. Un reto jugado antes de medirlo cuenta como diez minutos.
+  const msOf = entry => Math.max(0, Math.min(DAY_MS, Number.isSafeInteger(entry?.ms) ? entry.ms : 600000));
   const hoy = days[today], semana = Object.keys(days).filter(key => key >= weekKey && key <= today);
   return {
     today, weekKey,
-    day: hoy ? today : '', dayHits: hoy ? hitsOf(hoy) : 0, finishedAt: String(hoy?.finishedAt || '').slice(0, 40),
-    week: semana.length ? weekKey : '', weekHits: Math.min(DAILY_MAX * 7, semana.reduce((n, key) => n + hitsOf(days[key]), 0))
+    day: hoy ? today : '', dayHits: hoy ? hitsOf(hoy) : 0, dayMs: hoy ? msOf(hoy) : 0, finishedAt: String(hoy?.finishedAt || '').slice(0, 40),
+    week: semana.length ? weekKey : '', weekHits: Math.min(DAILY_MAX * 7, semana.reduce((n, key) => n + hitsOf(days[key]), 0)),
+    weekMs: semana.reduce((n, key) => n + msOf(days[key]), 0)
   };
 }
 function readRecords() { try { return JSON.parse(CT.Storage.getItem(R) || '{}'); } catch { return {}; } }
@@ -236,8 +240,9 @@ async function flush() {
     if ((remote?.revision || 0) !== expected) { const e=Error('Conflicto de progreso');e.code='account/conflict';throw e; }
     tx.set(r.progress,{...data,revision:expected+1,updatedAt:serverTimestamp()});
     const who = {alias:profile.alias, avatar:profile.avatar};
-    if (data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,finishedAt:periods(readRecords()).finishedAt,updatedAt:serverTimestamp()});
-    if (data.week) tx.set(weekScore(uid,data.week),{...who,hits:data.weekHits,updatedAt:serverTimestamp()});
+    const per = periods(readRecords());
+    if (data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,ms:per.dayMs,finishedAt:per.finishedAt,updatedAt:serverTimestamp()});
+    if (data.week) tx.set(weekScore(uid,data.week),{...who,hits:data.weekHits,ms:per.weekMs,updatedAt:serverTimestamp()});
   }).then(() => {
     revision=expected+1;setMeta(change !== generation);
     if (!metadata().dirty) document.getElementById('storage-notice')?.remove();
@@ -320,34 +325,49 @@ function accountCard() {
     <details class="account-details"><summary>Tu invitado y tus datos</summary><p>Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.</p><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a><button class="btn btn-ghost account-delete" data-account-action="delete">Eliminar invitado y progreso</button></details>
   </div>`;
 }
-async function ranking(tab = 'day') {
+// Qué tabla se está mirando: hoy o esta semana, o un día o una semana anteriores (flechas ‹ ›).
+let rankingView = { tab: 'day', key: '', all: false };
+const RANKING_PAGE = 50, RANKING_ALL = 200, RANKING_BACK_WEEKS = 8;
+function duration(ms) {
+  const total = Math.round((Number(ms) || 0) / 1000), h = Math.floor(total / 3600), m = Math.floor(total % 3600 / 60), sec = total % 60;
+  return h ? `${h} h ${m} min` : m ? `${m} min ${sec} s` : `${sec} s`;
+}
+async function ranking(tab = 'day', key = '', all = false) {
   await flush();
   if (failedConflict) return;
   const semana = tab === 'week', uid = identity.uid, per = periods(readRecords());
-  const key = semana ? per.weekKey : per.today;
-  const snap=await getDocsFromServer(query(collection(db, semana ? 'weeklyScores' : 'dailyScores', key, 'players'),orderBy('hits','desc'),limit(50)));
-  const hits = v => Number(v.hits) || 0;
+  const actual = semana ? per.weekKey : per.today, oldest = shiftKey(per.weekKey, -7 * RANKING_BACK_WEEKS);
+  key = key && key <= actual && key >= oldest ? key : actual;
+  rankingView = { tab: semana ? 'week' : 'day', key, all };
+  const snap=await getDocsFromServer(query(collection(db, semana ? 'weeklyScores' : 'dailyScores', key, 'players'),orderBy('hits','desc'),limit(all ? RANKING_ALL : RANKING_PAGE)));
+  const hits = v => Number(v.hits) || 0, ms = v => Number.isFinite(Number(v.ms)) ? Number(v.ms) : Infinity;
   const entries=snap.docs.map(d=>({id:d.id,...d.data()}));
-  // Hoy, a igualdad de aciertos va delante quien terminó antes; en la semana, los empates comparten puesto.
-  if (!semana) entries.sort((a,b) => hits(b) - hits(a) || String(a.finishedAt || '9').localeCompare(String(b.finishedAt || '9')));
-  const position = i => semana ? 1 + entries.filter(v => hits(v) > hits(entries[i])).length : i + 1;
+  // Más aciertos primero; a igualdad, quien tardó menos. Solo comparten puesto aciertos y tiempo idénticos.
+  entries.sort((a,b) => hits(b) - hits(a) || ms(a) - ms(b));
+  const position = i => 1 + entries.filter(v => hits(v) > hits(entries[i]) || (hits(v) === hits(entries[i]) && ms(v) < ms(entries[i]))).length;
   const mine=entries.findIndex(v=>v.id===uid);
   const ownSnap=mine<0?await getDocFromServer(semana ? weekScore(uid,key) : dayScore(uid,key)):null;
   const own=mine>=0?entries[mine]:ownSnap?.exists()?{id:uid,...ownSnap.data()}:null;
   const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
   const you = v => v.id===uid?'<small class="ranking-you">Tú</small>':'';
-  const player=(v,i)=>`<tr class="${v.id===uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}</td><td><b>${hits(v)}</b></td></tr>`;
-  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}<strong>${hits(v)}</strong><span>aciertos</span></article>`).join('');
-  const lunes = new Date(`${per.weekKey}T12:00:00`).toLocaleDateString('es-ES',{day:'numeric',month:'long'});
-  const tabs = `<div class="ranking-tabs" role="group" aria-label="Periodo"><button type="button" class="btn ${semana?'btn-secondary':'btn-primary'}" data-account-action="ranking-day" aria-pressed="${!semana}">Hoy</button><button type="button" class="btn ${semana?'btn-primary':'btn-secondary'}" data-account-action="ranking-week" aria-pressed="${semana}">Esta semana</button></div>`;
-  const personal = mine>=0 ? `<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${hits(own)}</b> aciertos</span>`
-    : own ? `<span>Tu posición <b>Fuera del top 50</b></span><span><b>${hits(own)}</b> aciertos</span>`
-    : semana ? 'Juega el reto diario para entrar en la tabla de esta semana.' : 'Todavía no has jugado el reto de hoy.';
-  const vacio = `<div class="ranking-empty"><span aria-hidden="true">✧</span><h3>${semana ? 'La semana acaba de empezar' : 'Nadie ha jugado todavía el reto de hoy'}</h3><p>${semana ? 'Cada lunes todo el mundo empieza de cero.' : 'Juega el reto y estrena la tabla de hoy.'}</p><button class="btn btn-primary ranking-daily" data-account-action="daily">Jugar el reto de hoy <span aria-hidden="true">→</span></button></div>`;
+  const time = v => Number.isFinite(ms(v)) ? `<small class="ranking-time">${duration(ms(v))}</small>` : '';
+  const player=(v,i)=>`<tr class="${v.id===uid?'is-you':''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}</td><td><b>${hits(v)}</b>${time(v)}</td></tr>`;
+  const podium=entries.slice(0,3).map((v,i)=>`<article class="ranking-medallion ranking-medallion-${i+1}${v.id===uid?' is-you':''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}<strong>${hits(v)}</strong><span>aciertos</span>${time(v)}</article>`).join('');
+  const esActual = key === actual;
+  const fecha = k => new Date(`${k}T12:00:00`).toLocaleDateString('es-ES', {weekday: semana ? undefined : 'long', day:'numeric', month:'long'});
+  const titulo = semana ? (esActual ? 'Esta semana' : `Semana del ${fecha(key)}`) : (esActual ? 'Hoy' : fecha(key).replace(/^./, c => c.toUpperCase()));
+  const subtitulo = semana ? `Del lunes ${fecha(key)} al domingo ${fecha(shiftKey(key, 6))}.${esActual ? ' El lunes que viene, todos a cero.' : ''}` : `Aciertos en el reto ${esActual ? 'de hoy' : 'de ese día'}, de 0 a 10. A igualdad, gana quien tardó menos.`;
+  const tabs = `<div class="ranking-tabs" role="group" aria-label="Periodo"><button type="button" class="btn ${semana?'btn-secondary':'btn-primary'}" data-account-action="ranking-day" aria-pressed="${!semana}">Por días</button><button type="button" class="btn ${semana?'btn-primary':'btn-secondary'}" data-account-action="ranking-week" aria-pressed="${semana}">Por semanas</button></div>`;
+  const nav = `<div class="ranking-nav"><button type="button" class="btn btn-ghost" data-account-action="ranking-prev" aria-label="${semana ? 'Semana anterior' : 'Día anterior'}"${key <= oldest ? ' disabled' : ''}>‹</button><span>${esc(titulo)}</span><button type="button" class="btn btn-ghost" data-account-action="ranking-next" aria-label="${semana ? 'Semana siguiente' : 'Día siguiente'}"${esActual ? ' disabled' : ''}>›</button></div>`;
+  const personal = mine>=0 ? `<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${hits(own)}</b> aciertos${time(own)}</span>`
+    : own ? `<span>Tu posición <b>Fuera de los ${entries.length} primeros</b></span><span><b>${hits(own)}</b> aciertos</span>`
+    : esActual ? (semana ? 'Juega el reto diario para entrar en la tabla de esta semana.' : 'Todavía no has jugado el reto de hoy.') : (semana ? 'No jugaste esa semana.' : 'No jugaste ese día.');
+  const vacio = `<div class="ranking-empty"><span aria-hidden="true">✧</span><h3>${esActual ? (semana ? 'La semana acaba de empezar' : 'Nadie ha jugado todavía el reto de hoy') : 'Nadie jugó ' + (semana ? 'esa semana' : 'ese día')}</h3>${esActual ? `<p>${semana ? 'Cada lunes todo el mundo empieza de cero.' : 'Juega el reto y estrena la tabla de hoy.'}</p><button class="btn btn-primary ranking-daily" data-account-action="daily">Jugar el reto de hoy <span aria-hidden="true">→</span></button>` : ''}</div>`;
+  const mas = !all && entries.length >= RANKING_PAGE ? `<button type="button" class="btn btn-secondary ranking-more" data-account-action="ranking-more">Ver más</button>` : '';
   if (document.querySelector('.ranking-modal')) CT.closeDialog();
-  accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETO DIARIO</span><span class="ranking-emblem" aria-hidden="true">✦</span><h2>${semana ? 'Esta semana' : 'Hoy'}</h2><p>${semana ? `Desde el lunes ${esc(lunes)}. El lunes que viene, todos a cero.` : 'Aciertos en el reto de hoy, de 0 a 10.'}</p>${tabs}</header>
-    <div class="ranking-body">${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros">${podium}</div><div class="ranking-personal${own?' has-result':''}">${personal}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}`:vacio}
-    <details class="account-details ranking-rules"><summary>Cómo funciona</summary><p>Cada día hay un reto de 10 cartas; cada carta bien colocada es un acierto. <b>Hoy</b> ordena por los aciertos del reto de hoy y, si hay empate, va delante quien terminó antes. <b>Esta semana</b> suma los aciertos de lunes a domingo; cada lunes todo el mundo vuelve a empezar, así que da igual cuándo empezaste a jugar.</p><p>Solo cuenta el reto diario. Primeros 50. Resultados enviados por el juego, sin validación competitiva.</p></details></div>
+  accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETO DIARIO</span><span class="ranking-emblem" aria-hidden="true">✦</span>${tabs}${nav}<h2 class="solo-lectores">${esc(titulo)}</h2><p>${esc(subtitulo)}</p></header>
+    <div class="ranking-body">${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros">${podium}</div><div class="ranking-personal${own?' has-result':''}">${personal}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}${mas}`:vacio}
+    <details class="account-details ranking-rules"><summary>Cómo funciona</summary><p>Cada día hay un reto de 10 cartas; cada carta bien colocada es un acierto. <b>Por días</b> ordena por los aciertos de ese día; <b>por semanas</b>, por los de lunes a domingo, y cada lunes todo el mundo vuelve a empezar, así que da igual cuándo empezaste a jugar. A igualdad de aciertos gana quien tardó menos en jugar el reto (en la semana, sumando los días).</p><p>Con ‹ › ves quién ganó los días y las semanas anteriores. Solo cuenta el reto diario. Resultados enviados por el juego, sin validación competitiva.</p></details></div>
     <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`,true);
 }
 function deleteScreen() {
@@ -367,7 +387,7 @@ async function removeAccount() {
 }
 export async function startAccounts(callback) {
   startGame=callback;
-  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar};
+  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,rankingDe:(tab)=>ranking(tab),renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar};
   await auth.authStateReady();
   await setPersistence(auth,browserLocalPersistence);
   onAuthStateChanged(auth,u=>{
@@ -384,7 +404,8 @@ export async function startAccounts(callback) {
     if(action==='close'){CT.closeDialog();return;}
     if(action==='daily'){CT.closeDialog();CT.localNavigate?.('daily');return;}
     if(busy)return;busy=true;target.disabled=true;
-    const fn={ranking:()=>ranking('day'),'ranking-day':()=>ranking('day'),'ranking-week':()=>ranking('week'),sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
+    const fn={ranking:()=>ranking('day'),'ranking-day':()=>ranking('day'),'ranking-week':()=>ranking('week'),
+      'ranking-prev':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?-7:-1)),'ranking-next':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?7:1)),'ranking-more':()=>ranking(rankingView.tab,rankingView.key,true),sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
     Promise.resolve().then(fn).catch(error=>{
       const text=message(error), el=document.getElementById('account-delete-message');
       if(el)el.textContent=text;else if(!failedConflict)syncNotice(text);

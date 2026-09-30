@@ -18,8 +18,9 @@ w.CONTINUUM = {
   categoryBadge: () => '', animalArt: () => '', cardBack: () => '', sortValue: (_, c) => c.year,
   formatValue: (_, c) => String(c.year), hiddenLabel: () => 'Año oculto', timelineTitle: () => 'Cronología',
   placementHint: () => 'Debía ir después de Primera.',
+  timelineEnds: () => '', timelineMap: () => '',
   Accounts: { user: { uid: 'me' }, profile: { alias: 'Yo' } },
-  Duelo: { CARTAS: 2, reparto: () => [1,2,3], Cifras: { CARTAS: 2, reparto: () => [2,3], leer: (_, value) => Number(value), puntosCarta: () => 75, banda: () => ({ nombre: 'Muy cerca' }), formato: (_, v) => `${v} años`, regla: () => ({ anos: true }) } }
+  Duelo: { CARTAS: 2, reparto: () => [1,2,3], Cifras: { CARTAS: 2, reparto: () => [2,3], leer: (_, value) => Number(value), puntosCarta: () => 75, acierto: () => true, banda: () => ({ nombre: 'Muy cerca' }), formato: (_, v) => `${v} años`, regla: () => ({ anos: true }) } }
 };
 w.__deps = {
   auth: { currentUser: { uid: 'me' } }, db: {}, doc: (_, ...args) => args.at(-1), Timestamp: { now: () => ({ seconds: now / 1000 }) }, serverTimestamp: () => ({ seconds: now / 1000 }),
@@ -96,9 +97,22 @@ try {
   t.snapshot(clone(games.get('numbers')));
   assert.match(w.document.querySelector('.turn-duel-solution').textContent, /190 años/);
   assert.match(w.document.querySelector('.turn-duel-solution').textContent, /10 años/);
-  assert.match(w.document.querySelector('.turn-duel-solution').textContent, /75/);
+  assert.match(w.document.querySelector('.turn-duel-solution').textContent, /Acierto/, 'cada carta de cifras es acierto o no');
+  assert.equal(games.get('numbers').scores.me, 1, 'un acierto suma 1');
   const stats = w.CONTINUUM.TurnDuel.headToHead('them', [game('win',{status:'finished',scores:{me:2,them:1}}),game('loss',{status:'resigned',winnerUid:'them'}),game('tie',{status:'finished',kind:'cifras',scores:{me:5,them:5}}),game('ignore',{status:'cancelled',scores:{me:20,them:0}})]);
   assert.equal(stats.orden.wins, 1); assert.equal(stats.orden.losses, 1); assert.equal(stats.cifras.draws, 1);
+  // El cara a cara con cada amigo junta las dos modalidades y ordena por duelos jugados.
+  const partida = (id, rival, alias, extra) => ({ ...game(id, extra), playersOrder: ['me', rival], players: { me: { alias: 'Yo' }, [rival]: { alias } } });
+  const tabla = w.CONTINUUM.TurnDuel.rivalStandings([
+    partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } }),
+    partida('m2', 'mario', 'Mario', { status: 'finished', kind: 'cifras', scores: { me: 4, mario: 2 } }),
+    partida('m3', 'mario', 'Mario', { status: 'resigned', winnerUid: 'mario' }),
+    partida('m4', 'mario', 'Mario', { status: 'finished', scores: { me: 5, mario: 5 } }),
+    partida('l1', 'lucia', 'Lucía', { status: 'finished', scores: { me: 0, lucia: 2 } }),
+    partida('x1', 'nadie', 'Nadie', { status: 'cancelled' })
+  ]);
+  assert.equal(JSON.stringify(tabla.map(r => [r.alias, r.wins, r.losses, r.draws])), JSON.stringify([['Mario', 2, 1, 1], ['Lucía', 0, 1, 0]]));
+  assert.match(w.CONTINUUM.TurnDuel.standingsMarkup([partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } })]), /Mario[\s\S]*1 duelo[\s\S]*<b class="is-ahead">1<\/b><i>—<\/i><b class="">0<\/b>/);
   games.set('race',game('race'));
   await assert.rejects(t.cancel('race','waiting'), /ha cambiado/);
   console.log('OK: readiness, persisted deadline, offline recovery, lost acknowledgement, idempotency, navigation, timeout, shared solutions, head-to-head, cancellation race.');

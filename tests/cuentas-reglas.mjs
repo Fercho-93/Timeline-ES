@@ -53,6 +53,14 @@ try {
  await assertFails(getDocs(collection(other,'weeklyScores',week,'players')));
  await assertFails(getDocs(query(collection(unauthenticated,'dailyScores',day,'players'),limit(50))));
  await assertFails(deleteDoc(doc(other,'weeklyScores',week,'players','account-a')));
+ // El tiempo que se tardó viaja con la fila y desempata; tiene que ser un número razonable.
+ await assertSucceeds(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,ms:95000,finishedAt:'',updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,ms:-5,finishedAt:'',updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db,'dailyScores',day,'players','account-a'),{...who,hits:7,ms:'rápido',finishedAt:'',updatedAt:serverTimestamp()}));
+ await assertSucceeds(setDoc(doc(db,'weeklyScores',week,'players','account-a'),{...who,hits:19,ms:400000,updatedAt:serverTimestamp()}));
+ // «Ver más»: hasta 200 filas; más, no.
+ await assertSucceeds(getDocs(query(collection(other,'dailyScores',day,'players'),orderBy('hits','desc'),limit(200))));
+ await assertFails(getDocs(query(collection(other,'dailyScores',day,'players'),orderBy('hits','desc'),limit(201))));
  await assertSucceeds(deleteDoc(doc(db,'weeklyScores',week,'players','account-a')));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'x'}));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,season:'other'}));

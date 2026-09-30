@@ -2376,3 +2376,14 @@ html.splash-active .ambience-toggle { display: none; }
 .public-answered { margin: 10px 0 0; text-align: center; }
 .public-leave { margin-top: 2px; }
 @media (prefers-reduced-motion: reduce) { .public-dots::after, .public-clock.is-low { animation: none; } }
+
+/* Cara a cara con los amigos de los duelos por turnos: quién va por delante con cada uno. */
+.duel-standings { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
+.duel-standings li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.duel-standings-who { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center; min-width: 0; }
+.duel-standings-who .avatar { grid-row: span 2; }
+.duel-standings-who b { overflow-wrap: anywhere; }
+.duel-standings-who small { color: var(--muted); font-size: .75rem; }
+.duel-standings-score { display: flex; align-items: baseline; gap: 6px; font-family: var(--font-display); font-size: 1.5rem; }
+.duel-standings-score i { font-style: normal; opacity: .5; font-size: 1rem; }
+.duel-standings-score .is-ahead { color: var(--accent); }

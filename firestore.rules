@@ -347,11 +347,16 @@ service cloud.firestore {
       return d.alias == p.alias && d.avatar == p.avatar
         && d.hits is int && d.hits >= 0 && d.hits <= maxHits && d.updatedAt == request.time;
     }
+    // Lo que se tardó en el reto (o en los de la semana): desempata. Opcional para clientes anteriores.
+    function validMs(maxMs) {
+      let d = request.resource.data;
+      return !('ms' in d) || (d.ms is int && d.ms >= 0 && d.ms <= maxMs);
+    }
     match /dailyScores/{day}/players/{uid} {
       allow get: if registered();
-      allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
-      allow create, update: if owner(uid) && scoreRow(uid, 10)
-        && request.resource.data.keys().hasOnly(['alias','avatar','hits','finishedAt','updatedAt'])
+      allow list: if registered() && request.query.limit != null && request.query.limit <= 200;
+      allow create, update: if owner(uid) && scoreRow(uid, 10) && validMs(86400000)
+        && request.resource.data.keys().hasOnly(['alias','avatar','hits','ms','finishedAt','updatedAt'])
         && request.resource.data.finishedAt is string && request.resource.data.finishedAt.size() <= 40
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.day == day
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.dayHits == request.resource.data.hits;
@@ -359,9 +364,9 @@ service cloud.firestore {
     }
     match /weeklyScores/{week}/players/{uid} {
       allow get: if registered();
-      allow list: if registered() && request.query.limit != null && request.query.limit <= 50;
-      allow create, update: if owner(uid) && scoreRow(uid, 70)
-        && request.resource.data.keys().hasOnly(['alias','avatar','hits','updatedAt'])
+      allow list: if registered() && request.query.limit != null && request.query.limit <= 200;
+      allow create, update: if owner(uid) && scoreRow(uid, 70) && validMs(604800000)
+        && request.resource.data.keys().hasOnly(['alias','avatar','hits','ms','updatedAt'])
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.week == week
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.weekHits == request.resource.data.hits;
       allow delete: if owner(uid);

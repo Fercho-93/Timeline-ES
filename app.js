@@ -1909,7 +1909,8 @@
         <span>${glyph(GLYPHS.racha)}<b>${racha}</b><small>${racha === 1 ? "día seguido" : "días seguidos"}</small></span>
         <span>${glyph(GLYPHS.marca)}<b>${records.best || 0}</b><small>mejor resultado</small></span>
       </div>
-      ${calendarHtml(records)}</section>`;
+      ${calendarHtml(records)}
+      ${CT.Accounts?.ready ? `<div class="atlas-ranking"><h3>Ranking</h3><p class="hint">Quién ganó cada día y cada semana. Usa ‹ › para ver los anteriores.</p><div class="actions"><button class="btn btn-secondary" data-account-action="ranking-day">Por días</button><button class="btn btn-secondary" data-account-action="ranking-week">Por semanas</button></div></div>` : ""}</section>`;
   }
 
   function perfilColeccion() {
@@ -1981,8 +1982,8 @@
           <svg class="atlas-chart-route" viewBox="0 0 640 440" preserveAspectRatio="none" aria-hidden="true"><path d="M96 120 C192 92 200 210 306 168 S435 66 528 135 S452 252 356 292 S183 266 116 357 S365 413 518 366" /></svg>
           <span class="atlas-chart-compass" aria-hidden="true">✦<small>N</small></span>
           <a class="atlas-chart-stop atlas-stop-collection" href="#atlas-collection"><i aria-hidden="true">01</i><b>Las láminas</b><small>${descubiertas} descubiertas</small></a>
-          <a class="atlas-chart-stop atlas-stop-daily" href="#atlas-daily"><i aria-hidden="true">02</i><b>El reto diario</b><small>Tu constancia</small></a>
-          <a class="atlas-chart-stop atlas-stop-duels" href="#atlas-duels"><i aria-hidden="true">03</i><b>Tus duelos</b><small>Con amigos</small></a>
+          <a class="atlas-chart-stop atlas-stop-daily" href="#atlas-daily"><i aria-hidden="true">02</i><b>El reto diario</b><small>Racha y ranking</small></a>
+          <a class="atlas-chart-stop atlas-stop-duels" href="#atlas-duels"><i aria-hidden="true">03</i><b>Tus duelos</b><small>Cara a cara</small></a>
           <a class="atlas-chart-stop atlas-stop-journey" href="#atlas-journey"><i aria-hidden="true">04</i><b>Tu recorrido</b><small>${resumen.games} ${resumen.games === 1 ? "partida" : "partidas"}</small></a>
           <a class="atlas-chart-stop atlas-stop-achievements" href="#atlas-achievements"><i aria-hidden="true">05</i><b>Los logros</b><small>${resumen.unlocked} de ${resumen.total}</small></a>
           <span class="atlas-chart-seal" aria-hidden="true">C<br><small>CONTINUUM</small></span>
@@ -1990,7 +1991,7 @@
         <div class="atlas-territories">
           <div class="atlas-territory" id="atlas-collection"><div class="atlas-territory-caption"><span>01 / ARCHIVO DE LÁMINAS</span><h2>Las láminas</h2></div>${atlasColeccion()}</div>
           <div class="atlas-territory" id="atlas-daily"><div class="atlas-territory-caption"><span>02 / CADA DÍA UN PASO</span><h2>El reto diario</h2></div>${atlasRetoDiario()}</div>
-          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / CAMINOS COMPARTIDOS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h2>Tus duelos</h2><p>Retos por turnos con tus amigos: en qué punto está cada uno.</p></div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
+          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / CAMINOS COMPARTIDOS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h2>Cara a cara</h2><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
           <div class="atlas-territory" id="atlas-journey"><div class="atlas-territory-caption"><span>04 / HUELLAS EN EL MAPA</span><h2>Tu recorrido</h2></div>
             ${estrenado
               ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
@@ -2004,6 +2005,15 @@
       </section>
       ${homeNav()}
     </div>`);
+    atlasCaraACara();
+  }
+
+  // El cara a cara necesita leer los duelos de la nube: se pinta el Atlas y se rellena al llegar.
+  function atlasCaraACara() {
+    const hueco = app.querySelector("#atlas-standings");
+    if (!hueco || !CT.Accounts?.ready) return;
+    turnDuelReady.then(() => CT.TurnDuel.standings()).then(html => { if (hueco.isConnected) hueco.innerHTML = html; })
+      .catch(() => { if (hueco.isConnected) hueco.innerHTML = '<p class="hint">No se pudieron cargar tus duelos.</p>'; });
   }
 
   async function perfilExport() {
@@ -2567,7 +2577,9 @@
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
       total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : null,
       duelo, finished: false, newDiscoveries: 0,
-      cartaEmpezadaEn: duelo?.ms > 0 ? Date.now() : null
+      cartaEmpezadaEn: duelo?.ms > 0 ? Date.now() : null,
+      // Cuánto se tarda en el reto diario desempata el ranking: se mide desde que empieza hasta que acaba.
+      empezadoEn: kind === "daily" ? Date.now() : null
     };
     pendingIndex = null;
     result = null;
@@ -2754,7 +2766,7 @@
       // `sequence` y `finishedAt` no los usa nada todavía: son lo que necesitaría un
       // marcador entre amigos del reto diario si algún día existe, guardado desde ya
       // para no depender de reconstruirlo a partir de partidas viejas que no lo llevan.
-      records.days[dia] = { hits: solo.hits, total, sequence: solo.sequence || [], finishedAt: new Date().toISOString() };
+      records.days[dia] = { hits: solo.hits, total, sequence: solo.sequence || [], finishedAt: new Date().toISOString(), ms: solo.empezadoEn ? Math.max(0, Date.now() - solo.empezadoEn) : null };
       records.streak = records.lastDay === previousDay(dia) ? (records.streak || 0) + 1 : 1;
       records.lastDay = dia;
       // No hace falta guardar el histórico entero: basta con los últimos días.

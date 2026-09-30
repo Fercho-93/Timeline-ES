@@ -356,6 +356,21 @@ function headToHead(player, games = cachedGames) {
   }
   return totals;
 }
+// El cara a cara con cada amigo: todas las partidas terminadas contra esa persona, juntas (ordenar y
+// cifras), de más a menos jugadas. «Tú 3 — 1 Mario».
+function rivalStandings(games = cachedGames) {
+  return rivals(games).map(r => {
+    const t = headToHead(r.uid, games);
+    const wins = t.orden.wins + t.cifras.wins, losses = t.orden.losses + t.cifras.losses, draws = t.orden.draws + t.cifras.draws;
+    return { ...r, wins, losses, draws, played: wins + losses + draws };
+  }).filter(r => r.played > 0).sort((a, b) => b.played - a.played || b.wins - a.wins);
+}
+function standingsMarkup(games = cachedGames) {
+  const rows = rivalStandings(games);
+  if (!rows.length) return '<p class="hint">Cuando termines un duelo por turnos con un amigo, aquí verás cuántas veces ha ganado cada uno.</p>';
+  return `<ol class="duel-standings">${rows.map(r => `<li><span class="duel-standings-who">${CT.Avatares?.markup(r.alias, { size: 36, seed: 'uid:' + r.uid }) || ''}<b>${safe(r.alias)}</b><small>${r.played} ${r.played === 1 ? 'duelo' : 'duelos'}${r.draws ? ` · ${r.draws} ${r.draws === 1 ? 'empate' : 'empates'}` : ''}</small></span><span class="duel-standings-score" aria-label="Tú ${r.wins} victorias, ${safe(r.alias)} ${r.losses}"><b class="${r.wins > r.losses ? 'is-ahead' : ''}">${r.wins}</b><i>—</i><b class="${r.losses > r.wins ? 'is-ahead' : ''}">${r.losses}</b></span></li>`).join('')}</ol><p class="hint">Victorias tuyas — victorias de tu amigo. Cancelaciones y caducidades no cuentan.</p>`;
+}
+async function standings() { return standingsMarkup(await list()); }
 function profileMarkup(games) {
   const visible = games.filter(g => !archivedIds.has(g.id));
   // Primero lo que espera algo de ti (tu turno, retos recibidos), después lo que espera
@@ -375,7 +390,7 @@ function profileMarkup(games) {
   }).join('');
   const archived = games.filter(g => archivedIds.has(g.id));
   const pendingCount = visible.filter(g => g.status === 'playing' && g.turnUid === uid()).length;
-  return `<h2>Mis duelos</h2>${pendingCount ? `<button class="btn btn-secondary btn-block" data-action="next-turn-duel">Ir al siguiente duelo pendiente <small>(${pendingCount})</small></button><p class="hint">Abre la partida más antigua en la que te toca jugar.</p>` : ''}${history || '<p>No tienes duelos abiertos.</p>'}${archived.length ? `<details><summary>Archivados (${archived.length})</summary>${rows(archived)}</details>` : ''}${rivalRows ? `<h3>Rivales y cara a cara</h3><p class="hint">Victorias separadas por modalidad. Cancelaciones y caducidades no cuentan. Archivar solo cambia tu lista.</p>${rivalRows}` : ''}${blockedPlayers.size ? `<details><summary>Rivales bloqueados</summary>${[...blockedPlayers].map(([player, name]) => `<p>${safe(name)} <button class="btn btn-ghost" data-action="unblock-duel-rival" data-rival-id="${safe(player)}">Desbloquear</button></p>`).join('')}</details>` : ''}`;
+  return `<h2>Mis duelos</h2><h3>Cara a cara con tus amigos</h3>${standingsMarkup(games)}${pendingCount ? `<button class="btn btn-secondary btn-block" data-action="next-turn-duel">Ir al siguiente duelo pendiente <small>(${pendingCount})</small></button><p class="hint">Abre la partida más antigua en la que te toca jugar.</p>` : ''}${history || '<p>No tienes duelos abiertos.</p>'}${archived.length ? `<details><summary>Archivados (${archived.length})</summary>${rows(archived)}</details>` : ''}${rivalRows ? `<details><summary>Rivales: retar, favoritos y bloqueos</summary><p class="hint">Victorias separadas por modalidad. Archivar solo cambia tu lista.</p>${rivalRows}</details>` : ''}${blockedPlayers.size ? `<details><summary>Rivales bloqueados</summary>${[...blockedPlayers].map(([player, name]) => `<p>${safe(name)} <button class="btn btn-ghost" data-action="unblock-duel-rival" data-rival-id="${safe(player)}">Desbloquear</button></p>`).join('')}</details>` : ''}`;
 }
 function favoriteIds() { try { const saved = JSON.parse(localStorage.getItem(`continuum-duel-favorites-${uid()}`) || '[]'); return Array.isArray(saved) ? saved.filter(id => typeof id === 'string') : []; } catch { return []; } }
 function favorite(player) {
@@ -438,14 +453,14 @@ async function next(back = onBack) {
 function open({ mode = 'history', kind = 'orden', gameId = '', back } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back).catch(() => notify('No se pudo crear el duelo.')); }
 function close() { stop?.(); stop = null; clearInterval(timer); document.removeEventListener('visibilitychange', leaveGuard); current = null; onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') place(pendingIndex); if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
-CT.TurnDuel = { open, close, list, cancel, TURN_SECONDS, READY_SECONDS };
+CT.TurnDuel = { open, close, list, cancel, standings, TURN_SECONDS, READY_SECONDS };
 // Los duelos que esperan algo de quien juega: los suyos en los que le toca y los retos
 // que le han mandado. Es lo que la portada avisa; lo demás se ve en la lista completa.
 function pending(games = cachedGames) {
   return games.filter(g => !archivedIds.has(g.id) && ((g.status === 'playing' && g.turnUid === uid()) || (g.status === 'waiting' && g.invitedUid === uid() && !blockedPlayers.has(g.playersOrder[0]))))
     .sort((a, b) => (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0));
 }
-Object.assign(CT.TurnDuel, { rivals, favorite, challenge, next, archive, block, headToHead, profileMarkup, reshare, pending });
+Object.assign(CT.TurnDuel, { rivals, rivalStandings, standingsMarkup, favorite, challenge, next, archive, block, headToHead, profileMarkup, reshare, pending });
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-turn-action]');
   const actions = { ready: () => { prepareTurn(true); render(); }, retry: retryPending, rematch: () => challenge(current.id), next: () => next(), accept: () => join(current.id, onBack, true), decline: () => cancel(current.id, 'waiting') };

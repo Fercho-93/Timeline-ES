@@ -50,7 +50,7 @@
         const previous=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
         daily.streak=daily.lastDay===previous?(daily.streak||0)+1:1;
         daily.lastDay=day();daily.best=Math.max(daily.best||0,hits);
-        daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id,finishedAt:new Date().toISOString()};
+        daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id,finishedAt:new Date().toISOString(),ms:record.startedAt?Math.max(0,Date.now()-record.startedAt):null};
         all.retoDiario=daily;CT.Storage.setItem(key,JSON.stringify(all));
         CT.Progreso?.finishQuickDaily?.({hits,total,streak:daily.streak});
       }
@@ -81,7 +81,7 @@
     const list=Array.from({length:count},(_,i)=>catalog[i % catalog.length]);
     return list.map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
   }
-  function begin(config) {pendingConfig=null;config.historyId ||= historyId();record={version:CT.QuickCatalog.version,config,commands:[]};state=E.create(config);selected=null;slot=null;save();render();}
+  function begin(config) {pendingConfig=null;config.historyId ||= historyId();record={version:CT.QuickCatalog.version,config,commands:[],startedAt:Date.now()};state=E.create(config);selected=null;slot=null;save();render();}
   function prepare(config) {
     pendingConfig=config; page='prepare'; state=null; record=null;
     const c=E.challenge(config.rounds[0].id);

@@ -86,12 +86,13 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});let started=0;
  w.localStorage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:999}}));
  await w.testAccounts.startAccounts(()=>started++);assert.equal(started,1);assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),'{}');
- w.CONTINUUM.Storage.setItem('hilo-retos-v1',JSON.stringify({retoDiario:{days:{[hoy]:{hits:7,total:10,finishedAt:'2026-01-01T10:00:00.000Z'},'2000-01-03':{hits:9,total:10}}}}));
+ w.CONTINUUM.Storage.setItem('hilo-retos-v1',JSON.stringify({retoDiario:{days:{[hoy]:{hits:7,total:10,finishedAt:'2026-01-01T10:00:00.000Z',ms:123000},'2000-01-03':{hits:9,total:10}}}}));
  w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:9,games:4,rankedHits:500,rankedGames:200,dailyHits:5,dailyGames:2}}));await w.testAccounts.flush();
  assert.equal(data.get('playerProgress/a').revision,1);
  // Las tablas de hoy y de esta semana llevan los aciertos del reto; un día de otra semana no suma.
  assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(data.get(`dailyScores/${hoy}/players/a`).finishedAt,'2026-01-01T10:00:00.000Z');
  assert.equal(data.get(`weeklyScores/${lunes}/players/a`).hits,7);
+ assert.equal(data.get(`dailyScores/${hoy}/players/a`).ms,123000,'lo que tardó en el reto desempata');assert.equal(data.get(`weeklyScores/${lunes}/players/a`).ms,123000);
  assert.equal(data.get('playerProgress/a').dayHits,7);assert.equal(data.get('playerProgress/a').weekHits,7);
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='Fulanito';await w.testAccounts.rename();
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get(`dailyScores/${hoy}/players/a`).alias,'Fulanito');
@@ -121,7 +122,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await w.testAccounts.startAccounts(()=>{});assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),p);dom.window.close();
 }
 {
- const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,[`dailyScores/${hoy}/players/b`]:{alias:'Luna',avatar:'star',hits:9,finishedAt:'2026-01-01T09:00:00Z'},[`dailyScores/${hoy}/players/c`]:{alias:'Atlas',avatar:'globe',hits:9,finishedAt:'2026-01-01T08:00:00Z'},[`dailyScores/${hoy}/players/d`]:{alias:'Marco',avatar:'book',hits:7},[`dailyScores/${hoy}/players/a`]:{alias:'Fer',avatar:'compass',hits:5},[`weeklyScores/${lunes}/players/b`]:{alias:'Luna',avatar:'star',hits:40},[`weeklyScores/${lunes}/players/a`]:{alias:'Fer',avatar:'compass',hits:12}});
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,[`dailyScores/${hoy}/players/b`]:{alias:'Luna',avatar:'star',hits:9,ms:200000,finishedAt:'2026-01-01T08:00:00Z'},[`dailyScores/${hoy}/players/c`]:{alias:'Atlas',avatar:'globe',hits:9,ms:95000,finishedAt:'2026-01-01T09:00:00Z'},[`dailyScores/${hoy}/players/d`]:{alias:'Marco',avatar:'book',hits:7},[`dailyScores/${hoy}/players/a`]:{alias:'Fer',avatar:'compass',hits:5},[`weeklyScores/${lunes}/players/b`]:{alias:'Luna',avatar:'star',hits:40},[`weeklyScores/${lunes}/players/a`]:{alias:'Fer',avatar:'compass',hits:12}});
  await w.testAccounts.startAccounts(()=>{});
  w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
  const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();await new Promise(r=>setTimeout(r,0));};
@@ -132,10 +133,19 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.ok(w.document.querySelector('[role="dialog"] #account-alias'));
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('ranking');assert.match(w.document.querySelector('[role="dialog"]').textContent,/Fer/);
- // Hoy: a igualdad de aciertos va delante quien terminó antes.
+ // A igualdad de aciertos va delante quien tardó menos, aunque terminara más tarde.
  assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Atlas/);
  assert.match(w.document.querySelector('.ranking-medallion-2').textContent,/Luna/);
  assert.equal(w.document.querySelector('[data-account-action="ranking-day"]').getAttribute('aria-pressed'),'true');
+ assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/1 min 35 s/,'se ve lo que tardó');
+ assert.ok(w.document.querySelector('[data-account-action="ranking-next"]').disabled,'no hay días futuros');
+ // El día anterior: su propia tabla, sin nadie todavía.
+ await click('ranking-prev');await new Promise(r=>setTimeout(r,0));
+ assert.equal(w.document.querySelectorAll('.ranking-modal').length,1);
+ assert.match(w.document.querySelector('.ranking-empty').textContent,/Nadie jugó ese día/);
+ assert.equal(w.document.querySelector('[data-account-action="ranking-next"]').disabled,false);
+ await click('ranking-next');await new Promise(r=>setTimeout(r,0));
+ assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Atlas/);
  assert.equal(w.document.querySelectorAll('.ranking-medallion').length,3);
  assert.equal(w.document.querySelectorAll('.ranking-medallion .avatar-art img').length,3);
  assert.equal(w.document.querySelectorAll('.ranking-medallion-1').length,1);
@@ -144,7 +154,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await click('ranking-week');await new Promise(r=>setTimeout(r,0));
  assert.equal(w.document.querySelectorAll('.ranking-modal').length,1,'cambiar de pestaña no apila diálogos');
  assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Luna.*40/s);
- assert.match(w.document.querySelector('.ranking-hero h2').textContent,/Esta semana/);
+ assert.match(w.document.querySelector('.ranking-nav span').textContent,/Esta semana/);
  await click('close');assert.equal(w.document.querySelector('[role="dialog"]'),null);
  await click('delete');assert.ok(w.document.querySelector('[role="dialog"] [data-account-action="delete-confirm"]'));
  w.document.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
@@ -177,7 +187,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const html=w.document.querySelector('.ranking-modal')?.innerHTML||'';
  assert.match(html,/avatars\/panda\.webp/,'se ve el avatar que eligió la otra persona');
  assert.match(html,/avatars\/lince\.webp/,'y el propio');
- assert.match(html,/Esta semana/);
+ assert.match(html,/Por semanas/);
  dom.window.close();
 }
 {
