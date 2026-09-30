@@ -5165,3 +5165,41 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 :root[data-theme="dark"] #app .pass-screen .pass-card:not(.comp-splash, .final-composition)::before { border-color: #d4bb8b40; }
 
 .table-seat.is-unused { visibility: hidden; }
+
+/* Atlas: dentro de cada territorio, los bloques no son una segunda tarjeta (quedaban sin
+   margen interior y pegados al borde); el territorio ya hace de marco. */
+:root #app[data-screen="perfil"] .atlas-territory > .panel,
+:root #app[data-screen="perfil"] .atlas-territory .perfil-account > .panel {
+  padding: 0 !important; margin: 0; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important;
+}
+#app[data-screen="perfil"] .atlas-territory .atlas-duels h3 { margin: 0 0 6px; font: 500 1.15rem/1.25 var(--font-display); }
+#app[data-screen="perfil"] .atlas-territory .atlas-duels { gap: 16px; }
+#app[data-screen="perfil"] .atlas-territory .perfil-collection { flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 0; }
+#app[data-screen="perfil"] .atlas-territory .perfil-collection small { text-align: left; }
+#app[data-screen="perfil"] .atlas-territory .daily-stats { margin-bottom: 4px; }
+#app[data-screen="perfil"] .atlas-territory .atlas-ranking { margin-top: 18px; }
+#app[data-screen="perfil"] .atlas-territory .atlas-ranking h3 { margin: 0 0 4px; font: 500 1.15rem/1.25 var(--font-display); }
+#app[data-screen="perfil"] .atlas-territory .atlas-ranking .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+#app[data-screen="perfil"] .atlas-count { margin: 0 0 12px; color: var(--edition-muted); font: .82rem/1.4 var(--ui-font); }
+#app[data-screen="perfil"] .perfil-achievement-group + .perfil-achievement-group { margin-top: 10px; }
+#app[data-screen="perfil"] .atlas-territory .perfil-account .actions { display: grid; gap: 10px; justify-content: stretch !important; }
+#app[data-screen="perfil"] .atlas-territory .perfil-account .actions .btn { width: 100%; }
+#app[data-screen="perfil"] .atlas-territories { gap: 22px; }
+
+/* Guía: el texto de las fichas con la letra de interfaz, como el resto de la guía, y la
+   etiqueta en su propia línea en vez de partirse junto al título. */
+.guide-handbook .gc-body b { display: block; font-size: .95rem; line-height: 1.25; }
+.guide-handbook .gc-body em { display: table; margin: 6px 0 0; border-radius: 10px; font-family: var(--ui-font); white-space: normal; }
+.guide-handbook .gc-body small { margin-top: 7px; font-family: var(--ui-font); font-size: .82rem; line-height: 1.5; }
+.guide-handbook .guide-cards { gap: 10px; }
+.guide-handbook .guide-card { padding: 14px 15px; }
+.guide-handbook .guide-chapter-body > p, .guide-handbook .guide-chapter-body > h4 { font-family: var(--ui-font); }
+.guide-handbook .guide-chapter-body > h4 { margin: 20px 0 6px; }
+
+/* Con el texto grande, las paradas del mapa del Atlas ya no caben en sus posiciones fijas y se
+   pisaban: pasan a una columna en zigzag, sin posiciones absolutas. */
+:root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart { height: auto; display: grid; gap: 12px; padding: 28px 18px 84px; }
+:root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart-heading { position: static; margin: 0 56px 6px 0; }
+:root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart-route { display: none; }
+:root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart-stop { position: relative; inset: auto; width: 78%; min-height: 0; }
+:root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart-stop:nth-of-type(even) { justify-self: end; }

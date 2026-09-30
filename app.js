@@ -1840,8 +1840,8 @@
   // El Atlas junta lo que antes eran el perfil y la enciclopedia: arriba la colección,
   // con la puerta a todas las cartas, y debajo el recorrido de quien juega.
   function atlasColeccion() {
-    return `<section class="panel atlas-collection"><div><h2>Tu colección</h2>${perfilColeccion()}</div>
-      <button class="btn btn-primary" data-action="home-encyclopedia">Explorar todas las cartas <span aria-hidden="true">→</span></button></section>`;
+    return `<section class="panel atlas-collection"><div>${perfilColeccion()}</div>
+      <button class="btn btn-primary" data-action="home-encyclopedia">Explorar las cartas <span aria-hidden="true">→</span></button></section>`;
   }
 
   // Quién eres en el juego: el nombre se puede cambiar sin perder tu avatar.
@@ -1913,7 +1913,7 @@
 
   function atlasRetoDiario() {
     const records = dailyRecords(), racha = dailyStreak(records);
-    return `<section class="panel atlas-daily"><h2>Reto diario</h2>
+    return `<section class="panel atlas-daily">
       <div class="solo-stats daily-stats">
         <span>${glyph(GLYPHS.racha)}<b>${racha}</b><small>${racha === 1 ? "día seguido" : "días seguidos"}</small></span>
         <span>${glyph(GLYPHS.marca)}<b>${records.best || 0}</b><small>mejor resultado</small></span>
@@ -1933,7 +1933,7 @@
   function perfilLogros(logros) {
     const grupos = LOGRO_GRUPOS.filter(grupo => logros.some(logro => logro.group === grupo));
     const siguiente = logros.find(logro => !logro.unlocked);
-    return `<div class="section-label">Logros <small>${logros.filter(l => l.unlocked).length} de ${logros.length}</small></div>
+    return `<p class="atlas-count">${logros.filter(l => l.unlocked).length} de ${logros.length} conseguidos</p>
       ${siguiente ? `<p class="profile-next-goal"><b>Siguiente objetivo:</b> ${escapeHtml(siguiente.name)} · ${escapeHtml(siguiente.desc)}</p>` : '<p class="profile-next-goal">Has conseguido todos los logros disponibles.</p>'}
       ${grupos.map(grupo => `<details class="perfil-achievement-group"><summary><span><b>${escapeHtml(grupo)}</b><small>${logros.filter(l => l.group === grupo && l.unlocked).length} de ${logros.filter(l => l.group === grupo).length} conseguidos</small></span><i aria-hidden="true">+</i></summary>
         <div class="logro-grid" role="group" aria-label="Logros de ${escapeHtml(grupo)}">
@@ -2000,7 +2000,7 @@
         <div class="atlas-territories">
           <div class="atlas-territory" id="atlas-collection"><div class="atlas-territory-caption"><span>01 / ARCHIVO DE LÁMINAS</span><h2>Las láminas</h2></div>${atlasColeccion()}</div>
           <div class="atlas-territory" id="atlas-daily"><div class="atlas-territory-caption"><span>02 / CADA DÍA UN PASO</span><h2>El reto diario</h2></div>${atlasRetoDiario()}</div>
-          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / CAMINOS COMPARTIDOS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h2>Cara a cara</h2><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
+          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / CAMINOS COMPARTIDOS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h3>Cara a cara</h3><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
           <div class="atlas-territory" id="atlas-journey"><div class="atlas-territory-caption"><span>04 / HUELLAS EN EL MAPA</span><h2>Tu recorrido</h2></div>
             ${estrenado
               ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
