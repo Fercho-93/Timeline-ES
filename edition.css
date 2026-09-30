@@ -5128,3 +5128,38 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 .starter-card > span { font-size: 1.05rem; }
 .starter-card .starter-card-art { margin: -24px -20px 16px; }
 .starter-card .starter-card-art .animal-card-art { height: min(62vw, 280px); }
+
+/* ===== Pantalla de «pasa el móvil» y demás tarjetas de turno de las partidas multijugador =====
+   Dejan el recuadro blanco liso y toman el pergamino del resto del juego: papel cálido, filete de latón
+   y un segundo marco interior, como las tarjetas del inicio. */
+:root:not([data-theme="dark"]) #app .pass-screen .pass-card:not(.comp-splash, .final-composition) {
+  padding: 42px 28px 30px;
+  border: 1px solid #d3b98f;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 50% at 15% 0%, #fffaf2cc, transparent 55%),
+    linear-gradient(165deg, #faf1e4f2, #f0dcc6ea 60%, #e8c9abe0);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  backdrop-filter: blur(14px) saturate(1.25);
+  box-shadow: inset 0 1px 0 #ffffffb3, inset 0 -1px 0 #b8653d2e, 0 18px 44px #7a3f1d29, 0 0 0 5px #fffaf259;
+  color: #2a1a10;
+}
+#app .pass-screen .pass-card:not(.comp-splash, .final-composition)::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid #b8935a66;
+  border-radius: 14px;
+  pointer-events: none;
+}
+:root:not([data-theme="dark"]) #app .pass-screen .pass-card:not(.comp-splash, .final-composition) :is(h1, h2, h3) { color: #2a1a10; }
+:root:not([data-theme="dark"]) #app .pass-screen .pass-card:not(.comp-splash, .final-composition) .eyebrow { color: #8a3f2f; }
+:root:not([data-theme="dark"]) #app .pass-screen .pass-card:not(.comp-splash, .final-composition) p { color: #4a3a2c; }
+:root[data-theme="dark"] #app .pass-screen .pass-card:not(.comp-splash, .final-composition) {
+  padding: 42px 28px 30px;
+  border: 1px solid #6d5435;
+  border-radius: 20px;
+  background: linear-gradient(165deg, #33241750, #2a1d11ee 60%, #231810f2);
+  box-shadow: inset 0 1px 0 #ffffff14, 0 18px 44px #0008, 0 0 0 5px #0002;
+}
+:root[data-theme="dark"] #app .pass-screen .pass-card:not(.comp-splash, .final-composition)::before { border-color: #d4bb8b40; }
