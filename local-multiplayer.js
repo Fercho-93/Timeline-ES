@@ -660,7 +660,8 @@
 
   function doCloseRoom() {
     if (role !== "host") return;
-    CT.UI.confirmDialog("Se cerrará la sala para todos los participantes.", () => leaveToEntrada(), { title: "¿Cerrar la sala?", confirmLabel: "Cerrar sala", cancelLabel: "Seguir en la sala" });
+    const jugando = roomState?.status === "playing";
+    CT.UI.confirmDialog(jugando ? "La partida no se guarda: se cerrará la sala para todos los participantes." : "Se cerrará la sala para todos los participantes.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
   }
 
   // Salir de la sala: quien organiza la cierra para todos (se pide confirmación si ya hay
@@ -669,12 +670,13 @@
   function requestLeave() {
     if (role === "host") {
       if (roomState && roomState.playerOrder.length > 1 && roomState.status !== "ended") {
-        CT.UI.confirmDialog("Si sales, la sala se cierra para todos los participantes.", () => leaveToEntrada(), { title: "¿Salir y cerrar la sala?", confirmLabel: "Cerrar sala", cancelLabel: "Quedarme en la sala" });
+        const jugando = roomState.status === "playing";
+        CT.UI.confirmDialog(jugando ? "La partida no se guarda: si sales, la sala se cierra para todos los participantes." : "Si sales, la sala se cierra para todos los participantes.", () => leaveToEntrada(), { title: jugando ? "¿Salir de la partida?" : "¿Salir y cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Quedarme en la sala" });
         return;
       }
       leaveToEntrada();
     } else if (role === "guest" && roomState && roomState.status === "playing") {
-      CT.UI.confirmDialog("Tus cartas volverán al mazo.", () => leaveToEntrada(), { title: "¿Salir de la partida?", confirmLabel: "Salir de la partida", cancelLabel: "Quedarme" });
+      CT.UI.confirmDialog("La partida no se guarda: tus cartas volverán al mazo.", () => leaveToEntrada(), { title: "¿Salir de la partida?", confirmLabel: "Salir sin guardar", cancelLabel: "Seguir jugando" });
     } else leaveToEntrada();
   }
 

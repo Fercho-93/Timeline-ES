@@ -1872,7 +1872,8 @@ async function deleteRoom() {
 }
 function closeRoom() {
   if (!roomRef || roomState?.hostUid !== user.uid) return;
-  CT.UI.confirmDialog("Se cerrará la sala para todos los participantes.", () => { void deleteRoom(); }, { title: "¿Cerrar la sala?", confirmLabel: "Cerrar sala", cancelLabel: "Seguir en la sala" });
+  const jugando = roomState?.status === "playing";
+  CT.UI.confirmDialog(jugando ? "La partida no se guarda: se cerrará la sala para todos los participantes." : "Se cerrará la sala para todos los participantes.", () => { void deleteRoom(); }, { title: jugando ? "¿Salir de la partida?" : "¿Cerrar la sala?", confirmLabel: jugando ? "Salir sin guardar" : "Cerrar sala", cancelLabel: jugando ? "Seguir jugando" : "Seguir en la sala" });
 }
 // Salir de la sala: quien no organiza deja su plaza (sus cartas vuelven al mazo si se estaba
 // jugando); en una mesa pública, además, es dejar de buscar.

@@ -155,18 +155,20 @@ html.splash-active #app-splash .splash-status { transition: opacity 460ms ease-o
 html.splash-active #app-splash .splash-masthead {
   position: absolute;
   top: 46%;
-  left: 50%;
+  /* Centrado sin depender de `translate(-50%)`: algunos Android lo dejaban desplazado a la derecha. */
+  left: 0;
+  right: 0;
   width: min(92vw, 560px);
   max-width: none;
-  margin: 0;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   gap: 0;
   padding: 0;
   opacity: 1;
   text-align: center;
-  transform: translate(-50%, -50%);
+  margin-inline: auto;
+  transform: translateY(-50%);
   z-index: 2;
   pointer-events: none;
 }

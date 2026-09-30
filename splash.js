@@ -2,6 +2,10 @@
   const root = document.documentElement;
   const MIN_VISIBLE = 3500, ENTER_VISIBLE = 1200, FADE_OUT = 420, MAX_WAIT = 20000;
   root.classList.add('splash-active');
+  // La intro arranca con el primer pintado. El botón «Jugar» se crea más tarde (cuando boot llega a `gate`),
+  // y en móviles lentos eso retrasaba su aparición: sus 5 s se cuentan desde aquí, no desde que se crea.
+  let introStart = performance.now();
+  window.requestAnimationFrame?.(() => { introStart = performance.now(); });
   let startedAt = null, ready = false, minVisible = MIN_VISIBLE, timeout, finishTimer, hideTimer;
   const splash = () => document.getElementById('app-splash');
   const hide = () => {
@@ -82,6 +86,9 @@
       button.className = 'splash-play';
       button.textContent = 'Jugar';
       actions.append(button);
+      const elapsed = performance.now() - introStart;
+      actions.style.animationDelay = `${Math.max(0, 5000 - elapsed)}ms`;
+      sound.style.animationDelay = `${Math.max(0, 5200 - elapsed)}ms`;
       el.append(sound, actions);
     }
     button.addEventListener('click', () => {

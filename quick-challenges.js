@@ -21,6 +21,8 @@
     // anterior del juego; desde cualquier otra, vuelve a esa pantalla de entrada.
     const back=playing ? 'data-quick="exit"' : page===entry ? 'data-action="ui-back"' : 'data-quick="formats"';
     paint(`<div class="shell quick-shell">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '')}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
+    // En una sala, cada jugada ajena repinta la pantalla: la portada del mazo sigue encima hasta que se toque.
+    if(splashLayer && !splashLayer.isConnected && !splashLayer.dataset.closed && state && splashLayer.dataset.game===(state.config.historyId||'sin-id') && splashLayer.dataset.index===String(state.index)) app().append(splashLayer);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
   let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, roomLength = 3, pendingConfig = null;
@@ -91,13 +93,15 @@
   // Antes de la explicación, una portada breve con el mazo que toca. Es una capa sobre la
   // pantalla «Reto preparado» (que ya está pintada debajo): solo se retira con un toque.
   // También se usa al pasar al siguiente reto de una partida, con `index` el número de ese reto.
+  let splashLayer=null;
   function deckSplash(config, index=0) {
     const c=E.challenge(config.rounds[index].id), total=config.rounds.length;
     const art=c.cards.filter(card=>card.image), pick=[...new Set([art[0],art[Math.floor(art.length/2)],art.at(-1)].filter(Boolean))];
     const lead=config.kind==='daily'?'Reto diario':total===1?'Vas a jugar a':`Reto ${index+1} de ${total}`;
     const layer=document.createElement('div');layer.className='quick-splash';layer.dataset.quickSplash='';layer.setAttribute('role','button');layer.tabIndex=0;layer.setAttribute('aria-label',`${lead}: ${c.title}. Toca para continuar.`);
     layer.innerHTML=`<div class="quick-splash-inner"><div class="quick-splash-fan" aria-hidden="true">${pick.map(card=>`<img src="${esc(card.image)}" alt="" decoding="async">`).join('')}</div><div class="eyebrow">${esc(lead)}</div><h2>${esc(c.title)}</h2><span class="quick-splash-hint">Toca para continuar</span></div>`;
-    const close=()=>{if(!layer.isConnected)return;layer.classList.add('is-leaving');setTimeout(()=>layer.remove(),260);};
+    app().querySelector('[data-quick-splash]')?.remove();splashLayer=layer;layer.dataset.game=config.historyId||'sin-id';layer.dataset.index=String(index);
+    const close=()=>{layer.dataset.closed='1';if(splashLayer===layer)splashLayer=null;if(!layer.isConnected)return;layer.classList.add('is-leaving');setTimeout(()=>layer.remove(),260);};
     layer.addEventListener('click',close);layer.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();close();}});
     app().append(layer);
   }
@@ -215,9 +219,15 @@
       <p class="hint">El primer turno rota en cada reto para que todos tengan las mismas oportunidades.</p><p id="quick-error" role="alert"></p></section>`);
   }
   function roomChanged(next,id,code) {
+    const wasLobby=page==='network-lobby'&&!room?.config;
     room=CT.QuickRoom.validate(next);myId=id;busy=false;page='network-lobby';
     if(code)CT.Storage.setItem(NET,JSON.stringify({code,name:room.names[room.members.indexOf(id)]}));
-    if(room.config){record=CT.QuickRoom.record(room);state=E.restore(record);selected=null;slot=null;render();}
+    if(room.config){
+      const starting=wasLobby && !room.commands.length;
+      record=CT.QuickRoom.record(room);state=E.restore(record);selected=null;slot=null;render();
+      // Al empezar la partida de la sala, la portada del primer mazo, como en el resto de Retos rápidos.
+      if(starting)deckSplash(state.config,0);
+    }
     else lobby(code || connection?.code);
   }
   // Mesa pública de Retos rápidos: la misma sala de espera que en Grandes colecciones.
@@ -581,7 +591,7 @@
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
       prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count}); return;
     }
-    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, state ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
+    if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, state || room ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
     if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
     if (action === 'setup') {setup(); return;}
     if (action === 'starter-guess') {starterGuess(); return;}
