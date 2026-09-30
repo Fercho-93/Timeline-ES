@@ -24,7 +24,7 @@ function client(uid){
  // no lo reconoce como marca de hora del servidor.
  w.__sdk={initializeApp:()=>({}),getAuth:()=>({}),getFirestore:()=>db(uid),doc,getDoc,runTransaction:(db,callback)=>runTransaction(db,tx=>callback({get:ref=>tx.get(ref),set:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.set(ref,limpio);},update:(ref,data)=>{const limpio=clone(data);for(const campo of ['updatedAt','turnStartedAt'])if(campo in data)limpio[campo]=data[campo];tx.update(ref,limpio);}})),serverTimestamp};
  const src=read('online.js').replace(/^import .+;\n/gm,'').replace('export async function','async function');
- w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,startPulse:(objetivo,regalo)=>startPulse(objetivo,regalo??roomState.players[user.uid].hand[0]),placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
+ w.eval(`(()=>{const {initializeApp,getAuth,getFirestore,doc,getDoc,runTransaction,serverTimestamp}=window.__sdk;const firebaseApp=initializeApp(),auth=getAuth(),db=getFirestore();${src}\nwindow.onlineTest={set(data){roomState=data;user={uid:${JSON.stringify(uid)}};roomRef=doc(db,'rooms',${JSON.stringify(ROOM)});roomCode=${JSON.stringify(ROOM)};},choose(id){selectedCardId=id;},startRoom,useGhost,placeCard,finishTurn,continueTie,skipTurn,removePlayer,navigateOnline,startPulse:(objetivo,regalo)=>startPulse(objetivo,regalo??roomState.players[user.uid].hand[0]),placePulse,defendPulse,renderGame,renderLobby,renderOnlineFinal,nextOnlineFinal,nextTournamentRound};})();`);
  return {w,api:w.onlineTest,errors,async load(){this.api.set(await snapshot());},async call(name,...args){await this.load();await this.api[name](...args);assert.equal(errors.length,0,errors.map(String).join('\n'));}};
 }
 const clients=[client(A),client(B),client(C)];
@@ -256,5 +256,23 @@ try {
  await clients[0].call('nextTournamentRound');s=await snapshot();assert.equal(s.mode,'history');assert.equal(s.tournament.history.length,2);
  s.status='ended';s.phase='finished';s.winner=A;s.winners=[A];await seed(s);
  const lastVersion=s.version;await clients[0].call('nextTournamentRound');assert.equal((await snapshot()).version,lastVersion);
+ // Salir de una partida online ofrece siempre «Salir sin guardar», como en el resto del juego.
+ await seed(fixture());
+ await clients[1].load();clients[1].api.navigateOnline('back');
+ {const d=clients[1].w.document;
+  assert.ok(d.querySelector('[data-exit-dialog]'),'sale el diálogo de salida');
+  assert.match(d.querySelector('[data-exit-discard]')?.textContent||'',/Salir sin guardar/,'quien juega puede salir sin guardar');
+  assert.match(d.querySelector('[data-exit-dialog]').textContent,/cartas vuelven al mazo/);
+  d.querySelector('[data-exit-stay]').click();}
+ await clients[0].load();clients[0].api.navigateOnline('back');
+ {const d=clients[0].w.document;
+  assert.match(d.querySelector('[data-exit-discard]')?.textContent||'',/Salir sin guardar/,'quien organiza también');
+  assert.match(d.querySelector('[data-exit-dialog]').textContent,/cierra la sala para todos/);
+  d.querySelector('[data-exit-stay]').click();}
+ // «Salir sin guardar» de quien no organiza deja su plaza.
+ await clients[1].load();clients[1].api.navigateOnline('back');
+ clients[1].w.document.querySelector('[data-exit-discard]').click();
+ await new Promise(r=>setTimeout(r,800));
+ assert.ok(!(await snapshot()).playerOrder.includes(B),'sale de la partida y su plaza queda libre');
  console.log('  Inicio, poderes, Pulso, salidas, desempate y competición de nueve participantes con cambio de mazo: OK');
 } finally {clients.forEach(c=>c.w.close());await env.cleanup();}

@@ -1876,8 +1876,10 @@ function closeRoom() {
 function requestLeaveRoom() {
   if (roomState?.matchmaking === "public" && roomState.status === "lobby") { void leavePublicLobby(); return; }
   const message = roomState?.status === "playing" ? "Tus cartas volverán al mazo." : roomState?.matchmaking === "public" ? "Tu plaza quedará libre para otra persona." : "Podrás volver a entrar con el código de la sala.";
-  const title = roomState?.matchmaking === "public" && roomState.status !== "playing" ? "¿Dejar de buscar partida?" : "¿Salir de la sala?";
-  CT.UI.confirmDialog(message, () => removePlayer(user.uid), { title, confirmLabel: roomState?.matchmaking === "public" && roomState.status !== "playing" ? "Dejar de buscar" : "Salir de la sala", cancelLabel: "Quedarme" });
+  const jugando = roomState?.status === "playing", buscando = roomState?.matchmaking === "public" && !jugando;
+  // En mitad de una partida la salida se llama igual que en el resto del juego: «Salir sin guardar».
+  const title = buscando ? "¿Dejar de buscar partida?" : jugando ? "¿Salir de la partida?" : "¿Salir de la sala?";
+  CT.UI.confirmDialog(message, () => removePlayer(user.uid), { title, confirmLabel: buscando ? "Dejar de buscar" : jugando ? "Salir sin guardar" : "Salir de la sala", cancelLabel: "Quedarme" });
 }
 // La sala de espera tiene una sola salida para todos. Quien organiza elige entre cerrarla para
 // todos o dejarla abierta (se puede volver a entrar con el código); el resto, dejar su plaza.
@@ -1923,7 +1925,13 @@ function navigateOnline(action) {
       else CT.localNavigate?.('home-top');
     } else CT.localNavigate?.(action);
   };
-  if (roomState?.status === 'playing') CT.UI.confirmExit('La sala seguirá en marcha. Podrás volver a entrar con su código; tu turno no se pausa.', go, '¿Salir de esta pantalla?', 'Salir de la pantalla');
+  // Como en el resto del juego, salir de una partida ofrece siempre «Salir sin guardar»: aquí es abandonarla
+  // (las cartas vuelven al mazo); quien organiza, en cambio, tendría que cerrar la sala para todos.
+  const esAnfitrion = roomState?.hostUid === user?.uid;
+  const salirSinGuardar = { label: 'Salir sin guardar', proceed: () => { if (esAnfitrion) closeRoom(); else void removePlayer(user.uid); } };
+  if (roomState?.status === 'playing') CT.UI.confirmExit(esAnfitrion
+    ? 'La sala seguirá en marcha y podrás volver a entrar con su código; tu turno no se pausa. «Salir sin guardar» cierra la sala para todos.'
+    : 'La sala seguirá en marcha y podrás volver a entrar con su código; tu turno no se pausa. «Salir sin guardar» abandona la partida y tus cartas vuelven al mazo.', go, '¿Salir de la partida?', 'Guardar y salir', salirSinGuardar);
   else go();
 }
 CT.onlineNavigate = navigateOnline;
