@@ -262,7 +262,7 @@
     let code=app().querySelector('#quick-net-code').value.trim();
     const epoch=networkEpoch, change=(...args)=>{if(epoch===networkEpoch)roomChanged(...args);}, fail=e=>{if(epoch===networkEpoch)errorNotice(e);};
     if(netKind==='internet') {
-      if(code.includes('#'))code=new URLSearchParams(new URL(code).hash.slice(1)).get('quick-room') || '';
+      code=roomCodeFromText(code);
       const opened=await CT.QuickNetwork.internet({create,code,name,capacity:roomCapacity,onChange:change,onError:fail});
       if(epoch!==networkEpoch){opened.close();return;}connection=opened;
     } else if(create) connection=CT.QuickNetwork.localHost(name,change,fail,roomCapacity);
@@ -282,6 +282,15 @@
     if(!CT.LocalShare.showQr(options))throw Error('Este contenido es demasiado largo para un código QR. Usa «Compartir».');
   }
   // Abre la cámara y, al leer un código, sigue con `next`. Sin cámara lo explica.
+  // Enlace de invitación: en la app nativa location.href es capacitor://localhost, inútil para otro móvil.
+  function roomUrl(code){const url=new URL(CT.Links?.base?.()||location.origin+location.pathname);url.search='';url.hash='quick-room='+code;return url;}
+  // Vale el enlace (con #quick-room=, ?quick-room= o cualquier texto con el código) o el código suelto.
+  function roomCodeFromText(text){
+    const raw=String(text||'').trim();
+    try{const url=new URL(raw);const found=new URLSearchParams(url.hash.slice(1)).get('quick-room')||url.searchParams.get('quick-room');if(found)return found.trim();}catch{}
+    const match=raw.match(/quick-room=([^&#\s]+)/);
+    return match?decodeURIComponent(match[1]):raw;
+  }
   async function scanQrInto(title,hint,next) {
     if(!CT.QrScanner?.isSupported())throw Error('Este navegador no permite usar la cámara aquí.');
     await CT.LocalShare.scanQr({title,hint,onText:text=>{Promise.resolve(next(text)).catch(errorNotice);}});
@@ -292,10 +301,14 @@
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
     if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count),kind:roomCapacity===2?'duel':'network',historyId:historyId()});return true;}
-    if(action==='share-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;await CT.LocalShare.shareSignal(url.href);return true;}
-    if(action==='qr-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;showQrOrExplain({eyebrow:'Sala de Retos rápidos',title:'Escanea para entrar',text:url.href,code:connection.code,hint:'Abre la cámara del otro móvil y apunta al código.'});return true;}
+    if(action==='share-room'){const url=roomUrl(connection.code);await CT.LocalShare.shareSignal(url.href);return true;}
+    if(action==='qr-room'){const url=roomUrl(connection.code);showQrOrExplain({eyebrow:'Sala de Retos rápidos',title:'Escanea para entrar',text:url.href,code:connection.code,hint:'Abre la cámara del otro móvil y apunta al código.'});return true;}
     if(action==='qr-signal'){showQrOrExplain({eyebrow:'Conexión sin internet',title:'Enséñalo al otro móvil',text:app().querySelector('#quick-signal').value,hint:'El otro móvil lo lee con «Escanear QR».'});return true;}
-    if(action==='scan-code'){await scanQrInto('Escanear QR de la sala','Encuadra el código QR de la sala o de la invitación.',text=>{app().querySelector('#quick-net-code').value=text;return formatAction('join-room');});return true;}
+    if(action==='scan-code'){await scanQrInto('Escanear QR de la sala','Encuadra el código QR de la sala o de la invitación.',text=>{
+      const code=app().querySelector('#quick-net-code');code.value=roomCodeFromText(text);
+      const name=app().querySelector('#quick-net-name-join');
+      if(name&&!name.value.trim()){code.closest('details')?.setAttribute('open','');name.focus();throw Error('Sala leída. Escribe tu nombre y pulsa «Unirme».');}
+      return formatAction('join-room');});return true;}
     if(action==='scan-answer'){await scanQrInto('Escanear QR de la respuesta','Encuadra el código QR que enseña el otro móvil.',text=>{app().querySelector('#quick-answer').value=text;return formatAction('accept-answer');});return true;}
     if(action==='share-signal'){await CT.LocalShare.shareSignal(app().querySelector('#quick-signal').value);return true;}
     if(action==='invite-peer'){
