@@ -218,7 +218,7 @@
       sessionStorage.setItem('continuum-entry-route', inlineCollections.dataset.inlineRoute);
       const drawer = document.getElementById('mode-inline-drawer');
       const open = drawer.hidden;
-      drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery() : '';
+      drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery().replaceAll('loading="lazy"', 'loading="eager"') : '';
       drawer.hidden = !open;
       inlineOpen[app.dataset.screen] = open;
       inlineCollections.setAttribute('aria-expanded', String(open));

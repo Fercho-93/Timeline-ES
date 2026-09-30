@@ -155,7 +155,9 @@
     if (!sheet.animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
     sheet.classList.add('motion-entering');
     const children = [...sheet.children].filter(child =>
-      !child.matches('.home-nav, .atlas-scroll-veil, style, script, .solo-lectores'));
+      !child.matches('.home-nav, .atlas-scroll-veil, style, script, .solo-lectores') &&
+      // La portada de la colección no se apaga al desplegarla: solo aparecen sus mazos.
+      !(collection && child.matches('.gallery-panel')));
     // Los botones de navegación permanecen estables y se conserva su anclaje fijo.
     const targets = children.length ? children : [sheet];
     const animations = targets.map(target => target.animate([

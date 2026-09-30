@@ -3819,9 +3819,15 @@
         const active = open && button.dataset.block === selectedBlockKey;
         const drawer = entry.querySelector(".collection-drawer");
         if (active) drawer.firstElementChild.innerHTML = `<div class="collection-decks"><p class="lead">Elige tu mazo</p>${gameList()}</div>`;
-        void drawer.offsetHeight;
-        // La carátula desplegada se ve grande: se pide su versión de 700 px.
-        if (active) button.querySelectorAll('img[src$="-400.webp"]').forEach(img => { img.src = img.getAttribute('src').replace(/-400\.webp$/, '-700.webp'); img.width = 700; img.removeAttribute('height'); });
+        if (active) void drawer.offsetHeight;
+        // La carátula desplegada se ve grande: se pide su versión de 700 px y se cambia cuando ya
+        // está descargada y decodificada, para que la portada no parpadee en blanco al cambiar de imagen.
+        if (active) button.querySelectorAll('img[src$="-400.webp"]').forEach(img => {
+          const grande = img.getAttribute('src').replace(/-400\.webp$/, '-700.webp'), precarga = new Image();
+          precarga.src = grande;
+          const poner = () => { if (!img.isConnected) return; img.src = grande; img.width = 700; img.removeAttribute('height'); };
+          (precarga.decode ? precarga.decode() : Promise.resolve()).then(poner, poner);
+        });
         entry.classList.toggle("active", active);
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
