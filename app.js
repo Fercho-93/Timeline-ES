@@ -525,7 +525,7 @@
     else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='wifi-quick') CT.Quick.openNetwork(render, 'local', 4);
     else if(sessionStorage.getItem('continuum-entry-route')==='online-quick') CT.Quick.openNetwork(render, 'internet', 4);
-    else if(sessionStorage.getItem('continuum-entry-route')==='duel-quick') CT.Quick.openNetwork(render, 'internet', 2);
+    else if(sessionStorage.getItem('continuum-entry-route')==='duel-quick') CT.Quick.openDuel(render);
     else CT.Quick.open(render);
   }
 

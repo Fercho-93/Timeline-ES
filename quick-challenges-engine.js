@@ -66,7 +66,7 @@
   }
   // Se reconstruye la partida con comandos legales; nunca se confía en un marcador guardado.
   function restore(record) {
-    if (!record || record.version !== catalog.version || !Array.isArray(record.commands) || record.commands.length > 100) throw Error('INVALID_SAVE');
+    if (!record || record.version !== catalog.version || !Array.isArray(record.commands) || record.commands.length > 2000) throw Error('INVALID_SAVE');
     return record.commands.reduce(step, create(record.config));
   }
   CT.QuickEngine = {create, step, restore, challenge};

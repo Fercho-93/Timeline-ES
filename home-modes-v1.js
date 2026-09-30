@@ -144,7 +144,7 @@
       route === 'online' ? modeDoor('online-join', 'menu-private.webp', 'Unirme a una sala', 'Escanea el QR o escribe el código de una sala que ya está creada.', true) : '',
       route === 'online' ? createRoomGroup(route) : [
         inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos.'),
-        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa para todos: cada uno arriesga o asegura sus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
+        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', route === 'duel' ? 'Mazos sorpresa: juegas tú, le mandas el enlace y compara aciertos.' : 'Mazos sorpresa para todos: cada uno arriesga o asegura sus aciertos.', false, `data-friend-quick="${route}"`, route === 'duel' ? 'Retar a un amigo' : 'Preparar partida'),
         route === 'local' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición') : ''
       ].join('')
     ].join(''), art);
