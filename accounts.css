@@ -83,5 +83,9 @@
 .ranking-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
 .ranking-nav span { font-family: var(--font-display); font-size: 1.35rem; min-width: 12ch; text-align: center; }
 .ranking-nav .btn { min-width: 44px; font-size: 1.4rem; }
+/* Sobre la cabecera verde, las flechas en dorado para que se vean; desactivadas, más tenues pero visibles. */
+#app .ranking-nav .btn, .ranking-nav .btn { color: #f0d08a; border: 1px solid #e0bd6f; background: #f0d08a1f; font-weight: 700; }
+#app .ranking-nav .btn:not(:disabled):active { background: #f0d08a40; }
+#app .ranking-nav .btn:disabled, .ranking-nav .btn:disabled { opacity: .4; color: #f0d08a; border-color: #e0bd6f99; }
 .ranking-time { display: block; opacity: .7; font-size: .7rem; }
 .ranking-more { display: block; margin: 12px auto 0; }
