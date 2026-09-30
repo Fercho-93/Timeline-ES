@@ -6,7 +6,8 @@
 #app .mode-entry-grid::before { content: "ELIGE TU CAMINO"; grid-column: 1 / -1; }
 #app .mode-daily-family { margin: -2px 4px 2px; color: #665442; font: .8rem/1.4 var(--ui-font); }
 #app .mode-play-zone { min-width: 0; }
-#app .mode-play-card { width: 100%; }
+#app .mode-play-card { width: 100%; transform: translateZ(0); backface-visibility: hidden; }
+#app .mode-choices-reveal { contain: layout paint; }
 #app .mode-play-card .mode-play-chevron { display: inline-block; margin-left: 8px; font: 700 1.35rem/0.7 var(--font-display); vertical-align: middle; transition: transform .32s ease; }
 #app .mode-play-card[aria-expanded="true"] .mode-play-chevron { transform: rotate(180deg); }
 #app .mode-play-card:focus-visible { outline: 3px solid #9c4f2c; outline-offset: 3px; }

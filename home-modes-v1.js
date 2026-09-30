@@ -65,7 +65,7 @@
       modeDoor('solo-hub', modeArt['solo-hub'], 'Jugar solo', 'Elige un mazo o una competición.', true),
       modeDoor('friends-hub', modeArt['friends-hub'], 'Jugar con amigos', 'En el mismo móvil o cada uno en el suyo.'),
       modeDoor('online-hub', modeArt['online-hub'], 'Jugar online', 'Encuentra jugadores en una mesa pública.')
-    ].join('');
+    ].join('').replaceAll('loading="lazy"', 'loading="eager"'); // decodificadas de antemano: si no, se pintan al desplegar y la tarjeta «Jugar» parpadea
     choices.setAttribute('aria-hidden', String(!playExpanded));
     choices.inert = !playExpanded;
 
