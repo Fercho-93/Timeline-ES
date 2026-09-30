@@ -90,10 +90,11 @@
   }
   // Antes de la explicación, una portada breve con el mazo que toca. Es una capa sobre la
   // pantalla «Reto preparado» (que ya está pintada debajo): solo se retira con un toque.
-  function deckSplash(config) {
-    const c=E.challenge(config.rounds[0].id), total=config.rounds.length;
+  // También se usa al pasar al siguiente reto de una partida, con `index` el número de ese reto.
+  function deckSplash(config, index=0) {
+    const c=E.challenge(config.rounds[index].id), total=config.rounds.length;
     const art=c.cards.filter(card=>card.image), pick=[...new Set([art[0],art[Math.floor(art.length/2)],art.at(-1)].filter(Boolean))];
-    const lead=config.kind==='daily'?'Reto diario':total===1?'Vas a jugar a':'Reto 1 de '+total;
+    const lead=config.kind==='daily'?'Reto diario':total===1?'Vas a jugar a':`Reto ${index+1} de ${total}`;
     const layer=document.createElement('div');layer.className='quick-splash';layer.dataset.quickSplash='';layer.setAttribute('role','button');layer.tabIndex=0;layer.setAttribute('aria-label',`${lead}: ${c.title}. Toca para continuar.`);
     layer.innerHTML=`<div class="quick-splash-inner"><div class="quick-splash-fan" aria-hidden="true">${pick.map(card=>`<img src="${esc(card.image)}" alt="" decoding="async">`).join('')}</div><div class="eyebrow">${esc(lead)}</div><h2>${esc(c.title)}</h2><span class="quick-splash-hint">Toca para continuar</span></div>`;
     const close=()=>{if(!layer.isConnected)return;layer.classList.add('is-leaving');setTimeout(()=>layer.remove(),260);};
@@ -402,8 +403,14 @@
     if (r.lost > 0) return solo ? `Pierdes ${n(r.lost, 'acierto', 'aciertos')} de este reto y quedas fuera hasta el siguiente. ${fuera}` : `${name} pierde ${n(r.lost, 'acierto', 'aciertos')} de este reto y queda fuera hasta el siguiente. ${fuera}`;
     return solo ? `No tenías aciertos provisionales que perder, pero quedas fuera de este reto hasta el siguiente. ${fuera}` : `${name} no tenía aciertos provisionales, pero queda fuera de este reto hasta el siguiente. ${fuera}`;
   }
+  // Qué partida y qué reto se han pintado ya: al pasar al siguiente reto se enseña su portada, igual que al
+  // empezar, en vez de soltar directamente las cartas. Reanudar una partida no la vuelve a enseñar.
+  let shownGame = null, shownIndex = 0;
   function render() {
     page="game";
+    const nextDeck = state.phase === 'turn' && shownGame === (state.config.historyId || 'sin-id') && state.index > shownIndex;
+    shownGame = state.config.historyId || 'sin-id'; shownIndex = state.index;
+    if (nextDeck) { const config = state.config, index = state.index; setTimeout(() => { if (state && state.index === index && page === 'game') deckSplash(config, index); }, 0); }
     saveHistory();
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
