@@ -234,6 +234,15 @@
     layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.quickStarter = '';
     layer.innerHTML = `<div class="modal">${html}</div>`; app().append(layer); CT.openDialog(layer, true);
   }
+  function starterFieldMarkup(names) {
+    if (starter && starter.key === names.join('|')) {
+      const order = starter.order.map(i => esc(names[i])).join(' → ');
+      return `<span class="field-label">Quién empieza</span><p class="starter-result"><strong>${esc(names[starter.order[0]])}</strong> ha acertado más cerca y empieza.</p><p class="hint">Orden de juego: ${order}</p><button type="button" class="btn btn-ghost" data-quick="draw-starter">Repetir el minijuego</button>`;
+    }
+    return `<span class="field-label">Quién empieza</span><button type="button" class="btn btn-block starter-draw-cta" data-quick="draw-starter"><span class="starter-draw-icon" aria-hidden="true">🂠</span><span class="starter-draw-copy"><b>Adivinar la cifra</b><small>Cada uno prueba con una carta y gana quien más se acerque</small></span><span class="starter-draw-arrow" aria-hidden="true">→</span></button>`;
+  }
+  const quickNames = () => [...app().querySelectorAll('[data-quick-name]')].map(el => el.value.trim());
+  function refreshStarterField() {const box = app().querySelector('.quick-starter-field'); if (box) box.innerHTML = starterFieldMarkup(quickNames());}
   function beginStarter(names) {
     const modeKey = CT.shuffle(CT.Tournament.modes())[0];
     const card = CT.shuffle(CT.cards(modeKey))[0];
@@ -256,7 +265,7 @@
     if (starterDraw.step < starterDraw.names.length) {starterAsk(); return;}
     const {modeKey, card, names, guesses} = starterDraw;
     const order = CT.Starter.order(modeKey, card.id, guesses.map((v, id) => ({id, value: v})));
-    starter = {key: names.join('|'), order};
+    starter = {key: names.join('|'), order}; refreshStarterField();
     starterPaint(`<h2>¿Quién empieza?</h2><div class="starter-winner-banner"><b>${esc(names[order[0]])}</b><span>Empieza la partida</span></div>
       <div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>El valor real era ${esc(CT.formatValue(modeKey, card))}</span></div>
       <ol class="starter-draw-list">${order.map((i, n) => `<li${n === 0 ? ' class="starter-draw-winner"' : ''}><span>${n + 1}.º ${esc(names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(modeKey, guesses[i]))}</span></li>`).join('')}</ol>
@@ -272,12 +281,13 @@
       <div id="quick-names">${nameFields(solo ? 1 : 2, solo ? ["Tú"] : [CT.Identidad?.propio?.() || "Jugador 1"])}</div>
       ${solo ? '' : button('add-player', '＋ Añadir participante', 'btn btn-ghost')}</div>
       <div class="setup-block"><div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Cómo empezar</span></div>
-      <div class="setup-grid"><div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option><option value="10">10 retos · maratón</option><option value="15">15 retos · gran maratón</option><option value="20">20 retos · resistencia</option><option value="${CT.QuickCatalog.challenges.length}">Todos los mazos · ${CT.QuickCatalog.challenges.length} retos</option></select></div></div>
-      <p class="hint">${solo ? "Puedes plantarte para asegurar los puntos del reto." : "El primer turno rota en cada reto."}</p></div>
+      <div class="setup-grid">${solo ? '' : `<div class="field starter-field quick-starter-field">${starterFieldMarkup(['Jugador 1','Jugador 2'])}</div>`}<div class="field"><label for="quick-length">Duración de la partida</label><select id="quick-length"><option value="1">1 reto · partida rápida</option><option value="3" selected>3 retos · partida estándar</option><option value="5">5 retos · partida larga</option><option value="10">10 retos · maratón</option><option value="15">15 retos · gran maratón</option><option value="20">20 retos · resistencia</option><option value="${CT.QuickCatalog.challenges.length}">Todos los mazos · ${CT.QuickCatalog.challenges.length} retos</option></select></div></div>
+      <p class="hint">${solo ? "Puedes plantarte para asegurar los puntos del reto." : "Empieza quien gane el minijuego; el primer turno rota en cada reto."}</p></div>
       ${button('start', 'Barajar y empezar <span>→</span>', 'btn btn-primary btn-block')}
       ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}
       <p id="quick-error" role="alert">${esc(error)}</p></div></section>
       <details class="panel quick-panel"><summary>Cómo se juega</summary><ol><li>Una carta revelada inicia la línea, sin dar puntos.</li><li>Elige una de las cartas comunes y toca un hueco. Confirma para revelar el dato.</li><li>Acertar suma un punto provisional y pasa el turno.</li><li>En tu siguiente turno puedes plantarte: aseguras tus puntos y sales de este reto.</li><li>Fallar pierde tus puntos de este reto y te retira. Los de retos anteriores se conservan.</li><li>Al agotarse las cartas, los puntos pendientes se aseguran. El reto también termina si nadie sigue activo.</li></ol><p>La carta fallada queda corregida en la línea. Si queda una sola persona, puede seguir arriesgando. Los empates de valor admiten cualquier orden equivalente. Gana quien suma más puntos; un empate final se comparte.</p></details>`);
+    if (!solo) {refreshStarterField(); app().querySelector('#quick-names')?.addEventListener('input', () => {if (starter && starter.key !== quickNames().join('|')) {starter = null;} refreshStarterField();});}
   }
   function nameFields(count, names = []) {
     return Array.from({length: count}, (_, i) => `<div class="player-row"><input id="quick-name-${i}" data-quick-name aria-label="Nombre del jugador o equipo ${i + 1}" maxlength="24" value="${esc(names[i] ?? `Jugador ${i + 1}`)}" autocomplete="off"><button class="remove" data-quick="remove-player" data-index="${i}" aria-label="Quitar jugador ${i + 1}" ${count <= 2 ? 'disabled' : ''}>×</button></div>`).join('');
@@ -414,6 +424,7 @@
       else if (action === 'remove-player' && names.length > 2) names.splice(Number(target.dataset.index), 1);
       app().querySelector('#quick-names').innerHTML = nameFields(names.length, names);
       app().querySelector('[data-quick="add-player"]').disabled = names.length >= 8;
+      refreshStarterField();
       app().querySelector(`#quick-name-${names.length - 1}`)?.focus(); return;
     }
     if (action === 'menu') {menu(); return;}
@@ -436,6 +447,7 @@
     if (action === 'starter-guess') {starterGuess(); return;}
     if (action === 'starter-go') {starterClose(); app().querySelector('[data-quick="start"]')?.click(); return;}
     if (action === 'starter-back') {starterClose(); return;}
+    if (action === 'draw-starter') {const n = quickNames(); if (n.length < 2 || n.some(x => !x) || new Set(n.map(x => x.toLocaleLowerCase('es'))).size !== n.length) {app().querySelector('#quick-error').textContent = 'Escribe nombres diferentes para cada participante.'; return;} starter = null; beginStarter(n); return;}
     if (action === 'start') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value.trim());
       if (names.some(n => !n) || new Set(names.map(n => n.toLocaleLowerCase('es'))).size !== names.length) {
