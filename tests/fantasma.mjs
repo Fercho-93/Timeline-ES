@@ -214,7 +214,7 @@ for (const difficulty of ['easy','normal','hard','expert']) {
 {
   // El modo competición ya no vive en el menú de un mazo concreto: baraja varios mazos
   // al azar, así que su botón está en la portada y no hace falta `abreMazo` para llegar.
-  const w=boot({'continuum-difficulty-v1':'expert'});click(irACompeticion(w),'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
+  const w=boot({'continuum-competition-difficulty-v1':'expert'});click(irACompeticion(w),'competition-menu');click(w,'start-competition');click(w,'comp-next-round');
   assert.equal(w.document.querySelectorAll('.ghost-card').length,1);
   let rounds=0;
   // La competición pasa por los mazos que son suyos menos la Gran mezcla, así que el

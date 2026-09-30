@@ -23,7 +23,7 @@
     paint(`<div class="shell quick-shell">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '')}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
   }
-  let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, pendingConfig = null;
+  let entry = 'menu', format = 'local', page = 'menu', connection = null, room = null, myId = null, busy = false, invite = null, netKind = 'internet', networkEpoch = 0, roomCapacity = 4, roomLength = 3, pendingConfig = null;
   const BEST = 'continuum-quick-best-v1', NET = 'continuum-quick-room-v1', HISTORY = 'continuum-quick-history-v1';
   const day = () => {const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
   function readJSON(key, fallback=null) {try{return JSON.parse(CT.Storage.getItem(key)) || fallback;}catch{return fallback;}}
@@ -162,13 +162,40 @@
     format='duel';begin({names:['Tú'],rounds:rival.rounds,kind:'duel',seed:rival.seed,length:rival.rounds.length,rivalScore:rival.score,rivalName:rival.name});
     history.replaceState(null,'',location.pathname+location.search);
   }
-  // El duelo de Retos rápidos: eliges cuántos mazos, juegas y mandas el enlace. Es el mismo guion que el
-  // duelo de las colecciones, pensado para jugarse a distancia y sin coincidir.
+  // El duelo de Retos rápidos tiene los mismos dos ritmos que el de las colecciones, y aquí siempre se ordenan
+  // cartas: «Partida completa» (juegas tú y mandas un enlace; tu amigo juega cuando pueda) y «Por turnos»
+  // (una sala de dos: cada uno juega desde su móvil y la partida se guarda entre turnos).
+  const DUEL_PACE='continuum-quick-duel-pace-v1';
+  const duelPace=()=>CT.Storage.getItem(DUEL_PACE)==='turnos'?'turnos':'seguidos';
+  const soloGlyph=paths=>`<svg class="solo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
+  const PACE_GLYPH={
+    seguidos:'<path d="M7 3h10M7 21h10M8 3v2a4 4 0 0 0 1.6 3.2L12 10l2.4-1.8A4 4 0 0 0 16 5V3M8 21v-2a4 4 0 0 1 1.6-3.2L12 14l2.4 1.8A4 4 0 0 1 16 19v2"/>',
+    turnos:'<path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/>',
+    reloj:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'
+  };
   function duelSetup() {
-    stopNetwork(); page='duel-setup'; format='duel'; state=null; record=null; selected=null; slot=null;
+    stopNetwork(); page='duel-setup'; format='duel'; netKind='internet'; roomCapacity=2; state=null; record=null; selected=null; slot=null;
+    const pace=duelPace(), ownName=esc(CT.Identidad?.propio?.() || '');
     const chip=(n,label)=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"><b>${n}</b><span>${n===1?'mazo':'mazos'}</span><small>${label}</small></button>`;
-    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo</div><h2 data-focus tabindex="-1">Duelo de Retos rápidos</h2><p class="lead">Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos mazos cuando quiera, sin coincidir contigo. Gana quien asegure más aciertos.</p><div class="quick-length" role="radiogroup" aria-label="Número de mazos">${chip(1,'Duelo rápido')}${chip(3,'Duelo estándar')}${chip(5,'Duelo largo')}</div><input id="quick-free-length" type="hidden" value="3">
-      ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}</section>`);
+    const option=([key,title,foot])=>`<label class="segmented-option${key===pace?' is-on':''}"><input type="radio" name="quick-duel-pace" value="${key}"${key===pace?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`;
+    const block=(key,body)=>`<div data-quick-duel-block="${key}"${key===pace?'':' hidden'}>${body}</div>`;
+    shell(`<section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Duelo con un amigo</h2>
+        <p class="lead">Los mismos mazos para los dos. Gana quien asegure más aciertos.</p><p class="solo-intro-rule">Ordenas las cartas de mazos sorpresa: arriesga o asegura.</p></div>
+      <div class="panel solo-panel">
+        <div class="solo-panel-head"><h3>Duelo de Retos rápidos</h3></div>
+        <div class="field duel-kind-field"><span class="field-label" id="quick-pace-label">Ritmo del duelo</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="quick-pace-label">${[['seguidos','Partida completa','Juegas y esperas al rival'],['turnos','Por turnos','Cada uno desde su móvil']].map(option).join('')}</div></div>
+        <div class="field duel-kind-field"><span class="field-label" id="quick-length-label">Mazos</span>
+          <div class="quick-length" role="radiogroup" aria-labelledby="quick-length-label">${chip(1,'Duelo rápido')}${chip(3,'Duelo estándar')}${chip(5,'Duelo largo')}</div><input id="quick-free-length" type="hidden" value="3"></div>
+        ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos mazos cuando quiera, sin coincidir contigo.</p></div>
+          ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
+        ${block('turnos',`<div class="duel-brief"><p>Jugáis por turnos en una sala de dos, cada uno desde su móvil. Creas la sala y le mandas el código, el enlace o el QR; la partida se guarda entre turnos y podéis volver más tarde.</p></div>
+          <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${ownName}"></div>
+          ${button('create-room','Crear sala de duelo <span>→</span>','btn btn-primary btn-block')}
+          <details class="duel-join"><summary>Mi amigo ya creó la sala</summary><div class="field"><label for="quick-net-code">Código o enlace de sala</label><textarea id="quick-net-code" rows="2"></textarea></div>
+            ${button('scan-code','Escanear código QR','btn btn-secondary btn-block')}${button('join-room','Unirme a la sala <span>→</span>','btn btn-secondary btn-block')}</details>
+          ${readJSON(NET)?button('reconnect','Volver a mi sala','btn btn-ghost btn-block'):''}<p id="quick-error" role="alert"></p>`)}
+      </div></section>`);
   }
   function networkSetup(kind,capacity=4) {
     roomCapacity=capacity;
@@ -230,6 +257,8 @@
   async function connectRoom(create) {
     const nameInput=app().querySelector(create?'#quick-net-name':'#quick-net-name-join') || app().querySelector('#quick-net-name'), name=nameInput.value.trim();if(!name)throw Error('Escribe tu nombre.');
     if (create) roomCapacity = Number(app().querySelector('#quick-net-players')?.value) || roomCapacity;
+    // La duración que se eligió al crear la sala; en la sala ya no hay desplegable, y sin esto siempre eran 3 retos.
+    if (create) roomLength = Number(app().querySelector('#quick-net-length')?.value || app().querySelector('#quick-free-length')?.value) || 3;
     let code=app().querySelector('#quick-net-code').value.trim();
     const epoch=networkEpoch, change=(...args)=>{if(epoch===networkEpoch)roomChanged(...args);}, fail=e=>{if(epoch===networkEpoch)errorNotice(e);};
     if(netKind==='internet') {
@@ -262,7 +291,7 @@
     if(action==='leave-public'){const leaving=connection;connection=null;clearInterval(publicClock);await leaving?.leave?.();toEntry();return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
-    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||3;await networkAction({type:'start',rounds:rounds(count),kind:roomCapacity===2?'duel':'network',historyId:historyId()});return true;}
+    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count),kind:roomCapacity===2?'duel':'network',historyId:historyId()});return true;}
     if(action==='share-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;await CT.LocalShare.shareSignal(url.href);return true;}
     if(action==='qr-room'){const url=new URL(location.href);url.hash='quick-room='+connection.code;showQrOrExplain({eyebrow:'Sala de Retos rápidos',title:'Escanea para entrar',text:url.href,code:connection.code,hint:'Abre la cámara del otro móvil y apunta al código.'});return true;}
     if(action==='qr-signal'){showQrOrExplain({eyebrow:'Conexión sin internet',title:'Enséñalo al otro móvil',text:app().querySelector('#quick-signal').value,hint:'El otro móvil lo lee con «Escanear QR».'});return true;}
@@ -470,6 +499,7 @@
   // pública no tienen una propia: se sale a la pantalla anterior del juego.
   function toEntry() {
     if (entry === 'free-setup') freeSetup();
+    else if (entry === 'duel-setup') duelSetup();
     else {stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;CT.navigateBack?.();}
   }
   function menu() {
@@ -479,6 +509,14 @@
     app().append(layer); CT.openDialog(layer, true);
   }
   document.addEventListener('change', event => {
+    if (event.target.name === 'quick-duel-pace' && app().querySelector('[data-quick-duel-block]')) {
+      // Cambiar de ritmo no repinta: se enseña un bloque y se esconde el otro, como en el duelo de las colecciones.
+      const pace = event.target.value === 'turnos' ? 'turnos' : 'seguidos';
+      CT.Storage.setItem(DUEL_PACE, pace);
+      app().querySelectorAll('[data-quick-duel-block]').forEach(b => { b.hidden = b.dataset.quickDuelBlock !== pace; });
+      app().querySelectorAll('.segmented-option').forEach(o => o.classList.toggle('is-on', o.querySelector('input').checked));
+      return;
+    }
     if (!app().querySelector('.quick-shell')) return;
     if (event.target.id === 'quick-net-length') app().querySelector('#quick-net-choice-wrap')?.setAttribute('hidden','');
   });
