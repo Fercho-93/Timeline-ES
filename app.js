@@ -967,7 +967,7 @@
     const card = starterCard();
     const regla = reglaCifra(selectedModeKey);
     const jugador = escapeHtml(starterDraw.names[starterDraw.step]);
-    renderStarterDialog(`<h2>Pasa el móvil a ${jugador}</h2>
+    renderStarterDialog(`<h2 data-dialog-focus tabindex="-1">Pasa el móvil a ${jugador}</h2>
       <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
       <div class="field cifra-field">
         <label for="starter-guess-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label>
@@ -976,7 +976,8 @@
       </div>
       <div class="actions"><button class="btn btn-primary btn-block" data-action="starter-guess-submit">Adivinar <span>→</span></button></div>`);
     const campo = app.querySelector("#starter-guess-input");
-    campo?.focus({ preventScroll: true });
+    // El teclado no se abre solo: taparía la carta y el botón. Se abre al tocar el campo; mientras tanto el
+    // foco se queda en el título del diálogo, que es lo que lee el lector de pantalla.
     // En iOS el teclado tarda un pelín en abrirse y el viewport en recalcularse: sin este
     // empujón el campo puede quedar tapado hasta que el usuario desplace a mano.
     campo?.addEventListener("focus", () => campo.scrollIntoView({ block: "center", behavior: "smooth" }));

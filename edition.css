@@ -5121,3 +5121,10 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 
 /* Dificultad de la competición: ocupa todo el ancho bajo los dos desplegables. */
 .competition-settings .competition-difficulty { grid-column: 1 / -1; }
+
+/* Minijuego de «quién empieza»: sin el teclado abierto de entrada hay sitio para una lámina y una carta grandes. */
+.starter-card { padding: 24px 20px; }
+.starter-card strong { font-size: clamp(1.6rem, 7vw, 2.2rem); line-height: 1.2; }
+.starter-card > span { font-size: 1.05rem; }
+.starter-card .starter-card-art { margin: -24px -20px 16px; }
+.starter-card .starter-card-art .animal-card-art { height: min(62vw, 280px); }

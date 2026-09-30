@@ -304,11 +304,10 @@
   }
   function starterAsk() {
     const {modeKey, card, names, step} = starterDraw, regla = CT.axis(modeKey).cifra || {};
-    starterPaint(`<h2>Pasa el móvil a ${esc(names[step])}</h2><div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${esc(regla.pregunta || '')}</span></div>
+    starterPaint(`<h2 data-dialog-focus tabindex="-1">Pasa el móvil a ${esc(names[step])}</h2><div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${esc(regla.pregunta || '')}</span></div>
       <div class="field cifra-field"><label for="quick-starter-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>` : ''}</label><input id="quick-starter-input" type="text" inputmode="${regla.decimales ? 'decimal' : 'numeric'}" autocomplete="off" enterkeyhint="send"><p class="hint">${esc(regla.pista || '')}</p></div>
       <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-guess">Adivinar <span>→</span></button><button class="btn btn-ghost btn-block" data-quick="starter-back">Volver a la preparación</button></div>`);
     const field = app().querySelector('#quick-starter-input');
-    field?.focus({preventScroll: true});
     field?.addEventListener('keydown', e => {if (e.key === 'Enter') {e.preventDefault(); starterGuess();}});
   }
   function starterGuess() {
