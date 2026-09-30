@@ -509,7 +509,7 @@ console.log("\nEl campo de respuesta dice en qué se puede responder");
   const w = boot();
   await abreDuelo(w, { block: "naturaleza", mode: "animals" });
   ok("se enseñan las unidades admitidas", /Se aceptan:/.test(texto(w)) && /kg/.test(texto(w)) && /mg/.test(texto(w)));
-  ok("y se dice cuál se entiende si no pones ninguna", /en kg si no pones otra/.test(texto(w)));
+  ok("y se dice cuál se entiende si no pones ninguna", /\(en kg\)/.test(texto(w)));
 
   // Escribir con unidad puntúa como el valor convertido, no como el número a secas.
   const guardado = estado(w, "animals");

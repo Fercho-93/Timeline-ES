@@ -140,7 +140,7 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
 .home-shell .choice-icon { background: var(--edition-paper); color: var(--edition-brass); }
 .panel, .modal, .room-code-card, .connection-strip { background: var(--edition-surface); border-color: var(--edition-line); box-shadow: var(--edition-shade); }
 .panel > h1, .panel > h2, .panel > p, .modal > h2, .modal > p, .settings-modal, .setup-section, .pass-screen { color: var(--edition-ink); }
-.field input, .field select, .modal textarea, .player-row input { background: var(--edition-surface); border-color: var(--edition-line); color: var(--edition-ink); }
+.field input, .field select, .modal textarea, .player-row input { background-color: var(--edition-surface); border-color: var(--edition-line); color: var(--edition-ink); }
 .overlay { background: #111a17a6; backdrop-filter: blur(8px); }
 .modal { border-radius: 12px; }
 .player-medallion { border: 1px solid var(--edition-brass); background: var(--edition-paper); color: var(--edition-brass); box-shadow: 0 0 0 7px var(--edition-surface), 0 0 0 8px var(--edition-line); }
@@ -5079,3 +5079,16 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
 html #app .mode-create-room{display:grid;gap:12px}
 html #app .mode-create-list{display:grid;gap:12px;padding-left:14px;border-left:2px solid #d8bf9c}
 html #app .mode-create-list[hidden]{display:none}
+
+/* Los títulos de las cartas parten por sílabas (con guion) en vez de a mitad de palabra cuando el texto es grande o la pantalla estrecha. */
+.timeline-card h3, .hand-card strong { -webkit-hyphens: auto; hyphens: auto; }
+
+/* Los desplegables llevan su flecha: varias reglas de arriba usan `background` abreviado y la borraban, con lo que parecían campos de texto. */
+#app select:not([multiple]), .modal select:not([multiple]) {
+  -webkit-appearance: none; appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--edition-muted, var(--muted)) 50%), linear-gradient(135deg, var(--edition-muted, var(--muted)) 50%, transparent 50%) !important;
+  background-position: calc(100% - 22px) calc(50% - 3px), calc(100% - 16px) calc(50% - 3px) !important;
+  background-size: 6px 6px, 6px 6px !important;
+  background-repeat: no-repeat !important;
+  padding-right: 38px;
+}

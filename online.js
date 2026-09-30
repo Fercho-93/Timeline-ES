@@ -805,7 +805,7 @@ function starterPanelMarkup(isHost) {
     }
     return `${cardMarkup(escapeHtml(regla.pregunta || ""))}
       <div class="field cifra-field">
-        <label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
+        <label for="starter-guess-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label>
         <input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send">
         <p class="hint">${escapeHtml(regla.pista || "")}</p>
       </div>
@@ -949,7 +949,7 @@ function publicStarterMarkup() {
     return `${head}${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="public-answered">Tu respuesta: <b>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), starterRecords.get(user.uid).value))}</b>. Las cifras se enseñan cuando empieza la partida.</p>`;
   }
   return `${head}${cardMarkup(escapeHtml(regla.pregunta || ""))}
-    <div class="field cifra-field"><label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label><input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"><p class="hint">${escapeHtml(regla.pista || "")}</p></div>
+    <div class="field cifra-field"><label for="starter-guess-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label><input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"><p class="hint">${escapeHtml(regla.pista || "")}</p></div>
     <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Responder <span>→</span></button>`;
 }
 

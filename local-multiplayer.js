@@ -587,7 +587,7 @@
       return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${cardMarkup(escapeHtml(regla.pregunta || ""))}<p class="hint">Ya has respondido. Esperando a ${escapeHtml(faltan.join(", "))}.</p>${repetir}</div>`;
     }
     return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${cardMarkup(escapeHtml(regla.pregunta || ""))}
-      <div class="field cifra-field"><label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label><input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"><p class="hint">${escapeHtml(regla.pista || "")}</p></div>
+      <div class="field cifra-field"><label for="starter-guess-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label><input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send"><p class="hint">${escapeHtml(regla.pista || "")}</p></div>
       <button type="button" class="btn btn-primary btn-block" data-local-action="starter-guess">Adivinar <span>→</span></button>${repetir}</div>`;
   }
 

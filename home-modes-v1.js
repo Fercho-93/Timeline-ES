@@ -117,9 +117,9 @@
   // elegir un mazo (jugar solo o preparar una partida en un solo móvil).
   // Pantallas con las colecciones desplegadas al salir de ellas: al volver, siguen así.
   const inlineOpen = {};
-  function inlineCollections(route) {
+  function inlineCollections(route, texto = 'Elige un tema o combina los ocho mazos cronológicos.') {
     const open = !!inlineOpen[app.dataset.pendingHub || ''];
-    return `<div class="mode-inline-collections">${modeDoor('jugar', 'menu-collections.webp', 'Grandes colecciones', 'Elige un tema o combina los ocho mazos cronológicos.', false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`, 'Elegir mazo')}<div id="mode-inline-drawer" class="mode-inline-drawer" data-route="${route}"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true) : ''}</div></div>`;
+    return `<div class="mode-inline-collections">${modeDoor('jugar', 'menu-collections.webp', 'Grandes colecciones', texto, false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`, 'Elegir mazo')}<div id="mode-inline-drawer" class="mode-inline-drawer" data-route="${route}"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true) : ''}</div></div>`;
   }
 
   // Cada forma de jugar con amigos conserva la misma entrada a los mazos.
@@ -133,7 +133,7 @@
   let createRoomOpen = false;
   function createRoomGroup(route) {
     return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear una sala</b><small>Tú organizas la partida y compartes el código, el enlace o el QR.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir modalidad'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
-      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas y rondas con marcador acumulado.', false, `data-competition-audience="${route}"`, 'Configurar competición')}</div></div>`;
+      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición')}</div></div>`;
   }
   function openFriendHub(route) {
     const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
@@ -143,9 +143,9 @@
       route === 'wifi' ? modeDoor('wifi-join', 'menu-wifi.webp', 'Unirme a una sala', 'Escanea el código de quien la ha creado, sea cual sea el mazo.', true) : '',
       route === 'online' ? modeDoor('online-join', 'menu-private.webp', 'Unirme a una sala', 'Escanea el QR o escribe el código de una sala que ya está creada.', true) : '',
       route === 'online' ? createRoomGroup(route) : [
-        inlineCollections(route),
-        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
-        route === 'local' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas y rondas con marcador acumulado.', false, `data-competition-audience="${route}"`, 'Configurar competición') : ''
+        inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos.'),
+        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa para todos: cada uno arriesga o asegura sus puntos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
+        route === 'local' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición') : ''
       ].join('')
     ].join(''), art);
   }
@@ -156,7 +156,7 @@
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       inlineCollections('collections'),
       modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus puntos.', false, 'data-solo-route="quick"', 'Preparar partida'),
-      modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas y rondas con aciertos acumulados.', false, 'data-competition-audience="solo"', 'Configurar competición')
+      modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; suma tus aciertos ronda a ronda.', false, 'data-competition-audience="solo"', 'Configurar competición')
     ].join(''), modeArt['solo-hub']);
   }
 
@@ -321,7 +321,7 @@
     const doors=app.querySelector('.home-doors'); if(!doors)return;
     const r=rankingSummary(), box=document.createElement('section');
     box.className='mode-ranking-summary';
-    box.innerHTML=`<div><small>TUS RETOS · ${seasonKey()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
+    box.innerHTML=`<div><small>TUS RETOS · ${new Date().toLocaleDateString('es-ES',{month:'long',year:'numeric'}).toUpperCase()} · PUNTOS</small><b>${r.total}</b></div><p>Grandes colecciones <strong>${r.classic}</strong> · Retos rápidos <strong>${r.quick}</strong></p>`;
     doors.append(box);
   }
 

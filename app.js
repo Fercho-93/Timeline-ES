@@ -391,7 +391,7 @@
       <header class="mode-hub-head"><div class="mode-hub-title"><div class="eyebrow">Grandes colecciones al azar</div><h1 data-focus tabindex="-1">Competición</h1></div><img src="assets/competition-engraving.webp" alt="" aria-hidden="true" decoding="async"></header>
       <section class="mode-hub-list">
         <div class="panel setup-grid competition-settings">
-          <div class="field"><label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
+          <div class="field"><label for="competition-length">Temas a jugar</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===competitionConfig.rounds?' selected':''}>${label}</option>`).join('')}</select></div>
           <div class="field"><label for="competition-cards">${audience === 'solo' ? 'Cartas por ronda' : withFriends ? 'Cartas iniciales por jugador' : 'Cartas por ronda o iniciales por jugador'}</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
         </div>
         ${showSolo && loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario</button>' : ''}
@@ -412,7 +412,7 @@
     document.getElementById('hand-size').value = String(pendingTournament.cards);
     const lengthField = document.createElement('div');
     lengthField.className = 'field';
-    lengthField.innerHTML = `<label for="competition-length">Rondas</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===pendingTournament.rounds?' selected':''}>${label}</option>`).join('')}</select>`;
+    lengthField.innerHTML = `<label for="competition-length">Temas a jugar</label><select id="competition-length">${[[3,'3 temas'],[5,'5 temas'],[CT.Tournament.modes().length,'Todos los temas']].map(([n,label])=>`<option value="${n}"${n===pendingTournament.rounds?' selected':''}>${label}</option>`).join('')}</select>`;
     document.getElementById('hand-size').closest('.field').before(lengthField);
     if (CT.Storage.getItem(MULTI_COMP_KEY) && !app.querySelector('[data-action="competition-resume"]')) app.querySelector('.setup-section .panel').insertAdjacentHTML('beforebegin', '<button class="btn btn-secondary btn-block" data-action="competition-resume">Continuar competición multijugador guardada <span>→</span></button>');
     app.querySelector('.setup-section h2').textContent = 'Competición multijugador';
@@ -957,7 +957,7 @@
     renderStarterDialog(`<h2>Pasa el móvil a ${jugador}</h2>
       <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta || "")}</span></div>
       <div class="field cifra-field">
-        <label for="starter-guess-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
+        <label for="starter-guess-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label>
         <input id="starter-guess-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send">
         <p class="hint">${escapeHtml(regla.pista || "")}</p>
       </div>
@@ -990,7 +990,7 @@
       <div class="starter-winner-banner"><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><b>${escapeHtml(starterDraw.names[winner])}</b><span>Empieza la partida</span></div>
       <div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>El valor real era ${escapeHtml(CT.formatValue(selectedModeKey, card))}</span></div>
       ${starterOrderList(order.map(i => ({ name: starterDraw.names[i], value: Cifras.formato(selectedModeKey, starterDraw.guesses[i]) })))}
-      <div class="actions" style="display:grid"><button class="btn btn-primary btn-block" data-action="starter-start">Barajar y empezar <span aria-hidden="true">→</span></button><button class="btn btn-ghost btn-block" data-action="close-menu">Volver a la preparación</button></div>`);
+      <div class="actions" style="display:grid"><button class="btn btn-primary btn-block" data-action="starter-start">Empezar la partida <span aria-hidden="true">→</span></button><button class="btn btn-ghost btn-block" data-action="close-menu">Volver a la preparación</button></div>`);
   }
 
   // El resultado del minijuego, ya en orden de juego: la primera fila empieza.
@@ -3048,7 +3048,7 @@
         ${relojMarkup(restante, plazoCifras())}
         <div class="cifra-card" id="cifra-pregunta">${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${escapeHtml(regla.pregunta)}</span></div>
         <div class="field cifra-field">
-          <label for="cifra-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${escapeHtml(regla.unidad)} si no pones otra</span>` : ""}</label>
+          <label for="cifra-input">Tu respuesta${regla.unidad ? ` <span class="cifra-unidad">(en ${escapeHtml(regla.unidad)})</span>` : ""}</label>
           <input id="cifra-input" type="text" inputmode="${regla.decimales ? "decimal" : "numeric"}" autocomplete="off" enterkeyhint="send" aria-describedby="cifra-pregunta cifra-unidades" placeholder="${escapeHtml(regla.unidad || "")}" ${cerrada ? "disabled" : "data-autofocus"}>
           <p class="hint" id="cifra-unidades">${escapeHtml(regla.pista || "")}${unidadesMarkup(cifras.mode)}</p>
         </div>
