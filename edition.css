@@ -5067,8 +5067,6 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
   color: #8a3f2f; font: 600 1.05rem/1.2 var(--font-display); letter-spacing: .02em; text-wrap: balance;
 }
 
-/* Aviso de la pantalla de competición: de dónde salen los mazos y dónde están los de Retos rápidos. */
-#app .competition-note { margin: 0 4px; color: var(--edition-muted, #7a6a58); font: .82rem/1.45 var(--ui-font); text-align: center; text-wrap: balance; }
 :root:not([data-theme="dark"]) #app .competition-hub .btn-secondary {
   border: 1px solid #b9a98e;
   background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
