@@ -11,7 +11,7 @@
 #app .mode-play-card .mode-play-chevron { display: inline-block; margin-left: 8px; font: 700 1.35rem/0.7 var(--font-display); vertical-align: middle; transition: transform .32s ease; }
 #app .mode-play-card[aria-expanded="true"] .mode-play-chevron { transform: rotate(180deg); }
 #app .mode-play-card:focus-visible { outline: 3px solid #9c4f2c; outline-offset: 3px; }
-#app .mode-choices-reveal { display: grid; grid-template-rows: 0fr; margin-top: 0; opacity: 0; visibility: hidden; transition: grid-template-rows .38s ease, margin-top .38s ease, opacity .28s ease, visibility .38s; }
+#app .mode-choices-reveal { display: grid; grid-template-rows: 0fr; margin-top: 0; opacity: 0; visibility: hidden;  }
 #app .mode-choices-reveal.is-open { grid-template-rows: 1fr; margin-top: 12px; opacity: 1; visibility: visible; }
 /* Sangrado con una línea guía: las opciones son hijas de la lámina «Jugar» de
    arriba, no un bloque al mismo nivel. */
@@ -130,3 +130,6 @@
 #app .mode-inline-drawer .gallery-panel .panel-label small { font-size: .68rem; }
 #app .mode-inline-drawer .gallery-panel .collection-index { top: 9px; left: 12px; min-height: 22px; padding: 2px 9px; font-size: .55rem; }
 #app .mode-inline-drawer .gallery-panel .collection-open { width: 28px; height: 28px; right: 12px; }
+
+/* La tarjeta «Jugar» no se mueve al tocarla (el :hover pegado del móvil y el giro de :active la hacían bailar mientras se despliega). */
+html #app button.mode-play-card:hover, html #app button.mode-play-card:active { transform: translateZ(0); box-shadow: inherit; }

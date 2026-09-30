@@ -5,6 +5,7 @@
   const app = document.getElementById('app');
   if (!app) return;
   let playExpanded = false;
+  let revealAnimations = [];
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
@@ -176,9 +177,34 @@
       playExpanded = !playExpanded;
       playToggle.setAttribute('aria-expanded', String(playExpanded));
       const choices = app.querySelector('#home-mode-choices');
-      choices.parentElement.classList.toggle('is-open', playExpanded);
+      const reveal = choices.parentElement;
+      const daily = app.querySelector('.mode-daily-zone');
       choices.setAttribute('aria-hidden', String(!playExpanded));
       choices.inert = !playExpanded;
+      // El despliegue no anima la altura (recalcular la maquetación en cada fotograma hacía
+      // temblar las tarjetas): la maquetación final se aplica de golpe y solo se anima, con
+      // transformaciones y opacidad, que se componen aparte, el desplazamiento de lo de debajo.
+      const animate = reveal.animate && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      revealAnimations.forEach(animation => animation.cancel());
+      revealAnimations = [];
+      if (!animate) { reveal.classList.toggle('is-open', playExpanded); return; }
+      const OPTIONS = { duration: 380, easing: 'cubic-bezier(.2,.7,.25,1)', fill: 'both' };
+      if (playExpanded) {
+        reveal.classList.add('is-open');
+        const height = reveal.getBoundingClientRect().height + 12;
+        revealAnimations = [
+          reveal.animate([{ opacity: 0, transform: 'translateY(-14px)', clipPath: 'inset(0 0 100% 0)' }, { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' }], OPTIONS),
+          ...(daily ? [daily.animate([{ transform: `translateY(${-height}px)` }, { transform: 'none' }], OPTIONS)] : [])
+        ];
+        revealAnimations.forEach(animation => { animation.onfinish = () => animation.cancel(); });
+      } else {
+        const height = reveal.getBoundingClientRect().height + 12;
+        revealAnimations = [
+          reveal.animate([{ opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' }, { opacity: 0, transform: 'translateY(-14px)', clipPath: 'inset(0 0 100% 0)' }], OPTIONS),
+          ...(daily ? [daily.animate([{ transform: 'none' }, { transform: `translateY(${-height}px)` }], OPTIONS)] : [])
+        ];
+        revealAnimations[0].onfinish = () => { reveal.classList.remove('is-open'); revealAnimations.forEach(animation => animation.cancel()); revealAnimations = []; };
+      }
       return;
     }
     const wifiJoin = event.target.closest('[data-action="wifi-join"]');
