@@ -135,12 +135,10 @@ await expectBack('home');
 await click('[data-action="friends-hub"]');
 await click('[data-action="local-hub"]');
 await click('.mode-entry[data-action="competition-menu"]');
-assert.equal(screen(), 'competition-menu');
-assert.equal(app().querySelector('[data-action="start-competition"]'), null);
-assert.ok(app().querySelector('[data-action="competition-local"]'));
-await click('[data-action="competition-local"]');
+// Un solo móvil abre directamente su única ventana de ajustes.
 assert.equal(screen(), 'setup');
-await expectBack('competition-menu');
+assert.equal(app().querySelector('[data-action="start-competition"]'), null);
+assert.ok(app().querySelector('#competition-length') && app().querySelector('#hand-size'));
 await expectBack('hub-friends-local');
 await expectBack('hub-friends');
 await expectBack('home');

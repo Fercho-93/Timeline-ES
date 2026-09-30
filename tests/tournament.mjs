@@ -18,10 +18,9 @@ const state=()=>JSON.parse(w.localStorage.getItem(key));
 assert.equal(w.document.querySelector('[data-action="start-competition"]'),null);
 assert.equal(w.document.getElementById('competition-length'),null);
 w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');
-assert.ok(w.document.querySelector('[data-action="competition-local"]'));
-w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='1';
-assert.equal(w.document.getElementById('competition-length').value,'3');
-assert.equal(w.document.getElementById('competition-cards').value,'1');
+// Desde «Un solo móvil» se abre directamente la ventana única de ajustes.
+assert.ok(w.document.getElementById('competition-length') && w.document.getElementById('hand-size'));
+assert.equal(w.document.getElementById('competition-cards'),null);
 // Cada puerta ofrece solo su forma de jugar: ya se eligió antes, no se vuelve a preguntar.
 assert.equal(w.document.querySelector('[data-action="competition-online"]'), null, 'desde «Un solo móvil» no se ofrece la sala online');
 assert.equal(w.document.querySelector('[data-action="start-competition"]'), null, 'ni la competición en solitario');
@@ -29,10 +28,10 @@ w.CONTINUUM.ModeHubs.open('hub-friends-online');click('[data-action="competition
 assert.ok(w.document.querySelector('[data-action="competition-online"]'));
 assert.equal(w.document.querySelector('[data-action="competition-local"]'), null, 'desde «Sala privada online» no se ofrece un solo móvil');
 w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');
-w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='1';
-click('[data-action="competition-local"]');click('[data-action="back-menu"]');
-assert.equal(w.document.getElementById('competition-cards').value,'1');
-click('[data-action="competition-local"]');click('[data-action="start"]');
+// Un solo móvil: una única ventana de ajustes (rondas y cartas), sin pantalla previa.
+assert.equal(w.document.getElementById('competition-cards'),null);
+w.document.getElementById('competition-length').value='3';w.document.getElementById('hand-size').value='1';
+click('[data-action="start"]');
 // Antes de repartir se juega el minijuego de quién empieza (todas con la misma
 // cifra: a igual distancia se respeta el orden de la mesa).
 while (w.document.getElementById('starter-guess-input')) { w.document.getElementById('starter-guess-input').value = '1900'; click('[data-action="starter-guess-submit"]'); }

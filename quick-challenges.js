@@ -225,6 +225,43 @@
     return false;
   }
 
+  // Minijuego de «quién empieza» (un solo móvil): el orden resultante pasa a ser el orden de los nombres.
+  let starter = null, starterDraw = null;
+  const starterClose = () => {app().querySelector('[data-quick-starter]')?.remove(); starterDraw = null;};
+  function starterPaint(html) {
+    let layer = app().querySelector('[data-quick-starter]');
+    if (layer) {layer.querySelector('.modal').innerHTML = html; return;}
+    layer = document.createElement('div'); layer.className = 'overlay'; layer.dataset.quickStarter = '';
+    layer.innerHTML = `<div class="modal">${html}</div>`; app().append(layer); CT.openDialog(layer, true);
+  }
+  function beginStarter(names) {
+    const modeKey = CT.shuffle(CT.Tournament.modes())[0];
+    const card = CT.shuffle(CT.cards(modeKey))[0];
+    starterDraw = {names, modeKey, card, step: 0, guesses: []};
+    starterAsk();
+  }
+  function starterAsk() {
+    const {modeKey, card, names, step} = starterDraw, regla = CT.axis(modeKey).cifra || {};
+    starterPaint(`<h2>Pasa el móvil a ${esc(names[step])}</h2><div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${esc(regla.pregunta || '')}</span></div>
+      <div class="field cifra-field"><label for="quick-starter-input">Tu cifra${regla.unidad ? ` <span class="cifra-unidad">en ${esc(regla.unidad)} si no pones otra</span>` : ''}</label><input id="quick-starter-input" type="text" inputmode="${regla.decimales ? 'decimal' : 'numeric'}" autocomplete="off" enterkeyhint="send"><p class="hint">${esc(regla.pista || '')}</p></div>
+      <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-guess">Adivinar <span>→</span></button><button class="btn btn-ghost btn-block" data-quick="starter-back">Volver a la preparación</button></div>`);
+    const field = app().querySelector('#quick-starter-input');
+    field?.focus({preventScroll: true});
+    field?.addEventListener('keydown', e => {if (e.key === 'Enter') {e.preventDefault(); starterGuess();}});
+  }
+  function starterGuess() {
+    const field = app().querySelector('#quick-starter-input'), value = CT.Duelo.Cifras.leer(starterDraw.modeKey, field ? field.value : '');
+    if (value === null) {field?.setAttribute('aria-invalid','true'); field?.focus(); return;}
+    starterDraw.guesses.push(value); starterDraw.step++;
+    if (starterDraw.step < starterDraw.names.length) {starterAsk(); return;}
+    const {modeKey, card, names, guesses} = starterDraw;
+    const order = CT.Starter.order(modeKey, card.id, guesses.map((v, id) => ({id, value: v})));
+    starter = {key: names.join('|'), order};
+    starterPaint(`<h2>¿Quién empieza?</h2><div class="starter-winner-banner"><b>${esc(names[order[0]])}</b><span>Empieza la partida</span></div>
+      <div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>El valor real era ${esc(CT.formatValue(modeKey, card))}</span></div>
+      <ol class="starter-draw-list">${order.map((i, n) => `<li${n === 0 ? ' class="starter-draw-winner"' : ''}><span>${n + 1}.º ${esc(names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(modeKey, guesses[i]))}</span></li>`).join('')}</ol>
+      <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-go">Barajar y empezar <span>→</span></button></div>`);
+  }
   const button = (action, text, cls = 'btn btn-primary') => `<button class="${cls}" data-quick="${action}">${text}</button>`;
   function setup() {
     stopNetwork();page="setup";const solo=format!=="local";
@@ -396,14 +433,22 @@
     if (action === 'exit') {CT.UI.confirmExit(connection?.kind==='local' ? 'Al salir se cierra la conexión con la sala local.' : 'La partida se conserva para que puedas continuar después.', toEntry, undefined, undefined, state ? {label:'Salir sin guardar', proceed:abandonQuick} : null); return;}
     if (action === 'abandon') {CT.UI.confirmExit('Se borrará esta partida y no podrás continuarla después.', abandonQuick, '¿Salir sin guardar?', 'Salir sin guardar'); return;}
     if (action === 'setup') {setup(); return;}
+    if (action === 'starter-guess') {starterGuess(); return;}
+    if (action === 'starter-go') {starterClose(); app().querySelector('[data-quick="start"]')?.click(); return;}
+    if (action === 'starter-back') {starterClose(); return;}
     if (action === 'start') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value.trim());
       if (names.some(n => !n) || new Set(names.map(n => n.toLocaleLowerCase('es'))).size !== names.length) {
         app().querySelector('#quick-error').textContent = 'Escribe nombres diferentes para cada participante.'; return;
       }
+      // En un solo móvil se decide quién empieza como en Grandes colecciones: una carta al azar de
+      // esas colecciones (no de los mazos sorpresa) y cada persona adivina su cifra.
+      if (format === 'local' && names.length > 1 && !(starter && starter.key === names.join('|'))) {beginStarter(names); return;}
+      let ordered = names;
+      if (format === 'local' && starter && starter.key === names.join('|')) ordered = starter.order.map(i => names[i]);
       const count = Number(app().querySelector('#quick-length').value);
       const list = rounds(count).map(round => E.challenge(round.id));
-      const config = {names, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id))})),kind:format,historyId:historyId()};
+      const config = {names: ordered, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id))})),kind:format,historyId:historyId()};
       record = {version: CT.QuickCatalog.version, config, commands: []}; state = E.create(config);
       save(); selected = null; slot = null; render(); return;
     }

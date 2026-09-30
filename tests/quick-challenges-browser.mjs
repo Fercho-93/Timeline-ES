@@ -49,6 +49,8 @@ try {
     await page.locator('#quick-length').selectOption('1');
     await page.locator('#quick-choice').selectOption('poker');
     await page.locator('[data-quick="start"]').click();
+    for (const v of ['1900', '1500']) { await page.locator('#quick-starter-input').fill(v); await page.locator('[data-quick="starter-guess"]').click(); }
+    await page.locator('[data-quick="starter-go"]').click();
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
     assert.equal(await overflow(), false, `Sin desbordamiento a ${width}px`);
     await page.screenshot({path: `test-results/quick-challenges/turn-${width}.png`, fullPage: true});
