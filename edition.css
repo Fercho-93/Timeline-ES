@@ -5203,3 +5203,25 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 :root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart-route { display: none; }
 :root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart-stop { position: relative; inset: auto; width: 78%; min-height: 0; }
 :root:is([data-text-size="125"], [data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"] .atlas-chart-stop:nth-of-type(even) { justify-self: end; }
+
+/* Resumen del reto en Inicio: una tarjeta de papel como las demás, con «Ver ranking» como el
+   enlace subrayado de latón de «Jugar el reto de hoy», en vez de un botón blanco. */
+#app[data-screen="home"] .mode-ranking-summary {
+  gap: 4px; margin-top: 14px; padding: 16px 18px 18px;
+  border: 1.5px solid #d2b683; border-radius: 14px;
+  background: linear-gradient(180deg, #fbf5e8, #f4ead5);
+  box-shadow: 0 2px 0 #e2cfa6, 0 10px 22px #4a321a1f, inset 0 0 0 4px #fffaf0, inset 0 0 0 5px #c4a46c40;
+  color: #2a1c12;
+}
+#app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats b { color: #2a1c12; font: 500 1.7rem/1.1 var(--font-display); }
+#app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats small { margin-top: 3px; color: #5f5142; }
+#app[data-screen="home"] .mode-ranking-summary .mode-ranking-link {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto; min-height: 0;
+  margin: 14px auto 0; padding: 0 0 4px; border: 0; border-bottom: 1.5px solid #9c7641; border-radius: 0;
+  background: none; box-shadow: none; color: #6e4a1f; font: 700 1.05rem/1.3 var(--font-display);
+}
+#app[data-screen="home"] .mode-ranking-summary .mode-ranking-link:active { opacity: .7; transform: none; }
+:root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary { border-color: #8c6f45; background: linear-gradient(180deg, #3a3024, #30271c); box-shadow: 0 12px 26px #0006; color: #f1e1bf; }
+:root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats b { color: #f1e1bf; }
+:root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats small { color: #e9dcc3; }
+:root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-link { color: #e6c58e; border-color: #c8a26a; }
