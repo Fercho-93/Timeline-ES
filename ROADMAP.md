@@ -91,6 +91,7 @@ Los porcentajes son orientativos: no sustituyen la ejecución de las pruebas ni 
 - [ ] Validar comprensión, repetición y disposición a pagar.
 - [ ] Decidir monetización después de la beta.
 - [ ] Si se venden mazos: implementar compras oficiales, restauración, reembolsos y validación en servidor.
+- [ ] **Cuentas que sobrevivan a reinstalar:** hoy cada instalación crea una cuenta anónima de Firebase; al desinstalar o cambiar de móvil se pierde el usuario y su nombre queda reservado por un uid inaccesible («Fer ya está cogido»). Vincular la cuenta anónima a «Iniciar sesión con Apple» (iPhone; Apple lo exige si se ofrece Google) y a Google (Android), con recuperación del nombre, el progreso y el ranking en otro móvil. Mientras tanto, para la beta: avisar a los testers y liberar a mano los nombres en `playerNames`.
 
 ## 8. Multijugador sin conexión (red local, sin internet)
 
