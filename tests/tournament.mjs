@@ -62,6 +62,13 @@ assert.equal(w.document.querySelector('[data-action="competition-next"]'),null);
 assert.match(w.document.querySelector('.tournament-board').textContent,/3 puntos/);
 assert.equal(w.document.querySelectorAll('.chapter-stop.complete').length,2);
 w.close();
+// La pantalla de resultado no puede ensancharse más que el móvil: sin una pista de rejilla acotada, el recorrido de
+// una competición (capítulos en fila) empujaba todo el resultado fuera de la pantalla y solo se veía el fondo.
+{
+  const css=read('edition.css');
+  assert.match(css,/\.pass-screen\s*\{\s*grid-template-columns:\s*minmax\(0,\s*1fr\);?\s*\}/,'.pass-screen tiene una única columna acotada');
+  assert.match(css,/\.chapter-journey ol > li\.chapter-stop\s*\{[^}]*display:\s*grid/,'los capítulos del recorrido no heredan el flex de las listas del marcador');
+}
 // Solitario conserva el mismo ciclo y respeta el número de cartas elegido.
 w=boot();w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-solo');click('[data-action="competition-menu"]');w.document.getElementById('competition-length').value='3';w.document.getElementById('competition-cards').value='2';
 click('[data-action="start-competition"]');click('[data-action="comp-next-round"]');

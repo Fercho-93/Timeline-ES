@@ -5227,3 +5227,12 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-link { color: #e6c58e; border-color: #c8a26a; }
 
 .app-version { display: none; }
+
+/* Una sola columna que nunca se ensancha más que la pantalla. Sin esto, la pista «auto» de .pass-screen crece hasta el
+   ancho natural de su contenido más ancho (el recorrido de una competición, con sus capítulos en fila) y, al centrarlo,
+   deja todo el resultado fuera de la pantalla: al final de una competición se veía solo el fondo. */
+.pass-screen { grid-template-columns: minmax(0, 1fr); }
+
+/* Los capítulos del recorrido son una columna (círculo, número, nombre, estado). Las reglas genéricas de listas
+   (.tournament-board li, .comp-summary li) los convertían en una fila y apretaban los círculos. */
+.chapter-journey ol > li.chapter-stop { display: grid; justify-content: normal; gap: 0; padding: 0; border-bottom: 0; background: none; border-radius: 0; }
