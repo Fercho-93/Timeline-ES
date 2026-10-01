@@ -122,6 +122,8 @@
 
       </div><details class="settings-section settings-support"><summary><span><b>Versión y conexión</b><small>Uso sin conexión e información de la aplicación</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         <p class="hint">Versión instalada: ${CT.escapeHtml(CT.APP_VERSION || "desconocida")}</p>
+        <button class="btn btn-secondary" data-settings-action="device-check">Comprobar sonido, vibración y movimiento</button>
+        <pre class="hint" id="device-check-result" role="status" aria-live="polite" style="white-space:pre-wrap;margin:10px 0 0;font:.78rem/1.5 ui-monospace,monospace"></pre>
         <p class="hint">Las partidas locales y las cartas ya descargadas funcionan sin conexión. Las salas, duelos por turnos, ranking y comentarios necesitan conexión. Si una ilustración no aparece, recarga cuando tengas internet.</p>
       </div></details>
 
@@ -159,6 +161,70 @@
     if (help) help.textContent = accepted
       ? 'Prueba enviada. Si no la notas, revisa la vibración en los ajustes del teléfono.'
       : 'No se pudo activar la vibración en este dispositivo.';
+  }
+
+  // Comprobación en el propio dispositivo: ejecuta de verdad cada efecto y cuenta qué ocurre. Sirve
+  // para saber, en un móvil concreto, si falla el sonido, la vibración o el movimiento y por qué.
+  async function runDeviceCheck() {
+    const out = document.getElementById('device-check-result');
+    const lines = [];
+    const say = text => { lines.push(text); if (out) out.textContent = lines.join('\n'); };
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const cap = window.Capacitor;
+    const native = cap?.isNativePlatform?.() === true;
+    say(`Plataforma: ${native ? 'app nativa (' + (cap.getPlatform?.() || '?') + ')' : 'navegador'} · ${CT.APP_VERSION || 'versión desconocida'}`);
+    say(`Ajustes: vibración ${settings.haptics ? 'sí' : 'no'} · música ${settings.ambience ? 'sí' : 'no'} · profundidad ${settings.depth ? 'sí' : 'no'} · volumen ${settings.ambienceVolume}%`);
+    // Vibración
+    try {
+      if (native) {
+        say(`Vibración: plugin ${cap.isPluginAvailable?.('Haptics') === false ? 'NO disponible' : 'disponible'}`);
+        const plugin = cap.registerPlugin?.('Haptics') || cap.Plugins?.Haptics;
+        await plugin.impact({ style: 'MEDIUM' });
+        say('Vibración: orden enviada sin error (¿la has notado?)');
+      } else say(`Vibración: navegador ${typeof navigator.vibrate === 'function' ? 'con' : 'sin'} soporte`);
+    } catch (error) { say(`Vibración: ERROR ${error?.message || error}`); }
+    // Sonido
+    let ctx = null;
+    try {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) throw new Error('este móvil no tiene Web Audio');
+      ctx = new Context();
+      say(`Sonido: contexto creado (estado «${ctx.state}»)`);
+      await Promise.race([ctx.resume(), wait(1500)]);
+      say(`Sonido: tras reanudar, estado «${ctx.state}»`);
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.frequency.value = 440; gain.gain.value = 0.2;
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.5);
+      say('Sonido: pitido de 0,5 s enviado (¿lo has oído?)');
+    } catch (error) { say(`Sonido: ERROR ${error?.message || error}`); }
+    try {
+      const response = await fetch('assets/audio/v1.mp3');
+      if (!response.ok) throw new Error(`la pista no se puede leer (HTTP ${response.status})`);
+      const data = await response.arrayBuffer();
+      say(`Música: pista leída (${Math.round(data.byteLength / 1024)} KB)`);
+      if (ctx) {
+        const decoded = await ctx.decodeAudioData(data);
+        say(`Música: decodificada (${Math.round(decoded.duration)} s)`);
+      }
+    } catch (error) { say(`Música: ERROR ${error?.message || error}`); }
+    // Movimiento (profundidad)
+    try {
+      if (!window.DeviceOrientationEvent) throw new Error('sin sensor de orientación');
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        say(`Movimiento: permiso «${permission}»`);
+        if (permission !== 'granted') throw new Error('permiso no concedido: revisa Ajustes del iPhone → Continuum');
+      }
+      let events = 0;
+      const count = () => { events += 1; };
+      window.addEventListener('deviceorientation', count);
+      await wait(1500);
+      window.removeEventListener('deviceorientation', count);
+      say(`Movimiento: ${events} lecturas en 1,5 s ${events ? '(bien)' : '(ninguna: mueve el móvil durante la prueba)'}`);
+    } catch (error) { say(`Movimiento: ERROR ${error?.message || error}`); }
+    try { await ctx?.close(); } catch { /* ya cerrado */ }
+    say('Hecho. Cuéntame qué has oído y notado, y mándame esta lista.');
   }
 
   async function sendFeedback() {
@@ -260,6 +326,7 @@
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
     else if (target.dataset.settingsAction === "reset-preferences") resetPreferences();
     else if (target.dataset.settingsAction === "test-haptics") void testHaptics();
+    else if (target.dataset.settingsAction === "device-check") void runDeviceCheck();
     else if (target.dataset.settingsAction === "download-feedback") {
       void (async () => {
         const note = document.getElementById('feedback-note')?.value || '';
