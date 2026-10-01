@@ -5225,3 +5225,5 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats b { color: #f1e1bf; }
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats small { color: #e9dcc3; }
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary .mode-ranking-link { color: #e6c58e; border-color: #c8a26a; }
+
+.app-version { display: none; }

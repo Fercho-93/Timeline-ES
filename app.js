@@ -790,10 +790,8 @@
     // Nada llama a esto con `await`: si la pantalla ya cambió (o, en pruebas, si la
     // ventana ya se cerró) para cuando `cacheVersion()` resuelve, tocar el DOM puede
     // fallar. No es un fallo que nadie necesite ver ni reportar.
-    try {
-      const label = document.getElementById("app-version");
-      if (key && label) label.textContent = key;
-    } catch { /* la pantalla ya no está: no hay nada que actualizar */ }
+    // La versión ya no se enseña al pie del inicio (queda en Ajustes → Versión y conexión).
+    void key;
   }
 
   // Lo que hace falta para depurar un fallo a distancia: qué versión hay instalada,
