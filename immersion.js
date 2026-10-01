@@ -627,7 +627,7 @@
     galleryScrollFrame = requestAnimationFrame(() => {
       galleryScrollFrame = 0;
       if (reduced() || !depthTarget()) return;
-      document.querySelectorAll('#app .home-gallery-shell .gallery-panel').forEach(panel => {
+      document.querySelectorAll('#app .home-gallery-shell .gallery-panel:not(.mode-inline-drawer .gallery-panel)').forEach(panel => {
         const rect = panel.getBoundingClientRect();
         if (rect.bottom < 0 || rect.top > window.innerHeight) return;
         const offset = Math.max(-6, Math.min(6, (rect.top + rect.height / 2 - window.innerHeight / 2) * .025));

@@ -5236,3 +5236,35 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 /* Los capítulos del recorrido son una columna (círculo, número, nombre, estado). Las reglas genéricas de listas
    (.tournament-board li, .comp-summary li) los convertían en una fila y apretaban los círculos. */
 .chapter-journey ol > li.chapter-stop { display: grid; justify-content: normal; gap: 0; padding: 0; border-bottom: 0; background: none; border-radius: 0; }
+
+/* ---- Colecciones ligeras (móviles con poca memoria gráfica) ----
+   Cada tarjeta de colección apilaba un giro 3D, una copia desenfocada de su imagen, una máscara y un filtro, y además
+   se recalculaba en cada fotograma de scroll. Con seis tarjetas seguidas, WebKit en algunos iPhone dejaba de pintar
+   unas cuantas (huecos en blanco entre tarjetas, sobre todo al desplazarse deprisa). Se quita lo que más pesa y
+   apenas se nota: sin giro 3D, sin copia desenfocada y sin máscara; la lámina y el degradado se mantienen. */
+#app .gallery-panel { transform: none !important; }
+#app .gallery-panel .panel-backdrop,
+#app .gallery-panel .panel-depth-light,
+#app .gallery-panel .panel-depth-ground { display: none; }
+#app .gallery-panel .panel-art { -webkit-mask-image: none; mask-image: none; filter: none; }
+#app .gallery-panel .panel-art img { transform: none !important; transition: none; filter: none; }
+#app .gallery-panel:not(.active) .panel-art img { filter: none; }
+#app .gallery-panel:active { transform: none !important; }
+
+/* Un cajón cerrado no ocupa nada: no depende de que el motor colapse una fila «0fr». */
+#app .collection-drawer[inert], #app .catalog-drawer[inert] { display: none; }
+
+/* ---- Pantallas estrechas y letra grande: nada se sale del móvil ---- */
+.player-row { grid-template-columns: minmax(0, 1fr) auto; }
+.player-row input { min-width: 0; width: 100%; box-sizing: border-box; }
+#app .shell, #app .shell > * { min-width: 0; max-width: 100%; }
+#app .mode-daily-family, #app .mode-ranking-summary small, #app .daily-stats small { overflow-wrap: anywhere; hyphens: auto; }
+#app .mode-ranking-stats, #app .daily-stats { min-width: 0; }
+#app .mode-ranking-stats > span, #app .daily-stats > span { min-width: 0; }
+.quick-shell .quick-length { min-width: 0; }
+.quick-shell .quick-length-chip { min-width: 0; overflow-wrap: anywhere; }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-wordmark { font-size: min(3.2rem, 12.5vw); max-width: 100%; }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-door-copy { min-width: 0; }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav button { min-width: 0; }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav small { font-size: .62rem; overflow-wrap: anywhere; }
