@@ -123,6 +123,28 @@ const juegaDiarioEntero = w => {
   }
 };
 
+console.log("\nReto diario sin vidas");
+{
+  const w = boot();
+  empiezaDiario(w);
+  ok("el reto diario no enseña vidas", !existe(w, ".solo-lives") && !/vidas?\b/.test(w.document.querySelector("h1.solo-lectores").textContent));
+  let vueltas = 0, fallos = 0;
+  while (!/Reto completado|Se acabaron las vidas/.test(texto(w)) && vueltas++ < 60) {
+    const estado = estadoDiario(w);
+    const cards = new Map(w.CONTINUUM.cards(estado.mode).map(card => [card.id, card]));
+    const bien = w.CONTINUUM.correctIndex(estado.mode, estado.timeline.map(id => cards.get(id)), cards.get(estado.current));
+    // Se falla a propósito cinco de las diez cartas, más de las tres vidas de una partida libre.
+    const fallar = fallos < 5 && vueltas % 2 === 0;
+    if (fallar) fallos++;
+    click(w, `[data-action="solo-place"][data-index="${fallar ? (bien === 0 ? 1 : 0) : bien}"]`);
+    click(w, '[data-action="confirm-place"]');
+    click(w, '[data-action="solo-next"]');
+  }
+  ok("con cinco fallos el reto se completa entero", /Reto completado/.test(texto(w)) && !/Se acabaron las vidas/.test(texto(w)));
+  ok("el resultado es 5 de 10", /5<\/strong> de 10|5 de 10/.test(w.document.getElementById("app").innerHTML));
+  ok("se guardan los 5 aciertos", Object.values(retoDiario(w).days)[0].hits === 5);
+}
+
 console.log("\nReto diario");
 {
   const uno = boot();

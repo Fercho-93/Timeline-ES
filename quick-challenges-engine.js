@@ -20,6 +20,10 @@
     startRound(s);
     return s;
   }
+  // Quien juega solo (sin ser un duelo) no queda fuera al fallar: la carta cuenta como fallo y sigue
+  // hasta acabar el mazo, como en Grandes colecciones. El riesgo de perder lo provisional solo tiene
+  // sentido cuando hay más gente en la mesa, o en un duelo, donde asegurar es parte de la estrategia.
+  const keepPlaying = s => s.config.names.length === 1 && s.config.kind !== 'duel';
   function startRound(s) {
     const round = s.config.rounds[s.index];
     s.timeline = [round.order[0]];
@@ -50,9 +54,10 @@
       const correction = s.timeline.findIndex(id => value(id) > value(command.cardId));
       s.timeline.splice(correct ? command.index : correction < 0 ? s.timeline.length : correction, 0, command.cardId);
       s.remaining = s.remaining.filter(id => id !== command.cardId);
-      const lost = correct ? 0 : p.points;
-      if (correct) p.points++; else {p.points = 0; p.status = 'failed';}
-      s.result = {cardId: command.cardId, correct, lost, player: s.current};
+      const keep = keepPlaying(s);
+      const lost = correct || keep ? 0 : p.points;
+      if (correct) p.points++; else if (!keep) {p.points = 0; p.status = 'failed';}
+      s.result = {cardId: command.cardId, correct, lost, player: s.current, keep};
       s.phase = 'result';
     } else if (command?.type === 'bank' && s.phase === 'turn') {
       p.score += p.points; p.roundScore = p.points; p.points = 0; p.status = 'banked';
@@ -69,5 +74,5 @@
     if (!record || record.version !== catalog.version || !Array.isArray(record.commands) || record.commands.length > 2000) throw Error('INVALID_SAVE');
     return record.commands.reduce(step, create(record.config));
   }
-  CT.QuickEngine = {create, step, restore, challenge};
+  CT.QuickEngine = {create, step, restore, challenge, keepPlaying};
 })();

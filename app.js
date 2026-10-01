@@ -2076,6 +2076,9 @@
   let pendingDuel = null;
 
   function enDuelo() { return solo?.kind === "duel"; }
+  // Sin vidas: el duelo y el reto diario se juegan siempre hasta el final de sus cartas (un fallo no corta
+  // el reto: el resultado es «7 de 10»). El resto de partidas en solitario sí tienen tres vidas.
+  function sinVidas() { return solo?.kind === "duel" || solo?.kind === "daily"; }
 
   // Cuándo se acaba una partida en solitario. El duelo es el único formato sin vidas: las
   // dos partes juegan las mismas cartas de principio a fin, porque si a una se le acabaran
@@ -2084,7 +2087,7 @@
     if (!solo) return true;
     if (solo.total && solo.played >= solo.total) return true;
     if (!solo.deck.length) return true;
-    return !enDuelo() && solo.lives === 0;
+    return !sinVidas() && solo.lives === 0;
   }
 
   // El reto diario tiene su propio hueco de guardado: comparte mazo con la partida libre
@@ -2191,10 +2194,10 @@
     const day = today(), done = !!dailyRecords().days?.[day];
     if (dailyFamily(day) === 'quick') {
       const c = CT.Quick.dailyChallenge(day);
-      return { family: 'Retos rápidos', title: c.title, done, rules: `${c.rule}${c.asOf ? ` (datos a ${c.asOf})` : ''}. Ordena ${c.cards - 1} cartas, una tras otra: cada acierto queda provisional hasta que te plantas; un fallo pierde los provisionales. Un solo intento.` };
+      return { family: 'Retos rápidos', title: c.title, done, rules: `${c.rule}${c.asOf ? ` (datos a ${c.asOf})` : ''}. Ordena ${c.cards - 1} cartas, una tras otra: cada carta bien colocada suma un acierto y un fallo no corta el reto. Al final cuentan tus aciertos. Un solo intento.` };
     }
     const mode = CT.mode(dailyModeKey(day));
-    return { family: 'Grandes colecciones', title: mode.name, done, rules: `${DAILY_CARDS} cartas, ordenadas ${mode.axis === 'time' ? 'de antes a después' : 'de menor a mayor'}, en dificultad Fácil y con 3 vidas. Un solo intento.` };
+    return { family: 'Grandes colecciones', title: mode.name, done, rules: `${DAILY_CARDS} cartas, ordenadas ${mode.axis === 'time' ? 'de antes a después' : 'de menor a mayor'}, en dificultad Fácil. Juegas todas, sin vidas: un fallo no corta el reto y al final cuentan tus aciertos. Un solo intento.` };
   };
 
   function startDaily() {
@@ -2618,10 +2621,10 @@
     const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + Math.ceil(solo.deck.length / (1 + CT.Ghost.level(solo.difficulty).extra));
     const etiqueta = soloLabel();
     paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
-      <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${enDuelo() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
+      <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${sinVidas() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
       ${solo.kind === "comp" ? `<div class="comp-topic">${escapeHtml(CT.mode(solo.mode).name)}</div>` : ""}
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
-      ${enDuelo() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
+ ${sinVidas() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
       ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn)), plazoDuelo()) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>${solo.difficulty === "expert" ? "Fechas ocultas toda la partida. Guíate por las ilustraciones." : "Fechas ocultas solo esta jugada."}</small></div></div>` : ""}
       <section class="board-focus-card"><div class="hand-title"><h3>Tu carta</h3></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
@@ -2690,7 +2693,7 @@
     paraReloj();
     if (!correct) {
       // El duelo no gasta vidas: ver `soloAcabada`.
-      if (!enDuelo()) solo.lives -= 1;
+      if (!sinVidas()) solo.lives -= 1;
       (solo.failed = solo.failed || []).push(solo.current);
     }
     solo.played += 1;
@@ -2724,7 +2727,7 @@
     const remate = correct ? "La carta se queda colocada."
       : motivo === "salida" ? "Has salido de la aplicación con la carta delante, así que esta no suma."
       : motivo === "tiempo" ? "Se agotaron los segundos sin colocarla, así que esta no suma."
-      : enDuelo() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`;
+      : sinVidas() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`;
     overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${titulo}</div><h2><span class="solo-lectores">${titulo}: </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${remate}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 

@@ -26,5 +26,5 @@ while(solo.phase!=='round-end'){
   else solo=E.step(solo,{type:'place',cardId:solo.remaining[0],index:solo.timeline.length});
 }
 assert.equal(solo.players[0].score,8);
-solo=E.create({names:['Tú'],rounds});solo=E.step(solo,{type:'place',cardId:'poker-2',index:1});solo=E.step(solo,{type:'ack'});solo=E.step(solo,{type:'place',cardId:'poker-3',index:0});solo=E.step(solo,{type:'ack'});assert.equal(solo.phase,'round-end');assert.equal(solo.players[0].score,0);
+solo=E.create({names:['Tú'],rounds});solo=E.step(solo,{type:'place',cardId:'poker-2',index:1});solo=E.step(solo,{type:'ack'});solo=E.step(solo,{type:'place',cardId:'poker-3',index:0});solo=E.step(solo,{type:'ack'});assert.equal(solo.phase,'turn','en solitario un fallo no corta el reto');assert.equal(solo.players[0].status,'active');assert.equal(solo.players[0].points,1,'conserva el acierto previo');
 console.log('Sala de Retos: capacidad, identidad, turnos, revisiones, inmutabilidad y solitario completo: OK');

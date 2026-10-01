@@ -1140,12 +1140,12 @@
     const dailyToday = hoy ? guideCard('◆','Hoy: '+escapeHtml(hoy.family),escapeHtml(hoy.title),escapeHtml(hoy.rules)+(hoy.done?' Hoy ya lo has jugado.':'')) : '';
     const formats = '<h4>Cada día</h4><div class="guide-cards">'+
       guideCard('☼','Reto diario','Un único reto al día','Cada día hay un solo reto, con las mismas cartas para todo el mundo y un único intento. Los días pares toca uno de Grandes colecciones y los impares uno de Retos rápidos: el inicio te dice cuál.')+
-      guideCard('≡','Días de Grandes colecciones','10 cartas · 3 vidas','Un mazo de las grandes colecciones, en dificultad Fácil. Termina al completar las cartas o al perder las tres vidas.')+
-      guideCard('⇅','Días de Retos rápidos','10 cartas · sin vidas','Ordenas 10 cartas de un mazo de Retos rápidos. Cada acierto queda provisional hasta que te plantas; un fallo pierde los provisionales.')+
+      guideCard('≡','Días de Grandes colecciones','10 cartas · sin vidas','Un mazo de las grandes colecciones, en dificultad Fácil. Juegas siempre las 10 cartas: un fallo no corta el reto y al final cuentan tus aciertos (por ejemplo, 7 de 10).')+
+      guideCard('⇅','Días de Retos rápidos','10 cartas · sin vidas','Ordenas 10 cartas de un mazo de Retos rápidos. Cada carta bien colocada suma un acierto y un fallo no te echa del reto: juegas las 10 y al final cuentan tus aciertos.')+
       dailyToday+'</div>'+
       '<h4>Jugar solo</h4><div class="guide-cards">'+
       guideCard('∞','Grandes colecciones','3 vidas','Elige un tema y una dificultad, y juega hasta completar el mazo o agotar las vidas. Puedes continuar más tarde la partida guardada. La ilustración de cada carta se ve siempre, aunque la dificultad oculte su valor.')+
-      guideCard('⇅','Retos rápidos','Mazos sorpresa','Cada reto es un mazo corto. Acertar suma un acierto provisional; plantarte lo asegura; fallar pierde los aciertos de ese reto. Elige cuántos mazos jugar (1, 3, 5 o más). Tiene su propia guía dentro.')+
+      guideCard('⇅','Retos rápidos','Mazos sorpresa','Cada reto es un mazo corto. Solo, cada carta bien colocada suma un acierto y un fallo no te echa: juegas el reto entero. Con más gente, los aciertos son provisionales: puedes plantarte para asegurarlos y fallar los pierde. Elige cuántos mazos jugar (1, 3, 5 o más). Tiene su propia guía dentro.')+
       guideCard('◈','Competición','Varios temas seguidos','Rondas con mazos sorpresa, con su propia dificultad. Se explica en el capítulo 04.')+'</div>'+
       '<h4>Jugar con amigos</h4><div class="guide-cards">'+
       guideCard('♟','Un solo móvil','2–9 personas','Elegid cartas iniciales y jugad el minijuego de quién empieza. Pasad el teléfono a la persona indicada; mantened en secreto las manos ajenas. También sirve para Retos rápidos y para la competición.')+

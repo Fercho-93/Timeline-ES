@@ -155,7 +155,7 @@
     app.dataset.pendingHub = 'hub-solo';
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       inlineCollections('collections'),
-      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus aciertos.', false, 'data-solo-route="quick"', 'Preparar partida'),
+      modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: ordena y suma aciertos.', false, 'data-solo-route="quick"', 'Preparar partida'),
       modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; suma tus aciertos ronda a ronda.', false, 'data-competition-audience="solo"', 'Configurar competición')
     ].join(''), modeArt['solo-hub']);
   }

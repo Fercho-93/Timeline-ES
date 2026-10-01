@@ -187,11 +187,57 @@ w=boot();CT=w.CONTINUUM;
 const dailyDate=new Date().toLocaleDateString('sv-SE');
 CT.Quick.startDaily(dailyDate,(markup,playing)=>{const app=w.document.getElementById('app');app.innerHTML=markup;app.dataset.screen=playing?'quick-game':'quick-challenges';});
 click('[data-quick="ready"]');
-click('[data-quick="bank"]');
+// En solitario no se puede plantar y un fallo no echa del reto: se juegan las diez cartas.
+assert.equal(w.document.querySelector('[data-quick="bank"]'), null, 'sin botón de plantarse en solitario');
+let aciertos = 0, jugadas = 0;
+for (;;) {
+  const saved = JSON.parse(w.localStorage.getItem(key)) || JSON.parse(w.localStorage.getItem('continuum-quick-challenges-v1'));
+  const st = E.restore(saved);
+  if (st.phase === 'round-end') break;
+  const c = E.challenge(st.config.rounds[0].id), cardId = st.remaining[0];
+  const val = id => c.cards.find(card => card.id === id).value * c.direction;
+  const right = st.timeline.findIndex(id => val(id) > val(cardId));
+  const rightIndex = right < 0 ? st.timeline.length : right;
+  // Se falla a propósito cada tercera carta: colocándola en un hueco que no es el suyo.
+  const fail = jugadas % 3 === 2 && st.timeline.length > 1;
+  const wrong = [...Array(st.timeline.length + 1).keys()].find(i => !E.step(st, {type: 'place', cardId, index: i}).result.correct);
+  const index = fail && wrong !== undefined ? wrong : rightIndex;
+  click(`[data-quick="select"][data-id="${cardId}"]`);
+  click(`[data-quick="slot"][data-index="${index}"]`);
+  click('[data-quick="confirm"]');
+  const after = E.restore(JSON.parse(w.localStorage.getItem(key)));
+  if (after.result.correct) aciertos++;
+  assert.equal(after.players[0].status, 'active', 'un fallo no saca a quien juega solo');
+  click('[data-quick="ack"]');
+  jugadas++;
+  assert.ok(jugadas <= 12, 'el reto termina');
+}
+assert.equal(jugadas, 10, 'se juegan las diez cartas aunque haya fallos');
+assert.ok(aciertos < 10 && aciertos > 0);
 const daily=JSON.parse(w.localStorage.getItem('hilo-retos-v1')).retoDiario;
 assert.equal(daily.days[dailyDate].family,'quick');
-assert.equal(daily.days[dailyDate].hits,0);
-assert.ok(daily.days[dailyDate].total>0);
+assert.equal(daily.days[dailyDate].hits,aciertos);
+assert.equal(daily.days[dailyDate].total,10);
+assert.match(w.document.querySelector('#app').textContent, new RegExp(`${aciertos} de 10`));
 assert.equal(daily.streak,1);
 w.close();
+// El motor: solo y sin ser duelo, un fallo cuenta y se sigue; en duelo o con más gente, se queda fuera.
+{
+  const cfg = {names: ['Tú'], kind: 'free', rounds: [round('poker')]};
+  let t = E.create(cfg);
+  t = E.step(t, {type: 'place', cardId: 'poker-2', index: 1});
+  t = E.step(t, {type: 'ack'});
+  t = E.step(t, {type: 'place', cardId: 'poker-3', index: 0});
+  assert.equal(t.result.correct, false);
+  assert.equal(t.result.lost, 0, 'no pierde lo ya acertado');
+  assert.equal(t.players[0].status, 'active');
+  assert.equal(t.players[0].points, 1, 'conserva el acierto y sigue');
+  t = E.step(t, {type: 'ack'});
+  assert.equal(t.phase, 'turn', 'sigue jugando tras el fallo');
+  const duel = E.create({names: ['Tú'], kind: 'duel', rounds: [round('poker')]});
+  let d = E.step(duel, {type: 'place', cardId: 'poker-2', index: 1});
+  d = E.step(d, {type: 'ack'});
+  d = E.step(d, {type: 'place', cardId: 'poker-3', index: 0});
+  assert.equal(d.players[0].status, 'failed', 'en el duelo el fallo sigue sacando del reto');
+}
 console.log('Retos rápidos: reglas, empates, orden descendente, turnos, recuperación y tres rondas completas: OK');
