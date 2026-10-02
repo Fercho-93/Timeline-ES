@@ -10,7 +10,7 @@
   function state(room) {return room.config ? E.restore(record(room)) : null;}
   function metadata(room) {
     // Quien se rinde cierra el duelo: la partida queda como terminada y el otro gana.
-    if (room.resigned) {room.phase = 'finished'; room.actor = room.host; return room;}
+    if (room.resigned || room.declined) {room.phase = 'finished'; room.actor = room.host; return room;}
     const s = state(room);
     room.phase = s.phase === 'round-end' && s.index === s.config.rounds.length - 1 ? 'finished' : s.phase;
     // En un duelo por turnos el amigo puede no haber entrado aún: mientras tanto el móvil de quien creó la sala hace de turno.
@@ -25,6 +25,7 @@
   function validate(room) {
     if (!room || room.version !== 1 || !Array.isArray(room.members) || room.members.length < 1 || !Number.isInteger(room.capacity) || room.capacity < 2 || room.capacity > 8 || room.members.length > room.capacity || new Set(room.members).size !== room.members.length || room.members[0] !== room.host || !Array.isArray(room.names) || room.names.length !== room.members.length || room.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) || !Number.isInteger(room.revision) || room.revision < 0) throw Error('Sala no válida.');
     if (room.resigned !== undefined && (!room.config || room.config.kind !== 'duel' || !room.members.includes(room.resigned))) throw Error('Sala no válida.');
+    if (room.declined !== undefined && (!room.config || room.declined !== room.invitedUid || room.members.includes(room.declined))) throw Error('Sala no válida.');
     if (room.config) {
       if (JSON.stringify(room.config.names) !== JSON.stringify(room.names) && !waitingFriend(room)) throw Error('Participantes no válidos.');
       const derived = metadata(copy(room));
@@ -52,6 +53,10 @@
       if (r.matchmaking !== 'public' || r.phase !== 'lobby' || at < 0 || r.members.length < 2) throw Error('No se puede salir ahora.');
       r.members.splice(at, 1); r.names.splice(at, 1);
       r.host = r.members[0]; r.actor = r.host;
+    } else if (action.type === 'decline') {
+      // Rechazar un reto dirigido sin haberlo aceptado: el duelo se cierra y a quien retó le sale cancelado.
+      if (!r.config || !r.invitedUid || r.invitedUid !== id || r.members.includes(id) || r.phase === 'finished' || r.declined) throw Error('No puedes rechazar este reto.');
+      r.declined = id; metadata(r);
     } else if (action.type === 'resign') {
       // Rendirse en un duelo por turnos con los dos dentro: el rival gana y el duelo queda en el historial.
       if (r.capacity !== 2 || r.members.length !== 2 || r.config?.kind !== 'duel' || r.phase === 'finished' || !r.members.includes(id)) throw Error('No te puedes rendir ahora.');

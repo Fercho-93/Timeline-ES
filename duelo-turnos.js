@@ -6,6 +6,8 @@ import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, runTran
 const CT = window.CONTINUUM;
 const TURN_SECONDS = 15; // Ya no hay reloj por turno; solo el tope que se guardaba en `ms` y que usan las partidas antiguas.
 const INACTIVE_DAYS = 7;
+// Quien crea el duelo juega su primera carta antes de que entre el rival (salvo en una revancha que empieza el otro).
+const firstTurnOf = game => game?.status === 'waiting' && game.playersOrder?.length === 1 && game.playersOrder[0] === uid() && !game.turnIndex && !game.starter;
 const ended = game => ['finished', 'cancelled', 'expired', 'resigned'].includes(game.status);
 const inactive = game => !ended(game) && game.updatedAt?.seconds && Date.now() - game.updatedAt.seconds * 1000 >= INACTIVE_DAYS * 86400000;
 const asVisible = game => inactive(game) ? { ...game, status: 'expired', turnUid: null, resultText: 'Duelo caducado tras siete días sin actividad.' } : game;
@@ -79,11 +81,13 @@ function cifraBoard(game, card) { return `<section class="turn-duel-answer"><div
 async function share() {
   if (!current) return;
   const link = shareLink || `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${current.id}`;
+  // Con el enlace mandado el duelo sigue su curso esperando al rival: se vuelve a la lista de duelos.
+  const toList = () => { if (current?.status === 'waiting' && !firstTurnOf(current)) window.dispatchEvent(new CustomEvent('continuum:duels-list')); };
   if (navigator.share) {
-    try { await navigator.share({ title: 'Duelo por turnos en Continuum', text: 'Únete a mi duelo por turnos en Continuum', url: link }); return; }
+    try { await navigator.share({ title: 'Duelo por turnos en Continuum', text: 'Únete a mi duelo por turnos en Continuum', url: link }); toList(); return; }
     catch (error) { if (error.name === 'AbortError') return; }
   }
-  try { await navigator.clipboard.writeText(link); notify('Enlace copiado. Ya puedes enviárselo a tu rival.'); }
+  try { await navigator.clipboard.writeText(link); notify('Enlace copiado. Ya puedes enviárselo a tu rival.'); toList(); }
   catch { document.querySelector('.turn-duel-share details')?.setAttribute('open', ''); notify('Copia el enlace que aparece en la invitación.'); }
 }
 async function reshare(gameId) {
@@ -103,29 +107,31 @@ function render() {
   const oldInput = app.querySelector('#turn-cifra-input');
   const inputValue = oldInput?.value;
   const sameTurn = app.querySelector('.turn-duel-shell')?.dataset.turn === String(current.turnIndex);
-  const mine = current.turnUid === uid();
+  const firstTurn = firstTurnOf(current);
+  const mine = current.turnUid === uid() || firstTurn;
   const pending = pendingMove(current.id);
   const card = mine && !current.timeout && !pending ? localCard(current) : null;
   const waiting = current.status === 'waiting';
+  const showInvite = waiting && !firstTurn, showBoard = !waiting || firstTurn || current.turnIndex > 0;
   const kindLabel = current.kind === 'cifras' ? 'Escribir la cifra' : 'Ordenar las cartas';
   const rival = current.players?.[current.playersOrder?.find(x => x !== uid())]?.alias || '';
   const finished = ended(current);
-  const active = mine && !waiting && !finished && !current.timeout && !pending;
-  const heading = finished ? current.status === 'expired' ? 'Duelo caducado' : current.status === 'cancelled' ? 'Duelo cerrado' : 'Duelo terminado' : waiting ? current.invitedUid ? current.invitedUid === uid() ? 'Te han retado' : 'Reto enviado' : 'Invita a tu rival' : statusText(current);
-  const waitingHint = current.invitedUid ? 'La invitación se acepta desde el perfil, sin compartir enlaces.' : 'Comparte el enlace para empezar vuestra partida.';
+  const active = mine && (!waiting || firstTurn) && !finished && !current.timeout && !pending;
+  const heading = finished ? current.status === 'expired' ? 'Duelo caducado' : current.status === 'cancelled' ? 'Duelo cerrado' : 'Duelo terminado' : firstTurn ? 'Empiezas tú' : waiting ? current.invitedUid ? current.invitedUid === uid() ? 'Te han retado' : 'Reto enviado' : 'Invita a tu rival' : statusText(current);
+  const waitingHint = current.invitedUid ? 'La invitación se acepta desde el perfil, sin compartir enlaces.' : current.turnIndex ? 'Ya has hecho tu jugada: mándale el enlace a tu rival y sigue él.' : 'Comparte el enlace para empezar vuestra partida.';
   const link = shareLink || `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${current.id}`;
   const nextTargets = cachedGames.filter(game => game.id !== current.id && game.status === 'playing' && game.turnUid === uid());
   const html = `<div class="shell turn-duel-shell" data-duel-id="${safe(current.id)}" data-turn="${current.turnIndex}">
     <nav class="turn-duel-nav" aria-label="Duelo"><button class="icon-btn turn-duel-back" data-turn-action="back" aria-label="Volver a la pantalla anterior"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button><span>CONTINUUM <small>Duelo por turnos</small></span><div class="turn-duel-nav-actions"><i data-sound-slot></i></div></nav>
     <section class="turn-duel-screen">
-      <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${safe(heading)}</h1><p>${waiting ? waitingHint : finished ? 'Así queda vuestra partida.' : `Carta ${Math.min(current.turnIndex + 1, current.total)} de ${current.total}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div></header>
+      <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${safe(heading)}</h1><p>${firstTurn ? `Carta 1 de ${current.total} · juegas tú y después invitas a tu rival.` : waiting ? waitingHint : finished ? 'Así queda vuestra partida.' : `Carta ${Math.min(current.turnIndex + 1, current.total)} de ${current.total}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div></header>
       <div class="turn-duel-scores" aria-label="Marcador">${current.playersOrder.map((player, index) => { const name = current.players?.[player]?.alias || 'Jugador'; const mine = player === uid(); const activePlayer = current.turnUid === player; return `<div class="turn-duel-player ${activePlayer ? 'is-active' : ''} ${mine ? 'is-you' : ''}" data-player="${safe(player)}"><span class="turn-duel-avatar" aria-hidden="true">${CT.Avatares?.markup(name, { size: 44, seed: 'uid:' + player, ...(mine ? { id: CT.Avatares.ownId() } : {}) }) || safe(name.trim().charAt(0).toUpperCase() || '?')}</span><span class="turn-duel-player-info"><strong>${safe(name)}</strong><small>${mine ? 'Tú' : index === 1 ? 'Rival' : 'Jugador'}</small></span><span class="turn-duel-score"><b>${current.scores?.[player] || 0}</b><small>${current.kind === 'cifras' && (current.plays || []).some(p => (p.points || 0) > 1) ? 'puntos' : 'aciertos'}</small></span>${activePlayer ? '<span class="turn-duel-turn-badge">Turno</span>' : ''}</div>`; }).join('')}</div>
-      ${waiting ? current.invitedUid ? `<div class="panel turn-duel-share"><h2>${current.invitedUid === uid() ? 'Te han retado' : `Reto enviado a ${safe(current.invitedAlias || 'tu rival')}`}</h2><p>${current.invitedUid === uid() ? 'Mismo mazo y modalidad. Cartas nuevas para otra partida.' : 'La invitación ya aparece en su perfil. No necesitas enviar otro enlace.'}</p>${current.invitedUid === uid() ? '<button class="btn btn-primary" data-turn-action="accept">Aceptar el duelo</button><button class="btn btn-ghost" data-turn-action="decline">Rechazar</button>' : ''}</div>` : `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>La partida empezará cuando se una tu rival.</small></div>` : ''}
+      ${showInvite ? current.invitedUid ? `<div class="panel turn-duel-share"><h2>${current.invitedUid === uid() ? 'Te han retado' : `Reto enviado a ${safe(current.invitedAlias || 'tu rival')}`}</h2><p>${current.invitedUid === uid() ? 'Mismo mazo y modalidad. Cartas nuevas para otra partida.' : 'La invitación ya aparece en su perfil. No necesitas enviar otro enlace.'}</p>${current.invitedUid === uid() ? '<button class="btn btn-primary" data-turn-action="accept">Aceptar el duelo</button><button class="btn btn-ghost" data-turn-action="decline">Rechazar</button>' : ''}</div>` : `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>Tu rival empieza su turno cuando abra el enlace.</small></div>` : ''}
       ${lastMove(current)}
       ${solution(current)}
       ${pending ? `<div class="turn-duel-status" role="status"><b>${sending.has(pending.operationId) ? 'Enviando jugada…' : 'Jugada guardada en este móvil, pendiente de confirmar'}</b><p>No vuelvas a jugar esta carta. Se enviará al recuperar la conexión, sin cambiar tu respuesta ni tu tiempo.</p>${delivery ? `<p>${safe(delivery)}</p>` : ''}<button class="btn btn-secondary" data-turn-action="retry">Comprobar y reintentar</button></div>` : delivery ? `<p class="turn-duel-status" role="status">${safe(delivery)}</p>` : ''}
       ${!waiting && !finished && !mine ? '<p class="turn-duel-status" role="status">Tu rival está jugando. La mesa se actualizará automáticamente.</p>' : ''}
-      ${!waiting && current.kind === 'orden' ? orderBoard(current, active ? card : null) : ''}
+      ${showBoard && current.kind === 'orden' ? orderBoard(current, active ? card : null) : ''}
       ${active && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
       ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
@@ -164,7 +170,7 @@ function savePending(gameId, move) {
   localStorage.setItem(outboxKey(), JSON.stringify(saved));
 }
 async function queueMove(extra) {
-  if (!current || current.status !== 'playing' || current.turnUid !== uid() || pendingMove(current.id)) return;
+  if (!current || !(firstTurnOf(current) || (current.status === 'playing' && current.turnUid === uid())) || pendingMove(current.id)) return;
   // Sin límite de tiempo por turno: `ms` solo se guarda como dato (siempre por debajo del tope antiguo) y nunca hay timeout.
   const ms = Math.max(0, Date.now() - (enteredAt || Date.now()));
   const move = { ...extra, ms: Math.min(ms, TURN_SECONDS * 1000 - 1), timeout: false, gameId: current.id, turnIndex: current.turnIndex, uid: uid(), operationId: id() };
@@ -184,7 +190,8 @@ async function sendPending(move) {
       // Never use mutable current here: snapshots, navigation and retries may change it.
       const ref = doc(db, 'turnDuels', move.gameId), game = (await tx.get(ref)).data();
       if (game?.plays?.[move.turnIndex]?.operationId === move.operationId) return 'confirmed';
-      if (!game || ended(game) || inactive(game) || game.turnIndex !== move.turnIndex || game.turnUid !== move.uid) return 'superseded';
+      const first = firstTurnOf(game) && game.playersOrder[0] === move.uid;
+      if (!game || ended(game) || inactive(game) || game.turnIndex !== move.turnIndex || (game.turnUid !== move.uid && !first)) return 'superseded';
       const card = localCard(game);
       if (!card) throw Error('No se pudo cargar la carta.');
       const nextIndex = game.turnIndex + 1, finished = nextIndex >= game.total;
@@ -201,7 +208,7 @@ async function sendPending(move) {
         play.correct = !move.timeout && correctPlacement(game, card, move.index);
         if (play.correct) { points = 1; line = timelineCards(game).map(c => c.id); line.splice(move.index, 0, card.id); }
       }
-      tx.update(ref, { plays: [...(game.plays || []), play], timeline: line, scores: { ...game.scores, [move.uid]: (game.scores?.[move.uid] || 0) + points }, turnIndex: nextIndex, turnUid: finished ? null : game.playersOrder[nextIndex % 2], status: finished ? 'finished' : 'playing', updatedAt: serverTimestamp(), resultText: finished ? 'Los dos jugadores han completado la partida.' : null });
+      tx.update(ref, { plays: [...(game.plays || []), play], timeline: line, scores: { ...game.scores, [move.uid]: (game.scores?.[move.uid] || 0) + points }, turnIndex: nextIndex, turnUid: first || finished ? null : game.playersOrder[(nextIndex + (game.starter || 0)) % 2], status: first ? 'waiting' : finished ? 'finished' : 'playing', updatedAt: serverTimestamp(), resultText: finished ? 'Los dos jugadores han completado la partida.' : null });
       return 'confirmed';
     });
     // Do not delete a newer operation saved by another tab/account.
@@ -247,14 +254,14 @@ async function join(gameId, back, accept = false) {
     if (game.invitedUid && !accept) return;
     if (game.status !== 'waiting' || game.playersOrder.length >= 2 || (game.invitedUid && game.invitedUid !== uid())) throw Error('invitación');
     const playersOrder = [...game.playersOrder, uid()];
-    tx.update(ref, { playersOrder, players: { ...game.players, [uid()]: { alias: alias() } }, scores: { ...game.scores, [uid()]: 0 }, timeline: game.kind === 'orden' && !game.timeline?.length ? [deckCards(game)[0].id] : game.timeline, status: 'playing', turnUid: playersOrder[0], updatedAt: serverTimestamp() });
+    tx.update(ref, { playersOrder, players: { ...game.players, [uid()]: { alias: alias() } }, scores: { ...game.scores, [uid()]: 0 }, timeline: game.kind === 'orden' && !game.timeline?.length ? [deckCards(game)[0].id] : game.timeline, status: 'playing', turnUid: playersOrder[((game.turnIndex || 0) + (game.starter || 0)) % 2], updatedAt: serverTimestamp() });
   });
   subscribe(gameId);
 }
 // Cada turno se juega sin reloj: se abre la carta cuando entras y la respuesta espera lo que haga falta.
 function prepareTurn() {
   awaitingReady = false; prepareUntil = 0;
-  if (current?.status !== 'playing' || current.turnUid !== uid()) return;
+  if (!firstTurnOf(current) && (current?.status !== 'playing' || current.turnUid !== uid())) return;
   const key = `${current.id}-${current.turnIndex}`;
   if (preparingTurn !== key) { preparingTurn = key; enteredAt = Date.now(); }
 }
@@ -343,18 +350,18 @@ function quickRowMarkup(x) {
   const archive = label => `<button class="btn btn-ghost" data-action="archive-turn-duel" data-turn-id="${code}" data-restore="${archived}">${archived ? 'Restaurar' : label}</button>`;
   // Las mismas acciones que en las colecciones: revancha y archivar al terminar, rendirse en marcha, y cancelar o reenviar
   // la invitación mientras nadie la ha abierto. Un reto que te han mandado se puede rechazar.
-  const acts = x.done ? `${x.rivalUid ? `<button class="btn btn-ghost" data-action="rematch-quick-duel" data-quick-code="${code}">Revancha</button>` : ''}${archive('Archivar')}`
-    : x.grupo === 'retado' ? archive('Rechazar')
+  const acts = x.done ? `${x.rivalUid && x.result ? `<button class="btn btn-ghost" data-action="rematch-quick-duel" data-quick-code="${code}">Revancha</button>` : ''}${archive('Archivar')}`
+    : x.grupo === 'retado' ? `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="decline">Rechazar</button>`
     : x.grupo === 'enviada' ? `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="cancel">Cancelar invitación</button>${x.host ? `<button class="btn btn-ghost" data-action="reshare-quick-duel" data-quick-code="${code}">Reenviar enlace</button>` : ''}`
     : `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="resign">Rendirse</button>`;
   const avatar = CT.Avatares?.markup(x.rival, { size: 44, seed: 'quick:' + x.code }) || '';
-  return `<div class="turn-duel-profile-row turn-duel-row-${safe(x.grupo)}"><button class="turn-duel-entry${x.pendiente ? ' is-pending' : ''}" data-action="open-quick-duel" data-quick-code="${safe(x.code)}" aria-label="${safe(`${x.rival}, Retos rápidos, ${x.deck}. ${x.estado}. ${x.detalle}. ${x.marcador}`)}"><span class="turn-duel-entry-avatar">${avatar}</span><span class="turn-duel-entry-copy"><b>${safe(x.rival)}</b><small>Retos rápidos · ${safe(x.deck)}</small><span class="turn-duel-entry-state">${safe(x.estado)} <em>· ${safe(x.detalle)}</em></span>${x.marcador ? `<span class="turn-duel-entry-score">${safe(x.marcador)}</span>` : ''}</span><i aria-hidden="true">→</i></button><div class="turn-duel-row-actions">${acts}</div></div>`;
+  return `<div class="turn-duel-profile-row turn-duel-row-${safe(x.grupo)}"><button class="turn-duel-entry${x.pendiente ? ' is-pending' : ''}" data-action="${x.grupo === 'retado' ? 'preview-quick-invite' : 'open-quick-duel'}" data-quick-code="${safe(x.code)}" aria-label="${safe(`${x.rival}, Retos rápidos, ${x.deck}. ${x.estado}. ${x.detalle}. ${x.marcador}`)}"><span class="turn-duel-entry-avatar">${avatar}</span><span class="turn-duel-entry-copy"><b>${safe(x.rival)}</b><small>Retos rápidos · ${safe(x.deck)}</small><span class="turn-duel-entry-state">${safe(x.estado)} <em>· ${safe(x.detalle)}</em></span>${x.marcador ? `<span class="turn-duel-entry-score">${safe(x.marcador)}</span>` : ''}</span><i aria-hidden="true">→</i></button><div class="turn-duel-row-actions">${acts}</div></div>`;
 }
 function profileMarkup(games, extras = []) {
   const visible = games.filter(g => !archivedIds.has(g.id));
   // Primero lo que espera algo de ti (tu turno, retos recibidos), después lo que espera
   // al rival y, plegado al final, el historial.
-  const groups = [ ['Tu turno', g => g.status === 'playing' && g.turnUid === uid()], ['Te han retado', g => g.status === 'waiting' && g.invitedUid === uid()], ['Esperando al rival', g => g.status === 'playing' && g.turnUid !== uid()], ['Invitaciones enviadas', g => g.status === 'waiting' && g.invitedUid !== uid()], ['Historial', ended] ];
+  const groups = [ ['Tu turno', g => (g.status === 'playing' && g.turnUid === uid()) || firstTurnOf(g)], ['Te han retado', g => g.status === 'waiting' && g.invitedUid === uid()], ['Esperando al rival', g => g.status === 'playing' && g.turnUid !== uid()], ['Invitaciones enviadas', g => g.status === 'waiting' && g.invitedUid !== uid() && !firstTurnOf(g)], ['Historial', ended] ];
   const row = g => {
     const rivalUid = g.playersOrder?.find(player => player !== uid()) || g.invitedUid;
     const archived = archivedIds.has(g.id), e = CT.Duelo.estadoTurnos(g, uid()), avatar = CT.Avatares?.markup(e.rival, { size: 44, ...(rivalUid ? { seed: 'uid:' + rivalUid } : {}) }) || '';
@@ -425,6 +432,8 @@ async function challenge(sourceId, back = onBack) {
       const existing = await tx.get(ref);
       if (existing.exists()) return !ended(existing.data()) && !inactive(existing.data());
       tx.set(ref, { id: gameId, sourceDuel: sourceId, invitationRound: round, invitedUid, invitedAlias: source.players[invitedUid].alias,
+        // La revancha la empieza quien no empezó el duelo anterior: si lo empecé yo, empieza mi rival.
+        starter: source.playersOrder[source.starter || 0] === uid() ? 1 : 0,
         mode: source.mode, kind: source.kind, seed, total, turnIndex: 0, turnUid: null,
         playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, scores: { [uid()]: 0 },
         status: 'waiting', plays: [], timeline: source.kind === 'orden' ? [CT.Duelo.reparto(source.mode, seed, total)[0]] : [],
@@ -450,7 +459,7 @@ CT.TurnDuel = { open, close, list, cancel, standings };
 // Los duelos que esperan algo de quien juega: los suyos en los que le toca y los retos
 // que le han mandado. Es lo que la portada avisa; lo demás se ve en la lista completa.
 function pending(games = cachedGames) {
-  return games.filter(g => !archivedIds.has(g.id) && ((g.status === 'playing' && g.turnUid === uid()) || (g.status === 'waiting' && g.invitedUid === uid() && !blockedPlayers.has(g.playersOrder[0]))))
+  return games.filter(g => !archivedIds.has(g.id) && ((g.status === 'playing' && g.turnUid === uid()) || firstTurnOf(g) || (g.status === 'waiting' && g.invitedUid === uid() && !blockedPlayers.has(g.playersOrder[0]))))
     .sort((a, b) => (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0));
 }
 Object.assign(CT.TurnDuel, { isBlocked: player => blockedPlayers.has(player), pendingQuick: rows => rows.filter(x => x.pendiente && !archivedIds.has(x.code)), rivals, rivalStandings, standingsMarkup, favorite, challenge, next, archive, block, headToHead, profileMarkup, reshare, pending });

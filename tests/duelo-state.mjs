@@ -113,6 +113,21 @@ try {
   const conRapidos = w.CONTINUUM.TurnDuel.rivalStandings([partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } })], [
     { done: true, rivalUid: 'mario', rival: 'Mario', result: 'win' }, { done: true, rivalUid: 'zoe', rival: 'Zoe', result: 'loss' }, { done: false, rivalUid: 'zoe', rival: 'Zoe' }]);
   assert.equal(JSON.stringify(conRapidos.map(r => [r.alias, r.wins, r.losses, r.draws])), JSON.stringify([['Mario', 2, 0, 0], ['Zoe', 0, 1, 0]]));
+  // Quien crea el duelo juega primero, antes de que entre el rival; después invita.
+  games.set('first', game('first', { status: 'waiting', turnUid: null, playersOrder: ['me'], players: { me: { alias: 'Yo' } }, scores: { me: 0 } }));
+  t.show(clone(games.get('first')));
+  assert.ok(w.document.querySelector('.hand-card'), 'quien crea ve su carta sin esperar a nadie');
+  assert.equal(w.document.querySelector('.turn-duel-share'), null, 'y aún no se le pide invitar');
+  await t.place(1);
+  assert.equal(games.get('first').turnIndex, 1); assert.equal(games.get('first').status, 'waiting'); assert.equal(games.get('first').turnUid, null);
+  assert.equal(games.get('first').plays[0].uid, 'me');
+  t.snapshot(clone(games.get('first')));
+  assert.ok(w.document.querySelector('.turn-duel-share'), 'jugada su carta, toca invitar al rival');
+  assert.equal(w.document.querySelector('.hand-card'), null);
+  // En una revancha que empieza el rival, quien crea no juega: solo invita.
+  games.set('rival-first', game('rival-first', { status: 'waiting', turnUid: null, starter: 1, playersOrder: ['me'], players: { me: { alias: 'Yo' } }, scores: { me: 0 } }));
+  t.show(clone(games.get('rival-first')));
+  assert.equal(w.document.querySelector('.hand-card'), null); assert.ok(w.document.querySelector('.turn-duel-share'));
   games.set('race',game('race'));
   await assert.rejects(t.cancel('race','waiting'), /ha cambiado/);
   console.log('OK: sin reloj ni pantalla de listo, offline recovery, lost acknowledgement, idempotency, navigation, timeout, shared solutions, head-to-head, cancellation race.');

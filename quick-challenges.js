@@ -76,7 +76,7 @@
   let publicClock=null;
   // Una sala de duelo por turnos (la crea quien abre «Duelo con un amigo → Por turnos») no enseña mesa: se manda el enlace y
   // empieza sola cuando entra el amigo.
-  let serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, justJoined=false, backTo=null, pendingInvite=null;
+  let previewCode=null, serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, justJoined=false, backTo=null, pendingInvite=null;
   function stopNetwork() {clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;myId=null;busy=false;invite=null;duelRoom=false;duelStarting=false;justJoined=false;}
   function errorNotice(e) {busy=false;let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=e.message || String(e);CT.announce(e.message || String(e));}
   function rounds(count=3, selectedId=null, seed=null) {
@@ -200,12 +200,12 @@
           <div class="quick-length" role="radiogroup" aria-labelledby="quick-length-label">${chip(1,'Duelo rápido')}${chip(3,'Duelo estándar')}${chip(5,'Duelo largo')}</div><input id="quick-free-length" type="hidden" value="3"></div>
         ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos mazos cuando quiera, sin coincidir contigo.</p></div>
           ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
-        ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas un enlace (o el código o el QR): tu amigo sigue la partida desde ahí. En la revancha empieza el otro. La partida se guarda entre turnos y podéis volver cuando queráis.</p></div>
+        ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas el enlace por WhatsApp, correo o como quieras: tu amigo entra directo en la partida, ve tu última jugada y sigue él. En la revancha empieza el otro. La partida se guarda entre turnos y podéis volver cuando queráis.</p></div>
           <div class="field duel-kind-field"><span class="field-label" id="quick-keep-label">Si alguien falla</span><div class="segmented" role="radiogroup" aria-labelledby="quick-keep-label">${[['seguir','Sigue hasta el final','Un fallo no suma, pero se juega todo el mazo y gana quien acierte más'],['fuera','Se queda sin turnos','Quien falla pierde lo provisional y no juega más ese reto']].map(([k,t,f])=>`<label class="segmented-option${(k==='seguir')===duelKeep()?' is-on':''}"><input type="radio" name="quick-keep" value="${k}"${(k==='seguir')===duelKeep()?' checked':''}><span><b>${t}</b><small>${f}</small></span></label>`).join('')}</div></div>
           <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${ownName}"></div>
           ${button('create-room','Crear duelo <span>→</span>','btn btn-primary btn-block')}
           <details class="duel-join"><summary>Mi amigo ya creó el duelo</summary><div class="field"><label for="quick-net-code">Código o enlace del duelo</label><textarea id="quick-net-code" rows="2"></textarea></div>
-            ${button('scan-code','Escanear código QR','btn btn-secondary btn-block')}${button('join-room','Unirme al duelo <span>→</span>','btn btn-secondary btn-block')}</details>
+            ${button('join-room','Unirme al duelo <span>→</span>','btn btn-secondary btn-block')}</details>
           ${readJSON(NET)?button('reconnect','Volver a mi duelo','btn btn-ghost btn-block'):''}<p id="quick-error" role="alert"></p>`)}
       </div></section>`);
   }
@@ -238,7 +238,6 @@
       record=CT.QuickRoom.record(room);state=E.restore(record);selected=null;slot=null;render();
       // Al empezar la partida de la sala, la portada del primer mazo, como en el resto de Retos rápidos.
       if(starting)deckSplash(state.config,0);
-      else if(justJoined){justJoined=false;deckSplash(state.config,state.index);}
     }
     else {
       lobby(code || connection?.code);
@@ -280,13 +279,15 @@
     const at={seconds:typeof room.updatedAt==='number'?room.updatedAt:room.updatedAt?.seconds||Math.floor(Date.now()/1000)};
     const cfg=room.config,me=room.members.indexOf(uid),host=room.members[0]===uid;
     const details={length:cfg.rounds.length,keep:cfg.keep!==false,firstName:cfg.names[cfg.first||0],host};
-    // Un reto que te han mandado y aún no has aceptado.
+    // Un reto que te han mandado y aún no has aceptado (o que has rechazado).
+    if(me<0&&room.declined)return {rival:room.names[0],rivalUid:room.host,me:'',deck:E.challenge(cfg.rounds[0].id).title,marcador:'',updatedAt:at,grupo:'historial',pendiente:false,estado:'Rechazaste el reto',detalle:'Cerrado',done:true,...details};
     if(me<0)return {rival:room.names[0],rivalUid:room.host,me:'',deck:E.challenge(cfg.rounds[0].id).title,marcador:'',updatedAt:at,grupo:'retado',pendiente:true,estado:`${room.names[0]} te ha retado`,detalle:'Acéptalo para empezar',invited:true,...details};
     const s=E.restore(CT.QuickRoom.record(room)),other=1-me,friendIn=room.members.length>1;
     const rival=friendIn?room.names[other]:room.invitedName||'tu amigo',c=E.challenge(s.config.rounds[s.index].id),total=s.config.rounds[s.index].order.length-1;
     const mine=p=>p.score+p.points,mios=mine(s.players[me]),suyos=mine(s.players[other]);
     const base={rival,rivalUid:friendIn?room.members[other]:room.invitedUid||null,me:room.names[me],deck:c.title,marcador:`Tú ${mios} · ${rival} ${suyos} aciertos`,updatedAt:at,...details};
     const where=`Mazo ${s.index+1} de ${s.config.rounds.length} · carta ${Math.max(1,Math.min(total,s.phase==='turn'?s.timeline.length:s.timeline.length-1))} de ${total}`;
+    if(room.declined)return {...base,grupo:'historial',pendiente:false,estado:'Cancelado: rechazó tu reto',detalle:'Cerrado',done:true,marcador:''};
     if(room.resigned){const yo=room.resigned===uid;return {...base,grupo:'historial',pendiente:false,estado:yo?'Te rendiste':'Ganaste: tu rival se rindió',detalle:'Terminado',done:true,result:yo?'loss':'win'};}
     if(room.phase==='finished'){const result=mios>suyos?'win':mios<suyos?'loss':'draw';return {...base,grupo:'historial',pendiente:false,estado:{win:'Ganaste',loss:'Perdiste',draw:'Empate'}[result],detalle:'Terminado',done:true,result};}
     if(!friendIn&&s.current!==me&&room.phase==='turn')return {...base,grupo:'enviada',pendiente:false,estado:room.invitedUid?`Esperando a que ${rival} acepte`:'Esperando a que tu amigo abra el enlace',detalle:where,marcador:''};
@@ -322,6 +323,16 @@
     if(CT.TurnDuel?.isBlocked?.(row.rivalUid))throw Error('Has bloqueado los retos de este rival.');
     await createDuelRoom({renderPage,name:row.me,length:row.length,keep:row.keep,iStart:row.me!==row.firstName,invite:{uid:row.rivalUid,name:row.rival},back});
   }
+  async function declineInvite(code) {await CT.QuickNetwork.actOnce(code,{type:'decline'});}
+  // Un reto que te han mandado se ve antes de entrar: se acepta (entras y juegas tu turno) o se rechaza (el duelo se cierra).
+  async function previewInvite(renderPage,code,back) {
+    const row=(readJSON(DUELS,[])||[]).find(x=>x.code===code);
+    if(!row)throw Error('No se encuentra ese reto.');
+    paint=renderPage;entry='duel-setup';backTo=back||null;previewCode=code;
+    shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">${esc(row.rival)} te ha retado</h2></div></section>
+      <section class="panel lobby-settings"><p>Duelo por turnos de Retos rápidos: ${row.length} ${row.length===1?'mazo':'mazos'}. ${row.keep?'Quien falla no suma esa carta, pero se juega todo el mazo.':'Quien falla pierde lo provisional y no juega más ese reto.'}</p><p class="hint">${esc(row.rival)} ya ha hecho su jugada: al aceptar verás cuál fue y seguirás tú.</p>
+        ${button('accept-invite','Aceptar el reto <span>→</span>','btn btn-primary btn-block')}${button('decline-invite','Rechazar','btn btn-ghost btn-block exit-discard')}${button('back-invite','Volver a mis duelos','btn btn-secondary btn-block')}<p id="quick-error" role="alert"></p></section>`);
+  }
   async function resignDuel(code) {await CT.QuickNetwork.actOnce(code,{type:'resign'});}
   async function cancelInvitation(code) {await CT.QuickNetwork.cancelRoom(code);}
   function reshare(code) {return CT.LocalShare.shareSignal(roomUrl(code).href);}
@@ -337,8 +348,8 @@
   function duelInvite() {
     const code=connection?.code, friend=esc(state.players[1].name), jugadas=record.commands.filter(c=>c.type==='place').length, invited=!!room.invitedUid;
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">Duelo en marcha</h2></div></section><section class="panel lobby-settings duel-invite"><div class="waiting-orbit"><span></span></div><h3>Le toca a ${invited?friend:'tu amigo'}</h3>
-      <p>${jugadas?'Ya has hecho tu jugada. ':''}${invited?`El reto ya le aparece en su lista de duelos. Si quieres, mándale también el enlace (o el código o el QR).`:'Mándale el enlace (o el código o el QR): al abrirlo, sigue la partida desde donde la has dejado.'}</p>
-      ${code?`${button('share-room','Compartir enlace','btn btn-primary btn-block')}<div class="room-code-card"><small>Código del duelo</small><strong>${esc(code)}</strong><div class="room-invite-actions"><button data-quick="qr-room">Mostrar QR</button></div></div>`:''}
+      <p>${jugadas?'Ya has hecho tu jugada. ':''}${invited?`El reto ya le aparece en su lista de duelos. Si quieres, mándale también el enlace.`:'Mándale el enlace por WhatsApp, correo o como quieras: al abrirlo entra directo en la partida, ve tu última jugada y sigue desde ahí.'}</p>
+      ${code?button('share-room','Compartir enlace','btn btn-primary btn-block'):''}
       ${button('formats','Volver a mis duelos','btn btn-secondary btn-block')}
       <p class="hint">La partida ya está en juego y se guarda: la verás en «Tus duelos», con a quién le toca.</p><p id="quick-error" role="alert"></p></section>`);
   }
@@ -346,9 +357,8 @@
     const length=roomLength||3, keep=duelKeep(), friend=esc(room.names[0]);
     const rule=keep?'Quien falla no suma esa carta, pero se juega todo el mazo.':'Quien falla pierde lo provisional y no juega más ese reto.';
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">${host?'Duelo preparado':'Duelo en marcha'}</h2></div>
-      ${host&&code?`<div class="room-code-card"><small>Código del duelo</small><strong>${esc(code)}</strong><div class="room-invite-actions"><button data-quick="share-room">Compartir enlace</button><button data-quick="qr-room">Mostrar QR</button></div></div>`:''}</section>
       <section class="panel lobby-settings"><div class="waiting-orbit"><span></span></div>
-        ${host?`<h3>Esperando a tu amigo</h3><p>Mándale el enlace, el código o el QR. En cuanto lo abra, empieza el duelo: ${length} ${length===1?'mazo':'mazos'}, un turno cada uno desde su móvil. ${rule}</p>${room.members.length>=2?button('start-room','Empezar el duelo <span>→</span>','btn btn-primary btn-block'):button('share-room','Compartir enlace','btn btn-primary btn-block')}<p class="hint">La partida se guarda entre turnos: podéis dejarla y volver cuando queráis.</p>`
+        ${host?`<h3>Esperando a tu amigo</h3><p>Mándale el enlace. En cuanto lo abra, empieza el duelo: ${length} ${length===1?'mazo':'mazos'}, un turno cada uno desde su móvil. ${rule}</p>${room.members.length>=2?button('start-room','Empezar el duelo <span>→</span>','btn btn-primary btn-block'):button('share-room','Compartir enlace','btn btn-primary btn-block')}<p class="hint">La partida se guarda entre turnos: podéis dejarla y volver cuando queráis.</p>`
           :`<h3>Esperando a ${friend}</h3><p>El duelo empieza en cuanto ${friend} lo abra en su móvil.</p>`}
         <p id="quick-error" role="alert"></p></section>`);
   }
@@ -475,6 +485,9 @@
       await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:me!==cfg.names[cfg.first||0],invite:other?{uid:other,name:room.names[room.members.indexOf(other)]}:null,back:backTo});
       return true;
     }
+    if(action==='accept-invite'){const code=previewCode;await openRoom(paint,code,backTo);return true;}
+    if(action==='decline-invite'){const code=previewCode;if(!window.confirm('¿Rechazar este reto? Se cerrará el duelo y a quien te retó le saldrá cancelado.'))return true;await declineInvite(code);previewCode=null;toEntry();return true;}
+    if(action==='back-invite'){previewCode=null;toEntry();return true;}
     if(action==='share-room'){
       const url=roomUrl(connection.code),esperando=!!(room&&state&&page==='game'&&room.members.length<state.players.length);
       await CT.LocalShare.shareSignal(url.href);
@@ -625,6 +638,16 @@
     if (r.lost > 0) return solo ? `Pierdes ${n(r.lost, 'acierto', 'aciertos')} de este reto y quedas fuera hasta el siguiente. ${fuera}` : `${name} pierde ${n(r.lost, 'acierto', 'aciertos')} de este reto y queda fuera hasta el siguiente. ${fuera}`;
     return solo ? `No tenías aciertos provisionales que perder, pero quedas fuera de este reto hasta el siguiente. ${fuera}` : `${name} no tenía aciertos provisionales, pero queda fuera de este reto hasta el siguiente. ${fuera}`;
   }
+  // Lo último que hizo el rival (o quien sea), para verlo al entrar en el duelo: quién colocó qué carta y si acertó.
+  function lastNote() {
+    if(!room||!record||state.phase!=='turn')return '';
+    let s=E.create(record.config),last=null;
+    for(const c of record.commands){const before=s.current,round=s.index;s=E.step(s,c);if(c.type==='place')last={by:before,cardId:c.cardId,correct:s.result.correct,round};}
+    if(!last||last.by===room.members.indexOf(myId))return '';
+    const item=E.challenge(record.config.rounds[last.round].id).cards.find(x=>x.id===last.cardId);
+    if(!item)return '';
+    return `<aside class="turn-duel-last" aria-label="Última jugada"><b>Última jugada</b><p>${esc(state.players[last.by].name)} ${last.correct?'acertó':'falló'} con «${esc(item.title)}» (${esc(item.label)}).</p></aside>`;
+  }
   // «Revancha»: crea un duelo nuevo contra la misma persona, en el que empieza quien no abrió el anterior.
   function rematchButton() {
     const cfg=state.config, me=state.players[room.members.indexOf(myId)]?.name, iStart=me!==cfg.names[cfg.first||0];
@@ -681,7 +704,7 @@
       return;
     }
     const gap = i => slot === i && selected ? `<div class="slot-confirm quick-confirm provisional-placement" data-index="${i}"><div class="slot-confirm-card"><small>Vista previa · sin confirmar</small><strong>${esc(get(selected).title)}</strong><span aria-hidden="true">Valor oculto</span></div>${button('confirm', 'Sí, aquí', 'btn btn-primary btn-block')}${button('cancel', 'Cancelar', 'btn btn-ghost btn-block')}</div>` : `<button class="slot" data-quick="slot" data-index="${i}" ${selected ? '' : 'disabled'} aria-label="${esc(i === 0 ? `Colocar antes de ${get(state.timeline[0]).title}` : i === state.timeline.length ? `Colocar después de ${get(state.timeline[i-1]).title}` : `Colocar entre ${get(state.timeline[i-1]).title} y ${get(state.timeline[i]).title}`)}"><span>+</span></button>`;
-    shell(`${heading}<section><h3 class="solo-lectores">Cartas comunes</h3><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
+    shell(`${heading}${lastNote()}<section><h3 class="solo-lectores">Cartas comunes</h3><div class="hand">${state.remaining.filter(id => !(slot !== null && selected === id)).map(id => `<button class="hand-card${selected === id ? ' selected' : ''}" data-quick="select" data-id="${id}" aria-pressed="${selected === id}"><span class="hidden-date">Valor oculto</span>${CT.cardBack('quick')}<strong>${esc(get(id).title)}</strong><span class="card-arrow">→</span></button>`).join('')}</div>
       <p class="hint">${selected ? 'Toca un hueco y confirma, o arrastra la carta hasta su lugar.' : 'Toca una carta o mantenla pulsada para arrastrarla hasta un hueco.'}</p></section>
       <section class="board-timeline-section"><div class="hand-title"><h3>Línea de cartas</h3></div>${timelineEnds(c)}${CT.timelineMap(null, state.timeline)}
       <div class="timeline-wrap"><div class="timeline" aria-label="Línea de cartas: orden de izquierda a derecha">${state.timeline.map((id, i) => gap(i) + cardMarkup(c, get(id))).join('')}${gap(state.timeline.length)}</div></div></section>`);
@@ -739,7 +762,7 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    const formatActions=['formats','leave-public','share-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect','rematch-room'];
+    const formatActions=['formats','leave-public','share-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect','rematch-room','accept-invite','decline-invite','back-invite'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);
@@ -831,7 +854,7 @@
     openSolo(renderPage){paint=renderPage;backTo=null;entry='free-setup';format='free';freeSetup();},
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},
-    duels, openRoom, challenge, resignDuel, cancelInvitation, reshare,
+    duels, openRoom, challenge, resignDuel, cancelInvitation, declineInvite, previewInvite, reshare,
     Duel:{pack:packCommands,unpack:unpackCommands,payload:duelPayload,read:readDuel,fingerprint:duelFingerprint,rounds},
     openNetwork(renderPage,kind,capacity){paint=renderPage;backTo=null;entry='network';networkSetup(kind,capacity);},
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.

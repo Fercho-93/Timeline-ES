@@ -2535,10 +2535,10 @@
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>${Cifras.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se cierra.</span></p></div>
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
-      ${bloque("turnos-orden", `<div class="duel-brief"><p>Colocad una carta cada vez, desde vuestro propio móvil. Recibirás un aviso cuando el rival juegue.</p>
+      ${bloque("turnos-orden", `<div class="duel-brief"><p>Colocad una carta cada vez, desde vuestro propio móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Sin límite de tiempo: respondes cuando te toque, con calma.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
-      ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Responded una cifra cada vez, desde vuestro propio móvil. El rival recibe un aviso al terminar tu turno.</p>
+      ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Responded una cifra cada vez, desde vuestro propio móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Sin límite de tiempo: respondes cuando te toque, con calma.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
       <div class="field duel-identity-field">
@@ -3967,11 +3967,15 @@
       CT.Quick.challenge((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView)
         .catch(error => showToast(error?.message || 'No se pudo enviar el reto.')).finally(() => { target.disabled = false; });
     }
+    else if (action === "preview-quick-invite") {
+      CT.Quick.previewInvite((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView)
+        .catch(error => showToast(error?.message || 'No se pudo abrir el reto.'));
+    }
     else if (action === "close-quick-duel") {
-      const cancel = target.dataset.mode === 'cancel';
-      if (!window.confirm(cancel ? '¿Cancelar esta invitación? No contará como derrota.' : '¿Rendirte? Tu rival ganará esta partida. Se conservará en el historial.')) return;
+      const mode = target.dataset.mode, code = target.dataset.quickCode;
+      if (!window.confirm(mode === 'cancel' ? '¿Cancelar esta invitación? No contará como derrota.' : mode === 'decline' ? '¿Rechazar este reto? Se cerrará el duelo y a quien te retó le saldrá cancelado.' : '¿Rendirte? Tu rival ganará esta partida. Se conservará en el historial.')) return;
       target.disabled = true;
-      (cancel ? CT.Quick.cancelInvitation(target.dataset.quickCode) : CT.Quick.resignDuel(target.dataset.quickCode))
+      (mode === 'cancel' ? CT.Quick.cancelInvitation(code) : mode === 'decline' ? CT.Quick.declineInvite(code) : CT.Quick.resignDuel(code))
         .then(() => { showToast('Partida actualizada'); duelsRefresh(); }).catch(() => { target.disabled = false; showToast('No se pudo actualizar el duelo. Puede haber cambiado: revisa la lista.'); });
     }
     else if (action === "reshare-quick-duel") { Promise.resolve(CT.Quick.reshare(target.dataset.quickCode)).catch(() => showToast('No se pudo compartir el enlace.')); }

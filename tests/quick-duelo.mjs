@@ -140,6 +140,11 @@ assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-duel-pace-v1'), 'turno
   assert.equal(e('EEEEEEEEE2').grupo, 'retado'); assert.equal(e('EEEEEEEEE2').rival, 'Marta'); assert.equal(e('EEEEEEEEE2').pendiente, true);
   assert.equal(e('FFFFFFFFF2').done, true); assert.equal(e('FFFFFFFFF2').result, 'win'); assert.match(e('FFFFFFFFF2').estado, /rindió/);
   assert.equal(e('FFFFFFFFF2').length, 3); assert.equal(e('FFFFFFFFF2').keep, true);
+  // Reto rechazado: cerrado para los dos, sin resultado.
+  const rech = R.reduce(invStarted, 'me', {type: 'decline'});
+  CT.QuickNetwork.mine = async () => [{code: 'GGGGGGGGG2', room: rech, uid: 'me'}];
+  const rc = (await CT.Quick.duels())[0];
+  assert.equal(rc.grupo, 'historial'); assert.equal(rc.done, true); assert.equal(rc.result, undefined); assert.match(rc.estado, /Rechazaste/);
   CT.QuickNetwork.mine = async () => rooms.map(x => ({...x, uid: 'me'}));
   await CT.Quick.duels();
   CT.QuickNetwork.mine = async () => {throw Error('sin conexión');};

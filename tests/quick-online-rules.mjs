@@ -159,6 +159,16 @@ try {
     const arch=(db,uid)=>setDoc(doc(db,'duelPreferences',uid,'archived','ABCDEFGH23'),{updatedAt:serverTimestamp()});
     await assertSucceeds(arch(guest,'guest'));
     await assertFails(arch(out,'outsider'));
+    // Rechazar el reto sin aceptarlo cierra el duelo; solo lo puede hacer quien lo recibió
+    {const rech=R.reduce(inv,'guest',{type:'decline'});
+      await assertFails(write(out,rech));
+      await assertFails(write(host,{...rech,declined:'host'}));
+      await assertSucceeds(write(guest,rech));
+      await assertSucceeds(arch(host,'host'));
+      }
+    await env.clearFirestore();
+    await assertSucceeds(write(host,Object.assign(R.create('host','Ana',2),{invitedUid:'guest',invitedName:'Bea'})));
+    await assertSucceeds(write(host,inv));
     // Aceptar y rendirse
     const dentro=R.reduce(inv,'guest',{type:'join',name:'Bea'});
     await assertSucceeds(write(guest,dentro));

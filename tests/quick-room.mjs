@@ -60,6 +60,7 @@ console.log('Sala de Retos: capacidad, identidad, turnos, revisiones, inmutabili
   const duelRounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
   let d=R.create('a','Ana',2);d.invitedUid='b';d.invitedName='Beto';
   d=R.reduce(d,'a',{type:'start',rounds:duelRounds,kind:'duel',keep:true});
+  const d0=JSON.parse(JSON.stringify(d));
   assert.throws(()=>R.reduce(d,'z',{type:'join',name:'Zoe'}),/otra persona/,'un reto dirigido solo lo acepta quien lo recibe');
   assert.throws(()=>R.reduce(d,'a',{type:'resign'}),/rendir/,'solo se rinde con el amigo dentro');
   d=R.reduce(d,'b',{type:'join',name:'Beto'});
@@ -68,6 +69,13 @@ console.log('Sala de Retos: capacidad, identidad, turnos, revisiones, inmutabili
   assert.throws(()=>R.reduce(r,'a',{type:'place',cardId:'poker-2',index:1}));
   assert.throws(()=>R.reduce(d,'z',{type:'resign'}));
   assert.throws(()=>R.validate({...d,resigned:'z'}));
+  // Rechazar el reto: el duelo se cierra y a quien retó le sale cancelado
+  const rech=R.reduce(d0,'b',{type:'decline'});
+  assert.equal(rech.phase,'finished');assert.equal(rech.declined,'b');assert.equal(rech.actor,'a');
+  assert.throws(()=>R.reduce(rech,'b',{type:'join',name:'Beto'}));
+  assert.throws(()=>R.reduce(d0,'a',{type:'decline'}),/rechazar/);
+  assert.throws(()=>R.reduce(d0,'z',{type:'decline'}),/rechazar/);
+  assert.throws(()=>R.validate({...d0,declined:'z'}));
   const m=R.reduce(R.reduce(R.create('a','Ana',4),'b',{type:'join',name:'Bea'}),'a',{type:'start',rounds:duelRounds,kind:'network'});
   assert.throws(()=>R.reduce(m,'b',{type:'resign'}),/rendir/,'las mesas de varios no tienen rendirse');
 }

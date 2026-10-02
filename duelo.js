@@ -477,6 +477,9 @@
     const unidad = "aciertos";
     const marcadorTexto = `Tú ${mios} · ${rival} ${suyos} ${unidad}`;
     const invitado = partida.status === "waiting" && partida.invitedUid === yo;
+    // Quien crea el duelo juega primero, antes de que entre el rival.
+    const creadorEmpieza = partida.status === "waiting" && (partida.playersOrder || []).length === 1 && partida.playersOrder[0] === yo && !partida.turnIndex && !partida.starter;
+    if (creadorEmpieza) return { grupo: "tu-turno", rival, estado: "Te toca", detalle: `Carta 1 de ${total} · empiezas tú`, marcador: "", pendiente: true };
     if (partida.status === "playing") {
       const mio = partida.turnUid === yo;
       return { grupo: mio ? "tu-turno" : "su-turno", rival, estado: mio ? "Te toca" : `Turno de ${rival}`,
@@ -485,7 +488,7 @@
     if (partida.status === "waiting") {
       return invitado
         ? { grupo: "retado", rival, estado: `${rival} te ha retado`, detalle: "Acéptalo para empezar", marcador: "", pendiente: true }
-        : { grupo: "enviada", rival, estado: `Esperando a que ${rival} acepte`, detalle: "Invitación enviada", marcador: "", pendiente: false };
+        : { grupo: "enviada", rival, estado: partida.invitedUid ? `Esperando a que ${rival} acepte` : "Esperando a que tu rival abra el enlace", detalle: partida.turnIndex ? `Ya has jugado · carta ${carta} de ${total}` : "Invitación enviada", marcador: "", pendiente: false };
     }
     const estado = partida.status === "resigned" ? (partida.winnerUid === yo ? "Ganaste: tu rival se rindió" : "Te rendiste")
       : partida.status === "expired" ? "Caducado por inactividad"

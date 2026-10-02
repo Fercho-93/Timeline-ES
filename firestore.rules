@@ -14,10 +14,11 @@ service cloud.firestore {
     // únicamente durante su turno; todos reconstruyen el marcador con el mismo motor.
     match /quickRooms/{code} {
       function valid(d) {
-        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','invitedUid','invitedName','resigned','updatedAt'])
+        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','invitedUid','invitedName','resigned','declined','updatedAt'])
           && (!('invitedUid' in d.keys()) || (d.invitedUid is string && d.invitedUid.size() > 0 && d.invitedUid.size() <= 128 && d.invitedUid != d.host))
           && (!('invitedName' in d.keys()) || (d.invitedName is string && d.invitedName.size() <= 24))
           && (!('resigned' in d.keys()) || d.resigned in d.members)
+          && (!('declined' in d.keys()) || d.declined == d.get('invitedUid', ''))
           && d.version == 1 && d.capacity is int && d.capacity >= 2 && d.capacity <= 8 && d.host is string && d.catalog is int
           && d.members is list && d.members.size() >= 1 && d.members.size() <= d.capacity
           && d.members.toSet().size() == d.members.size() && d.members[0] == d.host
@@ -61,6 +62,13 @@ service cloud.firestore {
           && a.config != null && a.config.get('kind','') == 'duel' && request.auth.uid in a.members
           && b.diff(a).affectedKeys().hasOnly(['resigned','phase','actor','revision','updatedAt'])
           && b.resigned == request.auth.uid && b.phase == 'finished' && b.actor == b.host && b.commands == a.commands;
+      }
+      // Rechazar un reto dirigido sin haberlo aceptado: el duelo queda cerrado.
+      function declining(a,b) {
+        return request.auth.uid == a.get('invitedUid', '') && !(request.auth.uid in a.members) && a.config != null
+          && a.phase in ['turn','result','round-end'] && a.get('matchmaking','private') != 'public'
+          && b.diff(a).affectedKeys().hasOnly(['declined','phase','actor','revision','updatedAt'])
+          && b.declined == request.auth.uid && b.phase == 'finished' && b.actor == b.host && b.commands == a.commands;
       }
       // Dejar una mesa pública antes de empezar. Si se va quien la llevaba, la lleva quien
       // queda primero (la única vez que cambia `host`).
@@ -111,12 +119,12 @@ service cloud.firestore {
       allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && valid(request.resource.data)
         && request.resource.data.host==request.auth.uid && request.resource.data.members==[request.auth.uid]
         && (!('invitedUid' in request.resource.data.keys()) || !blocked(request.auth.uid, request.resource.data.invitedUid))
-        && !('resigned' in request.resource.data.keys())
+        && !('resigned' in request.resource.data.keys()) && !('declined' in request.resource.data.keys())
         && request.resource.data.config==null && request.resource.data.commands==[]
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
-        && (joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
+        && (joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host;
     }
 
@@ -201,13 +209,16 @@ service cloud.firestore {
           && source.playersOrder.size() == 2
           && request.auth.uid in source.playersOrder && d.invitedUid in source.playersOrder
           && d.mode == source.mode && d.kind == source.kind
+          // La revancha la abre quien no abrió el duelo anterior: si el que reta lo abrió, empieza el rival.
+          && d.get('starter', 0) == (source.playersOrder[source.get('starter', 0)] == request.auth.uid ? 1 : 0)
           && (duelId == 'direct-' + d.sourceDuel + '-' + request.auth.uid
             || (d.invitationRound is int && d.invitationRound >= 0 && d.invitationRound < 1000 && source.seed.size() <= 64
               && duelId == 'invite-' + source.seed + '-' + request.auth.uid + '-' + string(d.invitationRound)));
       }
       function validCreate() {
-        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound'])
+        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound','starter'])
           && (!('invitedUid' in request.resource.data) || validInvitation())
+          && (!('starter' in request.resource.data) || request.resource.data.starter == 0 || ('invitedUid' in request.resource.data && request.resource.data.starter == 1))
           && request.resource.data.playersOrder == [request.auth.uid]
           && request.resource.data.turnUid == null
           && request.resource.data.status == 'waiting'
@@ -235,57 +246,94 @@ service cloud.firestore {
         && request.resource.data.winnerUid in resource.data.playersOrder && request.resource.data.winnerUid != request.auth.uid
         && request.resource.data.updatedAt == request.time
         && request.resource.data.resultText is string && request.resource.data.resultText.size() <= 160;
-      allow update: if (member() || (registered() && resource.data.status == 'waiting' && !(request.auth.uid in resource.data.playersOrder)))
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
-        && (
-          (resource.data.status == 'waiting' && request.auth.uid != resource.data.playersOrder[0]
-            && !blocked(request.auth.uid, resource.data.playersOrder[0])
-            && (!('invitedUid' in resource.data) || invited())
-            && request.time < resource.data.updatedAt + duration.value(7, 'd')
-            && request.resource.data.playersOrder.size() == 2
-            && request.resource.data.playersOrder[0] == resource.data.playersOrder[0]
-            && request.resource.data.playersOrder[1] == request.auth.uid
-            && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid])
-            && request.resource.data.scores.diff(resource.data.scores).affectedKeys().hasOnly([request.auth.uid])
-            && request.resource.data.scores[request.auth.uid] == 0
-            && request.resource.data.status == 'playing'
-            && request.resource.data.turnUid == request.resource.data.playersOrder[0]
-            && (request.resource.data.timeline == resource.data.timeline
-              || (resource.data.kind == 'orden' && resource.data.timeline.size() == 0 && request.resource.data.timeline.size() == 1))
-            && request.resource.data.turnIndex == 0)
-          ||
-          (resource.data.status == 'playing' && resource.data.turnUid == request.auth.uid
-            && request.resource.data.playersOrder == resource.data.playersOrder
-            && request.resource.data.players == resource.data.players
-            && request.resource.data.plays.removeAll([request.resource.data.plays[resource.data.turnIndex]]) == resource.data.plays
-            && request.time < resource.data.updatedAt + duration.value(7, 'd')
-            && request.resource.data.turnIndex == resource.data.turnIndex + 1
-            && request.resource.data.plays.size() == resource.data.plays.size() + 1
-            && request.resource.data.plays[resource.data.turnIndex].uid == request.auth.uid
-            && request.resource.data.plays[resource.data.turnIndex].cardId is int
-            && request.resource.data.scores.diff(resource.data.scores).affectedKeys().hasOnly([request.auth.uid])
+      // La actualización de un duelo se reparte en tres reglas (entrar el rival, primera carta de quien crea, jugada normal):
+      // juntas pasan del límite de expresiones que Firestore evalúa por regla.
+      function joinOk() {
+        let d = request.resource.data; let r = resource.data;
+        return (r.status == 'waiting' && request.auth.uid != r.playersOrder[0]
+            && !blocked(request.auth.uid, r.playersOrder[0])
+            && (!('invitedUid' in r) || invited())
+            && request.time < r.updatedAt + duration.value(7, 'd')
+            && d.playersOrder.size() == 2
+            && d.playersOrder[0] == r.playersOrder[0]
+            && d.playersOrder[1] == request.auth.uid
+            && d.players.diff(r.players).affectedKeys().hasOnly([request.auth.uid])
+            && d.scores.diff(r.scores).affectedKeys().hasOnly([request.auth.uid])
+            && d.scores[request.auth.uid] == 0
+            && d.status == 'playing'
+            && d.turnUid == d.playersOrder[(r.turnIndex + r.get('starter', 0)) % 2]
+            && d.plays == r.plays
+            && (d.timeline == r.timeline
+              || (r.kind == 'orden' && r.timeline.size() == 0 && d.timeline.size() == 1))
+            && d.turnIndex == r.turnIndex);
+      }
+      function creatorOk() {
+        let d = request.resource.data; let r = resource.data; let me = request.auth.uid; let p = d.plays[0]; let s1 = d.scores[me]; let s0 = r.scores[me];
+        return (r.status == 'waiting' && member() && me == r.playersOrder[0]
+            && r.playersOrder.size() == 1 && r.get('starter', 0) == 0 && r.turnIndex == 0
+            && d.status == 'waiting' && d.turnUid == null
+            && d.playersOrder == r.playersOrder
+            && d.players == r.players
+            && request.time < r.updatedAt + duration.value(7, 'd')
+            && d.turnIndex == 1 && d.plays.size() == 1
+            && p.uid == me && p.cardId is int
+            && d.scores.diff(r.scores).affectedKeys().hasOnly([me])
             && (
-              (resource.data.kind == 'orden'
-                && request.resource.data.plays[resource.data.turnIndex].index is int
-                && ((request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid]
-                      && request.resource.data.timeline == resource.data.timeline)
-                  || (request.resource.data.scores[request.auth.uid] == resource.data.scores[request.auth.uid] + 1
-                      && (request.resource.data.timeline.size() == resource.data.timeline.size() + 1
-                        || (resource.data.timeline.size() == 0 && request.resource.data.timeline.size() == 2)))))
+              (r.kind == 'orden' && p.index is int
+                && ((s1 == s0
+                      && d.timeline == r.timeline)
+                  || (s1 == s0 + 1
+                      && (d.timeline.size() == r.timeline.size() + 1
+                        || (r.timeline.size() == 0 && d.timeline.size() == 2)))))
               ||
-              (resource.data.kind == 'cifras'
-                && request.resource.data.plays[resource.data.turnIndex].respuesta is number
-                && request.resource.data.plays[resource.data.turnIndex].points is int
-                && request.resource.data.timeline == resource.data.timeline
-                && request.resource.data.scores[request.auth.uid] >= resource.data.scores[request.auth.uid]
-                && request.resource.data.scores[request.auth.uid] <= resource.data.scores[request.auth.uid] + 100)
+              (r.kind == 'cifras' && p.respuesta is number
+                && p.points is int && d.timeline == r.timeline
+                && s1 >= s0
+                && s1 <= s0 + 100)));
+      }
+      function playOk() {
+        let d = request.resource.data; let r = resource.data; let me = request.auth.uid; let i = r.turnIndex; let p = d.plays[i]; let s1 = d.scores[me]; let s0 = r.scores[me];
+        return (r.status == 'playing' && r.turnUid == me
+            && d.playersOrder == r.playersOrder
+            && d.players == r.players
+            && d.plays.removeAll([p]) == r.plays
+            && request.time < r.updatedAt + duration.value(7, 'd')
+            && d.turnIndex == i + 1
+            && d.plays.size() == r.plays.size() + 1
+            && p.uid == me
+            && p.cardId is int
+            && d.scores.diff(r.scores).affectedKeys().hasOnly([me])
+            && (
+              (r.kind == 'orden'
+                && p.index is int
+                && ((s1 == s0
+                      && d.timeline == r.timeline)
+                  || (s1 == s0 + 1
+                      && (d.timeline.size() == r.timeline.size() + 1
+                        || (r.timeline.size() == 0 && d.timeline.size() == 2)))))
+              ||
+              (r.kind == 'cifras'
+                && p.respuesta is number
+                && p.points is int
+                && d.timeline == r.timeline
+                && s1 >= s0
+                && s1 <= s0 + 100)
             )
-            && ((request.resource.data.turnIndex == resource.data.total
-                  && request.resource.data.status == 'finished' && request.resource.data.turnUid == null)
-                || (request.resource.data.turnIndex < resource.data.total
-                  && request.resource.data.status == 'playing'
-                  && request.resource.data.turnUid == resource.data.playersOrder[request.resource.data.turnIndex % 2])))
-        );
+            && ((d.turnIndex == r.total
+                  && d.status == 'finished' && d.turnUid == null)
+                || (d.turnIndex < r.total
+                  && d.status == 'playing'
+                  && d.turnUid == r.playersOrder[(d.turnIndex + r.get('starter', 0)) % 2])));
+      }
+      allow update: if registered() && !(request.auth.uid in resource.data.playersOrder)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
+        && joinOk();
+      allow update: if member()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
+        && creatorOk();
+      allow update: if member()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playersOrder','players','status','turnIndex','turnUid','plays','timeline','scores','updatedAt','resultText'])
+        && playOk();
       allow delete: if false;
     }
     function owner(uid) { return registered() && request.auth.uid == uid; }

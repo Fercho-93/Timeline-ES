@@ -93,7 +93,7 @@ try {
   await assertFails(updateDoc(doc(creator, 'turnDuels', duelId), { status: 'playing', turnUid: 'creator' }));
   await assertSucceeds(getDoc(doc(creator, 'turnDuels', duelId)));
   const directId = `direct-${duelId}-creator`;
-  const direct = { id: directId, sourceDuel: duelId, invitedUid: 'guest', invitedAlias: 'Bea', mode: 'history', kind: 'orden', seed: 'fresh', total: 15, turnIndex: 0, turnUid: null, playersOrder: ['creator'], players: { creator: { alias: 'Ana' } }, status: 'waiting', plays: [], timeline: [1], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  const direct = { id: directId, sourceDuel: duelId, invitedUid: 'guest', invitedAlias: 'Bea', starter: 1, mode: 'history', kind: 'orden', seed: 'fresh', total: 15, turnIndex: 0, turnUid: null, playersOrder: ['creator'], players: { creator: { alias: 'Ana' } }, status: 'waiting', plays: [], timeline: [1], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   await assertSucceeds(runTransaction(creator, async tx => { const ref = doc(creator, 'turnDuels', directId); await tx.get(ref); tx.set(ref, direct); }));
   await assertSucceeds(getDoc(doc(guest, 'turnDuels', directId)));
   await assertFails(getDoc(doc(outsider, 'turnDuels', directId)));
@@ -101,7 +101,7 @@ try {
   await assertSucceeds(getDocs(query(collection(creator, 'turnDuels'), where('playersOrder', 'array-contains', 'creator'))));
   await assertFails(setDoc(doc(creator, 'turnDuels', 'bad-invitation'), { ...direct, id: 'bad-invitation', invitedUid: 'outsider' }));
   await assertFails(updateDoc(doc(creator, 'turnDuels', directId), { remindedTurn: 'waiting:0' }));
-  const accept = { playersOrder: ['creator', 'guest'], players: { creator: { alias: 'Ana' }, guest: { alias: 'Bea' } }, scores: { creator: 0, guest: 0 }, status: 'playing', turnUid: 'creator', updatedAt: serverTimestamp() };
+  const accept = { playersOrder: ['creator', 'guest'], players: { creator: { alias: 'Ana' }, guest: { alias: 'Bea' } }, scores: { creator: 0, guest: 0 }, status: 'playing', turnUid: 'guest', updatedAt: serverTimestamp() };
   await assertFails(updateDoc(doc(outsider, 'turnDuels', directId), accept));
   await assertSucceeds(updateDoc(doc(guest, 'turnDuels', directId), accept));
   const boundedId = 'invite-abc123-creator-0';
@@ -122,6 +122,37 @@ try {
   await assertSucceeds(updateDoc(doc(guest, 'turnDuels', declineId), { ...cancellation, closedBy: 'guest' }));
   await env.withSecurityRulesDisabled(async ctx => updateDoc(doc(ctx.firestore(), 'turnDuels', directId), { updatedAt: Timestamp.fromMillis(Date.now() - 8 * 86400000) }));
   await assertFails(updateDoc(doc(creator, 'turnDuels', directId), { turnIndex: 1, turnUid: 'guest', plays: [{ uid: 'creator', cardId: 2, index: 0, correct: false }], updatedAt: serverTimestamp() }));
+  await assertSucceeds(deleteDoc(doc(guest, 'duelPreferences', 'guest', 'blocked', 'creator')));
+  // Quien crea el duelo juega primero, antes de que entre el rival, y la revancha la abre quien no abrió el anterior.
+  {
+    const firstId = 'first-play-duel', base = { id: firstId, mode: 'history', kind: 'orden', seed: 's1', total: 15, turnIndex: 0, turnUid: null, playersOrder: ['creator'], players: { creator: { alias: 'Ana' } }, status: 'waiting', plays: [], timeline: [1], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(creator, 'turnDuels', firstId), base));
+    const first = (uid, extra = {}) => ({ plays: [{ uid, cardId: 2, index: 0, correct: false, at: Timestamp.now() }], timeline: [1], scores: { creator: 0 }, turnIndex: 1, turnUid: null, status: 'waiting', updatedAt: serverTimestamp(), resultText: null, ...extra });
+    await assertFails(updateDoc(doc(guest, 'turnDuels', firstId), first('guest')));
+    await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), first('creator', { turnIndex: 2 })));
+    await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), first('creator', { scores: { creator: 5 } })));
+    await assertSucceeds(updateDoc(doc(creator, 'turnDuels', firstId), first('creator')));
+    await assertFails(updateDoc(doc(creator, 'turnDuels', firstId), { ...first('creator'), plays: [...[{ uid: 'creator', cardId: 2, index: 0, correct: false }, { uid: 'creator', cardId: 3, index: 0, correct: false }]], turnIndex: 2 }));
+    const join = (turnUid, extra = {}) => ({ playersOrder: ['creator', 'guest'], players: { creator: { alias: 'Ana' }, guest: { alias: 'Bea' } }, scores: { creator: 0, guest: 0 }, status: 'playing', turnUid, updatedAt: serverTimestamp(), ...extra });
+    await assertFails(updateDoc(doc(guest, 'turnDuels', firstId), join('creator')));
+    await assertFails(updateDoc(doc(guest, 'turnDuels', firstId), join('guest', { plays: [] })));
+    await assertSucceeds(updateDoc(doc(guest, 'turnDuels', firstId), join('guest')));
+    await assertSucceeds(runTransaction(guest, async transaction => {
+      const ref = doc(guest, 'turnDuels', firstId), game = (await transaction.get(ref)).data();
+      transaction.update(ref, { plays: [...game.plays, { uid: 'guest', cardId: 3, index: 1, correct: true, at: Timestamp.now() }], timeline: [1, 3], scores: { ...game.scores, guest: 1 }, turnIndex: 2, turnUid: 'creator', status: 'playing', updatedAt: serverTimestamp(), resultText: null });
+    }));
+    // Revancha: la reta quien abrió el anterior → empieza el rival; la reta quien no lo abrió → empieza quien reta.
+    const rematch = (uid, id, extra) => ({ id, sourceDuel: firstId, invitedUid: uid === 'creator' ? 'guest' : 'creator', invitedAlias: 'X', mode: 'history', kind: 'orden', seed: 's1', total: 15, invitationRound: 0, turnIndex: 0, turnUid: null, playersOrder: [uid], players: { [uid]: { alias: 'Y' } }, status: 'waiting', plays: [], timeline: [1], scores: { [uid]: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...extra });
+    await assertFails(setDoc(doc(creator, 'turnDuels', 'invite-s1-creator-0'), rematch('creator', 'invite-s1-creator-0', { starter: 0 })));
+    await assertFails(setDoc(doc(creator, 'turnDuels', 'invite-s1-creator-0'), rematch('creator', 'invite-s1-creator-0')));
+    await assertSucceeds(setDoc(doc(creator, 'turnDuels', 'invite-s1-creator-0'), rematch('creator', 'invite-s1-creator-0', { starter: 1 })));
+    await assertFails(setDoc(doc(guest, 'turnDuels', 'invite-s1-guest-0'), rematch('guest', 'invite-s1-guest-0', { starter: 1 })));
+    await assertSucceeds(setDoc(doc(guest, 'turnDuels', 'invite-s1-guest-0'), rematch('guest', 'invite-s1-guest-0', { starter: 0 })));
+    // Con starter 1 quien crea no juega primero; al aceptar, empieza quien acepta.
+    await assertFails(updateDoc(doc(creator, 'turnDuels', 'invite-s1-creator-0'), first('creator')));
+    await assertFails(updateDoc(doc(guest, 'turnDuels', 'invite-s1-creator-0'), join('creator', { plays: [] })));
+    await assertSucceeds(updateDoc(doc(guest, 'turnDuels', 'invite-s1-creator-0'), join('guest', { players: { creator: { alias: 'Y' }, guest: { alias: 'Bea' } } })));
+  }
   console.log('OK: link and direct invitations, private access, acceptance, decline, listing, closure and inactivity enforcement.');
 } finally {
   await env.cleanup();
