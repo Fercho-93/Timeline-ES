@@ -1,5 +1,5 @@
 import {auth, db} from './firebase-client.js';
-import {collection, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import {collection, deleteDoc, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
@@ -102,12 +102,30 @@ export async function mine(){
   await auth.authStateReady();
   const uid=auth.currentUser?.uid;
   if(!uid)throw Error('Sin perfil todavía.');
-  const snaps=await getDocs(query(collection(db,'quickRooms'),where('members','array-contains',uid)));
+  // Las tuyas y los retos que te han mandado (todavía sin aceptar), como en los duelos de las colecciones.
+  const [mineSnap,invitedSnap]=await Promise.all([
+    getDocs(query(collection(db,'quickRooms'),where('members','array-contains',uid))),
+    getDocs(query(collection(db,'quickRooms'),where('invitedUid','==',uid)))
+  ]);
+  const docs=[...new Map([...mineSnap.docs,...invitedSnap.docs].map(d=>[d.id,d])).values()];
   const found=[];
-  for(const d of snaps.docs){try{found.push({code:d.id,room:{...R.validate(d.data()),updatedAt:d.data().updatedAt?.seconds||0},uid});}catch{/* sala dañada: no se enseña */}}
+  for(const d of docs){try{found.push({code:d.id,room:{...R.validate(d.data()),updatedAt:d.data().updatedAt?.seconds||0},uid});}catch{/* sala dañada: no se enseña */}}
   return found;
 }
-export async function connect({code, name, create=false, capacity=4, onChange, onError}) {
+// Cancela una invitación que aún nadie ha aceptado: se borra la sala.
+export async function cancelRoom(code){
+  await auth.authStateReady();
+  await deleteDoc(doc(db,'quickRooms',String(code||'').toUpperCase()));
+}
+// Una jugada suelta sobre una sala en la que estás (rendirse desde la lista de duelos, sin abrirla).
+export async function actOnce(code,action){
+  await auth.authStateReady();
+  const uid=auth.currentUser?.uid;
+  if(!uid)throw Error('Sin perfil todavía.');
+  const ref=doc(db,'quickRooms',String(code||'').toUpperCase());
+  await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La sala ya no existe.');tx.update(ref,{...R.reduce(snap.data(),uid,action),updatedAt:serverTimestamp()});});
+}
+export async function connect({code, name, create=false, capacity=4, invite=null, onChange, onError}) {
   await auth.authStateReady();
   const uid=auth.currentUser?.uid;
   if(!uid) throw Error('Espera a que se prepare tu perfil e inténtalo de nuevo.');
@@ -119,7 +137,7 @@ export async function connect({code, name, create=false, capacity=4, onChange, o
     const snap=await tx.get(ref);
     if(create) {
       if(snap.exists())throw Error('Ese código ya existe. Vuelve a crear la sala.');
-      tx.set(ref,{...R.create(uid,name,capacity),catalog:CT.QuickNetwork.fingerprint(),updatedAt:serverTimestamp()});
+      tx.set(ref,{...R.create(uid,name,capacity),...(invite?.uid?{invitedUid:String(invite.uid).slice(0,128),invitedName:String(invite.name||'').slice(0,24)}:{}),catalog:CT.QuickNetwork.fingerprint(),updatedAt:serverTimestamp()});
     } else {
       if(!snap.exists())throw Error('No se encuentra esta sala.');
       const room=snap.data();

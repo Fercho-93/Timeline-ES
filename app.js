@@ -14,6 +14,7 @@
   const pushReady = import('./push.js').catch(() => null);
   const { escapeHtml, initials, shuffle, announce, seedFrom, seededRandom, shuffleWith } = CT;
   pushReady.then(module => module?.start?.());
+  window.addEventListener('continuum:duels-list', () => duelsView());
   window.addEventListener('continuum:turn-duel-open', event => turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: event.detail?.duelId, back: home })));
   // Pintar pasa por aquí para que el foco del teclado no se pierda en cada jugada.
   let playReturn = 'play-menu';
@@ -702,7 +703,7 @@
     Promise.all([turnDuelReady.then(() => CT.TurnDuel?.list?.() || []), quickDuels]).then(([partidas, quick]) => {
       if (!box.isConnected || screen !== "home") return;
       pendingDuels = CT.TurnDuel.pending?.(partidas) || [];
-      const quickTurn = quick.filter(x => x.pendiente).length;
+      const quickTurn = CT.TurnDuel.pendingQuick?.(quick).length || 0;
       const n = pendingDuels.length + quickTurn;
       if (!n) return;
       const turnos = pendingDuels.filter(g => g.status === "playing").length + quickTurn, retos = n - turnos;
@@ -2535,10 +2536,10 @@
         ${enCifras ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-cifras">Continuar ${contra(enCifras) ? `el duelo contra ${escapeHtml(contra(enCifras))}` : "tu duelo de cifras"} <span>→</span></button>` : ""}
         <button class="btn ${enCifras ? "btn-secondary" : "btn-primary"} btn-block" style="margin-top:10px" data-action="start-cifras">${enCifras ? "Empezar otro" : "Crear un duelo de cifras"} <span>→</span></button>`) : ""}
       ${bloque("turnos-orden", `<div class="duel-brief"><p>Colocad una carta cada vez, desde vuestro propio móvil. Recibirás un aviso cuando el rival juegue.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos para responder en cada turno · Si sales de la pantalla, el turno queda protegido.</span></p></div>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Sin límite de tiempo: respondes cuando te toque, con calma.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`)}
       ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Responded una cifra cada vez, desde vuestro propio móvil. El rival recibe un aviso al terminar tu turno.</p>
-        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>15 segundos para responder en cada turno · La respuesta queda cerrada si sales de la pantalla.</span></p></div>
+        <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Sin límite de tiempo: respondes cuando te toque, con calma.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
       <div class="field duel-identity-field">
         <label for="duel-name">Tu nombre de perfil</label>
@@ -3239,7 +3240,7 @@
         <h1 data-focus tabindex="-1" class="duelo-listo-titulo">${cifrasEsta ? "Escribir la cifra" : "Ordenar las cartas"}</h1>
         ${demoMarkup(cifrasEsta)}
         <ul class="duelo-reglas">${reglas.map(linea => `<li>${linea}</li>`).join("")}</ul>
-        <p class="solo-intro-rule">${enTurnos ? "15 segundos para responder en cada turno · Si sales de la pantalla, el turno queda protegido." : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.`}</p>
+        <p class="solo-intro-rule">${enTurnos ? "Sin límite de tiempo: respondes cuando te toque, con calma." : `${plazo} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se ${cifrasEsta ? "cierra" : "da por fallada"}.`}</p>
         ${rival ? `<div class="solo-stats" style="grid-template-columns:1fr"><span><b>${cifrasEsta ? `${rival.aciertos} de ${duel.total}` : `${rival.hits} de ${duel.total}`}</b><small>la marca de ${escapeHtml(rival.nombre || "quien te reta")}</small></span></div>` : ""}
         <button class="btn btn-primary btn-block duelo-jugar" data-action="duel-play">JUGAR <span>→</span></button>
       </div></section>
@@ -3961,8 +3962,20 @@
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
     else if (action === "open-quick-duel") { CT.Quick.openRoom((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView).catch(() => showToast('No se pudo abrir el duelo. Comprueba tu conexión.')); }
+    else if (action === "rematch-quick-duel" || action === "challenge-quick-rival") {
+      target.disabled = true;
+      CT.Quick.challenge((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView)
+        .catch(error => showToast(error?.message || 'No se pudo enviar el reto.')).finally(() => { target.disabled = false; });
+    }
+    else if (action === "close-quick-duel") {
+      const cancel = target.dataset.mode === 'cancel';
+      if (!window.confirm(cancel ? '¿Cancelar esta invitación? No contará como derrota.' : '¿Rendirte? Tu rival ganará esta partida. Se conservará en el historial.')) return;
+      target.disabled = true;
+      (cancel ? CT.Quick.cancelInvitation(target.dataset.quickCode) : CT.Quick.resignDuel(target.dataset.quickCode))
+        .then(() => { showToast('Partida actualizada'); duelsRefresh(); }).catch(() => { target.disabled = false; showToast('No se pudo actualizar el duelo. Puede haber cambiado: revisa la lista.'); });
+    }
+    else if (action === "reshare-quick-duel") { Promise.resolve(CT.Quick.reshare(target.dataset.quickCode)).catch(() => showToast('No se pudo compartir el enlace.')); }
     else if (action === "open-turn-duel") { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back })); }
-    else if (action === 'next-turn-duel') { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.next(back)).catch(() => showToast('No se pudieron consultar tus duelos.')); }
     else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); duelsRefresh(); }
     else if (action === 'rematch-turn-duel') { target.disabled = true; const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.challenge(target.dataset.turnId, back)).catch(() => showToast('No se pudo enviar la invitación.')).finally(() => { target.disabled = false; }); }
     else if (action === "close-turn-duel") {

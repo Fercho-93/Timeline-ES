@@ -45,21 +45,17 @@ const game = (id, extra = {}) => ({ id, mode: 'history', kind: 'orden', status: 
 try {
   games.set('one', game('one'));
   t.show(clone(games.get('one')));
-  assert.equal(t.awaiting(), true);
-  assert.equal(t.deadline(), 0);
-  assert.equal(w.document.querySelector('.hand-card'), null);
-  await t.place(1);
-  assert.equal(writes, 0, 'cannot play before ready');
-  t.ready(); const deadline = t.deadline();
-  t.ready(); assert.equal(t.deadline(), deadline, 'repeated ready cannot extend time');
-  assert.equal(w.document.querySelector('.hand-card'), null, 'card hidden during countdown');
+  // Sin reloj: la carta está lista nada más entrar, sin pantalla de «Estoy listo» ni cuenta atrás.
+  assert.equal(t.awaiting(), false);
+  assert.ok(w.document.querySelector('.hand-card'), 'la carta se ve al entrar');
+  assert.equal(w.document.querySelector('.turn-duel-clock'), null, 'no hay reloj');
+  assert.equal(w.document.querySelector('.turn-duel-ready'), null);
   now += 4000;
-  t.refresh();
-  assert.ok(w.document.querySelector('.hand-card'));
   offline = true;
   await t.place(1);
   const saved = clone(t.pendingMove('one'));
-  assert.equal(saved.ms, 1000);
+  assert.equal(saved.ms, 4000);
+  assert.equal(saved.timeout, false);
   assert.equal(saved.index, 1);
   assert.equal(writes, 0);
   await t.place(0);
@@ -67,12 +63,11 @@ try {
   assert.equal(w.document.querySelector('.hand-card'), null);
   now += 20000;
   t.restore(clone(games.get('one')));
-  assert.equal(t.deadline(), deadline, 'reload retains original deadline');
   assert.equal(w.document.querySelector('.hand-card'), null, 'reload with outbox does not reveal card');
   offline = false; loseAck = true;
   await t.retryPending();
   assert.equal(writes, 1);
-  assert.equal(games.get('one').plays[0].ms, 1000, 'retry preserves answer time');
+  assert.equal(games.get('one').plays[0].ms, 4000, 'retry preserves answer time');
   assert.equal(games.get('one').scores.me, 1);
   assert.ok(t.pendingMove('one'), 'lost acknowledgement retains pending operation');
   games.set('other', game('other'));
@@ -87,12 +82,13 @@ try {
   t.show({ ...clone(games.get('one')), plays: [{ uid: 'them', cardId: 2, index: 0, correct: false }], timeline: [1], status: 'playing', turnUid: 'me' });
   assert.match(w.document.querySelector('.turn-duel-solution').textContent, /Debía ir después/);
   games.set('late', game('late'));
-  t.show(clone(games.get('late'))); t.ready(); now += 19000;
+  t.show(clone(games.get('late'))); now += 3600000;
   await t.place(1);
-  assert.equal(games.get('late').plays[0].timeout, true, 'click after deadline is a timeout');
-  assert.equal(games.get('late').scores.me, 0);
+  assert.equal(games.get('late').plays[0].timeout, false, 'tardar horas ya no es un fallo por tiempo');
+  assert.ok(games.get('late').plays[0].ms < 15000, 'ms sigue por debajo del tope antiguo');
+  assert.equal(games.get('late').scores.me, 1);
   games.set('numbers', game('numbers', {kind:'cifras',timeline:[]}));
-  t.show(clone(games.get('numbers'))); t.ready(); now += 4000;
+  t.show(clone(games.get('numbers'))); now += 4000;
   await t.queueMove({respuesta:190});
   t.snapshot(clone(games.get('numbers')));
   assert.match(w.document.querySelector('.turn-duel-solution').textContent, /190 años/);
@@ -113,7 +109,11 @@ try {
   ]);
   assert.equal(JSON.stringify(tabla.map(r => [r.alias, r.wins, r.losses, r.draws])), JSON.stringify([['Mario', 2, 1, 1], ['Lucía', 0, 1, 0]]));
   assert.match(w.CONTINUUM.TurnDuel.standingsMarkup([partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } })]), /Mario[\s\S]*1 duelo[\s\S]*<b class="is-ahead">1<\/b><i>—<\/i><b class="">0<\/b>/);
+  // Los duelos terminados de Retos rápidos cuentan en el mismo cara a cara (y quien solo juega ahí también sale).
+  const conRapidos = w.CONTINUUM.TurnDuel.rivalStandings([partida('m1', 'mario', 'Mario', { status: 'finished', scores: { me: 3, mario: 1 } })], [
+    { done: true, rivalUid: 'mario', rival: 'Mario', result: 'win' }, { done: true, rivalUid: 'zoe', rival: 'Zoe', result: 'loss' }, { done: false, rivalUid: 'zoe', rival: 'Zoe' }]);
+  assert.equal(JSON.stringify(conRapidos.map(r => [r.alias, r.wins, r.losses, r.draws])), JSON.stringify([['Mario', 2, 0, 0], ['Zoe', 0, 1, 0]]));
   games.set('race',game('race'));
   await assert.rejects(t.cancel('race','waiting'), /ha cambiado/);
-  console.log('OK: readiness, persisted deadline, offline recovery, lost acknowledgement, idempotency, navigation, timeout, shared solutions, head-to-head, cancellation race.');
+  console.log('OK: sin reloj ni pantalla de listo, offline recovery, lost acknowledgement, idempotency, navigation, timeout, shared solutions, head-to-head, cancellation race.');
 } finally { dom.window.close(); }

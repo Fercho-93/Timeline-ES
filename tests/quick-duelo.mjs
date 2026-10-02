@@ -130,6 +130,18 @@ assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-duel-pace-v1'), 'turno
   assert.match(by('BBBBBBBBB2').detalle, /^Mazo 1 de 3 · carta \d de 5$/);
   assert.match(by('BBBBBBBBB2').marcador, /^Tú \d · Luis \d aciertos$/);
   assert.equal(by('CCCCCCCCC2').done, true); assert.ok(['win', 'loss', 'draw'].includes(by('CCCCCCCCC2').result));
+  // Reto que te han mandado, y duelo en el que alguien se rindió.
+  const inv = R.create('otro', 'Marta', 2); inv.invitedUid = 'me'; inv.invitedName = 'Tester';
+  const invStarted = R.reduce(inv, 'otro', {type: 'start', rounds: rounds3, kind: 'duel', keep: true});
+  const rendido = R.reduce(joined, 'amigo', {type: 'resign'});
+  CT.QuickNetwork.mine = async () => [{code: 'EEEEEEEEE2', room: invStarted, uid: 'me'}, {code: 'FFFFFFFFF2', room: rendido, uid: 'me'}];
+  const extra = await CT.Quick.duels();
+  const e = code => extra.find(x => x.code === code);
+  assert.equal(e('EEEEEEEEE2').grupo, 'retado'); assert.equal(e('EEEEEEEEE2').rival, 'Marta'); assert.equal(e('EEEEEEEEE2').pendiente, true);
+  assert.equal(e('FFFFFFFFF2').done, true); assert.equal(e('FFFFFFFFF2').result, 'win'); assert.match(e('FFFFFFFFF2').estado, /rindió/);
+  assert.equal(e('FFFFFFFFF2').length, 3); assert.equal(e('FFFFFFFFF2').keep, true);
+  CT.QuickNetwork.mine = async () => rooms.map(x => ({...x, uid: 'me'}));
+  await CT.Quick.duels();
   CT.QuickNetwork.mine = async () => {throw Error('sin conexión');};
   assert.equal((await CT.Quick.duels()).length, 3, 'sin conexión se enseña lo último que se supo');
   assert.equal(CT.Quick.forgetDuel, undefined, 'archivar va con la cuenta (duelPreferences), no con el móvil');

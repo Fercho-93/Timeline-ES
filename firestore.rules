@@ -14,7 +14,10 @@ service cloud.firestore {
     // únicamente durante su turno; todos reconstruyen el marcador con el mismo motor.
     match /quickRooms/{code} {
       function valid(d) {
-        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','updatedAt'])
+        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','invitedUid','invitedName','resigned','updatedAt'])
+          && (!('invitedUid' in d.keys()) || (d.invitedUid is string && d.invitedUid.size() > 0 && d.invitedUid.size() <= 128 && d.invitedUid != d.host))
+          && (!('invitedName' in d.keys()) || (d.invitedName is string && d.invitedName.size() <= 24))
+          && (!('resigned' in d.keys()) || d.resigned in d.members)
           && d.version == 1 && d.capacity is int && d.capacity >= 2 && d.capacity <= 8 && d.host is string && d.catalog is int
           && d.members is list && d.members.size() >= 1 && d.members.size() <= d.capacity
           && d.members.toSet().size() == d.members.size() && d.members[0] == d.host
@@ -45,11 +48,19 @@ service cloud.firestore {
       function joiningStarted(a,b) {
         return a.phase in ['turn','result'] && a.capacity == 2 && a.members.size() == 1 && a.get('matchmaking','private') != 'public'
           && a.config != null && a.config.get('kind','') == 'duel' && !(request.auth.uid in a.members)
+          && a.get('invitedUid', request.auth.uid) == request.auth.uid
           && b.diff(a).affectedKeys().hasOnly(['members','names','config','actor','revision','updatedAt'])
           && b.members == a.members.concat([request.auth.uid])
           && b.names.size() == 2 && b.names == a.names.concat([b.names[1]])
           && b.config.diff(a.config).affectedKeys().hasOnly(['names']) && b.config.names == b.names
           && b.phase == a.phase;
+      }
+      // Rendirse en un duelo por turnos con los dos dentro: el rival gana y el duelo queda terminado.
+      function resigning(a,b) {
+        return a.capacity == 2 && a.members.size() == 2 && a.phase in ['turn','result','round-end'] && a.get('matchmaking','private') != 'public'
+          && a.config != null && a.config.get('kind','') == 'duel' && request.auth.uid in a.members
+          && b.diff(a).affectedKeys().hasOnly(['resigned','phase','actor','revision','updatedAt'])
+          && b.resigned == request.auth.uid && b.phase == 'finished' && b.actor == b.host && b.commands == a.commands;
       }
       // Dejar una mesa pública antes de empezar. Si se va quien la llevaba, la lleva quien
       // queda primero (la única vez que cambia `host`).
@@ -96,14 +107,16 @@ service cloud.firestore {
         // Un duelo por turnos con el sitio del amigo libre se lee con el enlace para poder entrar.
         || (resource.data.capacity==2 && resource.data.members.size()==1 && resource.data.get('matchmaking','private')!='public'));
       // Tus salas (consulta con members array-contains tu uid): la lista unificada de duelos.
-      allow list: if registered() && request.auth.uid in resource.data.members;
+      allow list: if registered() && (request.auth.uid in resource.data.members || resource.data.get('invitedUid','') == request.auth.uid);
       allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && valid(request.resource.data)
         && request.resource.data.host==request.auth.uid && request.resource.data.members==[request.auth.uid]
+        && (!('invitedUid' in request.resource.data.keys()) || !blocked(request.auth.uid, request.resource.data.invitedUid))
+        && !('resigned' in request.resource.data.keys())
         && request.resource.data.config==null && request.resource.data.commands==[]
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
-        && (joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
+        && (joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host;
     }
 
@@ -167,7 +180,7 @@ service cloud.firestore {
       // Un duelo terminado de Retos rápidos se archiva igual; su identificador es el código de la sala.
       function quickArchivable() {
         let room = get(/databases/$(database)/documents/quickRooms/$(gameId)).data;
-        return player in room.members && room.phase == 'finished';
+        return (player in room.members && room.phase == 'finished') || (room.get('invitedUid','') == player && !(player in room.members));
       }
       allow read, delete: if registered() && request.auth.uid == player;
       allow create, update: if registered() && request.auth.uid == player && (archivable() || quickArchivable())

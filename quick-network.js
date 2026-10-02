@@ -34,5 +34,7 @@
   function fingerprint(){return CT.seedFrom(JSON.stringify(CT.QuickCatalog));}
   async function internet(options) {return (await import('./quick-online.js')).connect(options);}
   async function mine() {return (await import('./quick-online.js')).mine();}
-  CT.QuickNetwork={localHost,localGuest,internet,mine,fingerprint};
+  async function actOnce(code, action) {return (await import('./quick-online.js')).actOnce(code, action);}
+  async function cancelRoom(code) {return (await import('./quick-online.js')).cancelRoom(code);}
+  CT.QuickNetwork={localHost,localGuest,internet,mine,cancelRoom,actOnce,fingerprint};
 })();

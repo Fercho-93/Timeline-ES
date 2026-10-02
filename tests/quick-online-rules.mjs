@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
-import {collection,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
+import {collection,deleteDoc,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
 const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
 const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
@@ -142,6 +142,36 @@ try {
     await assertFails(arch(out,'outsider','FINISHEDX2'));
     await assertFails(arch(out,'guest','FINISHEDX2'));
     await assertSucceeds(getDocs(collection(guest,'duelPreferences','guest','archived')));
+  }
+  // Reto dirigido, rendirse y cancelar.
+  {
+    await env.clearFirestore();
+    const rounds3=Array.from({length:3},()=>({id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}));
+    let inv=R.create('host','Ana',2);inv.invitedUid='guest';inv.invitedName='Bea';
+    await assertSucceeds(write(host,inv));
+    inv=R.reduce(inv,'host',{type:'start',rounds:rounds3,kind:'duel',keep:true});
+    await assertSucceeds(write(host,inv));
+    // El invitado ve el reto en su lista; un tercero no.
+    await assertSucceeds(getDocs(query(collection(guest,'quickRooms'),where('invitedUid','==','guest'))));
+    await assertFails(getDocs(query(collection(out,'quickRooms'),where('invitedUid','==','guest'))));
+    {const sin={...inv};delete sin.invitedUid;await assertFails(write(out,{...R.reduce(sin,'outsider',{type:'join',name:'Zoe'}),invitedUid:'guest'}));}
+    // Rechazar = archivarlo sin haberlo aceptado
+    const arch=(db,uid)=>setDoc(doc(db,'duelPreferences',uid,'archived','ABCDEFGH23'),{updatedAt:serverTimestamp()});
+    await assertSucceeds(arch(guest,'guest'));
+    await assertFails(arch(out,'outsider'));
+    // Aceptar y rendirse
+    const dentro=R.reduce(inv,'guest',{type:'join',name:'Bea'});
+    await assertSucceeds(write(guest,dentro));
+    const rendida=R.reduce(dentro,'guest',{type:'resign'});
+    await assertFails(write(out,rendida));
+    await assertFails(write(guest,{...rendida,resigned:'host'}));
+    await assertSucceeds(write(guest,rendida));
+    await assertSucceeds(arch(host,'host'));
+    // Cancelar una invitación sin aceptar: borra quien la creó
+    await env.clearFirestore();
+    {const lob=Object.assign(R.create('host','Ana',2),{invitedUid:'guest',invitedName:'Bea'});await assertSucceeds(write(host,lob));await assertSucceeds(write(host,R.reduce(lob,'host',{type:'start',rounds:rounds3,kind:'duel'})));}
+    await assertFails(deleteDoc(ref(guest)));
+    await assertSucceeds(deleteDoc(ref(host)));
   }
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
 } finally {await env.cleanup();}

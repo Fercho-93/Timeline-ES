@@ -55,4 +55,20 @@ console.log('Sala de Retos: capacidad, identidad, turnos, revisiones, inmutabili
   let m=R.create('a','Ana',2);m=R.reduce(m,'b',{type:'join',name:'Bea'});m=R.reduce(m,'a',{type:'start',rounds:duelRounds,kind:'duel'});
   assert.throws(()=>R.reduce(m,'c',{type:'join',name:'Carla'}));
 }
+// Rendirse y retos dirigidos
+{
+  const duelRounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
+  let d=R.create('a','Ana',2);d.invitedUid='b';d.invitedName='Beto';
+  d=R.reduce(d,'a',{type:'start',rounds:duelRounds,kind:'duel',keep:true});
+  assert.throws(()=>R.reduce(d,'z',{type:'join',name:'Zoe'}),/otra persona/,'un reto dirigido solo lo acepta quien lo recibe');
+  assert.throws(()=>R.reduce(d,'a',{type:'resign'}),/rendir/,'solo se rinde con el amigo dentro');
+  d=R.reduce(d,'b',{type:'join',name:'Beto'});
+  const r=R.reduce(d,'b',{type:'resign'});
+  assert.equal(r.phase,'finished');assert.equal(r.resigned,'b');assert.equal(r.actor,'a');
+  assert.throws(()=>R.reduce(r,'a',{type:'place',cardId:'poker-2',index:1}));
+  assert.throws(()=>R.reduce(d,'z',{type:'resign'}));
+  assert.throws(()=>R.validate({...d,resigned:'z'}));
+  const m=R.reduce(R.reduce(R.create('a','Ana',4),'b',{type:'join',name:'Bea'}),'a',{type:'start',rounds:duelRounds,kind:'network'});
+  assert.throws(()=>R.reduce(m,'b',{type:'resign'}),/rendir/,'las mesas de varios no tienen rendirse');
+}
 console.log('Duelo por turnos: empieza el creador, el amigo entra después y el primer turno alterna: OK');
