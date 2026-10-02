@@ -1,7 +1,7 @@
 {
   "version": "0.1.1",
-  "cache": 564,
+  "cache": 565,
   "platforms": ["android", "ios"],
   "upload_testflight": true,
-  "reason": "Invitaciones de salas y duelos abiertas con el usuario de la app"
+  "reason": "Duelos, sincronización, audio iOS, vibración, artistas e ilustraciones corregidos"
 }

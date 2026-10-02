@@ -135,7 +135,7 @@ function render() {
       ${active && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
       ${finished ? `<p class="turn-duel-status">${safe(current.resultText || 'Gracias por jugar.')}</p>` : ''}
-      ${!active && (finished || nextTargets.length) ? `<div class="turn-duel-actions">${finished && current.playersOrder.length === 2 ? '<button class="btn btn-primary" data-turn-action="rematch">Revancha</button>' : ''}${nextTargets.length ? `<button class="btn btn-secondary" data-turn-action="next" aria-label="Ver tus duelos pendientes">Ver tus duelos pendientes <small>(${nextTargets.length})</small></button>` : ''}${finished && !nextTargets.length ? '<button class="btn btn-secondary" data-turn-action="back">Volver a mis duelos</button>' : ''}</div>` : ''}
+      ${!active && (finished || nextTargets.length) ? `<div class="turn-duel-actions">${finished && current.playersOrder.length === 2 ? '<button class="btn btn-primary" data-turn-action="rematch">Revancha</button>' : ''}${nextTargets.length ? `<button class="btn btn-secondary" data-turn-action="next" aria-label="Ver tus duelos pendientes">Ver tus duelos pendientes <small>(${nextTargets.length})</small></button>` : ''}${finished && !nextTargets.length ? '<button class="btn btn-secondary" data-turn-action="next">Volver a mis duelos</button>' : ''}</div>` : ''}
       ${!finished ? '<p class="hint">Un recordatorio tras 48 horas. Caduca a los 7 días sin actividad.</p>' : ''}
     </section></div>`;
   app.dataset.screen = 'turn-duel';
@@ -159,6 +159,7 @@ async function submitCifra() {
   if (!current || current.kind !== 'cifras') return;
   const value = CT.Duelo.Cifras.leer(current.mode, document.getElementById('turn-cifra-input')?.value || '');
   if (value === null) return notify('Escribe una cifra válida.');
+  CT.Effects?.stamp();
   return queueMove({ respuesta: value });
 }
 const outboxKey = () => `continuum-duel-outbox-${uid()}`;
@@ -271,6 +272,8 @@ function subscribe(gameId) {
     const next = snap.data(); if (!next) return;
     const previousTurn = current?.turnIndex;
     const wasPlayingAway = current?.status === 'playing' && current.turnUid !== uid();
+    const ownPlay=current?.plays && next.plays?.length===current.plays.length+1 ? next.plays.at(-1) : null;
+    if(ownPlay?.uid===uid())CT.Effects?.feedback(next.kind==='cifras'?ownPlay.points>0:ownPlay.correct===true);
     current = asVisible({ ...next, id: gameId, shareLink });
     if (previousTurn !== current.turnIndex) { pendingIndex = null; delivery = ''; }
     prepareTurn();
@@ -352,8 +355,8 @@ function quickRowMarkup(x) {
   // la invitación mientras nadie la ha abierto. Un reto que te han mandado se puede rechazar.
   const acts = x.done ? `${x.rivalUid && x.result ? `<button class="btn btn-ghost" data-action="rematch-quick-duel" data-quick-code="${code}">Revancha</button>` : ''}${archive('Archivar')}`
     : x.grupo === 'retado' ? `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="decline">Rechazar</button>`
-    : x.grupo === 'enviada' ? `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="cancel">Cancelar invitación</button>${x.host ? `<button class="btn btn-ghost" data-action="reshare-quick-duel" data-quick-code="${code}">Reenviar enlace</button>` : ''}`
-    : `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="resign">Rendirse</button>`;
+    : x.canCancel ? `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="cancel">Cancelar invitación</button>${x.host ? `<button class="btn btn-ghost" data-action="reshare-quick-duel" data-quick-code="${code}">Reenviar enlace</button>` : ''}`
+    : x.canResign ? `<button class="btn btn-ghost" data-action="close-quick-duel" data-quick-code="${code}" data-mode="resign">Rendirse</button>` : '';
   const avatar = CT.Avatares?.markup(x.rival, { size: 44, seed: 'quick:' + x.code }) || '';
   return `<div class="turn-duel-profile-row turn-duel-row-${safe(x.grupo)}"><button class="turn-duel-entry${x.pendiente ? ' is-pending' : ''}" data-action="${x.grupo === 'retado' ? 'preview-quick-invite' : 'open-quick-duel'}" data-quick-code="${safe(x.code)}" aria-label="${safe(`${x.rival}, Retos rápidos, ${x.deck}. ${x.estado}. ${x.detalle}. ${x.marcador}`)}"><span class="turn-duel-entry-avatar">${avatar}</span><span class="turn-duel-entry-copy"><b>${safe(x.rival)}</b><small>Retos rápidos · ${safe(x.deck)}</small><span class="turn-duel-entry-state">${safe(x.estado)} <em>· ${safe(x.detalle)}</em></span>${x.marcador ? `<span class="turn-duel-entry-score">${safe(x.marcador)}</span>` : ''}</span><i aria-hidden="true">→</i></button><div class="turn-duel-row-actions">${acts}</div></div>`;
 }
@@ -453,9 +456,10 @@ async function next(back = onBack) {
   open({ gameId: target.id, back });
 }
 function open({ mode = 'history', kind = 'orden', gameId = '', back } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back).catch(() => notify('No se pudo crear el duelo.')); }
-function close() { stop?.(); stop = null; clearInterval(timer); current = null; onBack?.(); }
-document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') place(pendingIndex); if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
-CT.TurnDuel = { open, close, list, cancel, standings };
+function leave() { stop?.(); stop = null; clearInterval(timer); current = null; }
+function close() { leave(); onBack?.(); }
+document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
+CT.TurnDuel = { open, close, leave, list, cancel, standings };
 // Los duelos que esperan algo de quien juega: los suyos en los que le toca y los retos
 // que le han mandado. Es lo que la portada avisa; lo demás se ve en la lista completa.
 function pending(games = cachedGames) {

@@ -5268,3 +5268,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav button { min-width: 0; }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav small { font-size: .62rem; overflow-wrap: anywhere; }
+
+/* El artista se lee también antes de revelar las ventas, sin modificar el tamaño de la carta. */
+#app .quick-shell .quick-card-artist { display: block; margin-top: 2px; font-family: var(--font-body); font-size: .78em; line-height: 1.12; font-weight: 500; color: #675842; }
+#app .quick-shell .hand-card > strong:has(.quick-card-artist) { display: block; -webkit-line-clamp: unset; overflow: visible; }

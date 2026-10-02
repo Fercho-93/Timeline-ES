@@ -115,15 +115,36 @@ export async function mine(){
 // Cancela una invitación que aún nadie ha aceptado: se borra la sala.
 export async function cancelRoom(code){
   await auth.authStateReady();
-  await deleteDoc(doc(db,'quickRooms',String(code||'').toUpperCase()));
+  const ref=doc(db,'quickRooms',String(code||'').toUpperCase());
+  await runTransaction(db,async tx=>{
+    const snap=await tx.get(ref);if(!snap.exists())return;
+    const room=snap.data();
+    if(room.host!==auth.currentUser?.uid)throw Error('Solo quien creó el duelo puede cancelar la invitación.');
+    if(room.capacity!==2||room.config?.kind!=='duel'||room.members.length!==1||room.phase==='finished')
+      throw Error('La invitación ya no está pendiente. Actualiza la lista; si tu amigo entró, puedes rendirte.');
+    tx.delete(ref);
+  });
 }
 // Una jugada suelta sobre una sala en la que estás (rendirse desde la lista de duelos, sin abrirla).
-export async function actOnce(code,action){
+export async function actOnce(code,action,expected){
   await auth.authStateReady();
   const uid=auth.currentUser?.uid;
   if(!uid)throw Error('Sin perfil todavía.');
   const ref=doc(db,'quickRooms',String(code||'').toUpperCase());
-  await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La sala ya no existe.');tx.update(ref,{...R.reduce(snap.data(),uid,action),updatedAt:serverTimestamp()});});
+  await runTransaction(db,async tx=>{
+    const snap=await tx.get(ref);if(!snap.exists())throw Error('La sala ya no existe.');
+    const room=snap.data();
+    if(expected){
+      if(expected.uid!==uid)throw Error('Esta jugada pertenece a otra cuenta.');
+      const commands=room.commands,base=expected.commands;
+      if(JSON.stringify(commands.slice(0,base.length))!==JSON.stringify(base))throw Error('La partida cambió: revisa tu jugada pendiente.');
+      const tail=commands.slice(base.length);
+      // A retry after a lost acknowledgement must not apply the same command twice.
+      if(tail.length && JSON.stringify(tail[0])===JSON.stringify(action))return;
+      if(tail.length)throw Error('La partida avanzó antes de enviar tu jugada. Vuelve a abrirla.');
+    }
+    tx.update(ref,{...R.reduce(room,uid,action),updatedAt:serverTimestamp()});
+  });
 }
 export async function connect({code, name, create=false, capacity=4, invite=null, onChange, onError}) {
   await auth.authStateReady();
@@ -141,7 +162,7 @@ export async function connect({code, name, create=false, capacity=4, invite=null
     } else {
       if(!snap.exists())throw Error('No se encuentra esta sala.');
       const room=snap.data();
-      if(room.catalog!==CT.QuickNetwork.fingerprint())throw Error('Actualizad Continuum para usar las mismas cartas.');
+      if(!CT.QuickNetwork.compatible(room.catalog))throw Error('Actualizad Continuum para usar las mismas cartas.');
       if(!room.members.includes(uid))tx.update(ref,{...R.reduce(room,uid,{type:'join',name}),updatedAt:serverTimestamp()});
     }
   });

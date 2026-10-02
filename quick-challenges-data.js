@@ -10,11 +10,11 @@
   };
   const host = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };
   // El detalle que se ve al descubrir una carta: qué es, qué se mide, a qué fecha y de dónde sale.
-  const cards = (prefix, source, rows, context, asOf) => rows.map(([title, value, label, image, cardSource], i) => {
+  const cards = (prefix, source, rows, context, asOf) => rows.map(([title, value, label, image, cardSource, artist], i) => {
     const reference = cardSource || source;
     return {
-      id: `${prefix}-${i + 1}`, title, value, label, image: image || null,
-      detail: `${title}: ${label}. ${context}${asOf ? ` Datos a ${asOf}.` : ''}${host(reference) ? ` Fuente: ${host(reference)}.` : ''}`, source: reference
+      id: `${prefix}-${i + 1}`, title, value, label, image: image || null, ...(artist ? {artist} : {}),
+      detail: `${title}${artist ? ' — ' + artist : ''}: ${label}. ${context}${asOf ? ` Datos a ${asOf}.` : ''}${host(reference) ? ` Fuente: ${host(reference)}.` : ''}`, source: reference
     };
   });
   const deck = (id, title, rule, context, direction, cover, source, rows) => ({ id, title, rule, context, direction, cover, asOf: AS_OF[id] || null, cards: cards(id, source, rows, context, AS_OF[id] || null) });
@@ -483,15 +483,15 @@
       'entertainment',
       S.albums,
       [
-        ['Led Zeppelin IV',37,'≈37 millones','assets/quick-cards/albums-sales-1.webp'],
-        ['Grease (banda sonora)',38,'≈38 millones','assets/quick-cards/albums-sales-2.webp'],
-        ['Rumours',40,'≈40 millones','assets/quick-cards/albums-sales-3.webp'],
-        ['Saturday Night Fever',40,'≈40 millones','assets/quick-cards/albums-sales-4.webp'],
-        ['Bat Out of Hell',43,'≈43 millones','assets/quick-cards/albums-sales-5.webp'],
-        ['The Dark Side of the Moon',45,'≈45 millones','assets/quick-cards/albums-sales-6.webp'],
-        ['Back in Black',50,'≈50 millones','assets/quick-cards/albums-sales-7.webp'],
-        ['Their Greatest Hits 1971–1975',45,'≈45 millones','assets/quick-cards/albums-sales-8.webp'],
-        ['Thriller',70,'≈70 millones','assets/quick-cards/albums-sales-9.webp']
+        ['Led Zeppelin IV',37,'≈37 millones','assets/quick-cards/albums-sales-1.webp',null,'Led Zeppelin'],
+        ['Grease (banda sonora)',38,'≈38 millones','assets/quick-cards/albums-sales-2.webp',null,'Varios artistas'],
+        ['Rumours',40,'≈40 millones','assets/quick-cards/albums-sales-3.webp',null,'Fleetwood Mac'],
+        ['Saturday Night Fever',40,'≈40 millones','assets/quick-cards/albums-sales-4.webp',null,'Bee Gees y varios artistas'],
+        ['Bat Out of Hell',43,'≈43 millones','assets/quick-cards/albums-sales-5.webp',null,'Meat Loaf'],
+        ['The Dark Side of the Moon',45,'≈45 millones','assets/quick-cards/albums-sales-6.webp',null,'Pink Floyd'],
+        ['Back in Black',50,'≈50 millones','assets/quick-cards/albums-sales-7.webp',null,'AC/DC'],
+        ['Their Greatest Hits 1971–1975',45,'≈45 millones','assets/quick-cards/albums-sales-8.webp',null,'Eagles'],
+        ['Thriller',70,'≈70 millones','assets/quick-cards/albums-sales-9.webp',null,'Michael Jackson']
       ]
     ),
     d(

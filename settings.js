@@ -174,6 +174,12 @@
     const native = cap?.isNativePlatform?.() === true;
     say(`Plataforma: ${native ? 'app nativa (' + (cap.getPlatform?.() || '?') + ')' : 'navegador'} · ${CT.APP_VERSION || 'versión desconocida'}`);
     say(`Ajustes: vibración ${settings.haptics ? 'sí' : 'no'} · música ${settings.ambience ? 'sí' : 'no'} · profundidad ${settings.depth ? 'sí' : 'no'} · volumen ${settings.ambienceVolume}%`);
+    // El permiso se solicita dentro del gesto, antes de esperar al audio o al plugin.
+    let orientationPermission = null;
+    try {
+      if (typeof window.DeviceOrientationEvent?.requestPermission === 'function')
+        orientationPermission = window.DeviceOrientationEvent.requestPermission().then(value => ({value}), error => ({error}));
+    } catch (error) { orientationPermission = Promise.resolve({error}); }
     // Vibración
     try {
       if (native) {
@@ -199,9 +205,7 @@
       say('Sonido: pitido de 0,5 s enviado (¿lo has oído?)');
     } catch (error) { say(`Sonido: ERROR ${error?.message || error}`); }
     try {
-      const response = await fetch('assets/audio/v1.mp3');
-      if (!response.ok) throw new Error(`la pista no se puede leer (HTTP ${response.status})`);
-      const data = await response.arrayBuffer();
+      const data = await CT.AudioAssets.read('assets/audio/v1.mp3');
       say(`Música: pista leída (${Math.round(data.byteLength / 1024)} KB)`);
       if (ctx) {
         const decoded = await ctx.decodeAudioData(data);
@@ -212,7 +216,9 @@
     try {
       if (!window.DeviceOrientationEvent) throw new Error('sin sensor de orientación');
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        const permission = await DeviceOrientationEvent.requestPermission();
+        const result = await orientationPermission;
+        if (result.error) throw result.error;
+        const permission = result.value;
         say(`Movimiento: permiso «${permission}»`);
         if (permission !== 'granted') throw new Error('permiso no concedido: revisa Ajustes del iPhone → Continuum');
       }

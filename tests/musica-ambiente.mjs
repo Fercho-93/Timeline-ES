@@ -5,8 +5,8 @@ import {JSDOM} from 'jsdom';
 const read = name => fs.readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 const settle = async () => { for (let i = 0; i < 8; i++) await new Promise(resolve => setImmediate(resolve)); };
 
-function boot({native = false, delayed = false, fails = 0, random = .5, initiallyEnabled = false, autoplay = 'allowed', hidden = false} = {}) {
-  const w = new JSDOM('<div id="app"></div>', {runScripts: 'outside-only', pretendToBeVisual: true}).window;
+function boot({native = false, delayed = false, fails = 0, random = .5, initiallyEnabled = false, autoplay = 'allowed', hidden = false, status = 200, type = 'basic', empty = false} = {}) {
+  const w = new JSDOM('<div id="app"></div>', {runScripts: 'outside-only', pretendToBeVisual: true, url:'https://continuum.test/'}).window;
   let enabled = initiallyEnabled, nativeListener, resolveFetch, requests = [], contexts = [], pendingTimers = new Map(), timerId = 0;
   let permitted = autoplay === 'allowed';
   if (hidden) Object.defineProperty(w.document, 'hidden', {configurable:true, value:true});
@@ -73,10 +73,10 @@ function boot({native = false, delayed = false, fails = 0, random = .5, initiall
     requests.push(path);
     if (delayed) {delayed = false; await new Promise(resolve => {resolveFetch = resolve;});}
     if (fails > 0) {fails--; return {ok:false};}
-    return {ok: true, arrayBuffer: async () => path};
+    return {ok: status>=200&&status<300, status, type, arrayBuffer: async () => empty ? new ArrayBuffer(0) : path};
   };
   w.CONTINUUM = {effectPrefs: () => ({ambience:enabled})};
-  if (native) w.Capacitor = {isNativePlatform: () => true, registerPlugin: () => ({addListener: async (name, callback) => {assert.equal(name, 'appStateChange'); nativeListener = callback;}})};
+  if (native) w.Capacitor = {isNativePlatform: () => true, getPlatform:()=> 'ios', registerPlugin: () => ({addListener: async (name, callback) => {assert.equal(name, 'appStateChange'); nativeListener = callback;}})};
   w.eval(read('ambience.js'));
   return {
     w, contexts, requests,
@@ -270,3 +270,16 @@ assert.ok(read('index.html').indexOf('ambience.js') < read('index.html').indexOf
 assert.ok(read('index.html').indexOf('settings.js') < read('index.html').indexOf('ambience.js'));
 assert.ok(read('index.html').indexOf('ambience.js') < read('index.html').indexOf('boot.js'));
 console.log('Música: inicio durante splash, desbloqueo por gesto, seis pistas, fundidos, pausa exacta, ciclo móvil, reintentos y caché: OK');
+
+// iOS packaged files report status 0: browser failures and opaque/empty files must stay rejected.
+for (const options of [
+  {native:true,status:0,expected:2}, {native:false,status:0,expected:0},
+  {native:true,status:0,type:'opaque',expected:0}, {native:true,status:500,expected:0},
+  {native:true,status:0,empty:true,expected:0}
+]) {
+  const t=boot({...options,initiallyEnabled:true});t.click();await settle();
+  assert.equal(t.contexts[0].sources.length,options.expected,JSON.stringify(options));
+  if(options.native&&options.status===0)await assert.rejects(t.w.CONTINUUM.AudioAssets.read('https://other.test/assets/audio/v1.mp3'));
+  t.w.close();
+}
+console.log('Audio nativo: status 0 local permitido; errores web, remotos, opacos y archivos vacíos rechazados.');

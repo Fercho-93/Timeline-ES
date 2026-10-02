@@ -6,7 +6,7 @@
     const transport = CT.LocalTransport.createHostSession((peerId, message) => {
       try {
         if (message.type !== 'quick-action') return;
-        if (message.data.catalog !== fingerprint()) throw Error('Actualizad Continuum en ambos móviles.');
+        if (!compatible(message.data.catalog)) throw Error('Actualizad Continuum en ambos móviles.');
         const action = message.data.action;
         room = R.reduce(room, peerId, action, action.type === 'join' ? room.revision : message.data.revision);
         publish();
@@ -31,10 +31,13 @@
     peer.peerConnection.addEventListener('connectionstatechange',()=>{if(!closed && ['disconnected','failed','closed'].includes(peer.peerConnection.connectionState))fail(Error('Se ha perdido la conexión con quien creó la sala. Comprobad la red Wi-Fi.'));});
     return {kind:'local',host:false, answer:peer.answerSignal, act(action){if(!room||!peer.isReady())throw Error('Se ha perdido la conexión con quien creó la sala.');peer.send('quick-action',{catalog:fingerprint(),action,revision:room.revision});},close(){closed=true;peer.close();}};
   }
-  function fingerprint(){return CT.seedFrom(JSON.stringify(CT.QuickCatalog));}
+  // Presentation changes do not alter the cards/rules required to resume a game.
+  function fingerprint(){return CT.seedFrom(JSON.stringify({version:CT.QuickCatalog.version,challenges:CT.QuickCatalog.challenges.map(c=>({id:c.id,direction:c.direction,cards:c.cards.map(x=>({id:x.id,value:x.value}))}))}));}
+  // v564 uses the same cards and values, but hashed illustrations and descriptions too.
+  function compatible(value){return value===fingerprint()||(value===2351751673&&fingerprint()===1085063415);}
   async function internet(options) {return (await import('./quick-online.js')).connect(options);}
   async function mine() {return (await import('./quick-online.js')).mine();}
-  async function actOnce(code, action) {return (await import('./quick-online.js')).actOnce(code, action);}
+  async function actOnce(code, action, expected) {return (await import('./quick-online.js')).actOnce(code, action, expected);}
   async function cancelRoom(code) {return (await import('./quick-online.js')).cancelRoom(code);}
-  CT.QuickNetwork={localHost,localGuest,internet,mine,cancelRoom,actOnce,fingerprint};
+  CT.QuickNetwork={localHost,localGuest,internet,mine,cancelRoom,actOnce,fingerprint,compatible};
 })();

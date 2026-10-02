@@ -125,7 +125,9 @@ service cloud.firestore {
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
         && (joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
-      allow delete: if registered() && request.auth.uid==resource.data.host;
+      allow delete: if registered() && request.auth.uid==resource.data.host
+        && (!(resource.data.capacity==2 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
+          || (resource.data.members.size()==1 && resource.data.phase!='finished'));
     }
 
     match /quickPublicQueues/{key} {

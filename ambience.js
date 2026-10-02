@@ -66,10 +66,19 @@
     }).catch(() => { /* El siguiente gesto vuelve a intentar desbloquear el audio. */ });
   }
 
-  async function load(path) {
+  CT.AudioAssets = { async read(path) {
+    const url = new URL(path, location.href);
     const response = await fetch(path);
-    if (!response.ok) throw new Error('Audio unavailable');
-    const buffer = await audio.decodeAudioData(await response.arrayBuffer());
+    const localIOS = window.Capacitor?.isNativePlatform?.() === true && window.Capacitor?.getPlatform?.() === 'ios'
+      && url.origin === location.origin && url.protocol === location.protocol && url.host === location.host && /^\/assets\/audio\/[^/]+\.mp3$/.test(url.pathname)
+      && response.status === 0 && response.type !== 'opaque';
+    if (!response.ok && !localIOS) throw new Error(`la pista no se puede leer (HTTP ${response.status})`);
+    const data = await response.arrayBuffer();
+    if (!data || data.byteLength === 0) throw new Error('La pista está vacía.');
+    return data;
+  }};
+  async function load(path) {
+    const buffer = await audio.decodeAudioData(await CT.AudioAssets.read(path));
     if (!Number.isFinite(buffer.duration) || buffer.duration <= 0) throw new Error('Invalid audio');
     return buffer;
   }

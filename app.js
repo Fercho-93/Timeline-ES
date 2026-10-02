@@ -718,6 +718,8 @@
   // Todos tus duelos por turnos, agrupados por lo que esperan: tu turno, el del rival,
   // retos recibidos, invitaciones enviadas e historial.
   function duelsView() {
+    CT.TurnDuel?.leave?.();
+    CT.Quick?.leave?.();
     screen = "duelos";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
@@ -3977,7 +3979,7 @@
       if (!window.confirm(mode === 'cancel' ? '¿Cancelar esta invitación? No contará como derrota.' : mode === 'decline' ? '¿Rechazar este reto? Se cerrará el duelo y a quien te retó le saldrá cancelado.' : '¿Rendirte? Tu rival ganará esta partida. Se conservará en el historial.')) return;
       target.disabled = true;
       (mode === 'cancel' ? CT.Quick.cancelInvitation(code) : mode === 'decline' ? CT.Quick.declineInvite(code) : CT.Quick.resignDuel(code))
-        .then(() => { showToast('Partida actualizada'); duelsRefresh(); }).catch(() => { target.disabled = false; showToast('No se pudo actualizar el duelo. Puede haber cambiado: revisa la lista.'); });
+        .then(() => { showToast('Partida actualizada'); duelsRefresh(); }).catch(error => { target.disabled = false; showToast(error.code==='permission-denied' ? 'No se pudo actualizar el duelo: revisa los permisos de la cuenta.' : error.message || 'No se pudo actualizar el duelo. Comprueba tu conexión.'); duelsRefresh(); });
     }
     else if (action === "reshare-quick-duel") { Promise.resolve(CT.Quick.reshare(target.dataset.quickCode)).catch(() => showToast('No se pudo compartir el enlace.')); }
     else if (action === "open-turn-duel") { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back })); }

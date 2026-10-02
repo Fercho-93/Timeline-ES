@@ -34,9 +34,9 @@ try {
   // The production adapter uses the real SDK against the emulator, including listeners,
   // concurrent join transactions, late reconnect and stale-turn rejection.
   const source=fs.readFileSync('quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
-  w.CONTINUUM.QuickNetwork={fingerprint:()=>1};
+  w.CONTINUUM.QuickNetwork={fingerprint:()=>1,compatible:value=>value===1};
   w.CONTINUUM.QuickRoom={...R,create:(...args)=>JSON.parse(JSON.stringify(R.create(...args))),reduce:(...args)=>JSON.parse(JSON.stringify(R.reduce(...args)))};
-  const adapter=(uid,db)=>new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connect;')({currentUser:{uid},authStateReady:async()=>{}},db,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
+  const adapter=(uid,db,api=false)=>new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn '+(api?'{connect,actOnce,cancelRoom}':'connect')+';')({currentUser:{uid},authStateReady:async()=>{}},db,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
   const rooms={};let failures=[];
   const h=await adapter('host',host)({name:'Ana',create:true,onChange:r=>rooms.h=r,onError:e=>failures.push(e)});
   const g=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.g=r,onError:e=>failures.push(e)});
@@ -172,10 +172,12 @@ try {
     // Aceptar y rendirse
     const dentro=R.reduce(inv,'guest',{type:'join',name:'Bea'});
     await assertSucceeds(write(guest,dentro));
+    await assertFails(deleteDoc(ref(host))); // A stale cancel button cannot delete an accepted duel.
     const rendida=R.reduce(dentro,'guest',{type:'resign'});
     await assertFails(write(out,rendida));
     await assertFails(write(guest,{...rendida,resigned:'host'}));
     await assertSucceeds(write(guest,rendida));
+    await assertFails(deleteDoc(ref(host))); // Keep the completed result for both players.
     await assertSucceeds(arch(host,'host'));
     // Cancelar una invitación sin aceptar: borra quien la creó
     await env.clearFirestore();
@@ -184,4 +186,22 @@ try {
     await assertSucceeds(deleteDoc(ref(host)));
   }
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
+  // The production transaction retries a saved command after a lost response, exactly once.
+  {
+    await env.clearFirestore();
+    const api=adapter('host',host,true),remote=adapter('guest',guest,true);
+    const a=await api.connect({name:'Ana',capacity:2,create:true,onChange:r=>{},onError:e=>{throw e;}});
+    const docRef=doc(host,'quickRooms',a.code);
+    await new Promise(resolve=>setTimeout(resolve,100));
+    await a.act({type:'start',rounds,kind:'duel',keep:true});
+    const base=(await getDoc(docRef)).data();
+    const b=await remote.connect({name:'Bea',code:a.code,onChange:r=>{},onError:e=>{throw e;}});
+    const action={type:'place',cardId:R.state(base).remaining[0],index:1};
+    await api.actOnce(a.code,action,{commands:[],uid:'host'}); // The join increased revision only.
+    await api.actOnce(a.code,action,{commands:[],uid:'host'}); // Lost acknowledgement retry.
+    assert.equal((await getDoc(docRef)).data().commands.length,1);
+    await assert.rejects(api.actOnce(a.code,{type:'ack'},{commands:[action],uid:'another-account'}));
+    await assert.rejects(api.cancelRoom(a.code),/ya no está pendiente/);
+    a.close();b.close();
+  }
 } finally {await env.cleanup();}
