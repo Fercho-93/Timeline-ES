@@ -24,7 +24,7 @@
     consoles: 'https://www.britannica.com/technology/video-game/History-of-video-games', oscar: 'https://www.oscars.org/oscars/ceremonies', companies: 'https://www.britannica.com/topic/Apple-Inc', timezone: 'https://www.timeanddate.com/time/zone/', geo: 'https://www.geonames.org/', body: 'https://www.britannica.com/science/human-body', series: 'https://www.imdb.com/', buildings: 'https://www.skyscrapercenter.com/buildings', rivers: 'https://www.chduero.es/portals/0/documentos/El%20Duero%20y%20sus%20afluentes.pdf', food: 'https://fdc.nal.usda.gov/', albums: 'https://en.wikipedia.org/wiki/List_of_best-selling_albums', stadiums: 'https://www.worldstadiums.com/', capitals: 'https://www.britannica.com/topic/list-of-national-capitals', eurovision: 'https://www.eurovision.com/eurovision-song-contest/history/', storage: 'https://www.bipm.org/en/measurement-units/si-prefixes', airports: 'https://aci.aero/resources/busiest-airports-in-the-world/', metro: 'https://en.wikipedia.org/wiki/List_of_metro_systems', fortune: 'https://fortune.com/ranking/global500/', tv: 'https://www.rtve.es/television/', wages: 'https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Minimum_wage_statistics'
   };
   const d = (id, title, rule, context, direction, cover, source, rows) => deck(id, title, rule, context, direction, cover, source, rows);
-  window.CONTINUUM.QuickCatalog = { version: 2, challenges: [
+  window.CONTINUUM.QuickCatalog = { version: 3, challenges: [
     d(
       'sports-players',
       'Deportes por jugadores por equipo',
@@ -259,9 +259,9 @@
     d(
       'oscars',
       'Películas por número de Óscar',
-      'De más premios ganados a menos',
+      'De menos premios ganados a más',
       'Se compara el número de premios Óscar ganados; no cuentan nominaciones ni premios honoríficos.',
-      -1,
+      1,
       'entertainment',
       S.oscar,
       [
@@ -346,10 +346,10 @@
     ),
     d(
       'cities-north-south',
-      'Ciudades de norte a sur',
-      'De más al norte a más al sur',
+      'Ciudades de sur a norte',
+      'De más al sur a más al norte',
       'Latitud aproximada del centro urbano.',
-      -1,
+      1,
       'globe',
       S.geo,
       [
@@ -638,9 +638,9 @@
     d(
       'spanish-tv',
       'Programas españoles por fecha de estreno',
-      'De estreno más reciente a más antiguo',
-      'Ordenados por su fecha de estreno; la cifra son los años transcurridos desde entonces.',
-      1,
+      'De estreno más antiguo a más reciente',
+      'Ordenados por su fecha de estreno; la cifra son los años transcurridos desde entonces, así que a la izquierda va el que más años lleva.',
+      -1,
       'entertainment',
       S.tv,
       [

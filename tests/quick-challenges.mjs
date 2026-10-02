@@ -45,13 +45,34 @@ s = E.step(s, {type: 'place', cardId: 'social-2', index: 1}); s = E.step(s, {typ
 s = E.step(s, {type: 'bank'}); s = E.step(s, {type: 'bank'});
 assert.equal(s.players[0].score, 1); assert.equal(s.players[0].roundScore, 1);
 assert.throws(() => E.step(s, {type: 'bank'}));
-// Agotamiento, dirección descendente y empates válidos.
-s = E.create({names: ['A', 'B'], rounds: [round('oscars')]});
-while (s.remaining.length) {
-  s = E.step(s, {type: 'place', cardId: s.remaining[0], index: s.timeline.length});
-  assert.equal(s.result.correct, true); s = E.step(s, {type: 'ack'});
+// Agotamiento, orden de izquierda a derecha y empates válidos.
+// Regla de todo el juego: la izquierda es lo menor/más antiguo y la derecha lo mayor/más reciente. Los Óscar (de menos a más
+// premios), las ciudades (de sur a norte) y las temporadas se leen así; el único mazo guardado al revés es el de programas por
+// estreno, porque la cifra son «años desde entonces» y lo más antiguo (más años) debe ir a la izquierda.
+for (const c of CT.QuickCatalog.challenges) {
+  if (c.id === 'spanish-tv') continue;
+  assert.equal(c.direction, 1, `${c.id}: de izquierda a derecha, de menos a más`);
 }
-assert.equal(s.phase, 'round-end'); assert.equal(s.players.reduce((sum, p) => sum + p.score, 0), 9);
+const tv = E.challenge('spanish-tv');
+assert.equal(tv.direction, -1);
+s = E.create({names: ['A', 'B'], rounds: [round('spanish-tv')]});
+while (s.remaining.length) {
+  const id = s.remaining[0], años = x => tv.cards.find(c => c.id === x).value;
+  const lugar = s.timeline.findIndex(t => años(t) < años(id));   // los de menos años quedan a su derecha
+  s = E.step(s, {type: 'place', cardId: id, index: lugar < 0 ? s.timeline.length : lugar});
+  assert.equal(s.result.correct, true, 'cada programa más antiguo va a la izquierda'); s = E.step(s, {type: 'ack'});
+}
+assert.equal(s.phase, 'round-end');
+{ const años = s.timeline.map(id => tv.cards.find(c => c.id === id).value); assert.equal(JSON.stringify(años), JSON.stringify([...años].sort((x, y) => y - x)), 'a la izquierda, los años más altos'); }
+s = E.create({names: ['A', 'B'], rounds: [round('oscars')]});
+assert.equal(E.step(s, {type: 'place', cardId: 'oscars-2', index: 0}).result.correct, true, 'con menos Óscar que la de referencia, va a su izquierda');
+assert.equal(E.step(s, {type: 'place', cardId: 'oscars-2', index: 1}).result.correct, false, 'y no a su derecha');
+const serie = E.challenge('series-seasons');
+s = E.create({names: ['A', 'B'], rounds: [round('series-seasons')]});
+const base = serie.cards.find(c => c.id === s.timeline[0]);
+const mas = serie.cards.find(c => c.value > base.value), menos = serie.cards.find(c => c.value < base.value);
+if (mas) assert.equal(E.step(s, {type: 'place', cardId: mas.id, index: 1}).result.correct, true, 'más temporadas, a la derecha');
+if (menos) assert.equal(E.step(s, {type: 'place', cardId: menos.id, index: 0}).result.correct, true, 'menos temporadas, a la izquierda');
 const oscars = E.challenge('oscars'); const before = oscars.cards[1].value;
 oscars.cards[1].value = oscars.cards[0].value;
 for (const index of [0, 1]) {

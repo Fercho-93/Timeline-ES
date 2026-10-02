@@ -462,16 +462,16 @@
     festivities: ['Primera fecha', 'Última fecha'], social: ['Más antigua', 'Más reciente'],
     wwii: ['Más antiguo', 'Más reciente'], 'civil-war': ['Más antiguo', 'Más reciente'],
     kings: ['Reinado más antiguo', 'Reinado más reciente'], consoles: ['Más antigua', 'Más reciente'],
-    oscars: ['Más premios', 'Menos premios'], 'companies-founded': ['Más antigua', 'Más reciente'],
+    oscars: ['Menos premios', 'Más premios'], 'companies-founded': ['Más antigua', 'Más reciente'],
     'timezones-june': ['Más por detrás', 'Más por delante'], 'cities-east-west': ['Oeste', 'Este'],
-    'cities-north-south': ['Norte', 'Sur'], body: ['Arriba', 'Abajo'],
+    'cities-north-south': ['Sur', 'Norte'], body: ['Arriba', 'Abajo'],
     'series-seasons': ['Menos temporadas', 'Más temporadas'], buildings: ['Más bajo', 'Más alto'],
     'rivers-spain': ['Más corto', 'Más largo'], 'foods-kcal': ['Menos kcal', 'Más kcal'],
     'albums-sales': ['Menos ventas', 'Más ventas'], stadiums: ['Menor aforo', 'Mayor aforo'],
     'capitals-altitude': ['Menor altitud', 'Mayor altitud'], 'eurovision-wins': ['Menos victorias', 'Más victorias'],
     storage: ['Menor capacidad', 'Mayor capacidad'], airports: ['Menos pasajeros', 'Más pasajeros'],
     metros: ['Red más corta', 'Red más larga'], 'companies-revenue': ['Menos facturación', 'Más facturación'],
-    'spanish-tv': ['Menos años', 'Más años'], 'minimum-wages': ['Menor salario', 'Mayor salario'],
+    'spanish-tv': ['Estreno más antiguo', 'Estreno más reciente'], 'minimum-wages': ['Menor salario', 'Mayor salario'],
     poker: ['Más débil', 'Más fuerte']
   };
   function timelineEnds(c) {
