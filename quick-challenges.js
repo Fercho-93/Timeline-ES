@@ -336,6 +336,27 @@
   async function resignDuel(code) {await CT.QuickNetwork.actOnce(code,{type:'resign'});}
   async function cancelInvitation(code) {await CT.QuickNetwork.cancelRoom(code);}
   function reshare(code) {return CT.LocalShare.shareSignal(roomUrl(code).href);}
+  // Quien abre el enlace de una sala o de un duelo entra directo: sin formularios de sala. Solo pide el nombre si este
+  // móvil aún no lo conoce (por ejemplo, al abrir el enlace en el navegador por primera vez).
+  async function enterByLink(code) {
+    const known=()=>CT.Identidad?.propio?.()||'';
+    stopNetwork();state=null;record=null;page='network';netKind='internet';roomCapacity=2;duelRoom=false;
+    shell(`<section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">Entrando en la partida…</h2>
+      <section class="panel lobby-settings"><div class="waiting-orbit"><span></span></div><p>Te estás uniendo con el enlace que te han mandado. Verás la última jugada y seguirás tú.</p>
+        <textarea id="quick-net-code" hidden>${esc(roomCodeFromText(code))}</textarea>
+        <div class="field" id="quick-link-name" hidden><label for="quick-net-name-join">Tu nombre</label><input id="quick-net-name-join" maxlength="24" value="${esc(known())}" autocomplete="nickname"></div>
+        <div id="quick-link-go" hidden>${button('join-room','Entrar en la partida <span>→</span>','btn btn-primary btn-block')}</div>
+        <p id="quick-error" role="alert"></p></section></section>`);
+    // El perfil puede tardar un instante en cargar: se espera un poco antes de pedir el nombre.
+    for(let i=0;i<15&&!known();i++)await new Promise(r=>setTimeout(r,100));
+    const input=app().querySelector('#quick-net-name-join');if(input&&!input.value)input.value=known();
+    if(!known()){app().querySelector('#quick-link-name')?.removeAttribute('hidden');app().querySelector('#quick-link-go')?.removeAttribute('hidden');}
+    else{
+      justJoined=true;
+      try{await connectRoom(false);}
+      catch(e){errorNotice(e);app().querySelector('#quick-link-name')?.removeAttribute('hidden');app().querySelector('#quick-link-go')?.removeAttribute('hidden');}
+    }
+  }
   async function openRoom(renderPage,code,back) {
     const saved=(readJSON(DUELS,[])||[]).find(x=>x.code===code);
     paint=renderPage;entry='duel-setup';duelSetup();backTo=back||null;
@@ -874,11 +895,7 @@
       const params = new URLSearchParams(location.hash.slice(1));
       try {
         if (params.has('quick-duel')) acceptDuel();
-        else if (params.has('quick-room')) {
-          networkSetup('internet'); app().querySelector('#quick-net-code').value = params.get('quick-room');
-          // Con el nombre ya conocido se entra directamente a la mesa, como en Grandes colecciones.
-          if (app().querySelector('#quick-net-name-join')?.value.trim()) formatAction('join-room').catch(errorNotice);
-        }
+        else if (params.has('quick-room')) void enterByLink(params.get('quick-room'));
         else CT.ModeHubs.open('hub-solo');
       } catch (e) {
         CT.ModeHubs.open('hub-solo');
