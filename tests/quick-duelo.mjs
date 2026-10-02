@@ -81,6 +81,10 @@ assert.equal(app.querySelector('[data-quick-duel-block="turnos"]').hidden, true)
 assert.ok(app.querySelector('[data-quick="start-duel"]'));
 assert.ok(app.querySelector('[data-quick-duel-block="turnos"] [data-quick="create-room"]'), 'por turnos se crea una sala de dos');
 assert.ok(app.querySelector('[data-quick-duel-block="turnos"] #quick-net-code'), 'y se puede entrar con un código');
+// Qué pasa al fallar se elige al crear el duelo por turnos (no en una sala de espera: el duelo no tiene mesa).
+assert.deepEqual([...app.querySelectorAll('[data-quick-duel-block="turnos"] input[name="quick-keep"]')].map(i => i.value), ['seguir', 'fuera']);
+assert.equal(app.querySelector('input[name="quick-keep"]:checked').value, 'seguir', 'por defecto, seguir hasta el final');
+assert.equal(app.querySelector('.lobby-table'), null, 'el duelo por turnos no enseña mesa');
 assert.doesNotMatch(app.textContent, /Escribir la cifra/, 'en Retos rápidos siempre se ordenan cartas');
 // Cambiar de ritmo enseña el otro bloque sin repintar y se recuerda.
 const turnos = app.querySelector('input[value="turnos"]'); turnos.checked = true;
