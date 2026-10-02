@@ -69,7 +69,7 @@
   }
   function guide() {
     const layer=document.createElement('div'); layer.className='overlay';
-    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Si juegas con más gente</h3><p>Cada acierto es provisional: puedes plantarte para asegurarlo. Si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
+    layer.innerHTML=`<div class="modal rules quick-guide-modal"><div class="guide-tools"><button type="button" class="icon-btn guide-close" data-quick="close-menu" aria-label="Cerrar guía">×</button></div><div class="guide-content"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2>Cómo se juega</h2><section><h3>Un reto, una línea</h3><p>Comienza con una carta de referencia y coloca cada carta nueva en el hueco que le corresponde. El dato se revela al confirmar.</p></section><section><h3>Si juegas solo (o en un duelo por enlace)</h3><p>Cada carta bien colocada suma un acierto. Un fallo cuenta como fallo, pero sigues hasta terminar el reto: no te echa.</p></section><section><h3>Duelo por turnos</h3><p>Quien crea la sala elige: seguir hasta el final del mazo (gana quien acierte más) o que quien falle no tenga más turnos en ese reto.</p></section><section><h3>Si juegas con más gente</h3><p>Cada acierto es provisional: puedes plantarte para asegurarlo. Si fallas, pierdes los provisionales de ese reto y quedas fuera hasta el siguiente.</p></section><section><h3>Mazos sorpresa</h3><p>Los mazos se sortean automáticamente. Solo conocerás la temática cuando empiece el reto; los siguientes permanecen ocultos.</p></section><section><h3>Turnos justos</h3><p>El primer turno rota en cada reto. En partidas por Internet o por enlace, siempre juega una persona cada vez.</p></section></div><button class="btn btn-primary btn-block" data-quick="close-menu">Entendido</button></div>`;
     app().append(layer); CT.openDialog(layer,true);
   }
   function myTurn() {return !room || room.actor === myId;}
@@ -115,7 +115,7 @@
   // El duelo de Retos rápidos por enlace: juegas tú, mandas el enlace y tu amigo juega los mismos mazos.
   // Los mazos salen de una semilla y las jugadas viajan abreviadas, así que el enlace es corto aunque la
   // partida sea larga. Quien lo abre reconstruye la partida con el motor, que es quien da por buena la marca.
-  const DUEL_VERSION=2;
+  const DUEL_VERSION=3;
   const duelFingerprint=()=>CT.QuickNetwork?.fingerprint?.() || CT.seedFrom(JSON.stringify(CT.QuickCatalog));
   function packCommands(commands, rounds) {
     let r=0;
@@ -150,11 +150,12 @@
   function readDuel(encoded) {
     let p;
     try{p=JSON.parse(CT.LocalTransport.decodeText(encoded));}catch{throw Error('Este enlace no es un duelo de Retos rápidos.');}
+    if(p&&p.v===2)throw Error('Este duelo se creó con una versión anterior de Continuum (en la que un fallo te dejaba fuera). Pide a tu amigo que cree uno nuevo.');
     if(!p||p.v!==DUEL_VERSION||typeof p.s!=='string'||!Number.isInteger(p.n)||p.n<1||p.n>CT.QuickCatalog.challenges.length)throw Error('Este enlace no es un duelo de Retos rápidos.');
     if(p.f!==duelFingerprint())throw Error('Este duelo se creó con otra versión de Continuum. Actualizad la aplicación en los dos móviles.');
     const rs=rounds(p.n,null,p.s);
     let s;
-    try{s=E.restore({version:CT.QuickCatalog.version,config:{names:['Tú'],rounds:rs,kind:'duel'},commands:unpackCommands(p.c,rs)});}
+    try{s=E.restore({version:CT.QuickCatalog.version,config:{names:['Tú'],rounds:rs,kind:'duel',keep:true},commands:unpackCommands(p.c,rs)});}
     catch{throw Error('El enlace del duelo está dañado o incompleto.');}
     if(s.players.length!==1 || s.phase!=='round-end' || s.index!==rs.length-1)throw Error('Tu rival no ha terminado su duelo: pídele que lo termine antes de mandártelo.');
     return {rounds:rs,seed:p.s,score:s.players[0].score,name:String(p.p||'').replace(/[<>\x00-\x1f]/g,'').slice(0,24)};
@@ -163,12 +164,15 @@
     const url=new URL(value,location.href),encoded=new URLSearchParams(url.hash.slice(1)).get('quick-duel');
     if(!encoded || encoded.length>16000)throw Error('Este enlace no es un duelo de Retos rápidos.');
     const rival=readDuel(encoded);
-    format='duel';begin({names:['Tú'],rounds:rival.rounds,kind:'duel',seed:rival.seed,length:rival.rounds.length,rivalScore:rival.score,rivalName:rival.name});
+    format='duel';begin({names:['Tú'],rounds:rival.rounds,kind:'duel',keep:true,seed:rival.seed,length:rival.rounds.length,rivalScore:rival.score,rivalName:rival.name});
     history.replaceState(null,'',location.pathname+location.search);
   }
   // El duelo de Retos rápidos tiene los mismos dos ritmos que el de las colecciones, y aquí siempre se ordenan
   // cartas: «Partida completa» (juegas tú y mandas un enlace; tu amigo juega cuando pueda) y «Por turnos»
   // (una sala de dos: cada uno juega desde su móvil y la partida se guarda entre turnos).
+  // En el duelo por turnos, quien crea la sala elige qué pasa al fallar: seguir hasta el final o quedarse sin más turnos.
+  const DUEL_KEEP='continuum-quick-duel-keep-v1';
+  const duelKeep=()=>CT.Storage.getItem(DUEL_KEEP)!=='fuera';
   const DUEL_PACE='continuum-quick-duel-pace-v1';
   const duelPace=()=>CT.Storage.getItem(DUEL_PACE)==='turnos'?'turnos':'seguidos';
   const soloGlyph=paths=>`<svg class="solo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
@@ -269,6 +273,7 @@
     const length=roomLength||3;
     const side=host
       ? `<div class="section-label">Partida</div><p>${length} ${length===1?'reto':'retos'} con las mismas cartas para toda la mesa. El primer turno rota en cada reto.</p>
+        ${cap===2?`<div class="field duel-kind-field"><span class="field-label" id="quick-keep-label">Si alguien falla</span><div class="segmented" role="radiogroup" aria-labelledby="quick-keep-label">${[['seguir','Sigue hasta el final','Un fallo no suma, pero se juega todo el mazo y gana quien acierte más'],['fuera','Se queda sin turnos','Quien falla pierde lo provisional y no juega más ese reto']].map(([k,t,f])=>`<label class="segmented-option${(k==='seguir')===duelKeep()?' is-on':''}"><input type="radio" name="quick-keep" value="${k}"${(k==='seguir')===duelKeep()?' checked':''}><span><b>${t}</b><small>${f}</small></span></label>`).join('')}</div></div>`:''}
         ${count<2?'<div class="waiting-orbit"><span></span></div><p class="hint">Esperando a alguien más…</p>':''}
         ${button('start-room','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}
         ${connection?.kind==='local'?button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}`
@@ -325,7 +330,7 @@
     if(action==='leave-public'){const leaving=connection;connection=null;clearInterval(publicClock);await leaving?.leave?.();toEntry();return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(action==='create-room'||action==='join-room'){await connectRoom(action==='create-room');return true;}
-    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count),kind:roomCapacity===2?'duel':'network',historyId:historyId()});return true;}
+    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count),kind:(room?.capacity||roomCapacity)===2?'duel':'network',historyId:historyId(),...((room?.capacity||roomCapacity)===2?{keep:duelKeep()}:{})});return true;}
     if(action==='share-room'){const url=roomUrl(connection.code);await CT.LocalShare.shareSignal(url.href);return true;}
     if(action==='qr-room'){const url=roomUrl(connection.code);showQrOrExplain({eyebrow:'Sala de Retos rápidos',title:'Escanea para entrar',text:url.href,code:connection.code,hint:'Abre la cámara del otro móvil y apunta al código.'});return true;}
     if(action==='qr-signal'){showQrOrExplain({eyebrow:'Conexión sin internet',title:'Enséñalo al otro móvil',text:app().querySelector('#quick-signal').value,hint:'El otro móvil lo lee con «Escanear QR».'});return true;}
@@ -464,7 +469,7 @@
   function resultNote(r, p) {
     const solo = !room && state.players.length === 1, name = esc(p.name);
     const n = (count, one, many) => `${count} ${count === 1 ? one : many}`;
-    if (r.keep) return `${r.correct ? 'Bien colocada.' : 'Esa carta no suma.'} Llevas ${n(p.points, 'acierto', 'aciertos')}.`;
+    if (r.keep) return `${r.correct ? 'Bien colocada.' : 'Esa carta no suma.'} ${solo ? 'Llevas' : `${name} lleva`} ${n(p.points, 'acierto', 'aciertos')}.`;
     if (r.correct) return solo ? `Tienes ${n(p.points, 'acierto provisional', 'aciertos provisionales')}.` : `${name} tiene ${n(p.points, 'acierto provisional', 'aciertos provisionales')}.`;
     const fuera = 'La carta ya está en su lugar correcto.';
     if (r.lost > 0) return solo ? `Pierdes ${n(r.lost, 'acierto', 'aciertos')} de este reto y quedas fuera hasta el siguiente. ${fuera}` : `${name} pierde ${n(r.lost, 'acierto', 'aciertos')} de este reto y queda fuera hasta el siguiente. ${fuera}`;
@@ -492,7 +497,7 @@
       const duelo = final && !room && record.config.kind==='duel' && Number.isFinite(record.config.rivalScore);
       shell(`${heading}<section class="panel quick-panel"><h2>${final ? duelo ? (best>record.config.rivalScore ? '¡Has ganado el duelo!' : best===record.config.rivalScore ? 'Empate' : `${esc(record.config.rivalName||'Tu rival')} gana`) : state.players.length===1 ? 'Tu resultado' : winners.length > 1 ? 'Victoria compartida' : `Gana ${winners[0]}` : 'Reto terminado'}</h2>
         ${final ? `<p>${E.keepPlaying(state) && state.config.rounds.length === 1 ? `${best} de ${state.config.rounds[0].order.length - 1}` : `${winners.join(' y ')} · ${best} ${best === 1 ? 'acierto' : 'aciertos'}`}.</p>` : '<p>Los aciertos de este reto ya están asegurados.</p>'}
-        <ul>${state.players.map(player => E.keepPlaying(state) ? `<li>${player.roundScore} de ${state.config.rounds[state.index].order.length - 1} cartas bien colocadas en este reto.</li>` : `<li>${esc(player.name)}: ${player.roundScore} ${player.roundScore === 1 ? 'acierto' : 'aciertos'} en este reto.</li>`).join('')}</ul>
+        <ul>${state.players.map(player => E.keepPlaying(state) ? `<li>${state.players.length === 1 ? '' : `${esc(player.name)}: `}${player.roundScore} de ${state.config.rounds[state.index].order.length - 1} cartas bien colocadas en este reto.</li>` : `<li>${esc(player.name)}: ${player.roundScore} ${player.roundScore === 1 ? 'acierto' : 'aciertos'} en este reto.</li>`).join('')}</ul>
         ${final && Number.isFinite(record.config.rivalScore) ? `<p>${esc(record.config.rivalName||'Tu rival')}: ${record.config.rivalScore} ${record.config.rivalScore===1?'acierto':'aciertos'}. Tú: ${best}. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Ha asegurado más aciertos.'}</p>` : ''}
         ${final ? (record.config.kind==='duel' && !room ? '' : button('formats', 'Elegir otra partida')) : button('next', 'Siguiente reto')}
         ${final && record.config.kind==='duel' && !room ? button('share-duel', Number.isFinite(record.config.rivalScore) ? 'Devolver el reto' : 'Retar a un amigo', 'btn btn-primary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div><p class="hint">${Number.isFinite(record.config.rivalScore) ? 'Tu amigo jugará los mismos mazos y tendrá que superar tu resultado.' : 'Tu amigo juega los mismos mazos cuando quiera y ve quién ha ganado.'}</p>` : ''}
@@ -557,6 +562,11 @@
       app().querySelectorAll('.segmented-option').forEach(o => o.classList.toggle('is-on', o.querySelector('input').checked));
       return;
     }
+    if (event.target.name === 'quick-keep') {
+      CT.Storage.setItem(DUEL_KEEP, event.target.value === 'fuera' ? 'fuera' : 'seguir');
+      app().querySelectorAll('.segmented-option').forEach(o => o.classList.toggle('is-on', o.querySelector('input').checked));
+      return;
+    }
     if (!app().querySelector('.quick-shell')) return;
     if (event.target.id === 'quick-net-length') app().querySelector('#quick-net-choice-wrap')?.setAttribute('hidden','');
   });
@@ -587,7 +597,7 @@
     }
     if (action === 'start-duel') {
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3, seed=historyId();
-      prepare({names:['Tú'],rounds:rounds(count,null,seed),kind:'duel',seed,length:count}); return;
+      prepare({names:['Tú'],rounds:rounds(count,null,seed),kind:'duel',keep:true,seed,length:count}); return;
     }
     if (action === 'start-free') {
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;

@@ -42,7 +42,7 @@
       r.host = r.members[0]; r.actor = r.host;
     } else if (action.type === 'start') {
       if (id !== r.host || r.phase !== 'lobby' || r.members.length < 2) throw Error('Solo quien crea la sala puede empezar, con al menos dos personas.');
-      r.config = {names:r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null}; E.create(r.config); metadata(r);
+      r.config = {names:r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null, ...(typeof action.keep === 'boolean' ? {keep: action.keep} : {})}; E.create(r.config); metadata(r);
     } else {
       if (!r.config || r.phase === 'finished' || id !== r.actor) throw Error('Espera tu turno.');
       const s = E.step(state(r), action);

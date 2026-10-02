@@ -234,6 +234,27 @@ w.close();
   assert.equal(t.players[0].points, 1, 'conserva el acierto y sigue');
   t = E.step(t, {type: 'ack'});
   assert.equal(t.phase, 'turn', 'sigue jugando tras el fallo');
+  // Duelo con `keep: true` (enlace «partida completa» o sala «sigue hasta el final»): un fallo no echa y plantarse no existe.
+  let dk = E.create({names: ['Tú'], kind: 'duel', keep: true, rounds: [round('poker')]});
+  dk = E.step(dk, {type: 'place', cardId: 'poker-3', index: 0});
+  assert.equal(dk.result.correct, false);
+  assert.equal(dk.players[0].status, 'active', 'con keep el fallo no saca del reto');
+  dk = E.step(dk, {type: 'ack'});
+  assert.equal(dk.phase, 'turn');
+  assert.throws(() => E.step(dk, {type: 'bank'}), /INVALID_ACTION/, 'con keep no se puede plantar');
+  // Sala de dos con keep: los dos juegan alternando hasta agotar las cartas y no queda nadie fuera.
+  let k2 = E.create({names: ['Ana', 'Luis'], kind: 'duel', keep: true, rounds: [round('poker')]});
+  for (let guard = 0; k2.phase !== 'round-end' && guard < 40; guard++) {
+    const c = E.challenge('poker'), id = k2.remaining[0], v = x => c.cards.find(card => card.id === x).value * c.direction;
+    const right = k2.timeline.findIndex(t => v(t) > v(id)), idx = right < 0 ? k2.timeline.length : right;
+    k2 = E.step(k2, {type: 'place', cardId: id, index: guard % 3 === 0 ? (idx === 0 ? 1 : 0) : idx});
+    assert.ok(k2.players.every(pl => pl.status === 'active'));
+    k2 = E.step(k2, {type: 'ack'});
+  }
+  assert.equal(k2.phase, 'round-end');
+  assert.equal(k2.players.reduce((n, pl) => n + pl.roundScore, 0) > 0, true);
+  assert.throws(() => E.create({names: ['Tú'], keep: 'si', rounds: [round('poker')]}), /INVALID_CONFIG/);
+  // Sin `keep` (duelos o partidas guardadas antes de existir la opción) todo sigue como entonces.
   const duel = E.create({names: ['Tú'], kind: 'duel', rounds: [round('poker')]});
   let d = E.step(duel, {type: 'place', cardId: 'poker-2', index: 1});
   d = E.step(d, {type: 'ack'});

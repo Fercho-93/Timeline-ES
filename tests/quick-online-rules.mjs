@@ -49,6 +49,14 @@ try {
   const rejoined=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.rejoined=r,onError:e=>failures.push(e)});
   await wait(()=>rooms.rejoined?.actor==='guest');await rejoined.act({type:'bank'});await wait(()=>rooms.h?.phase==='finished');
   assert.deepEqual(failures,[]);h.close();rejoined.close();
+  // Duelo por turnos «sigue hasta el final»: la configuración lleva `keep` y plantarse deja de ser una acción válida.
+  const hk=await adapter('host',host)({name:'Ana',create:true,onChange:r=>rooms.hk=r,onError:e=>failures.push(e)});
+  const gk=await adapter('guest',guest)({name:'Bea',code:hk.code,onChange:r=>rooms.gk=r,onError:e=>failures.push(e)});
+  await wait(()=>rooms.hk?.members.length===2&&rooms.gk?.members.length===2);
+  await hk.act({type:'start',rounds,keep:true});await wait(()=>rooms.gk?.phase==='turn');
+  assert.equal(rooms.gk.config.keep,true);
+  await assert.rejects(hk.act({type:'bank'}));
+  assert.deepEqual(failures,[]);hk.close();gk.close();
   // La primera persona crea sala y cola en una transacción; la segunda ocupa la
   // última plaza y cierra la cola antes de que una tercera pueda unirse.
   const publicAdapter=(uid,db)=>new Function('auth','db','doc','getDoc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connectPublic;')(

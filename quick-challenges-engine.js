@@ -8,6 +8,7 @@
     if (!config || !Array.isArray(config.names) || config.names.length < 1 || config.names.length > 8 ||
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
         !Array.isArray(config.rounds) || config.rounds.length < 1 || config.rounds.length > catalog.challenges.length) throw Error('INVALID_CONFIG');
+    if (config.keep !== undefined && typeof config.keep !== 'boolean') throw Error('INVALID_CONFIG');
     const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
@@ -20,10 +21,10 @@
     startRound(s);
     return s;
   }
-  // Quien juega solo (sin ser un duelo) no queda fuera al fallar: la carta cuenta como fallo y sigue
-  // hasta acabar el mazo, como en Grandes colecciones. El riesgo de perder lo provisional solo tiene
-  // sentido cuando hay más gente en la mesa, o en un duelo, donde asegurar es parte de la estrategia.
-  const keepPlaying = s => s.config.names.length === 1 && s.config.kind !== 'duel';
+  // ¿Un fallo deja fuera del reto? Con `config.keep` explícito manda él: true = se sigue hasta agotar las cartas (el fallo
+  // solo no suma), false = quien falla pierde lo provisional y no vuelve a jugar hasta el siguiente reto. Sin él (partidas
+  // guardadas antes de existir la opción) se mantiene lo de entonces: sigue quien juega solo sin ser un duelo.
+  const keepPlaying = s => typeof s.config.keep === 'boolean' ? s.config.keep : s.config.names.length === 1 && s.config.kind !== 'duel';
   function startRound(s) {
     const round = s.config.rounds[s.index];
     s.timeline = [round.order[0]];
@@ -59,7 +60,7 @@
       if (correct) p.points++; else if (!keep) {p.points = 0; p.status = 'failed';}
       s.result = {cardId: command.cardId, correct, lost, player: s.current, keep};
       s.phase = 'result';
-    } else if (command?.type === 'bank' && s.phase === 'turn') {
+    } else if (command?.type === 'bank' && s.phase === 'turn' && !keepPlaying(s)) {
       p.score += p.points; p.roundScore = p.points; p.points = 0; p.status = 'banked';
       settle(s);
     } else if (command?.type === 'ack' && s.phase === 'result') {

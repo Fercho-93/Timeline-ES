@@ -15,7 +15,7 @@ const w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine, D = CT.Quick.Duel;
 
 // Una partida perfecta de cinco mazos con el motor: es el caso más largo que puede salir.
 function jugar(rounds, {perfecta = true} = {}) {
-  let s = E.create({names: ['Tú'], rounds, kind: 'duel'}); const commands = [];
+  let s = E.create({names: ['Tú'], rounds, kind: 'duel', keep: true}); const commands = [];
   const step = c => { s = E.step(s, c); commands.push(c); };
   while (true) {
     if (s.phase === 'turn') {
@@ -36,7 +36,7 @@ assert.notDeepEqual(rounds.map(r => r.id), D.rounds(5, null, 'otra').map(r => r.
 const {commands, state} = jugar(rounds);
 const score = state.players[0].score;
 assert.ok(commands.length > 100, 'una partida larga pasa de 100 jugadas: antes no se podía ni reanudar');
-const record = {version: CT.QuickCatalog.version, config: {names: ['Tú'], rounds, kind: 'duel', seed}, commands};
+const record = {version: CT.QuickCatalog.version, config: {names: ['Tú'], rounds, kind: 'duel', keep: true, seed}, commands};
 assert.doesNotThrow(() => E.restore(record), 'el motor acepta una partida larga');
 const payload = D.payload(record);
 const link = CT.LocalTransport.encodeText(JSON.stringify(payload));
@@ -51,6 +51,7 @@ const enlace = cambios => CT.LocalTransport.encodeText(JSON.stringify({...payloa
 assert.throws(() => D.read('no-es-un-enlace'), /no es un duelo/);
 assert.throws(() => D.read(enlace({f: 'otra-version'})), /otra versión/);
 assert.throws(() => D.read(enlace({v: 1})), /no es un duelo/);
+assert.throws(() => D.read(enlace({v: 2})), /versión anterior/, 'los enlaces de antes (un fallo te dejaba fuera) piden crear uno nuevo');
 assert.throws(() => D.read(enlace({c: 'p99.0,a'})), /dañado/);
 assert.throws(() => D.read(enlace({c: commands.slice(0, 6).length ? D.pack(commands.slice(0, 6), rounds) : ''})), /no ha terminado/);
 assert.throws(() => D.read(enlace({n: 0})), /no es un duelo/);
@@ -59,6 +60,8 @@ const mala = jugar(rounds, {perfecta: false});
 const conMala = D.read(enlace({c: D.pack(mala.commands, rounds)}));
 assert.equal(conMala.score, mala.state.players[0].score);
 assert.ok(conMala.score < score, 'el resultado sale de las jugadas, no de lo que diga el enlace');
+assert.equal(mala.state.phase, 'round-end', 'en el duelo por enlace un fallo no corta: se juegan todos los mazos');
+assert.ok(mala.commands.filter(c => c.type === 'place').length >= rounds.reduce((n, r) => n + r.order.length - 1, 0), 'se colocan todas las cartas de todos los mazos');
 
 // La pantalla de preparar el duelo: 1, 3 o 5 mazos y, por defecto, 3.
 const app = w.document.getElementById('app');

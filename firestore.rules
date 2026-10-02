@@ -27,8 +27,8 @@ service cloud.firestore {
           && (d.names.size() < 6 || (d.names[5] is string && d.names[5].size() > 0 && d.names[5].size() <= 24))
           && (d.names.size() < 7 || (d.names[6] is string && d.names[6].size() > 0 && d.names[6].size() <= 24))
           && (d.names.size() < 8 || (d.names[7] is string && d.names[7].size() > 0 && d.names[7].size() <= 24))
-          && d.commands is list && d.commands.size() <= 100
-          && d.revision is int && d.revision >= 0 && d.revision <= 110
+          && d.commands is list && d.commands.size() <= 300
+          && d.revision is int && d.revision >= 0 && d.revision <= 320
           && d.actor in d.members && d.phase in ['lobby','turn','result','round-end','finished']
           && (!('matchmaking' in d.keys()) || d.matchmaking == 'public')
           && d.updatedAt == request.time;
@@ -58,7 +58,8 @@ service cloud.firestore {
           && (a.get('matchmaking','private') != 'public' || a.members.size() == a.capacity
               || a.updatedAt < request.time - duration.value(25, 's'))
           && b.diff(a).affectedKeys().hasOnly(['config','phase','revision','updatedAt'])
-          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId'])
+          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep'])
+          && (!('keep' in b.config.keys()) || b.config.keep is bool)
           && b.config.names == a.names && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
           && (!('kind' in b.config.keys()) || b.config.kind in ['duel','network','public'])
           && (!('historyId' in b.config.keys()) || b.config.historyId == null || (b.config.historyId is string && b.config.historyId.size() <= 64))
