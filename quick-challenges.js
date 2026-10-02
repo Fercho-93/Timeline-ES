@@ -200,7 +200,7 @@
           <div class="quick-length" role="radiogroup" aria-labelledby="quick-length-label">${chip(1,'Duelo rápido')}${chip(3,'Duelo estándar')}${chip(5,'Duelo largo')}</div><input id="quick-free-length" type="hidden" value="3"></div>
         ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos mazos cuando quiera, sin coincidir contigo.</p></div>
           ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
-        ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas un enlace (o el código o el QR): tu amigo sigue desde ahí y os avisamos cuando os toque. En la revancha empieza el otro. La partida se guarda entre turnos y podéis volver cuando queráis.</p></div>
+        ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas un enlace (o el código o el QR): tu amigo sigue la partida desde ahí. En la revancha empieza el otro. La partida se guarda entre turnos y podéis volver cuando queráis.</p></div>
           <div class="field duel-kind-field"><span class="field-label" id="quick-keep-label">Si alguien falla</span><div class="segmented" role="radiogroup" aria-labelledby="quick-keep-label">${[['seguir','Sigue hasta el final','Un fallo no suma, pero se juega todo el mazo y gana quien acierte más'],['fuera','Se queda sin turnos','Quien falla pierde lo provisional y no juega más ese reto']].map(([k,t,f])=>`<label class="segmented-option${(k==='seguir')===duelKeep()?' is-on':''}"><input type="radio" name="quick-keep" value="${k}"${(k==='seguir')===duelKeep()?' checked':''}><span><b>${t}</b><small>${f}</small></span></label>`).join('')}</div></div>
           <div class="field"><label for="quick-net-name">Tu nombre</label><input id="quick-net-name" maxlength="24" value="${ownName}"></div>
           ${button('create-room','Crear duelo <span>→</span>','btn btn-primary btn-block')}
@@ -272,7 +272,7 @@
   function duelInvite() {
     const code=connection?.code, friend=esc(state.players[1].name), jugadas=record.commands.filter(c=>c.type==='place').length;
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">Duelo en marcha</h2></div></section><section class="panel lobby-settings duel-invite"><div class="waiting-orbit"><span></span></div><h3>Le toca a tu amigo</h3>
-      <p>${jugadas?'Ya has hecho tu jugada. ':''}Mándale el enlace (o el código o el QR): al abrirlo, ${friend==='Tu amigo'?'sigue la partida desde donde la has dejado':'continúa la partida'}. Después os iréis avisando cuando os toque.</p>
+      <p>${jugadas?'Ya has hecho tu jugada. ':''}Mándale el enlace (o el código o el QR): al abrirlo, ${friend==='Tu amigo'?'sigue la partida desde donde la has dejado':'continúa la partida'}.</p>
       ${code?`${button('share-room','Compartir enlace','btn btn-primary btn-block')}<div class="room-code-card"><small>Código del duelo</small><strong>${esc(code)}</strong><div class="room-invite-actions"><button data-quick="qr-room">Mostrar QR</button></div></div>`:''}
       <p class="hint">La partida se guarda: puedes cerrar la app y volver a tu duelo cuando quieras.</p><p id="quick-error" role="alert"></p></section>`);
   }
