@@ -3961,7 +3961,6 @@
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
     else if (action === "open-quick-duel") { CT.Quick.openRoom((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView).catch(() => showToast('No se pudo abrir el duelo. Comprueba tu conexión.')); }
-    else if (action === "remove-quick-duel") { CT.Quick.forgetDuel(target.dataset.quickCode); duelsRefresh(); }
     else if (action === "open-turn-duel") { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back })); }
     else if (action === 'next-turn-duel') { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.next(back)).catch(() => showToast('No se pudieron consultar tus duelos.')); }
     else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); duelsRefresh(); }

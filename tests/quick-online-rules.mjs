@@ -127,5 +127,21 @@ try {
   await assertFails(getDocs(collection(guest,'quickRooms')));
   const minePeek=new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn mine;')({currentUser:{uid:'guest'},authStateReady:async()=>{}},guest,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
   const mias=await minePeek();assert.equal(mias.length,1);assert.equal(mias[0].code,'ABCDEFGH23');assert.equal(mias[0].room.members.includes('guest'),true);
+  // Archivar un duelo terminado de Retos rápidos va con la cuenta, como en las colecciones.
+  {
+    let fin=R.reduce(R.reduce(R.create('host','Ana',2),'host',{type:'start',rounds:duelRounds,kind:'duel',keep:true}),'guest',{type:'join',name:'Bea'});
+    const ongoing=fin;
+    for(let g=0;g<600&&fin.phase!=='finished';g++){if(fin.phase==='round-end'){fin=R.reduce(fin,fin.host,{type:'next'});continue;}const st=R.state(fin),id=fin.members[st.current];fin=R.reduce(fin,id,st.phase==='result'?{type:'ack'}:{type:'place',cardId:st.remaining[0],index:st.timeline.length});}
+    assert.equal(fin.phase,'finished');
+    await env.withSecurityRulesDisabled(async c=>{const d=c.firestore();
+      await setDoc(doc(d,'quickRooms','FINISHEDX2'),{...JSON.parse(JSON.stringify(fin)),catalog:1,updatedAt:new Date()});
+      await setDoc(doc(d,'quickRooms','ONGOINGXX2'),{...JSON.parse(JSON.stringify(ongoing)),catalog:1,updatedAt:new Date()});});
+    const arch=(db,uid,code)=>setDoc(doc(db,'duelPreferences',uid,'archived',code),{updatedAt:serverTimestamp()});
+    await assertSucceeds(arch(guest,'guest','FINISHEDX2'));
+    await assertFails(arch(guest,'guest','ONGOINGXX2'));
+    await assertFails(arch(out,'outsider','FINISHEDX2'));
+    await assertFails(arch(out,'guest','FINISHEDX2'));
+    await assertSucceeds(getDocs(collection(guest,'duelPreferences','guest','archived')));
+  }
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
 } finally {await env.cleanup();}

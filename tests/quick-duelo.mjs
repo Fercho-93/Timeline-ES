@@ -130,10 +130,8 @@ assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-duel-pace-v1'), 'turno
   assert.match(by('BBBBBBBBB2').detalle, /^Mazo 1 de 3 · carta \d de 5$/);
   assert.match(by('BBBBBBBBB2').marcador, /^Tú \d · Luis \d aciertos$/);
   assert.equal(by('CCCCCCCCC2').done, true); assert.ok(['win', 'loss', 'draw'].includes(by('CCCCCCCCC2').result));
-  CT.Quick.forgetDuel('CCCCCCCCC2');
-  const tras = await CT.Quick.duels();
-  assert.equal(tras.length, 3, 'archivar esconde de la lista pero el duelo sigue contando'); assert.equal(tras.find(x => x.code === 'CCCCCCCCC2').hidden, true);
   CT.QuickNetwork.mine = async () => {throw Error('sin conexión');};
   assert.equal((await CT.Quick.duels()).length, 3, 'sin conexión se enseña lo último que se supo');
+  assert.equal(CT.Quick.forgetDuel, undefined, 'archivar va con la cuenta (duelPreferences), no con el móvil');
 }
 console.log('Duelo de Retos rápidos: mazos por semilla, enlace corto, resultado comprobado por el motor y entrada con 1, 3 o 5 mazos.');

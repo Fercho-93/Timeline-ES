@@ -164,8 +164,13 @@ service cloud.firestore {
         return (player in game.playersOrder || game.get('invitedUid', '') == player)
           && (game.status in ['finished','cancelled','expired','resigned'] || request.time >= game.updatedAt + duration.value(7,'d'));
       }
+      // Un duelo terminado de Retos rápidos se archiva igual; su identificador es el código de la sala.
+      function quickArchivable() {
+        let room = get(/databases/$(database)/documents/quickRooms/$(gameId)).data;
+        return player in room.members && room.phase == 'finished';
+      }
       allow read, delete: if registered() && request.auth.uid == player;
-      allow create, update: if registered() && request.auth.uid == player && archivable()
+      allow create, update: if registered() && request.auth.uid == player && (archivable() || quickArchivable())
         && request.resource.data.keys().hasOnly(['updatedAt']) && request.resource.data.updatedAt == request.time;
     }
 

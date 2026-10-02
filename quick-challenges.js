@@ -270,9 +270,8 @@
   // Duelo por turnos: no es una mesa. Quien lo crea manda el enlace y la partida empieza sola cuando el amigo lo abre.
   // Duelos por turnos de tu cuenta (los que has creado y los que te han mandado), desde cualquier móvil: salen de las salas
   // en las que estás, igual que los de Grandes colecciones salen de tu cuenta. Lo último que se supo se guarda en el móvil
-  // para poder enseñar la lista sin conexión. Los archivados se esconden de la lista (en este móvil) pero siguen contando en el cara a cara.
-  const DUELS='continuum-quick-duels-v2', HIDDEN='continuum-quick-duels-hidden-v1';
-  const hiddenDuels=()=>{const list=readJSON(HIDDEN,[]);return Array.isArray(list)?list:[];};
+  // para poder enseñar la lista sin conexión. Archivar un duelo terminado va con la cuenta (duelPreferences, como en las colecciones) y no afecta al cara a cara.
+  const DUELS='continuum-quick-duels-v2';
   // Cómo se ve un duelo desde mi sitio: a quién le toca, en qué mazo y carta vais y el marcador.
   function duelRow(room,uid) {
     const s=E.restore(CT.QuickRoom.record(room)),me=room.members.indexOf(uid),other=1-me,friendIn=room.members.length>1;
@@ -289,14 +288,12 @@
   const isDuel=room=>room.capacity===2&&room.config?.kind==='duel'&&!room.matchmaking;
   // Los duelos de tu cuenta con su estado actual. Sin conexión se enseña lo último que se supo.
   async function duels() {
-    const hidden=new Set(hiddenDuels());
     try{
       const rows=(await CT.QuickNetwork.mine()).filter(x=>isDuel(x.room)).map(x=>({...duelRow(x.room,x.uid),code:x.code}));
       CT.Storage.setItem(DUELS,JSON.stringify(rows));
-      return rows.map(r=>({...r,hidden:hidden.has(r.code)}));
-    }catch{const cached=readJSON(DUELS,[]);return (Array.isArray(cached)?cached:[]).map(r=>({...r,hidden:hidden.has(r.code),stale:true}));}
+      return rows;
+    }catch{const cached=readJSON(DUELS,[]);return (Array.isArray(cached)?cached:[]).map(r=>({...r,stale:true}));}
   }
-  function forgetDuel(code) {CT.Storage.setItem(HIDDEN,JSON.stringify([...new Set([...hiddenDuels(),code])].slice(-200)));}
   // Entra en un duelo de la lista. `back` es a donde se vuelve al salir.
   async function openRoom(renderPage,code,back) {
     const saved=(readJSON(DUELS,[])||[]).find(x=>x.code===code);
@@ -743,7 +740,7 @@
     openSolo(renderPage){paint=renderPage;backTo=null;entry='free-setup';format='free';freeSetup();},
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},
-    duels, openRoom, forgetDuel,
+    duels, openRoom,
     Duel:{pack:packCommands,unpack:unpackCommands,payload:duelPayload,read:readDuel,fingerprint:duelFingerprint,rounds},
     openNetwork(renderPage,kind,capacity){paint=renderPage;backTo=null;entry='network';networkSetup(kind,capacity);},
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
