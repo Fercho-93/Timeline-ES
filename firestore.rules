@@ -41,6 +41,16 @@ service cloud.firestore {
           && b.names.size() == a.names.size()+1
           && b.names == a.names.concat([b.names[b.names.size()-1]]);
       }
+      // Duelo por turnos ya empezado por quien lo creó: el amigo entra al abrir el enlace y la partida sigue donde está.
+      function joiningStarted(a,b) {
+        return a.phase in ['turn','result'] && a.capacity == 2 && a.members.size() == 1 && a.get('matchmaking','private') != 'public'
+          && a.config != null && a.config.get('kind','') == 'duel' && !(request.auth.uid in a.members)
+          && b.diff(a).affectedKeys().hasOnly(['members','names','config','actor','revision','updatedAt'])
+          && b.members == a.members.concat([request.auth.uid])
+          && b.names.size() == 2 && b.names == a.names.concat([b.names[1]])
+          && b.config.diff(a.config).affectedKeys().hasOnly(['names']) && b.config.names == b.names
+          && b.phase == a.phase;
+      }
       // Dejar una mesa pública antes de empezar. Si se va quien la llevaba, la lleva quien
       // queda primero (la única vez que cambia `host`).
       function leaving(a,b) {
@@ -52,15 +62,19 @@ service cloud.firestore {
           && b.names.size() == b.members.size() && b.host == b.members[0] && b.actor == b.host;
       }
       function starting(a,b) {
-        return request.auth.uid == a.host && a.phase == 'lobby' && a.members.size() >= 2
+        return request.auth.uid == a.host && a.phase == 'lobby'
+          && (a.members.size() >= 2 || (a.capacity == 2 && a.get('matchmaking','private') != 'public' && b.config.get('kind','') == 'duel'))
           // Mesa pública: empieza al completarse o, con al menos dos personas, cuando lleva
           // un rato sin que entre nadie (la pantalla cuenta 30 s; aquí se exigen 25).
           && (a.get('matchmaking','private') != 'public' || a.members.size() == a.capacity
               || a.updatedAt < request.time - duration.value(25, 's'))
           && b.diff(a).affectedKeys().hasOnly(['config','phase','revision','updatedAt'])
-          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep'])
+          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep','first'])
           && (!('keep' in b.config.keys()) || b.config.keep is bool)
-          && b.config.names == a.names && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
+          && (!('first' in b.config.keys()) || (b.config.first in [0,1] && a.members.size() == 1))
+          && (b.config.names == a.names || (a.members.size() == 1 && b.config.names.size() == 2 && b.config.names[0] == a.names[0]
+              && b.config.names[1] is string && b.config.names[1].size() > 0 && b.config.names[1].size() <= 24))
+          && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
           && (!('kind' in b.config.keys()) || b.config.kind in ['duel','network','public'])
           && (!('historyId' in b.config.keys()) || b.config.historyId == null || (b.config.historyId is string && b.config.historyId.size() <= 64))
           && b.phase == 'turn';
@@ -78,7 +92,9 @@ service cloud.firestore {
             || (a.phase=='round-end' && request.auth.uid==a.host && last=={'type':'next'} && b.phase=='turn'))
           && (!(b.phase in ['round-end','finished']) || b.actor==a.host);
       }
-      allow get: if registered() && (!exists(/databases/$(database)/documents/quickRooms/$(code)) || resource.data.phase=='lobby' || request.auth.uid in resource.data.members);
+      allow get: if registered() && (!exists(/databases/$(database)/documents/quickRooms/$(code)) || resource.data.phase=='lobby' || request.auth.uid in resource.data.members
+        // Un duelo por turnos con el sitio del amigo libre se lee con el enlace para poder entrar.
+        || (resource.data.capacity==2 && resource.data.members.size()==1 && resource.data.get('matchmaking','private')!='public'));
       allow list: if false;
       allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && valid(request.resource.data)
         && request.resource.data.host==request.auth.uid && request.resource.data.members==[request.auth.uid]
@@ -86,7 +102,7 @@ service cloud.firestore {
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
-        && (joining(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
+        && (joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host;
     }
 

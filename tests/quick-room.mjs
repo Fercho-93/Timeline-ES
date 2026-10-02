@@ -28,3 +28,31 @@ while(solo.phase!=='round-end'){
 assert.equal(solo.players[0].score,8);
 solo=E.create({names:['Tú'],rounds});solo=E.step(solo,{type:'place',cardId:'poker-2',index:1});solo=E.step(solo,{type:'ack'});solo=E.step(solo,{type:'place',cardId:'poker-3',index:0});solo=E.step(solo,{type:'ack'});assert.equal(solo.phase,'turn','en solitario un fallo no corta el reto');assert.equal(solo.players[0].status,'active');assert.equal(solo.players[0].points,1,'conserva el acierto previo');
 console.log('Sala de Retos: capacidad, identidad, turnos, revisiones, inmutabilidad y solitario completo: OK');
+// Duelo por turnos: empieza quien lo crea, sin esperar; el amigo entra después y sigue donde se quedó.
+{
+  const duelRounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}, {id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
+  let d=R.create('a','Ana',2);
+  assert.throws(()=>R.reduce(d,'a',{type:'start',rounds:duelRounds,kind:'network'}),/al menos dos/,'solo un duelo empieza sin amigo');
+  d=R.reduce(d,'a',{type:'start',rounds:duelRounds,kind:'duel',keep:true});
+  assert.equal(JSON.stringify(d.config.names),'["Ana","Tu amigo"]');assert.equal(d.members.length,1);assert.equal(d.actor,'a');
+  d=R.reduce(d,'a',{type:'place',cardId:'poker-2',index:1});d=R.reduce(d,'a',{type:'ack'});
+  assert.equal(R.state(d).current,1,'le toca al amigo');assert.equal(d.actor,'a','mientras tanto el móvil de Ana hace de turno');
+  assert.throws(()=>R.reduce(d,'a',{type:'place',cardId:'poker-3',index:0}),/INVALID|Jugada|turno/i,'Ana no juega el turno del amigo');
+  const antes=JSON.stringify(d);
+  assert.throws(()=>R.reduce(d,'c',{type:'join',name:'ana'}),/diferente/);
+  d=R.reduce(d,'b',{type:'join',name:'Beto'});assert.equal(JSON.stringify(R.state(R.reduce(JSON.parse(antes),'b',{type:'join',name:'Beto'})).players.map(p=>p.name)),'["Ana","Beto"]');
+  assert.equal(d.actor,'b');assert.equal(JSON.stringify(d.config.names),'["Ana","Beto"]');
+  assert.throws(()=>R.reduce(d,'c',{type:'join',name:'Carla'}),/completa/);
+  d=R.reduce(d,'b',{type:'place',cardId:'poker-3',index:0});assert.equal(d.phase,'result');
+  // El primer turno alterna: con first:1 abre el amigo (y Ana solo espera)
+  let e=R.reduce(R.create('a','Ana',2),'a',{type:'start',rounds:duelRounds,kind:'duel',first:1});
+  assert.equal(R.state(e).current,1);assert.equal(e.actor,'a');
+  e=R.reduce(e,'b',{type:'join',name:'Beto'});assert.equal(e.actor,'b');
+  assert.equal(R.reduce(R.create('a','Ana',2),'a',{type:'start',rounds:duelRounds,kind:'duel',first:2}).config.first,undefined,'un primer turno inválido se ignora');
+  // Rondas siguientes: el inicio sigue rotando respecto a `first`
+  let t=E.create({names:['A','B'],rounds:duelRounds,first:1});assert.equal(t.current,1);t=E.step(t,{type:'bank'});t=E.step(t,{type:'bank'});t=E.step(t,{type:'next'});assert.equal(t.current,0);
+  // Una mesa corriente de dos no admite entrar una vez empezada
+  let m=R.create('a','Ana',2);m=R.reduce(m,'b',{type:'join',name:'Bea'});m=R.reduce(m,'a',{type:'start',rounds:duelRounds,kind:'duel'});
+  assert.throws(()=>R.reduce(m,'c',{type:'join',name:'Carla'}));
+}
+console.log('Duelo por turnos: empieza el creador, el amigo entra después y el primer turno alterna: OK');

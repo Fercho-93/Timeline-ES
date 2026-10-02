@@ -9,6 +9,8 @@
         config.names.some(n => typeof n !== 'string' || !n.trim() || n.length > 24) ||
         !Array.isArray(config.rounds) || config.rounds.length < 1 || config.rounds.length > catalog.challenges.length) throw Error('INVALID_CONFIG');
     if (config.keep !== undefined && typeof config.keep !== 'boolean') throw Error('INVALID_CONFIG');
+    // `first`: quién abre el primer reto (0 = el primero de la lista, 1 = el segundo); la revancha de un duelo lo alterna.
+    if (config.first !== undefined && !(config.first === 0 || config.first === 1)) throw Error('INVALID_CONFIG');
     const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
@@ -30,7 +32,7 @@
     s.timeline = [round.order[0]];
     s.remaining = round.order.slice(1);
     // El inicio rota en cada reto: nadie tiene ventaja por ser quien crea la sala.
-    s.starter = s.index % s.players.length;
+    s.starter = (s.index + (s.config.first || 0)) % s.players.length;
     s.current = s.starter;
     s.phase = 'turn'; s.result = null;
     s.players.forEach(p => {p.points = 0; p.status = 'active'; p.roundScore = 0;});

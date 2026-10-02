@@ -8,12 +8,12 @@ const { DAY, millis, lifecycle, movementMessage } = require('./duel-policy');
 initializeApp();
 
 const db = getFirestore();
-async function send(uid, duelId, title, body) {
+async function send(uid, duelId, title, body, type = 'turn-duel') {
   const snapshot = await db.collection('playerProfiles').doc(uid).collection('pushTokens').get();
   const docs = snapshot.docs.filter(d => typeof d.data().token === 'string');
   for (let start = 0; start < docs.length; start += 500) {
     const batch = docs.slice(start, start + 500);
-    const result = await getMessaging().sendEachForMulticast({ tokens: batch.map(d => d.data().token), notification: { title, body }, data: { type: 'turn-duel', duelId } });
+    const result = await getMessaging().sendEachForMulticast({ tokens: batch.map(d => d.data().token), notification: { title, body }, data: { type, duelId } });
     await Promise.all(result.responses.map((response, i) => {
       const code = response.error?.code;
       if (['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'].includes(code)) return batch[i].ref.delete();
@@ -35,6 +35,17 @@ exports.notifyTurnDuel = onDocumentUpdated('turnDuels/{duelId}', async event => 
   const before = event.data?.before.data(), after = event.data?.after.data();
   const message = before && after && movementMessage(before, after);
   if (message && await claimEvent(event.id)) await send(message.recipient, event.params.duelId, message.title, message.body);
+});
+// Duelo por turnos de Retos rápidos (sala de dos): avisa a quien le toca cuando el otro termina su jugada.
+exports.notifyQuickDuel = onDocumentUpdated('quickRooms/{code}', async event => {
+  const before = event.data?.before.data(), after = event.data?.after.data();
+  if (!before || !after || after.config?.kind !== 'duel' || after.members?.length !== 2 || before.members?.length !== 2) return;
+  if (after.actor === before.actor || !after.members.includes(after.actor)) return;
+  const title = after.phase === 'finished' ? 'Duelo terminado' : 'Te toca en Continuum';
+  const body = after.phase === 'finished' ? 'Tu amigo ha terminado el duelo de Retos rápidos. Mira quién ha ganado.'
+    : after.phase === 'round-end' ? 'Se ha acabado un mazo del duelo de Retos rápidos. Pasa al siguiente.'
+    : 'Tu amigo ha hecho su jugada en el duelo de Retos rápidos. Es tu turno.';
+  if (await claimEvent(event.id)) await send(after.actor, event.params.code, title, body, 'quick-duel');
 });
 exports.notifyDuelInvitation = onDocumentCreated('turnDuels/{duelId}', async event => {
   const game = event.data?.data();

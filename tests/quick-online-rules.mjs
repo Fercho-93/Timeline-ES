@@ -100,5 +100,26 @@ try {
   assert.equal(sinAna.host,'guest');
   await assertFails(write(guest,{...sinAna,host:'host'}));
   await assertSucceeds(write(host,sinAna));
+  // Duelo por turnos: quien lo crea empieza sin esperar y el amigo entra a mitad de partida.
+  await env.clearFirestore();
+  const duelRounds=Array.from({length:3},()=>({id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}));
+  let du=R.create('host','Ana',2);
+  await assertSucceeds(write(host,du));
+  du=R.reduce(du,'host',{type:'start',rounds:duelRounds,kind:'duel',keep:true,first:0});
+  await assertFails(write(guest,du));
+  await assertSucceeds(write(host,du));
+  du=R.reduce(du,'host',{type:'place',cardId:'poker-2',index:1});await assertSucceeds(write(host,du));
+  du=R.reduce(du,'host',{type:'ack'});await assertSucceeds(write(host,du));
+  assert.equal(du.actor,'host');
+  await assertSucceeds(getDoc(ref(guest)));
+  const entra=R.reduce(du,'guest',{type:'join',name:'Bea'});
+  await assertFails(write(guest,{...entra,names:['Impostor','Bea']}));
+  await assertFails(write(guest,{...entra,commands:[]}));
+  await assertSucceeds(write(guest,entra));du=entra;
+  assert.equal(du.actor,'guest');
+  await assertFails(write(out,R.reduce(R.reduce(du,'guest',{type:'place',cardId:'poker-3',index:0}),'guest',{type:'ack'})));
+  du=R.reduce(du,'guest',{type:'place',cardId:'poker-3',index:0});await assertSucceeds(write(guest,du));
+  // Una sala de dos que ya es de dos no admite a un tercero ni deja leer a quien no está.
+  await assertFails(getDoc(ref(out)));
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
 } finally {await env.cleanup();}
