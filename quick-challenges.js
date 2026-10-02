@@ -229,6 +229,7 @@
   function roomChanged(next,id,code) {
     const wasLobby=page==='network-lobby'&&!room?.config;
     serverRoom=next;
+    if(!backTo&&next.capacity===2&&next.config?.kind==='duel'&&!next.matchmaking)backTo=()=>window.dispatchEvent(new CustomEvent('continuum:duels-list'));
     room=CT.QuickRoom.validate(withOutbox(next,id,code));myId=id;busy=false;page='network-lobby';
     if(readOutbox()&&!flushing&&navigator.onLine!==false)void flushOutbox();
     if(code)CT.Storage.setItem(NET,JSON.stringify({code,name:room.names[room.members.indexOf(id)],duel:duelRoom,len:roomLength}));
@@ -334,11 +335,12 @@
   }
   // El móvil de quien creó el duelo, ya hecha su jugada: toca mandarle la partida al amigo, que sigue desde donde se ha quedado.
   function duelInvite() {
-    const code=connection?.code, friend=esc(state.players[1].name), jugadas=record.commands.filter(c=>c.type==='place').length;
-    shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">Duelo en marcha</h2></div></section><section class="panel lobby-settings duel-invite"><div class="waiting-orbit"><span></span></div><h3>Le toca a tu amigo</h3>
-      <p>${jugadas?'Ya has hecho tu jugada. ':''}Mándale el enlace (o el código o el QR): al abrirlo, ${friend==='Tu amigo'?'sigue la partida desde donde la has dejado':'continúa la partida'}.</p>
+    const code=connection?.code, friend=esc(state.players[1].name), jugadas=record.commands.filter(c=>c.type==='place').length, invited=!!room.invitedUid;
+    shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Duelo con un amigo · Retos rápidos</div><h2 data-focus tabindex="-1">Duelo en marcha</h2></div></section><section class="panel lobby-settings duel-invite"><div class="waiting-orbit"><span></span></div><h3>Le toca a ${invited?friend:'tu amigo'}</h3>
+      <p>${jugadas?'Ya has hecho tu jugada. ':''}${invited?`El reto ya le aparece en su lista de duelos. Si quieres, mándale también el enlace (o el código o el QR).`:'Mándale el enlace (o el código o el QR): al abrirlo, sigue la partida desde donde la has dejado.'}</p>
       ${code?`${button('share-room','Compartir enlace','btn btn-primary btn-block')}<div class="room-code-card"><small>Código del duelo</small><strong>${esc(code)}</strong><div class="room-invite-actions"><button data-quick="qr-room">Mostrar QR</button></div></div>`:''}
-      <p class="hint">La partida se guarda: puedes cerrar la app y volver a tu duelo cuando quieras.</p><p id="quick-error" role="alert"></p></section>`);
+      ${button('formats','Volver a mis duelos','btn btn-secondary btn-block')}
+      <p class="hint">La partida ya está en juego y se guarda: la verás en «Tus duelos», con a quién le toca.</p><p id="quick-error" role="alert"></p></section>`);
   }
   function duelWaiting(code,host) {
     const length=roomLength||3, keep=duelKeep(), friend=esc(room.names[0]);
@@ -473,7 +475,13 @@
       await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:me!==cfg.names[cfg.first||0],invite:other?{uid:other,name:room.names[room.members.indexOf(other)]}:null,back:backTo});
       return true;
     }
-    if(action==='share-room'){const url=roomUrl(connection.code);await CT.LocalShare.shareSignal(url.href);return true;}
+    if(action==='share-room'){
+      const url=roomUrl(connection.code),esperando=!!(room&&state&&page==='game'&&room.members.length<state.players.length);
+      await CT.LocalShare.shareSignal(url.href);
+      // Con el enlace ya mandado, el duelo sigue su curso esperando a tu amigo: se vuelve a la lista de duelos.
+      if(esperando)toEntry();
+      return true;
+    }
     if(action==='qr-room'){const url=roomUrl(connection.code);showQrOrExplain({eyebrow:'Sala de Retos rápidos',title:'Escanea para entrar',text:url.href,code:connection.code,hint:'Abre la cámara del otro móvil y apunta al código.'});return true;}
     if(action==='qr-signal'){showQrOrExplain({eyebrow:'Conexión sin internet',title:'Enséñalo al otro móvil',text:app().querySelector('#quick-signal').value,hint:'El otro móvil lo lee con «Escanear QR».'});return true;}
     if(action==='scan-code'){await scanQrInto('Escanear QR de la sala','Encuadra el código QR de la sala o de la invitación.',text=>{
