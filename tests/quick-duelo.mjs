@@ -106,21 +106,34 @@ assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-duel-pace-v1'), 'turno
   assert.doesNotMatch(mesa({correct: false, lost: 0}, {name: 'Ana'}), /pierde 0|0 aciertos/);
   assert.doesNotMatch(solo({correct: false, lost: 0}, {name: 'Tú'}), /Tú pierde/);
 }
-// Lista unificada de duelos: los de Retos rápidos dicen a quién le toca, en qué mazo y carta vais.
+// Lista unificada de duelos (de tu cuenta): dicen a quién le toca, en qué mazo y carta vais, y los terminados cuentan para el cara a cara.
 {
   const R = CT.QuickRoom, order = id => E.challenge(id).cards.map(c => c.id).slice(0, 6);
   const rounds3 = ['poker', 'drinks', 'oscars'].map(id => ({id, order: order(id)}));
   let r = R.create('me', 'Tester', 2); r = R.reduce(r, 'me', {type: 'start', rounds: rounds3, kind: 'duel', keep: true});
   r = R.reduce(r, 'me', {type: 'place', cardId: R.state(r).remaining[0], index: 1}); r = R.reduce(r, 'me', {type: 'ack'});
-  const rooms = {AAAAAAAAA2: r, BBBBBBBBB2: R.reduce(r, 'amigo', {type: 'join', name: 'Luis'})};
-  CT.Storage.setItem('continuum-quick-duels-v1', JSON.stringify(Object.keys(rooms).map(code => ({code, name: 'Tester'}))));
-  CT.QuickNetwork.peek = async code => code === 'ZZZZZZZZZ2' ? null : {room: rooms[code], uid: 'me'};
+  const joined = R.reduce(r, 'amigo', {type: 'join', name: 'Luis'});
+  let fin = joined;
+  for (let g = 0; g < 400 && fin.phase !== 'finished'; g++) {
+    if (fin.phase === 'round-end') {fin = R.reduce(fin, fin.host, {type: 'next'}); continue;}
+    const st = R.state(fin), id = fin.members[st.current];
+    fin = R.reduce(fin, id, st.phase === 'result' ? {type: 'ack'} : {type: 'place', cardId: st.remaining[0], index: st.timeline.length});
+  }
+  const mesa = R.create('me', 'Tester', 4);
+  const rooms = [{code: 'AAAAAAAAA2', room: r}, {code: 'BBBBBBBBB2', room: joined}, {code: 'CCCCCCCCC2', room: fin}, {code: 'DDDDDDDDD2', room: mesa}];
+  CT.QuickNetwork.mine = async () => rooms.map(x => ({...x, uid: 'me'}));
   const rows = await CT.Quick.duels();
   const by = code => rows.find(x => x.code === code);
+  assert.equal(rows.length, 3, 'las mesas de varios no son duelos');
   assert.equal(by('AAAAAAAAA2').grupo, 'enviada', 'si el amigo aún no ha abierto el enlace, esperas');
-  assert.equal(by('BBBBBBBBB2').grupo, 'su-turno'); assert.equal(by('BBBBBBBBB2').rival, 'Luis');
+  assert.equal(by('BBBBBBBBB2').grupo, 'su-turno'); assert.equal(by('BBBBBBBBB2').rival, 'Luis'); assert.equal(by('BBBBBBBBB2').rivalUid, 'amigo');
   assert.match(by('BBBBBBBBB2').detalle, /^Mazo 1 de 3 · carta \d de 5$/);
   assert.match(by('BBBBBBBBB2').marcador, /^Tú \d · Luis \d aciertos$/);
-  CT.Quick.forgetDuel('AAAAAAAAA2'); assert.equal((await CT.Quick.duels()).length, 1);
+  assert.equal(by('CCCCCCCCC2').done, true); assert.ok(['win', 'loss', 'draw'].includes(by('CCCCCCCCC2').result));
+  CT.Quick.forgetDuel('CCCCCCCCC2');
+  const tras = await CT.Quick.duels();
+  assert.equal(tras.length, 3, 'archivar esconde de la lista pero el duelo sigue contando'); assert.equal(tras.find(x => x.code === 'CCCCCCCCC2').hidden, true);
+  CT.QuickNetwork.mine = async () => {throw Error('sin conexión');};
+  assert.equal((await CT.Quick.duels()).length, 3, 'sin conexión se enseña lo último que se supo');
 }
 console.log('Duelo de Retos rápidos: mazos por semilla, enlace corto, resultado comprobado por el motor y entrada con 1, 3 o 5 mazos.');

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
-import {doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
+import {collection,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
 const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
 const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
@@ -36,7 +36,7 @@ try {
   const source=fs.readFileSync('quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
   w.CONTINUUM.QuickNetwork={fingerprint:()=>1};
   w.CONTINUUM.QuickRoom={...R,create:(...args)=>JSON.parse(JSON.stringify(R.create(...args))),reduce:(...args)=>JSON.parse(JSON.stringify(R.reduce(...args)))};
-  const adapter=(uid,db)=>new Function('auth','db','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connect;')({currentUser:{uid},authStateReady:async()=>{}},db,doc,runTransaction,onSnapshot,serverTimestamp,w);
+  const adapter=(uid,db)=>new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn connect;')({currentUser:{uid},authStateReady:async()=>{}},db,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
   const rooms={};let failures=[];
   const h=await adapter('host',host)({name:'Ana',create:true,onChange:r=>rooms.h=r,onError:e=>failures.push(e)});
   const g=await adapter('guest',guest)({name:'Bea',code:h.code,onChange:r=>rooms.g=r,onError:e=>failures.push(e)});
@@ -121,5 +121,11 @@ try {
   du=R.reduce(du,'guest',{type:'place',cardId:'poker-3',index:0});await assertSucceeds(write(guest,du));
   // Una sala de dos que ya es de dos no admite a un tercero ni deja leer a quien no está.
   await assertFails(getDoc(ref(out)));
+  // La lista de duelos de tu cuenta: solo se consultan las salas en las que estás.
+  await assertSucceeds(getDocs(query(collection(guest,'quickRooms'),where('members','array-contains','guest'))));
+  await assertFails(getDocs(query(collection(out,'quickRooms'),where('members','array-contains','guest'))));
+  await assertFails(getDocs(collection(guest,'quickRooms')));
+  const minePeek=new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn mine;')({currentUser:{uid:'guest'},authStateReady:async()=>{}},guest,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
+  const mias=await minePeek();assert.equal(mias.length,1);assert.equal(mias[0].code,'ABCDEFGH23');assert.equal(mias[0].room.members.includes('guest'),true);
   console.log('Retos online: reglas de acceso, turnos, historial, sala real, sincronización y reconexión: OK');
 } finally {await env.cleanup();}

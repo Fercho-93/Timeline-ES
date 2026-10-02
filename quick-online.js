@@ -1,5 +1,5 @@
 import {auth, db} from './firebase-client.js';
-import {doc, getDoc, runTransaction, onSnapshot, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import {collection, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
 const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
@@ -97,18 +97,15 @@ async function publicConnect(options) {
 }
 
 export async function connectPublic(options){return publicConnect(options);}
-// Lee una sala sin engancharse a ella: la lista de duelos la usa para saber a quién le toca. Devuelve null si la
-// sala ya no existe o no eres de ella.
-export async function peek(code){
+// Las salas en las que estás (por tu cuenta, desde cualquier móvil): la lista de duelos las usa para saber a quién le toca.
+export async function mine(){
   await auth.authStateReady();
   const uid=auth.currentUser?.uid;
   if(!uid)throw Error('Sin perfil todavía.');
-  try{
-    const snap=await getDoc(doc(db,'quickRooms',String(code||'').toUpperCase()));
-    if(!snap.exists())return null;
-    const room=R.validate(snap.data());
-    return room.members.includes(uid)?{room,uid,updatedAt:snap.data().updatedAt?.seconds||0}:null;
-  }catch(error){if(error?.code==='permission-denied')return null;throw error;}
+  const snaps=await getDocs(query(collection(db,'quickRooms'),where('members','array-contains',uid)));
+  const found=[];
+  for(const d of snaps.docs){try{found.push({code:d.id,room:{...R.validate(d.data()),updatedAt:d.data().updatedAt?.seconds||0},uid});}catch{/* sala dañada: no se enseña */}}
+  return found;
 }
 export async function connect({code, name, create=false, capacity=4, onChange, onError}) {
   await auth.authStateReady();

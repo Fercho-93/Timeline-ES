@@ -95,7 +95,8 @@ service cloud.firestore {
       allow get: if registered() && (!exists(/databases/$(database)/documents/quickRooms/$(code)) || resource.data.phase=='lobby' || request.auth.uid in resource.data.members
         // Un duelo por turnos con el sitio del amigo libre se lee con el enlace para poder entrar.
         || (resource.data.capacity==2 && resource.data.members.size()==1 && resource.data.get('matchmaking','private')!='public'));
-      allow list: if false;
+      // Tus salas (consulta con members array-contains tu uid): la lista unificada de duelos.
+      allow list: if registered() && request.auth.uid in resource.data.members;
       allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && valid(request.resource.data)
         && request.resource.data.host==request.auth.uid && request.resource.data.members==[request.auth.uid]
         && request.resource.data.config==null && request.resource.data.commands==[]

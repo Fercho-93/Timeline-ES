@@ -358,23 +358,31 @@ function headToHead(player, games = cachedGames) {
 }
 // El cara a cara con cada amigo: todas las partidas terminadas contra esa persona, juntas (ordenar y
 // cifras), de más a menos jugadas. «Tú 3 — 1 Mario».
-function rivalStandings(games = cachedGames) {
-  return rivals(games).map(r => {
+function rivalStandings(games = cachedGames, quick = []) {
+  const found = new Map(rivals(games).map(r => {
     const t = headToHead(r.uid, games);
     const wins = t.orden.wins + t.cifras.wins, losses = t.orden.losses + t.cifras.losses, draws = t.orden.draws + t.cifras.draws;
-    return { ...r, wins, losses, draws, played: wins + losses + draws };
-  }).filter(r => r.played > 0).sort((a, b) => b.played - a.played || b.wins - a.wins);
+    return [r.uid, { ...r, wins, losses, draws, played: wins + losses + draws }];
+  }));
+  // Los duelos terminados de Retos rápidos cuentan contra la misma persona, en el mismo marcador.
+  for (const x of quick) {
+    if (!x.done || !x.rivalUid || !['win', 'loss', 'draw'].includes(x.result)) continue;
+    const r = found.get(x.rivalUid) || { uid: x.rivalUid, alias: x.rival, favorite: favoriteIds().includes(x.rivalUid), wins: 0, losses: 0, draws: 0, played: 0 };
+    r[x.result === 'win' ? 'wins' : x.result === 'loss' ? 'losses' : 'draws']++; r.played++;
+    found.set(x.rivalUid, r);
+  }
+  return [...found.values()].filter(r => r.played > 0).sort((a, b) => b.played - a.played || b.wins - a.wins);
 }
-function standingsMarkup(games = cachedGames) {
-  const rows = rivalStandings(games);
+function standingsMarkup(games = cachedGames, quick = []) {
+  const rows = rivalStandings(games, quick);
   if (!rows.length) return '<p class="hint">Cuando termines un duelo por turnos con un amigo, aquí verás cuántas veces ha ganado cada uno.</p>';
   return `<ol class="duel-standings">${rows.map(r => `<li><span class="duel-standings-who">${CT.Avatares?.markup(r.alias, { size: 36, seed: 'uid:' + r.uid }) || ''}<b>${safe(r.alias)}</b><small>${r.played} ${r.played === 1 ? 'duelo' : 'duelos'}${r.draws ? ` · ${r.draws} ${r.draws === 1 ? 'empate' : 'empates'}` : ''}</small></span><span class="duel-standings-score" aria-label="Tú ${r.wins} victorias, ${safe(r.alias)} ${r.losses}"><b class="${r.wins > r.losses ? 'is-ahead' : ''}">${r.wins}</b><i>—</i><b class="${r.losses > r.wins ? 'is-ahead' : ''}">${r.losses}</b></span></li>`).join('')}</ol><p class="hint">Victorias tuyas — victorias de tu amigo. Cancelaciones y caducidades no cuentan.</p>`;
 }
-async function standings() { return standingsMarkup(await list()); }
+async function standings() { return standingsMarkup(await list(), await Promise.resolve(CT.Quick?.duels?.() || []).catch(() => [])); }
 // Una fila de un duelo por turnos de Retos rápidos, con el mismo aspecto que las de Grandes colecciones.
 function quickRowMarkup(x) {
   const avatar = CT.Avatares?.markup(x.rival, { size: 44, seed: 'quick:' + x.code }) || '';
-  return `<div class="turn-duel-profile-row turn-duel-row-${safe(x.grupo)}"><button class="turn-duel-entry${x.pendiente ? ' is-pending' : ''}" data-action="open-quick-duel" data-quick-code="${safe(x.code)}" aria-label="${safe(`${x.rival}, Retos rápidos, ${x.deck}. ${x.estado}. ${x.detalle}. ${x.marcador}`)}"><span class="turn-duel-entry-avatar">${avatar}</span><span class="turn-duel-entry-copy"><b>${safe(x.rival)}</b><small>Retos rápidos · ${safe(x.deck)}</small><span class="turn-duel-entry-state">${safe(x.estado)} <em>· ${safe(x.detalle)}</em></span>${x.marcador ? `<span class="turn-duel-entry-score">${safe(x.marcador)}</span>` : ''}</span><i aria-hidden="true">→</i></button><div class="turn-duel-row-actions"><button class="btn btn-ghost" data-action="remove-quick-duel" data-quick-code="${safe(x.code)}">Quitar de la lista</button></div></div>`;
+  return `<div class="turn-duel-profile-row turn-duel-row-${safe(x.grupo)}"><button class="turn-duel-entry${x.pendiente ? ' is-pending' : ''}" data-action="open-quick-duel" data-quick-code="${safe(x.code)}" aria-label="${safe(`${x.rival}, Retos rápidos, ${x.deck}. ${x.estado}. ${x.detalle}. ${x.marcador}`)}"><span class="turn-duel-entry-avatar">${avatar}</span><span class="turn-duel-entry-copy"><b>${safe(x.rival)}</b><small>Retos rápidos · ${safe(x.deck)}</small><span class="turn-duel-entry-state">${safe(x.estado)} <em>· ${safe(x.detalle)}</em></span>${x.marcador ? `<span class="turn-duel-entry-score">${safe(x.marcador)}</span>` : ''}</span><i aria-hidden="true">→</i></button><div class="turn-duel-row-actions">${x.done ? `<button class="btn btn-ghost" data-action="remove-quick-duel" data-quick-code="${safe(x.code)}">Archivar</button>` : ''}</div></div>`;
 }
 function profileMarkup(games, extras = []) {
   const visible = games.filter(g => !archivedIds.has(g.id));
@@ -391,14 +399,14 @@ function profileMarkup(games, extras = []) {
   // Los duelos de Retos rápidos (`extras`) van en los mismos grupos, mezclados por fecha con los de las colecciones.
   const rows = (entries, quick = []) => [...entries.map(g => ({ t: g.updatedAt?.seconds || 0, html: row(g) })), ...quick.map(x => ({ t: x.updatedAt?.seconds || 0, html: quickRowMarkup(x) }))].sort((a, b) => b.t - a.t).map(x => x.html).join('');
   const keys = ['tu-turno', 'retado', 'su-turno', 'enviada', 'historial'];
-  const history = groups.map(([title, filter], i) => { const entries = visible.filter(filter), quick = extras.filter(x => x.grupo === keys[i]), n = entries.length + quick.length; return !n ? '' : i === 4 ? `<details><summary>${title} (${n})</summary>${rows(entries, quick)}</details>` : `<h3>${title} (${n})</h3>${rows(entries, quick)}`; }).join('');
+  const history = groups.map(([title, filter], i) => { const entries = visible.filter(filter), quick = extras.filter(x => !x.hidden && x.grupo === keys[i]), n = entries.length + quick.length; return !n ? '' : i === 4 ? `<details><summary>${title} (${n})</summary>${rows(entries, quick)}</details>` : `<h3>${title} (${n})</h3>${rows(entries, quick)}`; }).join('');
   const rivalRows = rivals(games).map(r => {
     const stats = headToHead(r.uid, games);
     return `<div class="turn-duel-rival"><button class="btn btn-ghost" data-action="favorite-duel-rival" data-rival-id="${safe(r.uid)}" aria-pressed="${r.favorite}" aria-label="Favorito: ${safe(r.alias)}">${r.favorite ? '★' : '☆'}</button><span><b>${safe(r.alias)}</b>${Object.entries(stats).map(([kind, s]) => `<small>${kind === 'orden' ? 'Ordenar' : 'Cifras'}: tú ${s.wins} — ${s.losses} rival · ${s.draws} empates</small>`).join('')}</span><div class="turn-duel-row-actions">${!blockedPlayers.has(r.uid) ? `<button class="btn btn-secondary" data-action="rematch-turn-duel" data-turn-id="${safe(r.source)}">Retar</button><button class="btn btn-ghost" data-action="block-duel-rival" data-rival-id="${safe(r.uid)}" data-rival-name="${safe(r.alias)}">Bloquear retos</button>` : '<small>Retos bloqueados</small>'}</div></div>`;
   }).join('');
   const archived = games.filter(g => archivedIds.has(g.id));
   const pendingCount = visible.filter(g => g.status === 'playing' && g.turnUid === uid()).length;
-  return `<h2>Mis duelos</h2><h3>Cara a cara con tus amigos</h3>${standingsMarkup(games)}${pendingCount ? `<button class="btn btn-secondary btn-block" data-action="next-turn-duel">Ir al siguiente duelo pendiente <small>(${pendingCount})</small></button><p class="hint">Abre la partida más antigua en la que te toca jugar.</p>` : ''}${history || '<p>No tienes duelos abiertos.</p>'}${archived.length ? `<details><summary>Archivados (${archived.length})</summary>${rows(archived)}</details>` : ''}${rivalRows ? `<details><summary>Rivales: retar, favoritos y bloqueos</summary><p class="hint">Victorias separadas por modalidad. Archivar solo cambia tu lista.</p>${rivalRows}</details>` : ''}${blockedPlayers.size ? `<details><summary>Rivales bloqueados</summary>${[...blockedPlayers].map(([player, name]) => `<p>${safe(name)} <button class="btn btn-ghost" data-action="unblock-duel-rival" data-rival-id="${safe(player)}">Desbloquear</button></p>`).join('')}</details>` : ''}`;
+  return `<h2>Mis duelos</h2><h3>Cara a cara con tus amigos</h3>${standingsMarkup(games, extras)}${pendingCount ? `<button class="btn btn-secondary btn-block" data-action="next-turn-duel">Ir al siguiente duelo pendiente <small>(${pendingCount})</small></button><p class="hint">Abre la partida más antigua en la que te toca jugar.</p>` : ''}${history || '<p>No tienes duelos abiertos.</p>'}${archived.length ? `<details><summary>Archivados (${archived.length})</summary>${rows(archived)}</details>` : ''}${rivalRows ? `<details><summary>Rivales: retar, favoritos y bloqueos</summary><p class="hint">Victorias separadas por modalidad. Archivar solo cambia tu lista.</p>${rivalRows}</details>` : ''}${blockedPlayers.size ? `<details><summary>Rivales bloqueados</summary>${[...blockedPlayers].map(([player, name]) => `<p>${safe(name)} <button class="btn btn-ghost" data-action="unblock-duel-rival" data-rival-id="${safe(player)}">Desbloquear</button></p>`).join('')}</details>` : ''}`;
 }
 function favoriteIds() { try { const saved = JSON.parse(localStorage.getItem(`continuum-duel-favorites-${uid()}`) || '[]'); return Array.isArray(saved) ? saved.filter(id => typeof id === 'string') : []; } catch { return []; } }
 function favorite(player) {
