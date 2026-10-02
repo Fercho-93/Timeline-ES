@@ -698,12 +698,14 @@
   function refreshDuelBanner() {
     const box = document.getElementById("home-duels");
     if (!box) return;
-    turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
+    const quickDuels = Promise.resolve(CT.Quick?.duels?.() || []).catch(() => []);
+    Promise.all([turnDuelReady.then(() => CT.TurnDuel?.list?.() || []), quickDuels]).then(([partidas, quick]) => {
       if (!box.isConnected || screen !== "home") return;
       pendingDuels = CT.TurnDuel.pending?.(partidas) || [];
-      if (!pendingDuels.length) return;
-      const n = pendingDuels.length;
-      const turnos = pendingDuels.filter(g => g.status === "playing").length, retos = n - turnos;
+      const quickTurn = quick.filter(x => x.pendiente).length;
+      const n = pendingDuels.length + quickTurn;
+      if (!n) return;
+      const turnos = pendingDuels.filter(g => g.status === "playing").length + quickTurn, retos = n - turnos;
       const detalle = [turnos ? `${turnos} ${turnos === 1 ? "te espera" : "te esperan"}` : "", retos ? `${retos} ${retos === 1 ? "reto nuevo" : "retos nuevos"}` : ""].filter(Boolean).join(" · ");
       box.innerHTML = `<button class="home-duels-banner" data-action="duels-open"><span class="home-duels-mark" aria-hidden="true">⚔</span><span><b>${n === 1 ? "Tienes un duelo pendiente" : `Tienes ${n} duelos pendientes`}</b><small>${detalle}</small></span><i aria-hidden="true">→</i></button>`;
     }).catch(() => { /* sin conexión no hay aviso: la portada sigue igual */ });
@@ -723,9 +725,11 @@
       ${homeNav()}
     </div>`);
     const box = document.getElementById("turn-duels-list");
-    turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).then(partidas => {
+    // Un solo listado: los duelos de Grandes colecciones y los de Retos rápidos, en los mismos grupos.
+    const quickDuels = Promise.resolve(CT.Quick?.duels?.() || []).catch(() => []);
+    Promise.all([turnDuelReady.then(() => CT.TurnDuel?.list?.() || []).catch(error => quickDuels.then(q => { if (q.length) return []; throw error; })), quickDuels]).then(([partidas, quick]) => {
       if (!box?.isConnected || screen !== "duelos") return;
-      box.innerHTML = CT.TurnDuel.profileMarkup(partidas).replace(/^<h2>Mis duelos<\/h2>/, "");
+      box.innerHTML = CT.TurnDuel.profileMarkup(partidas, quick).replace(/^<h2>Mis duelos<\/h2>/, "");
     }).catch(() => { if (box?.isConnected && screen === "duelos") box.innerHTML = '<p>No se pudieron cargar los duelos. Comprueba tu conexión y vuelve a intentarlo.</p>'; });
   }
 
@@ -3956,6 +3960,8 @@
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
+    else if (action === "open-quick-duel") { CT.Quick.openRoom((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView).catch(() => showToast('No se pudo abrir el duelo. Comprueba tu conexión.')); }
+    else if (action === "remove-quick-duel") { CT.Quick.forgetDuel(target.dataset.quickCode); duelsRefresh(); }
     else if (action === "open-turn-duel") { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.dataset.turnId, back })); }
     else if (action === 'next-turn-duel') { const back = screen === "duelos" ? duelsView : perfilView; turnDuelReady.then(() => CT.TurnDuel.next(back)).catch(() => showToast('No se pudieron consultar tus duelos.')); }
     else if (action === 'favorite-duel-rival') { CT.TurnDuel.favorite(target.dataset.rivalId); duelsRefresh(); }

@@ -33,5 +33,6 @@
   }
   function fingerprint(){return CT.seedFrom(JSON.stringify(CT.QuickCatalog));}
   async function internet(options) {return (await import('./quick-online.js')).connect(options);}
-  CT.QuickNetwork={localHost,localGuest,internet,fingerprint};
+  async function peek(code) {return (await import('./quick-online.js')).peek(code);}
+  CT.QuickNetwork={localHost,localGuest,internet,peek,fingerprint};
 })();

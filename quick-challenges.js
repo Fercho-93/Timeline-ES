@@ -76,7 +76,7 @@
   let publicClock=null;
   // Una sala de duelo por turnos (la crea quien abre «Duelo con un amigo → Por turnos») no enseña mesa: se manda el enlace y
   // empieza sola cuando entra el amigo.
-  let duelRoom=false, duelStarting=false, duelFirst=0, justJoined=false;
+  let duelRoom=false, duelStarting=false, duelFirst=0, justJoined=false, backTo=null;
   function stopNetwork() {clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;myId=null;busy=false;invite=null;duelRoom=false;duelStarting=false;justJoined=false;}
   function errorNotice(e) {busy=false;let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=e.message || String(e);CT.announce(e.message || String(e));}
   function rounds(count=3, selectedId=null, seed=null) {
@@ -230,6 +230,7 @@
     const wasLobby=page==='network-lobby'&&!room?.config;
     room=CT.QuickRoom.validate(next);myId=id;busy=false;page='network-lobby';
     if(code)CT.Storage.setItem(NET,JSON.stringify({code,name:room.names[room.members.indexOf(id)],duel:duelRoom,len:roomLength}));
+    if((code||connection?.code)&&room.capacity===2&&room.config?.kind==='duel'&&!room.matchmaking)rememberDuel(code||connection.code,room.names[room.members.indexOf(id)],duelRow(room,id));
     if(room.config){
       const starting=wasLobby && !room.commands.length;
       record=CT.QuickRoom.record(room);state=E.restore(record);selected=null;slot=null;render();
@@ -268,6 +269,58 @@
   // repartidas alrededor según cuántos caben.
   const SEAT_SLOTS={2:[7,2],3:[0,3,6],4:[0,2,5,7],5:[0,2,3,6,7],6:[1,2,3,6,7,8],7:[0,1,2,3,6,7,8],8:[1,2,3,4,5,6,7,8]};
   // Duelo por turnos: no es una mesa. Quien lo crea manda el enlace y la partida empieza sola cuando el amigo lo abre.
+  // Lista de duelos por turnos de este móvil (los que has creado y los que te han mandado). Cada duelo guarda lo último
+  // que se supo de él para poder enseñarlo sin conexión; la lista unificada de «Tus duelos» lo refresca al abrirse.
+  const DUELS='continuum-quick-duels-v1';
+  const duelBook=()=>{const list=readJSON(DUELS,[]);return Array.isArray(list)?list.filter(x=>x&&typeof x.code==='string'):[];};
+  const saveBook=list=>CT.Storage.setItem(DUELS,JSON.stringify(list.slice(0,40)));
+  function rememberDuel(code,name,row) {
+    if(!code)return;
+    const list=duelBook(),at=list.find(x=>x.code===code);
+    saveBook([{code,name:name||at?.name||'',row:row||at?.row||null,at:Date.now()},...list.filter(x=>x.code!==code)]);
+  }
+  // Cómo se ve un duelo desde mi sitio: a quién le toca, en qué mazo y carta vais y el marcador.
+  function duelRow(room,uid) {
+    const s=E.restore(CT.QuickRoom.record(room)),me=room.members.indexOf(uid),other=1-me,friendIn=room.members.length>1;
+    const rival=friendIn?room.names[other]:'tu amigo',c=E.challenge(s.config.rounds[s.index].id),total=s.config.rounds[s.index].order.length-1;
+    const mine=p=>p.score+p.points,mios=mine(s.players[me]),suyos=mine(s.players[other]);
+    const base={rival,deck:c.title,marcador:`Tú ${mios} · ${rival} ${suyos} aciertos`,updatedAt:{seconds:typeof room.updatedAt==='number'?room.updatedAt:room.updatedAt?.seconds||Math.floor(Date.now()/1000)}};
+    const where=`Mazo ${s.index+1} de ${s.config.rounds.length} · carta ${Math.max(1,Math.min(total,s.phase==='turn'?s.timeline.length:s.timeline.length-1))} de ${total}`;
+    if(room.phase==='finished')return {...base,grupo:'historial',pendiente:false,estado:mios>suyos?'Ganaste':mios<suyos?'Perdiste':'Empate',detalle:'Terminado',done:true};
+    if(!friendIn&&s.current!==me&&room.phase==='turn')return {...base,grupo:'enviada',pendiente:false,estado:'Esperando a que tu amigo abra el enlace',detalle:where,marcador:''};
+    const mioTurno=room.actor===uid;
+    if(room.phase==='round-end')return mioTurno?{...base,grupo:'tu-turno',pendiente:true,estado:'Te toca',detalle:'Pasa al siguiente mazo'}:{...base,grupo:'su-turno',pendiente:false,estado:`Turno de ${rival}`,detalle:'Pasa al siguiente mazo'};
+    return mioTurno?{...base,grupo:'tu-turno',pendiente:true,estado:'Te toca',detalle:where}:{...base,grupo:'su-turno',pendiente:false,estado:`Turno de ${rival}`,detalle:where};
+  }
+  // Los duelos de este móvil con su estado actual. Los terminados no se vuelven a consultar; si no hay conexión se
+  // enseña lo último que se supo.
+  async function duels() {
+    const book=duelBook();
+    const rows=await Promise.all(book.map(async item=>{
+      if(item.row?.done)return {...item.row,code:item.code};
+      try{
+        const found=await CT.QuickNetwork.peek(item.code);
+        if(!found)return {gone:true,code:item.code};
+        const row=duelRow(found.room,found.uid);rememberDuelRow(item.code,row);return {...row,code:item.code};
+      }catch{return item.row?{...item.row,code:item.code,stale:true}:null;}
+    }));
+    const gone=new Set(rows.filter(r=>r?.gone).map(r=>r.code));
+    if(gone.size)saveBook(duelBook().filter(x=>!gone.has(x.code)));
+    return rows.filter(r=>r&&!r.gone);
+  }
+  function rememberDuelRow(code,row) {
+    const list=duelBook();saveBook(list.map(x=>x.code===code?{...x,row}:x));
+  }
+  function forgetDuel(code) {saveBook(duelBook().filter(x=>x.code!==code));}
+  // Entra en un duelo de la lista. `back` es a donde se vuelve al salir.
+  async function openRoom(renderPage,code,back) {
+    const saved=duelBook().find(x=>x.code===code);
+    paint=renderPage;entry='duel-setup';duelSetup();backTo=back||null;
+    duelRoom=true;
+    app().querySelector('#quick-net-name').value=saved?.name||CT.Identidad?.propio?.()||'';
+    app().querySelector('#quick-net-code').value=code;
+    await connectRoom(false);
+  }
   // El móvil de quien creó el duelo, ya hecha su jugada: toca mandarle la partida al amigo, que sigue desde donde se ha quedado.
   function duelInvite() {
     const code=connection?.code, friend=esc(state.players[1].name), jugadas=record.commands.filter(c=>c.type==='place').length;
@@ -582,6 +635,7 @@
   // Vuelve a la pantalla por la que se entró en Retos rápidos. El reto del día y la mesa
   // pública no tienen una propia: se sale a la pantalla anterior del juego.
   function toEntry() {
+    if (backTo) {const back=backTo;backTo=null;stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;back();return;}
     if (entry === 'free-setup') freeSetup();
     else if (entry === 'duel-setup') duelSetup();
     else {stopNetwork();pendingConfig=null;state=null;record=null;selected=null;slot=null;CT.navigateBack?.();}
@@ -691,7 +745,7 @@
   }
 
   async function openPublic(renderPage, capacity=0) {
-    paint=renderPage; entry='public'; stopNetwork(); page='network-lobby'; state=null; record=null; selected=null; slot=null; format='public'; netKind='internet';
+    backTo=null; paint=renderPage; entry='public'; stopNetwork(); page='network-lobby'; state=null; record=null; selected=null; slot=null; format='public'; netKind='internet';
     const name=CT.Identidad?.propio?.() || 'Explorador';
     const change=(...args)=>roomChanged(...args), fail=e=>errorNotice(e);
     shell('<section class="setup-section"><h2>Buscando mesa…</h2><div class="panel"><p>Retos rápidos · jugadores aleatorios</p><p class="hint">Entrarás en la primera mesa compatible.</p></div></section>');
@@ -701,11 +755,12 @@
   CT.Quick = {
     leave:stopNetwork,
     openPublic,
-    openSolo(renderPage){paint=renderPage;entry='free-setup';format='free';freeSetup();},
-    openLocal(renderPage){paint=renderPage;entry='setup';format='local';setup();},
-    openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';duelSetup();},
+    openSolo(renderPage){paint=renderPage;backTo=null;entry='free-setup';format='free';freeSetup();},
+    openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
+    openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},
+    duels, openRoom, forgetDuel,
     Duel:{pack:packCommands,unpack:unpackCommands,payload:duelPayload,read:readDuel,fingerprint:duelFingerprint,rounds},
-    openNetwork(renderPage,kind,capacity){paint=renderPage;entry='network';networkSetup(kind,capacity);},
+    openNetwork(renderPage,kind,capacity){paint=renderPage;backTo=null;entry='network';networkSetup(kind,capacity);},
     // El mazo y la regla del reto rápido de un día, para enseñarlos en la guía sin empezar la partida.
     dailyChallenge(dayValue) {const c=E.challenge(dailyQuick(dayValue).rounds[0].id);return {id:c.id,title:c.title,rule:c.rule,asOf:c.asOf,cards:dailyQuick(dayValue).rounds[0].order.length};},
     startDaily(dayValue, renderPage) {
@@ -719,7 +774,7 @@
     // Sin ruta de entrada (al abrir un enlace de sala o de duelo, o si se pierde la ruta) ya no hay un menú de
     // formatos propio: un duelo o una sala se abren directos y, sin enlace, se vuelve a las puertas de Jugar.
     open(renderPage) {
-      paint = renderPage; entry = 'network'; state = null; record = null; selected = null; slot = null;
+      backTo = null; paint = renderPage; entry = 'network'; state = null; record = null; selected = null; slot = null;
       const params = new URLSearchParams(location.hash.slice(1));
       try {
         if (params.has('quick-duel')) acceptDuel();
