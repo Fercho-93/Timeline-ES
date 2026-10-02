@@ -1,4 +1,11 @@
 (function () {
+  // Una invitación abierta por WhatsApp en web no inicia otra cuenta de Firebase.
+  // El perfil y la partida se abren dentro de la aplicación instalada.
+  const invitation = window.CONTINUUM?.Links?.parse(location.href);
+  if (!window.Capacitor?.isNativePlatform?.() && invitation) {
+    location.replace(window.CONTINUUM.Links.invitation(invitation));
+    return;
+  }
   const app = document.getElementById('app');
   let starting = false;
   function loadApp() {

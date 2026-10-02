@@ -1,5 +1,10 @@
 name: Preparar beta firmada
 on:
+  # Petición explícita de compilación: el conector puede publicar commits, pero no dispone de workflow_dispatch.
+  # Solo cambiar este archivo de petición lanza las dos plataformas; el resto de commits no lo hace.
+  push:
+    branches: [main]
+    paths: ['.github/beta-request.json']
   workflow_dispatch:
     inputs:
       platform:
@@ -15,7 +20,7 @@ permissions:
   contents: read
 jobs:
   android:
-    if: inputs.platform == 'android'
+    if: github.event_name == 'push' || inputs.platform == 'android'
     environment: android-beta
     runs-on: ubuntu-latest
     env:
@@ -56,7 +61,7 @@ jobs:
         if: always()
         run: rm -f -- "$ANDROID_KEYSTORE_PATH"
   ios:
-    if: inputs.platform == 'ios'
+    if: github.event_name == 'push' || inputs.platform == 'ios'
     environment: ios-beta
     runs-on: macos-26
     env:
@@ -98,7 +103,7 @@ jobs:
           path: ${{ runner.temp }}/continuum-export/*.ipa
           retention-days: 7
       - name: Subir a TestFlight si se solicitó
-        if: inputs.upload_testflight
+        if: github.event_name == 'push' || inputs.upload_testflight
         uses: apple-actions/upload-testflight-build@v5
         with:
           app-path: ${{ runner.temp }}/continuum-export/App.ipa

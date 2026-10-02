@@ -418,8 +418,7 @@
   }
 
   function enlace(payload) {
-    const base = CT.Links.base();
-    return `${base}#duelo=${encodeURIComponent(payload)}`;
+    return CT.Links.invitation({duelo:payload});
   }
 
   // El texto que se manda. Lleva el enlace y la marca a batir, pero ninguna carta: quien

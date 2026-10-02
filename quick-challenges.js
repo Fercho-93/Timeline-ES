@@ -146,7 +146,7 @@
     return {v:DUEL_VERSION,f:duelFingerprint(),s:c.seed,n:rs.length,c:packCommands(rec.commands,rs),p:String(CT.Identidad?.propio?.()||'').slice(0,24)};
   }
   function duelLink() {
-    const url=new URL(location.href);url.hash='quick-duel='+CT.LocalTransport.encodeText(JSON.stringify(duelPayload(record)));return url.href;
+    return CT.Links.invitation({quickDuel:CT.LocalTransport.encodeText(JSON.stringify(duelPayload(record)))});
   }
   // Lee un enlace de duelo y devuelve la partida del rival terminada y comprobada. Lanza un error legible si
   // el enlace está cortado, es de otra versión del juego o no es una partida terminada.
@@ -483,7 +483,7 @@
   }
   // Abre la cámara y, al leer un código, sigue con `next`. Sin cámara lo explica.
   // Enlace de invitación: en la app nativa location.href es capacitor://localhost, inútil para otro móvil.
-  function roomUrl(code){const url=new URL(CT.Links?.base?.()||location.origin+location.pathname);url.search='';url.hash='quick-room='+code;return url;}
+  function roomUrl(code){return new URL(CT.Links.invitation({quickRoom:code}));}
   // Vale el enlace (con #quick-room=, ?quick-room= o cualquier texto con el código) o el código suelto.
   function roomCodeFromText(text){
     const raw=String(text||'').trim();
@@ -890,11 +890,11 @@
     },
     // Sin ruta de entrada (al abrir un enlace de sala o de duelo, o si se pierde la ruta) ya no hay un menú de
     // formatos propio: un duelo o una sala se abren directos y, sin enlace, se vuelve a las puertas de Jugar.
-    open(renderPage) {
+    open(renderPage, target) {
       backTo = null; paint = renderPage; entry = 'network'; state = null; record = null; selected = null; slot = null;
-      const params = new URLSearchParams(location.hash.slice(1));
+      const params = target ? CT.Links.params(target) : new URLSearchParams(location.hash.slice(1) || location.search);
       try {
-        if (params.has('quick-duel')) acceptDuel();
+        if (params.has('quick-duel')) acceptDuel(CT.Links.base()+'#'+params.toString());
         else if (params.has('quick-room')) void enterByLink(params.get('quick-room'));
         else CT.ModeHubs.open('hub-solo');
       } catch (e) {

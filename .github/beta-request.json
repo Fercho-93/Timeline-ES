@@ -1,0 +1,7 @@
+{
+  "version": "0.1.1",
+  "cache": 564,
+  "platforms": ["android", "ios"],
+  "upload_testflight": true,
+  "reason": "Invitaciones de salas y duelos abiertas con el usuario de la app"
+}

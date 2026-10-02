@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3eee4">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'none'; object-src 'none'; base-uri 'none'">
+  <title>Tu invitación · Continuum</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;background:#f3eee4;color:#453729;font-family:Georgia,serif;padding:24px}main{width:min(100%,430px);padding:38px 28px;border:1px solid #cbb99e;border-radius:24px;background:#faf5eb;box-shadow:0 12px 35px #45372918;text-align:center}.brand{letter-spacing:.2em;font-size:.85rem}h1{font-size:2rem;font-weight:normal}p{line-height:1.6}a{display:block;padding:16px;border-radius:12px;background:#93694b;color:white;text-decoration:none;font:bold 1rem system-ui;margin-top:24px}small{display:block;line-height:1.5;margin-top:20px;color:#756858}#status{font: .9rem/1.5 system-ui}[hidden]{display:none!important}
+  </style>
+  <script src="links.js" defer></script>
+  <script src="invitation.js" defer></script>
+</head>
+<body><main>
+  <div class="brand">CONTINUUM</div>
+  <h1>Te han invitado a jugar</h1>
+  <p>Abre el duelo o la sala en Continuum para jugar con tu usuario y conservar tu progreso.</p>
+  <a id="open-app" hidden>Abrir en Continuum</a>
+  <p id="status" role="status"></p>
+  <small id="install-help">Necesitas tener instalada la última beta. En iPhone, actualízala desde TestFlight; en Android, instala la actualización que te han compartido. Después vuelve a este enlace.</small>
+</main></body>
+</html>

@@ -80,7 +80,7 @@ function orderBoard(game, card) {
 function cifraBoard(game, card) { return `<section class="turn-duel-answer"><div class="cifra-card">${CT.categoryBadge(game.mode, card)}<strong>${safe(card.title)}</strong><span>${safe(CT.Duelo.Cifras.regla(game.mode)?.pregunta || 'Escribe la cifra')}</span></div><label for="turn-cifra-input">Tu respuesta</label><input id="turn-cifra-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Escribe la cifra"><button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button></section>`; }
 async function share() {
   if (!current) return;
-  const link = shareLink || `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${current.id}`;
+  const link = shareLink || CT.Links.invitation({turnDuel:current.id});
   // Con el enlace mandado el duelo sigue su curso esperando al rival: se vuelve a la lista de duelos.
   const toList = () => { if (current?.status === 'waiting' && !firstTurnOf(current)) window.dispatchEvent(new CustomEvent('continuum:duels-list')); };
   if (navigator.share) {
@@ -91,7 +91,7 @@ async function share() {
   catch { document.querySelector('.turn-duel-share details')?.setAttribute('open', ''); notify('Copia el enlace que aparece en la invitación.'); }
 }
 async function reshare(gameId) {
-  const link = `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${gameId}`;
+  const link = CT.Links.invitation({turnDuel:gameId});
   if (navigator.share) { try { await navigator.share({ title: 'Duelo en Continuum', url: link }); return; } catch (error) { if (error.name === 'AbortError') return; } }
   await navigator.clipboard.writeText(link);
   notify('Enlace copiado. La invitación es la misma, no se crea otro duelo.');
@@ -119,7 +119,7 @@ function render() {
   const active = mine && (!waiting || firstTurn) && !finished && !current.timeout && !pending;
   const heading = finished ? current.status === 'expired' ? 'Duelo caducado' : current.status === 'cancelled' ? 'Duelo cerrado' : 'Duelo terminado' : firstTurn ? 'Empiezas tú' : waiting ? current.invitedUid ? current.invitedUid === uid() ? 'Te han retado' : 'Reto enviado' : 'Invita a tu rival' : statusText(current);
   const waitingHint = current.invitedUid ? 'La invitación se acepta desde el perfil, sin compartir enlaces.' : current.turnIndex ? 'Ya has hecho tu jugada: mándale el enlace a tu rival y sigue él.' : 'Comparte el enlace para empezar vuestra partida.';
-  const link = shareLink || `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${current.id}`;
+  const link = shareLink || CT.Links.invitation({turnDuel:current.id});
   const nextTargets = cachedGames.filter(game => game.id !== current.id && game.status === 'playing' && game.turnUid === uid());
   const html = `<div class="shell turn-duel-shell" data-duel-id="${safe(current.id)}" data-turn="${current.turnIndex}">
     <nav class="turn-duel-nav" aria-label="Duelo"><button class="icon-btn turn-duel-back" data-turn-action="back" aria-label="Volver a la pantalla anterior"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button><span>CONTINUUM <small>Duelo por turnos</small></span><div class="turn-duel-nav-actions"><i data-sound-slot></i></div></nav>
@@ -237,7 +237,7 @@ async function create(mode, kind, back) {
   const total = kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
   const seed = CT.Duelo.crearSemilla(), openingCard = kind === 'orden' ? CT.Duelo.reparto(mode, seed, total)[0] : null;
   const game = { id: gameId, mode, kind, seed, total, turnIndex: 0, turnUid: null, playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, status: 'waiting', plays: [], timeline: openingCard == null ? [] : [openingCard], scores: { [uid()]: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
-  shareLink = `${CT.Links?.base?.() || location.origin + location.pathname}#turnoduelo=${gameId}`;
+  shareLink = CT.Links.invitation({turnDuel:gameId});
   await runTransaction(db, async tx => { const ref = doc(db, 'turnDuels', gameId); if (!(await tx.get(ref)).exists()) tx.set(ref, game); });
   localStorage.removeItem(draftKey);
   await navigator.clipboard?.writeText(shareLink).catch(() => {}); notify('Duelo creado. Comparte el enlace con tu rival.');

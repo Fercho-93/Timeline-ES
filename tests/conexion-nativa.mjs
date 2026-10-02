@@ -55,7 +55,7 @@ for (const operation of ['createRoom', 'joinRoom']) {
     assert.deepEqual(test.events, native ? ['saved', 'remembered', 'connected'] : ['saved', 'remembered', 'history', 'connected']);
     assert.equal(test.messages.length, 0);
     assert.equal(test.location.href, native ? href : `https://fercho-93.github.io/Timeline-ES/?room=${code}`);
-    assert.equal(test.context.invitationUrl(code), `https://fercho-93.github.io/Timeline-ES/?room=${code}`);
+    assert.equal(test.context.invitationUrl(code), `https://fercho-93.github.io/Timeline-ES/invitation.html#room=${code}`);
   }
   const blocked = setup('https://fercho-93.github.io/Timeline-ES/', false, { blockedHistory: true });
   await run(blocked.context);

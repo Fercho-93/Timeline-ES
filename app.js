@@ -520,10 +520,11 @@
     const buttons = resume ? '<button class="btn btn-secondary" data-action="continue">Continuar partida</button>' : '';
     return buttons ? `<section class="quick-actions" aria-label="Jugar ahora">${buttons}</section>` : '';
   }
-  function quickChallenges() {
+  function quickChallenges(target) {
     screen = "quick-challenges";
     const render=(html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);};
-    if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
+    if (target?.quickRoom || target?.quickDuel) CT.Quick.open(render, target);
+    else if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='wifi-quick') CT.Quick.openNetwork(render, 'local', 4);
     else if(sessionStorage.getItem('continuum-entry-route')==='online-quick') CT.Quick.openNetwork(render, 'internet', 4);
@@ -4161,7 +4162,8 @@
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
   CT.Links.start(target => {
     const abrir = () => {
-      if (target.room) launchOnline(target.room);
+      if (target.quickRoom || target.quickDuel) quickChallenges(target);
+      else if (target.room) launchOnline(target.room);
       else if (target.turnDuel) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.turnDuel, mode: selectedModeKey, back: home }));
       else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo, value.mode); }
     };
@@ -4173,7 +4175,7 @@
   const duelPayload = params.get("duelo") || "";
   const turnDuelId = params.get("turnoduelo") || "";
   CT.openQuickChallenges = quickChallenges;
-  if (params.has("quick-room") || params.has("quick-duel")) quickChallenges();
+  if (params.has("quick-room") || params.has("quick-duel")) quickChallenges({quickRoom: params.get("quick-room"), quickDuel: params.get("quick-duel")});
   else if (invitedRoom) launchOnline(invitedRoom);
   else if (turnDuelId) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: turnDuelId, mode: selectedModeKey, back: home }));
   else if (duelPayload) {

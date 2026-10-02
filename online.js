@@ -340,11 +340,7 @@ function cleanCode(value) {
 }
 
 function invitationUrl(code = roomCode) {
-  const url = new URL(CT.Links.base());
-  url.search = "";
-  url.hash = "";
-  url.searchParams.set("room", code);
-  return url.toString();
+  return CT.Links.invitation({room:code});
 }
 
 // El enlace público sirve para compartir, no para cambiar la URL de Capacitor.

@@ -152,3 +152,10 @@ assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-duel-pace-v1'), 'turno
   assert.equal(CT.Quick.forgetDuel, undefined, 'archivar va con la cuenta (duelPreferences), no con el móvil');
 }
 console.log('Duelo de Retos rápidos: mazos por semilla, enlace corto, resultado comprobado por el motor y entrada con 1, 3 o 5 mazos.');
+
+// La invitación nativa se procesa sin cambiar el origen ni la cuenta del móvil.
+const encoded = CT.LocalTransport.encodeText(JSON.stringify(payload));
+CT.Quick.open(html => { app.innerHTML = html; }, {quickDuel:encoded});
+assert.equal(app.querySelectorAll('.hand-card').length, rounds[0].order.length - 1, 'la invitación arranca el primer mazo del rival');
+assert.equal(w.location.origin, 'https://continuum.test');
+w.close();
