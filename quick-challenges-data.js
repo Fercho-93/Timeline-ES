@@ -50,7 +50,7 @@
         ['Polo',4,'4 jugadores','assets/quick-cards/sports-players-14.webp','https://www.uspolo.org/assets/docs/2019-Rulebook-for-website_190205_122821.pdf'],
         ['Netball',7,'7 jugadores','assets/quick-cards/sports-players-15.webp','https://netball.sport/game/netball-explained/'],
         ['Kin-ball',4,'4 jugadores','assets/quick-cards/sports-players-16.webp','https://www.kin-ball.in/'],
-        ['Curling de cuatro',4,'4 jugadores','assets/quick-cards/sports-players-17.webp','https://worldcurling.org/about/curling/'],
+        ['Curling tradicional',4,'4 jugadores','assets/quick-cards/sports-players-17.webp','https://worldcurling.org/about/curling/'],
         ['Hurling',15,'15 jugadores','assets/quick-cards/sports-players-18.webp','https://www.gaa.ie/api/pdfs/image/upload/s0nddwy8nims22rad74a.pdf'],
         ['Vóley playa',2,'2 jugadores','assets/quick-cards/sports-players-19.webp','https://www.fivb.com/beach-volleyball/the-game/basic-rules/'],
         ['Natación artística por equipos',8,'8 deportistas','assets/quick-cards/sports-players-20.webp','https://www.worldaquatics.com/news/4431689/artistic-swimming-path-to-la-28-confirmed-as-olympic-qualification-system-approved'],

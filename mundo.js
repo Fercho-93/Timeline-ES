@@ -92,7 +92,7 @@ window.WORLD_CARDS = [
   { id: 5084, year: 1917, title: "La Revolución de Octubre", detail: "Los bolcheviques toman el poder en Rusia y fundan el primer Estado comunista." },
   { id: 5085, year: 1919, title: "El tratado de Versalles", detail: "La paz impuesta a Alemania siembra el rencor que veinte años después dará otra guerra." },
   { id: 5086, year: 1922, title: "La marcha sobre Roma", detail: "Mussolini llega al poder y estrena en Europa un régimen fascista." },
-  { id: 5087, year: 1929, title: "El crac del 29", detail: "La bolsa de Nueva York se hunde en octubre y arrastra al mundo a la Gran Depresión." },
+  { id: 5087, year: 1929, title: "El crac de la Bolsa de Nueva York", detail: "La bolsa de Nueva York se hunde en octubre y arrastra al mundo a la Gran Depresión." },
   { id: 5088, year: 1933, title: "Hitler, canciller de Alemania", detail: "Llega al poder por la vía legal y en meses desmonta la república." },
   { id: 5089, year: 1939, title: "Empieza la Segunda Guerra Mundial", detail: "Alemania invade Polonia y Francia y el Reino Unido declaran la guerra." },
   { id: 5090, year: 1941, title: "El ataque a Pearl Harbor", detail: "Japón bombardea la flota estadounidense y Estados Unidos entra directamente en la Segunda Guerra Mundial." },
