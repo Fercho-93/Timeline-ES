@@ -196,6 +196,45 @@
     return () => { clearTimeout(timer); wave.remove(); };
   }
 
+  // Al asentarse, un pespunte recorre el borde de la carta, como la puntada que une una
+  // pieza al resto de la colcha, y luego se desvanece: la carta ya forma parte de la línea.
+  // Se mide en el tamaño propio de la carta (sin el zoom de la línea), porque el dibujo
+  // va dentro de ella y escala con ella.
+  let stitches = 0;
+  function stitch(card, delay) {
+    const width = card.offsetWidth, height = card.offsetHeight;
+    if (!width || !height || typeof card.animate !== 'function') return () => {};
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'card-stitch');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    const id = `card-stitch-${++stitches}`;
+    const radius = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 7;
+    const rect = attrs => {
+      const node = document.createElementNS(ns, 'rect');
+      Object.entries({x: 4.5, y: 4.5, width: width - 9, height: height - 9, rx: Math.max(2, radius - 3), pathLength: 100, ...attrs})
+        .forEach(([name, value]) => node.setAttribute(name, value));
+      return node;
+    };
+    // El hilo se dibuja con una máscara que avanza: la línea discontinua no puede crecer
+    // por sí sola sin que sus puntadas se deslicen.
+    const mask = document.createElementNS(ns, 'mask');
+    mask.setAttribute('id', id);
+    const reveal = rect({fill: 'none', stroke: '#fff', 'stroke-width': 4, 'stroke-dasharray': '100 100', 'stroke-dashoffset': 100});
+    mask.append(reveal);
+    const thread = rect({class: 'card-stitch-thread', fill: 'none', mask: `url(#${id})`});
+    svg.append(mask, thread);
+    card.append(svg);
+    const sew = reveal.animate([{strokeDashoffset: 100}, {strokeDashoffset: 0}],
+      {duration: 520, delay, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards'});
+    const fade = svg.animate([{opacity: 1}, {opacity: 1, offset: .55}, {opacity: 0}],
+      {duration: 1300, delay: delay + 420, easing: 'ease-out', fill: 'forwards'});
+    const remove = () => svg.remove();
+    fade.finished.then(remove, remove);
+    return () => { sew.cancel(); fade.cancel(); remove(); };
+  }
+
   // Un mismo gesto físico para ambas llegadas: elevar, viajar y posar el papel.
   // Las coordenadas pertenecen a la línea ya escalada: compensar su zoom evita
   // que el recorrido cambie al elegir 80/100/120%.
@@ -203,8 +242,13 @@
     const angle = automatic ? 7 : -5;
     const shadow = getComputedStyle(card).boxShadow;
     const transform = (x, y, tilt, size) => `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg) scale(${size})`;
+    // La carta no se desliza hasta su sitio: llega en el aire, algo más grande y con la
+    // sombra abierta, y se asienta apretándose contra la línea antes de quedar quieta.
+    // Ese apretón es el gesto propio de colocar, el equivalente a coser la pieza.
     const animations = [card.animate([
       {transform: transform(dx, dy, angle, .9), opacity: 0, boxShadow: '0 16px 28px #39240b30', offset: 0},
+      {transform: transform(0, -9, angle * .15, 1.045), opacity: 1, boxShadow: '0 18px 26px #39240b33', offset: .66},
+      {transform: transform(0, 2, 0, .975), opacity: 1, boxShadow: '0 1px 2px #39240b40', offset: .84},
       {transform: 'none', opacity: 1, boxShadow: shadow, offset: 1}
       // `backwards` es lo que impide verla dos veces: quien reparte la hace visible justo
       // antes de animarla, y sin rellenar hacia atrás queda un instante en el que la carta
@@ -221,12 +265,13 @@
     card.classList.add('card-fitting');
     card.querySelector('.year')?.classList.add('date-ink');
     const clearWave = automatic ? () => {} : inkWave(card);
+    const clearStitch = automatic ? () => {} : stitch(card, duration * .8);
     const clean = () => {
       card.classList.remove('card-fitting');
       card.querySelector('.year')?.classList.remove('date-ink');
     };
     Promise.all(animations.map(animation => animation.finished)).then(clean, clean);
-    return () => { animations.forEach(animation => animation.cancel()); clearWave(); clean(); };
+    return () => { animations.forEach(animation => animation.cancel()); clearWave(); clearStitch(); clean(); };
   }
   // Una llegada termina antes de que empiece la siguiente.
   const TURNO = 1040;

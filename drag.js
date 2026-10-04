@@ -26,6 +26,13 @@
   const SETTLE_SLOT = 190;    // aterrizar en un hueco es respuesta del sistema: rápida
   const SETTLE_BACK = 260;    // volver a la mano es un desenlace: algo más largo
   const EASE_OUT = "cubic-bezier(.22, .61, .36, 1)";  // el mismo --ease-out de styles.css
+  // Peso de la carta en el aire. Se inclina hacia atrás al moverla, como un naipe que se
+  // lleva cogido por el canto de abajo, y vuelve a ponerse derecha cuando el dedo para.
+  const TILT_BASE = -1.5;     // el leve giro de siempre, con la carta quieta
+  const TILT_PER_SPEED = 7;   // grados por cada px/ms de velocidad horizontal
+  const TILT_MAX = 9;         // nunca más que esto: es un naipe, no una veleta
+  const TILT_FOLLOW = .22;    // cuánto se acerca cada frame al giro que le toca
+  const TILT_STILL_MS = 70;   // sin movimiento este rato, la velocidad ya no cuenta
 
   let session = null;
   let settling = null;        // la copia que aún está aterrizando del arrastre anterior
@@ -170,11 +177,38 @@
     };
   }
 
+  // El giro se hace alrededor del canto de abajo, que es por donde la lleva el dedo: así
+  // la carta cabecea por arriba y el punto que se agarra no se desplaza.
+  function ghostTransform(left, top, tilt, scale, width, height) {
+    const cx = width / 2, cy = height;
+    return `translate3d(${left}px, ${top}px, 0) translate(${cx}px, ${cy}px) rotate(${tilt.toFixed(2)}deg) translate(${-cx}px, ${-cy}px) scale(${scale})`;
+  }
+
+  // La sombra cae hacia el lado contrario del giro y se abre al ir más deprisa: es lo
+  // que hace que la carta parezca separada de la mesa y no pintada encima.
+  function ghostShadow(tilt) {
+    const lean = tilt - TILT_BASE;
+    const x = (-lean * 1.4).toFixed(1), blur = (34 + Math.abs(lean) * 2).toFixed(0);
+    return `${x}px 18px ${blur}px rgba(40,28,18,.3), ${(x / 3).toFixed(1)}px 4px 8px rgba(40,28,18,.16)`;
+  }
+
+  function nextTilt() {
+    const quieto = performance.now() - session.moveT > TILT_STILL_MS;
+    const objetivo = reduced() ? TILT_BASE
+      : TILT_BASE + Math.max(-TILT_MAX, Math.min(TILT_MAX, quieto ? 0 : -session.vx * TILT_PER_SPEED));
+    session.tilt += (objetivo - session.tilt) * TILT_FOLLOW;
+    if (Math.abs(objetivo - session.tilt) < .05) session.tilt = objetivo;
+    return session.tilt;
+  }
+
   function moveGhost() {
     const { left, top } = ghostPosition();
     // La copia ya viene encogida desde `startDrag` para no tapar la línea, y su escala
     // tiene que acompañar a cada movimiento o recuperaría su tamaño natural.
-    session.ghost.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(-1.5deg) scale(${session.ghostScale})`;
+    const tilt = nextTilt();
+    session.ghost.style.transform = ghostTransform(left, top, tilt, session.ghostScale, session.ghostWidth, session.ghostHeight);
+    const sombra = ghostShadow(tilt);
+    if (session.ghost.style.boxShadow !== sombra) session.ghost.style.boxShadow = sombra;
     const slot = slotUnder(session.x, session.y);
     if (slot !== session.slot) {
       session.slot?.classList.remove("drop-target");
@@ -188,7 +222,7 @@
   // al hueco elegido, o vuelve a la mano si no se eligió ninguno. Ese recorrido es lo
   // que dice dónde ha ido la carta; sin él, soltar fuera de un hueco parecía perderla.
   // Arranca con el resto de la velocidad que traía el dedo, para que no frene en seco.
-  function settle(ghost, from, target, medida, velocity, duration) {
+  function settle(ghost, from, target, medida, velocity, duration, tilt = TILT_BASE) {
     // La copia de un gesto terminado deja de llamarse como la de uno vivo: así el resto
     // del programa (y quien lea la pantalla) no las confunde.
     ghost.classList.replace("drag-ghost", "drag-settle");
@@ -204,12 +238,21 @@
     };
     const lead = d => Math.max(-LEAD_MAX, Math.min(LEAD_MAX, d * LEAD_MS));
     const escala = medida.scale;
-    const at = (x, y, rot, factor) => `translate3d(${x}px, ${y}px, 0) rotate(${rot}deg) scale(${escala * factor})`;
-    const animation = ghost.animate([
-      { transform: at(from.left, from.top, -1.5, 1), opacity: 1 },
-      { transform: at(from.left + lead(velocity.x), from.top + lead(velocity.y), -1.1, .98), opacity: .92, offset: .22 },
+    const at = (x, y, rot, factor) => ghostTransform(x, y, rot, escala * factor, medida.width, medida.height);
+    // Llega a un hueco con un pequeño asiento: baja un poco más de la cuenta y se
+    // aplasta un instante, como un naipe que se deja caer sobre la mesa. Volver a la
+    // mano no tiene asiento: allí la carta no se posa, se recoge.
+    const frames = target.slot ? [
+      { transform: at(from.left, from.top, tilt, 1), opacity: 1 },
+      { transform: at(from.left + lead(velocity.x), from.top + lead(velocity.y), tilt * .6, .99), opacity: .95, offset: .22 },
+      { transform: at(to.left, to.top + 3, 0, .9), opacity: .8, offset: .78 },
       { transform: at(to.left, to.top, 0, .92), opacity: 0 }
-    ], { duration, easing: EASE_OUT, fill: "forwards" });
+    ] : [
+      { transform: at(from.left, from.top, tilt, 1), opacity: 1 },
+      { transform: at(from.left + lead(velocity.x), from.top + lead(velocity.y), tilt * .6, .98), opacity: .92, offset: .22 },
+      { transform: at(to.left, to.top, 0, .92), opacity: 0 }
+    ];
+    const animation = ghost.animate(frames, { duration, easing: EASE_OUT, fill: "forwards" });
     settling = { node: ghost, animation };
     const done = () => { if (settling?.node === ghost) { ghost.remove(); settling = null; } };
     animation.addEventListener?.("finish", done);
@@ -231,7 +274,9 @@
       startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY,
       armed: raton, dragging: false, slot: null, ghost: null, timer: 0, frame: 0,
       // Velocidad del puntero en px/ms, suavizada entre eventos, y cuándo se midió.
-      vx: 0, vy: 0, moveT: event.timeStamp
+      vx: 0, vy: 0, moveT: event.timeStamp,
+      // Giro actual de la copia, que persigue al que pide la velocidad sin saltar a él.
+      tilt: TILT_BASE
     };
     // Empezar un arrastre interrumpe el aterrizaje del anterior: dos copias en pantalla
     // a la vez no cuentan ninguna historia.
@@ -296,14 +341,16 @@
 
   function onPointerUp(event) {
     if (!session || event.pointerId !== session.pointerId) return;
-    let ghost = null, from = null, target = null, medida = null, velocity = { x: 0, y: 0 }, duration = 0;
+    let ghost = null, from = null, target = null, medida = null, velocity = { x: 0, y: 0 }, duration = 0, tilt = TILT_BASE;
     if (session.dragging) {
       session.x = event.clientX;
       session.y = event.clientY;
       moveGhost(); // no depende de que llegue otro frame entre el último movimiento y soltar
       // El destino se mide ahora, antes de que `onDrop` repinte la partida y se lleve por
       // delante el hueco al que la copia tiene que llegar.
-      target = (session.slot || session.card).getBoundingClientRect();
+      const caja = (session.slot || session.card).getBoundingClientRect();
+      target = { left: caja.left, top: caja.top, width: caja.width, height: caja.height, slot: !!session.slot };
+      tilt = session.tilt;
       duration = session.slot ? SETTLE_SLOT : SETTLE_BACK;
       from = ghostPosition();
       // La sesión se borra en `cleanup`, así que lo que el recorrido necesite se copia ya.
@@ -316,9 +363,11 @@
     }
     const { dragging, slot, cardId, onDrop } = session;
     cleanup();
-    if (ghost) settle(ghost, from, target, medida, velocity, duration);
+    if (ghost) settle(ghost, from, target, medida, velocity, duration, tilt);
     if (!dragging) return;          // fue un toque: que siga su curso y seleccione
     window.CONTINUUM.Effects?.transition?.(slot ? 'place' : 'return');
+    // Posarla en un hueco se nota en la mano, igual que se nota al levantarla.
+    if (slot) window.CONTINUUM.Effects?.tap?.();
     // Tras un arrastre el navegador suele disparar un clic sobre lo que haya debajo; se
     // ignora, para que soltar fuera de un hueco no acabe seleccionando otra cosa. Pero
     // no siempre lo dispara, según dónde empezara y acabara el gesto, así que el oyente

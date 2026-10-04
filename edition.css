@@ -5279,3 +5279,112 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 /* El artista se lee también antes de revelar las ventas, sin modificar el tamaño de la carta. */
 #app .quick-shell .quick-card-artist { display: block; margin-top: 2px; font-family: var(--font-body); font-size: .78em; line-height: 1.12; font-weight: 500; color: #675842; }
 #app .quick-shell .hand-card > strong:has(.quick-card-artist) { display: block; -webkit-line-clamp: unset; overflow: visible; }
+
+/* ── Materia y vida ──────────────────────────────────────────────────────────────
+   Lo que hace que una mesa de juego digital parezca de verdad: el papel tiene textura,
+   las ilustraciones respiran, la luz de la mesa está viva y colocar una carta es un
+   gesto con peso. Nada de esto toca el estado de la partida, y todo lo que se mueve
+   se apaga con «reducir movimiento». Las animaciones solo usan transform y opacity:
+   el móvil las resuelve sin repintar. */
+
+/* Cartulina con acabado de lino, como la de los naipes de buena calidad: una trama
+   fina de hilos y un grano irregular de papel, impresos encima de la ilustración y del
+   texto. Se multiplica con lo que hay debajo, así que oscurece apenas y no cambia
+   ningún color. */
+:root {
+  --carta-lino: url("assets/texturas/lino.svg");
+  --carta-grano: url("assets/texturas/grano.svg");
+}
+/* Va por encima del texto (que ya es una capa con z-index 1) y por debajo del sello de
+   temática y del pespunte, que son z-index 3. */
+#app .timeline-card::before {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  border-radius: inherit;
+  background: var(--carta-lino), var(--carta-grano);
+  background-size: 9px 9px, 160px 160px;
+  mix-blend-mode: multiply;
+  /* Un canto con algo de grosor: luz arriba y una sombra muy leve abajo. */
+  box-shadow: inset 0 1px 0 #fffaea80, inset 0 -2px 3px #5a3c1a12;
+}
+#app .hand-card, #app .drag-ghost, #app .drag-settle,
+.drag-ghost, .drag-settle {
+  background-image: var(--carta-lino), var(--carta-grano);
+  background-size: 9px 9px, 160px 160px;
+}
+
+/* El pespunte que cose la carta a la línea al colocarla (a11y.js · stitch). */
+.card-stitch { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.card-stitch-thread {
+  stroke: #8d6327; stroke-width: 1.5; stroke-linecap: round;
+  stroke-dasharray: .55 .45;
+  filter: drop-shadow(0 .6px 0 #fff6dccc);
+}
+:root[data-theme="dark"] .card-stitch-thread { stroke: #c79a52; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Las láminas de las puertas respiran: un acercamiento muy lento que va y vuelve,
+     como la hierba que se mece en una ilustración. Cada una a su ritmo, para que la
+     pantalla no se mueva entera a la vez. */
+  #app .home-door-art img,
+  #app .mode-entry-art img,
+  #app .mode-hub-head > img {
+    animation: lamina-viva 22s ease-in-out infinite alternate both;
+  }
+  #app .mode-entry:nth-child(2n) .mode-entry-art img { animation-duration: 26s; animation-delay: -9s; }
+  #app .mode-entry:nth-child(3n) .mode-entry-art img { animation-duration: 19s; animation-delay: -4s; animation-direction: alternate-reverse; }
+  #app .home-door-daily .home-door-art img { animation-duration: 25s; animation-delay: -12s; }
+
+  /* La lámpara de la mesa: una luz cálida en la esquina superior que respira con un
+     pulso irregular, nunca a compás. Está detrás de todo y no cambia el contraste de
+     ningún texto. */
+  html::after {
+    content: ''; position: fixed; z-index: -1; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 45% at 12% 0%, #ffd9952e, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 92% 6%, #ffe2a81f, transparent 72%);
+    animation: lampara 9s ease-in-out infinite;
+  }
+  :root[data-theme="dark"]::after {
+    background:
+      radial-gradient(ellipse 70% 45% at 12% 0%, #ffb75a1c, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 92% 6%, #ffc8781a, transparent 72%);
+  }
+
+  /* Motas de polvo que suben despacio en la luz, como en un archivo antiguo. Es una sola
+     capa que se desplaza entera; el dibujo se repite cada 520 px y la capa se mueve
+     exactamente eso, así que el bucle no tiene costura. Durante la partida se quedan
+     quietas: allí se comparan fechas y nada debe tirar de la vista. */
+  html body::after {
+    content: ''; position: fixed; z-index: -1; left: 0; right: 0; top: 0;
+    height: calc(100lvh + 520px); pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 22%, #fffaf0 0 1.3px, #dfb86d8c 2.1px, transparent 3.4px),
+      radial-gradient(circle at 72% 8%, #fff6e0 0 1px, #d8ae5f80 1.8px, transparent 3px),
+      radial-gradient(circle at 44% 63%, #fffaf0 0 1.6px, #e2bd7480 2.5px, transparent 4px),
+      radial-gradient(circle at 88% 47%, #fff3d6 0 .9px, #d5a95a73 1.6px, transparent 2.6px),
+      radial-gradient(circle at 8% 81%, #fffaf0 0 1.1px, #dcb46a80 1.9px, transparent 3px),
+      radial-gradient(circle at 61% 92%, #fff6e0 0 1.3px, #e0b96f80 2.2px, transparent 3.4px),
+      radial-gradient(circle at 31% 41%, #fff8e8 0 .8px, #d6ab5c66 1.4px, transparent 2.4px);
+    background-size: 360px 520px;
+    opacity: .75;
+    animation: motas 95s linear infinite;
+  }
+  :root[data-theme="dark"] body::after { opacity: .3; }
+  html body:has(#app.atlas-board)::after { animation-play-state: paused; opacity: .4; }
+}
+
+@keyframes lamina-viva {
+  from { scale: 1; translate: 0 0; }
+  to { scale: 1.055; translate: -1.6% -1.1%; }
+}
+@keyframes lampara {
+  0%, 100% { opacity: .85; }
+  23% { opacity: 1; }
+  41% { opacity: .9; }
+  58% { opacity: .97; }
+  77% { opacity: .82; }
+}
+@keyframes motas {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -520px, 0); }
+}
