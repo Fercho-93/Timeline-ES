@@ -16,13 +16,14 @@ let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
 // Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
 const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
-assert.equal(quickCards.length, 427);
-assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 427);
+assert.equal(quickCards.length, 437);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 437);
+const metroNotes = new Map(JSON.parse(read('docs/fuentes-metros-ampliacion-2026-10-04.json')).cards.map(card => [card.id, card.measureNote]));
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
   assert.ok(card.detail.startsWith(card.curiosity), `${card.id}: curiosidad antes del criterio de medida`);
-  assert.ok(card.detail.includes(deck.context), `${card.id}: conserva las aclaraciones de comparación`);
+  assert.ok(card.detail.includes(metroNotes.get(card.id) || deck.context), `${card.id}: conserva las aclaraciones de comparación`);
   assert.ok(/^https?:\/\//.test(card.source), `${card.id}: fuente del dato`);
   assert.ok(/^https:\/\//.test(card.curiositySource), `${card.id}: fuente de la curiosidad`);
   if (deck.asOf) assert.ok(card.detail.includes(`Datos a ${deck.asOf}.`));
@@ -159,6 +160,21 @@ const airports = CT.QuickCatalog.challenges.find(c => c.id === 'airports');
 assert.ok(airports.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const metros = CT.QuickCatalog.challenges.find(c => c.id === 'metros');
 assert.ok(metros.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+
+assert.equal(metros.cards.length,19);
+assert.equal(new Set(metros.cards.map(c=>c.title)).size,19);
+const metroAudit=JSON.parse(read('docs/fuentes-metros-ampliacion-2026-10-04.json'));
+assert.equal(metroAudit.cards.length,10);
+for(const item of metroAudit.cards){const card=metros.cards.find(c=>c.id===item.id);assert.equal(card.value,item.value);assert.equal(card.label,item.label);assert.equal(card.source,item.source);assert.equal(card.curiositySource,item.curiositySource);assert.ok(card.detail.includes(item.dataDate));assert.ok(card.detail.includes(item.scope));}
+assert.equal(metros.cards.find(c=>c.id==='metros-10').value,124.7,'Barcelona excluye el funicular y FGC');
+assert.equal(metros.cards.find(c=>c.id==='metros-15').value,37.9,'Budapest suma las dos categorías de rutas KSH, incluida M1');
+assert.equal(metros.cards.find(c=>c.id==='metros-19').value,56.57,'Buenos Aires excluye Premetro');
+s=E.create({names:['A','B'],rounds:[round('metros')]});
+while(s.remaining.length){const id=s.remaining[0],value=x=>metros.cards.find(c=>c.id===x).value;const place=s.timeline.findIndex(t=>value(t)>value(id));s=E.step(s,{type:'place',cardId:id,index:place<0?s.timeline.length:place});assert.equal(s.result.correct,true);s=E.step(s,{type:'ack'});}
+assert.equal(s.phase,'round-end');
+const oldMetroSave={version:3,config:{names:['Ana','Luis'],rounds:[{id:'metros',order:Array.from({length:9},(_,i)=>'metros-'+(i+1))}]},commands:[{type:'place',cardId:'metros-2',index:1}]};
+assert.equal(E.restore(oldMetroSave).result.correct,true);
+
 const companiesRevenue = CT.QuickCatalog.challenges.find(c => c.id === 'companies-revenue');
 assert.ok(companiesRevenue.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(companiesRevenue.cards.length,30);
