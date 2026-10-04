@@ -5485,31 +5485,29 @@ html:has(#app.atlas-board) .motas { display: none; }
 }
 
 /* ── Escenario según el mazo ──────────────────────────────────────────────────────
-   Como la habitación de Calico o los hábitats de Wingspan: cada bloque juega sobre su
-   propia lámina. La ilustración de la portada del bloque llena el fondo de la mesa,
-   asoma con fuerza por arriba y por los lados y queda velada en el centro, donde están
-   las cartas, para no restar contraste a nada que haya que leer. Solo en la mesa de
-   juego (#app.atlas-board); los menús siguen con la lámina común. */
+   La lámina se trata como un grabado tenue sobre papel, limitado a la parte alta.
+   Una máscara amplia disuelve sus contornos sin una mancha opaca en el centro.
+   Solo cambia el fondo fijo de la mesa (#app.atlas-board). */
 :root[data-scene="history"] { --scene-art: url("assets/hero-history-700.webp"); --scene-art-pos: center 30%; }
 :root[data-scene="entertainment"] { --scene-art: url("assets/hero-entertainment-700.webp"); --scene-art-pos: center 20%; }
 :root[data-scene="science"] { --scene-art: url("assets/hero-science-700.webp"); --scene-art-pos: center 20%; }
 :root[data-scene="nature"] { --scene-art: url("assets/hero-nature-700.webp"); --scene-art-pos: center 25%; }
 :root[data-scene="globe"] { --scene-art: url("assets/hero-geography-700.webp"); --scene-art-pos: center 15%; }
 :root[data-scene="mixed"] { --scene-art: url("assets/hero-mixed-700.webp"); --scene-art-pos: center 25%; }
+:root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board) {
+  background: radial-gradient(ellipse at 85% 0%, color-mix(in srgb, var(--scene-wash) 9%, transparent), transparent 65%), var(--edition-paper);
+}
 :root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board)::before {
-  background:
-    linear-gradient(180deg, #f4ead8c7 0, #f4ead870 9%, transparent 16%),
-    radial-gradient(ellipse 70% 56% at 50% 58%, #f4ead8d9 0 30%, #f2e7d28c 60%, #efe2c814 100%),
-    linear-gradient(180deg, transparent 0 70%, color-mix(in srgb, var(--scene-color) 22%, transparent)),
-    var(--scene-art) var(--scene-art-pos) / cover no-repeat,
-    #e9dcc3;
-  filter: saturate(.95);
+  height: clamp(380px, 58lvh, 680px);
+  background: var(--scene-art) var(--scene-art-pos) / cover no-repeat;
+  opacity: .28;
+  filter: grayscale(.35) saturate(.55) sepia(.18);
+  -webkit-mask-image: radial-gradient(ellipse 130% 100% at 78% 0%, #000 8%, #0009 44%, transparent 100%);
+  mask-image: radial-gradient(ellipse 130% 100% at 78% 0%, #000 8%, #0009 44%, transparent 100%);
 }
 :root[data-theme="dark"]:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board)::before {
-  background:
-    radial-gradient(ellipse 78% 62% at 50% 60%, #140d08f2 0 34%, #140d08d9 62%, #140d0880 100%),
-    var(--scene-art) var(--scene-art-pos) / cover no-repeat,
-    #140d08;
+  opacity: .18;
+  filter: grayscale(.35) saturate(.55) sepia(.18);
 }
 /* La mesa deja ver la escena: el panel de la línea pierde algo de su papel opaco. */
 :root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]) #app.atlas-board .board-timeline-section {
