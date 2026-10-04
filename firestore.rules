@@ -647,7 +647,7 @@ service cloud.firestore {
           && next.actor == '' && next.fresh == false
           && next.owners.removeAll(['']).toSet().difference(data.playerOrder.toSet()).size() == 0
           && (next.owners.removeAll(['']).size() == next.owners.removeAll(['']).toSet().size()
-            || data.deck.toSet().difference(next.cards.toSet()).size() == 0));
+            || data.deck.toSet().difference(next.cards.toSet()).difference(data.get('pulsePower', {'cards': []}).cards.toSet()).size() == 0));
       }
       function drawnTo(card, owner, data, next) {
         return owner in next.playerOrder
@@ -666,7 +666,7 @@ service cloud.firestore {
         return i >= next.cards.size() || next.owners[i] == ''
           || !otherOwner(i, next.owners[i], next.owners)
           // Sin posiciones libres, el duplicado se consume sin otro uso.
-          || data.deck.toSet().difference(next.cards.toSet()).size() == 0;
+          || data.deck.toSet().difference(next.cards.toSet()).difference(data.get('pulsePower', {'cards': []}).cards.toSet()).size() == 0;
       }
       function duplicateDraw(i, j, card, owners, prior, data) {
         return i != j && j < owners.size() && owners[j] != '' && drawnTo(card, owners[j], prior, data);
@@ -773,7 +773,7 @@ service cloud.firestore {
           && p.owners.removeAll(['']).toSet().difference(data.playerOrder.toSet()).size() == 0
           && (!('ghost' in data) || p.cards.toSet().intersection(data.ghost.cards.toSet()).size() == 0)
           && (p.owners.removeAll(['']).size() == p.owners.removeAll(['']).toSet().size()
-            || data.deck.toSet().difference(p.cards.toSet()).difference(data.get('ghost', {cards: []}).cards.toSet()).size() == 0));
+            || data.deck.toSet().difference(p.cards.toSet()).difference(data.get('ghost', {'cards': []}).cards.toSet()).size() == 0));
       }
       function pulseOtherOwner(i, owner, owners) {
         return (i != 0 && owners.size() > 0 && owners[0] == owner)
@@ -784,7 +784,7 @@ service cloud.firestore {
         let p = data.pulsePower;
         return uniqueOwners || i >= p.cards.size() || p.owners[i] == ''
           || !pulseOtherOwner(i, p.owners[i], p.owners)
-          || data.deck.toSet().difference(p.cards.toSet()).difference(data.get('ghost', {cards: []}).cards.toSet()).size() == 0;
+          || data.deck.toSet().difference(p.cards.toSet()).difference(data.get('ghost', {'cards': []}).cards.toSet()).size() == 0;
       }
       function pulseDuplicateDraw(i, j, card, owners, prior, data) {
         return i != j && j < owners.size() && owners[j] != '' && drawnTo(card, owners[j], prior, data);

@@ -70,6 +70,43 @@ await check("crear una sala sin juego", "deny", setDoc(doc(ctx(HOST), "rooms", "
 await check("crear una sala con un juego desmesurado", "deny", setDoc(doc(ctx(HOST), "rooms", "LARG2345"), { ...base(), roomCode: "LARG2345", mode: "x".repeat(33) }));
 
 console.log("\nEmpezar la partida");
+
+// Fantasma no puede trasladarse a una carta reservada para Pulso.
+const powerOrder = [HOST, P2, P3, 'p4', 'p5', 'p6', 'p7', 'p8', 'p9'];
+const powerLobby = { ...base(), playerOrder: powerOrder, players: Object.fromEntries(powerOrder.map((uid, i) => [uid, { name: 'Jugador ' + (i + 1), hand: [], joinedAt: i + 1 }])) };
+const powerStart = {
+  status: 'playing', phase: 'turn', handSize: 4, pulse: true,
+  players: Object.fromEntries(powerOrder.map((uid, i) => [uid, { ...powerLobby.players[uid], hand: [i * 4 + 1, i * 4 + 2, i * 4 + 3, i * 4 + 4] }])),
+  timeline: [37], deck: [38, 39, 40], discard: [], current: 0, starter: HOST,
+  turnsInRound: 0, round: 1, winner: null, winners: null, reveal: null,
+  ghost: { distribution: 2, cards: [1, 2, 5], owners: [HOST, HOST, P2], used: [], pending: [], cooldown: [], actor: '', fresh: false },
+  pulsePower: { distribution: 2, cards: [38, 39, 40], owners: ['', '', ''], used: [] },
+  version: 2, updatedAt: serverTimestamp()
+};
+await seed(powerLobby);
+await check("Fantasma y Pulso: empezar sin cartas libres para trasladar el duplicado", "allow", updateDoc(ref(ctx(HOST)), powerStart));
+await seed(powerLobby);
+await check("Fantasma y Pulso: rechazar duplicados cuando queda una carta libre", "deny", updateDoc(ref(ctx(HOST)), { ...powerStart, deck: [38, 39, 40, 41] }));
+await seed(powerLobby);
+await check("Fantasma y Pulso: rechazar poderes en la misma carta", "deny", updateDoc(ref(ctx(HOST)), { ...powerStart, pulsePower: { ...powerStart.pulsePower, cards: [1, 39, 40] } }));
+
+// El caso simétrico también valida el valor por defecto de Fantasma.
+const pulseStart = { ...powerStart,
+  ghost: { ...powerStart.ghost, cards: [38, 39, 40], owners: ['', '', ''] },
+  pulsePower: { ...powerStart.pulsePower, cards: [1, 2, 5], owners: [HOST, HOST, P2] }
+};
+await seed(powerLobby);
+await check("Pulso y Fantasma: empezar sin cartas libres para trasladar el duplicado", "allow", updateDoc(ref(ctx(HOST)), pulseStart));
+await seed(powerLobby);
+await check("Pulso y Fantasma: rechazar duplicados cuando queda una carta libre", "deny", updateDoc(ref(ctx(HOST)), { ...pulseStart, deck: [38, 39, 40, 41] }));
+const ghostOnly = { ...powerStart, deck: [] };
+delete ghostOnly.pulsePower;
+await seed(powerLobby);
+await check("Fantasma sin Pulso: empezar con el mazo agotado", "allow", updateDoc(ref(ctx(HOST)), ghostOnly));
+const pulseOnly = { ...pulseStart, deck: [] };
+delete pulseOnly.ghost;
+await seed(powerLobby);
+await check("Pulso sin Fantasma: empezar con el mazo agotado", "allow", updateDoc(ref(ctx(HOST)), pulseOnly));
 const lobby3 = { ...base(), playerOrder: [HOST, P2, P3], players: { [HOST]: { name: "Ana", hand: [], joinedAt: 1 }, [P2]: { name: "Bea", hand: [], joinedAt: 2 }, [P3]: { name: "Cid", hand: [5], joinedAt: 3 } } };
 const startPayload = { winners: null, handSize: 2, players: { [HOST]: { name: "Ana", hand: [1, 2], joinedAt: 1 }, [P2]: { name: "Bea", hand: [3, 4], joinedAt: 2 }, [P3]: { name: "Cid", hand: [6, 7], joinedAt: 3 } }, deck: [10, 11], discard: [], timeline: [20], status: "playing", phase: "turn", current: 1, starter: P2, turnsInRound: 0, round: 1, winner: null, reveal: null, turnStartedAt: serverTimestamp(), version: 2, updatedAt: serverTimestamp() };
 await seed(lobby3);
