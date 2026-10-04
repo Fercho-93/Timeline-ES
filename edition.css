@@ -5485,9 +5485,8 @@ html:has(#app.atlas-board) .motas { display: none; }
 }
 
 /* ── Escenario según el mazo ──────────────────────────────────────────────────────
-   La lámina de cada colección se funde gradualmente con el papel: algo de paisaje
-   en la parte alta, un centro sereno y menos detalle junto a la línea. El velo
-   cubre también los bordes para que no se forme un marco de manchas intensas.
+   La lámina se trata como un grabado tenue sobre papel, limitado a la parte alta.
+   Una máscara amplia disuelve sus contornos sin una mancha opaca en el centro.
    Solo cambia el fondo fijo de la mesa (#app.atlas-board). */
 :root[data-scene="history"] { --scene-art: url("assets/hero-history-700.webp"); --scene-art-pos: center 30%; }
 :root[data-scene="entertainment"] { --scene-art: url("assets/hero-entertainment-700.webp"); --scene-art-pos: center 20%; }
@@ -5495,20 +5494,20 @@ html:has(#app.atlas-board) .motas { display: none; }
 :root[data-scene="nature"] { --scene-art: url("assets/hero-nature-700.webp"); --scene-art-pos: center 25%; }
 :root[data-scene="globe"] { --scene-art: url("assets/hero-geography-700.webp"); --scene-art-pos: center 15%; }
 :root[data-scene="mixed"] { --scene-art: url("assets/hero-mixed-700.webp"); --scene-art-pos: center 25%; }
+:root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board) {
+  background: radial-gradient(ellipse at 85% 0%, color-mix(in srgb, var(--scene-wash) 9%, transparent), transparent 65%), var(--edition-paper);
+}
 :root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board)::before {
-  background:
-    linear-gradient(180deg, #f3eee473 0%, #f3eee485 24%, #f3eee4c7 62%, #f3eee4f0 100%),
-    radial-gradient(ellipse 85% 75% at 50% 42%, #f3eee44d, #f3eee414 70%, transparent),
-    var(--scene-art) var(--scene-art-pos) / cover no-repeat,
-    #f3eee4;
-  filter: saturate(.65) sepia(.12);
+  height: clamp(380px, 58lvh, 680px);
+  background: var(--scene-art) var(--scene-art-pos) / cover no-repeat;
+  opacity: .28;
+  filter: grayscale(.35) saturate(.55) sepia(.18);
+  -webkit-mask-image: radial-gradient(ellipse 130% 100% at 78% 0%, #000 8%, #0009 44%, transparent 100%);
+  mask-image: radial-gradient(ellipse 130% 100% at 78% 0%, #000 8%, #0009 44%, transparent 100%);
 }
 :root[data-theme="dark"]:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board)::before {
-  background:
-    linear-gradient(180deg, #18110bb3 0%, #18110bc7 24%, #18110be6 62%, #18110bf7 100%),
-    radial-gradient(ellipse 85% 75% at 50% 42%, #18110b4d, #18110b14 70%, transparent),
-    var(--scene-art) var(--scene-art-pos) / cover no-repeat,
-    #18110b;
+  opacity: .18;
+  filter: grayscale(.35) saturate(.55) sepia(.18);
 }
 /* La mesa deja ver la escena: el panel de la línea pierde algo de su papel opaco. */
 :root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]) #app.atlas-board .board-timeline-section {
