@@ -1,0 +1,249 @@
+{
+  "generator": "OpenAI image_gen",
+  "generatedAt": "2026-10-04",
+  "format": "WebP 512 × 768; grabado sepia sobre pergamino; monumento o paisaje del país con sobre de pago, monedas y delantal.",
+  "assets": [
+    {
+      "cardId": "minimum-wages-1",
+      "title": "Bulgaria",
+      "path": "assets/quick-cards/minimum-wages-1.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "df923bc654f258c07a208704e940d626ab4193109d0f38ffd66e9c4443488f3a",
+      "previousSha256": null,
+      "landmark": "Sofia, the many domes of Alexander Nevsky Cathedral",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Bulgaria, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Sofia, the many domes of Alexander Nevsky Cathedral. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-2",
+      "title": "Rumanía",
+      "path": "assets/quick-cards/minimum-wages-2.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "418e37e13185c68a8709544f6caf83a75ad11a1ccc01d5d57aa0db154f29ffcc",
+      "previousSha256": null,
+      "landmark": "Bucharest, the monumental Palace of Parliament",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Rumanía, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Bucharest, the monumental Palace of Parliament. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-3",
+      "title": "Polonia",
+      "path": "assets/quick-cards/minimum-wages-3.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "b5fb3471edd5257b353bbc99c31735ab2d5d71027131bc7400da8c0dc48a573c",
+      "previousSha256": null,
+      "landmark": "Warsaw, Castle Square with the Royal Castle and Sigismund's Column",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Polonia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Warsaw, Castle Square with the Royal Castle and Sigismund's Column. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-4",
+      "title": "España",
+      "path": "assets/quick-cards/minimum-wages-4.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "b6c49ad9f770ab917e692416aa769ddb5c99d8f78bf84f3b1504a5989b1e0131",
+      "previousSha256": null,
+      "landmark": "Madrid, Puerta del Sol with the Real Casa de Correos clock tower",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing España, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Madrid, Puerta del Sol with the Real Casa de Correos clock tower. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-5",
+      "title": "Francia",
+      "path": "assets/quick-cards/minimum-wages-5.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "76fa3ecaa3f5016833e36a88e1fdf37c001d64ed86287239d0a4219a205aefb6",
+      "previousSha256": null,
+      "landmark": "Paris, Eiffel Tower viewed from a Seine embankment",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Francia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Paris, Eiffel Tower viewed from a Seine embankment. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-6",
+      "title": "Bélgica",
+      "path": "assets/quick-cards/minimum-wages-6.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "351714c83a05235421b8013b48fb28b5b2b94aef59e3658f4db1b2c45032d552",
+      "previousSha256": null,
+      "landmark": "Brussels, Grand Place with the Gothic town hall tower",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Bélgica, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Brussels, Grand Place with the Gothic town hall tower. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-7",
+      "title": "Países Bajos",
+      "path": "assets/quick-cards/minimum-wages-7.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "7b41e5e2f0eb73c8991a06ea35df1ec9cb099e2a943298e6bb15a82226243b58",
+      "previousSha256": null,
+      "landmark": "Amsterdam, canal bridge, narrow stepped-gable houses and a bicycle",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Países Bajos, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Amsterdam, canal bridge, narrow stepped-gable houses and a bicycle. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-8",
+      "title": "Alemania",
+      "path": "assets/quick-cards/minimum-wages-8.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "cf6f91cba332ad9e743bbd3aa43cf3d8c44d23b626298a432eecc131d69d88e8",
+      "previousSha256": null,
+      "landmark": "Berlin, Brandenburg Gate with its quadriga",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Alemania, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Berlin, Brandenburg Gate with its quadriga. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-9",
+      "title": "Irlanda",
+      "path": "assets/quick-cards/minimum-wages-9.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "8df1591d945072ca5fcd43ee7528ade1a57e2fd11b9325d2cb3694d77c0151be",
+      "previousSha256": null,
+      "landmark": "Dublin, Ha'penny pedestrian bridge over the Liffey",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Irlanda, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Dublin, Ha'penny pedestrian bridge over the Liffey. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-10",
+      "title": "Luxemburgo",
+      "path": "assets/quick-cards/minimum-wages-10.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "59e2df504a43014164b64dd6ced0e5ed6fb90b4e196dc1d7b954cebce18d43c9",
+      "previousSha256": null,
+      "landmark": "Luxembourg City, Adolphe Bridge spanning the deep leafy valley",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Luxemburgo, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Luxembourg City, Adolphe Bridge spanning the deep leafy valley. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-11",
+      "title": "Chequia",
+      "path": "assets/quick-cards/minimum-wages-11.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "1458d80a95dc32e26ac5103f5a52d9174f03b3868c91964bedb1f444d48867c3",
+      "previousSha256": null,
+      "landmark": "Prague, Charles Bridge and Prague Castle above the river",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Chequia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Prague, Charles Bridge and Prague Castle above the river. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-12",
+      "title": "Estonia",
+      "path": "assets/quick-cards/minimum-wages-12.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "7feaa57699b8493a0b628099ef1016badd3ad6a0ecc3d9cda995ca2c2fb7b889",
+      "previousSha256": null,
+      "landmark": "Tallinn, medieval old-town roofs and the tall Gothic town hall spire",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Estonia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Tallinn, medieval old-town roofs and the tall Gothic town hall spire. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-13",
+      "title": "Grecia",
+      "path": "assets/quick-cards/minimum-wages-13.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "177c9a3424a49c6bdbed8590ccb5f43c177832c146cebe36be3c679b75b5549f",
+      "previousSha256": null,
+      "landmark": "Athens, the Parthenon atop the rocky Acropolis",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Grecia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Athens, the Parthenon atop the rocky Acropolis. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-14",
+      "title": "Croacia",
+      "path": "assets/quick-cards/minimum-wages-14.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "e328c8f14804020fb384f43dc1b08e2cf8fe916600f3c6635167d3e3ed4e4794",
+      "previousSha256": null,
+      "landmark": "Dubrovnik, stone fortified walls overlooking the Adriatic and tiled roofs",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Croacia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Dubrovnik, stone fortified walls overlooking the Adriatic and tiled roofs. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-15",
+      "title": "Hungría",
+      "path": "assets/quick-cards/minimum-wages-15.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "0b0c41667165043fdd56709349189a9ad08040f75b961bcfd7ff14b3e8ce6e9d",
+      "previousSha256": null,
+      "landmark": "Budapest, Hungarian Parliament riverside facade and distinctive central dome",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Hungría, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Budapest, Hungarian Parliament riverside facade and distinctive central dome. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-16",
+      "title": "Lituania",
+      "path": "assets/quick-cards/minimum-wages-16.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "4ce4b4f8c77504c9a1a043365a9e93e7343ccfd26b0fb226c24714f344987654",
+      "previousSha256": null,
+      "landmark": "Vilnius, Gediminas brick castle tower above the cathedral square",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Lituania, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Vilnius, Gediminas brick castle tower above the cathedral square. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-17",
+      "title": "Letonia",
+      "path": "assets/quick-cards/minimum-wages-17.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "5dc7f5ec0bb1af15bdb1c0db242322edb7b36be39eb08a799dc956fdbbcab2cf",
+      "previousSha256": null,
+      "landmark": "Riga, House of the Blackheads with ornate stepped facade",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Letonia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Riga, House of the Blackheads with ornate stepped facade. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-18",
+      "title": "Malta",
+      "path": "assets/quick-cards/minimum-wages-18.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "4ec875624f4a789bcf78b95ed95fb833dc769d8f5decd0e4a4e64b3f6aeae5fd",
+      "previousSha256": null,
+      "landmark": "Valletta, massive stone harbor bastions and a traditional Maltese fishing boat",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Malta, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Valletta, massive stone harbor bastions and a traditional Maltese fishing boat. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-19",
+      "title": "Portugal",
+      "path": "assets/quick-cards/minimum-wages-19.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "4f034638a2c0ac3ac747c327ec3dd14dad75e4e983c21ddd4303bb8475cb0769",
+      "previousSha256": null,
+      "landmark": "Lisbon, the Belem Tower on the Tagus riverside",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Portugal, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Lisbon, the Belem Tower on the Tagus riverside. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-20",
+      "title": "Eslovenia",
+      "path": "assets/quick-cards/minimum-wages-20.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "85e938f0e1343c68f669a40e21130a22aa106b84a4206ee273c2836425fd6722",
+      "previousSha256": null,
+      "landmark": "Lake Bled, tiny church on the island and hilltop castle in the Alps",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Eslovenia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Lake Bled, tiny church on the island and hilltop castle in the Alps. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-21",
+      "title": "Eslovaquia",
+      "path": "assets/quick-cards/minimum-wages-21.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "3264af802d1efd18ea2b4cb65215a44eb30a085bc71a064d8c2ec5c6063ce913",
+      "previousSha256": null,
+      "landmark": "Bratislava, the rectangular hilltop castle with its four corner towers",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Eslovaquia, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Bratislava, the rectangular hilltop castle with its four corner towers. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    },
+    {
+      "cardId": "minimum-wages-22",
+      "title": "Chipre",
+      "path": "assets/quick-cards/minimum-wages-22.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "43c1d49037d28f8a3cd4d0e62ecf23fe9f78b7b8e2d708fd9a8b28f6fc5d5b02",
+      "previousSha256": null,
+      "landmark": "Paphos, the square medieval stone castle at the small harbor",
+      "prompt": "Create a finished vertical image-only illustration for the Timeline / Continuum game card representing Chipre, in a deck comparing national minimum wages. Canvas 512 x 768 pixels, portrait 2:3, full bleed. The dominant, instantly recognizable country-specific subject is Paphos, the square medieval stone castle at the small harbor. Show believable architectural forms in a coherent panoramic scene, landmark occupying the central and upper two thirds. In the lower foreground, integrate a small, discreet everyday wage-payment still life on a stone ledge: a closed plain pay envelope, several unmarked coins and a simple work apron folded beside it. It symbolizes wages but must not dominate or hide the landmark. Avoid generic worker portraits. Antique engraved travel illustration, fine etched linework, cross-hatching and stippling, muted sepia and ochre ink on warm aged parchment, cream highlights, soft irregular paper grain, clear silhouette readable at card size. No readable text, numbers, currency symbols, flags, logos, decorative borders, titles, watermarks or UI. Each country must have a distinctly different composition grounded in the stated real landmark."
+    }
+  ]
+}

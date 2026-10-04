@@ -16,8 +16,8 @@ let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
 // Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
 const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
-assert.equal(quickCards.length, 383);
-assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 383);
+assert.equal(quickCards.length, 395);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 395);
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
@@ -168,6 +168,18 @@ assert.ok(companiesRevenue.cards.every(card => card.image && fs.existsSync(new U
 const spanishTv = CT.QuickCatalog.challenges.find(c => c.id === 'spanish-tv');
 assert.ok(spanishTv.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const minimumWages = CT.QuickCatalog.challenges.find(c => c.id === 'minimum-wages');
+assert.equal(minimumWages.cards.length,22);
+assert.equal(minimumWages.asOf,'1 de julio de 2026');
+const wageAudit=JSON.parse(read('docs/fuentes-salarios-minimos-2026-07.json'));
+const wageSnapshot=JSON.parse(read('docs/eurostat-salarios-2026-S2-EUR.json'));
+assert.equal(wageSnapshot.dimension.time.category.index['2026-S2'],0);
+for(const record of wageAudit.cards){const card=minimumWages.cards.find(c=>c.id===record.id);assert.equal(card.title,record.title);assert.equal(card.value,wageSnapshot.value[wageSnapshot.dimension.geo.category.index[record.geo]]);assert.equal(card.source,record.source);assert.equal(card.curiositySource,record.nationalSource);}
+assert.deepEqual(Array.from(minimumWages.cards.slice(0,10),c=>c.title),['Bulgaria','Rumanía','Polonia','España','Francia','Bélgica','Países Bajos','Alemania','Irlanda','Luxemburgo']);
+const oldWagesSave={version:3,config:{names:['Ana','Luis'],rounds:[{id:'minimum-wages',order:Array.from({length:10},(_,i)=>'minimum-wages-'+(i+1))}]},commands:[{type:'place',cardId:'minimum-wages-2',index:1}]};
+assert.equal(E.restore(oldWagesSave).phase,'result','se recuperan las partidas con las diez cartas originales');
+assert.equal(E.restore(oldWagesSave).result.correct,true);
+{const order=['minimum-wages-13','minimum-wages-19'];const tied=E.create({names:['A','B'],rounds:[{id:'minimum-wages',order}]});assert.equal(E.step(tied,{type:'place',cardId:order[1],index:0}).result.correct,true);assert.equal(E.step(tied,{type:'place',cardId:order[1],index:1}).result.correct,true);}
+
 assert.ok(minimumWages.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const sportsPlayers = CT.QuickCatalog.challenges.find(c => c.id === 'sports-players');
 assert.ok(sportsPlayers.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));

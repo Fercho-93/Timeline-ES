@@ -1,9 +1,9 @@
 {
-  "assetsBytes": 238500000,
-  "precacheBytes": 48900000,
+  "assetsBytes": 239000000,
+  "precacheBytes": 50100000,
   "musicBytes": 27262976,
   "singleImageBytes": 819200,
   "cardWidth": 512,
   "cardHeight": 768,
-  "policy": "Arte de cartas 512×768; WebP por defecto y JPEG heredado cuando ya cumple. No añadir originales duplicados al paquete. Las seis pistas MP3 originales suman 26 MiB al límite de recursos, con límite propio de música, y no entran en la precarga de la instalación: se guardan en segundo plano al activar la versión. La precarga incluye las láminas de población e idiomas para que esos mazos funcionen completos sin conexión. Se reserva margen adicional para las tandas de láminas de Retos rápidos. Presupuesto sin compresión de tienda, no tamaño final de IPA/AAB. Los 36 avatares ilustrados y las siete portadas nuevas de menú se precargan para que aparezcan también sin conexión; sus WebP están optimizados para móvil."
+  "policy": "Arte de cartas 512×768; WebP por defecto y JPEG heredado cuando ya cumple. No añadir originales duplicados al paquete. Las seis pistas MP3 originales suman 26 MiB al límite de recursos, con límite propio de música, y no entran en la precarga de la instalación: se guardan en segundo plano al activar la versión. La precarga incluye las láminas de población e idiomas para que esos mazos funcionen completos sin conexión. Se reserva margen adicional para las tandas de láminas de Retos rápidos. Presupuesto sin compresión de tienda, no tamaño final de IPA/AAB. Los 36 avatares ilustrados y las siete portadas nuevas de menú se precargan para que aparezcan también sin conexión; sus WebP están optimizados para móvil. La ampliación de salarios mínimos a 22 países incorpora doce WebP nuevos y renueva diez; las 22 cartas se precargan para jugar sin conexión. Se ajusta el límite de recursos en 0,5 MB y el de precarga en 1,2 MB para esta ampliación."
 }

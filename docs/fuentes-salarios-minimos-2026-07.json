@@ -1,0 +1,264 @@
+{
+  "reviewedAt": "2026-10-04",
+  "referenceDate": "2026-07-01",
+  "dataset": "earn_mw_cur",
+  "period": "2026-S2",
+  "currency": "EUR",
+  "unit": "gross monthly national minimum wage; official Eurostat monthly conversion; rounded EUR as published",
+  "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2",
+  "updated": "2026-07-31T11:00:00+0200",
+  "rawSnapshots": [
+    {
+      "path": "docs/eurostat-salarios-2026-S2-EUR.json",
+      "sha256": "23c10c4485d5ced1a0f773103f84f6865d3a435a42d14c16b8f92daaaf6ae528"
+    },
+    {
+      "path": "docs/eurostat-salarios-2026-S2-NAC.json",
+      "sha256": "af94e80975a95ea425108b05820d479dd0ae906b2454676fad6fd709ac9017e4"
+    }
+  ],
+  "cards": [
+    {
+      "id": "minimum-wages-1",
+      "title": "Bulgaria",
+      "geo": "BG",
+      "value": 620,
+      "nationalValue": 620,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=BG",
+      "nationalSource": "https://asp.government.bg/uploaded/files/9639-pms-243-ot-13.11.25-g---mrz-2026.pdf",
+      "verification": "620,20 EUR/mes; norma nacional. Eurostat: 620 EUR.",
+      "previousValue": 620
+    },
+    {
+      "id": "minimum-wages-2",
+      "title": "Rumanía",
+      "geo": "RO",
+      "value": 825,
+      "nationalValue": 4325,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=RO",
+      "nationalSource": "https://static.anaf.ro/static/10/Anaf/legislatie/HG_146_2026.pdf",
+      "verification": "4.325 RON/mes; conversión a EUR de Eurostat al cierre de junio.",
+      "previousValue": 849.53
+    },
+    {
+      "id": "minimum-wages-3",
+      "title": "Polonia",
+      "geo": "PL",
+      "value": 1119,
+      "nationalValue": 4806,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=PL",
+      "nationalSource": "https://www.gov.pl/web/rodzina/minimalne-wynagrodzenie-za-prace",
+      "verification": "4.806 PLN/mes; conversión a EUR de Eurostat al cierre de junio.",
+      "previousValue": 1143.61
+    },
+    {
+      "id": "minimum-wages-4",
+      "title": "España",
+      "geo": "ES",
+      "value": 1425,
+      "nationalValue": 1425,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=ES",
+      "nationalSource": "https://www.boe.es/eli/es/rd/2026/02/18/126/con",
+      "verification": "1.221 EUR × 14 / 12 = 1.424,50 EUR; serie: 1.425.",
+      "previousValue": 1424.5
+    },
+    {
+      "id": "minimum-wages-5",
+      "title": "Francia",
+      "geo": "FR",
+      "value": 1867,
+      "nationalValue": 1867,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=FR",
+      "nationalSource": "https://www.service-public.gouv.fr/particuliers/vosdroits/F2300",
+      "verification": "12,31 EUR/h × 35 × 52 / 12 = 1.867,02 EUR; serie: 1.867.",
+      "previousValue": 1867.02
+    },
+    {
+      "id": "minimum-wages-6",
+      "title": "Bélgica",
+      "geo": "BE",
+      "value": 2234,
+      "nationalValue": 2234,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=BE",
+      "nationalSource": "https://employment.belgium.be/en/themes/international/posting/working-conditions-be-respected-case-posting-belgium/remuneration?id=38256",
+      "verification": "2.233,61 EUR/mes desde 1 julio 2026; serie: 2.234.",
+      "previousValue": 2189.81
+    },
+    {
+      "id": "minimum-wages-7",
+      "title": "Países Bajos",
+      "geo": "NL",
+      "value": 2338,
+      "nationalValue": 2338,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=NL",
+      "nationalSource": "https://www.rijksoverheid.nl/themas/werk/minimumloon/bedragen-minimumloon/bedragen-minimumloon-2026",
+      "verification": "14,99 EUR/h × 36 × 52 / 12 = 2.338,44 EUR; serie: 2.338.",
+      "previousValue": 2338.44
+    },
+    {
+      "id": "minimum-wages-8",
+      "title": "Alemania",
+      "geo": "DE",
+      "value": 2343,
+      "nationalValue": 2343,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=DE",
+      "nationalSource": "https://www.bmas.de/EN/Labour/Minimum-Wage/the-minimum-wage-questions-and-answers.html",
+      "verification": "13,90 EUR/h × 38,8 × 4,345 = 2.343,3454 EUR; serie: 2.343.",
+      "previousValue": 2343.35
+    },
+    {
+      "id": "minimum-wages-9",
+      "title": "Irlanda",
+      "geo": "IE",
+      "value": 2391,
+      "nationalValue": 2391,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=IE",
+      "nationalSource": "https://www.gov.ie/en/department-of-enterprise-tourism-and-employment/publications/national-minimum-wage-increase-on-1-january-2025/",
+      "verification": "14,15 EUR/h × 39 × 52 / 12 = 2.391,35 EUR; serie: 2.391.",
+      "previousValue": 2391.35
+    },
+    {
+      "id": "minimum-wages-10",
+      "title": "Luxemburgo",
+      "geo": "LU",
+      "value": 2771,
+      "nationalValue": 2771,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=LU",
+      "nationalSource": "https://itm.public.lu/fr/questions-reponses/droit-travail/remuneration/a/a3.html",
+      "verification": "2.771,33 EUR/mes desde 1 junio, adulto no cualificado; serie: 2.771.",
+      "previousValue": 2771
+    },
+    {
+      "id": "minimum-wages-11",
+      "title": "Chequia",
+      "geo": "CZ",
+      "value": 923,
+      "nationalValue": 22400,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=CZ",
+      "nationalSource": "https://mpsv.gov.cz/minimalni-mzda",
+      "verification": "22.400 CZK/mes; conversión a EUR de Eurostat al cierre de junio.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-12",
+      "title": "Estonia",
+      "geo": "EE",
+      "value": 946,
+      "nationalValue": 946,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=EE",
+      "nationalSource": "https://www.emta.ee/en/business-client/taxes-and-payment/income-and-social-taxes/tax-rates",
+      "verification": "946 EUR/mes desde 1 abril 2026.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-13",
+      "title": "Grecia",
+      "geo": "EL",
+      "value": 1073,
+      "nationalValue": 1073,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=EL",
+      "nationalSource": "https://ypergasias.gov.gr/ergasiakes-scheseis/syllogikes-ergasiakes-sxeseis/katotatos-misthos/",
+      "verification": "920 EUR × 14 / 12 = 1.073,33 EUR; serie: 1.073.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-14",
+      "title": "Croacia",
+      "geo": "HR",
+      "value": 1050,
+      "nationalValue": 1050,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=HR",
+      "nationalSource": "https://narodne-novine.nn.hr/clanci/sluzbeni/2025_10_132_1931.html",
+      "verification": "1.050 EUR/mes, 1 enero–31 diciembre 2026.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-15",
+      "title": "Hungría",
+      "geo": "HU",
+      "value": 906,
+      "nationalValue": 322800,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=HU",
+      "nationalSource": "https://njt.jog.gov.hu/jogszabaly/2025-426-20-22",
+      "verification": "322.800 HUF/mes general; 373.200 HUF cualificado, excluido; conversión Eurostat.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-16",
+      "title": "Lituania",
+      "geo": "LT",
+      "value": 1153,
+      "nationalValue": 1153,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=LT",
+      "nationalSource": "https://socmin.lrv.lt/lt/naujienos-1/patvirtinta-mma-nuo-2026-m-1153-eurai-mNK/",
+      "verification": "1.153 EUR/mes desde 1 enero 2026.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-17",
+      "title": "Letonia",
+      "geo": "LV",
+      "value": 780,
+      "nationalValue": 780,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=LV",
+      "nationalSource": "https://www.lm.gov.lv/lv/minimala-darba-alga?view=easy",
+      "verification": "780 EUR/mes desde 1 enero 2026.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-18",
+      "title": "Malta",
+      "geo": "MT",
+      "value": 994,
+      "nationalValue": 994,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=MT",
+      "nationalSource": "https://dier.gov.mt/wp-content/uploads/2025/12/Resource-Pack-2026-Final-04.12.2025.pdf",
+      "verification": "229,44 EUR/semana × 52 / 12 = 994,24 EUR; serie: 994.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-19",
+      "title": "Portugal",
+      "geo": "PT",
+      "value": 1073,
+      "nationalValue": 1073,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=PT",
+      "nationalSource": "https://www.dgert.gov.pt/contratacao-coletiva-relacoes-do-trabalho/remuneracoes-do-trabalho/remuneracao-minima-mensal-garantida",
+      "verification": "920 EUR × 14 / 12 = 1.073,33 EUR; serie: 1.073.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-20",
+      "title": "Eslovenia",
+      "geo": "SI",
+      "value": 1482,
+      "nationalValue": 1482,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=SI",
+      "nationalSource": "https://www.gov.si/novice/2026-01-28-dolocen-znesek-minimalne-place-za-2026/",
+      "verification": "1.481,88 EUR/mes; serie: 1.482. No sumar manualmente bonos a la serie.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-21",
+      "title": "Eslovaquia",
+      "geo": "SK",
+      "value": 915,
+      "nationalValue": 915,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=SK",
+      "nationalSource": "https://www.employment.gov.sk/showdoc.do?docid=443&forceBrowserDetector=blind",
+      "verification": "915 EUR/mes nivel 1; restantes niveles excluidos.",
+      "previousValue": null
+    },
+    {
+      "id": "minimum-wages-22",
+      "title": "Chipre",
+      "geo": "CY",
+      "value": 1088,
+      "nationalValue": 1088,
+      "source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_mw_cur?lang=en&freq=S&currency=EUR&time=2026-S2&geo=CY",
+      "nationalSource": "https://www.mlsi.gov.cy/mlsi/dlr/dlr.nsf/All/1BC7DC1FA85737B9C22586870039FD04",
+      "verification": "1.088 EUR/mes tras 6 meses; inicial 979 EUR, excluido.",
+      "previousValue": null
+    }
+  ]
+}
