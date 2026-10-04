@@ -74,6 +74,57 @@
     wrap.scrollBy({ left: caja.left - marco.left - (marco.width - caja.width) / 2, behavior: reduce ? "auto" : "smooth" });
   }
 
+  // Sigue a una carta mientras llega a la línea: la mantiene centrada en la tira y, si
+  // hace falta, a la vista en la página. Un centrado de una sola vez no basta, porque
+  // justo después de colocar el tablero se reajusta (con una carta más, todas encogen) y
+  // la carta acababa a medias fuera de la pantalla. La posición se mide en la maquetación,
+  // sin las transformaciones de la animación de llegada, que la desplazan a propósito.
+  // Si la persona toca o desplaza la línea, se deja de seguir: manda ella.
+  let stopFollow = null;
+  function followElement(wrap, el, duration = 1200) {
+    stopFollow?.();
+    if (!wrap || !el || typeof requestAnimationFrame !== "function") return () => {};
+    const timeline = el.closest(".timeline");
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const until = performance.now() + duration;
+    let frame = 0, verticalDone = false;
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      ["pointerdown", "wheel", "touchstart"].forEach(type => wrap.removeEventListener(type, stop));
+      if (stopFollow === stop) stopFollow = null;
+    };
+    const step = () => {
+      if (!el.isConnected || !wrap.isConnected || performance.now() > until) { stop(); return; }
+      let left = el.offsetLeft, top = el.offsetTop, width = el.offsetWidth, height = el.offsetHeight;
+      let origin = el.getBoundingClientRect(), scale = 1;
+      if (timeline && timeline.contains(el)) {
+        for (let node = el.offsetParent; node && node !== timeline && timeline.contains(node); node = node.offsetParent) {
+          left += node.offsetLeft; top += node.offsetTop;
+        }
+        origin = timeline.getBoundingClientRect();
+        scale = timeline.offsetWidth ? origin.width / timeline.offsetWidth : 1;
+        left = origin.left + left * scale; top = origin.top + top * scale;
+        width *= scale; height *= scale;
+      } else { left = origin.left; top = origin.top; }
+      const box = wrap.getBoundingClientRect();
+      const inner = box.left + wrap.clientLeft;
+      const delta = left - inner - (wrap.clientWidth - width) / 2;
+      // Se acerca a su sitio en vez de saltar: el movimiento acompaña a la carta.
+      if (Math.abs(delta) > .5) wrap.scrollLeft += reduce ? delta : delta * .35;
+      if (!verticalDone) {
+        verticalDone = true;
+        const view = window.innerHeight || document.documentElement.clientHeight;
+        const over = top - 8, under = top + height + 8 - view;
+        if (over < 0 || under > 0) window.scrollBy({ top: over < 0 ? over : Math.min(under, over), behavior: reduce ? "auto" : "smooth" });
+      }
+      frame = requestAnimationFrame(step);
+    };
+    ["pointerdown", "wheel", "touchstart"].forEach(type => wrap.addEventListener(type, stop, { passive: true, once: true }));
+    stopFollow = stop;
+    frame = requestAnimationFrame(step);
+    return stop;
+  }
+
   function changeZoom(event) {
     const button = event.target.closest("[data-timeline-zoom], [data-timeline-range], [data-zoom-level]");
     if (!button || button.disabled) return;
@@ -115,4 +166,5 @@
   CT.timelineMap = timelineMap;
   CT.applyTimelineZoom = applyTimelineZoom;
   CT.scrollToElement = scrollToElement;
+  CT.followElement = followElement;
 })();

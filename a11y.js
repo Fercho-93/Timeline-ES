@@ -442,6 +442,8 @@
         const frame = wrap.getBoundingClientRect();
         wrap.scrollLeft += target.left - frame.left - (frame.width - target.width) / 2;
       }
+      // La vista previa también cae en un tablero que se reajusta después de pintar.
+      window.CONTINUUM.followElement?.(wrap, confirmation, 700);
     }
     if (quietPrimaryNavigation && !primaryNavigationMotion?.dialog) primaryNavigationMotion = null;
     if (primero) return;
@@ -525,11 +527,12 @@
         overlay.setAttribute('aria-label', 'Mostrando la posición correcta');
         focus(overlay, {preventScroll: true});
         const wrap = correctSlot.closest('.timeline-wrap');
-        window.CONTINUUM.scrollToElement?.(wrap, correctSlot);
         if (wrap) {
           const box = correctSlot.getBoundingClientRect(), view = wrap.getBoundingClientRect();
           wrap.scrollLeft += box.left - view.left - (view.width - box.width) / 2;
         }
+        // El tablero se reajusta justo después de repintar: se sigue al hueco, no se centra una vez.
+        window.CONTINUUM.followElement?.(wrap, correctSlot);
         const attempted = document.querySelector(`.slot[data-index="${overlay.dataset.attemptedSlot}"]`);
         const from = attempted?.getBoundingClientRect() || correctSlot.getBoundingClientRect();
         const to = correctSlot.getBoundingClientRect();
@@ -576,7 +579,6 @@
         overlay.setAttribute('role', 'status');
         overlay.setAttribute('aria-label', '¡Bien colocado!');
         focus(overlay, {preventScroll: true});
-        window.CONTINUUM.scrollToElement?.(card.closest('.timeline-wrap'), card);
         const animations = [];
         const wrap = card.closest('.timeline-wrap');
         // Centrar antes del movimiento evita sumar dos desplazamientos a la vez.
@@ -584,6 +586,9 @@
           const box = card.getBoundingClientRect(), view = wrap.getBoundingClientRect();
           wrap.scrollLeft += box.left - view.left - (view.width - box.width) / 2;
         }
+        // Y después se la sigue mientras llega: el tablero se reajusta al tener una carta
+        // más, y un centrado de una sola vez la dejaba a medias fuera de la pantalla.
+        animations.push({cancel: window.CONTINUUM.followElement?.(wrap, card, Math.min(1300, remaining + 300)) || (() => {})});
         const scale = parseFloat(card.closest('.timeline')?.style.getPropertyValue('--timeline-scale')) || 1;
         const box = card.getBoundingClientRect();
         const hand = document.querySelector('.hand-card.selected')?.getBoundingClientRect();
