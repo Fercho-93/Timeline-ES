@@ -146,4 +146,38 @@ assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pendin
     assert.ok(document.querySelector('.hand-fan .fan-center.selected'));
   } finally { window.close(); }
 }
+{
+  const window = new JSDOM('<div id="app"></div>', {runScripts: 'outside-only'}).window;
+  try {
+    window.CONTINUUM = {};
+    window.matchMedia = () => ({matches: true});
+    window.requestAnimationFrame = () => 1;
+    window.cancelAnimationFrame = () => {};
+    window.eval(read('immersion.js'));
+    const app = window.document.querySelector('#app');
+    const renderHand = (screen, count, pending = false, solo = false) => {
+      app.dataset.screen = screen;
+      app.innerHTML = `<div class="shell"><section><div class="hand${solo ? ' hand-solo' : ''}">${Array.from({length: count}, (_, index) => `<button class="hand-card" data-id="${index}"><strong>Carta ${index}</strong></button>`).join('')}</div></section>${pending ? '<div class="slot-confirm"></div>' : ''}</div>`;
+      window.CONTINUUM.UI.mount(app, screen);
+    };
+    for (const screen of ['game', 'local-game', 'online-game', 'quick-game']) {
+      renderHand(screen, 3);
+      assert.ok(app.querySelector('.hand-fan-controls'), `${screen}: hay controles con varias cartas`);
+      renderHand(screen, 1);
+      const last = app.querySelector('.hand-card');
+      assert.ok(app.querySelector('.hand.hand-fan'), `${screen}: la última carta conserva los estilos de tamaño del abanico`);
+      assert.ok(last.classList.contains('fan-center'), `${screen}: la última carta queda centrada`);
+      assert.equal(last.style.getPropertyValue('--fan-offset'), '0');
+      assert.equal(last.style.getPropertyValue('--fan-depth'), '0');
+      assert.equal(last.tabIndex, 0, `${screen}: la carta sigue accesible con teclado`);
+      assert.equal(app.querySelector('.hand-fan-controls'), null, `${screen}: no hay flechas sin otras cartas`);
+      renderHand(screen, 1, true);
+      assert.ok(app.querySelector('.hand-fan.hand-placement-pending'), `${screen}: también conserva el formato durante la vista previa`);
+      renderHand(screen, 0);
+      assert.equal(app.querySelector('.hand-fan'), null, `${screen}: no se monta un abanico vacío`);
+    }
+    renderHand('solo', 1, false, true);
+    assert.equal(app.querySelector('.hand-fan'), null, 'solitario conserva su formato propio de carta única');
+  } finally { window.close(); }
+}
 console.log('Mano y reverso: solitario, local, online y retos rápidos correctos.');

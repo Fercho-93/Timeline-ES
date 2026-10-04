@@ -166,10 +166,11 @@
     const cards = [...hand.querySelectorAll('.hand-card')];
     // La carta activa está en la línea; centrar otra en el abanico no la selecciona.
     hand.classList.toggle('hand-placement-pending', !!hand.closest('#app')?.querySelector('.slot-confirm'));
-    if (hand.classList.contains('hand-solo') || cards.length < 2) return;
+    // Una mano de varias cartas conserva su formato de abanico hasta la última.
+    if (hand.classList.contains('hand-solo') || cards.length === 0) return;
     hand.classList.add('hand-fan');
     hand.setAttribute('role', 'group');
-    hand.setAttribute('aria-label', 'Cartas en mano. Desliza a los lados para elegir.');
+    hand.setAttribute('aria-label', cards.length === 1 ? 'Última carta en mano.' : 'Cartas en mano. Desliza a los lados para elegir.');
     const chosen = cards.findIndex(card => card.classList.contains('selected'));
     const center = Math.max(0, chosen);
     const enabled = cards.some(card => !card.disabled);
@@ -196,6 +197,7 @@
       }
     });
     previousFan = {key, center};
+    if (cards.length === 1) return;
     const controls = document.createElement('div');
     controls.className = 'hand-fan-controls';
     controls.innerHTML = `<button type="button" aria-label="Carta anterior" data-fan-step="-1">‹</button><span>${center + 1} / ${cards.length}</span><button type="button" aria-label="Carta siguiente" data-fan-step="1">›</button>`;
