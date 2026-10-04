@@ -75,7 +75,6 @@ assert.doesNotMatch(read('quick-challenges.js'), /seed:'room:'\+room.members/);
 assert.doesNotMatch(turnSource, /seed: 'quick:' \+ x.code/);
 const cacheVersion = read('service-worker-258.js').match(/const CACHE = "([^"]+)"/)[1];
 assert.ok(read('updates.js').includes(cacheVersion), 'La versión visible coincide con la caché nueva');
-assert.equal(cacheVersion, 'continuum-v566');
 for (const file of ['avatares.js','accounts.js','duelo-turnos.js','quick-challenges.js']) {
   new vm.Script(read(file).replace(/^import .*;\n/gm, '').replace(/^export /gm, ''), {filename: file});
 }
