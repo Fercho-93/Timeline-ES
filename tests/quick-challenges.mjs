@@ -13,6 +13,19 @@ function boot(saved) {
   return w;
 }
 let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
+// Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
+const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
+assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
+assert.equal(quickCards.length, 376);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 376);
+for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
+  assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
+  assert.ok(card.detail.startsWith(card.curiosity), `${card.id}: curiosidad antes del criterio de medida`);
+  assert.ok(card.detail.includes(deck.context), `${card.id}: conserva las aclaraciones de comparación`);
+  assert.ok(/^https?:\/\//.test(card.source), `${card.id}: fuente del dato`);
+  assert.ok(/^https:\/\//.test(card.curiositySource), `${card.id}: fuente de la curiosidad`);
+  if (deck.asOf) assert.ok(card.detail.includes(`Datos a ${deck.asOf}.`));
+}
 const round = id => ({id, order: E.challenge(id).cards.map(c => c.id)});
 const config = {names: ['Ana', 'Luis'], rounds: [round('poker'), round('social'), round('oscars')]};
 let s = E.create(config);
@@ -197,6 +210,7 @@ for (let r = 0; r < 3; r++) {
   const val = id => c.cards.find(card => card.id === id).value * c.direction;
   const index = s.timeline.findIndex(id => val(id) > val(cardId));
   click(`[data-quick="select"][data-id="${cardId}"]`);
+  assert.ok(!w.document.querySelector('.hand').textContent.includes(c.cards.find(card => card.id === cardId).curiosity), 'la curiosidad no se revela antes de jugar');
   assert.equal(w.document.querySelector('[data-quick="confirm"]'), null);
   click(`[data-quick="slot"][data-index="${index < 0 ? s.timeline.length : index}"]`);
   click('[data-quick="confirm"]');
@@ -205,8 +219,17 @@ for (let r = 0; r < 3; r++) {
   w.close(); w = boot(snapshot); CT = w.CONTINUUM; E = CT.QuickEngine;
   openQuick(); click('[data-quick="resume"]');
   assert.match(w.document.querySelector('#app').textContent, /¡Bien colocado!/);
+  const discovered = c.cards.find(card => card.id === cardId);
+  const resultPanel = w.document.querySelector('[data-quick-result]');
+  assert.ok(resultPanel.textContent.includes(discovered.curiosity), 'la carta descubierta enseña su curiosidad');
+  const references = [...resultPanel.querySelectorAll('a')].map(a => a.href);
+  assert.ok(references.includes(discovered.source));
+  assert.ok(references.includes(discovered.curiositySource));
   click('[data-quick="ack"]'); click('[data-quick="bank"]'); click('[data-quick="bank"]');
   assert.equal(E.restore(JSON.parse(w.localStorage.getItem(key))).phase, 'round-end');
+  const finalList = w.document.querySelector('details.quick-panel');
+  assert.ok(finalList.textContent.includes(discovered.curiosity));
+  assert.ok([...finalList.querySelectorAll('a')].some(a => a.href === discovered.curiositySource));
   if (r < 2) click('[data-quick="next"]');
 }
 assert.equal(w.document.querySelector('[data-quick="next"]'), null);

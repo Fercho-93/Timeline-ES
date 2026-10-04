@@ -671,6 +671,12 @@
     const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
     return `<div class="timeline-ends" aria-hidden="true"><span>← ${esc(cap(left))}</span><span>${esc(cap(right))} →</span></div>`;
   }
+  function sourceLinks(item) {
+    const link = (url, label) => `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+    return item.curiositySource && item.curiositySource !== item.source
+      ? `${link(item.source, 'Fuente del dato')} · ${link(item.curiositySource, 'Fuente de la curiosidad')}`
+      : link(item.source, 'Consultar fuente');
+  }
   function cardMarkup(c, item) {
     return `<article class="timeline-card card-flippable animal-timeline-card" data-id="${item.id}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(item.title)}. Toca para ver la explicación."><div class="card-category">${esc(c.title)}</div><div class="card-visual"><img class="animal-card-art" src="${esc(item.image || 'assets/hero-quick-400.webp')}" alt="" width="400" height="600"></div><div class="card-content"><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><p>${esc(item.detail)}</p><div class="year">${esc(item.label)}</div></div></article>`;
   }
@@ -738,13 +744,13 @@
         ${final && room && record.config.kind==='duel' && room.capacity===2 && room.members.length===2 ? rematchButton() : ''}
         ${final && record.config.kind==='daily' && CT.Accounts?.ready ? '<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>' : ''}
         <button class="btn btn-secondary" data-action="home">Guardar y volver al inicio</button>${button('abandon','Salir sin guardar','btn btn-ghost exit-discard')}</section>
-        <details class="panel quick-panel"><summary>Ver el orden completo y las fuentes</summary><ol>${[...c.cards].sort((a, b) => (a.value - b.value) * c.direction).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} <a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Fuente</a></p></li>`).join('')}</ol></details>`);
+        <details class="panel quick-panel"><summary>Ver el orden completo y las fuentes</summary><ol>${[...c.cards].sort((a, b) => (a.value - b.value) * c.direction).map(item => `<li><strong>${esc(item.title)} · ${esc(item.label)}</strong><p>${esc(item.detail)} ${sourceLinks(item)}</p></li>`).join('')}</ol></details>`);
       return;
     }
     if (state.phase === 'result') {
       const r = state.result, item = get(r.cardId);
       if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id=>cardMarkup(c,get(id))).join('')}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);return;}
-      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id => cardMarkup(c, get(id))).join('')}</div></div><div class="overlay" data-quick-result><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div><a href="${esc(item.source)}" target="_blank" rel="noopener noreferrer">Consultar fuente</a>
+      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id => cardMarkup(c, get(id))).join('')}</div></div><div class="overlay" data-quick-result><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div>${sourceLinks(item)}
         <p class="quick-result-note">${resultNote(r, p)}</p>
         ${button('ack', room && room.members.length < state.players.length ? 'Continuar y retar a mi amigo' : 'Continuar', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
       CT.openDialog(app().querySelector('[data-quick-result]'), false);

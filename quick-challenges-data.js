@@ -1,20 +1,20 @@
 (function () {
   'use strict';
-  // Primera fase: cartas sin ilustración. Cada carta conserva una fuente pública para
-  // poder auditarla y sustituirla más adelante sin tocar el motor de juego.
+  // Cada carta aporta una curiosidad y conserva la fuente del dato que ordena el reto.
+  // Las filas añaden curiosidad y, cuando es distinta, su fuente después del artista.
   // Fecha de referencia de las cifras que cambian con el tiempo (temporadas, ventas, capacidades,
   // salarios…). Se enseña igual en todos los mazos: «Datos a 2026». Al actualizar un mazo, se cambia aquí.
   const AS_OF = {
     'series-seasons': '2026', 'albums-sales': '2026', 'stadiums': '2026', 'minimum-wages': '2026', 'metros': '2026',
     'eurovision-wins': '2026', 'spanish-tv': '2026', 'airports': '2025', 'companies-revenue': '2025'
   };
-  const host = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };
-  // El detalle que se ve al descubrir una carta: qué es, qué se mide, a qué fecha y de dónde sale.
-  const cards = (prefix, source, rows, context, asOf) => rows.map(([title, value, label, image, cardSource, artist], i) => {
+  // Al descubrir la carta se muestra la curiosidad, el criterio de medida y la fecha de referencia.
+  const cards = (prefix, source, rows, context, asOf) => rows.map(([title, value, label, image, cardSource, artist, curiosity, curiositySource], i) => {
     const reference = cardSource || source;
     return {
       id: `${prefix}-${i + 1}`, title, value, label, image: image || null, ...(artist ? {artist} : {}),
-      detail: `${title}${artist ? ' — ' + artist : ''}: ${label}. ${context}${asOf ? ` Datos a ${asOf}.` : ''}${host(reference) ? ` Fuente: ${host(reference)}.` : ''}`, source: reference
+      curiosity, curiositySource: curiositySource || reference,
+      detail: `${curiosity} ${context}${asOf ? ` Datos a ${asOf}.` : ''}`, source: reference
     };
   });
   const deck = (id, title, rule, context, direction, cover, source, rows) => ({ id, title, rule, context, direction, cover, asOf: AS_OF[id] || null, cards: cards(id, source, rows, context, AS_OF[id] || null) });
@@ -34,27 +34,27 @@
       'sports',
       S.sport,
       [
-        ['Baloncesto',5,'5 jugadores','assets/quick-cards/sports-players-1.webp','https://about.fiba.basketball/en/our-sport/basketball'],
-        ['Fútbol sala',5,'5 jugadores','assets/quick-cards/sports-players-2.webp','https://inside.fifa.com/en/news/a-crash-course-in-futsal-rules'],
-        ['Hockey hielo',6,'6 jugadores','assets/quick-cards/sports-players-3.webp','https://www.iihf.com/en/static/55352/rules_regulations_guidelines'],
-        ['Voleibol',6,'6 jugadores','assets/quick-cards/sports-players-4.webp','https://www.fivb.com/volleyball/the-game/basic-rules/'],
-        ['Waterpolo',7,'7 jugadores','assets/quick-cards/sports-players-5.webp','https://www.worldaquatics.com/news/4186172/world-aquatics-updates-competition-regulations-2025'],
-        ['Balonmano',7,'7 jugadores','assets/quick-cards/sports-players-6.webp','https://www.ihf.info/sites/default/files/2025-02/09A%20-%20Rules%20of%20the%20Game_Indoor%20Handball_E.pdf'],
-        ['Béisbol',9,'9 jugadores','assets/quick-cards/sports-players-7.webp','https://www.mlb.com/glossary/positions'],
-        ['Lacrosse de campo masculino',10,'10 jugadores','assets/quick-cards/sports-players-8.webp','https://worldlacrosse.sport/discipline-mens-field/'],
-        ['Fútbol',11,'11 jugadores','assets/quick-cards/sports-players-9.webp','https://www.theifab.com/laws/latest/the-players/'],
-        ['Cricket',11,'11 jugadores','assets/quick-cards/sports-players-10.webp','https://www.icc-cricket.com/news/mens-test-match-clause-1-the-players'],
-        ['Hockey hierba',11,'11 jugadores','assets/quick-cards/sports-players-11.webp','https://www.fih.hockey/about-fih/official-documents/rules-of-hockey'],
-        ['Rugby union',15,'15 jugadores','assets/quick-cards/sports-players-12.webp','https://passport.world.rugby/laws-of-the-game/laws-by-number/3-team'],
-        ['Pádel',2,'2 jugadores','assets/quick-cards/sports-players-13.webp','https://www.padelfip.com/wp-content/uploads/2025/12/FIP_Rules-of-Padel.pdf'],
-        ['Polo',4,'4 jugadores','assets/quick-cards/sports-players-14.webp','https://www.uspolo.org/assets/docs/2019-Rulebook-for-website_190205_122821.pdf'],
-        ['Netball',7,'7 jugadores','assets/quick-cards/sports-players-15.webp','https://netball.sport/game/netball-explained/'],
-        ['Kin-ball',4,'4 jugadores','assets/quick-cards/sports-players-16.webp','https://www.kin-ball.in/'],
-        ['Curling tradicional',4,'4 jugadores','assets/quick-cards/sports-players-17.webp','https://worldcurling.org/about/curling/'],
-        ['Hurling',15,'15 jugadores','assets/quick-cards/sports-players-18.webp','https://www.gaa.ie/api/pdfs/image/upload/s0nddwy8nims22rad74a.pdf'],
-        ['Vóley playa',2,'2 jugadores','assets/quick-cards/sports-players-19.webp','https://www.fivb.com/beach-volleyball/the-game/basic-rules/'],
-        ['Natación artística por equipos',8,'8 deportistas','assets/quick-cards/sports-players-20.webp','https://www.worldaquatics.com/news/4431689/artistic-swimming-path-to-la-28-confirmed-as-olympic-qualification-system-approved'],
-        ['Fútbol americano',11,'11 jugadores','assets/quick-cards/sports-players-21.webp','https://playfootball.nfl.com/tackle/youth-and-high-school-tackle-football-glossary/']
+        ["Baloncesto",5,"5 jugadores","assets/quick-cards/sports-players-1.webp","https://about.fiba.basketball/en/our-sport/basketball",null,"Una canasta cambia de valor según el lugar del lanzamiento: un tiro lejano puede valer más que uno bajo el aro."],
+        ["Fútbol sala",5,"5 jugadores","assets/quick-cards/sports-players-2.webp","https://inside.fifa.com/en/news/a-crash-course-in-futsal-rules",null,"Las sustituciones se hacen sobre la marcha: un equipo puede renovar sus jugadores sin esperar a que se detenga el partido."],
+        ["Hockey hielo",6,"6 jugadores","assets/quick-cards/sports-players-3.webp","https://www.iihf.com/en/static/55352/rules_regulations_guidelines",null,"El portero puede salir del hielo para que entre otro atacante; esa apuesta deja la portería desprotegida."],
+        ["Voleibol",6,"6 jugadores","assets/quick-cards/sports-players-4.webp","https://www.fivb.com/volleyball/the-game/basic-rules/",null,"El líbero viste de otro color y se especializa en la defensa y la recepción, con restricciones para atacar y bloquear."],
+        ["Waterpolo",7,"7 jugadores","assets/quick-cards/sports-players-5.webp","https://www.worldaquatics.com/news/4186172/world-aquatics-updates-competition-regulations-2025",null,"La piscina también limita los movimientos: los jugadores de campo no pueden apoyarse en el fondo para intervenir en el juego."],
+        ["Balonmano",7,"7 jugadores","assets/quick-cards/sports-players-6.webp","https://www.ihf.info/sites/default/files/2025-02/09A%20-%20Rules%20of%20the%20Game_Indoor%20Handball_E.pdf",null,"El área de portería está reservada al portero. Un atacante puede lanzar mientras salta sobre ella, antes de tocar el suelo."],
+        ["Béisbol",9,"9 jugadores","assets/quick-cards/sports-players-7.webp","https://www.mlb.com/glossary/positions",null,"El equipo que bate y el que defiende se alternan. Sus posiciones defensivas incluyen lanzador, receptor, jugadores de cuadro y jardineros."],
+        ["Lacrosse de campo masculino",10,"10 jugadores","assets/quick-cards/sports-players-8.webp","https://worldlacrosse.sport/discipline-mens-field/",null,"El balón viaja dentro de una pequeña red en el extremo del palo: se puede transportar, pasar y lanzar con ella."],
+        ["Fútbol",11,"11 jugadores","assets/quick-cards/sports-players-9.webp","https://www.theifab.com/laws/latest/the-players/",null,"La regla del fuera de juego depende de la posición del atacante y de los adversarios en el momento del pase, no al recibir el balón."],
+        ["Cricket",11,"11 jugadores","assets/quick-cards/sports-players-10.webp","https://www.icc-cricket.com/news/mens-test-match-clause-1-the-players",null,"Aunque el equipo defensor ocupa el campo completo, quienes batean actúan por parejas para sumar carreras entre los wickets."],
+        ["Hockey hierba",11,"11 jugadores","assets/quick-cards/sports-players-11.webp","https://www.fih.hockey/about-fih/official-documents/rules-of-hockey",null,"El palo tiene una cara plana y otra redondeada; la pelota se juega con la cara plana."],
+        ["Rugby union",15,"15 jugadores","assets/quick-cards/sports-players-12.webp","https://passport.world.rugby/laws-of-the-game/laws-by-number/3-team",null,"La melé reúne a los delanteros de ambos equipos para disputar el balón mediante un empuje coordinado."],
+        ["Pádel",2,"2 jugadores","assets/quick-cards/sports-players-13.webp","https://www.padelfip.com/wp-content/uploads/2025/12/FIP_Rules-of-Padel.pdf",null,"Las paredes forman parte del juego: después de botar en el suelo, la pelota puede rebotar en ellas y seguir en juego."],
+        ["Polo",4,"4 jugadores","assets/quick-cards/sports-players-14.webp","https://www.uspolo.org/assets/docs/2019-Rulebook-for-website_190205_122821.pdf",null,"Además de manejar el mazo y la pelota, cada jugador debe conducir a su caballo y coordinarse con sus compañeros."],
+        ["Netball",7,"7 jugadores","assets/quick-cards/sports-players-15.webp","https://netball.sport/game/netball-explained/",null,"La canasta no tiene tablero. Solo las posiciones autorizadas pueden lanzar, y deben hacerlo desde el círculo de tiro."],
+        ["Kin-ball",4,"4 jugadores","assets/quick-cards/sports-players-16.webp","https://www.kin-ball.in/",null,"En la modalidad habitual compiten tres equipos a la vez; el equipo que golpea anuncia cuál debe recibir el enorme balón."],
+        ["Curling tradicional",4,"4 jugadores","assets/quick-cards/sports-players-17.webp","https://worldcurling.org/about/curling/",null,"Los compañeros barren el hielo delante de la piedra para influir en cuánto avanza y cómo se curva su recorrido."],
+        ["Hurling",15,"15 jugadores","assets/quick-cards/sports-players-18.webp","https://www.gaa.ie/api/pdfs/image/upload/s0nddwy8nims22rad74a.pdf",null,"La pelota puede golpearse con un palo de madera llamado hurley; un tiro entre los postes puntúa de forma distinta si entra en la red."],
+        ["Vóley playa",2,"2 jugadores","assets/quick-cards/sports-players-19.webp","https://www.fivb.com/beach-volleyball/the-game/basic-rules/",null,"No hay líbero ni suplentes que entren a relevar a la pareja: ambos jugadores cubren toda la pista de arena."],
+        ["Natación artística por equipos",8,"8 deportistas","assets/quick-cards/sports-players-20.webp","https://www.worldaquatics.com/news/4431689/artistic-swimming-path-to-la-28-confirmed-as-olympic-qualification-system-approved",null,"La rutina combina música, coordinación y movimientos bajo el agua; las deportistas no pueden apoyarse en el fondo de la piscina."],
+        ["Fútbol americano",11,"11 jugadores","assets/quick-cards/sports-players-21.webp","https://playfootball.nfl.com/tackle/youth-and-high-school-tackle-football-glossary/",null,"El equipo cambia de especialistas al pasar del ataque a la defensa; el quarterback organiza las jugadas ofensivas."]
       ]
     ),
     d(
@@ -67,40 +67,40 @@
       S.drinks,
       [
         // Las primeras 21 posiciones conservan los IDs y las ilustraciones por tipo de bebida.
-        ["Heineken Original (cerveza lager)",5,"5 % vol.","assets/quick-cards/drinks-1.webp","https://www.heineken.com/us/en/our-beers/heineken-original/"],
-        ["La Sidruca Original (sidra)",5.5,"5,5 % vol.","assets/quick-cards/drinks-2.webp","https://sidrasomarroza.es/producto/la-sidruca-natural/"],
-        ["Marqués de Riscal Verdejo Organic 2025 (vino blanco)",13,"13 % vol.","assets/quick-cards/drinks-3.webp","https://www.marquesderiscal.com/public/Attachment/2026/2/marqusderiscalverdejoorganic2025cas.pdf"],
-        ["Gekkeikan Traditional Sake",15.6,"15,6 % vol.","assets/quick-cards/drinks-4.webp","https://www.gekkeikan.com/sake101/"],
-        ["Tío Pepe (Jerez fino)",15,"15 % vol.","assets/quick-cards/drinks-5.webp","https://www.tiopepe.com/es-es/productos/tio-pepe"],
-        ["Patrón Silver (tequila, versión EE. UU.)",40,"40 % vol.","assets/quick-cards/drinks-6.webp","https://www.patrontequila.com/products/patron-silver.html"],
-        ["Jameson Original (whiskey irlandés)",40,"40 % vol.","assets/quick-cards/drinks-7.webp","https://www.jamesonwhiskey.com/uk-ua/nutritional-information/"],
-        ["Hendrick’s Gin (versión europea)",41.4,"41,4 % vol.","assets/quick-cards/drinks-8.webp","https://global.hendricksgin.com/it/faqs/"],
-        ["Bacardí Superior (ron blanco, versión europea)",37.5,"37,5 % vol.","assets/quick-cards/drinks-9.webp","https://www.bacardilimited.com/nutrition/bacardi?brand_locale=en-GL"],
-        ["Rémy Martin 1738 Accord Royal (coñac)",40,"40 % vol.","assets/quick-cards/drinks-10.webp","https://www.remymartin.com/en-us/collection/1738-accord-royal/"],
-        ["La Fée Parisienne (absenta)",68,"68 % vol.","assets/quick-cards/drinks-11.webp","https://lafee.com/absinthe-superieure-la-fee-2/"],
-        ["Martini Rosso (vermut, versión Bélgica)",15,"15 % vol.","assets/quick-cards/drinks-12.webp","https://www.bacardilimited.com/nutrition/martini?brand_locale=fr-BE"],
-        ["Pallini Limoncello",26,"26 % vol.","assets/quick-cards/drinks-13.webp","https://pallini.com/prodotti-pallini/limoncello/"],
-        ["Baileys Original Irish Cream",17,"17 % vol.","assets/quick-cards/drinks-14.webp","https://www.baileys.com/en-us/frequently-asked-questions"],
-        ["Del Maguey Vida Clásico (mezcal)",42,"42 % vol.","assets/quick-cards/drinks-15.webp","https://delmaguey.com/wp-content/uploads/2023/10/FY23_DelMaguey_AlwaysOn_Vida_Clasico_SellSheet.pdf"],
-        ["Capel Especial Doble Destilado (pisco)",35,"35 % vol.","assets/quick-cards/drinks-16.webp","https://cooperativacapel.cl/nuestros-negocios/piscos"],
-        ["Ruavieja Aguardiente de Orujo",42,"42 % vol.","assets/quick-cards/drinks-17.webp","https://ruavieja.es/wp-content/uploads/2022/03/Informacion-nutricional-Ruavieja-2021.pdf"],
-        ["Valhalla Ragnarök (hidromiel)",11,"11 % vol.","assets/quick-cards/drinks-18.webp","https://valhallahidromiel.com/es/hidromiel/valhalla-ragnarok-caja-de-6-botellas-de-75cl-8414606932412-101575.html"],
-        ["Ruavieja Pacharán",25,"25 % vol.","assets/quick-cards/drinks-19.webp","https://ruavieja.es/wp-content/uploads/2021/06/fy20_Informacion-nutricional.pdf"],
-        ["Licor 43 Original",31,"31 % vol.","assets/quick-cards/drinks-20.webp","https://licor43.com/faqs/"],
-        ["Chinchón Dulce (anís)",35,"35 % vol.","assets/quick-cards/drinks-21.webp","https://shop.pedrodomecq.com/chinchon-anis-dulce/MX00090NV007.html"],
-        ["Heineken Silver (cerveza, versión EE. UU.)",4,"4 % vol.","assets/quick-cards/drinks-22.webp","https://www.heineken.com/us/en/our-beers/heineken-original/"],
-        ["Guinness Draught (cerveza stout)",4.2,"4,2 % vol.","assets/quick-cards/drinks-23.webp","https://www.guinness.com/es-es/preguntas-frecuentes"],
-        ["Guinness Foreign Extra Stout",7.5,"7,5 % vol.","assets/quick-cards/drinks-24.webp","https://www.guinness.com/es-es/preguntas-frecuentes"],
-        ["Strongbow Original (sidra, versión británica)",4.5,"4,5 % vol.","assets/quick-cards/drinks-25.webp","https://uk.strongbow.com/nutrition"],
-        ["Freixenet Cordón Negro Brut (cava, 750 ml)",11.5,"11,5 % vol.","assets/quick-cards/drinks-26.webp","https://e-label.henkell-freixenet.com/global/es-es/63127.html?lang=1"],
-        ["Aperol (aperitivo)",11,"11 % vol.","assets/quick-cards/drinks-27.webp","https://www.aperol.com/en-gr/our-products/aperol/"],
-        ["Kahlúa Original Coffee Liqueur (versión internacional)",16,"16 % vol.","assets/quick-cards/drinks-28.webp","https://www.kahlua.com/en/products/original-coffee-liqueur/"],
-        ["Malibu Original (licor de coco a base de ron)",21,"21 % vol.","assets/quick-cards/drinks-29.webp","https://www.malibudrinks.com/en-us/products/malibu-original/"],
-        ["Jägermeister Original (licor de hierbas)",35,"35 % vol.","assets/quick-cards/drinks-30.webp","https://de.jagermeister.com/shop/jaegermeister/jaegermeister"],
-        ["Cointreau L’Unique (licor de naranja)",40,"40 % vol.","assets/quick-cards/drinks-31.webp","https://www.cointreau.com/fr/fr/faq"],
-        ["Absolut Vodka Original",40,"40 % vol.","assets/quick-cards/drinks-32.webp","https://www.absolut.com/en/products/absolut-vodka/"],
-        ["Jack Daniel’s Old No. 7 (Tennessee whiskey)",40,"40 % vol.","assets/quick-cards/drinks-33.webp","https://nutrition.brown-forman.com/en-gb/jack_daniels"],
-        ["Bombay Sapphire (ginebra, versión británica)",40,"40 % vol.","assets/quick-cards/drinks-34.webp","https://shop.bombaysapphire.com/collections/all-gin/products/bombay-sapphire"]
+        ["Heineken Original (cerveza lager)",5,"5 % vol.","assets/quick-cards/drinks-1.webp","https://www.heineken.com/us/en/our-beers/heineken-original/",null,"Su estilo lager utiliza una fermentación distinta a la de las cervezas ale. La levadura es una pieza clave de su elaboración."],
+        ["La Sidruca Original (sidra)",5.5,"5,5 % vol.","assets/quick-cards/drinks-2.webp","https://sidrasomarroza.es/producto/la-sidruca-natural/",null,"La sidra obtiene su alcohol al fermentar el zumo de manzana; no necesita pasar por una destilación."],
+        ["Marqués de Riscal Verdejo Organic 2025 (vino blanco)",13,"13 % vol.","assets/quick-cards/drinks-3.webp","https://www.marquesderiscal.com/public/Attachment/2026/2/marqusderiscalverdejoorganic2025cas.pdf",null,"La variedad verdejo da nombre al vino. La añada identifica la cosecha de la uva, no necesariamente el año de embotellado.","https://www.marquesderiscal.com/marques-de-riscal-verdejo"],
+        ["Gekkeikan Traditional Sake",15.6,"15,6 % vol.","assets/quick-cards/drinks-4.webp","https://www.gekkeikan.com/sake101/",null,"El arroz se convierte en sake con ayuda del koji, que permite transformar su almidón en azúcares fermentables."],
+        ["Tío Pepe (Jerez fino)",15,"15 % vol.","assets/quick-cards/drinks-5.webp","https://www.tiopepe.com/es-es/productos/tio-pepe",null,"Este fino envejece bajo un velo de levaduras llamado flor, que lo protege del contacto directo con el aire."],
+        ["Patrón Silver (tequila, versión EE. UU.)",40,"40 % vol.","assets/quick-cards/drinks-6.webp","https://www.patrontequila.com/products/patron-silver.html",null,"Se elabora con agave azul. La denominación Silver identifica un tequila sin el envejecimiento prolongado de un añejo."],
+        ["Jameson Original (whiskey irlandés)",40,"40 % vol.","assets/quick-cards/drinks-7.webp","https://www.jamesonwhiskey.com/uk-ua/nutritional-information/",null,"La triple destilación es una de las señas de este whiskey irlandés: el líquido pasa por el proceso tres veces.","https://www.jamesonwhiskey.com/en/our-whiskey/jameson-irish-whiskey/"],
+        ["Hendrick’s Gin (versión europea)",41.4,"41,4 % vol.","assets/quick-cards/drinks-8.webp","https://global.hendricksgin.com/it/faqs/",null,"Además del enebro característico de la ginebra, incorpora infusiones de rosa y pepino.","https://us.hendricksgin.com/hendricks-original/"],
+        ["Bacardí Superior (ron blanco, versión europea)",37.5,"37,5 % vol.","assets/quick-cards/drinks-9.webp","https://www.bacardilimited.com/nutrition/bacardi?brand_locale=en-GL",null,"El ron parte de la caña de azúcar. Que sea blanco no implica que sea una bebida sin alcohol o de baja graduación."],
+        ["Rémy Martin 1738 Accord Royal (coñac)",40,"40 % vol.","assets/quick-cards/drinks-10.webp","https://www.remymartin.com/en-us/collection/1738-accord-royal/",null,"Es un coñac de la región francesa de Cognac: pertenece a la familia de los aguardientes obtenidos del vino."],
+        ["La Fée Parisienne (absenta)",68,"68 % vol.","assets/quick-cards/drinks-11.webp","https://lafee.com/absinthe-superieure-la-fee-2/",null,"La absenta reúne botánicos como el ajenjo y el anís; su graduación corresponde a la botella, antes de añadir agua."],
+        ["Martini Rosso (vermut, versión Bélgica)",15,"15 % vol.","assets/quick-cards/drinks-12.webp","https://www.bacardilimited.com/nutrition/martini?brand_locale=fr-BE",null,"El vermut es un vino aromatizado con botánicos. Su amargor y su dulzor forman parte de ese equilibrio de ingredientes."],
+        ["Pallini Limoncello",26,"26 % vol.","assets/quick-cards/drinks-13.webp","https://pallini.com/prodotti-pallini/limoncello/",null,"Su aroma de limón procede de las pieles del cítrico, donde se concentran los aceites aromáticos."],
+        ["Baileys Original Irish Cream",17,"17 % vol.","assets/quick-cards/drinks-14.webp","https://www.baileys.com/en-us/frequently-asked-questions",null,"Combina crema láctea y whiskey irlandés; por eso su textura recuerda a un postre líquido."],
+        ["Del Maguey Vida Clásico (mezcal)",42,"42 % vol.","assets/quick-cards/drinks-15.webp","https://delmaguey.com/wp-content/uploads/2023/10/FY23_DelMaguey_AlwaysOn_Vida_Clasico_SellSheet.pdf",null,"Este mezcal se elabora con agave espadín y se produce en Oaxaca; comparte la planta de origen con otros destilados de agave."],
+        ["Capel Especial Doble Destilado (pisco)",35,"35 % vol.","assets/quick-cards/drinks-16.webp","https://cooperativacapel.cl/nuestros-negocios/piscos",null,"El pisco es un aguardiente de uva: procede de destilar un producto vínico, no de fermentar cereales."],
+        ["Ruavieja Aguardiente de Orujo",42,"42 % vol.","assets/quick-cards/drinks-17.webp","https://ruavieja.es/wp-content/uploads/2022/03/Informacion-nutricional-Ruavieja-2021.pdf",null,"El orujo aprovecha los restos sólidos de la uva después del prensado, como las pieles y las pepitas."],
+        ["Valhalla Ragnarök (hidromiel)",11,"11 % vol.","assets/quick-cards/drinks-18.webp","https://valhallahidromiel.com/es/hidromiel/valhalla-ragnarok-caja-de-6-botellas-de-75cl-8414606932412-101575.html",null,"La hidromiel se obtiene al fermentar miel diluida en agua; su materia prima la distingue del vino y de la cerveza."],
+        ["Ruavieja Pacharán",25,"25 % vol.","assets/quick-cards/drinks-19.webp","https://ruavieja.es/wp-content/uploads/2021/06/fy20_Informacion-nutricional.pdf",null,"Las endrinas, pequeños frutos oscuros del endrino, aportan el carácter frutal típico del pacharán."],
+        ["Licor 43 Original",31,"31 % vol.","assets/quick-cards/drinks-20.webp","https://licor43.com/faqs/",null,"Su nombre alude a los 43 ingredientes de la receta, que incluye cítricos mediterráneos y otros botánicos."],
+        ["Chinchón Dulce (anís)",35,"35 % vol.","assets/quick-cards/drinks-21.webp","https://shop.pedrodomecq.com/chinchon-anis-dulce/MX00090NV007.html",null,"El anís marca su aroma. La versión dulce y las versiones secas de Chinchón tienen composiciones y graduaciones diferentes."],
+        ["Heineken Silver (cerveza, versión EE. UU.)",4,"4 % vol.","assets/quick-cards/drinks-22.webp","https://www.heineken.com/us/en/our-beers/heineken-original/",null,"Comparte familia con Heineken Original, pero es una receta distinta: el nombre de la marca no determina una única graduación."],
+        ["Guinness Draught (cerveza stout)",4.2,"4,2 % vol.","assets/quick-cards/drinks-23.webp","https://www.guinness.com/es-es/preguntas-frecuentes",null,"El nitrógeno contribuye a su espuma cremosa; no toda la sensación de burbujas de una cerveza viene del dióxido de carbono.","https://www.guinness.com/en-us/frequently-asked-questions"],
+        ["Guinness Foreign Extra Stout",7.5,"7,5 % vol.","assets/quick-cards/drinks-24.webp","https://www.guinness.com/es-es/preguntas-frecuentes",null,"Su receta nació para viajar por mar: el lúpulo adicional ayudaba a conservar la cerveza durante las largas travesías de exportación.","https://www.guinness.com/en-gb/beers/guinness-foreign-extra-stout"],
+        ["Strongbow Original (sidra, versión británica)",4.5,"4,5 % vol.","assets/quick-cards/drinks-25.webp","https://uk.strongbow.com/nutrition",null,"Es una sidra de manzana. El azúcar residual ayuda a distinguir su sabor del de una sidra completamente seca."],
+        ["Freixenet Cordón Negro Brut (cava, 750 ml)",11.5,"11,5 % vol.","assets/quick-cards/drinks-26.webp","https://e-label.henkell-freixenet.com/global/es-es/63127.html?lang=1",null,"Combina tres variedades de uva: parellada, macabeo y xarel·lo. El cava obtiene sus burbujas mediante una segunda fermentación en botella.","https://freixenet.com/es/es/producto/cordon-negro/"],
+        ["Aperol (aperitivo)",11,"11 % vol.","assets/quick-cards/drinks-27.webp","https://www.aperol.com/en-gr/our-products/aperol/",null,"Su sabor combina notas amargas y cítricas. La graduación de Aperol no es la del cóctel preparado con él."],
+        ["Kahlúa Original Coffee Liqueur (versión internacional)",16,"16 % vol.","assets/quick-cards/drinks-28.webp","https://www.kahlua.com/en/products/original-coffee-liqueur/",null,"El café es el protagonista de este licor, que también incorpora una base de ron."],
+        ["Malibu Original (licor de coco a base de ron)",21,"21 % vol.","assets/quick-cards/drinks-29.webp","https://www.malibudrinks.com/en-us/products/malibu-original/",null,"El aroma de coco se combina con una base de ron; el resultado se comercializa como licor, no como un ron sin aromatizar."],
+        ["Jägermeister Original (licor de hierbas)",35,"35 % vol.","assets/quick-cards/drinks-30.webp","https://de.jagermeister.com/shop/jaegermeister/jaegermeister",null,"La receta mezcla numerosos botánicos. Sus notas dulces y amargas lo sitúan en la familia de los licores de hierbas."],
+        ["Cointreau L’Unique (licor de naranja)",40,"40 % vol.","assets/quick-cards/drinks-31.webp","https://www.cointreau.com/fr/fr/faq",null,"Combina pieles de naranjas dulces y amargas para obtener su aroma cítrico."],
+        ["Absolut Vodka Original",40,"40 % vol.","assets/quick-cards/drinks-32.webp","https://www.absolut.com/en/products/absolut-vodka/",null,"La receta parte de trigo de invierno y agua. Su aspecto transparente no permite deducir cuánto alcohol contiene."],
+        ["Jack Daniel’s Old No. 7 (Tennessee whiskey)",40,"40 % vol.","assets/quick-cards/drinks-33.webp","https://nutrition.brown-forman.com/en-gb/jack_daniels",null,"Se filtra a través de carbón de arce antes de madurar en barrica, un rasgo característico de este Tennessee whiskey.","https://www.brown-forman.com/brand/jack-daniels"],
+        ["Bombay Sapphire (ginebra, versión británica)",40,"40 % vol.","assets/quick-cards/drinks-34.webp","https://shop.bombaysapphire.com/collections/all-gin/products/bombay-sapphire",null,"Sus botánicos se aromatizan por infusión de vapor: el vapor alcohólico atraviesa los ingredientes durante la destilación."]
       ]
     ),
     d(
@@ -112,38 +112,38 @@
       'history',
       S.dates,
       [
-        ['Año Nuevo',1,'1 de enero','assets/quick-cards/festivities-1.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['Reyes Magos',6,'6 de enero','assets/quick-cards/festivities-2.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['San Valentín',45,'14 de febrero','assets/quick-cards/festivities-3.webp',"https://www.timeanddate.com/holidays/common/valentine-day"],
-        ['Día Internacional de la Mujer',67,'8 de marzo','assets/quick-cards/festivities-4.webp',"https://unric.org/es/dias-internacionales/"],
-        ['San Patricio',76,'17 de marzo','assets/quick-cards/festivities-5.webp',"https://www.ireland.ie/en/st-patricks-day-2026/everything-you-need-to-know-about-st-patricks-day/"],
-        ['Día del Libro',113,'23 de abril','assets/quick-cards/festivities-6.webp',"https://www.unesco.org/es/days/world-book-and-copyright"],
-        ['Día de Europa (Unión Europea)',129,'9 de mayo','assets/quick-cards/festivities-7.webp','https://european-union.europa.eu/principles-countries-history/europe-day_es'],
-        ['Día del Trabajo',121,'1 de mayo','assets/quick-cards/festivities-8.webp',"https://www.boe.es/buscar/act.php?id=BOE-A-1983-20906#a45"],
-        ['Día de la Música',172,'21 de junio','assets/quick-cards/festivities-9.webp',"https://www.cultura.gob.es/cultura/artesescenicas/destacados/dia-musica.html"],
-        ['Independencia de EE. UU.',185,'4 de julio','assets/quick-cards/festivities-10.webp',"https://www.archives.gov/historical-docs/declaration"],
-        ['Halloween',304,'31 de octubre','assets/quick-cards/festivities-11.webp',"https://www.timeanddate.com/holidays/common/halloween"],
-        ['Constitución Española',340,'6 de diciembre','assets/quick-cards/festivities-12.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['Navidad',359,'25 de diciembre','assets/quick-cards/festivities-13.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['San Isidro',135,'15 de mayo','assets/quick-cards/festivities-14.webp',"https://diario.madrid.es/blog/notas-de-prensa/madrid-se-prepara-para-celebrar-el-dia-grande-de-san-isidro/"],
-        ['Asunción de la Virgen',227,'15 de agosto','assets/quick-cards/festivities-15.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['Fiesta Nacional de España',285,'12 de octubre','assets/quick-cards/festivities-16.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['Inmaculada Concepción',342,'8 de diciembre','assets/quick-cards/festivities-17.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['Fiesta de la Comunidad de Madrid',122,'2 de mayo','assets/quick-cards/festivities-18.webp',"https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ['Nuestra Señora de la Almudena',313,'9 de noviembre','assets/quick-cards/festivities-19.webp',"https://diario.madrid.es/blog/2025/11/04/fiesta-de-la-almudena-programa-completo-de-actividades-y-actos/"],
-        ['Fiesta Nacional de Francia',195,'14 de julio','assets/quick-cards/festivities-20.webp',"https://www.elysee.fr/la-presidence/la-fete-nationale-du-14-juillet"],
-        ["Día de Andalucía",59,"28 de febrero","assets/quick-cards/festivities-21.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ["San José",78,"19 de marzo","assets/quick-cards/festivities-22.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ["Día Mundial de la Salud",97,"7 de abril","assets/quick-cards/festivities-23.webp","https://www.who.int/campaigns/world-health-day/"],
-        ["Día Internacional de la Madre Tierra",112,"22 de abril","assets/quick-cards/festivities-24.webp","https://unric.org/es/dias-internacionales/"],
-        ["Día Mundial del Medio Ambiente",156,"5 de junio","assets/quick-cards/festivities-25.webp","https://www.un.org/en/observances/environment-day/"],
-        ["San Juan",175,"24 de junio","assets/quick-cards/festivities-26.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ["Santiago Apóstol",206,"25 de julio","assets/quick-cards/festivities-27.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ["Día Internacional de la Paz",264,"21 de septiembre","assets/quick-cards/festivities-28.webp","https://www.un.org/es/observances/international-day-peace"],
-        ["Todos los Santos",305,"1 de noviembre","assets/quick-cards/festivities-29.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113"],
-        ["Nochebuena",358,"24 de diciembre","assets/quick-cards/festivities-30.webp","https://www.spain.info/es/top/tradiciones-navidad-espana/"],
-        ["Santos Inocentes",362,"28 de diciembre","assets/quick-cards/festivities-31.webp","https://www.spain.info/es/descubrir-espana/dia-santos-inocentes/"],
-        ["Nochevieja",365,"31 de diciembre","assets/quick-cards/festivities-32.webp","https://www.spain.info/es/descubrir-espana/nochevieja-espana/"]
+        ["Año Nuevo",1,"1 de enero","assets/quick-cards/festivities-1.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Las doce uvas de medianoche son una tradición española para recibir el año que empieza.","https://www.spain.info/es/descubrir-espana/nochevieja-espana/"],
+        ["Reyes Magos",6,"6 de enero","assets/quick-cards/festivities-2.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"El roscón puede esconder una figura y un haba; encontrar una u otra forma parte de la tradición de esta fiesta.","https://www.spain.info/es/top/tradiciones-navidad-espana/"],
+        ["San Valentín",45,"14 de febrero","assets/quick-cards/festivities-3.webp","https://www.timeanddate.com/holidays/common/valentine-day",null,"Las tarjetas, las flores y los pequeños regalos han convertido esta fecha en una celebración popular del amor."],
+        ["Día Internacional de la Mujer",67,"8 de marzo","assets/quick-cards/festivities-4.webp","https://unric.org/es/dias-internacionales/",null,"La jornada reivindica los derechos de las mujeres y la igualdad; forma parte del calendario internacional de Naciones Unidas."],
+        ["San Patricio",76,"17 de marzo","assets/quick-cards/festivities-5.webp","https://www.ireland.ie/en/st-patricks-day-2026/everything-you-need-to-know-about-st-patricks-day/",null,"Recuerda al patrón de Irlanda. Los desfiles y el trébol son dos símbolos habituales de la celebración."],
+        ["Día del Libro",113,"23 de abril","assets/quick-cards/festivities-6.webp","https://www.unesco.org/es/days/world-book-and-copyright",null,"La UNESCO vincula la fecha con Cervantes, Shakespeare e Inca Garcilaso de la Vega, figuras de la literatura universal."],
+        ["Día de Europa (Unión Europea)",129,"9 de mayo","assets/quick-cards/festivities-7.webp","https://european-union.europa.eu/principles-countries-history/europe-day_es",null,"Conmemora la Declaración Schuman, una propuesta de cooperación europea que está en el origen de la actual Unión Europea."],
+        ["Día del Trabajo",121,"1 de mayo","assets/quick-cards/festivities-8.webp","https://www.boe.es/buscar/act.php?id=BOE-A-1983-20906#a45",null,"Es una jornada de reivindicación de los derechos laborales; su historia está ligada a la lucha por limitar la jornada de trabajo.","https://www.ilo.org/resource/article/convention-no-1-landmark-workers%E2%80%99-rights"],
+        ["Día de la Música",172,"21 de junio","assets/quick-cards/festivities-9.webp","https://www.cultura.gob.es/cultura/artesescenicas/destacados/dia-musica.html",null,"La Fiesta de la Música anima a sacar las actuaciones a la calle y acercar la música al público."],
+        ["Independencia de EE. UU.",185,"4 de julio","assets/quick-cards/festivities-10.webp","https://www.archives.gov/historical-docs/declaration",null,"La fecha recuerda la adopción de la Declaración de Independencia, no el día en que todos sus firmantes la rubricaron."],
+        ["Halloween",304,"31 de octubre","assets/quick-cards/festivities-11.webp","https://www.timeanddate.com/holidays/common/halloween",null,"Disfraces, calabazas talladas y visitas para pedir dulces se han convertido en sus costumbres más reconocibles."],
+        ["Constitución Española",340,"6 de diciembre","assets/quick-cards/festivities-12.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Recuerda el referéndum en el que la ciudadanía aprobó la Constitución española de 1978.","https://constitucion.congreso.es/w/constituci%C3%B3n-de-1978"],
+        ["Navidad",359,"25 de diciembre","assets/quick-cards/festivities-13.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"En la tradición cristiana celebra el nacimiento de Jesús; en España convive con belenes, comidas familiares y otras costumbres.","https://www.spain.info/es/top/tradiciones-navidad-espana/"],
+        ["San Isidro",135,"15 de mayo","assets/quick-cards/festivities-14.webp","https://diario.madrid.es/blog/notas-de-prensa/madrid-se-prepara-para-celebrar-el-dia-grande-de-san-isidro/",null,"La pradera, los chulapos y las rosquillas forman parte de las celebraciones dedicadas al patrón de Madrid."],
+        ["Asunción de la Virgen",227,"15 de agosto","assets/quick-cards/festivities-15.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"La tradición católica conmemora la asunción de María al cielo, en cuerpo y alma; no debe confundirse con la Ascensión de Jesús.","https://www.vatican.va/archive/catechism_sp/p123a9p6_sp.html"],
+        ["Fiesta Nacional de España",285,"12 de octubre","assets/quick-cards/festivities-16.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Es la fiesta nacional española. El desfile militar de Madrid es uno de sus actos más conocidos.","https://www.defensa.gob.es/12octubre/"],
+        ["Inmaculada Concepción",342,"8 de diciembre","assets/quick-cards/festivities-17.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Se refiere a la concepción de María libre de pecado original; no a la concepción de Jesús.","https://www.vatican.va/archive/catechism_sp/p1s2a3p2_sp.html"],
+        ["Fiesta de la Comunidad de Madrid",122,"2 de mayo","assets/quick-cards/festivities-18.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Recuerda el levantamiento madrileño contra las tropas napoleónicas, uno de los hitos de la Guerra de la Independencia.","https://www.comunidad.madrid/noticias/2021/05/01/mostramos-documentos-historicos-archivos-relacionados-alzamientos-2-mayo"],
+        ["Nuestra Señora de la Almudena",313,"9 de noviembre","assets/quick-cards/festivities-19.webp","https://diario.madrid.es/blog/2025/11/04/fiesta-de-la-almudena-programa-completo-de-actividades-y-actos/",null,"La patrona de Madrid se celebra con actos religiosos y tradiciones locales, entre ellas la corona de la Almudena, un dulce típico."],
+        ["Fiesta Nacional de Francia",195,"14 de julio","assets/quick-cards/festivities-20.webp","https://www.elysee.fr/la-presidence/la-fete-nationale-du-14-juillet",null,"La celebración francesa recuerda la toma de la Bastilla y también la Fiesta de la Federación, símbolos de la Revolución."],
+        ["Día de Andalucía",59,"28 de febrero","assets/quick-cards/festivities-21.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Conmemora el referéndum por el que Andalucía impulsó su acceso a la autonomía por la vía del artículo 151 de la Constitución.","https://www.juntadeandalucia.es/presidencia/28f2021/momentos-historicos/"],
+        ["San José",78,"19 de marzo","assets/quick-cards/festivities-22.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"En España coincide con el Día del Padre. En Valencia también marca la jornada principal de la cremà de las Fallas.","https://www.spain.info/es/descubrir-espana/fiestas-espana-patrimonio-inmaterial-unesco/"],
+        ["Día Mundial de la Salud",97,"7 de abril","assets/quick-cards/festivities-23.webp","https://www.who.int/campaigns/world-health-day/",null,"Coincide con el aniversario de la fundación de la Organización Mundial de la Salud."],
+        ["Día Internacional de la Madre Tierra",112,"22 de abril","assets/quick-cards/festivities-24.webp","https://unric.org/es/dias-internacionales/",null,"La jornada invita a pensar en la relación entre las personas, los demás seres vivos y el planeta que comparten."],
+        ["Día Mundial del Medio Ambiente",156,"5 de junio","assets/quick-cards/festivities-25.webp","https://www.un.org/en/observances/environment-day/",null,"Naciones Unidas la dedica a sensibilizar sobre el medio ambiente y promover acciones para protegerlo."],
+        ["San Juan",175,"24 de junio","assets/quick-cards/festivities-26.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Las hogueras suelen encenderse durante la noche anterior; la festividad del calendario corresponde al día siguiente.","https://www.spain.info/es/consulta/fiestas-junio-espana/"],
+        ["Santiago Apóstol",206,"25 de julio","assets/quick-cards/festivities-27.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"Santiago es el patrón de Galicia; el Camino reúne rutas de peregrinación que terminan en Compostela.","https://www.spain.info/es/camino-santiago/"],
+        ["Día Internacional de la Paz",264,"21 de septiembre","assets/quick-cards/festivities-28.webp","https://www.un.org/es/observances/international-day-peace",null,"Naciones Unidas dedica esta jornada a fortalecer la paz y promover la no violencia y el alto el fuego."],
+        ["Todos los Santos",305,"1 de noviembre","assets/quick-cards/festivities-29.webp","https://www.boe.es/buscar/doc.php?id=BOE-A-2021-17113",null,"La tradición católica celebra a los santos en esta jornada y recuerda a los fieles difuntos al día siguiente: son dos conmemoraciones distintas.","https://www.vatican.va/content/benedict-xvi/es/angelus/2006/documents/hf_ben-xvi_ang_20061101_all-saints.html"],
+        ["Nochebuena",358,"24 de diciembre","assets/quick-cards/festivities-30.webp","https://www.spain.info/es/top/tradiciones-navidad-espana/",null,"La cena familiar y la Misa del Gallo son dos tradiciones de la víspera de Navidad en España."],
+        ["Santos Inocentes",362,"28 de diciembre","assets/quick-cards/festivities-31.webp","https://www.spain.info/es/descubrir-espana/dia-santos-inocentes/",null,"Las bromas y los pequeños muñecos de papel pegados a la espalda son señas populares de esta jornada en España."],
+        ["Nochevieja",365,"31 de diciembre","assets/quick-cards/festivities-32.webp","https://www.spain.info/es/descubrir-espana/nochevieja-espana/",null,"Las campanadas de la Puerta del Sol acompañan la tradición de tomar una uva por cada campanada."]
       ]
     ),
     d(
@@ -155,21 +155,21 @@
       'history',
       S.social,
       [
-        ['LinkedIn',2003,'2003','assets/quick-cards/social-1.webp'],
-        ['Myspace',2003,'2003','assets/quick-cards/social-2.webp'],
-        ['Skype',2003,'2003','assets/quick-cards/social-3.webp'],
-        ['Facebook',2004,'2004','assets/quick-cards/social-4.webp'],
-        ['YouTube',2005,'2005','assets/quick-cards/social-5.webp'],
-        ['Reddit',2005,'2005','assets/quick-cards/social-6.webp'],
-        ['Twitter',2006,'2006','assets/quick-cards/social-7.webp'],
-        ['Tumblr',2007,'2007','assets/quick-cards/social-8.webp'],
-        ['WhatsApp',2009,'2009','assets/quick-cards/social-9.webp'],
-        ['Instagram',2010,'2010','assets/quick-cards/social-10.webp'],
-        ['Pinterest',2010,'2010','assets/quick-cards/social-11.webp'],
-        ['Snapchat',2011,'2011','assets/quick-cards/social-12.webp'],
-        ['Telegram',2013,'2013','assets/quick-cards/social-13.webp'],
-        ['Discord',2015,'2015','assets/quick-cards/social-14.webp'],
-        ['TikTok',2016,'2016','assets/quick-cards/social-15.webp']
+        ["LinkedIn",2003,"2003","assets/quick-cards/social-1.webp",null,null,"Se diseñó alrededor de la identidad profesional: contactos de trabajo, experiencia laboral y búsqueda de empleo.","https://about.linkedin.com/"],
+        ["Myspace",2003,"2003","assets/quick-cards/social-2.webp",null,null,"Los perfiles personalizables y la presencia de músicos hicieron de esta red un escaparate para descubrir bandas.","https://myspace.com/discover/artists"],
+        ["Skype",2003,"2003","assets/quick-cards/social-3.webp",null,null,"Popularizó las llamadas de voz por internet entre ordenadores, antes de que las videollamadas fueran habituales en el móvil.","https://news.microsoft.com/2011/05/10/microsoft-to-acquire-skype/"],
+        ["Facebook",2004,"2004","assets/quick-cards/social-4.webp",null,null,"Comenzó como una red para estudiantes universitarios; después abrió sus puertas a un público mucho más amplio.","https://about.fb.com/company-info/"],
+        ["YouTube",2005,"2005","assets/quick-cards/social-5.webp",null,null,"Todo empezó con «Me at the zoo», un vídeo de solo 19 segundos: una escena cotidiana inauguró una plataforma de alcance mundial.","https://blog.youtube/news-and-events/neal-mohan-cannes-2025/"],
+        ["Reddit",2005,"2005","assets/quick-cards/social-6.webp",null,null,"Organiza las conversaciones en comunidades temáticas llamadas subreddits, donde los usuarios votan publicaciones y comentarios.","https://support.reddithelp.com/hc/en-us/articles/205313845-What-is-a-community-or-subreddit"],
+        ["Twitter",2006,"2006","assets/quick-cards/social-7.webp",null,null,"Sus mensajes breves se conocían como tuits; la plataforma acabó cambiando su nombre a X.","https://help.x.com/en/using-x/posting"],
+        ["Tumblr",2007,"2007","assets/quick-cards/social-8.webp",null,null,"El botón de rebloguear facilita que una publicación viaje de un blog a otro, conservando una cadena de atribuciones.","https://help.tumblr.com/reblogs/"],
+        ["WhatsApp",2009,"2009","assets/quick-cards/social-9.webp",null,null,"Vincula la cuenta al número de teléfono, una diferencia importante frente a las redes que giran alrededor de un nombre de usuario.","https://www.whatsapp.com/"],
+        ["Instagram",2010,"2010","assets/quick-cards/social-10.webp",null,null,"Las fotos y los filtros fueron el centro de su propuesta inicial; más tarde incorporó vídeo y publicaciones efímeras.","https://about.instagram.com/about-us"],
+        ["Pinterest",2010,"2010","assets/quick-cards/social-11.webp",null,null,"Sus tableros permiten guardar y organizar ideas visuales: una colección de imágenes funciona como un mapa de inspiración.","https://help.pinterest.com/en/guide/all-about-pinterest"],
+        ["Snapchat",2011,"2011","assets/quick-cards/social-12.webp",null,null,"Los mensajes que desaparecen y las historias temporales hicieron de lo efímero una parte central de su identidad.","https://help.snapchat.com/hc/en-us/articles/7012334940948-When-does-Snapchat-delete-Snaps-and-Chats"],
+        ["Telegram",2013,"2013","assets/quick-cards/social-13.webp",null,null,"Sus canales permiten difundir mensajes a grandes audiencias, mientras que los grupos están pensados para conversar.","https://telegram.org/faq"],
+        ["Discord",2015,"2015","assets/quick-cards/social-14.webp",null,null,"Sus servidores reúnen canales de texto y voz. Nació muy ligado a los videojuegos y se extendió a otras comunidades.","https://discord.com/company"],
+        ["TikTok",2016,"2016","assets/quick-cards/social-15.webp",null,null,"Los vídeos breves y el descubrimiento mediante recomendaciones son centrales en su funcionamiento; no depende solo de seguir contactos.","https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you"]
       ]
     ),
     d(
@@ -181,24 +181,24 @@
       'history',
       S.wwii,
       [
-        ['Invasión de Polonia',19390901,'1 septiembre 1939','assets/quick-cards/wwii-1.webp'],
-        ['Evacuación de Dunkerque',19400604,'4 junio 1940','assets/quick-cards/wwii-2.webp'],
-        ['Caída de Francia',19400622,'22 junio 1940','assets/quick-cards/wwii-3.webp'],
-        ['Pearl Harbor',19411207,'7 diciembre 1941','assets/quick-cards/wwii-4.webp'],
-        ['Segunda batalla de El Alamein',19421104,'4 noviembre 1942','assets/quick-cards/wwii-5.webp'],
-        ['Batalla de Stalingrado',19430202,'2 febrero 1943','assets/quick-cards/wwii-6.webp'],
-        ['Armisticio de Italia',19430903,'3 septiembre 1943','assets/quick-cards/wwii-7.webp'],
-        ['Desembarco de Normandía',19440606,'6 junio 1944','assets/quick-cards/wwii-8.webp'],
-        ['Batalla de las Ardenas',19441216,'16 diciembre 1944','assets/quick-cards/wwii-9.webp'],
-        ['Victoria en Europa',19450508,'8 mayo 1945','assets/quick-cards/wwii-10.webp'],
-        ['Bomba atómica sobre Hiroshima',19450806,'6 agosto 1945','assets/quick-cards/wwii-11.webp'],
-        ['Operación Barbarroja',19410622,'22 junio 1941','assets/quick-cards/wwii-12.webp'],
-        ['Batalla de Midway',19420604,'4 junio 1942','assets/quick-cards/wwii-13.webp'],
-        ['Rendición de Italia',19430908,'8 septiembre 1943','assets/quick-cards/wwii-14.webp'],
-        ['Liberación de París',19440825,'25 agosto 1944','assets/quick-cards/wwii-15.webp'],
-        ['Conferencia de Yalta',19450204,'4 febrero 1945','assets/quick-cards/wwii-16.webp'],
-        ['Pacto Mólotov-Ribbentrop',19390823,'23 agosto 1939','assets/quick-cards/wwii-17.webp'],
-        ['Conferencia de Wannsee',19420120,'20 enero 1942','assets/quick-cards/wwii-18.webp']
+        ["Invasión de Polonia",19390901,"1 septiembre 1939","assets/quick-cards/wwii-1.webp",null,null,"La invasión alemana provocó la declaración de guerra de Reino Unido y Francia; Polonia fue atacada después también por la Unión Soviética.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Evacuación de Dunkerque",19400604,"4 junio 1940","assets/quick-cards/wwii-2.webp",null,null,"Barcos militares y embarcaciones civiles evacuaron a soldados aliados atrapados en la costa francesa, dejando atrás mucho material.","https://www.iwm.org.uk/history/what-you-need-to-know-about-the-dunkirk-evacuations"],
+        ["Caída de Francia",19400622,"22 junio 1940","assets/quick-cards/wwii-3.webp",null,null,"El armisticio se firmó en el bosque de Compiègne, en un vagón asociado al final de la Primera Guerra Mundial.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Pearl Harbor",19411207,"7 diciembre 1941","assets/quick-cards/wwii-4.webp",null,null,"El ataque japonés a la base naval de Hawái llevó a Estados Unidos a entrar en la guerra.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Segunda batalla de El Alamein",19421104,"4 noviembre 1942","assets/quick-cards/wwii-5.webp",null,null,"La victoria aliada en el norte de África frenó el avance del Eje hacia Egipto y el canal de Suez.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Batalla de Stalingrado",19430202,"2 febrero 1943","assets/quick-cards/wwii-6.webp",null,null,"La lucha urbana acabó con un ejército alemán cercado; el combate se convirtió en un símbolo del giro de la guerra en el frente oriental.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Armisticio de Italia",19430903,"3 septiembre 1943","assets/quick-cards/wwii-7.webp",null,null,"La firma del armisticio y su anuncio público fueron acontecimientos distintos; la noticia no se hizo pública hasta días después.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Desembarco de Normandía",19440606,"6 junio 1944","assets/quick-cards/wwii-8.webp",null,null,"La operación combinó desembarcos marítimos y tropas aerotransportadas para abrir un frente aliado en Francia.","https://www.iwm.org.uk/history/the-10-things-you-need-to-know-about-d-day"],
+        ["Batalla de las Ardenas",19441216,"16 diciembre 1944","assets/quick-cards/wwii-9.webp",null,null,"La ofensiva alemana sorprendió a los aliados en invierno, pero no consiguió romper de forma decisiva el frente occidental.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Victoria en Europa",19450508,"8 mayo 1945","assets/quick-cards/wwii-10.webp",null,null,"El final de la guerra en Europa no puso fin a todo el conflicto: los combates contra Japón continuaron en el Pacífico.","https://www.iwm.org.uk/history/what-you-need-to-know-about-ve-day"],
+        ["Bomba atómica sobre Hiroshima",19450806,"6 agosto 1945","assets/quick-cards/wwii-11.webp",null,null,"Una sola bomba atómica devastó Hiroshima; el ataque inauguró el uso de armas nucleares en una guerra.","https://www.nps.gov/articles/trumanatomicbomb.htm"],
+        ["Operación Barbarroja",19410622,"22 junio 1941","assets/quick-cards/wwii-12.webp",null,null,"La invasión alemana de la Unión Soviética rompió el acuerdo de no agresión que ambos países habían firmado antes de la guerra.","https://www.iwm.org.uk/history/what-was-operation-barbarossa"],
+        ["Batalla de Midway",19420604,"4 junio 1942","assets/quick-cards/wwii-13.webp",null,null,"La batalla se decidió en gran parte mediante aviones embarcados en portaaviones, que cambiaron la forma de combatir en el mar.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Rendición de Italia",19430908,"8 septiembre 1943","assets/quick-cards/wwii-14.webp",null,null,"El anuncio del armisticio italiano abrió una nueva fase: Alemania ocupó parte de Italia y los aliados siguieron avanzando desde el sur.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Liberación de París",19440825,"25 agosto 1944","assets/quick-cards/wwii-15.webp",null,null,"La resistencia parisina y las fuerzas aliadas participaron en la liberación; la entrada de la 2.ª División Blindada quedó ligada a la memoria de la ciudad.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Conferencia de Yalta",19450204,"4 febrero 1945","assets/quick-cards/wwii-16.webp",null,null,"Roosevelt, Churchill y Stalin se reunieron en Crimea para discutir el futuro de Europa mientras la guerra aún continuaba.","https://www.iwm.org.uk/sites/default/files/files/2023-10/second_world_war_galleries_large_print.pdf"],
+        ["Pacto Mólotov-Ribbentrop",19390823,"23 agosto 1939","assets/quick-cards/wwii-17.webp",null,null,"El pacto de no agresión incluía un protocolo secreto sobre esferas de influencia en Europa oriental.","https://encyclopedia.ushmm.org/content/en/article/german-soviet-pact"],
+        ["Conferencia de Wannsee",19420120,"20 enero 1942","assets/quick-cards/wwii-18.webp",null,null,"La reunión coordinó la participación de organismos nazis en la deportación y el asesinato de los judíos europeos; la persecución ya estaba en marcha.","https://encyclopedia.ushmm.org/content/en/article/wannsee-conference-and-the-final-solution"]
       ]
     ),
     d(
@@ -210,20 +210,20 @@
       'history',
       S.civil,
       [
-        ['Inicio de la sublevación en Melilla',19360717,'17 julio 1936','assets/quick-cards/civil-war-1.webp'],
-        ['Batalla de Guadalajara',19370308,'8 marzo 1937','assets/quick-cards/civil-war-2.webp'],
-        ['Guernica',19370426,'26 abril 1937','assets/quick-cards/civil-war-3.webp'],
-        ['Batalla de Brunete',19370706,'6 julio 1937','assets/quick-cards/civil-war-4.webp'],
-        ['Batalla de Teruel',19371222,'22 diciembre 1937','assets/quick-cards/civil-war-5.webp'],
-        ['Batalla del Ebro',19380725,'25 julio 1938','assets/quick-cards/civil-war-6.webp'],
-        ['Caída de Barcelona',19390126,'26 enero 1939','assets/quick-cards/civil-war-7.webp'],
-        ['Fin de la guerra',19390401,'1 abril 1939','assets/quick-cards/civil-war-8.webp'],
-        ['Liberación del Alcázar de Toledo',19360927,'27 septiembre 1936','assets/quick-cards/civil-war-9.webp'],
-        ['Traslado del Gobierno a Valencia',19361106,'6 noviembre 1936','assets/quick-cards/civil-war-10.webp'],
-        ['Batalla del Jarama',19370206,'6 febrero 1937','assets/quick-cards/civil-war-11.webp'],
-        ['Hechos de Mayo en Barcelona',19370503,'3 mayo 1937','assets/quick-cards/civil-war-12.webp'],
-        ['Asesinato de José Calvo Sotelo',19360713,'13 julio 1936','assets/quick-cards/civil-war-13.webp'],
-        ['Traslado de las reservas de oro del Banco de España a Moscú',19361022,'22 octubre 1936','assets/quick-cards/civil-war-14.webp']
+        ["Inicio de la sublevación en Melilla",19360717,"17 julio 1936","assets/quick-cards/civil-war-1.webp",null,null,"La rebelión comenzó en el protectorado español de Marruecos antes de extenderse a la península; su fracaso parcial dio paso a la guerra.","https://vscw.ca/en/timeline"],
+        ["Batalla de Guadalajara",19370308,"8 marzo 1937","assets/quick-cards/civil-war-2.webp",null,null,"En el frente combatieron también fuerzas italianas enviadas por Mussolini; su derrota tuvo un importante efecto propagandístico.","https://vscw.ca/en/timeline"],
+        ["Guernica",19370426,"26 abril 1937","assets/quick-cards/civil-war-3.webp",null,null,"El bombardeo de la localidad vasca inspiró a Picasso el cuadro que acabaría convirtiéndose en un símbolo contra la guerra.","https://guernica.museoreinasofia.es/en"],
+        ["Batalla de Brunete",19370706,"6 julio 1937","assets/quick-cards/civil-war-4.webp",null,null,"La ofensiva republicana buscó aliviar la presión sobre otros frentes y obligar a las fuerzas sublevadas a desviar tropas.","https://vscw.ca/en/timeline"],
+        ["Batalla de Teruel",19371222,"22 diciembre 1937","assets/quick-cards/civil-war-5.webp",null,null,"La lucha por la ciudad transcurrió en un invierno especialmente duro; la toma republicana fue seguida por una contraofensiva.","https://vscw.ca/en/timeline"],
+        ["Batalla del Ebro",19380725,"25 julio 1938","assets/quick-cards/civil-war-6.webp",null,null,"El cruce del río permitió a la República lanzar una gran ofensiva, pero el desgaste posterior debilitó sus fuerzas.","https://vscw.ca/en/timeline"],
+        ["Caída de Barcelona",19390126,"26 enero 1939","assets/quick-cards/civil-war-7.webp",null,null,"La ocupación de Barcelona precedió al éxodo de civiles y combatientes hacia la frontera francesa.","https://vscw.ca/en/timeline"],
+        ["Fin de la guerra",19390401,"1 abril 1939","assets/quick-cards/civil-war-8.webp",null,null,"El último parte de guerra declaró terminado el conflicto; comenzó una dictadura que duraría décadas.","https://vscw.ca/en/timeline"],
+        ["Liberación del Alcázar de Toledo",19360927,"27 septiembre 1936","assets/quick-cards/civil-war-9.webp",null,null,"El asedio del Alcázar adquirió una enorme carga simbólica y propagandística para el bando sublevado.","https://vscw.ca/en/timeline"],
+        ["Traslado del Gobierno a Valencia",19361106,"6 noviembre 1936","assets/quick-cards/civil-war-10.webp",null,null,"El Gobierno republicano salió de Madrid mientras la capital afrontaba el ataque de las fuerzas sublevadas.","https://vscw.ca/en/timeline"],
+        ["Batalla del Jarama",19370206,"6 febrero 1937","assets/quick-cards/civil-war-11.webp",null,null,"La batalla estuvo ligada al intento de cortar las comunicaciones de Madrid con Valencia; ninguno de los bandos logró una victoria decisiva.","https://vscw.ca/en/timeline"],
+        ["Hechos de Mayo en Barcelona",19370503,"3 mayo 1937","assets/quick-cards/civil-war-12.webp",null,null,"Los enfrentamientos dentro de la zona republicana mostraron las fuertes tensiones entre organizaciones que combatían al mismo enemigo.","https://vscw.ca/en/timeline"],
+        ["Asesinato de José Calvo Sotelo",19360713,"13 julio 1936","assets/quick-cards/civil-war-13.webp",null,null,"El asesinato del dirigente monárquico agravó la crisis política, pero la conspiración militar contra la República ya existía.","https://vscw.ca/en/timeline"],
+        ["Traslado de las reservas de oro del Banco de España a Moscú",19361022,"22 octubre 1936","assets/quick-cards/civil-war-14.webp",null,null,"Parte de las reservas de oro se envió a la Unión Soviética para financiar suministros; de ahí procede la expresión «oro de Moscú».","https://vscw.ca/en/timeline"]
       ]
     ),
     d(
@@ -235,28 +235,28 @@
       'history',
       S.kings,
       [
-        ['Isabel I de Castilla',1474,'1474','assets/quick-cards/kings-1.webp'],
-        ['Carlos I',1516,'1516','assets/quick-cards/kings-2.webp'],
-        ['Felipe II',1556,'1556','assets/quick-cards/kings-3.webp'],
-        ['Felipe V',1700,'1700','assets/quick-cards/kings-4.webp'],
-        ['Amadeo I',1870,'1870','assets/quick-cards/kings-5.webp'],
-        ['Isabel II',1833,'1833','assets/quick-cards/kings-6.webp'],
-        ['Alfonso XII',1874,'1874','assets/quick-cards/kings-7.webp'],
-        ['Alfonso XIII',1886,'1886','assets/quick-cards/kings-8.webp'],
-        ['Juan Carlos I',1975,'1975','assets/quick-cards/kings-9.webp'],
-        ['Felipe VI',2014,'2014','assets/quick-cards/kings-10.webp'],
-        ['Fernando II de Aragón',1479,'1479','assets/quick-cards/kings-11.webp'],
-        ['Juana I de Castilla',1504,'1504','assets/quick-cards/kings-12.webp'],
-        ['Felipe I de Castilla',1506,'1506','assets/quick-cards/kings-13.webp'],
-        ['Felipe III',1598,'1598','assets/quick-cards/kings-14.webp'],
-        ['Felipe IV',1621,'1621','assets/quick-cards/kings-15.webp'],
-        ['Carlos II',1665,'1665','assets/quick-cards/kings-16.webp'],
-        ['Luis I',1724,'1724','assets/quick-cards/kings-17.webp'],
-        ['Fernando VI',1746,'1746','assets/quick-cards/kings-18.webp'],
-        ['Carlos III',1759,'1759','assets/quick-cards/kings-19.webp'],
-        ['Carlos IV',1788,'1788','assets/quick-cards/kings-20.webp'],
-        ['José I Bonaparte',1808,'1808','assets/quick-cards/kings-21.webp'],
-        ['Fernando VII',1814,'1814','assets/quick-cards/kings-22.webp']
+        ["Isabel I de Castilla",1474,"1474","assets/quick-cards/kings-1.webp",null,null,"Su matrimonio con Fernando de Aragón vinculó ambas coronas, pero Castilla y Aragón conservaron instituciones propias."],
+        ["Carlos I",1516,"1516","assets/quick-cards/kings-2.webp",null,null,"Fue Carlos I en sus reinos hispánicos y Carlos V como emperador del Sacro Imperio Romano Germánico."],
+        ["Felipe II",1556,"1556","assets/quick-cards/kings-3.webp",null,null,"Estableció la corte en Madrid y convirtió el monasterio de El Escorial en un emblema de su reinado."],
+        ["Felipe V",1700,"1700","assets/quick-cards/kings-4.webp",null,null,"Fue el primer Borbón en el trono español; su llegada estuvo ligada a una guerra de sucesión con dimensión europea."],
+        ["Amadeo I",1870,"1870","assets/quick-cards/kings-5.webp",null,null,"Procedía de la casa de Saboya y fue elegido por las Cortes. Su breve reinado terminó con una abdicación."],
+        ["Isabel II",1833,"1833","assets/quick-cards/kings-6.webp",null,null,"Heredó el trono siendo niña; la regencia y las guerras carlistas marcaron el comienzo de su reinado."],
+        ["Alfonso XII",1874,"1874","assets/quick-cards/kings-7.webp",null,null,"Su regreso al trono inauguró la Restauración borbónica, tras la Primera República."],
+        ["Alfonso XIII",1886,"1886","assets/quick-cards/kings-8.webp",null,null,"Fue rey desde su nacimiento, aunque su madre ejerció la regencia hasta que alcanzó la mayoría de edad."],
+        ["Juan Carlos I",1975,"1975","assets/quick-cards/kings-9.webp",null,null,"Su reinado estuvo ligado a la transición de la dictadura a una monarquía parlamentaria."],
+        ["Felipe VI",2014,"2014","assets/quick-cards/kings-10.webp",null,null,"Llegó al trono tras la abdicación de su padre; la Constitución define sus funciones como jefe del Estado."],
+        ["Fernando II de Aragón",1479,"1479","assets/quick-cards/kings-11.webp",null,null,"Su matrimonio con Isabel de Castilla dio origen a la unión dinástica de los Reyes Católicos."],
+        ["Juana I de Castilla",1504,"1504","assets/quick-cards/kings-12.webp",null,null,"Conservó el título de reina durante décadas, aunque su padre y después su hijo ejercieron el poder efectivo."],
+        ["Felipe I de Castilla",1506,"1506","assets/quick-cards/kings-13.webp",null,null,"Su matrimonio con Juana de Castilla introdujo a la dinastía de los Habsburgo en la sucesión de la corona castellana."],
+        ["Felipe III",1598,"1598","assets/quick-cards/kings-14.webp",null,null,"Delegó gran parte de los asuntos de gobierno en el duque de Lerma, un ejemplo del poder de los validos."],
+        ["Felipe IV",1621,"1621","assets/quick-cards/kings-15.webp",null,null,"El conde-duque de Olivares fue su principal valido. Velázquez retrató al rey y a su corte."],
+        ["Carlos II",1665,"1665","assets/quick-cards/kings-16.webp",null,null,"Murió sin descendencia; la disputa por su sucesión abrió el camino a la guerra y al cambio de dinastía."],
+        ["Luis I",1724,"1724","assets/quick-cards/kings-17.webp",null,null,"Su reinado duró solo unos meses; tras su muerte, Felipe V volvió al trono que había cedido a su hijo."],
+        ["Fernando VI",1746,"1746","assets/quick-cards/kings-18.webp",null,null,"La política de su reinado buscó mantener la paz y reforzar la administración y la Hacienda."],
+        ["Carlos III",1759,"1759","assets/quick-cards/kings-19.webp",null,null,"Antes de reinar en España fue rey de Nápoles y Sicilia; las reformas ilustradas marcaron su etapa española."],
+        ["Carlos IV",1788,"1788","assets/quick-cards/kings-20.webp",null,null,"Su abdicación en favor de Fernando VII precedió a las abdicaciones de Bayona y a la intervención de Napoleón."],
+        ["José I Bonaparte",1808,"1808","assets/quick-cards/kings-21.webp",null,null,"Era hermano de Napoleón. Su reinado fue disputado durante la Guerra de la Independencia."],
+        ["Fernando VII",1814,"1814","assets/quick-cards/kings-22.webp",null,null,"Al regresar de su cautiverio anuló la Constitución de Cádiz; su reinado alternó etapas absolutistas y liberales."]
       ]
     ),
     d(
@@ -268,18 +268,18 @@
       'entertainment',
       S.consoles,
       [
-        ['Magnavox Odyssey',1972,'1972','assets/quick-cards/consoles-1.webp'],
-        ['Atari 2600',1977,'1977','assets/quick-cards/consoles-2.webp'],
-        ['Intellivision',1980,'1980','assets/quick-cards/consoles-3.webp'],
-        ['Nintendo Famicom',1983,'1983','assets/quick-cards/consoles-4.webp'],
-        ['Game Boy',1989,'1989','assets/quick-cards/consoles-5.webp'],
-        ['Sega Mega Drive',1988,'1988','assets/quick-cards/consoles-6.webp'],
-        ['PlayStation',1994,'1994','assets/quick-cards/consoles-7.webp'],
-        ['Nintendo 64',1996,'1996','assets/quick-cards/consoles-8.webp'],
-        ['PlayStation 2',2000,'2000','assets/quick-cards/consoles-9.webp'],
-        ['Xbox',2001,'2001','assets/quick-cards/consoles-10.webp'],
-        ['Wii',2006,'2006','assets/quick-cards/consoles-11.webp'],
-        ['Nintendo Switch',2017,'2017','assets/quick-cards/consoles-12.webp']
+        ["Magnavox Odyssey",1972,"1972","assets/quick-cards/consoles-1.webp",null,null,"Usaba láminas de plástico que se colocaban sobre el televisor para añadir escenarios a sus sencillas figuras de pantalla.","https://americanhistory.si.edu/collections/object/nmah_1302004"],
+        ["Atari 2600",1977,"1977","assets/quick-cards/consoles-2.webp",null,null,"Los cartuchos intercambiables permitían cambiar de juego sin comprar una consola nueva, una idea decisiva para el mercado doméstico.","https://support.atari.com/hc/en-us/articles/24238326533019-Atari-2600-FAQ"],
+        ["Intellivision",1980,"1980","assets/quick-cards/consoles-3.webp",null,null,"Su mando incorporaba un disco direccional y un teclado numérico con plantillas específicas para los juegos.","https://www.intellivision.us/intvlibrary/Intellivision_Book.pdf"],
+        ["Nintendo Famicom",1983,"1983","assets/quick-cards/consoles-4.webp",null,null,"Famicom abrevia «Family Computer». En otros mercados, una versión rediseñada se presentó como Nintendo Entertainment System.","https://www.nintendo.com/en-za/Hardware/Nintendo-History/Nintendo-History-625945.html"],
+        ["Game Boy",1989,"1989","assets/quick-cards/consoles-5.webp",null,null,"Su pantalla monocroma y el formato portátil llevaron los juegos a lugares donde no había un televisor disponible.","https://www.nintendo.com/en-za/Hardware/Nintendo-History/Nintendo-History-625945.html"],
+        ["Sega Mega Drive",1988,"1988","assets/quick-cards/consoles-6.webp",null,null,"Se conoció como Genesis en Norteamérica; dos nombres comerciales identificaban la misma familia de consolas.","https://www.sega.jp/history/hard/megadrive/"],
+        ["PlayStation",1994,"1994","assets/quick-cards/consoles-7.webp",null,null,"Apostó por el disco compacto, que ofrecía más espacio de almacenamiento que muchos cartuchos de su época.","https://www.playstation.com/en-us/playstation-history/1994-ps-one/"],
+        ["Nintendo 64",1996,"1996","assets/quick-cards/consoles-8.webp",null,null,"Conservó los cartuchos mientras otras consolas usaban CD; su mando incorporó una palanca analógica muy ligada a los juegos en 3D.","https://www.nintendo.com/en-za/Hardware/Nintendo-History/Nintendo-History-625945.html"],
+        ["PlayStation 2",2000,"2000","assets/quick-cards/consoles-9.webp",null,null,"También podía reproducir películas en DVD, de modo que servía como consola y como reproductor doméstico.","https://www.playstation.com/en-gb/playstation-history/2000-ps2-psp/"],
+        ["Xbox",2001,"2001","assets/quick-cards/consoles-10.webp",null,null,"Halo acompañó el estreno de la primera Xbox. La aventura del Jefe Maestro quedó ligada a la identidad de la consola desde sus comienzos.","https://news.xbox.com/en-us/2021/05/13/celebrating-20-years-of-xbox/"],
+        ["Wii",2006,"2006","assets/quick-cards/consoles-11.webp",null,null,"Su mando detectaba movimientos y acercó los videojuegos a personas que no estaban acostumbradas a los mandos tradicionales.","https://www.nintendo.com/en-za/Hardware/Nintendo-History/Nintendo-History-625945.html"],
+        ["Nintendo Switch",2017,"2017","assets/quick-cards/consoles-12.webp",null,null,"Su diseño híbrido permite jugar en la pantalla integrada o conectarla al televisor mediante una base.","https://www.nintendo.com/en-za/Hardware/Nintendo-History/Nintendo-History-625945.html"]
       ]
     ),
     d(
@@ -291,16 +291,16 @@
       'entertainment',
       S.oscar,
       [
-        ['Titanic (1997)',11,'11 Óscar','assets/quick-cards/oscars-1.webp'],
-        ['West Side Story (1961)',10,'10 Óscar','assets/quick-cards/oscars-2.webp'],
-        ['El paciente inglés (1996)',9,'9 Óscar','assets/quick-cards/oscars-3.webp'],
-        ['Amadeus (1984)',8,'8 Óscar','assets/quick-cards/oscars-4.webp'],
-        ['La lista de Schindler (1993)',7,'7 Óscar','assets/quick-cards/oscars-5.webp'],
-        ['Forrest Gump (1994)',6,'6 Óscar','assets/quick-cards/oscars-6.webp'],
-        ['Gladiator (2000)',5,'5 Óscar','assets/quick-cards/oscars-7.webp'],
-        ['La forma del agua (2017)',4,'4 Óscar','assets/quick-cards/oscars-8.webp'],
-        ['El padrino (1972)',3,'3 Óscar','assets/quick-cards/oscars-9.webp'],
-        ['Joker (2019)',2,'2 Óscar','assets/quick-cards/oscars-10.webp']
+        ["Titanic (1997)",11,"11 Óscar","assets/quick-cards/oscars-1.webp",null,null,"Además de mejor película y dirección, recibió premios técnicos y musicales; «My Heart Will Go On» ganó el de canción original.","https://www.oscars.org/oscars/ceremonies/1998"],
+        ["West Side Story (1961)",10,"10 Óscar","assets/quick-cards/oscars-2.webp",null,null,"Su palmarés incluyó premios para los intérpretes secundarios Rita Moreno y George Chakiris.","https://www.oscars.org/oscars/ceremonies/1962"],
+        ["El paciente inglés (1996)",9,"9 Óscar","assets/quick-cards/oscars-3.webp",null,null,"Juliette Binoche ganó como actriz de reparto, mientras que el filme también fue reconocido por su fotografía y su música.","https://www.oscars.org/oscars/ceremonies/1997"],
+        ["Amadeus (1984)",8,"8 Óscar","assets/quick-cards/oscars-4.webp",null,null,"F. Murray Abraham ganó como actor por interpretar a Salieri, el personaje desde cuya mirada se cuenta la historia.","https://www.oscars.org/oscars/ceremonies/1985"],
+        ["La lista de Schindler (1993)",7,"7 Óscar","assets/quick-cards/oscars-5.webp",null,null,"Su reconocimiento incluyó fotografía, montaje y música, además de los premios de película y dirección.","https://www.oscars.org/oscars/ceremonies/1994"],
+        ["Forrest Gump (1994)",6,"6 Óscar","assets/quick-cards/oscars-6.webp",null,null,"Tom Hanks ganó como actor protagonista; los efectos visuales del filme también recibieron un Óscar.","https://www.oscars.org/oscars/ceremonies/1995"],
+        ["Gladiator (2000)",5,"5 Óscar","assets/quick-cards/oscars-7.webp",null,null,"Russell Crowe ganó como actor por su papel de Máximo, y el filme fue premiado por sus efectos visuales.","https://www.oscars.org/oscars/ceremonies/2001"],
+        ["La forma del agua (2017)",4,"4 Óscar","assets/quick-cards/oscars-8.webp",null,null,"La película de Guillermo del Toro ganó en dirección, diseño de producción y música, además de mejor película.","https://www.oscars.org/oscars/ceremonies/2018"],
+        ["El padrino (1972)",3,"3 Óscar","assets/quick-cards/oscars-9.webp",null,null,"Marlon Brando ganó como actor protagonista por interpretar a Vito Corleone; el guion adaptado también fue premiado.","https://www.oscars.org/oscars/ceremonies/1973"],
+        ["Joker (2019)",2,"2 Óscar","assets/quick-cards/oscars-10.webp",null,null,"Joaquin Phoenix ganó como actor protagonista y Hildur Guðnadóttir fue premiada por la música original.","https://www.oscars.org/oscars/ceremonies/2020"]
       ]
     ),
     d(
@@ -312,18 +312,18 @@
       'history',
       S.companies,
       [
-        ['Coca-Cola',1892,'1892','assets/quick-cards/companies-founded-1.webp','https://www.coca-colacompany.com/about-us/history'],
-        ['IBM',1911,'1911','assets/quick-cards/companies-founded-2.webp','https://www.ibm.com/history'],
-        ['Disney',1923,'1923','assets/quick-cards/companies-founded-3.webp','https://thewaltdisneycompany.com/about/'],
-        ['Toyota',1937,'1937','assets/quick-cards/companies-founded-4.webp','https://global.toyota/en/company/profile/overview/'],
-        ['Samsung',1938,'1938','assets/quick-cards/companies-founded-5.webp','https://www.samsung.com/us/aboutsamsung/company/history/'],
-        ['Sony',1946,'1946','assets/quick-cards/companies-founded-6.webp','https://www.sony.com/en/SonyInfo/CorporateInfo/History/'],
-        ['Microsoft',1975,'1975','assets/quick-cards/companies-founded-7.webp','https://news.microsoft.com/transforming-the-world/microsoft-history/'],
-        ['Apple',1976,'1976','assets/quick-cards/companies-founded-8.webp','https://www.apple.com/leadership/'],
-        ['Amazon',1994,'1994','assets/quick-cards/companies-founded-9.webp','https://www.aboutamazon.com/about-us'],
-        ['Netflix',1997,'1997','assets/quick-cards/companies-founded-10.webp','https://about.netflix.com/en'],
-        ['Google',1998,'1998','assets/quick-cards/companies-founded-11.webp','https://about.google/intl/en_us/company-info/'],
-        ['Facebook (hoy Meta)',2004,'2004','assets/quick-cards/companies-founded-12.webp','https://about.meta.com/company-info/']
+        ["Coca-Cola",1892,"1892","assets/quick-cards/companies-founded-1.webp","https://www.coca-colacompany.com/about-us/history",null,"La bebida comenzó vendiéndose por vasos en una farmacia de Atlanta; la historia del refresco precede a la expansión mundial de la compañía.","https://www.coca-colacompany.com/about-us/history/the-birth-of-a-refreshing-idea"],
+        ["IBM",1911,"1911","assets/quick-cards/companies-founded-2.webp","https://www.ibm.com/history",null,"Sus orígenes están en máquinas para tabular, medir y registrar datos; el nombre IBM llegó después del de Computing-Tabulating-Recording.","https://www.ibm.com/history/ctr-and-ibm"],
+        ["Disney",1923,"1923","assets/quick-cards/companies-founded-3.webp","https://thewaltdisneycompany.com/about/",null,"Walt y Roy Disney levantaron juntos el estudio. La animación fue el punto de partida antes de los parques y otros negocios."],
+        ["Toyota",1937,"1937","assets/quick-cards/companies-founded-4.webp","https://global.toyota/en/company/profile/overview/",null,"Su historia procede del negocio familiar de telares: fabricar automóviles fue una nueva rama de esa actividad industrial.","https://global.toyota/en/company/trajectory-of-toyota/history/"],
+        ["Samsung",1938,"1938","assets/quick-cards/companies-founded-5.webp","https://www.samsung.com/us/aboutsamsung/company/history/",null,"Empezó como una empresa comercial de alimentos y otros productos, mucho antes de fabricar teléfonos y televisores.","https://www.sgsg.samsung.com/newpage/newpage.php?f_id=samsung_history"],
+        ["Sony",1946,"1946","assets/quick-cards/companies-founded-6.webp","https://www.sony.com/en/SonyInfo/CorporateInfo/History/",null,"Nació con el nombre Tokyo Tsushin Kogyo; el cambio a Sony acompañó su expansión en la electrónica de consumo."],
+        ["Microsoft",1975,"1975","assets/quick-cards/companies-founded-7.webp","https://news.microsoft.com/transforming-the-world/microsoft-history/",null,"Su primer gran proyecto fue un intérprete de BASIC para el ordenador Altair, antes del predominio de Windows.","https://learn.microsoft.com/en-us/shows/history/history-of-microsoft-1975"],
+        ["Apple",1976,"1976","assets/quick-cards/companies-founded-8.webp","https://www.apple.com/leadership/",null,"El Apple I se vendía como una placa de ordenador; el usuario debía aportar elementos como la pantalla y el teclado.","https://americanhistory.si.edu/collections/object/nmah_334638"],
+        ["Amazon",1994,"1994","assets/quick-cards/companies-founded-9.webp","https://www.aboutamazon.com/about-us",null,"Comenzó vendiendo libros por internet antes de ampliar su catálogo a numerosas categorías de productos."],
+        ["Netflix",1997,"1997","assets/quick-cards/companies-founded-10.webp","https://about.netflix.com/en",null,"Su primer negocio fue el alquiler de DVD enviados por correo; la distribución por streaming llegó más tarde.","https://about.netflix.com/en/news/first-online-dvd-rental-store-opens"],
+        ["Google",1998,"1998","assets/quick-cards/companies-founded-11.webp","https://about.google/intl/en_us/company-info/",null,"Surgió de un proyecto de investigación de Larry Page y Sergey Brin sobre cómo ordenar los resultados de búsqueda.","https://about.google/company-info/our-story/"],
+        ["Facebook (hoy Meta)",2004,"2004","assets/quick-cards/companies-founded-12.webp","https://about.meta.com/company-info/",null,"Facebook comenzó como una red universitaria; el nombre Meta pasó a identificar a la empresa matriz, no solo a esa aplicación.","https://about.fb.com/news/2021/10/facebook-company-is-now-meta/"]
       ]
     ),
     d(
@@ -335,18 +335,18 @@
       'globe',
       S.timezone,
       [
-        ['Honolulu',-12,'12 horas menos','assets/quick-cards/timezones-june-1.webp'],
-        ['Los Ángeles',-9,'9 horas menos','assets/quick-cards/timezones-june-2.webp'],
-        ['Nueva York',-6,'6 horas menos','assets/quick-cards/timezones-june-3.webp'],
-        ['Río de Janeiro',-5,'5 horas menos','assets/quick-cards/timezones-june-4.webp'],
-        ['Londres',-1,'1 hora menos','assets/quick-cards/timezones-june-5.webp'],
-        ['Madrid',0,'Misma hora','assets/quick-cards/timezones-june-6.webp'],
-        ['Moscú',1,'1 hora más','assets/quick-cards/timezones-june-7.webp'],
-        ['Dubái',2,'2 horas más','assets/quick-cards/timezones-june-8.webp'],
-        ['Nueva Delhi',3.5,'3 horas y media más','assets/quick-cards/timezones-june-9.webp'],
-        ['Bangkok',5,'5 horas más','assets/quick-cards/timezones-june-10.webp'],
-        ['Tokio',7,'7 horas más','assets/quick-cards/timezones-june-11.webp'],
-        ['Sídney',8,'8 horas más','assets/quick-cards/timezones-june-12.webp']
+        ["Honolulu",-12,"12 horas menos","assets/quick-cards/timezones-june-1.webp",null,null,"Hawái no adelanta sus relojes en verano: su hora local conserva el mismo desfase durante el año.","https://www.timeanddate.com/time/zone/usa/honolulu"],
+        ["Los Ángeles",-9,"9 horas menos","assets/quick-cards/timezones-june-2.webp",null,null,"En junio aplica el horario de verano del Pacífico; en invierno su desfase respecto a UTC cambia.","https://www.timeanddate.com/time/zone/usa/los-angeles"],
+        ["Nueva York",-6,"6 horas menos","assets/quick-cards/timezones-june-3.webp",null,null,"La ciudad aplica el horario de verano del Este. Su diferencia con otras regiones puede variar cuando cambian los relojes.","https://www.timeanddate.com/time/zone/usa/new-york"],
+        ["Río de Janeiro",-5,"5 horas menos","assets/quick-cards/timezones-june-4.webp",null,null,"Brasil dejó de aplicar el horario de verano; Río mantiene el desfase de su zona horaria también en junio.","https://www.timeanddate.com/time/zone/brazil/rio-de-janeiro"],
+        ["Londres",-1,"1 hora menos","assets/quick-cards/timezones-june-5.webp",null,null,"En junio usa British Summer Time, una hora por delante de Greenwich Mean Time.","https://www.timeanddate.com/time/zone/uk/london"],
+        ["Madrid",0,"Misma hora","assets/quick-cards/timezones-june-6.webp",null,null,"Aunque está cerca del meridiano de Greenwich, comparte la hora centroeuropea; en junio se añade el horario de verano.","https://www.timeanddate.com/time/zone/spain/madrid"],
+        ["Moscú",1,"1 hora más","assets/quick-cards/timezones-june-7.webp",null,null,"No necesita adelantar el reloj en junio: su zona mantiene el mismo desfase durante todo el año.","https://www.timeanddate.com/time/zone/russia/moscow"],
+        ["Dubái",2,"2 horas más","assets/quick-cards/timezones-june-8.webp",null,null,"Los Emiratos Árabes Unidos no aplican horario de verano, por lo que Dubái conserva su desfase anual.","https://www.timeanddate.com/time/zone/united-arab-emirates/dubai"],
+        ["Nueva Delhi",3.5,"3 horas y media más","assets/quick-cards/timezones-june-9.webp",null,null,"La India utiliza una diferencia de media hora respecto a las horas enteras de UTC: no todos los husos van de hora en hora.","https://www.timeanddate.com/time/zone/india/new-delhi"],
+        ["Bangkok",5,"5 horas más","assets/quick-cards/timezones-june-10.webp",null,null,"Tailandia conserva la misma hora todo el año; no hay cambio estacional de reloj en Bangkok.","https://www.timeanddate.com/time/zone/thailand/bangkok"],
+        ["Tokio",7,"7 horas más","assets/quick-cards/timezones-june-11.webp",null,null,"Japón utiliza una sola hora oficial para todo el país y no aplica horario de verano.","https://www.timeanddate.com/time/zone/japan/tokyo"],
+        ["Sídney",8,"8 horas más","assets/quick-cards/timezones-june-12.webp",null,null,"Junio cae en el invierno austral: Sídney usa entonces la hora estándar, y adelanta el reloj durante su verano.","https://www.timeanddate.com/time/zone/australia/sydney"]
       ]
     ),
     d(
@@ -358,16 +358,16 @@
       'globe',
       S.geo,
       [
-        ['Honolulu',-157.86,'157,86° O','assets/quick-cards/cities-east-west-1.webp'],
-        ['San Francisco',-122.42,'122,42° O','assets/quick-cards/cities-east-west-2.webp'],
-        ['Los Ángeles',-118.24,'118,24° O','assets/quick-cards/cities-east-west-3.webp'],
-        ['Nueva York',-74.01,'74,01° O','assets/quick-cards/cities-east-west-4.webp'],
-        ['Madrid',-3.70,'3,70° O','assets/quick-cards/cities-east-west-5.webp'],
-        ['El Cairo',31.24,'31,24° E','assets/quick-cards/cities-east-west-6.webp'],
-        ['Singapur',103.82,'103,82° E','assets/quick-cards/cities-east-west-7.webp'],
-        ['Tokio',139.69,'139,69° E','assets/quick-cards/cities-east-west-8.webp'],
-        ['Sídney',151.21,'151,21° E','assets/quick-cards/cities-east-west-9.webp'],
-        ['Auckland',174.76,'174,76° E','assets/quick-cards/cities-east-west-10.webp']
+        ["Honolulu",-157.86,"157,86° O","assets/quick-cards/cities-east-west-1.webp",null,null,"La capital de Hawái está en la isla de Oahu; su posición en el Pacífico la separa del territorio continental estadounidense.","https://www.britannica.com/place/Honolulu"],
+        ["San Francisco",-122.42,"122,42° O","assets/quick-cards/cities-east-west-2.webp",null,null,"El Golden Gate une la península de San Francisco con el condado de Marin, atravesando la entrada de la bahía.","https://www.goldengate.org/faq/"],
+        ["Los Ángeles",-118.24,"118,24° O","assets/quick-cards/cities-east-west-3.webp",null,null,"Hollywood es un distrito de esta enorme ciudad californiana, no una ciudad independiente.","https://www.britannica.com/place/Hollywood-California"],
+        ["Nueva York",-74.01,"74,01° O","assets/quick-cards/cities-east-west-4.webp",null,null,"La ciudad se reparte en cinco distritos; Manhattan es solo uno de ellos.","https://www.nyc.gov/site/planning/data-maps/city-neighborhoods.page"],
+        ["Madrid",-3.7,"3,70° O","assets/quick-cards/cities-east-west-5.webp",null,null,"El río Manzanares atraviesa la ciudad, que se encuentra en el interior de la península ibérica.","https://www.britannica.com/place/Madrid"],
+        ["El Cairo",31.24,"31,24° E","assets/quick-cards/cities-east-west-6.webp",null,null,"El Nilo organiza la geografía de la ciudad; el delta comienza al norte de la capital egipcia.","https://www.britannica.com/place/Cairo"],
+        ["Singapur",103.82,"103,82° E","assets/quick-cards/cities-east-west-7.webp",null,null,"Es una ciudad-Estado: el nombre identifica tanto a un país como a su principal núcleo urbano.","https://www.britannica.com/place/Singapore"],
+        ["Tokio",139.69,"139,69° E","assets/quick-cards/cities-east-west-8.webp",null,null,"Antes de convertirse en Tokio se llamaba Edo; el cambio de nombre acompañó la transformación de la capital japonesa.","https://www.britannica.com/place/Tokyo"],
+        ["Sídney",151.21,"151,21° E","assets/quick-cards/cities-east-west-9.webp",null,null,"La Ópera se levanta sobre Bennelong Point, una pequeña península que se asoma al puerto.","https://www.sydneyoperahouse.com/our-story"],
+        ["Auckland",174.76,"174,76° E","assets/quick-cards/cities-east-west-10.webp",null,null,"Sus puertos se abren a costas diferentes: la ciudad se extiende sobre un estrecho istmo de la Isla Norte.","https://www.britannica.com/place/Auckland-New-Zealand"]
       ]
     ),
     d(
@@ -379,15 +379,15 @@
       'globe',
       S.geo,
       [
-        ['Reikiavik',64.15,'64,15° N','assets/quick-cards/cities-north-south-1.webp'],
-        ['Oslo',59.91,'59,91° N','assets/quick-cards/cities-north-south-2.webp'],
-        ['Londres',51.51,'51,51° N','assets/quick-cards/cities-north-south-3.webp'],
-        ['París',48.86,'48,86° N','assets/quick-cards/cities-north-south-4.webp'],
-        ['Madrid',40.42,'40,42° N','assets/quick-cards/cities-north-south-5.webp'],
-        ['El Cairo',30.04,'30,04° N','assets/quick-cards/cities-north-south-6.webp'],
-        ['Nairobi',-1.29,'1,29° S','assets/quick-cards/cities-north-south-7.webp'],
-        ['Lima',-12.05,'12,05° S','assets/quick-cards/cities-north-south-8.webp'],
-        ['Ciudad del Cabo',-33.93,'33,93° S','assets/quick-cards/cities-north-south-9.webp']
+        ["Reikiavik",64.15,"64,15° N","assets/quick-cards/cities-north-south-1.webp",null,null,"La capital islandesa se encuentra muy al norte del Atlántico; su latitud hace que las horas de luz cambien mucho entre estaciones.","https://www.britannica.com/place/Reykjavik"],
+        ["Oslo",59.91,"59,91° N","assets/quick-cards/cities-north-south-2.webp",null,null,"Está situada junto al fiordo de Oslo, donde el mar penetra hacia el interior de Noruega.","https://www.britannica.com/place/Oslo"],
+        ["Londres",51.51,"51,51° N","assets/quick-cards/cities-north-south-3.webp",null,null,"El Támesis atraviesa la ciudad y ha sido clave para su actividad comercial y portuaria.","https://www.britannica.com/place/London"],
+        ["París",48.86,"48,86° N","assets/quick-cards/cities-north-south-4.webp",null,null,"El Sena divide el centro en dos orillas; sus puentes conectan barrios e islas históricas.","https://whc.unesco.org/en/list/600/"],
+        ["Madrid",40.42,"40,42° N","assets/quick-cards/cities-north-south-5.webp",null,null,"Aunque está al sur de París y Londres, se encuentra en una meseta interior: latitud y altitud describen cosas distintas.","https://www.britannica.com/place/Madrid"],
+        ["El Cairo",30.04,"30,04° N","assets/quick-cards/cities-north-south-6.webp",null,null,"Está en el hemisferio norte, aunque Egipto suele asociarse a las zonas cálidas del continente africano.","https://www.britannica.com/place/Cairo"],
+        ["Nairobi",-1.29,"1,29° S","assets/quick-cards/cities-north-south-7.webp",null,null,"Se encuentra cerca del ecuador, pero en una zona elevada; estar en África no implica estar siempre a baja altitud.","https://www.britannica.com/place/Nairobi"],
+        ["Lima",-12.05,"12,05° S","assets/quick-cards/cities-north-south-8.webp",null,null,"Está en la costa del Pacífico, donde la influencia oceánica y la corriente de Humboldt ayudan a explicar su clima.","https://www.britannica.com/place/Lima"],
+        ["Ciudad del Cabo",-33.93,"33,93° S","assets/quick-cards/cities-north-south-9.webp",null,null,"La montaña de la Mesa forma una silueta característica sobre la ciudad y la península del Cabo.","https://www.britannica.com/place/Cape-Town"]
       ]
     ),
     d(
@@ -399,16 +399,16 @@
       'science',
       S.body,
       [
-        ['Cerebro',1,'Cabeza','assets/quick-cards/body-1.webp'],
-        ['Ojos',2,'Cara','assets/quick-cards/body-2.webp'],
-        ['Nariz',3,'Cara','assets/quick-cards/body-3.webp'],
-        ['Pulmones',4,'Tórax','assets/quick-cards/body-4.webp'],
-        ['Corazón',5,'Tórax','assets/quick-cards/body-5.webp'],
-        ['Hígado',6,'Abdomen superior','assets/quick-cards/body-6.webp'],
-        ['Estómago',7,'Abdomen superior','assets/quick-cards/body-7.webp'],
-        ['Riñones',8,'Abdomen posterior','assets/quick-cards/body-8.webp'],
-        ['Rodillas',9,'Extremidades inferiores','assets/quick-cards/body-9.webp'],
-        ['Pies',10,'Extremo inferior','assets/quick-cards/body-10.webp']
+        ["Cerebro",1,"Cabeza","assets/quick-cards/body-1.webp",null,null,"Además de permitir pensar y recordar, coordina funciones como el movimiento, la respiración y la interpretación de los sentidos.","https://www.ninds.nih.gov/health-information/public-education/brain-basics/brain-basics-know-your-brain"],
+        ["Ojos",2,"Cara","assets/quick-cards/body-2.webp",null,null,"La retina transforma la luz en señales nerviosas; el cerebro interpreta esas señales para construir la visión.","https://www.nei.nih.gov/espanol/informacion-sobre-la-salud-ocular/vision-saludable/como-funcionan-los-ojos"],
+        ["Nariz",3,"Cara","assets/quick-cards/body-3.webp",null,null,"No solo interviene en el olfato: también ayuda a calentar, humedecer y filtrar el aire inspirado.","https://www.nhlbi.nih.gov/health/lungs/respiratory-system"],
+        ["Pulmones",4,"Tórax","assets/quick-cards/body-4.webp",null,null,"El intercambio de gases ocurre en los alvéolos. El pulmón izquierdo es algo menor porque comparte espacio con el corazón.","https://www.nhlbi.nih.gov/health/lungs/respiratory-system"],
+        ["Corazón",5,"Tórax","assets/quick-cards/body-5.webp",null,null,"Sus válvulas mantienen la sangre avanzando en la dirección adecuada; el latido impulsa la circulación por pulmones y cuerpo.","https://www.nhlbi.nih.gov/health/heart/anatomy"],
+        ["Hígado",6,"Abdomen superior","assets/quick-cards/body-6.webp",null,null,"Produce bilis y procesa sustancias que llegan desde el aparato digestivo; también almacena nutrientes.","https://www.niddk.nih.gov/health-information/digestive-diseases/digestive-system-how-it-works"],
+        ["Estómago",7,"Abdomen superior","assets/quick-cards/body-7.webp",null,null,"Su pared muscular mezcla el alimento con los jugos gástricos antes de enviarlo al intestino delgado.","https://www.niddk.nih.gov/health-information/digestive-diseases/digestive-system-how-it-works"],
+        ["Riñones",8,"Abdomen posterior","assets/quick-cards/body-8.webp",null,null,"Filtran la sangre y eliminan desechos en la orina; además ayudan a regular el equilibrio de agua y sales.","https://www.niddk.nih.gov/health-information/kidney-disease/kidneys-how-they-work"],
+        ["Rodillas",9,"Extremidades inferiores","assets/quick-cards/body-9.webp",null,null,"Los meniscos son piezas de cartílago que amortiguan y distribuyen cargas entre el fémur y la tibia.","https://orthoinfo.aaos.org/en/diseases--conditions/meniscus-tears/"],
+        ["Pies",10,"Extremo inferior","assets/quick-cards/body-10.webp",null,null,"Sus arcos ayudan a distribuir el peso y amortiguar la marcha; huesos, músculos y ligamentos trabajan juntos para sostenernos.","https://www.britannica.com/science/foot-anatomy"]
       ]
     ),
     d(
@@ -420,17 +420,17 @@
       'entertainment',
       S.series,
       [
-        ['Chernobyl',1,'1 temporada','assets/quick-cards/series-seasons-1.webp'],
-        ['Breaking Bad',5,'5 temporadas','assets/quick-cards/series-seasons-2.webp'],
-        ['Westworld',4,'4 temporadas','assets/quick-cards/series-seasons-3.webp'],
-        ['Lost',6,'6 temporadas','assets/quick-cards/series-seasons-4.webp'],
-        ['Better Call Saul',6,'6 temporadas','assets/quick-cards/series-seasons-5.webp'],
-        ['Mad Men',7,'7 temporadas','assets/quick-cards/series-seasons-6.webp'],
-        ['Juego de tronos',8,'8 temporadas','assets/quick-cards/series-seasons-7.webp'],
-        ['Stranger Things',5,'5 temporadas','assets/quick-cards/series-seasons-8.webp'],
-        ['The Office (EE. UU.)',9,'9 temporadas','assets/quick-cards/series-seasons-9.webp'],
-        ['Friends',10,'10 temporadas','assets/quick-cards/series-seasons-10.webp'],
-        ['Los Simpson',37,'37 temporadas','assets/quick-cards/series-seasons-11.webp']
+        ["Chernobyl",1,"1 temporada","assets/quick-cards/series-seasons-1.webp",null,null,"Se concibió como una miniserie: cuenta una historia cerrada sobre el desastre nuclear y la respuesta que provocó.","https://www.hbo.com/chernobyl"],
+        ["Breaking Bad",5,"5 temporadas","assets/quick-cards/series-seasons-2.webp",null,null,"El profesor Walter White adopta el nombre de Heisenberg, una identidad que acompaña su transformación en el mundo criminal.","https://www.amc.com/blogs/breaking-bad-creator-vince-gilligan-answers-fan-questions-part-i--1010047"],
+        ["Westworld",4,"4 temporadas","assets/quick-cards/series-seasons-3.webp",null,null,"Parte de un parque de atracciones habitado por anfitriones artificiales y plantea preguntas sobre memoria y conciencia.","https://www.hbo.com/westworld"],
+        ["Lost",6,"6 temporadas","assets/quick-cards/series-seasons-4.webp",null,null,"Los supervivientes del vuelo Oceanic 815 llegan a una isla llena de secretos. Un médico, una fugitiva y un estafador deben aprender a colaborar.","https://www.disneyplus.com/browse/entity-466b3994-b574-44f1-88bc-63707507a6cb"],
+        ["Better Call Saul",6,"6 temporadas","assets/quick-cards/series-seasons-5.webp",null,null,"Amplía el universo de Breaking Bad siguiendo a Jimmy McGill antes y después de su transformación en Saul Goodman.","https://www.amc.com/blogs/better-call-saul-qa-co-creator-peter-gould-breaks-down-the-series-finale--1057584"],
+        ["Mad Men",7,"7 temporadas","assets/quick-cards/series-seasons-6.webp",null,null,"La publicidad del Nueva York de los años sesenta sirve de escenario para explorar cambios sociales y personales.","https://www.amc.com/shows/mad-men--1002238"],
+        ["Juego de tronos",8,"8 temporadas","assets/quick-cards/series-seasons-7.webp",null,null,"Adapta el mundo de las novelas de George R. R. Martin, donde varias casas compiten por el poder.","https://www.hbo.com/game-of-thrones"],
+        ["Stranger Things",5,"5 temporadas","assets/quick-cards/series-seasons-8.webp",null,null,"Combina una aventura juvenil ambientada en los años ochenta con una dimensión alternativa conocida como el Mundo del Revés.","https://www.netflix.com/tudum/stranger-things"],
+        ["The Office (EE. UU.)",9,"9 temporadas","assets/quick-cards/series-seasons-9.webp",null,null,"Utiliza el estilo de un falso documental para seguir la vida cotidiana de los empleados de Dunder Mifflin.","https://www.nbc.com/the-office"],
+        ["Friends",10,"10 temporadas","assets/quick-cards/series-seasons-10.webp",null,null,"La cafetería Central Perk funciona como lugar de encuentro habitual para su grupo de protagonistas.","https://www.warnerbros.com/tv/friends"],
+        ["Los Simpson",37,"37 temporadas","assets/quick-cards/series-seasons-11.webp",null,null,"La familia vive en Springfield, una ciudad ficticia cuyo estado no se identifica de forma definitiva en la serie.","https://www.fox.com/the-simpsons/"]
       ]
     ),
     d(
@@ -442,15 +442,15 @@
       'science',
       S.buildings,
       [
-        ['Petronas Towers',452,'452 m','assets/quick-cards/buildings-1.webp'],
-        ['Taipei 101',508,'508 m','assets/quick-cards/buildings-2.webp'],
-        ['One World Trade Center',541,'541 m','assets/quick-cards/buildings-3.webp'],
-        ['Lotte World Tower',555,'555 m','assets/quick-cards/buildings-4.webp'],
-        ['Makkah Royal Clock Tower',601,'601 m','assets/quick-cards/buildings-5.webp'],
-        ['Shanghai Tower',632,'632 m','assets/quick-cards/buildings-6.webp'],
-        ['Guangzhou CTF Finance Centre',530,'530 m','assets/quick-cards/buildings-7.webp'],
-        ['Merdeka 118',679,'679 m','assets/quick-cards/buildings-8.webp'],
-        ['Burj Khalifa',828,'828 m','assets/quick-cards/buildings-9.webp']
+        ["Petronas Towers",452,"452 m","assets/quick-cards/buildings-1.webp",null,null,"Las torres gemelas están conectadas por una pasarela elevada; su diseño combina geometría islámica y una estructura moderna.","https://www.petronastwintowers.com.my/"],
+        ["Taipei 101",508,"508 m","assets/quick-cards/buildings-2.webp",null,null,"Un enorme amortiguador de masa ayuda a reducir sus oscilaciones: una esfera suspendida contrarresta parte del movimiento.","https://www.taipei-101.com.tw/en/"],
+        ["One World Trade Center",541,"541 m","assets/quick-cards/buildings-3.webp",null,null,"Su altura arquitectónica equivale a 1.776 pies, una referencia al año de la independencia de Estados Unidos.","https://wtcstage.panynj.gov/en/local/learn-about-wtc/articles/what-s-the-meaning-of-the-wtc-logo-.html"],
+        ["Lotte World Tower",555,"555 m","assets/quick-cards/buildings-4.webp",null,null,"Se levanta en Seúl y combina usos como oficinas, hotel y un mirador en las plantas superiores.","https://www.skyscrapercenter.com/building/lotte-world-tower/88"],
+        ["Makkah Royal Clock Tower",601,"601 m","assets/quick-cards/buildings-5.webp",null,null,"El gran reloj de la parte alta es uno de los elementos más reconocibles del complejo situado junto a la Gran Mezquita.","https://www.skyscrapercenter.com/building/makkah-royal-clock-tower/84"],
+        ["Shanghai Tower",632,"632 m","assets/quick-cards/buildings-6.webp",null,null,"La fachada gira a medida que asciende; la forma del edificio ayuda a reducir las cargas provocadas por el viento.","https://www.gensler.com/projects/shanghai-tower"],
+        ["Guangzhou CTF Finance Centre",530,"530 m","assets/quick-cards/buildings-7.webp",null,null,"Reúne oficinas, hotel y viviendas en un mismo rascacielos, un ejemplo de edificio de uso mixto.","https://www.skyscrapercenter.com/building/guangzhou-ctf-finance-centre/176"],
+        ["Merdeka 118",679,"679 m","assets/quick-cards/buildings-8.webp",null,null,"Su nombre remite a la independencia de Malasia; la torre se levanta en Kuala Lumpur junto a un recinto de gran importancia histórica.","https://www.merdeka118.com/"],
+        ["Burj Khalifa",828,"828 m","assets/quick-cards/buildings-9.webp",null,null,"Su planta parte de una geometría con tres alas alrededor de un núcleo central, que ayuda a estabilizar la torre.","https://www.som.com/projects/burj-khalifa/"]
       ]
     ),
     d(
@@ -462,16 +462,16 @@
       'globe',
       S.rivers,
       [
-        ['Llobregat',175,'175 km','assets/quick-cards/rivers-spain-1.webp','https://es.wikipedia.org/wiki/R%C3%ADo_Llobregat'],
-        ['Turia',280,'280 km','assets/quick-cards/rivers-spain-2.webp','https://es.wikipedia.org/wiki/R%C3%ADo_Turia'],
-        ['Miño',315,'315 km','assets/quick-cards/rivers-spain-3.webp','https://es.wikipedia.org/wiki/R%C3%ADo_Mi%C3%B1o'],
-        ['Segura',325,'325 km','assets/quick-cards/rivers-spain-4.webp','https://es.wikipedia.org/wiki/Segura'],
-        ['Júcar',498,'498 km','assets/quick-cards/rivers-spain-5.webp','https://es.wikipedia.org/wiki/J%C3%BAcar'],
-        ['Guadalquivir',657,'657 km','assets/quick-cards/rivers-spain-6.webp','https://es.wikipedia.org/wiki/Guadalquivir'],
-        ['Guadiana',744,'744 km','assets/quick-cards/rivers-spain-7.webp','https://es.wikipedia.org/wiki/Guadiana'],
-        ['Duero',897,'897 km','assets/quick-cards/rivers-spain-8.webp','https://es.wikipedia.org/wiki/Duero'],
-        ['Ebro',930,'930 km','assets/quick-cards/rivers-spain-9.webp','https://es.wikipedia.org/wiki/Ebro'],
-        ['Tajo',1007,'1.007 km','assets/quick-cards/rivers-spain-10.webp','https://es.wikipedia.org/wiki/Tajo']
+        ["Llobregat",175,"175 km","assets/quick-cards/rivers-spain-1.webp","https://es.wikipedia.org/wiki/R%C3%ADo_Llobregat",null,"Nace en el Prepirineo y desemboca junto a Barcelona; su cuenca ha tenido un papel importante en la industria catalana."],
+        ["Turia",280,"280 km","assets/quick-cards/rivers-spain-2.webp","https://es.wikipedia.org/wiki/R%C3%ADo_Turia",null,"Su antiguo cauce en Valencia se convirtió en un jardín urbano después de desviar el río para reducir el riesgo de inundaciones."],
+        ["Miño",315,"315 km","assets/quick-cards/rivers-spain-3.webp","https://es.wikipedia.org/wiki/R%C3%ADo_Mi%C3%B1o",null,"En su tramo final forma parte de la frontera entre España y Portugal antes de llegar al Atlántico."],
+        ["Segura",325,"325 km","assets/quick-cards/rivers-spain-4.webp","https://es.wikipedia.org/wiki/Segura",null,"Su cuenca sostiene importantes regadíos del sureste peninsular, una región donde el agua es un recurso especialmente disputado."],
+        ["Júcar",498,"498 km","assets/quick-cards/rivers-spain-5.webp","https://es.wikipedia.org/wiki/J%C3%BAcar",null,"Desemboca en Cullera, en el Mediterráneo, después de atravesar paisajes muy distintos del interior y de la costa."],
+        ["Guadalquivir",657,"657 km","assets/quick-cards/rivers-spain-6.webp","https://es.wikipedia.org/wiki/Guadalquivir",null,"El puerto de Sevilla está ligado a su tramo navegable; es una salida al mar desde una ciudad del interior."],
+        ["Guadiana",744,"744 km","assets/quick-cards/rivers-spain-7.webp","https://es.wikipedia.org/wiki/Guadiana",null,"Su curso atraviesa territorios españoles y portugueses antes de desembocar junto a Ayamonte y Vila Real de Santo António."],
+        ["Duero",897,"897 km","assets/quick-cards/rivers-spain-8.webp","https://es.wikipedia.org/wiki/Duero",null,"En Portugal se llama Douro. Los viñedos de su valle están ligados a la producción del vino de Oporto."],
+        ["Ebro",930,"930 km","assets/quick-cards/rivers-spain-9.webp","https://es.wikipedia.org/wiki/Ebro",null,"Su desembocadura forma un delta mediterráneo, un paisaje de humedales, lagunas y arrozales."],
+        ["Tajo",1007,"1.007 km","assets/quick-cards/rivers-spain-10.webp","https://es.wikipedia.org/wiki/Tajo",null,"En Portugal recibe el nombre de Tejo y desemboca en un amplio estuario junto a Lisboa."]
       ]
     ),
     d(
@@ -483,21 +483,21 @@
       'science',
       S.food,
       [
-        ['Lechuga',15,'15 kcal/100 g','assets/quick-cards/foods-kcal-1.webp'],
-        ['Pepino',15,'15 kcal/100 g','assets/quick-cards/foods-kcal-2.webp'],
-        ['Zanahoria',41,'41 kcal/100 g','assets/quick-cards/foods-kcal-3.webp'],
-        ['Manzana',52,'52 kcal/100 g','assets/quick-cards/foods-kcal-4.webp'],
-        ['Patata',77,'77 kcal/100 g','assets/quick-cards/foods-kcal-5.webp'],
-        ['Plátano',89,'89 kcal/100 g','assets/quick-cards/foods-kcal-6.webp'],
-        ['Arroz blanco cocido',130,'130 kcal/100 g','assets/quick-cards/foods-kcal-7.webp'],
-        ['Pollo asado',190,'190 kcal/100 g','assets/quick-cards/foods-kcal-8.webp'],
-        ['Salmón',208,'208 kcal/100 g','assets/quick-cards/foods-kcal-9.webp'],
-        ['Pan blanco',266,'266 kcal/100 g','assets/quick-cards/foods-kcal-10.webp'],
-        ['Queso cheddar',403,'403 kcal/100 g','assets/quick-cards/foods-kcal-11.webp'],
-        ['Almendras',579,'579 kcal/100 g','assets/quick-cards/foods-kcal-12.webp'],
-        ['Mantequilla',717,'717 kcal/100 g','assets/quick-cards/foods-kcal-13.webp'],
+        ["Lechuga",15,"15 kcal/100 g","assets/quick-cards/foods-kcal-1.webp",null,null,"El agua representa buena parte de su peso, por eso una ración voluminosa puede aportar poca energía."],
+        ["Pepino",15,"15 kcal/100 g","assets/quick-cards/foods-kcal-2.webp",null,null,"Su alto contenido de agua ayuda a explicar su baja densidad energética; añadir aceite o salsas cambia la energía de la ración."],
+        ["Zanahoria",41,"41 kcal/100 g","assets/quick-cards/foods-kcal-3.webp",null,null,"Sus carotenoides contribuyen al color naranja. El cuerpo puede transformar el betacaroteno en vitamina A.","https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/"],
+        ["Manzana",52,"52 kcal/100 g","assets/quick-cards/foods-kcal-4.webp",null,null,"Comerla con piel conserva una parte de su fibra; un zumo no tiene la misma composición que la fruta entera."],
+        ["Patata",77,"77 kcal/100 g","assets/quick-cards/foods-kcal-5.webp",null,null,"Es un alimento rico en almidón: hervirla, asarla o freírla cambia mucho el resultado por el agua y la grasa añadida.","https://www.myplate.gov/eat-healthy/vegetables"],
+        ["Plátano",89,"89 kcal/100 g","assets/quick-cards/foods-kcal-6.webp",null,null,"A medida que madura, parte del almidón se transforma en azúcares; por eso cambian su dulzor y su textura."],
+        ["Arroz blanco cocido",130,"130 kcal/100 g","assets/quick-cards/foods-kcal-7.webp",null,null,"Durante la cocción absorbe agua: comparar el mismo peso de arroz crudo y cocido produce cifras de energía muy distintas."],
+        ["Pollo asado",190,"190 kcal/100 g","assets/quick-cards/foods-kcal-8.webp",null,null,"La piel y la parte del pollo elegida influyen en la cantidad de grasa; una pechuga sin piel no equivale a todas las piezas asadas."],
+        ["Salmón",208,"208 kcal/100 g","assets/quick-cards/foods-kcal-9.webp",null,null,"Es un pescado graso que aporta ácidos grasos omega-3; su contenido energético no depende solo de las proteínas.","https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/"],
+        ["Pan blanco",266,"266 kcal/100 g","assets/quick-cards/foods-kcal-10.webp",null,null,"La harina y el agua son la base de muchos panes; el horneado hace perder parte del agua y concentra los nutrientes por peso."],
+        ["Queso cheddar",403,"403 kcal/100 g","assets/quick-cards/foods-kcal-11.webp",null,null,"Al hacer queso se elimina parte del agua de la leche, de modo que grasas y proteínas quedan más concentradas."],
+        ["Almendras",579,"579 kcal/100 g","assets/quick-cards/foods-kcal-12.webp",null,null,"Su grasa, en gran parte insaturada, aporta mucha energía en poco peso; también contienen proteína y fibra."],
+        ["Mantequilla",717,"717 kcal/100 g","assets/quick-cards/foods-kcal-13.webp",null,null,"Es una grasa concentrada obtenida de la nata; su densidad energética es mucho mayor que la de alimentos ricos en agua."],
         // Añadida al final para conservar los IDs de cartas y partidas ya guardadas.
-        ['Tomate',18,'18 kcal/100 g','assets/quick-cards/foods-kcal-14.webp']
+        ["Tomate",18,"18 kcal/100 g","assets/quick-cards/foods-kcal-14.webp",null,null,"El licopeno contribuye a su color rojo. Aunque se usa como hortaliza en la cocina, botánicamente es un fruto.","https://www.britannica.com/plant/tomato"]
       ]
     ),
     d(
@@ -509,15 +509,15 @@
       'entertainment',
       S.albums,
       [
-        ['Led Zeppelin IV',37,'≈37 millones','assets/quick-cards/albums-sales-1.webp',null,'Led Zeppelin'],
-        ['Grease (banda sonora)',38,'≈38 millones','assets/quick-cards/albums-sales-2.webp',null,'Varios artistas'],
-        ['Rumours',40,'≈40 millones','assets/quick-cards/albums-sales-3.webp',null,'Fleetwood Mac'],
-        ['Saturday Night Fever',40,'≈40 millones','assets/quick-cards/albums-sales-4.webp',null,'Bee Gees y varios artistas'],
-        ['Bat Out of Hell',43,'≈43 millones','assets/quick-cards/albums-sales-5.webp',null,'Meat Loaf'],
-        ['The Dark Side of the Moon',45,'≈45 millones','assets/quick-cards/albums-sales-6.webp',null,'Pink Floyd'],
-        ['Back in Black',50,'≈50 millones','assets/quick-cards/albums-sales-7.webp',null,'AC/DC'],
-        ['Their Greatest Hits 1971–1975',45,'≈45 millones','assets/quick-cards/albums-sales-8.webp',null,'Eagles'],
-        ['Thriller',70,'≈70 millones','assets/quick-cards/albums-sales-9.webp',null,'Michael Jackson']
+        ["Led Zeppelin IV",37,"≈37 millones","assets/quick-cards/albums-sales-1.webp",null,"Led Zeppelin","La portada original no mostraba un título convencional ni el nombre del grupo; «Stairway to Heaven» es una de sus canciones.","https://discography.ledzeppelin.com/"],
+        ["Grease (banda sonora)",38,"≈38 millones","assets/quick-cards/albums-sales-2.webp",null,"Varios artistas","La banda sonora reúne canciones de la película y otras interpretadas por artistas como Frankie Valli.","https://www.rhino.com/article/august-1978-frankie-valli-hits-1-on-the-hot-100-with-grease"],
+        ["Rumours",40,"≈40 millones","assets/quick-cards/albums-sales-3.webp",null,"Fleetwood Mac","Incluye «Dreams» y «Go Your Own Way», canciones que forman parte del sonido más reconocible de Fleetwood Mac.","https://media.rhino.com/release-info/rumours"],
+        ["Saturday Night Fever",40,"≈40 millones","assets/quick-cards/albums-sales-4.webp",null,"Bee Gees y varios artistas","Las canciones de los Bee Gees ayudaron a asociar la película con el auge de la música disco.","https://www.beegees.com/saturday-night-fever/"],
+        ["Bat Out of Hell",43,"≈43 millones","assets/quick-cards/albums-sales-5.webp",null,"Meat Loaf","La voz de Meat Loaf y las composiciones de Jim Steinman dan al disco un carácter teatral cercano a una ópera rock.","https://www.britannica.com/biography/Meat-Loaf"],
+        ["The Dark Side of the Moon",45,"≈45 millones","assets/quick-cards/albums-sales-6.webp",null,"Pink Floyd","La banda interpretó la obra en directo durante un año antes de terminar el disco; varias ideas cambiaron gracias a esa experiencia ante el público.","https://www.pinkfloyd.com/albums/the-dark-side-of-the-moon/"],
+        ["Back in Black",50,"≈50 millones","assets/quick-cards/albums-sales-7.webp",null,"AC/DC","Brian Johnson se incorporó como cantante tras la muerte de Bon Scott; el negro de la portada está ligado a ese duelo.","https://www.acdc.com/music/back-in-black/"],
+        ["Their Greatest Hits 1971–1975",45,"≈45 millones","assets/quick-cards/albums-sales-8.webp",null,"Eagles","Es una recopilación de canciones ya publicadas, un recordatorio de que un gran éxito comercial no tiene que ser un álbum de estudio nuevo.","https://eagles.com/blogs/news/eagles-their-greatest-hits-1971-1975"],
+        ["Thriller",70,"≈70 millones","assets/quick-cards/albums-sales-9.webp",null,"Michael Jackson","Incluye «Billie Jean», «Beat It» y «Thriller»; sus videoclips reforzaron la relación entre música y relato visual.","https://www.michaeljackson.com/music/thriller/"]
       ]
     ),
     d(
@@ -529,16 +529,16 @@
       'sports',
       S.stadiums,
       [
-        ['Maracaná',78838,'78.838','assets/quick-cards/stadiums-1.webp'],
-        ['Santiago Bernabéu',84000,'84.000','assets/quick-cards/stadiums-2.webp'],
-        ['Croke Park',82300,'82.300','assets/quick-cards/stadiums-3.webp'],
-        ['Signal Iduna Park',81365,'81.365','assets/quick-cards/stadiums-4.webp'],
-        ['Estadio Azteca',87523,'87.523','assets/quick-cards/stadiums-5.webp'],
-        ['Wembley',90000,'90.000','assets/quick-cards/stadiums-6.webp'],
-        ['Camp Nou',99354,'99.354','assets/quick-cards/stadiums-7.webp'],
-        ['San Siro',80018,'80.018','assets/quick-cards/stadiums-8.webp'],
-        ['Michigan Stadium',107601,'107.601','assets/quick-cards/stadiums-9.webp'],
-        ['Rungrado 1.º de Mayo',114000,'114.000','assets/quick-cards/stadiums-10.webp']
+        ["Maracaná",78838,"78.838","assets/quick-cards/stadiums-1.webp",null,null,"Fue el escenario del decisivo Brasil-Uruguay de 1950, un encuentro recordado como el Maracanazo.","https://www.fifa.com/en/tournaments/mens/worldcup/articles/1950-world-cup-quiz"],
+        ["Santiago Bernabéu",84000,"84.000","assets/quick-cards/stadiums-2.webp",null,null,"La cubierta retráctil forma parte de su renovación y permite adaptar el recinto a actividades distintas del fútbol.","https://www.realmadrid.com/en-US/bernabeu-stadium"],
+        ["Croke Park",82300,"82.300","assets/quick-cards/stadiums-3.webp",null,null,"Su actividad principal está ligada a los deportes gaélicos; no es un estadio dedicado exclusivamente al fútbol asociación.","https://crokepark.ie/BlankSite/media/Images/Primary-schools-resource-pack.pdf"],
+        ["Signal Iduna Park",81365,"81.365","assets/quick-cards/stadiums-4.webp",null,null,"La gran grada sur del Borussia Dortmund es conocida como el Muro Amarillo por el color de su afición.","https://www.bvb.de/de/en/signal-iduna-park.html"],
+        ["Estadio Azteca",87523,"87.523","assets/quick-cards/stadiums-5.webp",null,null,"Acogió las finales mundialistas de 1970 y 1986, asociadas a las figuras de Pelé y Maradona.","https://www.fifa.com/en/articles/iconic-images-from-estadio-azteca-mexico-city"],
+        ["Wembley",90000,"90.000","assets/quick-cards/stadiums-6.webp",null,null,"El gran arco sobre el estadio es una de sus señas arquitectónicas; el recinto actual sustituyó al Wembley original.","https://www.wembleystadium.com/about/stadium-facts-and-features"],
+        ["Camp Nou",99354,"99.354","assets/quick-cards/stadiums-7.webp",null,null,"Su apertura permitió al Barcelona dejar Les Corts; las reformas posteriores han cambiado su capacidad y su configuración.","https://www.fcbarcelona.com/en/club/facilities/spotify-camp-nou"],
+        ["San Siro",80018,"80.018","assets/quick-cards/stadiums-8.webp",null,null,"Los dos grandes clubes de Milán, Inter y Milan, han compartido este recinto, también llamado Giuseppe Meazza.","https://www.sansirostadium.com/en/"],
+        ["Michigan Stadium",107601,"107.601","assets/quick-cards/stadiums-9.webp",null,null,"Su deporte habitual es el fútbol americano universitario; la enorme capacidad muestra que no todos los estadios de este mazo tienen el mismo uso.","https://mgoblue.com/sports/2017/6/16/facilities-michigan-stadium-html"],
+        ["Rungrado 1.º de Mayo",114000,"114.000","assets/quick-cards/stadiums-10.webp",null,null,"Está en Pionyang y ha sido escenario de grandes espectáculos colectivos además de encuentros deportivos.","https://www.britannica.com/place/Pyongyang"]
       ]
     ),
     d(
@@ -550,15 +550,15 @@
       'globe',
       S.capitals,
       [
-        ['Madrid',667,'667 m','assets/quick-cards/capitals-altitude-1.webp'],
-        ['Ciudad de México',2240,'2.240 m','assets/quick-cards/capitals-altitude-2.webp'],
-        ['Thimphu',2320,'2.320 m','assets/quick-cards/capitals-altitude-3.webp'],
-        ['Addis Abeba',2355,'2.355 m','assets/quick-cards/capitals-altitude-4.webp'],
-        ['Bogotá',2640,'2.640 m','assets/quick-cards/capitals-altitude-5.webp'],
-        ['Quito',2850,'2.850 m','assets/quick-cards/capitals-altitude-6.webp'],
-        ['La Paz',3640,'3.640 m','assets/quick-cards/capitals-altitude-7.webp'],
-        ['Asmara',2325,'2.325 m','assets/quick-cards/capitals-altitude-8.webp'],
-        ['Sucre',2810,'2.810 m','assets/quick-cards/capitals-altitude-9.webp']
+        ["Madrid",667,"667 m","assets/quick-cards/capitals-altitude-1.webp",null,null,"Se levanta en la Meseta Central, de modo que una ciudad relativamente meridional de Europa puede estar a bastante altura.","https://www.britannica.com/place/Madrid"],
+        ["Ciudad de México",2240,"2.240 m","assets/quick-cards/capitals-altitude-2.webp",null,null,"Se construyó sobre el territorio de la antigua Tenochtitlan, en una cuenca que incluía grandes lagos.","https://whc.unesco.org/en/list/412/"],
+        ["Thimphu",2320,"2.320 m","assets/quick-cards/capitals-altitude-3.webp",null,null,"La capital de Bután está en un valle del Himalaya; la montaña forma parte de su paisaje cotidiano.","https://www.britannica.com/place/Thimphu"],
+        ["Addis Abeba",2355,"2.355 m","assets/quick-cards/capitals-altitude-4.webp",null,null,"Es la sede de la Unión Africana, lo que añade a su función nacional un importante papel diplomático continental.","https://www.au.int/en/visit-au-headquarters"],
+        ["Bogotá",2640,"2.640 m","assets/quick-cards/capitals-altitude-5.webp",null,null,"Está en un altiplano de la cordillera Oriental de los Andes; su altura ayuda a explicar las temperaturas moderadas cerca del ecuador.","https://www.britannica.com/place/Bogota"],
+        ["Quito",2850,"2.850 m","assets/quick-cards/capitals-altitude-6.webp",null,null,"Su centro histórico forma parte del Patrimonio Mundial; la ciudad se extiende sobre un relieve andino volcánico.","https://whc.unesco.org/en/list/2/"],
+        ["La Paz",3640,"3.640 m","assets/quick-cards/capitals-altitude-7.webp",null,null,"Es la sede del Gobierno boliviano, mientras que Sucre es la capital constitucional. Conviene distinguir ambas funciones.","https://www.britannica.com/place/Bolivia"],
+        ["Asmara",2325,"2.325 m","assets/quick-cards/capitals-altitude-8.webp",null,null,"Su arquitectura modernista forma un conjunto reconocido por la UNESCO, construido en gran parte durante el periodo colonial italiano.","https://whc.unesco.org/en/list/1550/"],
+        ["Sucre",2810,"2.810 m","assets/quick-cards/capitals-altitude-9.webp",null,null,"Es la capital constitucional de Bolivia, aunque gran parte de la actividad del Gobierno nacional se concentra en La Paz.","https://whc.unesco.org/en/list/566/"]
       ]
     ),
     d(
@@ -570,18 +570,18 @@
       'entertainment',
       S.eurovision,
       [
-        ['España',2,'2','assets/quick-cards/eurovision-wins-1.webp'],
-        ['Noruega',3,'3','assets/quick-cards/eurovision-wins-2.webp'],
-        ['Dinamarca',3,'3','assets/quick-cards/eurovision-wins-3.webp'],
-        ['Suiza',3,'3','assets/quick-cards/eurovision-wins-4.webp'],
-        ['Ucrania',3,'3','assets/quick-cards/eurovision-wins-5.webp'],
-        ['Austria',3,'3','assets/quick-cards/eurovision-wins-6.webp'],
-        ['Israel',4,'4','assets/quick-cards/eurovision-wins-7.webp'],
-        ['Reino Unido',5,'5','assets/quick-cards/eurovision-wins-8.webp'],
-        ['Francia',5,'5','assets/quick-cards/eurovision-wins-9.webp'],
-        ['Países Bajos',5,'5','assets/quick-cards/eurovision-wins-10.webp'],
-        ['Suecia',7,'7','assets/quick-cards/eurovision-wins-11.webp'],
-        ['Irlanda',7,'7','assets/quick-cards/eurovision-wins-12.webp']
+        ["España",2,"2","assets/quick-cards/eurovision-wins-1.webp",null,null,"Una de sus victorias fue compartida: Salomé empató con representantes de otros tres países en la edición celebrada en Madrid.","https://www.eurovision.com/eurovision-song-contest/countries/spain/"],
+        ["Noruega",3,"3","assets/quick-cards/eurovision-wins-2.webp",null,null,"«Fairytale», interpretada por Alexander Rybak, dio al violín un papel protagonista en una de sus victorias.","https://www.eurovision.com/eurovision-song-contest/countries/norway/"],
+        ["Dinamarca",3,"3","assets/quick-cards/eurovision-wins-3.webp",null,null,"La victoria de los Olsen Brothers llegó con «Fly on the Wings of Love», una canción interpretada en inglés.","https://www.eurovision.com/eurovision-song-contest/countries/denmark/"],
+        ["Suiza",3,"3","assets/quick-cards/eurovision-wins-4.webp",null,null,"Ganó la primera edición del festival con Lys Assia y «Refrain»; el concurso comenzó en Lugano.","https://www.eurovision.com/eurovision-song-contest/countries/switzerland/"],
+        ["Ucrania",3,"3","assets/quick-cards/eurovision-wins-5.webp",null,null,"Ruslana, Jamala y Kalush Orchestra muestran propuestas musicales muy distintas dentro de su palmarés.","https://www.eurovision.com/eurovision-song-contest/countries/ukraine/"],
+        ["Austria",3,"3","assets/quick-cards/eurovision-wins-6.webp",null,null,"Conchita Wurst convirtió «Rise Like a Phoenix» en una de las actuaciones más reconocibles de su historia en el festival.","https://www.eurovision.com/eurovision-song-contest/countries/austria/"],
+        ["Israel",4,"4","assets/quick-cards/eurovision-wins-7.webp",null,null,"Dana International ganó con «Diva», una actuación que tuvo también un gran significado para la visibilidad trans.","https://www.eurovision.com/eurovision-song-contest/countries/israel/"],
+        ["Reino Unido",5,"5","assets/quick-cards/eurovision-wins-8.webp",null,null,"Katrina and the Waves ganó con «Love Shine a Light», canción asociada a una de sus victorias más recordadas.","https://www.eurovision.com/eurovision-song-contest/countries/united-kingdom/"],
+        ["Francia",5,"5","assets/quick-cards/eurovision-wins-9.webp",null,null,"Frida Boccara fue una de las cuatro ganadoras empatadas en la edición de Madrid; todas conservaron la victoria.","https://www.eurovision.com/eurovision-song-contest/countries/france/"],
+        ["Países Bajos",5,"5","assets/quick-cards/eurovision-wins-10.webp",null,null,"Duncan Laurence ganó con «Arcade», una balada que siguió encontrando público después del festival.","https://www.eurovision.com/eurovision-song-contest/countries/netherlands/"],
+        ["Suecia",7,"7","assets/quick-cards/eurovision-wins-11.webp",null,null,"ABBA ganó con «Waterloo». Décadas después, Loreen logró ganar dos veces como intérprete.","https://www.eurovision.com/eurovision-song-contest/countries/sweden/"],
+        ["Irlanda",7,"7","assets/quick-cards/eurovision-wins-12.webp",null,null,"Johnny Logan ganó dos veces como cantante y también compuso «Why Me?», otra canción ganadora para su país.","https://www.eurovision.com/eurovision-song-contest/countries/ireland/"]
       ]
     ),
     d(
@@ -593,15 +593,15 @@
       'science',
       S.storage,
       [
-        ['Byte',1,'1 byte','assets/quick-cards/storage-1.webp'],
-        ['Kilobyte',1e3,'10³ bytes','assets/quick-cards/storage-2.webp'],
-        ['Megabyte',1e6,'10⁶ bytes','assets/quick-cards/storage-3.webp'],
-        ['Gigabyte',1e9,'10⁹ bytes','assets/quick-cards/storage-4.webp'],
-        ['Terabyte',1e12,'10¹² bytes','assets/quick-cards/storage-5.webp'],
-        ['Petabyte',1e15,'10¹⁵ bytes','assets/quick-cards/storage-6.webp'],
-        ['Exabyte',1e18,'10¹⁸ bytes','assets/quick-cards/storage-7.webp'],
-        ['Zettabyte',1e21,'10²¹ bytes','assets/quick-cards/storage-8.webp'],
-        ['Yottabyte',1e24,'10²⁴ bytes','assets/quick-cards/storage-9.webp']
+        ["Byte",1,"1 byte","assets/quick-cards/storage-1.webp",null,null,"Un byte reúne ocho bits; cada bit representa una elección entre dos estados posibles.","https://csrc.nist.gov/glossary/term/byte"],
+        ["Kilobyte",1000,"10³ bytes","assets/quick-cards/storage-2.webp",null,null,"El kilobyte decimal contiene 1.000 bytes. El kibibyte usa otra escala y contiene 1.024.","https://physics.nist.gov/cuu/Units/binary.html"],
+        ["Megabyte",1000000,"10⁶ bytes","assets/quick-cards/storage-3.webp",null,null,"La abreviatura MB indica megabytes, mientras que Mb indica megabits: confundirlas cambia la cantidad por un factor de ocho.","https://physics.nist.gov/cuu/Units/binary.html"],
+        ["Gigabyte",1000000000,"10⁹ bytes","assets/quick-cards/storage-4.webp",null,null,"Un gigabyte decimal contiene mil megabytes; el gibibyte, abreviado GiB, pertenece a la escala binaria.","https://physics.nist.gov/cuu/Units/binary.html"],
+        ["Terabyte",1000000000000,"10¹² bytes","assets/quick-cards/storage-5.webp",null,null,"Un disco anunciado en terabytes decimales puede mostrar otra cifra cuando el sistema calcula unidades binarias.","https://physics.nist.gov/cuu/Units/binary.html"],
+        ["Petabyte",1000000000000000,"10¹⁵ bytes","assets/quick-cards/storage-6.webp",null,null,"Equivale a mil terabytes decimales, una escala más habitual en grandes conjuntos de datos que en un archivo cotidiano."],
+        ["Exabyte",1000000000000000000,"10¹⁸ bytes","assets/quick-cards/storage-7.webp",null,null,"Cada salto de prefijo multiplica por mil en esta escala: un exabyte reúne mil petabytes."],
+        ["Zettabyte",1e+21,"10²¹ bytes","assets/quick-cards/storage-8.webp",null,null,"Su símbolo es ZB. Describe una cantidad de almacenamiento, no la velocidad a la que los datos se transfieren."],
+        ["Yottabyte",1e+24,"10²⁴ bytes","assets/quick-cards/storage-9.webp",null,null,"Fue el mayor prefijo del SI antes de que se añadieran ronna y quetta; la lista de prefijos no termina necesariamente aquí."]
       ]
     ),
     d(
@@ -613,13 +613,13 @@
       'globe',
       S.airports,
       [
-        ['Londres-Heathrow',84.5,'≈84,5 millones','assets/quick-cards/airports-1.webp'],
-        ['Denver',82.4,'≈82,4 millones','assets/quick-cards/airports-2.webp'],
-        ['Chicago O’Hare',84.9,'≈84,9 millones','assets/quick-cards/airports-3.webp'],
-        ['Dallas-Fort Worth',85.7,'≈85,7 millones','assets/quick-cards/airports-4.webp'],
-        ['Tokio-Haneda',91.7,'≈91,7 millones','assets/quick-cards/airports-5.webp'],
-        ['Dubái',95.2,'≈95,2 millones','assets/quick-cards/airports-6.webp'],
-        ['Atlanta',106.3,'≈106,3 millones','assets/quick-cards/airports-7.webp']
+        ["Londres-Heathrow",84.5,"≈84,5 millones","assets/quick-cards/airports-1.webp",null,null,"Sus terminales están conectadas con Londres por distintos servicios ferroviarios; un aeropuerto puede funcionar como nodo de transporte terrestre además de aéreo.","https://www.heathrow.com/transport-and-directions"],
+        ["Denver",82.4,"≈82,4 millones","assets/quick-cards/airports-2.webp",null,null,"Las cubiertas de su terminal recuerdan a las montañas del entorno de Colorado, una seña visual reconocible incluso desde el exterior.","https://www.flydenver.com/about-den/den-history/"],
+        ["Chicago O’Hare",84.9,"≈84,9 millones","assets/quick-cards/airports-3.webp",null,null,"Su código ORD procede de Orchard Field, un nombre anterior al homenaje al aviador Edward O’Hare.","https://www.flychicago.com/business/CDA/Pages/OHare.aspx"],
+        ["Dallas-Fort Worth",85.7,"≈85,7 millones","assets/quick-cards/airports-4.webp",null,null,"Se extiende entre Dallas y Fort Worth: su nombre refleja que sirve a dos grandes ciudades del área metropolitana.","https://www.dfwairport.com/business/about/"],
+        ["Tokio-Haneda",91.7,"≈91,7 millones","assets/quick-cards/airports-5.webp",null,null,"Está más cerca del centro de Tokio que Narita; ambos aeropuertos cumplen funciones complementarias en la región.","https://tokyo-haneda.com/en/access/"],
+        ["Dubái",95.2,"≈95,2 millones","assets/quick-cards/airports-6.webp",null,null,"Es una gran puerta de conexión entre continentes: los pasajeros en tránsito forman parte de su papel como centro de enlaces.","https://dubaiairports.ae/corporate/our-story/who-we-are"],
+        ["Atlanta",106.3,"≈106,3 millones","assets/quick-cards/airports-7.webp",null,null,"Sus terminales y vestíbulos se organizan con un tren interno que permite enlazar vuelos sin salir de la zona aeroportuaria.","https://www.atl.com/passenger-information/"]
       ]
     ),
     d(
@@ -631,15 +631,15 @@
       'globe',
       S.metro,
       [
-        ['París',245,'≈245 km','assets/quick-cards/metros-1.webp'],
-        ['Madrid',294,'≈294 km','assets/quick-cards/metros-2.webp'],
-        ['Londres',402,'≈402 km','assets/quick-cards/metros-3.webp'],
-        ['Moscú',470,'≈470 km','assets/quick-cards/metros-4.webp'],
-        ['Seúl',620,'≈620 km','assets/quick-cards/metros-5.webp'],
-        ['Guangzhou',650,'≈650 km','assets/quick-cards/metros-6.webp'],
-        ['Pekín',807,'≈807 km','assets/quick-cards/metros-7.webp'],
-        ['Shanghái',896,'≈896 km','assets/quick-cards/metros-8.webp'],
-        ['Nueva York',399,'≈399 km','assets/quick-cards/metros-9.webp']
+        ["París",245,"≈245 km","assets/quick-cards/metros-1.webp",null,null,"Algunas entradas históricas fueron diseñadas por Hector Guimard, con formas vegetales propias del art nouveau.","https://www.ratp.fr/en/decouvrir/sorties-et-visites/culture/art-nouveau-and-paris-metro"],
+        ["Madrid",294,"≈294 km","assets/quick-cards/metros-2.webp",null,null,"Su primera línea conectaba Sol y Cuatro Caminos; desde aquel pequeño recorrido la red se extendió por la ciudad y su entorno.","https://www.metromadrid.es/es/quienes-somos/historia"],
+        ["Londres",402,"≈402 km","assets/quick-cards/metros-3.webp",null,null,"Su historia empezó con ferrocarriles que utilizaban vapor; no todas sus líneas circulan bajo tierra.","https://www.ltmuseum.co.uk/collections/stories/transport/very-short-history-underground"],
+        ["Moscú",470,"≈470 km","assets/quick-cards/metros-4.webp",null,null,"Varias estaciones están decoradas con mosaicos, esculturas y lámparas que recuerdan a salones monumentales.","https://www.britannica.com/place/Moscow/Transportation"],
+        ["Seúl",620,"≈620 km","assets/quick-cards/metros-5.webp",null,null,"La red integra servicios de distintos operadores y alcanza poblaciones del área metropolitana; «metro de Seúl» no significa solo una empresa.","https://english.visitseoul.net/transportation"],
+        ["Guangzhou",650,"≈650 km","assets/quick-cards/metros-6.webp",null,null,"Los cruces con otras líneas y servicios ferroviarios hacen de la red una pieza del transporte de toda el área urbana.","https://www.gzmtr.com/"],
+        ["Pekín",807,"≈807 km","assets/quick-cards/metros-7.webp",null,null,"Fue la primera ciudad de la China continental en disponer de metro; su red creció junto con la expansión de la capital.","https://www.bjsubway.com/en/"],
+        ["Shanghái",896,"≈896 km","assets/quick-cards/metros-8.webp",null,null,"La expansión de la red acompaña una metrópolis extendida a ambos lados del río Huangpu.","https://www.shmetro.com/"],
+        ["Nueva York",399,"≈399 km","assets/quick-cards/metros-9.webp",null,null,"Combina servicios locales y exprés: trenes que usan líneas relacionadas pueden detenerse en estaciones diferentes.","https://www.mta.info/guides/riding-the-subway"]
       ]
     ),
     d(
@@ -651,14 +651,14 @@
       'science',
       S.fortune,
       [
-        ['Apple',416,'≈416 mil M$','assets/quick-cards/companies-revenue-1.webp','https://fortune.com/company/apple/'],
-        ['China National Petroleum',402,'≈402 mil M$','assets/quick-cards/companies-revenue-2.webp','https://fortune.com/company/china-national-petroleum/'],
-        ['Sinopec',364,'≈364 mil M$','assets/quick-cards/companies-revenue-3.webp','https://fortune.com/company/sinopec-group/'],
-        ['UnitedHealth Group',447.5,'≈447,5 mil M$','assets/quick-cards/companies-revenue-4.webp','https://fortune.com/company/unitedhealth-group/'],
-        ['Saudi Aramco',446,'≈446 mil M$','assets/quick-cards/companies-revenue-5.webp','https://fortune.com/company/saudi-aramco/'],
-        ['State Grid',555,'≈555 mil M$','assets/quick-cards/companies-revenue-6.webp','https://fortune.com/company/state-grid/'],
-        ['Amazon',717,'≈717 mil M$','assets/quick-cards/companies-revenue-7.webp','https://fortune.com/company/amazon-com/'],
-        ['Walmart',713,'≈713 mil M$','assets/quick-cards/companies-revenue-8.webp','https://fortune.com/company/walmart/']
+        ["Apple",416,"≈416 mil M$","assets/quick-cards/companies-revenue-1.webp","https://fortune.com/company/apple/",null,"Además de vender dispositivos, obtiene ingresos por servicios: la facturación no procede exclusivamente de la venta del iPhone.","https://www.apple.com/newsroom/2025/10/apple-reports-fourth-quarter-results/"],
+        ["China National Petroleum",402,"≈402 mil M$","assets/quick-cards/companies-revenue-2.webp","https://fortune.com/company/china-national-petroleum/",null,"Su actividad recorre distintas etapas del petróleo y el gas, desde la exploración hasta el refino y la comercialización.","https://www.cnpc.com.cn/en/aboutcnpc/aboutcnpc_index.shtml"],
+        ["Sinopec",364,"≈364 mil M$","assets/quick-cards/companies-revenue-3.webp","https://fortune.com/company/sinopec-group/",null,"Combina negocios de refino, productos químicos y distribución; no es solo una empresa dedicada a extraer petróleo.","https://www.sinopecgroup.com/u/cms/jtyw/202603/22203315gxqf.pdf"],
+        ["UnitedHealth Group",447.5,"≈447,5 mil M$","assets/quick-cards/companies-revenue-4.webp","https://fortune.com/company/unitedhealth-group/",null,"Opera en seguros y servicios sanitarios. Su presencia en un ranking de ingresos no significa que venda bienes físicos como un comercio.","https://www.unitedhealthgroup.com/who-we-are.html"],
+        ["Saudi Aramco",446,"≈446 mil M$","assets/quick-cards/companies-revenue-5.webp","https://fortune.com/company/saudi-aramco/",null,"La cadena de negocio incluye extracción, procesamiento y otras actividades energéticas; los precios del petróleo influyen en sus resultados.","https://www.aramco.com/en/about-us"],
+        ["State Grid",555,"≈555 mil M$","assets/quick-cards/companies-revenue-6.webp","https://fortune.com/company/state-grid/",null,"Su actividad principal es la red eléctrica: transportar y distribuir electricidad es distinto de vender productos en tiendas.","https://www.sgcc.com.cn/html/sgcc_main_en/col2017112401/column_2017112401_1.shtml"],
+        ["Amazon",717,"≈717 mil M$","assets/quick-cards/companies-revenue-7.webp","https://fortune.com/company/amazon-com/",null,"La venta por internet convive con negocios como los servicios de computación en la nube de AWS.","https://www.aboutamazon.com/what-we-do"],
+        ["Walmart",713,"≈713 mil M$","assets/quick-cards/companies-revenue-8.webp","https://fortune.com/company/walmart/",null,"Su escala comercial combina tiendas físicas y comercio electrónico; los ingresos son ventas totales, no beneficio neto.","https://corporate.walmart.com/about"]
       ]
     ),
     d(
@@ -670,15 +670,15 @@
       'entertainment',
       S.tv,
       [
-        ['First Dates',10,'hace 10 años','assets/quick-cards/spanish-tv-1.webp','https://www.cuatro.com/firstdates/'],
-        ['Sálvame',17,'hace 17 años','assets/quick-cards/spanish-tv-2.webp','https://www.telecinco.es/salvame/'],
-        ['La ruleta de la suerte',20,'hace 20 años','assets/quick-cards/spanish-tv-3.webp','https://www.antena3.com/programas/la-ruleta-de-la-suerte/'],
-        ['El Hormiguero',20,'hace 20 años','assets/quick-cards/spanish-tv-4.webp','https://www.antena3.com/programas/el-hormiguero/'],
-        ['Pasapalabra',26,'hace 26 años','assets/quick-cards/spanish-tv-5.webp','https://www.antena3.com/programas/pasapalabra/'],
-        ['Gran Hermano',26,'hace 26 años','assets/quick-cards/spanish-tv-6.webp','https://www.telecinco.es/granhermano/'],
-        ['Cuéntame cómo pasó',25,'hace 25 años','assets/quick-cards/spanish-tv-7.webp','https://www.rtve.es/television/cuentame/'],
-        ['Saber y ganar',29,'hace 29 años','assets/quick-cards/spanish-tv-8.webp','https://www.rtve.es/play/videos/saber-y-ganar/'],
-        ['Informe semanal',53,'hace 53 años','assets/quick-cards/spanish-tv-9.webp','https://www.rtve.es/play/videos/informe-semanal/']
+        ["First Dates",10,"hace 10 años","assets/quick-cards/spanish-tv-1.webp","https://www.cuatro.com/firstdates/",null,"Su restaurante funciona como escenario de primeras citas entre personas que no se conocían antes del programa."],
+        ["Sálvame",17,"hace 17 años","assets/quick-cards/spanish-tv-2.webp","https://www.telecinco.es/salvame/",null,"La tertulia de actualidad del corazón se convirtió en su formato característico, con colaboradores presentes en el plató."],
+        ["La ruleta de la suerte",20,"hace 20 años","assets/quick-cards/spanish-tv-3.webp","https://www.antena3.com/programas/la-ruleta-de-la-suerte/",null,"Las letras descubren poco a poco una frase o expresión; resolver el panel exige combinar vocabulario y estrategia."],
+        ["El Hormiguero",20,"hace 20 años","assets/quick-cards/spanish-tv-4.webp","https://www.antena3.com/programas/el-hormiguero/",null,"Trancas y Barrancas, las hormigas del programa, acompañan las entrevistas y los juegos con los invitados."],
+        ["Pasapalabra",26,"hace 26 años","assets/quick-cards/spanish-tv-5.webp","https://www.antena3.com/programas/pasapalabra/",null,"El Rosco es su prueba más reconocible: las respuestas se asocian a letras y permiten pasar a la siguiente pregunta."],
+        ["Gran Hermano",26,"hace 26 años","assets/quick-cards/spanish-tv-6.webp","https://www.telecinco.es/granhermano/",null,"La convivencia bajo cámaras convirtió la observación de la vida cotidiana en el centro de un concurso televisivo."],
+        ["Cuéntame cómo pasó",25,"hace 25 años","assets/quick-cards/spanish-tv-7.webp","https://www.rtve.es/television/cuentame/",null,"La familia Alcántara sirve para recorrer los cambios de España desde finales de los años sesenta."],
+        ["Saber y ganar",29,"hace 29 años","assets/quick-cards/spanish-tv-8.webp","https://www.rtve.es/play/videos/saber-y-ganar/",null,"Jordi Hurtado ha sido una de sus figuras más reconocibles; el concurso combina cultura general, cálculo y otras pruebas."],
+        ["Informe semanal",53,"hace 53 años","assets/quick-cards/spanish-tv-9.webp","https://www.rtve.es/play/videos/informe-semanal/",null,"Utiliza reportajes para explicar la actualidad con más contexto que una noticia breve de un informativo."]
       ]
     ),
     d(
@@ -690,16 +690,16 @@
       'science',
       S.wages,
       [
-        ['Bulgaria',620,'620 €/mes','assets/quick-cards/minimum-wages-1.webp'],
-        ['Rumanía',849.53,'≈849,53 €/mes','assets/quick-cards/minimum-wages-2.webp'],
-        ['Polonia',1143.61,'≈1.143,61 €/mes','assets/quick-cards/minimum-wages-3.webp'],
-        ['España',1424.5,'≈1.424,50 €/mes equivalentes en 12 pagas (1.221 € en 14 pagas)','assets/quick-cards/minimum-wages-4.webp'],
-        ['Francia',1867.02,'≈1.867,02 €/mes','assets/quick-cards/minimum-wages-5.webp'],
-        ['Bélgica',2189.81,'≈2.189,81 €/mes','assets/quick-cards/minimum-wages-6.webp'],
-        ['Países Bajos',2338.44,'≈2.338,44 €/mes','assets/quick-cards/minimum-wages-7.webp'],
-        ['Alemania',2343.35,'≈2.343,35 €/mes','assets/quick-cards/minimum-wages-8.webp'],
-        ['Irlanda',2391.35,'≈2.391,35 €/mes','assets/quick-cards/minimum-wages-9.webp'],
-        ['Luxemburgo',2771,'2.771 €/mes','assets/quick-cards/minimum-wages-10.webp']
+        ["Bulgaria",620,"620 €/mes","assets/quick-cards/minimum-wages-1.webp",null,null,"La comparación usa un importe bruto: las deducciones personales pueden hacer que la cantidad recibida sea distinta.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Rumanía",849.53,"≈849,53 €/mes","assets/quick-cards/minimum-wages-2.webp",null,null,"El salario nacional se fija en lei; Eurostat lo convierte a euros, por lo que el tipo de cambio influye en la comparación.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Polonia",1143.61,"≈1.143,61 €/mes","assets/quick-cards/minimum-wages-3.webp",null,null,"La cifra nacional se publica en zlotys; pasarla a euros no elimina las diferencias de precios entre países.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["España",1424.5,"≈1.424,50 €/mes equivalentes en 12 pagas (1.221 € en 14 pagas)","assets/quick-cards/minimum-wages-4.webp",null,null,"La cifra anual se reparte aquí entre doce meses para poder compararla con países que tienen otro calendario de pagos.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Francia",1867.02,"≈1.867,02 €/mes","assets/quick-cards/minimum-wages-5.webp",null,null,"El SMIC se expresa también por hora; la cifra mensual equivalente depende de la jornada que se utiliza para calcularlo.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Bélgica",2189.81,"≈2.189,81 €/mes","assets/quick-cards/minimum-wages-6.webp",null,null,"El mínimo belga se conoce como ingreso mínimo mensual medio garantizado: su definición procede de acuerdos colectivos nacionales.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Países Bajos",2338.44,"≈2.338,44 €/mes","assets/quick-cards/minimum-wages-7.webp",null,null,"El mínimo se fija por hora; Eurostat utiliza un factor de conversión para presentarlo como equivalente mensual.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Alemania",2343.35,"≈2.343,35 €/mes","assets/quick-cards/minimum-wages-8.webp",null,null,"El mínimo se expresa por hora. Un equivalente mensual estadístico no es una nómina idéntica para todas las jornadas.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Irlanda",2391.35,"≈2.391,35 €/mes","assets/quick-cards/minimum-wages-9.webp",null,null,"El mínimo nacional se publica por hora; la cifra mensual de la tabla es una conversión para facilitar la comparación.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"],
+        ["Luxemburgo",2771,"2.771 €/mes","assets/quick-cards/minimum-wages-10.webp",null,null,"El salario social mínimo distingue situaciones como la cualificación profesional; la comparación usa el nivel general indicado por Eurostat.","https://ec.europa.eu/eurostat/cache/metadata/en/earn_minw_esms.htm"]
       ]
     ),
     // Se conserva este mazo ya existente para no romper partidas guardadas de la primera fase.
@@ -712,15 +712,15 @@
       'entertainment',
       'https://www.pokerstars.com/poker/games/rules/hand-rankings/',
       [
-        ['Carta alta',1,'1.ª'],
-        ['Pareja',2,'2.ª'],
-        ['Doble pareja',3,'3.ª'],
-        ['Trío',4,'4.ª'],
-        ['Escalera',5,'5.ª'],
-        ['Color',6,'6.ª'],
-        ['Full',7,'7.ª'],
-        ['Póker',8,'8.ª'],
-        ['Escalera de color',9,'9.ª']
+        ["Carta alta",1,"1.ª",null,null,null,"Cuando no hay una combinación superior, decide la carta más alta; si coincide, se comparan las siguientes."],
+        ["Pareja",2,"2.ª",null,null,null,"Reúne dos cartas del mismo valor. En un empate también importan las cartas que acompañan a la pareja."],
+        ["Doble pareja",3,"3.ª",null,null,null,"Contiene dos parejas de valores diferentes; primero se compara la pareja mayor y después la menor."],
+        ["Trío",4,"4.ª",null,null,null,"Tres cartas comparten valor. Las otras dos pueden decidir un empate entre tríos iguales."],
+        ["Escalera",5,"5.ª",null,null,null,"Son cinco valores consecutivos. El as puede cerrar la secuencia alta o iniciar A-2-3-4-5, pero no unir ambos extremos a la vez."],
+        ["Color",6,"6.ª",null,null,null,"Las cinco cartas son del mismo palo; no necesitan tener valores consecutivos."],
+        ["Full",7,"7.ª",null,null,null,"Combina un trío y una pareja. Para desempatar se compara primero el valor del trío."],
+        ["Póker",8,"8.ª",null,null,null,"Reúne las cuatro cartas de un mismo valor; la quinta carta actúa como acompañante para resolver ciertos empates."],
+        ["Escalera de color",9,"9.ª",null,null,null,"Combina una escalera con un solo palo. La escalera real es su caso más alto, no una familia independiente en este mazo."]
       ]
     )
   ]};
