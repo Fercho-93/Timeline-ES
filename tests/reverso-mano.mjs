@@ -39,6 +39,14 @@ function checkBoard(document, count) {
     assert.equal(card.querySelector('.animal-card-art'), null, 'la mano no revela ilustraciones');
   }
 }
+function checkPendingHand(document) {
+  assert.ok(document.querySelector('.slot-confirm'), 'la vista previa sigue en la línea');
+  assert.equal(document.querySelectorAll('.hand-card.selected, .hand-card[aria-pressed="true"]').length, 0,
+    'ninguna carta de arriba está seleccionada durante la vista previa');
+  assert.ok(document.querySelector('.hand-placement-pending'), 'el carrusel mantiene un centro sin resaltarlo en rojo');
+}
+assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pending\) \.hand-card\.fan-center\s*\{/,
+  'el centro del carrusel solo tiene el resaltado rojo cuando no hay vista previa');
 {
   const window = boot(), document = window.document;
   try {
@@ -79,6 +87,17 @@ function checkBoard(document, count) {
     assert.notEqual(document.querySelector('.hand-card.selected').dataset.id, before, 'la flecha elige la siguiente carta');
     click(document, '[data-fan-step="-1"]');
     assert.equal(document.querySelector('.hand-card.selected').dataset.id, before, 'el carrusel conserva el orden');
+    click(document, '[data-action="place"]');
+    checkPendingHand(document);
+    click(document, '[data-action="place"]');
+    checkPendingHand(document);
+    click(document, '[data-action="cancel-place"]');
+    assert.equal(document.querySelector('.hand-card.selected').dataset.id, before, 'cancelar devuelve la selección a su carta');
+    assert.equal(document.querySelector('.hand-placement-pending'), null);
+    click(document, '[data-action="place"]');
+    click(document, '.hand-card');
+    assert.equal(document.querySelector('.slot-confirm'), null, 'elegir otra carta retira la vista previa anterior');
+    assert.equal(document.querySelectorAll('.hand-card.selected').length, 1);
   } finally { window.close(); }
 }
 {
@@ -96,6 +115,12 @@ function checkBoard(document, count) {
     checkBoard(document, 4);
     click(document, '[data-online-action="select"]');
     assert.equal(document.querySelectorAll('.hand-card.selected').length, 1);
+    const before = document.querySelector('.hand-card.selected').dataset.id;
+    click(document, '[data-online-action="place"]');
+    checkPendingHand(document);
+    click(document, '[data-online-action="cancel-place"]');
+    assert.equal(document.querySelector('.hand-card.selected').dataset.id, before);
+    assert.equal(document.querySelector('.hand-placement-pending'), null);
   } finally { window.close(); }
 }
 {

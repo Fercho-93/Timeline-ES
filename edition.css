@@ -3958,7 +3958,7 @@ html:not(:has(#app[data-screen="home"]))::before {
   box-shadow: 0 7px 12px #51351d33;
   opacity: .8; animation: none;
 }
-#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card.fan-center {
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan:not(.hand-placement-pending) .hand-card.fan-center {
   opacity: 1; border: 2px solid #a75438; outline: 1px solid #a7543880; outline-offset: 2px;
   box-shadow: 0 3px 0 #734632, 0 12px 22px #663b2d59;
 }

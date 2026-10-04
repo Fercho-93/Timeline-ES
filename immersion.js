@@ -164,6 +164,8 @@
   let previousFan = null;
   function mountHandFan(hand) {
     const cards = [...hand.querySelectorAll('.hand-card')];
+    // La carta activa está en la línea; centrar otra en el abanico no la selecciona.
+    hand.classList.toggle('hand-placement-pending', !!hand.closest('#app')?.querySelector('.slot-confirm'));
     if (hand.classList.contains('hand-solo') || cards.length < 2) return;
     hand.classList.add('hand-fan');
     hand.setAttribute('role', 'group');
