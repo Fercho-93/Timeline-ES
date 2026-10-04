@@ -16,8 +16,8 @@ let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
 // Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
 const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
-assert.equal(quickCards.length, 395);
-assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 395);
+assert.equal(quickCards.length, 405);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 405);
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
@@ -60,24 +60,20 @@ s = E.step(s, {type: 'bank'}); s = E.step(s, {type: 'bank'});
 assert.equal(s.players[0].score, 1); assert.equal(s.players[0].roundScore, 1);
 assert.throws(() => E.step(s, {type: 'bank'}));
 // Agotamiento, orden de izquierda a derecha y empates válidos.
-// Regla de todo el juego: la izquierda es lo menor/más antiguo y la derecha lo mayor/más reciente. Los Óscar (de menos a más
-// premios), las ciudades (de sur a norte) y las temporadas se leen así; el único mazo guardado al revés es el de programas por
-// estreno, porque la cifra son «años desde entonces» y lo más antiguo (más años) debe ir a la izquierda.
-for (const c of CT.QuickCatalog.challenges) {
-  if (c.id === 'spanish-tv') continue;
-  assert.equal(c.direction, 1, `${c.id}: de izquierda a derecha, de menos a más`);
-}
-const tv = E.challenge('spanish-tv');
-assert.equal(tv.direction, -1);
-s = E.create({names: ['A', 'B'], rounds: [round('spanish-tv')]});
-while (s.remaining.length) {
-  const id = s.remaining[0], años = x => tv.cards.find(c => c.id === x).value;
-  const lugar = s.timeline.findIndex(t => años(t) < años(id));   // los de menos años quedan a su derecha
-  s = E.step(s, {type: 'place', cardId: id, index: lugar < 0 ? s.timeline.length : lugar});
-  assert.equal(s.result.correct, true, 'cada programa más antiguo va a la izquierda'); s = E.step(s, {type: 'ack'});
-}
-assert.equal(s.phase, 'round-end');
-{ const años = s.timeline.map(id => tv.cards.find(c => c.id === id).value); assert.equal(JSON.stringify(años), JSON.stringify([...años].sort((x, y) => y - x)), 'a la izquierda, los años más altos'); }
+// De izquierda a derecha, cada mazo aumenta su magnitud o su fecha absoluta.
+for (const c of CT.QuickCatalog.challenges) assert.equal(c.direction,1,c.id);
+const tv=E.challenge('spanish-tv');
+assert.equal(tv.cards.length,19);
+assert.equal(tv.asOf,null,'las fechas históricas no llevan fecha de actualización anual');
+const tvSources=JSON.parse(read('docs/fuentes-programas-estrenos-2026-10-04.json'));
+for(const r of tvSources.cards){const card=tv.cards.find(c=>c.id===r.id);const [year,month]=r.date.split('-').map(Number);assert.equal(card.value,year*100+month);assert.equal(card.label,r.label);assert.equal(card.source,r.source);assert.ok(!/hace|años transcurridos/.test(card.detail+' '+card.label));}
+s=E.create({names:['A','B'],rounds:[round('spanish-tv')]});
+while(s.remaining.length){const id=s.remaining[0],date=x=>tv.cards.find(c=>c.id===x).value;const place=s.timeline.findIndex(t=>date(t)>date(id));s=E.step(s,{type:'place',cardId:id,index:place<0?s.timeline.length:place});assert.equal(s.result.correct,true);s=E.step(s,{type:'ack'});}
+assert.equal(s.phase,'round-end');
+{const dates=s.timeline.map(id=>tv.cards.find(c=>c.id===id).value);assert.equal(JSON.stringify(dates),JSON.stringify([...dates].sort((a,b)=>a-b)));}
+{const order=['spanish-tv-3','spanish-tv-4'],state=E.create({names:['A','B'],rounds:[{id:'spanish-tv',order}]});assert.equal(E.step(state,{type:'place',cardId:order[1],index:1}).result.correct,true,'abril de 2006 antes de septiembre de 2006');assert.equal(E.step(state,{type:'place',cardId:order[1],index:0}).result.correct,false,'el mismo año no basta para empatar');}
+const oldTvSave={version:3,config:{names:['Ana','Luis'],rounds:[{id:'spanish-tv',order:Array.from({length:9},(_,i)=>'spanish-tv-'+(i+1))}]},commands:[{type:'place',cardId:'spanish-tv-2',index:0}]};
+assert.equal(E.restore(oldTvSave).phase,'result');assert.equal(E.restore(oldTvSave).result.correct,true);
 s = E.create({names: ['A', 'B'], rounds: [round('oscars')]});
 assert.equal(E.step(s, {type: 'place', cardId: 'oscars-2', index: 0}).result.correct, true, 'con menos Óscar que la de referencia, va a su izquierda');
 assert.equal(E.step(s, {type: 'place', cardId: 'oscars-2', index: 1}).result.correct, false, 'y no a su derecha');
