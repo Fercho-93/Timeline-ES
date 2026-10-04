@@ -750,8 +750,9 @@ function anotaProgreso() {
   if (roomState.phase === "reveal" && roomState.reveal) {
     const { reveal } = roomState;
     const mine=reveal.playerUid===user.uid;
+    CT.Progreso.discover({ mode: modeKey(), cardId: reveal.cardId, mine: reveal.targetUid === user.uid, correct: !!reveal.targetOk });
     const card=mine?CT.cards(modeKey()).find(item=>item.id===reveal.cardId):null;
-    const nuevaLamina=mine&&card&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(modeKey(),card);
+    const nuevaLamina=mine&&reveal.correct&&card&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(modeKey(),card);
     nuevos.push(...CT.Progreso.recordOnline({
       code: roomCode, version: roomState.version, mine,
       mode: modeKey(), cardId: reveal.cardId, correct: !!reveal.correct,

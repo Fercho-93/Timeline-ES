@@ -34,11 +34,11 @@
       byMode: {},
       byBand: {},
       misses: {},
-      // Las cartas ya descubiertas: las que han pasado por tu mano y te han enseñado su
-      // valor al resolverlas, aciertos y fallos por igual. Es lo que decide qué
-      // ilustraciones se ven en la enciclopedia. Son identificadores únicos en todo el
-      // juego, así que descubrir una carta en «Gran mezcla» la descubre en su mazo.
+      // Historial de cartas vistas, conservado para las versiones anteriores.
+      // El álbum usa exclusivamente mastered, no esta lista.
       seen: [],
+      // Solo aciertos propios verificables; el antiguo seen mezclaba aciertos y fallos.
+      mastered: [],
       achievements: {},
       // Las últimas jugadas de sala ya contadas, como `CÓDIGO:versión`. Ver `recordOnline`.
       seenOnline: [],
@@ -150,6 +150,7 @@
       byBand: normalizeByBand(stored.byBand),
       misses: normalizeMisses(stored.misses),
       seen: normalizeSeen(stored.seen),
+      mastered: normalizeSeen(stored.mastered),
       achievements: normalizeAchievements(stored.achievements),
       seenOnline: Array.isArray(stored.seenOnline) ? stored.seenOnline.filter(item => typeof item === "string").slice(-SEEN_ONLINE) : [],
       lastOnline: str(stored.lastOnline, base.lastOnline)
@@ -283,7 +284,7 @@
 
   // Una colocación resuelta. `hidden` es que el tablero estuviera oculto (Fantasma o
   // Experto) y `pulse`, que la carta viniera de un Pulso lanzado por quien registra.
-  function apply(profile, { mode, cardId, correct, kind = "free", hidden = false, pulse = false }) {
+  function apply(profile, { mode, cardId, correct, kind = "free", hidden = false, pulse = false, mine = kind !== "local" }) {
     if (!CT.has(mode)) return;
     profile.playerId = profile.playerId || playerId();
     profile.totals.cards += 1;
@@ -292,10 +293,9 @@
     entry.byKind[kind] = (entry.byKind[kind] || 0) + 1;
 
     const card = cardById(mode, cardId);
-    // Jugar una carta la descubre, se acierte o se falle: en los dos casos la pantalla de
-    // resultado te enseña su valor, su explicación y su lámina. Lo contrario —descubrir
-    // solo con los aciertos— dejaría escondidas justo las cartas que más interesa repasar.
+    // El historial conserva las cartas jugadas; el álbum solo desbloquea aciertos propios.
     if (card && !profile.seen.includes(cardId)) profile.seen.push(cardId);
+    if (card && correct && mine && !profile.mastered.includes(cardId)) profile.mastered.push(cardId);
     if (card) {
       const band = CT.eraForCard(mode, card);
       // La clave lleva el mazo delante: «antigua» existe en varios ejes y sin él se
@@ -560,13 +560,23 @@
   // veces —una por carta de la enciclopedia—, así que se devuelve el conjunto entero y
   // no un `isSeen(id)` que volvería a leer el almacenamiento en cada tarjeta.
   function seenCards() {
-    return new Set(read().seen);
+    return new Set(read().mastered);
+  }
+
+  // Un acierto verificable de un duelo guardado recupera la lámina sin volver a sumar estadísticas.
+  function discover({ mode, cardId, correct, mine }) {
+    if (!correct || !mine || !CT.has(mode) || !cardById(mode, cardId)) return false;
+    const profile = read();
+    if (profile.mastered.includes(cardId)) return false;
+    profile.mastered.push(cardId);
+    save(profile);
+    return true;
   }
 
   CT.Progreso = {
     KEY, ACHIEVEMENTS,
     read, record, recordOnline, finishGame, finishQuickDaily, finishOnline, finishCompetition, reset, playerId,
-    summary, modeRows, weakBands, weakCards, achievements, seenCards,
+    summary, modeRows, weakBands, weakCards, achievements, seenCards, discover,
     exportJson, importJson
   };
 })();

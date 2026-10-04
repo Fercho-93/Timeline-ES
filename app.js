@@ -1092,6 +1092,13 @@
     renderPass();
   }
 
+  function ownsLocalAtlas(player) {
+    const normalize = name => String(name || "").trim().toLocaleLowerCase("es");
+    const owner = normalize(CT.Accounts?.profile?.alias || CT.Identidad?.nombre?.());
+    return !!owner && normalize(player?.name) === owner
+      && game.players.filter(p => normalize(p.name) === owner).length === 1;
+  }
+
   function currentPlayer() { return game.players[game.current]; }
 
   function renderPass() {
@@ -1242,8 +1249,8 @@
     CT.Effects.feedback(correct);
     selectedCardId = null;
     // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
-    const nuevaLamina=!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(game.mode,card);
-    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", hidden: !!game.ghost?.pending.length }));
+    const nuevaLamina=correct&&ownsLocalAtlas(player)&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(game.mode,card);
+    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", mine: ownsLocalAtlas(player), hidden: !!game.ghost?.pending.length }));
     if(nuevaLamina)game.newDiscoveries=(game.newDiscoveries||0)+1;
     saveGame();
     renderResult();
@@ -1373,7 +1380,7 @@
     game.pulseTurn.byOk = aciertaEn(card, index);
     game.pulseTurn.stage = PULSE_PASE;
     pendingIndex = null;
-    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: game.pulseTurn.byOk, kind: "local", hidden: !!game.ghost?.pending.length, pulse: true }));
+    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: game.pulseTurn.byOk, kind: "local", mine: ownsLocalAtlas(currentPlayer()), hidden: !!game.ghost?.pending.length, pulse: true }));
     saveGame();
     renderPulsePass();
   }
@@ -1410,7 +1417,7 @@
       correct: byOk, card, pulse: true, duel: true, targetOk,
       byName: player.name, targetName: target.name, gift, posiciones, penaltySkipped
     };
-    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: targetOk, kind: "local", hidden: !!game.ghost?.pending.length, pulse: true }));
+    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: targetOk, kind: "local", mine: ownsLocalAtlas(target), hidden: !!game.ghost?.pending.length, pulse: true }));
     saveGame();
     renderResult();
   }
@@ -1678,7 +1685,7 @@
     screen = "enciclopedia";
     const all = encMode === "all";
     const mode = all ? {name: "Álbum de láminas"} : CT.mode(encMode);
-    const bands = all ? [] : CT.Enciclopedia.bands(encMode);
+    const bands = []; // No se filtra el álbum por la respuesta oculta.
     const cards = all
       ? CT.Enciclopedia.catalogGroups(encQuery, { lock: encLock }).flatMap(group => group.decks.flatMap(deck => deck.cards))
       : CT.Enciclopedia.filterCards(encMode, { query: encQuery, band: encBand, lock: encLock });
@@ -1703,13 +1710,13 @@
             </div>
           </div>` : ''}
           <details class="enc-advanced-filters">
-            <summary>Buscar o acotar por periodo</summary>
+            <summary>Buscar cartas</summary>
             <div class="enc-advanced-body">
               <div class="field">
                 <label for="enc-search-input">Buscar</label>
                 <input id="enc-search-input" type="search" autocomplete="off" placeholder="Título, explicación o fuente…" value="${escapeHtml(encQuery)}">
               </div>
-              ${all ? '' : `<div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
+              ${all || !bands.length ? '' : `<div class="enc-bands" role="group" aria-label="Filtrar por época o magnitud">
                 <button type="button" id="enc-band-all" class="band-chip${encBand === "all" ? " active" : ""}" data-action="enc-band" data-band="all" aria-pressed="${encBand === "all"}">Todas</button>
                 ${bands.map(band => `<button type="button" id="enc-band-${band.key}" class="band-chip${encBand === band.key ? " active" : ""}" data-action="enc-band" data-band="${band.key}" aria-pressed="${encBand === band.key}"><span aria-hidden="true">${band.symbol}</span> ${escapeHtml(band.name)}</button>`).join("")}
               </div>`}
@@ -1765,7 +1772,7 @@
     // Abrir la enciclopedia de un mazo cerrado la abre entera, no ese mazo.
     encMode = modeKey === "all" || (CT.has(modeKey) && CT.Cartera.tiene(modeKey)) ? modeKey : "all";
     encQuery = "";
-    encBand = band;
+    encBand = "all";
     // Cada mazo entra por «todas»: llegar a uno nuevo con el filtro de otro puesto —y con
     // media colección escondida sin saber por qué— es la manera más rápida de perderse.
     // Vale también al llegar desde un punto débil del perfil, donde lo que se busca es
@@ -2716,7 +2723,7 @@
     };
     CT.Effects.feedback(correct);
     solo.pendingResult = { correct, cardId: card.id, attemptedIndex: result.attemptedIndex, correctIndex: result.correctIndex };
-    const nuevaLamina=!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(solo.mode,card);
+    const nuevaLamina=correct&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(solo.mode,card);
     anotaLogros(CT.Progreso.record({ mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() }));
     if(nuevaLamina)solo.newDiscoveries=(solo.newDiscoveries||0)+1;
     saveSolo();

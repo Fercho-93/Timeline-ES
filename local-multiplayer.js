@@ -203,6 +203,13 @@
     }
     const previous = roomState;
     roomState = room;
+    if (room.phase === "reveal" && room.reveal) {
+      const reveal = room.reveal;
+      CT.Progreso?.discover?.({ mode: modeKey, cardId: reveal.cardId,
+        mine: reveal.playerId === myPlayerId, correct: !!reveal.correct });
+      CT.Progreso?.discover?.({ mode: modeKey, cardId: reveal.cardId,
+        mine: reveal.targetId === myPlayerId, correct: !!reveal.targetOk });
+    }
     if (previous?.phase !== room.phase || previous?.status !== room.status) renderGame.revelando = false;
     if (role === "guest") rememberSeat();
     if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir", "local-cercanas", "local-final", "local-final-secreta"].includes(screen)) renderCurrent();

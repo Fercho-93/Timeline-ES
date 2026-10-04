@@ -266,6 +266,17 @@ function prepareTurn() {
   const key = `${current.id}-${current.turnIndex}`;
   if (preparingTurn !== key) { preparingTurn = key; enteredAt = Date.now(); }
 }
+function discoverOwnPlays(game) {
+  for (const play of game.plays || []) {
+    const card = CT.cards(game.mode).find(c => c.id === play.cardId);
+    CT.Progreso?.discover?.({
+      mode: game.mode, cardId: play.cardId, mine: play.uid === uid(),
+      correct: !play.timeout && (game.kind === 'cifras'
+        ? !!card && CT.Duelo.Cifras.acierto(game.mode, card, play)
+        : play.correct === true)
+    });
+  }
+}
 function subscribe(gameId) {
   stop?.();
   stop = onSnapshot(doc(db, 'turnDuels', gameId), snap => {
@@ -275,6 +286,7 @@ function subscribe(gameId) {
     const ownPlay=current?.plays && next.plays?.length===current.plays.length+1 ? next.plays.at(-1) : null;
     if(ownPlay?.uid===uid())CT.Effects?.feedback(next.kind==='cifras'?ownPlay.points>0:ownPlay.correct===true);
     current = asVisible({ ...next, id: gameId, shareLink });
+    discoverOwnPlays(current);
     if (previousTurn !== current.turnIndex) { pendingIndex = null; delivery = ''; }
     prepareTurn();
     if (wasPlayingAway && current.turnUid === uid()) notify('Tu oponente ha colocado una carta. Te toca.');
@@ -305,6 +317,7 @@ async function list() {
   archivedIds = new Set(results[2].docs.map(d => d.id));
   blockedPlayers = new Map(results[3].docs.map(d => [d.id, d.data().alias || 'Jugador']));
   cachedGames = [...new Map(results.slice(0, 2).flatMap(s => s.docs.map(d => [d.id, asVisible({ ...d.data(), id: d.id })]))).values()];
+  cachedGames.forEach(discoverOwnPlays);
   return cachedGames;
 }
 async function archive(gameId, restore = false) {

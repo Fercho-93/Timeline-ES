@@ -1,5 +1,5 @@
-// La enciclopedia deja consultar cualquier mazo fuera de partida: valor, época y
-// explicación de cada carta, sin esperar a fallarla para conocerla. Es solo lectura y
+// El álbum deja explorar las explicaciones sin mostrar los valores de juego.
+// Las ilustraciones se desbloquean exclusivamente con aciertos propios. Es solo lectura y
 // solo lógica pura de filtrado — la pantalla que la usa vive en app.js, igual que
 // `ghost.js` da la aritmética de los poderes y deja la pantalla a quien la pide.
 (function () {
@@ -21,7 +21,7 @@
 
   function matches(modeKey, card, query) {
     if (!query) return true;
-    const texto = normalize(`${card.title} ${card.detail} ${card.source || ""}`);
+    const texto = normalize(`${card.title} ${description(card)} ${card.source || ""}`);
     return texto.includes(query);
   }
 
@@ -36,7 +36,7 @@
       .filter(card => !vistas || (!!CT.cardArt(modeKey, card) && vistas.has(card.id) === (lock === "seen")))
       .filter(card => matches(modeKey, card, q))
       .slice()
-      .sort((a, b) => CT.sortValue(modeKey, a) - CT.sortValue(modeKey, b));
+      .sort((a, b) => a.title.localeCompare(b.title, "es"));
   }
 
   // Qué cartas tienen la lámina a la vista. Se pide una vez por pantalla y se pasa a cada
@@ -57,12 +57,13 @@
     <path d="M12 15.9v2.4" stroke="var(--enc-sello-hueco)" stroke-width="1.7" stroke-linecap="round"/>
   </svg>`;
 
-  // Igual que las cartas de la partida, pero siempre reveladas y con la fuente cuando la
-  // carta la lleva: el valor, la época y la explicación se leen sin haber jugado nunca.
-  //
-  // Lo único que se gana jugando es la lámina: hasta que la carta pasa por tu mano, en su
-  // sitio hay un sello cerrado. La enciclopedia sigue sirviendo para consultar —que es
-  // para lo que está—, pero las ilustraciones se descubren, que es lo que invita a volver.
+  // Conserva la explicación, pero oculta cifras también cuando están dentro del texto.
+  function description(card) {
+    return String(card.detail || "")
+      .replace(/[-−]?\d+(?:[.,]\d+)*(?:\s*[–—-]\s*\d+(?:[.,]\d+)*)?/g, "…")
+      .replace(/\b(?:un[oa]?|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho|diecinueve|veinte|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien|ciento|mil)(?:\s+y\s+\w+)?\s+(?=años?\b|meses?\b|semanas?\b|días?\b|horas?\b|minutos?\b|segundos?\b|millones?\b|kilómetros?\b|metros?\b|kilogramos?\b|gramos?\b|toneladas?\b)/gi, "… ");
+  }
+
   function cardMarkup(modeKey, card, { highlight = false, descubiertas = null, interactive = true } = {}) {
     const era = CT.eraForCard(modeKey, card);
     // `cardArt` solo dice si hay lámina; el `<img>` se monta únicamente si se va a ver.
@@ -75,8 +76,8 @@
     // sello acababa pareciendo un aviso de error. Lo que dice el candado sin decirlo va
     // igualmente para quien no lo ve, en el texto que solo leen los lectores de pantalla.
     const visual = velada
-      ? `<span class="enc-sello">${CANDADO}<span class="solo-lectores">Lámina por descubrir (bloqueada). Juega esta carta para verla.</span></span>`
-      : tieneLamina ? CT.animalArt(modeKey, card) : `<span>${era.symbol}</span><small>${era.name}</small>`;
+      ? `<span class="enc-sello">${CANDADO}<span class="solo-lectores">Lámina por descubrir (bloqueada). Acierta esta carta para verla.</span></span>`
+      : tieneLamina ? CT.animalArt(modeKey, card) : `<span aria-hidden="true">✦</span>`;
     // La carta de la enciclopedia ya se abre en un formato grande. No anidamos
     // una segunda acción de zoom dentro de ella: así la ilustración aparece una
     // sola vez y la explicación queda inmediatamente debajo/al lado.
@@ -86,7 +87,7 @@
       ? `<p class="enc-source"><a href="${CT.escapeHtml(card.source)}" target="_blank" rel="noopener noreferrer">Fuente <span aria-hidden="true">↗</span><span class="solo-lectores"> (se abre en una pestaña nueva)</span></a></p>`
       : "";
     const action = interactive ? ` data-action="enc-card" data-mode="${modeKey}" data-id="${card.id}" tabindex="0" role="button" aria-label="Abrir carta ${CT.escapeHtml(card.title)}"` : "";
-    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${velada ? " enc-card-velada" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"${action}><div class="card-visual era-${era.key}">${visualFinal}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}${art ? `<div class="enc-era">${era.symbol} ${CT.escapeHtml(era.name)}</div>` : ""}<div class="year">${CT.formatValue(modeKey, card)}</div><h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(card.detail)}</p>${fuente}</div></article>`;
+    return `<article class="timeline-card enc-card${art ? " enc-card-illustrated" : ""}${velada ? " enc-card-velada" : ""}${highlight ? " enc-card-highlight" : ""}" data-enc-card="${card.id}"${action}><div class="card-visual">${visualFinal}</div><div class="card-content">${CT.categoryBadge(modeKey, card)}<h3>${CT.escapeHtml(card.title)}</h3><p>${CT.escapeHtml(description(card))}</p>${fuente}</div></article>`;
   }
 
   function resultsMarkup(modeKey, cards, { highlight = null, descubiertas = null } = {}) {
@@ -142,7 +143,7 @@
   // resuelve contra su mazo original para abrir el álbum con las últimas láminas, no con
   // una lista administrativa de filtros. Gran mezcla no duplica aquí sus cartas.
   function recentDiscoveries(limit = 6) {
-    const ids = (CT.Progreso?.read?.().seen || []).slice().reverse();
+    const ids = [...seen()].reverse();
     if (!ids.length) return [];
     const origin = new Map();
     for (const block of Object.values(CT.BLOCKS)) for (const modeKey of block.games) {
@@ -155,8 +156,8 @@
   function recentMarkup(limit = 6) {
     const latest = recentDiscoveries(limit);
     return `<section class="enc-recent" aria-labelledby="enc-recent-title"><div class="enc-album-heading"><div><span>Recién incorporadas</span><h2 id="enc-recent-title">Últimos descubrimientos</h2></div><small>${latest.length ? `${latest.length} láminas` : "Tu álbum empieza aquí"}</small></div>${latest.length
-      ? `<div class="enc-recent-strip">${latest.map(({modeKey, card}) => `<article class="enc-recent-card" data-action="enc-card" data-mode="${modeKey}" data-id="${card.id}" tabindex="0" role="button" aria-label="Abrir carta ${CT.escapeHtml(card.title)}"><div class="enc-recent-art">${CT.animalArt(modeKey, card)}</div><div><small>${CT.escapeHtml(CT.mode(modeKey).name)}</small><b>${CT.escapeHtml(card.title)}</b><span>${CT.formatValue(modeKey, card)}</span></div></article>`).join("")}</div>`
-      : `<div class="enc-recent-empty"><span aria-hidden="true">✦</span><p>Juega una carta con ilustración para colocar tu primera lámina.</p></div>`}</section>`;
+      ? `<div class="enc-recent-strip">${latest.map(({modeKey, card}) => `<article class="enc-recent-card" data-action="enc-card" data-mode="${modeKey}" data-id="${card.id}" tabindex="0" role="button" aria-label="Abrir carta ${CT.escapeHtml(card.title)}"><div class="enc-recent-art">${CT.animalArt(modeKey, card)}</div><div><small>${CT.escapeHtml(CT.mode(modeKey).name)}</small><b>${CT.escapeHtml(card.title)}</b></div></article>`).join("")}</div>`
+      : `<div class="enc-recent-empty"><span aria-hidden="true">✦</span><p>Acierta una carta con ilustración para colocar tu primera lámina.</p></div>`}</section>`;
   }
 
   const COVER = { history:"hero-history", entertainment:"hero-entertainment", science:"hero-science", nature:"hero-nature", globe:"hero-geography", mixed:"hero-mixed" };
@@ -191,5 +192,5 @@
     </section>`).join('');
   }
 
-  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup, catalogGroups, catalogMarkup, seenProgress, recentDiscoveries, recentMarkup };
+  CT.Enciclopedia = { bands, filterCards, cardMarkup, resultsMarkup, catalogGroups, catalogMarkup, seenProgress, recentDiscoveries, recentMarkup, description };
 })();

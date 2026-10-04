@@ -291,9 +291,8 @@ console.log("\nLa pantalla del perfil");
   ok("el tramo con menos aciertos sale en «Puntos débiles»", banda?.dataset.band === "antigua" && banda.dataset.mode === "history");
   ok("con su porcentaje real", /10%/.test(banda.textContent));
   banda.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
-  ok("y abre la enciclopedia ya filtrada por ese tramo", w.document.querySelector("#enc-band-antigua")?.classList.contains("active"));
-  ok("con solo las cartas de ese tramo", [...w.document.querySelectorAll("[data-enc-card]")]
-    .every(el => w.CONTINUUM.eraForCard("history", w.HISTORY_CARDS.find(c => c.id === Number(el.dataset.encCard))).key === "antigua"));
+  ok("y abre la enciclopedia sin filtrar por el valor oculto", !!w.document.querySelector("#enc-mode-select") && !w.document.querySelector(".band-chip"));
+  ok("con el mazo entero para no revelar el orden", w.document.querySelectorAll("[data-enc-card]").length === w.HISTORY_CARDS.length);
 }
 {
   // Un tramo con muy pocas cartas jugadas no es un punto débil: es no haber jugado.

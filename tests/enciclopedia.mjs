@@ -71,19 +71,19 @@ console.log("\nFiltrado puro (CT.Enciclopedia)");
     const img = fragment.querySelector('img');
     ok(`${key}: la enciclopedia usa su ilustración existente`, !!img && fs.existsSync(path.join(REPO, img.getAttribute('src'))));
     ok(`${key}: imagen diferida y contenido conservado`, img?.loading === 'lazy' || img?.getAttribute('loading') === 'lazy');
-    ok(`${key}: conserva el título y la explicación`, fragment.textContent.includes(card.title) && fragment.textContent.includes(card.detail));
+    ok(`${key}: conserva el título y la explicación`, fragment.textContent.includes(card.title) && fragment.textContent.includes(ct.Enciclopedia.description(card)));
   }
   const withoutArt = { ...ct.cards('history')[0], id: -999 };
   const markup = ct.Enciclopedia.cardMarkup('history', withoutArt);
-  ok('sin lámina conserva el símbolo de época sin imagen rota', !markup.includes('<img') && markup.includes('card-visual era-'));
+  ok('sin lámina conserva el símbolo de época sin imagen rota', !markup.includes('<img') && markup.includes('card-visual') && !markup.includes('era-'));
   w.close();
 }
 {
   const w = boot();
   const todas = w.CONTINUUM.Enciclopedia.filterCards("history", {});
   ok("sin filtro devuelve las 167 cartas", todas.length === 167);
-  const ordenado = todas.every((card, i) => i === 0 || card.year >= todas[i - 1].year);
-  ok("el orden es ascendente por el eje del mazo", ordenado);
+  const ordenado = todas.every((card, i) => i === 0 || card.title.localeCompare(todas[i - 1].title, "es") >= 0);
+  ok("el álbum se ordena por título, sin revelar el orden de juego", ordenado);
 
   const conAcento = w.CONTINUUM.Enciclopedia.filterCards("history", { query: "Córdoba" });
   const sinAcento = w.CONTINUUM.Enciclopedia.filterCards("history", { query: "cordoba" });
@@ -119,9 +119,9 @@ console.log("\nSe entra desde el menú del mazo elegido");
   ok("se puede elegir Historia de España desde la barra", /Historia de España/.test(texto(w)));
   ok("aparece el selector de mazo", existe(w, "#enc-mode-select"));
   ok("aparece el buscador", existe(w, "#enc-search-input"));
-  ok("aparecen las bandas como filtro", w.document.querySelectorAll(".band-chip").length > 1);
+  ok("no se filtra por la respuesta oculta", w.document.querySelectorAll(".band-chip").length === 0);
   ok("se listan las 167 cartas del mazo", w.document.querySelectorAll("#enc-results .timeline-card").length === 167);
-  ok("cada carta enseña su valor ya revelado", /class="year"/.test(w.document.getElementById("enc-results").innerHTML));
+  ok("las cartas del álbum no enseñan el valor de juego", !/class="year"/.test(w.document.getElementById("enc-results").innerHTML));
 }
 
 console.log("\nCambiar de mazo desde el desplegable");
@@ -153,23 +153,6 @@ console.log("\nBuscar sin perder el campo ni el foco");
 
   escribir(w, "#enc-search-input", "esto-no-existe-en-ningun-hecho-xyz");
   ok("una búsqueda sin resultados muestra el estado vacío", /Ninguna carta coincide/.test(w.document.getElementById("enc-results").textContent));
-}
-
-console.log("\nFiltrar por banda desde la pantalla");
-{
-  const w = boot();
-  abreMazo(w, "historia", "history");
-  click(irAlAtlas(w), '[data-action="home-encyclopedia"]');
-  elegir(w, '#enc-mode-select', 'history');
-  const total = w.document.querySelectorAll("#enc-results .timeline-card").length;
-  const chip = w.document.querySelector(".band-chip:not(#enc-band-all)");
-  const clave = chip.dataset.band;
-  click(w, `#enc-band-${clave}`);
-  ok("la banda elegida queda marcada", w.document.getElementById(`enc-band-${clave}`).getAttribute("aria-pressed") === "true");
-  const filtrado = w.document.querySelectorAll("#enc-results .timeline-card").length;
-  ok("el filtro de banda reduce los resultados", filtrado > 0 && filtrado < total);
-  click(w, "#enc-band-all");
-  ok("volver a «Todas» recupera el mazo entero", w.document.querySelectorAll("#enc-results .timeline-card").length === total);
 }
 
 console.log("\nSin entrada desde dentro de una partida");
@@ -294,14 +277,16 @@ console.log("\nLáminas por descubrir");
   // Ni se descarga ni se difumina lo que no se va a ver: es lo que dejaba pesada la
   // enciclopedia al abrir un mazo entero por descubrir.
   ok("y sin la imagen detrás, que no se llega a pedir", !velada.querySelector("img"));
-  ok("pero su valor y su explicación se leen igual", velada.textContent.includes(carta.title) && velada.textContent.includes(carta.detail) && !!velada.querySelector(".year"));
+  ok("se conserva la explicación sin mostrar el valor", velada.textContent.includes(carta.title) && velada.textContent.includes(CT.Enciclopedia.description(carta)) && !velada.querySelector(".year"));
   const antes = CT.Enciclopedia.seenProgress(mazo);
   ok(`el recuento empieza a cero (0 de ${antes.total})`, antes.seen === 0 && antes.total === CT.cards(mazo).length);
 
   // Jugarla la descubre, se acierte o se falle: en los dos casos se ha visto la carta.
   CT.Progreso.record({ mode: mazo, cardId: carta.id, correct: false });
+  ok("fallar no descubre la lámina", ficha(mazo).classList.contains("enc-card-velada"));
+  CT.Progreso.record({ mode: mazo, cardId: carta.id, correct: true });
   const descubierta = ficha(mazo);
-  ok("jugarla descubre la lámina, aunque se falle", !descubierta.classList.contains("enc-card-velada") && !descubierta.querySelector(".enc-sello"));
+  ok("acertarla descubre la lámina", !descubierta.classList.contains("enc-card-velada") && !descubierta.querySelector(".enc-sello"));
   ok("y el recuento del mazo lo refleja", CT.Enciclopedia.seenProgress(mazo).seen === 1);
   ok("la carta descubierta sigue trayendo su imagen", !!descubierta.querySelector("img"));
 
@@ -339,7 +324,7 @@ console.log("\nLáminas por descubrir");
   }
 
   // Y lo guardado aguanta una copia ajena: identificadores inventados o de otro tipo.
-  CT.Storage.setItem(CT.Progreso.KEY, JSON.stringify({ ...CT.Progreso.read(), seen: [carta.id, 99999999, "x", null] }));
+  CT.Storage.setItem(CT.Progreso.KEY, JSON.stringify({ ...CT.Progreso.read(), mastered: [carta.id, 99999999, "x", null] }));
   const limpio = CT.Progreso.seenCards();
   ok("una lista de descubiertas con basura se queda solo con las cartas reales", limpio.has(carta.id) && limpio.size === 1);
   w.close();
