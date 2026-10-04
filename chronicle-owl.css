@@ -16,10 +16,10 @@
 .cronista-collapsed::before { content: 'El cronista'; font: .75rem Georgia, serif; }
 .cronista-head { transform-origin: 80px 67px; animation: cronista-watch 7s ease-in-out infinite; }
 .cronista-eyes { transform-origin: 80px 58px; animation: cronista-blink 6s infinite; }
-.cronista-wing-left { transform-origin: 49px 73px; }
-.cronista-wing-right { transform-origin: 111px 74px; }
+.cronista-wing-left { transform-origin: 56px 73px; }
+.cronista-wing-right { transform-origin: 104px 74px; }
 .cronista-body { transform-origin: 80px 126px; }
-.cronista-quill { transform-origin: 117px 120px; }
+.cronista-quill { transform-origin: 113px 120px; }
 .cronista-sparkles { opacity: 0; }
 .cronista[data-mood='thinking'] .cronista-head { animation: none; transform: rotate(-12deg); }
 .cronista[data-mood='writing'] .cronista-quill { animation: cronista-write .55s ease-in-out 6; }
@@ -34,8 +34,8 @@ html[data-theme='dark'] .cronista { color: #e6cba3; background: #35291c88; borde
 @keyframes cronista-watch { 0%, 40%, 100% { transform: rotate(0); } 50%, 65% { transform: rotate(5deg); } }
 @keyframes cronista-blink { 0%, 43%, 47%, 100% { transform: scaleY(1); } 45% { transform: scaleY(.08); } }
 @keyframes cronista-write { 50% { transform: rotate(13deg); } }
-@keyframes cronista-hop { 50% { transform: translateY(-7px) rotate(-3deg); } }
-@keyframes cronista-wave { 50% { transform: rotate(25deg); } }
+@keyframes cronista-hop { 50% { transform: translateY(-4px) rotate(-2deg); } }
+@keyframes cronista-wave { 50% { transform: rotate(18deg); } }
 @keyframes cronista-nod { 50% { transform: translateY(4px) rotate(-7deg); } }
 @media (max-width: 420px) { .cronista { gap: 6px; padding-right: 5px; } .cronista-greet { flex-basis: 66px; width: 66px; height: 66px; } .cronista .cronista-message { font-size: .8rem; } }
 @media (prefers-reduced-motion: reduce) { .cronista *, .cronista[data-mood] * { animation: none !important; } }

@@ -18,37 +18,51 @@
   };
   // Dibujo vectorial propio: cada parte puede moverse sin descargar sprites.
   const artwork = `<svg class="cronista-art" viewBox="0 0 160 160" aria-hidden="true" focusable="false">
-    <ellipse cx="80" cy="147" rx="55" ry="6" fill="#503523" opacity=".15"/>
-    <g class="cronista-book" stroke="#654329" stroke-width="2.5" stroke-linejoin="round">
-      <path d="M29 128q25-10 51 0q26-10 51 0v17q-26-7-51 0q-26-7-51 0Z" fill="#a76d3b"/>
-      <path d="M31 122q25-8 49 2q25-10 49-2v18q-25-7-49 2q-25-9-49-2Z" fill="#ead5a5"/>
-      <path d="M80 125v16m-39-11 26 2m-25 4 23 2m28-6 25-2m-24 8 23-2" fill="none" opacity=".55"/>
+    <ellipse cx="80" cy="149" rx="48" ry="3" fill="#40382e" opacity=".12"/>
+    <g class="cronista-book" stroke="#756044" stroke-width="1" stroke-linejoin="round">
+      <path d="M34 131q24-7 46 1q22-8 46-1v14q-23-4-46 2q-22-6-46-2Z" fill="#5d4936"/>
+      <path d="M36 127q23-6 44 2q22-8 44-2v15q-23-5-44 2q-22-7-44-2Z" fill="#d9c6a0"/>
+      <path d="M38 128q22-4 42 3q21-7 42-3v11q-21-4-42 3q-21-7-42-3Z" fill="#f1e7ce"/>
+      <path d="M80 131v12m-36-9 26 2m-26 1 26 2m21-3 25-2m-25 5 25-2" fill="none" stroke="#b29a74" stroke-width=".65"/>
+      <path d="m83 144 5 8 3-9" fill="#917343" stroke="none"/>
     </g>
     <g class="cronista-body">
-      <path d="M45 60Q31 119 64 129h33q31-10 20-69Z" fill="#99633d" stroke="#503523" stroke-width="3"/>
-      <ellipse cx="81" cy="97" rx="26" ry="31" fill="#dcc08a"/>
-      <path d="m67 93 5 5 5-5m7 10 5 5 5-5m-25 9 5 5 5-5" fill="none" stroke="#a2784b" stroke-width="2"/>
-      <g class="cronista-wing-left"><path d="M47 70q-26 20-7 47q18-8 21-36" fill="#795037" stroke="#503523" stroke-width="3"/><path d="m42 87 6 17m-10-8 5 14" stroke="#c0935e" stroke-width="2"/></g>
-      <g class="cronista-wing-right"><path d="M113 72q25 15 12 43q-17-4-24-28" fill="#795037" stroke="#503523" stroke-width="3"/></g>
-      <path d="m65 126-7 5m10-5v7m27-7v7m3-7 7 5" stroke="#b87a36" stroke-width="4" stroke-linecap="round"/>
-      <g class="cronista-head">
-        <path d="m42 46-3-27 25 13q17-6 33 0l26-13-4 29q7 42-39 43q-45-1-38-45Z" fill="#a57449" stroke="#503523" stroke-width="3"/>
-        <path d="M80 43q-24-21-36 6q-10 30 36 36q46-6 36-36Q104 22 80 43Z" fill="#eedab0"/>
-        <g class="cronista-eyes">
-          <ellipse cx="61" cy="57" rx="13" ry="15" fill="#fcf3d6"/><ellipse cx="99" cy="57" rx="13" ry="15" fill="#fcf3d6"/>
-          <g class="cronista-pupils" fill="#392b22"><ellipse cx="63" cy="58" rx="6" ry="9"/><ellipse cx="97" cy="58" rx="6" ry="9"/></g>
-          <g fill="#fff8e9"><circle cx="65" cy="54" r="2.5"/><circle cx="99" cy="54" r="2.5"/></g>
-        </g>
-        <g fill="none" stroke="#715133" stroke-width="3"><circle cx="61" cy="58" r="18"/><circle cx="99" cy="58" r="18"/><path d="M79 56h2m-38 0-5-4m79 4 6-4"/></g>
-        <path d="m73 73 7 11 7-11q-7-8-14 0Z" fill="#c58a38" stroke="#805125" stroke-width="2"/>
-        <path d="m51 33 12 3m34 0 12-3" fill="none" stroke="#503523" stroke-width="3" stroke-linecap="round"/>
+      <path d="M55 64q-9 25-3 46q7 19 28 22q22-3 29-22q6-23-4-46Z" fill="#736451" stroke="#4e4539" stroke-width="1.3"/>
+      <path d="M67 71q-15 30-3 48q6 9 16 11q13-4 18-13q10-20-5-46Z" fill="#c8b795"/>
+      <path d="M72 77q8 6 16 0m-18 8q10 7 20 0m-22 8q12 8 24 0m-24 8q12 8 24 0m-21 8q10 7 20 0m-15 8q6 4 12 0" fill="none" stroke="#9b8662" stroke-width=".9"/>
+      <path d="m74 79 1 4m10-4-1 4m-7 5 1 4m8-4-1 4m-13 5 1 4m9-4-1 4m-4 5 1 4m9-4-1 4" stroke="#a38d68" stroke-width=".65"/>
+      <g class="cronista-wing-left">
+        <path d="M56 68q-20 22-8 54q15-9 17-37Z" fill="#615443" stroke="#4e4539" stroke-width="1.2"/>
+        <path d="M55 77q-10 21-4 37m7-29q-6 17-4 25m5-12-1 10" fill="none" stroke="#aa9776" stroke-width="1"/>
+        <path d="m49 93 7 3m-7 5 5 2m-3 5 3 1" fill="none" stroke="#aa9776" stroke-width=".65"/>
       </g>
-      <g class="cronista-quill" stroke="#654329" stroke-width="2" stroke-linejoin="round">
-        <path d="M117 120q-6-29 17-64q15 28-12 53Z" fill="#eee0bb"/>
-        <path d="m116 133 19-71m-9 32 9-5m-12 15 9-4" fill="none"/>
+      <g class="cronista-wing-right">
+        <path d="M104 69q18 21 9 49q-14-7-17-34Z" fill="#615443" stroke="#4e4539" stroke-width="1.2"/>
+        <path d="M105 78q9 19 6 33m-10-26q7 16 6 22m-6-11 3 8" fill="none" stroke="#aa9776" stroke-width="1"/>
+      </g>
+      <path d="m70 127-5 6m7-5v6m17-6v6m2-7 6 6" stroke="#957343" stroke-width="1.8" stroke-linecap="round"/>
+      <g class="cronista-head">
+        <path d="M51 42 48 16q12 8 20 15q12-4 24 0q9-9 20-15l-3 27q7 28-11 37q-18 10-36 0q-17-8-11-38Z" fill="#7f7059" stroke="#4e4539" stroke-width="1.3"/>
+        <path d="m51 23 8 19m49-19-8 19" stroke="#b5a17c" stroke-width="1.2"/>
+        <path d="M80 43q-16-16-25 0q-11 22 8 32l17 8 17-8q18-10 8-32q-9-16-25 0Z" fill="#deceb0"/>
+        <path d="M76 44q-13-12-19 4q-6 15 9 24m18-28q13-12 19 4q6 15-9 24" fill="none" stroke="#b8a080" stroke-width=".8"/>
+        <path d="m59 36 12 4m18 0 12-4m-45 8 3 1m-5 4 4 1m-4 4 4 1m-3 4 4 1m-1 4 3 1m42-22-3 1m5 4-4 1m4 4-4 1m3 4-4 1m1 4-3 1" fill="none" stroke="#9e8968" stroke-width=".75"/>
+        <g class="cronista-eyes">
+          <ellipse cx="65" cy="55" rx="9" ry="10" fill="#bba16b"/><ellipse cx="95" cy="55" rx="9" ry="10" fill="#bba16b"/>
+          <ellipse cx="65" cy="55" rx="4.5" ry="7" fill="#302b26"/><ellipse cx="95" cy="55" rx="4.5" ry="7" fill="#302b26"/>
+          <g fill="#f5e9ce"><circle cx="66.5" cy="52" r="1.5"/><circle cx="96.5" cy="52" r="1.5"/></g>
+        </g>
+        <g fill="none" stroke="#ac8750" stroke-width="1.25"><circle cx="65" cy="56" r="14"/><circle cx="95" cy="56" r="14"/><path d="M79 54q1-2 2 0m-30 0-5-3m63 3 5-3"/></g>
+        <path d="M76 69q4-4 8 0l-4 11Z" fill="#9e7b43" stroke="#6b5637" stroke-width=".9"/>
+        <path d="m66 75 5 3m18 0 5-3m-21 4 3 2m8 0 3-2" fill="none" stroke="#ac9571" stroke-width=".7"/>
+      </g>
+      <g class="cronista-quill" stroke="#806b4b" stroke-width=".9" stroke-linejoin="round">
+        <path d="M113 124q-1-29 25-70q8 29-17 53Z" fill="#e7dcc2"/>
+        <path d="M110 137q8-41 27-78m-17 45 11-6m-7-3 11-7m-7-3 9-6m-18 31 9-5m-6-17-2-11" fill="none"/>
+        <path d="m109 137 3-6" stroke="#493f31" stroke-width="1.2"/>
       </g>
     </g>
-    <g class="cronista-sparkles" fill="#b88136"><path d="m25 41 3-8 3 8 8 3-8 3-3 8-3-8-8-3Zm105-13 2-6 2 6 6 2-6 2-2 6-2-6-6-2Z"/></g>
+    <g class="cronista-sparkles" fill="#b18d51"><path d="m34 37 2-6 2 6 6 2-6 2-2 6-2-6-6-2Zm90-11 1.5-5 1.5 5 5 1.5-5 1.5-1.5 5-1.5-5-5-1.5Z"/></g>
   </svg>`;
   let node, screen, timer, streak = 0, state = 'idle', message = words.idle, collapsed = false;
   try { collapsed = CT.Storage?.getItem(KEY) === 'hidden'; } catch { /* Preferencia opcional. */ }
