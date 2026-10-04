@@ -149,7 +149,7 @@ const drinks = CT.QuickCatalog.challenges.find(c => c.id === 'drinks');
 assert.equal(drinks.cards.length, 34);
 assert.ok(drinks.cards.every(card => card.source !== 'https://www.niaaa.nih.gov/alcohols-effects-health/alcohol-topics/what-standard-drink'), 'Cada bebida tiene una fuente específica');
 assert.ok(drinks.cards.slice(0, 21).every((card, i) => card.id === 'drinks-' + (i + 1) && card.image === 'assets/quick-cards/drinks-' + (i + 1) + '.webp' && fs.existsSync(new URL('../' + card.image, import.meta.url))));
-assert.ok(drinks.cards.slice(21).every(card => card.image === null), 'Las nuevas cartas usan el respaldo visual hasta tener ilustración propia');
+assert.ok(drinks.cards.every((card, i) => card.image === 'assets/quick-cards/drinks-' + (i + 1) + '.webp' && fs.existsSync(new URL('../' + card.image, import.meta.url))), 'Todas las bebidas tienen una ilustración propia existente');
 assert.ok(new Set(drinks.cards.map(card => card.value)).size >= 20, 'El mazo cubre al menos 20 graduaciones');
 assert.ok(drinks.cards.filter(card => card.value === 40).length / drinks.cards.length < 0.25, 'Menos del 25 % del mazo se concentra en 40 %');
 const festivities = CT.QuickCatalog.challenges.find(c => c.id === 'festivities');
