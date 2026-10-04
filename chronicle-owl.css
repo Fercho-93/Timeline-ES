@@ -1,0 +1,46 @@
+.cronista {
+  position: relative; isolation: isolate; display: flex; align-items: center; gap: 12px;
+  width: 100%; max-width: 640px; min-height: 112px; margin: 12px auto;
+  padding: 6px 12px 6px 6px; box-sizing: border-box;
+  border: 1px solid #b49b704d; border-radius: 16px;
+  background: linear-gradient(115deg, #f9f3e766, #eadbb433); color: #63482d;
+}
+.cronista-greet { position: relative; z-index: 1; flex: 0 0 100px; width: 100px; height: 100px; border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: 50%; }
+.cronista-art { position: relative; display: block; width: 100%; height: 100%; pointer-events: none; transform-origin: 50% 90%; }
+.cronista-sprite-rest, .cronista-sprite { position: absolute; inset: 0; display: block; background-image: url('assets/companions/snowy-owl-atlas.webp'); background-size: 300% 200%; background-repeat: no-repeat; filter: drop-shadow(0 4px 3px #36271a25); transition: opacity .3s ease; }
+.cronista-sprite-rest { background-position: 0% 0%; }
+.cronista-sprite { background-position: var(--pose-x, 0%) var(--pose-y, 0%); opacity: 0; }
+.cronista[data-mood]:not([data-mood='idle']) .cronista-sprite-rest { opacity: 0; }
+.cronista[data-mood]:not([data-mood='idle']) .cronista-sprite { opacity: 1; }
+.cronista[data-mood='idle'] .cronista-art { animation: cronista-breathe 5s ease-in-out infinite; }
+.cronista[data-mood='thinking'] { --pose-x: 50%; --pose-y: 0%; }
+.cronista[data-mood='writing'], .cronista[data-mood='turn'] { --pose-x: 100%; --pose-y: 0%; }
+.cronista[data-mood='success'], .cronista[data-mood='greeting'], .cronista[data-mood='finished'] { --pose-x: 0%; --pose-y: 100%; }
+.cronista[data-mood='streak'] { --pose-x: 50%; --pose-y: 100%; }
+.cronista[data-mood='streak']:not([data-mood='idle']) .cronista-sprite-rest { opacity: 1; clip-path: inset(74% 0 0 0); }
+.cronista[data-mood='streak'] .cronista-sprite { clip-path: inset(0 0 26% 0); }
+.cronista[data-mood='failure'] { --pose-x: 100%; --pose-y: 100%; }
+.cronista-copy { position: relative; z-index: 2; flex: 1; min-width: 0; }
+.cronista-name { display: block; font: 600 .66rem/1.5 Georgia, serif; text-transform: uppercase; letter-spacing: .14em; opacity: .75; }
+.cronista .cronista-message { margin: 3px 0; font: .88rem/1.4 Georgia, serif; color: inherit; }
+.cronista-toggle { position: relative; z-index: 2; flex: 0 0 auto; min-height: 44px; border: 0; padding: 5px 8px; background: transparent; color: inherit; font: inherit; font-size: .7rem; cursor: pointer; }
+.cronista button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.cronista-collapsed { width: fit-content; min-height: 0; margin: 6px auto; padding: 0 10px; gap: 8px; }
+.cronista-collapsed .cronista-greet, .cronista-collapsed .cronista-copy { display: none; }
+.cronista-collapsed::before { content: 'El cronista'; font: .75rem Georgia, serif; }
+.cronista-aura { position: absolute; z-index: -1; inset: -5%; border: 1px solid #c5a15d; border-radius: 50%; opacity: 0; box-shadow: 0 0 20px #dcb56b44; }
+.cronista-ink { position: absolute; left: 23%; right: 27%; bottom: 13%; height: 2px; background: #584330; transform: scaleX(0); transform-origin: left; border-radius: 50%; opacity: 0; }
+.cronista-feathers { position: absolute; inset: 0; }
+.cronista-feathers i { position: absolute; left: 50%; top: 55%; width: 3px; height: 7px; border-radius: 80% 20% 80% 20%; background: #d0ad64; opacity: 0; transform: rotate(calc(var(--i) * 45deg)); }
+.cronista-reacting:is([data-mood='success'],[data-mood='streak'],[data-mood='finished'],[data-mood='greeting']) .cronista-aura { animation: cronista-ring 1.3s ease-out 1; }
+.cronista-reacting:is([data-mood='success'],[data-mood='streak'],[data-mood='finished']) .cronista-feathers i { animation: cronista-trail 1.7s cubic-bezier(.15,.6,.3,1) both; animation-delay: calc(var(--i) * 35ms); }
+.cronista-reacting:is([data-mood='writing'],[data-mood='turn']) .cronista-ink { animation: cronista-inscribe 1.2s ease-in-out 2; }
+.cronista-reacting[data-mood='writing'] .cronista-sprite { animation: cronista-scribe .65s ease-in-out 4; transform-origin: 70% 85%; }
+html[data-theme='dark'] .cronista { color: #e6cba3; background: linear-gradient(115deg, #463a2d88, #35291c88); border-color: #d6b17740; }
+@keyframes cronista-breathe { 50% { transform: translateY(-1px) scale(1.012); } }
+@keyframes cronista-ring { 0% { opacity: 0; transform: scale(.45); } 20% { opacity: .75; } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes cronista-trail { 0% { opacity: 0; transform: rotate(calc(var(--i) * 45deg)) translateY(-10px) scale(.5); } 20% { opacity: .85; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 45deg + 20deg)) translateY(-72px) scale(.3); } }
+@keyframes cronista-inscribe { 15% { opacity: .8; } 75% { opacity: .8; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+@keyframes cronista-scribe { 50% { transform: rotate(-2deg) translateY(1px); } }
+@media (max-width: 420px) { .cronista { min-height: 94px; gap: 8px; padding-right: 5px; } .cronista-greet { flex-basis: 80px; width: 80px; height: 80px; } .cronista .cronista-message { font-size: .8rem; } .cronista-collapsed { min-height: 0; } }
+@media (prefers-reduced-motion: reduce) { .cronista *, .cronista[data-mood] * { animation: none !important; transition: none !important; } .cronista .cronista-aura, .cronista .cronista-feathers, .cronista .cronista-ink { display: none; } }

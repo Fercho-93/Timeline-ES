@@ -427,6 +427,7 @@
     // a animarse en cada repintado de la misma pantalla.
     container.querySelectorAll(':scope > .shell').forEach(node => node.classList.add('motion-managed'));
     window.CONTINUUM.UI?.mount(container, screen);
+    window.CONTINUUM.Companion?.mount(container, screen);
     if (!primero && cambioDePantalla && !quietPrimaryNavigation) {
       const kind = ['winner', 'online-winner', 'solo-end', 'comp-end'].includes(screen) ? 'end'
         : ['pass', 'pulse-pass', 'comp-intro', 'tournament-intro', 'online-competition-intro'].includes(screen) ? 'turn'
@@ -679,6 +680,7 @@
     if (!quietPrimaryNavigation && !pila.some(dialog => dialog.overlay === overlay)) window.CONTINUUM.Effects?.transition?.('open');
     const modal = overlay.querySelector(".modal") || overlay;
     window.CONTINUUM.UI?.reveal(modal);
+    window.CONTINUUM.Companion?.reveal(modal);
     const openingFocus = document.activeElement;
     window.CONTINUUM.UI?.openSurface(modal);
     // Marcar y arrancar el desenrollado antes de activar `dialog-enter` evita que el
