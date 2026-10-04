@@ -24,6 +24,8 @@
 	<array><dict><key>CFBundleURLName</key><string>com.continuum.game.invite</string><key>CFBundleURLSchemes</key><array><string>continuum</string></array></dict></array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Continuum usa la cámara para escanear códigos QR y entrar en una sala o conectar los móviles de una partida.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Continuum usa la red Wi-Fi local para conectar los móviles de una partida sin enviar datos a internet.</string>
 	<key>NSBonjourServices</key>
