@@ -16,8 +16,8 @@ let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
 // Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
 const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
-assert.equal(quickCards.length, 405);
-assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 405);
+assert.equal(quickCards.length, 427);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 427);
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
@@ -95,13 +95,13 @@ assert.throws(() => E.restore({version: -1, config, commands: []}));
 assert.throws(() => E.restore({version: 1, config, commands: [{type: 'place', cardId: 'missing', index: 0}]}));
 assert.throws(() => E.create({names: ['A', 'B'], rounds: [{id:'social', order: ['social-1']}]}));
 for (const c of CT.QuickCatalog.challenges) {
-  assert.ok(c.cards.length >= 2 && c.cards.length <= (c.id === 'drinks' ? 34 : c.id === 'festivities' ? 32 : 25));
+  assert.ok(c.cards.length >= 2 && c.cards.length <= (c.id === 'drinks' ? 34 : c.id === 'festivities' ? 32 : c.id === 'companies-revenue' ? 30 : 25));
   assert.equal(new Set(c.cards.map(card => card.id)).size, c.cards.length);
   assert.ok(c.cards.every(card => Number.isFinite(card.value) && card.title && card.label && card.detail && card.source.startsWith('https://')));
 }
 const requestedDecks = ['sports-players','drinks','festivities','social','wwii','civil-war','kings','consoles','oscars','companies-founded','timezones-june','cities-east-west','cities-north-south','body','series-seasons','buildings','rivers-spain','foods-kcal','albums-sales','stadiums','capitals-altitude','eurovision-wins','storage','airports','metros','companies-revenue','spanish-tv','minimum-wages'];
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.some(c => c.id === id)));
-assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= (id === 'drinks' ? 34 : id === 'festivities' ? 32 : 25)));
+assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= (id === 'drinks' ? 34 : id === 'festivities' ? 32 : id === 'companies-revenue' ? 30 : 25)));
 const social = CT.QuickCatalog.challenges.find(c => c.id === 'social');
 assert.equal(social.cards.length, 22);
 const addedSocial = [['Fotolog',2002],['Flickr',2004],['Tuenti',2006],['Foursquare',2009],['Vine',2013],['BeReal',2020],['Threads',2023]];
@@ -161,6 +161,22 @@ const metros = CT.QuickCatalog.challenges.find(c => c.id === 'metros');
 assert.ok(metros.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const companiesRevenue = CT.QuickCatalog.challenges.find(c => c.id === 'companies-revenue');
 assert.ok(companiesRevenue.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+assert.equal(companiesRevenue.cards.length,30);
+assert.equal(companiesRevenue.asOf,'2025');
+const revenueAudit=JSON.parse(read('docs/fuentes-facturacion-empresas-2025.json'));
+const revenueFx=JSON.parse(read('docs/eurostat-cambios-medios-2025.json'));
+assert.equal(revenueFx.dimension.statinfo.category.index.AVG,0);
+assert.equal(revenueFx.dimension.time.category.index['2025'],0);
+assert.equal(new Set(companiesRevenue.cards.map(c=>c.title)).size,30);
+for(const r of revenueAudit.cards){const card=companiesRevenue.cards.find(c=>c.id===r.id);const rate=r.currency==='EUR'?1:revenueFx.value[revenueFx.dimension.currency.category.index[r.currency]];assert.equal(r.exchangeRate,rate);assert.equal(card.value,Math.round(r.originalMillions/rate));assert.equal(card.label,r.label);assert.ok(card.label.endsWith(' M€'));assert.equal(card.source,r.source);assert.ok(card.detail.includes(r.period));assert.ok(!card.label.includes('M$'));}
+assert.equal(companiesRevenue.cards.find(c=>c.title==='Mercadona').value,38178,'se usa cifra de negocios sin IVA');
+assert.equal(revenueAudit.cards.find(c=>c.title==='NVIDIA').period,'2025-01-27 / 2026-01-25','no se utiliza FY2025 que representa 2024');
+s=E.create({names:['A','B'],rounds:[round('companies-revenue')]});
+while(s.remaining.length){const id=s.remaining[0],value=x=>companiesRevenue.cards.find(c=>c.id===x).value;const place=s.timeline.findIndex(t=>value(t)>value(id));s=E.step(s,{type:'place',cardId:id,index:place<0?s.timeline.length:place});assert.equal(s.result.correct,true);s=E.step(s,{type:'ack'});}
+assert.equal(s.phase,'round-end');
+const oldRevenueSave={version:3,config:{names:['Ana','Luis'],rounds:[{id:'companies-revenue',order:Array.from({length:8},(_,i)=>'companies-revenue-'+(i+1))}]},commands:[{type:'place',cardId:'companies-revenue-2',index:0}]};
+assert.equal(E.restore(oldRevenueSave).result.correct,true);
+
 const spanishTv = CT.QuickCatalog.challenges.find(c => c.id === 'spanish-tv');
 assert.ok(spanishTv.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const minimumWages = CT.QuickCatalog.challenges.find(c => c.id === 'minimum-wages');
