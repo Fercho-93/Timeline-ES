@@ -12,6 +12,10 @@ on:
         required: true
         type: choice
         options: [android, ios]
+      apple_auth_testing:
+        description: Habilitar Apple para probadores autorizados (requiere perfil con Sign in with Apple)
+        type: boolean
+        default: false
       upload_testflight:
         description: Subir el IPA a TestFlight
         type: boolean
@@ -93,6 +97,10 @@ jobs:
         run: |
           ruby -rxcodeproj -e 'p=Xcodeproj::Project.open("ios/App/App.xcodeproj"); p.targets.select{|t|t.name=="App"}.each{|t|t.build_configurations.each{|c|c.build_settings["CODE_SIGN_STYLE"]="Manual";c.build_settings["DEVELOPMENT_TEAM"]=ENV.fetch("APPLE_TEAM_ID");c.build_settings["PROVISIONING_PROFILE_SPECIFIER"]=ENV.fetch("APPLE_PROFILE_NAME");c.build_settings["CODE_SIGN_IDENTITY"]="Apple Distribution"}};p.save'
           python3 -c 'import os,plistlib; plistlib.dump({"method":"app-store-connect","signingStyle":"manual","teamID":os.environ["APPLE_TEAM_ID"],"provisioningProfiles":{"com.continuum.game":os.environ["APPLE_PROFILE_NAME"]}},open("ExportOptions.plist","wb"))'
+      - name: Habilitar acceso Apple en esta compilación interna
+        if: github.event_name == 'workflow_dispatch' && inputs.apple_auth_testing
+        run: |
+          ruby -rxcodeproj -e 'p=Xcodeproj::Project.open("ios/App/App.xcodeproj"); p.targets.select{|t|t.name=="App"}.each{|t|t.build_configurations.each{|c|c.build_settings["CODE_SIGN_ENTITLEMENTS"]="App/AppAppleTesting.entitlements";c.build_settings["SWIFT_ACTIVE_COMPILATION_CONDITIONS"]="$(inherited) APPLE_AUTH_TESTING"}};p.save'
       - name: Compilar y exportar IPA
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Continuum.xcarchive" CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" archive

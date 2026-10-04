@@ -8,5 +8,6 @@ class MainViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(LocalPeerPlugin())
         bridge?.registerPluginInstance(LocalLanSignalPlugin())
+        bridge?.registerPluginInstance(AppleSignInPlugin())
     }
 }

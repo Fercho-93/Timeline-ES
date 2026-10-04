@@ -18,6 +18,7 @@
 		A1C0DE0000000000000000B1 /* LocalPeerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A1 /* LocalPeerPlugin.swift */; };
 		A1C0DE0000000000000000B2 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A2 /* MainViewController.swift */; };
 		A1C0DE0000000000000000B3 /* LocalLanSignalPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A3 /* LocalLanSignalPlugin.swift */; };
+		A1C0DE0000000000000000B4 /* AppleSignInPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A4 /* AppleSignInPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		A1C0DE0000000000000000A1 /* LocalPeerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPeerPlugin.swift; sourceTree = "<group>"; };
 		A1C0DE0000000000000000A2 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		A1C0DE0000000000000000A3 /* LocalLanSignalPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalLanSignalPlugin.swift; sourceTree = "<group>"; };
+		A1C0DE0000000000000000A4 /* AppleSignInPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				A1C0DE0000000000000000A1 /* LocalPeerPlugin.swift */,
 				A1C0DE0000000000000000A2 /* MainViewController.swift */,
+				A1C0DE0000000000000000A4 /* AppleSignInPlugin.swift */,
 				A1C0DE0000000000000000A3 /* LocalLanSignalPlugin.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
@@ -221,6 +224,7 @@
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				A1C0DE0000000000000000B1 /* LocalPeerPlugin.swift in Sources */,
 				A1C0DE0000000000000000B2 /* MainViewController.swift in Sources */,
+				A1C0DE0000000000000000B4 /* AppleSignInPlugin.swift in Sources */,
 				A1C0DE0000000000000000B3 /* LocalLanSignalPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

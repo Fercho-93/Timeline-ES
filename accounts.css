@@ -89,3 +89,11 @@
 #app .ranking-nav .btn:disabled, .ranking-nav .btn:disabled { opacity: .4; color: #f0d08a; border-color: #e0bd6f99; }
 .ranking-time { display: block; opacity: .7; font-size: .7rem; }
 .ranking-more { display: block; margin: 12px auto 0; }
+
+.account-signin { padding:0 20px 16px; font:.8rem/1.5 var(--ui-font); }
+.account-signin .btn { width:100%; min-height:44px; }
+.account-apple { background:#000; color:#fff; border:1px solid #000; }
+.account-apple:disabled { opacity:.55; cursor:default; }
+.account-signin p { font:inherit; }
+.account-signin details { font-size:.7rem; color:var(--edition-muted); }
+.account-signin code { display:block; overflow-wrap:anywhere; user-select:all; padding-top:8px; }

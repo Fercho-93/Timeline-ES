@@ -29,6 +29,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const alias=data.get('playerProfiles/guest').alias;
  await w.testAccounts.enter();assert.equal(started,1);assert.equal(data.get('playerProfiles/guest').alias,alias);
  assert.doesNotMatch(w.CONTINUUM.Accounts.card(),/Cerrar sesión|Continuar con Google|Contraseña/);
+ assert.match(w.CONTINUUM.Accounts.card(),/data-account-action="apple" disabled/);
  dom.window.close();
 }
 {

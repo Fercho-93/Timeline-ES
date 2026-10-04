@@ -8,7 +8,15 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Temporada de lanzamiento: invitados automáticos y datos nuevos por UID.
     function registered() {
-      return request.auth != null;
+      return request.auth != null
+        && (request.auth.token.get('firebase', {}).get('sign_in_provider', '') != 'apple.com'
+          || (exists(/databases/$(database)/documents/appleBetaTesters/$(request.auth.uid))
+            && get(/databases/$(database)/documents/appleBetaTesters/$(request.auth.uid)).data.get('enabled', false) == true));
+    }
+    // Autorizaciones de pruebas: solo se administran desde Firebase o Admin SDK.
+    match /appleBetaTesters/{owner} {
+      allow get: if request.auth != null && request.auth.uid == owner;
+      allow list, write: if false;
     }
     // Retos rápidos: historial inmutable de comandos. Cada participante escribe
     // únicamente durante su turno; todos reconstruyen el marcador con el mismo motor.
@@ -533,7 +541,7 @@ service cloud.firestore {
       allow list, delete: if false;
     }
     match /rooms/{roomId} {
-      function signedIn() { return request.auth != null; }
+      function signedIn() { return registered(); }
       function uid() { return request.auth.uid; }
       function before() { return resource.data; }
       function after() { return request.resource.data; }
