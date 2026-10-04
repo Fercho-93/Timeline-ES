@@ -1,0 +1,548 @@
+{
+  "generator": "OpenAI image_gen",
+  "generatedAt": "2026-10-05",
+  "format": "WebP 512 × 768; grabado sepia sobre papel envejecido, sin títulos, letras ni marco. Sesenta imágenes propias, revisadas visualmente por bloque. Las series contemporáneas conservan vestuario y ambientes de su época.",
+  "assets": [
+    {
+      "cardId": "series-seasons-12",
+      "title": "Dark",
+      "path": "assets/quick-cards/series-seasons-12.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "e7c65b72d484c7f87683beeb4b7190c9264e86c3bd041f0518848b90bb9dd360",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a hooded teenager with a bicycle at a dark cave entrance in a German forest. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-13",
+      "title": "Ozark",
+      "path": "assets/quick-cards/series-seasons-13.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "56534393bddcc7ff4b738f8711acfc322d1928d97c36c2340c07c37031f379cb",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a lakeside Missouri lodge with a family arriving by boat, ominous contemporary drama. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-14",
+      "title": "Peaky Blinders",
+      "path": "assets/quick-cards/series-seasons-14.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "3e1b8ae4f718733a623791480134ace26d4d8d853387794eba46d4b34256034f",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a Birmingham 1920s gangster in flat cap and three-piece suit walking an industrial street. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-15",
+      "title": "The Crown",
+      "path": "assets/quick-cards/series-seasons-15.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "55c01f3654075fcb21db39993215a768a63db7a14791ec87aa3d04f437ba6ef6",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Queen Elizabeth II in her white 1953 coronation gown and crown, short mid-century curled hair, inside a British palace with architecture and decor, accurate twentieth-century attire. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-16",
+      "title": "The Wire",
+      "path": "assets/quick-cards/series-seasons-16.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "97459d058bd76c018e55fd7e4509404640aca6c74fb4ea057ebd4f60a1658bfb",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a contemporary Baltimore police detective wearing a plain windbreaker in a modern industrial harbor, container stacks and modern harbor cranes, twenty-first-century clothing and architecture. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-17",
+      "title": "Los Soprano",
+      "path": "assets/quick-cards/series-seasons-17.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "910d06d0e3818cccde47f37b75353f1a460481f2becbec94188923c94e001d1a",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a middle-aged New Jersey mob boss in a diner booth, late 1990s. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-18",
+      "title": "Succession",
+      "path": "assets/quick-cards/series-seasons-18.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "7c38ce76ba7d967cd38416e746324123af864b05c3bce968ec5ead4304f22b79",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict an elderly media magnate and adult heirs around a Manhattan boardroom table. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-19",
+      "title": "The Big Bang Theory",
+      "path": "assets/quick-cards/series-seasons-19.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "f30bd3665af4b0521ef24072216bfb56eb5693b649a05df666620f63ce80134a",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Sheldon Cooper, Leonard Hofstadter, Raj Koothrappali and Howard Wolowitz in a modern university physics laboratory, contemporary casual T-shirt, hoodies and trousers, modern scientific instruments and a blank whiteboard, clearly twenty-first century, no Victorian clothes. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-20",
+      "title": "Modern Family",
+      "path": "assets/quick-cards/series-seasons-20.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "9770f8b4fd9c64f0747b3e445c269f3768f003b85cbb5bbec49b1767d6c4930c",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict three connected contemporary American families with teenagers, young children and grandparents posing casually in a modern suburban living room, modern casual shirts and jeans, clearly twenty-first century, no Victorian clothes. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "series-seasons-21",
+      "title": "Supernatural",
+      "path": "assets/quick-cards/series-seasons-21.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "2dbf95f0077603b1877405c1446e550b499fc0e666099917e9d2c8193d2808e5",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict two adult brothers beside a 1967 black sedan on an American rural road at dusk. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-10",
+      "title": "Helsinki",
+      "path": "assets/quick-cards/cities-north-south-10.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "06822b2defe46de43a8c9901937ca4d11e4458f1321f5ea6b15a6426bf1bd703",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Helsinki white neoclassical cathedral and harbor. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-11",
+      "title": "Estocolmo",
+      "path": "assets/quick-cards/cities-north-south-11.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "a643795c1aeee31fd6fd5fd6f5f72402de95369303eecd4d6f670d889a08e079",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Stockholm old town waterfront and islands. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-12",
+      "title": "Berlín",
+      "path": "assets/quick-cards/cities-north-south-12.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "343aae55e4fc88836769e0bad576aac824ee504e7db11a158b1897f35ec2a936",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Berlin Reichstag dome overlooking the River Spree. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-13",
+      "title": "Roma",
+      "path": "assets/quick-cards/cities-north-south-13.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "e0533aa1b3cbad354b4008b5c0d3da254d3c321f288181d536fccb1377a51486",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Rome Colosseum in historic city landscape. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-14",
+      "title": "Barcelona",
+      "path": "assets/quick-cards/cities-north-south-14.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "774ed8a3c601e12df288f64cf35fd5311476f951de0025ffe461e755102f066b",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Barcelona Sagrada Familia seen above the city. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-15",
+      "title": "Ciudad de México",
+      "path": "assets/quick-cards/cities-north-south-15.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "6c6ed47140943cc0099d81c141df61b91e7b346dd444a2871ee945f4c4c38c0d",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Mexico City cathedral and historic central plaza. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-16",
+      "title": "Buenos Aires",
+      "path": "assets/quick-cards/cities-north-south-16.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "66c8fd24f3352b19484bb1d28363017e1d3a5f9ee1efa266ef3c108794aab60b",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Buenos Aires wide boulevard with Obelisk and historic buildings. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-17",
+      "title": "Santiago de Chile",
+      "path": "assets/quick-cards/cities-north-south-17.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "1da45c7fad77b49c367e272b6631dcf89b8adc00eb24c4cbb4404a5248e9cb3f",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Santiago Chile historic center with Andes mountains. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-18",
+      "title": "Sídney",
+      "path": "assets/quick-cards/cities-north-south-18.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "8c59c9ed6f005ad2af4a09896fd18a5c6a95803b7aeed7d3bd9aef620a21663e",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Sydney Opera House and Harbour Bridge together in harbor landscape. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-north-south-19",
+      "title": "Ushuaia",
+      "path": "assets/quick-cards/cities-north-south-19.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "78c7f4b2a103a4cce89cdf924c0229c68d276ce3725c40a9b8d35bdafcb74500",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Ushuaia waterfront with snow-covered Fuegian mountains. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-11",
+      "title": "Lisboa",
+      "path": "assets/quick-cards/cities-east-west-11.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "e296c23e425294c18cb66b79c1906fcacbd5a1a44d311aad8c20989c4d815991",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Lisbon Belem Tower by Tagus river. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-12",
+      "title": "París",
+      "path": "assets/quick-cards/cities-east-west-12.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "f3f80591b42716820c5a54ec36703b51a6445e661db28233a51ff417ff0f22e8",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Paris Notre Dame and the River Seine. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-13",
+      "title": "Roma",
+      "path": "assets/quick-cards/cities-east-west-13.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "c602c949353c81af31f159796a0cf27afc421dc16742449d14e8ffc16aff5711",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Rome Pantheon and historic square. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-14",
+      "title": "Berlín",
+      "path": "assets/quick-cards/cities-east-west-14.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "17d348bbe0b668157d3fd7cdf42e8a3604a375566f325a7e03e3ea4fba64580f",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Berlin Brandenburg Gate from a side view. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-15",
+      "title": "Estambul",
+      "path": "assets/quick-cards/cities-east-west-15.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "e8d6258136c0eeda8aaddf5c65ae7c0e5a2c6ddd94546a49003a04c46f53e462",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Istanbul Bosporus ferry with Hagia Sophia and historic skyline. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-16",
+      "title": "Nueva Delhi",
+      "path": "assets/quick-cards/cities-east-west-16.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "dd3ba934c3b567bc86879833057a7dd904a328bebe94e62bd1890dd59c9fd777",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict New Delhi India Gate and broad tree-lined boulevard. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-17",
+      "title": "Pekín",
+      "path": "assets/quick-cards/cities-east-west-17.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "f3873bbb08872eab0bf87e91f226179d734d95ff11e8cc7d7513b029c51f8227",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Beijing Temple of Heaven with ceremonial gardens. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-18",
+      "title": "Seúl",
+      "path": "assets/quick-cards/cities-east-west-18.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "e58cb96f1341ee6ed9486f7677744728296b5690819936f4605dd72426199e99",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Seoul Gyeongbokgung palace and mountainous backdrop. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-19",
+      "title": "Buenos Aires",
+      "path": "assets/quick-cards/cities-east-west-19.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "44cb1cece8c9f8715ec3c28a2241988bf212918804cb5d3e9ea4143d5848d7da",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Buenos Aires Casa Rosada facade and Plaza de Mayo. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "cities-east-west-20",
+      "title": "Vancouver",
+      "path": "assets/quick-cards/cities-east-west-20.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "7b371bbc04c5406335695f16808290d4434e0be01a0ead06ad4284e9b8232872",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Vancouver harbor with Canada Place sail roofs and distant mountains. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-13",
+      "title": "San Juan de Terranova",
+      "path": "assets/quick-cards/timezones-june-13.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "10033186315c4ec4b08e6a1eb6c534f8c3c345b7d48e964307ed8dd9d1e212e2",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Saint Johns Newfoundland steep harbor houses with a lighthouse, strictly monochrome brown sepia ink, all houses drawn in brown tones only, no blue red or green colors. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-14",
+      "title": "Katmandú",
+      "path": "assets/quick-cards/timezones-june-14.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "583ad64da390de124b58f3d9d56406f2e544190ac3da2eb22b47ead1ea54016d",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Kathmandu Swayambhunath stupa with Himalayan foothills. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-15",
+      "title": "Adelaida",
+      "path": "assets/quick-cards/timezones-june-15.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "9fafa1cc030d725d10ee702509fc6d487aa5d3986b80c21731bffce851e367d6",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Adelaide historic town hall and urban riverbank. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-16",
+      "title": "Perth",
+      "path": "assets/quick-cards/timezones-june-16.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "d759475ff56d55ddd4632bf262432799b43c74238d8c6257519c54a6648de9c5",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Perth Swan River city skyline in Australian landscape. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-17",
+      "title": "Auckland",
+      "path": "assets/quick-cards/timezones-june-17.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "ebf09cde74a42cd81f3d902b4ecaa092b196f29e92d373be8019aefc9a153e1e",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Auckland Sky Tower and city harbor with sailing boats. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-18",
+      "title": "Kiritimati",
+      "path": "assets/quick-cards/timezones-june-18.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "6e8a3b801d084fb7031e9ff0b627bbc1f1e0778db5be702acac67e90701b5cb3",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Kiritimati tropical coral atoll lagoon with coconut palms, no urban skyline. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-19",
+      "title": "Ponta Delgada",
+      "path": "assets/quick-cards/timezones-june-19.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "afefc9f9678fe3b0fe5598936eadecd103d632748ccfc8f6916ab5679b4330ac",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Ponta Delgada Azores distinctive three-arched city gates and harbor. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-20",
+      "title": "Buenos Aires",
+      "path": "assets/quick-cards/timezones-june-20.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "ebb94d9ffb6118c605c6c8b1b834384c75deab05472ea39a5ea41f1a4d580945",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Buenos Aires historic Teatro Colon and street with jacaranda trees, strictly monochrome brown sepia ink, flowers in pale brown only, no purple or other colored accents. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-21",
+      "title": "Pekín",
+      "path": "assets/quick-cards/timezones-june-21.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "0b6ad019c559f5fc09b105093c0f77948aa52c3e9b5ed4a6e619ce31695b3a4f",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Beijing Forbidden City imperial palace courtyard. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "timezones-june-22",
+      "title": "Johannesburgo",
+      "path": "assets/quick-cards/timezones-june-22.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "1d7e194c5b7c669e9860e2769477c9812eeef40c460e9ebfa858d1b6135e2e90",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict Johannesburg contemporary skyline with Hillbrow tower and leafy neighborhoods. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-13",
+      "title": "Nintendo",
+      "path": "assets/quick-cards/companies-founded-13.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "f191599e2fb98ba56c9d3fa60282fbaa8e76514a965c28acd2107a0d25bad2a2",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a Japanese craftsman in an 1889 Kyoto workshop hand-painting blank unlabeled hanafuda flower cards. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-14",
+      "title": "Nokia",
+      "path": "assets/quick-cards/companies-founded-14.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "5d42b13eeee8d0ecc306a374d3c44f335f4fe93f046c29ff0d49aab9602f74fa",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict an 1865 Finnish wood pulp mill beside a river with waterwheel and timber. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-15",
+      "title": "IKEA",
+      "path": "assets/quick-cards/companies-founded-15.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "5e8cfd27cb69618469efd590d5d41c5b468ee7f13fd6184acfa9c627368e39ac",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a 1940s Swedish mail-order workshop with plain parcels and unmarked household goods. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-16",
+      "title": "LEGO",
+      "path": "assets/quick-cards/companies-founded-16.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "5f3949a0eac842504f0d2e4001ff75fb22ec41a41bea07cc4784185ca6719655",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a 1930s Danish carpenter creating wooden toy ducks in a woodworking shop. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-17",
+      "title": "Adidas",
+      "path": "assets/quick-cards/companies-founded-17.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "213e4b20056d580cb268904e44b77d385df22030bffaae02c09803eb3635343c",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a late 1940s German shoemaker sewing an unmarked sports shoe at a workshop bench. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-18",
+      "title": "Nike",
+      "path": "assets/quick-cards/companies-founded-18.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "fdcfbbf1953f5661bb3841342109b137ce4f50a3ad646b31fd6c221e58d54b0a",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a 1960s American runner buying unmarked running shoes from a salesman beside a parked car. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-19",
+      "title": "BMW",
+      "path": "assets/quick-cards/companies-founded-19.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "f211d7ef0e867833b6523bbee75095cac0bababe30a3ca41011c2a00b43f99d0",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a 1916 German industrial workshop with an early aircraft engine being assembled. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-20",
+      "title": "Porsche",
+      "path": "assets/quick-cards/companies-founded-20.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "7800f312920f6e38d599ad279227d803a7ea189a52bf576129b66e5647c62b9f",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a 1930s Stuttgart engineering design office with draftsman and an early car chassis, blank drawing plans. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-21",
+      "title": "Ford",
+      "path": "assets/quick-cards/companies-founded-21.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "b7cd9a3664519705518630572a986365fd130ed5bf98e92a67d0158056158a1a",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a 1903 American automobile workshop with mechanics assembling an early motor car. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "companies-founded-22",
+      "title": "Siemens",
+      "path": "assets/quick-cards/companies-founded-22.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "8860a8f6a9594135961a9f30ab50ce9e1a8566751e24a2272c56ca1e3a8a1955",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict an 1847 Berlin workshop where a craftsman assembles an early pointer telegraph, no visible labels. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-11",
+      "title": "Ben-Hur (1959)",
+      "path": "assets/quick-cards/oscars-11.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "6805e1930c05af82608a8f949150371d0dd481f753ddf82abcf17a95d409cc89",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a dramatic ancient Roman chariot race with one foreground chariot and plausible harnessed horses. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-12",
+      "title": "El señor de los anillos: El retorno del rey (2003)",
+      "path": "assets/quick-cards/oscars-12.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "ed02d5abc0a90dd0f26b15f3da4d278702c9eeeb44acbd6e839f6a85b55ec674",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a small hobbit hero with companion approaching a volcanic mountain in an epic fantasy landscape. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-13",
+      "title": "Slumdog Millionaire (2008)",
+      "path": "assets/quick-cards/oscars-13.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "ed2a4b3db9c546adda95fcda569a1b885fc522316b50bd4028362c20b1a22ba9",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a young Indian man in an unmarked television quiz studio with an interviewer and blank displays. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-14",
+      "title": "Oppenheimer (2023)",
+      "path": "assets/quick-cards/oscars-14.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "b9c049d8b692b878db001075a2985d08028f0e3f4d87db3c96b39362c2ca647e",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a 1940s American physicist in hat observing a remote desert atomic test from a safe bunker. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-15",
+      "title": "Todo a la vez en todas partes (2022)",
+      "path": "assets/quick-cards/oscars-15.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "fe78f7495a303ec0debfd4e688c6d83d52b0395bc39499f2c47393d1a3285f1e",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a middle-aged Chinese American laundromat owner between washing machines in a surreal but coherent setting. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-16",
+      "title": "La La Land (2016)",
+      "path": "assets/quick-cards/oscars-16.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "bd07b7457f9c06d6f85df83de8d10158b64bb7949e681cffb4fb8ce3224a04ea",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a young couple dancing on a Los Angeles hilltop at dusk, distant city lights. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-17",
+      "title": "Parásitos (2019)",
+      "path": "assets/quick-cards/oscars-17.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "4c1310d5d296b676ecfbce98a08944592e87c9ba18fdcf92ed660bc8a2e68b69",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a modern Korean hillside luxury house with a visitor approaching through the garden. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-18",
+      "title": "Whiplash (2014)",
+      "path": "assets/quick-cards/oscars-18.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "4c646c29d2c35db5c6b55b24db2b3401d6d07a96ae3e0b3296a2604360248e21",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a young jazz drummer and demanding conductor in a rehearsal room. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-19",
+      "title": "Mad Max: Furia en la carretera (2015)",
+      "path": "assets/quick-cards/oscars-19.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "718aba92b264f5f4501a697d404c3588127e545af110e2c1b35d76d2e99140c6",
+      "prompt": "Vertical illustration for a Continuum knowledge card, exactly 512×768 px, portrait 2:3. Depict a battered armored tanker driving a desert road with a determined woman at the wheel. Scientific naturalist and cartographic engraving, antique etched linework, cross-hatching, stippling, fine brown ink, muted sepia and ochre on aged parchment, subtle paper grain, softly darkened edges, layered foreground and background, accurate proportions, quiet breathing room, one coherent full-bleed scene. Artwork only, absolutely no text, letters, numerals, signage, logos, labels, watermarks, border, frame, collage, split panels, saturated colors, glossy 3D, cartoon or photographic look. All signs, shirts, documents and displays blank."
+    },
+    {
+      "cardId": "oscars-20",
+      "title": "Spider-Man: Un nuevo universo (2018)",
+      "path": "assets/quick-cards/oscars-20.webp",
+      "width": 512,
+      "height": 768,
+      "sha256": "eb8812d98776bcd60cdb0269d97daef96a7d00ced9075cd47e2d6901bb87f7d7",
+      "prompt": "A detailed antique architectural and naturalist engraving, portrait 512×768. Brooklyn brownstone rooftops with the Brooklyn Bridge and Manhattan skyline in the background. In the foreground, a delicate spider web stretched between two rooftop railing posts with one small realistic spider. Clear web strands, atmospheric depth, realistic architecture and perspective, fine etched brown linework and cross-hatching, strictly sepia ink on aged cream parchment, soft vignette, full-bleed single coherent scene. No people, no text, no letters, no numerals, no logos, no border, no frame, no panels, no saturated colors, no cartoon or photo look."
+    }
+  ],
+  "totalBytes": 4610004
+}

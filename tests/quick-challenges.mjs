@@ -16,9 +16,9 @@ let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
 // Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
 const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
-assert.equal(quickCards.length, 507);
-assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 507);
-const auditedNotes = new Map(['docs/fuentes-metros-ampliacion-2026-10-04.json','docs/fuentes-siete-retos-ampliacion-2026-10-05.json'].flatMap(file=>JSON.parse(read(file)).cards.map(card=>[card.id,card.measureNote])));
+assert.equal(quickCards.length, 567);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 567);
+const auditedNotes = new Map(['docs/fuentes-metros-ampliacion-2026-10-04.json','docs/fuentes-siete-retos-ampliacion-2026-10-05.json','docs/fuentes-seis-retos-ampliacion-2026-10-05.json'].flatMap(file=>JSON.parse(read(file)).cards.map(card=>[card.id,card.measureNote])));
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
@@ -203,6 +203,35 @@ assert.equal(E.challenge('stadiums').cards.find(c=>c.id==='stadiums-18').value,4
 assert.ok(E.challenge('stadiums').cards.find(c=>c.id==='stadiums-17').title.includes('antes de la reforma'));
 assert.equal(E.challenge('albums-sales').cards.find(c=>c.id==='albums-sales-15').value,25,'Springsteen: estimación oficial de 2024');
 assert.equal(E.challenge('rivers-spain').cards.find(c=>c.id==='rivers-spain-15').value,66,'Bidasoa: recorrido completo según Navarra');
+
+
+// Coordenadas firmadas, husos fraccionarios y premios por categoría: criterios verificables de los seis mazos.
+const sixAudit=JSON.parse(read('docs/fuentes-seis-retos-ampliacion-2026-10-05.json'));
+assert.equal(sixAudit.cards.length,60);
+assert.equal(E.challenge('series-seasons').cards.find(c=>c.id==='series-seasons-11').value,38,'Los Simpson: temporada 38 estrenada el 27 de septiembre de 2026');
+const sixPreviousSizes={'series-seasons':11,'cities-north-south':9,'cities-east-west':10,'timezones-june':12,'companies-founded':12,'oscars':10};
+for(const [deckId,previous] of Object.entries(sixPreviousSizes)){
+ const deck=E.challenge(deckId);assert.equal(deck.cards.length,previous+10);
+ assert.equal(new Set(deck.cards.map(c=>c.title)).size,deck.cards.length);
+ s=E.create({names:['A','B'],rounds:[round(deckId)]});
+ while(s.remaining.length){const id=s.remaining[0],value=x=>deck.cards.find(c=>c.id===x).value;const place=s.timeline.findIndex(t=>value(t)>value(id));s=E.step(s,{type:'place',cardId:id,index:place<0?s.timeline.length:place});assert.equal(s.result.correct,true);s=E.step(s,{type:'ack'});}
+ assert.equal(s.phase,'round-end');
+ const saved={version:3,config:{names:['A','B'],rounds:[{id:deckId,order:Array.from({length:previous},(_,i)=>deckId+'-'+(i+1))}]},commands:[]};
+ assert.equal(E.restore(saved).remaining.length,previous-1);
+}
+function juneUtcOffset(zone){const name=new Intl.DateTimeFormat('en',{timeZone:zone,timeZoneName:'longOffset'}).formatToParts(new Date('2026-06-15T12:00:00Z')).find(p=>p.type==='timeZoneName').value;const m=name.match(/GMT([+-])(\d{2}):(\d{2})/);return m?(m[1]==='-'?-1:1)*(Number(m[2])+Number(m[3])/60):0;}
+assert.equal(juneUtcOffset('Europe/Madrid'),2);
+for(const item of sixAudit.cards){
+ const card=E.challenge(item.deck).cards.find(c=>c.id===item.id);
+ assert.equal(card.value,item.value);assert.equal(card.source,item.source);assert.equal(card.curiositySource,item.curiositySource);assert.ok(card.detail.includes(item.scope));
+ if(item.deck.startsWith('cities-')){const fields=item.snapshot.raw.split('\t');const col=item.deck==='cities-north-south'?4:5;assert.equal(Number(fields[0]),item.snapshot.geonameId);assert.equal(Number(fields[col].trim()).toFixed(2),card.value.toFixed(2));}
+ if(item.deck==='timezones-june'){assert.equal(card.value,juneUtcOffset(item.snapshot.ianaZone)-juneUtcOffset('Europe/Madrid'));assert.ok(card.detail.includes('15 de junio de 2026'));}
+ if(item.deck==='oscars'){assert.equal(card.value,new Set(item.snapshot.winningCategories).size);assert.ok(item.snapshot.nominations>=card.value);assert.ok(card.detail.includes('ceremonia de '+item.snapshot.ceremonyYear));}
+}
+assert.equal(E.challenge('timezones-june').cards.find(c=>c.id==='timezones-june-14').value,3.75);
+assert.equal(E.challenge('timezones-june').cards.find(c=>c.id==='timezones-june-13').value,-4.5);
+assert.equal(E.challenge('oscars').cards.find(c=>c.id==='oscars-16').value,6,'La La Land: seis premios, no catorce nominaciones');
+assert.ok(E.challenge('companies-founded').cards.find(c=>c.id==='companies-founded-18').detail.includes('Blue Ribbon Sports'));
 
 const companiesRevenue = CT.QuickCatalog.challenges.find(c => c.id === 'companies-revenue');
 assert.ok(companiesRevenue.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
