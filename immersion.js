@@ -88,6 +88,92 @@
   function captureBoard(container) {
     const cards = [...container.querySelectorAll('.timeline .timeline-card')];
     if (cards.length) finalCards = cards.slice(-7).map(card => card.cloneNode(true));
+    captureHand(container);
+  }
+
+  // ── Cambio de turno con la mano que pasa ─────────────────────────────────────────
+  // Al pasar el móvil, la mano de quien acaba baja y sale de la pantalla mientras sube
+  // la tarjeta del siguiente; al empezar su turno, su mano sube desde abajo. Las cartas
+  // solo tienen su aspecto dentro de la mesa (sus reglas dependen de #app.atlas-board),
+  // así que para verlas caer sobre la pantalla de paso se copian con su estilo ya
+  // calculado: son un recuerdo de la mesa, no la mesa.
+  let lastScreen = null, outgoingHand = null;
+  const HAND_STYLE = ['width', 'height', 'box-sizing', 'padding', 'margin', 'border', 'border-radius', 'background-color',
+    'background-image', 'background-size', 'background-position', 'background-repeat', 'box-shadow', 'color', 'font-family',
+    'font-size', 'font-weight', 'font-style', 'line-height', 'letter-spacing', 'text-transform', 'text-align', 'display',
+    'flex-direction', 'align-items', 'align-content', 'justify-content', 'justify-items', 'place-items', 'gap', 'position',
+    'top', 'right', 'bottom', 'left', 'overflow', 'opacity', 'object-fit', 'max-width', 'max-height', 'min-height',
+    'outline', 'outline-offset', 'white-space', 'overflow-wrap', '-webkit-line-clamp', '-webkit-box-orient', 'z-index',
+    'justify-self', 'align-self', 'grid-template-columns', 'grid-template-rows', 'grid-area', 'flex', 'order', 'filter',
+    'object-position', 'aspect-ratio', 'min-width', 'margin-inline', 'translate', 'scale'];
+  function frozenCopy(source) {
+    const copy = source.cloneNode(true);
+    const pairs = [[source, copy]];
+    const originals = source.querySelectorAll('*'), copies = copy.querySelectorAll('*');
+    originals.forEach((node, i) => pairs.push([node, copies[i]]));
+    pairs.forEach(([from, to], i) => {
+      const style = getComputedStyle(from);
+      to.removeAttribute('id'); to.removeAttribute('class');
+      HAND_STYLE.forEach(name => to.style.setProperty(name, style.getPropertyValue(name)));
+      // La postura de la carta la pone el vuelo; la de lo que lleva dentro se conserva.
+      if (i) to.style.setProperty('transform', style.getPropertyValue('transform'));
+    });
+    return copy;
+  }
+  // Se guarda la última mano visible de la mesa. Al llegar la pantalla de paso la mano
+  // ya está oculta tras el resultado, así que vale la foto del repintado anterior. Solo se
+  // rehace cuando cambian las cartas: copiar estilos en cada toque sería trabajo de más.
+  function captureHand(container) {
+    if (lastScreen !== 'game' || reduced() || typeof DOMMatrixReadOnly !== 'function') { outgoingHand = null; return; }
+    const cards = [...container.querySelectorAll('.hand .hand-card')]
+      .filter(card => getComputedStyle(card).visibility !== 'hidden' && card.getBoundingClientRect().width);
+    if (!cards.length) return;
+    const key = cards.map(card => card.dataset.id).join('|');
+    if (outgoingHand?.key === key) return;
+    outgoingHand = {key, cards: cards.slice(0, 7).map(card => {
+      const box = card.getBoundingClientRect();
+      const matrix = new DOMMatrixReadOnly(getComputedStyle(card).transform);
+      return {copy: frozenCopy(card), box, width: card.offsetWidth, height: card.offsetHeight,
+        angle: Math.atan2(matrix.b, matrix.a) * 180 / Math.PI, scale: Math.hypot(matrix.a, matrix.b) || 1};
+    })};
+  }
+  function handOff(container, screen) {
+    const previous = lastScreen;
+    lastScreen = screen;
+    if (reduced()) return;
+    if (screen !== 'game' && screen !== 'pass') outgoingHand = null;
+    if (screen === 'pass' && previous === 'game' && outgoingHand) {
+      const leaving = outgoingHand; outgoingHand = null;
+      const layer = document.createElement('div');
+      layer.className = 'hand-handoff'; layer.setAttribute('aria-hidden', 'true');
+      document.body.append(layer);
+      const flights = leaving.cards.map(({copy, box, width, height, angle, scale}, i) => {
+        Object.assign(copy.style, {position: 'fixed', margin: '0', zIndex: '90', pointerEvents: 'none',
+          left: `${box.left + box.width / 2 - width / 2}px`, top: `${box.top + box.height / 2 - height / 2}px`,
+          width: `${width}px`, height: `${height}px`});
+        layer.append(copy);
+        const start = `rotate(${angle}deg) scale(${scale})`;
+        const drift = (i - (leaving.cards.length - 1) / 2) * 26;
+        return copy.animate([
+          {transform: `translateY(0) ${start}`, opacity: 1},
+          {transform: `translateY(-14px) ${start}`, opacity: 1, offset: .18},
+          {transform: `translate(${drift}px, ${window.innerHeight - box.top + 40}px) rotate(${angle + drift / 3}deg) scale(${scale * .92})`, opacity: .9}
+        ], {duration: 640, delay: i * 55, easing: 'cubic-bezier(.45,0,.75,.4)', fill: 'both'});
+      });
+      Promise.all(flights.map(flight => flight.finished)).then(() => layer.remove(), () => layer.remove());
+      container.querySelector('.pass-card')?.classList.add('turn-arrive');
+      return;
+    }
+    if (screen === 'game' && previous === 'pass') {
+      (window.requestAnimationFrame || (fn => setTimeout(fn, 0)))(() => {
+        const cards = [...container.querySelectorAll('.hand .hand-card')]
+          .filter(card => getComputedStyle(card).visibility !== 'hidden');
+        cards.forEach((card, i) => card.animate?.([
+          {translate: `0 ${window.innerHeight * .6}px`, rotate: `${(i % 2 ? 1 : -1) * 9}deg`, opacity: 0},
+          {translate: '0 0', rotate: '0deg', opacity: 1}
+        ], {duration: 620, delay: 120 + i * 70, easing: 'cubic-bezier(.3,1.35,.5,1)', fill: 'backwards'}));
+      });
+    }
   }
   function atlasFinal(container) {
     const panel = container.querySelector('.pass-screen .panel, .panel');
@@ -106,6 +192,34 @@
       fan.append(card);
     });
     if (finalCards.length) panel.prepend(fan);
+    lightScore(panel, fan);
+  }
+  // La puntuación se ilumina por partes, como el recuento de Calico o de Wingspan: cuando
+  // el abanico ya se ha reunido, cada carta se levanta y se dora una tras otra, y el
+  // contador sube al mismo ritmo hasta la cifra final, que se sella. Es solo la manera de
+  // contarlo: la cifra es la de siempre y al terminar queda exactamente igual.
+  function lightScore(panel, fan) {
+    const score = panel.querySelector('.final-score strong');
+    const cards = [...fan.children];
+    const target = Number(score?.textContent);
+    if (reduced() || !cards.length) return;
+    const counts = score && Number.isInteger(target) && target > 0;
+    const original = score?.textContent;
+    if (counts) { score.textContent = '0'; score.setAttribute('aria-hidden', 'true'); }
+    const start = 820, gap = Math.max(150, Math.min(300, 1900 / cards.length));
+    cards.forEach((card, i) => setTimeout(() => {
+      if (!card.isConnected) return;
+      card.classList.add('final-lit');
+      if (counts && score.isConnected) {
+        score.textContent = String(Math.round(target * (i + 1) / cards.length));
+        score.animate?.([{transform: 'scale(1.18)'}, {transform: 'none'}], {duration: 220, easing: 'ease-out'});
+      }
+    }, start + i * gap));
+    setTimeout(() => {
+      if (!score?.isConnected) return;
+      score.textContent = original; score.removeAttribute('aria-hidden');
+      score.closest('.final-score')?.classList.add('final-score-sealed');
+    }, start + cards.length * gap + 120);
   }
   function scrollVeil(surface, scroller = surface) {
     let veil = surface.querySelector(':scope > .atlas-scroll-veil');
@@ -218,8 +332,14 @@
       if (delta < -cards.length / 2) delta += cards.length;
       return delta;
     };
-    const step = Math.min(window.innerWidth * .3, 112, (window.innerHeight * .22 - 16) * .68) * .55;
-    const pose = offset => `translateX(${offset * step}px) translateY(${Math.abs(offset) * 11.2}px) rotate(${offset * 4}deg) scale(${Math.max(.65, 1 - Math.abs(offset) * .14)})`;
+    // El paso entre cartas se lee del propio CSS (la traslación de una carta en reposo),
+    // para que el arrastre y la postura final coincidan en cualquier tamaño de pantalla.
+    // La postura reproduce la regla de edition.css: traslación, caída, giro y escala.
+    let step = Math.min(window.innerWidth * .147, 54.6);
+    const pose = offset => `translateX(${offset * step}px) translateY(${Math.abs(offset) * 11.2}px) rotate(${offset * 6}deg) scale(${Math.max(.5, 1 - Math.abs(offset) * .14)})`;
+    // Un muelle: pasa un poco de su sitio y vuelve. Es lo que da peso a las cartas.
+    const SPRING = 'cubic-bezier(.3,1.45,.5,1)';
+    const offsets = new Map();
     cards.forEach((card, index) => {
       const offset = distance(index, center);
       card.style.setProperty('--fan-offset', offset);
@@ -229,11 +349,28 @@
       card.classList.toggle('fan-away', Math.abs(offset) > 2);
       card.tabIndex = index === center && enabled ? 0 : -1;
       card.setAttribute('aria-label', `${card.querySelector('strong')?.textContent || 'Carta'}. ${index + 1} de ${cards.length}`);
-      if (!reduced() && previousFan?.key === key && previousFan.center !== center && Math.abs(offset) <= 2) {
-        card.animate?.([{transform: pose(distance(index, previousFan.center))}, {transform: pose(offset)}], {duration: 260, easing: 'cubic-bezier(.2,.7,.2,1)'});
+      offsets.set(card.dataset.id, offset);
+    });
+    const sample = cards.find(card => offsets.get(card.dataset.id));
+    if (sample && typeof DOMMatrixReadOnly === 'function') {
+      const moved = new DOMMatrixReadOnly(getComputedStyle(sample).transform).e / offsets.get(sample.dataset.id);
+      if (Number.isFinite(moved) && Math.abs(moved) > 1) step = Math.abs(moved);
+    }
+    if (!reduced()) cards.forEach(card => {
+      const offset = offsets.get(card.dataset.id);
+      if (Math.abs(offset) > 2) return;
+      // Cambió la carta del centro (deslizar o flechas): cada carta sale de donde estaba,
+      // incluido lo que el dedo ya la había arrastrado, y llega con rebote.
+      if (previousFan?.key === key && previousFan.center !== center) {
+        const before = previousFan.offsets.get(card.dataset.id) + (previousFan.drag || 0);
+        card.animate?.([{transform: pose(before)}, {transform: pose(offset)}], {duration: 420, easing: SPRING});
+      // Salió una carta de la mano: las demás se recolocan y se asientan con un rebote.
+      } else if (previousFan && previousFan.key !== key && previousFan.offsets.has(card.dataset.id)) {
+        const before = previousFan.offsets.get(card.dataset.id);
+        if (before !== offset) card.animate?.([{transform: pose(before)}, {transform: pose(offset)}], {duration: 460, easing: SPRING});
       }
     });
-    previousFan = {key, center};
+    previousFan = {key, center, offsets, drag: 0};
     if (cards.length === 1) return;
     const controls = document.createElement('div');
     controls.className = 'hand-fan-controls';
@@ -254,26 +391,62 @@
       document.querySelector('.hand-fan .fan-center')?.focus({preventScroll: true});
     });
     let gesture = null;
+    // Mientras el dedo arrastra en horizontal, el abanico entero lo sigue: cada carta se
+    // desplaza por su arco hacia la posición de al lado. Más allá de una carta cede cada
+    // vez menos, como una goma.
+    const dragTo = drag => {
+      cards.forEach(card => {
+        const offset = offsets.get(card.dataset.id);
+        if (Math.abs(offset) > 3) return;
+        card.style.transition = 'none';
+        card.style.transform = pose(offset + drag);
+      });
+    };
+    const settle = from => {
+      cards.forEach(card => card.style.removeProperty('transition'));
+      if (reduced()) { cards.forEach(card => card.style.removeProperty('transform')); return; }
+      cards.forEach(card => {
+        const offset = offsets.get(card.dataset.id);
+        if (Math.abs(offset) > 3) return;
+        card.style.removeProperty('transform');
+        card.animate?.([{transform: pose(offset + from)}, {transform: pose(offset)}], {duration: 380, easing: SPRING});
+      });
+    };
+    const rubber = value => {
+      const limit = 1, sign = Math.sign(value), abs = Math.abs(value);
+      return abs <= limit ? value : sign * (limit + (1 - 1 / ((abs - limit) * 1.5 + 1)) * .4);
+    };
     hand.addEventListener('pointerdown', event => {
       if (!enabled || event.pointerType === 'mouse' || event.isPrimary === false) return;
-      gesture = {id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false};
+      gesture = {id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false, drag: 0};
+      hand.classList.add('fan-touch');
     });
     hand.addEventListener('pointermove', event => {
       if (!gesture || event.pointerId !== gesture.id) return;
       if (document.body.classList.contains('dragging-card')) { gesture = null; return; }
       const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
       if (!gesture.horizontal && Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { gesture = null; return; }
-      if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      if (!gesture.horizontal && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.4) {
         gesture.horizontal = true;
-        event.preventDefault();
         hand.setPointerCapture?.(event.pointerId);
+      }
+      if (gesture.horizontal) {
+        event.preventDefault();
+        if (!reduced()) { gesture.drag = rubber(dx / step); dragTo(gesture.drag); }
       }
     }, {passive: false});
     hand.addEventListener('pointerup', event => {
       const move = gesture; gesture = null;
-      if (!move || event.pointerId !== move.id || !move.horizontal || document.body.classList.contains('dragging-card')) return;
+      hand.classList.remove('fan-touch');
+      if (!move || event.pointerId !== move.id || !move.horizontal || document.body.classList.contains('dragging-card')) {
+        if (move?.drag) settle(move.drag);
+        return;
+      }
       const dx = event.clientX - move.x;
-      if (Math.abs(dx) < 35) return;
+      // Poco recorrido: el abanico vuelve a su sitio con un rebote, sin cambiar de carta.
+      if (Math.abs(dx) < 35) { settle(move.drag); return; }
+      // La carta nueva arranca desde donde el dedo dejó el abanico.
+      if (previousFan) previousFan.drag = move.drag;
       event.preventDefault();
       // Evita que el clic sintético del dedo seleccione otra carta tras repintar.
       const swallow = click => { if (click.isTrusted) { click.preventDefault(); click.stopImmediatePropagation(); } };
@@ -281,7 +454,10 @@
       setTimeout(() => document.removeEventListener('click', swallow, true), 350);
       select(dx < 0 ? 1 : -1);
     });
-    hand.addEventListener('pointercancel', () => { gesture = null; });
+    hand.addEventListener('pointercancel', () => {
+      if (gesture?.drag) settle(gesture.drag);
+      gesture = null; hand.classList.remove('fan-touch');
+    });
   }
   // Ajusta la mesa según el espacio visible real. Safari puede cambiar la altura al
   // plegar sus barras; las clases se recalculan sin tocar el zoom elegido ni el estado.
@@ -388,6 +564,7 @@
   }, {passive: true});
 
   function mount(container, screen) {
+    handOff(container, screen);
     if (['solo-end', 'winner', 'online-winner', 'comp-end'].includes(screen)) atlasFinal(container);
     if (screen === 'home') finalCards = [];
     // Se pliega aquí, antes de que la cámara fotografíe el destino (más abajo, en

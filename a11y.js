@@ -196,6 +196,36 @@
     return () => { clearTimeout(timer); wave.remove(); };
   }
 
+  const CT_escape = value => String(value).replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[char]));
+
+  // El rastro de tinta que deja la carta fallada al viajar hasta su sitio: una curva de
+  // trazos terracota que se dibuja a la vez que la carta avanza y luego se seca.
+  function inkTrail(start, control, end, duration) {
+    if (typeof document.createElementNS !== 'function') return () => {};
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'correction-trail');
+    svg.setAttribute('aria-hidden', 'true');
+    const d = `M${start.x} ${start.y} Q${control.x} ${control.y - 40} ${end.x} ${end.y}`;
+    const mask = document.createElementNS(ns, 'mask');
+    mask.setAttribute('id', 'correction-trail-mask');
+    const reveal = document.createElementNS(ns, 'path');
+    Object.entries({d, fill: 'none', stroke: '#fff', 'stroke-width': 10, pathLength: 100, 'stroke-dasharray': '100 100', 'stroke-dashoffset': 100})
+      .forEach(([name, value]) => reveal.setAttribute(name, value));
+    mask.append(reveal);
+    const path = document.createElementNS(ns, 'path');
+    Object.entries({d, class: 'correction-trail-ink', fill: 'none', pathLength: 100, mask: 'url(#correction-trail-mask)'})
+      .forEach(([name, value]) => path.setAttribute(name, value));
+    svg.append(mask, path);
+    document.body.append(svg);
+    const draw = reveal.animate?.([{strokeDashoffset: 100}, {strokeDashoffset: 100, offset: .31}, {strokeDashoffset: 0, offset: .78}, {strokeDashoffset: 0}],
+      {duration, fill: 'forwards'});
+    const fade = svg.animate?.([{opacity: 1}, {opacity: 1, offset: .8}, {opacity: 0}], {duration: duration + 250, fill: 'forwards'});
+    const remove = () => svg.remove();
+    fade?.finished.then(remove, remove);
+    return () => { draw?.cancel(); fade?.cancel(); remove(); };
+  }
+
   // El golpe de una carta al caer sobre la mesa: dos bocanadas de polvo que salen por
   // debajo hacia los lados y una sacudida breve de toda la línea. Va en la línea y no en
   // la carta, porque la carta recorta lo que se sale de ella.
@@ -540,24 +570,52 @@
         lesson.className = 'placement-correction-card'; lesson.setAttribute('aria-hidden', 'true');
         const heading = overlay.querySelector('h2')?.cloneNode(true);
         heading?.querySelectorAll('.solo-lectores').forEach(node => node.remove());
-        lesson.innerHTML = `<small>Su posición era</small><b>${heading?.textContent?.trim() || ''}</b><span>${overlay.querySelector('.year')?.textContent || ''}</span>`;
+        // La propia carta fallada, a su tamaño en la línea y con su lámina, es la que se
+        // corrige: aparece donde se puso, niega con la cabeza y viaja en arco hasta su
+        // sitio dejando un rastro de tinta. Sin lámina queda la tarjeta de texto.
+        const art = overlay.querySelector('.art-thumb img')?.getAttribute('src');
+        const sample = document.querySelector('.timeline .timeline-card');
+        const full = !!(art && sample?.offsetWidth);
+        const title = CT_escape(heading?.textContent?.trim() || '');
+        const year = CT_escape(overlay.querySelector('.year')?.textContent || '');
+        if (full) {
+          lesson.classList.add('is-card');
+          lesson.innerHTML = `<span class="correction-art"><img src="${CT_escape(art)}" alt="" decoding="async"></span><span class="correction-body"><small>Su posición era</small><b>${title}</b><span>${year}</span></span>`;
+        } else lesson.innerHTML = `<small>Su posición era</small><b>${title}</b><span>${year}</span>`;
         document.body.append(lesson);
-        const w = 126, h = 78;
+        const sampleBox = full ? sample.getBoundingClientRect() : null;
+        const w = full ? sampleBox.width : 126, h = full ? sampleBox.height : 78;
+        if (full) { lesson.style.width = `${w}px`; lesson.style.height = `${h}px`; }
         const clampX = x => Math.max(6, Math.min(window.innerWidth - w - 6, x));
         const clampY = y => Math.max(6, Math.min(window.innerHeight - h - 6, y));
         const startX = clampX(from.left + from.width / 2 - w / 2), startY = clampY(from.top + from.height / 2 - h / 2);
         const endX = clampX(to.left + to.width / 2 - w / 2), endY = clampY(to.top + to.height / 2 - h / 2);
-        const flight = lesson.animate([
+        const at = (x, y, rot, size) => `translate3d(${x}px,${y}px,0) rotate(${rot}deg) scale(${size})`;
+        const lift = Math.max(6, Math.min(startY, endY) - 46);
+        const midX = (startX + endX) / 2;
+        const flight = lesson.animate(full ? [
+          {transform: at(startX, startY + 10, -3, .86), opacity: 0},
+          {transform: at(startX, startY - 6, -2, 1.02), opacity: 1, offset: .12},
+          {transform: at(startX - 7, startY - 6, -6, 1.02), offset: .17},
+          {transform: at(startX + 7, startY - 6, 5, 1.02), offset: .22},
+          {transform: at(startX - 5, startY - 6, -4, 1.02), offset: .27},
+          {transform: at(startX, startY - 6, 0, 1.02), offset: .31},
+          {transform: at(midX, lift, endX > startX ? 7 : -7, 1.04), offset: .56},
+          {transform: at(endX, endY - 4, 0, 1), offset: .76},
+          {transform: at(endX, endY + 2, 0, .97), opacity: 1, offset: .82},
+          {transform: at(endX, endY, 0, .97), opacity: 0}
+        ] : [
           {transform:`translate3d(${startX}px,${startY}px,0) rotate(-4deg) scale(.88)`,opacity:.35},
           {transform:`translate3d(${startX}px,${startY - 12}px,0) rotate(-3deg) scale(1)`,opacity:1,offset:.22},
           {transform:`translate3d(${endX}px,${endY}px,0) rotate(0) scale(.94)`,opacity:1,offset:.78},
           {transform:`translate3d(${endX}px,${endY}px,0) rotate(0) scale(.9)`,opacity:0}
-        ], {duration:Math.min(1120, remaining),easing:'cubic-bezier(.2,.72,.22,1)',fill:'forwards'});
+        ], {duration:Math.min(1300, remaining),easing:full ? 'ease-in-out' : 'cubic-bezier(.2,.72,.22,1)',fill:'forwards'});
+        const clearTrail = full ? inkTrail({x: startX + w / 2, y: startY + h / 2}, {x: midX + w / 2, y: lift + h / 2}, {x: endX + w / 2, y: endY + h / 2}, Math.min(1300, remaining)) : () => {};
         correctSlot.classList.add('correction-target');
         const clearWave = inkWave(correctSlot, 'error');
         const onKey = event => { if (event.key === 'Tab' || event.key === 'Enter' || event.key === ' ') event.preventDefault(); };
         document.addEventListener('keydown', onKey);
-        const clean = () => { lesson.remove(); correctSlot.classList.remove('correction-target'); clearWave(); };
+        const clean = () => { lesson.remove(); correctSlot.classList.remove('correction-target'); clearWave(); clearTrail(); };
         const pending = {overlay, previo: document.activeElement, onKey, cerrable: false, cancelRoll: () => { clearTimeout(timer); flight.cancel(); clean(); }};
         pila.push(pending);
         const timer = setTimeout(() => {
@@ -625,7 +683,8 @@
     window.CONTINUUM.UI?.openSurface(modal);
     // Marcar y arrancar el desenrollado antes de activar `dialog-enter` evita que el
     // navegador llegue a pintar primero la animación CSS y después la animación JS.
-    const cancelRoll = unrollSheet(modal, false, true);
+    // La ficha de una carta crece desde la propia carta (zoomFromCard); no se desenrolla.
+    const cancelRoll = overlay.classList.contains("zoom-detail") ? null : unrollSheet(modal, false, true);
     overlay.classList.add("dialog-enter");
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", compact ? "false" : "true");
@@ -706,7 +765,11 @@
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     // jsdom y navegadores antiguos no exponen getAnimations: en ellos se mantiene el
     // cierre inmediato. En navegadores actuales se deja respirar la salida 160 ms.
-    if (immediate || reduce || typeof dialogo.overlay.getAnimations !== "function") { termina(); return; }
+    if (immediate || reduce || typeof dialogo.overlay.getAnimations !== "function") { if (dialogo.zoomSource) dialogo.zoomSource.style.visibility = ''; termina(); return; }
+    if (dialogo.zoomSource) {
+      dialogo.overlay.classList.remove("dialog-enter");
+      if (zoomBack(dialogo, termina)) return;
+    }
     dialogo.overlay.classList.remove("dialog-enter");
     dialogo.overlay.classList.add("dialog-exit");
     dialogo.overlay.inert = true;
@@ -779,8 +842,58 @@
     if (description.textContent) modal.append(description);
     modal.append(back);
     overlay.append(modal);
+    overlay.classList.add('zoom-detail');
     document.getElementById('app').append(overlay);
     openDialog(overlay, true);
+    zoomFromCard(overlay, carta);
+  }
+
+  // La ficha ampliada nace de la carta que se ha tocado: crece desde su sitio en la línea
+  // hasta ocupar la pantalla y, al cerrarla, vuelve a encogerse hasta él. Mientras está
+  // abierta, la carta de la línea se oculta: es ella la que se ha levantado de la mesa.
+  // Se mide sin escala no uniforme (la ficha no se deforma): solo se desplaza y escala
+  // hasta el ancho de la carta, y el resto aparece con un fundido.
+  function cardPose(modal, carta) {
+    const from = carta.getBoundingClientRect(), to = modal.getBoundingClientRect();
+    if (!from.width || !to.width) return null;
+    const scale = from.width / to.width;
+    return `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${scale})`;
+  }
+  function zoomFromCard(overlay, carta) {
+    const dialogo = pila.find(item => item.overlay === overlay);
+    const modal = overlay.querySelector('.modal');
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (!dialogo || !modal || reduce || typeof modal.animate !== 'function') return;
+    const pose = cardPose(modal, carta);
+    if (!pose) return;
+    dialogo.zoomSource = carta;
+    carta.style.visibility = 'hidden';
+    modal.style.transformOrigin = 'top left';
+    modal.animate([
+      {transform: pose, borderRadius: '7px', boxShadow: '0 4px 10px #3d271c33'},
+      {transform: 'none', borderRadius: getComputedStyle(modal).borderRadius, boxShadow: getComputedStyle(modal).boxShadow}
+    ], {duration: 420, easing: 'cubic-bezier(.2,.8,.2,1.04)'});
+    // El texto llega cuando la ficha ya casi ha crecido: durante el vuelo solo se ve la lámina.
+    [...modal.children].filter(child => !child.classList.contains('timeline-detail-image')).forEach(child => {
+      child.animate?.([{opacity: 0}, {opacity: 0, offset: .55}, {opacity: 1}], {duration: 420, easing: 'ease-out'});
+    });
+    overlay.animate?.([{backgroundColor: 'transparent'}, {}], {duration: 300, easing: 'ease-out'});
+  }
+  function zoomBack(dialogo, done) {
+    const carta = dialogo.zoomSource;
+    const modal = dialogo.overlay.querySelector('.modal');
+    const restore = () => { if (carta) carta.style.visibility = ''; };
+    const pose = carta?.isConnected && modal ? cardPose(modal, carta) : null;
+    if (!pose) { restore(); return false; }
+    dialogo.overlay.inert = true;
+    [...modal.children].filter(child => !child.classList.contains('timeline-detail-image')).forEach(child => {
+      child.animate?.([{opacity: 1}, {opacity: 0, offset: .35}, {opacity: 0}], {duration: 320, fill: 'forwards'});
+    });
+    dialogo.overlay.animate?.([{}, {backgroundColor: 'transparent'}], {duration: 320, fill: 'forwards'});
+    const flight = modal.animate([{transform: 'none'}, {transform: pose, borderRadius: '7px'}], {duration: 320, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards'});
+    const end = () => { restore(); done(); };
+    flight.finished.then(end, end);
+    return true;
   }
   document.addEventListener("click", event => {
     if (event.target.closest('[data-card-detail-close]')) { closeDialog(); return; }

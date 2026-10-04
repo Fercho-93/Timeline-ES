@@ -5483,3 +5483,93 @@ html:has(#app.atlas-board) .motas { display: none; }
   80% { opacity: var(--o); }
   100% { opacity: 0; transform: translate3d(0, -88vh, 0); }
 }
+
+/* ── Escenario según el mazo ──────────────────────────────────────────────────────
+   Como la habitación de Calico o los hábitats de Wingspan: cada bloque juega sobre su
+   propia lámina. La ilustración de la portada del bloque llena el fondo de la mesa,
+   asoma con fuerza por arriba y por los lados y queda velada en el centro, donde están
+   las cartas, para no restar contraste a nada que haya que leer. Solo en la mesa de
+   juego (#app.atlas-board); los menús siguen con la lámina común. */
+:root[data-scene="history"] { --scene-art: url("assets/hero-history-700.webp"); --scene-art-pos: center 30%; }
+:root[data-scene="entertainment"] { --scene-art: url("assets/hero-entertainment-700.webp"); --scene-art-pos: center 20%; }
+:root[data-scene="science"] { --scene-art: url("assets/hero-science-700.webp"); --scene-art-pos: center 20%; }
+:root[data-scene="nature"] { --scene-art: url("assets/hero-nature-700.webp"); --scene-art-pos: center 25%; }
+:root[data-scene="globe"] { --scene-art: url("assets/hero-geography-700.webp"); --scene-art-pos: center 15%; }
+:root[data-scene="mixed"] { --scene-art: url("assets/hero-mixed-700.webp"); --scene-art-pos: center 25%; }
+:root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board)::before {
+  background:
+    linear-gradient(180deg, #f4ead8c7 0, #f4ead870 9%, transparent 16%),
+    radial-gradient(ellipse 70% 56% at 50% 58%, #f4ead8d9 0 30%, #f2e7d28c 60%, #efe2c814 100%),
+    linear-gradient(180deg, transparent 0 70%, color-mix(in srgb, var(--scene-color) 22%, transparent)),
+    var(--scene-art) var(--scene-art-pos) / cover no-repeat,
+    #e9dcc3;
+  filter: saturate(.95);
+}
+:root[data-theme="dark"]:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board)::before {
+  background:
+    radial-gradient(ellipse 78% 62% at 50% 60%, #140d08f2 0 34%, #140d08d9 62%, #140d0880 100%),
+    var(--scene-art) var(--scene-art-pos) / cover no-repeat,
+    #140d08;
+}
+/* La mesa deja ver la escena: el panel de la línea pierde algo de su papel opaco. */
+:root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]) #app.atlas-board .board-timeline-section {
+  border-color: color-mix(in srgb, var(--scene-color) 30%, #d9c7a4);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--scene-color) 14%, transparent), inset 0 0 0 1px #fff8e855;
+}
+
+/* La ficha de una carta crece desde la carta (a11y.js · zoomFromCard): sin la entrada
+   genérica de los diálogos, que la haría deslizarse desde abajo. */
+.zoom-detail.dialog-enter .modal { animation: none; }
+
+/* Mano en abanico con física (immersion.js · mountHandFan): al apoyar el dedo, la carta
+   del centro se levanta un poco, como al cogerla de la mesa. `translate` y no
+   `transform`, que es donde vive la postura del abanico. */
+@media (prefers-reduced-motion: no-preference) {
+  #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { transition: translate 160ms ease-out; }
+  #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan.fan-touch .hand-card.fan-center { translate: 0 -7px; }
+}
+
+/* Cambio de turno (immersion.js · handOff): la tarjeta del siguiente sube mientras la
+   mano anterior cae, y su medallón aparece con un pequeño salto. */
+@media (prefers-reduced-motion: no-preference) {
+  #app .pass-card.turn-arrive { animation: turno-sube 620ms 180ms cubic-bezier(.3,1.3,.5,1) both; }
+  #app .pass-card.turn-arrive .player-medallion { animation: turno-medallon 520ms 560ms cubic-bezier(.3,1.6,.5,1) both; }
+}
+@keyframes turno-sube { from { opacity: 0; transform: translateY(70px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes turno-medallon { from { transform: scale(.4) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Fallo con más presencia (a11y.js): la carta fallada entera viaja a su sitio. */
+.placement-correction-card.is-card {
+  display: flex; flex-direction: column; gap: 0; padding: 0; overflow: hidden;
+  border-radius: 8px; border: 2px solid #a5543a;
+  box-shadow: 0 18px 30px #36210d45, 0 0 0 4px #a5543a26;
+  background-color: #f6ead0;
+  background-image: var(--carta-lino), var(--carta-grano);
+  background-size: 9px 9px, 160px 160px;
+}
+.placement-correction-card.is-card .correction-art { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.placement-correction-card.is-card .correction-art img { display: block; width: 100%; height: 100%; object-fit: cover; filter: sepia(.15); }
+.placement-correction-card.is-card .correction-body { display: grid; gap: 2px; padding: 6px 8px 8px; }
+.placement-correction-card.is-card .correction-body small { color: #944e35; font: 700 .5rem/1.2 var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
+.placement-correction-card.is-card .correction-body b { font: 700 .74rem/1.15 var(--font-display, Georgia); color: var(--edition-ink); }
+.placement-correction-card.is-card .correction-body span { color: #93482e; font: 700 .95rem/1 var(--font-display, Georgia); }
+.correction-trail { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 79; pointer-events: none; overflow: visible; }
+.correction-trail-ink { stroke: #a5543a; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1.4 2.4; opacity: .8; }
+
+/* Puntuación que se ilumina por partes (immersion.js · lightScore). */
+@media (prefers-reduced-motion: no-preference) {
+  #app .atlas-final-page .atlas-final-fan > .timeline-card { transition: translate 260ms cubic-bezier(.3,1.5,.5,1), box-shadow 260ms ease-out; }
+  #app .atlas-final-page .atlas-final-fan > .timeline-card.final-lit {
+    translate: 0 -10px;
+    box-shadow: 0 0 0 2px #d6a542, 0 0 18px #e8bd5e99, 0 10px 18px #33210e40;
+  }
+  #app .atlas-final-page .atlas-final-fan > .timeline-card.final-lit::after {
+    content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit;
+    background: linear-gradient(115deg, transparent 30%, #fff3c8b3 48%, #fffbe9e6 50%, #fff3c8b3 52%, transparent 70%) no-repeat;
+    background-size: 260% 100%; mix-blend-mode: screen;
+    animation: final-brillo 620ms ease-out both;
+  }
+  #app .final-score.final-score-sealed { animation: final-sello 520ms cubic-bezier(.3,1.6,.5,1); }
+}
+@keyframes final-brillo { from { background-position: 130% 0; } to { background-position: -30% 0; } }
+@keyframes final-sello { 0% { transform: scale(1); } 40% { transform: scale(1.08) rotate(-1.5deg); box-shadow: 0 0 0 3px #d6a54266, 0 0 26px #e8bd5e80; } 100% { transform: none; } }
