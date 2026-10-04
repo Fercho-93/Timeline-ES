@@ -1,0 +1,1623 @@
+{
+  "accessedAt": "2026-10-05",
+  "method": "Diez nuevas cartas por bloque. Fuentes individualizadas, preparación y alcance visibles. Los datos antiguos se conservan y esta ampliación no implica su revalidación. Las ventas son estimaciones históricas divulgadas, no totales homogéneos de 2026 ni certificaciones mundiales. Las altitudes nuevas corresponden a un punto urbano modelizado. Los ríos utilizan la medición cartográfica del curso salvo Bidasoa, cuya ficha autonómica incluye el recorrido completo.",
+  "datasets": {
+    "geonames": {
+      "url": "https://download.geonames.org/export/dump/cities15000.zip",
+      "sha256": "4d91d34a56966f1b6c7ae192e171bd721b47f7b86848955679ed20bd032d4aba",
+      "method": "Columna DEM; SRTM3 o GTOPO30 según GeoNames; cifra aproximada puntual, no altura media ni rango municipal."
+    },
+    "usda": {
+      "url": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "release": "SR28, septiembre de 2015",
+      "sha256": "8308fd1d224ef1e5331093748007180da01a7ac713cbac6a1f5bc2a03e1ee70a"
+    },
+    "ign": {
+      "url": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "sha256": "fc9cec4683805072010387bba237356d9bea6f321e9d9747304fa5162db8b8c7",
+      "caution": "No se utiliza el campo Nacimiento salvo el Ter; algunas filas contienen valores anómalos. No se suma el Baztan al tramo Bidasoa del IGN para inventar una longitud total."
+    }
+  },
+  "cards": [
+    {
+      "id": "airports-8",
+      "deck": "airports",
+      "title": "Madrid-Barajas",
+      "value": 68.179054,
+      "label": "≈68,2 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Las primeras líneas regulares de Barajas conectaron Madrid con Barcelona y Sevilla; las operaba LAPE, antecesora de Iberia.",
+      "curiositySource": "https://www.aena.es/es/adolfo-suarez-madrid-barajas/conocenos/historia.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 68179054,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-9",
+      "deck": "airports",
+      "title": "Barcelona-El Prat",
+      "value": 57.483036,
+      "label": "≈57,5 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Desde marzo de 2019 su nombre oficial recuerda a Josep Tarradellas, que fue presidente de la Generalitat de Catalunya.",
+      "curiositySource": "https://www.aena.es/en/josep-tarradellas-barcelona-el-prat/get-to-know-us/history.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 57483036,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-10",
+      "deck": "airports",
+      "title": "Palma de Mallorca",
+      "value": 33.806427,
+      "label": "≈33,8 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Antes del gran aeropuerto de Son Sant Joan, una línea postal unía Barcelona y Palma con hidroaviones que amerizaban en el puerto.",
+      "curiositySource": "https://www.aena.es/es/palma-de-mallorca/conocenos/historia.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 33806427,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-11",
+      "deck": "airports",
+      "title": "Málaga-Costa del Sol",
+      "value": 26.760549,
+      "label": "≈26,8 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Sus vuelos regulares comenzaron en 1919, dentro de una ruta que enlazaba Toulouse con Casablanca pasando por varias ciudades españolas.",
+      "curiositySource": "https://www.aena.es/es/malaga-costa-del-sol/conocenos/historia.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 26760549,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-12",
+      "deck": "airports",
+      "title": "Alicante-Elche",
+      "value": 19.950394,
+      "label": "≈20,0 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Abrió en 1967 y sustituyó al aeródromo de La Rabassa; el primer avión que aterrizó fue un Convair Metropolitan de Aviaco.",
+      "curiositySource": "https://www.aena.es/es/alicante-elche-miguel-hernandez/conocenos/historia.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 19950394,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-13",
+      "deck": "airports",
+      "title": "Gran Canaria",
+      "value": 15.826553,
+      "label": "≈15,8 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Su historia está ligada a Gando: una orden real de 1930 declaró aeropuerto nacional las instalaciones que se construyeran allí.",
+      "curiositySource": "https://www.aena.es/es/gran-canaria/conocenos/historia.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 15826553,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-14",
+      "deck": "airports",
+      "title": "Tenerife Sur",
+      "value": 13.969678,
+      "label": "≈14,0 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Fue inaugurado el 6 de noviembre de 1978; la reina Sofía llegó en un avión Mystere de la Subsecretaría de Aviación Civil.",
+      "curiositySource": "https://www.aena.es/es/tenerife-sur/conocenos/historia.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 13969678,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-15",
+      "deck": "airports",
+      "title": "Valencia",
+      "value": 11.847527,
+      "label": "≈11,8 millones de pasajeros",
+      "artist": null,
+      "source": "https://www.aena.es/doc/detalleprensa/260113-aena-estadisticas-2025.pdf",
+      "curiosity": "Su primer vuelo regular se realizó en septiembre de 1934 con la apertura de la línea Madrid-Valencia, un año después de abrir el aeródromo.",
+      "curiositySource": "https://www.aena.es/es/valencia/conocenos/historia.html",
+      "scope": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros totales del aeropuerto durante el año natural 2025; el valor de ordenación conserva el total publicado y la etiqueta se redondea a una décima de millón. Referencia del dato: 2025.",
+      "passengers": 11847527,
+      "location": "Aena, balance de 2025 publicado el 13 de enero de 2026, pp. 1–2"
+    },
+    {
+      "id": "airports-16",
+      "deck": "airports",
+      "title": "París-Charles de Gaulle",
+      "value": 72,
+      "label": "≈72,0 millones de pasajeros",
+      "artist": null,
+      "source": "https://essentiel.groupe-adp.com/fr/la-nouvelle-dynamique-du-marche-aerien-se-confirme",
+      "curiosity": "En 2025 fue el aeropuerto con más pasajeros de Francia y el tercero de Europa, según el balance anual de su operador.",
+      "curiositySource": "https://essentiel.groupe-adp.com/fr/la-nouvelle-dynamique-du-marche-aerien-se-confirme",
+      "scope": "Pasajeros del aeropuerto durante el año natural 2025; cifra redondeada por Groupe ADP, sin sumar París-Orly.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros del aeropuerto durante el año natural 2025; cifra redondeada por Groupe ADP, sin sumar París-Orly. Referencia del dato: 2025.",
+      "location": "Groupe ADP, informe anual 2025, capítulo sobre dinámica del mercado aéreo"
+    },
+    {
+      "id": "airports-17",
+      "deck": "airports",
+      "title": "Ámsterdam-Schiphol",
+      "value": 68.8,
+      "label": "≈68,8 millones de pasajeros",
+      "artist": null,
+      "source": "https://news.schiphol.com/schiphol-in-2025-quieter-aircraft-more-satisfied-travellers-and-solid-financial-results/",
+      "curiosity": "En 2025 sus viajeros se repartieron entre 48,9 millones en rutas europeas y 19,9 millones en conexiones intercontinentales.",
+      "curiositySource": "https://news.schiphol.com/schiphol-in-2025-quieter-aircraft-more-satisfied-travellers-and-solid-financial-results/",
+      "scope": "Pasajeros de Schiphol durante el año natural 2025; cifra redondeada del operador, sin sumar los demás aeropuertos del grupo.",
+      "dataDate": "2025",
+      "measureNote": "Pasajeros de Schiphol durante el año natural 2025; cifra redondeada del operador, sin sumar los demás aeropuertos del grupo. Referencia del dato: 2025.",
+      "location": "Royal Schiphol Group, resultados anuales 2025, Passenger numbers"
+    },
+    {
+      "id": "capitals-altitude-10",
+      "deck": "capitals-altitude",
+      "title": "Londres",
+      "value": 25,
+      "label": "≈25 m",
+      "artist": null,
+      "source": "https://www.geonames.org/2643743",
+      "curiosity": "Westminster reúne un palacio parlamentario, una abadía y una iglesia; el conjunto londinense figura en la Lista del Patrimonio Mundial.",
+      "curiositySource": "https://whc.unesco.org/en/list/426/",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 2643743,
+        "latitude": 51.50853,
+        "longitude": -0.12574,
+        "elevation": "",
+        "dem": 25,
+        "recordModifiedAt": "2026-08-17",
+        "raw": "2643743\tLondon\tLondon\tILondon,LON,Lakana,Landan,Landen,Ljondan,Llundain,Lodoni,Londain,Londan,Londar,Londe,Londen,Londin,Londinium,Londino,Londn,London,London osh,Londona,Londonas,Londoni,Londono,Londons,Londonu,Londra,Londres,Londrez,Londri,Londro,Londye,Londyn,Londýn,Lonn,Lonton,Lontoo,Lontra,Loundres,Luan GJon,Lun-tun,Lunden,Lundra,Lundun,Lundunir,Lundúnir,Lung-dung,Lunnainn,Lunnin,Lunnon,Luân Đôn,Lùn-tûn,Lùng-dŭng,Lûn-tun,Lākana,Lůndůn,Lọndọnu,Ranana,Rānana,ilantan,ladana,landan,landana,leondeon,lndn,london,londoni,lun dui,lun dun,lwndwn,lxndxn,rondon,Łondra,Λονδίνο,Лондан,Лондон,Лондон ош,Лондонъ,Лёндан,Լոնդոն,Լոնտոն,Լոնտրա,לאנדאן,לונדון,لأندأن,لندن,لوندون,لەندەن,ܠܘܢܕܘܢ,लंडन,लंदन,लण्डन,लन्डन्,लन्दन,লন্ডন,ਲੰਡਨ,લંડન,ଲଣ୍ଡନ,இலண்டன்,లండన్,ಲಂಡನ್,ലണ്ടൻ,ලන්ඩන්,ลอนดอน,ລອນດອນ,ལོན་ཊོན།,လန်ဒန်မြို့,ლონდონი,ለንደን,ᎫᎴ ᏗᏍᎪᏂᎯᏱ,ロンドン,伦敦,倫敦,런던\t51.50853\t-0.12574\tP\tPPLC\tGB\t\tENG\tGLA\t\t\t8961989\t\t25\tEurope/London\t2026-08-17"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-11",
+      "deck": "capitals-altitude",
+      "title": "París",
+      "value": 42,
+      "label": "≈42 m",
+      "artist": null,
+      "source": "https://www.geonames.org/2988507",
+      "curiosity": "Las orillas del Sena permiten recorrer siglos de arquitectura parisina, desde Notre-Dame hasta la torre Eiffel, dentro de un conjunto protegido.",
+      "curiositySource": "https://whc.unesco.org/en/list/600/",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 2988507,
+        "latitude": 48.85341,
+        "longitude": 2.3488,
+        "elevation": "",
+        "dem": 42,
+        "recordModifiedAt": "2026-02-23",
+        "raw": "2988507\tParis\tParis\tBaariis,Bahliz,Baris,Bariz,Lungsod ng Paris,Lutece,Lutetia,Lutetia Parisorum,Lutèce,PAR,Pa-ri,Paarys,Palika,Paname,Pantruche,Paraeis,Paras,Pari,Paries,Parigge,Pariggi,Parighji,Parigi,Pariis,Pariisi,Pariizu,Pariižu,Parij,Parijs,Paris,Parisi,Parixe,Pariz,Parize,Parizh,Parizh osh,Parizh',Parizo,Parizs,Pariž,Parys,Paryz,Paryzh,Paryzius,Paryż,Paryžius,Paräis,París,Paríž,Parîs,Parĩ,Parī,Parīze,Paříž,Páras,Párizs,Pʻariz,Ville-Lumiere,Ville-Lumière,ba li,barys,pairisa,pali,pari,paris,parys,paryzh,perisa,pryz,pyaris,pyarisa,pyrs,Παρίσι,Париж,Париж ош,Парижь,Париз,Парис,Парыж,Паріж,Բարիզ,Փարիզ,פאריז,פריז,باريس,پارىژ,پاريس,پاریس,پیرس,ܦܐܪܝܣ,पॅरिस,पेरिस,पैरिस,প্যারিস,ਪੈਰਿਸ,પૅરિસ,பாரிஸ்,పారిస్,ಪ್ಯಾರಿಸ್,പാരിസ്,ปารีส,ཕ་རི།,ပါရီမြို့,პარიზი,ፓሪስ,ប៉ារីស,パリ,巴黎,파리\t48.85341\t2.3488\tP\tPPLC\tFR\t\t11\t75\t751\t75056\t2138551\t\t42\tEurope/Paris\t2026-02-23"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-12",
+      "deck": "capitals-altitude",
+      "title": "Roma",
+      "value": 52,
+      "label": "≈52 m",
+      "artist": null,
+      "source": "https://www.geonames.org/3169070",
+      "curiosity": "Su centro histórico conserva monumentos de la Roma antigua junto a edificios de siglos posteriores; no pertenece a una única época.",
+      "curiositySource": "https://whc.unesco.org/en/list/91/",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 3169070,
+        "latitude": 41.89193,
+        "longitude": 12.51133,
+        "elevation": "20",
+        "dem": 52,
+        "recordModifiedAt": "2025-07-22",
+        "raw": "3169070\tRome\tRome\tAn Roimh,An Ròimh,An Róimh,Erroma,Hrom,Lungsod ng Roma,Mji wa Roma,ROM,Ramma,Rhufain,Rim,Rim,Roeme,Rom,Roma,Rome,Romma,Romo,Romë,Rooma,Roum,Rym,Rzym,Råmma,Rím,Róm,Róma,Urbs,loma,luo ma,luo ma shi,rm,rom,roma,romi,rwm,rwma,rym,Řím,Ρώμη,Рим,Римъ,Ром,Рым,Հռոմ,רומא,رم,روم,روما,رىم,ܪܘܡܐ,रोम,रोमा,রোম,โรม,რომი,ሮማ,ローマ,罗马市,羅馬,로마\t41.89193\t12.51133\tP\tPPLC\tIT\t\t07\tRM\t058091\t\t2318895\t20\t52\tEurope/Rome\t2025-07-22"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-13",
+      "deck": "capitals-altitude",
+      "title": "Berlín",
+      "value": 43,
+      "label": "≈43 m",
+      "artist": null,
+      "source": "https://www.geonames.org/2950159",
+      "curiosity": "La Isla de los Museos reúne cinco grandes museos construidos entre 1824 y 1930; el conjunto está inscrito como Patrimonio Mundial.",
+      "curiositySource": "https://whc.unesco.org/en/list/896/",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 2950159,
+        "latitude": 52.52437,
+        "longitude": 13.41053,
+        "elevation": "74",
+        "dem": 43,
+        "recordModifiedAt": "2025-07-22",
+        "raw": "2950159\tBerlin\tBerlin\tBER,Beirlin,Beirlín,Belin,Berleno,Berlien,Berliin,Berliini,Berlijn,Berlim,Berlin,Berline,Berlini,Berlino,Berlyn,Berlynas,Berlëno,Berlín,Berlîn,Berlīne,Berolino,Berolinum,Birlinu,Bèrlîn,Estat de Berlin,Estat de Berlín,Perlin,bai lin,barlina,beleullin,berlini,berurin,bexrlin,brlyn,perlin,Βερολίνο,Берлин,Берлін,Бэрлін,Բեռլին,Պերլին,בערלין,ברלין,برلين,برلین,بېرلىن,ܒܪܠܝܢ,बर्लिन,বার্লিন,பெர்லின்,เบอร์ลิน,ბერლინი,ベルリン,柏林,베를린\t52.52437\t13.41053\tP\tPPLC\tDE\t\t16\t00\t11000\t11000000\t3426354\t74\t43\tEurope/Berlin\t2025-07-22"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-14",
+      "deck": "capitals-altitude",
+      "title": "Lisboa",
+      "value": 68,
+      "label": "≈68 m",
+      "artist": null,
+      "source": "https://www.geonames.org/2267057",
+      "curiosity": "La torre de Belém y el monasterio de los Jerónimos recuerdan la época de las exploraciones marítimas portuguesas y comparten una inscripción UNESCO.",
+      "curiositySource": "https://whc.unesco.org/en/list/263/",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 2267057,
+        "latitude": 38.72509,
+        "longitude": -9.1498,
+        "elevation": "",
+        "dem": 68,
+        "recordModifiedAt": "2026-02-23",
+        "raw": "2267057\tLisbon\tLisbon\tFelicitas Julia,Felicitas Julia Olissipo,LIS,Liospoin,Liospóin,Lisabon,Lisabona,Lisboa,Lisbon,Lisbona,Lisbonne,Lisbono,Lisbonum,Lisimba,Lisimbã,Lissabon,Lisszabon,Lizboa,Lizbon,Lizbona,Lizpon,Olisipo,Olissipo,li si ben,lisabana,lisaboni,lisbana,lisbxn,liseubon,lshbwnt,lysabwn,lysbwn,risubon,Λισαβώνα,Лисабон,Лиссабон,Лісабон,Լիզպոն,Լիսաբոն,ליסבון,لشبونة,لىسابون,لیسبون,ܠܫܒܘܢܐ,लिस्बन,লিসবন,ลิสบอน,ལ་ས་བན།,ལི་སི་བཱོན།,ლისაბონი,ሊዝቦን,リスボン,里斯本,리스본\t38.72509\t-9.1498\tP\tPPLC\tPT\t\t14\t1106\t\t\t517802\t\t68\tEurope/Lisbon\t2026-02-23"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-15",
+      "deck": "capitals-altitude",
+      "title": "Ámsterdam",
+      "value": 13,
+      "label": "≈13 m",
+      "artist": null,
+      "source": "https://www.geonames.org/2759794",
+      "curiosity": "Su cinturón de canales se desarrolló en el siglo XVII como una gran ampliación planificada de la ciudad, con nuevos barrios y vías de agua.",
+      "curiositySource": "https://whc.unesco.org/en/list/1349/",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 2759794,
+        "latitude": 52.37403,
+        "longitude": 4.88969,
+        "elevation": "",
+        "dem": 13,
+        "recordModifiedAt": "2026-02-23",
+        "raw": "2759794\tAmsterdam\tAmsterdam\tAMS,Aemstelredamme,Aemsterdam,Amestelledamme,Amesterda,Amesterdam,Amesterdao,Amesterdã,Amesterdão,Amistardam,Amseutereudam,Amstadem,Amstardam,Amstardām,Amstedam,Amstehrdam,Amsteladamum,Amstelodamum,Amstelodhamon,Amstelodhámon,Amsterda,Amsterdam,Amsterdama,Amsterdamas,Amsterdame,Amsterdami,Amsterdamo,Amsterdams,Amsterdamu,Amsterdan,Amsterdã,Amsterntam,Amsterodam,Amstyerdam,Amstèdam,Amstèrdame,Amstérdam,Amstɛrɩdam,Amstʻertam,Amsut'erudam,Amszterdam,Amsŭt'erŭdam,Amusitedan,Amusuterudamu,Damsko,I-Amsterdami,Mokum,Mokum Aleph,a mu si te dan,aimstardaima,amasataradama,amastaradama,amastararyama,amseuteleudam,amstardama,amstartam,amstrdam,amusuterudamu,anstardyam,emstaradyama,xamstexrdam,yەmstەrdam,Àmsterdam,Ámsterdam,Ámsterdan,Âmesterdâm,Āmǔsītèdān,Άμστερνταμ,Амстердам,Амстэрдам,Ամսթերտամ,Ամստերդամ,אמסטערדאם,אמסטרדם,آمستردام,أمستردام,ئامستېردام,ئەمستەردام,امستردام,امسټرډام,ایمسٹرڈیم,ܐܡܣܛܪܕܐܡ,अ‍ॅम्स्टरडॅम,आम्स्टर्डम,एम्स्तरद्याम,ऐम्स्टर्डैम,আমস্টারডাম,ਅਮਸਤਰਦਮ,ଆମଷ୍ଟରଡ଼୍ୟାମ,ஆம்ஸ்டர்டம்,ಆಂಸ್ಟರ್ಡ್ಯಾಮ್,ആംസ്റ്റർഡാം,ඈම්ස්ටර්ඩෑම්,อัมสเตอร์ดัม,ཨེམ་སི་ཊར་ཌམ།,အမ်စတာဒမ်မြို့,ამსტერდამი,አምስተርዳም,アムステルダム,阿姆斯特丹,암스테르담\t52.37403\t4.88969\tP\tPPLC\tNL\t\t07\t0363\t\t\t741636\t\t13\tEurope/Amsterdam\t2026-02-23"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-16",
+      "deck": "capitals-altitude",
+      "title": "Washington D. C.",
+      "value": 6,
+      "label": "≈6 m",
+      "artist": null,
+      "source": "https://www.geonames.org/4140963",
+      "curiosity": "George Washington colocó la primera piedra del Capitolio en 1793; el Congreso se reunió allí por primera vez siete años después.",
+      "curiositySource": "https://www.aoc.gov/about-us/history",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 4140963,
+        "latitude": 38.89511,
+        "longitude": -77.03637,
+        "elevation": "7",
+        "dem": 6,
+        "recordModifiedAt": "2026-06-12",
+        "raw": "4140963\tWashington\tWashington\tD.C.,District of Columbia,Federal Capital,Federal City,Federal Town,Ouasinkton,Ranatakariahshne,Ranatakariáhshne,Territory of Columbia,Vashington,Vasingtonas,Vasingtonia,Vasingtono,Vaŝingtono,Vašingtonas,WAS,Washington,Washington City,Washington D. C.,Washington D.C.,Washington DC,Waszyngton,hua sheng dun te qu,wosingteon D.C.,wosingteon DC,Ουάσιγκτον,Вашингтон,华盛顿特区,워싱턴 D.C.,워싱턴 DC\t38.89511\t-77.03637\tP\tPPLC\tUS\t\tDC\t001\t\t\t689545\t7\t6\tAmerica/New_York\t2026-06-12"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-17",
+      "deck": "capitals-altitude",
+      "title": "Canberra",
+      "value": 571,
+      "label": "≈571 m",
+      "artist": null,
+      "source": "https://www.geonames.org/2172517",
+      "curiosity": "El Parlamento australiano ocupa Capital Hill y abrió en mayo de 1988, después de siete años de construcción.",
+      "curiositySource": "https://www.aph.gov.au/About_Parliament/Parliamentary_departments/Parliamentary_Library/parliament_house_chronology/Appendix_1_Facts_and_statistics",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 2172517,
+        "latitude": -35.28346,
+        "longitude": 149.12807,
+        "elevation": "",
+        "dem": 571,
+        "recordModifiedAt": "2019-09-05",
+        "raw": "2172517\tCanberra\tCanberra\tCBR,Camberra,Canberra,Canberrah,Kamberra,Kambra,Kampera,Kanapera,Kanbera,Kanbero,Kanberr,Kanberra,Kanberrae,Kanberre,Kanbérra,Kham-phi-la,Khâm-phì-là,Kānapera,kaenbeola,kainabara,kainberra,kan pei la,kanabera,kanbra,kanpara,kenabera,kyanabara,kyanabera,kyanbera,kynbra,kʼanbera,qnbrh,Καμπέρα,Канбера,Канберрæ,Канберра,Канберре,Канбєра,Կանբերրա,קאנבערא,קנברה,كانبرا,کانبرا,کانبێرا,کینبرا,कॅनबेरा,कैनबरा,कैन्बेर्रा,क्यानबरा,ক্যানবেরা,ਕੈਨਬਰਾ,କାନବେରା,கான்பரா,കാൻബറ,කැන්බරා,แคนเบอร์รา,ཁན་པེ་ར།,კანბერა,ካንበራ,キャンベラ,坎培拉,堪培拉,캔버라\t-35.28346\t149.12807\tP\tPPLC\tAU\t\t01\t\t\t\t367752\t\t571\tAustralia/Sydney\t2019-09-05"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-18",
+      "deck": "capitals-altitude",
+      "title": "Nairobi",
+      "value": 1684,
+      "label": "≈1684 m",
+      "artist": null,
+      "source": "https://www.geonames.org/184745",
+      "curiosity": "Acoge una de las cuatro grandes sedes de trabajo de Naciones Unidas y la única sede de la organización situada en África.",
+      "curiositySource": "https://www.unon.org/en/who-we-are",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 184745,
+        "latitude": -1.28333,
+        "longitude": 36.81667,
+        "elevation": "",
+        "dem": 1684,
+        "recordModifiedAt": "2023-12-21",
+        "raw": "184745\tNairobi\tNairobi\tNBO,Nai-lok-pi,Nai-lo̍k-pí,Nairoba,Nairobi,Nairobia,Nairobis,Nairoby,Nairobî,Nairompi,Nairovi,Nairòbi,Nairóbi,Nairóvi,Najrobi,Najrobi osh,Najrobio,Najrobo,Nayiiroobii,Nayrobi,Nayroobi,Nayropi,Nayrubi,Naíróbí,Naýrobi,Tó Sikʼaz,lai luo bi,na'irobi,nai luo bi,nailobi,nairobi,nairopi,nayreabi,nayrwby,nei luo bi,nirobi,nyrwby,nyyrwby,Ναϊρόμπι,Найроби,Найроби ош,Найробі,Најроби,Նայրոբի,Նայրոպի,נייראבי,ניירובי,نايروبى,نايروبي,نایروبی,نایرۆبی,نيروبي,نیروبی,नैरोबी,নাইরোবি,ਨੈਰੋਬੀ,નૈરોબી,நைரோபி,నైరోబి,ನೈರೋಬಿ,നയ്റോബി,නයිරෝබි,ไนโรบี,ནའི་རོ་བི།,နိုင်ရိုဘီမြို့,ნაირობი,ናይሮቢ,ᱱᱟᱭᱨᱳᱵᱤ,ⵏⴰⵢⵔⵓⴱⵉ,ナイロビ,內羅比,内罗毕,奈洛比,賴羅比,ꯅꯥꯏꯔꯣꯕꯤ,나이로비\t-1.28333\t36.81667\tP\tPPLC\tKE\t\t05\t\t\t\t4397073\t\t1684\tAfrica/Nairobi\t2023-12-21"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "capitals-altitude-19",
+      "deck": "capitals-altitude",
+      "title": "Katmandú",
+      "value": 1296,
+      "label": "≈1296 m",
+      "artist": null,
+      "source": "https://www.geonames.org/1283240",
+      "curiosity": "El patrimonio del valle reúne siete conjuntos monumentales; sus plazas, templos y estupas reflejan tradiciones hindúes y budistas.",
+      "curiositySource": "https://whc.unesco.org/en/list/121/",
+      "scope": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad.",
+      "dataDate": "consulta del 5 de octubre de 2026",
+      "measureNote": "Altitud aproximada del punto urbano de referencia de GeoNames, estimada por su modelo del terreno; la altura varía dentro de cada ciudad. Referencia del dato: consulta del 5 de octubre de 2026.",
+      "location": "GeoNames cities15000, columna dem (17), no confundir con elevation (16)",
+      "snapshot": {
+        "geonameId": 1283240,
+        "latitude": 27.70169,
+        "longitude": 85.3206,
+        "elevation": "1317",
+        "dem": 1296,
+        "recordModifiedAt": "2019-10-18",
+        "raw": "1283240\tKathmandu\tKathmandu\tCatmandu,Catmandum,KTM,Kantipur,Kantipura,Katemandu,Kathmandau,Kathmandou,Kathmandu,Katmando,Katmandoe,Katmandou,Katmandu,Katmanduo,Katmandó,Katmandú,Katmandû,Katmandū,Katmantou,Khatmandu,Káthmandu,Káthmándú,jia de man dou,kateumandu,kath manthu,kathamadaum,kathamadaum mahanagarapalika,kathamadu,kathamandu,kathmandu,katmandw,katmandww,katmantu,katomanzu,qtmndw,yem jilla,Κατμαντού,Катманду,Կատմանդու,קאטמאנדו,קטמנדו,كاتماندو,كاتماندۇ,کاتماندو,کاتماندوو,کھٹمنڈو,काठमांडू,काठमाडौं,काठमाडौं महानगरपालिका,काठमाण्डू,येँ जिल्ला,কাঠমাণ্ডু,কাঠমান্ডু,ਕਠਮੰਡੂ,કાઠમંડુ,କାଠମାଣ୍ଡୁ,காட்மாண்டு,కాఠ్మండు,ಕಠ್ಮಂಡು,കാഠ്മണ്ഡു,කත්මන්ඩු,กาฐมาณฑุ,ཀ་ཏ་མན་ཏ།,ཀ་ཏ་མན་ཏུ།,კატმანდუ,ካትማንዱ,カトマンズ,加德滿都,카트만두\t27.70169\t85.3206\tP\tPPLC\tNP\t\t3\t12095484\t\t\t1442271\t1317\t1296\tAsia/Kathmandu\t2019-10-18"
+      },
+      "dataset": "https://download.geonames.org/export/dump/cities15000.zip",
+      "methodology": "https://download.geonames.org/export/dump/readme.txt"
+    },
+    {
+      "id": "stadiums-11",
+      "deck": "stadiums",
+      "title": "Old Trafford",
+      "value": 74233,
+      "label": "74.233 espectadores",
+      "artist": null,
+      "source": "https://ir.manutd.com/~/media/Files/M/Manutd-IR/documents/2025-mu-plc-form-20-f.pdf",
+      "curiosity": "Su primera inauguración fue en febrero de 1910; sucesivas ampliaciones elevaron el aforo desde unas 58.000 plazas en 1996 hasta más de 74.000.",
+      "curiositySource": "https://ir.manutd.com/~/media/Files/M/Manutd-IR/documents/2025-mu-plc-form-20-f.pdf",
+      "scope": "Aforo de asientos publicado por Manchester United en su informe anual de 2025; se excluye el futuro estadio anunciado.",
+      "dataDate": "informe anual 2025, pp. 37–38",
+      "measureNote": "Aforo de asientos publicado por Manchester United en su informe anual de 2025; se excluye el futuro estadio anunciado. Referencia del dato: informe anual 2025, pp. 37–38."
+    },
+    {
+      "id": "stadiums-12",
+      "deck": "stadiums",
+      "title": "Allianz Arena",
+      "value": 75024,
+      "label": "75.024 espectadores",
+      "artist": null,
+      "source": "https://allianz-arena.com/en/arena/facts/general-information",
+      "curiosity": "Su fachada utiliza paneles inflados en forma de rombo; la iluminación permite cambiar los colores del exterior según el evento.",
+      "curiositySource": "https://allianz-arena.com/en/arena/facts/general-information",
+      "scope": "Aforo total para partidos nacionales, con zonas de pie; la configuración internacional sin ellas admite 70.000 espectadores.",
+      "dataDate": "ficha oficial consultada el 5 de octubre de 2026",
+      "measureNote": "Aforo total para partidos nacionales, con zonas de pie; la configuración internacional sin ellas admite 70.000 espectadores. Referencia del dato: ficha oficial consultada el 5 de octubre de 2026."
+    },
+    {
+      "id": "stadiums-13",
+      "deck": "stadiums",
+      "title": "Anfield",
+      "value": 61276,
+      "label": "61.276 espectadores",
+      "artist": null,
+      "source": "https://www.liverpoolfc.com/news/new-anfield-capacity-confirmed-ahead-2024-25",
+      "curiosity": "La ampliación de la grada Anfield Road permitió elevar el aforo para la temporada 2024/25; el recinto ha crecido mediante reformas sucesivas.",
+      "curiositySource": "https://www.liverpoolfc.com/news/new-anfield-capacity-confirmed-ahead-2024-25",
+      "scope": "Aforo oficial tras completar la ampliación de Anfield Road, anunciado para la temporada 2024/25.",
+      "dataDate": "temporada 2024/25",
+      "measureNote": "Aforo oficial tras completar la ampliación de Anfield Road, anunciado para la temporada 2024/25. Referencia del dato: temporada 2024/25."
+    },
+    {
+      "id": "stadiums-14",
+      "deck": "stadiums",
+      "title": "Emirates Stadium",
+      "value": 60704,
+      "label": "60.704 espectadores",
+      "artist": null,
+      "source": "https://www.premierleague.com/clubs/1/club/tickets",
+      "curiosity": "La venta de entradas del Arsenal para sus partidos de liga se dirige habitualmente a socios; la capacidad no equivale a entradas de venta libre.",
+      "curiositySource": "https://www.premierleague.com/clubs/1/club/tickets",
+      "scope": "Capacidad publicada por la Premier League para el Emirates; las localidades disponibles dependen del partido.",
+      "dataDate": "ficha de la Premier League consultada el 5 de octubre de 2026",
+      "measureNote": "Capacidad publicada por la Premier League para el Emirates; las localidades disponibles dependen del partido. Referencia del dato: ficha de la Premier League consultada el 5 de octubre de 2026."
+    },
+    {
+      "id": "stadiums-15",
+      "deck": "stadiums",
+      "title": "Metropolitano",
+      "value": 70460,
+      "label": "70.460 espectadores",
+      "artist": null,
+      "source": "https://www.atleticodemadrid.com/noticias/el-aforo-del-civitas-metropolitano-crece-hasta-los-70-460-espectadores",
+      "curiosity": "El club amplió el aforo instalando nuevas localidades; la capacidad para un partido no es la misma que la de un concierto.",
+      "curiositySource": "https://www.atleticodemadrid.com/noticias/el-aforo-del-civitas-metropolitano-crece-hasta-los-70-460-espectadores",
+      "scope": "Aforo de fútbol tras la ampliación de localidades anunciada por el Atlético de Madrid.",
+      "dataDate": "ampliación anunciada por el club en 2023",
+      "measureNote": "Aforo de fútbol tras la ampliación de localidades anunciada por el Atlético de Madrid. Referencia del dato: ampliación anunciada por el club en 2023."
+    },
+    {
+      "id": "stadiums-16",
+      "deck": "stadiums",
+      "title": "Mestalla",
+      "value": 49419,
+      "label": "49.419 espectadores",
+      "artist": null,
+      "source": "https://www.valenciacf.com/mestalla-stadium",
+      "curiosity": "La historia del campo de Mestalla comienza en 1923; las reformas posteriores transformaron unas gradas que inicialmente eran mucho más pequeñas.",
+      "curiositySource": "https://www.valenciacf.com/historia-de-mestalla",
+      "scope": "Capacidad indicada en la ficha principal de Mestalla del Valencia CF; otras páginas históricas redondean o recogen configuraciones diferentes.",
+      "dataDate": "ficha oficial consultada el 5 de octubre de 2026",
+      "measureNote": "Capacidad indicada en la ficha principal de Mestalla del Valencia CF; otras páginas históricas redondean o recogen configuraciones diferentes. Referencia del dato: ficha oficial consultada el 5 de octubre de 2026."
+    },
+    {
+      "id": "stadiums-17",
+      "deck": "stadiums",
+      "title": "Benito Villamarín (antes de la reforma)",
+      "value": 60721,
+      "label": "60.721 espectadores",
+      "artist": null,
+      "source": "https://en.realbetisbalompie.es/club/estadio-benito-villamarin",
+      "curiosity": "La reforma obligó al Betis a trasladar sus partidos a La Cartuja; esta carta representa el Villamarín de antes de las obras.",
+      "curiositySource": "https://www.realbetisbalompie.es/media/files/rbetis/pdf/2025_ccaa_informeauditoria.pdf",
+      "scope": "Aforo nominal anterior a la reforma publicado por el Betis; no representa un aforo operativo durante las obras.",
+      "dataDate": "configuración anterior a las obras de 2025",
+      "measureNote": "Aforo nominal anterior a la reforma publicado por el Betis; no representa un aforo operativo durante las obras. Referencia del dato: configuración anterior a las obras de 2025.",
+      "location": "Real Betis, Stadium Benito Villamarín, Capacity; contrastado con la historia oficial del club"
+    },
+    {
+      "id": "stadiums-18",
+      "deck": "stadiums",
+      "title": "Ramón Sánchez-Pizjuán",
+      "value": 43858,
+      "label": "43.858 espectadores",
+      "artist": null,
+      "source": "https://mediaverse.sevillafc.hiway.media/document/2025/11/14/69177117/3.-CUENTAS-ANUALES-2024-2025.-JGA-2025.pdf",
+      "curiosity": "El estadio lleva el nombre de un presidente del Sevilla que impulsó su construcción; el proyecto se asentó junto al antiguo campo de Nervión.",
+      "curiositySource": "https://mediaverse.sevillafc.hiway.media/document/2025/05/28/6836fd96/La-Historia-completa-del-Sevilla-Fu-tbol-Club.pdf",
+      "scope": "Capacidad del Ramón Sánchez-Pizjuán indicada en las cuentas anuales del Sevilla; se excluye la ampliación futura.",
+      "dataDate": "cuentas anuales 2024/25",
+      "measureNote": "Capacidad del Ramón Sánchez-Pizjuán indicada en las cuentas anuales del Sevilla; se excluye la ampliación futura. Referencia del dato: cuentas anuales 2024/25.",
+      "location": "Sevilla FC, cuentas anuales 2024/25, informe de gestión, p. 23, cuadro Capacidad Estadio Ramón Sánchez-Pizjuán"
+    },
+    {
+      "id": "stadiums-19",
+      "deck": "stadiums",
+      "title": "San Mamés",
+      "value": 53000,
+      "label": "≈53.000 espectadores",
+      "artist": null,
+      "source": "https://sanmames.athletic-club.eus/san-mames/",
+      "curiosity": "El estadio permite visitar espacios que normalmente se reservan al equipo, como el vestuario, el túnel de jugadores y el terreno de juego.",
+      "curiositySource": "https://sanmames.athletic-club.eus/en/visit-the-stadium/",
+      "scope": "Capacidad redondeada publicada por el operador de San Mamés; no incluye ampliaciones anunciadas que todavía no estén terminadas.",
+      "dataDate": "ficha oficial consultada el 5 de octubre de 2026",
+      "measureNote": "Capacidad redondeada publicada por el operador de San Mamés; no incluye ampliaciones anunciadas que todavía no estén terminadas. Referencia del dato: ficha oficial consultada el 5 de octubre de 2026."
+    },
+    {
+      "id": "stadiums-20",
+      "deck": "stadiums",
+      "title": "Balaídos",
+      "value": 24870,
+      "label": "24.870 espectadores",
+      "artist": null,
+      "source": "https://rccelta.es/club/instalaciones/",
+      "curiosity": "Su origen se remonta a 1928 y al arquitecto Jenaro de la Fuente; las reformas recientes se atribuyen a Pedro de la Puente.",
+      "curiositySource": "https://rccelta.es/club/instalaciones/",
+      "scope": "Aforo de Balaídos publicado en la ficha de instalaciones del Celta; puede variar temporalmente durante las obras.",
+      "dataDate": "ficha oficial consultada el 5 de octubre de 2026",
+      "measureNote": "Aforo de Balaídos publicado en la ficha de instalaciones del Celta; puede variar temporalmente durante las obras. Referencia del dato: ficha oficial consultada el 5 de octubre de 2026."
+    },
+    {
+      "id": "albums-sales-10",
+      "deck": "albums-sales",
+      "title": "Hotel California",
+      "value": 32,
+      "label": "≈32 millones de copias",
+      "artist": "Eagles",
+      "source": "https://images.rhino.com/index.php/press-release/eagles-hotel-california-40th-anniversary-deluxe-edition-available-november-24",
+      "curiosity": "El disco produjo dos canciones que llegaron al número uno en Estados Unidos y recibió dos premios Grammy, según su edición conmemorativa.",
+      "curiositySource": "https://images.rhino.com/index.php/press-release/eagles-hotel-california-40th-anniversary-deluxe-edition-available-november-24",
+      "scope": "Más de 32 millones de copias mundiales divulgadas por Rhino; se usa 32 como referencia aproximada, no como una certificación mundial exacta.",
+      "dataDate": "comunicado de 2017",
+      "measureNote": "Más de 32 millones de copias mundiales divulgadas por Rhino; se usa 32 como referencia aproximada, no como una certificación mundial exacta. Referencia del dato: comunicado de 2017."
+    },
+    {
+      "id": "albums-sales-11",
+      "deck": "albums-sales",
+      "title": "Come On Over",
+      "value": 40,
+      "label": "≈40 millones de copias",
+      "artist": "Shania Twain",
+      "source": "https://www.universalmusic.ca/2023/07/12/shania-twains-mega-platinum-breakthrough-album-come-on-over-is-celebrated-with-a-number-of-expanded-25th-anniversary-u-s-and-international-diamond-editions-on-august-25/",
+      "curiosity": "El álbum tuvo versiones estadounidense e internacional; la reedición de su aniversario reunió ambas mezclas y material adicional.",
+      "curiositySource": "https://www.universalmusic.ca/2023/07/12/shania-twains-mega-platinum-breakthrough-album-come-on-over-is-celebrated-with-a-number-of-expanded-25th-anniversary-u-s-and-international-diamond-editions-on-august-25/",
+      "scope": "Más de 40 millones de copias mundiales comunicadas por Universal; valor aproximado de ventas divulgadas, sin sumar equivalentes de streaming.",
+      "dataDate": "comunicado del 12 de julio de 2023",
+      "measureNote": "Más de 40 millones de copias mundiales comunicadas por Universal; valor aproximado de ventas divulgadas, sin sumar equivalentes de streaming. Referencia del dato: comunicado del 12 de julio de 2023."
+    },
+    {
+      "id": "albums-sales-12",
+      "deck": "albums-sales",
+      "title": "21",
+      "value": 30,
+      "label": "≈30 millones de copias",
+      "artist": "Adele",
+      "source": "https://time.com/4155801/adele-story/",
+      "curiosity": "Adele eligió títulos que remiten a edades de su vida: 19, 21 y 25 forman parte de esa manera de identificar sus etapas musicales.",
+      "curiositySource": "https://time.com/4155801/adele-story/",
+      "scope": "Unos 30 millones de copias mundiales según el perfil de TIME; estimación publicada en esa fecha, no un total actualizado de 2026.",
+      "dataDate": "diciembre de 2015",
+      "measureNote": "Unos 30 millones de copias mundiales según el perfil de TIME; estimación publicada en esa fecha, no un total actualizado de 2026. Referencia del dato: diciembre de 2015."
+    },
+    {
+      "id": "albums-sales-13",
+      "deck": "albums-sales",
+      "title": "25",
+      "value": 22,
+      "label": "≈22 millones de copias",
+      "artist": "Adele",
+      "source": "https://routenote.com/blog/best-selling-albums/",
+      "curiosity": "El álbum se lanzó sin estar disponible inicialmente en streaming; esos servicios lo incorporaron siete meses después de su estreno.",
+      "curiositySource": "https://time.com/4379950/adele-25-streaming/",
+      "scope": "Estimación divulgada de 22 millones de ventas mundiales de copias físicas y descargas; no equivale a una certificación global auditada.",
+      "dataDate": "artículo del 13 de julio de 2026",
+      "measureNote": "Estimación divulgada de 22 millones de ventas mundiales de copias físicas y descargas; no equivale a una certificación global auditada. Referencia del dato: artículo del 13 de julio de 2026."
+    },
+    {
+      "id": "albums-sales-14",
+      "deck": "albums-sales",
+      "title": "Appetite for Destruction",
+      "value": 30,
+      "label": "≈30 millones de copias",
+      "artist": "Guns N’ Roses",
+      "source": "https://www.universalmusic.ca/2018/05/04/guns-n-roses-celebrated-massive-appetite-destruction-locked-n-loaded-edition-box-set-available-june-29/",
+      "curiosity": "Publicado en julio de 1987, este primer álbum del grupo llegó a ser el debut más vendido en Estados Unidos, según Universal.",
+      "curiositySource": "https://www.universalmusic.ca/2018/05/04/guns-n-roses-celebrated-massive-appetite-destruction-locked-n-loaded-edition-box-set-available-june-29/",
+      "scope": "Más de 30 millones de copias mundiales comunicadas por Universal; referencia aproximada de ventas publicadas.",
+      "dataDate": "comunicado del 4 de mayo de 2018",
+      "measureNote": "Más de 30 millones de copias mundiales comunicadas por Universal; referencia aproximada de ventas publicadas. Referencia del dato: comunicado del 4 de mayo de 2018."
+    },
+    {
+      "id": "albums-sales-15",
+      "deck": "albums-sales",
+      "title": "Born in the U.S.A.",
+      "value": 25,
+      "label": "≈25 millones de copias",
+      "artist": "Bruce Springsteen",
+      "source": "https://brucespringsteen.net/news/2024/sony-music-celebrates-bruce-springsteens-born-in-the-u-s-a-with-special-40th-anniversary-vinyl-release-coming-june-14/",
+      "curiosity": "De sus canciones salieron siete sencillos que entraron en el top diez estadounidense, un éxito recordado en la edición de su cuarenta aniversario.",
+      "curiositySource": "https://brucespringsteen.net/news/2024/sony-music-celebrates-bruce-springsteens-born-in-the-u-s-a-with-special-40th-anniversary-vinyl-release-coming-june-14/",
+      "scope": "Unos 25 millones de discos mundiales según el comunicado oficial del artista y Sony; no se sustituye por estimaciones mayores sin fuente.",
+      "dataDate": "comunicado de mayo de 2024",
+      "measureNote": "Unos 25 millones de discos mundiales según el comunicado oficial del artista y Sony; no se sustituye por estimaciones mayores sin fuente. Referencia del dato: comunicado de mayo de 2024."
+    },
+    {
+      "id": "albums-sales-16",
+      "deck": "albums-sales",
+      "title": "Metallica",
+      "value": 35,
+      "label": "≈35 millones de copias",
+      "artist": "Metallica",
+      "source": "https://www.metallica.com/store/metallica-the-black-album-remastered-digital-download/REBADD.html",
+      "curiosity": "Aunque su título oficial es Metallica, suele llamarse el álbum negro; incluye canciones como Enter Sandman y Nothing Else Matters.",
+      "curiositySource": "https://www.metallica.com/store/metallica-the-black-album-remastered-digital-download/REBADD.html",
+      "scope": "Más de 35 millones de copias mundiales según la tienda oficial del grupo; referencia aproximada de ventas divulgadas.",
+      "dataDate": "ficha oficial consultada el 5 de octubre de 2026",
+      "measureNote": "Más de 35 millones de copias mundiales según la tienda oficial del grupo; referencia aproximada de ventas divulgadas. Referencia del dato: ficha oficial consultada el 5 de octubre de 2026."
+    },
+    {
+      "id": "albums-sales-17",
+      "deck": "albums-sales",
+      "title": "Nevermind",
+      "value": 30,
+      "label": "≈30 millones de copias",
+      "artist": "Nirvana",
+      "source": "https://www.prnewswire.com/news-releases/20th-anniversary-of-nirvanas-nevermind-album-celebrated-with-a-deluxe-edition-in-september-124345084.html",
+      "curiosity": "Salió en septiembre de 1991 y alcanzó el número uno en Estados Unidos pocos meses después; el grupo lo grabó como un trío.",
+      "curiositySource": "https://www.prnewswire.com/news-releases/20th-anniversary-of-nirvanas-nevermind-album-celebrated-with-a-deluxe-edition-in-september-124345084.html",
+      "scope": "Más de 30 millones de copias mundiales comunicadas por Universal Music Enterprises; estimación publicada, no una certificación global.",
+      "dataDate": "comunicado del 22 de junio de 2011",
+      "measureNote": "Más de 30 millones de copias mundiales comunicadas por Universal Music Enterprises; estimación publicada, no una certificación global. Referencia del dato: comunicado del 22 de junio de 2011."
+    },
+    {
+      "id": "albums-sales-18",
+      "deck": "albums-sales",
+      "title": "Supernatural",
+      "value": 25,
+      "label": "≈25 millones de copias",
+      "artist": "Santana",
+      "source": "https://www.prnewswire.com/news-releases/santanas-supernatural-legacy-edition-celebrates-10th-anniversary-with-new-2-cd-deluxe-set-82054697.html",
+      "curiosity": "Su regreso al número uno llegó casi tres décadas después de los primeros éxitos de Santana; la canción Smooth recibió tres premios Grammy.",
+      "curiositySource": "https://www.prnewswire.com/news-releases/santanas-supernatural-legacy-edition-celebrates-10th-anniversary-with-new-2-cd-deluxe-set-82054697.html",
+      "scope": "Más de 25 millones de copias mundiales según Sony/Legacy; se conserva la cifra trazable de esta edición, sin atribuirle una actualización posterior.",
+      "dataDate": "comunicado de enero de 2010",
+      "measureNote": "Más de 25 millones de copias mundiales según Sony/Legacy; se conserva la cifra trazable de esta edición, sin atribuirle una actualización posterior. Referencia del dato: comunicado de enero de 2010."
+    },
+    {
+      "id": "albums-sales-19",
+      "deck": "albums-sales",
+      "title": "Brothers in Arms",
+      "value": 30,
+      "label": "≈30 millones de copias",
+      "artist": "Dire Straits",
+      "source": "https://www.udiscovermusic.com/stories/dire-straits-brothers-in-arms-album/",
+      "curiosity": "El álbum mantuvo nueve semanas el número uno estadounidense y ganó dos Grammy; su éxito acompañó la expansión comercial del formato CD.",
+      "curiositySource": "https://www.udiscovermusic.com/stories/dire-straits-brothers-in-arms-album/",
+      "scope": "Unos 30 millones de copias mundiales según uDiscover Music, publicación de Universal; estimación de ventas divulgadas.",
+      "dataDate": "artículo consultado el 5 de octubre de 2026",
+      "measureNote": "Unos 30 millones de copias mundiales según uDiscover Music, publicación de Universal; estimación de ventas divulgadas. Referencia del dato: artículo consultado el 5 de octubre de 2026."
+    },
+    {
+      "id": "foods-kcal-15",
+      "deck": "foods-kcal",
+      "title": "Fresas",
+      "value": 32,
+      "label": "32 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "Su parte comestible contiene aproximadamente un 91 % de agua; la ficha del USDA registra también 2 gramos de fibra por cada 100 gramos.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 09316.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 09316. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 09316; NUT_DATA.txt: NDB 09316, Nutr_No 208",
+      "snapshot": {
+        "ndb": "09316",
+        "description": "Strawberries, raw",
+        "raw": "~09316~^~0900~^~Strawberries, raw~^~STRAWBERRIES,RAW~^~~^~~^~Y~^~Caps and stems~^6^~Fragaria X ananassa~^6.25^3.36^8.37^3.60",
+        "nutrients": {
+          "203": {
+            "value": 0.67,
+            "raw": "~09316~^~203~^0.67^19^0.026^~1~^~A~^~~^~~^5^0.51^0.89^4^0.596^0.740^~2~^04/2003^"
+          },
+          "204": {
+            "value": 0.3,
+            "raw": "~09316~^~204~^0.30^15^0.047^~1~^~A~^~~^~~^5^0.13^0.50^4^0.173^0.436^~2~^04/2003^"
+          },
+          "208": {
+            "value": 32,
+            "raw": "~09316~^~208~^32^0^^~4~^~NC~^~~^~~^^^^^^^~~^05/2006^"
+          },
+          "255": {
+            "value": 90.95,
+            "raw": "~09316~^~255~^90.95^23^0.214^~1~^~A~^~~^~~^7^88.10^92.60^6^90.430^91.476^~2~^04/2003^"
+          },
+          "291": {
+            "value": 2,
+            "raw": "~09316~^~291~^2.0^21^0.152^~1~^~A~^~~^~~^7^1.1^2.8^6^1.624^2.366^~2~^04/2003^"
+          },
+          "401": {
+            "value": 58.8,
+            "raw": "~09316~^~401~^58.8^9^2.473^~1~^~A~^~~^~~^3^52.5^69.9^2^48.124^69.403^~2~^04/2003^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-16",
+      "deck": "foods-kcal",
+      "title": "Naranja",
+      "value": 47,
+      "label": "47 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "Además de agua, la naranja entera aporta fibra: la referencia del USDA recoge 2,4 gramos por cada 100 gramos de parte comestible.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 09200.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 09200. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 09200; NUT_DATA.txt: NDB 09200, Nutr_No 208",
+      "snapshot": {
+        "ndb": "09200",
+        "description": "Oranges, raw, all commercial varieties",
+        "raw": "~09200~^~0900~^~Oranges, raw, all commercial varieties~^~ORANGES,RAW,ALL COMM VAR~^~~^~~^~Y~^~Peel and seeds~^27^~Citrus sinensis~^6.25^3.36^8.37^3.60",
+        "nutrients": {
+          "203": {
+            "value": 0.94,
+            "raw": "~09200~^~203~^0.94^69^0.014^~1~^~~^~~^~~^^^^^^^~~^08/1982^"
+          },
+          "204": {
+            "value": 0.12,
+            "raw": "~09200~^~204~^0.12^4^0.010^~1~^~~^~~^~~^^^^^^^~~^08/1982^"
+          },
+          "208": {
+            "value": 47,
+            "raw": "~09200~^~208~^47^0^^~4~^~NC~^~~^~~^^^^^^^~~^08/1982^"
+          },
+          "255": {
+            "value": 86.75,
+            "raw": "~09200~^~255~^86.75^88^0.121^~1~^~~^~~^~~^^^^^^^~~^08/1982^"
+          },
+          "291": {
+            "value": 2.4,
+            "raw": "~09200~^~291~^2.4^0^^~1~^~~^~~^~~^^^^^^^~~^08/1982^"
+          },
+          "401": {
+            "value": 53.2,
+            "raw": "~09200~^~401~^53.2^145^0.718^~1~^~~^~~^~~^^^^^^^~~^08/1982^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-17",
+      "deck": "foods-kcal",
+      "title": "Sandía",
+      "value": 30,
+      "label": "30 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "La pulpa de sandía contiene algo más de un 91 % de agua; la cifra de la carta corresponde a la fruta, sin incluir la corteza.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 09326.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 09326. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 09326; NUT_DATA.txt: NDB 09326, Nutr_No 208",
+      "snapshot": {
+        "ndb": "09326",
+        "description": "Watermelon, raw",
+        "raw": "~09326~^~0900~^~Watermelon, raw~^~WATERMELON,RAW~^~~^~~^~Y~^~Rind, seeds, and cutting loss~^48^~Citrullus lanatus~^6.25^3.36^8.37^3.60",
+        "nutrients": {
+          "203": {
+            "value": 0.61,
+            "raw": "~09326~^~203~^0.61^11^0.041^~1~^~A~^~~^~~^3^0.40^0.84^2^0.434^0.784^~2~^03/2003^"
+          },
+          "204": {
+            "value": 0.15,
+            "raw": "~09326~^~204~^0.15^10^0.037^~1~^~A~^~~^~~^3^0.05^0.27^2^-0.012^0.307^~2~^04/2003^"
+          },
+          "208": {
+            "value": 30,
+            "raw": "~09326~^~208~^30^0^^~4~^~NC~^~~^~~^^^^^^^~~^04/2006^"
+          },
+          "255": {
+            "value": 91.45,
+            "raw": "~09326~^~255~^91.45^14^0.316^~1~^~A~^~~^~~^6^90.10^92.42^5^90.636^92.263^~2~^03/2003^"
+          },
+          "291": {
+            "value": 0.4,
+            "raw": "~09326~^~291~^0.4^10^0.051^~1~^~A~^~~^~~^4^0.4^0.7^3^0.274^0.595^~2~^03/2003^"
+          },
+          "401": {
+            "value": 8.1,
+            "raw": "~09326~^~401~^8.1^6^2.425^~1~^~A~^~~^~~^2^5.3^14.7^1^-22.710^38.909^~2~^03/2003^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-18",
+      "deck": "foods-kcal",
+      "title": "Brócoli crudo",
+      "value": 34,
+      "label": "34 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "La ficha de este brócoli sin cocinar registra unos 89 gramos de agua y 2,6 gramos de fibra por cada 100 gramos de parte comestible.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 11090.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 11090. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 11090; NUT_DATA.txt: NDB 11090, Nutr_No 208",
+      "snapshot": {
+        "ndb": "11090",
+        "description": "Broccoli, raw",
+        "raw": "~11090~^~1100~^~Broccoli, raw~^~BROCCOLI,RAW~^~~^~~^~Y~^~Leaves and tough stalks with trimmings~^39^~Brassica oleracea var. italica~^^2.44^8.37^3.57",
+        "nutrients": {
+          "203": {
+            "value": 2.82,
+            "raw": "~11090~^~203~^2.82^23^0.437^~11~^~JO~^~~^~~^3^1.99^3.15^1^-2.737^8.375^~4~^04/2003^"
+          },
+          "204": {
+            "value": 0.37,
+            "raw": "~11090~^~204~^0.37^29^0.004^~11~^~JO~^~~^~~^5^0.33^0.41^3^0.353^0.381^~4~^04/2003^"
+          },
+          "208": {
+            "value": 34,
+            "raw": "~11090~^~208~^34^0^^~4~^~NC~^~~^~~^^^^^^^~~^03/2006^"
+          },
+          "255": {
+            "value": 89.3,
+            "raw": "~11090~^~255~^89.30^49^1.036^~11~^~JO~^~~^~~^10^73.73^91.80^7^86.867^91.739^~4~^04/2003^"
+          },
+          "291": {
+            "value": 2.6,
+            "raw": "~11090~^~291~^2.6^13^0.257^~6~^~JA~^~~^~~^5^2.2^3.2^3^1.774^3.407^~4~^04/2003^"
+          },
+          "401": {
+            "value": 89.2,
+            "raw": "~11090~^~401~^89.2^19^3.977^~11~^~JO~^~~^~~^2^85.2^93.2^1^38.648^139.705^~4~^04/2003^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-19",
+      "deck": "foods-kcal",
+      "title": "Lentejas cocidas",
+      "value": 116,
+      "label": "116 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "La referencia corresponde a lentejas hervidas sin sal; por cada 100 gramos registra unos 9 gramos de proteína y 7,9 gramos de fibra.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 16070.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 16070. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 16070; NUT_DATA.txt: NDB 16070, Nutr_No 208",
+      "snapshot": {
+        "ndb": "16070",
+        "description": "Lentils, mature seeds, cooked, boiled, without salt",
+        "raw": "~16070~^~1600~^~Lentils, mature seeds, cooked, boiled, without salt~^~LENTILS,MATURE SEEDS,CKD,BLD,WO/SALT~^~~^~~^~Y~^~~^0^~~^6.25^3.47^8.37^4.07",
+        "nutrients": {
+          "203": {
+            "value": 9.02,
+            "raw": "~16070~^~203~^9.02^23^0.191^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          },
+          "204": {
+            "value": 0.38,
+            "raw": "~16070~^~204~^0.38^22^0.014^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          },
+          "208": {
+            "value": 116,
+            "raw": "~16070~^~208~^116^0^^~4~^~NC~^~~^~~^^^^^^^~~^04/2007^"
+          },
+          "255": {
+            "value": 69.64,
+            "raw": "~16070~^~255~^69.64^23^0.753^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          },
+          "291": {
+            "value": 7.9,
+            "raw": "~16070~^~291~^7.9^0^^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          },
+          "401": {
+            "value": 1.5,
+            "raw": "~16070~^~401~^1.5^0^^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-20",
+      "deck": "foods-kcal",
+      "title": "Huevo cocido",
+      "value": 155,
+      "label": "155 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "Esta ficha describe un huevo hervido hasta quedar duro; por cada 100 gramos sin cáscara recoge unos 12,6 gramos de proteína.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 01129.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 01129. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 01129; NUT_DATA.txt: NDB 01129, Nutr_No 208",
+      "snapshot": {
+        "ndb": "01129",
+        "description": "Egg, whole, cooked, hard-boiled",
+        "raw": "~01129~^~0100~^~Egg, whole, cooked, hard-boiled~^~EGG,WHL,CKD,HARD-BOILED~^~~^~~^~Y~^~Shell~^12^~~^6.25^4.36^9.02^3.68",
+        "nutrients": {
+          "203": {
+            "value": 12.58,
+            "raw": "~01129~^~203~^12.58^14^0.180^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          },
+          "204": {
+            "value": 10.61,
+            "raw": "~01129~^~204~^10.61^7^0.050^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          },
+          "208": {
+            "value": 155,
+            "raw": "~01129~^~208~^155^0^^~4~^~NC~^~~^~~^^^^^^^~~^02/2009^"
+          },
+          "255": {
+            "value": 74.62,
+            "raw": "~01129~^~255~^74.62^14^0.140^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          },
+          "291": {
+            "value": 0,
+            "raw": "~01129~^~291~^0.0^0^^~7~^~Z~^~~^~~^^^^^^^~~^02/2009^"
+          },
+          "401": {
+            "value": 0,
+            "raw": "~01129~^~401~^0.0^2^^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-21",
+      "deck": "foods-kcal",
+      "title": "Garbanzos cocidos",
+      "value": 164,
+      "label": "164 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "Los garbanzos de la carta están hervidos sin sal; la ficha recoge unos 8,9 gramos de proteína y 7,6 gramos de fibra por cada 100 gramos.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 16057.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 16057. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 16057; NUT_DATA.txt: NDB 16057, Nutr_No 208",
+      "snapshot": {
+        "ndb": "16057",
+        "description": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+        "raw": "~16057~^~1600~^~Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt~^~CHICKPEAS ,MATURE SEEDS,CKD,BLD,WO/SALT~^~~^~~^~Y~^~~^0^~~^6.25^3.47^8.37^4.07",
+        "nutrients": {
+          "203": {
+            "value": 8.86,
+            "raw": "~16057~^~203~^8.86^23^0.205^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          },
+          "204": {
+            "value": 2.59,
+            "raw": "~16057~^~204~^2.59^24^0.091^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          },
+          "208": {
+            "value": 164,
+            "raw": "~16057~^~208~^164^0^^~4~^~NC~^~~^~~^^^^^^^~~^04/2007^"
+          },
+          "255": {
+            "value": 60.21,
+            "raw": "~16057~^~255~^60.21^23^0.607^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          },
+          "291": {
+            "value": 7.6,
+            "raw": "~16057~^~291~^7.6^0^^~1~^~~^~~^~~^^^^^^^~~^01/1994^"
+          },
+          "401": {
+            "value": 1.3,
+            "raw": "~16057~^~401~^1.3^0^^~1~^~~^~~^~~^^^^^^^~~^12/1986^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-22",
+      "deck": "foods-kcal",
+      "title": "Yogur natural entero",
+      "value": 61,
+      "label": "61 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "Se trata de yogur natural elaborado con leche entera: la referencia recoge 3,25 gramos de grasa por cada 100 gramos, sin añadir azúcar.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 01116.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 01116. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 01116; NUT_DATA.txt: NDB 01116, Nutr_No 208",
+      "snapshot": {
+        "ndb": "01116",
+        "description": "Yogurt, plain, whole milk, 8 grams protein per 8 ounce",
+        "raw": "~01116~^~0100~^~Yogurt, plain, whole milk, 8 grams protein per 8 ounce~^~YOGURT,PLN,WHL MILK,8 GRAMS PROT PER 8 OZ~^~~^~~^~Y~^~~^0^~~^6.38^4.27^8.79^3.87",
+        "nutrients": {
+          "203": {
+            "value": 3.47,
+            "raw": "~01116~^~203~^3.47^0^^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          },
+          "204": {
+            "value": 3.25,
+            "raw": "~01116~^~204~^3.25^0^^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          },
+          "208": {
+            "value": 61,
+            "raw": "~01116~^~208~^61^0^^~4~^~NC~^~~^~~^^^^^^^~~^02/2009^"
+          },
+          "255": {
+            "value": 87.9,
+            "raw": "~01116~^~255~^87.90^0^^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          },
+          "291": {
+            "value": 0,
+            "raw": "~01116~^~291~^0.0^0^^~4~^~~^~~^~~^^^^^^^~~^11/1976^"
+          },
+          "401": {
+            "value": 0.5,
+            "raw": "~01116~^~401~^0.5^0^^~1~^~~^~~^~~^^^^^^^~~^11/1976^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-23",
+      "deck": "foods-kcal",
+      "title": "Aceite de oliva",
+      "value": 884,
+      "label": "884 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "La referencia del USDA registra el aceite como 100 gramos de grasa por cada 100 gramos; su energía se calcula con factores específicos para grasas.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 04053.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 04053. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 04053; NUT_DATA.txt: NDB 04053, Nutr_No 208",
+      "snapshot": {
+        "ndb": "04053",
+        "description": "Oil, olive, salad or cooking",
+        "raw": "~04053~^~0400~^~Oil, olive, salad or cooking~^~OIL,OLIVE,SALAD OR COOKING~^~~^~~^~Y~^~~^0^~~^0.00^^8.84^",
+        "nutrients": {
+          "203": {
+            "value": 0,
+            "raw": "~04053~^~203~^0.00^4^0.000^~1~^~A~^~~^~~^1^0.00^0.00^^^^~2, 3~^03/2005^"
+          },
+          "204": {
+            "value": 100,
+            "raw": "~04053~^~204~^100.00^0^^~4~^~O~^~~^~~^^^^^^^~~^03/2005^"
+          },
+          "208": {
+            "value": 884,
+            "raw": "~04053~^~208~^884^0^^~4~^~NC~^~~^~~^^^^^^^~~^03/2005^"
+          },
+          "255": {
+            "value": 0,
+            "raw": "~04053~^~255~^0.00^4^0.000^~1~^~A~^~~^~~^1^0.00^0.00^^^^~1, 2, 3~^03/2005^"
+          },
+          "291": {
+            "value": 0,
+            "raw": "~04053~^~291~^0.0^0^^~4~^~~^~~^~~^^^^^^^~~^06/1979^"
+          },
+          "401": {
+            "value": 0,
+            "raw": "~04053~^~401~^0.0^0^^~4~^~~^~~^~~^^^^^^^~~^06/1979^"
+          }
+        }
+      }
+    },
+    {
+      "id": "foods-kcal-24",
+      "deck": "foods-kcal",
+      "title": "Chocolate negro (70–85 % cacao)",
+      "value": 598,
+      "label": "598 kcal / 100 g",
+      "artist": null,
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "curiosity": "El porcentaje de cacao importa: esta referencia describe chocolate con entre un 70 y un 85 %, y registra 10,9 gramos de fibra por cada 100 gramos.",
+      "curiositySource": "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/dnload/sr28asc.zip",
+      "scope": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 19904.",
+      "dataDate": "edición SR28 de septiembre de 2015",
+      "measureNote": "Energía por 100 g de parte comestible en la preparación indicada; referencia USDA SR28, nutriente 208 (kcal), registro NDB 19904. Referencia del dato: edición SR28 de septiembre de 2015.",
+      "location": "FOOD_DES.txt: NDB 19904; NUT_DATA.txt: NDB 19904, Nutr_No 208",
+      "snapshot": {
+        "ndb": "19904",
+        "description": "Chocolate, dark, 70-85% cacao solids",
+        "raw": "~19904~^~1900~^~Chocolate, dark, 70-85% cacao solids~^~CHOCOLATE,DK,70-85% CACAO SOL~^~~^~~^~~^~~^0^~~^^^^",
+        "nutrients": {
+          "203": {
+            "value": 7.79,
+            "raw": "~19904~^~203~^7.79^2^^~1~^~A~^~~^~~^1^6.92^9.10^^^^~~^08/2008^"
+          },
+          "204": {
+            "value": 42.63,
+            "raw": "~19904~^~204~^42.63^4^0.170^~1~^~A~^~~^~~^1^39.86^46.55^1^41.394^43.858^~2, 3~^04/2009^"
+          },
+          "208": {
+            "value": 598,
+            "raw": "~19904~^~208~^598^0^^~4~^~NC~^~~^~~^^^^^^^~~^04/2009^"
+          },
+          "255": {
+            "value": 1.37,
+            "raw": "~19904~^~255~^1.37^2^^~1~^~A~^~~^~~^1^1.05^1.84^^^^~~^08/2008^"
+          },
+          "291": {
+            "value": 10.9,
+            "raw": "~19904~^~291~^10.9^2^^~1~^~A~^~~^~~^1^9.8^12.5^^^^~~^08/2008^"
+          }
+        }
+      }
+    },
+    {
+      "id": "rivers-spain-11",
+      "deck": "rivers-spain",
+      "title": "Nalón",
+      "value": 143.17,
+      "label": "≈143,17 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "Su desembocadura se sitúa entre Soto del Barco y Muros de Nalón; el tramo final forma parte del paisaje de la costa asturiana.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 100374",
+      "snapshot": {
+        "Vertiente": "CANTÁBRICA",
+        "Identificador demarcación": "ES018",
+        "Demarcación": "CANTÁBRICO OCCIDENTAL",
+        "Identificador curso": 100374,
+        "Nombre": "Río Nalón",
+        "Clasificación": "Río principal",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 143.17,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Caso",
+        "Desembocadura": "Soto del Barco - Muros de Nalón",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-680404.9402223821%2C5329371.652910741%2C-583215.1843327492%2C5399082.433822682%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-12",
+      "deck": "rivers-spain",
+      "title": "Narcea",
+      "value": 110.71,
+      "label": "≈110,71 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "Es un afluente del Nalón por su margen izquierda: su agua continúa hacia el mar a través de otro río, en lugar de desembocar directamente.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 1003742",
+      "snapshot": {
+        "Vertiente": "CANTÁBRICA",
+        "Identificador demarcación": "ES018",
+        "Demarcación": "CANTÁBRICO OCCIDENTAL",
+        "Identificador curso": 1003742,
+        "Nombre": "Río Narcea",
+        "Clasificación": "Afluente, afluente por la margen izquierda del río Río Nalón",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 110.71,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Cangas del Narcea",
+        "Desembocadura": "Pravia",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-737433.1045086158%2C5308271.024913607%2C-679795.6695635779%2C5384480.709106554%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-13",
+      "deck": "rivers-spain",
+      "title": "Sella",
+      "value": 63.26,
+      "label": "≈63,26 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "Su recorrido acaba en la ría de Ribadesella, donde el agua del río se encuentra con el mar Cantábrico.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 1003738",
+      "snapshot": {
+        "Vertiente": "CANTÁBRICA",
+        "Identificador demarcación": "ES018",
+        "Demarcación": "CANTÁBRICO OCCIDENTAL",
+        "Identificador curso": 1003738,
+        "Nombre": "Río Sella",
+        "Clasificación": "Río principal",
+        "Orden": "Tercer orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 63.26,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Francia",
+        "Desembocadura": "Ría de Ribadesella",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-577157.498849692%2C5331584.316278767%2C-560821.8517208537%2C5383796.947869283%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-14",
+      "deck": "rivers-spain",
+      "title": "Navia",
+      "value": 160.43,
+      "label": "≈160,43 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "El inventario hidrográfico sitúa su desembocadura en la Playa de la Barra, dentro de la demarcación del Cantábrico Occidental.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 100376",
+      "snapshot": {
+        "Vertiente": "CANTÁBRICA",
+        "Identificador demarcación": "ES018",
+        "Demarcación": "CANTÁBRICO OCCIDENTAL",
+        "Identificador curso": 100376,
+        "Nombre": "Río Navia",
+        "Clasificación": "Río principal",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 160.43,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Francia",
+        "Desembocadura": "Playa Barra",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-793014.2912502636%2C5268866.029104591%2C-747513.187335458%2C5397587.472399571%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-15",
+      "deck": "rivers-spain",
+      "title": "Bidasoa",
+      "value": 66,
+      "label": "≈66 km",
+      "artist": null,
+      "source": "https://www.navarra.es/NR/rdonlyres/6BA76F8C-32B9-4AA4-8F91-1005E870309C/100470/bidasoa_castellano.pdf",
+      "curiosity": "En su tramo final forma frontera con Francia; de los 66 kilómetros recogidos por el Gobierno de Navarra, diez quedan fuera de esa comunidad.",
+      "curiositySource": "https://www.navarra.es/NR/rdonlyres/6BA76F8C-32B9-4AA4-8F91-1005E870309C/100470/bidasoa_castellano.pdf",
+      "scope": "Longitud aproximada del recorrido completo del Bidasoa según el Foro del Agua del Gobierno de Navarra; no solo el tramo cartográfico denominado Bidasoa Ibaia.",
+      "dataDate": "documento del Foro del Agua consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud aproximada del recorrido completo del Bidasoa según el Foro del Agua del Gobierno de Navarra; no solo el tramo cartográfico denominado Bidasoa Ibaia. Referencia del dato: documento del Foro del Agua consultado el 5 de octubre de 2026.",
+      "location": "Buscando soluciones al Bidasoa, ficha Longitud"
+    },
+    {
+      "id": "rivers-spain-16",
+      "deck": "rivers-spain",
+      "title": "Ter",
+      "value": 216.88,
+      "label": "≈216,88 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "El inventario del IGN sitúa su nacimiento en Setcases y su desembocadura en Torroella de Montgrí, en la vertiente mediterránea.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 20054",
+      "snapshot": {
+        "Vertiente": "MEDITERRÁNEA",
+        "Identificador demarcación": "ES100",
+        "Demarcación": "CUENCAS INTERNAS DE CATALUÑA",
+        "Identificador curso": 20054,
+        "Nombre": "el Ter",
+        "Clasificación": "Río principal",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 216.88,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Setcases",
+        "Desembocadura": "Torroella de Montgrí",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=243990.6804898521%2C5154542.820206829%2C355504.72766047745%2C5224173.313417848%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-17",
+      "deck": "rivers-spain",
+      "title": "Tormes",
+      "value": 250.53,
+      "label": "≈250,53 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "Se incorpora al Duero por su margen izquierda; el inventario sitúa la desembocadura en la frontera entre España y Portugal.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 10042",
+      "snapshot": {
+        "Vertiente": "ATLÁNTICA",
+        "Identificador demarcación": "ES020",
+        "Demarcación": "DUERO ",
+        "Identificador curso": 10042,
+        "Nombre": "Río Tormes",
+        "Clasificación": "Afluente, afluente por la margen izquierda del río Río Duero",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 250.53,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Francia",
+        "Desembocadura": "España/Portugal",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-721369.5586883966%2C4912342.934555095%2C-571509.0244652345%2C5055839.202757176%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-18",
+      "deck": "rivers-spain",
+      "title": "Jarama",
+      "value": 209.65,
+      "label": "≈209,65 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "Es un afluente del Tajo por la derecha; su desembocadura se sitúa en el término de Aranjuez, según el inventario hidrográfico.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 10068",
+      "snapshot": {
+        "Vertiente": "ATLÁNTICA",
+        "Identificador demarcación": "ES030",
+        "Demarcación": "TAJO",
+        "Identificador curso": 10068,
+        "Nombre": "Río Jarama",
+        "Clasificación": "Afluente, afluente por la margen derecha del río Río Tajo",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 209.65,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Montejo de la Sierra",
+        "Desembocadura": "Aranjuez",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-406310.7177015699%2C4870442.156335978%2C-366606.9198835144%2C5032672.729501708%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-19",
+      "deck": "rivers-spain",
+      "title": "Genil",
+      "value": 345.75,
+      "label": "≈345,75 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "Es un afluente del Guadalquivir por su margen izquierda; desemboca en Palma del Río, tras atravesar su propia cuenca.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 100942",
+      "snapshot": {
+        "Vertiente": "ATLÁNTICA",
+        "Identificador demarcación": "ES050",
+        "Demarcación": "GUADALQUIVIR",
+        "Identificador curso": 100942,
+        "Nombre": "Río Genil",
+        "Clasificación": "Afluente, afluente por la margen izquierda del río Río Guadalquivir",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 345.75,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "Francia",
+        "Desembocadura": "Palma del Río",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-592614.7261158956%2C4454371.826728897%2C-371907.9575237721%2C4537258.414446951%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "rivers-spain-20",
+      "deck": "rivers-spain",
+      "title": "Pisuerga",
+      "value": 289.08,
+      "label": "≈289,08 km",
+      "artist": null,
+      "source": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "curiosity": "Desemboca en el Duero por su margen derecha; el inventario hidrográfico sitúa esa unión en Villanueva de Duero.",
+      "curiositySource": "https://www.ign.es/resources/ane/Informacion_Geografica_Destacada/IGN_INFOGEO_RIOS.json",
+      "scope": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas.",
+      "dataDate": "inventario IGN consultado el 5 de octubre de 2026",
+      "measureNote": "Longitud cartográfica del curso identificado por el IGN, sumando tramos nacionales, fronterizos y no nacionales; puede diferir de las longitudes tradicionales publicadas. Referencia del dato: inventario IGN consultado el 5 de octubre de 2026.",
+      "location": "IGN, IGR Hidrografía, identificador de curso 10048",
+      "snapshot": {
+        "Vertiente": "ATLÁNTICA",
+        "Identificador demarcación": "ES020",
+        "Demarcación": "DUERO ",
+        "Identificador curso": 10048,
+        "Nombre": "Río Pisuerga",
+        "Clasificación": "Afluente, afluente por la margen derecha del río Río Duero",
+        "Orden": "Segundo orden",
+        "Persistencia": "Permanente",
+        "Longitud nacional (km)": 289.08,
+        "Longitud fronteriza (km)": "",
+        "Longitud no nacional (km)": "",
+        "Nacimiento": "La Pernía",
+        "Desembocadura": "Villanueva de Duero",
+        "Ver en mapa": "https://signa.ign.es/signa/?extent=-541711.2316995776%2C5093832.905541205%2C-470420.9514355925%2C5310923.025175323%2C102100&basemap=basemap_3"
+      }
+    },
+    {
+      "id": "buildings-10",
+      "deck": "buildings",
+      "title": "Empire State Building",
+      "value": 381,
+      "label": "381 m",
+      "artist": null,
+      "source": "https://www.skyscraper.org/tallest-towers/empire-state-building/",
+      "curiosity": "Su construcción avanzó a un ritmo extraordinario: la obra del edificio se completó en unos once meses, según el Museo del Rascacielos.",
+      "curiositySource": "https://www.skyscraper.org/tallest-towers/empire-state-building/",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-11",
+      "deck": "buildings",
+      "title": "Chrysler Building",
+      "value": 318.9,
+      "label": "318,9 m",
+      "artist": null,
+      "source": "https://www.skyscrapercenter.com/new-york-city/chrysler-building/422/",
+      "curiosity": "Tiene 77 plantas sobre rasante; su aguja forma parte del remate arquitectónico y se cuenta en la altura del edificio.",
+      "curiositySource": "https://www.skyscrapercenter.com/new-york-city/chrysler-building/422/",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-12",
+      "deck": "buildings",
+      "title": "Willis Tower",
+      "value": 442.1,
+      "label": "442,1 m",
+      "artist": null,
+      "source": "https://www.skyscrapercenter.com/building/willis-tower/169",
+      "curiosity": "El Museo del Rascacielos lo identifica también por su antiguo nombre, Sears Tower; su altura arquitectónica excluye las antenas superiores.",
+      "curiositySource": "https://old.skyscraper.org/EXHIBITIONS/SUPERTALL/pdf/48GridForWeb.pdf",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-13",
+      "deck": "buildings",
+      "title": "Shanghai World Financial Center",
+      "value": 492,
+      "label": "492 m",
+      "artist": null,
+      "source": "https://global.ctbuh.org/resources/papers/download/14-case-study-shanghai-world-financial-center.pdf",
+      "curiosity": "En sus plantas superiores hay un hotel y un recorrido panorámico; el paso del piso cien permite caminar sobre la ciudad.",
+      "curiositySource": "https://www.kpf.com/project/shanghai-world-financial-center",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-14",
+      "deck": "buildings",
+      "title": "International Commerce Centre",
+      "value": 484,
+      "label": "484 m",
+      "artist": null,
+      "source": "https://www.skyscrapercenter.com/build/international-commerce-centre/137",
+      "curiosity": "Su ficha registra 108 plantas sobre rasante, pero la planta ocupada más alta está por debajo del remate total de la torre.",
+      "curiositySource": "https://www.skyscrapercenter.com/build/international-commerce-centre/137",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-15",
+      "deck": "buildings",
+      "title": "Central Park Tower",
+      "value": 472.4,
+      "label": "472,4 m",
+      "artist": null,
+      "source": "https://www.skyscrapercenter.com/building/wd/14269",
+      "curiosity": "Su función principal es residencial; la ficha técnica distingue la altura arquitectónica de la altura de la planta ocupada más alta.",
+      "curiositySource": "https://www.skyscrapercenter.com/building/wd/14269",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-16",
+      "deck": "buildings",
+      "title": "Lakhta Center",
+      "value": 462,
+      "label": "462 m",
+      "artist": null,
+      "source": "https://lakhta.center/en/about/",
+      "curiosity": "El complejo no se limita a la torre: incluye un edificio multifuncional curvado como un bumerán, dividido por un atrio longitudinal.",
+      "curiositySource": "https://lakhta.center/en/about/",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-17",
+      "deck": "buildings",
+      "title": "Burj Al Arab",
+      "value": 321,
+      "label": "321 m",
+      "artist": null,
+      "source": "https://cdn.jumeirah.com/api/public/content/b409c1a40de5419ca768ec00068b5d0a?v=fc854a3e",
+      "curiosity": "Su silueta recuerda la vela de un dhow; se levanta en una isla artificial separada de la costa por unos 280 metros.",
+      "curiositySource": "https://cdn.jumeirah.com/api/public/content/b409c1a40de5419ca768ec00068b5d0a?v=fc854a3e",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-18",
+      "deck": "buildings",
+      "title": "Commerzbank Tower",
+      "value": 259,
+      "label": "259 m",
+      "artist": null,
+      "source": "https://www.arup.com/en-us/projects/commerzbank-tower/",
+      "curiosity": "Su diseño incorpora un atrio central triangular que lleva luz al interior; Arup atribuye el proyecto a Foster y sitúa su finalización en 1997.",
+      "curiositySource": "https://www.arup.com/en-us/projects/commerzbank-tower/",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    },
+    {
+      "id": "buildings-19",
+      "deck": "buildings",
+      "title": "Gran Torre Santiago",
+      "value": 300,
+      "label": "300 m",
+      "artist": null,
+      "source": "https://minas.uchile.cl/dam/jcr%3Aae977370-63cd-48b0-8bce-19f030c63f5d/Guia_Vivir_Chile.pdf",
+      "curiosity": "El mirador Sky Costanera ocupa las plantas 61 y 62; desde allí se contempla Santiago con la cordillera de los Andes al fondo.",
+      "curiositySource": "https://www.skycostanera.cl/es",
+      "scope": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos.",
+      "dataDate": "fuente consultada el 5 de octubre de 2026",
+      "measureNote": "Altura arquitectónica del edificio: incluye agujas integrantes del diseño y excluye antenas y equipos técnicos. Referencia del dato: fuente consultada el 5 de octubre de 2026.",
+      "location": "Ficha de altura o documento técnico del edificio"
+    }
+  ]
+}

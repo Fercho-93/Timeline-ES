@@ -16,14 +16,14 @@ let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
 // Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
 const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
-assert.equal(quickCards.length, 437);
-assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 437);
-const metroNotes = new Map(JSON.parse(read('docs/fuentes-metros-ampliacion-2026-10-04.json')).cards.map(card => [card.id, card.measureNote]));
+assert.equal(quickCards.length, 507);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 507);
+const auditedNotes = new Map(['docs/fuentes-metros-ampliacion-2026-10-04.json','docs/fuentes-siete-retos-ampliacion-2026-10-05.json'].flatMap(file=>JSON.parse(read(file)).cards.map(card=>[card.id,card.measureNote])));
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
   assert.ok(card.detail.startsWith(card.curiosity), `${card.id}: curiosidad antes del criterio de medida`);
-  assert.ok(card.detail.includes(metroNotes.get(card.id) || deck.context), `${card.id}: conserva las aclaraciones de comparación`);
+  assert.ok(card.detail.includes(auditedNotes.get(card.id) || deck.context), `${card.id}: conserva las aclaraciones de comparación`);
   assert.ok(/^https?:\/\//.test(card.source), `${card.id}: fuente del dato`);
   assert.ok(/^https:\/\//.test(card.curiositySource), `${card.id}: fuente de la curiosidad`);
   if (deck.asOf) assert.ok(card.detail.includes(`Datos a ${deck.asOf}.`));
@@ -174,6 +174,35 @@ while(s.remaining.length){const id=s.remaining[0],value=x=>metros.cards.find(c=>
 assert.equal(s.phase,'round-end');
 const oldMetroSave={version:3,config:{names:['Ana','Luis'],rounds:[{id:'metros',order:Array.from({length:9},(_,i)=>'metros-'+(i+1))}]},commands:[{type:'place',cardId:'metros-2',index:1}]};
 assert.equal(E.restore(oldMetroSave).result.correct,true);
+
+
+// La ampliación conserva los IDs antiguos y las partidas guardadas; se prueban todos los valores nuevos al ordenar.
+const sevenAudit=JSON.parse(read('docs/fuentes-siete-retos-ampliacion-2026-10-05.json'));
+assert.equal(sevenAudit.cards.length,70);
+const previousSizes={'airports':7,'capitals-altitude':9,'stadiums':10,'albums-sales':9,'foods-kcal':14,'rivers-spain':10,'buildings':9};
+for(const [deckId,previous] of Object.entries(previousSizes)){
+ const deck=E.challenge(deckId);assert.equal(deck.cards.length,previous+10);
+ assert.equal(new Set(deck.cards.map(c=>c.title)).size,deck.cards.length);
+ s=E.create({names:['A','B'],rounds:[round(deckId)]});
+ while(s.remaining.length){const id=s.remaining[0],value=x=>deck.cards.find(c=>c.id===x).value;const place=s.timeline.findIndex(t=>value(t)>value(id));s=E.step(s,{type:'place',cardId:id,index:place<0?s.timeline.length:place});assert.equal(s.result.correct,true);s=E.step(s,{type:'ack'});}
+ assert.equal(s.phase,'round-end');
+ const saved={version:3,config:{names:['A','B'],rounds:[{id:deckId,order:Array.from({length:previous},(_,i)=>deckId+'-'+(i+1))}]},commands:[]};
+ assert.equal(E.restore(saved).remaining.length,previous-1);
+}
+for(const item of sevenAudit.cards){
+ const card=E.challenge(item.deck).cards.find(c=>c.id===item.id);
+ assert.equal(card.value,item.value);assert.equal(card.label,item.label);assert.equal(card.source,item.source);
+ assert.equal(card.curiositySource,item.curiositySource);assert.ok(card.detail.includes(item.scope));assert.ok(card.detail.includes(item.dataDate));
+ if(item.passengers)assert.equal(card.value,item.passengers/1e6);
+ if(item.deck==='foods-kcal')assert.equal(card.value,item.snapshot.nutrients['208'].value);
+ if(item.deck==='capitals-altitude')assert.equal(card.value,item.snapshot.dem);
+}
+for(const card of E.challenge('albums-sales').cards)assert.ok(card.artist&&card.artist.length>=3,'cada álbum identifica a su artista');
+assert.equal(E.challenge('stadiums').cards.find(c=>c.id==='stadiums-12').value,75024,'Allianz: configuración nacional');
+assert.equal(E.challenge('stadiums').cards.find(c=>c.id==='stadiums-18').value,43858,'Sevilla: cuentas oficiales 2024/25');
+assert.ok(E.challenge('stadiums').cards.find(c=>c.id==='stadiums-17').title.includes('antes de la reforma'));
+assert.equal(E.challenge('albums-sales').cards.find(c=>c.id==='albums-sales-15').value,25,'Springsteen: estimación oficial de 2024');
+assert.equal(E.challenge('rivers-spain').cards.find(c=>c.id==='rivers-spain-15').value,66,'Bidasoa: recorrido completo según Navarra');
 
 const companiesRevenue = CT.QuickCatalog.challenges.find(c => c.id === 'companies-revenue');
 assert.ok(companiesRevenue.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
