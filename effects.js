@@ -57,7 +57,7 @@
     hapticsAvailable,
     stamp() { void vibration("confirm"); },
     testHaptics() { return vibration("confirm"); },
-    feedback(correct) { void vibration(correct ? "success" : "failure"); },
+    feedback(correct) { CT.Companion?.feedback(correct); void vibration(correct ? "success" : "failure"); },
     tap() { void vibration("confirm"); },
     page() {},
     transition() {}
