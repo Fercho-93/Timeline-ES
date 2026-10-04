@@ -85,13 +85,13 @@ assert.throws(() => E.restore({version: -1, config, commands: []}));
 assert.throws(() => E.restore({version: 1, config, commands: [{type: 'place', cardId: 'missing', index: 0}]}));
 assert.throws(() => E.create({names: ['A', 'B'], rounds: [{id:'social', order: ['social-1']}]}));
 for (const c of CT.QuickCatalog.challenges) {
-  assert.ok(c.cards.length >= 2 && c.cards.length <= (c.id === 'drinks' ? 34 : 25));
+  assert.ok(c.cards.length >= 2 && c.cards.length <= (c.id === 'drinks' ? 34 : c.id === 'festivities' ? 32 : 25));
   assert.equal(new Set(c.cards.map(card => card.id)).size, c.cards.length);
   assert.ok(c.cards.every(card => Number.isFinite(card.value) && card.title && card.label && card.detail && card.source.startsWith('https://')));
 }
 const requestedDecks = ['sports-players','drinks','festivities','social','wwii','civil-war','kings','consoles','oscars','companies-founded','timezones-june','cities-east-west','cities-north-south','body','series-seasons','buildings','rivers-spain','foods-kcal','albums-sales','stadiums','capitals-altitude','eurovision-wins','storage','airports','metros','companies-revenue','spanish-tv','minimum-wages'];
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.some(c => c.id === id)));
-assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= (id === 'drinks' ? 34 : 25)));
+assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= (id === 'drinks' ? 34 : id === 'festivities' ? 32 : 25)));
 const social = CT.QuickCatalog.challenges.find(c => c.id === 'social');
 assert.equal(social.cards.length, 15);
 assert.ok(social.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
@@ -153,6 +153,18 @@ assert.ok(drinks.cards.every((card, i) => card.image === 'assets/quick-cards/dri
 assert.ok(new Set(drinks.cards.map(card => card.value)).size >= 20, 'El mazo cubre al menos 20 graduaciones');
 assert.ok(drinks.cards.filter(card => card.value === 40).length / drinks.cards.length < 0.25, 'Menos del 25 % del mazo se concentra en 40 %');
 const festivities = CT.QuickCatalog.challenges.find(c => c.id === 'festivities');
+assert.equal(festivities.cards.length, 32);
+assert.ok(festivities.cards.every(card => card.source !== 'https://www.timeanddate.com/holidays/'), 'Cada festividad tiene una referencia concreta');
+const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+for (const card of festivities.cards) {
+  const match = /^(\d{1,2}) de ([a-z]+)$/.exec(card.label);
+  assert.ok(match, `${card.title}: día y mes fijos`);
+  const month = months.indexOf(match[2]), day = Number(match[1]);
+  assert.ok(month >= 0);
+  const date = new Date(Date.UTC(2025, month, day));
+  assert.equal(date.getUTCMonth(), month, `${card.title}: fecha existente`);
+  assert.equal(card.value, (date.getTime() - Date.UTC(2025, 0, 0)) / 86400000, `${card.title}: posición correcta en el año`);
+}
 assert.ok(festivities.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming, undefined, 'La colección pendiente ya no se publica');
 assert.equal(CT.has('counts'), false, 'La colección eliminada no entra en partidas ni en competición');
