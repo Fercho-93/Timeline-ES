@@ -1222,7 +1222,7 @@
     if (isCorrectSlot) {
       return `<button class="slot slot-correct" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="Aquí iba la carta que acabas de fallar"><span>✦</span><small>Aquí</small></button>`;
     }
-    return `<button class="slot" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${total + 1}"><span>+</span></button>`;
+    return `<button class="slot" data-action="${actionName}" data-index="${index}" ${enabled ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${total + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`;
   }
 
   function confirmSlot(card) {

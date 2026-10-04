@@ -853,10 +853,10 @@
       slots.push(confirmable && pendingIndex === index
         ? `<div class="slot-confirm" data-index="${index}"><small>Colocar aquí</small><strong>${escapeHtml(confirmable.title)}</strong><button class="btn btn-primary btn-block" data-local-action="${myPulse ? (defensa ? "confirm-defense" : "confirm-pulse") : "confirm-place"}" data-autofocus>Sí, aquí</button><button class="btn btn-ghost btn-block" data-local-action="cancel-place">Cancelar</button></div>`
         : myPulse
-          ? `<button class="slot" data-local-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`
+          ? `<button class="slot" data-local-action="pulse-place" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`
         : index === failIndex
           ? `<button class="slot slot-correct" data-local-action="place" data-index="${index}" disabled aria-label="Aquí iba la carta que se acaba de fallar"><span>✦</span><small>Aquí</small></button>`
-          : `<button class="slot" data-local-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>+</span></button>`);
+          : `<button class="slot" data-local-action="place" data-index="${index}" ${myTurn && selectedCardId ? "" : "disabled"} aria-label="Colocar en la posición ${index + 1} de ${timelineCards.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
       if (index < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[index]));
     }
     const secondsLeft = turnRemaining();

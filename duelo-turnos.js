@@ -71,7 +71,7 @@ function orderBoard(game, card) {
   for (let index = 0; index <= line.length; index++) {
     if (card) slots.push(pendingIndex === index
       ? `<div class="slot-confirm"><small>Colocar aquí</small><strong>${safe(card.title)}</strong><button class="btn btn-primary btn-block" data-turn-action="confirm-place">Sí, aquí</button><button class="btn btn-ghost btn-block" data-turn-action="cancel-place">Cancelar</button></div>`
-      : `<button class="slot" data-turn-action="select-slot" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${line.length + 1}"><span>+</span></button>`);
+      : `<button class="slot" data-turn-action="select-slot" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${line.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
     if (index < line.length) slots.push(timelineCardMarkup(game, line[index]));
   }
   const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3><small>${safe(CT.hiddenLabel(game.mode))}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(game.mode, card)}<span class="hidden-date">${safe(CT.hiddenLabel(game.mode))}</span>${CT.cardBack(game.mode)}<strong>${safe(card.title)}</strong></div></div><p class="hint">${pendingIndex === null ? 'Toca el hueco donde quieres colocar la carta.' : 'Confirma el hueco elegido o toca otro.'}</p></section>` : '';

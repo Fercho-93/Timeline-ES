@@ -1044,7 +1044,7 @@
       <div class="gp-card" data-guide-card>${animalArt(modeKey, medio)}<i>${escapeHtml(hiddenLabel(modeKey))}</i><b data-guide-hidden>?</b><small>${escapeHtml(medio.title)}</small><em data-guide-value hidden>${escapeHtml(shortValue(modeKey, medio))}</em></div>
       <p>¿Dónde encaja esta carta?</p>
       <div class="gp-line">
-        <button type="button" data-guide-place="0" aria-label="Colocar antes de ${escapeHtml(izquierda.title)}">+</button>
+        <button type="button" data-guide-place="0" aria-label="Colocar antes de ${escapeHtml(izquierda.title)}">−</button>
         <div class="gp-reference">${mini(izquierda)}</div>
         <button type="button" data-guide-place="1" aria-label="Colocar entre las dos cartas">+</button>
         <div class="gp-reference">${mini(derecha)}</div>
