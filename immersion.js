@@ -477,6 +477,7 @@
         dock.setAttribute('role', 'group');
         dock.setAttribute('aria-label', 'Confirmar la posición elegida');
         dock.append(status, actions);
+        previewCard(slot);
       }
       const timelineSection = container.querySelector('.timeline-wrap')?.closest('section');
       // Cuando hay una decisión pendiente, sus mandos pertenecen a la línea y quedan
@@ -494,6 +495,32 @@
       // Mantén a quien juega junto al participante anterior al pasar el móvil.
       roster.scrollLeft = Math.max(0, active.offsetLeft - roster.children[1].offsetLeft);
     });
+  }
+  // La vista previa del hueco elegido es la propia carta, boca abajo como en la mano,
+  // posada en la línea. Debajo, el tramo que ocupa: las fechas de sus dos vecinas. Es lo
+  // que de verdad se decide al elegir hueco y no revela nada que no esté ya a la vista.
+  function neighbourValue(slot, step) {
+    for (let node = slot[step]; node; node = node[step]) {
+      if (!node.matches('.timeline-card')) continue;
+      return node.querySelector('.year')?.textContent.trim() || '';
+    }
+    return '';
+  }
+  function previewCard(slot) {
+    const title = slot.querySelector('strong')?.textContent.trim();
+    if (!title) return;
+    const before = neighbourValue(slot, 'previousElementSibling');
+    const after = neighbourValue(slot, 'nextElementSibling');
+    const range = before && after ? `<small>Entre</small><b>${CT.escapeHtml(before)}</b><i aria-hidden="true"></i><b>${CT.escapeHtml(after)}</b>`
+      : after ? `<small>Antes de</small><b>${CT.escapeHtml(after)}</b>`
+      : before ? `<small>Después de</small><b>${CT.escapeHtml(before)}</b>` : '';
+    const card = document.createElement('div');
+    card.className = 'slot-confirm-card preview-card';
+    card.innerHTML = `<span class="preview-card-face" aria-hidden="true"><img class="reverso-emblema" src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" decoding="async"></span><strong>${CT.escapeHtml(title)}</strong>${range ? `<p class="preview-range">${range}</p>` : ''}`;
+    slot.replaceChildren(card);
+    slot.classList.add('has-preview-card');
+    const where = before && after ? `entre ${before} y ${after}` : after ? `antes de ${after}` : before ? `después de ${before}` : '';
+    slot.setAttribute('aria-label', `Posición elegida${where ? `: ${where}` : ''}`);
   }
   // Al abrir el menú ⋯ de una partida se añade arriba un bloque «Vista» con el zoom y la
   // música. Se engancha a cualquier menú de la barra superior, sea cual sea la modalidad.

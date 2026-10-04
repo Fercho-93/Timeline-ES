@@ -9,6 +9,26 @@
       document.documentElement.dataset.scene = !neutral && CT.has(mode) ? CT.blockOf(mode).art : "archive";
     }
   };
+  // Motas de polvo que suben en la luz de la lámpara. Son elementos sueltos fuera de #app,
+  // así que ningún repintado las reinicia; cada una lleva su tamaño, su velocidad y su
+  // vaivén. Con «reducir movimiento» y durante la partida, edition.css las oculta.
+  function motas() {
+    if (document.querySelector(".motas") || !document.body) return;
+    const capa = document.createElement("div");
+    capa.className = "motas";
+    capa.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < 24; i++) {
+      const mota = document.createElement("i");
+      const d = 14 + Math.random() * 16;
+      mota.style.cssText = `--x:${(Math.random() * 100).toFixed(1)}%;--s:${(3 + Math.random() * 4).toFixed(1)}px;` +
+        `--d:${d.toFixed(1)}s;--delay:${(-Math.random() * d).toFixed(1)}s;` +
+        `--sway:${(Math.random() * 60 - 30).toFixed(0)}px;--o:${(.55 + Math.random() * .45).toFixed(2)}`;
+      capa.append(mota);
+    }
+    document.body.append(capa);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", motas, { once: true });
+  else motas();
   let haptics;
   function hapticsAvailable() {
     try {

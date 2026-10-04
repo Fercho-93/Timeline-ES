@@ -5312,79 +5312,174 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   background-size: 9px 9px, 160px 160px;
 }
 
-/* El pespunte que cose la carta a la línea al colocarla (a11y.js · stitch). */
-.card-stitch { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.card-stitch-thread {
-  stroke: #8d6327; stroke-width: 1.5; stroke-linecap: round;
-  stroke-dasharray: .55 .45;
-  filter: drop-shadow(0 .6px 0 #fff6dccc);
+/* El golpe al colocar (a11y.js · impact): polvo que sale por debajo de la carta. */
+.card-impact-dust {
+  position: absolute; z-index: 4; width: 78px; height: 34px; margin-left: -39px; pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 60%, #b8925bdd 0 9%, transparent 22%),
+    radial-gradient(circle at 70% 45%, #c09a62cc 0 7%, transparent 19%),
+    radial-gradient(ellipse at center, #b99359e6 0 22%, #cfb07ca6 46%, transparent 72%);
+  filter: blur(1.2px); opacity: 0;
+  animation: polvo-golpe 700ms cubic-bezier(.2,.7,.3,1) both;
 }
-:root[data-theme="dark"] .card-stitch-thread { stroke: #c79a52; }
+.card-impact-dust.dust-left { --polvo-x: -38px; }
+.card-impact-dust.dust-right { --polvo-x: 38px; }
+@keyframes polvo-golpe {
+  0% { opacity: 1; transform: translateX(0) scale(.3, .45); }
+  35% { opacity: .9; }
+  100% { opacity: 0; transform: translateX(var(--polvo-x)) translateY(-12px) scale(1.6, 1.3); }
+}
+
+/* La vista previa del hueco elegido (immersion.js · previewCard): la carta boca abajo,
+   entera y con color, posada en la línea, y debajo el tramo de fechas que ocupa. */
+#app.atlas-board .slot-confirm.has-preview-card {
+  display: grid; align-content: center; justify-items: center; padding: 6px 4px;
+  border: 1.5px dashed color-mix(in srgb, var(--atlas-selection) 70%, transparent);
+  background: radial-gradient(ellipse at 50% 85%, #c7a2622e, transparent 70%), #fbf4e46b;
+  box-shadow: inset 0 0 0 4px #fff8e866;
+}
+#app.atlas-board .slot-confirm-card.preview-card {
+  position: relative; width: 100%; min-height: 0; padding: 6px 6px 8px; gap: 6px;
+  display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
+  border: 1px solid #b88d4d; border-radius: 8px; opacity: 1; filter: none;
+  background-color: #f7eedb;
+  background-image: var(--carta-lino), var(--carta-grano);
+  background-size: 9px 9px, 160px 160px;
+  box-shadow: 0 2px 0 #b89b6e, 0 10px 18px #4a341a33, inset 0 0 0 3px #fff8e9;
+  transform-origin: 50% 100%;
+}
+#app.atlas-board .preview-card-face {
+  display: grid; place-items: center; aspect-ratio: 4 / 3; border-radius: 5px;
+  border: 1px solid #d7c29a;
+  background: radial-gradient(circle at 50% 45%, #fffaf0, #efe2c6 75%);
+}
+#app.atlas-board .preview-card-face img { width: 82%; height: auto; }
+#app.atlas-board .slot-confirm-card.preview-card strong { font: 700 .74rem/1.15 var(--font-display, Georgia); color: var(--edition-ink); }
+#app.atlas-board .preview-range {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 2px 5px;
+  margin: 2px 0 0; padding: 5px 4px 3px; border-top: 1px solid #d8c39b;
+  color: #8b3f2c; font: 700 .78rem/1.1 var(--font-display, Georgia); text-align: center;
+}
+#app.atlas-board .preview-range small {
+  flex-basis: 100%; color: var(--edition-muted); font: 700 .5rem/1 var(--ui-font);
+  letter-spacing: .12em; text-transform: uppercase;
+}
+#app.atlas-board .preview-range i { width: 10px; height: 1px; align-self: center; background: currentColor; opacity: .6; }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Las láminas de las puertas respiran: un acercamiento muy lento que va y vuelve,
-     como la hierba que se mece en una ilustración. Cada una a su ritmo, para que la
-     pantalla no se mueva entera a la vez. */
+  /* La carta cae en el hueco: llega desde arriba, golpea aplastándose, rebota y queda
+     flotando apenas, a la espera de confirmar. El polvo sale del golpe. */
+  #app.atlas-board .slot-confirm.placement-enter { animation: none; }
+  #app.atlas-board .slot-confirm.placement-enter .preview-card { animation: vista-cae 560ms both, vista-flota 3.2s 900ms ease-in-out infinite; }
+  #app.atlas-board .slot-confirm.has-preview-card:not(.placement-enter) .preview-card { animation: vista-flota 3.2s ease-in-out infinite; }
+  #app.atlas-board .slot-confirm.placement-enter::after {
+    content: ''; position: absolute; left: 50%; bottom: 4px; width: 120%; height: 26px; margin-left: -60%;
+    border-radius: 50%; pointer-events: none;
+    background: radial-gradient(ellipse at center, #c9a46aa6 0 20%, #d9bd8a5c 45%, transparent 70%);
+    filter: blur(2px); animation: vista-polvo 620ms 230ms ease-out both;
+  }
+  #app.atlas-board .slot-confirm.has-preview-card { position: relative; }
+
+  /* Las láminas de las puertas respiran: un acercamiento lento que va y vuelve, cada una
+     a su ritmo, y un reflejo de luz que las cruza de vez en cuando. */
   #app .home-door-art img,
   #app .mode-entry-art img,
   #app .mode-hub-head > img {
-    animation: lamina-viva 22s ease-in-out infinite alternate both;
+    animation: lamina-viva 13s ease-in-out infinite alternate both;
   }
-  #app .mode-entry:nth-child(2n) .mode-entry-art img { animation-duration: 26s; animation-delay: -9s; }
-  #app .mode-entry:nth-child(3n) .mode-entry-art img { animation-duration: 19s; animation-delay: -4s; animation-direction: alternate-reverse; }
-  #app .home-door-daily .home-door-art img { animation-duration: 25s; animation-delay: -12s; }
+  #app .mode-entry:nth-child(2n) .mode-entry-art img { animation-duration: 15s; animation-delay: -6s; }
+  #app .mode-entry:nth-child(3n) .mode-entry-art img { animation-duration: 11s; animation-delay: -3s; animation-direction: alternate-reverse; }
+  #app .home-door-daily .home-door-art img { animation-duration: 14s; animation-delay: -7s; }
+  #app :is(.home-door-art, .mode-entry-art)::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, #fff3d455 45%, #fffaeccc 50%, #fff3d455 55%, transparent 62%) no-repeat;
+    background-size: 250% 100%;
+    animation: lamina-reflejo 9s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  #app .mode-entry:nth-child(2n) .mode-entry-art::after { animation-delay: -3s; }
+  #app .home-door-daily .home-door-art::after { animation-delay: -5s; }
 
-  /* La lámpara de la mesa: una luz cálida en la esquina superior que respira con un
-     pulso irregular, nunca a compás. Está detrás de todo y no cambia el contraste de
-     ningún texto. */
+  /* La lámpara de la mesa: un haz de rayos cálidos desde la esquina superior que oscila
+     despacio y una luz que respira con un pulso irregular. Detrás de todo. */
   html::after {
-    content: ''; position: fixed; z-index: -1; inset: 0; pointer-events: none;
+    content: ''; position: fixed; z-index: -1; top: -10vh; left: -30vw; width: 160vw; height: 110vh; pointer-events: none;
     background:
-      radial-gradient(ellipse 70% 45% at 12% 0%, #ffd9952e, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 92% 6%, #ffe2a81f, transparent 72%);
-    animation: lampara 9s ease-in-out infinite;
+      repeating-conic-gradient(from 90deg at 50% 12%, #fffaf000 0deg 4deg, #fffaf0b3 7deg, #fffaf000 10deg 15deg),
+      radial-gradient(ellipse 30% 26% at 50% 14%, #fff8e6cc, transparent 70%);
+    mix-blend-mode: screen;
+    -webkit-mask: radial-gradient(ellipse 48% 62% at 50% 12%, #000 25%, transparent 78%);
+    mask: radial-gradient(ellipse 48% 62% at 50% 12%, #000 25%, transparent 78%);
+    transform-origin: 50% 12%;
+    animation: lampara-haz 11s ease-in-out infinite alternate, lampara 6s ease-in-out infinite;
   }
-  :root[data-theme="dark"]::after {
-    background:
-      radial-gradient(ellipse 70% 45% at 12% 0%, #ffb75a1c, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 92% 6%, #ffc8781a, transparent 72%);
-  }
-
-  /* Motas de polvo que suben despacio en la luz, como en un archivo antiguo. Es una sola
-     capa que se desplaza entera; el dibujo se repite cada 520 px y la capa se mueve
-     exactamente eso, así que el bucle no tiene costura. Durante la partida se quedan
-     quietas: allí se comparan fechas y nada debe tirar de la vista. */
-  html body::after {
-    content: ''; position: fixed; z-index: -1; left: 0; right: 0; top: 0;
-    height: calc(100lvh + 520px); pointer-events: none;
-    background:
-      radial-gradient(circle at 18% 22%, #fffaf0 0 1.3px, #dfb86d8c 2.1px, transparent 3.4px),
-      radial-gradient(circle at 72% 8%, #fff6e0 0 1px, #d8ae5f80 1.8px, transparent 3px),
-      radial-gradient(circle at 44% 63%, #fffaf0 0 1.6px, #e2bd7480 2.5px, transparent 4px),
-      radial-gradient(circle at 88% 47%, #fff3d6 0 .9px, #d5a95a73 1.6px, transparent 2.6px),
-      radial-gradient(circle at 8% 81%, #fffaf0 0 1.1px, #dcb46a80 1.9px, transparent 3px),
-      radial-gradient(circle at 61% 92%, #fff6e0 0 1.3px, #e0b96f80 2.2px, transparent 3.4px),
-      radial-gradient(circle at 31% 41%, #fff8e8 0 .8px, #d6ab5c66 1.4px, transparent 2.4px);
-    background-size: 360px 520px;
-    opacity: .75;
-    animation: motas 95s linear infinite;
-  }
-  :root[data-theme="dark"] body::after { opacity: .3; }
-  html body:has(#app.atlas-board)::after { animation-play-state: paused; opacity: .4; }
+  :root[data-theme="dark"]::after { opacity: .5; }
+  html:has(#app.atlas-board)::after { animation-play-state: paused; opacity: .45; }
 }
 
+/* Las motas de polvo en la luz son elementos sueltos (effects.js · motas), cada una con
+   su ritmo; aquí solo su aspecto. */
+.motas { position: fixed; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; }
+.motas i {
+  position: absolute; bottom: -12px; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%;
+  background: radial-gradient(circle, #fffdf3 0 30%, #e8b14f 58%, #c98a2a00 72%);
+  box-shadow: 0 0 7px 2px #f0b9529e;
+  opacity: 0;
+  animation: mota-sube var(--d) linear var(--delay) infinite;
+}
+.motas i:nth-child(3n) { animation-name: mota-sube-b; }
+:root[data-theme="dark"] .motas { opacity: .55; }
+html:has(#app.atlas-board) .motas { display: none; }
+@media (prefers-reduced-motion: reduce) { .motas { display: none; } }
+
+@keyframes vista-cae {
+  0% { opacity: 0; transform: translateY(-42px) rotate(-4deg) scale(1.08); }
+  40% { opacity: 1; transform: translateY(-14px) rotate(-1.5deg) scale(1.06); }
+  58% { transform: translateY(3px) rotate(0) scale(1.07, .88); }
+  74% { transform: translateY(-6px) scale(.97, 1.04); }
+  88% { transform: translateY(1px) scale(1.01, .99); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes vista-flota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes vista-polvo {
+  0% { opacity: .9; transform: scale(.4, .5); }
+  100% { opacity: 0; transform: scale(1.35, 1.1) translateY(-6px); }
+}
 @keyframes lamina-viva {
   from { scale: 1; translate: 0 0; }
-  to { scale: 1.055; translate: -1.6% -1.1%; }
+  to { scale: 1.12; translate: -3.5% -2.5%; }
+}
+@keyframes lamina-reflejo {
+  0%, 55% { background-position: 120% 0; }
+  85%, 100% { background-position: -20% 0; }
+}
+@keyframes lampara-haz {
+  from { transform: rotate(-6deg); }
+  to { transform: rotate(7deg); }
 }
 @keyframes lampara {
-  0%, 100% { opacity: .85; }
-  23% { opacity: 1; }
-  41% { opacity: .9; }
-  58% { opacity: .97; }
-  77% { opacity: .82; }
+  0%, 100% { opacity: .55; }
+  21% { opacity: 1; }
+  38% { opacity: .72; }
+  55% { opacity: .95; }
+  74% { opacity: .45; }
 }
-@keyframes motas {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(0, -520px, 0); }
+@keyframes mota-sube {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  12% { opacity: var(--o); }
+  50% { transform: translate3d(var(--sway), -45vh, 0); }
+  85% { opacity: var(--o); }
+  100% { opacity: 0; transform: translate3d(0, -90vh, 0); }
+}
+@keyframes mota-sube-b {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  15% { opacity: var(--o); }
+  35% { transform: translate3d(calc(var(--sway) * -1), -30vh, 0); }
+  70% { transform: translate3d(var(--sway), -62vh, 0); }
+  80% { opacity: var(--o); }
+  100% { opacity: 0; transform: translate3d(0, -88vh, 0); }
 }

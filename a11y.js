@@ -196,43 +196,39 @@
     return () => { clearTimeout(timer); wave.remove(); };
   }
 
-  // Al asentarse, un pespunte recorre el borde de la carta, como la puntada que une una
-  // pieza al resto de la colcha, y luego se desvanece: la carta ya forma parte de la línea.
-  // Se mide en el tamaño propio de la carta (sin el zoom de la línea), porque el dibujo
-  // va dentro de ella y escala con ella.
-  let stitches = 0;
-  function stitch(card, delay) {
-    const width = card.offsetWidth, height = card.offsetHeight;
-    if (!width || !height || typeof card.animate !== 'function') return () => {};
-    const ns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('class', 'card-stitch');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-    const id = `card-stitch-${++stitches}`;
-    const radius = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 7;
-    const rect = attrs => {
-      const node = document.createElementNS(ns, 'rect');
-      Object.entries({x: 4.5, y: 4.5, width: width - 9, height: height - 9, rx: Math.max(2, radius - 3), pathLength: 100, ...attrs})
-        .forEach(([name, value]) => node.setAttribute(name, value));
-      return node;
-    };
-    // El hilo se dibuja con una máscara que avanza: la línea discontinua no puede crecer
-    // por sí sola sin que sus puntadas se deslicen.
-    const mask = document.createElementNS(ns, 'mask');
-    mask.setAttribute('id', id);
-    const reveal = rect({fill: 'none', stroke: '#fff', 'stroke-width': 4, 'stroke-dasharray': '100 100', 'stroke-dashoffset': 100});
-    mask.append(reveal);
-    const thread = rect({class: 'card-stitch-thread', fill: 'none', mask: `url(#${id})`});
-    svg.append(mask, thread);
-    card.append(svg);
-    const sew = reveal.animate([{strokeDashoffset: 100}, {strokeDashoffset: 0}],
-      {duration: 520, delay, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards'});
-    const fade = svg.animate([{opacity: 1}, {opacity: 1, offset: .55}, {opacity: 0}],
-      {duration: 1300, delay: delay + 420, easing: 'ease-out', fill: 'forwards'});
-    const remove = () => svg.remove();
-    fade.finished.then(remove, remove);
-    return () => { sew.cancel(); fade.cancel(); remove(); };
+  // El golpe de una carta al caer sobre la mesa: dos bocanadas de polvo que salen por
+  // debajo hacia los lados y una sacudida breve de toda la línea. Va en la línea y no en
+  // la carta, porque la carta recorta lo que se sale de ella.
+  function impact(card, delay) {
+    const timeline = card.closest('.timeline');
+    if (!timeline || typeof card.animate !== 'function') return () => {};
+    const timers = [], nodes = [], animations = [];
+    timers.push(setTimeout(() => {
+      if (!card.isConnected) return;
+      // Se mide con las medidas de maquetación, que ignoran tanto el zoom de la línea
+      // como el aplastamiento de la carta en ese instante.
+      let left = card.offsetLeft, top = card.offsetTop;
+      for (let node = card.offsetParent; node && node !== timeline && timeline.contains(node); node = node.offsetParent) {
+        left += node.offsetLeft; top += node.offsetTop;
+      }
+      ['left', 'right'].forEach(side => {
+        const puff = document.createElement('span');
+        puff.className = `card-impact-dust dust-${side}`;
+        puff.setAttribute('aria-hidden', 'true');
+        puff.style.left = `${side === 'left' ? left : left + card.offsetWidth}px`;
+        puff.style.top = `${top + card.offsetHeight - 12}px`;
+        timeline.append(puff);
+        nodes.push(puff);
+      });
+      // `translate` y no `transform`: la línea ya lleva su zoom en `transform`.
+      animations.push(timeline.animate([
+        {translate: '0 0'}, {translate: '0 3px', offset: .25},
+        {translate: '0 -1px', offset: .6}, {translate: '0 0'}
+      ], {duration: 260, easing: 'ease-out'}));
+      window.CONTINUUM.Effects?.stamp?.();
+      timers.push(setTimeout(() => nodes.forEach(node => node.remove()), 760));
+    }, delay));
+    return () => { timers.forEach(clearTimeout); animations.forEach(animation => animation.cancel()); nodes.forEach(node => node.remove()); };
   }
 
   // Un mismo gesto físico para ambas llegadas: elevar, viajar y posar el papel.
@@ -242,36 +238,44 @@
     const angle = automatic ? 7 : -5;
     const shadow = getComputedStyle(card).boxShadow;
     const transform = (x, y, tilt, size) => `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg) scale(${size})`;
-    // La carta no se desliza hasta su sitio: llega en el aire, algo más grande y con la
-    // sombra abierta, y se asienta apretándose contra la línea antes de quedar quieta.
-    // Ese apretón es el gesto propio de colocar, el equivalente a coser la pieza.
+    // La carta no se desliza hasta su sitio: sube, se queda un instante en el aire con la
+    // sombra abierta y cae de golpe. Al tocar la línea se aplasta, rebota un poco y se
+    // asienta. Ese golpe es el gesto propio de colocar.
+    const pose = (x, y, tilt, sx, sy = sx) => `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg) scale(${sx}, ${sy})`;
     const animations = [card.animate([
-      {transform: transform(dx, dy, angle, .9), opacity: 0, boxShadow: '0 16px 28px #39240b30', offset: 0},
-      {transform: transform(0, -9, angle * .15, 1.045), opacity: 1, boxShadow: '0 18px 26px #39240b33', offset: .66},
-      {transform: transform(0, 2, 0, .975), opacity: 1, boxShadow: '0 1px 2px #39240b40', offset: .84},
+      {transform: transform(dx, dy, angle, .9), opacity: 0, boxShadow: '0 16px 28px #39240b30', offset: 0, easing: 'cubic-bezier(.2,.7,.3,1)'},
+      {transform: pose(0, -26, angle * .2, 1.09), opacity: 1, boxShadow: '0 30px 34px #39240b38', offset: .58, easing: 'cubic-bezier(.55,0,.9,.45)'},
+      {transform: pose(0, 5, 0, 1.06, .9), opacity: 1, boxShadow: '0 0 1px #39240b55', offset: .74, easing: 'ease-out'},
+      {transform: pose(0, -6, 0, .98, 1.03), opacity: 1, boxShadow: '0 8px 12px #39240b2a', offset: .86, easing: 'ease-in-out'},
       {transform: 'none', opacity: 1, boxShadow: shadow, offset: 1}
       // `backwards` es lo que impide verla dos veces: quien reparte la hace visible justo
       // antes de animarla, y sin rellenar hacia atrás queda un instante en el que la carta
       // ya está pintada en su sitio y todavía no ha empezado a viajar hasta él.
-    ], {duration, easing: 'cubic-bezier(.25,.65,.3,1)', fill: 'backwards'})];
+    ], {duration, fill: 'backwards'})];
     const cards = [...card.parentElement.querySelectorAll('.timeline-card')];
     const at = cards.indexOf(card);
     [cards[at - 1], cards[at + 1]].forEach((neighbor, i) => {
       if (neighbor?.animate) animations.push(neighbor.animate([
         {transform: `translateX(${i === 0 ? 20 : -20}px)`, offset: 0},
+        {transform: 'none', offset: .58},
+        // El golpe empuja a las vecinas hacia fuera, y vuelven a su sitio.
+        {transform: 'none', offset: .72},
+        {transform: `translateX(${i === 0 ? -6 : 6}px)`, offset: .8},
         {transform: 'none', offset: 1}
-      ], {duration, easing: 'cubic-bezier(.25,.65,.3,1)'}));
+      ], {duration, easing: 'ease-out'}));
     });
     card.classList.add('card-fitting');
     card.querySelector('.year')?.classList.add('date-ink');
-    const clearWave = automatic ? () => {} : inkWave(card);
-    const clearStitch = automatic ? () => {} : stitch(card, duration * .8);
+    // La onda de tinta y el polvo salen en el instante del golpe, no al despegar.
+    let clearWave = () => {};
+    const waveTimer = automatic ? 0 : setTimeout(() => { if (card.isConnected) clearWave = inkWave(card); }, duration * .74);
+    const clearImpact = automatic ? () => {} : impact(card, duration * .74);
     const clean = () => {
       card.classList.remove('card-fitting');
       card.querySelector('.year')?.classList.remove('date-ink');
     };
     Promise.all(animations.map(animation => animation.finished)).then(clean, clean);
-    return () => { animations.forEach(animation => animation.cancel()); clearWave(); clearStitch(); clean(); };
+    return () => { clearTimeout(waveTimer); animations.forEach(animation => animation.cancel()); clearWave(); clearImpact(); clean(); };
   }
   // Una llegada termina antes de que empiece la siguiente.
   const TURNO = 1040;
