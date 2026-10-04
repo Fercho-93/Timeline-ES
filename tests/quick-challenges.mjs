@@ -16,8 +16,8 @@ let w = boot(), CT = w.CONTINUUM, E = CT.QuickEngine;
 // Cada carta enseña su curiosidad al descubrirse y conserva referencias trazables.
 const quickCards = CT.QuickCatalog.challenges.flatMap(deck => deck.cards);
 assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las partidas guardadas');
-assert.equal(quickCards.length, 376);
-assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 376);
+assert.equal(quickCards.length, 383);
+assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 383);
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
   assert.ok(card.detail.startsWith(card.curiosity), `${card.id}: curiosidad antes del criterio de medida`);
@@ -106,7 +106,19 @@ const requestedDecks = ['sports-players','drinks','festivities','social','wwii',
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.some(c => c.id === id)));
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= (id === 'drinks' ? 34 : id === 'festivities' ? 32 : 25)));
 const social = CT.QuickCatalog.challenges.find(c => c.id === 'social');
-assert.equal(social.cards.length, 15);
+assert.equal(social.cards.length, 22);
+const addedSocial = [['Fotolog',2002],['Flickr',2004],['Tuenti',2006],['Foursquare',2009],['Vine',2013],['BeReal',2020],['Threads',2023]];
+for (const [i, [title, year]] of addedSocial.entries()) {
+  const card = social.cards[i + 15];
+  assert.equal(card.title, title);
+  assert.equal(card.id, `social-${i + 16}`);
+  assert.equal(card.value, year);
+  assert.equal(card.label, String(year));
+  assert.notEqual(card.source, 'https://en.wikipedia.org/wiki/Timeline_of_social_media');
+}
+const publishedSocialOrder = social.cards.slice(0, 15).map(card => card.id);
+const oldSocialSave = {version: 3, config: {names: ['Ana','Luis'], rounds: [{id: 'social', order: publishedSocialOrder}]}, commands: [{type: 'place', cardId: 'social-2', index: 1}]};
+assert.equal(E.restore(oldSocialSave).phase, 'result', 'se pueden continuar las partidas guardadas con las 15 redes originales');
 assert.ok(social.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const wwii = CT.QuickCatalog.challenges.find(c => c.id === 'wwii');
 assert.ok(wwii.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
