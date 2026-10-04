@@ -85,13 +85,13 @@ assert.throws(() => E.restore({version: -1, config, commands: []}));
 assert.throws(() => E.restore({version: 1, config, commands: [{type: 'place', cardId: 'missing', index: 0}]}));
 assert.throws(() => E.create({names: ['A', 'B'], rounds: [{id:'social', order: ['social-1']}]}));
 for (const c of CT.QuickCatalog.challenges) {
-  assert.ok(c.cards.length >= 2 && c.cards.length <= 25);
+  assert.ok(c.cards.length >= 2 && c.cards.length <= (c.id === 'drinks' ? 34 : 25));
   assert.equal(new Set(c.cards.map(card => card.id)).size, c.cards.length);
   assert.ok(c.cards.every(card => Number.isFinite(card.value) && card.title && card.label && card.detail && card.source.startsWith('https://')));
 }
 const requestedDecks = ['sports-players','drinks','festivities','social','wwii','civil-war','kings','consoles','oscars','companies-founded','timezones-june','cities-east-west','cities-north-south','body','series-seasons','buildings','rivers-spain','foods-kcal','albums-sales','stadiums','capitals-altitude','eurovision-wins','storage','airports','metros','companies-revenue','spanish-tv','minimum-wages'];
 assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.some(c => c.id === id)));
-assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= 25));
+assert.ok(requestedDecks.every(id => CT.QuickCatalog.challenges.find(c => c.id === id).cards.length <= (id === 'drinks' ? 34 : 25)));
 const social = CT.QuickCatalog.challenges.find(c => c.id === 'social');
 assert.equal(social.cards.length, 15);
 assert.ok(social.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
@@ -146,7 +146,12 @@ assert.ok(minimumWages.cards.every(card => card.image && fs.existsSync(new URL('
 const sportsPlayers = CT.QuickCatalog.challenges.find(c => c.id === 'sports-players');
 assert.ok(sportsPlayers.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 const drinks = CT.QuickCatalog.challenges.find(c => c.id === 'drinks');
-assert.ok(drinks.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+assert.equal(drinks.cards.length, 34);
+assert.ok(drinks.cards.every(card => card.source !== 'https://www.niaaa.nih.gov/alcohols-effects-health/alcohol-topics/what-standard-drink'), 'Cada bebida tiene una fuente específica');
+assert.ok(drinks.cards.slice(0, 21).every((card, i) => card.id === 'drinks-' + (i + 1) && card.image === 'assets/quick-cards/drinks-' + (i + 1) + '.webp' && fs.existsSync(new URL('../' + card.image, import.meta.url))));
+assert.ok(drinks.cards.slice(21).every(card => card.image === null), 'Las nuevas cartas usan el respaldo visual hasta tener ilustración propia');
+assert.ok(new Set(drinks.cards.map(card => card.value)).size >= 20, 'El mazo cubre al menos 20 graduaciones');
+assert.ok(drinks.cards.filter(card => card.value === 40).length / drinks.cards.length < 0.25, 'Menos del 25 % del mazo se concentra en 40 %');
 const festivities = CT.QuickCatalog.challenges.find(c => c.id === 'festivities');
 assert.ok(festivities.cards.every(card => card.image && fs.existsSync(new URL('../' + card.image, import.meta.url))));
 assert.equal(CT.QuickCatalog.upcoming, undefined, 'La colección pendiente ya no se publica');
