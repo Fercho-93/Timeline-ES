@@ -19,6 +19,7 @@ assert.equal(CT.QuickCatalog.version, 3, 'los cambios de texto conservan las par
 assert.equal(quickCards.length, 383);
 assert.equal(new Set(quickCards.map(card => card.curiosity)).size, 383);
 for (const deck of CT.QuickCatalog.challenges) for (const card of deck.cards) {
+  assert.ok(card.image && fs.existsSync(new URL('../' + card.image, import.meta.url)), `${card.id}: ilustración propia existente`);
   assert.ok(typeof card.curiosity === 'string' && card.curiosity.length >= 50, `${card.id}: curiosidad propia`);
   assert.ok(card.detail.startsWith(card.curiosity), `${card.id}: curiosidad antes del criterio de medida`);
   assert.ok(card.detail.includes(deck.context), `${card.id}: conserva las aclaraciones de comparación`);

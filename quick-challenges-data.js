@@ -719,15 +719,15 @@
       'entertainment',
       'https://www.pokerstars.com/poker/games/rules/hand-rankings/',
       [
-        ["Carta alta",1,"1.ª",null,null,null,"Cuando no hay una combinación superior, decide la carta más alta; si coincide, se comparan las siguientes."],
-        ["Pareja",2,"2.ª",null,null,null,"Reúne dos cartas del mismo valor. En un empate también importan las cartas que acompañan a la pareja."],
-        ["Doble pareja",3,"3.ª",null,null,null,"Contiene dos parejas de valores diferentes; primero se compara la pareja mayor y después la menor."],
-        ["Trío",4,"4.ª",null,null,null,"Tres cartas comparten valor. Las otras dos pueden decidir un empate entre tríos iguales."],
-        ["Escalera",5,"5.ª",null,null,null,"Son cinco valores consecutivos. El as puede cerrar la secuencia alta o iniciar A-2-3-4-5, pero no unir ambos extremos a la vez."],
-        ["Color",6,"6.ª",null,null,null,"Las cinco cartas son del mismo palo; no necesitan tener valores consecutivos."],
-        ["Full",7,"7.ª",null,null,null,"Combina un trío y una pareja. Para desempatar se compara primero el valor del trío."],
-        ["Póker",8,"8.ª",null,null,null,"Reúne las cuatro cartas de un mismo valor; la quinta carta actúa como acompañante para resolver ciertos empates."],
-        ["Escalera de color",9,"9.ª",null,null,null,"Combina una escalera con un solo palo. La escalera real es su caso más alto, no una familia independiente en este mazo."]
+        ["Carta alta",1,"1.ª","assets/quick-cards/poker-1.webp",null,null,"Cuando no hay una combinación superior, decide la carta más alta; si coincide, se comparan las siguientes."],
+        ["Pareja",2,"2.ª","assets/quick-cards/poker-2.webp",null,null,"Reúne dos cartas del mismo valor. En un empate también importan las cartas que acompañan a la pareja."],
+        ["Doble pareja",3,"3.ª","assets/quick-cards/poker-3.webp",null,null,"Contiene dos parejas de valores diferentes; primero se compara la pareja mayor y después la menor."],
+        ["Trío",4,"4.ª","assets/quick-cards/poker-4.webp",null,null,"Tres cartas comparten valor. Las otras dos pueden decidir un empate entre tríos iguales."],
+        ["Escalera",5,"5.ª","assets/quick-cards/poker-5.webp",null,null,"Son cinco valores consecutivos. El as puede cerrar la secuencia alta o iniciar A-2-3-4-5, pero no unir ambos extremos a la vez."],
+        ["Color",6,"6.ª","assets/quick-cards/poker-6.webp",null,null,"Las cinco cartas son del mismo palo; no necesitan tener valores consecutivos."],
+        ["Full",7,"7.ª","assets/quick-cards/poker-7.webp",null,null,"Combina un trío y una pareja. Para desempatar se compara primero el valor del trío."],
+        ["Póker",8,"8.ª","assets/quick-cards/poker-8.webp",null,null,"Reúne las cuatro cartas de un mismo valor; la quinta carta actúa como acompañante para resolver ciertos empates."],
+        ["Escalera de color",9,"9.ª","assets/quick-cards/poker-9.webp",null,null,"Combina una escalera con un solo palo. La escalera real es su caso más alto, no una familia independiente en este mazo."]
       ]
     )
   ]};
