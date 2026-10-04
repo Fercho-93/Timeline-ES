@@ -5080,8 +5080,15 @@ html #app .mode-create-room{display:grid;gap:12px}
 html #app .mode-create-list{display:grid;gap:12px;padding-left:14px;border-left:2px solid #d8bf9c}
 html #app .mode-create-list[hidden]{display:none}
 
-/* Los títulos de las cartas parten por sílabas (con guion) en vez de a mitad de palabra cuando el texto es grande o la pantalla estrecha. */
-.timeline-card h3, .hand-card strong { -webkit-hyphens: auto; hyphens: auto; }
+/* Las palabras de las cartas se mantienen enteras. El ajuste compartido reduce
+   la letra solo si hace falta para que una palabra larga quepa en su recuadro. */
+:is(.hand-card, .timeline-card, .slot-confirm-card, .drag-card-preview) :is(strong, h3, p, small),
+.card-category {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  -webkit-hyphens: none !important;
+  hyphens: none !important;
+}
 
 /* Los desplegables llevan su flecha: varias reglas de arriba usan `background` abreviado y la borraban, con lo que parecían campos de texto. */
 #app select:not([multiple]), .modal select:not([multiple]) {

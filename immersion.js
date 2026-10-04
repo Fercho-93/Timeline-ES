@@ -162,6 +162,42 @@
     });
   }
   let previousFan = null;
+  const cardTextSelector = '.hand-card > strong, .timeline-card h3, .timeline-card .card-content p, .slot-confirm-card strong, .card-category';
+  function fitCardText(container) {
+    if (!container) return;
+    container.querySelectorAll(cardTextSelector).forEach(text => {
+      text.style.removeProperty('font-size');
+      if (!text.clientWidth || !text.clientHeight) return; // cartas ocultas
+      const base = parseFloat(getComputedStyle(text).fontSize);
+      const card = text.closest('.hand-card');
+      const availableHeight = card && text.offsetParent === card
+        ? Math.max(1, card.clientHeight - text.offsetTop - parseFloat(getComputedStyle(card).paddingBottom || 0))
+        : Infinity;
+      const fits = () => text.scrollWidth <= text.clientWidth && text.scrollHeight <= Math.min(text.clientHeight, availableHeight);
+      if (!base || fits()) return;
+      // Busca el mayor tamaño que permite saltar entre palabras, sin desbordar el recuadro.
+      let low = 1, high = base;
+      for (let step = 0; step < 10; step++) {
+        const size = (low + high) / 2;
+        text.style.fontSize = `${size}px`;
+        if (fits()) low = size;
+        else high = size;
+      }
+      text.style.fontSize = `${low}px`;
+    });
+  }
+  let cardTextFrame = 0;
+  function scheduleCardText(container = document.getElementById('app')) {
+    cancelAnimationFrame(cardTextFrame);
+    cardTextFrame = requestAnimationFrame(() => fitCardText(container));
+  }
+  window.addEventListener('resize', () => scheduleCardText(), {passive: true});
+  window.visualViewport?.addEventListener('resize', () => scheduleCardText(), {passive: true});
+  document.fonts?.ready.then(() => scheduleCardText());
+  // Una carta girada revela otro texto que también necesita medirse cuando ya es visible.
+  document.addEventListener('click', event => {
+    if (event.target.closest?.('.timeline-card, .hand-card, [data-text-size]')) scheduleCardText();
+  });
   function mountHandFan(hand) {
     const cards = [...hand.querySelectorAll('.hand-card')];
     // La carta activa está en la línea; centrar otra en el abanico no la selecciona.
@@ -341,8 +377,14 @@
       }
     });
   }
-  window.addEventListener('resize', () => fitBoard(document.getElementById('app')), {passive: true});
-  window.visualViewport?.addEventListener('resize', () => fitBoard(document.getElementById('app')), {passive: true});
+  window.addEventListener('resize', () => {
+    fitBoard(document.getElementById('app'));
+    scheduleCardText();
+  }, {passive: true});
+  window.visualViewport?.addEventListener('resize', () => {
+    fitBoard(document.getElementById('app'));
+    scheduleCardText();
+  }, {passive: true});
 
   function mount(container, screen) {
     if (['solo-end', 'winner', 'online-winner', 'comp-end'].includes(screen)) atlasFinal(container);
@@ -443,6 +485,7 @@
     }
     refreshDepth();
     fitBoard(container);
+    scheduleCardText(container);
     if (screen === 'game' && window.innerWidth <= 699) requestAnimationFrame(() => {
       const roster = container.querySelector('.scoreboard-panel .scoreboard');
       const active = roster?.querySelector('.score.active');
