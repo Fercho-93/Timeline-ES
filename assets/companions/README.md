@@ -2,7 +2,13 @@
 
 Atlas original generado el 5 de octubre de 2026 con la herramienta integrada de imágenes de OpenAI, a partir de la fotografía de búho nival aportada por el usuario como referencia de anatomía, plumaje y ojos. La fotografía no se incluye en el juego.
 
-`snowy-owl-atlas.webp`: 1536 × 1024, transparencia real, seis celdas de 512 × 512. Orden: reposo, curiosidad, escritura, alas desplegadas, vuelo y reverencia. El original se convierte a WebP de 363502 bytes preservando el canal alfa. El libro y la pluma mantienen el papel de cronista.
+`snowy-owl-atlas.webp`: 1536 × 1024, transparencia real, seis celdas de 512 × 512. Orden: reposo, curiosidad, escritura, alas desplegadas, vuelo y reverencia. La versión final ilustrada se convierte a WebP de 359566 bytes preservando el canal alfa. El libro y la pluma mantienen el papel de cronista. La revisión estiliza las proporciones, agranda los ojos y suaviza el plumaje con un acabado de personaje de fantasía.
+
+## Prompt de la revisión ilustrada
+
+Restyle this entire atlas with a SIGNIFICANT artistic change: make the snowy owl a STYLIZED ANIMATED FANTASY FILM CHARACTER, visibly illustrated and charming, about 60% stylized character illustration and 40% natural bird inspiration. Do NOT merely retouch the photograph. The appearance should be painterly stylized 3D with smooth broad feather shapes, cream white plumage, decorative simplified dark charcoal scalloped patterns, a softer slightly bigger round head, noticeably larger expressive amber eyes, a tiny beak, fluffy cheeks and chest, elegant wise friendly personality. Subtle hand-painted texture and soft rounded modeling, distinctly illustration rather than a real animal photograph. No hyperreal micro-feathers, no wildlife photography, no flat vector icon, no plastic figurine. Rounded snowy owl head WITHOUT ear tufts. No glasses or clothes.
+Preserve the SIX poses and exact 3 columns x 2 rows of square tiles at 1536x1024. Same owl identity in every tile. Full wings must fit inside their own cell. Keep every open book below 74% cell height with BLANK cream pages (no letters, no scribbles). Smaller simple antique brown leather book, decorative brass corners, ivory quill, consistent across all cells. Cell order: idle on book; curious tilt on book; writing with quill in beak; wings spread perched on book; hovering raised wings above a stationary book with feet above 70%; gentle bowed head.
+Genuine alpha transparency, absolutely no painted background, no grid, no labels, no watermark. Strong fantasy illustration art direction, warm understated magical lighting.
 
 ## Prompt de generación
 
