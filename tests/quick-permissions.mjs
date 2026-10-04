@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {JSDOM} from 'jsdom';
+import {gameHtml} from './game-fixture.mjs';
+const read=name=>fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
+const html=gameHtml(read('index.html'));
+const w=new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''),{runScripts:'outside-only',url:'https://continuum.test/'}).window;
+try {
+  w.scrollTo=()=>{};w.Element.prototype.scrollIntoView=()=>{};
+  for(const m of html.matchAll(/<script src="([^"]+)"/g))w.eval(read(m[1]));
+  const CT=w.CONTINUUM,R=CT.QuickRoom,E=CT.QuickEngine,app=w.document.getElementById('app');
+  const settle=async()=>{for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r));};
+  const rounds=[{id:'albums-sales',order:E.challenge('albums-sales').cards.map(c=>c.id)}];
+  const server=R.reduce(R.create('me','Tester',2),'me',{type:'start',rounds,kind:'duel',keep:true});
+  CT.Accounts={user:{uid:'me'}};
+  CT.QuickNetwork.internet=async opts=>{opts.onChange(server,'me','ABCDEFGH23');return {kind:'internet',code:'ABCDEFGH23',close(){},act:async()=>{throw Object.assign(Error('offline'),{code:'unavailable'});}};};
+  Object.defineProperty(w.navigator,'onLine',{configurable:true,value:false});
+  await CT.Quick.openRoom(markup=>{app.innerHTML=markup;},'ABCDEFGH23',()=>{});
+  app.querySelector('[data-quick="select"]').click();
+  app.querySelector('[data-quick="slot"]').click();
+  app.querySelector('[data-quick="confirm"]').click();await settle();
+  const key='continuum-quick-outbox-v1',before=CT.Storage.getItem(key);
+  assert.ok(before,'la jugada se protege antes de enviarla');
+  CT.QuickNetwork.actOnce=async()=>{throw Object.assign(Error('Missing or insufficient permissions.'),{code:'permission-denied'});};
+  Object.defineProperty(w.navigator,'onLine',{configurable:true,value:true});
+  w.dispatchEvent(new w.Event('online'));await settle();
+  assert.equal(CT.Storage.getItem(key),before,'un rechazo de permisos no borra la jugada pendiente');
+  assert.match(app.querySelector('#quick-error').textContent,/No se pudo guardar el cambio en el duelo/);
+  assert.doesNotMatch(app.textContent,/missing or insufficient permissions/i);
+  console.log('Duelo: aviso de permisos en español y conservación de la jugada pendiente: OK');
+} finally {w.close();}

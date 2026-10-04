@@ -11,6 +11,28 @@ const host=env.authenticatedContext('host').firestore(),guest=env.authenticatedC
 const ref=db=>doc(db,'quickRooms','ABCDEFGH23');
 const write=(db,r)=>setDoc(ref(db),{...JSON.parse(JSON.stringify(r)),catalog:1,updatedAt:serverTimestamp()});
 try {
+  // Los retos actuales pueden tener más de diez cartas: hay que poder completar
+  // un duelo también colocando en el último hueco de una línea larga.
+  {
+    const challenge=w.CONTINUUM.QuickCatalog.challenges.find(c=>c.cards.length>12);
+    assert.ok(challenge, 'hay un reto de más de doce cartas para reproducir el fallo');
+    const order=challenge.cards.slice().sort((a,b)=>(a.value-b.value)*challenge.direction).map(c=>c.id);
+    const longRef=db=>doc(db,'quickRooms','LONGDUEL23');
+    const save=async(uid,room)=>assertSucceeds(setDoc(longRef(uid==='host'?host:guest),{...JSON.parse(JSON.stringify(room)),catalog:1,updatedAt:serverTimestamp()}));
+    let room=R.create('host','Ana',2);await save('host',room);
+    room=R.reduce(room,'guest',{type:'join',name:'Bea'});await save('guest',room);
+    room=R.reduce(room,'host',{type:'start',rounds:[{id:challenge.id,order}],kind:'duel',keep:true});await save('host',room);
+    await assertFails(setDoc(longRef(out),{...JSON.parse(JSON.stringify(room)),revision:room.revision+1,updatedAt:serverTimestamp()}));
+    let reachedLongSlot=false;
+    while(room.phase!=='finished') {
+      const state=R.state(room),actor=room.actor;
+      const action=room.phase==='result'?{type:'ack'}:{type:'place',cardId:state.remaining[0],index:state.timeline.length};
+      if(action.index>10)reachedLongSlot=true;
+      room=R.reduce(room,actor,action);await save(actor,room);
+    }
+    assert.ok(reachedLongSlot, 'el duelo ha confirmado huecos superiores a diez');
+    assert.equal(R.state(room).remaining.length,0, 'ambos jugadores pueden terminar el reto largo');
+  }
   let r=R.create('host','Ana');
   await assertSucceeds(write(host,r));
   await assertFails(write(out,r));

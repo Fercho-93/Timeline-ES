@@ -188,8 +188,9 @@
   }
   let cardTextFrame = 0;
   function scheduleCardText(container = document.getElementById('app')) {
-    cancelAnimationFrame(cardTextFrame);
-    cardTextFrame = requestAnimationFrame(() => fitCardText(container));
+    if (!window.requestAnimationFrame) { fitCardText(container); return; }
+    window.cancelAnimationFrame?.(cardTextFrame);
+    cardTextFrame = window.requestAnimationFrame(() => fitCardText(container));
   }
   window.addEventListener('resize', () => scheduleCardText(), {passive: true});
   window.visualViewport?.addEventListener('resize', () => scheduleCardText(), {passive: true});

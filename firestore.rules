@@ -104,7 +104,9 @@ service cloud.firestore {
           && b.diff(a).affectedKeys().hasOnly(['commands','phase','actor','revision','updatedAt'])
           && b.commands.size() == a.commands.size()+1 && b.commands == a.commands.concat([last])
           && ((a.phase=='turn' && last.type=='place' && last.keys().hasOnly(['type','cardId','index'])
-              && last.cardId is string && last.cardId.size() <= 32 && last.index is int && last.index>=0 && last.index<=10
+              // La línea empieza con una carta y cada comando añade como máximo otra.
+              // Los retos largos pueden superar diez huecos sin dejar de ser legales.
+              && last.cardId is string && last.cardId.size() <= 32 && last.index is int && last.index>=0 && last.index<=a.commands.size()+1
               && b.phase=='result' && b.actor==a.actor)
             || (a.phase=='turn' && last=={'type':'bank'} && b.phase in ['turn','round-end','finished'])
             || (a.phase=='result' && last=={'type':'ack'} && b.phase in ['turn','round-end','finished'])
@@ -124,7 +126,7 @@ service cloud.firestore {
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
-        && (joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data) || playing(resource.data,request.resource.data));
+        && (playing(resource.data,request.resource.data) || joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host
         && (!(resource.data.capacity==2 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
           || (resource.data.members.size()==1 && resource.data.phase!='finished'));
