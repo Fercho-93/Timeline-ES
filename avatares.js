@@ -77,5 +77,34 @@
       + '.webp" width="' + side + '" height="' + side + '" alt="" decoding="async"></span>';
   }
 
-  CT.Avatares = { markup, idFor, ids: IDS, ownSeed, ownId, choice, choose, title };
+  // El rival se identifica por su cuenta, nunca por el código de una partida.
+  function userId(player) {
+    try {
+      const saved = CT.Storage.getItem("continuum-rival-avatar-v1:" + player);
+      return IDS.includes(saved) ? saved : null;
+    } catch { return null; }
+  }
+
+  function rememberUser(player, avatar) {
+    if (!player || !IDS.includes(avatar)) return;
+    try { CT.Storage.setItem("continuum-rival-avatar-v1:" + player, avatar); } catch { /* sesión privada */ }
+    // Actualiza solo la imagen: no repinta el tablero ni interrumpe una jugada.
+    for (const node of document.querySelectorAll("[data-avatar-user]")) {
+      if (node.getAttribute("data-avatar-user") === player) {
+        const img = node.querySelector("img");
+        if (img) img.setAttribute("src", "assets/avatars/" + avatar + ".webp");
+      }
+    }
+  }
+
+  function forUser(nombre, player, options = {}) {
+    if (!player) return markup(nombre, options);
+    const mine = player === CT.Accounts?.user?.uid || "uid:" + player === ownSeed();
+    const avatar = mine ? ownId() : userId(player);
+    if (!mine) void CT.Accounts?.cargaAvatares?.([player]);
+    return markup(nombre, { ...options, seed: "uid:" + player, id: avatar })
+      .replace('<span class="avatar ', '<span data-avatar-user="' + CT.escapeHtml(player) + '" class="avatar ');
+  }
+
+  CT.Avatares = { markup, forUser, rememberUser, idFor, ids: IDS, ownSeed, ownId, choice, choose, title };
 })();

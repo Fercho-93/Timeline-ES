@@ -171,6 +171,28 @@ async function syncAvatar() {
     profile = {...profile, avatar: wanted};
   } catch { /* sin conexión o reglas sin actualizar: se reintenta al entrar */ }
 }
+// Solo consulta datos públicos ya permitidos por las reglas; los perfiles son privados.
+// Si el rival no tiene fila pública o estamos sin conexión, Avatares conserva el UID.
+const avatarReads = new Map();
+async function loadAvatars(players) {
+  if (!identity) return;
+  await Promise.all([...new Set(players)].filter(player => typeof player === 'string' && player && player !== identity.uid).map(player => {
+    const old = avatarReads.get(player);
+    if (old?.pending) return old.pending;
+    if (old && Date.now() - old.at < 60000) return Promise.resolve();
+    const entry = { at: Date.now() };
+    entry.pending = (async () => {
+      try {
+        const row = await getDocFromServer(refs(player).ranking);
+        const avatar = row.exists() ? row.data().avatar : null;
+        if (CT.Avatares?.ids.includes(avatar)) CT.Avatares.rememberUser(player, avatar);
+      } catch { /* sin conexión: avatar conocido o alternativa estable por UID */ }
+      finally { entry.pending = null; }
+    })();
+    avatarReads.set(player, entry);
+    return entry.pending;
+  }));
+}
 function metadata() { try { return JSON.parse(CT.Storage.getItem(META)) || {}; } catch { return {}; } }
 function setMeta(dirty) { CT.Storage.setItem(META,JSON.stringify({revision,dirty})); }
 function payload() {
@@ -387,7 +409,7 @@ async function removeAccount() {
 }
 export async function startAccounts(callback) {
   startGame=callback;
-  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,rankingDe:(tab)=>ranking(tab),renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar};
+  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,rankingDe:(tab)=>ranking(tab),renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar,cargaAvatares:loadAvatars};
   await auth.authStateReady();
   await setPersistence(auth,browserLocalPersistence);
   onAuthStateChanged(auth,u=>{

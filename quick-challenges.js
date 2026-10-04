@@ -395,7 +395,7 @@
     slots.forEach((slot,i)=>{
       const name=room.names[i], mine=room.members[i]===myId;
       table[slot]=name
-        ? `<div class="table-seat occupied${mine?' is-you':''}"><span class="seat-avatar">${CT.Avatares.markup(name,mine?{size:44,seed:CT.Avatares.ownSeed(),id:CT.Avatares.ownId()}:{size:44,seed:'room:'+room.members[i]})}</span><strong>${esc(name)}${mine?' · tú':''}</strong><small>${room.members[i]===room.host?'Anfitrión':`Plaza ${i+1}`}</small><i class="ready-seal">Listo</i></div>`
+        ? `<div class="table-seat occupied${mine?' is-you':''}"><span class="seat-avatar">${CT.Avatares.forUser(name,room.members[i],{size:44})}</span><strong>${esc(name)}${mine?' · tú':''}</strong><small>${room.members[i]===room.host?'Anfitrión':`Plaza ${i+1}`}</small><i class="ready-seal">Listo</i></div>`
         : `<div class="table-seat empty" aria-label="Plaza ${i+1} libre"><span>+</span><small>Libre</small></div>`;
     });
     const length=roomLength||3;
@@ -645,7 +645,7 @@
   function playerAvatar(p, i) {
     const mine = room ? room.members?.[i] === myId : state.players.length === 1;
     if (mine) return CT.Avatares.markup(p.name, {size:28, seed:CT.Avatares.ownSeed(), id:CT.Avatares.ownId()});
-    return CT.Avatares.markup(p.name, room?.members?.[i] ? {size:28, seed:'room:'+room.members[i]} : {size:28});
+    return CT.Avatares.forUser(p.name, room?.members?.[i], {size:28});
   }
   // Qué significa cada extremo de la línea, según la naturaleza de cada mazo.
   const ENDS = {
