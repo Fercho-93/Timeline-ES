@@ -252,6 +252,15 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   sinInternet.checked = true;
   sinInternet.dispatchEvent(new w.Event("change", { bubbles: true }));
   ok("en directo se elige internet o la misma Wi-Fi", w.localStorage.getItem("hilo-sala-red-v1") === "wifi" && w.document.querySelector('[data-duel-block="directo"]').hidden === false);
+  // Sin internet, en directo se marca sola la Wi-Fi, sin cambiar lo que había guardado.
+  w.localStorage.setItem("hilo-sala-red-v1", "internet");
+  Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => false });
+  abreMazo(w, "geografia", "population");
+  click(w, '[data-action="duel-home"]');
+  ok("sin internet se propone la Wi-Fi y se avisa", w.document.querySelector('input[name="live-net"][value="wifi"]').checked && !!w.document.querySelector('[data-offline-note]') && w.localStorage.getItem("hilo-sala-red-v1") === "internet");
+  Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => true });
+  abreMazo(w, "geografia", "population");
+  click(w, '[data-action="duel-home"]');
   const aSeguidos = w.document.querySelector('input[name="duel-pace"][value="seguidos"]');
   aSeguidos.checked = true;
   aSeguidos.dispatchEvent(new w.Event("change", { bubbles: true }));

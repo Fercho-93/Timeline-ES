@@ -60,14 +60,16 @@ console.log("\nDisponibilidad");
 const web = boot("web", false);
 ok("fuera de la app de iOS no hay conexión cercana", web.CONTINUUM.LocalPeer.available() === false);
 await pausa();
-for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="wifi"]', '[data-action="wifi-join"]']) { click(web, sel); await pausa(); }
-ok("en la web no se ofrece «Buscar salas cercanas»", !web.document.querySelector('[data-local-action="nearby-search"]'));
+for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="friends-join"]']) { click(web, sel); await pausa(); }
+ok("en la web no se ofrece «Buscar salas cercanas»", !web.document.querySelector('[data-action="friends-join-nearby"]'));
 
 console.log("\nAnfitrión en un iPhone");
 const anfitrion = boot("anfitrion");
 ok("dentro de la app de iOS sí está disponible", anfitrion.CONTINUUM.LocalPeer.available() === true);
 await pausa();
-for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="wifi"]', '[data-inline-route="wifi"]', '#mode-inline-drawer [data-block="historia"]', '#mode-inline-drawer [data-mode="history"]']) { click(anfitrion, sel); await pausa(); }
+for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="create-room-toggle"]', '[data-inline-route="online"]', '#mode-inline-drawer [data-block="historia"]', '#mode-inline-drawer [data-mode="history"]']) { click(anfitrion, sel); await pausa(); }
+for (const [name, value] of [['duel-pace', 'directo'], ['live-net', 'wifi']]) { const input = anfitrion.document.querySelector(`input[name="${name}"][value="${value}"]`); input.checked = true; input.dispatchEvent(new anfitrion.Event('change', { bubbles: true })); }
+click(anfitrion, '[data-action="start-live-room"]'); await pausa();
 anfitrion.document.getElementById("local-name-host").value = "Fer";
 submit(anfitrion, '[data-local-form="create"]');
 await pausa(10);
@@ -77,14 +79,12 @@ ok("el vestíbulo avisa de que es visible para iPhones y deja el QR para Android
 console.log("\nInvitado en otro iPhone");
 const invitado = boot("invitado");
 await pausa();
-for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="wifi"]', '[data-action="wifi-join"]']) { click(invitado, sel); await pausa(); }
-ok("la pantalla de unirse ofrece buscar salas cercanas", !!invitado.document.querySelector('[data-local-action="nearby-search"]'));
-invitado.document.getElementById("local-guest-name").value = "";
-click(invitado, '[data-local-action="nearby-search"]');
-ok("sin nombre no avanza", /Unirse a una sala/.test(html(invitado)));
-invitado.document.getElementById("local-guest-name").value = "Ana";
-click(invitado, '[data-local-action="nearby-search"]');
+for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="friends-join"]']) { click(invitado, sel); await pausa(); }
+ok("«Unirme» ofrece buscar salas cercanas", !!invitado.document.querySelector('[data-action="friends-join-nearby"]'));
+invitado.CONTINUUM.Identidad.guarda({ nombre: "Ana" });
+click(invitado, '[data-action="friends-join-nearby"]');
 await pausa(10);
+ok("con nombre de perfil se busca directamente, sin otra pantalla", invitado.document.getElementById("app").dataset.screen === "local-cercanas");
 ok("aparece la lista con la sala del anfitrión y su mazo", !!invitado.document.querySelector('[data-local-action="nearby-join"]') && /Fer/.test(html(invitado)));
 click(invitado, '[data-local-action="nearby-join"]');
 await pausa(30);

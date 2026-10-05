@@ -524,7 +524,8 @@
   function quickChallenges(target) {
     screen = "quick-challenges";
     const render=(html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);};
-    if (target?.quickRoom || target?.quickDuel) CT.Quick.open(render, target);
+    if (target?.quickLocal) CT.Quick.joinLocal(render, target.quickLocal);
+    else if (target?.quickRoom || target?.quickDuel) CT.Quick.open(render, target);
     else if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='wifi-quick') CT.Quick.openNetwork(render, 'local', 4);
@@ -2522,7 +2523,9 @@
     const regla = reglaCifra();
     const prueba = duelKind();
     const ritmo = duelPace();
-    const red = liveNet();
+    // Sin internet, en directo solo cabe la Wi-Fi: se marca sola, sin cambiar lo guardado.
+    const sinRed = navigator.onLine === false;
+    const red = sinRed ? "wifi" : liveNet();
     const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === duelBlockKey(ritmo, prueba) ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
       <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
@@ -2560,6 +2563,7 @@
               </label>`).join("")}
           </div>
         </div>
+        ${sinRed ? '<p class="hint" data-offline-note style="margin-top:10px">No hay internet: jugaréis por la Wi‑Fi.</p>' : ""}
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
       ${bloque("seguidos-orden", `<div class="duel-brief"><p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
@@ -2583,37 +2587,48 @@
     </div>`;
   }
 
-  // «Unirme» de Cada uno en su móvil: un solo campo para cualquier invitación por internet
-  // (sala, duelo por turnos, duelo por enlace o Retos rápidos), que se reconoce sola y se
-  // abre igual que si se hubiera tocado el enlace. Las invitaciones por Wi-Fi no dicen de
-  // qué juego son hasta conectarse, así que tienen sus propios botones.
+  // «Unirme» de Cada uno en su móvil: un solo campo y un solo botón de escanear para
+  // cualquier invitación, por internet (sala, duelo por turnos, duelo por enlace o Retos
+  // rápidos) o por Wi-Fi (sala de colecciones o de Retos rápidos). Se reconoce sola y se
+  // abre igual que si se hubiera tocado el enlace. Buscar salas cercanas solo aparece
+  // donde funciona.
   function friendsJoin() {
     screen = "friends-join";
     const camara = CT.QrScanner?.isSupported?.();
+    const cercanas = CT.LocalPeer?.available?.();
+    const sinRed = navigator.onLine === false;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home friends-join"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Cada uno en su móvil</div><h2 class="solo-title" data-focus tabindex="-1">Unirme a una partida</h2>
-        <p class="lead">Pega el enlace o escribe el código que te han pasado. Vale para salas, duelos y Retos rápidos.</p></div>
+        <p class="lead">Escanea el código QR que te enseñan, o pega el enlace o el código que te han pasado. Vale para todo: salas, duelos y Retos rápidos, por internet o por Wi‑Fi.</p></div>
         <form class="panel solo-panel" data-friends-join-form novalidate>
+          ${sinRed ? '<p class="hint" data-offline-note>No hay internet: puedes unirte a una sala por Wi‑Fi escaneando el código de quien la ha creado.</p>' : ""}
           <div class="field"><label for="friends-join-code">Código o enlace</label><input id="friends-join-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD2345 o el enlace"></div>
           ${camara ? '<button type="button" class="btn btn-secondary btn-block" data-action="friends-join-scan">Escanear código QR</button>' : ""}
           <button type="submit" class="btn btn-primary btn-block">Unirme <span>→</span></button>
           <p class="hint" id="friends-join-error" role="alert"></p>
         </form>
-        <div class="panel solo-panel"><div class="solo-panel-head"><h3>Sin internet, en la misma Wi‑Fi</h3></div>
-          <p>Quien ha creado la sala te enseña un código QR en su móvil.</p>
-          <button type="button" class="btn btn-secondary btn-block" data-action="wifi-join">Unirme a una sala por Wi‑Fi</button>
-          <button type="button" class="btn btn-ghost btn-block" data-action="friends-join-quick-wifi">Unirme a Retos rápidos por Wi‑Fi</button>
-        </div>
+        ${cercanas ? `<div class="panel solo-panel"><div class="solo-panel-head"><h3>Salas cercanas</h3></div>
+          <p>Entre iPhones, sin escanear nada: basta con tener Bluetooth y Wi‑Fi activados.</p>
+          <button type="button" class="btn btn-secondary btn-block" data-action="friends-join-nearby">Buscar salas cercanas</button>
+        </div>` : ""}
       </section>
     </div>`);
   }
 
+  // Las invitaciones por Wi-Fi no son enlaces. Las de colecciones van envueltas con su sala
+  // y su mazo (`CTM1:`); las de Retos rápidos son la oferta de conexión tal cual. La
+  // respuesta que devuelve un invitado también es una señal, pero esa la lee el anfitrión.
+  function wifiSignalRole(text) {
+    try { return CT.LocalTransport.decodeSignal(text).role; } catch { return null; }
+  }
   function friendsJoinWith(text) {
-    const target = CT.Links.fromText(text);
-    if (target) { openInvitation(target); return; }
     const raw = String(text || "").trim();
+    const target = CT.Links.fromText(raw)
+      || (raw.startsWith("CTM1:") ? { wifiRoom: raw } : null)
+      || (wifiSignalRole(raw) === "offer" ? { quickLocal: raw } : null);
+    if (target) { openInvitation(target); return; }
     const aviso = !raw ? "Escribe o pega el código que te han pasado."
-      : raw.startsWith("CTL1:") || raw.length > 120 ? "Parece una invitación por Wi‑Fi: usa «Unirme a una sala por Wi‑Fi»."
+      : wifiSignalRole(raw) === "answer" ? "Ese código es la respuesta de otro móvil: lo escanea quien ha creado la sala."
       : "No reconozco ese código. Comprueba que esté completo.";
     const box = document.getElementById("friends-join-error");
     if (box) box.textContent = aviso;
@@ -4036,8 +4051,8 @@
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "friends-join-scan") CT.LocalShare.scanQr({ title: "Escanear invitación", hint: "Encuadra el código QR de la sala o del duelo.", onText: friendsJoinWith }).catch(() => friendsJoinWith(""));
-    else if (action === "friends-join-quick-wifi") { sessionStorage.setItem("continuum-entry-route", "wifi-join-quick"); quickChallenges(); }
-    else if (action === "start-live-room") { if (liveNet() === "wifi") launchLocalMultiplayer(); else launchOnline("", null, { createOnly: true }); }
+    else if (action === "friends-join-nearby") { sessionStorage.setItem("continuum-entry-route", "wifi"); CT.LocalMultiplayer.open({ join: true, nearby: true, onBack: friendsJoin }); }
+    else if (action === "start-live-room") { if ((app.querySelector('input[name="live-net"]:checked')?.value || liveNet()) === "wifi") launchLocalMultiplayer(); else launchOnline("", null, { createOnly: true }); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
     else if (action === "open-quick-duel") { CT.Quick.openRoom((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView).catch(() => showToast('No se pudo abrir el duelo. Comprueba tu conexión.')); }
     else if (action === "rematch-quick-duel" || action === "challenge-quick-rival") {
@@ -4244,10 +4259,13 @@
 
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
-  // También la usa «Unirme» con lo que se pega o se escanea.
+  // También la usa «Unirme» con lo que se pega o se escanea, que puede ser además una
+  // invitación por Wi-Fi.
   function openInvitation(target) {
     const abrir = () => {
-      if (target.quickRoom || target.quickDuel) quickChallenges(target);
+      if (target.wifiRoom) { sessionStorage.setItem("continuum-entry-route", "wifi"); CT.LocalMultiplayer.open({ join: true, offer: target.wifiRoom, onBack: friendsJoin }); }
+      else if (target.quickLocal) { sessionStorage.setItem("continuum-entry-route", "wifi-join-quick"); quickChallenges(target); }
+      else if (target.quickRoom || target.quickDuel) quickChallenges(target);
       else if (target.room) launchOnline(target.room);
       else if (target.turnDuel) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: target.turnDuel, mode: selectedModeKey, back: home }));
       else { const value = CT.Duelo.descodificar(target.duelo); if (value.ok) { pendingDuel = value.duelo; duelIntro(); } else duelInvalido(value.motivo, value.mode); }

@@ -24,7 +24,7 @@
     const image = art || modeArt[action] || 'home-door-jugar.webp';
     return `<button class="mode-entry${featured ? ' mode-entry-featured' : ''}" data-action="${action}" ${attrs}>
       <span class="mode-entry-art" aria-hidden="true"><img src="assets/${image}" alt="" loading="lazy" decoding="async"></span>
-      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(description)}</small><span class="mode-entry-cta" aria-hidden="true">${escapeHtml(cta || (action === 'public-match' || action === 'quick-public' ? 'Buscar mesa' : action === 'online-collections' ? 'Elegir temas' : action === 'wifi-join' ? 'Escanear' : 'Explorar'))} <span>→</span></span></span>
+      <span class="mode-entry-copy"><b>${escapeHtml(title)}</b><small>${escapeHtml(description)}</small><span class="mode-entry-cta" aria-hidden="true">${escapeHtml(cta || (action === 'public-match' || action === 'quick-public' ? 'Buscar mesa' : action === 'online-collections' ? 'Elegir temas' : 'Explorar'))} <span>→</span></span></span>
     </button>`;
   }
 
@@ -141,7 +141,7 @@
     app.dataset.pendingHub = screen;
     hub(screen, title, eyebrow, [
       // Quien se une no elige mazo ni ritmo: la invitación ya lo lleva.
-      route === 'online' ? modeDoor('friends-join', 'menu-private.webp', 'Unirme a una partida', 'Con el código, el enlace o el QR que te han pasado. También por Wi‑Fi, sin internet.', true, '', 'Unirme') : '',
+      route === 'online' ? modeDoor('friends-join', 'menu-private.webp', 'Unirme a una partida', 'Escanea el QR o pega el enlace o el código. Por internet o por Wi‑Fi.', true, '', 'Unirme') : '',
       route === 'online' ? createRoomGroup(route) : [
         inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos.'),
         modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa para todos: cada uno arriesga o asegura sus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
@@ -204,15 +204,6 @@
         ];
         revealAnimations[0].onfinish = () => { reveal.classList.remove('is-open'); revealAnimations.forEach(animation => animation.cancel()); revealAnimations = []; };
       }
-      return;
-    }
-    const wifiJoin = event.target.closest('[data-action="wifi-join"]');
-    if (wifiJoin) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      sessionStorage.setItem('continuum-entry-route', 'wifi');
-      const fromJoin = app.dataset.screen === 'friends-join' && window.CONTINUUM.openFriendsJoin;
-      window.CONTINUUM.LocalMultiplayer.open({ join: true, onBack: fromJoin ? () => window.CONTINUUM.openFriendsJoin() : () => openFriendHub('online') });
       return;
     }
     const friendsJoin = event.target.closest('[data-action="friends-join"]');

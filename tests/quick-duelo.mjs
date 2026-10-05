@@ -105,6 +105,15 @@ turnos.dispatchEvent(new w.Event('change', {bubbles: true}));
 assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, true);
 assert.equal(app.querySelector('[data-quick-duel-block="turnos"]').hidden, false);
 assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-duel-pace-v1'), 'turnos');
+// Sin internet, en directo se marca sola la Wi-Fi, sin cambiar lo que había guardado.
+w.CONTINUUM.Storage.setItem('continuum-quick-duel-pace-v1', 'directo');
+w.CONTINUUM.Storage.setItem('continuum-quick-live-net-v1', 'internet');
+Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => false});
+CT.Quick.openDuel(html => { app.innerHTML = html; });
+assert.equal(app.querySelector('input[name="quick-live-net"]:checked').value, 'wifi');
+assert.ok(app.querySelector('[data-offline-note]'));
+assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-live-net-v1'), 'internet');
+Object.defineProperty(w.navigator, 'onLine', {configurable: true, get: () => true});
 // El texto tras fallar una carta concuerda con quien juega: «Pierdes…» en solitario, «Ana pierde…» en mesa,
 // y con 0 aciertos provisionales no dice «pierde 0 aciertos».
 {

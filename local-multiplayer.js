@@ -246,10 +246,19 @@
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
-    // «Unirme a una sala» desde el menú de Wi-Fi local: no hay mazo elegido, el de la
-    // invitación manda. Se salta la entrada y se pasa directo a escanear.
+    // Desde «Unirme»: no hay mazo elegido, el de la invitación manda. Se salta la entrada;
+    // si la invitación ya viene escaneada y hay nombre de perfil, se entra sin más, y si
+    // se pidió buscar salas cercanas, se empieza a buscar.
     directJoin = !!options.join;
-    if (directJoin) renderUnirseForm(); else renderEntrada();
+    if (!directJoin) { renderEntrada(); return; }
+    renderUnirseForm();
+    const name = String(CT.Identidad?.propio?.() || savedSeat()?.name || "").trim().slice(0, 18);
+    if (options.offer) {
+      const field = document.getElementById("local-guest-offer");
+      if (field) field.value = options.offer;
+      if (name) void doJoinWithOffer(name, options.offer);
+      else { field?.closest("details")?.setAttribute("open", ""); document.getElementById("local-guest-name")?.focus(); }
+    } else if (options.nearby && nearbyAvailable() && name) void renderNearby(name);
   }
 
   function renderEntrada() {

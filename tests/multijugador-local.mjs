@@ -66,12 +66,11 @@ w = boot();
   const pausa = () => new Promise(resolve => setTimeout(resolve, 0));
   await pausa();
   for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="friends-join"]']) { click(w, sel); await pausa(); }
-  ok("«Unirme» ofrece entrar en una sala por Wi-Fi", !!w.document.querySelector('[data-action="wifi-join"]'));
-  click(w, '[data-action="wifi-join"]'); await pausa();
-  ok("abre directamente la pantalla de unirse", /Unirse a una sala/.test(w.document.body.innerHTML) && !!w.document.querySelector('[data-local-action="scan-offer"]'));
-  ok("explica que no hay que elegir mazo y pide la cámara aquí", /No hace falta elegir mazo/.test(w.document.body.innerHTML) && !!w.document.querySelector('[data-local-action="warm-camera"]'));
-  click(w, '[data-local-action="back"]'); await pausa();
-  ok("volver lleva otra vez a «Unirme»", !!w.document.querySelector('[data-action="wifi-join"]') && w.document.getElementById('app').dataset.screen === 'friends-join');
+  ok("«Unirme» ya no separa el Wi-Fi en botones propios", !w.document.querySelector('[data-action="wifi-join"], [data-action="friends-join-quick-wifi"]'));
+  ok("en la web no se ofrece buscar salas cercanas", !w.document.querySelector('[data-action="friends-join-nearby"]'));
+  const prueba = (texto) => { w.document.getElementById("friends-join-code").value = texto; submit(w, '[data-friends-join-form]'); return w.document.getElementById("friends-join-error")?.textContent || ""; };
+  ok("una respuesta de otro móvil se explica, no se abre", /respuesta de otro móvil/.test(prueba("S2|a|ufrag|pwd|" + "A".repeat(43) + "|a|192.168.1.2:5000")));
+  ok("una oferta suelta se abre como Retos rápidos por Wi-Fi", (prueba("S2|o|ufrag|pwd|" + "A".repeat(43) + "|x|192.168.1.2:5000"), w.sessionStorage.getItem("continuum-entry-route") === "wifi-join-quick"));
 }
 
 console.log("\nUnirse a una sala con un código inválido");
@@ -170,14 +169,29 @@ const elige = (win, id, value) => { const el = win.document.getElementById(id); 
 const valorDe = (win, titulo) => { const CTw = win.CONTINUUM; const carta = CTw.cards("history").find(item => item.title === titulo); return { carta, valor: CTw.sortValue("history", carta) }; };
 
 // Conecta una invitada nueva (o que vuelve) al anfitrión, por el camino de pegar códigos.
-async function conecta(host, guest, nombre = "Ana") {
+// Con `desdeUnirme`, quien se une pega la invitación en «Unirme» de Cada uno en su móvil,
+// que la reconoce como Wi-Fi de colecciones y abre la sala sin elegir nada más.
+async function conecta(host, guest, nombre = "Ana", desdeUnirme = false) {
   click(host, '[data-local-action="invite"]');
   await until(() => !!host.document.querySelector(".signal-box"));
   const invitacion = host.document.querySelector(".signal-box").textContent;
-  if (pantalla(guest) !== "local-unirse") click(guest, '[data-local-action="go-unirse"]');
-  guest.document.getElementById("local-guest-name").value = nombre;
-  guest.document.getElementById("local-guest-offer").value = invitacion;
-  submit(guest, '[data-local-form="join-offer"]');
+  if (desdeUnirme) {
+    // Quien entra por «Unirme» juega con su nombre de perfil, sin escribirlo.
+    guest.CONTINUUM.Identidad.guarda({ nombre });
+    for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="friends-join"]']) { click(guest, sel); await tick(); }
+    guest.document.getElementById("friends-join-code").value = invitacion;
+    submit(guest, '[data-friends-join-form]');
+    await tick();
+    if (!guest.document.querySelector(".signal-box")) {
+      guest.document.getElementById("local-guest-name").value = nombre;
+      submit(guest, '[data-local-form="join-offer"]');
+    }
+  } else {
+    if (pantalla(guest) !== "local-unirse") click(guest, '[data-local-action="go-unirse"]');
+    guest.document.getElementById("local-guest-name").value = nombre;
+    guest.document.getElementById("local-guest-offer").value = invitacion;
+    submit(guest, '[data-local-form="join-offer"]');
+  }
   await until(() => !!guest.document.querySelector(".signal-box"));
   const respuesta = guest.document.querySelector(".signal-box").textContent;
   host.document.getElementById("local-answer").value = respuesta;
@@ -202,9 +216,9 @@ async function minijuego(host, guest, exacto = host) {
 await entrarWifi(anfitrion);
 anfitrion.document.getElementById("local-name-host").value = "Fer";
 submit(anfitrion, '[data-local-form="create"]');
-await entrarWifi(invitada);
-const { invitacion, respuesta } = await conecta(anfitrion, invitada);
+const { invitacion, respuesta } = await conecta(anfitrion, invitada, "Ana", true);
 ok("el anfitrión tiene una invitación que compartir", /^CTM1:/.test(invitacion || ""));
+ok("«Unirme» reconoce la invitación Wi-Fi y abre la sala", pantalla(invitada).startsWith("local-"));
 ok("la invitada genera su respuesta", respuesta === "FAKE-ANSWER-1");
 await until(() => pantalla(anfitrion) === "local-lobby" && pantalla(invitada) === "local-lobby");
 ok("el anfitrión ve a las dos personas en la mesa", /Ana/.test(html(anfitrion)) && pantalla(anfitrion) === "local-lobby");
