@@ -2606,6 +2606,10 @@
           ${camara ? '<button type="button" class="btn btn-secondary btn-block" data-action="friends-join-scan">Escanear código QR</button>' : ""}
           <button type="submit" class="btn btn-primary btn-block">Unirme <span>→</span></button>
           <p class="hint" id="friends-join-error" role="alert"></p>
+          <div class="friends-camera" data-camera-box>
+            <p class="hint" data-camera-status aria-live="polite">${camara ? "Para escanear, el juego necesita permiso para usar la cámara. Si al escanear no se abre, actívala aquí." : "Este navegador no permite usar la cámara aquí: pega el enlace o escribe el código."}</p>
+            ${camara ? '<button type="button" class="btn btn-ghost btn-block" data-action="friends-join-camera">Activar la cámara</button>' : ""}
+          </div>
         </form>
         ${cercanas ? `<div class="panel solo-panel"><div class="solo-panel-head"><h3>Salas cercanas</h3></div>
           <p>Entre iPhones, sin escanear nada: basta con tener Bluetooth y Wi‑Fi activados.</p>
@@ -2613,6 +2617,46 @@
         </div>` : ""}
       </section>
     </div>`);
+    if (camara) watchCameraPermission();
+  }
+
+  // El permiso de la cámara, a la vista en «Unirme»: si no se concedió al principio, o se
+  // denegó sin querer, se puede pedir otra vez desde aquí antes de escanear. Lo que se
+  // enseña sigue al permiso real cuando el navegador deja consultarlo.
+  function cameraStatus(estado) {
+    const texto = document.querySelector("[data-camera-status]");
+    const boton = document.querySelector('[data-action="friends-join-camera"]');
+    if (!texto) return;
+    const nativa = !!window.Capacitor?.isNativePlatform?.();
+    const iphone = /iPhone|iPad|iPod/.test(navigator.userAgent || "");
+    const donde = nativa ? "en los ajustes del teléfono, en Continuum › Cámara"
+      : iphone ? "en Ajustes › Safari › Cámara, o en «aA» › Ajustes del sitio web"
+      : "tocando el candado de la barra de direcciones › Permisos › Cámara";
+    const mensajes = {
+      granted: "Cámara activada: ya puedes escanear.",
+      denied: `La cámara está bloqueada para el juego. Actívala ${donde} y vuelve a intentarlo.`,
+      missing: "No se encuentra ninguna cámara en este dispositivo: pega el enlace o escribe el código."
+    };
+    if (mensajes[estado]) texto.textContent = mensajes[estado];
+    if (boton) boton.hidden = estado === "granted" || estado === "missing";
+  }
+  function watchCameraPermission() {
+    try {
+      navigator.permissions?.query?.({ name: "camera" }).then(permiso => {
+        cameraStatus(permiso.state);
+        permiso.onchange = () => cameraStatus(permiso.state);
+      }).catch(() => {});
+    } catch { /* Sin consulta de permisos se queda el texto general. */ }
+  }
+  async function askCamera() {
+    if (!CT.QrScanner?.isSupported?.()) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+      stream.getTracks().forEach(track => track.stop());
+      cameraStatus("granted");
+    } catch (error) {
+      cameraStatus(error?.name === "NotFoundError" || error?.name === "OverconstrainedError" ? "missing" : "denied");
+    }
   }
 
   // Las invitaciones por Wi-Fi no son enlaces. Las de colecciones van envueltas con su sala
@@ -4051,6 +4095,7 @@
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "friends-join-scan") CT.LocalShare.scanQr({ title: "Escanear invitación", hint: "Encuadra el código QR de la sala o del duelo.", onText: friendsJoinWith }).catch(() => friendsJoinWith(""));
+    else if (action === "friends-join-camera") void askCamera();
     else if (action === "friends-join-nearby") { sessionStorage.setItem("continuum-entry-route", "wifi"); CT.LocalMultiplayer.open({ join: true, nearby: true, onBack: friendsJoin }); }
     else if (action === "start-live-room") { if ((app.querySelector('input[name="live-net"]:checked')?.value || liveNet()) === "wifi") launchLocalMultiplayer(); else launchOnline("", null, { createOnly: true }); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
