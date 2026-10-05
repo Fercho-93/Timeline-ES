@@ -640,19 +640,6 @@
         mountHandFan(hand);
         const hint = hand.parentElement.querySelector('.hint');
         if (hint) hint.hidden = true;
-        // Dos gestos, una fila: la explicación completa queda para lectores de pantalla.
-        let placementHint = hand.parentElement.querySelector('.hand-placement-hint');
-        const canPlace = !container.querySelector('.slot-confirm') && [...hand.querySelectorAll('.hand-card')].some(card => !card.disabled);
-        if (canPlace && !placementHint) {
-          placementHint = document.createElement('p');
-          placementHint.className = 'hand-placement-hint';
-          placementHint.innerHTML = `<span class="solo-lectores">Selecciona una carta y toca un hueco de la línea, o mantén pulsada la carta y arrástrala hasta un hueco.</span>
-            <span class="placement-gesture" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12V5.5a1.5 1.5 0 0 1 3 0V10l1.5-.7a1.4 1.4 0 0 1 1.8.8l1.4-.3a1.4 1.4 0 0 1 1.5 1l.3 4.1c.2 2.5-1.8 5.1-4.3 5.1h-2.3c-1.2 0-2.1-.5-2.8-1.4L6.4 14a1.4 1.4 0 0 1 2-1.9L10 14"/><path d="M5 7H3V3h4M17 3h4v4h-2" stroke-dasharray="2 2"/></svg>Toca un hueco</span>
-            <span class="placement-or" aria-hidden="true">·</span>
-            <span class="placement-gesture" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="10" height="14" rx="2"/><path d="M8 12h13m-3-3 3 3-3 3"/></svg>Mantén y arrastra</span>`;
-          hand.parentElement.append(placementHint);
-        }
-        if (placementHint) placementHint.hidden = !canPlace;
       }
       const slot = container.querySelector('.slot-confirm');
       const dock = document.createElement('div'); dock.className = 'placement-dock';

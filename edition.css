@@ -4854,17 +4854,6 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
    giradas ya no toca el borde superior del bloque. */
 #app.atlas-board .atlas-hand-section + .board-timeline-section, #app.atlas-board .atlas-hand-section ~ .board-timeline-section { margin-top: 22px !important; }
 
-/* Ayuda de colocación: dos gestos junto a la mano, sin añadir un panel. */
-#app.atlas-board .hand-placement-hint {
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
-  gap: 3px 8px; margin: 4px 0 2px; padding: 0;
-  color: var(--edition-brass); font: 500 .72rem/1.35 var(--ui-font);
-}
-#app.atlas-board .hand-placement-hint[hidden] { display: none; }
-#app.atlas-board .placement-gesture { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-#app.atlas-board .placement-gesture svg { width: 18px; height: 18px; flex: none; }
-#app.atlas-board .placement-or { opacity: .65; }
-
 /* «Pasar reto» junto al título de la línea de cartas, a la derecha, en el hueco que quedó libre. */
 #app.atlas-board .quick-shell .board-timeline-section > .hand-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 #app.atlas-board .quick-shell .board-timeline-section > .hand-title .quick-pass { flex: none; margin-right: 2px; }
