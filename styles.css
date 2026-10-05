@@ -1197,6 +1197,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .play-choice { position: relative; }
   .continue-choice { grid-column: 1 / -1; text-align: center; }
   .online-entry-grid { grid-template-columns: 1fr 1fr; }
+  .online-entry-grid.online-entry-single { grid-template-columns: minmax(0, 34rem); justify-content: center; }
   .online-form { padding: 28px; }
   .lobby-head { grid-template-columns: 1fr auto; align-items: end; }
   .room-code-card { min-width: 250px; }
@@ -2384,3 +2385,7 @@ html.splash-active .ambience-toggle { display: none; }
 .public-answered { margin: 10px 0 0; text-align: center; }
 .public-leave { margin-top: 2px; }
 @media (prefers-reduced-motion: reduce) { .public-dots::after, .public-clock.is-low { animation: none; } }
+
+/* Los campos que se esconden según el ritmo (la prueba y los mazos en directo): su
+   `display` propio no debe ganar al atributo `hidden`. */
+.duel-kind-field[hidden] { display: none; }

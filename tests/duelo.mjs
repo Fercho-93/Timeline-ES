@@ -217,7 +217,7 @@ console.log("\nCrear un duelo y jugarlo");
   const w = boot();
   abreMazo(w, "historia", "history");
   click(w, '[data-action="duel-home"]');
-  ok("el duelo es un formato más del solitario", /Duelo por enlace/.test(texto(w)));
+  ok("el duelo es uno de los ritmos de jugar con amigos", /Partida con amigos/.test(texto(w)) && /Mismas cartas/.test(texto(w)));
   w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-duel"]');
   ok("antes de jugar se explica la modalidad", existe(w, ".demo-orden") && existe(w, '[data-action="duel-play"]'));

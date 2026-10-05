@@ -20,6 +20,16 @@ for (const target of routes) {
   assert.deepEqual(plain(CT.Links.parse(base+'?'+CT.Links.params(target))),target);
 }
 for (const invalid of ['https://evil.test/#room=ABCD2345','continuum://otro?room=ABCD2345',base+'#quick-room=bad',base+'#room=ABCD2345&quick-room=ABCD2345',base+'#room=ABCD2345&room=BCDE2345',base+'#quick-duel=%3Cscript%3E']) assert.equal(CT.Links.parse(invalid),null);
+// «Unirme» acepta el enlace entero, su parte final o el código suelto.
+for (const target of routes) {
+  assert.deepEqual(plain(CT.Links.fromText('  '+CT.Links.invitation(target)+'\n')),target);
+  assert.deepEqual(plain(CT.Links.fromText('https://otro.sitio/juego#'+CT.Links.params(target))),target,'la parte final sirve aunque cambie la dirección');
+  assert.deepEqual(plain(CT.Links.fromText(String(CT.Links.params(target)))),target);
+}
+assert.deepEqual(plain(CT.Links.fromText('abcd 2345')),{room:'ABCD2345'});
+assert.deepEqual(plain(CT.Links.fromText('ABCD-234567')),{quickRoom:'ABCD234567'});
+assert.deepEqual(plain(CT.Links.fromText('A'.repeat(32))),{turnDuel:'a'.repeat(32)});
+for (const nothing of ['', 'hola', 'ABCD1234', 'CTL1:{}', 'https://evil.test/#room=ABCD2345&room=BCDE2345']) assert.equal(CT.Links.fromText(nothing),null,nothing);
 launch = {url:CT.Links.nativeUrl(routes[3])};
 const delivered=[];
 CT.Links.start(target=>delivered.push(plain(target)));
@@ -46,7 +56,7 @@ assert.equal(redirected,CT.Links.invitation(routes[3]),'invitación antigua sale
 
 // Ejecutar el receptor real de app.js. El UID ya autenticado se conserva.
 const app = read('app.js');
-const routeSource=app.slice(app.indexOf('  CT.Links.start(target => {'),app.indexOf('  const params = new URLSearchParams(location.hash',app.indexOf('  CT.Links.start(target => {')));
+const routeSource=app.slice(app.indexOf('  function openInvitation(target) {'),app.indexOf('  const params = new URLSearchParams(location.hash',app.indexOf('  function openInvitation(target) {')));
 const opened=[];let active=false, receiver;
 const currentUser={uid:'usuario-app-existente'};
 vm.runInNewContext(routeSource,{CT:{Links:{start:fn=>receiver=fn},isSessionActive:()=>active,UI:{confirmDialog(_message,fn){fn();}},TurnDuel:{open:options=>opened.push(['turn',options.gameId,currentUser.uid])},Duelo:{descodificar:()=>({ok:true,duelo:'validado'})}},quickChallenges:target=>opened.push(['quick',plain(target),currentUser.uid]),launchOnline:code=>opened.push(['room',code,currentUser.uid]),turnDuelReady:Promise.resolve(),selectedModeKey:'history',home(){},duelIntro:()=>opened.push(['duel',currentUser.uid]),duelInvalido(){}});

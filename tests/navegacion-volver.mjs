@@ -91,29 +91,40 @@ await expectBack('hub-friends-local');
 await expectBack('hub-friends');
 await expectBack('home');
 
-// Jugar con amigos → Duelo por turnos.
+// Jugar con amigos → Cada uno en su móvil → Crear partida → mazo → ritmo.
 await click('[data-action="friends-hub"]');
-await click('[data-friend-hub="duel"]');
-assert.equal(screen(), 'hub-friends-duel', 'Duelo por turnos tiene su propia pantalla, como Jugar solo');
-await click('[data-inline-route="duel"]');
+assert.ok(!app().querySelector('[data-friend-hub="duel"], [data-friend-hub="wifi"]'), 'la sala, el Wi-Fi y el duelo ya no son puertas aparte');
+await click('[data-friend-hub="online"]');
+assert.equal(screen(), 'hub-friends-online', 'Cada uno en su móvil tiene su propia pantalla');
+assert.ok(app().querySelector('[data-action="friends-join"]') && app().querySelector('[data-action="duels-list"]'));
+await click('[data-action="create-room-toggle"]');
+await click('[data-inline-route="online"]');
 await click('#mode-inline-drawer [data-action="set-block"]');
 await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
-assert.equal(screen(), 'duel-home');
-await expectBack('hub-friends-duel');
+assert.equal(screen(), 'duel-home', 'con el mazo elegido solo queda el ritmo');
+assert.ok(app().querySelector('[data-action="start-live-room"]') && app().querySelector('[data-action="start-turn-duel"]') && app().querySelector('[data-action="start-duel"]'));
+await expectBack('hub-friends-online');
 await expectBack('hub-friends');
 await expectBack('home');
 
-// Wi-Fi local → mazo → sala, sin volver a elegir Wi-Fi.
+// Cada uno en su móvil → Unirme: un solo campo para cualquier invitación.
 await click('[data-action="friends-hub"]');
-await click('[data-friend-hub="wifi"]');
-assert.equal(screen(), 'hub-friends-wifi');
-await click('[data-inline-route="wifi"]');
-await click('#mode-inline-drawer [data-action="set-block"]');
-await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
-assert.equal(screen(), 'local-entrada');
-await back();
-assert.equal(screen(), 'hub-friends-wifi');
+await click('[data-friend-hub="online"]');
+await click('[data-action="friends-join"]');
+assert.equal(screen(), 'friends-join');
+app().querySelector('#friends-join-code').value = 'esto no es nada';
+app().querySelector('[data-friends-join-form]').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
+assert.match(app().querySelector('#friends-join-error').textContent, /No reconozco/);
+assert.ok(app().querySelector('[data-action="wifi-join"]'), 'sin internet, por Wi-Fi, también se entra desde aquí');
+await expectBack('hub-friends-online');
 await expectBack('hub-friends');
+await expectBack('home');
+
+// Las pantallas de antes de juntarlo todo llevan a Cada uno en su móvil.
+w.CONTINUUM.ModeHubs.open('hub-friends-wifi');
+assert.equal(screen(), 'hub-friends-online');
+w.CONTINUUM.ModeHubs.open('hub-friends-duel');
+assert.equal(screen(), 'hub-friends-online');
 await expectBack('home');
 
 // Jugar online → Grandes colecciones: vuelve a Jugar online, no al inicio.

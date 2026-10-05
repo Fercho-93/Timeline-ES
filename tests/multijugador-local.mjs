@@ -9,12 +9,17 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-// Se entra como en la aplicación: Inicio → Jugar con amigos → Wi-Fi local → mazo. Ya no
-// hay que volver a elegir el formato después del mazo: la sala se abre directamente.
+// Se entra como en la aplicación: Inicio → Jugar con amigos → Cada uno en su móvil → Crear
+// partida → mazo → En directo, sin internet → Crear sala.
 async function entrarWifi(w) {
   const pausa = () => new Promise(resolve => setTimeout(resolve, 0));
   await pausa();
-  for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="wifi"]', '[data-inline-route="wifi"]', '#mode-inline-drawer [data-block="historia"]', '#mode-inline-drawer [data-mode="history"]']) { click(w, sel); await pausa(); }
+  for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="create-room-toggle"]', '[data-inline-route="online"]', '#mode-inline-drawer [data-block="historia"]', '#mode-inline-drawer [data-mode="history"]']) { click(w, sel); await pausa(); }
+  for (const [name, value] of [['duel-pace', 'directo'], ['live-net', 'wifi']]) {
+    const input = w.document.querySelector(`input[name="${name}"][value="${value}"]`);
+    input.checked = true; input.dispatchEvent(new w.Event('change', { bubbles: true }));
+  }
+  click(w, '[data-action="start-live-room"]'); await pausa();
   return w.document;
 }
 
@@ -55,18 +60,18 @@ click(w, '[data-local-action="invite"]');
 await new Promise(resolve => setTimeout(resolve, 0));
 ok("no revienta: vuelve al vestíbulo con un aviso, no con una pantalla en blanco", w.document.body.innerHTML.includes("Preparando la mesa") || w.document.body.innerHTML.includes("Sala de espera") || w.document.body.innerHTML.includes("Mesa de exploradores"));
 
-console.log("\nUnirse directo desde el menú de Wi-Fi local, sin elegir mazo");
+console.log("\nUnirse por Wi-Fi desde «Unirme», sin elegir mazo");
 w = boot();
 {
   const pausa = () => new Promise(resolve => setTimeout(resolve, 0));
   await pausa();
-  for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="wifi"]']) { click(w, sel); await pausa(); }
-  ok("el menú de Wi-Fi local ofrece «Unirme a una sala»", !!w.document.querySelector('[data-action="wifi-join"]'));
+  for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="friends-join"]']) { click(w, sel); await pausa(); }
+  ok("«Unirme» ofrece entrar en una sala por Wi-Fi", !!w.document.querySelector('[data-action="wifi-join"]'));
   click(w, '[data-action="wifi-join"]'); await pausa();
   ok("abre directamente la pantalla de unirse", /Unirse a una sala/.test(w.document.body.innerHTML) && !!w.document.querySelector('[data-local-action="scan-offer"]'));
   ok("explica que no hay que elegir mazo y pide la cámara aquí", /No hace falta elegir mazo/.test(w.document.body.innerHTML) && !!w.document.querySelector('[data-local-action="warm-camera"]'));
   click(w, '[data-local-action="back"]'); await pausa();
-  ok("volver lleva otra vez al menú de Wi-Fi local", !!w.document.querySelector('[data-action="wifi-join"]'));
+  ok("volver lleva otra vez a «Unirme»", !!w.document.querySelector('[data-action="wifi-join"]') && w.document.getElementById('app').dataset.screen === 'friends-join');
 }
 
 console.log("\nUnirse a una sala con un código inválido");

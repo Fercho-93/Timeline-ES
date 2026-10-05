@@ -246,7 +246,16 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   abreMazo(w, "geografia", "population");
   click(w, '[data-action="duel-home"]');
   // El duelo es una sola opción del menú con las dos modalidades dentro.
-  ok("hay un único duelo con cuatro combinaciones", w.document.querySelectorAll('[data-duel-block]').length === 4 && /Duelo por enlace/.test(texto(w)));
+  ok("hay una sola pantalla: en directo y cuatro combinaciones de duelo", w.document.querySelectorAll('[data-duel-block]').length === 5 && /Partida con amigos/.test(texto(w)));
+  ok("por defecto, en directo, sin elegir prueba", w.document.querySelector('[data-duel-block="directo"]').hidden === false && w.document.querySelector('[data-duel-kind-field]').hidden === true);
+  const sinInternet = w.document.querySelector('input[name="live-net"][value="wifi"]');
+  sinInternet.checked = true;
+  sinInternet.dispatchEvent(new w.Event("change", { bubbles: true }));
+  ok("en directo se elige internet o la misma Wi-Fi", w.localStorage.getItem("hilo-sala-red-v1") === "wifi" && w.document.querySelector('[data-duel-block="directo"]').hidden === false);
+  const aSeguidos = w.document.querySelector('input[name="duel-pace"][value="seguidos"]');
+  aSeguidos.checked = true;
+  aSeguidos.dispatchEvent(new w.Event("change", { bubbles: true }));
+  ok("con mismas cartas aparece la prueba", w.document.querySelector('[data-duel-kind-field]').hidden === false);
   // Las dos modalidades se ven a la vez, no escondidas dentro de un desplegable, y se
   // ve cuál está elegida: es una elección que hay que hacer, no un ajuste con un valor
   // puesto de antemano.

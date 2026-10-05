@@ -22,6 +22,23 @@
       } catch { /* Ignorar enlaces ajenos o malformados. */ }
       return null;
     },
+    // Lo que alguien pega o escanea en «Unirme»: el enlace entero, solo su parte final o el
+    // código suelto. Cada código tiene su forma: 8 caracteres es una sala, 10 una sala de
+    // Retos rápidos y 32 hexadecimales un duelo por turnos.
+    fromText(value) {
+      const text = String(value || '').trim();
+      if (!text) return null;
+      const linked = CT.Links.parse(text);
+      if (linked) return linked;
+      const tail = text.match(/[#?]([^#?\s]*=[^#?\s]*)\s*$/) || text.match(/^((?:room|duelo|turnoduelo|quick-room|quick-duel)=\S+)$/);
+      if (tail) return CT.Links.parse(PUBLIC_URL + '#' + tail[1]);
+      const hex = text.replace(/\s+/g, '').toLowerCase();
+      if (/^[a-f0-9]{32}$/.test(hex)) return {turnDuel: hex};
+      const code = text.toUpperCase().replace(/[\s-]/g, '');
+      if (/^[A-HJ-NP-Z2-9]{8}$/.test(code)) return {room: code};
+      if (/^[A-HJ-NP-Z2-9]{10}$/.test(code)) return {quickRoom: code};
+      return null;
+    },
     params(target) {
       const params = new URLSearchParams();
       for (const [field, key] of [['room','room'], ['duelo','duelo'], ['turnDuel','turnoduelo'], ['quickRoom','quick-room'], ['quickDuel','quick-duel']]) {

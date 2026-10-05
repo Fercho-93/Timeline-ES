@@ -122,31 +122,32 @@
     return `<div class="mode-inline-collections">${modeDoor('jugar', 'menu-collections.webp', 'Grandes colecciones', texto, false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`, 'Elegir mazo')}<div id="mode-inline-drawer" class="mode-inline-drawer" data-route="${route}"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true) : ''}</div></div>`;
   }
 
-  // Cada forma de jugar con amigos conserva la misma entrada a los mazos.
+  // Dos maneras de jugar con amigos: en un solo móvil o cada uno en el suyo. La sala, el
+  // Wi-Fi local y los duelos ya no son puertas aparte: el ritmo se elige al crear la partida.
   const FRIEND_HUBS = {
     local: ['hub-friends-local', 'Un solo móvil', 'Pasad el teléfono', 'menu-local.webp'],
-    online: ['hub-friends-online', 'Sala privada', 'Cada uno en su móvil', 'menu-private.webp'],
-    wifi: ['hub-friends-wifi', 'Wi‑Fi local', 'Sin internet, cerca', 'menu-wifi.webp'],
-    duel: ['hub-friends-duel', 'Duelo con un amigo', 'Jugad cuando podáis', 'mode-walk-duel.webp']
+    online: ['hub-friends-online', 'Cada uno en su móvil', 'Juntos o a distancia', 'menu-private.webp']
   };
-  // Sala privada online: por un lado unirse a una sala ya creada; por otro, crearla (mazo, retos o competición).
+  // Cada uno en su móvil: por un lado unirse a lo que ya ha creado otro; por otro, crear (mazo, retos o competición).
   let createRoomOpen = false;
   function createRoomGroup(route) {
-    return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear una sala</b><small>Tú organizas la partida y compartes el código, el enlace o el QR.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir modalidad'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
+    return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear partida</b><small>Elige qué jugar y después el ritmo: en directo, por turnos o con las mismas cartas.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
       <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición')}</div></div>`;
   }
   function openFriendHub(route) {
+    // `wifi` y `duel` eran puertas propias: quien vuelva a ellas llega a Cada uno en su móvil.
+    if (!FRIEND_HUBS[route]) route = 'online';
     const [screen, title, eyebrow, art] = FRIEND_HUBS[route];
     app.dataset.pendingHub = screen;
     hub(screen, title, eyebrow, [
-      // Quien se une no elige mazo: la invitación ya lo lleva.
-      route === 'wifi' ? modeDoor('wifi-join', 'menu-wifi.webp', 'Unirme a una sala', 'Escanea el código de quien la ha creado, sea cual sea el mazo.', true) : '',
-      route === 'online' ? modeDoor('online-join', 'menu-private.webp', 'Unirme a una sala', 'Escanea el QR o escribe el código de una sala que ya está creada.', true) : '',
+      // Quien se une no elige mazo ni ritmo: la invitación ya lo lleva.
+      route === 'online' ? modeDoor('friends-join', 'menu-private.webp', 'Unirme a una partida', 'Con el código, el enlace o el QR que te han pasado. También por Wi‑Fi, sin internet.', true, '', 'Unirme') : '',
       route === 'online' ? createRoomGroup(route) : [
         inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos.'),
-        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', route === 'duel' ? 'Mazos sorpresa: juegas tú, le mandas el enlace y compara aciertos.' : 'Mazos sorpresa para todos: cada uno arriesga o asegura sus aciertos.', false, `data-friend-quick="${route}"`, route === 'duel' ? 'Retar a un amigo' : 'Preparar partida'),
-        route === 'local' ? modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición') : ''
-      ].join('')
+        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa para todos: cada uno arriesga o asegura sus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
+        modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición')
+      ].join(''),
+      route === 'online' ? modeDoor('duels-list', 'mode-walk-duel.webp', 'Tus partidas', 'Los duelos por turnos en curso y a quién le toca.', false, '', 'Ver') : ''
     ].join(''), art);
   }
   const openLocalHub = () => openFriendHub('local');
@@ -163,9 +164,7 @@
   function openFriendsHub() {
     hub('hub-friends', 'Jugar con amigos', 'Juntos', [
       modeDoor('local-hub', 'menu-local.webp', 'Un solo móvil', 'Pasad un mismo teléfono en cada turno.'),
-      modeDoor('friend-hub', 'menu-private.webp', 'Sala privada online', 'Cada persona con su móvil, por código o enlace.', false, 'data-friend-hub="online"'),
-      modeDoor('friend-hub', 'menu-wifi.webp', 'Wi‑Fi local', 'Varios móviles cerca, en la misma red.', false, 'data-friend-hub="wifi"'),
-      modeDoor('friend-hub', 'mode-walk-duel.webp', 'Duelo con un amigo', 'Partida completa o por turnos, por enlace.', false, 'data-friend-hub="duel"')
+      modeDoor('friend-hub', 'menu-private.webp', 'Cada uno en su móvil', 'En directo, por turnos o con las mismas cartas. Por internet o en la misma Wi‑Fi.', false, 'data-friend-hub="online"')
     ].join(''), modeArt['friends-hub']);
   }
 
@@ -212,7 +211,16 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       sessionStorage.setItem('continuum-entry-route', 'wifi');
-      window.CONTINUUM.LocalMultiplayer.open({ join: true, onBack: () => openFriendHub('wifi') });
+      const fromJoin = app.dataset.screen === 'friends-join' && window.CONTINUUM.openFriendsJoin;
+      window.CONTINUUM.LocalMultiplayer.open({ join: true, onBack: fromJoin ? () => window.CONTINUUM.openFriendsJoin() : () => openFriendHub('online') });
+      return;
+    }
+    const friendsJoin = event.target.closest('[data-action="friends-join"]');
+    if (friendsJoin) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      sessionStorage.setItem('continuum-entry-route', 'online');
+      window.CONTINUUM.openFriendsJoin();
       return;
     }
     const createToggle = event.target.closest('[data-action="create-room-toggle"]');
@@ -222,15 +230,7 @@
       createRoomOpen = createToggle.getAttribute('aria-expanded') !== 'true';
       createToggle.setAttribute('aria-expanded', String(createRoomOpen));
       document.getElementById('mode-create-list').hidden = !createRoomOpen;
-      createToggle.querySelector('.mode-entry-cta').innerHTML = `${createRoomOpen ? 'Ocultar' : 'Elegir modalidad'} <span>${createRoomOpen ? '↑' : '↓'}</span>`;
-      return;
-    }
-    const onlineJoin = event.target.closest('[data-action="online-join"]');
-    if (onlineJoin) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      sessionStorage.setItem('continuum-entry-route', 'online');
-      import('./online.js').then(online => online.openOnlineMode({ joinOnly: true, onBack: () => openFriendHub('online') }));
+      createToggle.querySelector('.mode-entry-cta').innerHTML = `${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span>`;
       return;
     }
     const friendQuick = event.target.closest('[data-friend-quick]');
@@ -288,7 +288,7 @@
     if (!['online-hub','online-collections','solo-hub','friends-hub','local-hub','friend-hub'].includes(action)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    ['hub-solo', 'hub-friends-local', 'hub-friends-online', 'hub-friends-wifi', 'hub-friends-duel'].forEach(key => { inlineOpen[key] = false; });
+    ['hub-solo', 'hub-friends-local', 'hub-friends-online'].forEach(key => { inlineOpen[key] = false; });
     if (action === 'friend-hub' || action === 'friends-hub') createRoomOpen = false;
     if (action === 'online-hub') openOnlineHub();
     else if (action === 'online-collections') openOnlineCollections();

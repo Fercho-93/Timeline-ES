@@ -490,7 +490,7 @@
       pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
       collectionDetails = previous.collectionDetails; collectionIndexExpanded = previous.collectionIndexExpanded; jugarSection = previous.jugarSection || null;
       homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
-      const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'perfil':perfilView, 'duelo-intro':duelIntro, 'quick-challenges':quickChallenges}[previous.screen];
+      const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'friends-join':friendsJoin, 'perfil':perfilView, 'duelo-intro':duelIntro, 'quick-challenges':quickChallenges}[previous.screen];
       if (render) render();
       else if (previous.screen.startsWith('hub-') && CT.ModeHubs) CT.ModeHubs.open(previous.screen);
       else { screen = previous.screen; paint(previous.html); }
@@ -506,6 +506,7 @@
       else playMenu();
     }
     else if (screen === "duelo-intro") duelHome();
+    else if (screen === "friends-join") CT.ModeHubs?.open('hub-friends-online');
     else if (screen === "play-menu") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
     else if (screen === "competition-menu") CT.ModeHubs.open({ local: 'hub-friends-local', online: 'hub-friends-online', friends: 'hub-friends' }[sessionStorage.getItem('continuum-competition-audience')] || 'hub-solo');
     else if (screen === "quick-challenges") jugarView();
@@ -527,8 +528,8 @@
     else if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='wifi-quick') CT.Quick.openNetwork(render, 'local', 4);
-    else if(sessionStorage.getItem('continuum-entry-route')==='online-quick') CT.Quick.openNetwork(render, 'internet', 4);
-    else if(sessionStorage.getItem('continuum-entry-route')==='duel-quick') CT.Quick.openDuel(render);
+    else if(sessionStorage.getItem('continuum-entry-route')==='wifi-join-quick') CT.Quick.openNetwork(render, 'local', 4, 'join');
+    else if(['online-quick','duel-quick'].includes(sessionStorage.getItem('continuum-entry-route'))) CT.Quick.openDuel(render);
     else CT.Quick.open(render);
   }
 
@@ -723,7 +724,7 @@
     screen = "duelos";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Retos entre amigos</div><h1 data-focus tabindex="-1">Tus duelos</h1><p>En qué punto está cada uno y a quién le toca.</p></header>
+        <header class="atlas-page-heading"><div class="eyebrow">Retos entre amigos</div><h1 data-focus tabindex="-1">Tus partidas</h1><p>Tus duelos por turnos: en qué punto está cada uno y a quién le toca.</p></header>
         <section class="panel turn-duel-profile" id="turn-duels-list"><p role="status">Cargando tus duelos…</p></section>
       </section>
       ${homeNav()}
@@ -743,7 +744,7 @@
 
   // La antigua pantalla «¿Qué te apetece jugar?» ya no existe: cualquier camino que llevaba a
   // ella abre ahora la pantalla de la modalidad de la que se viene (Jugar solo, Un solo móvil…).
-  const HUB_FOR_ROUTE = { local: 'hub-friends-local', wifi: 'hub-friends-wifi', online: 'hub-friends-online', duel: 'hub-friends-duel' };
+  const HUB_FOR_ROUTE = { local: 'hub-friends-local', wifi: 'hub-friends-online', online: 'hub-friends-online', duel: 'hub-friends-online', 'wifi-join': 'hub-friends-online' };
   function jugarView() {
     CT.Quick.leave();
     pendingTournament = null;
@@ -779,9 +780,9 @@
     const entry = sessionStorage.getItem('continuum-entry-route');
     if (entry === 'collections' || entry === 'mixed') { soloHome(); return; }
     if (entry === 'local') { setup(); return; }
-    if (entry === 'online') { launchOnline(); return; }
-    if (entry === 'wifi') { launchLocalMultiplayer(); return; }
-    if (entry === 'duel') { duelHome(); return; }
+    // Cada uno en su móvil: con el mazo elegido se decide el ritmo. `wifi` y `duel` son las
+    // rutas de antes de juntarlo todo, que aún pueden venir de una sesión guardada.
+    if (entry === 'online' || entry === 'wifi' || entry === 'duel') { duelHome(); return; }
     // Una ruta que no elige mazo (Retos rápidos y similares) se quedó guardada al volver: el
     // formato ya se decidió antes, así que no se vuelve a preguntar «cómo quieres jugar».
     if (entry) { soloHome(); return; }
@@ -2335,7 +2336,10 @@
     turnos: '<path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/>',
     orden: '<rect x="2.5" y="7" width="5.5" height="10" rx="1.2"/><rect x="9.25" y="7" width="5.5" height="10" rx="1.2"/><rect x="16" y="7" width="5.5" height="10" rx="1.2"/>',
     cifras: '<path d="M9.5 4 7.5 20M16.5 4l-2 16M4.5 9h15M3.5 15h15"/>',
-    reloj: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'
+    reloj: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    directo: '<circle cx="12" cy="12" r="2.5"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>',
+    internet: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/>',
+    wifi: '<path d="M4 10a12 12 0 0 1 16 0"/><path d="M7.5 13.5a7 7 0 0 1 9 0"/><circle cx="12" cy="17.5" r="1"/>'
   };
   function glyph(paths) {
     return `<svg class="solo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
@@ -2403,17 +2407,19 @@
     </div>`);
   }
 
-  // Duelo con un amigo: el duelo por enlace, que antes vivía dentro del solitario, tiene
-  // ahora su propia pantalla como tercera manera de jugar un mazo.
+  // Partida con amigos, cada uno en su móvil: con el mazo ya elegido solo queda el ritmo.
+  // En directo es la sala (por internet o por Wi-Fi), por turnos el duelo que se guarda
+  // entre jugadas y «mismas cartas» el duelo por enlace. La pantalla conserva su nombre
+  // interno, `duel-home`, porque el resto del juego vuelve a ella con ese nombre.
   function duelHome() {
     screen = "duel-home";
     solo = loadSolo();
     pendingIndex = null;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Duelo con un amigo</h2>
-        <p class="lead">Las mismas cartas para los dos. Gana quien más acierte.</p><p class="solo-intro-rule">En duelo se juegan las ${CT.Duelo.CARTAS} cartas sin límite de vidas.</p></div>
+      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Partida con amigos</h2>
+        <p class="lead">Cada uno desde su móvil. Elige cómo jugáis: todos a la vez, por turnos o con las mismas cartas.</p></div>
         ${duelPanel()}
-        <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus duelos en curso</button>
+        <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus partidas en curso</button>
       </section>
     </div>`);
   }
@@ -2498,7 +2504,12 @@
     const guardado = CT.Storage.getItem(DUEL_KIND_KEY) || CT.Storage.getItem("hilo-duelo-modo-v1");
     return guardado === "cifras" && reglaCifra() ? "cifras" : "orden";
   }
-  function duelPace() { return CT.Storage.getItem(DUEL_PACE_KEY) === "turnos" ? "turnos" : "seguidos"; }
+  // Sin nada guardado se empieza en directo, la primera opción.
+  function duelPace() { const guardado = CT.Storage.getItem(DUEL_PACE_KEY); return guardado === "turnos" || guardado === "seguidos" ? guardado : "directo"; }
+  // En directo se juega por internet o, cerca y sin conexión, por la misma Wi-Fi.
+  const LIVE_NET_KEY = "hilo-sala-red-v1";
+  function liveNet() { return CT.Storage.getItem(LIVE_NET_KEY) === "wifi" ? "wifi" : "internet"; }
+  function duelBlockKey(ritmo, prueba) { return ritmo === "directo" ? "directo" : `${ritmo}-${prueba}`; }
   // Compatibilidad con llamadas antiguas: el modo ya solo representa la prueba.
   function duelMode() { return duelKind(); }
 
@@ -2511,14 +2522,14 @@
     const regla = reglaCifra();
     const prueba = duelKind();
     const ritmo = duelPace();
-    const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === `${ritmo}-${prueba}` ? "" : " hidden"}>${cuerpo}</div>`;
+    const red = liveNet();
+    const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === duelBlockKey(ritmo, prueba) ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
-      <div class="solo-panel-head"><h3>Duelo por enlace</h3></div>
-      <p>Juegas tú, mandas el enlace, y quien lo abra recibe exactamente las mismas cartas.</p>
+      <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
       <div class="field duel-kind-field">
-        <span class="field-label" id="duel-pace-label">Ritmo del duelo</span>
+        <span class="field-label" id="duel-pace-label">Ritmo</span>
         <div class="segmented" role="radiogroup" aria-labelledby="duel-pace-label">
-          ${[["seguidos", "Partida completa", "Juegas y esperas al rival"], ["turnos", "Por turnos", "Cada uno desde su móvil"]]
+          ${[["directo", "En directo", "Todos a la vez, en una sala"], ["turnos", "Por turnos", "Cada uno cuando pueda"], ["seguidos", "Mismas cartas", "Juegas tú y mandas el reto"]]
             .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === ritmo ? " is-on" : ""}">
               <input type="radio" name="duel-pace" value="${clave}"${clave === ritmo ? " checked" : ""}>
               <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>
@@ -2526,7 +2537,7 @@
             </label>`).join("")}
         </div>
       </div>
-      <div class="field duel-kind-field">
+      <div class="field duel-kind-field" data-duel-kind-field${ritmo === "directo" ? " hidden" : ""}>
         <span class="field-label" id="duel-kind-label">Prueba</span>
         <div class="segmented" role="radiogroup" aria-labelledby="duel-kind-label">
           ${[["orden", "Ordenar las cartas", "Colocarlas en la línea"], ...(regla ? [["cifras", "Escribir la cifra", "Responder con el número"]] : [])]
@@ -2537,6 +2548,19 @@
             </label>`).join("")}
         </div>
       </div>
+      ${bloque("directo", `<div class="duel-brief"><p>Una sala de 2 a 9 personas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Al crearla compartes el código, el enlace o el QR.</p></div>
+        <div class="field duel-kind-field">
+          <span class="field-label" id="live-net-label">Conexión</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="live-net-label">
+            ${[["internet", "Por internet", "Cada uno donde esté"], ["wifi", "Sin internet", "Cerca, en la misma Wi‑Fi"]]
+              .map(([clave, titulo, pie]) => `<label class="segmented-option${clave === red ? " is-on" : ""}">
+                <input type="radio" name="live-net" value="${clave}"${clave === red ? " checked" : ""}>
+                <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[clave])}</i>
+                <span><b>${titulo}</b><small>${pie}</small></span>
+              </label>`).join("")}
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
       ${bloque("seguidos-orden", `<div class="duel-brief"><p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>${CT.Duelo.SEGUNDOS} segundos por carta · El reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
         ${enOrden ? `<button class="btn btn-primary btn-block" style="margin-top:10px" data-action="resume-solo">Continuar ${contra(solo) ? `el duelo contra ${escapeHtml(contra(solo))}` : "tu duelo"} <span>→</span></button>` : ""}
@@ -2558,6 +2582,43 @@
       </div>
     </div>`;
   }
+
+  // «Unirme» de Cada uno en su móvil: un solo campo para cualquier invitación por internet
+  // (sala, duelo por turnos, duelo por enlace o Retos rápidos), que se reconoce sola y se
+  // abre igual que si se hubiera tocado el enlace. Las invitaciones por Wi-Fi no dicen de
+  // qué juego son hasta conectarse, así que tienen sus propios botones.
+  function friendsJoin() {
+    screen = "friends-join";
+    const camara = CT.QrScanner?.isSupported?.();
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
+      <section class="setup-section solo-home friends-join"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Cada uno en su móvil</div><h2 class="solo-title" data-focus tabindex="-1">Unirme a una partida</h2>
+        <p class="lead">Pega el enlace o escribe el código que te han pasado. Vale para salas, duelos y Retos rápidos.</p></div>
+        <form class="panel solo-panel" data-friends-join-form novalidate>
+          <div class="field"><label for="friends-join-code">Código o enlace</label><input id="friends-join-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD2345 o el enlace"></div>
+          ${camara ? '<button type="button" class="btn btn-secondary btn-block" data-action="friends-join-scan">Escanear código QR</button>' : ""}
+          <button type="submit" class="btn btn-primary btn-block">Unirme <span>→</span></button>
+          <p class="hint" id="friends-join-error" role="alert"></p>
+        </form>
+        <div class="panel solo-panel"><div class="solo-panel-head"><h3>Sin internet, en la misma Wi‑Fi</h3></div>
+          <p>Quien ha creado la sala te enseña un código QR en su móvil.</p>
+          <button type="button" class="btn btn-secondary btn-block" data-action="wifi-join">Unirme a una sala por Wi‑Fi</button>
+          <button type="button" class="btn btn-ghost btn-block" data-action="friends-join-quick-wifi">Unirme a Retos rápidos por Wi‑Fi</button>
+        </div>
+      </section>
+    </div>`);
+  }
+
+  function friendsJoinWith(text) {
+    const target = CT.Links.fromText(text);
+    if (target) { openInvitation(target); return; }
+    const raw = String(text || "").trim();
+    const aviso = !raw ? "Escribe o pega el código que te han pasado."
+      : raw.startsWith("CTL1:") || raw.length > 120 ? "Parece una invitación por Wi‑Fi: usa «Unirme a una sala por Wi‑Fi»."
+      : "No reconozco ese código. Comprueba que esté completo.";
+    const box = document.getElementById("friends-join-error");
+    if (box) box.textContent = aviso;
+  }
+  CT.openFriendsJoin = friendsJoin;
 
   // El nombre se guarda entre duelos: es lo único que hay que escribir, y pedirlo cada
   // vez para acabar poniendo lo mismo sobra.
@@ -3679,7 +3740,8 @@
   // de fuera (ni Firebase ni ninguna CDN), así que se carga siempre con el resto de la
   // aplicación, igual que `duelo.js`. `launchLocalMultiplayer` solo entrega el control.
   function launchLocalMultiplayer() {
-    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: sessionStorage.getItem('continuum-entry-route') === 'wifi' ? () => (CT.ModeHubs ? CT.ModeHubs.open('hub-friends-wifi') : jugarView()) : playMenu });
+    const fromFriends = ['online', 'wifi', 'duel'].includes(sessionStorage.getItem('continuum-entry-route'));
+    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: fromFriends ? duelHome : playMenu });
   }
 
   CT.launchPublicMatch = () => launchPublicMatch();
@@ -3720,12 +3782,12 @@
     }
   }
 
-  async function launchOnline(roomCode = "", competition = null) {
+  async function launchOnline(roomCode = "", competition = null, { createOnly = false } = {}) {
     screen = "online-loading";
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Conectando la sala</h2><p>Preparando el modo multijugador…</p></div></section></div>`);
     try {
       const online = await import("./online.js");
-      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, competition, onBack: backMenu });
+      await online.openOnlineMode({ roomCode, modeKey: selectedModeKey, competition, createOnly, onBack: backMenu });
     } catch (error) {
       console.error(error);
       screen = "online-error";
@@ -3742,13 +3804,16 @@
     if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value, { returnTo: encReturn }); return; }
     // Cambiar de modalidad no repinta: repintar cerraría el desplegable que se acaba de
     // abrir para llegar hasta aquí. Se enseña un bloque y se esconde el otro.
-    if (event.target.name === "duel-kind" || event.target.name === "duel-pace") {
+    if (event.target.name === "duel-kind" || event.target.name === "duel-pace" || event.target.name === "live-net") {
       const value = event.target.value;
       if (event.target.name === "duel-kind") CT.Storage.setItem(DUEL_KIND_KEY, value);
-      else CT.Storage.setItem(DUEL_PACE_KEY, value);
+      else if (event.target.name === "duel-pace") CT.Storage.setItem(DUEL_PACE_KEY, value);
+      else CT.Storage.setItem(LIVE_NET_KEY, value);
       const selectedKind = event.target.name === "duel-kind" ? value : duelKind();
       const selectedPace = event.target.name === "duel-pace" ? value : duelPace();
-      app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== `${selectedPace}-${selectedKind}`; });
+      app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== duelBlockKey(selectedPace, selectedKind); });
+      const campoPrueba = app.querySelector("[data-duel-kind-field]");
+      if (campoPrueba) campoPrueba.hidden = selectedPace === "directo";
       // La pastilla elegida se marca en el propio elemento: el `:has()` del CSS lo haría
       // solo, pero no todos los navegadores en los que se juega esto lo soportan.
       app.querySelectorAll(".segmented-option").forEach(opcion => {
@@ -3914,7 +3979,7 @@
       setup(); beginStarterDraw();
     }
     else if (action === "competition-local") prepareMultiCompetition();
-    else if (action === "competition-online") launchOnline('',competitionOptions());
+    else if (action === "competition-online") launchOnline('',competitionOptions(),{ createOnly: true });
     else if (action === "competition-next") nextTournamentRound();
     else if (action === "competition-resume") resumeMultiCompetition();
     else if (action === "competition-round-start") { game.tournamentIntro = false; saveGame(); renderPass(); }
@@ -3970,6 +4035,9 @@
     // El duelo de cifras se estrena igual, y «Devolver el reto» pasa por aquí desde el
     // cara a cara, donde el campo del nombre no existe y no hay nada que guardar.
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
+    else if (action === "friends-join-scan") CT.LocalShare.scanQr({ title: "Escanear invitación", hint: "Encuadra el código QR de la sala o del duelo.", onText: friendsJoinWith }).catch(() => friendsJoinWith(""));
+    else if (action === "friends-join-quick-wifi") { sessionStorage.setItem("continuum-entry-route", "wifi-join-quick"); quickChallenges(); }
+    else if (action === "start-live-room") { if (liveNet() === "wifi") launchLocalMultiplayer(); else launchOnline("", null, { createOnly: true }); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }
     else if (action === "open-quick-duel") { CT.Quick.openRoom((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, target.dataset.quickCode, duelsView).catch(() => showToast('No se pudo abrir el duelo. Comprueba tu conexión.')); }
     else if (action === "rematch-quick-duel" || action === "challenge-quick-rival") {
@@ -4064,6 +4132,13 @@
     else if (action === "perfil-import" && !CT.Accounts) perfilImport();
     else if (action === "perfil-reset" && !CT.Accounts) perfilResetMenu();
     else if (action === "perfil-reset-confirm" && !CT.Accounts) { CT.Progreso.reset(); CT.closeDialog(); showToast("Perfil borrado"); perfilView(); }
+  });
+
+  app.addEventListener("submit", event => {
+    const form = event.target.closest("[data-friends-join-form]");
+    if (!form) return;
+    event.preventDefault();
+    friendsJoinWith(form.querySelector("#friends-join-code")?.value);
   });
 
   // Los dos formularios de nombre (bienvenida y Atlas) se envían con Intro igual que con
@@ -4169,7 +4244,8 @@
 
   // Dos maneras de entrar por enlace: la invitación a una sala, que necesita conexión, y
   // el reto de un duelo, que no necesita nada porque el enlace ya lo lleva todo dentro.
-  CT.Links.start(target => {
+  // También la usa «Unirme» con lo que se pega o se escanea.
+  function openInvitation(target) {
     const abrir = () => {
       if (target.quickRoom || target.quickDuel) quickChallenges(target);
       else if (target.room) launchOnline(target.room);
@@ -4178,7 +4254,8 @@
     };
     if (CT.isSessionActive()) CT.UI.confirmDialog('Tu partida local quedará guardada.', abrir, { title: '¿Abrir la invitación?', confirmLabel: 'Abrir la invitación', cancelLabel: 'Ahora no' });
     else abrir();
-  });
+  }
+  CT.Links.start(openInvitation);
   const params = new URLSearchParams(location.hash.slice(1) || location.search);
   const invitedRoom = params.get("room") || "";
   const duelPayload = params.get("duelo") || "";

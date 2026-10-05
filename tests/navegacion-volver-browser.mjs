@@ -66,10 +66,15 @@ async function flows(vp) {
     await click('[data-quick="start-free"]'); await at('quick-challenges'); await click('[data-quick="ready"]'); await at('quick-game'); await back('quick-challenges'); await click('[data-quick="start-free"]'); await back('quick-challenges');
     await back('hub-solo'); await back('home');
     // Jugar con amigos
+    // Un solo móvil, o cada uno en el suyo: el duelo, el Wi-Fi y la sala salen del ritmo elegido tras el mazo.
     for (const [route, target] of [['local', 'setup'], ['duel', 'duel-home'], ['wifi', 'local-entrada'], ['online', null]]) {
+      const hub = route === 'local' ? 'local' : 'online';
       await click('[data-action="friends-hub"]'); await at('hub-friends');
-      await click(route === 'local' ? '[data-action="local-hub"]' : `[data-friend-hub="${route}"]`); await at(`hub-friends-${route}`);
-      await click(`[data-inline-route="${route}"]`); await click('#mode-inline-drawer [data-action="set-block"]'); await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
+      await click(route === 'local' ? '[data-action="local-hub"]' : '[data-friend-hub="online"]'); await at(`hub-friends-${hub}`);
+      if (hub === 'online') await click('[data-action="create-room-toggle"]');
+      await click(`[data-inline-route="${hub}"]`); await click('#mode-inline-drawer [data-action="set-block"]'); await click('#mode-inline-drawer .collection-entry.active [data-action="set-mode"]');
+      if (route === 'duel') await click('label:has(input[name="duel-pace"][value="seguidos"])');
+      if (route === 'wifi' || route === 'online') { await click(`label:has(input[name="live-net"][value="${route === 'wifi' ? 'wifi' : 'internet'}"])`); await click('[data-action="start-live-room"]'); }
       if (target) await at(target);
       if (route === 'online') { await pg.waitForFunction(() => document.getElementById('app').dataset.screen !== 'online-loading', null, {timeout: 15000}).catch(() => {}); console.log('online →', await screen()); }
       if (route === 'local') { await click('[data-action="start"]'); await at('pass'); await back('setup'); }
