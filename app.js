@@ -378,13 +378,13 @@
           ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
           ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi‑Fi", "wifi"]], red, ` data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}`)}
           ${sinRed ? '<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi‑Fi.</p>' : ""}
-          <div class="duel-brief" data-comp-brief><p>${compBrief(ritmo)}</p></div>
-          <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start">Empezar competición <span>→</span></button>
           <div class="field duel-identity-field">
             <label for="duel-name">Tu nombre de perfil</label>
             <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
             <small class="field-help">Se usará automáticamente en la competición. Puedes cambiarlo desde tu perfil.</small>
           </div>
+          <div class="duel-brief" data-comp-brief><p>${compBrief(ritmo)}</p></div>
+          <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start">Empezar competición <span>→</span></button>
         </div>
         <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus partidas en curso</button>
       </section>
@@ -2569,6 +2569,11 @@
         </div>
       </div>
       ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
+      <div class="field duel-identity-field">
+        <label for="duel-name">Tu nombre de perfil</label>
+        <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
+        <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
+      </div>
       ${bloque("directo", `<div class="duel-brief"><p>Una sala de 2 a 9 personas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Al crearla compartes el código, el enlace o el QR.</p></div>
         <div class="field duel-kind-field">
           <span class="field-label" id="live-net-label">Conexión</span>
@@ -2597,11 +2602,6 @@
       ${regla ? bloque("turnos-cifras", `<div class="duel-brief"><p>Responded una cifra cada vez, desde vuestro propio móvil. Juegas tú primero y después le mandas el enlace a tu rival; en la revancha empieza él.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Respondes cuando te toque. Con tiempo, el reloj empieza al abrir tu carta.</span></p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-turn-duel">Crear duelo por turnos <span>→</span></button>`) : ""}
-      <div class="field duel-identity-field">
-        <label for="duel-name">Tu nombre de perfil</label>
-        <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
-        <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
-      </div>
     </div>`;
   }
 

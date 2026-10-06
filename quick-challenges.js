@@ -226,6 +226,7 @@
         ${lengthChips('quick-free-length',SHORT_LENGTHS,'Retos')}
         ${keepField(` data-quick-keep-field${pace==='seguidos'?' hidden':''}`)}
         ${CT.Tiempo.field('amigos',{porDefecto:15})}
+        ${identityField()}
         ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 personas: todos jugáis a la vez, cada uno desde su móvil. Al crearla compartes el código, el enlace o el QR.</p></div>
           <div class="field"><label for="quick-net-players">Máximo de participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===4?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
           <div class="field duel-kind-field"><span class="field-label" id="quick-net-label">Conexión</span>
@@ -236,7 +237,6 @@
         ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas el enlace: tu amigo entra directo en la partida, ve tu última jugada y sigue él. En la revancha empieza el otro. La partida se guarda entre turnos.</p></div>
           ${button('create-room','Crear duelo <span>→</span>','btn btn-primary btn-block')}
           ${readJSON(NET)?button('duels-list','Volver a mis duelos','btn btn-ghost btn-block'):''}`)}
-        ${identityField()}
         <p id="quick-error" role="alert"></p>
       </div></section>`);
   }

@@ -82,18 +82,22 @@
 #app .mode-topic-picker { display: grid; gap: 14px; }
 #app .mode-topic-picker > p { margin: 0; line-height: 1.4; }
 #app .mode-topic-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-#app .mode-topic-grid label { position: relative; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px; border: 1px solid #d2b683; border-radius: 10px; background: #f8f0df; cursor: pointer; transition: background .15s ease, color .15s ease; }
+#app .mode-topic-grid label { position: relative; display: flex; align-items: center; gap: 9px; min-height: 52px; padding: 8px 11px; font-size: .9rem; line-height: 1.2; border: 1px solid #d2b683; border-radius: 10px; background: #f8f0df; cursor: pointer; transition: background .15s ease, color .15s ease; }
 #app .mode-topic-grid input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-#app .mode-topic-grid label::before { content: ""; flex: 0 0 auto; width: 18px; height: 18px; border: 1.5px solid #9c7641; border-radius: 50%; }
+#app .mode-topic-grid label::before { content: "✓"; display: grid; place-items: center; flex: 0 0 auto; width: 18px; height: 18px; border: 1.5px solid #9c7641; border-radius: 5px; color: transparent; font: 800 .74rem/1 var(--ui-font); }
 #app .mode-topic-grid label:has(input:checked) { color: var(--ink-solid-contrast, #fff); background: var(--ink-solid, #84432a); border-color: transparent; }
-#app .mode-topic-grid label:has(input:checked)::before { border-color: currentColor; background: radial-gradient(circle, currentColor 0 4px, transparent 5px); }
+#app .mode-topic-grid label:has(input:checked)::before { border-color: currentColor; color: currentColor; }
 #app .mode-topic-grid label:has(input:focus-visible) { outline: 3px solid #9c4f2c; outline-offset: 2px; }
 #app .mode-topic-count { margin: -4px 2px 0; }
 /* Jugar online: el tablón de mesas abiertas (como el vestíbulo de Risk) y la pantalla para crear una. */
 #app .public-board { display: grid; gap: 8px; }
-#app .mode-hub-list .section-label small { margin-left: 6px; color: #805b37; font-weight: 500; letter-spacing: 0; text-transform: none; }
-#app .public-quick-label { margin-top: 8px; }
-#app .public-quick-hint { margin: -6px 2px 0; color: #4a3d31; line-height: 1.4; }
+/* Títulos de sección de «Jugar online»: versalitas doradas con una línea fina, como «EL RETO DE HOY»
+   y los epígrafes de las pantallas de configuración. */
+#app .mode-section-title { display: flex; align-items: center; gap: 10px; margin: 0; padding-left: 4px; color: #805b37; font: 700 .7rem/1.2 var(--ui-font); letter-spacing: .19em; text-transform: uppercase; }
+#app .mode-section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #b8935a80, transparent); }
+#app .mode-section-title small { order: 2; color: #805b37; font: 700 .7rem/1.2 var(--ui-font); letter-spacing: 0; }
+#app .public-quick-label { margin-top: 10px; }
+#app .public-quick-hint { margin: -4px 4px 0; color: #4a3d31; line-height: 1.4; text-align: left; }
 #app .public-board-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 #app .public-board-empty { padding: 14px 16px; border: 1px dashed #c9a96f; border-radius: 12px; color: #4a3d31; background: #f8f0df8c; line-height: 1.4; }
 #app .public-board-alert { margin: 0; padding: 10px 14px; border-radius: 10px; color: #7a2418; background: #f7dfd4; }
@@ -142,6 +146,9 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
   #app .mode-entry-copy small { font-size: .86rem; }
   #app .mode-hub-head { padding: 14px; gap: 10px; min-height: 142px; }
   #app .mode-hub-title h1 { font-size: 1.72rem; }
+  #app .mode-topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 340px) {
   #app .mode-topic-grid { grid-template-columns: 1fr; }
 }
 :root[data-theme="dark"] #app .mode-entry,
@@ -180,3 +187,11 @@ html #app button.mode-play-card:hover, html #app button.mode-play-card:active { 
 #app .mode-ranking-summary .mode-ranking-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
 #app .mode-ranking-summary .mode-ranking-stats span { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
 #app .mode-ranking-summary .mode-ranking-stats small { font: 700 .66rem var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
+
+/* Retos rápidos: su lámina es la única casi negra entre las del resto del juego. En tema claro se
+   aclara hasta quedar en el mismo tono sepia que las demás; en oscuro encaja tal cual. */
+:root:not([data-theme="dark"]) #app .mode-entry:is([data-action="quick-challenges"], [data-action="quick-public"]) .mode-entry-art img { filter: sepia(.55) saturate(.7) brightness(1.55) contrast(.72); }
+/* Textos de ayuda dentro de los paneles de configuración: alineados a la izquierda, como los campos. */
+#app :is(.solo-panel, .public-create, .mode-online-config, .quick-shell .panel) .hint { text-align: left; }
+:root[data-theme="dark"] #app .mode-section-title, :root[data-theme="dark"] #app .mode-section-title small { color: #e0b77e; }
+:root[data-theme="dark"] #app .public-quick-hint { color: #cdbda5; }

@@ -14,7 +14,8 @@
     'solo-hub': 'mode-walk-solo.webp',
     'friends-hub': 'mode-walk-multi.webp',
     'competition-menu': 'competition-engraving.webp',
-    'public-match': 'menu-online.webp',
+    'public-match': 'mode-walk-multi.webp',
+    'public-create': 'menu-wifi.webp',
     'online-collections': 'menu-collections.webp',
     'quick-public': 'menu-quick.webp',
     'quick-challenges': 'menu-quick.webp'
@@ -114,10 +115,10 @@
   // eligen dónde sentarse. La partida rápida sigue ahí para quien no quiere elegir.
   function openOnlineHub() {
     hub('hub-online', 'Jugar online', 'Mesas públicas', [
-      modeDoor('public-create', modeArt['online-hub'], 'Crear mesa', 'Elige el juego, las plazas y el tiempo. Los demás la verán en la lista y se sentarán.', true, '', 'Crear'),
-      `<section class="public-board" aria-labelledby="public-board-title"><div class="section-label" id="public-board-title">Mesas abiertas <small data-board-count></small></div>
+      modeDoor('public-create', modeArt['public-create'], 'Crear mesa', 'Elige el juego, las plazas y el tiempo. Los demás la verán en la lista y se sentarán.', true, '', 'Crear'),
+      `<section class="public-board" aria-labelledby="public-board-title"><h2 class="mode-section-title" id="public-board-title">Mesas abiertas <small data-board-count></small></h2>
         <ul class="public-board-list" data-public-board aria-live="polite"><li class="public-board-empty">Buscando mesas…</li></ul></section>`,
-      `<div class="section-label public-quick-label">Partida rápida</div><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
+      `<h2 class="mode-section-title public-quick-label">Partida rápida</h2><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
       modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
       modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"'),
