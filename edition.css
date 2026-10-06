@@ -5156,6 +5156,13 @@ html #app .tiempo-field .tiempo-segmented .segmented-option.is-on {
 }
 @media (hover: hover) and (pointer: fine) { html #app .tiempo-field .tiempo-segmented .segmented-option:not(.is-on):hover { border-color: #c9a06f; background: linear-gradient(165deg, #fffaf1, #f3e3cc); color: #2a1a10; } }
 html #app .tiempo-field .tiempo-segmented .segmented-option:has(input:focus-visible) { outline: 2px solid #b8653d; outline-offset: 3px; }
+/* El título, también igual en todas: versalitas doradas con una línea fina, como en Solitario. */
+html #app .tiempo-field > .field-label {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 9px; padding: 0;
+  color: #8a5a2e; font: 700 .68rem/1.2 var(--ui-font); letter-spacing: .2em; text-transform: uppercase;
+}
+html #app .tiempo-field > .field-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #b8935a80, transparent); }
+:root[data-theme="dark"] #app .tiempo-field > .field-label { color: #e0b77e; }
 /* Sin el circulito de marcado: en pastillas tan cortas tapaba el texto; lo elegido ya se ve por el color. */
 html #app .tiempo-segmented .segmented-option::after { content: none !important; }
 :root[data-theme="dark"] #app .tiempo-field .tiempo-segmented .segmented-option { color: #f5e6cc; background: #2c2118; border-color: #6d5435; box-shadow: none; }
