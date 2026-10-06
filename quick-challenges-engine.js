@@ -10,7 +10,7 @@
         !Array.isArray(config.rounds) || config.rounds.length < 1 || config.rounds.length > catalog.challenges.length) throw Error('INVALID_CONFIG');
     if (config.keep !== undefined && typeof config.keep !== 'boolean') throw Error('INVALID_CONFIG');
     // `first`: quién abre el primer reto (0 = el primero de la lista, 1 = el segundo); la revancha de un duelo lo alterna.
-    if (config.first !== undefined && !(config.first === 0 || config.first === 1)) throw Error('INVALID_CONFIG');
+    if (config.first !== undefined && !(Number.isInteger(config.first) && config.first >= 0 && config.first < config.names.length)) throw Error('INVALID_CONFIG');
     // `seconds`: plazo por jugada (0 = sin tiempo). Al agotarse se juega `timeoutPlacement`.
     if (config.seconds !== undefined && ![0, 15, 20, 30].includes(config.seconds)) throw Error('INVALID_CONFIG');
     const ids = new Set();

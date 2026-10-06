@@ -227,7 +227,7 @@
         ${keepField(` data-quick-keep-field${pace==='seguidos'?' hidden':''}`)}
         ${CT.Tiempo.field('amigos',{porDefecto:15})}
         ${identityField()}
-        ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 personas: todos jugáis a la vez, cada uno desde su móvil. Empieza quien crea la sala y después vais por turnos. Al crearla compartes el código, el enlace o el QR.</p></div>
+        ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 personas: todos jugáis a la vez, cada uno desde su móvil. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
           <div class="field"><label for="quick-net-players">Máximo de participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===4?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
           <div class="field duel-kind-field"><span class="field-label" id="quick-net-label">Conexión</span>
             <div class="segmented" role="radiogroup" aria-labelledby="quick-net-label">${[['internet','Por internet','Cada uno donde esté'],['wifi','Sin internet','Cerca, en la misma Wi‑Fi']].map(([key,title,foot])=>`<label class="segmented-option${key===net?' is-on':''}"><input type="radio" name="quick-live-net" value="${key}"${key===net?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`).join('')}</div></div>
@@ -284,8 +284,41 @@
   // Mesa pública de Retos rápidos: la misma sala de espera que en Grandes colecciones.
   // Empieza sola al completarse o, con al menos dos personas, cuando pasan 30 s sin que
   // entre nadie más; se puede dejar de buscar sin dejar la plaza ocupada.
+  // Quién empieza en una sala en directo, como en las colecciones: se sortea una carta, cada persona
+  // escribe su cifra y empieza quien más se acerca. En una mesa pública se sortea sola.
+  function roomStarterMarkup(auto) {
+    const host=myId===room.host, count=room.members.length, s=room.starter, head='<div class="section-label">Quién empieza</div>';
+    if(count<2)return `${head}<p class="hint">Cuando haya dos personas se sortea una carta y empieza quien más se acerque a su cifra.</p>`;
+    if(!s)return host&&!auto
+      ? `${head}<button type="button" class="btn btn-secondary btn-block" data-quick="room-starter-draw">🂠 Sortear con una carta quién empieza</button>`
+      : `${head}<p class="hint">${auto?'Sorteando la carta…':'El anfitrión sorteará una carta para decidir quién empieza.'}</p>`;
+    const card=CT.cards(s.modeKey).find(c=>c.id===s.cardId);
+    if(!card)return `${head}<p class="hint">Preparando la carta…</p>`;
+    const regla=CT.axis(s.modeKey).cifra||{}, mine=Number.isFinite(s.guesses[myId]), done=CT.QuickRoom.starterComplete(room);
+    const cardBox=detail=>`<div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${detail}</span></div>`;
+    const redo=host&&!auto?`<button type="button" class="btn btn-ghost btn-block" data-quick="room-starter-draw">🂠 Repetir el sorteo</button>`:'';
+    if(!mine)return `${head}${cardBox(esc(regla.pregunta||''))}<div class="field cifra-field"><label for="quick-room-starter-input">Tu respuesta${regla.unidad?` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>`:''}</label><input id="quick-room-starter-input" type="text" inputmode="${regla.decimales?'decimal':'numeric'}" autocomplete="off" enterkeyhint="send"><p class="hint">${esc(regla.pista||'')}</p></div><button type="button" class="btn btn-primary btn-block" data-quick="room-starter-guess">Adivinar <span>→</span></button>${redo}`;
+    if(!done){
+      const faltan=room.members.filter(who=>!Number.isFinite(s.guesses[who])).map(who=>esc(room.names[room.members.indexOf(who)]));
+      return `${head}${cardBox(esc(regla.pregunta||''))}<p class="hint">Has respondido. Esperando a: ${faltan.join(', ')}.</p>${redo}`;
+    }
+    const order=CT.QuickRoom.starterOrder(room);
+    const list=order.map((i,n)=>`<li${n===0?' class="starter-draw-winner"':''}><span>${n+1}.º ${esc(room.names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(s.modeKey,s.guesses[room.members[i]]))}</span></li>`).join('');
+    return `${head}${cardBox(`El valor real era ${esc(CT.formatValue(s.modeKey,card))}`)}<div class="starter-winner-banner"><b>${esc(room.names[order[0]])}</b><span>Empieza la partida</span></div><ol class="starter-draw-list">${list}</ol>${redo}`;
+  }
+  async function roomStarterAction(action) {
+    if(action==='room-starter-draw'){await networkAction({type:'starter-draw',...CT.QuickRoom.starterPick()});return true;}
+    if(action==='room-starter-guess'){
+      const field=app().querySelector('#quick-room-starter-input'), s=room?.starter;
+      const value=s?CT.Duelo.Cifras.leer(s.modeKey,field?field.value:''):null;
+      if(value===null){field?.setAttribute('aria-invalid','true');field?.focus();return true;}
+      await networkAction({type:'starter-guess',value});return true;
+    }
+    return false;
+  }
   function publicLobby() {
     clearInterval(publicClock);publicClock=null;
+    const draft=app().querySelector('#quick-room-starter-input')?.value||'';
     const count=room.members.length, cap=room.capacity, left=()=>connection?.secondsLeft?.() ?? 30;
     const clock=s=>`0:${String(Math.max(0,s)).padStart(2,'0')}`;
     const status=()=>count<2
@@ -300,7 +333,9 @@
     shell(`<section class="setup-section public-lobby"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${cap} jugadores</div><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="hint">Tres retos con las mismas cartas para toda la mesa. Arriesga para sumar aciertos o plántate para asegurarlos. ${connection?.seconds ? `${connection.seconds} s por carta.` : 'Sin límite de tiempo.'}</p>
       <div class="panel public-status" role="status" aria-live="polite">${status()}</div>
       <div class="panel public-roster"><div class="section-label">Jugadores <small>${count}/${cap}</small></div><ul class="public-seats">${seats}</ul></div>
+      <div class="panel public-starter">${roomStarterMarkup(true)}</div>
       ${button('leave-public','Dejar de buscar','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></section>`);
+    if(draft){const input=app().querySelector('#quick-room-starter-input');if(input&&!input.value)input.value=draft;}
     publicClock=setInterval(()=>{const el=document.getElementById('quick-public-clock');if(!el||page!=='network-lobby'){if(!el)clearInterval(publicClock);return;}const s=left();el.textContent=clock(s);el.classList.toggle('is-low',s<=5);},500);
   }
   // Sala privada: la misma mesa de exploradores que en Grandes colecciones, con las plazas
@@ -423,6 +458,7 @@
   function lobby(code) {
     if(room.matchmaking==='public'){state=null;publicLobby();return;}
     clearInterval(publicClock);publicClock=null;
+    const draft=app().querySelector('#quick-room-starter-input')?.value||'';
     state=null;const host=myId===room.host, cap=room.capacity, count=room.members.length;
     if(cap===2 && (duelRoom || !host)) {duelWaiting(code,host);return;}
     const slots=SEAT_SLOTS[cap]||SEAT_SLOTS[8], table=Array(9).fill('<div class="table-seat is-unused" aria-hidden="true"></div>');
@@ -436,13 +472,15 @@
     const side=host
       ? `<div class="section-label">Partida</div><p>${length} ${length===1?'reto':'retos'} con las mismas cartas para toda la mesa. El primer turno rota en cada reto.</p>
         ${count<2?'<div class="waiting-orbit"><span></span></div><p class="hint">Esperando a alguien más…</p>':''}
+        <div class="field starter-field">${roomStarterMarkup(false)}</div>
         ${button('start-room','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}
         ${connection?.kind==='local'?button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}`
-      : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`;
+      : `<div class="field starter-field">${roomStarterMarkup(false)}</div><div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`;
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera · Retos rápidos</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div>
       <div class="room-code-card"><small>${code?'Código de sala':'Red Wi-Fi local'}</small><strong>${code?esc(code):count+'/'+cap}</strong>${code?`<div class="room-invite-actions"><button data-quick="share-room">Compartir enlace</button><button data-quick="qr-room">Mostrar QR</button></div>`:''}</div></section>
       <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${count}/${cap}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${count}</strong><small>${count===1?'explorador':'exploradores'}</small></div>${table.join('')}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${side}<p id="quick-error" role="alert"></p></section></div>`);
+    if(draft){const input=app().querySelector('#quick-room-starter-input');if(input&&!input.value)input.value=draft;}
     const start=app().querySelector('[data-quick="start-room"]');if(start)start.disabled=count<2;
   }
   async function connectRoom(create) {
@@ -556,12 +594,13 @@
     await CT.LocalShare.scanQr({title,hint,onText:text=>{Promise.resolve(next(text)).catch(errorNotice);}});
   }
   async function formatAction(action) {
+    if(action==='room-starter-draw'||action==='room-starter-guess')return roomStarterAction(action);
     if(action==='formats'){toEntry();return true;}
     if(action==='leave-public'){const leaving=connection;connection=null;clearInterval(publicClock);await leaving?.leave?.();toEntry();return true;}
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(action==='live-room'){const net=app().querySelector('input[name="quick-live-net"]:checked')?.value||liveNet();netKind=net==='wifi'?'local':'internet';await connectRoom(true);return true;}
     if(action==='create-room'||action==='join-room'){justJoined=action==='join-room';await connectRoom(action==='create-room');return true;}
-    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count),kind:(room?.capacity||roomCapacity)===2?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...((room?.capacity||roomCapacity)===2?{first:duelFirst}:{})});return true;}
+    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count),kind:(room?.capacity||roomCapacity)===2?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...((room?.capacity||roomCapacity)===2?{first:duelFirst}:(()=>{const order=room?CT.QuickRoom.starterOrder(room):null;return Number.isInteger(order?.[0])?{first:order[0]}:{};})())});return true;}
     if(action==='rematch-room'){
       const cfg=state.config, me=state.players[room.members.indexOf(myId)].name, other=room.members.find(m=>m!==myId);
       await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:me!==cfg.names[cfg.first||0],invite:other?{uid:other,name:room.names[room.members.indexOf(other)]}:null,back:backTo});
@@ -879,7 +918,7 @@
     const target = event.target.closest('[data-quick]');
     if (!target || !app().contains(target) || !paint) return;
     const action = target.dataset.quick;
-    const formatActions=['live-room','formats','leave-public','share-duel','create-room','join-room','start-room','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect','duels-list','rematch-room','accept-invite','decline-invite','back-invite'];
+    const formatActions=['live-room','formats','leave-public','share-duel','create-room','join-room','start-room','room-starter-draw','room-starter-guess','share-room','qr-room','qr-signal','scan-code','scan-answer','share-signal','invite-peer','accept-answer','reconnect','duels-list','rematch-room','accept-invite','decline-invite','back-invite'];
     if(formatActions.includes(action)){target.disabled=true;Promise.resolve(formatAction(action)).catch(errorNotice).finally(()=>{if(target.isConnected)target.disabled=false;});return;}
     if (action === 'add-player' || action === 'remove-player') {
       const names = [...app().querySelectorAll('[data-quick-name]')].map(el => el.value);

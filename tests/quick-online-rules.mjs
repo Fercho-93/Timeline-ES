@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
 import {collection,deleteDoc,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
-const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
+const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','cartera.js','tournament.js','final.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
 const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
 const rounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
 const host=env.authenticatedContext('host').firestore(),guest=env.authenticatedContext('guest').firestore(),out=env.authenticatedContext('outsider').firestore();
@@ -94,7 +94,14 @@ try {
   await wait(()=>publicRooms.host?.members.length===2 && publicRooms.guest?.members.length===2);
   const queue=await getDoc(doc(host,'quickPublicQueues','quick:2:v1:1'));
   assert.equal(queue.data().status,'full');
+  // Con dos personas la mesa sortea sola la carta de «quién empieza» y no arranca hasta que las dos responden.
+  await wait(()=>publicRooms.host?.starter && publicRooms.guest?.starter);
+  assert.equal(publicRooms.host.phase,'lobby','la mesa espera las respuestas');
+  await first.act({type:'starter-guess',value:1900});
+  await assert.rejects(first.act({type:'starter-guess',value:1800}),'no se puede cambiar la respuesta');
+  await second.act({type:'starter-guess',value:5});
   await wait(()=>publicRooms.guest?.phase==='turn');
+  assert.equal(publicRooms.guest.config.first,R.starterOrder(publicRooms.guest)[0],'empieza quien más se acercó');
   assert.deepEqual(failures,[]);
   first.close();second.close();
   // Mesa abandonada: quien la abrió se fue y su cola lleva más de dos minutos sin
@@ -116,6 +123,26 @@ try {
   await assertFails(env.withSecurityRulesDisabled(async()=>{}).then(()=>setDoc(doc(out,'quickPublicQueues','quick:2:v1:1'),{code:'YYYYYYYYY2',status:'waiting',capacity:2,updatedAt:serverTimestamp()})));
   assert.deepEqual(failures,[]);
   nueva.close();
+  // Quién empieza en una sala en directo: sortea quien la lleva, cada uno responde una vez y solo la suya.
+  await env.clearFirestore();
+  {
+    const pick=R.starterPick();
+    let sala=R.create('host','Ana',4);await assertSucceeds(write(host,sala));
+    sala=R.reduce(sala,'guest',{type:'join',name:'Bea'});await assertSucceeds(write(guest,sala));
+    await assertFails(write(guest,R.reduce(sala,'host',{type:'starter-draw',...pick})));
+    const sorteada=R.reduce(sala,'host',{type:'starter-draw',...pick});await assertSucceeds(write(host,sorteada));
+    const respuestaDeBea=R.reduce(sorteada,'guest',{type:'starter-guess',value:1900});
+    await assertFails(write(host,respuestaDeBea));
+    await assertFails(write(out,respuestaDeBea));
+    await assertSucceeds(write(guest,respuestaDeBea));
+    await assertFails(write(guest,{...respuestaDeBea,revision:respuestaDeBea.revision+1,starter:{...respuestaDeBea.starter,guesses:{guest:1}}}));
+    const respuestaDeAna=R.reduce(respuestaDeBea,'host',{type:'starter-guess',value:2000});await assertSucceeds(write(host,respuestaDeAna));
+    const conPrimero=R.reduce(respuestaDeAna,'host',{type:'start',rounds,first:1});
+    assert.equal(conPrimero.config.first,1);
+    const mal={...conPrimero,config:{...conPrimero.config,first:5}};
+    await assertFails(write(host,mal));
+    await assertSucceeds(write(host,conPrimero));
+  }
   // Dejar una mesa pública antes de empezar: se libera la plaza y, si se va quien la
   // llevaba, la lleva quien queda primero.
   await env.clearFirestore();

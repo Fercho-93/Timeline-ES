@@ -22,10 +22,15 @@ service cloud.firestore {
     // únicamente durante su turno; todos reconstruyen el marcador con el mismo motor.
     match /quickRooms/{code} {
       function valid(d) {
-        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','invitedUid','invitedName','resigned','declined','updatedAt'])
+        return d.keys().hasOnly(['version','capacity','host','members','names','config','commands','revision','phase','actor','catalog','matchmaking','invitedUid','invitedName','resigned','declined','starter','updatedAt'])
           && (!('invitedUid' in d.keys()) || (d.invitedUid is string && d.invitedUid.size() > 0 && d.invitedUid.size() <= 128 && d.invitedUid != d.host))
           && (!('invitedName' in d.keys()) || (d.invitedName is string && d.invitedName.size() <= 24))
           && (!('resigned' in d.keys()) || d.resigned in d.members)
+          // Minijuego de quién empieza: carta sorteada y respuestas de quienes están en la mesa.
+          && (!('starter' in d.keys()) || (d.starter.keys().hasOnly(['modeKey','cardId','guesses'])
+              && d.starter.modeKey is string && d.starter.modeKey.size() >= 1 && d.starter.modeKey.size() <= 32
+              && d.starter.cardId is int && d.starter.guesses is map && d.starter.guesses.size() <= 8
+              && d.starter.guesses.keys().toSet().difference(d.members.toSet()).size() == 0))
           && (!('declined' in d.keys()) || d.declined == d.get('invitedUid', ''))
           && d.version == 1 && d.capacity is int && d.capacity >= 2 && d.capacity <= 8 && d.host is string && d.catalog is int
           && d.members is list && d.members.size() >= 1 && d.members.size() <= d.capacity
@@ -83,10 +88,25 @@ service cloud.firestore {
       function leaving(a,b) {
         return a.get('matchmaking','private') == 'public' && a.phase == 'lobby' && b.phase == 'lobby'
           && request.auth.uid in a.members && !(request.auth.uid in b.members)
-          && b.diff(a).affectedKeys().hasOnly(['members','names','host','actor','revision','updatedAt'])
+          && b.diff(a).affectedKeys().hasOnly(['members','names','host','actor','starter','revision','updatedAt'])
           && b.members.size() == a.members.size() - 1 && b.members.size() >= 1
           && b.members.toSet() == a.members.toSet().difference([request.auth.uid].toSet())
           && b.names.size() == b.members.size() && b.host == b.members[0] && b.actor == b.host;
+      }
+      // Quién empieza: quien lleva la sala sortea una carta (y repetirlo borra las respuestas) y cada
+      // persona responde una vez, solo con su propia cifra.
+      function drawing(a,b) {
+        return a.phase == 'lobby' && request.auth.uid == a.host && a.members.size() >= 2 && 'starter' in b.keys()
+          && b.diff(a).affectedKeys().hasOnly(['starter','revision','updatedAt'])
+          && b.starter.guesses.size() == 0;
+      }
+      function guessing(a,b) {
+        return a.phase == 'lobby' && 'starter' in a.keys() && request.auth.uid in a.members
+          && !(request.auth.uid in a.starter.guesses)
+          && b.diff(a).affectedKeys().hasOnly(['starter','revision','updatedAt'])
+          && b.starter.diff(a.starter).affectedKeys().hasOnly(['guesses'])
+          && b.starter.guesses.diff(a.starter.guesses).affectedKeys().hasOnly([request.auth.uid])
+          && b.starter.guesses[request.auth.uid] is number;
       }
       function starting(a,b) {
         return request.auth.uid == a.host && a.phase == 'lobby'
@@ -95,11 +115,14 @@ service cloud.firestore {
           // un rato sin que entre nadie (la pantalla cuenta 30 s; aquí se exigen 25).
           && (a.get('matchmaking','private') != 'public' || a.members.size() == a.capacity
               || a.updatedAt < request.time - duration.value(25, 's'))
-          && b.diff(a).affectedKeys().hasOnly(['config','phase','revision','updatedAt'])
+          // Con `first`, el turno empieza en esa persona: `actor` pasa a ser ella.
+          && b.diff(a).affectedKeys().hasOnly(['config','phase','actor','revision','updatedAt'])
+          && (b.actor == a.actor || ('first' in b.config.keys() && a.members.size() >= 2 && b.actor == a.members[b.config.first]))
           && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep','first','seconds'])
           && (!('seconds' in b.config.keys()) || b.config.seconds in [15, 20, 30])
           && (!('keep' in b.config.keys()) || b.config.keep is bool)
-          && (!('first' in b.config.keys()) || (b.config.first in [0,1] && a.members.size() == 1))
+          && (!('first' in b.config.keys()) || ((b.config.first in [0,1] && a.members.size() == 1)
+              || (a.members.size() >= 2 && b.config.first is int && b.config.first >= 0 && b.config.first < a.members.size())))
           && (b.config.names == a.names || (a.members.size() == 1 && b.config.names.size() == 2 && b.config.names[0] == a.names[0]
               && b.config.names[1] is string && b.config.names[1].size() > 0 && b.config.names[1].size() <= 24))
           && b.config.rounds is list && b.config.rounds.size() in [1,3,5]
@@ -135,7 +158,7 @@ service cloud.firestore {
         && request.resource.data.revision==0 && request.resource.data.phase=='lobby';
       allow update: if registered() && valid(request.resource.data)
         && request.resource.data.revision==resource.data.revision+1
-        && (playing(resource.data,request.resource.data) || joining(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || starting(resource.data,request.resource.data));
+        && (starting(resource.data,request.resource.data) || joining(resource.data,request.resource.data) || drawing(resource.data,request.resource.data) || guessing(resource.data,request.resource.data) || leaving(resource.data,request.resource.data) || playing(resource.data,request.resource.data) || joiningStarted(resource.data,request.resource.data) || resigning(resource.data,request.resource.data) || declining(resource.data,request.resource.data));
       allow delete: if registered() && request.auth.uid==resource.data.host
         && (!(resource.data.capacity==2 && resource.data.config!=null && resource.data.config.get('kind','')=='duel')
           || (resource.data.members.size()==1 && resource.data.phase!='finished'));

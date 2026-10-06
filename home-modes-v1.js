@@ -208,7 +208,7 @@
       <div class="field" data-public-deck${choice.kind === 'quick' ? ' hidden' : ''}><label for="public-create-mode">Mazo</label><select id="public-create-mode"><option value="">Al azar</option>${decks.map(([key, m]) => `<option value="${escapeHtml(key)}"${key === choice.mode ? ' selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}</select></div>
       <div class="field"><span class="field-label">Jugadores</span>${pills('capacity', [[2, '2'], [3, '3'], [4, '4']], choice.capacity, 3)}</div>
       ${CT?.Tiempo?.field?.('publica', { porDefecto: 30 }) || ''}
-      <p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más. Quién empieza se decide con un minijuego de adivinar la cifra de una carta (en Retos rápidos, empieza quien abre la mesa).</p>
+      <p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más. Quién empieza se decide con un minijuego: cada uno adivina la cifra de una carta.</p>
       <button type="button" class="btn btn-primary btn-block" data-action="public-create-go">Abrir mesa</button>
     </div>`, modeArt['online-hub']);
   }

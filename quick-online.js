@@ -111,12 +111,21 @@ async function watchPublic({uid,code,seconds,queueRef:qref=null,onChange,onError
   // PUBLIC_WAIT_MS sin que entre nadie (la hora es la de la última entrada, del
   // servidor). La arranca quien la lleva; si las reglas aún no lo permiten, se reintenta.
   const secondsLeft=()=>{const last=latest?.updatedAt?.toMillis?.();return Number.isFinite(last)?Math.max(0,Math.ceil((last+PUBLIC_WAIT_MS-Date.now())/1000)):PUBLIC_WAIT_MS/1000;};
+  let drawingStarter=false;
   const tryStart=()=>{
     if(!latest||latest.config||latest.phase!=='lobby'||latest.host!==uid||latest.members.length<2||started)return;
-    if(latest.members.length<latest.capacity&&secondsLeft()>0)return;
+    // Con dos personas se sortea la carta de «quién empieza», como en las colecciones.
+    if(!latest.starter){
+      if(!drawingStarter){drawingStarter=true;api.act({type:'starter-draw',...R.starterPick()}).catch(()=>{}).finally(()=>{setTimeout(()=>{drawingStarter=false;},2000);});}
+      return;
+    }
+    // Empieza al completarse la mesa con todas las respuestas o, con al menos dos personas, al agotarse la espera.
+    const ready=latest.members.length>=latest.capacity&&R.starterComplete(latest);
+    if(!ready&&secondsLeft()>0)return;
     started=true;
     const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,3);
-    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code,...(tableSeconds?{seconds:tableSeconds}:{})}).catch(()=>{setTimeout(()=>{started=false;},2000);});
+    const first=R.starterOrder(latest)?.[0];
+    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code,...(tableSeconds?{seconds:tableSeconds}:{}),...(Number.isInteger(first)?{first}:{})}).catch(e=>{setTimeout(()=>{started=false;},2000);});
   };
   const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);syncTable();tryStart();
   }catch(e){onError(e);}},onError);

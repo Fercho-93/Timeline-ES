@@ -80,3 +80,22 @@ console.log('Sala de Retos: capacidad, identidad, turnos, revisiones, inmutabili
   assert.throws(()=>R.reduce(m,'b',{type:'resign'}),/rendir/,'las mesas de varios no tienen rendirse');
 }
 console.log('Duelo por turnos: empieza el creador, el amigo entra después y el primer turno alterna: OK');
+
+{
+  // Quién empieza en una sala en directo: sortea quien la lleva, cada uno responde una vez y quien gana abre el primer reto.
+  let t=R.create('a','Ana',4);t=R.reduce(t,'b',{type:'join',name:'Bea'});t=R.reduce(t,'c',{type:'join',name:'Cid'});
+  assert.throws(()=>R.reduce(t,'b',{type:'starter-draw',modeKey:'history',cardId:1}),/sortear/);
+  t=R.reduce(t,'a',{type:'starter-draw',modeKey:'history',cardId:1});
+  assert.equal(JSON.stringify(t.starter.guesses),'{}');
+  assert.throws(()=>R.reduce(t,'z',{type:'starter-guess',value:5}),/responder/);
+  t=R.reduce(t,'b',{type:'starter-guess',value:1900});
+  assert.throws(()=>R.reduce(t,'b',{type:'starter-guess',value:1800}),/responder/,'no se puede cambiar la respuesta');
+  assert.throws(()=>R.reduce(t,'c',{type:'starter-guess',value:NaN}),/responder/);
+  t=R.reduce(t,'c',{type:'starter-guess',value:5});
+  const empezada=R.reduce(t,'a',{type:'start',rounds,first:2});
+  assert.equal(empezada.config.first,2);assert.equal(empezada.actor,'c','abre el reto quien ganó el minijuego');
+  assert.equal(R.reduce(t,'a',{type:'start',rounds,first:9}).config.first,undefined,'un puesto que no existe se ignora');
+  assert.equal(JSON.stringify(R.reduce(t,'a',{type:'starter-draw',modeKey:'history',cardId:2}).starter.guesses),'{}','repetir el sorteo borra las respuestas');
+  assert.throws(()=>R.validate({...t,starter:{modeKey:'history',cardId:1,guesses:{x:5}}}),/no válida/,'respuestas de quien no está en la mesa');
+}
+console.log('Quién empieza en una sala en directo: sorteo, respuesta única y primer turno: OK');

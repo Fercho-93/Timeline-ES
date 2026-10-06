@@ -31,6 +31,12 @@
       const derived = metadata(copy(room));
       if (derived.actor !== room.actor || derived.phase !== room.phase) throw Error('Turno no válido.');
     } else if (room.phase !== 'lobby' || room.actor !== room.host || room.commands.length) throw Error('Sala no válida.');
+    // El minijuego de quién empieza: una carta sorteada y la cifra de cada persona.
+    if (room.starter !== undefined) {
+      const s = room.starter;
+      if (!s || typeof s.modeKey !== 'string' || !s.modeKey || s.modeKey.length > 32 || !Number.isInteger(s.cardId) || !s.guesses || typeof s.guesses !== 'object'
+          || Object.entries(s.guesses).some(([who, value]) => !room.members.includes(who) || !Number.isFinite(value))) throw Error('Sala no válida.');
+    }
     return room;
   }
   function reduce(input, id, action, revision = input.revision) {
@@ -52,7 +58,16 @@
       const at = r.members.indexOf(id);
       if (r.matchmaking !== 'public' || r.phase !== 'lobby' || at < 0 || r.members.length < 2) throw Error('No se puede salir ahora.');
       r.members.splice(at, 1); r.names.splice(at, 1);
+      if (r.starter) delete r.starter.guesses[id];
       r.host = r.members[0]; r.actor = r.host;
+    } else if (action.type === 'starter-draw') {
+      // Sortear la carta: solo quien lleva la sala, con al menos dos personas; repetirlo borra las respuestas.
+      if (r.phase !== 'lobby' || id !== r.host || r.members.length < 2 || typeof action.modeKey !== 'string' || !action.modeKey || action.modeKey.length > 32 || !Number.isInteger(action.cardId)) throw Error('No se puede sortear ahora.');
+      r.starter = {modeKey: action.modeKey, cardId: action.cardId, guesses: {}};
+    } else if (action.type === 'starter-guess') {
+      // Cada persona responde una vez, sin poder cambiarla después de ver las demás.
+      if (r.phase !== 'lobby' || !r.starter || !r.members.includes(id) || id in r.starter.guesses || !Number.isFinite(action.value)) throw Error('No puedes responder ahora.');
+      r.starter.guesses[id] = action.value;
     } else if (action.type === 'decline') {
       // Rechazar un reto dirigido sin haberlo aceptado: el duelo se cierra y a quien retó le sale cancelado.
       if (!r.config || !r.invitedUid || r.invitedUid !== id || r.members.includes(id) || r.phase === 'finished' || r.declined) throw Error('No puedes rechazar este reto.');
@@ -65,7 +80,7 @@
       // Un duelo por turnos lo empieza quien lo crea, sin esperar al amigo: su sitio queda reservado hasta que abra el enlace.
       const alone = r.capacity === 2 && r.members.length === 1 && action.kind === 'duel' && r.matchmaking !== 'public';
       if (id !== r.host || r.phase !== 'lobby' || (r.members.length < 2 && !alone)) throw Error('Solo quien crea la sala puede empezar, con al menos dos personas.');
-      r.config = {names:alone ? [...r.names, FRIEND] : r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null, ...(typeof action.keep === 'boolean' ? {keep: action.keep} : {}), ...([15, 20, 30].includes(action.seconds) ? {seconds: action.seconds} : {}), ...(alone && (action.first === 0 || action.first === 1) ? {first: action.first} : {})}; E.create(r.config); metadata(r);
+      r.config = {names:alone ? [...r.names, FRIEND] : r.names, rounds:action.rounds, kind: action.kind || (r.capacity === 2 ? 'duel' : 'network'), historyId: action.historyId || null, ...(typeof action.keep === 'boolean' ? {keep: action.keep} : {}), ...([15, 20, 30].includes(action.seconds) ? {seconds: action.seconds} : {}), ...(alone ? (action.first === 0 || action.first === 1 ? {first: action.first} : {}) : (Number.isInteger(action.first) && action.first >= 0 && action.first < r.members.length ? {first: action.first} : {}))}; E.create(r.config); metadata(r);
     } else {
       if (!r.config || r.phase === 'finished' || id !== r.actor) throw Error('Espera tu turno.');
       const now = state(r);
@@ -78,5 +93,17 @@
     r.revision++;
     return validate(r);
   }
-  CT.QuickRoom = {create, reduce, record, state, validate};
+  // Orden del minijuego: índices de la mesa de quien más se acercó a quien menos (quien no respondió, al final).
+  function starterOrder(room) {
+    if (!room.starter) return null;
+    const ids = CT.Starter.order(room.starter.modeKey, room.starter.cardId, room.members.map(who => ({id: who, value: Number.isFinite(room.starter.guesses[who]) ? room.starter.guesses[who] : null})));
+    return ids.map(who => room.members.indexOf(who));
+  }
+  // Carta del minijuego: de una colección al azar que se pueda responder con una cifra.
+  function starterPick() {
+    const modeKey = CT.shuffle(CT.Tournament.modes())[0];
+    return {modeKey, cardId: CT.shuffle(CT.cards(modeKey))[0].id};
+  }
+  const starterComplete = room => !!room.starter && room.members.every(who => Number.isFinite(room.starter.guesses[who]));
+  CT.QuickRoom = {create, reduce, record, state, validate, starterOrder, starterComplete, starterPick};
 })();

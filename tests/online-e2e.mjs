@@ -172,6 +172,8 @@ try {
   await filaK.waitFor({ timeout: 20000 }).catch(() => {});
   ok('también se anuncian las mesas de Retos rápidos', (await filaK.count()) === 1 && /Retos rápidos/.test(await filaK.textContent()) && /20 s por carta/.test(await filaK.textContent()));
   await filaK.locator('[data-action="public-join"]').click();
+  // La mesa llena sortea la carta de quién empieza y arranca en cuanto responden las dos personas.
+  for (const p of [k1, k2]) { await p.page.locator('#quick-room-starter-input').waitFor({ timeout: 20000 }); await p.page.fill('#quick-room-starter-input', '1900'); await p.click('[data-quick="room-starter-guess"]', { wait: 600 }); }
   await k2.page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'quick-game' || /reto 1 de 3/i.test(document.body.textContent), null, { timeout: 30000 }).catch(() => {});
   ok('con la mesa llena empieza el reto con su tiempo por carta', /reto 1 de 3/i.test(flat(await k2.text())));
   for (const p of [m1, m2, k1, k2]) {
@@ -194,6 +196,12 @@ try {
   await quick(q2);
   await q1.page.waitForTimeout(1500);
   ok('con dos personas corre la cuenta atrás', /empieza en 0:\d\d/.test(flat(await q2.text())));
+  // Quién empieza, como en las colecciones: se sortea una carta y cada uno escribe su cifra.
+  await q2.page.locator('#quick-room-starter-input').waitFor({ timeout: 15000 }).catch(() => {});
+  ok('la mesa sortea sola una carta para decidir quién empieza', await q2.page.locator('.public-starter .starter-card').count() === 1);
+  for (const p of [q1, q2]) { await p.page.fill('#quick-room-starter-input', '1900'); await p.click('[data-quick="room-starter-guess"]', { wait: 800 }); }
+  await q1.page.waitForTimeout(1200);
+  ok('con las dos respuestas se ve quién empieza', /Empieza la partida/i.test(flat(await q2.text())) && /Empieza la partida/i.test(flat(await q1.text())));
   await q2.shot('e2e-05-retos');
   await q2.page.waitForFunction(() => !document.querySelector('.public-lobby'), null, { timeout: 60000 }).catch(() => {});
   ok('y la partida de Retos rápidos empieza sola', !(await q2.page.locator('.public-lobby').count()) && /reto 1 de 3/i.test(flat(await q2.text())));
