@@ -249,6 +249,7 @@
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     competition = options.competition || null;
     lobbySettings.turnSeconds = String(CT.Tiempo.get("amigos", 15));
+    lobbySettings.handSize = String(CT.ManoInicial?.get?.() ?? 4);
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
@@ -653,7 +654,7 @@
       ? `<div class="section-label">Ajustes</div>
         <div class="field"><label for="wifi-preset">Tipo de partida</label><select id="wifi-preset">${opcion("simple", "Primera partida · sin poderes", lobbySettings.preset)}${opcion("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}${lobbySettings.preset === "custom" ? opcion("custom", "Personalizada", lobbySettings.preset) : ""}</select></div>
         ${CT.Tiempo.field("amigos", { valor: lobbySettings.turnSeconds, nombre: "wifi-turn-seconds" })}
-        ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} cartas por persona.</p>` : `<div class="field"><label for="wifi-hand-size">Cartas iniciales</label><select id="wifi-hand-size">${[1, 2, 3, 4, 5, 6].map(n => opcion(n, n, lobbySettings.handSize)).join("")}</select></div>`}
+        ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} cartas por persona.</p>` : `<div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div>`}
         <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="wifi-pulse"${lobbySettings.pulse ? " checked" : ""}></label>
         <label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="wifi-ghost"${lobbySettings.ghost ? " checked" : ""}></label>
         ${CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(true) : roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}`

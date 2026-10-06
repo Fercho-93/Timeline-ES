@@ -227,17 +227,17 @@ ok("la invitada pasa sola al vestíbulo", pantalla(invitada) === "local-lobby" &
 
 console.log("\nMinijuego de quién empieza, igual que en la sala online");
 ok("sin minijuego no se puede barajar todavía", !anfitrion.document.querySelector('[data-local-action="start"]') && !!anfitrion.document.querySelector('[data-local-action="starter-draw"]'));
-elige(anfitrion, "wifi-hand-size", "2");
+ok("la sala ya no pregunta las cartas iniciales: las enseña", !anfitrion.document.querySelector("select#wifi-hand-size") && /4 por persona/.test(html(anfitrion)));
 elige(anfitrion, "wifi-turn-seconds", "0");
 await minijuego(anfitrion, invitada, invitada);
 await until(() => invitada.document.querySelectorAll(".starter-draw-list li").length === 2);
 ok("los dos móviles ven el orden de juego", invitada.document.querySelectorAll(".starter-draw-list li").length === 2 && /1\.º Ana/.test(invitada.document.querySelector(".starter-draw-list").textContent));
-ok("los ajustes elegidos no se pierden al repintar la sala", anfitrion.document.getElementById("wifi-hand-size").value === "2");
+ok("los ajustes elegidos no se pierden al repintar la sala", anfitrion.document.querySelector('input[name="wifi-turn-seconds"]:checked')?.value === "0");
 click(anfitrion, '[data-local-action="start"]');
 await until(() => pantalla(invitada) === "local-game");
 ok("la partida arranca en los dos móviles", pantalla(anfitrion) === "local-game" && pantalla(invitada) === "local-game");
 ok("empieza quien más se acercó en el minijuego", /Tu turno/.test(invitada.document.querySelector(".turn-name").textContent));
-ok("el anfitrión ve su propia mano (antes la pantalla se rompía)", anfitrion.document.querySelectorAll(".hand-card").length === 2 && !erroresAnfitrion.length);
+ok("el anfitrión ve su propia mano (antes la pantalla se rompía)", anfitrion.document.querySelectorAll(".hand-card").length === 4 && !erroresAnfitrion.length);
 ok("sin límite de tiempo no se enseña reloj", !anfitrion.document.getElementById("turn-timer"));
 
 // Se juega bien, para que la partida termine en pocas vueltas: el hueco correcto se
@@ -300,7 +300,6 @@ ok("y hay que volver a jugar el minijuego", !anfitrion.document.querySelector('[
 
 console.log("\nReloj del turno, poderes y menú de la sala");
 elige(anfitrion, "wifi-turn-seconds", "20");
-elige(anfitrion, "wifi-hand-size", "4");
 elige(anfitrion, "wifi-preset", "advanced");
 ok("la partida avanzada activa Pulso y Fantasma", anfitrion.document.getElementById("wifi-pulse").checked && anfitrion.document.getElementById("wifi-ghost").checked);
 await minijuego(anfitrion, invitada, anfitrion);

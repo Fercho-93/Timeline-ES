@@ -65,4 +65,21 @@
     return { stop() { parado = true; clearInterval(id); } };
   }
   CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido };
+
+  // Cartas iniciales por persona de las partidas en directo con amigos: se eligen en la pantalla
+  // previa y la sala de espera (online o Wi‑Fi) solo las enseña.
+  const MANO = [1, 2, 3, 4, 5, 6], CLAVE_MANO = "continuum-live-hand-v1";
+  function mano() {
+    try { const v = Number(CT.Storage.getItem(CLAVE_MANO)); if (MANO.includes(v)) return v; } catch { /* sin almacenamiento */ }
+    return 4;
+  }
+  function manoField(id = "live-hand-size") {
+    const actual = mano();
+    return `<div class="field"><label for="${id}">Cartas iniciales por persona</label><select id="${id}" data-mano-inicial>${MANO.map(n => `<option value="${n}"${n === actual ? " selected" : ""}>${n}</option>`).join("")}</select></div>`;
+  }
+  document.addEventListener("change", event => {
+    const select = event.target.closest?.("select[data-mano-inicial]");
+    if (select && MANO.includes(Number(select.value))) { try { CT.Storage.setItem(CLAVE_MANO, String(Number(select.value))); } catch { /* almacenamiento lleno */ } }
+  });
+  CT.ManoInicial = { get: mano, field: manoField };
 })();

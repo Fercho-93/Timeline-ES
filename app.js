@@ -2575,6 +2575,7 @@
         <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
       </div>
       ${bloque("directo", `<div class="duel-brief"><p>Una sala de 2 a 9 personas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Al crearla compartes el código, el enlace o el QR.</p></div>
+        ${CT.ManoInicial.field()}
         <div class="field duel-kind-field">
           <span class="field-label" id="live-net-label">Conexión</span>
           <div class="segmented" role="radiogroup" aria-labelledby="live-net-label">
