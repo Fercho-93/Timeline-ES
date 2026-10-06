@@ -3,6 +3,7 @@ import {createServer} from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
+// ENGINES=chromium limita la prueba a Chromium donde no hay WebKit instalado (por defecto, los dos).
 const {webkit, chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
 import {gameHtml} from './game-fixture.mjs';
 const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
@@ -24,9 +25,9 @@ await fs.mkdir(destination,{recursive:true});
 const records=[];
 let browser;
 try {
-  for(const [engine,type] of [['webkit',webkit],['chromium',chromium]]) {
+  for(const [engine,type] of [['webkit',webkit],['chromium',chromium]].filter(([name])=>(process.env.ENGINES||'webkit,chromium').split(',').includes(name))) {
     if(process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE!==engine)continue;
-    browser=await type.launch();
+    browser=await type.launch(engine === 'chromium' && process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {});
     for(const {width,height} of [{width:320,height:568},{width:375,height:667},{width:390,height:640},{width:390,height:844},{width:430,height:932},{width:600,height:800}]) {
       for(const format of ['solo','local','competition','quick']) {
         const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
@@ -40,6 +41,7 @@ try {
             await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
             await page.locator('[data-solo-route="quick"]').click();
             await page.locator('[data-quick="start-free"]').click();
+            await page.evaluate(()=>document.querySelector('[data-quick-splash]')?.click());
             await page.locator('[data-quick="ready"]').click();
           } else if(format==='competition') {
             await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));

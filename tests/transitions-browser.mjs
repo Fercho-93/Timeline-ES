@@ -39,20 +39,21 @@ try {
       assert.deepEqual(active, [], 'no reaparece una segunda animación');
       assert.equal(await page.locator('.camera-move, .profile-roll-edge').count(), 0);
     };
-    // Todas las salidas superiores, incluido el cierre mientras aún entra el panel.
+    // Todas las salidas superiores, incluido el cierre mientras aún entra el panel. La barra superior
+    // de Inicio flota sobre la portada y solo toma alto cuando recibe el botón de sonido: no es fondo.
     for (const [open, close] of [
       ['[data-action="rules"]', '.rules .atlas-dialog-back'],
       ['[data-settings-action="open"]', '.settings-modal .atlas-dialog-back']
     ]) {
       for (const quick of [false, true]) {
-        const backgroundOpacity = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
+        const backgroundOpacity = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil):not(.atlas-topbar)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
         await page.locator('.home-nav ' + open).click();
         if (!quick) await settle();
         await page.locator(close).first().click();
         await page.waitForFunction(() => document.querySelector('#app > .shell > .home-nav') && (!document.querySelector('.overlay') || document.querySelector('.dialog-exit')));
         await page.waitForFunction(() => !document.querySelector('.dialog-exit, .enc-modal, .rules, .settings-modal') && document.querySelector('#app').dataset.screen !== 'perfil');
         assert.equal(await page.locator('#app > .shell.motion-entering').count(), 0, `${open} (rápido=${quick}): volver no inicia un segundo fundido`);
-        const alphas = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
+        const alphas = await page.locator('#app > .shell > :not(.home-nav):not(.atlas-scroll-veil):not(.atlas-topbar)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => getComputedStyle(node).opacity));
         assert.deepEqual(alphas, backgroundOpacity, 'el fondo conserva su opacidad al regresar');
       }
     }
@@ -64,18 +65,18 @@ try {
     }
     await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
     await settle();
-    await page.locator('[data-action="toggle-play-catalog"][data-section="collections"]').click();
+    // Jugar solo → Grandes colecciones → mazo; después, el mismo mazo en un solo móvil y vuelta.
+    await page.locator('[data-inline-route="collections"]').click();
     await settle();
     await page.locator('[data-block="historia"]').click();
     await settle();
     await page.locator('[data-mode="history"]').click();
     await settle();
-    await page.locator('[data-format="multi"]').click();
+    await page.evaluate(() => window.CONTINUUM.openDeckAs('local'));
     await settle();
-    await page.locator('[data-action="setup"]').click();
-    await settle();
+    // Volver y volver a entrar mientras aún entra la pantalla anterior.
     await page.locator('[data-action="back-menu"]').click();
-    await page.locator('[data-action="solo"]').click();
+    await page.evaluate(() => window.CONTINUUM.openDeckAs('collections'));
     await settle();
     // Navegación durante una entrada: la limpieza antigua no toca la nueva.
     await page.locator('.home-nav [data-action="home-top"]').click();

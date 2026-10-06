@@ -25,7 +25,8 @@ try{
    await CT.Quick.openRoom((markup,playing)=>CT.paint(document.getElementById('app'),markup,playing?'quick-game':'quick-challenges'),'ABCDEFGH23',()=>{});
   });
   await page.locator('.hand-card .quick-card-artist').first().waitFor();
-  assert.equal(await page.locator('.hand-card .quick-card-artist').count(),8);
+  // Todas las cartas del reto menos la que abre la línea, sea cual sea el tamaño del mazo.
+  assert.equal(await page.locator('.hand-card .quick-card-artist').count(),await page.evaluate(()=>CONTINUUM.QuickEngine.challenge('albums-sales').cards.length-1));
   assert.equal(await page.locator('.timeline-card .quick-card-artist').innerText(),'Led Zeppelin');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'No horizontal overflow');
   const bounds=await page.locator('.fan-center strong').evaluate(el=>({client:el.clientHeight,scroll:el.scrollHeight}));

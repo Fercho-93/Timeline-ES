@@ -28,15 +28,14 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
     await page.evaluate(() => window.CONTINUUM_SPLASH?.finish());
-    await page.locator('[data-action="jugar"]').click();
-    const sizes = await page.locator('.gallery-panel').evaluateAll(els => els.map(el => ({w:el.getBoundingClientRect().width,h:el.getBoundingClientRect().height})));
-    assert.ok(sizes.length >= 2);
-    for (const size of sizes.slice(-2)) assert.deepEqual(size, sizes[0], 'Los nuevos bloques tienen el tamaño de las colecciones');
+    // Inicio → Jugar → Jugar con amigos → Un solo móvil → Retos rápidos.
+    await page.locator('[data-action="toggle-modes"]').click();
+    await page.locator('[data-action="friends-hub"]').click();
+    await page.locator('[data-action="local-hub"]').click();
+    const sizes = await page.locator('.mode-hub-list .mode-entry').evaluateAll(els => els.map(el => Math.round(el.getBoundingClientRect().width)));
+    assert.ok(sizes.length >= 3 && sizes.every(w => w === sizes[0]), 'Retos rápidos tiene el mismo ancho que las otras puertas');
     await page.screenshot({path: `test-results/quick-challenges/home-${width}.png`, fullPage:true});
-    assert.equal(await page.locator('[data-action="quick-counts"]').count(), 0);
-    await page.locator('[data-action="quick-challenges"]').click();
-    await page.locator('[data-quick="show-multi"]').click();
-    await page.locator('[data-quick="local"]').click();
+    await page.locator('[data-friend-quick="local"]').click();
     await page.screenshot({path: `test-results/quick-challenges/setup-${width}.png`, fullPage: true});
     await page.locator('#quick-name-0').fill('Ana');
     await page.locator('[data-quick="add-player"]').click();
@@ -47,18 +46,22 @@ try {
     await page.locator('[data-quick="remove-player"]').last().click();
     assert.equal(await page.locator('[data-quick-name]').count(), 2);
     await page.locator('.quick-length-chip[data-length="1"]').click();
-    await page.locator('#quick-choice').selectOption('poker');
     await page.locator('[data-quick="start"]').click();
     for (const v of ['1900', '1500']) { await page.locator('#quick-starter-input').fill(v); await page.locator('[data-quick="starter-guess"]').click(); }
     await page.locator('[data-quick="starter-go"]').click();
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
     assert.equal(await overflow(), false, `Sin desbordamiento a ${width}px`);
     await page.screenshot({path: `test-results/quick-challenges/turn-${width}.png`, fullPage: true});
+    // Tocar una carta de la línea abre su ficha (antes se giraba); Escape la cierra.
     await page.locator('.card-flippable').first().click();
-    assert.ok(await page.locator('.card-flippable.is-flipped').count());
-    await page.locator('[data-zoom-level="2"]').click();
+    assert.ok(await page.locator('.overlay, [role="dialog"]').count(), 'la carta abre su ficha');
+    await page.keyboard.press('Escape');
+    // El zoom de las cartas se elige en el menú de la partida.
+    await page.locator('[data-quick="menu"]').click();
+    await page.locator('.menu-view-zoom [data-zoom-level="2"]').click();
     assert.equal(await page.locator('.timeline').evaluate(el => el.style.transform), 'scale(1.2)');
-    await page.locator('[data-zoom-level="1"]').click();
+    await page.locator('.menu-view-zoom [data-zoom-level="1"]').click();
+    await page.locator('[data-quick="close-menu"]').click();
     await page.locator('[data-quick="menu"]').click();
     await page.locator('[data-settings-action="open"]').click();
     await page.locator('[data-settings-action="close"]').first().click();
@@ -81,7 +84,9 @@ try {
     await page.locator('[data-quick="ack"]').click();
     while (await page.locator('[data-quick="bank"]').count()) await page.locator('[data-quick="bank"]').click();
     await page.getByText('Ver el orden completo y las fuentes').click();
-    assert.equal(await page.locator('details li').count(), 9);
+    // El orden completo enseña todas las cartas del reto que salió.
+    const cards = await page.evaluate(() => JSON.parse(localStorage.getItem('continuum-quick-challenges-v1')).config.rounds[0].order.length);
+    assert.equal(await page.locator('details li').count(), cards);
     assert.equal(await overflow(), false);
     assert.deepEqual(errors, []);
     await page.close();

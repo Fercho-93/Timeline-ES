@@ -36,11 +36,16 @@ try {
         cards: () => cards, categoryBadge: () => '', animalArt: () => '', cardBack: () => '<span class="carta-reverso">✦</span>',
         eraForCard: () => ({ key: 'modern', symbol: '✦', name: 'Historia' }), formatValue: (_, c) => String(c.year), sortValue: (_, c) => c.year, mode: () => ({name:'Historia'}), placementHint: () => 'Debía ir después de la carta anterior.',
         hiddenLabel: () => 'Fecha oculta', timelineTitle: () => 'Línea temporal', Accounts: { user: { uid: 'me' } },
+        Links: { invitation: () => 'https://continuum.test/#turn-duel=layout' }, Avatares: { markup: () => '', forUser: () => '' }, timelineEnds: () => '', has: () => true,
         Duelo: { CARTAS: 15, reparto: () => cards.map(c => c.id), Cifras: { reparto: () => cards.map(c => c.id), regla: () => ({ pregunta: '¿En qué año fue?' }) } }
       };
     });
     await page.addScriptTag({ url: '/mapa.js' });
-    await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{cachedGames=options.nextGames||[];current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();clearInterval(timer);}; window.redrawDuel=()=>{render();clearInterval(timer);};window.tickDuel=()=>{enteredAt=Date.now()-10000;updateClock();};` });
+    // El estado de la lista de duelos sale del módulo real; el reparto sigue siendo el de la prueba.
+    await page.evaluate(() => { window.__duelStub = CONTINUUM.Duelo; });
+    await page.addScriptTag({ url: '/duelo.js' });
+    await page.evaluate(() => { CONTINUUM.Duelo = { ...CONTINUUM.Duelo, ...window.__duelStub }; });
+    await page.addScriptTag({ content: `const auth={currentUser:{uid:'me'}};\n${source}\nwindow.showDuel=(options={})=>{cachedGames=options.nextGames||[];current={id:'layout',mode:'history',kind:'orden',seed:'test',total:15,turnIndex:0,turnUid:'me',status:'playing',playersOrder:['me','them'],players:{me:{alias:'Explorador'},them:{alias:'Un rival con nombre largo'}},scores:{me:0,them:0},timeline:[1],...options};enteredAt=Date.now();pendingIndex=null;render();clearInterval(timer);}; window.redrawDuel=()=>{render();clearInterval(timer);};` });
     const fits = async label => {
       const sizes = await page.evaluate(() => ({ viewport: innerWidth, page: document.documentElement.scrollWidth, shell: document.querySelector('.turn-duel-shell').getBoundingClientRect().right }));
       assert.ok(sizes.page <= sizes.viewport + 1, `${width}px ${label}: page overflow ${JSON.stringify(sizes)}`);
@@ -63,28 +68,24 @@ try {
     assert.equal(await page.locator('.timeline-card').count(), 3, 'board stays visible while waiting');
     await page.evaluate(() => showDuel({ kind: 'cifras' }));
     await page.locator('#turn-cifra-input').fill('1492');
-    await page.evaluate(() => { redrawDuel(); tickDuel(); });
-    assert.equal(await page.locator('#turn-cifra-input').inputValue(), '1492');
-    assert.equal(await page.locator('#turn-duel-seconds').textContent(), '5');
+    await page.evaluate(() => redrawDuel());
+    assert.equal(await page.locator('#turn-cifra-input').inputValue(), '1492', 'repintar conserva lo escrito');
+    // Por turnos no hay reloj: la respuesta espera lo que haga falta.
+    assert.equal(await page.locator('.turn-duel-clock, #turn-duel-seconds').count(), 0);
     await fits('cifras');
-    await page.evaluate(() => showDuel({ status:'waiting', turnUid:null, playersOrder:['me'] }));
+    // Ya hecha la primera jugada, se invita al rival con el enlace.
+    await page.evaluate(() => showDuel({ status:'waiting', turnUid:null, playersOrder:['me'], turnIndex: 1, timeline: [1, 2] }));
     await fits('invitation');
     await page.locator('summary').click();
     await fits('invitation link');
-    await page.addScriptTag({ content: `window.previewTurn=()=>{preparingTurn=null;prepareTurn();render();clearInterval(timer);};window.beginPreparation=()=>{preparingTurn=null;prepareTurn(true);render();clearInterval(timer);return enteredAt;};window.endPreparation=()=>{prepareUntil=Date.now()-1;render();clearInterval(timer);};` });
+    // Sin reloj ni cuenta atrás: al entrar en tu turno la carta ya está en la mano.
+    await page.addScriptTag({ content: `window.previewTurn=()=>{preparingTurn=null;prepareTurn();render();clearInterval(timer);return enteredAt;};window.reenterTurn=()=>{prepareTurn();render();clearInterval(timer);return enteredAt;};` });
     await page.evaluate(() => showDuel());
-    await page.evaluate(() => previewTurn());
-    assert.equal(await page.locator('[data-turn-action="ready"]').count(), 1);
-    assert.equal(await page.locator('.hand-card').count(), 0, 'no card before I am ready');
-    assert.equal(await page.locator('.turn-duel-clock').count(), 0);
-    await fits('ready screen');
-    const deadline = await page.evaluate(() => beginPreparation());
-    assert.equal(await page.locator('#turn-ready-seconds').textContent(), '3');
-    assert.equal(await page.locator('.hand-card').count(), 0, 'pending card is absent during preparation');
-    assert.equal(await page.locator('[data-turn-action="select-slot"]').count(), 0);
-    assert.equal(await page.evaluate(() => beginPreparation()), deadline, 'reentry does not reset the deadline');
-    await page.evaluate(() => endPreparation());
+    const entered = await page.evaluate(() => previewTurn());
     assert.equal(await page.locator('.hand-card').count(), 1);
+    assert.equal(await page.locator('[data-turn-action="ready"]').count(), 0);
+    assert.equal(await page.evaluate(() => reenterTurn()), entered, 'volver a entrar no reinicia la hora de entrada');
+    await fits('turn without clock');
     await page.evaluate(() => showDuel({status:'cancelled',turnUid:null,resultText:'Duelo cerrado.'}));
     assert.equal(await page.locator('.hand-card').count(), 0);
     assert.equal(await page.locator('[data-turn-action="select-slot"]').count(), 0);
@@ -110,7 +111,7 @@ try {
     assert.equal(await page.locator('[data-action="archive-turn-duel"]').count(), 1);
     assert.equal(await page.locator('[data-action="block-duel-rival"]').count(), 1);
     assert.deepEqual(errors, []);
-    console.log(`OK ${width}px: invitation, long board, confirmation, opponent turn, answer and circular timer`);
+    console.log(`OK ${width}px: invitation, long board, confirmation, opponent turn, answer without clock`);
     await page.close();
   }
 } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }

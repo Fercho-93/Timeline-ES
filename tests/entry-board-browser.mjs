@@ -42,6 +42,8 @@ try {
       const click=async(selector,fill=false,value='')=>{
         const modes=page.locator('[data-action="toggle-modes"][aria-expanded="false"]');
         if(await modes.count())await modes.first().click();
+        // La portada del mazo de Retos rápidos se retira con un toque antes de seguir.
+        await page.evaluate(()=>document.querySelector('[data-quick-splash]')?.click());await page.waitForTimeout(300);
         const target=page.locator(`${selector}:visible`).first();
         if(fill)await target.fill(value);else await target.click();
       };

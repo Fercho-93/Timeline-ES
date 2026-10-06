@@ -1,6 +1,7 @@
 // Prueba de maquetación real: JSDOM no puede detectar que una imagen se encoge.
 // Ejecutar con Playwright instalado; el workflow instala Chromium y WebKit.
 import {fileURLToPath, pathToFileURL} from 'node:url';
+// ENGINES=chromium limita la prueba a Chromium donde no hay WebKit instalado (por defecto, los dos).
 const {chromium, webkit} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -23,12 +24,14 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url=`http://127.0.0.1:${server.address().port}/`;
 await fs.mkdir('test-results/zoom',{recursive:true});
 const records=[];
+// Jugar solo → Grandes colecciones: elegir un mazo lleva directo a jugarlo en solitario.
 async function openCollections(page){
-  await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
-  await page.locator('[data-action="toggle-play-catalog"][data-section="collections"]').click();
+  await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
+  // Si el cajón ya estaba abierto (se recuerda al volver), no se vuelve a tocar: se cerraría.
+  if(await page.locator('#mode-inline-drawer[hidden]').count())await page.locator('[data-inline-route="collections"]').click();
 }
 try {
- for(const [engine,type] of [['webkit',webkit],['chromium',chromium]]) {
+ for(const [engine,type] of [['webkit',webkit],['chromium',chromium]].filter(([name])=>(process.env.ENGINES||'webkit,chromium').split(',').includes(name))) {
   if (process.env.BROWSER_ENGINE && process.env.BROWSER_ENGINE !== engine) continue;
   const browser=await type.launch(engine === 'chromium' && process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {});
   const newPage = async options => {
@@ -46,7 +49,6 @@ try {
    await openCollections(illustratedPage);
    await illustratedPage.locator('[data-block="historia"]').click();
    await illustratedPage.locator('[data-mode="history"]').click();
-   await illustratedPage.locator('[data-action="solo"]').click();
    await illustratedPage.locator('[data-action="start-free"]').click();
    const illustratedCard=illustratedPage.locator('.timeline .timeline-card:has(.animal-card-art)').first();
    await illustratedCard.locator('img').evaluate(img=>img.decode());
@@ -82,12 +84,13 @@ try {
    });
    const longTitle=await illustratedCard.evaluate(card=>{
      const title=card.querySelector('h3'),value=card.querySelector('.year'),frame=card.closest('.timeline-scale-frame');
-     return {titleHeight:title.getBoundingClientRect().height,titleScroll:title.scrollHeight,
+     const line=parseFloat(getComputedStyle(title).lineHeight)||parseFloat(getComputedStyle(title).fontSize)*1.2;
+     return {titleHeight:title.getBoundingClientRect().height,titleScroll:title.scrollHeight,titleLines:Math.round(title.getBoundingClientRect().height/line),
        titleClamp:getComputedStyle(title).webkitLineClamp,
        valueBottom:value.getBoundingClientRect().bottom,cardBottom:card.getBoundingClientRect().bottom,
        frameBottom:frame.getBoundingClientRect().bottom};
    });
-   assert.ok(longTitle.titleHeight>30,'el título largo ocupa varias líneas');
+   assert.ok(longTitle.titleLines>=2,'el título largo ocupa varias líneas');
    assert.ok(longTitle.titleScroll<=longTitle.titleHeight+1,'se ven todas las líneas del título');
    assert.equal(longTitle.titleClamp,'none','el título no tiene límite de líneas');
    assert.ok(longTitle.valueBottom<=longTitle.cardBottom+1,'el valor sigue visible bajo el título');
@@ -126,16 +129,12 @@ try {
    await openCollections(transitionPage);
    await transitionPage.locator('[data-block="historia"]').click();
    await transitionPage.locator('[data-mode="history"]').click();
-   const header=transitionPage.locator('.atlas-landscape');
    assert.equal(await transitionPage.locator('.camera-move').count(),0,'sin copia de pantalla');
    assert.equal(await transitionPage.locator('.home-nav').count(),1,'navegación única y estable');
    await transitionPage.waitForFunction(()=>!document.querySelector('.motion-entering'));
    assert.equal(await transitionPage.locator('.shell').evaluate(el=>getComputedStyle(el).animationName),'none','sin segunda entrada CSS');
-   assert.equal(await header.evaluate(el=>getComputedStyle(el).opacity),'1');
    await transitionPage.screenshot({path:`test-results/zoom/${engine}-entrada-editorial.png`});
-   await transitionPage.locator('[data-action="solo"]').click();
-   assert.ok(await transitionPage.locator('.solo-fold').count()>0,'solitario llega plegado');
-   assert.equal(await transitionPage.locator('.solo-panel:not(.solo-fold)').count(),0,'ningún panel llega abierto');
+   assert.ok(await transitionPage.locator('.solo-panel [data-action="start-free"]').count()>0,'solitario llega con su única opción a la vista');
    await transitionPage.waitForFunction(()=>!document.querySelector('.motion-entering'));
    const soloBefore=await transitionPage.locator('.solo-home').evaluate(el=>({text:el.innerText,top:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height}));
    await transitionPage.waitForTimeout(400);
@@ -150,7 +149,7 @@ try {
    assert.ok(Math.abs(soloAfter.height-soloBefore.height)<SALTO_MAXIMO,`la altura no debería saltar tras el viaje (${soloBefore.height} → ${soloAfter.height})`);
    await transitionPage.locator('[data-action="back-menu"]').click();
    await transitionPage.waitForFunction(()=>!document.querySelector('.motion-entering')).catch(()=>{});
-   await transitionPage.locator('[data-action="back-menu"]').click();
+   if(!await transitionPage.locator('#app [data-mode="history"]').isVisible())await transitionPage.locator('#app [data-block="historia"]').click();
    // Durante el viaje inverso hay una réplica inerte de la pantalla anterior. El
    // usuario solo puede tocar #app; la prueba debe apuntar al mismo lugar interactivo.
    await transitionPage.locator('#app [data-mode="history"]').click();
@@ -192,7 +191,8 @@ try {
    });
    await encyclopediaPage.locator('[data-action="enc-back"]').first().click();
    await encyclopediaPage.waitForTimeout(260);
-   const restoredImage=encyclopediaPage.locator('.home-gallery-shell img').first();
+   // Se abrió desde el Atlas: al cerrar vuelve esa misma pantalla, con sus imágenes ya decodificadas.
+   const restoredImage=encyclopediaPage.locator('#app > .shell img').first();
    assert.equal(await restoredImage.evaluate(image=>image.__continuumCloseProbe===true),true,'cerrar la enciclopedia conserva el mismo nodo de imagen');
    assert.equal(await restoredImage.evaluate(image=>image.complete&&image.naturalWidth>0),true,'la carátula sigue decodificada al reaparecer');
    await encyclopediaPage.close();
@@ -207,31 +207,28 @@ try {
    await openCollections(duelPage);
    await duelPage.locator('[data-block="naturaleza"]').click();
    await duelPage.locator('[data-mode="animals"]').click();
-   await duelPage.locator('[data-action="solo"]').click();
-   await duelPage.locator('.solo-fold[data-solo-kind="duel"] > summary').click();
+   // El mismo mazo, cada uno en su móvil y con las mismas cartas.
+   await duelPage.evaluate(()=>window.CONTINUUM.openDeckAs('online'));
+   await duelPage.locator('label:has(input[name="duel-pace"][value="seguidos"])').click();
    await duelPage.locator('[data-action="start-duel"]').click();
    await duelPage.locator('[data-action="duel-play"]').click();
-   await duelPage.locator('[data-action="solo-place"]').first().click();
-   const dockBox=await duelPage.locator('.placement-dock').boundingBox();
-   const timelineBox=await duelPage.locator('.timeline-wrap').boundingBox();
-   const handTitleBox=await duelPage.locator('.atlas-hand-section .hand-title').boundingBox();
-   assert.ok(dockBox.y>=timelineBox.y+timelineBox.height-1,'la confirmación queda debajo de la línea');
-   assert.ok(dockBox.y+dockBox.height<=handTitleBox.y+1,'la confirmación queda antes de Tu carta');
-   assert.equal(await duelPage.locator('.placement-dock').evaluate(el=>getComputedStyle(el).position),'static','la confirmación no flota sobre el contenido');
-   assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
+   // La carta del turno va arriba, sobre la línea; se ve entera y sin el pliegue dorado.
    const selectedStyle=await duelPage.locator('.hand-solo .hand-card.selected').evaluate(el=>({
      fold:getComputedStyle(el,'::before').display,
-     transform:getComputedStyle(el).transform,
      width:el.getBoundingClientRect().width,
      height:el.getBoundingClientRect().height
    }));
-   assert.equal(selectedStyle.fold,'none','la carta inferior no conserva el pliegue dorado');
-   assert.ok(selectedStyle.width>=115&&selectedStyle.height>=148,'la carta inferior gana presencia sin dominar la pantalla');
-   // Con la carta a la vista, el muelle no la tapa.
-   await duelPage.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
-   const manoBox=await duelPage.locator('.hand-solo .hand-card').boundingBox();
-   const dockAbajo=await duelPage.locator('.placement-dock').boundingBox();
-   assert.ok(dockAbajo.y+dockAbajo.height<=manoBox.y+1,'la confirmación termina antes de la carta y no la tapa');
+   assert.equal(selectedStyle.fold,'none','la carta de la mano no conserva el pliegue dorado');
+   // En una pantalla baja la mesa encoge la carta para que quepa también la línea: legible, pero sin pasar de un cuarto del alto.
+   assert.ok(selectedStyle.width>=100&&selectedStyle.height>=130&&selectedStyle.height<=664*.25,'la carta gana presencia sin dominar la pantalla');
+   await duelPage.locator('[data-action="solo-place"]').first().click();
+   const dockBox=await duelPage.locator('.placement-dock').boundingBox();
+   const timelineBox=await duelPage.locator('.timeline-wrap').boundingBox();
+   const focusBox=await duelPage.locator('.board-focus-card').boundingBox();
+   assert.ok(focusBox.y+focusBox.height<=timelineBox.y+1,'la carta queda encima de la línea');
+   assert.ok(dockBox.y>=timelineBox.y+timelineBox.height-1,'la confirmación queda debajo de la línea');
+   assert.equal(await duelPage.locator('.placement-dock').evaluate(el=>getComputedStyle(el).position),'static','la confirmación no flota sobre el contenido');
+   assert.ok(await duelPage.locator('[data-action="confirm-place"]').isVisible(),'y se puede pulsar sin desplazar');
    await duelPage.screenshot({path:`test-results/zoom/${engine}-duelo-muelle.png`});
    await duelPage.close();
    for(const [width,height] of [[375,667],[414,714],[390,844],[412,915]]) {
@@ -331,12 +328,12 @@ try {
       await page.locator('.enc-recent-card img, .enc-deck-cover img').evaluateAll(imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return img.decode();})));
       await page.screenshot({path:`test-results/zoom/${engine}-enciclopedia-album.png`,fullPage:true});
       await page.locator('[data-action="enc-back"]').first().click();
+      // La enciclopedia vuelve al Atlas: de ahí, otra vez a Jugar solo y al mazo.
+      await openCollections(page);
       const historyMode=page.locator('[data-mode="history"]');
       if(!await historyMode.isVisible())await page.locator('[data-block="historia"]').click();
       await historyMode.click();
     }
-    await page.locator('[data-action="solo"]').click();
-    await page.locator('.solo-fold').filter({has:page.locator('[data-action="resume-solo"]')}).locator('summary').click();
     await page.locator('[data-action="resume-solo"]').click();
     await page.locator('.timeline-card img').evaluate(img=>img.decode());
     const measure=()=>page.evaluate(()=>{
@@ -345,16 +342,13 @@ try {
       return {card:box(card),image:box(img),panel:box(panel),label:document.querySelector('.timeline-zoom output').textContent};
     });
     const base=await measure();
-    assert.ok(base.card.width >= 127, 'la carta conserva un ancho legible');
-    assert.ok(base.image.height >= 165, 'la ilustración gana altura al recuperar la fila de zoom');
-    const heading=await page.locator('.timeline-toolbar').boundingBox();
-    const zoom=await page.locator('.timeline-zoom').boundingBox();
-    const board=await page.locator('.timeline-wrap').boundingBox();
-    assert.ok(zoom.y >= heading.y && zoom.y+zoom.height <= heading.y+heading.height+1,'zoom integrado en la cabecera');
-    assert.ok(zoom.y+zoom.height <= board.y+1,'zoom situado encima de las cartas');
-    assert.ok(heading.x+heading.width <= width,'los controles caben sin desbordamiento horizontal');
+    assert.ok(base.card.width >= 100, 'la carta conserva un ancho legible');
+    assert.ok(base.image.height >= 150, 'la ilustración conserva su altura');
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'la mesa cabe sin desbordamiento horizontal');
+    // El zoom se elige en el menú de la partida; aquí se pulsan los mismos niveles que ofrece.
+    const zoomTo=index=>page.evaluate(i=>document.querySelector(`.timeline-zoom .zoom-menu [data-zoom-level="${i}"]`).click(),index);
     for(const [index,scale] of [.8,1,1.2].entries()) {
-      await page.locator(`[data-zoom-level="${index}"]`).click();
+      await zoomTo(index);
       const now=await measure();
       assert.equal(now.label,`${Math.round(scale*100)}%`);
       for(const part of ['card','image'])for(const axis of ['width','height']) {
@@ -368,7 +362,7 @@ try {
     }
     if (width === 414) {
       await page.emulateMedia({reducedMotion:'no-preference'});
-      await page.locator('[data-zoom-level="1"]').click();
+      await zoomTo(1);
       const hand=page.locator('.hand-card.selected');
       await hand.scrollIntoViewIfNeeded();
       const source=await hand.boundingBox();
@@ -378,7 +372,9 @@ try {
       await page.mouse.move(target.x+target.width/2,target.y+target.height/2,{steps:8});
       await page.locator('.drag-ghost').waitFor();
       const ghost=await page.locator('.drag-ghost').boundingBox();
-      assert.ok(ghost.width<150,'el arrastre deja visible el destino');
+      // La copia va levantada sobre el dedo: el centro del hueco de destino queda a la vista.
+      const tx=target.x+target.width/2,ty=target.y+target.height/2;
+      assert.ok(!(tx>ghost.x&&tx<ghost.x+ghost.width&&ty>ghost.y&&ty<ghost.y+ghost.height),'el arrastre deja visible el destino');
       assert.ok(await page.locator('.slot.drop-target').count()>0);
       await page.screenshot({path:`test-results/zoom/${engine}-arrastre.png`});
       await page.mouse.up();

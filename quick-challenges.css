@@ -40,7 +40,6 @@
 @media(prefers-reduced-motion:no-preference){.quick-ready-card{animation:quick-ready-in var(--motion-slow) var(--ease-out) both}.quick-ready-seal svg{animation:quick-ready-seal 900ms var(--ease-out) both}}
 @keyframes quick-ready-in{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes quick-ready-seal{from{opacity:0;transform:rotate(-45deg) scale(.7)}to{opacity:1;transform:none}}
-.quick-shell .play-choice>span:first-child:not(.walking-copy){min-width:0}
 
 /* Reto preparado: cabecera centrada y con el mismo rojizo que el botón «Estoy preparado». */
 .quick-ready{--accent:#8a3f2f;--accent-dark:#7a3a2c;--accent-soft:#f0d3c2;text-align:center}

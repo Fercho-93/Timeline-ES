@@ -49,7 +49,6 @@
   #app .mode-entry:hover { box-shadow: 0 2px 0 #e2cfa6, 0 16px 30px #4a321a2e; }
   #app .mode-entry:hover .mode-entry-art img { transform: scale(1.045); }
 }
-#app .mode-secondary { margin-top: 4px; }
 @media (prefers-reduced-motion: reduce) {
   #app .mode-choices-reveal, #app .mode-play-card .mode-play-chevron { transition: none; }
 }

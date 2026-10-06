@@ -17,7 +17,9 @@ let rows=await CT.Quick.duels();
 assert.equal(rows[0].grupo,'tu-turno');assert.equal(rows[0].canCancel,true,'First turn before the friend joins offers cancel, not resign.');
 assert.throws(()=>R.reduce(server,'me',{type:'resign'}));
 const hash=CT.QuickNetwork.fingerprint(),catalog=CT.QuickCatalog;
-assert.equal(CT.QuickNetwork.compatible(2351751673),true,'v564 duels remain compatible.');
+// La huella de la v564 solo valía mientras el catálogo era el de la v565: al ampliarse con retos nuevos, un duelo de entonces ya no reparte lo mismo.
+assert.equal(CT.QuickNetwork.compatible(2351751673),hash===1085063415,'v564 duels are compatible only with the v565 catalog.');
+assert.equal(CT.QuickNetwork.compatible(hash),true,'the current catalog is always compatible with itself.');
 const card=catalog.challenges[0].cards[0],title=card.title,value=card.value;
 card.title+=' presentation';assert.equal(CT.QuickNetwork.fingerprint(),hash);card.title=title;
 card.value++;assert.notEqual(CT.QuickNetwork.fingerprint(),hash);assert.equal(CT.QuickNetwork.compatible(2351751673),false);card.value=value;

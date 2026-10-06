@@ -51,10 +51,8 @@ html body::before {
    selector lleva `.topbar-actions` delante para ganarle a la barra agrupada del móvil,
    que aprieta todos sus botones y les quita el ancho mínimo; sin eso, el atajo se queda
    estrecho justo donde más falta hace el ancho de un dedo. */
-.topbar-actions .icon-btn.icon-btn-home { min-width: 52px; padding: 0 10px; color: var(--edition-brass); }
-.topbar-actions .icon-btn.icon-btn-home:active { color: var(--edition-ink); }
-.home-shell:not(.play-menu-shell) .brand { visibility: visible; }
-.home-shell:not(.play-menu-shell) .topbar { margin: 0 0 10px; border-bottom: 1px solid var(--edition-line); }
+.home-shell .brand { visibility: visible; }
+.home-shell .topbar { margin: 0 0 10px; border-bottom: 1px solid var(--edition-line); }
 .home-masthead { color: var(--edition-ink); margin: 6px auto 24px; }
 .home-crest { width: clamp(180px, 46vw, 248px); }
 .home-wordmark { font-size: clamp(2.55rem, 9vw, 4rem); font-weight: 400; letter-spacing: -.045em; }
@@ -79,10 +77,6 @@ html body::before {
 .btn-secondary, .btn-ghost { color: var(--edition-ink); }
 .btn-secondary { border-color: var(--edition-line); background: var(--edition-surface); }
 .btn:focus-visible, .icon-btn:focus-visible, .home-nav button:focus-visible { outline-color: var(--edition-brass); }
-.collection-heading { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: baseline; gap: 8px 24px; text-align: left; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--edition-line); }
-.collection-heading .eyebrow { order: 1; font: 500 .75rem/1.5 var(--ui-font); letter-spacing: .14em; color: var(--edition-muted); }
-.collection-heading .eyebrow-line { display: none; }
-.collection-heading h2 { margin: 0; color: var(--edition-ink); font-size: 1.9rem; font-weight: 400; }
 .home-shell .hero-copy { gap: 38px; }
 .home-shell .gallery { grid-template-columns: minmax(0, 1fr); gap: 18px; }
 .home-shell .gallery-panel { height: 250px; border-radius: 8px; border: 1px solid #78634366; box-shadow: var(--edition-shade); }
@@ -106,12 +100,6 @@ html body::before {
 .collection-decks .game-row.active { border-left-color: var(--edition-brass); }
 .collection-decks .game-name { font-size: 1.1rem; }
 .collection-decks .game-meta { color: var(--edition-muted); font: .875rem/1.5 var(--ui-font); }
-.home-competition { padding-top: 8px; color: var(--edition-ink); }
-.home-competition .field { max-width: 340px; }
-.home-shell .comp-promo { background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 8px; box-shadow: var(--edition-shade); }
-.home-shell .comp-promo-copy { padding: 22px; }
-.home-shell .comp-promo-copy b { color: var(--edition-ink); text-transform: none; font-size: 1.4rem; font-weight: 400; }
-.home-shell .comp-promo-copy small { color: var(--edition-muted); font: .9375rem/1.6 var(--ui-font); }
 /* Anclada al borde inferior y a todo el ancho, no flotante: separada del borde dejaba
    ver el contenido de la página por debajo, que es justo lo que una barra fija no debe
    hacer. El relleno inferior absorbe la franja de gestos del teléfono. */
@@ -121,24 +109,7 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
 .home-nav small { font: .75rem/1.3 var(--ui-font); }
 .home-nav button[aria-current] { color: var(--edition-ink); background: color-mix(in srgb, var(--edition-brass) 13%, transparent); }
 .home-nav button[aria-current] span { color: var(--edition-brass); }
-.mode-masthead { min-height: 300px; grid-template-columns: minmax(0, 1fr); padding: 36px; border: 1px solid var(--edition-line); border-radius: 8px; box-shadow: var(--edition-shade); }
-.mode-masthead::after { background: linear-gradient(90deg, #151912ed, #15191265 65%, #15191222); }
-.mode-masthead > div { min-width: 0; max-width: 40ch; overflow-wrap: anywhere; }
-.mode-masthead h1 { font-weight: 400; font-size: clamp(2.4rem, 7vw, 4rem); line-height: 1.06; overflow-wrap: anywhere; }
-.mode-masthead p { font: 1rem/1.6 var(--ui-font); }
-.mode-masthead .eyebrow { color: #e5d5ad; font: .75rem/1.5 var(--ui-font); letter-spacing: .2em; }
-.home-play { color: var(--edition-ink); }
-.home-shell .play-choices-head { text-align: left; padding-bottom: 10px; }
-.home-shell .play-choices-head .eyebrow { justify-content: flex-start; color: var(--edition-brass); }
-.home-shell .play-block-toggle, .home-shell .play-choice { background: var(--edition-surface); border: 1px solid var(--edition-line); color: var(--edition-ink); box-shadow: none; border-radius: 6px; }
-.home-shell .play-block-toggle { padding: 20px; }
-.home-shell .play-block-toggle b, .home-shell .play-choice b { text-transform: none; font-size: 1.2rem; font-weight: 400; }
-.home-shell .play-block-toggle small, .home-shell .play-choice small { color: var(--edition-muted); font: .875rem/1.5 var(--ui-font); }
-.home-shell .play-choice-block.open .play-block-toggle { box-shadow: inset 3px 0 var(--scene-color); }
-.home-shell .play-choice.primary { background: var(--scene-color); color: #fff9ed; border-color: transparent; }
-.home-shell .play-choice.primary small { color: #f0e9db; }
-.home-shell .choice-icon { background: var(--edition-paper); color: var(--edition-brass); }
-.panel, .modal, .room-code-card, .connection-strip { background: var(--edition-surface); border-color: var(--edition-line); box-shadow: var(--edition-shade); }
+.panel, .modal, .room-code-card { background: var(--edition-surface); border-color: var(--edition-line); box-shadow: var(--edition-shade); }
 .panel > h1, .panel > h2, .panel > p, .modal > h2, .modal > p, .settings-modal, .setup-section, .pass-screen { color: var(--edition-ink); }
 .field input, .field select, .modal textarea, .player-row input { background-color: var(--edition-surface); border-color: var(--edition-line); color: var(--edition-ink); }
 .overlay { background: #111a17a6; backdrop-filter: blur(8px); }
@@ -156,9 +127,6 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
 .comp-splash-lead { color: var(--edition-muted); font: .75rem/1.5 var(--ui-font); }
 .comp-splash h2 { color: var(--edition-ink); font-weight: 400; }
 .comp-splash-start, .comp-topic { background: var(--scene-color); color: #fff9ed; box-shadow: none; }
-.competition-current-deck { margin: 12px 0 22px; text-align: center; }
-.competition-current-deck span { display: block; color: var(--edition-muted); font: .78rem/1.4 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; }
-.competition-current-deck strong { display: block; margin-top: 5px; color: var(--edition-ink); font: 700 clamp(1.8rem, 8vw, 3.6rem)/1.05 var(--display-font); }
 .comp-topic { border-radius: 6px; font-weight: 400; }
 
 /* Un halo único confirma un acierto; el fallo mantiene su señal original. */
@@ -166,7 +134,6 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
 .success .result-mark::after { content: ""; position: absolute; inset: -9px; border: 1px solid currentColor; border-radius: 50%; opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: no-preference) {
   .dialog-enter .success .result-mark::after { animation: edition-seal 650ms 120ms ease-out both; }
-  .screen-enter .mode-masthead > div { animation: edition-arrive 450ms 80ms var(--ease-out) backwards; }
   [data-screen="winner"] .screen-enter .big-icon { animation: edition-arrive 550ms 80ms var(--ease-out) backwards; }
   .collection-entry.active .collection-decks { animation: edition-arrive 260ms var(--ease-out) both; }
 }
@@ -189,11 +156,11 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .collection-decks { border: 1px solid var(--edition-line); border-left: 0; border-radius: 0 8px 8px 0; }
 }
 @media (max-width: 620px) {
-  .home-shell:not(.play-menu-shell) .topbar { align-items: center; margin: 0; border: 0; }
-  .home-shell:not(.play-menu-shell) .topbar-actions { width: auto; background: transparent; border: 1px solid var(--edition-line); box-shadow: none; border-radius: 6px; }
+  .home-shell .topbar { align-items: center; margin: 0; border: 0; }
+  .home-shell .topbar-actions { width: auto; background: transparent; border: 1px solid var(--edition-line); box-shadow: none; border-radius: 6px; }
   .topbar-actions { background: var(--edition-surface); border-color: var(--edition-line); box-shadow: none; }
-  .home-shell:not(.play-menu-shell) .home-masthead { margin-top: 24px; }
-  .home-shell:not(.play-menu-shell) .topbar-actions::after { background: var(--edition-line); }
+  .home-shell .home-masthead { margin-top: 24px; }
+  .home-shell .topbar-actions::after { background: var(--edition-line); }
   .home-shell .gallery { gap: 12px; }
   .home-shell .gallery-panel { height: 225px; }
   .home-shell .gallery-panel .panel-label, .home-shell .gallery-panel:not(.active) .panel-label { left: 16px; right: 16px; bottom: 18px; }
@@ -202,10 +169,7 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .home-shell .panel-label small { font-size: .75rem; line-height: 1.4; }
   .collection-index { top: 19px; left: 16px; font-size: .6875rem; letter-spacing: .02em; }
   .collection-open { top: 41px; right: 16px; width: 25px; height: 25px; }
-  .collection-heading .eyebrow { font-size: .6875rem; letter-spacing: .07em; }
-  .collection-heading h2 { font-size: 1.65rem; }
   .collection-decks { padding: 18px; }
-  .mode-masthead { min-height: 270px; padding: 25px; }
   .quick-actions { margin-bottom: 28px; }
 }
 @media (max-width: 359px) { .home-shell .gallery { grid-template-columns: minmax(0, 1fr); } }
@@ -288,7 +252,6 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 .perfil-section > .section-label { margin: 36px 0 18px; font-family: var(--font-display); font-size: 1.5rem; line-height: 1.3; letter-spacing: 0; text-transform: none; color: var(--edition-ink); gap: 12px; flex-wrap: wrap; }
 .perfil-section > .section-label small { font: .85rem/1.5 var(--ui-font); color: var(--edition-muted); }
 .perfil-section h3 { margin: 24px 0 14px; font-size: 1.1rem; line-height: 1.4; }
-.perfil-section h3.logro-grupo { margin-top: 28px; font: 600 .85rem/1.5 var(--ui-font); letter-spacing: .1em; color: var(--edition-brass); }
 .perfil-section .logro-grid, .perfil-section .weak-list { gap: 12px; }
 .perfil-section .logro { padding: 17px 16px; gap: 14px; }
 .perfil-section .logro b, .perfil-section .weak-row b { font-size: 1rem; line-height: 1.4; color: var(--edition-ink); }
@@ -315,13 +278,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 }
 /* Con `.enc-card-illustrated` delante, que es quien pinta ahí el papel liso justo encima. */
 .enc-card-velada.enc-card-illustrated .card-visual { background: var(--enc-sello); }
-.enc-era { margin-bottom: 10px; color: var(--edition-muted); font: .8rem/1.5 var(--ui-font); }
 .guide-tools .guide-close { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 1.35rem; font-weight: 400; line-height: 1; border: 0; background: transparent; color: var(--edition-muted); box-shadow: none; }
-.home-shell .play-choice-block .play-choice-grid { margin-left: clamp(14px, 4vw, 28px); padding-left: 12px; border-left: 1px solid var(--edition-line); }
-.home-shell .play-choice-block .play-choice { background: linear-gradient(125deg, var(--edition-surface), color-mix(in srgb, var(--edition-brass) 18%, var(--edition-paper))); color: var(--edition-ink); border-color: var(--edition-line); }
-.home-shell .play-choice-block .play-choice small { color: var(--edition-muted); }
-.home-shell .play-choice-block .play-choice .choice-icon { background: color-mix(in srgb, var(--edition-brass) 14%, var(--edition-surface)); color: var(--edition-brass); }
-.home-shell .play-choice-block .play-choice > i { color: var(--edition-brass); }
 /* La ampliación vuelve a una columna; ningún título queda encerrado en una lámina. */
 /* Android estrecho: menos escala visual sin alterar coordenadas de arrastre,
    el zoom del navegador ni las preferencias de texto ampliado del usuario. */
@@ -333,7 +290,6 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
   :root[data-platform="android"][data-text-size="100"] .home-shell .gallery-panel { height: 205px; }
   :root[data-platform="android"][data-text-size="100"] .collection-decks { padding: 15px; }
   :root[data-platform="android"][data-text-size="100"] .collection-decks .game-row { padding: 13px 16px 15px; margin-block: 8px; }
-  :root[data-platform="android"][data-text-size="100"] .mode-masthead { min-height: 240px; padding: 20px; }
   :root[data-platform="android"][data-text-size="100"] .solo-fold summary { padding-block: 14px; }
 }
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-shell .gallery { grid-template-columns: minmax(0, 1fr); }
@@ -344,7 +300,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
 :root:is([data-text-size="150"], [data-text-size="200"]) .home-ornament { justify-content: center; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .home-shell .gallery-panel, .collection-decks, .mode-masthead > div, .result-mark::after { animation: none !important; transition: none !important; }
+  .home-shell .gallery-panel, .collection-decks, .result-mark::after { animation: none !important; transition: none !important; }
 }
 
 /* La apertura dibuja una línea de cinco hitos antes de descubrir la colección. */
@@ -383,8 +339,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .atlas-nav svg { display: block; width: 22px; height: 22px; }
 #app .enc-modal { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
 #app .enc-modal .atlas-nav { position: fixed; }
-#app .atlas-intro { display: grid; grid-template-columns: 1fr; position: relative; isolation: isolate; min-height: 500px; padding: 28px 24px 16px; overflow: hidden; background: var(--edition-paper); border: 0; box-shadow: none; border-radius: 0; }
-#app .atlas-intro::after { display: none; }
 #app .atlas-landscape { position: absolute; inset: 0; z-index: -1; max-width: none; overflow: hidden; }
 /* La profundidad de las portadas la escribe immersion.js en cada aviso del giroscopio, y
    eso llega a ser sesenta veces por segundo. Declarar aquí que estas variables no se
@@ -401,17 +355,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @property --cover-ry { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 #app .atlas-landscape img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; filter: sepia(1) saturate(.55); transform: translate(var(--depth-x,0px), var(--depth-y,0px)) scale(1.06); transition: transform 350ms ease-out; }
 #app .atlas-landscape::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--edition-paper) 0%, color-mix(in srgb,var(--edition-paper) 88%,transparent) 18%, transparent 47%, color-mix(in srgb,var(--edition-paper) 35%,transparent) 70%,var(--edition-paper) 100%); }
-#app .atlas-intro-copy { color: var(--edition-ink); max-width: 42ch; margin-bottom: 165px; z-index: 1; }
-#app .atlas-intro .eyebrow { color: var(--edition-brass); }
-#app .atlas-intro h1 { color: var(--edition-ink); font-size: clamp(2rem,7.5vw,3.5rem); margin-block: 8px; }
-#app .atlas-intro p { color: var(--edition-ink); font-size: .92rem; line-height: 1.5; text-shadow: 0 1px var(--edition-paper); }
 #app .atlas-specimens { display: flex; justify-content: center; gap: 10px; align-items: end; max-width: 510px; width: 100%; justify-self: center; transform: translate(calc(var(--depth-x,0px) * -0.6), calc(var(--depth-y,0px) * -0.6)); transition: transform 350ms ease-out; }
 .atlas-specimens figure { width: 30%; margin: 0; padding: 4px; border: 1px solid var(--edition-line); background: var(--edition-surface); box-shadow: 0 8px 14px #382a2233; border-radius: 6px; overflow: hidden; }
 .atlas-specimens figure:first-child { transform: rotate(-8deg) translateY(4px); }
 .atlas-specimens figure:last-child { transform: rotate(8deg) translateY(4px); }
 #app .atlas-specimens img { position: static; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; filter: sepia(1) saturate(.55); }
 .atlas-specimens figcaption { padding: 5px 2px; color: var(--edition-ink); text-align: center; font-size: .8rem; line-height: 1.2; overflow-wrap: anywhere; }
-#app .atlas-intro + .home-play { margin-top: 6px; }
 #app .gallery-panel img { transform: translate(var(--depth-x,0px),var(--depth-y,0px)) scale(1.035); transition: transform 500ms ease-out; }
 #app.atlas-board .shell { max-width: 940px; padding: max(4px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom)); }
 #app.atlas-board .atlas-topbar { margin-bottom: 4px; }
@@ -474,12 +423,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .placement-dock-actions { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; }
 #app.atlas-board .placement-dock .btn-primary { min-height: 44px; padding: 9px 14px; background: var(--atlas-selection); color: var(--edition-surface); }
 #app.atlas-board .placement-dock .btn-ghost { min-height: 44px; padding: 9px 12px; font-size: .72rem; }
-.placement-instruction { font: .66rem/1.3 var(--ui-font); color: var(--edition-muted); text-align: center; }
 #app.atlas-board .solo-lives { font-size: 1.1rem; margin: 0 0 5px; }
 #app.atlas-board .ghost-banner, #app.atlas-board .pulse-banner { margin: 4px 0; padding: 6px 9px; font-size: .78rem; }
 @media (min-width: 720px) {
-  #app .atlas-intro { min-height: 540px; padding: 40px; }
-  #app .atlas-intro-copy { max-width: 45ch; }
   #app .atlas-specimens { max-width: 460px; justify-self: end; }
   #app.atlas-board .hand:not(.hand-solo) { grid-template-columns: repeat(4,minmax(0,1fr)); }
   #app.atlas-board .timeline-card { width: 150px; }
@@ -604,7 +550,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 }
 
 /* Portadas impresas en el papel: el alfa deja ver el fondo real en los cuatro bordes. */
-#app .atlas-intro { background: transparent; }
 #app .atlas-landscape {
   -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 28%, #0009 58%, transparent 76%);
   mask-image: radial-gradient(ellipse at 50% 50%, #000 28%, #0009 58%, transparent 76%);
@@ -612,23 +557,9 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* La altura disponible incluye las barras del navegador móvil. No se fija el alto
    del contenido: con texto ampliado o formatos desplegados se puede seguir bajando. */
 @media (max-width: 699px) {
-  #app .play-menu-shell { padding-top: max(8px, env(safe-area-inset-top)); }
-  #app .play-menu-shell .atlas-topbar { margin-bottom: 2px; }
-  #app .atlas-intro { min-height: 0; padding: 8px 10px 12px; gap: 0; }
-  #app .atlas-intro-copy { margin-bottom: clamp(8px, 2svh, 24px); }
-  #app .atlas-intro h1 { font-size: clamp(1.75rem, 7vw, 2.3rem); margin-block: 5px; }
-  #app .atlas-intro p { margin-block: 4px 0; font-size: .84rem; line-height: 1.35; }
   #app .atlas-specimens { max-width: 245px; gap: 8px; }
   #app .atlas-specimens img { aspect-ratio: 1.45; }
   #app .atlas-specimens figcaption { font-size: .65rem; line-height: 1.15; padding: 4px 1px; }
-  #app .play-menu-shell .play-choices { margin: 4px 0 12px; padding: 0; }
-  #app .play-menu-shell .play-choices-head { margin-bottom: 8px; padding-bottom: 0; }
-  #app .play-menu-shell .play-choices-head .eyebrow { margin-bottom: 3px; font-size: .65rem; }
-  #app .play-menu-shell .play-choices h2 { font-size: 1.45rem; }
-  #app .play-menu-shell .play-block-toggle { padding: 10px 12px; min-height: 60px; }
-  #app .play-menu-shell .play-choice { min-height: 60px; padding: 8px 12px; }
-  #app .play-menu-shell :is(.play-block-toggle,.play-choice) b { font-size: 1.05rem; }
-  #app .play-menu-shell :is(.play-block-toggle,.play-choice) small { font-size: .78rem; line-height: 1.3; }
   /* El resto de la cabecera se retira para dejar sitio a la colección, pero el
      interruptor de sonido se queda: es la única manera de llegar a él en esta
      pantalla sin pasar por Ajustes. Y la flecha de volver, que toda pantalla
@@ -642,8 +573,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app .home-gallery-shell .home-wordmark { font-size: 2.25rem; }
   #app .home-gallery-shell .home-tagline { margin-top: 6px; font-size: .65rem; }
   #app .home-gallery-shell .home-ornament { margin-top: 10px; }
-  #app .home-gallery-shell .collection-heading { margin-bottom: 10px; padding-bottom: 8px; }
-  #app .home-gallery-shell .collection-heading h2 { font-size: 1.5rem; }
   #app .home-gallery-shell .gallery { gap: 12px; }
   #app .home-gallery-shell .gallery-panel { height: clamp(110px, calc((100svh - 400px) / 2), 215px); }
   #app .home-gallery-shell .gallery-panel.active { height: 215px; }
@@ -655,43 +584,10 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 }
 
 @media (max-width: 699px) and (max-height: 650px) {
-  #app .atlas-intro-copy { margin-bottom: 8px; }
   #app .atlas-specimens figcaption { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 }
 
 /* Las modalidades se presentan como pequeños viajes sobre el mismo papel. */
-#app .home-shell .walking-choice { position: relative; isolation: isolate; overflow: hidden; display: flex; justify-content: space-between; min-height: 98px; padding: 16px; text-align: left; }
-#app .walking-art { position: absolute; z-index: -1; inset: 0 18px 0 auto; width: 58%; height: 100%; object-fit: cover; object-position: right 65%; mix-blend-mode: multiply; opacity: .82; -webkit-mask-image: linear-gradient(90deg,transparent,#000 38%,#000 92%,transparent); mask-image: linear-gradient(90deg,transparent,#000 38%,#000 92%,transparent); }
-#app .walking-copy { max-width: 65%; text-shadow: 0 1px 3px var(--edition-surface),0 0 8px var(--edition-surface); }
-#app .walking-choice > i { align-self: center; z-index: 1; }
-:root[data-theme="dark"] #app .walking-art { mix-blend-mode: normal; opacity: .3; }
-@media (max-width: 699px) {
-  /* `dvh` y no `svh`: la barra inferior se pliega al desplazarse y la barra de menús va
-     fija al borde real de la ventana, así que midiendo con la altura mínima la columna
-     terminaba un dedo por encima de ella. Con la altura visible, portada y formatos
-     llegan hasta la barra sin dejar papel en blanco. */
-  #app.atlas-has-nav > .play-menu-shell:has(> .atlas-intro) { display: flex; flex-direction: column; min-height: 100dvh; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
-  #app .play-menu-shell > .atlas-intro { flex: 1; align-content: space-between; }
-  #app .play-menu-shell > .atlas-intro .atlas-intro-copy { margin-bottom: clamp(12px, 3svh, 32px); }
-  #app .play-menu-shell > .atlas-intro .atlas-specimens { max-width: 275px; }
-  /* El grabado del mazo es la portada del capítulo: se estampa más grande y con el velo
-     abierto, para que se vea la escena entera y no solo su centro. */
-  #app .play-menu-shell > .atlas-intro .atlas-landscape {
-    -webkit-mask-image: radial-gradient(ellipse at 50% 46%, #000 40%, #0009 68%, transparent 86%);
-    mask-image: radial-gradient(ellipse at 50% 46%, #000 40%, #0009 68%, transparent 86%);
-  }
-  #app .play-menu-shell > .atlas-intro .atlas-landscape img { transform: translate(var(--depth-x,0px), var(--depth-y,0px)) scale(1.18); }
-  #app .play-menu-shell > .home-play { margin-top: 12px; }
-  #app .play-menu-shell .walking-choice { min-height: clamp(76px, 12svh, 104px); padding: 12px; }
-  #app .play-menu-shell .play-choices { margin-bottom: 0; }
-}
-@media (max-width: 699px) and (max-height: 650px) {
-  #app .play-menu-shell > .atlas-intro .atlas-specimens { max-width: 255px; }
-  #app .play-menu-shell > .atlas-intro .atlas-intro-copy { margin-bottom: 8px; }
-}
-@media (max-width: 699px) {
-  #app .play-menu-shell > .atlas-intro .atlas-specimens figcaption { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-}
 
 #app .modal .atlas-nav { position: fixed; inset: auto 0 0; }
 
@@ -736,13 +632,11 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .solo-fold-body > p { font: .84rem/1.45 var(--ui-font); margin: 8px 0 14px; }
 #app .solo-fold-body .hint { font-size: .76rem; margin: 10px 0; }
 #app .solo-fold-body .field { margin-bottom: 12px; }
-#app .solo-fold-body .field-hint { text-align: left; }
 /* ——— Jugar en solitario: reto diario y duelo por enlace ———
    Todo se apoya en el latón del tema y en superficies con filete fino, como las fichas
    de la enciclopedia: nada de placas macizas, que eran lo que hacía pesada la pantalla. */
 #app .solo-fold[data-solo-kind="daily"] { border-color: color-mix(in srgb, var(--edition-brass) 40%, var(--edition-line)); background: radial-gradient(120% 60% at 0% 0%, color-mix(in srgb, var(--edition-brass) 12%, transparent), transparent 62%), var(--edition-surface); }
 #app .solo-fold[data-solo-kind="daily"] .solo-option-mark { color: var(--edition-surface); border-color: transparent; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--edition-brass) 62%, #fff), var(--edition-brass) 72%); box-shadow: 0 0 0 4px color-mix(in srgb, var(--edition-brass) 13%, transparent), 0 6px 14px -4px color-mix(in srgb, var(--edition-brass) 55%, transparent); }
-#app .solo-fold-body .solo-done { padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--edition-brass) 35%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--edition-brass) 8%, transparent); color: var(--edition-ink); }
 
 #app .solo-fold-body .daily-stats { gap: 0; margin: 18px 0 0; border: 1px solid var(--edition-line); border-radius: 14px; background: color-mix(in srgb, var(--edition-surface) 72%, transparent); overflow: hidden; }
 #app .solo-fold-body .daily-stats > span { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 10px; row-gap: 6px; padding: 14px 15px 13px; border: 0; border-radius: 0; background: none; text-align: left; }
@@ -806,7 +700,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .deck-count { width: auto; min-width: 72px; height: 46px; padding: 4px 10px; border-radius: 12px; }
 #app.atlas-board .deck-count span { font-size: .52rem; white-space: nowrap; letter-spacing: .03em; }
 #app.atlas-board .placement-dock .btn-primary:disabled { background: color-mix(in srgb,var(--atlas-selection) 12%,var(--edition-paper)); color: var(--edition-muted); border: 1px solid var(--edition-line); box-shadow: none; }
-#app.atlas-board .placement-instruction { font: .74rem/1.4 var(--ui-font); text-align: center; color: var(--edition-muted); margin-top: 4px; }
 @media (max-width: 699px) {
   #app .home-gallery-shell .collection-decks { padding: 14px; }
   #app .home-gallery-shell .collection-decks > h2 { display: none; }
@@ -904,26 +797,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .slot.drop-target { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); border-radius: 12px; }
 
 /* Competición: una lámina de atlas al final de las colecciones. */
-#app .home-competition { margin-top: 26px; }
-#app .home-shell .comp-promo { display: flex; position: relative; isolation: isolate; align-items: center; min-height: 270px; margin-top: 0; border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-paper); box-shadow: 0 8px 24px #352a1710; }
-#app .home-shell .comp-promo-art { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; z-index: -1; -webkit-mask-image: radial-gradient(ellipse at 65% 50%,#000 30%,transparent 78%); mask-image: radial-gradient(ellipse at 65% 50%,#000 30%,transparent 78%); }
-#app .home-shell .comp-promo-art img { object-fit: cover; object-position: center; filter: sepia(1); mix-blend-mode: multiply; }
-#app .home-shell .comp-promo-copy { padding: 24px 20px; width: 62%; text-shadow: 0 1px 6px var(--edition-paper); }
-#app .competition-kicker { display: block; margin-bottom: 14px; font: .58rem/1.5 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; color: var(--edition-brass); }
-#app .home-shell .comp-promo-copy b { font-size: clamp(1.6rem,5vw,2.2rem); font-weight: 400; line-height: 1.07; margin-bottom: 12px; }
-#app .home-shell .comp-promo-copy small { font: .79rem/1.5 var(--ui-font); color: var(--edition-ink); }
-#app .competition-cta { display: inline-flex; gap: 12px; align-items: center; margin-top: 20px; padding: 9px 0; border-bottom: 1px solid var(--edition-brass); color: var(--edition-brass); font: 600 .77rem/1.3 var(--ui-font); }
-#app .comp-atlas-intro { min-height: 250px; padding: 24px 18px; border: 0; background: transparent; box-shadow: none; }
-#app .comp-atlas-intro > img { filter: sepia(1); opacity: .7; -webkit-mask-image: radial-gradient(ellipse at 65% 50%,#000 18%,transparent 76%); mask-image: radial-gradient(ellipse at 65% 50%,#000 18%,transparent 76%); }
-#app .comp-atlas-intro::after { display: none; }
-#app .comp-atlas-intro > div { max-width: 65%; }
-#app .comp-atlas-intro :is(h1,p) { color: var(--edition-ink); text-shadow: 0 1px 6px var(--edition-paper); }
-#app .comp-atlas-intro .eyebrow { color: var(--edition-brass); }
-#app .comp-atlas-intro h1 { font-size: clamp(1.8rem,6vw,3rem); }
-#app .comp-atlas-intro p { font: .82rem/1.45 var(--ui-font); }
-@media (min-width: 700px) { #app .home-shell .comp-promo { min-height: 310px; } #app .home-shell .comp-promo-copy { padding: 36px; width: 55%; } }
 @media (max-width: 699px) {
-  #app[data-screen="competition-menu"] .comp-atlas-intro { min-height: 195px; padding-block: 16px; }
   #app[data-screen="competition-menu"] .setup-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 14px; margin-bottom: 14px; }
   #app[data-screen="competition-menu"] .setup-grid label { min-height: 2.6em; font: 600 .76rem/1.3 var(--ui-font); }
   #app[data-screen="competition-menu"] .setup-grid select { padding-inline: 8px; font-size: .82rem; }
@@ -1055,12 +929,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .timeline-zoom [hidden] { display: none !important; }
 #app .timeline-zoom [data-zoom-level] { min-width: 62px; width: auto; height: 40px; border: 0; border-radius: 9px; font: 600 .78rem system-ui; color: #766447; }
 #app .timeline-zoom [aria-pressed="true"] { color: #fff8e7; background: #79613b; box-shadow: 0 2px 6px #4a341a22; }
-#app.atlas-board .placement-dock:has(> .placement-instruction:only-child) { background: transparent; padding: 0; }
-#app.atlas-board .placement-instruction { font-size: .75rem; text-align: center; color: #786c56; }
-.board-progress { display: flex; gap: 12px; align-items: center; padding: 9px 12px; border: 1px solid #baa16d44; border-radius: 10px; background: #fff9e64d; }
-.board-progress div { flex: 1; }.board-progress b { display: block; font-size: .83rem; }.board-progress span { display: block; margin-top: 3px; font: .66rem/1.4 system-ui; color: #78674b; }
-.board-progress progress { width: 52px; height: 5px; accent-color: #9e793b; }
-.board-milestone { animation: board-hito 800ms ease-out; }
 @keyframes board-hito { 40% { background: #e6c67566; box-shadow: 0 0 16px #d2ad4b33; } }
 /* El resultado ocupa su lugar en la página y permite seguir viendo y moviendo la línea. */
 #app .overlay.board-result-layer { position: relative; inset: auto; display: block; padding: 0 12px max(16px,env(safe-area-inset-bottom)); background: none; backdrop-filter: none; -webkit-backdrop-filter: none; z-index: 6; animation: none; }
@@ -1072,15 +940,11 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .result-summary .year { font-size: 1.5rem; margin: 0; }
 .result-history { margin: 8px 0 14px; }.result-history > summary { cursor: pointer; font: .8rem system-ui; color: #79613b; padding: 6px 0; }.result-history .reveal { margin-top: 12px; }.result-history p { font-size: .9rem; line-height: 1.45; }
 #app .board-result .btn-block { min-height: 44px; padding: 10px 16px; }
-@media (prefers-reduced-motion: reduce) { .board-milestone { animation: none; } #app.atlas-board .timeline-card { transition: none; } }
+@media (prefers-reduced-motion: reduce) { #app.atlas-board .timeline-card { transition: none; } }
 #app.atlas-board .slot { position: relative; }
-#app.atlas-board .board-progress { border-left: 3px solid var(--scene-color); }
-#app.atlas-board .board-progress progress { accent-color: var(--scene-color); }
 #app.atlas-board:has(.board-result-layer) > .shell { min-height: 0; }
 #app.atlas-board .game-head > div:first-child { flex: 1; }
 #app.atlas-board .game-head .solo-lives { flex: none; margin: 0 8px; white-space: nowrap; font-size: .9rem; }
-#app.atlas-board .board-progress { padding: 6px 10px; }
-.board-progress span:empty { display: none; }
 #app.atlas-board .atlas-hand-section { margin-top: 4px; }
 .drag-card-preview > strong { font-size: .78rem; padding-right: 0; line-height: 1.16; hyphens: none; overflow-wrap: normal; }
 #app.atlas-board[data-platform][data-screen] .hand-solo .hand-card > strong {
@@ -1090,9 +954,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 
 /* El zoom comparte cabecera con la línea: el espacio recuperado es para el grabado. */
 #app.atlas-board .hand-title.timeline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0 6px; }
-#app .timeline-caption { min-width: 0; flex: 1; }
-#app.atlas-board .timeline-caption h3 { margin: 0; font-size: .98rem; line-height: 1.2; }
-#app .timeline-caption > small { display: block; margin-top: 3px; font-size: .65rem; }
 #app .timeline-toolbar .timeline-zoom { flex: none; margin: 0; padding: 2px; border-radius: 10px; }
 #app .timeline-toolbar .timeline-zoom [data-zoom-level] { min-width: 44px; width: 44px; height: 40px; min-height: 40px; font-size: .7rem; border-radius: 8px; }
 @media (max-width: 699px) {
@@ -1108,80 +969,22 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app.atlas-board .timeline-toolbar .timeline-zoom [data-zoom-level] { min-width: 50px; }
 }
 
-/* Tintas de acuarela para la entrada al mazo; el papel y la lectura mandan. */
-#app .play-menu-shell .atlas-landscape img {
-  filter: sepia(.28) saturate(1.2) contrast(1.04);
-}
-#app .play-menu-shell .atlas-landscape::after {
-  background:
-    linear-gradient(180deg, var(--edition-paper), transparent 38%, transparent 70%, var(--edition-paper)),
-    linear-gradient(115deg, color-mix(in srgb, var(--scene-wash) 32%, transparent), transparent 48%, #bda05e24),
-    linear-gradient(180deg, color-mix(in srgb, var(--edition-paper) 92%, transparent), transparent 58%);
-}
-#app .play-menu-shell .atlas-intro h1 {
-  color: color-mix(in srgb, var(--scene-color) 62%, var(--edition-ink));
-}
-#app .play-menu-shell .atlas-intro .eyebrow {
-  display: inline-block; padding: 5px 10px; border-radius: 4px;
-  background: color-mix(in srgb, var(--scene-wash) 24%, var(--edition-paper));
-  color: var(--edition-ink); border-left: 3px solid var(--edition-brass);
-}
-#app .play-menu-shell .atlas-specimens img { filter: sepia(.22) saturate(1.15) contrast(1.04); }
-#app .play-menu-shell .atlas-specimens figure {
-  border-color: color-mix(in srgb, var(--scene-wash) 60%, var(--edition-line));
-  border-bottom: 3px solid var(--scene-wash);
-  background: color-mix(in srgb, var(--scene-wash) 10%, var(--edition-surface));
-}
-#app .play-menu-shell .walking-choice {
-  --choice-pigment: #ad7352;
-  --choice-tint: color-mix(in srgb, var(--choice-pigment) 18%, var(--edition-surface));
-  background: linear-gradient(105deg, var(--choice-tint), var(--edition-surface) 66%, color-mix(in srgb, var(--choice-pigment) 25%, var(--edition-surface)));
-  border-color: color-mix(in srgb, var(--choice-pigment) 48%, var(--edition-line));
-  border-left: 4px solid var(--choice-pigment);
-  box-shadow: 0 5px 14px color-mix(in srgb, var(--choice-pigment) 12%, transparent);
-}
-#app .play-menu-shell .walking-choice[data-action="solo"] { --choice-pigment: #b08b48; }
-#app .play-menu-shell .walking-copy { text-shadow: 0 1px 4px var(--choice-tint), 0 0 10px var(--choice-tint); }
-#app .play-menu-shell .walking-choice small { color: var(--edition-ink); }
-#app .play-menu-shell .walking-choice > i {
-  display: grid; place-items: center; width: 30px; height: 30px; flex-shrink: 0;
-  border-radius: 50%; color: var(--edition-ink);
-  background: color-mix(in srgb, var(--choice-pigment) 24%, var(--edition-surface));
-}
-#app .play-menu-shell .walking-choice {
-  box-shadow: inset 0 1px 0 #fff9, inset 0 -2px 0 color-mix(in srgb, var(--choice-pigment, var(--edition-brass)) 24%, transparent), 0 5px 12px #49331d24, 0 12px 22px #49331d10;
-  transition: transform 220ms var(--ease-out), box-shadow 220ms ease;
-}
-#app .play-menu-shell .walking-art { filter: sepia(.35) saturate(1.15) contrast(1.16) drop-shadow(0 3px 4px #49331d4a); opacity: .96; }
-#app .play-menu-shell .duel-choice { --choice-pigment: #a77b42; }
-#app .play-menu-shell .duel-choice::before { content: ""; position: absolute; z-index: -1; inset: 0 4% 0 34%; pointer-events: none; background: radial-gradient(ellipse at 67% 52%, #d2a75a55, transparent 68%); }
-#app .play-menu-shell .duel-choice .walking-art {
-  z-index: -2; right: -2%; width: 66%; opacity: .94; object-position: right 31%;
-  filter: sepia(.18) saturate(1.08) contrast(1.12) drop-shadow(0 4px 5px #49331d5c);
-}
-:root[data-theme="dark"] #app .play-menu-shell .atlas-intro h1 { color: var(--edition-ink); }
-
 /* Botones como piezas de papel prensado: un canto fino, contacto con la mesa y una
    respuesta corta al dedo. Conservan la tinta propia de cada acción. */
-#app :is(.btn, .play-block-toggle, .play-choice, .game-row, .solo-fold > summary, .comp-promo) {
+#app :is(.btn, .game-row, .solo-fold > summary) {
   border-color: color-mix(in srgb, var(--edition-brass) 42%, var(--edition-line));
   box-shadow: inset 0 1px 0 #fff8, 0 1px 0 #9a74484a, 0 4px 10px #49331d12;
 }
 #app .btn-primary { border: 1px solid color-mix(in srgb, var(--scene-color) 72%, #f2d89d); }
 @media (prefers-reduced-motion: no-preference) {
-  #app :is(.btn, .play-block-toggle, .play-choice, .game-row, .solo-fold > summary, .comp-promo) {
+  #app :is(.btn, .game-row, .solo-fold > summary) {
     transition: transform 120ms ease-out, box-shadow 120ms ease-out, border-color 180ms ease;
   }
-  #app :is(.btn, .play-block-toggle, .play-choice, .game-row, .solo-fold > summary, .comp-promo):active {
+  #app :is(.btn, .game-row, .solo-fold > summary):active {
     transform: translateY(2px) scale(.995);
     box-shadow: inset 0 2px 4px #5a3c1717, 0 1px 1px #49331d18;
   }
 }
-
-/* La entrada del mazo se mueve como una sola escena para que el giro de cámara no
-   fragmente portada, controles y texto en animaciones independientes. */
-#app .play-menu-shell.screen-enter > *,
-#app .play-menu-shell.screen-enter .atlas-intro > div { animation: none !important; }
 
 /* La mesa tiene fibra, luz cálida y una incisión doble bajo la cronología. */
 #app.atlas-board {
@@ -1401,10 +1204,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .enc-card-large .enc-card .card-visual { min-height: 310px; }
 .enc-card-large .enc-card .card-content { padding: 18px; }
 .enc-card-large .enc-card .card-content h3 { font-size: 1.25rem; }
-.enc-image-zoom { position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 0; color: inherit; background: transparent; cursor: zoom-in; }
-.enc-image-zoom .animal-card-art { display: block; }
-.enc-image-zoom-label { position: absolute; right: 10px; bottom: 10px; padding: 7px 10px; border: 1px solid #fff8; border-radius: 999px; color: #fff; background: #21170db8; font: 700 .63rem/1 var(--ui-font); letter-spacing: .04em; opacity: .9; }
-.enc-image-zoom:focus-visible { outline: 2px solid var(--edition-rust); outline-offset: -4px; }
 .enc-image-overlay { z-index: 65; }
 .enc-image-modal { position: relative; width: min(100%, 760px); max-height: min(94dvh, 980px); overflow: auto; padding: 26px clamp(16px, 4vw, 34px) 24px; background: var(--edition-paper); }
 .enc-image-modal h2 { max-width: calc(100% - 50px); margin: 4px 0 16px; font: 600 clamp(1.5rem, 5vw, 2.2rem)/1.05 var(--font-display); }
@@ -1454,7 +1253,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .enc-grid .enc-card-illustrated .card-visual { width: 100%; align-self: stretch; min-height: 190px; }
 #app .enc-grid .enc-card-illustrated .animal-card-art { object-fit: cover; }
 @media (max-width: 520px) {
-  #app .enc-primary-filters { grid-template-columns: 1fr; }
   .enc-recent-strip { grid-auto-columns: minmax(136px,45%); }
   #app .enc-grid .enc-card-illustrated { grid-template-columns: minmax(108px,36%) minmax(0,1fr); }
   #app .enc-grid .enc-card-illustrated .card-content { padding: 10px; }
@@ -1691,25 +1489,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app[data-screen="home"] .home-ornament span { width: 78px; background: #9a7448; }
 #app[data-screen="home"] .home-ornament i { width: 11px; height: 11px; border-color: #9b682f; }
 #app[data-screen="home"] .deck-collection { padding-top: 0; }
-#app[data-screen="home"] .collection-heading {
-  margin-bottom: 17px;
-  padding-bottom: 12px;
-  border-bottom-color: #9b7549;
-  flex-wrap: nowrap;
-}
-#app[data-screen="home"] .collection-heading h2 {
-  color: #302018;
-  font-size: clamp(1.8rem, 6.4vw, 2.35rem);
-  line-height: 1;
-}
-#app[data-screen="home"] .collection-heading .eyebrow {
-  color: #604b3a;
-  font-size: clamp(.59rem, 2vw, .72rem);
-  font-weight: 650;
-  letter-spacing: .22em;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
 #app[data-screen="home"] .gallery { gap: 19px; }
 #app[data-screen="home"] .home-gallery-shell .gallery-panel,
 #app[data-screen="home"] .home-gallery-shell .gallery-panel.active {
@@ -1962,9 +1741,6 @@ html #app .home-nav.atlas-nav::before {
   #app[data-screen="home"] .home-tagline { margin-top: 2px; font-size: .53rem; letter-spacing: .2em; }
   #app[data-screen="home"] .home-ornament { margin-top: 9px; }
   #app[data-screen="home"] .home-ornament span { width: 62px; }
-  #app[data-screen="home"] .collection-heading { margin-bottom: 12px; padding-bottom: 9px; }
-  #app[data-screen="home"] .collection-heading h2 { font-size: 1.78rem; }
-  #app[data-screen="home"] .collection-heading .eyebrow { font-size: .56rem; letter-spacing: .16em; }
   #app[data-screen="home"] .gallery { gap: 13px; }
   #app[data-screen="home"] .home-gallery-shell .gallery-panel,
   #app[data-screen="home"] .home-gallery-shell .gallery-panel.active {
@@ -1997,16 +1773,13 @@ html #app .home-nav.atlas-nav::before {
 }
 #app .motion-managed,
 #app .motion-managed > :not(.spinner):not(.waiting-orbit),
-#app .motion-managed :is(.atlas-landscape img, .atlas-specimens figure,
-  .mode-masthead > div, .guide-step, .guide-card, .reveal, .result-mark,
-  .result-mark::after, .comp-splash, .atlas-final-page > *, .game-row) {
+#app .motion-managed :is(.atlas-landscape img, .atlas-specimens figure, .guide-step, .guide-card, .reveal, .result-mark, .result-mark::after, .comp-splash, .atlas-final-page > *, .game-row) {
   animation: none !important;
 }
 #app .dialog-enter:has(.motion-managed) { animation: none; }
 #app .dialog-exit .modal { animation: none !important; }
 @media (prefers-reduced-motion: no-preference) {
-  #app :is(.play-choice-grid, .guide-chapter[open] .guide-chapter-body,
-    .solo-fold[open] > :not(summary), .enc-deck[open] > :not(summary)) {
+  #app :is(.guide-chapter[open] .guide-chapter-body, .solo-fold[open] > :not(summary), .enc-deck[open] > :not(summary)) {
     animation: continuum-ink-enter 420ms var(--ease-out) backwards;
   }
   #app .guide-chapter[open] .guide-drawing { animation: none; }
@@ -2040,7 +1813,6 @@ html #app .home-nav.atlas-nav::before {
 #app .enc-selection-heading h2 { margin: 0 0 7px; font: 500 1.35rem/1.25 var(--font-display); }
 #app #enc-count { margin: 0; font: .8rem/1.7 var(--ui-font); color: var(--edition-muted); }
 #app .enc-toolbar { padding: 20px; border: 1px solid var(--edition-line); border-radius: 14px; background: var(--edition-surface); box-shadow: none; }
-#app .enc-primary-filters { gap: 18px; }
 #app .enc-toolbar .field { margin-bottom: 0; }
 #app .enc-toolbar label, #app .enc-lock-label { font: 600 .78rem/1.5 var(--ui-font); }
 #app .enc-toolbar .enc-bands { gap: 7px; }
@@ -2096,7 +1868,6 @@ html #app .home-nav.atlas-nav::before {
 #app .turn-duel-profile p { font: .85rem/1.6 var(--ui-font); color: var(--edition-muted); }
 #app .perfil-account .account-card { margin: 0; border-radius: 14px; overflow: hidden; }
 #app .perfil-account .account-hero { padding: 22px; }
-#app .perfil-account .account-identity { gap: 12px; }
 #app .perfil-account .account-actions { flex-wrap: wrap; }
 #app .perfil-account .account-actions .btn { flex: 1 1 140px; }
 #app .perfil-achievement-group { border: 1px solid var(--edition-line); background: var(--edition-surface); border-radius: 12px; margin: 10px 0; }
@@ -2136,6 +1907,12 @@ html #app .home-nav.atlas-nav::before {
 }
 @media (max-width: 420px) {
   #app > .overlay > :is(.enc-modal,.settings-modal,.rules) { padding-inline: 16px; }
+  /* La veladura sale justo hasta el borde: el mismo margen que el relleno de 16 px. */
+  #app > .overlay > :is(.enc-modal, .rules, .settings-modal) > .atlas-scroll-veil {
+    width: calc(100% + max(16px, env(safe-area-inset-left)) + max(16px, env(safe-area-inset-right)));
+    margin-left: calc(-1 * max(16px, env(safe-area-inset-left)));
+    margin-right: calc(-1 * max(16px, env(safe-area-inset-right)));
+  }
   #app .perfil-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
   #app .perfil-stats > span:nth-child(n+3) { border-top: 1px solid var(--edition-line); }
   #app .enc-toolbar { padding: 16px; }
@@ -2182,17 +1959,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .home-duels-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--edition-line); color: var(--edition-brass); font-size: 1rem; }
 #app .home-duels-banner i { font-style: normal; font-size: 1.1rem; color: var(--edition-brass); }
 #app .home-duels-banner:focus-visible { outline: 3px solid var(--edition-ink); outline-offset: 3px; }
-
-/* Jugar: las tres familias de contenido una debajo de otra. */
-#app .jugar-heading { max-width: 720px; margin: 8px auto 22px; text-align: center; }
-#app .jugar-heading .eyebrow { justify-content: center; }
-#app .home-quick { margin-top: 26px; }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  #app .play-menu-shell .walking-choice:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 #fff9, inset 0 -2px 0 color-mix(in srgb, var(--choice-pigment, var(--edition-brass)) 30%, transparent), 0 9px 18px #49331d2b, 0 16px 26px #49331d14; }
-}
-@media (prefers-reduced-motion: reduce) {
-  #app .play-menu-shell .walking-choice { transition: none; }
-}
 
 /* Atlas: la colección arriba, con su puerta a la enciclopedia; debajo, el recorrido. */
 #app .atlas-collection, #app .atlas-duels { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
@@ -2262,18 +2028,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .daily-splash-art.is-revealed { display: block; }
 #app .daily-splash-art.is-revealed img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
-/* Jugar: las grandes colecciones agrupadas en una cuadrícula de dos, como un índice.
-   La que se abre ocupa el ancho entero para enseñar sus mazos debajo. */
-#app .jugar-shell #deck-collection .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-#app .jugar-shell #deck-collection .gallery-panel { height: 112px; min-height: 112px; }
-#app .jugar-shell #deck-collection .gallery-panel.active { height: 190px; }
-#app .jugar-shell #deck-collection .gallery-panel { transition: height 380ms var(--ease-out), transform var(--motion-fast) ease, box-shadow var(--motion-base) ease; }
-#app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label { left: 12px; right: 12px; bottom: 10px; column-gap: 8px; }
-#app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label strong { font-size: 1.02rem; letter-spacing: -.01em; }
-#app .jugar-shell #deck-collection .gallery-panel:not(.active) .panel-label small { display: none; }
-#app .jugar-shell #deck-collection .gallery-panel:not(.active) .collection-index { top: 10px; left: 12px; font-size: .6rem; }
-#app .jugar-shell #deck-collection .gallery-panel:not(.active) .collection-open { top: 10px; right: 12px; width: 20px; height: 20px; }
-
 /* Identidad: bienvenida, selector de avatares, Atlas y avatares en la mesa. */
 #app .bienvenida-shell { max-width: 460px; min-height: 100svh; display: grid; align-content: center; padding-block: calc(env(safe-area-inset-top) + 24px) calc(env(safe-area-inset-bottom) + 24px); }
 #app .bienvenida { display: grid; justify-items: center; gap: 14px; text-align: center; }
@@ -2300,7 +2054,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .identidad-avatar-vivo { display: grid; place-items: center; margin: 4px 0 10px; }
 #app .table-seat > span.seat-avatar, #app .manage-player > span.seat-avatar { padding: 0; overflow: visible; border: 0; background: transparent; box-shadow: none; color: inherit; }
 #app .seat-avatar svg { width: 100%; height: 100%; }
-#app .avatar-inicial { display: inline-grid; place-items: center; border-radius: 50%; background: var(--edition-line); color: var(--edition-ink); font: 700 .7rem var(--ui-font); }
 
 /* Portada Continuum: cada acceso es una lámina completa con el foco de lectura a la izquierda. */
 #app .home-doors { gap: 12px; }
@@ -2999,7 +2752,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app.atlas-board .scoreboard-panel .score > em small { color: var(--edition-muted); font: .48rem/1 var(--ui-font); text-transform: uppercase; }
 
 #app.atlas-board .placement-dock { gap: 4px; padding-top: 5px; }
-#app.atlas-board .placement-dock > .placement-instruction { margin: 0; font-size: .64rem; }
 #app.atlas-board .placement-dock > .btn-primary { min-height: 42px; border-radius: 12px; }
 
 @media (max-width: 699px) {
@@ -3148,12 +2900,6 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   min-width: 48px;
   font-size: .65rem;
 }
-#app.atlas-board .board-timeline-section .timeline-caption h3 {
-  font-size: .9rem;
-}
-#app.atlas-board .board-timeline-section .timeline-caption > small {
-  font-size: .6rem;
-}
 @media (max-width: 699px) {
   #app.atlas-board > .shell {
     box-sizing: border-box;
@@ -3258,59 +3004,12 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app[data-screen="home"] .home-duels-banner { background: #f8eed7; border-color: #ac9163; }
 
 /* Jugar: tres entradas y un único panel abierto; las alturas se animan en el DOM. */
-#app .jugar-shell { max-width: 820px; }
-#app .jugar-shell .jugar-heading { margin: 8px auto 26px; max-width: 540px; }
-#app .jugar-shell .jugar-heading h1 { font-size: clamp(2rem, 7vw, 3rem); line-height: 1.08; margin: 10px 0; }
-#app .jugar-shell .jugar-heading p { font-size: .93rem; line-height: 1.5; }
-#app .play-catalog { display: grid; gap: 16px; }
-#app .catalog-section { --catalog-color: #6f5939; --catalog-tint: #f1e8d5; overflow: hidden; border: 1px solid color-mix(in srgb, var(--catalog-color) 34%, var(--edition-line)); border-radius: 14px; background: var(--edition-surface); box-shadow: 0 4px 13px #3b291414; }
-#app .catalog-quick { --catalog-color: #6b6446; --catalog-tint: #ede9d9; }
-#app .catalog-competition { --catalog-color: #695947; --catalog-tint: #ebe5d8; }
-#app .catalog-section > h2 { margin: 0; padding: 0; }
-#app .catalog-toggle { display: grid; grid-template-columns: 42px minmax(0, 1fr) 30px; align-items: center; gap: 13px; width: 100%; padding: 22px 18px; border: 0; border-radius: 0; color: var(--catalog-color); background: linear-gradient(115deg, var(--catalog-tint), color-mix(in srgb, var(--catalog-tint) 32%, var(--edition-surface))); text-align: left; cursor: pointer; }
-#app .catalog-number { display: grid; place-items: center; width: 42px; height: 50px; border-radius: 10px 10px 18px 10px; background: var(--catalog-color); color: #fffdf6; font: 500 1.05rem var(--font-display); box-shadow: 0 3px 0 #00000015; }
-#app .catalog-copy { display: grid; gap: 7px; min-width: 0; }
-#app .catalog-copy strong { font: 500 clamp(1.3rem, 4.5vw, 1.65rem)/1.08 var(--font-display); }
-#app .catalog-copy small { color: var(--edition-ink); font: .78rem/1.45 var(--ui-font); }
-#app .catalog-cta { font: 700 .69rem/1.4 var(--ui-font); }
-#app .catalog-chevron { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid currentColor; font: 300 1.4rem/1 var(--ui-font); transition: transform 420ms ease; }
-#app .catalog-section.is-open .catalog-chevron { transform: rotate(45deg); }
-#app .catalog-toggle:focus-visible { outline: 3px solid var(--catalog-color); outline-offset: -5px; }
-#app .catalog-drawer, #app .collection-drawer { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 440ms cubic-bezier(.2,.7,.25,1), visibility 440ms; }
-#app .catalog-drawer-inner, #app .collection-drawer-inner { min-height: 0; overflow: hidden; }
-#app .catalog-section.is-open > .catalog-drawer, #app .collection-entry.active > .collection-drawer { grid-template-rows: 1fr; visibility: visible; }
-#app .catalog-drawer-inner > .catalog-hint { margin: 17px 16px 12px; font: .78rem/1.4 var(--ui-font); color: var(--edition-muted); }
-#app .jugar-shell #deck-collection { margin: 0 12px 14px; padding: 0; }
-#app .jugar-shell #deck-collection .gallery { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
-#app .jugar-shell #deck-collection .collection-entry { display: block; grid-column: auto; width: 100%; min-width: 0; border-radius: 12px; overflow: hidden; background: var(--edition-paper); }
-#app .jugar-shell #deck-collection .gallery-panel { display: block; width: 100%; height: 104px; min-height: 104px; border: 0; border-radius: 12px; box-shadow: none; transform: none; transition: height 440ms cubic-bezier(.2,.7,.25,1); }
-#app .jugar-shell #deck-collection .gallery-panel.active { height: 154px; min-height: 104px; border-radius: 12px 12px 0 0; }
-#app .jugar-shell #deck-collection .gallery-panel .panel-label { top: auto; bottom: 14px; left: 17px; right: 50px; transform: none; display: block; }
-#app .jugar-shell #deck-collection .gallery-panel .panel-label strong { font-size: 1.35rem; line-height: 1.1; color: #fff9e8; }
-#app .jugar-shell #deck-collection .gallery-panel .panel-label small, #app .jugar-shell #deck-collection .panel-spine { display: none; }
-#app .jugar-shell #deck-collection .gallery-panel .collection-index { top: 12px; left: 17px; font-size: .61rem; }
-#app .jugar-shell #deck-collection .gallery-panel .collection-open { top: 50%; right: 15px; width: 26px; height: 26px; transform: translateY(-50%) rotate(45deg); }
-#app .jugar-shell #deck-collection .gallery-panel::after { background: linear-gradient(90deg, #152b29d4, #14261a54 65%, #19221515); }
-#app .jugar-shell #deck-collection .panel-art { filter: saturate(1.3) contrast(1.05); }
-@media (hover: hover) { #app .jugar-shell #deck-collection .gallery-panel:hover .panel-art { filter: saturate(1.3) contrast(1.05); } }
-#app .jugar-shell #deck-collection .collection-decks { display: block; margin: 0; padding: 14px 12px; border: 0; border-radius: 0; box-shadow: none; background: var(--edition-surface); animation: none; }
-#app .jugar-shell #deck-collection .collection-decks h2 { display: none; }
-#app .jugar-shell #deck-collection .collection-decks .lead { margin: 0 0 10px; font-size: .78rem; }
-#app .jugar-shell #deck-collection .collection-decks .games { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px; }
-#app .catalog-drawer-inner > :is(.home-quick, .home-competition) { margin: 0; padding: 16px 12px; }
-#app .catalog-drawer-inner .home-quick .gallery { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
-#app .catalog-drawer-inner .home-competition .comp-promo { min-height: 210px; }
-@media (max-width: 359px) {
-  #app .catalog-toggle { grid-template-columns: minmax(0, 1fr) 28px; padding: 20px 15px; }
-  #app .catalog-number { display: none; }
-}
+#app .collection-drawer { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 440ms cubic-bezier(.2,.7,.25,1), visibility 440ms; }
+#app .collection-drawer-inner { min-height: 0; overflow: hidden; }
+#app .collection-entry.active > .collection-drawer { grid-template-rows: 1fr; visibility: visible; }
 @media (prefers-reduced-motion: reduce) {
-  #app .catalog-drawer, #app .collection-drawer, #app .catalog-chevron, #app .jugar-shell #deck-collection .gallery-panel { transition: none; }
+  #app .collection-drawer { transition: none; }
 }
-:root[data-theme="dark"] #app .catalog-section { --catalog-tint: #352d21; --catalog-color: #dfc497; }
-:root[data-theme="dark"] #app .catalog-quick { --catalog-tint: #302e23; --catalog-color: #d5c89e; }
-:root[data-theme="dark"] #app .catalog-competition { --catalog-tint: #332c25; --catalog-color: #d6bd9e; }
-:root[data-theme="dark"] #app .catalog-number { color: #201b17; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-door { --door-paper: #332a20; --door-ink: #f1e1bf; --door-edge: #997d50; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-door[data-action="jugar"] { --door-paper: #302d24; --door-ink: #ece2c7; --door-edge: #888363; }
 :root[data-theme="dark"] #app[data-screen="home"] .home-door[data-action="perfil"] { --door-paper: #312b23; --door-ink: #e8dcc6; --door-edge: #90816a; }
@@ -3564,53 +3263,11 @@ html body:has(#app[data-screen="home"])::before {
     repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, 90vw) min(520px, 60vh) no-repeat;
 }
 
-/* Jugar: cada entrada lleva a la derecha un grabado del juego, como las láminas de un
-   jugador o de duelo, impreso en el propio papel de la tarjeta: se multiplica con él,
-   toma su tono terracota y se desvanece hacia el texto. El texto no se mueve. */
-#app .catalog-toggle { position: relative; overflow: hidden; isolation: isolate; }
-#app .catalog-toggle > :not(.catalog-art) { position: relative; z-index: 1; }
-#app .catalog-toggle .catalog-copy { padding-right: 22%; }
-#app .catalog-art {
-  position: absolute;
-  z-index: 0;
-  inset: 0 0 0 auto;
-  width: 58%;
-  pointer-events: none;
-  background-repeat: no-repeat;
-  background-size: cover;
-  mix-blend-mode: multiply;
-  filter: sepia(.55) saturate(.85) hue-rotate(-6deg);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 55%);
-  mask-image: linear-gradient(90deg, transparent, #000 55%);
-}
-#app .catalog-art-competition { background-image: url("assets/competition-engraving.webp"); background-position: 85% 45%; opacity: .92; }
-#app .catalog-art-quick {
-  background-image: url("assets/hero-quick-400.webp"); background-position: 50% 42%; opacity: .5;
-  filter: sepia(.75) saturate(.8) hue-rotate(-8deg) brightness(1.4) contrast(.85);
-}
-/* Colecciones: la portada de la mezcla de todos los mazos (templo, reloj, cine, brújula),
-   con el mismo lavado que la de los retos. */
-#app .catalog-art-collections {
-  background-image: url("assets/hero-mixed-400.webp"); background-position: 50% 30%; opacity: .5;
-  filter: sepia(.75) saturate(.8) hue-rotate(-8deg) brightness(1.4) contrast(.85);
-}
-#app .catalog-chevron { background: color-mix(in srgb, var(--edition-surface) 82%, transparent); box-shadow: 0 1px 4px #4a2c161f; }
-:root[data-theme="dark"] #app .catalog-art { mix-blend-mode: normal; opacity: .4; }
-@media (max-width: 359px) { #app .catalog-art { width: 48%; } }
-
 /* Jugar con un punto más de color: el color lo ponen las láminas, que recuperan su
    tono; los tres recuadros comparten el mismo papel terracota suave. */
-#app :is(.catalog-collections, .catalog-quick, .catalog-competition) { --catalog-color: #6f4a33; --catalog-tint: #f3e3d2; --catalog-wash: #b8653d; }
-#app .catalog-section { border-color: color-mix(in srgb, var(--catalog-wash) 34%, var(--edition-line)); box-shadow: 0 4px 14px #b8653d1f; }
-#app .catalog-toggle { background: linear-gradient(110deg, #fbf5ec, var(--catalog-tint) 65%); }
-#app .catalog-art::after { background: linear-gradient(90deg, transparent 15%, #b8653d14); }
-#app :is(.catalog-art-collections, .catalog-art-quick) { opacity: .78; filter: sepia(.2) saturate(1.15) brightness(1.08) contrast(.95); }
-#app .catalog-art-competition { opacity: 1; filter: sepia(.15) saturate(1.2); }
 html:not(:has(#app[data-screen="home"]))::before {
   background: linear-gradient(#f3e3c8b3, #f2e1c494 60%, #f0dcbc4d), #e9dcc3 url("assets/continuum-splash-clean-v3.webp") center bottom / cover no-repeat;
 }
-:root[data-theme="dark"] #app :is(.catalog-collections, .catalog-quick, .catalog-competition) { --catalog-color: #e6c9a5; --catalog-tint: #352a1f; }
-:root[data-theme="dark"] #app .catalog-toggle { background: linear-gradient(110deg, #2b221a, var(--catalog-tint) 65%); }
 
 /* Retratos ilustrados: el círculo, la moldura y la sombra pertenecen al juego.
    El recorte evita que se vea una miniatura cuadrada sobre el papel de la pantalla. */
@@ -3686,99 +3343,6 @@ html:not(:has(#app[data-screen="home"]))::before {
 @media (hover: hover) { #app .avatar-picker-option:hover { background: #e8d9bb80; } }
 #app .avatar-picker-option:focus-visible, #app .avatar-picker-close:focus-visible { outline: 3px solid var(--edition-brass); outline-offset: 2px; }
 @media (max-width: 360px) { #app .avatar-picker-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-
-/* Cristal líquido: la parte que se despliega de cada entrada de Jugar deja ver la
-   ilustración del fondo, desenfocada y con un velo terracota, con un brillo en el canto
-   superior y un filo claro, como una lámina de vidrio sobre el papel. */
-#app .catalog-section {
-  position: relative;
-  background:
-    radial-gradient(120% 60% at 15% 0%, #fffaf280, transparent 55%),
-    linear-gradient(160deg, #f8ecdd8c, #e7c4a473 55%, #d9a98266);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
-  border: 1px solid #ffffff8c;
-  box-shadow:
-    inset 0 1px 0 #ffffffb3,
-    inset 0 -1px 0 #b8653d33,
-    inset 1px 0 0 #ffffff4d,
-    0 10px 30px #7a3f1d24,
-    0 2px 6px #7a3f1d14;
-}
-#app .catalog-section::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 30%, #ffffff2e 42%, transparent 54%);
-}
-#app .catalog-section > * { position: relative; z-index: 1; }
-#app .catalog-drawer-inner > .catalog-hint { color: #5d3a24; }
-#app .jugar-shell #deck-collection .collection-decks {
-  background: linear-gradient(160deg, #fff7ec99, #efd4bb80);
-  -webkit-backdrop-filter: blur(10px) saturate(1.2);
-  backdrop-filter: blur(10px) saturate(1.2);
-  box-shadow: inset 0 1px 0 #ffffff99;
-}
-:root[data-theme="dark"] #app .catalog-section {
-  background: linear-gradient(160deg, #3a2a1ecc, #24190fcc);
-  border-color: #ffffff1f;
-  box-shadow: inset 0 1px 0 #ffffff26, 0 10px 30px #0008;
-}
-:root[data-theme="dark"] #app .catalog-drawer-inner > .catalog-hint { color: #e3cfb4; }
-:root[data-theme="dark"] #app .jugar-shell #deck-collection .collection-decks { background: #2a1f16cc; }
-#app .catalog-direct .catalog-chevron { font-size: 1.1rem; }
-@media (hover: hover) { #app .catalog-direct .catalog-toggle:hover .catalog-chevron { transform: translateX(3px); } }
-
-/* Cabeceras con ilustración (Retos rápidos, cada mazo) con el estilo de la de Competición:
-   la lámina se imprime clara, en sepia, a la derecha, y se desvanece en el papel con una
-   máscara ovalada; el texto va directamente sobre el papel, a la izquierda, con un halo
-   del mismo papel. Las láminas oscuras se aclaran para que nunca quede letra oscura
-   sobre fondo oscuro. */
-#app .atlas-intro .atlas-landscape,
-#app .play-menu-shell > .atlas-intro .atlas-landscape {
-  inset: 0 0 0 auto;
-  width: 78%;
-  background: none;
-  -webkit-mask-image: radial-gradient(closest-side ellipse at 58% 50%, #000 42%, transparent 100%);
-  mask-image: radial-gradient(closest-side ellipse at 58% 50%, #000 42%, transparent 100%);
-}
-#app .atlas-intro .atlas-landscape::after { display: none; }
-#app .atlas-intro .atlas-landscape img,
-#app .play-menu-shell .atlas-intro .atlas-landscape img {
-  object-position: 55% 40%;
-  filter: sepia(1) saturate(.7) brightness(1.45) contrast(.76);
-  opacity: .72;
-  mix-blend-mode: multiply;
-}
-#app .atlas-intro .atlas-intro-copy { max-width: min(62%, 42ch); }
-/* Retos rápidos: su cabecera no lleva cartas de muestra; se le da la altura de la de
-   Competición para que la lámina respire junto al título. */
-#app .quick-shell > .atlas-intro { min-height: 195px; align-content: center; }
-#app .atlas-intro .atlas-intro-copy h1 { color: #2a1a10; }
-#app .atlas-intro .atlas-intro-copy p { color: #3d2c20; }
-#app .atlas-intro .atlas-intro-copy .eyebrow { color: #8a5a2e; background: none; border: 0; box-shadow: none; padding: 0; }
-#app .atlas-intro .atlas-intro-copy :is(h1, p, .eyebrow),
-#app .comp-atlas-intro :is(h1, p, .eyebrow) {
-  text-shadow: 0 0 3px #f7eedd, 0 0 8px #f7eedd, 0 0 16px #f3e6cf;
-}
-:root[data-theme="dark"] #app .atlas-intro .atlas-landscape img { mix-blend-mode: normal; opacity: .28; filter: sepia(1) saturate(.6); }
-:root[data-theme="dark"] #app .atlas-intro .atlas-intro-copy h1 { color: #f5e6cc; }
-:root[data-theme="dark"] #app .atlas-intro .atlas-intro-copy p { color: #e3d2b6; }
-:root[data-theme="dark"] #app .atlas-intro .atlas-intro-copy .eyebrow { color: #e0b77e; }
-:root[data-theme="dark"] #app .atlas-intro .atlas-intro-copy :is(h1, p, .eyebrow),
-:root[data-theme="dark"] #app .comp-atlas-intro :is(h1, p, .eyebrow) { text-shadow: 0 0 6px #140d08, 0 0 14px #140d08; }
-
-/* Tarjetas de formato con grabado: la ilustración se funde antes de llegar al texto y
-   las letras llevan un halo de papel, para que nunca pisen una zona oscura. */
-#app .walking-copy :is(b, small) { text-shadow: 0 0 4px #fbf5eb, 0 0 10px #fbf5ebcc; }
-#app .play-menu-shell .duel-choice .walking-art {
-  -webkit-mask-image: linear-gradient(90deg, transparent 0 22%, #000 58%, #000 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent 0 22%, #000 58%, #000 92%, transparent);
-}
-:root[data-theme="dark"] #app .walking-copy :is(b, small) { text-shadow: 0 0 6px #1a120b; }
 
 /* Paneles de Jugar solo y Retar a un amigo con la estética del resto: cristal terracota,
    rótulos en versalitas de latón y opciones como láminas de papel. La elegida se marca
@@ -4352,7 +3916,6 @@ html:not(:has(#app[data-screen="home"]))::before {
   }
   #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > .score-avatar,
   #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > .score-avatar .avatar { width: 24px !important; height: 24px !important; }
-  #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > em strong { font-size: .87rem; }
   #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > em small { display: none; }
   #app.atlas-board[data-board-fit="tight"] .atlas-hand-section { position: relative; }
@@ -4402,7 +3965,6 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading { margin-bottom: 3px; gap: 5px; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading h1 { margin: 2px 0; font-size: 1.06rem; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-heading p { margin: 2px 0; font-size: .64rem; line-height: 1.15; }
-  #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-clock { width: 40px; height: 40px; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-scores { gap: 4px; margin-bottom: 4px; }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-player {
     grid-template-columns: 27px minmax(0,1fr) auto; gap: 3px; min-height: 45px;
@@ -4910,14 +4472,6 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 #app.atlas-board .hand-card > .card-category { font-size: 0 !important; color: transparent !important; }
 #app.atlas-board .hand-card > .card-category > span[aria-hidden="true"] { font-size: .7rem !important; }
 
-/* Competición con el formato de las pantallas de modalidad. */
-#app .competition-hub .competition-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; padding: 14px 16px; border-radius: 16px; }
-#app .competition-hub .competition-settings label { font-size: .8rem; }
-#app .competition-hub .mode-hub-list > .btn { margin: 0; }
-#app .competition-hub .competition-settings .field { display: grid; gap: 6px; margin: 0; }
-#app .competition-hub .competition-settings label { min-height: 0; margin: 0; }
-#app .competition-hub .competition-settings select { min-height: 44px; }
-
 /* Franja única bajo la barra en todas las mesas. */
 #app.atlas-board .game-head.game-head-slim { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 0; margin: 0 0 6px; padding: 0 0 6px; }
 #app.atlas-board .game-head.game-head-slim > div:first-child { flex: 0 1 auto; }
@@ -5067,14 +4621,6 @@ html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { 
   color: #8a3f2f; font: 600 1.05rem/1.2 var(--font-display); letter-spacing: .02em; text-wrap: balance;
 }
 
-:root:not([data-theme="dark"]) #app .competition-hub .btn-secondary {
-  border: 1px solid #b9a98e;
-  background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
-  color: #5b4936;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
-}
-#app .competition-hub .btn-primary { border: 1px solid #7a3a2c; background: #8a3f2f; color: #fff6e8; box-shadow: 0 5px 14px #8a3f2f2e; }
-
 /* Sala privada online: «Crear una sala» agrupa las modalidades bajo una sola tarjeta. */
 html #app .mode-create-room{display:grid;gap:12px}
 html #app .mode-create-list{display:grid;gap:12px;padding-left:14px;border-left:2px solid #d8bf9c}
@@ -5125,9 +4671,6 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   object-fit: contain; object-position: center; transform: translate(-50%, -50%);
   opacity: 1; filter: drop-shadow(0 3px 3px #734f2938);
 }
-
-/* Dificultad de la competición: ocupa todo el ancho bajo los dos desplegables. */
-.competition-settings .competition-difficulty { grid-column: 1 / -1; }
 
 /* Minijuego de «quién empieza»: sin el teclado abierto de entrada hay sitio para una lámina y una carta grandes. */
 .starter-card { padding: 24px 20px; }
@@ -5259,7 +4802,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 #app .gallery-panel:active { transform: none !important; }
 
 /* Un cajón cerrado no ocupa nada: no depende de que el motor colapse una fila «0fr». */
-#app .collection-drawer[inert], #app .catalog-drawer[inert] { display: none; }
+#app .collection-drawer[inert] { display: none; }
 
 /* ---- Pantallas estrechas y letra grande: nada se sale del móvil ---- */
 .player-row { grid-template-columns: minmax(0, 1fr) auto; }
@@ -5571,3 +5114,17 @@ html:has(#app.atlas-board) .motas { display: none; }
 }
 @keyframes final-brillo { from { background-position: 130% 0; } to { background-position: -30% 0; } }
 @keyframes final-sello { 0% { transform: scale(1); } 40% { transform: scale(1.08) rotate(-1.5deg); box-shadow: 0 0 0 3px #d6a54266, 0 0 26px #e8bd5e80; } 100% { transform: none; } }
+
+/* Carta del turno en el móvil: el emblema ocupa el hueco que dejan el rótulo de arriba y el
+   título de abajo, en vez de ir fijo en medio. Con un título de tres o cuatro líneas o un
+   rótulo en dos («VELOCIDAD OCULTA») ya no se pisan; el papel del reverso cubre toda la carta. */
+@media (max-width: 699px) {
+  html #app.atlas-board .board-focus-card .hand-solo .hand-card { background: var(--cardback-fill); }
+  html #app.atlas-board .board-focus-card .hand-solo .hand-card > .carta-reverso {
+    position: static; flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 2px 0; background: none;
+  }
+  html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .board-focus-card .hand-solo .hand-card .carta-reverso > .reverso-emblema {
+    position: relative; inset: auto; top: auto; left: auto; transform: none;
+    width: 88% !important; height: 100% !important; max-height: 100% !important;
+  }
+}

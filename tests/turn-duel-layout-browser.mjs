@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {gameHtml} from './game-fixture.mjs';
+// ENGINES=chromium limita la prueba a Chromium donde no hay WebKit instalado (por defecto, los dos).
 const {webkit,chromium}=await import(process.env.PLAYWRIGHT_MODULE?pathToFileURL(process.env.PLAYWRIGHT_MODULE).href:'playwright');
 const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
 const html=gameHtml(await fs.readFile(path.join(root,'index.html'),'utf8'));
@@ -14,8 +15,8 @@ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const errors=[];
 await fs.mkdir(path.join(root,'test-results/zoom'),{recursive:true});
 try{
- for(const [name,engine] of [['webkit',webkit],['chromium',chromium]]){
-  const browser=await engine.launch();
+ for(const [name,engine] of [['webkit',webkit],['chromium',chromium]].filter(([name])=>(process.env.ENGINES||'webkit,chromium').split(',').includes(name))){
+  const browser=await engine.launch(name==='chromium'&&process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{});
   try{
    for(const [width,height] of [[320,568],[375,667]]){
     const page=await browser.newPage({viewport:{width,height},isMobile:true,deviceScaleFactor:2,reducedMotion:'reduce'});
