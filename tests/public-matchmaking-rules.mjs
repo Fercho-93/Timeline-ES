@@ -105,6 +105,53 @@ await env.withSecurityRulesDisabled(async c=>{
 await check('TRAMPA: al irse, pasarle la mesa a quien no toca',false,updateDoc(doc(ctx(H),'rooms',CODE),{players:{[P2]:player('Bea'),[P3]:player('Cid')},playerOrder:[P2,P3],hostUid:P3,version:3,updatedAt:serverTimestamp()}));
 await check('quien lleva la mesa se va y la lleva quien queda primero',true,updateDoc(doc(ctx(H),'rooms',CODE),{players:{[P2]:player('Bea'),[P3]:player('Cid')},playerOrder:[P2,P3],hostUid:P2,version:3,updatedAt:serverTimestamp()}));
 
+console.log('\nTablón de mesas públicas');
+{
+  const { collection, query, orderBy, limit, getDocs, deleteDoc } = await import('firebase/firestore');
+  const ficha=(over={})=>({kind:'collections',code:CODE,mode:'history',capacity:2,seconds:20,players:1,names:['Ana'],hostUid:H,hostAvatar:null,clientVersion:42,fingerprint:'167.test1',updatedAt:serverTimestamp(),...over});
+  const sala=async(over={})=>env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'rooms',CODE),{...room(),turnSeconds:20,createdAt:new Date(),updatedAt:new Date(),...over}));
+  await env.clearFirestore();
+  // Crear mesa: la sala nace con su tiempo elegido, sin pasar por la cola.
+  await check('se abre una mesa pública con su tiempo, sin cola',true,setDoc(doc(ctx(H),'rooms',CODE),{...room(),turnSeconds:20}));
+  await check('quien la lleva publica su ficha en el tablón',true,setDoc(doc(ctx(H),'publicTables',CODE),ficha()));
+  await check('cualquiera con perfil lista las mesas abiertas',true,getDocs(query(collection(ctx(P2),'publicTables'),orderBy('updatedAt','desc'),limit(50))));
+  await check('TRAMPA: listar sin límite',false,getDocs(query(collection(ctx(P2),'publicTables'),orderBy('updatedAt','desc'))));
+  await check('TRAMPA: publicar la ficha de una mesa ajena',false,setDoc(doc(ctx(P2),'publicTables',CODE),ficha({hostUid:P2})));
+  await check('TRAMPA: la ficha dice otro mazo que la sala',false,setDoc(doc(ctx(H),'publicTables',CODE),ficha({mode:'science'})));
+  await check('TRAMPA: un tiempo que no existe',false,setDoc(doc(ctx(H),'publicTables',CODE),ficha({seconds:45})));
+  await check('TRAMPA: más jugadores que plazas',false,setDoc(doc(ctx(H),'publicTables',CODE),ficha({players:3})));
+  await check('TRAMPA: un campo de más',false,setDoc(doc(ctx(H),'publicTables',CODE),ficha({premio:1})));
+  await check('quien entra en la mesa (elegida en el tablón) ocupa su plaza',true,updateDoc(doc(ctx(P2),'rooms',CODE),{players:{[H]:player('Ana'),[P2]:player('Bea')},playerOrder:[H,P2],version:2,updatedAt:serverTimestamp()}));
+  await check('quien no lleva la mesa no puede borrar una ficha viva',false,deleteDoc(doc(ctx(P3),'publicTables',CODE)));
+  await check('quien la lleva la quita al llenarse',true,deleteDoc(doc(ctx(H),'publicTables',CODE)));
+  // Relevo: la nueva persona al mando reescribe la ficha a su nombre.
+  await env.clearFirestore();
+  await sala({hostUid:P2,playerOrder:[P2],players:{[P2]:player('Bea')}});
+  await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'publicTables',CODE),{...ficha(),updatedAt:new Date()}));
+  await check('tras el relevo, la ficha pasa a quien lleva ahora la mesa',true,setDoc(doc(ctx(P2),'publicTables',CODE),ficha({hostUid:P2,names:['Bea']})));
+  // Una sala que ya ha empezado no puede seguir anunciándose.
+  await env.clearFirestore();
+  await sala({status:'playing',phase:'turn'});
+  await check('TRAMPA: anunciar una mesa que ya juega',false,setDoc(doc(ctx(H),'publicTables',CODE),ficha()));
+  await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'publicTables',CODE),{...ficha(),updatedAt:new Date()}));
+  await check('cualquiera retira la ficha de una mesa que ya empezó',true,deleteDoc(doc(ctx(P3),'publicTables',CODE)));
+  // Ficha abandonada (más de dos minutos sin renovar): cualquiera la retira.
+  await env.clearFirestore();
+  await sala();
+  await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'publicTables',CODE),{...ficha(),updatedAt:new Date(Date.now()-5*60000)}));
+  await check('cualquiera retira una ficha abandonada',true,deleteDoc(doc(ctx(P3),'publicTables',CODE)));
+  // Retos rápidos: la ficha la escribe quien lleva la sala de retos.
+  await env.clearFirestore();
+  const Q='ABCDEFGH23';
+  await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'quickRooms',Q),{version:1,capacity:3,host:H,members:[H],names:['Ana'],config:null,commands:[],revision:0,phase:'lobby',actor:H,catalog:1,matchmaking:'public',updatedAt:new Date()}));
+  const rapida=over=>ficha({kind:'quick',code:Q,mode:'quick',capacity:3,seconds:0,fingerprint:1,clientVersion:1,...over});
+  await check('mesa de Retos rápidos en el tablón',true,setDoc(doc(ctx(H),'publicTables',Q),rapida()));
+  await check('TRAMPA: ficha de Retos rápidos con otras plazas',false,setDoc(doc(ctx(H),'publicTables',Q),rapida({capacity:4})));
+  await check('TRAMPA: ficha de Retos rápidos de quien no la lleva',false,setDoc(doc(ctx(P2),'publicTables',Q),rapida({hostUid:P2})));
+  // Las pruebas siguientes comparten el emulador: no se dejan salas a medias.
+  await env.clearFirestore();
+}
+
 await env.cleanup();
 console.log(fail ? '\n'+fail+' fallos' : '\n0 fallos');
 process.exit(fail?1:0);

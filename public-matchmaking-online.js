@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-client.js';
-import { doc, getDoc, onSnapshot, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { doc, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 import { publicQueueKey, isJoinablePublicRoom, makePublicRoomCode, normalizePublicCapacity } from './public-matchmaking.js';
 
 const CT = window.CONTINUUM;
@@ -18,12 +18,12 @@ const notify = text => {
   clearTimeout(notify.timer);notify.timer=setTimeout(()=>toast.classList.remove('show'),2600);
 };
 
-function roomData(code, mode, capacity, uid) {
+function roomData(code, mode, capacity, uid, seconds = 30) {
   const name=alias();
   return {
     roomCode:code, mode, deckFingerprint:CT.deckFingerprint(mode), hostUid:uid,
     matchmaking:'public', capacity, clientVersion:CLIENT_VERSION, queueKey:publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(mode)}),
-    status:'lobby', phase:'lobby', version:1, handSize:4, turnSeconds:30,
+    status:'lobby', phase:'lobby', version:1, handSize:4, turnSeconds:seconds,
     playerOrder:[uid],
     players:{[uid]:{name,avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
     deck:[],discard:[],timeline:[],current:0,starter:uid,turnsInRound:0,round:1,
@@ -42,12 +42,7 @@ const queueFresh = queue => {
 
 async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
   const capacity=normalizePublicCapacity(capacityInput);
-  let user=auth.currentUser;
-  if(!user || !CT.Accounts?.ready) {
-    await auth.authStateReady?.();
-    user=auth.currentUser;
-  }
-  if(!user || !CT.Accounts?.ready) throw Error('AUTH_NOT_READY');
+  const user=await readyUser();
   const fingerprint=CT.deckFingerprint(mode);
   const queueKey=publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint});
   const queueRef=doc(db,'publicQueues',queueKey);
@@ -110,6 +105,54 @@ function watchPublicRoom(code) {
   return stop;
 }
 
+async function readyUser() {
+  let user=auth.currentUser;
+  if(!user || !CT.Accounts?.ready) {
+    await auth.authStateReady?.();
+    user=auth.currentUser;
+  }
+  if(!user || !CT.Accounts?.ready) throw Error('AUTH_NOT_READY');
+  return user;
+}
+
+// «Crear mesa»: una mesa nueva con la configuración elegida (mazo, plazas y tiempo). No
+// ocupa la cola de la partida rápida; se encuentra en el tablón de mesas abiertas.
+async function createTable(mode, capacityInput, seconds) {
+  const capacity=normalizePublicCapacity(capacityInput);
+  if(![0,15,20,30].includes(Number(seconds))) throw Error('INVALID_PUBLIC_SECONDS');
+  const user=await readyUser();
+  const code=makePublicRoomCode(), roomRef=doc(db,'rooms',code);
+  // Una sala que no existe no se puede leer con las reglas de las salas: se escribe sin
+  // mirar antes (con siete caracteres al azar, repetir un código es improbable, y si
+  // ocurriera las reglas lo tratarían como una modificación y la rechazarían).
+  await setDoc(roomRef,roomData(code,mode,capacity,user.uid,Number(seconds)));
+  return code;
+}
+
+// Entrar en una mesa elegida en el tablón. Si con esta plaza se llena y la cola de la
+// partida rápida apuntaba a ella, la cola se marca llena, como al entrar desde la búsqueda.
+async function joinTable(code) {
+  const user=await readyUser();
+  const roomRef=doc(db,'rooms',code);
+  return runTransaction(db,async tx=>{
+    const snap=await tx.get(roomRef);
+    if(!snap.exists()) throw Error('TABLE_GONE');
+    const room=snap.data();
+    if(room.playerOrder?.includes(user.uid)) return room.mode;
+    const queueRef=room.queueKey?doc(db,'publicQueues',room.queueKey):null;
+    const queue=queueRef?await tx.get(queueRef):null;
+    if(!isJoinablePublicRoom(room,{clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(room.mode)})) throw Error('TABLE_FULL');
+    const order=[...room.playerOrder,user.uid];
+    tx.update(roomRef,{
+      players:{...room.players,[user.uid]:{name:alias(),avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
+      playerOrder:order,version:room.version+1,updatedAt:serverTimestamp()
+    });
+    if(order.length===room.capacity && queue?.exists() && queue.data().roomCode===code && queue.data().status==='waiting')
+      tx.update(queueRef,{status:'full',updatedAt:serverTimestamp()});
+    return room.mode;
+  });
+}
+
 function capacityOrder(value) {
   const n=Number(value);
   if([2,3,4].includes(n)) return [n];
@@ -154,4 +197,4 @@ function refresh() {
 new MutationObserver(refresh).observe(document.getElementById('app'),{childList:true,subtree:true});
 refresh();
 
-export { findOrCreate, findFlexible, findAcrossModes, watchPublicRoom };
+export { findOrCreate, findFlexible, findAcrossModes, watchPublicRoom, createTable, joinTable, CLIENT_VERSION };

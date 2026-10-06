@@ -3833,11 +3833,27 @@
   }
 
   CT.launchPublicMatch = () => launchPublicMatch();
-  async function launchPublicMatch() {
+  // El tablón de mesas (como en Risk): abrir una mesa con su configuración
+  // ({create:true, mode, capacity, seconds}) o entrar en una concreta ({code}).
+  CT.openPublicTable = table => launchPublicMatch(table);
+  async function launchPublicMatch(table = null) {
     screen = "online-loading";
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Buscando partida</h2><p>Buscando una mesa pública compatible…</p></div></section></div>`);
+    const [title, text] = table?.create ? ["Abriendo tu mesa", "Aparecerá en la lista de mesas abiertas."]
+      : table?.code ? ["Entrando en la mesa", "Ocupando tu plaza…"] : ["Buscando partida", "Buscando una mesa pública compatible…"];
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">${title}</h2><p>${text}</p></div></section></div>`);
     try {
       const matchmaking = await import("./public-matchmaking-online.js");
+      if (table) {
+        let timer;
+        const pending = table.create
+          ? matchmaking.createTable(table.mode, table.capacity, table.seconds).then(code => ({ code, mode: table.mode }))
+          : matchmaking.joinTable(table.code).then(mode => ({ code: table.code, mode }));
+        const { code, mode } = await Promise.race([pending, new Promise((_, reject) => { timer = setTimeout(() => reject(Error("MATCH_TIMEOUT")), 30000); })]).finally(() => clearTimeout(timer));
+        const online = await import("./online.js");
+        await online.openOnlineMode({ roomCode: code, modeKey: mode, onBack: () => CT.ModeHubs ? CT.ModeHubs.open("hub-online") : home() });
+        matchmaking.watchPublicRoom?.(code);
+        return;
+      }
       const intent=sessionStorage.getItem('continuum-public-kind');
       const capacity=Number(sessionStorage.getItem('continuum-public-capacity') ?? 4);
       let preferred=[];
@@ -3859,14 +3875,16 @@
     } catch (error) {
       console.error("PUBLIC_MATCH_ERROR", error?.code || "", error?.message || error);
       screen = "public-match-error";
-      const detail = error?.code === "permission-denied"
+      const detail = table?.code && (error?.code === "permission-denied" || /TABLE_(FULL|GONE)/.test(error?.message || ""))
+        ? "Esa mesa ya está completa o ha empezado. Elige otra en la lista o crea la tuya."
+        : error?.code === "permission-denied"
         ? "Firebase ha rechazado la creación de la mesa pública."
         : error?.message === "AUTH_NOT_READY"
           ? "Tu perfil todavía no está preparado."
         : error?.message === "MATCH_TIMEOUT"
           ? "La conexión con el servidor tarda demasiado. Comprueba tu internet e inténtalo de nuevo."
           : "No se pudo crear ni encontrar una mesa pública.";
-      paint(`<div class="shell">${header('<button class="icon-btn" data-action="public-match-back">Volver</button>')}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p><button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button><button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
+      paint(`<div class="shell">${header('<button class="icon-btn" data-action="public-match-back">Volver</button>')}<section class="pass-screen"><div class="panel"><div class="big-icon">☁</div><h2 data-focus tabindex="-1">No se pudo preparar la partida</h2><p class="lead" style="margin-inline:auto">${detail}</p>${table ? '<button class="btn btn-primary btn-block" data-action="online-hub">Ver mesas abiertas</button>' : '<button class="btn btn-primary btn-block" data-action="public-match">Buscar otra vez</button>'}<button class="btn btn-ghost btn-block" data-action="public-match-back">Volver</button></div></section></div>`);
     }
   }
 
@@ -4284,9 +4302,9 @@
   CT.navigateBack = backMenu;
   // La flecha de volver de la pantalla visible, la pinte este archivo o un módulo propio.
   const screenBackArrow = () => app.querySelector('.topbar .atlas-back, .topbar [data-local-action][aria-label="Volver"], .turn-duel-back');
-  CT.openQuickPublic = capacity => {
+  CT.openQuickPublic = (capacity, table = {}) => {
     screen = 'quick-lobby';
-    return CT.Quick.openPublic((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, capacity);
+    return CT.Quick.openPublic((html, playing) => { screen = playing === 'lobby' ? 'quick-lobby' : playing ? 'quick-game' : 'quick-challenges'; paint(html); }, capacity, table);
   };
   CT.isSessionActive = () => ["pass", "game", "pulse-pass", "final-local", "solo", "cifras", "comp-intro", "quick-game", "quick-lobby"].includes(screen) || !!CT.onlineActive;
   CT.Updates.start();

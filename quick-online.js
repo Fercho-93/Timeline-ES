@@ -1,17 +1,51 @@
 import {auth, db} from './firebase-client.js';
 import {collection, deleteDoc, doc, getDoc, getDocs, query, where, runTransaction, onSnapshot, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 const CT=window.CONTINUUM, R=CT.QuickRoom;
-const PUBLIC_VERSION=1;
+export const PUBLIC_VERSION=1;
 function publicKey(capacity){return 'quick:'+capacity+':v'+PUBLIC_VERSION+':'+CT.QuickNetwork.fingerprint();}
 // Solo quien abre una mesa pública puede empezarla, así que la mesa vive mientras esa
 // persona siga esperando: su móvil renueva la cola cada 45 s. Una cola sin renovar en dos
 // minutos es una mesa abandonada: la búsqueda no entra y abre otra en su lugar.
 const STALE_QUEUE_MS=120000, PUBLIC_WAIT_MS=30000;
 const queueFresh=q=>{const at=q?.updatedAt?.toMillis?.();return Number.isFinite(at)&&Date.now()-at<STALE_QUEUE_MS;};
+// El tablón de mesas abiertas (`public-tables.js`): quien lleva la mesa mantiene su ficha.
+// Se carga aparte y sin bloquear: si no está, la mesa funciona igual por la cola.
+let tablesModule=null;
+const tables=()=>(tablesModule??=import('./public-tables.js'));
+const freshCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%31]).join('');
+// «Crear mesa» abre una mesa nueva con su configuración, sin pasar por la cola de la
+// partida rápida; «Unirme» desde el tablón entra en esa mesa concreta.
+async function claimTable({uid,name,create,code,capacity}){
+  if(create){
+    const fresh=freshCode();
+    await runTransaction(db,async tx=>{
+      tx.set(doc(db,'quickRooms',fresh),{...R.create(uid,name,capacity),catalog:CT.QuickNetwork.fingerprint(),matchmaking:'public',updatedAt:serverTimestamp()});
+    });
+    return fresh;
+  }
+  const ref=doc(db,'quickRooms',code);
+  await runTransaction(db,async tx=>{
+    const snap=await tx.get(ref);
+    if(!snap.exists())throw Error('Esa mesa ya no existe. Elige otra en la lista.');
+    const room=snap.data();
+    if(room.members.includes(uid))return;
+    if(room.matchmaking!=='public'||room.phase!=='lobby'||room.members.length>=room.capacity)throw Error('Esa mesa ya está completa o ha empezado. Elige otra en la lista.');
+    if(room.catalog!==CT.QuickNetwork.fingerprint())throw Error('Esa mesa usa otra versión de los retos. Actualiza Continuum o elige otra.');
+    const qref=doc(db,'quickPublicQueues',publicKey(room.capacity)), queue=await tx.get(qref);
+    const next=R.reduce(room,uid,{type:'join',name});
+    tx.update(ref,{...next,updatedAt:serverTimestamp()});
+    if(next.members.length===room.capacity&&queue.exists()&&queue.data().code===code&&queue.data().status==='waiting')tx.update(qref,{status:'full',updatedAt:serverTimestamp()});
+  });
+  return code;
+}
 async function publicConnect(options) {
   const {name,capacity=4,onChange,onError,allowStale=false}=options;
   await auth.authStateReady(); const uid=auth.currentUser?.uid;
   if(!uid)throw Error('Espera a que se prepare tu perfil e inténtalo de nuevo.');
+  if(options.create||options.code){
+    const code=await claimTable({uid,name,create:!!options.create,code:String(options.code||'').toUpperCase(),capacity:[2,3,4].includes(Number(capacity))?Number(capacity):4});
+    return watchPublic({...options,uid,code,seconds:options.create?options.seconds:undefined});
+  }
   const capacities=[2,3,4].includes(Number(capacity))?[Number(capacity)]:[4,3,2];
   let chosen=null;
   for(const cap of capacities){
@@ -41,7 +75,7 @@ async function publicConnect(options) {
       }
       return queue.data().code;
     }
-    const fresh=Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%31]).join('');
+    const fresh=freshCode();
     const ref=doc(db,'quickRooms',fresh);
     tx.set(ref,{...R.create(uid,name,chosen.cap),catalog:CT.QuickNetwork.fingerprint(),matchmaking:'public',updatedAt:serverTimestamp()});
     tx.set(qref,{code:fresh,status:'waiting',capacity:chosen.cap,updatedAt:serverTimestamp()});
@@ -52,7 +86,26 @@ async function publicConnect(options) {
     throw error;
   });
   if(code===null)return publicConnect({...options,allowStale:true});
+  // La partida rápida juega sin tiempo, como siempre.
+  return watchPublic({...options,uid,code,seconds:0,queueRef:qref});
+}
+async function watchPublic({uid,code,seconds,queueRef:qref=null,onChange,onError}) {
   const ref=doc(db,'quickRooms',code);
+  // El tiempo por carta es de la mesa: quien la crea lo elige y quien entra (o hereda la
+  // mesa si se va quien la llevaba) lo lee de su ficha del tablón.
+  let tableSeconds=[0,15,20,30].includes(Number(seconds))?Number(seconds):null;
+  if(tableSeconds===null){const entry=await tables().then(t=>t.readTable(code)).catch(()=>null);tableSeconds=[0,15,20,30].includes(entry?.seconds)?entry.seconds:0;}
+  let tableState='';
+  const syncTable=()=>{
+    if(!latest||latest.host!==uid)return;
+    if(latest.phase==='lobby'&&latest.members.length<latest.capacity){
+      tableState='open';
+      const entry={kind:'quick',code,mode:'quick',capacity:latest.capacity,seconds:tableSeconds,players:latest.members.length,
+        names:latest.names.slice(0,4).map(n=>String(n).slice(0,24)),hostUid:uid,hostAvatar:CT.Avatares?.ownId?.()||null,
+        clientVersion:PUBLIC_VERSION,fingerprint:CT.QuickNetwork.fingerprint()};
+      void tables().then(t=>t.publishTable(entry)).catch(()=>{});
+    } else if(tableState!=='closed'){tableState='closed';void tables().then(t=>t.removeTable(code)).catch(()=>{});}
+  };
   let latest=null,started=false;
   // La mesa empieza al completarse o, con al menos dos personas, cuando lleva
   // PUBLIC_WAIT_MS sin que entre nadie (la hora es la de la última entrada, del
@@ -63,21 +116,29 @@ async function publicConnect(options) {
     if(latest.members.length<latest.capacity&&secondsLeft()>0)return;
     started=true;
     const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,3);
-    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code}).catch(()=>{setTimeout(()=>{started=false;},2000);});
+    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code,...(tableSeconds?{seconds:tableSeconds}:{})}).catch(()=>{setTimeout(()=>{started=false;},2000);});
   };
-  const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);tryStart();
+  const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);syncTable();tryStart();
   }catch(e){onError(e);}},onError);
   const startTimer=setInterval(tryStart,1000);
   let warned=false;
   const keepAlive=async()=>{
-    if(!latest||latest.phase!=='lobby'||latest.members.length>=chosen.cap)return;
+    if(!latest||latest.phase!=='lobby'||latest.members.length>=latest.capacity)return;
     if(latest.host===uid){
+      syncTable();
+      if(!qref)return;
       try{await runTransaction(db,async tx=>{const q=await tx.get(qref);if(!q.exists()||q.data().code!==code||q.data().status!=='waiting')return;tx.update(qref,{updatedAt:serverTimestamp()});});}
       catch(error){console.warn('QUICK_QUEUE_KEEPALIVE',error?.code||error);}
       return;
     }
-    // Nadie más puede empezar la mesa: si quien la abrió ya no la mantiene, se avisa.
-    try{const q=await getDoc(qref);if(!(q.exists()&&q.data().code===code&&queueFresh(q.data()))&&!warned){warned=true;onError(Error('Quien abrió la mesa se ha ido y nadie más puede empezarla. Vuelve a buscar para encontrar otra.'));}}
+    // Nadie más puede empezar la mesa: si quien la abrió ya no la mantiene (ni su cola ni
+    // su ficha del tablón se renuevan), se avisa.
+    try{
+      const table=await tables().then(t=>t.readTable(code).then(entry=>entry&&t.tableFresh(entry))).catch(()=>false);
+      if(table)return;
+      const q=qref?await getDoc(qref):null;
+      if(!(q?.exists()&&q.data().code===code&&queueFresh(q.data()))&&!warned){warned=true;onError(Error('Quien abrió la mesa se ha ido y nadie más puede empezarla. Vuelve a buscar para encontrar otra.'));}
+    }
     catch{}
   };
   const keepTimer=setInterval(keepAlive,45000);
@@ -88,11 +149,11 @@ async function publicConnect(options) {
     try{await runTransaction(db,async tx=>{
       const snap=await tx.get(ref);if(!snap.exists())return;
       const data=snap.data();if(data.phase!=='lobby'||!data.members.includes(uid))return;
-      if(data.members.length<=1){if(data.host===uid)tx.delete(ref);return;}
+      if(data.members.length<=1){if(data.host===uid){tableState='closed';tx.delete(ref);void tables().then(t=>t.removeTable(code)).catch(()=>{});}return;}
       tx.update(ref,{...R.reduce(data,uid,{type:'leave'}),updatedAt:serverTimestamp()});
     });}catch(error){console.warn('QUICK_PUBLIC_LEAVE',error?.code||error);}
   }
-  const api={kind:'internet',public:true,code,secondsLeft,leave,get host(){return latest?.host===uid;},close,async act(action){if(!latest)throw Error('Espera a que se cargue la mesa.');const revision=latest.revision;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La mesa ya no existe.');const next=R.reduce(snap.data(),uid,action,revision);tx.update(ref,{...next,updatedAt:serverTimestamp()});});}};
+  const api={kind:'internet',public:true,code,secondsLeft,leave,get seconds(){return tableSeconds;},get host(){return latest?.host===uid;},close,async act(action){if(!latest)throw Error('Espera a que se cargue la mesa.');const revision=latest.revision;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw Error('La mesa ya no existe.');const next=R.reduce(snap.data(),uid,action,revision);tx.update(ref,{...next,updatedAt:serverTimestamp()});});}};
   return api;
 }
 

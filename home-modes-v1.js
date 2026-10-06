@@ -108,13 +108,143 @@
     const options = [['0', 'Cualquier mesa · más rápido'], ['2', 'Hasta 2 jugadores'], ['3', 'Hasta 3 jugadores'], ['4', 'Hasta 4 jugadores']];
     return `<div class="panel mode-online-config"><div class="field"><label for="mode-public-capacity">Tamaño de mesa</label><select id="mode-public-capacity">${options.map(([value, label]) => `<option value="${value}"${value === cap ? ' selected' : ''}>${label}</option>`).join('')}</select></div><p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</p></div>`;
   }
+  // Jugar online, como el vestíbulo de Risk: alguien abre una mesa con su configuración
+  // (juego, plazas y tiempo), la mesa aparece en la lista de mesas abiertas y los demás
+  // eligen dónde sentarse. La partida rápida sigue ahí para quien no quiere elegir.
   function openOnlineHub() {
     hub('hub-online', 'Jugar online', 'Mesas públicas', [
+      modeDoor('public-create', modeArt['online-hub'], 'Crear mesa', 'Elige el juego, las plazas y el tiempo. Los demás la verán en la lista y se sentarán.', true, '', 'Crear'),
+      `<section class="public-board" aria-labelledby="public-board-title"><div class="section-label" id="public-board-title">Mesas abiertas <small data-board-count></small></div>
+        <ul class="public-board-list" data-public-board aria-live="polite"><li class="public-board-empty">Buscando mesas…</li></ul></section>`,
+      `<div class="section-label public-quick-label">Partida rápida</div><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
       modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
       modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"'),
       capacityField()
     ].join(''), modeArt['online-hub']);
+    watchBoard();
+  }
+
+  // La lista de mesas abiertas se mantiene al día mientras se ve; al salir de la pantalla
+  // se deja de escuchar.
+  let stopBoard = null;
+  const boardVersions = () => Promise.all([import('./public-matchmaking-online.js'), import('./quick-online.js')])
+    .then(([collections, quick]) => ({ collections: collections.CLIENT_VERSION, quick: quick.PUBLIC_VERSION }));
+  function watchBoard() {
+    stopBoard?.(); stopBoard = null;
+    Promise.all([import('./public-tables.js'), boardVersions()]).then(([tables, versions]) => {
+      if (!app.querySelector('[data-public-board]')) return;
+      const stop = tables.watchTables(list => {
+        const box = app.querySelector('[data-public-board]');
+        if (!box) { stop(); if (stopBoard === stop) stopBoard = null; return; }
+        renderBoard(box, list.filter(t => usableTable(t, tables, versions)));
+      }, () => {
+        const box = app.querySelector('[data-public-board]');
+        if (box) box.innerHTML = '<li class="public-board-empty">No se pudo cargar la lista de mesas. Puedes crear una o usar la partida rápida.</li>';
+      });
+      stopBoard = stop;
+    }).catch(() => {
+      const box = app.querySelector('[data-public-board]');
+      if (box) box.innerHTML = '<li class="public-board-empty">No se pudo cargar la lista de mesas. Puedes crear una o usar la partida rápida.</li>';
+    });
+  }
+  // Solo las mesas en las que se puede entrar desde este móvil: vivas, con sitio y con el
+  // mismo mazo y la misma versión del juego.
+  function usableTable(t, tables, versions) {
+    const CT = window.CONTINUUM;
+    if (!tables.tableFresh(t) || !(t.players < t.capacity)) return false;
+    if (t.kind === 'quick') return t.clientVersion === versions.quick && t.fingerprint === CT.QuickNetwork?.fingerprint?.();
+    if (t.kind !== 'collections' || !CT.MODES?.[t.mode] || t.clientVersion !== versions.collections) return false;
+    if (CT.Cartera?.tiene && !CT.Cartera.tiene(t.mode)) return false;
+    return t.fingerprint === CT.deckFingerprint(t.mode);
+  }
+  const tableTime = seconds => seconds ? `${seconds} s por carta` : 'Sin tiempo';
+  function renderBoard(box, list) {
+    const CT = window.CONTINUUM;
+    // Primero las que están a punto de llenarse; después, las más nuevas.
+    const sorted = [...list].sort((a, b) => (b.players / b.capacity) - (a.players / a.capacity));
+    const count = app.querySelector('[data-board-count]');
+    if (count) count.textContent = sorted.length ? String(sorted.length) : '';
+    if (!sorted.length) {
+      box.innerHTML = '<li class="public-board-empty">No hay mesas abiertas ahora mismo. Crea la tuya: aparecerá aquí para los demás.</li>';
+      return;
+    }
+    box.innerHTML = sorted.map(t => {
+      const game = t.kind === 'quick' ? 'Retos rápidos' : CT.MODES[t.mode]?.name || 'Grandes colecciones';
+      const host = t.names?.[0] || 'Explorador';
+      const avatar = CT.Avatares?.markup?.(host, { size: 44, id: t.hostAvatar, seed: 'uid:' + t.hostUid }) || '';
+      const seats = Array.from({ length: t.capacity }, (_, i) => `<i class="${i < t.players ? 'is-taken' : ''}"></i>`).join('');
+      return `<li class="public-table">
+        <span class="public-table-avatar">${avatar}</span>
+        <span class="public-table-copy"><b>${escapeHtml(game)}</b><small>Mesa de ${escapeHtml(host)} · ${tableTime(t.seconds)}</small>
+          <span class="public-table-seats" aria-label="${t.players} de ${t.capacity} plazas ocupadas">${seats}<em>${t.players}/${t.capacity}</em></span></span>
+        <button type="button" class="btn btn-primary public-table-join" data-action="public-join" data-code="${escapeHtml(t.code)}" data-kind="${t.kind === 'quick' ? 'quick' : 'collections'}" data-capacity="${t.capacity}" aria-label="Unirme a la mesa de ${escapeHtml(host)} · ${escapeHtml(game)}">Unirme</button>
+      </li>`;
+    }).join('');
+  }
+
+  // Crear mesa: lo que se elige aquí es lo que verán los demás en la lista.
+  const CREATE_KEY = 'continuum-public-create-v1';
+  function createChoice() {
+    let saved = {};
+    try { saved = JSON.parse(sessionStorage.getItem(CREATE_KEY) || '{}'); } catch {}
+    return { kind: saved.kind === 'quick' ? 'quick' : 'collections', mode: typeof saved.mode === 'string' ? saved.mode : '', capacity: [2, 3, 4].includes(saved.capacity) ? saved.capacity : 4 };
+  }
+  function pills(name, options, current, columns) {
+    return `<div class="segmented public-create-segmented" style="--pills:${columns}" role="radiogroup">${options.map(([value, label]) => `<label class="segmented-option${String(value) === String(current) ? ' is-on' : ''}">
+      <input type="radio" name="${name}" value="${value}" data-public-create="${name}"${String(value) === String(current) ? ' checked' : ''}><span><b>${escapeHtml(label)}</b></span></label>`).join('')}</div>`;
+  }
+  function availableDecks() {
+    const CT = window.CONTINUUM;
+    return Object.entries(CT?.MODES || {}).filter(([key]) => key !== 'mixed' && (!CT?.Cartera?.tiene || CT.Cartera.tiene(key)));
+  }
+  function openPublicCreate() {
+    const CT = window.CONTINUUM, choice = createChoice();
+    const decks = availableDecks();
+    hub('hub-online-create', 'Crear mesa', 'Mesa pública', `<div class="panel public-create">
+      <div class="field"><span class="field-label">Juego</span>${pills('kind', [['collections', 'Grandes colecciones'], ['quick', 'Retos rápidos']], choice.kind, 2)}</div>
+      <div class="field" data-public-deck${choice.kind === 'quick' ? ' hidden' : ''}><label for="public-create-mode">Mazo</label><select id="public-create-mode"><option value="">Al azar</option>${decks.map(([key, m]) => `<option value="${escapeHtml(key)}"${key === choice.mode ? ' selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}</select></div>
+      <div class="field"><span class="field-label">Jugadores</span>${pills('capacity', [[2, '2'], [3, '3'], [4, '4']], choice.capacity, 3)}</div>
+      ${CT?.Tiempo?.field?.('publica', { porDefecto: 30 }) || ''}
+      <p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</p>
+      <button type="button" class="btn btn-primary btn-block" data-action="public-create-go">Abrir mesa</button>
+    </div>`, modeArt['online-hub']);
+  }
+  function saveCreateChoice() {
+    const kind = app.querySelector('input[data-public-create="kind"]:checked')?.value === 'quick' ? 'quick' : 'collections';
+    const capacity = Number(app.querySelector('input[data-public-create="capacity"]:checked')?.value) || 4;
+    const mode = app.querySelector('#public-create-mode')?.value || '';
+    try { sessionStorage.setItem(CREATE_KEY, JSON.stringify({ kind, capacity, mode })); } catch {}
+    return { kind, capacity, mode };
+  }
+  // Si algo falla al entrar en una mesa de Retos rápidos, se vuelve a la lista con el aviso.
+  function quickTableFailed(error) {
+    console.error('QUICK_PUBLIC_TABLE_ERROR', error);
+    openOnlineHub();
+    const note = document.createElement('p'); note.setAttribute('role', 'alert'); note.className = 'public-board-alert';
+    note.textContent = error?.message || 'No se pudo entrar en la mesa. Elige otra o crea la tuya.';
+    app.querySelector('.mode-hub-list')?.prepend(note);
+  }
+  function publicTableAction(action, target) {
+    const CT = window.CONTINUUM;
+    if (action === 'public-create') { openPublicCreate(); return true; }
+    if (action === 'public-create-go') {
+      const { kind, capacity, mode } = saveCreateChoice();
+      const seconds = CT.Tiempo?.chosen?.('publica', 30) ?? 30;
+      if (kind === 'quick') { CT.openQuickPublic(capacity, { create: true, seconds }).catch(quickTableFailed); return true; }
+      const decks = availableDecks().map(([key]) => key);
+      const deck = decks.includes(mode) ? mode : decks[Math.floor(Math.random() * decks.length)];
+      if (!deck) return true;
+      CT.openPublicTable({ create: true, mode: deck, capacity, seconds });
+      return true;
+    }
+    if (action === 'public-join') {
+      const code = target.dataset.code;
+      if (target.dataset.kind === 'quick') CT.openQuickPublic(Number(target.dataset.capacity) || 4, { code }).catch(quickTableFailed);
+      else CT.openPublicTable({ code });
+      return true;
+    }
+    return false;
   }
 
   function openOnlineCollections() {
@@ -288,6 +418,11 @@
     const target = event.target.closest('[data-action]');
     if (!target) return;
     const action = target.dataset.action;
+    if (['public-create', 'public-create-go', 'public-join'].includes(action)) {
+      event.preventDefault(); event.stopImmediatePropagation();
+      publicTableAction(action, target);
+      return;
+    }
     if(action==='online-collections') sessionStorage.setItem('continuum-public-capacity',document.getElementById('mode-public-capacity')?.value ?? '0');
     if(action==='quick-public'){
       event.preventDefault();event.stopImmediatePropagation();
@@ -310,9 +445,16 @@
 
   app.addEventListener('change', event => {
     if (event.target.id === 'mode-public-capacity') sessionStorage.setItem('continuum-public-capacity', event.target.value);
+    const pill = event.target.closest?.('input[data-public-create]');
+    if (pill) {
+      pill.closest('.segmented')?.querySelectorAll('.segmented-option').forEach(op => op.classList.toggle('is-on', op.querySelector('input').checked));
+      const deck = app.querySelector('[data-public-deck]');
+      if (deck && pill.dataset.publicCreate === 'kind') deck.hidden = pill.value === 'quick';
+    }
+    if (pill || event.target.id === 'public-create-mode') saveCreateChoice();
   });
 
-  const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends-wifi': () => openFriendHub('wifi'), 'hub-friends-duel': () => openFriendHub('duel'), 'hub-friends': openFriendsHub};
+  const hubs = {'hub-online': openOnlineHub, 'hub-online-create': openPublicCreate, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends-wifi': () => openFriendHub('wifi'), 'hub-friends-duel': () => openFriendHub('duel'), 'hub-friends': openFriendsHub};
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
 
   function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}

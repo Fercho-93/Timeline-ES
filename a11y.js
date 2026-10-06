@@ -143,7 +143,7 @@
     };
   }, true);
   const primaryNavigationActive = () => !!primaryNavigationMotion;
-  const preparationDepth = { home: 0, "hub-online": 0.25, "hub-solo": 0.25, "hub-friends": 0.25, "hub-online-collections": 0.4, jugar: 0.5, duelos: 0.5, "duel-home": 2, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
+  const preparationDepth = { home: 0, "hub-online": 0.25, "hub-solo": 0.25, "hub-friends": 0.25, "hub-online-collections": 0.4, "hub-online-create": 0.4, jugar: 0.5, duelos: 0.5, "duel-home": 2, "competition-menu": 1, setup: 2, "solo-home": 2, "duelo-intro": 3, "duelo-invalido": 3, "comp-intro": 2, "tournament-intro": 2, "online-competition-intro": 2, "online-loading": 2, "online-error": 2, "online-entry": 3, "online-lobby": 4 };
 
   // Una sola entrada por superficie. La marca permanece al terminar para que CSS
   // no reactive una segunda entrada cuando se retira el estado transitorio.

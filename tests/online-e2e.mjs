@@ -135,6 +135,52 @@ try {
   ok('con la mesa completa y todos respondidos, empieza sin esperar la cuenta atrás', await t1.screen() === 'online-game');
   for (const p of [t1, t2]) await p.ctx.close();
 
+  console.log('\nMesas abiertas: crear una con su configuración y entrar desde la lista');
+  const [m1, m2, k1, k2] = [await h.player('M1'), await h.player('M2'), await h.player('K1'), await h.player('K2')];
+  await m1.enter('Marta'); await m2.enter('Mario'); await k1.enter('Kiko'); await k2.enter('Katia');
+  for (const p of [m1, m2, k1, k2]) await openHub(p);
+  const crear = async (p, { kind, capacity, seconds, deck = 1 }) => {
+    await p.click('[data-action="public-create"]');
+    await p.page.locator(`input[data-public-create="kind"][value="${kind}"]`).check({ force: true });
+    if (kind === 'collections') await p.page.selectOption('#public-create-mode', { index: deck });
+    await p.page.locator(`input[data-public-create="capacity"][value="${capacity}"]`).check({ force: true });
+    await p.page.locator(`input[data-tiempo="publica"][value="${seconds}"]`).check({ force: true });
+    await p.click('[data-action="public-create-go"]', { wait: 1500 });
+  };
+  await crear(m1, { kind: 'collections', capacity: 2, seconds: 15 });
+  await m1.waitScreen('online-lobby', 20000);
+  const mazo = (await m1.page.locator('.public-lobby-head h2').textContent()).trim();
+  ok('la mesa creada lleva el tiempo elegido', /15 s por turno/.test(flat(await m1.text())));
+  const fila = m2.page.locator('.public-table', { hasText: 'Marta' });
+  await fila.waitFor({ timeout: 20000 }).catch(() => {});
+  ok(`la mesa aparece en la lista de los demás con su configuración (${mazo})`, (await fila.count()) === 1 && /15 s por carta/.test(flat(await fila.textContent())) && flat(await fila.textContent()).includes(mazo));
+  await m2.shot('e2e-04b-mesas-abiertas');
+  await fila.locator('[data-action="public-join"]').click();
+  await m2.waitScreen('online-lobby', 20000);
+  await m1.page.waitForTimeout(1500);
+  ok('al pulsar «Unirme» se sienta en esa mesa', await seats(m1) === 2 && await seats(m2) === 2 && /15 s por turno/.test(flat(await m2.text())));
+  await k2.page.waitForTimeout(2500);
+  ok('una mesa llena desaparece de la lista', !(await k2.page.locator('.public-table', { hasText: 'Marta' }).count()));
+  const realM = await cardValue(m1);
+  await answer(m1, Math.round(realM)); await answer(m2, Math.round(realM + 10));
+  await Promise.all([m1, m2].map(p => p.waitScreen('online-game', 20000)));
+  const reloj = Number(await m1.page.locator('#turn-timer-value').textContent().catch(() => 'NaN'));
+  ok(`y la partida empieza con ese tiempo por turno (${reloj} s)`, reloj > 0 && reloj <= 15);
+  await crear(k1, { kind: 'quick', capacity: 2, seconds: 20 });
+  await k1.page.waitForTimeout(1500);
+  const filaK = k2.page.locator('.public-table', { hasText: 'Kiko' });
+  await filaK.waitFor({ timeout: 20000 }).catch(() => {});
+  ok('también se anuncian las mesas de Retos rápidos', (await filaK.count()) === 1 && /Retos rápidos/.test(await filaK.textContent()) && /20 s por carta/.test(await filaK.textContent()));
+  await filaK.locator('[data-action="public-join"]').click();
+  await k2.page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'quick-game' || /reto 1 de 3/i.test(document.body.textContent), null, { timeout: 30000 }).catch(() => {});
+  ok('con la mesa llena empieza el reto con su tiempo por carta', /reto 1 de 3/i.test(flat(await k2.text())));
+  for (const p of [m1, m2, k1, k2]) {
+    const errors = p.log.filter(l => /pageerror|PERMISSION|permission-denied/i.test(l));
+    ok(`${p.label}: sin errores en la consola`, !errors.length);
+    if (errors.length) console.log(errors.join('\n'));
+    await p.ctx.close();
+  }
+
   console.log('\nRetos rápidos en mesa pública');
   const [q1, q2, q3] = [await h.player('Q1'), await h.player('Q2'), await h.player('Q3')];
   await q1.enter('Quino'); await q2.enter('Queralt'); await q3.enter('Quique');

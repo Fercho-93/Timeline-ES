@@ -297,7 +297,7 @@
       return name ? `<li class="public-seat${mine?' is-you':''}"><span class="public-seat-avatar">${playerAvatar({name},i)}</span><span class="public-seat-copy"><b>${esc(name)}${mine?' <span class="public-you">tú</span>':''}</b><small>En la mesa</small></span></li>`
         : `<li class="public-seat is-empty"><span class="public-seat-avatar" aria-hidden="true">+</span><span class="public-seat-copy"><b>Plaza libre</b><small>Esperando a alguien…</small></span></li>`;
     }).join('');
-    shell(`<section class="setup-section public-lobby"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${cap} jugadores</div><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="hint">Tres retos con las mismas cartas para toda la mesa. Arriesga para sumar aciertos o plántate para asegurarlos.</p>
+    shell(`<section class="setup-section public-lobby"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${cap} jugadores</div><h2 data-focus tabindex="-1">Retos rápidos</h2><p class="hint">Tres retos con las mismas cartas para toda la mesa. Arriesga para sumar aciertos o plántate para asegurarlos. ${connection?.seconds ? `${connection.seconds} s por carta.` : 'Sin límite de tiempo.'}</p>
       <div class="panel public-status" role="status" aria-live="polite">${status()}</div>
       <div class="panel public-roster"><div class="section-label">Jugadores <small>${count}/${cap}</small></div><ul class="public-seats">${seats}</ul></div>
       ${button('leave-public','Dejar de buscar','btn btn-ghost btn-block')}<p id="quick-error" role="alert"></p></section>`);
@@ -957,12 +957,15 @@
     return {names:['Tú'],rounds:[{id:challenge.id,order}],kind:'daily',day:dayValue};
   }
 
-  async function openPublic(renderPage, capacity=0) {
+  // `table`: «Crear mesa» ({create:true, seconds}) o entrar en una mesa del tablón ({code}).
+  async function openPublic(renderPage, capacity=0, table={}) {
     backTo=null; paint=renderPage; entry='public'; stopNetwork(); page='network-lobby'; state=null; record=null; selected=null; slot=null; format='public'; netKind='internet';
     const name=CT.Identidad?.propio?.() || 'Explorador';
     const change=(...args)=>roomChanged(...args), fail=e=>errorNotice(e);
-    shell('<section class="setup-section"><h2>Buscando mesa…</h2><div class="panel"><p>Retos rápidos · jugadores aleatorios</p><p class="hint">Entrarás en la primera mesa compatible.</p></div></section>');
-    connection=await (await import('./quick-online.js')).connectPublic({name,capacity,onChange:change,onError:fail});
+    shell(table.create ? '<section class="setup-section"><h2>Abriendo tu mesa…</h2><div class="panel"><p>Retos rápidos · mesa pública</p><p class="hint">Aparecerá en la lista de mesas abiertas.</p></div></section>'
+      : table.code ? '<section class="setup-section"><h2>Entrando en la mesa…</h2><div class="panel"><p>Retos rápidos · mesa pública</p></div></section>'
+      : '<section class="setup-section"><h2>Buscando mesa…</h2><div class="panel"><p>Retos rápidos · jugadores aleatorios</p><p class="hint">Entrarás en la primera mesa compatible.</p></div></section>');
+    connection=await (await import('./quick-online.js')).connectPublic({name,capacity,...table,onChange:change,onError:fail});
   }
 
   CT.Quick = {

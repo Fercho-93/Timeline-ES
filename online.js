@@ -225,7 +225,36 @@ async function claimHost(auto = false) {
 // `public-matchmaking-online.js` y la regla de `publicQueues`).
 function keepPublicQueueAlive() {
   if (!roomState || roomState.matchmaking !== "public" || roomState.status !== "lobby" || roomState.playerOrder.length >= roomState.capacity) return;
+  syncPublicTable();
   return reopenPublicQueue(roomCode, roomState.queueKey, true);
+}
+
+// El tablón de mesas abiertas (`public-tables.js`): quien lleva una mesa pública que
+// espera jugadores mantiene su ficha al día —quién hay sentado, plazas y tiempo— y la
+// quita cuando la mesa se llena o empieza. Si hay relevo, la ficha pasa al nuevo anfitrión.
+let tablesModule = null, tableState = "";
+const publicTables = () => (tablesModule ??= import("./public-tables.js"));
+const publicSeconds = () => [0, 15, 20, 30].includes(roomState?.turnSeconds) ? roomState.turnSeconds : 30;
+function publicTableEntry() {
+  return {
+    kind: "collections", code: roomCode, mode: roomState.mode, capacity: roomState.capacity,
+    seconds: publicSeconds(), players: roomState.playerOrder.length,
+    names: roomState.playerOrder.slice(0, 4).map(uid => String(roomState.players[uid]?.name || "Jugador").slice(0, 24)),
+    hostUid: user.uid, hostAvatar: roomState.players[user.uid]?.avatarId || null,
+    clientVersion: roomState.clientVersion || CLIENT_VERSION, fingerprint: roomState.deckFingerprint || CT.deckFingerprint(roomState.mode)
+  };
+}
+function syncPublicTable() {
+  if (!roomState || !user || roomState.matchmaking !== "public" || roomState.hostUid !== user.uid) return;
+  const code = roomCode;
+  if (roomState.status === "lobby" && roomState.playerOrder.length < roomState.capacity) {
+    tableState = code;
+    const entry = publicTableEntry();
+    void publicTables().then(t => t.publishTable(entry)).catch(() => {});
+  } else if (tableState !== "-" + code) {
+    tableState = "-" + code;
+    void publicTables().then(t => t.removeTable(code)).catch(() => {});
+  }
 }
 
 // Mesas públicas: nadie conoce a nadie, así que no se espera a que alguien pulse «Tomar
@@ -688,6 +717,7 @@ function connectToRoom(code) {
       return;
     }
     ensurePresence();
+    syncPublicTable();
     if (roomState.status === "lobby") ensureStarterListeners(); else stopStarterListeners();
     if (roomState.phase !== "turn") pendingIndex = null;
     anotaProgreso();
@@ -858,7 +888,7 @@ function renderLobby() {
     <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>${isPublic ? 'Partida rápida' : 'Código de sala'}</small><strong>${isPublic ? people.length + '/' + capacity : roomCode}</strong>${isPublic ? '' : '<div class="room-invite-actions"><button data-online-action="share">Compartir enlace</button><button data-online-action="qr">Mostrar QR</button></div>'}</div></section>
     <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${people.length}/${capacity}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
       <section class="panel lobby-settings">${isPublic
-        ? `<div class="section-label">Partida rápida</div><input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="30">${people.length === capacity ? publicStarterMarkup() : `<div class="waiting-orbit"><span></span></div><h3>Buscando jugadores</h3><p>Esperando a ${capacity - people.length} ${capacity - people.length === 1 ? 'jugador' : 'jugadores'} más…</p><p class="hint">Cuando la mesa esté completa, un minijuego decidirá el orden de juego.</p><button class="btn btn-ghost btn-block" data-online-action="${isHost ? "leave" : "leave-room"}">Dejar de buscar</button>`}`
+        ? `<div class="section-label">Partida rápida</div><input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="${publicSeconds()}">${people.length === capacity ? publicStarterMarkup() : `<div class="waiting-orbit"><span></span></div><h3>Buscando jugadores</h3><p>Esperando a ${capacity - people.length} ${capacity - people.length === 1 ? 'jugador' : 'jugadores'} más…</p><p class="hint">Cuando la mesa esté completa, un minijuego decidirá el orden de juego.</p><button class="btn btn-ghost btn-block" data-online-action="${isHost ? "leave" : "leave-room"}">Dejar de buscar</button>`}`
         : (isHost ? `<div class="section-label">Ajustes</div><div class="field"><label for="online-preset">Tipo de partida</label><select id="online-preset">${lobbyOption("simple", "Primera partida · sin poderes", lobbySettings.preset)}${lobbyOption("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}${lobbySettings.preset === "custom" ? lobbyOption("custom", "Personalizada", lobbySettings.preset) : ""}</select></div><div class="field"><label for="online-turn-seconds">Tiempo por turno</label><select id="online-turn-seconds">${lobbyOption(0, "Sin tiempo", lobbySettings.turnSeconds)}${lobbyOption(15, "15 segundos", lobbySettings.turnSeconds)}${lobbyOption(20, "20 segundos", lobbySettings.turnSeconds)}${lobbyOption(30, "30 segundos", lobbySettings.turnSeconds)}</select></div><div class="field"><label for="online-hand-size">Cartas iniciales</label><select id="online-hand-size">${[1, 2, 3, 4, 5, 6].map(n => lobbyOption(n, n, lobbySettings.handSize)).join("")}</select></div><label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="online-pulse"${lobbySettings.pulse ? " checked" : ""}></label><label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="online-ghost"${lobbySettings.ghost ? " checked" : ""}></label>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`)}</section>
     </div>
   </div>`, "online-lobby");
@@ -960,11 +990,11 @@ function renderPublicLobby() {
   const count = roomState.playerOrder.length;
   const starter = publicStarterMarkup();
   paint(`<div class="shell online-shell public-lobby">${header('<button class="icon-btn" data-online-action="guide">Guía</button>')}
-    <section class="public-lobby-head"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${roomState.capacity} jugadores</div><h2 data-focus tabindex="-1">${escapeHtml(mode.name)}</h2><p class="hint">Partida con conexión: cada uno juega desde su móvil, con ${roomState.turnSeconds || 30} s por turno.</p></section>
+    <section class="public-lobby-head"><div class="eyebrow"><span class="eyebrow-line"></span> Mesa pública · hasta ${roomState.capacity} jugadores</div><h2 data-focus tabindex="-1">${escapeHtml(mode.name)}</h2><p class="hint">Partida con conexión: cada uno juega desde su móvil, ${publicSeconds() ? `con ${publicSeconds()} s por turno` : "sin límite de tiempo por turno"}.</p></section>
     <section class="panel public-status" role="status" aria-live="polite">${publicStatusMarkup()}</section>
     <section class="panel public-roster"><div class="section-label">Jugadores <small>${count}/${roomState.capacity}</small></div><ul class="public-seats">${publicRosterMarkup()}</ul></section>
     ${starter ? `<section class="panel public-starter">${starter}</section>` : ""}
-    <input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="30">
+    <input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="${publicSeconds()}">
     <button class="btn btn-ghost btn-block public-leave" data-online-action="leave-public">Dejar de buscar</button>
   </div>`, "online-lobby");
   if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
@@ -1721,7 +1751,11 @@ async function leavePublicLobby() {
   const code = roomCode, queueKey = roomState.queueKey;
   busy = true;
   try {
-    if (roomState.playerOrder.length <= 1 && roomState.hostUid === user.uid) await deleteDoc(roomRef);
+    if (roomState.playerOrder.length <= 1 && roomState.hostUid === user.uid) {
+      tableState = "-" + code;
+      await publicTables().then(t => t.removeTable(code)).catch(() => {});
+      await deleteDoc(roomRef);
+    }
     else {
       await runTransaction(db, async transaction => {
         const data = (await transaction.get(roomRef)).data();
