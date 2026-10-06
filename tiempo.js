@@ -16,13 +16,15 @@
     try { CT.Storage.setItem(clave(contexto), String(Number(segundos))); } catch { /* almacenamiento lleno */ }
   }
   const icono = '<svg class="solo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
-  // El campo: cuatro pastillas con el mismo aspecto que «Ritmo» o «Conexión».
-  function field(contexto, { porDefecto = 0, etiqueta = "Tiempo por carta", attrs = "" } = {}) {
-    const actual = get(contexto, porDefecto), id = `tiempo-${contexto}-label`;
+  // El campo: cuatro pastillas, con el mismo aspecto en todas las pantallas (edition.css).
+  // `valor` fija lo marcado (la sala de espera recuerda lo que eligió el anfitrión) y
+  // `nombre` el del grupo, para que quien lo lea lo reconozca.
+  function field(contexto, { porDefecto = 0, etiqueta = "Tiempo por carta", attrs = "", valor = null, nombre = `tiempo-${contexto}` } = {}) {
+    const actual = valor !== null && valido(valor) ? Number(valor) : get(contexto, porDefecto), id = `${nombre}-label`;
     return `<div class="field duel-kind-field tiempo-field"${attrs}>
       <span class="field-label" id="${id}">${etiqueta}</span>
       <div class="segmented tiempo-segmented" role="radiogroup" aria-labelledby="${id}">${OPCIONES.map(s => `<label class="segmented-option${s === actual ? " is-on" : ""}">
-        <input type="radio" name="tiempo-${contexto}" value="${s}" data-tiempo="${contexto}"${s === actual ? " checked" : ""}>
+        <input type="radio" name="${nombre}" value="${s}" data-tiempo="${contexto}"${s === actual ? " checked" : ""}>
         <span><b>${s ? `${s} s` : "Sin tiempo"}</b></span>
       </label>`).join("")}</div>
     </div>`;

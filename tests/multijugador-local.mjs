@@ -165,7 +165,8 @@ const anfitrion = boot(), invitada = boot();
 for (const win of [anfitrion, invitada]) { red.install(win); win.confirm = () => true; }
 const erroresAnfitrion = [];
 anfitrion.addEventListener("error", event => erroresAnfitrion.push(event.message));
-const elige = (win, id, value) => { const el = win.document.getElementById(id); if (typeof value === "boolean") el.checked = value; else el.value = value; el.dispatchEvent(new win.Event("change", { bubbles: true })); };
+// El tiempo por turno son pastillas (un grupo de radios con ese nombre); el resto, campos con id.
+const elige = (win, id, value) => { const el = win.document.getElementById(id) || win.document.querySelector(`input[name="${id}"][value="${value}"]`); if (typeof value === "boolean" || el.type === "radio") el.checked = el.type === "radio" ? true : value; else el.value = value; el.dispatchEvent(new win.Event("change", { bubbles: true })); };
 const valorDe = (win, titulo) => { const CTw = win.CONTINUUM; const carta = CTw.cards("history").find(item => item.title === titulo); return { carta, valor: CTw.sortValue("history", carta) }; };
 
 // Conecta una invitada nueva (o que vuelve) al anfitrión, por el camino de pegar códigos.

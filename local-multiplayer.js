@@ -652,7 +652,7 @@
     const settings = isHost
       ? `<div class="section-label">Ajustes</div>
         <div class="field"><label for="wifi-preset">Tipo de partida</label><select id="wifi-preset">${opcion("simple", "Primera partida · sin poderes", lobbySettings.preset)}${opcion("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}${lobbySettings.preset === "custom" ? opcion("custom", "Personalizada", lobbySettings.preset) : ""}</select></div>
-        <div class="field"><label for="wifi-turn-seconds">Tiempo por turno</label><select id="wifi-turn-seconds">${opcion(0, "Sin tiempo", lobbySettings.turnSeconds)}${opcion(15, "15 segundos", lobbySettings.turnSeconds)}${opcion(20, "20 segundos", lobbySettings.turnSeconds)}${opcion(30, "30 segundos", lobbySettings.turnSeconds)}</select></div>
+        ${CT.Tiempo.field("amigos", { etiqueta: "Tiempo por turno", valor: lobbySettings.turnSeconds, nombre: "wifi-turn-seconds" })}
         ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} cartas por persona.</p>` : `<div class="field"><label for="wifi-hand-size">Cartas iniciales</label><select id="wifi-hand-size">${[1, 2, 3, 4, 5, 6].map(n => opcion(n, n, lobbySettings.handSize)).join("")}</select></div>`}
         <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="wifi-pulse"${lobbySettings.pulse ? " checked" : ""}></label>
         <label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="wifi-ghost"${lobbySettings.ghost ? " checked" : ""}></label>
@@ -1089,7 +1089,8 @@
   });
 
   document.addEventListener("change", event => {
-    const id = event.target.id;
+    // El tiempo son pastillas (CT.Tiempo.field), no un desplegable: se reconocen por su grupo.
+    const id = event.target.name === "wifi-turn-seconds" ? event.target.name : event.target.id;
     if (!["wifi-preset", "wifi-turn-seconds", "wifi-hand-size", "wifi-pulse", "wifi-ghost"].includes(id)) return;
     const pulseBox = document.getElementById("wifi-pulse"), ghostBox = document.getElementById("wifi-ghost");
     if (id === "wifi-preset") {

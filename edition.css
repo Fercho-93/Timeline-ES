@@ -5129,11 +5129,35 @@ html:has(#app.atlas-board) .motas { display: none; }
   }
 }
 
-/* Tiempo por carta: cuatro opciones cortas en una sola fila. */
-#app .tiempo-segmented { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-#app .tiempo-segmented .segmented-option,
-#app .solo-home .solo-panel .tiempo-segmented .segmented-option { justify-items: center; align-content: center; min-height: 46px; padding: 8px 4px; text-align: center; }
-#app .tiempo-segmented .segmented-option b,
-#app .solo-home .solo-panel .tiempo-segmented .segmented-option b { font-size: .88rem; white-space: nowrap; }
+/* Tiempo por carta: el mismo selector en todas las pantallas (solitario, un solo móvil,
+   amigos, competición, Retos rápidos, salas de espera y mesas públicas), sea cual sea el
+   estilo de los demás campos de la pantalla. Cuatro pastillas de papel en una fila; la de
+   «Sin tiempo», algo más ancha, parte el texto en dos líneas si no cabe: nunca se sale. */
+html #app .tiempo-field .tiempo-segmented {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)); gap: 8px;
+  padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+html #app .tiempo-field .tiempo-segmented .segmented-option {
+  position: relative; display: grid; place-items: center; place-content: center; gap: 0; min-width: 0; min-height: 50px; margin: 0; padding: 6px 6px;
+  border: 1px solid #d6bf98; border-radius: 12px; color: #2a1a10; text-align: center;
+  background: linear-gradient(165deg, #fffaf1, #f6ead8);
+  box-shadow: inset 0 1px 0 #fff, 0 2px 6px #5a341a12; transform: none;
+  transition: border-color var(--motion-base) ease, background var(--motion-base) ease, box-shadow var(--motion-base) ease;
+}
+html #app .tiempo-field .tiempo-segmented .segmented-option b {
+  display: block; min-width: 0; max-width: 100%; margin: 0; color: inherit;
+  font: 600 clamp(.82rem, 3.7vw, .96rem)/1.12 var(--font-display);
+  white-space: normal; overflow-wrap: normal; text-wrap: balance;
+}
+html #app .tiempo-field .tiempo-segmented .segmented-option.is-on {
+  border-color: #b8653d; color: #8e3d1e;
+  background: linear-gradient(165deg, #fdf3ea, #f4dccb);
+  box-shadow: 0 0 0 1px #b8653d, 0 8px 18px -12px #b8653dcc, inset 0 1px 0 #fff;
+}
+@media (hover: hover) and (pointer: fine) { html #app .tiempo-field .tiempo-segmented .segmented-option:not(.is-on):hover { border-color: #c9a06f; background: linear-gradient(165deg, #fffaf1, #f3e3cc); color: #2a1a10; } }
+html #app .tiempo-field .tiempo-segmented .segmented-option:has(input:focus-visible) { outline: 2px solid #b8653d; outline-offset: 3px; }
 /* Sin el circulito de marcado: en pastillas tan cortas tapaba el texto; lo elegido ya se ve por el color. */
 html #app .tiempo-segmented .segmented-option::after { content: none !important; }
+:root[data-theme="dark"] #app .tiempo-field .tiempo-segmented .segmented-option { color: #f5e6cc; background: #2c2118; border-color: #6d5435; box-shadow: none; }
+:root[data-theme="dark"] #app .tiempo-field .tiempo-segmented .segmented-option.is-on { color: #ffd9bf; background: #3d2a1d; border-color: #d08a5e; box-shadow: 0 0 0 1px #d08a5e; }
+@media (hover: hover) and (pointer: fine) { :root[data-theme="dark"] #app .tiempo-field .tiempo-segmented .segmented-option:not(.is-on):hover { color: #f5e6cc; background: #33271c; border-color: #8c6f45; } }
