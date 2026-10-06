@@ -19,7 +19,7 @@ const browser=await chromium.launch();
 const findings=[];
 const scenarios={
   collections:async({click,deck})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="collections"]');await deck();await click('[data-action="start-free"]');},
-  mixed:async({click})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="collections"]');await click('[data-block="mezcla"]');await click('[data-mode="mixed"]');await click('[data-action="start-free"]');},
+  mixed:async({click})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="collections"]');await click('[data-block="mezcla"]');await click('[data-action="start-free"]');},
   quick:async({click})=>{await click('[data-action="solo-hub"]');await click('[data-solo-route="quick"]');await click('[data-quick="start-free"]');await click('[data-quick="ready"]');},
   local:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-action="local-hub"]');await click('[data-inline-route="local"]');await deck();await click('[data-action="start"]');for(const n of ['1000','2000']){await click('#starter-guess-input',true,n);await click('[data-action="starter-guess-submit"]');}await click('[data-action="starter-start"]');await click('[data-action="ready"]');},
   duel:async({click,deck})=>{await click('[data-action="friends-hub"]');await click('[data-friend-hub="online"]');await click('[data-action="create-room-toggle"]');await click('[data-inline-route="online"]');await deck();await click('label:has(input[name="duel-pace"][value="seguidos"])');await click('[data-action="start-duel"]');await click('[data-action="duel-play"]');},

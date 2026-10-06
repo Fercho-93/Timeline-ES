@@ -57,9 +57,10 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
     w.CONTINUUM.Cartera.concede({ origen: 'prueba' });
     for (const block of Object.values(w.CONTINUUM.BLOCKS)) {
       click(irAJugar(w), `[data-block="${block.key}"]`);
-      click(w, `[data-mode="${block.games[0]}"]`);
+      // Una colección de un solo mazo ya lo ha abierto.
+      if (w.document.querySelector(`[data-mode="${block.games[0]}"]`)) click(w, `[data-mode="${block.games[0]}"]`);
       assert.equal(w.document.documentElement.dataset.scene, block.art);
-      click(w, '[data-action="solo"]');
+      (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
       click(w, '[data-action="start-free"]');
       assert.equal(w.document.documentElement.dataset.scene, block.art);
       assert.ok(w.document.querySelector('.hand-card'), 'el ambiente no sustituye la partida');
@@ -72,7 +73,6 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
       click(w, '[data-action="ui-back"]');
       click(w, '[data-exit-confirm]');
       click(w, '[data-action="back-menu"]');
-      click(w, '[data-action="collection-back"]');
       assert.equal(w.document.documentElement.dataset.scene, 'archive');
     }
     click(irACompeticion(w), '[data-action="competition-menu"]'); click(w, '[data-action="start-competition"]');
@@ -221,23 +221,20 @@ for (const reduce of [false, true]) {
     click(w, '[data-action="home-top"]');
     click(irAJugar(w), '[data-block="historia"]');
     click(w, '[data-mode="history"]');
-    click(w, '[data-action="solo"]');
+    (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
     // El reto diario está en la portada y el duelo es su propio formato: en solitario
     // queda una sola opción, la partida libre, y se enseña abierta, sin plegar.
     assert.equal(doc.querySelectorAll('.solo-fold').length, 0);
     assert.ok(doc.querySelector('.solo-panel [data-action="start-free"]'));
     click(w, '[data-action="back-menu"]');
-    click(w, '[data-action="duel-home"]');
+    (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
     assert.equal(doc.getElementById('app').dataset.screen, 'duel-home');
     assert.equal(doc.querySelectorAll('.solo-fold').length, 0);
     assert.ok(doc.querySelector('.solo-panel [data-action="start-duel"]'));
     click(w, '[data-action="back-menu"]');
-    assert.equal(doc.getElementById('app').dataset.screen, 'play-menu');
-    click(w, '[data-format="multi"]');
-    click(w, '[data-action="setup"]');
+    assert.equal(doc.getElementById('app').dataset.screen, 'hub-solo');
+    (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
     click(w, '[data-action="back-menu"]');
-    assert.equal(doc.getElementById('app').dataset.screen, 'play-menu');
-    click(w, '[data-action="collection-back"]');
     assert.equal(doc.getElementById('app').dataset.screen, 'hub-solo');
     click(w, '[data-action="home-top"]');
     assert.equal(doc.querySelector('.home-nav [aria-current="page"]').dataset.action, 'home-top');
@@ -287,7 +284,7 @@ console.log('Edición: ambientes, navegación, menús plegables y confirmación 
     const oldEffects = effects.slice();
     assert.ok(w.document.querySelector('.shell.motion-entering'));
     assert.equal(w.document.querySelector('.camera-move'), null, 'no se clona ni desplaza la pantalla');
-    click(w, '[data-action="solo"]');
+    (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
     assert.ok(oldEffects.every(effect => effect.cancelled), 'otra navegación cancela las entradas anteriores');
     assert.ok(w.document.querySelector('.solo-panel [data-action="start-free"]'), 'solitario llega con su única opción a la vista');
     assert.equal(w.document.querySelectorAll('.home-nav').length, 1);
@@ -399,7 +396,7 @@ console.log('Atajo al inicio: marca dibujada, caja propia y especificidad que ga
       return { finished: new Promise(() => {}), cancel() {} };
     };
     const render = screen => w.CONTINUUM.paint(w.document.getElementById('app'), '<div class="shell"><h2 data-focus tabindex="-1">Pantalla</h2></div>', screen);
-    for (const screen of ['play-menu', 'setup', 'pass', 'game', 'home', 'solo-home', 'solo', 'solo-end', 'comp-intro', 'online-loading', 'online-entry', 'online-lobby', 'online-game', 'perfil']) {
+    for (const screen of ['duel-home', 'setup', 'pass', 'game', 'home', 'solo-home', 'solo', 'solo-end', 'comp-intro', 'online-loading', 'online-entry', 'online-lobby', 'online-game', 'perfil']) {
       const before = effects.filter(effect => effect.target.matches('h2')).length;
       render(screen);
       assert.equal(effects.filter(effect => effect.target.matches('h2')).length, before + 1, screen + ': una entrada común');

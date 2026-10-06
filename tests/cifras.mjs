@@ -68,7 +68,7 @@ async function jugar(w) {
 // Entra en el duelo de cifras de un mazo, con el nombre puesto.
 async function abreDuelo(w, { block = "geografia", mode = "population", nombre = "Fernando" } = {}) {
   abreMazo(w, block, mode);
-  click(w, '[data-action="duel-home"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   w.document.getElementById("duel-name").value = nombre;
   click(w, '[data-action="start-cifras"]');
   await jugar(w);
@@ -244,7 +244,7 @@ console.log("\nCrear un duelo de cifras y jugarlo");
 {
   const w = boot();
   abreMazo(w, "geografia", "population");
-  click(w, '[data-action="duel-home"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   // El duelo es una sola opción del menú con las dos modalidades dentro.
   ok("hay una sola pantalla: en directo y cuatro combinaciones de duelo", w.document.querySelectorAll('[data-duel-block]').length === 5 && /Partida con amigos/.test(texto(w)));
   ok("por defecto, en directo, sin elegir prueba", w.document.querySelector('[data-duel-block="directo"]').hidden === false && w.document.querySelector('[data-duel-kind-field]').hidden === true);
@@ -256,11 +256,11 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   w.localStorage.setItem("hilo-sala-red-v1", "internet");
   Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => false });
   abreMazo(w, "geografia", "population");
-  click(w, '[data-action="duel-home"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   ok("sin internet se propone la Wi-Fi y se avisa", w.document.querySelector('input[name="live-net"][value="wifi"]').checked && !!w.document.querySelector('[data-offline-note]') && w.localStorage.getItem("hilo-sala-red-v1") === "internet");
   Object.defineProperty(w.navigator, "onLine", { configurable: true, get: () => true });
   abreMazo(w, "geografia", "population");
-  click(w, '[data-action="duel-home"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   const aSeguidos = w.document.querySelector('input[name="duel-pace"][value="seguidos"]');
   aSeguidos.checked = true;
   aSeguidos.dispatchEvent(new w.Event("change", { bubbles: true }));
@@ -397,7 +397,7 @@ console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
     "hilo-cifras-population-v1": JSON.stringify({ ...guardado, empezadaEn: Date.now() - 60000 })
   } });
   abreMazo(vuelta, "geografia", "population");
-  click(vuelta, '[data-action="duel-home"]');
+  (vuelta.CONTINUUM||vuelta.defaultView.CONTINUUM).openDeckAs('online');
   ok("se ofrece continuar el duelo empezado", existe(vuelta, '[data-action="resume-cifras"]'));
   click(vuelta, '[data-action="resume-cifras"]');
   ok("al continuar, la carta que estaba abierta se cierra", existe(vuelta, ".overlay"));
@@ -409,7 +409,7 @@ console.log("\nNi recargar ni cerrar la aplicación devuelven el plazo entero");
     "hilo-cifras-population-v1": JSON.stringify({ ...guardado, empezadaEn: Date.now() - 500 })
   } });
   abreMazo(rapida, "geografia", "population");
-  click(rapida, '[data-action="duel-home"]');
+  (rapida.CONTINUUM||rapida.defaultView.CONTINUUM).openDeckAs('online');
   click(rapida, '[data-action="resume-cifras"]');
   ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && estado(rapida, "population").jugadas.length === 0);
 }
@@ -447,7 +447,7 @@ console.log("\nEl duelo de cifras no se cuela donde no debe");
   const w = boot();
   abreMazo(w, "geografia", "population");
   ok("no hay duelo de cifras en el menú de formatos", !existe(w, '[data-action="start-cifras"]'));
-  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   ok("ni en la preparación de una partida local", !existe(w, '[data-action="start-cifras"]'));
 }
 
@@ -545,7 +545,7 @@ console.log("\nAntes de jugar se explica, y se empieza al pulsar, sin cuenta atr
 {
   const w = boot();
   abreMazo(w, "geografia", "population");
-  click(w, '[data-action="duel-home"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   click(w, '[data-action="start-cifras"]');
   ok("no se entra directamente a la partida", !existe(w, '[data-action="cifra-answer"]'));
   ok("se explica cómo funciona la modalidad", existe(w, ".demo-cifras") && /Puntúa lo cerca/.test(texto(w)));

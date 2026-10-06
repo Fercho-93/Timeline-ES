@@ -13,14 +13,12 @@ try {
  w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');
  w.document.querySelector(`[data-action="set-block"][data-block="${defaultBlock}"]`).click();
  w.document.querySelector(`[data-action="set-mode"][data-mode="${w.CONTINUUM.DEFAULT_MODE}"]`).click();
- assert.ok(w.document.querySelector('[data-action="solo"]'));
- assert.equal(w.document.querySelector('[data-format="solo"]'),null);
- w.document.querySelector('[data-format="multi"]').click();click('setup');
+ assert.equal(w.document.getElementById('app').dataset.screen,'solo-home');
+ w.CONTINUUM.openDeckAs('local');
  assert.equal(w.document.getElementById('ghost-toggle').checked,false);
  assert.equal(w.document.getElementById('pulse-toggle').checked,false);
- const preset=w.document.getElementById('local-preset');preset.value='advanced';preset.dispatchEvent(new w.Event('change',{bubbles:true}));
- assert.equal(w.document.getElementById('ghost-toggle').checked,true);
- assert.equal(w.document.getElementById('pulse-toggle').checked,true);
+ // Los poderes se eligen con sus interruptores; no hay un desplegable que diga lo mismo.
+ assert.equal(w.document.getElementById('local-preset'),null);
  w.CONTINUUM.localNavigate('home');w.CONTINUUM.ModeHubs.refreshHome();w.CONTINUUM.ModeHubs.open('hub-solo');click('competition-menu');w.document.getElementById('competition-length').value='3';click('start-competition');
  let state=JSON.parse(w.localStorage.getItem('continuum-competition-v1'));
  assert.equal(state.totalThemes,3);assert.equal(state.queue.length,3);

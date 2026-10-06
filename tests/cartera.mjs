@@ -304,7 +304,7 @@ console.log("\nUn mazo abierto sigue funcionando igual que siempre");
   click(w, '[data-mode="history"]');
   ok("se entra sin fricción", w.localStorage.getItem("hilo-selected-mode-v1") === "history");
   ok("y no aparece ninguna explicación de puerta cerrada", !/Todavía no es tuyo/.test(texto(w)));
-  click(w, '[data-action="solo"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
   ok("se puede jugar", existe(w, '[data-action="start-free"]'));
 }
 

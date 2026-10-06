@@ -25,8 +25,12 @@ assert.equal(w.document.getElementById('competition-cards'),null);
 assert.equal(w.document.querySelector('[data-action="competition-online"]'), null, 'desde «Un solo móvil» no se ofrece la sala online');
 assert.equal(w.document.querySelector('[data-action="start-competition"]'), null, 'ni la competición en solitario');
 w.CONTINUUM.ModeHubs.open('hub-friends-online');click('[data-action="competition-menu"]');
-assert.ok(w.document.querySelector('[data-action="competition-online"]'));
-assert.equal(w.document.querySelector('[data-action="competition-local"]'), null, 'desde «Sala privada online» no se ofrece un solo móvil');
+assert.ok(w.document.querySelector('[data-action="comp-friends-start"]'));
+assert.equal(w.document.querySelector('[data-action="competition-local"]'), null, 'desde «Cada uno en su móvil» no se ofrece un solo móvil');
+// La competición es siempre de las Grandes colecciones: no se elige contenido.
+assert.equal(w.document.querySelector('input[name="comp-content"]'), null);
+// Cartas por persona siempre a la vista, con 5 temas por defecto.
+assert.ok(w.document.getElementById('competition-cards').checkVisibility?.() ?? !w.document.getElementById('competition-cards').closest('[hidden]'));
 w.CONTINUUM.ModeHubs.open('hub-friends-local');click('[data-action="competition-menu"]');
 // Un solo móvil: una única ventana de ajustes (rondas y cartas), sin pantalla previa.
 assert.equal(w.document.getElementById('competition-cards'),null);

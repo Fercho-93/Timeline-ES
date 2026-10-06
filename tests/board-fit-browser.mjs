@@ -37,27 +37,24 @@ try {
           await page.addInitScript(()=>localStorage.setItem('continuum-splash-seen-v2','1'));
           await page.goto(url);await page.evaluate(()=>window.CONTINUUM_SPLASH?.finish());
           if(format==='quick') {
-            await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
-            await page.locator('[data-action="quick-challenges"]').click();
-            await page.locator('[data-quick="free"]').click();
+            await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
+            await page.locator('[data-solo-route="quick"]').click();
             await page.locator('[data-quick="start-free"]').click();
             await page.locator('[data-quick="ready"]').click();
           } else if(format==='competition') {
-            await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
-            await page.locator('[data-action="competition-menu"]').click();
+            await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
+            await page.locator('.mode-entry[data-action="competition-menu"]').click();
             await page.locator('[data-action="start-competition"]').click();
             await page.locator('[data-action="comp-next-round"]').click();
           } else {
-            await page.evaluate(()=>window.CONTINUUM.localNavigate('jugar'));
-            await page.locator('[data-action="toggle-play-catalog"][data-section="collections"]').click();
+            await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
+            await page.locator('[data-inline-route="collections"]').click();
             await page.locator('[data-block="historia"]').click();
             await page.locator('[data-mode="history"]').click();
             if(format==='solo') {
-              await page.locator('[data-action="solo"]').click();
               await page.locator('[data-action="start-free"]').click();
             } else {
-              await page.locator('[data-action="toggle-format-block"][data-format="multi"]').click();
-              await page.locator('[data-action="setup"]').click();
+              await page.evaluate(()=>window.CONTINUUM.openDeckAs('local'));
               await page.locator('[data-action="start"]').click();
               for(const guess of ['1000','2000']) {
                 await page.locator('#starter-guess-input').fill(guess);

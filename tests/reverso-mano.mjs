@@ -56,7 +56,7 @@ assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pendin
     click(document, '[data-inline-route]'); window.sessionStorage.removeItem('continuum-entry-route');
     click(document, '[data-block="historia"]');
     click(document, '[data-mode="history"]');
-    click(document, '[data-action="solo"]');
+    (document.CONTINUUM||document.defaultView.CONTINUUM).openDeckAs('collections');
     click(document, '[data-action="start-free"]');
     checkBoard(document, 1);
     assert.ok(document.querySelector('.hand-card.selected'), 'la carta única destaca');
@@ -69,8 +69,7 @@ assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pendin
     click(document, '[data-inline-route]'); window.sessionStorage.removeItem('continuum-entry-route');
     click(document, '[data-block="historia"]');
     click(document, '[data-mode="history"]');
-    click(document, '[data-format="multi"]');
-    click(document, '[data-action="setup"]');
+    (document.CONTINUUM||document.defaultView.CONTINUUM).openDeckAs('local');
     document.querySelector('#hand-size').value = '4';
     click(document, '[data-action="start"]');
     // Antes de repartir se juega el minijuego de quién empieza (todas con la misma

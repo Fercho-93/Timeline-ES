@@ -35,7 +35,7 @@ async function back() {
   await tick();
 }
 async function expectBack(expected) { await back(); assert.equal(screen(), expected, `volver debería llevar a ${expected}`); }
-async function openFirstDeck(expected = 'play-menu') {
+async function openFirstDeck(expected = 'solo-home') {
   await click('[data-action="set-block"]');
   await click('.collection-entry.active [data-action="set-mode"]');
   assert.equal(screen(), expected);
@@ -60,8 +60,7 @@ assert.equal(app().querySelector('.play-choices'), null);
 await expectBack('hub-solo');
 if (app().querySelector('#mode-inline-drawer').hidden) await click('[data-solo-route="collections"]');
 await click('#mode-inline-drawer [data-action="set-block"][data-block="mezcla"]');
-await click('#mode-inline-drawer [data-action="set-mode"][data-mode="mixed"]');
-assert.equal(screen(), 'solo-home', 'Gran mezcla llega a dificultad sin elegir otra vez mazo ni formato');
+assert.equal(screen(), 'solo-home', 'Gran mezcla, colección de un solo mazo, se abre al tocarla');
 await expectBack('hub-solo');
 await expectBack('home');
 
@@ -85,7 +84,6 @@ assert.equal(screen(), 'setup');
 await expectBack('hub-friends-local');
 if (app().querySelector('#mode-inline-drawer').hidden) await click('[data-inline-route="local"]');
 await click('#mode-inline-drawer [data-action="set-block"][data-block="mezcla"]');
-await click('#mode-inline-drawer [data-action="set-mode"][data-mode="mixed"]');
 assert.equal(screen(), 'setup', 'Gran mezcla en un solo móvil va a preparar la partida');
 await expectBack('hub-friends-local');
 await expectBack('hub-friends');
@@ -105,6 +103,12 @@ assert.equal(screen(), 'duel-home', 'con el mazo elegido solo queda el ritmo');
 assert.ok(app().querySelector('[data-action="start-live-room"]') && app().querySelector('[data-action="start-turn-duel"]') && app().querySelector('[data-action="start-duel"]'));
 await expectBack('hub-friends-online');
 await expectBack('hub-friends');
+await expectBack('home');
+
+// Inicio → Unirme: el acceso directo para quien recibe una invitación en persona.
+await click('[data-action="toggle-modes"]');
+await click('.mode-join-shortcut[data-action="friends-join"]');
+assert.equal(screen(), 'friends-join');
 await expectBack('home');
 
 // Cada uno en su móvil → Unirme: un solo campo para cualquier invitación.
@@ -170,6 +174,16 @@ assert.ok(app().querySelector('#competition-length') && app().querySelector('#ha
 await expectBack('hub-friends-local');
 await expectBack('hub-friends');
 await expectBack('home');
+// Cada uno en su móvil: competición de colecciones, sin elegir contenido.
+await click('[data-action="friends-hub"]');
+await click('[data-friend-hub="online"]');
+await click('[data-action="create-room-toggle"]');
+await click('.mode-entry[data-action="competition-menu"]');
+assert.equal(screen(), 'competition-friends');
+assert.equal(app().querySelector('input[name="comp-content"]'), null);
+await expectBack('hub-friends-online');
+await expectBack('hub-friends');
+await expectBack('home');
 await click('.home-nav [data-action="perfil"]');
 assert.equal(screen(), 'perfil');
 await expectBack('home');
@@ -182,8 +196,8 @@ assert.equal(screen(), 'hub-solo', 'la antigua pantalla «Jugar» ya no existe: 
 await click('[data-inline-route]');
 w.sessionStorage.removeItem('continuum-entry-route');
 await openFirstDeck();
-await click('.play-choice-block [data-action="toggle-format-block"]');
-await click('.play-choice[data-action="setup"]');
+w.CONTINUUM.openDeckAs('local');
+await tick();
 await click('[data-action="start"]');
 // Antes de repartir se juega el minijuego de quién empieza (todas con la misma
 // cifra: a igual distancia se respeta el orden de la mesa).
@@ -193,7 +207,7 @@ assert.equal(screen(), 'pass');
 await back();
 await click('[data-exit-confirm]');
 assert.equal(screen(), 'setup');
-await expectBack('play-menu');
+await expectBack('solo-home');
 await expectBack('hub-solo');
 await expectBack('home');
 
@@ -220,12 +234,14 @@ assert.equal(screen(), 'hub-solo', 'deslizar en Retos rápidos vuelve a Jugar so
 if (!app().querySelector('[data-action="set-block"]')) await click('[data-inline-route]');
 w.sessionStorage.removeItem('continuum-entry-route');
 await openFirstDeck();
-await click('.play-choice-block [data-action="toggle-format-block"]');
-await click('.play-choice[data-action="local-multiplayer"]');
+w.CONTINUUM.openDeckAs('online');
+await tick();
+await click('label:has(input[name="live-net"][value="wifi"])');
+await click('[data-action="start-live-room"]');
 const wifi = screen();
 assert.ok(wifi.startsWith('local-'), `Wi-Fi local abierto (${wifi})`);
 await swipe();
-assert.equal(screen(), 'play-menu', 'deslizar en Wi-Fi local vuelve al menú del mazo');
+assert.equal(screen(), 'duel-home', 'deslizar en Wi-Fi local vuelve a elegir el ritmo');
 
 console.log('✓ La flecha de volver lleva siempre a la pantalla anterior');
 w.close();

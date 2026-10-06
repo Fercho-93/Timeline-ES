@@ -31,17 +31,6 @@
       ['home-top', 'home', 'Inicio', ['home']], ['perfil', 'atlas', 'Atlas', ['perfil']], ['rules', 'guide', 'Guía', ['guide']], ['settings', 'settings', 'Ajustes', ['settings']]
     ].map(([action, symbol, label, current]) => `<button aria-label="${label}" ${action === 'settings' ? 'data-settings-action="open"' : `data-action="${action}"`}${current.includes(screen) ? ' aria-current="page"' : ''}><span>${icon(symbol)}</span><small>${label}</small></button>`).join('')}</nav>`;
   }
-  function deckIntro(modeKey, cover) {
-    const mode = CT.mode(modeKey), block = CT.blockOf(modeKey);
-    // Muestras fijas repartidas por el mazo: no usan la mano, el reparto ni valores ocultos.
-    const illustrated = mode.cards.filter(card => CT.cardArt(modeKey, card));
-    const samples = [...new Set([illustrated[0], illustrated[Math.floor(illustrated.length / 2)], illustrated.at(-1)].filter(Boolean))];
-    return `<section class="mode-masthead atlas-intro" data-depth-scene>
-      <div class="atlas-landscape"><img src="${cover}" alt="" decoding="async" fetchpriority="high"></div>
-      <div class="atlas-intro-copy"><div class="eyebrow">${CT.escapeHtml(block.name)}</div><h1 data-focus tabindex="-1">${CT.escapeHtml(mode.name)}</h1><p>${CT.escapeHtml(mode.blurb)}</p></div>
-      <div class="atlas-specimens" aria-label="Una muestra de las ilustraciones del mazo">${samples.map(card => `<figure>${CT.animalArt(modeKey, card)}<figcaption>${CT.escapeHtml(card.title)}</figcaption></figure>`).join('')}</div>
-    </section>`;
-  }
   // `discard` es opcional: cuando lo hay, añade un tercer botón para salir sin guardar
   // nada, sin pasar por el guardado que hace `proceed`. Vive en el mismo diálogo que
   // «Guardar y salir» para que salir de una partida ofrezca siempre las dos salidas
@@ -898,6 +887,6 @@
   }
   document.addEventListener('visibilitychange', refreshDepth);
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', refreshDepth);
-  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, deckIntro, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface, requestDepth,
+  CT.UI = {isPlaying: screen => playing.has(screen), header, nav, mount, captureBoard, compactResult, confirmExit, askDialog, confirmDialog, pulseGiftDialog, reveal, openSurface, closeSurface, requestDepth,
     updateEffects() { refreshDepth(); CT.Ambience?.sync(true); }};
 })();

@@ -70,7 +70,7 @@ const chips = [...app.querySelectorAll('.quick-length-chip')].map(c => c.dataset
 assert.deepEqual(chips, ['1', '3', '5']);
 assert.equal(app.querySelector('.quick-length-chip.is-selected').dataset.length, '3');
 assert.match(app.textContent, /Partida con amigos/);
-assert.match(app.textContent, /mismos mazos/);
+assert.match(app.textContent, /mismos retos/);
 assert.match(app.textContent, /En directo/);
 assert.match(app.textContent, /Por turnos/);
 assert.match(app.textContent, /Mismas cartas/);
@@ -80,7 +80,9 @@ assert.equal(app.querySelector('input[name="quick-duel-pace"]:checked').value, '
 assert.equal(app.querySelector('[data-quick-duel-block="directo"]').hidden, false);
 assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, true);
 assert.equal(app.querySelector('[data-quick-duel-block="turnos"]').hidden, true);
-assert.equal(app.querySelector('[data-quick-length-field]').hidden, true, 'en directo los retos se eligen al crear la sala');
+assert.ok(app.querySelector('[data-quick-duel-block="directo"] #quick-net-players'), 'en directo la sala se prepara en la misma pantalla');
+assert.equal(app.querySelector('[data-quick-keep-field]').hidden, false, 'en directo también se elige qué pasa al fallar');
+assert.ok(app.querySelector('#quick-profile-name[readonly]'), 'el nombre es el del perfil');
 assert.deepEqual([...app.querySelectorAll('input[name="quick-live-net"]')].map(i => i.value), ['internet', 'wifi']);
 assert.ok(app.querySelector('[data-quick-duel-block="directo"] [data-quick="live-room"]'));
 const sinInternet = app.querySelector('input[name="quick-live-net"][value="wifi"]'); sinInternet.checked = true;
@@ -90,13 +92,13 @@ const completa = app.querySelector('input[name="quick-duel-pace"][value="seguido
 completa.dispatchEvent(new w.Event('change', {bubbles: true}));
 assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, false);
 assert.equal(app.querySelector('[data-quick-duel-block="directo"]').hidden, true);
-assert.equal(app.querySelector('[data-quick-length-field]').hidden, false);
+assert.equal(app.querySelector('[data-quick-keep-field]').hidden, true, 'con las mismas cartas un fallo nunca corta');
 assert.ok(app.querySelector('[data-quick="start-duel"]'));
 assert.ok(app.querySelector('[data-quick-duel-block="turnos"] [data-quick="create-room"]'), 'por turnos se crea una sala de dos');
-assert.ok(app.querySelector('[data-quick-duel-block="turnos"] #quick-net-code'), 'y se puede entrar con un código');
+assert.equal(app.querySelector('details.duel-join'), null, 'unirse a un duelo va por «Unirme a una partida»');
 // Qué pasa al fallar se elige al crear el duelo por turnos (no en una sala de espera: el duelo no tiene mesa).
-assert.deepEqual([...app.querySelectorAll('[data-quick-duel-block="turnos"] input[name="quick-keep"]')].map(i => i.value), ['seguir', 'fuera']);
-assert.equal(app.querySelector('input[name="quick-keep"]:checked').value, 'seguir', 'por defecto, seguir hasta el final');
+assert.deepEqual([...app.querySelectorAll('input[name="quick-keep"]')].map(i => i.value), ['fuera', 'seguir']);
+assert.equal(app.querySelector('input[name="quick-keep"]:checked').value, 'fuera', 'por defecto, arriesgar o plantarse');
 assert.equal(app.querySelector('.lobby-table'), null, 'el duelo por turnos no enseña mesa');
 assert.doesNotMatch(app.textContent, /Escribir la cifra/, 'en Retos rápidos siempre se ordenan cartas');
 // Cambiar de ritmo enseña el otro bloque sin repintar y se recuerda.

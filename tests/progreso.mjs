@@ -90,7 +90,7 @@ console.log("\nUna partida en solitario cuadra con lo anotado");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
   click(w, '[data-action="start-free"]');
   // Un fallo de cada tres: hacen falta aciertos y fallos para comprobar las dos ramas.
   const { jugadas, aciertos } = juegaSolitario(w, { falla: n => n % 3 === 2 });
@@ -115,7 +115,7 @@ console.log("\nUna partida a un solo móvil");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   w.document.getElementById("hand-size").value = "1";
   click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   const cards = new Map(w.HISTORY_CARDS.map(c => [c.id, c]));
@@ -240,7 +240,7 @@ console.log("\nAlmacenamiento roto, lleno o de otra versión");
   const w = boot({ "hilo-retos-v1": JSON.stringify(previo) });
   ok("no hay perfil todavía", w.localStorage.getItem("hilo-perfil-v1") === null);
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
   ok("el solitario sigue enseñando la mejor marca de antes", /Mejor marca en Fácil: 9/.test(texto(w)));
   const guardado = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
   ok("la marca se conserva y la racha por mazo se borra", guardado.history.best === 9 && guardado.history.streak === undefined);
@@ -261,7 +261,7 @@ console.log("\nLa pantalla del perfil");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
   click(w, '[data-action="start-free"]');
   juegaSolitario(w, { falla: n => n % 2 === 1 });
   click(w, '[data-action="home"]');
@@ -340,7 +340,7 @@ console.log("\nCopia de seguridad");
   const retos = { history: { best: 11 }, retoDiario: { best: 11, streak: 5, lastDay: "2026-02-02", days: { "2026-02-02": { hits: 11, total: 15 } } } };
   const w = boot({ "hilo-retos-v1": JSON.stringify(retos) });
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="solo"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
   click(w, '[data-action="start-free"]');
   juegaSolitario(w, { falla: n => n % 2 === 1 });
   click(w, '[data-action="home"]');
@@ -363,7 +363,7 @@ console.log("\nNo se cuela en ninguna pantalla de partida");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   ok("la preparación conserva el menú inferior", existe(w, '.home-nav [data-action="home-top"]'));
   click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   click(w, '[data-action="ready"]');

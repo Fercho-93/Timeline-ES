@@ -47,6 +47,8 @@ const el = (w, selector) => {
   return element;
 };
 function click(w, selector) { const element = el(w, selector); element.focus(); element.click(); }
+// El nombre del mazo abierto: en su pantalla de juego o en la puerta cerrada si no es suyo.
+const deckTitle = w => (w.document.querySelector('.solo-intro .eyebrow') || el(w, '#app h1')).textContent.trim();
 // Un mazo concreto se elige ahora desde la portada antes de llegar al menú de
 // formatos (`playMenu`), donde de verdad viven «setup»/«start»/«ready».
 function abreMazo(w, block, mode) {
@@ -55,7 +57,7 @@ function abreMazo(w, block, mode) {
   if (!w.document.querySelector(`[data-mode="${mode}"]`)) click(irAJugar(w), `[data-block="${block}"]`);
   click(w, `[data-mode="${mode}"]`);
 }
-function game(w) { abreMazo(w, "historia", "history"); click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]'); click(w, '[data-action="start"]'); jugarQuienEmpieza(w); click(w, '[data-action="ready"]'); }
+function game(w) { abreMazo(w, "historia", "history"); (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local'); click(w, '[data-action="start"]'); jugarQuienEmpieza(w); click(w, '[data-action="ready"]'); }
 function animationEnd(w, target, name) {
   const event = new w.Event("animationend", { bubbles: true });
   Object.defineProperty(event, "animationName", { value: name });
@@ -74,15 +76,21 @@ console.log("\nGalería continua y navegación repetida");
   for (let round = 0; round < 3; round++) {
     for (const block of blocks) {
       click(irAJugar(w), `[data-block="${block.key}"]`);
+      // Una colección de un solo mazo (Gran mezcla) lo abre directamente.
+      if (block.games.length === 1 && w.CONTINUUM.Cartera.tiene(block.games[0])) {
+        assert.equal(deckTitle(w), w.CONTINUUM.mode(block.games[0]).name);
+        click(w, '[data-action="back-menu"]');
+        continue;
+      }
       assert.equal(el(w, ".gallery-panel.active").dataset.block, block.key);
       assert.equal(w.document.activeElement.dataset.block, block.key);
       for (const mode of block.games) {
         click(w, `[data-mode="${mode}"]`);
-        assert.equal(el(w, "h1").textContent, w.CONTINUUM.mode(mode).name);
+        assert.equal(deckTitle(w), w.CONTINUUM.mode(mode).name);
         // Un mazo que no es suyo enseña la puerta cerrada en vez del menú de formatos:
         // lleva el mismo título y tiene su propia salida. Que esté bien contada se
         // comprueba en `cartera.mjs`; aquí solo importa que se vuelva de ella igual.
-        click(w, w.CONTINUUM.Cartera.tiene(mode) ? '[data-action="collection-back"]' : '[data-action="back-menu"]');
+        click(w, '[data-action="back-menu"]');
         // Se vuelve a la pantalla de la modalidad; la colección se despliega de nuevo al tocarla.
         if (!w.document.querySelector(".gallery-panel.active")) { irAJugar(w); click(w, `[data-block="${block.key}"]`); }
         assert.equal(el(w, ".gallery-panel.active").dataset.block, block.key);
@@ -96,14 +104,14 @@ console.log("\nGalería continua y navegación repetida");
   ok("la imagen de Ciencia pide el tamaño grande al desplegarse", el(w, ".panel-science img").getAttribute("src").endsWith("700.webp"));
   for (let round = 0; round < 6; round++) {
     abreMazo(w, "historia", "history");
-    click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+    (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
     assert.ok(el(w, ".shell").classList.contains("screen-enter"));
     click(w, '[data-action="back-menu"]');
-    click(w, '[data-action="collection-back"]');
-    abreMazo(w, "historia", "history");
-    click(w, '[data-action="solo"]');
     click(w, '[data-action="back-menu"]');
-    click(w, '[data-action="collection-back"]');
+    abreMazo(w, "historia", "history");
+    (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+    click(w, '[data-action="back-menu"]');
+    click(w, '[data-action="back-menu"]');
   }
   ok("seis recorridos inicio–configuración–solitario conservan controles y foco", true);
   w.close();
@@ -127,9 +135,9 @@ console.log("\nVolver al menú sin saltos de lectura");
   // (menú de formatos, configuración) no vuelve a tocar esa posición guardada.
   click(w, '[data-mode="history"]');
   ok("elegir un mazo comienza arriba incluso si Inicio estaba desplazado", w.scrollY === 0);
-  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   click(w, '[data-action="back-menu"]');
-  click(w, '[data-action="collection-back"]');
+  click(w, '[data-action="back-menu"]');
   ok("Volver recupera la posición y el foco de cuando se dejó Jugar", w.scrollY === 520 && w.document.activeElement.dataset.mode === 'history');
   ok("el regreso tiene sentido inverso sin un segundo desplazamiento animado", el(w, '.shell').classList.contains('screen-return') && calls.every(call => call.behavior === 'instant'));
   // La enciclopedia se abre ahora desde el Atlas, y al cerrarla se vuelve a él.
@@ -158,16 +166,16 @@ for (const reduce of [false, true]) {
     return {finished: Promise.resolve(), cancel() {}};
   };
   click(w, '[data-mode="history"]');
-  ok("la cabecera está disponible desde el primer momento", !!el(w, '.atlas-landscape img') && !el(w, '.atlas-landscape').classList.contains('cover-arriving'));
+  ok("la pantalla del mazo está disponible desde el primer momento", !!el(w, '.solo-title') && !w.document.querySelector('.cover-arriving'));
   ok(reduce ? "movimiento reducido entra sin desplazar la cámara" : "la entrada revela el contenido sin duplicar la pantalla",
     reduce
       ? !w.document.querySelector('.camera-move, .deck-cover-flight, .book-turn') && animated.length === 0
       : !!w.document.querySelector('.shell.motion-entering') &&
         !w.document.querySelector('.camera-move, .deck-cover-flight, .book-turn') && animated.length > 0);
-  ok("el foco llega al título sin esperar la transición", w.document.activeElement === el(w, 'h1'));
-  click(w, '[data-action="collection-back"]');
+  ok("el foco llega al título sin esperar la transición", w.document.activeElement === el(w, '.solo-title'));
+  click(w, '[data-action="back-menu"]');
   click(w, '[data-mode="history"]');
-  ok("se puede volver y entrar inmediatamente", el(w, '#app').dataset.screen === 'play-menu' && (reduce || !!w.document.querySelector('.shell.motion-entering')) && !w.document.querySelector('.deck-cover-flight'));
+  ok("se puede volver y entrar inmediatamente", el(w, '#app').dataset.screen === 'solo-home' && (reduce || !!w.document.querySelector('.shell.motion-entering')) && !w.document.querySelector('.deck-cover-flight'));
   await Promise.resolve();
   w.close();
 }
@@ -564,9 +572,9 @@ console.log("\nLa casita del inicio");
   const casa = () => w.document.querySelector('.home-nav [data-action="home-top"]');
   ok("en el inicio la casa aparece activa en la barra", casa()?.getAttribute("aria-current") === "page");
   abreMazo(w, "historia", "history");
-  ok("en el menú del mazo aparece, junto a «Volver»", !!casa() && !!w.document.querySelector('.topbar [data-action="collection-back"]'));
+  ok("en el menú del mazo aparece, junto a «Volver»", !!casa() && !!w.document.querySelector('.topbar [data-action="back-menu"]'));
   ok("y se anuncia como lo que es", casa().textContent.trim() === "Inicio");
-  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   ok("en la configuración también", !!casa());
   casa().click();
   ok("la casita salta al inicio de una vez, sin pasar por el menú", el(w, "#app").dataset.screen === "home");
@@ -590,10 +598,10 @@ const pantalla = w => el(w, "#app").dataset.screen;
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  assert.equal(pantalla(w), "play-menu");
+  assert.equal(pantalla(w), "solo-home");
   await swipe(w);
   await sleep(5);
-  ok("deslizar en el menú del mazo vuelve a la colección, como «Volver»", pantalla(w) === "hub-solo" && !!w.document.querySelector('[data-mode="history"]'));
+  ok("deslizar en la pantalla del mazo vuelve a la colección, como «Volver»", pantalla(w) === "hub-solo" && !!w.document.querySelector('[data-mode="history"]'));
   await sleep(5);
   await swipe(w);
   await sleep(5);
@@ -605,12 +613,12 @@ const pantalla = w => el(w, "#app").dataset.screen;
   // al soltar, así que el siguiente toque de verdad llega en el turno siguiente.
   await sleep(5);
   abreMazo(w, "historia", "history");
-  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   assert.equal(pantalla(w), "setup");
   await swipe(w, { cancelado: true });
-  ok("un gesto que el navegador cancela a mitad, ya cumplido, vuelve igual", pantalla(w) === "play-menu");
+  ok("un gesto que el navegador cancela a mitad, ya cumplido, vuelve igual", pantalla(w) === "solo-home");
   await sleep(5);
-  click(w, '[data-action="setup"]');
+  w.CONTINUUM.openDeckAs('local');
   await swipe(w, { from: 200, to: 40 });
   ok("de derecha a izquierda no vuelve: ese no es el gesto", pantalla(w) === "setup");
   await swipe(w, { dy: 130 });
@@ -628,7 +636,7 @@ const pantalla = w => el(w, "#app").dataset.screen;
   await swipe(w, { target: tira });
   ok("una tira que se desplaza a los lados se queda el gesto", pantalla(w) === "setup");
   await swipe(w);
-  ok("y fuera de ella el gesto sigue volviendo", pantalla(w) === "play-menu");
+  ok("y fuera de ella el gesto sigue volviendo", pantalla(w) === "solo-home");
   w.close();
 }
 {

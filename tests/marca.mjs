@@ -25,13 +25,6 @@ const click = action => {
   assert.ok(button, `Existe la acción ${action}`);
   button.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
 };
-// El menú de formatos agrupa sus opciones en dos bloques plegados; hay que desplegar
-// el que toque («multi» o «solo») antes de poder tocar los botones de dentro.
-const openFormat = format => {
-  const button = w.document.querySelector(`[data-format="${format}"]`);
-  assert.ok(button, `Existe el bloque de formato ${format}`);
-  button.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
-};
 // Al volver desde otra pantalla, la colección elegida puede seguir desplegada. Solo
 // tocamos su carátula cuando aún no se ven los mazos; volver a tocar una colección ya
 // abierta ahora la pliega de forma intencionada.
@@ -60,16 +53,10 @@ try {
   w.document.querySelector('[data-inline-route]').click(); w.sessionStorage.removeItem('continuum-entry-route');
   openSelectedCollection();
   click("set-mode");
-  checkScreen("Menú de formatos");
-  openFormat("multi");
-  click("setup");
-  checkScreen("Configuración");
-  click("back-menu");
-  click("collection-back");
-  openSelectedCollection();
-  click("set-mode");
-  click("solo");
   checkScreen("Solitario");
+  w.CONTINUUM.openDeckAs("local");
+  checkScreen("Configuración");
+  w.CONTINUUM.openDeckAs("collections");
   click("start-free");
   checkScreen("Partida libre");
   check("cabecera compartida del modo online", /CT.UI.header/.test(read("online.js")));

@@ -39,11 +39,11 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
   const w=boot();
   try {
     click(irAJugar(w),'[data-block="naturaleza"]');click(w,'[data-mode="animals"]');
-    assert.equal(w.document.querySelectorAll('.atlas-specimens figure').length,3);
+    assert.equal(w.document.getElementById('app').dataset.screen,'solo-home');
     assert.equal(w.document.querySelectorAll('.home-nav button').length,4);
     assert.ok(w.document.querySelector('.home-nav [data-action="rules"]'));
     assert.equal(w.document.querySelector('.topbar [data-action="rules"]'),null);
-    click(w,'[data-format="multi"]');click(w,'[data-action="setup"]');
+    (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
     w.document.querySelector('#hand-size').value='4';click(w, '[data-action="start"]'); jugarQuienEmpieza(w);click(w,'[data-action="ready"]');
     assert.equal(w.document.querySelectorAll('.hand-card').length,4);
     assert.equal(w.document.querySelector('.home-nav'),null);
@@ -68,7 +68,7 @@ const screen = w => w.document.querySelector('#app').dataset.screen;
     click(w,'[data-exit-stay]');assert.equal(screen(w),'game');assert.equal(w.localStorage.getItem('hilo-game-animals-v1'),saved);
     click(w,'[data-action="ui-back"]');click(w,'[data-exit-confirm]');assert.equal(screen(w),'setup');
     assert.ok(w.localStorage.getItem('hilo-game-animals-v1'));
-    click(w,'[data-action="back-menu"]');click(w,'[data-action="continue"]');click(w,'[data-action="ready"]');
+    click(w,'[data-action="continue"]');click(w,'[data-action="ready"]');
     assert.equal(w.document.querySelectorAll('.hand-card').length,4);
   } finally {w.close();}
 }

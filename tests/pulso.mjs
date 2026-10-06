@@ -98,7 +98,7 @@ function entrar(w) {
 function entrar2(w) {
   click(irAJugar(w), '[data-block="historia"]');
   click(w, '[data-mode="history"]');
-  click(w, '[data-format="multi"]');
+  w.CONTINUUM.openDeckAs('local');
   click(w, '[data-action="continue"]');
 }
 

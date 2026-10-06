@@ -63,7 +63,7 @@
     choices.id = 'home-mode-choices';
     choices.setAttribute('aria-label', 'Cómo quieres jugar');
     choices.innerHTML = [
-      modeDoor('solo-hub', modeArt['solo-hub'], 'Jugar solo', 'Elige un mazo o una competición.', true),
+      modeDoor('solo-hub', modeArt['solo-hub'], 'Jugar solo', 'Colecciones, retos rápidos o competición.', true),
       modeDoor('friends-hub', modeArt['friends-hub'], 'Jugar con amigos', 'En el mismo móvil o cada uno en el suyo.'),
       modeDoor('online-hub', modeArt['online-hub'], 'Jugar online', 'Encuentra jugadores en una mesa pública.')
     ].join('').replaceAll('loading="lazy"', 'loading="eager"'); // decodificadas de antemano: si no, se pintan al desplegar y la tarjeta «Jugar» parpadea
@@ -76,7 +76,13 @@
     const playWrap = document.createElement('section');
     playWrap.className = 'mode-play-zone';
     playWrap.setAttribute('aria-label', 'Jugar');
-    playWrap.append(play, reveal);
+    // Quien recibe un QR o un código en persona entra desde aquí, sin bajar por Jugar con amigos.
+    const join = document.createElement('button');
+    join.type = 'button';
+    join.className = 'mode-join-shortcut';
+    join.dataset.action = 'friends-join';
+    join.innerHTML = '<span class="mode-join-mark" aria-hidden="true">⌁</span><span><b>Unirme a una partida</b><small>¿Te han invitado? Escanea el QR o pega el código.</small></span><i aria-hidden="true">→</i>';
+    playWrap.append(play, reveal, join);
 
     doors.replaceChildren(playWrap, dailyWrap);
     doors.dataset.modesV1 = 'true';
@@ -95,12 +101,19 @@
     else { app.dataset.screen = screen; app.innerHTML = html; }
   }
 
+  // El tamaño de la mesa se recuerda durante la sesión y se enseña igual en las dos pantallas.
+  function publicCapacity() { return sessionStorage.getItem('continuum-public-capacity') || '0'; }
+  function capacityField() {
+    const cap = publicCapacity();
+    const options = [['0', 'Cualquier mesa · más rápido'], ['2', 'Hasta 2 jugadores'], ['3', 'Hasta 3 jugadores'], ['4', 'Hasta 4 jugadores']];
+    return `<div class="panel mode-online-config"><div class="field"><label for="mode-public-capacity">Tamaño de mesa</label><select id="mode-public-capacity">${options.map(([value, label]) => `<option value="${value}"${value === cap ? ' selected' : ''}>${label}</option>`).join('')}</select></div><p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</p></div>`;
+  }
   function openOnlineHub() {
     hub('hub-online', 'Jugar online', 'Mesas públicas', [
-      `<div class="mode-online-config"><label for="mode-public-capacity">Mesa</label><select id="mode-public-capacity"><option value="0">Cualquier mesa · más rápido</option><option value="2">Hasta 2 jugadores</option><option value="3">Hasta 3 jugadores</option><option value="4">Hasta 4 jugadores</option></select><small>La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</small></div>`,
-      modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Un mazo sorpresa: entra en la primera mesa disponible.', false, 'data-online-kind="surprise"'),
+      modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
-      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Ordena, arriesga y asegura tus aciertos con otros jugadores.', false, 'data-online-kind="quick"')
+      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"'),
+      capacityField()
     ].join(''), modeArt['online-hub']);
   }
 
@@ -109,7 +122,9 @@
     const modes=Object.entries(window.CONTINUUM?.MODES||{}).filter(([key])=>key!=='mixed' && (!window.CONTINUUM?.Cartera?.tiene || window.CONTINUUM.Cartera.tiene(key)));
     hub('hub-online-collections', 'Grandes colecciones', 'Mesa pública · temas', `
       <div class="mode-topic-picker"><p>Marca hasta 3 temas. Buscaremos mesa en esos temas; si no eliges ninguno, buscaremos en todas las colecciones.</p>
-      <div class="mode-topic-grid">${modes.map(([key,m])=>`<label><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
+      <div class="mode-topic-grid">${modes.map(([key,m])=>`<label class="mode-topic"><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
+      <p class="hint mode-topic-count" data-topic-count aria-live="polite">Ningún tema elegido: buscaremos en todas.</p>
+      ${capacityField()}
       ${modeDoor('public-match', modeArt['online-hub'], 'Buscar mesa', 'La mesa compartirá un único tema.', true, 'data-online-kind="collections-vote"')}</div>`, modeArt['online-collections']);
   }
 
@@ -132,7 +147,7 @@
   let createRoomOpen = false;
   function createRoomGroup(route) {
     return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear partida</b><small>Elige qué jugar y después el ritmo: en directo, por turnos o con las mismas cartas.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
-      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: arriesga o asegura tus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición')}</div></div>`;
+      <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Temas al azar de las colecciones; gana quien más puntos sume.', false, `data-competition-audience="${route}"`, 'Configurar competición')}</div></div>`;
   }
   function openFriendHub(route) {
     // `wifi` y `duel` eran puertas propias: quien vuelva a ellas llega a Cada uno en su móvil.
@@ -144,8 +159,8 @@
       route === 'online' ? modeDoor('friends-join', 'menu-private.webp', 'Unirme a una partida', 'Escanea el QR o pega el enlace o el código. Por internet o por Wi‑Fi.', true, '', 'Unirme') : '',
       route === 'online' ? createRoomGroup(route) : [
         inlineCollections(route, 'Elegid un tema o combinad los ocho mazos cronológicos.'),
-        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa para todos: cada uno arriesga o asegura sus aciertos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
-        modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; gana quien sume más rondas.', false, `data-competition-audience="${route}"`, 'Configurar competición')
+        modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida'),
+        modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Temas al azar de las colecciones; gana quien más puntos sume.', false, `data-competition-audience="${route}"`, 'Configurar competición')
       ].join(''),
       route === 'online' ? modeDoor('duels-list', 'mode-walk-duel.webp', 'Tus partidas', 'Los duelos por turnos en curso y a quién le toca.', false, '', 'Ver') : ''
     ].join(''), art);
@@ -157,7 +172,7 @@
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
       inlineCollections('collections'),
       modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: ordena y suma aciertos.', false, 'data-solo-route="quick"', 'Preparar partida'),
-      modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Varios temas seguidos; suma tus aciertos ronda a ronda.', false, 'data-competition-audience="solo"', 'Configurar competición')
+      modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', 'Temas al azar de las colecciones; suma tus aciertos tema a tema.', false, 'data-competition-audience="solo"', 'Configurar competición')
     ].join(''), modeArt['solo-hub']);
   }
 
@@ -245,8 +260,12 @@
     }
     const topicInput=event.target.closest('[data-public-topic]');
     if(topicInput){
-      const checked=[...document.querySelectorAll('[data-public-topic]:checked')];
-      if(checked.length>3){topicInput.checked=false;return;}
+      let checked=[...document.querySelectorAll('[data-public-topic]:checked')];
+      const full=checked.length>3;
+      if(full){topicInput.checked=false;checked=checked.filter(x=>x!==topicInput);}
+      const count=app.querySelector('[data-topic-count]');
+      if(count) count.textContent=full?'Ya tienes 3 temas: quita uno para elegir otro.':checked.length?`${checked.length} de 3 temas elegidos.`:'Ningún tema elegido: buscaremos en todas.';
+      return;
     }
     const publicEntry = event.target.closest('[data-action="public-match"][data-online-kind]');
     if (publicEntry) {
@@ -288,6 +307,10 @@
     else if (action === 'friend-hub') openFriendHub(target.dataset.friendHub);
     else openFriendsHub();
   }, true);
+
+  app.addEventListener('change', event => {
+    if (event.target.id === 'mode-public-capacity') sessionStorage.setItem('continuum-public-capacity', event.target.value);
+  });
 
   const hubs = {'hub-online': openOnlineHub, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends-wifi': () => openFriendHub('wifi'), 'hub-friends-duel': () => openFriendHub('duel'), 'hub-friends': openFriendsHub};
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };

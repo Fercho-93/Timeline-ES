@@ -40,7 +40,7 @@ try {
   await p.locator('[data-quick="start"]').click();
   for(let i=0;i<3;i++){await p.locator('[data-quick="bank"]').click();if(i<2)await p.locator('[data-quick="next"]').click();}
   await p.locator('[data-quick="formats"]').click();await p.locator('[data-quick="duel"]').click();
-  await p.locator('#quick-length').selectOption('1');await p.locator('[data-quick="start"]').click();await p.locator('[data-quick="bank"]').click();
+  await p.locator('.quick-length-chip[data-length="1"]').click();await p.locator('[data-quick="start"]').click();await p.locator('[data-quick="bank"]').click();
   const link=await p.locator('#quick-result-link').inputValue();
   const rival=await browser.newPage();rival.on('pageerror',e=>errors.push(e.message));await rival.goto(link);await rival.evaluate(()=>window.CONTINUUM_SPLASH?.finish());
   await rival.locator('[data-quick="bank"]').click();assert.ok(await rival.getByText(/Habéis empatado/).isVisible());

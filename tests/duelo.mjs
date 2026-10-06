@@ -59,7 +59,7 @@ const partida = w => JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
 // Entra en un duelo de orden recién creado.
 async function abreDuelo(w) {
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="duel-home"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   click(w, '[data-action="start-duel"]');
   await jugar(w);
 }
@@ -216,7 +216,7 @@ console.log("\nCrear un duelo y jugarlo");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
-  click(w, '[data-action="duel-home"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('online');
   ok("el duelo es uno de los ritmos de jugar con amigos", /Partida con amigos/.test(texto(w)) && /Mismas cartas/.test(texto(w)));
   w.document.getElementById("duel-name").value = "Fernando";
   click(w, '[data-action="start-duel"]');
@@ -340,7 +340,7 @@ console.log("\nEl duelo no se cuela donde no debe");
   const w = boot();
   abreMazo(w, "historia", "history");
   ok("no hay duelo en el menú de formatos", !existe(w, '[data-action="start-duel"]'));
-  click(w, '[data-format="multi"]'); click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   ok("ni en la preparación de una partida local", !existe(w, '[data-action="start-duel"]'));
   click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   click(w, '[data-action="ready"]');
@@ -393,7 +393,7 @@ console.log("\nCerrar la aplicación no devuelve el plazo");
     "hilo-solo-history-v1": JSON.stringify({ ...guardada, cartaEmpezadaEn: Date.now() - 60000 })
   } });
   abreMazo(vuelta, "historia", "history");
-  click(vuelta, '[data-action="duel-home"]');
+  (vuelta.CONTINUUM||vuelta.defaultView.CONTINUUM).openDeckAs('online');
   click(vuelta, '[data-action="resume-solo"]');
   ok("al continuar, la carta que seguía abierta se cierra", existe(vuelta, ".overlay"));
   ok("y se cierra como salida", /Has salido de la aplicación/.test(texto(vuelta)));
@@ -403,7 +403,7 @@ console.log("\nCerrar la aplicación no devuelve el plazo");
     "hilo-solo-history-v1": JSON.stringify({ ...guardada, cartaEmpezadaEn: Date.now() - 500 })
   } });
   abreMazo(rapida, "historia", "history");
-  click(rapida, '[data-action="duel-home"]');
+  (rapida.CONTINUUM||rapida.defaultView.CONTINUUM).openDeckAs('online');
   click(rapida, '[data-action="resume-solo"]');
   ok("volver enseguida deja seguir con la carta", !existe(rapida, ".overlay") && partida(rapida).played === 0);
 }

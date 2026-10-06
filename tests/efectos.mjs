@@ -41,7 +41,7 @@ for (const savedSound of [false, true]) {
   try {
     assert.equal(w.CONTINUUM.effectPrefs().sound,false,'las preferencias antiguas no reactivan efectos');
     w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');
-    for(const selector of ['[data-block="historia"]','[data-mode="history"]','[data-action="solo"]','[data-action="back-menu"]']) {
+    for(const selector of ['[data-block="historia"]','[data-mode="history"]','[data-action="back-menu"]']) {
       w.document.querySelector('#app '+selector).click();
     }
     w.document.querySelector('[data-settings-action="open"]').click();
@@ -75,9 +75,6 @@ console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibr
     click('#app [data-block="historia"]'); has('close');
     click('#app [data-block="historia"]');
     click('#app [data-mode="history"]'); has('page');
-    click('#app [data-format="multi"]'); has('expand');
-    click('#app [data-format="multi"]'); has('close');
-    click('#app [data-action="solo"]'); has('page');
     click('#app [data-action="start-free"]'); has('page');
     click('#app .slot'); has('place');
     click('#app [data-action="cancel-place"]'); has('return');

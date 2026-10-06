@@ -150,7 +150,7 @@ try {
    assert.ok(Math.abs(soloAfter.height-soloBefore.height)<SALTO_MAXIMO,`la altura no debería saltar tras el viaje (${soloBefore.height} → ${soloAfter.height})`);
    await transitionPage.locator('[data-action="back-menu"]').click();
    await transitionPage.waitForFunction(()=>!document.querySelector('.motion-entering')).catch(()=>{});
-   await transitionPage.locator('[data-action="collection-back"]').click();
+   await transitionPage.locator('[data-action="back-menu"]').click();
    // Durante el viaje inverso hay una réplica inerte de la pantalla anterior. El
    // usuario solo puede tocar #app; la prueba debe apuntar al mismo lugar interactivo.
    await transitionPage.locator('#app [data-mode="history"]').click();

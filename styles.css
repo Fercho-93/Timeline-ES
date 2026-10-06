@@ -251,6 +251,7 @@ h2 { font-family: var(--font-display); font-weight: 650; font-size: clamp(1.65re
 .setup-block-head { margin-bottom: 12px; }
 .setup-grid { display: grid; gap: 16px; }
 .field { display: grid; gap: 7px; }
+.field[hidden] { display: none; }
 .field label, .field .field-label { font-size: .85rem; font-weight: 700; color: var(--muted); }
 .field-help { display: block; margin-top: 2px; color: var(--muted); font-size: .78rem; line-height: 1.4; }
 .field input[readonly] { color: var(--muted); background: var(--paper); }

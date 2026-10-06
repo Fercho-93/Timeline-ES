@@ -51,8 +51,7 @@ for (let g = 0; g < muestras.length; g++) {
   // legítimos de año o magnitud, deben conservarse durante toda la partida.
   const cardsById = new Map(mazo.map(c => [c.id, c]));
   const orden = card => (["countries", "population", "languages", "animals", "lifespan", "speed", "distances"].includes(mode) ? card.value : card.year);
-  fire(w, w.document.querySelector('[data-format="multi"]'));
-  fire(w, w.document.querySelector('[data-action="setup"]'));
+  w.CONTINUUM.openDeckAs('local');
   // Dos jugadores y una carta reducen el coste de cada navegador aislado sin dejar
   // de recorrer un turno completo, la persistencia y el resultado de la partida.
   const mano = 1;

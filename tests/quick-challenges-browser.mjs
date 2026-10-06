@@ -46,7 +46,7 @@ try {
     await page.locator('[data-quick="remove-player"]').last().click();
     await page.locator('[data-quick="remove-player"]').last().click();
     assert.equal(await page.locator('[data-quick-name]').count(), 2);
-    await page.locator('#quick-length').selectOption('1');
+    await page.locator('.quick-length-chip[data-length="1"]').click();
     await page.locator('#quick-choice').selectOption('poker');
     await page.locator('[data-quick="start"]').click();
     for (const v of ['1900', '1500']) { await page.locator('#quick-starter-input').fill(v); await page.locator('[data-quick="starter-guess"]').click(); }

@@ -31,7 +31,7 @@ for (const mode of Object.keys(w.CONTINUUM.MODES)) {
   assert.equal(next.players.length,2);
 }
 function click(sel) { const el=w.document.querySelector(sel); assert.ok(el,sel); el.click(); }
-w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');click('[data-block="historia"]');click('[data-mode="history"]');click('[data-format="multi"]');click('[data-action="setup"]');
+w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');click('[data-block="historia"]');click('[data-mode="history"]');w.CONTINUUM.openDeckAs('local');
 w.document.querySelector('#hand-size').value='1';click('[data-action="start"]');
 while (w.document.getElementById('starter-guess-input')) { w.document.getElementById('starter-guess-input').value='1900'; click('[data-action="starter-guess-submit"]'); }
 click('[data-action="starter-start"]');

@@ -56,8 +56,7 @@ const respira = () => new Promise(r => setTimeout(r, 80));
 function partida(w) {
   click(irAJugar(w), '[data-block="historia"]');
   click(w, '[data-mode="history"]');
-  click(w, '[data-format="multi"]');
-  click(w, '[data-action="setup"]');
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('local');
   click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
   click(w, '[data-action="ready"]');
 }

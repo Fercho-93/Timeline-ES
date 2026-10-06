@@ -40,7 +40,7 @@ try {
   // catálogo y de la cartera para que dar de alta un mazo nuevo —o cerrar uno— no obligue
   // a repasar las cuentas de esta prueba.
   const temas = Object.keys(w.CONTINUUM.MODES).filter(key => key !== "mixed" && w.CONTINUUM.Cartera.tiene(key)).length;
-  click(irACompeticion(w), "competition-menu"); click(w, "start-competition");
+  click(irACompeticion(w), "competition-menu"); w.document.getElementById('competition-length').value=w.document.querySelector('[data-comp-all]').value; click(w, "start-competition");
   const intro = saved(w);
   assert.equal(intro.queue.length, temas);
   assert.equal(intro.saveVersion, 2);
@@ -119,7 +119,7 @@ try {
       return native.call(this, key, value);
     };
   });
-  w.full = true; click(irACompeticion(w), "competition-menu"); click(w, "start-competition");
+  w.full = true; click(irACompeticion(w), "competition-menu"); w.document.getElementById('competition-length').value=w.document.querySelector('[data-comp-all]').value; click(w, "start-competition");
   assert.ok(w.CONTINUUM.Storage.hasPending());
   assert.ok(w.document.querySelector("#storage-notice"));
   assert.ok(JSON.parse(w.CONTINUUM.Storage.getItem(key)).queue.length);
@@ -142,7 +142,7 @@ try {
   } }));
   await tick();
   const updateButton = w.document.querySelector("#update-notice button"); assert.ok(updateButton);
-  click(irACompeticion(w), "competition-menu"); click(w, "start-competition"); await tick(); assert.equal(updateButton.disabled, true);
+  click(irACompeticion(w), "competition-menu"); w.document.getElementById('competition-length').value=w.document.querySelector('[data-comp-all]').value; click(w, "start-competition"); await tick(); assert.equal(updateButton.disabled, true);
   updateButton.click(); assert.equal(messages.length, 0);
   handlers.controllerchange(); assert.equal(w.document.getElementById("app").hasAttribute("inert"), false);
   click(w, "ui-back"); w.document.querySelector("[data-exit-confirm]").click(); click(w, "home-top"); await tick(); assert.equal(updateButton.disabled, false);
