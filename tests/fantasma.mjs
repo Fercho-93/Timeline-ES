@@ -200,6 +200,9 @@ for (const difficulty of ['easy','normal','hard','expert']) {
     s=state(w,soloKey);const values=s.timeline.map(id=>w.CONTINUUM.sortValue(s.mode,byId.get(id)));
     assert.deepEqual([...values].sort((a,b)=>a-b),values);
     play(w,true,true); click(w,'solo-next');
+    // Sin ceder el turno, los observadores del DOM nunca reciben sus cambios y los
+    // acumulan: con un mazo entero, la prueba se quedaba sin memoria en GitHub.
+    await null;
   }
   assert.ok(turns<cards.length,'termina sin bloqueo aunque las automáticas agoten el mazo');
   assert.match(w.document.body.textContent,/Has completado el mazo/);
@@ -227,6 +230,7 @@ for (const difficulty of ['easy','normal','hard','expert']) {
       const card=byId.get(id);const mode=Object.values(ct.MODES).find(m=>m.key!=='mixed'&&m.cards.some(c=>c.id===id)).key;
       const at=ct.correctIndex(mode,board,card);
       w.document.querySelectorAll('[data-action="solo-place"]')[at].click();click(w,'confirm-place');click(w,'solo-next');
+      await null;
     }
     if(rounds<temas){click(w,'comp-next-round');}
   }
