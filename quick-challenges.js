@@ -935,6 +935,22 @@
     duels, openRoom, challenge, resignDuel, cancelInvitation, declineInvite, previewInvite, reshare,
     Duel:{pack:packCommands,unpack:unpackCommands,payload:duelPayload,read:readDuel,fingerprint:duelFingerprint,rounds},
     openNetwork(renderPage,kind,capacity,only){paint=renderPage;backTo=null;entry='network';networkSetup(kind,capacity,only);},
+    // Competición de Retos rápidos desde «Crear partida»: `length` retos al azar, en directo
+    // (sala por internet o por Wi-Fi, con los retos ya elegidos) o por turnos (el duelo de dos,
+    // que se crea directamente).
+    openComp(renderPage,{pace='directo',net='internet',length=3}={}){
+      paint=renderPage;backTo=null;
+      const n=[1,3,5].includes(Number(length))?String(length):'3';
+      if(pace==='turnos'){
+        entry='duel-setup';format='duel';CT.Storage.setItem(DUEL_PACE,'turnos');duelSetup();
+        app().querySelector('#quick-free-length').value=n;
+        app().querySelectorAll('.quick-length-chip').forEach(chip=>{const on=chip.dataset.length===n;chip.classList.toggle('is-selected',on);chip.setAttribute('aria-checked',String(on));});
+        connectRoom(true).catch(errorNotice);
+        return;
+      }
+      entry='network';networkSetup(net==='wifi'?'local':'internet',4,'create');
+      const select=app().querySelector('#quick-net-length');if(select)select.value=n;
+    },
     // Una invitación Wi-Fi ya escaneada en «Unirme»: con nombre de perfil se entra directamente.
     joinLocal(renderPage,signal){
       paint=renderPage;backTo=null;entry='network';networkSetup('local',4,'join');

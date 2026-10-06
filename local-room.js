@@ -26,12 +26,15 @@
   const PULSE_MIN_HAND = 2;
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 
-  function createRoom({ roomCode, hostId, hostName, avatarId = null, modeKey, deckFingerprint = null, now }) {
+  // `tournament` (de `CT.Tournament.create`) convierte la sala en una competición: varios
+  // temas al azar, uno por ronda, con las mismas reglas de puntos que la sala online.
+  function createRoom({ roomCode, hostId, hostName, avatarId = null, modeKey, deckFingerprint = null, tournament = null, now }) {
     if (!roomCode || !hostId || !hostName || !modeKey) throw new Error("INVALID_ROOM");
     return {
-      roomCode, mode: modeKey, deckFingerprint,
+      roomCode, mode: tournament ? tournament.queue[0] : modeKey, deckFingerprint,
+      ...(tournament ? { tournament } : {}),
       hostId, status: "lobby", phase: "lobby", version: 1,
-      handSize: 4, turnSeconds: 30,
+      handSize: tournament?.handSize || 4, turnSeconds: 30,
       playerOrder: [hostId],
       players: { [hostId]: { name: hostName, ...(avatarId ? { avatarId } : {}), hand: [], joinedAt: now } },
       deck: [], discard: [], timeline: [], current: 0, starter: hostId,
@@ -55,7 +58,7 @@
       if (!state.players[playerId].away) return state;
       return { ...state, players: { ...state.players, [playerId]: { ...state.players[playerId], away: false } }, version: state.version + 1, updatedAt: now };
     }
-    if (state.status !== "lobby") throw new Error("ALREADY_STARTED");
+    if (state.status !== "lobby" || state.tournament?.index > 0) throw new Error("ALREADY_STARTED");
     if (state.playerOrder.length >= MAX_PLAYERS) throw new Error("ROOM_FULL");
     return {
       ...state,
@@ -85,11 +88,20 @@
 
   // `deck` llega ya barajado y sin la carta del minijuego; `order` es la mesa por orden de
   // cercanía. Igual que en la sala online, no se empieza sin haber jugado el minijuego.
+  // En una competición, desde la segunda ronda no hay minijuego: empieza el siguiente de la
+  // mesa en cada tema, igual que en la sala online.
+  function laterRound(state) { return (state.tournament?.index || 0) > 0; }
+  function rotatedOrder(state) {
+    const shift = state.tournament.index % state.playerOrder.length;
+    return [...state.playerOrder.slice(shift), ...state.playerOrder.slice(0, shift)];
+  }
   function startRoom(state, { requesterId, handSize, turnSeconds, order, deck: shuffledDeck, ghost = false, pulse = false, random = Math.random, now }) {
     if (state.hostId !== requesterId) throw new Error("NOT_HOST");
     if (state.status !== "lobby") throw new Error("INVALID_START");
     if (state.playerOrder.length < MIN_PLAYERS) throw new Error("INVALID_START");
-    if (!starterComplete(state)) throw new Error("STARTER_PENDING");
+    if (laterRound(state)) order = rotatedOrder(state);
+    else if (!starterComplete(state)) throw new Error("STARTER_PENDING");
+    if (state.tournament) handSize = state.tournament.handSize;
     const sameTable = Array.isArray(order) && order.length === state.playerOrder.length && state.playerOrder.every(id => order.includes(id));
     if (!sameTable) throw new Error("INVALID_START");
     const deck = [...shuffledDeck];
@@ -334,12 +346,33 @@
   // Revancha: la misma mesa vuelve al vestíbulo, lista para otro minijuego y otro reparto.
   // Solo el anfitrión, y solo con la partida terminada; quien seguía desconectado se va.
   function rematch(state, { requesterId, now }) {
-    if (state.hostId !== requesterId || state.status !== "ended") throw new Error("NOT_ALLOWED");
+    if (state.hostId !== requesterId || state.status !== "ended" || state.tournament) throw new Error("NOT_ALLOWED");
     const playerOrder = state.playerOrder.filter(id => !state.players[id].away);
     const players = {};
     playerOrder.forEach(id => { const { away, pulseUsed, shieldRound, ...rest } = state.players[id]; players[id] = { ...rest, hand: [] }; });
     return {
       ...state, status: "lobby", phase: "lobby", players, playerOrder,
+      deck: [], discard: [], timeline: [], current: 0, turnsInRound: 0, round: 1,
+      winner: null, winners: null, reveal: null, turnStartedAt: null,
+      starterDraw: null, ghost: null, pulsePower: null, pulseTurn: null, final: null, finalAnswers: null,
+      version: state.version + 1, updatedAt: now
+    };
+  }
+
+  // Siguiente tema de la competición: la misma mesa vuelve a la sala de espera con el mazo
+  // del tema que toca; la ronda que acaba queda apuntada con las cartas que le quedaban a
+  // cada cual, que es de lo que salen los puntos. Solo el anfitrión, con la ronda terminada.
+  function competitionNext(state, { requesterId, deckFingerprint = null, now }) {
+    const t = state.tournament;
+    if (state.hostId !== requesterId || state.status !== "ended" || !t || t.index + 1 >= t.queue.length) throw new Error("NOT_ALLOWED");
+    const players = Object.fromEntries(state.playerOrder.map(id => [id, { id, hand: state.players[id].hand }]));
+    const tournament = CT.Tournament.next(t, players, state.winners || (state.winner ? [state.winner] : []));
+    const playerOrder = state.playerOrder.filter(id => !state.players[id].away);
+    const kept = {};
+    playerOrder.forEach(id => { const { away, pulseUsed, shieldRound, ...rest } = state.players[id]; kept[id] = { ...rest, hand: [] }; });
+    return {
+      ...state, tournament, mode: tournament.queue[tournament.index], deckFingerprint,
+      status: "lobby", phase: "lobby", players: kept, playerOrder,
       deck: [], discard: [], timeline: [], current: 0, turnsInRound: 0, round: 1,
       winner: null, winners: null, reveal: null, turnStartedAt: null,
       starterDraw: null, ghost: null, pulsePower: null, pulseTurn: null, final: null, finalAnswers: null,
@@ -354,7 +387,7 @@
     join: joinRoom, "starter-draw": starterDraw, "starter-guess": starterGuess, start: startRoom,
     "place-card": placeCard, "use-ghost": useGhost, "pulse-start": pulseStart, "pulse-place": pulsePlace, "pulse-defend": pulseDefend,
     "finish-turn": finishTurn, "skip-turn": skipTurn, "final-answer": finalAnswer, "final-next": finalNext,
-    "remove-player": removePlayer, "player-away": playerAway, rematch
+    "remove-player": removePlayer, "player-away": playerAway, rematch, "competition-next": competitionNext
   };
   function reduce(state, action) {
     const handler = ACTIONS[action?.type];
@@ -363,7 +396,7 @@
   }
 
   CT.LocalRoom = {
-    MIN_PLAYERS, MAX_PLAYERS, createRoom, joinRoom, startRoom, placeCard, finishTurn, skipTurn, rematch, removePlayer,
+    MIN_PLAYERS, MAX_PLAYERS, createRoom, joinRoom, startRoom, placeCard, finishTurn, skipTurn, rematch, removePlayer, competitionNext, laterRound,
     starterComplete, finalComplete, pulseAvailable, pulseTargets, reduce
   };
 })();

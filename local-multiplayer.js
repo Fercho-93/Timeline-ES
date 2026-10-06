@@ -23,6 +23,8 @@
   const CAMERA_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="14" r="3.5"/></svg>';
 
   let onBackToMenu = null;
+  // Una competición sin internet: varios temas al azar, uno por ronda ({ rounds, cards }).
+  let competition = null;
   let modeKey = "history";
   let directJoin = false;
   let screen = "";
@@ -203,6 +205,8 @@
     }
     const previous = roomState;
     roomState = room;
+    // En una competición el mazo cambia de una ronda a otra: se juega siempre el de la sala.
+    if (room?.mode && room.mode !== modeKey && CT.has(room.mode)) modeKey = room.mode;
     if (room.phase === "reveal" && room.reveal) {
       const reveal = room.reveal;
       CT.Progreso?.discover?.({ mode: modeKey, cardId: reveal.cardId,
@@ -243,6 +247,7 @@
     stopCamera();
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
+    competition = options.competition || null;
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
@@ -263,6 +268,19 @@
 
   function renderEntrada() {
     screen = "local-entrada";
+    // Una competición se crea desde «Crear partida»: unirse está en su propia entrada.
+    if (competition) {
+      paint(`<div class="shell online-shell">${header("back")}
+        <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición sin internet</div><h2 data-focus tabindex="-1">${competition.rounds} temas al azar,<br>cada uno en su móvil</h2><p class="lead">${competition.cards} cartas por persona en cada tema. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno.</p></section>
+        ${wifiNote()}
+        ${cameraNote()}
+        <div class="online-entry-grid online-entry-single">
+          <form class="panel online-form" data-local-form="create"><h3>Crear la sala</h3><p>Tú preparas la competición y los demás escanean tu código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName()}"></div><button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
+        </div>
+        <p class="online-note">No necesita conexión a internet en ningún momento.</p>
+      </div>`, "local-entrada");
+      return;
+    }
     paint(`<div class="shell online-shell">${header("back")}
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(CT.mode(modeKey).name)}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas — sin internet</h2><p class="lead">Cada persona juega desde su móvil, conectadas por Wi-Fi local, sin ninguna conexión a internet.</p></section>
       ${wifiNote()}
@@ -280,9 +298,11 @@
     myName = name;
     myPlayerId = CT.LocalSession.HOST_ID;
     const roomCode = createRoomCode();
+    const tournament = competition ? CT.Tournament.create(competition.rounds, competition.cards) : null;
+    if (tournament) modeKey = tournament.queue[0];
     try {
       hostSession = CT.LocalSession.createHostSession({
-        roomCode, hostName: name, avatarId: CT.Avatares.ownId(), modeKey,
+        roomCode, hostName: name, avatarId: CT.Avatares.ownId(), modeKey, tournament,
         deckFingerprint: CT.deckFingerprint(modeKey),
         onChange: onRoomChange,
         onPeerLost: (lostName, playing) => showToast(playing
@@ -607,6 +627,14 @@
       <button type="button" class="btn btn-primary btn-block" data-local-action="starter-guess">Adivinar <span>→</span></button>${repetir}</div>`;
   }
 
+  // El tema que viene en una competición: desde la segunda ronda no hay minijuego, empieza
+  // el siguiente de la mesa. Quien organiza lo pone en marcha.
+  function nextThemeMarkup(isHost) {
+    const t = roomState.tournament;
+    const first = roomState.players[roomState.playerOrder[t.index % roomState.playerOrder.length]];
+    return `${CT.Tournament.journey(t)}<h3>Tema ${t.index + 1} de ${t.queue.length}: ${escapeHtml(CT.mode(roomState.mode).name)}</h3><p>Empieza ${escapeHtml(first?.name || "el siguiente de la mesa")}.</p>${isHost ? '<button type="button" class="btn btn-primary btn-block" data-local-action="start">Empezar el tema <span>→</span></button>' : '<p class="hint">Esperando a que quien organiza empiece el tema.</p>'}`;
+  }
+
   function renderLobby() {
     if (!roomState) return;
     screen = "local-lobby";
@@ -623,11 +651,11 @@
       ? `<div class="section-label">Ajustes</div>
         <div class="field"><label for="wifi-preset">Tipo de partida</label><select id="wifi-preset">${opcion("simple", "Primera partida · sin poderes", lobbySettings.preset)}${opcion("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}${lobbySettings.preset === "custom" ? opcion("custom", "Personalizada", lobbySettings.preset) : ""}</select></div>
         <div class="field"><label for="wifi-turn-seconds">Tiempo por turno</label><select id="wifi-turn-seconds">${opcion(0, "Sin límite", lobbySettings.turnSeconds)}${opcion(20, "20 segundos", lobbySettings.turnSeconds)}${opcion(30, "30 segundos", lobbySettings.turnSeconds)}${opcion(45, "45 segundos", lobbySettings.turnSeconds)}</select></div>
-        <div class="field"><label for="wifi-hand-size">Cartas iniciales</label><select id="wifi-hand-size">${[1, 2, 3, 4, 5, 6].map(n => opcion(n, n, lobbySettings.handSize)).join("")}</select></div>
+        ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} cartas por persona.</p>` : `<div class="field"><label for="wifi-hand-size">Cartas iniciales</label><select id="wifi-hand-size">${[1, 2, 3, 4, 5, 6].map(n => opcion(n, n, lobbySettings.handSize)).join("")}</select></div>`}
         <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="wifi-pulse"${lobbySettings.pulse ? " checked" : ""}></label>
         <label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="wifi-ghost"${lobbySettings.ghost ? " checked" : ""}></label>
-        ${roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}`
-      : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
+        ${CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(true) : roomState.playerOrder.length < 2 ? '<p class="hint">Esperando a alguien más…</p>' : starterPanelMarkup(true)}`
+      : CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(false) : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
     paint(`<div class="shell online-shell">${header("leave")}
       <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
       ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una sala → Buscar salas cercanas». Para un Android, usa el QR.</p>` : ""}
@@ -879,7 +907,7 @@
       : `<section><div class="hand-title"><h3>Tu mano</h3><small>${me.hand.length} por colocar</small></div><div class="hand">${me.hand.map(id => { const card = getCard(id); return `<button class="hand-card ${pendingIndex === null && selectedCardId === id ? "selected" : ""}" data-local-action="select" data-id="${id}" aria-pressed="${pendingIndex === null && selectedCardId === id}" ${myTurn ? "" : "disabled"}>${categoryBadge(card)}<span class="hidden-date">${hiddenLabel()}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong><span class="card-arrow">→</span></button>`; }).join("")}</div><p class="hint">${myTurn ? (pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : selectedCardId ? "Ahora toca uno de los huecos + de la línea temporal" : "Toca una carta para seleccionarla y después un hueco +, o mantenla pulsada y arrástrala hasta el hueco") : `${escapeHtml(currentPlayer.name)} está pensando dónde colocar su carta…`}</p></section>`;
     paint(`<div class="shell">${header("room-menu", '<button class="icon-btn" data-local-action="room-menu" aria-label="Abrir menú de la sala">Sala</button>')}
       <h1 class="solo-lectores" data-focus tabindex="-1">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}, ronda ${roomState.round}</h1>
-      <div class="game-head"><div><div class="turn-label" aria-hidden="true">Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
+      <div class="game-head"><div><div class="turn-label" aria-hidden="true">${roomState.tournament ? `Competición · tema ${roomState.tournament.index + 1} de ${roomState.tournament.queue.length} · ` : ""}Ronda ${roomState.round} · Turno ${roomState.turnsInRound + 1} de ${roomState.playerOrder.length}</div><div class="turn-name" aria-hidden="true">${myTurn ? "Tu turno" : `Turno de ${escapeHtml(currentPlayer.name)}`}</div></div>${secondsLeft !== null ? `<div class="turn-timer ${secondsLeft <= 5 ? "turn-timer-low" : ""}" id="turn-timer" role="timer" aria-label="Tiempo para jugar"><strong id="turn-timer-value">${secondsLeft}</strong><span>seg</span></div>` : ""}<div class="deck-count"><strong>${roomState.deck.length}</strong><span>mazo</span></div></div>
       <section class="scoreboard-panel" aria-label="Jugadores"><div class="scoreboard-title">Jugadores</div><div class="scoreboard">${roomState.playerOrder.map(uid => { const player = roomState.players[uid]; return `<span class="score ${uid === currentUid ? "active" : ""}"${uid === currentUid ? ' aria-current="true"' : ""}><i class="score-avatar">${CT.Avatares.markup(player.name, { size: 40, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</i><span class="score-copy"><b>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}${player.away ? " · desconectado" : ""}</b><span class="score-progress" aria-hidden="true"><i style="--player-progress:${playerProgress(player.hand.length)}%"></i></span></span><em><strong>${player.hand.length}</strong><small>cartas</small></em></span>`; }).join("")}</div></section>
       ${pulsing ? `<div class="pulse-banner">⚡ Duelo · <b>${escapeHtml(currentPlayer.name)}</b> reta a <b>${escapeHtml(pulseTargetName)}</b>${defensa ? " · defiende" : ""}</div>` : ""}
       ${CT.Ghost.banner(roomState.ghost, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name })))}
@@ -983,6 +1011,17 @@
     const title = !names.length ? "Partida terminada" : names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
     const lead = roomState.final ? "Ha ganado la final con la cifra más cercana." : names.length ? (roomState.playerOrder.length === 1 ? "Es la última persona que queda en la mesa." : "Se ha quedado sin cartas antes que nadie.") : "";
     const isHost = role === "host";
+    const t = roomState.tournament;
+    if (t) {
+      // Competición: el marcador de todos los temas y, si quedan, el siguiente.
+      const quedan = t.index + 1 < t.queue.length;
+      const board = CT.Tournament.board(t, roomState.playerOrder.map(id => ({ id, name: roomState.players[id].name, hand: roomState.players[id].hand })), uids.length ? uids : [roomState.playerOrder[0]]);
+      const siguiente = quedan
+        ? (isHost ? '<button class="btn btn-primary btn-block" data-local-action="competition-next">Siguiente tema <span>→</span></button><button class="btn btn-secondary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<p class="hint">Quien organiza pondrá en marcha el siguiente tema.</p><button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>')
+        : (isHost ? '<button class="btn btn-primary btn-block" data-local-action="close-room">Cerrar la sala</button>' : '<button class="btn btn-secondary btn-block" data-local-action="leave">Salir de la sala</button>');
+      paint(`<div class="shell">${header("leave")}<section class="pass-screen"><div class="panel pass-card"><div class="eyebrow">Competición · tema ${t.index + 1} de ${t.queue.length}</div><h2 data-focus tabindex="-1">${title}</h2><p>${lead}</p></div>${board}<div class="panel">${siguiente}</div></section></div>`, "local-final");
+      return;
+    }
     const puedeRevancha = isHost && roomState.playerOrder.filter(uid => !roomState.players[uid].away).length >= CT.LocalRoom.MIN_PLAYERS;
     const acciones = isHost
       ? `${puedeRevancha ? '<button class="btn btn-primary btn-block" data-local-action="rematch">Revancha con la misma mesa <span>→</span></button>' : ""}<button class="btn ${puedeRevancha ? "btn-secondary" : "btn-primary"} btn-block" data-local-action="close-room">Cerrar la sala</button>`
@@ -1085,6 +1124,7 @@
     else if (action === "close-guide") CT.closeDialog();
     else if (action === "skip") { CT.closeDialog(); doSkipTurn(); }
     else if (action === "rematch") attempt("rematch");
+    else if (action === "competition-next") attempt("competition-next");
     else if (action === "starter-draw") attempt("starter-draw");
     else if (action === "starter-guess") doStarterGuess();
     else if (action === "go-unirse") renderUnirseForm();

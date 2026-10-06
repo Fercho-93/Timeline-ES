@@ -345,5 +345,61 @@ click(h2, '[data-ask-action="0"]');
 await until(() => pantalla(g2) === "local-entrada");
 ok("la invitada no se queda congelada: vuelve a la entrada con un aviso", pantalla(g2) === "local-entrada" && /conexión|cerrado/.test(g2.document.getElementById("toast")?.textContent || ""));
 
+console.log("\nCompetición sin internet entre dos móviles");
+{
+  const red3 = fakeNetwork();
+  const h3 = boot(), g3 = boot();
+  for (const win of [h3, g3]) { red3.install(win); win.confirm = () => true; }
+  // Los temas salen al azar; aquí se fijan para saber qué mazo toca en cada ronda.
+  h3.CONTINUUM.Tournament.create = (rounds, cards) => ({ queue: ["history", "inventions"], index: 0, history: [], handSize: cards });
+  // Juega cada turno: quien esté en `fallan` coloca mal, el resto bien. Así la ronda tiene un ganador claro.
+  async function juega(ventanas, modo, fallan = []) {
+    for (let i = 0; i < 200 && ventanas.some(win => pantalla(win) === "local-game"); i++) {
+      const turno = ventanas.find(win => win.document.querySelector(".hand-card:not([disabled])"));
+      const sigue = ventanas.find(win => win.document.querySelector('[data-local-action="finish-turn"]'));
+      if (sigue && !turno) { click(sigue, '[data-local-action="finish-turn"]'); await tick(); continue; }
+      if (!turno) { await tick(); continue; }
+      const CTg = turno.CONTINUUM, porId = id => CTg.cards(modo).find(card => card.id === Number(id));
+      const carta = turno.document.querySelector(".hand-card:not([disabled])");
+      const linea = [...turno.document.querySelectorAll(".timeline .timeline-card")].map(el => porId(el.dataset.id));
+      const bueno = CTg.correctIndex(modo, linea, porId(carta.dataset.id));
+      const hueco = fallan.includes(turno) ? (bueno === 0 ? linea.length : 0) : bueno;
+      click(turno, `.hand-card[data-id="${carta.dataset.id}"]`);
+      click(turno, `.slot[data-local-action="place"][data-index="${hueco}"]`);
+      click(turno, '[data-local-action="confirm-place"]');
+      await tick();
+      await until(() => !turno.document.querySelector(".hand-card:not([disabled])") || ventanas.every(win => pantalla(win) !== "local-game"), 3000);
+    }
+  }
+  h3.CONTINUUM.LocalMultiplayer.open({ modeKey: "movies", competition: { rounds: 2, cards: 1 }, onBack: () => {} });
+  ok("la entrada de la competición solo ofrece crear la sala", /Competición sin internet/.test(html(h3)) && !h3.document.querySelector('[data-local-action="go-unirse"]'));
+  h3.document.getElementById("local-name-host").value = "Fer";
+  submit(h3, '[data-local-form="create"]');
+  ok("la sala empieza por el primer tema de la competición, no por el mazo de antes", /Competición: 2 temas · 1 cartas por persona/.test(html(h3)) && !h3.document.getElementById("wifi-hand-size"));
+  g3.CONTINUUM.LocalMultiplayer.open({ modeKey: "movies", onBack: () => {} });
+  await conecta(h3, g3);
+  await until(() => pantalla(g3) === "local-lobby");
+  elige(h3, "wifi-turn-seconds", "0");
+  await minijuego(h3, g3, h3);
+  click(h3, '[data-local-action="start"]');
+  await until(() => pantalla(g3) === "local-game");
+  ok("los dos juegan el primer tema con una carta", pantalla(g3) === "local-game" && h3.document.querySelectorAll(".hand-card").length === 1 && /Competición · tema 1 de 2/.test(html(g3)));
+  await juega([h3, g3], "history", [g3]);
+  await until(() => [h3, g3].every(win => pantalla(win) === "local-final"));
+  ok("al acabar el tema, los dos ven el marcador de la competición", [h3, g3].every(win => /tournament-board/.test(html(win)) && /Fer<\/strong><span>1 punto/.test(html(win))));
+  ok("solo quien organiza puede pasar al siguiente tema", !!h3.document.querySelector('[data-local-action="competition-next"]') && !g3.document.querySelector('[data-local-action="competition-next"]'));
+  click(h3, '[data-local-action="competition-next"]');
+  await until(() => pantalla(g3) === "local-lobby");
+  ok("el segundo tema se prepara en los dos móviles, sin minijuego", [h3, g3].every(win => pantalla(win) === "local-lobby" && /Tema 2 de 2: Inventos/.test(html(win))) && !h3.document.querySelector('[data-local-action="starter-draw"]'));
+  click(h3, '[data-local-action="start"]');
+  await until(() => pantalla(g3) === "local-game");
+  const porId = (win, id) => win.CONTINUUM.cards("inventions").find(card => card.id === Number(id));
+  ok("la invitada juega ya con cartas del segundo mazo", [...g3.document.querySelectorAll(".timeline .timeline-card, .hand-card")].every(el => porId(g3, el.dataset.id)));
+  ok("y empieza ella, la siguiente de la mesa", /Tu turno/.test(g3.document.querySelector(".turn-name").textContent));
+  await juega([h3, g3], "inventions", [h3]);
+  await until(() => [h3, g3].every(win => pantalla(win) === "local-final"));
+  ok("tras el último tema queda el resultado de la competición, sin «siguiente tema»", [h3, g3].every(win => /Resultado de la competición/.test(html(win))) && !h3.document.querySelector('[data-local-action="competition-next"]'));
+}
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

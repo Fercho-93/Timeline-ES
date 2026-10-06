@@ -28,43 +28,79 @@ function notify(text) {
   if (toast) { toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2800); }
   if (document.visibilityState === 'hidden' && 'Notification' in window && Notification.permission === 'granted') new Notification('Continuum', { body: text });
 }
+// Competición por turnos: varios temas al azar en una misma partida, con las mismas cartas
+// por tema. Los temas viajan en el propio campo `mode` («comp:history,science,…»), así que
+// el documento y las reglas de Firestore son los de siempre. Cada tema reparte con su propia
+// semilla, y su línea se rehace a partir de las jugadas: la guardada en `timeline` solo crece
+// una carta por acierto, que es lo que las reglas aceptan.
+const COMP = 'comp:', MAX_CARDS = 30, MAX_THEMES = 5;
+const compTotal = (mode, cards) => { const themes = mode.slice(COMP.length).split(',').length; return themes * Math.max(1, Math.min(Number(cards) || 1, Math.floor(MAX_CARDS / themes))); };
+const compModes = game => typeof game?.mode === 'string' && game.mode.startsWith(COMP) ? game.mode.slice(COMP.length).split(',').filter(key => CT.has(key)) : null;
+const perTheme = game => { const themes = compModes(game); return themes?.length ? Math.max(1, Math.floor(game.total / themes.length)) : game.total; };
+const themeAt = (game, turn = game.turnIndex) => { const themes = compModes(game); return themes?.length ? Math.min(themes.length - 1, Math.floor(turn / perTheme(game))) : 0; };
+const modeAt = (game, turn = game.turnIndex) => compModes(game)?.[themeAt(game, turn)] ?? game.mode;
+function themeDeal(game, theme) {
+  const mode = compModes(game)[theme], byId = new Map(CT.cards(mode).map(card => [String(card.id), card]));
+  return CT.Duelo.reparto(mode, `${game.seed}:${theme}`, perTheme(game)).map(item => byId.get(String(item))).filter(Boolean);
+}
 function deckCards(game) {
+  if (compModes(game)) return themeDeal(game, themeAt(game));
   const deck = CT.cards(game.mode), byId = new Map(deck.map(card => [String(card.id), card]));
   const dealt = game.kind === 'cifras' ? CT.Duelo.Cifras.reparto(game.mode, game.seed, game.total) : CT.Duelo.reparto(game.mode, game.seed, game.total);
   return dealt.map(item => byId.get(String(item?.id ?? item))).filter(Boolean);
 }
-function localCard(game) { const cards = deckCards(game); return cards[game.turnIndex + (game.kind === 'orden' ? 1 : 0)]; }
-function timelineCards(game) {
+function localCard(game) {
+  if (compModes(game)) return themeDeal(game, themeAt(game))[game.turnIndex - themeAt(game) * perTheme(game) + 1];
+  const cards = deckCards(game); return cards[game.turnIndex + (game.kind === 'orden' ? 1 : 0)];
+}
+// La línea de un tema de la competición: su carta de salida y, en orden, cada acierto de ese tema.
+function themeLine(game, theme) {
+  const deal = themeDeal(game, theme), byId = new Map(CT.cards(compModes(game)[theme]).map(card => [String(card.id), card]));
+  const line = deal.slice(0, 1);
+  (game.plays || []).forEach((play, turn) => {
+    if (themeAt(game, turn) !== theme || !play.correct || play.timeout) return;
+    const card = byId.get(String(play.cardId));
+    if (card) line.splice(Math.max(0, Math.min(line.length, play.index)), 0, card);
+  });
+  return line;
+}
+function timelineCards(game, theme = themeAt(game)) {
+  if (compModes(game)) return themeLine(game, theme);
   const byId = new Map(CT.cards(game.mode).map(card => [String(card.id), card]));
   const ids = game.timeline?.length ? game.timeline : game.kind === 'orden' ? [deckCards(game)[0]?.id] : [];
   return ids.map(item => byId.get(String(item))).filter(Boolean);
 }
-function correctPlacement(game, card, index) { const line = timelineCards(game); const value = CT.sortValue(game.mode, card); const left = line[index - 1], right = line[index]; return (!left || CT.sortValue(game.mode, left) <= value) && (!right || value <= CT.sortValue(game.mode, right)); }
+function correctPlacement(game, card, index) { const mode = modeAt(game); const line = timelineCards(game); const value = CT.sortValue(mode, card); const left = line[index - 1], right = line[index]; return (!left || CT.sortValue(mode, left) <= value) && (!right || value <= CT.sortValue(mode, right)); }
+// El nombre de lo que se juega: el mazo o, en una competición, cuántos temas.
+function gameLabel(game) { const themes = compModes(game); return themes ? `Competición · ${themes.length} temas` : CT.mode(game.mode).name; }
 function statusText(game) { return game.turnUid === uid() ? 'Es tu turno' : `Turno de ${game.players?.[game.turnUid]?.alias || 'tu oponente'}`; }
 function lastMove(game) {
   const play = game.plays?.at(-1);
   if (!play) return '';
-  const card = CT.cards(game.mode).find(c => String(c.id) === String(play.cardId));
+  const card = CT.cards(modeAt(game, game.plays.length - 1)).find(c => String(c.id) === String(play.cardId));
   const who = game.players?.[play.uid]?.alias || 'Tu rival';
   const result = play.timeout ? 'agotó el tiempo' : game.kind === 'cifras' ? (play.points > 1 ? `sumó ${play.points} puntos` : play.points ? 'acertó' : 'no acertó') : play.correct ? 'acertó la posición' : 'falló la posición';
   return `<aside class="turn-duel-last" aria-label="Última jugada"><b>Última jugada</b><p>${safe(who)} ${result}${card ? `: ${safe(card.title)}` : ''}.</p><small>${game.playersOrder.map(player => `${safe(game.players?.[player]?.alias || 'Jugador')}: ${game.scores?.[player] || 0}`).join(' · ')}</small></aside>`;
 }
 function solution(game) {
   const play = game.plays?.at(-1);
-  const card = play && CT.cards(game.mode).find(c => String(c.id) === String(play.cardId));
+  const playTurn = (game.plays?.length || 1) - 1, mode = modeAt(game, playTurn);
+  const card = play && CT.cards(mode).find(c => String(c.id) === String(play.cardId));
   if (!card) return '';
+  // En una competición la jugada puede ser del tema anterior: su línea y su mazo son los de ese tema.
+  const line = timelineCards(game, themeAt(game, playTurn)).filter(c => c.id !== card.id);
+  game = { ...game, mode };
   const cifras = game.kind === 'cifras', correct = cifras ? play.points > 0 : play.correct;
   const title = play.timeout ? 'Se acabó el tiempo' : cifras ? CT.Duelo.Cifras.banda(game.mode, card, play.respuesta).nombre : correct ? '¡Bien colocado!' : 'No encaja ahí';
-  const line = timelineCards(game).filter(c => c.id !== card.id);
   const explanation = cifras
     ? `<p>${play.timeout ? 'Sin respuesta a tiempo.' : `Respuesta: <strong>${safe(CT.Duelo.Cifras.formato(game.mode, play.respuesta))}</strong>. Diferencia respecto al valor correcto: ${safe(Math.abs(play.respuesta - CT.sortValue(game.mode, card)).toLocaleString('es-ES', { maximumFractionDigits: 3 }))}${CT.Duelo.Cifras.regla(game.mode)?.anos ? ' años' : ' (en la unidad del mazo)'}.`}</p><p class="cifra-puntos"><b>${Number(play.points) > 1 ? `+${play.points} puntos` : play.points ? "Acierto" : "Sin acierto"}</b></p>`
     : !correct && !play.timeout ? `<p>${CT.placementHint?.(game.mode, line, card) || ''}</p>` : '';
   return `<details class="turn-duel-solution" ${play.uid === uid() ? 'open' : ''}><summary>Ver solución · ${safe(card.title)}</summary><div class="turn-duel-result ${correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${correct ? '✓' : '×'}</div><div class="eyebrow">${safe(title)}</div><h2>${safe(card.title)}</h2><div class="reveal">${CT.categoryBadge(game.mode, card)}${CT.Art?.button?.(game.mode, card) || ''}<div class="year">${safe(CT.formatValue(game.mode, card))}</div><p>${safe(card.detail)}</p></div>${explanation}</div></details>`;
 }
 function timelineCardMarkup(game, card) {
-  const era = CT.eraForCard(game.mode, card), art = CT.animalArt(game.mode, card);
+  const era = CT.eraForCard(modeAt(game), card), art = CT.animalArt(modeAt(game), card);
   const visual = art || `<span>${era.symbol}</span><small>${safe(era.name)}</small>`;
-  return `<article class="timeline-card ${art ? 'animal-timeline-card card-flippable' : ''}" data-id="${card.id}" ${art ? `role="button" tabindex="0" aria-label="${safe(card.title)}. Toca para ver la lámina y los datos."` : ''}><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(game.mode, card)}<h3>${safe(card.title)}</h3>${art ? `<p>${safe(card.detail || '')}</p>` : ''}<div class="year">${safe(CT.formatValue(game.mode, card))}</div></div></article>`;
+  return `<article class="timeline-card ${art ? 'animal-timeline-card card-flippable' : ''}" data-id="${card.id}" ${art ? `role="button" tabindex="0" aria-label="${safe(card.title)}. Toca para ver la lámina y los datos."` : ''}><div class="card-visual era-${era.key}">${visual}</div><div class="card-content">${CT.categoryBadge(modeAt(game), card)}<h3>${safe(card.title)}</h3>${art ? `<p>${safe(card.detail || '')}</p>` : ''}<div class="year">${safe(CT.formatValue(modeAt(game), card))}</div></div></article>`;
 }
 function orderBoard(game, card) {
   const line = timelineCards(game), slots = [];
@@ -74,10 +110,10 @@ function orderBoard(game, card) {
       : `<button class="slot" data-turn-action="select-slot" data-index="${index}" aria-label="Colocar en la posición ${index + 1} de ${line.length + 1}"><span>${index === 0 ? "−" : "+"}</span></button>`);
     if (index < line.length) slots.push(timelineCardMarkup(game, line[index]));
   }
-  const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3><small>${safe(CT.hiddenLabel(game.mode))}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(game.mode, card)}<span class="hidden-date">${safe(CT.hiddenLabel(game.mode))}</span>${CT.cardBack(game.mode)}<strong>${safe(card.title)}</strong></div></div><p class="hint">${pendingIndex === null ? 'Toca el hueco donde quieres colocar la carta.' : 'Confirma el hueco elegido o toca otro.'}</p></section>` : '';
-  return `${hand}<section class="turn-duel-board"><div class="hand-title"><h3>${safe(CT.timelineTitle(game.mode))}</h3></div>${CT.timelineEnds(game.mode)}${CT.timelineMap?.(game.mode, line) || ''}<div class="timeline-wrap" tabindex="0" role="region" aria-label="Mesa de cartas, desplaza para ver más"><div class="timeline">${slots.join('')}</div></div><p class="hint">Desliza la línea para ver todas las cartas.</p></section>`;
+  const hand = card ? `<section class="turn-duel-hand"><div class="hand-title"><h3>Tu carta</h3><small>${safe(CT.hiddenLabel(modeAt(game)))}</small></div><div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${CT.categoryBadge(modeAt(game), card)}<span class="hidden-date">${safe(CT.hiddenLabel(modeAt(game)))}</span>${CT.cardBack(modeAt(game))}<strong>${safe(card.title)}</strong></div></div><p class="hint">${pendingIndex === null ? 'Toca el hueco donde quieres colocar la carta.' : 'Confirma el hueco elegido o toca otro.'}</p></section>` : '';
+  return `${hand}<section class="turn-duel-board"><div class="hand-title"><h3>${safe(CT.timelineTitle(modeAt(game)))}</h3></div>${CT.timelineEnds(modeAt(game))}${CT.timelineMap?.(modeAt(game), line) || ''}<div class="timeline-wrap" tabindex="0" role="region" aria-label="Mesa de cartas, desplaza para ver más"><div class="timeline">${slots.join('')}</div></div><p class="hint">Desliza la línea para ver todas las cartas.</p></section>`;
 }
-function cifraBoard(game, card) { return `<section class="turn-duel-answer"><div class="cifra-card">${CT.categoryBadge(game.mode, card)}<strong>${safe(card.title)}</strong><span>${safe(CT.Duelo.Cifras.regla(game.mode)?.pregunta || 'Escribe la cifra')}</span></div><label for="turn-cifra-input">Tu respuesta</label><input id="turn-cifra-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Escribe la cifra"><button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button></section>`; }
+function cifraBoard(game, card) { return `<section class="turn-duel-answer"><div class="cifra-card">${CT.categoryBadge(modeAt(game), card)}<strong>${safe(card.title)}</strong><span>${safe(CT.Duelo.Cifras.regla(modeAt(game))?.pregunta || 'Escribe la cifra')}</span></div><label for="turn-cifra-input">Tu respuesta</label><input id="turn-cifra-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Escribe la cifra"><button class="btn btn-primary btn-block" data-turn-action="submit-cifra">Enviar cifra</button></section>`; }
 async function share() {
   if (!current) return;
   const link = shareLink || CT.Links.invitation({turnDuel:current.id});
@@ -113,7 +149,10 @@ function render() {
   const card = mine && !current.timeout && !pending ? localCard(current) : null;
   const waiting = current.status === 'waiting';
   const showInvite = waiting && !firstTurn, showBoard = !waiting || firstTurn || current.turnIndex > 0;
-  const kindLabel = current.kind === 'cifras' ? 'Escribir la cifra' : 'Ordenar las cartas';
+  const themes = compModes(current);
+  const kindLabel = themes ? `Competición · tema ${themeAt(current) + 1} de ${themes.length} · ${CT.mode(modeAt(current)).name}` : current.kind === 'cifras' ? 'Escribir la cifra' : 'Ordenar las cartas';
+  // Por qué carta se va: en una competición, dentro del tema que se está jugando.
+  const cardOf = () => themes ? `Carta ${Math.min(current.turnIndex - themeAt(current) * perTheme(current) + 1, perTheme(current))} de ${perTheme(current)} del tema` : `Carta ${Math.min(current.turnIndex + 1, current.total)} de ${current.total}`;
   const rival = current.players?.[current.playersOrder?.find(x => x !== uid())]?.alias || '';
   const finished = ended(current);
   const active = mine && (!waiting || firstTurn) && !finished && !current.timeout && !pending;
@@ -124,7 +163,7 @@ function render() {
   const html = `<div class="shell turn-duel-shell" data-duel-id="${safe(current.id)}" data-turn="${current.turnIndex}">
     <nav class="turn-duel-nav" aria-label="Duelo"><button class="icon-btn turn-duel-back" data-turn-action="back" aria-label="Volver a la pantalla anterior"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg></button><span>CONTINUUM <small>Duelo por turnos</small></span><div class="turn-duel-nav-actions"><i data-sound-slot></i></div></nav>
     <section class="turn-duel-screen">
-      <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${safe(heading)}</h1><p>${firstTurn ? `Carta 1 de ${current.total} · juegas tú y después invitas a tu rival.` : waiting ? waitingHint : finished ? 'Así queda vuestra partida.' : `Carta ${Math.min(current.turnIndex + 1, current.total)} de ${current.total}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div></header>
+      <header class="turn-duel-heading"><div><div class="eyebrow">${safe(kindLabel)}</div><h1 data-focus tabindex="-1">${safe(heading)}</h1><p>${firstTurn ? `${cardOf()} · juegas tú y después invitas a tu rival.` : waiting ? waitingHint : finished ? 'Así queda vuestra partida.' : `${cardOf()}${rival ? ` · Contra ${safe(rival)}` : ''}`}</p></div></header>
       <div class="turn-duel-scores" aria-label="Marcador">${current.playersOrder.map((player, index) => { const name = current.players?.[player]?.alias || 'Jugador'; const mine = player === uid(); const activePlayer = current.turnUid === player; return `<div class="turn-duel-player ${activePlayer ? 'is-active' : ''} ${mine ? 'is-you' : ''}" data-player="${safe(player)}"><span class="turn-duel-avatar" aria-hidden="true">${CT.Avatares?.forUser(name, player, { size: 44 }) || safe(name.trim().charAt(0).toUpperCase() || '?')}</span><span class="turn-duel-player-info"><strong>${safe(name)}</strong><small>${mine ? 'Tú' : index === 1 ? 'Rival' : 'Jugador'}</small></span><span class="turn-duel-score"><b>${current.scores?.[player] || 0}</b><small>${current.kind === 'cifras' && (current.plays || []).some(p => (p.points || 0) > 1) ? 'puntos' : 'aciertos'}</small></span>${activePlayer ? '<span class="turn-duel-turn-badge">Turno</span>' : ''}</div>`; }).join('')}</div>
       ${showInvite ? current.invitedUid ? `<div class="panel turn-duel-share"><h2>${current.invitedUid === uid() ? 'Te han retado' : `Reto enviado a ${safe(current.invitedAlias || 'tu rival')}`}</h2><p>${current.invitedUid === uid() ? 'Mismo mazo y modalidad. Cartas nuevas para otra partida.' : 'La invitación ya aparece en su perfil. No necesitas enviar otro enlace.'}</p>${current.invitedUid === uid() ? '<button class="btn btn-primary" data-turn-action="accept">Aceptar el duelo</button><button class="btn btn-ghost" data-turn-action="decline">Rechazar</button>' : ''}</div>` : `<div class="panel turn-duel-share"><span class="turn-duel-share-icon" aria-hidden="true">↗</span><h2>Una partida, dos móviles</h2><p>Envía la invitación por WhatsApp, mensaje o la aplicación que prefieras.</p><button class="btn btn-primary btn-block" data-turn-action="share">Compartir el duelo</button><details><summary>Ver enlace de invitación</summary><code>${safe(link)}</code></details><small>Tu rival empieza su turno cuando abra el enlace.</small></div>` : ''}
       ${lastMove(current)}
@@ -207,7 +246,8 @@ async function sendPending(move) {
       } else {
         play.index = move.timeout ? -1 : move.index;
         play.correct = !move.timeout && correctPlacement(game, card, move.index);
-        if (play.correct) { points = 1; line = timelineCards(game).map(c => c.id); line.splice(move.index, 0, card.id); }
+        // En una competición la línea visible se rehace desde las jugadas; la guardada solo suma la carta acertada.
+        if (play.correct) { points = 1; if (compModes(game)) line = [...line, card.id]; else { line = timelineCards(game).map(c => c.id); line.splice(move.index, 0, card.id); } }
       }
       tx.update(ref, { plays: [...(game.plays || []), play], timeline: line, scores: { ...game.scores, [move.uid]: (game.scores?.[move.uid] || 0) + points }, turnIndex: nextIndex, turnUid: first || finished ? null : game.playersOrder[(nextIndex + (game.starter || 0)) % 2], status: first ? 'waiting' : finished ? 'finished' : 'playing', updatedAt: serverTimestamp(), resultText: finished ? 'Los dos jugadores han completado la partida.' : null });
       return 'confirmed';
@@ -225,18 +265,24 @@ async function sendPending(move) {
 }
 function retryPending() { return Promise.all(Object.values(outbox()).map(sendPending)); }
 window.addEventListener('online', retryPending);
-async function create(mode, kind, back) {
+// `competition` ({ rounds, cards }) crea una competición: temas al azar y las mismas cartas por tema.
+async function create(mode, kind, back, competition = null) {
   if (busy) return;
   busy = true;
   try {
   onBack = back;
-  const existing = (await list()).find(g => g.status === 'waiting' && !g.invitedUid && g.playersOrder[0] === uid() && g.mode === mode && g.kind === kind);
+  if (competition) {
+    const themes = CT.Tournament.create(competition.rounds, competition.cards).queue.slice(0, MAX_THEMES);
+    mode = COMP + themes.join(','); kind = 'orden';
+  }
+  const existing = competition ? null : (await list()).find(g => g.status === 'waiting' && !g.invitedUid && g.playersOrder[0] === uid() && g.mode === mode && g.kind === kind);
   if (existing) { shareLink = ''; subscribe(existing.id); return; }
   const draftKey = `continuum-duel-draft-${uid()}-${mode}-${kind}`;
   const gameId = localStorage.getItem(draftKey) || id();
   localStorage.setItem(draftKey, gameId);
-  const total = kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
-  const seed = CT.Duelo.crearSemilla(), openingCard = kind === 'orden' ? CT.Duelo.reparto(mode, seed, total)[0] : null;
+  // Las reglas admiten hasta 30 cartas por partida: en una competición, temas × cartas por tema.
+  const total = competition ? compTotal(mode, competition.cards) : kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
+  const seed = CT.Duelo.crearSemilla(), openingCard = competition ? themeDeal({ mode, seed, total }, 0)[0]?.id : kind === 'orden' ? CT.Duelo.reparto(mode, seed, total)[0] : null;
   const game = { id: gameId, mode, kind, seed, total, turnIndex: 0, turnUid: null, playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, status: 'waiting', plays: [], timeline: openingCard == null ? [] : [openingCard], scores: { [uid()]: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   shareLink = CT.Links.invitation({turnDuel:gameId});
   await runTransaction(db, async tx => { const ref = doc(db, 'turnDuels', gameId); if (!(await tx.get(ref)).exists()) tx.set(ref, game); });
@@ -267,15 +313,16 @@ function prepareTurn() {
   if (preparingTurn !== key) { preparingTurn = key; enteredAt = Date.now(); }
 }
 function discoverOwnPlays(game) {
-  for (const play of game.plays || []) {
-    const card = CT.cards(game.mode).find(c => c.id === play.cardId);
+  (game.plays || []).forEach((play, turn) => {
+    const mode = modeAt(game, turn);
+    const card = CT.cards(mode).find(c => c.id === play.cardId);
     CT.Progreso?.discover?.({
-      mode: game.mode, cardId: play.cardId, mine: play.uid === uid(),
+      mode, cardId: play.cardId, mine: play.uid === uid(),
       correct: !play.timeout && (game.kind === 'cifras'
         ? !!card && CT.Duelo.Cifras.acierto(game.mode, card, play)
         : play.correct === true)
     });
-  }
+  });
 }
 function subscribe(gameId) {
   stop?.();
@@ -383,7 +430,7 @@ function profileMarkup(games, extras = []) {
     const archived = archivedIds.has(g.id), e = CT.Duelo.estadoTurnos(g, uid()), avatar = CT.Avatares?.forUser(e.rival, rivalUid, { size: 44 }) || '';
     // La fila entera es el botón que entra en el duelo: quién, de qué mazo, a quién le
     // toca, por qué carta vais y cómo va el marcador, sin tener que abrirlo para saberlo.
-    return `<div class="turn-duel-profile-row turn-duel-row-${e.grupo}"><button class="turn-duel-entry${e.pendiente ? ' is-pending' : ''}" data-action="open-turn-duel" data-turn-id="${safe(g.id)}" aria-label="${safe(`${e.rival}, ${CT.mode(g.mode).name}. ${e.estado}. ${e.detalle}. ${e.marcador}`)}"><span class="turn-duel-entry-avatar">${avatar}</span><span class="turn-duel-entry-copy"><b>${safe(e.rival)}</b><small>${safe(CT.mode(g.mode).name)} · ${g.kind === 'cifras' ? 'Cifras' : 'Ordenar'}</small><span class="turn-duel-entry-state">${safe(e.estado)} <em>· ${safe(e.detalle)}</em></span>${e.marcador ? `<span class="turn-duel-entry-score">${safe(e.marcador)}</span>` : ''}</span><i aria-hidden="true">→</i></button><div class="turn-duel-row-actions">${ended(g) ? `${g.playersOrder.length === 2 && g.playersOrder.includes(uid()) ? `<button class="btn btn-ghost" data-action="rematch-turn-duel" data-turn-id="${safe(g.id)}">Revancha</button>` : ''}<button class="btn btn-ghost" data-action="archive-turn-duel" data-turn-id="${safe(g.id)}" data-restore="${archived}">${archived ? 'Restaurar' : 'Archivar'}</button>` : `<button class="btn btn-ghost" data-action="close-turn-duel" data-turn-id="${safe(g.id)}" data-playing="${g.status === 'playing'}">${g.status === 'playing' ? 'Rendirse' : g.invitedUid === uid() ? 'Rechazar' : 'Cancelar invitación'}</button>${g.status === 'waiting' && g.playersOrder[0] === uid() ? `<button class="btn btn-ghost" data-action="reshare-turn-duel" data-turn-id="${safe(g.id)}">Reenviar enlace</button>` : ''}`}</div></div>`;
+    return `<div class="turn-duel-profile-row turn-duel-row-${e.grupo}"><button class="turn-duel-entry${e.pendiente ? ' is-pending' : ''}" data-action="open-turn-duel" data-turn-id="${safe(g.id)}" aria-label="${safe(`${e.rival}, ${gameLabel(g)}. ${e.estado}. ${e.detalle}. ${e.marcador}`)}"><span class="turn-duel-entry-avatar">${avatar}</span><span class="turn-duel-entry-copy"><b>${safe(e.rival)}</b><small>${safe(gameLabel(g))} · ${g.kind === 'cifras' ? 'Cifras' : 'Ordenar'}</small><span class="turn-duel-entry-state">${safe(e.estado)} <em>· ${safe(e.detalle)}</em></span>${e.marcador ? `<span class="turn-duel-entry-score">${safe(e.marcador)}</span>` : ''}</span><i aria-hidden="true">→</i></button><div class="turn-duel-row-actions">${ended(g) ? `${g.playersOrder.length === 2 && g.playersOrder.includes(uid()) ? `<button class="btn btn-ghost" data-action="rematch-turn-duel" data-turn-id="${safe(g.id)}">Revancha</button>` : ''}<button class="btn btn-ghost" data-action="archive-turn-duel" data-turn-id="${safe(g.id)}" data-restore="${archived}">${archived ? 'Restaurar' : 'Archivar'}</button>` : `<button class="btn btn-ghost" data-action="close-turn-duel" data-turn-id="${safe(g.id)}" data-playing="${g.status === 'playing'}">${g.status === 'playing' ? 'Rendirse' : g.invitedUid === uid() ? 'Rechazar' : 'Cancelar invitación'}</button>${g.status === 'waiting' && g.playersOrder[0] === uid() ? `<button class="btn btn-ghost" data-action="reshare-turn-duel" data-turn-id="${safe(g.id)}">Reenviar enlace</button>` : ''}`}</div></div>`;
   };
   // Los duelos de Retos rápidos (`extras`) van en los mismos grupos, mezclados por fecha con los de las colecciones.
   const rows = (entries, quick = []) => [...entries.map(g => ({ t: g.updatedAt?.seconds || 0, html: row(g) })), ...quick.map(x => ({ t: x.updatedAt?.seconds || 0, html: quickRowMarkup(x) }))].sort((a, b) => b.t - a.t).map(x => x.html).join('');
@@ -435,7 +482,7 @@ async function challenge(sourceId, back = onBack) {
     const existing = games.find(g => g.status === 'waiting' && g.mode === source.mode && g.kind === source.kind && ((g.invitedUid === invitedUid && g.playersOrder[0] === uid()) || (g.invitedUid === uid() && g.playersOrder[0] === invitedUid)));
     if (existing) { open({ gameId: existing.id, back }); return; }
     let round = 0, gameId;
-    const seed = CT.Duelo.crearSemilla(), total = source.kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
+    const seed = CT.Duelo.crearSemilla(), total = compModes(source) ? source.total : source.kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
     // A bounded identifier avoids ever-growing rematch links. An ended invitation
     // gets another round; simultaneous/repeated taps still address the same document.
     const previous = games.filter(g => g.sourceDuel === sourceId && g.playersOrder[0] === uid() && Number.isInteger(g.invitationRound));
@@ -452,7 +499,7 @@ async function challenge(sourceId, back = onBack) {
         starter: source.playersOrder[source.starter || 0] === uid() ? 1 : 0,
         mode: source.mode, kind: source.kind, seed, total, turnIndex: 0, turnUid: null,
         playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, scores: { [uid()]: 0 },
-        status: 'waiting', plays: [], timeline: source.kind === 'orden' ? [CT.Duelo.reparto(source.mode, seed, total)[0]] : [],
+        status: 'waiting', plays: [], timeline: compModes(source) ? [themeDeal({ mode: source.mode, seed, total }, 0)[0]?.id] : source.kind === 'orden' ? [CT.Duelo.reparto(source.mode, seed, total)[0]] : [],
         createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
       return true;
     });
@@ -468,7 +515,7 @@ async function next(back = onBack) {
   if (!target) return notify('No tienes más duelos pendientes de jugar.');
   open({ gameId: target.id, back });
 }
-function open({ mode = 'history', kind = 'orden', gameId = '', back } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back).catch(() => notify('No se pudo crear el duelo.')); }
+function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
 function leave() { stop?.(); stop = null; clearInterval(timer); current = null; }
 function close() { leave(); onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });

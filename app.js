@@ -380,6 +380,8 @@
     const withFriends = audience !== 'solo' && audience !== 'all';
     // «Un solo móvil» ya es su propia pantalla de ajustes: rondas y cartas se eligen ahí, en una sola ventana.
     if (audience === 'local') { prepareMultiCompetition(); return; }
+    // «Cada uno en su móvil» tiene la misma pantalla que las otras dos formas de crear partida.
+    if (audience === 'online') { competitionFriends(); return; }
     // Formas de jugar que se ofrecen. Si solo hay una (lo normal: ya se eligió en el menú de origen), no se repite
     // como puerta con el mismo nombre: queda un botón directo para empezar.
     const salidas = [
@@ -402,6 +404,78 @@
           ? `<p class="hint" style="text-align:center;margin:2px 0 0">${salidas[0][3]}</p><button class="btn btn-primary btn-block" data-action="${salidas[0][0]}">Empezar competición <span aria-hidden="true">→</span></button>`
           : salidas.map(salida => door(...salida)).join('')}
       </section></div>`);
+  }
+
+  // Competición con amigos, cada uno en su móvil: la misma estructura que «Partida con
+  // amigos» de Grandes colecciones y Retos rápidos. Se elige qué se juega (temas de las
+  // colecciones o retos rápidos, siempre al azar), cuántos temas, el ritmo (en directo o por
+  // turnos) y, en directo, la conexión (internet o la misma Wi-Fi).
+  const COMP_CONTENT_KEY = "hilo-competicion-contenido-v1", COMP_PACE_KEY = "hilo-competicion-ritmo-v1";
+  // Por turnos, una partida admite hasta 30 cartas: como mucho cinco temas.
+  const COMP_TURN_THEMES = 5;
+  function compContent() { return CT.Storage.getItem(COMP_CONTENT_KEY) === "quick" ? "quick" : "collections"; }
+  function compPace() { return CT.Storage.getItem(COMP_PACE_KEY) === "turnos" ? "turnos" : "directo"; }
+  function competitionFriends() {
+    screen = "competition-friends";
+    const contenido = compContent(), ritmo = compPace();
+    const sinRed = navigator.onLine === false;
+    const red = sinRed ? "wifi" : liveNet();
+    const todos = CT.Tournament.modes().length;
+    const todosVisible = contenido === "collections" && ritmo === "directo";
+    const temas = !todosVisible && competitionConfig.rounds > COMP_TURN_THEMES ? COMP_TURN_THEMES : competitionConfig.rounds;
+    const opcion = (name, clave, titulo, pie, icono, actual) => `<label class="segmented-option${clave === actual ? " is-on" : ""}">
+      <input type="radio" name="${name}" value="${clave}"${clave === actual ? " checked" : ""}>
+      <i class="duel-option-mark" aria-hidden="true">${glyph(GLYPHS[icono])}</i>
+      <span><b>${titulo}</b><small>${pie}</small></span>
+    </label>`;
+    const grupo = (name, id, etiqueta, opciones, actual, extra = "") => `<div class="field duel-kind-field"${extra}>
+      <span class="field-label" id="${id}">${etiqueta}</span>
+      <div class="segmented" role="radiogroup" aria-labelledby="${id}">${opciones.map(o => opcion(name, ...o, actual)).join("")}</div>
+    </div>`;
+    paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
+      <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición con amigos</h2>
+        <p class="lead">Cada uno desde su móvil. Los temas salen al azar y gana quien más sume al final.</p></div>
+        <div class="panel solo-panel">
+          <div class="solo-panel-head"><h3>Qué jugáis</h3></div>
+          ${grupo("comp-content", "comp-content-label", "Cartas", [["collections", "Grandes colecciones", "Temas al azar de los mazos", "orden"], ["quick", "Retos rápidos", "Mazos sorpresa", "retos"]], contenido)}
+          <div class="field"><label for="competition-length">Temas a jugar</label><select id="competition-length">${[[3, "3 temas"], [5, "5 temas"], [todos, "Todos los temas"]].map(([n, label]) => `<option value="${n}"${n === todos ? " data-comp-all" : ""}${n === todos && !todosVisible ? " hidden disabled" : ""}${n === temas ? " selected" : ""}>${label}</option>`).join("")}</select></div>
+          <div class="field" data-comp-cards-field${contenido === "quick" ? " hidden" : ""}><label for="competition-cards">Cartas por persona en cada tema</label><select id="competition-cards">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === competitionConfig.cards ? " selected" : ""}>${n}</option>`).join("")}</select></div>
+          <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
+          ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"]], ritmo)}
+          ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi‑Fi", "wifi"]], red, ` data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}`)}
+          ${sinRed ? '<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi‑Fi.</p>' : ""}
+          <div class="duel-brief" data-comp-brief><p>${compBrief(contenido, ritmo)}</p></div>
+          <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start">Empezar competición <span>→</span></button>
+          <div class="field duel-identity-field">
+            <label for="duel-name">Tu nombre de perfil</label>
+            <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
+            <small class="field-help">Se usará automáticamente en la competición. Puedes cambiarlo desde tu perfil.</small>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus partidas en curso</button>
+      </section>
+    </div>`);
+  }
+  // Qué pasa con cada combinación, dicho en una frase.
+  function compBrief(contenido, ritmo) {
+    if (ritmo === "turnos") return contenido === "quick"
+      ? "Entre dos, cada uno desde su móvil y cuando pueda: retos sorpresa por turnos. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival."
+      : `Entre dos, cada uno desde su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`;
+    return contenido === "quick"
+      ? "Una sala de 2 a 8 personas: todos jugáis a la vez los mismos retos sorpresa. Al crearla compartes el código, el enlace o el QR."
+      : "Una sala de 2 a 9 personas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno.";
+  }
+  function startCompFriends() {
+    const opciones = competitionOptions(), contenido = compContent(), ritmo = compPace();
+    const red = app.querySelector('input[name="live-net"]:checked')?.value || liveNet();
+    if (contenido === "quick") { quickChallenges({ quickComp: { pace: ritmo, net: red, length: Math.min(opciones.rounds, 5) } }); return; }
+    if (ritmo === "turnos") {
+      const competicion = { rounds: Math.min(opciones.rounds, COMP_TURN_THEMES), cards: opciones.cards };
+      turnDuelReady.then(() => CT.TurnDuel?.open({ competition: competicion, back: backMenu }));
+      return;
+    }
+    if (red === "wifi") { CT.LocalMultiplayer.open({ modeKey: selectedModeKey, competition: opciones, onBack: competitionFriends }); return; }
+    launchOnline("", opciones, { createOnly: true });
   }
 
   function competitionOptions() {
@@ -490,7 +564,7 @@
       pendingTournament = previous.tournament; collectionOpen = previous.collectionOpen;
       collectionDetails = previous.collectionDetails; collectionIndexExpanded = previous.collectionIndexExpanded; jugarSection = previous.jugarSection || null;
       homeDestination = previous.homeDestination; profileReturn = previous.profileReturn;
-      const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'friends-join':friendsJoin, 'perfil':perfilView, 'duelo-intro':duelIntro, 'quick-challenges':quickChallenges}[previous.screen];
+      const render = {'home':home, 'jugar':jugarView, 'duelos':duelsView, 'play-menu':playMenu, 'competition-menu':competitionMenu, 'setup':setup, 'solo-home':soloHome, 'duel-home':duelHome, 'friends-join':friendsJoin, 'competition-friends':competitionFriends, 'perfil':perfilView, 'duelo-intro':duelIntro, 'quick-challenges':quickChallenges}[previous.screen];
       if (render) render();
       else if (previous.screen.startsWith('hub-') && CT.ModeHubs) CT.ModeHubs.open(previous.screen);
       else { screen = previous.screen; paint(previous.html); }
@@ -506,7 +580,7 @@
       else playMenu();
     }
     else if (screen === "duelo-intro") duelHome();
-    else if (screen === "friends-join") CT.ModeHubs?.open('hub-friends-online');
+    else if (screen === "friends-join" || screen === "competition-friends") CT.ModeHubs?.open('hub-friends-online');
     else if (screen === "play-menu") { collectionIndexExpanded = true; jugarSection = "collections"; collectionOpen = true; collectionDetails = true; homeDestination = "collection"; jugarView(); }
     else if (screen === "competition-menu") CT.ModeHubs.open({ local: 'hub-friends-local', online: 'hub-friends-online', friends: 'hub-friends' }[sessionStorage.getItem('continuum-competition-audience')] || 'hub-solo');
     else if (screen === "quick-challenges") jugarView();
@@ -524,7 +598,8 @@
   function quickChallenges(target) {
     screen = "quick-challenges";
     const render=(html, playing) => {screen = playing === "lobby" ? "quick-lobby" : playing ? "quick-game" : "quick-challenges"; paint(html);};
-    if (target?.quickLocal) CT.Quick.joinLocal(render, target.quickLocal);
+    if (target?.quickComp) CT.Quick.openComp(render, target.quickComp);
+    else if (target?.quickLocal) CT.Quick.joinLocal(render, target.quickLocal);
     else if (target?.quickRoom || target?.quickDuel) CT.Quick.open(render, target);
     else if(sessionStorage.getItem('continuum-entry-route')==='quick') CT.Quick.openSolo(render);
     else if(sessionStorage.getItem('continuum-entry-route')==='local-quick') CT.Quick.openLocal(render);
@@ -2338,6 +2413,7 @@
     orden: '<rect x="2.5" y="7" width="5.5" height="10" rx="1.2"/><rect x="9.25" y="7" width="5.5" height="10" rx="1.2"/><rect x="16" y="7" width="5.5" height="10" rx="1.2"/>',
     cifras: '<path d="M9.5 4 7.5 20M16.5 4l-2 16M4.5 9h15M3.5 15h15"/>',
     reloj: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    retos: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>',
     directo: '<circle cx="12" cy="12" r="2.5"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>',
     internet: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/>',
     wifi: '<path d="M4 10a12 12 0 0 1 16 0"/><path d="M7.5 13.5a7 7 0 0 1 9 0"/><circle cx="12" cy="17.5" r="1"/>'
@@ -3863,6 +3939,21 @@
     if (event.target.id === "enc-mode-select") { openEnciclopedia(event.target.value, { returnTo: encReturn }); return; }
     // Cambiar de modalidad no repinta: repintar cerraría el desplegable que se acaba de
     // abrir para llegar hasta aquí. Se enseña un bloque y se esconde el otro.
+    if (event.target.name === "comp-content" || event.target.name === "comp-pace") {
+      CT.Storage.setItem(event.target.name === "comp-content" ? COMP_CONTENT_KEY : COMP_PACE_KEY, event.target.value);
+      const contenido = compContent(), ritmo = compPace();
+      const cartas = app.querySelector("[data-comp-cards-field]"), red = app.querySelector("[data-comp-net-field]");
+      if (cartas) cartas.hidden = contenido === "quick";
+      if (red) red.hidden = ritmo === "turnos";
+      // «Todos los temas» solo cabe en directo con las colecciones: por turnos hay tope y en Retos rápidos se juegan hasta cinco.
+      const todos = app.querySelector("[data-comp-all]"), select = document.getElementById("competition-length");
+      const cabe = contenido === "collections" && ritmo === "directo";
+      if (todos) { todos.hidden = todos.disabled = !cabe; if (!cabe && select?.value === todos.value) select.value = String(COMP_TURN_THEMES); }
+      const brief = app.querySelector("[data-comp-brief] p");
+      if (brief) brief.textContent = compBrief(contenido, ritmo);
+      app.querySelectorAll(".segmented-option").forEach(opcion => opcion.classList.toggle("is-on", opcion.querySelector("input").checked));
+      return;
+    }
     if (event.target.name === "duel-kind" || event.target.name === "duel-pace" || event.target.name === "live-net") {
       const value = event.target.value;
       if (event.target.name === "duel-kind") CT.Storage.setItem(DUEL_KIND_KEY, value);
@@ -4096,6 +4187,7 @@
     else if (action === "start-cifras") { guardaNombreSiLoHay(); duelReady("cifras"); }
     else if (action === "friends-join-scan") CT.LocalShare.scanQr({ title: "Escanear invitación", hint: "Encuadra el código QR de la sala o del duelo.", onText: friendsJoinWith }).catch(() => friendsJoinWith(""));
     else if (action === "friends-join-camera") void askCamera();
+    else if (action === "comp-friends-start") startCompFriends();
     else if (action === "friends-join-nearby") { sessionStorage.setItem("continuum-entry-route", "wifi"); CT.LocalMultiplayer.open({ join: true, nearby: true, onBack: friendsJoin }); }
     else if (action === "start-live-room") { if ((app.querySelector('input[name="live-net"]:checked')?.value || liveNet()) === "wifi") launchLocalMultiplayer(); else launchOnline("", null, { createOnly: true }); }
     else if (action === "start-turn-duel") { guardaNombreSiLoHay(); duelReady(duelKind(), null, "turnos"); }

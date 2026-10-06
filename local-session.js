@@ -37,7 +37,7 @@
   }
 
   const TYPES = ["join", "starter-draw", "starter-guess", "start", "place-card", "use-ghost", "pulse-start", "pulse-place", "pulse-defend",
-    "finish-turn", "skip-turn", "final-answer", "final-next", "remove-player", "player-away", "rematch"];
+    "finish-turn", "skip-turn", "final-answer", "final-next", "remove-player", "player-away", "rematch", "competition-next"];
 
   // Traduce un mensaje del canal a una acción del reductor. `playerId` es siempre quién
   // habla (el anfitrión lo fija por el canal, ver más abajo) y va también como
@@ -57,6 +57,12 @@
       action.deck = buildDeck(modeKey, shuffle, draw ? [draw.cardId] : []);
       if (draw && CT.Starter) action.order = CT.Starter.order(modeKey, draw.cardId, room.playerOrder.map(id => ({ id, value: draw.guesses[id] ?? null })));
     }
+    // Al pasar de tema en una competición, la huella del mazo nuevo: con ella se comprueba que
+    // quien vuelva a sentarse lleva la misma versión de ese mazo.
+    if (message.type === "competition-next" && room?.tournament) {
+      const nextMode = room.tournament.queue[room.tournament.index + 1];
+      action.deckFingerprint = nextMode && CT.deckFingerprint ? CT.deckFingerprint(nextMode) : null;
+    }
     if (message.type === "starter-draw" && data.cardId == null) {
       const ids = CT.cards(modeKey).map(card => card.id);
       action.cardId = ids[Math.floor(random() * ids.length)];
@@ -69,9 +75,11 @@
   // partida, esa persona conserva su plaza y sus cartas (`player-away`) y puede volver a
   // sentarse con una invitación nueva; en la sala de espera, simplemente se libera la
   // plaza. `onPeerLost` y `onPeerBack` reciben el nombre, para avisar en pantalla.
-  function createHostSession({ roomCode, hostName, avatarId = null, modeKey, deckFingerprint = null, now = () => Date.now(), onChange, onPeerLost, onPeerBack }) {
-    const context = contextFor(modeKey, now);
-    let room = CT.LocalRoom.createRoom({ roomCode, hostId: HOST_ID, hostName, avatarId, modeKey, deckFingerprint, now: now() });
+  function createHostSession({ roomCode, hostName, avatarId = null, modeKey, deckFingerprint = null, tournament = null, now = () => Date.now(), onChange, onPeerLost, onPeerBack }) {
+    // El mazo de cada acción es el de la ronda en juego: en una competición cambia de un tema a otro.
+    const contexts = new Map();
+    const contextOf = mode => { if (!contexts.has(mode)) contexts.set(mode, contextFor(mode, now)); return contexts.get(mode); };
+    let room = CT.LocalRoom.createRoom({ roomCode, hostId: HOST_ID, hostName, avatarId, modeKey, deckFingerprint, tournament, now: now() });
     onChange(room);
     const peerPlayers = new Map();
     function peerOf(playerId) { for (const [peerId, id] of peerPlayers) if (id === playerId) return peerId; return null; }
@@ -90,7 +98,7 @@
       } else data.playerId = bound;
       try {
         const wasAway = !!room.players[data.playerId]?.away;
-        const next = CT.LocalRoom.reduce(room, actionFromMessage({ type: message.type, data }, context, room));
+        const next = CT.LocalRoom.reduce(room, actionFromMessage({ type: message.type, data }, contextOf(room.mode), room));
         if (!bound && next.playerOrder.includes(data.playerId)) peerPlayers.set(peerId, data.playerId);
         setRoom(next);
         if (!bound && wasAway) onPeerBack?.(next.players[data.playerId]?.name || "");
@@ -102,7 +110,7 @@
       peerPlayers.delete(peerId);
       if (!playerId || !room.playerOrder.includes(playerId)) return;
       const name = room.players[playerId]?.name || "";
-      try { setRoom(CT.LocalRoom.reduce(room, actionFromMessage({ type: "player-away", data: { playerId: HOST_ID, targetId: playerId } }, context, room))); }
+      try { setRoom(CT.LocalRoom.reduce(room, actionFromMessage({ type: "player-away", data: { playerId: HOST_ID, targetId: playerId } }, contextOf(room.mode), room))); }
       catch (error) { console.error(error); }
       onPeerLost?.(name, room.status === "playing");
     }
@@ -135,7 +143,7 @@
       }
     }
     function act(type, data = {}) {
-      setRoom(CT.LocalRoom.reduce(room, actionFromMessage({ type, data: { ...data, playerId: HOST_ID } }, context, room)));
+      setRoom(CT.LocalRoom.reduce(room, actionFromMessage({ type, data: { ...data, playerId: HOST_ID } }, contextOf(room.mode), room)));
     }
 
     async function ensureLan() {
