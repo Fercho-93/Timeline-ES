@@ -228,11 +228,11 @@ ok("la invitada pasa sola al vestíbulo", pantalla(invitada) === "local-lobby" &
 console.log("\nMinijuego de quién empieza, igual que en la sala online");
 ok("sin minijuego no se puede barajar todavía", !anfitrion.document.querySelector('[data-local-action="start"]') && !!anfitrion.document.querySelector('[data-local-action="starter-draw"]'));
 ok("la sala ya no pregunta las cartas iniciales: las enseña", !anfitrion.document.querySelector("select#wifi-hand-size") && /4 por persona/.test(html(anfitrion)));
-elige(anfitrion, "wifi-turn-seconds", "0");
+anfitrion.CONTINUUM.Tiempo.set("amigos", 0);
 await minijuego(anfitrion, invitada, invitada);
 await until(() => invitada.document.querySelectorAll(".starter-draw-list li").length === 2);
 ok("los dos móviles ven el orden de juego", invitada.document.querySelectorAll(".starter-draw-list li").length === 2 && /1\.º Ana/.test(invitada.document.querySelector(".starter-draw-list").textContent));
-ok("los ajustes elegidos no se pierden al repintar la sala", anfitrion.document.querySelector('input[name="wifi-turn-seconds"]:checked')?.value === "0");
+ok("los ajustes elegidos no se pierden al repintar la sala", !anfitrion.document.querySelector('input[name="wifi-turn-seconds"]') && /sin tiempo/.test(html(anfitrion)));
 click(anfitrion, '[data-local-action="start"]');
 await until(() => pantalla(invitada) === "local-game");
 ok("la partida arranca en los dos móviles", pantalla(anfitrion) === "local-game" && pantalla(invitada) === "local-game");
@@ -299,7 +299,7 @@ ok("los dos vuelven al vestíbulo, con las mismas personas", pantalla(anfitrion)
 ok("y hay que volver a jugar el minijuego", !anfitrion.document.querySelector('[data-local-action="start"]'));
 
 console.log("\nReloj del turno, poderes y menú de la sala");
-elige(anfitrion, "wifi-turn-seconds", "20");
+anfitrion.CONTINUUM.Tiempo.set("amigos", 20);
 elige(anfitrion, "wifi-pulse", true);
 elige(anfitrion, "wifi-ghost", true);
 ok("la sala no ofrece elegir poderes: solo los enseña", !anfitrion.document.querySelector("select#wifi-preset") && /Poderes/.test(html(anfitrion)));
@@ -381,7 +381,7 @@ console.log("\nCompetición sin internet entre dos móviles");
   g3.CONTINUUM.LocalMultiplayer.open({ modeKey: "movies", onBack: () => {} });
   await conecta(h3, g3);
   await until(() => pantalla(g3) === "local-lobby");
-  elige(h3, "wifi-turn-seconds", "0");
+  h3.CONTINUUM.Tiempo.set("amigos", 0);
   await minijuego(h3, g3, h3);
   click(h3, '[data-local-action="start"]');
   await until(() => pantalla(g3) === "local-game");

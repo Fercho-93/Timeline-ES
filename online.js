@@ -889,7 +889,7 @@ function renderLobby() {
     <div class="online-lobby-grid"><section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${people.length}/${capacity}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${people.length}</strong><small>${people.length===1?'explorador':'exploradores'}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
       <section class="panel lobby-settings">${isPublic
         ? `<div class="section-label">Partida rápida</div><input type="hidden" id="online-hand-size" value="4"><input type="hidden" id="online-turn-seconds" value="${publicSeconds()}">${people.length === capacity ? publicStarterMarkup() : `<div class="waiting-orbit"><span></span></div><h3>Buscando jugadores</h3><p>Esperando a ${capacity - people.length} ${capacity - people.length === 1 ? 'jugador' : 'jugadores'} más…</p><p class="hint">Cuando la mesa esté completa, un minijuego decidirá el orden de juego.</p><button class="btn btn-ghost btn-block" data-online-action="${isHost ? "leave" : "leave-room"}">Dejar de buscar</button>`}`
-        : (isHost ? `<div class="section-label">Ajustes</div>${CT.Tiempo?.field?.("amigos", { valor: lobbySettings.turnSeconds, nombre: "online-turn-seconds" }) ?? ""}<input type="hidden" id="online-hand-size" value="${lobbySettings.handSize}"><div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div><input type="checkbox" hidden id="online-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="online-ghost"${lobbySettings.ghost ? " checked" : ""}><div class="field"><span class="field-label">Poderes</span><p class="hint">${CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes"} (lo elegiste al crear la partida).</p></div>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`)}</section>
+        : (isHost ? `<div class="section-label">Ajustes</div><input type="hidden" id="online-turn-seconds" value="${lobbySettings.turnSeconds}"><div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${CT.Tiempo?.texto?.(lobbySettings.turnSeconds) ?? lobbySettings.turnSeconds + " s"} (lo elegiste al crear la partida).</p></div><input type="hidden" id="online-hand-size" value="${lobbySettings.handSize}"><div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div><input type="checkbox" hidden id="online-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="online-ghost"${lobbySettings.ghost ? " checked" : ""}><div class="field"><span class="field-label">Poderes</span><p class="hint">${CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes"} (lo elegiste al crear la partida).</p></div>${people.length < 2 ? `<p class="hint">Esperando a alguien más…</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(true)}</div>`}` : `${roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>` : `<div class="field starter-field"><span class="field-label">Quién empieza</span>${starterPanelMarkup(false)}</div>`}`)}</section>
     </div>
   </div>`, "online-lobby");
   if (draft) { const input = document.getElementById("starter-guess-input"); if (input && !input.value) input.value = draft; }
@@ -2012,9 +2012,8 @@ document.addEventListener("submit", event => {
 });
 
 document.addEventListener("change", event => {
-  // El tiempo son pastillas (CT.Tiempo.field), no un desplegable: se reconocen por su grupo.
-  const id = event.target.name === "online-turn-seconds" ? event.target.name : event.target.id;
-  if (!["online-preset", "online-turn-seconds", "online-hand-size", "online-pulse", "online-ghost"].includes(id)) return;
+  const id = event.target.id;
+  if (!["online-preset", "online-hand-size", "online-pulse", "online-ghost"].includes(id)) return;
   const pulseBox = document.getElementById("online-pulse"), ghostBox = document.getElementById("online-ghost");
   if (id === "online-preset") {
     if (event.target.value === "custom") return;
@@ -2022,8 +2021,7 @@ document.addEventListener("change", event => {
     lobbySettings.pulse = lobbySettings.ghost = advanced;
     if (pulseBox) pulseBox.checked = advanced;
     if (ghostBox) ghostBox.checked = advanced;
-  } else if (id === "online-turn-seconds") lobbySettings.turnSeconds = event.target.value;
-  else if (id === "online-hand-size") lobbySettings.handSize = event.target.value;
+  } else if (id === "online-hand-size") lobbySettings.handSize = event.target.value;
   else {
     if (id === "online-pulse") lobbySettings.pulse = event.target.checked; else lobbySettings.ghost = event.target.checked;
   }

@@ -248,7 +248,6 @@
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     competition = options.competition || null;
-    lobbySettings.turnSeconds = String(CT.Tiempo.get("amigos", 15));
     lobbySettings.handSize = String(CT.ManoInicial?.get?.() ?? 4);
     { const p = CT.ManoInicial?.poderes?.() ?? {}; lobbySettings.pulse = !!p.pulse; lobbySettings.ghost = !!p.ghost; lobbySettings.preset = p.pulse && p.ghost ? "advanced" : !p.pulse && !p.ghost ? "simple" : "custom"; }
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
@@ -594,7 +593,7 @@
   // Los ajustes del anfitrión se guardan aquí y no en el propio formulario: la sala de
   // espera se repinta con cada respuesta del minijuego y, si no, volverían a los de serie.
   // El tiempo de partida sale de lo elegido en «Partida con amigos»; el anfitrión aún puede cambiarlo.
-  const lobbySettings = { preset: "simple", handSize: "4", turnSeconds: "15", pulse: false, ghost: false };
+  const lobbySettings = { preset: "simple", handSize: "4", pulse: false, ghost: false };
 
   // El minijuego de quién empieza, el mismo que en la sala online y en un solo móvil:
   // el anfitrión reparte una carta, cada persona escribe su cifra en su móvil, empieza
@@ -653,7 +652,7 @@
     const opcion = (value, label, current) => `<option value="${value}"${String(current) === String(value) ? " selected" : ""}>${label}</option>`;
     const settings = isHost
       ? `<div class="section-label">Ajustes</div>
-        ${CT.Tiempo.field("amigos", { valor: lobbySettings.turnSeconds, nombre: "wifi-turn-seconds" })}
+        <div class="field"><span class="field-label">Tiempo por carta</span><p class="hint">${CT.Tiempo.texto(CT.Tiempo.get("amigos", 15))} (lo elegiste al crear la partida).</p></div>
         ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} cartas por persona.</p>` : `<div class="field"><span class="field-label">Cartas iniciales</span><p class="hint">${lobbySettings.handSize} por persona (lo elegiste al crear la partida).</p></div>`}
         <input type="checkbox" hidden id="wifi-pulse"${lobbySettings.pulse ? " checked" : ""}><input type="checkbox" hidden id="wifi-ghost"${lobbySettings.ghost ? " checked" : ""}>
         <div class="field"><span class="field-label">Poderes</span><p class="hint">${CT.ManoInicial?.poderesTexto?.({ pulse: lobbySettings.pulse, ghost: lobbySettings.ghost }) ?? "sin poderes"} (lo elegiste al crear la partida).</p></div>
@@ -695,7 +694,7 @@
     if (role !== "host") return;
     attempt("start", {
       handSize: Number(lobbySettings.handSize) || 4,
-      turnSeconds: Number(lobbySettings.turnSeconds) || 0,
+      turnSeconds: Number(CT.Tiempo.get("amigos", 15)) || 0,
       pulse: !!lobbySettings.pulse, ghost: !!lobbySettings.ghost
     });
   }
@@ -1090,17 +1089,15 @@
   });
 
   document.addEventListener("change", event => {
-    // El tiempo son pastillas (CT.Tiempo.field), no un desplegable: se reconocen por su grupo.
-    const id = event.target.name === "wifi-turn-seconds" ? event.target.name : event.target.id;
-    if (!["wifi-preset", "wifi-turn-seconds", "wifi-hand-size", "wifi-pulse", "wifi-ghost"].includes(id)) return;
+    const id = event.target.id;
+    if (!["wifi-preset", "wifi-hand-size", "wifi-pulse", "wifi-ghost"].includes(id)) return;
     const pulseBox = document.getElementById("wifi-pulse"), ghostBox = document.getElementById("wifi-ghost");
     if (id === "wifi-preset") {
       if (event.target.value === "custom") return;
       lobbySettings.pulse = lobbySettings.ghost = event.target.value === "advanced";
       if (pulseBox) pulseBox.checked = lobbySettings.pulse;
       if (ghostBox) ghostBox.checked = lobbySettings.ghost;
-    } else if (id === "wifi-turn-seconds") lobbySettings.turnSeconds = event.target.value;
-    else if (id === "wifi-hand-size") lobbySettings.handSize = event.target.value;
+    } else if (id === "wifi-hand-size") lobbySettings.handSize = event.target.value;
     else if (id === "wifi-pulse") lobbySettings.pulse = event.target.checked;
     else if (id === "wifi-ghost") lobbySettings.ghost = event.target.checked;
     // El desplegable siempre dice lo que hacen las casillas: con un solo poder es «Personalizada».

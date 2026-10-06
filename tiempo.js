@@ -64,7 +64,8 @@
     paso();
     return { stop() { parado = true; clearInterval(id); } };
   }
-  CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido };
+  const texto = s => (Number(s) ? `${Number(s)} s por carta` : "sin tiempo");
+  CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido, texto };
 
   // Cartas iniciales por persona de las partidas en directo con amigos: se eligen en la pantalla
   // previa y la sala de espera (online o Wi‑Fi) solo las enseña.
