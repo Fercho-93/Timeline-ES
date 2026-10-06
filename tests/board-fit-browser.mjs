@@ -90,16 +90,25 @@ try {
               horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2};
           });
           records.push({engine,width,height,format,...data,errors});
-          if(data.screen!==(format==='quick'?'quick-game':format==='local'?'game':'solo') ||
-            data.documentHeight>data.viewport+2 || data.horizontalOverflow || data.zoom!=='100%' ||
-            !data.order || (data.cards>1&&!data.fan) || data.labelFits===false || data.emblemVisible===false ||
-            (data.cards===1&&data.handCard?.height<data.handCard?.width*1.25) ||
-            (data.placed&&data.placed.height<data.placed.width*1.2) || data.headingGap>45 ||
-            (width===390&&format==='solo'&&data.placed?.width<120) ||
-            (width===390&&format==='solo'&&data.focusTitle?.right>data.handCard?.left+2) ||
-            (format==='local'&&(data.players.length!==2||data.rosterOverflowsY||data.players.some(p=>p.left<data.roster.left-2||p.right>data.roster.right+2||p.top<data.roster.top-2||p.bottom>data.roster.bottom+2))) ||
-            (data.placed&&data.placed.bottom>data.viewport+2))
-            errors.push('La mesa no cumple las medidas o el orden de juego');
+          // Cada condición con su nombre: si falla, el registro dice cuál.
+          const checks=[
+            ['pantalla',data.screen!==(format==='quick'?'quick-game':format==='local'?'game':'solo')],
+            [`alto ${data.documentHeight}/${data.viewport}`,data.documentHeight>data.viewport+2],
+            ['desborda en horizontal',data.horizontalOverflow],
+            [`zoom ${data.zoom}`,data.zoom!=='100%'],
+            ['la mano no va encima de la línea',!data.order],
+            ['mano sin abanico',data.cards>1&&!data.fan],
+            ['el rótulo de la carta no cabe',data.labelFits===false],
+            ['el emblema pisa el rótulo',data.emblemVisible===false],
+            ['carta de la mano achatada',data.cards===1&&data.handCard?.height<data.handCard?.width*1.25],
+            ['carta colocada achatada',data.placed&&data.placed.height<data.placed.width*1.2],
+            [`hueco bajo la barra ${data.headingGap}`,data.headingGap>45],
+            ['carta colocada estrecha',width===390&&format==='solo'&&data.placed?.width<120],
+            ['el título pisa la carta',width===390&&format==='solo'&&data.focusTitle?.right>data.handCard?.left+2],
+            ['marcador de jugadores',format==='local'&&(data.players.length!==2||data.rosterOverflowsY||data.players.some(p=>p.left<data.roster.left-2||p.right>data.roster.right+2||p.top<data.roster.top-2||p.bottom>data.roster.bottom+2))],
+            ['carta colocada fuera de pantalla',data.placed&&data.placed.bottom>data.viewport+2]
+          ].filter(([,bad])=>bad).map(([name])=>name);
+          if(checks.length) errors.push('La mesa no cumple las medidas o el orden de juego: '+checks.join(', '));
           if(width===320||width===390)await page.screenshot({path:path.join(destination,`board-${engine}-${format}-${width}x${height}.png`)});
         }catch(error){records.push({engine,width,height,format,error:String(error),errors});}
         finally{await fs.writeFile(path.join(destination,'board-fit.json'),JSON.stringify(records,null,2));await page.close();}

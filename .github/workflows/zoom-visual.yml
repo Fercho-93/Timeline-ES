@@ -12,6 +12,7 @@ on:
       - 'effects.js'
       - '*.css'
       - 'tests/zoom-browser.mjs'
+      - 'tests/board-fit-browser.mjs'
       - 'tests/online-e2e.mjs'
       - 'tests/transitions-browser.mjs'
       - '.github/workflows/zoom-visual.yml'
