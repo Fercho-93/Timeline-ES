@@ -96,7 +96,8 @@ service cloud.firestore {
           && (a.get('matchmaking','private') != 'public' || a.members.size() == a.capacity
               || a.updatedAt < request.time - duration.value(25, 's'))
           && b.diff(a).affectedKeys().hasOnly(['config','phase','revision','updatedAt'])
-          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep','first'])
+          && b.config is map && b.config.keys().hasOnly(['names','rounds','kind','historyId','keep','first','seconds'])
+          && (!('seconds' in b.config.keys()) || b.config.seconds in [15, 20, 30])
           && (!('keep' in b.config.keys()) || b.config.keep is bool)
           && (!('first' in b.config.keys()) || (b.config.first in [0,1] && a.members.size() == 1))
           && (b.config.names == a.names || (a.members.size() == 1 && b.config.names.size() == 2 && b.config.names[0] == a.names[0]
@@ -228,7 +229,8 @@ service cloud.firestore {
               && duelId == 'invite-' + source.seed + '-' + request.auth.uid + '-' + string(d.invitationRound)));
       }
       function validCreate() {
-        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound','starter'])
+        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound','starter','seconds'])
+          && (!('seconds' in request.resource.data) || request.resource.data.seconds in [0, 15, 20, 30])
           && (!('invitedUid' in request.resource.data) || validInvitation())
           && (!('starter' in request.resource.data) || request.resource.data.starter == 0 || ('invitedUid' in request.resource.data && request.resource.data.starter == 1))
           && request.resource.data.playersOrder == [request.auth.uid]
@@ -895,7 +897,7 @@ service cloud.firestore {
           && next.status == 'playing'
           && next.phase == 'turn'
           && next.handSize >= 1 && next.handSize <= 6
-          && next.get('turnSeconds', 20) in [0, 20, 30, 45]
+          && next.get('turnSeconds', 20) in [0, 15, 20, 30, 45]
           && next.current >= 0 && next.current < prior.playerOrder.size()
           && next.timeline.size() == 1
           && next.discard.size() == 0
@@ -1404,7 +1406,7 @@ service cloud.firestore {
         && request.resource.data.playerOrder.size() == 1
         && request.resource.data.playerOrder[0] == request.auth.uid
         && request.resource.data.players.size() == 1
-        && request.resource.data.get('turnSeconds', 20) in [0, 20, 30, 45]
+        && request.resource.data.get('turnSeconds', 20) in [0, 15, 20, 30, 45]
         && validName(request.resource.data.players[request.auth.uid].name)
         && request.resource.data.players[request.auth.uid].hand.size() == 0
         && request.resource.data.deck.size() == 0

@@ -170,6 +170,7 @@ function render() {
       ${solution(current)}
       ${pending ? `<div class="turn-duel-status" role="status"><b>${sending.has(pending.operationId) ? 'Enviando jugada…' : 'Jugada guardada en este móvil, pendiente de confirmar'}</b><p>No vuelvas a jugar esta carta. Se enviará al recuperar la conexión, sin cambiar tu respuesta ni tu tiempo.</p>${delivery ? `<p>${safe(delivery)}</p>` : ''}<button class="btn btn-secondary" data-turn-action="retry">Comprobar y reintentar</button></div>` : delivery ? `<p class="turn-duel-status" role="status">${safe(delivery)}</p>` : ''}
       ${!waiting && !finished && !mine ? '<p class="turn-duel-status" role="status">Tu rival está jugando. La mesa se actualizará automáticamente.</p>' : ''}
+      ${turnClockMarkup(active && !!card)}
       ${showBoard && current.kind === 'orden' ? orderBoard(current, active ? card : null) : ''}
       ${active && current.kind === 'cifras' && card ? cifraBoard(current, card) : ''}
       ${active && !card ? '<p role="alert">No se pudo cargar la carta. Actualiza Continuum en los dos móviles.</p>' : ''}
@@ -189,6 +190,7 @@ function render() {
   }
   if (focused?.dataset.turnAction === 'select-slot') app.querySelector('[data-turn-action="confirm-place"]')?.focus({ preventScroll: true });
   window.scrollTo({ left: 0, top: oldTop, behavior: 'instant' });
+  startTurnClock(active && !!card);
 }
 async function place(index) {
   if (!Number.isInteger(index) || index < 0 || !current || index > timelineCards(current).length) return;
@@ -211,9 +213,10 @@ function savePending(gameId, move) {
 }
 async function queueMove(extra) {
   if (!current || !(firstTurnOf(current) || (current.status === 'playing' && current.turnUid === uid())) || pendingMove(current.id)) return;
-  // Sin límite de tiempo por turno: `ms` solo se guarda como dato (siempre por debajo del tope antiguo) y nunca hay timeout.
+  // Con plazo (`seconds`), agotarlo manda la jugada como fallo por tiempo; sin plazo, `ms` es solo un dato.
   const ms = Math.max(0, Date.now() - (enteredAt || Date.now()));
-  const move = { ...extra, ms: Math.min(ms, TURN_SECONDS * 1000 - 1), timeout: false, gameId: current.id, turnIndex: current.turnIndex, uid: uid(), operationId: id() };
+  const tope = Number(current.seconds) > 0 ? Number(current.seconds) * 1000 : TURN_SECONDS * 1000 - 1;
+  const move = { ...extra, ms: Math.min(ms, tope), timeout: !!extra.timeout, gameId: current.id, turnIndex: current.turnIndex, uid: uid(), operationId: id() };
   try { savePending(current.id, move); }
   catch { return notify('No hay espacio para proteger el envío. Libera almacenamiento antes de continuar.'); }
   clearInterval(timer);
@@ -283,7 +286,8 @@ async function create(mode, kind, back, competition = null) {
   // Las reglas admiten hasta 30 cartas por partida: en una competición, temas × cartas por tema.
   const total = competition ? compTotal(mode, competition.cards) : kind === 'cifras' ? CT.Duelo.Cifras.CARTAS : TOTAL;
   const seed = CT.Duelo.crearSemilla(), openingCard = competition ? themeDeal({ mode, seed, total }, 0)[0]?.id : kind === 'orden' ? CT.Duelo.reparto(mode, seed, total)[0] : null;
-  const game = { id: gameId, mode, kind, seed, total, turnIndex: 0, turnUid: null, playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, status: 'waiting', plays: [], timeline: openingCard == null ? [] : [openingCard], scores: { [uid()]: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+  const seconds = CT.Tiempo?.get?.('amigos', 15) || 0;
+  const game = { id: gameId, mode, kind, seed, total, seconds, turnIndex: 0, turnUid: null, playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, status: 'waiting', plays: [], timeline: openingCard == null ? [] : [openingCard], scores: { [uid()]: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   shareLink = CT.Links.invitation({turnDuel:gameId});
   await runTransaction(db, async tx => { const ref = doc(db, 'turnDuels', gameId); if (!(await tx.get(ref)).exists()) tx.set(ref, game); });
   localStorage.removeItem(draftKey);
@@ -310,7 +314,29 @@ function prepareTurn() {
   awaitingReady = false; prepareUntil = 0;
   if (!firstTurnOf(current) && (current?.status !== 'playing' || current.turnUid !== uid())) return;
   const key = `${current.id}-${current.turnIndex}`;
-  if (preparingTurn !== key) { preparingTurn = key; enteredAt = Date.now(); }
+  if (preparingTurn !== key) {
+    preparingTurn = key;
+    const saved = Number(localStorage.getItem(`continuum-duel-turn-start-${key}`));
+    enteredAt = Number(current.seconds) > 0 && saved > 0 && saved <= Date.now() ? saved : Date.now();
+    if (Number(current.seconds) > 0) try { localStorage.setItem(`continuum-duel-turn-start-${key}`, String(enteredAt)); } catch { /* sin espacio: el reloj empieza ahora */ }
+  }
+}
+// La barra y el aviso del plazo del turno, si la partida lo lleva.
+let turnClock = null;
+function turnClockMarkup(active) {
+  const seconds = Number(current?.seconds) || 0;
+  if (!seconds || !active) return '';
+  return CT.Tiempo?.bar?.(seconds * 1000 - (Date.now() - enteredAt), seconds * 1000) || '';
+}
+function startTurnClock(active) {
+  turnClock?.stop(); turnClock = null;
+  const seconds = Number(current?.seconds) || 0;
+  if (!seconds || !active || !CT.Tiempo) return;
+  const turn = current.turnIndex, gameId = current.id;
+  turnClock = CT.Tiempo.clock({ empezadoEn: enteredAt, ms: seconds * 1000, root: document.getElementById('app'), onTimeout: () => {
+    if (current?.id !== gameId || current.turnIndex !== turn || pendingMove(gameId)) return;
+    queueMove(current.kind === 'cifras' ? { respuesta: 0, timeout: true } : { index: -1, timeout: true });
+  } });
 }
 function discoverOwnPlays(game) {
   (game.plays || []).forEach((play, turn) => {
@@ -497,7 +523,7 @@ async function challenge(sourceId, back = onBack) {
       tx.set(ref, { id: gameId, sourceDuel: sourceId, invitationRound: round, invitedUid, invitedAlias: source.players[invitedUid].alias,
         // La revancha la empieza quien no empezó el duelo anterior: si lo empecé yo, empieza mi rival.
         starter: source.playersOrder[source.starter || 0] === uid() ? 1 : 0,
-        mode: source.mode, kind: source.kind, seed, total, turnIndex: 0, turnUid: null,
+        mode: source.mode, kind: source.kind, seed, total, seconds: Number(source.seconds) || 0, turnIndex: 0, turnUid: null,
         playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, scores: { [uid()]: 0 },
         status: 'waiting', plays: [], timeline: compModes(source) ? [themeDeal({ mode: source.mode, seed, total }, 0)[0]?.id] : source.kind === 'orden' ? [CT.Duelo.reparto(source.mode, seed, total)[0]] : [],
         createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
@@ -516,7 +542,7 @@ async function next(back = onBack) {
   open({ gameId: target.id, back });
 }
 function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
-function leave() { stop?.(); stop = null; clearInterval(timer); current = null; }
+function leave() { stop?.(); stop = null; clearInterval(timer); turnClock?.stop(); turnClock = null; current = null; }
 function close() { leave(); onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
 CT.TurnDuel = { open, close, leave, list, cancel, standings };

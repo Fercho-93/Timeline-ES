@@ -21,7 +21,11 @@ try {
     const save=async(uid,room)=>assertSucceeds(setDoc(longRef(uid==='host'?host:guest),{...JSON.parse(JSON.stringify(room)),catalog:1,updatedAt:serverTimestamp()}));
     let room=R.create('host','Ana',2);await save('host',room);
     room=R.reduce(room,'guest',{type:'join',name:'Bea'});await save('guest',room);
-    room=R.reduce(room,'host',{type:'start',rounds:[{id:challenge.id,order}],kind:'duel',keep:true});await save('host',room);
+    // El plazo por jugada viaja en la configuración; un valor fuera de la lista no se acepta.
+    const malPlazo=R.reduce(room,'host',{type:'start',rounds:[{id:challenge.id,order}],kind:'duel',keep:true});malPlazo.config.seconds=45;
+    await assertFails(setDoc(longRef(host),{...JSON.parse(JSON.stringify(malPlazo)),catalog:1,updatedAt:serverTimestamp()}));
+    room=R.reduce(room,'host',{type:'start',rounds:[{id:challenge.id,order}],kind:'duel',keep:true,seconds:20});await save('host',room);
+    assert.equal(room.config.seconds,20);
     await assertFails(setDoc(longRef(out),{...JSON.parse(JSON.stringify(room)),revision:room.revision+1,updatedAt:serverTimestamp()}));
     let reachedLongSlot=false;
     while(room.phase!=='finished') {

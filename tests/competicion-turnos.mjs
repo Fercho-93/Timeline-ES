@@ -56,7 +56,7 @@ await t.create('history', 'orden', null, { rounds: 2, cards: 2 });
 assert.equal(created.length, 1, 'se crea un único documento');
 const id = created[0];
 let game = games.get(id);
-assert.deepEqual(Object.keys(game).sort(), ['createdAt', 'id', 'kind', 'mode', 'playersOrder', 'players', 'plays', 'scores', 'seed', 'status', 'timeline', 'total', 'turnIndex', 'turnUid', 'updatedAt'].sort(), 'los mismos campos que admiten las reglas');
+assert.deepEqual(Object.keys(game).sort(), ['createdAt', 'id', 'kind', 'mode', 'playersOrder', 'players', 'plays', 'scores', 'seconds', 'seed', 'status', 'timeline', 'total', 'turnIndex', 'turnUid', 'updatedAt'].sort(), 'los mismos campos que admiten las reglas');
 assert.equal(game.mode, 'comp:alfa,beta', 'los temas viajan en el campo del mazo');
 assert.equal(game.kind, 'orden');
 assert.equal(game.total, 4, 'dos temas por dos cartas');

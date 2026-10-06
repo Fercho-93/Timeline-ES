@@ -248,6 +248,7 @@
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     competition = options.competition || null;
+    lobbySettings.turnSeconds = String(CT.Tiempo.get("amigos", 15));
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
     pendingInvite = null; pendingAnswerText = ""; selectedCardId = null; pendingIndex = null;
     cardsByIdCache = new Map();
@@ -590,7 +591,8 @@
 
   // Los ajustes del anfitrión se guardan aquí y no en el propio formulario: la sala de
   // espera se repinta con cada respuesta del minijuego y, si no, volverían a los de serie.
-  const lobbySettings = { preset: "simple", handSize: "4", turnSeconds: "30", pulse: false, ghost: false };
+  // El tiempo de partida sale de lo elegido en «Partida con amigos»; el anfitrión aún puede cambiarlo.
+  const lobbySettings = { preset: "simple", handSize: "4", turnSeconds: "15", pulse: false, ghost: false };
 
   // El minijuego de quién empieza, el mismo que en la sala online y en un solo móvil:
   // el anfitrión reparte una carta, cada persona escribe su cifra en su móvil, empieza
@@ -650,7 +652,7 @@
     const settings = isHost
       ? `<div class="section-label">Ajustes</div>
         <div class="field"><label for="wifi-preset">Tipo de partida</label><select id="wifi-preset">${opcion("simple", "Primera partida · sin poderes", lobbySettings.preset)}${opcion("advanced", "Avanzada · Pulso y Fantasma", lobbySettings.preset)}${lobbySettings.preset === "custom" ? opcion("custom", "Personalizada", lobbySettings.preset) : ""}</select></div>
-        <div class="field"><label for="wifi-turn-seconds">Tiempo por turno</label><select id="wifi-turn-seconds">${opcion(0, "Sin límite", lobbySettings.turnSeconds)}${opcion(20, "20 segundos", lobbySettings.turnSeconds)}${opcion(30, "30 segundos", lobbySettings.turnSeconds)}${opcion(45, "45 segundos", lobbySettings.turnSeconds)}</select></div>
+        <div class="field"><label for="wifi-turn-seconds">Tiempo por turno</label><select id="wifi-turn-seconds">${opcion(0, "Sin tiempo", lobbySettings.turnSeconds)}${opcion(15, "15 segundos", lobbySettings.turnSeconds)}${opcion(20, "20 segundos", lobbySettings.turnSeconds)}${opcion(30, "30 segundos", lobbySettings.turnSeconds)}</select></div>
         ${roomState.tournament ? `<p class="hint">Competición: ${roomState.tournament.queue.length} temas · ${roomState.tournament.handSize} cartas por persona.</p>` : `<div class="field"><label for="wifi-hand-size">Cartas iniciales</label><select id="wifi-hand-size">${[1, 2, 3, 4, 5, 6].map(n => opcion(n, n, lobbySettings.handSize)).join("")}</select></div>`}
         <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="wifi-pulse"${lobbySettings.pulse ? " checked" : ""}></label>
         <label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="wifi-ghost"${lobbySettings.ghost ? " checked" : ""}></label>

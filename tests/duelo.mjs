@@ -194,7 +194,7 @@ console.log("\nUn enlace roto no rompe nada");
     ok(`un enlace ${nombre} se rechaza sin excepción`, resultado.ok === false && !resultado.excepcion);
   }
   ok("un mazo desconocido se distingue de un enlace roto", D.descodificar(cruda(w, "1|inventado|abc|3|2|110|x|Ana")).motivo === "mazo");
-  ok("una versión futura también", D.descodificar(cruda(w, "9|history|abc|3|2|110|x|Ana")).motivo === "version");
+  ok("una versión futura también", D.descodificar(cruda(w, "99|history|abc|3|2|110|x|Ana")).motivo === "version");
 }
 
 function plano(w, payload) {
@@ -330,7 +330,7 @@ console.log("\nUn enlace que no vale se explica y no rompe la aplicación");
 
   const w = boot();
   const D = w.CONTINUUM.Duelo;
-  const futuro = cruda(w, "9|history|abc|3|2|110|" + D.huella("history") + "|Ana");
+  const futuro = cruda(w, "99|history|abc|3|2|110|" + D.huella("history") + "|Ana");
   const conVersion = boot({ url: `https://hilo.test/?duelo=${futuro}` });
   ok("un enlace de una versión más nueva pide actualizar", /Actualiza la aplicación/.test(texto(conVersion)));
 }

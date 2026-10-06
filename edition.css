@@ -5128,3 +5128,12 @@ html:has(#app.atlas-board) .motas { display: none; }
     width: 88% !important; height: 100% !important; max-height: 100% !important;
   }
 }
+
+/* Tiempo por carta: cuatro opciones cortas en una sola fila. */
+#app .tiempo-segmented { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+#app .tiempo-segmented .segmented-option,
+#app .solo-home .solo-panel .tiempo-segmented .segmented-option { justify-items: center; align-content: center; min-height: 46px; padding: 8px 4px; text-align: center; }
+#app .tiempo-segmented .segmented-option b,
+#app .solo-home .solo-panel .tiempo-segmented .segmented-option b { font-size: .88rem; white-space: nowrap; }
+/* Sin el circulito de marcado: en pastillas tan cortas tapaba el texto; lo elegido ya se ve por el color. */
+html #app .tiempo-segmented .segmented-option::after { content: none !important; }

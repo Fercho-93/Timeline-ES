@@ -17,7 +17,7 @@ const dist = path.join(root, "dist");
 // `updates.js` registra, y cambiarla dejaría sin caché a quien ya lo tenga
 // instalado, como si abriera la aplicación por primera vez sin conexión.
 const FILES = [
-  "quick-room.js", "quick-network.js", "quick-online.js", "quick-challenges.css", "quick-challenges-data.js", "quick-challenges-engine.js", "quick-challenges.js",
+  "tiempo.js", "quick-room.js", "quick-network.js", "quick-online.js", "quick-challenges.css", "quick-challenges-data.js", "quick-challenges-engine.js", "quick-challenges.js",
   "invitation.html", "invitation.js", "index.html", "actualizar.html", "privacidad.html", "manifest.webmanifest", "icon.svg",
   "splash.css", "splash.js", "styles.css", "edition.css", "home-modes-v1.css", "home-modes-v1.js", "service-worker-258.js",
   "cards.js", "movies.js", "music.js", "videogames.js", "animals.js",

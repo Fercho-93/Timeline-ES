@@ -43,10 +43,24 @@
     "2": { cifras: true, ms: 10000 },
     "3": { cifras: false, ms: 20000 },
     "4": { cifras: false, ms: MS },
-    "5": { cifras: true, ms: MS }
+    "5": { cifras: true, ms: MS },
+    // El plazo ya se elige al crear el duelo: sin tiempo, 15, 20 o 30 segundos por carta.
+    "6": { cifras: false, ms: 30000 },
+    "7": { cifras: true, ms: 0 },
+    "8": { cifras: true, ms: 20000 },
+    "9": { cifras: true, ms: 30000 }
   };
-  const VERSION_ORDEN = "4";
-  const VERSION_CIFRAS = "5";
+  // La versión que corresponde a una prueba y un plazo. Un plazo que no tiene versión se
+  // juega con el de siempre, 15 segundos.
+  function versionDe(cifras, ms = MS) {
+    // La «2» (cifras a 10 s) es de antes y ya no se crea.
+    const clave = Object.keys(REGLAS).find(v => v !== "2" && REGLAS[v].cifras === cifras && REGLAS[v].ms === Number(ms));
+    return clave || (cifras ? "5" : "4");
+  }
+  // Sin reloj, la rapidez sigue desempatando las cifras: se mide contra un tope amplio
+  // (diez minutos por carta) en vez de contra el plazo.
+  const SIN_RELOJ_MS = 600000;
+  const tope = ms => Number(ms) > 0 ? Number(ms) : SIN_RELOJ_MS;
 
   // La huella del mazo —compartida con las salas, en modes.js—. No es opcional: si los
   // dos móviles llevan versiones distintas de la aplicación, el mazo puede haber
@@ -183,6 +197,7 @@
     if (!jugada || jugada.salida) return 0;
     const acierto = banda(modeKey, card, jugada.respuesta).puntos;
     if (!acierto) return 0;
+    plazo = tope(plazo);
     const usado = Math.min(Math.max(Number(jugada.ms) || 0, 0), plazo);
     return acierto + Math.round(PUNTOS_PRISA * ((plazo - usado) / plazo));
   }
@@ -200,6 +215,7 @@
     return jugadas.filter((jugada, i) => acierto(modeKey, cartas[i], jugada)).length;
   }
   function tiempoPartida(jugadas, plazo = CIFRAS_MS) {
+    plazo = tope(plazo);
     return jugadas.reduce((suma, jugada) => suma + (jugada.salida ? plazo : Math.min(Math.max(Number(jugada.ms) || 0, 0), plazo)), 0);
   }
   // 1 si gana `a`, -1 si gana `b`, 0 si empatan en aciertos y en tiempo.
@@ -306,9 +322,9 @@
   // aplicación que no la conozca pide actualizar en vez de comparar dos partidas que se
   // jugaron con plazos distintos. Es la misma idea que la huella del mazo, aplicada a las
   // reglas en vez de a las cartas.
-  function codificar({ mode, seed, total, hits, sequence, nombre, deck }) {
+  function codificar({ mode, seed, total, hits, sequence, nombre, deck, ms = MS }) {
     const campos = [
-      VERSION_ORDEN, mode, seed, total, hits,
+      versionDe(false, ms), mode, seed, total, hits,
       sequence.map(acierto => (acierto ? "1" : "0")).join(""),
       huella(mode, deck), limpiaNombre(nombre)
     ];
@@ -319,14 +335,14 @@
   // aciertos y cuadrícula lleva los puntos y una jugada por carta.
   //
   //   2 | mazo | semilla | cartas | puntos | respuesta:ms:salida,… | huella | nombre
-  function codificarCifras({ mode, seed, total, jugadas, nombre, deck }) {
+  function codificarCifras({ mode, seed, total, jugadas, nombre, deck, ms = CIFRAS_MS }) {
     const datos = jugadas.map(jugada => [
       textoCifra(mode, jugada.respuesta),
-      Math.min(Math.max(Math.round(Number(jugada.ms) || 0), 0), CIFRAS_MS),
+      Math.min(Math.max(Math.round(Number(jugada.ms) || 0), 0), tope(ms)),
       jugada.salida ? 1 : 0
     ].join(":")).join(",");
     const campos = [
-      VERSION_CIFRAS, mode, seed, total, puntosPartida(mode, seed, total, jugadas),
+      versionDe(true, ms), mode, seed, total, puntosPartida(mode, seed, total, jugadas, ms),
       datos, huella(mode, deck), limpiaNombre(nombre)
     ];
     return aBase64url(campos.join("|"));
@@ -399,7 +415,7 @@
       const respuesta = escrita === "" ? null : Number(escrita);
       if (respuesta !== null && (!Number.isFinite(respuesta) || Math.abs(respuesta) > MAX_CIFRA)) return { ok: false, motivo: "roto" };
       const ms = Number(textoMs);
-      if (!Number.isInteger(ms) || ms < 0 || ms > plazo) return { ok: false, motivo: "roto" };
+      if (!Number.isInteger(ms) || ms < 0 || ms > tope(plazo)) return { ok: false, motivo: "roto" };
       if (textoSalida !== "0" && textoSalida !== "1") return { ok: false, motivo: "roto" };
       jugadas.push({ respuesta, ms, salida: textoSalida === "1" });
     }
@@ -423,9 +439,10 @@
 
   // El texto que se manda. Lleva el enlace y la marca a batir, pero ninguna carta: quien
   // lo recibe tiene que jugarlo sin saber qué le va a salir.
-  function invitacion({ modeName, nombre, hits, total, payload }) {
+  const ritmoTexto = ms => Number(ms) > 0 ? `a ${Math.round(ms / 1000)} segundos por carta` : "sin tiempo";
+  function invitacion({ modeName, nombre, hits, total, payload, ms = MS }) {
     const quien = nombre ? `${nombre} te reta` : "Te retan";
-    return `${quien} en Continuum · ${modeName}\n📊 ${hits}/${total}, a ${SEGUNDOS} segundos por carta — a ver si lo superas\n${enlace(payload)}`;
+    return `${quien} en Continuum · ${modeName}\n📊 ${hits}/${total}, ${ritmoTexto(ms)} — a ver si lo superas\n${enlace(payload)}`;
   }
 
   // El cara a cara, para compartir el resultado. Las dos cuadrículas, una debajo de otra,
@@ -436,9 +453,9 @@
     return `Duelo en Continuum · ${modeName}\n${veredicto} — ${mio.hits} a ${rival.hits}\n${rival.nombre || "Quien retaba"} ${rejilla(rival.sequence)}\nYo ${rejilla(mio.sequence)}`;
   }
 
-  function invitacionCifras({ modeName, nombre, aciertos, total, payload }) {
+  function invitacionCifras({ modeName, nombre, aciertos, total, payload, ms = CIFRAS_MS }) {
     const quien = nombre ? `${nombre} te reta` : "Te retan";
-    return `${quien} en Continuum · Cifras · ${modeName}\n🎯 ${aciertos}/${total} aciertos, a ${CIFRAS_SEGUNDOS} segundos por carta\n${enlace(payload)}`;
+    return `${quien} en Continuum · Cifras · ${modeName}\n🎯 ${aciertos}/${total} aciertos, ${ritmoTexto(ms)}\n${enlace(payload)}`;
   }
 
   // La cuadrícula de un duelo de cifras dice cuánto se acercó cada carta, no si se
@@ -501,7 +518,7 @@
     huella, crearSemilla, reparto, codificar, descodificar,
     enlace, invitacion, marcador, limpiaNombre, estadoTurnos,
     Cifras: {
-      CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS,
+      CARTAS: CIFRAS_CARTAS, SEGUNDOS: CIFRAS_SEGUNDOS, MS: CIFRAS_MS, GRACIA_MS, SIN_RELOJ_MS, tope,
       PUNTOS_CARTA, PUNTOS_TINO, PUNTOS_PRISA, MAX_CIFRA,
       regla: reglaCifra, unidades, factorDe, leer: leerCifra, reparto: repartoCifras, cartas: cartasCifras,
       banda, puntosCarta, puntosPartida, acierto, aciertos: aciertosPartida, tiempo: tiempoPartida, compara: comparaCifras, formato: formatoCifra, texto: textoCifra,

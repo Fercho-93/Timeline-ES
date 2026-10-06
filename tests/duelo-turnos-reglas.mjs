@@ -21,6 +21,16 @@ try {
     timeline: [], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
   }));
 
+  // Tiempo por carta: el duelo puede llevar su plazo (sin tiempo, 15, 20 o 30 s), y ningún otro.
+  const conPlazo = segundos => ({
+    id: `timed-${segundos}`, mode: 'history', kind: 'orden', seed: 'abc123', total: 15, seconds: segundos,
+    turnIndex: 0, turnUid: null, playersOrder: ['creator'],
+    players: { creator: { alias: 'Ana' } }, status: 'waiting', plays: [],
+    timeline: [], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  });
+  for (const segundos of [0, 15, 20, 30]) await assertSucceeds(setDoc(doc(creator, 'turnDuels', `timed-${segundos}`), conPlazo(segundos)));
+  for (const segundos of [10, 45, '15']) await assertFails(setDoc(doc(creator, 'turnDuels', `timed-${segundos}`), conPlazo(segundos)));
+
   await assertSucceeds(getDoc(doc(guest, 'turnDuels', duelId)));
   await assertFails(getDoc(doc(publicDb, 'turnDuels', duelId)));
 

@@ -11,6 +11,8 @@
     if (config.keep !== undefined && typeof config.keep !== 'boolean') throw Error('INVALID_CONFIG');
     // `first`: quién abre el primer reto (0 = el primero de la lista, 1 = el segundo); la revancha de un duelo lo alterna.
     if (config.first !== undefined && !(config.first === 0 || config.first === 1)) throw Error('INVALID_CONFIG');
+    // `seconds`: plazo por jugada (0 = sin tiempo). Al agotarse se juega `timeoutPlacement`.
+    if (config.seconds !== undefined && ![0, 15, 20, 30].includes(config.seconds)) throw Error('INVALID_CONFIG');
     const ids = new Set();
     for (const round of config.rounds) {
       const c = challenge(round.id);
@@ -77,5 +79,13 @@
     if (!record || record.version !== catalog.version || !Array.isArray(record.commands) || record.commands.length > 2000) throw Error('INVALID_SAVE');
     return record.commands.reduce(step, create(record.config));
   }
-  CT.QuickEngine = {create, step, restore, challenge, keepPlaying};
+  // La jugada que se hace sola cuando se agota el tiempo: la primera carta pendiente en un hueco
+  // donde no encaja, así cuenta como fallo con un comando normal (vale igual en salas y enlaces).
+  function timeoutPlacement(s) {
+    const c = challenge(s.config.rounds[s.index].id), cardId = s.remaining[0];
+    const value = id => c.cards.find(card => card.id === id).value * c.direction;
+    for (let index = 0; index <= s.timeline.length; index++) if (!CT.Engine.fits(s.timeline, cardId, index, value)) return {type: 'place', cardId, index};
+    return {type: 'place', cardId, index: 0};
+  }
+  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement};
 })();

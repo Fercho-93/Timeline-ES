@@ -1,0 +1,66 @@
+(function () {
+  "use strict";
+  // Tiempo por jugada: la misma opción en todas las formas de jugar (menos el reto diario,
+  // que es igual para todo el mundo). «Sin tiempo» o un plazo de 15, 20 o 30 segundos para
+  // cada carta o turno. Cada pantalla recuerda lo último que se eligió en ella.
+  const CT = window.CONTINUUM;
+  const OPCIONES = [0, 15, 20, 30];
+  const clave = contexto => `continuum-tiempo-${contexto}-v1`;
+  const valido = s => OPCIONES.includes(Number(s));
+  function get(contexto, porDefecto = 0) {
+    try { const guardado = CT.Storage.getItem(clave(contexto)); if (guardado !== null && valido(guardado)) return Number(guardado); } catch { /* sin almacenamiento */ }
+    return porDefecto;
+  }
+  function set(contexto, segundos) {
+    if (!valido(segundos)) return;
+    try { CT.Storage.setItem(clave(contexto), String(Number(segundos))); } catch { /* almacenamiento lleno */ }
+  }
+  const icono = '<svg class="solo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
+  // El campo: cuatro pastillas con el mismo aspecto que «Ritmo» o «Conexión».
+  function field(contexto, { porDefecto = 0, etiqueta = "Tiempo por carta", attrs = "" } = {}) {
+    const actual = get(contexto, porDefecto), id = `tiempo-${contexto}-label`;
+    return `<div class="field duel-kind-field tiempo-field"${attrs}>
+      <span class="field-label" id="${id}">${etiqueta}</span>
+      <div class="segmented tiempo-segmented" role="radiogroup" aria-labelledby="${id}">${OPCIONES.map(s => `<label class="segmented-option${s === actual ? " is-on" : ""}">
+        <input type="radio" name="tiempo-${contexto}" value="${s}" data-tiempo="${contexto}"${s === actual ? " checked" : ""}>
+        <span><b>${s ? `${s} s` : "Sin tiempo"}</b></span>
+      </label>`).join("")}</div>
+    </div>`;
+  }
+  // Lo elegido en pantalla (o lo guardado si el campo no está).
+  function chosen(contexto, porDefecto = 0) {
+    const marcado = document.querySelector(`input[data-tiempo="${contexto}"]:checked`);
+    return marcado ? Number(marcado.value) : get(contexto, porDefecto);
+  }
+  document.addEventListener("change", event => {
+    const input = event.target.closest?.("input[data-tiempo]");
+    if (!input) return;
+    set(input.dataset.tiempo, input.value);
+    input.closest(".segmented")?.querySelectorAll(".segmented-option").forEach(op => op.classList.toggle("is-on", op.querySelector("input").checked));
+  });
+  // La barra de cuenta atrás, igual en todas partes: se pinta con lo que queda y `tick`
+  // la pone en hora sin repintar la pantalla.
+  function bar(restanteMs, totalMs) {
+    const s = Math.ceil(Math.max(0, restanteMs) / 1000);
+    return `<div class="reloj" data-tiempo-reloj><progress class="reloj-bar ${restanteMs <= 3000 ? "reloj-apura" : ""}" max="${totalMs}" value="${Math.max(0, restanteMs)}" aria-label="Tiempo restante"></progress><span class="reloj-left" aria-live="off">${s} s</span></div>`;
+  }
+  // Un reloj que avisa al acabarse. `empezadoEn` es un instante (Date.now()): así sigue
+  // corriendo aunque se repinte la pantalla o el móvil se vaya al fondo.
+  function clock({ empezadoEn, ms, onTimeout, root = document }) {
+    let parado = false;
+    const paso = () => {
+      if (parado) return;
+      const restante = ms - (Date.now() - empezadoEn);
+      root.querySelectorAll("[data-tiempo-reloj]").forEach(caja => {
+        const barra = caja.querySelector(".reloj-bar"), marca = caja.querySelector(".reloj-left");
+        if (barra) { barra.value = Math.max(0, restante); barra.classList.toggle("reloj-apura", restante <= 3000); }
+        if (marca) marca.textContent = `${Math.ceil(Math.max(0, restante) / 1000)} s`;
+      });
+      if (restante <= 0) { parado = true; clearInterval(id); onTimeout?.(); }
+    };
+    const id = setInterval(paso, 200);
+    paso();
+    return { stop() { parado = true; clearInterval(id); } };
+  }
+  CT.Tiempo = { OPCIONES, get, set, field, chosen, bar, clock, valido };
+})();
