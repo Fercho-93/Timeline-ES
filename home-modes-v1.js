@@ -79,9 +79,10 @@
     // Quien recibe un QR o un código en persona entra desde aquí, sin bajar por Jugar con amigos.
     const join = document.createElement('button');
     join.type = 'button';
-    join.className = 'mode-join-shortcut';
+    // Misma tarjeta que «Jugar» y el reto diario (ilustración, título y enlace), más baja.
+    join.className = 'home-door mode-join-shortcut';
     join.dataset.action = 'friends-join';
-    join.innerHTML = '<span class="mode-join-mark" aria-hidden="true">⌁</span><span><b>Unirme a una partida</b><small>¿Te han invitado? Escanea el QR o pega el código.</small></span><i aria-hidden="true">→</i>';
+    join.innerHTML = '<span class="home-door-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" decoding="async"></span><span class="home-door-copy"><b>Unirme a una partida</b><small>¿Te han invitado? Escanea el QR o pega el código.</small><span class="home-door-cta" aria-hidden="true">Unirme →</span></span>';
     playWrap.append(play, reveal, join);
 
     doors.replaceChildren(playWrap, dailyWrap);

@@ -124,13 +124,11 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 :root[data-theme="dark"] #app .public-table-seats i.is-taken { border-color: #e0a77d; background: #e0a77d; }
 }
 /* Acceso directo de Inicio para unirse a una partida a la que te han invitado. */
-#app .mode-join-shortcut { appearance: none; display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 12px 16px; border: 1px dashed #b8955a; border-radius: 12px; background: #f8f0dfb8; color: #2a1c12; text-align: left; cursor: pointer; font-family: var(--font-display); }
-#app .mode-join-shortcut b { display: block; font: 500 1.1rem/1.2 var(--font-display); }
-#app .mode-join-shortcut small { display: block; margin-top: 2px; color: #4a3d31; font-size: .86rem; line-height: 1.3; }
-#app .mode-join-shortcut > span:nth-child(2) { flex: 1; }
-#app .mode-join-shortcut i { font-style: normal; color: #6e4a1f; font-weight: 700; }
-#app .mode-join-mark { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border: 1px solid #b8955a; border-radius: 50%; color: #6e4a1f; font-size: 1.2rem; }
-#app .mode-join-shortcut:focus-visible { outline: 3px solid #9c4f2c; outline-offset: 3px; }
+#app .mode-join-shortcut { margin-top: 13px; }
+#app .home-doors-shell .mode-join-shortcut,
+#app .home-doors-shell .mode-join-shortcut .home-door-copy { min-height: 96px; }
+#app .home-doors-shell .mode-join-shortcut .home-door-copy { padding-block: 11px; gap: 3px; }
+#app .home-doors-shell .mode-join-shortcut .home-door-copy b { font-size: clamp(1.12rem, 3.2vw, 1.3rem); }
 @media (max-width: 700px) {
   #app .mode-entry-grid { grid-template-columns: 1fr; }
   #app .mode-entry-featured { grid-column: auto; min-height: 150px; }
@@ -161,9 +159,6 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 :root[data-theme="dark"] #app .mode-ranking-summary,
 :root[data-theme="dark"] #app .mode-daily-family { color: #e9dcc3; }
 :root[data-theme="dark"] #app .mode-topic-grid label:not(:has(input:checked)),
-:root[data-theme="dark"] #app .mode-join-shortcut { color: #f1e1bf; background: #332a20; border-color: #8c6f45; }
-:root[data-theme="dark"] #app .mode-join-shortcut small { color: #e9dcc3; }
-:root[data-theme="dark"] #app .mode-join-shortcut i, :root[data-theme="dark"] #app .mode-join-mark { color: #e6c58e; border-color: #8c6f45; }
 :root[data-theme="dark"] #app .mode-hub-head .icon-btn { background: #332a20cc; }
 
 .mode-inline-drawer { display: grid; gap: 12px; margin-top: 14px; }
