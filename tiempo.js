@@ -81,5 +81,26 @@
     const select = event.target.closest?.("select[data-mano-inicial]");
     if (select && MANO.includes(Number(select.value))) { try { CT.Storage.setItem(CLAVE_MANO, String(Number(select.value))); } catch { /* almacenamiento lleno */ } }
   });
-  CT.ManoInicial = { get: mano, field: manoField };
+  // Poderes (Pulso y Fantasma) de esas mismas partidas: también se eligen en la pantalla previa.
+  const CLAVE_PODERES = "continuum-live-powers-v1";
+  function poderes() {
+    try { const v = JSON.parse(CT.Storage.getItem(CLAVE_PODERES) || "{}"); return { pulse: !!v.pulse, ghost: !!v.ghost }; } catch { return { pulse: false, ghost: false }; }
+  }
+  function poderesField() {
+    const p = poderes();
+    return `<div class="poderes-field"><span class="field-label" id="live-powers-label">Poderes</span>
+      <p class="hint">Para una primera partida, mejor sin poderes.</p>
+      <label class="opt-row"><span>Cartas Fantasma <small>De 1 a 3 poderes ocultos según los jugadores. Pueden quedarse sin descubrir.</small></span><input type="checkbox" id="live-ghost-toggle" data-poder="ghost"${p.ghost ? " checked" : ""}></label>
+      <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="live-pulse-toggle" data-poder="pulse"${p.pulse ? " checked" : ""}></label>
+    </div>`;
+  }
+  document.addEventListener("change", event => {
+    const box = event.target.closest?.("input[data-poder]");
+    if (!box) return;
+    const p = poderes(); p[box.dataset.poder] = box.checked;
+    try { CT.Storage.setItem(CLAVE_PODERES, JSON.stringify(p)); } catch { /* almacenamiento lleno */ }
+  });
+  // Texto para la sala de espera, que solo enseña lo elegido.
+  const poderesTexto = (p = poderes()) => p.pulse && p.ghost ? "Pulso y Fantasma" : p.pulse ? "Pulso" : p.ghost ? "Fantasma" : "sin poderes";
+  CT.ManoInicial = { get: mano, field: manoField, poderes, poderesField, poderesTexto };
 })();

@@ -300,8 +300,10 @@ ok("y hay que volver a jugar el minijuego", !anfitrion.document.querySelector('[
 
 console.log("\nReloj del turno, poderes y menú de la sala");
 elige(anfitrion, "wifi-turn-seconds", "20");
-elige(anfitrion, "wifi-preset", "advanced");
-ok("la partida avanzada activa Pulso y Fantasma", anfitrion.document.getElementById("wifi-pulse").checked && anfitrion.document.getElementById("wifi-ghost").checked);
+elige(anfitrion, "wifi-pulse", true);
+elige(anfitrion, "wifi-ghost", true);
+ok("la sala no ofrece elegir poderes: solo los enseña", !anfitrion.document.querySelector("select#wifi-preset") && /Poderes/.test(html(anfitrion)));
+ok("con los dos poderes elegidos, Pulso y Fantasma están activos", anfitrion.document.getElementById("wifi-pulse").checked && anfitrion.document.getElementById("wifi-ghost").checked);
 await minijuego(anfitrion, invitada, anfitrion);
 click(anfitrion, '[data-local-action="start"]');
 await until(() => pantalla(invitada) === "local-game");
