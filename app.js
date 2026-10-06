@@ -395,7 +395,7 @@
   function compBrief(ritmo) {
     return ritmo === "turnos"
       ? `Entre dos, cada uno desde su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
-      : "Una sala de hasta el máximo de personas que elijas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno.";
+      : "Una sala de hasta el máximo de personas que elijas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
   }
   function startCompFriends() {
     const opciones = competitionOptions(), ritmo = compPace();
@@ -2575,7 +2575,7 @@
         <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
         <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
       </div>
-      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de personas que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Al crearla compartes el código, el enlace o el QR.</p></div>
+      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de personas que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
         ${CT.ManoInicial.field()}
         ${CT.ManoInicial.poderesField()}
         ${CT.ManoInicial.maximoField()}
