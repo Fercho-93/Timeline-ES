@@ -3920,13 +3920,6 @@ html:not(:has(#app[data-screen="home"]))::before {
   #app.atlas-board[data-board-fit="tight"] .scoreboard-panel .score > em small { display: none; }
   #app.atlas-board[data-board-fit="tight"] .atlas-hand-section { position: relative; }
   #app.atlas-board[data-board-fit="tight"] .atlas-hand-section > .hand-title small { display: none; }
-  #app.atlas-board[data-board-fit="tight"] .atlas-hand-section > .hand-fan-controls {
-    position: absolute; z-index: 11; right: 0; top: 0; margin: 0; gap: 2px;
-  }
-  #app.atlas-board[data-board-fit="tight"] .atlas-hand-section > .hand-fan-controls button {
-    width: 30px; height: 30px; min-height: 30px;
-  }
-  #app.atlas-board[data-board-fit="tight"] .atlas-hand-section > .hand-fan-controls span { min-width: 38px; }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .atlas-hand-section .hand.hand-fan {
     height: 92px; padding-bottom: 5px;
   }
@@ -4387,6 +4380,11 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 62px; tr
 #app.atlas-board .scoreboard-panel .scoreboard { display: flex !important; flex-direction: row; justify-content: flex-start; gap: 6px !important; width: auto; max-width: 100%; max-height: none !important; height: auto !important; min-height: 0 !important; margin: 0 0 0 auto !important; padding: 0 !important; overflow-x: auto !important; overflow-y: hidden !important; scrollbar-width: none; }
 #app.atlas-board .scoreboard-panel .scoreboard::-webkit-scrollbar { display: none; }
 #app.atlas-board .scoreboard-panel .score { display: inline-flex !important; flex: 0 0 auto; align-items: center; width: auto !important; min-height: 0 !important; height: auto !important; gap: 6px !important; padding: 3px 11px 3px 4px !important; border-radius: 999px !important; grid-template-columns: none !important; border: 1px solid #c9b48f; background: #fbf4e4; color: #4a3626; box-shadow: 0 1px 3px #5a3f1f22; }
+/* Con dos jugadores, las dos píldoras caben siempre en su fila: encogen y el nombre se corta
+   con «…» (en Safari la letra ocupa algo más y la segunda se salía). Con más, la fila se desliza. */
+#app.atlas-board .scoreboard-panel .scoreboard:not(:has(> .score:nth-child(3))) > .score { flex: 0 1 auto; min-width: 0; }
+#app.atlas-board .scoreboard-panel .score > .score-avatar,
+#app.atlas-board .scoreboard-panel .score > em { flex: 0 0 auto; }
 #app.atlas-board .scoreboard-panel .score.active { background: linear-gradient(135deg, #a84a37, #7d3223) !important; border-color: #7d3223; color: #fff6e8; }
 #app.atlas-board .scoreboard-panel .score > .score-avatar,
 #app.atlas-board .scoreboard-panel .score > .score-avatar .avatar { width: 28px !important; height: 28px !important; }
