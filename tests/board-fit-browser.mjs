@@ -107,7 +107,7 @@ try {
     }
     await browser.close();browser=null;
   }
-  const summary=records.map(r=>`${r.engine} ${r.width}×${r.height} ${r.format}: ${r.error||`${r.screen} ${r.fit} ${r.shellHeight}/${r.viewport} fan=${r.fan}`}`);
+  const summary=records.map(r=>`${r.engine} ${r.width}×${r.height} ${r.format}: ${r.error||`${r.screen} ${r.fit} ${r.shellHeight}/${r.viewport} fan=${r.fan}`}${r.errors?.length?` · FALLA: ${r.errors.join(' | ')}`:''}`);
   console.log(summary.join('\n'));
   if(records.some(r=>r.error||r.errors?.length))process.exitCode=1;
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
