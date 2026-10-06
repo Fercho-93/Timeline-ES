@@ -5127,6 +5127,35 @@ html:has(#app.atlas-board) .motas { display: none; }
   }
 }
 
+/* Pastillas de elegir (Juego, Jugadores, Si alguien falla, Ritmo, Conexión…): tarjetas de
+   papel con la elegida marcada en terracota, como «Duración de la partida» y el tiempo por
+   carta. Sustituye a la barra amarilla con la opción rellena de rojo. Los paneles que ya
+   tienen sus propias tarjetas (Solitario, Amigos) mantienen las suyas. */
+#app .segmented { gap: 8px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+#app .segmented-option {
+  display: grid; place-content: center; justify-items: center; gap: 3px; min-width: 0; min-height: 50px; padding: 8px 8px;
+  border: 1px solid #d6bf98; border-radius: 12px; color: #2a1a10; text-align: center;
+  background: linear-gradient(165deg, #fffaf1, #f6ead8);
+  box-shadow: inset 0 1px 0 #fff, 0 2px 6px #5a341a12;
+  transition: border-color var(--motion-base) ease, background var(--motion-base) ease, box-shadow var(--motion-base) ease;
+}
+#app .segmented-option b { color: inherit; font: 600 clamp(.84rem, 3.7vw, .98rem)/1.15 var(--font-display); overflow-wrap: normal; text-wrap: balance; }
+#app .segmented-option small { margin-top: 1px; color: #5c4a3a; font: .72rem/1.3 var(--ui-font); opacity: 1; text-wrap: pretty; }
+#app .segmented-option.is-on {
+  border-color: #b8653d; color: #8e3d1e;
+  background: linear-gradient(165deg, #fdf3ea, #f4dccb);
+  box-shadow: 0 0 0 1px #b8653d, 0 8px 18px -12px #b8653dcc, inset 0 1px 0 #fff;
+}
+@media (hover: hover) and (pointer: fine) { #app .segmented-option:not(.is-on):hover { border-color: #c9a06f; background: linear-gradient(165deg, #fffaf1, #f3e3cc); color: #2a1a10; } }
+#app .segmented-option:has(input:focus-visible) { outline: 2px solid #b8653d; outline-offset: 3px; box-shadow: none; }
+:root[data-theme="dark"] #app .segmented-option { color: #f5e6cc; background: #2c2118; border-color: #6d5435; box-shadow: none; }
+:root[data-theme="dark"] #app .segmented-option small { color: #cdb99a; }
+:root[data-theme="dark"] #app .segmented-option.is-on { color: #ffd9bf; background: #3d2a1d; border-color: #d08a5e; box-shadow: 0 0 0 1px #d08a5e; }
+:root[data-theme="dark"] #app .quick-shell .quick-length-chip { color: #f5e6cc; background: #2c2118; border-color: #6d5435; box-shadow: none; }
+:root[data-theme="dark"] #app .quick-shell .quick-length-chip small { color: #cdb99a; }
+:root[data-theme="dark"] #app .quick-shell .quick-length-chip.is-selected { color: #ffd9bf; background: #3d2a1d; border-color: #d08a5e; box-shadow: 0 0 0 1px #d08a5e; }
+@media (hover: hover) and (pointer: fine) { :root[data-theme="dark"] #app .segmented-option:not(.is-on):hover { color: #f5e6cc; background: #33271c; border-color: #8c6f45; } }
+
 /* Tiempo por carta: el mismo selector en todas las pantallas (solitario, un solo móvil,
    amigos, competición, Retos rápidos, salas de espera y mesas públicas), sea cual sea el
    estilo de los demás campos de la pantalla. Cuatro pastillas de papel en una fila; la de

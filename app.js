@@ -900,7 +900,6 @@
             </div>
           </div>
           <div class="setup-block">
-            <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Tiempo</span></div>
             ${CT.Tiempo.field("local")}
           </div>
           <div class="setup-block">
