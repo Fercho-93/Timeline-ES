@@ -113,7 +113,7 @@
   const SHORT_LENGTHS=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga']];
   const LONG_LENGTHS=[...SHORT_LENGTHS,[10,'Maratón'],[15,'Gran maratón'],[20,'Resistencia']];
   function lengthChips(id,options,label,attrs='') {
-    const chip=([n,text])=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"><b>${n}</b><span>${n===1?'reto':'retos'}</span><small>${text}</small></button>`;
+    const chip=([n,text])=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}${text==='Todo el catálogo'?' quick-length-all':''}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"><b>${n}</b><span>${n===1?'reto':'retos'}</span><small>${text}</small></button>`;
     return `<div class="field duel-kind-field"${attrs}><span class="field-label" id="${id}-label">${label}</span><div class="quick-length" role="radiogroup" aria-labelledby="${id}-label">${options.map(chip).join('')}</div><input type="hidden" id="${id}" data-quick-length-input value="3"></div>`;
   }
   // Qué pasa al fallar en las partidas con amigos: se elige al crearlas, igual en un solo móvil,

@@ -5156,6 +5156,17 @@ html:has(#app.atlas-board) .motas { display: none; }
 :root[data-theme="dark"] #app .quick-shell .quick-length-chip.is-selected { color: #ffd9bf; background: #3d2a1d; border-color: #d08a5e; box-shadow: 0 0 0 1px #d08a5e; }
 @media (hover: hover) and (pointer: fine) { :root[data-theme="dark"] #app .segmented-option:not(.is-on):hover { color: #f5e6cc; background: #33271c; border-color: #8c6f45; } }
 
+/* Tres opciones con icono (el «Ritmo» de las partidas con amigos): una columna a todo el ancho, con el
+   icono a la izquierda y el círculo de marcado a la derecha, centrado. Con dos columnas la tercera
+   quedaba sola con un hueco al lado. */
+#app .solo-home .solo-panel .segmented:has(.duel-option-mark):has(> .segmented-option:nth-child(3)) { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+#app .solo-home .solo-panel .segmented:has(.duel-option-mark):has(> .segmented-option:nth-child(3)) > .segmented-option {
+  grid-template-columns: 36px minmax(0, 1fr); align-items: center; align-content: center; justify-items: start; column-gap: 12px; row-gap: 0;
+  min-height: 64px; padding: 10px 46px 10px 13px;
+}
+#app .solo-home .solo-panel .segmented:has(.duel-option-mark):has(> .segmented-option:nth-child(3)) > .segmented-option > span { display: grid; gap: 1px; min-width: 0; }
+#app .solo-home .solo-panel .segmented:has(.duel-option-mark):has(> .segmented-option:nth-child(3)) > .segmented-option::after { top: 50%; margin-top: -9px; }
+
 /* Tiempo por carta: el mismo selector en todas las pantallas (solitario, un solo móvil,
    amigos, competición, Retos rápidos, salas de espera y mesas públicas), sea cual sea el
    estilo de los demás campos de la pantalla. Cuatro pastillas de papel en una fila; la de
