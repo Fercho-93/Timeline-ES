@@ -337,6 +337,7 @@
           <div class="solo-panel-head"><h3>Qué juegas</h3></div>
           ${lengthField(competitionConfig.rounds)}
           <div class="field"><label for="competition-cards">Cartas por tema</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
+          ${CT.ManoInicial.maximoField()}
           ${CT.Ghost.difficultySelect("competition-difficulty", competitionDifficulty).replace('class="field difficulty-field"', 'class="field difficulty-field competition-difficulty"')}
           ${CT.Tiempo.field("comp-solo")}
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-competition">Empezar competición <span aria-hidden="true">→</span></button>
@@ -394,7 +395,7 @@
   function compBrief(ritmo) {
     return ritmo === "turnos"
       ? `Entre dos, cada uno desde su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
-      : "Una sala de 2 a 9 personas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno.";
+      : "Una sala de hasta el máximo de personas que elijas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno.";
   }
   function startCompFriends() {
     const opciones = competitionOptions(), ritmo = compPace();
@@ -2574,9 +2575,10 @@
         <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
         <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
       </div>
-      ${bloque("directo", `<div class="duel-brief"><p>Una sala de 2 a 9 personas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Al crearla compartes el código, el enlace o el QR.</p></div>
+      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de personas que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Al crearla compartes el código, el enlace o el QR.</p></div>
         ${CT.ManoInicial.field()}
         ${CT.ManoInicial.poderesField()}
+        ${CT.ManoInicial.maximoField()}
         <div class="field duel-kind-field">
           <span class="field-label" id="live-net-label">Conexión</span>
           <div class="segmented" role="radiogroup" aria-labelledby="live-net-label">

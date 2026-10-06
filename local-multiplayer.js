@@ -304,7 +304,7 @@
     if (tournament) modeKey = tournament.queue[0];
     try {
       hostSession = CT.LocalSession.createHostSession({
-        roomCode, hostName: name, avatarId: CT.Avatares.ownId(), modeKey, tournament,
+        roomCode, hostName: name, avatarId: CT.Avatares.ownId(), modeKey, tournament, capacity: CT.ManoInicial?.maximo?.(),
         deckFingerprint: CT.deckFingerprint(modeKey),
         onChange: onRoomChange,
         onPeerLost: (lostName, playing) => showToast(playing
@@ -485,7 +485,7 @@
   // Anfitrión: invitar a una persona más
   async function openInvite() {
     if (!hostSession || busy) return;
-    if (roomState.playerOrder.length >= CT.LocalRoom.MAX_PLAYERS) { showToast("La sala ya está llena"); return; }
+    if (roomState.playerOrder.length >= (roomState.capacity ?? CT.LocalRoom.MAX_PLAYERS)) { showToast("La sala ya está llena"); return; }
     busy = true;
     screen = "local-invitar";
     paint(`<div class="shell online-shell">${header("local-lobby")}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Preparando la invitación</h2></div></section></div>`, "local-invitar");
@@ -662,7 +662,7 @@
       <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
       ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una sala → Buscar salas cercanas». Para un Android, usa el QR.</p>` : ""}
       <div class="online-lobby-grid">
-        <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
+        <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${roomState.capacity ?? CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${settings}</section>
       </div>
     </div>`, "local-lobby");

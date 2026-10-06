@@ -105,6 +105,23 @@ await env.withSecurityRulesDisabled(async c=>{
 await check('TRAMPA: al irse, pasarle la mesa a quien no toca',false,updateDoc(doc(ctx(H),'rooms',CODE),{players:{[P2]:player('Bea'),[P3]:player('Cid')},playerOrder:[P2,P3],hostUid:P3,version:3,updatedAt:serverTimestamp()}));
 await check('quien lleva la mesa se va y la lleva quien queda primero',true,updateDoc(doc(ctx(H),'rooms',CODE),{players:{[P2]:player('Bea'),[P3]:player('Cid')},playerOrder:[P2,P3],hostUid:P2,version:3,updatedAt:serverTimestamp()}));
 
+console.log('\nSala privada con máximo de participantes');
+{
+  const priv=(cap)=>({...room(),matchmaking:undefined,queueKey:undefined,capacity:cap});
+  const limpia=o=>Object.fromEntries(Object.entries(o).filter(([,v])=>v!==undefined));
+  await env.clearFirestore();
+  await check('se crea una sala privada con máximo 2',true,(async()=>{const db=ctx(H),b=writeBatch(db);b.set(doc(db,'rooms',CODE),limpia(priv(2)));b.set(doc(db,'roomCreation',H),{lastCreatedAt:serverTimestamp(),roomCode:CODE});return b.commit();})());
+  await env.clearFirestore();
+  await check('TRAMPA: máximo de 12 en una sala privada',false,(async()=>{const db=ctx(H),b=writeBatch(db);b.set(doc(db,'rooms',CODE),limpia(priv(12)));b.set(doc(db,'roomCreation',H),{lastCreatedAt:serverTimestamp(),roomCode:CODE});return b.commit();})());
+  await env.clearFirestore();
+  await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'rooms',CODE),{...limpia(priv(2)),createdAt:new Date(),updatedAt:new Date()}));
+  await check('la segunda persona entra en la sala de máximo 2',true,updateDoc(doc(ctx(P2),'rooms',CODE),{players:{[H]:player('Ana'),[P2]:player('Bea')},playerOrder:[H,P2],version:2,updatedAt:serverTimestamp()}));
+  await env.clearFirestore();
+  await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'rooms',CODE),{...limpia(priv(2)),playerOrder:[H,P2],players:{[H]:player('Ana'),[P2]:player('Bea')},version:2,createdAt:new Date(),updatedAt:new Date()}));
+  await check('TRAMPA: una tercera persona no cabe en la sala de máximo 2',false,updateDoc(doc(ctx(P3),'rooms',CODE),{players:{[H]:player('Ana'),[P2]:player('Bea'),[P3]:player('Cid')},playerOrder:[H,P2,P3],version:3,updatedAt:serverTimestamp()}));
+  await env.clearFirestore();
+}
+
 console.log('\nTablón de mesas públicas');
 {
   const { collection, query, orderBy, limit, getDocs, deleteDoc } = await import('firebase/firestore');

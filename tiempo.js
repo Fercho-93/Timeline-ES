@@ -103,5 +103,19 @@
   });
   // Texto para la sala de espera, que solo enseña lo elegido.
   const poderesTexto = (p = poderes()) => p.pulse && p.ghost ? "Pulso y Fantasma" : p.pulse ? "Pulso" : p.ghost ? "Fantasma" : "sin poderes";
-  CT.ManoInicial = { get: mano, field: manoField, poderes, poderesField, poderesTexto };
+  // Máximo de personas de la sala (2–9): se elige antes de crearla.
+  const CLAVE_MAX = "continuum-live-max-v1", MAXIMOS = [2, 3, 4, 5, 6, 7, 8, 9];
+  function maximo() {
+    try { const v = Number(CT.Storage.getItem(CLAVE_MAX)); if (MAXIMOS.includes(v)) return v; } catch { /* sin almacenamiento */ }
+    return 4;
+  }
+  function maximoField() {
+    const actual = maximo();
+    return `<div class="field"><label for="live-max-players">Máximo de participantes</label><select id="live-max-players" data-maximo-sala>${MAXIMOS.map(n => `<option value="${n}"${n === actual ? " selected" : ""}>${n} jugadores</option>`).join("")}</select></div>`;
+  }
+  document.addEventListener("change", event => {
+    const select = event.target.closest?.("select[data-maximo-sala]");
+    if (select && MAXIMOS.includes(Number(select.value))) { try { CT.Storage.setItem(CLAVE_MAX, String(Number(select.value))); } catch { /* almacenamiento lleno */ } }
+  });
+  CT.ManoInicial = { get: mano, field: manoField, poderes, poderesField, poderesTexto, maximo, maximoField };
 })();

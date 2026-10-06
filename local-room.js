@@ -28,12 +28,13 @@
 
   // `tournament` (de `CT.Tournament.create`) convierte la sala en una competición: varios
   // temas al azar, uno por ronda, con las mismas reglas de puntos que la sala online.
-  function createRoom({ roomCode, hostId, hostName, avatarId = null, modeKey, deckFingerprint = null, tournament = null, now }) {
+  function createRoom({ roomCode, hostId, hostName, avatarId = null, modeKey, deckFingerprint = null, tournament = null, capacity = MAX_PLAYERS, now }) {
     if (!roomCode || !hostId || !hostName || !modeKey) throw new Error("INVALID_ROOM");
     return {
       roomCode, mode: tournament ? tournament.queue[0] : modeKey, deckFingerprint,
       ...(tournament ? { tournament } : {}),
       hostId, status: "lobby", phase: "lobby", version: 1,
+      capacity: Number.isInteger(capacity) && capacity >= MIN_PLAYERS && capacity <= MAX_PLAYERS ? capacity : MAX_PLAYERS,
       handSize: tournament?.handSize || 4, turnSeconds: 30,
       playerOrder: [hostId],
       players: { [hostId]: { name: hostName, ...(avatarId ? { avatarId } : {}), hand: [], joinedAt: now } },
@@ -59,7 +60,7 @@
       return { ...state, players: { ...state.players, [playerId]: { ...state.players[playerId], away: false } }, version: state.version + 1, updatedAt: now };
     }
     if (state.status !== "lobby" || state.tournament?.index > 0) throw new Error("ALREADY_STARTED");
-    if (state.playerOrder.length >= MAX_PLAYERS) throw new Error("ROOM_FULL");
+    if (state.playerOrder.length >= (state.capacity ?? MAX_PLAYERS)) throw new Error("ROOM_FULL");
     return {
       ...state,
       players: { ...state.players, [playerId]: { name, ...(avatarId ? { avatarId } : {}), hand: [], joinedAt: now } },

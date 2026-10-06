@@ -619,6 +619,7 @@ async function createRoom(name) {
       phase: "lobby",
       version: 1,
       handSize: tournament?.handSize || 4, turnSeconds: (CT.Tiempo?.get?.("amigos", 15) ?? 15),
+      capacity: CT.ManoInicial?.maximo?.() ?? 9,
       playerOrder: [user.uid],
       players: { [user.uid]: { name, avatarId: CT.Avatares.ownId(), hand: [], joinedAt: Date.now(), clientVersion: CLIENT_VERSION } },
       deck: [], discard: [], timeline: [], current: 0, starter: user.uid,
@@ -652,7 +653,7 @@ async function joinRoom(code, name) {
       if (data.deckFingerprint && data.deckFingerprint !== CT.deckFingerprint(data.mode)) throw new Error("DECK_MISMATCH");
       if (data.playerOrder.includes(user.uid)) return;
       if (data.status !== "lobby") throw new Error("ALREADY_STARTED");
-      if (data.playerOrder.length >= 9) throw new Error("ROOM_FULL");
+      if (data.playerOrder.length >= (data.capacity ?? 9)) throw new Error("ROOM_FULL");
       transaction.update(reference, {
         players: { ...data.players, [user.uid]: { name, avatarId: CT.Avatares.ownId(), hand: [], joinedAt: Date.now(), clientVersion: CLIENT_VERSION } },
         playerOrder: [...data.playerOrder, user.uid],
@@ -877,7 +878,7 @@ function renderLobby() {
   const draft = document.getElementById("starter-guess-input")?.value || "";
   const isHost = roomState.hostUid === user.uid;
   const isPublic = roomState.matchmaking === 'public';
-  const capacity = isPublic ? roomState.capacity : 9;
+  const capacity = roomState.capacity ?? 9;
   const people = roomState.playerOrder.map(uid => roomState.players[uid]);
   const seats = Array.from({length:capacity},(_,index)=>{
     const uid=roomState.playerOrder[index], player=uid ? roomState.players[uid] : null;

@@ -75,11 +75,11 @@
   // partida, esa persona conserva su plaza y sus cartas (`player-away`) y puede volver a
   // sentarse con una invitación nueva; en la sala de espera, simplemente se libera la
   // plaza. `onPeerLost` y `onPeerBack` reciben el nombre, para avisar en pantalla.
-  function createHostSession({ roomCode, hostName, avatarId = null, modeKey, deckFingerprint = null, tournament = null, now = () => Date.now(), onChange, onPeerLost, onPeerBack }) {
+  function createHostSession({ roomCode, hostName, avatarId = null, modeKey, deckFingerprint = null, tournament = null, capacity, now = () => Date.now(), onChange, onPeerLost, onPeerBack }) {
     // El mazo de cada acción es el de la ronda en juego: en una competición cambia de un tema a otro.
     const contexts = new Map();
     const contextOf = mode => { if (!contexts.has(mode)) contexts.set(mode, contextFor(mode, now)); return contexts.get(mode); };
-    let room = CT.LocalRoom.createRoom({ roomCode, hostId: HOST_ID, hostName, avatarId, modeKey, deckFingerprint, tournament, now: now() });
+    let room = CT.LocalRoom.createRoom({ roomCode, hostId: HOST_ID, hostName, avatarId, modeKey, deckFingerprint, tournament, capacity, now: now() });
     onChange(room);
     const peerPlayers = new Map();
     function peerOf(playerId) { for (const [peerId, id] of peerPlayers) if (id === playerId) return peerId; return null; }

@@ -910,7 +910,8 @@ service cloud.firestore {
         return signedIn()
           && resource.data.status == 'lobby'
           && !(request.auth.uid in resource.data.playerOrder)
-          && resource.data.playerOrder.size() < (resource.data.get('matchmaking','private') == 'public' ? resource.data.capacity : 9)
+          // Las salas privadas también pueden tener un máximo propio (2–9); sin él, caben nueve.
+          && resource.data.playerOrder.size() < resource.data.get('capacity', 9)
           && changed().hasOnly(['players', 'playerOrder', 'version', 'updatedAt'])
           && (resource.data.get('matchmaking','private') != 'public'
             || (request.resource.data.players[request.auth.uid].clientVersion == resource.data.clientVersion
@@ -1411,6 +1412,8 @@ service cloud.firestore {
 
       allow create: if registered()
         && request.resource.data.get('finalRoundOffset',0) == 0
+        && (request.resource.data.get('matchmaking','private') == 'public' || !('capacity' in request.resource.data)
+          || (request.resource.data.capacity is int && request.resource.data.capacity >= 2 && request.resource.data.capacity <= 9))
         && (request.resource.data.get('matchmaking','private') != 'public'
           || (request.resource.data.matchmaking == 'public'
             && request.resource.data.capacity is int && request.resource.data.capacity >= 2 && request.resource.data.capacity <= 4
