@@ -14,7 +14,6 @@
     'solo-hub': 'mode-walk-solo.webp',
     'friends-hub': 'mode-walk-multi.webp',
     'competition-menu': 'competition-engraving.webp',
-    'public-match': 'mode-walk-multi.webp',
     'public-create': 'menu-wifi.webp',
     'online-collections': 'menu-collections.webp',
     'quick-public': 'menu-quick.webp',
@@ -121,8 +120,7 @@
         <ul class="public-board-list" data-public-board aria-live="polite"><li class="public-board-empty">Buscando mesas…</li></ul></section>`,
       `<h2 class="mode-section-title public-quick-label">Partida rápida</h2><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
       capacityField(false),
-      modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.', false, 'data-online-kind="surprise"'),
-      modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
+      modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas o ninguno, y te sentamos en la primera mesa libre.', false, 'data-online-kind="collections"'),
       modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"')
     ].join(''), modeArt['online-hub']);
     watchBoard();
@@ -258,7 +256,7 @@
       <div class="mode-topic-grid">${modes.map(([key,m])=>`<label class="mode-topic"><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
       <p class="hint mode-topic-count" data-topic-count aria-live="polite">Ningún tema elegido: buscaremos en todas.</p>
       ${capacityField()}
-      ${modeDoor('public-match', modeArt['online-hub'], 'Buscar mesa', 'La mesa compartirá un único tema.', true, 'data-online-kind="collections-vote"')}</div>`, modeArt['online-collections']);
+      ${modeDoor('public-match', modeArt['online-hub'], 'Buscar mesa al azar', 'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.', true, 'data-online-kind="collections-vote"')}</div>`, modeArt['online-collections']);
   }
 
   // «Grandes colecciones» se despliega dentro de la propia pantalla; `route` decide qué pasa al
@@ -398,6 +396,12 @@
       if(full){topicInput.checked=false;checked=checked.filter(x=>x!==topicInput);}
       const count=app.querySelector('[data-topic-count]');
       if(count) count.textContent=full?'Ya tienes 3 temas: quita uno para elegir otro.':checked.length?`${checked.length} de 3 temas elegidos.`:'Ningún tema elegido: buscaremos en todas.';
+      // Sin temas el botón busca mesa con un mazo al azar; con temas, en esos temas.
+      const door=app.querySelector('[data-online-kind="collections-vote"]');
+      if(door){
+        door.querySelector('b').textContent=checked.length?'Buscar mesa':'Buscar mesa al azar';
+        door.querySelector('small').textContent=checked.length?'La mesa compartirá un único tema de los que has marcado.':'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.';
+      }
       return;
     }
     const publicEntry = event.target.closest('[data-action="public-match"][data-online-kind]');

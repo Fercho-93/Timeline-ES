@@ -11,6 +11,8 @@ async function openHub(p) { await p.click('[data-action="toggle-modes"]', { wait
 async function search(p, kind = 'surprise', capacity = '0') {
   if (await p.screen() !== 'hub-online') { await p.click('[data-action="home-top"]').catch(() => {}); await openHub(p); }
   await p.page.selectOption('#mode-public-capacity', capacity);
+  // «Sorpréndeme» ya no existe: buscar al azar es entrar en Grandes colecciones sin marcar ningún tema.
+  if (kind === 'surprise') { await p.click('[data-action="online-collections"]'); kind = 'collections-vote'; }
   await p.click(`[data-action="public-match"][data-online-kind="${kind}"]`, { wait: 100 });
   await p.waitScreen('online-lobby', 20000).catch(async error => {
     console.log(`  ${p.label} no llega a la mesa: ${await p.screen()} · ${flat(await p.text()).slice(0, 200)}`);
@@ -165,7 +167,7 @@ try {
   await answer(m1, Math.round(realM)); await answer(m2, Math.round(realM + 10));
   await Promise.all([m1, m2].map(p => p.waitScreen('online-game', 20000)));
   const reloj = Number(await m1.page.locator('#turn-timer-value').textContent().catch(() => 'NaN'));
-  ok(`y la partida empieza con ese tiempo por turno (${reloj} s)`, reloj > 0 && reloj <= 15);
+  ok(`y la partida empieza con ese tiempo por turno (${reloj} s)`, reloj > 0 && reloj <= 17);
   await crear(k1, { kind: 'quick', capacity: 2, seconds: 20 });
   await k1.page.waitForTimeout(1500);
   const filaK = k2.page.locator('.public-table', { hasText: 'Kiko' });

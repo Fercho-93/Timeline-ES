@@ -24,13 +24,14 @@ export async function publishTable(entry) {
   if (previous?.sig === sig && Date.now() - previous.at < RENEW_MS) return;
   written.set(entry.code, { sig, at: Date.now() });
   try { await setDoc(doc(db, 'publicTables', entry.code), { ...entry, updatedAt: serverTimestamp() }); }
-  catch (error) { written.delete(entry.code); console.warn('PUBLIC_TABLE', error?.code || error); }
+  // Si la mesa acaba de llenarse o empezar, la regla ya no deja anunciarla: es lo esperado, no un fallo.
+  catch (error) { written.delete(entry.code); if (error?.code !== 'permission-denied') console.warn('PUBLIC_TABLE', error?.code || error); }
 }
 
 export async function removeTable(code) {
   written.delete(code);
   try { await deleteDoc(doc(db, 'publicTables', code)); }
-  catch (error) { if (error?.code !== 'not-found') console.warn('PUBLIC_TABLE_REMOVE', error?.code || error); }
+  catch (error) { if (error?.code !== 'not-found' && error?.code !== 'permission-denied') console.warn('PUBLIC_TABLE_REMOVE', error?.code || error); }
 }
 
 export async function readTable(code) {
