@@ -350,7 +350,6 @@
           <div class="solo-panel-head"><h3>Qué juegas</h3></div>
           ${lengthField(competitionConfig.rounds)}
           <div class="field"><label for="competition-cards">Cartas por tema</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
-          ${CT.ManoInicial.maximoField()}
           ${CT.Ghost.difficultySelect("competition-difficulty", competitionDifficulty).replace('class="field difficulty-field"', 'class="field difficulty-field competition-difficulty"')}
           ${CT.Tiempo.field("comp-solo")}
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-competition">Empezar competición <span aria-hidden="true">→</span></button>
@@ -407,7 +406,7 @@
   function compBrief(ritmo) {
     return ritmo === "turnos"
       ? `Entre dos, cada uno desde su móvil y cuando pueda: temas al azar (hasta ${COMP_TURN_THEMES}), una carta cada vez. Creas la partida, haces tu primera jugada y le mandas el enlace a tu rival.`
-      : "Una sala de hasta el máximo de personas que elijas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
+      : "Una sala para varias personas: un tema al azar por ronda. Ganar la ronda suma un punto; las cartas que te queden restan su número menos uno. Quién empieza se decide en la sala de espera con un minijuego.";
   }
   function startCompFriends() {
     const opciones = competitionOptions(), ritmo = compPace();
@@ -896,7 +895,7 @@
     screen = "setup";
     starterDraw = null;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
-      <section class="setup-section"><h2 data-focus tabindex="-1">${currentMode().name}</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
+      <section class="setup-section"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 data-focus tabindex="-1">Un solo móvil</h2><p class="lead">Añade hasta 9 personas y decidid quién empieza adivinando la cifra de una carta.</p>
         ${game && !game.winners && !pendingTournament && sessionStorage.getItem('continuum-entry-route') === 'local' ? '<button class="btn btn-secondary btn-block" data-action="continue">Continuar partida guardada <span>→</span></button>' : ''}
         <div class="panel">
           <div class="setup-block">
@@ -3843,7 +3842,7 @@
   // aplicación, igual que `duelo.js`. `launchLocalMultiplayer` solo entrega el control.
   function launchLocalMultiplayer() {
     const fromFriends = ['online', 'wifi', 'duel'].includes(sessionStorage.getItem('continuum-entry-route'));
-    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, onBack: fromFriends ? duelHome : jugarView });
+    CT.LocalMultiplayer.open({ modeKey: selectedModeKey, createOnly: fromFriends, onBack: fromFriends ? duelHome : jugarView });
   }
 
   CT.launchPublicMatch = () => launchPublicMatch();

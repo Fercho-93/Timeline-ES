@@ -243,11 +243,14 @@
 
   // ---------------------------------------------------------------------------
   // Entrada
+  // «Crear partida» ya ha decidido que se crea: la entrada no vuelve a ofrecer unirse.
+  let createOnly = false;
   function open(options = {}) {
     stopCamera();
     onBackToMenu = typeof options.onBack === "function" ? options.onBack : null;
     modeKey = CT.has(options.modeKey) ? options.modeKey : CT.DEFAULT_MODE;
     competition = options.competition || null;
+    createOnly = !!options.createOnly;
     lobbySettings.handSize = String(CT.ManoInicial?.get?.() ?? 4);
     { const p = CT.ManoInicial?.poderes?.() ?? {}; lobbySettings.pulse = !!p.pulse; lobbySettings.ghost = !!p.ghost; lobbySettings.preset = p.pulse && p.ghost ? "advanced" : !p.pulse && !p.ghost ? "simple" : "custom"; }
     role = null; hostSession = null; guestSession = null; roomState = null; myPlayerId = "";
@@ -287,9 +290,9 @@
       <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${escapeHtml(CT.mode(modeKey).name)}</div><h2 data-focus tabindex="-1">Una mesa,<br>varias pantallas — sin internet</h2><p class="lead">Cada persona juega desde su móvil, conectadas por Wi-Fi local, sin ninguna conexión a internet.</p></section>
       ${wifiNote()}
       ${cameraNote()}
-      <div class="online-entry-grid">
-        <div class="panel online-form"><span class="form-number">01</span><h3>Unirse a una sala</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme a la partida <span>→</span></button></div>
-        <form class="panel online-form" data-local-form="create"><span class="form-number">02</span><h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName()}"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
+      <div class="online-entry-grid${createOnly ? " online-entry-single" : ""}">
+        ${createOnly ? "" : '<div class="panel online-form"><span class="form-number">01</span><h3>Unirse a una sala</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme a la partida <span>→</span></button></div>'}
+        <form class="panel online-form" data-local-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName()}"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
       </div>
       <p class="online-note">No necesita conexión a internet en ningún momento.</p>
     </div>`, "local-entrada");

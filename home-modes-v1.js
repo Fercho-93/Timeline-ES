@@ -104,11 +104,10 @@
 
   // El tamaño de la mesa se recuerda durante la sesión y se enseña igual en las dos pantallas.
   function publicCapacity() { return sessionStorage.getItem('continuum-public-capacity') || '0'; }
-  // `nota`: la explicación de cuándo empieza la partida (en «Jugar online» ya sale en Crear mesa).
-  function capacityField(nota = true) {
+  function capacityField() {
     const cap = publicCapacity();
     const options = [['0', 'Cualquier mesa · más rápido'], ['2', 'Hasta 2 jugadores'], ['3', 'Hasta 3 jugadores'], ['4', 'Hasta 4 jugadores']];
-    return `<div class="panel mode-online-config"><div class="field"><label for="mode-public-capacity">Tamaño de mesa</label><select id="mode-public-capacity">${options.map(([value, label]) => `<option value="${value}"${value === cap ? ' selected' : ''}>${label}</option>`).join('')}</select></div>${nota ? '<p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</p>' : ''}</div>`;
+    return `<div class="panel mode-online-config"><div class="field"><label for="mode-public-capacity">Tamaño de mesa</label><select id="mode-public-capacity">${options.map(([value, label]) => `<option value="${value}"${value === cap ? ' selected' : ''}>${label}</option>`).join('')}</select></div></div>`;
   }
   // Jugar online, como el vestíbulo de Risk: alguien abre una mesa con su configuración
   // (juego, plazas y tiempo), la mesa aparece en la lista de mesas abiertas y los demás
@@ -119,7 +118,7 @@
       `<section class="public-board" aria-labelledby="public-board-title"><h2 class="mode-section-title" id="public-board-title">Mesas abiertas <small data-board-count></small></h2>
         <ul class="public-board-list" data-public-board aria-live="polite"><li class="public-board-empty">Buscando mesas…</li></ul></section>`,
       `<h2 class="mode-section-title public-quick-label">Partida rápida</h2><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
-      capacityField(false),
+      capacityField(),
       modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas o ninguno, y te sentamos en la primera mesa libre.', false, 'data-online-kind="collections"'),
       modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"')
     ].join(''), modeArt['online-hub']);
@@ -260,7 +259,7 @@
       <div class="mode-topic-picker"><p>Marca hasta 3 temas. Buscaremos mesa en esos temas; si no eliges ninguno, buscaremos en todas las colecciones.</p>
       <div class="mode-topic-grid">${modes.map(([key,m])=>`<label class="mode-topic"><input type="checkbox" value="${escapeHtml(key)}" data-public-topic> <span>${escapeHtml(m.name)}</span></label>`).join('')}</div>
       <p class="hint mode-topic-count" data-topic-count aria-live="polite">Ningún tema elegido: buscaremos en todas.</p>
-      ${capacityField()}
+      <p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más. El tamaño de mesa es el que elegiste en Jugar online.</p>
       ${modeDoor('public-match', modeArt['online-hub'], 'Buscar mesa al azar', 'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.', true, 'data-online-kind="collections-vote"')}</div>`, modeArt['online-collections']);
   }
 
@@ -279,12 +278,12 @@
   // Wi-Fi local y los duelos ya no son puertas aparte: el ritmo se elige al crear la partida.
   const FRIEND_HUBS = {
     local: ['hub-friends-local', 'Un solo móvil', 'Pasad el teléfono', 'menu-local.webp'],
-    online: ['hub-friends-online', 'Cada uno en su móvil', 'Juntos o a distancia', 'menu-private.webp']
+    online: ['hub-friends-online', 'Cada uno en su móvil', 'Juntos o a distancia', 'mode-walk-multi.webp']
   };
   // Cada uno en su móvil: por un lado unirse a lo que ya ha creado otro; por otro, crear (mazo, retos o competición).
   let createRoomOpen = false;
   function createRoomGroup(route) {
-    return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-private.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear partida</b><small>Elige qué jugar y después el ritmo: en directo, por turnos o con las mismas cartas.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
+    return `<div class="mode-create-room"><button type="button" class="mode-entry mode-create-toggle" data-action="create-room-toggle" aria-expanded="${createRoomOpen}" aria-controls="mode-create-list"><span class="mode-entry-art" aria-hidden="true"><img src="assets/menu-wifi.webp" alt="" loading="lazy" decoding="async"></span><span class="mode-entry-copy"><b>Crear partida</b><small>Elige qué jugar y después el ritmo: en directo, por turnos o con las mismas cartas.</small><span class="mode-entry-cta" aria-hidden="true">${createRoomOpen ? 'Ocultar' : 'Elegir qué jugar'} <span>${createRoomOpen ? '↑' : '↓'}</span></span></span></button>
       <div id="mode-create-list" class="mode-create-list"${createRoomOpen ? '' : ' hidden'}>${inlineCollections(route)}${modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: los mismos retos para todos.', false, `data-friend-quick="${route}"`, 'Preparar partida')}</div></div>`;
   }
   function openFriendHub(route) {

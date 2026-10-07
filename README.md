@@ -2,27 +2,33 @@
 
 ## Cómo está organizado el juego
 
-La portada tiene tres puertas y nada más:
+La portada tiene tres puertas y un atajo:
 
+- **Jugar.** Se despliega en la propia portada con tres caminos: **Jugar solo**, **Jugar con
+  amigos** y **Jugar online**. En todos, primero se elige *qué* se juega y después *cómo*:
+  - **Jugar solo:** Grandes colecciones (mazos completos, agrupados por colección, con la
+    **Competición** como último panel de la lista) o Retos rápidos.
+  - **Jugar con amigos:** *Un solo móvil* (pasando el teléfono) o *Cada uno en su móvil*, donde
+    se puede unirse a una partida, crearla (en directo, por turnos o con las mismas cartas) o
+    ver «Tus partidas».
+  - **Jugar online:** mesas públicas. Se crea una mesa, se elige entre las abiertas o se busca
+    una partida rápida, de Grandes colecciones o de Retos rápidos.
+- **Unirme a una partida.** Atajo para quien recibe un QR, un enlace o un código.
 - **Reto diario.** Uno para todo el mundo: cada día se sortea un mazo con la fecha como
-  semilla y de él salen las mismas 15 cartas en todos los móviles. El mazo es sorpresa:
-  la portada enseña solo la hoja de calendario del día, y al tocarla una presentación de
-  unos tres segundos pasa los nombres de los mazos hasta pararse en el de hoy; el botón
-  «Jugar» empieza la partida. Un reto ya empezado se retoma sin presentación. Enseña la racha y, una vez jugado,
-  el mazo que era y el resultado para compartirlo.
-- **Jugar.** Primero se elige *qué*: **Grandes colecciones** (los mazos completos,
-  agrupados en una cuadrícula por colección), **Retos rápidos** (temas cortos y concretos, como las redes sociales por
-  fecha de aparición) o **Competición** (un tema distinto en cada ronda). Después, *cómo*:
-  solo, multijugador (uno o varios móviles) o **retando a un amigo**.
-- **Atlas.** Lo que antes eran el perfil y la enciclopedia: la colección de cartas con la
-  puerta a todas ellas, la racha del reto diario con su calendario, los duelos, las
-  estadísticas y los logros.
+  semilla y de él salen las mismas 10 cartas en todos los móviles. Un día toca Grandes
+  colecciones y otro Retos rápidos. El mazo es sorpresa: en Grandes colecciones la portada
+  enseña solo la hoja de calendario del día y, al tocarla, una presentación de unos tres
+  segundos pasa los nombres de los mazos hasta pararse en el de hoy. Un reto ya empezado se
+  retoma sin presentación. Enseña la racha y, una vez jugado, el mazo que era y el resultado
+  para compartirlo. Debajo, un resumen con los aciertos de hoy, de la semana y la racha.
 
-Encima de las tres puertas, y solo cuando hay algo pendiente, un aviso de **duelos por
-turnos**: si es uno, lleva directo a él; si son varios, a la lista con el estado de cada
-uno (tu turno, esperando al rival, retos recibidos, invitaciones enviadas, historial).
+Encima, y solo cuando hay algo pendiente, un aviso de **duelos por turnos**: si es uno, lleva
+directo a él; si son varios, a la lista con el estado de cada uno (tu turno, esperando al
+rival, retos recibidos, invitaciones enviadas, historial).
 
-La barra inferior se queda en Inicio, Guía y Ajustes: a Jugar y al Atlas se entra desde la portada.
+La barra inferior tiene Inicio, Atlas, Guía y Ajustes. El **Atlas** reúne la colección de
+cartas con la puerta a todas ellas, la racha del reto diario con su calendario, los duelos, las
+estadísticas y los logros.
 
 ## Tu nombre y tu avatar
 
@@ -82,7 +88,7 @@ Validación: `node tests/quick-challenges.mjs`. La prueba visual
 
 ## Competición por rondas
 
-Desde la portada se abre Modo competición. En la siguiente hoja se elige Jugar solo o Multijugador; este último se despliega para escoger un móvil o varios móviles. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por ronda. Cada ronda usa un mazo aleatorio diferente; Gran mezcla se excluye porque combina otros mazos.
+La Competición es el último panel de la lista de Grandes colecciones, en Jugar solo, Un solo móvil y Cada uno en su móvil. Se configuran 3, 5 o todas las temáticas y entre 1 y 6 cartas por ronda. Cada ronda usa un mazo aleatorio diferente; Gran mezcla se excluye porque combina otros mazos.
 
 En solitario se suman los aciertos. En multijugador se reparten las cartas elegidas a cada participante (ajustadas si el mazo es pequeño), gana quien termine una vuelta completa sin cartas y se usa la final numérica secreta si hay varios. Ganar una ronda suma un punto; quedarse con cartas en la mano al terminarla penaliza con su número menos uno (una carta no resta nada, dos cartas restan un punto, tres restan dos, y así sucesivamente). Al terminar, el marcador muestra el ganador o el empate global en puntos.
 
@@ -191,7 +197,7 @@ La aplicación ofrece cuatro formas de jugar:
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
 - **En solitario:** una persona contra el mazo, con tres vidas.
-- **Competición:** un tema al azar tras otro, sin repetirse, hasta pasar por los quince juegos.
+- **Competición:** un tema al azar tras otro, sin repetirse, con 3, 5 o todas las temáticas a elegir.
 
 Al terminar una partida —local, en solitario o de competición— si hubo alguna carta mal
 colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su
@@ -433,7 +439,7 @@ y un botón para copiarlo.
 Tres formatos, los tres sin conexión y con la marca guardada en el propio móvil:
 
 - **Reto diario:** se entra desde la portada, no desde un mazo. Cada día sale un mazo —sorteado
-  con la fecha entre los gratuitos, sin repetir el del día anterior— y de él las mismas 15 cartas
+  con la fecha entre los gratuitos, sin repetir el del día anterior— y de él las mismas 10 cartas
   para todo el mundo, con un solo intento. Tiene su propio guardado, así que empezarlo no pisa una
   partida libre a medias del mismo mazo. Las cartas se
   barajan con la fecha como semilla, así que no hace falta ningún servidor para que dos móviles
@@ -446,7 +452,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   amigos necesitaría el día que exista, sin tener que rehacer partidas ya jugadas para tenerlo.
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
-- **Competición:** una ronda de 5 cartas por cada uno de los quince juegos, en un orden al azar
+- **Competición:** una ronda por tema (3, 5 o todos) con de 1 a 6 cartas a elegir, en un orden al azar
   distinto cada vez y sin repetir ninguno, con tres vidas nuevas en cada ronda. Al terminar la
   última se ve el marcador de todas las rondas juntas. No se puede dejar a medias y continuar
   después: cada ronda cambia de juego, y por tanto de dónde se guardaría la partida.

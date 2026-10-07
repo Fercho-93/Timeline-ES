@@ -11,7 +11,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 // Se entra como en la aplicación: Inicio → Jugar con amigos → Cada uno en su móvil → Crear
 // partida → mazo → En directo, sin internet → Crear sala.
-async function entrarWifi(w) {
+// `unirse`: quien se une no pasa por «Crear partida» (que ya no ofrece unirse), sino por la entrada completa.
+async function entrarWifi(w, { unirse = false } = {}) {
   const pausa = () => new Promise(resolve => setTimeout(resolve, 0));
   await pausa();
   for (const sel of ['[data-action="friends-hub"]', '[data-friend-hub="online"]', '[data-action="create-room-toggle"]', '[data-inline-route="online"]', '#mode-inline-drawer [data-block="historia"]', '#mode-inline-drawer [data-mode="history"]']) { click(w, sel); await pausa(); }
@@ -20,6 +21,7 @@ async function entrarWifi(w) {
     input.checked = true; input.dispatchEvent(new w.Event('change', { bubbles: true }));
   }
   click(w, '[data-action="start-live-room"]'); await pausa();
+  if (unirse) { w.CONTINUUM.LocalMultiplayer.open({ modeKey: w.CONTINUUM.DEFAULT_MODE, onBack: () => {} }); await pausa(); }
   return w.document;
 }
 
@@ -73,9 +75,14 @@ w = boot();
   ok("una oferta suelta se abre como Retos rápidos por Wi-Fi", (prueba("S2|o|ufrag|pwd|" + "A".repeat(43) + "|x|192.168.1.2:5000"), w.sessionStorage.getItem("continuum-entry-route") === "wifi-join-quick"));
 }
 
-console.log("\nUnirse a una sala con un código inválido");
+console.log("\nCrear partida por Wi-Fi no vuelve a ofrecer unirse");
 w = boot();
 await entrarWifi(w);
+ok("la entrada de «Crear partida» solo ofrece crear la sala", !w.document.querySelector('[data-local-action="go-unirse"]') && !!w.document.querySelector('[data-local-form="create"]'));
+
+console.log("\nUnirse a una sala con un código inválido");
+w = boot();
+await entrarWifi(w, { unirse: true });
 click(w, '[data-local-action="go-unirse"]');
 ok("pide el nombre y el código pegado", !!w.document.getElementById("local-guest-name") && !!w.document.getElementById("local-guest-offer"));
 w.document.getElementById("local-guest-name").value = "Ana";
@@ -339,7 +346,7 @@ const red2 = fakeNetwork();
 const h2 = boot(), g2 = boot();
 for (const win of [h2, g2]) { red2.install(win); win.confirm = () => true; }
 await entrarWifi(h2); submit(h2, '[data-local-form="create"]');
-await entrarWifi(g2);
+await entrarWifi(g2, { unirse: true });
 await conecta(h2, g2);
 await until(() => pantalla(g2) === "local-lobby");
 click(h2, '[data-local-action="leave"]');
