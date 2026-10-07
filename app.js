@@ -2795,7 +2795,9 @@
         : slotMarkup(i, timelineCards.length, "solo-place", true, i === failIndex));
       if (i < timelineCards.length) slots.push(timelineCardMarkup(timelineCards[i], soloHidden(), true));
     }
-    const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + Math.ceil(solo.deck.length / (1 + CT.Ghost.level(solo.difficulty).extra));
+    // Sin un total fijo, lo que queda por colocar son las cartas del mazo (las juegues tú o las
+    // ponga el tablero): cuántas pondrá el tablero depende de tus aciertos.
+    const restantes = solo.total ? solo.total - solo.played : (solo.pendingResult ? 0 : 1) + solo.deck.length;
     const etiqueta = soloLabel();
     paint(`<div class="shell">${header(`<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="${solo.kind === "comp" ? "abandon-comp" : "solo-menu"}">Salir</button>`)}
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${sinVidas() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
@@ -2806,7 +2808,7 @@
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>${solo.difficulty === "expert" ? "Fechas ocultas toda la partida. Guíate por las ilustraciones." : "Fechas ocultas solo esta jugada."}</small></div></div>` : ""}
       <section class="board-focus-card"><div class="hand-title"><h3>Tu carta</h3></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
       <section class="board-timeline-section"><div class="hand-title"><h3>${currentAxis().timelineTitle}</h3></div>${CT.timelineEnds(selectedModeKey)}${CT.timelineMap(selectedModeKey, timelineCards, { hidden: soloHidden() })}<div class="timeline-wrap"><div class="timeline">${slots.join("")}</div></div></section>
-      ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">El tablero ha incorporado ${solo.autoAdded.length} ${solo.autoAdded.length === 1 ? "carta" : "cartas"}: ${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}. No suman aciertos.</p>` : ""}
+      ${solo.autoAdded?.length ? `<p class="auto-cards" role="status">Por tu acierto, el tablero se complica: ${solo.autoAdded.length === 1 ? "entra 1 carta" : `entran ${solo.autoAdded.length} cartas`} bien colocada${solo.autoAdded.length === 1 ? "" : "s"} (${solo.autoAdded.map(id => escapeHtml(cardsById.get(id).title)).join(" · ")}). ${solo.autoAdded.length === 1 ? "No suma" : "No suman"} aciertos.</p>` : ""}
     </div>`);
     if (failIndex !== null) setTimeout(() => CT.scrollToElement(document.querySelector(".timeline-wrap"), document.querySelector(".slot-correct")), 0);
     // Las cartas que acaba de colocar el tablero se ven llegar, una detrás de otra, y la
@@ -2928,7 +2930,10 @@
     // consume por la inserción automática, que no modifica aciertos ni vidas.
     solo.current = solo.deck.shift();
     solo.autoAdded = [];
-    const extra = CT.Ghost.level(solo.difficulty).extra;
+    // Las cartas automáticas solo llegan tras un acierto: cuando vas bien, el tablero se
+    // complica (la línea se estrecha). Tras un fallo ya pierdes una vida y la carta fallada
+    // entra en la línea; sumarle más sería castigar dos veces.
+    const extra = jugada.correct ? CT.Ghost.level(solo.difficulty).extra : 0;
     for (let n = 0; n < extra && solo.deck.length; n++) {
       const id = solo.deck.shift();
       const at = CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), cardsById.get(id));

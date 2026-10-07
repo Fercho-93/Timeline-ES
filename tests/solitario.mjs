@@ -415,7 +415,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="start-free"]');
   colocaHistoriaBien(w);
   click(w, '[data-action="confirm-place"]');
-  ok("en Normal el tablero coloca una carta por turno", /incorporado/.test(texto(w)) === false);
+  ok("en Normal el tablero coloca una carta por turno", /el tablero se complica/.test(texto(w)) === false);
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
   const vistas = llegadas();
@@ -423,7 +423,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   ok("entra desde el centro de la pantalla y acaba en su sitio",
     /translate3d/.test(vistas[0].frames[0].transform) && vistas[0].frames.at(-1).transform === "none");
   ok("empieza invisible, para no verse dos veces", vistas[0].frames[0].opacity === 0 && vistas[0].timing.fill === "backwards");
-  ok("la línea la ha incorporado de verdad, no solo en la animación", /incorporado/.test(texto(w)));
+  ok("la línea la ha incorporado de verdad, no solo en la animación", /el tablero se complica/.test(texto(w)));
   click(w, '[data-action="solo-place"]');
   ok("repintar al elegir hueco no la vuelve a repartir", llegadas().length === 1);
   w.close();
@@ -483,7 +483,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
   ok("con movimiento reducido no se anima nada", !animaciones.some(el => el.classList?.contains("timeline-card")));
-  ok("y la carta automática está igualmente en la línea", /incorporado/.test(texto(w)));
+  ok("y la carta automática está igualmente en la línea", /el tablero se complica/.test(texto(w)));
   w.close();
 }
 {
@@ -498,7 +498,7 @@ console.log("\nLas cartas que coloca el tablero se ven llegar");
   click(w, '[data-action="confirm-place"]');
   click(w, '[data-action="solo-next"]');
   await new Promise(resolve => w.setTimeout(resolve, 1050));
-  ok("en Fácil no llega ninguna carta automática", !animaciones.some(el => el.classList?.contains("timeline-card")) && !/incorporado/.test(texto(w)));
+  ok("en Fácil no llega ninguna carta automática", !animaciones.some(el => el.classList?.contains("timeline-card")) && !/el tablero se complica/.test(texto(w)));
   w.close();
 }
 

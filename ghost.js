@@ -5,9 +5,9 @@
   const CT = window.CONTINUUM;
   const LEVELS = {
     easy: { name: "Fácil", extra: 0, description: "Valores visibles. Sin cartas automáticas." },
-    normal: { name: "Normal", extra: 1, description: "Valores visibles. Una carta automática por turno." },
-    hard: { name: "Difícil", extra: 2, description: "Dos cartas automáticas y turnos Fantasma ocasionales." },
-    expert: { name: "Experto", extra: 2, description: "Dos cartas automáticas. Fechas siempre ocultas (la ilustración se ve)." }
+    normal: { name: "Normal", extra: 1, description: "Valores visibles. Cada acierto añade una carta bien colocada: la línea se estrecha." },
+    hard: { name: "Difícil", extra: 2, description: "Cada acierto añade dos cartas bien colocadas y hay turnos Fantasma ocasionales." },
+    expert: { name: "Experto", extra: 2, description: "Cada acierto añade dos cartas bien colocadas. Fechas siempre ocultas (la ilustración se ve)." }
   };
 
   // Siempre ceil(P/3) poderes, máximo 3. Cada posición elegible pesa

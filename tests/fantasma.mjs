@@ -192,7 +192,14 @@ for (const difficulty of ['easy','normal','hard','expert']) {
   assert.ok(w.document.querySelector('.modal'));click(w,'solo-next');
   s=state(w,soloKey);
   assert.equal(s.lives,2);assert.equal(s.hits,0);assert.equal(s.played,1);
-  assert.equal(s.autoAdded.length, {easy:0,normal:1,hard:2,expert:2}[difficulty], 'automáticas incluso tras fallo');
+  assert.equal(s.autoAdded.length, 0, 'tras un fallo no entran cartas automáticas');
+  {
+    // Tras un acierto, sí: tantas como marque el nivel.
+    const antes = state(w,soloKey); play(w,true,true); click(w,'solo-next');
+    const tras = state(w,soloKey);
+    assert.equal(tras.autoAdded.length, Math.min({easy:0,normal:1,hard:2,expert:2}[difficulty], antes.deck.length), 'tras un acierto entran las del nivel');
+    if (tras.autoAdded.length) assert.match(w.document.querySelector('.auto-cards').textContent, /Por tu acierto, el tablero se complica/);
+  }
   assert.equal(new Set([...s.timeline,...s.deck,s.current,...s.failed]).size,initialTotal);
   const cards=w.CONTINUUM.cards(s.mode), byId=new Map(cards.map(c=>[c.id,c]));
   let turns=0;

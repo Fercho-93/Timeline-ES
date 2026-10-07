@@ -523,14 +523,14 @@ ausencia de posiciones duplicadas, recolocación y conservación de las cartas n
 
 ### Solitario
 
-| Nivel | Cartas automáticas tras cada turno | Visibilidad |
+| Nivel | Cartas automáticas tras cada acierto | Visibilidad |
 |---|---:|---|
 | Fácil | 0 | Visible |
 | Normal | 1 | Visible |
 | Difícil | 2 | Fantasma ocasional durante una jugada |
 | Experto | 2 | Oculto en todas las jugadas |
 
-Las incorporaciones se hacen al continuar, tras acierto o fallo, antes de la nueva decisión.
+Las incorporaciones se hacen al continuar y solo tras un acierto: cuando vas bien, el tablero se complica. Tras un fallo no entran, porque ya se pierde una vida y la carta fallada pasa a la línea.
 Primero se reserva la siguiente carta del jugador; si faltan cartas se añaden menos. No
 suman aciertos ni cambian vidas. Y se ven llegar: la carta entra desde el centro de la
 pantalla hasta su sitio, y la vista va con ella —una detrás de otra si son dos, porque la
