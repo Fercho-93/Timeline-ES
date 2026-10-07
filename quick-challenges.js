@@ -112,9 +112,11 @@
   // Duraciones de Retos rápidos: las cortas valen para todo; las largas, para jugar en un solo móvil.
   const SHORT_LENGTHS=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga']];
   const LONG_LENGTHS=[...SHORT_LENGTHS,[10,'Maratón'],[15,'Gran maratón'],[20,'Resistencia']];
+  // Se enseñan las tres duraciones de siempre (1, 3 y 5); las largas quedan tras «Más duraciones».
   function lengthChips(id,options,label,attrs='') {
-    const chip=([n,text])=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}${text==='Todo el catálogo'?' quick-length-all':''}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"><b>${n}</b><span>${n===1?'reto':'retos'}</span><small>${text}</small></button>`;
-    return `<div class="field duel-kind-field"${attrs}><span class="field-label" id="${id}-label">${label}</span><div class="quick-length" role="radiogroup" aria-labelledby="${id}-label">${options.map(chip).join('')}</div><input type="hidden" id="${id}" data-quick-length-input value="3"></div>`;
+    const chip=([n,text],i)=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}${text==='Todo el catálogo'?' quick-length-all':''}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"${i>=3?' data-length-extra hidden':''}><b>${n}</b><span>${n===1?'reto':'retos'}</span><small>${text}</small></button>`;
+    const more=options.length>3?`<button type="button" class="btn btn-ghost quick-length-more" data-quick="more-lengths" aria-expanded="false">Más duraciones</button>`:'';
+    return `<div class="field duel-kind-field"${attrs}><span class="field-label" id="${id}-label">${label}</span><div class="quick-length" role="radiogroup" aria-labelledby="${id}-label">${options.map(chip).join('')}</div>${more}<input type="hidden" id="${id}" data-quick-length-input value="3"></div>`;
   }
   // Qué pasa al fallar en las partidas con amigos: se elige al crearlas, igual en un solo móvil,
   // en una sala o por turnos. Solo y «mismas cartas» siguen siempre; la mesa pública lo elige quien la crea.
@@ -217,21 +219,25 @@
     const offline=navigator.onLine===false, net=offline?'wifi':liveNet();
     const option=([key,title,foot])=>`<label class="segmented-option${key===pace?' is-on':''}"><input type="radio" name="quick-duel-pace" value="${key}"${key===pace?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`;
     const block=(key,body)=>`<div data-quick-duel-block="${key}"${key===pace?'':' hidden'}>${body}</div>`;
+    // Conexión y máximo solo cuentan en directo: van antes de la duración, el tiempo y el nombre.
+    const pre=body=>`<div data-quick-duel-pre${pace==='directo'?'':' hidden'}>${body}</div>`;
     shell(`<section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Retos rápidos con amigos</h2>
         <p class="lead">Cada uno desde su móvil, con los mismos retos sorpresa. Gana quien acierte más.</p></div>
       <div class="panel solo-panel">
         <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
         <div class="field duel-kind-field"><span class="field-label" id="quick-pace-label">Ritmo</span>
           <div class="segmented" role="radiogroup" aria-labelledby="quick-pace-label">${[['directo','En directo','Todos a la vez, en una sala'],['turnos','Por turnos','Cada uno cuando pueda'],['seguidos','Mismas cartas','Juegas tú y mandas el reto']].map(option).join('')}</div></div>
+        ${pre(`
+          <div class="field duel-kind-field"><span class="field-label" id="quick-net-label">Conexión</span>
+            <div class="segmented" role="radiogroup" aria-labelledby="quick-net-label">${[['internet','Por internet','Cada uno donde esté'],['wifi','Sin internet','Cerca, en la misma Wi‑Fi']].map(([key,title,foot])=>`<label class="segmented-option${key===net?' is-on':''}"><input type="radio" name="quick-live-net" value="${key}"${key===net?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`).join('')}</div></div>
+          ${offline?'<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi‑Fi.</p>':''}
+          <div class="field"><label for="quick-net-players">Máximo de participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===4?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
+        `)}
         ${lengthChips('quick-free-length',SHORT_LENGTHS,'Retos')}
         ${keepField(` data-quick-keep-field${pace==='seguidos'?' hidden':''}`)}
         ${CT.Tiempo.field('amigos',{porDefecto:15})}
         ${identityField()}
-        ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 personas: todos jugáis a la vez, cada uno desde su móvil. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
-          <div class="field"><label for="quick-net-players">Máximo de participantes</label><select id="quick-net-players">${[2,3,4,5,6,7,8].map(n=>`<option value="${n}"${n===4?' selected':''}>${n} jugadores</option>`).join('')}</select></div>
-          <div class="field duel-kind-field"><span class="field-label" id="quick-net-label">Conexión</span>
-            <div class="segmented" role="radiogroup" aria-labelledby="quick-net-label">${[['internet','Por internet','Cada uno donde esté'],['wifi','Sin internet','Cerca, en la misma Wi‑Fi']].map(([key,title,foot])=>`<label class="segmented-option${key===net?' is-on':''}"><input type="radio" name="quick-live-net" value="${key}"${key===net?' checked':''}><i class="duel-option-mark" aria-hidden="true">${soloGlyph(PACE_GLYPH[key])}</i><span><b>${title}</b><small>${foot}</small></span></label>`).join('')}</div></div>
-          ${offline?'<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi‑Fi.</p>':''}${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
+        ${block('directo',`<div class="duel-brief"><p>Una sala de 2 a 8 personas: todos jugáis a la vez, cada uno desde su móvil. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>${button('live-room','Crear sala <span>→</span>','btn btn-primary btn-block')}`)}
         ${block('seguidos',`<div class="duel-brief"><p>Juegas tú ahora y le mandas un enlace a tu amigo: juega los mismos retos cuando quiera, sin coincidir contigo. Un fallo no suma, pero se juega todo el reto.</p></div>
           ${button('start-duel','Jugar y retar <span>→</span>','btn btn-primary btn-block')}`)}
         ${block('turnos',`<div class="duel-brief"><p>Cada uno juega desde su móvil, por turnos. Creas el duelo, haces tú la primera jugada y después le mandas el enlace: tu amigo entra directo en la partida, ve tu última jugada y sigue él. En la revancha empieza el otro. La partida se guarda entre turnos.</p></div>
@@ -896,6 +902,7 @@
       const pace = ['turnos', 'seguidos'].includes(event.target.value) ? event.target.value : 'directo';
       CT.Storage.setItem(DUEL_PACE, pace);
       app().querySelectorAll('[data-quick-duel-block]').forEach(b => { b.hidden = b.dataset.quickDuelBlock !== pace; });
+      app().querySelectorAll('[data-quick-duel-pre]').forEach(b => { b.hidden = pace !== 'directo'; });
       const keep = app().querySelector('[data-quick-keep-field]');
       if (keep) keep.hidden = pace === 'seguidos';
       app().querySelectorAll('.segmented-option').forEach(o => o.classList.toggle('is-on', o.querySelector('input').checked));
@@ -936,6 +943,12 @@
     if (action === 'stats') {statsPanel(); return;}
     if (action === 'rematch') {entry='duel-setup'; duelSetup(); return;}
     if (action === 'ready') { if (pendingConfig) begin(pendingConfig); return; }
+    if (action === 'more-lengths') {
+      const field = target.closest('.field');
+      field?.querySelectorAll('[data-length-extra]').forEach(chip => { chip.hidden = false; });
+      target.remove();
+      return;
+    }
     if (action === 'length') {
       app().querySelectorAll('.quick-length-chip').forEach(chip => {const on = chip === target; chip.classList.toggle('is-selected', on); chip.setAttribute('aria-checked', String(on));});
       const input = target.closest('.field')?.querySelector('[data-quick-length-input]') || app().querySelector('[data-quick-length-input]'); if (input) input.value = target.dataset.length; return;

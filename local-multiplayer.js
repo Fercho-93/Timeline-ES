@@ -71,6 +71,13 @@
   }
 
   function ownName() { return escapeHtml(CT.Identidad?.propio?.() || ""); }
+  // Quien crea ya tiene nombre de perfil: se usa sin volver a pedirlo. Sin perfil, se pide.
+  function hostNameField() {
+    const name = ownName();
+    return name
+      ? `<input type="hidden" id="local-name-host" name="name" value="${name}"><p class="hint">Entras como <b>${name}</b>. Puedes cambiarlo desde tu perfil.</p>`
+      : `<div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value=""></div>`;
+  }
 
   // Cuando Android e iPhone no comparten ningún destino en la hoja de compartir del
   // sistema, queda copiar el texto a mano. Si el portapapeles tampoco está disponible, el
@@ -280,7 +287,7 @@
         ${wifiNote()}
         ${cameraNote()}
         <div class="online-entry-grid online-entry-single">
-          <form class="panel online-form" data-local-form="create"><h3>Crear la sala</h3><p>Tú preparas la competición y los demás escanean tu código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName()}"></div><button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
+          <form class="panel online-form" data-local-form="create"><h3>Crear la sala</h3><p>Tú preparas la competición y los demás escanean tu código.</p>${hostNameField()}<button class="btn btn-primary btn-block" type="submit">Crear sala <span>→</span></button></form>
         </div>
         <p class="online-note">No necesita conexión a internet en ningún momento.</p>
       </div>`, "local-entrada");
@@ -292,7 +299,7 @@
       ${cameraNote()}
       <div class="online-entry-grid${createOnly ? " online-entry-single" : ""}">
         ${createOnly ? "" : '<div class="panel online-form"><span class="form-number">01</span><h3>Unirse a una sala</h3><p>Alguien ya ha creado una y te ha pasado su código.</p><button type="button" class="btn btn-primary btn-block" data-local-action="go-unirse">Unirme a la partida <span>→</span></button></div>'}
-        <form class="panel online-form" data-local-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p><div class="field"><label for="local-name-host">Tu nombre</label><input id="local-name-host" name="name" maxlength="18" required placeholder="Ej. Fernando" autocomplete="name" value="${ownName()}"></div><button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
+        <form class="panel online-form" data-local-form="create">${createOnly ? "" : '<span class="form-number">02</span>'}<h3>Crear una sala</h3><p>Tú preparas la partida y compartes el código.</p>${hostNameField()}<button class="btn btn-secondary btn-block" type="submit">Crear sala</button></form>
       </div>
       <p class="online-note">No necesita conexión a internet en ningún momento.</p>
     </div>`, "local-entrada");

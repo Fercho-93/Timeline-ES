@@ -80,11 +80,22 @@ assert.equal(app.querySelector('input[name="quick-duel-pace"]:checked').value, '
 assert.equal(app.querySelector('[data-quick-duel-block="directo"]').hidden, false);
 assert.equal(app.querySelector('[data-quick-duel-block="seguidos"]').hidden, true);
 assert.equal(app.querySelector('[data-quick-duel-block="turnos"]').hidden, true);
-assert.ok(app.querySelector('[data-quick-duel-block="directo"] #quick-net-players'), 'en directo la sala se prepara en la misma pantalla');
+assert.ok(app.querySelector('[data-quick-duel-pre] #quick-net-players'), 'en directo la sala se prepara en la misma pantalla');
 assert.equal(app.querySelector('[data-quick-keep-field]').hidden, false, 'en directo también se elige qué pasa al fallar');
 assert.ok(app.querySelector('#quick-profile-name[readonly]'), 'el nombre es el del perfil');
 assert.deepEqual([...app.querySelectorAll('input[name="quick-live-net"]')].map(i => i.value), ['internet', 'wifi']);
 assert.ok(app.querySelector('[data-quick-duel-block="directo"] [data-quick="live-room"]'));
+// Orden de «Cómo jugáis», igual en todas las modalidades: ritmo, conexión, máximo, contenido, tiempo, nombre y botón.
+{
+  const pos = sel => { const el = app.querySelector(sel); assert.ok(el, `falta ${sel}`); return [...app.querySelectorAll('*')].indexOf(el); };
+  const orden = ['input[name="quick-duel-pace"]', 'input[name="quick-live-net"]', '#quick-net-players', '.quick-length-chip', '[data-quick-keep-field]', '[data-tiempo], .tiempo-field, [name="tiempo-amigos"]', '#quick-profile-name', '[data-quick="live-room"]'];
+  const encontrados = orden.filter(sel => app.querySelector(sel));
+  assert.ok(encontrados.length >= 7, 'están los campos del formulario');
+  const posiciones = encontrados.map(pos);
+  assert.deepEqual(posiciones, [...posiciones].sort((a, b) => a - b), 'los campos siguen el orden común');
+}
+// Duraciones: solo 1, 3 y 5 a la vista; las largas del solitario y un solo móvil, tras «Más duraciones».
+assert.equal(app.querySelectorAll('.quick-length-chip:not([hidden])').length, 3);
 const sinInternet = app.querySelector('input[name="quick-live-net"][value="wifi"]'); sinInternet.checked = true;
 sinInternet.dispatchEvent(new w.Event('change', {bubbles: true}));
 assert.equal(w.CONTINUUM.Storage.getItem('continuum-quick-live-net-v1'), 'wifi');

@@ -559,9 +559,19 @@ export async function openOnlineMode(options = {}) {
   createOnly = !!options.createOnly && !joinOnly;
   sessionNewDiscoveries = 0;
   sessionAchievements = [];
-  renderEntry(cleanCode(options.roomCode));
+  // Desde «Crear partida» el nombre ya es el del perfil: no se vuelve a pedir, se crea la sala.
+  const profileName = String(CT.Identidad?.propio?.() || "").trim().slice(0, 18);
+  const autoCreate = createOnly && !cleanCode(options.roomCode) && !!profileName;
+  if (autoCreate) {
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel"><div class="spinner"></div><h2 data-focus tabindex="-1">Creando tu sala</h2><p>Un momento…</p></div></section></div>`, "online-loading");
+  } else renderEntry(cleanCode(options.roomCode));
   await ensureAuth();
   if (request !== entryRequest) return;
+  if (autoCreate) {
+    // Si algo falla, se vuelve a la entrada para poder reintentarlo con el nombre a la vista.
+    if (!(await createRoom(profileName)) && request === entryRequest) renderEntry();
+    return;
+  }
   const invited = cleanCode(options.roomCode);
   if (!invited) return;
   try {
@@ -632,6 +642,7 @@ async function createRoom(name) {
     rememberRoom(code, name);
     updateRoomAddress(code);
     connectToRoom(code);
+    return true;
   } catch (error) {
     console.error(error);
     showToast(roomErrorMessage(error, "No se pudo crear la sala. Vuelve a intentarlo; si persiste, comunica el error."));

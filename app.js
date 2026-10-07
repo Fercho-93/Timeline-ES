@@ -388,9 +388,10 @@
           <div class="field"><label for="competition-cards">Cartas por persona en cada tema</label><select id="competition-cards">${[1, 2, 3, 4, 5, 6].map(n => `<option${n === competitionConfig.cards ? " selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
           ${grupo("comp-pace", "comp-pace-label", "Ritmo", [["directo", "En directo", "Todos a la vez, en una sala", "directo"], ["turnos", "Por turnos", "Cada uno cuando pueda", "turnos"]], ritmo)}
-          ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
           ${grupo("live-net", "comp-net-label", "Conexión", [["internet", "Por internet", "Cada uno donde esté", "internet"], ["wifi", "Sin internet", "Cerca, en la misma Wi‑Fi", "wifi"]], red, ` data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}`)}
           ${sinRed ? '<p class="hint" data-offline-note>No hay internet: jugaréis por la Wi‑Fi.</p>' : ""}
+          <div data-comp-net-field${ritmo === "turnos" ? " hidden" : ""}>${CT.ManoInicial.maximoField()}</div>
+          ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
           <div class="field duel-identity-field">
             <label for="duel-name">Tu nombre de perfil</label>
             <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
@@ -912,13 +913,13 @@
             </div>
           </div>
           <div class="setup-block">
-            ${CT.Tiempo.field("local")}
-          </div>
-          <div class="setup-block">
             <div class="setup-block-head"><span class="eyebrow"><span class="eyebrow-line"></span> Poderes</span></div>
             <p class="hint">Para una primera partida, mejor sin poderes.</p>
             <label class="opt-row"><span>Cartas Fantasma <small>Esconde de 1 a 3 Fantasmas según los jugadores. Pueden salir al repartir o robar, o quedarse sin descubrir. Se guardan aparte y no cuentan para ganar.</small></span><input type="checkbox" id="ghost-toggle"${lastLocalSetup?.ghost ? " checked" : ""}></label>
             <label class="opt-row"><span>Cartas Pulso <small>Esconde de 1 a 3 poderes Pulso con el mismo reparto que Fantasma.</small></span><input type="checkbox" id="pulse-toggle"${lastLocalSetup?.pulse ? " checked" : ""}></label>
+          </div>
+          <div class="setup-block">
+            ${CT.Tiempo.field("local")}
           </div>
           <button class="btn btn-primary btn-block" style="margin-top:20px" data-action="start">Barajar y empezar <span>→</span></button>
         </div>
@@ -2555,6 +2556,8 @@
     const sinRed = navigator.onLine === false;
     const red = sinRed ? "wifi" : liveNet();
     const bloque = (clave, cuerpo) => `<div data-duel-block="${clave}"${clave === duelBlockKey(ritmo, prueba) ? "" : " hidden"}>${cuerpo}</div>`;
+    // Lo que solo se elige en directo (conexión, máximo, cartas y poderes) va antes del tiempo y del nombre, como en el resto de formularios.
+    const preDirecto = cuerpo => `<div data-duel-pre="directo"${ritmo === "directo" ? "" : " hidden"}>${cuerpo}</div>`;
     return `<div class="panel solo-panel">
       <div class="solo-panel-head"><h3>Cómo jugáis</h3></div>
       <div class="field duel-kind-field">
@@ -2579,16 +2582,7 @@
             </label>`).join("")}
         </div>
       </div>
-      ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
-      <div class="field duel-identity-field">
-        <label for="duel-name">Tu nombre de perfil</label>
-        <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
-        <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
-      </div>
-      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de personas que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
-        ${CT.ManoInicial.field()}
-        ${CT.ManoInicial.poderesField()}
-        ${CT.ManoInicial.maximoField()}
+      ${preDirecto(`
         <div class="field duel-kind-field">
           <span class="field-label" id="live-net-label">Conexión</span>
           <div class="segmented" role="radiogroup" aria-labelledby="live-net-label">
@@ -2601,6 +2595,16 @@
           </div>
         </div>
         ${sinRed ? '<p class="hint" data-offline-note style="margin-top:10px">No hay internet: jugaréis por la Wi‑Fi.</p>' : ""}
+        ${CT.ManoInicial.maximoField()}
+        ${CT.ManoInicial.field()}
+        ${CT.ManoInicial.poderesField()}`)}
+      ${CT.Tiempo.field("amigos", { porDefecto: 15 })}
+      <div class="field duel-identity-field">
+        <label for="duel-name">Tu nombre de perfil</label>
+        <div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares.markup(duelName(), { size: 38, seed: CT.Avatares.ownSeed() })}</span><input id="duel-name" type="text" readonly aria-readonly="true" value="${escapeHtml(duelName())}"></div>
+        <small class="field-help">Se usará automáticamente en el duelo. Puedes cambiarlo desde tu perfil.</small>
+      </div>
+      ${bloque("directo", `<div class="duel-brief"><p>Una sala de hasta el máximo de personas que elijas: cada uno coloca desde su móvil y todos veis la línea avanzar a la vez. Quién empieza se decide en la sala de espera con un minijuego: cada uno adivina la cifra de una carta. Al crearla compartes el código, el enlace o el QR.</p></div>
         <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-live-room">Crear sala <span>→</span></button>`)}
       ${bloque("seguidos-orden", `<div class="duel-brief"><p>${CT.Duelo.CARTAS} cartas al azar de este mazo, y las colocas en la línea. Gana quien más acierte.</p>
         <p class="solo-intro-rule duel-rule">${glyph(GLYPHS.reloj)}<span>Con tiempo, el reloj no se para: si sales de la aplicación, la carta se da por fallada.</span></p></div>
@@ -3926,8 +3930,7 @@
     if (event.target.name === "comp-pace") {
       CT.Storage.setItem(COMP_PACE_KEY, event.target.value);
       const ritmo = compPace();
-      const red = app.querySelector("[data-comp-net-field]");
-      if (red) red.hidden = ritmo === "turnos";
+      app.querySelectorAll("[data-comp-net-field]").forEach(campo => { campo.hidden = ritmo === "turnos"; });
       // «Todos los temas» solo cabe en directo: por turnos hay un tope de temas.
       const todos = app.querySelector("[data-comp-all]"), select = document.getElementById("competition-length");
       const cabe = ritmo === "directo";
@@ -3945,6 +3948,7 @@
       const selectedKind = event.target.name === "duel-kind" ? value : duelKind();
       const selectedPace = event.target.name === "duel-pace" ? value : duelPace();
       app.querySelectorAll("[data-duel-block]").forEach(bloque => { bloque.hidden = bloque.dataset.duelBlock !== duelBlockKey(selectedPace, selectedKind); });
+      app.querySelectorAll("[data-duel-pre]").forEach(bloque => { bloque.hidden = selectedPace !== "directo"; });
       const campoPrueba = app.querySelector("[data-duel-kind-field]");
       if (campoPrueba) campoPrueba.hidden = selectedPace === "directo";
       // La pastilla elegida se marca en el propio elemento: el `:has()` del CSS lo haría

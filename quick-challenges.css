@@ -58,6 +58,8 @@
 .quick-shell .quick-length-chip small{margin-top:4px;color:var(--muted,#7a6a58);font:.68rem/1.2 var(--ui-font,inherit)}
 .quick-shell .quick-length-chip.is-selected{border-color:#aa7157;color:#704a37;background:linear-gradient(155deg,#f8efdf,#eadbc4);box-shadow:inset 0 0 0 1px #aa7157,0 5px 9px rgba(61,43,29,.17);transform:translateY(-2px)}
 .quick-shell .quick-length-chip:focus-visible{outline:2px solid #8a3f2f;outline-offset:2px}
+.quick-shell .quick-length-chip[hidden]{display:none}
+.quick-shell .quick-length-more{width:100%;margin:-8px 0 14px}
 .quick-shell .quick-length-chip.quick-length-all{grid-column:1/-1;grid-auto-flow:column;justify-content:center;gap:8px;min-height:58px}
 .quick-shell .quick-length-chip.quick-length-all b{font-size:1.3rem}
 .quick-shell .quick-length-chip.quick-length-all small{margin:0 0 0 4px}

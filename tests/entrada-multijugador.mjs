@@ -54,3 +54,4 @@ try {
   assert.match(w.document.body.textContent, /Ana <López>/);
   console.log('ok  acierto, fallo, salto, reconexión y espectadores tienen avisos coherentes');
 } finally { w.close(); }
+assert.match(source, /autoCreate[\s\S]*?createRoom\(profileName\)/, "desde «Crear partida» la sala se crea con el nombre del perfil, sin pedirlo otra vez");

@@ -248,6 +248,13 @@ console.log("\nCrear un duelo de cifras y jugarlo");
   // El duelo es una sola opción del menú con las dos modalidades dentro.
   ok("hay una sola pantalla: en directo y cuatro combinaciones de duelo", w.document.querySelectorAll('[data-duel-block]').length === 5 && /Partida con amigos/.test(texto(w)));
   ok("por defecto, en directo, sin elegir prueba", w.document.querySelector('[data-duel-block="directo"]').hidden === false && w.document.querySelector('[data-duel-kind-field]').hidden === true);
+  {
+    // Mismo orden que en el resto de modalidades: ritmo, conexión, máximo, cartas, poderes, tiempo, nombre y botón.
+    const todos = [...w.document.querySelectorAll('*')];
+    const posiciones = ['input[name="duel-pace"]', 'input[name="live-net"]', '#live-max-players', '#hand-size, [data-mano-inicial]', '[data-poder]', 'input[data-tiempo]', '#duel-name', '[data-action="start-live-room"]']
+      .map(sel => { const el = w.document.querySelector(sel); return el ? todos.indexOf(el) : -1; });
+    ok("el formulario de amigos sigue el orden común de campos", posiciones.every(p => p >= 0) && posiciones.every((p, i) => i === 0 || p > posiciones[i - 1]));
+  }
   const sinInternet = w.document.querySelector('input[name="live-net"][value="wifi"]');
   sinInternet.checked = true;
   sinInternet.dispatchEvent(new w.Event("change", { bubbles: true }));
