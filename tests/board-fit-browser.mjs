@@ -46,7 +46,7 @@ try {
           } else if(format==='competition') {
             await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
             if (await page.locator('#mode-inline-drawer[hidden]').count()) await page.locator('[data-inline-route]').click();
-            await page.locator('.mode-entry[data-action="competition-menu"]').click();
+            await page.locator('[data-action="competition-menu"]').click();
             await page.locator('[data-action="start-competition"]').click();
             await page.locator('[data-action="comp-next-round"]').click();
           } else {

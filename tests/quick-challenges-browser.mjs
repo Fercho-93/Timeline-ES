@@ -33,7 +33,7 @@ try {
     await page.locator('[data-action="friends-hub"]').click();
     await page.locator('[data-action="local-hub"]').click();
     const sizes = await page.locator('.mode-hub-list .mode-entry').evaluateAll(els => els.map(el => Math.round(el.getBoundingClientRect().width)));
-    assert.ok(sizes.length >= 3 && sizes.every(w => w === sizes[0]), 'Retos rápidos tiene el mismo ancho que las otras puertas');
+    assert.ok(sizes.length >= 2 && sizes.every(w => w === sizes[0]), 'Retos rápidos tiene el mismo ancho que las otras puertas');
     await page.screenshot({path: `test-results/quick-challenges/home-${width}.png`, fullPage:true});
     await page.locator('[data-friend-quick="local"]').click();
     await page.screenshot({path: `test-results/quick-challenges/setup-${width}.png`, fullPage: true});

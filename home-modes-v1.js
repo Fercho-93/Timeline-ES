@@ -268,13 +268,11 @@
   // elegir un mazo (jugar solo o preparar una partida en un solo móvil).
   // Pantallas con las colecciones desplegadas al salir de ellas: al volver, siguen así.
   const inlineOpen = {};
-  // La competición vive dentro de Grandes colecciones: es otra forma de jugar con sus mazos
-  // (temas al azar, varias rondas), y arriba del desplegable queda a mano antes de elegir un tema.
-  const COMP_TEXT = { collections: 'Varias rondas con temas al azar de las colecciones; suma tus aciertos tema a tema.', local: 'Varias rondas con temas al azar de las colecciones; gana quien más puntos sume.', online: 'Varias rondas con temas al azar de las colecciones; gana quien más puntos sume.' };
-  const competitionTile = route => `<div class="mode-inline-competition">${modeDoor('competition-menu', modeArt['competition-menu'], 'Competición', COMP_TEXT[route] || COMP_TEXT.online, false, `data-competition-audience="${route === 'collections' ? 'solo' : route}"`, 'Configurar competición')}</div>`;
+  // La competición va al final de la lista de colecciones, con su misma carátula (app.js).
+  const compAudience = route => route === 'collections' ? 'solo' : route;
   function inlineCollections(route, texto = 'Elige un tema o combina los ocho mazos cronológicos, o juega una competición.') {
     const open = !!inlineOpen[app.dataset.pendingHub || ''];
-    return `<div class="mode-inline-collections">${modeDoor('jugar', 'menu-collections.webp', 'Grandes colecciones', texto, false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`, 'Elegir mazo')}<div id="mode-inline-drawer" class="mode-inline-drawer" data-route="${route}"${open ? '' : ' hidden'}>${competitionTile(route)}${open ? window.CONTINUUM.collectionsGallery(true) : ''}</div></div>`;
+    return `<div class="mode-inline-collections">${modeDoor('jugar', 'menu-collections.webp', 'Grandes colecciones', texto, false, `data-inline-route="${route}" data-solo-route="collections" aria-expanded="${open}" aria-controls="mode-inline-drawer"`, 'Elegir mazo')}<div id="mode-inline-drawer" class="mode-inline-drawer" data-route="${route}"${open ? '' : ' hidden'}>${open ? window.CONTINUUM.collectionsGallery(true, compAudience(route)) : window.CONTINUUM.competitionPanel(compAudience(route))}</div></div>`;
   }
 
   // Dos maneras de jugar con amigos: en un solo móvil o cada uno en el suyo. La sala, el
@@ -388,7 +386,8 @@
       sessionStorage.setItem('continuum-entry-route', inlineCollections.dataset.inlineRoute);
       const drawer = document.getElementById('mode-inline-drawer');
       const open = drawer.hidden;
-      drawer.innerHTML = competitionTile(inlineCollections.dataset.inlineRoute) + (open ? window.CONTINUUM.collectionsGallery().replaceAll('loading="lazy"', 'loading="eager"') : '');
+      const audience = inlineCollections.dataset.inlineRoute === 'collections' ? 'solo' : inlineCollections.dataset.inlineRoute;
+      drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery(false, audience).replaceAll('loading="lazy"', 'loading="eager"') : window.CONTINUUM.competitionPanel(audience);
       drawer.hidden = !open;
       inlineOpen[app.dataset.screen] = open;
       inlineCollections.setAttribute('aria-expanded', String(open));

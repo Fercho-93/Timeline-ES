@@ -68,7 +68,7 @@ async function flows(vp) {
     await click('[data-quick="start-free"]'); await at('quick-challenges'); await click('[data-quick="ready"]'); await at('quick-game'); await back('quick-challenges');
     await back('hub-solo');
     if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route]');
-    await click('.mode-entry[data-action="competition-menu"]'); await at('competition-menu');
+    await click('[data-action="competition-menu"]'); await at('competition-menu');
     await click('[data-action="start-competition"]'); await back('competition-menu');
     await back('hub-solo'); await back('home');
     // Jugar con amigos → Un solo móvil
@@ -81,7 +81,7 @@ async function flows(vp) {
     await back('hub-friends-local');
     await click('[data-friend-quick="local"]'); await at('quick-challenges'); await back('hub-friends-local');
     if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route]');
-    await click('.mode-entry[data-action="competition-menu"]'); await at('setup'); await back('hub-friends-local');
+    await click('[data-action="competition-menu"]'); await at('setup'); await back('hub-friends-local');
     await back('hub-friends'); await back('home');
     // Jugar con amigos → Cada uno en su móvil
     await click('[data-action="friends-hub"]'); await click('[data-friend-hub="online"]'); await at('hub-friends-online');
@@ -97,7 +97,7 @@ async function flows(vp) {
     await click('[data-friend-quick="online"]'); await at('quick-challenges'); await back('hub-friends-online');
     if (await pg.locator('[data-action="create-room-toggle"][aria-expanded="false"]').count()) await click('[data-action="create-room-toggle"]');
     if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route]');
-    await click('.mode-entry[data-action="competition-menu"]'); await at('competition-friends'); await back('hub-friends-online');
+    await click('[data-action="competition-menu"]'); await at('competition-friends'); await back('hub-friends-online');
     await back('hub-friends'); await back('home');
     // Jugar online
     await click('[data-action="online-hub"]'); await at('hub-online');

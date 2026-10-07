@@ -195,3 +195,11 @@ html #app button.mode-play-card:hover, html #app button.mode-play-card:active { 
 #app :is(.solo-panel, .public-create, .mode-online-config, .quick-shell .panel) .hint { text-align: left; }
 :root[data-theme="dark"] #app .mode-section-title, :root[data-theme="dark"] #app .mode-section-title small { color: #e0b77e; }
 :root[data-theme="dark"] #app .public-quick-hint { color: #cdbda5; }
+
+/* Competición al final de la lista de colecciones: mismo formato que ellas, con su grabado oscurecido
+   para que case con las demás carátulas, y una flecha en vez de «+» porque no despliega mazos. */
+#app .gallery-panel.panel-competition { --scene-glow: #d8b46a; --scene-shade: #3a2c18; --scene-focus: 72%; background: #4a3922; }
+#app .gallery-panel.panel-competition .panel-art img,
+#app .gallery-panel.panel-competition .panel-backdrop img { object-fit: cover; object-position: 66% 38%; filter: sepia(.75) saturate(.9) brightness(.52) contrast(1.15); }
+#app .home-shell .gallery-panel.panel-competition .collection-open::after,
+#app .gallery-panel.panel-competition .collection-open::after { content: "→"; }

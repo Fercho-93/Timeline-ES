@@ -271,7 +271,20 @@
 
   // La galería en acordeón es el selector de bloque: la carátula elegida se despliega
   // en color y las otras quedan como lomos que se pueden tocar.
-  function gallery() {
+  // La competición es una forma de jugar con las colecciones: se muestra al final de la lista con la misma
+  // carátula y la misma sangría, pero abre su propia pantalla de ajustes en lugar de desplegar mazos.
+  const competitionArt = '<img src="assets/competition-engraving.webp" alt="" width="1000" height="667" decoding="async" loading="lazy">';
+  const competitionPanel = audience => `<div class="collection-extra"><button class="gallery-panel panel-competition" data-action="competition-menu" data-competition-audience="${audience}" aria-label="Competición: varias rondas con temas al azar de las colecciones">
+        <span class="panel-backdrop" aria-hidden="true">${competitionArt}</span>
+        <span class="panel-depth-light" aria-hidden="true"></span>
+        <span class="panel-art" aria-hidden="true">${competitionArt}</span>
+        <span class="panel-depth-ground" aria-hidden="true"></span>
+        <span class="collection-foil" aria-hidden="true"></span>
+        <span class="collection-index" aria-hidden="true">Varias rondas</span>
+        <span class="collection-open" aria-hidden="true">→</span>
+        <span class="panel-label" aria-hidden="true"><i></i><strong>Competición</strong><small>Temas al azar; gana quien más puntos sume.</small></span>
+      </button></div>`;
+  function gallery(competitionAudience = "") {
     return `<div class="gallery" role="group" aria-label="Elige una colección">${Object.values(CT.BLOCKS).map((item, index) => {
       const active = collectionOpen && item.key === selectedBlockKey;
       const total = item.games.length;
@@ -290,7 +303,7 @@
         <span class="panel-spine" aria-hidden="true"><i>${item.icon}</i><b>${item.name}</b></span>
         <span class="panel-label" aria-hidden="true"><i></i><strong>${item.name}</strong><small>${item.tagline}</small></span>
       </button><div id="collection-drawer-${item.key}" class="collection-drawer"${active ? "" : " inert"}><div class="collection-drawer-inner">${mazos}</div></div></div>`;
-    }).join("")}</div>`;
+    }).join("")}${competitionAudience ? competitionPanel(competitionAudience) : ""}</div>`;
   }
 
   // Los juegos del bloque en pantalla.
@@ -4295,10 +4308,11 @@
   // (en solitario), `local` (un solo móvil) u `online` (cada uno en su móvil).
   CT.openDeckAs = route => { sessionStorage.setItem('continuum-entry-route', route); openMode(selectedModeKey); };
   // `keep`: al volver a la pantalla se conserva la colección que estaba desplegada.
-  CT.collectionsGallery = (keep = false) => {
+  CT.competitionPanel = audience => `<div class="gallery">${competitionPanel(audience)}</div>`;
+  CT.collectionsGallery = (keep = false, audience = "") => {
     if (!keep) { collectionOpen = false; collectionDetails = false; }
     collectionIndexExpanded = true; jugarSection = "collections";
-    return `<p class="catalog-hint">Elige una colección para desplegar sus mazos.</p><section id="deck-collection">${gallery()}</section>`;
+    return `<p class="catalog-hint">Elige una colección para desplegar sus mazos.</p><section id="deck-collection">${gallery(audience)}</section>`;
   };
   CT.navigateBack = backMenu;
   // La flecha de volver de la pantalla visible, la pinte este archivo o un módulo propio.

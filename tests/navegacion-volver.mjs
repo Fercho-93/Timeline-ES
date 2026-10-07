@@ -159,16 +159,16 @@ await expectBack('home');
 
 // Competición muestra solo los formatos de la entrada elegida.
 await click('[data-action="solo-hub"]');
-assert.equal(app().querySelectorAll('.mode-entry[data-action="competition-menu"]').length, 1, 'la competición es una sola puerta');
-assert.ok(app().querySelector('#mode-inline-drawer .mode-entry[data-action="competition-menu"]'), 'la competición está dentro de Grandes colecciones');
-await click('.mode-entry[data-action="competition-menu"]');
+assert.equal(app().querySelectorAll('[data-action="competition-menu"]').length, 1, 'la competición es una sola puerta');
+assert.ok(app().querySelector('#mode-inline-drawer [data-action="competition-menu"]'), 'la competición está dentro de Grandes colecciones');
+await click('[data-action="competition-menu"]');
 assert.ok(app().querySelector('[data-action="start-competition"]'));
 assert.equal(app().querySelector('[data-action="competition-local"]'), null);
 await expectBack('hub-solo');
 await expectBack('home');
 await click('[data-action="friends-hub"]');
 await click('[data-action="local-hub"]');
-await click('.mode-entry[data-action="competition-menu"]');
+await click('[data-action="competition-menu"]');
 // Un solo móvil abre directamente su única ventana de ajustes.
 assert.equal(screen(), 'setup');
 assert.equal(app().querySelector('[data-action="start-competition"]'), null);
@@ -180,7 +180,7 @@ await expectBack('home');
 await click('[data-action="friends-hub"]');
 await click('[data-friend-hub="online"]');
 await click('[data-action="create-room-toggle"]');
-await click('.mode-entry[data-action="competition-menu"]');
+await click('[data-action="competition-menu"]');
 assert.equal(screen(), 'competition-friends');
 assert.equal(app().querySelector('input[name="comp-content"]'), null);
 await expectBack('hub-friends-online');

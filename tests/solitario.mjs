@@ -293,7 +293,7 @@ console.log("\nBloque de geografía");
   ok("los cuatro juegos del bloque aparecen por su nombre",
      /Superficie de países/.test(texto(w)) && /Población de países/.test(texto(w))
      && /Idiomas por hablantes nativos/.test(texto(w)) && /Distancias entre ciudades/.test(texto(w)));
-  ok("la galería ofrece los seis bloques", w.document.querySelectorAll(".gallery-panel").length === 6);
+  ok("la galería ofrece los seis bloques", w.document.querySelectorAll(".gallery-panel[data-block]").length === 6);
   const portada = w.document.querySelector(".gallery-panel.active").outerHTML;
   // Las tres carátulas están siempre, pero solo la desplegada pide el tamaño grande.
   ok("la carátula desplegada es la de geografía, no otra",
