@@ -5224,3 +5224,11 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 /* Bienvenida: qué se guarda y que el ranking es opcional, en letra pequeña bajo el campo del nombre. */
 #app .bienvenida .bienvenida-datos { margin-top: 10px; font-size: .74rem; line-height: 1.45; }
 #app .bienvenida .bienvenida-datos a { color: inherit; text-decoration: underline; }
+
+/* Enlaces que abren algo dentro del juego (créditos de la música): se ven como enlace, son botones. */
+#app .link-button { padding: 0; border: 0; background: none; color: var(--accent, #8a3f2f); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+#app .link-button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
+#app .credits-modal { max-width: 26rem; text-align: left; }
+#app .credits-modal h2 { margin-top: 0; }
+#app .credits-modal .btn { margin-top: 12px; }
+#app .credits-modal .hint { text-align: left; }

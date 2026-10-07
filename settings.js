@@ -114,8 +114,8 @@
           <input id="ajuste-volumen" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.ambienceVolume) || 0))}" data-settings-action="ambience-volume" aria-describedby="volume-help">
           <p class="hint" id="volume-help">Puedes dejar la música activa y bajar su volumen hasta 0 %.</p>
         </div>
+        <p class="hint"><button type="button" class="link-button" data-settings-action="music-credits">Créditos de la música</button></p>
         <label class="opt-row"><span>Profundidad al mover el móvil</span><input type="checkbox" data-settings-action="depth" ${s.depth === true ? "checked" : ""}></label>
-        <p class="hint"><a href="assets/audio/CREDITS.md" target="_blank" rel="noopener noreferrer">Créditos de la música</a></p>
         <p class="hint" data-depth-help>La profundidad solo actúa en las portadas y respeta «reducir movimiento».</p>
         <p class="hint">Los efectos acompañan al resultado; toda la información también se muestra en texto.</p>
       </section>
@@ -263,6 +263,19 @@
   // Cada motor pinta a su manera, así que abrir y cerrar el panel pasa por lo que ya
   // tienen: `CT.openDialog`/`CT.closeDialog`, los mismos diálogos que usan las reglas o
   // el menú de partida.
+  // Los créditos se leen dentro del juego, encima de Ajustes, y se cierran sin salir de la app.
+  // El archivo técnico (assets/audio/CREDITS.md) sigue en el repositorio para la documentación.
+  function openMusicCredits() {
+    if (document.querySelector('[data-overlay="music-credits"]')) return;
+    document.getElementById("app").insertAdjacentHTML("beforeend", `<div class="overlay" data-overlay="music-credits"><div class="modal credits-modal" role="dialog" aria-modal="true" aria-labelledby="music-credits-title">
+      <h2 id="music-credits-title" tabindex="-1" data-dialog-focus>Créditos de la música</h2>
+      <p>Música original de Continuum: seis piezas creadas para acompañar el juego.</p>
+      <p class="hint">Suenan en bucle mientras juegas. Puedes apagarlas o bajar su volumen en «Sonido y movimiento».</p>
+      <button class="btn btn-primary btn-block" data-settings-action="close">Cerrar</button>
+    </div></div>`);
+    CT.openDialog(document.querySelector('[data-overlay="music-credits"]'), true);
+  }
+
   function open() {
     draftLook = { theme: settings.theme, textSize: settings.textSize };
     document.getElementById("app").insertAdjacentHTML("beforeend", panelHtml());
@@ -336,6 +349,7 @@
       settings.theme=draftLook.theme;settings.textSize=draftLook.textSize;save();applyTheme();CT.Effects?.transition?.('select');previewLook();
     }
     else if (target.dataset.settingsAction === "feedback") sendFeedback();
+    else if (target.dataset.settingsAction === "music-credits") openMusicCredits();
     else if (target.dataset.settingsAction === "reset-preferences") resetPreferences();
     else if (target.dataset.settingsAction === "test-haptics") void testHaptics();
     else if (target.dataset.settingsAction === "device-check") void runDeviceCheck();

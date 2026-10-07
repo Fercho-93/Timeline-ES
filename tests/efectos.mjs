@@ -48,6 +48,12 @@ for (const savedSound of [false, true]) {
     assert.equal(w.document.querySelector('[data-settings-action="sound"]'),null,'no queda un interruptor sin función');
     assert.ok(w.document.querySelector('[data-settings-action="ambience"]'),'la música conserva su ajuste');
     assert.ok(w.document.querySelector('[data-settings-action="haptics"]'),'la vibración conserva su ajuste');
+    // Los créditos de la música se leen dentro del juego y se cierran sin salir de Ajustes.
+    assert.equal(w.document.querySelector('a[href*="CREDITS.md"]'),null,'los créditos no abren un archivo de texto');
+    w.document.querySelector('[data-settings-action="music-credits"]').click();
+    assert.match(w.document.querySelector('[data-overlay="music-credits"]')?.textContent||'',/Música original de Continuum/);
+    w.document.querySelector('[data-overlay="music-credits"] [data-settings-action="close"]').click();
+    assert.ok(w.document.querySelector('[data-overlay="settings"]'),'cerrar los créditos deja Ajustes abierto');
     // Ni siquiera otro módulo con preferencias antiguas puede hacerlos sonar.
     w.CONTINUUM.effectPrefs=()=>({sound:true,haptics:false,ambience:false});
     const effects=w.CONTINUUM.Effects;
