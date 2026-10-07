@@ -105,10 +105,11 @@
 
   // El tamaño de la mesa se recuerda durante la sesión y se enseña igual en las dos pantallas.
   function publicCapacity() { return sessionStorage.getItem('continuum-public-capacity') || '0'; }
-  function capacityField() {
+  // `nota`: la explicación de cuándo empieza la partida (en «Jugar online» ya sale en Crear mesa).
+  function capacityField(nota = true) {
     const cap = publicCapacity();
     const options = [['0', 'Cualquier mesa · más rápido'], ['2', 'Hasta 2 jugadores'], ['3', 'Hasta 3 jugadores'], ['4', 'Hasta 4 jugadores']];
-    return `<div class="panel mode-online-config"><div class="field"><label for="mode-public-capacity">Tamaño de mesa</label><select id="mode-public-capacity">${options.map(([value, label]) => `<option value="${value}"${value === cap ? ' selected' : ''}>${label}</option>`).join('')}</select></div><p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</p></div>`;
+    return `<div class="panel mode-online-config"><div class="field"><label for="mode-public-capacity">Tamaño de mesa</label><select id="mode-public-capacity">${options.map(([value, label]) => `<option value="${value}"${value === cap ? ' selected' : ''}>${label}</option>`).join('')}</select></div>${nota ? '<p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más.</p>' : ''}</div>`;
   }
   // Jugar online, como el vestíbulo de Risk: alguien abre una mesa con su configuración
   // (juego, plazas y tiempo), la mesa aparece en la lista de mesas abiertas y los demás
@@ -119,10 +120,10 @@
       `<section class="public-board" aria-labelledby="public-board-title"><h2 class="mode-section-title" id="public-board-title">Mesas abiertas <small data-board-count></small></h2>
         <ul class="public-board-list" data-public-board aria-live="polite"><li class="public-board-empty">Buscando mesas…</li></ul></section>`,
       `<h2 class="mode-section-title public-quick-label">Partida rápida</h2><p class="hint public-quick-hint">Sin elegir mesa: te sentamos en la primera libre.</p>`,
+      capacityField(false),
       modeDoor('public-match', modeArt['public-match'], 'Sorpréndeme', 'Un mazo al azar de las Grandes colecciones, en la primera mesa libre.', false, 'data-online-kind="surprise"'),
       modeDoor('online-collections', modeArt['online-collections'], 'Grandes colecciones', 'Elige hasta tres temas para buscar mesa.', false, 'data-online-kind="collections"'),
-      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"'),
-      capacityField()
+      modeDoor('quick-public', modeArt['quick-public'], 'Retos rápidos', 'Tres retos sorpresa: arriesga o plántate para asegurar tus aciertos.', false, 'data-online-kind="quick"')
     ].join(''), modeArt['online-hub']);
     watchBoard();
   }
