@@ -369,7 +369,7 @@
     </div>`;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición con amigos</h2>
-        <p class="lead">Cada uno desde su móvil. Temas al azar de las Grandes colecciones y gana quien más sume al final.</p></div>
+        <p class="lead">Cada uno desde su móvil. Se juega por rondas, todos a la vez y con puntos. Temas al azar de las Grandes colecciones y gana quien más sume al final.</p></div>
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Qué jugáis</h3></div>
           ${lengthField(temas, { all: todosVisible })}
