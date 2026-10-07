@@ -127,6 +127,12 @@
         <p class="hint">Las partidas locales y las cartas ya descargadas funcionan sin conexión. Las salas, duelos por turnos, ranking y comentarios necesitan conexión. Si una ilustración no aparece, recarga cuando tengas internet.</p>
       </div></details>
 
+      ${window.CONTINUUM?.Accounts?.ready ? `<details class="settings-section settings-support settings-privacy"><summary><span><b>Privacidad y ranking</b><small>Qué se guarda y quién lo ve</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
+        <p class="hint" style="text-align:left">Tu progreso (partidas, aciertos, logros y retos diarios) se guarda en un servidor (Firebase) para que no se pierda, sin correo ni datos personales. El ranking del reto diario es público y opcional: solo apareces si lo decides.</p>
+        <label class="opt-row"><span>Aparecer en el ranking público <small>Nombre de perfil, avatar, aciertos y tiempo</small></span><input type="checkbox" data-ranking-toggle ${window.CONTINUUM.Accounts.rankingPublico === true ? "checked" : ""}></label>
+        <p class="hint" style="text-align:left"><a href="privacidad.html" target="_blank" rel="noopener noreferrer">Política de privacidad</a> · Para borrar tus datos: Atlas → Tu cuenta y tus datos.</p>
+      </div></details>` : ""}
+
       <details class="settings-section settings-support"><summary><span><b>Ayuda y comentarios</b><small>Cuéntanos cómo mejorar tu experiencia</small></span><i aria-hidden="true">+</i></summary><div class="settings-support-body">
         <p class="hint" style="text-align:left;margin-top:0"><a href="privacidad.html#arte" target="_blank" rel="noopener noreferrer">Privacidad, datos y procedencia del arte</a></p>
         <div class="field">

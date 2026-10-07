@@ -47,6 +47,14 @@ function periods(records, now = new Date()) {
   };
 }
 function readRecords() { try { return JSON.parse(CT.Storage.getItem(R) || '{}'); } catch { return {}; } }
+// ¿Aparece quien juega en el ranking público? Se pregunta al terminar su primer reto diario y la respuesta
+// viaja con su progreso (dentro de los retos), así que vale en cualquier móvil con la misma cuenta. Sin
+// decidir, no se publica nada: ni aciertos, ni tiempo, ni nombre.
+const rankingPublico = () => { const v = readRecords().rankingPublico; return v === true ? true : v === false ? false : null; };
+let rankingPreguntado = false;
+// La cuenta con la que se ha vinculado el invitado (Apple o Google), si la hay.
+const PROVIDERS = {'apple.com':'Apple','google.com':'Google'};
+const linkedProvider = u => u?.providerData?.map(p => p.providerId).find(id => PROVIDERS[id]) || null;
 function message(error) {
   const texts = {
     'auth/operation-not-allowed':'Este método de acceso aún no está activado en Firebase. Contacta con soporte.',
@@ -265,8 +273,9 @@ async function flush() {
     tx.set(r.progress,{...data,revision:expected+1,updatedAt:serverTimestamp()});
     const who = {alias:profile.alias, avatar:profile.avatar};
     const per = periods(readRecords());
-    if (data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,ms:per.dayMs,finishedAt:per.finishedAt,updatedAt:serverTimestamp()});
-    if (data.week) tx.set(weekScore(uid,data.week),{...who,hits:data.weekHits,ms:per.weekMs,updatedAt:serverTimestamp()});
+    const publico = rankingPublico() === true;
+    if (publico && data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,ms:per.dayMs,finishedAt:per.finishedAt,updatedAt:serverTimestamp()});
+    if (publico && data.week) tx.set(weekScore(uid,data.week),{...who,hits:data.weekHits,ms:per.weekMs,updatedAt:serverTimestamp()});
   }).then(() => {
     revision=expected+1;setMeta(change !== generation);
     if (!metadata().dirty) document.getElementById('storage-notice')?.remove();
@@ -276,6 +285,10 @@ async function flush() {
 function schedule(key) {
   if (suppress || ![P,R].includes(key)) return;
   change++;setMeta(true);clearTimeout(timer);
+  // Recién terminado un reto diario y sin haber decidido todavía: se pregunta sobre su resultado.
+  if (key === R && ready && !rankingPreguntado && rankingPublico() === null && periods(readRecords()).day) {
+    rankingPreguntado = true; setTimeout(askRanking, 1800);
+  }
   timer=setTimeout(() => flush().catch(e => { if (!failedConflict) syncNotice(message(e)); }),2000);
 }
 // Adivinar todos los códigos con los que Firebase puede anunciar "sin red" no
@@ -326,6 +339,25 @@ function appleControls() {
     <details><summary>Identificador para pruebas internas</summary><code>${esc(identity?.uid || '')}</code></details>
     <p id="account-auth-message" role="status"></p></section>`;
 }
+// Al vincular una cuenta de Apple o Google que ya tenía progreso propio, se pregunta cuál conservar en vez
+// de cambiar sin avisar. Si se elige el de este móvil, se deja apartado (fuera del espacio de cada cuenta)
+// para recogerlo tras recargar con la otra cuenta; caduca a los diez minutos.
+const HANDOFF = 'continuum-progress-handoff';
+function chooseProgress(provider) {
+  return new Promise(resolve => {
+    const layer = document.createElement('div'); layer.className = 'overlay';
+    layer.innerHTML = `<section class="modal" role="alertdialog" aria-modal="true" aria-labelledby="choose-progress-title"><h2 id="choose-progress-title">Esta cuenta de ${esc(PROVIDERS[provider] || 'acceso')} ya tiene progreso</h2>
+      <p>¿Con cuál te quedas? El otro se descarta.</p>
+      <div class="actions" style="display:grid;gap:10px"><button class="btn btn-primary" data-choose="cuenta">El de mi cuenta</button><button class="btn btn-secondary" data-choose="movil">El de este móvil</button><button class="btn btn-ghost" data-choose="">Cancelar</button></div></section>`;
+    layer.addEventListener('click', event => { const b = event.target.closest('[data-choose]'); if (!b) return; layer.remove(); resolve(b.dataset.choose || null); });
+    app.append(layer); layer.querySelector('[data-choose="cuenta"]').focus();
+  });
+}
+function takeHandoff() {
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem(HANDOFF) || 'null'); localStorage.removeItem(HANDOFF); } catch { /* sin almacenamiento */ }
+  return data && Date.now() - Number(data.at) < 600000 ? data : null;
+}
 async function signInApple() {
   if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de acceder con Apple.');
   if (!appleNativeEnabled) throw Object.assign(Error('Apple no está habilitado en esta beta.'),{code:'apple/beta-disabled'});
@@ -342,7 +374,10 @@ async function signInApple() {
     try { signed = await linkWithCredential(auth.currentUser, credential); }
     catch (error) {
       if (error.code !== 'auth/credential-already-in-use') throw error;
-      // Volver a una cuenta de pruebas ya existente, sin mezclar sus datos con los del invitado.
+      // La cuenta ya existía con su propio progreso: se pregunta cuál conservar. Nunca se mezclan.
+      const choice = await chooseProgress('apple.com');
+      if (!choice) throw Object.assign(Error('Cancelado'), {code:'apple/cancelled'});
+      if (choice === 'movil') { const {progress, records} = payload(); try { localStorage.setItem(HANDOFF, JSON.stringify({progress, records, at: Date.now()})); } catch {} }
       signed = await signInWithCredential(auth, credential);
     }
     await signed.user.getIdToken(true);
@@ -391,7 +426,12 @@ async function enter() {
     if (profile.season !== season) throw Object.assign(Error('Este perfil pertenece a otra temporada. Contacta con soporte.'),{code:'account/wrong-season'});
     const snap=await getDocFromServer(r.progress), remote=snap.exists()?snap.data():null;
     const meta=metadata();revision=meta.revision || 0;
-    if (meta.dirty) {
+    const handoff=takeHandoff();
+    if (handoff) {
+      // Se eligió conservar el progreso del móvil al entrar con una cuenta que ya tenía el suyo.
+      suppress=true;CT.Storage.setItem(P,handoff.progress || '{}');CT.Storage.setItem(R,handoff.records || '{}');suppress=false;
+      revision=remote?.revision || 0;change++;setMeta(true);await flush();
+    } else if (meta.dirty) {
       if (revision !== (remote?.revision || 0)) { conflictScreen(); return; }
       await flush();
     } else if (!remote && adoptOffline()) {
@@ -402,6 +442,8 @@ async function enter() {
     await syncAvatar();
     try { const note=localStorage.getItem('continuum-apple-auth-notice');if(note){localStorage.removeItem('continuum-apple-auth-notice');syncNotice(note);} } catch {}
     ready=true;stopStorage?.();stopStorage=CT.AccountStorage.subscribe(schedule);
+    // Quien dijo que no y no tenía conexión al decirlo: se terminan de retirar sus filas.
+    if (rankingPublico() === false) void removeRankingRows().catch(() => {});
     if (!active) { active=true;startGame(); }
   } catch (error) {
     if (failedConflict) return;
@@ -414,6 +456,39 @@ async function enter() {
     feedback(message(error));button('account-load',enter);
   }
 }
+// Aparecer o dejar de aparecer en el ranking. Al dejarlo se borran las filas de hoy y de esta semana (y la
+// antigua tabla única); si no hay conexión, se reintenta al volver a abrir el juego.
+async function removeRankingRows() {
+  if (!identity) return;
+  const uid = identity.uid, per = periods(readRecords());
+  await runTransaction(db, async tx => { tx.delete(dayScore(uid, per.today)); tx.delete(weekScore(uid, per.weekKey)); tx.delete(refs(uid).ranking); });
+}
+async function setRanking(value) {
+  const records = readRecords();
+  records.rankingPublico = value === true;
+  CT.Storage.setItem(R, JSON.stringify(records));
+  if (value !== true) await removeRankingRows().catch(() => {});
+  await flush().catch(() => {});
+  refreshCard();
+}
+function refreshCard() { const card = document.querySelector('.account-card'); if (card) card.outerHTML = accountCard(); }
+function askRanking() {
+  if (!ready || rankingPublico() !== null || document.querySelector('.ranking-consent')) return;
+  accountDialog(`<div class="overlay"><section class="modal ranking-consent"><h2>¿Quieres aparecer en el ranking?</h2>
+    <p>El ranking del reto diario es público: lo ven los demás jugadores. Si aceptas, mostrará tu nombre de perfil, tu avatar, tus aciertos y tu tiempo, del día y de la semana.</p>
+    <p class="hint">Puedes cambiarlo cuando quieras en Ajustes o en el Atlas.</p>
+    <div class="actions" style="display:grid;gap:10px"><button class="btn btn-primary" data-account-action="ranking-yes">Sí, aparecer en el ranking</button><button class="btn btn-ghost" data-account-action="ranking-no">Ahora no</button></div></section></div>`);
+}
+function rankingControls() {
+  const publico = rankingPublico() === true;
+  return `<section class="account-privacy" aria-label="Ranking público"><p><b>Ranking público:</b> ${publico ? 'apareces con tu nombre de perfil, tu avatar, tus aciertos y tu tiempo.' : 'no apareces. Tus resultados solo los ves tú.'}</p>
+    <button class="btn btn-secondary" data-account-action="ranking-toggle" aria-pressed="${publico}">${publico ? 'Dejar de aparecer' : 'Aparecer en el ranking'}</button></section>`;
+}
+function accountText() {
+  const provider = linkedProvider(identity);
+  if (provider) return `Tu progreso está guardado en tu cuenta de ${PROVIDERS[provider]}. Entrando con ella en otro móvil lo recuperas.`;
+  return 'Juegas como invitado: tu progreso se guarda en un servidor (Firebase) ligado a esta instalación, sin correo ni datos personales. Si borras la app o cambias de móvil, normalmente no podrás recuperarlo; algunos móviles lo restauran desde su copia de seguridad.';
+}
 function accountCard() {
   const stats=payload(), dirty=metadata().dirty;
   return `<div class="account-card">
@@ -422,7 +497,8 @@ function accountCard() {
     <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking de retos diarios</b><span>Hoy y esta semana</span></span><span aria-hidden="true">↗</span></button>
     ${appleControls()}
     <div class="account-actions"><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>
-    <details class="account-details"><summary>Tu cuenta y tus datos</summary><p>${appleUser(identity) ? 'Cuenta interna de Apple. Puedes volver a acceder con la misma cuenta en una compilación de pruebas habilitada.' : 'Invitado de esta instalación. Si borras los datos de la app o cambias de móvil, no podrás recuperar tu progreso.'}</p><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a><button class="btn btn-ghost account-delete" data-account-action="delete">${appleUser(identity) ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</button></details>
+    ${rankingControls()}
+    <details class="account-details"><summary>Tu cuenta y tus datos</summary><p>${esc(accountText())}</p><a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a><button class="btn btn-ghost account-delete" data-account-action="delete">${appleUser(identity) ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</button></details>
   </div>`;
 }
 // Qué tabla se está mirando: hoy o esta semana, o un día o una semana anteriores (flechas ‹ ›).
@@ -466,7 +542,7 @@ async function ranking(tab = 'day', key = '', all = false) {
   const mas = !all && entries.length >= RANKING_PAGE ? `<button type="button" class="btn btn-secondary ranking-more" data-account-action="ranking-more">Ver más</button>` : '';
   if (document.querySelector('.ranking-modal')) CT.closeDialog();
   accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · RETO DIARIO</span><span class="ranking-emblem" aria-hidden="true">✦</span>${tabs}${nav}<h2 class="solo-lectores">${esc(titulo)}</h2><p>${esc(subtitulo)}</p></header>
-    <div class="ranking-body">${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros">${podium}</div><div class="ranking-personal${own?' has-result':''}">${personal}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}${mas}`:vacio}
+    <div class="ranking-body"><p class="ranking-public-note">Ranking público: solo aparece quien lo ha decidido, con su nombre de perfil, avatar, aciertos y tiempo.</p>${rankingPublico() === true ? '' : '<div class="ranking-optin"><p>No apareces en esta tabla.</p><button type="button" class="btn btn-secondary" data-account-action="ranking-join">Aparecer en el ranking</button></div>'}${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros">${podium}</div><div class="ranking-personal${own?' has-result':''}">${personal}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}${mas}`:vacio}
     <details class="account-details ranking-rules"><summary>Cómo funciona</summary><p>Cada día hay un reto de 10 cartas; cada carta bien colocada es un acierto. <b>Por días</b> ordena por los aciertos de ese día; <b>por semanas</b>, por los de lunes a domingo, y cada lunes todo el mundo vuelve a empezar, así que da igual cuándo empezaste a jugar. A igualdad de aciertos gana quien tardó menos en jugar el reto (en la semana, sumando los días).</p><p>Con ‹ › ves quién ganó los días y las semanas anteriores. Solo cuenta el reto diario. Resultados enviados por el juego, sin validación competitiva.</p></details></div>
     <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`,true);
 }
@@ -489,7 +565,7 @@ async function removeAccount() {
 }
 export async function startAccounts(callback) {
   startGame=callback;
-  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,rankingDe:(tab)=>ranking(tab),renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar,cargaAvatares:loadAvatars};
+  CT.Accounts={get ready(){return ready;},get user(){return identity;},get profile(){return profile;},card:accountCard,flush,rankingDe:(tab)=>ranking(tab),renombra:alias=>rename(alias),sincronizaAvatar:syncAvatar,cargaAvatares:loadAvatars,get rankingPublico(){return rankingPublico();},setRanking};
   await auth.authStateReady();
   await setPersistence(auth,browserLocalPersistence);
   onAuthStateChanged(auth,u=>{
@@ -499,6 +575,11 @@ export async function startAccounts(callback) {
     if (!authChanging && active && (!u || u.uid!==identity?.uid)) {
       ready=false;stopStorage?.();clearTimeout(timer);app.inert=true;location.reload();
     }
+  });
+  // El interruptor de Ajustes («Aparecer en el ranking público»).
+  document.addEventListener('change',event=>{
+    const box=event.target.closest?.('[data-ranking-toggle]');if(!box||!ready)return;
+    box.disabled=true;setRanking(box.checked).finally(()=>{box.disabled=false;box.checked=rankingPublico()===true;});
   });
   window.addEventListener('online',()=>flush().catch(e=>{if(!failedConflict)syncNotice(message(e));}));
   document.addEventListener('visibilitychange',()=>{if(document.hidden)void flush().catch(()=>{});});
@@ -510,7 +591,7 @@ export async function startAccounts(callback) {
     if(action==='daily'){CT.closeDialog();CT.localNavigate?.('daily');return;}
     if(busy)return;busy=true;target.disabled=true;
     const fn={ranking:()=>ranking('day'),'ranking-day':()=>ranking('day'),'ranking-week':()=>ranking('week'),
-      'ranking-prev':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?-7:-1)),'ranking-next':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?7:1)),'ranking-more':()=>ranking(rankingView.tab,rankingView.key,true),sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},apple:signInApple,signout:signOutApple,'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
+      'ranking-prev':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?-7:-1)),'ranking-next':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?7:1)),'ranking-more':()=>ranking(rankingView.tab,rankingView.key,true),sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},apple:signInApple,signout:signOutApple,'ranking-yes':async()=>{CT.closeDialog();await setRanking(true);},'ranking-no':async()=>{CT.closeDialog();await setRanking(false);},'ranking-toggle':()=>setRanking(rankingPublico()!==true),'ranking-join':async()=>{await setRanking(true);await ranking(rankingView.tab,rankingView.key);},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
     Promise.resolve().then(fn).catch(error=>{
       if (error.code === 'apple/cancelled') return;
       const text=message(error), el=document.getElementById('account-auth-message') || document.getElementById('account-delete-message');

@@ -556,14 +556,15 @@
     paint(`<div class="shell bienvenida-shell"><section class="bienvenida">
       <button class="bienvenida-avatar avatar-picker-trigger" type="button" data-action="identidad-avatar" data-avatar-vivo aria-label="Elegir avatar">${CT.Avatares.markup(nombre, { size: 112, seed: CT.Avatares.ownSeed() })}<span class="avatar-picker-cue">Elegir avatar <span aria-hidden="true">✦</span></span></button>
       <h1 data-focus tabindex="-1">Bienvenido a Continuum</h1>
-      <p class="lead">¿Cómo te llamas?</p>
+      <p class="lead">¿Cómo quieres que te llamemos?</p>
       <form class="bienvenida-form" data-bienvenida="nombre" novalidate>
-        <label class="solo-lectores" for="bienvenida-nombre">Tu nombre</label>
-        <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu nombre" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error bienvenida-pista">
+        <label class="solo-lectores" for="bienvenida-nombre">Tu apodo</label>
+        <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu apodo" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error bienvenida-pista bienvenida-datos">
         <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
         <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
       </form>
       <p class="hint" id="bienvenida-pista">Toca el avatar para elegirlo. Podrás cambiarlo después.</p>
+      <p class="hint bienvenida-datos" id="bienvenida-datos">Mejor un apodo que tu nombre real. Tu progreso se guarda en un servidor, sin correo ni datos personales. El ranking es opcional: te preguntaremos al terminar tu primer reto diario. <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></p>
     </section></div>`);
   }
 

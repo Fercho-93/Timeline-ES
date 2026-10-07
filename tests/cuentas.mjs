@@ -87,9 +87,17 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const {w,dom,data}=setup(user('a'),{'playerProfiles/a':profile});let started=0;
  w.localStorage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:999}}));
  await w.testAccounts.startAccounts(()=>started++);assert.equal(started,1);assert.equal(w.CONTINUUM.Storage.getItem('hilo-perfil-v1'),'{}');
+ // Sin haber decidido aparecer en el ranking, el progreso se guarda pero no se publica ninguna fila.
  w.CONTINUUM.Storage.setItem('hilo-retos-v1',JSON.stringify({retoDiario:{days:{[hoy]:{hits:7,total:10,finishedAt:'2026-01-01T10:00:00.000Z',ms:123000},'2000-01-03':{hits:9,total:10}}}}));
+ await w.testAccounts.flush();
+ assert.equal(data.get('playerProgress/a').revision,1);assert.equal(data.has(`dailyScores/${hoy}/players/a`),false,'sin aceptar no se publica en el ranking');
+ assert.equal(w.CONTINUUM.Accounts.rankingPublico,null);
+ // Al terminar el reto diario se pregunta; aceptar publica las filas del día y de la semana.
+ await new Promise(r=>setTimeout(r,1900));
+ assert.ok(w.document.querySelector('.ranking-consent'),'tras el reto diario se pregunta por el ranking');
+ assert.doesNotMatch(w.document.querySelector('.ranking-consent').textContent,/Player|Fer/,'la pregunta no nombra a nadie');
+ await w.CONTINUUM.Accounts.setRanking(true);
  w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:9,games:4,rankedHits:500,rankedGames:200,dailyHits:5,dailyGames:2}}));await w.testAccounts.flush();
- assert.equal(data.get('playerProgress/a').revision,1);
  // Las tablas de hoy y de esta semana llevan los aciertos del reto; un día de otra semana no suma.
  assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(data.get(`dailyScores/${hoy}/players/a`).finishedAt,'2026-01-01T10:00:00.000Z');
  assert.equal(data.get(`weeklyScores/${lunes}/players/a`).hits,7);
@@ -98,6 +106,13 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='Fulanito';await w.testAccounts.rename();
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get(`dailyScores/${hoy}/players/a`).alias,'Fulanito');
  assert.equal(data.get(`weeklyScores/${lunes}/players/a`).alias,'Fulanito');assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
+ // Dejar de aparecer retira las filas del día y de la semana, y no se vuelven a publicar.
+ await w.CONTINUUM.Accounts.setRanking(false);
+ assert.equal(data.has(`dailyScores/${hoy}/players/a`),false);assert.equal(data.has(`weeklyScores/${lunes}/players/a`),false);
+ w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:10}}));await w.testAccounts.flush();
+ assert.equal(data.has(`dailyScores/${hoy}/players/a`),false,'tras decir que no, el progreso se guarda sin publicar');
+ assert.match(w.CONTINUUM.Accounts.card(),/Aparecer en el ranking/);
+ await w.CONTINUUM.Accounts.setRanking(true);
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='<bad>';await assert.rejects(w.testAccounts.rename());
  data.set('playerNames/ocupado',{uid:'someone-else'});
  w.document.getElementById('account-alias').value='OCUPADO';await assert.rejects(w.testAccounts.rename(),/ya está en uso/);
@@ -174,7 +189,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 }
 {
  // El avatar elegido se publica en el perfil y en la fila del ranking, y el ranking dibuja el de cada persona.
- const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'playerProgress/a':{progress:'{}',records:JSON.stringify({retoDiario:{days:{[hoy]:{hits:3,total:10}}}}),revision:1,season:'launch-1',day:hoy,dayHits:3,week:lunes,weekHits:3},[`dailyScores/${hoy}/players/a`]:{alias:'Fer',avatar:'compass',hits:3},[`dailyScores/${hoy}/players/b`]:{alias:'Bea',avatar:'panda',hits:5}});
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'playerProgress/a':{progress:'{}',records:JSON.stringify({rankingPublico:true,retoDiario:{days:{[hoy]:{hits:3,total:10}}}}),revision:1,season:'launch-1',day:hoy,dayHits:3,week:lunes,weekHits:3},[`dailyScores/${hoy}/players/a`]:{alias:'Fer',avatar:'compass',hits:3},[`dailyScores/${hoy}/players/b`]:{alias:'Bea',avatar:'panda',hits:5}});
  await w.testAccounts.startAccounts(()=>{});
  assert.equal(data.get('playerProfiles/a').avatar,w.CONTINUUM.Avatares.ownId(),'al entrar se publica el avatar de la persona, también el que le tocó sin elegir');
  w.CONTINUUM.Avatares.choose('tigre');await w.CONTINUUM.Accounts.sincronizaAvatar();

@@ -5220,3 +5220,7 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
   text-align: center;
   padding-inline: 4px !important;
 }
+
+/* Bienvenida: qué se guarda y que el ranking es opcional, en letra pequeña bajo el campo del nombre. */
+#app .bienvenida .bienvenida-datos { margin-top: 10px; font-size: .74rem; line-height: 1.45; }
+#app .bienvenida .bienvenida-datos a { color: inherit; text-decoration: underline; }

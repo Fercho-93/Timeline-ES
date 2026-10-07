@@ -4,7 +4,7 @@
 
 - La primera apertura con conexión crea un invitado Firebase automáticamente y un alias aleatorio `Player 4821`. No hay formulario ni registro previo.
 - Firebase conserva la sesión local. Volver a abrir usa el mismo UID; el nombre se reserva de forma única en `playerNames`, sin distinguir mayúsculas. Los puntos se separan por UID.
-- Perfil → Cambiar nombre actualiza el perfil y la entrada del ranking de forma atómica, conservando los puntos. Los nombres aceptan de 2 a 24 caracteres.
+- Atlas → Cambiar nombre actualiza el perfil y la entrada del ranking de forma atómica, conservando los puntos. Los nombres aceptan de 2 a 24 caracteres.
 - No hay cierre de sesión ni recuperación por correo. Si se pierde la instalación o se borran sus datos, se pierde acceso al invitado. No se promete recuperación por copias del sistema operativo.
 - La apertura requiere conexión para preparar el invitado y leer su progreso. Una vez abierto, el juego conserva cambios locales y reintenta guardarlos al recuperar conexión. No se crea otro invitado ante un fallo de red.
 - La temporada `launch-1` empieza de cero; los datos locales antiguos no se importan. No se borra masivamente la base de datos.
@@ -14,6 +14,10 @@
 - El nombre del ranking es único (sin distinguir mayúsculas). Si alguien puso su nombre sin conexión, se publica al abrir con cuenta; si ya lo usa otra persona, el juego avisa. El avatar es el que cada persona eligió entre los 36 del selector: se guarda en el perfil y en sus filas de hoy y de la semana.
 - Lo jugado sin conexión antes de tener invitado (espacio local `locked`) pasa a la cuenta nueva si esta aún no tiene progreso en la nube; en una cuenta que ya lo tiene no se mezcla y prevalece el de la nube. La colección nueva `dailyRanking` separa las marcas anteriores. Son resultados declarados por cliente, no una clasificación antitrampas.
 - Eliminar invitado y progreso requiere confirmación y borra sus documentos e identidad; la siguiente apertura comienza desde cero. Desinstalar no borra automáticamente documentos remotos ni entradas del ranking.
+
+- El ranking es opcional. `rankingPublico` (dentro de `hilo-retos-v1`, que viaja con el progreso) vale `true`, `false` o no existe. Sin decidir no se escribe ninguna fila en `dailyScores` ni `weeklyScores`. La pregunta sale al terminar el primer reto diario («¿Quieres aparecer en el ranking?») y se puede cambiar en Ajustes → Privacidad y ranking y en el Atlas. Al dejar de aparecer se borran las filas del día y de la semana en curso y `dailyRanking/{uid}`; si falla por falta de conexión, se reintenta en la siguiente apertura.
+- La bienvenida avisa de que el progreso se guarda en un servidor sin correo y de que el ranking es opcional, con enlace a la política de privacidad.
+- Al vincular Apple con una cuenta que ya tenía progreso (`auth/credential-already-in-use`) se pregunta cuál conservar. Si se elige el del móvil, se deja apartado en `continuum-progress-handoff` (fuera del espacio de cada cuenta, caduca a los diez minutos) y se sube a la cuenta tras recargar. Nunca se mezclan.
 
 ## Configuración del propietario
 

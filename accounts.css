@@ -92,3 +92,12 @@
 .account-signin p { font:inherit; }
 .account-signin details { font-size:.7rem; color:var(--edition-muted); }
 .account-signin code { display:block; overflow-wrap:anywhere; user-select:all; padding-top:8px; }
+
+/* Ranking público y opcional: estado en la tarjeta, nota visible y entrada desde la tabla. */
+.account-privacy { padding:0 20px 16px; font:.8rem/1.5 var(--ui-font); }
+.account-privacy p { margin:0 0 8px; font:inherit; }
+.account-privacy .btn { width:100%; min-height:44px; }
+.ranking-public-note { margin:0 0 12px; color:var(--edition-muted); font:.74rem/1.45 var(--ui-font); text-align:center; }
+.ranking-optin { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 14px; margin-bottom:14px; border:1px dashed var(--edition-line); border-radius:12px; font:.8rem/1.4 var(--ui-font); }
+.ranking-optin p { margin:0; }
+.ranking-consent .actions .btn { width:100%; }

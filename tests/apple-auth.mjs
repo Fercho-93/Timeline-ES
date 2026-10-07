@@ -26,6 +26,13 @@ function setup({enabled = true, tester = true, ios = true, apple = false} = {}) 
   w.eval(source+'\nwindow.appleTest={startAccounts,signInApple,signOutApple,deleteScreen,removeAccount};');
   return {w,dom,data,auth,calls};
 }
+// Al vincular una cuenta que ya tenía progreso, el juego pregunta cuál conservar.
+async function conEleccion(w, choice) {
+  const pending = w.appleTest.signInApple();
+  for (let i = 0; i < 50 && !w.document.querySelector('[data-choose]'); i++) await new Promise(r => setTimeout(r, 0));
+  w.document.querySelector(`[data-choose="${choice}"]`).click();
+  return pending;
+}
 {
   const {w,dom,calls}=setup({enabled:false});await w.appleTest.startAccounts(()=>{});
   assert.match(w.CONTINUUM.Accounts.card(),/data-account-action="apple" disabled/);
@@ -51,13 +58,28 @@ function setup({enabled = true, tester = true, ios = true, apple = false} = {}) 
 {
   const {w,dom,calls}=setup();await w.appleTest.startAccounts(()=>{});
   w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
-  await w.appleTest.signInApple();assert.equal(calls.login,1);assert.equal(calls.logout,1);
+  await conEleccion(w,'cuenta');assert.equal(calls.login,1);assert.equal(calls.logout,1);
   assert.equal(w.auth.currentUser,null);assert.match(w.localStorage.getItem('continuum-apple-auth-notice'),/no está autorizada/);dom.window.close();
 }
 {
   const {w,dom,data,calls}=setup();data.set('appleBetaTesters/existing-apple',{enabled:true});await w.appleTest.startAccounts(()=>{});
   w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
-  await w.appleTest.signInApple();assert.equal(calls.login,1);assert.equal(calls.logout,0);assert.equal(w.auth.currentUser.uid,'existing-apple');dom.window.close();
+  await conEleccion(w,'cuenta');assert.equal(calls.login,1);assert.equal(calls.logout,0);assert.equal(w.auth.currentUser.uid,'existing-apple');
+  assert.equal(w.localStorage.getItem('continuum-progress-handoff'),null,'quedarse con el de la cuenta no aparta nada');dom.window.close();
+}
+{
+  // Quedarse con el progreso del móvil: se aparta para subirlo a la cuenta tras recargar.
+  const {w,dom,data,calls}=setup();data.set('appleBetaTesters/existing-apple',{enabled:true});await w.appleTest.startAccounts(()=>{});
+  w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:42}}));
+  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
+  await conEleccion(w,'movil');assert.equal(calls.login,1);
+  assert.match(JSON.parse(w.localStorage.getItem('continuum-progress-handoff')).progress,/"hits":42/);dom.window.close();
+}
+{
+  // Cancelar la elección no cambia de cuenta.
+  const {w,dom,calls}=setup();await w.appleTest.startAccounts(()=>{});
+  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
+  await assert.rejects(conEleccion(w,''),/Cancelado/);assert.equal(calls.login,0);assert.equal(w.auth.currentUser.uid,'guest');dom.window.close();
 }
 {
   const {w,dom}=setup();await w.appleTest.startAccounts(()=>{});
