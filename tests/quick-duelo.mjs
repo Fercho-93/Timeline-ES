@@ -69,7 +69,7 @@ CT.Quick.openDuel(html => { app.innerHTML = html; });
 const chips = [...app.querySelectorAll('.quick-length-chip')].map(c => c.dataset.length);
 assert.deepEqual(chips, ['1', '3', '5']);
 assert.equal(app.querySelector('.quick-length-chip.is-selected').dataset.length, '3');
-assert.match(app.textContent, /Partida con amigos/);
+assert.match(app.textContent, /Retos rápidos con amigos/);
 assert.match(app.textContent, /mismos retos/);
 assert.match(app.textContent, /En directo/);
 assert.match(app.textContent, /Por turnos/);
