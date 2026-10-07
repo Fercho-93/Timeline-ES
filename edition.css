@@ -5208,3 +5208,15 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 :root[data-theme="dark"] #app .tiempo-field .tiempo-segmented .segmented-option { color: #f5e6cc; background: #2c2118; border-color: #6d5435; box-shadow: none; }
 :root[data-theme="dark"] #app .tiempo-field .tiempo-segmented .segmented-option.is-on { color: #ffd9bf; background: #3d2a1d; border-color: #d08a5e; box-shadow: 0 0 0 1px #d08a5e; }
 @media (hover: hover) and (pointer: fine) { :root[data-theme="dark"] #app .tiempo-field .tiempo-segmented .segmented-option:not(.is-on):hover { color: #f5e6cc; background: #33271c; border-color: #8c6f45; } }
+
+/* «Fecha oculta» / «Valor oculto» de las cartas de la mano: centrada y dentro del marco, sin
+   rozar la línea del borde. Vale para todas las modalidades y para la carta levantada al arrastrar. */
+#app .hand .hand-card > .hidden-date,
+.drag-card-preview > .hidden-date {
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 7px;
+  text-align: center;
+  padding-inline: 4px !important;
+}
