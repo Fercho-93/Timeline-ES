@@ -2905,13 +2905,24 @@
       : motivo === "salida" ? `Has salido de la aplicación con la carta delante, así que esta no suma${sinVidas() ? "" : `: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}.`
       : motivo === "tiempo" ? `Se agotaron los segundos sin colocarla, así que esta no suma${sinVidas() ? "" : `: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}.`
       : sinVidas() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`;
-    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${titulo}</div><h2><span class="solo-lectores">${titulo}: </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${remate}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    const entra = !correct && cartaFalladaEntraEnLinea() ? " Al continuar, la carta pasa a su lugar correcto como referencia." : "";
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${titulo}</div><h2><span class="solo-lectores">${titulo}: </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${remate}${entra}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
+  // La carta fallada no se pierde: al continuar pasa a su lugar correcto y queda en la línea como
+  // referencia, igual que en Retos rápidos. El duelo por enlace queda fuera: sus reglas van
+  // numeradas dentro del enlace (ver `duelo.js`) y las dos marcas tienen que ser comparables.
+  const cartaFalladaEntraEnLinea = () => solo.kind !== "duel";
   function soloNext() {
     if (!solo?.pendingResult) return;
+    const jugada = solo.pendingResult;
     solo.pendingResult = null;
     result = null;
+    let falladaAlLinea = null;
+    if (!jugada.correct && cartaFalladaEntraEnLinea() && Number.isInteger(jugada.correctIndex) && !solo.timeline.includes(jugada.cardId)) {
+      solo.timeline.splice(jugada.correctIndex, 0, jugada.cardId);
+      falladaAlLinea = jugada.cardId;
+    }
     if (soloAcabada()) return soloFinish();
     // Primero se reserva la siguiente carta del jugador. Nunca se duplica ni se
     // consume por la inserción automática, que no modifica aciertos ni vidas.
@@ -2926,7 +2937,7 @@
     // `autoAdded` se guarda con la partida y sigue ahí al reanudarla, así que no sirve
     // para saber si el movimiento está por enseñar: eso lo dice esta lista, que vive solo
     // en esta pantalla y se vacía en cuanto se ha visto llegar las cartas.
-    recienColocadas = solo.autoAdded.slice();
+    recienColocadas = [...(falladaAlLinea ? [falladaAlLinea] : []), ...solo.autoAdded];
     // La carta nueva estrena plazo. Se apunta el instante, no lo que queda: así el tiempo
     // corre aunque el móvil apague la pantalla o la aplicación se vaya al fondo.
     if (enDueloConReloj()) solo.cartaEmpezadaEn = Date.now();

@@ -145,6 +145,30 @@ console.log("\nReto diario sin vidas");
   ok("se guardan los 5 aciertos", Object.values(retoDiario(w).days)[0].hits === 5);
 }
 
+console.log("\nLa carta fallada acaba en la línea");
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  click(w, '[data-action="start-free"]');
+  const libre = () => JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+  const antes = libre();
+  const cards = new Map(w.CONTINUUM.cards("history").map(card => [card.id, card]));
+  const bien = w.CONTINUUM.correctIndex("history", antes.timeline.map(id => cards.get(id)), cards.get(antes.current));
+  click(w, `[data-action="solo-place"][data-index="${bien === 0 ? 1 : 0}"]`);
+  click(w, '[data-action="confirm-place"]');
+  ok("al fallar, la carta aún no está en la línea", libre().timeline.length === antes.timeline.length && !libre().timeline.includes(antes.current));
+  ok("el aviso dice que pasará a su lugar", /pasa a su lugar correcto/.test(texto(w)));
+  click(w, '[data-action="solo-next"]');
+  const despues = libre();
+  ok("al continuar, la carta fallada entra en la línea", despues.timeline.includes(antes.current) && despues.timeline.length === antes.timeline.length + 1);
+  ok("y queda en su sitio correcto", despues.timeline.indexOf(antes.current) === bien);
+  ok("sigue costando una vida y no suma acierto", despues.lives === antes.lives - 1 && despues.hits === 0);
+  ok("la carta en juego es otra", despues.current !== antes.current && !despues.timeline.includes(despues.current));
+  const ids = despues.timeline.map(id => cards.get(id).year);
+  ok("la línea sigue ordenada", ids.every((year, i) => i === 0 || year >= ids[i - 1]));
+}
+
 console.log("\nReto diario");
 {
   const uno = boot();

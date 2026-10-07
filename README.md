@@ -199,6 +199,12 @@ La aplicación ofrece cuatro formas de jugar:
 - **En solitario:** una persona contra el mazo, con tres vidas.
 - **Competición:** un tema al azar tras otro, sin repetirse, con 3, 5 o todas las temáticas a elegir.
 
+En solitario y en la competición en solitario, una carta fallada no se pierde: tras ver el hueco donde
+iba, al continuar pasa a su lugar correcto y queda en la línea como referencia, igual que en Retos
+rápidos (cuesta la vida y no suma acierto). El duelo por enlace queda aparte: sus reglas viajan
+numeradas en el enlace para que las dos marcas sean comparables, y ahí la carta fallada sigue sin
+entrar. En multijugador, un fallo sigue yendo al descarte.
+
 Al terminar una partida —local, en solitario o de competición— si hubo alguna carta mal
 colocada aparece un botón para repasarlas: dónde iban de verdad, con su época y su
 explicación completa, en vez de perderse en el descarte sin más. Y en el momento mismo del

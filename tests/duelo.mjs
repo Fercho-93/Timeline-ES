@@ -95,6 +95,21 @@ function juegaDuelo(w, mode, { falla = () => false } = {}) {
   return secuencia;
 }
 
+console.log("\nEn el duelo por enlace la carta fallada sigue sin entrar en la línea");
+{
+  const w = boot();
+  await abreDuelo(w);
+  const antes = partida(w);
+  const cards = new Map(w.CONTINUUM.cards("history").map(c => [c.id, c]));
+  const bien = w.CONTINUUM.correctIndex("history", antes.timeline.map(id => cards.get(id)), cards.get(antes.current));
+  w.document.querySelectorAll('[data-action="solo-place"]')[bien === 0 ? antes.timeline.length : 0].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  click(w, '[data-action="confirm-place"]');
+  click(w, '[data-action="solo-next"]');
+  const despues = partida(w);
+  ok("la línea del duelo conserva solo los aciertos", despues.timeline.length === antes.timeline.length && !despues.timeline.includes(antes.current));
+  w.close();
+}
+
 console.log("\nDos móviles, la misma semilla, las mismas cartas");
 {
   const uno = boot();
