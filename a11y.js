@@ -573,10 +573,10 @@
         // La propia carta fallada, a su tamaño en la línea y con su lámina, es la que se
         // corrige: aparece donde se puso, niega con la cabeza y viaja en arco hasta su
         // sitio dejando un rastro de tinta. Sin lámina queda la tarjeta de texto.
-        const art = overlay.querySelector('.art-thumb img')?.getAttribute('src');
+        const art = overlay.dataset.correctionArt || overlay.querySelector('.art-thumb img')?.getAttribute('src');
         const sample = document.querySelector('.timeline .timeline-card');
         const full = !!(art && sample?.offsetWidth);
-        const title = CT_escape(heading?.textContent?.trim() || '');
+        const title = CT_escape(overlay.dataset.correctionTitle || heading?.textContent?.trim() || '');
         const year = CT_escape(overlay.querySelector('.year')?.textContent || '');
         if (full) {
           lesson.classList.add('is-card');

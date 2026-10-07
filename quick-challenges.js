@@ -764,14 +764,26 @@
   function cardMarkup(c, item) {
     return `<article class="timeline-card card-flippable animal-timeline-card" data-id="${item.id}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(item.title)}. Toca para ver la explicación."><div class="card-category">${esc(c.title)}</div><div class="card-visual"><img class="animal-card-art" src="${esc(item.image || 'assets/hero-quick-400.webp')}" alt="" width="400" height="600"></div><div class="card-content"><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><p>${esc(item.detail)}</p><div class="year">${esc(item.label)}</div></div></article>`;
   }
+  // La línea tal y como se ve al resolver una jugada. Si se ha fallado, la carta aún no está en ella:
+  // se enseña el hueco donde iba de verdad, igual que en Grandes colecciones, y entra al continuar.
+  function resultLine(c, r, get) {
+    if (r.correct) return state.timeline.map(id => cardMarkup(c, get(id))).join('');
+    const line = state.timeline.filter(id => id !== r.cardId), at = state.timeline.indexOf(r.cardId);
+    return [...line.map((id, i) => resultGap(i, i === at) + cardMarkup(c, get(id))), resultGap(line.length, line.length === at)].join('');
+  }
+  const resultGap = (i, correct) => correct
+    ? `<button class="slot slot-correct" disabled tabindex="-1" data-index="${i}" aria-label="Aquí iba la carta que acabas de fallar"><span>✦</span><small>Aquí</small></button>`
+    : `<button class="slot" disabled tabindex="-1" data-index="${i}" aria-hidden="true"><span>${i === 0 ? '−' : '+'}</span></button>`;
+  // Datos que usa la animación de corrección (a11y.js): qué carta, dónde la puso y dónde iba.
+  const correctionAttrs = (r, item) => r.correct ? '' : ` data-correction-card="${esc(r.cardId)}" data-attempted-slot="${Number.isInteger(r.attempted) ? r.attempted : ''}" data-correct-slot="${state.timeline.indexOf(r.cardId)}" data-correction-title="${esc(item.title)}"${item.image ? ` data-correction-art="${esc(item.image)}"` : ''}`;
   // Lo que pasa tras colocar una carta, dicho a quien juega solo («Pierdes 2 aciertos…») o a una mesa
   // («Ana pierde 2 aciertos…»). Con 0 aciertos provisionales no hay nada que «perder»: se dice tal cual.
   function resultNote(r, p) {
     const solo = !room && state.players.length === 1, name = esc(p.name);
     const n = (count, one, many) => `${count} ${count === 1 ? one : many}`;
-    if (r.keep) return `${r.correct ? 'Bien colocada.' : 'Esa carta no suma.'} ${solo ? 'Llevas' : `${name} lleva`} ${n(p.points, 'acierto', 'aciertos')}.`;
+    if (r.keep) return `${r.correct ? 'Bien colocada.' : 'Esa carta no suma y pasa a su lugar correcto.'} ${solo ? 'Llevas' : `${name} lleva`} ${n(p.points, 'acierto', 'aciertos')}.`;
     if (r.correct) return solo ? `Tienes ${n(p.points, 'acierto provisional', 'aciertos provisionales')}.` : `${name} tiene ${n(p.points, 'acierto provisional', 'aciertos provisionales')}.`;
-    const fuera = 'La carta ya está en su lugar correcto.';
+    const fuera = 'Al continuar, la carta pasa a su lugar correcto como referencia.';
     if (r.lost > 0) return solo ? `Pierdes ${n(r.lost, 'acierto', 'aciertos')} de este reto y quedas fuera hasta el siguiente. ${fuera}` : `${name} pierde ${n(r.lost, 'acierto', 'aciertos')} de este reto y queda fuera hasta el siguiente. ${fuera}`;
     return solo ? `No tenías aciertos provisionales que perder, pero quedas fuera de este reto hasta el siguiente. ${fuera}` : `${name} no tenía aciertos provisionales, pero queda fuera de este reto hasta el siguiente. ${fuera}`;
   }
@@ -844,8 +856,8 @@
     }
     if (state.phase === 'result') {
       const r = state.result, item = get(r.cardId);
-      if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id=>cardMarkup(c,get(id))).join('')}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);return;}
-      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${state.timeline.map(id => cardMarkup(c, get(id))).join('')}</div></div><div class="overlay" data-quick-result><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div>${sourceLinks(item)}
+      if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c,r,get)}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);return;}
+      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c, r, get)}</div></div><div class="overlay" data-quick-result${correctionAttrs(r, item)}><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div>${sourceLinks(item)}
         <p class="quick-result-note">${resultNote(r, p)}</p>
         ${button('ack', room && room.members.length < state.players.length ? 'Continuar y retar a mi amigo' : 'Continuar', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
       CT.openDialog(app().querySelector('[data-quick-result]'), false);

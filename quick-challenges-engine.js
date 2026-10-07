@@ -62,7 +62,8 @@
       const keep = keepPlaying(s);
       const lost = correct || keep ? 0 : p.points;
       if (correct) p.points++; else if (!keep) {p.points = 0; p.status = 'failed';}
-      s.result = {cardId: command.cardId, correct, lost, player: s.current, keep};
+      // `attempted`: el hueco donde se puso (sobre la línea sin la carta), para enseñar dónde falló.
+      s.result = {cardId: command.cardId, correct, lost, player: s.current, keep, attempted: command.index};
       s.phase = 'result';
     } else if (command?.type === 'bank' && s.phase === 'turn' && !keepPlaying(s)) {
       p.score += p.points; p.roundScore = p.points; p.points = 0; p.status = 'banked';

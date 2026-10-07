@@ -57,7 +57,7 @@ no puntúa. En cada turno se elige una carta común y se confirma su hueco en la
 línea. Acertar suma un punto provisional y pasa el turno; fallar pierde los puntos
 de ese reto y retira al participante hasta el siguiente. Plantarse asegura los
 puntos y también retira al participante. Los puntos de retos anteriores nunca se
-pierden. Una carta fallada se coloca correctamente como referencia.
+pierden. Una carta fallada se coloca correctamente como referencia: al fallar se ve el hueco donde iba y, al continuar, entra en la línea.
 
 Al agotarse las cartas se aseguran los puntos pendientes; también termina el reto
 si nadie sigue activo. La última persona activa puede continuar o plantarse. El

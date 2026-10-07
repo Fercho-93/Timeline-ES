@@ -380,7 +380,24 @@ for (;;) {
   const after = E.restore(JSON.parse(w.localStorage.getItem(key)));
   if (after.result.correct) aciertos++;
   assert.equal(after.players[0].status, 'active', 'un fallo no saca a quien juega solo');
+  const resultado = w.document.querySelector('[data-quick-result]');
+  if (!after.result.correct) {
+    // Como en Grandes colecciones: al fallar la carta no está en la línea; se marca el hueco donde iba.
+    const enLinea = [...w.document.querySelectorAll('.timeline .timeline-card')].map(el => el.dataset.id);
+    assert.ok(!enLinea.includes(cardId), 'la carta fallada aún no está en la línea');
+    assert.equal(enLinea.length, st.timeline.length, 'la línea sigue siendo la de antes de la jugada');
+    const marcado = w.document.querySelector('.timeline .slot-correct');
+    assert.ok(marcado, 'se marca el hueco correcto');
+    assert.equal(Number(marcado.dataset.index), after.timeline.indexOf(cardId), 'el hueco marcado es donde iba de verdad');
+    assert.equal(resultado.dataset.correctionCard, cardId);
+    assert.equal(Number(resultado.dataset.attemptedSlot), index, 'se conoce el hueco donde se puso');
+    assert.match(resultado.textContent, /pasa a su lugar correcto/);
+  } else {
+    assert.ok(!w.document.querySelector('.timeline .slot-correct'), 'un acierto no marca ningún hueco');
+    assert.ok(!resultado.dataset.correctionCard);
+  }
   click('[data-quick="ack"]');
+  if (!after.result.correct) assert.ok([...w.document.querySelectorAll('.timeline .timeline-card')].some(el => el.dataset.id === cardId), 'al continuar, la carta fallada entra en su sitio como referencia');
   jugadas++;
   assert.ok(jugadas <= 12, 'el reto termina');
 }
