@@ -1054,6 +1054,7 @@
   }
 
   function startGame() {
+    if (game?.pendientes?.length) vuelcaCartas(game);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     const inputs = [...document.querySelectorAll("#players input")];
     if (inputs.length < 2) return showToast("Se necesitan al menos 2 jugadores");
@@ -1282,7 +1283,7 @@
     selectedCardId = null;
     // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
     const nuevaLamina=correct&&ownsLocalAtlas(player)&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(game.mode,card);
-    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct, kind: "local", mine: ownsLocalAtlas(player), hidden: !!game.ghost?.pending.length }));
+    anotaCarta(game, { mode: game.mode, cardId: card.id, correct, kind: "local", mine: ownsLocalAtlas(player), hidden: !!game.ghost?.pending.length });
     if(nuevaLamina)game.newDiscoveries=(game.newDiscoveries||0)+1;
     saveGame();
     renderResult();
@@ -1412,7 +1413,7 @@
     game.pulseTurn.byOk = aciertaEn(card, index);
     game.pulseTurn.stage = PULSE_PASE;
     pendingIndex = null;
-    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: game.pulseTurn.byOk, kind: "local", mine: ownsLocalAtlas(currentPlayer()), hidden: !!game.ghost?.pending.length, pulse: true }));
+    anotaCarta(game, { mode: game.mode, cardId: card.id, correct: game.pulseTurn.byOk, kind: "local", mine: ownsLocalAtlas(currentPlayer()), hidden: !!game.ghost?.pending.length, pulse: true });
     saveGame();
     renderPulsePass();
   }
@@ -1449,7 +1450,7 @@
       correct: byOk, card, pulse: true, duel: true, targetOk,
       byName: player.name, targetName: target.name, gift, posiciones, penaltySkipped
     };
-    anotaLogros(CT.Progreso.record({ mode: game.mode, cardId: card.id, correct: targetOk, kind: "local", mine: ownsLocalAtlas(target), hidden: !!game.ghost?.pending.length, pulse: true }));
+    anotaCarta(game, { mode: game.mode, cardId: card.id, correct: targetOk, kind: "local", mine: ownsLocalAtlas(target), hidden: !!game.ghost?.pending.length, pulse: true });
     saveGame();
     renderResult();
   }
@@ -1567,6 +1568,7 @@
   }
 
   function endGame(winners) {
+    vuelcaCartas(game);
     game.winners = winners.map(player => player.id);
     game.winner = game.winners[0];
     anotaLogros(CT.Progreso.finishGame({ mode: game.mode, kind: "local", players: game.players.length }));
@@ -2737,6 +2739,7 @@
   // se estrena uno propio con semilla nueva. En los dos casos el reparto sale de la misma
   // función, que es justo lo que garantiza que los dos móviles jueguen lo mismo.
   function startSolo(kind, duel = null) {
+    if (solo?.pendientes?.length) vuelcaCartas(solo);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
     // El duelo se juega siempre en Fácil, como el reto diario: si cada parte lo jugara en
     // una dificultad, el marcador compararía dos cosas distintas.
@@ -2889,7 +2892,7 @@
     CT.Effects.feedback(correct);
     solo.pendingResult = { correct, cardId: card.id, attemptedIndex: result.attemptedIndex, correctIndex: result.correctIndex };
     const nuevaLamina=correct&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(solo.mode,card);
-    anotaLogros(CT.Progreso.record({ mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() }));
+    anotaCarta(solo, { mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() });
     if(nuevaLamina)solo.newDiscoveries=(solo.newDiscoveries||0)+1;
     saveSolo();
     soloResult();
@@ -2952,6 +2955,7 @@
   }
 
   function soloFinish() {
+    vuelcaCartas(solo);
     if (solo.kind === "comp") return compRoundFinish();
     screen = "solo-end";
     const total = solo.total || solo.played;
@@ -3749,6 +3753,8 @@
   }
 
   function returnFromPlay() {
+    // «Guardar y salir»: lo jugado hasta aquí ya cuenta en el perfil.
+    if (screen === 'solo') vuelcaCartas(solo); else vuelcaCartas(game);
     if ((screen === 'solo' && solo?.kind === 'comp') || screen === 'comp-intro') {
       saveCompetition(); solo = null; comp = null; competitionMenu(); return;
     }
@@ -3838,6 +3844,19 @@
   // Un logro puede caer a mitad de partida, y ahí no hay pantalla donde ponerlo: se avisa
   // y se sigue jugando. En una pantalla de fin, en cambio, hay sitio para enseñarlo
   // entero, así que ahí se usa `logrosMarkup` en vez de esto.
+  // Lo de cada carta (cartas colocadas, aciertos, láminas, puntos débiles y los logros que
+  // traigan) se apunta en la propia partida y pasa al perfil al terminarla o al «Guardar y
+  // salir». «Salir sin guardar» la descarta entera, con todo lo apuntado: no cuenta nada.
+  function anotaCarta(partida, evento) {
+    if (!partida) return;
+    (partida.pendientes = partida.pendientes || []).push(evento);
+  }
+  function vuelcaCartas(partida) {
+    const eventos = partida?.pendientes || [];
+    if (!eventos.length) return;
+    partida.pendientes = [];
+    for (const evento of eventos) anotaLogros(CT.Progreso.record(evento));
+  }
   function anotaLogros(nuevos) {
     if (!nuevos || !nuevos.length) return;
     if (solo) { solo.earnedAchievements = [...(solo.earnedAchievements || []), ...nuevos]; }
@@ -4255,9 +4274,9 @@
     else if (action === "game-menu") gameMenu();
     else if (action === "close-menu") CT.closeDialog();
     else if (action === "starter-start") { CT.closeDialog(); startGame(); }
-    else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual. Esta acción no se puede deshacer.', game?.tournament ? discardMultiCompetition : () => { game = null; saveGame(); home(); }, '¿Salir sin guardar?', 'Salir sin guardar');
+    else if (action === "abandon") CT.UI.confirmExit('Se borrará la partida actual y no contará nada de ella: ni cartas, ni aciertos, ni láminas. Esta acción no se puede deshacer.', game?.tournament ? discardMultiCompetition : () => { game = null; saveGame(); home(); }, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "abandon-solo" && solo?.kind === "comp") CT.UI.confirmExit('Se borrará la competición en curso, con todas sus rondas, y no podrás continuarla después. Esta acción no se puede deshacer.', discardCompetition, '¿Salir sin guardar?', 'Salir sin guardar');
-    else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará en las estadísticas ni en la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
+    else if (action === "abandon-solo") CT.UI.confirmExit('Se borrará el intento actual y no contará nada de él: ni cartas, ni aciertos, ni láminas, ni la racha. Esta acción no se puede deshacer.', abandonSolo, '¿Salir sin guardar?', 'Salir sin guardar');
     else if (action === "pulse-open") pulseTargetMenu();
     else if (action === "pulse-defend") { game.pulseTurn.stage = PULSE_DEFENSA; pendingIndex = null; saveGame(); gameView(); }
     else if (action === "pulse-target") { CT.closeDialog(); pulseChooseGift(Number(target.dataset.target)); }

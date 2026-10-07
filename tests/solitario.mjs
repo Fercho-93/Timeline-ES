@@ -169,6 +169,39 @@ console.log("\nLa carta fallada acaba en la línea");
   ok("la línea sigue ordenada", ids.every((year, i) => i === 0 || year >= ids[i - 1]));
 }
 
+console.log("\nSalir sin guardar no deja rastro; guardar y salir sí cuenta");
+{
+  const w = boot();
+  const perfil = () => JSON.parse(w.localStorage.getItem("hilo-perfil-v1") || "{}").totals?.cards || 0;
+  const juegaUna = () => {
+    const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+    const cards = new Map(w.CONTINUUM.cards("history").map(card => [card.id, card]));
+    const bien = w.CONTINUUM.correctIndex("history", estado.timeline.map(id => cards.get(id)), cards.get(estado.current));
+    click(w, `[data-action="solo-place"][data-index="${bien}"]`);
+    click(w, '[data-action="confirm-place"]');
+    click(w, '[data-action="solo-next"]');
+  };
+  abreMazo(w, "historia", "history");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  const antes = perfil();
+  click(w, '[data-action="start-free"]');
+  juegaUna(); juegaUna();
+  ok("durante la partida, las cartas se apuntan en ella y no en el perfil", perfil() === antes && JSON.parse(w.localStorage.getItem("hilo-solo-history-v1")).pendientes.length === 2);
+  click(w, '[data-action="ui-back"]');
+  click(w, '[data-exit-discard]');
+  ok("salir sin guardar no suma nada al perfil", perfil() === antes);
+  click(w, '[data-action="start-free"]');
+  juegaUna();
+  click(w, '[data-action="ui-back"]');
+  click(w, '[data-exit-confirm]');
+  ok("guardar y salir sí lo suma", perfil() === antes + 1);
+  click(w, '[data-action="resume-solo"]');
+  juegaUna();
+  click(w, '[data-action="ui-back"]');
+  click(w, '[data-exit-discard]');
+  ok("descartar después solo pierde lo jugado desde el último guardado", perfil() === antes + 1);
+}
+
 console.log("\nReto diario");
 {
   const uno = boot();
