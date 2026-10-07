@@ -159,6 +159,8 @@ await expectBack('home');
 
 // Competición muestra solo los formatos de la entrada elegida.
 await click('[data-action="solo-hub"]');
+assert.equal(app().querySelectorAll('.mode-entry[data-action="competition-menu"]').length, 1, 'la competición es una sola puerta');
+assert.ok(app().querySelector('#mode-inline-drawer .mode-entry[data-action="competition-menu"]'), 'la competición está dentro de Grandes colecciones');
 await click('.mode-entry[data-action="competition-menu"]');
 assert.ok(app().querySelector('[data-action="start-competition"]'));
 assert.equal(app().querySelector('[data-action="competition-local"]'), null);

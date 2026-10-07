@@ -67,6 +67,7 @@ async function flows(vp) {
     await click('[data-solo-route="quick"]'); await at('quick-challenges');
     await click('[data-quick="start-free"]'); await at('quick-challenges'); await click('[data-quick="ready"]'); await at('quick-game'); await back('quick-challenges');
     await back('hub-solo');
+    if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route]');
     await click('.mode-entry[data-action="competition-menu"]'); await at('competition-menu');
     await click('[data-action="start-competition"]'); await back('competition-menu');
     await back('hub-solo'); await back('home');
@@ -79,6 +80,7 @@ async function flows(vp) {
     await click('[data-action="starter-start"]'); await at('pass'); await back('setup');
     await back('hub-friends-local');
     await click('[data-friend-quick="local"]'); await at('quick-challenges'); await back('hub-friends-local');
+    if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route]');
     await click('.mode-entry[data-action="competition-menu"]'); await at('setup'); await back('hub-friends-local');
     await back('hub-friends'); await back('home');
     // Jugar con amigos → Cada uno en su móvil
@@ -94,6 +96,7 @@ async function flows(vp) {
     if (await pg.locator('[data-action="create-room-toggle"][aria-expanded="false"]').count()) await click('[data-action="create-room-toggle"]');
     await click('[data-friend-quick="online"]'); await at('quick-challenges'); await back('hub-friends-online');
     if (await pg.locator('[data-action="create-room-toggle"][aria-expanded="false"]').count()) await click('[data-action="create-room-toggle"]');
+    if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route]');
     await click('.mode-entry[data-action="competition-menu"]'); await at('competition-friends'); await back('hub-friends-online');
     await back('hub-friends'); await back('home');
     // Jugar online
