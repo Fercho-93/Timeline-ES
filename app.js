@@ -387,7 +387,6 @@
           <div class="duel-brief" data-comp-brief><p>${compBrief(ritmo)}</p></div>
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="comp-friends-start">Empezar competición <span>→</span></button>
         </div>
-        <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus partidas en curso</button>
       </section>
     </div>`);
   }
@@ -2438,7 +2437,6 @@
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${currentMode().name}</div><h2 class="solo-title" data-focus tabindex="-1">Partida con amigos</h2>
         <p class="lead">Cada uno desde su móvil. Elige cómo jugáis: todos a la vez, por turnos o con las mismas cartas.</p></div>
         ${duelPanel()}
-        <button class="btn btn-ghost btn-block" data-action="duels-list">Ver tus partidas en curso</button>
       </section>
     </div>`);
   }
