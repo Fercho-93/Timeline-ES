@@ -177,7 +177,7 @@
       const seats = Array.from({ length: t.capacity }, (_, i) => `<i class="${i < t.players ? 'is-taken' : ''}"></i>`).join('');
       return `<li class="public-table">
         <span class="public-table-avatar">${avatar}</span>
-        <span class="public-table-copy"><b>${escapeHtml(game)}</b><small>Mesa de ${escapeHtml(host)} · ${tableTime(t.seconds)}</small>
+        <span class="public-table-copy"><b>${escapeHtml(game)}</b><small>Mesa de ${escapeHtml(host)} · ${t.kind === 'quick' && t.length ? `${t.length} ${t.length === 1 ? 'reto' : 'retos'} · ` : ''}${tableTime(t.seconds)}</small>
           <span class="public-table-seats" aria-label="${t.players} de ${t.capacity} plazas ocupadas">${seats}<em>${t.players}/${t.capacity}</em></span></span>
         <button type="button" class="btn btn-primary public-table-join" data-action="public-join" data-code="${escapeHtml(t.code)}" data-kind="${t.kind === 'quick' ? 'quick' : 'collections'}" data-capacity="${t.capacity}" aria-label="Unirme a la mesa de ${escapeHtml(host)} · ${escapeHtml(game)}">Unirme</button>
       </li>`;
@@ -189,7 +189,7 @@
   function createChoice() {
     let saved = {};
     try { saved = JSON.parse(sessionStorage.getItem(CREATE_KEY) || '{}'); } catch {}
-    return { kind: saved.kind === 'quick' ? 'quick' : 'collections', mode: typeof saved.mode === 'string' ? saved.mode : '', capacity: [2, 3, 4].includes(saved.capacity) ? saved.capacity : 4 };
+    return { kind: saved.kind === 'quick' ? 'quick' : 'collections', mode: typeof saved.mode === 'string' ? saved.mode : '', capacity: [2, 3, 4].includes(saved.capacity) ? saved.capacity : 4, length: [1, 3, 5].includes(saved.length) ? saved.length : 3, keep: saved.keep === 'seguir' ? 'seguir' : 'fuera' };
   }
   function pills(name, options, current, columns) {
     return `<div class="segmented public-create-segmented" style="--pills:${columns}" role="radiogroup">${options.map(([value, label]) => `<label class="segmented-option${String(value) === String(current) ? ' is-on' : ''}">
@@ -206,6 +206,8 @@
       <div class="field"><span class="field-label">Juego</span>${pills('kind', [['collections', 'Grandes colecciones'], ['quick', 'Retos rápidos']], choice.kind, 2)}</div>
       <div class="field" data-public-deck${choice.kind === 'quick' ? ' hidden' : ''}><label for="public-create-mode">Mazo</label><select id="public-create-mode"><option value="">Al azar</option>${decks.map(([key, m]) => `<option value="${escapeHtml(key)}"${key === choice.mode ? ' selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}</select></div>
       <div class="field"><span class="field-label">Jugadores</span>${pills('capacity', [[2, '2'], [3, '3'], [4, '4']], choice.capacity, 3)}</div>
+      <div class="field" data-public-quick${choice.kind === 'quick' ? '' : ' hidden'}><span class="field-label">Duración</span>${pills('length', [[1, '1 reto'], [3, '3 retos'], [5, '5 retos']], choice.length, 3)}</div>
+      <div class="field" data-public-quick${choice.kind === 'quick' ? '' : ' hidden'}><span class="field-label">Si alguien falla</span>${pills('keep', [['fuera', 'Arriesgar o plantarse'], ['seguir', 'Seguir hasta el final']], choice.keep, 2)}</div>
       ${CT?.Tiempo?.field?.('publica', { porDefecto: 30 }) || ''}
       <p class="hint">La partida empieza al completarse la mesa o, con al menos 2 personas, cuando pasan 30 s sin que entre nadie más. Quién empieza se decide con un minijuego: cada uno adivina la cifra de una carta.</p>
       <button type="button" class="btn btn-primary btn-block" data-action="public-create-go">Abrir mesa</button>
@@ -215,8 +217,10 @@
     const kind = app.querySelector('input[data-public-create="kind"]:checked')?.value === 'quick' ? 'quick' : 'collections';
     const capacity = Number(app.querySelector('input[data-public-create="capacity"]:checked')?.value) || 4;
     const mode = app.querySelector('#public-create-mode')?.value || '';
-    try { sessionStorage.setItem(CREATE_KEY, JSON.stringify({ kind, capacity, mode })); } catch {}
-    return { kind, capacity, mode };
+    const length = Number(app.querySelector('input[data-public-create="length"]:checked')?.value) || 3;
+    const keep = app.querySelector('input[data-public-create="keep"]:checked')?.value === 'seguir' ? 'seguir' : 'fuera';
+    try { sessionStorage.setItem(CREATE_KEY, JSON.stringify({ kind, capacity, mode, length, keep })); } catch {}
+    return { kind, capacity, mode, length, keep };
   }
   // Si algo falla al entrar en una mesa de Retos rápidos, se vuelve a la lista con el aviso.
   function quickTableFailed(error) {
@@ -230,9 +234,9 @@
     const CT = window.CONTINUUM;
     if (action === 'public-create') { openPublicCreate(); return true; }
     if (action === 'public-create-go') {
-      const { kind, capacity, mode } = saveCreateChoice();
+      const { kind, capacity, mode, length, keep } = saveCreateChoice();
       const seconds = CT.Tiempo?.chosen?.('publica', 30) ?? 30;
-      if (kind === 'quick') { CT.openQuickPublic(capacity, { create: true, seconds }).catch(quickTableFailed); return true; }
+      if (kind === 'quick') { CT.openQuickPublic(capacity, { create: true, seconds, length, keep: keep === 'seguir' }).catch(quickTableFailed); return true; }
       const decks = availableDecks().map(([key]) => key);
       const deck = decks.includes(mode) ? mode : decks[Math.floor(Math.random() * decks.length)];
       if (!deck) return true;
@@ -457,6 +461,7 @@
       pill.closest('.segmented')?.querySelectorAll('.segmented-option').forEach(op => op.classList.toggle('is-on', op.querySelector('input').checked));
       const deck = app.querySelector('[data-public-deck]');
       if (deck && pill.dataset.publicCreate === 'kind') deck.hidden = pill.value === 'quick';
+      if (pill.dataset.publicCreate === 'kind') app.querySelectorAll('[data-public-quick]').forEach(box => { box.hidden = pill.value !== 'quick'; });
     }
     if (pill || event.target.id === 'public-create-mode') saveCreateChoice();
   });

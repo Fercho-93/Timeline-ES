@@ -44,7 +44,7 @@ async function publicConnect(options) {
   if(!uid)throw Error('Espera a que se prepare tu perfil e inténtalo de nuevo.');
   if(options.create||options.code){
     const code=await claimTable({uid,name,create:!!options.create,code:String(options.code||'').toUpperCase(),capacity:[2,3,4].includes(Number(capacity))?Number(capacity):4});
-    return watchPublic({...options,uid,code,seconds:options.create?options.seconds:undefined});
+    return watchPublic({...options,uid,code,seconds:options.create?options.seconds:undefined,length:options.create?options.length:undefined,keep:options.create?options.keep:undefined});
   }
   const capacities=[2,3,4].includes(Number(capacity))?[Number(capacity)]:[4,3,2];
   let chosen=null;
@@ -87,20 +87,27 @@ async function publicConnect(options) {
   });
   if(code===null)return publicConnect({...options,allowStale:true});
   // La partida rápida juega sin tiempo, como siempre.
-  return watchPublic({...options,uid,code,seconds:0,queueRef:qref});
+  return watchPublic({...options,uid,code,seconds:0,length:3,keep:false,queueRef:qref});
 }
-async function watchPublic({uid,code,seconds,queueRef:qref=null,onChange,onError}) {
+async function watchPublic({uid,code,seconds,length,keep,queueRef:qref=null,onChange,onError}) {
   const ref=doc(db,'quickRooms',code);
   // El tiempo por carta es de la mesa: quien la crea lo elige y quien entra (o hereda la
   // mesa si se va quien la llevaba) lo lee de su ficha del tablón.
   let tableSeconds=[0,15,20,30].includes(Number(seconds))?Number(seconds):null;
-  if(tableSeconds===null){const entry=await tables().then(t=>t.readTable(code)).catch(()=>null);tableSeconds=[0,15,20,30].includes(entry?.seconds)?entry.seconds:0;}
+  // La duración y qué pasa al fallar también son de la mesa: quien la crea los elige y el resto los lee de la ficha.
+  let tableLength=[1,3,5].includes(Number(length))?Number(length):null, tableKeep=typeof keep==='boolean'?keep:null;
+  if(tableSeconds===null||tableLength===null||tableKeep===null){
+    const entry=await tables().then(t=>t.readTable(code)).catch(()=>null);
+    if(tableSeconds===null)tableSeconds=[0,15,20,30].includes(entry?.seconds)?entry.seconds:0;
+    if(tableLength===null)tableLength=[1,3,5].includes(entry?.length)?entry.length:3;
+    if(tableKeep===null)tableKeep=typeof entry?.keep==='boolean'?entry.keep:false;
+  }
   let tableState='';
   const syncTable=()=>{
     if(!latest||latest.host!==uid)return;
     if(latest.phase==='lobby'&&latest.members.length<latest.capacity){
       tableState='open';
-      const entry={kind:'quick',code,mode:'quick',capacity:latest.capacity,seconds:tableSeconds,players:latest.members.length,
+      const entry={kind:'quick',code,mode:'quick',capacity:latest.capacity,seconds:tableSeconds,length:tableLength,keep:tableKeep,players:latest.members.length,
         names:latest.names.slice(0,4).map(n=>String(n).slice(0,24)),hostUid:uid,hostAvatar:CT.Avatares?.ownId?.()||null,
         clientVersion:PUBLIC_VERSION,fingerprint:CT.QuickNetwork.fingerprint()};
       void tables().then(t=>t.publishTable(entry)).catch(()=>{});
@@ -123,9 +130,9 @@ async function watchPublic({uid,code,seconds,queueRef:qref=null,onChange,onError
     const ready=latest.members.length>=latest.capacity&&R.starterComplete(latest);
     if(!ready&&secondsLeft()>0)return;
     started=true;
-    const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,3);
+    const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,tableLength);
     const first=R.starterOrder(latest)?.[0];
-    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code,...(tableSeconds?{seconds:tableSeconds}:{}),...(Number.isInteger(first)?{first}:{})}).catch(e=>{setTimeout(()=>{started=false;},2000);});
+    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code,keep:tableKeep,...(tableSeconds?{seconds:tableSeconds}:{}),...(Number.isInteger(first)?{first}:{})}).catch(e=>{setTimeout(()=>{started=false;},2000);});
   };
   const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);syncTable();tryStart();
   }catch(e){onError(e);}},onError);

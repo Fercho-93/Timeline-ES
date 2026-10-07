@@ -117,7 +117,7 @@
     return `<div class="field duel-kind-field"${attrs}><span class="field-label" id="${id}-label">${label}</span><div class="quick-length" role="radiogroup" aria-labelledby="${id}-label">${options.map(chip).join('')}</div><input type="hidden" id="${id}" data-quick-length-input value="3"></div>`;
   }
   // Qué pasa al fallar en las partidas con amigos: se elige al crearlas, igual en un solo móvil,
-  // en una sala o por turnos. Solo y «mismas cartas» siguen siempre; la mesa pública, siempre arriesga.
+  // en una sala o por turnos. Solo y «mismas cartas» siguen siempre; la mesa pública lo elige quien la crea.
   function keepField(attrs='') {
     const keep=duelKeep();
     return `<div class="field duel-kind-field"${attrs}><span class="field-label" id="quick-keep-label">Si alguien falla</span><div class="segmented" role="radiogroup" aria-labelledby="quick-keep-label">${[['fuera','Arriesgar o plantarse','Un fallo pierde los aciertos provisionales del reto; plantarse los asegura'],['seguir','Seguir hasta el final','Un fallo no suma, pero se juega todo el reto y gana quien acierte más']].map(([k,t,f])=>`<label class="segmented-option${(k==='seguir')===keep?' is-on':''}"><input type="radio" name="quick-keep" value="${k}"${(k==='seguir')===keep?' checked':''}><span><b>${t}</b><small>${f}</small></span></label>`).join('')}</div></div>`;

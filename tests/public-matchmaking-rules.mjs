@@ -163,6 +163,10 @@ console.log('\nTablón de mesas públicas');
   await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'quickRooms',Q),{version:1,capacity:3,host:H,members:[H],names:['Ana'],config:null,commands:[],revision:0,phase:'lobby',actor:H,catalog:1,matchmaking:'public',updatedAt:new Date()}));
   const rapida=over=>ficha({kind:'quick',code:Q,mode:'quick',capacity:3,seconds:0,fingerprint:1,clientVersion:1,...over});
   await check('mesa de Retos rápidos en el tablón',true,setDoc(doc(ctx(H),'publicTables',Q),rapida()));
+  await check('mesa de Retos rápidos con duración y reglas de fallo',true,setDoc(doc(ctx(H),'publicTables',Q),rapida({length:5,keep:true})));
+  await check('TRAMPA: duración que no existe',false,setDoc(doc(ctx(H),'publicTables',Q),rapida({length:4})));
+  await check('TRAMPA: «seguir» que no es booleano',false,setDoc(doc(ctx(H),'publicTables',Q),rapida({keep:'si'})));
+  await check('TRAMPA: duración en una ficha de colecciones',false,setDoc(doc(ctx(H),'publicTables',CODE),ficha({length:3})));
   await check('TRAMPA: ficha de Retos rápidos con otras plazas',false,setDoc(doc(ctx(H),'publicTables',Q),rapida({capacity:4})));
   await check('TRAMPA: ficha de Retos rápidos de quien no la lleva',false,setDoc(doc(ctx(P2),'publicTables',Q),rapida({hostUid:P2})));
   // Las pruebas siguientes comparten el emulador: no se dejan salas a medias.
