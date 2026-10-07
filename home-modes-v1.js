@@ -177,7 +177,7 @@
       const seats = Array.from({ length: t.capacity }, (_, i) => `<i class="${i < t.players ? 'is-taken' : ''}"></i>`).join('');
       return `<li class="public-table">
         <span class="public-table-avatar">${avatar}</span>
-        <span class="public-table-copy"><b>${escapeHtml(game)}</b><small>Mesa de ${escapeHtml(host)} · ${t.kind === 'quick' && t.length ? `${t.length} ${t.length === 1 ? 'reto' : 'retos'} · ` : ''}${tableTime(t.seconds)}</small>
+        <span class="public-table-copy"><b>${escapeHtml(game)}</b><small>Mesa de ${escapeHtml(host)} · ${t.kind === 'quick' && t.length ? `${t.length} ${t.length === 1 ? 'reto' : 'retos'} · ` : t.kind !== 'quick' && t.handSize ? `${t.handSize} ${t.handSize === 1 ? 'carta' : 'cartas'} · ` : ''}${tableTime(t.seconds)}</small>
           <span class="public-table-seats" aria-label="${t.players} de ${t.capacity} plazas ocupadas">${seats}<em>${t.players}/${t.capacity}</em></span></span>
         <button type="button" class="btn btn-primary public-table-join" data-action="public-join" data-code="${escapeHtml(t.code)}" data-kind="${t.kind === 'quick' ? 'quick' : 'collections'}" data-capacity="${t.capacity}" aria-label="Unirme a la mesa de ${escapeHtml(host)} · ${escapeHtml(game)}">Unirme</button>
       </li>`;
@@ -206,6 +206,7 @@
       <div class="field"><span class="field-label">Juego</span>${pills('kind', [['collections', 'Grandes colecciones'], ['quick', 'Retos rápidos']], choice.kind, 2)}</div>
       <div class="field" data-public-deck${choice.kind === 'quick' ? ' hidden' : ''}><label for="public-create-mode">Mazo</label><select id="public-create-mode"><option value="">Al azar</option>${decks.map(([key, m]) => `<option value="${escapeHtml(key)}"${key === choice.mode ? ' selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}</select></div>
       <div class="field"><span class="field-label">Jugadores</span>${pills('capacity', [[2, '2'], [3, '3'], [4, '4']], choice.capacity, 3)}</div>
+      <div data-public-deck${choice.kind === 'quick' ? ' hidden' : ''}>${CT?.ManoInicial?.field?.('public-hand-size') || ''}</div>
       <div class="field" data-public-quick${choice.kind === 'quick' ? '' : ' hidden'}><span class="field-label">Duración</span>${pills('length', [[1, '1 reto'], [3, '3 retos'], [5, '5 retos']], choice.length, 3)}</div>
       <div class="field" data-public-quick${choice.kind === 'quick' ? '' : ' hidden'}><span class="field-label">Si alguien falla</span>${pills('keep', [['fuera', 'Arriesgar o plantarse'], ['seguir', 'Seguir hasta el final']], choice.keep, 2)}</div>
       ${CT?.Tiempo?.field?.('publica', { porDefecto: 30 }) || ''}
@@ -240,7 +241,7 @@
       const decks = availableDecks().map(([key]) => key);
       const deck = decks.includes(mode) ? mode : decks[Math.floor(Math.random() * decks.length)];
       if (!deck) return true;
-      CT.openPublicTable({ create: true, mode: deck, capacity, seconds });
+      CT.openPublicTable({ create: true, mode: deck, capacity, seconds, handSize: CT.ManoInicial?.get?.() ?? 4 });
       return true;
     }
     if (action === 'public-join') {
@@ -459,8 +460,7 @@
     const pill = event.target.closest?.('input[data-public-create]');
     if (pill) {
       pill.closest('.segmented')?.querySelectorAll('.segmented-option').forEach(op => op.classList.toggle('is-on', op.querySelector('input').checked));
-      const deck = app.querySelector('[data-public-deck]');
-      if (deck && pill.dataset.publicCreate === 'kind') deck.hidden = pill.value === 'quick';
+      if (pill.dataset.publicCreate === 'kind') app.querySelectorAll('[data-public-deck]').forEach(box => { box.hidden = pill.value === 'quick'; });
       if (pill.dataset.publicCreate === 'kind') app.querySelectorAll('[data-public-quick]').forEach(box => { box.hidden = pill.value !== 'quick'; });
     }
     if (pill || event.target.id === 'public-create-mode') saveCreateChoice();

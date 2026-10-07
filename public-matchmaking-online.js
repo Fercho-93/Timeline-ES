@@ -18,12 +18,12 @@ const notify = text => {
   clearTimeout(notify.timer);notify.timer=setTimeout(()=>toast.classList.remove('show'),2600);
 };
 
-function roomData(code, mode, capacity, uid, seconds = 30) {
+function roomData(code, mode, capacity, uid, seconds = 30, handSize = 4) {
   const name=alias();
   return {
     roomCode:code, mode, deckFingerprint:CT.deckFingerprint(mode), hostUid:uid,
     matchmaking:'public', capacity, clientVersion:CLIENT_VERSION, queueKey:publicQueueKey({mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:CT.deckFingerprint(mode)}),
-    status:'lobby', phase:'lobby', version:1, handSize:4, turnSeconds:seconds,
+    status:'lobby', phase:'lobby', version:1, handSize, turnSeconds:seconds,
     playerOrder:[uid],
     players:{[uid]:{name,avatarId:avatarId(),hand:[],joinedAt:Date.now(),clientVersion:CLIENT_VERSION}},
     deck:[],discard:[],timeline:[],current:0,starter:uid,turnsInRound:0,round:1,
@@ -117,15 +117,16 @@ async function readyUser() {
 
 // «Crear mesa»: una mesa nueva con la configuración elegida (mazo, plazas y tiempo). No
 // ocupa la cola de la partida rápida; se encuentra en el tablón de mesas abiertas.
-async function createTable(mode, capacityInput, seconds) {
+async function createTable(mode, capacityInput, seconds, handSize = 4) {
   const capacity=normalizePublicCapacity(capacityInput);
   if(![0,15,20,30].includes(Number(seconds))) throw Error('INVALID_PUBLIC_SECONDS');
+  if(![1,2,3,4,5,6].includes(Number(handSize))) throw Error('INVALID_PUBLIC_HAND');
   const user=await readyUser();
   const code=makePublicRoomCode(), roomRef=doc(db,'rooms',code);
   // Una sala que no existe no se puede leer con las reglas de las salas: se escribe sin
   // mirar antes (con siete caracteres al azar, repetir un código es improbable, y si
   // ocurriera las reglas lo tratarían como una modificación y la rechazarían).
-  await setDoc(roomRef,roomData(code,mode,capacity,user.uid,Number(seconds)));
+  await setDoc(roomRef,roomData(code,mode,capacity,user.uid,Number(seconds),Number(handSize)));
   return code;
 }
 

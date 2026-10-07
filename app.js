@@ -3847,7 +3847,7 @@
       if (table) {
         let timer;
         const pending = table.create
-          ? matchmaking.createTable(table.mode, table.capacity, table.seconds).then(code => ({ code, mode: table.mode }))
+          ? matchmaking.createTable(table.mode, table.capacity, table.seconds, table.handSize).then(code => ({ code, mode: table.mode }))
           : matchmaking.joinTable(table.code).then(mode => ({ code: table.code, mode }));
         const { code, mode } = await Promise.race([pending, new Promise((_, reject) => { timer = setTimeout(() => reject(Error("MATCH_TIMEOUT")), 30000); })]).finally(() => clearTimeout(timer));
         const online = await import("./online.js");

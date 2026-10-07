@@ -141,21 +141,24 @@ try {
   const [m1, m2, k1, k2] = [await h.player('M1'), await h.player('M2'), await h.player('K1'), await h.player('K2')];
   await m1.enter('Marta'); await m2.enter('Mario'); await k1.enter('Kiko'); await k2.enter('Katia');
   for (const p of [m1, m2, k1, k2]) await openHub(p);
-  const crear = async (p, { kind, capacity, seconds, deck = 1 }) => {
+  const crear = async (p, { kind, capacity, seconds, deck = 1, hand, length, keep }) => {
     await p.click('[data-action="public-create"]');
     await p.page.locator(`input[data-public-create="kind"][value="${kind}"]`).check({ force: true });
     if (kind === 'collections') await p.page.selectOption('#public-create-mode', { index: deck });
     await p.page.locator(`input[data-public-create="capacity"][value="${capacity}"]`).check({ force: true });
+    if (hand) await p.page.selectOption('#public-hand-size', String(hand));
+    if (length) await p.page.locator(`input[data-public-create="length"][value="${length}"]`).check({ force: true });
+    if (keep) await p.page.locator(`input[data-public-create="keep"][value="${keep}"]`).check({ force: true });
     await p.page.locator(`input[data-tiempo="publica"][value="${seconds}"]`).check({ force: true });
     await p.click('[data-action="public-create-go"]', { wait: 1500 });
   };
-  await crear(m1, { kind: 'collections', capacity: 2, seconds: 15 });
+  await crear(m1, { kind: 'collections', capacity: 2, seconds: 15, hand: 2 });
   await m1.waitScreen('online-lobby', 20000);
   const mazo = (await m1.page.locator('.public-lobby-head h2').textContent()).trim();
-  ok('la mesa creada lleva el tiempo elegido', /15 s por turno/.test(flat(await m1.text())));
+  ok('la mesa creada lleva el tiempo y las cartas elegidas', /15 s por turno/.test(flat(await m1.text())) && /2 cartas iniciales/.test(flat(await m1.text())));
   const fila = m2.page.locator('.public-table', { hasText: 'Marta' });
   await fila.waitFor({ timeout: 20000 }).catch(() => {});
-  ok(`la mesa aparece en la lista de los demás con su configuración (${mazo})`, (await fila.count()) === 1 && /15 s por carta/.test(flat(await fila.textContent())) && flat(await fila.textContent()).includes(mazo));
+  ok(`la mesa aparece en la lista de los demás con su configuración (${mazo})`, (await fila.count()) === 1 && /15 s por carta/.test(flat(await fila.textContent())) && /2 cartas/.test(flat(await fila.textContent())) && flat(await fila.textContent()).includes(mazo));
   await m2.shot('e2e-04b-mesas-abiertas');
   await fila.locator('[data-action="public-join"]').click();
   await m2.waitScreen('online-lobby', 20000);
@@ -168,16 +171,16 @@ try {
   await Promise.all([m1, m2].map(p => p.waitScreen('online-game', 20000)));
   const reloj = Number(await m1.page.locator('#turn-timer-value').textContent().catch(() => 'NaN'));
   ok(`y la partida empieza con ese tiempo por turno (${reloj} s)`, reloj > 0 && reloj <= 17);
-  await crear(k1, { kind: 'quick', capacity: 2, seconds: 20 });
+  await crear(k1, { kind: 'quick', capacity: 2, seconds: 20, length: 1, keep: 'seguir' });
   await k1.page.waitForTimeout(1500);
   const filaK = k2.page.locator('.public-table', { hasText: 'Kiko' });
   await filaK.waitFor({ timeout: 20000 }).catch(() => {});
-  ok('también se anuncian las mesas de Retos rápidos', (await filaK.count()) === 1 && /Retos rápidos/.test(await filaK.textContent()) && /20 s por carta/.test(await filaK.textContent()));
+  ok('también se anuncian las mesas de Retos rápidos', (await filaK.count()) === 1 && /Retos rápidos/.test(await filaK.textContent()) && /20 s por carta/.test(await filaK.textContent()) && /1 reto/.test(await filaK.textContent()));
   await filaK.locator('[data-action="public-join"]').click();
   // La mesa llena sortea la carta de quién empieza y arranca en cuanto responden las dos personas.
   for (const p of [k1, k2]) { await p.page.locator('#quick-room-starter-input').waitFor({ timeout: 20000 }); await p.page.fill('#quick-room-starter-input', '1900'); await p.click('[data-quick="room-starter-guess"]', { wait: 600 }); }
-  await k2.page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'quick-game' || /reto 1 de 3/i.test(document.body.textContent), null, { timeout: 30000 }).catch(() => {});
-  ok('con la mesa llena empieza el reto con su tiempo por carta', /reto 1 de 3/i.test(flat(await k2.text())));
+  await k2.page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'quick-game' || /vas a jugar a|por colocar/i.test(document.body.textContent), null, { timeout: 30000 }).catch(() => {});
+  ok('con la mesa llena empieza el reto con su duración y su tiempo por carta', (await k2.page.evaluate(() => document.querySelector('#app')?.dataset.screen)) === 'quick-game' && !/de 3\b/i.test(flat(await k2.text())) && /por colocar/i.test(flat(await k2.text())));
   for (const p of [m1, m2, k1, k2]) {
     const errors = p.log.filter(l => /pageerror|PERMISSION|permission-denied/i.test(l));
     ok(`${p.label}: sin errores en la consola`, !errors.length);

@@ -532,7 +532,7 @@ service cloud.firestore {
             && quickAfter().phase == 'lobby' && quickAfter().capacity == d.capacity;
       }
       function validTable(d) {
-        return d.keys().hasOnly(['kind','code','mode','capacity','seconds','players','names','hostUid','hostAvatar','clientVersion','fingerprint','length','keep','updatedAt'])
+        return d.keys().hasOnly(['kind','code','mode','capacity','seconds','players','names','hostUid','hostAvatar','clientVersion','fingerprint','length','keep','handSize','updatedAt'])
           && code.matches('^[A-Z2-9]{8,10}$') && d.code == code
           && d.kind in ['collections','quick']
           && d.mode is string && d.mode.size() >= 1 && d.mode.size() <= 32
@@ -540,6 +540,7 @@ service cloud.firestore {
           && d.seconds in [0, 15, 20, 30]
           && (!('length' in d.keys()) || (d.kind == 'quick' && d.length in [1, 3, 5]))
           && (!('keep' in d.keys()) || (d.kind == 'quick' && d.keep is bool))
+          && (!('handSize' in d.keys()) || (d.kind == 'collections' && d.handSize is int && d.handSize >= 1 && d.handSize <= 6))
           && d.players is int && d.players >= 1 && d.players <= d.capacity
           && d.names is list && d.names.size() <= 4 && nameOk(d, 0) && nameOk(d, 1) && nameOk(d, 2) && nameOk(d, 3)
           && d.hostUid == request.auth.uid
