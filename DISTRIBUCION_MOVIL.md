@@ -12,13 +12,22 @@ las acciones de Apple-Actions para importar, descargar perfiles y subir la compi
 
 ## Enlaces
 
-Las invitaciones nativas apuntan a `https://fercho-93.github.io/Timeline-ES/`, verificada como página de Continuum. `links.js` procesa `appUrlOpen` y el enlace de arranque; acepta solo ese origen y ruta. Conserva la alternativa web. Para que el sistema operativo abra la app falta completar la asociación con el titular:
+El juego se muda a su dominio propio, `continuumjuego.es`. `links.js` acepta las dos direcciones (`https://continuumjuego.es/`, `https://www.continuumjuego.es/` y la antigua `https://fercho-93.github.io/Timeline-ES/`), y procesa `appUrlOpen` y el enlace de arranque. En la web, las invitaciones salen con la dirección desde la que se juega: al activar el dominio en GitHub Pages pasan solas a `continuumjuego.es`, y GitHub redirige la dirección antigua, así que los enlaces ya enviados siguen funcionando. La app nativa comparte todavía la dirección antigua; se cambia a la nueva cuando el dominio esté activo y con HTTPS.
+
+Para que el sistema operativo abra la app directamente al tocar un enlace:
 
 1. Obtener el Team ID de Apple y la huella SHA-256 del certificado de firma de Android (en Play App Signing, usar el certificado de la app distribuida).
-2. Ejecutar `node scripts/domain-associations.mjs TEAM_ID HUELLA` después del build.
-3. Publicar ambos archivos en `https://fercho-93.github.io/.well-known/`, desde el alojamiento de la raíz del dominio. Publicarlos solo dentro de este proyecto no sirve. Alternativa: un dominio propio cuya raíz pueda administrarse.
-4. Activar Associated Domains en el portal y en el perfil de firma. El proyecto incluye la capacidad `applinks:fercho-93.github.io` y el filtro Android HTTPS con `autoVerify` para ese host y ruta `/Timeline-ES/`; solo se verifican cuando los archivos de asociación de la raíz son accesibles y coinciden con los certificados reales.
-5. Instalar una compilación firmada y verificar enlaces con la app cerrada/abierta, y en otro móvil sin instalar. No se declara verificada la asociación antes de esas pruebas.
+2. Ejecutar `node scripts/domain-associations.mjs TEAM_ID HUELLA`. Escribe `.well-known/apple-app-site-association` y `.well-known/assetlinks.json` en la raíz del repositorio; al subirlos a `main`, GitHub Pages los publica en `https://continuumjuego.es/.well-known/`. Comprobar que GitHub los sirve (Apple descarga el archivo por su CDN).
+3. Activar Associated Domains en el portal y en el perfil de firma. El proyecto incluye `applinks:continuumjuego.es` y `applinks:www.continuumjuego.es` (y conserva el antiguo), y el filtro Android HTTPS con `autoVerify` para los tres hosts.
+4. Instalar una compilación firmada y verificar enlaces con la app cerrada y abierta, y en otro móvil sin la app. No se declara verificada la asociación antes de esas pruebas.
+
+### Activar el dominio (orden)
+
+1. DNS en Hostinger: cuatro registros A y cuatro AAAA de GitHub Pages para `@`, y CNAME `www` → `fercho-93.github.io`.
+2. Firebase y Google Cloud: añadir `continuumjuego.es` y `www.continuumjuego.es` a los dominios autorizados de Authentication y, si la clave web de Firebase tiene restricción por referente HTTP, a esa lista. Sin esto, la web en el dominio nuevo no podrá abrir cuentas ni salas.
+3. Avisar a quien juegue desde la web: cada dirección guarda sus propios datos, así que en `continuumjuego.es` empezará con un invitado nuevo. Antes del cambio, «Copiar mi perfil» en el Atlas; después, «Recuperar ese perfil». Las apps nativas no se ven afectadas.
+4. GitHub → Settings → Pages → Custom domain: `continuumjuego.es`; esperar la comprobación de DNS y marcar «Enforce HTTPS».
+5. Cambiar `PUBLIC_URL` en `links.js` al dominio para las apps nativas y publicar nuevas compilaciones.
 
 Referencia: https://capacitorjs.com/docs/guides/deep-links .
 

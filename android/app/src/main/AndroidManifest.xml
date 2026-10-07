@@ -29,6 +29,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="fercho-93.github.io" android:pathPrefix="/Timeline-ES/" />
+                <data android:scheme="https" android:host="continuumjuego.es" android:pathPrefix="/" />
+                <data android:scheme="https" android:host="www.continuumjuego.es" android:pathPrefix="/" />
             </intent-filter>
         </activity>
 

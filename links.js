@@ -1,14 +1,25 @@
 (function () {
   'use strict';
   const CT = window.CONTINUUM = window.CONTINUUM || {};
+  // La dirección pública de la app. El juego se muda a su dominio propio: mientras tanto se
+  // aceptan las dos, y la de GitHub sigue funcionando porque GitHub redirige al dominio.
   const PUBLIC_URL = 'https://fercho-93.github.io/Timeline-ES/';
+  const DOMAIN_URL = 'https://continuumjuego.es/';
+  const TRUSTED = [DOMAIN_URL, 'https://www.continuumjuego.es/', PUBLIC_URL];
+  // Desde la web, las invitaciones usan la dirección desde la que se juega (así, al activarse el
+  // dominio, salen ya con él); la app nativa usa la pública fija.
+  const shareBase = () => {
+    if (window.Capacitor?.isNativePlatform?.()) return PUBLIC_URL;
+    try { return TRUSTED.find(base => location.href.startsWith(base)) || PUBLIC_URL; } catch { return PUBLIC_URL; }
+  };
   CT.Links = {
     base() { return window.Capacitor?.isNativePlatform?.() ? PUBLIC_URL : location.origin + location.pathname; },
     parse(value) {
       try {
-        const url = new URL(value), trusted = new URL(PUBLIC_URL);
+        const url = new URL(value);
         const nativeLink = url.protocol === 'continuum:' && url.hostname === 'invite' && (url.pathname === '' || url.pathname === '/');
-        if (!nativeLink && (url.protocol !== 'https:' || url.origin !== trusted.origin || ![trusted.pathname, trusted.pathname+'index.html', trusted.pathname+'invitation.html'].includes(url.pathname))) return null;
+        const fromTrusted = TRUSTED.map(base => new URL(base)).some(trusted => url.origin === trusted.origin && [trusted.pathname, trusted.pathname+'index.html', trusted.pathname+'invitation.html'].includes(url.pathname));
+        if (!nativeLink && (url.protocol !== 'https:' || !fromTrusted)) return null;
         const params = new URLSearchParams(url.hash.slice(1) || url.search);
         const routes = ['room', 'duelo', 'turnoduelo', 'quick-room', 'quick-duel'];
         if (routes.filter(key => params.has(key)).length !== 1 || routes.some(key => params.getAll(key).length > 1)) return null;
@@ -48,7 +59,7 @@
     },
     invitation(value) {
       const target = typeof value === 'string' ? CT.Links.parse(value) : value;
-      const url = new URL('invitation.html', PUBLIC_URL);
+      const url = new URL('invitation.html', shareBase());
       url.hash = CT.Links.params(target).toString();
       return url.href;
     },
