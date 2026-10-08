@@ -1,7 +1,7 @@
 {
   "version": "0.1.1",
-  "cache": 634,
-  "platforms": ["android", "ios"],
+  "cache": 635,
+  "platforms": ["ios"],
   "upload_testflight": true,
-  "reason": "Dominio propio continuumjuego.es con enlaces universales, ranking opcional con cuentas de Apple/Google, retos rápidos y fantasma ajustados"
+  "reason": "Acceso con Apple abierto a todos en iPhone, con eliminación de cuenta y revocación"
 }
