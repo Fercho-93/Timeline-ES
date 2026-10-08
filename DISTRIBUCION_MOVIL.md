@@ -17,7 +17,7 @@ El juego se muda a su dominio propio, `continuumjuego.es`. `links.js` acepta las
 Para que el sistema operativo abra la app directamente al tocar un enlace:
 
 1. Obtener el Team ID de Apple y la huella SHA-256 del certificado de firma de Android (en Play App Signing, usar el certificado de la app distribuida).
-2. Ejecutar `node scripts/domain-associations.mjs TEAM_ID HUELLA`. Escribe `.well-known/apple-app-site-association` y `.well-known/assetlinks.json` en la raíz del repositorio; al subirlos a `main`, GitHub Pages los publica en `https://continuumjuego.es/.well-known/`. Comprobar que GitHub los sirve (Apple descarga el archivo por su CDN).
+2. Ejecutar `node scripts/domain-associations.mjs TEAM_ID HUELLA` (con `-` en lugar de un dato se genera solo el de la otra plataforma). Hecho para iOS con el Team ID `ZRFCQ78M82`; falta la huella de Android (`node scripts/domain-associations.mjs - HUELLA`). Escribe `.well-known/apple-app-site-association` y `.well-known/assetlinks.json` en la raíz del repositorio; al subirlos a `main`, GitHub Pages los publica en `https://continuumjuego.es/.well-known/`. Comprobar que GitHub los sirve (Apple descarga el archivo por su CDN).
 3. Activar Associated Domains en el portal y en el perfil de firma. El proyecto incluye `applinks:continuumjuego.es` y `applinks:www.continuumjuego.es` (y conserva el antiguo), y el filtro Android HTTPS con `autoVerify` para los tres hosts.
 4. Instalar una compilación firmada y verificar enlaces con la app cerrada y abierta, y en otro móvil sin la app. No se declara verificada la asociación antes de esas pruebas.
 
