@@ -12,7 +12,7 @@ las acciones de Apple-Actions para importar, descargar perfiles y subir la compi
 
 ## Enlaces
 
-El juego se muda a su dominio propio, `continuumjuego.es`. `links.js` acepta las dos direcciones (`https://continuumjuego.es/`, `https://www.continuumjuego.es/` y la antigua `https://fercho-93.github.io/Timeline-ES/`), y procesa `appUrlOpen` y el enlace de arranque. En la web, las invitaciones salen con la dirección desde la que se juega: al activar el dominio en GitHub Pages pasan solas a `continuumjuego.es`, y GitHub redirige la dirección antigua, así que los enlaces ya enviados siguen funcionando. La app nativa comparte todavía la dirección antigua; se cambia a la nueva cuando el dominio esté activo y con HTTPS.
+El juego se muda a su dominio propio, `continuumjuego.es`. `links.js` acepta las dos direcciones (`https://continuumjuego.es/`, `https://www.continuumjuego.es/` y la antigua `https://fercho-93.github.io/Timeline-ES/`), y procesa `appUrlOpen` y el enlace de arranque. En la web, las invitaciones salen con la dirección desde la que se juega: al activar el dominio en GitHub Pages pasan solas a `continuumjuego.es`, y GitHub redirige la dirección antigua, así que los enlaces ya enviados siguen funcionando. El dominio está activo en GitHub Pages (archivo `CNAME`) y la app nativa comparte ya `https://continuumjuego.es/` a partir de la próxima compilación.
 
 Para que el sistema operativo abra la app directamente al tocar un enlace:
 
@@ -27,7 +27,7 @@ Para que el sistema operativo abra la app directamente al tocar un enlace:
 2. Firebase y Google Cloud: añadir `continuumjuego.es` y `www.continuumjuego.es` a los dominios autorizados de Authentication y, si la clave web de Firebase tiene restricción por referente HTTP, a esa lista. Sin esto, la web en el dominio nuevo no podrá abrir cuentas ni salas.
 3. Avisar a quien juegue desde la web: cada dirección guarda sus propios datos, así que en `continuumjuego.es` empezará con un invitado nuevo. Antes del cambio, «Copiar mi perfil» en el Atlas; después, «Recuperar ese perfil». Las apps nativas no se ven afectadas.
 4. GitHub → Settings → Pages → Custom domain: `continuumjuego.es`; esperar la comprobación de DNS y marcar «Enforce HTTPS».
-5. Cambiar `PUBLIC_URL` en `links.js` al dominio para las apps nativas y publicar nuevas compilaciones.
+5. Hecho: `PUBLIC_URL` en `links.js` es el dominio. Falta publicar nuevas compilaciones de las apps.
 
 Referencia: https://capacitorjs.com/docs/guides/deep-links .
 

@@ -1,11 +1,11 @@
 (function () {
   'use strict';
   const CT = window.CONTINUUM = window.CONTINUUM || {};
-  // La dirección pública de la app. El juego se muda a su dominio propio: mientras tanto se
-  // aceptan las dos, y la de GitHub sigue funcionando porque GitHub redirige al dominio.
-  const PUBLIC_URL = 'https://fercho-93.github.io/Timeline-ES/';
-  const DOMAIN_URL = 'https://continuumjuego.es/';
-  const TRUSTED = [DOMAIN_URL, 'https://www.continuumjuego.es/', PUBLIC_URL];
+  // La dirección pública de la app es su dominio propio. La antigua de GitHub se sigue aceptando
+  // (enlaces ya enviados y apps sin actualizar) y GitHub la redirige al dominio.
+  const PUBLIC_URL = 'https://continuumjuego.es/';
+  const LEGACY_URL = 'https://fercho-93.github.io/Timeline-ES/';
+  const TRUSTED = [PUBLIC_URL, 'https://www.continuumjuego.es/', LEGACY_URL];
   // Desde la web, las invitaciones usan la dirección desde la que se juega (así, al activarse el
   // dominio, salen ya con él); la app nativa usa la pública fija.
   const shareBase = () => {

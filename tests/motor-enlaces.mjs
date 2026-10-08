@@ -16,7 +16,7 @@ for(let count=2;count<=9;count++) {
   assert.equal(CT.Engine.roundOutcome(order,players,count).ended,false);
 }
 context.window.Capacitor={isNativePlatform:()=>true};
-assert.equal(CT.Links.base(),'https://fercho-93.github.io/Timeline-ES/');
+assert.equal(CT.Links.base(),'https://continuumjuego.es/');
 // El dominio propio se acepta igual que la dirección de GitHub, con y sin www; otras rutas no.
 assert.deepEqual(plain(CT.Links.parse('https://continuumjuego.es/invitation.html#room=ABCD2345')),{room:'ABCD2345'});
 assert.deepEqual(plain(CT.Links.parse('https://www.continuumjuego.es/#room=ABCD2345')),{room:'ABCD2345'});
@@ -34,11 +34,13 @@ console.log('Motor puro, agotamiento de 2 a 9 jugadores y enlaces nativos: OK');
   context.window.Capacitor = null;
   context.location.href = 'https://continuumjuego.es/';
   assert.equal(CT.Links.invitation({room:'ABCD2345'}), 'https://continuumjuego.es/invitation.html#room=ABCD2345');
+  context.location.href = 'https://fercho-93.github.io/Timeline-ES/';
+  assert.equal(CT.Links.invitation({room:'ABCD2345'}), 'https://fercho-93.github.io/Timeline-ES/invitation.html#room=ABCD2345');
   context.location.href = 'https://local.test/';
-  assert.equal(CT.Links.invitation({room:'ABCD2345'}), 'https://fercho-93.github.io/Timeline-ES/invitation.html#room=ABCD2345');
+  assert.equal(CT.Links.invitation({room:'ABCD2345'}), 'https://continuumjuego.es/invitation.html#room=ABCD2345');
   context.window.Capacitor = {isNativePlatform:()=>true};
-  context.location.href = 'https://continuumjuego.es/';
-  assert.equal(CT.Links.invitation({room:'ABCD2345'}), 'https://fercho-93.github.io/Timeline-ES/invitation.html#room=ABCD2345');
+  context.location.href = 'capacitor://localhost/';
+  assert.equal(CT.Links.invitation({room:'ABCD2345'}), 'https://continuumjuego.es/invitation.html#room=ABCD2345');
   context.window.Capacitor = native;
 }
 console.log('Dominio propio: se aceptan las dos direcciones y la web comparte la suya: OK');

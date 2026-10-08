@@ -13,7 +13,7 @@ vm.runInContext(read('links.js'),ctx);
 const routes = [{room:'ABCD2345'},{duelo:'v1|Fer|history|123'},{turnDuel:'a'.repeat(32)},{quickRoom:'ABCD234567'},{quickDuel:'eyJ2IjozfQ'}];
 for (const target of routes) {
   const invitation = CT.Links.invitation(target);
-  assert.equal(new URL(invitation).pathname,'/Timeline-ES/invitation.html');
+  assert.equal(new URL(invitation).origin + new URL(invitation).pathname,'https://continuumjuego.es/invitation.html');
   assert.deepEqual(plain(CT.Links.parse(invitation)),target);
   assert.deepEqual(plain(CT.Links.parse(CT.Links.nativeUrl(target))),target);
   assert.deepEqual(plain(CT.Links.parse(base+'#'+CT.Links.params(target))),target,'acepta invitaciones antiguas');
