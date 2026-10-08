@@ -29,7 +29,8 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  const alias=data.get('playerProfiles/guest').alias;
  await w.testAccounts.enter();assert.equal(started,1);assert.equal(data.get('playerProfiles/guest').alias,alias);
  assert.doesNotMatch(w.CONTINUUM.Accounts.card(),/Cerrar sesión|Continuar con Google|Contraseña/);
- assert.match(w.CONTINUUM.Accounts.card(),/data-account-action="apple" disabled/);
+ assert.doesNotMatch(w.CONTINUUM.Accounts.card(),/data-account-action="apple"/,'fuera de la app de iPhone no hay botón de Apple');
+ assert.match(w.CONTINUUM.Accounts.card(),/Juegas como invitado/);
  dom.window.close();
 }
 {

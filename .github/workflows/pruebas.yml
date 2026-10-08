@@ -67,7 +67,7 @@ jobs:
         run: |
           xcodebuild -version
           xcodebuild -showsdks
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath build SWIFT_ACTIVE_COMPILATION_CONDITIONS=APPLE_AUTH_TESTING CODE_SIGNING_ALLOWED=NO build
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
 
   reglas:
     name: Reglas de Firestore

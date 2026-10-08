@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-client.js';
-import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, signOut } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
+import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, reauthenticateWithCredential, revokeAccessToken, signOut } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import { doc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, collection, query, orderBy, limit, getDocsFromServer } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
 const CT = window.CONTINUUM;
@@ -10,7 +10,7 @@ const P = 'hilo-perfil-v1', R = 'hilo-retos-v1', META = 'continuum-cloud-v1';
 let identity = null, profile = null, ready = false, active = false, busy = false;
 let startGame, stopStorage, timer, saving, suppress = false, change = 0, revision = 0;
 let failedConflict = false, lockedUid = null;
-let appleNativeEnabled = false, appleTester = false, authChanging = false;
+let appleNativeEnabled = false, authChanging = false;
 const appleUser = u => !!u?.providerData?.some(p => p.providerId === 'apple.com');
 async function acquireTab(uid) {
   if (!navigator.locks || lockedUid === uid) return true;
@@ -312,31 +312,21 @@ function offlineFallback() {
   if (!active) { active=true;startGame(); }
 }
 
-async function appleAccess(uid) {
-  const snap = await getDocFromServer(doc(db, 'appleBetaTesters', uid));
-  return snap.exists() && snap.data().enabled === true;
-}
-async function prepareApple(u) {
+// Apple solo se ofrece en la app de iPhone: allí el sistema da la identidad; en la web y en Android el
+// juego sigue siendo de invitado.
+async function prepareApple() {
   const cap = window.Capacitor;
   if (cap?.isNativePlatform?.() && cap.getPlatform?.() === 'ios') {
     try { appleNativeEnabled = (await cap.Plugins?.AppleSignIn?.availability())?.enabled === true; }
     catch { appleNativeEnabled = false; }
   }
-  appleTester = false;
-  if (appleNativeEnabled || appleUser(u)) appleTester = await appleAccess(u.uid);
-  if (appleUser(u) && !appleTester) throw Object.assign(Error('El acceso de Apple está reservado a las pruebas internas de esta beta.'), {code:'apple/not-authorized'});
-  // Solo es una ayuda para volver a mostrar el botón tras cerrar sesión, no un permiso.
-  if (appleTester) try { localStorage.setItem('continuum-apple-test-device', '1'); } catch {}
 }
 function appleControls() {
   const signed = appleUser(identity);
-  let hint = false;
-  try { hint = localStorage.getItem('continuum-apple-test-device') === '1'; } catch {}
-  const enabled = appleNativeEnabled && (appleTester || hint);
-  return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>${signed ? 'Cuenta de pruebas con Apple' : 'Durante la beta puedes jugar como invitado.'}</p>
-    ${signed ? '<button class="btn btn-secondary" data-account-action="signout">Cerrar sesión de Apple</button>' : `<button class="btn account-apple" data-account-action="apple"${enabled ? '' : ' disabled'} aria-describedby="apple-beta-note">Continuar con Apple</button>`}
-    <p id="apple-beta-note">${signed || enabled ? 'Prueba interna. Los datos de la beta podrán reiniciarse antes del lanzamiento.' : 'No disponible en esta fase beta. Continúa como invitado.'}</p>
-    <details><summary>Identificador para pruebas internas</summary><code>${esc(identity?.uid || '')}</code></details>
+  if (!signed && !appleNativeEnabled) return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>Juegas como invitado: tu progreso queda en este móvil.</p><p id="account-auth-message" role="status"></p></section>`;
+  return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>${signed ? 'Has entrado con tu cuenta de Apple.' : 'Con Apple conservas tu progreso si cambias de móvil.'}</p>
+    ${signed ? '<button class="btn btn-secondary" data-account-action="signout">Cerrar sesión de Apple</button>' : '<button class="btn account-apple" data-account-action="apple">Continuar con Apple</button>'}
+    <p id="apple-account-note">${signed ? 'Puedes cerrar sesión cuando quieras; tu progreso sigue en tu cuenta. Para borrarla del todo, usa «Eliminar».' : 'Apple no comparte tu nombre ni tu correo: el juego solo guarda un identificador.'}</p>
     <p id="account-auth-message" role="status"></p></section>`;
 }
 // Al vincular una cuenta de Apple o Google que ya tenía progreso propio, se pregunta cuál conservar en vez
@@ -360,10 +350,7 @@ function takeHandoff() {
 }
 async function signInApple() {
   if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de acceder con Apple.');
-  if (!appleNativeEnabled) throw Object.assign(Error('Apple no está habilitado en esta beta.'),{code:'apple/beta-disabled'});
-  let hint = false;
-  try { hint = localStorage.getItem('continuum-apple-test-device') === '1'; } catch {}
-  if (!await appleAccess(identity.uid) && !hint) throw Object.assign(Error('Este invitado no está autorizado para probar Apple.'),{code:'apple/not-authorized'});
+  if (!appleNativeEnabled) throw Object.assign(Error('Apple no está disponible en este dispositivo.'),{code:'apple/unavailable'});
   await flush();
   const result = await window.Capacitor.Plugins.AppleSignIn.authorize();
   if (!result?.idToken || !result?.rawNonce) throw Error('Apple no devolvió una identidad válida.');
@@ -381,11 +368,6 @@ async function signInApple() {
       signed = await signInWithCredential(auth, credential);
     }
     await signed.user.getIdToken(true);
-    if (!await appleAccess(signed.user.uid)) {
-      await signOut(auth);
-      try { localStorage.setItem('continuum-apple-auth-notice','Esta cuenta Apple no está autorizada para la beta. Has vuelto al acceso de invitado.'); } catch {}
-      location.reload();return;
-    }
     location.reload();
   } catch (error) {
     authChanging = false;
@@ -420,7 +402,7 @@ async function enter() {
 
   try {
     await u.getIdToken(true);
-    await prepareApple(u);
+    await prepareApple();
     const r=refs(u.uid);
     profile=await ensureProfile(u.uid);
     if (profile.season !== season) throw Object.assign(Error('Este perfil pertenece a otra temporada. Contacta con soporte.'),{code:'account/wrong-season'});
@@ -440,17 +422,12 @@ async function enter() {
     // Un UID compartido con Firebase y un alias guardado para los modos que piden nombre.
     CT.Storage.setItem('hilo-jugador-v1',u.uid);CT.Storage.setItem('hilo-nombre-v1',profile.alias);
     await syncAvatar();
-    try { const note=localStorage.getItem('continuum-apple-auth-notice');if(note){localStorage.removeItem('continuum-apple-auth-notice');syncNotice(note);} } catch {}
     ready=true;stopStorage?.();stopStorage=CT.AccountStorage.subscribe(schedule);
     // Quien dijo que no y no tenía conexión al decirlo: se terminan de retirar sus filas.
     if (rankingPublico() === false) void removeRankingRows().catch(() => {});
     if (!active) { active=true;startGame(); }
   } catch (error) {
     if (failedConflict) return;
-    if (error.code === 'apple/not-authorized') {
-      shell('<h2>Apple está en pruebas internas</h2><p>Esta cuenta todavía no está autorizada para probar Apple. Puedes continuar como invitado.</p><button class="btn btn-primary" data-account-action="signout">Continuar como invitado</button><p id="account-auth-message" role="status"></p>');
-      return;
-    }
     if (isNetworkError(error)) { offlineFallback(); return; }
     shell('<h2>No hemos podido abrir tu progreso</h2><p>Necesitas conexión para abrir tu invitado. Tus datos no se han sustituido.</p><button class="btn btn-primary" id="account-load">Reintentar</button>');
     feedback(message(error));button('account-load',enter);
@@ -547,13 +524,20 @@ async function ranking(tab = 'day', key = '', all = false) {
     <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`,true);
 }
 function deleteScreen() {
-  if (appleUser(identity)) throw Error('El borrado de cuentas Apple de esta prueba requiere revocar el acceso. Solicítalo a feedbackcontinuum@gmail.com. El borrado automático se completará antes del lanzamiento.');
-  if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de eliminar el invitado.');
-  accountDialog(`<div class="overlay"><section class="modal"><h2>Eliminar invitado y progreso</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p><button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
+  const apple = appleUser(identity);
+  if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de eliminar ' + (apple ? 'tu cuenta' : 'el invitado') + '.');
+  accountDialog(`<div class="overlay"><section class="modal"><h2>${apple ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p>${apple ? '<p>Apple te pedirá confirmar que eres tú y el juego dejará de tener acceso a tu cuenta de Apple.</p>' : ''}<button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
 }
 async function removeAccount() {
   const u=auth.currentUser;
-  if (appleUser(u)) throw Error('La cuenta Apple necesita revocación antes del borrado.');
+  if (appleUser(u)) {
+    // Apple exige poder borrar la cuenta y revocar su acceso. Se confirma con Apple (también da el código
+    // de revocación) antes de tocar ningún dato: si algo falla aquí, no se ha borrado nada.
+    const result = await window.Capacitor.Plugins.AppleSignIn.authorize();
+    if (!result?.idToken || !result?.rawNonce || !result?.authorizationCode) throw Error('Apple no devolvió la confirmación. No se ha borrado nada.');
+    await reauthenticateWithCredential(u, new OAuthProvider('apple.com').credential({idToken:result.idToken,rawNonce:result.rawNonce}));
+    await revokeAccessToken(auth, result.authorizationCode);
+  }
   clearTimeout(timer);stopStorage?.();if (saving) await saving;
   const r=refs(u.uid), batch=writeBatch(db);
   if(profile?.aliasKey) batch.delete(nameRef(profile.aliasKey));

@@ -4,7 +4,8 @@ import AuthenticationServices
 import CryptoKit
 import Security
 
-// Solo las compilaciones internas con APPLE_AUTH_TESTING pueden abrir Apple.
+// Acceso con Apple en iPhone. Devuelve la identidad y el código de autorización: Firebase lo necesita para
+// revocar el acceso cuando la persona elimina su cuenta.
 @objc(AppleSignInPlugin)
 public class AppleSignInPlugin: CAPPlugin, CAPBridgedPlugin, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     public let identifier = "AppleSignInPlugin"
@@ -19,15 +20,10 @@ public class AppleSignInPlugin: CAPPlugin, CAPBridgedPlugin, ASAuthorizationCont
     private var anchor: UIWindow?
 
     @objc func availability(_ call: CAPPluginCall) {
-        #if APPLE_AUTH_TESTING
         call.resolve(["enabled": true])
-        #else
-        call.resolve(["enabled": false])
-        #endif
     }
 
     @objc func authorize(_ call: CAPPluginCall) {
-        #if APPLE_AUTH_TESTING
         DispatchQueue.main.async { [weak self] in
             guard let self else { call.reject("No se pudo abrir Apple.", "apple/unavailable"); return }
             guard self.pending == nil else { call.reject("Ya hay un acceso en curso.", "apple/busy"); return }
@@ -52,9 +48,6 @@ public class AppleSignInPlugin: CAPPlugin, CAPBridgedPlugin, ASAuthorizationCont
             controller.presentationContextProvider = self
             controller.performRequests()
         }
-        #else
-        call.reject("Apple no está habilitado en esta beta.", "apple/beta-disabled")
-        #endif
     }
 
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
@@ -72,7 +65,9 @@ public class AppleSignInPlugin: CAPPlugin, CAPBridgedPlugin, ASAuthorizationCont
             call.reject("Apple no devolvió una identidad válida.", "apple/invalid-response"); return
         }
         // Los tokens solo viajan a Firebase; nunca se registran ni se guardan localmente.
-        call.resolve(["idToken": idToken, "rawNonce": raw])
+        var result = ["idToken": idToken, "rawNonce": raw]
+        if let code = credential.authorizationCode, let authorizationCode = String(data: code, encoding: .utf8) { result["authorizationCode"] = authorizationCode }
+        call.resolve(result)
     }
 
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
