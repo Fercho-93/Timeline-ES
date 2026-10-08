@@ -56,6 +56,7 @@ async function conEleccion(w, choice) {
 {
   const {w,dom,calls,auth}=setup();await w.appleTest.startAccounts(()=>{});await w.appleTest.signInApple();
   assert.equal(calls.link,1);assert.equal(auth.currentUser.uid,'guest');assert.equal(w.appleReloads,1);
+  assert.equal(w.sessionStorage.getItem('continuum-repinta'),'1','la carga tras la hoja de Apple avisa a la intro para repintar');
   assert.equal(w.document.getElementById('app').inert,undefined,'el observador no recarga durante el cambio de sesión');
   assert.equal(w.localStorage.getItem('apple-token'),null);dom.window.close();
 }

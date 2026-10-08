@@ -352,6 +352,9 @@ function takeHandoff() {
 // (pantallas recortadas o vacías hasta reabrir la app). Se espera a que la app esté de nuevo a la vista
 // y a que la hoja haya acabado de cerrarse antes de recargar.
 async function afterNativeSheet() {
+  // Se avisa a la intro de que esta carga viene justo después de la hoja de Apple: allí el fundido de entrada
+  // se omite y se fuerza el repintado, porque el iPhone no repinta las capas hasta que se toca la pantalla.
+  try { sessionStorage.setItem('continuum-repinta', '1'); } catch { /* sin almacenamiento */ }
   if (document.visibilityState === 'hidden') await new Promise(resolve => document.addEventListener('visibilitychange', resolve, {once:true}));
   await new Promise(resolve => setTimeout(resolve, 700));
 }

@@ -8,6 +8,16 @@
   window.requestAnimationFrame?.(() => { introStart = performance.now(); });
   let startedAt = null, ready = false, minVisible = MIN_VISIBLE, timeout, finishTimer, hideTimer;
   const splash = () => document.getElementById('app-splash');
+  // Tras la hoja nativa de Apple el WebView de iPhone no repinta lo nuevo hasta que se toca la pantalla
+  // (se quedaba solo el fondo). En esa carga se omite el fundido de entrada y se fuerza el repintado.
+  let repinta = false;
+  try { repinta = sessionStorage.getItem('continuum-repinta') === '1'; sessionStorage.removeItem('continuum-repinta'); } catch { /* sin almacenamiento */ }
+  const empuja = () => {
+    const app = document.getElementById('app');
+    if (!app) return;
+    app.style.opacity = '.999';
+    setTimeout(() => { app.style.opacity = ''; window.dispatchEvent(new Event('resize')); }, 40);
+  };
   const hide = () => {
     clearTimeout(timeout); clearTimeout(finishTimer); clearTimeout(hideTimer);
     root.classList.remove('splash-active');
@@ -18,6 +28,7 @@
     document.getElementById('splash-ambience')?.remove();
     document.getElementById('splash-status')?.remove();
     startedAt = null;
+    if (repinta) [0, 200, 600, 1500].forEach(ms => setTimeout(empuja, ms));
   };
   // Un arranque que se queda a medias no puede dejar la pantalla en blanco para siempre.
   const guard = () => {
@@ -133,7 +144,7 @@
       // transformación aquí convertiría a `#app` en el marco de su barra fija.
       const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       const app = document.getElementById('app');
-      if (app && !reduced) {
+      if (app && !reduced && !repinta) {
         app.classList.add('app-arrive');
         const limpiar = () => app.classList.remove('app-arrive');
         app.addEventListener('animationend', limpiar, { once: true });
