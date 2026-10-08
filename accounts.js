@@ -371,8 +371,14 @@ async function signInApple() {
       // La cuenta ya existía con su propio progreso: se pregunta cuál conservar. Nunca se mezclan.
       const choice = await chooseProgress('apple.com');
       if (!choice) throw Object.assign(Error('Cancelado'), {code:'apple/cancelled'});
+      // El token de Apple es de un solo uso y ya se gastó al intentar vincular: reutilizarlo hace que Firebase
+      // lo rechace por duplicado (auth/missing-or-invalid-nonce). El propio error trae la credencial lista
+      // para iniciar sesión con esa cuenta.
+      const existing = OAuthProvider.credentialFromError(error);
+      if (!existing) throw Error('No se pudo entrar con esa cuenta de Apple. Vuelve a intentarlo.');
       if (choice === 'movil') { const {progress, records} = payload(); try { localStorage.setItem(HANDOFF, JSON.stringify({progress, records, at: Date.now()})); } catch {} }
-      signed = await signInWithCredential(auth, credential);
+      try { signed = await signInWithCredential(auth, existing); }
+      catch (failure) { try { localStorage.removeItem(HANDOFF); } catch {} throw failure; }
     }
     await signed.user.getIdToken(true);
     await afterNativeSheet();location.reload();

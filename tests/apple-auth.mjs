@@ -16,9 +16,9 @@ function setup({enabled = true, ios = true, apple = false} = {}) {
   const snap = key => ({exists:()=>data.has(key),data:()=>data.get(key)});
   Object.assign(w,{auth,db:{},appleReloads:0,browserLocalPersistence:{},setPersistence:async()=>{},signInAnonymously:async()=>({user:u}),onAuthStateChanged:(_,fn)=>{listener=fn;},doc:(_,...parts)=>parts.join('/'),getDocFromServer:async key=>snap(key),serverTimestamp:()=>123,
     runTransaction:async(_,fn)=>fn({get:async key=>snap(key),set:(key,value)=>data.set(key,value),delete:key=>data.delete(key)}),
-    OAuthProvider:class {constructor(id){assert.equal(id,'apple.com');}credential(value){assert.equal(value.rawNonce,'random-request-nonce');return value;}},
+    OAuthProvider:class {constructor(id){assert.equal(id,'apple.com');}credential(value){assert.equal(value.rawNonce,'random-request-nonce');return value;}static credentialFromError(error){return error.credential||null;}},
     linkWithCredential:async(user,credential)=>{calls.link++;assert.equal(credential.idToken,'apple-token');user.providerData=[{providerId:'apple.com'}];user.isAnonymous=false;listener?.(user);return {user};},
-    signInWithCredential:async()=>{calls.login++;auth.currentUser={...u,uid:'existing-apple',providerData:[{providerId:'apple.com'}]};listener?.(auth.currentUser);return {user:auth.currentUser};},
+    signInWithCredential:async(_,credential)=>{calls.login++;assert.equal(credential.idToken,'credencial-de-la-cuenta','nunca se reutiliza el token de Apple ya gastado al vincular');if(w.loginFails)throw Error('falla');auth.currentUser={...u,uid:'existing-apple',providerData:[{providerId:'apple.com'}]};listener?.(auth.currentUser);return {user:auth.currentUser};},
     signOut:async()=>{calls.logout++;auth.currentUser=null;listener?.(null);},
     reauthenticateWithCredential:async(user,credential)=>{calls.reauth++;assert.equal(credential.idToken,'apple-token');},
     revokeAccessToken:async(_,code)=>{calls.revoke.push(code);if(w.revokeFails)throw Error('sin red al revocar');},
@@ -61,13 +61,13 @@ async function conEleccion(w, choice) {
 }
 {
   const {w,dom,calls}=setup();await w.appleTest.startAccounts(()=>{});
-  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
+  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use',credential:{idToken:'credencial-de-la-cuenta'}});};
   await conEleccion(w,'cuenta');assert.equal(calls.login,1);assert.equal(calls.logout,0);
   assert.equal(w.auth.currentUser.uid,'existing-apple');assert.equal(w.localStorage.getItem('continuum-apple-auth-notice'),null);dom.window.close();
 }
 {
   const {w,dom,data,calls}=setup();await w.appleTest.startAccounts(()=>{});
-  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
+  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use',credential:{idToken:'credencial-de-la-cuenta'}});};
   await conEleccion(w,'cuenta');assert.equal(calls.login,1);assert.equal(calls.logout,0);assert.equal(w.auth.currentUser.uid,'existing-apple');
   assert.equal(w.localStorage.getItem('continuum-progress-handoff'),null,'quedarse con el de la cuenta no aparta nada');dom.window.close();
 }
@@ -75,14 +75,14 @@ async function conEleccion(w, choice) {
   // Quedarse con el progreso del móvil: se aparta para subirlo a la cuenta tras recargar.
   const {w,dom,data,calls}=setup();await w.appleTest.startAccounts(()=>{});
   w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:42}}));
-  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
+  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use',credential:{idToken:'credencial-de-la-cuenta'}});};
   await conEleccion(w,'movil');assert.equal(calls.login,1);
   assert.match(JSON.parse(w.localStorage.getItem('continuum-progress-handoff')).progress,/"hits":42/);dom.window.close();
 }
 {
   // Cancelar la elección no cambia de cuenta.
   const {w,dom,calls}=setup();await w.appleTest.startAccounts(()=>{});
-  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use'});};
+  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use',credential:{idToken:'credencial-de-la-cuenta'}});};
   await assert.rejects(conEleccion(w,''),/Cancelado/);assert.equal(calls.login,0);assert.equal(w.auth.currentUser.uid,'guest');dom.window.close();
 }
 {
@@ -113,5 +113,12 @@ async function conEleccion(w, choice) {
   const {w,dom,calls}=setup({apple:true});await w.appleTest.startAccounts(()=>{});
   w.Capacitor.Plugins.AppleSignIn.authorize=async()=>({idToken:'apple-token',rawNonce:'random-request-nonce'});
   await assert.rejects(w.appleTest.removeAccount(),/No se ha borrado nada/);assert.equal(calls.batch,0);assert.equal(calls.deleted,0);dom.window.close();
+}
+{
+  // Si entrar con la cuenta existente falla, no queda apartado el progreso del móvil.
+  const {w,dom}=setup();await w.appleTest.startAccounts(()=>{});
+  w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use',credential:{idToken:'credencial-de-la-cuenta'}});};
+  w.loginFails=true;await assert.rejects(conEleccion(w,'movil'),/falla/);
+  assert.equal(w.localStorage.getItem('continuum-progress-handoff'),null);dom.window.close();
 }
 console.log('Apple: abierto a todos, vinculación, reentrada, salida y borrado con revocación correctos.');

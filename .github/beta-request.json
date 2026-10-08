@@ -1,7 +1,7 @@
 {
   "version": "0.1.1",
-  "cache": 636,
+  "cache": 637,
   "platforms": ["ios"],
   "upload_testflight": true,
-  "reason": "Acceso con Apple: la pantalla ya no se queda sin repintar tras entrar"
+  "reason": "Acceso con Apple: al elegir la cuenta existente ya no falla por token duplicado"
 }
