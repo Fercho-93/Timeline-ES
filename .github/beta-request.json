@@ -1,7 +1,7 @@
 {
   "version": "0.1.1",
-  "cache": 635,
+  "cache": 636,
   "platforms": ["ios"],
   "upload_testflight": true,
-  "reason": "Acceso con Apple abierto a todos en iPhone, con eliminación de cuenta y revocación"
+  "reason": "Acceso con Apple: la pantalla ya no se queda sin repintar tras entrar"
 }

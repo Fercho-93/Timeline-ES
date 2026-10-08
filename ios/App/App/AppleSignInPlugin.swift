@@ -78,6 +78,11 @@ public class AppleSignInPlugin: CAPPlugin, CAPBridgedPlugin, ASAuthorizationCont
     }
 
     private func clearRequest() {
+        // Al cerrarse la hoja de Apple el WebView puede quedarse sin repintar: se le pide recalcular su diseño.
+        DispatchQueue.main.async { [weak self] in
+            self?.bridge?.webView?.setNeedsLayout()
+            self?.bridge?.webView?.layoutIfNeeded()
+        }
         pending = nil
         controller = nil
         nonce = nil

@@ -348,6 +348,13 @@ function takeHandoff() {
   try { data = JSON.parse(localStorage.getItem(HANDOFF) || 'null'); localStorage.removeItem(HANDOFF); } catch { /* sin almacenamiento */ }
   return data && Date.now() - Number(data.at) < 600000 ? data : null;
 }
+// Recargar mientras la hoja nativa de Apple aún se está cerrando dejaba el WebView de iPhone sin repintar
+// (pantallas recortadas o vacías hasta reabrir la app). Se espera a que la app esté de nuevo a la vista
+// y a que la hoja haya acabado de cerrarse antes de recargar.
+async function afterNativeSheet() {
+  if (document.visibilityState === 'hidden') await new Promise(resolve => document.addEventListener('visibilitychange', resolve, {once:true}));
+  await new Promise(resolve => setTimeout(resolve, 700));
+}
 async function signInApple() {
   if (CT.isSessionActive?.()) throw Error('Sal de la partida antes de acceder con Apple.');
   if (!appleNativeEnabled) throw Object.assign(Error('Apple no está disponible en este dispositivo.'),{code:'apple/unavailable'});
@@ -368,12 +375,12 @@ async function signInApple() {
       signed = await signInWithCredential(auth, credential);
     }
     await signed.user.getIdToken(true);
-    location.reload();
+    await afterNativeSheet();location.reload();
   } catch (error) {
     authChanging = false;
     // Si Firebase ya cambió de identidad, reabrir su perfil antes de permitir
     // escrituras. Nunca dejar la pantalla del invitado usando otra sesión.
-    if (auth.currentUser?.uid !== identity.uid || appleUser(auth.currentUser)) { location.reload();return; }
+    if (auth.currentUser?.uid !== identity.uid || appleUser(auth.currentUser)) { await afterNativeSheet();location.reload();return; }
     throw error;
   }
 }
@@ -529,8 +536,8 @@ function deleteScreen() {
   accountDialog(`<div class="overlay"><section class="modal"><h2>${apple ? 'Eliminar cuenta y progreso' : 'Eliminar invitado y progreso'}</h2><p>Se borrarán tu perfil, progreso y entrada en el ranking. Esta acción no se puede deshacer. Al volver a entrar se creará un invitado nuevo desde cero.</p>${apple ? '<p>Apple te pedirá confirmar que eres tú y el juego dejará de tener acceso a tu cuenta de Apple.</p>' : ''}<button class="btn btn-ghost" data-account-action="delete-confirm">Eliminar definitivamente</button><button class="btn btn-primary" data-account-action="close">Cancelar</button><p id="account-delete-message" role="status"></p></section></div>`,true);
 }
 async function removeAccount() {
-  const u=auth.currentUser;
-  if (appleUser(u)) {
+  const u=auth.currentUser, wasApple=appleUser(u);
+  if (wasApple) {
     // Apple exige poder borrar la cuenta y revocar su acceso. Se confirma con Apple (también da el código
     // de revocación) antes de tocar ningún dato: si algo falla aquí, no se ha borrado nada.
     const result = await window.Capacitor.Plugins.AppleSignIn.authorize();
@@ -545,7 +552,7 @@ async function removeAccount() {
   batch.delete(r.ranking);batch.delete(doc(db,'socialRanking',u.uid));batch.delete(r.progress);batch.delete(r.profile);await batch.commit();
   active=false;
   try { await deleteUser(u); } catch(error) { active=true; throw error; }
-  CT.AccountStorage.clear();ready=false;location.reload();
+  CT.AccountStorage.clear();ready=false;if (wasApple) await afterNativeSheet();location.reload();
 }
 export async function startAccounts(callback) {
   startGame=callback;
