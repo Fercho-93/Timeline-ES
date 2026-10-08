@@ -1,7 +1,7 @@
 {
   "version": "0.1.1",
-  "cache": 565,
+  "cache": 634,
   "platforms": ["android", "ios"],
   "upload_testflight": true,
-  "reason": "Duelos, sincronización, audio iOS, vibración, artistas e ilustraciones corregidos"
+  "reason": "Dominio propio continuumjuego.es con enlaces universales, ranking opcional con cuentas de Apple/Google, retos rápidos y fantasma ajustados"
 }
