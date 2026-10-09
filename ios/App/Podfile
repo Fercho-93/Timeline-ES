@@ -18,6 +18,8 @@ end
 target 'App' do
   capacitor_pods
   # Add your Pods here
+  # App Check con App Attest (AppAttestationPlugin.swift).
+  pod 'FirebaseAppCheck', '~> 12.0'
 end
 
 post_install do |installer|

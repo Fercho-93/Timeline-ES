@@ -7,16 +7,26 @@ export const firebaseApp = getApps().length ? getApp() : initializeApp({
   storageBucket: 'timeline-es.firebasestorage.app', messagingSenderId: '572227626442',
   appId: '1:572227626442:web:f7c1ad0d66de6f02d79b33'
 });
-// App Check: cada petición a Firestore y Auth lleva una prueba de que sale de la web de
-// Continuum, no de un script. Se activa en cuanto `deployment.js` trae la clave pública de
-// reCAPTCHA Enterprise, y antes de abrir Firestore para que ninguna petición salga sin ella.
-// En la app instalada la atestación es nativa (App Attest / Play Integrity) y aún no está.
-const appCheckKey = window.CONTINUUM?.Deployment?.appCheckSiteKey;
-const appCheckReady = !!appCheckKey && !window.Capacitor?.isNativePlatform?.();
-if (appCheckReady) {
+// App Check: cada petición a Firestore y Auth lleva una prueba de que sale de Continuum, no
+// de un script. En la web, con reCAPTCHA Enterprise (clave pública en `deployment.js`); en la
+// app de iPhone, con App Attest a través del plugin nativo `AppAttestation`. Se inicia antes
+// de abrir Firestore para que ninguna petición salga sin ella. Android aún no lo lleva: Play
+// Integrity exige que la app esté en Google Play.
+const deployment = window.CONTINUUM?.Deployment;
+const capacitor = window.Capacitor;
+const native = !!capacitor?.isNativePlatform?.();
+const attestation = native && capacitor?.getPlatform?.() === 'ios' ? capacitor?.Plugins?.AppAttestation : null;
+const iosAppCheck = deployment?.iosAppCheck;
+if ((!native && deployment?.appCheckSiteKey) || (attestation && iosAppCheck?.appId && iosAppCheck?.apiKey)) {
   try {
-    const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js');
-    initializeAppCheck(firebaseApp, { provider: new ReCaptchaEnterpriseProvider(appCheckKey), isTokenAutoRefreshEnabled: true });
+    const { initializeAppCheck, ReCaptchaEnterpriseProvider, CustomProvider } = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js');
+    const provider = native
+      ? new CustomProvider({ getToken: async () => {
+          const { token, expireTimeMillis } = await attestation.getToken({ ...iosAppCheck, projectId: 'timeline-es', senderId: '572227626442' });
+          return { token, expireTimeMillis };
+        } })
+      : new ReCaptchaEnterpriseProvider(deployment.appCheckSiteKey);
+    initializeAppCheck(firebaseApp, { provider, isTokenAutoRefreshEnabled: true });
   } catch (error) { console.warn('App Check no disponible', error); }
 }
 export const auth = getAuth(firebaseApp);
