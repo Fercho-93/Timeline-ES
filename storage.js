@@ -98,6 +98,18 @@
     },
     notice, noticeHost, get message() { return message; }
   };
+  // Las reglas admiten una partida nueva online cada 10 s por persona (`creationQuota`).
+  // Antes de crear otra se espera lo que falte, en vez de dejar que falle.
+  // Si Firestore reintenta la misma transacción, la llamada vuelve en menos de 3 s: es el
+  // mismo intento y no se espera otra vez.
+  let lastCreation = 0;
+  CT.creationSlot = async () => {
+    if (Date.now() - lastCreation < 3000) return;
+    const wait = lastCreation + 10500 - Date.now();
+    if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
+    lastCreation = Date.now();
+  };
+
   window.addEventListener("beforeunload", event => {
     if (!pending.size) return;
     event.preventDefault(); event.returnValue = "";

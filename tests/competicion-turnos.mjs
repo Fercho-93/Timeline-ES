@@ -53,8 +53,11 @@ w.eval(`const {auth,db,doc,Timestamp,serverTimestamp,runTransaction,onSnapshot}=
 const t = w.testComp;
 
 await t.create('history', 'orden', null, { rounds: 2, cards: 2 });
-assert.equal(created.length, 1, 'se crea un único documento');
-const id = created[0];
+// Además del duelo se escribe su registro de cuota (`creationQuota/<uid>`).
+const duels = created.filter(key => key !== me);
+assert.equal(duels.length, 1, 'se crea un único duelo');
+assert.ok(created.includes(me), 'el duelo va con su registro de cuota');
+const id = duels[0];
 let game = games.get(id);
 assert.deepEqual(Object.keys(game).sort(), ['createdAt', 'id', 'kind', 'mode', 'playersOrder', 'players', 'plays', 'scores', 'seconds', 'seed', 'status', 'timeline', 'total', 'turnIndex', 'turnUid', 'updatedAt'].sort(), 'los mismos campos que admiten las reglas');
 assert.equal(game.mode, 'comp:alfa,beta', 'los temas viajan en el campo del mazo');

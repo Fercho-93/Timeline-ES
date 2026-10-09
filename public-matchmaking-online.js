@@ -74,7 +74,9 @@ async function findOrCreate(mode, capacityInput, { allowStale = false } = {}) {
       return oldRoom.roomCode;
     }
     const code=makePublicRoomCode(),roomRef=doc(db,'rooms',code);
+    await CT.creationSlot?.();
     tx.set(roomRef,roomData(code,mode,capacity,user.uid));
+    tx.set(doc(db,'creationQuota',user.uid),{lastCreatedAt:serverTimestamp(),kind:'publicRoom',target:code});
     tx.set(queueRef,{queueKey,roomCode:code,mode,capacity,clientVersion:CLIENT_VERSION,deckFingerprint:fingerprint,status:'waiting',updatedAt:serverTimestamp()});
     return code;
   }).catch(error=>{
@@ -126,7 +128,11 @@ async function createTable(mode, capacityInput, seconds, handSize = 4) {
   // Una sala que no existe no se puede leer con las reglas de las salas: se escribe sin
   // mirar antes (con siete caracteres al azar, repetir un código es improbable, y si
   // ocurriera las reglas lo tratarían como una modificación y la rechazarían).
-  await setDoc(roomRef,roomData(code,mode,capacity,user.uid,Number(seconds),Number(handSize)));
+  await CT.creationSlot?.();
+  await runTransaction(db,async tx=>{
+    tx.set(roomRef,roomData(code,mode,capacity,user.uid,Number(seconds),Number(handSize)));
+    tx.set(doc(db,'creationQuota',user.uid),{lastCreatedAt:serverTimestamp(),kind:'publicRoom',target:code});
+  });
   return code;
 }
 

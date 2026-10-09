@@ -289,7 +289,8 @@ async function create(mode, kind, back, competition = null) {
   const seconds = CT.Tiempo?.get?.('amigos', 15) || 0;
   const game = { id: gameId, mode, kind, seed, total, seconds, turnIndex: 0, turnUid: null, playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, status: 'waiting', plays: [], timeline: openingCard == null ? [] : [openingCard], scores: { [uid()]: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   shareLink = CT.Links.invitation({turnDuel:gameId});
-  await runTransaction(db, async tx => { const ref = doc(db, 'turnDuels', gameId); if (!(await tx.get(ref)).exists()) tx.set(ref, game); });
+  await CT.creationSlot?.();
+  await runTransaction(db, async tx => { const ref = doc(db, 'turnDuels', gameId); if (!(await tx.get(ref)).exists()) { tx.set(ref, game); tx.set(doc(db, 'creationQuota', uid()), { lastCreatedAt: serverTimestamp(), kind: 'turnDuel', target: gameId }); } });
   localStorage.removeItem(draftKey);
   await navigator.clipboard?.writeText(shareLink).catch(() => {}); notify('Duelo creado. Comparte el enlace con tu rival.');
   subscribe(gameId);
@@ -514,6 +515,7 @@ async function challenge(sourceId, back = onBack) {
     const previous = games.filter(g => g.sourceDuel === sourceId && g.playersOrder[0] === uid() && Number.isInteger(g.invitationRound));
     if (previous.length) round = Math.max(...previous.map(g => g.invitationRound)) + 1;
     let available = false;
+    await CT.creationSlot?.();
     while (!available && round < 1000) {
     gameId = `invite-${source.seed}-${uid()}-${round}`;
     available = await runTransaction(db, async tx => {
@@ -527,6 +529,7 @@ async function challenge(sourceId, back = onBack) {
         playersOrder: [uid()], players: { [uid()]: { alias: alias() } }, scores: { [uid()]: 0 },
         status: 'waiting', plays: [], timeline: compModes(source) ? [themeDeal({ mode: source.mode, seed, total }, 0)[0]?.id] : source.kind === 'orden' ? [CT.Duelo.reparto(source.mode, seed, total)[0]] : [],
         createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      tx.set(doc(db, 'creationQuota', uid()), { lastCreatedAt: serverTimestamp(), kind: 'turnDuel', target: gameId });
       return true;
     });
     if (!available) round++;

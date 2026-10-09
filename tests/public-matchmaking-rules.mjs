@@ -13,13 +13,15 @@ const player=(name,version=42)=>({name,avatarId:null,hand:[],joinedAt:1,clientVe
 const room=(host=H)=>({roomCode:CODE,mode:'history',deckFingerprint:'167.test1',hostUid:host,matchmaking:'public',capacity:2,clientVersion:42,queueKey:KEY,status:'lobby',phase:'lobby',version:1,handSize:4,turnSeconds:30,playerOrder:[host],players:{[host]:player('Ana')},deck:[],discard:[],timeline:[],current:0,starter:host,turnsInRound:0,round:1,winner:null,winners:null,reveal:null,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
 const queue=(code=CODE,status='waiting')=>({queueKey:KEY,roomCode:code,mode:'history',capacity:2,clientVersion:42,deckFingerprint:'167.test1',status,updatedAt:serverTimestamp()});
 let fail=0;
+// Cada mesa nueva va con su registro de cuota (`creationQuota`), en la misma operación.
+const cuota=(b,db,uid,code)=>b.set(doc(db,'creationQuota',uid),{lastCreatedAt:serverTimestamp(),kind:'publicRoom',target:code});
 const check=async(label,ok,p)=>{try{await(ok?assertSucceeds(p):assertFails(p));console.log('  ok  ',label);}catch(e){fail++;console.log('  FALLA',label,String(e).split('\n')[0]);}};
 
 console.log('\nMatchmaking público');
 await env.clearFirestore();
 {
   const db=ctx(H),b=writeBatch(db);
-  b.set(doc(db,'rooms',CODE),room());
+  b.set(doc(db,'rooms',CODE),room());cuota(b,db,H,CODE);
   b.set(doc(db,'publicQueues',KEY),queue());
   await check('crea sala pública y su cola de forma atómica',true,b.commit());
 }
@@ -30,7 +32,7 @@ await env.clearFirestore();
 // Evita la lectura circular de getAfter entre ambas reglas de creación.
 await check('permite preparar la sala sin cola',true,(async()=>{
   const db=ctx(H),b=writeBatch(db);
-  b.set(doc(db,'rooms',CODE),room());
+  b.set(doc(db,'rooms',CODE),room());cuota(b,db,H,CODE);
   return b.commit();
 })());
 
@@ -69,7 +71,7 @@ await env.withSecurityRulesDisabled(async c=>{
 });
 {
   const db=ctx(P2),b=writeBatch(db);
-  b.set(doc(db,'rooms','PBBBBBBB'),{...room(P2),roomCode:'PBBBBBBB'});
+  b.set(doc(db,'rooms','PBBBBBBB'),{...room(P2),roomCode:'PBBBBBBB'});cuota(b,db,P2,'PBBBBBBB');
   b.set(doc(db,'publicQueues',KEY),queue('PBBBBBBB'));
   await check('una mesa abandonada (cola sin renovar en dos minutos) se sustituye por una nueva',true,b.commit());
 }
@@ -81,7 +83,7 @@ await env.withSecurityRulesDisabled(async c=>{
 });
 {
   const db=ctx(P2),b=writeBatch(db);
-  b.set(doc(db,'rooms','PBBBBBBB'),{...room(P2),roomCode:'PBBBBBBB'});
+  b.set(doc(db,'rooms','PBBBBBBB'),{...room(P2),roomCode:'PBBBBBBB'});cuota(b,db,P2,'PBBBBBBB');
   b.set(doc(db,'publicQueues',KEY),queue('PBBBBBBB'));
   await check('una mesa que sigue viva no se puede sustituir',false,b.commit());
 }
@@ -129,7 +131,10 @@ console.log('\nTablón de mesas públicas');
   const sala=async(over={})=>env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'rooms',CODE),{...room(),turnSeconds:20,createdAt:new Date(),updatedAt:new Date(),...over}));
   await env.clearFirestore();
   // Crear mesa: la sala nace con su tiempo elegido, sin pasar por la cola.
-  await check('se abre una mesa pública con su tiempo, sin cola',true,setDoc(doc(ctx(H),'rooms',CODE),{...room(),turnSeconds:20}));
+  await check('se abre una mesa pública con su tiempo, sin cola',true,(async()=>{const db=ctx(H),b=writeBatch(db);b.set(doc(db,'rooms',CODE),{...room(),turnSeconds:20});cuota(b,db,H,CODE);return b.commit();})());
+  await env.withSecurityRulesDisabled(async c=>{await deleteDoc(doc(c.firestore(),'creationQuota',H));});
+  await check('TRAMPA: abrir otra mesa sin su registro de cuota',false,setDoc(doc(ctx(H),'rooms','PCCCCCCC'),{...room(),roomCode:'PCCCCCCC',turnSeconds:20}));
+  await check('TRAMPA: abrir otra mesa antes de 10 s',false,(async()=>{const db=ctx(H),b=writeBatch(db);b.set(doc(db,'rooms','PDDDDDDD'),{...room(),roomCode:'PDDDDDDD',turnSeconds:20});cuota(b,db,H,'PDDDDDDD');await b.commit();const b2=writeBatch(db);b2.set(doc(db,'rooms','PEEEEEEE'),{...room(),roomCode:'PEEEEEEE',turnSeconds:20});cuota(b2,db,H,'PEEEEEEE');return b2.commit();})());
   await check('quien la lleva publica su ficha en el tablón',true,setDoc(doc(ctx(H),'publicTables',CODE),ficha()));
   await check('cualquiera con perfil lista las mesas abiertas',true,getDocs(query(collection(ctx(P2),'publicTables'),orderBy('updatedAt','desc'),limit(50))));
   await check('TRAMPA: listar sin límite',false,getDocs(query(collection(ctx(P2),'publicTables'),orderBy('updatedAt','desc'))));

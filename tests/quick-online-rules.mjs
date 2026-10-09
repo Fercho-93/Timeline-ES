@@ -2,14 +2,23 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
-import {collection,deleteDoc,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot} from 'firebase/firestore';
+import {collection,deleteDoc,getDocs,query,where,doc,getDoc,setDoc,updateDoc,serverTimestamp,runTransaction,onSnapshot,writeBatch} from 'firebase/firestore';
 const env=await initializeTestEnvironment({projectId:'demo-hilo',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
 const w={};for(const p of ['cards.js','movies.js','music.js','videogames.js','animals.js','lifespan.js','speed.js','inventos.js','mundo.js','astronomy.js','medicine.js','countries.js','population.js','idiomas.js','distances.js','modes.js','engine.js','quick-challenges-data.js','quick-challenges-engine.js','cartera.js','tournament.js','final.js','quick-room.js'])vm.runInNewContext(fs.readFileSync(p,'utf8'),{window:w});
 const R=w.CONTINUUM.QuickRoom, E=w.CONTINUUM.QuickEngine;
 const rounds=[{id:'poker',order:E.challenge('poker').cards.map(c=>c.id)}];
 const host=env.authenticatedContext('host').firestore(),guest=env.authenticatedContext('guest').firestore(),out=env.authenticatedContext('outsider').firestore();
 const ref=db=>doc(db,'quickRooms','ABCDEFGH23');
-const write=(db,r)=>setDoc(ref(db),{...JSON.parse(JSON.stringify(r)),catalog:1,updatedAt:serverTimestamp()});
+// Una sala nueva (revisión 0) se crea junto con su registro de cuota, como en quick-online.js.
+// Antes se borra la cuota anterior: las pruebas crean salas seguidas sin esperar los 10 s.
+const uidOf=new Map([[host,'host'],[guest,'guest'],[out,'outsider']]);
+const libre=uid=>env.withSecurityRulesDisabled(c=>deleteDoc(doc(c.firestore(),'creationQuota',uid)));
+const save=async(db,target,data)=>{
+  if(data.revision!==0)return setDoc(target,data);
+  const uid=uidOf.get(db);await libre(uid);
+  const b=writeBatch(db);b.set(target,data);b.set(doc(db,'creationQuota',uid),{lastCreatedAt:serverTimestamp(),kind:'quickRoom',target:target.id});return b.commit();
+};
+const write=(db,r)=>save(db,ref(db),{...JSON.parse(JSON.stringify(r)),catalog:1,updatedAt:serverTimestamp()});
 try {
   // Los retos actuales pueden tener más de diez cartas: hay que poder completar
   // un duelo también colocando en el último hueco de una línea larga.
@@ -18,13 +27,13 @@ try {
     assert.ok(challenge, 'hay un reto de más de doce cartas para reproducir el fallo');
     const order=challenge.cards.slice().sort((a,b)=>(a.value-b.value)*challenge.direction).map(c=>c.id);
     const longRef=db=>doc(db,'quickRooms','LONGDUEL23');
-    const save=async(uid,room)=>assertSucceeds(setDoc(longRef(uid==='host'?host:guest),{...JSON.parse(JSON.stringify(room)),catalog:1,updatedAt:serverTimestamp()}));
-    let room=R.create('host','Ana',2);await save('host',room);
-    room=R.reduce(room,'guest',{type:'join',name:'Bea'});await save('guest',room);
+    const keep=async(uid,room)=>{const db=uid==='host'?host:guest;return assertSucceeds(save(db,longRef(db),{...JSON.parse(JSON.stringify(room)),catalog:1,updatedAt:serverTimestamp()}));};
+    let room=R.create('host','Ana',2);await keep('host',room);
+    room=R.reduce(room,'guest',{type:'join',name:'Bea'});await keep('guest',room);
     // El plazo por jugada viaja en la configuración; un valor fuera de la lista no se acepta.
     const malPlazo=R.reduce(room,'host',{type:'start',rounds:[{id:challenge.id,order}],kind:'duel',keep:true});malPlazo.config.seconds=45;
     await assertFails(setDoc(longRef(host),{...JSON.parse(JSON.stringify(malPlazo)),catalog:1,updatedAt:serverTimestamp()}));
-    room=R.reduce(room,'host',{type:'start',rounds:[{id:challenge.id,order}],kind:'duel',keep:true,seconds:20});await save('host',room);
+    room=R.reduce(room,'host',{type:'start',rounds:[{id:challenge.id,order}],kind:'duel',keep:true,seconds:20});await keep('host',room);
     assert.equal(room.config.seconds,20);
     await assertFails(setDoc(longRef(out),{...JSON.parse(JSON.stringify(room)),revision:room.revision+1,updatedAt:serverTimestamp()}));
     let reachedLongSlot=false;
@@ -32,7 +41,7 @@ try {
       const state=R.state(room),actor=room.actor;
       const action=room.phase==='result'?{type:'ack'}:{type:'place',cardId:state.remaining[0],index:state.timeline.length};
       if(action.index>10)reachedLongSlot=true;
-      room=R.reduce(room,actor,action);await save(actor,room);
+      room=R.reduce(room,actor,action);await keep(actor,room);
     }
     assert.ok(reachedLongSlot, 'el duelo ha confirmado huecos superiores a diez');
     assert.equal(R.state(room).remaining.length,0, 'ambos jugadores pueden terminar el reto largo');
@@ -68,6 +77,8 @@ try {
   // concurrent join transactions, late reconnect and stale-turn rejection.
   const source=fs.readFileSync('quick-online.js','utf8').replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
   w.CONTINUUM.QuickNetwork={fingerprint:()=>1,compatible:value=>value===1};
+  // Antes de cada alta el cliente espera a que pase la cuota; aquí se simula vaciándola.
+  w.CONTINUUM.creationSlot=async()=>{for(const uid of ['host','guest','outsider'])await libre(uid);};
   w.CONTINUUM.QuickRoom={...R,create:(...args)=>JSON.parse(JSON.stringify(R.create(...args))),reduce:(...args)=>JSON.parse(JSON.stringify(R.reduce(...args)))};
   const adapter=(uid,db,api=false)=>new Function('auth','db','collection','getDocs','query','where','getDoc','doc','runTransaction','onSnapshot','serverTimestamp','window',source+'\nreturn '+(api?'{connect,actOnce,cancelRoom}':'connect')+';')({currentUser:{uid},authStateReady:async()=>{}},db,collection,getDocs,query,where,getDoc,doc,runTransaction,onSnapshot,serverTimestamp,w);
   const rooms={};let failures=[];

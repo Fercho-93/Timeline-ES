@@ -18,8 +18,10 @@ const freshCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(10)),n=>'AB
 async function claimTable({uid,name,create,code,capacity}){
   if(create){
     const fresh=freshCode();
+    await CT.creationSlot?.();
     await runTransaction(db,async tx=>{
       tx.set(doc(db,'quickRooms',fresh),{...R.create(uid,name,capacity),catalog:CT.QuickNetwork.fingerprint(),matchmaking:'public',updatedAt:serverTimestamp()});
+      tx.set(doc(db,'creationQuota',uid),{lastCreatedAt:serverTimestamp(),kind:'quickRoom',target:fresh});
     });
     return fresh;
   }
@@ -77,7 +79,9 @@ async function publicConnect(options) {
     }
     const fresh=freshCode();
     const ref=doc(db,'quickRooms',fresh);
+    await CT.creationSlot?.();
     tx.set(ref,{...R.create(uid,name,chosen.cap),catalog:CT.QuickNetwork.fingerprint(),matchmaking:'public',updatedAt:serverTimestamp()});
+    tx.set(doc(db,'creationQuota',uid),{lastCreatedAt:serverTimestamp(),kind:'quickRoom',target:fresh});
     tx.set(qref,{code:fresh,status:'waiting',capacity:chosen.cap,updatedAt:serverTimestamp()});
     return fresh;
   }).catch(error=>{
@@ -231,11 +235,13 @@ export async function connect({code, name, create=false, capacity=4, invite=null
   code=String(code||'').trim().toUpperCase();
   if(!/^[A-Z2-9]{10}$/.test(code))throw Error('Escribe el código de diez caracteres de la sala.');
   const ref=doc(db,'quickRooms',code);
+  if(create)await CT.creationSlot?.();
   await runTransaction(db,async tx=>{
     const snap=await tx.get(ref);
     if(create) {
       if(snap.exists())throw Error('Ese código ya existe. Vuelve a crear la sala.');
       tx.set(ref,{...R.create(uid,name,capacity),...(invite?.uid?{invitedUid:String(invite.uid).slice(0,128),invitedName:String(invite.name||'').slice(0,24)}:{}),catalog:CT.QuickNetwork.fingerprint(),updatedAt:serverTimestamp()});
+      tx.set(doc(db,'creationQuota',uid),{lastCreatedAt:serverTimestamp(),kind:'quickRoom',target:code});
     } else {
       if(!snap.exists())throw Error('No se encuentra esta sala.');
       const room=snap.data();

@@ -146,7 +146,7 @@ service cloud.firestore {
         || (resource.data.capacity==2 && resource.data.members.size()==1 && resource.data.get('matchmaking','private')!='public'));
       // Tus salas (consulta con members array-contains tu uid): la lista unificada de duelos.
       allow list: if registered() && (request.auth.uid in resource.data.members || resource.data.get('invitedUid','') == request.auth.uid);
-      allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && valid(request.resource.data)
+      allow create: if registered() && code.matches('^[A-Z2-9]{10}$') && quotaFor(code) && valid(request.resource.data)
         && request.resource.data.host==request.auth.uid && request.resource.data.members==[request.auth.uid]
         && (!('invitedUid' in request.resource.data.keys()) || !blocked(request.auth.uid, request.resource.data.invitedUid))
         && !('resigned' in request.resource.data.keys()) && !('declined' in request.resource.data.keys())
@@ -248,7 +248,7 @@ service cloud.firestore {
               && duelId == 'invite-' + source.seed + '-' + request.auth.uid + '-' + string(d.invitationRound)));
       }
       function validCreate() {
-        return registered() && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound','starter','seconds'])
+        return registered() && quotaFor(duelId) && request.resource.data.keys().hasOnly(['id','mode','kind','seed','total','turnIndex','turnUid','playersOrder','players','status','plays','timeline','scores','createdAt','updatedAt','invitedUid','invitedAlias','sourceDuel','invitationRound','starter','seconds'])
           && (!('seconds' in request.resource.data) || request.resource.data.seconds in [0, 15, 20, 30])
           && (!('invitedUid' in request.resource.data) || validInvitation())
           && (!('starter' in request.resource.data) || request.resource.data.starter == 0 || ('invitedUid' in request.resource.data && request.resource.data.starter == 1))
@@ -608,6 +608,36 @@ service cloud.firestore {
                 || get(/databases/$(database)/documents/rooms/$(resource.data.roomCode)).data.playerOrder.size() >= resource.data.capacity)
               && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.hostUid == request.auth.uid));
       allow delete: if false;
+    }
+
+    // Cuota de altas: una partida nueva (duelo por turnos, sala de Retos rápidos o mesa
+    // pública) cada 10 s por persona. Se escribe en la misma operación que crea la partida,
+    // que a su vez exige este registro apuntándola; así no se puede crear sin pasar por aquí.
+    // No impide crear otra identidad anónima (eso lo cubre App Check), pero frena los bucles.
+    match /creationQuota/{owner} {
+      function made(kind, target) {
+        return (kind == 'turnDuel' && !exists(/databases/$(database)/documents/turnDuels/$(target))
+            && getAfter(/databases/$(database)/documents/turnDuels/$(target)).data.playersOrder[0] == owner
+            && getAfter(/databases/$(database)/documents/turnDuels/$(target)).data.createdAt == request.time)
+          || (kind == 'quickRoom' && !exists(/databases/$(database)/documents/quickRooms/$(target))
+            && getAfter(/databases/$(database)/documents/quickRooms/$(target)).data.host == owner
+            && getAfter(/databases/$(database)/documents/quickRooms/$(target)).data.updatedAt == request.time)
+          || (kind == 'publicRoom' && !exists(/databases/$(database)/documents/rooms/$(target))
+            && getAfter(/databases/$(database)/documents/rooms/$(target)).data.hostUid == owner
+            && getAfter(/databases/$(database)/documents/rooms/$(target)).data.createdAt == request.time);
+      }
+      allow get: if registered() && request.auth.uid == owner;
+      allow create, update: if registered() && request.auth.uid == owner
+        && request.resource.data.keys().hasOnly(['lastCreatedAt','kind','target'])
+        && request.resource.data.lastCreatedAt == request.time
+        && request.resource.data.target is string && request.resource.data.target.size() >= 1 && request.resource.data.target.size() <= 160
+        && (!exists(/databases/$(database)/documents/creationQuota/$(owner)) || request.time >= resource.data.lastCreatedAt + duration.value(10,'s'))
+        && made(request.resource.data.kind, request.resource.data.target);
+      allow list, delete: if false;
+    }
+    function quotaFor(target) {
+      let q = getAfter(/databases/$(database)/documents/creationQuota/$(request.auth.uid));
+      return q != null && q.data.target == target && q.data.lastCreatedAt == request.time;
     }
 
     match /roomCreation/{owner} {
@@ -1477,7 +1507,8 @@ service cloud.firestore {
           && request.resource.data.tournament.index == 0 && request.resource.data.tournament.history == []
           && request.resource.data.mode == request.resource.data.tournament.queue[0]))
         && (request.resource.data.get('matchmaking','private') == 'public'
-          || (getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.roomCode == roomId
+          ? quotaFor(roomId)
+          : (getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.roomCode == roomId
             && getAfter(/databases/$(database)/documents/roomCreation/$(request.auth.uid)).data.lastCreatedAt == request.time))
         && !('ghost' in request.resource.data)
         && !('pulsePower' in request.resource.data)
