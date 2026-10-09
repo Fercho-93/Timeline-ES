@@ -7,6 +7,18 @@ export const firebaseApp = getApps().length ? getApp() : initializeApp({
   storageBucket: 'timeline-es.firebasestorage.app', messagingSenderId: '572227626442',
   appId: '1:572227626442:web:f7c1ad0d66de6f02d79b33'
 });
+// App Check: cada petición a Firestore y Auth lleva una prueba de que sale de la web de
+// Continuum, no de un script. Se activa en cuanto `deployment.js` trae la clave pública de
+// reCAPTCHA Enterprise, y antes de abrir Firestore para que ninguna petición salga sin ella.
+// En la app instalada la atestación es nativa (App Attest / Play Integrity) y aún no está.
+const appCheckKey = window.CONTINUUM?.Deployment?.appCheckSiteKey;
+const appCheckReady = !!appCheckKey && !window.Capacitor?.isNativePlatform?.();
+if (appCheckReady) {
+  try {
+    const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js');
+    initializeAppCheck(firebaseApp, { provider: new ReCaptchaEnterpriseProvider(appCheckKey), isTokenAutoRefreshEnabled: true });
+  } catch (error) { console.warn('App Check no disponible', error); }
+}
 export const auth = getAuth(firebaseApp);
 // En la app instalada (pantalla de inicio) de iOS el canal de streaming de Firestore puede
 // quedarse colgado sin fallar, y toda lectura espera para siempre. Con la detección

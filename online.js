@@ -1,4 +1,4 @@
-import { firebaseApp, auth, db } from './firebase-client.js';
+import { auth, db } from './firebase-client.js';
 import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const appEl = document.getElementById("app");
@@ -529,17 +529,11 @@ function rememberedRoom(code) {
   catch { return null; }
 }
 
-let protectionReady;
+// App Check se inicia con Firebase (firebase-client.js). Una versión pública no abre salas
+// en una plataforma que aún no tenga su atestación configurada.
 async function ensureProtection() {
   const config = CT.Deployment;
-  if (!config?.appCheckSiteKey || window.Capacitor?.isNativePlatform?.()) {
-    if (config?.audience === 'public') throw Error('Falta configurar la protección de las salas para esta plataforma.');
-    return;
-  }
-  protectionReady ||= import('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js').then(({initializeAppCheck,ReCaptchaEnterpriseProvider}) => {
-    initializeAppCheck(firebaseApp,{provider:new ReCaptchaEnterpriseProvider(config.appCheckSiteKey),isTokenAutoRefreshEnabled:true});
-  }).catch(error => { protectionReady=null; throw error; });
-  await protectionReady;
+  if ((!config?.appCheckSiteKey || window.Capacitor?.isNativePlatform?.()) && config?.audience === 'public') throw Error('Falta configurar la protección de las salas para esta plataforma.');
 }
 async function ensureAuth() {
   await ensureProtection();

@@ -12,13 +12,13 @@
          resto de la aplicación —incluida la carga de todos los mazos— es de este origen.
          `frame-ancestors` no se puede fijar aquí: los navegadores solo la respetan si la
          manda una cabecera HTTP de verdad, y GitHub Pages no permite añadir cabeceras. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com; frame-src https://timeline-es.firebaseapp.com https://accounts.google.com https://appleid.apple.com; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://www.google.com/recaptcha/; connect-src 'self' https://*.googleapis.com; frame-src https://timeline-es.firebaseapp.com https://accounts.google.com https://appleid.apple.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="preload" href="assets/continuum-splash-clean-v3.webp" as="image" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="splash.css" />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="edition.css?v=639" />
+    <link rel="stylesheet" href="edition.css?v=640" />
     <link rel="stylesheet" href="accounts.css" />
     <link rel="stylesheet" href="quick-challenges.css" />
     <link rel="stylesheet" href="home-modes-v1.css" />
