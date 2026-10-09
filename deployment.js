@@ -3,6 +3,6 @@
   window.CONTINUUM.Deployment = Object.freeze({
     audience: 'private-beta',
     feedbackEmail: 'feedbackcontinuum@gmail.com',
-    appCheckSiteKey: ''
+    appCheckSiteKey: '6Lcp5eYtAAAAAFymbjtUg5q2ys6tJyhrBsBOe5Gm'
   });
 })();
