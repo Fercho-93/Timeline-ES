@@ -98,4 +98,24 @@ console.log('Duelo por turnos: empieza el creador, el amigo entra después y el 
   assert.equal(JSON.stringify(R.reduce(t,'a',{type:'starter-draw',modeKey:'history',cardId:2}).starter.guesses),'{}','repetir el sorteo borra las respuestas');
   assert.throws(()=>R.validate({...t,starter:{modeKey:'history',cardId:1,guesses:{x:5}}}),/no válida/,'respuestas de quien no está en la mesa');
 }
+{
+  // Cada jugada lleva quién la hizo, y la reconstrucción comprueba que era su turno.
+  let t=R.reduce(R.reduce(R.create('a','Ana',2),'b',{type:'join',name:'Bea'}),'a',{type:'start',rounds,kind:'duel'});
+  t=R.reduce(t,'a',{type:'place',cardId:'poker-2',index:1});
+  assert.equal(t.commands.at(-1).by,'a','la jugada queda firmada por quien la hace');
+  assert.equal(R.reduce(t,'a',{type:'ack',by:'b'}).commands.at(-1).by,'a','la firma no la elige quien manda la acción');
+  // TRAMPA: quien tiene el turno se apunta otra vez como actor y juega la carta del rival.
+  const forged=JSON.parse(JSON.stringify(t));
+  forged.commands.push({type:'ack',by:'a'});forged.revision++;
+  forged.commands.push({type:'place',cardId:'poker-9',index:0,by:'a'});forged.revision++;
+  forged.commands.push({type:'ack',by:'a'});forged.revision++;
+  // Fase y actor coherentes con el motor: solo la firma delata la jugada.
+  const st=R.state(forged);forged.phase=st.phase;forged.actor=forged.members[st.current];
+  assert.throws(()=>R.validate(forged),/Turno no válido/,'una jugada firmada por quien no tenía el turno no cuenta');
+  // Las salas anteriores al cambio, sin firmas, se siguen pudiendo reconstruir.
+  const legacy=JSON.parse(JSON.stringify(t));legacy.commands=legacy.commands.map(({by,...c})=>c);
+  assert.doesNotThrow(()=>R.validate(legacy));
+  assert.ok(R.sameCommand(t.commands.at(-1),{type:'place',cardId:'poker-2',index:1},'a'),'una jugada pendiente se reconoce ya firmada');
+  assert.ok(!R.sameCommand(t.commands.at(-1),{type:'place',cardId:'poker-2',index:1},'b'));
+}
 console.log('Quién empieza en una sala en directo: sorteo, respuesta única y primer turno: OK');

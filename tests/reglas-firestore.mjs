@@ -114,6 +114,11 @@ await check("el anfitrión reparte y empieza", "allow", updateDoc(ref(ctx(HOST))
 await seed(lobby3);
 await check("un invitado intenta empezar", "deny", updateDoc(ref(ctx(P2)), startPayload));
 await check("empezar con 20 cartas en mano", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, handSize: 20 }));
+// TRAMPA: quien reparte se queda sin cartas (o deja a alguien fuera) y gana en la primera ronda.
+await seed(lobby3);
+await check("TRAMPA: el anfitrión se reparte 0 cartas y 2 al resto", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, players: { ...startPayload.players, [HOST]: { name: "Ana", hand: [], joinedAt: 1 } } }));
+await check("TRAMPA: a un invitado le tocan más cartas que a los demás", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, players: { ...startPayload.players, [P3]: { name: "Cid", hand: [6, 7, 8, 9, 12, 13], joinedAt: 3 } } }));
+await check("TRAMPA: dejar a un invitado fuera del reparto", "deny", updateDoc(ref(ctx(HOST)), { ...startPayload, players: { [HOST]: startPayload.players[HOST], [P2]: startPayload.players[P2] } }));
 // El minijuego de quién empieza sienta a la mesa por orden de cercanía.
 await seed(lobby3);
 await check("empezar con la mesa ordenada por el minijuego", "allow", updateDoc(ref(ctx(HOST)), { ...startPayload, playerOrder: [P2, P3, HOST], current: 0 }));

@@ -68,8 +68,15 @@ public class LocalLanSignalPlugin: CAPPlugin, CAPBridgedPlugin {
         connection.start(queue: queue)
     }
 
+    // Lo que manda un móvil de la misma red no es de fiar: un Content-Length negativo hacía
+    // un rango inválido y cerraba la app, y una petición que nunca termina iba acumulando
+    // memoria. La respuesta WebRTC ocupa unos pocos KB.
+    private static let maxBody = 65536
+    private static let maxRequest = 81920
+
     private func handle(_ connection: NWConnection) {
         connection.start(queue: queue)
+        queue.asyncAfter(deadline: .now() + 10) { connection.cancel() }
         receiveAll(connection, data: Data())
     }
 
@@ -78,10 +85,12 @@ public class LocalLanSignalPlugin: CAPPlugin, CAPBridgedPlugin {
             guard let self else { return }
             var accumulated = data; if let chunk { accumulated.append(chunk) }
             if error != nil { connection.cancel(); return }
+            if accumulated.count > Self.maxRequest { self.reply(connection, status: 404); return }
             if let marker = accumulated.range(of: Data("\r\n\r\n".utf8)) {
                 let header = String(decoding: accumulated[..<marker.lowerBound], as: UTF8.self)
                 guard header.hasPrefix("POST /answer ") else { self.reply(connection, status: 404); return }
                 let length = header.split(separator: "\r\n").first { $0.lowercased().hasPrefix("content-length:") }.flatMap { Int($0.split(separator: ":", maxSplits: 1)[1].trimmingCharacters(in: .whitespaces)) } ?? 0
+                guard length >= 0, length <= Self.maxBody else { self.reply(connection, status: 404); return }
                 let bodyStart = marker.upperBound
                 if accumulated.count >= bodyStart + length {
                     let bodyData = accumulated.subdata(in: bodyStart..<(bodyStart + length))

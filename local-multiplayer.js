@@ -657,7 +657,7 @@
       const player = roomState.players[uid];
       const pos = SEAT_POSITIONS[index] || SEAT_POSITIONS[SEAT_POSITIONS.length - 1];
       const puedeExpulsar = isHost && uid !== roomState.hostId;
-      return `<div class="table-seat" style="left:${pos.left};top:${pos.top};"><span class="seat-avatar">${CT.Avatares.markup(player.name, { size: 44, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</span><strong>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</strong><small>${uid === roomState.hostId ? "Anfitrión" : `Plaza ${index + 1}`}</small><i class="ready-seal">Listo</i>${puedeExpulsar ? `<button class="kick-btn" data-local-action="kick" data-uid="${uid}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>` : ""}</div>`;
+      return `<div class="table-seat" style="left:${pos.left};top:${pos.top};"><span class="seat-avatar">${CT.Avatares.markup(player.name, { size: 44, seed: 'room:' + uid, id: esMio(uid) ? CT.Avatares.ownId() : player.avatarId })}</span><strong>${escapeHtml(player.name)}${uid === myPlayerId ? " · tú" : ""}</strong><small>${uid === roomState.hostId ? "Anfitrión" : `Plaza ${index + 1}`}</small><i class="ready-seal">Listo</i>${puedeExpulsar ? `<button class="kick-btn" data-local-action="kick" data-uid="${escapeHtml(uid)}" aria-label="Expulsar a ${escapeHtml(player.name)}">×</button>` : ""}</div>`;
     }).join("");
     const opcion = (value, label, current) => `<option value="${value}"${String(current) === String(value) ? " selected" : ""}>${label}</option>`;
     const settings = isHost
@@ -672,7 +672,7 @@
       <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
       ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una sala → Buscar salas cercanas». Para un Android, usa el QR.</p>` : ""}
       <div class="online-lobby-grid">
-        <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${roomState.capacity ?? CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
+        <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${Number(roomState.capacity) || CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${settings}</section>
       </div>
     </div>`, "local-lobby");
@@ -842,7 +842,7 @@
         ${isHost && playing ? `<button class="btn btn-secondary" data-local-action="invite">Invitar a alguien${ausentes.length ? ` · para que vuelva ${escapeHtml(ausentes.map(uid => roomState.players[uid].name).join(", "))}` : ""}</button>` : ""}
         ${isHost && playing && currentUid !== roomState.hostId && ["turn", "pulse"].includes(roomState.phase) ? `<button class="btn btn-ghost" data-local-action="skip">Saltar el turno de ${escapeHtml(currentName)}</button>` : ""}
       </div>
-      ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'room:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}${roomState.players[uid].away ? " · desconectado" : ""}</strong><button class="kick-btn" data-local-action="kick" data-uid="${uid}">Expulsar</button></div>`).join("")}</div>` : ""}
+      ${isHost && others.length ? `<div class="manage-players"><div class="section-label">Participantes</div>${others.map(uid => `<div class="manage-player"><span class="seat-avatar">${CT.Avatares.markup(roomState.players[uid].name, { size: 34, seed: 'room:' + uid, id: roomState.players[uid].avatarId })}</span><strong>${escapeHtml(roomState.players[uid].name)}${roomState.players[uid].away ? " · desconectado" : ""}</strong><button class="kick-btn" data-local-action="kick" data-uid="${escapeHtml(uid)}">Expulsar</button></div>`).join("")}</div>` : ""}
       <div class="actions" style="display:grid">
         ${isHost ? '<button class="btn btn-ghost" data-local-action="close-room">Terminar partida y cerrar sala</button>' : '<button class="btn btn-ghost" data-local-action="leave">Salir de la partida</button>'}
         <button class="btn btn-primary" data-local-action="close-room-menu">Volver a la partida</button>
@@ -858,7 +858,7 @@
   function openPulse() {
     const opciones = pulseTargetIds().map(uid => {
       const player = roomState.players[uid];
-      return `<button class="btn btn-secondary btn-block pulse-target" data-local-action="pulse-target" data-target="${uid}"><b>${escapeHtml(player.name)}</b><small>${player.hand.length} ${player.hand.length === 1 ? "carta" : "cartas"}</small></button>`;
+      return `<button class="btn btn-secondary btn-block pulse-target" data-local-action="pulse-target" data-target="${escapeHtml(uid)}"><b>${escapeHtml(player.name)}</b><small>${player.hand.length} ${player.hand.length === 1 ? "carta" : "cartas"}</small></button>`;
     }).join("");
     appEl.insertAdjacentHTML("beforeend", `<div class="overlay" data-pulse-overlay><div class="modal">
       <div class="eyebrow">Pulso</div>

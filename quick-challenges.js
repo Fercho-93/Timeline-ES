@@ -545,8 +545,8 @@
     if(JSON.stringify(next.commands.slice(0,o.commands.length))!==JSON.stringify(o.commands))return next;
     const tail=next.commands.slice(o.commands.length);
     let confirmed=0;
-    while(confirmed<tail.length&&confirmed<o.actions.length&&JSON.stringify(tail[confirmed])===JSON.stringify(o.actions[confirmed]))confirmed++;
-    if(confirmed){o.commands=o.commands.concat(o.actions.splice(0,confirmed));o.base=next.revision;
+    while(confirmed<tail.length&&confirmed<o.actions.length&&CT.QuickRoom.sameCommand(tail[confirmed],o.actions[confirmed],id))confirmed++;
+    if(confirmed){o.commands=o.commands.concat(tail.slice(0,confirmed));o.actions.splice(0,confirmed);o.base=next.revision;
       if(!o.actions.length){CT.Storage.removeItem(OUTBOX);return next;}
       CT.Storage.setItem(OUTBOX,JSON.stringify(o));
     }
@@ -570,7 +570,7 @@
         if(!current||current.code!==o.code||current.uid!==o.uid)break;
         // A snapshot may have already acknowledged this move while the transaction awaited.
         if(JSON.stringify(current.commands)===JSON.stringify(base)){
-          current.actions.shift();current.commands.push(sent);current.base++;
+          current.actions.shift();current.commands.push(CT.QuickRoom.sign(sent,o.uid));current.base++;
           if(current.actions.length)CT.Storage.setItem(OUTBOX,JSON.stringify(current));else CT.Storage.removeItem(OUTBOX);
         }
         o=readOutbox();

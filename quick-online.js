@@ -217,7 +217,7 @@ export async function actOnce(code,action,expected){
       if(JSON.stringify(commands.slice(0,base.length))!==JSON.stringify(base))throw Error('La partida cambió: revisa tu jugada pendiente.');
       const tail=commands.slice(base.length);
       // A retry after a lost acknowledgement must not apply the same command twice.
-      if(tail.length && JSON.stringify(tail[0])===JSON.stringify(action))return;
+      if(tail.length && R.sameCommand(tail[0],action,uid))return;
       if(tail.length)throw Error('La partida avanzó antes de enviar tu jugada. Vuelve a abrirla.');
     }
     tx.update(ref,{...R.reduce(room,uid,action),updatedAt:serverTimestamp()});

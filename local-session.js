@@ -20,6 +20,27 @@
     };
   }
 
+  // Identificadores de plaza: los de `randomPlayerId` (base 36) y el del anfitrión.
+  const validId = id => typeof id === "string" && /^[0-9a-z]{1,40}$/.test(id);
+  const isInt = v => Number.isInteger(v);
+  const intList = v => Array.isArray(v) && v.length <= 2000 && v.every(x => isInt(x) || (typeof x === "string" && x.length <= 64));
+  // El estado que manda el anfitrión se pinta tal cual en el invitado: se comprueba su forma
+  // antes de aceptarlo (como `QuickRoom.validate` en los Retos rápidos), así un anfitrión
+  // malicioso no puede colar marcado en lugar de un número o de un identificador.
+  function validRoom(room) {
+    if (!room || typeof room !== "object" || !Array.isArray(room.playerOrder) || room.playerOrder.length < 1 || room.playerOrder.length > 9
+      || !room.playerOrder.every(validId) || !room.players || typeof room.players !== "object") return false;
+    for (const key of ["capacity", "round", "turnsInRound", "current", "version", "handSize"]) if (key in room && !isInt(room[key])) return false;
+    if ("turnSeconds" in room && !isInt(room.turnSeconds)) return false;
+    for (const key of ["deck", "timeline", "discard"]) if (key in room && !intList(room[key])) return false;
+    if (typeof room.hostId !== "string") return false;
+    if (room.tournament != null && (typeof room.tournament !== "object" || !isInt(room.tournament.index) || !isInt(room.tournament.handSize) || !Array.isArray(room.tournament.queue))) return false;
+    return room.playerOrder.every(id => {
+      const p = Object.prototype.hasOwnProperty.call(room.players, id) ? room.players[id] : null;
+      return p && typeof p.name === "string" && p.name.length <= 24 && intList(p.hand) && (p.avatarId == null || typeof p.avatarId === "string");
+    });
+  }
+
   function valueOfForMode(modeKey) { const byId = new Map(CT.cards(modeKey).map(card => [card.id, card])); return id => CT.sortValue(modeKey, byId.get(id)); }
   function buildDeck(modeKey, shuffle = CT.shuffle, exclude = []) { return shuffle((CT.uniqueValueIds || ((_, ids) => ids))(modeKey, CT.cards(modeKey).map(card => card.id).filter(id => !exclude.includes(id)))); }
 
@@ -90,8 +111,14 @@
       if (!bound) {
         // Antes de unirse no se puede hacer nada más; y solo se ocupa una plaza que ya
         // existe si su dueño está desconectado (es quien vuelve).
-        const existing = room.players[data.playerId];
-        if (message?.type !== "join" || !data.playerId || data.playerId === HOST_ID || (existing && !existing.away)) {
+        // El identificador y el nombre llegan de otro móvil: se pintan en todas las pantallas
+        // y viajan en cada estado, así que solo se aceptan con la forma que genera el juego.
+        if (!validId(data.playerId)) { transport.sendTo(peerId, "error", { message: "NOT_ALLOWED" }); return; }
+        data.name = typeof data.name === "string" ? data.name.trim().slice(0, 24) : "";
+        if (!data.name) data.name = "Invitado";
+        data.avatarId = typeof data.avatarId === "string" && data.avatarId.length <= 40 ? data.avatarId : null;
+        const existing = Object.prototype.hasOwnProperty.call(room.players, data.playerId) ? room.players[data.playerId] : null;
+        if (message?.type !== "join" || data.playerId === HOST_ID || (existing && !existing.away)) {
           transport.sendTo(peerId, "error", { message: existing && !existing.away ? "SEAT_TAKEN" : "NOT_ALLOWED" });
           return;
         }
@@ -183,7 +210,7 @@
   function createGuestSession({ offerSignal, nearbyHostId = null, onFail, playerId, name, avatarId = null, deckFingerprint = null, onChange, onError, onDisconnect }) {
     let room = null, lanInvite = null, rawOffer = offerSignal;
     if (!nearbyHostId && typeof offerSignal === "string" && offerSignal.startsWith("CTL1:")) { lanInvite = CT.LocalLanSignal.decodeInvite(offerSignal); rawOffer = lanInvite.signal; }
-    const onMessage = message => { if (message.type === "state") { room = message.data; onChange(room); } else if (message.type === "error") onError?.(message.data?.message); };
+    const onMessage = message => { if (message.type === "state") { if (!validRoom(message.data)) { onError?.("INVALID_ROOM"); return; } room = message.data; onChange(room); } else if (message.type === "error") onError?.(message.data?.message); };
     const onOpen = () => peer.send("join", { playerId, name, avatarId, deckFingerprint });
     const peer = nearbyHostId
       ? CT.LocalPeer.createGuestPeer(nearbyHostId, onMessage, onOpen, () => onDisconnect?.(), () => onFail?.())
@@ -206,5 +233,5 @@
     };
   }
 
-  CT.LocalSession = { HOST_ID, valueOfForMode, buildDeck, actionFromMessage, contextFor, createHostSession, createGuestSession };
+  CT.LocalSession = { HOST_ID, validId, validRoom, valueOfForMode, buildDeck, actionFromMessage, contextFor, createHostSession, createGuestSession };
 })();

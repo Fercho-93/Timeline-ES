@@ -47,6 +47,13 @@ try {
   await assertFails(getDoc(ref(out)));
   await assertFails(write(out,R.reduce(r,'host',{type:'bank'})));
   await assertFails(write(guest,R.reduce(r,'host',{type:'bank'})));
+  // Cada comando lleva quién lo jugó: sin firma, o firmado por otro, no entra.
+  {
+    const signed=R.reduce(r,'host',{type:'place',cardId:'poker-2',index:1});
+    const unsigned={...signed,commands:signed.commands.map(({by,...c})=>c)};
+    await assertFails(write(host,unsigned));
+    await assertFails(write(host,{...signed,commands:[...r.commands,{...signed.commands.at(-1),by:'guest'}]}));
+  }
   let next=R.reduce(r,'host',{type:'place',cardId:'poker-2',index:1});await assertSucceeds(write(host,next));r=next;
   next=R.reduce(r,'host',{type:'ack'});await assertSucceeds(write(host,next));r=next;
   assert.equal(r.actor,'guest');

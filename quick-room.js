@@ -17,6 +17,19 @@
     room.actor = room.phase === 'round-end' || room.phase === 'finished' ? room.host : room.members[s.current] || room.host;
     return room;
   }
+  // Cada comando guarda quién lo jugó. Las reglas exigen que sea quien escribe, y `authors`
+  // comprueba que era su turno: así nadie puede jugar las cartas de otro apuntándose como
+  // `actor`. Los comandos sin firma son de salas anteriores a este cambio y se aceptan.
+  const sign = (action, id) => ({...copy(action), by: id});
+  const sameCommand = (command, action, id) => JSON.stringify(command) === JSON.stringify(sign(action, id)) || JSON.stringify(command) === JSON.stringify(action);
+  function authors(room) {
+    let s = E.create(room.config);
+    for (const command of room.commands) {
+      const expected = command?.type === 'next' ? room.host : room.members[s.current];
+      if (command && 'by' in command && command.by !== expected) throw Error('Turno no válido.');
+      s = E.step(s, command);
+    }
+  }
   // Duelo por turnos recién empezado por quien lo crea: la partida ya tiene dos jugadores, pero el segundo aún no ha entrado.
   const FRIEND = 'Tu amigo';
   function waitingFriend(room) {
@@ -28,6 +41,7 @@
     if (room.declined !== undefined && (!room.config || room.declined !== room.invitedUid || room.members.includes(room.declined))) throw Error('Sala no válida.');
     if (room.config) {
       if (JSON.stringify(room.config.names) !== JSON.stringify(room.names) && !waitingFriend(room)) throw Error('Participantes no válidos.');
+      authors(room);
       const derived = metadata(copy(room));
       if (derived.actor !== room.actor || derived.phase !== room.phase) throw Error('Turno no válido.');
     } else if (room.phase !== 'lobby' || room.actor !== room.host || room.commands.length) throw Error('Sala no válida.');
@@ -86,7 +100,7 @@
       const now = state(r);
       if ((now.phase === 'turn' || now.phase === 'result') && r.members[now.current] !== id) throw Error('Espera tu turno.');
       const s = E.step(now, action);
-      r.commands.push(copy(action));
+      r.commands.push(sign(action, id));
       if (!s) throw Error('Jugada no válida.');
       metadata(r);
     }
@@ -105,5 +119,5 @@
     return {modeKey, cardId: CT.shuffle(CT.cards(modeKey))[0].id};
   }
   const starterComplete = room => !!room.starter && room.members.every(who => Number.isFinite(room.starter.guesses[who]));
-  CT.QuickRoom = {create, reduce, record, state, validate, starterOrder, starterComplete, starterPick};
+  CT.QuickRoom = {create, reduce, record, state, validate, sign, sameCommand, starterOrder, starterComplete, starterPick};
 })();

@@ -127,14 +127,18 @@ service cloud.firestore {
         return request.auth.uid == a.actor && a.phase in ['turn','result','round-end']
           && b.diff(a).affectedKeys().hasOnly(['commands','phase','actor','revision','updatedAt'])
           && b.commands.size() == a.commands.size()+1 && b.commands == a.commands.concat([last])
-          && ((a.phase=='turn' && last.type=='place' && last.keys().hasOnly(['type','cardId','index'])
+          // Cada comando lleva quién lo jugó (`by`). Las reglas no pueden recalcular de quién es
+          // el turno —eso lo sabe el motor—, así que quien tenía el turno podía apuntarse otra vez
+          // como `actor` y jugar las cartas del rival; firmado, todos los móviles lo detectan al
+          // reconstruir la partida (QuickRoom.validate) y la jugada no cuenta.
+          && ((a.phase=='turn' && last.type=='place' && last.keys().hasOnly(['type','cardId','index','by']) && last.by==request.auth.uid
               // La línea empieza con una carta y cada comando añade como máximo otra.
               // Los retos largos pueden superar diez huecos sin dejar de ser legales.
               && last.cardId is string && last.cardId.size() <= 32 && last.index is int && last.index>=0 && last.index<=a.commands.size()+1
               && b.phase=='result' && b.actor==a.actor)
-            || (a.phase=='turn' && last=={'type':'bank'} && b.phase in ['turn','round-end','finished'])
-            || (a.phase=='result' && last=={'type':'ack'} && b.phase in ['turn','round-end','finished'])
-            || (a.phase=='round-end' && request.auth.uid==a.host && last=={'type':'next'} && b.phase=='turn'))
+            || (a.phase=='turn' && last=={'type':'bank','by':request.auth.uid} && b.phase in ['turn','round-end','finished'])
+            || (a.phase=='result' && last=={'type':'ack','by':request.auth.uid} && b.phase in ['turn','round-end','finished'])
+            || (a.phase=='round-end' && request.auth.uid==a.host && last=={'type':'next','by':request.auth.uid} && b.phase=='turn'))
           && (!(b.phase in ['round-end','finished']) || b.actor==a.host);
       }
       allow get: if registered() && (!exists(/databases/$(database)/documents/quickRooms/$(code)) || resource.data.phase=='lobby' || request.auth.uid in resource.data.members
@@ -254,7 +258,19 @@ service cloud.firestore {
           && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
           && request.resource.data.turnIndex == 0 && request.resource.data.plays == []
           && request.resource.data.total is int && request.resource.data.total > 0 && request.resource.data.total <= 30
-          && request.resource.data.mode is string && request.resource.data.kind in ['orden','cifras'] && request.resource.data.seed is string;
+          && request.resource.data.mode is string && request.resource.data.kind in ['orden','cifras'] && request.resource.data.seed is string
+          && request.resource.data.mode.size() <= 32 && request.resource.data.seed.size() <= 64
+          // Quien crea empieza a cero y solo con su propia ficha: antes podía abrir el duelo
+          // con la puntuación que quisiera y el marcador la daba por buena.
+          && request.resource.data.scores.keys().hasOnly([request.auth.uid])
+          && request.resource.data.scores[request.auth.uid] == 0
+          && request.resource.data.players.keys().hasOnly([request.auth.uid])
+          && request.resource.data.players[request.auth.uid].keys().hasOnly(['alias'])
+          && request.resource.data.players[request.auth.uid].alias is string
+          && request.resource.data.players[request.auth.uid].alias.size() <= 24
+          && request.resource.data.timeline is list && request.resource.data.timeline.size() <= 1
+          && (!('invitedAlias' in request.resource.data)
+            || (request.resource.data.invitedAlias is string && request.resource.data.invitedAlias.size() <= 24));
       }
       allow create: if validCreate();
       allow get: if registered() && !exists(/databases/$(database)/documents/turnDuels/$(duelId));
@@ -941,6 +957,21 @@ service cloud.firestore {
           && bumped();
       }
 
+      // El reparto: cada persona recibe exactamente `handSize` cartas y nadie desaparece de
+      // `players`. Sin esto, quien reparte podía quedarse sin cartas y dar seis al resto, o
+      // dejar a alguien fuera, y ganar en la primera ronda. Desplegado hasta nueve personas,
+      // igual que `emptyAt`, y lo más corto posible: con Fantasma y Pulso a la vez el arranque
+      // va al límite de 1000 expresiones por petición.
+      function dealtAt(prior, next, i) {
+        return i >= prior.playerOrder.size() || next.players[prior.playerOrder[i]].hand.size() == next.handSize;
+      }
+      function validDeal(prior, next) {
+        return next.players.keys().toSet() == prior.players.keys().toSet()
+          && dealtAt(prior, next, 0) && dealtAt(prior, next, 1) && dealtAt(prior, next, 2)
+          && dealtAt(prior, next, 3) && dealtAt(prior, next, 4) && dealtAt(prior, next, 5)
+          && dealtAt(prior, next, 6) && dealtAt(prior, next, 7) && dealtAt(prior, next, 8);
+      }
+
       // El anfitrión reparte y arranca la partida.
       function validStart() {
         let prior = resource.data;
@@ -971,6 +1002,7 @@ service cloud.firestore {
           && next.winner == null
           && next.get('winners', null) == null
           && next.reveal == null
+          && validDeal(prior, next)
           // Optativo por compatibilidad: un cliente sin actualizar todavía no lo manda.
           // No se exige igual a `request.time` por el mismo motivo que `winners` es
           // optativo: forzarlo dejaría fuera a quien no ha actualizado el suyo.

@@ -61,5 +61,15 @@ ok("invitar a alguien sí necesita WebRTC, y falla con un motivo claro en Node",
 console.log("\nEl invitado: manda acciones, nunca las resuelve por su cuenta");
 ok("un invitado sin conexión real falla igual al intentar unirse", intenta(() => Session.createGuestSession({ offerSignal: "loquesea", playerId: "ana", name: "Ana", onChange: () => {}, onError: () => {} })) !== null);
 
+console.log("\nLo que llega de otro móvil se comprueba antes de pintarlo");
+ok("un identificador de plaza normal se acepta", Session.validId("k3x9a0b1c2"));
+ok("un identificador con marcado se rechaza", !Session.validId('x"><div data-local-action="kick">'));
+ok("un identificador que no es texto se rechaza", !Session.validId({ toString: () => "ana" }) && !Session.validId("__proto__"));
+ok("el estado de la sala tal y como lo crea el anfitrión es válido", Session.validRoom(ultimoEstado));
+ok("TRAMPA: una capacidad con marcado en lugar de número", !Session.validRoom({ ...ultimoEstado, capacity: '<a href="https://evil.example">x</a>' }));
+ok("TRAMPA: un jugador cuyo identificador lleva marcado", !Session.validRoom({ ...ultimoEstado, playerOrder: ['host', 'x"><b>'], players: { ...ultimoEstado.players, 'x"><b>': { name: "Eva", hand: [] } } }));
+ok("TRAMPA: una mano que no es una lista", !Session.validRoom({ ...ultimoEstado, players: { host: { ...ultimoEstado.players.host, hand: { length: "<b>" } } } }));
+ok("TRAMPA: un nombre desmesurado", !Session.validRoom({ ...ultimoEstado, players: { host: { ...ultimoEstado.players.host, name: "x".repeat(200000) } } }));
+
 console.log(`\n${fail} fallos`);
 process.exit(fail ? 1 : 0);

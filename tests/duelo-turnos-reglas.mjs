@@ -31,6 +31,19 @@ try {
   for (const segundos of [0, 15, 20, 30]) await assertSucceeds(setDoc(doc(creator, 'turnDuels', `timed-${segundos}`), conPlazo(segundos)));
   for (const segundos of [10, 45, '15']) await assertFails(setDoc(doc(creator, 'turnDuels', `timed-${segundos}`), conPlazo(segundos)));
 
+  // TRAMPA: abrir el duelo con ventaja. Quien crea empieza a cero y solo con su ficha.
+  const trampa = (id, extra) => setDoc(doc(creator, 'turnDuels', id), {
+    id, mode: 'history', kind: 'orden', seed: 'abc123', total: 15,
+    turnIndex: 0, turnUid: null, playersOrder: ['creator'],
+    players: { creator: { alias: 'Ana' } }, status: 'waiting', plays: [],
+    timeline: [], scores: { creator: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...extra
+  });
+  await assertFails(trampa('ventaja-1', { scores: { creator: 999 } }));
+  await assertFails(trampa('ventaja-2', { scores: { creator: 0, guest: -5 } }));
+  await assertFails(trampa('ventaja-3', { players: { creator: { alias: 'Ana' }, guest: { alias: 'Bea' } } }));
+  await assertFails(trampa('ventaja-4', { players: { creator: { alias: 'A'.repeat(5000) } } }));
+  await assertFails(trampa('ventaja-5', { timeline: [1, 2, 3] }));
+
   await assertSucceeds(getDoc(doc(guest, 'turnDuels', duelId)));
   await assertFails(getDoc(doc(publicDb, 'turnDuels', duelId)));
 
