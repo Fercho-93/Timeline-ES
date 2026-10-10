@@ -1,7 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 638,
-  "platforms": ["ios"],
+  "cache": 644,
+  "platforms": [
+    "ios"
+  ],
   "upload_testflight": true,
-  "reason": "Acceso con Apple: la pantalla se repinta sola tras entrar, sin tener que tocar"
+  "reason": "Seguridad: jugadas firmadas en Retos rápidos, reparto validado, sala Wi-Fi blindada, límite de altas y App Check con App Attest"
 }
