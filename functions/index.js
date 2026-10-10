@@ -4,6 +4,8 @@ const { getMessaging } = require('firebase-admin/messaging');
 const { onDocumentUpdated, onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { DAY, millis, lifecycle, movementMessage } = require('./duel-policy');
+const { getAuth } = require('firebase-admin/auth');
+const { ACTIVITY, cutoff, expiredRankingKey, staleAnonymous } = require('./retention');
 
 initializeApp();
 
@@ -98,4 +100,59 @@ exports.maintainTurnDuels = onSchedule({ schedule: 'every 60 minutes', timeZone:
     }
     cursor = page.size === 200 ? page.docs.at(-1) : null;
   } while (cursor);
+});
+
+// Limpieza diaria según los plazos de retention.js (los mismos que cuenta la política de
+// privacidad). Borra con sus subcolecciones: una sala se lleva su presencia y su final.
+async function purgeCollection(name, now) {
+  let removed = 0;
+  for (;;) {
+    const page = await db.collection(name).where(ACTIVITY[name], '<', cutoff(name, now)).limit(200).get();
+    for (const snapshot of page.docs) { await db.recursiveDelete(snapshot.ref); removed++; }
+    if (page.size < 200) return removed;
+  }
+}
+async function purgeRanking(collection, now) {
+  let removed = 0;
+  for (const ref of await db.collection(collection).listDocuments()) {
+    if (expiredRankingKey(ref.id, now)) { await db.recursiveDelete(ref); removed++; }
+  }
+  return removed;
+}
+// Todo lo que pertenece a una cuenta, como al borrarla desde el juego.
+async function purgeAccount(uid) {
+  const aliasKey = (await db.doc(`playerProfiles/${uid}`).get()).data()?.aliasKey;
+  for (const path of [`playerProfiles/${uid}`, `playerProgress/${uid}`, `socialRanking/${uid}`, `dailyRanking/${uid}`,
+    `duelPreferences/${uid}`, `creationQuota/${uid}`, `roomCreation/${uid}`, `duelReminderBudgets/${uid}`]) await db.recursiveDelete(db.doc(path));
+  if (aliasKey) {
+    const name = db.doc(`playerNames/${aliasKey}`);
+    if ((await name.get()).data()?.uid === uid) await name.delete();
+  }
+}
+// Invitados anónimos que llevan un año sin abrir el juego: nadie puede volver a entrar en ellos.
+async function purgeStaleGuests(now, limit = 500) {
+  let token, removed = 0;
+  do {
+    const page = await getAuth().listUsers(1000, token);
+    for (const user of page.users) {
+      if (removed >= limit) return removed;
+      if (!staleAnonymous(user, now)) continue;
+      await purgeAccount(user.uid);
+      await getAuth().deleteUser(user.uid);
+      removed++;
+    }
+    token = page.pageToken;
+  } while (token);
+  return removed;
+}
+exports.purgeExpiredData = onSchedule({ schedule: 'every day 04:17', timeZone: 'Europe/Madrid', timeoutSeconds: 540, maxInstances: 1 }, async () => {
+  const now = Date.now(), summary = {};
+  for (const name of Object.keys(ACTIVITY)) {
+    try { summary[name] = await purgeCollection(name, now); } catch (error) { console.warn('Purge failed', name, error.code || error.message); }
+  }
+  for (const name of ['dailyScores', 'weeklyScores']) {
+    try { summary[name] = await purgeRanking(name, now); } catch (error) { console.warn('Purge failed', name, error.code || error.message); }
+  }
+  try { summary.guests = await purgeStaleGuests(now); } catch (error) { console.warn('Purge failed', 'guests', error.code || error.message); }
+  console.log('Purge summary', JSON.stringify(summary));
 });
