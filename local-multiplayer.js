@@ -136,6 +136,7 @@
   function errorMessage(code) {
     const map = {
       NOT_HOST: "Solo quien organiza la sala puede hacer eso",
+      BAD_PIN: "Código incorrecto. Pídele a quien ha creado la sala el código de 4 cifras que ve en su pantalla",
       INVALID_START: "Hacen falta al menos dos personas para empezar",
       INVALID_ROOM: "No se pudo crear la sala",
       ROOM_FULL: "La sala ya tiene el máximo de participantes",
@@ -379,7 +380,15 @@
   let nearbySearch = null, nearbyRooms = [], nearbyName = "";
   function stopNearbySearch() { nearbySearch?.stop?.(); nearbySearch = null; }
 
+  // Tras elegir una sala se pide su código; mientras tanto la lista no se repinta, para no
+  // borrar lo que se está escribiendo.
+  let nearbyPending = null;
+  function nearbyPinMarkup(id) {
+    const info = nearbyRooms.find(room => room.id === id);
+    return `<form class="nearby-pin-form" data-nearby-pin data-id="${escapeHtml(id)}"><div class="field"><label for="nearby-pin">Código de la sala de ${escapeHtml(info?.host || "quien la ha creado")}</label><input id="nearby-pin" name="pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" required></div><p class="hint">Son 4 cifras: las ve quien ha creado la sala en su pantalla.</p><button class="btn btn-primary btn-block" type="submit">Entrar</button><button class="btn btn-ghost btn-block" type="button" data-local-action="nearby-cancel">Elegir otra sala</button></form>`;
+  }
   function nearbyListMarkup() {
+    if (nearbyPending) return nearbyPinMarkup(nearbyPending);
     if (!nearbyRooms.length) return `<div class="status status-waiting"><div class="spinner" aria-hidden="true"></div><span>Buscando salas cercanas… Que quien organiza haya creado ya la sala, y que los dos tengáis Bluetooth y Wi-Fi activados (no hace falta estar conectados a ninguna red).</span></div>`;
     return `<div class="nearby-list">${nearbyRooms.map(room => {
       const known = CT.has(room.mode), sameDeck = !room.fp || !known || room.fp === CT.deckFingerprint(room.mode);
@@ -391,16 +400,17 @@
   async function renderNearby(name) {
     nearbyName = name;
     nearbyRooms = [];
+    nearbyPending = null;
     screen = "local-cercanas";
     paint(`<div class="shell online-shell">${header("go-unirse")}
-      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Salas cercanas</h2><p class="lead">Elige la sala de quien la ha creado. Se unirá sola, sin códigos.</p></section>
+      <section class="online-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Invitado</div><h2 data-focus tabindex="-1">Salas cercanas</h2><p class="lead">Elige la sala de quien la ha creado y escribe el código de 4 cifras que ve en su pantalla.</p></section>
       <div class="panel" id="local-nearby-list" aria-live="polite">${nearbyListMarkup()}</div>
     </div>`, "local-cercanas");
     try {
       nearbySearch = await CT.LocalPeer.browse(rooms => {
         nearbyRooms = rooms;
         const list = document.getElementById("local-nearby-list");
-        if (list && screen === "local-cercanas") list.innerHTML = nearbyListMarkup();
+        if (list && screen === "local-cercanas" && !nearbyPending) list.innerHTML = nearbyListMarkup();
       });
     } catch (error) {
       console.error(error);
@@ -409,7 +419,7 @@
     }
   }
 
-  async function doJoinNearby(id) {
+  async function doJoinNearby(id, pin) {
     if (busy) return;
     const info = nearbyRooms.find(room => room.id === id);
     if (!info) return;
@@ -421,9 +431,13 @@
       myPlayerId = seat && seat.roomCode === info.room ? seat.playerId : randomPlayerId();
       modeKey = CT.has(info.mode) ? info.mode : modeKey;
       guestSession = CT.LocalSession.createGuestSession({
-        nearbyHostId: id, playerId: myPlayerId, name: myName, avatarId: CT.Avatares.ownId(), deckFingerprint: CT.deckFingerprint(modeKey),
+        nearbyHostId: id, pin, playerId: myPlayerId, name: myName, avatarId: CT.Avatares.ownId(), deckFingerprint: CT.deckFingerprint(modeKey),
         onChange: onRoomChange,
-        onError: code => showToast(errorMessage(code)),
+        onError: code => {
+          showToast(errorMessage(code));
+          // Código incorrecto: el anfitrión cierra el canal; se vuelve a pedir.
+          if (code === "BAD_PIN" && role === "guest" && !roomState) { try { guestSession?.close(); } catch {} guestSession = null; role = null; nearbyPending = id; if (screen === "local-cercanas") { const list = document.getElementById("local-nearby-list"); if (list) list.innerHTML = nearbyListMarkup(); } }
+        },
         onDisconnect: onGuestDisconnect,
         onFail: () => {
           if (role !== "guest" || roomState) return;
@@ -670,7 +684,7 @@
       : CT.LocalRoom.laterRound(roomState) ? nextThemeMarkup(false) : roomState.playerOrder.length < 2 ? `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles a la vez.</p>` : starterPanelMarkup(false);
     paint(`<div class="shell online-shell">${header("leave")}
       <section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div><div class="room-code-card"><small>Código de sala</small><strong>${escapeHtml(roomState.roomCode)}</strong>${isHost ? `<div class="room-invite-actions"><button type="button" data-local-action="invite">${hostSession?.nearby ? "Invitar por QR (Android)" : "Invitar a alguien"}</button></div>` : ""}</div></section>
-      ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una sala → Buscar salas cercanas». Para un Android, usa el QR.</p>` : ""}
+      ${isHost && hostSession?.nearby ? `<p class="online-note" data-nearby-note>Sala visible para los iPhones cercanos: que pulsen «Unirme a una sala → Buscar salas cercanas» y escriban este código: <b class="nearby-pin">${escapeHtml(hostSession.nearbyPin)}</b>. Para un Android, usa el QR.</p>` : ""}
       <div class="online-lobby-grid">
         <section class="panel lobby-table-panel"><div class="section-label">Mesa de exploradores <small>${roomState.playerOrder.length}/${Number(roomState.capacity) || CT.LocalRoom.MAX_PLAYERS}</small></div><div class="lobby-table"><div class="lobby-table-core"><span>CONTINUUM</span><strong>${roomState.playerOrder.length}</strong><small>${roomState.playerOrder.length === 1 ? "explorador" : "exploradores"}</small></div>${seats}</div><p class="lobby-ready-note"><i>Listo</i> La plaza queda preparada al entrar en la sala.</p></section>
         <section class="panel lobby-settings">${settings}</section>
@@ -1067,6 +1081,14 @@
   // ---------------------------------------------------------------------------
   // Eventos
   document.addEventListener("submit", event => {
+    if (event.target.matches("[data-nearby-pin]")) {
+      event.preventDefault();
+      const pin = String(new FormData(event.target).get("pin") || "").trim();
+      if (!/^\d{4}$/.test(pin)) return showToast("Escribe las 4 cifras del código");
+      nearbyPending = null;
+      void doJoinNearby(event.target.dataset.id, pin);
+      return;
+    }
     if (event.target.matches("[data-local-final]")) {
       event.preventDefault();
       try {
@@ -1167,7 +1189,16 @@
       if (!name) return showToast("Escribe tu nombre antes de buscar");
       void renderNearby(name);
     }
-    else if (action === "nearby-join") void doJoinNearby(target.dataset.id);
+    else if (action === "nearby-join") {
+      nearbyPending = target.dataset.id;
+      const list = document.getElementById("local-nearby-list");
+      if (list) { list.innerHTML = nearbyListMarkup(); list.querySelector("#nearby-pin")?.focus(); }
+    }
+    else if (action === "nearby-cancel") {
+      nearbyPending = null;
+      const list = document.getElementById("local-nearby-list");
+      if (list) list.innerHTML = nearbyListMarkup();
+    }
     else if (action === "scan-offer") {
       const name = String(document.getElementById("local-guest-name")?.value || "").trim().slice(0, 18);
       if (!name) return showToast("Escribe tu nombre antes de escanear");

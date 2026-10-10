@@ -108,6 +108,15 @@
     function onGuestMessage(peerId, message) {
       const bound = peerPlayers.get(peerId);
       const data = { ...(message?.data || {}) };
+      if (!bound && nearby?.owns(peerId) && String(data.pin ?? "") !== nearbyPin) {
+        // Por «salas cercanas» se conecta cualquier iPhone que esté al alcance, sin QR: solo
+        // se sienta quien escribe el código que ve el anfitrión. Cada intento fallido cierra
+        // el canal, y tras cinco el código cambia.
+        transport.sendTo(peerId, "error", { message: "BAD_PIN" });
+        setTimeout(() => transport.removePeer(peerId), 300);
+        if (++badPins >= 5) { badPins = 0; nearbyPin = newPin(); onChange(room); }
+        return;
+      }
       if (!bound) {
         // Antes de unirse no se puede hacer nada más; y solo se ocupa una plaza que ya
         // existe si su dueño está desconectado (es quien vuelve).
@@ -147,6 +156,8 @@
     // vías conviven en la misma sala detrás de una sola interfaz.
     const webrtc = CT.LocalTransport.createHostSession(onGuestMessage, null, onGuestLost);
     const nearby = CT.LocalPeer?.available?.() ? CT.LocalPeer.createHostTransport(onGuestMessage, null, onGuestLost) : null;
+    const newPin = () => String(crypto.getRandomValues(new Uint32Array(1))[0] % 10000).padStart(4, "0");
+    let nearbyPin = nearby ? newPin() : "", badPins = 0;
     const transport = nearby ? {
       addPeer: webrtc.addPeer,
       removePeer: id => (nearby.owns(id) ? nearby : webrtc).removePeer(id),
@@ -161,10 +172,12 @@
 
     // Quien ya no está en la sala (expulsado o que se marchó) recibe la última foto, en la
     // que ya no aparece, y después se le cierra el canal.
+    // El estado (con las manos y el mazo) solo va a quien ya tiene plaza: un móvil conectado
+    // que aún no se ha unido no recibe nada.
     function setRoom(next) {
       room = next;
       onChange(room);
-      transport.broadcast("state", room);
+      for (const peerId of peerPlayers.keys()) transport.sendTo(peerId, "state", room);
       for (const [peerId, playerId] of [...peerPlayers]) {
         if (!room.playerOrder.includes(playerId)) { peerPlayers.delete(peerId); transport.removePeer(peerId); }
       }
@@ -204,14 +217,14 @@
       try { transport.closeAll(); }
       finally { pendingPeers.clear(); peerPlayers.clear(); if (lan) void lan.stop(); lan = null; lanSecret = null; }
     }
-    return { HOST_ID, nearby: !!nearby, invitePeer, removePeer: transport.removePeer, peerOf, act, currentRoom: () => room, close };
+    return { HOST_ID, nearby: !!nearby, get nearbyPin() { return nearbyPin; }, invitePeer, removePeer: transport.removePeer, peerOf, act, currentRoom: () => room, close };
   }
 
-  function createGuestSession({ offerSignal, nearbyHostId = null, onFail, playerId, name, avatarId = null, deckFingerprint = null, onChange, onError, onDisconnect }) {
+  function createGuestSession({ offerSignal, nearbyHostId = null, pin = "", onFail, playerId, name, avatarId = null, deckFingerprint = null, onChange, onError, onDisconnect }) {
     let room = null, lanInvite = null, rawOffer = offerSignal;
     if (!nearbyHostId && typeof offerSignal === "string" && offerSignal.startsWith("CTL1:")) { lanInvite = CT.LocalLanSignal.decodeInvite(offerSignal); rawOffer = lanInvite.signal; }
     const onMessage = message => { if (message.type === "state") { if (!validRoom(message.data)) { onError?.("INVALID_ROOM"); return; } room = message.data; onChange(room); } else if (message.type === "error") onError?.(message.data?.message); };
-    const onOpen = () => peer.send("join", { playerId, name, avatarId, deckFingerprint });
+    const onOpen = () => peer.send("join", { playerId, name, avatarId, deckFingerprint, ...(nearbyHostId ? { pin: String(pin) } : {}) });
     const peer = nearbyHostId
       ? CT.LocalPeer.createGuestPeer(nearbyHostId, onMessage, onOpen, () => onDisconnect?.(), () => onFail?.())
       : CT.LocalTransport.createGuestPeer(rawOffer, onMessage, onOpen, () => onDisconnect?.());

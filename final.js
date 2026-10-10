@@ -31,6 +31,16 @@
     if (!Number.isSafeInteger(target)) throw Error('Valor de carta fuera de rango.');
     return {round:(previous?.round || 0) + 1, players:[...players], cardId:card.id, target, submitted:[], used:used.includes(card.id) ? [card.id] : [...used, card.id]};
   }
+  // La cifra correcta sale siempre de la carta. En una sala online la escribe quien abre la
+  // final y las reglas no pueden recalcularla (los valores viven en el cliente): cada móvil
+  // comprueba que coincide antes de dar la final por buena.
+  function targetOf(mode, cardId) {
+    const card = CT.cards(mode).find(item => item.id === cardId);
+    if (!card) return null;
+    const target = Math.round(CT.sortValue(mode, card) * factor(mode));
+    return Number.isSafeInteger(target) ? target : null;
+  }
+  const valid = (mode, final) => !!final && Number.isSafeInteger(final.target) && targetOf(mode, final.cardId) === final.target;
   function rank(final, answers) {
     const rows = final.players.map(uid => {
       if (!Number.isSafeInteger(answers[uid])) throw Error('Faltan respuestas.');
@@ -55,7 +65,7 @@
     const ranked = rank(final, answers);
     return `<section class="panel final-results"><h2>Valor real: ${value(mode, final.target)}</h2><table><thead><tr><th>Finalista</th><th>Respuesta</th><th>Diferencia</th></tr></thead><tbody>${ranked.rows.map(row => `<tr${ranked.winners.includes(row.uid) ? ' class="final-best"' : ''}><th>${CT.escapeHtml(name(row.uid))}</th><td>${value(mode, row.answer)}</td><td>${value(mode, row.distance)}</td></tr>`).join('')}</tbody></table><p>${ranked.winners.length === 1 ? `${CT.escapeHtml(name(ranked.winners[0]))} gana la final.` : `Empate: ${ranked.winners.map(uid => CT.escapeHtml(name(uid))).join(', ')} pasan a otra carta.`}</p></section>`;
   }
-  CT.Final = {factor, parse, create, rank, value, question, form, results};
+  CT.Final = {factor, parse, create, rank, value, question, form, results, targetOf, valid};
 
   // El minijuego de quién empieza, igual en todas las modalidades con turnos: cada
   // persona escribe la cifra de la misma carta, empieza quien más se acerque y el resto

@@ -1621,6 +1621,10 @@ function finalAnswerRef(code, round, uid) {
 }
 async function renderOnlineFinal() {
   const request = ++finalRenderId, code = roomCode, final = roomState.final;
+  if (!CT.Final.valid(modeKey(), final)) {
+    paint(`<div class="shell">${header(roomState.hostUid === user.uid ? '<button class="icon-btn" data-online-action="close-room">Cerrar sala</button>' : '')}<h1 data-focus tabindex="-1">Final de desempate</h1><section class="panel"><h2>Esta final no es válida</h2><p>La cifra correcta guardada en la sala no coincide con la de la carta: alguien ha modificado la partida y el resultado no cuenta.</p></section></div>`, 'online-final');
+    return;
+  }
   const draftKey = `${code}:${final.round}`;
   const oldForm = appEl.querySelector('[data-final-online]');
   if (oldForm?.dataset.round === String(final.round)) finalDrafts.set(draftKey, {guess:oldForm.elements.guess.value, era:oldForm.elements.era?.value});
@@ -1679,6 +1683,7 @@ async function nextOnlineFinal() {
     await runTransaction(db, async tx => {
       const data = (await tx.get(reference)).data(), final = data.final;
       if (data.phase !== 'final' || final.round !== expectedRound || final.submitted.length !== final.players.length) return;
+      if (!CT.Final.valid(data.mode, final)) throw Error('FINAL_TAMPERED');
       const answers = Object.fromEntries(await Promise.all(final.players.map(async uid => [uid, (await tx.get(finalAnswerRef(code, final.round, uid))).data().value])));
       const ranking = CT.Final.rank(final, answers);
       tx.update(reference, ranking.winners.length === 1
@@ -1694,7 +1699,7 @@ function renderWinner() {
   const uids = (roomState.winners || [roomState.winner]).filter(uid => roomState.players[uid]);
   const names = uids.map(uid => escapeHtml(roomState.players[uid].name));
   const title = names.length === 1 ? `${names[0]} gana` : `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]} ganan`;
-  const lead = roomState.final ? "Ha ganado la final con la cifra más cercana." : names.length === 1
+  const lead = roomState.final ? (CT.Final.valid(modeKey(), roomState.final) ? "Ha ganado la final con la cifra más cercana." : "La final se manipuló: este resultado no es válido.") : names.length === 1
     ? "Ha sido la única persona en terminar la ronda sin cartas."
     : "Se acabaron las cartas del mazo y terminan la ronda empatadas sin cartas.";
   const logroMarkup=sessionAchievements.length?`<div class="logros-nuevos" role="status"><div class="eyebrow">${sessionAchievements.length===1?'Logro nuevo':`${sessionAchievements.length} logros nuevos`}</div>${sessionAchievements.map(item=>`<div class="logro-chip"><b>${escapeHtml(item.name)}</b><small>${escapeHtml(item.desc)}</small></div>`).join('')}</div>`:'';

@@ -86,8 +86,21 @@ click(invitado, '[data-action="friends-join-nearby"]');
 await pausa(10);
 ok("con nombre de perfil se busca directamente, sin otra pantalla", invitado.document.getElementById("app").dataset.screen === "local-cercanas");
 ok("aparece la lista con la sala del anfitrión y su mazo", !!invitado.document.querySelector('[data-local-action="nearby-join"]') && /Fer/.test(html(invitado)));
-click(invitado, '[data-local-action="nearby-join"]');
-await pausa(30);
+// Solo entra quien escribe el código de 4 cifras que ve el anfitrión en su vestíbulo.
+const pinAnfitrion = anfitrion.document.querySelector(".nearby-pin")?.textContent || "";
+ok("el anfitrión ve el código de 4 cifras para los iPhones cercanos", /^\d{4}$/.test(pinAnfitrion));
+const escribePin = async pin => {
+  click(invitado, '[data-local-action="nearby-join"]'); await pausa();
+  const form = invitado.document.querySelector("[data-nearby-pin]");
+  form.elements.pin.value = pin;
+  form.dispatchEvent(new invitado.Event("submit", { bubbles: true, cancelable: true }));
+  await pausa(400);
+};
+await escribePin(pinAnfitrion === "0000" ? "1111" : "0000");
+ok("TRAMPA: con un código equivocado no se entra ni se recibe la partida", !/Preparando la mesa/.test(html(invitado)) && !/Ana/.test(html(anfitrion)));
+ok("y se vuelve a pedir el código", !!invitado.document.querySelector("[data-nearby-pin]"));
+click(invitado, '[data-local-action="nearby-cancel"]'); await pausa();
+await escribePin(pinAnfitrion);
 ok("el invitado entra en la sala de espera sin escanear nada", /Preparando la mesa|Sala de espera/.test(html(invitado)) && /Ana/.test(html(invitado)));
 ok("el anfitrión ve llegar a la invitada", /Ana/.test(html(anfitrion)));
 ok("con dos personas el anfitrión ya puede sortear quién empieza", !!anfitrion.document.querySelector('[data-local-action="starter-draw"]'));

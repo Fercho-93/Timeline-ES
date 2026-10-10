@@ -18,6 +18,16 @@ let w = boot();
 const F = w.CONTINUUM.Final;
 assert.equal(F.parse('animals','0,3'),300000000);
 assert.equal(F.parse('history','218',true),-218);
+// La cifra correcta de una final se comprueba contra la carta: una sala online no puede
+// traer otra (la escribe quien abre la final y las reglas no la recalculan).
+{
+  const honesta = F.create('history', ['a','b']);
+  assert.ok(F.valid('history', honesta), 'una final creada por el juego es válida');
+  assert.equal(F.targetOf('history', honesta.cardId), honesta.target);
+  assert.ok(!F.valid('history', {...honesta, target: honesta.target + 1}), 'TRAMPA: otra cifra correcta para la misma carta');
+  assert.ok(!F.valid('history', {...honesta, cardId: -1}), 'TRAMPA: una carta que no existe');
+  assert.ok(!F.valid('history', null));
+}
 for (const raw of ['', 'NaN','1.234,56','1e6','3.1']) assert.throws(()=>F.parse('history',raw));
 assert.throws(()=>F.parse('animals','-1'));
 const ranked = F.rank({players:['a','b','c'], target:300000000},{a:200000000,b:400000000,c:900000000});
