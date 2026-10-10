@@ -451,13 +451,24 @@ async function enter() {
 }
 // Aparecer o dejar de aparecer en el ranking. Al dejarlo se borran las filas de hoy y de esta semana (y la
 // antigua tabla única); si no hay conexión, se reintenta al volver a abrir el juego.
-// Todas las filas que pudo publicar: una por cada día jugado (están en los retos, que viajan con el
-// progreso) y una por cada semana de esos días, además de las de hoy y esta semana. Borrar una
+// Todas las filas que pudo publicar: una por día y una por semana desde que existe la cuenta (el
+// historial de retos solo guarda 60 días, así que no basta con los días que recuerda). Borrar una
 // fila que no existe no falla, así que no hace falta saber cuáles llegaron a publicarse.
-function rankingRows(uid, records = readRecords()) {
-  const per = periods(records), days = new Set([per.today, ...Object.keys(records?.retoDiario?.days || {})]);
-  const weeks = new Set([per.weekKey]);
-  for (const key of days) if (/^\d{4}-\d{2}-\d{2}$/.test(key)) weeks.add(periods(records, new Date(`${key}T12:00:00`)).weekKey);
+function rankingRows(uid, records = readRecords(), now = new Date()) {
+  const start = new Date(now); start.setHours(12, 0, 0, 0);
+  const candidates = [...Object.keys(records?.retoDiario?.days || {}).filter(key => /^\d{4}-\d{2}-\d{2}$/.test(key)).map(key => new Date(`${key}T12:00:00`))];
+  try { candidates.push(new Date(JSON.parse(CT.Storage.getItem(P) || '{}').createdAt)); } catch { /* sin progreso local */ }
+  const created = profile?.createdAt?.toDate?.(); if (created) candidates.push(created);
+  const oldest = new Date(now); oldest.setDate(oldest.getDate() - 730);
+  for (const date of candidates) if (date >= oldest && date < start) start.setTime(date.getTime());
+  start.setHours(12, 0, 0, 0);
+  const days = new Set(), weeks = new Set();
+  for (const d = new Date(start); d <= now || dateKey(d) === dateKey(now); d.setDate(d.getDate() + 1)) {
+    days.add(dateKey(d));
+    const monday = new Date(d); monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+    weeks.add(dateKey(monday));
+    if (dateKey(d) === dateKey(now)) break;
+  }
   return [...[...days].map(key => dayScore(uid, key)), ...[...weeks].map(key => weekScore(uid, key))];
 }
 // Borra por tandas: una transacción de Firestore admite 500 escrituras.

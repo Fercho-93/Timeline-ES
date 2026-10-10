@@ -239,6 +239,16 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(data.has(`dailyScores/${viejo}/players/b`),true,'las de otras personas no se tocan');
  dom.window.close();
 }
+{
+ // Más allá de los 60 días que guarda el historial de retos: se recorre desde que existe la cuenta.
+ const antiguo=new Date();antiguo.setDate(antiguo.getDate()-200);const diaAntiguo=antiguo.toLocaleDateString('sv-SE');
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'playerProgress/a':{progress:JSON.stringify({createdAt:antiguo.toISOString()}),records:JSON.stringify({rankingPublico:true,retoDiario:{days:{[hoy]:{hits:3,total:10}}}}),revision:1,season:'launch-1',day:hoy,dayHits:3,week:lunes,weekHits:3},
+   [`dailyScores/${diaAntiguo}/players/a`]:{alias:'Fer',avatar:'compass',hits:4}});
+ await w.testAccounts.startAccounts(()=>{});
+ await w.CONTINUUM.Accounts.setRanking(false);
+ assert.equal(data.has(`dailyScores/${diaAntiguo}/players/a`),false,'una fila de hace 200 días también se borra');
+ dom.window.close();
+}
 assert.match(read('index.html'),/src="boot.js"/);assert.doesNotMatch(read('index.html'),/src="app.js"/);
 assert.doesNotMatch(read('online.js'),/signInAnonymously/);
 console.log('Invitados: alta automática, reentrada, error de conexión, cambio de nombre, ranking, aislamiento y conflictos correctos.');
