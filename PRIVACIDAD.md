@@ -8,11 +8,15 @@ Al abrir el juego se crea automáticamente un invitado mediante Firebase Authent
 
 ## Ranking de retos diarios
 
-El ranking es opcional: al terminar tu primer reto diario se te pregunta si quieres aparecer, y puedes cambiarlo cuando quieras en Ajustes o en el Atlas. Sin aceptar no se publica nada. Si aceptas, otros jugadores ven tu alias, tu avatar, tus aciertos y el tiempo que tardaste, del día y de la semana. Si dejas de aparecer, se retiran tus filas del día y de la semana en curso. No se solicita correo electrónico para jugar. Los resultados son declarados por el juego en el dispositivo y no constituyen una clasificación competitiva validada. Usa un alias sin datos personales.
+El ranking es opcional: al terminar tu primer reto diario se te pregunta si quieres aparecer, y puedes cambiarlo cuando quieras en Ajustes o en el Atlas. Sin aceptar no se publica nada. Si aceptas, otros jugadores ven tu alias, tu avatar, tus aciertos y el tiempo que tardaste, del día y de la semana. Si dejas de aparecer, se retiran todas tus filas del ranking, también las de días y semanas anteriores. No se solicita correo electrónico para jugar. Los resultados son declarados por el juego en el dispositivo y no constituyen una clasificación competitiva validada. Usa un alias sin datos personales.
 
 ## Salas de varios móviles
 
 Para conectar a los participantes utilizamos Firebase, de Google. Se tratan un identificador de autenticación seudónimo, el nombre elegido, el código y estado de sala, las cartas y marcas de actividad y presencia. No necesitas dar tu nombre real. El identificador no equivale a anonimato absoluto. Los participantes pueden ver los datos de la sala; evita incluir información privada en los nombres.
+
+## Partidas entre móviles cercanos
+
+Las salas Wi-Fi y las salas cercanas de iPhone conectan los móviles directamente entre sí, sin pasar por nuestros servidores. Para que se encuentren, el código QR o la invitación de la sala incluye la dirección IP local del móvil que invita dentro de vuestra red (no su dirección pública de internet). Por eso, mientras se prepara ese código, el juego puede abrir la cámara unos segundos: los navegadores solo dan la dirección local real a una página que tiene la cámara en uso. No se graba, no se muestra ni se envía ninguna imagen, y la cámara se cierra en cuanto el código está listo. Si no das permiso, la sala intenta conectarse igualmente, aunque puede fallar más entre Android e iPhone. La cámara también se usa para escanear los códigos QR de invitación. Comparte el código de la sala solo con quien vaya a jugar contigo.
 
 ## Invitaciones y comentarios
 

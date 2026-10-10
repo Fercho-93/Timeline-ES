@@ -25,7 +25,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Continuum usa la cámara para escanear códigos QR y entrar en una sala o conectar los móviles de una partida.</string>
+	<string>Continuum usa la cámara para escanear códigos QR. Al invitar a una sala Wi-Fi también la abre unos segundos, sin grabar ni enviar imágenes, para que los móviles se encuentren en tu red local.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Continuum usa la red Wi-Fi local para conectar los móviles de una partida sin enviar datos a internet.</string>
 	<key>NSBonjourServices</key>
