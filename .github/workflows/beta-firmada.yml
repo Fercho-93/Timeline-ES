@@ -75,11 +75,11 @@ jobs:
           cache: npm
       - name: Verificar identificación de firma
         run: test -n "$APPLE_TEAM_ID" && test -n "$APPLE_PROFILE_NAME"
-      - uses: apple-actions/import-codesign-certs@v7
+      - uses: apple-actions/import-codesign-certs@77ba2a2a8f5cfc8c405ebf3159f767c323e238f9 # v7.1.0
         with:
           p12-file-base64: ${{ secrets.APPSTORE_CERTIFICATES_FILE_BASE64 }}
           p12-password: ${{ secrets.APPSTORE_CERTIFICATES_PASSWORD }}
-      - uses: apple-actions/download-provisioning-profiles@v6
+      - uses: apple-actions/download-provisioning-profiles@2126b5f86a0e2863cbf4d2d312112b22b943a594 # v6.1.0
         with:
           bundle-id: com.continuum.game
           profile-type: IOS_APP_STORE
@@ -104,7 +104,7 @@ jobs:
           retention-days: 7
       - name: Subir a TestFlight si se solicitó
         if: github.event_name == 'push' || inputs.upload_testflight
-        uses: apple-actions/upload-testflight-build@v5
+        uses: apple-actions/upload-testflight-build@155ea93be9ee6d5186c71f660a612f5eddb14510 # v5.6.0
         with:
           app-path: ${{ runner.temp }}/continuum-export/App.ipa
           issuer-id: ${{ vars.APPSTORE_ISSUER_ID }}
