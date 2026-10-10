@@ -23,6 +23,9 @@ const safe = value => CT.escapeHtml(String(value ?? ''));
 const uid = () => auth.currentUser?.uid || CT.Accounts?.user?.uid;
 const alias = () => CT.Identidad?.propio?.() || 'Explorador';
 const id = () => crypto.randomUUID().replaceAll('-', '');
+// El aviso de turno (con la pestaña en segundo plano) se pide al crear o aceptar un duelo, que es
+// cuando tiene sentido, y no al abrir cualquiera.
+function askTurnAlerts() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); }
 function notify(text) {
   const toast = document.getElementById('toast');
   if (toast) { toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2800); }
@@ -270,6 +273,7 @@ function retryPending() { return Promise.all(Object.values(outbox()).map(sendPen
 window.addEventListener('online', retryPending);
 // `competition` ({ rounds, cards }) crea una competición: temas al azar y las mismas cartas por tema.
 async function create(mode, kind, back, competition = null) {
+  askTurnAlerts();
   if (busy) return;
   busy = true;
   try {
@@ -544,7 +548,7 @@ async function next(back = onBack) {
   if (!target) return notify('No tienes más duelos pendientes de jugar.');
   open({ gameId: target.id, back });
 }
-function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
+function open({ mode = 'history', kind = 'orden', gameId = '', back, competition = null } = {}) { stop?.(); clearInterval(timer); current = null; prepareUntil = 0; preparingTurn = null; awaitingReady = false; enteredAt = 0; delivery = ''; pendingIndex = null; onBack = back; shareLink = ''; retryPending(); if (gameId) join(gameId, back).catch(() => notify('No se pudo abrir este duelo.')); else create(mode, kind, back, competition).catch(() => notify('No se pudo crear el duelo.')); }
 function leave() { stop?.(); stop = null; clearInterval(timer); turnClock?.stop(); turnClock = null; current = null; }
 function close() { leave(); onBack?.(); }
 document.addEventListener('click', e => { const target = e.target.closest('[data-turn-action]'), action = target?.dataset.turnAction; if (action === 'select-slot') { CT.Effects?.tap(); pendingIndex = Number(target.dataset.index); render(); } if (action === 'confirm-place') { CT.Effects?.stamp(); place(pendingIndex); } if (action === 'cancel-place') { pendingIndex = null; render(); } if (action === 'submit-cifra') submitCifra(); if (action === 'share') share(); if (action === 'back') close(); });
@@ -558,7 +562,7 @@ function pending(games = cachedGames) {
 Object.assign(CT.TurnDuel, { isBlocked: player => blockedPlayers.has(player), pendingQuick: rows => rows.filter(x => x.pendiente && !archivedIds.has(x.code)), rivals, rivalStandings, standingsMarkup, favorite, challenge, next, archive, block, headToHead, profileMarkup, reshare, pending });
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-turn-action]');
-  const actions = { retry: retryPending, rematch: () => challenge(current.id), next: () => window.dispatchEvent(new CustomEvent('continuum:duels-list')), accept: () => join(current.id, onBack, true), decline: () => cancel(current.id, 'waiting') };
+  const actions = { retry: retryPending, rematch: () => challenge(current.id), next: () => window.dispatchEvent(new CustomEvent('continuum:duels-list')), accept: () => { askTurnAlerts(); return join(current.id, onBack, true); }, decline: () => cancel(current.id, 'waiting') };
   const action = actions[button?.dataset.turnAction];
   if (!action || button.disabled) return;
   button.disabled = true;

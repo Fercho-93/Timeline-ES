@@ -100,7 +100,7 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  await w.CONTINUUM.Accounts.setRanking(true);
  w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:9,games:4,rankedHits:500,rankedGames:200,dailyHits:5,dailyGames:2}}));await w.testAccounts.flush();
  // Las tablas de hoy y de esta semana llevan los aciertos del reto; un día de otra semana no suma.
- assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(data.get(`dailyScores/${hoy}/players/a`).finishedAt,'2026-01-01T10:00:00.000Z');
+ assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(data.get(`dailyScores/${hoy}/players/a`).finishedAt,'','la hora exacta del reto no se publica');
  assert.equal(data.get(`weeklyScores/${lunes}/players/a`).hits,7);
  assert.equal(data.get(`dailyScores/${hoy}/players/a`).ms,123000,'lo que tardó en el reto desempata');assert.equal(data.get(`weeklyScores/${lunes}/players/a`).ms,123000);
  assert.equal(data.get('playerProgress/a').dayHits,7);assert.equal(data.get('playerProgress/a').weekHits,7);

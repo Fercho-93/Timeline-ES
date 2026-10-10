@@ -274,7 +274,9 @@ async function flush() {
     const who = {alias:profile.alias, avatar:profile.avatar};
     const per = periods(readRecords());
     const publico = rankingPublico() === true;
-    if (publico && data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,ms:per.dayMs,finishedAt:per.finishedAt,updatedAt:serverTimestamp()});
+    // `finishedAt` va vacío: la hora exacta del reto no la usa nada y no hace falta publicarla (las
+    // reglas aún exigen el campo, por los clientes anteriores).
+    if (publico && data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,ms:per.dayMs,finishedAt:'',updatedAt:serverTimestamp()});
     if (publico && data.week) tx.set(weekScore(uid,data.week),{...who,hits:data.weekHits,ms:per.weekMs,updatedAt:serverTimestamp()});
   }).then(() => {
     revision=expected+1;setMeta(change !== generation);
@@ -326,7 +328,7 @@ function appleControls() {
   if (!signed && !appleNativeEnabled) return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>Juegas como invitado: tu progreso queda en este móvil.</p><p id="account-auth-message" role="status"></p></section>`;
   return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>${signed ? 'Has entrado con tu cuenta de Apple.' : 'Con Apple conservas tu progreso si cambias de móvil.'}</p>
     ${signed ? '<button class="btn btn-secondary" data-account-action="signout">Cerrar sesión de Apple</button>' : '<button class="btn account-apple" data-account-action="apple">Continuar con Apple</button>'}
-    <p id="apple-account-note">${signed ? 'Puedes cerrar sesión cuando quieras; tu progreso sigue en tu cuenta. Para borrarla del todo, usa «Eliminar».' : 'Apple no comparte tu nombre ni tu correo: el juego solo guarda un identificador.'}</p>
+    <p id="apple-account-note">${signed ? 'Puedes cerrar sesión cuando quieras; tu progreso sigue en tu cuenta. Para borrarla del todo, usa «Eliminar».' : 'El juego no pide a Apple tu nombre ni tu correo: solo guarda el identificador que Apple asigna a esta app.'}</p>
     <p id="account-auth-message" role="status"></p></section>`;
 }
 // Al vincular una cuenta de Apple o Google que ya tenía progreso propio, se pregunta cuál conservar en vez
@@ -380,8 +382,15 @@ async function signInApple() {
       const existing = OAuthProvider.credentialFromError(error);
       if (!existing) throw Error('No se pudo entrar con esa cuenta de Apple. Vuelve a intentarlo.');
       if (choice === 'movil') { const {progress, records} = payload(); try { localStorage.setItem(HANDOFF, JSON.stringify({progress, records, at: Date.now()})); } catch {} }
+      // El invitado de este móvil se descarta de verdad: sus datos del servidor se borran mientras
+      // aún es él quien escribe (las reglas solo dejan borrar lo propio) y, ya dentro de la cuenta de
+      // Apple, se elimina su usuario. Si se eligió su progreso, viaja en el traspaso local de arriba.
+      const guest = auth.currentUser;
+      clearTimeout(timer);
+      if (guest?.isAnonymous) await purgeServerData(guest.uid, profile?.aliasKey).catch(error => console.warn('No se pudo borrar el invitado', error));
       try { signed = await signInWithCredential(auth, existing); }
       catch (failure) { try { localStorage.removeItem(HANDOFF); } catch {} throw failure; }
+      if (guest?.isAnonymous) { await deleteUser(guest).catch(() => {}); forgetLocalDuels(guest.uid); try { const prefix = `continuum-account:${CT.AccountStorage.season}:${guest.uid}:`; for (const key of Object.keys(localStorage)) if (key.startsWith(prefix)) localStorage.removeItem(key); } catch {} }
     }
     await signed.user.getIdToken(true);
     await afterNativeSheet();location.reload();
@@ -477,6 +486,29 @@ async function deleteAll(refsToDelete) {
     const chunk = refsToDelete.slice(i, i + 450);
     await runTransaction(db, async tx => { chunk.forEach(ref => tx.delete(ref)); });
   }
+}
+// Todo lo que la cuenta tiene en el servidor y puede borrar ella misma: filas del ranking de todos
+// los días, avisos del móvil, lista de bloqueados y archivados, registros de cuota y, al final, el
+// perfil, el alias y el progreso. Antes del perfil, porque sin dueño nadie podría borrarlo después.
+async function purgeServerData(uid, aliasKey) {
+  const r = refs(uid);
+  const list = async (...path) => { try { return (await getDocsFromServer(collection(db, ...path))).docs.map(item => item.ref); } catch { return []; } };
+  await deleteAll([...rankingRows(uid),
+    ...await list('playerProfiles', uid, 'pushTokens'),
+    ...await list('duelPreferences', uid, 'blocked'),
+    ...await list('duelPreferences', uid, 'archived')]);
+  // Aparte: con unas reglas anteriores estos dos no se podían borrar, y no deben frenar el resto.
+  await deleteAll([doc(db, 'creationQuota', uid), doc(db, 'roomCreation', uid)]).catch(() => {});
+  const batch = writeBatch(db);
+  if (aliasKey) batch.delete(nameRef(aliasKey));
+  batch.delete(r.ranking); batch.delete(doc(db, 'socialRanking', uid)); batch.delete(r.progress); batch.delete(r.profile);
+  await batch.commit();
+}
+// Lo que los duelos guardan en este móvil fuera del espacio de cada cuenta (favoritos con los
+// identificadores de los rivales, jugadas pendientes, borradores, relojes de turno).
+function forgetLocalDuels(uid) {
+  try { for (const key of Object.keys(localStorage)) if (key.startsWith('continuum-duel-') && (key.includes(uid) || key.startsWith('continuum-duel-turn-start-'))) localStorage.removeItem(key); }
+  catch { /* sin almacenamiento */ }
 }
 async function removeRankingRows() {
   if (!identity) return;
@@ -582,17 +614,10 @@ async function removeAccount() {
     await revokeAccessToken(auth, result.authorizationCode);
   }
   clearTimeout(timer);stopStorage?.();if (saving) await saving;
-  const r=refs(u.uid), batch=writeBatch(db);
-  // Antes que el perfil: las filas del ranking de todos los días jugados (no solo las de hoy y esta
-  // semana, que eran las únicas que se borraban) y los avisos del móvil. Sin dueño, nadie podría
-  // borrarlas después.
-  let tokens=null;try{tokens=await getDocsFromServer(collection(db,'playerProfiles',u.uid,'pushTokens'));}catch{/* sin avisos que borrar */}
-  await deleteAll([...rankingRows(u.uid), ...(tokens?.docs||[]).map(t=>t.ref)]);
-  if(profile?.aliasKey) batch.delete(nameRef(profile.aliasKey));
-  batch.delete(r.ranking);batch.delete(doc(db,'socialRanking',u.uid));batch.delete(r.progress);batch.delete(r.profile);await batch.commit();
+  await purgeServerData(u.uid, profile?.aliasKey);
   active=false;
   try { await deleteUser(u); } catch(error) { active=true; throw error; }
-  CT.AccountStorage.clear();ready=false;if (wasApple) await afterNativeSheet();location.reload();
+  CT.AccountStorage.clear();forgetLocalDuels(u.uid);try{localStorage.removeItem(HANDOFF);}catch{}ready=false;if (wasApple) await afterNativeSheet();location.reload();
 }
 export async function startAccounts(callback) {
   startGame=callback;

@@ -64,6 +64,11 @@ try {
   b.set(doc(creator, 'creationQuota', 'creator'), { lastCreatedAt: serverTimestamp(), kind: 'turnDuel', target: 'seguido-2' });
   await assertFails(b.commit());
   await assertFails(setDoc(doc(creator, 'creationQuota', 'creator'), { lastCreatedAt: serverTimestamp(), kind: 'turnDuel', target: duelId }));
+  // Se puede borrar con la cuenta, pero no antes de que pase la espera (sería saltársela).
+  await assertFails(deleteDoc(doc(creator, 'creationQuota', 'creator')));
+  await env.withSecurityRulesDisabled(c => setDoc(doc(c.firestore(), 'creationQuota', 'creator'), { lastCreatedAt: Timestamp.fromMillis(Date.now() - 60000), kind: 'turnDuel', target: 'seguido-1' }));
+  await assertFails(deleteDoc(doc(guest, 'creationQuota', 'creator')));
+  await assertSucceeds(deleteDoc(doc(creator, 'creationQuota', 'creator')));
 
   await assertSucceeds(getDoc(doc(guest, 'turnDuels', duelId)));
   await assertFails(getDoc(doc(publicDb, 'turnDuels', duelId)));

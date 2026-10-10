@@ -633,7 +633,9 @@ service cloud.firestore {
         && request.resource.data.target is string && request.resource.data.target.size() >= 1 && request.resource.data.target.size() <= 160
         && (!exists(/databases/$(database)/documents/creationQuota/$(owner)) || request.time >= resource.data.lastCreatedAt + duration.value(10,'s'))
         && made(request.resource.data.kind, request.resource.data.target);
-      allow list, delete: if false;
+      allow list: if false;
+      // Se borra con la cuenta. Solo pasada la espera: borrarlo antes serviría para saltársela.
+      allow delete: if registered() && request.auth.uid == owner && request.time >= resource.data.lastCreatedAt + duration.value(10,'s');
     }
     function quotaFor(target) {
       let q = getAfter(/databases/$(database)/documents/creationQuota/$(request.auth.uid));
@@ -650,7 +652,8 @@ service cloud.firestore {
         && !exists(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode))
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.hostUid == owner
         && getAfter(/databases/$(database)/documents/rooms/$(request.resource.data.roomCode)).data.createdAt == request.time;
-      allow list, delete: if false;
+      allow list: if false;
+      allow delete: if registered() && request.auth.uid == owner && request.time >= resource.data.lastCreatedAt + duration.value(30,'s');
     }
     match /rooms/{roomId} {
       function signedIn() { return registered(); }

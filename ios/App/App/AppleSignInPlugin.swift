@@ -36,8 +36,9 @@ public class AppleSignInPlugin: CAPPlugin, CAPBridgedPlugin, ASAuthorizationCont
             }
             let raw = bytes.map { String(format: "%02x", $0) }.joined()
             let request = ASAuthorizationAppleIDProvider().createRequest()
-            // No importamos el nombre real al alias público del juego.
-            request.requestedScopes = [.email]
+            // Ni nombre ni correo: el juego no los usa, y Firebase solo necesita el identificador
+            // que Apple da siempre. Sin pedirlos, Apple no los incluye en el token.
+            request.requestedScopes = []
             request.nonce = SHA256.hash(data: Data(raw.utf8)).map { String(format: "%02x", $0) }.joined()
             let controller = ASAuthorizationController(authorizationRequests: [request])
             self.pending = call

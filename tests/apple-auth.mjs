@@ -64,7 +64,9 @@ async function conEleccion(w, choice) {
   const {w,dom,calls}=setup();await w.appleTest.startAccounts(()=>{});
   w.linkWithCredential=async()=>{throw Object.assign(Error('existente'),{code:'auth/credential-already-in-use',credential:{idToken:'credencial-de-la-cuenta'}});};
   await conEleccion(w,'cuenta');assert.equal(calls.login,1);assert.equal(calls.logout,0);
-  assert.equal(w.auth.currentUser.uid,'existing-apple');assert.equal(w.localStorage.getItem('continuum-apple-auth-notice'),null);dom.window.close();
+  assert.equal(w.auth.currentUser.uid,'existing-apple');assert.equal(w.localStorage.getItem('continuum-apple-auth-notice'),null);
+  // El invitado descartado no se queda huérfano: se borran sus datos y su usuario.
+  assert.equal(calls.batch,1,'se borran perfil, alias y progreso del invitado');assert.equal(calls.deleted,1,'y su usuario de Firebase');dom.window.close();
 }
 {
   const {w,dom,data,calls}=setup();await w.appleTest.startAccounts(()=>{});
