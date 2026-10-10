@@ -226,6 +226,19 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(JSON.parse(data.get('playerProgress/m').progress).totals.dailyHits,9);
  dom.window.close();
 }
+{
+ // Dejar el ranking retira también las filas de días y semanas anteriores, no solo las de hoy.
+ const viejo='2026-03-04', lunesViejo='2026-03-02';
+ const records={rankingPublico:true,retoDiario:{days:{[viejo]:{hits:4,total:10},[hoy]:{hits:3,total:10}}}};
+ const {w,dom,data}=setup(user('a'),{'playerProfiles/a':{...profile,aliasKey:'fer'},'playerProgress/a':{progress:'{}',records:JSON.stringify(records),revision:1,season:'launch-1',day:hoy,dayHits:3,week:lunes,weekHits:3},
+   [`dailyScores/${viejo}/players/a`]:{alias:'Fer',avatar:'compass',hits:4},[`weeklyScores/${lunesViejo}/players/a`]:{alias:'Fer',avatar:'compass',hits:4},[`dailyScores/${viejo}/players/b`]:{alias:'Bea',avatar:'panda',hits:5}});
+ await w.testAccounts.startAccounts(()=>{});
+ await w.CONTINUUM.Accounts.setRanking(false);
+ assert.equal(data.has(`dailyScores/${viejo}/players/a`),false,'la fila de un día anterior se borra');
+ assert.equal(data.has(`weeklyScores/${lunesViejo}/players/a`),false,'y la de su semana');
+ assert.equal(data.has(`dailyScores/${viejo}/players/b`),true,'las de otras personas no se tocan');
+ dom.window.close();
+}
 assert.match(read('index.html'),/src="boot.js"/);assert.doesNotMatch(read('index.html'),/src="app.js"/);
 assert.doesNotMatch(read('online.js'),/signInAnonymously/);
 console.log('Invitados: alta automática, reentrada, error de conexión, cambio de nombre, ranking, aislamiento y conflictos correctos.');

@@ -451,10 +451,26 @@ async function enter() {
 }
 // Aparecer o dejar de aparecer en el ranking. Al dejarlo se borran las filas de hoy y de esta semana (y la
 // antigua tabla única); si no hay conexión, se reintenta al volver a abrir el juego.
+// Todas las filas que pudo publicar: una por cada día jugado (están en los retos, que viajan con el
+// progreso) y una por cada semana de esos días, además de las de hoy y esta semana. Borrar una
+// fila que no existe no falla, así que no hace falta saber cuáles llegaron a publicarse.
+function rankingRows(uid, records = readRecords()) {
+  const per = periods(records), days = new Set([per.today, ...Object.keys(records?.retoDiario?.days || {})]);
+  const weeks = new Set([per.weekKey]);
+  for (const key of days) if (/^\d{4}-\d{2}-\d{2}$/.test(key)) weeks.add(periods(records, new Date(`${key}T12:00:00`)).weekKey);
+  return [...[...days].map(key => dayScore(uid, key)), ...[...weeks].map(key => weekScore(uid, key))];
+}
+// Borra por tandas: una transacción de Firestore admite 500 escrituras.
+async function deleteAll(refsToDelete) {
+  for (let i = 0; i < refsToDelete.length; i += 450) {
+    const chunk = refsToDelete.slice(i, i + 450);
+    await runTransaction(db, async tx => { chunk.forEach(ref => tx.delete(ref)); });
+  }
+}
 async function removeRankingRows() {
   if (!identity) return;
-  const uid = identity.uid, per = periods(readRecords());
-  await runTransaction(db, async tx => { tx.delete(dayScore(uid, per.today)); tx.delete(weekScore(uid, per.weekKey)); tx.delete(refs(uid).ranking); });
+  const uid = identity.uid;
+  await deleteAll([...rankingRows(uid), refs(uid).ranking]);
 }
 async function setRanking(value) {
   const records = readRecords();
@@ -556,8 +572,12 @@ async function removeAccount() {
   }
   clearTimeout(timer);stopStorage?.();if (saving) await saving;
   const r=refs(u.uid), batch=writeBatch(db);
+  // Antes que el perfil: las filas del ranking de todos los días jugados (no solo las de hoy y esta
+  // semana, que eran las únicas que se borraban) y los avisos del móvil. Sin dueño, nadie podría
+  // borrarlas después.
+  let tokens=null;try{tokens=await getDocsFromServer(collection(db,'playerProfiles',u.uid,'pushTokens'));}catch{/* sin avisos que borrar */}
+  await deleteAll([...rankingRows(u.uid), ...(tokens?.docs||[]).map(t=>t.ref)]);
   if(profile?.aliasKey) batch.delete(nameRef(profile.aliasKey));
-  const per=periods(readRecords());batch.delete(dayScore(u.uid,per.today));batch.delete(weekScore(u.uid,per.weekKey));
   batch.delete(r.ranking);batch.delete(doc(db,'socialRanking',u.uid));batch.delete(r.progress);batch.delete(r.profile);await batch.commit();
   active=false;
   try { await deleteUser(u); } catch(error) { active=true; throw error; }
