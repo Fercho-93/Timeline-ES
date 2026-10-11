@@ -187,9 +187,8 @@ html #app button.mode-play-card:hover, html #app button.mode-play-card:active { 
 #app .mode-ranking-summary .mode-ranking-stats span { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
 #app .mode-ranking-summary .mode-ranking-stats small { font: 700 .66rem var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
 
-/* Retos rápidos: su lámina es la única casi negra entre las del resto del juego. En tema claro se
-   aclara hasta quedar en el mismo tono sepia que las demás; en oscuro encaja tal cual. */
-:root:not([data-theme="dark"]) #app .mode-entry:is([data-action="quick-challenges"], [data-action="quick-public"]) .mode-entry-art img { filter: sepia(.55) saturate(.7) brightness(1.55) contrast(.72); }
+/* Retos rápidos: en tema claro se aclara la lámina sin borrar sus tintas suaves. */
+:root:not([data-theme="dark"]) #app .mode-entry:is([data-action="quick-challenges"], [data-action="quick-public"]) .mode-entry-art img { filter: sepia(.05) saturate(.82) brightness(1.35) contrast(.82); }
 /* Textos de ayuda dentro de los paneles de configuración: alineados a la izquierda, como los campos. */
 #app :is(.solo-panel, .public-create, .mode-online-config, .quick-shell .panel) .hint { text-align: left; }
 :root[data-theme="dark"] #app .mode-section-title, :root[data-theme="dark"] #app .mode-section-title small { color: #e0b77e; }
@@ -199,6 +198,14 @@ html #app button.mode-play-card:hover, html #app button.mode-play-card:active { 
    para que case con las demás carátulas, y una flecha en vez de «+» porque no despliega mazos. */
 #app .gallery-panel.panel-competition { --scene-glow: #d8b46a; --scene-shade: #3a2c18; --scene-focus: 72%; background: #4a3922; }
 #app .gallery-panel.panel-competition .panel-art img,
-#app .gallery-panel.panel-competition .panel-backdrop img { object-fit: cover; object-position: 66% 38%; filter: sepia(.75) saturate(.9) brightness(.52) contrast(1.15); }
+#app .gallery-panel.panel-competition .panel-backdrop img { object-fit: cover; object-position: 66% 38%; filter: sepia(.05) saturate(.85) brightness(.65) contrast(1.08); }
 #app .home-shell .gallery-panel.panel-competition .collection-open::after,
 #app .gallery-panel.panel-competition .collection-open::after { content: "→"; }
+
+/* Lavados de color solo en ilustraciones de navegación; las cartas conservan sus filtros. */
+#app .mode-entry-art img { filter: sepia(.05) saturate(.85) contrast(1.02); }
+#app .mode-hub-head > img { filter: sepia(.04) saturate(.85); }
+#app[data-screen="home"] .home-doors-shell .home-door-art img { filter: sepia(.05) saturate(.85) contrast(1.03); }
+:root[data-theme="dark"] #app[data-screen="home"] .home-doors-shell .home-door-art img { filter: sepia(.04) saturate(.82) brightness(.92); }
+#app .home-shell .gallery-panel:not(.active) .panel-art { filter: sepia(.05) saturate(.85) brightness(.96); }
+#app .enc-deck-cover img { filter: sepia(.05) saturate(.85); }
