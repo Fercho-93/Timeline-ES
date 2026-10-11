@@ -3493,7 +3493,7 @@
     },
     {
       "path": "assets/continuum-splash-clean-v3.webp",
-      "sha256": "af8be123ceaccc29a65efba8f46e8636207b1b7016ab32286f0d010f75ac85ee",
+      "sha256": "aa6f600e0a9ee0717d11ea182fe1754e450557762a27a1d2fad21c6880a59267",
       "rightsEvidence": {
         "status": "ai-generated-with-recorded-prompt",
         "generator": "ChatGPT / OpenAI",

@@ -20,7 +20,7 @@ const html = gameHtml(read('index.html'));
 {
   const portada = new JSDOM(html).window.document;
   const css = read('splash.css');
-  assert.equal(portada.querySelectorAll('.splash-float-card').length, 5, 'la portada compone cinco cartas que pueden moverse por separado');
+  assert.equal(portada.querySelectorAll('.splash-float-card').length, 3, 'la portada compone tres cartas que pueden moverse por separado');
   assert.ok([...portada.querySelectorAll('.splash-float-card img')].every(img => img.getAttribute('src')?.startsWith('assets/')), 'las cartas flotantes reutilizan láminas propias del juego');
   assert.match(css, /@keyframes splash-card-drift/, 'las cartas tienen un vaivén independiente');
   assert.match(css, /@keyframes splash-sunbeam-shimmer/, 'el rayo de atardecer tintinea suavemente');

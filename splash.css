@@ -58,6 +58,9 @@ html.splash-active #app-splash::before {
   content: "";
   position: absolute;
   inset: 5px;
+  /* Un lavado de color propio por carta: tiñe el grabado sepia sin taparlo. */
+  background: var(--wash, transparent);
+  mix-blend-mode: color;
   border: 1px solid #f2d49a99;
   border-radius: 6px;
   box-shadow: inset 0 0 22px #2a170c55;
@@ -71,11 +74,9 @@ html.splash-active #app-splash::before {
   filter: sepia(.16) saturate(.78) contrast(.93) brightness(1.05);
 }
 /* `--deal` es cuándo entra cada carta y `--from-*`, desde dónde llega repartida. */
-#app-splash .splash-card-tl { top: 3%; left: -12%; --tilt: -17deg; --drift-x: 8px; --drift-y: 7px; --period: 8.8s; --deal: .75s; --from-x: -260px; --from-y: -120px; --from-r: -50deg; }
-#app-splash .splash-card-tr { top: 7%; right: -11%; --tilt: 16deg; --spin: -1.1deg; --drift-x: -7px; --period: 10.2s; --deal: .95s; --from-x: 260px; --from-y: -140px; --from-r: 45deg; }
-#app-splash .splash-card-ml { top: 48%; left: -23%; --tilt: 13deg; --spin: -1.4deg; --drift-x: 9px; --drift-y: -7px; --period: 9.6s; --deal: 1.15s; --from-x: -280px; --from-y: 40px; --from-r: -25deg; }
-#app-splash .splash-card-mr { top: 42%; right: -23%; --tilt: 13deg; --drift-x: -8px; --drift-y: 8px; --period: 8.2s; --deal: 1.3s; --from-x: 280px; --from-y: -30px; --from-r: 50deg; }
-#app-splash .splash-card-br { right: -16%; bottom: -7%; --tilt: -14deg; --spin: 1deg; --drift-x: -5px; --drift-y: -10px; --period: 10.8s; --deal: 1.45s; --from-x: 220px; --from-y: 260px; --from-r: 30deg; }
+#app-splash .splash-card-tl { --wash: #4a7fa899; top: 3%; left: -12%; --tilt: -17deg; --drift-x: 8px; --drift-y: 7px; --period: 8.8s; --deal: .75s; --from-x: -260px; --from-y: -120px; --from-r: -50deg; }
+#app-splash .splash-card-tr { --wash: #6b8a4599; top: 7%; right: -11%; --tilt: 16deg; --spin: -1.1deg; --drift-x: -7px; --period: 10.2s; --deal: .95s; --from-x: 260px; --from-y: -140px; --from-r: 45deg; }
+#app-splash .splash-card-mr { --wash: #c45e3099; top: 42%; right: -23%; --tilt: 13deg; --drift-x: -8px; --drift-y: 8px; --period: 8.2s; --deal: 1.3s; --from-x: 280px; --from-y: -30px; --from-r: 50deg; }
 
 /* Un rayo de atardecer cruza la escena; los puntos de luz dan el tintineo sin parpadeos bruscos. */
 #app-splash .splash-sunbeam {
