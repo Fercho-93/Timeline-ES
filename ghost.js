@@ -132,12 +132,20 @@
   function difficultyCards(name, selected = "easy") {
     const linea = n => n ? `Cada acierto añade ${n} ${n === 1 ? "carta" : "cartas"} a la línea` : "La línea no se complica";
     const cifras = { never: "Cifras a la vista", sometimes: "Cifras ocultas a veces", always: "Cifras siempre ocultas" };
-    return `<fieldset class="field difficulty-field difficulty-cards"><legend class="field-label">Dificultad</legend><div class="difficulty-grid">${Object.entries(LEVELS).map(([key, info]) => `<label class="difficulty-card${key === selected ? " is-on" : ""}">
+    const icon = body => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+    const clock = icon('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6M12 2v3M19 5l2 2"/>');
+    const cards = icon('<rect x="4" y="7" width="11" height="14" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3M7 14h5M9.5 11.5v5"/>');
+    const eye = icon('<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>');
+    const hiddenEye = icon('<path d="m3 3 18 18M9.5 6.3A12 12 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3 3.5M6 7.5A17 17 0 0 0 2 12s3.5 6 10 6a12 12 0 0 0 4-.7"/>');
+    const check = icon('<path d="m6 12 4 4 8-8"/>');
+    return `<fieldset class="field difficulty-field difficulty-cards"><legend class="field-label">Dificultad</legend><div class="difficulty-grid">${Object.entries(LEVELS).map(([key, info], index) => `<label class="difficulty-card${key === selected ? " is-on" : ""}" data-difficulty="${key}">
       <input type="radio" name="${name}" value="${key}"${key === selected ? " checked" : ""}>
-      <b>${info.name}</b>
-      <span><i aria-hidden="true">⏱</i>${info.seconds ? `${info.seconds} s por carta` : "Sin tiempo"}</span>
-      <span><i aria-hidden="true">＋</i>${linea(info.extra)}</span>
-      <span><i aria-hidden="true">${info.hidden === "never" ? "◉" : "◌"}</i>${cifras[info.hidden]}</span>
+      <div class="difficulty-heading"><small class="difficulty-level" aria-hidden="true">${["I", "II", "III", "IV"][index]}</small><b>${info.name}</b><i class="difficulty-mark" aria-hidden="true">${check}</i></div>
+      <div class="difficulty-details">
+        <span>${clock}<em>${info.seconds ? `${info.seconds} s por carta` : "Sin tiempo"}</em></span>
+        <span>${cards}<em>${linea(info.extra)}</em></span>
+        <span>${info.hidden === "never" ? eye : hiddenEye}<em>${cifras[info.hidden]}</em></span>
+      </div>
     </label>`).join("")}</div></fieldset>`;
   }
   // Se sortea una carta Fantasma por bloque de cuatro turnos a partir del cuarto.

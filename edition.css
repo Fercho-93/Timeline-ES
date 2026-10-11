@@ -5223,14 +5223,31 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 /* Dificultad en tarjetas: cada nivel dice su tiempo, qué pasa al acertar y si se ven las cifras. */
 #app .difficulty-cards { min-width: 0; margin-inline: 0; padding: 0; border: 0; }
 #app .difficulty-cards > legend { width: 100%; padding: 0; }
-#app .difficulty-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-#app .difficulty-card { position: relative; display: grid; align-content: start; gap: 5px; padding: 11px 11px 12px; border: 1px solid #d6bf98; border-radius: 14px; color: #2a1a10; background: linear-gradient(165deg, #fffaf1, #f6ead8); box-shadow: inset 0 1px 0 #fff, 0 2px 6px #5a341a12; cursor: pointer; transition: border-color var(--motion-base) ease, background var(--motion-base) ease, box-shadow var(--motion-base) ease; }
+#app .difficulty-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+#app .difficulty-card { --difficulty-ink: #52634d; --difficulty-wash: #e5eadf; position: relative; display: grid; align-content: start; gap: 12px; min-width: 0; padding: 14px 12px 15px; border: 1px solid var(--edition-line); border-radius: 12px; color: var(--edition-ink); background: linear-gradient(150deg, var(--edition-surface), var(--edition-paper)); box-shadow: inset 0 0 0 3px var(--edition-surface), inset 0 0 0 4px #a68b5c18, 0 3px 9px #352a170c; cursor: pointer; transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease; }
+#app .difficulty-card[data-difficulty="normal"] { --difficulty-ink: #446271; --difficulty-wash: #e2eaee; }
+#app .difficulty-card[data-difficulty="hard"] { --difficulty-ink: #8a533b; --difficulty-wash: #f0e4d9; }
+#app .difficulty-card[data-difficulty="expert"] { --difficulty-ink: #705369; --difficulty-wash: #ece3e9; }
 #app .difficulty-card input { position: absolute; opacity: 0; pointer-events: none; }
-#app .difficulty-card b { margin-bottom: 2px; font: 600 1.05rem/1.2 var(--font-display); }
-#app .difficulty-card span { display: grid; grid-template-columns: 1.1em minmax(0, 1fr); gap: 5px; color: #5c4a3a; font: .74rem/1.3 var(--ui-font); }
-#app .difficulty-card span i { color: #8a5a2e; font-style: normal; text-align: center; }
-#app .difficulty-card.is-on { border-color: #b8653d; background: linear-gradient(165deg, #fdf3ea, #f4dccb); box-shadow: 0 0 0 1px #b8653d, 0 10px 22px -12px #b8653dcc, inset 0 1px 0 #fff; }
-#app .difficulty-card:has(input:focus-visible) { outline: 2px solid #b8653d; outline-offset: 3px; }
+#app .difficulty-heading { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 7px; padding-bottom: 10px; border-bottom: 1px solid var(--edition-line); }
+#app .difficulty-level { display: grid; place-items: center; min-width: 22px; height: 26px; padding-inline: 3px; border: 1px solid #a68b5c38; border-radius: 5px; color: var(--difficulty-ink); background: var(--difficulty-wash); font: 600 .72rem/1 var(--font-display); }
+#app .difficulty-card b { font: 600 1.02rem/1.2 var(--font-display); overflow-wrap: normal; }
+#app .difficulty-mark { display: grid; place-items: center; width: 17px; height: 17px; border: 1px solid var(--edition-line); border-radius: 50%; color: var(--edition-surface); }
+#app .difficulty-mark svg { width: 13px; height: 13px; opacity: 0; }
+#app .difficulty-details { display: grid; gap: 8px; }
+#app .difficulty-details span { display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: start; gap: 7px; color: var(--edition-muted); font: .76rem/1.4 var(--ui-font); }
+#app .difficulty-details svg { width: 16px; height: 16px; margin-top: 1px; color: var(--difficulty-ink); }
+#app .difficulty-details em { min-width: 0; font-style: normal; }
+#app .difficulty-card.is-on { border-color: var(--difficulty-ink); box-shadow: inset 0 0 0 3px var(--edition-surface), inset 0 0 0 4px var(--difficulty-wash), 0 0 0 1px var(--difficulty-ink), 0 7px 16px #352a1715; }
+#app .difficulty-card.is-on .difficulty-mark { border-color: var(--difficulty-ink); background: var(--difficulty-ink); }
+#app .difficulty-card.is-on .difficulty-mark svg { opacity: 1; }
+#app .difficulty-card:has(input:focus-visible) { outline: 2px solid var(--difficulty-ink); outline-offset: 4px; }
+:root[data-theme="dark"] #app .difficulty-card { --difficulty-ink: #b4c2a3; --difficulty-wash: #36402e; }
+:root[data-theme="dark"] #app .difficulty-card[data-difficulty="normal"] { --difficulty-ink: #adc7d2; --difficulty-wash: #2e4149; }
+:root[data-theme="dark"] #app .difficulty-card[data-difficulty="hard"] { --difficulty-ink: #dfb291; --difficulty-wash: #503b2e; }
+:root[data-theme="dark"] #app .difficulty-card[data-difficulty="expert"] { --difficulty-ink: #cfb3c6; --difficulty-wash: #473447; }
+@media (hover: hover) { #app .difficulty-card:hover { border-color: var(--difficulty-ink); } }
+@media (max-width: 340px) { #app .difficulty-grid { grid-template-columns: minmax(0, 1fr); } }
 
 /* Bienvenida: elegir el tamaño de la letra con una carta de ejemplo que cambia al momento. */
 #app .bienvenida-letra { display: grid; gap: 10px; min-width: 0; margin: 6px 0 4px; padding: 14px 12px 12px; border: 1px solid var(--edition-line); border-radius: 12px; background: var(--edition-surface); text-align: center; }
