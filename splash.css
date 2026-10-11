@@ -345,7 +345,7 @@ html.splash-active #app-splash .splash-masthead {
 #app-splash .splash-actions {
   position: absolute;
   left: 50%;
-  bottom: max(16svh, calc(78px + env(safe-area-inset-bottom)));
+  bottom: max(22svh, calc(78px + env(safe-area-inset-bottom)));
   width: min(78vw, 440px);
   display: grid;
   z-index: 2;
@@ -431,7 +431,7 @@ html.splash-active #app-splash .splash-masthead {
 #app-splash .splash-status {
   position: absolute;
   left: 50%;
-  bottom: max(17svh, calc(90px + env(safe-area-inset-bottom)));
+  bottom: max(23svh, calc(90px + env(safe-area-inset-bottom)));
   width: min(78vw, 440px);
   margin: 0;
   color: #57483b;
@@ -469,7 +469,7 @@ html.splash-active #app-splash .splash-masthead {
   #app-splash .home-tagline { margin-top: 10px; }
   #app-splash .home-ornament { margin-top: 13px; }
   #app-splash .splash-hitos { margin-top: 8px; }
-  #app-splash .splash-actions { bottom: max(7svh, calc(28px + env(safe-area-inset-bottom))); }
+  #app-splash .splash-actions { bottom: max(22svh, calc(28px + env(safe-area-inset-bottom))); }
   #app-splash .splash-play { min-height: 60px; }
 }
 @media (min-aspect-ratio: 4/3) and (max-height: 760px) {
