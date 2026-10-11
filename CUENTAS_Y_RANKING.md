@@ -117,7 +117,7 @@ UID. No se usa huella del dispositivo, IMEI ni identificador publicitario.
 4. Firebase → Authentication → Apple: para que la revocación funcione, rellenar **Services ID,
    Team ID, Key ID y clave privada (.p8)** (la clave se crea en Apple Developer → Keys con «Sign
    in with Apple»). La clave privada solo se introduce en la consola de Firebase, nunca en el
-   repositorio.
+   repositorio. Configurado y comprobado el 11 de octubre de 2026.
 5. Reglas y Functions se publican como se explica en
    [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue).
 
