@@ -1,6 +1,6 @@
 # Privacidad de Continuum
 
-Información de la beta · actualizada el 10 de octubre de 2026.
+Información de la beta · actualizada el 11 de octubre de 2026.
 
 Esta página explica qué datos trata Continuum, para qué, con quién se comparten, cuánto tiempo se guardan y cómo puedes decidir sobre ellos. Continuum no tiene publicidad, no usa analítica de terceros y no vende ni cede datos a nadie con fines comerciales.
 
@@ -89,7 +89,7 @@ Google, Apple y GitHub pueden tratar datos en Estados Unidos u otros países fue
 - Las mesas del tablón público y las colas de partida rápida: un día.
 - Los registros del límite de altas: siete días; los registros técnicos de los avisos: 30 días.
 
-Una tarea automática diaria aplica estos plazos. Se está poniendo en marcha durante la beta: hasta que funcione, algunos datos pueden conservarse más tiempo.
+Una tarea automática diaria aplica estos plazos. Los datos caducados se borran en la siguiente pasada.
 
 ## Borrar tu cuenta
 

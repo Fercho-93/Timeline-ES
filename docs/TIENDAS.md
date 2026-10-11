@@ -161,7 +161,7 @@ Check (Play Integrity exige estar publicada en Google Play) ni avisos activos.
   un enlace de duelo o de sala, copiar o recuperar el perfil.
 
 Antes de enviar: confirmar los SDK presentes en el binario, qué llega realmente a Firebase en
-producción y que la limpieza diaria (`purgeExpiredData`) está publicada y funcionando.
+producción y que la limpieza diaria (`purgeExpiredData`) funciona (publicada el 11 de octubre de 2026).
 
 ## Clasificación por edades
 
