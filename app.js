@@ -346,14 +346,13 @@
     screen = 'competition-menu';
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Competición</div><h2 class="solo-title" data-focus tabindex="-1">Competición en solitario</h2>
-        <p class="lead">Temas al azar de las Grandes colecciones, uno detrás de otro, sin repetir.</p><p class="solo-intro-rule">${SOLO_LIVES} vidas por tema · Al final cuentan todos tus aciertos.</p></div>
+        <p class="lead">Temas al azar de las Grandes colecciones, uno detrás de otro, sin repetir.</p>${vidasAviso("por tema")}<p class="solo-intro-rule">Al final cuentan todos tus aciertos.</p></div>
         ${loadCompetition() ? '<button class="btn btn-secondary btn-block" data-action="resume-competition">Continuar competición en solitario <span>→</span></button>' : ''}
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Qué juegas</h3></div>
           ${lengthField(competitionConfig.rounds)}
           <div class="field"><label for="competition-cards">Cartas por tema</label><select id="competition-cards">${[1,2,3,4,5,6].map(n=>`<option${n===competitionConfig.cards?' selected':''}>${n}</option>`).join('')}</select></div>
-          ${CT.Ghost.difficultySelect("competition-difficulty", competitionDifficulty).replace('class="field difficulty-field"', 'class="field difficulty-field competition-difficulty"')}
-          ${CT.Tiempo.field("comp-solo")}
+          ${CT.Ghost.difficultyCards("competition-difficulty", competitionDifficulty).replace('class="field difficulty-field', 'class="field difficulty-field competition-difficulty')}
           <button class="btn btn-primary btn-block" style="margin-top:10px" data-action="start-competition">Empezar competición <span aria-hidden="true">→</span></button>
         </div>
       </section></div>`);
@@ -563,6 +562,7 @@
         <label class="solo-lectores" for="bienvenida-nombre">Tu apodo</label>
         <input id="bienvenida-nombre" type="text" autocomplete="nickname" maxlength="${CT.Identidad.MAX}" placeholder="Tu apodo" value="${escapeHtml(nombre)}" aria-describedby="bienvenida-error bienvenida-pista bienvenida-datos">
         <p id="bienvenida-error" class="bienvenida-error" role="alert">${escapeHtml(error)}</p>
+        ${CT.textSizePicker?.() || ""}
         <button class="btn btn-primary btn-block" type="submit">Empezar a jugar <span aria-hidden="true">→</span></button>
       </form>
       <p class="hint" id="bienvenida-pista">Toca el avatar para elegirlo. Podrás cambiarlo después.</p>
@@ -2045,6 +2045,7 @@
               ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
               : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
             ${perfilResumen(resumen)}
+            ${CT.Quick?.stats ? '<button class="btn btn-secondary" data-action="quick-history">Historial de Retos rápidos <span aria-hidden="true">→</span></button>' : ""}
             <div class="perfil-main">${perfilPorJuego(filas)}${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}</div>
           </div>
           <div class="atlas-territory" id="atlas-achievements"><div class="atlas-territory-caption"><span>05 / RUMBO A NUEVAS METAS</span><h2>Logros</h2></div><div class="perfil-main">${perfilLogros(logros)}</div></div>
@@ -2409,6 +2410,19 @@
   // Las cartas que el tablero acaba de colocar y todavía no se han visto llegar.
   let recienColocadas = [];
   if (!CT.Ghost.LEVELS[selectedDifficulty]) selectedDifficulty = "easy";
+  // Antes de empezar: las tres vidas, grandes, para que se vean de un vistazo.
+  function vidasAviso(detalle = "") {
+    return `<div class="vidas-aviso"><span class="vidas-aviso-corazones" aria-hidden="true">${"♥".repeat(SOLO_LIVES)}</span><p><b>Tienes ${SOLO_LIVES} vidas${detalle ? ` ${detalle}` : ""}.</b> Cada fallo cuesta una.</p></div>`;
+  }
+  // El corazón recién perdido se pinta con su animación de rotura hasta pasar a la carta siguiente.
+  let vidaRota = null;
+  function vidasMarkup() {
+    const rota = vidaRota;
+    const corazones = Array.from({ length: SOLO_LIVES }, (_, i) => i < solo.lives
+      ? '<span class="vida">♥</span>'
+      : `<span class="vida vida-perdida${i === rota ? " vida-rota" : ""}">♡</span>`).join("");
+    return `<div class="solo-lives" role="img" aria-label="Vidas restantes: ${solo.lives}">${corazones}</div>`;
+  }
   function soloHidden() { return solo.difficulty === "expert" || !!solo.ghostTurns?.includes(solo.played - (solo.pendingResult ? 1 : 0)); }
   function soloHome() {
     screen = "solo-home";
@@ -2419,13 +2433,12 @@
     const pendiente = solo && solo.kind === "free";
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
-        <p class="lead">Ordena, descubre y supera tu marca.</p><p class="solo-intro-rule">${SOLO_LIVES} vidas · Cada fallo cuesta una.</p></div>
+        <p class="lead">Ordena, descubre y supera tu marca.</p></div>${vidasAviso()}
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Partida libre</h3></div>
           <p>El mazo entero, hasta perder las tres vidas o agotarlo.</p>
-          ${CT.Ghost.difficultySelect("solo-difficulty", selectedDifficulty)}
+          ${CT.Ghost.difficultyCards("solo-difficulty", selectedDifficulty)}
           <p class="hint" data-level-record>Mejor marca en ${CT.Ghost.level(selectedDifficulty).name}: ${records.bestByDifficulty?.[selectedDifficulty] || (selectedDifficulty === "easy" ? records.best || 0 : 0)}</p>
-          ${CT.Tiempo.field("solo")}
           ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
         </div>
@@ -2751,7 +2764,7 @@
     }
     const timeline = [barajado.shift()];
     // La partida libre lleva el plazo que se eligió en su pantalla; el reto diario, ninguno.
-    const ms = kind === "free" ? CT.Tiempo.chosen("solo") * 1000 : 0;
+    const ms = kind === "free" ? CT.Ghost.level(selectedDifficulty).seconds * 1000 : 0;
     solo = {
       kind, difficulty, ghostTurns: difficulty === "hard" ? CT.Ghost.soloSchedule(ids.length) : [], ms,
       mode: selectedModeKey, day: today(), deck: barajado, timeline,
@@ -2797,7 +2810,7 @@
       <h1 class="solo-lectores" data-focus tabindex="-1">${etiqueta}: ${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}${sinVidas() ? "" : `, ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}</h1>
       ${solo.kind === "comp" ? `<div class="comp-topic">${escapeHtml(CT.mode(solo.mode).name)}</div>` : ""}
       <div class="game-head"><div><div class="turn-label" aria-hidden="true">${etiqueta}</div><div class="turn-name" aria-hidden="true">${solo.hits} ${solo.hits === 1 ? "acierto" : "aciertos"}</div></div><div class="deck-count"><strong>${restantes}</strong><span>por colocar</span></div></div>
- ${sinVidas() ? "" : `<div class="solo-lives" aria-label="Vidas restantes: ${solo.lives}">${"♥".repeat(solo.lives)}${"♡".repeat(SOLO_LIVES - solo.lives)}</div>`}
+ ${sinVidas() ? "" : vidasMarkup()}
       ${enDueloConReloj() && solo.cartaEmpezadaEn && !solo.pendingResult ? relojMarkup(Math.max(0, plazoDuelo() - (Date.now() - solo.cartaEmpezadaEn)), plazoDuelo()) : ""}
       ${soloHidden() ? `<div class="ghost-banner" role="status"><span aria-hidden="true">◌</span><div><b>Fantasma ${solo.difficulty === "expert" ? "permanente" : "· esta jugada"}</b><small>${solo.difficulty === "expert" ? "Fechas ocultas toda la partida. Guíate por las ilustraciones." : "Fechas ocultas solo esta jugada."}</small></div></div>` : ""}
       <section class="board-focus-card"><div class="hand-title"><h3>Tu carta</h3></div>${pendingIndex === null ? `<div class="hand hand-solo"><div class="hand-card selected" data-id="${card.id}">${categoryBadge(card)}<span class="hidden-date">${currentAxis().hiddenLabel}</span>${cardBack()}<strong>${escapeHtml(card.title)}</strong></div></div>` : `<p class="hint provisional-hand-note">La carta está en la línea como vista previa.</p>`}<p class="hint">${pendingIndex !== null ? "Confirma el hueco elegido o toca otro" : "Toca el hueco donde quieres colocar la carta, o mantén pulsada la carta y arrástrala hasta él"}</p></section>
@@ -2866,7 +2879,7 @@
     paraReloj();
     if (!correct) {
       // El duelo no gasta vidas: ver `soloAcabada`.
-      if (!sinVidas()) solo.lives -= 1;
+      if (!sinVidas()) { solo.lives -= 1; vidaRota = solo.lives; }
       (solo.failed = solo.failed || []).push(solo.current);
     }
     solo.played += 1;
@@ -2902,7 +2915,7 @@
       : motivo === "tiempo" ? `Se agotaron los segundos sin colocarla, así que esta no suma${sinVidas() ? "" : `: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}`}.`
       : sinVidas() ? "Fallo: esa carta no suma." : `Fallo: te quedan ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}.`;
     const entra = !correct && cartaFalladaEntraEnLinea() ? " Al continuar, la carta pasa a su lugar correcto como referencia." : "";
-    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div><div class="eyebrow" aria-hidden="true">${titulo}</div><h2><span class="solo-lectores">${titulo}: </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${remate}${entra}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
+    overlay(`<div class="overlay" data-result-card="${correct ? card.id : ''}"${correct ? '' : ` data-correction-card="${card.id}" data-attempted-slot="${result.attemptedIndex}" data-correct-slot="${result.correctIndex}"`}><div class="modal ${correct ? "success" : "failure"}"><div class="result-mark" aria-hidden="true">${correct ? "✓" : "×"}</div>${correct || sinVidas() ? "" : vidasMarkup()}<div class="eyebrow" aria-hidden="true">${titulo}</div><h2><span class="solo-lectores">${titulo}: </span>${escapeHtml(card.title)}</h2><div class="reveal">${categoryBadge(card)}<div class="reveal-era era-${era.key}"><span>${era.symbol}</span>${era.name}</div>${CT.Art.button(selectedModeKey, card)}<div class="year">${formatValue(card)}</div><p>${escapeHtml(card.detail)}</p></div>${hint}<p>${remate}${entra}</p><button class="btn btn-primary btn-block" data-dialog-focus data-action="solo-next">${acabada ? "Ver el resultado" : "Siguiente carta"} <span>→</span></button></div></div>`);
   }
 
   // La carta fallada no se pierde: al continuar pasa a su lugar correcto y queda en la línea como
@@ -2911,6 +2924,7 @@
   const cartaFalladaEntraEnLinea = () => solo.kind !== "duel";
   function soloNext() {
     if (!solo?.pendingResult) return;
+    vidaRota = null;
     const jugada = solo.pendingResult;
     solo.pendingResult = null;
     result = null;
@@ -3644,10 +3658,10 @@
     const temas = compModes();
     // «Jugar otra vez» desde el final no tiene los desplegables delante: repite los ajustes de la última.
     const opciones = competitionOptions();
-    comp = { decks: CT.Saves.clone(Object.fromEntries(temas.map(key => [key, CT.cards(key)]))), difficulty: CT.Ghost.LEVELS[document.getElementById("competition-difficulty")?.value] ? document.getElementById("competition-difficulty").value : competitionDifficulty, queue: shuffle(temas).slice(0, opciones.rounds || temas.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
+    comp = { decks: CT.Saves.clone(Object.fromEntries(temas.map(key => [key, CT.cards(key)]))), difficulty: competitionDifficulty, queue: shuffle(temas).slice(0, opciones.rounds || temas.length), roundsSummary: [], totalHits: 0, totalFailed: [] };
     comp.totalThemes = comp.queue.length;
     comp.cardsPerRound = opciones.cards;
-    comp.ms = CT.Tiempo.chosen("comp-solo") * 1000;
+    comp.ms = CT.Ghost.level(comp.difficulty).seconds * 1000;
     compRoundIntro();
   }
 
@@ -3974,18 +3988,19 @@
       });
       return;
     }
-    if (event.target.id === "competition-difficulty") {
+    if (event.target.matches?.('input[name="competition-difficulty"], input[name="solo-difficulty"]')) {
+      event.target.closest(".difficulty-grid").querySelectorAll(".difficulty-card").forEach(card => card.classList.toggle("is-on", card.querySelector("input").checked));
+    }
+    if (event.target.name === "competition-difficulty") {
       const elegida = event.target.value;
       if (!CT.Ghost.LEVELS[elegida]) return;
-      event.target.closest(".difficulty-field").querySelector("[data-difficulty-help]").textContent = CT.Ghost.level(elegida).description;
       competitionDifficulty = elegida;
       CT.Storage.setItem("continuum-competition-difficulty-v1", elegida);
       return;
     }
-    if (event.target.id !== "solo-difficulty") return;
+    if (event.target.name !== "solo-difficulty") return;
     const key = event.target.value;
     if (!CT.Ghost.LEVELS[key]) return;
-    event.target.closest(".difficulty-field").querySelector("[data-difficulty-help]").textContent = CT.Ghost.level(key).description;
     selectedDifficulty = key;
     CT.Storage.setItem("continuum-difficulty-v1", key);
     const record = app.querySelector("[data-level-record]");
@@ -4068,6 +4083,7 @@
     }
     else if (action === "duels-open") openPendingDuels();
     else if (action === "duels-list") duelsView();
+    else if (action === "quick-history") CT.Quick?.stats?.();
     else if (action === "share-daily-home") shareDailyFromHome();
     else if (action === "set-mode") openMode(target.dataset.mode);
     else if (action === "mazo-desbloquear") tiendaSimulada(target.dataset.paquete, target.dataset.mode);

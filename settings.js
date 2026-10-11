@@ -7,6 +7,7 @@
 
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
+  const TEXT_SIZES = [['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']];
   const DEFAULTS = { theme: "light", textSize: "100", haptics: false, ambience: false, depth: false, ambienceVolume: 50 };
   // Las dos apariencias, en un solo sitio: de aquí salen el desplegable, la validación
   // de lo guardado y el color de la barra del navegador.
@@ -97,7 +98,7 @@
         <div class="field">
           <label for="ajuste-texto">Tamaño del texto</label>
           <select id="ajuste-texto" data-settings-action="text-size">
-            ${[['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']].map(([value,label])=>`<option value="${value}"${s.textSize===value?' selected':''}>${label}</option>`).join('')}
+            ${TEXT_SIZES.map(([value,label])=>`<option value="${value}"${s.textSize===value?' selected':''}>${label}</option>`).join('')}
           </select>
         </div>
         <button class="btn btn-secondary btn-block settings-apply-look" data-settings-action="apply-look" disabled>Aplicar apariencia</button>
@@ -362,6 +363,25 @@
         setTimeout(()=>URL.revokeObjectURL(url),1000);
       })();
     }
+  });
+
+  // Elegir el tamaño del texto en la bienvenida: se aplica al momento, sin el paso de
+  // «Aplicar» de Ajustes, porque la propia pantalla es la vista previa.
+  CT.textSizePicker = () => {
+    const actual = settings.textSize;
+    return `<fieldset class="bienvenida-letra"><legend>Tamaño de la letra</legend>
+      <div class="bienvenida-muestra" aria-hidden="true"><small>Carta de ejemplo</small><strong>Llegada de Colón a América</strong><b>1492</b></div>
+      <div class="segmented bienvenida-letra-opciones">${TEXT_SIZES.map(([value, label]) => `<label class="segmented-option${value === actual ? " is-on" : ""}"><input type="radio" name="bienvenida-letra" value="${value}" data-text-size-pick${value === actual ? " checked" : ""}><span><b>${label}</b></span></label>`).join("")}</div>
+      <p class="hint">Puedes cambiarlo luego en Ajustes.</p></fieldset>`;
+  };
+  document.addEventListener("change", event => {
+    const input = event.target.closest?.("input[data-text-size-pick]");
+    if (!input || !TEXT_SIZES.some(([value]) => value === input.value)) return;
+    settings.textSize = input.value;
+    draftLook.textSize = input.value;
+    save();
+    applyTheme();
+    input.closest(".segmented")?.querySelectorAll(".segmented-option").forEach(op => op.classList.toggle("is-on", op.querySelector("input").checked));
   });
 
   CT.settingsButton = () => '<button class="icon-btn" data-settings-action="open">Ajustes</button>';

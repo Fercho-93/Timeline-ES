@@ -16,14 +16,15 @@
     more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
   };
   const icon = name => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
-  function header(back = '', menu = '', inGame = false, title = '') {
+  // `help`, si lo hay, son los atributos de un botón de guía propio de la pantalla.
+  function header(back = '', menu = '', inGame = false, title = '', help = '') {
     // La tercera columna es una fila propia, no una sola celda: así aloja el interruptor
     // de sonido y, cuando lo hay, el botón de menú, sin que ninguno de los dos tenga que
     // adivinar el sitio del otro.
     return `<header class="topbar atlas-topbar${inGame ? ' atlas-game-topbar' : ''}">
       ${back ? `<button class="icon-btn atlas-back" ${back} aria-label="Volver a la pantalla anterior">${icon('back')}</button>` : '<span></span>'}
       ${inGame ? (title ? `<div class="topbar-title">${title}</div>` : '<span></span>') : '<div class="brand">Continuum</div>'}
-      <div class="atlas-topbar-actions"><i data-sound-slot></i>${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
+      <div class="atlas-topbar-actions"><i data-sound-slot></i>${help ? `<button class="icon-btn atlas-help" ${help} aria-label="Cómo se juega">${icon('guide')}</button>` : ''}${menu ? `<button class="icon-btn atlas-menu" ${menu} aria-label="Opciones de la partida" aria-haspopup="dialog">${icon('more')}</button>` : ''}</div>
     </header>`;
   }
   function nav(screen) {
@@ -451,6 +452,7 @@
   // Ajusta la mesa según el espacio visible real. Safari puede cambiar la altura al
   // plegar sus barras; las clases se recalculan sin tocar el zoom elegido ni el estado.
   let boardFitFrame = 0;
+  let heldHand = null;
   function fitBoard(container) {
     if (!board.has(container.dataset.screen) || window.innerWidth > 699) {
       delete container.dataset.boardFit;
@@ -474,8 +476,12 @@
         frame.style.height = `${line.offsetHeight * scale}px`;
       };
       const fits = () => { syncFrame(); return top + shell.scrollHeight <= available; };
-      container.classList.remove('board-card-expanded');
+      container.classList.remove('board-card-expanded', 'board-hand-expanded', 'board-hand-air', 'board-hand-hold');
+      container.style.removeProperty('--board-hand-hold');
       container.style.removeProperty('--optimal-timeline-width');
+      container.style.removeProperty('--optimal-hand-width');
+      container.style.removeProperty('--optimal-fan-card');
+      container.style.removeProperty('--board-hand-air');
       container.dataset.boardFit = 'normal';
       if (!fits()) container.dataset.boardFit = 'compact';
       if (!fits()) container.dataset.boardFit = 'tight';
@@ -515,11 +521,14 @@
       }
       if (!fits() && container.dataset.boardFit === 'normal') container.dataset.boardFit = 'compact';
       if (!fits() && container.dataset.boardFit === 'compact') container.dataset.boardFit = 'tight';
-      // Aprovecha el papel libre dentro de la línea. La carta crece de forma
-      // progresiva y se detiene antes de desplazar cualquier mando fuera de vista.
+      // Aprovecha el papel libre dentro de la línea. Primero crece tu carta (o el abanico
+      // de la mano) con la mitad del hueco, para que la mesa quede repartida entre la mano
+      // y la línea en vez de dejar papel vacío abajo; después, con lo que quede, crece la
+      // carta de la línea. Todo de forma progresiva y sin sacar ningún mando de la vista.
       if (!shrunk && fits() && window.innerWidth >= 375) {
         const section = shell.querySelector('.board-timeline-section');
         const card = section?.querySelector('.timeline .timeline-card');
+        if (card) growHand(container, shell, section, card, available, fits);
         if (card) {
           const gap = Math.min(section.getBoundingClientRect().bottom, available) - card.getBoundingClientRect().bottom;
           const base = card.getBoundingClientRect().width;
@@ -541,7 +550,62 @@
           }
         }
       }
+      // Al elegir hueco, tu carta pasa a la línea como vista previa: su sitio en la mano
+      // conserva el alto que tenía para que la línea no suba de golpe.
+      const handSection = shell.querySelector(':scope > :is(.atlas-hand-section, .board-focus-card)');
+      const previewing = !!handSection?.querySelector('.provisional-hand-note');
+      // Si ahora no cabe entero (aparece el botón de colocar), guarda todo el que quepa.
+      if (previewing && heldHand?.screen === container.dataset.screen) {
+        const now = handSection.getBoundingClientRect().height;
+        container.classList.add('board-hand-hold');
+        let held = false;
+        for (let height = heldHand.height; height > now + 8; height -= 8) {
+          container.style.setProperty('--board-hand-hold', `${height}px`);
+          if (fits()) { held = true; break; }
+        }
+        if (!held) { container.classList.remove('board-hand-hold'); container.style.removeProperty('--board-hand-hold'); }
+      }
+      // El papel que aún sobre bajo la línea pasa alrededor de la mano: la línea baja y las
+      // dos mitades de la mesa quedan equilibradas en vez de dejar un hueco abajo.
+      if (!shrunk && !previewing && fits()) {
+        const section = shell.querySelector('.board-timeline-section');
+        const card = section?.querySelector('.timeline .timeline-card');
+        const spare = card ? Math.floor(freeBelow(section, card, available) - 30) : 0;
+        if (spare >= 16) {
+          container.classList.add('board-hand-air');
+          container.style.setProperty('--board-hand-air', `${Math.floor(spare / 2)}px`);
+          if (!fits()) { container.classList.remove('board-hand-air'); container.style.removeProperty('--board-hand-air'); }
+        }
+      }
+      if (handSection && !previewing && handSection.querySelector('.hand-card')) heldHand = { screen: container.dataset.screen, height: Math.round(handSection.getBoundingClientRect().height) };
     });
+  }
+  // Papel libre bajo la carta de la línea, dentro de su recuadro y de la pantalla.
+  const freeBelow = (section, card, available) => Math.min(section.getBoundingClientRect().bottom, available) - card.getBoundingClientRect().bottom;
+  function growHand(container, shell, section, card, available, fits) {
+    const solo = shell.querySelector('.board-focus-card .hand-solo .hand-card');
+    const fan = shell.querySelector('.atlas-hand-section .hand.hand-fan .hand-card');
+    const target = solo || fan;
+    const share = (freeBelow(section, card, available) - 30) / 2;
+    if (!target || share < 12) return;
+    const base = target.getBoundingClientRect().width;
+    // `solo` es 3:4 y el abanico 2:3: cada píxel de ancho suma 4/3 o 3/2 de alto.
+    const ratio = solo ? 4 / 3 : 3 / 2;
+    // En el abanico, la carta más lejana del centro queda a 1,1 anchos, mide 0,72 y va
+    // girada: su borde tiene que seguir dentro de la pantalla.
+    // Tu carta no pasa de un cuarto del alto en pantallas bajas, ni de un tercio largo en las altas.
+    const tallest = available * (available <= 740 ? 0.25 : 0.32);
+    const limit = solo ? Math.min(window.innerWidth * 0.5, 210, tallest / ratio) : Math.min((window.innerWidth / 2 - 10) / 1.6, 150);
+    const wanted = Math.min(limit, base + Math.floor(share / ratio));
+    if (wanted < base + 6) return;
+    const property = solo ? '--optimal-hand-width' : '--optimal-fan-card';
+    container.classList.add('board-hand-expanded');
+    for (let width = wanted; width > base; width -= 4) {
+      container.style.setProperty(property, `${width}px`);
+      if (fits() && freeBelow(section, card, available) >= 30) return;
+    }
+    container.classList.remove('board-hand-expanded');
+    container.style.removeProperty(property);
   }
   window.addEventListener('resize', () => {
     fitBoard(document.getElementById('app'));

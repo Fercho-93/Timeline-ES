@@ -1,5 +1,6 @@
-// Tiempo por carta: la opción está en todas las pantallas de configuración (menos el reto
-// diario) y, cuando se agota el plazo, la jugada cuenta como fallo.
+// Tiempo por carta: la opción está en las pantallas de configuración (menos el reto diario
+// y el solitario, donde lo marca la dificultad) y, cuando se agota el plazo, la jugada
+// cuenta como fallo.
 import {gameHtml} from './game-fixture.mjs';
 import { JSDOM } from 'jsdom';
 import fs from 'node:fs';
@@ -33,13 +34,14 @@ console.log('\nLa opción está en cada configuración');
 {
   const w = boot();
   abreMazo(w);
-  ok('jugar solo · colecciones', JSON.stringify(opciones(w, 'solo')) === '[0,15,20,30]');
+  ok('jugar solo · colecciones: el tiempo va con la dificultad, sin opción aparte', opciones(w, 'solo').length === 0 && w.document.querySelectorAll('input[name="solo-difficulty"]').length === 4);
+  ok('cada tarjeta de dificultad dice su tiempo', /Sin tiempo/.test($(w, '.difficulty-card').textContent) && /15 s por carta/.test([...w.document.querySelectorAll('.difficulty-card')].at(-1).textContent));
   w.CONTINUUM.openDeckAs('local');
   ok('un solo móvil · colecciones', opciones(w, 'local').length === 4);
   w.CONTINUUM.openDeckAs('online');
   ok('cada uno en su móvil · colecciones (los tres ritmos)', opciones(w, 'amigos').length === 4 && $(w, 'input[data-tiempo="amigos"][value="15"]').checked);
   w.CONTINUUM.ModeHubs.open('hub-solo'); click(w, '[data-action="competition-menu"]');
-  ok('competición en solitario', opciones(w, 'comp-solo').length === 4);
+  ok('competición en solitario: también con la dificultad', opciones(w, 'comp-solo').length === 0 && w.document.querySelectorAll('input[name="competition-difficulty"]').length === 4);
   w.CONTINUUM.ModeHubs.open('hub-friends-local'); click(w, '[data-action="competition-menu"]');
   ok('competición en un solo móvil', opciones(w, 'local').length === 4);
   w.CONTINUUM.ModeHubs.open('hub-friends-online'); click(w, '[data-action="create-room-toggle"]'); click(w, '[data-action="competition-menu"]');
@@ -62,19 +64,18 @@ console.log('\nLa opción está en cada configuración');
 
 console.log('\nJugar solo: agotar el plazo cuesta una vida');
 {
-  const w = boot();
+  const w = boot({ 'continuum-difficulty-v1': 'normal' });
   abreMazo(w);
-  elige(w, 'solo', 15);
   click(w, '[data-action="start-free"]');
   ok('la partida enseña la cuenta atrás', !!$(w, '.reloj-bar'));
   const vidas = JSON.parse(w.localStorage.getItem('hilo-solo-history-v1')).lives;
-  w.adelanta(16000); await sleep(350);
+  w.adelanta(31000); await sleep(350);
   const partida = JSON.parse(w.localStorage.getItem('hilo-solo-history-v1'));
   ok('al agotarse, la carta cuenta como fallo y resta una vida', partida.lives === vidas - 1 && partida.played === 1);
   ok('y se dice que se acabó el tiempo', /Se acabó el tiempo/.test(w.document.body.textContent));
   w.close();
-  const sin = boot(); abreMazo(sin); elige(sin, 'solo', 0); click(sin, '[data-action="start-free"]');
-  ok('sin tiempo no hay cuenta atrás', !$(sin, '.reloj-bar'));
+  const sin = boot({ 'continuum-difficulty-v1': 'easy' }); abreMazo(sin); click(sin, '[data-action="start-free"]');
+  ok('en Fácil no hay cuenta atrás', !$(sin, '.reloj-bar'));
   sin.close();
 }
 

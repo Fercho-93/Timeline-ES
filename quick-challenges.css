@@ -13,7 +13,6 @@
 .quick-shell .setup-section .field{margin-bottom:14px}
 .quick-shell .setup-section textarea{width:100%;max-width:100%;font-size:16px;padding:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px}
 .quick-shell .solo-panel>.btn{margin:8px 0}
-.quick-secondary-actions{display:grid;gap:8px;margin:18px 0 6px}
 .quick-guide-modal section{padding:12px 0;border-top:1px solid var(--line,#b7a58b)}
 .quick-guide-modal section h3{margin:0 0 5px;color:var(--accent-dark,#7f4b32)}
 .quick-guide-modal section p{margin:0;line-height:1.55}
@@ -80,17 +79,11 @@
 @media(prefers-reduced-motion:reduce){.quick-splash{transition:none}}
 
 /* Botones sueltos de las pantallas de entrada de Retos rápidos (fuera de los paneles): pergamino. */
-:root:not([data-theme="dark"]) .quick-shell .setup-section > .btn-secondary,
-:root:not([data-theme="dark"]) .quick-shell .quick-secondary-actions .btn-secondary {
+:root:not([data-theme="dark"]) .quick-shell .setup-section > .btn-secondary {
   border: 1px solid #b9a98e;
   background: linear-gradient(155deg, rgba(250,246,235,.97), rgba(232,221,201,.96));
   color: #5b4936;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 4px rgba(54,41,26,.12);
-}
-:root:not([data-theme="dark"]) .quick-shell .quick-secondary-actions .btn-ghost {
-  border: 1px solid #cdb48d;
-  background: rgba(250,243,227,.82);
-  color: #5b4936;
 }
 .quick-shell .setup-section > .btn-secondary { margin-top: 10px; }
 

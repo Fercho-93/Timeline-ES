@@ -3,11 +3,13 @@
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
+  // Cada nivel lleva su propio tiempo por carta: así la mejor marca de un nivel se
+  // consigue siempre con el mismo reloj y se puede comparar.
   const LEVELS = {
-    easy: { name: "Fácil", extra: 0, description: "Valores visibles. Sin cartas automáticas." },
-    normal: { name: "Normal", extra: 1, description: "Valores visibles. Cada acierto añade una carta bien colocada: la línea se estrecha." },
-    hard: { name: "Difícil", extra: 2, description: "Cada acierto añade dos cartas bien colocadas y hay turnos Fantasma ocasionales." },
-    expert: { name: "Experto", extra: 2, description: "Cada acierto añade dos cartas bien colocadas. Valores siempre ocultos (la ilustración se ve)." }
+    easy: { name: "Fácil", extra: 0, seconds: 0, hidden: "never", description: "Valores visibles. Sin cartas automáticas. Sin tiempo." },
+    normal: { name: "Normal", extra: 1, seconds: 30, hidden: "never", description: "Valores visibles. Cada acierto añade una carta bien colocada: la línea se estrecha. 30 segundos por carta." },
+    hard: { name: "Difícil", extra: 2, seconds: 20, hidden: "sometimes", description: "Cada acierto añade dos cartas bien colocadas y hay turnos Fantasma ocasionales. 20 segundos por carta." },
+    expert: { name: "Experto", extra: 2, seconds: 15, hidden: "always", description: "Cada acierto añade dos cartas bien colocadas. Valores siempre ocultos (la ilustración se ve). 15 segundos por carta." }
   };
 
   // Siempre ceil(P/3) poderes, máximo 3. Cada posición elegible pesa
@@ -125,8 +127,18 @@
     return `<button class="ghost-power pulse-power" ${action} ${ready ? "" : "disabled"}><span aria-hidden="true">⚡</span><span><b>Carta Pulso</b><small>${hint}</small><small>No cuenta para ganar · un uso</small></span></button>`;
   }
   function level(key) { return LEVELS[key] || LEVELS.easy; }
-  function difficultySelect(id, selected = "easy") {
-    return `<div class="field difficulty-field"><label for="${id}">Dificultad</label><select id="${id}">${Object.entries(LEVELS).map(([key, info]) => `<option value="${key}" ${key === selected ? "selected" : ""}>${info.name}</option>`).join("")}</select><p class="hint" data-difficulty-help>${level(selected).description}</p></div>`;
+  // Las cuatro dificultades como tarjetas: en cada una, en lenguaje llano, el tiempo por
+  // carta, qué le pasa a la línea al acertar y si las cifras se ven.
+  function difficultyCards(name, selected = "easy") {
+    const linea = n => n ? `Cada acierto añade ${n} ${n === 1 ? "carta" : "cartas"} a la línea` : "La línea no se complica";
+    const cifras = { never: "Cifras a la vista", sometimes: "Cifras ocultas a veces", always: "Cifras siempre ocultas" };
+    return `<fieldset class="field difficulty-field difficulty-cards"><legend class="field-label">Dificultad</legend><div class="difficulty-grid">${Object.entries(LEVELS).map(([key, info]) => `<label class="difficulty-card${key === selected ? " is-on" : ""}">
+      <input type="radio" name="${name}" value="${key}"${key === selected ? " checked" : ""}>
+      <b>${info.name}</b>
+      <span><i aria-hidden="true">⏱</i>${info.seconds ? `${info.seconds} s por carta` : "Sin tiempo"}</span>
+      <span><i aria-hidden="true">＋</i>${linea(info.extra)}</span>
+      <span><i aria-hidden="true">${info.hidden === "never" ? "◉" : "◌"}</i>${cifras[info.hidden]}</span>
+    </label>`).join("")}</div></fieldset>`;
   }
   // Se sortea una carta Fantasma por bloque de cuatro turnos a partir del cuarto.
   // Hay al menos un turno normal entre efectos, sin temporizadores ni sorteos al
@@ -139,6 +151,6 @@
     }
     return schedule;
   }
-  CT.Ghost = { create, claim, owns, available, activate, advance, remove, hiddenCard, banner, power, level, difficultySelect, soloSchedule, LEVELS };
+  CT.Ghost = { create, claim, owns, available, activate, advance, remove, hiddenCard, banner, power, level, difficultyCards, soloSchedule, LEVELS };
   CT.Powers = { create: createPowers, claim: claimPowers, ownsPulse, consumePulse, pulsePower };
 })();

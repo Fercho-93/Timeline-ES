@@ -22,7 +22,7 @@
     // Desde la pantalla por la que se entró, la flecha sale de Retos rápidos a la pantalla
     // anterior del juego; desde cualquier otra, vuelve a esa pantalla de entrada.
     const back=playing ? 'data-quick="exit"' : page===entry ? 'data-action="ui-back"' : 'data-quick="formats"';
-    paint(`<div class="shell quick-shell">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '')}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
+    paint(`<div class="shell quick-shell">${CT.UI.header(back, state ? 'data-quick="menu"' : '', playing, state ? topTitle : '', state ? '' : 'data-quick="guide"')}${state ? content : `<div class="quick-content">${content}</div>`}</div>`, playing ? state ? true : 'lobby' : false);
     // En una sala, cada jugada ajena repinta la pantalla: la portada del mazo sigue encima hasta que se toque.
     if(splashLayer && !splashLayer.isConnected && !splashLayer.dataset.closed && state && splashLayer.dataset.game===(state.config.historyId||'sin-id') && splashLayer.dataset.index===String(state.index)) app().append(splashLayer);
     if(state && room && !myTurn()) for(const el of app().querySelectorAll('[data-quick="select"],[data-quick="slot"],[data-quick="confirm"],[data-quick="bank"],[data-quick="next"],[data-quick="ack"]')) el.disabled=true;
@@ -67,7 +67,8 @@
     const history = quickHistory(), games = history.length, points = history.reduce((n,item)=>n + (Number(item.score)||0),0), best = history.reduce((n,item)=>Math.max(n,Number(item.score)||0),0);
     const rows = history.slice(0, 12).map(item => `<li><strong>${esc(item.score)} aciertos</strong><span>${esc(item.date)} · ${esc(item.kind === 'daily' ? 'Reto diario' : item.kind === 'duel' ? 'Duelo de Retos rápidos' : `${item.rounds} ${item.rounds === 1 ? 'reto' : 'retos'}`)}</span></li>`).join('');
     const layer = document.createElement('div'); layer.className='overlay';
-    layer.innerHTML = `<div class="modal quick-stats-modal"><h2>Historial y estadísticas</h2><div class="quick-stats-grid"><span><b>${games}</b><small>partidas terminadas</small></span><span><b>${points}</b><small>aciertos acumulados</small></span><span><b>${best}</b><small>mejor resultado</small></span></div><h3>Últimas partidas</h3>${rows ? `<ol class="quick-history">${rows}</ol>` : '<p class="hint">Todavía no hay partidas terminadas. Tu historial aparecerá aquí.</p>'}<button class="btn btn-primary btn-block" data-quick="close-menu">Cerrar</button></div>`;
+    layer.innerHTML = `<div class="modal quick-stats-modal"><h2>Historial de Retos rápidos</h2><div class="quick-stats-grid"><span><b>${games}</b><small>partidas terminadas</small></span><span><b>${points}</b><small>aciertos acumulados</small></span><span><b>${best}</b><small>mejor resultado</small></span></div><h3>Últimas partidas</h3>${rows ? `<ol class="quick-history">${rows}</ol>` : '<p class="hint">Todavía no hay partidas terminadas. Tu historial aparecerá aquí.</p>'}<button type="button" class="btn btn-primary btn-block" data-close-stats>Cerrar</button></div>`;
+    layer.querySelector('[data-close-stats]').addEventListener('click',()=>CT.closeDialog());
     app().append(layer); CT.openDialog(layer,true);
   }
   function guide() {
@@ -136,7 +137,7 @@
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
     const total=CT.QuickCatalog.challenges.length;
     const options=LONG_LENGTHS.filter(([n])=>n<total);
-    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}${button('start-free','Empezar <span>→</span>','btn btn-primary btn-block')}${load() ? button('resume','Continuar partida guardada','btn btn-secondary btn-block') : ''}<div class="quick-secondary-actions">${button('guide','Guía de Retos rápidos','btn btn-secondary btn-block')}${button('stats','Historial y estadísticas','btn btn-ghost btn-block')}</div><p id="quick-error" role="alert">${esc(error)}</p></section>`);
+    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}${button('start-free','Empezar <span>→</span>','btn btn-primary btn-block')}${load() ? button('resume','Continuar partida guardada','btn btn-secondary btn-block') : ''}<p id="quick-error" role="alert">${esc(error)}</p></section>`);
   }
   // El duelo de Retos rápidos por enlace: juegas tú, mandas el enlace y tu amigo juega los mismos mazos.
   // Los mazos salen de una semilla y las jugadas viajan abreviadas, así que el enlace es corto aunque la
@@ -953,7 +954,6 @@
     if (action === 'menu') {menu(); return;}
     if (action === 'close-menu') {CT.closeDialog(); return;}
     if (action === 'guide') {guide(); return;}
-    if (action === 'stats') {statsPanel(); return;}
     if (action === 'rematch') {entry='duel-setup'; duelSetup(); return;}
     if (action === 'ready') { if (pendingConfig) begin(pendingConfig); return; }
     if (action === 'more-lengths') {
@@ -1036,6 +1036,8 @@
   CT.Quick = {
     leave:stopNetwork,
     openPublic,
+    // El historial de Retos rápidos vive en el Atlas, junto al resto de estadísticas.
+    stats:statsPanel,
     openSolo(renderPage){paint=renderPage;backTo=null;entry='free-setup';format='free';freeSetup();},
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},

@@ -2,7 +2,8 @@
 (function () {
   "use strict";
   // Tiempo por jugada: la misma opción en todas las formas de jugar (menos el reto diario,
-  // que es igual para todo el mundo). «Sin tiempo» o un plazo de 15, 20 o 30 segundos para
+  // que es igual para todo el mundo, y el solitario de colecciones, donde lo marca la
+  // dificultad: ver `CT.Ghost.LEVELS`). «Sin tiempo» o un plazo de 15, 20 o 30 segundos para
   // cada carta o turno. Cada pantalla recuerda lo último que se eligió en ella.
   const CT = window.CONTINUUM;
   const OPCIONES = [0, 15, 20, 30];
