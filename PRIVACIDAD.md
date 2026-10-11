@@ -119,3 +119,5 @@ Si cambia algo importante, se actualizará esta página y su fecha. Mientras dur
 Las ilustraciones de las cartas, portadas, icono, logo, splash y demás recursos visuales de Continuum fueron generados con ChatGPT/OpenAI, según declaración del titular del proyecto. El juego no presenta estas imágenes como dibujadas manualmente ni como recursos descargados de terceros. La procedencia y las huellas de los archivos se documentan en [PROCEDENCIA_ARTE_IA.md](PROCEDENCIA_ARTE_IA.md). La generación con IA no elimina la necesidad de revisar marcas, personajes, textos, datos o elementos de terceros que pudieran aparecer representados. Esta información no sustituye asesoramiento jurídico ni las condiciones aplicables del servicio utilizado.
 
 [Información de privacidad de Firebase](https://firebase.google.com/support/privacy)
+
+[Licencias de terceros](licencias.html)

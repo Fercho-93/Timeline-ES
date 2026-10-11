@@ -22,8 +22,8 @@ jobs:
     name: Probar y publicar
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -31,9 +31,10 @@ jobs:
       - name: Probar los plazos de conservación y la sintaxis
         run: |
           node tests/retencion.mjs
+          node tests/duelo-policy.cjs
           node --check functions/index.js
       - name: Instalar las dependencias de las Functions
-        run: npm install --prefix functions --no-audit --no-fund
+        run: npm ci --prefix functions --no-audit --no-fund
       - name: Escribir la credencial
         env:
           CUENTA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

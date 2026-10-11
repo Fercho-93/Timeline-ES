@@ -1,23 +1,14 @@
-name: Zoom visual móvil
+name: Pruebas en navegador
+# Pruebas que necesitan un navegador de verdad (Playwright con WebKit y Chromium): encaje del
+# tablero en pantallas pequeñas, zoom, transiciones, duelos y navegación, y la partida online de
+# extremo a extremo contra los emuladores de Firebase. También se lanza a mano desde Actions.
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'mapa.js'
-      - 'drag.js'
-      - 'a11y.js'
-      - 'app.js'
-      - 'online.js'
-      - 'immersion.js'
-      - 'effects.js'
-      - '*.css'
-      - 'tests/zoom-browser.mjs'
-      - 'tests/board-fit-browser.mjs'
-      - 'tests/online-e2e.mjs'
-      - 'tests/transitions-browser.mjs'
-      - '.github/workflows/zoom-visual.yml'
+    paths: ['*.js', '*.css', '*.html', 'tests/**', '.github/workflows/zoom-visual.yml']
   pull_request:
-    paths: ['mapa.js', '*.css', 'tests/zoom-browser.mjs', '.github/workflows/zoom-visual.yml']
+    paths: ['*.js', '*.css', '*.html', 'tests/**', '.github/workflows/zoom-visual.yml']
 permissions:
   contents: read
 jobs:
@@ -25,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - run: |
@@ -38,7 +29,12 @@ jobs:
       - run: node tests/turn-duel-layout-browser.mjs
       - run: node tests/zoom-browser.mjs
       - run: node tests/transitions-browser.mjs
-      - uses: actions/upload-artifact@v4
+      - run: node tests/duelo-layout.mjs
+      - run: node tests/duelos-amigos-browser.mjs
+      - run: node tests/navegacion-volver-browser.mjs
+      - run: node tests/quick-challenges-browser.mjs
+      - run: node tests/quick-formats-browser.mjs
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: zoom-mobile-measurements
@@ -50,11 +46,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -67,7 +63,7 @@ jobs:
         env:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/online-browser/node_modules/playwright/index.mjs
           SHOTS: test-results/online
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: online-mobile-measurements
