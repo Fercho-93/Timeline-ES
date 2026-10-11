@@ -7,10 +7,10 @@
 // ese decimal y no finge una precisión mayor. Es una compilación secundaria y su corte es
 // de 2022, no de hoy.
 //
-// Las ocho lenguas por debajo de los seis millones —del danés al feroés— no salen de esa
+// Las once lenguas por debajo de los seis millones —del danés al aragonés— no salen de esa
 // lista, que se corta en los 24 millones, sino de cifras aproximadas aportadas aparte. Son
 // las que dan cola a la línea, pero no comparten corte temporal con el resto: es una
-// mezcla de fuentes asumida a conciencia y explicada en VERIFICACION_IDIOMAS.md.
+// mezcla de fuentes asumida a conciencia (el README del proyecto lo explica también).
 //
 // Del chino y del árabe se conservan solo las variedades principales —mandarín y cantonés;
 // árabe egipcio—. Las demás que publica la fuente por separado (min nan, hakka, jin,

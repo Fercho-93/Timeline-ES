@@ -17,7 +17,9 @@ if(process.argv.includes('--write')) {
   const byPath=new Map(previous.map(asset=>[asset.path,asset]));
   async function walk(dir) {const result=[];for(const e of await fs.readdir(dir,{withFileTypes:true})){const file=dir+'/'+e.name;if(e.isDirectory())result.push(...await walk(file));else if(/\.(png|webp|jpg|svg)$/i.test(file)){
     const sha256=createHash('sha256').update(await fs.readFile(file)).digest('hex'),old=byPath.get(file);
-    result.push(old?.sha256===sha256?old:{path:file,sha256,rightsEvidence:null,...(old?{previousEvidence:old,reviewRequired:true}:{})});
+    // Una imagen que cambia pierde la evidencia de derechos de la anterior y se marca para revisar;
+    // si la anterior no tenía evidencia, no hay nada que revisar.
+    result.push(old?.sha256===sha256?old:{path:file,sha256,rightsEvidence:null,...(old?.rightsEvidence?{previousEvidence:old,reviewRequired:true}:{})});
   }}return result;}
   await fs.writeFile('docs/inventario-arte.json',JSON.stringify({note:'Completar derechos y procedencia con evidencia del titular. No se presupone que una imagen pública pueda reutilizarse.',assets:await walk('assets')},null,2)+'\n');
 }

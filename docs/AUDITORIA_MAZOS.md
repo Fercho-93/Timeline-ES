@@ -2,6 +2,13 @@
 
 Este registro indica qué cartas se han contrastado de forma individual. Una prueba automática de estructura o una URL guardada en una carta no equivalen por sí solas a verificar sus afirmaciones. Continuar por el siguiente mazo o por la siguiente carta pendiente, y no volver a marcar como revisadas las ya cerradas salvo que cambie su contenido o su fuente.
 
+> **Nota del 11 de octubre de 2026.** Esta tabla es del cierre del 30 de septiembre y del 4 de
+> octubre. El 5 de octubre se ampliaron trece retos con 130 cartas nuevas (diez por reto), cada
+> una con fuente individual: ver `revision-siete-retos-ampliacion-2026-10-05.md` y
+> `revision-seis-retos-ampliacion-2026-10-05.md`. Los recuentos «cerrado» de abajo se refieren a
+> las cartas que había entonces; el catálogo actual tiene 567 cartas en 29 retos y las Grandes
+> colecciones, 1.272.
+
 ## Retos rápidos
 
 | Mazo | Estado | Resultado |

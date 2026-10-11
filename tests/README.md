@@ -6,155 +6,182 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm ci
 
-# Juego, guardado, mazos, service worker, accesibilidad y build: veinticinco suites y presupuesto de recursos.
+# Juego, guardado, mazos, cuentas, service worker, accesibilidad, build y servidor experimental:
+# 82 órdenes (80 suites, la comprobación de recursos y la auditoría de contenido).
 npm test
 
-# Reglas de Firestore y entrada en sala, contra el emulador oficial (necesita Java).
+# Reglas de Firestore contra el emulador oficial (necesita Java): 15 suites.
 npm run test:reglas
 
-# Todas las suites, incluidas las siete del emulador.
+# Las dos cosas.
 npm run test:todo
+
+# «Jugar online» de extremo a extremo, en Chromium contra los emuladores de Auth y Firestore.
+npm run test:online-e2e
 ```
 
-Las mismas comprobaciones se ejecutan solas en cada propuesta de cambio y en cada subida a
-`main` (`.github/workflows/pruebas.yml`), sobre un clon limpio. El resultado aparece como un
-tick verde o una cruz roja en la propia propuesta, antes de fusionar.
+Las cuentas son de octubre de 2026; la lista exacta está en `package.json`.
 
-Cada suite se puede lanzar por separado con `node tests/<archivo>.mjs`:
+Dónde se ejecutan solas:
 
-| Archivo | Qué comprueba |
-| --- | --- |
-| `sintaxis.mjs` | Que todos los archivos del juego parsean. Es la única red que cubre `online.js`. Sin dependencias. |
-| `marca.mjs` | Nombre Continuum en metadatos, acceso directo de iOS, manifiesto y pantallas locales. Distingue marca de identificadores técnicos. |
-| `imagenes-unicas.mjs` | Que ninguna ilustración de carta repita exactamente los píxeles de otra carta. |
-| `referencias-idiomas.mjs` | Que las 50 cartas de idiomas tienen una lámina WebP propia, vertical, ligera y correctamente enlazada. |
-| `partida-local.mjs` | Partida completa del modo de un solo móvil sobre un DOM simulado. |
-| `partidas-al-azar.mjs` | 4 partidas reproducibles en mazos representativos: bloqueos, conteo de cartas y orden de la línea. |
-| `service-worker.mjs` | Qué versión de la aplicación acaba viendo el móvil, y que ni un guion de `index.html` ni una carátula se queden sin precargar. Sin dependencias. |
-| `actualizar.mjs` | La página que se manda a quien tiene la app atascada en una versión vieja: descarta el service worker y su caché, pero no borra el perfil ni las partidas guardadas. Sin dependencias. |
-| `diagnostico.mjs` | Un error sin capturar enseña un aviso con la versión, la pantalla y el mazo abiertos en vez de dejar la pantalla en blanco, no se duplica con varios errores seguidos y no confunde un ruido conocido del navegador con un fallo. El mismo informe alimenta el botón de comentarios de Ajustes. |
-| `mazos.mjs` | Calidad de todos los mazos: repeticiones, huecos, años únicos, espaciado cuando corresponde y cifras que el redondeo no confunda. Sin dependencias. |
-| `solitario.mjs` | Solitario, reto diario, confirmación al colocar, modalidad de países, el mapa de la línea y la llegada animada de las cartas automáticas. |
-| `pulso.mjs` | El Pulso: cuándo se ofrece, qué pasa al acertar y al fallar, el escudo de ronda y que las cartas ni se creen ni se pierdan al cambiar de mano. |
-| `accesibilidad.mjs` | Que el foco no se pierda al repintar, que las capas sean diálogos, que lo invisible se anuncie, y el contraste de las bandas y de los temas Claro y Oscuro. |
-| `movimiento.mjs` | Navegación repetida, galería persistente, selección de cartas, cierres interrumpidos, arrastre, deslizar para volver y movimiento reducido. |
-| `enciclopedia.mjs` | Filtrado y búsqueda de `CT.Enciclopedia`, la pantalla que consulta cualquier mazo fuera de partida y su enlace desde el repaso de fin de partida. Comprueba también que no aparece dentro de ninguna partida, que las láminas se sellan hasta jugar la carta sin velar nunca el texto, y el filtro de bloqueadas y desbloqueadas. |
-| `reglas-firestore.mjs` | Quién puede escribir en una sala y qué puede escribir. Necesita el emulador. |
-| `compatibilidad-version-anterior.mjs` | Que las reglas nuevas aceptan las salas de la versión anterior. Necesita el emulador. |
-| `entrada-por-enlace.mjs` | La secuencia del SDK al entrar por una invitación. Necesita el emulador. |
+- `.github/workflows/pruebas.yml`, en cada propuesta de cambio y cada subida a `main`, sobre un
+  clon limpio: `npm test`, `npm run test:reglas`, el build móvil con `npx cap sync` y la
+  compilación de Android y de iPhone sin firma.
+- `.github/workflows/reglas-firestore.yml`: `npm run test:reglas` antes de publicar las reglas.
+- `.github/workflows/zoom-visual.yml`: las pruebas de navegador con Playwright (Chromium y
+  WebKit) cuando cambian los archivos de interfaz.
+- `.github/workflows/functions.yml`: `retencion.mjs` y `duelo-policy.cjs` antes de publicar las
+  Cloud Functions.
 
-`reglas-firestore.mjs` cubre quién puede escribir en una sala y qué puede escribir:
-entrar, empezar, colocar carta, cerrar turno, saltar turno, expulsar, marcharse y una
-docena de intentos de trampa (vaciarse la mano, repartirse cartas, declararse ganador
-con cartas, expulsar al anfitrión). Si alguna denegación se explica por el límite de
-1000 expresiones de Firestore en vez de por la propia regla, el emulador lo imprime:
-esa señal no debe aparecer.
+Cada suite se puede lanzar por separado con `node tests/<archivo>`. Las de navegador necesitan
+Playwright y aceptan `PLAYWRIGHT_MODULE`, `CHROME_PATH` y `ENGINES=chromium` (para no exigir
+WebKit).
 
-`compatibilidad-version-anterior.mjs` comprueba que las reglas nuevas siguen aceptando las
-salas y las escrituras de la versión anterior de la aplicación, que no conocía el campo
-`winners`. Así se pueden publicar las reglas sin esperar a que todos los móviles hayan
-recargado la aplicación.
+## Qué comprueba cada archivo
 
-`entrada-por-enlace.mjs` fija el comportamiento del SDK del que depende `connectToRoom()`:
-al entrar por una invitación, la primera instantánea de `onSnapshot` llega de la caché y
-todavía no incluye a quien acaba de entrar. Comprueba el SDK y la condición, no el propio
-`online.js`, que no se puede importar desde Node porque carga Firebase desde gstatic.
+Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (emulador);
+**navegador** = Playwright, en `zoom-visual.yml` o a mano.
 
-`accesibilidad.mjs` juega con teclado sobre el DOM simulado: comprueba que tras cada
-repintado el foco vuelve donde debe, que las capas se anuncian como diálogos y devuelven
-el foco al cerrarse, que elegir carta y hueco pasa por la región viva, y que el texto de
-las bandas de época llega a 4,5:1 de contraste; eso último es puro dato, no necesita
-navegador y avisa en cuanto alguien añade una banda demasiado clara. Claro y Oscuro pasan
-por ese mismo cálculo en sus seis pares con texto, y Oscuro tiene que declarar todas las
-superficies de la mesa, no solo el papel. `edicion.mjs` comprueba el resto del ajuste: que
-solo se ofrecen ambos temas, que lo elegido llega al elemento raíz, a las dos etiquetas
-de color del navegador y al almacenamiento, y que las preferencias antiguas migran a su
-equivalente sin perder los demás ajustes.
-También recorre las seis colecciones comprobando que en la mano no aparece ninguna lámina
-—ni ninguna imagen— sino el reverso de la colección, que cada una tiene su propio emblema
-y que la lámina se sigue montando para la carta ya colocada y para la enciclopedia.
+| Archivo | Dónde | Qué comprueba |
+| --- | --- | --- |
+| `accesibilidad.mjs` | test | Foco tras repintar, capas como diálogos, región viva, contraste de bandas y de los temas Claro y Oscuro. |
+| `actualizar.mjs` | test | La página «Actualizar Continuum» descarta el service worker y su caché sin borrar el perfil ni las partidas. |
+| `apple-auth-rules.mjs` | reglas | Una cuenta de Apple se trata como un invitado y `appleBetaTesters` está cerrada. |
+| `apple-auth.mjs` | test | Iniciar sesión con Apple: vinculación, reentrada, cierre de sesión y borrado con revocación. |
+| `arte-catalogo.mjs` | test | Cada mazo de la página real tiene sus ilustraciones, sin mazos repetidos ni identificadores duplicados. |
+| `atlas-aciertos.mjs` | test | Solo los aciertos propios desbloquean láminas del Atlas, también desde Gran mezcla y duelos. |
+| `avatar-propio.mjs` | test | El avatar elegido en el Atlas es el que aparece en las partidas. |
+| `avatares-duelos.mjs` | test | Un mismo UID conserva su avatar entre partidas, tamaños y cambios de alias. |
+| `board-fit-browser.mjs` | navegador | La mesa cabe al 100 % en móviles de distintos tamaños en todos los formatos. |
+| `build-movil.mjs` | test | `npm run build` deja un `dist/` completo y sincronizado con `capacitor.config.json`. |
+| `camera-permissions.mjs` | test | Las declaraciones de cámara de iOS y Android que necesita leer un QR. |
+| `card-text.mjs` | test | El texto de las cartas se ajusta sin partir palabras y recupera su tamaño. |
+| `cartera.mjs` | test | La cartera: un mazo cerrado a mano se respeta en todos los rincones del juego. |
+| `cifras.mjs` | test | Duelo de cifras: puntos por cercanía y rapidez, carga útil recalculada y reloj que no se para. |
+| `cliente-competicion.mjs` | test | El cliente HTTP del servidor experimental exige HTTPS, añade tokens y traduce errores. |
+| `compartir-local.mjs` | test | La señal de la sala Wi-Fi viaja por «compartir» del sistema o por el portapapeles. |
+| `compatibilidad-version-anterior.mjs` | reglas | Las reglas nuevas aceptan las salas y escrituras de la versión anterior de la app. |
+| `competicion-servidor.mjs` | test | Servidor experimental: partidas completas de 2 a 9, Pulso privado y manipulaciones rechazadas. |
+| `competicion-turnos.mjs` | test | Competición de varios temas dentro de un duelo por turnos. |
+| `competicion-wifi.mjs` | test | Competición por rondas en la sala Wi-Fi, con las mismas reglas que la sala online. |
+| `conexion-nativa.mjs` | test | Entrada en salas desde enlaces nativos y antiguos, y fallos de red o del servidor. |
+| `confirmacion-extremos.mjs` | test | El botón de confirmar se ve y recibe el foco en los dos extremos de la línea. |
+| `cuentas-reglas.mjs` | reglas | Invitados, aislamiento, nombres, revisiones, privacidad del ranking y borrado. |
+| `cuentas.mjs` | test | Alta automática, reentrada, fallo de red, cambio de nombre, ranking, aislamiento y conflictos. |
+| `diagnostico.mjs` | test | Un error sin capturar enseña un aviso con versión, pantalla y mazo en vez de una pantalla en blanco. |
+| `duelo-layout.mjs` | navegador | Maquetación de los duelos por turnos en móvil y escritorio, sin desbordamiento. |
+| `duelo-policy.cjs` | test (y `functions.yml`) | Recordatorios a las 48 h, uno por turno, caducidad a los 7 días y textos de los avisos. |
+| `duelo-state.mjs` | test | Duelo por turnos sin pantalla de listo: envío pendiente, reintento e idempotencia. |
+| `duelo-turnos-reglas.mjs` | reglas | Reglas de los duelos por turnos: cuota, tiempo por carta, turnos, bloqueo y archivo. |
+| `duelo.mjs` | test | Duelo por enlace: mismas cartas en dos móviles, carga útil y enlaces manipulados o de otra versión. |
+| `duelos-amigos-browser.mjs` | navegador | La lista de duelos a 360 y 393 px, sin desbordamiento ni texto cortado. |
+| `duelos-amigos-regresion.mjs` | test | Compatibilidad de los duelos de Retos rápidos con la huella del catálogo. |
+| `edicion.mjs` | test | Temas Claro y Oscuro, migración de preferencias antiguas y la portada animada. |
+| `efectos.mjs` | test | Sonidos, vibración y efectos opcionales, fallos de audio y foco al ampliar. |
+| `enciclopedia.mjs` | test | Búsqueda y filtros de la enciclopedia, láminas selladas hasta jugar la carta y que no aparezca en partida. |
+| `entrada-multijugador.mjs` | test | La entrada a una sala prioriza unirse con invitación y los avisos son coherentes. |
+| `entrada-por-enlace.mjs` | reglas | La primera instantánea al entrar por enlace llega de la caché y no se confunde con una expulsión. |
+| `entry-board-browser.mjs` | navegador | Recorre las puertas del inicio hasta la mesa jugable o la sala de espera. |
+| `estabilizacion.mjs` | test | Competición guardada, versiones de guardado, almacenamiento lleno y actualizaciones en partida. |
+| `fantasma-online.mjs` | reglas | `online.js` real con dos clientes: Fantasma y Pulso contra las reglas, y escrituras tramposas rechazadas. |
+| `fantasma.mjs` | test | 90.000 repartos deterministas del Fantasma, su uso, duración y dificultades del solitario. |
+| `final-helper.mjs` | (auxiliar) | Ayuda compartida para terminar una final numérica local en otras pruebas. |
+| `final-reglas.mjs` | reglas | Final privada: respuestas secretas, recibos atómicos, inmutabilidad y nueve finalistas. |
+| `final.mjs` | test | La cifra correcta de la final se comprueba contra la carta. |
+| `game-fixture.mjs` | (auxiliar) | Prepara `index.html` para arrancar las pruebas después del acceso y la bienvenida. |
+| `identidad-fixture.js` | (auxiliar) | Identidad de prueba ya elegida para las suites que no prueban la bienvenida. |
+| `identidad.mjs` | test | La bienvenida: el avatar del invitado y el nombre editable sin perderlo. |
+| `imagenes-retos-rapidos.mjs` | test | Cada carta de Retos rápidos usa una ilustración propia que existe y coincide con su posición. |
+| `imagenes-unicas.mjs` | test | Ninguna ilustración de carta repite exactamente los píxeles de otra. |
+| `integridad-reglas.mjs` | reglas | Conservación de cartas, victoria, salidas, desempates y cuota de altas en las salas. |
+| `interfaz-atlas.mjs` | test | Barra inferior, Atlas y títulos legibles. |
+| `invitaciones-app.mjs` | test | «Unirme» acepta el enlace entero, su parte final o el código suelto. |
+| `jugadores-recientes.mjs` | test | Un solo móvil recuerda los nombres de los jugadores recientes. |
+| `marca.mjs` | test | Nombre Continuum en la web, iOS, manifiesto, paquete, documentación y pantallas, sin la marca antigua. |
+| `mazos.mjs` | test | Integridad de todos los mazos: repeticiones, huecos, espaciado y cifras que el redondeo no confunda. |
+| `motor-enlaces.mjs` | test | Los enlaces del dominio propio y de GitHub se aceptan, con y sin `www`; otras rutas no. |
+| `motor-invariantes.mjs` | test | Motor puro: inmutabilidad, conservación de cartas, Pulso e índices inválidos. |
+| `movimiento.mjs` | test | Navegación, arrastre con el dedo, deslizar para volver, foco y movimiento reducido. |
+| `multijugador-cercano.mjs` | test | Salas cercanas entre iPhones con un sistema simulado, incluido el código de 4 cifras. |
+| `multijugador-local.mjs` | test | La sala Wi-Fi sobre el DOM real: crear, vestíbulo y partida entera con transporte simulado. |
+| `musica-ambiente.mjs` | test | Música: seis pistas barajadas, fundidos, pausa, desbloqueo por gesto y segundo plano. |
+| `navegacion-volver-browser.mjs` | navegador | En cada pantalla se ve la flecha de volver y lleva a la anterior. |
+| `navegacion-volver.mjs` | test | La flecha de volver lleva a la pantalla inmediatamente anterior, también en Retos rápidos. |
+| `online-e2e-harness.mjs` | (auxiliar) | Arnés de `online-e2e.mjs`: la app real en Chromium contra los emuladores. |
+| `online-e2e.mjs` | `test:online-e2e` | «Jugar online» con varias personas a la vez: mesas, sala de espera, salida y relevo. |
+| `orden-salida-online.mjs` | reglas | Minijuego de quién empieza y relevo del anfitrión en mesas públicas, con `online.js` real. |
+| `partida-local.mjs` | test | Partidas completas de un solo móvil sobre el DOM real. |
+| `partidas-al-azar.mjs` | test | Partidas reproducibles en cuatro mazos: sin bloqueos y sin cartas creadas ni perdidas. |
+| `presencia-reglas.mjs` | reglas | Presencia privada, reloj del servidor y relevo tras inactividad. |
+| `preview.html` | (`npm run dev`) | Página para revisar la interfaz a 360, 390, 430, 768 y 1080 px. |
+| `progreso.mjs` | test | Estadísticas, logros y la pantalla del perfil con almacenamiento vacío, dañado o antiguo. |
+| `public-matchmaking-rules.mjs` | reglas | Colas y mesas públicas: carreras, capacidad, versiones y cuota. |
+| `public-matchmaking.mjs` | test | Claves de cola, capacidad de 2 a 4 y compatibilidad de mesas. |
+| `pulso.mjs` | test | El Pulso: cuándo se ofrece, aciertos y fallos, escudo de ronda y cartas que no se pierden. |
+| `qr-local.mjs` | test | El QR de invitación se genera y se decodifica de verdad con `jsQR`. |
+| `quick-challenges-browser.mjs` | navegador | Retos rápidos en un solo móvil, en Chromium. |
+| `quick-challenges.mjs` | test | Catálogo de Retos rápidos: curiosidades, fuentes trazables y motor. |
+| `quick-duelo.mjs` | test | Duelo de Retos rápidos por enlace con los mismos mazos. |
+| `quick-formats-browser.mjs` | navegador | Formatos de Retos rápidos con varios móviles, cada uno con su nombre. |
+| `quick-online-rules.mjs` | reglas | Salas de Retos rápidos: cuota, comandos firmados, turnos y salida. |
+| `quick-permissions.mjs` | test | Aviso de permisos en español y conservación de la jugada pendiente. |
+| `quick-room.mjs` | test | Sala de Retos rápidos: capacidad, identidad, turnos, revisiones y quién empieza. |
+| `ranking-inicio.mjs` | test | El marcador del inicio y lo que suma cada reto diario al ranking. |
+| `recarga.mjs` | test | Una vista guardada por una versión anterior se abre en la pantalla correcta. |
+| `referencias-animales.mjs` | test | Empates reales y cifras próximas de los mazos de animales sobre el DOM. |
+| `referencias-idiomas.mjs` | test | Las 50 cartas de idiomas tienen su lámina WebP vertical, ligera y bien enlazada. |
+| `referencias-paises.mjs` | test | Huellas de las láminas de países revisadas a mano. |
+| `referencias-poblacion.mjs` | test | Referencias y láminas del mazo de población. |
+| `reglas-firestore.mjs` | reglas | Quién puede escribir en una sala y qué: entrar, empezar, colocar, saltar, expulsar y trampas. |
+| `result-preview.mjs` | test | La pantalla de resultado: acierto, corrección del fallo, foco y movimiento reducido. |
+| `retencion.mjs` | test | Los plazos de `functions/retention.js` coinciden con la política, y `PRIVACIDAD.md` y `privacidad.html` tienen las mismas secciones. |
+| `revancha-local.mjs` | test | La revancha en un solo móvil recupera la mesa anterior. |
+| `reverso-mano.mjs` | test | La mano enseña el reverso de la colección en todos los modos. |
+| `ritmo.mjs` | test | Los poderes se eligen con sus interruptores en la configuración. |
+| `sala-local.mjs` | test | El reductor puro de la sala Wi-Fi: una partida entera en Node. |
+| `service-worker.mjs` | test | Qué versión ve el móvil: caché por versión, refresco y precarga de todo lo que pide `index.html`. |
+| `servidor-http.mjs` | test | Servidor experimental: identidad, App Check obligatorio, origen y límites del cuerpo. |
+| `servidor-reglas.mjs` | reglas | Reglas del servidor experimental (proyecto de emulador aparte): privacidad, carreras y cuotas. |
+| `sesion-local.mjs` | test | La sesión que une sala y transporte Wi-Fi, sin WebRTC real. |
+| `sintaxis.mjs` | test | Que todos los archivos del juego parsean; la única red que cubre `online.js`. |
+| `solitario.mjs` | test | Solitario, reto diario, confirmación al colocar y llegada animada de las cartas automáticas. |
+| `sorteo-online-reglas.mjs` | reglas | El sorteo de quién empieza en las salas online contra las reglas. |
+| `tiempo.mjs` | test | Tiempo por carta (sin tiempo, 15, 20 o 30 s) en todas las configuraciones; al agotarse, fallo. |
+| `tournament.mjs` | test | Competición por rondas desde un solo móvil y sus ajustes. |
+| `transitions-browser.mjs` | navegador | Transiciones en Chromium móvil, con y sin movimiento reducido. |
+| `transporte-local.mjs` | test | Señal WebRTC compacta para el QR y mensajes del canal. |
+| `turn-duel-layout-browser.mjs` | navegador | Maquetación de un turno activo de duelo. |
+| `valores-repetidos.mjs` | test | Un reparto no lleva dos cartas con el mismo valor, y con semilla es reproducible. |
+| `wow.mjs` | test | Pantalla final del Atlas: abanico, logros nuevos y movimiento reducido. |
+| `zoom-browser.mjs` | navegador | El zoom de la mesa en un navegador real: las imágenes no se encogen. |
+| `zoom.mjs` | test | Zoom simulado: escala, desplazamiento, límites y conservación del DOM. |
 
-`service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado.
-Comprueba lo que decide qué versión ve cada móvil: se responde con la copia guardada,
-pero se pide la del servidor por detrás, así que un archivo nuevo llega en el siguiente
-arranque aunque se olvide subir el número de la caché.
-La instalación fuerza una descarga actual y el refresco revalida la caché HTTP. Así no
-se puede etiquetar como nueva una copia antigua todavía vigente en la caché del navegador.
+Además, `npm test` ejecuta `scripts/check-assets.mjs` (dimensiones, decodificación y presupuesto
+de peso de las imágenes) y `scripts/audit-content.mjs` (inventario de fuentes; ver
+`CONTENIDO_Y_DERECHOS.md`).
 
-## Referencias animales
+## Notas sobre algunas suites
 
-`node tests/referencias-animales.mjs` juega casos con empates y cifras próximas en el DOM
-real: comprueba ambos lados de un empate, el orden de 70 y 70,35 km/h, la precisión de las
-masas y que los datos pendientes se avisan en el título y la explicación. No valida hechos
-zoológicos: las fuentes y los límites están en `VERIFICACION_CORRECCIONES.md`.
+`reglas-firestore.mjs` cubre entrar, empezar, colocar carta, cerrar turno, saltar turno,
+expulsar, marcharse y una docena de intentos de trampa (vaciarse la mano, repartirse cartas,
+declararse ganador con cartas, expulsar al anfitrión). Si alguna denegación se debe al límite de
+1000 expresiones de Firestore en vez de a la propia regla, el emulador lo imprime: esa señal no
+debe aparecer. Ninguna prueba de reglas toca Firebase de producción.
 
-## Movimiento e interacción
+`entrada-por-enlace.mjs` fija el comportamiento del SDK del que depende `connectToRoom()`: al
+entrar por una invitación, la primera instantánea de `onSnapshot` llega de la caché y todavía no
+incluye a quien acaba de entrar. Comprueba el SDK y la condición, no `online.js`, que no se puede
+importar desde Node porque carga Firebase desde gstatic.
 
-`node tests/movimiento.mjs` recorre tres veces todos los bloques y mazos, seis veces la
-navegación y los diálogos, y ocho veces la elección y cancelación de huecos. Simula
-deslizamiento, pulsación mantenida, arrastre, suelta entre frames y cancelación del sistema.
-Fija las dos mitades del arrastre con el dedo: deslizar sin esperar desplaza la página y no
-levanta nada, y mantener pulsada la carta la levanta y deja de desplazar. Y el atajo al
-inicio: dónde aparece, dónde no —ni en el inicio ni en una partida— y a dónde lleva.
-Fija también el gesto de volver: deslizar de izquierda a derecha hace lo mismo que «Volver»
-y cierra el diálogo de encima, y no navega hacia la izquierda, en diagonal, con un roce
-corto, con el ratón, dentro de una partida, sobre un campo de texto, sobre una tira que se
-desplaza a los lados, ni en el inicio, donde no hay nada detrás.
-Comprueba también el foco al interrumpir un cierre y el desplazamiento sin animación cuando
-se solicita movimiento reducido. Captura excepciones de los manejadores, no solo aserciones.
+`service-worker.mjs` ejecuta el archivo real con un entorno de service worker simulado: se
+responde con la copia guardada pero se pide la del servidor por detrás, así que un archivo nuevo
+llega en el siguiente arranque aunque se olvide subir el número de la caché. La instalación fuerza
+una descarga actual y el refresco revalida la caché HTTP.
 
-Son contratos sobre DOM simulado: no miden fluidez ni sustituyen la inspección visual en un
-navegador o un iPhone. Los movimientos usan tiempos cortos (160–460 ms), salvo el encuadre
-suave de la carátula; no se anima la mesa completa al elegir carta o hueco. La copia de una
-carta arrastrada se posiciona una vez por frame, sin interpolación que la retrase respecto al dedo.
-# Revisión visual de las transiciones
+`movimiento.mjs` y las demás pruebas sobre DOM simulado son contratos: no miden fluidez ni
+sustituyen la inspección en un navegador o un iPhone. Para revisar a mano, `npm run dev` sirve los
+archivos con Vite (Node 20.19+ o 22.12+) y `/tests/preview.html` enseña la interfaz a varios
+anchos; la web publicada sigue siendo estática.
 
-## Música ambiente
-
-`node tests/musica-ambiente.mjs` comprueba las seis pistas, el barajado de cada
-ciclo sin repeticiones en sus límites, el solapamiento de cuatro segundos,
-la pausa y reanudación de ambas pistas durante el fundido, el interruptor,
-los eventos de segundo plano de Capacitor, los reintentos y las descargas tardías.
-Verifica también el inicio durante el splash con el ajuste activado, el bloqueo
-de autoplay (rechazado o pendiente), el desbloqueo por toque/tecla y la continuidad
-al entrar al juego, sin duplicar pistas ni ignorar el ajuste de silencio.
-El reloj simulado permite recorrer varias listas completas. `build-movil.mjs`
-comprueba además que los seis MP3 llegan íntegros al paquete sin conexión.
-La comprobación auditiva final en Android e iPhone físicos sigue siendo necesaria.
-
-`npm run dev` sirve los archivos originales con Vite, solo durante el desarrollo.
-Abre `/tests/preview.html` en ese servidor para revisar anchos de 360, 390, 430,
-768 y 1080 px. La publicación en GitHub Pages sigue siendo estática: no necesita
-compilar ni descarga Vite al móvil. El servidor de desarrollo requiere Node
-20.19+ o 22.12+.
-
-Recorrido: cambia varias veces de bloque y de mazo; abre y cierra Guía y Ajustes;
-entra en configuración y vuelve al mismo punto de Inicio; inicia una partida,
-elige carta, cambia de hueco, cancela y confirma. Repite en claro, oscuro y con
-«reducir movimiento». Comprueba que no desaparecen controles, no quedan alturas
-fijas, no se repite el desplazamiento al cambiar de hueco y las animaciones no
-duplican jugadas. La vista responsive no sustituye una prueba en un iPhone real.
-
-`node tests/movimiento.mjs` verifica además interrupciones, foco, cancelación,
-gestos, navegación y el comportamiento con movimiento reducido.
-
-## Fantasma, Pulso y dificultades
-
-`npm test` incluye 90.000 repartos deterministas, uso y duración del Fantasma,
-minimapa sin pistas, guardado tras resolver, victoria con poder sin gastar,
-robos que entregan poderes, partidas completas por dificultad y competición experta.
-`npm run test:reglas` ejecuta además `fantasma-online.mjs`: el código real de
-`online.js` con clientes DOM independientes y transacciones contra el emulador
-de Firestore. Comprueba activación, revelado, cooldown, robos, Pulso, salidas,
-cantidad fija por jugadores, posiciones de todo el mazo con mezcla 50/50 y rechazo de
-escrituras que inventan o roban poderes. También prueba la recolocación de duplicados,
-dos robos encadenados en un desempate, el agotamiento del mazo, la privacidad de la
-interfaz y la compatibilidad con partidas anteriores. Pulso comprueba además inventario
-privado, consumo, victoria sin gastarlo, reparto conjunto sin posiciones compartidas y
-rechazo online de usos o asignaciones inventados. Comprueba los ejemplos de probabilidad
-con 50, 200 y 500 cartas disponibles usando márgenes estadísticos.
-No sustituye una prueba de Safari en un iPhone físico.
-
-`estabilizacion.mjs` comprueba recuperación de Competición, versiones de guardado, valores corregidos, almacenamiento lleno y actualizaciones durante partidas.
-
-El motor puro se verifica en motor-invariantes.mjs. competicion-servidor.mjs juega partidas completas de 2–9 participantes; servidor-http.mjs verifica autenticación, App Check y límites; servidor-reglas.mjs comprueba privacidad, carreras e idempotencia en el proyecto demo-competicion del emulador. Este último no cambia las reglas de las salas familiares ni accede a producción.
+Las pruebas de música, efectos y Fantasma usan relojes y azar deterministas; la comprobación
+auditiva y la prueba en Safari de un iPhone físico siguen siendo necesarias.

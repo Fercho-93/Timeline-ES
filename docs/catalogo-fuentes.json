@@ -514,7 +514,7 @@
     {
       "file": "cards.js",
       "id": 52,
-      "title": "Desastre del 98",
+      "title": "Pérdida de las últimas colonias españolas de ultramar",
       "value": 1898,
       "source": null,
       "reviewStatus": null,
@@ -1484,7 +1484,7 @@
     {
       "file": "cards.js",
       "id": 166,
-      "title": "Crisis política, militar y social de 1917",
+      "title": "Crisis política, militar y social durante el reinado de Alfonso XIII",
       "value": 1917,
       "source": null,
       "reviewStatus": null,
@@ -1514,7 +1514,7 @@
     {
       "file": "cards.js",
       "id": 169,
-      "title": "Encuentro de la Generación del 27",
+      "title": "Homenaje de poetas a Góngora en Sevilla",
       "value": 1927,
       "source": null,
       "reviewStatus": null,
@@ -4830,7 +4830,7 @@
       "file": "animals.js",
       "id": 10008,
       "title": "Cobaya (adulto típico)",
-      "value": 0.9,
+      "value": 0.95,
       "source": "https://animaldiversity.org/accounts/Cavia_porcellus/",
       "reviewStatus": null,
       "comparison": null,
@@ -4850,7 +4850,7 @@
       "file": "animals.js",
       "id": 10040,
       "title": "Flamenco",
-      "value": 2.7,
+      "value": 3.1,
       "source": "https://animals.sandiegozoo.org/animals/flamingo",
       "reviewStatus": null,
       "comparison": null,
@@ -4990,7 +4990,7 @@
       "file": "animals.js",
       "id": 10020,
       "title": "León africano (macho adulto)",
-      "value": 190,
+      "value": 205,
       "source": "https://animals.sandiegozoo.org/animals/lion",
       "reviewStatus": null,
       "comparison": null,
@@ -5180,7 +5180,7 @@
       "file": "animals.js",
       "id": 10046,
       "title": "Tucán toco",
-      "value": 0.000676,
+      "value": 0.676,
       "source": "https://animaldiversity.org/accounts/Ramphastos_toco/",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5250,7 +5250,7 @@
       "file": "animals.js",
       "id": 10053,
       "title": "Emú",
-      "value": 57.5,
+      "value": 55,
       "source": "https://nationalzoo.si.edu/animals/emu",
       "reviewStatus": "reviewed",
       "comparison": null,
@@ -5609,7 +5609,7 @@
     {
       "file": "lifespan.js",
       "id": 12005,
-      "title": "Abeja obrera (referencia de seis semanas)",
+      "title": "Abeja obrera adulta",
       "value": 0.11498973305954825,
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2398712/",
       "reviewStatus": null,
@@ -6222,6 +6222,196 @@
       "title": "Takin",
       "value": 13.5,
       "source": "https://animals.sandiegozoo.org/animals/takin",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12067,
+      "title": "Gorila",
+      "value": 38,
+      "source": "https://animaldiversity.org/accounts/Gorilla_gorilla/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12068,
+      "title": "Jaguar",
+      "value": 12,
+      "source": "https://animaldiversity.org/accounts/Panthera_onca/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12069,
+      "title": "Leopardo",
+      "value": 11,
+      "source": "https://animaldiversity.org/accounts/Panthera_pardus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12070,
+      "title": "Gran tiburón blanco",
+      "value": 35,
+      "source": "https://animaldiversity.org/accounts/Carcharodon_carcharias/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12071,
+      "title": "Vaca doméstica",
+      "value": 18,
+      "source": "https://animal.research.wvu.edu/files/d/68e6d750-3b90-4396-a9a6-e73f24dd3bf8/humane-care-of-aging-animals.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12072,
+      "title": "Cabra",
+      "value": 15,
+      "source": "https://animaldiversity.org/accounts/Capra_hircus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12073,
+      "title": "Oveja",
+      "value": 11,
+      "source": "https://animal.research.wvu.edu/files/d/68e6d750-3b90-4396-a9a6-e73f24dd3bf8/humane-care-of-aging-animals.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12074,
+      "title": "Cerdo doméstico común",
+      "value": 13,
+      "source": "https://science.rspca.org.uk/documents/1494931/0/FS%2BPig%2BFactsheet.pdf/66c19082-4a0c-129b-10cb-548cc2f2bbfc",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12075,
+      "title": "Gallina",
+      "value": 8,
+      "source": "https://potawatomizoo.org/animal/chicken/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12076,
+      "title": "Pato",
+      "value": 10,
+      "source": "https://www.rvc.ac.uk/Media/Default/Beaumont%20Sainsbury%20Animal%20Hospital/EXOTICS/Animal%20Care%20Factsheets/Duck%20caresheet%20Nov%202023%20vb.pdf",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12077,
+      "title": "Camaleón",
+      "value": 7,
+      "source": "https://www.nationalgeographic.com/animals/reptiles/facts/veiled-chameleon",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12078,
+      "title": "Iguana marina",
+      "value": 9,
+      "source": "https://galapagosconservation.org.uk/species/marine-iguana/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12079,
+      "title": "Escorpión",
+      "value": 7,
+      "source": "https://www.oregonzoo.org/animals/common-emperor-scorpion",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12080,
+      "title": "Atún rojo",
+      "value": 15,
+      "source": "https://animaldiversity.org/accounts/Thunnus_thynnus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12081,
+      "title": "Salmón",
+      "value": 5,
+      "source": "https://www.fisheries.noaa.gov/species/atlantic-salmon",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12082,
+      "title": "Foca común",
+      "value": 28,
+      "source": "https://www.fisheries.noaa.gov/species/harbor-seal",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12083,
+      "title": "Morsa",
+      "value": 35,
+      "source": "https://animaldiversity.org/accounts/Odobenus_rosmarus/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12084,
+      "title": "Búfalo africano",
+      "value": 11,
+      "source": "https://animaldiversity.org/accounts/Syncerus_caffer/",
+      "reviewStatus": null,
+      "comparison": null,
+      "reviewedAt": null
+    },
+    {
+      "file": "lifespan.js",
+      "id": 12085,
+      "title": "Babuino",
+      "value": 28,
+      "source": "https://primate.wisc.edu/primate-info-net/pin-factsheets/pin-factsheet-olive-baboon/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -6969,7 +7159,7 @@
     {
       "file": "inventos.js",
       "id": 4008,
-      "title": "Julio César decreta la reforma del calendario (46 a. C.)",
+      "title": "Julio César decreta la reforma del calendario",
       "value": -46,
       "source": null,
       "reviewStatus": null,
@@ -6979,7 +7169,7 @@
     {
       "file": "inventos.js",
       "id": 4009,
-      "title": "El papel en China",
+      "title": "La mejora del papel en China (fecha tradicional)",
       "value": 105,
       "source": null,
       "reviewStatus": null,
@@ -7639,7 +7829,7 @@
     {
       "file": "mundo.js",
       "id": 5006,
-      "title": "La destrucción del Primer Templo de Jerusalén (fecha discutida)",
+      "title": "La destrucción del Primer Templo de Jerusalén",
       "value": -586,
       "source": null,
       "reviewStatus": null,
@@ -7819,7 +8009,7 @@
     {
       "file": "mundo.js",
       "id": 5024,
-      "title": "El llamado Edicto de Milán",
+      "title": "El edicto de Milán",
       "value": 313,
       "source": null,
       "reviewStatus": null,
@@ -7849,7 +8039,7 @@
     {
       "file": "mundo.js",
       "id": 5027,
-      "title": "La división del Imperio romano",
+      "title": "La división duradera del Imperio romano",
       "value": 395,
       "source": null,
       "reviewStatus": null,
@@ -7929,7 +8119,7 @@
     {
       "file": "mundo.js",
       "id": 5035,
-      "title": "El Cisma de Oriente (fecha convencional)",
+      "title": "El Cisma de Oriente",
       "value": 1054,
       "source": null,
       "reviewStatus": null,
@@ -8049,7 +8239,7 @@
     {
       "file": "mundo.js",
       "id": 5047,
-      "title": "La expedición de Colón llega al Caribe",
+      "title": "Colón llega a América",
       "value": 1492,
       "source": null,
       "reviewStatus": null,
@@ -8449,7 +8639,7 @@
     {
       "file": "mundo.js",
       "id": 5087,
-      "title": "El crac del 29",
+      "title": "El crac de la Bolsa de Nueva York",
       "value": 1929,
       "source": null,
       "reviewStatus": null,
@@ -8739,7 +8929,7 @@
     {
       "file": "mundo.js",
       "id": 5116,
-      "title": "La OMS declara la pandemia de COVID-19",
+      "title": "La OMS declara pandemia",
       "value": 2020,
       "source": null,
       "reviewStatus": null,
@@ -8749,7 +8939,7 @@
     {
       "file": "mundo.js",
       "id": 5117,
-      "title": "La invasión rusa a gran escala de Ucrania",
+      "title": "La invasión rusa de Ucrania",
       "value": 2022,
       "source": null,
       "reviewStatus": null,
@@ -8759,9 +8949,9 @@
     {
       "file": "astronomy.js",
       "id": 4006,
-      "title": "Eratóstenes mide la Tierra",
+      "title": "Eratóstenes mide la Tierra (fecha aproximada)",
       "value": -240,
-      "source": null,
+      "source": "https://pumas.nasa.gov/sites/default/files/examples/04_01_13_1.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8769,9 +8959,9 @@
     {
       "file": "astronomy.js",
       "id": 4010,
-      "title": "El Almagesto de Ptolomeo",
+      "title": "El Almagesto de Ptolomeo (fecha aproximada)",
       "value": 150,
-      "source": null,
+      "source": "https://ntrs.nasa.gov/api/citations/20160001564/downloads/20160001564.pdf",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8779,9 +8969,9 @@
     {
       "file": "astronomy.js",
       "id": 4011,
-      "title": "El astrolabio en el mundo islámico (siglo VIII, fecha aproximada)",
-      "value": 750,
-      "source": null,
+      "title": "El astrolabio en el mundo islámico",
+      "value": 850,
+      "source": "https://www.britishmuseum.org/collection/object/W_1855-0709-1",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8791,7 +8981,7 @@
       "id": 4014,
       "title": "El reloj astronómico de Su Song",
       "value": 1088,
-      "source": null,
+      "source": "https://collection.sciencemuseumgroup.org.uk/objects/co894/scale-model-of-su-songs-water-balance-escapement",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8801,7 +8991,7 @@
       "id": 8001,
       "title": "Copérnico publica su modelo heliocéntrico",
       "value": 1543,
-      "source": null,
+      "source": "https://science.nasa.gov/earth/earth-observatory/planetary-motion/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8811,7 +9001,7 @@
       "id": 8002,
       "title": "Tycho Brahe observa una nueva estrella",
       "value": 1572,
-      "source": null,
+      "source": "https://supernova.eso.org/exhibition/images/tycho-book-cc/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8821,7 +9011,7 @@
       "id": 4020,
       "title": "Lippershey solicita el primer privilegio conocido para un telescopio",
       "value": 1608,
-      "source": null,
+      "source": "https://brunelleschi.imss.fi.it/esplora/cannocchiale/dswmedia/storia/estoria1_st.html",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8831,7 +9021,7 @@
       "id": 8003,
       "title": "Galileo apunta un telescopio al cielo",
       "value": 1609,
-      "source": null,
+      "source": "https://science.nasa.gov/solar-system/galileos-observations-of-the-moon-jupiter-venus-and-the-sun/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8841,7 +9031,7 @@
       "id": 8004,
       "title": "Descubrimiento de las lunas de Júpiter",
       "value": 1610,
-      "source": null,
+      "source": "https://science.nasa.gov/jupiter/jupiter-moons/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8851,7 +9041,7 @@
       "id": 8005,
       "title": "Kepler publica su tercera ley",
       "value": 1619,
-      "source": null,
+      "source": "https://science.nasa.gov/solar-system/orbits-and-keplers-laws/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8861,7 +9051,7 @@
       "id": 8006,
       "title": "Huygens descubre Titán",
       "value": 1655,
-      "source": null,
+      "source": "https://science.nasa.gov/saturn/moons/titan/facts/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8871,7 +9061,7 @@
       "id": 8007,
       "title": "Fundación del Observatorio de Greenwich",
       "value": 1675,
-      "source": null,
+      "source": "https://www.rmg.co.uk/collections/research-guides/royal-observatory-history",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8879,9 +9069,9 @@
     {
       "file": "astronomy.js",
       "id": 4026,
-      "title": "Rømer demuestra que la luz tiene velocidad finita",
+      "title": "Rømer muestra que la luz tiene velocidad finita",
       "value": 1676,
-      "source": null,
+      "source": "https://observatoiredeparis.psl.eu/340-years-ago-romer-showed.html",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8891,7 +9081,7 @@
       "id": 8008,
       "title": "Newton publica los Principia",
       "value": 1687,
-      "source": null,
+      "source": "https://www.newtonproject.ox.ac.uk/catalogue/record/NATP00071",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8901,7 +9091,7 @@
       "id": 8009,
       "title": "Halley predice el regreso de su cometa",
       "value": 1705,
-      "source": null,
+      "source": "https://science.nasa.gov/solar-system/comets/1p-halley/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8911,7 +9101,7 @@
       "id": 8010,
       "title": "Descubrimiento de Urano",
       "value": 1781,
-      "source": null,
+      "source": "https://science.nasa.gov/uranus/facts/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8921,7 +9111,7 @@
       "id": 8011,
       "title": "Descubrimiento de Ceres",
       "value": 1801,
-      "source": null,
+      "source": "https://science.nasa.gov/dwarf-planets/ceres/facts/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8929,9 +9119,9 @@
     {
       "file": "astronomy.js",
       "id": 8012,
-      "title": "Primera distancia estelar por paralaje",
+      "title": "Primera distancia estelar fiable por paralaje",
       "value": 1838,
-      "source": null,
+      "source": "https://www.esa.int/Science_Exploration/Space_Science/Gaia/Why_was_it_so_difficult_to_study_the_Milky_Way_before_Gaia",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8941,7 +9131,7 @@
       "id": 8013,
       "title": "Descubrimiento de Neptuno",
       "value": 1846,
-      "source": null,
+      "source": "https://science.nasa.gov/neptune/neptune-facts/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8949,9 +9139,9 @@
     {
       "file": "astronomy.js",
       "id": 8014,
-      "title": "El helio aparece primero en el Sol",
+      "title": "El helio se detecta primero en el Sol",
       "value": 1868,
-      "source": null,
+      "source": "https://science.nasa.gov/image-article/apod-2001-january-20-helios-helium/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8961,7 +9151,7 @@
       "id": 8015,
       "title": "Relatividad especial",
       "value": 1905,
-      "source": null,
+      "source": "https://www.aps.org/apsnews/2000/08/this-month-in-physics-history",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8969,9 +9159,9 @@
     {
       "file": "astronomy.js",
       "id": 8016,
-      "title": "Relatividad general",
+      "title": "Einstein formula la relatividad general",
       "value": 1915,
-      "source": null,
+      "source": "https://journals.aps.org/prd/edannounce/10.1103/PhysRevD.92.050001",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8979,9 +9169,9 @@
     {
       "file": "astronomy.js",
       "id": 8017,
-      "title": "Andrómeda queda fuera de la Vía Láctea",
+      "title": "Hubble identifica una cefeida en Andrómeda",
       "value": 1923,
-      "source": null,
+      "source": "https://science.nasa.gov/missions/hubble/hubble-views-the-star-that-changed-the-universe/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -8989,9 +9179,9 @@
     {
       "file": "astronomy.js",
       "id": 8018,
-      "title": "El universo se expande",
+      "title": "Hubble publica la relación distancia-velocidad",
       "value": 1929,
-      "source": null,
+      "source": "https://cosmology.carnegiescience.edu/timeline/1929.html",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9001,7 +9191,7 @@
       "id": 8019,
       "title": "Descubrimiento de Plutón",
       "value": 1930,
-      "source": null,
+      "source": "https://lowell.edu/campus/pluto-discovery-telescope/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9011,7 +9201,7 @@
       "id": 8020,
       "title": "Zwicky propone la materia oscura",
       "value": 1933,
-      "source": null,
+      "source": "https://science.nasa.gov/dark-matter/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9021,7 +9211,7 @@
       "id": 8021,
       "title": "Primera fotografía de la Tierra desde el espacio",
       "value": 1946,
-      "source": null,
+      "source": "https://www.nasa.gov/history/90-years-of-our-changing-views-of-earth/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9031,7 +9221,7 @@
       "id": 8022,
       "title": "Sputnik 1",
       "value": 1957,
-      "source": null,
+      "source": "https://www.nasa.gov/history/dawn-of-the-space-age/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9041,7 +9231,7 @@
       "id": 8023,
       "title": "Luna 2 alcanza la Luna",
       "value": 1959,
-      "source": null,
+      "source": "https://science.nasa.gov/deep-space-exploration/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9051,7 +9241,7 @@
       "id": 8024,
       "title": "Yuri Gagarin orbita la Tierra",
       "value": 1961,
-      "source": null,
+      "source": "https://www.nasa.gov/history/may-5-1961-alan-shepard-becomes-the-first-american-in-space/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9061,7 +9251,7 @@
       "id": 8025,
       "title": "Valentina Tereshkova viaja al espacio",
       "value": 1963,
-      "source": null,
+      "source": "https://www.nasa.gov/history/sally-ride-first-american-woman-in-space/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9071,7 +9261,7 @@
       "id": 8026,
       "title": "Primer paseo espacial",
       "value": 1965,
-      "source": null,
+      "source": "https://www.esa.int/About_Us/50_years_of_ESA/Alexei_Leonov_The_artistic_spaceman",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9081,7 +9271,7 @@
       "id": 8027,
       "title": "Apollo 8 orbita la Luna",
       "value": 1968,
-      "source": null,
+      "source": "https://www.nasa.gov/mission/apollo-8/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9091,7 +9281,7 @@
       "id": 8028,
       "title": "Primeros pasos humanos en la Luna",
       "value": 1969,
-      "source": null,
+      "source": "https://www.nasa.gov/missions/apollo/apollo-11/apollo-11-mission-overview/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9101,7 +9291,7 @@
       "id": 8029,
       "title": "Salyut 1, primera estación espacial",
       "value": 1971,
-      "source": null,
+      "source": "https://www.nasa.gov/missions/station/50-years-ago-launch-of-salyut-the-worlds-first-space-station/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9111,7 +9301,7 @@
       "id": 8030,
       "title": "Pioneer 10 sobrevuela Júpiter",
       "value": 1973,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/pioneer-10/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9121,7 +9311,7 @@
       "id": 8031,
       "title": "Viking 1 aterriza en Marte",
       "value": 1976,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/viking-1/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9131,7 +9321,7 @@
       "id": 8032,
       "title": "Parten las sondas Voyager",
       "value": 1977,
-      "source": null,
+      "source": "https://science.nasa.gov/missions/voyager-program/pioneering-nasa-spacecraft-mark-thirty-years-of-flight/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9141,7 +9331,7 @@
       "id": 8033,
       "title": "Primer vuelo de un transbordador espacial",
       "value": 1981,
-      "source": null,
+      "source": "https://www.nasa.gov/history/sts1/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9151,7 +9341,7 @@
       "id": 8034,
       "title": "Giotto fotografía el núcleo del cometa Halley",
       "value": 1986,
-      "source": null,
+      "source": "https://www.esa.int/Science_Exploration/Space_Science/Rosetta/Giotto_-_ESA_s_first_comet_mission",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9161,7 +9351,7 @@
       "id": 8035,
       "title": "Lanzamiento del telescopio Hubble",
       "value": 1990,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/hubble/overview/hubble-timeline/hubble-history-timeline-full-text/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9171,7 +9361,7 @@
       "id": 8036,
       "title": "Primeros exoplanetas confirmados",
       "value": 1992,
-      "source": null,
+      "source": "https://science.nasa.gov/universe/exoplanets/will-the-real-first-exoplanet-please-stand-up/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9181,7 +9371,7 @@
       "id": 8037,
       "title": "Un exoplaneta alrededor de una estrella como el Sol",
       "value": 1995,
-      "source": null,
+      "source": "https://science.nasa.gov/universe/exoplanets/nobel-winners-changed-our-understanding-with-exoplanet-discovery/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9191,7 +9381,7 @@
       "id": 8038,
       "title": "Sojourner recorre Marte en la misión Pathfinder",
       "value": 1997,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/mars-pathfinder/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9201,7 +9391,7 @@
       "id": 8039,
       "title": "Cassini entra en órbita de Saturno",
       "value": 2004,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/cassini/the-journey/timeline/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9211,7 +9401,7 @@
       "id": 8040,
       "title": "Plutón pasa a ser planeta enano",
       "value": 2006,
-      "source": null,
+      "source": "https://www.iau.org/IAU/Iau/News/PR2006/iau-resolution-planet-definition-voting.aspx",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9221,7 +9411,7 @@
       "id": 8041,
       "title": "Curiosity aterriza en Marte",
       "value": 2012,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/msl-curiosity/science/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9231,7 +9421,7 @@
       "id": 8042,
       "title": "Philae aterriza en un cometa",
       "value": 2014,
-      "source": null,
+      "source": "https://www.esa.int/Newsroom/Press_Releases/Touchdown%21_Rosetta_s_Philae_probe_lands_on_comet",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9239,9 +9429,9 @@
     {
       "file": "astronomy.js",
       "id": 8043,
-      "title": "New Horizons llega a Plutón",
+      "title": "New Horizons sobrevuela Plutón",
       "value": 2015,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/new-horizons/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9251,7 +9441,7 @@
       "id": 8044,
       "title": "LIGO anuncia la primera detección directa de ondas gravitacionales",
       "value": 2016,
-      "source": null,
+      "source": "https://www.ligo.caltech.edu/MIT/news/ligo20160211",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9259,9 +9449,9 @@
     {
       "file": "astronomy.js",
       "id": 8045,
-      "title": "Primera imagen de un agujero negro",
+      "title": "Primera imagen de la sombra de un agujero negro",
       "value": 2019,
-      "source": null,
+      "source": "https://www.eso.org/public/news/eso1907/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9271,7 +9461,7 @@
       "id": 8046,
       "title": "Lanzamiento del telescopio James Webb",
       "value": 2021,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/webb/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9281,7 +9471,7 @@
       "id": 8047,
       "title": "Primeras imágenes científicas del James Webb",
       "value": 2022,
-      "source": null,
+      "source": "https://science.nasa.gov/mission/webb/webbs-first-images/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9291,7 +9481,7 @@
       "id": 8048,
       "title": "OSIRIS-REx trae muestras de Bennu",
       "value": 2023,
-      "source": null,
+      "source": "https://science.nasa.gov/blogs/osiris-rex/2023/09/24/capsule-containing-asteroid-bennu-sample-has-landed/",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null
@@ -9301,7 +9491,7 @@
       "id": 8049,
       "title": "Chang'e 6 trae muestras de la cara oculta",
       "value": 2024,
-      "source": null,
+      "source": "https://www.cnsa.gov.cn/english/n6465652/n6465653/c10573060/content.html",
       "reviewStatus": null,
       "comparison": null,
       "reviewedAt": null

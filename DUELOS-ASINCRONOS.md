@@ -1,61 +1,102 @@
-# Organización de duelos por turnos
+# Duelos por turnos
 
-Esta mejora no cambia los dos ejes del juego: seguidos/turnos y ordenar/cifras.
-Las siguientes funciones organizan los duelos por turnos:
+Un duelo por turnos se juega entre dos cuentas, cada una cuando puede. Se crea desde
+**Jugar con amigos → Cada uno en su móvil → Crear partida**, eligiendo el ritmo **Por turnos**, y
+se sigue en **Tus partidas**. El código está en `duelo-turnos.js` (Grandes colecciones,
+colección `turnDuels`) y en `quick-challenges.js` / `quick-online.js` para los duelos de Retos
+rápidos (salas de dos en `quickRooms`). Los dos ejes del juego siguen igual: ordenar o cifras.
 
-- Revancha desde el historial o al finalizar: mismo rival, mazo y modalidad, nueva semilla de cartas. El rival debe aceptar.
-- Siguiente turno pendiente: abre la partida más antigua que espera tu jugada. No permite saltar desde una carta que ya está en juego.
-- Rivales recientes y favoritos en el perfil. Retar utiliza la última partida compartida. Los favoritos son locales al dispositivo y cuenta.
-- Última jugada: muestra quién jugó, el resultado y el marcador, sin mostrar la siguiente carta.
-- Recordatorio después de 48 horas sin actividad: uno por turno/invitación y como máximo uno por destinatario cada 24 horas. Caducidad después de 7 días sin actividad, manteniendo el historial.
+## Organización
 
-Una invitación directa es privada entre emisor y destinatario; no necesita compartir enlace. Pulsaciones repetidas reutilizan la invitación pendiente. Al terminar, cancelar o caducar se permite otro reto. El identificador de las nuevas invitaciones mantiene una longitud acotada durante una serie de revanchas. Crear por enlace también reutiliza una invitación abierta del mismo mazo/modalidad. Reenviar comparte el mismo enlace, sin crear documentos nuevos. Las invitaciones aparecen al abrir de nuevo el perfil; el listado no se actualiza en vivo mientras permanece abierto.
+- Revancha desde el historial o al terminar: mismo rival, mazo y modalidad, nueva semilla. El
+  rival debe aceptar.
+- Siguiente turno pendiente: abre la partida más antigua que espera tu jugada. No permite saltar
+  desde una carta que ya está en juego.
+- Rivales recientes y favoritos. Retar utiliza la última partida compartida. Los favoritos son
+  locales al dispositivo y a la cuenta.
+- Última jugada: quién jugó, el resultado y el marcador, sin enseñar la siguiente carta.
+- Recordatorio a las 48 horas sin actividad: uno por turno o invitación y como máximo uno por
+  destinatario cada 24 horas. Caducidad a los 7 días sin actividad, conservando el historial.
 
-## Preparación, resultados y conexión
+Una invitación directa es privada entre emisor y destinatario; no necesita enlace. Pulsar varias
+veces reutiliza la invitación pendiente. Al terminar, cancelar o caducar se permite otro reto.
+Crear por enlace también reutiliza una invitación abierta del mismo mazo y modalidad; reenviar
+comparte el mismo enlace sin crear documentos nuevos. Las invitaciones aparecen al abrir de nuevo
+la lista; no se actualiza en vivo mientras está abierta.
 
-Antes de descubrir una carta se muestra rival, marcador y última jugada. «Estoy listo» inicia los 3 segundos de preparación y después los 15 de juego. El plazo se guarda antes de descubrirla; volver a entrar no lo reinicia. Sin conexión no se permite iniciar una carta nueva.
+## Tiempo, resultados y conexión
 
-La solución usa los mismos formatos de valor, explicación, posición correcta y valoración de cifras del resto del juego. Se muestra únicamente una carta ya resuelta, nunca la pendiente. Las cifras enseñan respuesta, diferencia y puntos. La cuenta de velocidad se calcula sobre los 15 segundos de este modo.
+El tiempo por carta se elige al crear el duelo: **sin tiempo, 15, 20 o 30 segundos** (`tiempo.js`,
+los mismos valores que admiten las reglas). No hay pantalla de «listo»: el plazo empieza al
+descubrir la carta y se guarda en el dispositivo, así que volver a entrar no lo reinicia. Si se
+agota, la jugada cuenta como fallo por tiempo. Sin plazo, lo que se tarda queda solo como dato.
 
-La jugada se guarda localmente antes de enviarse con un identificador único y el tiempo de respuesta congelado. La pantalla distingue envío pendiente y confirmado. Una transacción detecta si ya se aplicó la misma jugada, incluso si se perdió su confirmación. Se reintenta al recuperar conexión, al abrir el perfil/duelo, manualmente o cada 15 segundos mientras la página sigue viva. Navegar a otra partida no cambia el destino del envío. Una partida ya cerrada o un turno resuelto por otro dispositivo no se reescriben.
+La solución usa los mismos formatos de valor, explicación, posición correcta y valoración de
+cifras del resto del juego. Solo se muestra una carta ya resuelta, nunca la pendiente.
 
-La cola pertenece a la cuenta y al dispositivo. No se debe borrar el almacenamiento mientras haya envíos pendientes. Sin espacio disponible se avisa y no se envía una respuesta sin protección local. No hay ejecución en segundo plano con el navegador cerrado: el envío continúa al regresar. No es una garantía antitrampas absoluta: la adjudicación y el temporizador siguen en el cliente.
+La jugada se guarda en local antes de enviarse, con un identificador único y el tiempo de
+respuesta congelado. La pantalla distingue envío pendiente y confirmado. Una transacción detecta si
+ya se aplicó la misma jugada, aunque se perdiera su confirmación. Se reintenta al recuperar
+conexión, al abrir la lista o el duelo, a mano o cada 15 segundos mientras la página sigue viva.
+Una partida ya cerrada o un turno resuelto desde otro dispositivo no se reescriben.
+
+La cola pertenece a la cuenta y al dispositivo: no borrar el almacenamiento con envíos
+pendientes. Sin espacio se avisa y no se envía una respuesta sin protección local. No hay envío en
+segundo plano con la app cerrada: continúa al volver. No es una garantía antitrampas: la
+adjudicación y el temporizador están en el cliente.
 
 ## Cancelar, rendirse, archivar y bloquear
 
-- Una invitación pendiente se cancela/rechaza sin victoria ni derrota.
-- Rendirse en una partida aceptada otorga la victoria al rival, sin alterar las puntuaciones ni las jugadas anteriores. Hay confirmación previa. Si la invitación fue aceptada mientras se intentaba cancelar, se pide revisarla; nunca se transforma ese clic en una rendición accidental.
-- Archivar solo oculta una partida terminada de tu listado principal. Se puede restaurar desde Archivados y no afecta al otro jugador. Esta preferencia se sincroniza por cuenta.
-- El cara a cara cuenta victorias, derrotas y empates por separado en ordenar/cifras. Incluye rendiciones y partidas archivadas; excluye cancelaciones y caducidades.
-- Bloquear retos impide crear o aceptar nuevas invitaciones entre esas cuentas, tanto directas como por enlace. No interrumpe partidas ya aceptadas. Se puede desbloquear desde el perfil. Los recordatorios de invitaciones bloqueadas se suprimen al desplegar las funciones actualizadas. No impide que una persona vuelva con otra cuenta.
+- Una invitación pendiente se cancela o rechaza sin victoria ni derrota.
+- Rendirse en una partida aceptada da la victoria al rival, sin alterar las jugadas anteriores.
+  Hay confirmación previa. Si la invitación se aceptó mientras se intentaba cancelar, se pide
+  revisarla; nunca se convierte ese toque en una rendición.
+- Archivar solo oculta una partida terminada de tu lista. Se restaura desde Archivados y no afecta
+  al otro jugador. Se sincroniza por cuenta.
+- El cara a cara cuenta victorias, derrotas y empates por separado en ordenar y cifras. Incluye
+  rendiciones y archivadas; excluye cancelaciones y caducidades.
+- Bloquear impide crear o aceptar nuevas invitaciones entre esas cuentas, directas o por enlace, y
+  suprime sus avisos. No interrumpe partidas ya aceptadas ni impide volver con otra cuenta. Se
+  puede desbloquear cuando se quiera.
 
-Las preferencias privadas de archivo/bloqueo viven en `duelPreferences/{uid}` y no son modificables por el rival. Requieren publicar las nuevas reglas.
+Las preferencias de archivo y bloqueo viven en `duelPreferences/{uid}/archived` y `.../blocked`;
+el rival no puede leerlas ni modificarlas.
 
-## Activación en Firebase
+## Servidor
 
-El código en GitHub no publica automáticamente las reglas ni las funciones. Desde la carpeta del repositorio actualizado, en PowerShell:
+Las Cloud Functions que intervienen (todas en `functions/index.js`):
 
-```powershell
-npm.cmd install --prefix functions
-npx.cmd firebase-tools login
-npx.cmd firebase-tools deploy --project timeline-es --only "firestore:rules,functions"
-```
+- `notifyTurnDuel`: avisa a quien le toca cuando cambia el turno de un duelo.
+- `notifyQuickDuel`: lo mismo en los duelos de Retos rápidos, y avisa del final.
+- `notifyDuelInvitation`: avisa de un reto nuevo, salvo bloqueo.
+- `maintainTurnDuels`: cada hora, recordatorios y caducidad a los 7 días. Los avisos y la
+  caducidad del servidor pueden demorarse hasta esa revisión; el cliente muestra la caducidad y
+  las reglas rechazan jugadas desde los siete días.
+- `purgeExpiredData`: cada día borra los duelos y salas de Retos rápidos con 30 días sin
+  actividad y los registros técnicos de avisos.
 
-Si se copian las reglas manualmente, copiar todo `firestore.rules` a Firestore > Reglas y publicar. Eso no sustituye el despliegue de Functions. El trabajo programado requiere la facturación/servicios de Cloud Functions y Cloud Scheduler habilitados; revisar sus costes antes de activarlos.
+Se publican a mano con el workflow «Publicar Cloud Functions» y las reglas se publican solas
+desde `main`: ver [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue).
 
-Funciones publicadas: `notifyTurnDuel`, `notifyDuelInvitation`, `maintainTurnDuels`. El mantenimiento se ejecuta cada hora; los avisos y la caducidad del servidor pueden demorarse hasta esa revisión. El cliente muestra la caducidad y las reglas rechazan nuevas jugadas desde los siete días.
+`duelNotificationEvents` (eventos ya procesados, para no repetir avisos; sin tokens) y
+`duelReminderBudgets` (último recordatorio por destinatario) solo son accesibles por el
+servidor.
 
-Los avisos push requieren la configuración nativa y permisos de notificación. Esta entrega no verifica la entrega push en dispositivos físicos ni soluciona la integración pendiente del token APNs de iOS con FCM. No habilita avisos con Safari/Chrome cerrados. Los fallos de entrega no se reintentan automáticamente para evitar duplicados.
-
-Los registros internos `duelNotificationEvents` y `duelReminderBudgets` solo son accesibles por el servidor. Los primeros conservan identificadores de eventos procesados para evitar avisos duplicados; no contienen tokens.
+**Avisos del móvil:** las Functions envían por Firebase Cloud Messaging a los tokens guardados en
+`playerProfiles/{uid}/pushTokens`, pero la app todavía no registra el dispositivo (`push.js` no se
+inicia) y falta integrar el token APNs de iOS con FCM. Mientras tanto, el navegador puede mostrar
+un aviso local cuando te toca y no tienes la pestaña a la vista. Los fallos de entrega no se
+reintentan, para evitar duplicados.
 
 ## Verificación
 
-```powershell
+```sh
 node tests/duelo-policy.cjs
 node tests/duelo-state.mjs
-npx.cmd firebase-tools emulators:exec --project demo-hilo --only firestore "node tests/duelo-turnos-reglas.mjs"
-npm.cmd run build
+node tests/quick-duelo.mjs
+npm run test:reglas   # incluye duelo-turnos-reglas.mjs
+npm run build
 ```
 
-`tests/duelo-layout.mjs` verifica tamaños móviles y escritorio con Playwright/Chrome, preparación, invitaciones privadas, historial, favoritos y ausencia de desbordamiento horizontal. No sustituye una prueba entre dos móviles reales tras desplegar.
+`tests/duelo-layout.mjs` y `tests/turn-duel-layout-browser.mjs` verifican la maquetación en
+navegador con Playwright. Nada de esto sustituye una prueba entre dos móviles reales.

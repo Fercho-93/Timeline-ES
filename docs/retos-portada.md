@@ -1,6 +1,6 @@
 # Portada de Retos rápidos
 
-Generada el 20 de septiembre de 2026 con la herramienta integrada de generación de imágenes de OpenAI. Referencia de estilo: assets/hero-entertainment-700.webp. Versiones optimizadas: assets/hero-quick-400.webp y assets/hero-quick-700.webp. La ilustración es decorativa y común al reto; no representa una carta concreta.
+Generada el 20 de septiembre de 2026 con la herramienta integrada de generación de imágenes de OpenAI. Referencia de estilo: assets/hero-entertainment-700.webp. Versión optimizada en uso: assets/hero-quick-400.webp (la de 700 px se retiró por no usarse). La ilustración es decorativa y común al reto; no representa una carta concreta.
 
 ## Prompt
 

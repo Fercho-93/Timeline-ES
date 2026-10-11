@@ -1,57 +1,67 @@
-# Activar el modo multijugador
+# Multijugador: Firebase, despliegue y operación
 
-El código de Firebase ya está incluido en `online.js`. Solo falta publicar las reglas de seguridad antes de probar una sala.
+El juego online usa el proyecto de Firebase `timeline-es` (el identificador conserva el nombre
+antiguo; ver «Nombre del proyecto» más abajo): Authentication para el invitado y la cuenta de
+Apple, Firestore para salas, duelos, mesas, progreso y ranking, Cloud Functions para avisos y
+limpieza, y App Check. La configuración pública está en `firebase-client.js` y `deployment.js`.
+El mapa de colecciones está en [docs/MODELO_DE_DATOS.md](docs/MODELO_DE_DATOS.md).
 
-## 1. Publicar las reglas de Firestore
+## Despliegue
 
-> Publica esta versión de `firestore.rules` una vez. A partir de ella, **añadir juegos ya no
-> obliga a republicarlas**: las reglas dejaron de llevar dentro la lista de juegos permitidos,
-> porque nunca pudieron validar el contenido de un mazo (las cartas viven en el cliente) y esa
-> lista solo servía para obligar a una publicación manual con cada juego nuevo.
+Cada pieza se publica por su propio camino. Los demás documentos enlazan aquí en vez de
+repetirlo.
 
-1. Abre en Firebase el proyecto conectado a **Continuum**. Puedes identificarlo por el `projectId` de `online.js`, aunque su nombre en la consola todavía sea el anterior.
-2. Entra en **Firestore**.
-3. Abre la pestaña **Reglas**.
-4. Borra el contenido del editor.
-5. Copia todo el contenido del archivo `firestore.rules`.
-6. Pégalo en el editor y pulsa **Publicar**.
+| Pieza | Cómo se publica | Cuándo |
+| --- | --- | --- |
+| Web (`continuumjuego.es`) | GitHub Pages sirve la rama `main` tal cual, con el dominio del archivo `CNAME` | Al subir a `main` |
+| Reglas de Firestore (`firestore.rules`) | `.github/workflows/reglas-firestore.yml`: pasa `npm run test:reglas` contra el emulador y, si todo está en verde, publica en **producción** | Automático al subir a `main` un cambio en `firestore.rules` (también a mano desde Actions) |
+| Cloud Functions (`functions/`) | `.github/workflows/functions.yml`, «Publicar Cloud Functions» | Solo a mano |
+| Beta de iPhone (TestFlight) | `.github/workflows/beta-firmada.yml` | Al subir a `main` un cambio en `.github/beta-request.json` |
 
-Cada escritura entra por una sola rama de las reglas, según lo que intente cambiar: entrar
-en el vestíbulo, repartir, colocar una carta, cerrar el turno, saltar un turno, expulsar o
-marcharse. Las reglas comprueban quién escribe, en qué fase está la sala, qué campos toca y
-que las cartas ni se creen ni se dupliquen:
+### Web
 
-- Solo el participante de turno coloca carta, y solo puede tocar su propia mano.
-- Al acertar, la carta sale de la mano y entra en la línea temporal; no se roba nada de paso.
-- Nadie puede vaciarse la mano sin jugar, repartir cartas a otras personas fuera del
-  desempate de final de ronda ni declararse ganador con cartas en la mano.
-- El juego tiene que ser un identificador corto, y no cambia después de crear la sala, igual
-  que el código y el anfitrión. Cuál sea en concreto lo decide el cliente: un valor que no
-  conozca hace que caiga en el mazo por defecto.
-- Expulsar es cosa del anfitrión; marcharse, de cada cual. El anfitrión no puede ser
-  expulsado: cierra la sala.
-- La sala guarda también una huella del mazo —el mismo mecanismo del duelo por enlace—,
-  igual de inmutable que el juego. Si un móvil se actualiza mientras espera en el vestíbulo
-  y el mazo ha cambiado entretanto, entrar o repartir se rechaza con un aviso claro en vez
-  de repartir cartas que no significan lo mismo en cada pantalla.
+GitHub Pages publica `main` sin compilar nada. Lo que cambie lo que ve el jugador (JS, CSS,
+HTML, recursos) tiene que subir a la vez la versión en tres sitios, o el service worker seguirá
+sirviendo la anterior:
 
-**Lo que las reglas no pueden comprobar:** si el año de la carta encaja de verdad en el hueco
-elegido. Las fechas viven en `cards.js` y `movies.js`, dentro del propio navegador, así que esa
-parte la decide el cliente. Quien sepa manipular su navegador puede declarar acertada una
-jugada fallida en su turno, aunque no puede robar cartas ajenas, saltarse turnos ni forzar la
-victoria. Cerrar también esa puerta exige mover la jugada a una Cloud Function, con las manos
-en subcolecciones privadas; para un juego de sobremesa entre conocidos no compensa.
+- `service-worker-258.js`: `const CACHE = "continuum-vNNN";`
+- `updates.js`: `CT.APP_VERSION = "continuum-vNNN";`
+- `index.html`: `edition.css?v=NNN`
 
-Las reglas toleran las salas creadas por la versión anterior de la aplicación, así que se
-pueden publicar sin esperar a que todos los móviles hayan recargado la web. Las pruebas de
-`tests/reglas-firestore.mjs` y `tests/compatibilidad-version-anterior.mjs` ejecutan estas
-reglas contra el emulador oficial antes de publicarlas. Consulta `tests/README.md`.
+Las reglas para hacerlo sin pisar a otras sesiones están en `CLAUDE.md`. Ajustes → «Versión y
+conexión» enseña la versión que tiene guardada cada móvil, que es la forma rápida de comprobar
+si un cambio ha llegado.
 
-### Publicar las Cloud Functions
+### Reglas de Firestore
 
-Las Functions (avisos de duelos y limpieza diaria de datos caducados, `purgeExpiredData`) se
-publican con el workflow manual **Publicar Cloud Functions**: GitHub → Actions → «Publicar Cloud
-Functions» → «Run workflow». Funciona desde el móvil y usa el mismo secreto
+No hay que copiar ni pegar nada en la consola. Al subir a `main` un cambio en `firestore.rules`,
+el workflow «Publicar reglas de Firestore» ejecuta las 15 suites de `npm run test:reglas` en el
+emulador y, solo si pasan, ejecuta `firebase deploy --only firestore:rules --project timeline-es`
+con el secreto `FIREBASE_SERVICE_ACCOUNT`. Si faltara el secreto, el workflow explica cómo
+crearlo. También se puede lanzar a mano: Actions → «Publicar reglas de Firestore» → «Run
+workflow».
+
+Como se publica en producción al momento, antes de subir un cambio de reglas:
+
+- Ejecutar `npm run test:reglas` en local.
+- Asegurarse de que los clientes ya instalados siguen funcionando: las reglas tienen que aceptar
+  lo que escriben las versiones anteriores de la app (lo vigila
+  `tests/compatibilidad-version-anterior.mjs`).
+
+### Cloud Functions
+
+Las Functions (`functions/index.js`) son cinco:
+
+| Función | Disparo | Qué hace |
+| --- | --- | --- |
+| `notifyTurnDuel` | Al actualizarse un `turnDuels/{id}` | Avisa a quien le toca |
+| `notifyQuickDuel` | Al actualizarse un `quickRooms/{code}` de un duelo de Retos rápidos | Avisa a quien le toca o del final |
+| `notifyDuelInvitation` | Al crearse un `turnDuels/{id}` con invitado | Avisa del reto, salvo bloqueo |
+| `maintainTurnDuels` | Cada 60 minutos (Europe/Madrid) | Recordatorio a las 48 h sin jugar y caducidad a los 7 días |
+| `purgeExpiredData` | Cada día a las 04:17 (Europe/Madrid) | Limpieza según `functions/retention.js` |
+
+Se publican solo a mano, con el workflow **Publicar Cloud Functions**: GitHub → Actions →
+«Publicar Cloud Functions» → «Run workflow». Funciona desde el móvil y usa el mismo secreto
 `FIREBASE_SERVICE_ACCOUNT` que las reglas. Requisitos:
 
 - El proyecto debe estar en el plan **Blaze** (pago por uso): las Functions y las tareas
@@ -61,112 +71,116 @@ Functions» → «Run workflow». Funciona desde el móvil y usa el mismo secret
   Cloud Functions**, **Usuario de cuenta de servicio**, **Administrador de Cloud Scheduler**,
   **Administrador de Eventarc** y **Administrador de Artifact Registry**. Si el workflow falla con
   un error de permisos (`403`, `PERMISSION_DENIED`), el mensaje dice cuál falta.
+- Las APIs que pide Firebase al desplegar (Cloud Functions, Cloud Build, Artifact Registry,
+  Cloud Scheduler, Eventarc) deben estar habilitadas; el primer despliegue avisa de las que falten.
 
 Alternativa con ordenador: instalar Node 22, `npm install -g firebase-tools`, `firebase login`,
 `npm install --prefix functions` y `firebase deploy --only functions --project timeline-es`.
 
-### Limpiar salas antiguas
+### Beta de iPhone
 
-Objetivo de retención para la beta: siete días desde la última actividad. La configuración
-real de producción sigue pendiente de verificación. Si se utiliza `updatedAt`, configurar
-explícitamente un desplazamiento de expiración de siete días: con desplazamiento cero
-se convierte en una fecha de vencimiento inmediato. No activar una política sin probarla
-primero en un proyecto de ensayo. La eliminación es asíncrona y genera operaciones facturables.
+Editar `.github/beta-request.json` y subirlo a `main` lanza `beta-firmada.yml`: compila y firma la
+app y sube el IPA a TestFlight (la compilación Android firmada se lanza en el mismo
+workflow). El contenido del archivo es un registro de la petición; lo que dispara la
+compilación es el cambio. Detalles de firma y secretos en
+[DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md).
 
-El borrado de una sala no borra sus subcolecciones. Los documentos `presence` requieren su
-propia política (sobre `seenAt`, también con siete días de desplazamiento) o limpieza recursiva
-desde un servicio de confianza. Verificar con una sala caducada que desaparecen ambos.
-Referencia: https://firebase.google.com/docs/firestore/ttl y
-https://firebase.google.com/docs/firestore/manage-data/delete-data .
+## Qué validan las reglas
 
-Configurar alertas de presupuesto y observar lecturas, escrituras y autenticaciones antes
-de ampliar la beta. Una alerta avisa; no limita automáticamente el gasto. Conservar un
-procedimiento de cierre temporal de altas y revisar picos de creación de identidades.
+Cada escritura en una sala entra por una sola rama de las reglas, según lo que intente cambiar:
+entrar en el vestíbulo, repartir, colocar una carta, cerrar el turno, saltar un turno, expulsar
+o marcharse. Las reglas comprueban quién escribe, en qué fase está la sala, qué campos toca y
+que las cartas ni se creen ni se dupliquen:
 
-## 2. Comprobar Authentication
+- Solo el participante de turno coloca carta, y solo puede tocar su propia mano.
+- Al acertar, la carta sale de la mano y entra en la línea temporal; no se roba nada de paso.
+- Nadie puede vaciarse la mano sin jugar, repartir cartas a otras personas fuera del
+  desempate ni declararse ganador con cartas en la mano.
+- El juego es un identificador corto que no cambia después de crear la sala, igual que el
+  código y el anfitrión. Un valor que el cliente no conozca cae en el mazo por defecto: las
+  reglas no llevan la lista de juegos, así que añadir un mazo no obliga a tocarlas.
+- Expulsar es cosa del anfitrión; marcharse, de cada cual.
+- La sala guarda una huella del mazo, igual de inmutable. Si un móvil con otra versión del mazo
+  intenta entrar o repartir, se rechaza con un aviso claro.
+- Pulso y Fantasma: las reglas validan la obtención privada y el uso de cada poder, y la
+  recolocación de un Fantasma duplicado solo tras un robo válido.
+
+**Lo que las reglas no pueden comprobar:** si el valor de la carta encaja de verdad en el hueco
+elegido. Los datos de los mazos viven en el cliente, así que quien sepa manipular su navegador
+puede declarar acertada una jugada fallida en su turno, aunque no puede robar cartas ajenas,
+saltarse turnos ni forzar la victoria. La final numérica sí se comprueba contra la carta en cada
+cliente (`CT.Final.valid`). Cerrar del todo esa puerta exige un servidor autoritativo (ver
+[server/README.md](server/README.md)); para un juego de sobremesa entre conocidos no compensa.
+Más detalles en [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md).
+
+## Conservación y limpieza de datos
+
+Los plazos viven en un único sitio, `functions/retention.js`, y los aplica cada día
+`purgeExpiredData` (04:17, hora de Madrid). Cuentan desde la última actividad de cada documento
+y se borran con sus subcolecciones (una sala se lleva su presencia, su minijuego y su final):
+
+| Datos | Plazo |
+| --- | --- |
+| Salas online (`rooms`, con `presence`, `starter` y `finalRounds`) | 7 días |
+| Salas y duelos de Retos rápidos (`quickRooms`) | 30 días |
+| Duelos por turnos (`turnDuels`; a los 7 días sin jugar ya caducan) | 30 días |
+| Tablón de mesas públicas y colas de partida rápida (`publicTables`, `publicQueues`, `quickPublicQueues`) | 1 día |
+| Registros de la cuota de altas (`creationQuota`, `roomCreation`) | 7 días |
+| Registros técnicos de avisos (`duelNotificationEvents`, `duelReminderBudgets`) | 30 días |
+| Tablas del ranking (`dailyScores`, `weeklyScores`, por fecha) | 90 días |
+| Invitados anónimos sin vincular que no abren el juego | 1 año (se borran con sus datos) |
+
+Estos plazos los cuenta también la política de privacidad: si cambian en `retention.js`, hay
+que cambiarlos en `privacidad.html` y `PRIVACIDAD.md`. `tests/retencion.mjs` comprueba que
+coinciden. No hace falta configurar políticas TTL en la consola.
+
+Configurar alertas de presupuesto y observar lecturas, escrituras y autenticaciones antes de
+ampliar la beta. Una alerta avisa; no limita el gasto. Conservar un procedimiento de cierre
+temporal de altas y revisar picos de creación de identidades.
+
+## Authentication
+
+- **Anónimo** habilitado: cada instalación crea su invitado al abrir (ver
+  [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
+- **Apple** habilitado para la app de iPhone. Para que el borrado de cuenta pueda revocar el
+  acceso, el proveedor necesita en la consola el Services ID, el Team ID, el Key ID y la clave
+  privada (.p8); la clave nunca va al repositorio. Pasos en
+  [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md#configuración-del-titular).
+- **Dominios autorizados:** `continuumjuego.es`, `www.continuumjuego.es` y la dirección antigua
+  `fercho-93.github.io`. Si la clave web de Firebase tiene restricción por referente HTTP, esos
+  dominios también tienen que estar en esa lista.
 
 ### Nombre del proyecto
 
-Para unificar la denominación, cambia el nombre visible del proyecto a **Continuum** en
-**Configuración del proyecto → General → Nombre del proyecto**. Este es un paso pendiente
-en la consola, no un cambio que aplique el código de este repositorio.
+Sigue pendiente cambiar el nombre visible del proyecto a **Continuum** en Configuración del
+proyecto → General. El nombre visible y el identificador son distintos: hay que conservar el
+`projectId`, `authDomain` y `storageBucket` actuales. El identificador de un proyecto existente no
+se puede renombrar; sustituirlo desconectaría salas y cuentas y exigiría una migración.
 
-El nombre visible y el identificador son distintos: conserva el `projectId`, `authDomain`
-y `storageBucket` actuales de `online.js`. El identificador de un proyecto existente no
-se puede renombrar; reemplazarlo por un nombre inventado desconecta las salas y las cuentas.
-Eliminar también la denominación histórica de esos identificadores exige un proyecto nuevo
-y una migración planificada de configuración y datos.
+## Probar con dos móviles
 
-### Proveedor y dominios
+1. Abre la web (`https://continuumjuego.es/`) o la app con conexión a internet.
+2. Jugar → **Jugar con amigos → Cada uno en su móvil → Crear partida**, elige un mazo y el ritmo
+   **En directo**.
+3. Crea la sala y comparte el enlace, el código o el QR.
+4. En el segundo móvil: **Unirme a una partida** y escanea el QR o pega el enlace o el código.
+5. En la sala de espera, el anfitrión ajusta cartas, tiempo por turno (sin tiempo, 15, 20 o
+   30 s) y poderes, y pulsa **Barajar y empezar**. Antes de repartir se juega el minijuego de
+   quién empieza.
 
-La temporada nueva crea invitados automáticamente. Mantén habilitado Anónimo en Firebase Authentication. Publica las reglas de `firestore.rules` y el cliente nuevo; consulta `CUENTAS_Y_RANKING.md`. No hacen falta Google, Apple ni correo/contraseña.
-
-Si Firebase muestra un error de dominio al probar desde GitHub Pages:
-
-1. Abre **Authentication → Configuración → Dominios autorizados**.
-2. Añade el dominio `TU-USUARIO.github.io`, sustituyendo `TU-USUARIO` por el nombre de tu cuenta.
-
-## 3. Actualizar GitHub Pages
-
-Sube todos los archivos de esta versión. En especial deben estar:
-
-- `app.js`
-- `online.js`
-- `styles.css`
-- `service-worker-258.js`
-- `cards.js`
-- `movies.js`
-- la carpeta `assets`
-
-El archivo `firestore.rules` no es ejecutado por GitHub Pages; se incluye como copia de seguridad de las reglas publicadas en Firebase.
-
-Al cambiar cualquier archivo conviene subir el número de `CACHE` en `service-worker-258.js`
-(`hilo-modos-v10`, `v11`…): eso hace que el navegador reinstale el service worker y
-descarte de golpe la versión anterior. Si se olvida, la actualización llega igualmente,
-pero un arranque más tarde. La portada muestra abajo la versión que tiene guardada ese
-móvil, que es la forma rápida de comprobar si un cambio ha llegado o no.
-
-## 4. Probar con dos móviles
-
-1. Abre la web actualizada con conexión a internet.
-2. Elige **Varios móviles → Crear una sala**.
-3. Escribe el nombre del anfitrión.
-4. Comparte el enlace generado o pulsa **Mostrar QR** para que el resto lo escanee con la cámara.
-5. Abre el enlace desde un segundo móvil e introduce otro nombre.
-6. El anfitrión selecciona las cartas iniciales y la persona más joven.
-7. Pulsa **Barajar y empezar**.
-
-Durante la partida, el botón **Sala** abre la gestión: compartir el enlace, mostrar el QR y,
-si eres el anfitrión, **saltar el turno** de quien se haya quedado sin batería o **expulsar**
-a quien ya no juegue. Sus cartas vuelven al descarte y la partida sigue. Quien no sea
-anfitrión puede salir por su cuenta desde ese mismo menú.
-
-El orden de entrada en la sala determina el orden de los turnos; la persona marcada como más joven realiza el primero.
+Durante la partida, el menú de la sala permite compartir el enlace y el QR y, al anfitrión,
+saltar el turno de quien se haya quedado sin batería o expulsar a quien ya no juegue: sus cartas
+vuelven al descarte y la partida sigue. Cualquiera puede marcharse desde ese mismo menú.
 
 ## Privacidad y límites
 
-- La identidad de invitado se gestiona mediante Firebase Authentication; no se solicita correo.
-- Cada participante usa el UID de su invitado.
-- Las salas utilizan códigos aleatorios de ocho caracteres.
-- Los códigos QR se generan dentro del propio dispositivo y no envían la invitación a servicios externos.
-- La interfaz solo enseña a cada participante su propia mano.
-- Es un juego doméstico: el documento de la sala viaja entero a cada móvil, así que quien
-  sepa inspeccionar el navegador puede ver las manos ajenas y el orden del mazo. Las reglas
-  impiden manipular la partida, no mirar.
-- El modo compartido necesita internet. El modo de un móvil continúa funcionando sin conexión.
-
-## Fantasma y Pulso
-
-Publica el contenido completo de `firestore.rules` en Firebase Console → Firestore Database
-→ Reglas → Publicar antes de activar Fantasma o Pulso. Si utilizas la CLI autenticada, usa
-`firebase deploy --only firestore:rules --project timeline-es` con `firebase.json` apuntando
-a este archivo. No hace falta modificar los mazos. Las reglas validan tanto la obtención
-privada como el uso de la Carta Pulso, y recolocan un Fantasma duplicado solo tras un robo
-válido. Las salas nuevas incluyen de 1 a 3 poderes de cada tipo activado según el número de
-jugadores. Fantasma y Pulso utilizan el reparto 50/50 entre las primeras 12 cartas por
-jugador y el mazo completo, sin compartir posiciones.
-
-Hasta publicar las reglas, desmarca **Cartas Fantasma** y **Cartas Pulso** en la
-configuración de la sala. La app no puede publicar reglas con la clave pública de Firebase:
-hace falta la cuenta propietaria o una cuenta de servicio autorizada. El poder sí funciona
-sin Firebase al pasar un solo móvil.
+- El invitado se gestiona con Firebase Authentication; no se pide correo.
+- Las salas usan códigos aleatorios de ocho caracteres; los QR se generan en el propio
+  dispositivo.
+- La interfaz solo enseña a cada participante su propia mano, pero el documento de la sala viaja
+  entero a cada móvil: quien sepa inspeccionar el navegador puede ver las manos ajenas y el orden
+  del mazo. Las reglas impiden manipular la partida, no mirar.
+- Las partidas compartidas necesitan internet, salvo las salas por Wi-Fi local. Un solo móvil y
+  el solitario funcionan sin conexión.
+- Cada participante envía una señal de presencia cada 45 segundos mientras tiene la sala a la
+  vista; cuenta en lecturas y escrituras de Firestore.

@@ -1,7 +1,6 @@
 // Velocidades de referencia en km/h, no un ranking homogéneo de récords absolutos.
 // El título identifica el movimiento y si se trata de crucero, carrera o muestra medida.
-// Las cartas aún sin referencia se señalan explícitamente como pendientes de revisión.
-// Véase VERIFICACION_CORRECCIONES.md para fuentes y limitaciones.
+// Cada carta lleva su fuente en `source` (inventario en docs/catalogo-fuentes.json).
 window.ANIMAL_SPEED_CARDS = [
   { id: 13001, value: 9, title: "Escarabajo tigre (carrera en tierra)", detail: "Guinness reconoce a Cicindela hudsoni como el insecto terrestre más rápido: 2,5 metros por segundo, unos 9 km/h. Sustituye al caracol de jardín, cuya cifra superaba ese récord.", source: "https://www.guinnessworldrecords.com/world-records/70631-fastest-insect-on-land" },
   { id: 13002, value: 14, title: "Cangrejo fantasma (carrera en tierra)", detail: "Guinness reconoce a los cangrejos del género Ocypode como el crustáceo terrestre más rápido: 4 metros por segundo, 14,4 km/h. Sustituye a la babosa, que nunca tuvo cifra documentada.", source: "https://www.guinnessworldrecords.com/world-records/112626-fastest-moving-crustacean-on-land" },

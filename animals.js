@@ -1,6 +1,6 @@
 // Masa de referencia en kg. El título distingue medias, sexo, ejemplares grandes
 // y extremos de rangos cuando corresponde; no es una tabla de promedios universales.
-// Los cambios numéricos de la auditoría llevan su fuente. Véase VERIFICACION_CORRECCIONES.md.
+// Cada carta lleva su fuente en `source` (inventario en docs/catalogo-fuentes.json).
 window.ANIMAL_WEIGHT_CARDS = [
   { id: 10001, value: 0.00012, title: "Abeja melífera", detail: "Un estudio de Scientific Reports midió masas medias de 0,10–0,13 g en abejas obreras; la carta usa 0,12 g como referencia de una obrera adulta.", source: "https://www.nature.com/articles/s41598-022-21347-5", reviewStatus: "reviewed", reviewedAt: "2026-09-19" },
   { id: 10002, value: 0.0005, title: "Mariposa monarca", detail: "Monarch Watch sitúa la masa adulta media en 0,5 g y el rango habitual en 0,25–0,75 g. La carta usa la media.", source: "https://www.monarchwatch.org/read/", reviewStatus: "reviewed", reviewedAt: "2026-09-19" },

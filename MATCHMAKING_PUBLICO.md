@@ -1,215 +1,112 @@
-# Matchmaking público — Fase 1
+# Jugar online: mesas públicas y partida rápida
 
-Objetivo: añadir **Partida rápida** al multijugador online sin tocar el modo LAN/offline ni sustituir las salas privadas actuales.
+«Jugar online» sienta a desconocidos en mesas públicas de 2 a 4 personas, sin tocar las salas
+privadas ni el modo Wi-Fi. Tiene dos caminos en la misma pantalla:
 
-## Experiencia MVP
+- **Tablón de mesas** (como el vestíbulo de Risk): alguien pulsa **Crear mesa**, elige juego,
+  plazas y tiempo, y la mesa aparece en «Mesas abiertas»; los demás eligen dónde sentarse.
+- **Partida rápida:** sin elegir mesa, te sientan en la primera libre. Se elige el tamaño de
+  mesa («Cualquier mesa», hasta 2, 3 o 4) y el contenido: **Grandes colecciones** (hasta tres
+  temas o ninguno, o un mazo al azar) o **Retos rápidos**.
 
-1. El jugador entra en `Multijugador → Partida rápida`.
-2. Elige tamaño de mesa: 2, 3 o 4 jugadores. En la primera iteración se puede fijar 4 por defecto.
-3. Continuum busca una mesa pública compatible en estado `waiting`.
-4. Si existe hueco, reserva la plaza mediante transacción de Firestore.
-5. Si no existe, crea una mesa pública y queda esperando.
-6. Cuando se llena, la sala pasa atómicamente a `starting` y muestra una cuenta atrás corta.
-7. Después pasa a `playing` y reutiliza el motor online existente.
-
-No hay chat, espectadores, ranking específico, filtros por nivel ni listado manual de mesas en esta fase.
+| Pieza | Archivo |
+| --- | --- |
+| Pantallas de Jugar online | `home-modes-v1.js` |
+| Tablón de mesas (`publicTables`) | `public-tables.js` |
+| Claves de cola, compatibilidad y arranque | `public-matchmaking.js` |
+| Transacciones de Grandes colecciones (`rooms` + `publicQueues`) | `online.js`, `public-matchmaking-online.js` |
+| Transacciones de Retos rápidos (`quickRooms` + `quickPublicQueues`) | `quick-online.js`, `quick-room.js` |
+| Reglas | `firestore.rules` (`publicTables`, `publicQueues`, `quickPublicQueues`, `rooms`, `quickRooms`) |
 
 ## Principios
 
-- **Firebase es la autoridad de emparejamiento.** Ningún teléfono decide por sí solo que una mesa está llena.
-- **Entrada atómica.** Dos jugadores que intenten ocupar la última plaza no pueden entrar ambos.
-- **Idempotencia.** Pulsar dos veces o reintentar tras una pérdida de red no debe meter al mismo UID dos veces.
-- **Compatibilidad de cliente y mazo.** Se conservan `CLIENT_VERSION` y `deckFingerprint` para evitar partidas entre instalaciones incompatibles.
-- **Separación de modos.** Sala privada, partida pública y LAN/offline mantienen flujos independientes.
-- **Sin anfitrión funcional.** Puede conservarse un `hostUid` técnico para compatibilidad con el motor actual, pero no debe ser necesario para que la mesa pública sobreviva al abandono de quien la creó.
+- **Firebase es la autoridad de emparejamiento.** Ningún teléfono decide por sí solo que una mesa
+  está llena; entrar es una transacción y dos personas no pueden ocupar la última plaza.
+- **Idempotencia.** Pulsar dos veces o reintentar tras una pérdida de red no mete al mismo UID dos
+  veces.
+- **Compatibilidad.** La versión del cliente (`CLIENT_VERSION`, hoy 42) y la huella del mazo
+  forman parte de la clave de la cola: instalaciones incompatibles no se mezclan.
+- **La sala manda.** La cola y la ficha del tablón solo sirven para encontrar la mesa; la verdad
+  está en `rooms/{código}` o `quickRooms/{código}`.
+- **Sin anfitrión visible.** Hay un anfitrión técnico para el motor, pero la mesa sobrevive a que
+  se vaya quien la creó.
 
-## Modelo propuesto
+## Modelo
 
-### `publicQueues/{queueKey}`
+**`publicQueues/{queueKey}`** (Grandes colecciones): un único puntero por modalidad, capacidad,
+versión y huella, con la clave `modo:capacidad:vVersión:huella`. Campos: `queueKey`, `roomCode`,
+`mode`, `capacity`, `clientVersion`, `deckFingerprint`, `status` (`waiting` | `full`) y
+`updatedAt`. Las reglas exigen que coincida con su sala.
 
-Documento pequeño usado únicamente para localizar/reservar una mesa abierta.
+**`quickPublicQueues/{key}`** (Retos rápidos): `code`, `status`, `capacity` y `updatedAt`.
 
-```js
-{
-  queueKey: "history-4-v42",
-  mode: "history",
-  capacity: 4,
-  clientVersion: 42,
-  roomCode: "ABCD2345",
-  status: "waiting", // waiting | full
-  members: [uid1, uid2],
-  createdAt,
-  updatedAt
-}
-```
+**`rooms/{código}`** público: la sala de siempre con `matchmaking: 'public'`, `capacity`,
+`queueKey`, `clientVersion` y `deckFingerprint`. Los códigos públicos empiezan por `P`.
 
-`queueKey` separa modalidad, capacidad y versión compatible. La operación buscar/crear se ejecuta en una transacción.
+**`publicTables/{código}`**: la ficha del tablón (`kind` `collections` o `quick`, modo, plazas,
+tiempo por turno, jugadores, nombres, anfitrión y su avatar, versión, huella y opciones). Solo la
+escribe quien lleva la mesa; cualquiera con sesión la lista (máximo 50). Se renueva cada 40–45 s;
+sin renovar en dos minutos deja de enseñarse y cualquiera puede borrarla. La limpieza diaria
+borra las fichas y colas con más de un día.
 
-### `rooms/{roomCode}`
+Las reglas impiden capacidades fuera de 2–4, añadir o quitar a otro, superar la capacidad,
+cambiar modo, versión, código o clave después de crear la cola, entrar en una cola `full`,
+apuntar una cola a una sala incompatible y modificar una partida pública sin pertenecer a ella.
+Cada mesa nueva va con su registro de cuota (`creationQuota`): una partida nueva cada 10 s por
+persona.
 
-Se reutiliza el documento de sala actual, añadiendo únicamente metadatos públicos:
-
-```js
-{
-  matchmaking: {
-    kind: "public",
-    capacity: 4,
-    queueKey: "history-4-v42"
-  },
-  status: "lobby", // después starting / playing
-  ...camposActuales
-}
-```
-
-El objetivo es no duplicar el motor de partida.
-
-## Transacción `findOrCreatePublicMatch`
-
-Pseudocódigo:
-
-```text
-asegurar autenticación
-calcular queueKey(mode, capacity, clientVersion)
-leer publicQueues/queueKey
-
-si existe una cola waiting y el UID no está dentro:
-    leer rooms/roomCode
-    comprobar lobby + hueco + fingerprint + versión
-    añadir UID a players/playerOrder y a queue.members
-    si alcanza capacity:
-        queue.status = full
-        room.matchmaking.readyAt = serverTimestamp
-    commit
-si no existe una cola utilizable:
-    crear roomCode aleatorio
-    crear rooms/roomCode con el jugador
-    crear/reemplazar publicQueues/queueKey apuntando a esa sala
-    commit
-
-conectar al listener normal de rooms/roomCode
-```
-
-Si una transacción pierde una carrera porque otra persona llenó la mesa, se reintenta la búsqueda; nunca se fuerza la entrada en una sala completa.
-
-## Arranque
-
-Al alcanzar `capacity`, la sala deja de aceptar jugadores. Para la primera versión:
-
-- `readyAt` marca cuándo se completó.
-- Todos muestran la misma pantalla `Mesa completa`.
-- La transición real a `playing` debe ser una única escritura validada/atómica.
-- Mientras el motor actual siga necesitando acciones de anfitrión para preparar/repartir, se asignará un coordinador técnico reemplazable. La evolución posterior moverá ese arranque a lógica de servidor si hace falta para eliminar totalmente esa dependencia.
-
-## Abandono y reconexión
-
-### Mientras espera
-
-- Salir elimina al UID de la mesa mediante transacción.
-- Si queda vacía, se elimina/invalida la cola.
-- Si sale el coordinador técnico, otro miembro ocupa ese papel.
-
-### Mesa completa / partida
-
-- Una pérdida breve de conexión no libera inmediatamente la plaza.
-- Se reutiliza `presence` para detectar reconexión.
-- La Fase 1 no introduce bots; un abandono definitivo utiliza la lógica existente de salida/relevo siempre que sea compatible.
-
-## Seguridad Firestore
-
-Antes de activar la interfaz pública hay que ampliar `firestore.rules` para `publicQueues` y para los nuevos campos de `rooms`.
-
-Las reglas deben impedir como mínimo:
-
-- capacidades fuera de 2–4;
-- que un usuario añada/elimine a otro arbitrariamente;
-- superar la capacidad;
-- cambiar `mode`, `clientVersion`, `roomCode` o `queueKey` después de crear la cola;
-- entrar en una cola marcada `full`;
-- apuntar una cola a una sala incompatible;
-- modificar una partida pública sin pertenecer a ella.
-
-No se publicará el botón de Partida rápida hasta que estas reglas tengan pruebas con el emulador.
-
-## Pruebas obligatorias
-
-1. Primer usuario crea cola y sala.
-2. Segundo usuario encuentra y ocupa plaza.
-3. Dos usuarios compiten por la última plaza: solo uno entra.
-4. Doble toque/reintento del mismo UID: no se duplica.
-5. Sala llena rechaza nuevas entradas.
-6. Versiones o `deckFingerprint` distintos no se mezclan.
-7. Usuario abandona mientras espera y libera plaza.
-8. Creador abandona y la sala sigue siendo recuperable.
-9. Corte de red y reconexión conservan la plaza.
-10. Dos mesas simultáneas no mezclan jugadores.
-
-## Orden de implementación
-
-- [x] Diseñar flujo y modelo de datos.
-- [ ] Crear módulo `public-matchmaking.js` con claves, validación y transacciones.
-- [ ] Añadir reglas Firestore y pruebas de emulador.
-- [ ] Integrar `Partida rápida` en `online.js`.
-- [ ] Añadir sala de espera y cuenta atrás.
-- [ ] Reutilizar arranque/motor de partida actual.
-- [ ] Pruebas con 2 y 4 dispositivos y carreras simultáneas.
-- [ ] Activar el acceso en la interfaz solo después de reglas + pruebas en verde.
-
-## Fuera de Fase 1
-
-Chat, ranking/ELO, filtros de nivel, mesas visibles, espectadores, invitaciones a una mesa pública, bots, temporadas y matchmaking por habilidad.
 ## Orden de juego y relevo del anfitrión
 
 - **Quién empieza.** Al completarse la mesa se juega el mismo minijuego que en las salas
   privadas: el anfitrión técnico reparte una carta automáticamente y cada persona tiene 30
-  segundos para escribir su cifra. La partida arranca sola en cuanto han respondido todos
-  (o se agota el plazo). La mesa se sienta por orden de cercanía; quien no respondió juega
-  al final.
-- **Relevo automático.** Si el anfitrión técnico deja de dar señales (15 s si dejó la
-  pantalla de la sala o la app pasó a segundo plano, 90 s si simplemente dejó de
-  responder), la primera persona conectada de la mesa toma el relevo sin pulsar nada. En
-  la sala de espera, además, se saca de la mesa a quien se fue y la cola vuelve a ofrecer
-  la mesa (`status: waiting`).
-- **Reglas.** Reordenar la mesa al empezar necesita la versión actual de
-  `firestore.rules` (`validStart` admite una permutación de `playerOrder`). Con las
-  reglas antiguas publicadas, el cliente reintenta sin reordenar: empieza quien ganó el
-  minijuego, en el orden de entrada.
-- **Mesas abandonadas.** Mientras alguien espera en una mesa con plazas libres, su móvil
-  renueva la cola cada 45 s. Una cola sin renovar en dos minutos se da por abandonada: la
-  búsqueda no entra en ella y abre una mesa nueva en su lugar (la regla de
-  `publicQueues` lo permite). Con las reglas anteriores publicadas, el cliente entra en la
-  mesa abandonada como antes y el relevo automático la pone en marcha.
-- **Sala de espera.** En una mesa pública no se muestra quién es el anfitrión técnico: cada
-  plaza dice solo su número y, si esa persona no da señal, «sin señal».
-- **Retos rápidos.** Sus mesas públicas usan la cola `quickPublicQueues` y solo las puede
-  empezar quien las abrió (no hay relevo). Por eso esa persona renueva la cola cada 45 s
-  mientras espera; una cola sin renovar en dos minutos se da por abandonada y la búsqueda
-  abre otra mesa. Quien ya estaba esperando en una mesa abandonada recibe un aviso para
-  volver a buscar.
+  segundos para escribir su cifra. La mesa se sienta por orden de cercanía; quien no respondió
+  juega al final.
+- **Relevo automático.** Si el anfitrión técnico deja de dar señales (15 s si dejó la pantalla de
+  la sala o la app pasó a segundo plano, 90 s si simplemente dejó de responder), la primera
+  persona conectada toma el relevo sin pulsar nada. En la sala de espera, además, se saca de la
+  mesa a quien se fue y la cola vuelve a ofrecerla (`status: waiting`).
+- **Reglas antiguas.** Reordenar la mesa al empezar necesita las reglas actuales (`validStart`
+  admite una permutación de `playerOrder`). Con reglas anteriores, el cliente reintenta sin
+  reordenar.
+- **Mesas abandonadas.** Mientras alguien espera en una mesa con plazas libres, su móvil renueva
+  la cola cada 45 s. Una cola sin renovar en dos minutos se da por abandonada: la búsqueda no
+  entra en ella y abre una mesa nueva.
+- **Retos rápidos.** Sus mesas usan `quickPublicQueues` y solo las puede empezar quien las abrió
+  (no hay relevo). Esa persona renueva la cola cada 45 s; quien estaba esperando en una mesa
+  abandonada recibe un aviso para volver a buscar.
 
-## Sala de espera (revisión con prueba de extremo a extremo)
+## Sala de espera
 
-Referencia: las salas públicas de juegos como Among Us o Risk. Nadie organiza, el juego
-lleva la mesa y nadie se queda esperando para siempre.
+Referencia: las salas públicas de juegos como Among Us o Risk. Nadie organiza, el juego lleva la
+mesa y nadie se queda esperando para siempre.
 
-- **Cuándo empieza.** Al completarse la mesa (y responder todos al minijuego) o, con al
-  menos dos personas, cuando pasan 30 s sin que entre nadie más. Cada entrada reinicia la
-  cuenta atrás, medida con la hora del servidor (`updatedAt` de la sala). Las reglas no
-  dejan empezar antes de 25 s desde la última entrada. Antes, una mesa de 4 con dos
-  personas no empezaba nunca.
-- **Minijuego mientras se espera.** La carta sale en cuanto hay dos personas; quien entra
-  después responde a la misma; quien no responde a tiempo juega al final.
-- **Salir.** «Dejar de buscar» o la flecha de volver liberan la plaza al momento. Si se va
-  quien lleva la mesa, la pasa a quien queda primero (`validPublicHostLeave`); si no
-  quedaba nadie, la mesa se cierra.
-- **Buscar después de que otra mesa haya empezado.** La cola puede seguir apuntando a una
-  mesa ya en juego, que no se puede leer. Antes, leerla dentro de la transacción hacía
-  fallar toda la búsqueda («Firebase ha rechazado la creación de la mesa pública»); ahora
-  se comprueba antes y se abre una mesa nueva.
-- **Pantalla.** Arriba, la colección y el estado con la cuenta atrás; debajo, los
-  jugadores con su estado (tú, en la mesa, pensando su cifra, ha respondido, sin señal) y
-  el minijuego. Sin «Anfitrión» ni la caja técnica de conexión. Al terminar, «Buscar otra
-  partida».
-- **Retos rápidos.** Las mismas reglas de arranque y de salida (acción `leave` en
-  `quick-room.js` y regla `leaving`).
-- **Prueba.** `npm run test:online-e2e` recorre todo lo anterior con varias personas a la
-  vez, en Chromium y contra los emuladores de Auth y Firestore con las reglas reales.
+- **Cuándo empieza.** Al completarse la mesa (y responder todos al minijuego) o, con al menos dos
+  personas, cuando pasan 30 s sin que entre nadie más. Cada entrada reinicia la cuenta atrás,
+  medida con la hora del servidor (`updatedAt` de la sala). Las reglas no dejan empezar antes de
+  25 s desde la última entrada.
+- **Minijuego mientras se espera.** La carta sale en cuanto hay dos personas; quien entra después
+  responde a la misma.
+- **Salir.** «Dejar de buscar» o la flecha de volver liberan la plaza al momento. Si se va quien
+  lleva la mesa, la pasa a quien queda primero (`validPublicHostLeave`); si no queda nadie, la mesa
+  se cierra.
+- **Cola que apunta a una mesa ya en juego.** Se comprueba antes de la transacción y se abre una
+  mesa nueva, en vez de fallar la búsqueda.
+- **Pantalla.** Arriba, la colección y el estado con la cuenta atrás; debajo, los jugadores con su
+  estado (tú, en la mesa, pensando su cifra, ha respondido, sin señal) y el minijuego. Sin
+  «Anfitrión». Al terminar, «Buscar otra partida».
+- **Retos rápidos.** Las mismas reglas de arranque y de salida (acción `leave` en `quick-room.js`
+  y regla `leaving`).
+
+## Pruebas
+
+- `node tests/public-matchmaking.mjs`: claves, capacidad y compatibilidad.
+- `npm run test:reglas` (`public-matchmaking-rules.mjs`, `quick-online-rules.mjs`,
+  `orden-salida-online.mjs`): carreras por la última plaza, idempotencia, salas llenas, versiones
+  distintas, abandono, relevo y cuota contra el emulador.
+- `npm run test:online-e2e`: recorrido completo con varias personas a la vez, en Chromium y contra
+  los emuladores de Auth y Firestore con las reglas reales.
+
+Pendiente: pruebas con 2 y 4 dispositivos reales a la vez.
+
+Fuera de alcance por ahora: chat, ranking o ELO de mesas, filtros por nivel, espectadores, bots y
+emparejamiento por habilidad.

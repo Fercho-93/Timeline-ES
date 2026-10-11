@@ -28,55 +28,78 @@ rival, retos recibidos, invitaciones enviadas, historial).
 
 La barra inferior tiene Inicio, Atlas, Guía y Ajustes. El **Atlas** reúne la colección de
 cartas con la puerta a todas ellas, la racha del reto diario con su calendario, los duelos, las
-estadísticas y los logros.
+estadísticas, los logros, el ranking y tu cuenta.
+
+## Dónde vive cada cosa
+
+El mapa de archivos y carpetas del proyecto está en [MAPA_DEL_PROYECTO.md](MAPA_DEL_PROYECTO.md).
+El resto de la documentación:
+
+| Documento | De qué trata |
+| --- | --- |
+| [ROADMAP.md](ROADMAP.md) | Estado del proyecto: lo hecho y lo pendiente. Es la referencia única de estado. |
+| [BETA_CHECKLIST.md](BETA_CHECKLIST.md) | Pruebas de la beta, testers, incidencias y requisitos previos a tiendas. |
+| [docs/TIENDAS.md](docs/TIENDAS.md) | Ficha de App Store y Google Play, notas de revisión y declaraciones de privacidad. |
+| [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md) | Firebase, **despliegue** de web, reglas, Functions y beta, y plazos de conservación. |
+| [docs/MODELO_DE_DATOS.md](docs/MODELO_DE_DATOS.md) | Cada colección de Firestore: para qué, quién la lee y escribe, cuánto se conserva. |
+| [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md) | Modelo de confianza, medidas antitrampas y App Check. |
+| [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md) | Invitado, Iniciar sesión con Apple, borrado de cuenta y ranking. |
+| [DUELOS-ASINCRONOS.md](DUELOS-ASINCRONOS.md) | Duelos por turnos y sus Cloud Functions. |
+| [MATCHMAKING_PUBLICO.md](MATCHMAKING_PUBLICO.md) | Jugar online: tablón de mesas y partida rápida. |
+| [DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md) | Compilaciones firmadas, TestFlight y enlaces universales. |
+| [PRIVACIDAD.md](PRIVACIDAD.md) | Política de privacidad (la misma que `privacidad.html`). |
+| [CONTENIDO_Y_DERECHOS.md](CONTENIDO_Y_DERECHOS.md), [PROCEDENCIA_ARTE_IA.md](PROCEDENCIA_ARTE_IA.md) | Fuentes de las cartas y procedencia del arte. |
+| [tests/README.md](tests/README.md) | Qué comprueba cada prueba y dónde se ejecuta. |
+| [server/README.md](server/README.md) | Servidor experimental de competición (no desplegado). |
 
 ## Tu nombre y tu avatar
 
-La bienvenida pide un nombre, pero el avatar ilustrado se asigna al invitado y no
-cambia al editarlo. Hay 36 medallones originales en `assets/avatars/`, dibujados
-con el mismo papel y color que el resto del juego. En una cuenta, la elección sale
-del UID anónimo: ese mismo jugador se ve igual en el Atlas, las salas, los duelos
-y el ranking sin guardar ni transmitir una imagen. Fuera de una cuenta se conserva
-una semilla local para mantener el avatar entre aperturas de esta instalación.
-En salas online se usa el UID; en salas por Wi-Fi, el identificador de la sala;
-en partidas en un solo móvil, el nombre disponible.
+La bienvenida propone un alias y un avatar; los dos se pueden cambiar después en el Atlas, y
+cambiar el nombre no cambia el avatar. Hay 36 medallones originales en `assets/avatars/`,
+dibujados con el mismo papel y color que el resto del juego (`avatares.js`). Al entrar se asigna
+uno a partir del UID, y la elección propia se guarda en el perfil de la cuenta: ese mismo
+jugador se ve igual en el Atlas, las salas, los duelos, las mesas y el ranking, sin guardar ni
+transmitir una imagen. En salas por Wi-Fi viaja el identificador del avatar; en partidas en un
+solo móvil se usa el nombre disponible.
 
-`identidad.js` guarda el nombre en `continuum-identidad-v1` y lo copia en
-`hilo-nombre-v1`, usado por duelos y salas. Si hay cuenta, se guarda también en
-ella y un nombre ocupado por otra cuenta se rechaza con aviso.
+`identidad.js` guarda el nombre en `continuum-identidad-v1` y lo copia en `hilo-nombre-v1`,
+usado por duelos y salas. Con cuenta se guarda también en ella, y un nombre ocupado por otra
+cuenta se rechaza con aviso (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
 
-## Retos rápidos y ¿Cuántos hay…?
+## Retos rápidos
 
-**Retos rápidos** funciona igual que las grandes colecciones, con temas cortos: se juega
-solo (partida libre por duración), en multijugador de 2–4 participantes en un móvil, por
-internet o por Wi-Fi local, o retando a un amigo en un duelo por turnos. No usa el
-marcador de Competición: mantiene su propia partida guardada.
+**Retos rápidos** funciona igual que las grandes colecciones, con temas cortos: se juega solo
+(partida libre por duración), en un solo móvil, por internet o por Wi-Fi local, en mesas
+públicas, o retando a un amigo en un duelo (por turnos o con las mismas cartas por enlace). No
+usa el marcador de Competición: mantiene su propia partida guardada.
 
-Cada conjunto tiene como máximo diez cartas, incluida una referencia inicial que
-no puntúa. En cada turno se elige una carta común y se confirma su hueco en la
-línea. Acertar suma un punto provisional y pasa el turno; fallar pierde los puntos
-de ese reto y retira al participante hasta el siguiente. Plantarse asegura los
-puntos y también retira al participante. Los puntos de retos anteriores nunca se
-pierden. Una carta fallada se coloca correctamente como referencia: al fallar se ve el hueco donde iba y, al continuar, entra en la línea.
+Cada reto se juega con todas sus cartas barajadas; la primera hace de referencia y no puntúa.
+En cada turno se elige una carta y se confirma su hueco en la línea. Acertar suma un punto
+provisional y pasa el turno. Qué pasa al fallar se elige al preparar la partida («Si alguien
+falla»):
 
-Al agotarse las cartas se aseguran los puntos pendientes; también termina el reto
-si nadie sigue activo. La última persona activa puede continuar o plantarse. El
-primer turno rota entre retos. Gana la mayor puntuación acumulada y los empates
-finales se comparten. La rotación reduce la ventaja inicial, pero no garantiza el
-mismo número de intentos: depende de los fallos, retiradas y cartas disponibles.
+- **Arriesgar o plantarse:** fallar pierde los puntos provisionales de ese reto y retira al
+  participante hasta el siguiente; plantarse los asegura y también le retira.
+- **Seguir hasta el final:** un fallo no suma, pero se juega todo el reto y gana quien acierte más.
 
-El catálogo inicial contiene redes sociales (6 cartas), películas por Óscar (10),
-graduación de bebidas concretas (6) y categorías de manos del póker (9). Cada carta
-incluye dato, explicación y fuente, accesible al revelar y al repasar el orden
-completo. En póker, la escalera real forma parte de la categoría escalera de color.
-La colocación admite empates reales y retos de orden ascendente o descendente.
+Los puntos de retos anteriores nunca se pierden. Una carta fallada se coloca correctamente como
+referencia: al fallar se ve el hueco donde iba y, al continuar, entra en la línea. Al agotarse
+las cartas se aseguran los puntos pendientes; también termina el reto si nadie sigue activo. El
+primer turno rota entre retos. Gana la mayor puntuación acumulada y los empates finales se
+comparten. La rotación reduce la ventaja inicial, pero no garantiza el mismo número de intentos.
 
-**¿Cuántos hay…?** queda reservado como gran mazo de cantidades, con el contenido
-pendiente de selección. Se anuncia como «En preparación» y no se incorpora como
-mazo vacío a partidas, enciclopedia, compras o rotación de Competición.
+El catálogo tiene **29 retos y 567 cartas**, de 9 a 34 por reto: deportes por jugadores,
+graduación de bebidas, festividades, redes sociales, Segunda Guerra Mundial, Guerra Civil, reyes
+de España, consolas, películas por Óscar, empresas por fundación y por facturación, husos
+horarios, ciudades de oeste a este y de sur a norte, partes del cuerpo, series por temporadas,
+edificios, ríos de España, alimentos por calorías, discos, estadios, capitales por altitud,
+Eurovisión, unidades de almacenamiento, aeropuertos, metros, programas españoles, salarios
+mínimos y manos del póker. Cada carta tiene su ilustración, dato, curiosidad y fuente,
+accesibles al revelar y al repasar el orden completo; las cifras que cambian con el tiempo
+indican su fecha de referencia («Datos a 2026»). La colocación admite empates reales y retos de
+orden ascendente o descendente.
 
-`quick-challenges-data.js` contiene el catálogo independiente y la reserva del
-mazo futuro. `quick-challenges-engine.js` reutiliza la comparación de `engine.js`;
+`quick-challenges-data.js` contiene el catálogo. `quick-challenges-engine.js` reutiliza la comparación de `engine.js`;
 `quick-challenges.js` presenta los turnos y guarda una configuración y un historial
 de acciones en el almacenamiento de la cuenta. La recuperación reproduce acciones
 válidas en vez de aceptar puntuaciones guardadas. Si cambia el significado de los
@@ -92,27 +115,21 @@ La Competición es el último panel de la lista de Grandes colecciones, en Jugar
 
 En solitario se suman los aciertos. En multijugador se reparten las cartas elegidas a cada participante (ajustadas si el mazo es pequeño), gana quien termine una vuelta completa sin cartas y se usa la final numérica secreta si hay varios. Ganar una ronda suma un punto; quedarse con cartas en la mano al terminarla penaliza con su número menos uno (una carta no resta nada, dos cartas restan un punto, tres restan dos, y así sucesivamente). Al terminar, el marcador muestra el ganador o el empate global en puntos.
 
-En un móvil se conserva la competición por separado de las partidas normales. En varios móviles, el anfitrión pasa al siguiente mazo dentro de la misma sala; se conservan participantes e historial y se preparan nuevas manos. Se puede reconectar con el mismo código. El multijugador online necesita las reglas actualizadas para el cliente 42.
-
-## Documentación de beta y lanzamiento
-
-- [Hoja de ruta consolidada](ROADMAP.md): estado actual, prioridades y criterios para avanzar.
-- [Checklist de beta y lanzamiento](BETA_CHECKLIST.md): pruebas automáticas, móviles, testers y tiendas.
-
-Juego de ordenar para 2–9 personas, diseñado para jugarse pasando un solo móvil o mediante una sala compartida. Funciona sin conexión después de instalarse como aplicación web, salvo cuando se utiliza el modo de varios móviles.
+En un móvil se conserva la competición por separado de las partidas normales. En varios móviles, el anfitrión pasa al siguiente mazo dentro de la misma sala; se conservan participantes e historial y se preparan nuevas manos. Se puede reconectar con el mismo código. En la sala online lo admiten las reglas publicadas
+desde el cliente 42; en la sala Wi-Fi, `local-room.js`.
 
 ## Nombre y destino del producto
 
-El nombre del juego es **Continuum**, tanto en la aplicación como en su instalación móvil,
-documentación y futuras fichas comerciales. El objetivo es comercializarlo como juego móvil
-en App Store; la versión actual es una aplicación web instalable, no una app iOS publicada.
+Juego de ordenar cartas para jugar solo o con 2–9 personas, pasando un solo móvil, cada uno en
+el suyo o en mesas públicas. El nombre es **Continuum**, en la aplicación, su instalación móvil,
+la documentación y las fichas comerciales. La web está en `https://continuumjuego.es/` (GitHub
+Pages, rama `main`) y la app de iPhone se reparte en beta por TestFlight; el objetivo es
+publicarlo en App Store y Google Play (ver [ROADMAP.md](ROADMAP.md)).
 
-El nombre del repositorio y el nombre visible del proyecto de Firebase se administran fuera
-del código. Sigue pendiente unificar el nombre visible del repositorio y del proyecto de Firebase a **Continuum** desde sus respectivas configuraciones.
-Al renombrar el repositorio, hay que comprobar de nuevo GitHub Pages y actualizar enlaces de
-invitación e instalaciones existentes: el sitio publicado no hereda automáticamente las
-redirecciones del repositorio. No se cambia ninguna dirección de servicio hasta que exista
-su destino real.
+El nombre del repositorio (`Timeline-ES`) y el nombre visible del proyecto de Firebase se
+administran fuera del código; sigue pendiente unificarlos a **Continuum**. Con el dominio propio,
+renombrar el repositorio ya no cambia la dirección de la web, pero hay que comprobar de nuevo
+GitHub Pages después.
 
 Los identificadores técnicos como `timeline` describen la línea de cartas, no la marca.
 Se conservan para mantener compatibles las partidas guardadas y las reglas de las salas.
@@ -124,50 +141,49 @@ de las pantallas locales. Este cambio de denominación no modifica la licencia d
 ## Bloques y juegos
 
 Los juegos se agrupan en seis bloques. La portada enseña el bloque y lista sus juegos debajo,
-así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
+así que añadir uno es declararlo en `modes.js` y sumarlo a `games`. En total son 15 mazos y
+1.272 cartas (recuento de octubre de 2026; la cifra exacta la da `CT.cards(mazo)`).
 
 **Historia**
 
-- **Historia de España:** 167 hechos históricos verificados, desde la Antigüedad hasta la actualidad,
-  sin dos cartas a un año de distancia salvo un puñado de hitos que de verdad lo son.
-- **Historia mundial:** 117 hechos de los faraones a hoy, mirando más allá de España y
-  dejando los hitos técnicos al mazo de al lado. Mismo criterio de fechas que aquel.
-- **Inventos y descubrimientos:** 103 hitos de la técnica y la ciencia, de la escritura cuneiforme
-  a las imágenes del telescopio James Webb. Cada carta se fecha por un hecho concreto y datable
-  —una patente, una publicación, una primera demostración— y ningún año se repite, así que dos
-  cartas nunca son una moneda al aire.
+- **Historia de España:** 167 hechos, de la fundación griega de Emporion a la pandemia de 2020.
+- **Historia mundial:** 117 hechos, de la unificación de Egipto a la invasión rusa de Ucrania,
+  mirando más allá de España y dejando los hitos técnicos al mazo de al lado. Donde la fecha es
+  tradicional o aproximada, lo dice el propio título.
+- **Inventos y descubrimientos:** 67 hitos de la técnica y la ciencia, de la escritura cuneiforme
+  al iPhone. Cada carta se fecha por un hecho concreto y datable: una patente, una publicación,
+  una primera demostración.
 
 **Entretenimiento**
 
-- **Estrenos de cine:** 87 películas conocidas, de *Viaje a la Luna* (1902) a *Del revés 2* (2024),
-  con trece títulos del cine español. Cada año aparece una sola vez y el reparto está equilibrado
-  por décadas para ofrecer una selección variada de estrenos.
-- **Hitos de la música:** 51 estrenos, obras, discos y cambios de formato, de *L'Orfeo* (1607)
-  a *The Eras Tour* (2023). El recorrido cruza música clásica, jazz, rock, pop, hip-hop y la
-  transición del fonógrafo al streaming.
-- **Historia de los videojuegos:** 51 hitos de *OXO* (1952) a *Balatro* (2024), repartidos entre
+- **Estrenos de cine:** 120 películas, de *Viaje a la Luna* (1902) a *La odisea* (2026), con títulos
+  del cine español y un reparto variado por décadas.
+- **Hitos de la música:** 99 estrenos, obras, discos y cambios de formato, de *L'Orfeo* (1607)
+  a *The Eras Tour* (2023), de la música clásica al streaming.
+- **Historia de los videojuegos:** 90 hitos de *OXO* (1952) a *Balatro* (2024), entre
   laboratorio, recreativas, ordenadores, consolas, juego en línea y móvil. En lanzamientos
   regionales se toma siempre el primero que la propia carta especifica.
 
 **Ciencia**
 
-- **Astronomía y espacio:** 49 descubrimientos y misiones, del modelo heliocéntrico de Copérnico
-  (1543) a las primeras muestras traídas de la cara oculta de la Luna (2024).
-- **Historia de la medicina:** 48 hitos, del corpus hipocrático a los primeros xenotrasplantes
-  modernos. Las explicaciones reconocen los procesos colectivos y distinguen descubrimiento,
+- **Astronomía y espacio:** 55 descubrimientos y misiones, de Eratóstenes midiendo la Tierra a las
+  primeras muestras traídas de la cara oculta de la Luna (2024), cada una con su fuente.
+- **Historia de la medicina:** 54 hitos, del corpus hipocrático al primer riñón de cerdo
+  modificado trasplantado a una persona viva. Las explicaciones distinguen descubrimiento,
   demostración, aprobación y aplicación clínica.
 
 **Naturaleza**
 
-- **Peso de animales:** 41 referencias de masa. Los títulos distinguen sexo, ejemplares grandes,
-  medias publicadas y extremos de rangos cuando corresponde; no son promedios universales.
-- **Longevidad de animales:** 38 referencias de edad. Se distingue fase adulta, vida en libertad,
-  cuidado humano, estadísticos y edades de ejemplares o colonias. Por eso el mazo ya no se
-  presenta como «esperanza de vida», que implicaría una medida estadística homogénea.
-- **Velocidad de animales:** 38 referencias que identifican movimiento y tipo de medición:
+- **Peso de animales:** 80 referencias de masa, de la abeja melífera a la ballena azul. Los
+  títulos distinguen sexo, ejemplares grandes, medias publicadas y extremos de rangos cuando
+  corresponde; no son promedios universales.
+- **Longevidad de animales:** 85 referencias de edad. Se distingue fase adulta, vida en libertad,
+  cuidado humano, estadísticos y edades de ejemplares o colonias; por eso no se presenta como
+  «esperanza de vida».
+- **Velocidad de animales:** 69 referencias que identifican movimiento y tipo de medición:
   esprint, nado, picado, crucero o media de una carrera. No es una tabla de récords absolutos.
-- **Revisión de datos:** los mazos actuales ya no llevan etiquetas «en revisión». La cobertura de fuentes estructuradas todavía es desigual; esto no equivale a certificar todos los datos.
-  Véase el historial de [correcciones y fuentes](VERIFICACION_CORRECCIONES.md).
+- Todas las cartas de Naturaleza llevan su fuente (ver
+  [CONTENIDO_Y_DERECHOS.md](CONTENIDO_Y_DERECHOS.md)); eso no equivale a certificar cada dato.
 
 **Geografía**
 
@@ -175,28 +191,30 @@ así que añadir uno es declararlo en `modes.js` y sumarlo a `games`.
   Aquí la línea no es temporal: se ordena por tamaño.
 - **Población de países:** 77 países ordenados de menos a más gente, del Vaticano a la India,
   con la proyección de la ONU a 1 de julio de 2026 (WPP 2024, vía Worldometer).
-- **Idiomas por hablantes nativos:** 47 lenguas del chino mandarín (929 millones) al feroés
-  (69.000), ordenadas por hablantes de lengua materna. No es la lista de «idiomas más hablados
-  del mundo»: quien aprende un idioma de adulto no cuenta aquí, y por eso el inglés aparece por
-  detrás del español. Del chino y del árabe solo están las variedades principales. Las cifras
-  grandes son de Ethnologue 2022 a través de una recopilación de Wikipedia; las ocho lenguas por
-  debajo de los seis millones llegan aparte y con otro corte temporal.
-  Véase [la verificación del mazo](VERIFICACION_IDIOMAS.md).
-- **Distancias entre ciudades:** 50 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
+- **Idiomas por hablantes nativos:** 50 lenguas, del aragonés al chino mandarín (929 millones),
+  ordenadas por hablantes de lengua materna. No es la lista de «idiomas más hablados del mundo»:
+  quien aprende un idioma de adulto no cuenta, y por eso el inglés aparece por detrás del
+  español. Del chino y del árabe solo están las variedades principales. Las cifras grandes son de
+  Ethnologue 2022 a través de una recopilación de Wikipedia; las lenguas pequeñas llegan aparte y
+  con otro corte temporal, una mezcla de fuentes asumida a conciencia (explicada en `idiomas.js`).
+- **Distancias entre ciudades:** 70 pares urbanos de París–Versalles a Madrid–Auckland. Se mide
   la distancia geodésica en línea recta entre centros urbanos, no una ruta por carretera, tren o avión.
 
 **Gran mezcla temporal** no es de ningún bloque temático, a propósito: concatena los ocho mazos
-cronológicos —673 cartas en total— y los ordena sobre un único eje. Se presenta aparte en la
+cronológicos —769 cartas en total— y los ordena sobre un único eje. Se presenta aparte en la
 portada como modalidad transversal, reutiliza las épocas generales de Historia mundial y no
 entra en la rotación del modo Competición, que sí cambia de tema.
 
 Cada juego conserva su propia partida local. El juego elegido también se guarda en las salas multijugador para que todos los participantes utilicen el mismo mazo.
 
-La aplicación ofrece cuatro formas de jugar:
+Formas de jugar un mazo:
 
+- **Jugar solo:** una persona contra el mazo, con tres vidas (partida libre o competición).
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
-- **Varios móviles:** crea una sala compartida con Firebase, invita por enlace o código QR y permite que cada persona juegue su mano mientras todos ven la cronología en directo.
-- **En solitario:** una persona contra el mazo, con tres vidas.
+- **Cada uno en su móvil:** en directo en una sala (por internet con Firebase, o por la misma
+  Wi-Fi sin internet), por turnos en un duelo que cada uno juega cuando puede, o con las mismas
+  cartas por enlace. Se invita por enlace, código o QR.
+- **Jugar online:** mesas públicas de 2 a 4 personas, eligiendo mesa en el tablón o con partida rápida.
 - **Competición:** un tema al azar tras otro, sin repetirse, con 3, 5 o todas las temáticas a elegir.
 
 En solitario y en la competición en solitario, una carta fallada no se pierde: tras ver el hueco donde
@@ -240,7 +258,7 @@ bloquear.
 
 En el catálogo, un filtro o una búsqueda abren los mazos para enseñar lo que han
 encontrado, pero solo mientras quepa: por encima de 120 cartas se enseñan los mazos con su
-recuento y se despliega el que se quiera. «Bloqueadas» sobre el catálogo entero son casi
+recuento y se despliega el que se quiera. «Bloqueadas» sobre el catálogo entero son más de
 mil cartas, y pintarlas de una vez cuesta más de un segundo en un móvil modesto; con los
 mazos plegados, cincuenta milisegundos y la misma respuesta: cuántas faltan y dónde.
 Descubre tanto acertarla como fallarla: en los dos casos la pantalla de resultado te la ha
@@ -292,8 +310,8 @@ todos los rincones lo respetan. Sin esa mitad, la cartera sería una función qu
 
 ## Duelo por enlace
 
-«Retar a un amigo», la tercera manera de jugar un mazo junto a «Jugar solo» y «Multijugador». Juegas unas cartas al azar del mazo abierto y
-mandas un enlace: quien lo abra recibe exactamente esas mismas cartas, en el mismo orden, y
+Es el ritmo «Mismas cartas» de **Cada uno en su móvil → Crear partida**. Juegas unas cartas al
+azar del mazo elegido y mandas un enlace: quien lo abra recibe exactamente esas mismas cartas, en el mismo orden, y
 al terminar ve el cara a cara —el marcador y las dos tiradas carta a carta— con un botón
 para devolver el reto con semilla nueva.
 
@@ -336,9 +354,10 @@ que termina, así que el reloj de la primera carta empieza cuando de verdad se v
 
 ### El reloj
 
-Las dos modalidades van a reloj por la misma razón: sin un plazo por carta, cualquiera
-puede ir a buscar la respuesta a otra parte, y quien la busca gana. El plazo es **el mismo
-en las dos** —lo dice una sola constante, `SEGUNDOS` en `duelo.js`— y no se puede parar.
+Sin un plazo por carta, cualquiera puede ir a buscar la respuesta a otra parte, y quien la
+busca gana. Por eso el plazo se elige al crear el duelo —**sin tiempo, 15, 20 o 30 segundos**,
+las mismas opciones de todo el juego (`tiempo.js`)— y, una vez elegido, no se puede parar. Sin
+tiempo, en cifras la rapidez sigue desempatando contra un tope amplio de diez minutos por carta.
 
 Eso obliga a medirlo **restando marcas de `Date.now()`, nunca descontando de un contador**.
 No es una preferencia de estilo: una pestaña escondida congela sus temporizadores, así que
@@ -402,8 +421,10 @@ El perfil se guarda en `hilo-perfil-v1`, aparte del reto diario y los récords d
 `hilo-retos-v1`. El reto diario guarda su racha dentro de `hilo-retos-v1`, en el campo
 `retoDiario` (no es ningún mazo), porque esa es la clave que la cuenta sincroniza. Las
 rachas del antiguo reto diario por mazo se borraron al llegar el reto para todos; las
-mejores marcas de la partida libre se conservan. Como todo vive en un solo móvil, la pantalla permite copiar el
-perfil en JSON y recuperarlo en otro, y borrarlo entero previa confirmación.
+mejores marcas de la partida libre se conservan. Con cuenta, `hilo-perfil-v1` y `hilo-retos-v1`
+se sincronizan en Firestore (`playerProgress`), así que el progreso no depende del móvil. Aun así,
+la pantalla permite copiar el perfil en JSON y recuperarlo en otro sitio (útil sin cuenta de
+Apple o al cambiar de dirección web), y borrarlo entero previa confirmación.
 
 Dos cosas se cuentan con cuidado. En una partida a un solo móvil gana alguien de la mesa,
 pero el juego no sabe quién sostiene el teléfono: esa partida se cuenta como jugada, no como
@@ -444,18 +465,17 @@ y un botón para copiarlo.
 
 Tres formatos, los tres sin conexión y con la marca guardada en el propio móvil:
 
-- **Reto diario:** se entra desde la portada, no desde un mazo. Cada día sale un mazo —sorteado
-  con la fecha entre los gratuitos, sin repetir el del día anterior— y de él las mismas 10 cartas
+- **Reto diario:** se entra desde la portada, no desde un mazo. Cada día sale un mazo —un día de
+  Grandes colecciones y otro de Retos rápidos, sorteado con la fecha— y de él las mismas 10 cartas
   para todo el mundo, con un solo intento. Tiene su propio guardado, así que empezarlo no pisa una
   partida libre a medias del mismo mazo. Las cartas se
   barajan con la fecha como semilla, así que no hace falta ningún servidor para que dos móviles
   reciban exactamente el mismo reto. Completar el reto un día detrás de otro encadena una racha,
   que además se ve como un calendario de las últimas cuatro semanas, no solo como un número. Al
   terminar se puede compartir el resultado —puntuación y una cuadrícula de aciertos al estilo
-  Wordle, sin desvelar ninguna carta— por donde el móvil ofrezca o copiado al portapapeles. La
-  partida guarda además un identificador anónimo y estable por dispositivo y la secuencia exacta
-  de aciertos de cada día: nada de eso sale del móvil todavía, pero es lo que un marcador entre
-  amigos necesitaría el día que exista, sin tener que rehacer partidas ya jugadas para tenerlo.
+  Wordle, sin desvelar ninguna carta— por donde el móvil ofrezca o copiado al portapapeles. Con
+  cuenta, el resultado se guarda en el progreso y, si se acepta, entra en el ranking diario y
+  semanal (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
 - **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
 - **Competición:** una ronda por tema (3, 5 o todos) con de 1 a 6 cartas a elegir, en un orden al azar
@@ -545,23 +565,28 @@ el valor y la explicación de la carta jugada para aprender de ella.
 La partida libre permite los cuatro niveles, conserva partidas y separa récords por mazo
 y dificultad. Los récords antiguos se mantienen en Fácil. La competición individual también
 elige un nivel, conserva cinco decisiones humanas por tema y reserva cartas adicionales
-para el tablero. El reto diario permanece en Fácil para no cambiar las quince cartas ni las
-marcas existentes. En las partidas compartidas, Pulso conserva su efecto pero se obtiene
+para el tablero. El reto diario permanece en Fácil para que sus 10 cartas y sus marcas sean
+iguales para todo el mundo. En las partidas compartidas, Pulso conserva su efecto pero se obtiene
 como poder secreto al encontrar la carta normal a la que quedó asociado.
-
-**Publicar `firestore.rules` antes de activar Fantasma o Pulso.** Sin esas reglas, desmarcar
-ambos poderes permite seguir jugando en salas compartidas con normalidad.
 
 ## Probarlo en un ordenador
 
-La carpeta debe abrirse mediante un servidor web local (no haciendo doble clic en `index.html`). Por ejemplo, con la extensión gratuita **Live Server** de Visual Studio Code, usa **Open with Live Server** sobre `index.html`.
+La carpeta debe abrirse mediante un servidor web local (no haciendo doble clic en `index.html`):
+`npm run dev` (Vite) o, por ejemplo, la extensión **Live Server** de Visual Studio Code sobre
+`index.html`. Las salas online, el ranking y las cuentas usan el proyecto real de Firebase; para
+probar reglas sin tocarlo están las pruebas del emulador (`tests/README.md`).
 
-## Instalarlo en el móvil sin coste
+## Instalarlo en el móvil
 
-1. Publica esta carpeta en cualquier alojamiento estático HTTPS gratuito (por ejemplo, GitHub Pages o Cloudflare Pages).
-2. Abre la dirección una sola vez desde el móvil.
-3. En Android/Chrome, elige **Añadir a pantalla de inicio**. En iPhone/Safari, pulsa **Compartir → Añadir a pantalla de inicio**.
-4. Desde ese momento se abre como una app y la partida funciona sin conexión.
+La web se publica en `https://continuumjuego.es/` con GitHub Pages, directamente desde la rama
+`main` (ver «Despliegue» en [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue)).
+
+1. Abre la dirección una vez desde el móvil.
+2. En Android/Chrome, elige **Añadir a pantalla de inicio**. En iPhone/Safari, pulsa **Compartir → Añadir a pantalla de inicio**.
+3. Desde ese momento se abre como una app y las partidas en solitario y en un solo móvil
+   funcionan sin conexión.
+
+En iPhone también está la app nativa en beta por TestFlight.
 
 Pensado para el dedo. Sobre la línea temporal hay un mapa —una tira con una parada por
 carta colocada, con su época y su año— porque en una pantalla de 390 px no caben ni dos
@@ -599,70 +624,59 @@ sin querer al mirar la mesa—, encima de una tira que se desplaza a los lados, 
 temporal o el marcador, y sobre un campo de texto o un desplegable. Desde el inicio no hace
 nada: cerrar la aplicación sigue siendo cosa del botón Atrás de Android.
 
-## Preparación para App Store / Google Play (beta móvil)
+## App móvil (Capacitor)
 
-Continuum se sigue sirviendo como PWA (la sección anterior), y en paralelo se está
-preparando una capa móvil con [Capacitor](https://capacitorjs.com/) alrededor del mismo
-núcleo, sin reescribir el juego ni duplicarlo por plataforma:
+La misma web se empaqueta como app de iPhone y Android con [Capacitor](https://capacitorjs.com/),
+sin reescribir el juego ni duplicarlo por plataforma:
 
 - `npm run build` genera `dist/`, una copia literal de los archivos que el juego necesita
-  para funcionar (el juego se sirve como scripts clásicos, no como módulos, así que el
-  build no empaqueta ni transforma nada: solo copia y comprueba que no falte nada de lo
-  que pide `service-worker-258.js`).
-- `capacitor.config.json` apunta `webDir` a `dist/`. El `appId` (`com.continuum.game`) ya
-  está aprobado y es el que hay que mantener estable de aquí en adelante: las tiendas lo
-  usan para reconocer la aplicación de forma permanente, así que cambiarlo después de
-  publicar equivaldría a crear una aplicación nueva desde cero.
-- `android/` e `ios/` son los proyectos nativos generados por `npx cap add`. Se mantienen en
-  el repositorio (con el propio `.gitignore` de Capacitor, que excluye la copia de `dist/`
-  que se sincroniza dentro) porque ahí es donde vivirán ajustes específicos de cada
-  plataforma: iconos, splash, firma, permisos.
-- Los iconos y la pantalla de apertura nativos ya están generados en todos los tamaños que
-  piden Android e iOS, a partir de `icon.svg` (el mismo icono de la PWA) y del emblema de la
-  portada, con `npm run icons` (usa `sharp`; las fuentes en alta resolución
-  viven en `resources/`). Vuelve a ejecutarlo si cambia el logo definitivo.
-- El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar
-  una partida en curso, o vuelve al inicio; ambos comportamientos están en `a11y.js`
-  (`backPressed`) y `app.js`, y solo se activan dentro del contenedor nativo de Capacitor
-  (`window.Capacitor`), así que no tocan la versión web ni iOS. El deslizamiento de
-  izquierda a derecha comparte con él ese mismo «atrás» y sí funciona en las tres versiones;
-  la diferencia es que no interrumpe una partida ni cierra la aplicación.
-- `npm run build && npx cap sync` deja `android/` e `ios/` al día con el último `dist/`
-  antes de abrirlos en Android Studio o Xcode.
-- El número de versión de la beta (`0.1.1`, distinto del número interno de caché del
-  service worker) vive en `android/app/build.gradle` (`versionName`) y en
-  `ios/App/App.xcodeproj/project.pbxproj` (`MARKETING_VERSION`).
-- Ya probada en iPhone real (compilada sin firma vía GitHub Actions e instalada con
-  Sideloadly, sin necesitar un Mac). `.github/workflows/ios-beta-sin-firmar.yml` reproduce
-  ese build bajo demanda. Pendiente de un dispositivo Android para repetir la prueba ahí.
-- `PRIVACIDAD.md` es un primer borrador de la política de privacidad y `TESTERS.md` la
-  guía para elegir testers y qué preguntarles; ambos listos para cuando toque repartir la
-  beta, sin que haga falta tocarlos hasta entonces.
-- Sigue pendiente (decisiones o pasos que necesitan intervención humana): revisión
-  profesional de `PRIVACIDAD.md` antes de publicar, y la cuenta de pago de Apple
-  Developer (con TestFlight) cuando llegue el momento de repartir la beta más allá de
-  este repositorio.
+  (el juego se sirve como scripts clásicos, no como módulos, así que el build no empaqueta ni
+  transforma nada: solo copia y comprueba que no falte nada de lo que pide
+  `service-worker-258.js`). `npm run build && npx cap sync` deja `android/` e `ios/` al día.
+- `capacitor.config.json` apunta `webDir` a `dist/`. El `appId` (`com.continuum.game`) es el que
+  hay que mantener estable: las tiendas lo usan para reconocer la aplicación, así que cambiarlo
+  equivaldría a crear una aplicación nueva.
+- `android/` e `ios/` son los proyectos nativos, con sus ajustes de plataforma (iconos, splash,
+  firma, permisos) y los plugins propios de `ios/App/App/`: Iniciar sesión con Apple, App Attest
+  y salas cercanas.
+- Los iconos y la pantalla de apertura se generan con `npm run icons` (usa `sharp`; las fuentes en
+  alta resolución viven en `resources/`) a partir de `icon.svg` y del emblema.
+- El botón/gesto Atrás de Android cierra el diálogo abierto, pregunta antes de abandonar una
+  partida o vuelve al inicio (`a11y.js`, `backPressed`, y `app.js`); solo se activa dentro de
+  Capacitor. El deslizamiento de izquierda a derecha comparte ese mismo «atrás» en todas las
+  versiones, sin interrumpir una partida ni cerrar la aplicación.
+- La versión de la beta (`0.1.1`, distinta del número de caché del service worker) vive en
+  `android/app/build.gradle` (`versionName`) y en `ios/App/App.xcodeproj/project.pbxproj`
+  (`MARKETING_VERSION`).
+- La beta de iPhone se compila, firma y sube a TestFlight desde GitHub Actions al cambiar
+  `.github/beta-request.json` (ver [DISTRIBUCION_MOVIL.md](DISTRIBUCION_MOVIL.md)). Falta probar
+  Android en un dispositivo real y crear su ficha en Google Play ([ROADMAP.md](ROADMAP.md)).
 
-El modo local no utiliza backend ni cuentas y guarda la partida únicamente en el dispositivo. Ningún modo incluye anuncios, compras ni servicios de pago.
+## Conexión, cuentas y Firebase
 
-El modo multijugador utiliza el proyecto gratuito de Firebase configurado para esta aplicación. Consulta `CONFIGURAR_MULTIJUGADOR.md` antes de publicarlo: las reglas de seguridad solo hay que volver a publicarlas cuando cambia su contenido, no al añadir un juego nuevo.
+Al abrir el juego con conexión se crea automáticamente un invitado anónimo de Firebase, también
+para jugar en un solo móvil o en solitario: así el progreso, las estadísticas y los retos
+diarios se guardan en la cuenta (`playerProgress`) y no solo en el dispositivo. Sin conexión al
+abrir, el juego arranca igualmente y guarda lo jugado en local hasta que haya cuenta. En iPhone
+se puede entrar con Apple para conservar el progreso al cambiar de móvil. Ningún modo incluye
+anuncios, compras ni servicios de pago.
 
-> **Para Fantasma y Pulso hay que publicar `firestore.rules`.** Valida tanto la obtención
-> privada como el uso de Pulso; sin publicarlas, las salas nuevas rechazan el reparto con
-> cualquiera de los dos poderes activado.
+Las salas, los duelos, las mesas públicas, el ranking y las cuentas usan el proyecto de Firebase
+`timeline-es` (plan Blaze, por las Cloud Functions). Cómo se publican las reglas, las Functions y
+la web está en [CONFIGURAR_MULTIJUGADOR.md](CONFIGURAR_MULTIJUGADOR.md#despliegue): las reglas se
+publican solas al subir `firestore.rules` a `main`, después de pasar las pruebas del emulador, y
+no hay que volver a publicarlas al añadir un mazo nuevo.
 
 ## Comprobaciones
 
-`tests/` contiene treinta y dos suites automáticas: veinticinco que corren en cualquier
-ordenador con `npm test` —la sintaxis de todos los archivos, partidas completas sobre un DOM
-simulado, cuarenta partidas al azar que vigilan bloqueos y el conteo de cartas, la calidad de
-todos los mazos, el modo solitario, el Pulso, el Fantasma, el movimiento, las referencias de
-los animales, la marca, el service worker, la página que fuerza una actualización, la
-pantalla de fallo, la enciclopedia, el perfil, el duelo por enlace, la accesibilidad con
-teclado y lector de pantalla, y el build móvil (`npm run build`, `dist/` completo y
-sincronizado con `capacitor.config.json`)— y siete más que necesitan el emulador oficial de Firestore y
-se lanzan aparte con `npm run test:reglas`. Se instalan con `npm install` y se ejecutan solas
-en cada propuesta de cambio. Las instrucciones están en `tests/README.md`.
+`tests/` contiene las pruebas automáticas. `npm test` encadena unas 80 órdenes que corren en
+cualquier ordenador —sintaxis de todos los archivos, partidas completas sobre un DOM simulado,
+partidas al azar, calidad de los mazos, solitario, Pulso, Fantasma, cuentas, ranking, Retos
+rápidos, salas Wi-Fi, duelos, service worker, accesibilidad, build móvil, servidor experimental,
+plazos de conservación y presupuesto de recursos— y `npm run test:reglas` lanza 15 suites contra
+el emulador oficial de Firestore. Se instalan con `npm ci` y se ejecutan solas en cada propuesta
+de cambio y cada subida a `main`. Qué comprueba cada archivo está en
+[tests/README.md](tests/README.md).
 
 ## Reglas implementadas
 
@@ -671,7 +685,9 @@ solitario y las salas compartidas. Explica primero el eje del mazo abierto y des
 las funciones de la modalidad activa: Pulso, reto diario, partida libre, competición o
 gestión de sala.
 
-- La persona más joven comienza y el turno avanza en el orden de los jugadores.
+- Antes de repartir se juega el minijuego de quién empieza: todos dicen la cifra de la misma
+  carta y la mesa se sienta por orden de cercanía (`CT.Starter`, en `final.js`). Empieza quien
+  más se acerca y el turno avanza en ese orden.
 - Cada persona recibe cuatro cartas por defecto; se puede elegir entre una y seis.
 - El dato que ordena el mazo —fecha, superficie, población, peso, longevidad, velocidad o
   distancia— permanece oculto hasta colocar la carta en un hueco de la línea.
@@ -692,8 +708,9 @@ gestión de sala.
   formato se comprueba para no confundir valores distintos. En animales se permiten empates
   reales y referencias próximas: no se alteran las cifras para imponer una distancia del 8%.
 - Cuando dos cartas tienen exactamente el mismo valor, cualquiera de los dos órdenes es válido.
-  Las cartas «en revisión» indican antes de jugar que su referencia sigue pendiente de contraste;
-  mientras permanezcan en el mazo se resuelven con el valor mostrado.
+  Al repartir, un mazo no lleva dos cartas con el mismo valor: de cada grupo se deja una al azar.
+  Si una carta se marcara «en revisión», lo indicaría antes de jugar y se resolvería con el valor
+  mostrado (hoy ninguna lo está).
 - Un acierto permanece en la línea. Un fallo se descarta y obliga a robar una carta.
 - La victoria se comprueba al final de cada ronda completa.
 - Gana quien sea la única persona sin cartas al acabar la ronda. Si hay varias, pasan a una final numérica con una carta neutral y cifras secretas.
@@ -737,7 +754,7 @@ En el modo de varios móviles, el anfitrión puede saltar el turno de quien se h
 batería o expulsar a quien ya no juegue, y cualquier participante puede marcharse: sus cartas
 vuelven al descarte y la partida continúa.
 
-## Guardado y actualizaciones (v74)
+## Guardado y actualizaciones
 
 Competición se guarda en una clave propia: conserva dificultad, orden de temas, marcador,
 ronda y resultado pendiente. «Salir» la deja en pausa; «Continuar competición guardada»
@@ -752,41 +769,34 @@ reintento y descarga de copia (recuperable desde Ajustes); cerrar sin resolverlo
 La huella compartida incluye orden, identificadores y valores de las cartas, además de
 su texto. Los enlaces y salas con otra huella requieren usar la misma versión del juego.
 
-El trabajador mantiene una caché estable por versión. Avisa de una actualización y solo
+El service worker mantiene una caché estable por versión. Avisa de una actualización y solo
 la aplica mediante «Actualizar ahora», fuera de una partida y sin guardados pendientes.
 Hay que cerrar las otras pestañas de Continuum antes de aplicarla. Los errores del modo
-sin conexión muestran un aviso y permiten seguir jugando. Subir CACHE y APP_VERSION
-juntos al publicar cambios. La primera transición desde v73 puede seguir el comportamiento
-de recarga del código antiguo que ya estuviera abierto.
+sin conexión muestran un aviso y permiten seguir jugando. Al publicar un cambio visible hay que
+subir la versión a la vez en tres sitios —`CACHE` en `service-worker-258.js`,
+`CT.APP_VERSION` en `updates.js` y `edition.css?v=` en `index.html`— con el formato
+`continuum-vNNN` (ver `CLAUDE.md`). Si alguien se queda atascado en una versión vieja,
+`actualizar.html` descarta el service worker y su caché sin borrar su progreso.
 
-La corrección del Pulso online requiere publicar también firestore.rules; no basta con
-actualizar los archivos web. Las pruebas del emulador no modifican Firebase de producción.
+## Salas online: reloj, presencia y relevo
 
-## Inicio y continuidad de salas (v75)
+El tiempo por turno se elige al preparar la partida: sin tiempo, 15, 20 o 30 segundos, las
+mismas opciones en todas las formas de jugar (`tiempo.js`). En las salas online el reloj se
+ancla con una confirmación del servidor y avanza con un contador monotónico: cambiar la hora
+del teléfono no cambia el turno. Antes de sincronizar, muestra «…» y no salta turnos. La
+latencia puede introducir una pequeña diferencia entre contadores visibles.
 
-La portada ofrece Jugar, Continuar y volver a la última sala. Solitario se abre
-directamente. La primera partida se propone sin poderes; el ajuste avanzado activa
-Pulso y Fantasma. Competición permite 3, 5 o todos los temas.
+Cada participante envía una señal de actividad cada 45 segundos mientras está visible; la
+interfaz distingue segundo plano, falta de actividad y pérdida de red local. Esto añade
+lecturas y escrituras de Firestore y cuenta en los costes. Tras 90 segundos sin señales del
+anfitrión, o 15 segundos desde una señal de segundo plano, otro participante puede tomar el
+relevo. Las reglas comprueban el plazo y la pertenencia a la sala; el relevo conserva cartas y
+turno. No es presencia instantánea. La limpieza diaria borra cada sala con su presencia y sus
+demás subcolecciones a los siete días sin actividad.
 
-Las salas nuevas ofrecen turnos sin límite, de 20, 30 o 45 segundos. El reloj se ancla
-con una confirmación del servidor y avanza con un contador monotónico: cambiar la hora
-del teléfono no cambia el turno. Antes de sincronizar, muestra «…» y no salta turnos.
-La latencia puede introducir una pequeña diferencia entre contadores visibles.
-
-Cada participante envía una señal de actividad cada 45 segundos mientras está visible;
-la interfaz distingue segundo plano, falta de actividad y pérdida de red local. Esto
-añade lecturas y escrituras de Firestore y debe incluirse en el seguimiento de costes.
-Tras 90 segundos sin señales del anfitrión, o 15 segundos desde una señal de segundo
-plano, otro participante puede tomar el relevo. El servidor comprueba el plazo y la
-pertenencia a la sala; el relevo conserva cartas y turno. No es presencia instantánea.
-
-Publicar las reglas v39 junto con el cliente. Las subcolecciones de presencia deben
-incluirse en la limpieza de salas; borrar el documento padre no las elimina.
-
-Retos rápidos utiliza las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del tablero compartido. Ofrece partida libre en solitario; partidas de 2–4 participantes en un móvil, por internet o por Wi-Fi local; y, como «Retar a un amigo», duelos por turnos en salas para dos. El reto diario es el de la portada, común a todo el juego. Conserva el guardado local y recupera la última sala por internet. Tiene una portada propia; «¿Cuántos hay…?» aparece en otro bloque del mismo tamaño, pendiente de contenido.
-
-Las salas de Retos usan `quickRooms`, con turnos transaccionales e historial de comandos que cada cliente reconstruye. Publicar las reglas junto con el cliente. Los resultados son de juego casual, sin clasificación competitiva del servidor. En Wi-Fi local, quien crea la sala debe mantenerla abierta; las invitaciones se intercambian mediante Compartir/copiar. El diario se fija por fecha local y conserva un intento por perfil. El duelo de seguidos incluye las cartas y el resultado en el enlace.
-
-### Navegación de juego (septiembre de 2026)
-
-La entrada principal se organiza por intención: **Jugar online**, **Jugar solo**, **Jugar con amigos** y **Competición**, con el **Reto del día** separado. El online público ofrece **Sorpréndeme**, **Grandes colecciones** y **Retos rápidos**, con mesas públicas de 2 a 4 participantes. Grandes colecciones permite proponer hasta tres temas candidatos; Retos rápidos dispone de matchmaking público propio. El reto diario alterna entre una gran colección y un reto rápido. La portada resume la puntuación de la temporada mensual y conserva el desglose de ambos formatos.
+Retos rápidos usa las mismas cartas, tamaños, arrastre, confirmación, giro, zoom y ajustes del
+tablero compartido. Sus salas usan `quickRooms`, con turnos transaccionales e historial de
+comandos firmados que cada cliente reconstruye y valida (`quick-room.js`). Los resultados son de
+juego casual, sin clasificación competitiva del servidor. En Wi-Fi local, quien crea la sala
+debe mantenerla abierta. El reto diario se fija por fecha local y conserva un intento por
+perfil. El duelo con las mismas cartas incluye las cartas y el resultado en el enlace.

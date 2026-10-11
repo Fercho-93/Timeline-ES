@@ -1,6 +1,6 @@
 # Servicio experimental de competición
 
-Este servicio es independiente de las salas familiares del protocolo 40. Implementa creación y entrada a sala, inicio con tres cartas, jugadas normales, Pulso con respuestas privadas, cierre de ronda, desempates y resultados registrados por el servidor. Comparte la resolución de cartas con `engine.js`.
+Este servicio es independiente de las salas familiares actuales (`rooms`, cliente 42 en `online.js`). Implementa creación y entrada a sala, inicio con tres cartas, jugadas normales, Pulso con respuestas privadas, cierre de ronda, desempates y resultados registrados por el servidor. Comparte la resolución de cartas con `engine.js`.
 
 `server/client.mjs` ofrece un adaptador HTTP pequeño para la futura interfaz: exige una URL HTTPS, añade los tokens de Firebase cuando están disponibles, limita el tiempo de espera y convierte respuestas de error en excepciones. No se activa mientras no exista una URL de servidor configurada.
 
