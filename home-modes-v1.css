@@ -126,9 +126,8 @@ html #app .public-create-segmented .segmented-option::after { content: none !imp
 :root[data-theme="dark"] #app .public-table-seats em { color: #cdbda5; }
 :root[data-theme="dark"] #app .public-table-seats i { border-color: #c9a96f; }
 :root[data-theme="dark"] #app .public-table-seats i.is-taken { border-color: #e0a77d; background: #e0a77d; }
-}
 /* Acceso directo de Inicio para unirse a una partida a la que te han invitado. */
-#app .mode-join-shortcut { margin-top: 13px; }
+#app .mode-join-shortcut { margin-top: 12px; }
 #app .home-doors-shell .mode-join-shortcut,
 #app .home-doors-shell .mode-join-shortcut .home-door-copy { min-height: 96px; }
 #app .home-doors-shell .mode-join-shortcut .home-door-copy { padding-block: 11px; gap: 3px; }
