@@ -4311,6 +4311,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
 #app.atlas-board .timeline-zoom .zoom-menu [data-zoom-level][aria-pressed="true"] { background: #8a3f2f; color: #fff6e8; }
 #app.atlas-board .board-focus-card > .hand-title { justify-content: flex-start; }
 #app.atlas-board .timeline-ends { display: flex; justify-content: space-between; gap: 8px; margin: 4px 2px 2px; color: #8a3f2f; font: 700 .66rem/1.2 var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+/* Los extremos van siempre en una línea: si un rótulo no cabe, se corta con puntos suspensivos. */
+#app.atlas-board .timeline-ends > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 #app.atlas-board[data-platform][data-screen] .timeline-zoom button.zoom-toggle { width: auto !important; height: 30px !important; min-width: 0 !important; min-height: 30px !important; padding: 0 11px !important; border-radius: 999px !important; aspect-ratio: auto !important; font-size: .74rem !important; }
 #app.atlas-board[data-platform][data-screen] .timeline-zoom button.zoom-toggle svg { display: block; flex: none; width: 15px; height: 15px; }
 #app.atlas-board[data-platform][data-screen] .timeline-zoom .zoom-menu button[data-zoom-level] { width: 100% !important; height: auto !important; min-height: 34px !important; aspect-ratio: auto !important; border-radius: 8px !important; }
