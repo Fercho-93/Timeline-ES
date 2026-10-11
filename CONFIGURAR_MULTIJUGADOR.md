@@ -165,7 +165,7 @@ se puede renombrar; sustituirlo desconectaría salas y cuentas y exigiría una m
 3. Crea la sala y comparte el enlace, el código o el QR.
 4. En el segundo móvil: **Unirme a una partida** y escanea el QR o pega el enlace o el código.
 5. En la sala de espera, el anfitrión ajusta cartas, tiempo por turno (sin tiempo, 15, 20 o
-   30 s) y poderes, y pulsa **Barajar y empezar**. Antes de repartir se juega el minijuego de
+   30 s) y poderes, y pulsa **Empezar**. Antes de repartir se juega el minijuego de
    quién empieza.
 
 Durante la partida, el menú de la sala permite compartir el enlace y el QR y, al anfitrión,

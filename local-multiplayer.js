@@ -632,18 +632,18 @@
     if (roomState.playerOrder.length < 2) return "";
     if (!draw) {
       return isHost
-        ? `<div class="field starter-field"><span class="field-label">Quién empieza</span><button type="button" class="btn btn-secondary btn-block" data-local-action="starter-draw">🂠 Sortear con una carta quién empieza</button><p class="hint">Cada persona escribe la cifra de la misma carta: empieza quien más se acerque y el resto juega por orden de cercanía.</p></div>`
+        ? `<div class="field starter-field"><span class="field-label">Quién empieza</span><button type="button" class="btn btn-secondary btn-block" data-local-action="starter-draw">🂠 Jugar el minijuego de quién empieza</button><p class="hint">Cada persona escribe la cifra de la misma carta: empieza quien más se acerque y el resto juega por orden de cercanía.</p></div>`
         : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>Va a repartir una carta para decidir el orden de juego.</p>`;
     }
     const card = getCard(draw.cardId);
     const regla = CT.axis(modeKey).cifra || {};
-    const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-local-action="starter-draw">🂠 Repetir el sorteo</button>` : "";
+    const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-local-action="starter-draw">🂠 Repetir el minijuego</button>` : "";
     const cardMarkup = detalle => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
     const ranking = starterRanking();
     if (ranking) {
       const lista = ranking.map((id, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ""}><span>${i + 1}.º ${escapeHtml(roomState.players[id].name)}${id === myPlayerId ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey, draw.guesses[id]))}</span></li>`).join("");
       const resultado = `${cardMarkup(`El valor real era ${escapeHtml(formatValue(card))}`)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol>`;
-      return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${resultado}${isHost ? `${repetir}<button class="btn btn-primary btn-block" data-local-action="start">Barajar y empezar <span>→</span></button>` : '<p class="hint">Esperando al anfitrión para empezar.</p>'}</div>`;
+      return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${resultado}${isHost ? `${repetir}<button class="btn btn-primary btn-block" data-local-action="start">Empezar <span>→</span></button>` : '<p class="hint">Esperando al anfitrión para empezar.</p>'}</div>`;
     }
     if (myPlayerId in draw.guesses) {
       const faltan = roomState.playerOrder.filter(id => !(id in draw.guesses)).map(id => roomState.players[id].name);

@@ -821,12 +821,12 @@ function starterPanelMarkup(isHost) {
   if ((roomState.tournament?.index || 0) > 0) {
     const next = roomState.players[roomState.playerOrder[roomState.tournament.index % roomState.playerOrder.length]];
     const aviso = `<p>Empieza <b>${escapeHtml(next?.name || "")}</b>: el orden de la primera ronda se mantiene y el turno de empezar rota en cada ronda.</p>`;
-    return isHost ? `${aviso}<button class="btn btn-primary btn-block" data-online-action="start">Barajar y empezar <span>→</span></button>` : `${aviso}<p class="hint">Esperando al anfitrión para empezar.</p>`;
+    return isHost ? `${aviso}<button class="btn btn-primary btn-block" data-online-action="start">Empezar <span>→</span></button>` : `${aviso}<p class="hint">Esperando al anfitrión para empezar.</p>`;
   }
   const cardId = starterCardId();
   if (cardId == null) {
     return isHost
-      ? `<button type="button" class="btn btn-secondary btn-block" data-online-action="starter-draw">🂠 Sortear con una carta quién empieza</button>`
+      ? `<button type="button" class="btn btn-secondary btn-block" data-online-action="starter-draw">🂠 Jugar el minijuego de quién empieza</button>`
       : `<div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>Va a repartir una carta para decidir quién empieza.</p>`;
   }
   const card = getCard(cardId);
@@ -834,7 +834,7 @@ function starterPanelMarkup(isHost) {
   const mine = starterRecords.get(user.uid);
   const answered = mine && mine.cardId === cardId && mine.value !== null;
   const everyone = starterEveryoneAnswered();
-  const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-online-action="starter-draw">🂠 Repetir el sorteo</button>` : "";
+  const repetir = isHost ? `<button type="button" class="btn btn-ghost btn-block" data-online-action="starter-draw">🂠 Repetir el minijuego</button>` : "";
   const cardMarkup = (detalle) => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
   if (!everyone) {
     if (answered) {
@@ -855,7 +855,7 @@ function starterPanelMarkup(isHost) {
   const lista = ranking.map((uid, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ''}><span>${i + 1}.º ${escapeHtml(roomState.players[uid].name)}${uid === user.uid ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey(), valueOf(uid)))}</span></li>`).join("");
   const resultado = `${cardMarkup(`El valor real era ${escapeHtml(CT.formatValue(modeKey(), card))}`)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol><p>${escapeHtml(roomState.players[winner].name)} ha acertado más cerca y empieza.</p>`;
   if (!isHost) return `${resultado}<p class="hint">Esperando al anfitrión para empezar.</p>`;
-  return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Barajar y empezar <span>→</span></button>`;
+  return `${resultado}${repetir}<button class="btn btn-primary btn-block" data-online-action="start" ${roomState.playerOrder.length < 2 ? "disabled" : ""}>Empezar <span>→</span></button>`;
 }
 
 // En una mesa pública no hay anfitrión que importe a quien juega (lo lleva el propio

@@ -37,7 +37,7 @@ const nombres = ['Lucía', 'Marcos', 'Irene'];
 w.document.querySelectorAll('#players input').forEach((input, i) => { input.value = nombres[i]; });
 w.document.getElementById('hand-size').value = '3';
 w.document.getElementById('pulse-toggle').checked = true;
-// Sin minijuego no se baraja: «Barajar y empezar» lo abre, igual que en las salas.
+// Sin minijuego no se baraja: «Empezar» lo abre, igual que en las salas.
 await click('[data-action="start"]');
 assert.ok(w.document.getElementById('starter-guess-input'), 'empezar abre el minijuego de quién empieza');
 assert.equal(screen(), 'setup');

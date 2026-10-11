@@ -120,7 +120,7 @@ ok("el resultado enseña la cifra de cada jugador", w.document.querySelectorAll(
 ok("hay una persona ganadora marcada", !!w.document.querySelector(".starter-draw-winner"));
 ok("el resultado mantiene visible la ilustración de la carta", !!w.document.querySelector('.starter-card-art img.animal-card-art'));
 click(w, '[data-action="close-menu"]');
-ok("el campo pasa a ofrecer repetir el sorteo", /Repetir el sorteo/.test(w.document.body.innerHTML));
+ok("el campo pasa a ofrecer repetir el minijuego", /Repetir el minijuego/.test(w.document.body.innerHTML));
 click(w, '[data-action="start"]'); jugarQuienEmpieza(w);
 const partidaSorteada = JSON.parse(w.localStorage.getItem("hilo-game-history-v1"));
 ok("la partida arranca con quien ganó el sorteo", partidaSorteada.current === partidaSorteada.starter);

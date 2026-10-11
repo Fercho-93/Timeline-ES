@@ -136,7 +136,7 @@
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
     const total=CT.QuickCatalog.challenges.length;
     const options=LONG_LENGTHS.filter(([n])=>n<total);
-    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los retos se sortearán sin mostrarte cuáles son.</p>${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}${button('start-free','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}${load() ? button('resume','Continuar partida guardada','btn btn-secondary btn-block') : ''}<div class="quick-secondary-actions">${button('guide','Guía de Retos rápidos','btn btn-secondary btn-block')}${button('stats','Historial y estadísticas','btn btn-ghost btn-block')}</div><p id="quick-error" role="alert">${esc(error)}</p></section>`);
+    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}${button('start-free','Empezar <span>→</span>','btn btn-primary btn-block')}${load() ? button('resume','Continuar partida guardada','btn btn-secondary btn-block') : ''}<div class="quick-secondary-actions">${button('guide','Guía de Retos rápidos','btn btn-secondary btn-block')}${button('stats','Historial y estadísticas','btn btn-ghost btn-block')}</div><p id="quick-error" role="alert">${esc(error)}</p></section>`);
   }
   // El duelo de Retos rápidos por enlace: juegas tú, mandas el enlace y tu amigo juega los mismos mazos.
   // Los mazos salen de una semilla y las jugadas viajan abreviadas, así que el enlace es corto aunque la
@@ -298,13 +298,13 @@
     const host=myId===room.host, count=room.members.length, s=room.starter, head='<div class="section-label">Quién empieza</div>';
     if(count<2)return `${head}<p class="hint">Cuando haya dos personas se sortea una carta y empieza quien más se acerque a su cifra.</p>`;
     if(!s)return host&&!auto
-      ? `${head}<button type="button" class="btn btn-secondary btn-block" data-quick="room-starter-draw">🂠 Sortear con una carta quién empieza</button>`
+      ? `${head}<button type="button" class="btn btn-secondary btn-block" data-quick="room-starter-draw">🂠 Jugar el minijuego de quién empieza</button>`
       : `${head}<p class="hint">${auto?'Sorteando la carta…':'El anfitrión sorteará una carta para decidir quién empieza.'}</p>`;
     const card=CT.cards(s.modeKey).find(c=>c.id===s.cardId);
     if(!card)return `${head}<p class="hint">Preparando la carta…</p>`;
     const regla=CT.axis(s.modeKey).cifra||{}, mine=Number.isFinite(s.guesses[myId]), done=CT.QuickRoom.starterComplete(room);
     const cardBox=detail=>`<div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>${detail}</span></div>`;
-    const redo=host&&!auto?`<button type="button" class="btn btn-ghost btn-block" data-quick="room-starter-draw">🂠 Repetir el sorteo</button>`:'';
+    const redo=host&&!auto?`<button type="button" class="btn btn-ghost btn-block" data-quick="room-starter-draw">🂠 Repetir el minijuego</button>`:'';
     if(!mine)return `${head}${cardBox(esc(regla.pregunta||''))}<div class="field cifra-field"><label for="quick-room-starter-input">Tu respuesta${regla.unidad?` <span class="cifra-unidad">(en ${esc(regla.unidad)})</span>`:''}</label><input id="quick-room-starter-input" type="text" inputmode="${regla.decimales?'decimal':'numeric'}" autocomplete="off" enterkeyhint="send"><p class="hint">${esc(regla.pista||'')}</p></div><button type="button" class="btn btn-primary btn-block" data-quick="room-starter-guess">Adivinar <span>→</span></button>${redo}`;
     if(!done){
       const faltan=room.members.filter(who=>!Number.isFinite(s.guesses[who])).map(who=>esc(room.names[room.members.indexOf(who)]));
@@ -480,7 +480,7 @@
       ? `<div class="section-label">Partida</div><p>${length} ${length===1?'reto':'retos'} con las mismas cartas para toda la mesa. El primer turno rota en cada reto.</p>
         ${count<2?'<div class="waiting-orbit"><span></span></div><p class="hint">Esperando a alguien más…</p>':''}
         <div class="field starter-field">${roomStarterMarkup(false)}</div>
-        ${button('start-room','Sortear y empezar <span>→</span>','btn btn-primary btn-block')}
+        ${button('start-room','Empezar <span>→</span>','btn btn-primary btn-block')}
         ${connection?.kind==='local'?button('invite-peer','Invitar otro móvil','btn btn-secondary btn-block'):''}`
       : `<div class="field starter-field">${roomStarterMarkup(false)}</div><div class="waiting-orbit"><span></span></div><h3>Esperando al anfitrión</h3><p>La partida comenzará en todos los móviles al mismo tiempo.</p>`;
     shell(`<section class="lobby-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> Sala de espera · Retos rápidos</div><h2 data-focus tabindex="-1">Preparando la mesa</h2></div>
@@ -685,7 +685,7 @@
     starterPaint(`<h2>¿Quién empieza?</h2><div class="starter-winner-banner"><b>${esc(names[order[0]])}</b><span>Empieza la partida</span></div>
       <div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>El valor real era ${esc(CT.formatValue(modeKey, card))}</span></div>
       <ol class="starter-draw-list">${order.map((i, n) => `<li${n === 0 ? ' class="starter-draw-winner"' : ''}><span>${n + 1}.º ${esc(names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(modeKey, guesses[i]))}</span></li>`).join('')}</ol>
-      <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-go">Barajar y empezar <span>→</span></button></div>`);
+      <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-go">Empezar <span>→</span></button></div>`);
   }
   const button = (action, text, cls = 'btn btn-primary') => `<button class="${cls}" data-quick="${action}">${text}</button>`;
   function setup() {
@@ -702,7 +702,7 @@
       ${solo ? '' : keepField()}
       ${CT.Tiempo.field(solo ? 'quick-solo' : 'quick-local')}
       <p class="hint">${solo ? "Juegas todas las cartas del reto; al final cuentan tus aciertos." : "Empieza quien gane el minijuego; el primer turno rota en cada reto."}</p></div>
-      ${button('start', 'Barajar y empezar <span>→</span>', 'btn btn-primary btn-block')}
+      ${button('start', 'Empezar <span>→</span>', 'btn btn-primary btn-block')}
       ${saved ? button('resume', 'Continuar partida guardada', 'btn btn-secondary btn-block') : ''}
       <p id="quick-error" role="alert">${esc(error)}</p></div></section>
       <details class="panel quick-panel"><summary>Cómo se juega</summary><ol><li>Una carta revelada inicia la línea, sin contar como acierto.</li><li>Elige una de las cartas comunes y toca un hueco. Confirma para revelar el dato.</li>${solo ? '<li>Cada carta bien colocada suma un acierto.</li><li>Un fallo cuenta como fallo, pero sigues jugando hasta agotar las cartas del reto.</li>' : '<li>Acertar suma un acierto y pasa el turno.</li><li>Con «Arriesgar o plantarse», el acierto es provisional: en tu siguiente turno puedes plantarte para asegurarlo, y fallar pierde los de este reto y te retira. Los de retos anteriores se conservan.</li><li>Con «Seguir hasta el final», un fallo no suma pero sigues jugando.</li><li>Al agotarse las cartas, los aciertos pendientes se aseguran. El reto también termina si nadie sigue activo.</li>'}</ol><p>La carta fallada queda corregida en la línea. ${solo ? '' : 'Si queda una sola persona, puede seguir arriesgando. '} Los empates de valor admiten cualquier orden equivalente. Gana quien asegura más aciertos; un empate final se comparte.</p></details>`);
