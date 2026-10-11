@@ -1,3 +1,4 @@
+// Mazo de Historia de España: cada carta tiene un año, un título y una explicación.
 window.HISTORY_CARDS = [
   { id: 1, year: -218, title: "Desembarco romano en Emporion", detail: "Roma inicia la conquista de Hispania durante la segunda guerra púnica." },
   { id: 2, year: -133, title: "Caída de Numancia", detail: "La ciudad celtíbera cae tras el asedio romano de Escipión Emiliano." },

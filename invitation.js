@@ -1,3 +1,5 @@
+// Página de invitación: cuando alguien abre un enlace de duelo o de sala, la pasa a la app instalada
+// sin crear cuentas ni cargar Firebase.
 (function () {
   'use strict';
   // Esta página no carga Firebase ni crea usuarios: solo entrega la invitación a la app.

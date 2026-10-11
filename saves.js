@@ -1,3 +1,4 @@
+// Guarda una partida a medias en el móvil para poder seguirla más tarde.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;

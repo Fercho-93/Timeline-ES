@@ -1,3 +1,5 @@
+// Reglas de Retos rápidos, sin pantallas: preparar la partida, colocar cartas, puntuar y decidir el
+// ganador.
 (function () {
   'use strict';
   const CT = window.CONTINUUM;

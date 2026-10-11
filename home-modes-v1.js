@@ -1,3 +1,4 @@
+// Pantalla de Inicio: las entradas ilustradas a cada forma de jugar y sus animaciones.
 (function () {
   'use strict';
 

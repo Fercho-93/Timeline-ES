@@ -1,3 +1,4 @@
+// Arranque de la app de Android: carga el juego y registra el ayudante de salas Wi-Fi.
 package com.continuum.game;
 
 import android.os.Bundle;

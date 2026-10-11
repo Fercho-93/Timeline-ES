@@ -1,3 +1,5 @@
+// Guardado en el propio móvil: escribe los datos, avisa si el guardado falla y permite descargar una
+// copia de seguridad.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;

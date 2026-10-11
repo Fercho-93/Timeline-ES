@@ -1,3 +1,5 @@
+// Cuentas del jugador: crea el invitado automático, permite entrar con Apple, sincroniza el progreso con
+// la nube, gestiona el ranking opcional y borra la cuenta con todos sus datos cuando se pide.
 import { auth, db } from './firebase-client.js';
 import { signInAnonymously, setPersistence, browserLocalPersistence, deleteUser, onAuthStateChanged, OAuthProvider, linkWithCredential, signInWithCredential, reauthenticateWithCredential, revokeAccessToken, signOut } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import { doc, getDocFromServer, runTransaction, serverTimestamp, writeBatch, collection, query, orderBy, limit, getDocsFromServer } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';

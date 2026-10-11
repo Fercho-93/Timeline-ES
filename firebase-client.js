@@ -1,3 +1,5 @@
+// Conexión con Firebase (la nube de Google) y con App Check, que demuestra que quien llama es el juego
+// de verdad y no un programa ajeno.
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import { getFirestore, initializeFirestore } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';

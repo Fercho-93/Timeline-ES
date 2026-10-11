@@ -1,3 +1,4 @@
+/* Aspecto de las pantallas de Retos rápidos. */
 .quick-content{padding-bottom:48px}
 .quick-panel{padding:22px;margin:18px 0}.quick-panel h2{margin-top:0}.quick-panel p,.quick-panel li{line-height:1.6}
 .quick-panel label{display:block;font-weight:600;margin:16px 0 7px}.quick-panel input,.quick-panel select{width:100%;padding:12px;border:1px solid var(--line,#b7a58b);border-radius:10px;font:inherit;color:inherit;background:var(--paper,#f3eee4)}

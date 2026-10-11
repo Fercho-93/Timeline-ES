@@ -1,3 +1,4 @@
+// Datos de Retos rápidos: cada reto (tema corto) con sus cartas, curiosidades y la fuente de cada dato.
 (function () {
   'use strict';
   // Cada carta aporta una curiosidad y conserva la fuente del dato que ordena el reto.

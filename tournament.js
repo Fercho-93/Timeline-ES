@@ -1,3 +1,4 @@
+// El modo Competición: varias rondas seguidas, cada una con un mazo distinto.
 (function () {
   'use strict';
   const CT = window.CONTINUUM;

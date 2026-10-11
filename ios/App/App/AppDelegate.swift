@@ -1,3 +1,5 @@
+// Arranque de la app de iPhone: prepara el sonido, entrega el registro de avisos y abre los enlaces de
+// invitación dentro de la app.
 import UIKit
 import AVFoundation
 import Capacitor

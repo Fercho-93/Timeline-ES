@@ -1,3 +1,4 @@
+// Ayuda a dos móviles de la misma Wi-Fi a encontrarse para jugar sin internet (salas Wi-Fi).
 import Foundation
 import Capacitor
 import Network

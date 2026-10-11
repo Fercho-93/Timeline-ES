@@ -1,3 +1,5 @@
+// Partidas por internet con amigos (salas con código): crear y unirse a una sala, turnos, jugadas y
+// final, todo guardado en Firestore.
 import { auth, db } from './firebase-client.js';
 import { deleteDoc, disableNetwork, doc, enableNetwork, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 

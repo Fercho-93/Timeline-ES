@@ -1,3 +1,5 @@
+// El corazón del juego en un solo móvil: dibuja cada pantalla (Inicio, partidas, Atlas, Ajustes…) y
+// responde a cada toque. Las partidas por internet las lleva online.js.
 (function () {
   "use strict";
 

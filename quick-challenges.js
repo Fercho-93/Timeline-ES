@@ -1,3 +1,5 @@
+// Pantallas de Retos rápidos: elegir reto y formato, jugar solo, en un móvil, por Wi-Fi, por internet o
+// en duelo, y ver el resultado.
 (function () {
   'use strict';
   const CT = window.CONTINUUM, E = CT.QuickEngine, esc = CT.escapeHtml;

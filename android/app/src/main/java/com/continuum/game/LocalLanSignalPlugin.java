@@ -1,3 +1,5 @@
+// Ayuda a dos móviles de la misma Wi-Fi a encontrarse para jugar sin internet (salas Wi-Fi).
+// Es la versión Android del mismo ayudante de iPhone.
 package com.continuum.game;
 
 import com.getcapacitor.*;

@@ -1,3 +1,5 @@
+// Revisa el contenido: cuenta las cartas que tienen fuente y, con --write, actualiza el catálogo de
+// fuentes y el inventario del arte (docs/inventario-arte.json).
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';

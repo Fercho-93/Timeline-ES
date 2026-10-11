@@ -1,3 +1,4 @@
+// Cuándo se manda un recordatorio de duelo, cuándo caduca un duelo y qué texto lleva cada aviso.
 const DAY = 86400000;
 const millis = value => value?.toMillis?.() || (value?.seconds || 0) * 1000;
 function lifecycle(game, now) {

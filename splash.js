@@ -1,3 +1,4 @@
+// La portada animada que se ve al abrir el juego mientras termina de cargar.
 (() => {
   const root = document.documentElement;
   const MIN_VISIBLE = 3500, ENTER_VISIBLE = 1200, FADE_OUT = 420, MAX_WAIT = 20000;

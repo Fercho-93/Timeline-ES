@@ -1,3 +1,5 @@
+// Lo primero que se ejecuta al abrir el juego: decide si mostrar el juego, una invitación recibida o la
+// bienvenida.
 (function () {
   // Una invitación abierta por WhatsApp en web no inicia otra cuenta de Firebase.
   // El perfil y la partida se abren dentro de la aplicación instalada.

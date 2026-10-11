@@ -1,3 +1,5 @@
+// Configuración pública del juego (correo de contacto y claves públicas de App Check).
+// Aquí nunca van contraseñas ni claves privadas.
 (function () {
   // Configuración pública, nunca contraseñas ni claves privadas.
   window.CONTINUUM.Deployment = Object.freeze({

@@ -1,3 +1,5 @@
+// La sala de Retos rápidos con varias personas: quién está, quién juega y qué jugadas se aceptan.
+// La usan tanto la versión por Wi-Fi como la de internet.
 (function () {
   'use strict';
   const CT = window.CONTINUUM, E = CT.QuickEngine;

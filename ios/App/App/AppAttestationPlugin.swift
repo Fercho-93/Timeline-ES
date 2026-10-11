@@ -1,3 +1,4 @@
+// App Attest: Apple certifica que la app que hace la petición es la original. Lo usa App Check.
 import Foundation
 import Capacitor
 import FirebaseCore

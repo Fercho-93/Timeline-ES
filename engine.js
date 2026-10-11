@@ -1,3 +1,5 @@
+// Reglas básicas de una partida, sin pantallas: robar cartas, colocar una en la línea y comprobar si el
+// hueco elegido es correcto.
 (function () {
   'use strict';
   const CT = typeof window === 'undefined' ? null : window.CONTINUUM;

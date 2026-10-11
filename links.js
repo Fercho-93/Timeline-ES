@@ -1,3 +1,5 @@
+// Los enlaces del juego: cómo se escriben y se leen las invitaciones a salas y duelos, y qué dominios
+// se aceptan.
 (function () {
   'use strict';
   const CT = window.CONTINUUM = window.CONTINUUM || {};

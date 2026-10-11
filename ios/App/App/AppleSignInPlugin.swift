@@ -1,3 +1,4 @@
+// «Iniciar sesión con Apple» en iPhone. No pide a Apple ni el nombre ni el correo.
 import Foundation
 import Capacitor
 import AuthenticationServices

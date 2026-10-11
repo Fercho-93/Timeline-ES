@@ -1,3 +1,4 @@
+// Retos rápidos por Wi-Fi local: conecta los móviles de la misma red y les pasa las jugadas.
 (function () {
   'use strict';
   const CT = window.CONTINUUM, R = CT.QuickRoom;

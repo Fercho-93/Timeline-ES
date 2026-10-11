@@ -1,3 +1,4 @@
+// El tiempo por jugada (sin tiempo, 15, 20 o 30 segundos), igual en todas las formas de jugar.
 (function () {
   "use strict";
   // Tiempo por jugada: la misma opción en todas las formas de jugar (menos el reto diario,

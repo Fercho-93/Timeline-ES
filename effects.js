@@ -1,3 +1,5 @@
+// Efectos visuales y de sonido de la mesa (al acertar, fallar, abrir diálogos…). Solo decoran: nunca
+// deciden el resultado de una jugada.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;

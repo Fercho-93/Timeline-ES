@@ -1,3 +1,5 @@
+// Comprueba las imágenes y la música: que no falte ninguna y que no se pase del peso permitido
+// (asset-budget.json).
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';

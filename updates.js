@@ -1,7 +1,9 @@
+// Actualizaciones de la web: detecta que hay una versión nueva y la instala. CT.APP_VERSION se sube
+// en cada cambio, igual que la caché del service worker.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;
-  CT.APP_VERSION = "continuum-v653";
+  CT.APP_VERSION = "continuum-v654";
   CT.Updates = { start };
   function start() {
     if (!("serviceWorker" in navigator) || window.Capacitor?.isNativePlatform?.()) return;

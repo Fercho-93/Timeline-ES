@@ -1,3 +1,5 @@
+// Recuerda los nombres de las últimas personas con las que se jugó en el mismo móvil, para no tener que
+// escribirlos otra vez.
 (function () {
   "use strict";
 

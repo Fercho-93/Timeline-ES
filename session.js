@@ -1,3 +1,5 @@
+// Un reloj común para todos los móviles de una partida, para que midan igual el tiempo de cada turno
+// aunque sus relojes no coincidan.
 (function () {
   "use strict";
   const CT = window.CONTINUUM;

@@ -1,3 +1,5 @@
+// La pantalla principal de la app de iPhone: carga el juego y registra las piezas nativas (Apple, App
+// Attest, salas cercanas y Wi-Fi).
 import UIKit
 import Capacitor
 

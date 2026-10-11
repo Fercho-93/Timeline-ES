@@ -1,3 +1,4 @@
+// Mazo de Cine: cada carta es una película con su año de estreno.
 window.MOVIE_CARDS = [
   { id: 1001, year: 1902, title: "Viaje a la Luna", detail: "Georges Méliès crea un hito del cine fantástico con el célebre cohete clavado en el ojo de la Luna." },
   { id: 1002, year: 1920, title: "El gabinete del doctor Caligari", detail: "Robert Wiene levanta el expresionismo alemán con decorados torcidos y sombras pintadas." },

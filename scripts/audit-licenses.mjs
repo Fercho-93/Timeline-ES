@@ -1,3 +1,5 @@
+// Lista las licencias de las herramientas instaladas (con --write las guarda en
+// docs/licencias-dependencias.json).
 import fs from 'node:fs/promises';
 const lock=JSON.parse(await fs.readFile('package-lock.json','utf8'));
 const packages=Object.entries(lock.packages).filter(([path])=>path).map(([path,p])=>({path,version:p.version,declaredLicense:p.license||null,developmentOnly:p.dev===true}));

@@ -1,3 +1,5 @@
+// Página de rescate «Actualizar»: borra la copia guardada del juego en el navegador y vuelve a abrirlo,
+// para cuando un móvil se ha quedado con una versión vieja.
 (async () => {
   const status = document.querySelector("#status");
   const continueLink = document.querySelector("#continue");

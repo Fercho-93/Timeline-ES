@@ -1,3 +1,4 @@
+// Salas cercanas entre iPhones sin Wi-Fi ni internet, con la misma tecnología que AirDrop.
 import Foundation
 import Capacitor
 import MultipeerConnectivity

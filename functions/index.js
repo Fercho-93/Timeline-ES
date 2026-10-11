@@ -1,3 +1,5 @@
+// Tareas automáticas en la nube (Cloud Functions): avisos de duelos al móvil, mantenimiento de duelos
+// caducados y la limpieza diaria de datos caducados (purgeExpiredData). Se publican a mano.
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue, FieldPath } = require('firebase-admin/firestore');
 const { getMessaging } = require('firebase-admin/messaging');
