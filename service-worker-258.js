@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v667";
+const CACHE = "continuum-v668";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -31,6 +31,7 @@ const ASSETS = [
   "./manifest.webmanifest", "./icon.svg", "./assets/continuum-emblem-800.webp", "./assets/continuum-splash-clean-v3.webp", "./assets/continuum-splash-blue-v5.webp",
   "./assets/splash-card-marathon.webp", "./assets/splash-card-hippocrates.webp", "./assets/splash-card-vesuvius.webp",
   "./assets/home-door-jugar.webp",
+  "./assets/difficulty-easy-v1.webp", "./assets/difficulty-normal-v1.webp", "./assets/difficulty-hard-v1.webp", "./assets/difficulty-expert-v1.webp",
   "./assets/world-cards/5009-battle-marathon.webp", "./assets/medicine-cards/9001-hippocratic-corpus.webp", "./assets/astronomy-cards/first-earth-photo.webp",
   "./assets/world-cards/5022-vesuvius-eruption.webp", "./assets/world-cards/5002-great-pyramid-giza.webp",
   "./assets/hero-history-400.webp", "./assets/hero-history-700.webp",

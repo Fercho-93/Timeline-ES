@@ -140,6 +140,7 @@
     const check = icon('<path d="m6 12 4 4 8-8"/>');
     return `<fieldset class="field difficulty-field difficulty-cards"><legend class="field-label">Dificultad</legend><div class="difficulty-grid">${Object.entries(LEVELS).map(([key, info], index) => `<label class="difficulty-card${key === selected ? " is-on" : ""}" data-difficulty="${key}">
       <input type="radio" name="${name}" value="${key}"${key === selected ? " checked" : ""}>
+      <div class="difficulty-art" aria-hidden="true"><img src="assets/difficulty-${key}-v1.webp" alt="" width="480" height="320" decoding="async"></div>
       <div class="difficulty-heading"><small class="difficulty-level" aria-hidden="true">${["I", "II", "III", "IV"][index]}</small><b>${info.name}</b><i class="difficulty-mark" aria-hidden="true">${check}</i></div>
       <div class="difficulty-details">
         <span>${clock}<em>${info.seconds ? `${info.seconds} s por carta` : "Sin tiempo"}</em></span>
