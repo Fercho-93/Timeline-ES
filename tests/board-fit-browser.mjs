@@ -35,7 +35,12 @@ try {
         const errors=[];
         page.on('pageerror',e=>errors.push(e.message));
         try {
-          await page.addInitScript(()=>localStorage.setItem('continuum-splash-seen-v2','1'));
+          await page.addInitScript(()=>{
+            localStorage.setItem('continuum-splash-seen-v2','1');
+            // Baraja fija: la carta que sale cambia un poco las medidas, y con azar la prueba
+            // fallaba por un píxel de vez en cuando (Retos rápidos, hueco de 46 frente a 45).
+            let seed=20261011;Math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
+          });
           await page.goto(url);await page.evaluate(()=>window.CONTINUUM_SPLASH?.finish());
           if(format==='quick') {
             await page.evaluate(()=>window.CONTINUUM.ModeHubs.open('hub-solo'));
@@ -67,7 +72,16 @@ try {
               await page.locator('[data-action="ready"]').click();
             }
           }
-          await page.waitForTimeout(180);
+          // Medir cuando la mesa ya está quieta: imágenes cargadas y dos fotogramas seguidos iguales.
+          await page.evaluate(async()=>{
+            await Promise.all([...document.images].filter(i=>!i.complete).map(i=>new Promise(r=>{i.onload=i.onerror=r;})));
+            let last='';
+            for(let i=0;i<40;i++){
+              await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+              const now=[...document.querySelectorAll('.timeline-toolbar,.timeline-card,.hand')].map(e=>{const r=e.getBoundingClientRect();return `${r.top|0},${r.height|0}`;}).join(';');
+              if(now===last)break;last=now;
+            }
+          });
           const data=await page.evaluate(()=>{
             const app=document.getElementById('app'),shell=app.querySelector(':scope > .shell');
             const box=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),left:Math.round(r.left),right:Math.round(r.right),height:Math.round(r.height),width:Math.round(r.width)}};
