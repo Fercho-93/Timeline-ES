@@ -46,7 +46,9 @@ jobs:
       - name: Publicar las Functions
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/cuenta.json
-        run: npx firebase deploy --only functions --project timeline-es --non-interactive
+        # --force: configura sola la política que borra las imágenes antiguas de cada despliegue
+        # (sin ella se acumulan y cuestan) y retira las Functions que ya no estén en el código.
+        run: npx firebase deploy --only functions --project timeline-es --non-interactive --force
       - name: Borrar la credencial
         if: always()
         run: rm -f "$RUNNER_TEMP/cuenta.json"
