@@ -1,9 +1,9 @@
 {
-  "version": "0.1.1",
-  "cache": 644,
+  "version": "0.1.2",
+  "cache": 655,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Seguridad: jugadas firmadas en Retos rápidos, reparto validado, sala Wi-Fi blindada, límite de altas y App Check con App Attest"
+  "reason": "Limpieza y mejoras: cartas más ligeras (35 MB menos), splash oscuro, licencias, rótulos de Retos rápidos en una línea y política de privacidad al día"
 }
