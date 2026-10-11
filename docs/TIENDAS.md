@@ -176,7 +176,7 @@ cuestionarios de cada tienda con el contenido real de la versión enviada.
 **Alcance de la primera versión:** solitario, reto diario, Retos rápidos, partidas en un solo
 móvil, salas con amigos (internet y Wi-Fi), duelos, mesas públicas y ranking opcional. Fuera de
 alcance mientras no exista un servidor autoritativo: competición pública arbitrada, premios y
-clasificaciones certificadas (ver [server/README.md](../server/README.md)).
+clasificaciones certificadas.
 
 **Monetización:** pendiente del feedback de la beta. Comparar pago único y ampliaciones de
 contenido con personas reales antes de implementar cobros. La cartera (`cartera.js`) ya separa

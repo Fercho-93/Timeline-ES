@@ -35,7 +35,7 @@ si un cambio ha llegado.
 ### Reglas de Firestore
 
 No hay que copiar ni pegar nada en la consola. Al subir a `main` un cambio en `firestore.rules`,
-el workflow «Publicar reglas de Firestore» ejecuta las 15 suites de `npm run test:reglas` en el
+el workflow «Publicar reglas de Firestore» ejecuta las 14 suites de `npm run test:reglas` en el
 emulador y, solo si pasan, ejecuta `firebase deploy --only firestore:rules --project timeline-es`
 con el secreto `FIREBASE_SERVICE_ACCOUNT`. Si faltara el secreto, el workflow explica cómo
 crearlo. También se puede lanzar a mano: Actions → «Publicar reglas de Firestore» → «Run
@@ -110,7 +110,7 @@ elegido. Los datos de los mazos viven en el cliente, así que quien sepa manipul
 puede declarar acertada una jugada fallida en su turno, aunque no puede robar cartas ajenas,
 saltarse turnos ni forzar la victoria. La final numérica sí se comprueba contra la carta en cada
 cliente (`CT.Final.valid`). Cerrar del todo esa puerta exige un servidor autoritativo (ver
-[server/README.md](server/README.md)); para un juego de sobremesa entre conocidos no compensa.
+[SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md)); para un juego de sobremesa entre conocidos no compensa.
 Más detalles en [SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md).
 
 ## Conservación y limpieza de datos

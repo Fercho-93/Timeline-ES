@@ -50,7 +50,6 @@ El resto de la documentación:
 | [PRIVACIDAD.md](PRIVACIDAD.md) | Política de privacidad (la misma que `privacidad.html`). |
 | [CONTENIDO_Y_DERECHOS.md](CONTENIDO_Y_DERECHOS.md), [PROCEDENCIA_ARTE_IA.md](PROCEDENCIA_ARTE_IA.md) | Fuentes de las cartas y procedencia del arte. |
 | [tests/README.md](tests/README.md) | Qué comprueba cada prueba y dónde se ejecuta. |
-| [server/README.md](server/README.md) | Servidor experimental de competición (no desplegado). |
 
 ## Tu nombre y tu avatar
 
@@ -672,8 +671,8 @@ no hay que volver a publicarlas al añadir un mazo nuevo.
 `tests/` contiene las pruebas automáticas. `npm test` encadena unas 80 órdenes que corren en
 cualquier ordenador —sintaxis de todos los archivos, partidas completas sobre un DOM simulado,
 partidas al azar, calidad de los mazos, solitario, Pulso, Fantasma, cuentas, ranking, Retos
-rápidos, salas Wi-Fi, duelos, service worker, accesibilidad, build móvil, servidor experimental,
-plazos de conservación y presupuesto de recursos— y `npm run test:reglas` lanza 15 suites contra
+rápidos, salas Wi-Fi, duelos, service worker, accesibilidad, build móvil,
+plazos de conservación y presupuesto de recursos— y `npm run test:reglas` lanza 14 suites contra
 el emulador oficial de Firestore. Se instalan con `npm ci` y se ejecutan solas en cada propuesta
 de cambio y cada subida a `main`. Qué comprueba cada archivo está en
 [tests/README.md](tests/README.md).

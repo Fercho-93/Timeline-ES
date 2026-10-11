@@ -6,6 +6,8 @@ El titular del proyecto declara que todos los recursos visuales incorporados a C
 
 Esta declaración se basa en la confirmación expresa del titular y en el historial disponible de conversaciones del proyecto. El inventario `docs/inventario-arte.json` enlaza cada archivo con esta declaración y conserva su huella SHA-256.
 
+La declaración es general y también vale para el futuro: todas las imágenes del juego se generan con IA, y de ninguna otra manera. `node scripts/audit-content.mjs --write` asigna esta declaración a cada imagen nueva o modificada.
+
 ## Lenguaje visual
 
 Los 36 retratos de `assets/avatars/` se generaron con ChatGPT/OpenAI el 25 de

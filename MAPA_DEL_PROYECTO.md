@@ -144,7 +144,6 @@ Cada archivo es una lista de cartas con su título, su explicación, el valor qu
 | `ios/` | El envoltorio de la app de iPhone (proyecto de Xcode). Ver abajo. |
 | `android/` | El envoltorio de la app de Android (proyecto de Android Studio). Ver abajo. |
 | `resources/` | Las imágenes originales del icono y de la pantalla de carga, a partir de las que se generan todos los tamaños (`npm run icons`). |
-| `server/` | Un servidor de competición experimental. **No está en uso**; ver [server/README.md](server/README.md). |
 | `.github/` | Los robots de GitHub (`workflows/`), las plantillas para abrir incidencias y `beta-request.json`. |
 | `.well-known/` | Un archivo que demuestra a Apple que el dominio es del juego, para que los enlaces de invitación abran la app (lo genera `scripts/domain-associations.mjs`). |
 | `.agents/` | Instrucciones para asistentes de IA que generan ilustraciones de cartas. |

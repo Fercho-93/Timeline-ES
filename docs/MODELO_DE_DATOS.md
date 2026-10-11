@@ -56,9 +56,6 @@ Lo que borra la eliminación de una cuenta está en
 ## Fuera de producción
 
 - `appleBetaTesters` ya no existe: las reglas no la permiten (`tests/apple-auth-rules.mjs`).
-- `matches`, `matchSecrets`, `matchResults`, `matchRequests` y `matchQuotas` son del servidor
-  experimental de competición (`server/firestore.rules`), no desplegado. Ver
-  [server/README.md](../server/README.md).
 
 Además de Firestore, Firebase Authentication guarda la identidad de cada invitado o cuenta de
 Apple; los invitados anónimos sin vincular que llevan un año sin abrir el juego se borran con sus

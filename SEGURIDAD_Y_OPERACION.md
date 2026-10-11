@@ -106,9 +106,8 @@ Crear una versión de protocolo independiente con estas fronteras:
 - Resultados: un registro de servidor con versión del motor y del catálogo, ganador y secuencia de
   acciones. Las clasificaciones solo aceptarían estos registros.
 
-El servicio experimental de `server/` implementa estas fronteras, con pruebas independientes. No
-está desplegado ni integrado en las pantallas. Ver [server/README.md](server/README.md) antes de
-cualquier exposición pública.
+Hubo un prototipo de este servicio en `server/`, nunca desplegado; se retiró en octubre de 2026 y
+sigue en el historial de git.
 
 ## Fuentes operativas
 

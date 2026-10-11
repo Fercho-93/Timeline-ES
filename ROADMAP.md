@@ -53,7 +53,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - Accesibilidad, movimiento reducido, teclado, lector de pantalla y navegación móvil.
 - Capacitor con proyectos `android/` e `ios/`, iconos y splash generables.
 - Inventario de fuentes y de arte, y procedencia del arte documentada.
-- Pruebas automáticas: unas 80 órdenes en `npm test` y 15 suites de reglas en
+- Pruebas automáticas: unas 80 órdenes en `npm test` y 14 suites de reglas en
   `npm run test:reglas` (ver [tests/README.md](tests/README.md)).
 
 ## 2. Prioridad inmediata: beta privada
@@ -91,7 +91,7 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 - [ ] Aplicar el *enforcement* de App Check.
 - [ ] Límites, alertas y procedimiento de cierre ante abuso o costes anómalos.
 - [ ] Moderación de alias (filtro y denuncia) si las tiendas lo exigen.
-- [ ] Mantener desactivada la competición pública mientras el servidor no esté desplegado.
+- [ ] Mantener fuera la competición pública arbitrada: exigiría un servidor autoritativo.
 
 ## 5. Cuentas
 
@@ -117,14 +117,9 @@ externa o una decisión del titular. Las listas de comprobación de la beta est�
 
 ## 7. Servidor de competición pública
 
-Prototipo en `server/` (ver [server/README.md](server/README.md)). Antes de anunciarlo:
-
-- [ ] Elegir un catálogo competitivo revisado y versionado.
-- [ ] Desplegar el servidor detrás de HTTPS con credenciales y orígenes permitidos.
-- [ ] Integrar la interfaz de la aplicación.
-- [ ] Completar Fantasma, abandono, recuperación y controles globales.
-- [ ] Revisar IAM, App Check nativo, revocación, cuotas y alertas.
-- [ ] Pruebas de carga y recuperación.
+Hubo un prototipo de servidor autoritativo (en el historial de git hasta octubre de 2026), retirado
+porque no se desplegó. Si algún día se quiere competición pública arbitrada, el diseño está en
+[SEGURIDAD_Y_OPERACION.md](SEGURIDAD_Y_OPERACION.md#arquitectura-para-una-futura-competición-pública).
 
 ## 8. Lanzamiento
 
@@ -138,6 +133,19 @@ Prototipo en `server/` (ver [server/README.md](server/README.md)). Antes de anun
 - [ ] Validar comprensión, repetición y disposición a pagar con testers.
 - [ ] Decidir la monetización después de la beta; si se venden mazos, compras oficiales,
       restauración, reembolsos y validación en servidor.
+- [ ] **Empezar de cero al salir a la App Store** (decidido por el titular): borrar todas las
+      cuentas y datos de la beta para que nadie arrastre progreso, ranking ni alias de prueba.
+      Pasos, el mismo día de la publicación y antes de abrirla:
+      1. Avisar a los testers con antelación de que su progreso se borrará.
+      2. Firebase Authentication: borrar todos los usuarios (invitados y vinculados con Apple).
+      3. Firestore: borrar todas las colecciones (perfiles, progreso, ranking, salas, duelos,
+         mesas, cuotas y registros de avisos).
+      4. En el código, cambiar `SEASON` de `account-storage.js` (`'launch-1'` → `'launch-2'`)
+         para que las copias guardadas en los móviles de la beta no se suban a las cuentas nuevas,
+         y subir la caché.
+      5. Quitar de `privacidad.html` y `PRIVACIDAD.md` la frase sobre el correo de Apple de
+         quienes vincularon antes del 10 de octubre de 2026: con el borrado deja de existir.
+      Conviene preparar un script o workflow de un solo uso para los pasos 2 y 3 cuando llegue el momento.
 
 ## 9. Multijugador sin internet
 

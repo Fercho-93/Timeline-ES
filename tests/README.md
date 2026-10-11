@@ -6,11 +6,11 @@ siempre las mismas. `node_modules` no se guarda en el repositorio.
 ```sh
 npm ci
 
-# Juego, guardado, mazos, cuentas, service worker, accesibilidad, build y servidor experimental:
-# 82 órdenes (80 suites, la comprobación de recursos y la auditoría de contenido).
+# Juego, guardado, mazos, cuentas, service worker, accesibilidad, y build:
+# 79 órdenes (77 suites, la comprobación de recursos y la auditoría de contenido).
 npm test
 
-# Reglas de Firestore contra el emulador oficial (necesita Java): 15 suites.
+# Reglas de Firestore contra el emulador oficial (necesita Java): 14 suites.
 npm run test:reglas
 
 # Las dos cosas.
@@ -58,10 +58,8 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `card-text.mjs` | test | El texto de las cartas se ajusta sin partir palabras y recupera su tamaño. |
 | `cartera.mjs` | test | La cartera: un mazo cerrado a mano se respeta en todos los rincones del juego. |
 | `cifras.mjs` | test | Duelo de cifras: puntos por cercanía y rapidez, carga útil recalculada y reloj que no se para. |
-| `cliente-competicion.mjs` | test | El cliente HTTP del servidor experimental exige HTTPS, añade tokens y traduce errores. |
 | `compartir-local.mjs` | test | La señal de la sala Wi-Fi viaja por «compartir» del sistema o por el portapapeles. |
 | `compatibilidad-version-anterior.mjs` | reglas | Las reglas nuevas aceptan las salas y escrituras de la versión anterior de la app. |
-| `competicion-servidor.mjs` | test | Servidor experimental: partidas completas de 2 a 9, Pulso privado y manipulaciones rechazadas. |
 | `competicion-turnos.mjs` | test | Competición de varios temas dentro de un duelo por turnos. |
 | `competicion-wifi.mjs` | test | Competición por rondas en la sala Wi-Fi, con las mismas reglas que la sala online. |
 | `conexion-nativa.mjs` | test | Entrada en salas desde enlaces nativos y antiguos, y fallos de red o del servidor. |
@@ -140,8 +138,6 @@ Columna «Dónde»: **test** = `npm test`; **reglas** = `npm run test:reglas` (e
 | `ritmo.mjs` | test | Los poderes se eligen con sus interruptores en la configuración. |
 | `sala-local.mjs` | test | El reductor puro de la sala Wi-Fi: una partida entera en Node. |
 | `service-worker.mjs` | test | Qué versión ve el móvil: caché por versión, refresco y precarga de todo lo que pide `index.html`. |
-| `servidor-http.mjs` | test | Servidor experimental: identidad, App Check obligatorio, origen y límites del cuerpo. |
-| `servidor-reglas.mjs` | reglas | Reglas del servidor experimental (proyecto de emulador aparte): privacidad, carreras y cuotas. |
 | `sesion-local.mjs` | test | La sesión que une sala y transporte Wi-Fi, sin WebRTC real. |
 | `sintaxis.mjs` | test | Que todos los archivos del juego parsean; la única red que cubre `online.js`. |
 | `solitario.mjs` | test | Solitario, reto diario, confirmación al colocar y llegada animada de las cartas automáticas. |
