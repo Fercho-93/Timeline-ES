@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 655,
+  "cache": 663,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Limpieza y mejoras: cartas más ligeras (35 MB menos), splash oscuro, licencias, rótulos de Retos rápidos en una línea y política de privacidad al día"
+  "reason": "Retoques visuales de la intro y el inicio: globo con mar azul grisáceo, cartas flotantes con color suave, botón Jugar más alto y más aire entre «Jugar» y «Unirme a una partida», e ilustraciones del menú con color sobrio"
 }
