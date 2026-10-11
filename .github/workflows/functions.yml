@@ -1,0 +1,52 @@
+name: Publicar Cloud Functions
+
+# Despliega las Cloud Functions (avisos de duelos y limpieza diaria de datos caducados) sin
+# necesidad de un ordenador: pestaña Actions -> «Publicar Cloud Functions» -> «Run workflow»,
+# también desde el móvil. Solo se lanza a mano: publicar código de servidor debe ser una
+# decisión explícita.
+#
+# Usa la misma credencial que las reglas (FIREBASE_SERVICE_ACCOUNT). Esa cuenta de servicio
+# necesita además permisos para desplegar Functions; ver CONFIGURAR_MULTIJUGADOR.md.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: functions
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    name: Probar y publicar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Probar los plazos de conservación y la sintaxis
+        run: |
+          node tests/retencion.mjs
+          node --check functions/index.js
+      - name: Instalar las dependencias de las Functions
+        run: npm install --prefix functions --no-audit --no-fund
+      - name: Escribir la credencial
+        env:
+          CUENTA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$CUENTA" ]; then
+            echo "Falta el secreto FIREBASE_SERVICE_ACCOUNT del repositorio." >&2
+            exit 1
+          fi
+          printf '%s' "$CUENTA" > "$RUNNER_TEMP/cuenta.json"
+      - name: Publicar las Functions
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/cuenta.json
+        run: npx firebase deploy --only functions --project timeline-es --non-interactive
+      - name: Borrar la credencial
+        if: always()
+        run: rm -f "$RUNNER_TEMP/cuenta.json"

@@ -47,6 +47,24 @@ pueden publicar sin esperar a que todos los móviles hayan recargado la web. Las
 `tests/reglas-firestore.mjs` y `tests/compatibilidad-version-anterior.mjs` ejecutan estas
 reglas contra el emulador oficial antes de publicarlas. Consulta `tests/README.md`.
 
+### Publicar las Cloud Functions
+
+Las Functions (avisos de duelos y limpieza diaria de datos caducados, `purgeExpiredData`) se
+publican con el workflow manual **Publicar Cloud Functions**: GitHub → Actions → «Publicar Cloud
+Functions» → «Run workflow». Funciona desde el móvil y usa el mismo secreto
+`FIREBASE_SERVICE_ACCOUNT` que las reglas. Requisitos:
+
+- El proyecto debe estar en el plan **Blaze** (pago por uso): las Functions y las tareas
+  programadas no funcionan en el plan gratuito. El uso de esta beta cabe en la cuota gratuita
+  de Blaze, pero conviene poner una alerta de presupuesto.
+- La cuenta de servicio del secreto necesita, en Google Cloud → IAM, los roles **Administrador de
+  Cloud Functions**, **Usuario de cuenta de servicio**, **Administrador de Cloud Scheduler**,
+  **Administrador de Eventarc** y **Administrador de Artifact Registry**. Si el workflow falla con
+  un error de permisos (`403`, `PERMISSION_DENIED`), el mensaje dice cuál falta.
+
+Alternativa con ordenador: instalar Node 22, `npm install -g firebase-tools`, `firebase login`,
+`npm install --prefix functions` y `firebase deploy --only functions --project timeline-es`.
+
 ### Limpiar salas antiguas
 
 Objetivo de retención para la beta: siete días desde la última actividad. La configuración
