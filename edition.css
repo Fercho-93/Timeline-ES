@@ -3080,18 +3080,18 @@ html body::before {
   box-shadow: none;
 }
 html::before {
-  background: #e9dcc3 url("assets/continuum-splash-blue-v4.webp") center bottom / cover no-repeat;
+  background: #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 :root[data-theme="dark"]::before {
-  background: linear-gradient(#140d08d6, #140d08e6), #140d08 url("assets/continuum-splash-blue-v4.webp") center bottom / cover no-repeat;
+  background: linear-gradient(#140d08d6, #140d08e6), #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 /* Fuera de la portada hay textos sobre el fondo: un velo de papel deja la ilustración
    como ambiente sin que las órbitas pasen por detrás de las letras. */
 html:not(:has(#app[data-screen="home"]))::before {
-  background: linear-gradient(#f1e7d2b8, #f1e7d299 60%, #f1e7d24d), #e9dcc3 url("assets/continuum-splash-blue-v4.webp") center bottom / cover no-repeat;
+  background: linear-gradient(#f1e7d2b8, #f1e7d299 60%, #f1e7d24d), #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 :root[data-theme="dark"]:not(:has(#app[data-screen="home"]))::before {
-  background: linear-gradient(#140d08e6, #140d08f0), #140d08 url("assets/continuum-splash-blue-v4.webp") center bottom / cover no-repeat;
+  background: linear-gradient(#140d08e6, #140d08f0), #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 html body::before {
   background:
@@ -3251,7 +3251,7 @@ html body:has(#app[data-screen="home"])::before {
 /* Jugar con un punto más de color: el color lo ponen las láminas, que recuperan su
    tono; los tres recuadros comparten el mismo papel terracota suave. */
 html:not(:has(#app[data-screen="home"]))::before {
-  background: linear-gradient(#f3e3c8b3, #f2e1c494 60%, #f0dcbc4d), #e9dcc3 url("assets/continuum-splash-blue-v4.webp") center bottom / cover no-repeat;
+  background: linear-gradient(#f3e3c8b3, #f2e1c494 60%, #f0dcbc4d), #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 
 /* Retratos ilustrados: el círculo, la moldura y la sombra pertenecen al juego.

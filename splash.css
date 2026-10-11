@@ -10,7 +10,7 @@ html.splash-active #app-splash {
   user-select: none;
   -webkit-user-select: none;
   color: #29241e;
-  background: #e9dcc3 url("assets/continuum-splash-blue-v4.webp") center / cover no-repeat;
+  background: #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center / cover no-repeat;
   opacity: 1;
   isolation: isolate;
   transition: opacity 420ms cubic-bezier(.22,.61,.36,1);
