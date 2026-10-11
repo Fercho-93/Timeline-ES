@@ -6,8 +6,9 @@
   const CT = window.CONTINUUM;
   const HOST_ID = "host";
 
-  // Bootstrap local: mantiene el flujo operativo aunque una build antigua aún no incluya
-  // local-lan-signal.js en index.html.
+  // Señalización por la red local (solo en la app instalada): el anfitrión abre un pequeño
+  // servidor y el invitado le devuelve la respuesta WebRTC sin tener que escanear otro QR.
+  // El puente con el plugin nativo `LocalLanSignal` vive aquí mismo.
   if (!CT.LocalLanSignal) {
     const P = () => window.Capacitor?.Plugins?.LocalLanSignal || null;
     CT.LocalLanSignal = {

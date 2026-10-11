@@ -469,7 +469,6 @@
   const hubs = {'hub-online': openOnlineHub, 'hub-online-create': openPublicCreate, 'hub-online-collections': openOnlineCollections, 'hub-solo': openSoloHub, 'hub-friends-local': openLocalHub, 'hub-friends-online': () => openFriendHub('online'), 'hub-friends-wifi': () => openFriendHub('wifi'), 'hub-friends-duel': () => openFriendHub('duel'), 'hub-friends': openFriendsHub};
   if (window.CONTINUUM) window.CONTINUUM.ModeHubs = { open(screen) { (hubs[screen] || openSoloHub)(); }, refreshHome() { restructureHome(); } };
 
-  function seasonKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
   // El resumen del inicio habla el mismo idioma que el ranking: aciertos de hoy, de esta semana y la racha.
   function rankingSummary() {
     const key = d => d.toLocaleDateString('sv-SE');

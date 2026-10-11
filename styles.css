@@ -85,7 +85,6 @@ button { touch-action: manipulation; color: inherit; }
    justo los que más se usan: el de la esquina en cada pantalla de partida. */
 .icon-btn { min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 16px; font-size: .85rem; font-weight: 650; cursor: pointer; }
 /* La rosa gira al pulsarla: es el único adorno del atajo y dura lo que el toque. */
-.hero-copy { position: relative; z-index: 2; }
 /* Galería persistente: el bloque anterior se contrae a la vez que se abre el nuevo.
    Cambiar de mazo dentro del mismo bloque no reinicia ni descarga la carátula. */
 /* En móvil la galería va primero: se elige el juego y luego se lee de qué va. */
@@ -1241,7 +1240,6 @@ body::before {
 .home-ornament { display: grid; grid-template-columns: 58px 10px 58px; align-items: center; justify-content: center; gap: 7px; margin: 27px 0 0; }
 .home-ornament span { height: 1px; background: rgba(137,87,36,.58); }
 .home-ornament i { width: 8px; height: 8px; border: 1px solid #a36d2d; transform: rotate(45deg); }
-.home-shell .hero-copy { display: grid; gap: 24px; }
 
 .deck-collection {
   scroll-margin-top: 15px;
@@ -1705,8 +1703,6 @@ body::before {
     margin-top: 24px; width: 100%; border-radius: 12px;
   }
 }
-.home-shell .hero-copy { grid-template-columns: minmax(0, 1fr); }
-
 
 .turn-change-splash { z-index: 80; background: rgba(35, 23, 12, .78); backdrop-filter: blur(7px) sepia(.16); animation: turn-splash-in 180ms ease-out both; }
 .turn-change-card { width: min(420px, calc(100% - 32px)); padding: 30px 24px; text-align: center; }
@@ -1715,7 +1711,6 @@ body::before {
 .turn-change-card p { margin: 0; font-size: 1.05rem; }
 .turn-change-card strong { color: var(--accent-dark); }
 @keyframes turn-splash-in { from { opacity: 0; } to { opacity: 1; } }
-
 
 /* Mesa móvil: controles en una fila, nombres sin alturas artificiales.
    Se adapta al ancho disponible, no a la marca del teléfono. */

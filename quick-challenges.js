@@ -374,7 +374,6 @@
     return mioTurno?{...base,grupo:'tu-turno',pendiente:true,estado:'Te toca',detalle:where}:{...base,grupo:'su-turno',pendiente:false,estado:`Turno de ${rival}`,detalle:where};
   }
   const isDuel=room=>room.capacity===2&&room.config?.kind==='duel'&&!room.matchmaking;
-  const myRooms=(found)=>found.filter(x=>isDuel(x.room));
   // Los duelos de tu cuenta con su estado actual. Sin conexión se enseña lo último que se supo.
   async function duels() {
     try{

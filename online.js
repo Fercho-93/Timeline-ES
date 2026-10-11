@@ -147,7 +147,6 @@ function starterRanking(allowMissing = false) {
   if (!answers || (!allowMissing && !answers.every(Boolean))) return null;
   return CT.Starter.order(modeKey(), starterCardId(), roomState.playerOrder.map((uid, i) => ({ id: uid, value: answers[i]?.value ?? null })));
 }
-function starterWinnerUid() { return starterRanking()?.[0] || null; }
 
 async function drawStarterCard() {
   if (starterBusy || roomState.hostUid !== user.uid) return;
@@ -872,7 +871,6 @@ function seatSilent(uid) {
 // valores de serie. Se reinician al cambiar de sala.
 const LOBBY_DEFAULTS = { preset: "simple", turnSeconds: "30", handSize: "4", pulse: false, ghost: false };
 const lobbySettings = { room: "", ...LOBBY_DEFAULTS };
-const lobbyOption = (value, label, current) => `<option value="${value}"${String(current) === String(value) ? " selected" : ""}>${label}</option>`;
 function presetFor(pulse, ghost) { return pulse && ghost ? "advanced" : !pulse && !ghost ? "simple" : "custom"; }
 
 function renderLobby() {

@@ -21,11 +21,6 @@
   // añade un STUN alcanzable en la propia red local, va aquí.
   const ICE_CONFIG = Object.freeze({ iceServers: [] });
 
-  // Cuántos caracteres tolera de sobra un QR pensado para leerse con la cámara de un móvil,
-  // a la distancia normal a la que se enseña una pantalla a otra. Por encima de esto el QR
-  // se vuelve denso y falla la lectura con luz mala o pulso inestable — como en un avión.
-  // Es solo una referencia para la interfaz que use este transporte; aquí no se aplica.
-  const MAX_SIGNAL_LENGTH = 1200;
 
   function hasBtoa() { return typeof btoa === "function"; }
 
@@ -310,7 +305,7 @@
   }
 
   CT.LocalTransport = {
-    ICE_CONFIG, MAX_SIGNAL_LENGTH,
+    ICE_CONFIG,
     encodeSignal, decodeSignal, describeSignal, encodeMessage, decodeMessage,
     // Codificación de texto genérica, sin las validaciones propias de la señal WebRTC:
     // la usa `local-multiplayer.js` para meter en una sola invitación la señal y los

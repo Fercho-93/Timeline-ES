@@ -50,8 +50,3 @@ export function publicPlayer({ uid, name, avatarId = null, clientVersion, joined
   return { uid, name: String(name).slice(0, 18), avatarId, clientVersion, joinedAt };
 }
 
-export const PUBLIC_MATCHMAKING = Object.freeze({
-  MIN_PLAYERS,
-  MAX_PLAYERS,
-  PUBLIC_ROOM_PREFIX
-});

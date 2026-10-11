@@ -33,8 +33,7 @@
   }
   // Presentation changes do not alter the cards/rules required to resume a game.
   function fingerprint(){return CT.seedFrom(JSON.stringify({version:CT.QuickCatalog.version,challenges:CT.QuickCatalog.challenges.map(c=>({id:c.id,direction:c.direction,cards:c.cards.map(x=>({id:x.id,value:x.value}))}))}));}
-  // v564 uses the same cards and values, but hashed illustrations and descriptions too.
-  function compatible(value){return value===fingerprint()||(value===2351751673&&fingerprint()===1085063415);}
+  function compatible(value){return value===fingerprint();}
   async function internet(options) {return (await import('./quick-online.js')).connect(options);}
   async function mine() {return (await import('./quick-online.js')).mine();}
   async function actOnce(code, action, expected) {return (await import('./quick-online.js')).actOnce(code, action, expected);}

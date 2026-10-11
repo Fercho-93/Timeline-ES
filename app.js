@@ -1289,15 +1289,6 @@
     renderResult();
   }
 
-  function drawCard(player) {
-    const drawn = CT.Engine.draw(game.deck, game.discard);
-    game.deck = drawn.deck; game.discard = drawn.discard;
-    const id = drawn.cardId;
-    if (id == null) return false;
-    player.hand.push(id);
-    CT.Powers.claim(game, id, player.id, game.deck);
-    return true;
-  }
 
   // ---------------------------------------------------------------------------
   // El Pulso: un duelo a ciegas
@@ -2123,7 +2114,6 @@
   // El duelo que ha llegado por enlace y todavía no se ha aceptado.
   let pendingDuel = null;
 
-  function enDuelo() { return solo?.kind === "duel"; }
   // Sin vidas: el duelo y el reto diario se juegan siempre hasta el final de sus cartas (un fallo no corta
   // el reto: el resultado es «7 de 10»). El resto de partidas en solitario sí tienen tres vidas.
   function sinVidas() { return solo?.kind === "duel" || solo?.kind === "daily"; }
@@ -2543,8 +2533,6 @@
   const LIVE_NET_KEY = "hilo-sala-red-v1";
   function liveNet() { return CT.Storage.getItem(LIVE_NET_KEY) === "wifi" ? "wifi" : "internet"; }
   function duelBlockKey(ritmo, prueba) { return ritmo === "directo" ? "directo" : `${ritmo}-${prueba}`; }
-  // Compatibilidad con llamadas antiguas: el modo ya solo representa la prueba.
-  function duelMode() { return duelKind(); }
 
   function duelPanel() {
     // Un duelo aceptado y dejado a medias no se puede volver a empezar desde el enlace si
@@ -3730,16 +3718,6 @@
     </div></section></div>`);
   }
 
-  // Salir a mitad de una competición no debe dejar la modalidad cambiada puesta: se
-  // restaura la de antes de empezar, igual que hace `compFinish` al terminarla entera.
-  function abandonCompetition() {
-    saveCompetition();
-    selectedModeKey = previousModeKey;
-    cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
-    solo = null;
-    comp = null;
-    home();
-  }
 
   // La guía explica la forma de jugar que se tiene delante. Con una partida en marcha la
   // dice ella; sin partida empezada la dice la pantalla, porque abrir la guía desde el
