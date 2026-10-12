@@ -453,6 +453,11 @@
   // plegar sus barras; las clases se recalculan sin tocar el zoom elegido ni el estado.
   let boardFitFrame = 0;
   let heldHand = null;
+  // El ancho del abanico se decide la primera vez que se mide la mesa y se conserva mientras
+  // sigan la misma pantalla y el mismo tamaño de ventana: si cada repintado lo recalculara,
+  // pasar de una carta a otra podía encoger o agrandar la mano según lo que midiera ese
+  // instante (la animación a medias, el aviso de colocar), y la mano bailaba de tamaño.
+  let fanHold = null;
   function fitBoard(container) {
     if (!board.has(container.dataset.screen) || window.innerWidth > 699) {
       delete container.dataset.boardFit;
@@ -550,11 +555,16 @@
         }
       }
       // Con lo que la línea deja libre, crece tu carta (o el abanico de la mano).
-      if (!shrunk && fits() && window.innerWidth >= 375) {
+      const fanCard = shell.querySelector('.atlas-hand-section .hand.hand-fan .hand-card');
+      const fanKey = fanCard ? `${container.dataset.screen}:${window.innerWidth}x${window.innerHeight}` : null;
+      if (fanKey && fanHold?.key === fanKey) {
+        if (fanHold.width) { container.classList.add('board-hand-expanded'); container.style.setProperty('--optimal-fan-card', fanHold.width); }
+      } else if (!shrunk && fits() && window.innerWidth >= 375) {
         const section = shell.querySelector('.board-timeline-section');
         const card = section?.querySelector('.timeline .timeline-card');
         if (card) growHand(container, shell, section, card, available, fits);
       }
+      if (fanKey && fanHold?.key !== fanKey) fanHold = { key: fanKey, width: container.style.getPropertyValue('--optimal-fan-card') || '' };
       // Al elegir hueco, tu carta pasa a la línea como vista previa: su sitio en la mano
       // conserva el alto que tenía para que la línea no suba de golpe.
       const handSection = shell.querySelector(':scope > :is(.atlas-hand-section, .board-focus-card)');

@@ -402,6 +402,7 @@
       const audience = inlineCollections.dataset.inlineRoute === 'collections' ? 'solo' : inlineCollections.dataset.inlineRoute;
       drawer.innerHTML = open ? window.CONTINUUM.collectionsGallery(false, audience).replaceAll('loading="lazy"', 'loading="eager"') : window.CONTINUUM.competitionPanel(audience);
       drawer.hidden = !open;
+      window.CONTINUUM.Effects?.transition?.(open ? 'unroll' : 'fold');
       inlineOpen[app.dataset.screen] = open;
       inlineCollections.setAttribute('aria-expanded', String(open));
       // El efecto de profundidad al inclinar el móvil también vale para las portadas desplegadas.

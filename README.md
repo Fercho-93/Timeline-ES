@@ -208,7 +208,7 @@ Cada juego conserva su propia partida local. El juego elegido también se guarda
 
 Formas de jugar un mazo:
 
-- **Jugar solo:** una persona contra el mazo, con tres vidas (rondas de 15 cartas, maratón o competición).
+- **Jugar solo:** una persona contra el mazo, con tres vidas (rondas de 10 cartas, maratón o competición).
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Cada uno en su móvil:** en directo en una sala (por internet con Firebase, o por la misma
   Wi-Fi sin internet), por turnos en un duelo que cada uno juega cuando puede, o con las mismas
@@ -475,7 +475,7 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   Wordle, sin desvelar ninguna carta— por donde el móvil ofrezca o copiado al portapapeles. Con
   cuenta, el resultado se guarda en el progreso y, si se acepta, entra en el ranking diario y
   semanal (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
-- **Ronda:** 15 cartas sacadas con preferencia de las que aún no están en el álbum y ordenadas de la
+- **Ronda:** 10 cartas sacadas con preferencia de las que aún no están en el álbum y ordenadas de la
   más holgada a la más apretada respecto a la línea. Acabarla con vidas la supera y cada vida que
   queda es una estrella; se guarda la mejor ronda por juego y dificultad. Se puede dejar a medias.
 - **Maratón:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu

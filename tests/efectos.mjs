@@ -93,7 +93,7 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
     assert.equal(CT.effectPrefs().sfx,true,'los efectos vienen encendidos');
     assert.equal(contexts,0,'cargar el juego no crea audio');
     CT.Effects.transition('lift');assert.equal(contexts,1);assert.ok(notas>0,'coger una carta suena');
-    for(const [paso,accion] of [['hueco',()=>CT.Effects.transition('hover',{index:2,total:5})],['acierto',()=>CT.Effects.feedback(true)],['fallo',()=>CT.Effects.feedback(false)],['lámina',()=>CT.Effects.discovery()],['logro',()=>CT.Effects.achievement()],['reloj',()=>CT.Effects.clock(2)],['fin',()=>CT.Effects.transition('end')],['turno',()=>CT.Effects.transition('turn')]]){
+    for(const [paso,accion] of [['hueco',()=>CT.Effects.transition('hover',{index:2,total:5})],['acierto',()=>CT.Effects.feedback(true)],['fallo',()=>CT.Effects.feedback(false)],['lámina',()=>CT.Effects.discovery()],['logro',()=>CT.Effects.achievement()],['reloj',()=>CT.Effects.clock(2)],['fin',()=>CT.Effects.transition('end')],['turno',()=>CT.Effects.transition('turn')],['atrás',()=>CT.Effects.transition('back')],['desplegar',()=>CT.Effects.transition('unroll')],['plegar',()=>CT.Effects.transition('fold')]]){
       const antes=notas;accion();assert.ok(notas>antes,`${paso} suena`);
     }
     assert.ok(Math.abs(master.gain.value-.8*.7*.7)<1e-9,'volumen por defecto, 70 %');
@@ -126,7 +126,7 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
   try {
     w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');
     click('#app [data-block="historia"]'); has('unroll');
-    click('#app [data-block="historia"]'); has('close');
+    click('#app [data-block="historia"]'); has('fold');
     click('#app [data-block="historia"]');
     click('#app [data-mode="history"]'); has('page');
     click('#app [data-action="start-free"]'); has('page');

@@ -181,7 +181,7 @@ console.log("\nLos logros que dependen del final de la partida");
   ok("un reto de 14 de 15 no es «Reto perfecto»", !P.finishGame({ mode: "history", kind: "daily", hits: 14, total: 15, streak: 7 }).some(l => l.key === "pleno"));
   ok("un 15 de 15 sí", P.finishGame({ mode: "history", kind: "daily", hits: 15, total: 15, streak: 7 }).some(l => l.key === "pleno"));
   ok("agotar las vidas en Experto no cuenta como completarlo", !P.finishGame({ mode: "history", kind: "marathon", difficulty: "expert", lives: 0 }).some(l => l.key === "experto"));
-  ok("una ronda de 15 en Experto tampoco: el logro es el mazo entero", !P.finishGame({ mode: "history", kind: "free", difficulty: "expert", lives: 2 }).some(l => l.key === "experto"));
+  ok("una ronda de 10 en Experto tampoco: el logro es el mazo entero", !P.finishGame({ mode: "history", kind: "free", difficulty: "expert", lives: 2 }).some(l => l.key === "experto"));
   ok("terminar la maratón con vidas sí", P.finishGame({ mode: "history", kind: "marathon", difficulty: "expert", lives: 2 }).some(l => l.key === "experto"));
   ok("una mesa de 4 no da «Mesa llena»", !P.finishGame({ mode: "history", kind: "local", players: 4 }).some(l => l.key === "mesa"));
   ok("una de 5 sí", P.finishGame({ mode: "history", kind: "local", players: 5 }).some(l => l.key === "mesa"));

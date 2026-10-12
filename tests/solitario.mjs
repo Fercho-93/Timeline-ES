@@ -72,7 +72,7 @@ console.log("\nConfirmar antes de colocar");
   ok("al confirmar se revela la carta", existe(w, ".modal") && !!w.document.querySelector(".modal .year"));
 }
 
-console.log("\nRonda de 15 cartas");
+console.log("\nRonda de 10 cartas");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
@@ -82,8 +82,8 @@ console.log("\nRonda de 15 cartas");
   const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
   {
     const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
-    ok("la ronda son 15 cartas por colocar", estado.total === 15 && estado.deck.length + 1 === 15);
-    ok("el marcador dice 15 por colocar", /15\s*por colocar/.test(w.document.querySelector(".deck-count").textContent.replace(/\s+/g, " ")));
+    ok("la ronda son 10 cartas por colocar", estado.total === 10 && estado.deck.length + 1 === 10);
+    ok("el marcador dice 10 por colocar", /10\s*por colocar/.test(w.document.querySelector(".deck-count").textContent.replace(/\s+/g, " ")));
     ok("el resto del mazo queda en reserva para las cartas automáticas", Array.isArray(estado.reserve) && estado.reserve.length > 0 && !estado.reserve.includes(estado.current) && !estado.deck.some(id => estado.reserve.includes(id)));
     // De la más holgada a la más apretada: la distancia (en posiciones del mazo ordenado) de
     // cada carta a lo que ya había en la línea no crece a lo largo de la ronda.
@@ -130,13 +130,13 @@ console.log("\nRonda superada: las vidas que quedan son estrellas");
     click(w, '[data-action="confirm-place"]');
     click(w, '[data-action="solo-next"]');
   }
-  ok("con un solo fallo la ronda se supera", /Ronda superada/.test(texto(w)) && vueltas === 15);
+  ok("con un solo fallo la ronda se supera", /Ronda superada/.test(texto(w)) && vueltas === 10);
   ok("y vale dos estrellas", /★★☆/.test(texto(w)));
   const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
-  ok("la mejor ronda guarda dos estrellas y 14 aciertos", marcas.history.rondas.easy.stars === 2 && marcas.history.rondas.easy.hits === 14);
+  ok("la mejor ronda guarda dos estrellas y 9 aciertos", marcas.history.rondas.easy.stars === 2 && marcas.history.rondas.easy.hits === 9);
   click(w, '[data-action="solo"]');
   ok("la pantalla del mazo enseña la mejor ronda", /Mejor ronda en Fácil: ★★☆/.test(texto(w)));
-  ok("y cuántas cartas del mazo se dominan ya", /Dominadas 14 de \d+ hechos/.test(texto(w)));
+  ok("y cuántas cartas del mazo se dominan ya", /Dominadas 9 de \d+ hechos/.test(texto(w)));
   // La ronda siguiente prefiere las cartas que aún no están en el álbum.
   click(w, '[data-action="start-free"]');
   const vistas = w.CONTINUUM.Progreso.seenCards();
@@ -146,7 +146,7 @@ console.log("\nRonda superada: las vidas que quedan son estrellas");
   irAInicio(w); irAJugar(w);
   if (!existe(w, '[data-mode="history"]')) click(w, '[data-block="historia"]');
   const fila = w.document.querySelector('[data-mode="history"] .game-progress')?.textContent || "";
-  ok("la fila del mazo enseña su progreso y su mejor ronda", /Dominadas 14 de/.test(fila) && /★★☆/.test(fila));
+  ok("la fila del mazo enseña su progreso y su mejor ronda", /Dominadas 9 de/.test(fila) && /★★☆/.test(fila));
 }
 
 console.log("\nAtajos del hub de Jugar solo");
@@ -158,7 +158,7 @@ console.log("\nAtajos del hub de Jugar solo");
   colocaHistoriaBien(w); click(w, '[data-action="confirm-place"]'); click(w, '[data-action="solo-next"]');
   irAInicio(w); w.CONTINUUM.ModeHubs.open('hub-solo');
   const atajo = w.document.querySelector('[data-action="solo-open-deck"][data-resume="true"]');
-  ok("una ronda a medias se ofrece desde el hub, antes de la lista", !!atajo && /Continuar Historia de España/.test(atajo.textContent) && /carta 2 de 15/.test(atajo.textContent));
+  ok("una ronda a medias se ofrece desde el hub, antes de la lista", !!atajo && /Continuar Historia de España/.test(atajo.textContent) && /carta 2 de 10/.test(atajo.textContent));
   ok("el atajo no se confunde con un mazo de la galería", !w.document.querySelector('.solo-shortcuts [data-mode]'));
   atajo.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
   ok("y continúa la ronda donde estaba", w.document.getElementById("app").dataset.screen === "solo" && JSON.parse(w.localStorage.getItem("hilo-solo-history-v1")).played === 1);

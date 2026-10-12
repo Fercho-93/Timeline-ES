@@ -3,7 +3,9 @@
   'use strict';
   const CT = window.CONTINUUM;
   const TRACKS = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'].map(name => `assets/audio/${name}.mp3`);
-  const OVERLAP = 4, VOLUME = .12, FADE_IN = 2.2, FADE_OUT = .3;
+  // Al entrar en una partida la música no se corta: se va en un fundido largo. Apagarla
+  // desde Ajustes sigue siendo rápido, que es lo que se espera de un interruptor.
+  const OVERLAP = 4, VOLUME = .12, FADE_IN = 2.2, FADE_OUT = .3, FADE_OUT_GAME = 2.4;
   let userVolume = 1;
   let queue = [], last = null, audio, master, loading = false, ready = null;
   let pageActive = true, nativeActive = true, startRequested = false, pauseTimer;
@@ -175,8 +177,9 @@
         // No esperar una cola de promesas al entrar en segundo plano.
         void audio.suspend().then(reconcile).catch(() => {});
       } else {
-        fadeMaster(0, FADE_OUT);
-        pauseTimer = setTimeout(reconcile, FADE_OUT * 1000);
+        const fade = inGame() ? FADE_OUT_GAME : FADE_OUT;
+        fadeMaster(0, fade);
+        pauseTimer = setTimeout(reconcile, fade * 1000);
       }
     } else {
       // Aunque el navegador aún no deje sonar nada, la primera pista se va bajando.

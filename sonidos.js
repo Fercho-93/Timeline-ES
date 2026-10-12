@@ -193,6 +193,19 @@
       tono(nota(5, 74), t + .16, { dur: 1.8, vol: .15, eco: .55 });
       return 2.1;
     },
+    // Volver atrás: dos notas que bajan, cortas y claras. Se distingue del soplo de pasar
+    // de página, que apenas se nota.
+    vuelta(t) {
+      tono(nota(5), t, { dur: .32, vol: .11, eco: .3 });
+      tono(nota(2), t + .09, { dur: .5, vol: .1, eco: .35 });
+      return .6;
+    },
+    // Desplegar una colección: tres notas que suben, como abrir un cajón; plegarla, una sola que baja.
+    despliegue(t) {
+      [0, 2, 4].forEach((p, i) => tono(nota(p), t + i * .055, { dur: .45, vol: .09, eco: .35 }));
+      return .7;
+    },
+    pliegue(t) { tono(nota(0), t, { dur: .4, vol: .09, eco: .3 }); return .5; },
     // Soplo: dos notas que entran despacio, para pasar de página y para los avisos.
     soplo(t) {
       tono(nota(3), t, { dur: .55, vol: .05, eco: .5, timbre: 'aire' });
@@ -255,9 +268,12 @@
         racha = 0; aciertos = 0; fallos = 0;
         break;
       }
-      case 'page': case 'back': case 'open': case 'notice': case 'unroll': {
-        // Salir de una partida a medias no deja su racha para la siguiente.
-        if (kind === 'back') { racha = 0; aciertos = 0; fallos = 0; }
+      // Volver atrás y desplegar o plegar una colección tienen voz propia: son toques
+      // deliberados y tienen que oírse, no insinuarse como el pasar de página.
+      case 'back': racha = 0; aciertos = 0; fallos = 0; suena('vuelta'); ultimoSoplo = ahora(); break;
+      case 'unroll': suena('despliegue'); ultimoSoplo = ahora(); break;
+      case 'fold': suena('pliegue'); break;
+      case 'page': case 'open': case 'notice': {
         // Tras un acierto, un logro o un turno, el diálogo o el aviso que llega detrás no
         // pisa la cola; y una pantalla que abre un diálogo a la vez suena una sola vez.
         const t = ahora();

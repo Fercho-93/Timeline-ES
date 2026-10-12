@@ -2117,7 +2117,7 @@
   // Jugar solo se juega por rondas de un puñado de cartas, no con el mazo entero: así hay
   // un final claro, una calificación (las vidas que quedan) y cada ronda avanza el mazo
   // porque las cartas salen de las que aún no se dominan. El mazo entero sigue en Maratón.
-  const SOLO_ROUND_CARDS = 15;
+  const SOLO_ROUND_CARDS = 10;
   const RECORDS_KEY = "hilo-retos-v1";
   let solo = null;
   // Los fallos de la última partida en solitario, para poder repasarlos aunque `solo`
@@ -4223,7 +4223,7 @@
       collectionOpen = open;
       collectionDetails = open;
       // Cerrar una colección suena a plegar; abrirla se despliega (y suena) más abajo.
-      if (!open) CT.Effects?.transition?.('close');
+      if (!open) CT.Effects?.transition?.('fold');
       app.querySelectorAll("#deck-collection .collection-entry").forEach(entry => {
         const button = entry.querySelector(".gallery-panel");
         const active = open && button.dataset.block === selectedBlockKey;

@@ -64,6 +64,11 @@ button, input, select { font: inherit; }
 /* Safari aplica azul de enlace a algunos botones si no se declara el color de forma
    explícita. Los nombres de los mazos deben usar siempre la tinta de la interfaz. */
 button { touch-action: manipulation; color: inherit; }
+/* Mantener pulsada una tarjeta, una puerta o una lámina no abre el menú de copiar la imagen
+   ni la arrastra: aquí las imágenes son parte del botón. La lámina ampliada queda fuera. */
+#app img:not(.art-modal img), #app button, #app .mode-entry, #app .home-door, #app .gallery-panel, #app .game-row, #app .solo-shortcut {
+  -webkit-touch-callout: none; -webkit-user-drag: none; -webkit-user-select: none; user-select: none;
+}
 
 #app { min-height: 100dvh; overflow-x: clip; }
 /* Las entradas de pantalla tienen un único propietario en a11y.js. */
