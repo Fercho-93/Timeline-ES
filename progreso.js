@@ -247,7 +247,7 @@
     { key: "semana", group: "Constancia", name: "Una semana", desc: "Encadena 7 retos diarios seguidos.", have: p => p.marks.bestStreak, goal: 7 },
     { key: "mes", group: "Constancia", name: "Un mes entero", desc: "Encadena 30 retos diarios seguidos.", have: p => p.marks.bestStreak, goal: 30 },
 
-    { key: "pleno", group: "Puntería", name: "Reto perfecto", desc: "Acierta las quince cartas de un reto diario.", have: p => p.marks.perfectDaily, goal: 1 },
+    { key: "pleno", group: "Puntería", name: "Reto perfecto", desc: "Acierta todas las cartas de un reto diario.", have: p => p.marks.perfectDaily, goal: 1 },
     { key: "tirada", group: "Puntería", name: "Veinticinco seguidas", desc: "Coloca 25 cartas seguidas sin fallar ninguna.", have: p => p.totals.bestRun, goal: 25 },
     { key: "finura", group: "Puntería", name: "Nueve de cada diez", desc: "Llega al 90 % de aciertos en un mazo con 50 cartas jugadas.", have: fineDecks, goal: 1 },
 
