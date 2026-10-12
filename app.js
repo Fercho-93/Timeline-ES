@@ -1286,7 +1286,7 @@
     // El perfil se registra aquí y no al pintar: pintar se repite y contaría de más.
     const nuevaLamina=correct&&ownsLocalAtlas(player)&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(game.mode,card);
     anotaCarta(game, { mode: game.mode, cardId: card.id, correct, kind: "local", mine: ownsLocalAtlas(player), hidden: !!game.ghost?.pending.length });
-    if(nuevaLamina)game.newDiscoveries=(game.newDiscoveries||0)+1;
+    if(nuevaLamina){game.newDiscoveries=(game.newDiscoveries||0)+1;CT.Effects.discovery?.();}
     saveGame();
     renderResult();
   }
@@ -2896,7 +2896,7 @@
     solo.pendingResult = { correct, cardId: card.id, attemptedIndex: result.attemptedIndex, correctIndex: result.correctIndex };
     const nuevaLamina=correct&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(solo.mode,card);
     anotaCarta(solo, { mode: solo.mode, cardId: card.id, correct, kind: solo.kind, hidden: soloHidden() });
-    if(nuevaLamina)solo.newDiscoveries=(solo.newDiscoveries||0)+1;
+    if(nuevaLamina){solo.newDiscoveries=(solo.newDiscoveries||0)+1;CT.Effects.discovery?.();}
     saveSolo();
     soloResult();
   }
@@ -3855,6 +3855,7 @@
     if (!nuevos || !nuevos.length) return;
     if (solo) { solo.earnedAchievements = [...(solo.earnedAchievements || []), ...nuevos]; }
     else if (game) { game.earnedAchievements = [...(game.earnedAchievements || []), ...nuevos]; }
+    CT.Effects.achievement?.();
     showToast(nuevos.length === 1 ? `Logro: ${nuevos[0].name}` : `${nuevos.length} logros nuevos`);
     announce(nuevos.map(item => `Logro desbloqueado: ${item.name}.`).join(" "));
   }

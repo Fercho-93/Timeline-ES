@@ -51,6 +51,7 @@ Casi todo el juego vive suelto en la carpeta principal. Se agrupa aquí por func
 | `drag.js`, `swipe.js` | Arrastrar cartas con el dedo y deslizar para volver atrás. |
 | `a11y.js` | Accesibilidad: poder jugar con teclado o con lector de pantalla. |
 | `ambience.js` | La música de fondo. |
+| `sonidos.js` | Los efectos de sonido (coger, colocar, acertar, fallar, fin de partida…), sintetizados al momento sin archivos de audio. |
 | `icon.svg`, `manifest.webmanifest` | Icono y ficha de la web cuando se instala en el móvil desde el navegador. |
 
 ### Mazos de cartas (los datos)

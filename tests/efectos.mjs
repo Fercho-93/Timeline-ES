@@ -29,17 +29,18 @@ try {
   console.log('Efectos opcionales, fallo de audio y ampliación con retorno de foco: OK');
 } finally { w.close(); }
 
-// Los efectos se han retirado, no solo silenciado con una preferencia nueva.
-// Un usuario que tenía sound:true tampoco debe crear contextos de audio.
+// La antigua preferencia sound:true no reactiva nada: los efectos de sonido dependen solo
+// de su propio ajuste (sfx). Con él apagado, ninguna acción crea un contexto de audio.
 for (const savedSound of [false, true]) {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
   w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});w.Element.prototype.scrollIntoView=()=>{};
-  w.localStorage.setItem('hilo-ajustes-v1',JSON.stringify({sound:savedSound,ambience:false,haptics:true}));
+  w.localStorage.setItem('hilo-ajustes-v1',JSON.stringify({sound:savedSound,sfx:false,ambience:false,haptics:true}));
   let contexts=0;
   w.AudioContext=w.webkitAudioContext=function(){contexts++;throw Error('No debe crearse audio de efectos');};
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
   try {
     assert.equal(w.CONTINUUM.effectPrefs().sound,false,'las preferencias antiguas no reactivan efectos');
+    assert.equal(w.CONTINUUM.effectPrefs().sfx,false,'el ajuste propio de los efectos manda');
     w.CONTINUUM.ModeHubs.open('hub-solo');w.document.querySelector('[data-inline-route]').click();w.sessionStorage.removeItem('continuum-entry-route');
     for(const selector of ['[data-block="historia"]','[data-mode="history"]','[data-action="back-menu"]']) {
       w.document.querySelector('#app '+selector).click();
@@ -47,6 +48,7 @@ for (const savedSound of [false, true]) {
     w.document.querySelector('[data-settings-action="open"]').click();
     assert.equal(w.document.querySelector('[data-settings-action="sound"]'),null,'no queda un interruptor sin función');
     assert.ok(w.document.querySelector('[data-settings-action="ambience"]'),'la música conserva su ajuste');
+    assert.equal(w.document.querySelector('[data-settings-action="sfx"]').checked,false,'los efectos tienen su interruptor, aquí apagado');
     assert.ok(w.document.querySelector('[data-settings-action="haptics"]'),'la vibración conserva su ajuste');
     // Los créditos de la música se leen dentro del juego y se cierran sin salir de Ajustes.
     assert.equal(w.document.querySelector('a[href*="CREDITS.md"]'),null,'los créditos no abren un archivo de texto');
@@ -63,7 +65,53 @@ for (const savedSound of [false, true]) {
     assert.equal(contexts,0,'todas las acciones y transiciones son silenciosas');
   } finally {w.close();}
 }
-console.log('Efectos retirados, preferencias antiguas y ajustes de ambiente/vibración: OK');
+console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibración: OK');
+
+// Efectos de sonido encendidos (lo que trae una instalación nueva): cada momento de la
+// jugada suena, el volumen sigue al ajuste, y apagarlos los calla sin tocar la música.
+{
+  const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
+  w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});w.Element.prototype.scrollIntoView=()=>{};
+  let contexts=0, notas=0, master=null;
+  const param=()=>({value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}});
+  const nodo=extra=>({connect(){},disconnect(){},...extra});
+  w.AudioContext=function(){
+    contexts++;
+    Object.assign(this,{state:'running',currentTime:0,sampleRate:8000,destination:nodo(),
+      resume:async()=>{},suspend:async()=>{},
+      createGain:()=>{const g=nodo({gain:param()});master??=g;return g;},
+      createDynamicsCompressor:()=>nodo({threshold:param(),knee:param(),ratio:param(),attack:param(),release:param()}),
+      createBiquadFilter:()=>nodo({frequency:param(),Q:param()}),
+      createConvolver:()=>nodo(),
+      createBuffer:(c,n)=>({getChannelData:()=>new Float32Array(n)}),
+      createOscillator:()=>nodo({frequency:param(),start(){notas++;},stop(){}}),
+      createBufferSource:()=>nodo({start(){},stop(){}})});
+  };
+  for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
+  try {
+    const CT=w.CONTINUUM;
+    assert.equal(CT.effectPrefs().sfx,true,'los efectos vienen encendidos');
+    assert.equal(contexts,0,'cargar el juego no crea audio');
+    CT.Effects.transition('lift');assert.equal(contexts,1);assert.ok(notas>0,'coger una carta suena');
+    for(const [paso,accion] of [['hueco',()=>CT.Effects.transition('hover',{index:2,total:5})],['acierto',()=>CT.Effects.feedback(true)],['fallo',()=>CT.Effects.feedback(false)],['lámina',()=>CT.Effects.discovery()],['logro',()=>CT.Effects.achievement()],['reloj',()=>CT.Effects.clock(2)],['fin',()=>CT.Effects.transition('end')],['turno',()=>CT.Effects.transition('turn')]]){
+      const antes=notas;accion();assert.ok(notas>antes,`${paso} suena`);
+    }
+    assert.ok(Math.abs(master.gain.value-.8*.7*.7)<1e-9,'volumen por defecto, 70 %');
+    w.document.querySelector('[data-settings-action="open"]').click();
+    const volumen=w.document.querySelector('[data-settings-action="sfx-volume"]');
+    volumen.value='100';volumen.dispatchEvent(new w.Event('change',{bubbles:true}));
+    assert.ok(Math.abs(master.gain.value-.8)<1e-9,'el volumen sigue al ajuste y se oye una prueba');
+    const toggle=w.document.querySelector('[data-settings-action="sfx"]');
+    toggle.checked=false;toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
+    await new Promise(resolve=>w.setTimeout(resolve,0));
+    assert.equal(CT.effectPrefs().sfx,false);assert.equal(CT.effectPrefs().ambience,false,'la música no cambia');
+    const antes=notas;
+    CT.Effects.feedback(true);CT.Effects.transition('lift');CT.Effects.transition('end');CT.Effects.clock(1);
+    assert.equal(notas,antes,'apagados, nada suena');
+    assert.equal(JSON.parse(w.localStorage.getItem('hilo-ajustes-v1')).sfx,false,'el ajuste se guarda');
+    console.log('Efectos de sonido: encendidos por defecto, cada momento suena, volumen y apagado: OK');
+  } finally {w.close();}
+}
 
 // Recorridos reales: los avisos internos conservan el cambio de estado, también con
 // movimiento reducido. Repintar la misma pantalla o tocar lo ya elegido es silencio.

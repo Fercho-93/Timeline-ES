@@ -8,7 +8,7 @@
   const CT = window.CONTINUUM;
   const KEY = "hilo-ajustes-v1";
   const TEXT_SIZES = [['100','Normal'],['125','Grande'],['150','Muy grande'],['200','Doble']];
-  const DEFAULTS = { theme: "light", textSize: "100", haptics: false, ambience: false, depth: false, ambienceVolume: 50 };
+  const DEFAULTS = { theme: "light", textSize: "100", haptics: false, ambience: false, depth: false, ambienceVolume: 50, sfx: true, sfxVolume: 70 };
   // Las dos apariencias, en un solo sitio: de aquí salen el desplegable, la validación
   // de lo guardado y el color de la barra del navegador.
   const THEMES = {
@@ -109,6 +109,12 @@
         <label class="opt-row"><span>Vibración suave</span><input type="checkbox" data-settings-action="haptics" aria-describedby="haptics-help" ${s.haptics === true && hapticsSupported ? "checked" : ""} ${hapticsSupported ? "" : "disabled"}></label>
         <p class="hint" id="haptics-help" role="status">${hapticsSupported ? 'Un toque breve al elegir posición, confirmar y recibir el resultado.' : (window.Capacitor?.isNativePlatform?.() ? 'La vibración no está disponible en esta versión de la app. Comprueba si hay una actualización.' : 'Este navegador no ofrece vibración. En iPhone necesitas la app de TestFlight o App Store.')}</p>
         ${hapticsSupported ? `<button class="btn btn-secondary" data-settings-action="test-haptics" ${s.haptics ? '' : 'disabled'}>Probar vibración</button>` : ''}
+        <label class="opt-row"><span>Efectos de sonido</span><input type="checkbox" data-settings-action="sfx" aria-describedby="sfx-help" ${s.sfx === true ? "checked" : ""}></label>
+        <div class="field settings-volume">
+          <label for="ajuste-volumen-efectos">Volumen de los efectos <output id="ajuste-volumen-efectos-valor">${Number(s.sfxVolume) || 0}%</output></label>
+          <input id="ajuste-volumen-efectos" type="range" min="0" max="100" step="5" value="${Math.max(0, Math.min(100, Number(s.sfxVolume) || 0))}" data-settings-action="sfx-volume" aria-describedby="sfx-help">
+          <p class="hint" id="sfx-help">Notas suaves al coger y colocar cartas, acertar o fallar. En iPhone respetan el modo silencio.</p>
+        </div>
         <label class="opt-row"><span>Música ambiente</span><input type="checkbox" data-settings-action="ambience" ${s.ambience === true ? "checked" : ""}></label>
         <div class="field settings-volume">
           <label for="ajuste-volumen">Volumen de la música <output id="ajuste-volumen-valor">${Number(s.ambienceVolume) || 0}%</output></label>
@@ -180,7 +186,7 @@
     const cap = window.Capacitor;
     const native = cap?.isNativePlatform?.() === true;
     say(`Plataforma: ${native ? 'app nativa (' + (cap.getPlatform?.() || '?') + ')' : 'navegador'} · ${CT.APP_VERSION || 'versión desconocida'}`);
-    say(`Ajustes: vibración ${settings.haptics ? 'sí' : 'no'} · música ${settings.ambience ? 'sí' : 'no'} · profundidad ${settings.depth ? 'sí' : 'no'} · volumen ${settings.ambienceVolume}%`);
+    say(`Ajustes: vibración ${settings.haptics ? 'sí' : 'no'} · efectos ${settings.sfx ? 'sí' : 'no'} (${settings.sfxVolume}%) · música ${settings.ambience ? 'sí' : 'no'} · profundidad ${settings.depth ? 'sí' : 'no'} · volumen ${settings.ambienceVolume}%`);
     // El permiso se solicita dentro del gesto, antes de esperar al audio o al plugin.
     let orientationPermission = null;
     try {
@@ -283,7 +289,7 @@
     CT.openDialog(document.querySelector('[data-overlay="settings"]'), true);
   }
 
-  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true, ambienceVolume: settings.ambienceVolume / 100 });
+  CT.effectPrefs = () => ({ sound: false, haptics: settings.haptics === true, ambience: settings.ambience === true, depth: settings.depth === true, ambienceVolume: settings.ambienceVolume / 100, sfx: settings.sfx === true, sfxVolume: settings.sfxVolume / 100 });
   CT.setAmbience = enabled => {
     settings.ambience = enabled === true;
     save();
@@ -309,11 +315,20 @@
       CT.Ambience?.setVolume?.(volume / 100);
       return;
     }
+    if (event.target.dataset.settingsAction === 'sfx-volume') {
+      const volume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
+      settings.sfxVolume = volume;
+      const output = document.getElementById('ajuste-volumen-efectos-valor');
+      if (output) output.value = `${volume}%`;
+      save();
+      CT.Sonidos?.test();
+      return;
+    }
     if (event.target.dataset.settingsAction === 'text-size') {
       if (!['100','125','150','200'].includes(event.target.value)) return;
       draftLook.textSize = event.target.value; previewLook(); CT.Effects?.transition?.('select'); return;
     }
-    if (["haptics", "ambience", "depth"].includes(event.target.dataset.settingsAction)) {
+    if (["haptics", "ambience", "depth", "sfx"].includes(event.target.dataset.settingsAction)) {
       const key = event.target.dataset.settingsAction;
       let enabled = event.target.checked;
       if (key === 'depth' && enabled) {

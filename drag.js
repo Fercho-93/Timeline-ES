@@ -124,6 +124,7 @@
   function startDrag() {
     const { card } = session;
     window.CONTINUUM.Effects?.tap?.();
+    window.CONTINUUM.Effects?.transition?.('lift');
     const ghost = card.cloneNode(true);
     ghost.classList.add("drag-ghost");
     ghost.classList.remove("dragging", "armed", "holding", "selected", "selection-enter");
@@ -213,7 +214,8 @@
     if (slot !== session.slot) {
       session.slot?.classList.remove("drop-target");
       slot?.classList.add("drop-target");
-      if (slot) window.CONTINUUM.Effects?.transition?.('hover');
+      // Cada hueco suena con su nota: el índice y el total dicen cuán a la derecha está.
+      if (slot) window.CONTINUUM.Effects?.transition?.('hover', { index: Number(slot.dataset.index) || 0, total: document.querySelectorAll(session.slotSelector).length });
       session.slot = slot;
     }
   }

@@ -50,6 +50,7 @@
   }
   // Un reloj que avisa al acabarse. `empezadoEn` es un instante (Date.now()): así sigue
   // corriendo aunque se repinte la pantalla o el móvil se vaya al fondo.
+  let avisado = {};
   function clock({ empezadoEn, ms, onTimeout, root = document }) {
     let parado = false;
     const paso = () => {
@@ -60,6 +61,15 @@
         if (barra) { barra.value = Math.max(0, restante); barra.classList.toggle("reloj-apura", restante <= 3000); }
         if (marca) marca.textContent = `${Math.ceil(Math.max(0, restante) / 1000)} s`;
       });
+      // Los tres últimos segundos se oyen, uno a uno. La jugada se repinta y crea otro
+      // reloj para la misma carta: el segundo ya avisado no vuelve a sonar.
+      const quedan = Math.max(0, Math.ceil(restante / 1000));
+      if (quedan <= 3 && (avisado.empezadoEn !== empezadoEn || avisado.quedan !== quedan)) {
+        const primero = avisado.empezadoEn !== empezadoEn;
+        avisado = { empezadoEn, quedan };
+        // Un reloj que nace ya en la recta final (al volver a la partida) no suena a destiempo.
+        if (!primero || quedan === 3) window.CONTINUUM?.Effects?.clock?.(quedan);
+      }
       if (restante <= 0) { parado = true; clearInterval(id); onTimeout?.(); }
     };
     const id = setInterval(paso, 200);

@@ -52,17 +52,20 @@
       return navigator.vibrate(kind === 'failure' ? [18, 35, 18] : 18) !== false;
     } catch { return false; /* Un efecto opcional nunca impide jugar. */ }
   }
-  // Las acciones son silenciosas, incluso con preferencias antiguas sound:true.
-  // Conservamos la API de avisos para no afectar al juego ni a la vibración.
+  // Los sonidos los sintetiza sonidos.js y dependen de su propio ajuste («Efectos de
+  // sonido»), no de la antigua preferencia sound:true, que sigue sin reactivar nada.
   // La música ambiente tiene su reproductor independiente en ambience.js.
   CT.Effects = {
     hapticsAvailable,
     stamp() { void vibration("confirm"); },
     testHaptics() { return vibration("confirm"); },
-    feedback(correct) { void vibration(correct ? "success" : "failure"); },
+    feedback(correct) { void vibration(correct ? "success" : "failure"); CT.Sonidos?.result(correct); },
     tap() { void vibration("confirm"); },
-    page() {},
-    transition() {}
+    page(back) { CT.Sonidos?.cue(back ? 'back' : 'page'); },
+    transition(kind, info) { CT.Sonidos?.cue(kind, info); },
+    discovery() { CT.Sonidos?.discovery(); },
+    achievement() { CT.Sonidos?.achievement(); },
+    clock(left) { CT.Sonidos?.clock(left); }
   };
   document.addEventListener("click", event => {
     const tactile = event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-action="select-card"], [data-action="solo-place"], [data-action="place"], [data-online-action="select"], [data-online-action="place"]');
