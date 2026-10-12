@@ -328,7 +328,9 @@
       playToggle.setAttribute('aria-expanded', String(playExpanded));
       const choices = app.querySelector('#home-mode-choices');
       const reveal = choices.parentElement;
-      const daily = app.querySelector('.mode-daily-zone');
+      // Todo lo que va debajo del despliegue («Unirme a una partida» y el reto diario) se
+      // desplaza a la vez: si no, «Unirme» saltaba a su sitio al terminar la animación.
+      const below = [app.querySelector('.mode-join-shortcut'), app.querySelector('.mode-daily-zone')].filter(Boolean);
       choices.setAttribute('aria-hidden', String(!playExpanded));
       choices.inert = !playExpanded;
       // El despliegue no anima la altura (recalcular la maquetación en cada fotograma hacía
@@ -344,14 +346,14 @@
         const height = reveal.getBoundingClientRect().height + 12;
         revealAnimations = [
           reveal.animate([{ opacity: 0, transform: 'translateY(-14px)', clipPath: 'inset(0 0 100% 0)' }, { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' }], OPTIONS),
-          ...(daily ? [daily.animate([{ transform: `translateY(${-height}px)` }, { transform: 'none' }], OPTIONS)] : [])
+          ...below.map(el => el.animate([{ transform: `translateY(${-height}px)` }, { transform: 'none' }], OPTIONS))
         ];
         revealAnimations.forEach(animation => { animation.onfinish = () => animation.cancel(); });
       } else {
         const height = reveal.getBoundingClientRect().height + 12;
         revealAnimations = [
           reveal.animate([{ opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' }, { opacity: 0, transform: 'translateY(-14px)', clipPath: 'inset(0 0 100% 0)' }], OPTIONS),
-          ...(daily ? [daily.animate([{ transform: 'none' }, { transform: `translateY(${-height}px)` }], OPTIONS)] : [])
+          ...below.map(el => el.animate([{ transform: 'none' }, { transform: `translateY(${-height}px)` }], OPTIONS))
         ];
         revealAnimations[0].onfinish = () => { reveal.classList.remove('is-open'); revealAnimations.forEach(animation => animation.cancel()); revealAnimations = []; };
       }
