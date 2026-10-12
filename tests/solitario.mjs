@@ -72,15 +72,29 @@ console.log("\nConfirmar antes de colocar");
   ok("al confirmar se revela la carta", existe(w, ".modal") && !!w.document.querySelector(".modal .year"));
 }
 
-console.log("\nPartida libre");
+console.log("\nRonda de 15 cartas");
 {
   const w = boot();
   abreMazo(w, "historia", "history");
   (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  ok("la pantalla ofrece la ronda y la maratón", existe(w, '[data-action="start-free"]') && existe(w, '[data-action="start-marathon"]'));
   click(w, '[data-action="start-free"]');
   const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
+  {
+    const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+    ok("la ronda son 15 cartas por colocar", estado.total === 15 && estado.deck.length + 1 === 15);
+    ok("el marcador dice 15 por colocar", /15\s*por colocar/.test(w.document.querySelector(".deck-count").textContent.replace(/\s+/g, " ")));
+    ok("el resto del mazo queda en reserva para las cartas automáticas", Array.isArray(estado.reserve) && estado.reserve.length > 0 && !estado.reserve.includes(estado.current) && !estado.deck.some(id => estado.reserve.includes(id)));
+    // De la más holgada a la más apretada: la distancia (en posiciones del mazo ordenado) de
+    // cada carta a lo que ya había en la línea no crece a lo largo de la ronda.
+    const orden = [...w.HISTORY_CARDS].sort((a, b) => a.year - b.year).map(c => c.id);
+    const rango = id => orden.indexOf(id);
+    const linea = [rango(estado.timeline[0])];
+    const distancias = [estado.current, ...estado.deck].map(id => { const d = Math.min(...linea.map(l => Math.abs(l - rango(id)))); linea.push(rango(id)); return d; });
+    ok("las cartas van de la más lejana a la más apretada", distancias.every((d, i) => i === 0 || d <= distancias[i - 1]));
+  }
   let vueltas = 0;
-  while (!/Se acabaron las vidas|Reto completado/.test(texto(w)) && vueltas++ < 400) {
+  while (!/Se acabaron las vidas|Ronda superada/.test(texto(w)) && vueltas++ < 400) {
     const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
     const años = estado.timeline.map(id => cards.get(id).year);
     let index = años.findIndex(y => y > cards.get(estado.current).year);
@@ -92,9 +106,73 @@ console.log("\nPartida libre");
     if (vidas === 0) ok("la partida se acaba al perder las tres vidas", true);
     click(w, '[data-action="solo-next"]');
   }
-  ok("la partida libre termina sola", /Se acabaron las vidas|Reto completado/.test(texto(w)));
+  ok("con un fallo de cada tres, la ronda acaba por vidas", /Se acabaron las vidas/.test(texto(w)) && !/Ronda superada/.test(texto(w)));
   const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
-  ok("se guarda la mejor marca", marcas && marcas.history && marcas.history.best > 0);
+  ok("se guardan los aciertos de la ronda, sin estrellas", marcas?.history?.rondas?.easy?.hits > 0 && marcas.history.rondas.easy.stars === 0);
+  ok("la maratón no hereda esa marca", !marcas.history.best);
+}
+
+console.log("\nRonda superada: las vidas que quedan son estrellas");
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  click(w, '[data-action="start-free"]');
+  const cards = new Map([...w.HISTORY_CARDS].map(c => [c.id, c]));
+  let vueltas = 0;
+  while (!/Se acabaron las vidas|Ronda superada/.test(texto(w)) && vueltas++ < 40) {
+    const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+    const años = estado.timeline.map(id => cards.get(id).year);
+    let index = años.findIndex(y => y > cards.get(estado.current).year);
+    if (index < 0) index = años.length;
+    if (vueltas === 5) index = index === 0 ? años.length : 0; // un solo fallo
+    w.document.querySelectorAll('[data-action="solo-place"]')[index].dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    click(w, '[data-action="confirm-place"]');
+    click(w, '[data-action="solo-next"]');
+  }
+  ok("con un solo fallo la ronda se supera", /Ronda superada/.test(texto(w)) && vueltas === 15);
+  ok("y vale dos estrellas", /★★☆/.test(texto(w)));
+  const marcas = JSON.parse(w.localStorage.getItem("hilo-retos-v1"));
+  ok("la mejor ronda guarda dos estrellas y 14 aciertos", marcas.history.rondas.easy.stars === 2 && marcas.history.rondas.easy.hits === 14);
+  click(w, '[data-action="solo"]');
+  ok("la pantalla del mazo enseña la mejor ronda", /Mejor ronda en Fácil: ★★☆/.test(texto(w)));
+  ok("y cuántas cartas del mazo se dominan ya", /Dominadas 14 de \d+ hechos/.test(texto(w)));
+  // La ronda siguiente prefiere las cartas que aún no están en el álbum.
+  click(w, '[data-action="start-free"]');
+  const vistas = w.CONTINUUM.Progreso.seenCards();
+  const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+  ok("la ronda siguiente no repite cartas ya dominadas", [...estado.timeline, estado.current, ...estado.deck].every(id => !vistas.has(id)));
+  // Y la fila del mazo, en la galería, enseña el progreso y la mejor ronda.
+  irAInicio(w); irAJugar(w);
+  if (!existe(w, '[data-mode="history"]')) click(w, '[data-block="historia"]');
+  const fila = w.document.querySelector('[data-mode="history"] .game-progress')?.textContent || "";
+  ok("la fila del mazo enseña su progreso y su mejor ronda", /Dominadas 14 de/.test(fila) && /★★☆/.test(fila));
+}
+
+console.log("\nAtajos del hub de Jugar solo");
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  click(w, '[data-action="start-free"]');
+  colocaHistoriaBien(w); click(w, '[data-action="confirm-place"]'); click(w, '[data-action="solo-next"]');
+  irAInicio(w); w.CONTINUUM.ModeHubs.open('hub-solo');
+  const atajo = w.document.querySelector('[data-action="solo-open-deck"][data-resume="true"]');
+  ok("una ronda a medias se ofrece desde el hub, antes de la lista", !!atajo && /Continuar Historia de España/.test(atajo.textContent) && /carta 2 de 15/.test(atajo.textContent));
+  ok("el atajo no se confunde con un mazo de la galería", !w.document.querySelector('.solo-shortcuts [data-mode]'));
+  atajo.dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+  ok("y continúa la ronda donde estaba", w.document.getElementById("app").dataset.screen === "solo" && JSON.parse(w.localStorage.getItem("hilo-solo-history-v1")).played === 1);
+}
+
+console.log("\nMaratón: el mazo entero");
+{
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
+  click(w, '[data-action="start-marathon"]');
+  const estado = JSON.parse(w.localStorage.getItem("hilo-solo-history-v1"));
+  ok("la maratón reparte el mazo entero", estado.kind === "marathon" && estado.total === null && estado.deck.length > 100 && !estado.reserve);
+  ok("y se llama así en la mesa", /Maratón · Fácil/.test(texto(w)));
 }
 
 // El reto diario es uno para todo el mundo y se entra desde la portada: cada día sale

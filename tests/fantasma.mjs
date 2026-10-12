@@ -182,8 +182,9 @@ console.log('\nFantasma: reparto, jugadas y dificultades');
   click(w,'solo-next');assert.equal(w.document.querySelectorAll('.ghost-card').length,0);
   assert.equal(state(w,soloKey).autoAdded.length,2);w.close();
 }
+// La maratón: el mazo entero, con las cartas automáticas saliendo del propio mazo.
 for (const difficulty of ['easy','normal','hard','expert']) {
-  let w = boot({ 'continuum-difficulty-v1': difficulty }); abreMazo(w); w.CONTINUUM.openDeckAs('collections'); click(w,'start-free');
+  let w = boot({ 'continuum-difficulty-v1': difficulty }); abreMazo(w); w.CONTINUUM.openDeckAs('collections'); click(w,'start-marathon');
   let s = state(w,soloKey); const initialTotal=s.deck.length+s.timeline.length+1;
   assert.equal(s.difficulty,difficulty);
   assert.equal(w.document.querySelectorAll('.ghost-card').length,difficulty==='expert'?1:0);

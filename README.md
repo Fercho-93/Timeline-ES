@@ -208,7 +208,7 @@ Cada juego conserva su propia partida local. El juego elegido también se guarda
 
 Formas de jugar un mazo:
 
-- **Jugar solo:** una persona contra el mazo, con tres vidas (partida libre o competición).
+- **Jugar solo:** una persona contra el mazo, con tres vidas (rondas de 15 cartas, maratón o competición).
 - **Un solo móvil:** de 2 a 9 personas pasándose el teléfono. No necesita conexión y conserva las partidas localmente.
 - **Cada uno en su móvil:** en directo en una sala (por internet con Firebase, o por la misma
   Wi-Fi sin internet), por turnos en un duelo que cada uno juega cuando puede, o con las mismas
@@ -475,7 +475,10 @@ Tres formatos, los tres sin conexión y con la marca guardada en el propio móvi
   Wordle, sin desvelar ninguna carta— por donde el móvil ofrezca o copiado al portapapeles. Con
   cuenta, el resultado se guarda en el progreso y, si se acepta, entra en el ranking diario y
   semanal (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
-- **Partida libre:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
+- **Ronda:** 15 cartas sacadas con preferencia de las que aún no están en el álbum y ordenadas de la
+  más holgada a la más apretada respecto a la línea. Acabarla con vidas la supera y cada vida que
+  queda es una estrella; se guarda la mejor ronda por juego y dificultad. Se puede dejar a medias.
+- **Maratón:** el mazo entero y sin límite de cartas, hasta perder las tres vidas. Guarda tu
   mejor marca de cada juego y se puede dejar a medias y continuar después.
 - **Competición:** una ronda por tema (3, 5 o todos) con de 1 a 6 cartas a elegir, en un orden al azar
   distinto cada vez y sin repetir ninguno, con tres vidas nuevas en cada ronda. Al terminar la
@@ -561,8 +564,8 @@ Fantasma en cada bloque de cuatro turnos a partir del cuarto; nunca son consecut
 El calendario se guarda al iniciar, no al repintar. En Experto el resultado sigue revelando
 el valor y la explicación de la carta jugada para aprender de ella.
 
-La partida libre permite los cuatro niveles, conserva partidas y separa récords por mazo
-y dificultad. Los récords antiguos se mantienen en Fácil. La competición individual también
+La ronda y la maratón permiten los cuatro niveles, conservan partidas y separan récords por mazo
+y dificultad. Los récords antiguos de la partida libre pasan a la maratón, en Fácil. La competición individual también
 elige un nivel, conserva cinco decisiones humanas por tema y reserva cartas adicionales
 para el tablero. El reto diario permanece en Fácil para que sus 10 cartas y sus marcas sean
 iguales para todo el mundo. En las partidas compartidas, Pulso conserva su efecto pero se obtiene

@@ -304,9 +304,20 @@
   }
   const openLocalHub = () => openFriendHub('local');
 
+  // Antes de la lista: seguir una partida a medias de cualquier mazo y volver al último mazo.
+  function soloShortcuts() {
+    const resumen = window.CONTINUUM?.soloResumen?.();
+    if (!resumen) return '';
+    const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} jugadas`}</small><span aria-hidden="true">→</span></button>`);
+    const ultimo = resumen.ultimo && !resumen.pendientes.some(p => p.mode === resumen.ultimo.mode)
+      ? `<button type="button" class="solo-shortcut" data-action="solo-open-deck" data-solo-deck="${resumen.ultimo.mode}"><b>Último mazo: ${escapeHtml(resumen.ultimo.name)}</b><small>Jugar otra ronda</small><span aria-hidden="true">→</span></button>` : '';
+    const items = [...pendientes, ultimo].filter(Boolean);
+    return items.length ? `<section class="solo-shortcuts" aria-label="Atajos">${items.join('')}</section>` : '';
+  }
   function openSoloHub() {
     app.dataset.pendingHub = 'hub-solo';
     hub('hub-solo', 'Jugar solo', 'A tu ritmo', [
+      soloShortcuts(),
       inlineCollections('collections'),
       modeDoor('quick-challenges', modeArt['quick-challenges'], 'Retos rápidos', 'Mazos sorpresa: ordena y suma aciertos.', false, 'data-solo-route="quick"', 'Preparar partida')
     ].join(''), modeArt['solo-hub']);

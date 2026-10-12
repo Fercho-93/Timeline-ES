@@ -308,6 +308,15 @@
     }).join("")}${competitionAudience ? competitionPanel(competitionAudience) : ""}</div>`;
   }
 
+  // Cuánto del mazo está ya en el álbum y la mejor ronda, en la propia fila del mazo: así se
+  // elige con algo más que el nombre. Solo cuando hay algo que contar.
+  function progresoMazo(modeKey) {
+    const { hechas, total } = dominadas(modeKey);
+    const rondas = readRecords()[modeKey]?.rondas || {};
+    const mejor = Math.max(0, ...Object.values(rondas).map(r => r.stars || 0));
+    if (!hechas && !mejor) return "";
+    return `<span class="game-progress"><span class="game-progress-bar" aria-hidden="true"><i style="width:${Math.round(100 * hechas / total)}%"></i></span><small>Dominadas ${hechas} de ${total}${mejor ? ` · mejor ronda ${estrellas(mejor)}` : ""}</small></span>`;
+  }
   // Los juegos del bloque en pantalla.
   function gameList() {
     const games = CT.blockGames(selectedBlockKey);
@@ -327,6 +336,7 @@
         ${preview}<span class="deck-chapter" aria-hidden="true">Capítulo ${["I", "II", "III", "IV", "V", "VI", "VII", "VIII"][index] || index + 1}<i>↗</i></span>
         <span class="game-name">${item.name}<span class="solo-lectores">${abierto ? "" : ", cerrado"}</span></span>
         <span class="game-meta"${abierto ? "" : ` id="mazo-cerrado-${item.key}"`}>${abierto ? `${item.cards.length} ${item.cardLabel} · ${item.blurb}` : escapeHtml(CT.Cartera.motivo(item.key).texto)}</span>
+        ${abierto ? progresoMazo(item.key) : ""}
       </button>`;
     }).join("")}</div>`;
   }
@@ -2104,6 +2114,10 @@
 
   const DAILY_CARDS = 10;
   const SOLO_LIVES = 3;
+  // Jugar solo se juega por rondas de un puñado de cartas, no con el mazo entero: así hay
+  // un final claro, una calificación (las vidas que quedan) y cada ronda avanza el mazo
+  // porque las cartas salen de las que aún no se dominan. El mazo entero sigue en Maratón.
+  const SOLO_ROUND_CARDS = 15;
   const RECORDS_KEY = "hilo-retos-v1";
   let solo = null;
   // Los fallos de la última partida en solitario, para poder repasarlos aunque `solo`
@@ -2346,6 +2360,8 @@
       if (!stored || !stored.timeline || stored.finished) return null;
       // Los guardados del antiguo reto diario por mazo ya no se continúan.
       if (stored.kind === "daily") return null;
+      // Una partida libre de antes de las rondas era el mazo entero: hoy eso es la maratón.
+      if (stored.kind === "free" && !stored.total) stored.kind = "marathon";
       return stored;
     } catch { return null; }
   }
@@ -2424,27 +2440,68 @@
     return `<div class="solo-lives" role="img" aria-label="Vidas restantes: ${solo.lives}">${corazones}</div>`;
   }
   function soloHidden() { return solo.difficulty === "expert" || !!solo.ghostTurns?.includes(solo.played - (solo.pendingResult ? 1 : 0)); }
+  // Las estrellas de una ronda son las vidas con las que se termina: tres sin fallar, una
+  // con dos fallos. Cero es no haberla acabado.
+  function estrellas(n) { return "★".repeat(n) + "☆".repeat(SOLO_LIVES - n); }
+  function rondaRecord(records, difficulty) { return records.rondas?.[difficulty] || { stars: 0, hits: 0 }; }
+  function textoRondaRecord(records, difficulty) {
+    const r = rondaRecord(records, difficulty);
+    return `Mejor ronda en ${CT.Ghost.level(difficulty).name}: ${r.stars ? `${estrellas(r.stars)} · ${r.hits} de ${SOLO_ROUND_CARDS}` : r.hits ? `${r.hits} de ${SOLO_ROUND_CARDS}, sin superar` : "todavía ninguna"}`;
+  }
+  function textoMaratonRecord(records, difficulty) {
+    return `Mejor marca en ${CT.Ghost.level(difficulty).name}: ${records.bestByDifficulty?.[difficulty] || (difficulty === "easy" ? records.best || 0 : 0)}`;
+  }
+  // Cuántas cartas del mazo se han colocado bien alguna vez (las del álbum del Atlas).
+  function dominadas(modeKey) {
+    const vistas = CT.Progreso.seenCards();
+    const cartas = CT.cards(modeKey);
+    return { hechas: cartas.filter(card => vistas.has(card.id)).length, total: cartas.length };
+  }
   function soloHome() {
     screen = "solo-home";
     solo = loadSolo();
     pendingIndex = null;
     const records = modeRecords();
     const mode = currentMode();
-    const pendiente = solo && solo.kind === "free";
+    const pendiente = solo && (solo.kind === "free" || solo.kind === "marathon");
+    const progreso = dominadas(selectedModeKey);
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="rules">Guía</button><button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section solo-home"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ${mode.name}</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
-        <p class="lead">Ordena, descubre y supera tu marca.</p></div>${vidasAviso()}
+        <p class="lead">Ordena, descubre y supera tu marca.</p><p class="hint solo-dominadas" data-solo-dominadas>Dominadas ${progreso.hechas} de ${progreso.total} ${mode.cardLabel}.</p></div>${vidasAviso("por ronda")}
+        ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${solo.kind === "marathon" ? "la maratón" : "la ronda"} · ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
         <div class="panel solo-panel">
-          <div class="solo-panel-head"><h3>Partida libre</h3></div>
-          <p>El mazo entero, hasta perder las tres vidas o agotarlo.</p>
+          <div class="solo-panel-head"><h3>Ronda de ${SOLO_ROUND_CARDS} cartas</h3></div>
+          <p>Salen de las que aún no dominas y van de la más holgada a la más apretada. Acábalas con vidas de sobra y la ronda se supera: cada vida que te quede es una estrella.</p>
           ${CT.Ghost.difficultyCards("solo-difficulty", selectedDifficulty)}
-          <p class="hint" data-level-record>Mejor marca en ${CT.Ghost.level(selectedDifficulty).name}: ${records.bestByDifficulty?.[selectedDifficulty] || (selectedDifficulty === "easy" ? records.best || 0 : 0)}</p>
-          ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
-          <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra" : "Empezar"}</button>
+          <p class="hint" data-level-record>${textoRondaRecord(records, selectedDifficulty)}</p>
+          <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra ronda" : "Empezar ronda"}</button>
+        </div>
+        <div class="panel solo-panel-maraton">
+          <div class="solo-panel-head"><h3>Maratón</h3></div>
+          <p>El mazo entero, hasta perder las tres vidas o agotarlo, con la misma dificultad de arriba.</p>
+          <p class="hint" data-marathon-record>${textoMaratonRecord(records, selectedDifficulty)}</p>
+          <button class="btn btn-secondary btn-block" data-action="start-marathon">Empezar maratón</button>
         </div>
       </section>
     </div>`);
   }
+
+  // Lo que el hub de Jugar solo enseña antes de la lista de mazos: las partidas a medias de
+  // cualquier mazo (el guardado es por mazo, y sin esto una ronda empezada en Historia no se
+  // veía desde otro sitio) y el último mazo jugado, para volver a él de un toque.
+  CT.soloResumen = () => {
+    const pendientes = [];
+    for (const key of Object.keys(CT.MODES)) {
+      if (!CT.Cartera.tiene(key)) continue;
+      try {
+        const stored = CT.Saves.read(`hilo-solo-${key}-v1`, key);
+        if (!stored || !stored.timeline || stored.finished || !["free", "marathon"].includes(stored.kind)) continue;
+        pendientes.push({ mode: key, name: CT.mode(key).name, kind: stored.kind === "free" && !stored.total ? "marathon" : stored.kind, difficulty: CT.Ghost.level(stored.difficulty).name, played: stored.played || 0, total: stored.total || null });
+      } catch { /* un guardado roto no bloquea el hub */ }
+    }
+    const jugado = CT.Cartera.tiene(selectedModeKey) && (dominadas(selectedModeKey).hechas > 0 || !!readRecords()[selectedModeKey]);
+    return { pendientes, ultimo: jugado ? { mode: selectedModeKey, name: currentMode().name } : null };
+  };
 
   // Partida con amigos, cada uno en su móvil: con el mazo ya elegido solo queda el ritmo.
   // En directo es la sala (por internet o por Wi-Fi), por turnos el duelo que se guarda
@@ -2741,6 +2798,39 @@
   // `duel` recibe el duelo ya descodificado cuando se acepta un reto ajeno; si no viene,
   // se estrena uno propio con semilla nueva. En los dos casos el reparto sale de la misma
   // función, que es justo lo que garantiza que los dos móviles jueguen lo mismo.
+  // Las cartas de una ronda: la primera abre la línea y las demás se juegan en orden. Se
+  // eligen con preferencia por las que aún no están en el álbum, para que cada ronda haga
+  // avanzar el mazo, y se ordenan de la más holgada a la más apretada: la primera cae lejos
+  // de todo lo que hay en la línea y la última, entre dos vecinas. La distancia se mide en
+  // posiciones del mazo ordenado, no en el valor: así un siglo en la Antigüedad y una
+  // década en el siglo XX pesan lo que pesan en ese mazo.
+  function repartoRonda(modeKey, ids, random = Math.random) {
+    const vistas = CT.Progreso.seenCards();
+    const mezcla = items => shuffleWith(items, random);
+    const nuevas = mezcla(ids.filter(id => !vistas.has(id)));
+    const sabidas = mezcla(ids.filter(id => vistas.has(id)));
+    const ronda = [...nuevas, ...sabidas].slice(0, SOLO_ROUND_CARDS + 1);
+    const byId = new Map(CT.cards(modeKey).map(card => [card.id, card]));
+    const orden = [...ids].sort((a, b) => CT.sortValue(modeKey, byId.get(a)) - CT.sortValue(modeKey, byId.get(b)));
+    const rango = new Map(orden.map((id, i) => [id, i]));
+    const inicial = mezcla(ronda)[0];
+    const linea = [rango.get(inicial)];
+    const pool = ronda.filter(id => id !== inicial);
+    const salida = [inicial];
+    while (pool.length) {
+      let mejor = 0, lejania = -1;
+      pool.forEach((id, i) => {
+        const r = rango.get(id);
+        const d = Math.min(...linea.map(l => Math.abs(l - r)));
+        if (d > lejania) { lejania = d; mejor = i; }
+      });
+      const [id] = pool.splice(mejor, 1);
+      salida.push(id); linea.push(rango.get(id));
+    }
+    return salida;
+  }
+  CT.repartoRonda = repartoRonda;
+
   function startSolo(kind, duel = null) {
     if (solo?.pendientes?.length) vuelcaCartas(solo);
     cardsById = new Map(CT.cards(selectedModeKey).map(card => [card.id, card]));
@@ -2759,17 +2849,23 @@
     } else if (kind === "daily") {
       const azar = seededRandom(seedFrom(`${today()}:${selectedModeKey}`));
       barajado = shuffleWith(CT.uniqueValueIds(selectedModeKey, ids, azar), azar).slice(0, DAILY_CARDS + 1);
+    } else if (kind === "free") {
+      barajado = repartoRonda(selectedModeKey, ids);
     } else {
       barajado = shuffle(CT.uniqueValueIds(selectedModeKey, ids));
     }
     const timeline = [barajado.shift()];
-    // La partida libre lleva el plazo que se eligió en su pantalla; el reto diario, ninguno.
-    const ms = kind === "free" ? CT.Ghost.level(selectedDifficulty).seconds * 1000 : 0;
+    // Las cartas que el tablero coloca solo tras un acierto (Normal y más) no salen de la ronda,
+    // que es fija, sino de una reserva con el resto del mazo. En la maratón salen del mazo.
+    const reserve = kind === "free" ? shuffle(ids.filter(id => !barajado.includes(id) && id !== timeline[0])) : null;
+    const turnos = kind === "free" ? SOLO_ROUND_CARDS : ids.length;
+    // La ronda y la maratón llevan el plazo que se eligió en su pantalla; el reto diario, ninguno.
+    const ms = kind === "free" || kind === "marathon" ? CT.Ghost.level(selectedDifficulty).seconds * 1000 : 0;
     solo = {
-      kind, difficulty, ghostTurns: difficulty === "hard" ? CT.Ghost.soloSchedule(ids.length) : [], ms,
-      mode: selectedModeKey, day: today(), deck: barajado, timeline,
+      kind, difficulty, ghostTurns: difficulty === "hard" ? CT.Ghost.soloSchedule(turnos) : [], ms,
+      mode: selectedModeKey, day: today(), deck: barajado, timeline, reserve,
       current: barajado.shift(), lives: SOLO_LIVES, hits: 0, played: 0,
-      total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : null,
+      total: kind === "daily" ? DAILY_CARDS : kind === "duel" ? duelo.total : kind === "free" ? SOLO_ROUND_CARDS : null,
       duelo, finished: false, newDiscoveries: 0,
       cartaEmpezadaEn: (duelo?.ms || ms) > 0 ? Date.now() : null,
       // Cuánto se tarda en el reto diario desempata el ranking: se mide desde que empieza hasta que acaba.
@@ -2942,8 +3038,9 @@
     // complica (la línea se estrecha). Tras un fallo ya pierdes una vida y la carta fallada
     // entra en la línea; sumarle más sería castigar dos veces.
     const extra = jugada.correct ? CT.Ghost.level(solo.difficulty).extra : 0;
-    for (let n = 0; n < extra && solo.deck.length; n++) {
-      const id = solo.deck.shift();
+    const fuente = solo.reserve || solo.deck;
+    for (let n = 0; n < extra && fuente.length; n++) {
+      const id = fuente.shift();
       const at = CT.correctIndex(selectedModeKey, solo.timeline.map(id => cardsById.get(id)), cardsById.get(id));
       solo.timeline.splice(at, 0, id); solo.autoAdded.push(id);
     }
@@ -2991,6 +3088,13 @@
       records.best = Math.max(records.best || 0, solo.hits);
       saveDailyRecords(records);
     } else if (solo.kind === "free") {
+      // La ronda se califica por las vidas que quedan al acabarla; sin acabarla, cero estrellas.
+      records.rondas = records.rondas || {};
+      const ronda = rondaRecord(records, difficulty);
+      const stars = solo.played >= total && solo.lives > 0 ? solo.lives : 0;
+      records.rondas[difficulty] = { stars: Math.max(ronda.stars, stars), hits: Math.max(ronda.hits, solo.hits) };
+      saveRecords(records);
+    } else if (solo.kind === "marathon") {
       records.bestByDifficulty = records.bestByDifficulty || { easy: records.best || 0 };
       records.bestByDifficulty[difficulty] = Math.max(records.bestByDifficulty[difficulty] || 0, solo.hits);
       if (difficulty === "easy") records.best = records.bestByDifficulty.easy;
@@ -3005,23 +3109,28 @@
       // crearlo todavía no hay rival, solo una marca que mandar.
       won: enDueloEsta && !!solo.duelo?.rival && solo.hits > solo.duelo.rival.hits
     });
+    const rondaSuperada = solo.kind === "free" && superado;
     const resumen = solo.kind === "daily" || enDueloEsta
       ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
-      : `Has colocado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} en ${CT.Ghost.level(solo.difficulty).name}. ${solo.lives > 0 ? "Has completado el mazo." : "Has agotado las tres vidas."}`;
+      : solo.kind === "free"
+        ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas en ${CT.Ghost.level(solo.difficulty).name}. ${rondaSuperada ? `Ronda superada con ${solo.lives} ${solo.lives === 1 ? "vida" : "vidas"}: ${estrellas(solo.lives)}.` : "Has agotado las tres vidas antes de acabarla."}`
+        : `Has colocado <strong>${solo.hits}</strong> ${solo.hits === 1 ? "carta" : "cartas"} en ${CT.Ghost.level(solo.difficulty).name}. ${solo.lives > 0 ? "Has completado el mazo." : "Has agotado las tres vidas."}`;
     soloFailedForReview = (solo.failed || []).map(id => ({ id, mode: solo.mode }));
     const compartir = solo.kind === "daily" ? shareText(currentMode().name, dia, solo.hits, total, solo.sequence || [], records.streak) : null;
     const duelo = enDueloEsta ? cierreDuelo(solo, total) : null;
     const earned = [...(solo.earnedAchievements || []), ...logros];
     const sessionLogros = [...new Map(earned.map(item => [item.id || item.name, item])).values()];
     const finalHits=solo.hits;
+    const finalLives=solo.lives;
     const soloKind=solo.kind;
     const newDiscoveries=solo.newDiscoveries||0;
-    const bestNow=solo.kind==='free'?Math.max(previousBest,solo.hits):Math.max(previousBest,records.best||0);
+    const bestNow=solo.kind==='free'?estrellas(rondaRecord(records,difficulty).stars):solo.kind==='marathon'?Math.max(previousBest,solo.hits):Math.max(previousBest,records.best||0);
+    const bestLabel=solo.kind==='free'?'mejor ronda':solo.kind==='marathon'?(solo.hits>previousBest?'nueva mejor marca':'mejor marca'):'mejor marca';
     solo.finished = true;
     saveSolo();
     solo = null;
     const fallosUnicos = new Set(soloFailedForReview.map(item => item.id)).size;
-    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,soloKind==='free'?(finalHits>previousBest?'nueva mejor marca':'mejor marca'):'mejor marca',newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${compartir && CT.Accounts?.ready ? `<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}${soloKind === "daily" ? '<button class="btn btn-primary" data-action="home">Ir al inicio</button>' : `<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="${duelo ? "duel-home" : "solo"}">${duelo ? "Volver a los duelos" : "Volver a solitario"}</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`}</div></div></section></div>`);
+    paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel final-composition"><div class="eyebrow">${duelo ? duelo.eyebrow : soloKind === "free" ? (superado ? `Ronda superada · ${estrellas(finalLives)}` : "Se acabaron las vidas") : superado ? "Reto completado" : "Se acabaron las vidas"}</div><h1 class="final-title" data-focus tabindex="-1">${duelo ? duelo.titular : 'Tu resultado'}</h1>${finalMetrics(finalHits,finalHits===1?'acierto':'aciertos',bestNow,bestLabel,newDiscoveries,sessionLogros.length)}${duelo ? duelo.cuerpo : `<p class="final-lead">${resumen}</p>`}${logrosMarkup(sessionLogros)}<div class="actions final-actions">${duelo ? duelo.acciones : ""}${compartir ? `<button class="btn btn-secondary" data-action="share-daily">Compartir resultado</button>` : ""}${compartir && CT.Accounts?.ready ? `<button class="btn btn-secondary" data-account-action="ranking">Ver ranking</button>` : ""}${fallosUnicos ? `<button class="btn btn-ghost" data-action="review-solo">Ver lo que se falló (${fallosUnicos})</button>` : ""}${soloKind === "daily" ? '<button class="btn btn-primary" data-action="home">Ir al inicio</button>' : `<button class="btn ${duelo ? "btn-secondary" : "btn-primary"}" data-action="${duelo ? "duel-home" : "solo"}">${duelo ? "Volver a los duelos" : "Volver a solitario"}</button><button class="btn btn-secondary" data-action="home">Ir al inicio</button>`}</div></div></section></div>`);
     lastShareText = compartir;
   }
 
@@ -3612,7 +3721,8 @@
     // El tema no va aquí: lo lleva su propio rótulo encima del marcador, que es lo que
     // recuerda a qué se está jugando cuando el cartel del principio ya se ha ido.
     if (solo.kind === "comp") return `Competición · ${CT.Ghost.level(comp.difficulty).name} · tema ${(comp.totalThemes || TOTAL_TEMAS) - comp.queue.length} de ${comp.totalThemes || TOTAL_TEMAS}`;
-    return `Partida libre · ${CT.Ghost.level(solo.difficulty).name}`;
+    if (solo.kind === "marathon") return `Maratón · ${CT.Ghost.level(solo.difficulty).name}`;
+    return `Ronda · ${CT.Ghost.level(solo.difficulty).name}`;
   }
 
   const COMP_KEY = "continuum-competition-v1";
@@ -4006,7 +4116,9 @@
     CT.Storage.setItem("continuum-difficulty-v1", key);
     const record = app.querySelector("[data-level-record]");
     const records = modeRecords();
-    if (record) record.textContent = `Mejor marca en ${CT.Ghost.level(key).name}: ${records.bestByDifficulty?.[key] || (key === "easy" ? records.best || 0 : 0)}`;
+    if (record) record.textContent = textoRondaRecord(records, key);
+    const maraton = app.querySelector("[data-marathon-record]");
+    if (maraton) maraton.textContent = textoMaratonRecord(records, key);
   });
 
   app.addEventListener("toggle", event => {
@@ -4195,6 +4307,13 @@
     else if (action === "solo") soloHome();
     else if (action === "duel-home") duelHome();
     else if (action === "start-free") startSolo("free");
+    else if (action === "start-marathon") startSolo("marathon");
+    // Atajos del hub de Jugar solo: abrir un mazo en solitario (y, si hay partida a medias, seguirla).
+    else if (action === "solo-open-deck") {
+      try { sessionStorage.setItem('continuum-entry-route', 'collections'); } catch { /* sin espacio: se abre igual */ }
+      if (!setMode(target.dataset.soloDeck)) return;
+      if (target.dataset.resume === "true") resumeSolo(); else soloHome();
+    }
     // Vale tanto para estrenar un duelo como para devolver uno recién jugado: en los dos
     // casos es una semilla nueva, así que nadie repite cartas que ya conoce.
     // El campo del nombre solo está donde se pide. Al devolver un reto desde el cara a

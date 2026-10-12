@@ -259,7 +259,7 @@
     { key: "mesa", group: "Oficio", name: "Mesa llena", desc: "Termina una partida de 5 personas o más en un solo móvil.", have: p => p.marks.bigWins, goal: 1 },
     { key: "pulso", group: "Oficio", name: "Pulso firme", desc: "Acierta la carta de un Pulso que hayas lanzado tú.", have: p => p.marks.pulseHits, goal: 1 },
     { key: "fantasma", group: "Oficio", name: "A ciegas", desc: "Acierta una carta con los valores ocultos por el Fantasma.", have: p => p.marks.ghostHits, goal: 1 },
-    { key: "experto", group: "Oficio", name: "Nivel experto", desc: "Completa un mazo en partida libre y en Experto.", have: p => p.marks.expertClears, goal: 1 },
+    { key: "experto", group: "Oficio", name: "Nivel experto", desc: "Completa un mazo entero en Maratón y en Experto.", have: p => p.marks.expertClears, goal: 1 },
     { key: "sala", group: "Oficio", name: "Ganar en sala", desc: "Gana una partida de varios móviles.", have: p => p.marks.onlineWins, goal: 1 },
     { key: "duelo", group: "Oficio", name: "Duelo ganado", desc: "Supera la marca de quien te retó por enlace.", have: p => p.marks.duelWins, goal: 1 },
     { key: "habitual", group: "Oficio", name: "Cincuenta partidas", desc: "Termina cincuenta partidas, del formato que sea.", have: p => p.totals.games, goal: 50 }
@@ -353,7 +353,7 @@
     }
     // Completar el mazo en Experto, no simplemente jugarlo: el logro es terminar con
     // vidas, que es lo que distingue haberlo hecho de haberlo intentado.
-    if (kind === "free" && difficulty === "expert" && lives > 0) profile.marks.expertClears += 1;
+    if (kind === "marathon" && difficulty === "expert" && lives > 0) profile.marks.expertClears += 1;
     if (kind === "local" && players >= 5) profile.marks.bigWins += 1;
     if (kind === "online" && won) profile.marks.onlineWins += 1;
     // El duelo es la otra vez que el juego sabe que la victoria es tuya: hay una marca

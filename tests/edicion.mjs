@@ -223,7 +223,7 @@ for (const reduce of [false, true]) {
     click(w, '[data-mode="history"]');
     (w.CONTINUUM||w.defaultView.CONTINUUM).openDeckAs('collections');
     // El reto diario está en la portada y el duelo es su propio formato: en solitario
-    // queda una sola opción, la partida libre, y se enseña abierta, sin plegar.
+    // queda la ronda, abierta y sin plegar, con la maratón como panel aparte debajo.
     assert.equal(doc.querySelectorAll('.solo-fold').length, 0);
     assert.ok(doc.querySelector('.solo-panel [data-action="start-free"]'));
     click(w, '[data-action="back-menu"]');
