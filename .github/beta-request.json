@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 673,
+  "cache": 675,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Jugar solo por rondas de 15 cartas con estrellas, Maratón con el mazo entero, atajos para continuar y último mazo, progreso por mazo, y efectos de sonido sintetizados con su ajuste de volumen"
+  "reason": "Rondas de 10 cartas en Jugar solo, configuración de Retos rápidos alineada con la de un mazo, música que se apaga en fundido al empezar, abanico de la mano con tamaño estable, sonidos al volver atrás y al desplegar colecciones, y sin copiar imágenes al mantener pulsado"
 }
