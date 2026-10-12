@@ -5304,3 +5304,13 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
    desplegables cualquier par de `.solo-panel`, y la ronda tiene que verse abierta de entrada. */
 .solo-panel-maraton { margin-bottom: 16px; opacity: .92; }
 .solo-panel-maraton p { color: var(--muted); font-size: .82rem; margin: 0 0 14px; }
+
+/* La configuración de Retos rápidos en solitario comparte maqueta con la de un mazo: los
+   chips de duración y el tiempo por carta viven dentro del mismo panel, con sus rótulos. */
+#app .quick-shell .solo-home .solo-panel .quick-length { margin: 12px 0 10px; }
+#app .quick-shell .solo-home .solo-panel .quick-length-more { margin: 0 0 4px; }
+#app .quick-shell .solo-home .solo-panel .tiempo-field { margin-top: 18px; }
+#app .quick-shell .solo-home .solo-panel .btn-block { margin-top: 18px; }
+#app .quick-shell .solo-home .solo-panel #quick-error { margin: 8px 0 0; }
+#app .quick-shell .solo-home .solo-panel #quick-error:empty { display: none; }
+

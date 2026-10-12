@@ -137,7 +137,19 @@
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
     const total=CT.QuickCatalog.challenges.length;
     const options=LONG_LENGTHS.filter(([n])=>n<total);
-    shell(`<section class="setup-section quick-free-setup"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">¿Cuánto quieres jugar?</h2><p class="lead">Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}${button('start-free','Empezar <span>→</span>','btn btn-primary btn-block')}${load() ? button('resume','Continuar partida guardada','btn btn-secondary btn-block') : ''}<p id="quick-error" role="alert">${esc(error)}</p></section>`);
+    // Misma maqueta que la pantalla de un mazo de Grandes colecciones (`soloHome` en app.js):
+    // portada con rótulo, título y entradilla, y debajo un único panel con los ajustes y el
+    // botón de empezar. Así las dos puertas de Jugar solo se leen igual.
+    const pendiente=load();
+    shell(`<section class="setup-section solo-home quick-free-setup"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
+        <p class="lead">Mazos sorpresa: ordena y suma aciertos.</p><p class="hint solo-dominadas">${total} retos en el catálogo. Un fallo no te echa: juegas cada reto entero.</p></div>
+        ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
+        <div class="panel solo-panel">
+          <div class="solo-panel-head"><h3>¿Cuánto quieres jugar?</h3></div>
+          <p>Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>
+          ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}
+          ${button('start-free',`${pendiente ? 'Empezar otra' : 'Empezar'} <span>→</span>`,`btn ${pendiente ? 'btn-secondary' : 'btn-primary'} btn-block`)}<p id="quick-error" role="alert">${esc(error)}</p>
+        </div></section>`);
   }
   // El duelo de Retos rápidos por enlace: juegas tú, mandas el enlace y tu amigo juega los mismos mazos.
   // Los mazos salen de una semilla y las jugadas viajan abreviadas, así que el enlace es corto aunque la

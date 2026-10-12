@@ -301,6 +301,19 @@ const openQuick = () => {
   w.CONTINUUM.ModeHubs.open('hub-friends-local');
   w.document.querySelector('[data-action="quick-challenges"]').click();
 };
+// En solitario, la pantalla de configuración comparte maqueta con la de un mazo de Grandes
+// colecciones (`soloHome`): portada con rótulo y título, y un único panel con los ajustes.
+w.sessionStorage.setItem('continuum-entry-route', 'quick');
+w.CONTINUUM.ModeHubs.open('hub-solo');
+w.document.querySelector('[data-action="quick-challenges"]').click();
+{
+  const seccion = w.document.querySelector('.setup-section.solo-home.quick-free-setup');
+  assert.ok(seccion, 'Retos rápidos en solitario usa la maqueta de solitario');
+  assert.ok(seccion.querySelector('.solo-intro .solo-title') && seccion.querySelector('.solo-intro .eyebrow'), 'con la misma portada');
+  const panel = seccion.querySelector('.panel.solo-panel');
+  assert.ok(panel && panel.querySelector('.solo-panel-head h3') && panel.querySelector('.quick-length') && panel.querySelector('.tiempo-field') && panel.querySelector('[data-quick="start-free"]'), 'y un único panel con duración, tiempo y el botón de empezar');
+  assert.equal(seccion.querySelectorAll('.solo-panel').length, 1, 'un solo panel: no se pliega en desplegables');
+}
 openQuick();
 assert.match(w.document.querySelector('#app').textContent, /un solo móvil/);
 assert.ok(w.document.querySelector('.quick-starter-field [data-quick="draw-starter"]'), 'el campo de quién empieza es visible en la preparación');
