@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 663,
+  "cache": 673,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Retoques visuales de la intro y el inicio: globo con mar azul grisáceo, cartas flotantes con color suave, botón Jugar más alto y más aire entre «Jugar» y «Unirme a una partida», e ilustraciones del menú con color sobrio"
+  "reason": "Jugar solo por rondas de 15 cartas con estrellas, Maratón con el mazo entero, atajos para continuar y último mazo, progreso por mazo, y efectos de sonido sintetizados con su ajuste de volumen"
 }
