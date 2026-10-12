@@ -521,14 +521,13 @@
       }
       if (!fits() && container.dataset.boardFit === 'normal') container.dataset.boardFit = 'compact';
       if (!fits() && container.dataset.boardFit === 'compact') container.dataset.boardFit = 'tight';
-      // Aprovecha el papel libre dentro de la línea. Primero crece tu carta (o el abanico
-      // de la mano) con la mitad del hueco, para que la mesa quede repartida entre la mano
-      // y la línea en vez de dejar papel vacío abajo; después, con lo que quede, crece la
-      // carta de la línea. Todo de forma progresiva y sin sacar ningún mando de la vista.
+      // Aprovecha el papel libre dentro de la línea. Primero crece la carta de la línea,
+      // como siempre; con lo que quede crece tu carta (o el abanico de la mano), para que la
+      // mesa quede repartida entre la mano y la línea en vez de dejar papel vacío abajo.
+      // Todo de forma progresiva y sin sacar ningún mando de la vista.
       if (!shrunk && fits() && window.innerWidth >= 375) {
         const section = shell.querySelector('.board-timeline-section');
         const card = section?.querySelector('.timeline .timeline-card');
-        if (card) growHand(container, shell, section, card, available, fits);
         if (card) {
           const gap = Math.min(section.getBoundingClientRect().bottom, available) - card.getBoundingClientRect().bottom;
           const base = card.getBoundingClientRect().width;
@@ -549,6 +548,12 @@
             }
           }
         }
+      }
+      // Con lo que la línea deja libre, crece tu carta (o el abanico de la mano).
+      if (!shrunk && fits() && window.innerWidth >= 375) {
+        const section = shell.querySelector('.board-timeline-section');
+        const card = section?.querySelector('.timeline .timeline-card');
+        if (card) growHand(container, shell, section, card, available, fits);
       }
       // Al elegir hueco, tu carta pasa a la línea como vista previa: su sitio en la mano
       // conserva el alto que tenía para que la línea no suba de golpe.
