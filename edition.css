@@ -3093,14 +3093,10 @@ html:not(:has(#app[data-screen="home"]))::before {
 :root[data-theme="dark"]:not(:has(#app[data-screen="home"]))::before {
   background: linear-gradient(#140d08e6, #140d08f0), #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
-html body::before {
-  background:
-    url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
-    url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat;
-}
-/* Fuera de la portada los títulos van a la izquierda y la ilustración de fondo basta. */
-html body:not(:has(#app[data-screen="home"]))::before { content: none; }
-:root[data-theme="dark"] body::before { opacity: .18; }
+/* Los adornos de la portada van en la misma capa fija que la lámina (html::before, más abajo):
+   una segunda capa fija a pantalla completa solo en Inicio era lo único que esa pantalla tenía
+   distinto de las demás, y en iPhone la barra inferior temblaba al desplazar solo ahí. */
+html body::before { content: none; }
 /* La portada ya no pinta su propio papel: deja ver la lámina común. */
 :root #app[data-screen="home"], :root:not([data-theme="dark"]) #app[data-screen="home"], :root[data-theme="dark"] #app[data-screen="home"] { background: transparent; }
 #app[data-screen="home"]::before, #app[data-screen="home"]::after { content: none; }
@@ -3238,15 +3234,26 @@ html body:not(:has(#app[data-screen="home"]))::before { content: none; }
 
 /* Barniz suave: conserva el papel cálido sin apagar los azules y el verde del olivo. */
 html::before { filter: saturate(.9) sepia(.08); }
-html body::before { filter: saturate(.85) sepia(.05); }
 
-/* Rayos de luz también desde la esquina derecha, como los que entran por la izquierda. */
-html body:has(#app[data-screen="home"])::before {
+/* Portada: rayos de luz desde las dos esquinas sobre la lámina, en la misma capa fija. En oscuro
+   el velo de la lámina los atenúa (antes iban al 18 % de opacidad en una capa propia). */
+html:has(#app[data-screen="home"])::before {
   background:
     url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
     url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat,
-    repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, 90vw) min(520px, 60vh) no-repeat;
+    repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, 90vw) min(520px, 60vh) no-repeat,
+    #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
+:root[data-theme="dark"]:has(#app[data-screen="home"])::before {
+  background:
+    linear-gradient(#140d08d6, #140d08e6),
+    url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
+    url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat,
+    #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
+}
+/* La portada apenas desborda la pantalla. Con `dvh`, en Safari la altura mínima cambiaba con cada
+   pliegue de la barra del navegador mientras se desplazaba y la página se recolocaba; `svh` es fija. */
+html body:has(#app[data-screen="home"]), #app[data-screen="home"] { min-height: 100svh; }
 
 /* Jugar con un punto más de color: el color lo ponen las láminas, que recuperan su
    tono; los tres recuadros comparten el mismo papel terracota suave. */
@@ -4934,12 +4941,16 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   #app .mode-entry:nth-child(2n) .mode-entry-art img { animation-duration: 15s; animation-delay: -6s; }
   #app .mode-entry:nth-child(3n) .mode-entry-art img { animation-duration: 11s; animation-delay: -3s; animation-direction: alternate-reverse; }
   #app .home-door-daily .home-door-art img { animation-duration: 14s; animation-delay: -7s; }
+  /* El reflejo se mueve con `transform`, no con `background-position`: así lo lleva el compositor y el
+     hilo principal no repinta seis láminas en cada fotograma mientras la pantalla se desplaza. El
+     recorrido es el mismo que antes (de 120 % a -20 % de un fondo del 250 %): una franja de 2,5 anchos
+     que parte 1,8 anchos a la izquierda y avanza el 84 % de sí misma. */
   #app :is(.home-door-art, .mode-entry-art)::after {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(105deg, transparent 38%, #fff3d455 45%, #fffaeccc 50%, #fff3d455 55%, transparent 62%) no-repeat;
-    background-size: 250% 100%;
+    content: ''; position: absolute; top: 0; bottom: 0; left: -180%; width: 250%; pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, #fff3d455 45%, #fffaeccc 50%, #fff3d455 55%, transparent 62%);
     animation: lamina-reflejo 9s ease-in-out infinite;
     mix-blend-mode: screen;
+    will-change: transform;
   }
   #app .mode-entry:nth-child(2n) .mode-entry-art::after { animation-delay: -3s; }
   #app .home-door-daily .home-door-art::after { animation-delay: -5s; }
@@ -4997,8 +5008,8 @@ html:has(#app.atlas-board) .motas { display: none; }
   to { scale: 1.12; translate: -3.5% -2.5%; }
 }
 @keyframes lamina-reflejo {
-  0%, 55% { background-position: 120% 0; }
-  85%, 100% { background-position: -20% 0; }
+  0%, 55% { transform: translateX(0); }
+  85%, 100% { transform: translateX(84%); }
 }
 @keyframes lampara-haz {
   from { transform: rotate(-6deg); }
