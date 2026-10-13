@@ -124,3 +124,25 @@
 @media (max-width: 360px) {
   #app .guide-handbook > .atlas-page-heading { padding-inline: 16px; }
 }
+
+/* La portada se abre a la sabana: la lámina incluye mesa, cuaderno y paisaje. */
+#app .guide-handbook > .atlas-page-heading {
+  background: radial-gradient(ellipse at 50% 0, #82623b50, transparent 70%),
+    linear-gradient(150deg, #344248, #1b3039 70%, #172b32);
+}
+#app .guide-handbook > .atlas-page-heading::before { display: none; }
+#app .guide-handbook > .atlas-page-heading .guide-frontispiece {
+  display: block; width: calc(100% + 44px); max-width: none; height: auto;
+  aspect-ratio: 3 / 2; object-fit: contain; margin: -30px -22px 24px;
+  border-radius: 19px 19px 0 0; border-bottom: 1px solid #c6a46c;
+  filter: none;
+}
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading {
+  background: radial-gradient(ellipse at 50% 0, #82623b30, transparent 70%),
+    linear-gradient(150deg, #263a40, #142831 70%, #10222a);
+}
+@media (max-width: 360px) {
+  #app .guide-handbook > .atlas-page-heading .guide-frontispiece {
+    width: calc(100% + 32px); margin-inline: -16px;
+  }
+}
