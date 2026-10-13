@@ -91,3 +91,58 @@
 .quick-ready-asof{margin:6px 0 0;color:var(--muted,#7a6a58);font:600 .72rem/1.3 var(--font-display);letter-spacing:.14em;text-transform:uppercase}
 
 .quick-result .quick-result-note { margin-top: 14px; }
+
+/* Las dos puertas de solitario comparten las acuarelas del resto de Continuum. */
+html #app[data-screen] .quick-free-setup .quick-day-panel {
+  background: radial-gradient(ellipse at 100% 0, #94b1a52b, transparent 60%),
+    radial-gradient(ellipse at 0 100%, #d5ad6022, transparent 55%), var(--edition-surface);
+}
+html #app[data-screen] .quick-free-setup .quick-mode-switch { gap: 12px; align-items: stretch; }
+html #app[data-screen] .quick-free-setup .quick-mode-card {
+  --choice-tone: #88642f; --choice-wash: #d9ba7b;
+  display: flex; flex-direction: column; gap: 0; padding: 0 0 16px; overflow: hidden;
+  border-color: color-mix(in srgb, var(--choice-tone) 45%, var(--edition-line));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--choice-wash) 22%, var(--edition-surface)), var(--edition-surface));
+  box-shadow: 0 5px 13px #45331b16, inset 0 0 0 4px #b8976010;
+}
+html #app[data-screen] .quick-free-setup .quick-mode-surprise { --choice-tone: #3c656b; --choice-wash: #87aeaa; }
+html #app[data-screen] .quick-free-setup .quick-mode-visual {
+  position: relative; display: block; width: 100%; height: clamp(96px, 27vw, 150px);
+  margin: 0 0 16px; border-bottom: 1px solid color-mix(in srgb, var(--choice-tone) 30%, var(--edition-line));
+  background: var(--choice-wash);
+}
+html #app[data-screen] .quick-free-setup .quick-mode-visual > img {
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: 78% 52%;
+}
+html #app[data-screen] .quick-free-setup .quick-mode-surprise .quick-mode-visual > img { object-position: 50% 43%; }
+html #app[data-screen] .quick-free-setup .quick-mode-visual .quick-mode-art {
+  position: absolute; left: 10px; bottom: -14px; width: 34px; height: 34px; padding: 5px;
+  border: 1px solid var(--choice-tone); border-radius: 50%; color: var(--choice-tone);
+  background: var(--edition-surface); box-shadow: 0 3px 6px #37281728;
+}
+html #app[data-screen] .quick-free-setup .quick-mode-copy { padding: 0 10px; gap: 7px; }
+html #app[data-screen] .quick-free-setup .quick-mode-copy b { color: var(--edition-ink); font-size: 1.05rem; line-height: 1.22; }
+html #app[data-screen] .quick-free-setup .quick-mode-copy small { font-size: .74rem; line-height: 1.5; }
+html #app[data-screen] .quick-free-setup .quick-mode-copy em { font-size: .65rem; padding: 4px 8px; color: var(--choice-tone); border-color: color-mix(in srgb, var(--choice-tone) 50%, var(--edition-line)); }
+html #app[data-screen] .quick-free-setup .quick-mode-card.is-selected {
+  border-color: var(--choice-tone);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--choice-wash) 35%, var(--edition-surface)), var(--edition-surface));
+  box-shadow: inset 0 0 0 2px var(--choice-tone), 0 7px 16px #45331b24;
+}
+html #app[data-screen] .quick-free-setup .quick-mode-card.is-selected .quick-mode-copy em { background: var(--choice-tone); color: #fff7e8; }
+html #app[data-screen] .quick-free-setup .quick-mode-card.is-selected::after {
+  display: grid; place-items: center; width: 23px; height: 23px; top: 8px; right: 8px;
+  border-radius: 50%; background: var(--choice-tone); color: #fff7e8; box-shadow: 0 2px 5px #0003;
+}
+html #app[data-screen] .quick-free-setup .quick-day-head {
+  padding: 18px 16px; border: 1px solid var(--edition-line); border-left: 3px solid #8b733e;
+  border-radius: 12px; background: linear-gradient(110deg, #b8995622, #8caa9a12), var(--edition-surface);
+}
+html #app[data-screen] .quick-free-setup .quick-day-deck { background: linear-gradient(115deg, #b8995614, #8caa9a0d), var(--edition-surface); }
+html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-mode-card { --choice-tone: #e0bd7d; --choice-wash: #8f6f36; }
+html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-mode-surprise { --choice-tone: #a9d0ce; --choice-wash: #476d70; }
+html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-mode-card.is-selected .quick-mode-copy em,
+html[data-theme="dark"] #app[data-screen] .quick-free-setup .quick-mode-card.is-selected::after { color: #1d2b2b; }
+
+html #app[data-screen] .quick-free-setup .quick-mode-copy { flex: 1; width: 100%; }
+html #app[data-screen] .quick-free-setup .quick-mode-copy em { margin-top: auto; }

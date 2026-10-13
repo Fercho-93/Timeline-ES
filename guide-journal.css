@@ -197,3 +197,47 @@
   #app .guide-handbook > .atlas-page-heading p { max-width: 60%; font-size: .75rem; }
   #app .guide-handbook > .atlas-page-heading::after { left: 16px; }
 }
+
+/* La veladura deja respirar el cuaderno y la fauna de la mitad derecha. */
+#app .guide-handbook > .atlas-page-heading { min-height: 228px; }
+#app .guide-handbook > .atlas-page-heading::before {
+  background: linear-gradient(90deg, #fbf1ddfc 0%, #fbf1ddf5 25%, #fbf1ddc7 39%, #fbf1dd45 51%, #fbf1dd00 66%);
+}
+#app .guide-handbook > .atlas-page-heading .eyebrow,
+#app .guide-handbook > .atlas-page-heading h1 { max-width: 48%; }
+#app .guide-handbook > .atlas-page-heading p { max-width: 46%; }
+#app .guide-handbook > .atlas-page-heading .guide-frontispiece { object-position: right center; }
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading::before {
+  background: linear-gradient(90deg, #172c29fc 0%, #172c29f5 25%, #172c29d9 39%, #172c2966 51%, #172c2900 66%);
+}
+/* Cada capítulo tiene su propia tinta, como las escalas del Atlas. */
+#app .guide-handbook .guide-chapter { --chapter-tone: #476c71; --chapter-wash: #e4edef; }
+#app .guide-handbook .guide-chapter:nth-of-type(3n+2) { --chapter-tone: #64704a; --chapter-wash: #e9eddf; }
+#app .guide-handbook .guide-chapter:nth-of-type(3n) { --chapter-tone: #966738; --chapter-wash: #f2e5ce; }
+#app .guide-handbook .guide-start {
+  background: radial-gradient(ellipse at 100% 0, #c4a46c24, transparent 55%),
+    linear-gradient(135deg, color-mix(in srgb, var(--journal-wash) 48%, var(--edition-surface)), var(--edition-surface) 65%);
+  box-shadow: 0 9px 22px #3d514514, inset 0 0 0 5px #b8976010, inset 0 0 0 6px #b8976024;
+}
+#app .guide-handbook .guide-chapter {
+  border-color: color-mix(in srgb, var(--chapter-tone) 35%, var(--edition-line));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--chapter-tone) 8%, var(--edition-surface)), var(--edition-surface));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--chapter-tone) 12%, transparent), 0 9px 22px #3d514510;
+}
+#app .guide-handbook .guide-chapter > summary {
+  background: radial-gradient(ellipse at 95% 0, #c4a46c20, transparent 60%),
+    repeating-linear-gradient(120deg, transparent 0 28px, #8d754908 29px, transparent 30px 58px),
+    linear-gradient(115deg, color-mix(in srgb, var(--chapter-tone) 14%, var(--edition-surface)), var(--edition-surface));
+}
+#app .guide-handbook .guide-chapter-number {
+  color: var(--chapter-tone); box-shadow: -3px 0 var(--chapter-tone);
+  background: color-mix(in srgb, var(--chapter-tone) 8%, var(--edition-surface));
+}
+#app .guide-handbook .guide-chapter-body { background: color-mix(in srgb, var(--chapter-tone) 6%, var(--edition-surface)); }
+#app .guide-handbook .guide-chapter .guide-card { background: color-mix(in srgb, var(--chapter-tone) 7%, var(--edition-surface)); }
+:root[data-theme="dark"] #app .guide-handbook .guide-chapter { --chapter-tone: #a9ccd0; }
+:root[data-theme="dark"] #app .guide-handbook .guide-chapter:nth-of-type(3n+2) { --chapter-tone: #c0cc9c; }
+:root[data-theme="dark"] #app .guide-handbook .guide-chapter:nth-of-type(3n) { --chapter-tone: #e1bb83; }
+@media (max-width: 350px) {
+  #app .guide-handbook > .atlas-page-heading p { max-width: 48%; }
+}
