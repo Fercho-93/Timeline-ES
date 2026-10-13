@@ -4,10 +4,10 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav {
   --nav-paper: #fbf3e2; --nav-paper-shade: #eee1c7;
   --nav-ink: #67502f; --nav-brass: #a17a3c; --nav-hairline: #b894596b;
   --nav-active: #284e54; --nav-gold: #ead19a;
-  position: fixed; left: 50%; right: auto; bottom: calc(9px + env(safe-area-inset-bottom));
-  width: min(calc(100% - 28px), 500px); max-width: 500px; min-height: 84px;
+  position: fixed; left: 50%; right: auto; bottom: 0;
+  width: min(calc(100% - 28px), 500px); max-width: 500px; min-height: calc(84px + env(safe-area-inset-bottom));
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch;
-  gap: 0; margin: 0; padding: 6px 9px 8px; overflow: visible;
+  gap: 0; margin: 0; padding: 6px 9px calc(8px + env(safe-area-inset-bottom)); overflow: visible;
   border: 1px solid var(--nav-brass); border-radius: 24px;
   background: radial-gradient(ellipse at 40% 0%, #fff9edb3, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade));
   box-shadow: inset 0 1px 0 #fff9e8, inset 0 -2px 0 #a17a3c24, 0 8px 22px #32261630, 0 2px 3px #3226161c;
@@ -80,13 +80,13 @@ html #app[data-screen][data-screen] :is(.enc-modal, .settings-modal, .rules):has
   html #app[data-screen][data-screen] .home-nav.atlas-nav { width: calc(100% - 20px); padding-inline: 5px; }
   html #app[data-screen][data-screen] .home-nav.atlas-nav button small { font-size: .74rem; }
 }
-/* El texto grande pasa a dos columnas en el flujo: conserva todos los nombres
-   y evita que una barra alta tape los controles de la pantalla. */
+/* Con texto grande conserva dos columnas y sigue anclada al borde inferior.
+   El contenido reserva la altura de ambas filas para quedar accesible al desplazar. */
 @media (max-width: 480px) {
   html:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen][data-screen] .home-nav.atlas-nav {
-    position: relative; left: auto; bottom: auto; width: 100%; max-width: none;
-    margin: 24px 0 0; transform: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 0;
   }
   html:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen][data-screen] .home-nav.atlas-nav button { min-height: 78px; }
   html:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen][data-screen] .home-nav.atlas-nav button small { font-size: 1rem; }
+  html:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen][data-screen] :is(.shell, .enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(220px + env(safe-area-inset-bottom)); }
 }
