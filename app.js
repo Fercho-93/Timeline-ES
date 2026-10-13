@@ -2036,7 +2036,7 @@
         <header class="atlas-page-heading"><div class="eyebrow">Cartografía personal · Continuum</div><h1 data-focus tabindex="-1">Tu Atlas</h1><p>Un mapa de lo que has descubierto y de los caminos que aún puedes recorrer.</p></header>
         ${atlasIdentidad()}
         <nav class="atlas-chart" aria-label="Mapa de tu Atlas">
-          <div class="atlas-chart-heading"><span>MAPA DE TU VIAJE</span><small>Elige un destino para explorar</small></div>
+          <div class="atlas-chart-heading"><span>MAPA DE TU VIAJE</span><small>Pon rumbo a nuevos descubrimientos</small></div>
           <svg class="atlas-chart-route" viewBox="0 0 640 440" preserveAspectRatio="none" aria-hidden="true"><path d="M96 120 C192 92 200 210 306 168 S435 66 528 135 S452 252 356 292 S183 266 116 357 S365 413 518 366" /></svg>
           <span class="atlas-chart-compass" aria-hidden="true">✦<small>N</small></span>
           <a class="atlas-chart-stop atlas-stop-collection" href="#atlas-collection"><i aria-hidden="true">01</i><b>Las láminas</b><small>${descubiertas} descubiertas</small></a>
@@ -2044,6 +2044,7 @@
           <a class="atlas-chart-stop atlas-stop-duels" href="#atlas-duels"><i aria-hidden="true">03</i><b>Tus duelos</b><small>Cara a cara</small></a>
           <a class="atlas-chart-stop atlas-stop-journey" href="#atlas-journey"><i aria-hidden="true">04</i><b>Tu recorrido</b><small>${resumen.games} ${resumen.games === 1 ? "partida" : "partidas"}</small></a>
           <a class="atlas-chart-stop atlas-stop-achievements" href="#atlas-achievements"><i aria-hidden="true">05</i><b>Los logros</b><small>${resumen.unlocked} de ${resumen.total}</small></a>
+          <span class="atlas-chart-landfall" aria-hidden="true">Rumbo al Nuevo Mundo</span>
           <span class="atlas-chart-seal" aria-hidden="true">C<br><small>CONTINUUM</small></span>
         </nav>
         <div class="atlas-territories">
