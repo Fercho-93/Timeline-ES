@@ -132,7 +132,7 @@ console.log("\nLas reglas se adaptan al mazo");
   ok("el ensayo no modifica partidas ni progreso", JSON.stringify({...w.localStorage}) === saved);
   ok("el ejemplo incluye tres ilustraciones reales", w.document.querySelectorAll('.guide-practice img').length === 3);
   const chapters = [...w.document.querySelectorAll('[data-guide-chapter]')];
-  ok("seis capítulos cubren todas las reglas sin desplegarlas de golpe", chapters.length === 6 && chapters.every(chapter => !chapter.open));
+  ok("siete capítulos cubren todas las reglas sin desplegarlas de golpe", chapters.length === 7 && chapters.every(chapter => !chapter.open));
   chapters[0].open = true;
   await respira();
   chapters[1].open = true;

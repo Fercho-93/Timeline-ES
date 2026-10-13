@@ -1291,6 +1291,10 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .guide-handbook .guide-card { background: var(--edition-paper); }
 .guide-handbook .guide-card small { font-size: .78rem; }
 .guide-handbook .guide-levels > div { grid-template-columns: minmax(65px,.6fr) minmax(0,1.4fr); background: var(--edition-paper); }
+.guide-glossary { display: grid; grid-template-columns: minmax(84px,.7fr) minmax(0,1.6fr); gap: 1px; margin: 0; font-family: var(--ui-font); border: 1px solid var(--edition-line); border-radius: 9px; overflow: hidden; background: var(--edition-line); font-size: .8rem; }
+.guide-glossary dt, .guide-glossary dd { margin: 0; padding: 9px 12px; background: var(--edition-paper); line-height: 1.4; }
+.guide-glossary dt { color: var(--edition-ink); font-family: var(--font-display); font-weight: 600; }
+.guide-glossary dd { color: var(--edition-muted); }
 .guide-pulse-table { width: 100%; border-collapse: collapse; font: .75rem/1.45 var(--ui-font); }
 .guide-pulse-table caption { text-align: left; padding: 16px 0 8px; font-weight: 700; color: var(--edition-ink); }
 .guide-pulse-table th, .guide-pulse-table td { padding: 10px 7px; border-bottom: 1px solid var(--edition-line); text-align: left; }
