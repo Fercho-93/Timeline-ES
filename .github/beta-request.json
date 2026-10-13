@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 677,
+  "cache": 688,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Sonidos del menú de madera suave: un toque al cambiar de pantalla, uno más grave al volver atrás y dos al desplegar o plegar una colección"
+  "reason": "Retos rápidos en solitario con mazos del día y partida sorpresa bien diferenciados, colección de cartas descubiertas, ranking de cartas, y el nuevo ranking, Atlas náutico y barra de navegación de marfil y latón"
 }
