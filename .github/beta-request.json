@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 691,
+  "cache": 696,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Barra de navegación inferior realmente más baja, toque de sonido en todos los botones, sonido y vibración en todos los modos y plantarse con sonido propio en Retos rápidos"
+  "reason": "Barra inferior estable al desplazar (sin rebote elástico y centrada sin medio píxel), volver suena siempre igual, la escala del menú sube de grave a agudo y acceso al último mazo con carátula"
 }
