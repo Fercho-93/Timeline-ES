@@ -12,9 +12,17 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav {
   border: 1px solid var(--nav-brass); border-radius: 24px;
   background: radial-gradient(ellipse at 40% 0%, #fff9edb3, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade));
   box-shadow: inset 0 1px 0 #fff9e8, inset 0 -2px 0 #a17a3c24, 0 8px 22px #32261630, 0 2px 3px #3226161c;
-  -webkit-backdrop-filter: none; backdrop-filter: none; transform: translateX(-50%);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  /* Capa propia y fija para el compositor: al desplazar la pantalla la barra no se recoloca en el hilo
+     principal y no tiembla (en iPhone, con inercia o al rebotar, una barra fija sin capa propia se
+     retrasa un fotograma respecto al contenido). */
+  transform: translate3d(-50%, 0, 0); -webkit-transform: translate3d(-50%, 0, 0);
+  will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  contain: layout style; isolation: isolate;
   z-index: 15;
 }
+/* Sin rebote al tirar de la pantalla más allá de su borde: la barra fija se queda quieta. */
+html, body { overscroll-behavior-y: none; }
 html #app[data-screen][data-screen] .home-nav.atlas-nav::before {
   content: ""; position: absolute; inset: 4px; border: 1px solid var(--nav-hairline);
   border-radius: 19px; background: none; box-shadow: none; pointer-events: none;
