@@ -1256,8 +1256,11 @@ service cloud.firestore {
       }
       function validFinalStart() {
         let next = request.resource.data;
-        return (isCurrent() || isHost()) && before().status == 'playing' && before().phase == 'reveal' && roundEnds()
-          && changed().hasOnly(['phase','final','reveal','version','updatedAt'])
+        // La final se abre al cerrar la vuelta con una jugada o, si el anfitrión salta el
+        // último turno, con ese salto.
+        return before().status == 'playing' && roundEnds()
+          && (((isCurrent() || isHost()) && before().phase == 'reveal' && changed().hasOnly(['phase','final','reveal','version','updatedAt']))
+            || (isHost() && before().phase in ['turn','pulse'] && changed().hasOnly(['phase','final','reveal','discard','pulseTurn','version','updatedAt']) && skipCleanup()))
           && next.phase == 'final' && next.reveal == null && finalShape(next.final)
           && next.final.round == before().get('finalRoundOffset',0)+1 && next.final.players == emptyPlayers(before())
           && next.final.used == [next.final.cardId] && bumped();
@@ -1400,21 +1403,34 @@ service cloud.firestore {
       }
 
       // El anfitrión salta el turno de quien se ha desconectado.
+      // Saltar un Pulso a medias lo cancela: la carta del reto va al descarte.
+      function skipCleanup() {
+        return request.resource.data.discard == (resource.data.phase == 'pulse' ? resource.data.discard.concat([resource.data.pulseTurn.cardId]) : resource.data.discard)
+          && request.resource.data.get('pulseTurn', null) == (resource.data.phase == 'pulse' ? null : resource.data.get('pulseTurn', null));
+      }
       function validSkip() {
         return isHost()
           && resource.data.phase != 'tiebreak'
           && resource.data.status == 'playing'
-          && changed().hasOnly(['ghost', 'discard', 'pulseTurn', 'current', 'turnsInRound', 'round', 'phase', 'reveal',
-                                'turnStartedAt', 'version', 'updatedAt'])
-          && request.resource.data.phase == 'turn'
           && request.resource.data.reveal == null
-          && request.resource.data.current == (resource.data.current + 1) % resource.data.playerOrder.size()
-          && request.resource.data.turnsInRound == (roundEnds() ? 0 : resource.data.turnsInRound + 1)
-          && request.resource.data.round == (roundEnds() ? resource.data.round + 1 : resource.data.round)
-          && request.resource.data.discard == (resource.data.phase == 'pulse' ? resource.data.discard.concat([resource.data.pulseTurn.cardId]) : resource.data.discard)
-          && request.resource.data.get('pulseTurn', null) == (resource.data.phase == 'pulse' ? null : resource.data.get('pulseTurn', null))
-          // Optativo por compatibilidad con clientes sin actualizar; ver `validStart`.
-          && (!('turnStartedAt' in request.resource.data) || request.resource.data.turnStartedAt is timestamp)
+          && skipCleanup()
+          // Si el turno saltado cierra la vuelta y una sola persona se ha quedado sin
+          // cartas, gana igual que si se hubiera cerrado con una jugada.
+          && (request.resource.data.status == 'ended'
+            ? (changed().hasOnly(['status', 'phase', 'winner', 'winners', 'reveal', 'discard', 'pulseTurn', 'version', 'updatedAt'])
+              && request.resource.data.phase == 'finished'
+              && roundEnds()
+              && request.resource.data.winner in resource.data.playerOrder
+              && resource.data.players[request.resource.data.winner].hand.size() == 0
+              && validWinners(resource.data, request.resource.data))
+            : (changed().hasOnly(['ghost', 'discard', 'pulseTurn', 'current', 'turnsInRound', 'round', 'phase', 'reveal',
+                                  'turnStartedAt', 'version', 'updatedAt'])
+              && request.resource.data.phase == 'turn'
+              && request.resource.data.current == (resource.data.current + 1) % resource.data.playerOrder.size()
+              && request.resource.data.turnsInRound == (roundEnds() ? 0 : resource.data.turnsInRound + 1)
+              && request.resource.data.round == (roundEnds() ? resource.data.round + 1 : resource.data.round)
+              // Optativo por compatibilidad con clientes sin actualizar; ver `validStart`.
+              && (!('turnStartedAt' in request.resource.data) || request.resource.data.turnStartedAt is timestamp)))
           && bumped();
       }
 

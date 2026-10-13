@@ -1814,12 +1814,26 @@ async function skipTurn(expectedVersion = null) {
       const data = snapshot.data();
       if (data.hostUid !== user.uid || data.status !== "playing") throw new Error("NOT_ALLOWED");
       if (expectedVersion !== null && (data.version !== expectedVersion || data.phase !== "turn")) return;
+      const roundEnds = data.turnsInRound + 1 >= data.playerOrder.length;
+      const cleanup = data.phase === "pulse" ? { discard: [...data.discard, data.pulseTurn.cardId], pulseTurn: null } : {};
+      // Saltar el último turno de la vuelta también la cierra: quien se haya quedado sin
+      // cartas gana, o se va a la final, igual que en `finishTurn`.
+      if (roundEnds) {
+        const {empty} = CT.Engine.roundOutcome(data.playerOrder, data.players, data.deck.length + (cleanup.discard || data.discard).length);
+        if (empty.length === 1) {
+          transaction.update(roomRef, { ...cleanup, status: "ended", phase: "finished", winner: empty[0], winners: empty, reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
+          return;
+        }
+        if (empty.length > 1) {
+          transaction.update(roomRef, { ...cleanup, phase: 'final', final: CT.Final.create(data.mode, empty, data.finalRoundOffset ? {round:data.finalRoundOffset,used:[]} : null, data.timeline), reveal: null, version: data.version + 1, updatedAt: serverTimestamp() });
+          return;
+        }
+      }
       const ghost = data.ghost ? structuredClone(data.ghost) : null;
       CT.Ghost.advance(ghost, data.playerOrder[data.current], data.playerOrder);
-      const roundEnds = data.turnsInRound + 1 >= data.playerOrder.length;
       transaction.update(roomRef, {
         ...(ghost ? { ghost } : {}),
-        ...(data.phase === "pulse" ? { discard: [...data.discard, data.pulseTurn.cardId], pulseTurn: null } : {}),
+        ...cleanup,
         current: (data.current + 1) % data.playerOrder.length,
         turnsInRound: roundEnds ? 0 : data.turnsInRound + 1,
         round: roundEnds ? data.round + 1 : data.round,

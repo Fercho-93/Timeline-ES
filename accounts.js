@@ -342,7 +342,7 @@ async function prepareApple() {
 }
 function appleControls() {
   const signed = appleUser(identity);
-  if (!signed && !appleNativeEnabled) return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>Juegas como invitado: tu progreso queda en este móvil.</p><p id="account-auth-message" role="status"></p></section>`;
+  if (!signed && !appleNativeEnabled) return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>Juegas como invitado, sin cuenta.</p><p id="account-auth-message" role="status"></p></section>`;
   return `<section class="account-signin" aria-label="Acceso a tu cuenta"><p>${signed ? 'Has entrado con tu cuenta de Apple.' : 'Con Apple conservas tu progreso si cambias de móvil.'}</p>
     ${signed ? '<button class="btn btn-secondary" data-account-action="signout">Cerrar sesión de Apple</button>' : '<button class="btn account-apple" data-account-action="apple">Continuar con Apple</button>'}
     <p id="apple-account-note">${signed ? 'Puedes cerrar sesión cuando quieras; tu progreso sigue en tu cuenta. Para borrarla del todo, usa «Eliminar».' : 'El juego no pide a Apple tu nombre ni tu correo: solo guarda el identificador que Apple asigna a esta app.'}</p>

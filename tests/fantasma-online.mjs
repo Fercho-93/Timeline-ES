@@ -82,6 +82,26 @@ try {
  // Ganar conservando el poder y desempatar con un robo que lo entrega.
  const winning=fixture();winning.phase='reveal';winning.turnsInRound=2;winning.players[A].hand=[];winning.reveal={cardId:6,correct:true,playerUid:A,playerName:'Ana'};
  await seed(winning);await clients[0].call('finishTurn');assert.equal((await snapshot()).winner,A);
+ // Saltar el último turno de la vuelta también la cierra: gana quien se quedó sin cartas…
+ const skipWin=fixture();skipWin.current=2;skipWin.turnsInRound=2;skipWin.players[A].hand=[];
+ await seed(skipWin);await clients[0].call('skipTurn');s=await snapshot();
+ assert.equal(s.status,'ended');assert.equal(s.winner,A);assert.deepEqual(s.winners,[A]);
+ // …aunque el turno saltado fuera un Pulso a medias, cuya carta va al descarte…
+ const skipPulse=fixture();skipPulse.current=2;skipPulse.turnsInRound=2;skipPulse.players[A].hand=[];skipPulse.players[C].pulseUsed=true;skipPulse.phase='pulse';skipPulse.pulseTurn={targetUid:B,cardId:15,giftId:12};skipPulse.deck=[16,17,18];
+ await seed(skipPulse);await clients[0].call('skipTurn');s=await snapshot();
+ assert.equal(s.winner,A);assert.equal(s.pulseTurn,null);assert.deepEqual(s.discard,[15]);
+ // …y con varias personas sin cartas se va a la final.
+ const skipTie=clone(skipWin);skipTie.players[B].hand=[];
+ await seed(skipTie);await clients[0].call('skipTurn');s=await snapshot();
+ assert.equal(s.phase,'final');assert.deepEqual(s.final.players,[A,B]);
+ // Nadie más puede saltar para cerrar, ni se puede dar la victoria a quien aún tiene cartas
+ // o a mitad de vuelta.
+ await seed(skipWin);
+ await assertFails(updateDoc(ref(B),{status:'ended',phase:'finished',winner:A,winners:[A],version:2,updatedAt:serverTimestamp()}));
+ await assertFails(updateDoc(ref(A),{status:'ended',phase:'finished',winner:B,winners:[B],version:2,updatedAt:serverTimestamp()}));
+ const midRound=clone(skipWin);midRound.current=1;midRound.turnsInRound=1;await seed(midRound);
+ await assertFails(updateDoc(ref(A),{status:'ended',phase:'finished',winner:A,winners:[A],version:2,updatedAt:serverTimestamp()}));
+ await assertFails(updateDoc(ref(A),{phase:'final',final:{round:1,players:[A,B],cardId:20,target:1900,submitted:[],used:[20]},version:2,updatedAt:serverTimestamp()}));
  // El empate abre la final secreta sin repartir cartas ni poderes.
  const tie=fixture();tie.phase='reveal';tie.current=2;tie.turnsInRound=2;tie.players[A].hand=[];tie.players[B].hand=[];tie.reveal={cardId:12,correct:true,playerUid:C,playerName:'Carlos'};
  await seed(tie);await clients[2].call('finishTurn');s=await snapshot();

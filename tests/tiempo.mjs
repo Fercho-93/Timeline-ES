@@ -79,7 +79,8 @@ console.log('\nJugar solo: agotar el plazo cuesta una vida');
   sin.close();
 }
 
-console.log('\nUn solo móvil: agotar el turno es una jugada fallada');
+console.log('\nUn solo móvil: agotar el tiempo hace perder el turno');
+const PARTIDA_LOCAL = 'hilo-game-history-v1';
 {
   const w = boot();
   abreMazo(w, 'local');
@@ -90,9 +91,15 @@ console.log('\nUn solo móvil: agotar el turno es una jugada fallada');
   click(w, '[data-action="starter-start"]');
   click(w, '[data-action="ready"]');
   ok('el turno enseña la cuenta atrás', !!$(w, '.reloj-bar'));
+  const antes = JSON.parse(w.localStorage.getItem(PARTIDA_LOCAL));
   w.adelanta(21000); await sleep(350);
-  ok('al agotarse se resuelve el turno como fallo por tiempo', /Se acabó el tiempo/.test(w.document.body.textContent) && !!$(w, '[data-action="finish-turn"]'));
-  ok('mientras se ve el resultado el reloj no sigue', !$(w, '.reloj-bar'));
+  ok('al agotarse se pierde el turno', /Se acabó el tiempo/.test(w.document.body.textContent) && /pierde el turno/.test(w.document.body.textContent) && !!$(w, '[data-action="finish-turn"]'));
+  ok('mientras se ve el aviso el reloj no sigue', !$(w, '.reloj-bar'));
+  const despues = JSON.parse(w.localStorage.getItem(PARTIDA_LOCAL));
+  ok('no se coloca ni se roba ninguna carta', JSON.stringify(despues.players.map(p => p.hand)) === JSON.stringify(antes.players.map(p => p.hand)) && JSON.stringify(despues.timeline) === JSON.stringify(antes.timeline) && JSON.stringify(despues.deck) === JSON.stringify(antes.deck) && !despues.failed?.length);
+  click(w, '[data-action="finish-turn"]');
+  const siguiente = JSON.parse(w.localStorage.getItem(PARTIDA_LOCAL));
+  ok('y el turno pasa a la siguiente persona', siguiente.current === (antes.current + 1) % antes.players.length && !siguiente.pendingResult);
   w.close();
 }
 

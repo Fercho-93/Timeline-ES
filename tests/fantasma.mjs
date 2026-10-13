@@ -236,6 +236,7 @@ for (const difficulty of ['easy','normal','hard','expert']) {
       const cards=Object.values(ct.MODES).flatMap(m=>m.cards),byId=new Map(cards.map(c=>[c.id,c]));
       const board=[...w.document.querySelectorAll('.timeline-card')].map(el=>byId.get(Number(el.dataset.id)));
       const card=byId.get(id);const mode=Object.values(ct.MODES).find(m=>m.key!=='mixed'&&m.cards.some(c=>c.id===id)).key;
+      if(i===0)assert.match(w.document.querySelector('.ghost-banner').textContent,ct.mode(mode).axis==='time'?/Fechas ocultas/:/Cifras ocultas/,'el aviso nombra lo que se oculta en '+mode);
       const at=ct.correctIndex(mode,board,card);
       w.document.querySelectorAll('[data-action="solo-place"]')[at].click();click(w,'confirm-place');click(w,'solo-next');
       await null;
