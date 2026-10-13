@@ -102,17 +102,23 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
     // Los botones del menú suenan cada vez más agudos al ir avanzando, y volver atrás suena siempre igual
     // (el toque grave de Atlas) y solo en los botones de volver.
     {
-      await new Promise(r=>w.setTimeout(r,11000));
+      await new Promise(r=>w.setTimeout(r,1000));
       const host=w.document.createElement('div');host.id='menu-prueba';w.document.body.append(host);
-      host.innerHTML='<button id="b1">Uno</button><button id="b2">Dos</button><button id="b3">Tres</button><button id="b4">Cuatro</button><button id="v1" class="icon-btn atlas-back" aria-label="Volver a la pantalla anterior">‹</button><button id="v2" aria-label="Volver">‹</button><button id="v3" data-action="ui-back">‹</button>';
+      host.innerHTML='<button id="b1">Uno</button><button id="b2">Dos</button><button id="b3">Tres</button><button id="b4">Cuatro</button><button id="v1" class="icon-btn atlas-back" aria-label="Volver a la pantalla anterior">‹</button><button id="v2" aria-label="Volver">‹</button><button id="v3" data-action="ui-back">‹</button><button id="inicio" data-action="home-top">Inicio</button>';
       const toque=async id=>{graves.length=0;host.querySelector(id).click();await new Promise(r=>w.setTimeout(r,320));return graves[0];};
+      // Inicio devuelve la escala al grave; de ahí, cada botón sube un escalón.
+      const base=await toque('#inicio');
       const subida=[];
       for(const id of ['#b1','#b2','#b3','#b4'])subida.push(await toque(id));
+      assert.ok(subida[0]>base,'el primer botón tras Inicio sube un escalón');
       assert.ok(subida.every(Number.isFinite)&&subida.every((f,i)=>i===0||f>subida[i-1]*1.03),`cada botón suena más agudo que el anterior: ${subida.map(f=>Math.round(f))}`);
       const atras=[];
       for(const id of ['#v1','#v2','#v3'])atras.push(await toque(id));
       assert.ok(atras.every(f=>Math.abs(f-atras[0])<atras[0]*.01),`volver suena siempre igual: ${atras.map(f=>Math.round(f))}`);
       assert.ok(atras[0]<subida[0],'y es más grave que los toques de avanzar');
+      // Volver tres veces bajó tres escalones: el siguiente botón retoma desde ahí, no desde el grave.
+      const retoma=await toque('#b1');
+      assert.ok(retoma>base*1.03&&retoma<subida[3],`tras volver, el menú sigue en su escalón: ${Math.round(base)} < ${Math.round(retoma)} < ${Math.round(subida[3])}`);
       // Una pantalla que cambia "hacia atrás" sin pulsar volver no usa el sonido de volver.
       await new Promise(r=>w.setTimeout(r,1700));
       graves.length=0;CT.Effects.transition('back');await new Promise(r=>w.setTimeout(r,50));

@@ -235,14 +235,12 @@
   };
 
   // La escala del menú: cada botón que se pulsa para avanzar suena un escalón más agudo que el anterior
-  // (de la escala pentatónica, dos octavas) y se queda arriba; volver baja un escalón. Si pasan
-  // ESCALA_REPOSO ms sin tocar nada, empieza de nuevo por el grave.
-  const BASE_MENU = 55, ESCALON_MAX = 9, ESCALA_REPOSO = 10000;
-  let escalon = 0, ultimoEscalon = -Infinity;
+  // (de la escala pentatónica, dos octavas) y se queda arriba; volver baja un escalón y el botón de
+  // Inicio la devuelve al grave. No se reinicia con el tiempo: leer una pantalla sin tocar nada no
+  // debe devolver los toques al grave.
+  const BASE_MENU = 55, ESCALON_MAX = 9;
+  let escalon = 0;
   function sube() {
-    const t = ahora();
-    if (t - ultimoEscalon > ESCALA_REPOSO) escalon = 0;
-    ultimoEscalon = t;
     const actual = escalon;
     escalon = Math.min(ESCALON_MAX, escalon + 1);
     return actual;
@@ -344,6 +342,7 @@
     suena('vuelta');
   }
   document.addEventListener('click', event => {
+    if (event.target.closest?.('[data-action="home-top"], [data-action="home"]')) escalon = 0;
     const el = event.target.closest?.(VOLVER);
     if (el && !el.disabled && el.getAttribute('aria-disabled') !== 'true') atras();
   }, true);

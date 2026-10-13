@@ -33,7 +33,7 @@ Los sonidos de acción usan texturas suaves de papel y madera. Se activan con
 | Plantarse en Retos rápidos | Tres notas de madera que suben y vibración media | `effects.js`: `bank` |
 | Resultado de quién empieza | Dos golpes suaves y vibración media, una vez por sorteo | `effects.js`: `starterResult` |
 | Botón de volver (flecha de la cabecera, «Volver», gesto de deslizar) | Siempre el mismo toque grave de madera, el de Atlas; solo suena en estos botones | `sonidos.js`: `atras` |
-| Cualquier botón del menú al avanzar | Toque de madera que sube un escalón de la escala cada vez (dos octavas); volver baja uno y, tras 10 s sin tocar, vuelve al grave | `sonidos.js`: `sube`, `pagina` |
+| Cualquier botón del menú al avanzar | Toque de madera que sube un escalón de la escala cada vez (dos octavas); volver baja uno e Inicio la devuelve al grave (no se reinicia con el tiempo) | `sonidos.js`: `sube`, `pagina` |
 | Cualquier otro botón, enlace o pestaña sin sonido propio | Toque de madera de menú, 90 ms después si nada más ha sonado | `sonidos.js`: toque genérico |
 | Portada del mazo en Retos rápidos y elegir modo en solitario | Toque de madera | `quick-challenges.js` |
 
