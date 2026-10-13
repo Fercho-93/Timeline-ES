@@ -116,7 +116,7 @@
   const SHORT_LENGTHS=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga']];
   const LONG_LENGTHS=[...SHORT_LENGTHS,[10,'Maratón'],[15,'Gran maratón'],[20,'Resistencia']];
   // Se enseñan las tres duraciones de siempre (1, 3 y 5); las largas quedan tras «Más duraciones».
-  function lengthChips(id,options,label,attrs='',illustrated=false) {
+  function lengthChips(id,options,label,attrs='',illustrated=true) {
     const art=n=> {
       const layers=n===1?1:n===3?3:5;
       return `<svg class="quick-duration-art" viewBox="0 0 100 76" aria-hidden="true" focusable="false">${Array.from({length:layers},(_,j)=>{

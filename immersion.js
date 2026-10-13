@@ -631,6 +631,49 @@
     scheduleCardText();
   }, {passive: true});
 
+  // Acabado común de los formularios: solo decoración; conserva los controles,
+  // sus nodos, identificadores y eventos, y no interviene en partidas ni esperas.
+  function decorateSetup(container, screen) {
+    const screens = new Set(['setup', 'solo-home', 'duel-home', 'competition-menu',
+      'competition-friends', 'friends-join', 'hub-online-create', 'online-entry',
+      'local-entrada', 'local-unirse', 'quick-challenges']);
+    if (!screens.has(screen)) return;
+    const candidates = container.querySelectorAll('.setup-section .panel, .online-entry-grid > .online-form, .public-create');
+    candidates.forEach(panel => {
+      if (panel.closest('.quick-free-setup') || panel.classList.contains('setup-art-panel') || panel.matches('details:not(.solo-fold)')) return;
+      if (!panel.matches('.online-form, .solo-panel-maraton, .solo-fold') && !panel.querySelector('input:not([type="hidden"]), select, textarea:not([hidden]), .segmented, .setup-block')) return;
+      panel.classList.add('setup-art-panel');
+      const quick = !!panel.closest('.quick-shell');
+      const competition = screen.startsWith('competition');
+      const alone = screen === 'solo-home';
+      const joining = screen === 'friends-join' || screen === 'local-unirse' || panel.matches('[data-online-form="join"], [data-local-form="join-offer"]');
+      const art = quick ? 'menu-quick.webp' : competition ? 'competition-engraving.webp' : alone ? 'menu-collections.webp' : screen.startsWith('local-') ? 'menu-wifi.webp' : 'menu-private.webp';
+      const kicker = competition ? 'Cada ronda cuenta' : alone ? 'A tu ritmo' : joining ? 'Tu sitio en la mesa' : 'La mesa os espera';
+      panel.style.setProperty('--setup-illustration', `url("assets/${art}")`);
+      panel.querySelectorAll('.tiempo-field > .field-label').forEach(label => {
+        if (label.querySelector('.setup-time-icon')) return;
+        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('class', 'setup-time-icon'); icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('aria-hidden', 'true'); icon.setAttribute('focusable', 'false');
+        icon.innerHTML = '<circle cx="12" cy="13" r="8"/><path d="M12 8v5l4 2M9 2h6M12 2v3"/>';
+        label.prepend(icon);
+      });
+      if (panel.matches('.solo-fold')) return; // el desplegable ya conserva su cabecera
+      let head = panel.querySelector(':scope > .solo-panel-head');
+      const heading = head?.querySelector('h3') || panel.querySelector(':scope > h3');
+      if (!head) { head = document.createElement('div'); head.className = 'solo-panel-head'; panel.prepend(head); }
+      head.classList.add('setup-art-head');
+      const image = document.createElement('img');
+      image.className = 'setup-art-image'; image.src = `assets/${art}`;
+      image.alt = ''; image.setAttribute('aria-hidden', 'true'); image.decoding = 'async';
+      const copy = document.createElement('div'); copy.className = 'setup-art-copy';
+      const label = document.createElement('span'); label.className = 'setup-art-kicker'; label.textContent = kicker;
+      const title = heading || document.createElement('h3');
+      if (!heading) title.textContent = joining ? 'Únete a la partida' : screen === 'hub-online-create' ? 'Prepara tu mesa' : screen === 'setup' ? 'Prepara la partida' : 'Elegid vuestra partida';
+      copy.append(label, title); head.append(image, copy);
+    });
+  }
+
   function mount(container, screen) {
     handOff(container, screen);
     if (['solo-end', 'winner', 'online-winner', 'comp-end'].includes(screen)) atlasFinal(container);
@@ -641,6 +684,7 @@
     // golpe a lo que se acababa de enseñar. Eso es lo que se veía como una pantalla que
     // se abre y se cierra sola.
     if (screen === 'solo-home') foldSoloPanels(container);
+    decorateSetup(container, screen);
 
     surfaceNav.clear();
     const inGame = playing.has(screen);
