@@ -5390,3 +5390,73 @@ html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-
   position: absolute; inset: 0; display: block; width: 100%; height: 100%; min-height: 0; padding: 0; margin: 0; background: var(--cardback-fill);
 }
 #app .quick-free-setup .solo-panel-head { display: block; }
+
+/* v678: preparación ilustrada de retos rápidos. Los ajustes conservan sus controles. */
+#app .quick-free-setup .solo-panel { overflow: hidden; }
+#app .quick-free-setup .quick-preparation-head {
+  position: relative; isolation: isolate; min-height: 126px; display: flex;
+  align-items: center; margin: -20px -20px 20px; padding: 25px 22px 22px;
+  border-bottom: 1px solid var(--edition-line);
+  background: linear-gradient(125deg, #b8976012, transparent), var(--edition-surface);
+}
+#app .quick-preparation-art {
+  position: absolute; z-index: -1; inset: 0 0 0 auto; width: 48%; height: 100%;
+  object-fit: cover; object-position: 80% center; opacity: .82;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 65%);
+  mask-image: linear-gradient(90deg, transparent, #000 65%);
+}
+#app .quick-preparation-copy { width: 78%; position: relative; }
+#app .quick-free-setup .quick-preparation-head h3 { margin: 0; max-width: 260px; font: 600 clamp(1.45rem, 6vw, 2rem)/1.12 var(--font-display); text-wrap: balance; }
+#app .quick-preparation-motto { display: block; margin-top: 10px; color: var(--edition-muted); font: italic .78rem/1.3 var(--font-display); }
+#app .quick-free-setup .solo-panel > p:not(#quick-error) { font-size: .85rem; line-height: 1.5; }
+#app .quick-free-setup .quick-length { gap: 10px; }
+#app .quick-free-setup .quick-length-chip {
+  --quick-card-paper: #f3e7cf;
+  gap: 2px; min-height: 160px; padding: 12px 5px 11px;
+  border-radius: 15px; background: linear-gradient(155deg, #fffaf065, #b8976014), var(--edition-surface);
+  box-shadow: inset 0 0 0 4px #b897600e, inset 0 0 0 5px #b8976024, 0 5px 10px #6343231c;
+}
+#app .quick-free-setup .quick-duration-art { width: min(100%, 92px); height: 68px; color: #917043; filter: drop-shadow(0 3px 2px #63432330); }
+#app .quick-free-setup .quick-length-chip b { font-size: 1.75rem; color: var(--edition-ink); }
+#app .quick-free-setup .quick-length-chip > span { letter-spacing: .12em; font-size: .64rem; }
+#app .quick-free-setup .quick-length-chip small { margin-top: 6px; font-size: .62rem; line-height: 1.3; }
+#app .quick-free-setup .quick-length-chip.is-selected {
+  --quick-card-paper: #edd1a5;
+  border-color: #955338; background: linear-gradient(155deg, #e3b56a38, #b66b3b16), var(--edition-surface);
+  box-shadow: inset 0 0 0 2px #955338, inset 0 0 0 5px #fff7e755, 0 8px 16px #6343232c;
+}
+#app .quick-free-setup .quick-length-chip.is-selected .quick-duration-art { color: #965134; }
+#app .quick-free-setup .quick-length-chip.is-selected::after {
+  display: grid; place-items: center; top: 7px; right: 7px; width: 18px; height: 18px;
+  border-radius: 50%; color: #fff5dd; background: #955338; font-size: .65rem;
+}
+#app .quick-free-setup .quick-length-chip.quick-length-all { min-height: 76px; padding: 8px; gap: 8px; }
+#app .quick-free-setup .quick-length-all .quick-duration-art { width: 56px; height: 52px; }
+#app .quick-free-setup .quick-length-all b { font-size: 1.3rem; }
+#app .quick-free-setup .quick-length-all small { max-width: 90px; }
+#app .quick-free-setup .quick-length-more { display: flex; justify-content: center; align-items: center; gap: 10px; border-style: dashed; background: transparent; }
+#app .quick-free-setup .quick-length-more::before { content: "◇"; color: var(--edition-brass); font-size: 1.1rem; }
+#app .quick-free-setup .quick-length-more::after { content: "⌄"; color: var(--edition-brass); }
+#app .quick-free-setup .quick-length-more[aria-expanded="true"]::after { content: "⌃"; }
+#app .quick-pace-caption { display: flex; align-items: center; gap: 10px; margin: 22px 0 4px; padding-top: 17px; border-top: 1px solid var(--edition-line); color: var(--edition-brass); }
+#app .quick-pace-caption svg { width: 35px; height: 35px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.4; filter: drop-shadow(0 2px 1px #63432320); }
+#app .quick-pace-caption span { font: 600 1.15rem/1.2 var(--font-display); color: var(--edition-ink); }
+#app .quick-free-setup .solo-panel .tiempo-field { margin-top: 9px; }
+#app .quick-free-setup .tiempo-segmented .segmented-option { min-height: 55px; box-shadow: inset 0 0 0 3px #b8976012, 0 3px 7px #63432312; }
+#app .quick-free-setup .tiempo-segmented .segmented-option.is-on { border-color: #955338; color: #86442d; box-shadow: inset 0 0 0 1px #955338, 0 4px 8px #63432320; }
+#app .quick-free-setup [data-quick="start-free"] { position: relative; isolation: isolate; min-height: 56px; margin-top: 25px; border-radius: 14px; font-size: 1rem; background: linear-gradient(135deg, #a36846, #783c2c); box-shadow: inset 0 0 0 3px #fff3d51a, inset 0 0 0 4px #e0b47755, 0 6px 13px #63432330; }
+#app .quick-free-setup [data-quick="start-free"] > span { display: inline-grid; place-items: center; margin-left: 12px; width: 28px; height: 28px; border: 1px solid #f5dbaf60; border-radius: 50%; }
+:root[data-theme="dark"] #app .quick-free-setup .quick-length-chip { --quick-card-paper: #3d2e1f; }
+:root[data-theme="dark"] #app .quick-free-setup .quick-length-chip.is-selected { --quick-card-paper: #725234; }
+:root[data-theme="dark"] #app .quick-free-setup .quick-duration-art { color: #d0aa71; }
+:root[data-theme="dark"] #app .quick-free-setup .quick-length-chip.is-selected .quick-duration-art { color: #efbc87; }
+@media (max-width: 370px) {
+  #app .quick-free-setup .quick-length { gap: 7px; }
+  #app .quick-free-setup .quick-length-chip { padding-inline: 4px; min-height: 150px; }
+  #app .quick-free-setup .quick-duration-art { height: 60px; }
+  #app .quick-free-setup .quick-preparation-head { padding-inline: 18px; }
+  #app .quick-preparation-copy { width: 85%; }
+  #app .quick-free-setup .quick-length-chip.quick-length-all { grid-auto-flow: row; grid-template-columns: 56px 1fr; text-align: left; }
+  #app .quick-free-setup .quick-length-all .quick-duration-art { grid-row: 1 / span 3; }
+  #app .quick-free-setup .quick-length-all small { max-width: none; margin: 0; }
+}

@@ -116,8 +116,15 @@
   const SHORT_LENGTHS=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga']];
   const LONG_LENGTHS=[...SHORT_LENGTHS,[10,'Maratón'],[15,'Gran maratón'],[20,'Resistencia']];
   // Se enseñan las tres duraciones de siempre (1, 3 y 5); las largas quedan tras «Más duraciones».
-  function lengthChips(id,options,label,attrs='') {
-    const chip=([n,text],i)=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}${text==='Todo el catálogo'?' quick-length-all':''}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"${i>=3?' data-length-extra hidden':''}><b>${n}</b><span>${n===1?'reto':'retos'}</span><small>${text}</small></button>`;
+  function lengthChips(id,options,label,attrs='',illustrated=false) {
+    const art=n=> {
+      const layers=n===1?1:n===3?3:5;
+      return `<svg class="quick-duration-art" viewBox="0 0 100 76" aria-hidden="true" focusable="false">${Array.from({length:layers},(_,j)=>{
+        const angle=(j-(layers-1)/2)*12;
+        return `<g transform="rotate(${angle} 50 64)"><rect x="30" y="8" width="40" height="57" rx="5" fill="var(--quick-card-paper)" stroke="currentColor" stroke-width="1.4"/><rect x="34" y="12" width="32" height="49" rx="3" fill="none" stroke="currentColor" stroke-opacity=".4"/><path d="M50 22l3 10 10 3-10 3-3 10-3-10-10-3 10-3z" fill="currentColor" fill-opacity=".65"/><circle cx="50" cy="35" r="12" fill="none" stroke="currentColor" stroke-opacity=".35"/></g>`;
+      }).join('')}</svg>`;
+    };
+    const chip=([n,text],i)=>`<button type="button" class="quick-length-chip${n===3?' is-selected':''}${text==='Todo el catálogo'?' quick-length-all':''}" role="radio" aria-checked="${n===3}" data-quick="length" data-length="${n}"${i>=3?' data-length-extra hidden':''}>${illustrated?art(n):''}<b>${n}</b><span>${n===1?'reto':'retos'}</span><small>${text}</small></button>`;
     const more=options.length>3?`<button type="button" class="btn btn-ghost quick-length-more" data-quick="more-lengths" aria-expanded="false">Más duraciones</button>`:'';
     return `<div class="field duel-kind-field"${attrs}><span class="field-label" id="${id}-label">${label}</span><div class="quick-length" role="radiogroup" aria-labelledby="${id}-label">${options.map(chip).join('')}</div>${more}<input type="hidden" id="${id}" data-quick-length-input value="3"></div>`;
   }
@@ -145,9 +152,9 @@
         <p class="lead">Mazos sorpresa: ordena y suma aciertos.</p><p class="hint solo-dominadas">${total} retos en el catálogo. Un fallo no te echa: juegas cada reto entero.</p></div>
         ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
         <div class="panel solo-panel">
-          <div class="solo-panel-head"><span class="quick-setup-kicker">Tu próxima aventura</span><h3>¿Cuánto quieres jugar?</h3></div>
+          <div class="solo-panel-head quick-preparation-head"><img class="quick-preparation-art" src="assets/menu-quick.webp" alt="" aria-hidden="true" decoding="async"><div class="quick-preparation-copy"><span class="quick-setup-kicker">Tu próxima aventura</span><h3>¿Cuánto quieres jugar?</h3><span class="quick-preparation-motto">El azar reparte. Tú decides.</span></div></div>
           <p>Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>
-          ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}
+          ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida','',true)}<div class="quick-pace-caption" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="25" r="17"/><circle cx="24" cy="25" r="13"/><path d="M24 16v10l7 4M19 4h10M24 4v4"/></svg><span>Marca tu ritmo</span></div>${CT.Tiempo.field('quick-solo')}
           ${button('start-free',`${pendiente ? 'Empezar otra' : 'Empezar'} <span>→</span>`,`btn ${pendiente ? 'btn-secondary' : 'btn-primary'} btn-block`)}<p id="quick-error" role="alert">${esc(error)}</p>
         </div></section>`);
   }
