@@ -5609,3 +5609,32 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 #app .quick-mode-card:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 2px; }
 @media (hover: hover) { #app .quick-mode-card:not(.is-selected):hover { border-color: var(--edition-brass); } }
 @media (max-width: 340px) { #app .quick-mode-switch { grid-template-columns: 1fr; } }
+
+/* Último mazo: una ficha de colección con carátula y filete de latón. */
+#app .solo-shortcut-last {
+  position: relative; isolation: isolate; grid-template-columns: 64px minmax(0, 1fr) 38px;
+  gap: 18px; min-height: 118px; padding: 17px 20px;
+  border: 1px solid var(--edition-brass); border-radius: 18px;
+  background: radial-gradient(ellipse at 0 0, #b897601c, transparent 72%), var(--edition-paper);
+  box-shadow: inset 0 0 0 5px #fff7e733, inset 0 0 0 6px #b8976029, 0 7px 18px #6343231c;
+}
+#app .solo-shortcut-last > span { grid-row: 1; }
+#app .solo-shortcut-last .solo-last-cover {
+  position: relative; display: block; width: 64px; height: 82px; border-radius: 7px;
+  border: 1px solid #b8976099; background: var(--edition-paper);
+  box-shadow: -3px 3px 0 var(--edition-paper), -4px 4px 0 #b8976080, -6px 6px 0 var(--edition-paper), -7px 7px 0 #b897604d, 0 4px 9px #34231630;
+}
+#app .solo-last-cover img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 6px; filter: saturate(.8) sepia(.08); }
+#app .solo-last-cover::after { content: ''; position: absolute; inset: 4px; border: 1px solid #fff1cd80; border-radius: 3px; pointer-events: none; }
+#app .solo-shortcut-last .solo-shortcut-copy { min-width: 0; color: var(--edition-ink); }
+#app .solo-shortcut-last .solo-shortcut-copy em { margin-bottom: 7px; font-size: .6rem; letter-spacing: .16em; }
+#app .solo-shortcut-last .solo-shortcut-copy b { font: 600 clamp(1.05rem, 3.8vw, 1.3rem)/1.18 var(--font-display); overflow-wrap: break-word; }
+#app .solo-shortcut-last small { margin-top: 8px; color: var(--edition-muted); font: .76rem/1.35 var(--ui-font); }
+#app .solo-shortcut-last .solo-shortcut-arrow { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #b8976066; border-radius: 50%; background: #b8976012; color: var(--edition-brass); font-size: 1.25rem; }
+#app .solo-shortcut-last:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 4px; }
+@media (hover: hover) { #app .solo-shortcut-last:hover { border-color: var(--edition-ink); } }
+@media (max-width: 360px) {
+  #app .solo-shortcut-last { grid-template-columns: 50px minmax(0, 1fr) 32px; gap: 12px; padding: 16px; }
+  #app .solo-shortcut-last .solo-last-cover { width: 50px; height: 70px; }
+  #app .solo-shortcut-last .solo-shortcut-arrow { width: 32px; height: 32px; }
+}

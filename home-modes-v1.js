@@ -309,8 +309,10 @@
     const resumen = window.CONTINUUM?.soloResumen?.();
     if (!resumen) return '';
     const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><span class="solo-shortcut-copy"><em>Partida guardada</em><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} jugadas`}</small></span><span class="solo-shortcut-arrow" aria-hidden="true">→</span></button>`);
+    const lastArt = window.CONTINUUM?.blockOf?.(resumen.ultimo?.mode)?.art;
+    const lastCover = { history: 'history', entertainment: 'entertainment', science: 'science', nature: 'nature', globe: 'geography', mixed: 'mixed' }[lastArt] || 'mixed';
     const ultimo = resumen.ultimo && !resumen.pendientes.some(p => p.mode === resumen.ultimo.mode)
-      ? `<button type="button" class="solo-shortcut" data-action="solo-open-deck" data-solo-deck="${resumen.ultimo.mode}"><b>Último mazo: ${escapeHtml(resumen.ultimo.name)}</b><small>Jugar otra ronda</small><span aria-hidden="true">→</span></button>` : '';
+      ? `<button type="button" class="solo-shortcut solo-shortcut-last" data-action="solo-open-deck" data-solo-deck="${escapeHtml(resumen.ultimo.mode)}"><span class="solo-last-cover" aria-hidden="true"><img src="assets/hero-${lastCover}-400.webp" alt="" width="64" height="82" decoding="async"></span><span class="solo-shortcut-copy"><em>Último mazo</em><b>${escapeHtml(resumen.ultimo.name)}</b><small>Jugar otra ronda</small></span><span class="solo-shortcut-arrow" aria-hidden="true">→</span></button>` : '';
     const items = [...pendientes, ultimo].filter(Boolean);
     return items.length ? `<section class="solo-shortcuts" aria-label="Atajos">${items.join('')}</section>` : '';
   }
