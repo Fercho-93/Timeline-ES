@@ -5664,3 +5664,20 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
   #app .solo-shortcut-last .solo-last-cover { width: 50px; height: 70px; }
   #app .solo-shortcut-last .solo-shortcut-arrow { width: 32px; height: 32px; }
 }
+
+/* Pista de colocación en la carta activa de la mano: una mano que va a pulsar y tres palabras,
+   en la franja libre entre el emblema y el título, pegadas a la derecha. Solo en la carta del
+   centro del abanico (o la única), y nunca mientras la carta está en la línea como vista previa. */
+#app .hand-card > .card-hint {
+  position: absolute; z-index: 2; right: 10px; bottom: calc(29% + 12px);
+  display: inline-flex; align-items: center; gap: 3px; max-width: calc(100% - 20px);
+  margin: 0; padding: 0; color: #8a6a3f; opacity: .85; pointer-events: none;
+  font: 600 .5rem/1 var(--ui-font); letter-spacing: .02em; white-space: nowrap; overflow: hidden;
+}
+#app .hand-card > .card-hint svg { flex: none; width: 11px; height: 11px; stroke-width: 2; }
+#app .hand-card > .card-hint small { font: inherit; }
+#app .hand-fan .hand-card:not(.fan-center) > .card-hint,
+#app .hand-placement-pending .hand-card > .card-hint,
+#app .hand-card:disabled > .card-hint,
+#app .enc-background .hand-card > .card-hint { display: none; }
+:root[data-theme="dark"] #app .hand-card > .card-hint { color: #d8bf92; }

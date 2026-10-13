@@ -7,6 +7,8 @@
   const reduced = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const icons = {
     back: '<path d="m14 5-7 7 7 7M7 12h14"/>',
+    // Mano que va a pulsar: índice extendido, pulgar abierto y el resto cerrado.
+    press: '<path d="M9 12V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 11V9.5a1.5 1.5 0 0 1 3 0V12"/><path d="M15 12v-1a1.5 1.5 0 0 1 3 0v2"/><path d="M18 13v-.5a1.5 1.5 0 0 1 3 0V16a6 6 0 0 1-6 6h-2.2a5 5 0 0 1-4-2L4.6 14.9a1.5 1.5 0 0 1 2.3-1.9L9 15.2"/>',
     home: '<path d="m3 11 9-8 9 8M5 10v11h5v-7h4v7h5V10"/>',
     book: '<path d="M12 5v16M3 4c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2Z"/>',
     atlas: '<path d="m12 2 2 8 8 2-8 2-2 8-2-8-8-2 8-2Z"/><path d="m5 5 7 5 7-5-5 7 5 7-7-5-7 5 5-7Z" stroke-width=".7" opacity=".6"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
@@ -303,8 +305,15 @@
   document.addEventListener('click', event => {
     if (event.target.closest?.('.timeline-card, .hand-card, [data-text-size]')) scheduleCardText();
   });
+  // Pista mínima en la esquina inferior derecha de la carta activa: cómo se coloca. Es decorativa
+  // (el párrafo de ayuda de cada mesa ya lo explica), por eso queda fuera del árbol de accesibilidad.
+  function handHint(card) {
+    if (card.querySelector(':scope > .card-hint')) return;
+    card.insertAdjacentHTML('beforeend', `<span class="card-hint" aria-hidden="true">${icon('press')}<small>Arrastra o pulsa +</small></span>`);
+  }
   function mountHandFan(hand) {
     const cards = [...hand.querySelectorAll('.hand-card')];
+    cards.forEach(handHint);
     // La carta activa está en la línea; centrar otra en el abanico no la selecciona.
     hand.classList.toggle('hand-placement-pending', !!hand.closest('#app')?.querySelector('.slot-confirm'));
     // Una mano de varias cartas conserva su formato de abanico hasta la última.
