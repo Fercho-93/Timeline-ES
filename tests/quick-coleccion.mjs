@@ -34,9 +34,27 @@ assert.equal(tiles.length, 4, 'cuatro mazos del día');
 assert.deepEqual(tiles.map(t => t.dataset.deck), ids(new Date().toLocaleDateString('sv-SE')));
 assert.match(tiles[0].textContent, /Descubiertas 0 de \d+/);
 
+// Dos formas de jugar bien separadas: mazos del día (por defecto) o partida sorpresa. Solo se ve una.
+const modo = key => w.document.querySelector(`[data-quick="solo-mode"][data-mode="${key}"]`);
+const panel = key => w.document.querySelector(`[data-mode-pane="${key}"]`);
+assert.equal(modo('day').getAttribute('aria-checked'), 'true', 'empieza en los mazos del día');
+assert.equal(panel('day').hidden, false);
+assert.equal(panel('surprise').hidden, true, 'la partida sorpresa no se mezcla con los mazos del día');
+assert.match(modo('day').textContent, /Cambian en \d+ h/);
+modo('surprise').click();
+assert.equal(modo('surprise').getAttribute('aria-checked'), 'true');
+assert.equal(panel('surprise').hidden, false);
+assert.equal(panel('day').hidden, true);
+assert.ok(panel('surprise').querySelector('[data-quick="start-free"]') && panel('surprise').querySelector('.quick-length'));
+// Se recuerda la última forma elegida.
+w.document.querySelector('[data-quick="collection"]').click();
+w.document.querySelector('[data-quick="formats"]').click();
+assert.equal(panel('surprise').hidden, false, 'al volver sigue en la partida sorpresa');
+modo('day').click();
+
 // Un mazo del día se juega entero.
 const deckId = tiles[0].dataset.deck, deck = E.challenge(deckId);
-tiles[0].click();
+w.document.querySelector(`[data-quick="play-deck"][data-deck="${deckId}"]`).click();
 w.document.querySelector('[data-quick="ready"]').click();
 const saved = () => JSON.parse(w.localStorage.getItem('continuum-quick-challenges-v1'));
 assert.equal(saved().config.rounds.length, 1);

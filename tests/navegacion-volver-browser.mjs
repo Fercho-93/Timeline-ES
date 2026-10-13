@@ -65,7 +65,7 @@ async function flows(vp) {
     if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route="collections"]');
     await click('#mode-inline-drawer [data-action="set-block"][data-block="mezcla"]'); await at('solo-home'); await back('hub-solo');
     await click('[data-solo-route="quick"]'); await at('quick-challenges');
-    await click('[data-quick="start-free"]'); await at('quick-challenges'); await click('[data-quick="ready"]'); await at('quick-game'); await back('quick-challenges');
+    await click('[data-quick="solo-mode"][data-mode="surprise"]'); await click('[data-quick="start-free"]'); await at('quick-challenges'); await click('[data-quick="ready"]'); await at('quick-game'); await back('quick-challenges');
     await back('hub-solo');
     if (await pg.locator('#mode-inline-drawer[hidden]').count()) await click('[data-inline-route]');
     await click('[data-action="competition-menu"]'); await at('competition-menu');

@@ -5515,7 +5515,7 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 /* Retos rápidos en solitario: los mazos del día y la colección de cartas descubiertas. */
 #app .quick-free-setup .quick-collection-link { margin-top: 8px; min-height: 40px; padding: 6px 14px; border: 1px solid var(--edition-line); border-radius: 12px; font-size: .84rem; }
 #app .quick-day-head { margin-bottom: 14px; }
-#app .quick-day-head h3 { margin: 4px 0 6px; font: 600 clamp(1.35rem, 5.6vw, 1.8rem)/1.15 var(--font-display); color: var(--edition-ink); }
+#app .quick-day-head h4 { margin: 4px 0 6px; font: 600 clamp(1.2rem, 5vw, 1.5rem)/1.15 var(--font-display); color: var(--edition-ink); }
 #app .quick-day-head small { display: block; color: var(--edition-muted); font: .8rem/1.4 var(--ui-font); }
 #app .quick-day-decks { display: grid; gap: 10px; margin-bottom: 16px; }
 #app .quick-day-deck { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 12px; width: 100%; min-height: 84px; padding: 10px 12px 10px 10px; text-align: left; color: var(--edition-ink); background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 14px; box-shadow: inset 0 0 0 4px #b8976012, 0 3px 8px #63432314; cursor: pointer; }
@@ -5530,7 +5530,7 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 #app .quick-deck-progress .game-progress-bar { display: block; height: 4px; border-radius: 2px; background: var(--edition-line); overflow: hidden; }
 #app .quick-deck-progress .game-progress-bar i { display: block; height: 100%; background: var(--edition-brass); }
 #app .quick-deck-progress small { display: block; margin-top: 4px; color: var(--edition-muted); font: .72rem/1.35 var(--ui-font); }
-#app .quick-surprise { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--edition-line); }
+#app .quick-mode-pane { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--edition-line); }
 #app .quick-free-setup .quick-surprise .quick-preparation-head h4 { margin: 0; font: 600 clamp(1.2rem, 5vw, 1.55rem)/1.15 var(--font-display); color: var(--edition-ink); }
 #app .quick-new-card { margin: 6px auto 10px; padding: 6px 12px; width: fit-content; border-radius: 999px; color: var(--edition-brass); border: 1px solid var(--edition-brass); font: 600 .82rem/1.3 var(--ui-font); }
 #app .quick-collection-summary { margin: 14px 0; padding: 12px 14px; border: 1px solid var(--edition-line); border-radius: 14px; background: var(--edition-surface); }
@@ -5557,3 +5557,20 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 #app .quick-album-card.is-locked b { color: var(--edition-muted); }
 #app .quick-free-setup .quick-surprise .quick-preparation-head { margin: 0 0 14px; min-height: 104px; padding: 18px 16px; border: 1px solid var(--edition-line); border-radius: 14px; overflow: hidden; }
 #app .quick-free-setup .quick-surprise > p { font-size: .85rem; line-height: 1.5; }
+
+/* Retos rápidos en solitario: dos formas de jugar, elegidas con dos tarjetas grandes. */
+#app .quick-mode-head h3 { margin: 4px 0 12px; font: 600 clamp(1.35rem, 5.6vw, 1.8rem)/1.15 var(--font-display); color: var(--edition-ink); }
+#app .quick-mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+#app .quick-mode-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; padding: 16px 10px 14px; text-align: center; color: var(--edition-ink); background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 16px; box-shadow: inset 0 0 0 4px #b8976012, 0 3px 8px #63432314; cursor: pointer; transition: border-color var(--motion-fast, .16s), box-shadow var(--motion-fast, .16s), transform var(--motion-fast, .16s); }
+#app .quick-mode-card .quick-mode-art { width: 58px; height: 58px; color: var(--edition-muted); }
+#app .quick-mode-copy { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+#app .quick-mode-copy b { font: 600 1.05rem/1.2 var(--font-display); }
+#app .quick-mode-copy small { color: var(--edition-muted); font: .74rem/1.38 var(--ui-font); }
+#app .quick-mode-copy em { margin-top: 2px; padding: 2px 9px; border-radius: 999px; font: 600 .66rem/1.6 var(--ui-font); font-style: normal; letter-spacing: .03em; color: var(--edition-muted); border: 1px solid var(--edition-line); }
+#app .quick-mode-card.is-selected { border-color: var(--edition-brass); background: linear-gradient(160deg, #b8976026, #b897600a), var(--edition-surface); box-shadow: inset 0 0 0 2px var(--edition-brass), 0 6px 14px #63432326; }
+#app .quick-mode-card.is-selected .quick-mode-art { color: var(--edition-brass); }
+#app .quick-mode-card.is-selected .quick-mode-copy em { color: var(--edition-surface); background: var(--edition-brass); border-color: var(--edition-brass); }
+#app .quick-mode-card.is-selected::after { content: "✓"; position: absolute; right: 9px; top: 8px; font: 700 .78rem/1 var(--ui-font); color: var(--edition-brass); }
+#app .quick-mode-card:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 2px; }
+@media (hover: hover) { #app .quick-mode-card:not(.is-selected):hover { border-color: var(--edition-brass); } }
+@media (max-width: 340px) { #app .quick-mode-switch { grid-template-columns: 1fr; } }

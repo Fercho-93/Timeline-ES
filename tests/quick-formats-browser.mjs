@@ -49,7 +49,7 @@ try {
   const p=await open();
   await openPlay(p);await p.locator('[data-action="solo-hub"]').click();await p.locator('[data-solo-route="quick"]').click();
   await p.screenshot({path:'test-results/quick-challenges/formats.png',fullPage:true});
-  await p.locator('.quick-length-chip[data-length="1"]').click();await p.locator('[data-quick="start-free"]').click();
+  await p.locator('[data-quick="solo-mode"][data-mode="surprise"]').click();await p.locator('.quick-length-chip[data-length="1"]').click();await p.locator('[data-quick="start-free"]').click();
   await dismissSplash(p);await p.locator('[data-quick="ready"]').click();
   assert.equal(await p.locator('[data-quick="bank"]').count(),0,'en solitario no hay que plantarse');
   await playRound(p);
