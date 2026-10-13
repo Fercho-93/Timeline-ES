@@ -509,7 +509,7 @@
     const r=rankingSummary(), box=document.createElement('section');
     box.className='mode-ranking-summary';
     box.setAttribute('aria-label','Tus retos diarios');
-    const trophy='<svg viewBox="0 0 80 80" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 65C10 57 9 37 17 23M54 65c16-8 17-28 9-42M17 48l-8-7m9-2-7-8m10-1-5-9m47 27 8-7m-9-2 7-8m-10-1 5-9"/><path d="M26 21h28v15c0 10-6 17-14 17s-14-7-14-17Z" fill="currentColor" fill-opacity=".16"/><path d="M26 26H18v6c0 7 5 12 11 12m25-18h8v6c0 7-5 12-11 12M40 53v10m-10 5h20l-3-5H33Z"/><path d="m40 27 2.5 5 5.5.8-4 4 .9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-4 5.5-.8Z" fill="currentColor" stroke-width="1"/></g></svg>';
+    const trophy='<img src="assets/ranking-trophy-v1.webp" alt="" aria-hidden="true" width="80" height="80" decoding="async">';
     box.innerHTML=`<div class="mode-ranking-head"><span class="mode-ranking-medallion">${trophy}</span><div class="mode-ranking-copy"><span class="mode-ranking-kicker">El reto de cada día</span><h3>Ranking</h3><p>Cada acierto deja huella.</p></div><span class="mode-ranking-star" aria-hidden="true">✦</span></div><div class="mode-ranking-stats"><span><b>${r.day===null?'–':`${r.day}/10`}</b><small>Hoy</small></span><span><b>${r.weekHits}</b><small>Esta semana</small></span><span><b>${r.streak}</b><small>${r.streak===1?'Día seguido':'Días seguidos'}</small></span></div>${window.CONTINUUM?.Accounts?.ready?'<button type="button" class="btn btn-secondary mode-ranking-link" data-account-action="ranking">Ver ranking <span aria-hidden="true">→</span></button>':''}`;
     doors.append(box);
   }

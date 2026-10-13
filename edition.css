@@ -4730,7 +4730,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 }
 #app[data-screen="home"] .mode-ranking-head { justify-content: flex-start; align-items: center; gap: 14px; }
 #app[data-screen="home"] .mode-ranking-medallion { flex: 0 0 72px; width: 72px; height: 72px; display: grid; place-items: center; border: 1px solid #b38b49; border-radius: 50%; color: #805820; background: linear-gradient(135deg, #fff6d9 5%, #d9b366 48%, #f9e4ad 75%, #bd914b); box-shadow: 0 4px 10px #75521d30, inset 0 0 0 4px #fff1c28c, inset 0 0 0 5px #a37b3e80; }
-#app[data-screen="home"] .mode-ranking-medallion svg { width: 62px; height: 62px; }
+#app[data-screen="home"] .mode-ranking-medallion img { display: block; width: 68px; height: 68px; object-fit: contain; filter: drop-shadow(0 2px 2px #63432330); }
 #app[data-screen="home"] .mode-ranking-copy { min-width: 0; }
 #app[data-screen="home"] .mode-ranking-kicker { display: block; color: #75552c; font: 700 .58rem/1.4 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
 #app[data-screen="home"] .mode-ranking-copy h3 { margin: 2px 0 3px; color: inherit; font: 600 clamp(1.65rem, 6vw, 2rem)/1.05 var(--font-display); }
@@ -4760,7 +4760,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   #app[data-screen="home"] .mode-ranking-summary { padding: 18px 14px; }
   #app[data-screen="home"] .mode-ranking-head { gap: 10px; }
   #app[data-screen="home"] .mode-ranking-medallion { flex-basis: 58px; width: 58px; height: 58px; }
-  #app[data-screen="home"] .mode-ranking-medallion svg { width: 50px; height: 50px; }
+  #app[data-screen="home"] .mode-ranking-medallion img { width: 54px; height: 54px; }
   #app[data-screen="home"] .mode-ranking-star { display: none; }
 }
 :root[data-theme="dark"] #app[data-screen="home"] .mode-ranking-summary { border-color: #8c6f45; background: radial-gradient(ellipse at 0% 0%, #b68c3c33, transparent 65%), linear-gradient(145deg, #3a3024, #251b11); box-shadow: 0 3px 0 #8c6f4560, 0 12px 26px #0006, inset 0 0 0 5px #f1e1bf08, inset 0 0 0 6px #c8a26a30; color: #f1e1bf; }
