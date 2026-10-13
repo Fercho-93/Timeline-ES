@@ -2033,9 +2033,9 @@
     const estrenado = resumen.cards > 0 || resumen.games > 0;
     paint(`<div class="shell">${header('<button class="icon-btn" data-action="back-menu">Volver</button>')}
       <section class="setup-section perfil-section">
-        <header class="atlas-page-heading"><div class="eyebrow">Cartografía personal · Continuum</div><h1 data-focus tabindex="-1">Tu Atlas</h1><p>Un mapa de lo que has descubierto y de los caminos que aún puedes recorrer.</p></header>
+        <header class="atlas-page-heading"><div class="eyebrow">Cuaderno de navegación · Continuum</div><h1 data-focus tabindex="-1">Tu Atlas</h1><p>Tus descubrimientos, tus travesías y los horizontes que aún te esperan.</p></header>
         ${atlasIdentidad()}
-        <nav class="atlas-chart" aria-label="Mapa de tu Atlas">
+        <nav class="atlas-chart" id="atlas-chart" tabindex="-1" aria-label="Mapa de tu Atlas">
           <div class="atlas-chart-heading"><span>MAPA DE TU VIAJE</span><small>Pon rumbo a nuevos descubrimientos</small></div>
           <svg class="atlas-chart-route" viewBox="0 0 640 440" preserveAspectRatio="none" aria-hidden="true"><path d="M96 120 C192 92 200 210 306 168 S435 66 528 135 S452 252 356 292 S183 266 116 357 S365 413 518 366" /></svg>
           <span class="atlas-chart-compass" aria-hidden="true">✦<small>N</small></span>
@@ -2048,10 +2048,10 @@
           <span class="atlas-chart-seal" aria-hidden="true">C<br><small>CONTINUUM</small></span>
         </nav>
         <div class="atlas-territories">
-          <div class="atlas-territory" id="atlas-collection"><div class="atlas-territory-caption"><span>01 / ARCHIVO DE LÁMINAS</span><h2>Las láminas</h2></div>${atlasColeccion()}</div>
-          <div class="atlas-territory" id="atlas-daily"><div class="atlas-territory-caption"><span>02 / CADA DÍA UN PASO</span><h2>El reto diario</h2></div>${atlasRetoDiario()}</div>
-          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / CAMINOS COMPARTIDOS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h3>Cara a cara</h3><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
-          <div class="atlas-territory" id="atlas-journey"><div class="atlas-territory-caption"><span>04 / HUELLAS EN EL MAPA</span><h2>Tu recorrido</h2></div>
+          <div class="atlas-territory" id="atlas-collection"><div class="atlas-territory-caption"><span>01 / HALLAZGOS DE LA TRAVESÍA</span><h2>Las láminas</h2></div>${atlasColeccion()}</div>
+          <div class="atlas-territory" id="atlas-daily"><div class="atlas-territory-caption"><span>02 / EL RUMBO DE CADA DÍA</span><h2>El reto diario</h2></div>${atlasRetoDiario()}</div>
+          <div class="atlas-territory" id="atlas-duels"><div class="atlas-territory-caption"><span>03 / TRAVESÍAS COMPARTIDAS</span><h2>Tus duelos</h2></div><section class="panel atlas-duels"><div><h3>Cara a cara</h3><p>Cuántas veces has ganado tú y cuántas cada amigo en los duelos por turnos.</p></div><div id="atlas-standings" aria-live="polite">${CT.Accounts?.ready ? '<p class="hint">Cargando tus duelos…</p>' : '<p class="hint">Necesitas conexión para ver tus duelos.</p>'}</div><button class="btn btn-secondary" data-action="duels-list">Ver tus duelos <span aria-hidden="true">→</span></button></section></div>
+          <div class="atlas-territory" id="atlas-journey"><div class="atlas-territory-caption"><span>04 / CUADERNO DE BITÁCORA</span><h2>Tu recorrido</h2></div>
             ${estrenado
               ? `<p class="lead">${resumen.hits} ${resumen.hits === 1 ? "acierto" : "aciertos"} de ${resumen.cards} ${resumen.cards === 1 ? "carta" : "cartas"} colocadas.</p>`
               : `<p class="lead">Todavía no hay nada que contar. Tu primera partida será el comienzo de tu recorrido.</p>`}
@@ -2059,13 +2059,33 @@
             ${CT.Quick?.stats ? '<button class="btn btn-secondary" data-action="quick-history">Historial de Retos rápidos <span aria-hidden="true">→</span></button>' : ""}
             <div class="perfil-main">${perfilPorJuego(filas)}${perfilPuntosDebiles(CT.Progreso.weakBands(), CT.Progreso.weakCards())}</div>
           </div>
-          <div class="atlas-territory" id="atlas-achievements"><div class="atlas-territory-caption"><span>05 / RUMBO A NUEVAS METAS</span><h2>Logros</h2></div><div class="perfil-main">${perfilLogros(logros)}</div></div>
-          <div class="atlas-territory atlas-territory-account"><div class="atlas-territory-caption"><span>06 / CUADERNO DE VIAJE</span><h2>Tu cuenta y tus datos</h2></div><div class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</div></div>
+          <div class="atlas-territory" id="atlas-achievements"><div class="atlas-territory-caption"><span>05 / NUEVOS HORIZONTES</span><h2>Logros</h2></div><div class="perfil-main">${perfilLogros(logros)}</div></div>
+          <div class="atlas-territory atlas-territory-account" id="atlas-account"><div class="atlas-territory-caption"><span>06 / DOCUMENTOS DE A BORDO</span><h2>Tu cuenta y tus datos</h2></div><div class="perfil-account" aria-label="Cuenta y datos">${CT.Accounts?.card() || perfilCopia()}</div></div>
         </div>
       </section>
       ${homeNav()}
     </div>`);
+    atlasVoyageNavigation();
     atlasCaraACara();
+  }
+
+  // Cada escala mantiene sus datos y ofrece una salida clara al mapa o a la siguiente.
+  // Son anclas nativas: funcionan con teclado, sin listeners ni estado que limpiar al salir.
+  function atlasVoyageNavigation() {
+    const stops = [...app.querySelectorAll('.atlas-territory')];
+    stops.forEach((stop, index) => {
+      const heading = stop.querySelector('.atlas-territory-caption h2');
+      heading.id = `${stop.id}-title`;
+      stop.tabIndex = -1;
+      stop.setAttribute('role', 'region');
+      stop.setAttribute('aria-labelledby', heading.id);
+      stop.dataset.atlasStep = String(index + 1).padStart(2, '0');
+      const next = stops[index + 1];
+      const nextTitle = next?.querySelector('.atlas-territory-caption h2').textContent || '';
+      stop.insertAdjacentHTML('beforeend', `<nav class="atlas-scale-nav" aria-label="Navegación de ${escapeHtml(heading.textContent)}"><a href="#atlas-chart"><span aria-hidden="true">↑</span> Volver al mapa</a>${next ? `<a class="atlas-next-scale" href="#${next.id}" aria-label="Siguiente escala: ${escapeHtml(nextTitle)}"><small>Siguiente escala</small><span>${escapeHtml(nextTitle)} <i aria-hidden="true">→</i></span></a>` : '<span class="atlas-voyage-close">El viaje continúa.</span>'}</nav>`);
+    });
+    const rankingIcon = app.querySelector('.atlas-territory-account .account-action-icon');
+    if (rankingIcon) rankingIcon.innerHTML = '<img src="assets/ranking-trophy-v1.webp" alt="" width="40" height="40" decoding="async">';
   }
 
   // El cara a cara necesita leer los duelos de la nube: se pinta el Atlas y se rellena al llegar.
