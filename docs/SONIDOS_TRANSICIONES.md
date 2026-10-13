@@ -32,6 +32,7 @@ Los sonidos de acción usan texturas suaves de papel y madera. Se activan con
 | Activar Fantasma, lanzar un Pulso o recibir una carta de poder | Brillo que sube y vibración media | `effects.js`: `power` |
 | Plantarse en Retos rápidos | Tres notas de madera que suben y vibración media | `effects.js`: `bank` |
 | Resultado de quién empieza | Dos golpes suaves y vibración media, una vez por sorteo | `effects.js`: `starterResult` |
+| Cualquier otro botón, enlace o pestaña sin sonido propio | Toque de madera de menú, 90 ms después si nada más ha sonado | `sonidos.js`: toque genérico |
 | Portada del mazo en Retos rápidos y elegir modo en solitario | Toque de madera | `quick-challenges.js` |
 
 ## Repeticiones y prioridad

@@ -231,6 +231,7 @@
   };
 
   const ultimo = {};
+  let ultimoSonido = -Infinity;
   function suena(nombre, retraso = 0, ...args) {
     if (!activo()) return null;
     // Una misma acción puede avisar dos veces (soltar una carta lo cuenta el arrastre y
@@ -238,6 +239,7 @@
     const t0 = ahora();
     if (!['hueco', 'tic'].includes(nombre) && t0 - (ultimo[nombre] ?? -Infinity) < 200) return null;
     ultimo[nombre] = t0;
+    ultimoSonido = t0;
     try {
       if (!audio()) return null;
       if (ctx.state !== 'running') void ctx.resume().catch(() => {});
@@ -307,6 +309,22 @@
   }
 
   for (const evento of ['pointerdown', 'touchstart', 'keydown']) document.addEventListener(evento, despierta, { capture: true, passive: true });
+  // Todo botón suena: si el toque no ha provocado ningún sonido propio (cambiar de pantalla, abrir un
+  // panel, elegir una carta…) en los 90 ms siguientes, se oye el toque de madera de menú. Así ningún
+  // botón queda mudo y ninguno suena dos veces.
+  const TOCABLE = 'button, a[href], summary, [role="button"], [role="radio"], [role="tab"], [data-action], [data-quick], [data-online-action], [data-local-action], [data-turn-action], [data-account-action], [data-settings-action]';
+  document.addEventListener('click', event => {
+    const el = event.target.closest?.(TOCABLE);
+    if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true' || el.closest('[inert]')) return;
+    const t0 = ahora();
+    setTimeout(() => {
+      if (ultimoSonido >= t0 || !activo()) return;
+      // Los diálogos y avisos que llegan detrás de un acierto o un logro no pisan su cola.
+      if (ahora() - ultimoRico < PAUSA_AVISOS) return;
+      ultimoSoplo = ahora();
+      suena('pagina');
+    }, 90);
+  }, true);
   document.addEventListener('click', event => {
     const confirmar = event.target.closest?.('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-turn-action="confirm-place"], [data-quick="confirm"], [data-local-action="confirm-place"], [data-local-action="confirm-pulse"], [data-local-action="confirm-defense"], [data-online-action="confirm-pulse"], [data-online-action="confirm-defense"]');
     if (confirmar && !confirmar.disabled) confirm();

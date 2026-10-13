@@ -97,6 +97,28 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
       const antes=notas;accion();assert.ok(notas>antes,`${paso} suena`);
     }
     assert.ok(Math.abs(master.gain.value-.8*.7*.7)<1e-9,'volumen por defecto, 70 %');
+    // Ningún botón queda mudo: uno sin sonido propio suena con el toque de menú, y uno que ya provoca
+    // su sonido no suena dos veces. Uno desactivado no suena.
+    {
+      await new Promise(r=>w.setTimeout(r,1000));
+      const host=w.document.createElement('div');w.document.body.append(host);
+      host.innerHTML='<button id="mudo">Un botón cualquiera</button><button id="off" disabled>Desactivado</button><span id="no">texto</span>';
+      let antes=notas;host.querySelector('#mudo').click();
+      assert.equal(notas,antes,'el toque espera por si hay un sonido propio');
+      await new Promise(r=>w.setTimeout(r,150));
+      assert.ok(notas>antes,'un botón sin sonido propio suena');
+      const unToque=notas-antes;
+      antes=notas;host.querySelector('#off').click();host.querySelector('#no').click();await new Promise(r=>w.setTimeout(r,150));
+      assert.equal(notas,antes,'un botón desactivado o un texto no suenan');
+      await new Promise(r=>w.setTimeout(r,250));
+      host.querySelector('#mudo').addEventListener('click',()=>CT.Effects.transition('back'),{once:true});
+      antes=notas;host.querySelector('#mudo').click();await new Promise(r=>w.setTimeout(r,150));
+      const propio=notas-antes;
+      await new Promise(r=>w.setTimeout(r,250));
+      antes=notas;host.querySelector('#mudo').click();await new Promise(r=>w.setTimeout(r,150));
+      assert.equal(propio,unToque,'si el botón ya provoca su sonido, no se añade el toque encima');
+      host.remove();
+    }
     w.document.querySelector('[data-settings-action="open"]').click();
     const volumen=w.document.querySelector('[data-settings-action="sfx-volume"]');
     volumen.value='100';volumen.dispatchEvent(new w.Event('change',{bubbles:true}));

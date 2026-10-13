@@ -1,13 +1,14 @@
 /* Barra compartida de marfil y latón: cuatro destinos alineados, un solo
-   medallón activo y espacio para la zona de gestos del teléfono. */
+   medallón activo y un poco de espacio para la zona de gestos del teléfono (solo el 30 % de la zona segura:
+   la barra sigue llegando al borde, pero los iconos no quedan con un hueco en blanco debajo). */
 html #app[data-screen][data-screen] .home-nav.atlas-nav {
   --nav-paper: #fbf3e2; --nav-paper-shade: #eee1c7;
   --nav-ink: #67502f; --nav-brass: #a17a3c; --nav-hairline: #b894596b;
   --nav-active: #284e54; --nav-gold: #ead19a;
   position: fixed; left: 50%; right: auto; bottom: 0;
-  width: min(calc(100% - 28px), 500px); max-width: 500px; min-height: calc(84px + env(safe-area-inset-bottom));
+  width: min(calc(100% - 28px), 500px); max-width: 500px; min-height: calc(80px + env(safe-area-inset-bottom) * .3);
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch;
-  gap: 0; margin: 0; padding: 6px 9px calc(8px + env(safe-area-inset-bottom)); overflow: visible;
+  gap: 0; margin: 0; padding: 6px 9px calc(4px + env(safe-area-inset-bottom) * .3); overflow: visible;
   border: 1px solid var(--nav-brass); border-radius: 24px;
   background: radial-gradient(ellipse at 40% 0%, #fff9edb3, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade));
   box-shadow: inset 0 1px 0 #fff9e8, inset 0 -2px 0 #a17a3c24, 0 8px 22px #32261630, 0 2px 3px #3226161c;
@@ -60,8 +61,8 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="pag
 }
 html #app[data-screen][data-screen] .home-nav.atlas-nav button:focus-visible { outline: 2px solid var(--nav-active); outline-offset: -1px; }
 html #app[data-screen][data-screen] .home-nav.atlas-nav button:active span { opacity: .8; }
-html #app[data-screen][data-screen] .shell:has(> .home-nav.atlas-nav) { padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
-html #app[data-screen][data-screen] :is(.enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
+html #app[data-screen][data-screen] .shell:has(> .home-nav.atlas-nav) { padding-bottom: calc(106px + env(safe-area-inset-bottom) * .3); }
+html #app[data-screen][data-screen] :is(.enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(106px + env(safe-area-inset-bottom) * .3); }
 :root[data-theme="dark"] #app[data-screen][data-screen] .home-nav.atlas-nav {
   --nav-paper: #33362d; --nav-paper-shade: #252d28; --nav-ink: #dfceb0;
   --nav-brass: #c4a365; --nav-hairline: #c4a36555; --nav-active: #ddc38e;
