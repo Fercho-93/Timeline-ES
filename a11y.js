@@ -101,7 +101,12 @@
   const galleryPositions = {};
   // La altura de la pantalla sobre la que se abrió la enciclopedia, para volver a ella.
   let encyclopediaOrigin = null;
-  function restoreWindowPosition(top) {
+  // Inicio desplaza `#app` (su propio contenedor) y no la ventana: la posición guardada y la
+  // restaurada son las de quien realmente se desplaza en ese momento.
+  const scrolls = container => /auto|scroll/.test(getComputedStyle(container).overflowY);
+  const scrollTopOf = container => scrolls(container) ? container.scrollTop : window.scrollY;
+  function restoreWindowPosition(top, container) {
+    if (container && scrolls(container)) { container.scrollTop = top; window.scrollTo(0, 0); return; }
     const root = document.documentElement;
     const previous = root.style.getPropertyValue("scroll-behavior");
     const priority = root.style.getPropertyPriority("scroll-behavior");
@@ -394,16 +399,16 @@
     const activo = document.activeElement;
     const dentro = activo && activo !== container && container.contains(activo);
     const clave = dentro ? selectorFor(activo) : null;
-    const previousWindowTop = window.scrollY;
+    const previousWindowTop = scrollTopOf(container);
     const primero = paint.screen === undefined;
     const cambioDePantalla = screen !== paint.screen;
     const vuelve = galleryScreens.includes(screen) ||
       (screen === "solo-home" && ["solo", "solo-end", "review"].includes(paint.screen)) ||
       (screen === "online-entry" && !["home", "online-loading"].includes(paint.screen));
     if (cambioDePantalla && galleryScreens.includes(paint.screen)) {
-      galleryPositions[paint.screen] = { top: window.scrollY, focus: clave };
+      galleryPositions[paint.screen] = { top: previousWindowTop, focus: clave };
     }
-    if (cambioDePantalla && screen === "enciclopedia") encyclopediaOrigin = { screen: paint.screen, top: window.scrollY };
+    if (cambioDePantalla && screen === "enciclopedia") encyclopediaOrigin = { screen: paint.screen, top: previousWindowTop };
     const cartaElegida = container.querySelector(".hand-card.selected")?.dataset.id || null;
     const confirmacionAnterior = container.querySelector(".slot-confirm")?.dataset.index ?? null;
     const oldFinal = container.querySelector('.final-results')?.textContent;
@@ -491,7 +496,7 @@
       // Al reconstruir Inicio el navegador puede conservar todavía el valor antiguo y
       // reajustarlo a cero al terminar el layout. Por eso, cuando hay un regreso guardado,
       // reafirmamos siempre la posición aunque en este instante parezca coincidir.
-      if (regreso || conservaFondo || window.scrollY !== top || window.scrollX !== 0) restoreWindowPosition(top);
+      if (regreso || conservaFondo || scrollTopOf(container) !== top || window.scrollX !== 0) restoreWindowPosition(top, container);
       // El fondo ya se ha visto durante el cierre: volver a hacerlo transparente
       // produce un destello. Las acciones de regreso llegan directamente a su estado final.
       if (screen !== "enciclopedia" && !closingEncyclopedia && !backwards && !returning) {

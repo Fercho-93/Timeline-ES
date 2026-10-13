@@ -3255,9 +3255,20 @@ html:has(#app[data-screen="home"])::before {
     url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat,
     #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
-/* La portada apenas desborda la pantalla. Con `dvh`, en Safari la altura mínima cambiaba con cada
-   pliegue de la barra del navegador mientras se desplazaba y la página se recolocaba; `svh` es fija. */
-html body:has(#app[data-screen="home"]), #app[data-screen="home"] { min-height: 100svh; }
+/* En Safari la barra inferior «rebotaba» al desplazar el Inicio: la portada apenas desborda la
+   pantalla, así que cada gesto llega al extremo y pliega o despliega la barra del propio Safari, y
+   un elemento fijo al borde inferior sigue ese movimiento. Guía y Ajustes no lo sufren porque
+   desplazan un contenedor propio, no el documento. Aquí igual: el documento ya no se desplaza y
+   `#app` es el contenedor con scroll, de modo que la barra del navegador no se mueve. */
+html:has(#app[data-screen="home"]) { height: 100dvh; overflow: hidden; overscroll-behavior: none; }
+html:has(#app[data-screen="home"]) body { height: 100%; min-height: 0; overflow: hidden; }
+#app[data-screen="home"] {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* Jugar con un punto más de color: el color lo ponen las láminas, que recuperan su
    tono; los tres recuadros comparten el mismo papel terracota suave. */
