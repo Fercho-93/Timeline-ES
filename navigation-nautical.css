@@ -1,0 +1,92 @@
+/* Barra compartida de marfil y latón: cuatro destinos alineados, un solo
+   medallón activo y espacio para la zona de gestos del teléfono. */
+html #app[data-screen][data-screen] .home-nav.atlas-nav {
+  --nav-paper: #fbf3e2; --nav-paper-shade: #eee1c7;
+  --nav-ink: #67502f; --nav-brass: #a17a3c; --nav-hairline: #b894596b;
+  --nav-active: #284e54; --nav-gold: #ead19a;
+  position: fixed; left: 50%; right: auto; bottom: calc(9px + env(safe-area-inset-bottom));
+  width: min(calc(100% - 28px), 500px); max-width: 500px; min-height: 84px;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch;
+  gap: 0; margin: 0; padding: 6px 9px 8px; overflow: visible;
+  border: 1px solid var(--nav-brass); border-radius: 24px;
+  background: radial-gradient(ellipse at 40% 0%, #fff9edb3, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade));
+  box-shadow: inset 0 1px 0 #fff9e8, inset 0 -2px 0 #a17a3c24, 0 8px 22px #32261630, 0 2px 3px #3226161c;
+  -webkit-backdrop-filter: none; backdrop-filter: none; transform: translateX(-50%);
+  z-index: 15;
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav::before {
+  content: ""; position: absolute; inset: 4px; border: 1px solid var(--nav-hairline);
+  border-radius: 19px; background: none; box-shadow: none; pointer-events: none;
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav::after { content: none; }
+html #app[data-screen][data-screen] .home-nav.atlas-nav button,
+html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="page"] {
+  position: relative; display: grid; align-content: center; justify-items: center;
+  grid-template-rows: 40px auto; gap: 4px; width: 100%; min-width: 0; min-height: 68px;
+  margin: 0; padding: 3px 2px 7px; border: 0; border-radius: 14px;
+  background: transparent; color: var(--nav-ink); box-shadow: none;
+  transform: none; --atlas-card-tilt: 0deg; cursor: pointer;
+  transition: color 180ms ease;
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav button::before,
+html #app[data-screen][data-screen] .home-nav.atlas-nav button::after { content: none; }
+html #app[data-screen][data-screen] .home-nav.atlas-nav button span,
+html #app[data-screen][data-screen] .home-nav.atlas-nav button:nth-child(n) span {
+  display: grid; place-items: center; width: 40px; height: 40px; margin: 0; padding: 0;
+  border: 1px solid transparent; border-radius: 50%; background: none;
+  color: var(--nav-brass); box-shadow: none; transform: none;
+  transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav button svg {
+  display: block; width: 27px; height: 27px; stroke-width: 1.2;
+  filter: drop-shadow(0 1px 0 #fff9e8a0);
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav button small {
+  display: block; margin: 0; color: inherit; font: 500 .78rem/1.15 var(--font-display);
+  letter-spacing: .01em; text-decoration: none; white-space: nowrap;
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="page"] { color: var(--nav-active); }
+html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="page"] span {
+  border-color: var(--nav-brass); color: var(--nav-gold);
+  background: radial-gradient(circle at 32% 20%, #456c6b, #284e54 65%, #1a383e);
+  box-shadow: inset 0 0 0 2px #e0c08030, inset 0 1px 0 #fff2, 0 3px 6px #32261630;
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="page"] svg { filter: drop-shadow(0 1px 1px #142c32); }
+html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="page"] small { color: var(--nav-active); font-weight: 700; }
+html #app[data-screen][data-screen] .home-nav.atlas-nav button[aria-current="page"]::after {
+  content: ""; position: absolute; left: 50%; bottom: 1px; width: 22px; height: 2px;
+  transform: translateX(-50%); border-radius: 2px; background: var(--nav-brass);
+  box-shadow: 0 1px 0 #fff9e8a0;
+}
+html #app[data-screen][data-screen] .home-nav.atlas-nav button:focus-visible { outline: 2px solid var(--nav-active); outline-offset: -1px; }
+html #app[data-screen][data-screen] .home-nav.atlas-nav button:active span { opacity: .8; }
+html #app[data-screen][data-screen] .shell:has(> .home-nav.atlas-nav) { padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
+html #app[data-screen][data-screen] :is(.enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
+:root[data-theme="dark"] #app[data-screen][data-screen] .home-nav.atlas-nav {
+  --nav-paper: #33362d; --nav-paper-shade: #252d28; --nav-ink: #dfceb0;
+  --nav-brass: #c4a365; --nav-hairline: #c4a36555; --nav-active: #ddc38e;
+  background: radial-gradient(ellipse at 40% 0%, #e4c48112, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade));
+  box-shadow: inset 0 1px 0 #fff2, 0 8px 22px #0006, 0 2px 3px #0003;
+}
+:root[data-theme="dark"] #app[data-screen][data-screen] .home-nav.atlas-nav button svg { filter: none; }
+@media (hover: hover) {
+  html #app[data-screen][data-screen] .home-nav.atlas-nav button:not([aria-current]):hover span { background: color-mix(in srgb, var(--nav-brass) 10%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html #app[data-screen][data-screen] .home-nav.atlas-nav button,
+  html #app[data-screen][data-screen] .home-nav.atlas-nav button span { transition: none; }
+}
+@media (max-width: 350px) {
+  html #app[data-screen][data-screen] .home-nav.atlas-nav { width: calc(100% - 20px); padding-inline: 5px; }
+  html #app[data-screen][data-screen] .home-nav.atlas-nav button small { font-size: .74rem; }
+}
+/* El texto grande pasa a dos columnas en el flujo: conserva todos los nombres
+   y evita que una barra alta tape los controles de la pantalla. */
+@media (max-width: 480px) {
+  html:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen][data-screen] .home-nav.atlas-nav {
+    position: relative; left: auto; bottom: auto; width: 100%; max-width: none;
+    margin: 24px 0 0; transform: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 0;
+  }
+  html:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen][data-screen] .home-nav.atlas-nav button { min-height: 78px; }
+  html:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen][data-screen] .home-nav.atlas-nav button small { font-size: 1rem; }
+}

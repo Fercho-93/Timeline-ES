@@ -9,7 +9,7 @@
     back: '<path d="m14 5-7 7 7 7M7 12h14"/>',
     home: '<path d="m3 11 9-8 9 8M5 10v11h5v-7h4v7h5V10"/>',
     book: '<path d="M12 5v16M3 4c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2Z"/>',
-    atlas: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5Z"/>',
+    atlas: '<path d="m12 2 2 8 8 2-8 2-2 8-2-8-8-2 8-2Z"/><path d="m5 5 7 5 7-5-5 7 5 7-7-5-7 5 5-7Z" stroke-width=".7" opacity=".6"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
     guide: '<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4m0 3v1"/>',
     profile: '<circle cx="12" cy="7.5" r="3.5"/><path d="M5.5 21v-1.5a6.5 6.5 0 0 1 13 0V21"/>',
     settings: '<circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/>',
@@ -29,8 +29,8 @@
   }
   function nav(screen) {
     return `<nav class="home-nav atlas-nav" aria-label="Menú principal">${[
-      ['home-top', 'home', 'Inicio', ['home']], ['perfil', 'atlas', 'Atlas', ['perfil']], ['rules', 'guide', 'Guía', ['guide']], ['settings', 'settings', 'Ajustes', ['settings']]
-    ].map(([action, symbol, label, current]) => `<button aria-label="${label}" ${action === 'settings' ? 'data-settings-action="open"' : `data-action="${action}"`}${current.includes(screen) ? ' aria-current="page"' : ''}><span>${icon(symbol)}</span><small>${label}</small></button>`).join('')}</nav>`;
+      ['home-top', 'home', 'Inicio', ['home']], ['perfil', 'atlas', 'Atlas', ['perfil']], ['rules', 'book', 'Guía', ['guide']], ['settings', 'settings', 'Ajustes', ['settings']]
+    ].map(([action, symbol, label, current]) => `<button type="button" aria-label="${label}" ${action === 'settings' ? 'data-settings-action="open"' : `data-action="${action}"`}${current.includes(screen) ? ' aria-current="page"' : ''}><span>${icon(symbol)}</span><small>${label}</small></button>`).join('')}</nav>`;
   }
   // `discard` es opcional: cuando lo hay, añade un tercer botón para salir sin guardar
   // nada, sin pasar por el guardado que hace `proceed`. Vive en el mismo diálogo que
