@@ -334,7 +334,7 @@
     // El paso entre cartas se lee del propio CSS (la traslación de una carta en reposo),
     // para que el arrastre y la postura final coincidan en cualquier tamaño de pantalla.
     // La postura reproduce la regla de edition.css: traslación, caída, giro y escala.
-    let step = Math.min(window.innerWidth * .147, 54.6);
+    let step = Math.min(CT.Mesa.ancho() * .147, 54.6);
     const pose = offset => `translateX(${offset * step}px) translateY(${Math.abs(offset) * 11.2}px) rotate(${offset * 6}deg) scale(${Math.max(.5, 1 - Math.abs(offset) * .14)})`;
     // Un muelle: pasa un poco de su sitio y vuelve. Es lo que da peso a las cartas.
     const SPRING = 'cubic-bezier(.3,1.45,.5,1)';
@@ -431,7 +431,7 @@
       }
       if (gesture.horizontal) {
         event.preventDefault();
-        if (!reduced()) { gesture.drag = rubber(dx / step); dragTo(gesture.drag); }
+        if (!reduced()) { gesture.drag = rubber(dx / CT.Mesa.escala() / step); dragTo(gesture.drag); }
       }
     }, {passive: false});
     hand.addEventListener('pointerup', event => {
@@ -467,8 +467,10 @@
   // pasar de una carta a otra podía encoger o agrandar la mano según lo que midiera ese
   // instante (la animación a medias, el aviso de colocar), y la mano bailaba de tamaño.
   let fanHold = null;
+  const mesaCaja = el => CT.Mesa.caja(el);
   function fitBoard(container) {
-    if (!board.has(container.dataset.screen) || window.innerWidth > 699) {
+    // Sin fotogramas (pruebas en jsdom) no hay nada que medir.
+    if (!board.has(container.dataset.screen) || CT.Mesa.ancho() > 699 || typeof window.requestAnimationFrame !== 'function') {
       delete container.dataset.boardFit;
       return;
     }
@@ -477,8 +479,9 @@
       if (!container.classList.contains('atlas-board')) return;
       const shell = container.querySelector(':scope > .shell');
       if (!shell) return;
-      const available = window.visualViewport?.height || window.innerHeight;
-      const top = shell.getBoundingClientRect().top + window.scrollY;
+      // En puntos de la mesa: dentro de la partida, los del iPhone de referencia (mesa-escala.js).
+      const available = CT.Mesa.alto();
+      const top = mesaCaja(shell).top + CT.Mesa.desplazado();
       // El marco de la línea se redimensiona en un observador asíncrono: sin ajustarlo aquí, cada
       // medida se hacía con el alto de la carta anterior y la mesa parecía no caber.
       const syncFrame = () => {
@@ -508,7 +511,7 @@
       if (!fits() && container.dataset.boardFit === 'tight') {
         const card = shell.querySelector('.board-timeline-section .timeline .timeline-card');
         if (card) {
-          const start = Math.floor(card.getBoundingClientRect().width);
+          const start = Math.floor(mesaCaja(card).width);
           container.classList.add('board-card-expanded');
           // Un título largo hace más líneas al estrechar la carta: se busca el ancho más
           // grande con el que la mesa cabe y, si ninguno cabe, el que menos sobra.
@@ -528,7 +531,7 @@
           const excess = Math.ceil(top + shell.scrollHeight - available);
           const visual = card.querySelector('.card-visual:has(.animal-card-art)');
           if (excess > 2 && visual) {
-            container.style.setProperty('--board-image-height', `${Math.max(64, Math.floor(visual.getBoundingClientRect().height - excess - 4))}px`);
+            container.style.setProperty('--board-image-height', `${Math.max(64, Math.floor(mesaCaja(visual).height - excess - 4))}px`);
             container.classList.add('board-image-condensed');
           }
         }
@@ -539,19 +542,19 @@
       // como siempre; con lo que quede crece tu carta (o el abanico de la mano), para que la
       // mesa quede repartida entre la mano y la línea en vez de dejar papel vacío abajo.
       // Todo de forma progresiva y sin sacar ningún mando de la vista.
-      if (!shrunk && fits() && window.innerWidth >= 375) {
+      if (!shrunk && fits() && CT.Mesa.ancho() >= 375) {
         const section = shell.querySelector('.board-timeline-section');
         const card = section?.querySelector('.timeline .timeline-card');
         if (card) {
-          const gap = Math.min(section.getBoundingClientRect().bottom, available) - card.getBoundingClientRect().bottom;
-          const base = card.getBoundingClientRect().width;
+          const gap = Math.min(mesaCaja(section).bottom, available) - mesaCaja(card).bottom;
+          const base = mesaCaja(card).width;
           const growth = Math.min(38, Math.max(0, Math.floor((gap - 25) / 1.5)));
           if (growth >= 5) {
             container.classList.add('board-card-expanded');
             let expanded = false;
             for (let amount = growth; amount >= 0; amount -= 2) {
               container.style.setProperty('--optimal-timeline-width', `${base + amount}px`);
-              if (fits() && card.getBoundingClientRect().bottom <= available - 8) {
+              if (fits() && mesaCaja(card).bottom <= available - 8) {
                 expanded = true;
                 break;
               }
@@ -565,10 +568,10 @@
       }
       // Con lo que la línea deja libre, crece tu carta (o el abanico de la mano).
       const fanCard = shell.querySelector('.atlas-hand-section .hand.hand-fan .hand-card');
-      const fanKey = fanCard ? `${container.dataset.screen}:${window.innerWidth}x${window.innerHeight}` : null;
+      const fanKey = fanCard ? `${container.dataset.screen}:${CT.Mesa.ancho()}x${CT.Mesa.alto()}` : null;
       if (fanKey && fanHold?.key === fanKey) {
         if (fanHold.width) { container.classList.add('board-hand-expanded'); container.style.setProperty('--optimal-fan-card', fanHold.width); }
-      } else if (!shrunk && fits() && window.innerWidth >= 375) {
+      } else if (!shrunk && fits() && CT.Mesa.ancho() >= 375) {
         const section = shell.querySelector('.board-timeline-section');
         const card = section?.querySelector('.timeline .timeline-card');
         if (card) growHand(container, shell, section, card, available, fits);
@@ -580,7 +583,7 @@
       const previewing = !!handSection?.querySelector('.provisional-hand-note');
       // Si ahora no cabe entero (aparece el botón de colocar), guarda todo el que quepa.
       if (previewing && heldHand?.screen === container.dataset.screen) {
-        const now = handSection.getBoundingClientRect().height;
+        const now = mesaCaja(handSection).height;
         container.classList.add('board-hand-hold');
         let held = false;
         for (let height = heldHand.height; height > now + 8; height -= 8) {
@@ -601,25 +604,25 @@
           if (!fits()) { container.classList.remove('board-hand-air'); container.style.removeProperty('--board-hand-air'); }
         }
       }
-      if (handSection && !previewing && handSection.querySelector('.hand-card')) heldHand = { screen: container.dataset.screen, height: Math.round(handSection.getBoundingClientRect().height) };
+      if (handSection && !previewing && handSection.querySelector('.hand-card')) heldHand = { screen: container.dataset.screen, height: Math.round(mesaCaja(handSection).height) };
     });
   }
   // Papel libre bajo la carta de la línea, dentro de su recuadro y de la pantalla.
-  const freeBelow = (section, card, available) => Math.min(section.getBoundingClientRect().bottom, available) - card.getBoundingClientRect().bottom;
+  const freeBelow = (section, card, available) => Math.min(mesaCaja(section).bottom, available) - mesaCaja(card).bottom;
   function growHand(container, shell, section, card, available, fits) {
     const solo = shell.querySelector('.board-focus-card .hand-solo .hand-card');
     const fan = shell.querySelector('.atlas-hand-section .hand.hand-fan .hand-card');
     const target = solo || fan;
     const share = (freeBelow(section, card, available) - 30) / 2;
     if (!target || share < 12) return;
-    const base = target.getBoundingClientRect().width;
+    const base = mesaCaja(target).width;
     // `solo` es 3:4 y el abanico 2:3: cada píxel de ancho suma 4/3 o 3/2 de alto.
     const ratio = solo ? 4 / 3 : 3 / 2;
     // En el abanico, la carta más lejana del centro queda a 1,1 anchos, mide 0,72 y va
     // girada: su borde tiene que seguir dentro de la pantalla.
     // Tu carta no pasa de un cuarto del alto en pantallas bajas, ni de un tercio largo en las altas.
     const tallest = available * (available <= 740 ? 0.25 : 0.32);
-    const limit = solo ? Math.min(window.innerWidth * 0.5, 210, tallest / ratio) : Math.min((window.innerWidth / 2 - 10) / 1.6, 150);
+    const limit = solo ? Math.min(CT.Mesa.ancho() * 0.5, 210, tallest / ratio) : Math.min((CT.Mesa.ancho() / 2 - 10) / 1.6, 150);
     const wanted = Math.min(limit, base + Math.floor(share / ratio));
     if (wanted < base + 6) return;
     const property = solo ? '--optimal-hand-width' : '--optimal-fan-card';
@@ -699,6 +702,7 @@
     const inGame = playing.has(screen);
     container.classList.toggle('atlas-playing', inGame);
     container.classList.toggle('atlas-board', board.has(screen));
+    CT.Mesa.aplica(container, board.has(screen));
     if (screen === 'perfil') {
       const veil = document.createElement('div');
       veil.className = 'atlas-scroll-veil atlas-profile-veil';
@@ -786,7 +790,7 @@
     refreshDepth();
     fitBoard(container);
     scheduleCardText(container);
-    if (screen === 'game' && window.innerWidth <= 699) requestAnimationFrame(() => {
+    if (screen === 'game' && CT.Mesa.ancho() <= 699) window.requestAnimationFrame?.(() => {
       const roster = container.querySelector('.scoreboard-panel .scoreboard');
       const active = roster?.querySelector('.score.active');
       if (!roster?.isConnected || !active || roster.scrollWidth <= roster.clientWidth) return;

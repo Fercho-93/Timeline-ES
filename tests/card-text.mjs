@@ -20,6 +20,7 @@ try {
   window.requestAnimationFrame = callback => {frames.set(++next, callback); return next;};
   window.cancelAnimationFrame = id => frames.delete(id);
   const flush = () => {const pending = [...frames.values()]; frames.clear(); pending.forEach(callback => callback());};
+  window.eval(read('mesa-escala.js'));
   window.eval(read('immersion.js'));
   const app = window.document.querySelector('#app');
   for (const screen of ['game', 'local-game', 'online-game', 'quick-game']) {

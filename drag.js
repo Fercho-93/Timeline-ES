@@ -131,8 +131,11 @@
     ghost.setAttribute("aria-hidden", "true");
     ghost.setAttribute("tabindex", "-1");
     ghost.removeAttribute("disabled");
-    const sourceWidth = card.getBoundingClientRect().width || GHOST_WIDTH;
-    const scale = Math.min(1.12, Math.max(.78, sourceWidth * 1.08 / GHOST_WIDTH), (window.innerWidth - 2 * MARGIN) / GHOST_WIDTH, (window.innerHeight - 2 * MARGIN) / (GHOST_WIDTH * 1.5));
+    // La copia vuela fuera de la mesa, sobre la pantalla real: se mide en puntos de la mesa
+    // (mesa-escala.js) y se escala igual que ella, para que tenga el tamaño de siempre.
+    const mesa = window.CONTINUUM.Mesa;
+    const sourceWidth = card.getBoundingClientRect().width / mesa.escala() || GHOST_WIDTH;
+    const scale = mesa.escala() * Math.min(1.12, Math.max(.78, sourceWidth * 1.08 / GHOST_WIDTH), (mesa.ancho() - 2 * MARGIN) / GHOST_WIDTH, (mesa.alto() - 2 * MARGIN) / (GHOST_WIDTH * 1.5));
     ghost.classList.add('drag-card-preview');
     ghost.removeAttribute('id');
     ghost.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));

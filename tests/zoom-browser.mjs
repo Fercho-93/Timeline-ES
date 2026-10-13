@@ -85,7 +85,7 @@ try {
    const longTitle=await illustratedCard.evaluate(card=>{
      const title=card.querySelector('h3'),value=card.querySelector('.year'),frame=card.closest('.timeline-scale-frame');
      const line=parseFloat(getComputedStyle(title).lineHeight)||parseFloat(getComputedStyle(title).fontSize)*1.2;
-     return {titleHeight:title.getBoundingClientRect().height,titleScroll:title.scrollHeight,titleLines:Math.round(title.getBoundingClientRect().height/line),
+     return {titleHeight:title.offsetHeight,titleScroll:title.scrollHeight,titleLines:Math.round(title.offsetHeight/line),
        titleClamp:getComputedStyle(title).webkitLineClamp,
        valueBottom:value.getBoundingClientRect().bottom,cardBottom:card.getBoundingClientRect().bottom,
        frameBottom:frame.getBoundingClientRect().bottom};

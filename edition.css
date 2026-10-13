@@ -43,7 +43,7 @@ html body::before {
 }
 :root[data-theme="dark"] body { background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--scene-wash) 12%, transparent), transparent 55%), var(--edition-paper); }
 .shell { position: relative; }
-.home-shell { max-width: 1160px; padding-inline: clamp(18px, 4vw, 48px); padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+.home-shell { max-width: 1160px; padding-inline: clamp(18px, calc(4 * var(--vw)), 48px); padding-bottom: calc(112px + var(--safe-bottom)); }
 .topbar { color: var(--edition-ink); border-color: var(--edition-line); }
 .brand { color: var(--edition-ink); font-size: .8rem; letter-spacing: .24em; }
 .icon-btn { font-family: var(--ui-font); font-size: .875rem; border: 1px solid var(--edition-line); border-radius: 6px; background: var(--edition-surface); box-shadow: none; }
@@ -54,8 +54,8 @@ html body::before {
 .home-shell .brand { visibility: visible; }
 .home-shell .topbar { margin: 0 0 10px; border-bottom: 1px solid var(--edition-line); }
 .home-masthead { color: var(--edition-ink); margin: 6px auto 24px; }
-.home-crest { width: clamp(180px, 46vw, 248px); }
-.home-wordmark { font-size: clamp(2.55rem, 9vw, 4rem); font-weight: 400; letter-spacing: -.045em; }
+.home-crest { width: clamp(180px, calc(46 * var(--vw)), 248px); }
+.home-wordmark { font-size: clamp(2.55rem, calc(9 * var(--vw)), 4rem); font-weight: 400; letter-spacing: -.045em; }
 .home-tagline { color: var(--edition-brass); font-family: var(--ui-font); font-size: .75rem; letter-spacing: .2em; line-height: 1.7; }
 .home-ornament { margin: 18px 0 0; }
 .home-ornament span { background: var(--edition-line); }
@@ -85,7 +85,7 @@ html body::before {
 .home-shell .gallery-panel:not(.active) .panel-label,
 .home-shell .gallery-panel.active .panel-label { top: auto; bottom: 25px; left: 25px; right: 25px; transform: none; display: block; }
 .home-shell .panel-label i { display: none; }
-.home-shell .panel-label strong { display: block; font-size: clamp(1.25rem, 2.2vw, 1.7rem); font-weight: 400; line-height: 1.15; color: #fff5df; }
+.home-shell .panel-label strong { display: block; font-size: clamp(1.25rem, calc(2.2 * var(--vw)), 1.7rem); font-weight: 400; line-height: 1.15; color: #fff5df; }
 .home-shell .panel-label small { display: block; color: #e9dbc2; font: .8125rem/1.5 var(--ui-font); margin-top: 7px; }
 .collection-index { position: absolute; z-index: 2; top: 23px; left: 25px; color: #fff5df; font: 500 .75rem/1.5 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; text-shadow: 0 1px 5px #000; }
 .collection-open { position: absolute; top: 19px; right: 22px; z-index: 2; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid #eee0bd88; border-radius: 50%; color: #fff5df; background: #17150f44; font: 1.1rem var(--ui-font); }
@@ -102,7 +102,7 @@ html body::before {
 /* Anclada al borde inferior y a todo el ancho, no flotante: separada del borde dejaba
    ver el contenido de la página por debajo, que es justo lo que una barra fija no debe
    hacer. El relleno inferior absorbe la franja de gestos del teléfono. */
-html .home-nav { bottom: 0; min-height: 66px; padding: 5px 5px calc(5px + env(safe-area-inset-bottom)); border: 0; border-top: 1px solid var(--edition-line); border-radius: 0; background: var(--edition-surface); box-shadow: 0 -8px 32px #0002; }
+html .home-nav { bottom: 0; min-height: 66px; padding: 5px 5px calc(5px + var(--safe-bottom)); border: 0; border-top: 1px solid var(--edition-line); border-radius: 0; background: var(--edition-surface); box-shadow: 0 -8px 32px #0002; }
 html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-surface) 94%, transparent); border-color: var(--edition-line); }
 .home-nav button { gap: 4px; padding: 7px 4px; border-radius: 7px; color: var(--edition-muted); }
 .home-nav small { font: .75rem/1.3 var(--ui-font); }
@@ -220,7 +220,7 @@ html:root .home-shell .home-nav { background: color-mix(in srgb, var(--edition-s
   .collection-decks .game-row:hover .deck-chapter i { transform: translate(3px, -3px); }
 }
 html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(--edition-brass) 24%, var(--edition-surface)); box-shadow: inset 0 1px 3px #0002; }
-#app[data-screen="perfil"] > .shell { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+#app[data-screen="perfil"] > .shell { padding-bottom: calc(90px + var(--safe-bottom)); }
 .solo-home .solo-intro { margin-bottom: 14px; }
 .solo-home .solo-intro .lead { font-size: .9rem; line-height: 1.45; margin-block: 8px 14px; }
 .solo-home .solo-fold { padding: 0; margin-block: 12px; }
@@ -246,7 +246,7 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
   #app[data-screen="online-game"] .hand .hand-card { height: 145px; min-height: 145px; }
   #app[data-device="ios"]:is([data-screen="online-game"], [data-screen="game"], [data-screen="quick-game"]) .hand .hand-card { height: auto; min-height: 215px; }
 }
-.perfil-section > h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.12; margin: 10px 0 18px; }
+.perfil-section > h1 { font-size: clamp(2rem, calc(7 * var(--vw)), 2.8rem); line-height: 1.12; margin: 10px 0 18px; }
 .perfil-section > .lead { font-size: 1rem; line-height: 1.65; margin-bottom: 26px; max-width: 62ch; }
 .perfil-section > .section-label { margin: 36px 0 18px; font-family: var(--font-display); font-size: 1.5rem; line-height: 1.3; letter-spacing: 0; text-transform: none; color: var(--edition-ink); gap: 12px; flex-wrap: wrap; }
 .perfil-section > .section-label small { font: .85rem/1.5 var(--ui-font); color: var(--edition-muted); }
@@ -283,8 +283,8 @@ html .home-nav button[aria-current="page"] { background: color-mix(in srgb, var(
    el zoom del navegador ni las preferencias de texto ampliado del usuario. */
 @media (max-width: 420px) {
   :root[data-platform="android"] { --normal-text-size: 90%; }
-  :root[data-platform="android"][data-text-size="100"] .home-crest { width: clamp(160px, 43vw, 180px); }
-  :root[data-platform="android"][data-text-size="100"] .home-wordmark { font-size: clamp(2.3rem, 8.4vw, 3.2rem); }
+  :root[data-platform="android"][data-text-size="100"] .home-crest { width: clamp(160px, calc(43 * var(--vw)), 180px); }
+  :root[data-platform="android"][data-text-size="100"] .home-wordmark { font-size: clamp(2.3rem, calc(8.4 * var(--vw)), 3.2rem); }
   :root[data-platform="android"][data-text-size="100"] #app .home-gallery-shell .home-masthead { margin-top: 16px; margin-bottom: 18px; }
   :root[data-platform="android"][data-text-size="100"] .home-shell .gallery-panel { height: 205px; }
   :root[data-platform="android"][data-text-size="100"] .collection-decks { padding: 15px; }
@@ -331,12 +331,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
    ancho fijo que solo cabría una. */
 #app .atlas-topbar-actions { grid-column: 3; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
 #app .atlas-topbar-actions .ambience-toggle { width: 36px; height: 36px; }
-#app.atlas-has-nav > .shell { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+#app.atlas-has-nav > .shell { padding-bottom: calc(96px + var(--safe-bottom)); }
 #app .atlas-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); width: 100%; max-width: none; left: 0; transform: none; background: var(--edition-surface); min-height: 64px; z-index: 30; }
 #app .atlas-nav button { min-height: 50px; min-width: 0; }
 #app .atlas-nav small { font: .67rem/1.3 var(--ui-font); }
 #app .atlas-nav svg { display: block; width: 22px; height: 22px; }
-#app .enc-modal { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+#app .enc-modal { padding-bottom: calc(100px + var(--safe-bottom)); }
 #app .enc-modal .atlas-nav { position: fixed; }
 #app .atlas-landscape { position: absolute; inset: 0; z-index: -1; max-width: none; overflow: hidden; }
 /* La profundidad de las portadas la escribe immersion.js en cada aviso del giroscopio, y
@@ -361,7 +361,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .atlas-specimens img { position: static; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; filter: sepia(1) saturate(.55); }
 .atlas-specimens figcaption { padding: 5px 2px; color: var(--edition-ink); text-align: center; font-size: .8rem; line-height: 1.2; overflow-wrap: anywhere; }
 #app .gallery-panel img { transform: translate(var(--depth-x,0px),var(--depth-y,0px)) scale(1.035); transition: transform 500ms ease-out; }
-#app.atlas-board .shell { max-width: 940px; padding: max(4px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom)); }
+#app.atlas-board .shell { max-width: 940px; padding: max(4px,var(--safe-top)) 12px max(12px,var(--safe-bottom)); }
 #app.atlas-board .atlas-topbar { margin-bottom: 4px; }
 #app.atlas-board .game-head { margin: 0 0 6px; padding-bottom: 6px; gap: 8px; align-items: center; }
 #app.atlas-board .turn-name { font-size: 1.18rem; line-height: 1.15; }
@@ -416,7 +416,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .hand-solo .reverso-emblema { width: 62px; height: 62px; }
 #app.atlas-board .atlas-hand-many { max-height: 260px; overflow-y: auto; padding: 7px 5px; }
 #app.atlas-board .atlas-hand-section > .hint { font: .72rem/1.3 var(--ui-font); margin: 5px 0; }
-#app.atlas-board .placement-dock { position: sticky; bottom: 0; z-index: 5; background: var(--edition-paper); padding: 7px 0 max(6px,env(safe-area-inset-bottom)); display: grid; gap: 7px; }
+#app.atlas-board .placement-dock { position: sticky; bottom: 0; z-index: 5; background: var(--edition-paper); padding: 7px 0 max(6px,var(--safe-bottom)); display: grid; gap: 7px; }
 #app.atlas-board .placement-dock-status { display: flex; align-items: center; gap: 6px; color: var(--edition-ink); font: 700 .68rem/1.1 var(--ui-font); letter-spacing: .025em; }
 #app.atlas-board .placement-dock-status span { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--atlas-selection); color: var(--edition-surface); font: 800 .76rem/1 var(--ui-font); box-shadow: inset 0 0 0 1px #fff8e744; }
 #app.atlas-board .placement-dock-actions { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px; }
@@ -458,7 +458,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 @media (prefers-reduced-motion: reduce) {
   #app .gallery-panel img, #app .atlas-landscape img, #app .atlas-specimens, #app .atlas-specimens figure, #app .hand-card, .atlas-reveal { animation: none !important; transition: none !important; }
 }
-#app .rules:has(.atlas-nav), #app .settings-modal:has(.atlas-nav) { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+#app .rules:has(.atlas-nav), #app .settings-modal:has(.atlas-nav) { padding-bottom: calc(96px + var(--safe-bottom)); }
 #app .modal .atlas-nav { position: fixed; bottom: 0; }
 #app .guide-tools { justify-content: flex-start; }
 #app .settings-head { flex-direction: row-reverse; }
@@ -487,7 +487,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   border: 0; border-radius: 0; background: none; box-shadow: none;
   white-space: normal; pointer-events: none;
 }
-#app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: max(12px,env(safe-area-inset-bottom)); }
+#app.atlas-board:has(.placement-dock .btn) > .shell { padding-bottom: max(12px,var(--safe-bottom)); }
 #app.atlas-board .placement-dock:not(:has(.btn)) { position: static; }
 @media (max-width: 360px) {
   #app.atlas-board .placement-dock:has(.btn) { grid-template-columns: 1fr; }
@@ -503,7 +503,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
    muerta bajo el botón de confirmar. El hueco que sobra se lo queda la línea temporal
    —con sus cartas centradas— en lugar de acumularse al final de la pantalla. */
 @media (max-width: 699px) {
-  #app.atlas-board > .shell { display: flex; flex-direction: column; min-height: 100dvh; }
+  #app.atlas-board > .shell { display: flex; flex-direction: column; min-height: calc(100 * var(--dvh)); }
   #app.atlas-board > .shell > section:has(.timeline-wrap) { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
   #app.atlas-board > .shell > section:has(.timeline-wrap) .timeline-wrap { flex: 0 0 auto; display: flex; align-items: flex-start; }
 }
@@ -526,10 +526,10 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
      el hueco libre —lo que queda tras la barra, la cabecera, el zoom y el botón de
      confirmar— permite que la línea conserve su prioridad, mientras la mano crece un
      poco más y la página puede desplazarse si una pantalla corta lo necesita. */
-  #app.atlas-board { --atlas-card: clamp(142px, calc(100dvh - 610px), 218px); }
+  #app.atlas-board { --atlas-card: clamp(142px, calc(calc(100 * var(--dvh)) - 610px), 218px); }
   #app.atlas-board:has(.hand-solo) {
-    --atlas-card: clamp(142px, calc((100dvh - 366px) * .62), 306px);
-    --atlas-hand: clamp(148px, calc((100dvh - 366px) * .44), 244px);
+    --atlas-card: clamp(142px, calc((calc(100 * var(--dvh)) - 366px) * .62), 306px);
+    --atlas-hand: clamp(148px, calc((calc(100 * var(--dvh)) - 366px) * .44), 244px);
   }
   #app.atlas-board .timeline-card { width: max(112px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: max(76px, calc(var(--atlas-card) * .66 - 18px)); }
@@ -544,8 +544,8 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .timeline .card-visual {
     aspect-ratio: 2 / 3; height: auto; max-height: calc(var(--atlas-card) - 92px);
   }
-  #app.atlas-board:has(.hand-solo) .timeline-card h3 { font-size: clamp(.76rem, 1.12dvh, .92rem); }
-  #app.atlas-board:has(.hand-solo) .timeline-card .year { font-size: clamp(1rem, 1.5dvh, 1.22rem); }
+  #app.atlas-board:has(.hand-solo) .timeline-card h3 { font-size: clamp(.76rem, calc(1.12 * var(--dvh)), .92rem); }
+  #app.atlas-board:has(.hand-solo) .timeline-card .year { font-size: clamp(1rem, calc(1.5 * var(--dvh)), 1.22rem); }
 }
 
 /* Portadas impresas en el papel: el alfa deja ver el fondo real en los cuatro bordes. */
@@ -568,12 +568,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app .home-gallery-shell .atlas-topbar > .atlas-topbar-actions { grid-column: 3; }
   #app .home-gallery-shell .quick-actions { margin: 6px auto; }
   #app .home-gallery-shell .home-masthead { margin: 8px auto 14px; }
-  #app .home-gallery-shell .home-crest { width: clamp(80px, 15svh, 100px); }
+  #app .home-gallery-shell .home-crest { width: clamp(80px, calc(15 * var(--svh)), 100px); }
   #app .home-gallery-shell .home-wordmark { font-size: 2.25rem; }
   #app .home-gallery-shell .home-tagline { margin-top: 6px; font-size: .65rem; }
   #app .home-gallery-shell .home-ornament { margin-top: 10px; }
   #app .home-gallery-shell .gallery { gap: 12px; }
-  #app .home-gallery-shell .gallery-panel { height: clamp(110px, calc((100svh - 400px) / 2), 215px); }
+  #app .home-gallery-shell .gallery-panel { height: clamp(110px, calc((calc(100 * var(--svh)) - 400px) / 2), 215px); }
   #app .home-gallery-shell .gallery-panel.active { height: 215px; }
   #app .home-gallery-shell .gallery-panel .panel-label { bottom: 14px; }
   #app .home-gallery-shell .panel-label small { margin-top: 3px; }
@@ -710,7 +710,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app .collection-decks .game-row .game-meta { font: .75rem/1.4 var(--ui-font); margin-top: 5px; }
   #app .atlas-specimens figure { padding-bottom: 5px; }
   #app .atlas-specimens figcaption { height: 2.3em; padding: 0 2px; margin-top: 4px; }
-  #app[data-screen="solo-home"] .solo-title { font-size: clamp(1.7rem,7vw,2.1rem); margin: 8px 0; }
+  #app[data-screen="solo-home"] .solo-title { font-size: clamp(1.7rem,calc(7 * var(--vw)),2.1rem); margin: 8px 0; }
   #app[data-screen="solo-home"] .setup-section { margin-top: 4px; }
   #app[data-screen="solo-home"] .solo-fold { margin-block: 10px; }
   #app .solo-fold summary { padding: 13px 12px; min-height: 80px; }
@@ -746,7 +746,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   #app .solo-home:has(.solo-fold[open]) .solo-fold:not([open]) .solo-option-copy :is(small,time) { display: none; }
   #app .solo-home:has(.solo-fold[open]) .solo-fold:not([open]) .solo-option-mark { width: 32px; height: 32px; flex-basis: 32px; }
 }
-#app .solo-fold { scroll-margin-top: 12px; scroll-margin-bottom: calc(90px + env(safe-area-inset-bottom)); }
+#app .solo-fold { scroll-margin-top: 12px; scroll-margin-bottom: calc(90px + var(--safe-bottom)); }
 #app .deck-preview img { position: static; opacity: 1; }
 
 /* La lámina del resultado: la escena entera, estampada en el papel como en la carta,
@@ -761,7 +761,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 /* Se mide por el alto —no por el ancho del aviso— para que el botón de continuar siga
    cabiendo en la pantalla junto con el texto más largo. */
 #app .art-thumb img {
-  display: block; height: clamp(88px, 18dvh, 190px); width: auto; aspect-ratio: 2 / 3;
+  display: block; height: clamp(88px, calc(18 * var(--dvh)), 190px); width: auto; aspect-ratio: 2 / 3;
   object-fit: cover; filter: sepia(.42) saturate(.8) contrast(1.02); mix-blend-mode: multiply;
 }
 #app .art-thumb span {
@@ -930,7 +930,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .timeline-zoom [aria-pressed="true"] { color: #fff8e7; background: #79613b; box-shadow: 0 2px 6px #4a341a22; }
 @keyframes board-hito { 40% { background: #e6c67566; box-shadow: 0 0 16px #d2ad4b33; } }
 /* El resultado ocupa su lugar en la página y permite seguir viendo y moviendo la línea. */
-#app .overlay.board-result-layer { position: relative; inset: auto; display: block; padding: 0 12px max(16px,env(safe-area-inset-bottom)); background: none; backdrop-filter: none; -webkit-backdrop-filter: none; z-index: 6; animation: none; }
+#app .overlay.board-result-layer { position: relative; inset: auto; display: block; padding: 0 12px max(16px,var(--safe-bottom)); background: none; backdrop-filter: none; -webkit-backdrop-filter: none; z-index: 6; animation: none; }
 #app:has(.board-result-layer) .atlas-hand-section, #app:has(.board-result-layer) .placement-dock { display: none; }
 #app .board-result-layer .modal.board-result { width: 100%; max-width: 660px; max-height: none; margin: 0 auto; padding: 16px; border: 1px solid #b79d6955; border-radius: 16px; text-align: left; box-shadow: 0 6px 22px #4a341a15; background: #fff9ec; }
 #app .board-result > .result-mark, #app .board-result > .eyebrow { display: none; }
@@ -947,7 +947,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app.atlas-board .atlas-hand-section { margin-top: 4px; }
 .drag-card-preview > strong { font-size: .78rem; padding-right: 0; line-height: 1.16; hyphens: none; overflow-wrap: normal; }
 #app.atlas-board[data-platform][data-screen] .hand-solo .hand-card > strong {
-  font-size: clamp(.66rem,2.65vw,.78rem); padding-right: 0; line-height: 1.12;
+  font-size: clamp(.66rem,calc(2.65 * var(--vw)),.78rem); padding-right: 0; line-height: 1.12;
   -webkit-hyphens: none; hyphens: none; overflow-wrap: normal; word-break: normal;
 }
 
@@ -956,10 +956,10 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app .timeline-toolbar .timeline-zoom { flex: none; margin: 0; padding: 2px; border-radius: 10px; }
 #app .timeline-toolbar .timeline-zoom [data-zoom-level] { min-width: 44px; width: 44px; height: 40px; min-height: 40px; font-size: .7rem; border-radius: 8px; }
 @media (max-width: 699px) {
-  #app.atlas-board { --atlas-card: clamp(172px, calc(100dvh - 550px), 268px); }
+  #app.atlas-board { --atlas-card: clamp(172px, calc(calc(100 * var(--dvh)) - 550px), 268px); }
   #app.atlas-board .timeline-card { width: max(128px, calc(var(--atlas-card) * .73)); min-height: var(--atlas-card); }
   #app.atlas-board[data-platform][data-screen] .timeline .card-visual { height: max(108px, calc(var(--atlas-card) * .66 + 12px)); }
-  #app.atlas-board:has(.hand-solo) { --atlas-card: clamp(224px, calc((100dvh - 366px) * .62 + 56px), 360px); }
+  #app.atlas-board:has(.hand-solo) { --atlas-card: clamp(224px, calc((calc(100 * var(--dvh)) - 366px) * .62 + 56px), 360px); }
   #app.atlas-board:has(.hand-solo) .timeline-card { width: max(128px, calc((var(--atlas-card) - 92px) / 1.5 + 16px)); }
   #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .timeline .card-visual { aspect-ratio: 2 / 3; height: auto; max-height: none; flex: none; }
   #app.atlas-board :is(.slot, .slot-confirm) { min-height: var(--atlas-card); }
@@ -1195,19 +1195,19 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 .enc-card[data-action="enc-card"], .enc-recent-card[data-action="enc-card"] { cursor: pointer; }
 .enc-card[data-action="enc-card"]:focus-visible, .enc-recent-card[data-action="enc-card"]:focus-visible { outline: 2px solid var(--edition-rust); outline-offset: 3px; }
 .enc-card-overlay { z-index: 60; }
-.enc-card-modal { position: relative; width: min(100%, 620px); max-height: min(92dvh, 900px); overflow: auto; padding: 26px clamp(16px, 4vw, 34px) 24px; background: var(--edition-paper); }
+.enc-card-modal { position: relative; width: min(100%, 620px); max-height: min(calc(92 * var(--dvh)), 900px); overflow: auto; padding: 26px clamp(16px, calc(4 * var(--vw)), 34px) 24px; background: var(--edition-paper); }
 .enc-card-close { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid var(--edition-line); border-radius: 50%; color: var(--edition-ink); background: var(--edition-surface); font-size: 1.5rem; line-height: 1; cursor: pointer; }
-.enc-card-modal h2 { max-width: calc(100% - 50px); margin: 4px 0 16px; font: 600 clamp(1.6rem, 5vw, 2.35rem)/1.05 var(--font-display); }
+.enc-card-modal h2 { max-width: calc(100% - 50px); margin: 4px 0 16px; font: 600 clamp(1.6rem, calc(5 * var(--vw)), 2.35rem)/1.05 var(--font-display); }
 .enc-card-large { margin: 0 auto 20px; }
 .enc-card-large .enc-card { display: grid; grid-template-columns: minmax(190px, 42%) minmax(0, 1fr); width: 100%; overflow: hidden; }
 .enc-card-large .enc-card .card-visual { min-height: 310px; }
 .enc-card-large .enc-card .card-content { padding: 18px; }
 .enc-card-large .enc-card .card-content h3 { font-size: 1.25rem; }
 .enc-image-overlay { z-index: 65; }
-.enc-image-modal { position: relative; width: min(100%, 760px); max-height: min(94dvh, 980px); overflow: auto; padding: 26px clamp(16px, 4vw, 34px) 24px; background: var(--edition-paper); }
-.enc-image-modal h2 { max-width: calc(100% - 50px); margin: 4px 0 16px; font: 600 clamp(1.5rem, 5vw, 2.2rem)/1.05 var(--font-display); }
+.enc-image-modal { position: relative; width: min(100%, 760px); max-height: min(calc(94 * var(--dvh)), 980px); overflow: auto; padding: 26px clamp(16px, calc(4 * var(--vw)), 34px) 24px; background: var(--edition-paper); }
+.enc-image-modal h2 { max-width: calc(100% - 50px); margin: 4px 0 16px; font: 600 clamp(1.5rem, calc(5 * var(--vw)), 2.2rem)/1.05 var(--font-display); }
 .enc-image-full { display: grid; place-items: center; min-height: 260px; margin: 0 auto 20px; padding: 10px; border: 1px solid var(--edition-line); background: var(--edition-surface); }
-.enc-image-full .animal-card-art { display: block; width: min(100%, 620px); max-height: min(68dvh, 720px); object-fit: contain; }
+.enc-image-full .animal-card-art { display: block; width: min(100%, 620px); max-height: min(calc(68 * var(--dvh)), 720px); object-fit: contain; }
 @media (max-width: 560px) {
   #app .enc-toolbar-compact { grid-template-columns: 1fr; gap: 8px; }
   .enc-card-large .enc-card { grid-template-columns: 1fr; }
@@ -1215,7 +1215,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 }
 .enc-album-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .enc-album-heading span { display: block; margin-bottom: 3px; color: var(--edition-brass); font: 700 .58rem/1.3 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
-.enc-album-heading h2 { margin: 0; font-size: clamp(1.35rem,5vw,1.8rem); }
+.enc-album-heading h2 { margin: 0; font-size: clamp(1.35rem,calc(5 * var(--vw)),1.8rem); }
 .enc-album-heading > small { flex: none; color: var(--edition-muted); font: .68rem/1.4 var(--ui-font); }
 .enc-recent { margin: 4px 0 24px; padding: 16px 0 18px; border-block: 1px solid color-mix(in srgb,var(--edition-brass) 28%,transparent); }
 .enc-recent-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(142px,38%); gap: 10px; overflow-x: auto; padding: 4px 3px 15px; scroll-snap-type: x proximity; }
@@ -1343,12 +1343,12 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 
 /* Resultado de una sola mirada: cifra, marca, colección y logros antes de las acciones. */
 #app .final-composition { padding: 24px 22px 20px; text-align: center; }
-#app .final-composition .final-title { max-width: 24ch; margin: 5px auto 6px; font-size: clamp(1.65rem,6.5vw,2.45rem) !important; line-height: 1.08; }
+#app .final-composition .final-title { max-width: 24ch; margin: 5px auto 6px; font-size: clamp(1.65rem,calc(6.5 * var(--vw)),2.45rem) !important; line-height: 1.08; }
 .final-lead { max-width: 38ch; margin: 0 auto 14px; color: var(--edition-muted); font: .78rem/1.45 var(--ui-font); }
 .final-metrics { display: grid; grid-template-columns: 1.25fr repeat(3,1fr); gap: 7px; margin: 12px 0 14px; }
 .final-score,.final-stat { min-width: 0; min-height: 76px; display: grid; place-items: center; align-content: center; padding: 8px 5px; border: 1px solid var(--edition-line); border-radius: 9px; background: color-mix(in srgb,var(--edition-brass) 7%,var(--edition-surface)); }
 .final-score { border-color: color-mix(in srgb,var(--edition-brass) 60%,var(--edition-line)); background: linear-gradient(145deg,#f8edcf,#e9d09c); }
-.final-score strong { color: #744c25; font: 600 clamp(2.2rem,10vw,3.5rem)/.86 var(--font-display); }
+.final-score strong { color: #744c25; font: 600 clamp(2.2rem,calc(10 * var(--vw)),3.5rem)/.86 var(--font-display); }
 .final-score span,.final-stat small { margin-top: 6px; color: var(--edition-muted); font: 700 .5rem/1.15 var(--ui-font); letter-spacing: .06em; text-transform: uppercase; }
 .final-stat b { max-width: 100%; color: var(--edition-ink); font: 600 .88rem/1.05 var(--font-display); overflow-wrap: anywhere; }
 #app .final-composition .logros-nuevos { margin: 8px auto 12px; }
@@ -1440,8 +1440,8 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   --edition-brass: #8b5e2d;
   isolation: isolate;
   max-width: 760px;
-  padding-inline: clamp(18px, 5vw, 38px);
-  padding-bottom: calc(122px + env(safe-area-inset-bottom));
+  padding-inline: clamp(18px, calc(5 * var(--vw)), 38px);
+  padding-bottom: calc(122px + var(--safe-bottom));
   background:
     radial-gradient(circle at 92% 7%, transparent 0 82px, #9a754323 83px 84px, transparent 85px 105px, #9a75431a 106px 107px, transparent 108px),
     radial-gradient(circle at 8% 13%, transparent 0 118px, #9a75431c 119px 120px, transparent 121px),
@@ -1470,20 +1470,20 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
   text-align: center;
 }
 #app[data-screen="home"] .home-crest {
-  width: clamp(118px, 29vw, 170px);
+  width: clamp(118px, calc(29 * var(--vw)), 170px);
   margin: 0 auto -8px;
   filter: sepia(.12) saturate(.92) drop-shadow(0 5px 7px #58371921);
 }
 #app[data-screen="home"] .home-wordmark {
   color: #2f1c12;
-  font-size: clamp(2.65rem, 9.5vw, 4.2rem);
+  font-size: clamp(2.65rem, calc(9.5 * var(--vw)), 4.2rem);
   letter-spacing: -.035em;
   text-shadow: 0 1px #fff8e7;
 }
 #app[data-screen="home"] .home-tagline {
   margin-top: 5px;
   color: #6f4529;
-  font-size: clamp(.61rem, 2vw, .78rem);
+  font-size: clamp(.61rem, calc(2 * var(--vw)), .78rem);
   font-weight: 650;
   letter-spacing: .28em;
   text-transform: uppercase;
@@ -1495,7 +1495,7 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 #app[data-screen="home"] .gallery { gap: 19px; }
 #app[data-screen="home"] .home-gallery-shell .gallery-panel,
 #app[data-screen="home"] .home-gallery-shell .gallery-panel.active {
-  height: clamp(190px, 50vw, 300px);
+  height: clamp(190px, calc(50 * var(--vw)), 300px);
   min-height: 190px;
   border: 0;
   border-radius: 15px;
@@ -1586,14 +1586,14 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 }
 #app[data-screen="home"] .gallery-panel .panel-label strong {
   color: #fff8e8;
-  font-size: clamp(1.65rem, 6vw, 2.35rem);
+  font-size: clamp(1.65rem, calc(6 * var(--vw)), 2.35rem);
   line-height: .98;
   text-shadow: 0 2px 5px #0f0907;
 }
 #app[data-screen="home"] .gallery-panel .panel-label small {
   margin-top: 5px;
   color: #f7e6c9;
-  font-size: clamp(.72rem, 2.5vw, .93rem);
+  font-size: clamp(.72rem, calc(2.5 * var(--vw)), .93rem);
   line-height: 1.25;
   text-shadow: 0 2px 4px #0f0907;
 }
@@ -1605,8 +1605,8 @@ html #app .home-nav.atlas-nav {
   bottom: 0;
   width: 100%;
   max-width: none;
-  min-height: calc(68px + env(safe-area-inset-bottom));
-  padding: 4px 12px calc(4px + env(safe-area-inset-bottom));
+  min-height: calc(68px + var(--safe-bottom));
+  padding: 4px 12px calc(4px + var(--safe-bottom));
   border: 0;
   border-radius: 0;
   color: #3e3028;
@@ -1690,7 +1690,7 @@ html #app .home-nav.atlas-nav::before {
 #app .home-nav.atlas-nav small {
   color: inherit;
   margin-top: 4px;
-  font: 600 clamp(.53rem, 1.9vw, .64rem)/1.05 var(--font-display);
+  font: 600 clamp(.53rem, calc(1.9 * var(--vw)), .64rem)/1.05 var(--font-display);
 }
 #app .home-nav.atlas-nav button[aria-current] {
   color: #fff1cf;
@@ -1717,10 +1717,10 @@ html #app .home-nav.atlas-nav::before {
 #app > .overlay > :is(.enc-modal, .settings-modal, .rules) {
   width: 100%;
   max-width: none;
-  max-height: 100dvh;
-  min-height: 100dvh;
+  max-height: calc(100 * var(--dvh));
+  min-height: calc(100 * var(--dvh));
   margin: 0;
-  padding: max(18px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) calc(82px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  padding: max(18px, var(--safe-top)) max(20px, var(--safe-right)) calc(82px + var(--safe-bottom)) max(20px, var(--safe-left));
   border: 0;
   border-radius: 0;
   background: var(--edition-paper);
@@ -1728,7 +1728,7 @@ html #app .home-nav.atlas-nav::before {
 }
 #app[data-screen="perfil"] > .shell { width: 100%; max-width: none; }
 #app :is(.enc-modal, .settings-modal, .rules) .home-nav.atlas-nav { display: grid; }
-#app :is(.enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
+#app :is(.enc-modal, .settings-modal, .rules):has(.home-nav.atlas-nav) { padding-bottom: calc(82px + var(--safe-bottom)); }
 #app .home-nav.atlas-nav button[aria-current] small {
   color: #8a3f2f;
   text-decoration: underline;
@@ -1740,14 +1740,14 @@ html #app .home-nav.atlas-nav::before {
   #app[data-screen="home"] .home-gallery-shell { padding-inline: 22px; }
   #app[data-screen="home"] .home-masthead { margin: 0 auto 17px; padding-top: 0; }
   #app[data-screen="home"] .home-crest { width: 94px; margin-bottom: -7px; }
-  #app[data-screen="home"] .home-wordmark { font-size: clamp(2.25rem, 10.8vw, 2.85rem); }
+  #app[data-screen="home"] .home-wordmark { font-size: clamp(2.25rem, calc(10.8 * var(--vw)), 2.85rem); }
   #app[data-screen="home"] .home-tagline { margin-top: 2px; font-size: .53rem; letter-spacing: .2em; }
   #app[data-screen="home"] .home-ornament { margin-top: 9px; }
   #app[data-screen="home"] .home-ornament span { width: 62px; }
   #app[data-screen="home"] .gallery { gap: 13px; }
   #app[data-screen="home"] .home-gallery-shell .gallery-panel,
   #app[data-screen="home"] .home-gallery-shell .gallery-panel.active {
-    height: clamp(154px, 41vw, 170px);
+    height: clamp(154px, calc(41 * var(--vw)), 170px);
     min-height: 154px;
   }
   #app[data-screen="home"] .gallery-panel .collection-index { top: 12px; left: 14px; min-height: 27px; padding: 3px 11px; }
@@ -1755,7 +1755,7 @@ html #app .home-nav.atlas-nav::before {
   #app[data-screen="home"] .gallery-panel .panel-label,
   #app[data-screen="home"] .gallery-panel:not(.active) .panel-label,
   #app[data-screen="home"] .gallery-panel.active .panel-label { right: 60px; bottom: 13px; left: 16px; }
-  #app[data-screen="home"] .gallery-panel .panel-label strong { font-size: clamp(1.45rem, 6vw, 1.75rem); }
+  #app[data-screen="home"] .gallery-panel .panel-label strong { font-size: clamp(1.45rem, calc(6 * var(--vw)), 1.75rem); }
   #app[data-screen="home"] .gallery-panel .panel-label small { font-size: .7rem; }
   html #app .home-nav.atlas-nav { width: 100%; bottom: 0; }
 }
@@ -1768,10 +1768,10 @@ html #app .home-nav.atlas-nav::before {
    La marca persiste tras terminar JS: nunca reactivar una entrada CSS al limpiarlo. */
 @keyframes continuum-ink-enter { from { opacity: 0; } to { opacity: 1; } }
 #app > .overlay > :is(.enc-modal, .rules, .settings-modal) > .atlas-scroll-veil {
-  top: calc(-1 * max(18px, env(safe-area-inset-top)));
-  width: calc(100% + max(20px, env(safe-area-inset-left)) + max(20px, env(safe-area-inset-right)));
-  margin-left: calc(-1 * max(20px, env(safe-area-inset-left)));
-  margin-right: calc(-1 * max(20px, env(safe-area-inset-right)));
+  top: calc(-1 * max(18px, var(--safe-top)));
+  width: calc(100% + max(20px, var(--safe-left)) + max(20px, var(--safe-right)));
+  margin-left: calc(-1 * max(20px, var(--safe-left)));
+  margin-right: calc(-1 * max(20px, var(--safe-right)));
   border-radius: 0;
 }
 #app .motion-managed,
@@ -1804,11 +1804,11 @@ html #app .home-nav.atlas-nav::before {
   max-width: 1080px;
   margin-inline: auto;
   padding-inline: 20px;
-  padding-bottom: calc(110px + env(safe-area-inset-bottom));
+  padding-bottom: calc(110px + var(--safe-bottom));
 }
 #app .atlas-page-heading { padding: 22px 0 28px; margin: 0 0 26px; border-bottom: 1px solid var(--edition-line); text-align: left; }
 #app .atlas-page-heading .eyebrow { font: 600 .68rem/1.5 var(--ui-font); letter-spacing: .18em; color: var(--edition-brass); }
-#app .atlas-page-heading h1 { margin: 8px 0 10px; font: 400 clamp(2.25rem, 5vw, 3.3rem)/1.1 var(--font-display); letter-spacing: -.035em; color: var(--edition-ink); }
+#app .atlas-page-heading h1 { margin: 8px 0 10px; font: 400 clamp(2.25rem, calc(5 * var(--vw)), 3.3rem)/1.1 var(--font-display); letter-spacing: -.035em; color: var(--edition-ink); }
 #app .atlas-page-heading p { margin: 0; max-width: 58ch; color: var(--edition-muted); font: .95rem/1.6 var(--ui-font); }
 #app :is(.settings-head, .guide-tools) { margin: 0; }
 #app .enc-section { padding-top: 0; }
@@ -1832,7 +1832,7 @@ html #app .home-nav.atlas-nav::before {
 #app .enc-deck-cards { padding: 0 16px 16px; }
 #app .enc-empty { border: 1px dashed var(--edition-line); border-radius: 12px; padding: 32px 20px; color: var(--edition-muted); }
 #app .guide-content { max-width: 820px; margin-inline: auto; }
-#app .guide-start { padding: clamp(18px,3vw,30px); background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 16px; }
+#app .guide-start { padding: clamp(18px,calc(3 * var(--vw)),30px); background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 16px; }
 #app .guide-start > h2 { margin: 0 0 8px; font: 500 1.5rem/1.25 var(--font-display); }
 #app .guide-context { font-size: .78rem; line-height: 1.5; }
 #app .guide-lead { font-size: .95rem; line-height: 1.7; }
@@ -1912,9 +1912,9 @@ html #app .home-nav.atlas-nav::before {
   #app > .overlay > :is(.enc-modal,.settings-modal,.rules) { padding-inline: 16px; }
   /* La veladura sale justo hasta el borde: el mismo margen que el relleno de 16 px. */
   #app > .overlay > :is(.enc-modal, .rules, .settings-modal) > .atlas-scroll-veil {
-    width: calc(100% + max(16px, env(safe-area-inset-left)) + max(16px, env(safe-area-inset-right)));
-    margin-left: calc(-1 * max(16px, env(safe-area-inset-left)));
-    margin-right: calc(-1 * max(16px, env(safe-area-inset-right)));
+    width: calc(100% + max(16px, var(--safe-left)) + max(16px, var(--safe-right)));
+    margin-left: calc(-1 * max(16px, var(--safe-left)));
+    margin-right: calc(-1 * max(16px, var(--safe-right)));
   }
   #app .perfil-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
   #app .perfil-stats > span:nth-child(n+3) { border-top: 1px solid var(--edition-line); }
@@ -1984,16 +1984,16 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
    propio): aquí no hay ningún otro botón con el que pueda solaparse, así que flotar en
    esta esquina no cuesta el hueco que exige la portada sin desplazamiento. */
 #app .home-doors-shell .atlas-topbar {
-  position: absolute; inset: max(6px, env(safe-area-inset-top)) 0 auto 0;
+  position: absolute; inset: max(6px, var(--safe-top)) 0 auto 0;
   margin: 0; padding: 0; border: 0; min-height: 0; z-index: 5; pointer-events: none;
 }
 #app .home-doors-shell .atlas-topbar > :not(.atlas-topbar-actions) { display: none; }
-#app .home-doors-shell .atlas-topbar-actions { pointer-events: auto; padding-right: max(4px, env(safe-area-inset-right)); }
-#app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(env(safe-area-inset-top) + 10px) auto clamp(12px, 2.4svh, 22px); padding: 0; }
-#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(78px, 13svh, 128px); margin-bottom: -6px; }
-#app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2.2rem, 6.2svh, 3.4rem); }
-#app[data-screen="home"] .home-doors-shell .home-ornament { margin-top: clamp(6px, 1.4svh, 12px); }
-#app .home-doors-shell .home-door { padding-block: clamp(8px, 1.4svh, 12px); }
+#app .home-doors-shell .atlas-topbar-actions { pointer-events: auto; padding-right: max(4px, var(--safe-right)); }
+#app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(var(--safe-top) + 10px) auto clamp(12px, calc(2.4 * var(--svh)), 22px); padding: 0; }
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(78px, calc(13 * var(--svh)), 128px); margin-bottom: -6px; }
+#app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2.2rem, calc(6.2 * var(--svh)), 3.4rem); }
+#app[data-screen="home"] .home-doors-shell .home-ornament { margin-top: clamp(6px, calc(1.4 * var(--svh)), 12px); }
+#app .home-doors-shell .home-door { padding-block: clamp(8px, calc(1.4 * var(--svh)), 12px); }
 @media (max-height: 700px) {
   #app[data-screen="home"] .home-doors-shell .home-ornament { display: none; }
   #app .home-doors-shell .home-door-art { width: 64px; height: 64px; }
@@ -2022,9 +2022,9 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app .daily-splash-art.is-revealed img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 /* Identidad: bienvenida, selector de avatares, Atlas y avatares en la mesa. */
-#app .bienvenida-shell { max-width: 460px; min-height: 100svh; display: grid; align-content: center; padding-block: calc(env(safe-area-inset-top) + 24px) calc(env(safe-area-inset-bottom) + 24px); }
+#app .bienvenida-shell { max-width: 460px; min-height: calc(100 * var(--svh)); display: grid; align-content: center; padding-block: calc(var(--safe-top) + 24px) calc(var(--safe-bottom) + 24px); }
 #app .bienvenida { display: grid; justify-items: center; gap: 14px; text-align: center; }
-#app .bienvenida h1 { margin: 0; color: var(--edition-ink); font-family: var(--font-display); font-weight: 400; font-size: clamp(1.8rem, 7vw, 2.4rem); line-height: 1.1; }
+#app .bienvenida h1 { margin: 0; color: var(--edition-ink); font-family: var(--font-display); font-weight: 400; font-size: clamp(1.8rem, calc(7 * var(--vw)), 2.4rem); line-height: 1.1; }
 #app .bienvenida .lead { margin: 0; color: var(--edition-muted); }
 #app .bienvenida-form { display: grid; gap: 10px; width: 100%; }
 #app .bienvenida-form input, #app .identidad-modal input { width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--edition-line); border-radius: 8px; background: var(--edition-surface); color: var(--edition-ink); font: 1.1rem var(--ui-font); text-align: center; }
@@ -2055,7 +2055,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   position: relative;
   display: block;
   box-sizing: border-box;
-  height: clamp(104px, 14svh, 136px);
+  height: clamp(104px, calc(14 * var(--svh)), 136px);
   min-height: 104px;
   padding: 0;
   overflow: hidden;
@@ -2129,7 +2129,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 @media (max-height: 700px) {
   #app .home-door,
-  #app .home-door-daily { height: clamp(96px, 14svh, 120px); min-height: 96px; }
+  #app .home-door-daily { height: clamp(96px, calc(14 * var(--svh)), 120px); min-height: 96px; }
   #app .home-door-copy { padding: 10px 18px; }
 }
 @media (max-width: 480px) {
@@ -2276,12 +2276,12 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 #app .home-doors-shell .home-door-copy b,
 #app .home-doors-shell .home-door-daily .home-door-copy b {
-  font-size: clamp(1.27rem, 3.6vw, 1.5rem);
+  font-size: clamp(1.27rem, calc(3.6 * var(--vw)), 1.5rem);
   line-height: 1.08;
 }
 #app .home-doors-shell .home-door-copy small {
   display: block;
-  font-size: clamp(.75rem, 2.15vw, .82rem);
+  font-size: clamp(.75rem, calc(2.15 * var(--vw)), .82rem);
   line-height: 1.4;
   color: color-mix(in srgb, var(--edition-ink) 72%, var(--edition-muted));
 }
@@ -2514,7 +2514,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   width: 100%;
   min-height: 2.15em;
   color: color-mix(in srgb, var(--edition-ink) 72%, var(--edition-muted));
-  font: 400 clamp(1.5rem, 5.3vw, 2.55rem)/1.06 var(--font-display);
+  font: 400 clamp(1.5rem, calc(5.3 * var(--vw)), 2.55rem)/1.06 var(--font-display);
   letter-spacing: -.02em;
   text-wrap: balance;
   transition: color 260ms ease;
@@ -2593,7 +2593,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   #app .daily-splash .daily-splash-art { height: 188px; }
   #app .daily-reel-stage { margin-bottom: 18px; }
   #app .daily-reel-window { min-height: 78px; padding-inline: 27px; }
-  #app .daily-reel { font-size: clamp(1.38rem, 7vw, 2rem); }
+  #app .daily-reel { font-size: clamp(1.38rem, calc(7 * var(--vw)), 2rem); }
   #app .daily-splash .chapter-number { font-size: .61rem; letter-spacing: .14em; }
   #app .daily-splash-rule { font-size: .75rem; }
 }
@@ -2694,7 +2694,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 /* v344 · La carta por jugar ocupa el centro y la línea queda como destino inferior. */
 #app.atlas-board .board-question { width: min(100%, 430px); margin: 3px auto 5px; text-align: center; }
-#app.atlas-board .board-question h2 { margin: 0 0 3px; color: var(--edition-ink); font: 700 clamp(1.2rem, 5.3vw, 1.65rem)/1.05 var(--font-display); letter-spacing: -.025em; }
+#app.atlas-board .board-question h2 { margin: 0 0 3px; color: var(--edition-ink); font: 700 clamp(1.2rem, calc(5.3 * var(--vw)), 1.65rem)/1.05 var(--font-display); letter-spacing: -.025em; }
 #app.atlas-board .board-axis { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border: 1px solid color-mix(in srgb, var(--edition-brass) 42%, transparent); border-radius: 999px; color: var(--edition-muted); background: color-mix(in srgb, var(--edition-surface) 58%, transparent); font: 650 .62rem/1 var(--ui-font); letter-spacing: .09em; text-transform: uppercase; }
 #app.atlas-board .board-axis strong { color: var(--atlas-selection); }
 #app.atlas-board .board-question p { margin: 4px 0 0; color: var(--edition-muted); font: .7rem/1.25 var(--ui-font); }
@@ -2702,15 +2702,15 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 #app.atlas-board .board-focus-card { margin-top: 0; }
 #app.atlas-board .board-focus-card > .hand-title { justify-content: center; margin-bottom: 3px; }
 #app.atlas-board .board-focus-card > .hand-title h3 { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
-#app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(54vw, 220px)); justify-content: center; padding: 2px; }
+#app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(calc(54 * var(--vw)), 220px)); justify-content: center; padding: 2px; }
 #app.atlas-board[data-platform][data-device][data-screen] .board-focus-card .hand-solo .hand-card { width: 100%; height: auto !important; min-height: 0 !important; aspect-ratio: 2 / 3; padding: 11px; border-radius: 10px; }
 #app.atlas-board .board-focus-card .hand-solo .carta-reverso { min-height: 0; height: auto; flex: 1 1 auto; }
 #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong,
 #app.atlas-board[data-platform][data-screen] .atlas-hand-section .hand-card > strong { display: block; max-height: none; overflow: visible; white-space: normal; overflow-wrap: break-word; hyphens: auto; text-overflow: clip; }
-#app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong { margin-top: 8px; font-size: clamp(.84rem, 3.6vw, 1rem); line-height: 1.15; }
+#app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong { margin-top: 8px; font-size: clamp(.84rem, calc(3.6 * var(--vw)), 1rem); line-height: 1.15; }
 
 /* En manos de varias cartas, la elegida adquiere la misma jerarquía sin ocultar las demás. */
-#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected { grid-column: 1 / -1; justify-self: center; width: min(62vw, 240px); min-height: 220px !important; aspect-ratio: 3 / 4 !important; }
+#app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected { grid-column: 1 / -1; justify-self: center; width: min(calc(62 * var(--vw)), 240px); min-height: 220px !important; aspect-ratio: 3 / 4 !important; }
 #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected .carta-reverso { min-height: 112px; }
 
 /* El selector de escala tiene una fila propia, centrada antes del título de la línea. */
@@ -2757,7 +2757,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 @media (max-height: 760px) and (max-width: 699px) {
   #app.atlas-board .board-question p { display: none; }
-  #app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(48vw, 190px)); }
+  #app.atlas-board .board-focus-card .hand-solo { grid-template-columns: minmax(0, min(calc(48 * var(--vw)), 190px)); }
   #app.atlas-board .scoreboard-panel .scoreboard { max-height: 82px; }
   #app.atlas-board .scoreboard-panel .score { grid-template-columns: 34px minmax(0,1fr) 38px; padding-block: 2px; }
   #app.atlas-board .scoreboard-panel .score > .score-avatar,
@@ -2775,7 +2775,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
     margin: 0 0 10px;
   }
   #app.atlas-board .board-focus-card .hand-solo {
-    grid-template-columns: minmax(0, min(33.6vw, 131px));
+    grid-template-columns: minmax(0, min(calc(33.6 * var(--vw)), 131px));
     padding-block: 0;
   }
   #app.atlas-board[data-platform][data-device][data-screen] .board-focus-card .hand-solo .hand-card {
@@ -2790,7 +2790,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   }
   #app.atlas-board[data-platform][data-screen] .board-focus-card .hand-solo .hand-card > strong {
     margin-top: auto;
-    font-size: clamp(.72rem, 3vw, .86rem);
+    font-size: clamp(.72rem, calc(3 * var(--vw)), .86rem);
     line-height: 1.12;
   }
   #app.atlas-board .board-focus-card > .hint {
@@ -2831,7 +2831,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 
 @media (max-width: 380px), (max-height: 740px) {
   #app.atlas-board .board-focus-card .hand-solo {
-    grid-template-columns: minmax(0, min(30.4vw, 117px));
+    grid-template-columns: minmax(0, min(calc(30.4 * var(--vw)), 117px));
   }
   #app.atlas-board .board-timeline-section .timeline-card,
   #app.atlas-board .board-timeline-section :is(.slot, .slot-confirm) {
@@ -2893,7 +2893,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 @media (max-width: 699px) {
   #app.atlas-board > .shell {
     box-sizing: border-box;
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh));
     padding-inline: 12px;
   }
   #app.atlas-board .game-head {
@@ -2934,7 +2934,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
   }
   #app.atlas-board[data-platform][data-screen] .board-timeline-section .timeline .card-visual,
   #app.atlas-board:has(.hand-solo)[data-platform][data-screen] .board-timeline-section .timeline .card-visual {
-    height: clamp(126px, 23svh, 168px);
+    height: clamp(126px, calc(23 * var(--svh)), 168px);
     max-height: none;
     margin: 5px 5px 0;
   }
@@ -2983,7 +2983,7 @@ body:has(#app > .overlay > :is(.enc-modal,.settings-modal,.rules)) { overflow: h
 }
 #app[data-screen="home"] .home-doors-shell .home-door-art img { filter: sepia(.32) saturate(.91) contrast(1.13); opacity: 1; }
 #app[data-screen="home"] .home-doors-shell .home-door-copy { min-height: 140px; width: 83%; padding: 17px 20px; gap: 6px; }
-#app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-size: clamp(1.45rem, 5vw, 1.9rem); }
+#app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-size: clamp(1.45rem, calc(5 * var(--vw)), 1.9rem); }
 #app[data-screen="home"] .home-doors-shell .home-door-copy small { max-width: 29ch; color: #514b40; }
 #app[data-screen="home"] .home-doors-shell .home-door-cta {
   margin-top: 5px; padding: 0 0 2px; border-radius: 0; border-bottom: 1px solid var(--door-edge); background: transparent; color: #745a35; font-weight: 700; box-shadow: none;
@@ -3077,8 +3077,8 @@ html body::before {
   left: 0;
   right: 0;
   /* Viewport grande: cubre también la franja que deja libre la barra de Safari al plegarse. */
-  height: 100vh;
-  height: 100lvh;
+  height: calc(100 * var(--vh));
+  height: calc(100 * var(--lvh));
   pointer-events: none;
   opacity: 1;
   box-shadow: none;
@@ -3105,12 +3105,12 @@ html body::before { content: none; }
 :root #app[data-screen="home"], :root:not([data-theme="dark"]) #app[data-screen="home"], :root[data-theme="dark"] #app[data-screen="home"] { background: transparent; }
 #app[data-screen="home"]::before, #app[data-screen="home"]::after { content: none; }
 
-#app[data-screen="home"] .home-doors-shell .home-masthead { margin-top: calc(env(safe-area-inset-top) + clamp(16px, 4svh, 44px)); }
+#app[data-screen="home"] .home-doors-shell .home-masthead { margin-top: calc(var(--safe-top) + clamp(16px, calc(4 * var(--svh)), 44px)); }
 #app[data-screen="home"] .home-doors-shell .home-masthead::before { display: none; }
-#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(96px, 24vw, 132px); margin-bottom: 2px; }
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(96px, calc(24 * var(--vw)), 132px); margin-bottom: 2px; }
 #app[data-screen="home"] .home-doors-shell .home-wordmark {
   color: #2a1a10;
-  font-size: clamp(2.2rem, 10.6vw, 3.6rem);
+  font-size: clamp(2.2rem, calc(10.6 * var(--vw)), 3.6rem);
   font-weight: 600;
   letter-spacing: .005em;
   text-shadow: 0 1px 0 #fff8e8, 0 4px 10px #4a2c1624;
@@ -3142,7 +3142,7 @@ html body::before { content: none; }
 }
 #app[data-screen="home"] .home-doors-shell .home-door[data-action="jugar"] .home-door-art img { object-position: 70% 50%; }
 #app[data-screen="home"] .home-doors-shell .home-door-copy { min-height: 150px; width: 70%; padding: 18px 22px; gap: 7px; }
-#app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, 6.6vw, 2.05rem); letter-spacing: -.01em; }
+#app[data-screen="home"] .home-doors-shell .home-door-copy b { color: var(--door-ink); font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, calc(6.6 * var(--vw)), 2.05rem); letter-spacing: -.01em; }
 #app[data-screen="home"] .home-doors-shell .home-door-copy small { max-width: 26ch; color: #4a3d31; font: 1rem/1.35 var(--font-display); }
 #app[data-screen="home"] .home-doors-shell .home-door-cta {
   margin-top: 8px; padding-bottom: 4px; border-bottom: 1.5px solid #9c7641; color: #6e4a1f;
@@ -3176,7 +3176,7 @@ html body::before { content: none; }
   #app[data-screen="home"] .home-doors-shell .home-door-copy small { font-size: .92rem; }
   #app[data-screen="home"] .home-duels-banner b { font-size: 1.02rem; }
 }
-#app[data-screen="home"] .home-doors-shell { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
+#app[data-screen="home"] .home-doors-shell { padding-bottom: calc(150px + var(--safe-bottom)); }
 :root #app[data-screen="daily-intro"] { background: radial-gradient(ellipse at 50% 22%, color-mix(in srgb, var(--scene-wash) 18%, transparent), transparent 43%); }
 /* La mesa de juego conserva su fibra y su luz, pero ahora sobre la carta náutica común. */
 #app.atlas-board {
@@ -3189,16 +3189,16 @@ html body::before { content: none; }
 
 /* Portada compacta: caben al menos dos láminas enteras en un móvil con la barra del
    navegador visible. */
-#app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(env(safe-area-inset-top) + clamp(4px, 1.6svh, 18px)) auto clamp(10px, 1.8svh, 18px); }
-#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(70px, 17vw, 110px); margin-bottom: -2px; }
-#app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2rem, 9.4vw, 3.2rem); }
+#app[data-screen="home"] .home-doors-shell .home-masthead { margin: calc(var(--safe-top) + clamp(4px, calc(1.6 * var(--svh)), 18px)) auto clamp(10px, calc(1.8 * var(--svh)), 18px); }
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(70px, calc(17 * var(--vw)), 110px); margin-bottom: -2px; }
+#app[data-screen="home"] .home-doors-shell .home-wordmark { font-size: clamp(2rem, calc(9.4 * var(--vw)), 3.2rem); }
 #app[data-screen="home"] .home-doors-shell .home-doors { gap: 10px; }
 #app[data-screen="home"] .home-doors-shell .home-door,
 #app[data-screen="home"] .home-doors-shell .home-door-daily,
 #app[data-screen="home"] .home-doors-shell .home-door-copy,
 #app[data-screen="home"] .home-doors-shell .home-door-daily .home-door-copy { min-height: 112px; }
 #app[data-screen="home"] .home-doors-shell .home-door-copy { padding: 12px 18px; gap: 3px; }
-#app[data-screen="home"] .home-doors-shell .home-door-copy b { font-size: clamp(1.35rem, 5.6vw, 1.7rem); }
+#app[data-screen="home"] .home-doors-shell .home-door-copy b { font-size: clamp(1.35rem, calc(5.6 * var(--vw)), 1.7rem); }
 #app[data-screen="home"] .home-doors-shell .home-door-copy small { font-size: .92rem; line-height: 1.3; }
 #app[data-screen="home"] .home-doors-shell .home-door-cta { margin-top: 4px; padding-bottom: 2px; font-size: .98rem; }
 #app[data-screen="home"] .home-doors-shell .home-door-daily.is-done,
@@ -3218,7 +3218,7 @@ html body::before { content: none; }
   background: none;
   box-shadow: none;
   color: #24170e;
-  font-size: clamp(.66rem, 2.3vw, .82rem);
+  font-size: clamp(.66rem, calc(2.3 * var(--vw)), .82rem);
   letter-spacing: .24em;
   font-weight: 700;
   text-shadow: 0 0 4px #fbf4e4, 0 0 10px #fbf4e4, 0 0 18px #f6ecd6;
@@ -3227,7 +3227,7 @@ html body::before { content: none; }
 
 /* Marca un punto más presente: halo cálido de luz alrededor del emblema y del nombre,
    sin engrosar las letras. */
-#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(78px, 19vw, 120px); }
+#app[data-screen="home"] .home-doors-shell .home-crest { width: clamp(78px, calc(19 * var(--vw)), 120px); }
 #app[data-screen="home"] .home-doors-shell .home-crest img { filter: sepia(.08) saturate(.95) drop-shadow(0 0 10px #fff4d6) drop-shadow(0 5px 9px #5a341a40); }
 #app[data-screen="home"] .home-doors-shell .home-wordmark {
   color: #24150c;
@@ -3243,16 +3243,16 @@ html::before { filter: saturate(.9) sepia(.08); }
    el velo de la lámina los atenúa (antes iban al 18 % de opacidad en una capa propia). */
 html:has(#app[data-screen="home"])::before {
   background:
-    url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
-    url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat,
-    repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, 90vw) min(520px, 60vh) no-repeat,
+    url("assets/home-deco-left.webp") left top / min(165px, calc(39 * var(--vw))) auto no-repeat,
+    url("assets/home-deco-right.webp") right top / min(165px, calc(39 * var(--vw))) auto no-repeat,
+    repeating-conic-gradient(from 200deg at 100% 0%, #fff8e400 0deg 5deg, #fff8e466 7deg, #fff8e400 10deg 15deg) right top / min(420px, calc(90 * var(--vw))) min(520px, calc(60 * var(--vh))) no-repeat,
     #e9dcc3 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 :root[data-theme="dark"]:has(#app[data-screen="home"])::before {
   background:
     linear-gradient(#140d08d6, #140d08e6),
-    url("assets/home-deco-left.webp") left top / min(165px, 39vw) auto no-repeat,
-    url("assets/home-deco-right.webp") right top / min(165px, 39vw) auto no-repeat,
+    url("assets/home-deco-left.webp") left top / min(165px, calc(39 * var(--vw))) auto no-repeat,
+    url("assets/home-deco-right.webp") right top / min(165px, calc(39 * var(--vw))) auto no-repeat,
     #140d08 url("assets/continuum-splash-blue-v5.webp") center bottom / cover no-repeat;
 }
 /* En Safari la barra inferior «rebotaba» al desplazar el Inicio: la portada apenas desborda la
@@ -3260,7 +3260,7 @@ html:has(#app[data-screen="home"])::before {
    un elemento fijo al borde inferior sigue ese movimiento. Guía y Ajustes no lo sufren porque
    desplazan un contenedor propio, no el documento. Aquí igual: el documento ya no se desplaza y
    `#app` es el contenedor con scroll, de modo que la barra del navegador no se mueve. */
-html:has(#app[data-screen="home"]) { height: 100dvh; overflow: hidden; overscroll-behavior: none; }
+html:has(#app[data-screen="home"]) { height: calc(100 * var(--dvh)); overflow: hidden; overscroll-behavior: none; }
 html:has(#app[data-screen="home"]) body { height: 100%; min-height: 0; overflow: hidden; }
 #app[data-screen="home"] {
   height: 100%;
@@ -3334,7 +3334,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app .bienvenida-avatar { justify-self: center; }
 #app .avatar-picker-cue { color: var(--edition-muted); font: 600 .76rem/1.2 var(--ui-font); letter-spacing: .04em; }
 #app .avatar-picker-cue span { color: var(--edition-brass); }
-#app .avatar-picker { width: min(94vw, 480px); max-height: min(82svh, 720px); padding: 20px 18px 12px; display: flex; flex-direction: column; overflow: hidden; background: #f8f0df; color: var(--edition-ink); }
+#app .avatar-picker { width: min(calc(94 * var(--vw)), 480px); max-height: min(calc(82 * var(--svh)), 720px); padding: 20px 18px 12px; display: flex; flex-direction: column; overflow: hidden; background: #f8f0df; color: var(--edition-ink); }
 #app .avatar-picker-header { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
 #app .avatar-picker-header h2 { margin: 4px 0 0; font: 400 1.75rem/1.1 var(--font-display); }
 #app .avatar-picker-close { width: 38px; height: 38px; flex: none; border: 1px solid var(--edition-line); border-radius: 50%; background: #fff9ed; color: var(--edition-ink); font-size: 1.6rem; cursor: pointer; }
@@ -3471,7 +3471,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 }
 #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected {
   order: -1; grid-column: 1 / -1; justify-self: center;
-  width: min(52vw, 210px); min-height: 210px !important; aspect-ratio: 3 / 4 !important;
+  width: min(calc(52 * var(--vw)), 210px); min-height: 210px !important; aspect-ratio: 3 / 4 !important;
   z-index: 2; border: 2px solid #a75438; outline: 1px solid #a75438;
   outline-offset: 2px; transform: translateY(-5px);
   box-shadow: 0 2px 0 #6d3927, 0 14px 28px #663b2d66, 0 0 0 7px #c78b5c2e;
@@ -3489,7 +3489,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .atlas-hand-many { max-height: 340px; padding: 10px 9px 13px; }
 @media (max-width: 420px) {
   #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card { min-height: 105px; }
-  #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected { width: min(49vw, 185px); min-height: 188px !important; }
+  #app.atlas-board .atlas-hand-section .hand:not(.hand-solo) .hand-card.selected { width: min(calc(49 * var(--vw)), 185px); min-height: 188px !important; }
 }
 @media (prefers-reduced-motion: no-preference) {
   #app.atlas-board .atlas-hand-section .hand-card.selected .reverso-emblema { animation: continuum-mark-reveal .42s ease-out both; }
@@ -3512,16 +3512,16 @@ html:not(:has(#app[data-screen="home"]))::before {
 
 /* Mano en abanico: una única fila de cartas superpuestas alrededor de la elegida. */
 #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan {
-  --fan-step: min(14.7vw, 54.6px);
+  --fan-step: min(calc(14.7 * var(--vw)), 54.6px);
   display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr;
   justify-items: center; align-items: center;
-  width: 100%; max-width: 460px; height: clamp(160px, 45vw, 176px);
+  width: 100%; max-width: 460px; height: clamp(160px, calc(45 * var(--vw)), 176px);
   min-height: 0; max-height: none; margin: 0 auto; padding: 8px 0 18px;
   overflow: clip; isolation: isolate; touch-action: pan-y;
 }
 #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card {
   grid-area: 1 / 1; order: 0; position: relative;
-  width: min(26.6vw, 105px); min-height: 0 !important; height: auto !important;
+  width: min(calc(26.6 * var(--vw)), 105px); min-height: 0 !important; height: auto !important;
   aspect-ratio: 3 / 4 !important; margin: 0; padding: 6px;
   transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 6deg)) scale(calc(1 - var(--fan-depth) * .14));
   transform-origin: center 85%; touch-action: pan-y;
@@ -3552,7 +3552,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board .hand-fan-controls button:disabled { opacity: .35; }
 :root[data-theme="dark"] #app.atlas-board .hand-fan-controls button { background: #392a20; color: #edd3a9; }
 :root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: auto; min-height: 300px; }
-:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(66vw, 250px); min-height: 290px !important; }
+:root:is([data-text-size="150"],[data-text-size="200"]) #app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(calc(66 * var(--vw)), 250px); min-height: 290px !important; }
 
 /* Lámina completa a proporción 2:3 y placa de datos fuera del dibujo. */
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(> .card-visual > .animal-card-art) {
@@ -3583,7 +3583,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content :is(h3, p) { color: #302116; }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .year {
   margin-top: auto; padding-top: 5px; color: #824023;
-  border-top: 1px solid #6b4b3040; font-size: clamp(.86rem, 2vw, 1.08rem);
+  border-top: 1px solid #6b4b3040; font-size: clamp(.86rem, calc(2 * var(--vw)), 1.08rem);
 }
 #app.atlas-board[data-platform][data-screen] .timeline .timeline-card:has(.animal-card-art) .card-content .card-category {
   margin-bottom: 4px; padding: 2px 4px; background: #e9dac0; color: #60422e;
@@ -3641,10 +3641,10 @@ html:not(:has(#app[data-screen="home"]))::before {
 
 /* La vista ampliada deja el título y la explicación debajo de la lámina, sin recortarla. */
 .timeline-detail-overlay { z-index: 80; }
-.timeline-detail-modal { width: min(100%, 500px); max-height: min(94dvh, 900px); padding: 14px; overflow-y: auto; background: #f8efdd; color: #302116; text-align: left; }
+.timeline-detail-modal { width: min(100%, 500px); max-height: min(calc(94 * var(--dvh)), 900px); padding: 14px; overflow-y: auto; background: #f8efdd; color: #302116; text-align: left; }
 .timeline-detail-modal .timeline-detail-image { display: grid; place-items: center; margin: 0 0 12px; background: #ede0c9; border-radius: 7px; overflow: hidden; }
-.timeline-detail-modal .timeline-detail-image img { display: block; width: auto; max-width: 100%; height: auto; max-height: min(57dvh, 570px); object-fit: contain; filter: sepia(.12) saturate(.95); }
-.timeline-detail-modal h2 { margin: 0 44px 7px 0; font: 700 clamp(1.25rem, 5vw, 1.75rem)/1.12 var(--font-display); }
+.timeline-detail-modal .timeline-detail-image img { display: block; width: auto; max-width: 100%; height: auto; max-height: min(calc(57 * var(--dvh)), 570px); object-fit: contain; filter: sepia(.12) saturate(.95); }
+.timeline-detail-modal h2 { margin: 0 44px 7px 0; font: 700 clamp(1.25rem, calc(5 * var(--vw)), 1.75rem)/1.12 var(--font-display); }
 .timeline-detail-modal .timeline-detail-value { display: block; margin-bottom: 8px; color: #824023; font: 700 1.35rem/1.1 var(--font-display); }
 .timeline-detail-modal p { margin: 0 0 8px; color: #5a412e; }
 .timeline-detail-modal .timeline-detail-close { margin-top: 12px; }
@@ -3661,7 +3661,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 /* Atlas personal: carta de navegación, estaciones y cuadernos del recorrido. */
 #app[data-screen="perfil"] .perfil-section { max-width: 900px; margin-inline: auto; }
 #app[data-screen="perfil"] .atlas-page-heading { margin-bottom: 8px; text-align: center; }
-#app[data-screen="perfil"] .atlas-page-heading h1 { font-size: clamp(2.8rem, 11vw, 4.8rem); letter-spacing: -.035em; }
+#app[data-screen="perfil"] .atlas-page-heading h1 { font-size: clamp(2.8rem, calc(11 * var(--vw)), 4.8rem); letter-spacing: -.035em; }
 #app[data-screen="perfil"] .atlas-page-heading p { max-width: 42ch; margin-inline: auto; }
 #app[data-screen="perfil"] .atlas-identidad {
   max-width: 490px; margin: 10px auto -22px; padding: 12px 18px; position: relative; z-index: 2;
@@ -3701,7 +3701,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 }
 #app[data-screen="perfil"] .atlas-chart-stop::before { content: ''; position: absolute; left: -14px; top: 50%; width: 15px; height: 15px; border: 3px solid #f6e9d2; border-radius: 50%; background: #456b70; box-shadow: 0 0 0 2px #456b7055; transform: translateY(-50%); }
 #app[data-screen="perfil"] .atlas-chart-stop i { font: 700 .61rem/1.2 var(--ui-font); letter-spacing: .16em; color: #3a6267; }
-#app[data-screen="perfil"] .atlas-chart-stop b { margin-top: 3px; font: 600 clamp(1rem, 2.4vw, 1.27rem)/1.1 var(--font-display); }
+#app[data-screen="perfil"] .atlas-chart-stop b { margin-top: 3px; font: 600 clamp(1rem, calc(2.4 * var(--vw)), 1.27rem)/1.1 var(--font-display); }
 #app[data-screen="perfil"] .atlas-chart-stop small { margin-top: 4px; font: .69rem/1.3 var(--ui-font); color: #69533e; }
 #app[data-screen="perfil"] .atlas-chart-stop:focus-visible { outline: 3px solid #753d28; outline-offset: 4px; }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
@@ -3723,7 +3723,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 
 #app[data-screen="perfil"] .atlas-territories { position: relative; display: grid; gap: 18px; padding-left: 30px; }
 #app[data-screen="perfil"] .atlas-territories::before { content: ''; position: absolute; left: 13px; top: 20px; bottom: 70px; width: 2px; background: repeating-linear-gradient(to bottom, #a76e50 0 5px, transparent 5px 13px); opacity: .6; }
-#app[data-screen="perfil"] .atlas-territory { position: relative; min-width: 0; scroll-margin-top: 18px; padding: 19px clamp(15px, 4vw, 28px) 24px; border: 1px solid color-mix(in srgb, var(--edition-brass) 26%, var(--edition-line)); border-radius: 16px; background: radial-gradient(ellipse at 94% 8%, color-mix(in srgb, var(--edition-brass) 10%, transparent), transparent 40%), var(--edition-surface); box-shadow: 0 8px 20px #50371d12, inset 0 1px #fff5; }
+#app[data-screen="perfil"] .atlas-territory { position: relative; min-width: 0; scroll-margin-top: 18px; padding: 19px clamp(15px, calc(4 * var(--vw)), 28px) 24px; border: 1px solid color-mix(in srgb, var(--edition-brass) 26%, var(--edition-line)); border-radius: 16px; background: radial-gradient(ellipse at 94% 8%, color-mix(in srgb, var(--edition-brass) 10%, transparent), transparent 40%), var(--edition-surface); box-shadow: 0 8px 20px #50371d12, inset 0 1px #fff5; }
 #app[data-screen="perfil"] .atlas-territory::before { content: ''; position: absolute; left: -27px; top: 30px; width: 18px; height: 18px; border: 4px solid var(--edition-paper); border-radius: 50%; background: var(--atlas-selection); box-shadow: 0 0 0 1px var(--edition-brass); }
 #app[data-screen="perfil"] .atlas-territory-caption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 3px 16px; padding-bottom: 11px; margin-bottom: 14px; border-bottom: 1px solid var(--edition-line); }
 #app[data-screen="perfil"] .atlas-territory-caption span { color: var(--edition-brass); font: 700 .66rem/1.3 var(--ui-font); letter-spacing: .15em; }
@@ -3739,7 +3739,7 @@ html:not(:has(#app[data-screen="home"]))::before {
 #app[data-screen="perfil"] .atlas-territory .lead { margin: 0 0 12px; }
 
 @media (max-width: 600px) {
-  #app[data-screen="perfil"] .atlas-chart { height: clamp(525px, 145vw, 760px); border-radius: 18px; }
+  #app[data-screen="perfil"] .atlas-chart { height: clamp(525px, calc(145 * var(--vw)), 760px); border-radius: 18px; }
   #app[data-screen="perfil"] .atlas-chart-heading { left: 22px; top: 36px; right: 74px; }
   #app[data-screen="perfil"] .atlas-chart-heading small { font-size: .9rem; }
   #app[data-screen="perfil"] .atlas-chart-compass { right: 22px; top: 28px; width: 38px; height: 38px; font-size: 1.5rem; }
@@ -3773,17 +3773,17 @@ html:not(:has(#app[data-screen="home"]))::before {
     top: 30%; max-height: 28%;
   }
   #app.atlas-board[data-board-fit="compact"] {
-    --fit-hand-height: 132px; --fit-hand-width: min(24vw, 88px);
-    --fit-focus-width: min(27vw, 105px); --fit-timeline-width: 101px;
+    --fit-hand-height: 132px; --fit-hand-width: min(calc(24 * var(--vw)), 88px);
+    --fit-focus-width: min(calc(27 * var(--vw)), 105px); --fit-timeline-width: 101px;
     --fit-score-height: 62px; --fit-section-pad: 6px;
   }
   #app.atlas-board[data-board-fit="tight"] {
-    --fit-hand-height: 110px; --fit-hand-width: min(21vw, 74px);
-    --fit-focus-width: min(24vw, 88px); --fit-timeline-width: 87px;
+    --fit-hand-height: 110px; --fit-hand-width: min(calc(21 * var(--vw)), 74px);
+    --fit-focus-width: min(calc(24 * var(--vw)), 88px); --fit-timeline-width: 87px;
     --fit-score-height: 52px; --fit-section-pad: 4px;
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell {
-    padding-top: max(2px, env(safe-area-inset-top)); padding-bottom: max(3px, env(safe-area-inset-bottom));
+    padding-top: max(2px, var(--safe-top)); padding-bottom: max(3px, var(--safe-bottom));
   }
   #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) .atlas-topbar {
     min-height: 40px; height: 40px; margin-bottom: 0; padding-block: 0;
@@ -3868,7 +3868,7 @@ html:not(:has(#app[data-screen="home"]))::before {
     height: 90px; padding-bottom: 4px;
   }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card {
-    width: min(18vw, 64px);
+    width: min(calc(18 * var(--vw)), 64px);
   }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .hand-fan-controls { margin-top: -5px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .scoreboard-panel .score > .score-avatar,
@@ -3889,7 +3889,7 @@ html:not(:has(#app[data-screen="home"]))::before {
     height: 76px; padding-bottom: 3px;
   }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card {
-    width: min(16vw, 55px);
+    width: min(calc(16 * var(--vw)), 55px);
   }
   #app.atlas-board[data-platform][data-screen][data-board-fit="tight"] .quick-shell .board-timeline-section .timeline .timeline-card { width: 72px; }
   #app.atlas-board[data-board-fit="tight"] .quick-shell .timeline .timeline-card .card-content { padding: 3px 4px; }
@@ -3920,10 +3920,10 @@ html:not(:has(#app[data-screen="home"]))::before {
     height: 92px; padding-bottom: 5px;
   }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .atlas-hand-section .hand.hand-fan .hand-card {
-    width: min(21vw,67px);
+    width: min(calc(21 * var(--vw)),67px);
   }
   #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan { height: 76px; }
-  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card { width: min(16vw,55px); }
+  #app.atlas-board[data-platform][data-device][data-screen][data-board-fit="tight"] .quick-shell .atlas-hand-section .hand.hand-fan .hand-card { width: min(calc(16 * var(--vw)),55px); }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section > .timeline-zoom [data-zoom-level] { min-height: 28px; height: 28px; }
   #app.atlas-board[data-board-fit="tight"] .board-timeline-section > .timeline-zoom {
     position: absolute; z-index: 2; top: 3px; right: 4px; margin: 0; padding: 0;
@@ -3943,8 +3943,8 @@ html:not(:has(#app[data-screen="home"]))::before {
 /* En el duelo por turnos, la carta activa precede a la línea y ambas caben en la mesa corta. */
 @media (max-width: 699px) and (max-height: 740px) {
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) > .turn-duel-shell {
-    display: flex; flex-direction: column; min-height: 100dvh;
-    padding: max(2px,env(safe-area-inset-top)) 10px max(2px,env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; min-height: calc(100 * var(--dvh));
+    padding: max(2px,var(--safe-top)) 10px max(2px,var(--safe-bottom));
   }
   #app[data-screen="turn-duel"]:has(.turn-duel-hand) .turn-duel-nav {
     min-height: 40px; margin-bottom: 3px; padding: 0;
@@ -4096,8 +4096,8 @@ html #app .home-nav.atlas-nav {
   bottom: 0;
   width: min(calc(100% - 24px), 460px);
   max-width: 460px;
-  min-height: calc(88px + env(safe-area-inset-bottom));
-  padding: 5px 5px calc(7px + env(safe-area-inset-bottom));
+  min-height: calc(88px + var(--safe-bottom));
+  padding: 5px 5px calc(7px + var(--safe-bottom));
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: end;
   gap: 7px;
@@ -4148,7 +4148,7 @@ html #app .home-nav.atlas-nav button svg { width: 19px; height: 19px; stroke-wid
 html #app .home-nav.atlas-nav button small {
   margin-top: 1px;
   color: inherit;
-  font: 600 clamp(.57rem, 2vw, .67rem)/1.05 var(--font-display);
+  font: 600 clamp(.57rem, calc(2 * var(--vw)), .67rem)/1.05 var(--font-display);
 }
 html #app .home-nav.atlas-nav button[aria-current="page"] {
   z-index: 3;
@@ -4196,8 +4196,8 @@ html #app .home-nav.atlas-nav {
   bottom: 0;
   width: 100%;
   max-width: none;
-  min-height: calc(88px + env(safe-area-inset-bottom));
-  padding: 5px 12px calc(7px + env(safe-area-inset-bottom));
+  min-height: calc(88px + var(--safe-bottom));
+  padding: 5px 12px calc(7px + var(--safe-bottom));
   border: 0;
   border-top: 1px solid #c9b99e;
   border-radius: 13px 13px 0 0;
@@ -4222,7 +4222,7 @@ html #app .home-nav.atlas-nav::after { content: none; }
 /* El panel termina en el borde inferior de las fichas normales. El vidrio deja
    pasar apenas el papel y difumina el contenido para conservar una base serena. */
 html #app .home-nav.atlas-nav {
-  bottom: env(safe-area-inset-bottom);
+  bottom: var(--safe-bottom);
   min-height: 70px;
   padding: 0 12px;
   border: 1px solid #c9b99e;
@@ -4350,7 +4350,7 @@ html #app .home-nav.atlas-nav {
   /* Solo se reserva una parte de la zona segura del iPhone: la barra sigue llegando al borde, pero
      los iconos bajan y no queda un hueco en blanco bajo las etiquetas (el indicador de inicio
      ocupa los últimos puntos). */
-  padding: 6px 12px calc(3px + env(safe-area-inset-bottom) * .3);
+  padding: 6px 12px calc(3px + var(--safe-bottom) * .3);
   border-radius: 14px 14px 0 0;
   background: #eee5d5;
   -webkit-backdrop-filter: none;
@@ -4365,8 +4365,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 /* ===== Mesa de juego unificada (todas las modalidades) =====
    Misma estética que «Jugar solo»: la mano en abanico sin recortar, los jugadores
    como píldoras a la derecha y la lámina de la línea siempre entera. */
-#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: clamp(112px, 22dvh, 176px) !important; padding: 2px 0 12px !important; overflow: visible !important; }
-#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(30vw, 112px, calc((22dvh - 16px) * .68)) !important; aspect-ratio: 2 / 3 !important; --fan-step: calc(min(30vw, 112px, (22dvh - 16px) * .68) * .55); transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 4deg)) scale(calc(1 - var(--fan-depth) * .14)); }
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan { height: clamp(112px, calc(22 * var(--dvh)), 176px) !important; padding: 2px 0 12px !important; overflow: visible !important; }
+#app.atlas-board[data-platform][data-device][data-screen] .atlas-hand-section .hand.hand-fan .hand-card { width: min(calc(30 * var(--vw)), 112px, calc((calc(22 * var(--dvh)) - 16px) * .68)) !important; aspect-ratio: 2 / 3 !important; --fan-step: calc(min(calc(30 * var(--vw)), 112px, (calc(22 * var(--dvh)) - 16px) * .68) * .55); transform: translateX(calc(var(--fan-offset) * var(--fan-step))) translateY(calc(var(--fan-depth) * 11.2px)) rotate(calc(var(--fan-offset) * 4deg)) scale(calc(1 - var(--fan-depth) * .14)); }
 #app.atlas-board[data-platform][data-device][data-screen] .hand.hand-fan .hand-card > strong { font-size: .7rem; line-height: 1.12; overflow-wrap: normal; word-break: normal; hyphens: auto; }
 #app.atlas-board .scoreboard-panel { display: flex !important; justify-content: flex-end; height: auto !important; margin: 0 0 4px !important; padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
 #app.atlas-board .scoreboard-panel .scoreboard-title { display: none !important; }
@@ -4395,7 +4395,7 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 
 /* Las flechas de la mano van a los lados del abanico (ya no ocupan una fila debajo): más sitio
    para la carta de la línea. El contador queda solo para lectores de pantalla. */
-#app.atlas-board .atlas-hand-section > .hand-fan-controls { position: relative; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; height: 0; margin: 0 !important; padding: 0 2px; gap: 0; pointer-events: none; transform: translateY(calc(-0.5 * clamp(112px, 22dvh, 176px) - 18px)); }
+#app.atlas-board .atlas-hand-section > .hand-fan-controls { position: relative; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; height: 0; margin: 0 !important; padding: 0 2px; gap: 0; pointer-events: none; transform: translateY(calc(-0.5 * clamp(112px, calc(22 * var(--dvh)), 176px) - 18px)); }
 #app.atlas-board .atlas-hand-section > .hand-fan-controls button { width: 38px !important; height: 38px !important; min-height: 38px !important; pointer-events: auto; font-size: 1.4rem; background: #fbf4e4cc; }
 #app.atlas-board .atlas-hand-section > .hand-fan-controls span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -4494,8 +4494,8 @@ html #app .home-nav.atlas-nav button[aria-current="page"] { min-height: 58px; tr
 :root[data-theme="dark"] #app.atlas-board .hand-card > .hidden-date { position: relative; z-index: 3; width: fit-content; padding: 1px 5px; border-radius: 4px; background: #2b2118; }
 
 /* Mesas de juego (todas las modalidades): todo el contenido baja un poco desde el borde superior. */
-html #app.atlas-board > .shell { padding-top: calc(env(safe-area-inset-top) + 30px); }
-html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { padding-top: calc(env(safe-area-inset-top) + 22px); }
+html #app.atlas-board > .shell { padding-top: calc(var(--safe-top) + 30px); }
+html #app.atlas-board[data-board-fit]:not([data-board-fit="normal"]) > .shell { padding-top: calc(var(--safe-top) + 22px); }
 
 /* Popup de salir de la partida: pergamino con marco de latón, en la línea del resto del juego. */
 #app [data-exit-dialog] .modal {
@@ -4665,10 +4665,10 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 
 /* Minijuego de «quién empieza»: sin el teclado abierto de entrada hay sitio para una lámina y una carta grandes. */
 .starter-card { padding: 24px 20px; }
-.starter-card strong { font-size: clamp(1.6rem, 7vw, 2.2rem); line-height: 1.2; }
+.starter-card strong { font-size: clamp(1.6rem, calc(7 * var(--vw)), 2.2rem); line-height: 1.2; }
 .starter-card > span { font-size: 1.05rem; }
 .starter-card .starter-card-art { margin: -24px -20px 16px; }
-.starter-card .starter-card-art .animal-card-art { height: min(62vw, 280px); }
+.starter-card .starter-card-art .animal-card-art { height: min(calc(62 * var(--vw)), 280px); }
 
 /* ===== Pantalla de «pasa el móvil» y demás tarjetas de turno de las partidas multijugador =====
    Dejan el recuadro blanco liso y toman el pergamino del resto del juego: papel cálido, filete de latón
@@ -4759,13 +4759,13 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 #app[data-screen="home"] .mode-ranking-medallion img { display: block; width: 68px; height: 68px; object-fit: contain; filter: drop-shadow(0 2px 2px #63432330); }
 #app[data-screen="home"] .mode-ranking-copy { min-width: 0; }
 #app[data-screen="home"] .mode-ranking-kicker { display: block; color: #75552c; font: 700 .58rem/1.4 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
-#app[data-screen="home"] .mode-ranking-copy h3 { margin: 2px 0 3px; color: inherit; font: 600 clamp(1.65rem, 6vw, 2rem)/1.05 var(--font-display); }
+#app[data-screen="home"] .mode-ranking-copy h3 { margin: 2px 0 3px; color: inherit; font: 600 clamp(1.65rem, calc(6 * var(--vw)), 2rem)/1.05 var(--font-display); }
 #app[data-screen="home"] .mode-ranking-copy p { color: #665039; font: .78rem/1.4 var(--ui-font); }
 #app[data-screen="home"] .mode-ranking-star { margin-left: auto; align-self: flex-start; color: #957036; font-size: 1.2rem; }
 #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats { gap: 0; padding: 12px 0; border-block: 1px solid #b8955a45; background: linear-gradient(90deg, transparent, #fffaf070, transparent); }
 #app[data-screen="home"] .mode-ranking-stats > span { padding: 0 5px; gap: 5px; }
 #app[data-screen="home"] .mode-ranking-stats > span + span { border-left: 1px solid #b8955a45; }
-#app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats b { color: #604018; font: 600 clamp(1.55rem, 6vw, 1.85rem)/1.1 var(--font-display); font-variant-numeric: lining-nums tabular-nums; }
+#app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats b { color: #604018; font: 600 clamp(1.55rem, calc(6 * var(--vw)), 1.85rem)/1.1 var(--font-display); font-variant-numeric: lining-nums tabular-nums; }
 #app[data-screen="home"] .mode-ranking-summary .mode-ranking-stats small { margin: 0; color: #64523d; font-size: .56rem; line-height: 1.4; letter-spacing: .07em; overflow-wrap: normal; hyphens: none; }
 #app[data-screen="home"] .mode-ranking-summary .mode-ranking-link {
   position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 16px; width: 100%; min-height: 46px;
@@ -4835,7 +4835,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
 #app .mode-ranking-stats > span, #app .daily-stats > span { min-width: 0; }
 .quick-shell .quick-length { min-width: 0; }
 .quick-shell .quick-length-chip { min-width: 0; overflow-wrap: anywhere; }
-:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-wordmark { font-size: min(3.2rem, 12.5vw); max-width: 100%; }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app .home-wordmark { font-size: min(3.2rem, calc(12.5 * var(--vw))); max-width: 100%; }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-door-copy { min-width: 0; }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app .home-nav button { min-width: 0; }
@@ -4973,7 +4973,7 @@ html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] .
   /* La lámpara de la mesa: un haz de rayos cálidos desde la esquina superior que oscila
      despacio y una luz que respira con un pulso irregular. Detrás de todo. */
   html::after {
-    content: ''; position: fixed; z-index: -1; top: -10vh; left: -30vw; width: 160vw; height: 110vh; pointer-events: none;
+    content: ''; position: fixed; z-index: -1; top: calc(-10 * var(--vh)); left: calc(-30 * var(--vw)); width: calc(160 * var(--vw)); height: calc(110 * var(--vh)); pointer-events: none;
     background:
       repeating-conic-gradient(from 90deg at 50% 12%, #fffaf000 0deg 4deg, #fffaf0b3 7deg, #fffaf000 10deg 15deg),
       radial-gradient(ellipse 30% 26% at 50% 14%, #fff8e6cc, transparent 70%);
@@ -5040,17 +5040,17 @@ html:has(#app.atlas-board) .motas { display: none; }
 @keyframes mota-sube {
   0% { opacity: 0; transform: translate3d(0, 0, 0); }
   12% { opacity: var(--o); }
-  50% { transform: translate3d(var(--sway), -45vh, 0); }
+  50% { transform: translate3d(var(--sway), calc(-45 * var(--vh)), 0); }
   85% { opacity: var(--o); }
-  100% { opacity: 0; transform: translate3d(0, -90vh, 0); }
+  100% { opacity: 0; transform: translate3d(0, calc(-90 * var(--vh)), 0); }
 }
 @keyframes mota-sube-b {
   0% { opacity: 0; transform: translate3d(0, 0, 0); }
   15% { opacity: var(--o); }
-  35% { transform: translate3d(calc(var(--sway) * -1), -30vh, 0); }
-  70% { transform: translate3d(var(--sway), -62vh, 0); }
+  35% { transform: translate3d(calc(var(--sway) * -1), calc(-30 * var(--vh)), 0); }
+  70% { transform: translate3d(var(--sway), calc(-62 * var(--vh)), 0); }
   80% { opacity: var(--o); }
-  100% { opacity: 0; transform: translate3d(0, -88vh, 0); }
+  100% { opacity: 0; transform: translate3d(0, calc(-88 * var(--vh)), 0); }
 }
 
 /* ── Escenario según el mazo ──────────────────────────────────────────────────────
@@ -5067,7 +5067,7 @@ html:has(#app.atlas-board) .motas { display: none; }
   background: radial-gradient(ellipse at 85% 0%, color-mix(in srgb, var(--scene-wash) 9%, transparent), transparent 65%), var(--edition-paper);
 }
 :root:is([data-scene="history"], [data-scene="entertainment"], [data-scene="science"], [data-scene="nature"], [data-scene="globe"], [data-scene="mixed"]):has(#app.atlas-board)::before {
-  height: clamp(380px, 58lvh, 680px);
+  height: clamp(380px, calc(58 * var(--lvh)), 680px);
   background: var(--scene-art) var(--scene-art-pos) / cover no-repeat;
   opacity: .28;
   filter: grayscale(.35) saturate(.55) sepia(.18);
@@ -5120,7 +5120,7 @@ html:has(#app.atlas-board) .motas { display: none; }
 .placement-correction-card.is-card .correction-body small { color: #944e35; font: 700 .5rem/1.2 var(--ui-font); letter-spacing: .08em; text-transform: uppercase; }
 .placement-correction-card.is-card .correction-body b { font: 700 .74rem/1.15 var(--font-display, Georgia); color: var(--edition-ink); }
 .placement-correction-card.is-card .correction-body span { color: #93482e; font: 700 .95rem/1 var(--font-display, Georgia); }
-.correction-trail { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 79; pointer-events: none; overflow: visible; }
+.correction-trail { position: fixed; inset: 0; width: calc(100 * var(--vw)); height: calc(100 * var(--vh)); z-index: 79; pointer-events: none; overflow: visible; }
 .correction-trail-ink { stroke: #a5543a; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1.4 2.4; opacity: .8; }
 
 /* Puntuación que se ilumina por partes (immersion.js · lightScore). */
@@ -5167,7 +5167,7 @@ html:has(#app.atlas-board) .motas { display: none; }
   box-shadow: inset 0 1px 0 #fff, 0 2px 6px #5a341a12;
   transition: border-color var(--motion-base) ease, background var(--motion-base) ease, box-shadow var(--motion-base) ease;
 }
-#app .segmented-option b { color: inherit; font: 600 clamp(.84rem, 3.7vw, .98rem)/1.15 var(--font-display); overflow-wrap: normal; text-wrap: balance; }
+#app .segmented-option b { color: inherit; font: 600 clamp(.84rem, calc(3.7 * var(--vw)), .98rem)/1.15 var(--font-display); overflow-wrap: normal; text-wrap: balance; }
 #app .segmented-option small { margin-top: 1px; color: #5c4a3a; font: .72rem/1.3 var(--ui-font); opacity: 1; text-wrap: pretty; }
 #app .segmented-option.is-on {
   border-color: #b8653d; color: #8e3d1e;
@@ -5212,7 +5212,7 @@ html #app .tiempo-field .tiempo-segmented .segmented-option {
 }
 html #app .tiempo-field .tiempo-segmented .segmented-option b {
   display: block; min-width: 0; max-width: 100%; margin: 0; color: inherit;
-  font: 600 clamp(.82rem, 3.7vw, .96rem)/1.12 var(--font-display);
+  font: 600 clamp(.82rem, calc(3.7 * var(--vw)), .96rem)/1.12 var(--font-display);
   white-space: normal; overflow-wrap: normal; text-wrap: balance;
 }
 html #app .tiempo-field .tiempo-segmented .segmented-option.is-on {
@@ -5290,7 +5290,7 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 #app .difficulty-card[data-difficulty="hard"] { --difficulty-ink: #8a533b; --difficulty-wash: #f0e4d9; }
 #app .difficulty-card[data-difficulty="expert"] { --difficulty-ink: #705369; --difficulty-wash: #ece3e9; }
 #app .difficulty-card input { position: absolute; opacity: 0; pointer-events: none; }
-#app .difficulty-art { display: grid; place-items: center; height: clamp(62px, 19vw, 84px); margin-top: -3px; pointer-events: none; }
+#app .difficulty-art { display: grid; place-items: center; height: clamp(62px, calc(19 * var(--vw)), 84px); margin-top: -3px; pointer-events: none; }
 #app .difficulty-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
 #app .difficulty-heading { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 7px; padding-bottom: 10px; border-bottom: 1px solid var(--edition-line); }
 #app .difficulty-level { display: grid; place-items: center; min-width: 22px; height: 26px; padding-inline: 3px; border: 1px solid #a68b5c38; border-radius: 5px; color: var(--difficulty-ink); background: var(--difficulty-wash); font: 600 .72rem/1 var(--font-display); }
@@ -5467,7 +5467,7 @@ html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-
   mask-image: linear-gradient(90deg, transparent, #000 65%);
 }
 #app .quick-preparation-copy { width: 78%; position: relative; }
-#app .quick-free-setup .quick-preparation-head h3 { margin: 0; max-width: 260px; font: 600 clamp(1.45rem, 6vw, 2rem)/1.12 var(--font-display); text-wrap: balance; }
+#app .quick-free-setup .quick-preparation-head h3 { margin: 0; max-width: 260px; font: 600 clamp(1.45rem, calc(6 * var(--vw)), 2rem)/1.12 var(--font-display); text-wrap: balance; }
 #app .quick-preparation-motto { display: block; margin-top: 10px; color: var(--edition-muted); font: italic .78rem/1.3 var(--font-display); }
 #app .quick-free-setup .solo-panel > p:not(#quick-error) { font-size: .85rem; line-height: 1.5; }
 #app .quick-free-setup .quick-length { gap: 10px; }
@@ -5538,7 +5538,7 @@ html #app[data-screen] .setup-art-panel {
 #app .setup-art-image { position: absolute; z-index: -1; inset: 0 0 0 auto; width: 47%; height: 100%; object-fit: cover; object-position: 75% center; opacity: .8; -webkit-mask-image: linear-gradient(90deg, transparent, #000 70%); mask-image: linear-gradient(90deg, transparent, #000 70%); }
 #app .setup-art-copy { min-width: 0; width: 78%; }
 #app .setup-art-kicker { display: block; margin-bottom: 8px; color: var(--edition-brass); font: 600 .61rem/1.3 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
-#app .setup-art-head h3 { margin: 0; font: 600 clamp(1.3rem, 5.3vw, 1.8rem)/1.14 var(--font-display); text-wrap: balance; }
+#app .setup-art-head h3 { margin: 0; font: 600 clamp(1.3rem, calc(5.3 * var(--vw)), 1.8rem)/1.14 var(--font-display); text-wrap: balance; }
 html #app[data-screen] .setup-art-panel .field { min-width: 0; }
 html #app[data-screen] .setup-art-panel .field > :is(label, .field-label) { color: var(--edition-brass); }
 html #app[data-screen] .setup-art-panel :is(input:not([type="radio"], [type="checkbox"], [type="hidden"]), select, textarea) { border: 1px solid var(--edition-line); border-radius: 12px; background-color: var(--edition-surface); box-shadow: inset 0 0 0 3px #b897600b, 0 2px 5px #63432312; }
@@ -5576,7 +5576,7 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 /* Retos rápidos en solitario: los mazos del día y la colección de cartas descubiertas. */
 #app .quick-free-setup .quick-collection-link { margin-top: 8px; min-height: 40px; padding: 6px 14px; border: 1px solid var(--edition-line); border-radius: 12px; font-size: .84rem; }
 #app .quick-day-head { margin-bottom: 14px; }
-#app .quick-day-head h4 { margin: 4px 0 6px; font: 600 clamp(1.2rem, 5vw, 1.5rem)/1.15 var(--font-display); color: var(--edition-ink); }
+#app .quick-day-head h4 { margin: 4px 0 6px; font: 600 clamp(1.2rem, calc(5 * var(--vw)), 1.5rem)/1.15 var(--font-display); color: var(--edition-ink); }
 #app .quick-day-head small { display: block; color: var(--edition-muted); font: .8rem/1.4 var(--ui-font); }
 #app .quick-day-decks { display: grid; gap: 10px; margin-bottom: 16px; }
 #app .quick-day-deck { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 12px; width: 100%; min-height: 84px; padding: 10px 12px 10px 10px; text-align: left; color: var(--edition-ink); background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 14px; box-shadow: inset 0 0 0 4px #b8976012, 0 3px 8px #63432314; cursor: pointer; }
@@ -5592,7 +5592,7 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 #app .quick-deck-progress .game-progress-bar i { display: block; height: 100%; background: var(--edition-brass); }
 #app .quick-deck-progress small { display: block; margin-top: 4px; color: var(--edition-muted); font: .72rem/1.35 var(--ui-font); }
 #app .quick-mode-pane { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--edition-line); }
-#app .quick-free-setup .quick-surprise .quick-preparation-head h4 { margin: 0; font: 600 clamp(1.2rem, 5vw, 1.55rem)/1.15 var(--font-display); color: var(--edition-ink); }
+#app .quick-free-setup .quick-surprise .quick-preparation-head h4 { margin: 0; font: 600 clamp(1.2rem, calc(5 * var(--vw)), 1.55rem)/1.15 var(--font-display); color: var(--edition-ink); }
 #app .quick-new-card { margin: 6px auto 10px; padding: 6px 12px; width: fit-content; border-radius: 999px; color: var(--edition-brass); border: 1px solid var(--edition-brass); font: 600 .82rem/1.3 var(--ui-font); }
 #app .quick-collection-summary { margin: 14px 0; padding: 12px 14px; border: 1px solid var(--edition-line); border-radius: 14px; background: var(--edition-surface); }
 #app .quick-collection-summary > p { margin: 0 0 8px; font-weight: 600; }
@@ -5620,7 +5620,7 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 #app .quick-free-setup .quick-surprise > p { font-size: .85rem; line-height: 1.5; }
 
 /* Retos rápidos en solitario: dos formas de jugar, elegidas con dos tarjetas grandes. */
-#app .quick-mode-head h3 { margin: 4px 0 12px; font: 600 clamp(1.35rem, 5.6vw, 1.8rem)/1.15 var(--font-display); color: var(--edition-ink); }
+#app .quick-mode-head h3 { margin: 4px 0 12px; font: 600 clamp(1.35rem, calc(5.6 * var(--vw)), 1.8rem)/1.15 var(--font-display); color: var(--edition-ink); }
 #app .quick-mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
 #app .quick-mode-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; padding: 16px 10px 14px; text-align: center; color: var(--edition-ink); background: var(--edition-surface); border: 1px solid var(--edition-line); border-radius: 16px; box-shadow: inset 0 0 0 4px #b8976012, 0 3px 8px #63432314; cursor: pointer; transition: border-color var(--motion-fast, .16s), box-shadow var(--motion-fast, .16s), transform var(--motion-fast, .16s); }
 #app .quick-mode-card .quick-mode-art { width: 58px; height: 58px; color: var(--edition-muted); }
@@ -5654,7 +5654,7 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 #app .solo-last-cover::after { content: ''; position: absolute; inset: 4px; border: 1px solid #fff1cd80; border-radius: 3px; pointer-events: none; }
 #app .solo-shortcut-last .solo-shortcut-copy { min-width: 0; color: var(--edition-ink); }
 #app .solo-shortcut-last .solo-shortcut-copy em { margin-bottom: 7px; font-size: .6rem; letter-spacing: .16em; }
-#app .solo-shortcut-last .solo-shortcut-copy b { font: 600 clamp(1.05rem, 3.8vw, 1.3rem)/1.18 var(--font-display); overflow-wrap: break-word; }
+#app .solo-shortcut-last .solo-shortcut-copy b { font: 600 clamp(1.05rem, calc(3.8 * var(--vw)), 1.3rem)/1.18 var(--font-display); overflow-wrap: break-word; }
 #app .solo-shortcut-last small { margin-top: 8px; color: var(--edition-muted); font: .76rem/1.35 var(--ui-font); }
 #app .solo-shortcut-last .solo-shortcut-arrow { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #b8976066; border-radius: 50%; background: #b8976012; color: var(--edition-brass); font-size: 1.25rem; }
 #app .solo-shortcut-last:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 4px; }

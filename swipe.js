@@ -93,13 +93,18 @@
       pieces.at(-1).move = "translate";
     }
     pieces.forEach(piece => { if (piece.move) piece.node.style.willChange = piece.move; });
+    // Dentro de la mesa a escala (mesa-escala.js) las medidas son puntos de la mesa: el dedo
+    // recorre `dx` píxeles de pantalla, que allí dentro son `dx / escala`.
+    const mesa = window.CONTINUUM.Mesa;
+    const escala = mesa?.activa() && target.closest?.("#app") ? mesa.escala() : 1;
     return {
       target, pieces, dx: 0,
       set(dx) {
         this.dx = dx;
+        const paso = dx / escala;
         for (const piece of pieces) {
-          if (piece.move === "left") piece.node.style.left = `${dx}px`;
-          else if (piece.move === "translate") piece.node.style.translate = `${dx}px 0`;
+          if (piece.move === "left") piece.node.style.left = `${paso}px`;
+          else if (piece.move === "translate") piece.node.style.translate = `${paso}px 0`;
         }
       },
       restore() {

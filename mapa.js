@@ -113,9 +113,15 @@
       if (Math.abs(delta) > .5) wrap.scrollLeft += reduce ? delta : delta * .35;
       if (!verticalDone) {
         verticalDone = true;
-        const view = window.innerHeight || document.documentElement.clientHeight;
-        const over = top - 8, under = top + height + 8 - view;
-        if (over < 0 || under > 0) window.scrollBy({ top: over < 0 ? over : Math.min(under, over), behavior: reduce ? "auto" : "smooth" });
+        // Durante la partida lo que se desplaza es la mesa a escala (mesa-escala.js), no la ventana.
+        const mesa = CT.Mesa?.activa() ? document.getElementById("app").getBoundingClientRect() : null;
+        const view = mesa ? Math.min(window.innerHeight, mesa.bottom) : window.innerHeight || document.documentElement.clientHeight;
+        const over = top - 8 - (mesa ? Math.max(0, mesa.top) : 0), under = top + height + 8 - view;
+        const shift = over < 0 ? over : Math.min(under, over);
+        if (over < 0 || under > 0) {
+          if (mesa) CT.Mesa.desplaza(shift / CT.Mesa.escala(), !reduce);
+          else window.scrollBy({ top: shift, behavior: reduce ? "auto" : "smooth" });
+        }
       }
       frame = requestAnimationFrame(step);
     };

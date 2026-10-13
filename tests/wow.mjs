@@ -7,7 +7,7 @@ let stamps=0, followed=0, reduced=false;
 w.matchMedia=()=>({matches:reduced});
 w.CONTINUUM={Effects:{stamp(){stamps++;}}};
 w.HTMLElement.prototype.animate=()=>({finished:Promise.resolve(),cancel(){}});
-for(const name of ['a11y.js','immersion.js'])w.eval(fs.readFileSync(new URL('../'+name,import.meta.url),'utf8'));
+for(const name of ['a11y.js','mesa-escala.js','immersion.js'])w.eval(fs.readFileSync(new URL('../'+name,import.meta.url),'utf8'));
 const card=app.querySelector('.timeline-card');
 w.CONTINUUM.dealIn([card],{delay:1000,seguir(){followed++;}});
 assert.equal(card.style.visibility,'hidden');assert.equal(app.querySelector('.shell').inert,true);

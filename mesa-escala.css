@@ -1,0 +1,35 @@
+/* Mesa a escala (mesa-escala.js): durante la partida #app es la pantalla de un iPhone Pro,
+   402 × 874 puntos con sus márgenes de isla y barra de inicio, escalada entera a la
+   pantalla real. Dentro, las variables de pantalla valen lo de ese iPhone; fuera de la
+   partida no cambia nada. */
+html #app.atlas-board.mesa-escena {
+  --vw: 4.02px; --vh: 8.74px; --svh: 8.74px; --dvh: 8.74px; --lvh: 8.74px;
+  --safe-top: 62px; --safe-right: 0px; --safe-bottom: 34px; --safe-left: 0px;
+  position: fixed; left: var(--mesa-x, 0px); top: var(--mesa-y, 0px); z-index: 1;
+  box-sizing: border-box; width: 402px; height: 874px; min-height: 0; max-width: none; margin: 0;
+  transform: scale(var(--mesa-escala, 1)); transform-origin: 0 0;
+  overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
+  /* El papel de la mesa lo pone .mesa-fondo en toda la pantalla: así no queda un borde
+     entre la mesa y las franjas laterales de los móviles más anchos o del ordenador. */
+  background: none;
+}
+/* Las capas (menú, reglas, avisos) cubren la mesa visible, aunque esté desplazada. */
+html #app.mesa-escena > .overlay:not(.board-result-layer) {
+  position: absolute; inset: auto; left: 0; top: var(--mesa-desplazada, 0px); width: 100%; height: 874px;
+}
+.mesa-fondo {
+  position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 48% 28%, #fff4cf70 0 16%, transparent 58%),
+    repeating-linear-gradient(4deg, transparent 0 7px, #74502c08 7px 8px),
+    repeating-linear-gradient(94deg, transparent 0 29px, #fff8e414 29px 30px),
+    color-mix(in srgb, var(--edition-paper) 48%, transparent);
+}
+/* Con una capa abierta se oscurece también lo que queda a los lados de la mesa, con el mismo
+   velo que la capa (#111a17a6): un marco del tamaño de la mesa cuya sombra cubre solo el resto. */
+.mesa-fondo::after {
+  content: ''; position: absolute; left: var(--mesa-x, 0px); top: var(--mesa-y, 0px);
+  width: calc(402px * var(--mesa-escala, 1)); height: calc(874px * var(--mesa-escala, 1));
+  box-shadow: 0 0 0 100vmax #111a17a6; opacity: 0;
+}
+:root.mesa-escalada:has(#app > .overlay:not(.board-result-layer, .result-preview)) .mesa-fondo::after { opacity: 1; }

@@ -371,7 +371,7 @@ function pointer(w, type, target, x, y, pointerType = "touch") {
   w.document.elementFromPoint = () => el(w, '.slot[data-index="0"]');
   pointer(w, "pointermove", card, 100, 280, "mouse");
   const ghost = el(w, ".drag-ghost");
-  ok("la copia queda compacta para dejar visible el destino",ghost.style.width === "124px" && ghost.style.height === "186px" && ghost.style.transform.includes("scale(1.12)"));
+  ok("la copia queda compacta para dejar visible el destino",ghost.style.width === "124px" && ghost.style.height === "186px" && Math.abs(Number(/scale\(([\d.]+)\)/.exec(ghost.style.transform)?.[1]) - 1.12 * w.CONTINUUM.Mesa.escala()) < 1e-6);
   ok("la copia usa composición y no duplica el control accesible", ghost.style.transform.includes("translate3d") && ghost.getAttribute("aria-hidden") === "true" && ghost.tabIndex === -1);
   // Soltar en otro hueco antes del siguiente frame debe elegir la posición final.
   w.document.elementFromPoint = () => el(w, '.slot[data-index="1"]');

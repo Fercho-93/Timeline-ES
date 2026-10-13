@@ -152,6 +152,7 @@ assert.match(read('edition.css'), /\.hand\.hand-fan:not\(\.hand-placement-pendin
     window.matchMedia = () => ({matches: true});
     window.requestAnimationFrame = () => 1;
     window.cancelAnimationFrame = () => {};
+    window.eval(read('mesa-escala.js'));
     window.eval(read('immersion.js'));
     const app = window.document.querySelector('#app');
     const renderHand = (screen, count, pending = false, solo = false) => {
