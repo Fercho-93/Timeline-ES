@@ -5666,10 +5666,12 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 }
 
 /* Pista de colocación en la carta activa de la mano: una mano que va a pulsar y tres palabras,
-   en la franja libre entre el emblema y el título, pegadas a la derecha. Solo en la carta del
-   centro del abanico (o la única), y nunca mientras la carta está en la línea como vista previa. */
+   colgando justo bajo la esquina inferior derecha de la carta, fuera de su marco. Dentro no hay
+   sitio: entre el emblema y el título quedan unos 5 px en cualquier tamaño, y el título apoya en el
+   filete del borde. Solo en la carta del centro del abanico (o la única), y nunca mientras la carta
+   está en la línea como vista previa. */
 #app .hand-card > .card-hint {
-  position: absolute; z-index: 2; right: 10px; bottom: calc(29% + 12px);
+  position: absolute; z-index: 2; right: 6px; top: calc(100% + 4px); bottom: auto;
   display: inline-flex; align-items: center; gap: 3px; max-width: calc(100% - 20px);
   margin: 0; padding: 0; color: #8a6a3f; opacity: .85; pointer-events: none;
   font: 600 .5rem/1 var(--ui-font); letter-spacing: .02em; white-space: nowrap; overflow: hidden;
@@ -5679,5 +5681,10 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 #app .hand-fan .hand-card:not(.fan-center) > .card-hint,
 #app .hand-placement-pending .hand-card > .card-hint,
 #app .hand-card:disabled > .card-hint,
-#app .enc-background .hand-card > .card-hint { display: none; }
+#app .enc-background .hand-card > .card-hint,
+.drag-card-preview .card-hint { display: none; }
 :root[data-theme="dark"] #app .hand-card > .card-hint { color: #d8bf92; }
+/* La pista cuelga fuera de la carta, así que la carta de la mano no recorta su contenido; el
+   reverso, que la llena entera, hereda las esquinas redondeadas para no asomar por ellas. */
+#app .hand .hand-card:has(> .card-hint) { overflow: visible; }
+#app .hand .hand-card:has(> .card-hint) > .carta-reverso { border-radius: inherit; }
