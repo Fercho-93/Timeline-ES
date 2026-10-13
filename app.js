@@ -2501,7 +2501,7 @@
         ${pendiente ? `<button class="btn btn-primary btn-block" data-action="resume-solo">Continuar ${solo.kind === "marathon" ? "la maratón" : "la ronda"} · ${CT.Ghost.level(solo.difficulty).name} <span>→</span></button>` : ""}
         <div class="panel solo-panel">
           <div class="solo-panel-head"><h3>Ronda de ${SOLO_ROUND_CARDS} cartas</h3></div>
-          <p>Salen de las que aún no dominas y van de la más holgada a la más apretada. Acábalas con vidas de sobra y la ronda se supera: cada vida que te quede es una estrella.</p>
+          <p>Cada carta cuesta más de encajar que la anterior. Acaba la ronda con vidas y la superas: cada vida que te quede es una estrella.</p>
           ${CT.Ghost.difficultyCards("solo-difficulty", selectedDifficulty)}
           <p class="hint" data-level-record>${textoRondaRecord(records, selectedDifficulty)}</p>
           <button class="btn ${pendiente ? "btn-secondary" : "btn-primary"} btn-block" data-action="start-free">${pendiente ? "Empezar otra ronda" : "Empezar ronda"}</button>
