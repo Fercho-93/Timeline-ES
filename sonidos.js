@@ -116,6 +116,20 @@
     s.start(t, Math.random() * .8, dur + .05);
     s.onended = () => suelta(f, g);
   }
+  // Papel: ruido filtrado cuyo centro recorre `frecs` (un punto cada `paso` segundos), con
+  // la envolvente de volumen `vols` en los mismos instantes. Es el roce de una hoja.
+  function papel(t, { frecs, vols, paso, tipo = 'bandpass', q = .9, eco = .12 }) {
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    const dur = paso * (vols.length - 1);
+    s.buffer = ruido; f.type = tipo; f.Q.value = q;
+    f.frequency.setValueAtTime(frecs[0], t);
+    frecs.forEach((v, i) => i && f.frequency.exponentialRampToValueAtTime(v, t + i * paso));
+    g.gain.setValueAtTime(.0001, t);
+    vols.forEach((v, i) => i && g.gain.exponentialRampToValueAtTime(Math.max(.0001, v), t + i * paso));
+    s.connect(f); f.connect(g); salida(g, eco);
+    s.start(t, Math.random() * .5, dur + .05);
+    s.onended = () => suelta(f, g);
+  }
   function golpe(t, { de, a, dur, vol }) {
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.frequency.setValueAtTime(de, t);
@@ -201,6 +215,19 @@
     // Volver atrás: siempre este mismo toque grave, el de Atlas, y solo en los botones de volver.
     // Baja un escalón la escala del menú, para que lo siguiente que se avance retome desde ahí.
     vuelta(t) { escalon = Math.max(0, escalon - 1); tono(nota(0, 50), t, { dur: .22, vol: .13, eco: .08, timbre: 'madera' }); return .3; },
+    // Deslizar para volver: una hoja de libro que se pasa. El roce sube de tono al
+    // levantarla, la hoja cruza en el aire con un crujido fino y cae con un golpe blando
+    // de papel. Cada vez un poco distinta, como una hoja de verdad.
+    hoja(t) {
+      escalon = Math.max(0, escalon - 1);
+      const v = 1 + (Math.random() - .5) * .16, k = humano() * (1 + (Math.random() - .5) * .1);
+      papel(t, { frecs: [700 * k, 1900 * k, 3400 * k, 2300 * k, 1500 * k], vols: [0, .055 * v, .1 * v, .07 * v, .0001], paso: .065, q: .8 });
+      for (let i = 0; i < 4; i++) {
+        soplo(t + .04 + i * .045 + Math.random() * .02, { tipo: 'highpass', frec: 5200 + Math.random() * 1800, q: .7, vol: (.016 + Math.random() * .012) * v, ataque: .003, dur: .014, eco: .05 });
+      }
+      papel(t + .23, { frecs: [900 * k, 380 * k], vols: [0, .08 * v, .0001], paso: .045, tipo: 'lowpass', q: .5, eco: .18 });
+      return .5;
+    },
     // Desplegar una colección: dos toques que suben (y avanzan la escala); plegarla, los mismos al revés.
     despliegue(t) {
       const p = sube();
@@ -303,7 +330,7 @@
       }
       // Volver atrás y desplegar o plegar una colección tienen voz propia: son toques
       // deliberados y tienen que oírse, no insinuarse como el pasar de página.
-      // Volver atrás suena solo al pulsar un botón de volver (o deslizar para volver), y siempre igual.
+      // Volver atrás suena solo al pulsar un botón de volver, y siempre igual (deslizar para volver suena a hoja: `hoja`).
       // Un cambio de pantalla "hacia atrás" provocado por otra cosa es un toque de menú más.
       case 'back': {
         racha = 0; aciertos = 0; fallos = 0;
@@ -341,10 +368,18 @@
     racha = 0; aciertos = 0; fallos = 0;
     suena('vuelta');
   }
+  // Deslizar el dedo para volver no es pulsar un botón: suena a pasar una hoja. El gesto
+  // pulsa después la flecha de la pantalla, y ese clic ya no suena otra vez.
+  let ultimoGesto = -Infinity;
+  function hoja() {
+    ultimoGesto = ultimoAtras = ultimoSoplo = ahora();
+    racha = 0; aciertos = 0; fallos = 0;
+    suena('hoja');
+  }
   document.addEventListener('click', event => {
     if (event.target.closest?.('[data-action="home-top"], [data-action="home"]')) escalon = 0;
     const el = event.target.closest?.(VOLVER);
-    if (el && !el.disabled && el.getAttribute('aria-disabled') !== 'true') atras();
+    if (el && !el.disabled && el.getAttribute('aria-disabled') !== 'true' && ahora() - ultimoGesto > 800) atras();
   }, true);
   const TOCABLE = 'button, a[href], summary, [role="button"], [role="radio"], [role="tab"], [data-action], [data-quick], [data-online-action], [data-local-action], [data-turn-action], [data-account-action], [data-settings-action]';
   document.addEventListener('click', event => {
@@ -366,7 +401,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden && ctx?.state === 'running') void ctx.suspend().catch(() => {}); });
 
   CT.Sonidos = {
-    cue, result, confirm, discovery, achievement, clock, atras,
+    cue, result, confirm, discovery, achievement, clock, atras, hoja,
     // La prueba de Ajustes: un acierto, para oír el volumen elegido.
     test() { if (master) master.gain.value = volumen(); suena('acierto', 0, 0); }
   };

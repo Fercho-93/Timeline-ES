@@ -72,7 +72,7 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
 {
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
   w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});w.Element.prototype.scrollIntoView=()=>{};
-  let contexts=0, notas=0, master=null;
+  let contexts=0, notas=0, ruidos=0, master=null;
   // El tono fundamental de cada sonido (la primera voz de cada nota), para comprobar la altura.
   const graves=[];
   const param=()=>({value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}});
@@ -87,7 +87,7 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
       createConvolver:()=>nodo(),
       createBuffer:(c,n)=>({getChannelData:()=>new Float32Array(n)}),
       createOscillator:()=>{let v=0;return nodo({frequency:{...param(),get value(){return v;},set value(x){v=x;graves.push(x);}},start(){notas++;},stop(){}});},
-      createBufferSource:()=>nodo({start(){},stop(){}})});
+      createBufferSource:()=>nodo({start(){ruidos++;},stop(){}})});
   };
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
   try {
@@ -123,6 +123,11 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
       await new Promise(r=>w.setTimeout(r,1700));
       graves.length=0;CT.Effects.transition('back');await new Promise(r=>w.setTimeout(r,50));
       assert.ok(graves.length>0&&Math.abs(graves[0]-atras[0])>atras[0]*.05,'solo los botones de volver usan el sonido de volver');
+      // Deslizar para volver suena a pasar una hoja: papel (ruido), sin el toque de madera. El
+      // gesto pulsa después la flecha, y ese clic no suena encima.
+      await new Promise(r=>w.setTimeout(r,1700));
+      graves.length=0;const papel=ruidos;CT.Sonidos.hoja();host.querySelector('#v1').click();await new Promise(r=>w.setTimeout(r,320));
+      assert.ok(ruidos-papel>=3&&graves.length===0,`deslizar suena a hoja de papel y no a botón (${ruidos-papel} ruidos, ${graves.length} notas)`);
       host.remove();
     }
     // Ningún botón queda mudo: uno sin sonido propio suena con el toque de menú, y uno que ya provoca
