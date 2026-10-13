@@ -66,3 +66,11 @@
 #app .guide-handbook .gp-reference { min-width: 0; overflow-wrap: anywhere; }
 #app .guide-handbook .gp-reference img { max-width: 100%; }
 #app .guide-handbook .guide-practice.is-correct .gp-feedback { color: var(--green); font-weight: 700; }
+
+/* El cuaderno es una lámina pintada, con transparencia real y espacio para el título. */
+#app .guide-handbook .guide-frontispiece {
+  width: min(100%, 280px); height: auto; aspect-ratio: 3 / 2; object-fit: contain;
+  margin: -4px auto 16px; filter: drop-shadow(0 8px 7px #61412418);
+}
+:root[data-theme="dark"] #app .guide-handbook .guide-frontispiece { filter: drop-shadow(0 8px 10px #0005); }
+@media (max-width: 360px) { #app .guide-handbook .guide-frontispiece { width: min(100%, 240px); } }
