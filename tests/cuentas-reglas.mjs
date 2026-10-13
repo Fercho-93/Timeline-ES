@@ -62,6 +62,23 @@ try {
  await assertSucceeds(getDocs(query(collection(other,'dailyScores',day,'players'),orderBy('hits','desc'),limit(200))));
  await assertFails(getDocs(query(collection(other,'dailyScores',day,'players'),orderBy('hits','desc'),limit(201))));
  await assertSucceeds(deleteDoc(doc(db,'weeklyScores',week,'players','account-a')));
+ // Ranking de descubrimientos: la fila cuadra con el recuento del progreso, que los clientes anteriores no envían.
+ batch=writeBatch(db);batch.set(doc(db,'playerProgress','account-a'),{...progress,revision:3,found:12,foundCollections:9,foundQuick:3});
+ batch.set(doc(db,'discoveryScores','account-a'),{...who,cards:12,collections:9,quick:3,updatedAt:serverTimestamp()});await assertSucceeds(batch.commit());
+ await assertFails(setDoc(doc(db,'discoveryScores','account-a'),{...who,cards:13,collections:10,quick:3,updatedAt:serverTimestamp()})); // no cuadra con el progreso
+ await assertFails(setDoc(doc(db,'discoveryScores','account-a'),{...who,alias:'Otro',cards:12,collections:9,quick:3,updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db,'discoveryScores','account-a'),{...who,cards:12,collections:9,quick:3,email:'x@example.com',updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(other,'discoveryScores','account-a'),{...who,cards:12,collections:9,quick:3,updatedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db,'playerProgress','account-a'),{...progress,revision:4,found:13,foundCollections:9,foundQuick:3})); // la suma no cuadra
+ await assertFails(setDoc(doc(db,'playerProgress','account-a'),{...progress,revision:4,found:-1,foundCollections:-1,foundQuick:0}));
+ await assertSucceeds(getDocs(query(collection(other,'discoveryScores'),orderBy('cards','desc'),limit(200))));
+ await assertSucceeds(getDocs(query(collection(anonymous,'discoveryScores'),orderBy('quick','desc'),limit(50))));
+ await assertFails(getDocs(query(collection(other,'discoveryScores'),orderBy('cards','desc'),limit(201))));
+ await assertFails(getDocs(collection(other,'discoveryScores')));
+ await assertFails(getDocs(query(collection(unauthenticated,'discoveryScores'),limit(50))));
+ await assertFails(deleteDoc(doc(other,'discoveryScores','account-a')));
+ await assertSucceeds(setDoc(doc(db,'playerProgress','account-a'),{...progress,revision:4})); // un cliente anterior
+ await assertSucceeds(deleteDoc(doc(db,'discoveryScores','account-a')));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,alias:'x'}));
  await assertFails(setDoc(doc(db,'playerProfiles','account-a'),{...data,season:'other'}));
  await assertFails(deleteDoc(doc(db,'playerNames','fulanito')));

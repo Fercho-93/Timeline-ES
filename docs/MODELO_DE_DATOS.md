@@ -16,9 +16,10 @@ Lo que borra la eliminación de una cuenta está en
 | `playerProfiles/{uid}` | Alias, clave del alias, avatar, temporada y versión de privacidad aceptada | Su dueño | Su dueño (solo alias y avatar tras crearlo) | Mientras exista la cuenta; invitado sin uso, 1 año |
 | `playerProfiles/{uid}/pushTokens/{id}` | Token de avisos del móvil y plataforma | Su dueño; las Functions para enviar | Su dueño; las Functions borran los tokens caducados | Con la cuenta (hoy la app aún no registra tokens) |
 | `playerNames/{alias}` | Reserva única del alias (sin mayúsculas) → `uid` | Con sesión (`get`, sin listar) | Su dueño, en la misma transacción que el perfil | Con la cuenta |
-| `playerProgress/{uid}` | Progreso, récords, aciertos, partidas, revisión y aciertos del día y la semana | Su dueño | Su dueño, con revisión creciente | Con la cuenta |
+| `playerProgress/{uid}` | Progreso, récords, aciertos, partidas, revisión, aciertos del día y la semana y cartas descubiertas (`found`, `foundCollections`, `foundQuick`) | Su dueño | Su dueño, con revisión creciente | Con la cuenta |
 | `dailyScores/{fecha}/players/{uid}` | Fila del ranking del día: alias, avatar, aciertos (0–10), `ms` y `finishedAt` vacío | Con sesión (listas de hasta 200) | Su dueño, si aceptó el ranking; debe coincidir con perfil y progreso | 90 días (la tabla entera, por fecha) |
 | `weeklyScores/{lunes}/players/{uid}` | Fila del ranking semanal (0–70) | Con sesión (hasta 200) | Su dueño, igual que la diaria | 90 días |
+| `discoveryScores/{uid}` | Fila del ranking de descubrimientos: alias, avatar y cartas descubiertas (`cards`, `collections`, `quick`) | Con sesión (hasta 200) | Su dueño, si aceptó el ranking; debe coincidir con perfil y con `found*` del progreso | Con la cuenta o al dejar el ranking |
 | `dailyRanking/{uid}` | Marcador acumulado anterior; ya no se crea | Con sesión (hasta 50) | Su dueño (solo se actualiza alias y avatar) | Con la cuenta o al dejar el ranking |
 | `socialRanking/{uid}` | Marcador social anterior; ya no se escribe | Con sesión (hasta 50) | Su dueño | Con la cuenta |
 

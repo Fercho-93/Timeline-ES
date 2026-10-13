@@ -28,7 +28,17 @@ const refs = uid => ({profile:doc(db,'playerProfiles',uid), progress:doc(db,'pla
 // semana es una colección propia, así que el lunes todo el mundo empieza de cero sin borrar nada.
 const dayScore = (uid, key) => doc(db,'dailyScores',key,'players',uid);
 const weekScore = (uid, key) => doc(db,'weeklyScores',key,'players',uid);
-const DAILY_MAX = 10, DAY_MS = 86400000;
+// Y una fila por persona con sus cartas descubiertas (las de las colecciones y las de Retos rápidos):
+// no caduca ni empieza de cero, porque lo que mide es la colección entera.
+const foundScore = uid => doc(db,'discoveryScores',uid);
+const DAILY_MAX = 10, DAY_MS = 86400000, FOUND_MAX = 100000;
+// Cartas descubiertas según el progreso guardado, por sección.
+function discoveries(progress) {
+  let p = {}; try { p = JSON.parse(progress || '{}') || {}; } catch { /* progreso ilegible: cero */ }
+  const count = list => Array.isArray(list) ? Math.min(FOUND_MAX, new Set(list).size) : 0;
+  const collections = count(p.mastered), quick = count(p.quickMastered);
+  return { found: collections + quick, foundCollections: collections, foundQuick: quick };
+}
 const shiftKey = (key, days) => { const d = new Date(`${key}T12:00:00`); d.setDate(d.getDate() + days); return dateKey(d); };
 const dateKey = date => date.toLocaleDateString('sv-SE');
 // Aciertos de hoy y de esta semana, leídos de los retos diarios guardados. Solo se suman aciertos:
@@ -135,6 +145,10 @@ async function scoreRows(tx, uid) {
     const row = await tx.get(ref);
     if (row.exists()) rows.push([ref, row.data()]);
   }
+  // La de descubrimientos, solo si coincide con el progreso: una versión anterior del juego pudo
+  // guardarlo sin el recuento, y entonces las reglas no dejarían reescribirla.
+  const found = await tx.get(foundScore(uid));
+  if (found.exists() && data.found === found.data().cards && data.foundCollections === found.data().collections && data.foundQuick === found.data().quick) rows.push([foundScore(uid), found.data()]);
   return rows;
 }
 async function rename(aliasArg) {
@@ -212,7 +226,7 @@ function payload() {
   const totals = JSON.parse(progress).totals || {};
   const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
   const {day,dayHits,week,weekHits} = periods(readRecords());
-  return {progress,records,hits:count(totals.dailyHits),games:count(totals.dailyGames),season,day,dayHits,week,weekHits};
+  return {progress,records,hits:count(totals.dailyHits),games:count(totals.dailyGames),season,day,dayHits,week,weekHits,...discoveries(progress)};
 }
 // Lo jugado sin conexión antes de tener invitado vive en un espacio aparte («locked»). Si la cuenta
 // es nueva y no tiene progreso en la nube, ese progreso pasa a ser el suyo en vez de perderse.
@@ -280,6 +294,7 @@ async function flush() {
     // reglas aún exigen el campo, por los clientes anteriores).
     if (publico && data.day) tx.set(dayScore(uid,data.day),{...who,hits:data.dayHits,ms:per.dayMs,finishedAt:'',updatedAt:serverTimestamp()});
     if (publico && data.week) tx.set(weekScore(uid,data.week),{...who,hits:data.weekHits,ms:per.weekMs,updatedAt:serverTimestamp()});
+    if (publico && data.found) tx.set(foundScore(uid),{...who,cards:data.found,collections:data.foundCollections,quick:data.foundQuick,updatedAt:serverTimestamp()});
   }).then(() => {
     revision=expected+1;setMeta(change !== generation);
     if (!metadata().dirty) document.getElementById('storage-notice')?.remove();
@@ -495,7 +510,7 @@ async function deleteAll(refsToDelete) {
 async function purgeServerData(uid, aliasKey) {
   const r = refs(uid);
   const list = async (...path) => { try { return (await getDocsFromServer(collection(db, ...path))).docs.map(item => item.ref); } catch { return []; } };
-  await deleteAll([...rankingRows(uid),
+  await deleteAll([...rankingRows(uid), foundScore(uid),
     ...await list('playerProfiles', uid, 'pushTokens'),
     ...await list('duelPreferences', uid, 'blocked'),
     ...await list('duelPreferences', uid, 'archived')]);
@@ -515,7 +530,7 @@ function forgetLocalDuels(uid) {
 async function removeRankingRows() {
   if (!identity) return;
   const uid = identity.uid;
-  await deleteAll([...rankingRows(uid), refs(uid).ranking]);
+  await deleteAll([...rankingRows(uid), refs(uid).ranking, foundScore(uid)]);
 }
 async function setRanking(value) {
   const records = readRecords();
@@ -529,13 +544,13 @@ function refreshCard() { const card = document.querySelector('.account-card'); i
 function askRanking() {
   if (!ready || rankingPublico() !== null || document.querySelector('.ranking-consent')) return;
   accountDialog(`<div class="overlay"><section class="modal ranking-consent"><h2>¿Quieres aparecer en el ranking?</h2>
-    <p>El ranking del reto diario es público: lo ven los demás jugadores. Si aceptas, mostrará tu nombre de perfil, tu avatar, tus aciertos y tu tiempo, del día y de la semana.</p>
+    <p>El ranking es público: lo ven los demás jugadores. Si aceptas, mostrará tu nombre de perfil, tu avatar, tus aciertos y tu tiempo en el reto diario (del día y de la semana) y cuántas cartas has descubierto.</p>
     <p class="hint">Puedes cambiarlo cuando quieras en Ajustes o en el Atlas.</p>
     <div class="actions" style="display:grid;gap:10px"><button class="btn btn-primary" data-account-action="ranking-yes">Sí, aparecer en el ranking</button><button class="btn btn-ghost" data-account-action="ranking-no">Ahora no</button></div></section></div>`);
 }
 function rankingControls() {
   const publico = rankingPublico() === true;
-  return `<section class="account-privacy" aria-label="Ranking público"><p><b>Ranking público:</b> ${publico ? 'apareces con tu nombre de perfil, tu avatar, tus aciertos y tu tiempo.' : 'no apareces. Tus resultados solo los ves tú.'}</p>
+  return `<section class="account-privacy" aria-label="Ranking público"><p><b>Ranking público:</b> ${publico ? 'apareces con tu nombre de perfil, tu avatar, tus aciertos, tu tiempo y tus cartas descubiertas.' : 'no apareces. Tus resultados solo los ves tú.'}</p>
     <button class="btn btn-secondary" data-account-action="ranking-toggle" aria-pressed="${publico}">${publico ? 'Dejar de aparecer' : 'Aparecer en el ranking'}</button></section>`;
 }
 function accountText() {
@@ -547,8 +562,8 @@ function accountCard() {
   const stats=payload(), dirty=metadata().dirty;
   return `<div class="account-card">
     <div class="account-hero"><span class="account-kicker">TU CUENTA</span><span class="account-save-state" role="status">${dirty ? '◌ Cambios pendientes' : '✓ Progreso guardado'}</span>
-    <div class="account-metrics"><div><b>${stats.day ? `${stats.dayHits}/${DAILY_MAX}` : '–'}</b><span>Reto de hoy</span></div><div><b>${stats.weekHits}</b><span>Aciertos esta semana</span></div></div></div>
-    <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking de retos diarios</b><span>Hoy y esta semana</span></span><span aria-hidden="true">↗</span></button>
+    <div class="account-metrics"><div><b>${stats.day ? `${stats.dayHits}/${DAILY_MAX}` : '–'}</b><span>Reto de hoy</span></div><div><b>${stats.weekHits}</b><span>Aciertos esta semana</span></div><div><b>${stats.found}</b><span>Cartas descubiertas</span></div></div></div>
+    <button class="account-ranking-link" data-account-action="ranking"><span class="account-action-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v6a4 4 0 0 1-8 0V3Z M8 5H4v2a4 4 0 0 0 4 4 M16 5h4v2a4 4 0 0 1-4 4 M12 13v5 M8 21h8 M9 18h6v3H9z"/></svg></span><span><small>EL RETO CONTINÚA</small><b>Ranking</b><span>Reto diario y cartas descubiertas</span></span><span aria-hidden="true">↗</span></button>
     ${appleControls()}
     <div class="account-actions"><button class="btn btn-secondary" data-account-action="sync"><span aria-hidden="true">↻</span> Guardar ahora</button></div>
     ${rankingControls()}
@@ -587,7 +602,7 @@ async function ranking(tab = 'day', key = '', all = false) {
   const fecha = k => new Date(`${k}T12:00:00`).toLocaleDateString('es-ES', {weekday: semana ? undefined : 'long', day:'numeric', month:'long'});
   const titulo = semana ? (esActual ? 'Esta semana' : `Semana del ${fecha(key)}`) : (esActual ? 'Hoy' : fecha(key).replace(/^./, c => c.toUpperCase()));
   const subtitulo = semana ? `Del lunes ${fecha(key)} al domingo ${fecha(shiftKey(key, 6))}.${esActual ? ' El lunes que viene, todos a cero.' : ''}` : `Aciertos en el reto ${esActual ? 'de hoy' : 'de ese día'}, de 0 a 10. A igualdad, gana quien tardó menos.`;
-  const tabs = `<div class="ranking-tabs" role="group" aria-label="Periodo"><button type="button" class="btn ${semana?'btn-secondary':'btn-primary'}" data-account-action="ranking-day" aria-pressed="${!semana}">Por días</button><button type="button" class="btn ${semana?'btn-primary':'btn-secondary'}" data-account-action="ranking-week" aria-pressed="${semana}">Por semanas</button></div>`;
+  const tabs = `<div class="ranking-tabs" role="group" aria-label="Periodo"><button type="button" class="btn ${semana?'btn-secondary':'btn-primary'}" data-account-action="ranking-day" aria-pressed="${!semana}">Por días</button><button type="button" class="btn ${semana?'btn-primary':'btn-secondary'}" data-account-action="ranking-week" aria-pressed="${semana}">Por semanas</button><button type="button" class="btn btn-secondary" data-account-action="ranking-discoveries" aria-pressed="false">Cartas</button></div>`;
   const nav = `<div class="ranking-nav"><button type="button" class="btn btn-ghost" data-account-action="ranking-prev" aria-label="${semana ? 'Semana anterior' : 'Día anterior'}"${key <= oldest ? ' disabled' : ''}>‹</button><span>${esc(titulo)}</span><button type="button" class="btn btn-ghost" data-account-action="ranking-next" aria-label="${semana ? 'Semana siguiente' : 'Día siguiente'}"${esActual ? ' disabled' : ''}>›</button></div>`;
   const personal = mine>=0 ? `<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${hits(own)}</b> aciertos${time(own)}</span>`
     : own ? `<span>Tu posición <b>Fuera de los ${entries.length} primeros</b></span><span><b>${hits(own)}</b> aciertos</span>`
@@ -599,6 +614,42 @@ async function ranking(tab = 'day', key = '', all = false) {
     <div class="ranking-body"><p class="ranking-public-note">Ranking público: solo aparece quien lo ha decidido, con su nombre de perfil, avatar, aciertos y tiempo.</p>${rankingPublico() === true ? '' : '<div class="ranking-optin"><p>No apareces en esta tabla.</p><button type="button" class="btn btn-secondary" data-account-action="ranking-join">Aparecer en el ranking</button></div>'}${entries.length?`<div class="ranking-podium" aria-label="Los tres primeros">${podium}</div><div class="ranking-personal${own?' has-result':''}">${personal}</div>${entries.length>3?`<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Aciertos</th></tr></thead><tbody>${entries.slice(3).map((v,i)=>player(v,i+3)).join('')}</tbody></table>`:''}${mas}`:vacio}
     <details class="account-details ranking-rules"><summary>Cómo funciona</summary><p>Cada día hay un reto de 10 cartas; cada carta bien colocada es un acierto. <b>Por días</b> ordena por los aciertos de ese día; <b>por semanas</b>, por los de lunes a domingo, y cada lunes todo el mundo vuelve a empezar, así que da igual cuándo empezaste a jugar. A igualdad de aciertos gana quien tardó menos en jugar el reto (en la semana, sumando los días).</p><p>Con ‹ › ves quién ganó los días y las semanas anteriores. Solo cuenta el reto diario. Resultados enviados por el juego, sin validación competitiva.</p></details></div>
     <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`,true);
+}
+// Ranking de descubrimientos: quién ha descubierto más cartas, en total o en cada sección. No va por
+// fechas: cuenta la colección entera de cada cuenta. A igualdad de cartas se comparte el puesto.
+const FOUND_SECTIONS = { all: ['cards', 'Todas', 'cartas descubiertas en total'], collections: ['collections', 'Grandes colecciones', 'cartas descubiertas en Grandes colecciones'], quick: ['quick', 'Retos rápidos', 'cartas descubiertas en Retos rápidos'] };
+async function discoveryRanking(section = 'all', all = false) {
+  await flush();
+  if (failedConflict) return;
+  section = FOUND_SECTIONS[section] ? section : 'all';
+  const [field, label, sentence] = FOUND_SECTIONS[section], uid = identity.uid;
+  rankingView = { tab: 'found', section, key: '', all };
+  const snap = await getDocsFromServer(query(collection(db, 'discoveryScores'), orderBy(field, 'desc'), limit(all ? RANKING_ALL : RANKING_PAGE)));
+  const value = v => Number(v[field]) || 0;
+  const entries = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(v => value(v) > 0);
+  entries.sort((a, b) => value(b) - value(a) || String(a.alias).localeCompare(String(b.alias), 'es'));
+  const position = i => 1 + entries.filter(v => value(v) > value(entries[i])).length;
+  const mine = entries.findIndex(v => v.id === uid);
+  const ownSnap = mine < 0 ? await getDocFromServer(foundScore(uid)).catch(() => null) : null;
+  const own = mine >= 0 ? entries[mine] : ownSnap?.exists() ? {id: uid, ...ownSnap.data()} : null;
+  const local = discoveries(CT.Storage.getItem(P));
+  const localValue = {all: local.found, collections: local.foundCollections, quick: local.foundQuick}[section];
+  const rankAvatar = (v, size) => CT.Avatares.markup(v.alias, { size, seed: 'uid:' + v.id, id: v.id === uid ? CT.Avatares.ownId() : v.avatar });
+  const you = v => v.id === uid ? '<small class="ranking-you">Tú</small>' : '';
+  const player = (v, i) => `<tr class="${v.id === uid ? 'is-you' : ''}"><td><span class="ranking-place">${position(i)}</span></td><td><span aria-hidden="true">${rankAvatar(v, 32)}</span> <span class="ranking-name">${esc(v.alias)}</span>${you(v)}</td><td><b>${value(v)}</b></td></tr>`;
+  const podium = entries.slice(0, 3).map((v, i) => `<article class="ranking-medallion ranking-medallion-${i + 1}${v.id === uid ? ' is-you' : ''}"><span class="ranking-medal" aria-label="Puesto ${position(i)}">${['Ⅰ','Ⅱ','Ⅲ'][i]}</span><span class="ranking-avatar" aria-hidden="true">${rankAvatar(v, 46)}</span><b>${esc(v.alias)}</b>${you(v)}<strong>${value(v)}</strong><span>cartas</span></article>`).join('');
+  const tabs = `<div class="ranking-tabs" role="group" aria-label="Tabla"><button type="button" class="btn btn-secondary" data-account-action="ranking-day" aria-pressed="false">Por días</button><button type="button" class="btn btn-secondary" data-account-action="ranking-week" aria-pressed="false">Por semanas</button><button type="button" class="btn btn-primary" data-account-action="ranking-discoveries" aria-pressed="true">Cartas</button></div>`;
+  const sections = `<div class="ranking-tabs ranking-sections" role="group" aria-label="Sección">${Object.entries(FOUND_SECTIONS).map(([key, [, name]]) => `<button type="button" class="btn ${key === section ? 'btn-primary' : 'btn-secondary'}" data-account-action="ranking-found-${key}" aria-pressed="${key === section}">${esc(name)}</button>`).join('')}</div>`;
+  const personal = mine >= 0 ? `<span>Tu puesto <b>#${position(mine)}</b></span><span><b>${value(own)}</b> cartas</span>`
+    : own && value(own) ? `<span>Tu posición <b>Fuera de los ${entries.length} primeros</b></span><span><b>${value(own)}</b> cartas</span>`
+    : `<span>Llevas <b>${localValue}</b> ${localValue === 1 ? 'carta descubierta' : 'cartas descubiertas'}${rankingPublico() === true ? '' : ', pero no apareces en el ranking'}.</span>`;
+  const vacio = `<div class="ranking-empty"><span aria-hidden="true">✧</span><h3>Todavía no hay nadie en esta tabla</h3><p>Cada carta que colocas bien por primera vez entra en tu colección y suma aquí.</p></div>`;
+  const mas = !all && entries.length >= RANKING_PAGE ? `<button type="button" class="btn btn-secondary ranking-more" data-account-action="ranking-more">Ver más</button>` : '';
+  if (document.querySelector('.ranking-modal')) CT.closeDialog();
+  accountDialog(`<div class="overlay"><section class="modal ranking-modal"><header class="ranking-hero"><span class="account-kicker">CONTINUUM · DESCUBRIMIENTOS</span><span class="ranking-emblem" aria-hidden="true">✦</span>${tabs}${sections}<h2>${esc(label)}</h2><p>${esc(`Quién lleva más ${sentence}.`)}</p></header>
+    <div class="ranking-body"><p class="ranking-public-note">Ranking público: solo aparece quien lo ha decidido, con su nombre de perfil, avatar y cartas descubiertas.</p>${rankingPublico() === true ? '' : '<div class="ranking-optin"><p>No apareces en esta tabla.</p><button type="button" class="btn btn-secondary" data-account-action="ranking-join">Aparecer en el ranking</button></div>'}${entries.length ? `<div class="ranking-podium" aria-label="Los tres primeros">${podium}</div><div class="ranking-personal${own ? ' has-result' : ''}">${personal}</div>${entries.length > 3 ? `<table class="account-ranking"><thead><tr><th scope="col">Puesto</th><th scope="col">Explorador</th><th scope="col">Cartas</th></tr></thead><tbody>${entries.slice(3).map((v, i) => player(v, i + 3)).join('')}</tbody></table>` : ''}${mas}` : `<div class="ranking-personal">${personal}</div>${vacio}`}
+    <details class="account-details ranking-rules"><summary>Cómo funciona</summary><p>Una carta se descubre la primera vez que la colocas bien en una partida tuya: en Grandes colecciones (cualquier modo) o en Retos rápidos. Volver a acertarla no suma otra vez. <b>Todas</b> ordena por el total; <b>Grandes colecciones</b> y <b>Retos rápidos</b>, por las de cada sección. A igualdad de cartas se comparte el puesto.</p><p>Esta tabla no se reinicia: cuenta tu colección entera. Resultados enviados por el juego, sin validación competitiva.</p></details></div>
+    <footer class="ranking-footer"><button class="btn btn-primary" data-account-action="close">Cerrar</button></footer></section></div>`, true);
 }
 function deleteScreen() {
   const apple = appleUser(identity);
@@ -649,7 +700,7 @@ export async function startAccounts(callback) {
     if(action==='daily'){CT.closeDialog();CT.localNavigate?.('daily');return;}
     if(busy)return;busy=true;target.disabled=true;
     const fn={ranking:()=>ranking('day'),'ranking-day':()=>ranking('day'),'ranking-week':()=>ranking('week'),
-      'ranking-prev':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?-7:-1)),'ranking-next':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?7:1)),'ranking-more':()=>ranking(rankingView.tab,rankingView.key,true),sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},apple:signInApple,signout:signOutApple,'ranking-yes':async()=>{CT.closeDialog();await setRanking(true);},'ranking-no':async()=>{CT.closeDialog();await setRanking(false);},'ranking-toggle':()=>setRanking(rankingPublico()!==true),'ranking-join':async()=>{await setRanking(true);await ranking(rankingView.tab,rankingView.key);},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
+      'ranking-prev':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?-7:-1)),'ranking-next':()=>ranking(rankingView.tab,shiftKey(rankingView.key,rankingView.tab==='week'?7:1)),'ranking-more':()=>rankingView.tab==='found'?discoveryRanking(rankingView.section,true):ranking(rankingView.tab,rankingView.key,true),'ranking-discoveries':()=>discoveryRanking('all'),'ranking-found-all':()=>discoveryRanking('all'),'ranking-found-collections':()=>discoveryRanking('collections'),'ranking-found-quick':()=>discoveryRanking('quick'),sync:async()=>{await flush();const card=document.querySelector('.account-card');if(card)card.outerHTML=accountCard();},apple:signInApple,signout:signOutApple,'ranking-yes':async()=>{CT.closeDialog();await setRanking(true);},'ranking-no':async()=>{CT.closeDialog();await setRanking(false);},'ranking-toggle':()=>setRanking(rankingPublico()!==true),'ranking-join':async()=>{await setRanking(true);if(rankingView.tab==='found')await discoveryRanking(rankingView.section);else await ranking(rankingView.tab,rankingView.key);},'edit-name':editNameScreen,rename,delete:deleteScreen,'delete-confirm':removeAccount}[action];
     Promise.resolve().then(fn).catch(error=>{
       if (error.code === 'apple/cancelled') return;
       const text=message(error), el=document.getElementById('account-auth-message') || document.getElementById('account-delete-message');

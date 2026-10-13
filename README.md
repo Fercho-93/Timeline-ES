@@ -68,9 +68,17 @@ cuenta se rechaza con aviso (ver [CUENTAS_Y_RANKING.md](CUENTAS_Y_RANKING.md)).
 ## Retos rápidos
 
 **Retos rápidos** funciona igual que las grandes colecciones, con temas cortos: se juega solo
-(partida libre por duración), en un solo móvil, por internet o por Wi-Fi local, en mesas
+(cuatro mazos del día que rotan, o una partida sorpresa por duración), en un solo móvil, por internet o por Wi-Fi local, en mesas
 públicas, o retando a un amigo en un duelo (por turnos o con las mismas cartas por enlace). No
 usa el marcador de Competición: mantiene su propia partida guardada.
+
+En solitario, cada día se ofrecen cuatro retos distintos, iguales para todo el mundo: el
+catálogo se baraja una vez con semilla fija y cada día toma el tramo siguiente, así que en ocho
+días salen todos sin repetir de un día a otro. Cada carta que quien juega coloca bien entra en su
+**colección** de Retos rápidos (`quickMastered` en `hilo-perfil-v1`, que viaja con el progreso de
+la cuenta): la pantalla de solitario enseña lo descubierto de cada mazo y «Ver tu colección» lista
+las cartas conseguidas y las que faltan. Cuentan las de solitario, el reto diario, el duelo por
+enlace y, en salas, las de la propia plaza; no las de un móvil compartido entre varios.
 
 Cada reto se juega con todas sus cartas barajadas; la primera hace de referencia y no puntúa.
 En cada turno se elige una carta y se confirma su hueco en la línea. Acertar suma un punto

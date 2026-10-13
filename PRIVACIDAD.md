@@ -1,6 +1,6 @@
 # Privacidad de Continuum
 
-Información de la beta · actualizada el 11 de octubre de 2026.
+Información de la beta · actualizada el 13 de octubre de 2026.
 
 Esta página explica qué datos trata Continuum, para qué, con quién se comparten, cuánto tiempo se guardan y cómo puedes decidir sobre ellos. Continuum no tiene publicidad, no usa analítica de terceros y no vende ni cede datos a nadie con fines comerciales.
 
@@ -22,9 +22,9 @@ En la app de iPhone puedes entrar con tu cuenta de Apple para conservar el progr
 
 Si al vincular una cuenta de Apple esta ya tenía progreso, eliges cuál conservar; el invitado descartado se borra del servidor. Al eliminar tu cuenta, Apple te pide confirmar y el juego revoca su acceso a tu cuenta de Apple.
 
-## Ranking de retos diarios (opcional)
+## Ranking (opcional)
 
-Al terminar tu primer reto diario se te pregunta si quieres aparecer en el ranking; puedes cambiarlo cuando quieras en Ajustes o en el Atlas. Sin aceptar no se publica nada. Si aceptas, cualquier jugador puede ver tu alias, tu avatar, tus aciertos y el tiempo que tardaste, del día y de la semana. Si dejas de aparecer, se retiran todas tus filas, también las de días y semanas anteriores. Los resultados los declara el juego en el dispositivo; no son una clasificación competitiva validada.
+Al terminar tu primer reto diario se te pregunta si quieres aparecer en el ranking; puedes cambiarlo cuando quieras en Ajustes o en el Atlas. Sin aceptar no se publica nada. Si aceptas, cualquier jugador puede ver tu alias, tu avatar, tus aciertos y el tiempo que tardaste en el reto diario, del día y de la semana, y cuántas cartas has descubierto (en total, en Grandes colecciones y en Retos rápidos). Si dejas de aparecer, se retiran todas tus filas, también las de días y semanas anteriores. Los resultados los declara el juego en el dispositivo; no son una clasificación competitiva validada.
 
 **Base jurídica:** tu consentimiento (art. 6.1.a del RGPD), que puedes retirar en cualquier momento.
 
@@ -83,7 +83,7 @@ Google, Apple y GitHub pueden tratar datos en Estados Unidos u otros países fue
 ## Cuánto tiempo se guardan
 
 - Tu perfil y tu progreso: mientras exista tu cuenta. Un invitado sin vincular que lleve **un año** sin abrir el juego se borra.
-- Las filas del ranking: **90 días**.
+- Las filas del ranking del reto diario: **90 días**. La de cartas descubiertas, mientras sigas en el ranking y exista tu cuenta.
 - Las salas online, con su presencia y sus respuestas: **siete días** sin actividad.
 - Los duelos por turnos y las salas de Retos rápidos: **30 días** sin actividad (un duelo sin jugar caduca a los siete días).
 - Las mesas del tablón público y las colas de partida rápida: un día.

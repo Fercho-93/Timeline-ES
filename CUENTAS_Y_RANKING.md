@@ -93,6 +93,20 @@ Atlas → «Tu cuenta y tus datos» → eliminar. Pide confirmación y no se pue
   clientes antiguos y se borran con la cuenta.
 - Son resultados declarados por el cliente: un marcador social, no una clasificación antitrampas.
 
+## Ranking de descubrimientos
+
+- Con el mismo consentimiento (`rankingPublico`). Ordena por **cartas descubiertas**: una carta se
+  descubre la primera vez que quien juega la coloca bien en una partida suya. En Grandes colecciones
+  es el álbum (`mastered` del progreso); en Retos rápidos, `quickMastered`. Volver a acertarla no
+  suma.
+- Tres vistas: **Todas** (el total), **Grandes colecciones** y **Retos rápidos**. No va por fechas
+  ni se reinicia. A igualdad de cartas se comparte el puesto. 50 puestos y «Ver más» hasta 200.
+- Datos: `discoveryScores/{uid}` con alias, avatar, `cards`, `collections` y `quick`. Cada fila
+  debe coincidir, en la misma transacción, con el perfil y con `found/foundCollections/foundQuick`
+  del progreso. Se borra al dejar el ranking y con la cuenta (también en la limpieza de invitados
+  de `functions/index.js`).
+- Se abre desde la pestaña «Cartas» del ranking y desde «Tu colección» de Retos rápidos.
+
 Tipos de puntuación que enseña el juego: partida única (gana quien se queda sin cartas; empate →
 final numérica), partida con rondas (competición: +1 al ganar la ronda, −(cartas − 1) al resto),
 reto diario (X de 10; la rapidez desempata) y duelos (más aciertos; la rapidez desempata). En el

@@ -140,23 +140,69 @@
     const name=profileName();
     return `<div class="field duel-identity-field"><label for="quick-profile-name">Tu nombre de perfil</label><div class="duel-identity"><span class="duel-avatar" aria-hidden="true">${CT.Avatares?.markup?.(name,{size:38,seed:CT.Avatares.ownSeed?.()})||''}</span><input id="quick-profile-name" type="text" readonly aria-readonly="true" value="${esc(name)}"></div><small class="field-help">Se usará automáticamente en la partida. Puedes cambiarlo desde tu perfil.</small></div><input type="hidden" id="quick-net-name" value="${esc(name)}"><textarea id="quick-net-code" hidden></textarea>`;
   }
+  // Mazos del día: cada día salen QUICK_DAY_DECKS retos distintos, los mismos para todo el mundo, que
+  // van rotando por el catálogo entero. El catálogo se baraja una vez con una semilla fija y cada día
+  // toma el tramo siguiente, así que en una semana larga han salido todos y ninguno se repite antes.
+  const QUICK_DAY_DECKS=4;
+  function dayNumber(dayValue) {const [y,m,d]=dayValue.split('-').map(Number);return Math.floor(Date.UTC(y,m-1,d)/86400000);}
+  function todayDecks(dayValue=day()) {
+    const order=CT.shuffleWith(CT.QuickCatalog.challenges,CT.seededRandom(CT.seedFrom('quick-rotation-v1')));
+    const count=Math.min(QUICK_DAY_DECKS,order.length), start=(dayNumber(dayValue)*count)%order.length;
+    return Array.from({length:count},(_,i)=>order[(start+i)%order.length]);
+  }
+  // Lo descubierto de un reto: sus cartas acertadas alguna vez por quien juega (CT.Progreso).
+  const quickSeen=()=>CT.Progreso?.quickSeenCards?.() || new Set();
+  function deckProgress(c, seen=quickSeen()) {const done=c.cards.filter(card=>seen.has(card.id)).length;return {done,total:c.cards.length};}
+  function progressBar({done,total}) {
+    return `<span class="game-progress quick-deck-progress"><span class="game-progress-bar" aria-hidden="true"><i style="width:${Math.round(100*done/total)}%"></i></span><small>${done===total?`Completo · ${total} de ${total} cartas`:`Descubiertas ${done} de ${total}`}</small></span>`;
+  }
+  const deckArt=c=>c.cards.find(card=>card.image)?.image || 'assets/menu-quick.webp';
   function freeSetup() {
     stopNetwork(); page='free-setup'; format='free'; state=null; record=null; selected=null; slot=null;
     const total=CT.QuickCatalog.challenges.length;
     const options=LONG_LENGTHS.filter(([n])=>n<total);
+    const seen=quickSeen(), cards=CT.QuickCatalog.challenges.reduce((n,c)=>n+c.cards.length,0);
+    const found=CT.QuickCatalog.challenges.reduce((n,c)=>n+deckProgress(c,seen).done,0);
+    const deckTile=c=>`<button type="button" class="quick-day-deck" data-quick="play-deck" data-deck="${esc(c.id)}" aria-label="Jugar ${esc(c.title)}. ${esc(c.rule)}. ${deckProgress(c,seen).done} de ${c.cards.length} cartas descubiertas"><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" decoding="async" loading="lazy"><span class="quick-day-deck-copy"><b>${esc(c.title)}</b><small>${esc(c.rule)} · ${c.cards.length} cartas</small>${progressBar(deckProgress(c,seen))}</span><span class="quick-day-deck-go" aria-hidden="true">→</span></button>`;
     // Misma maqueta que la pantalla de un mazo de Grandes colecciones (`soloHome` en app.js):
-    // portada con rótulo, título y entradilla, y debajo un único panel con los ajustes y el
+    // portada con rótulo, título y entradilla, y debajo los paneles con los ajustes y el
     // botón de empezar. Así las dos puertas de Jugar solo se leen igual.
     const pendiente=load();
     shell(`<section class="setup-section solo-home quick-free-setup"><div class="solo-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 class="solo-title" data-focus tabindex="-1">Jugar en solitario</h2>
-        <p class="lead">Mazos sorpresa: ordena y suma aciertos.</p><p class="hint solo-dominadas">${total} retos en el catálogo. Un fallo no te echa: juegas cada reto entero.</p></div>
+        <p class="lead">Cada día, ${QUICK_DAY_DECKS} mazos distintos. Juegas el mazo entero: un fallo no te echa.</p>
+        <p class="hint solo-dominadas">Tu colección: ${found} de ${cards} cartas descubiertas.</p>${button('collection','Ver tu colección','btn btn-ghost quick-collection-link')}</div>
         ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
-        <div class="panel solo-panel">
-          <div class="solo-panel-head quick-preparation-head"><img class="quick-preparation-art" src="assets/menu-quick.webp" alt="" aria-hidden="true" decoding="async"><div class="quick-preparation-copy"><span class="quick-setup-kicker">Tu próxima aventura</span><h3>¿Cuánto quieres jugar?</h3><span class="quick-preparation-motto">El azar reparte. Tú decides.</span></div></div>
-          <p>Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>
-          ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida','',true)}<div class="quick-pace-caption" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="25" r="17"/><circle cx="24" cy="25" r="13"/><path d="M24 16v10l7 4M19 4h10M24 4v4"/></svg><span>Marca tu ritmo</span></div>${CT.Tiempo.field('quick-solo')}
-          ${button('start-free',`${pendiente ? 'Empezar otra' : 'Empezar'} <span>→</span>`,`btn ${pendiente ? 'btn-secondary' : 'btn-primary'} btn-block`)}<p id="quick-error" role="alert">${esc(error)}</p>
+        <div class="panel solo-panel quick-day-panel">
+          <div class="solo-panel-head quick-day-head"><span class="quick-setup-kicker">Mazos de hoy</span><h3>Elige un mazo</h3><small>Mañana salen otros ${QUICK_DAY_DECKS}. Cada carta que aciertes queda en tu colección.</small></div>
+          <div class="quick-day-decks">${todayDecks().map(deckTile).join('')}</div>
+          <div class="quick-pace-caption" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="25" r="17"/><circle cx="24" cy="25" r="13"/><path d="M24 16v10l7 4M19 4h10M24 4v4"/></svg><span>Marca tu ritmo</span></div>${CT.Tiempo.field('quick-solo')}
+          <div class="quick-surprise"><div class="quick-preparation-head"><img class="quick-preparation-art" src="assets/menu-quick.webp" alt="" aria-hidden="true" decoding="async"><div class="quick-preparation-copy"><span class="quick-setup-kicker">O una partida sorpresa</span><h4>¿Cuánto quieres jugar?</h4><span class="quick-preparation-motto">El azar reparte. Tú decides.</span></div></div>
+          <p>Elige una duración. Los retos saldrán al azar de todo el catálogo, sin mostrarte cuáles son.</p>
+          ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida','',true)}
+          ${button('start-free',`${pendiente ? 'Empezar otra' : 'Empezar'} <span>→</span>`,`btn ${pendiente ? 'btn-secondary' : 'btn-primary'} btn-block`)}</div><p id="quick-error" role="alert">${esc(error)}</p>
         </div></section>`);
+  }
+  // Tu colección de Retos rápidos: todos los retos con lo descubierto de cada uno. Las cartas
+  // acertadas enseñan su lámina y su dato; las que faltan, solo el título y un candado.
+  // `open`: el reto que se despliega al entrar (el que se acaba de jugar).
+  function collectionPage(open=null) {
+    stopNetwork(); page='collection'; state=null; record=null; selected=null; slot=null;
+    const seen=quickSeen(), hoy=new Set(todayDecks().map(c=>c.id));
+    const decks=[...CT.QuickCatalog.challenges].sort((a,b)=>Number(hoy.has(b.id))-Number(hoy.has(a.id)));
+    const cards=decks.reduce((n,c)=>n+c.cards.length,0), found=decks.reduce((n,c)=>n+deckProgress(c,seen).done,0);
+    const complete=decks.filter(c=>deckProgress(c,seen).done===c.cards.length).length;
+    const card=(c,item)=>seen.has(item.id)
+      ? `<li class="quick-album-card is-found">${item.image?`<img src="${esc(item.image)}" alt="" aria-hidden="true" loading="lazy" decoding="async">`:''}<b>${esc(item.title)}</b><small>${esc(item.label)}</small></li>`
+      : `<li class="quick-album-card is-locked"><span class="quick-album-lock" aria-hidden="true">?</span><b>${esc(item.title)}</b><small>Por descubrir</small></li>`;
+    const deck=c=>{const pr=deckProgress(c,seen);return `<details class="quick-album-deck"${c.id===open?' open':''}><summary><img src="${esc(deckArt(c))}" alt="" aria-hidden="true" loading="lazy" decoding="async"><span><b>${esc(c.title)}</b>${hoy.has(c.id)?'<em class="quick-album-today">Hoy</em>':''}${progressBar(pr)}</span></summary>
+      <p class="hint">${esc(c.rule)}.</p>${hoy.has(c.id)?button('play-deck',pr.done===pr.total?'Volver a jugarlo':'Jugarlo ahora','btn btn-primary btn-block',`data-deck="${esc(c.id)}"`):'<p class="hint">Este mazo volverá a salir entre los mazos del día. También puede tocarte en una partida sorpresa.</p>'}
+      <ul class="quick-album-cards">${[...c.cards].sort((a,b)=>Number(seen.has(b.id))-Number(seen.has(a.id))).map(item=>card(c,item)).join('')}</ul></details>`;};
+    shell(`<section class="setup-section quick-album"><div class="eyebrow"><span class="eyebrow-line"></span> Retos rápidos</div><h2 data-focus tabindex="-1">Tu colección</h2>
+      <p class="lead">${found} de ${cards} cartas descubiertas · ${complete} ${complete===1?'mazo completo':'mazos completos'}.</p>
+      <p class="hint">Una carta se descubre al colocarla bien en una partida tuya. Las que faltan siguen esperando en su mazo.</p>
+      ${CT.Accounts?.ready?'<button class="btn btn-secondary" data-account-action="ranking-discoveries">Ranking de descubrimientos</button>':''}
+      <div class="quick-album-decks">${decks.map(deck).join('')}</div></section>`);
+    if(open) app().querySelector('.quick-album-deck[open]')?.scrollIntoView?.({block:'start'});
   }
   // El duelo de Retos rápidos por enlace: juegas tú, mandas el enlace y tu amigo juega los mismos mazos.
   // Los mazos salen de una semilla y las jugadas viajan abreviadas, así que el enlace es corto aunque la
@@ -707,7 +753,7 @@
       <ol class="starter-draw-list">${order.map((i, n) => `<li${n === 0 ? ' class="starter-draw-winner"' : ''}><span>${n + 1}.º ${esc(names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(modeKey, guesses[i]))}</span></li>`).join('')}</ol>
       <div class="actions"><button class="btn btn-primary btn-block" data-quick="starter-go">Empezar <span>→</span></button></div>`);
   }
-  const button = (action, text, cls = 'btn btn-primary') => `<button class="${cls}" data-quick="${action}">${text}</button>`;
+  const button = (action, text, cls = 'btn btn-primary', attrs = '') => `<button class="${cls}" data-quick="${action}"${attrs ? ` ${attrs}` : ''}>${text}</button>`;
   function setup() {
     stopNetwork();page="setup";const solo=format!=="local";
     state = null; record = null; selected = null; slot = null;
@@ -836,6 +882,30 @@
   function timedTurn(){return !!state&&state.phase==='turn'&&myTurn()&&Number(state.config.seconds)>0&&!(room&&room.members.length<state.players.length&&state.current!==0);}
   function turnKey(){return `${state.config.historyId||'sin-id'}:${state.index}:${record?.commands?.length||0}`;}
   function stopClock(){quickClock?.stop();quickClock=null;}
+  // Cada acierto propio deja la carta en tu colección de Retos rápidos, como en Grandes colecciones.
+  // Solo cuentan los de quien juega en este móvil (solo, reto diario, duelo por enlace) o, en una
+  // sala, los de su plaza: en un móvil que se pasan varios no se sabe quién acertó.
+  // `finds`: las cartas nuevas de esta partida, para celebrarlas y contarlas al final.
+  let finds = {game: null, ids: []};
+  function noteDiscovery() {
+    const game = state?.config?.historyId || 'sin-id';
+    if (finds.game !== game) finds = {game, ids: [...(Array.isArray(record?.found) ? record.found : [])]};
+    const r = state?.result;
+    if (state?.phase !== 'result' || !r?.correct) return false;
+    const mine = room ? room.members?.[r.player] === myId : state.players.length === 1;
+    if (!mine) return false;
+    if (CT.Progreso?.discoverQuick?.(r.cardId)) {finds.ids.push(r.cardId); if (record && !room) {record.found = finds.ids; save();}}
+    return finds.ids.includes(r.cardId);
+  }
+  // Al acabar: cuántas cartas nuevas ha dejado la partida y cómo va la colección de cada mazo jugado.
+  function collectionSummary() {
+    if (!room && state.players.length !== 1) return '';
+    noteDiscovery();
+    const seen = quickSeen(), ids = [...new Set(state.config.rounds.map(r => r.id))];
+    const n = finds.ids.length;
+    const decks = ids.slice(0, 5).map(id => {const c = E.challenge(id); return `<li><b>${esc(c.title)}</b>${progressBar(deckProgress(c, seen))}</li>`;}).join('');
+    return `<div class="quick-collection-summary"><p><span aria-hidden="true">✦</span> ${n ? `${n} ${n === 1 ? 'carta nueva' : 'cartas nuevas'} en tu colección.` : 'Ninguna carta nueva esta vez.'}</p><ul>${decks}</ul>${room ? '' : button('collection', 'Ver tu colección', 'btn btn-secondary btn-block', `data-deck="${esc(ids.at(-1))}"`)}</div>`;
+  }
   function render() {
     page="game";
     stopClock();
@@ -865,6 +935,7 @@
       shell(`${heading}<section class="panel quick-panel"><h2>${final ? duelo ? (best>record.config.rivalScore ? '¡Has ganado el duelo!' : best===record.config.rivalScore ? 'Empate' : `${esc(record.config.rivalName||'Tu rival')} gana`) : state.players.length===1 ? 'Tu resultado' : winners.length > 1 ? 'Victoria compartida' : `Gana ${winners[0]}` : 'Reto terminado'}</h2>
         ${final ? `<p>${E.keepPlaying(state) && state.config.rounds.length === 1 ? `${best} de ${state.config.rounds[0].order.length - 1}` : `${winners.join(' y ')} · ${best} ${best === 1 ? 'acierto' : 'aciertos'}`}.</p>` : '<p>Los aciertos de este reto ya están asegurados.</p>'}
         <ul>${state.players.map(player => E.keepPlaying(state) ? `<li>${state.players.length === 1 ? '' : `${esc(player.name)}: `}${player.roundScore} de ${state.config.rounds[state.index].order.length - 1} cartas bien colocadas en este reto.</li>` : `<li>${esc(player.name)}: ${player.roundScore} ${player.roundScore === 1 ? 'acierto' : 'aciertos'} en este reto.</li>`).join('')}</ul>
+        ${final ? collectionSummary() : ''}
         ${final && Number.isFinite(record.config.rivalScore) ? `<p>${esc(record.config.rivalName||'Tu rival')}: ${record.config.rivalScore} ${record.config.rivalScore===1?'acierto':'aciertos'}. Tú: ${best}. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Ha asegurado más aciertos.'}</p>` : ''}
         ${final ? (record.config.kind==='duel' && !room ? '' : button('formats', 'Elegir otra partida')) : button('next', 'Siguiente reto')}
         ${final && record.config.kind==='duel' && !room ? button('share-duel', Number.isFinite(record.config.rivalScore) ? 'Devolver el reto' : 'Retar a un amigo', 'btn btn-primary btn-block') + `<div class="field"><label for="quick-result-link">Enlace del duelo</label><input id="quick-result-link" readonly value="${esc(duelLink())}"></div><p class="hint">${Number.isFinite(record.config.rivalScore) ? 'Tu amigo jugará los mismos mazos y tendrá que superar tu resultado.' : 'Tu amigo juega los mismos mazos cuando quiera y ve quién ha ganado.'}</p>` : ''}
@@ -876,9 +947,9 @@
       return;
     }
     if (state.phase === 'result') {
-      const r = state.result, item = get(r.cardId);
+      const r = state.result, item = get(r.cardId), fresh = noteDiscovery();
       if(room && !myTurn()){shell(`${heading}${CT.timelineMap(null,state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c,r,get)}</div></div><section class="panel quick-panel"><h2>${r.correct?'¡Bien colocado!':'No encaja ahí'}</h2><p>${esc(item.title)} · ${esc(item.label)}</p><p>Esperando a que continúe ${esc(p.name)}.</p></section>`);return;}
-      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c, r, get)}</div></div><div class="overlay" data-quick-result${correctionAttrs(r, item)}><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3><div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div>${sourceLinks(item)}
+      shell(`${heading}${CT.timelineMap(null, state.timeline)}<div class="timeline-wrap"><div class="timeline">${resultLine(c, r, get)}</div></div><div class="overlay" data-quick-result${correctionAttrs(r, item)}><section class="modal quick-result ${r.correct ? 'success' : 'failure'}"><div class="result-mark" aria-hidden="true">${r.correct ? '✓' : '×'}</div><h2>${r.correct ? '¡Bien colocado!' : 'No encaja ahí'}</h2><h3>${esc(item.title)}${item.artist?`<small class="quick-card-artist">${esc(item.artist)}</small>`:""}</h3>${fresh ? '<p class="quick-new-card"><span aria-hidden="true">✦</span> Nueva carta en tu colección</p>' : ''}<div class="reveal"><div class="year">${esc(item.label)}</div><p>${esc(item.detail)}</p></div>${sourceLinks(item)}
         <p class="quick-result-note">${resultNote(r, p)}</p>
         ${button('ack', room && room.members.length < state.players.length ? 'Continuar y retar a mi amigo' : 'Continuar', 'btn btn-primary btn-block')}${room ? button('exit','Salir de la sala','btn btn-ghost btn-block') : ''}</section></div>`);
       CT.openDialog(app().querySelector('[data-quick-result]'), false);
@@ -989,6 +1060,13 @@
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3, seed=historyId();
       prepare({names:['Tú'],rounds:rounds(count,null,seed),kind:'duel',keep:true,seed,length:count,seconds:CT.Tiempo.chosen('amigos',15)}); return;
     }
+    if (action === 'collection') {collectionPage(target.dataset.deck || null); return;}
+    // Un mazo del día: el reto entero, sus cartas barajadas.
+    if (action === 'play-deck') {
+      const id=target.dataset.deck;
+      if(!todayDecks().some(c=>c.id===id)){freeSetup();return;}
+      prepare({names:['Tú'],rounds:rounds(1,id),kind:'free',length:1,seconds:CT.Tiempo.chosen('quick-solo')}); return;
+    }
     if (action === 'start-free') {
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3;
       prepare({names:['Tú'],rounds:rounds(count),kind:'free',length:count,seconds:CT.Tiempo.chosen('quick-solo')}); return;
@@ -1058,6 +1136,9 @@
     // El historial de Retos rápidos vive en el Atlas, junto al resto de estadísticas.
     stats:statsPanel,
     openSolo(renderPage){paint=renderPage;backTo=null;entry='free-setup';format='free';freeSetup();},
+    // Los mazos que se ofrecen un día en solitario y la colección de cartas descubiertas.
+    todayDecks,
+    openCollection(renderPage,deck=null){paint=renderPage;backTo=null;entry='free-setup';format='free';collectionPage(deck);},
     openLocal(renderPage){paint=renderPage;backTo=null;entry='setup';format='local';setup();},
     openDuel(renderPage){paint=renderPage;entry='duel-setup';format='duel';backTo=null;duelSetup();},
     duels, openRoom, challenge, resignDuel, cancelInvitation, declineInvite, previewInvite, reshare,

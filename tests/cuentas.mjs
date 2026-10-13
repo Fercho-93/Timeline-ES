@@ -104,12 +104,18 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
  assert.equal(data.get(`weeklyScores/${lunes}/players/a`).hits,7);
  assert.equal(data.get(`dailyScores/${hoy}/players/a`).ms,123000,'lo que tardó en el reto desempata');assert.equal(data.get(`weeklyScores/${lunes}/players/a`).ms,123000);
  assert.equal(data.get('playerProgress/a').dayHits,7);assert.equal(data.get('playerProgress/a').weekHits,7);
+ // Cartas descubiertas: el progreso lleva el recuento por sección y la fila del ranking de descubrimientos lo copia.
+ assert.equal(data.has('discoveryScores/a'),false,'sin cartas descubiertas no hay fila');
+ w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:9},mastered:[1,2,3,3],quickMastered:['drinks-1','poker-2']}));await w.testAccounts.flush();
+ assert.equal(data.get('playerProgress/a').found,5);assert.equal(data.get('playerProgress/a').foundCollections,3);assert.equal(data.get('playerProgress/a').foundQuick,2);
+ assert.equal(data.get('discoveryScores/a').cards,5);assert.equal(data.get('discoveryScores/a').collections,3);assert.equal(data.get('discoveryScores/a').quick,2);assert.equal(data.get('discoveryScores/a').alias,'Fer');
+ assert.match(w.CONTINUUM.Accounts.card(),/<b>5<\/b><span>Cartas descubiertas/);
  w.testAccounts.editNameScreen();w.document.getElementById('account-alias').value='Fulanito';await w.testAccounts.rename();
  assert.equal(data.get('playerProfiles/a').alias,'Fulanito');assert.equal(data.get(`dailyScores/${hoy}/players/a`).alias,'Fulanito');
- assert.equal(data.get(`weeklyScores/${lunes}/players/a`).alias,'Fulanito');assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
+ assert.equal(data.get(`weeklyScores/${lunes}/players/a`).alias,'Fulanito');assert.equal(data.get('discoveryScores/a').alias,'Fulanito','el nombre cambia también en la fila de descubrimientos');assert.equal(data.get(`dailyScores/${hoy}/players/a`).hits,7);assert.equal(w.CONTINUUM.Storage.getItem('hilo-nombre-v1'),'Fulanito');
  // Dejar de aparecer retira las filas del día y de la semana, y no se vuelven a publicar.
  await w.CONTINUUM.Accounts.setRanking(false);
- assert.equal(data.has(`dailyScores/${hoy}/players/a`),false);assert.equal(data.has(`weeklyScores/${lunes}/players/a`),false);
+ assert.equal(data.has(`dailyScores/${hoy}/players/a`),false);assert.equal(data.has(`weeklyScores/${lunes}/players/a`),false);assert.equal(data.has('discoveryScores/a'),false,'y la de descubrimientos');
  w.CONTINUUM.Storage.setItem('hilo-perfil-v1',JSON.stringify({totals:{hits:10}}));await w.testAccounts.flush();
  assert.equal(data.has(`dailyScores/${hoy}/players/a`),false,'tras decir que no, el progreso se guarda sin publicar');
  assert.match(w.CONTINUUM.Accounts.card(),/Aparecer en el ranking/);
@@ -251,4 +257,23 @@ const profile={alias:'Fer',avatar:'compass',season:'launch-1',privacyVersion:1};
 }
 assert.match(read('index.html'),/src="boot.js"/);assert.doesNotMatch(read('index.html'),/src="app.js"/);
 assert.doesNotMatch(read('online.js'),/signInAnonymously/);
+{
+ // Ranking de descubrimientos: por cartas en total y por sección; quien tiene cero en una sección no sale en ella.
+ const {w,dom}=setup(user('a'),{'playerProfiles/a':profile,'discoveryScores/b':{alias:'Luna',avatar:'star',cards:40,collections:10,quick:30},'discoveryScores/c':{alias:'Atlas',avatar:'globe',cards:25,collections:25,quick:0},'discoveryScores/a':{alias:'Fer',avatar:'compass',cards:12,collections:9,quick:3}});
+ await w.testAccounts.startAccounts(()=>{});
+ w.document.getElementById('app').innerHTML=w.CONTINUUM.Accounts.card();
+ const click=async action=>{w.document.querySelector(`[data-account-action="${action}"]`).click();for(let i=0;i<4;i++)await new Promise(r=>setTimeout(r,0));};
+ await click('ranking');await click('ranking-discoveries');
+ assert.equal(w.document.querySelector('[data-account-action="ranking-discoveries"]').getAttribute('aria-pressed'),'true');
+ assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Luna/);assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/40/);
+ assert.match(w.document.querySelector('.ranking-medallion-3').textContent,/Fer/);
+ await click('ranking-found-collections');
+ assert.match(w.document.querySelector('.ranking-medallion-1').textContent,/Atlas/);
+ await click('ranking-found-quick');
+ assert.equal(w.document.querySelectorAll('.ranking-medallion').length,2,'con cero cartas en la sección no se aparece');
+ assert.match(w.document.querySelector('.ranking-personal').textContent,/#2/);
+ await click('ranking-day');
+ assert.equal(w.document.querySelector('[data-account-action="ranking-day"]').getAttribute('aria-pressed'),'true');
+ dom.window.close();
+}
 console.log('Invitados: alta automática, reentrada, error de conexión, cambio de nombre, ranking, aislamiento y conflictos correctos.');

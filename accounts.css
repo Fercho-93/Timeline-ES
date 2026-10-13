@@ -8,8 +8,8 @@
 .account-hero { padding:24px; }
 .account-kicker { display:block; font:600 .63rem/1.5 var(--ui-font); letter-spacing:.18em; color:#e4c891; }
 .account-save-state { font-size:.7rem; color:#d1e4d6; }
-.account-metrics { display:grid; grid-template-columns:1fr 1fr; border-top:1px solid #e4c89140; padding-top:18px; gap:16px; }
-.account-metrics > div+div { border-left:1px solid #e4c89140; padding-left:20px; }
+.account-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid #e4c89140; padding-top:18px; gap:16px; }
+.account-metrics > div+div { border-left:1px solid #e4c89140; padding-left:12px; }
 .account-metrics b { display:block; font:500 2rem/1.1 var(--font-display,Georgia); color:#f5dfac; }
 .account-metrics span { display:block; font-size:.7rem; margin-top:7px; color:#e0e7de; }
 .account-ranking-link { display:flex; align-items:center; gap:12px; margin:16px; padding:18px 14px; border:1px solid var(--edition-line); border-radius:16px; background:linear-gradient(120deg,#b9975222,transparent); color:var(--edition-ink); text-align:left; font-family:var(--ui-font); cursor:pointer; transition:transform .2s,box-shadow .2s; }
@@ -74,8 +74,10 @@
 .ranking-avatar .avatar-art { width: 100%; height: 100%; }
 .account-ranking td .avatar-art { margin-right: 6px; }
 
-.ranking-tabs { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
-.ranking-tabs .btn { min-width: 120px; }
+.ranking-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+.ranking-tabs .btn { min-width: 0; flex: 1 1 90px; max-width: 160px; padding-inline: 10px; }
+.ranking-sections { margin-top: 8px; }
+.ranking-sections .btn { flex-basis: 80px; min-height: 36px; font-size: .78rem; }
 .ranking-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
 .ranking-nav span { font-family: var(--font-display); font-size: 1.35rem; min-width: 12ch; text-align: center; }
 .ranking-nav .btn { min-width: 44px; font-size: 1.4rem; }

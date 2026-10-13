@@ -124,7 +124,7 @@ async function purgeRanking(collection, now) {
 // Todo lo que pertenece a una cuenta, como al borrarla desde el juego.
 async function purgeAccount(uid) {
   const aliasKey = (await db.doc(`playerProfiles/${uid}`).get()).data()?.aliasKey;
-  for (const path of [`playerProfiles/${uid}`, `playerProgress/${uid}`, `socialRanking/${uid}`, `dailyRanking/${uid}`,
+  for (const path of [`playerProfiles/${uid}`, `playerProgress/${uid}`, `socialRanking/${uid}`, `dailyRanking/${uid}`, `discoveryScores/${uid}`,
     `duelPreferences/${uid}`, `creationQuota/${uid}`, `roomCreation/${uid}`, `duelReminderBudgets/${uid}`]) await db.recursiveDelete(db.doc(path));
   if (aliasKey) {
     const name = db.doc(`playerNames/${aliasKey}`);

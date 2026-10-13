@@ -39,6 +39,9 @@
       seen: [],
       // Solo aciertos propios verificables; el antiguo seen mezclaba aciertos y fallos.
       mastered: [],
+      // Las cartas de Retos rápidos acertadas por quien juega (`drinks-3`…): su propio álbum,
+      // aparte porque sus identificadores son de otro tipo que los de las colecciones.
+      quickMastered: [],
       achievements: {},
       // Las últimas jugadas de sala ya contadas, como `CÓDIGO:versión`. Ver `recordOnline`.
       seenOnline: [],
@@ -122,6 +125,12 @@
     return [...new Set(stored.filter(id => typeof id === "number" && Number.isFinite(id) && anyCard(id)))];
   }
 
+  // Lo mismo para Retos rápidos: solo cartas que existen hoy en algún reto.
+  function normalizeQuick(stored) {
+    if (!Array.isArray(stored)) return [];
+    return [...new Set(stored.filter(id => typeof id === "string" && quickCard(id)))];
+  }
+
   // Solo logros que existen hoy.
   function normalizeAchievements(stored) {
     const out = {};
@@ -151,6 +160,7 @@
       misses: normalizeMisses(stored.misses),
       seen: normalizeSeen(stored.seen),
       mastered: normalizeSeen(stored.mastered),
+      quickMastered: normalizeQuick(stored.quickMastered),
       achievements: normalizeAchievements(stored.achievements),
       seenOnline: Array.isArray(stored.seenOnline) ? stored.seenOnline.filter(item => typeof item === "string").slice(-SEEN_ONLINE) : [],
       lastOnline: str(stored.lastOnline, base.lastOnline)
@@ -190,6 +200,12 @@
   // Y el mismo mapa sin mazo, para las cartas descubiertas: su lista no guarda de qué
   // mazo venía cada una porque los identificadores no se repiten en todo el juego.
   let todas = null;
+  let quickIds = null;
+  function quickCard(cardId) {
+    quickIds ||= new Set((CT.QuickCatalog?.challenges || []).flatMap(c => c.cards.map(card => card.id)));
+    return quickIds.has(cardId);
+  }
+
   function anyCard(cardId) {
     if (!todas) todas = new Set(Object.values(CT.MODES).flatMap(mode => mode.cards).map(card => card.id));
     return todas.has(cardId);
@@ -573,10 +589,29 @@
     return true;
   }
 
+  // Un acierto propio en Retos rápidos: la carta pasa a su álbum. Devuelve si era nueva.
+  function discoverQuick(cardId) {
+    if (!quickCard(cardId)) return false;
+    const profile = read();
+    if (profile.quickMastered.includes(cardId)) return false;
+    profile.quickMastered.push(cardId);
+    save(profile);
+    return true;
+  }
+  function quickSeenCards() {
+    return new Set(read().quickMastered);
+  }
+  // Cartas descubiertas, en total y por sección: es lo que ordena el ranking de descubrimientos.
+  function discoveries(profile = read()) {
+    const collections = profile.mastered.length, quick = profile.quickMastered.length;
+    return { collections, quick, total: collections + quick };
+  }
+
   CT.Progreso = {
     KEY, ACHIEVEMENTS,
     read, record, recordOnline, finishGame, finishQuickDaily, finishOnline, finishCompetition, reset, playerId,
     summary, modeRows, weakBands, weakCards, achievements, seenCards, discover,
+    discoverQuick, quickSeenCards, discoveries,
     exportJson, importJson
   };
 })();

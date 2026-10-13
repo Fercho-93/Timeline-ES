@@ -434,7 +434,12 @@ service cloud.firestore {
     match /playerProgress/{uid} {
       function valid() {
         let d = request.resource.data;
-        return d.keys().hasOnly(['progress','records','hits','games','season','revision','updatedAt','day','dayHits','week','weekHits'])
+        return d.keys().hasOnly(['progress','records','hits','games','season','revision','updatedAt','day','dayHits','week','weekHits','found','foundCollections','foundQuick'])
+          // Cartas descubiertas, en total y por sección: de ahí sale el ranking de descubrimientos. Opcional
+          // para los clientes anteriores, que no lo envían.
+          && (!('found' in d) || (d.found is int && d.foundCollections is int && d.foundQuick is int
+            && d.foundCollections >= 0 && d.foundCollections <= 100000 && d.foundQuick >= 0 && d.foundQuick <= 100000
+            && d.found == d.foundCollections + d.foundQuick))
           // Aciertos del reto de hoy (0–10) y de esta semana (0–70), de donde salen las tablas del ranking.
           && (!('day' in d) || (d.day is string && d.day.size() <= 10
             && d.dayHits is int && d.dayHits >= 0 && d.dayHits <= 10
@@ -498,6 +503,24 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['alias','avatar','hits','ms','updatedAt'])
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.week == week
         && getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data.weekHits == request.resource.data.hits;
+      allow delete: if owner(uid);
+    }
+    // Ranking de descubrimientos: una fila por cuenta, con sus cartas descubiertas en total y por sección.
+    // Debe coincidir con el nombre y avatar del perfil y con el recuento de su progreso.
+    match /discoveryScores/{uid} {
+      function valid() {
+        let d = request.resource.data;
+        let p = getAfter(/databases/$(database)/documents/playerProfiles/$(uid)).data;
+        let s = getAfter(/databases/$(database)/documents/playerProgress/$(uid)).data;
+        return d.keys().hasOnly(['alias','avatar','cards','collections','quick','updatedAt'])
+          && d.alias == p.alias && d.avatar == p.avatar
+          && d.cards is int && d.collections is int && d.quick is int
+          && s.found == d.cards && s.foundCollections == d.collections && s.foundQuick == d.quick
+          && d.updatedAt == request.time;
+      }
+      allow get: if registered();
+      allow list: if registered() && request.query.limit != null && request.query.limit <= 200;
+      allow create, update: if owner(uid) && valid();
       allow delete: if owner(uid);
     }
     match /dailyRanking/{uid} {
