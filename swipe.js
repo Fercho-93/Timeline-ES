@@ -285,14 +285,39 @@
     event.preventDefault();
   }
 
+  // Donde el gesto puede volver, la flecha de arriba sobra en una pantalla táctil: CSS la
+  // oculta (sin sacarla del documento, que sigue sirviendo a los lectores de pantalla, al
+  // teclado, al botón Atrás de Android y al propio gesto, que la pulsa) mientras `<html>`
+  // lleve esta marca. Se recalcula al cambiar de pantalla y al abrir o cerrar un diálogo.
+  let pending = false;
+  function refresh() {
+    pending = false;
+    // La página puede haberse cerrado entre el cambio y este recálculo.
+    if (typeof document === "undefined" || !document?.documentElement) return;
+    document.documentElement.classList.toggle("swipe-back-ready", !!(goBack && surface?.()));
+  }
+  function scheduleRefresh() {
+    if (pending) return;
+    pending = true;
+    Promise.resolve().then(refresh);
+  }
+  function watch() {
+    const app = document.getElementById("app");
+    if (!app || typeof MutationObserver !== "function") return;
+    new MutationObserver(scheduleRefresh).observe(app, { childList: true, attributes: true, attributeFilter: ["data-screen"] });
+    scheduleRefresh();
+  }
+
   // Los oyentes van en el documento y en fase de captura, para que el gesto no dependa de
   // que ninguna pantalla deje pasar el evento hacia arriba. `target` es opcional: sin él
   // el gesto funciona igual, solo que la pantalla no sigue al dedo.
   function enableSwipeBack(handler, target = null) {
     goBack = handler;
     surface = target;
+    scheduleRefresh();
     if (enableSwipeBack.installed) return;
     enableSwipeBack.installed = true;
+    watch();
     document.addEventListener("pointerdown", onDown, true);
     document.addEventListener("pointermove", onMove, true);
     document.addEventListener("pointerup", onUp, true);

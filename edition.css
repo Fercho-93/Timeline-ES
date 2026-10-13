@@ -5688,3 +5688,13 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
    reverso, que la llena entera, hereda las esquinas redondeadas para no asomar por ellas. */
 #app .hand .hand-card:has(> .card-hint) { overflow: visible; }
 #app .hand .hand-card:has(> .card-hint) > .carta-reverso { border-radius: inherit; }
+
+/* Deslizar para volver sustituye a la flecha en pantallas táctiles, solo donde el gesto
+   vuelve de verdad (swipe.js pone la marca). La flecha sigue en el documento para los
+   lectores de pantalla y el teclado, y reaparece si recibe el foco. */
+@media (hover: none) and (pointer: coarse) {
+  html.swipe-back-ready #app :is(.atlas-back, .atlas-dialog-back, .turn-duel-back, .topbar [data-local-action][aria-label="Volver"]):not(:focus-visible) {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}

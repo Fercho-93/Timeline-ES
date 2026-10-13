@@ -657,6 +657,22 @@ const pantalla = w => el(w, "#app").dataset.screen;
   w.close();
 }
 {
+  // La flecha de arriba se oculta en pantallas táctiles solo donde el gesto vuelve de verdad.
+  const w = boot();
+  const listo = () => w.document.documentElement.classList.contains("swipe-back-ready");
+  await sleep(5);
+  ok("en el inicio no hay flecha que sustituir", !listo());
+  abreMazo(w, "historia", "history");
+  await sleep(5);
+  ok("en la pantalla de un mazo el gesto sustituye a la flecha", listo());
+  game(w);
+  await sleep(5);
+  ok("en plena partida la flecha se queda: el gesto no sale de ella", !listo());
+  const css = read("edition.css");
+  ok("y solo se oculta en pantallas táctiles, sin sacarla del documento", /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*html\.swipe-back-ready[\s\S]*opacity: 0/.test(css) && !/swipe-back-ready[^}]*display: none/.test(css));
+  w.close();
+}
+{
   // En el inicio, nada se mueve: no hay pantalla detrás.
   const w = boot();
   const shell = el(w, "#app > .shell, #app > *");
