@@ -146,3 +146,54 @@
     width: calc(100% + 32px); margin-inline: -16px;
   }
 }
+
+/* Como la portada del Atlas: lectura a la izquierda, paisaje a la derecha. */
+#app .guide-handbook > .atlas-page-heading {
+  min-height: 248px; padding: 28px 26px 36px; text-align: left; border-radius: 22px;
+  background: #e9dcc3;
+  box-shadow: 0 12px 26px #5b44231f, inset 0 0 0 6px #fff7e460, inset 0 0 0 7px #a3865550;
+}
+#app .guide-handbook > .atlas-page-heading .guide-frontispiece {
+  position: absolute; inset: 0; z-index: -2; display: block;
+  width: 100%; max-width: none; height: 100%; aspect-ratio: auto;
+  margin: 0; border: 0; border-radius: 0; object-fit: cover; object-position: 65% center;
+  filter: none; pointer-events: none;
+}
+#app .guide-handbook > .atlas-page-heading::before {
+  display: block; inset: 0; z-index: -1; opacity: 1;
+  background: linear-gradient(90deg, #fbf1ddfc 0%, #fbf1ddf5 36%, #fbf1dddc 51%, #fbf1dd16 79%);
+}
+#app .guide-handbook > .atlas-page-heading .eyebrow {
+  justify-content: flex-start; max-width: 60%; color: #5f623d;
+  font-size: .6rem; line-height: 1.5; letter-spacing: .14em; text-shadow: none;
+}
+#app .guide-handbook > .atlas-page-heading h1 {
+  max-width: 60%; margin: 12px 0 10px; color: #3c4837;
+  font-size: clamp(2.55rem, 9vw, 4rem); text-shadow: none;
+}
+#app .guide-handbook > .atlas-page-heading p {
+  max-width: 57%; margin: 0; color: #525b46;
+  font: .8rem/1.65 var(--ui-font); text-wrap: pretty;
+}
+#app .guide-handbook > .atlas-page-heading::after {
+  position: absolute; left: 26px; bottom: 16px; width: 80px; margin: 0;
+}
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading {
+  background: #1e302c;
+  box-shadow: 0 12px 26px #0005, inset 0 0 0 6px #13272240, inset 0 0 0 7px #b89c6550;
+}
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading::before {
+  background: linear-gradient(90deg, #172c29fc 0%, #172c29f5 36%, #172c29df 51%, #172c2930 79%);
+}
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading .eyebrow { color: #e5c78f; }
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading h1 { color: #fff0d2; }
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading p { color: #ede4cf; }
+@media (max-width: 600px) {
+  #app .guide-handbook > .atlas-page-heading { min-height: 240px; padding: 24px 20px 36px; }
+  #app .guide-handbook > .atlas-page-heading::after { left: 20px; }
+}
+@media (max-width: 350px) {
+  #app .guide-handbook > .atlas-page-heading { padding-inline: 16px; }
+  #app .guide-handbook > .atlas-page-heading p { max-width: 60%; font-size: .75rem; }
+  #app .guide-handbook > .atlas-page-heading::after { left: 16px; }
+}
