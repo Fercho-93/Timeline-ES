@@ -1,6 +1,6 @@
 // Al cambiar cualquier archivo hay que subir este número: es lo que hace que el
 // navegador reinstale el service worker y descarte la caché anterior.
-const CACHE = "continuum-v685";
+const CACHE = "continuum-v686";
 // Las láminas de animales —5,5 MB en casi cien archivos— no se precargan: quien nunca
 // abre ese bloque no debería pagar esa descarga solo por instalar la aplicación. La ruta
 // `fetch` de más abajo ya guarda en caché cualquier respuesta válida la primera vez que
@@ -20,7 +20,7 @@ const ASSETS = [
   "./assets/avatars/alfonso-x.webp", "./assets/avatars/aretha-franklin.webp", "./assets/avatars/automata.webp", "./assets/avatars/aventurera.webp", "./assets/avatars/ballena-azul.webp", "./assets/avatars/beethoven.webp", "./assets/avatars/buho-real.webp", "./assets/avatars/caballera.webp", "./assets/avatars/carlos-iii.webp", "./assets/avatars/cervantes.webp", "./assets/avatars/chaplin.webp", "./assets/avatars/cleopatra.webp", "./assets/avatars/creador-puzles.webp", "./assets/avatars/david-bowie.webp", "./assets/avatars/el-cid.webp", "./assets/avatars/elefante.webp", "./assets/avatars/explorador.webp", "./assets/avatars/felipe-ii.webp", "./assets/avatars/flamenco.webp", "./assets/avatars/hechicera.webp", "./assets/avatars/ingrid-bergman.webp", "./assets/avatars/isabel-catolica.webp", "./assets/avatars/jirafa.webp", "./assets/avatars/juana-i.webp", "./assets/avatars/leon.webp", "./assets/avatars/lince.webp", "./assets/avatars/marie-curie.webp", "./assets/avatars/melies.webp", "./assets/avatars/ninja.webp", "./assets/avatars/panda.webp", "./assets/avatars/piloto-arcade.webp", "./assets/avatars/piloto-espacial.webp", "./assets/avatars/pinguino.webp", "./assets/avatars/pulpo.webp", "./assets/avatars/tigre.webp", "./assets/avatars/zorro.webp",
   "./assets/mode-walk-solo.webp", "./assets/mode-walk-multi.webp", "./assets/mode-walk-duel.webp",
   "./assets/menu-online.webp", "./assets/menu-local.webp", "./assets/menu-wifi.webp", "./assets/menu-private.webp",
-  "./assets/atlas-ocean-v1.webp", "./assets/ranking-trophy-v1.webp", "./assets/menu-quick.webp", "./assets/menu-daily.webp", "./assets/menu-collections.webp",
+  "./assets/voyage-collection-v1.webp", "./assets/voyage-daily-v1.webp", "./assets/voyage-duels-v1.webp", "./assets/voyage-journey-v1.webp", "./assets/voyage-account-v1.webp", "./assets/atlas-ocean-v1.webp", "./assets/ranking-trophy-v1.webp", "./assets/menu-quick.webp", "./assets/menu-daily.webp", "./assets/menu-collections.webp",
   "./deployment.js", "./accounts.css", "./firebase-client.js", "./account-storage.js", "./recent-players.js", "./accounts.js", "./boot.js",
   "./privacidad.html", "./licencias.html",
   "./engine.js", "./final.js", "./tournament.js", "./links.js",

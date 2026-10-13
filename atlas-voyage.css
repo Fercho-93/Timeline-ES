@@ -120,3 +120,61 @@
   #app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-nav .atlas-next-scale { width: 100%; text-align: left; margin: 0; }
 }
 :root:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-nav .atlas-next-scale { width: 100%; text-align: left; margin: 0; }
+
+/* Portada y acuarelas de cada escala: el detalle se concentra arriba, como en
+   las carátulas del juego; las zonas de lectura conservan el papel despejado. */
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading {
+  position: relative; isolation: isolate; overflow: hidden; min-height: 228px;
+  margin: 0 0 20px; padding: 28px 26px; border: 1px solid #b6935f80; border-radius: 22px;
+  background: linear-gradient(90deg, #fbf1ddf5 0%, #fbf1dde8 43%, #fbf1dd20 76%), url("assets/atlas-ocean-v1.webp") right 18% / 100% auto no-repeat, #ece0c7;
+  box-shadow: 0 12px 26px #34524b1f, inset 0 0 0 6px #fff7e460, inset 0 0 0 7px #a3865550;
+  text-align: left;
+}
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading .eyebrow { max-width: 60%; color: #3c6164; font-size: .6rem; line-height: 1.5; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading h1 { max-width: 60%; margin: 12px 0 10px; color: #2e463e; font-size: clamp(2.55rem, 9vw, 4rem); }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading p { max-width: 57%; margin: 0; color: #4f6258; font-size: .8rem; line-height: 1.6; text-wrap: pretty; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading::after { position: absolute; right: 20px; bottom: 15px; width: 74px; margin: 0; color: #765729; background-size: 25px 1px, 25px 1px; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad { padding: 18px; border-color: color-mix(in srgb, var(--voyage-brass) 45%, var(--voyage-line)); border-radius: 18px; box-shadow: 0 7px 20px #34524b18, inset 0 0 0 4px color-mix(in srgb, var(--voyage-paper) 75%, transparent), inset 0 0 0 5px color-mix(in srgb, var(--voyage-brass) 18%, transparent); }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad > div { min-width: 0; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad-kicker { display: block; margin-bottom: 5px; color: var(--voyage-sea); font: 600 .57rem/1.5 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad-avatar { border: 3px double var(--voyage-brass); border-radius: 50%; padding: 3px; background: var(--voyage-paper); box-shadow: 0 4px 12px #6c512426; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-territories { gap: 34px; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory {
+  overflow: visible; border-color: color-mix(in srgb, var(--voyage-brass) 38%, var(--voyage-line));
+  background: linear-gradient(165deg, color-mix(in srgb, var(--voyage-wash) 55%, var(--voyage-paper)), var(--voyage-paper) 32%);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--voyage-brass) 15%, transparent), 0 15px 28px #34524b16, inset 0 0 0 5px color-mix(in srgb, var(--voyage-paper) 85%, transparent), inset 0 0 0 6px color-mix(in srgb, var(--voyage-brass) 14%, transparent);
+}
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory::before { width: 29px; height: 29px; top: 44px; border: 3px double var(--voyage-brass); background: var(--voyage-paper); color: var(--voyage-sea); box-shadow: 0 3px 8px #34524b20, 0 0 0 3px var(--edition-paper); font-size: .62rem; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory-caption {
+  position: relative; isolation: isolate; min-height: 124px; align-content: center;
+  margin: -24px -28px 22px; padding: 24px 158px 22px 28px; overflow: hidden;
+  border-radius: 15px 15px 0 0; border-bottom: 1px solid color-mix(in srgb, var(--voyage-brass) 40%, var(--voyage-line));
+  background: radial-gradient(ellipse at 96% 80%, color-mix(in srgb, var(--voyage-brass) 17%, transparent), transparent 50%), repeating-linear-gradient(116deg, transparent 0 26px, color-mix(in srgb, var(--voyage-sea) 5%, transparent) 27px, transparent 28px 54px), linear-gradient(135deg, var(--voyage-paper), var(--voyage-wash));
+}
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory-caption > span { font-size: .59rem; line-height: 1.5; letter-spacing: .1em; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory-caption h2 { font-weight: 600; font-size: clamp(1.4rem, 5.7vw, 1.95rem); text-wrap: balance; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-art { position: absolute; right: 13px; top: 50%; z-index: -1; transform: translateY(-50%) rotate(-4deg); width: 138px; height: 138px; object-fit: contain; filter: drop-shadow(0 6px 4px #5d472528); pointer-events: none; }
+#app[data-screen="perfil"][data-screen] .perfil-section #atlas-duels .atlas-scale-art { transform: translateY(-50%) rotate(0); }
+#app[data-screen="perfil"][data-screen] .perfil-section .perfil-collection { border-radius: 12px; border-style: double; border-width: 3px; box-shadow: inset 0 1px #fff5; }
+#app[data-screen="perfil"][data-screen] .perfil-section .perfil-collection b { font-size: 2rem; font-family: var(--font-display); }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-nav { padding-top: 18px; border-top-style: double; border-top-width: 3px; }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-nav .atlas-next-scale { min-height: 52px; padding: 8px 12px; border: 1px solid var(--voyage-line); border-radius: 9px; background: linear-gradient(145deg, var(--voyage-paper), var(--voyage-wash)); box-shadow: inset 0 1px #fff3, 0 2px 0 color-mix(in srgb, var(--voyage-brass) 16%, transparent); }
+#app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory .perfil-stats b { font-size: 2rem; }
+#app[data-screen="perfil"][data-screen] .perfil-section .perfil-achievement-group > summary { background: linear-gradient(120deg, color-mix(in srgb, var(--voyage-brass) 8%, var(--voyage-paper)), var(--voyage-paper)); border-radius: 11px; }
+#app[data-screen="perfil"][data-screen] .perfil-section .perfil-achievement-group[open] > summary { border-radius: 11px 11px 0 0; border-bottom: 1px solid var(--voyage-line); margin-bottom: 14px; }
+#app[data-screen="perfil"][data-screen] .perfil-section .account-hero { box-shadow: inset 0 0 0 5px #fff1, inset 0 0 0 6px #d7bd7a40; }
+@media (max-width: 600px) {
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading { min-height: 224px; padding: 24px 20px; background-position: center, right 15%; }
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory-caption { margin: -22px -16px 20px; padding: 20px 112px 20px 18px; min-height: 128px; }
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-art { right: 4px; width: 106px; height: 114px; }
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-territories { gap: 30px; }
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-identidad { padding: 16px 12px; gap: 12px; }
+}
+@media (max-width: 350px) {
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory-caption { padding-right: 98px; }
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-art { width: 90px; }
+  #app[data-screen="perfil"][data-screen] .perfil-section .atlas-page-heading p { font-size: .75rem; }
+}
+:root:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"][data-screen] .perfil-section .atlas-territory-caption { padding-right: 24px; padding-bottom: 24px; }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"][data-screen] .perfil-section .atlas-scale-art { position: static; width: 92px; height: 92px; margin-top: 10px; transform: none; }
+:root:is([data-text-size="150"], [data-text-size="200"]) #app[data-screen="perfil"][data-screen] .perfil-section #atlas-duels .atlas-scale-art { transform: none; }

@@ -2073,6 +2073,8 @@
   // Son anclas nativas: funcionan con teclado, sin listeners ni estado que limpiar al salir.
   function atlasVoyageNavigation() {
     const stops = [...app.querySelectorAll('.atlas-territory')];
+    const art = ['voyage-collection-v1.webp', 'voyage-daily-v1.webp', 'voyage-duels-v1.webp', 'voyage-journey-v1.webp', 'ranking-trophy-v1.webp', 'voyage-account-v1.webp'];
+    app.querySelector('.atlas-identidad h2')?.insertAdjacentHTML('beforebegin', '<span class="atlas-identidad-kicker">A bordo de tu aventura</span>');
     stops.forEach((stop, index) => {
       const heading = stop.querySelector('.atlas-territory-caption h2');
       heading.id = `${stop.id}-title`;
@@ -2080,6 +2082,7 @@
       stop.setAttribute('role', 'region');
       stop.setAttribute('aria-labelledby', heading.id);
       stop.dataset.atlasStep = String(index + 1).padStart(2, '0');
+      heading.parentElement.insertAdjacentHTML('beforeend', `<img class="atlas-scale-art" src="assets/${art[index]}" alt="" aria-hidden="true" width="144" height="144" loading="lazy" decoding="async">`);
       const next = stops[index + 1];
       const nextTitle = next?.querySelector('.atlas-territory-caption h2').textContent || '';
       stop.insertAdjacentHTML('beforeend', `<nav class="atlas-scale-nav" aria-label="Navegación de ${escapeHtml(heading.textContent)}"><a href="#atlas-chart"><span aria-hidden="true">↑</span> Volver al mapa</a>${next ? `<a class="atlas-next-scale" href="#${next.id}" aria-label="Siguiente escala: ${escapeHtml(nextTitle)}"><small>Siguiente escala</small><span>${escapeHtml(nextTitle)} <i aria-hidden="true">→</i></span></a>` : '<span class="atlas-voyage-close">El viaje continúa.</span>'}</nav>`);
