@@ -215,17 +215,18 @@
     // Volver atrás: siempre este mismo toque grave, el de Atlas, y solo en los botones de volver.
     // Baja un escalón la escala del menú, para que lo siguiente que se avance retome desde ahí.
     vuelta(t) { escalon = Math.max(0, escalon - 1); tono(nota(0, 50), t, { dur: .22, vol: .13, eco: .08, timbre: 'madera' }); return .3; },
-    // Deslizar para volver: una hoja de libro que se pasa. El roce sube de tono al
-    // levantarla, la hoja cruza en el aire con un crujido fino y cae con un golpe blando
-    // de papel. Cada vez un poco distinta, como una hoja de verdad.
+    // Deslizar para volver: una hoja de libro que se pasa, suave. El roce sube de tono al
+    // levantarla, la hoja cruza con un crujido muy fino y cae con un golpe blando de
+    // papel. Sin agudos ásperos: el filtro no pasa de los tonos medios del papel. Cada vez
+    // un poco distinta, como una hoja de verdad.
     hoja(t) {
       escalon = Math.max(0, escalon - 1);
       const v = 1 + (Math.random() - .5) * .16, k = humano() * (1 + (Math.random() - .5) * .1);
-      papel(t, { frecs: [700 * k, 1900 * k, 3400 * k, 2300 * k, 1500 * k], vols: [0, .055 * v, .1 * v, .07 * v, .0001], paso: .065, q: .8 });
-      for (let i = 0; i < 4; i++) {
-        soplo(t + .04 + i * .045 + Math.random() * .02, { tipo: 'highpass', frec: 5200 + Math.random() * 1800, q: .7, vol: (.016 + Math.random() * .012) * v, ataque: .003, dur: .014, eco: .05 });
+      papel(t, { frecs: [600 * k, 1500 * k, 2500 * k, 1800 * k, 1200 * k], vols: [0, .03 * v, .055 * v, .038 * v, .0001], paso: .07, q: .7 });
+      for (let i = 0; i < 3; i++) {
+        soplo(t + .05 + i * .05 + Math.random() * .02, { tipo: 'bandpass', frec: 4200 + Math.random() * 1200, q: .9, vol: (.007 + Math.random() * .005) * v, ataque: .004, dur: .016, eco: .05 });
       }
-      papel(t + .23, { frecs: [900 * k, 380 * k], vols: [0, .08 * v, .0001], paso: .045, tipo: 'lowpass', q: .5, eco: .18 });
+      papel(t + .25, { frecs: [700 * k, 320 * k], vols: [0, .045 * v, .0001], paso: .05, tipo: 'lowpass', q: .5, eco: .18 });
       return .5;
     },
     // Desplegar una colección: dos toques que suben (y avanzan la escala); plegarla, los mismos al revés.
