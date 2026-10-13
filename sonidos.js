@@ -193,19 +193,23 @@
       tono(nota(5, 74), t + .16, { dur: 1.8, vol: .15, eco: .55 });
       return 2.1;
     },
-    // Volver atrás: dos notas que bajan, cortas y claras. Se distingue del soplo de pasar
-    // de página, que apenas se nota.
-    vuelta(t) {
-      tono(nota(5), t, { dur: .32, vol: .11, eco: .3 });
-      tono(nota(2), t + .09, { dur: .5, vol: .1, eco: .35 });
-      return .6;
-    },
-    // Desplegar una colección: tres notas que suben, como abrir un cajón; plegarla, una sola que baja.
+    // Los toques del menú son de madera: secos, graves y sin cola, de la familia de la
+    // marimba de confirmar. Se notan sin competir con los sonidos de la partida.
+    // Tocar una tarjeta o abrir un panel: un solo toque.
+    pagina(t) { tono(nota(3, 57), t, { dur: .18, vol: .1, eco: .08, timbre: 'madera' }); return .3; },
+    // Volver atrás: un toque más grave.
+    vuelta(t) { tono(nota(0, 50), t, { dur: .22, vol: .13, eco: .08, timbre: 'madera' }); return .3; },
+    // Desplegar una colección: dos toques que suben; plegarla, los mismos al revés.
     despliegue(t) {
-      [0, 2, 4].forEach((p, i) => tono(nota(p), t + i * .055, { dur: .45, vol: .09, eco: .35 }));
-      return .7;
+      tono(nota(0, 57), t, { dur: .2, vol: .1, eco: .1, timbre: 'madera' });
+      tono(nota(2, 57), t + .07, { dur: .22, vol: .11, eco: .12, timbre: 'madera' });
+      return .4;
     },
-    pliegue(t) { tono(nota(0), t, { dur: .4, vol: .09, eco: .3 }); return .5; },
+    pliegue(t) {
+      tono(nota(2, 57), t, { dur: .2, vol: .1, eco: .08, timbre: 'madera' });
+      tono(nota(0, 57), t + .07, { dur: .22, vol: .09, eco: .1, timbre: 'madera' });
+      return .4;
+    },
     // Soplo: dos notas que entran despacio, para pasar de página y para los avisos.
     soplo(t) {
       tono(nota(3), t, { dur: .55, vol: .05, eco: .5, timbre: 'aire' });
@@ -279,7 +283,9 @@
         const t = ahora();
         if (t - ultimoRico < PAUSA_AVISOS || t - ultimoSoplo < 250) break;
         ultimoSoplo = t;
-        suena('soplo');
+        // Cambiar de pantalla o abrir un panel es un toque de madera; un aviso, que no
+        // responde a un toque, conserva su soplo discreto.
+        suena(kind === 'notice' ? 'soplo' : 'pagina');
         break;
       }
       // deal, flip, close, expand, zoom: en silencio, ya se ven.
