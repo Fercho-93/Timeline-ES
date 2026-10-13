@@ -648,12 +648,20 @@ const pantalla = w => el(w, "#app").dataset.screen;
   pointer(w, "pointermove", el(w, "#app"), 60, 322);
   pointer(w, "pointermove", el(w, "#app"), 90, 323);
   ok("arrastrando, la pantalla se aparta con el dedo", shell.style.left === "60px");
+  const detras = w.document.querySelector(".swipe-peek");
+  ok("y por el hueco asoma, inerte, la pantalla a la que se vuelve", detras?.querySelector("#app")?.dataset.screen === "hub-solo" &&
+    !!detras.querySelector('[data-mode="history"]') && detras.getAttribute("aria-hidden") === "true" && detras.previousElementSibling === el(w, "#app"));
+  ok("la copia de detrás no le quita su sitio a la pantalla de verdad", w.document.getElementById("app") === el(w, "#app") && w.document.getElementById("app").dataset.screen === "solo-home");
   await sleep(150);
   pointer(w, "pointermove", el(w, "#app"), 95, 323);
   await sleep(150);
   pointer(w, "pointerup", el(w, "#app"), 96, 323);
   await sleep(320);
   ok("soltada sin impulso y a poca distancia, vuelve a su sitio sin navegar", pantalla(w) === "solo-home" && !shell.style.left && !shell.style.boxShadow);
+  ok("y la pantalla de detrás se retira", !w.document.querySelector(".swipe-peek"));
+  await swipe(w);
+  await sleep(80);
+  ok("tras volver, la copia deja paso a la pantalla de verdad", pantalla(w) === "hub-solo" && !w.document.querySelector(".swipe-peek"));
   w.close();
 }
 {

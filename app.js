@@ -4576,6 +4576,16 @@
     if (CT.isSessionActive() || (app.dataset.screen || screen) === "home") return null;
     if (screenBackArrow()?.dataset.localAction === "leave" && !app.querySelector('[data-online-action="back"]')) return null;
     return app;
+  }, () => {
+    // Qué pantalla asoma detrás mientras se desliza: la que pintará «Volver». Solo se sabe
+    // si la visible la pintó este archivo; las de otros módulos las resuelve swipe.js con
+    // las pantallas que se han ido dejando.
+    if ((app.dataset.screen || screen) !== screen) return null;
+    if (screenBackArrow()?.dataset.action === "home") return "home";
+    for (let i = navigationTrail.length - 1; i >= 0; i--) {
+      if (screenGroup(navigationTrail[i].screen) !== screenGroup(screen)) return navigationTrail[i].screen;
+    }
+    return null;
   });
   // Qué mazos tiene abiertos quien juega lo decide `CT.Cartera.arranque()`, que ya se ha
   // ejecutado al cargarse `cartera.js`: este archivo necesita saberlo antes de elegir el

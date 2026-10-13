@@ -5698,3 +5698,10 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
     pointer-events: none !important;
   }
 }
+/* La pantalla que asoma detrás al deslizar es una copia de cómo se dejó: lo que estaba
+   entrando o moviéndose se ve ya en su sitio, sin repetir la entrada. */
+.swipe-peek *, .swipe-peek *::before, .swipe-peek *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition: none !important;
+}
