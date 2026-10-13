@@ -93,7 +93,7 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
     assert.equal(CT.effectPrefs().sfx,true,'los efectos vienen encendidos');
     assert.equal(contexts,0,'cargar el juego no crea audio');
     CT.Effects.transition('lift');assert.equal(contexts,1);assert.ok(notas>0,'coger una carta suena');
-    for(const [paso,accion] of [['hueco',()=>CT.Effects.transition('hover',{index:2,total:5})],['acierto',()=>CT.Effects.feedback(true)],['fallo',()=>CT.Effects.feedback(false)],['lámina',()=>CT.Effects.discovery()],['logro',()=>CT.Effects.achievement()],['reloj',()=>CT.Effects.clock(2)],['fin',()=>CT.Effects.transition('end')],['turno',()=>CT.Effects.transition('turn')],['atrás',()=>CT.Effects.transition('back')],['desplegar',()=>CT.Effects.transition('unroll')],['plegar',()=>CT.Effects.transition('fold')]]){
+    for(const [paso,accion] of [['hueco',()=>CT.Effects.transition('hover',{index:2,total:5})],['acierto',()=>CT.Effects.feedback(true)],['fallo',()=>CT.Effects.feedback(false)],['lámina',()=>CT.Effects.discovery()],['logro',()=>CT.Effects.achievement()],['reloj',()=>CT.Effects.clock(2)],['fin',()=>CT.Effects.transition('end')],['plantarse',()=>CT.Effects.bank()],['poder',()=>CT.Effects.power()],['turno',()=>CT.Effects.transition('turn')],['atrás',()=>CT.Effects.transition('back')],['desplegar',()=>CT.Effects.transition('unroll')],['plegar',()=>CT.Effects.transition('fold')]]){
       const antes=notas;accion();assert.ok(notas>antes,`${paso} suena`);
     }
     assert.ok(Math.abs(master.gain.value-.8*.7*.7)<1e-9,'volumen por defecto, 70 %');
@@ -155,6 +155,11 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
     w.CONTINUUM.paint(app,'<div class="shell"><h1>Fin</h1></div>','winner');has('end');
     cues.length=0;
     w.CONTINUUM.paint(app,'<div class="shell"><h1>Tu turno</h1></div>','pass');has('turn');
+    // También acaban o avisan el duelo de cifras, la mesa por Wi-Fi y las finales numéricas en red.
+    cues.length=0;w.CONTINUUM.paint(app,'<div class="shell"><h1>Duelo</h1></div>','cifras-end');has('end');
+    cues.length=0;w.CONTINUUM.paint(app,'<div class="shell"><h1>Final</h1></div>','online-final');has('turn');
+    cues.length=0;w.CONTINUUM.paint(app,'<div class="shell"><h1>Fin</h1></div>','local-final');has('end');
+    cues.length=0;w.CONTINUUM.paint(app,'<div class="shell"><h1>Tu turno</h1></div>','pass');
     w.CONTINUUM.paint(app,'<div class="shell"><article class="final-card">Carta neutral</article><form class="final-form"></form></div>','final-local');
     cues.length=0;
     w.CONTINUUM.paint(app,'<div class="shell"><article class="final-card">Carta neutral</article><section class="final-results">Resultado</section></div>','final-local');has('flip');
@@ -185,8 +190,16 @@ for (const platform of ['unsupported','web','native','native-missing','native-er
     assert.equal(pulses.length,1,'activar produce una prueba inmediata');
     const test=w.document.querySelector('[data-settings-action="test-haptics"]');test.click();
     await new Promise(resolve=>setTimeout(resolve,0));assert.equal(pulses.length,2);
+    if(platform==='web'){
+      // Los momentos que se notan en la mano: te toca, fin, levantar carta, plantarse, poder, tiempo
+      // agotado y el resultado de quién empieza (una sola vez por sorteo). Los menús solo suenan.
+      const E=w.CONTINUUM.Effects, n=pulses.length;
+      E.transition('turn');E.transition('end');E.transition('lift');E.bank();E.power();E.clock(0);E.clock(2);
+      E.starterResult('sala:7');E.starterResult('sala:7');E.transition('page');E.transition('open');
+      assert.equal(JSON.stringify(pulses.slice(n)),JSON.stringify([28,28,18,28,28,[30,40,30],18,28]));
+    }
     toggle.checked=false;toggle.dispatchEvent(new w.Event('change',{bubbles:true}));
-    assert.equal(test.disabled,true);await w.CONTINUUM.Effects.testHaptics();assert.equal(pulses.length,2,'apagar detiene también las pruebas');
+    assert.equal(test.disabled,true);const encendida=pulses.length;await w.CONTINUUM.Effects.testHaptics();w.CONTINUUM.Effects.transition('turn');w.CONTINUUM.Effects.power();assert.equal(pulses.length,encendida,'apagar detiene también las pruebas y los avisos');
   } finally {w.close();}
 }
 console.log('Vibración: prueba inmediata, independencia del sonido, navegador no compatible y errores nativos: OK');

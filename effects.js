@@ -32,6 +32,7 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", motas, { once: true });
   else motas();
   let haptics;
+  const starterHeard = new Set();
   function hapticsAvailable() {
     try {
       const cap = window.Capacitor;
@@ -44,12 +45,15 @@
   async function vibration(kind) {
     if (!CT.effectPrefs?.().haptics || !hapticsAvailable()) return false;
     try {
+      // `confirm`: toque ligero (elegir, colocar, levantar); `medium`: algo pasa sin que lo hayas
+      // tocado tú (te toca); `success`/`failure`/`warning`: resultados y avisos del sistema.
       if (window.Capacitor?.isNativePlatform?.()) {
         if (kind === 'confirm') await haptics.impact({ style: 'LIGHT' });
+        else if (kind === 'medium') await haptics.impact({ style: 'MEDIUM' });
         else await haptics.notification({ type: kind === 'success' ? 'SUCCESS' : 'WARNING' });
         return true;
       }
-      return navigator.vibrate(kind === 'failure' ? [18, 35, 18] : 18) !== false;
+      return navigator.vibrate({ failure: [18, 35, 18], warning: [30, 40, 30], medium: 28, success: [14, 40, 22] }[kind] || 18) !== false;
     } catch { return false; /* Un efecto opcional nunca impide jugar. */ }
   }
   // Los sonidos los sintetiza sonidos.js y dependen de su propio ajuste («Efectos de
@@ -62,13 +66,34 @@
     feedback(correct) { void vibration(correct ? "success" : "failure"); CT.Sonidos?.result(correct); },
     tap() { void vibration("confirm"); },
     page(back) { CT.Sonidos?.cue(back ? 'back' : 'page'); },
-    transition(kind, info) { CT.Sonidos?.cue(kind, info); },
-    discovery() { CT.Sonidos?.discovery(); },
-    achievement() { CT.Sonidos?.achievement(); },
-    clock(left) { CT.Sonidos?.clock(left); }
+    transition(kind, info) {
+      CT.Sonidos?.cue(kind, info);
+      // Los momentos que se tienen que notar también en la mano: levantar una carta, que sea tu
+      // turno y el final de la partida. Los toques de menú solo suenan.
+      if (kind === 'lift') void vibration('confirm');
+      else if (kind === 'turn') void vibration('medium');
+      else if (kind === 'end') void vibration('medium');
+    },
+    // Una lámina nueva llega justo detrás del acierto: su vibración espera a que pase la del acierto.
+    discovery() { CT.Sonidos?.discovery(); setTimeout(() => void vibration('success'), 620); },
+    achievement() { CT.Sonidos?.achievement(); setTimeout(() => void vibration('success'), 1000); },
+    // En los tres últimos segundos, un toque por segundo; al agotarse, un aviso.
+    clock(left) { CT.Sonidos?.clock(left); void vibration(left > 0 ? 'confirm' : 'warning'); },
+    // El sorteo de quién empieza ya tiene resultado. Las salas repintan su panel en cada cambio:
+    // `key` (la carta sorteada y la sala) hace que suene una sola vez por sorteo.
+    starterResult(key) { if (key && starterHeard.has(key)) return; if (key) starterHeard.add(key); CT.Sonidos?.cue('turn'); void vibration('medium'); },
+    // Activar un poder o recibir una carta de poder.
+    power() { CT.Sonidos?.cue('power'); void vibration('medium'); },
+    // Plantarse en Retos rápidos: asegurar lo ganado.
+    bank() { CT.Sonidos?.cue('bank'); void vibration('medium'); }
   };
+  // Activar Fantasma o lanzar un Pulso (al elegir a quién), en cualquier mesa.
   document.addEventListener("click", event => {
-    const tactile = event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-action="select-card"], [data-action="solo-place"], [data-action="place"], [data-online-action="select"], [data-online-action="place"]');
+    const poder = event.target.closest('[data-action="ghost-use"], [data-online-action="ghost-use"], [data-local-action="ghost-use"], [data-action="pulse-target"], [data-online-action="pulse-target"], [data-local-action="pulse-target"]');
+    if (poder && !poder.disabled) CT.Effects.power();
+  }, true);
+  document.addEventListener("click", event => {
+    const tactile = event.target.closest('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-action="select-card"], [data-action="solo-place"], [data-action="place"], [data-online-action="select"], [data-online-action="place"], [data-local-action="select"], [data-local-action="place"], [data-local-action="confirm-place"], [data-local-action="confirm-pulse"], [data-local-action="confirm-defense"], [data-online-action="confirm-pulse"], [data-online-action="confirm-defense"]');
     if (tactile && !tactile.disabled) void vibration("confirm");
   }, true);
   CT.Art = {

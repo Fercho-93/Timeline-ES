@@ -11,6 +11,9 @@ const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ''), {runScr
 w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
 for (const m of html.matchAll(/<script src="([^"]+)"><\/script>/g)) w.eval(read(m[1]));
 const CT = w.CONTINUUM, E = CT.QuickEngine, Q = CT.Quick;
+// Se escuchan los avisos de sonido y vibración que lanza la partida.
+const cues = [];
+CT.Effects = {...CT.Effects, discovery: () => cues.push('discovery'), transition: kind => cues.push(kind), feedback: ok => cues.push(ok ? 'acierto' : 'fallo'), bank: () => cues.push('bank')};
 
 // Rotación: cuatro mazos distintos cada día, iguales para todos, que cambian de un día a otro y
 // recorren el catálogo entero en ocho días.
@@ -75,6 +78,7 @@ const play = right => {
 };
 const acertada = play(true);
 assert.ok(CT.Progreso.quickSeenCards().has(acertada), 'el acierto entra en la colección');
+assert.ok(cues.includes('acierto') && cues.includes('discovery'), 'una carta nueva suena como una lámina');
 assert.match(w.document.querySelector('[data-quick-result]').textContent, /Nueva carta en tu colección/);
 assert.deepEqual(plain(saved().found), [acertada], 'la partida guardada recuerda sus cartas nuevas');
 w.document.querySelector('[data-quick="ack"]').click();
@@ -94,6 +98,7 @@ assert.deepEqual(plain(CT.Progreso.read().quickMastered), [acertada], 'solo cart
 // Al terminar el mazo, el resumen cuenta las cartas nuevas y lleva a la colección.
 for (let guard = 0; E.restore(saved()).phase !== 'round-end' && guard < 60; guard++) {play(true); w.document.querySelector('[data-quick="ack"]').click();}
 const final = w.document.querySelector('.quick-collection-summary');
+assert.equal(cues.filter(k => k === 'end').length, 1, 'el final de la partida suena una vez');
 assert.ok(final, 'resumen de la colección al acabar');
 assert.match(final.textContent, new RegExp(`${deck.cards.length - 2} cartas nuevas`));
 final.querySelector('[data-quick="collection"]').click();

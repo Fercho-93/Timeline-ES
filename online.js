@@ -784,14 +784,25 @@ function showTurnChangeSplash(nextUid, previousState = null) {
   const splash = appEl.querySelector("[data-turn-change-splash]");
   window.setTimeout(() => splash?.remove(), 2000);
 }
+// Avisa cuando te llega una carta de poder: antes no tenías ninguno por usar y ahora sí.
+let teniaPoder = null;
+function avisaPoder() {
+  const tiene = roomState?.status === "playing" && CT.Powers.holds(roomState, user.uid);
+  if (teniaPoder === false && tiene) CT.Effects.power?.();
+  teniaPoder = tiene;
+}
 function anotaProgreso() {
-  if (lastEffectVersion !== null && lastEffectVersion !== roomState.version && roomState.phase === "reveal" && roomState.reveal?.playerUid === user.uid) CT.Effects.feedback(roomState.reveal.correct);
+  avisaPoder();
+  const fresca = lastEffectVersion !== null && lastEffectVersion !== roomState.version && roomState.phase === "reveal";
+  if (fresca && roomState.reveal?.playerUid === user.uid) CT.Effects.feedback(roomState.reveal.correct);
+  // A quien defiende un Pulso también le llega su resultado.
+  else if (fresca && roomState.reveal?.targetUid === user.uid) CT.Effects.feedback(!!roomState.reveal.targetOk);
   lastEffectVersion = roomState.version;
   const nuevos = [];
   if (roomState.phase === "reveal" && roomState.reveal) {
     const { reveal } = roomState;
     const mine=reveal.playerUid===user.uid;
-    CT.Progreso.discover({ mode: modeKey(), cardId: reveal.cardId, mine: reveal.targetUid === user.uid, correct: !!reveal.targetOk });
+    if (CT.Progreso.discover({ mode: modeKey(), cardId: reveal.cardId, mine: reveal.targetUid === user.uid, correct: !!reveal.targetOk })) CT.Effects.discovery?.();
     const card=mine?CT.cards(modeKey()).find(item=>item.id===reveal.cardId):null;
     const nuevaLamina=mine&&reveal.correct&&card&&!CT.Progreso.seenCards().has(card.id)&&!!CT.cardArt(modeKey(),card);
     nuevos.push(...CT.Progreso.recordOnline({
@@ -799,7 +810,7 @@ function anotaProgreso() {
       mode: modeKey(), cardId: reveal.cardId, correct: !!reveal.correct,
       hidden: !!roomState.ghost?.pending.length, pulse: !!reveal.pulse
     }));
-    if(nuevaLamina)sessionNewDiscoveries+=1;
+    if(nuevaLamina){sessionNewDiscoveries+=1;CT.Effects.discovery?.();}
   }
   if (roomState.status === "ended") {
     const ganadores = roomState.winners || (roomState.winner ? [roomState.winner] : []);
@@ -809,6 +820,7 @@ function anotaProgreso() {
   }
   if (nuevos.length) {
     sessionAchievements=[...new Map([...sessionAchievements,...nuevos].map(item=>[item.id||item.name,item])).values()];
+    CT.Effects.achievement?.();
     showToast(nuevos.length === 1 ? `Logro: ${nuevos[0].name}` : `${nuevos.length} logros nuevos`);
     announce(nuevos.map(item => `Logro desbloqueado: ${item.name}.`).join(" "));
   }
@@ -849,6 +861,8 @@ function starterPanelMarkup(isHost) {
       </div>
       <button type="button" class="btn btn-primary btn-block" data-online-action="starter-guess-submit">Adivinar <span>→</span></button>${repetir}`;
   }
+  // Todos han respondido: el orden de juego está decidido.
+  CT.Effects.starterResult?.(`online:${roomCode}:${cardId}:${roomState.playerOrder.join(',')}`);
   const ranking = starterRanking();
   const winner = ranking[0];
   const valueOf = uid => starterRecords.get(uid)?.value;
@@ -1161,14 +1175,18 @@ function turnRemaining() {
   }
   return Math.max(0, seconds - Math.floor((performance.now() - fallbackTimerStartedAt) / 1000));
 }
+let lastClockSecond = null;
 function manageTurnTimer() {
   clearTurnTimer();
+  lastClockSecond = null;
   if (!roomState || roomState.status !== "playing" || roomState.phase !== "turn" || !turnSeconds()) return;
   const tick = () => {
     const remaining = turnRemaining();
     const value = document.getElementById("turn-timer-value");
     if (value) value.textContent = remaining ?? "…";
     document.getElementById("turn-timer")?.classList.toggle("turn-timer-low", remaining !== null && remaining <= 5);
+    // Los tres últimos segundos de tu turno suenan y vibran, como en un solo móvil.
+    if (remaining !== null && remaining <= 3 && remaining !== lastClockSecond && roomState.playerOrder[roomState.current] === user.uid) { lastClockSecond = remaining; CT.Effects.clock?.(remaining); }
     if (remaining === 0 && roomState.hostUid === user.uid && navigator.onLine) { clearTurnTimer(); skipTurn(roomState.version); }
   };
   tick(); turnTimerHandle = setInterval(tick, 250);

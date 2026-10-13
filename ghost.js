@@ -161,5 +161,7 @@
     return schedule;
   }
   CT.Ghost = { create, claim, owns, available, activate, advance, remove, hiddenCard, banner, power, level, difficultyCards, soloSchedule, LEVELS };
-  CT.Powers = { create: createPowers, claim: claimPowers, ownsPulse, consumePulse, pulsePower };
+  // ¿Tiene esta persona un poder por usar (Fantasma o Pulso)? Sirve para avisar cuando le llega uno.
+  function holds(state, playerId) { return owns(state?.ghost, playerId) || ownsPulse(state?.pulsePower, playerId); }
+  CT.Powers = { create: createPowers, claim: claimPowers, ownsPulse, consumePulse, pulsePower, holds };
 })();

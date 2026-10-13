@@ -57,7 +57,9 @@
         daily.lastDay=day();daily.best=Math.max(daily.best||0,hits);
         daily.days[day()]={hits,total,family:'quick',challenge:record.config.rounds[0].id,finishedAt:new Date().toISOString(),ms:record.startedAt?Math.max(0,Date.now()-record.startedAt):null};
         all.retoDiario=daily;CT.Storage.setItem(key,JSON.stringify(all));
-        CT.Progreso?.finishQuickDaily?.({hits,total,streak:daily.streak});
+        // Los logros del reto diario (reto perfecto, rachas) se anuncian como en las colecciones.
+        const logros=CT.Progreso?.finishQuickDaily?.({hits,total,streak:daily.streak}) || [];
+        if(logros.length){record.achievements=logros.map(item=>item.name);CT.Effects?.achievement?.();CT.announce?.(logros.map(item=>`Logro desbloqueado: ${item.name}.`).join(' '));}
       }
     }
     record.historySaved = true;
@@ -111,6 +113,7 @@
     const close=()=>{layer.dataset.closed='1';if(splashLayer===layer)splashLayer=null;if(!layer.isConnected)return;layer.classList.add('is-leaving');setTimeout(()=>layer.remove(),260);};
     layer.addEventListener('click',close);layer.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();close();}});
     app().append(layer);
+    CT.Effects?.transition?.('open');
   }
   // Duraciones de Retos rápidos: las cortas valen para todo; las largas, para jugar en un solo móvil.
   const SHORT_LENGTHS=[[1,'Partida rápida'],[3,'Partida estándar'],[5,'Partida larga']];
@@ -371,7 +374,10 @@
     if(code)CT.Storage.setItem(NET,JSON.stringify({code,name:room.names[room.members.indexOf(id)],duel:duelRoom,len:roomLength}));
     if(room.config){
       const starting=wasLobby && !room.commands.length;
-      record=CT.QuickRoom.record(room);state=E.restore(record);if(freshOwnPlace)CT.Effects?.feedback(state.result.correct);selected=null;slot=null;render();
+      record=CT.QuickRoom.record(room);state=E.restore(record);if(freshOwnPlace)CT.Effects?.feedback(state.result.correct);
+      // Te toca: el turno acaba de pasar a tu plaza.
+      if(previous?.config && previous.actor!==id && room.actor===id && state.phase==='turn')CT.Effects?.transition?.('turn');
+      selected=null;slot=null;render();
       // Al empezar la partida de la sala, la portada del primer mazo, como en el resto de Retos rápidos.
       if(starting)deckSplash(state.config,0);
     }
@@ -402,6 +408,7 @@
       return `${head}${cardBox(esc(regla.pregunta||''))}<p class="hint">Has respondido. Esperando a: ${faltan.join(', ')}.</p>${redo}`;
     }
     const order=CT.QuickRoom.starterOrder(room);
+    CT.Effects?.starterResult?.(`quick:${connection?.code||''}:${s.cardId}:${Object.keys(s.guesses).join(',')}`);
     const list=order.map((i,n)=>`<li${n===0?' class="starter-draw-winner"':''}><span>${n+1}.º ${esc(room.names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(s.modeKey,s.guesses[room.members[i]]))}</span></li>`).join('');
     return `${head}${cardBox(`El valor real era ${esc(CT.formatValue(s.modeKey,card))}`)}<div class="starter-winner-banner"><b>${esc(room.names[order[0]])}</b><span>Empieza la partida</span></div><ol class="starter-draw-list">${list}</ol>${redo}`;
   }
@@ -772,7 +779,7 @@
     if (starterDraw.step < starterDraw.names.length) {starterAsk(); return;}
     const {modeKey, card, names, guesses} = starterDraw;
     const order = CT.Starter.order(modeKey, card.id, guesses.map((v, id) => ({id, value: v})));
-    starter = {key: names.join('|'), order}; refreshStarterField();
+    starter = {key: names.join('|'), order}; refreshStarterField(); CT.Effects?.starterResult?.();
     starterPaint(`<h2>¿Quién empieza?</h2><div class="starter-winner-banner"><b>${esc(names[order[0]])}</b><span>Empieza la partida</span></div>
       <div class="cifra-card starter-card"><strong>${esc(card.title)}</strong><span>El valor real era ${esc(CT.formatValue(modeKey, card))}</span></div>
       <ol class="starter-draw-list">${order.map((i, n) => `<li${n === 0 ? ' class="starter-draw-winner"' : ''}><span>${n + 1}.º ${esc(names[i])}</span><span>${esc(CT.Duelo.Cifras.formato(modeKey, guesses[i]))}</span></li>`).join('')}</ol>
@@ -809,8 +816,11 @@
   }
   function dispatch(command) {
     if(room){if(myTurn())void networkAction(command);return;}
+    const before = state.current;
     state = E.step(state, command);
     if (command.type === 'place') CT.Effects?.feedback(state.result.correct);
+    // En un solo móvil, pasar el teléfono a otra persona suena como en Grandes colecciones.
+    else if (state.players.length > 1 && state.phase === 'turn' && state.current !== before) CT.Effects?.transition?.('turn');
     record.commands.push(command); save(); selected = null; slot = null; render();
   }
   function scores() {
@@ -919,7 +929,7 @@
     if (state?.phase !== 'result' || !r?.correct) return false;
     const mine = room ? room.members?.[r.player] === myId : state.players.length === 1;
     if (!mine) return false;
-    if (CT.Progreso?.discoverQuick?.(r.cardId)) {finds.ids.push(r.cardId); if (record && !room) {record.found = finds.ids; save();}}
+    if (CT.Progreso?.discoverQuick?.(r.cardId)) {finds.ids.push(r.cardId); CT.Effects?.discovery?.(); if (record && !room) {record.found = finds.ids; save();}}
     return finds.ids.includes(r.cardId);
   }
   // Al acabar: cuántas cartas nuevas ha dejado la partida y cómo va la colección de cada mazo jugado.
@@ -931,6 +941,15 @@
     const decks = ids.slice(0, 5).map(id => {const c = E.challenge(id); return `<li><b>${esc(c.title)}</b>${progressBar(deckProgress(c, seen))}</li>`;}).join('');
     return `<div class="quick-collection-summary"><p><span aria-hidden="true">✦</span> ${n ? `${n} ${n === 1 ? 'carta nueva' : 'cartas nuevas'} en tu colección.` : 'Ninguna carta nueva esta vez.'}</p><ul>${decks}</ul>${room ? '' : button('collection', 'Ver tu colección', 'btn btn-secondary btn-block', `data-deck="${esc(ids.at(-1))}"`)}</div>`;
   }
+  // El final de la partida suena y vibra como en las colecciones; Retos rápidos no cambia de pantalla
+  // al acabar, así que se avisa aquí. Solo si se ha visto llegar (no al reabrir una partida terminada).
+  let lastPhase = null;
+  function roundEndCue() {
+    const game = state.config.historyId || 'sin-id', now = `${game}:${state.index}:${state.phase}`;
+    const arrived = state.phase === 'round-end' && lastPhase && lastPhase !== now && lastPhase.startsWith(`${game}:${state.index}:`);
+    lastPhase = now;
+    if (arrived && state.index + 1 === state.config.rounds.length) CT.Effects?.transition?.('end');
+  }
   function render() {
     page="game";
     stopClock();
@@ -938,6 +957,7 @@
     shownGame = state.config.historyId || 'sin-id'; shownIndex = state.index;
     if (nextDeck) { const config = state.config, index = state.index; setTimeout(() => { if (state && state.index === index && page === 'game') deckSplash(config, index); }, 0); }
     saveHistory();
+    roundEndCue();
     const c = E.challenge(state.config.rounds[state.index].id), p = state.players[state.current];
     const get = id => c.cards.find(item => item.id === id);
     topTitle = `${state.config.rounds.length === 1 ? '' : `${state.index + 1}/${state.config.rounds.length} · `}${esc(c.title)}`;
@@ -960,6 +980,7 @@
       shell(`${heading}<section class="panel quick-panel"><h2>${final ? duelo ? (best>record.config.rivalScore ? '¡Has ganado el duelo!' : best===record.config.rivalScore ? 'Empate' : `${esc(record.config.rivalName||'Tu rival')} gana`) : state.players.length===1 ? 'Tu resultado' : winners.length > 1 ? 'Victoria compartida' : `Gana ${winners[0]}` : 'Reto terminado'}</h2>
         ${final ? `<p>${E.keepPlaying(state) && state.config.rounds.length === 1 ? `${best} de ${state.config.rounds[0].order.length - 1}` : `${winners.join(' y ')} · ${best} ${best === 1 ? 'acierto' : 'aciertos'}`}.</p>` : '<p>Los aciertos de este reto ya están asegurados.</p>'}
         <ul>${state.players.map(player => E.keepPlaying(state) ? `<li>${state.players.length === 1 ? '' : `${esc(player.name)}: `}${player.roundScore} de ${state.config.rounds[state.index].order.length - 1} cartas bien colocadas en este reto.</li>` : `<li>${esc(player.name)}: ${player.roundScore} ${player.roundScore === 1 ? 'acierto' : 'aciertos'} en este reto.</li>`).join('')}</ul>
+        ${final && record.achievements?.length ? `<p class="quick-new-card">✦ ${record.achievements.length === 1 ? `Logro: ${esc(record.achievements[0])}` : `${record.achievements.length} logros nuevos: ${record.achievements.map(esc).join(', ')}`}</p>` : ''}
         ${final ? collectionSummary() : ''}
         ${final && Number.isFinite(record.config.rivalScore) ? `<p>${esc(record.config.rivalName||'Tu rival')}: ${record.config.rivalScore} ${record.config.rivalScore===1?'acierto':'aciertos'}. Tú: ${best}. ${best > record.config.rivalScore ? '¡Has superado su resultado!' : best === record.config.rivalScore ? 'Habéis empatado.' : 'Ha asegurado más aciertos.'}</p>` : ''}
         ${final ? (record.config.kind==='duel' && !room ? '' : button('formats', 'Elegir otra partida')) : button('next', 'Siguiente reto')}
@@ -1085,7 +1106,7 @@
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3, seed=historyId();
       prepare({names:['Tú'],rounds:rounds(count,null,seed),kind:'duel',keep:true,seed,length:count,seconds:CT.Tiempo.chosen('amigos',15)}); return;
     }
-    if (action === 'solo-mode') {setSoloMode(target.dataset.mode==='surprise'?'surprise':'day'); CT.Effects?.tap?.(); return;}
+    if (action === 'solo-mode') {setSoloMode(target.dataset.mode==='surprise'?'surprise':'day'); CT.Effects?.tap?.(); CT.Effects?.transition?.('page'); return;}
     if (action === 'collection') {collectionPage(target.dataset.deck || null); return;}
     // Un mazo del día: el reto entero, sus cartas barajadas.
     if (action === 'play-deck') {
@@ -1126,7 +1147,7 @@
     else if (action === 'slot' && selected && state.phase === 'turn') {slot = Number(target.dataset.index); CT.Effects?.tap(); render(); focusPlacement();}
     else if (action === 'cancel') {slot = null; render();}
     else if (action === 'confirm' && selected && slot !== null) {CT.Effects?.stamp(); dispatch({type: 'place', cardId: selected, index: slot});}
-    else if (['bank', 'ack', 'next'].includes(action)) dispatch({type: action});
+    else if (['bank', 'ack', 'next'].includes(action)) {if (action === 'bank') CT.Effects?.bank?.(); dispatch({type: action});}
   });
   function block(title, subtitle, art, action, count) {
     const cover = art === 'quick' ? 'menu-quick.webp' : `hero-${art}-400.webp`;

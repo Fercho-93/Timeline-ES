@@ -22,6 +22,17 @@ Los sonidos de acción usan texturas suaves de papel y madera. Se activan con
 | Zoom y cambios de preferencias | Toque muy suave, solo al cambiar el valor | `mapa.js`, `settings.js` |
 | Aviso nuevo en el juego, sala o ajustes | Toque discreto | Funciones `showToast` |
 | Acierto o fallo | Respuestas distintas de madera y papel | `effects.js`: `feedback` |
+| Tu jugada en salas online, por Wi-Fi y duelos por turnos (también al defender un Pulso) | Acierto o fallo, con vibración | `online.js`, `local-multiplayer.js`, `duelo-turnos.js`, `quick-challenges.js` |
+| Te toca en una sala o duelo, y al pasar el móvil en Retos rápidos | Dos golpes suaves y vibración media | `online.js`, `local-multiplayer.js`, `duelo-turnos.js`, `quick-challenges.js` |
+| Fin de partida en todos los modos (también duelo de cifras, Wi-Fi, duelos por turnos y Retos rápidos) | Tres toques y vibración media | `a11y.js` (pantallas de fin), `duelo-turnos.js`, `quick-challenges.js` |
+| Entrar en una final numérica o un desempate | Dos golpes suaves | `a11y.js`: `final-local`, `online-final`, `online-tiebreak`, `local-final-secreta` |
+| Lámina o carta nueva en la colección (todas las mesas y Retos rápidos) | Arpegio de lámina y vibración de éxito | `effects.js`: `discovery` |
+| Logro desbloqueado (también al acabar solitario, duelos, competición, online y reto diario rápido) | Acorde de logro y vibración de éxito | `effects.js`: `achievement` |
+| Tres últimos segundos y tiempo agotado (también salas online, Wi-Fi y duelos por enlace) | Tic por segundo con toque ligero; nota grave con aviso al agotarse | `effects.js`: `clock` |
+| Activar Fantasma, lanzar un Pulso o recibir una carta de poder | Brillo que sube y vibración media | `effects.js`: `power` |
+| Plantarse en Retos rápidos | Tres notas de madera que suben y vibración media | `effects.js`: `bank` |
+| Resultado de quién empieza | Dos golpes suaves y vibración media, una vez por sorteo | `effects.js`: `starterResult` |
+| Portada del mazo en Retos rápidos y elegir modo en solitario | Toque de madera | `quick-challenges.js` |
 
 ## Repeticiones y prioridad
 

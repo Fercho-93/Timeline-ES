@@ -1019,6 +1019,7 @@
     starterDraw.winner = winner;
     starterDraw.order = order;
     document.querySelector(".starter-field").innerHTML = starterFieldMarkup();
+    CT.Effects.starterResult?.();
     announce(`${starterDraw.names[winner]} ha acertado más cerca y empieza la partida. Orden de juego: ${order.map(i => starterDraw.names[i]).join(", ")}.`);
     renderStarterDialog(`<h2>¿Quién empieza?</h2>
       <div class="starter-winner-banner"><span class="starter-winner-crown" aria-hidden="true">${crownIcon()}</span><b>${escapeHtml(starterDraw.names[winner])}</b><span>Empieza la partida</span></div>
@@ -1285,7 +1286,9 @@
     const {correct, returned} = played;
     player.hand = played.hand;
     game.timeline = played.timeline; game.deck = played.deck; game.discard = played.discard;
-    if (played.drawnCardId != null) CT.Powers.claim(game, played.drawnCardId, player.id, game.deck);
+    { const tenia = CT.Powers.holds(game, player.id);
+      if (played.drawnCardId != null) CT.Powers.claim(game, played.drawnCardId, player.id, game.deck);
+      if (!tenia && CT.Powers.holds(game, player.id)) CT.Effects.power?.(); }
     if (!correct) (game.failed = game.failed || []).push(selectedCardId);
     result = {
       correct, returned, card, playerName: player.name, attemptedIndex: index, motivo: localTimeout ? "tiempo" : null,
@@ -1445,7 +1448,9 @@
       target.shieldRound = game.round;
       game.pulseGift = {to:target.id, cardId:gift.id, from:player.name};
     }
-    if (resolved.drawnCardId != null) CT.Powers.claim(game, resolved.drawnCardId, player.id, game.deck);
+    { const tenia = CT.Powers.holds(game, player.id);
+      if (resolved.drawnCardId != null) CT.Powers.claim(game, resolved.drawnCardId, player.id, game.deck);
+      if (!tenia && CT.Powers.holds(game, player.id)) CT.Effects.power?.(); }
     game.pulseTurn = null;
     CT.Effects.feedback(targetOk);
     pendingIndex = null;
@@ -3133,6 +3138,7 @@
       // crearlo todavía no hay rival, solo una marca que mandar.
       won: enDueloEsta && !!solo.duelo?.rival && solo.hits > solo.duelo.rival.hits
     });
+    if (logros.length) CT.Effects.achievement?.();
     const rondaSuperada = solo.kind === "free" && superado;
     const resumen = solo.kind === "daily" || enDueloEsta
       ? `Has colocado bien <strong>${solo.hits}</strong> de ${total} cartas.`
@@ -3309,6 +3315,10 @@
     barra.classList.toggle("reloj-apura", restante <= 3000);
     const marca = app.querySelector(".reloj-left");
     if (marca) marca.textContent = `${Math.max(0, Math.ceil(restante / 1000))} s`;
+    // Los tres últimos segundos suenan y vibran, y el final también, como en el resto de relojes.
+    const segundo = Math.max(0, Math.ceil(restante / 1000));
+    if (segundo <= 3 && segundo !== tictac.ultimo) { tictac.ultimo = segundo; CT.Effects.clock?.(segundo); }
+    else if (segundo > 3) tictac.ultimo = null;
     if (restante <= 0) abierta.cierra("tiempo");
   }
 
@@ -3344,8 +3354,10 @@
     cifras.empezadaEn = null;
     const acierto = Cifras.acierto(cifras.mode, card, jugada);
     cifras.pendiente = { jugada, motivo, acierto };
+    const nuevaLamina = acierto && !CT.Progreso.seenCards().has(card.id) && !!CT.cardArt(cifras.mode, card);
     anotaLogros(CT.Progreso.record({ mode: cifras.mode, cardId: card.id, correct: acierto, kind: "cifras" }));
     CT.Effects.feedback(acierto);
+    if (nuevaLamina) CT.Effects.discovery?.();
     guardaCifras();
     cifrasView();
     cifrasRevelado();
@@ -3497,6 +3509,7 @@
     const payload = Cifras.codificar({ mode, seed, total, jugadas, nombre: duelName(), ms: cifras.ms });
     const gano = !!rival && resultado > 0;
     const logros = CT.Progreso.finishGame({ mode, kind: "duel", hits: aciertos, total, won: gano });
+    if (logros.length) CT.Effects.achievement?.();
     const sessionLogros = [...new Map(logros.map(item => [item.id || item.name, item])).values()];
 
     let icono = "🎯", eyebrow = "Duelo de cifras listo", titular = `<strong>${aciertos}</strong> de ${total} aciertos.`, cuerpo = "", acciones = "";
@@ -3858,6 +3871,7 @@
     const fallosUnicos = new Set(comp.totalFailed.map(item => item.id)).size;
     const filas = comp.roundsSummary.map(r => `<li><b>${escapeHtml(CT.mode(r.mode).name)}</b><span>${r.hits} de ${r.total}</span></li>`).join("");
     const logros = CT.Progreso.finishCompetition();
+    if (logros.length) CT.Effects.achievement?.();
     paint(`<div class="shell">${header()}<section class="pass-screen"><div class="panel">
       <div class="big-icon">🏆</div>
       <div class="eyebrow">Competición terminada</div>

@@ -343,17 +343,20 @@ function startTurnClock(active) {
     queueMove(current.kind === 'cifras' ? { respuesta: 0, timeout: true } : { index: -1, timeout: true });
   } });
 }
+// Devuelve si alguna jugada propia ha dejado una lámina nueva en el álbum.
 function discoverOwnPlays(game) {
+  let nueva = false;
   (game.plays || []).forEach((play, turn) => {
     const mode = modeAt(game, turn);
     const card = CT.cards(mode).find(c => c.id === play.cardId);
-    CT.Progreso?.discover?.({
+    nueva = CT.Progreso?.discover?.({
       mode, cardId: play.cardId, mine: play.uid === uid(),
       correct: !play.timeout && (game.kind === 'cifras'
         ? !!card && CT.Duelo.Cifras.acierto(game.mode, card, play)
         : play.correct === true)
-    });
+    }) || nueva;
   });
+  return nueva;
 }
 function subscribe(gameId) {
   stop?.();
@@ -363,11 +366,14 @@ function subscribe(gameId) {
     const wasPlayingAway = current?.status === 'playing' && current.turnUid !== uid();
     const ownPlay=current?.plays && next.plays?.length===current.plays.length+1 ? next.plays.at(-1) : null;
     if(ownPlay?.uid===uid())CT.Effects?.feedback(next.kind==='cifras'?ownPlay.points>0:ownPlay.correct===true);
+    // El duelo acaba de terminar delante de ti (no al abrir uno ya terminado).
+    const justEnded = current?.id === gameId && !ended(current) && ['finished', 'resigned'].includes(next.status);
     current = asVisible({ ...next, id: gameId, shareLink });
-    discoverOwnPlays(current);
+    if (discoverOwnPlays(current) && ownPlay?.uid === uid()) CT.Effects?.discovery?.();
+    if (justEnded) CT.Effects?.transition?.('end');
     if (previousTurn !== current.turnIndex) { pendingIndex = null; delivery = ''; }
     prepareTurn();
-    if (wasPlayingAway && current.turnUid === uid()) notify('Tu oponente ha colocado una carta. Te toca.');
+    if (wasPlayingAway && current.turnUid === uid() && !ended(current)) { CT.Effects?.transition?.('turn'); notify('Tu oponente ha colocado una carta. Te toca.'); }
     render();
     const pending = pendingMove(gameId);
     if (pending && !snap.metadata?.fromCache) sendPending(pending);

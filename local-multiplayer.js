@@ -217,11 +217,24 @@
     if (room?.mode && room.mode !== modeKey && CT.has(room.mode)) modeKey = room.mode;
     if (room.phase === "reveal" && room.reveal) {
       const reveal = room.reveal;
-      CT.Progreso?.discover?.({ mode: modeKey, cardId: reveal.cardId,
+      // Tu jugada (o tu defensa de un Pulso) suena y vibra al resolverse, como en las demás mesas.
+      if (previous && previous.version !== room.version) {
+        if (esMio(reveal.playerId)) CT.Effects?.feedback?.(!!reveal.correct);
+        else if (reveal.targetId && esMio(reveal.targetId)) CT.Effects?.feedback?.(!!reveal.targetOk);
+      }
+      const nueva = CT.Progreso?.discover?.({ mode: modeKey, cardId: reveal.cardId,
         mine: reveal.playerId === myPlayerId, correct: !!reveal.correct });
-      CT.Progreso?.discover?.({ mode: modeKey, cardId: reveal.cardId,
+      const defendida = CT.Progreso?.discover?.({ mode: modeKey, cardId: reveal.cardId,
         mine: reveal.targetId === myPlayerId, correct: !!reveal.targetOk });
+      if (nueva || defendida) CT.Effects?.discovery?.();
     }
+    // Te llega una carta de poder.
+    const poderDe = r => r?.status === "playing" && [myPlayerId, role === "host" ? r.hostId : null].some(id => id && CT.Powers.holds(r, id));
+    if (previous && !poderDe(previous) && poderDe(room)) CT.Effects?.power?.();
+    // Te toca: el turno acaba de pasar a tu plaza (o te lanzan un Pulso y defiendes tú).
+    const turnoDe = r => r?.status !== "playing" ? null : r.phase === "turn" ? r.playerOrder[r.current] : r.phase === "pulse" && r.pulseTurn?.stage === "defensa" ? r.pulseTurn.targetId : null;
+    const ahora = turnoDe(room), antes = turnoDe(previous);
+    if (previous && ahora && esMio(ahora) && !(antes && esMio(antes) && previous.current === room.current && previous.phase === room.phase)) CT.Effects?.transition?.("turn");
     if (previous?.phase !== room.phase || previous?.status !== room.status) renderGame.revelando = false;
     if (role === "guest") rememberSeat();
     if (["local-lobby", "local-game", "local-invitar", "local-unirse-compartir", "local-cercanas", "local-final", "local-final-secreta"].includes(screen)) renderCurrent();
@@ -641,6 +654,7 @@
     const cardMarkup = detalle => `<div class="cifra-card starter-card"><div class="starter-card-art" aria-label="Ilustración de ${escapeHtml(card.title)}">${animalArt(card)}</div>${categoryBadge(card)}<strong>${escapeHtml(card.title)}</strong><span>${detalle}</span></div>`;
     const ranking = starterRanking();
     if (ranking) {
+      CT.Effects?.starterResult?.(`wifi:${draw.cardId}:${Object.keys(draw.guesses).join(",")}`);
       const lista = ranking.map((id, i) => `<li${i === 0 ? ' class="starter-draw-winner"' : ""}><span>${i + 1}.º ${escapeHtml(roomState.players[id].name)}${id === myPlayerId ? " · tú" : ""}</span><span>${escapeHtml(CT.Duelo.Cifras.formato(modeKey, draw.guesses[id]))}</span></li>`).join("");
       const resultado = `${cardMarkup(`El valor real era ${escapeHtml(formatValue(card))}`)}<p class="hint">Orden de juego, de quien más se acercó a quien menos:</p><ol class="starter-draw-list">${lista}</ol>`;
       return `<div class="field starter-field"><span class="field-label">Quién empieza</span>${resultado}${isHost ? `${repetir}<button class="btn btn-primary btn-block" data-local-action="start">Empezar <span>→</span></button>` : '<p class="hint">Esperando al anfitrión para empezar.</p>'}</div>`;
@@ -814,8 +828,10 @@
     return Math.max(0, Math.ceil(seconds - (performance.now() - turnSeenAt) / 1000));
   }
 
+  let lastClockSecond = null;
   function manageTurnTimer() {
     clearTurnTimer();
+    lastClockSecond = null;
     if (turnRemaining() === null) return;
     const version = roomState.version;
     const tick = () => {
@@ -823,6 +839,8 @@
       const value = document.getElementById("turn-timer-value");
       if (value && remaining !== null) value.textContent = remaining;
       document.getElementById("turn-timer")?.classList.toggle("turn-timer-low", remaining !== null && remaining <= 5);
+      // Los tres últimos segundos de tu turno suenan y vibran.
+      if (remaining !== null && remaining <= 3 && remaining !== lastClockSecond && esMio(roomState.playerOrder[roomState.current])) { lastClockSecond = remaining; CT.Effects?.clock?.(remaining); }
       if (remaining === 0 && role === "host" && roomState?.version === version) {
         clearTurnTimer();
         const name = roomState.players[roomState.playerOrder[roomState.current]]?.name;

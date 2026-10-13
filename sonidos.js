@@ -210,6 +210,18 @@
       tono(nota(0, 57), t + .07, { dur: .22, vol: .09, eco: .1, timbre: 'madera' });
       return .4;
     },
+    // Un poder (Fantasma o Pulso): un brillo que sube y se queda flotando.
+    poder(t) {
+      [7, 9, 10, 12, 14].forEach((p, i) => tono(nota(p), t + i * .05, { dur: 1, vol: .06, eco: .8 }));
+      soplo(t, { tipo: 'bandpass', frec: 2400, vol: .03, ataque: .15, dur: .8, eco: .6 });
+      return 1.4;
+    },
+    // Plantarse y asegurar los aciertos: tres notas que suben y se quedan, como guardar algo.
+    asegurar(t) {
+      [0, 2, 4].forEach((p, i) => tono(nota(p, 62), t + i * .07, { dur: .5, vol: .11, eco: .3, timbre: 'madera' }));
+      tono(nota(7, 62), t + .21, { dur: 1.2, vol: .09, eco: .5 });
+      return 1.4;
+    },
     // Soplo: dos notas que entran despacio, para pasar de página y para los avisos.
     soplo(t) {
       tono(nota(3), t, { dur: .55, vol: .05, eco: .5, timbre: 'aire' });
@@ -277,6 +289,8 @@
       case 'back': racha = 0; aciertos = 0; fallos = 0; suena('vuelta'); ultimoSoplo = ahora(); break;
       case 'unroll': suena('despliegue'); ultimoSoplo = ahora(); break;
       case 'fold': suena('pliegue'); break;
+      case 'bank': suena('asegurar'); rico(); break;
+      case 'power': suena('poder'); rico(); break;
       case 'page': case 'open': case 'notice': {
         // Tras un acierto, un logro o un turno, el diálogo o el aviso que llega detrás no
         // pisa la cola; y una pantalla que abre un diálogo a la vez suena una sola vez.
@@ -294,7 +308,7 @@
 
   for (const evento of ['pointerdown', 'touchstart', 'keydown']) document.addEventListener(evento, despierta, { capture: true, passive: true });
   document.addEventListener('click', event => {
-    const confirmar = event.target.closest?.('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-turn-action="confirm-place"], [data-quick="confirm"]');
+    const confirmar = event.target.closest?.('[data-action="confirm-place"], [data-online-action="confirm-place"], [data-turn-action="confirm-place"], [data-quick="confirm"], [data-local-action="confirm-place"], [data-local-action="confirm-pulse"], [data-local-action="confirm-defense"], [data-online-action="confirm-pulse"], [data-online-action="confirm-defense"]');
     if (confirmar && !confirmar.disabled) confirm();
   }, true);
   document.addEventListener('visibilitychange', () => { if (document.hidden && ctx?.state === 'running') void ctx.suspend().catch(() => {}); });

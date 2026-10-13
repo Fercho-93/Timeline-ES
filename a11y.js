@@ -428,8 +428,10 @@
     container.querySelectorAll(':scope > .shell').forEach(node => node.classList.add('motion-managed'));
     window.CONTINUUM.UI?.mount(container, screen);
     if (!primero && cambioDePantalla && !quietPrimaryNavigation) {
-      const kind = ['winner', 'online-winner', 'solo-end', 'comp-end'].includes(screen) ? 'end'
-        : ['pass', 'pulse-pass', 'comp-intro', 'tournament-intro', 'online-competition-intro'].includes(screen) ? 'turn'
+      // Fin de partida (o de un tema de la competición por Wi-Fi) y momentos en que te toca: entrar en
+      // una final numérica o en un desempate también lo es.
+      const kind = ['winner', 'online-winner', 'solo-end', 'comp-end', 'cifras-end', 'local-final'].includes(screen) ? 'end'
+        : ['pass', 'pulse-pass', 'comp-intro', 'tournament-intro', 'online-competition-intro', 'final-local', 'online-final', 'online-tiebreak', 'local-final-secreta'].includes(screen) ? 'turn'
         : vuelve || (nextDepth !== undefined && nextDepth < previousDepth) ? 'back' : 'page';
       window.CONTINUUM.Effects?.transition?.(kind);
     }
