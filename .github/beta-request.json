@@ -1,9 +1,9 @@
 {
   "version": "0.1.1",
-  "cache": 690,
+  "cache": 691,
   "platforms": [
     "ios"
   ],
   "upload_testflight": true,
-  "reason": "Sonido y vibración en todos los modos (te toca, fin de partida, tiempo, láminas, logros, poderes, sorteo), plantarse con sonido propio en Retos rápidos y barra de navegación inferior más baja"
+  "reason": "Barra de navegación inferior realmente más baja, toque de sonido en todos los botones, sonido y vibración en todos los modos y plantarse con sonido propio en Retos rápidos"
 }
