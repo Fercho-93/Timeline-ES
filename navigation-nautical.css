@@ -5,18 +5,18 @@ html #app[data-screen][data-screen] .home-nav.atlas-nav {
   --nav-paper: #fbf3e2; --nav-paper-shade: #eee1c7;
   --nav-ink: #67502f; --nav-brass: #a17a3c; --nav-hairline: #b894596b;
   --nav-active: #284e54; --nav-gold: #ead19a;
-  position: fixed; left: 50%; right: auto; bottom: 0;
+  position: fixed; left: 0; right: 0; bottom: 0;
   width: min(calc(100% - 28px), 500px); max-width: 500px; min-height: calc(80px + env(safe-area-inset-bottom) * .3);
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch;
-  gap: 0; margin: 0; padding: 6px 9px calc(4px + env(safe-area-inset-bottom) * .3); overflow: visible;
+  gap: 0; margin: 0 auto; padding: 6px 9px calc(4px + env(safe-area-inset-bottom) * .3); overflow: visible;
   border: 1px solid var(--nav-brass); border-radius: 24px;
   background: radial-gradient(ellipse at 40% 0%, #fff9edb3, transparent 65%), linear-gradient(145deg, var(--nav-paper), var(--nav-paper-shade));
   box-shadow: inset 0 1px 0 #fff9e8, inset 0 -2px 0 #a17a3c24, 0 8px 22px #32261630, 0 2px 3px #3226161c;
   -webkit-backdrop-filter: none; backdrop-filter: none;
-  /* Capa propia y fija para el compositor: al desplazar la pantalla la barra no se recoloca en el hilo
-     principal y no tiembla (en iPhone, con inercia o al rebotar, una barra fija sin capa propia se
-     retrasa un fotograma respecto al contenido). */
-  transform: translate3d(-50%, 0, 0); -webkit-transform: translate3d(-50%, 0, 0);
+  /* Centrada con márgenes automáticos y no con `left: 50%` + `translate(-50%)`: en anchos impares eso
+     la dejaba a medio píxel y, en iPhone, vibraba al desplazar. Capa propia para el compositor, sin
+     desplazamiento, para que el iPhone no la recoloque mientras la pantalla se mueve. */
+  transform: translateZ(0); -webkit-transform: translateZ(0);
   will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
   contain: layout style; isolation: isolate;
   z-index: 15;
