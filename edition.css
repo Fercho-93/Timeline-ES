@@ -5314,3 +5314,79 @@ html #app .tiempo-segmented .segmented-option::after { content: none !important;
 #app .quick-shell .solo-home .solo-panel #quick-error { margin: 8px 0 0; }
 #app .quick-shell .solo-home .solo-panel #quick-error:empty { display: none; }
 
+
+/* Continuum v677: avisos y preparación con el mismo papel y filetes del menú. */
+#app .solo-shortcut-resume {
+  position: relative; grid-template-columns: minmax(0, 1fr) 42px; gap: 16px;
+  padding: 19px 22px; border: 1px solid var(--edition-brass); border-radius: 18px;
+  background: radial-gradient(ellipse at 0 0, #fffaf280, transparent 65%), var(--edition-paper);
+  box-shadow: inset 0 0 0 5px #fff7e740, inset 0 0 0 6px #b8976033, 0 5px 12px #6343231c;
+}
+#app .solo-shortcut-resume .solo-shortcut-copy { grid-row: auto; color: inherit; min-width: 0; }
+#app .solo-shortcut-copy em { display: block; margin-bottom: 5px; color: var(--edition-brass); font: 600 .62rem/1.2 var(--ui-font); letter-spacing: .13em; text-transform: uppercase; }
+#app .solo-shortcut-copy b { font: 600 1.12rem/1.2 var(--font-display); }
+#app .solo-shortcut-resume .solo-shortcut-arrow { grid-column: 2; grid-row: 1; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #b8976066; border-radius: 50%; background: #b8976012; color: var(--edition-brass); }
+#app .solo-shortcut-resume:focus-visible { outline: 2px solid var(--edition-brass); outline-offset: 4px; }
+#app .vidas-aviso {
+  gap: 14px; padding: 15px 18px; margin: 16px 0 12px;
+  border: 1px solid var(--edition-brass); border-radius: 18px;
+  background: linear-gradient(120deg, #b8976012, transparent 70%), var(--edition-paper);
+  box-shadow: inset 0 0 0 4px #fff7e733, inset 0 0 0 5px #b8976029, 0 4px 10px #63432314;
+}
+#app .vidas-aviso-corazones { display: flex; gap: 4px; font-size: 1.25rem; letter-spacing: 0; }
+#app .vidas-aviso-corazones i { display: grid; place-items: center; width: 26px; height: 32px; border: 1px solid #aa62463b; border-radius: 13px 13px 9px 9px; background: #ac463514; font-style: normal; text-shadow: 0 1px 0 #fff8; }
+#app .vidas-aviso b { margin-bottom: 3px; }
+#app .quick-free-setup .solo-panel { position: relative; border: 1px solid var(--edition-brass); box-shadow: inset 0 0 0 5px #fff7e733, inset 0 0 0 6px #b8976029, 0 10px 25px #6343231c; background: radial-gradient(ellipse at 15% 0, #fffaf280, transparent 65%), var(--edition-paper); }
+#app .quick-setup-kicker { display: block; margin-bottom: 8px; color: var(--edition-brass); font: 600 .64rem/1.2 var(--ui-font); letter-spacing: .14em; text-transform: uppercase; }
+#app .quick-free-setup .quick-length { gap: 10px; }
+#app .quick-free-setup .quick-length-chip { position: relative; min-height: 110px; padding: 17px 6px 12px; border-radius: 14px; overflow-wrap: normal; background: var(--edition-surface); color: var(--edition-ink); border-color: var(--edition-line); box-shadow: inset 0 0 0 4px #b8976012, 0 3px 8px #63432314; }
+#app .quick-free-setup .quick-length-chip small { font-size: .65rem; line-height: 1.3; color: var(--edition-muted); }
+#app .quick-free-setup .quick-length-chip.is-selected { border-color: var(--edition-brass); color: var(--edition-ink); background: linear-gradient(145deg, #b8976024, #b8976010), var(--edition-surface); box-shadow: inset 0 0 0 2px var(--edition-brass), 0 5px 12px #63432324; }
+#app .quick-free-setup .quick-length-chip.is-selected::after { content: "✓"; position: absolute; right: 7px; top: 6px; font: 700 .7rem/1 var(--ui-font); color: var(--edition-brass); }
+#app .quick-free-setup .quick-length-more { min-height: 44px; border: 1px solid var(--edition-line); border-radius: 12px; font-size: .82rem; background: #b897600a; }
+#app .quick-free-setup .tiempo-segmented { gap: 8px; }
+#app .quick-free-setup .tiempo-segmented .segmented-option { border-radius: 12px; background: var(--edition-surface); box-shadow: inset 0 0 0 3px #b8976012; }
+#app .quick-free-setup .tiempo-segmented .segmented-option.is-on { border-color: var(--edition-brass); box-shadow: inset 0 0 0 1px var(--edition-brass); background: linear-gradient(145deg, #b8976024, #b8976010), var(--edition-surface); }
+#app .quick-free-setup .tiempo-segmented b { font-size: .92rem; line-height: 1.15; }
+#app .quick-free-setup [data-quick="start-free"] { border-radius: 12px; color: #fff6e7; border-color: #75432c; background: linear-gradient(160deg, #986045, #77402d); box-shadow: inset 0 1px 0 #ffffff30, 0 4px 10px #63432325; }
+
+/* El reverso conserva el tamaño exterior. Rótulo, emblema y título tienen
+   zonas independientes; el ajuste de texto de immersion.js mantiene palabras enteras. */
+#app .hand-card, .drag-card-preview {
+  --cardback-fill: radial-gradient(ellipse at 50% 43%, #fffaf0 0 18%, transparent 55%), repeating-conic-gradient(from 0deg at 50% 43%, #b897600b 0deg 1deg, transparent 1deg 15deg), repeating-linear-gradient(45deg, #a77b380b 0 1px, transparent 1px 10px), repeating-linear-gradient(-45deg, #a77b380b 0 1px, transparent 1px 10px), linear-gradient(145deg, #f9efdb, #e7d0a6);
+}
+html #app .hand-card .carta-reverso::after, .drag-card-preview .carta-reverso::after {
+  content: ""; position: absolute; inset: auto; left: 50%; top: 43%; width: 58%;
+  height: auto; aspect-ratio: 1; border: 3px double #ab804d60; border-radius: 50%;
+  transform: translate(-50%, -50%); background: transparent;
+  box-shadow: 0 0 0 5px #ab804d0d, inset 0 0 0 5px #fff6e744;
+}
+html #app .hand-card .carta-reverso > .reverso-emblema,
+html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] :is(.board-focus-card, .atlas-hand-section) .hand .hand-card .carta-reverso > .reverso-emblema,
+.drag-card-preview .carta-reverso > .reverso-emblema {
+  position: absolute; left: 50%; top: 43%; transform: translate(-50%, -50%); width: 82% !important; height: 39% !important; z-index: 1;
+  object-fit: contain; object-position: center; animation: none;
+}
+html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-card, .atlas-hand-section) .hand .hand-card > strong,
+html #app.atlas-board[data-platform][data-device][data-screen][data-board-fit] :is(.board-focus-card, .atlas-hand-section) .hand .hand-card > strong,
+html #app .hand-card > strong, .drag-card-preview > strong {
+  position: absolute; inset: auto 9px 9px; box-sizing: border-box;
+  width: auto; min-width: 0; height: 29%; max-height: none; margin: 0; padding: 7px 6px;
+  display: flex; flex-direction: column; justify-content: center;
+  border: 1px solid #b8976066; border-radius: 5px;
+  font-size: .82rem; line-height: 1.15; text-align: center;
+  overflow: hidden; white-space: normal; overflow-wrap: normal !important;
+  word-break: normal !important; -webkit-hyphens: none !important; hyphens: none !important;
+  -webkit-line-clamp: unset;
+}
+html #app .hand-card > .hidden-date { position: absolute; inset: 12px 9px auto; margin: 0; text-align: center; padding: 0; }
+@media (max-width: 370px) {
+  #app .vidas-aviso { gap: 10px; padding: 14px 12px; }
+  #app .vidas-aviso-corazones { gap: 2px; }
+  #app .vidas-aviso-corazones i { width: 22px; }
+}
+
+html #app.atlas-board[data-platform][data-device][data-screen] :is(.board-focus-card, .atlas-hand-section) .hand .hand-card > .carta-reverso {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%; min-height: 0; padding: 0; margin: 0; background: var(--cardback-fill);
+}
+#app .quick-free-setup .solo-panel-head { display: block; }

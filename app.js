@@ -2428,7 +2428,7 @@
   if (!CT.Ghost.LEVELS[selectedDifficulty]) selectedDifficulty = "easy";
   // Antes de empezar: las tres vidas, grandes, para que se vean de un vistazo.
   function vidasAviso(detalle = "") {
-    return `<div class="vidas-aviso"><span class="vidas-aviso-corazones" aria-hidden="true">${"♥".repeat(SOLO_LIVES)}</span><p><b>Tienes ${SOLO_LIVES} vidas${detalle ? ` ${detalle}` : ""}.</b> Cada fallo cuesta una.</p></div>`;
+    return `<div class="vidas-aviso"><span class="vidas-aviso-corazones" aria-hidden="true">${Array.from({length: SOLO_LIVES}, () => "<i>♥</i>").join("")}</span><p><b>Tienes ${SOLO_LIVES} vidas${detalle ? ` ${detalle}` : ""}.</b> Cada fallo cuesta una.</p></div>`;
   }
   // El corazón recién perdido se pinta con su animación de rotura hasta pasar a la carta siguiente.
   let vidaRota = null;

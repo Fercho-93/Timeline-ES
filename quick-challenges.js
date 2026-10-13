@@ -145,7 +145,7 @@
         <p class="lead">Mazos sorpresa: ordena y suma aciertos.</p><p class="hint solo-dominadas">${total} retos en el catálogo. Un fallo no te echa: juegas cada reto entero.</p></div>
         ${pendiente ? button('resume','Continuar partida guardada <span>→</span>','btn btn-primary btn-block') : ''}
         <div class="panel solo-panel">
-          <div class="solo-panel-head"><h3>¿Cuánto quieres jugar?</h3></div>
+          <div class="solo-panel-head"><span class="quick-setup-kicker">Tu próxima aventura</span><h3>¿Cuánto quieres jugar?</h3></div>
           <p>Elige una duración. Los retos saldrán al azar, sin mostrarte cuáles son.</p>
           ${lengthChips('quick-free-length',[...options,[total,'Todo el catálogo']],'Duración de la partida')}${CT.Tiempo.field('quick-solo')}
           ${button('start-free',`${pendiente ? 'Empezar otra' : 'Empezar'} <span>→</span>`,`btn ${pendiente ? 'btn-secondary' : 'btn-primary'} btn-block`)}<p id="quick-error" role="alert">${esc(error)}</p>

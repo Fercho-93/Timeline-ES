@@ -308,7 +308,7 @@
   function soloShortcuts() {
     const resumen = window.CONTINUUM?.soloResumen?.();
     if (!resumen) return '';
-    const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} jugadas`}</small><span aria-hidden="true">→</span></button>`);
+    const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><span class="solo-shortcut-copy"><em>Partida guardada</em><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} jugadas`}</small></span><span class="solo-shortcut-arrow" aria-hidden="true">→</span></button>`);
     const ultimo = resumen.ultimo && !resumen.pendientes.some(p => p.mode === resumen.ultimo.mode)
       ? `<button type="button" class="solo-shortcut" data-action="solo-open-deck" data-solo-deck="${resumen.ultimo.mode}"><b>Último mazo: ${escapeHtml(resumen.ultimo.name)}</b><small>Jugar otra ronda</small><span aria-hidden="true">→</span></button>` : '';
     const items = [...pendientes, ultimo].filter(Boolean);
