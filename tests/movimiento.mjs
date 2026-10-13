@@ -591,8 +591,8 @@ function swipe(w, { target = el(w, "#app"), from = 30, to = 170, y = 320, dy = 0
   pointer(w, "pointerdown", target, from, y, pointerType);
   for (let paso = 1; paso <= steps; paso++) pointer(w, "pointermove", target, from + ((to - from) * paso) / steps, y + (dy * paso) / steps, pointerType);
   pointer(w, cancelado ? "pointercancel" : "pointerup", target, to, y + dy, pointerType);
-  // La salida se pulsa justo después del gesto (en el turno siguiente).
-  return sleep(5);
+  // La pantalla termina de apartarse (unos 220 ms) y la salida se pulsa justo después.
+  return sleep(320);
 }
 const pantalla = w => el(w, "#app").dataset.screen;
 {
@@ -637,6 +637,44 @@ const pantalla = w => el(w, "#app").dataset.screen;
   ok("una tira que se desplaza a los lados se queda el gesto", pantalla(w) === "setup");
   await swipe(w);
   ok("y fuera de ella el gesto sigue volviendo", pantalla(w) === "solo-home");
+  w.close();
+}
+{
+  // Mientras se arrastra, la pantalla sigue al dedo; si se suelta pronto, vuelve a su sitio.
+  const w = boot();
+  abreMazo(w, "historia", "history");
+  const shell = el(w, "#app > .shell");
+  pointer(w, "pointerdown", el(w, "#app"), 30, 320);
+  pointer(w, "pointermove", el(w, "#app"), 60, 322);
+  pointer(w, "pointermove", el(w, "#app"), 90, 323);
+  ok("arrastrando, la pantalla se aparta con el dedo", shell.style.left === "60px");
+  await sleep(150);
+  pointer(w, "pointermove", el(w, "#app"), 95, 323);
+  await sleep(150);
+  pointer(w, "pointerup", el(w, "#app"), 96, 323);
+  await sleep(320);
+  ok("soltada sin impulso y a poca distancia, vuelve a su sitio sin navegar", pantalla(w) === "solo-home" && !shell.style.left && !shell.style.boxShadow);
+  w.close();
+}
+{
+  // En el inicio, nada se mueve: no hay pantalla detrás.
+  const w = boot();
+  const shell = el(w, "#app > .shell, #app > *");
+  pointer(w, "pointerdown", el(w, "#app"), 30, 320);
+  pointer(w, "pointermove", el(w, "#app"), 120, 322);
+  ok("en el inicio la pantalla no sigue al dedo", !shell.style.left && !shell.style.translate);
+  pointer(w, "pointerup", el(w, "#app"), 120, 322);
+  w.close();
+}
+{
+  const w = boot();
+  click(w, '[data-action="rules"]');
+  const guia = w.document.querySelector(".overlay");
+  pointer(w, "pointerdown", el(w, ".modal"), 30, 320);
+  pointer(w, "pointermove", el(w, ".modal"), 100, 322);
+  ok("con un diálogo encima, lo que se aparta es el diálogo", guia.style.translate === "70px 0" && !el(w, "#app > .shell")?.style.left);
+  pointer(w, "pointerup", el(w, ".modal"), 100, 322);
+  await sleep(320);
   w.close();
 }
 {

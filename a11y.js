@@ -926,5 +926,7 @@
   window.CONTINUUM.openDialog = openDialog;
   window.CONTINUUM.closeDialog = closeDialog;
   window.CONTINUUM.backPressed = backPressed;
+  // El diálogo de encima, para que el gesto de volver sepa si lo puede apartar.
+  window.CONTINUUM.topDialog = () => pila.length ? { overlay: pila[pila.length - 1].overlay, cerrable: pila[pila.length - 1].cerrable } : null;
   window.CONTINUUM.prepareReturn = prepareReturn;
 })();

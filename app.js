@@ -4567,6 +4567,15 @@
     if (flecha?.dataset.localAction === "leave") return;
     if (flecha) { pulsa(flecha); return; }
     backMenu();
+  }, () => {
+    // Qué sigue al dedo mientras se desliza: lo mismo que decide arriba a dónde se vuelve.
+    // Un diálogo descartable se aparta él; uno obligado, nada. Sin diálogo, la pantalla,
+    // salvo donde el gesto no navega.
+    const encima = CT.topDialog?.();
+    if (encima) return encima.cerrable ? encima.overlay : null;
+    if (CT.isSessionActive() || (app.dataset.screen || screen) === "home") return null;
+    if (screenBackArrow()?.dataset.localAction === "leave" && !app.querySelector('[data-online-action="back"]')) return null;
+    return app;
   });
   // Qué mazos tiene abiertos quien juega lo decide `CT.Cartera.arranque()`, que ya se ha
   // ejecutado al cargarse `cartera.js`: este archivo necesita saberlo antes de elegir el
