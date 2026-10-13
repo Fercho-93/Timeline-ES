@@ -74,3 +74,53 @@
 }
 :root[data-theme="dark"] #app .guide-handbook .guide-frontispiece { filter: drop-shadow(0 8px 10px #0005); }
 @media (max-width: 360px) { #app .guide-handbook .guide-frontispiece { width: min(100%, 240px); } }
+
+/* Cuero bajo un cielo grabado; el pergamino conserva la claridad de lectura. */
+#app > .overlay > .rules:has(.guide-handbook) {
+  background:
+    radial-gradient(ellipse at 0 0, #40616b1c, transparent 52%),
+    radial-gradient(ellipse at 100% 35%, #ba985222, transparent 55%),
+    repeating-linear-gradient(0deg, #96744504 0 1px, transparent 1px 4px),
+    var(--edition-paper);
+}
+#app .guide-handbook > .atlas-page-heading {
+  padding: 30px 22px 28px; overflow: hidden; border-color: #947345;
+  border-radius: 20px 20px 8px 8px;
+  background:
+    radial-gradient(ellipse at 50% 28%, #d8ad6359, transparent 54%),
+    radial-gradient(ellipse at 12% 0, #577b8060, transparent 55%),
+    linear-gradient(150deg, #2c444c, #1b3039 58%, #172b32);
+  box-shadow: inset 0 0 0 6px #172b3220, inset 0 0 0 7px #dfc18a59,
+    inset 0 -45px 65px #0e202d55, 0 14px 28px #25353b2b, 0 2px 3px #82603830;
+}
+#app .guide-handbook > .atlas-page-heading::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: url('assets/guide-celestial-v1.svg') center top / cover no-repeat; opacity: .42;
+}
+#app .guide-handbook > .atlas-page-heading::after {
+  height: 7px; width: 112px; margin-top: 20px; opacity: .8;
+  background: radial-gradient(circle, #e5c891 0 2px, transparent 2.5px) center / 7px 7px no-repeat,
+    linear-gradient(90deg, transparent, #bd965b) left center / 43px 1px no-repeat,
+    linear-gradient(90deg, #bd965b, transparent) right center / 43px 1px no-repeat;
+}
+#app .guide-handbook > .atlas-page-heading .eyebrow { color: #f8e8c5; text-shadow: 0 1px 6px #0d1c26; }
+#app .guide-handbook > .atlas-page-heading h1 {
+  color: #fff0d2; text-shadow: 0 2px 1px #0c1b23, 0 0 25px #e6bb5e25;
+}
+#app .guide-handbook > .atlas-page-heading p { color: #f0ebdf; }
+#app .guide-handbook > .atlas-page-heading .guide-frontispiece {
+  position: relative; filter: drop-shadow(0 12px 9px #091c2d75);
+}
+:root[data-theme="dark"] #app > .overlay > .rules:has(.guide-handbook) {
+  background: radial-gradient(ellipse at 0 0, #39535e38, transparent 50%),
+    radial-gradient(ellipse at 100% 35%, #ae81431c, transparent 55%), var(--edition-paper);
+}
+:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading {
+  background: radial-gradient(ellipse at 50% 28%, #bf914a40, transparent 54%),
+    linear-gradient(150deg, #263e47, #142831 70%, #10222a);
+  box-shadow: inset 0 0 0 6px #10222a20, inset 0 0 0 7px #dfc18a45,
+    inset 0 -45px 65px #07161d55, 0 14px 28px #0005;
+}
+@media (max-width: 360px) {
+  #app .guide-handbook > .atlas-page-heading { padding-inline: 16px; }
+}
