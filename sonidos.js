@@ -195,19 +195,23 @@
     },
     // Los toques del menú son de madera: secos, graves y sin cola, de la familia de la
     // marimba de confirmar. Se notan sin competir con los sonidos de la partida.
-    // Tocar una tarjeta o abrir un panel: un solo toque.
-    pagina(t) { tono(nota(3, 57), t, { dur: .18, vol: .1, eco: .08, timbre: 'madera' }); return .3; },
-    // Volver atrás: un toque más grave.
-    vuelta(t) { tono(nota(0, 50), t, { dur: .22, vol: .13, eco: .08, timbre: 'madera' }); return .3; },
-    // Desplegar una colección: dos toques que suben; plegarla, los mismos al revés.
+    // Tocar un botón del menú: un toque de madera que sube un escalón de la escala cada vez que se
+    // avanza, de grave a agudo (ver `escalon`). Tras unos segundos sin tocar nada, vuelve al grave.
+    pagina(t) { tono(nota(sube(), BASE_MENU), t, { dur: .18, vol: .1, eco: .08, timbre: 'madera' }); return .3; },
+    // Volver atrás: siempre este mismo toque grave, el de Atlas, y solo en los botones de volver.
+    // Baja un escalón la escala del menú, para que lo siguiente que se avance retome desde ahí.
+    vuelta(t) { escalon = Math.max(0, escalon - 1); tono(nota(0, 50), t, { dur: .22, vol: .13, eco: .08, timbre: 'madera' }); return .3; },
+    // Desplegar una colección: dos toques que suben (y avanzan la escala); plegarla, los mismos al revés.
     despliegue(t) {
-      tono(nota(0, 57), t, { dur: .2, vol: .1, eco: .1, timbre: 'madera' });
-      tono(nota(2, 57), t + .07, { dur: .22, vol: .11, eco: .12, timbre: 'madera' });
+      const p = sube();
+      tono(nota(p, BASE_MENU), t, { dur: .2, vol: .1, eco: .1, timbre: 'madera' });
+      tono(nota(p + 2, BASE_MENU), t + .07, { dur: .22, vol: .11, eco: .12, timbre: 'madera' });
       return .4;
     },
     pliegue(t) {
-      tono(nota(2, 57), t, { dur: .2, vol: .1, eco: .08, timbre: 'madera' });
-      tono(nota(0, 57), t + .07, { dur: .22, vol: .09, eco: .1, timbre: 'madera' });
+      const p = Math.max(0, escalon - 1); escalon = p;
+      tono(nota(p + 2, BASE_MENU), t, { dur: .2, vol: .1, eco: .08, timbre: 'madera' });
+      tono(nota(p, BASE_MENU), t + .07, { dur: .22, vol: .09, eco: .1, timbre: 'madera' });
       return .4;
     },
     // Un poder (Fantasma o Pulso): un brillo que sube y se queda flotando.
@@ -230,8 +234,21 @@
     }
   };
 
+  // La escala del menú: cada botón que se pulsa para avanzar suena un escalón más agudo que el anterior
+  // (de la escala pentatónica, dos octavas) y se queda arriba; volver baja un escalón. Si pasan
+  // ESCALA_REPOSO ms sin tocar nada, empieza de nuevo por el grave.
+  const BASE_MENU = 55, ESCALON_MAX = 9, ESCALA_REPOSO = 10000;
+  let escalon = 0, ultimoEscalon = -Infinity;
+  function sube() {
+    const t = ahora();
+    if (t - ultimoEscalon > ESCALA_REPOSO) escalon = 0;
+    ultimoEscalon = t;
+    const actual = escalon;
+    escalon = Math.min(ESCALON_MAX, escalon + 1);
+    return actual;
+  }
   const ultimo = {};
-  let ultimoSonido = -Infinity;
+  let ultimoSonido = -Infinity, ultimoAtras = -Infinity;
   function suena(nombre, retraso = 0, ...args) {
     if (!activo()) return null;
     // Una misma acción puede avisar dos veces (soltar una carta lo cuenta el arrastre y
@@ -288,7 +305,14 @@
       }
       // Volver atrás y desplegar o plegar una colección tienen voz propia: son toques
       // deliberados y tienen que oírse, no insinuarse como el pasar de página.
-      case 'back': racha = 0; aciertos = 0; fallos = 0; suena('vuelta'); ultimoSoplo = ahora(); break;
+      // Volver atrás suena solo al pulsar un botón de volver (o deslizar para volver), y siempre igual.
+      // Un cambio de pantalla "hacia atrás" provocado por otra cosa es un toque de menú más.
+      case 'back': {
+        racha = 0; aciertos = 0; fallos = 0;
+        if (ahora() - ultimoAtras < 1500) { ultimoSoplo = ahora(); break; }
+        suena('pagina'); ultimoSoplo = ahora();
+        break;
+      }
       case 'unroll': suena('despliegue'); ultimoSoplo = ahora(); break;
       case 'fold': suena('pliegue'); break;
       case 'bank': suena('asegurar'); rico(); break;
@@ -312,10 +336,21 @@
   // Todo botón suena: si el toque no ha provocado ningún sonido propio (cambiar de pantalla, abrir un
   // panel, elegir una carta…) en los 90 ms siguientes, se oye el toque de madera de menú. Así ningún
   // botón queda mudo y ninguno suena dos veces.
+  // Los botones de volver: la flecha de la cabecera (todas las mesas y salas) y los de volver de cada pantalla.
+  const VOLVER = '.atlas-back, .turn-duel-back, [aria-label^="Volver"], [data-action="ui-back"], [data-action="collection-back"], [data-action="back-menu"], [data-online-action="back"], [data-online-action="back-from-timeline"], [data-turn-action="back"], [data-action="public-match-back"], [data-action="enc-back"], [data-action="enc-card-close"]';
+  function atras() {
+    ultimoAtras = ahora(); ultimoSoplo = ultimoAtras;
+    racha = 0; aciertos = 0; fallos = 0;
+    suena('vuelta');
+  }
+  document.addEventListener('click', event => {
+    const el = event.target.closest?.(VOLVER);
+    if (el && !el.disabled && el.getAttribute('aria-disabled') !== 'true') atras();
+  }, true);
   const TOCABLE = 'button, a[href], summary, [role="button"], [role="radio"], [role="tab"], [data-action], [data-quick], [data-online-action], [data-local-action], [data-turn-action], [data-account-action], [data-settings-action]';
   document.addEventListener('click', event => {
     const el = event.target.closest?.(TOCABLE);
-    if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true' || el.closest('[inert]')) return;
+    if (!el || el.matches(VOLVER) || el.disabled || el.getAttribute('aria-disabled') === 'true' || el.closest('[inert]')) return;
     const t0 = ahora();
     setTimeout(() => {
       if (ultimoSonido >= t0 || !activo()) return;
@@ -332,7 +367,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden && ctx?.state === 'running') void ctx.suspend().catch(() => {}); });
 
   CT.Sonidos = {
-    cue, result, confirm, discovery, achievement, clock,
+    cue, result, confirm, discovery, achievement, clock, atras,
     // La prueba de Ajustes: un acierto, para oír el volumen elegido.
     test() { if (master) master.gain.value = volumen(); suena('acierto', 0, 0); }
   };

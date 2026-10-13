@@ -73,6 +73,8 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
   const w = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g,''), {runScripts:'outside-only',url:'https://continuum.test/',pretendToBeVisual:true}).window;
   w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});w.Element.prototype.scrollIntoView=()=>{};
   let contexts=0, notas=0, master=null;
+  // El tono fundamental de cada sonido (la primera voz de cada nota), para comprobar la altura.
+  const graves=[];
   const param=()=>({value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}});
   const nodo=extra=>({connect(){},disconnect(){},...extra});
   w.AudioContext=function(){
@@ -84,7 +86,7 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
       createBiquadFilter:()=>nodo({frequency:param(),Q:param()}),
       createConvolver:()=>nodo(),
       createBuffer:(c,n)=>({getChannelData:()=>new Float32Array(n)}),
-      createOscillator:()=>nodo({frequency:param(),start(){notas++;},stop(){}}),
+      createOscillator:()=>{let v=0;return nodo({frequency:{...param(),get value(){return v;},set value(x){v=x;graves.push(x);}},start(){notas++;},stop(){}});},
       createBufferSource:()=>nodo({start(){},stop(){}})});
   };
   for(const m of html.matchAll(/<script src="([^"]+)"><\/script>/g))w.eval(read(m[1]));
@@ -97,6 +99,26 @@ console.log('Efectos apagados, preferencias antiguas y ajustes de ambiente/vibra
       const antes=notas;accion();assert.ok(notas>antes,`${paso} suena`);
     }
     assert.ok(Math.abs(master.gain.value-.8*.7*.7)<1e-9,'volumen por defecto, 70 %');
+    // Los botones del menú suenan cada vez más agudos al ir avanzando, y volver atrás suena siempre igual
+    // (el toque grave de Atlas) y solo en los botones de volver.
+    {
+      await new Promise(r=>w.setTimeout(r,11000));
+      const host=w.document.createElement('div');host.id='menu-prueba';w.document.body.append(host);
+      host.innerHTML='<button id="b1">Uno</button><button id="b2">Dos</button><button id="b3">Tres</button><button id="b4">Cuatro</button><button id="v1" class="icon-btn atlas-back" aria-label="Volver a la pantalla anterior">‹</button><button id="v2" aria-label="Volver">‹</button><button id="v3" data-action="ui-back">‹</button>';
+      const toque=async id=>{graves.length=0;host.querySelector(id).click();await new Promise(r=>w.setTimeout(r,320));return graves[0];};
+      const subida=[];
+      for(const id of ['#b1','#b2','#b3','#b4'])subida.push(await toque(id));
+      assert.ok(subida.every(Number.isFinite)&&subida.every((f,i)=>i===0||f>subida[i-1]*1.03),`cada botón suena más agudo que el anterior: ${subida.map(f=>Math.round(f))}`);
+      const atras=[];
+      for(const id of ['#v1','#v2','#v3'])atras.push(await toque(id));
+      assert.ok(atras.every(f=>Math.abs(f-atras[0])<atras[0]*.01),`volver suena siempre igual: ${atras.map(f=>Math.round(f))}`);
+      assert.ok(atras[0]<subida[0],'y es más grave que los toques de avanzar');
+      // Una pantalla que cambia "hacia atrás" sin pulsar volver no usa el sonido de volver.
+      await new Promise(r=>w.setTimeout(r,1700));
+      graves.length=0;CT.Effects.transition('back');await new Promise(r=>w.setTimeout(r,50));
+      assert.ok(graves.length>0&&Math.abs(graves[0]-atras[0])>atras[0]*.05,'solo los botones de volver usan el sonido de volver');
+      host.remove();
+    }
     // Ningún botón queda mudo: uno sin sonido propio suena con el toque de menú, y uno que ya provoca
     // su sonido no suena dos veces. Uno desactivado no suena.
     {

@@ -91,6 +91,7 @@
     // drag.js: no todos los navegadores lo disparan, así que no se puede esperar sentado.
     document.addEventListener("click", swallow, { capture: true, once: true });
     setTimeout(() => document.removeEventListener("click", swallow, { capture: true }), 0);
+    window.CONTINUUM.Sonidos?.atras?.();
     goBack();
   }
 
