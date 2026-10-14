@@ -4617,6 +4617,7 @@
   const duelPayload = params.get("duelo") || "";
   const turnDuelId = params.get("turnoduelo") || "";
   CT.openQuickChallenges = quickChallenges;
+  CT.openGuide = rules;
   if (params.has("quick-room") || params.has("quick-duel")) quickChallenges({quickRoom: params.get("quick-room"), quickDuel: params.get("quick-duel")});
   else if (invitedRoom) launchOnline(invitedRoom);
   else if (turnDuelId) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: turnDuelId, mode: selectedModeKey, back: home }));

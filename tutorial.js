@@ -185,7 +185,7 @@
       { chapter: 2, title: "¡A jugar!", duration: 4000, last: true,
         html: `<div class="tv-center tv-end"><div class="tv-logo">¡Ya sabes jugar!</div><p>Para tu primera partida: «Jugar solo», un mazo de Grandes colecciones, en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button><button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button></div></div>`,
         steps: [
-          [0, c => { c.say("¡Listo! Ya sabes jugar. Los detalles están en el manual, debajo."); c.add(".tv-end", "is-in"); }]
+          [0, c => { c.say("¡Listo! Ya sabes jugar. Cada detalle está en el manual de la Guía."); c.add(".tv-end", "is-in"); }]
         ] }
     ];
   }
@@ -418,7 +418,11 @@
       else if (action === "prev") go(t > 1500 ? index : index - 1);
       else if (action === "next") go(index + 1);
       else if (action === "replay") go(0);
-      else if (action === "manual") root.closest(".guide-handbook")?.querySelector(".guide-manual")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+      else if (action === "manual") {
+        // Dentro de la Guía el manual está debajo; fuera (en Inicio), se abre la Guía.
+        const manual = root.closest(".guide-handbook")?.querySelector(".guide-manual");
+        if (manual) manual.scrollIntoView?.({ behavior: "smooth", block: "start" }); else { stop(); CT.openGuide?.(); }
+      }
     });
     // Tocar la pantalla pausa o reanuda, como en un vídeo (salvo en la jugada propia).
     root.querySelector(".tv-screen").addEventListener("click", event => {
