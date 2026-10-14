@@ -3464,6 +3464,34 @@
       }
     },
     {
+      "path": "assets/cofre-oak-v1.webp",
+      "sha256": "505b158769b7c20c3f124cf51e985a7adb1f21f82a9e8c20dada9cd70d5d41a6",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "docs/cofre-intro.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-10-15",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
+      "path": "assets/cofre-voyage-v1.webp",
+      "sha256": "ba4147305bf840e5d44b024e073ae4d3ba12eec3f6abf474dab2c475683aeed2",
+      "rightsEvidence": {
+        "status": "user-confirmed-ai-generated",
+        "generator": "ChatGPT / OpenAI",
+        "declaredBy": "Fercho-93",
+        "evidenceRef": "docs/cofre-intro.md",
+        "exactPrompt": null,
+        "generatedAt": "2026-10-15",
+        "referenceImage": null,
+        "commercialTermsRef": "terms-to-preserve"
+      }
+    },
+    {
       "path": "assets/competition-engraving.webp",
       "sha256": "c9812eda2cd1ca2ef46c93136550dbeceffa40def8b513ffe4186fe160414d60",
       "rightsEvidence": {

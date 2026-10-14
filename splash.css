@@ -540,22 +540,23 @@ html.splash-active #app-splash .splash-masthead {
 /* El cofre del juego: la primera vez, antes de la portada, se está en cubierta en alta mar,
    con tierra al fondo, y un cofre de madera cerrado espera un toque (lo monta splash.js solo
    esa vez). Mientras el cofre está cerrado, la intro de debajo queda parada en su primer
-   fotograma: arranca al abrirlo. El mar, la cubierta y el cofre están dibujados a mano en
-   SVG y CSS: no hace falta ninguna lámina nueva. */
+   fotograma: arranca al abrirlo. Paisaje pintado y cofre 3D con materiales propios. */
 html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop, .splash-crest-in, .splash-coin, .splash-swirl, .splash-halo, .splash-glint,
   .home-wordmark span, .home-tagline span, .home-ornament i, .home-ornament span, .splash-float-card, .splash-sunbeam, .splash-sparkles) { animation-play-state: paused; }
 #app-splash .splash-caja-escena {
-  --w: clamp(190px, min(60vmin, 38svh), 330px);
+  --w: clamp(180px, min(62vmin, 34svh), 340px);
   --d: calc(var(--w) * .58);
   --h: calc(var(--w) * .36);
   --r: calc(var(--w) * .17);
-  --tinta: #2b1a0e;
+  --tinta: #392514;
+  --cofre-metal: linear-gradient(90deg, transparent 12.5%, #392c1d 13%, #b89a5b 14%, #74603d 16%, #342b20 18%, transparent 18.5%, transparent 81.5%, #392c1d 82%, #b89a5b 83%, #74603d 85%, #342b20 87%, transparent 87.5%);
+  --cofre-roble: url("assets/cofre-oak-v1.webp");
   position: absolute;
   z-index: 40;
   inset: 0;
   overflow: hidden;
   color: #f3e6cc;
-  background: #9dbfd0;
+  background: #243e4b;
   cursor: pointer;
   transition: opacity 500ms ease;
 }
@@ -564,19 +565,14 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
 #app-splash.splash-caja-abriendo .splash-caja-escena::after { animation: caja-oscurece .7s 2.1s ease-in forwards; }
 #app-splash .splash-caja-escena.caja-se-va { opacity: 0; pointer-events: none; }
 
-/* El fondo: cielo, sol, tierra, mar y cubierta. Todo cabalga con el balanceo del barco. */
-#app-splash .cofre-mar { position: absolute; inset: -3%; z-index: 0; animation: barco-balanceo 7s ease-in-out infinite; }
-#app-splash .cofre-mar svg { display: block; width: 100%; height: 100%; }
-#app-splash .cofre-mar .ola { animation: cofre-ola var(--t, 9s) ease-in-out infinite alternate; }
-#app-splash .cofre-mar .ola-2 { --t: 11s; animation-direction: alternate-reverse; }
-#app-splash .cofre-mar .ola-3 { --t: 8s; }
-#app-splash .cofre-mar .nube { animation: cofre-nube 60s linear infinite; }
-#app-splash .cofre-mar .nube-2 { animation-duration: 85s; animation-delay: -30s; }
-#app-splash .cofre-mar .gaviota { animation: cofre-gaviota 26s linear infinite; }
-#app-splash .cofre-mar .gaviota-2 { animation-delay: -11s; animation-duration: 34s; }
-#app-splash .cofre-mar .destello { animation: cofre-destello 3.2s ease-in-out infinite alternate; }
+/* Una lámina de materiales reales, sin líneas de oleaje repetidas. El pequeño
+   movimiento compartido mantiene el cofre apoyado en la cubierta. */
+#app-splash .cofre-mar { position: absolute; inset: -2%; z-index: 0; animation: barco-balanceo 10s ease-in-out infinite; }
+#app-splash .cofre-paisaje { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 65%; }
+#app-splash .cofre-mar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #f3dfb329, transparent 24%, transparent 68%, #180f0a70), radial-gradient(ellipse, transparent 45%, #15232b38); }
+#app-splash .cofre-reflejo { position: absolute; inset: 36% 6% 35%; background: radial-gradient(ellipse at 22% 55%, #ffe8ad36, transparent 55%); mix-blend-mode: screen; animation: cofre-destello 5s ease-in-out infinite alternate; pointer-events: none; }
 /* El cofre se apoya en la cubierta: su base cae donde empiezan los tablones (en torno al 80 % de alto). */
-#app-splash .caja-mundo { position: absolute; z-index: 1; inset: 0; display: grid; place-items: end center; padding-bottom: 3svh; perspective: 1100px; perspective-origin: 50% 30%; animation: barco-balanceo 7s ease-in-out infinite; }
+#app-splash .caja-mundo { position: absolute; z-index: 1; inset: 0; display: grid; place-items: end center; padding-bottom: max(5svh, 32px); perspective: 1100px; perspective-origin: 50% 30%; animation: barco-balanceo 10s ease-in-out infinite; }
 #app-splash .caja-zoom { display: grid; justify-items: center; transform-origin: 50% 60%; }
 #app-splash.splash-caja-abriendo .caja-zoom { animation: caja-entra .95s 1.95s cubic-bezier(.6,0,.85,.45) forwards; }
 #app-splash .caja-etiqueta,
@@ -591,9 +587,11 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
   text-align: center;
   pointer-events: none;
 }
+#app-splash .caja-etiqueta span { display: block; margin-bottom: 12px; font: 500 .58rem/1.4 var(--ui-font, system-ui, sans-serif); letter-spacing: .28em; text-transform: uppercase; }
+#app-splash .caja-etiqueta i { display: block; margin-top: 14px; color: #876130; font-size: .8rem; font-style: normal; }
 #app-splash .caja-etiqueta { top: max(26px, calc(env(safe-area-inset-top) + 14px)); color: #3a2a1a; text-shadow: 0 1px 0 #fff6e2b0, 0 0 14px #fff2d4; animation: caja-aparece .8s 1s ease-out both; }
 #app-splash .caja-etiqueta b { font-style: normal; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: #27231f; }
-#app-splash .caja-pista { bottom: max(26px, calc(env(safe-area-inset-bottom) + 14px)); color: #f8e8c6; text-shadow: 0 1px 2px #000000a6; animation: caja-aparece .7s 1.5s ease-out both, caja-late 2.2s 2.2s ease-in-out infinite; }
+#app-splash .caja-pista { bottom: max(26px, calc(env(safe-area-inset-bottom) + 14px)); color: #fff0cf; font-size: .88rem; letter-spacing: .06em; text-shadow: 0 2px 5px #000, 0 0 16px #000; animation: caja-aparece .7s 1.5s ease-out both; }
 #app-splash.splash-caja-abriendo :is(.caja-etiqueta, .caja-pista) { animation: caja-desaparece .3s ease-out forwards; }
 
 #app-splash .caja-mesa { position: relative; display: grid; place-items: center; width: calc(var(--w) * 1.6); height: calc(var(--w) * 1.05); }
@@ -612,7 +610,7 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
 /* La llegada y el vaivén van en un envoltorio plano: una animación (con opacidad) sobre el
    propio cofre hace que Chromium aplane su 3D. Por lo mismo el cofre es un div con rol de
    botón, no un <button>, y el haz de luz queda fuera de él. */
-#app-splash .caja-cae { display: block; animation: caja-llega 1.1s cubic-bezier(.34,1.3,.5,1) both; }
+#app-splash .caja-cae { display: block; animation: caja-llega 1.4s cubic-bezier(.2,.7,.3,1) both; }
 #app-splash .caja {
   position: relative;
   width: var(--w);
@@ -620,25 +618,28 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transform-style: preserve-3d;
-  transform: rotateX(-20deg) rotateY(-28deg);
+  transform: rotateX(-22deg) rotateY(-18deg);
 }
 #app-splash .caja:focus-visible { outline: 3px solid #f8e2af; outline-offset: 18px; border-radius: 8px; }
+#app-splash.splash-caja-abriendo .caja:focus-visible { outline: none; }
 #app-splash .caja-cuerpo,
 #app-splash .caja-tapa,
 #app-splash .caja-cartas { position: absolute; left: 50%; top: 50%; display: block; width: var(--w); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2); transform-style: preserve-3d; }
-/* Cada cara es madera de tablones con contorno de tinta; los herrajes van pintados encima. */
-#app-splash .caja-cara {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: block;
-  box-sizing: border-box;
-  border: 2px solid var(--tinta);
-  background:
-    linear-gradient(90deg, transparent 13%, #2d2a28 13%, #4a4542 14.5%, #2d2a28 18%, transparent 18%, transparent 82%, #2d2a28 82%, #4a4542 83.5%, #2d2a28 87%, transparent 87%),
-    repeating-linear-gradient(180deg, #8a5a30 0, #7a4b26 22%, #5c3515 23%, #4a2a10 25%, #8a5a30 26%),
-    #7a4b26;
-  box-shadow: inset 0 0 0 1px #c08a5a55, inset 0 0 40px #2a150a66;
+/* Textura de roble horizontal, duelas y herrajes de latón con bordes finos. */
+#app-splash .caja-cara,
+#app-splash .caja-duela {
+  position: absolute; left: 50%; top: 50%; display: block; box-sizing: border-box;
+  border: 1px solid var(--tinta);
+  background: var(--cofre-metal), repeating-linear-gradient(180deg, transparent 0 24%, #24160c99 24.5% 25%, transparent 25.5% 49%), var(--cofre-roble) center / cover, #704624;
+  box-shadow: inset 0 1px 0 #e8c58e80, inset 0 -2px 5px #140b0799, inset 0 0 22px #28170e55;
+}
+#app-splash .caja-duela {
+  width: var(--w); height: calc(var(--w) * var(--lh) + 1px);
+  margin-left: calc(var(--w) / -2); margin-top: calc(var(--w) * var(--lh) / -2);
+  background: var(--cofre-metal), var(--cofre-roble) center / cover, #704624;
+  filter: brightness(var(--shade));
+  transform: translate3d(0, calc(var(--w) * var(--ly)), calc(var(--w) * var(--lz))) rotateX(var(--la));
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
 #app-splash :is(.caja-frente, .caja-atras, .caja-tapa-frente, .caja-tapa-atras) { width: var(--w); margin-left: calc(var(--w) / -2); }
 #app-splash :is(.caja-izquierda, .caja-derecha, .caja-tapa-izquierda, .caja-tapa-derecha) { width: var(--d); margin-left: calc(var(--d) / -2); }
@@ -655,7 +656,7 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
   background:
     radial-gradient(circle at 50% 18%, #d9c08a 0 1.5px, #3a3534 2.2px, transparent 3.5px),
     radial-gradient(circle at 50% 82%, #d9c08a 0 1.5px, #3a3534 2.2px, transparent 3.5px),
-    linear-gradient(90deg, #26211f, #4e4845 50%, #26211f);
+    linear-gradient(90deg, #3b2c1c, #aa8b51 30%, #74603d 55%, #3b2c1c);
 }
 #app-splash .caja-frente::before { left: -2px; }
 #app-splash .caja-frente::after { right: -2px; }
@@ -724,8 +725,8 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
 #app-splash.splash-caja-abriendo .caja-tapa { animation: caja-abre 1.5s .35s cubic-bezier(.3,.9,.3,1) forwards; }
 #app-splash :is(.caja-tapa-frente, .caja-tapa-atras, .caja-tapa-izquierda, .caja-tapa-derecha) { height: var(--r); margin-top: calc(var(--h) / -2 - var(--r) + 2px); }
 /* Los laterales de la tapa llevan el arco que le da el abombado. */
-#app-splash :is(.caja-tapa-izquierda, .caja-tapa-derecha) { border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: radial-gradient(ellipse at 50% 100%, #8a5a30, #5c3515 70%, #3a2010); }
-#app-splash .caja-tapa-frente { transform: translateZ(calc(var(--d) / 2 + 2px)); background: linear-gradient(180deg, #a06a3a, #7a4b26 40%, #5c3515); }
+#app-splash :is(.caja-tapa-izquierda, .caja-tapa-derecha) { border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: linear-gradient(180deg, #a77c4530, #170d0870), var(--cofre-roble) center / cover, #704624; }
+#app-splash .caja-tapa-frente { transform: translateZ(calc(var(--d) / 2 + 2px)); background: var(--cofre-metal), linear-gradient(180deg, #c7a96a33, #170d0855), var(--cofre-roble) center / cover, #704624; }
 #app-splash .caja-tapa-frente::before { content: ""; position: absolute; inset: 22% 32% 22%; border: 2px solid var(--tinta); background: linear-gradient(90deg, #2d2a28, #5a5350 50%, #2d2a28); }
 #app-splash .caja-tapa-atras { transform: rotateY(180deg) translateZ(calc(var(--d) / 2 + 2px)); }
 #app-splash .caja-tapa-izquierda { transform: rotateY(-90deg) translateZ(calc(var(--w) / 2 + 2px)); }
@@ -736,15 +737,13 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
   width: calc(var(--w) + 4px);
   height: calc(var(--d) + 4px);
   margin: calc(var(--d) / -2 - 2px) 0 0 calc(var(--w) / -2 - 2px);
-  /* Tablones a lo largo y una sombra que curva la tapa hacia los bordes. */
-  background:
-    linear-gradient(180deg, #2a150a80, transparent 22%, transparent 78%, #2a150a80),
-    linear-gradient(90deg, transparent 13%, #2d2a28 13%, #4a4542 14.5%, #2d2a28 18%, transparent 18%, transparent 82%, #2d2a28 82%, #4a4542 83.5%, #2d2a28 87%, transparent 87%),
-    repeating-linear-gradient(90deg, #9a6638 0, #8a5a30 18%, #5c3515 19%, #4a2a10 21%, #9a6638 22%);
-  transform: rotateX(90deg) translateZ(calc(var(--h) / 2 + var(--r) - 2px));
+  /* Las duelas dibujan la curva. Este plano solo sostiene el medallón. */
+  background: none; border: 0; box-shadow: none;
+  transform: rotateX(90deg) translateZ(calc(var(--h) / 2 + var(--r) + 4px));
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+#app-splash :is(.caja-tapa-frente, .caja-tapa-atras) { height: 3px; margin-top: calc(var(--h) / -2 - 1px); }
 /* Medallón de latón grabado con el emblema, en el centro de la tapa. */
 #app-splash .caja-tapa-arriba img {
   width: 40%;
@@ -762,11 +761,11 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
   width: var(--w);
   height: var(--d);
   margin: calc(var(--d) / -2) 0 0 calc(var(--w) / -2);
-  background: linear-gradient(180deg, #5a3a1e, #3e2611);
+  background: linear-gradient(#27190c88, #27190c88), var(--cofre-roble) center / cover, #3e2611;
   box-shadow: inset 0 0 0 3px #2a160a, inset 0 0 40px #00000060;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  transform: rotateX(90deg) translateZ(calc(var(--h) / 2 + var(--r) - 4px)) rotateY(180deg);
+  transform: rotateX(90deg) translateZ(calc(var(--h) / 2 - 1px)) rotateY(180deg);
 }
 /* El candado de latón que cierra el cofre: se abre y cae al tocar. */
 #app-splash .caja-sello {
@@ -791,15 +790,12 @@ html.splash-active.splash-caja #app-splash :is(.splash-curtain, .splash-backdrop
 #app-splash.splash-caja-abriendo .caja-sello { animation: caja-sello-salta .55s ease-in forwards; }
 
 @keyframes barco-balanceo {
-  0%, 100% { transform: rotate(-.8deg) translateY(0); }
-  50% { transform: rotate(.8deg) translateY(-6px); }
+  0%, 100% { transform: rotate(-.25deg) translateY(0); }
+  50% { transform: rotate(.25deg) translateY(-3px); }
 }
-@keyframes cofre-ola { from { transform: translateX(-2.5%); } to { transform: translateX(2.5%); } }
-@keyframes cofre-nube { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
-@keyframes cofre-gaviota { from { transform: translate(-30%, 0); } 50% { transform: translate(10%, -3%); } to { transform: translate(40%, 1%); } }
 @keyframes cofre-destello { from { opacity: .35; } to { opacity: .9; } }
 @keyframes caja-llega {
-  from { opacity: 0; transform: translateY(40px) scale(.92); }
+  from { opacity: 0; transform: translateY(10px) scale(.99); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes caja-sombra-llega { from { opacity: 0; transform: translate(-50%, -50%) scale(.6); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
