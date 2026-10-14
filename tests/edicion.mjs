@@ -102,8 +102,12 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 }
 // Reloj virtual: la lectura mínima, el arranque lento y el límite de espera
 // se comprueban sin hacer esperar veinte segundos a cada ejecución.
-function splashClock(reduce = false) {
+// `caja`: 'abierta' (lo normal: la caja del primer arranque ya se abrió otro día), 'nueva'
+// (nadie ha abierto nunca el juego aquí) o 'veterano' (sin la marca, pero con datos guardados).
+function splashClock(reduce = false, caja = 'abierta') {
   const w = new JSDOM('<div id="app-splash"></div><main id="app">Juego listo</main>', {runScripts:'outside-only', url:'https://continuum.test/'}).window;
+  if (caja === 'abierta') w.localStorage.setItem('continuum-caja-abierta-v1', '1');
+  if (caja === 'veterano') w.localStorage.setItem('hilo-selected-mode-v1', 'history');
   let time = 0, id = 0;
   const timers = new Map();
   w.performance.now = () => time;
@@ -212,6 +216,57 @@ for (const reduce of [false, true]) {
     await new Promise(resolve => setImmediate(resolve));
     assert.ok(abierto, '«Jugar» entra en el juego como siempre');
   } finally { w.close(); }
+}
+{
+  // La caja del juego: la primera vez que alguien abre Continuum en un dispositivo recibe la
+  // caja cerrada y la abre con un toque; solo entonces arranca la intro y aparece «Jugar».
+  const css = read('splash.css');
+  assert.match(css, /html\.splash-active\.splash-caja #app-splash :is\([^)]*\.splash-coin[^)]*\)\s*\{\s*animation-play-state: paused/, 'con la caja en la mesa la intro queda parada en su primer fotograma');
+  assert.match(css, /@keyframes caja-abre/, 'la tapa se abre');
+  assert.match(css, /@keyframes caja-carta-sale/, 'y de dentro salen cartas');
+  const {w, advance, active} = splashClock(false, 'nueva');
+  try {
+    w.CONTINUUM = { effectPrefs: () => ({ambience: false}), setAmbience() {} };
+    assert.ok(w.document.documentElement.classList.contains('splash-caja'), 'la intro se para desde <head>, antes de pintar nada');
+    w.CONTINUUM_SPLASH.show();
+    const escena = w.document.querySelector('#app-splash .splash-caja-escena');
+    assert.ok(escena, 'en el estreno aparece la caja');
+    const caja = escena.querySelector('.caja');
+    assert.equal(caja.getAttribute('role'), 'button');
+    assert.ok(escena.querySelector('.caja-tapa-arriba img')?.getAttribute('src').startsWith('assets/'), 'la tapa lleva el emblema del juego, sin láminas nuevas');
+    let abierto = false;
+    w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(!w.document.getElementById('splash-play'), '«Jugar» no aparece mientras la caja sigue cerrada');
+    advance(25000);
+    assert.ok(active() && escena.isConnected, 'esperar a que alguien la abra no dispara el aviso de carga lenta');
+    caja.dispatchEvent(new w.KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+    assert.equal(w.localStorage.getItem('continuum-caja-abierta-v1'), '1', 'abrirla se recuerda al instante');
+    assert.ok(w.document.getElementById('app-splash').classList.contains('splash-caja-abriendo'));
+    caja.click();
+    advance(2749);
+    assert.ok(w.document.documentElement.classList.contains('splash-caja'), 'la intro sigue parada mientras se abre');
+    advance(1);
+    assert.ok(!w.document.documentElement.classList.contains('splash-caja'), 'con la cámara dentro, arranca la intro');
+    await new Promise(resolve => setImmediate(resolve));
+    const boton = w.document.getElementById('splash-play');
+    assert.ok(boton, 'y ahora sí llega «Jugar»');
+    assert.equal(w.document.getElementById('splash-actions').style.animationDelay, '5000ms', 'con los 5 s de la intro contados desde la apertura, no desde la carga');
+    advance(500);
+    assert.ok(!escena.isConnected, 'la escena de la caja se retira');
+    assert.ok(!abierto, 'y el juego sigue esperando a «Jugar»');
+    boton.click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(abierto, 'que entra como siempre');
+  } finally { w.close(); }
+  for (const [caso, reduce, caja] of [['segunda visita', false, 'abierta'], ['quien ya tenía partidas guardadas', false, 'veterano'], ['movimiento reducido', true, 'nueva']]) {
+    const {w} = splashClock(reduce, caja);
+    try {
+      w.CONTINUUM_SPLASH.show();
+      assert.ok(!w.document.querySelector('.splash-caja-escena') && !w.document.documentElement.classList.contains('splash-caja'), `${caso}: sin caja, directo a la portada`);
+      assert.equal(w.localStorage.getItem('continuum-caja-abierta-v1'), reduce ? null : '1', `${caso}: ${reduce ? 'sin marcar nada' : 'y queda marcada como abierta'}`);
+    } finally { w.close(); }
+  }
 }
 {
   const arranque = read('boot.js');

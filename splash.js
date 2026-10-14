@@ -28,7 +28,8 @@
     document.getElementById('splash-actions')?.remove();
     document.getElementById('splash-ambience')?.remove();
     document.getElementById('splash-status')?.remove();
-    startedAt = null;
+    quitaCaja?.();
+    startedAt = null; esperandoJugar = false;
     if (repinta) [0, 200, 600, 1500].forEach(ms => setTimeout(empuja, ms));
   };
   // Un arranque que se queda a medias no puede dejar la pantalla en blanco para siempre.
@@ -43,6 +44,96 @@
       }
     }, MAX_WAIT);
   };
+  // En cuanto la moneda deja de girar, el emblema pasa a ser una imagen plana: algunos Android
+  // componían mal la escena 3D ya quieta y dejaban el logo desplazado a la derecha.
+  const asienta = el => {
+    const settle = () => el?.classList.add('splash-coin-settled');
+    el?.querySelector('.splash-coin')?.addEventListener('animationend', settle, { once: true });
+    setTimeout(settle, 3600);
+  };
+
+  // La caja del juego. La primera vez que alguien abre Continuum en un dispositivo no entra
+  // de golpe en la portada: recibe la caja del juego, cerrada, y la abre con un toque. Al
+  // abrirla sale la luz, salen las cartas y la cámara entra en la caja: ahí empieza la
+  // intro de siempre. Solo esa primera vez; después se recuerda y la portada abre directa.
+  const CAJA = 'continuum-caja-abierta-v1';
+  const CAJA_ABRE = 2750, CAJA_SE_VA = 500;
+  let quitaCaja = null, esperandoJugar = false;
+  // Lo que espera `gate`: resuelto de salida (sin caja) y, si hay caja, cuando se termina de abrir.
+  let cajaAbierta = Promise.resolve();
+  const tocaCaja = () => {
+    try {
+      if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
+      if (localStorage.getItem(CAJA)) return false;
+      // Quien ya guarda algo (una partida, un ajuste, una cuenta) conocía el juego antes de
+      // que existiera la caja: no se le entrega ahora, se le marca como ya abierta.
+      if (localStorage.length) { localStorage.setItem(CAJA, '1'); return false; }
+      return true;
+    } catch { return false; } // Sin almacenamiento no se podría recordar: se repetiría cada vez.
+  };
+  // Se decide ya, en <head>: la clase en <html> deja la intro parada antes del primer pintado,
+  // con lo que al abrir la caja empieza desde su principio y no desde donde se quedó.
+  const conCaja = tocaCaja();
+  if (conCaja) root.classList.add('splash-caja');
+  const CARTAS = ['assets/splash-card-marathon.webp', 'assets/splash-card-hippocrates.webp', 'assets/splash-card-vesuvius.webp'];
+  const montaCaja = el => {
+    // Mientras la caja espera un toque no corre el aviso de carga lenta: se espera a una persona.
+    clearTimeout(timeout);
+    const escena = document.createElement('div');
+    escena.className = 'splash-caja-escena';
+    escena.innerHTML = `<div class="caja-mundo"><div class="caja-zoom">
+      <p class="caja-etiqueta">Tu copia de <b>Continuum</b></p>
+      <div class="caja-mesa"><i class="caja-sombra"></i><i class="caja-rayos"></i>
+        <span class="caja-cae"><div class="caja" role="button" tabindex="0" aria-label="Abrir la caja de Continuum">
+          <span class="caja-cuerpo">
+            <i class="caja-cara caja-suelo"></i><i class="caja-luz"></i>
+            <i class="caja-cara caja-atras"></i><i class="caja-cara caja-izquierda"></i><i class="caja-cara caja-derecha"></i><i class="caja-cara caja-frente"><em>Juego de ordenar</em></i>
+          </span>
+          <span class="caja-cartas">${CARTAS.map((src, i) => `<i class="caja-carta" style="--n:${i}"><img src="${src}" alt="" /></i>`).join('')}</span>
+          <span class="caja-tapa">
+            <i class="caja-cara caja-tapa-arriba"><img src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" /><b>Continuum</b><small>Ordena. Compara. Descubre.</small></i><i class="caja-cara caja-tapa-dentro"></i>
+            <i class="caja-cara caja-tapa-atras"></i><i class="caja-cara caja-tapa-izquierda"></i><i class="caja-cara caja-tapa-derecha"></i><i class="caja-cara caja-tapa-frente"></i>
+          </span>
+          <i class="caja-sello"></i>
+        </div></span>
+      </div>
+      <p class="caja-pista">Toca la caja para abrirla</p>
+    </div></div>`;
+    el.append(escena);
+    let abierta = false;
+    const abre = () => {
+      if (abierta) return;
+      abierta = true;
+      try { localStorage.setItem(CAJA, '1'); } catch { /* Se verá otra vez: mejor eso que no entrar. */ }
+      el.classList.add('splash-caja-abriendo');
+      // Un botón de verdad aplanaría la caja (los navegadores no respetan `preserve-3d` en
+      // <button>): es un div con rol de botón, así que al abrirse deja de ser pulsable a mano.
+      const caja = escena.querySelector('.caja');
+      caja.setAttribute('aria-disabled', 'true'); caja.tabIndex = -1;
+      setTimeout(() => {
+        // La cámara ya está dentro, a oscuras: arranca la intro de siempre bajo la escena,
+        // que se disuelve sobre su telón. El reloj de «Jugar» empieza a contar ahora.
+        root.classList.remove('splash-caja');
+        escena.classList.add('caja-se-va');
+        introStart = performance.now();
+        asienta(el);
+        if (!esperandoJugar) guard();
+        setTimeout(() => escena.remove(), CAJA_SE_VA);
+        quitaCaja = null;
+        resuelve();
+      }, CAJA_ABRE);
+    };
+    let resuelve;
+    cajaAbierta = new Promise(resolve => { resuelve = resolve; });
+    // Si el telón se cierra con la caja aún en la mesa (arranque fallido), no se deja a nadie esperando.
+    quitaCaja = () => { escena.remove(); root.classList.remove('splash-caja'); el.classList.remove('splash-caja-abriendo'); quitaCaja = null; resuelve(); };
+    // Un toque en cualquier parte de la escena vale; la caja, además, responde al teclado.
+    escena.addEventListener('click', abre);
+    escena.querySelector('.caja').addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); abre(); }
+    });
+  };
+
   const show = () => {
     // DOMContentLoaded y boot pueden pedir la misma apertura: no reiniciar su reloj.
     if (startedAt !== null) return;
@@ -53,11 +144,8 @@
     el?.classList.add('splash-ready');
     el?.setAttribute('aria-hidden', 'false');
     guard();
-    // En cuanto la moneda deja de girar, el emblema pasa a ser una imagen plana: algunos Android
-    // componían mal la escena 3D ya quieta y dejaban el logo desplazado a la derecha.
-    const settle = () => el?.classList.add('splash-coin-settled');
-    el?.querySelector('.splash-coin')?.addEventListener('animationend', settle, { once: true });
-    setTimeout(settle, 3600);
+    if (el && conCaja && !el.querySelector('.splash-caja-escena')) montaCaja(el);
+    else if (!conCaja) asienta(el);
   };
   // Encaje de la portada. El globo es parte de la imagen de fondo (escalada con `cover`), así
   // que su altura en pantalla cambia con cada móvil y con las barras del navegador. Se calcula
@@ -115,11 +203,13 @@
   // El juego no entra solo: entra cuando alguien pulsa «Jugar». Ese toque es además lo
   // único que permite encender el audio —ningún navegador deja sonar nada antes—, así
   // que es lo que hace que la música ya esté puesta cuando aparece el menú.
-  const gate = () => new Promise(resolve => {
+  // Si hay caja, «Jugar» no aparece hasta que se abre: la intro, y sus 5 s, empiezan entonces.
+  const gate = () => cajaAbierta.then(() => new Promise(resolve => {
     const el = splash();
     if (!el) { resolve(); return; }
     // Aquí se espera a una persona, no a la red: el aviso de carga lenta sobra.
     clearTimeout(timeout);
+    esperandoJugar = true;
     el.classList.add('splash-gate');
     let actions = document.getElementById('splash-actions');
     let button = document.getElementById('splash-play');
@@ -181,7 +271,7 @@
     button.addEventListener('click', enter, { once: true });
     document.getElementById('splash-guide')?.addEventListener('click', () => verVideo(el));
     try { button.focus({ preventScroll: true }); } catch { /* Sin foco también se pulsa. */ }
-  });
+  }));
   // La guía en vídeo, a pantalla completa sobre la portada. No entra en el juego: al terminar
   // (o al cerrarla) se vuelve a la portada, con «Jugar» esperando.
   const verVideo = el => {
