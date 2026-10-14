@@ -84,8 +84,10 @@ console.log("\nLa primera vez: el nombre");
   ok("con un nombre válido se entra en la portada", pantalla(w) === "home");
   ok("queda guardado limpio", identidad(w).nombre === "Fernando");
   ok("y como el nombre de siempre, para duelos y salas", w.localStorage.getItem("hilo-nombre-v1") === "Fernando");
+  ok("quien empieza de cero ve primero la guía en vídeo", existe(w, '.overlay [data-tutorial]'));
   const vuelta = boot({ ...w.localStorage });
   ok("la segunda vez no se vuelve a preguntar", pantalla(vuelta) === "home");
+  ok("ni se abre otra vez la guía", !existe(vuelta, '.overlay'));
 }
 
 console.log("\nQuien ya tenía nombre se reconoce");

@@ -1029,68 +1029,6 @@
     return `Iba entre «${escapeHtml(before.title)}» y «${escapeHtml(after.title)}».`;
   }
 
-  // La primera jugada se aprende haciéndola. Las tres cartas se toman de puntos separados
-  // del mazo y la central encaja de verdad entre las otras dos; no hay una respuesta
-  // amañada que contradiga luego las reglas del tablero.
-  function guideDemo(modeKey) {
-    const deck = cards(modeKey);
-    if (deck.length < 3) return "";
-    const ordenadas = [...deck].sort((a, b) => sortValue(modeKey, a) - sortValue(modeKey, b));
-    const en = fraccion => ordenadas[Math.floor(ordenadas.length * fraccion)];
-    const [izquierda, medio, derecha] = [en(0.2), en(0.5), en(0.8)];
-    const mini = card => `${animalArt(modeKey, card)}<b>${escapeHtml(shortValue(modeKey, card))}</b><small>${escapeHtml(card.title)}</small>`;
-    return `<section class="guide-practice" data-guide-practice data-correct="1">
-      <div class="guide-practice-head"><span>Tu primera colocación</span><small>Prueba sin gastar ninguna carta</small></div>
-      <div class="gp-card" data-guide-card>${animalArt(modeKey, medio)}<i>${escapeHtml(hiddenLabel(modeKey))}</i><b data-guide-hidden>?</b><small>${escapeHtml(medio.title)}</small><em data-guide-value hidden>${escapeHtml(shortValue(modeKey, medio))}</em></div>
-      <p>¿Dónde encaja esta carta?</p>
-      <div class="gp-line">
-        <button type="button" data-guide-place="0" aria-label="Colocar antes de ${escapeHtml(izquierda.title)}">−</button>
-        <div class="gp-reference">${mini(izquierda)}</div>
-        <button type="button" data-guide-place="1" aria-label="Colocar entre las dos cartas">+</button>
-        <div class="gp-reference">${mini(derecha)}</div>
-        <button type="button" data-guide-place="2" aria-label="Colocar después de ${escapeHtml(derecha.title)}">+</button>
-      </div>
-      <div class="gp-feedback" data-guide-feedback role="status">Toca uno de los tres huecos.</div>
-      <button type="button" class="gp-reset" data-guide-reset hidden>Probar otra vez</button>
-    </section>`;
-  }
-
-  if(typeof document!=='undefined')document.addEventListener('click', event => {
-    const place=event.target.closest('[data-guide-place]'), resetTarget=event.target.closest('[data-guide-reset]');
-    if(!place&&!resetTarget)return;
-    const practice=event.target.closest('[data-guide-practice]');
-    if(!practice)return;
-    const reset=practice.querySelector('[data-guide-reset]');
-    if(resetTarget){
-      practice.classList.remove('is-correct','is-wrong');
-      practice.querySelectorAll('[data-guide-place]').forEach(button=>{button.disabled=false;button.removeAttribute('aria-pressed');});
-      practice.querySelector('[data-guide-value]').hidden=true;
-      practice.querySelector('[data-guide-hidden]').hidden=false;
-      practice.querySelector('[data-guide-feedback]').textContent='Toca uno de los tres huecos.';
-      reset.hidden=true;return;
-    }
-    const correct=Number(place.dataset.guidePlace)===Number(practice.dataset.correct);
-    practice.classList.toggle('is-correct',correct);practice.classList.toggle('is-wrong',!correct);
-    practice.querySelectorAll('[data-guide-place]').forEach(button=>button.setAttribute('aria-pressed',String(button===place)));
-    const feedback=practice.querySelector('[data-guide-feedback]');
-    if(correct){
-      practice.querySelectorAll('[data-guide-place]').forEach(button=>button.disabled=true);
-      practice.querySelector('[data-guide-value]').hidden=false;
-      practice.querySelector('[data-guide-hidden]').hidden=true;
-      feedback.textContent='¡Exacto! La carta revela su valor y se queda entre las dos.';
-      reset.hidden=false;
-    } else {
-      practice.querySelector('[data-guide-value]').hidden=false;
-      practice.querySelector('[data-guide-hidden]').hidden=true;
-      const references=[...practice.querySelectorAll('.gp-reference > b')].map(node=>node.textContent);
-      feedback.textContent=`Prueba otro hueco: ${practice.querySelector('[data-guide-value]').textContent} va entre ${references[0]} y ${references[1]}. Aquí no pierdes vidas.`;
-    }
-  });
-
-  function guideStep(numero, titulo, texto) {
-    return `<li class="guide-step"><span class="gs-num" aria-hidden="true">${numero}</span><b>${titulo}</b><small>${texto}</small></li>`;
-  }
-
   function guideCard(icono, titulo, estado, texto) {
     return `<div class="guide-card"><i aria-hidden="true">${icono}</i><span class="gc-body"><b>${titulo}</b>${estado ? `<em>${estado}</em>` : ""}<small>${texto}</small></span></div>`;
   }
@@ -1139,7 +1077,8 @@
       '<h4>Cómo se gana</h4><p>Jugando solo cuentan tus aciertos (en las rondas, además, las estrellas: capítulo 02). En los duelos gana quien más acierte; si acertáis lo mismo, es empate, salvo en el duelo de cifras «Mismas cartas», donde gana quien respondió más rápido.</p>'+
       '<p>En una partida en grupo de Grandes colecciones gana quien se quede sin cartas en la mano. La vuelta se termina siempre, para que todos hayan jugado el mismo número de turnos; si al acabarla hay más de una persona sin cartas, se juega una final de desempate. Los poderes guardados no cuentan como cartas. Retos rápidos tiene sus propias reglas (capítulo 02).</p>'+
       '<h4>La final de desempate</h4><p>Sale una carta que no está en la línea y cada finalista escribe en secreto su cifra, en la unidad indicada'+(time?' (en los mazos de fechas, eligiendo también a. C. o d. C.)':'')+'. Se revelan a la vez y gana quien más se acerque, por arriba o por abajo. Si dos o más quedan a la misma distancia, solo ellos repiten con otra carta. En la final no hay poderes.</p>'+
-      '<p>Al terminar, «Ver lo que se falló» repasa las cartas que no acertaste.</p>';
+      '<p>Al terminar, «Ver lo que se falló» repasa las cartas que no acertaste.</p>'+
+      '<p class="guide-note">Si dos cartas tienen el mismo valor, cualquiera de los dos órdenes es correcto.'+(time?' Los años antes de Cristo (a. C.) van antes que los de después (d. C.), y entre ellos, cuanto mayor es el número, más antiguo: 500 a. C. va antes que 100 a. C.':' Compara la cifra y su unidad, no el tamaño de la ilustración.')+(pending?' Las cartas «en revisión» se juegan con el valor mostrado.':'')+'</p>';
     // Las reglas del reto de hoy, calculadas al abrir la guía (si la aplicación aún no las ofrece, se omiten).
     const hoy = window.CONTINUUM.dailyInfo?.();
     const dailyToday = hoy ? guideCard('◆','Hoy: '+escapeHtml(hoy.family),escapeHtml(hoy.title),escapeHtml(hoy.rules)+(hoy.done?' Hoy ya lo has jugado.':'')) : '';
@@ -1203,12 +1142,10 @@
       ['Descarte','Donde van las cartas falladas en una partida en grupo.'],
       ['Lámina','La ilustración de una carta, una vez desbloqueada en tu Atlas.']
     ].map(([term, text]) => '<dt>'+term+'</dt><dd>'+text+'</dd>').join('')+'</dl>';
-    return '<div class="guide-handbook"><header class="atlas-page-heading"><img class="guide-frontispiece" src="assets/guide-savanna-v1.webp" alt="Cuaderno de explorador sobre una mesa, con animales en la sabana africana al fondo" width="900" height="600" decoding="async" /><div class="eyebrow">El manual del explorador</div><h1>Guía</h1><p>Lo esencial para empezar y, debajo, cada detalle por capítulos.</p></header><section class="guide-start"><h2>Aprende en tres pasos</h2>'+
-      '<p class="guide-context">'+here+' · Ejemplo: '+escapeHtml(selectedMode.name)+'</p><p class="guide-lead">Cada carta esconde un dato. En este mazo, ordena las cartas '+order+' según '+escapeHtml(starterNoun(modeKey))+'. La partida empieza con una carta de referencia ya en la línea; tú colocas las demás en su hueco y, al confirmar, descubres si has acertado.</p>'+
-      '<ol class="guide-steps">'+guideStep(1,'Mira tu carta','Su valor está oculto. Si tienes varias en la mano, toca la que quieras jugar.')+guideStep(2,'Elige el hueco','Toca uno de los «+» de la línea o mantén pulsada la carta y arrástrala. Hasta confirmar, puedes cambiar de idea con «Cambiar».')+guideStep(3,'Confirma','Pulsa «Colocar carta» («Sí, aquí» en los duelos por turnos). Después ya no se puede deshacer.')+'</ol>'+
-      guideDemo(modeKey)+'<p class="guide-note">En este ensayo basta con tocar el hueco; en la partida hay que confirmar. No gasta vidas ni cambia tu progreso.</p>'+
-      '<p class="guide-note">Si dos cartas tienen el mismo valor, cualquiera de los dos órdenes es correcto.'+(time?' Los años antes de Cristo (a. C.) van antes que los de después (d. C.), y entre ellos, cuanto mayor es el número, más antiguo: 500 a. C. va antes que 100 a. C.':' Compara la cifra y su unidad, no el tamaño de la ilustración.')+(pending?' Las cartas «en revisión» se juegan con el valor mostrado.':'')+'</p>'+
-      '</section><div class="atlas-section-heading"><h2>El juego, capítulo a capítulo</h2><p class="guide-index-hint">Abre el tema que quieras consultar.</p></div>'+
+    // La guía empieza por el vídeo interactivo (tutorial.js); debajo queda el manual de consulta.
+    return '<div class="guide-handbook"><header class="guide-masthead"><div class="eyebrow">El manual del explorador</div><h1>Guía</h1><p>Mírala como un vídeo y haz tú la jugada cuando te toque. Debajo, cada detalle por capítulos.</p></header>'+
+      (window.CONTINUUM.Tutorial?.markup(modeKey) || '')+
+      '<div class="atlas-section-heading guide-manual"><h2>Manual de consulta</h2><p class="guide-index-hint">'+here+' · Abre el tema que quieras consultar.</p></div>'+
       guideChapter('01','Aciertos, fallos y cómo se gana','Qué pasa al confirmar y quién gana','result',result)+
       guideChapter('02','Elige cómo jugar','Cada día, solo, con amigos u online','modes',formats)+
       guideChapter('03','Poderes: Fantasma y Pulso','Solo en partidas en grupo','powers',powers)+
