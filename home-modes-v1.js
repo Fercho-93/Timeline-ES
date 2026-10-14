@@ -308,7 +308,7 @@
   function soloShortcuts() {
     const resumen = window.CONTINUUM?.soloResumen?.();
     if (!resumen) return '';
-    const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><span class="solo-shortcut-copy"><em>Partida guardada</em><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} jugadas`}</small></span><span class="solo-shortcut-arrow" aria-hidden="true">→</span></button>`);
+    const pendientes = resumen.pendientes.map(p => `<button type="button" class="solo-shortcut solo-shortcut-resume" data-action="solo-open-deck" data-solo-deck="${p.mode}" data-resume="true"><span class="solo-shortcut-copy"><em>Partida guardada</em><b>Continuar ${escapeHtml(p.name)}</b><small>${p.kind === 'marathon' ? 'Maratón' : 'Ronda'} · ${escapeHtml(p.difficulty)}${p.total ? ` · carta ${Math.min(p.played + 1, p.total)} de ${p.total}` : ` · ${p.played} jugadas`}</small></span><span class="solo-shortcut-arrow" aria-hidden="true"><img class="solo-resume-illustration" src="assets/saved-journey-v1.webp" alt="" width="360" height="240" decoding="async"><i>→</i></span></button>`);
     const lastArt = window.CONTINUUM?.blockOf?.(resumen.ultimo?.mode)?.art;
     const lastCover = { history: 'history', entertainment: 'entertainment', science: 'science', nature: 'nature', globe: 'geography', mixed: 'mixed' }[lastArt] || 'mixed';
     const ultimo = resumen.ultimo && !resumen.pendientes.some(p => p.mode === resumen.ultimo.mode)

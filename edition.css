@@ -5675,3 +5675,28 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
   background: radial-gradient(ellipse at 0 0, #f9edcf88, transparent 75%),
     linear-gradient(125deg, var(--edition-surface), var(--edition-paper));
 }
+
+/* Guardar el punto de la aventura: cuaderno con cinta, junto a los datos de la partida. */
+#app .solo-shortcut-resume {
+  grid-template-columns: minmax(0, 1fr) 112px; gap: 12px; min-height: 144px;
+}
+#app .solo-shortcut-resume .solo-shortcut-copy { grid-column: 1; grid-row: 1; }
+#app .solo-shortcut-resume .solo-shortcut-arrow {
+  position: relative; display: block; align-self: center; width: 112px; height: 112px;
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+#app .solo-shortcut-resume .solo-resume-illustration {
+  display: block; width: 112px; height: 80px; object-fit: contain;
+  filter: drop-shadow(0 4px 3px #63432320); pointer-events: none;
+}
+#app .solo-shortcut-resume .solo-shortcut-arrow > i {
+  position: absolute; right: 0; bottom: 0; display: grid; place-items: center;
+  width: 28px; height: 28px; border: 1px solid var(--edition-line); border-radius: 50%;
+  background: color-mix(in srgb, var(--edition-brass) 8%, var(--edition-surface));
+  color: var(--edition-brass); font: normal 1.1rem/1 var(--ui-font);
+}
+@media (max-width: 360px) {
+  #app .solo-shortcut-resume { grid-template-columns: minmax(0, 1fr) 88px; gap: 10px; padding: 17px 16px; }
+  #app .solo-shortcut-resume .solo-shortcut-arrow { width: 88px; height: 96px; }
+  #app .solo-shortcut-resume .solo-resume-illustration { width: 88px; height: 64px; }
+}
