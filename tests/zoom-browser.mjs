@@ -169,20 +169,16 @@ try {
    await encyclopediaPage.locator('[data-action="home-encyclopedia"]').click();
    const encyclopediaModal=encyclopediaPage.locator('.enc-modal');
    const persistentBack=encyclopediaPage.locator('.enc-modal > .atlas-dialog-back');
-   const encyclopediaVeil=encyclopediaPage.locator('.enc-modal > .atlas-scroll-veil');
-   assert.equal(await encyclopediaVeil.evaluate(veil=>getComputedStyle(veil).opacity),'0','la enciclopedia empieza sin veladura');
-   assert.ok(await encyclopediaVeil.evaluate(veil=>Math.abs(veil.getBoundingClientRect().width-veil.parentElement.clientWidth)<=2),'la veladura de la enciclopedia llega a los bordes sin dibujar un rectángulo interior');
+   assert.equal(await encyclopediaPage.locator('.atlas-scroll-veil').count(),0,'no hay niebla al abrir la enciclopedia');
    const backAtTop=await persistentBack.boundingBox();
    await encyclopediaModal.evaluate(modal=>{modal.scrollTop=Math.max(20,modal.scrollHeight*.55);});
    await encyclopediaPage.waitForTimeout(50);
    await encyclopediaModal.evaluate(modal=>modal.dispatchEvent(new Event('scroll')));
-   await encyclopediaPage.waitForFunction(() => getComputedStyle(document.querySelector('.enc-modal > .atlas-scroll-veil')).opacity === '1');
    const backHalfway=await persistentBack.boundingBox();
    assert.equal(await persistentBack.evaluate(button=>getComputedStyle(button).position),'sticky','la salida de la enciclopedia queda anclada');
    assert.ok(await persistentBack.isVisible(),'la salida sigue disponible a mitad del catálogo');
    assert.ok(Math.abs(backHalfway.y-backAtTop.y)<=1,'la salida no se desplaza con las cartas');
-   assert.equal(await encyclopediaVeil.evaluate(veil=>getComputedStyle(veil).opacity),'1','la enciclopedia difumina el contenido que sale por arriba');
-   assert.ok(await encyclopediaVeil.evaluate(veil=>veil.getBoundingClientRect().top<=veil.parentElement.getBoundingClientRect().top+2),'la veladura de la enciclopedia cubre también el relleno superior');
+   assert.equal(await encyclopediaPage.locator('.atlas-scroll-veil').count(),0,'hacer scroll no añade niebla sobre el catálogo');
    const backgroundImage=encyclopediaPage.locator('.enc-background img').first();
    await backgroundImage.waitFor();
    await backgroundImage.evaluate(async image=>{

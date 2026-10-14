@@ -1130,54 +1130,6 @@ html.splash-active #app-splash { color: var(--edition-ink); background-color: va
 }
 #app[data-screen="perfil"] .atlas-topbar > :not(.atlas-back) { display: none; }
 #app[data-screen="perfil"] .atlas-topbar > .atlas-back { pointer-events: auto; }
-.atlas-scroll-veil {
-  position: sticky;
-  top: 0;
-  z-index: 23;
-  display: block;
-  height: 88px;
-  margin-bottom: -88px;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(to bottom,var(--atlas-veil-paper,var(--edition-surface)) 0 18%,transparent 100%);
-  -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
-  -webkit-mask-image: linear-gradient(to bottom,#000 0 32%,transparent 100%);
-  mask-image: linear-gradient(to bottom,#000 0 32%,transparent 100%);
-  transition: opacity 180ms ease-out;
-}
-#app :is(.enc-modal,.rules,.settings-modal) > .atlas-scroll-veil {
-  top: -26px;
-  box-sizing: border-box;
-  width: calc(100% + 52px);
-  height: 114px;
-  margin-bottom: -114px;
-  margin-inline: -26px;
-  border-radius: 11px 11px 0 0;
-  --atlas-veil-paper: var(--edition-surface);
-  background: linear-gradient(to bottom,var(--atlas-veil-paper) 0 35%,transparent 100%);
-}
-#app .enc-modal > .atlas-scroll-veil { --atlas-veil-paper: var(--edition-paper); }
-#app[data-screen="perfil"] .atlas-profile-veil {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 23;
-  margin: 0;
-  --atlas-veil-paper: var(--edition-paper);
-}
-.atlas-scroll-veil.is-visible { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .atlas-scroll-veil { transition: none; }
-}
-@media (max-width: 480px) {
-  #app .settings-modal > .atlas-scroll-veil {
-    top: -16px;
-    width: calc(100% + 32px);
-    height: 104px;
-    margin-bottom: -104px;
-    margin-inline: -16px;
-  }
-}
 #app .enc-toolbar-compact { display: grid; grid-template-columns: minmax(180px,.8fr) minmax(260px,1.2fr); align-items: end; gap: 12px; padding: 10px 12px; margin: 12px 0 18px; border-radius: 14px; }
 #app .enc-toolbar-compact .field { margin: 0; gap: 4px; }
 #app .enc-toolbar-compact label, #app .enc-toolbar-compact .enc-lock-label { font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; }
@@ -1767,13 +1719,6 @@ html #app .home-nav.atlas-nav::before {
 /* Lenguaje de movimiento común: la tinta aparece sobre el papel en un solo gesto.
    La marca persiste tras terminar JS: nunca reactivar una entrada CSS al limpiarlo. */
 @keyframes continuum-ink-enter { from { opacity: 0; } to { opacity: 1; } }
-#app > .overlay > :is(.enc-modal, .rules, .settings-modal) > .atlas-scroll-veil {
-  top: calc(-1 * max(18px, var(--safe-top)));
-  width: calc(100% + max(20px, var(--safe-left)) + max(20px, var(--safe-right)));
-  margin-left: calc(-1 * max(20px, var(--safe-left)));
-  margin-right: calc(-1 * max(20px, var(--safe-right)));
-  border-radius: 0;
-}
 #app .motion-managed,
 #app .motion-managed > :not(.spinner):not(.waiting-orbit),
 #app .motion-managed :is(.atlas-landscape img, .atlas-specimens figure, .guide-step, .guide-card, .reveal, .result-mark, .result-mark::after, .comp-splash, .atlas-final-page > *, .game-row) {
@@ -1911,11 +1856,6 @@ html #app .home-nav.atlas-nav::before {
 @media (max-width: 420px) {
   #app > .overlay > :is(.enc-modal,.settings-modal,.rules) { padding-inline: 16px; }
   /* La veladura sale justo hasta el borde: el mismo margen que el relleno de 16 px. */
-  #app > .overlay > :is(.enc-modal, .rules, .settings-modal) > .atlas-scroll-veil {
-    width: calc(100% + max(16px, var(--safe-left)) + max(16px, var(--safe-right)));
-    margin-left: calc(-1 * max(16px, var(--safe-left)));
-    margin-right: calc(-1 * max(16px, var(--safe-right)));
-  }
   #app .perfil-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
   #app .perfil-stats > span:nth-child(n+3) { border-top: 1px solid var(--edition-line); }
   #app .enc-toolbar { padding: 16px; }

@@ -213,24 +213,6 @@
       score.closest('.final-score')?.classList.add('final-score-sealed');
     }, start + cards.length * gap + 120);
   }
-  function scrollVeil(surface, scroller = surface) {
-    let veil = surface.querySelector(':scope > .atlas-scroll-veil');
-    if (!veil) {
-      veil = document.createElement('div');
-      veil.className = 'atlas-scroll-veil';
-      veil.setAttribute('aria-hidden', 'true');
-      surface.prepend(veil);
-    }
-    const update = () => veil.classList.toggle('is-visible', scroller.scrollTop > 8);
-    scroller.addEventListener('scroll', update, {passive: true});
-    update();
-    return veil;
-  }
-  function refreshProfileVeil() {
-    const veil = document.querySelector('#app[data-screen="perfil"] .atlas-profile-veil');
-    veil?.classList.toggle('is-visible', window.scrollY > 8);
-  }
-  window.addEventListener('scroll', refreshProfileVeil, {passive: true});
   // Convierte cada modo de solitario en un desplegable: cerrados de entrada, con un único
   // abierto a la vez. Vive aquí, y no en quien pinta la pantalla, para que ya estén
   // plegados antes de que cualquier transición fotografíe el destino.
@@ -703,13 +685,6 @@
     container.classList.toggle('atlas-playing', inGame);
     container.classList.toggle('atlas-board', board.has(screen));
     CT.Mesa.aplica(container, board.has(screen));
-    if (screen === 'perfil') {
-      const veil = document.createElement('div');
-      veil.className = 'atlas-scroll-veil atlas-profile-veil';
-      veil.setAttribute('aria-hidden', 'true');
-      container.querySelector('.shell')?.append(veil);
-      refreshProfileVeil();
-    }
     // El fondo de la enciclopedia es una instantánea inerte; su barra no es la real.
     container.querySelectorAll('.enc-background .home-nav').forEach(el => el.remove());
     // La bienvenida tampoco lleva barra: hasta tener nombre no hay a dónde ir.
@@ -878,7 +853,6 @@
       });
     }
     const close = modal.querySelector('.guide-close, .settings-close, [data-action="enc-back"]');
-    scrollVeil(modal);
     refreshDepth();
     if (close) { if (!close.hasAttribute('aria-label')) close.setAttribute('aria-label','Volver a la pantalla anterior'); close.innerHTML = icon('back'); close.classList.add('atlas-dialog-back'); }
   }
