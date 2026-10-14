@@ -5646,3 +5646,32 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
   animation-delay: 0s !important;
   transition: none !important;
 }
+
+/* Un mismo pergamino cálido en las superficies de menú. Las cartas de la mesa
+   conservan sus tintas y el tema oscuro mantiene su paleta de cuero. */
+:root:not([data-theme="dark"]) #app:not(.atlas-board),
+:root:not([data-theme="dark"]) #app :is(.rules, .settings-modal, .enc-modal) {
+  --edition-surface: #f3e4c6;
+  --edition-paper: #edddba;
+  --edition-line: #cbb58b;
+  --edition-muted: #655b49;
+  --edition-brass: #785a2d;
+}
+:root:not([data-theme="dark"]) #app:not(.atlas-board) .solo-home .solo-panel {
+  border-color: var(--edition-line);
+  background: radial-gradient(ellipse at 10% 0, #fff2ce66, transparent 65%),
+    repeating-linear-gradient(115deg, #90703c04 0 1px, transparent 1px 5px),
+    linear-gradient(145deg, var(--edition-surface), var(--edition-paper));
+}
+:root:not([data-theme="dark"]) #app .guide-handbook { --journal-wash: #e6dcc2; --journal-line: #c5b590; }
+:root:not([data-theme="dark"]) #app:not(.atlas-board) .difficulty-card {
+  background: radial-gradient(ellipse at 50% 0, #f9edcf, transparent 72%),
+    linear-gradient(155deg, var(--edition-surface), #e9d6b0);
+}
+:root:not([data-theme="dark"]) #app:not(.atlas-board) .difficulty-card.is-on {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--difficulty-ink) 9%, var(--edition-surface)), #e9d6b0);
+}
+:root:not([data-theme="dark"]) #app:not(.atlas-board) :is(.solo-shortcut-resume, .vidas-aviso) {
+  background: radial-gradient(ellipse at 0 0, #f9edcf88, transparent 75%),
+    linear-gradient(125deg, var(--edition-surface), var(--edition-paper));
+}
