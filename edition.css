@@ -4216,6 +4216,12 @@ html #app .home-nav.atlas-nav button[aria-current="page"] {
 #app #deck-collection .collection-decks .game-row .game-name { color: #fbf1dc; max-width: 70%; }
 #app #deck-collection .collection-decks .game-row .game-meta { color: #eadcc0; max-width: 72%; }
 #app #deck-collection .collection-decks .game-row.game-row-cerrado .game-meta { color: #d9cdb6; }
+/* El progreso del mazo («Dominadas 10 de 167…») va en dorado sobre el fondo oscuro, que en gris
+   apagado no se leía; la sombra lo separa de la ilustración que asoma por la derecha. */
+#app #deck-collection .collection-decks .game-row .game-progress { max-width: 72%; }
+#app #deck-collection .collection-decks .game-row .game-progress small { color: #f0d49a; font-weight: 600; text-shadow: 0 1px 2px #1d150ecc; }
+#app #deck-collection .collection-decks .game-row .game-progress-bar { background: #fbf1dc33; }
+#app #deck-collection .collection-decks .game-row .game-progress-bar i { background: #e2c48c; }
 
 /* Mesa de juego: la lupa del zoom bajo el contador de pendientes, a la derecha del todo;
    «Tu carta» pegada a la izquierda; y los extremos de la línea según el mazo. */
@@ -5563,12 +5569,12 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
 }
 
 /* Pista de colocación en la carta activa de la mano: una mano que va a pulsar y tres palabras,
-   colgando justo bajo la esquina inferior derecha de la carta, fuera de su marco. Dentro no hay
+   colgando bajo la esquina inferior derecha de la carta, fuera de su marco. Dentro no hay
    sitio: entre el emblema y el título quedan unos 5 px en cualquier tamaño, y el título apoya en el
    filete del borde. Solo en la carta del centro del abanico (o la única), y nunca mientras la carta
    está en la línea como vista previa. */
 #app .hand-card > .card-hint {
-  position: absolute; z-index: 2; right: 6px; top: calc(100% + 4px); bottom: auto;
+  position: absolute; z-index: 2; right: -4px; top: calc(100% + 10px); bottom: auto;
   display: inline-flex; align-items: center; gap: 3px; max-width: calc(100% - 20px);
   margin: 0; padding: 0; color: #8a6a3f; opacity: .85; pointer-events: none;
   font: 600 .5rem/1 var(--ui-font); letter-spacing: .02em; white-space: nowrap; overflow: hidden;
