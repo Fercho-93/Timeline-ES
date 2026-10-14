@@ -590,7 +590,6 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   text-transform: uppercase;
   color: var(--accent-dark);
 }
-.guide-lead { margin: 8px 0 0; color: var(--muted); font-size: .92rem; line-height: 1.5; }
 .guide-note {
   margin: 15px 0 0;
   padding: 10px 13px;
@@ -626,35 +625,8 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   84%, 100% { opacity: 0; transform: translateX(-50%) scale(1); }
 }
 
-.guide-steps { list-style: none; margin: 17px 0 0; padding: 0; display: grid; gap: 8px; }
-.guide-step {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  column-gap: 12px;
-  padding: 11px 13px;
-  border: 1px solid var(--vitela-borde);
-  border-radius: 9px;
-  background: var(--vitela);
-}
-.gs-num {
-  grid-row: span 2;
-  align-self: center;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: #fff3d7;
-  background: var(--accent-solid);
-  font: 700 .85rem var(--font-display);
-}
-.guide-step b { font-size: .93rem; }
-.guide-step small { color: var(--muted); font-size: .8rem; line-height: 1.4; }
-/* Los tres pasos entran uno detrás de otro: se leen en ese orden, así que se presentan
-   en ese orden. Solo al abrir la guía, no en cada repintado. */
-.dialog-enter .guide-step, .dialog-enter .guide-card { animation: guide-in 360ms var(--ease-spring) backwards; }
-.dialog-enter .guide-step:nth-child(2) { animation-delay: 80ms; }
-.dialog-enter .guide-step:nth-child(3) { animation-delay: 160ms; }
+/* Las fichas de la guía entran con un leve desplazamiento. Solo al abrir la guía, no en cada repintado. */
+.dialog-enter .guide-card { animation: guide-in 360ms var(--ease-spring) backwards; }
 @keyframes guide-in { from { opacity: 0; transform: translateY(9px); } }
 
 .guide-cards { display: grid; gap: 8px; }
@@ -1068,7 +1040,7 @@ body.dragging-card .hand-card:not(.dragging):not(.drag-ghost) { opacity: .5; }
   .screen-enter, .screen-enter .topbar, .screen-enter > :not(.topbar), .selection-enter, .placement-enter,
   .dialog-enter, .dialog-enter .modal, .dialog-enter .reveal, .dialog-enter .result-mark,
   .dialog-exit, .dialog-exit .modal, .drag-ghost, .game-row.active,
-  .dialog-enter .guide-step, .dialog-enter .guide-card,
+  .dialog-enter .guide-card,
   .spinner, .waiting-orbit, .waiting-inline i, .turn-timer-low,
   .comp-splash, .starter-winner-banner::after, .starter-winner-crown, .starter-winner-banner b,
   .starter-draw-list li.starter-draw-winner { animation: none !important; }

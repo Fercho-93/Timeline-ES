@@ -410,6 +410,33 @@ html.splash-active #app-splash .splash-masthead {
   cursor: pointer;
   transition: color 160ms ease, text-decoration-color 160ms ease;
 }
+/* El vídeo desde la portada: a pantalla completa, sobre un velo cálido y oscuro. */
+#app-splash .splash-video {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  touch-action: pan-y;
+  background: radial-gradient(ellipse at 50% 40%, #3a2a1cf2, #140d07f7 75%);
+  animation: splash-video-in 320ms ease-out both;
+}
+#app-splash .splash-video > .tv-player { width: min(100%, 520px); margin: 0; }
+#app-splash .splash-video .tv-btn { background: #fff7e8; color: #3b2816; border-color: #c9a96f; }
+#app-splash .splash-video .tv-play { background: #a04c32; color: #fff5df; border-color: #6f301f; }
+#app-splash .splash-video .tv-chapter small { color: #e9dcc3; }
+#app-splash .splash-video .tv-chapter.is-current small { color: #fff5df; }
+#app-splash .splash-video .tv-bar { background: #ffffff2e; }
+#app-splash .splash-video .tv-bar i { background: #e7c98f; }
+#app-splash .splash-video-head { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; width: min(100%, 520px); color: #f3e6cc; font: italic 400 1.15rem/1.2 var(--font-display, Georgia, serif); text-align: center; }
+#app-splash .splash-video-close { width: 44px; height: 44px; border: 1px solid #e7c98f66; border-radius: 50%; background: #ffffff12; color: #fff5df; font-size: 1.2rem; cursor: pointer; }
+#app-splash .splash-video-close:focus-visible { outline: 2px solid #f8e2af; outline-offset: 2px; }
+#app-splash.splash-viendo .splash-sound { visibility: hidden; }
+@keyframes splash-video-in { from { opacity: 0; } }
 #app-splash .splash-guide:focus-visible { outline: 2px solid #f8e2af; outline-offset: 2px; border-radius: 6px; }
 @media (hover: hover) and (pointer: fine) {
   #app-splash .splash-guide:hover { color: #6f2c13; text-decoration-color: #8f3c27b3; }

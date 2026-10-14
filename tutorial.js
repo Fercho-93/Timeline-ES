@@ -40,7 +40,8 @@
   // ── Las escenas ────────────────────────────────────────────────────────────────────────
   // Cada escena dibuja su mesa (`html`) y una lista de pasos [milisegundo, acción]. Una
   // acción con `wait` detiene el reloj hasta que quien mira hace la jugada.
-  function scenes(modeKey) {
+  // `portada`: el vídeo se ve suelto desde la portada, sin manual debajo; al acabar se vuelve a ella.
+  function scenes(modeKey, portada = false) {
     const s = sample(modeKey);
     const time = CT.mode(modeKey).axis === "time";
     const order = time ? "de antes a después" : "de menor a mayor";
@@ -183,18 +184,18 @@
           [3600, c => { c.stagger(".tv-tiles .tv-tile", 600); c.say("Crea tu mesa, siéntate en una abierta o pide una partida rápida."); }]
         ] },
       { chapter: 2, title: "¡A jugar!", duration: 4000, last: true,
-        html: `<div class="tv-center tv-end"><div class="tv-logo">¡Ya sabes jugar!</div><p>Para tu primera partida: «Jugar solo», un mazo de Grandes colecciones, en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button><button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button></div></div>`,
+        html: `<div class="tv-center tv-end"><div class="tv-logo">¡Ya sabes jugar!</div><p>Para tu primera partida: «Jugar solo», un mazo de Grandes colecciones, en Fácil.</p><div class="tv-end-actions"><button type="button" class="btn btn-secondary" data-tv="replay">Ver otra vez</button>${portada ? "" : '<button type="button" class="btn btn-ghost" data-tv="manual">Ver el manual</button>'}</div></div>`,
         steps: [
-          [0, c => { c.say("¡Listo! Ya sabes jugar. Los detalles están en el manual, debajo."); c.add(".tv-end", "is-in"); }]
+          [0, c => { c.say(portada ? "¡Listo! Ya sabes jugar. Pulsa «Jugar» para empezar." : "¡Listo! Ya sabes jugar. Los detalles están en el manual, debajo."); c.add(".tv-end", "is-in"); }]
         ] }
     ];
   }
 
   const CHAPTERS = ["De qué va", "Colocar cartas", "Modalidades"];
 
-  function markup(modeKey) {
+  function markup(modeKey, { portada = false } = {}) {
     if (!sample(modeKey)) return "";
-    return `<section class="tv-player" data-tutorial="${esc(modeKey)}" aria-label="Guía en vídeo">
+    return `<section class="tv-player" data-tutorial="${esc(modeKey)}"${portada ? " data-portada" : ""} aria-label="Guía en vídeo">
       <div class="tv-screen">
         <div class="tv-scene-title" aria-hidden="true"></div>
         <div class="tv-stage"></div>
@@ -216,7 +217,7 @@
     if (root.dataset.tutorialReady) return;
     root.dataset.tutorialReady = "1";
     const modeKey = root.dataset.tutorial;
-    const list = scenes(modeKey);
+    const list = scenes(modeKey, root.hasAttribute("data-portada"));
     const stage = root.querySelector(".tv-stage"), finger = root.querySelector(".tv-finger");
     const caption = root.querySelector(".tv-caption"), sceneTitle = root.querySelector(".tv-scene-title");
     let index = 0, t = 0, applied = 0, playing = true, waiting = false, ended = false, last = 0, timer = 0;
@@ -345,7 +346,12 @@
         advance(t + dt);
         const scene = list[index];
         if (!waiting && t >= scene.duration) {
-          if (scene.last || index >= list.length - 1) { ended = true; playing = false; markSeen(); paint(); return; }
+          if (scene.last || index >= list.length - 1) {
+            ended = true; playing = false; markSeen(); paint();
+            // Quien lo ha abierto (la portada) decide qué hacer al terminar.
+            root.dispatchEvent(new CustomEvent("tutorial-end", { bubbles: true }));
+            return;
+          }
           index++; build();
         }
       }

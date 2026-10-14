@@ -3,193 +3,193 @@
 #app .guide-handbook > .guide-masthead .eyebrow { justify-content: center; color: var(--edition-brass); font: 600 .62rem/1.5 var(--ui-font); letter-spacing: .2em; }
 #app .guide-handbook > .guide-masthead h1 { margin: 6px auto 8px; color: var(--journal-ink); font: 500 clamp(2.2rem, 9vw, 3.2rem)/1.05 var(--font-display); letter-spacing: -.045em; }
 #app .guide-handbook > .guide-masthead p { max-width: 36ch; margin: 0 auto; color: var(--edition-muted); font: .82rem/1.6 var(--ui-font); text-wrap: balance; }
-#app .tv-player {
+:is(#app, #app-splash) .tv-player {
   --tv-screen: #2b2219; --tv-screen-2: #3d3022; --tv-glow: #e7c98f; --tv-paper: #fbf3e2; --tv-ink: #3b2816;
   --tv-ok: #4c8a5f; --tv-bad: #b4532f;
   margin: 4px 0 26px;
 }
-#app .tv-screen {
+:is(#app, #app-splash) .tv-screen {
   position: relative; overflow: hidden; isolation: isolate;
   height: clamp(340px, 92vw, 400px); border-radius: 18px;
   background: radial-gradient(ellipse at 50% 30%, var(--tv-screen-2), var(--tv-screen) 72%);
   box-shadow: inset 0 0 0 1px #ffffff14, 0 12px 26px #1c140c33;
   color: var(--tv-paper); cursor: pointer; user-select: none; -webkit-user-select: none;
 }
-#app .tv-scene-title {
+:is(#app, #app-splash) .tv-scene-title {
   position: absolute; z-index: 3; top: 12px; left: 14px; right: 14px;
   color: var(--tv-glow); font: 600 .62rem/1.4 var(--ui-font); letter-spacing: .16em; text-transform: uppercase;
 }
-#app .tv-scene-title.is-in { animation: tv-fade-down .5s ease both; }
-#app .tv-stage { position: absolute; inset: 34px 10px 74px; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; }
-#app .tv-caption {
+:is(#app, #app-splash) .tv-scene-title.is-in { animation: tv-fade-down .5s ease both; }
+:is(#app, #app-splash) .tv-stage { position: absolute; inset: 34px 10px 74px; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; }
+:is(#app, #app-splash) .tv-caption {
   position: absolute; z-index: 4; left: 10px; right: 10px; bottom: 10px; min-height: 52px; margin: 0;
   display: grid; place-items: center; padding: 8px 12px; border-radius: 10px;
   background: #0d0905b8; color: #fff; font: 500 .84rem/1.4 var(--ui-font); text-align: center; text-wrap: balance;
 }
-#app .tv-caption:empty { visibility: hidden; }
-#app .tv-big-play {
+:is(#app, #app-splash) .tv-caption:empty { visibility: hidden; }
+:is(#app, #app-splash) .tv-big-play {
   position: absolute; z-index: 5; top: 50%; left: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px;
   border: 0; border-radius: 50%; background: #0d0905c4; color: #fff; font-size: 1.6rem; box-shadow: 0 0 0 3px #ffffff40;
 }
-#app .tv-big-play[hidden] { display: none; }
-#app .tv-player.is-paused:not(.is-waiting) .tv-stage { filter: saturate(.7) brightness(.85); }
+:is(#app, #app-splash) .tv-big-play[hidden] { display: none; }
+:is(#app, #app-splash) .tv-player.is-paused:not(.is-waiting) .tv-stage { filter: saturate(.7) brightness(.85); }
 
 /* El dedo que hace las jugadas. */
-#app .tv-finger {
+:is(#app, #app-splash) .tv-finger {
   position: absolute; z-index: 6; top: 0; left: 0; width: 38px; height: 38px; margin: -6px 0 0 -12px;
   opacity: 0; pointer-events: none; transition: transform .7s cubic-bezier(.5,.05,.3,1), opacity .3s;
 }
-#app .tv-finger svg { width: 100%; height: 100%; fill: #fff; stroke: #2b2219; stroke-width: 1.3; stroke-linejoin: round; filter: drop-shadow(0 3px 4px #0008); transition: transform .2s; }
-#app .tv-finger.is-in { opacity: 1; }
-#app .tv-finger.is-press svg { transform: scale(.86); }
-#app .tv-finger::after { content: ""; position: absolute; top: 2px; left: 6px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--tv-glow); opacity: 0; }
-#app .tv-finger.is-tap::after { animation: tv-ripple .55s ease-out; }
+:is(#app, #app-splash) .tv-finger svg { width: 100%; height: 100%; fill: #fff; stroke: #2b2219; stroke-width: 1.3; stroke-linejoin: round; filter: drop-shadow(0 3px 4px #0008); transition: transform .2s; }
+:is(#app, #app-splash) .tv-finger.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-finger.is-press svg { transform: scale(.86); }
+:is(#app, #app-splash) .tv-finger::after { content: ""; position: absolute; top: 2px; left: 6px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--tv-glow); opacity: 0; }
+:is(#app, #app-splash) .tv-finger.is-tap::after { animation: tv-ripple .55s ease-out; }
 
 /* Cartas. */
-#app .tv-card {
+:is(#app, #app-splash) .tv-card {
   position: relative; display: grid; grid-template-rows: auto auto auto; justify-items: center; align-content: start;
   width: 62px; min-width: 0; padding: 4px 4px 6px; border-radius: 8px;
   background: var(--tv-paper); color: var(--tv-ink); box-shadow: 0 4px 10px #0006;
   transition: transform .9s cubic-bezier(.5,.05,.3,1), box-shadow .3s, opacity .4s, background .3s;
 }
-#app .tv-art { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; max-height: 70px; overflow: hidden; border-radius: 5px; background: #e8dcc2; }
-#app .tv-art img { width: 100%; height: 100%; object-fit: cover; }
-#app .tv-art i { font-style: normal; color: #9b7a45; }
-#app .tv-card b { margin-top: 3px; font: 700 .72rem/1.1 var(--ui-font); white-space: nowrap; }
-#app .tv-card small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; font: .5rem/1.2 var(--ui-font); text-align: center; color: #6b553a; }
-#app .tv-card .tv-secret { display: none; color: #9b411d; text-align: center; }
-#app .tv-card .tv-secret i { display: block; font: 600 .42rem/1.2 var(--ui-font); font-style: normal; letter-spacing: .04em; text-transform: uppercase; color: #8a6b45; }
-#app .tv-card.is-hidden .tv-value { display: none; }
-#app .tv-card.is-hidden .tv-secret { display: block; }
-#app .tv-card.is-hidden { background: linear-gradient(160deg, #fff6e2, #ecdcbb); }
-#app .tv-card.is-ok { box-shadow: 0 0 0 3px var(--tv-ok), 0 4px 14px #0007; animation: tv-pop .45s ease; }
-#app .tv-card.is-bad { box-shadow: 0 0 0 3px var(--tv-bad), 0 4px 14px #0007; }
-#app .tv-card.is-ok .tv-value { color: var(--tv-ok); }
-#app .tv-card.is-moved { animation: tv-pop .5s ease; }
-#app .tv-card.is-shake { animation: tv-shake .45s ease; }
-#app .tv-card.is-lifted { z-index: 5; box-shadow: 0 14px 24px #000a; transition: transform .9s cubic-bezier(.5,.05,.3,1), box-shadow .2s; }
-#app .tv-card.is-draggable, #app .is-yours .tv-line .is-placed { cursor: grab; touch-action: none; }
-#app .tv-big { width: 108px; opacity: 0; transform: translateY(18px) rotate(-3deg); }
-#app .tv-big .tv-art { max-height: 120px; }
-#app .tv-big b { font-size: 1.05rem; }
-#app .tv-big small { font-size: .62rem; }
-#app .tv-big.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-art { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; max-height: 70px; overflow: hidden; border-radius: 5px; background: #e8dcc2; }
+:is(#app, #app-splash) .tv-art img { width: 100%; height: 100%; object-fit: cover; }
+:is(#app, #app-splash) .tv-art i { font-style: normal; color: #9b7a45; }
+:is(#app, #app-splash) .tv-card b { margin-top: 3px; font: 700 .72rem/1.1 var(--ui-font); white-space: nowrap; }
+:is(#app, #app-splash) .tv-card small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; font: .5rem/1.2 var(--ui-font); text-align: center; color: #6b553a; }
+:is(#app, #app-splash) .tv-card .tv-secret { display: none; color: #9b411d; text-align: center; }
+:is(#app, #app-splash) .tv-card .tv-secret i { display: block; font: 600 .42rem/1.2 var(--ui-font); font-style: normal; letter-spacing: .04em; text-transform: uppercase; color: #8a6b45; }
+:is(#app, #app-splash) .tv-card.is-hidden .tv-value { display: none; }
+:is(#app, #app-splash) .tv-card.is-hidden .tv-secret { display: block; }
+:is(#app, #app-splash) .tv-card.is-hidden { background: linear-gradient(160deg, #fff6e2, #ecdcbb); }
+:is(#app, #app-splash) .tv-card.is-ok { box-shadow: 0 0 0 3px var(--tv-ok), 0 4px 14px #0007; animation: tv-pop .45s ease; }
+:is(#app, #app-splash) .tv-card.is-bad { box-shadow: 0 0 0 3px var(--tv-bad), 0 4px 14px #0007; }
+:is(#app, #app-splash) .tv-card.is-ok .tv-value { color: var(--tv-ok); }
+:is(#app, #app-splash) .tv-card.is-moved { animation: tv-pop .5s ease; }
+:is(#app, #app-splash) .tv-card.is-shake { animation: tv-shake .45s ease; }
+:is(#app, #app-splash) .tv-card.is-lifted { z-index: 5; box-shadow: 0 14px 24px #000a; transition: transform .9s cubic-bezier(.5,.05,.3,1), box-shadow .2s; }
+:is(#app, #app-splash) .tv-card.is-draggable, :is(#app, #app-splash) .is-yours .tv-line .is-placed { cursor: grab; touch-action: none; }
+:is(#app, #app-splash) .tv-big { width: 108px; opacity: 0; transform: translateY(18px) rotate(-3deg); }
+:is(#app, #app-splash) .tv-big .tv-art { max-height: 120px; }
+:is(#app, #app-splash) .tv-big b { font-size: 1.05rem; }
+:is(#app, #app-splash) .tv-big small { font-size: .62rem; }
+:is(#app, #app-splash) .tv-big.is-in { opacity: 1; transform: none; }
 
-#app .tv-center { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 14px; width: 100%; }
-#app .tv-logo { color: var(--tv-glow); font: 500 1.7rem/1.1 var(--font-display); letter-spacing: -.02em; text-align: center; }
+:is(#app, #app-splash) .tv-center { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 14px; width: 100%; }
+:is(#app, #app-splash) .tv-logo { color: var(--tv-glow); font: 500 1.7rem/1.1 var(--font-display); letter-spacing: -.02em; text-align: center; }
 
 /* La línea y sus huecos. */
-#app .tv-line { display: flex; align-items: center; justify-content: center; width: 100%; min-width: 0; }
-#app .tv-line .tv-card { flex: 0 1 62px; }
-#app .tv-center .tv-line .tv-card { opacity: 0; transform: translateY(10px); }
-#app .tv-center .tv-line .tv-card.is-in { opacity: 1; transform: none; }
-#app .tv-gap {
+:is(#app, #app-splash) .tv-line { display: flex; align-items: center; justify-content: center; width: 100%; min-width: 0; }
+:is(#app, #app-splash) .tv-line .tv-card { flex: 0 1 62px; }
+:is(#app, #app-splash) .tv-center .tv-line .tv-card { opacity: 0; transform: translateY(10px); }
+:is(#app, #app-splash) .tv-center .tv-line .tv-card.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-gap {
   flex: 0 0 auto; display: grid; place-items: center; width: 16px; height: 40px; margin: 0 2px; padding: 0;
   border: 1px dashed #e7c98f88; border-radius: 6px; background: transparent; color: var(--tv-glow); font: 600 .9rem/1 var(--ui-font);
   transition: background .2s, transform .2s;
 }
-#app .tv-gap.is-here { position: relative; border-style: solid; border-color: var(--tv-ok); background: #4c8a5f55; }
-#app .tv-gap.is-here::after { content: "Aquí"; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); padding: 1px 6px; border-radius: 4px; background: var(--tv-ok); color: #fff; font: 700 .55rem/1.5 var(--ui-font); }
-#app .is-yours .tv-gap { width: 24px; height: 54px; border-color: var(--tv-glow); cursor: pointer; }
-#app .tv-player.is-waiting .is-yours .tv-gap { animation: tv-breathe 1.6s ease-in-out infinite; }
-#app .is-yours .tv-gap.is-over, #app .is-yours .tv-gap:hover { background: #e7c98f44; transform: scale(1.08); }
-#app .is-yours .tv-gap:disabled { animation: none; opacity: .4; cursor: default; }
-#app .tv-axis { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; width: min(100%, 300px); opacity: 0; transition: opacity .6s; color: var(--tv-glow); font: 600 .62rem/1 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
-#app .tv-axis i { height: 2px; background: linear-gradient(90deg, transparent, var(--tv-glow)); position: relative; }
-#app .tv-axis i::after { content: ""; position: absolute; right: -2px; top: -4px; border: 5px solid transparent; border-left: 7px solid var(--tv-glow); border-right: 0; }
-#app .tv-axis.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-gap.is-here { position: relative; border-style: solid; border-color: var(--tv-ok); background: #4c8a5f55; }
+:is(#app, #app-splash) .tv-gap.is-here::after { content: "Aquí"; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); padding: 1px 6px; border-radius: 4px; background: var(--tv-ok); color: #fff; font: 700 .55rem/1.5 var(--ui-font); }
+:is(#app, #app-splash) .is-yours .tv-gap { width: 24px; height: 54px; border-color: var(--tv-glow); cursor: pointer; }
+:is(#app, #app-splash) .tv-player.is-waiting .is-yours .tv-gap { animation: tv-breathe 1.6s ease-in-out infinite; }
+:is(#app, #app-splash) .is-yours .tv-gap.is-over, :is(#app, #app-splash) .is-yours .tv-gap:hover { background: #e7c98f44; transform: scale(1.08); }
+:is(#app, #app-splash) .is-yours .tv-gap:disabled { animation: none; opacity: .4; cursor: default; }
+:is(#app, #app-splash) .tv-axis { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; width: min(100%, 300px); opacity: 0; transition: opacity .6s; color: var(--tv-glow); font: 600 .62rem/1 var(--ui-font); letter-spacing: .1em; text-transform: uppercase; }
+:is(#app, #app-splash) .tv-axis i { height: 2px; background: linear-gradient(90deg, transparent, var(--tv-glow)); position: relative; }
+:is(#app, #app-splash) .tv-axis i::after { content: ""; position: absolute; right: -2px; top: -4px; border: 5px solid transparent; border-left: 7px solid var(--tv-glow); border-right: 0; }
+:is(#app, #app-splash) .tv-axis.is-in { opacity: 1; }
 
 /* La mesa: línea arriba, mano abajo. */
-#app .tv-table { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: space-between; width: 100%; height: 100%; padding: 6px 0 0; }
-#app .tv-hand { display: grid; place-items: center; min-height: 104px; padding: 6px 18px; border-radius: 12px; background: #ffffff0d; }
-#app .tv-hand .tv-card { opacity: 0; transform: translateY(16px); }
-#app .tv-hand .tv-card.is-in { opacity: 1; transform: none; }
-#app .tv-confirm {
+:is(#app, #app-splash) .tv-table { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: space-between; width: 100%; height: 100%; padding: 6px 0 0; }
+:is(#app, #app-splash) .tv-hand { display: grid; place-items: center; min-height: 104px; padding: 6px 18px; border-radius: 12px; background: #ffffff0d; }
+:is(#app, #app-splash) .tv-hand .tv-card { opacity: 0; transform: translateY(16px); }
+:is(#app, #app-splash) .tv-hand .tv-card.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-confirm {
   position: absolute; right: 6px; bottom: 26px; padding: 8px 12px; border: 0; border-radius: 999px;
   background: var(--tv-glow); color: var(--tv-ink); font: 700 .72rem/1 var(--ui-font);
   opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; pointer-events: none;
 }
-#app .tv-confirm.is-in { opacity: 1; transform: none; pointer-events: auto; }
-#app .is-yours .tv-confirm { cursor: pointer; }
-#app .is-yours .tv-confirm:disabled { opacity: .45; }
-#app .is-yours .tv-confirm:not(.is-in) { opacity: 0; }
-#app .tv-lives { position: absolute; left: 8px; bottom: 34px; display: flex; gap: 3px; color: #e3664b; font-size: 1rem; opacity: 0; transition: opacity .4s; }
-#app .tv-lives.is-in { opacity: 1; }
-#app .tv-lives .is-lost { color: #ffffff40; animation: tv-shake .45s ease; }
+:is(#app, #app-splash) .tv-confirm.is-in { opacity: 1; transform: none; pointer-events: auto; }
+:is(#app, #app-splash) .is-yours .tv-confirm { cursor: pointer; }
+:is(#app, #app-splash) .is-yours .tv-confirm:disabled { opacity: .45; }
+:is(#app, #app-splash) .is-yours .tv-confirm:not(.is-in) { opacity: 0; }
+:is(#app, #app-splash) .tv-lives { position: absolute; left: 8px; bottom: 34px; display: flex; gap: 3px; color: #e3664b; font-size: 1rem; opacity: 0; transition: opacity .4s; }
+:is(#app, #app-splash) .tv-lives.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-lives .is-lost { color: #ffffff40; animation: tv-shake .45s ease; }
 
 /* Fechas y cifras. */
-#app .tv-examples { display: grid; gap: 10px; width: min(100%, 300px); }
-#app .tv-example { display: grid; grid-template-columns: 52px 1fr; align-items: center; gap: 12px; padding: 8px; border-radius: 12px; background: #ffffff10; opacity: 0; transform: translateX(-14px); transition: opacity .5s, transform .5s; }
-#app .tv-example.is-in { opacity: 1; transform: none; }
-#app .tv-example .tv-card { width: 52px; }
-#app .tv-example .tv-art { max-height: 56px; }
-#app .tv-example > span b { display: block; color: var(--tv-glow); font: 600 1rem/1.2 var(--font-display); }
-#app .tv-example > span small { color: #f3e6cc; font: .7rem/1.4 var(--ui-font); }
+:is(#app, #app-splash) .tv-examples { display: grid; gap: 10px; width: min(100%, 300px); }
+:is(#app, #app-splash) .tv-example { display: grid; grid-template-columns: 52px 1fr; align-items: center; gap: 12px; padding: 8px; border-radius: 12px; background: #ffffff10; opacity: 0; transform: translateX(-14px); transition: opacity .5s, transform .5s; }
+:is(#app, #app-splash) .tv-example.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-example .tv-card { width: 52px; }
+:is(#app, #app-splash) .tv-example .tv-art { max-height: 56px; }
+:is(#app, #app-splash) .tv-example > span b { display: block; color: var(--tv-glow); font: 600 1rem/1.2 var(--font-display); }
+:is(#app, #app-splash) .tv-example > span small { color: #f3e6cc; font: .7rem/1.4 var(--ui-font); }
 
 /* Modalidades. */
-#app .tv-board { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 10px; width: 100%; height: 100%; }
-#app .tv-kicker { color: var(--tv-glow); font: 500 1.05rem/1.2 var(--font-display); text-align: center; }
-#app .tv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 7px; width: 100%; }
-#app .tv-tiles.tv-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-#app .tv-tile {
+:is(#app, #app-splash) .tv-board { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 10px; width: 100%; height: 100%; }
+:is(#app, #app-splash) .tv-kicker { color: var(--tv-glow); font: 500 1.05rem/1.2 var(--font-display); text-align: center; }
+:is(#app, #app-splash) .tv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 7px; width: 100%; }
+:is(#app, #app-splash) .tv-tiles.tv-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+:is(#app, #app-splash) .tv-tile {
   display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 7px; align-items: center; padding: 8px;
   border: 1px solid #e7c98f44; border-radius: 10px; background: #ffffff0f; text-align: left;
   opacity: 0; transform: translateY(10px) scale(.96); transition: opacity .45s, transform .45s, background .3s;
 }
-#app .tv-tile.is-in { opacity: 1; transform: none; }
-#app .tv-tile i { grid-row: span 2; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--tv-glow); color: var(--tv-ink); font-style: normal; font-size: .82rem; }
-#app .tv-tile b { font: 600 .78rem/1.2 var(--ui-font); color: #fff; }
-#app .tv-tile small { font: .6rem/1.3 var(--ui-font); color: #e9dcc2; }
-#app .tv-three .tv-tile { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 4px; }
-#app .tv-three .tv-tile i { grid-row: auto; }
-#app .tv-daily { width: 100%; }
-#app .tv-daily .tv-tile { border-color: var(--tv-glow); background: #e7c98f22; }
-#app .tv-note { margin: 0; max-width: 300px; color: #f3e6cc; font: .72rem/1.45 var(--ui-font); text-align: center; opacity: 0; transition: opacity .5s; }
-#app .tv-note.is-in { opacity: 1; }
-#app .tv-dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; width: min(100%, 300px); }
-#app .tv-dots span { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; background: #ffffff14; color: transparent; font: 700 .7rem/1 var(--ui-font); transition: background .3s, color .3s, transform .3s; transform: scale(.7); }
-#app .tv-dots span.is-in { transform: none; color: #fff; }
-#app .tv-dots span.is-in[data-mark="ok"] { background: var(--tv-ok); }
-#app .tv-dots span.is-in[data-mark="bad"] { background: var(--tv-bad); }
-#app .tv-score { color: var(--tv-glow); font: 500 1.6rem/1 var(--font-display); opacity: 0; transform: scale(.8); transition: opacity .4s, transform .4s; }
-#app .tv-score.is-in { opacity: 1; transform: none; }
-#app .tv-facts, #app .tv-levels { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
-#app .tv-facts span, #app .tv-levels span { padding: 3px 9px; border-radius: 999px; background: #ffffff14; color: #f3e6cc; font: 600 .62rem/1.5 var(--ui-font); opacity: 0; transition: opacity .3s, background .3s, color .3s; }
-#app .tv-facts span.is-in, #app .tv-levels span.is-in { opacity: 1; }
-#app .tv-levels span.is-on { background: var(--tv-glow); color: var(--tv-ink); }
-#app .tv-pass { display: flex; align-items: center; gap: 12px; opacity: 0; transition: opacity .4s; }
-#app .tv-pass.is-in { opacity: 1; }
-#app .tv-phone { display: grid; width: 30px; height: 30px; color: var(--tv-glow); animation: tv-wiggle 1.8s ease-in-out infinite; }
-#app .tv-phone svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
-#app .tv-people { display: flex; gap: 6px; }
-#app .tv-people b { padding: 3px 9px; border-radius: 999px; background: #ffffff14; font: 600 .66rem/1.5 var(--ui-font); transition: background .3s, color .3s, transform .3s; }
-#app .tv-people b.is-on { background: var(--tv-glow); color: var(--tv-ink); transform: translateY(-3px); }
-#app .tv-table-seats { display: flex; gap: 10px; color: var(--tv-glow); font-size: 1.3rem; opacity: 0; transition: opacity .4s; }
-#app .tv-table-seats.is-in { opacity: 1; }
-#app .tv-table-seats span:not(.is-free) { animation: tv-pop .4s ease; }
-#app .tv-end { opacity: 0; transform: scale(.96); transition: opacity .5s, transform .5s; }
-#app .tv-end.is-in { opacity: 1; transform: none; }
-#app .tv-end p { max-width: 280px; margin: 0; color: #f3e6cc; font: .78rem/1.5 var(--ui-font); text-align: center; }
-#app .tv-end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-#app .tv-end-actions .btn { min-height: 40px; padding: 8px 14px; font-size: .78rem; }
-#app .tv-end-actions .btn-ghost { color: var(--tv-glow); border-color: #e7c98f66; }
+:is(#app, #app-splash) .tv-tile.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-tile i { grid-row: span 2; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--tv-glow); color: var(--tv-ink); font-style: normal; font-size: .82rem; }
+:is(#app, #app-splash) .tv-tile b { font: 600 .78rem/1.2 var(--ui-font); color: #fff; }
+:is(#app, #app-splash) .tv-tile small { font: .6rem/1.3 var(--ui-font); color: #e9dcc2; }
+:is(#app, #app-splash) .tv-three .tv-tile { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 4px; }
+:is(#app, #app-splash) .tv-three .tv-tile i { grid-row: auto; }
+:is(#app, #app-splash) .tv-daily { width: 100%; }
+:is(#app, #app-splash) .tv-daily .tv-tile { border-color: var(--tv-glow); background: #e7c98f22; }
+:is(#app, #app-splash) .tv-note { margin: 0; max-width: 300px; color: #f3e6cc; font: .72rem/1.45 var(--ui-font); text-align: center; opacity: 0; transition: opacity .5s; }
+:is(#app, #app-splash) .tv-note.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; width: min(100%, 300px); }
+:is(#app, #app-splash) .tv-dots span { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; background: #ffffff14; color: transparent; font: 700 .7rem/1 var(--ui-font); transition: background .3s, color .3s, transform .3s; transform: scale(.7); }
+:is(#app, #app-splash) .tv-dots span.is-in { transform: none; color: #fff; }
+:is(#app, #app-splash) .tv-dots span.is-in[data-mark="ok"] { background: var(--tv-ok); }
+:is(#app, #app-splash) .tv-dots span.is-in[data-mark="bad"] { background: var(--tv-bad); }
+:is(#app, #app-splash) .tv-score { color: var(--tv-glow); font: 500 1.6rem/1 var(--font-display); opacity: 0; transform: scale(.8); transition: opacity .4s, transform .4s; }
+:is(#app, #app-splash) .tv-score.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-facts, :is(#app, #app-splash) .tv-levels { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+:is(#app, #app-splash) .tv-facts span, :is(#app, #app-splash) .tv-levels span { padding: 3px 9px; border-radius: 999px; background: #ffffff14; color: #f3e6cc; font: 600 .62rem/1.5 var(--ui-font); opacity: 0; transition: opacity .3s, background .3s, color .3s; }
+:is(#app, #app-splash) .tv-facts span.is-in, :is(#app, #app-splash) .tv-levels span.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-levels span.is-on { background: var(--tv-glow); color: var(--tv-ink); }
+:is(#app, #app-splash) .tv-pass { display: flex; align-items: center; gap: 12px; opacity: 0; transition: opacity .4s; }
+:is(#app, #app-splash) .tv-pass.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-phone { display: grid; width: 30px; height: 30px; color: var(--tv-glow); animation: tv-wiggle 1.8s ease-in-out infinite; }
+:is(#app, #app-splash) .tv-phone svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+:is(#app, #app-splash) .tv-people { display: flex; gap: 6px; }
+:is(#app, #app-splash) .tv-people b { padding: 3px 9px; border-radius: 999px; background: #ffffff14; font: 600 .66rem/1.5 var(--ui-font); transition: background .3s, color .3s, transform .3s; }
+:is(#app, #app-splash) .tv-people b.is-on { background: var(--tv-glow); color: var(--tv-ink); transform: translateY(-3px); }
+:is(#app, #app-splash) .tv-table-seats { display: flex; gap: 10px; color: var(--tv-glow); font-size: 1.3rem; opacity: 0; transition: opacity .4s; }
+:is(#app, #app-splash) .tv-table-seats.is-in { opacity: 1; }
+:is(#app, #app-splash) .tv-table-seats span:not(.is-free) { animation: tv-pop .4s ease; }
+:is(#app, #app-splash) .tv-end { opacity: 0; transform: scale(.96); transition: opacity .5s, transform .5s; }
+:is(#app, #app-splash) .tv-end.is-in { opacity: 1; transform: none; }
+:is(#app, #app-splash) .tv-end p { max-width: 280px; margin: 0; color: #f3e6cc; font: .78rem/1.5 var(--ui-font); text-align: center; }
+:is(#app, #app-splash) .tv-end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+:is(#app, #app-splash) .tv-end-actions .btn { min-height: 40px; padding: 8px 14px; font-size: .78rem; }
+:is(#app, #app-splash) .tv-end-actions .btn-ghost { color: var(--tv-glow); border-color: #e7c98f66; }
 
 /* Controles del reproductor. */
-#app .tv-controls { display: grid; grid-template-columns: auto auto auto 1fr; align-items: center; gap: 6px; margin-top: 10px; }
-#app .tv-btn {
+:is(#app, #app-splash) .tv-controls { display: grid; grid-template-columns: auto auto auto 1fr; align-items: center; gap: 6px; margin-top: 10px; }
+:is(#app, #app-splash) .tv-btn {
   display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--edition-line); border-radius: 50%;
   background: var(--edition-surface); color: var(--edition-ink); font: 600 .78rem/1 var(--ui-font);
 }
-#app .tv-play { width: 46px; height: 46px; background: var(--edition-brass); color: var(--edition-surface); border-color: var(--edition-brass); }
-#app .tv-chapters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; min-width: 0; }
-#app .tv-chapter { display: grid; gap: 5px; min-width: 0; padding: 4px 0; border: 0; background: none; color: var(--edition-muted); text-align: left; cursor: pointer; }
-#app .tv-chapter small { overflow: hidden; font: 600 .56rem/1.2 var(--ui-font); white-space: nowrap; text-overflow: ellipsis; }
-#app .tv-chapter.is-current small { color: var(--edition-ink); }
-#app .tv-bar { display: block; height: 4px; overflow: hidden; border-radius: 4px; background: var(--edition-line); }
-#app .tv-bar i { display: block; width: 0; height: 100%; background: var(--edition-brass); }
+:is(#app, #app-splash) .tv-play { width: 46px; height: 46px; background: var(--edition-brass); color: var(--edition-surface); border-color: var(--edition-brass); }
+:is(#app, #app-splash) .tv-chapters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; min-width: 0; }
+:is(#app, #app-splash) .tv-chapter { display: grid; gap: 5px; min-width: 0; padding: 4px 0; border: 0; background: none; color: var(--edition-muted); text-align: left; cursor: pointer; }
+:is(#app, #app-splash) .tv-chapter small { overflow: hidden; font: 600 .56rem/1.2 var(--ui-font); white-space: nowrap; text-overflow: ellipsis; }
+:is(#app, #app-splash) .tv-chapter.is-current small { color: var(--edition-ink); }
+:is(#app, #app-splash) .tv-bar { display: block; height: 4px; overflow: hidden; border-radius: 4px; background: var(--edition-line); }
+:is(#app, #app-splash) .tv-bar i { display: block; width: 0; height: 100%; background: var(--edition-brass); }
 
 /* Al saltar a mitad de escena, todo aparece ya en su sitio. */
-#app .tv-player.tv-instant *, #app .tv-player.tv-instant *::after { transition: none !important; animation: none !important; }
+:is(#app, #app-splash) .tv-player.tv-instant *, :is(#app, #app-splash) .tv-player.tv-instant *::after { transition: none !important; animation: none !important; }
 
 @keyframes tv-fade-down { from { opacity: 0; transform: translateY(-6px); } }
 @keyframes tv-ripple { from { opacity: 1; transform: scale(.4); } to { opacity: 0; transform: scale(1.8); } }
@@ -198,13 +198,13 @@
 @keyframes tv-breathe { 50% { background: #e7c98f33; } }
 @keyframes tv-wiggle { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg) translateX(6px); } }
 @media (prefers-reduced-motion: reduce) {
-  #app .tv-player *, #app .tv-player *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
-  #app .tv-finger, #app .tv-card { transition-duration: .2s; }
+  :is(#app, #app-splash) .tv-player *, :is(#app, #app-splash) .tv-player *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  :is(#app, #app-splash) .tv-finger, :is(#app, #app-splash) .tv-card { transition-duration: .2s; }
 }
 @media (max-width: 360px) {
-  #app .tv-card { width: 54px; }
-  #app .tv-line .tv-card { flex-basis: 54px; }
-  #app .tv-gap { width: 14px; }
-  #app .is-yours .tv-gap { width: 20px; }
-  #app .tv-tiles.tv-three .tv-tile small { display: none; }
+  :is(#app, #app-splash) .tv-card { width: 54px; }
+  :is(#app, #app-splash) .tv-line .tv-card { flex-basis: 54px; }
+  :is(#app, #app-splash) .tv-gap { width: 14px; }
+  :is(#app, #app-splash) .is-yours .tv-gap { width: 20px; }
+  :is(#app, #app-splash) .tv-tiles.tv-three .tv-tile small { display: none; }
 }

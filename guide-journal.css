@@ -6,18 +6,6 @@
 :root[data-theme="dark"] #app .guide-handbook {
   --journal-ink: #afc9d3; --journal-wash: #263238; --journal-line: #53666c;
 }
-#app .guide-handbook > .atlas-page-heading {
-  position: relative; isolation: isolate; margin: 4px 0 24px; padding: 28px 20px 24px;
-  border: 1px solid var(--journal-line); border-radius: 18px 18px 6px 6px;
-  background: radial-gradient(ellipse at 50% 0, var(--journal-wash), transparent 75%), var(--edition-surface);
-  box-shadow: inset 0 0 0 6px var(--edition-surface), inset 0 0 0 7px var(--edition-line), 0 9px 24px #26323a12;
-  text-align: center;
-}
-#app .guide-frontispiece { display: block; width: 126px; height: 86px; margin: 0 auto 14px; color: var(--journal-ink); }
-#app .guide-handbook > .atlas-page-heading .eyebrow { justify-content: center; color: var(--edition-brass); font: 600 .62rem/1.5 var(--ui-font); letter-spacing: .2em; }
-#app .guide-handbook > .atlas-page-heading h1 { margin: 9px auto 10px; color: var(--journal-ink); font: 500 clamp(2.8rem, 10vw, 4rem)/1.05 var(--font-display); letter-spacing: -.045em; }
-#app .guide-handbook > .atlas-page-heading p { max-width: 36ch; margin: 0 auto; color: var(--edition-muted); font: .85rem/1.65 var(--ui-font); text-wrap: balance; }
-#app .guide-handbook > .atlas-page-heading::after { content: ''; display: block; height: 1px; width: 72px; margin: 20px auto 0; background: var(--edition-brass); }
 #app .guide-handbook .guide-note { color: var(--edition-muted); font: .76rem/1.6 var(--ui-font); }
 #app .guide-handbook > .atlas-section-heading { display: block; margin: 34px 0 18px; padding: 0 2px 14px; border-bottom: 1px solid var(--edition-brass); }
 #app .guide-handbook > .atlas-section-heading h2 { color: var(--journal-ink); font: 500 clamp(1.35rem, 5vw, 1.7rem)/1.25 var(--font-display); margin-bottom: 7px; }
@@ -40,15 +28,6 @@
   #app .guide-handbook .guide-chapter > summary { padding: 14px 12px; gap: 10px; grid-template-columns: 36px minmax(0,1fr) 24px; }
   #app .guide-handbook .guide-chapter-number { width: 34px; height: 42px; }
 }
-/* Las referencias ceden ancho en móviles pequeños; los huecos conservan altura táctil. */
-
-/* El cuaderno es una lámina pintada, con transparencia real y espacio para el título. */
-#app .guide-handbook .guide-frontispiece {
-  width: min(100%, 280px); height: auto; aspect-ratio: 3 / 2; object-fit: contain;
-  margin: -4px auto 16px; filter: drop-shadow(0 8px 7px #61412418);
-}
-:root[data-theme="dark"] #app .guide-handbook .guide-frontispiece { filter: drop-shadow(0 8px 10px #0005); }
-@media (max-width: 360px) { #app .guide-handbook .guide-frontispiece { width: min(100%, 240px); } }
 
 /* Cuero bajo un cielo grabado; el pergamino conserva la claridad de lectura. */
 #app > .overlay > .rules:has(.guide-handbook) {
@@ -58,133 +37,11 @@
     repeating-linear-gradient(0deg, #96744504 0 1px, transparent 1px 4px),
     var(--edition-paper);
 }
-#app .guide-handbook > .atlas-page-heading {
-  padding: 30px 22px 28px; overflow: hidden; border-color: #947345;
-  border-radius: 20px 20px 8px 8px;
-  background:
-    radial-gradient(ellipse at 50% 28%, #d8ad6359, transparent 54%),
-    radial-gradient(ellipse at 12% 0, #577b8060, transparent 55%),
-    linear-gradient(150deg, #2c444c, #1b3039 58%, #172b32);
-  box-shadow: inset 0 0 0 6px #172b3220, inset 0 0 0 7px #dfc18a59,
-    inset 0 -45px 65px #0e202d55, 0 14px 28px #25353b2b, 0 2px 3px #82603830;
-}
-#app .guide-handbook > .atlas-page-heading::before {
-  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: url('assets/guide-celestial-v1.svg') center top / cover no-repeat; opacity: .42;
-}
-#app .guide-handbook > .atlas-page-heading::after {
-  height: 7px; width: 112px; margin-top: 20px; opacity: .8;
-  background: radial-gradient(circle, #e5c891 0 2px, transparent 2.5px) center / 7px 7px no-repeat,
-    linear-gradient(90deg, transparent, #bd965b) left center / 43px 1px no-repeat,
-    linear-gradient(90deg, #bd965b, transparent) right center / 43px 1px no-repeat;
-}
-#app .guide-handbook > .atlas-page-heading .eyebrow { color: #f8e8c5; text-shadow: 0 1px 6px #0d1c26; }
-#app .guide-handbook > .atlas-page-heading h1 {
-  color: #fff0d2; text-shadow: 0 2px 1px #0c1b23, 0 0 25px #e6bb5e25;
-}
-#app .guide-handbook > .atlas-page-heading p { color: #f0ebdf; }
-#app .guide-handbook > .atlas-page-heading .guide-frontispiece {
-  position: relative; filter: drop-shadow(0 12px 9px #091c2d75);
-}
 :root[data-theme="dark"] #app > .overlay > .rules:has(.guide-handbook) {
   background: radial-gradient(ellipse at 0 0, #39535e38, transparent 50%),
     radial-gradient(ellipse at 100% 35%, #ae81431c, transparent 55%), var(--edition-paper);
 }
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading {
-  background: radial-gradient(ellipse at 50% 28%, #bf914a40, transparent 54%),
-    linear-gradient(150deg, #263e47, #142831 70%, #10222a);
-  box-shadow: inset 0 0 0 6px #10222a20, inset 0 0 0 7px #dfc18a45,
-    inset 0 -45px 65px #07161d55, 0 14px 28px #0005;
-}
-@media (max-width: 360px) {
-  #app .guide-handbook > .atlas-page-heading { padding-inline: 16px; }
-}
 
-/* La portada se abre a la sabana: la lámina incluye mesa, cuaderno y paisaje. */
-#app .guide-handbook > .atlas-page-heading {
-  background: radial-gradient(ellipse at 50% 0, #82623b50, transparent 70%),
-    linear-gradient(150deg, #344248, #1b3039 70%, #172b32);
-}
-#app .guide-handbook > .atlas-page-heading::before { display: none; }
-#app .guide-handbook > .atlas-page-heading .guide-frontispiece {
-  display: block; width: calc(100% + 44px); max-width: none; height: auto;
-  aspect-ratio: 3 / 2; object-fit: contain; margin: -30px -22px 24px;
-  border-radius: 19px 19px 0 0; border-bottom: 1px solid #c6a46c;
-  filter: none;
-}
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading {
-  background: radial-gradient(ellipse at 50% 0, #82623b30, transparent 70%),
-    linear-gradient(150deg, #263a40, #142831 70%, #10222a);
-}
-@media (max-width: 360px) {
-  #app .guide-handbook > .atlas-page-heading .guide-frontispiece {
-    width: calc(100% + 32px); margin-inline: -16px;
-  }
-}
-
-/* Como la portada del Atlas: lectura a la izquierda, paisaje a la derecha. */
-#app .guide-handbook > .atlas-page-heading {
-  min-height: 248px; padding: 28px 26px 36px; text-align: left; border-radius: 22px;
-  background: #e9dcc3;
-  box-shadow: 0 12px 26px #5b44231f, inset 0 0 0 6px #fff7e460, inset 0 0 0 7px #a3865550;
-}
-#app .guide-handbook > .atlas-page-heading .guide-frontispiece {
-  position: absolute; inset: 0; z-index: -2; display: block;
-  width: 100%; max-width: none; height: 100%; aspect-ratio: auto;
-  margin: 0; border: 0; border-radius: 0; object-fit: cover; object-position: 65% center;
-  filter: none; pointer-events: none;
-}
-#app .guide-handbook > .atlas-page-heading::before {
-  display: block; inset: 0; z-index: -1; opacity: 1;
-  background: linear-gradient(90deg, #fbf1ddfc 0%, #fbf1ddf5 36%, #fbf1dddc 51%, #fbf1dd16 79%);
-}
-#app .guide-handbook > .atlas-page-heading .eyebrow {
-  justify-content: flex-start; max-width: 60%; color: #5f623d;
-  font-size: .6rem; line-height: 1.5; letter-spacing: .14em; text-shadow: none;
-}
-#app .guide-handbook > .atlas-page-heading h1 {
-  max-width: 60%; margin: 12px 0 10px; color: #3c4837;
-  font-size: clamp(2.55rem, 9vw, 4rem); text-shadow: none;
-}
-#app .guide-handbook > .atlas-page-heading p {
-  max-width: 57%; margin: 0; color: #525b46;
-  font: .8rem/1.65 var(--ui-font); text-wrap: pretty;
-}
-#app .guide-handbook > .atlas-page-heading::after {
-  position: absolute; left: 26px; bottom: 16px; width: 80px; margin: 0;
-}
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading {
-  background: #1e302c;
-  box-shadow: 0 12px 26px #0005, inset 0 0 0 6px #13272240, inset 0 0 0 7px #b89c6550;
-}
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading::before {
-  background: linear-gradient(90deg, #172c29fc 0%, #172c29f5 36%, #172c29df 51%, #172c2930 79%);
-}
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading .eyebrow { color: #e5c78f; }
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading h1 { color: #fff0d2; }
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading p { color: #ede4cf; }
-@media (max-width: 600px) {
-  #app .guide-handbook > .atlas-page-heading { min-height: 240px; padding: 24px 20px 36px; }
-  #app .guide-handbook > .atlas-page-heading::after { left: 20px; }
-}
-@media (max-width: 350px) {
-  #app .guide-handbook > .atlas-page-heading { padding-inline: 16px; }
-  #app .guide-handbook > .atlas-page-heading p { max-width: 60%; font-size: .75rem; }
-  #app .guide-handbook > .atlas-page-heading::after { left: 16px; }
-}
-
-/* La veladura deja respirar el cuaderno y la fauna de la mitad derecha. */
-#app .guide-handbook > .atlas-page-heading { min-height: 228px; }
-#app .guide-handbook > .atlas-page-heading::before {
-  background: linear-gradient(90deg, #fbf1ddfc 0%, #fbf1ddf5 25%, #fbf1ddc7 39%, #fbf1dd45 51%, #fbf1dd00 66%);
-}
-#app .guide-handbook > .atlas-page-heading .eyebrow,
-#app .guide-handbook > .atlas-page-heading h1 { max-width: 48%; }
-#app .guide-handbook > .atlas-page-heading p { max-width: 46%; }
-#app .guide-handbook > .atlas-page-heading .guide-frontispiece { object-position: right center; }
-:root[data-theme="dark"] #app .guide-handbook > .atlas-page-heading::before {
-  background: linear-gradient(90deg, #172c29fc 0%, #172c29f5 25%, #172c29d9 39%, #172c2966 51%, #172c2900 66%);
-}
 /* Cada capítulo tiene su propia tinta, como las escalas del Atlas. */
 #app .guide-handbook .guide-chapter { --chapter-tone: #476c71; --chapter-wash: #e4edef; }
 #app .guide-handbook .guide-chapter:nth-of-type(3n+2) { --chapter-tone: #64704a; --chapter-wash: #e9eddf; }
@@ -208,6 +65,3 @@
 :root[data-theme="dark"] #app .guide-handbook .guide-chapter { --chapter-tone: #a9ccd0; }
 :root[data-theme="dark"] #app .guide-handbook .guide-chapter:nth-of-type(3n+2) { --chapter-tone: #c0cc9c; }
 :root[data-theme="dark"] #app .guide-handbook .guide-chapter:nth-of-type(3n) { --chapter-tone: #e1bb83; }
-@media (max-width: 350px) {
-  #app .guide-handbook > .atlas-page-heading p { max-width: 48%; }
-}

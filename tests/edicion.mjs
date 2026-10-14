@@ -182,22 +182,35 @@ for (const reduce of [false, true]) {
   } finally { w.close(); }
 }
 {
-  // «Ver el manual», bajo «Jugar»: un enlace discreto que entra igual y deja pedida la Guía.
-  const {w} = splashClock();
+  // «Ver el manual», bajo «Jugar»: reproduce la guía en vídeo sobre la portada, sin entrar en
+  // el juego, y al terminar (o al cerrarla) se vuelve a la portada con «Jugar» esperando.
+  const {w, advance} = splashClock();
   try {
-    w.CONTINUUM = { effectPrefs: () => ({ambience: false}), setAmbience() {} };
+    let pedido = null;
+    w.CONTINUUM = { effectPrefs: () => ({ambience: false}), setAmbience() {}, has: () => true, DEFAULT_MODE: 'history',
+      Tutorial: { markup: (modo, opciones) => { pedido = {modo, opciones}; return '<section data-tutorial="history" data-portada></section>'; }, mountAll() {} } };
     let abierto = false;
     w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
     await new Promise(resolve => setImmediate(resolve));
     const guia = w.document.getElementById('splash-guide');
     assert.ok(guia && guia.tagName === 'BUTTON' && guia.textContent === 'Ver el manual', 'la portada ofrece ver el manual');
     assert.equal(guia.previousElementSibling?.id, 'splash-play', 'justo debajo de «Jugar»');
-    assert.equal(w.sessionStorage.getItem('continuum-abrir-guia'), null);
     guia.click();
     await new Promise(resolve => setImmediate(resolve));
-    assert.ok(abierto, 'entra en el juego igual que «Jugar»');
-    assert.equal(w.sessionStorage.getItem('continuum-abrir-guia'), '1', 'y deja pedida la Guía');
-    assert.ok(!w.document.getElementById('splash-actions'), 'los controles dejan paso');
+    const capa = w.document.querySelector('#app-splash .splash-video');
+    assert.ok(capa?.querySelector('[data-tutorial]'), 'el vídeo se reproduce sobre la portada');
+    assert.equal(pedido.opciones?.portada, true, 'en su versión de portada, sin manual debajo');
+    assert.ok(!abierto && w.document.getElementById('splash-play'), 'sin entrar en el juego: «Jugar» sigue esperando');
+    capa.querySelector('[data-tutorial]').dispatchEvent(new w.CustomEvent('tutorial-end', {bubbles: true}));
+    advance(1600);
+    assert.ok(!w.document.querySelector('.splash-video'), 'al terminar, vuelve sola a la portada');
+    assert.ok(!abierto && w.document.getElementById('splash-play'), 'y «Jugar» sigue ahí');
+    guia.click();
+    w.document.querySelector('.splash-video-close').click();
+    assert.ok(!w.document.querySelector('.splash-video'), 'también se puede cerrar antes de que acabe');
+    w.document.getElementById('splash-play').click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(abierto, '«Jugar» entra en el juego como siempre');
   } finally { w.close(); }
 }
 {

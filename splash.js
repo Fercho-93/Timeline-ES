@@ -155,8 +155,8 @@
       button.type = 'button';
       button.className = 'splash-play';
       button.textContent = 'Jugar';
-      // Bajo «Jugar», un enlace discreto para quien quiere ver antes cómo se juega: entra
-      // igual (y enciende igual la música) y, ya dentro, abre la Guía con su vídeo.
+      // Bajo «Jugar», un enlace discreto para quien quiere ver antes cómo se juega: reproduce
+      // la guía en vídeo aquí mismo y, al terminar, se vuelve a esta portada.
       const guide = document.createElement('button');
       guide.id = 'splash-guide';
       guide.type = 'button';
@@ -179,12 +179,44 @@
       resolve();
     };
     button.addEventListener('click', enter, { once: true });
-    document.getElementById('splash-guide')?.addEventListener('click', () => {
-      try { sessionStorage.setItem('continuum-abrir-guia', '1'); } catch { /* sin almacenamiento: entra sin abrirla */ }
-      enter();
-    }, { once: true });
+    document.getElementById('splash-guide')?.addEventListener('click', () => verVideo(el));
     try { button.focus({ preventScroll: true }); } catch { /* Sin foco también se pulsa. */ }
   });
+  // La guía en vídeo, a pantalla completa sobre la portada. No entra en el juego: al terminar
+  // (o al cerrarla) se vuelve a la portada, con «Jugar» esperando.
+  const verVideo = el => {
+    const CT = window.CONTINUUM;
+    if (!CT?.Tutorial || el.querySelector('.splash-video')) return;
+    let modeKey = null;
+    try { modeKey = CT.Storage?.getItem('hilo-selected-mode-v1'); } catch { /* sin almacenamiento */ }
+    const video = CT.Tutorial.markup(CT.has?.(modeKey) ? modeKey : CT.DEFAULT_MODE, { portada: true });
+    if (!video) return;
+    const capa = document.createElement('div');
+    capa.className = 'splash-video';
+    capa.setAttribute('role', 'dialog');
+    capa.setAttribute('aria-modal', 'true');
+    capa.setAttribute('aria-label', 'Cómo se juega');
+    capa.innerHTML = `<div class="splash-video-head"><button type="button" class="splash-video-close" aria-label="Volver a la portada">←</button><span>Cómo se juega</span></div>${video}`;
+    const volver = () => {
+      capa.querySelector('[data-tutorial]')?.tutorial?.stop();
+      document.removeEventListener('keydown', escape);
+      capa.remove();
+      el.classList.remove('splash-viendo');
+      try { document.getElementById('splash-guide')?.focus({ preventScroll: true }); } catch { /* sin foco */ }
+    };
+    const escape = event => { if (event.key === 'Escape') volver(); };
+    capa.querySelector('.splash-video-close').addEventListener('click', volver);
+    // Al acabar se deja ver un instante el cierre y se vuelve solo a la portada.
+    // Si en ese instante se pulsa «Ver otra vez», el vídeo sigue y no se cierra.
+    capa.addEventListener('tutorial-end', () => setTimeout(() => {
+      if (capa.isConnected && capa.querySelector('[data-tutorial]')?.tutorial?.state().ended !== false) volver();
+    }, 1600));
+    document.addEventListener('keydown', escape);
+    el.classList.add('splash-viendo');
+    el.append(capa);
+    CT.Tutorial.mountAll(capa);
+    try { capa.querySelector('.splash-video-close').focus({ preventScroll: true }); } catch { /* sin foco */ }
+  };
   // Segundo telón, ya con la música sonando: ahora sí se está montando la partida.
   const entering = (text = 'Entrando al juego…') => {
     const el = splash();
