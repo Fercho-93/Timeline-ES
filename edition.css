@@ -5676,27 +5676,34 @@ html #app[data-screen] .setup-art-panel .setup-time-icon { width: 24px; height: 
     linear-gradient(125deg, var(--edition-surface), var(--edition-paper));
 }
 
-/* Guardar el punto de la aventura: cuaderno con cinta, junto a los datos de la partida. */
+/* Partida guardada: una lámina compacta, con el cuaderno fundido en el papel. */
 #app .solo-shortcut-resume {
-  grid-template-columns: minmax(0, 1fr) 112px; gap: 12px; min-height: 144px;
+  position: relative; isolation: isolate; display: block; overflow: hidden;
+  width: min(calc(100% - 16px), 620px); min-height: 116px; margin-inline: auto;
+  padding: 16px 18px; text-align: left;
 }
-#app .solo-shortcut-resume .solo-shortcut-copy { grid-column: 1; grid-row: 1; }
-#app .solo-shortcut-resume .solo-shortcut-arrow {
-  position: relative; display: block; align-self: center; width: 112px; height: 112px;
-  border: 0; border-radius: 0; background: none; box-shadow: none;
+#app .solo-shortcut-resume .solo-shortcut-copy {
+  position: relative; z-index: 1; display: block; width: 74%; min-width: 0;
+}
+#app .solo-shortcut-resume .solo-resume-art {
+  position: absolute; z-index: 0; inset: 0 0 0 auto; width: 48%;
+  display: block; pointer-events: none; opacity: .92;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 48%);
+  mask-image: linear-gradient(90deg, transparent, #000 48%);
 }
 #app .solo-shortcut-resume .solo-resume-illustration {
-  display: block; width: 112px; height: 80px; object-fit: contain;
-  filter: drop-shadow(0 4px 3px #63432320); pointer-events: none;
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: 60% center;
+  filter: drop-shadow(0 4px 3px #63432318);
 }
-#app .solo-shortcut-resume .solo-shortcut-arrow > i {
-  position: absolute; right: 0; bottom: 0; display: grid; place-items: center;
-  width: 28px; height: 28px; border: 1px solid var(--edition-line); border-radius: 50%;
-  background: color-mix(in srgb, var(--edition-brass) 8%, var(--edition-surface));
-  color: var(--edition-brass); font: normal 1.1rem/1 var(--ui-font);
+#app .solo-shortcut-resume .solo-shortcut-arrow {
+  position: absolute; z-index: 2; right: 12px; bottom: 10px;
+  display: grid; place-items: center; width: 26px; height: 26px;
+  border: 1px solid var(--edition-line); border-radius: 50%;
+  background: color-mix(in srgb, var(--edition-surface) 85%, transparent);
+  color: var(--edition-brass); font: normal 1.05rem/1 var(--ui-font);
 }
 @media (max-width: 360px) {
-  #app .solo-shortcut-resume { grid-template-columns: minmax(0, 1fr) 88px; gap: 10px; padding: 17px 16px; }
-  #app .solo-shortcut-resume .solo-shortcut-arrow { width: 88px; height: 96px; }
-  #app .solo-shortcut-resume .solo-resume-illustration { width: 88px; height: 64px; }
+  #app .solo-shortcut-resume { padding: 15px 16px; }
+  #app .solo-shortcut-resume .solo-shortcut-copy { width: 76%; }
+  #app .solo-shortcut-resume .solo-shortcut-copy b { font-size: 1.05rem; }
 }
