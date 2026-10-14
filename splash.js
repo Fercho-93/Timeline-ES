@@ -52,10 +52,10 @@
     setTimeout(settle, 3600);
   };
 
-  // La caja del juego. La primera vez que alguien abre Continuum en un dispositivo no entra
-  // de golpe en la portada: recibe la caja del juego, cerrada, y la abre con un toque. Al
-  // abrirla sale la luz, salen las cartas y la cámara entra en la caja: ahí empieza la
-  // intro de siempre. Solo esa primera vez; después se recuerda y la portada abre directa.
+  // El cofre del juego. La primera vez que alguien abre Continuum en un dispositivo no entra
+  // de golpe en la portada: está en cubierta, en alta mar, con un cofre cerrado que se abre con
+  // un toque. Al abrirlo sale la luz, salen las cartas y la cámara entra en el cofre: ahí empieza
+  // la intro de siempre. Solo esa primera vez; después se recuerda y la portada abre directa.
   const CAJA = 'continuum-caja-abierta-v1';
   const CAJA_ABRE = 2750, CAJA_SE_VA = 500;
   let quitaCaja = null, esperandoJugar = false;
@@ -76,29 +76,80 @@
   const conCaja = tocaCaja();
   if (conCaja) root.classList.add('splash-caja');
   const CARTAS = ['assets/splash-card-marathon.webp', 'assets/splash-card-hippocrates.webp', 'assets/splash-card-vesuvius.webp'];
+  // El mar, dibujado: cielo, sol bajo, tierra al fondo, oleaje, la borda del barco y la
+  // cubierta de tablones en perspectiva. Un solo SVG que se recorta por el centro en
+  // cualquier pantalla (todo lo importante está en la franja central).
+  const mar = () => {
+    const ola = (y, n = 16) => `M-120 ${y}` + Array.from({ length: n }, () => ' q40 -7 80 0 t80 0').join('');
+    const postes = [60, 300, 540, 780, 1020, 1260];
+    const cuerda = postes.slice(0, -1).map((x, i) => `<path d="M${x + 7} 522 Q${(x + postes[i + 1]) / 2} 556 ${postes[i + 1] - 7} 522"/>`).join('');
+    const tablas = Array.from({ length: 15 }, (_, i) => {
+      const k = (i - 7) * .19, k2 = (i - 6) * .19;
+      const x1 = 600 + k * 315, x2 = 600 + k * 500, x3 = 600 + k2 * 500, x4 = 600 + k2 * 315;
+      return `<polygon points="${x1},615 ${x2},800 ${x3},800 ${x4},615" fill="${['#8c5a33', '#7e4f2a', '#946239'][i % 3]}"/>`;
+    }).join('');
+    return `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="cf-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7aa5c2"/><stop offset=".55" stop-color="#bdd5de"/><stop offset="1" stop-color="#f4dcb0"/></linearGradient>
+        <radialGradient id="cf-sol"><stop offset="0" stop-color="#fff7d6"/><stop offset=".35" stop-color="#ffe9a8" stop-opacity=".9"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+        <linearGradient id="cf-mar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86b7c8"/><stop offset=".3" stop-color="#4a8ca6"/><stop offset="1" stop-color="#22607b"/></linearGradient>
+        <linearGradient id="cf-tierra" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93a7b2"/><stop offset="1" stop-color="#6c8591"/></linearGradient>
+        <linearGradient id="cf-madera" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5713f"/><stop offset="1" stop-color="#6b4323"/></linearGradient>
+        <radialGradient id="cf-vineta" cx=".5" cy=".55" r=".72"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#1a0e05" stop-opacity=".5"/></radialGradient>
+      </defs>
+      <rect width="1200" height="420" fill="url(#cf-cielo)"/>
+      <circle cx="640" cy="330" r="130" fill="url(#cf-sol)"/><circle cx="640" cy="330" r="36" fill="#fff6d8"/>
+      <g class="nube" fill="#fff9ee" opacity=".82"><ellipse cx="250" cy="150" rx="90" ry="26"/><ellipse cx="300" cy="135" rx="60" ry="30"/><ellipse cx="200" cy="140" rx="50" ry="22"/></g>
+      <g class="nube nube-2" fill="#fff9ee" opacity=".7"><ellipse cx="900" cy="210" rx="110" ry="24"/><ellipse cx="950" cy="195" rx="70" ry="30"/><ellipse cx="850" cy="200" rx="55" ry="20"/></g>
+      <g class="gaviota" fill="none" stroke="#3f4a52" stroke-width="2.4" stroke-linecap="round"><path d="M380 180q12-12 24 0q12-12 24 0"/><path d="M440 160q9-9 18 0q9-9 18 0"/></g>
+      <g class="gaviota gaviota-2" fill="none" stroke="#3f4a52" stroke-width="2" stroke-linecap="round"><path d="M760 230q10-10 20 0q10-10 20 0"/></g>
+      <path fill="url(#cf-tierra)" stroke="#4d5e6a" stroke-width="1.5" d="M-10 414 L-10 392 C60 372 120 362 190 374 C240 382 280 366 330 384 C370 398 420 404 470 412 Z"/>
+      <path fill="url(#cf-tierra)" stroke="#4d5e6a" stroke-width="1.5" d="M820 413 C860 394 900 386 950 394 C990 400 1030 388 1070 398 C1100 404 1150 410 1210 412 L1210 416 L820 416Z"/>
+      <path fill="#8ea3af" stroke="#56687400" stroke-width="1.3" d="M300 413 C360 398 410 386 470 392 C520 397 560 380 610 388 C660 396 700 386 745 393 C800 401 850 408 900 413 Z"/>
+      <path d="M736 400 L739 380 L746 380 L749 400Z" fill="#f1e6cf" stroke="#4d5e6a" stroke-width="1.2"/><rect x="738" y="375" width="9" height="6" fill="#b43f2a"/>
+      <path d="M1000 398 L1004 370 L1013 370 L1017 398Z" fill="#f1e6cf" stroke="#4d5e6a" stroke-width="1.2"/><rect x="1003" y="364" width="11" height="7" fill="#b43f2a"/>
+      <rect y="410" width="1200" height="200" fill="url(#cf-mar)"/>
+      <g class="destello" fill="#fff4cf"><ellipse cx="640" cy="424" rx="36" ry="2"/><ellipse cx="628" cy="438" rx="22" ry="2"/><ellipse cx="652" cy="452" rx="30" ry="2.2"/><ellipse cx="636" cy="470" rx="18" ry="2"/><ellipse cx="648" cy="490" rx="26" ry="2.4"/></g>
+      <g class="ola" fill="none" stroke="#dbeef3" stroke-opacity=".55" stroke-width="2"><path d="${ola(432)}"/><path d="${ola(452)}"/></g>
+      <g class="ola ola-2" fill="none" stroke="#d2e8ee" stroke-opacity=".45" stroke-width="2.4"><path d="${ola(478)}"/><path d="${ola(500)}"/></g>
+      <g class="ola ola-3" fill="none" stroke="#c6e0e8" stroke-opacity=".35" stroke-width="3"><path d="${ola(528)}"/><path d="${ola(560)}"/></g>
+      <g stroke="#2b1a0e" stroke-width="2">
+        ${postes.map(x => `<rect x="${x - 8}" y="506" width="16" height="80" fill="#5a3a20"/>`).join('')}
+        <rect x="-10" y="500" width="1220" height="18" rx="4" fill="url(#cf-madera)"/>
+        <rect x="-10" y="580" width="1220" height="42" fill="#7d5231"/><line x1="-10" y1="600" x2="1210" y2="600" stroke="#5a3a20" stroke-width="1.5"/>
+      </g>
+      <g fill="none" stroke="#d6b57c" stroke-width="5" stroke-linecap="round">${cuerda}</g>
+      <rect y="615" width="1200" height="185" fill="#85552f"/>
+      <g stroke="#3a2210" stroke-width="1.2">${tablas}</g>
+      <g transform="translate(340 752) scale(1 .45)" fill="none" stroke="#5a3a20" stroke-width="11"><circle r="58"/><circle r="42"/><circle r="26"/><circle r="11"/></g>
+      <g transform="translate(340 752) scale(1 .45)" fill="none" stroke="#cfae72" stroke-width="7"><circle r="58"/><circle r="42"/><circle r="26"/><circle r="11"/></g>
+      <rect width="1200" height="800" fill="url(#cf-vineta)"/>
+    </svg>`;
+  };
   const montaCaja = el => {
-    // Mientras la caja espera un toque no corre el aviso de carga lenta: se espera a una persona.
+    // Mientras el cofre espera un toque no corre el aviso de carga lenta: se espera a una persona.
     clearTimeout(timeout);
     const escena = document.createElement('div');
     escena.className = 'splash-caja-escena';
-    escena.innerHTML = `<div class="caja-mundo"><div class="caja-zoom">
-      <p class="caja-etiqueta">Tu copia de <b>Continuum</b></p>
-      <div class="caja-mesa"><i class="caja-sombra"></i><i class="caja-rayos"></i>
-        <span class="caja-cae"><div class="caja" role="button" tabindex="0" aria-label="Abrir la caja de Continuum">
-          <span class="caja-cuerpo">
-            <i class="caja-cara caja-suelo"></i><i class="caja-luz"></i>
-            <i class="caja-cara caja-atras"></i><i class="caja-cara caja-izquierda"></i><i class="caja-cara caja-derecha"></i><i class="caja-cara caja-frente"><em>Juego de ordenar</em></i>
-          </span>
-          <span class="caja-cartas">${CARTAS.map((src, i) => `<i class="caja-carta" style="--n:${i}"><img src="${src}" alt="" /></i>`).join('')}</span>
-          <span class="caja-tapa">
-            <i class="caja-cara caja-tapa-arriba"><img src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" /><b>Continuum</b><small>Ordena. Compara. Descubre.</small></i><i class="caja-cara caja-tapa-dentro"></i>
-            <i class="caja-cara caja-tapa-atras"></i><i class="caja-cara caja-tapa-izquierda"></i><i class="caja-cara caja-tapa-derecha"></i><i class="caja-cara caja-tapa-frente"></i>
-          </span>
-          <i class="caja-sello"></i>
-        </div></span>
-      </div>
-      <p class="caja-pista">Toca la caja para abrirla</p>
-    </div></div>`;
+    escena.innerHTML = `<div class="cofre-mar">${mar()}</div>
+      <p class="caja-etiqueta">Rumbo a <b>Continuum</b></p>
+      <div class="caja-mundo"><div class="caja-zoom">
+        <div class="caja-mesa"><i class="caja-sombra"></i><i class="caja-rayos"></i>
+          <span class="caja-cae"><div class="caja" role="button" tabindex="0" aria-label="Abrir el cofre de Continuum">
+            <span class="caja-cuerpo">
+              <i class="caja-cara caja-suelo"></i><i class="caja-luz"></i>
+              <i class="caja-cara caja-atras"></i><i class="caja-cara caja-izquierda"></i><i class="caja-cara caja-derecha"></i><i class="caja-cara caja-frente"></i>
+            </span>
+            <span class="caja-cartas">${CARTAS.map((src, i) => `<i class="caja-carta" style="--n:${i}"><img src="${src}" alt="" /></i>`).join('')}</span>
+            <span class="caja-tapa">
+              <i class="caja-cara caja-tapa-arriba"><img src="assets/continuum-emblem-800.webp" alt="" width="800" height="533" /></i><i class="caja-cara caja-tapa-dentro"></i>
+              <i class="caja-cara caja-tapa-atras"></i><i class="caja-cara caja-tapa-izquierda"></i><i class="caja-cara caja-tapa-derecha"></i><i class="caja-cara caja-tapa-frente"></i>
+            </span>
+            <i class="caja-sello"></i>
+          </div></span>
+        </div>
+      </div></div>
+      <p class="caja-pista">Toca el cofre para abrirlo</p>`;
     el.append(escena);
     let abierta = false;
     const abre = () => {
