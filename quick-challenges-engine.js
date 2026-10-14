@@ -90,5 +90,7 @@
     for (let index = 0; index <= s.timeline.length; index++) if (!CT.Engine.fits(s.timeline, cardId, index, value)) return {type: 'place', cardId, index};
     return {type: 'place', cardId, index: 0};
   }
-  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement};
+  // Partidas con más de una persona (sala, mesa pública, un solo móvil, duelo): siempre 10 cartas al azar del mazo.
+  const MULTI_CARDS = 10;
+  CT.QuickEngine = {create, step, restore, challenge, keepPlaying, timeoutPlacement, MULTI_CARDS};
 })();

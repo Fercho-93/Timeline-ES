@@ -137,7 +137,7 @@ async function watchPublic({uid,code,seconds,length,keep,queueRef:qref=null,onCh
     started=true;
     const catalog=CT.shuffle(CT.QuickCatalog.challenges).slice(0,tableLength);
     const first=R.starterOrder(latest)?.[0];
-    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id))})),kind:'public',historyId:'public-'+code,keep:tableKeep,...(tableSeconds?{seconds:tableSeconds}:{}),...(Number.isInteger(first)?{first}:{})}).catch(e=>{setTimeout(()=>{started=false;},2000);});
+    api.act({type:'start',rounds:catalog.map(x=>({id:x.id,order:CT.shuffle(x.cards.map(c=>c.id)).slice(0,CT.QuickEngine.MULTI_CARDS)})),kind:'public',historyId:'public-'+code,keep:tableKeep,...(tableSeconds?{seconds:tableSeconds}:{}),...(Number.isInteger(first)?{first}:{})}).catch(e=>{setTimeout(()=>{started=false;},2000);});
   };
   const stop=onSnapshot(ref,snap=>{try{if(!snap.exists())throw Error('La mesa ya no existe.');latest=R.validate(snap.data());onChange(latest,uid,code);syncTable();tryStart();
   }catch(e){onError(e);}},onError);

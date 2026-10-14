@@ -85,12 +85,12 @@
   let previewCode=null, serverRoom=null, duelRoom=false, duelStarting=false, duelFirst=0, justJoined=false, backTo=null, pendingInvite=null;
   function stopNetwork() {quickClock?.stop();quickClock=null;clearInterval(publicClock);publicClock=null;networkEpoch++;connection?.close();connection=null;room=null;serverRoom=null;myId=null;busy=false;invite=null;duelRoom=false;duelStarting=false;justJoined=false;}
   function errorNotice(e) {busy=false;const message=e?.code==='permission-denied'||/missing or insufficient permissions/i.test(e?.message||'')?'No se pudo guardar el cambio en el duelo. Vuelve a abrirlo e inténtalo de nuevo.':e.message || String(e);let el=app().querySelector('#quick-error');if(!el){el=document.createElement('p');el.id='quick-error';el.setAttribute('role','alert');(app().querySelector('.modal') || app().querySelector('.quick-shell'))?.append(el);}if(el)el.textContent=message;CT.announce(message);}
-  function rounds(count=3, selectedId=null, seed=null) {
-    const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed));
-    if (selectedId) return [E.challenge(selectedId)].map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
+  function rounds(count=3, selectedId=null, seed=null, limit=0) {
+    const random=seed===null?Math.random:CT.seededRandom(CT.seedFrom(seed)), deal=c=>{const ids=CT.shuffleWith(c.cards.map(x=>x.id),random);return limit?ids.slice(0,limit):ids;};
+    if (selectedId) return [E.challenge(selectedId)].map(c=>({id:c.id,order:deal(c)}));
     const catalog=CT.shuffleWith(CT.QuickCatalog.challenges,random);
     const list=Array.from({length:count},(_,i)=>catalog[i % catalog.length]);
-    return list.map(c=>({id:c.id,order:CT.shuffleWith(c.cards.map(x=>x.id),random)}));
+    return list.map(c=>({id:c.id,order:deal(c)}));
   }
   function begin(config) {pendingConfig=null;config.historyId ||= historyId();record={version:CT.QuickCatalog.version,config,commands:[],startedAt:Date.now()};state=E.create(config);selected=null;slot=null;save();render();}
   function prepare(config) {
@@ -383,7 +383,7 @@
     }
     else {
       lobby(code || connection?.code);
-      if(duelRoom && myId===room.host && !duelStarting){duelStarting=true;void networkAction({type:'start',rounds:rounds(roomLength||3),kind:'duel',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),first:duelFirst}).then(()=>{duelStarting=false;});}
+      if(duelRoom && myId===room.host && !duelStarting){duelStarting=true;void networkAction({type:'start',rounds:rounds(roomLength||3,null,null,E.MULTI_CARDS),kind:'duel',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),first:duelFirst}).then(()=>{duelStarting=false;});}
     }
   }
   // Mesa pública de Retos rápidos: la misma sala de espera que en Grandes colecciones.
@@ -705,7 +705,7 @@
     if(action==='share-duel'){await CT.LocalShare.shareSignal(duelLink());return true;}
     if(action==='live-room'){const net=app().querySelector('input[name="quick-live-net"]:checked')?.value||liveNet();netKind=net==='wifi'?'local':'internet';await connectRoom(true);return true;}
     if(action==='create-room'||action==='join-room'){justJoined=action==='join-room';await connectRoom(action==='create-room');return true;}
-    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count),kind:(room?.capacity||roomCapacity)===2?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...((room?.capacity||roomCapacity)===2?{first:duelFirst}:(()=>{const order=room?CT.QuickRoom.starterOrder(room):null;return Number.isInteger(order?.[0])?{first:order[0]}:{};})())});return true;}
+    if(action==='start-room'){const count=Number(app().querySelector('#quick-net-length')?.value)||roomLength||3;await networkAction({type:'start',rounds:rounds(count,null,null,E.MULTI_CARDS),kind:(room?.capacity||roomCapacity)===2?'duel':'network',historyId:historyId(),keep:duelKeep(),seconds:CT.Tiempo.get('amigos',15),...((room?.capacity||roomCapacity)===2?{first:duelFirst}:(()=>{const order=room?CT.QuickRoom.starterOrder(room):null;return Number.isInteger(order?.[0])?{first:order[0]}:{};})())});return true;}
     if(action==='rematch-room'){
       const cfg=state.config, me=state.players[room.members.indexOf(myId)].name, other=room.members.find(m=>m!==myId);
       await createDuelRoom({renderPage:paint,name:me,length:cfg.rounds.length,keep:cfg.keep!==false,iStart:me!==cfg.names[cfg.first||0],invite:other?{uid:other,name:room.names[room.members.indexOf(other)]}:null,back:backTo});
@@ -1104,7 +1104,7 @@
     }
     if (action === 'start-duel') {
       const count=Number(app().querySelector('#quick-free-length')?.value) || 3, seed=historyId();
-      prepare({names:['Tú'],rounds:rounds(count,null,seed),kind:'duel',keep:true,seed,length:count,seconds:CT.Tiempo.chosen('amigos',15)}); return;
+      prepare({names:['Tú'],rounds:rounds(count,null,seed,E.MULTI_CARDS),kind:'duel',keep:true,seed,length:count,seconds:CT.Tiempo.chosen('amigos',15)}); return;
     }
     if (action === 'solo-mode') {setSoloMode(target.dataset.mode==='surprise'?'surprise':'day'); CT.Effects?.tap?.(); CT.Effects?.transition?.('page'); return;}
     if (action === 'collection') {collectionPage(target.dataset.deck || null); return;}
@@ -1136,8 +1136,8 @@
       let ordered = names;
       if (format === 'local' && starter && starter.key === names.join('|')) ordered = starter.order.map(i => names[i]);
       const count = Number(app().querySelector('#quick-length').value);
-      const list = rounds(count).map(round => E.challenge(round.id));
-      const config = {names: ordered, rounds: list.map(c => ({id: c.id, order: CT.shuffle(c.cards.map(item => item.id))})),kind:format,historyId:historyId(),seconds:CT.Tiempo.chosen(format === 'local' ? 'quick-local' : 'quick-solo'),...(format === 'local' && names.length > 1 ? {keep: duelKeep()} : {})};
+      const list = rounds(count).map(round => E.challenge(round.id)), multi = format === 'local' && names.length > 1;
+      const config = {names: ordered, rounds: list.map(c => ({id: c.id, order: multi ? CT.shuffle(c.cards.map(item => item.id)).slice(0, E.MULTI_CARDS) : CT.shuffle(c.cards.map(item => item.id))})),kind:format,historyId:historyId(),seconds:CT.Tiempo.chosen(format === 'local' ? 'quick-local' : 'quick-solo'),...(format === 'local' && names.length > 1 ? {keep: duelKeep()} : {})};
       record = {version: CT.QuickCatalog.version, config, commands: []}; state = E.create(config);
       save(); selected = null; slot = null; render(); return;
     }
