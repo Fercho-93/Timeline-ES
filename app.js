@@ -608,6 +608,17 @@
     }
   }
 
+  // La portada deja la petición de «Ver el manual» para cuando el juego ya esté pintado. Se lee
+  // una sola vez al arrancar: si se entra por una invitación, la petición se descarta.
+  let guiaPendiente = (() => {
+    try {
+      const pedida = sessionStorage.getItem("continuum-abrir-guia") === "1";
+      sessionStorage.removeItem("continuum-abrir-guia");
+      return pedida;
+    } catch { return false; }
+  })();
+  const guiaPedida = () => { const pedida = guiaPendiente; guiaPendiente = false; return pedida; };
+
   async function bienvenidaNombreEnviado(boton) {
     const nombre = CT.Identidad.limpia(document.getElementById("bienvenida-nombre")?.value);
     bienvenidaNombre = nombre;
@@ -623,7 +634,8 @@
     bienvenidaNombre = "";
     home();
     // Quien empieza de cero ve primero la guía en vídeo; una sola vez, aunque la cierre antes de acabar.
-    if (CT.Tutorial && !CT.Tutorial.seen()) { CT.Tutorial.markSeen(); rules(); }
+    // También quien la pidió en la portada con «Ver el manual».
+    if (guiaPedida() || (CT.Tutorial && !CT.Tutorial.seen())) { CT.Tutorial?.markSeen(); rules(); }
   }
 
   // La portada tiene dos puertas y nada más: jugar y el reto del día (el atlas vive en la barra). Encima,
@@ -4617,7 +4629,6 @@
   const duelPayload = params.get("duelo") || "";
   const turnDuelId = params.get("turnoduelo") || "";
   CT.openQuickChallenges = quickChallenges;
-  CT.openGuide = rules;
   if (params.has("quick-room") || params.has("quick-duel")) quickChallenges({quickRoom: params.get("quick-room"), quickDuel: params.get("quick-duel")});
   else if (invitedRoom) launchOnline(invitedRoom);
   else if (turnDuelId) turnDuelReady.then(() => CT.TurnDuel?.open({ gameId: turnDuelId, mode: selectedModeKey, back: home }));
@@ -4626,6 +4637,10 @@
     if (leido.ok) { pendingDuel = leido.duelo; duelIntro(); }
     else duelInvalido(leido.motivo, leido.mode);
   } else if (!CT.Identidad.reconoce()) bienvenida();
-  else if (!restoreView()) home();
+  else {
+    if (!restoreView()) home();
+    // «Ver el manual» en la portada: ya dentro, la Guía se abre con su vídeo.
+    if (guiaPedida()) rules();
+  }
   sincronizaNombrePendiente();
 })();

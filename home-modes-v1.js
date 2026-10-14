@@ -29,33 +29,6 @@
     </button>`;
   }
 
-  // Al pie de los caminos, una entrada discreta a la guía en vídeo: al tocarla se despliega
-  // aquí mismo y empieza a reproducirse, sin salir de Inicio.
-  function tutorialDoor() {
-    if (!window.CONTINUUM?.Tutorial) return '';
-    return `<div class="mode-tutorial">
-      <button type="button" class="mode-tutorial-toggle" data-home-tutorial aria-expanded="false" aria-controls="mode-tutorial-player">
-        <span class="mode-tutorial-thumb" aria-hidden="true"><span class="mtt-line"><i></i><i></i><i></i></span><span class="mtt-card"></span><span class="mtt-play">▶</span></span>
-        <span class="mode-tutorial-copy"><small>¿Primera vez?</small><b>Mira cómo se juega</b><em>Guía en vídeo · haz tú la jugada</em></span>
-        <span class="mode-tutorial-chevron" aria-hidden="true">⌄</span>
-      </button>
-      <div class="mode-tutorial-player" id="mode-tutorial-player" hidden></div>
-    </div>`;
-  }
-
-  function toggleTutorial(button, open = button.getAttribute('aria-expanded') !== 'true') {
-    const CT = window.CONTINUUM;
-    const holder = button.parentElement.querySelector('.mode-tutorial-player');
-    button.setAttribute('aria-expanded', String(open));
-    button.parentElement.classList.toggle('is-open', open);
-    if (!open) { holder.querySelector('[data-tutorial]')?.tutorial?.stop(); holder.innerHTML = ''; holder.hidden = true; return; }
-    const modeKey = CT.Storage?.getItem('hilo-selected-mode-v1');
-    holder.innerHTML = CT.Tutorial.markup(CT.has(modeKey) ? modeKey : CT.DEFAULT_MODE);
-    holder.hidden = false;
-    CT.Tutorial.mountAll(holder);
-    button.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-  }
-
   function dailyFamily() {
     const d=new Date(), stamp=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
     const n=Number(stamp);
@@ -94,7 +67,7 @@
       modeDoor('solo-hub', modeArt['solo-hub'], 'Jugar solo', 'Colecciones, retos rápidos o competición.', true),
       modeDoor('friends-hub', modeArt['friends-hub'], 'Jugar con amigos', 'En el mismo móvil o cada uno en el suyo.'),
       modeDoor('online-hub', modeArt['online-hub'], 'Jugar online', 'Encuentra jugadores en una mesa pública.')
-    ].join('').replaceAll('loading="lazy"', 'loading="eager"') + tutorialDoor(); // decodificadas de antemano: si no, se pintan al desplegar y la tarjeta «Jugar» parpadea
+    ].join('').replaceAll('loading="lazy"', 'loading="eager"'); // decodificadas de antemano: si no, se pintan al desplegar y la tarjeta «Jugar» parpadea
     choices.setAttribute('aria-hidden', String(!playExpanded));
     choices.inert = !playExpanded;
 
@@ -360,16 +333,12 @@
   }
 
   app.addEventListener('click', event => {
-    const tutorialToggle = event.target.closest('[data-home-tutorial]');
-    if (tutorialToggle) { event.preventDefault(); toggleTutorial(tutorialToggle); return; }
     const playToggle = event.target.closest('[data-action="toggle-modes"]');
     if (playToggle && app.dataset.screen === 'home') {
       event.preventDefault();
       event.stopImmediatePropagation();
       playExpanded = !playExpanded;
       playToggle.setAttribute('aria-expanded', String(playExpanded));
-      const tutorialOpen = app.querySelector('[data-home-tutorial][aria-expanded="true"]');
-      if (!playExpanded && tutorialOpen) toggleTutorial(tutorialOpen, false);
       const choices = app.querySelector('#home-mode-choices');
       const reveal = choices.parentElement;
       // Todo lo que va debajo del despliegue («Unirme a una partida» y el reto diario) se

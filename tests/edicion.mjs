@@ -103,7 +103,7 @@ for (const [userAgent, expected] of [['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 l
 // Reloj virtual: la lectura mínima, el arranque lento y el límite de espera
 // se comprueban sin hacer esperar veinte segundos a cada ejecución.
 function splashClock(reduce = false) {
-  const w = new JSDOM('<div id="app-splash"></div><main id="app">Juego listo</main>', {runScripts:'outside-only'}).window;
+  const w = new JSDOM('<div id="app-splash"></div><main id="app">Juego listo</main>', {runScripts:'outside-only', url:'https://continuum.test/'}).window;
   let time = 0, id = 0;
   const timers = new Map();
   w.performance.now = () => time;
@@ -179,6 +179,25 @@ for (const reduce of [false, true]) {
     advance(1199); assert.ok(active(), 'el segundo telón se ve un momento');
     advance(1); advance(1100);
     assert.ok(!active(), 'y se disuelve sin repetir la lectura entera de la portada');
+  } finally { w.close(); }
+}
+{
+  // «Ver el manual», bajo «Jugar»: un enlace discreto que entra igual y deja pedida la Guía.
+  const {w} = splashClock();
+  try {
+    w.CONTINUUM = { effectPrefs: () => ({ambience: false}), setAmbience() {} };
+    let abierto = false;
+    w.CONTINUUM_SPLASH.gate().then(() => { abierto = true; });
+    await new Promise(resolve => setImmediate(resolve));
+    const guia = w.document.getElementById('splash-guide');
+    assert.ok(guia && guia.tagName === 'BUTTON' && guia.textContent === 'Ver el manual', 'la portada ofrece ver el manual');
+    assert.equal(guia.previousElementSibling?.id, 'splash-play', 'justo debajo de «Jugar»');
+    assert.equal(w.sessionStorage.getItem('continuum-abrir-guia'), null);
+    guia.click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(abierto, 'entra en el juego igual que «Jugar»');
+    assert.equal(w.sessionStorage.getItem('continuum-abrir-guia'), '1', 'y deja pedida la Guía');
+    assert.ok(!w.document.getElementById('splash-actions'), 'los controles dejan paso');
   } finally { w.close(); }
 }
 {

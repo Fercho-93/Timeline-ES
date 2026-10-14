@@ -61,26 +61,6 @@ function partida(w) {
   click(w, '[data-action="ready"]');
 }
 
-console.log("\nLa guía en vídeo, también al desplegar «Jugar»");
-{
-  const w = boot();
-  w.CONTINUUM.ModeHubs.refreshHome();
-  const toggle = w.document.querySelector('[data-action="toggle-modes"]');
-  ok("Inicio ofrece «Jugar» desplegable", !!toggle);
-  click(w, '[data-action="toggle-modes"]');
-  const entrada = el(w, '#home-mode-choices [data-home-tutorial]');
-  ok("al pie de los caminos hay una entrada discreta a la guía en vídeo", /Mira cómo se juega/.test(entrada.textContent) && entrada.getAttribute('aria-expanded') === 'false' && !w.document.querySelector('#home-mode-choices [data-tutorial]'));
-  click(w, '[data-home-tutorial]');
-  const video = el(w, '#home-mode-choices [data-tutorial]');
-  ok("al tocarla se despliega ahí mismo y se reproduce", video.dataset.tutorialReady === '1' && video.tutorial.state().playing && entrada.getAttribute('aria-expanded') === 'true' && w.document.getElementById('app').dataset.screen === 'home');
-  click(w, '[data-home-tutorial]');
-  ok("al volver a tocarla se recoge y se detiene", !w.document.querySelector('#home-mode-choices [data-tutorial]') && !video.tutorial.state().playing);
-  click(w, '[data-home-tutorial]');
-  const otra = el(w, '#home-mode-choices [data-tutorial]');
-  click(w, '[data-action="toggle-modes"]');
-  ok("plegar «Jugar» también lo detiene", !otra.tutorial.state().playing && !w.document.querySelector('#home-mode-choices [data-tutorial]'));
-}
-
 console.log("\nEl foco no se pierde al repintar");
 {
   const w = boot();

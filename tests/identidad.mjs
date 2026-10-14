@@ -16,11 +16,12 @@ const guiones = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m =>
 let fail = 0;
 const ok = (label, cond) => { if (!cond) fail++; console.log(`  ${cond ? "ok  " : "FALLA"} ${label}`); };
 
-function boot(almacen = {}) {
+function boot(almacen = {}, sesion = {}) {
   const { window } = new JSDOM(html.replace(/<script src="[^"]*"><\/script>/g, ""), { runScripts: "outside-only", url: "https://hilo.test/" });
   window.scrollTo = () => {};
   window.Element.prototype.scrollIntoView = function () {};
   Object.entries(almacen).forEach(([clave, valor]) => window.localStorage.setItem(clave, valor));
+  Object.entries(sesion).forEach(([clave, valor]) => window.sessionStorage.setItem(clave, valor));
   guiones.forEach(archivo => window.eval(read(archivo)));
   return window;
 }
@@ -88,6 +89,9 @@ console.log("\nLa primera vez: el nombre");
   const vuelta = boot({ ...w.localStorage });
   ok("la segunda vez no se vuelve a preguntar", pantalla(vuelta) === "home");
   ok("ni se abre otra vez la guía", !existe(vuelta, '.overlay'));
+  const conManual = boot({ ...w.localStorage }, { "continuum-abrir-guia": "1" });
+  ok("«Ver el manual» en la portada abre la guía ya dentro", pantalla(conManual) === "home" && existe(conManual, '.overlay [data-tutorial]'));
+  ok("y la petición se consume", conManual.sessionStorage.getItem("continuum-abrir-guia") === null);
 }
 
 console.log("\nQuien ya tenía nombre se reconoce");

@@ -102,17 +102,32 @@
       button.type = 'button';
       button.className = 'splash-play';
       button.textContent = 'Jugar';
-      actions.append(button);
+      // Bajo «Jugar», un enlace discreto para quien quiere ver antes cómo se juega: entra
+      // igual (y enciende igual la música) y, ya dentro, abre la Guía con su vídeo.
+      const guide = document.createElement('button');
+      guide.id = 'splash-guide';
+      guide.type = 'button';
+      guide.className = 'splash-guide';
+      guide.textContent = 'Ver el manual';
+      actions.append(button, guide);
       const elapsed = performance.now() - introStart;
       actions.style.animationDelay = `${Math.max(0, 5000 - elapsed)}ms`;
       sound.style.animationDelay = `${Math.max(0, 5200 - elapsed)}ms`;
       el.append(sound, actions);
     }
-    button.addEventListener('click', () => {
+    let entered = false;
+    const enter = () => {
+      if (entered) return;
+      entered = true;
       actions?.remove();
       document.getElementById('splash-ambience')?.remove();
       el.classList.remove('splash-gate');
       resolve();
+    };
+    button.addEventListener('click', enter, { once: true });
+    document.getElementById('splash-guide')?.addEventListener('click', () => {
+      try { sessionStorage.setItem('continuum-abrir-guia', '1'); } catch { /* sin almacenamiento: entra sin abrirla */ }
+      enter();
     }, { once: true });
     try { button.focus({ preventScroll: true }); } catch { /* Sin foco también se pulsa. */ }
   });
